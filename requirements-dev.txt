@@ -17,5 +17,5 @@ xarray>=0.13
 wheel
 mypy>=0.930
 black[jupyter]==23.3.0
-isort>=5.10
+isort>=5.12
 pygments>=2.7.4 # not directly required, pinned by Snyk to avoid a vulnerability

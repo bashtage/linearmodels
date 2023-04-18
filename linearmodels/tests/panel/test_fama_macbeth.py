@@ -1,10 +1,12 @@
 from itertools import product
+import warnings
 
 import numpy as np
 from numpy.linalg import lstsq
 from numpy.testing import assert_allclose
 import pandas as pd
 import pytest
+from statsmodels.regression.linear_model import OLS
 
 from linearmodels.panel.data import PanelData
 from linearmodels.panel.model import FamaMacBeth
@@ -146,3 +148,31 @@ def test_limited_redundancy():
     mod = FamaMacBeth(data.y, data.x)
     res = mod.fit()
     assert np.any(np.isnan(res.all_params))
+
+
+@pytest.mark.parametrize("just_id", [True, False])
+@pytest.mark.parametrize("use_const", [True, False])
+def test_avg_r2(use_const, just_id):
+    nvar = 10 if not just_id else 3 + int(use_const)
+    mi = pd.MultiIndex.from_product([np.arange(nvar), np.arange(10)])
+    rg = np.random.default_rng(0)
+    n = len(mi)
+    e = rg.standard_normal((n, 3))
+    cols = ["x1", "x2", "x3"]
+    x = pd.DataFrame(e, index=mi, columns=cols)
+    if use_const:
+        const = pd.Series(np.ones(n), index=mi, name="const")
+        x = pd.concat([const, x], axis=1)
+    y = pd.Series(rg.standard_normal(n), index=mi, name="y")
+    res = FamaMacBeth(y, x).fit()
+    z = pd.concat([y, x], axis=1)
+    r2 = []
+    r2_adj = []
+    for _, g in z.groupby(level=1):
+        with warnings.catch_warnings():
+            warnings.simplefilter("ignore")
+            ols_res = OLS(g["y"], g[x.columns]).fit()
+            r2.append(ols_res.rsquared)
+            r2_adj.append(ols_res.rsquared_adj)
+    assert_allclose(np.array(r2).mean(), res.avg_rsquared)
+    assert_allclose(np.array(r2_adj).mean(), res.avg_adj_rsquared)

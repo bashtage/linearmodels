@@ -1165,8 +1165,8 @@ class PanelOLS(_PanelModelBase):
     If both ``entity_effect`` and ``time_effects`` are ``False``, and no other
     effects are included, the model reduces to :class:`PooledOLS`.
 
-    Model supports at most 2 effects.  These can be entity-time, entity-other, time-other or
-    2 other.
+    Model supports at most 2 effects.  These can be entity-time, entity-other,
+    time-other or 2 other.
     """
 
     def __init__(
@@ -1530,8 +1530,8 @@ class PanelOLS(_PanelModelBase):
             warnings.warn(
                 "Using low-memory algorithm to estimate two-way model. Explicitly set "
                 "low_memory=True to silence this message.  Set low_memory=False to use "
-                "the standard algorithm that creates dummy variables for the smaller of "
-                "the number of entities or number of time periods.",
+                "the standard algorithm that creates dummy variables for the smaller "
+                "of the number of entities or number of time periods.",
                 MemoryWarning,
                 stacklevel=3,
             )
@@ -1826,8 +1826,8 @@ class PanelOLS(_PanelModelBase):
             if not self._drop_absorbed:
                 check_absorbed(x, [str(var) for var in self.exog.vars])
             else:
-                # TODO: Need to special case the constant here when determining which to retain
-                # since we always want to retain the constant if present
+                # TODO: Need to special case the constant here when determining which
+                #  to retain since we always want to retain the constant if present
                 retain = not_absorbed(x, self._constant, self._constant_index)
                 if not retain:
                     raise ValueError(
@@ -2982,18 +2982,41 @@ class FamaMacBeth(_PanelModelBase):
             index=wy_df.index,
         )
 
+        has_constant = self.has_constant
+
         def single(z: DataFrame) -> Series:
             exog = z.iloc[:, 1:].values
+            cols = list(z.columns) + ["r2", "adv_r2"]
             if exog.shape[0] < exog.shape[1]:
-                return Series([np.nan] * len(z.columns), index=z.columns)
+                return Series([np.nan] * (len(z.columns) + 2), index=cols)
             dep = z.iloc[:, :1].values
             params, _, rank, _ = _lstsq(exog, dep)
-            if rank != exog.shape[1]:
-                return Series([np.nan] * len(z.columns), index=z.columns)
-            return Series(np.r_[np.nan, params.ravel()], index=z.columns)
+            nexog = exog.shape[1]
+            if rank != nexog:
+                return Series([np.nan] * (len(z.columns) + 2), index=cols)
+            err = dep - exog @ params
+            sse = float(err.T @ err)
+            if has_constant:
+                dep_demean = dep - dep.mean()
+                tss = float(dep_demean.T @ dep_demean)
+            else:
+                tss = float(dep.T @ dep)
+            r2 = 1 - sse / tss
+            nobs = exog.shape[0]
+            if nobs - nexog > 0:
+                adj_r2 = 1 - (sse / (nobs - nexog)) / (tss / (nobs - int(has_constant)))
+            else:
+                adj_r2 = np.nan
+            return Series(np.r_[np.nan, params.ravel(), r2, adj_r2], index=cols)
 
         all_params = yx.groupby(level=1).apply(single)
-        all_params = all_params.iloc[:, 1:]
+        avg_r2 = np.nanmean(all_params.iloc[:, -2])
+        avg_adj_r2_values = all_params.iloc[:, -1]
+        if np.any(np.isfinite(avg_adj_r2_values)):
+            avg_adj_r2 = np.nanmean(avg_adj_r2_values)
+        else:
+            avg_adj_r2 = np.nan
+        all_params = all_params.iloc[:, 1:-2]
         params = np.asarray(all_params.mean(0).values[:, None], dtype=float)
 
         wy = np.asarray(wy_df)
@@ -3057,6 +3080,8 @@ class FamaMacBeth(_PanelModelBase):
                 effects=effects,
                 idiosyncratic=idiosyncratic,
                 all_params=all_params,
+                avg_r2=avg_r2,
+                avg_adj_r2=avg_adj_r2,
             )
         )
         return FamaMacBethResults(res)

@@ -258,7 +258,7 @@ class KernelWeightMatrix(HeteroskedasticWeightMatrix, _HACMixin):
 
     .. math::
 
-      W   & = \hat{\Gamma}_0 + \sum_{i=1}^{n-1} w_i (\hat{\Gamma}_i + \hat{\Gamma}_i^\prime) \\
+      W & = \hat{\Gamma}_0+\sum_{i=1}^{n-1} w_i (\hat{\Gamma}_i+\hat{\Gamma}_i^\prime)
       \hat{\Gamma}_j & = n^{-1}\sum_{i=1}^{n-j} g'_ig_{i+j} \\
       g_i & = (z_{1i}\epsilon_{1i},z_{2i}\epsilon_{2i},\ldots,z_{ki}\epsilon_{ki})
 

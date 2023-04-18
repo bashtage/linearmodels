@@ -910,6 +910,8 @@ class FamaMacBethResults(PanelResults):
     def __init__(self, res: AttrDict):
         super().__init__(res)
         self._all_params = res.all_params
+        self._avg_r2 = res.avg_r2
+        self._avg_adj_r2 = res.avg_adj_r2
 
     @property
     def all_params(self) -> DataFrame:
@@ -922,6 +924,30 @@ class FamaMacBethResults(PanelResults):
             The parameters (nobs, nparam).
         """
         return self._all_params
+
+    @property
+    def avg_rsquared(self) -> float:
+        """
+        The average coefficient of determination
+
+        This value contains the average of the individual adjusted rsquared
+        values across the nobs cross-sectional regressions. An rsquare value
+        is only included in the average if a cross-section has full rank.
+        """
+        return self._avg_r2
+
+    @property
+    def avg_adj_rsquared(self) -> float:
+        """
+        The average coefficient of determination, adjusted for sample size.
+
+        This value contains the average of the individual adjusted rsquared
+        values across the nobs cross-sectional regressions. An rsquare value
+        is only included in the average if a cross-section has full rank and
+        if the number of dependent variables in a cross-section is larger than
+        the number of regressors.
+        """
+        return self._avg_adj_r2
 
 
 class PanelModelComparison(_ModelComparison):
