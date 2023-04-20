@@ -74,10 +74,10 @@
    "cell_type": "code",
    "execution_count": null,
    "metadata": {
-    "scrolled": true,
     "pycharm": {
      "name": "#%%\n"
-    }
+    },
+    "scrolled": true
    },
    "outputs": [],
    "source": [
@@ -792,7 +792,7 @@
     "import pandas as pd\n",
     "\n",
     "res_direct = IV2SLS(\n",
-    "    data[dep], pd.concat([v, data[exog]], 1), data[endog], data[instr]\n",
+    "    data[dep], pd.concat([v, data[exog]], axis=1), data[endog], data[instr]\n",
     ").fit(cov_type=\"unadjusted\")\n",
     "print(res_direct)"
    ]
@@ -1084,7 +1084,8 @@
     "mod = IV2SLS.from_formula(\"lscrap ~ 1 + [hrsemp ~ grant]\", deltas)\n",
     "res_iv = mod.fit(cov_type=\"unadjusted\")\n",
     "n = deltas.shape[0]\n",
-    "res_iv.predict(exog=np.ones((n, 1)), endog=deltas[[\"hrsemp\"]])"
+    "pred_exog = pd.DataFrame(np.ones((n, 1)), index=deltas.index)\n",
+    "res_iv.predict(exog=pred_exog, endog=deltas[[\"hrsemp\"]])"
    ]
   }
  ],
@@ -1104,7 +1105,7 @@
    "name": "python",
    "nbconvert_exporter": "python",
    "pygments_lexer": "ipython3",
-   "version": "3.8.12"
+   "version": "3.9.16"
   },
   "pycharm": {
    "stem_cell": {
