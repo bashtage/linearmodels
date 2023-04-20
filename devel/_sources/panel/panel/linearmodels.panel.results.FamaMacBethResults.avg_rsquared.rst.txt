@@ -1,0 +1,6 @@
+linearmodels.panel.results.FamaMacBethResults.avg\_rsquared
+===========================================================
+
+.. currentmodule:: linearmodels.panel.results
+
+.. autoproperty:: FamaMacBethResults.avg_rsquared

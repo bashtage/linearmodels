@@ -1,6 +1,13 @@
 Change Log
 ==========
 
+Since 4.28
+----------
+* Added average :math:`R^2` and average adjusted :math:`R^2` properties to
+  :class:`~linearmodels.panel.results.FamaMacBethResults` as
+  :meth:`~linearmodels.panel.results.FamaMacBethResults.avg_rsquared` and
+  :meth:`~linearmodels.panel.results.FamaMacBethResults.avg_adj_rsquared`.
+
 Version 4.28
 ------------
 * Expanded compatability for formulaic from 0.3.2 to 0.5.2

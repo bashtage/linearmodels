@@ -14,8 +14,8 @@ the case and automatically adjust the degree of freedom. This can be
 overridden using by setting the fit option ``auto_df=False`` and then
 changing the value of ``count_effects``.
 
-R2 definitions
-==============
+:math:`R^2` definitions
+=======================
 The :math:`R^2` definitions are all designed so that the reported value will
 match the original model using the estimated parameters.  This differs from
 other packages, such as Stata, which use a correlation based measure which

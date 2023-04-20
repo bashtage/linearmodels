@@ -27,6 +27,8 @@
       :toctree:
 
       ~FamaMacBethResults.all_params
+      ~FamaMacBethResults.avg_adj_rsquared
+      ~FamaMacBethResults.avg_rsquared
       ~FamaMacBethResults.corr_squared_between
       ~FamaMacBethResults.corr_squared_overall
       ~FamaMacBethResults.corr_squared_within
