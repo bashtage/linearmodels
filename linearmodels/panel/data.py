@@ -144,10 +144,10 @@ class PanelData:
         should be converted to dummy variables
     drop_first : bool
         Flag indicating to drop first dummy category when converting
-    copy: bool
+    copy : bool
         Flag indicating whether to copy the input. Only has an effect when
         x is a DataFrame
-    cast: bool
+    cast : bool
         Flag indicating to case the data to double precision.
 
     Notes

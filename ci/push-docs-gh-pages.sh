@@ -13,8 +13,8 @@ echo "Checking for tag"
 if [[ -n "${GIT_TAG}" ]]; then
   echo "Tag ${GIT_TAG} is defined"
   echo "Copy docs to root"
-  echo "cp -r ${PWD}/doc/build/html/* ${PWD}/"
-  cp -r "${PWD}/doc/build/html/*" "${PWD}"
+  echo "cp -r ${PWD}/doc/build/html/. ${PWD}/"
+  cp -r "${PWD}/doc/build/html/." "${PWD}/"
 else
   echo "Tag is ${GIT_TAG}. Not updating main documents"
 fi
@@ -25,8 +25,17 @@ ls ${PWD}/doc/build/html
 echo "Copy docs to devel"
 echo "cp -r ${PWD}/doc/build/html/. ${PWD}/devel/"
 cp -r "${PWD}/doc/build/html/." "${PWD}/devel/"
+echo "Remove build directory"
+echo "rm -rf ${PWD}/doc/build/"
+rm -rf ${PWD}/doc/build/
 echo "Add devel"
 git add devel/.
+echo "Add new HTML/JS/CSS"
+git add ./\*.html
+git add ./\*.js
+git add ./\*.css
+git add _sources/.
+git add _static/.
 echo "Change remote"
 git remote set-url origin https://bashtage:"${GH_PAGES_TOKEN}"@github.com/bashtage/linearmodels.git
 echo "Github Actions doc build after commit ${GITHUB_SHA::8}"
