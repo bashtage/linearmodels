@@ -67,7 +67,7 @@ Dep. Variable:                 lscrap   R-squared:                        0.0528
 Estimator:                   PanelOLS   R-squared (Between):             -0.0379
 No. Observations:                 140   R-squared (Within):               0.0528
 Date:                Thu, Apr 20 2023   R-squared (Overall):             -0.0288
-Time:                        18:09:49   Log-likelihood                   -90.459
+Time:                        18:24:10   Log-likelihood                   -90.459
 Cov. Estimator:            Unadjusted
                                         F-statistic:                      5.0751
 Entities:                          48   P-value                           0.0267
@@ -117,7 +117,7 @@ Dep. Variable:                    Dep   R-squared:                        0.0528
 Estimator:                   PanelOLS   R-squared (Between):             -0.0379
 No. Observations:                 140   R-squared (Within):               0.0528
 Date:                Thu, Apr 20 2023   R-squared (Overall):             -0.0288
-Time:                        18:09:49   Log-likelihood                   -90.459
+Time:                        18:24:10   Log-likelihood                   -90.459
 Cov. Estimator:            Unadjusted
                                         F-statistic:                      5.0751
 Entities:                          48   P-value                           0.0267
@@ -173,14 +173,18 @@ Data variables: (12/28)
 </pre></div></div> </div> <div class="nbinput docutils container"> <div class="prompt highlight-none notranslate"><div class=highlight ><pre><span></span>[7]:
 </pre></div> </div> <div class="input_area highlight-ipython3 notranslate"><div class=highlight ><pre><span></span><span class=n >res</span> <span class=o >=</span> <span class=n >PanelOLS</span><span class=p >(</span><span class=n >da</span><span class=p >[</span><span class=s2 >"lscrap"</span><span class=p >]</span><span class=o >.</span><span class=n >T</span><span class=p >,</span> <span class=n >da</span><span class=p >[</span><span class=s2 >"hrsemp"</span><span class=p >]</span><span class=o >.</span><span class=n >T</span><span class=p >,</span> <span class=n >entity_effects</span><span class=o >=</span><span class=kc >True</span><span class=p >)</span><span class=o >.</span><span class=n >fit</span><span class=p >()</span>
 <span class=nb >print</span><span class=p >(</span><span class=n >res</span><span class=p >)</span>
-</pre></div> </div> </div> <div class="nboutput docutils container"> <div class="prompt empty docutils container"> </div> <div class="output_area docutils container"> <div class=highlight ><pre>
+</pre></div> </div> </div> <div class="nboutput docutils container"> <div class="prompt empty docutils container"> </div> <div class="output_area stderr docutils container"> <div class=highlight ><pre>
+/home/kevin/git/linearmodels/linearmodels/panel/model.py:1185: MissingValueWarning:
+Inputs contain missing values. Dropping rows with missing observations.
+  super().__init__(dependent, exog, weights=weights, check_rank=check_rank)
+</pre></div></div> </div> <div class="nboutput nblast docutils container"> <div class="prompt empty docutils container"> </div> <div class="output_area docutils container"> <div class=highlight ><pre>
                           PanelOLS Estimation Summary
 ================================================================================
 Dep. Variable:                    Dep   R-squared:                        0.0528
 Estimator:                   PanelOLS   R-squared (Between):             -0.0379
 No. Observations:                 140   R-squared (Within):               0.0528
 Date:                Thu, Apr 20 2023   R-squared (Overall):             -0.0288
-Time:                        18:09:49   Log-likelihood                   -90.459
+Time:                        18:24:10   Log-likelihood                   -90.459
 Cov. Estimator:            Unadjusted
                                         F-statistic:                      5.0751
 Entities:                          48   P-value                           0.0267
@@ -205,10 +209,6 @@ P-value: 0.0000
 Distribution: F(47,91)
 
 Included effects: Entity
-</pre></div></div> </div> <div class="nboutput nblast docutils container"> <div class="prompt empty docutils container"> </div> <div class="output_area stderr docutils container"> <div class=highlight ><pre>
-/home/kevin/git/linearmodels/linearmodels/panel/model.py:1185: MissingValueWarning:
-Inputs contain missing values. Dropping rows with missing observations.
-  super().__init__(dependent, exog, weights=weights, check_rank=check_rank)
 </pre></div></div> </div> </section> <section id=Conversion-of-Categorical-and-Strings-to-Dummies > <h2 id=Conversion-of-Categorical-and-Strings-to-Dummies >Conversion of Categorical and Strings to Dummies<a class=headerlink  href="#Conversion-of-Categorical-and-Strings-to-Dummies" title="Permalink to this heading">¶</a></h2> <p>Categorical or string variables are treated as factors and so are converted to dummies. The first category is always dropped. If this is not desirable, you should manually convert the data to dummies before estimating a model.</p> <div class="nbinput nblast docutils container"> <div class="prompt highlight-none notranslate"><div class=highlight ><pre><span></span>[8]:
 </pre></div> </div> <div class="input_area highlight-ipython3 notranslate"><div class=highlight ><pre><span></span><span class=kn >import</span> <span class=nn >pandas</span> <span class=k >as</span> <span class=nn >pd</span>
 
@@ -239,18 +239,13 @@ fcode  year
 hrsemp      float64
 year_str     object
 dtype: object
-</pre></div></div> </div> <div class="nboutput docutils container"> <div class="prompt empty docutils container"> </div> <div class="output_area stderr docutils container"> <div class=highlight ><pre>
-/home/kevin/git/linearmodels/linearmodels/panel/model.py:1185: MissingValueWarning:
-Inputs contain missing values. Dropping rows with missing observations.
-  super().__init__(dependent, exog, weights=weights, check_rank=check_rank)
-</pre></div></div> </div> <div class="nboutput nblast docutils container"> <div class="prompt empty docutils container"> </div> <div class="output_area docutils container"> <div class=highlight ><pre>
                           PanelOLS Estimation Summary
 ================================================================================
 Dep. Variable:                 lscrap   R-squared:                        0.1985
 Estimator:                   PanelOLS   R-squared (Between):             -0.1240
 No. Observations:                 140   R-squared (Within):               0.1985
 Date:                Thu, Apr 20 2023   R-squared (Overall):             -0.0934
-Time:                        18:09:49   Log-likelihood                   -78.765
+Time:                        18:24:10   Log-likelihood                   -78.765
 Cov. Estimator:            Unadjusted
                                         F-statistic:                      7.3496
 Entities:                          48   P-value                           0.0002
@@ -277,6 +272,10 @@ P-value: 0.0000
 Distribution: F(47,89)
 
 Included effects: Entity
+</pre></div></div> </div> <div class="nboutput nblast docutils container"> <div class="prompt empty docutils container"> </div> <div class="output_area stderr docutils container"> <div class=highlight ><pre>
+/home/kevin/git/linearmodels/linearmodels/panel/model.py:1185: MissingValueWarning:
+Inputs contain missing values. Dropping rows with missing observations.
+  super().__init__(dependent, exog, weights=weights, check_rank=check_rank)
 </pre></div></div> </div> <p>Using <code class="docutils literal notranslate"><span class=pre >categorical</span></code>s has the same effect.</p> <div class="nbinput docutils container"> <div class="prompt highlight-none notranslate"><div class=highlight ><pre><span></span>[10]:
 </pre></div> </div> <div class="input_area highlight-ipython3 notranslate"><div class=highlight ><pre><span></span><span class=nb >print</span><span class=p >(</span><span class=s2 >"Exogenous variables"</span><span class=p >)</span>
 <span class=nb >print</span><span class=p >(</span><span class=n >mi_data</span><span class=p >[[</span><span class=s2 >"hrsemp"</span><span class=p >,</span> <span class=s2 >"year_cat"</span><span class=p >]]</span><span class=o >.</span><span class=n >head</span><span class=p >())</span>
@@ -304,7 +303,7 @@ Dep. Variable:                 lscrap   R-squared:                        0.1985
 Estimator:                   PanelOLS   R-squared (Between):             -0.1240
 No. Observations:                 140   R-squared (Within):               0.1985
 Date:                Thu, Apr 20 2023   R-squared (Overall):             -0.0934
-Time:                        18:09:49   Log-likelihood                   -78.765
+Time:                        18:24:11   Log-likelihood                   -78.765
 Cov. Estimator:            Unadjusted
                                         F-statistic:                      7.3496
 Entities:                          48   P-value                           0.0002
