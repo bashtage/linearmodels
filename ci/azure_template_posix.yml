@@ -78,14 +78,14 @@ jobs:
     displayName: 'Install dependencies'
 
   - script: |
+      python -m pip list
+    displayName: 'List Configuration'
+
+  - script: |
      flake8 linearmodels
      black --check linearmodels
      isort --check linearmodels
     displayName: 'Check style and formatting'
-
-  - script: |
-      python -m pip list
-    displayName: 'List Configuration'
 
   - script: |
       echo "Installing to site packages"

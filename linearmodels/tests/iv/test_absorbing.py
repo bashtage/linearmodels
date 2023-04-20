@@ -191,7 +191,8 @@ def generate_data(
     )
 
 
-# Permutations, k in (0,3), const in (True,False), factors=(0,1,2), interactions in (0,1)
+# Permutations:
+# k in (0,3), const in (True,False), factors=(0,1,2), interactions in (0,1)
 
 
 # k=3, const=True, nfactors=1, factor_density=10, nobs=2000, cont_interactions=1,

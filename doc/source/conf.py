@@ -336,4 +336,7 @@ numpydoc_xref_aliases = {
     "csc_matrix": "scipy.sparse.csc_matrix",
     "DataArray": "xarray.DataArray",
     "PanelModelData": "linearmodels.panel.utility.PanelModelData",
+    "ndarray": "numpy.array",
+    "np.ndarray": "numpy.array",
+    "pd.Series": "pandas.Series",
 }
