@@ -528,6 +528,7 @@ def generate_panel_data(
     rng: np.random.RandomState | None = None,
 ) -> PanelModelData:
     """
+    Simulate panel data for testing
 
     Parameters
     ----------
