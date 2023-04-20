@@ -7,7 +7,6 @@ Since 4.28
   :class:`~linearmodels.panel.results.FamaMacBethResults` as
   :meth:`~linearmodels.panel.results.FamaMacBethResults.avg_rsquared` and
   :meth:`~linearmodels.panel.results.FamaMacBethResults.avg_adj_rsquared`.
-* Changed the doc theme from sphinx-material to sphinx-immaterial.
 
 Version 4.28
 ------------

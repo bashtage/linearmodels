@@ -1,5 +1,3 @@
-:hero: Models for panel data, system regression, instrumental  variables and asset pricing.
-
 .. image:: images/logo-text.svg
    :width: 50%
    :align: left
