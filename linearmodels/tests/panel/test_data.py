@@ -295,7 +295,9 @@ def test_demean_against_dummy_regression(data):
 
 
 def test_demean_missing(mi_df):
-    mi_df.values.flat[::13] = np.nan
+    values = np.require(mi_df, requirements="W")
+    values.flat[::13] = np.nan
+    mi_df.loc[:, :] = values
     data = PanelData(mi_df)
     fe = data.demean("entity")
     expected = data.values3d.copy()

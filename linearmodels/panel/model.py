@@ -2419,7 +2419,7 @@ class FirstDifferenceOLS(_PanelModelBase):
             )
             w_frame = w_frame.reindex(self.weights.index).dropna(how="any")
             index = cast(MultiIndex, w_frame.index)
-            w = w_frame.to_numpy()
+            w = np.require(w_frame, requirements="W")
 
             w /= w.mean()
             root_w = cast(Float64Array, np.sqrt(w))

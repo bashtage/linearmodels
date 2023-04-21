@@ -22,6 +22,7 @@ from numpy import (
     ndarray,
     ones,
     ptp,
+    require,
     sqrt,
     where,
     zeros,
@@ -702,7 +703,7 @@ class AbsorbingLS:
         self._regressors_hash: tuple[tuple[str, ...], ...] | None = None
 
     def _drop_missing(self) -> BoolArray:
-        missing = self.dependent.isnull.to_numpy()
+        missing = require(self.dependent.isnull.to_numpy(), requirements="W")
         missing |= self.exog.isnull.to_numpy()
         missing |= self._absorb_inter.cat.isnull().any(axis=1).to_numpy()
         missing |= self._absorb_inter.cont.isnull().any(axis=1).to_numpy()
