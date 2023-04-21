@@ -1,12 +1,13 @@
 Change Log
 ==========
 
-Since 4.28
-----------
+Version 4.29
+------------
 * Added average :math:`R^2` and average adjusted :math:`R^2` properties to
   :class:`~linearmodels.panel.results.FamaMacBethResults` as
   :meth:`~linearmodels.panel.results.FamaMacBethResults.avg_rsquared` and
   :meth:`~linearmodels.panel.results.FamaMacBethResults.avg_adj_rsquared`.
+* Initial compatability with pandas 2.0 Copy-on-Write feature.
 
 Version 4.28
 ------------

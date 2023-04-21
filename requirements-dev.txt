@@ -9,7 +9,7 @@ pytest>=7.0,<7.1
 pytest-xdist
 pytest-cov
 seaborn
-sphinx
+sphinx >=5,<6
 sphinx-material
 sphinxcontrib-spelling
 sphinx_autodoc_typehints
