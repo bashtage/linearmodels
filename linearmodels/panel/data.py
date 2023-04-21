@@ -284,7 +284,7 @@ class PanelData:
     @property
     def values2d(self) -> AnyArray:
         """NumPy ndarray view of dataframe"""
-        return np.asarray(self._frame)
+        return np.require(self._frame, requirements="W")
 
     @property
     def values3d(self) -> AnyArray:
@@ -502,7 +502,7 @@ class PanelData:
 
         exclude = np.ptp(np.asarray(self._frame), 0) == 0
         max_rmse = np.sqrt(np.asarray(self._frame).var(0).max())
-        scale = np.asarray(self._frame.std())
+        scale = np.require(self._frame.std(), requirements="W")
         exclude = exclude | (scale < 1e-14 * max_rmse)
         replacement = cast(Float64Array, np.maximum(scale, 1))
         scale[exclude] = replacement[exclude]

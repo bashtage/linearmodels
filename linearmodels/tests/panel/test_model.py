@@ -198,8 +198,8 @@ def test_absorbing_effect(data, intercept):
         nentity = len(x.index.levels[0])
         ntime = len(x.index.levels[1])
         temp = data.x.iloc[:, 0].copy()
-        temp.values[:] = 1.0
-        temp.values[: (ntime * (nentity // 2))] = 0
+        temp.loc[:] = 1.0
+        temp.iloc[: (ntime * (nentity // 2))] = 0
 
         if intercept:
             x["Intercept"] = 1.0
