@@ -24,11 +24,12 @@ from numpy import (
     ptp,
     require,
     sqrt,
+    squeeze,
     where,
     zeros,
 )
 from numpy.linalg import lstsq
-from pandas import Categorical, DataFrame, Series
+from pandas import Categorical, CategoricalDtype, DataFrame, Series
 from pandas.api.types import is_categorical_dtype
 import scipy.sparse as sp
 from scipy.sparse.linalg import lsmr
@@ -172,7 +173,7 @@ def category_product(cats: AnyPandas) -> Series:
     for c in cats:
         # TODO: Bug in pandas-stubs
         #  https://github.com/pandas-dev/pandas-stubs/issues/97
-        if not is_categorical_dtype(cats[c]):  # type: ignore
+        if not isinstance(cats[c], CategoricalDtype):  # type: ignore
             raise TypeError("cats must contain only categorical variables")
         # TODO: Bug in pandas-stubs
         #  https://github.com/pandas-dev/pandas-stubs/issues/97
@@ -342,7 +343,9 @@ class Interaction:
         if self._cat_data.shape[1] == self._cont_data.shape[1] == 0:
             raise ValueError("Both cat and cont are empty arrays")
         cat_data = self._cat_data.pandas
-        convert = [col for col in cat_data if not (is_categorical_dtype(cat_data[col]))]
+        convert = [
+            col for col in cat_data if not (isinstance(cat_data[col], CategoricalDtype))
+        ]
         if convert:
             cat_data = DataFrame(
                 {col: cat_data[col].astype("category") for col in cat_data}
@@ -462,7 +465,7 @@ class Interaction:
         >>> interact.sparse.shape # Cart product of all cats, 5!, times ncont, 6
         (100000, 720)
         """
-        cat_cols = [col for col in frame if is_categorical_dtype(frame[col])]
+        cat_cols = [col for col in frame if isinstance(frame[col], CategoricalDtype)]
         cont_cols = [col for col in frame if col not in cat_cols]
         # TODO: Bug in pandas-stubs
         #   https://github.com/pandas-dev/pandas-stubs/issues/97
@@ -1152,7 +1155,7 @@ class AbsorbingLS:
         if self.has_constant:
             e = e - root_w * average(self._dependent.ndarray, weights=w)
 
-        total_ss = float(e.T @ e)
+        total_ss = float(squeeze(e.T @ e))
         r2 = max(1 - residual_ss / total_ss, 0.0)
 
         e = self._absorbed_dependent.to_numpy()  # already scaled by root_w
@@ -1164,7 +1167,7 @@ class AbsorbingLS:
             mu = (lstsq(x, e, rcond=None)[0]).squeeze()
             e = e - x * mu
 
-        aborbed_total_ss = float(e.T @ e)
+        aborbed_total_ss = float(squeeze(e.T @ e))
         r2_absorbed = max(1 - residual_ss / aborbed_total_ss, 0.0)
 
         fstat = self._f_statistic(params, cov, debiased)
@@ -1175,7 +1178,7 @@ class AbsorbingLS:
                 weps.squeeze(), index=index, name="weighted residual"
             ),
             "cov": DataFrame(cov, columns=columns, index=columns),
-            "s2": float(cov_estimator.s2),
+            "s2": float(squeeze(cov_estimator.s2)),
             "debiased": debiased,
             "residual_ss": float(residual_ss),
             "total_ss": float(total_ss),

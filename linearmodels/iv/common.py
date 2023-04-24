@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-from numpy import ix_, ptp, where
+from numpy import ix_, ptp, squeeze, where
 from numpy.linalg import inv
 
 from linearmodels.shared.hypotheses import InvalidTestStatistic, WaldTestStatistic
@@ -66,7 +66,7 @@ def f_statistic(
         )
     test_params = params[non_const]
     test_cov = cov[ix_(non_const, non_const)]
-    test_stat = float(test_params.T @ inv(test_cov) @ test_params)
+    test_stat = float(squeeze(test_params.T @ inv(test_cov) @ test_params))
     df = test_params.shape[0]
     if debiased:
         wald = WaldTestStatistic(test_stat / df, null, df, resid_df, name=name)

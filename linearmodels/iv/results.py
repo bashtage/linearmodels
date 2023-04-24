@@ -8,7 +8,19 @@ from linearmodels.compat.statsmodels import Summary
 import datetime as dt
 from typing import Any, Sequence, Union
 
-from numpy import array, asarray, c_, diag, empty, isnan, log, ndarray, ones, sqrt
+from numpy import (
+    array,
+    asarray,
+    c_,
+    diag,
+    empty,
+    isnan,
+    log,
+    ndarray,
+    ones,
+    sqrt,
+    squeeze,
+)
 from numpy.linalg import inv
 from pandas import DataFrame, Series, concat, to_numeric
 from property_cached import cached_property
@@ -1094,7 +1106,7 @@ class IVResults(_CommonIVResults):
 
         name = "Durbin test of exogeneity"
         df = ntested
-        return WaldTestStatistic(float(stat), null, df, name=name)
+        return WaldTestStatistic(float(squeeze(stat)), null, df, name=name)
 
     def wu_hausman(self, variables: str | list[str] | None = None) -> WaldTestStatistic:
         r"""
@@ -1152,7 +1164,7 @@ class IVResults(_CommonIVResults):
         delta = e1.T @ e1 - e2.T @ e2
         stat = delta / df
         stat /= (e0.T @ e0 - delta) / df_denom
-        stat = float(stat)
+        stat = float(squeeze(stat))
 
         name = "Wu-Hausman test of exogeneity"
         return WaldTestStatistic(stat, null, df, df_denom, name=name)

@@ -118,7 +118,7 @@ class IVData:
                     x[col] = c
                 dt = c.dtype
                 all_numeric = all_numeric and is_numeric_dtype(dt)
-                if not (is_numeric_dtype(dt) or is_categorical_dtype(dt)):
+                if not (is_numeric_dtype(dt) or isinstance(dt, pd.CategoricalDtype)):
                     raise ValueError(
                         "Only numeric, string  or categorical " "data permitted"
                     )
