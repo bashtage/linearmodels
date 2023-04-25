@@ -64,9 +64,9 @@ def test_linear_model_parameters(data):
         block = np.zeros((nf, nf + 1))
         for j in range(nf):  # rows
             for k in range(1, nf + 1):  # cols
-                block[j, k] = b[i][j] * lam[k - 1]
+                block[j, k] = b[i][j] * lam[k - 1, 0]
                 if j + 1 == k:
-                    block[j, k] -= alphas[i]
+                    block[j, k] -= alphas[i, 0]
         jac[block1:block2, loc : loc + nf + 1] = block
         loc += nf + 1
     # 2, 2
@@ -77,7 +77,7 @@ def test_linear_model_parameters(data):
     for _ in range(nport):
         for j in range(nf + 1):
             if j != 0:
-                block[row, col] = lam[j - 1]
+                block[row, col] = lam[j - 1, 0]
             col += 1
         row += 1
     jac[-nport:, : (nport * (nf + 1))] = block
@@ -106,7 +106,7 @@ def test_linear_model_parameters(data):
     assert_allclose(cov, res.cov)
 
     acov = cov[: block1 : (nf + 1), : block1 : (nf + 1)]
-    jstat = float(alphas.T @ np.linalg.pinv(acov) @ alphas)
+    jstat = float(np.squeeze(alphas.T @ np.linalg.pinv(acov) @ alphas))
     assert_allclose(res.j_statistic.stat, jstat)
     assert_allclose(res.j_statistic.pval, 1 - stats.chi2(nport - nf).cdf(jstat))
 
@@ -173,9 +173,9 @@ def test_linear_model_parameters_risk_free(data):
         block = np.zeros((nf + 1, nf + 1))
         for j in range(nf + 1):  # rows
             for k in range(1, nf + 1):  # cols
-                block[j, k] = bc[i][j] * lam[k]
+                block[j, k] = bc[i][j] * lam[k, 0]
                 if j == k:
-                    block[j, k] -= alphas[i]
+                    block[j, k] -= alphas[i, 0]
         jac[block1:block2, loc : loc + nf + 1] = block
         loc += nf + 1
     # 2, 2
@@ -186,7 +186,7 @@ def test_linear_model_parameters_risk_free(data):
     for _ in range(nport):
         for j in range(nf + 1):
             if j != 0:
-                block[row, col] = lam[j]
+                block[row, col] = lam[j, 0]
             col += 1
         row += 1
     jac[-nport:, : (nport * (nf + 1))] = block
@@ -216,7 +216,7 @@ def test_linear_model_parameters_risk_free(data):
     assert np.all(res.pvalues <= 1.0)
 
     acov = cov[: block1 : (nf + 1), : block1 : (nf + 1)]
-    jstat = float(alphas.T @ np.linalg.pinv(acov) @ alphas)
+    jstat = float(np.squeeze(alphas.T @ np.linalg.pinv(acov) @ alphas))
     assert_allclose(res.cov.values[: block1 : (nf + 1), : block1 : (nf + 1)], acov)
     assert_allclose(res.j_statistic.stat, jstat, rtol=1e-1)
     assert_allclose(
@@ -277,12 +277,12 @@ def test_linear_model_parameters_risk_free_gls(data):
     nport, nf = p.shape[1], f.shape[1]
     block2 = block1 + nf + 1
     bct = sigma_inv @ bc
-    at = sigma_inv @ alphas
+    at = np.squeeze(sigma_inv @ alphas)
     for i in range(nport):
         block = np.zeros((nf + 1, nf + 1))
         for j in range(nf + 1):  # rows
             for k in range(1, nf + 1):  # cols
-                block[j, k] = bct[i][j] * lam[k]
+                block[j, k] = bct[i][j] * lam[k, 0]
                 if j == k:
                     block[j, k] -= at[i]
         jac[block1:block2, loc : loc + nf + 1] = block
@@ -295,7 +295,7 @@ def test_linear_model_parameters_risk_free_gls(data):
     for _ in range(nport):
         for j in range(nf + 1):
             if j != 0:
-                block[row, col] = lam[j]
+                block[row, col] = lam[j, 0]
             col += 1
         row += 1
     jac[-nport:, : (nport * (nf + 1))] = block
@@ -324,7 +324,7 @@ def test_linear_model_parameters_risk_free_gls(data):
     assert_allclose(cov, res.cov)
 
     acov = cov[: block1 : (nf + 1), : block1 : (nf + 1)]
-    jstat = float(alphas.T @ np.linalg.pinv(acov) @ alphas)
+    jstat = float(np.squeeze(alphas.T @ np.linalg.pinv(acov) @ alphas))
     assert_allclose(res.cov.values[: block1 : (nf + 1), : block1 : (nf + 1)], acov)
     assert_allclose(res.j_statistic.stat, jstat, rtol=1e-1)
     assert_allclose(

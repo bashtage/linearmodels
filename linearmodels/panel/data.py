@@ -5,6 +5,7 @@ from typing import Hashable, Literal, Sequence, Union, cast, overload
 
 import numpy as np
 from numpy.linalg import lstsq
+import pandas as pd
 from pandas import (
     Categorical,
     DataFrame,
@@ -14,12 +15,7 @@ from pandas import (
     concat,
     get_dummies,
 )
-from pandas.api.types import (
-    is_categorical_dtype,
-    is_datetime64_any_dtype,
-    is_numeric_dtype,
-    is_string_dtype,
-)
+from pandas.api.types import is_datetime64_any_dtype, is_numeric_dtype, is_string_dtype
 
 from linearmodels.shared.utility import ensure_unique_column, panel_to_frame
 from linearmodels.typing import (
@@ -114,7 +110,7 @@ def convert_columns(s: Series, drop_first: bool) -> AnyPandas:
     if is_string_dtype(s.dtype) and s.map(lambda v: isinstance(v, str)).all():
         s = s.astype("category")
 
-    if is_categorical_dtype(s):
+    if isinstance(s.dtype, pd.CategoricalDtype):
         out = get_dummies(s, drop_first=drop_first)
         # TODO: Remove once pandas typing fixed
         out.columns = Index([str(s.name) + "." + str(c) for c in out])

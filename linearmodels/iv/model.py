@@ -18,9 +18,11 @@ from numpy import (
     eye,
     isscalar,
     logical_not,
+    nan,
     nanmean,
     ones,
     sqrt,
+    squeeze,
 )
 from numpy.linalg import eigvalsh, inv, matrix_rank, pinv
 from pandas import DataFrame, Series, concat
@@ -438,14 +440,14 @@ class _IVModelBase:
         cov = cov_estimator.cov
         debiased = cov_estimator.debiased
 
-        residual_ss = weps.T @ weps
+        residual_ss = squeeze(weps.T @ weps)
 
         w = self.weights.ndarray
         e = self._wy
         if self.has_constant:
             e = e - sqrt(self.weights.ndarray) * average(self._y, weights=w)
 
-        total_ss = float(e.T @ e)
+        total_ss = float(squeeze(e.T @ e))
         r2 = 1 - residual_ss / total_ss
 
         fstat = self._f_statistic(params, cov, debiased)
@@ -456,11 +458,11 @@ class _IVModelBase:
                 weps.squeeze(), index=index, name="weighted residual"
             ),
             "cov": DataFrame(cov, columns=columns, index=columns),
-            "s2": float(cov_estimator.s2),
+            "s2": float(squeeze(cov_estimator.s2)),
             "debiased": debiased,
             "residual_ss": float(residual_ss),
             "total_ss": float(total_ss),
-            "r2": float(r2),
+            "r2": float(squeeze(r2)),
             "fstat": fstat,
             "vars": columns,
             "instruments": self._instr_columns,
@@ -650,8 +652,18 @@ class _IVLSModelBase(_IVModelBase):
         linearmodels.iv.covariance.ClusteredCovariance
         """
         wy, wx, wz = self._wy, self._wx, self._wz
-        liml_kappa = self._estimate_kappa()
         kappa = self._kappa
+
+        try:
+            liml_kappa: float = self._estimate_kappa()
+        except Exception as exc:
+            liml_kappa = nan
+            if kappa is None:
+                raise ValueError(
+                    "Unable to estimate kappa. This is most likely occurs if the "
+                    f"instrument matrix is rank deficient. The error raised when "
+                    f"computing kappa was:\n\n{exc}"
+                )
         if kappa is not None:
             est_kappa = kappa
         else:
@@ -1258,7 +1270,7 @@ class IVGMM(_IVGMMBase):
                 v = (xpz @ wmat @ xpz.T) / nobs
                 vinv = inv(v)
             _params = params
-            norm = float(delta.T @ vinv @ delta)
+            norm = float(squeeze(delta.T @ vinv @ delta))
             iters += 1
 
         cov_config["debiased"] = debiased

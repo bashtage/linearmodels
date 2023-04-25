@@ -236,7 +236,7 @@ def quadratic_form_test(
     value = np.asarray(value).ravel()[:, None]
     diff = restriction @ np.asarray(params)[:, None] - value
     rcov = restriction @ cov @ restriction.T
-    stat = float(diff.T @ np.linalg.inv(rcov) @ diff)
+    stat = float(np.squeeze(diff.T @ np.linalg.inv(rcov) @ diff))
     df = restriction.shape[0]
     null = "Linear equality constraint is valid"
     name = "Linear Equality Hypothesis Test"

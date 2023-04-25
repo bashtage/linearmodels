@@ -491,11 +491,12 @@ class _PanelModelBase:
 
             num_df -= 1
             weps_const = cast(
-                Float64Array, y - float((root_w.T @ y) / (root_w.T @ root_w))
+                Float64Array,
+                y - float(np.squeeze((root_w.T @ y) / (root_w.T @ root_w))),
             )
 
-        resid_ss = weps.T @ weps
-        num = float(weps_const.T @ weps_const - resid_ss)
+        resid_ss = float(np.squeeze(weps.T @ weps))
+        num = float(np.squeeze(weps_const.T @ weps_const - resid_ss))
         denom = resid_ss
         denom_df = df_resid
         stat = float((num / num_df) / (denom / denom_df)) if denom > 0.0 else 0.0
@@ -587,12 +588,12 @@ class _PanelModelBase:
         wx = root_w * x
         wy = root_w * y
         weps = wy - wx @ params
-        residual_ss = float(weps.T @ weps)
+        residual_ss = float(np.squeeze(weps.T @ weps))
         e = y
         if self.has_constant:
             e = y - (w * y).sum() / w.sum()
 
-        total_ss = float(w.T @ (e**2))
+        total_ss = float(np.squeeze(w.T @ (e**2)))
         r2b = 1 - residual_ss / total_ss if total_ss > 0.0 else 0.0
 
         #############################################
@@ -605,10 +606,10 @@ class _PanelModelBase:
         wx = root_w * x
         wy = root_w * y
         weps = wy - wx @ params
-        residual_ss = float(weps.T @ weps)
+        residual_ss = float(np.squeeze(weps.T @ weps))
         mu = (w * y).sum() / w.sum() if self.has_constant else 0
         we = wy - root_w * mu
-        total_ss = float(we.T @ we)
+        total_ss = float(np.squeeze(we.T @ we))
         r2o = 1 - residual_ss / total_ss if total_ss > 0.0 else 0.0
 
         #############################################
@@ -626,8 +627,8 @@ class _PanelModelBase:
         assert isinstance(wy, np.ndarray)
         assert isinstance(wx, np.ndarray)
         weps = wy - wx @ params
-        residual_ss = float(weps.T @ weps)
-        total_ss = float(wy.T @ wy)
+        residual_ss = float(np.squeeze(weps.T @ weps))
+        total_ss = float(np.squeeze(wy.T @ wy))
         if self.dependent.nobs == 1 or (self.exog.nvar == 1 and self.has_constant):
             r2w = 0.0
         else:
@@ -656,7 +657,7 @@ class _PanelModelBase:
         )
         entity_info, time_info, other_info = self._info()
         nobs = weps.shape[0]
-        sigma2 = float(weps.T @ weps / nobs)
+        sigma2 = float(np.squeeze(weps.T @ weps) / nobs)
         if sigma2 > 0.0:
             loglik = -0.5 * nobs * (np.log(2 * np.pi) + np.log(sigma2) + 1)
         else:
@@ -1005,12 +1006,12 @@ class PooledOLS(_PanelModelBase):
         )
         eps = y - fitted.values
         idiosyncratic = DataFrame(eps, index, ["idiosyncratic"])
-        residual_ss = float(weps.T @ weps)
+        residual_ss = float(np.squeeze(weps.T @ weps))
         e = y
         if self._constant:
             e = e - (w * y).sum() / w.sum()
 
-        total_ss = float(w.T @ (e**2))
+        total_ss = float(np.squeeze(w.T @ (e**2)))
         r2 = 1 - residual_ss / total_ss
 
         res = self._postestimation(
@@ -1893,17 +1894,17 @@ class PanelOLS(_PanelModelBase):
         idiosyncratic = DataFrame(eps, index, ["idiosyncratic"])
         eps_effects = _y - fitted.values
 
-        sigma2_tot = float(eps_effects.T @ eps_effects / nobs)
-        sigma2_eps = float(eps.T @ eps / nobs)
+        sigma2_tot = float(np.squeeze(eps_effects.T @ eps_effects) / nobs)
+        sigma2_eps = float(np.squeeze(eps.T @ eps) / nobs)
         sigma2_effects = sigma2_tot - sigma2_eps
         rho = sigma2_effects / sigma2_tot if sigma2_tot > 0.0 else 0.0
 
-        resid_ss = float(weps.T @ weps)
+        resid_ss = float(np.squeeze(weps.T @ weps))
         if self.has_constant:
             mu = ybar
         else:
             mu = np.array([0.0])
-        total_ss = float((y - mu).T @ (y - mu))
+        total_ss = float(np.squeeze((y - mu).T @ (y - mu)))
         r2 = 1 - resid_ss / total_ss if total_ss > 0.0 else 0.0
 
         root_w = cast(Float64Array, np.sqrt(self.weights.values2d))
@@ -1916,7 +1917,7 @@ class PanelOLS(_PanelModelBase):
             or self.other_effects
         ):
             mu_ex = root_w * ((root_w.T @ y_ex) / (root_w.T @ root_w))
-        total_ss_ex_effect = float((y_ex - mu_ex).T @ (y_ex - mu_ex))
+        total_ss_ex_effect = float(np.squeeze((y_ex - mu_ex).T @ (y_ex - mu_ex)))
         r2_ex_effects = (
             1 - resid_ss / total_ss_ex_effect if total_ss_ex_effect > 0.0 else 0.0
         )
@@ -1934,7 +1935,7 @@ class PanelOLS(_PanelModelBase):
                 wx -= root_w * _lstsq(root_w, wx, rcond=None)[0]
                 df_num -= 1
             weps_pooled = wy - wx @ _lstsq(wx, wy, rcond=None)[0]
-            resid_ss_pooled = float(weps_pooled.T @ weps_pooled)
+            resid_ss_pooled = float(np.squeeze(weps_pooled.T @ weps_pooled))
             num = (resid_ss_pooled - resid_ss) / df_num
 
             denom = resid_ss / df_denom
@@ -2158,12 +2159,12 @@ class BetweenOLS(_PanelModelBase):
             ["idiosyncratic"],
         )
 
-        residual_ss = float(weps.T @ weps)
+        residual_ss = float(np.squeeze(weps.T @ weps))
         e = y
         if self._constant:
             e = y - (w * y).sum() / w.sum()
 
-        total_ss = float(w.T @ (e**2))
+        total_ss = float(np.squeeze(w.T @ (e**2)))
         r2 = 1 - residual_ss / total_ss
 
         res = self._postestimation(
@@ -2464,8 +2465,8 @@ class FirstDifferenceOLS(_PanelModelBase):
         )
         eps = y - x @ params
 
-        residual_ss = float(weps.T @ weps)
-        total_ss = float(w.T @ (y**2))
+        residual_ss = float(np.squeeze(weps.T @ weps))
+        total_ss = float(np.squeeze(w.T @ (y**2)))
         r2 = 1 - residual_ss / total_ss
 
         res = self._postestimation(
@@ -2724,12 +2725,12 @@ class RandomEffects(_PanelModelBase):
         nobs = weps.shape[0]
         neffects = wu.shape[0]
         nvar = x.shape[1]
-        sigma2_e = float(weps.T @ weps) / (nobs - nvar - neffects + 1)
-        ssr = float(wu.T @ wu)
+        sigma2_e = float(np.squeeze(weps.T @ weps)) / (nobs - nvar - neffects + 1)
+        ssr = float(np.squeeze(wu.T @ wu))
         t = np.asarray(self.dependent.count("entity"))
         unbalanced = np.ptp(t) != 0
         if small_sample and unbalanced:
-            ssr = float((t * wu).T @ wu)
+            ssr = float(np.squeeze((t * wu).T @ wu))
             wx_df = cast(DataFrame, root_w * self.exog.dataframe)
             means = wx_df.groupby(level=0).transform("mean").values
             denom = means.T @ means
@@ -2785,12 +2786,12 @@ class RandomEffects(_PanelModelBase):
             ["estimated_effects"],
         )
         idiosyncratic = DataFrame(eps, index, ["idiosyncratic"])
-        residual_ss = float(weps.T @ weps)
+        residual_ss = float(np.squeeze(weps.T @ weps))
         wmu: float | Float64Array = 0.0
         if self.has_constant:
             wmu = root_w * _lstsq(root_w, wy, rcond=None)[0]
         wy_demeaned = wy - wmu
-        total_ss = float(wy_demeaned.T @ wy_demeaned)
+        total_ss = float(np.squeeze(wy_demeaned.T @ wy_demeaned))
         r2 = 1 - residual_ss / total_ss
 
         res = self._postestimation(
@@ -2995,12 +2996,12 @@ class FamaMacBeth(_PanelModelBase):
             if rank != nexog:
                 return Series([np.nan] * (len(z.columns) + 2), index=cols)
             err = dep - exog @ params
-            sse = float(err.T @ err)
+            sse = float(np.squeeze(err.T @ err))
             if has_constant:
                 dep_demean = dep - dep.mean()
-                tss = float(dep_demean.T @ dep_demean)
+                tss = float(np.squeeze(dep_demean.T @ dep_demean))
             else:
-                tss = float(dep.T @ dep)
+                tss = float(np.squeeze(dep.T @ dep))
             r2 = 1 - sse / tss
             nobs = exog.shape[0]
             if nobs - nexog > 0:
@@ -3033,11 +3034,11 @@ class FamaMacBeth(_PanelModelBase):
         w = self.weights.values2d
         root_w = cast(Float64Array, np.sqrt(w))
         #
-        residual_ss = float(weps.T @ weps)
+        residual_ss = float(np.squeeze(weps.T @ weps))
         y = e = self.dependent.values2d
         if self.has_constant:
             e = y - (w * y).sum() / w.sum()
-        total_ss = float(w.T @ (e**2))
+        total_ss = float(np.squeeze(w.T @ (e**2)))
         r2 = 1 - residual_ss / total_ss
 
         if cov_type not in (
