@@ -8,13 +8,14 @@ import pytest
 
 logger = logging.getLogger(__name__)
 
-
-try:
-    cow = bool(os.environ.get("LM_TEST_COPY_ON_WRITE", False))
-    pd.options.mode.copy_on_write = cow
-    logger.critical("Copy on Write Enabled!")
-except AttributeError:
-    logger.critical("Copy on Write disabled")
+cow = bool(os.environ.get("LM_TEST_COPY_ON_WRITE", False))
+if cow:
+    try:
+        pd.options.mode.copy_on_write = cow
+    except AttributeError:
+        cow = False
+if cow:
+    logger.critical("Copy on Write testing enabled")
 
 
 def pytest_configure(config):

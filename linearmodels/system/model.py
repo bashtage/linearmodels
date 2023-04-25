@@ -778,7 +778,7 @@ class _SystemModelBase:
             if cons:
                 wc = np.ones_like(wy) * np.sqrt(w)
                 wye = wy - wc @ lstsq(wc, wy, rcond=None)[0]
-            total_ss = float(wye.T @ wye)
+            total_ss = float(np.squeeze(wye.T @ wye))
             stats = self._common_indiv_results(
                 i,
                 beta,
@@ -829,7 +829,7 @@ class _SystemModelBase:
         null = "All parameters ex. constant are zero"
         name = "Equation F-statistic"
         try:
-            stat = float(params.T @ inv(cov) @ params)
+            stat = float(np.squeeze(params.T @ inv(cov) @ params))
 
         except np.linalg.LinAlgError:
             return InvalidTestStatistic(
@@ -913,7 +913,7 @@ class _SystemModelBase:
         stats["df_model"] = df
         stats["resid"] = resid[:, [i]]
         stats["fitted"] = self._x[i] @ b
-        stats["resid_ss"] = float(resid[:, [i]].T @ resid[:, [i]])
+        stats["resid_ss"] = float(np.squeeze(resid[:, [i]].T @ resid[:, [i]]))
         stats["total_ss"] = total_ss
         stats["r2"] = 1.0 - stats.resid_ss / stats.total_ss
         stats["r2a"] = 1.0 - (stats.resid_ss / df_r) / (stats.total_ss / df_c)
@@ -1088,7 +1088,7 @@ class _SystemModelBase:
                 ye = self._wy[i] - c @ lstsq(c, self._wy[i], rcond=None)[0]
             else:
                 ye = self._wy[i]
-            total_ss = float(ye.T @ ye)
+            total_ss = float(np.squeeze(ye.T @ ye))
             stats = self._common_indiv_results(
                 i,
                 beta,
@@ -1944,7 +1944,7 @@ class IVSystemGMM(_SystemModelBase):
                 xpz = cast(Float64Array, xpz / nobs)
                 v = (xpz @ winv @ xpz.T) / nobs
                 vinv = inv(v)
-            norm = float(delta.T @ vinv @ delta)
+            norm = float(np.squeeze(delta.T @ vinv @ delta))
             beta_last = beta
 
             _eps = []
@@ -2038,7 +2038,7 @@ class IVSystemGMM(_SystemModelBase):
                 ye = self._wy[i] - c @ lstsq(c, self._wy[i], rcond=None)[0]
             else:
                 ye = self._wy[i]
-            total_ss = float(ye.T @ ye)
+            total_ss = float(np.squeeze(ye.T @ ye))
             stats = self._common_indiv_results(
                 i,
                 beta,

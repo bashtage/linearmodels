@@ -121,7 +121,7 @@ class HomoskedasticCovariance:
     def s2(self) -> float:
         """Error variance"""
         eps = self.eps
-        return self._scale * float(eps.T @ eps) / self._nobs
+        return self._scale * float(np.squeeze(eps.T @ eps)) / self._nobs
 
     @cached_property
     def cov(self) -> Float64Array:

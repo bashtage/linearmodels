@@ -9,7 +9,7 @@ from typing import Any, Union
 
 import numpy as np
 import pandas as pd
-from pandas.api.types import is_categorical_dtype, is_numeric_dtype, is_string_dtype
+from pandas.api.types import is_numeric_dtype, is_string_dtype
 
 from linearmodels.typing import AnyPandas, ArrayLike, NumericArray
 
@@ -18,7 +18,7 @@ type_err = "Only ndarrays, DataArrays and Series and DataFrames are supported"
 
 
 def convert_columns(s: pd.Series, drop_first: bool) -> AnyPandas:
-    if is_categorical_dtype(s):
+    if isinstance(s.dtype, pd.CategoricalDtype):
         out = pd.get_dummies(s, drop_first=drop_first)
         # TODO: Remove once pandas typing fixed
         out.columns = pd.Index([str(s.name) + "." + str(c) for c in out])

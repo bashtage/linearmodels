@@ -29,7 +29,7 @@ def has_constant(x: Float64Array, x_rank: int | None = None) -> tuple[bool, int]
 
     if np.any((np.ptp(x, axis=0) == 0) & ~np.all(x == 0, axis=0)):
         loc_arr = (np.ptp(x, axis=0) == 0) & ~np.all(x == 0, axis=0)
-        loc = int(np.argwhere(loc_arr))
+        loc = int(np.squeeze(np.argwhere(loc_arr)))
         return True, loc
 
     n = x.shape[0]

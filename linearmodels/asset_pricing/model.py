@@ -351,7 +351,7 @@ class TradedFactorModel(_FactorModelBase):
 
         # Return values
         alpha_vcv = vcv[:nportfolio, :nportfolio]
-        stat = float(alphas.T @ np.linalg.pinv(alpha_vcv) @ alphas)
+        stat = float(np.squeeze(alphas.T @ np.linalg.pinv(alpha_vcv) @ alphas))
         jstat = WaldTestStatistic(
             stat, "All alphas are 0", nportfolio, name="J-statistic"
         )
@@ -654,7 +654,7 @@ class LinearFactorModel(_LinearFactorModelBase):
         # VCV
         full_vcv = cov_est_inst.cov
         alpha_vcv = full_vcv[s2:, s2:]
-        stat = float(alphas.T @ np.linalg.pinv(alpha_vcv) @ alphas)
+        stat = float(np.squeeze(alphas.T @ np.linalg.pinv(alpha_vcv) @ alphas))
         jstat = WaldTestStatistic(
             stat, "All alphas are 0", nport - nf - nrf, name="J-statistic"
         )
@@ -1136,7 +1136,7 @@ class LinearFactorModelGMM(_LinearFactorModelBase):
         g = self._moments(parameters, excess_returns)
         nobs = self.portfolios.shape[0]
         gbar = g.mean(0)[:, None]
-        return nobs * float(gbar.T @ w @ gbar)
+        return nobs * float(np.squeeze(gbar.T @ w @ gbar))
 
     def _j_cue(
         self,
@@ -1149,7 +1149,7 @@ class LinearFactorModelGMM(_LinearFactorModelBase):
         gbar = g.mean(0)[:, None]
         nobs = self.portfolios.shape[0]
         w = weight_est.w(g)
-        return nobs * float(gbar.T @ w @ gbar)
+        return nobs * float(np.squeeze(gbar.T @ w @ gbar))
 
     def _jacobian(self, params: Float64Array, excess_returns: bool) -> Float64Array:
         """Jacobian matrix for inference"""

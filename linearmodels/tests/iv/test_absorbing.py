@@ -562,6 +562,8 @@ def test_against_ols(ols_data):
 
 
 def test_cache():
+    # Clear the cache to avoid side effects and order dependency
+    _VARIABLE_CACHE.clear()
     gen = generate_data(
         2, True, 2, factor_format="pandas", ncont=0, cont_interactions=1
     )
@@ -580,6 +582,8 @@ def test_cache():
     mod.fit()
     fourth = len(_VARIABLE_CACHE)
     assert fourth - third == 0
+    # Clear the cache to avoid side effects and order dependency
+    _VARIABLE_CACHE.clear()
 
 
 def test_instrments():

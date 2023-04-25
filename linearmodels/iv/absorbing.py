@@ -30,7 +30,6 @@ from numpy import (
 )
 from numpy.linalg import lstsq
 from pandas import Categorical, CategoricalDtype, DataFrame, Series
-from pandas.api.types import is_categorical_dtype
 import scipy.sparse as sp
 from scipy.sparse.linalg import lsmr
 
@@ -173,7 +172,7 @@ def category_product(cats: AnyPandas) -> Series:
     for c in cats:
         # TODO: Bug in pandas-stubs
         #  https://github.com/pandas-dev/pandas-stubs/issues/97
-        if not isinstance(cats[c], CategoricalDtype):  # type: ignore
+        if not isinstance(cats[c].dtype, CategoricalDtype):
             raise TypeError("cats must contain only categorical variables")
         # TODO: Bug in pandas-stubs
         #  https://github.com/pandas-dev/pandas-stubs/issues/97
@@ -465,7 +464,9 @@ class Interaction:
         >>> interact.sparse.shape # Cart product of all cats, 5!, times ncont, 6
         (100000, 720)
         """
-        cat_cols = [col for col in frame if isinstance(frame[col], CategoricalDtype)]
+        cat_cols = [
+            col for col in frame if isinstance(frame[col].dtype, CategoricalDtype)
+        ]
         cont_cols = [col for col in frame if col not in cat_cols]
         # TODO: Bug in pandas-stubs
         #   https://github.com/pandas-dev/pandas-stubs/issues/97
@@ -555,7 +556,7 @@ class AbsorbingRegressor:
         if self._cat is not None and self._cat.shape[1] > 0:
             regressors.append(dummy_matrix(self._cat, precondition=False)[0])
         if self._cont is not None and self._cont.shape[1] > 0:
-            regressors.append(sp.csc_matrix(self._cont.to_numpy()))
+            regressors.append(sp.csc_matrix(self._cont.astype(float).to_numpy()))
         if self._interactions is not None:
             regressors.extend([interact.sparse for interact in self._interactions])
 

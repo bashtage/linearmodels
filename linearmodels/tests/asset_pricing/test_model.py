@@ -114,7 +114,7 @@ def test_linear_model_time_series(data):
 
     alphas = np.array(all_params)[0::nfp1][:, None]
     alpha_cov = cov[0 : (nfp1 * nport) : nfp1, 0 : (nfp1 * nport) : nfp1]
-    stat_direct = float(alphas.T @ np.linalg.inv(alpha_cov) @ alphas)
+    stat_direct = float(np.squeeze(alphas.T @ np.linalg.inv(alpha_cov) @ alphas))
     assert_allclose(res.j_statistic.stat, stat_direct)
     assert_allclose(1.0 - stats.chi2.cdf(stat_direct, nport), res.j_statistic.pval)
 
