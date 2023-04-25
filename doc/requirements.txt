@@ -1,9 +1,9 @@
-sphinx_material
+sphinx_immaterial
 sphinx_autodoc_typehints
 ipython
 nbsphinx
 sphinxcontrib.spelling
-sphinx >=5,<6
+sphinx
 jupyter
 notebook
 xarray>=0.13
