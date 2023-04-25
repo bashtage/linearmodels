@@ -15,7 +15,7 @@
     
   
       
-        <title>linearmodels.system.model.SUR - arch v4.30 (+5)</title>
+        <title>linearmodels.system.model.SUR - linearmodels v4.30 (+9)</title>
       
     
 
@@ -27,11 +27,6 @@
   <link rel="shortcut icon" href="../../_static/icons/favicon.ico">
   <meta name="msapplication-TileColor" content="#f8f8f8">
   <meta name="msapplication-config" content="../../_static/icons/browserconfig.xml">
-  <style>
-  .highlight {
-    background-color: hsla(0,0%,92.5%,.5) !important;
-  }
-  </style>
 
     
       
@@ -98,7 +93,7 @@
 
 <header class="md-header" data-md-component="header">
   <nav class="md-header__inner md-grid" aria-label="Header">
-    <a href="../../index.html" title="arch v4.30 (+5)" class="md-header__button md-logo" aria-label="arch v4.30 (+5)" data-md-component="logo">
+    <a href="../../index.html" title="linearmodels v4.30 (+9)" class="md-header__button md-logo" aria-label="linearmodels v4.30 (+9)" data-md-component="logo">
       <img src="../../_static/bw-logo.svg" alt="logo">
     </a>
     <label class="md-header__button md-icon" for="__drawer">
@@ -108,7 +103,7 @@
       <div class="md-header__ellipsis">
         <div class="md-header__topic">
           <span class="md-ellipsis">
-            arch v4.30 (+5)
+            linearmodels v4.30 (+9)
           </span>
         </div>
         <div class="md-header__topic" data-md-component="header-topic">
@@ -195,10 +190,10 @@
 
 <nav class="md-nav md-nav--primary" aria-label="Navigation" data-md-level="0">
   <label class="md-nav__title" for="__drawer">
-    <a href="../../index.html" title="arch v4.30 (+5)" class="md-nav__button md-logo" aria-label="arch v4.30 (+5)" data-md-component="logo">
+    <a href="../../index.html" title="linearmodels v4.30 (+9)" class="md-nav__button md-logo" aria-label="linearmodels v4.30 (+9)" data-md-component="logo">
       <img src="../../_static/bw-logo.svg" alt="logo">
     </a>
-    arch v4.30 (+5)
+    linearmodels v4.30 (+9)
   </label>
   
     <div class="md-nav__source">
@@ -676,12 +671,25 @@
     <span class="md-ellipsis">Parameters</span>
   </a>
   
+    <nav class="md-nav" aria-label="Parameters">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#linearmodels.system.model.SUR.__init__.equations" class="md-nav__link">
+    <span aria-label="Python parameter" class="objinfo-icon objinfo-icon__sub-data" title="Python parameter">p</span><span title="linearmodels.system.model.SUR.__init__.equations (Python parameter) — Dictionary-like structure containing dependent and exogenous variable values.  Each key is an equations label and must be a string. Each value must be either a tuple of the form (dependent, exog, [weights]) or a dictionary with keys &#34;dependent&#34; and &#34;exog&#34; and the optional key &#34;weights&#34;." class="md-ellipsis">equations</span>
+  </a>
+  
 </li>
         
           <li class="md-nav__item">
-  <a href="#linearmodels.system.model.SUR-attributes" class="md-nav__link">
-    <span class="md-ellipsis">Attributes</span>
+  <a href="#linearmodels.system.model.SUR.__init__.sigma" class="md-nav__link">
+    <span aria-label="Python parameter" class="objinfo-icon objinfo-icon__sub-data" title="Python parameter">p</span><span title="linearmodels.system.model.SUR.__init__.sigma (Python parameter) — Prespecified residual covariance to use in GLS estimation. If not provided, FGLS is implemented based on an estimate of sigma." class="md-ellipsis">sigma</span>
   </a>
+  
+</li>
+        
+      </ul>
+    </nav>
   
 </li>
         
@@ -1121,12 +1129,25 @@
     <span class="md-ellipsis">Parameters</span>
   </a>
   
+    <nav class="md-nav" aria-label="Parameters">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#linearmodels.system.model.SUR.__init__.equations" class="md-nav__link">
+    <span aria-label="Python parameter" class="objinfo-icon objinfo-icon__sub-data" title="Python parameter">p</span><span title="linearmodels.system.model.SUR.__init__.equations (Python parameter) — Dictionary-like structure containing dependent and exogenous variable values.  Each key is an equations label and must be a string. Each value must be either a tuple of the form (dependent, exog, [weights]) or a dictionary with keys &#34;dependent&#34; and &#34;exog&#34; and the optional key &#34;weights&#34;." class="md-ellipsis">equations</span>
+  </a>
+  
 </li>
         
           <li class="md-nav__item">
-  <a href="#linearmodels.system.model.SUR-attributes" class="md-nav__link">
-    <span class="md-ellipsis">Attributes</span>
+  <a href="#linearmodels.system.model.SUR.__init__.sigma" class="md-nav__link">
+    <span aria-label="Python parameter" class="objinfo-icon objinfo-icon__sub-data" title="Python parameter">p</span><span title="linearmodels.system.model.SUR.__init__.sigma (Python parameter) — Prespecified residual covariance to use in GLS estimation. If not provided, FGLS is implemented based on an estimate of sigma." class="md-ellipsis">sigma</span>
   </a>
+  
+</li>
+        
+      </ul>
+    </nav>
   
 </li>
         
@@ -1152,18 +1173,18 @@
 <h1 id="linearmodels-system-model-sur">linearmodels.system.model.SUR<a class="headerlink" href="#linearmodels-system-model-sur" title="Permalink to this heading">¶</a></h1>
 <dl class="py class objdesc">
 <dt class="sig sig-object highlight py" id="linearmodels.system.model.SUR">
-<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">linearmodels.system.model.</span></span><span class="sig-name descname"><span class="pre">SUR</span></span><span class="sig-paren">(</span><span class="sig-param-decl"><em class="sig-param"><span class="n"><span class="pre">equations</span></span></em>, </span><span class="sig-param-decl"><em class="sig-param"><span class="o"><span class="pre">*</span></span></em>, </span><span class="sig-param-decl"><em class="sig-param"><span class="n"><span class="pre">sigma</span></span><span class="o"><span class="pre">=</span></span><code class="code python default_value docutils literal highlight highlight-python"><span class="kc">None</span></code></em></span><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/linearmodels/system/model.html#SUR"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#linearmodels.system.model.SUR" title="Permalink to this definition">¶</a></dt>
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">linearmodels.system.model.</span></span><span class="sig-name descname"><span class="pre">SUR</span></span><span class="sig-paren">(</span><span class="sig-param-decl"><em class="sig-param"><a class="n reference internal" href="#linearmodels.system.model.SUR.__init__.equations" title="linearmodels.system.model.SUR.__init__.equations (Python parameter) — Dictionary-like structure containing dependent and exogenous variable values.  Each key is an equations label and must be a string. Each value must be either a tuple of the form (dependent, exog, [weights]) or a dictionary with keys &quot;dependent&quot; and &quot;exog&quot; and the optional key &quot;weights&quot;."><span class="n"><span class="pre">equations</span></span></a></em>, </span><span class="sig-param-decl"><em class="sig-param"><span class="o"><span class="pre">*</span></span></em>, </span><span class="sig-param-decl"><em class="sig-param"><a class="n reference internal" href="#linearmodels.system.model.SUR.__init__.sigma" title="linearmodels.system.model.SUR.__init__.sigma (Python parameter) — Prespecified residual covariance to use in GLS estimation. If not provided, FGLS is implemented based on an estimate of sigma."><span class="n"><span class="pre">sigma</span></span></a><span class="o"><span class="pre">=</span></span><code class="code python default_value docutils literal highlight highlight-python"><span class="kc">None</span></code></em></span><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/linearmodels/system/model.html#SUR"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#linearmodels.system.model.SUR" title="Permalink to this definition">¶</a></dt>
 <dd><p>Seemingly unrelated regression estimation (SUR/SURE)</p>
-<dl class="field-list">
+<dl class="field-list simple">
 <dt class="field-odd" id="linearmodels.system.model.SUR-parameters">Parameters<span class="colon">:</span><a class="headerlink" href="#linearmodels.system.model.SUR-parameters" title="Permalink to this headline">¶</a></dt>
-<dd class="field-odd"><dl>
-<dt><strong>equations</strong><span class="classifier"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.11)"><code class="docutils literal notranslate"><span class="pre">dict</span></code></a></span></dt><dd><p>Dictionary-like structure containing dependent and exogenous variable
+<dd class="field-odd"><dl class="simple api-field highlight">
+<dt id="linearmodels.system.model.SUR.__init__.equations"><span class="sig-name descname">equations</span><span class="p"> : </span><span class="desctype"><span class="desctype"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.11)">dict</a></span></span><a class="headerlink" href="#linearmodels.system.model.SUR.__init__.equations" title="Permalink to this definition">¶</a></dt><dd><p>Dictionary-like structure containing dependent and exogenous variable
 values.  Each key is an equations label and must be a string. Each
 value must be either a tuple of the form (dependent,
 exog, [weights]) or a dictionary with keys “dependent” and “exog” and
 the optional key “weights”.</p>
 </dd>
-<dt><strong>sigma</strong><span class="classifier"><span class="xref std std-term">numpy:array_like</span></span></dt><dd><p>Prespecified residual covariance to use in GLS estimation. If not
+<dt id="linearmodels.system.model.SUR.__init__.sigma"><span class="sig-name descname">sigma</span><span class="p"> : </span><span class="desctype"><span class="desctype">array_like</span></span><a class="headerlink" href="#linearmodels.system.model.SUR.__init__.sigma" title="Permalink to this definition">¶</a></dt><dd><p>Prespecified residual covariance to use in GLS estimation. If not
 provided, FGLS is implemented based on an estimate of sigma.</p>
 </dd>
 </dl>
@@ -1204,20 +1225,6 @@ expressed as</p>
 <p>where <span class="math notranslate nohighlight">\(\Sigma\)</span> is the covariance matrix of the residuals.</p>
 <p>SUR is a special case of 3SLS where there are no endogenous regressors and
 no instruments.</p>
-<dl class="field-list simple">
-<dt class="field-odd" id="linearmodels.system.model.SUR-attributes">Attributes<span class="colon">:</span><a class="headerlink" href="#linearmodels.system.model.SUR-attributes" title="Permalink to this headline">¶</a></dt>
-<dd class="field-odd"><dl class="simple">
-<dt><a class="reference internal" href="linearmodels.system.model.SUR.constraints.html#linearmodels.system.model.SUR.constraints" title="linearmodels.system.model.SUR.constraints (Python property) — Model constraints"><code class="xref py py-obj docutils literal notranslate"><span class="pre">constraints</span></code></a></dt><dd><p>Model constraints</p>
-</dd>
-<dt><a class="reference internal" href="linearmodels.system.model.SUR.formula.html#linearmodels.system.model.SUR.formula" title="linearmodels.system.model.SUR.formula (Python property) — Set or get the formula used to construct the model"><code class="xref py py-obj docutils literal notranslate"><span class="pre">formula</span></code></a></dt><dd><p>Set or get the formula used to construct the model</p>
-</dd>
-<dt><a class="reference internal" href="linearmodels.system.model.SUR.has_constant.html#linearmodels.system.model.SUR.has_constant" title="linearmodels.system.model.SUR.has_constant (Python property) — Vector indicating which equations contain constants"><code class="xref py py-obj docutils literal notranslate"><span class="pre">has_constant</span></code></a></dt><dd><p>Vector indicating which equations contain constants</p>
-</dd>
-<dt><a class="reference internal" href="linearmodels.system.model.SUR.param_names.html#linearmodels.system.model.SUR.param_names" title="linearmodels.system.model.SUR.param_names (Python property) — Model parameter names"><code class="xref py py-obj docutils literal notranslate"><span class="pre">param_names</span></code></a></dt><dd><p>Model parameter names</p>
-</dd>
-</dl>
-</dd>
-</dl>
 <p class="rubric">Methods</p>
 <table class="autosummary longtable docutils data align-default">
 <tbody>

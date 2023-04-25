@@ -15,7 +15,7 @@
     
   
       
-        <title>linearmodels.system.model.IV3SLS - arch v4.30 (+5)</title>
+        <title>linearmodels.system.model.IV3SLS - linearmodels v4.30 (+9)</title>
       
     
 
@@ -27,11 +27,6 @@
   <link rel="shortcut icon" href="../../_static/icons/favicon.ico">
   <meta name="msapplication-TileColor" content="#f8f8f8">
   <meta name="msapplication-config" content="../../_static/icons/browserconfig.xml">
-  <style>
-  .highlight {
-    background-color: hsla(0,0%,92.5%,.5) !important;
-  }
-  </style>
 
     
       
@@ -98,7 +93,7 @@
 
 <header class="md-header" data-md-component="header">
   <nav class="md-header__inner md-grid" aria-label="Header">
-    <a href="../../index.html" title="arch v4.30 (+5)" class="md-header__button md-logo" aria-label="arch v4.30 (+5)" data-md-component="logo">
+    <a href="../../index.html" title="linearmodels v4.30 (+9)" class="md-header__button md-logo" aria-label="linearmodels v4.30 (+9)" data-md-component="logo">
       <img src="../../_static/bw-logo.svg" alt="logo">
     </a>
     <label class="md-header__button md-icon" for="__drawer">
@@ -108,7 +103,7 @@
       <div class="md-header__ellipsis">
         <div class="md-header__topic">
           <span class="md-ellipsis">
-            arch v4.30 (+5)
+            linearmodels v4.30 (+9)
           </span>
         </div>
         <div class="md-header__topic" data-md-component="header-topic">
@@ -195,10 +190,10 @@
 
 <nav class="md-nav md-nav--primary" aria-label="Navigation" data-md-level="0">
   <label class="md-nav__title" for="__drawer">
-    <a href="../../index.html" title="arch v4.30 (+5)" class="md-nav__button md-logo" aria-label="arch v4.30 (+5)" data-md-component="logo">
+    <a href="../../index.html" title="linearmodels v4.30 (+9)" class="md-nav__button md-logo" aria-label="linearmodels v4.30 (+9)" data-md-component="logo">
       <img src="../../_static/bw-logo.svg" alt="logo">
     </a>
-    arch v4.30 (+5)
+    linearmodels v4.30 (+9)
   </label>
   
     <div class="md-nav__source">
@@ -691,12 +686,25 @@
     <span class="md-ellipsis">Parameters</span>
   </a>
   
+    <nav class="md-nav" aria-label="Parameters">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#linearmodels.system.model.IV3SLS.__init__.equations" class="md-nav__link">
+    <span aria-label="Python parameter" class="objinfo-icon objinfo-icon__sub-data" title="Python parameter">p</span><span title="linearmodels.system.model.IV3SLS.__init__.equations (Python parameter) — Dictionary-like structure containing dependent, exogenous, endogenous and instrumental variables.  Each key is an equations label and must be a string. Each value must be either a tuple of the form (dependent, exog, endog, instrument[, weights]) or a dictionary with keys &#34;dependent&#34;, and at least one of &#34;exog&#34; or &#34;endog&#34; and &#34;instruments&#34;.  When using a tuple, values must be provided for all 4 variables, although either empty arrays or None can be passed if a category of variable is not included in a model. The dictionary may contain optional keys for &#34;exog&#34;, &#34;endog&#34;, &#34;instruments&#34;, and &#34;weights&#34;. &#34;exog&#34; can be omitted if all variables in an equation are endogenous. Alternatively, &#34;exog&#34; can contain either an empty array or None to indicate that an equation contains no exogenous regressors. Similarly &#34;endog&#34; and &#34;instruments&#34; can either be omitted or may contain an empty array (or None) if all variables in an equation are exogenous." class="md-ellipsis">equations</span>
+  </a>
+  
 </li>
         
           <li class="md-nav__item">
-  <a href="#linearmodels.system.model.IV3SLS-attributes" class="md-nav__link">
-    <span class="md-ellipsis">Attributes</span>
+  <a href="#linearmodels.system.model.IV3SLS.__init__.sigma" class="md-nav__link">
+    <span aria-label="Python parameter" class="objinfo-icon objinfo-icon__sub-data" title="Python parameter">p</span><span title="linearmodels.system.model.IV3SLS.__init__.sigma (Python parameter) — Prespecified residual covariance to use in GLS estimation. If not provided, FGLS is implemented based on an estimate of sigma." class="md-ellipsis">sigma</span>
   </a>
+  
+</li>
+        
+      </ul>
+    </nav>
   
 </li>
         
@@ -1121,12 +1129,25 @@
     <span class="md-ellipsis">Parameters</span>
   </a>
   
+    <nav class="md-nav" aria-label="Parameters">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#linearmodels.system.model.IV3SLS.__init__.equations" class="md-nav__link">
+    <span aria-label="Python parameter" class="objinfo-icon objinfo-icon__sub-data" title="Python parameter">p</span><span title="linearmodels.system.model.IV3SLS.__init__.equations (Python parameter) — Dictionary-like structure containing dependent, exogenous, endogenous and instrumental variables.  Each key is an equations label and must be a string. Each value must be either a tuple of the form (dependent, exog, endog, instrument[, weights]) or a dictionary with keys &#34;dependent&#34;, and at least one of &#34;exog&#34; or &#34;endog&#34; and &#34;instruments&#34;.  When using a tuple, values must be provided for all 4 variables, although either empty arrays or None can be passed if a category of variable is not included in a model. The dictionary may contain optional keys for &#34;exog&#34;, &#34;endog&#34;, &#34;instruments&#34;, and &#34;weights&#34;. &#34;exog&#34; can be omitted if all variables in an equation are endogenous. Alternatively, &#34;exog&#34; can contain either an empty array or None to indicate that an equation contains no exogenous regressors. Similarly &#34;endog&#34; and &#34;instruments&#34; can either be omitted or may contain an empty array (or None) if all variables in an equation are exogenous." class="md-ellipsis">equations</span>
+  </a>
+  
 </li>
         
           <li class="md-nav__item">
-  <a href="#linearmodels.system.model.IV3SLS-attributes" class="md-nav__link">
-    <span class="md-ellipsis">Attributes</span>
+  <a href="#linearmodels.system.model.IV3SLS.__init__.sigma" class="md-nav__link">
+    <span aria-label="Python parameter" class="objinfo-icon objinfo-icon__sub-data" title="Python parameter">p</span><span title="linearmodels.system.model.IV3SLS.__init__.sigma (Python parameter) — Prespecified residual covariance to use in GLS estimation. If not provided, FGLS is implemented based on an estimate of sigma." class="md-ellipsis">sigma</span>
   </a>
+  
+</li>
+        
+      </ul>
+    </nav>
   
 </li>
         
@@ -1152,12 +1173,12 @@
 <h1 id="linearmodels-system-model-iv3sls">linearmodels.system.model.IV3SLS<a class="headerlink" href="#linearmodels-system-model-iv3sls" title="Permalink to this heading">¶</a></h1>
 <dl class="py class objdesc">
 <dt class="sig sig-object highlight py" id="linearmodels.system.model.IV3SLS">
-<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">linearmodels.system.model.</span></span><span class="sig-name descname"><span class="pre">IV3SLS</span></span><span class="sig-paren">(</span><span class="sig-param-decl"><em class="sig-param"><span class="n"><span class="pre">equations</span></span></em>, </span><span class="sig-param-decl"><em class="sig-param"><span class="o"><span class="pre">*</span></span></em>, </span><span class="sig-param-decl"><em class="sig-param"><span class="n"><span class="pre">sigma</span></span><span class="o"><span class="pre">=</span></span><code class="code python default_value docutils literal highlight highlight-python"><span class="kc">None</span></code></em></span><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/linearmodels/system/model.html#IV3SLS"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#linearmodels.system.model.IV3SLS" title="Permalink to this definition">¶</a></dt>
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">linearmodels.system.model.</span></span><span class="sig-name descname"><span class="pre">IV3SLS</span></span><span class="sig-paren">(</span><span class="sig-param-decl"><em class="sig-param"><a class="n reference internal" href="#linearmodels.system.model.IV3SLS.__init__.equations" title="linearmodels.system.model.IV3SLS.__init__.equations (Python parameter) — Dictionary-like structure containing dependent, exogenous, endogenous and instrumental variables.  Each key is an equations label and must be a string. Each value must be either a tuple of the form (dependent, exog, endog, instrument[, weights]) or a dictionary with keys &quot;dependent&quot;, and at least one of &quot;exog&quot; or &quot;endog&quot; and &quot;instruments&quot;.  When using a tuple, values must be provided for all 4 variables, although either empty arrays or None can be passed if a category of variable is not included in a model. The dictionary may contain optional keys for &quot;exog&quot;, &quot;endog&quot;, &quot;instruments&quot;, and &quot;weights&quot;. &quot;exog&quot; can be omitted if all variables in an equation are endogenous. Alternatively, &quot;exog&quot; can contain either an empty array or None to indicate that an equation contains no exogenous regressors. Similarly &quot;endog&quot; and &quot;instruments&quot; can either be omitted or may contain an empty array (or None) if all variables in an equation are exogenous."><span class="n"><span class="pre">equations</span></span></a></em>, </span><span class="sig-param-decl"><em class="sig-param"><span class="o"><span class="pre">*</span></span></em>, </span><span class="sig-param-decl"><em class="sig-param"><a class="n reference internal" href="#linearmodels.system.model.IV3SLS.__init__.sigma" title="linearmodels.system.model.IV3SLS.__init__.sigma (Python parameter) — Prespecified residual covariance to use in GLS estimation. If not provided, FGLS is implemented based on an estimate of sigma."><span class="n"><span class="pre">sigma</span></span></a><span class="o"><span class="pre">=</span></span><code class="code python default_value docutils literal highlight highlight-python"><span class="kc">None</span></code></em></span><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/linearmodels/system/model.html#IV3SLS"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#linearmodels.system.model.IV3SLS" title="Permalink to this definition">¶</a></dt>
 <dd><p>Three-stage Least Squares (3SLS) Estimator</p>
-<dl class="field-list">
+<dl class="field-list simple">
 <dt class="field-odd" id="linearmodels.system.model.IV3SLS-parameters">Parameters<span class="colon">:</span><a class="headerlink" href="#linearmodels.system.model.IV3SLS-parameters" title="Permalink to this headline">¶</a></dt>
-<dd class="field-odd"><dl>
-<dt><strong>equations</strong><span class="classifier"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.11)"><code class="docutils literal notranslate"><span class="pre">dict</span></code></a></span></dt><dd><p>Dictionary-like structure containing dependent, exogenous, endogenous
+<dd class="field-odd"><dl class="simple api-field highlight">
+<dt id="linearmodels.system.model.IV3SLS.__init__.equations"><span class="sig-name descname">equations</span><span class="p"> : </span><span class="desctype"><span class="desctype"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.11)">dict</a></span></span><a class="headerlink" href="#linearmodels.system.model.IV3SLS.__init__.equations" title="Permalink to this definition">¶</a></dt><dd><p>Dictionary-like structure containing dependent, exogenous, endogenous
 and instrumental variables.  Each key is an equations label and must
 be a string. Each value must be either a tuple of the form (dependent,
 exog, endog, instrument[, weights]) or a dictionary with keys “dependent”,
@@ -1172,7 +1193,7 @@ equation contains no exogenous regressors. Similarly “endog” and
 “instruments” can either be omitted or may contain an empty array (or
 <cite>None</cite>) if all variables in an equation are exogenous.</p>
 </dd>
-<dt><strong>sigma</strong><span class="classifier"><span class="xref std std-term">numpy:array_like</span></span></dt><dd><p>Prespecified residual covariance to use in GLS estimation. If not
+<dt id="linearmodels.system.model.IV3SLS.__init__.sigma"><span class="sig-name descname">sigma</span><span class="p"> : </span><span class="desctype"><span class="desctype">array_like</span></span><a class="headerlink" href="#linearmodels.system.model.IV3SLS.__init__.sigma" title="Permalink to this definition">¶</a></dt><dd><p>Prespecified residual covariance to use in GLS estimation. If not
 provided, FGLS is implemented based on an estimate of sigma.</p>
 </dd>
 </dl>
@@ -1213,20 +1234,6 @@ satisfied, a GLS estimator of the form</p>
 <div class="math notranslate nohighlight">
 \[\Omega = \Sigma \otimes I_N\]</div>
 <p>where <span class="math notranslate nohighlight">\(\Sigma\)</span> is the covariance matrix of the residuals.</p>
-<dl class="field-list simple">
-<dt class="field-odd" id="linearmodels.system.model.IV3SLS-attributes">Attributes<span class="colon">:</span><a class="headerlink" href="#linearmodels.system.model.IV3SLS-attributes" title="Permalink to this headline">¶</a></dt>
-<dd class="field-odd"><dl class="simple">
-<dt><a class="reference internal" href="linearmodels.system.model.IV3SLS.constraints.html#linearmodels.system.model.IV3SLS.constraints" title="linearmodels.system.model.IV3SLS.constraints (Python property) — Model constraints"><code class="xref py py-obj docutils literal notranslate"><span class="pre">constraints</span></code></a></dt><dd><p>Model constraints</p>
-</dd>
-<dt><a class="reference internal" href="linearmodels.system.model.IV3SLS.formula.html#linearmodels.system.model.IV3SLS.formula" title="linearmodels.system.model.IV3SLS.formula (Python property) — Set or get the formula used to construct the model"><code class="xref py py-obj docutils literal notranslate"><span class="pre">formula</span></code></a></dt><dd><p>Set or get the formula used to construct the model</p>
-</dd>
-<dt><a class="reference internal" href="linearmodels.system.model.IV3SLS.has_constant.html#linearmodels.system.model.IV3SLS.has_constant" title="linearmodels.system.model.IV3SLS.has_constant (Python property) — Vector indicating which equations contain constants"><code class="xref py py-obj docutils literal notranslate"><span class="pre">has_constant</span></code></a></dt><dd><p>Vector indicating which equations contain constants</p>
-</dd>
-<dt><a class="reference internal" href="linearmodels.system.model.IV3SLS.param_names.html#linearmodels.system.model.IV3SLS.param_names" title="linearmodels.system.model.IV3SLS.param_names (Python property) — Model parameter names"><code class="xref py py-obj docutils literal notranslate"><span class="pre">param_names</span></code></a></dt><dd><p>Model parameter names</p>
-</dd>
-</dl>
-</dd>
-</dl>
 <p class="rubric">Methods</p>
 <table class="autosummary longtable docutils data align-default">
 <tbody>
