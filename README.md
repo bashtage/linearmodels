@@ -153,7 +153,7 @@ is possible that older versions work.
 ### Documentation
 
 -   sphinx
--   sphinx-material
+-   sphinx-immaterial
 -   nbsphinx
 -   nbconvert
 -   nbformat

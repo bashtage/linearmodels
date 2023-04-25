@@ -9,8 +9,8 @@ pytest>=7.0,<7.1
 pytest-xdist
 pytest-cov
 seaborn
-sphinx >=5,<6
-sphinx-material
+sphinx
+sphinx-immaterial
 sphinxcontrib-spelling
 sphinx_autodoc_typehints
 xarray>=0.13
