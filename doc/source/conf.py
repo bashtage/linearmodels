@@ -18,7 +18,7 @@ import linearmodels
 
 # -- Project information -----------------------------------------------------
 
-project = "arch"
+project = "linearmodels"
 copyright = "2021, Kevin Sheppard"
 author = "Kevin Sheppard"
 
