@@ -1,1 +1,1463 @@
-<!DOCTYPE html> <html lang=en > <meta charset=utf-8  /> <meta name=viewport  content="width=device-width, initial-scale=1.0" /><meta name=generator  content="Docutils 0.19: https://docutils.sourceforge.io/" /> <meta name=viewport  content="width=device-width,initial-scale=1"> <meta http-equiv=x-ua-compatible  content="ie=edge"> <meta name="lang:clipboard.copy" content="Copy to clipboard"> <meta name="lang:clipboard.copied" content="Copied to clipboard"> <meta name="lang:search.language" content=en > <meta name="lang:search.pipeline.stopwords" content=True > <meta name="lang:search.pipeline.trimmer" content=True > <meta name="lang:search.result.none" content="No matching documents"> <meta name="lang:search.result.one" content="1 matching document"> <meta name="lang:search.result.other" content="# matching documents"> <meta name="lang:search.tokenizer" content="[\s\-]+"> <link href="https://fonts.gstatic.com/" rel=preconnect  crossorigin> <link href="https://fonts.googleapis.com/css?family=Roboto+Mono:400,500,700|Roboto:300,400,400i,700&display=fallback" rel=stylesheet > <style> body, input { font-family: "Roboto", "Helvetica Neue", Helvetica, Arial, sans-serif } code, kbd, pre { font-family: "Roboto Mono", "Courier New", Courier, monospace } </style> <link rel=stylesheet  href="../_static/stylesheets/application.css"/> <link rel=stylesheet  href="../_static/stylesheets/application-palette.css"/> <link rel=stylesheet  href="../_static/stylesheets/application-fixes.css"/> <link rel=stylesheet  href="../_static/fonts/material-icons.css"/> <meta name=theme-color  content="#2196f3"> <script src="../_static/javascripts/modernizr.js"></script> <title>Formulas and Mathematical Detail &#8212; linearmodels 4.30.dev3+gddd9602e2 documentation</title> <link rel=apple-touch-icon  sizes=180x180  href="../_static/icons/apple-touch-icon.png"> <link rel=icon  type="image/png" sizes=32x32  href="../_static/icons/favicon-32x32.png"> <link rel=icon  type="image/png" sizes=16x16  href="../_static/icons/favicon-16x16.png"> <link rel=manifest  href="../_static/icons/site.webmanifest"> <link rel=mask-icon  href="../_static/icons/safari-pinned-tab.svg" color="#2196f3"> <link rel="shortcut icon" href="../_static/icons/favicon.ico"> <meta name=msapplication-TileColor  content="#f8f8f8"> <meta name=msapplication-config  content="../_static/icons/browserconfig.xml"> <style> .highlight { background-color: hsla(0,0%,92.5%,.5) !important; } </style> <link rel=stylesheet  type="text/css" href="../_static/pygments.css" /> <link rel=stylesheet  type="text/css" href="../_static/material.css" /> <script data-url_root="../" id=documentation_options  src="../_static/documentation_options.js"></script> <script src="../_static/jquery.js"></script> <script src="../_static/underscore.js"></script> <script src="../_static/_sphinx_javascript_frameworks_compat.js"></script> <script src="../_static/doctools.js"></script> <script src="../_static/sphinx_highlight.js"></script> <script crossorigin=anonymous  integrity="sha256-Ae2Vz/4ePdIu6ZyI/5ZGsYnb+m0JlOmKPjt6XZ9JJkA=" src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.4/require.min.js"></script> <script>window.MathJax = {"tex": {"inlineMath": [["$", "$"], ["\\(", "\\)"]], "processEscapes": true}, "options": {"ignoreHtmlClass": "tex2jax_ignore|mathjax_ignore|document", "processHtmlClass": "tex2jax_process|mathjax_process|math|output_area"}}</script> <script defer=defer  src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script> <link rel="shortcut icon" href="../_static/favicon.ico"/> <link rel=index  title=Index  href="../genindex.html" /> <link rel=search  title=Search  href="../search.html" /> <link rel=next  title="Panel Data Model Estimation" href="../panel/index.html" /> <link rel=prev  title=linearmodels.iv.data.IVData.shape  href="iv/linearmodels.iv.data.IVData.shape.html" /> <body dir=ltr data-md-color-primary=blue data-md-color-accent=orange> <svg class=md-svg > <defs data-children-count=0 > <svg xmlns="http://www.w3.org/2000/svg" width=416  height=448  viewBox="0 0 416 448" id=__github ><path fill=currentColor  d="M160 304q0 10-3.125 20.5t-10.75 19T128 352t-18.125-8.5-10.75-19T96 304t3.125-20.5 10.75-19T128 256t18.125 8.5 10.75 19T160 304zm160 0q0 10-3.125 20.5t-10.75 19T288 352t-18.125-8.5-10.75-19T256 304t3.125-20.5 10.75-19T288 256t18.125 8.5 10.75 19T320 304zm40 0q0-30-17.25-51T296 232q-10.25 0-48.75 5.25Q229.5 240 208 240t-39.25-2.75Q130.75 232 120 232q-29.5 0-46.75 21T56 304q0 22 8 38.375t20.25 25.75 30.5 15 35 7.375 37.25 1.75h42q20.5 0 37.25-1.75t35-7.375 30.5-15 20.25-25.75T360 304zm56-44q0 51.75-15.25 82.75-9.5 19.25-26.375 33.25t-35.25 21.5-42.5 11.875-42.875 5.5T212 416q-19.5 0-35.5-.75t-36.875-3.125-38.125-7.5-34.25-12.875T37 371.5t-21.5-28.75Q0 312 0 260q0-59.25 34-99-6.75-20.5-6.75-42.5 0-29 12.75-54.5 27 0 47.5 9.875t47.25 30.875Q171.5 96 212 96q37 0 70 8 26.25-20.5 46.75-30.25T376 64q12.75 25.5 12.75 54.5 0 21.75-6.75 42 34 40 34 99.5z"/></svg> </defs> </svg> <input class=md-toggle  data-md-toggle=drawer  type=checkbox  id=__drawer > <input class=md-toggle  data-md-toggle=search  type=checkbox  id=__search > <label class=md-overlay  data-md-component=overlay  for=__drawer ></label> <a href="#iv/mathematical-formula" tabindex=1  class=md-skip > Skip to content </a> <header class=md-header  data-md-component=header > <nav class="md-header-nav md-grid"> <div class="md-flex navheader"> <div class="md-flex__cell md-flex__cell--shrink"> <a href="../index.html" title="linearmodels 4.30.dev3+gddd9602e2 documentation" class="md-header-nav__button md-logo"> <img src="../_static/bw-logo.svg" height=26  alt="linearmodels 4.30.dev3+gddd9602e2 documentation logo"> </a> </div> <div class="md-flex__cell md-flex__cell--shrink"> <label class="md-icon md-icon--menu md-header-nav__button" for=__drawer ></label> </div> <div class="md-flex__cell md-flex__cell--stretch"> <div class="md-flex__ellipsis md-header-nav__title" data-md-component=title > <span class=md-header-nav__topic >linearmodels v4.30 (+3)</span> <span class=md-header-nav__topic > Formulas and Mathematical Detail </span> </div> </div> <div class="md-flex__cell md-flex__cell--shrink"> <label class="md-icon md-icon--search md-header-nav__button" for=__search ></label> <div class=md-search  data-md-component=search  role=dialog > <label class=md-search__overlay  for=__search ></label> <div class=md-search__inner  role=search > <form class=md-search__form  action="../search.html" method=get  name=search > <input type=text  class=md-search__input  name=q  placeholder=Search  autocapitalize=off  autocomplete=off  spellcheck=false  data-md-component=query  data-md-state=active > <label class="md-icon md-search__icon" for=__search ></label> <button type=reset  class="md-icon md-search__icon" data-md-component=reset  tabindex=-1 > &#xE5CD; </button> </form> <div class=md-search__output > <div class=md-search__scrollwrap  data-md-scrollfix> <div class=md-search-result  data-md-component=result > <div class=md-search-result__meta > Type to start searching </div> <ol class=md-search-result__list ></ol> </div> </div> </div> </div> </div> </div> <div class="md-flex__cell md-flex__cell--shrink"> <div class=md-header-nav__source > <a href="https://github.com/bashtage/linearmodels/" title="Go to repository" class=md-source  data-md-source=github > <div class=md-source__icon > <svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" viewBox="0 0 24 24" width=28  height=28 > <use xlink:href="#__github" width=24  height=24 ></use> </svg> </div> <div class=md-source__repository > linearmodels </div> </a> </div> </div> <div class="md-flex__cell md-flex__cell--shrink dropdown"> <button class=dropdownbutton >Versions</button> <div class="dropdown-content md-hero"> <a title=Release  href="https://bashtage.github.io/linearmodels/">Release</a> <a title=Development  href="https://bashtage.github.io/linearmodels/devel/">Development</a> </div> </div> </div> </nav> </header> <div class=md-container > <nav class=md-tabs  data-md-component=tabs > <div class="md-tabs__inner md-grid"> <ul class=md-tabs__list > <li class=md-tabs__item ><a href=index.html  class=md-tabs__link >Instrumental Variable Estimation</a> </ul> </div> </nav> <main class=md-main > <div class="md-main__inner md-grid" data-md-component=container > <div class="md-sidebar md-sidebar--primary" data-md-component=navigation > <div class=md-sidebar__scrollwrap > <div class=md-sidebar__inner > <nav class="md-nav md-nav--primary" data-md-level=0 > <label class="md-nav__title md-nav__title--site" for=__drawer > <a href="../index.html" title="linearmodels 4.30.dev3+gddd9602e2 documentation" class="md-nav__button md-logo"> <img src="../_static/bw-logo.svg" alt=" logo" width=48  height=48 > </a> <a href="../index.html" title="linearmodels 4.30.dev3+gddd9602e2 documentation">linearmodels v4.30 (+3)</a> </label> <div class=md-nav__source > <a href="https://github.com/bashtage/linearmodels/" title="Go to repository" class=md-source  data-md-source=github > <div class=md-source__icon > <svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" viewBox="0 0 24 24" width=28  height=28 > <use xlink:href="#__github" width=24  height=24 ></use> </svg> </div> <div class=md-source__repository > linearmodels </div> </a> </div> <ul class=md-nav__list > <li class=md-nav__item > <a href=index.html  class=md-nav__link >Instrumental Variable Estimation</a> <ul class=md-nav__list > <li class=md-nav__item > <a href=introduction.html  class=md-nav__link >Introduction</a> <li class=md-nav__item > <a href="examples/basic-examples.html" class=md-nav__link >Basic Examples</a> <li class=md-nav__item > <a href="examples/advanced-examples.html" class=md-nav__link >Further Examples</a> <li class=md-nav__item > <a href="examples/using-formulas.html" class=md-nav__link >Using formulas to specify models</a> <li class=md-nav__item > <a href="examples/absorbing-regression.html" class=md-nav__link >Absorbing Regression</a> <li class=md-nav__item > <a href=reference.html  class=md-nav__link >Module Reference</a> <li class=md-nav__item > <input class="md-toggle md-nav__toggle" data-md-toggle=toc  type=checkbox  id=__toc > <label class="md-nav__link md-nav__link--active" for=__toc > Formulas and Mathematical Detail </label> <a href="#" class="md-nav__link md-nav__link--active">Formulas and Mathematical Detail</a> <nav class="md-nav md-nav--secondary"> <label class=md-nav__title  for=__toc >Contents</label> <ul class=md-nav__list  data-md-scrollfix=""> <li class=md-nav__item ><a href="#iv-mathematical-formula--page-root" class=md-nav__link >Formulas and Mathematical Detail</a><nav class=md-nav > <ul class=md-nav__list > <li class=md-nav__item ><a href="#notation" class=md-nav__link >Notation</a> <li class=md-nav__item ><a href="#parameter-estimation" class=md-nav__link >Parameter Estimation</a><nav class=md-nav > <ul class=md-nav__list > <li class=md-nav__item ><a href="#two-stage-least-squares-2sls" class=md-nav__link >Two-stage Least Squares (2SLS)</a> <li class=md-nav__item ><a href="#limited-information-maximum-likelihood-and-k-class-estimators" class=md-nav__link >Limited Information Maximum Likelihood and k-class Estimators</a> <li class=md-nav__item ><a href="#generalized-method-of-moments-gmm" class=md-nav__link >Generalized Method of Moments (GMM)</a> <li class=md-nav__item ><a href="#continuously-updating-generalized-method-of-moments-gmm-cue" class=md-nav__link >Continuously Updating Generalized Method of Moments (GMM-CUE)</a> </ul> </nav> <li class=md-nav__item ><a href="#basic-statistics" class=md-nav__link >Basic Statistics</a> <li class=md-nav__item ><a href="#parameter-covariance-estimation" class=md-nav__link >Parameter Covariance Estimation</a><nav class=md-nav > <ul class=md-nav__list > <li class=md-nav__item ><a href="#two-stage-ls-liml-and-k-class-estimators" class=md-nav__link >Two-stage LS, LIML and k-class estimators</a> <li class=md-nav__item ><a href="#standard-errors" class=md-nav__link >Standard Errors</a> <li class=md-nav__item ><a href="#t-statistics" class=md-nav__link >T-statistics</a> <li class=md-nav__item ><a href="#p-values" class=md-nav__link >P-values</a> <li class=md-nav__item ><a href="#confidence-intervals" class=md-nav__link >Confidence Intervals</a> <li class=md-nav__item ><a href="#linear-hypothesis-tests" class=md-nav__link >Linear Hypothesis Tests</a> <li class=md-nav__item ><a href="#gmm-covariance-estimators" class=md-nav__link >GMM Covariance estimators</a> <li class=md-nav__item ><a href="#gmm-weight-estimators" class=md-nav__link >GMM Weight Estimators</a> </ul> </nav> <li class=md-nav__item ><a href="#post-estimation" class=md-nav__link >Post-estimation</a><nav class=md-nav > <ul class=md-nav__list > <li class=md-nav__item ><a href="#sls-and-liml-post-estimation-results" class=md-nav__link >2SLS and LIML Post-estimation Results</a> <li class=md-nav__item ><a href="#gmm-post-estimation-results" class=md-nav__link >GMM Post-estimation Results</a> </ul> </nav> <li class=md-nav__item ><a href="#first-stage-estimation-analysis" class=md-nav__link >First-stage Estimation Analysis</a> <li class=md-nav__item ><a href="#kernel-weights-and-bandwidth-selection" class=md-nav__link >Kernel Weights and Bandwidth Selection</a> <li class=md-nav__item ><a href="#constant-detection" class=md-nav__link >Constant Detection</a> </ul> </nav> <li class=md-nav__item ><a class=md-nav__extra_link  href="../_sources/iv/mathematical-formula.rst.txt">Show Source</a> </ul> </nav> </ul> <li class=md-nav__item > <a href="../panel/index.html" class=md-nav__link >Panel Data Model Estimation</a> <li class=md-nav__item > <a href="../asset-pricing/index.html" class=md-nav__link >Linear Factor Models for Asset Pricing</a> <li class=md-nav__item > <a href="../system/index.html" class=md-nav__link >System Regression Models</a> <li class=md-nav__item > <a href="../utility.html" class=md-nav__link >Utilities</a> <li class=md-nav__item > <a href="../compatibility.html" class=md-nav__link >Compatibility</a> <li class=md-nav__item > <a href="../plan.html" class=md-nav__link >Module Plans</a> <li class=md-nav__item > <a href="../contributing.html" class=md-nav__link >Contributing</a> <li class=md-nav__item > <a href="../changes.html" class=md-nav__link >Change Log</a> <li class=md-nav__item > <a href="../references.html" class=md-nav__link >References</a> </ul> </nav> </div> </div> </div> <div class="md-sidebar md-sidebar--secondary" data-md-component=toc > <div class=md-sidebar__scrollwrap > <div class=md-sidebar__inner > <nav class="md-nav md-nav--secondary"> <label class=md-nav__title  for=__toc >Contents</label> <ul class=md-nav__list  data-md-scrollfix=""> <li class=md-nav__item ><a href="#iv-mathematical-formula--page-root" class=md-nav__link >Formulas and Mathematical Detail</a><nav class=md-nav > <ul class=md-nav__list > <li class=md-nav__item ><a href="#notation" class=md-nav__link >Notation</a> <li class=md-nav__item ><a href="#parameter-estimation" class=md-nav__link >Parameter Estimation</a><nav class=md-nav > <ul class=md-nav__list > <li class=md-nav__item ><a href="#two-stage-least-squares-2sls" class=md-nav__link >Two-stage Least Squares (2SLS)</a> <li class=md-nav__item ><a href="#limited-information-maximum-likelihood-and-k-class-estimators" class=md-nav__link >Limited Information Maximum Likelihood and k-class Estimators</a> <li class=md-nav__item ><a href="#generalized-method-of-moments-gmm" class=md-nav__link >Generalized Method of Moments (GMM)</a> <li class=md-nav__item ><a href="#continuously-updating-generalized-method-of-moments-gmm-cue" class=md-nav__link >Continuously Updating Generalized Method of Moments (GMM-CUE)</a> </ul> </nav> <li class=md-nav__item ><a href="#basic-statistics" class=md-nav__link >Basic Statistics</a> <li class=md-nav__item ><a href="#parameter-covariance-estimation" class=md-nav__link >Parameter Covariance Estimation</a><nav class=md-nav > <ul class=md-nav__list > <li class=md-nav__item ><a href="#two-stage-ls-liml-and-k-class-estimators" class=md-nav__link >Two-stage LS, LIML and k-class estimators</a> <li class=md-nav__item ><a href="#standard-errors" class=md-nav__link >Standard Errors</a> <li class=md-nav__item ><a href="#t-statistics" class=md-nav__link >T-statistics</a> <li class=md-nav__item ><a href="#p-values" class=md-nav__link >P-values</a> <li class=md-nav__item ><a href="#confidence-intervals" class=md-nav__link >Confidence Intervals</a> <li class=md-nav__item ><a href="#linear-hypothesis-tests" class=md-nav__link >Linear Hypothesis Tests</a> <li class=md-nav__item ><a href="#gmm-covariance-estimators" class=md-nav__link >GMM Covariance estimators</a> <li class=md-nav__item ><a href="#gmm-weight-estimators" class=md-nav__link >GMM Weight Estimators</a> </ul> </nav> <li class=md-nav__item ><a href="#post-estimation" class=md-nav__link >Post-estimation</a><nav class=md-nav > <ul class=md-nav__list > <li class=md-nav__item ><a href="#sls-and-liml-post-estimation-results" class=md-nav__link >2SLS and LIML Post-estimation Results</a> <li class=md-nav__item ><a href="#gmm-post-estimation-results" class=md-nav__link >GMM Post-estimation Results</a> </ul> </nav> <li class=md-nav__item ><a href="#first-stage-estimation-analysis" class=md-nav__link >First-stage Estimation Analysis</a> <li class=md-nav__item ><a href="#kernel-weights-and-bandwidth-selection" class=md-nav__link >Kernel Weights and Bandwidth Selection</a> <li class=md-nav__item ><a href="#constant-detection" class=md-nav__link >Constant Detection</a> </ul> </nav> <li class=md-nav__item ><a class=md-nav__extra_link  href="../_sources/iv/mathematical-formula.rst.txt">Show Source</a> <li id=searchbox  class=md-nav__item > </ul> </nav> </div> </div> </div> <div class=md-content > <article class="md-content__inner md-typeset" role=main > <section id=formulas-and-mathematical-detail > <span id=iv-mathematical-notation ></span><h1 id=iv-mathematical-formula--page-root >Formulas and Mathematical Detail<a class=headerlink  href="#iv-mathematical-formula--page-root" title="Permalink to this heading">¶</a></h1> <section id=notation > <h2 id=notation >Notation<a class=headerlink  href="#notation" title="Permalink to this heading">¶</a></h2> <p>Interest is in recovering the parameter vector from the model</p> <div class="math notranslate nohighlight"> \[\begin{aligned} y_{i} &amp; =\beta^{\prime}x_{i}+\epsilon_{i}\end{aligned}\]</div> <p>where <span class="math notranslate nohighlight">\(\beta\)</span> is <span class="math notranslate nohighlight">\(k\)</span> by 1, <span class="math notranslate nohighlight">\(x_{i}\)</span> is a <span class="math notranslate nohighlight">\(k\)</span> by 1 vector of observable variables and <span class="math notranslate nohighlight">\(\epsilon_{i}\)</span> is a scalar error. <span class="math notranslate nohighlight">\(x_{i}\)</span> can be separated in two types of variables. The <span class="math notranslate nohighlight">\(k_{1}\)</span> by 1 set of variables <span class="math notranslate nohighlight">\(x_{1i}\)</span> are exogenous regressors in the sense that <span class="math notranslate nohighlight">\(E\left[x_{1i}\epsilon_{i}\right]=0\)</span>. The <span class="math notranslate nohighlight">\(k_{2}\)</span> by 1 variables <span class="math notranslate nohighlight">\(x_{2i}\)</span> are endogenous. A set of <span class="math notranslate nohighlight">\(p\)</span> instruments is available that satisfy the requirements for validity where <span class="math notranslate nohighlight">\(p\geq k_{2}\)</span>. The extended model can be written as</p> <div class="math notranslate nohighlight"> \[\begin{split}\begin{aligned} y_{i} &amp; =\underset{\textrm{exogenous}}{\underbrace{\beta_{1}^{\prime}x_{1i}}}+\underset{\textrm{endogenous}}{\underbrace{\beta_{2}^{\prime}x_{2i}}}+\epsilon_{i}\\ x_{2i} &amp; =\underset{\textrm{exogenous}}{\underbrace{\gamma_{1}^{\prime}z_{1i}}}+\underset{\textrm{instruments}}{\underbrace{\gamma_{2}^{\prime}z_{2i}}}+u_{i}\end{aligned}\end{split}\]</div> <p>The model can be expressed compactly</p> <div class="math notranslate nohighlight"> \[\begin{split}\begin{aligned} Y &amp; =X_{1}\beta_{1}+X_{2}\beta_{1}+\epsilon=X\beta+\epsilon\\ X_{2} &amp; =Z_{1}\gamma_{1}+Z_{2}\gamma_{2}+u=Z\gamma+u\end{aligned}\end{split}\]</div> <p>The vector of instruments <span class="math notranslate nohighlight">\(z_{i}\)</span> is <span class="math notranslate nohighlight">\(p\)</span> by 1. There are <span class="math notranslate nohighlight">\(n\)</span> observations for all variables. <span class="math notranslate nohighlight">\(k_{c}=1\)</span> if the model contains a constant (either explicit or implicit, i.e., including all categories of a dummy variable). The constant, if included, is in <span class="math notranslate nohighlight">\(x_{1i}\)</span>. <span class="math notranslate nohighlight">\(X\)</span> is the <span class="math notranslate nohighlight">\(n\)</span> by <span class="math notranslate nohighlight">\(k\)</span> matrix if regressors where row <span class="math notranslate nohighlight">\(i\)</span> of <span class="math notranslate nohighlight">\(X\)</span> is <span class="math notranslate nohighlight">\(x_{i}^{\prime}\)</span>. <span class="math notranslate nohighlight">\(X\)</span> can be partitioned into <span class="math notranslate nohighlight">\(\left[X_{1}\;X_{2}\right]\)</span>. <span class="math notranslate nohighlight">\(Z\)</span> is the <span class="math notranslate nohighlight">\(n\)</span> by <span class="math notranslate nohighlight">\(p\)</span> matrix of instruments. The vector <span class="math notranslate nohighlight">\(y\)</span> is <span class="math notranslate nohighlight">\(n\)</span> by 1. Projection matrices for <span class="math notranslate nohighlight">\(X\)</span> is defined <span class="math notranslate nohighlight">\(P_{X}=X\left(X^{\prime}X\right)^{-1}X^{\prime}\)</span>. The projection matrix for <span class="math notranslate nohighlight">\(Z\)</span> is similarly defined only using <span class="math notranslate nohighlight">\(Z\)</span>. The annihilator matrix for <span class="math notranslate nohighlight">\(X\)</span> is <span class="math notranslate nohighlight">\(M_{X}=I-P_{X}\)</span>.</p> </section> <section id=parameter-estimation > <h2 id=parameter-estimation >Parameter Estimation<a class=headerlink  href="#parameter-estimation" title="Permalink to this heading">¶</a></h2> <section id=two-stage-least-squares-2sls > <h3 id=two-stage-least-squares-2sls >Two-stage Least Squares (2SLS)<a class=headerlink  href="#two-stage-least-squares-2sls" title="Permalink to this heading">¶</a></h3> <p>The 2SLS estimator is</p> <div class="math notranslate nohighlight"> \[\begin{aligned} \hat{\beta}_{2SLS} &amp; =\left(X^{\prime}P_{Z}X\right)^{-1}\left(X^{\prime}P_{Z}y\right)\end{aligned}\]</div> </section> <section id=limited-information-maximum-likelihood-and-k-class-estimators > <h3 id=limited-information-maximum-likelihood-and-k-class-estimators >Limited Information Maximum Likelihood and k-class Estimators<a class=headerlink  href="#limited-information-maximum-likelihood-and-k-class-estimators" title="Permalink to this heading">¶</a></h3> <p>The LIML or other k-class estimator is</p> <div class="math notranslate nohighlight"> \[\begin{aligned} \hat{\beta}_{\kappa} &amp; =\left(X^{\prime}\left(I-\kappa M_{Z}\right)X\right)^{-1}\left(X^{\prime}\left(I-\kappa M_{Z}\right)y\right)\end{aligned}\]</div> <p>where <span class="math notranslate nohighlight">\(\kappa\)</span> is the parameter of the class. When <span class="math notranslate nohighlight">\(\kappa=1\)</span> the 2SLS estimator is recovered. When <span class="math notranslate nohighlight">\(\kappa=0\)</span>, the OLS estimator is recovered. The LIML estimator is recovered when <span class="math notranslate nohighlight">\(\kappa\)</span> set to</p> <div class="math notranslate nohighlight"> \[\hat{\kappa}=\min\mathrm{eig\left[\left(W^{\prime}M_{Z}W\right)^{-\frac{1}{2}}\left(W^{\prime}M_{X_{1}}W\right)\left(W^{\prime}M_{Z}W\right)^{-\frac{1}{2}}\right]}\]</div> <p>where <span class="math notranslate nohighlight">\(W=\left[y\:X_{2}\right]\)</span> and <span class="math notranslate nohighlight">\(\mathrm{eig}\)</span> returns the eigenvalues.</p> </section> <section id=generalized-method-of-moments-gmm > <h3 id=generalized-method-of-moments-gmm >Generalized Method of Moments (GMM)<a class=headerlink  href="#generalized-method-of-moments-gmm" title="Permalink to this heading">¶</a></h3> <p>The GMM estimator is defined as</p> <div class="math notranslate nohighlight"> \[\begin{aligned} \hat{\beta}_{GMM} &amp; =\left(X^{\prime}ZWZ^{\prime}X\right)^{-1}\left(X^{\prime}ZWZ^{\prime}y\right)\end{aligned}\]</div> <p>where <span class="math notranslate nohighlight">\(W\)</span> is a positive definite weighting matrix.</p> </section> <section id=continuously-updating-generalized-method-of-moments-gmm-cue > <h3 id=continuously-updating-generalized-method-of-moments-gmm-cue >Continuously Updating Generalized Method of Moments (GMM-CUE)<a class=headerlink  href="#continuously-updating-generalized-method-of-moments-gmm-cue" title="Permalink to this heading">¶</a></h3> <p>The continuously updating GMM estimator solves the minimization problem</p> <div class="math notranslate nohighlight"> \[\min_{\beta}n\bar{g}\left(\beta\right)^{\prime}W\left(\beta\right)^{-1}\bar{g}\left(\beta\right)\]</div> <p>where <span class="math notranslate nohighlight">\(\bar{g}\left(\beta\right)=n^{-1}\sum_{i=1}^{n}z_{i}\hat{\epsilon}_{i}\)</span> and <span class="math notranslate nohighlight">\(\hat{\epsilon}_{i}=y_{i}-x_{i}\beta\)</span>. Unlike standard GMM, the weight matrix, <span class="math notranslate nohighlight">\(W\)</span> directly depends on the model parameters <span class="math notranslate nohighlight">\(\beta\)</span> and so it is not possible to use a closed form estimator.</p> </section> </section> <section id=basic-statistics > <h2 id=basic-statistics >Basic Statistics<a class=headerlink  href="#basic-statistics" title="Permalink to this heading">¶</a></h2> <p>Let <span class="math notranslate nohighlight">\(\hat{\epsilon}=y-X\hat{\beta}\)</span>. The residual sum of squares (RSS) is <span class="math notranslate nohighlight">\(\hat{\epsilon}^{\prime}\hat{\epsilon}\)</span>, the model sum of squares (MSS) is <span class="math notranslate nohighlight">\(\hat{\beta}^{\prime}X^{\prime}X\hat{\beta}\)</span> and the total sum of squares (TSS) is <span class="math notranslate nohighlight">\(\left(y-k_{c}\bar{y}\right)^{\prime}\left(y-k_{c}\bar{y}\right)^{\prime}\)</span>where <span class="math notranslate nohighlight">\(\bar{y}\)</span> is the sample average of <span class="math notranslate nohighlight">\(y\)</span>. The model <span class="math notranslate nohighlight">\(R^{2}\)</span>is defined</p> <div class="math notranslate nohighlight"> \[\begin{aligned} R^{2} &amp; =1-\frac{\hat{\epsilon}^{\prime}\hat{\epsilon}}{\left(y-k_{c}\bar{y}\right)^{\prime}\left(y-k_{c}\bar{y}\right)^{\prime}}=1-\frac{RSS}{TSS}\end{aligned}\]</div> <p>and the adjusted <span class="math notranslate nohighlight">\(R^{2}\)</span> is defined</p> <div class="math notranslate nohighlight"> \[\begin{aligned} \bar{R}^{2} &amp; =1-\left(1-R^{2}\right)\frac{N-k_{c}}{N-k}.\end{aligned}\]</div> <p>The residual variance is <span class="math notranslate nohighlight">\(s^{2}=n^{-1}\hat{\epsilon}^{\prime}\hat{\epsilon}\)</span> unless the debiased flag is used, in which case a small sample adjusted version is estimated <span class="math notranslate nohighlight">\(s^{2}=\left(n-k\right)^{-1}\hat{\epsilon}^{\prime}\hat{\epsilon}\)</span>. The model degree of freedom is <span class="math notranslate nohighlight">\(k\)</span> and the residual degree of freedom is <span class="math notranslate nohighlight">\(n-k\)</span>.</p> <p>The model F-statistic is defined</p> <div class="math notranslate nohighlight"> \[\begin{aligned} F &amp; =\hat{\beta}_{-}^{\prime}\hat{V}_{-}^{-1}\dot{\hat{\beta}_{-}}\end{aligned}\]</div> <p>where the notation <span class="math notranslate nohighlight">\(\hat{\beta}_{-}\)</span> indicates that the constant is excluded from <span class="math notranslate nohighlight">\(\hat{\beta}\)</span> and <span class="math notranslate nohighlight">\(\hat{V}_{-}\)</span> indicates that the row and column corresponding to a constant are excluded. <a class="footnote-reference brackets" href="#id3" id=id1  role=doc-noteref ><span class=fn-bracket >[</span>1<span class=fn-bracket >]</span></a> The test statistic is distributed as <span class="math notranslate nohighlight">\(\chi_{k-k_{c}}^{2}.\)</span> If the debiased flag is set, then the test statistic <span class="math notranslate nohighlight">\(F\)</span> is transformed as <span class="math notranslate nohighlight">\(F/\left(k-k_{c}\right)\)</span> and a <span class="math notranslate nohighlight">\(F_{k-k_{c},n-k}\)</span> distribution is used.</p> </section> <section id=parameter-covariance-estimation > <h2 id=parameter-covariance-estimation >Parameter Covariance Estimation<a class=headerlink  href="#parameter-covariance-estimation" title="Permalink to this heading">¶</a></h2> <section id=two-stage-ls-liml-and-k-class-estimators > <h3 id=two-stage-ls-liml-and-k-class-estimators >Two-stage LS, LIML and k-class estimators<a class=headerlink  href="#two-stage-ls-liml-and-k-class-estimators" title="Permalink to this heading">¶</a></h3> <p>Four covariance estimators are available. The first is the standard homoskedastic covariance, defined as</p> <div class="math notranslate nohighlight"> \[\begin{aligned} \hat{\Sigma}=n^{-1}s^{2}\left(\frac{X^{\prime}\left(I-\kappa M_{z}\right)X}{n}\right)^{-1} &amp; =n^{-1}s^{2}\hat{A}.\end{aligned}\]</div> <p>Note that this estimator can be expressed as</p> <div class="math notranslate nohighlight"> \[\begin{aligned} \hat{\Sigma}=n^{-1}\hat{A}^{-1}\left\{ s^{2}\hat{A}\right\} \hat{A}^{-1} &amp; =n^{-1}\hat{A}^{-1}\hat{B}\hat{A}^{-1}.\end{aligned}\]</div> <p>All estimators take this form and only differ in how the asymptotic covariance of the scores, <span class="math notranslate nohighlight">\(B\)</span>, is estimated. For the homoskedastic covariance estimator, <span class="math notranslate nohighlight">\(\hat{B}=s^{2}\hat{A}.\)</span> The score covariance in the heteroskedasticity robust covariance estimator is</p> <div class="math notranslate nohighlight"> \[\begin{aligned} \hat{B} &amp; =n^{-1}\sum_{i=1}^{n}\hat{\epsilon}_{i}^{2}\hat{x}_{i}\hat{x}_{i}^{\prime}=n^{-1}\sum_{i=1}^{n}\hat{\xi}_{i}\hat{\xi}_{i}^{\prime}.\end{aligned}\]</div> <p>where <span class="math notranslate nohighlight">\(\hat{x_{i}}\)</span> is row <span class="math notranslate nohighlight">\(i\)</span> of <span class="math notranslate nohighlight">\(\hat{X}=P_{Z}X\)</span> and <span class="math notranslate nohighlight">\(\hat{\xi}_{i}=\hat{\epsilon}_{i}\hat{x}_{i}\)</span>.</p> <p>The kernel covariance estimator is robust to both heteroskedasticity and autocorrelation and is defined as</p> <div class="math notranslate nohighlight"> \[\begin{split}\begin{aligned} \hat{B} &amp; =\hat{\Gamma}_{0}+\sum_{i=1}^{n-1}K\left(\frac{i}{h}\right)\left(\hat{\Gamma}_{i}+\hat{\Gamma}_{i}^{\prime}\right)\\ \hat{\Gamma_{j}} &amp; =n^{-1}\sum_{i=j+1}^{n}\hat{\xi}_{i-j}\hat{\xi}_{i}^{\prime}\end{aligned}\end{split}\]</div> <p>where <span class="math notranslate nohighlight">\(K\left(\frac{i}{h}\right)\)</span> is a kernel weighting function where <span class="math notranslate nohighlight">\(h\)</span> is the kernel bandwidth.</p> <p>The one-way clustered covariance estimator is defined as</p> <div class="math notranslate nohighlight"> \[\begin{aligned} n^{-1}\sum_{j=1}^{g}\left(\sum_{i\in\mathcal{G}_{j}}\hat{\xi}_{i}\right)\left(\sum_{i\in\mathcal{G}_{j}}\hat{\xi}_{i}\right)^{\prime}\end{aligned}\]</div> <p>where <span class="math notranslate nohighlight">\(\sum_{i\in\mathcal{G}_{j}}\hat{\xi}_{i}\)</span> is the sum of the scores for all members in group <span class="math notranslate nohighlight">\(\mathcal{G}_{j}\)</span> and <span class="math notranslate nohighlight">\(g\)</span> is the number of groups.</p> <p>If the debiased flag is used to perform a small-sample adjustment, all estimators except the clustered covariance are rescaled by <span class="math notranslate nohighlight">\(\left(n-k\right)/n\)</span>. The clustered covariance is rescaled by <span class="math notranslate nohighlight">\(\left(\left(n-k\right)\left(n-1\right)/n^{2}\right)\left(\left(g-1\right)/g\right)\)</span>. <a class="footnote-reference brackets" href="#id4" id=id2  role=doc-noteref ><span class=fn-bracket >[</span>2<span class=fn-bracket >]</span></a></p> </section> <section id=standard-errors > <h3 id=standard-errors >Standard Errors<a class=headerlink  href="#standard-errors" title="Permalink to this heading">¶</a></h3> <p>Standard errors are defined as</p> <div class="math notranslate nohighlight"> \[s.e.\left(\hat{\beta}_{j}\right)=\sqrt{e_{j}^{\prime}\hat{\Sigma}e_{j}}\]</div> <p>where <span class="math notranslate nohighlight">\(e_{j}\)</span> is a vector of 0s except in location <span class="math notranslate nohighlight">\(j\)</span> which is 1.</p> </section> <section id=t-statistics > <h3 id=t-statistics >T-statistics<a class=headerlink  href="#t-statistics" title="Permalink to this heading">¶</a></h3> <p>T-statistics test the null <span class="math notranslate nohighlight">\(H_{0}:\beta_{j}=0\)</span> against a 2-sided alternative and are defined as</p> <div class="math notranslate nohighlight"> \[z=\frac{\hat{\beta}_{j}}{s.e.\left(\hat{\beta}_{j}\right)}.\]</div> </section> <section id=p-values > <h3 id=p-values >P-values<a class=headerlink  href="#p-values" title="Permalink to this heading">¶</a></h3> <p>P-values are computes using 2-sided tests,</p> <div class="math notranslate nohighlight"> \[Pr\left(\left|z\right|&gt;Z\right)=2-2\Phi\left(\left|z\right|\right)\]</div> <p>If the covariance estimator was debiased, a Student’s t distribution with <span class="math notranslate nohighlight">\(n-k\)</span> degrees of freedom is used,</p> <div class="math notranslate nohighlight"> \[\begin{aligned} Pr\left(\left|z\right|&gt;Z\right) &amp; =2-2t_{n-k}\left(\left|z\right|\right)\end{aligned}\]</div> <p>where <span class="math notranslate nohighlight">\(t_{n-k}\left(\cdot\right)\)</span> is the CDF of a Student’s T distribution.</p> </section> <section id=confidence-intervals > <h3 id=confidence-intervals >Confidence Intervals<a class=headerlink  href="#confidence-intervals" title="Permalink to this heading">¶</a></h3> <p>Confidence intervals are constructed as</p> <div class="math notranslate nohighlight"> \[CI_{i,1-\alpha}=\hat{\beta}_{i}\pm q_{\alpha/2}\times\hat{\sigma}_{\beta_{i}}\]</div> <p>where <span class="math notranslate nohighlight">\(q_{\alpha/2}\)</span> is the <span class="math notranslate nohighlight">\(\alpha/2\)</span> quantile of a standard Normal distribution or a Student’s t. The Student’s t is used when a debiased covariance estimator is used.</p> </section> <section id=linear-hypothesis-tests > <h3 id=linear-hypothesis-tests >Linear Hypothesis Tests<a class=headerlink  href="#linear-hypothesis-tests" title="Permalink to this heading">¶</a></h3> <p>Linear hypothesis tests examine the validity of nulls of the form <span class="math notranslate nohighlight">\(H_{0}:R\beta-r=0\)</span> and are implemented using a Wald test statistic</p> <div class="math notranslate nohighlight"> \[W=\left(R\hat{\beta}-r\right)^{\prime}\left[R^{\prime}\hat{\Sigma}R\right]^{-1}\left(R\hat{\beta}-r\right)\sim\chi_{q}^{2}\]</div> <p>where <span class="math notranslate nohighlight">\(q\)</span> is the <span class="math notranslate nohighlight">\(rank\left(R\right)\)</span> which is usually the number of rows in <span class="math notranslate nohighlight">\(R\)</span> . If the debiased flag is used, then <span class="math notranslate nohighlight">\(W/q\)</span> is reported and critical and p-values are taken from a <span class="math notranslate nohighlight">\(F_{q,n-k}\)</span> distribution.</p> </section> <section id=gmm-covariance-estimators > <h3 id=gmm-covariance-estimators >GMM Covariance estimators<a class=headerlink  href="#gmm-covariance-estimators" title="Permalink to this heading">¶</a></h3> <p>GMM covariance depends on the weighting matrix used in estimation and the assumed covariance of the scores. In most applications these are the same and so the inefficient form,</p> <div class="math notranslate nohighlight"> \[\hat{\Sigma}=n^{-1}\left(\left(\frac{X'Z}{n}\right)W\left(\frac{Z'X}{n}\right)\right)^{-1}\left(\left(\frac{X'Z}{n}\right)WSW\left(\frac{Z'X}{n}\right)\right)\left(\left(\frac{X'Z}{n}\right)W\left(\frac{Z'X}{n}\right)\right)^{-1}\]</div> <p>will collapse to the simpler form</p> <div class="math notranslate nohighlight"> \[\hat{\Sigma}=n^{-1}\left(\left(\frac{X'Z}{n}\right)W\left(\frac{Z'X}{n}\right)\right)^{-1}\]</div> <p>when <span class="math notranslate nohighlight">\(W=S^{-1}\)</span>. When an unadjusted (homoskedastic) covariance is used,</p> <div class="math notranslate nohighlight"> \[\hat{S}=\tilde{s}^{2}n^{-1}\sum_{j=1}^{n}z_{j}^{\prime}z_{j}\]</div> <p>where <span class="math notranslate nohighlight">\(\tilde{s}^{2}=n^{-1}\sum_{i=1}^{n}\left(\epsilon_{i}-\bar{\epsilon}\right)^{2}\)</span> subtracts the mean which may be non-zero if the model is overidentified. Like previous covariance estimators, if the debiased flag is used, <span class="math notranslate nohighlight">\(n^{-1}\)</span> is replaced by <span class="math notranslate nohighlight">\(\left(n-k\right)^{-1}\)</span>. When a robust (heteroskedastic) covariance is used, the estimator of <span class="math notranslate nohighlight">\(S\)</span> is modified to</p> <div class="math notranslate nohighlight"> \[\hat{S}=n^{-1}\sum_{i=1}^{n}\hat{\epsilon}_{i}^{2}z_{i}^{\prime}z_{i}.\]</div> <p>If the debiased flag is used, <span class="math notranslate nohighlight">\(n^{-1}\)</span> is replaced by <span class="math notranslate nohighlight">\(\left(n-k\right)^{-1}\)</span>.</p> <p>Kernel covariance estimators of <span class="math notranslate nohighlight">\(S\)</span> take the form</p> <div class="math notranslate nohighlight"> \[\begin{split}\begin{aligned} \hat{S} &amp; =\hat{\Gamma}_{0}+\sum_{i=1}^{n-1}k\left(i/h\right)\left(\hat{\Gamma}_{i}+\hat{\Gamma}_{i}^{\prime}\right)\\ \hat{\Gamma_{j}} &amp; =n^{-1}\sum_{i=j+1}^{n}\hat{\epsilon}_{i-j}\hat{\epsilon}_{i}z_{i-j}^{\prime}z_{i}\end{aligned}\end{split}\]</div> <p>and <span class="math notranslate nohighlight">\(k\left(\cdot\right)\)</span> is a kernel weighting function with bandwidth <span class="math notranslate nohighlight">\(h\)</span>. If the debiased flag is used, <span class="math notranslate nohighlight">\(n^{-1}\)</span> is replaced by <span class="math notranslate nohighlight">\(\left(n-k\right)^{-1}\)</span>.</p> <p>The one-way clustered covariance estimator is defined as</p> <div class="math notranslate nohighlight"> \[\hat{S}=n^{-1}\sum_{j=1}^{g}\left(\sum_{i\in\mathcal{G}_{j}}\hat{\epsilon}_{i}z_{i}\right)^{\prime}\left(\sum_{i\in\mathcal{G}_{j}}\hat{\epsilon}_{i}z_{i}\right)\]</div> <p>where <span class="math notranslate nohighlight">\(\sum_{i\in\mathcal{G}_{j}}\hat{\epsilon}_{i}z_{i}\)</span> is the sum of the moment conditional for all members in group <span class="math notranslate nohighlight">\(\mathcal{G}_{j}\)</span> and <span class="math notranslate nohighlight">\(g\)</span> is the number of groups. If the debiased flag is used, the <span class="math notranslate nohighlight">\(n^{-1}\)</span> term is replaced by</p> <div class="math notranslate nohighlight"> \[\left(n-k\right)^{-1}\frac{n-1}{n}\frac{g}{g-1}.\]</div> </section> <section id=gmm-weight-estimators > <h3 id=gmm-weight-estimators >GMM Weight Estimators<a class=headerlink  href="#gmm-weight-estimators" title="Permalink to this heading">¶</a></h3> <p>The GMM optimal weight estimators are identical to the the estimators of <span class="math notranslate nohighlight">\(S\)</span> with two notable exceptions. First, they are never debiased and so always use <span class="math notranslate nohighlight">\(n^{-1}\)</span>. Second, if the center flag is true, the demeaned moment conditions defined as <span class="math notranslate nohighlight">\(\tilde{g}_{i}=z_{i}\hat{\epsilon}_{i}-\overline{z\epsilon}\)</span> are used in-place of <span class="math notranslate nohighlight">\(g_{i}\)</span> in the robust, kernel and clustered estimators. The unadjusted estimator is always centered, and so this option has no effect.</p> </section> </section> <section id=post-estimation > <h2 id=post-estimation >Post-estimation<a class=headerlink  href="#post-estimation" title="Permalink to this heading">¶</a></h2> <section id=sls-and-liml-post-estimation-results > <h3 id=sls-and-liml-post-estimation-results >2SLS and LIML Post-estimation Results<a class=headerlink  href="#sls-and-liml-post-estimation-results" title="Permalink to this heading">¶</a></h3> <p><strong>Sargan</strong></p> <p>Sargan’s test of over-identifying restrictions examines whether the variance of the IV residuals is similar to that of the OLS residuals. The test statistic is computed</p> <div class="math notranslate nohighlight"> \[s=n(1-\hat{\epsilon}^{\prime}M_{Z}\hat{\epsilon}/\hat{\epsilon}^{\prime}\hat{\epsilon})\sim\chi_{v}^{2}\]</div> <p>where <span class="math notranslate nohighlight">\(\hat{\epsilon}\)</span> are the IV residuals and <span class="math notranslate nohighlight">\(M_{Z}\)</span> is the annihilator matrix using all exogenous variables.<span class="math notranslate nohighlight">\(\nu\)</span> is the number of overidentifying restrictions, which is the number of instruments minus the number of endogenous variables, <span class="math notranslate nohighlight">\(p-k_{2}\)</span>.</p> <p><strong>Basmann</strong></p> <p>Basmann’s test is a small-sample corrected version of Sargan’s test of over-identifying restrictions. It has the same distribution. Let <span class="math notranslate nohighlight">\(s\)</span> be Sargan’s test statistic, then Basmann’s test statistic is</p> <div class="math notranslate nohighlight"> \[s(n-p)/(n-s)\sim\chi_{v}^{2}\]</div> <p><strong>Wooldridge score</strong></p> <p>Wooldridge’s score test of exogeneity examines the magnitude of the correlation between the OLS residuals and a an appropriately constructed set of residuals of the instruments. Define <span class="math notranslate nohighlight">\(e=M_{X}Y\)</span> and <span class="math notranslate nohighlight">\(\nu=M_{X}M_{Z}X_{2}\)</span>. Then the test statistic is computed from the regression</p> <div class="math notranslate nohighlight"> \[1=\gamma_{1}\hat{\epsilon}_{1}\hat{v}_{1,i}+\ldots+\gamma_{p}\hat{\epsilon}_{1}\hat{v}_{p,i}+\eta_{i}\]</div> <p>as <span class="math notranslate nohighlight">\(nR^{2}\sim\chi_{k_{2}}^{2}\)</span>.</p> <p><strong>Wooldridge regression</strong></p> <p>Wooldridge’s regression test of exogeneity is closely related to the score test and is generally more powerful. It also inherits robustness to heteroskedasticity and/or autocorrelation the comes from the choice of covariance estimator used in the model. Define <span class="math notranslate nohighlight">\(R=M_{Z}X_{2}\)</span>. The test is implemented in a regression of</p> <div class="math notranslate nohighlight"> \[Y=X\beta+R\gamma+\eta\]</div> <p>as</p> <div class="math notranslate nohighlight"> \[\hat{\gamma}^{\prime}\hat{\Sigma}_{\gamma}^{-1}\gamma^{\prime}\sim\chi_{k_{2}}^{2}\]</div> <p>where <span class="math notranslate nohighlight">\(\hat{\Sigma}_{\gamma}\)</span> is the block of the covariance matrix corresponding to the <span class="math notranslate nohighlight">\(\gamma\)</span> parameters. <span class="math notranslate nohighlight">\(\hat{\Sigma}\)</span> is estimated using the same covariance estimator as the model fit.</p> <p><strong>Wooldridge’s Test of Overidentifying restrictions</strong></p> <p>Wooldridge’s test is a score test examining whether the component of the instrument that is uncorrelated with both the included exogenous and the fitted exogenous is uncorrelated with the IV residuals. Define <span class="math notranslate nohighlight">\(\tilde{Z}=M_{\left[X_{1}\:\hat{X}_{2}\right]}Z_{2,1:q}\)</span> where <span class="math notranslate nohighlight">\(\hat{X_{2}}\)</span> are the fitted values from the first stage regression of the endogenous on all exogenous variables and <span class="math notranslate nohighlight">\(Z_{2,1:q}\)</span> contains any <span class="math notranslate nohighlight">\(q\)</span> columns of <span class="math notranslate nohighlight">\(Z_{2}\)</span>, <span class="math notranslate nohighlight">\(q=p-k_{2}\)</span> . The test statistic is computed using a regression of 1s on the test functions <span class="math notranslate nohighlight">\(\hat{\epsilon}_{i}\tilde{z}_{i,j}\)</span> for <span class="math notranslate nohighlight">\(j=1,\ldots,q\)</span> which should have expected value 0.</p> <div class="math notranslate nohighlight"> \[1=\gamma_{1}\hat{\epsilon}_{i}\tilde{z}_{i,1}+\ldots+\gamma_{q}\hat{\epsilon}_{i}\tilde{z}_{i,q}\]</div> <p>The test statistic is <span class="math notranslate nohighlight">\(nR^{2}\sim\chi_{q}^{2}\)</span> from the regression.</p> <p><strong>Anderson-Rubin</strong></p> <p>The Andersen-Rubin test of overidentification examines the magnitude of the LIML <span class="math notranslate nohighlight">\(\hat{\kappa}\)</span>which should be close to unity when the model is not overidentified.</p> <div class="math notranslate nohighlight"> \[n\ln(\hat{\kappa})\sim\chi_{q}^{2}\]</div> <p>where <span class="math notranslate nohighlight">\(q=p-k_{2}\)</span>.</p> <p><strong>Basman’s F</strong></p> <p>Basmann’s F test of overidentification also examines the magnitude of the LIML <span class="math notranslate nohighlight">\(\hat{\kappa}\)</span>. The test statistic is</p> <div class="math notranslate nohighlight"> \[\hat{\kappa}(n-p)/q\sim F_{q,n-n_{instr}}\]</div> <p>where <span class="math notranslate nohighlight">\(q=p-k_{2}\)</span>.</p> <p><strong>Durbin and Wu-Haussman</strong></p> <p>Durbin’s and the Wu-Hausman tests of exogeneity test of exogeneity is depends on the variance of the residuals when come endogenous variables are treated as exogenous against the case where they are treated as endogenous. Durbin’s test statistic is</p> <div class="math notranslate nohighlight"> \[\begin{split}\begin{aligned} \delta= &amp; \hat{\epsilon}'_{e}P_{[z,w]}\hat{\epsilon}_{e}-\hat{\epsilon}'_{c}P_{z}\hat{\epsilon}_{c}\\ D= &amp; \delta/(\hat{\epsilon}'_{e}\hat{\epsilon}_{e})/n\sim\chi_{q}^{2}\end{aligned}\end{split}\]</div> <p>and the Wu-Hausman test statistic is</p> <div class="math notranslate nohighlight"> \[\begin{aligned} WH= &amp; \frac{\delta/q}{(\hat{\epsilon}'_{e}\hat{\epsilon}_{e}-\delta)/v}\sim F_{q,\nu}\end{aligned}\]</div> <p>where <span class="math notranslate nohighlight">\(\hat{\epsilon}_{e}\)</span> treats the selected set of endogenous variables as exogenous (efficient estimate) and <span class="math notranslate nohighlight">\(\hat{\epsilon}_{c}\)</span> is a consistent estimator if these variables are endogenous.<span class="math notranslate nohighlight">\(P_{\left[Z\,W\right]}\)</span> is the projection matrix containing all exogenous variables including the instrument as well as the variables being tested for endogeneity <span class="math notranslate nohighlight">\(\left(W\right)\)</span>.<span class="math notranslate nohighlight">\(q\)</span> is the number of variables being tested for exogeneity and <span class="math notranslate nohighlight">\(\nu=n-k1-k2-q\)</span>.</p> </section> <section id=gmm-post-estimation-results > <h3 id=gmm-post-estimation-results >GMM Post-estimation Results<a class=headerlink  href="#gmm-post-estimation-results" title="Permalink to this heading">¶</a></h3> <p><strong>J-stat</strong></p> <p>The J-statistic tests whether the model is over-identified, and is defined</p> <div class="math notranslate nohighlight"> \[n\bar{g}'W^{-1}\bar{g}\sim\chi_{q}^{2}\]</div> <p>where <span class="math notranslate nohighlight">\(\bar{g}=n^{-1}\sum\hat{\epsilon}_{i}z_{i}\)</span> and <span class="math notranslate nohighlight">\(W\)</span> is a consistent estimator of the variance of <span class="math notranslate nohighlight">\(\sqrt{n}\bar{g}\)</span>. The degree of freedom is <span class="math notranslate nohighlight">\(q=p-k_{2}\)</span>.</p> <p><strong>C-stat</strong></p> <p>The C-statistic tests exogeneity by treating a the set of endogenous variables as exogenous. In practice this means that are included in the GMM moment conditions, and so a likelihood-ratio-like test statistic can be computed as</p> <div class="math notranslate nohighlight"> \[J_{e}-J_{c}\sim\chi_{m}^{2}\]</div> <p>where <span class="math notranslate nohighlight">\(J_{e}\)</span> is the J-statistic treating the tested variables as exogenous and <span class="math notranslate nohighlight">\(J_{c}\)</span> leaves then as endogenous. The optimal weighting matrix is computed from the expanded model (efficient) and used to estimate parameters in both models. This ensures that the test statistic is positive.</p> </section> </section> <section id=first-stage-estimation-analysis > <h2 id=first-stage-estimation-analysis >First-stage Estimation Analysis<a class=headerlink  href="#first-stage-estimation-analysis" title="Permalink to this heading">¶</a></h2> <p><strong>Partial R2 and Partial F-statistic</strong></p> <p>The <span class="math notranslate nohighlight">\(R^{2}\)</span> is reported after orthogonalizing the instruments from included exogenous variables, so that the model estimated is</p> <div class="math notranslate nohighlight"> \[x_{2i}=\gamma_{0}+\tilde{z}_{2i}\gamma+\eta_{i}\]</div> <p>where <span class="math notranslate nohighlight">\(\tilde{Z}_{2}=M_{X_{1}}\tilde{Z}\)</span>. The partial <span class="math notranslate nohighlight">\(F\)</span>-statistic is the F-statistic from this regression. It is implemented as a standard <span class="math notranslate nohighlight">\(F\)</span>-statistic when the data is assumed to be homoskedastic with an <span class="math notranslate nohighlight">\(F_{p_{2},n-p_{2}}\)</span> distribution. In all other cases, a quadratic form is used with an asymptotic <span class="math notranslate nohighlight">\(\chi_{p_{2}}^{2}\)</span> distribution testing <span class="math notranslate nohighlight">\(H_{0}:\gamma=0\)</span>.</p> <p><strong>Shea’s R2</strong></p> <p>Shea’s <span class="math notranslate nohighlight">\(R^{2}\)</span> is defined as the ratio of the parameter variances under OLS and 2SLS estimation standardized by the unexplained variance under each,</p> <div class="math notranslate nohighlight"> \[\frac{\frac{\hat{\sigma}_{OLS,\beta_{i}}^{2}}{1-R_{OLS}^{2}}}{\frac{\hat{\sigma}_{IV,\beta_{i}}^{2}}{1-R_{IV}^{2}}}=\frac{\hat{\sigma}_{OLS,\beta_{i}}^{2}}{\hat{\sigma}_{IV,\beta_{i}}^{2}}\times\frac{1-R_{IV}^{2}}{1-R_{OLS}^{2}}\]</div> <p>If the estimator under 2SLS was as good as under OLS, both ratios would be 1 and Shea’s <span class="math notranslate nohighlight">\(R^{2}=1\)</span>. On the other hand, the worse the <span class="math notranslate nohighlight">\(IV\)</span> fit in terms of either <span class="math notranslate nohighlight">\(R^{2}\)</span> or the parameter variances, the lower the value reported by Shea’s <span class="math notranslate nohighlight">\(R^{2}\)</span>.</p> </section> <section id=kernel-weights-and-bandwidth-selection > <h2 id=kernel-weights-and-bandwidth-selection >Kernel Weights and Bandwidth Selection<a class=headerlink  href="#kernel-weights-and-bandwidth-selection" title="Permalink to this heading">¶</a></h2> <p><strong>Kernel weights</strong></p> <p>In all formulas, <span class="math notranslate nohighlight">\(m\)</span> is the kernel bandwidth parameter.</p> <ul> <li><p>Bartlett</p> <div class="math notranslate nohighlight"> \[w_{i}=1-\frac{i}{m+1},\,i&lt;m\]</div> <li><p>Parzen</p> <div class="math notranslate nohighlight"> \[\begin{split}\begin{aligned} z_{i} &amp; =\frac{i}{m+1},\,i&lt;m\\ w_{i} &amp; =1-6z_{i}^{2}+6z_{i}^{3},z\leq0.5\\ w_{i} &amp; =2(1-z_{i})^{3},z&gt;0.5\end{aligned}\end{split}\]</div> <li><p>Quadratic-Spectral</p> <div class="math notranslate nohighlight"> \[\begin{split}\begin{aligned} z_{i} &amp; =\frac{6\pi i}{5m}\\ w_{0} &amp; =1\\ w_{i} &amp; =3(\sin(z_{i})/z_{i}-\cos(z_{i}))/z_{i}^{2},\:i\geq1\end{aligned}\end{split}\]</div> </ul> <p><strong>Optimal BW selection</strong></p> <p>TODO</p> </section> <section id=constant-detection > <h2 id=constant-detection >Constant Detection<a class=headerlink  href="#constant-detection" title="Permalink to this heading">¶</a></h2> <p>Whether a model contains a constant or equivalent is tested using three tests. These are executed in order and so once a constant is detected, the others are not executed. The simplest method to ensure that a constant is correctly detected is to include a columns of 1s.</p> <ol class="arabic simple"> <li><p>A column with only 1.0s</p> <li><p>A column with a maximum minus minimum equal to 0 and that is not all 0s.</p> <li><p>Whether the rank of <span class="math notranslate nohighlight">\(X\)</span> is the same as <span class="math notranslate nohighlight">\(\left[1_{N}\:X\right]\)</span>. If these are the same, then the model contains a constant equivalent (e.g., dummies for all categories).</p> </ol> <aside class="footnote-list brackets"> <aside class="footnote brackets" id=id3  role=note > <span class=label ><span class=fn-bracket >[</span><a href="#id1" role=doc-backlink >1</a><span class=fn-bracket >]</span></span> <p>If the model contains an implicit constant, e.g., all categories of a dummy, one of the categories is excluded when computing the test statistic. The choice of category to drop has no effect and is equivalent to reparameterizing the model with a constant and excluding one category of dummy.</p> </aside> <aside class="footnote brackets" id=id4  role=note > <span class=label ><span class=fn-bracket >[</span><a href="#id2" role=doc-backlink >2</a><span class=fn-bracket >]</span></span> <p>This somewhat non-obvious choice is driven by Stata compatibility.</p> </aside> </aside> <p class=rubric >References</p> <p>Sources used in writing the code include <a class="reference internal" href="../references.html#baltagi" id=id5 ><span>[Baltagi]</span></a>, <a class="reference internal" href="../references.html#baumetal" id=id6 ><span>[BaumEtAl]</span></a> and <a class="reference internal" href="../references.html#cametal" id=id7 ><span>[CamEtAl]</span></a>, <a class="reference internal" href="../references.html#camtri05" id=id8 ><span>[CamTri05]</span></a>, <a class="reference internal" href="../references.html#camtri09" id=id9 ><span>[CamTri09]</span></a>, <a class="reference internal" href="../references.html#greene" id=id10 ><span>[Greene]</span></a>, <a class="reference internal" href="../references.html#newwes94" id=id11 ><span>[NewWes94]</span></a>, <a class="reference internal" href="../references.html#stata" id=id12 ><span>[Stata]</span></a>, <a class="reference internal" href="../references.html#wool10" id=id13 ><span>[Wool10]</span></a> and <a class="reference internal" href="../references.html#wool12" id=id14 ><span>[Wool12]</span></a>.</p> </section> </section> </article> </div> </div> </main> </div> <footer class=md-footer > <div class=md-footer-nav > <nav class="md-footer-nav__inner md-grid"> <a href="iv/linearmodels.iv.data.IVData.shape.html" title=linearmodels.iv.data.IVData.shape  class="md-flex md-footer-nav__link md-footer-nav__link--prev" rel=prev > <div class="md-flex__cell md-flex__cell--shrink"> <i class="md-icon md-icon--arrow-back md-footer-nav__button"></i> </div> <div class="md-flex__cell md-flex__cell--stretch md-footer-nav__title"> <span class=md-flex__ellipsis > <span class=md-footer-nav__direction > Previous </span> linearmodels.iv.data.IVData.shape </span> </div> </a> <a href="../panel/index.html" title="Panel Data Model Estimation" class="md-flex md-footer-nav__link md-footer-nav__link--next" rel=next > <div class="md-flex__cell md-flex__cell--stretch md-footer-nav__title"><span class=md-flex__ellipsis > <span class=md-footer-nav__direction > Next </span> Panel Data Model Estimation </span> </div> <div class="md-flex__cell md-flex__cell--shrink"><i class="md-icon md-icon--arrow-forward md-footer-nav__button"></i> </div> </a> </nav> </div> <div class="md-footer-meta md-typeset"> <div class="md-footer-meta__inner md-grid"> <div class=md-footer-copyright > <div class=md-footer-copyright__highlight > &#169; Copyright 2017, Kevin Sheppard. </div> Created using <a href="http://www.sphinx-doc.org/">Sphinx</a> 5.3.0. and <a href="https://github.com/bashtage/sphinx-material/">Material for Sphinx</a> </div> </div> </div> </footer> <script src="../_static/javascripts/application.js"></script> <script>app.initialize({version: "1.0.4", url: {base: ".."}})</script>
+
+
+
+<!doctype html>
+<html lang="en" class="no-js">
+  <head>
+    
+      <meta charset="utf-8">
+      <meta name="viewport" content="width=device-width,initial-scale=1">
+      
+      
+      
+      <link rel="icon" href="../_static/favicon.ico">
+    
+    
+  
+      
+        <title>Formulas and Mathematical Detail - arch v4.30 (+5)</title>
+      
+    
+
+  <link rel="apple-touch-icon" sizes="180x180" href="../_static/icons/apple-touch-icon.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="../_static/icons/favicon-32x32.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="../_static/icons/favicon-16x16.png">
+  <link rel="manifest" href="../_static/icons/site.webmanifest">
+  <link rel="mask-icon" href="../_static/icons/safari-pinned-tab.svg" color="#2196f3">
+  <link rel="shortcut icon" href="../_static/icons/favicon.ico">
+  <meta name="msapplication-TileColor" content="#f8f8f8">
+  <meta name="msapplication-config" content="../_static/icons/browserconfig.xml">
+  <style>
+  .highlight {
+    background-color: hsla(0,0%,92.5%,.5) !important;
+  }
+  </style>
+
+    
+      
+        
+        
+          
+          
+          <meta name="theme-color" content="#2094f3">
+        
+      
+      
+
+    
+    
+    
+      
+        
+        
+        <style>:root{--md-text-font:"Roboto";--md-code-font:"Roboto Mono"}</style>
+      
+    
+        <link rel="stylesheet" type="text/css" href="../_static/sphinx_immaterial_theme.8118e13f191069ea1.min.css" />
+        <link rel="stylesheet" type="text/css" href="../_static/css/small_fixes.css" />
+    <script>__md_scope=new URL("..",location),__md_hash=e=>[...e].reduce((e,_)=>(e<<5)-e+_.charCodeAt(0),0),__md_get=(e,_=localStorage,t=__md_scope)=>JSON.parse(_.getItem(t.pathname+"."+e)),__md_set=(e,_,t=localStorage,a=__md_scope)=>{try{t.setItem(a.pathname+"."+e,JSON.stringify(_))}catch(e){}}</script>
+    
+      
+
+    
+    
+    
+  </head>
+  
+  
+    
+    
+    
+    
+    
+    <body dir="ltr" data-md-color-scheme="" data-md-color-primary="blue" data-md-color-accent="orange">
+  
+    
+    
+    <input class="md-toggle" data-md-toggle="drawer" type="checkbox" id="__drawer" autocomplete="off">
+    <input class="md-toggle" data-md-toggle="search" type="checkbox" id="__search" autocomplete="off">
+    <label class="md-overlay" for="__drawer"></label>
+    <div data-md-component="skip">
+      
+        
+        <a href="#notation" class="md-skip">
+          Skip to content
+        </a>
+      
+    </div>
+    <div data-md-component="announce">
+      
+    </div>
+    
+      <div data-md-component="outdated" hidden>
+        
+      </div>
+    
+    
+      
+
+<header class="md-header" data-md-component="header">
+  <nav class="md-header__inner md-grid" aria-label="Header">
+    <a href="../index.html" title="arch v4.30 (+5)" class="md-header__button md-logo" aria-label="arch v4.30 (+5)" data-md-component="logo">
+      <img src="../_static/bw-logo.svg" alt="logo">
+    </a>
+    <label class="md-header__button md-icon" for="__drawer">
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M3 6h18v2H3V6m0 5h18v2H3v-2m0 5h18v2H3v-2Z"/></svg>
+    </label>
+    <div class="md-header__title" data-md-component="header-title">
+      <div class="md-header__ellipsis">
+        <div class="md-header__topic">
+          <span class="md-ellipsis">
+            arch v4.30 (+5)
+          </span>
+        </div>
+        <div class="md-header__topic" data-md-component="header-topic">
+          <span class="md-ellipsis">
+            
+              Formulas and Mathematical Detail
+            
+          </span>
+        </div>
+      </div>
+    </div>
+    
+    
+    
+      <label class="md-header__button md-icon" for="__search">
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.516 6.516 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5Z"/></svg>
+      </label>
+      <div class="md-search" data-md-component="search" role="dialog">
+  <label class="md-search__overlay" for="__search"></label>
+  <div class="md-search__inner" role="search">
+    <form class="md-search__form" name="search">
+      <input type="text" class="md-search__input" name="query" aria-label="Search" placeholder="Search" autocapitalize="off" autocorrect="off" autocomplete="off" spellcheck="false" data-md-component="search-query" required>
+      <label class="md-search__icon md-icon" for="__search">
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.516 6.516 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5Z"/></svg>
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20 11v2H8l5.5 5.5-1.42 1.42L4.16 12l7.92-7.92L13.5 5.5 8 11h12Z"/></svg>
+      </label>
+      <nav class="md-search__options" aria-label="Search">
+        
+        <button type="reset" class="md-search__icon md-icon" title="Clear" aria-label="Clear" tabindex="-1">
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M19 6.41 17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12 19 6.41Z"/></svg>
+        </button>
+      </nav>
+      
+    </form>
+    <div class="md-search__output">
+      <div class="md-search__scrollwrap" data-md-scrollfix>
+        <div class="md-search-result" data-md-component="search-result">
+          <div class="md-search-result__meta">
+            Initializing search
+          </div>
+          <ol class="md-search-result__list"></ol>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+    
+    
+      <div class="md-header__source">
+        <a href="https://github.com/bashtage/linearmodels/" title="Go to repository" class="md-source" data-md-component="source">
+  <div class="md-source__icon md-icon">
+    
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 496 512"><!--! Font Awesome Free 6.2.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2022 Fonticons, Inc.--><path d="M165.9 397.4c0 2-2.3 3.6-5.2 3.6-3.3.3-5.6-1.3-5.6-3.6 0-2 2.3-3.6 5.2-3.6 3-.3 5.6 1.3 5.6 3.6zm-31.1-4.5c-.7 2 1.3 4.3 4.3 4.9 2.6 1 5.6 0 6.2-2s-1.3-4.3-4.3-5.2c-2.6-.7-5.5.3-6.2 2.3zm44.2-1.7c-2.9.7-4.9 2.6-4.6 4.9.3 2 2.9 3.3 5.9 2.6 2.9-.7 4.9-2.6 4.6-4.6-.3-1.9-3-3.2-5.9-2.9zM244.8 8C106.1 8 0 113.3 0 252c0 110.9 69.8 205.8 169.5 239.2 12.8 2.3 17.3-5.6 17.3-12.1 0-6.2-.3-40.4-.3-61.4 0 0-70 15-84.7-29.8 0 0-11.4-29.1-27.8-36.6 0 0-22.9-15.7 1.6-15.4 0 0 24.9 2 38.6 25.8 21.9 38.6 58.6 27.5 72.9 20.9 2.3-16 8.8-27.1 16-33.7-55.9-6.2-112.3-14.3-112.3-110.5 0-27.5 7.6-41.3 23.6-58.9-2.6-6.5-11.1-33.3 2.6-67.9 20.9-6.5 69 27 69 27 20-5.6 41.5-8.5 62.8-8.5s42.8 2.9 62.8 8.5c0 0 48.1-33.6 69-27 13.7 34.7 5.2 61.4 2.6 67.9 16 17.7 25.8 31.5 25.8 58.9 0 96.5-58.9 104.2-114.8 110.5 9.2 7.9 17 22.9 17 46.4 0 33.7-.3 75.4-.3 83.6 0 6.5 4.6 14.4 17.3 12.1C428.2 457.8 496 362.9 496 252 496 113.3 383.5 8 244.8 8zM97.2 352.9c-1.3 1-1 3.3.7 5.2 1.6 1.6 3.9 2.3 5.2 1 1.3-1 1-3.3-.7-5.2-1.6-1.6-3.9-2.3-5.2-1zm-10.8-8.1c-.7 1.3.3 2.9 2.3 3.9 1.6 1 3.6.7 4.3-.7.7-1.3-.3-2.9-2.3-3.9-2-.6-3.6-.3-4.3.7zm32.4 35.6c-1.6 1.3-1 4.3 1.3 6.2 2.3 2.3 5.2 2.6 6.5 1 1.3-1.3.7-4.3-1.3-6.2-2.2-2.3-5.2-2.6-6.5-1zm-11.4-14.7c-1.6 1-1.6 3.6 0 5.9 1.6 2.3 4.3 3.3 5.6 2.3 1.6-1.3 1.6-3.9 0-6.2-1.4-2.3-4-3.3-5.6-2z"/></svg>
+  </div>
+  <div class="md-source__repository">
+    linearmodels
+  </div>
+</a>
+      </div>
+    
+  </nav>
+  
+</header>
+    
+    <div class="md-container" data-md-component="container">
+      
+      
+      
+      
+        
+          
+        
+      
+      <main class="md-main" data-md-component="main">
+        <div class="md-main__inner md-grid">
+          
+            
+              
+              <div class="md-sidebar md-sidebar--primary" data-md-component="sidebar" data-md-type="navigation" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+
+
+<nav class="md-nav md-nav--primary" aria-label="Navigation" data-md-level="0">
+  <label class="md-nav__title" for="__drawer">
+    <a href="../index.html" title="arch v4.30 (+5)" class="md-nav__button md-logo" aria-label="arch v4.30 (+5)" data-md-component="logo">
+      <img src="../_static/bw-logo.svg" alt="logo">
+    </a>
+    arch v4.30 (+5)
+  </label>
+  
+    <div class="md-nav__source">
+      <a href="https://github.com/bashtage/linearmodels/" title="Go to repository" class="md-source" data-md-component="source">
+  <div class="md-source__icon md-icon">
+    
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 496 512"><!--! Font Awesome Free 6.2.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2022 Fonticons, Inc.--><path d="M165.9 397.4c0 2-2.3 3.6-5.2 3.6-3.3.3-5.6-1.3-5.6-3.6 0-2 2.3-3.6 5.2-3.6 3-.3 5.6 1.3 5.6 3.6zm-31.1-4.5c-.7 2 1.3 4.3 4.3 4.9 2.6 1 5.6 0 6.2-2s-1.3-4.3-4.3-5.2c-2.6-.7-5.5.3-6.2 2.3zm44.2-1.7c-2.9.7-4.9 2.6-4.6 4.9.3 2 2.9 3.3 5.9 2.6 2.9-.7 4.9-2.6 4.6-4.6-.3-1.9-3-3.2-5.9-2.9zM244.8 8C106.1 8 0 113.3 0 252c0 110.9 69.8 205.8 169.5 239.2 12.8 2.3 17.3-5.6 17.3-12.1 0-6.2-.3-40.4-.3-61.4 0 0-70 15-84.7-29.8 0 0-11.4-29.1-27.8-36.6 0 0-22.9-15.7 1.6-15.4 0 0 24.9 2 38.6 25.8 21.9 38.6 58.6 27.5 72.9 20.9 2.3-16 8.8-27.1 16-33.7-55.9-6.2-112.3-14.3-112.3-110.5 0-27.5 7.6-41.3 23.6-58.9-2.6-6.5-11.1-33.3 2.6-67.9 20.9-6.5 69 27 69 27 20-5.6 41.5-8.5 62.8-8.5s42.8 2.9 62.8 8.5c0 0 48.1-33.6 69-27 13.7 34.7 5.2 61.4 2.6 67.9 16 17.7 25.8 31.5 25.8 58.9 0 96.5-58.9 104.2-114.8 110.5 9.2 7.9 17 22.9 17 46.4 0 33.7-.3 75.4-.3 83.6 0 6.5 4.6 14.4 17.3 12.1C428.2 457.8 496 362.9 496 252 496 113.3 383.5 8 244.8 8zM97.2 352.9c-1.3 1-1 3.3.7 5.2 1.6 1.6 3.9 2.3 5.2 1 1.3-1 1-3.3-.7-5.2-1.6-1.6-3.9-2.3-5.2-1zm-10.8-8.1c-.7 1.3.3 2.9 2.3 3.9 1.6 1 3.6.7 4.3-.7.7-1.3-.3-2.9-2.3-3.9-2-.6-3.6-.3-4.3.7zm32.4 35.6c-1.6 1.3-1 4.3 1.3 6.2 2.3 2.3 5.2 2.6 6.5 1 1.3-1.3.7-4.3-1.3-6.2-2.2-2.3-5.2-2.6-6.5-1zm-11.4-14.7c-1.6 1-1.6 3.6 0 5.9 1.6 2.3 4.3 3.3 5.6 2.3 1.6-1.3 1.6-3.9 0-6.2-1.4-2.3-4-3.3-5.6-2z"/></svg>
+  </div>
+  <div class="md-source__repository">
+    linearmodels
+  </div>
+</a>
+    </div>
+  
+  <ul class="md-nav__list" data-md-scrollfix>
+    
+      
+      
+      
+
+  
+  
+    
+  
+  
+    
+    <li class="md-nav__item md-nav__item--active md-nav__item--nested">
+      
+      
+        <input class="md-nav__toggle md-toggle" data-md-toggle="__nav_1" type="checkbox" id="__nav_1" checked>
+      
+      
+      
+        
+        <div class="md-nav__link md-nav__link--index ">
+          <a href="index.html"><span title="/iv/index.rst (reference label)" class="md-ellipsis">Instrumental Variable Estimation</span></a>
+          
+            <label for="__nav_1">
+              <span class="md-nav__icon md-icon"></span>
+            </label>
+          
+        </div>
+      
+      <nav class="md-nav" aria-label="Instrumental Variable Estimation" data-md-level="1">
+        <label class="md-nav__title" for="__nav_1">
+          <span class="md-nav__icon md-icon"></span>
+          <span title="/iv/index.rst (reference label)" class="md-ellipsis">Instrumental Variable Estimation</span>
+        </label>
+        <ul class="md-nav__list" data-md-scrollfix>
+          
+            
+              
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="introduction.html" class="md-nav__link">
+        <span title="/iv/introduction.rst (reference label)" class="md-ellipsis">Introduction</span>
+      </a>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="examples/basic-examples.html" class="md-nav__link">
+        <span title="/iv/examples/basic-examples.ipynb (reference label)" class="md-ellipsis">Basic Examples</span>
+      </a>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="examples/advanced-examples.html" class="md-nav__link">
+        <span title="/iv/examples/advanced-examples.ipynb (reference label)" class="md-ellipsis">Further Examples</span>
+      </a>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="examples/using-formulas.html" class="md-nav__link">
+        <span title="/iv/examples/using-formulas.ipynb (reference label)" class="md-ellipsis">Using formulas to specify models</span>
+      </a>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="examples/absorbing-regression.html" class="md-nav__link">
+        <span title="/iv/examples/absorbing-regression.ipynb (reference label)" class="md-ellipsis">Absorbing Regression</span>
+      </a>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="reference.html" class="md-nav__link">
+        <span title="/iv/reference.rst (reference label)" class="md-ellipsis">Module Reference</span>
+      </a>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+    
+  
+    
+  
+  
+    <li class="md-nav__item md-nav__item--active">
+      
+      
+      <input class="md-nav__toggle md-toggle" data-md-toggle="toc" type="checkbox" id="__toc">
+      
+        <label class="md-nav__link md-nav__link--active" for="__toc">
+          <span title="/iv/mathematical-formula.rst (reference label)" class="md-ellipsis">Formulas and Mathematical Detail</span>
+          <span class="md-nav__icon md-icon"></span>
+        </label>
+      
+      <a href="#" class="md-nav__link md-nav__link--active">
+        <span title="/iv/mathematical-formula.rst (reference label)" class="md-ellipsis">Formulas and Mathematical Detail</span>
+      </a>
+      
+        
+
+  
+
+<nav class="md-nav md-nav--secondary">
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Contents
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#notation" class="md-nav__link">
+    <span title="/iv/mathematical-formula.rst#notation (reference label)" class="md-ellipsis">Notation</span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#parameter-estimation" class="md-nav__link">
+    <span title="/iv/mathematical-formula.rst#parameter-estimation (reference label)" class="md-ellipsis">Parameter Estimation</span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Parameter Estimation">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#two-stage-least-squares-2sls" class="md-nav__link">
+    <span title="/iv/mathematical-formula.rst#two-stage-least-squares-2sls (reference label)" class="md-ellipsis">Two-<wbr>stage Least Squares <wbr>(2SLS)</span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#limited-information-maximum-likelihood-and-k-class-estimators" class="md-nav__link">
+    <span title="/iv/mathematical-formula.rst#limited-information-maximum-likelihood-and-k-class-estimators (reference label)" class="md-ellipsis">Limited Information Maximum Likelihood and k-<wbr>class Estimators</span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#generalized-method-of-moments-gmm" class="md-nav__link">
+    <span title="/iv/mathematical-formula.rst#generalized-method-of-moments-gmm (reference label)" class="md-ellipsis">Generalized Method of Moments <wbr>(GMM)</span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#continuously-updating-generalized-method-of-moments-gmm-cue" class="md-nav__link">
+    <span title="/iv/mathematical-formula.rst#continuously-updating-generalized-method-of-moments-gmm-cue (reference label)" class="md-ellipsis">Continuously Updating Generalized Method of Moments <wbr>(GMM-<wbr>CUE)</span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#basic-statistics" class="md-nav__link">
+    <span title="/iv/mathematical-formula.rst#basic-statistics (reference label)" class="md-ellipsis">Basic Statistics</span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#parameter-covariance-estimation" class="md-nav__link">
+    <span title="/iv/mathematical-formula.rst#parameter-covariance-estimation (reference label)" class="md-ellipsis">Parameter Covariance Estimation</span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Parameter Covariance Estimation">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#two-stage-ls-liml-and-k-class-estimators" class="md-nav__link">
+    <span title="/iv/mathematical-formula.rst#two-stage-ls-liml-and-k-class-estimators (reference label)" class="md-ellipsis">Two-<wbr>stage LS, LIML and k-<wbr>class estimators</span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#standard-errors" class="md-nav__link">
+    <span title="/iv/mathematical-formula.rst#standard-errors (reference label)" class="md-ellipsis">Standard Errors</span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#t-statistics" class="md-nav__link">
+    <span title="/iv/mathematical-formula.rst#t-statistics (reference label)" class="md-ellipsis">T-<wbr>statistics</span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#p-values" class="md-nav__link">
+    <span title="/iv/mathematical-formula.rst#p-values (reference label)" class="md-ellipsis">P-<wbr>values</span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#confidence-intervals" class="md-nav__link">
+    <span title="/iv/mathematical-formula.rst#confidence-intervals (reference label)" class="md-ellipsis">Confidence Intervals</span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#linear-hypothesis-tests" class="md-nav__link">
+    <span title="/iv/mathematical-formula.rst#linear-hypothesis-tests (reference label)" class="md-ellipsis">Linear Hypothesis Tests</span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#gmm-covariance-estimators" class="md-nav__link">
+    <span title="/iv/mathematical-formula.rst#gmm-covariance-estimators (reference label)" class="md-ellipsis">GMM Covariance estimators</span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#gmm-weight-estimators" class="md-nav__link">
+    <span title="/iv/mathematical-formula.rst#gmm-weight-estimators (reference label)" class="md-ellipsis">GMM Weight Estimators</span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#post-estimation" class="md-nav__link">
+    <span title="/iv/mathematical-formula.rst#post-estimation (reference label)" class="md-ellipsis">Post-<wbr>estimation</span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Post-estimation">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#sls-and-liml-post-estimation-results" class="md-nav__link">
+    <span title="/iv/mathematical-formula.rst#sls-and-liml-post-estimation-results (reference label)" class="md-ellipsis">2SLS and LIML Post-<wbr>estimation Results</span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#gmm-post-estimation-results" class="md-nav__link">
+    <span title="/iv/mathematical-formula.rst#gmm-post-estimation-results (reference label)" class="md-ellipsis">GMM Post-<wbr>estimation Results</span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#first-stage-estimation-analysis" class="md-nav__link">
+    <span title="/iv/mathematical-formula.rst#first-stage-estimation-analysis (reference label)" class="md-ellipsis">First-<wbr>stage Estimation Analysis</span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#kernel-weights-and-bandwidth-selection" class="md-nav__link">
+    <span title="/iv/mathematical-formula.rst#kernel-weights-and-bandwidth-selection (reference label)" class="md-ellipsis">Kernel Weights and Bandwidth Selection</span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#constant-detection" class="md-nav__link">
+    <span title="/iv/mathematical-formula.rst#constant-detection (reference label)" class="md-ellipsis">Constant Detection</span>
+  </a>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+      
+    </li>
+  
+
+            
+          
+        </ul>
+      </nav>
+    </li>
+  
+  
+
+    
+      
+      
+      
+
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../panel/index.html" class="md-nav__link">
+        <span title="/panel/index.rst (reference label)" class="md-ellipsis">Panel Data Model Estimation</span>
+      </a>
+    </li>
+  
+
+    
+      
+      
+      
+
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../asset-pricing/index.html" class="md-nav__link">
+        <span title="/asset-pricing/index.rst (reference label)" class="md-ellipsis">Linear Factor Models for Asset Pricing</span>
+      </a>
+    </li>
+  
+
+    
+      
+      
+      
+
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../system/index.html" class="md-nav__link">
+        <span title="/system/index.rst (reference label)" class="md-ellipsis">System Regression Models</span>
+      </a>
+    </li>
+  
+
+    
+      
+      
+      
+
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../utility.html" class="md-nav__link">
+        <span title="/utility.rst (reference label)" class="md-ellipsis">Utilities</span>
+      </a>
+    </li>
+  
+
+    
+      
+      
+      
+
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../compatibility.html" class="md-nav__link">
+        <span title="/compatibility.rst (reference label)" class="md-ellipsis">Compatibility</span>
+      </a>
+    </li>
+  
+
+    
+      
+      
+      
+
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../plan.html" class="md-nav__link">
+        <span title="/plan.rst (reference label)" class="md-ellipsis">Module Plans</span>
+      </a>
+    </li>
+  
+
+    
+      
+      
+      
+
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../contributing.html" class="md-nav__link">
+        <span title="/contributing.rst (reference label)" class="md-ellipsis">Contributing</span>
+      </a>
+    </li>
+  
+
+    
+      
+      
+      
+
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../changes.html" class="md-nav__link">
+        <span title="/changes.rst (reference label)" class="md-ellipsis">Change Log</span>
+      </a>
+    </li>
+  
+
+    
+      
+      
+      
+
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../references.html" class="md-nav__link">
+        <span title="/references.rst (reference label)" class="md-ellipsis">References</span>
+      </a>
+    </li>
+  
+
+    
+  </ul>
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+            
+              
+              <div class="md-sidebar md-sidebar--secondary" data-md-component="sidebar" data-md-type="toc" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+
+  
+
+<nav class="md-nav md-nav--secondary">
+  
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Contents
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#notation" class="md-nav__link">
+    <span title="/iv/mathematical-formula.rst#notation (reference label)" class="md-ellipsis">Notation</span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#parameter-estimation" class="md-nav__link">
+    <span title="/iv/mathematical-formula.rst#parameter-estimation (reference label)" class="md-ellipsis">Parameter Estimation</span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Parameter Estimation">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#two-stage-least-squares-2sls" class="md-nav__link">
+    <span title="/iv/mathematical-formula.rst#two-stage-least-squares-2sls (reference label)" class="md-ellipsis">Two-<wbr>stage Least Squares <wbr>(2SLS)</span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#limited-information-maximum-likelihood-and-k-class-estimators" class="md-nav__link">
+    <span title="/iv/mathematical-formula.rst#limited-information-maximum-likelihood-and-k-class-estimators (reference label)" class="md-ellipsis">Limited Information Maximum Likelihood and k-<wbr>class Estimators</span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#generalized-method-of-moments-gmm" class="md-nav__link">
+    <span title="/iv/mathematical-formula.rst#generalized-method-of-moments-gmm (reference label)" class="md-ellipsis">Generalized Method of Moments <wbr>(GMM)</span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#continuously-updating-generalized-method-of-moments-gmm-cue" class="md-nav__link">
+    <span title="/iv/mathematical-formula.rst#continuously-updating-generalized-method-of-moments-gmm-cue (reference label)" class="md-ellipsis">Continuously Updating Generalized Method of Moments <wbr>(GMM-<wbr>CUE)</span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#basic-statistics" class="md-nav__link">
+    <span title="/iv/mathematical-formula.rst#basic-statistics (reference label)" class="md-ellipsis">Basic Statistics</span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#parameter-covariance-estimation" class="md-nav__link">
+    <span title="/iv/mathematical-formula.rst#parameter-covariance-estimation (reference label)" class="md-ellipsis">Parameter Covariance Estimation</span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Parameter Covariance Estimation">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#two-stage-ls-liml-and-k-class-estimators" class="md-nav__link">
+    <span title="/iv/mathematical-formula.rst#two-stage-ls-liml-and-k-class-estimators (reference label)" class="md-ellipsis">Two-<wbr>stage LS, LIML and k-<wbr>class estimators</span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#standard-errors" class="md-nav__link">
+    <span title="/iv/mathematical-formula.rst#standard-errors (reference label)" class="md-ellipsis">Standard Errors</span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#t-statistics" class="md-nav__link">
+    <span title="/iv/mathematical-formula.rst#t-statistics (reference label)" class="md-ellipsis">T-<wbr>statistics</span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#p-values" class="md-nav__link">
+    <span title="/iv/mathematical-formula.rst#p-values (reference label)" class="md-ellipsis">P-<wbr>values</span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#confidence-intervals" class="md-nav__link">
+    <span title="/iv/mathematical-formula.rst#confidence-intervals (reference label)" class="md-ellipsis">Confidence Intervals</span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#linear-hypothesis-tests" class="md-nav__link">
+    <span title="/iv/mathematical-formula.rst#linear-hypothesis-tests (reference label)" class="md-ellipsis">Linear Hypothesis Tests</span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#gmm-covariance-estimators" class="md-nav__link">
+    <span title="/iv/mathematical-formula.rst#gmm-covariance-estimators (reference label)" class="md-ellipsis">GMM Covariance estimators</span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#gmm-weight-estimators" class="md-nav__link">
+    <span title="/iv/mathematical-formula.rst#gmm-weight-estimators (reference label)" class="md-ellipsis">GMM Weight Estimators</span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#post-estimation" class="md-nav__link">
+    <span title="/iv/mathematical-formula.rst#post-estimation (reference label)" class="md-ellipsis">Post-<wbr>estimation</span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Post-estimation">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#sls-and-liml-post-estimation-results" class="md-nav__link">
+    <span title="/iv/mathematical-formula.rst#sls-and-liml-post-estimation-results (reference label)" class="md-ellipsis">2SLS and LIML Post-<wbr>estimation Results</span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#gmm-post-estimation-results" class="md-nav__link">
+    <span title="/iv/mathematical-formula.rst#gmm-post-estimation-results (reference label)" class="md-ellipsis">GMM Post-<wbr>estimation Results</span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#first-stage-estimation-analysis" class="md-nav__link">
+    <span title="/iv/mathematical-formula.rst#first-stage-estimation-analysis (reference label)" class="md-ellipsis">First-<wbr>stage Estimation Analysis</span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#kernel-weights-and-bandwidth-selection" class="md-nav__link">
+    <span title="/iv/mathematical-formula.rst#kernel-weights-and-bandwidth-selection (reference label)" class="md-ellipsis">Kernel Weights and Bandwidth Selection</span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#constant-detection" class="md-nav__link">
+    <span title="/iv/mathematical-formula.rst#constant-detection (reference label)" class="md-ellipsis">Constant Detection</span>
+  </a>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+          
+          
+            <div class="md-content" data-md-component="content">
+              <article class="md-content__inner md-typeset" role="main">
+                  
+
+
+<h1 id="formulas-and-mathematical-detail"><span id="iv-mathematical-notation"></span>Formulas and Mathematical Detail<a class="headerlink" href="#formulas-and-mathematical-detail" title="Permalink to this heading">¶</a></h1>
+<h2 id="notation">Notation<a class="headerlink" href="#notation" title="Permalink to this heading">¶</a></h2>
+<p>Interest is in recovering the parameter vector from the model</p>
+<div class="math notranslate nohighlight">
+\[\begin{aligned}
+y_{i} &amp; =\beta^{\prime}x_{i}+\epsilon_{i}\end{aligned}\]</div>
+<p>where <span class="math notranslate nohighlight">\(\beta\)</span> is <span class="math notranslate nohighlight">\(k\)</span> by 1, <span class="math notranslate nohighlight">\(x_{i}\)</span> is a <span class="math notranslate nohighlight">\(k\)</span> by 1
+vector of observable variables and <span class="math notranslate nohighlight">\(\epsilon_{i}\)</span> is a scalar
+error. <span class="math notranslate nohighlight">\(x_{i}\)</span> can be separated in two types of variables. The
+<span class="math notranslate nohighlight">\(k_{1}\)</span> by 1 set of variables <span class="math notranslate nohighlight">\(x_{1i}\)</span> are exogenous
+regressors in the sense that <span class="math notranslate nohighlight">\(E\left[x_{1i}\epsilon_{i}\right]=0\)</span>.
+The <span class="math notranslate nohighlight">\(k_{2}\)</span> by 1 variables <span class="math notranslate nohighlight">\(x_{2i}\)</span> are endogenous. A set of
+<span class="math notranslate nohighlight">\(p\)</span> instruments is available that satisfy the requirements for
+validity where <span class="math notranslate nohighlight">\(p\geq k_{2}\)</span>. The extended model can be written as</p>
+<div class="math notranslate nohighlight">
+\[\begin{split}\begin{aligned}
+y_{i} &amp; =\underset{\textrm{exogenous}}{\underbrace{\beta_{1}^{\prime}x_{1i}}}+\underset{\textrm{endogenous}}{\underbrace{\beta_{2}^{\prime}x_{2i}}}+\epsilon_{i}\\
+x_{2i} &amp; =\underset{\textrm{exogenous}}{\underbrace{\gamma_{1}^{\prime}z_{1i}}}+\underset{\textrm{instruments}}{\underbrace{\gamma_{2}^{\prime}z_{2i}}}+u_{i}\end{aligned}\end{split}\]</div>
+<p>The model can be expressed compactly</p>
+<div class="math notranslate nohighlight">
+\[\begin{split}\begin{aligned}
+Y &amp; =X_{1}\beta_{1}+X_{2}\beta_{1}+\epsilon=X\beta+\epsilon\\
+X_{2} &amp; =Z_{1}\gamma_{1}+Z_{2}\gamma_{2}+u=Z\gamma+u\end{aligned}\end{split}\]</div>
+<p>The vector of instruments <span class="math notranslate nohighlight">\(z_{i}\)</span> is <span class="math notranslate nohighlight">\(p\)</span> by 1. There are
+<span class="math notranslate nohighlight">\(n\)</span> observations for all variables. <span class="math notranslate nohighlight">\(k_{c}=1\)</span> if the model
+contains a constant (either explicit or implicit, i.e., including all
+categories of a dummy variable). The constant, if included, is in
+<span class="math notranslate nohighlight">\(x_{1i}\)</span>. <span class="math notranslate nohighlight">\(X\)</span> is the <span class="math notranslate nohighlight">\(n\)</span> by <span class="math notranslate nohighlight">\(k\)</span> matrix if
+regressors where row <span class="math notranslate nohighlight">\(i\)</span> of <span class="math notranslate nohighlight">\(X\)</span> is <span class="math notranslate nohighlight">\(x_{i}^{\prime}\)</span>.
+<span class="math notranslate nohighlight">\(X\)</span> can be partitioned into <span class="math notranslate nohighlight">\(\left[X_{1}\;X_{2}\right]\)</span>.
+<span class="math notranslate nohighlight">\(Z\)</span> is the <span class="math notranslate nohighlight">\(n\)</span> by <span class="math notranslate nohighlight">\(p\)</span> matrix of instruments. The
+vector <span class="math notranslate nohighlight">\(y\)</span> is <span class="math notranslate nohighlight">\(n\)</span> by 1. Projection matrices for <span class="math notranslate nohighlight">\(X\)</span> is
+defined <span class="math notranslate nohighlight">\(P_{X}=X\left(X^{\prime}X\right)^{-1}X^{\prime}\)</span>. The
+projection matrix for <span class="math notranslate nohighlight">\(Z\)</span> is similarly defined only using
+<span class="math notranslate nohighlight">\(Z\)</span>. The annihilator matrix for <span class="math notranslate nohighlight">\(X\)</span> is
+<span class="math notranslate nohighlight">\(M_{X}=I-P_{X}\)</span>.</p>
+<h2 id="parameter-estimation">Parameter Estimation<a class="headerlink" href="#parameter-estimation" title="Permalink to this heading">¶</a></h2>
+<h3 id="two-stage-least-squares-2sls">Two-stage Least Squares (2SLS)<a class="headerlink" href="#two-stage-least-squares-2sls" title="Permalink to this heading">¶</a></h3>
+<p>The 2SLS estimator is</p>
+<div class="math notranslate nohighlight">
+\[\begin{aligned}
+\hat{\beta}_{2SLS} &amp; =\left(X^{\prime}P_{Z}X\right)^{-1}\left(X^{\prime}P_{Z}y\right)\end{aligned}\]</div>
+<h3 id="limited-information-maximum-likelihood-and-k-class-estimators">Limited Information Maximum Likelihood and k-class Estimators<a class="headerlink" href="#limited-information-maximum-likelihood-and-k-class-estimators" title="Permalink to this heading">¶</a></h3>
+<p>The LIML or other k-class estimator is</p>
+<div class="math notranslate nohighlight">
+\[\begin{aligned}
+\hat{\beta}_{\kappa} &amp; =\left(X^{\prime}\left(I-\kappa M_{Z}\right)X\right)^{-1}\left(X^{\prime}\left(I-\kappa M_{Z}\right)y\right)\end{aligned}\]</div>
+<p>where <span class="math notranslate nohighlight">\(\kappa\)</span> is the parameter of the class. When
+<span class="math notranslate nohighlight">\(\kappa=1\)</span> the 2SLS estimator is recovered. When <span class="math notranslate nohighlight">\(\kappa=0\)</span>,
+the OLS estimator is recovered. The LIML estimator is recovered when
+<span class="math notranslate nohighlight">\(\kappa\)</span> set to</p>
+<div class="math notranslate nohighlight">
+\[\hat{\kappa}=\min\mathrm{eig\left[\left(W^{\prime}M_{Z}W\right)^{-\frac{1}{2}}\left(W^{\prime}M_{X_{1}}W\right)\left(W^{\prime}M_{Z}W\right)^{-\frac{1}{2}}\right]}\]</div>
+<p>where <span class="math notranslate nohighlight">\(W=\left[y\:X_{2}\right]\)</span> and <span class="math notranslate nohighlight">\(\mathrm{eig}\)</span> returns
+the eigenvalues.</p>
+<h3 id="generalized-method-of-moments-gmm">Generalized Method of Moments (GMM)<a class="headerlink" href="#generalized-method-of-moments-gmm" title="Permalink to this heading">¶</a></h3>
+<p>The GMM estimator is defined as</p>
+<div class="math notranslate nohighlight">
+\[\begin{aligned}
+\hat{\beta}_{GMM} &amp; =\left(X^{\prime}ZWZ^{\prime}X\right)^{-1}\left(X^{\prime}ZWZ^{\prime}y\right)\end{aligned}\]</div>
+<p>where <span class="math notranslate nohighlight">\(W\)</span> is a positive definite weighting matrix.</p>
+<h3 id="continuously-updating-generalized-method-of-moments-gmm-cue">Continuously Updating Generalized Method of Moments (GMM-CUE)<a class="headerlink" href="#continuously-updating-generalized-method-of-moments-gmm-cue" title="Permalink to this heading">¶</a></h3>
+<p>The continuously updating GMM estimator solves the minimization problem</p>
+<div class="math notranslate nohighlight">
+\[\min_{\beta}n\bar{g}\left(\beta\right)^{\prime}W\left(\beta\right)^{-1}\bar{g}\left(\beta\right)\]</div>
+<p>where
+<span class="math notranslate nohighlight">\(\bar{g}\left(\beta\right)=n^{-1}\sum_{i=1}^{n}z_{i}\hat{\epsilon}_{i}\)</span>
+and <span class="math notranslate nohighlight">\(\hat{\epsilon}_{i}=y_{i}-x_{i}\beta\)</span>. Unlike standard GMM,
+the weight matrix, <span class="math notranslate nohighlight">\(W\)</span> directly depends on the model parameters
+<span class="math notranslate nohighlight">\(\beta\)</span> and so it is not possible to use a closed form estimator.</p>
+<h2 id="basic-statistics">Basic Statistics<a class="headerlink" href="#basic-statistics" title="Permalink to this heading">¶</a></h2>
+<p>Let <span class="math notranslate nohighlight">\(\hat{\epsilon}=y-X\hat{\beta}\)</span>. The residual sum of squares
+(RSS) is <span class="math notranslate nohighlight">\(\hat{\epsilon}^{\prime}\hat{\epsilon}\)</span>, the model sum of
+squares (MSS) is <span class="math notranslate nohighlight">\(\hat{\beta}^{\prime}X^{\prime}X\hat{\beta}\)</span> and
+the total sum of squares (TSS) is
+<span class="math notranslate nohighlight">\(\left(y-k_{c}\bar{y}\right)^{\prime}\left(y-k_{c}\bar{y}\right)^{\prime}\)</span>where
+<span class="math notranslate nohighlight">\(\bar{y}\)</span> is the sample average of <span class="math notranslate nohighlight">\(y\)</span>. The model
+<span class="math notranslate nohighlight">\(R^{2}\)</span>is defined</p>
+<div class="math notranslate nohighlight">
+\[\begin{aligned}
+R^{2} &amp; =1-\frac{\hat{\epsilon}^{\prime}\hat{\epsilon}}{\left(y-k_{c}\bar{y}\right)^{\prime}\left(y-k_{c}\bar{y}\right)^{\prime}}=1-\frac{RSS}{TSS}\end{aligned}\]</div>
+<p>and the adjusted <span class="math notranslate nohighlight">\(R^{2}\)</span> is defined</p>
+<div class="math notranslate nohighlight">
+\[\begin{aligned}
+\bar{R}^{2} &amp; =1-\left(1-R^{2}\right)\frac{N-k_{c}}{N-k}.\end{aligned}\]</div>
+<p>The residual variance is
+<span class="math notranslate nohighlight">\(s^{2}=n^{-1}\hat{\epsilon}^{\prime}\hat{\epsilon}\)</span> unless the
+debiased flag is used, in which case a small sample adjusted version is
+estimated
+<span class="math notranslate nohighlight">\(s^{2}=\left(n-k\right)^{-1}\hat{\epsilon}^{\prime}\hat{\epsilon}\)</span>.
+The model degree of freedom is <span class="math notranslate nohighlight">\(k\)</span> and the residual degree of
+freedom is <span class="math notranslate nohighlight">\(n-k\)</span>.</p>
+<p>The model F-statistic is defined</p>
+<div class="math notranslate nohighlight">
+\[\begin{aligned}
+F &amp; =\hat{\beta}_{-}^{\prime}\hat{V}_{-}^{-1}\dot{\hat{\beta}_{-}}\end{aligned}\]</div>
+<p>where the notation <span class="math notranslate nohighlight">\(\hat{\beta}_{-}\)</span> indicates that the constant
+is excluded from <span class="math notranslate nohighlight">\(\hat{\beta}\)</span> and <span class="math notranslate nohighlight">\(\hat{V}_{-}\)</span> indicates
+that the row and column corresponding to a constant are excluded. <a class="footnote-reference brackets" href="#id3" id="id1" role="doc-noteref"><span class="fn-bracket">[</span>1<span class="fn-bracket">]</span></a>
+The test statistic is distributed as <span class="math notranslate nohighlight">\(\chi_{k-k_{c}}^{2}.\)</span> If the
+debiased flag is set, then the test statistic <span class="math notranslate nohighlight">\(F\)</span> is transformed
+as <span class="math notranslate nohighlight">\(F/\left(k-k_{c}\right)\)</span> and a <span class="math notranslate nohighlight">\(F_{k-k_{c},n-k}\)</span>
+distribution is used.</p>
+<h2 id="parameter-covariance-estimation">Parameter Covariance Estimation<a class="headerlink" href="#parameter-covariance-estimation" title="Permalink to this heading">¶</a></h2>
+<h3 id="two-stage-ls-liml-and-k-class-estimators">Two-stage LS, LIML and k-class estimators<a class="headerlink" href="#two-stage-ls-liml-and-k-class-estimators" title="Permalink to this heading">¶</a></h3>
+<p>Four covariance estimators are available. The first is the standard
+homoskedastic covariance, defined as</p>
+<div class="math notranslate nohighlight">
+\[\begin{aligned}
+\hat{\Sigma}=n^{-1}s^{2}\left(\frac{X^{\prime}\left(I-\kappa M_{z}\right)X}{n}\right)^{-1} &amp; =n^{-1}s^{2}\hat{A}.\end{aligned}\]</div>
+<p>Note that this estimator can be expressed as</p>
+<div class="math notranslate nohighlight">
+\[\begin{aligned}
+\hat{\Sigma}=n^{-1}\hat{A}^{-1}\left\{ s^{2}\hat{A}\right\} \hat{A}^{-1} &amp; =n^{-1}\hat{A}^{-1}\hat{B}\hat{A}^{-1}.\end{aligned}\]</div>
+<p>All estimators take this form and only differ in how the asymptotic
+covariance of the scores, <span class="math notranslate nohighlight">\(B\)</span>, is estimated. For the homoskedastic
+covariance estimator, <span class="math notranslate nohighlight">\(\hat{B}=s^{2}\hat{A}.\)</span> The score covariance
+in the heteroskedasticity robust covariance estimator is</p>
+<div class="math notranslate nohighlight">
+\[\begin{aligned}
+\hat{B} &amp; =n^{-1}\sum_{i=1}^{n}\hat{\epsilon}_{i}^{2}\hat{x}_{i}\hat{x}_{i}^{\prime}=n^{-1}\sum_{i=1}^{n}\hat{\xi}_{i}\hat{\xi}_{i}^{\prime}.\end{aligned}\]</div>
+<p>where <span class="math notranslate nohighlight">\(\hat{x_{i}}\)</span> is row <span class="math notranslate nohighlight">\(i\)</span> of <span class="math notranslate nohighlight">\(\hat{X}=P_{Z}X\)</span> and
+<span class="math notranslate nohighlight">\(\hat{\xi}_{i}=\hat{\epsilon}_{i}\hat{x}_{i}\)</span>.</p>
+<p>The kernel covariance estimator is robust to both heteroskedasticity and
+autocorrelation and is defined as</p>
+<div class="math notranslate nohighlight">
+\[\begin{split}\begin{aligned}
+\hat{B} &amp; =\hat{\Gamma}_{0}+\sum_{i=1}^{n-1}K\left(\frac{i}{h}\right)\left(\hat{\Gamma}_{i}+\hat{\Gamma}_{i}^{\prime}\right)\\
+\hat{\Gamma_{j}} &amp; =n^{-1}\sum_{i=j+1}^{n}\hat{\xi}_{i-j}\hat{\xi}_{i}^{\prime}\end{aligned}\end{split}\]</div>
+<p>where <span class="math notranslate nohighlight">\(K\left(\frac{i}{h}\right)\)</span> is a kernel weighting function
+where <span class="math notranslate nohighlight">\(h\)</span> is the kernel bandwidth.</p>
+<p>The one-way clustered covariance estimator is defined as</p>
+<div class="math notranslate nohighlight">
+\[\begin{aligned}
+n^{-1}\sum_{j=1}^{g}\left(\sum_{i\in\mathcal{G}_{j}}\hat{\xi}_{i}\right)\left(\sum_{i\in\mathcal{G}_{j}}\hat{\xi}_{i}\right)^{\prime}\end{aligned}\]</div>
+<p>where <span class="math notranslate nohighlight">\(\sum_{i\in\mathcal{G}_{j}}\hat{\xi}_{i}\)</span> is the sum of the
+scores for all members in group <span class="math notranslate nohighlight">\(\mathcal{G}_{j}\)</span> and <span class="math notranslate nohighlight">\(g\)</span> is
+the number of groups.</p>
+<p>If the debiased flag is used to perform a small-sample adjustment, all
+estimators except the clustered covariance are rescaled by
+<span class="math notranslate nohighlight">\(\left(n-k\right)/n\)</span>. The clustered covariance is rescaled by
+<span class="math notranslate nohighlight">\(\left(\left(n-k\right)\left(n-1\right)/n^{2}\right)\left(\left(g-1\right)/g\right)\)</span>. <a class="footnote-reference brackets" href="#id4" id="id2" role="doc-noteref"><span class="fn-bracket">[</span>2<span class="fn-bracket">]</span></a></p>
+<h3 id="standard-errors">Standard Errors<a class="headerlink" href="#standard-errors" title="Permalink to this heading">¶</a></h3>
+<p>Standard errors are defined as</p>
+<div class="math notranslate nohighlight">
+\[s.e.\left(\hat{\beta}_{j}\right)=\sqrt{e_{j}^{\prime}\hat{\Sigma}e_{j}}\]</div>
+<p>where <span class="math notranslate nohighlight">\(e_{j}\)</span> is a vector of 0s except in location <span class="math notranslate nohighlight">\(j\)</span> which
+is 1.</p>
+<h3 id="t-statistics">T-statistics<a class="headerlink" href="#t-statistics" title="Permalink to this heading">¶</a></h3>
+<p>T-statistics test the null <span class="math notranslate nohighlight">\(H_{0}:\beta_{j}=0\)</span> against a 2-sided
+alternative and are defined as</p>
+<div class="math notranslate nohighlight">
+\[z=\frac{\hat{\beta}_{j}}{s.e.\left(\hat{\beta}_{j}\right)}.\]</div>
+<h3 id="p-values">P-values<a class="headerlink" href="#p-values" title="Permalink to this heading">¶</a></h3>
+<p>P-values are computes using 2-sided tests,</p>
+<div class="math notranslate nohighlight">
+\[Pr\left(\left|z\right|&gt;Z\right)=2-2\Phi\left(\left|z\right|\right)\]</div>
+<p>If the covariance estimator was debiased, a Student’s t distribution
+with <span class="math notranslate nohighlight">\(n-k\)</span> degrees of freedom is used,</p>
+<div class="math notranslate nohighlight">
+\[\begin{aligned}
+Pr\left(\left|z\right|&gt;Z\right) &amp; =2-2t_{n-k}\left(\left|z\right|\right)\end{aligned}\]</div>
+<p>where <span class="math notranslate nohighlight">\(t_{n-k}\left(\cdot\right)\)</span> is the CDF of a Student’s T
+distribution.</p>
+<h3 id="confidence-intervals">Confidence Intervals<a class="headerlink" href="#confidence-intervals" title="Permalink to this heading">¶</a></h3>
+<p>Confidence intervals are constructed as</p>
+<div class="math notranslate nohighlight">
+\[CI_{i,1-\alpha}=\hat{\beta}_{i}\pm q_{\alpha/2}\times\hat{\sigma}_{\beta_{i}}\]</div>
+<p>where <span class="math notranslate nohighlight">\(q_{\alpha/2}\)</span> is the <span class="math notranslate nohighlight">\(\alpha/2\)</span> quantile of a
+standard Normal distribution or a Student’s t. The Student’s t is used
+when a debiased covariance estimator is used.</p>
+<h3 id="linear-hypothesis-tests">Linear Hypothesis Tests<a class="headerlink" href="#linear-hypothesis-tests" title="Permalink to this heading">¶</a></h3>
+<p>Linear hypothesis tests examine the validity of nulls of the form
+<span class="math notranslate nohighlight">\(H_{0}:R\beta-r=0\)</span> and are implemented using a Wald test statistic</p>
+<div class="math notranslate nohighlight">
+\[W=\left(R\hat{\beta}-r\right)^{\prime}\left[R^{\prime}\hat{\Sigma}R\right]^{-1}\left(R\hat{\beta}-r\right)\sim\chi_{q}^{2}\]</div>
+<p>where <span class="math notranslate nohighlight">\(q\)</span> is the <span class="math notranslate nohighlight">\(rank\left(R\right)\)</span> which is usually the
+number of rows in <span class="math notranslate nohighlight">\(R\)</span> . If the debiased flag is used, then
+<span class="math notranslate nohighlight">\(W/q\)</span> is reported and critical and p-values are taken from a
+<span class="math notranslate nohighlight">\(F_{q,n-k}\)</span> distribution.</p>
+<h3 id="gmm-covariance-estimators">GMM Covariance estimators<a class="headerlink" href="#gmm-covariance-estimators" title="Permalink to this heading">¶</a></h3>
+<p>GMM covariance depends on the weighting matrix used in estimation and
+the assumed covariance of the scores. In most applications these are the
+same and so the inefficient form,</p>
+<div class="math notranslate nohighlight">
+\[\hat{\Sigma}=n^{-1}\left(\left(\frac{X'Z}{n}\right)W\left(\frac{Z'X}{n}\right)\right)^{-1}\left(\left(\frac{X'Z}{n}\right)WSW\left(\frac{Z'X}{n}\right)\right)\left(\left(\frac{X'Z}{n}\right)W\left(\frac{Z'X}{n}\right)\right)^{-1}\]</div>
+<p>will collapse to the simpler form</p>
+<div class="math notranslate nohighlight">
+\[\hat{\Sigma}=n^{-1}\left(\left(\frac{X'Z}{n}\right)W\left(\frac{Z'X}{n}\right)\right)^{-1}\]</div>
+<p>when <span class="math notranslate nohighlight">\(W=S^{-1}\)</span>. When an unadjusted (homoskedastic) covariance is
+used,</p>
+<div class="math notranslate nohighlight">
+\[\hat{S}=\tilde{s}^{2}n^{-1}\sum_{j=1}^{n}z_{j}^{\prime}z_{j}\]</div>
+<p>where
+<span class="math notranslate nohighlight">\(\tilde{s}^{2}=n^{-1}\sum_{i=1}^{n}\left(\epsilon_{i}-\bar{\epsilon}\right)^{2}\)</span>
+subtracts the mean which may be non-zero if the model is overidentified.
+Like previous covariance estimators, if the debiased flag is used,
+<span class="math notranslate nohighlight">\(n^{-1}\)</span> is replaced by <span class="math notranslate nohighlight">\(\left(n-k\right)^{-1}\)</span>. When a
+robust (heteroskedastic) covariance is used, the estimator of <span class="math notranslate nohighlight">\(S\)</span>
+is modified to</p>
+<div class="math notranslate nohighlight">
+\[\hat{S}=n^{-1}\sum_{i=1}^{n}\hat{\epsilon}_{i}^{2}z_{i}^{\prime}z_{i}.\]</div>
+<p>If the debiased flag is used, <span class="math notranslate nohighlight">\(n^{-1}\)</span> is replaced by
+<span class="math notranslate nohighlight">\(\left(n-k\right)^{-1}\)</span>.</p>
+<p>Kernel covariance estimators of <span class="math notranslate nohighlight">\(S\)</span> take the form</p>
+<div class="math notranslate nohighlight">
+\[\begin{split}\begin{aligned}
+\hat{S} &amp; =\hat{\Gamma}_{0}+\sum_{i=1}^{n-1}k\left(i/h\right)\left(\hat{\Gamma}_{i}+\hat{\Gamma}_{i}^{\prime}\right)\\
+\hat{\Gamma_{j}} &amp; =n^{-1}\sum_{i=j+1}^{n}\hat{\epsilon}_{i-j}\hat{\epsilon}_{i}z_{i-j}^{\prime}z_{i}\end{aligned}\end{split}\]</div>
+<p>and <span class="math notranslate nohighlight">\(k\left(\cdot\right)\)</span> is a kernel weighting function with
+bandwidth <span class="math notranslate nohighlight">\(h\)</span>. If the debiased flag is used, <span class="math notranslate nohighlight">\(n^{-1}\)</span> is
+replaced by <span class="math notranslate nohighlight">\(\left(n-k\right)^{-1}\)</span>.</p>
+<p>The one-way clustered covariance estimator is defined as</p>
+<div class="math notranslate nohighlight">
+\[\hat{S}=n^{-1}\sum_{j=1}^{g}\left(\sum_{i\in\mathcal{G}_{j}}\hat{\epsilon}_{i}z_{i}\right)^{\prime}\left(\sum_{i\in\mathcal{G}_{j}}\hat{\epsilon}_{i}z_{i}\right)\]</div>
+<p>where <span class="math notranslate nohighlight">\(\sum_{i\in\mathcal{G}_{j}}\hat{\epsilon}_{i}z_{i}\)</span> is the
+sum of the moment conditional for all members in group
+<span class="math notranslate nohighlight">\(\mathcal{G}_{j}\)</span> and <span class="math notranslate nohighlight">\(g\)</span> is the number of groups. If the
+debiased flag is used, the <span class="math notranslate nohighlight">\(n^{-1}\)</span> term is replaced by</p>
+<div class="math notranslate nohighlight">
+\[\left(n-k\right)^{-1}\frac{n-1}{n}\frac{g}{g-1}.\]</div>
+<h3 id="gmm-weight-estimators">GMM Weight Estimators<a class="headerlink" href="#gmm-weight-estimators" title="Permalink to this heading">¶</a></h3>
+<p>The GMM optimal weight estimators are identical to the the estimators of
+<span class="math notranslate nohighlight">\(S\)</span> with two notable exceptions. First, they are never debiased
+and so always use <span class="math notranslate nohighlight">\(n^{-1}\)</span>. Second, if the center flag is true,
+the demeaned moment conditions defined as
+<span class="math notranslate nohighlight">\(\tilde{g}_{i}=z_{i}\hat{\epsilon}_{i}-\overline{z\epsilon}\)</span> are
+used in-place of <span class="math notranslate nohighlight">\(g_{i}\)</span> in the robust, kernel and clustered
+estimators. The unadjusted estimator is always centered, and so this
+option has no effect.</p>
+<h2 id="post-estimation">Post-estimation<a class="headerlink" href="#post-estimation" title="Permalink to this heading">¶</a></h2>
+<h3 id="sls-and-liml-post-estimation-results">2SLS and LIML Post-estimation Results<a class="headerlink" href="#sls-and-liml-post-estimation-results" title="Permalink to this heading">¶</a></h3>
+<p><strong>Sargan</strong></p>
+<p>Sargan’s test of over-identifying restrictions examines whether the
+variance of the IV residuals is similar to that of the OLS residuals.
+The test statistic is computed</p>
+<div class="math notranslate nohighlight">
+\[s=n(1-\hat{\epsilon}^{\prime}M_{Z}\hat{\epsilon}/\hat{\epsilon}^{\prime}\hat{\epsilon})\sim\chi_{v}^{2}\]</div>
+<p>where <span class="math notranslate nohighlight">\(\hat{\epsilon}\)</span> are the IV residuals and <span class="math notranslate nohighlight">\(M_{Z}\)</span> is
+the annihilator matrix using all exogenous variables.<span class="math notranslate nohighlight">\(\nu\)</span> is
+the number of overidentifying restrictions, which is the number of
+instruments minus the number of endogenous variables, <span class="math notranslate nohighlight">\(p-k_{2}\)</span>.</p>
+<p><strong>Basmann</strong></p>
+<p>Basmann’s test is a small-sample corrected version of Sargan’s test of
+over-identifying restrictions. It has the same distribution. Let
+<span class="math notranslate nohighlight">\(s\)</span> be Sargan’s test statistic, then Basmann’s test statistic is</p>
+<div class="math notranslate nohighlight">
+\[s(n-p)/(n-s)\sim\chi_{v}^{2}\]</div>
+<p><strong>Wooldridge score</strong></p>
+<p>Wooldridge’s score test of exogeneity examines the magnitude of the
+correlation between the OLS residuals and a an appropriately constructed
+set of residuals of the instruments. Define <span class="math notranslate nohighlight">\(e=M_{X}Y\)</span> and
+<span class="math notranslate nohighlight">\(\nu=M_{X}M_{Z}X_{2}\)</span>. Then the test statistic is computed from
+the regression</p>
+<div class="math notranslate nohighlight">
+\[1=\gamma_{1}\hat{\epsilon}_{1}\hat{v}_{1,i}+\ldots+\gamma_{p}\hat{\epsilon}_{1}\hat{v}_{p,i}+\eta_{i}\]</div>
+<p>as <span class="math notranslate nohighlight">\(nR^{2}\sim\chi_{k_{2}}^{2}\)</span>.</p>
+<p><strong>Wooldridge regression</strong></p>
+<p>Wooldridge’s regression test of exogeneity is closely related to the
+score test and is generally more powerful. It also inherits robustness
+to heteroskedasticity and/or autocorrelation the comes from the choice
+of covariance estimator used in the model. Define <span class="math notranslate nohighlight">\(R=M_{Z}X_{2}\)</span>.
+The test is implemented in a regression of</p>
+<div class="math notranslate nohighlight">
+\[Y=X\beta+R\gamma+\eta\]</div>
+<p>as</p>
+<div class="math notranslate nohighlight">
+\[\hat{\gamma}^{\prime}\hat{\Sigma}_{\gamma}^{-1}\gamma^{\prime}\sim\chi_{k_{2}}^{2}\]</div>
+<p>where <span class="math notranslate nohighlight">\(\hat{\Sigma}_{\gamma}\)</span> is the block of the covariance
+matrix corresponding to the <span class="math notranslate nohighlight">\(\gamma\)</span> parameters.
+<span class="math notranslate nohighlight">\(\hat{\Sigma}\)</span> is estimated using the same covariance estimator as
+the model fit.</p>
+<p><strong>Wooldridge’s Test of Overidentifying restrictions</strong></p>
+<p>Wooldridge’s test is a score test examining whether the component of the
+instrument that is uncorrelated with both the included exogenous and the
+fitted exogenous is uncorrelated with the IV residuals. Define
+<span class="math notranslate nohighlight">\(\tilde{Z}=M_{\left[X_{1}\:\hat{X}_{2}\right]}Z_{2,1:q}\)</span> where
+<span class="math notranslate nohighlight">\(\hat{X_{2}}\)</span> are the fitted values from the first stage
+regression of the endogenous on all exogenous variables and
+<span class="math notranslate nohighlight">\(Z_{2,1:q}\)</span> contains any <span class="math notranslate nohighlight">\(q\)</span> columns of <span class="math notranslate nohighlight">\(Z_{2}\)</span>,
+<span class="math notranslate nohighlight">\(q=p-k_{2}\)</span> . The test statistic is computed using a regression of
+1s on the test functions <span class="math notranslate nohighlight">\(\hat{\epsilon}_{i}\tilde{z}_{i,j}\)</span> for
+<span class="math notranslate nohighlight">\(j=1,\ldots,q\)</span> which should have expected value 0.</p>
+<div class="math notranslate nohighlight">
+\[1=\gamma_{1}\hat{\epsilon}_{i}\tilde{z}_{i,1}+\ldots+\gamma_{q}\hat{\epsilon}_{i}\tilde{z}_{i,q}\]</div>
+<p>The test statistic is <span class="math notranslate nohighlight">\(nR^{2}\sim\chi_{q}^{2}\)</span> from the
+regression.</p>
+<p><strong>Anderson-Rubin</strong></p>
+<p>The Andersen-Rubin test of overidentification examines the magnitude of
+the LIML <span class="math notranslate nohighlight">\(\hat{\kappa}\)</span>which should be close to unity when the
+model is not overidentified.</p>
+<div class="math notranslate nohighlight">
+\[n\ln(\hat{\kappa})\sim\chi_{q}^{2}\]</div>
+<p>where <span class="math notranslate nohighlight">\(q=p-k_{2}\)</span>.</p>
+<p><strong>Basman’s F</strong></p>
+<p>Basmann’s F test of overidentification also examines the magnitude of
+the LIML <span class="math notranslate nohighlight">\(\hat{\kappa}\)</span>. The test statistic is</p>
+<div class="math notranslate nohighlight">
+\[\hat{\kappa}(n-p)/q\sim F_{q,n-n_{instr}}\]</div>
+<p>where <span class="math notranslate nohighlight">\(q=p-k_{2}\)</span>.</p>
+<p><strong>Durbin and Wu-Haussman</strong></p>
+<p>Durbin’s and the Wu-Hausman tests of exogeneity test of exogeneity is
+depends on the variance of the residuals when come endogenous variables
+are treated as exogenous against the case where they are treated as
+endogenous. Durbin’s test statistic is</p>
+<div class="math notranslate nohighlight">
+\[\begin{split}\begin{aligned}
+\delta= &amp; \hat{\epsilon}'_{e}P_{[z,w]}\hat{\epsilon}_{e}-\hat{\epsilon}'_{c}P_{z}\hat{\epsilon}_{c}\\
+D= &amp; \delta/(\hat{\epsilon}'_{e}\hat{\epsilon}_{e})/n\sim\chi_{q}^{2}\end{aligned}\end{split}\]</div>
+<p>and the Wu-Hausman test statistic is</p>
+<div class="math notranslate nohighlight">
+\[\begin{aligned}
+WH= &amp; \frac{\delta/q}{(\hat{\epsilon}'_{e}\hat{\epsilon}_{e}-\delta)/v}\sim F_{q,\nu}\end{aligned}\]</div>
+<p>where <span class="math notranslate nohighlight">\(\hat{\epsilon}_{e}\)</span> treats the selected set of endogenous
+variables as exogenous (efficient estimate) and
+<span class="math notranslate nohighlight">\(\hat{\epsilon}_{c}\)</span> is a consistent estimator if these variables
+are endogenous.<span class="math notranslate nohighlight">\(P_{\left[Z\,W\right]}\)</span> is the projection matrix
+containing all exogenous variables including the instrument as well as
+the variables being tested for endogeneity
+<span class="math notranslate nohighlight">\(\left(W\right)\)</span>.<span class="math notranslate nohighlight">\(q\)</span> is the number of variables being
+tested for exogeneity and <span class="math notranslate nohighlight">\(\nu=n-k1-k2-q\)</span>.</p>
+<h3 id="gmm-post-estimation-results">GMM Post-estimation Results<a class="headerlink" href="#gmm-post-estimation-results" title="Permalink to this heading">¶</a></h3>
+<p><strong>J-stat</strong></p>
+<p>The J-statistic tests whether the model is over-identified, and is
+defined</p>
+<div class="math notranslate nohighlight">
+\[n\bar{g}'W^{-1}\bar{g}\sim\chi_{q}^{2}\]</div>
+<p>where <span class="math notranslate nohighlight">\(\bar{g}=n^{-1}\sum\hat{\epsilon}_{i}z_{i}\)</span> and <span class="math notranslate nohighlight">\(W\)</span> is
+a consistent estimator of the variance of <span class="math notranslate nohighlight">\(\sqrt{n}\bar{g}\)</span>. The
+degree of freedom is <span class="math notranslate nohighlight">\(q=p-k_{2}\)</span>.</p>
+<p><strong>C-stat</strong></p>
+<p>The C-statistic tests exogeneity by treating a the set of endogenous
+variables as exogenous. In practice this means that are included in the
+GMM moment conditions, and so a likelihood-ratio-like test statistic can
+be computed as</p>
+<div class="math notranslate nohighlight">
+\[J_{e}-J_{c}\sim\chi_{m}^{2}\]</div>
+<p>where <span class="math notranslate nohighlight">\(J_{e}\)</span> is the J-statistic treating the tested variables as
+exogenous and <span class="math notranslate nohighlight">\(J_{c}\)</span> leaves then as endogenous. The optimal
+weighting matrix is computed from the expanded model (efficient) and
+used to estimate parameters in both models. This ensures that the test
+statistic is positive.</p>
+<h2 id="first-stage-estimation-analysis">First-stage Estimation Analysis<a class="headerlink" href="#first-stage-estimation-analysis" title="Permalink to this heading">¶</a></h2>
+<p><strong>Partial R2 and Partial F-statistic</strong></p>
+<p>The <span class="math notranslate nohighlight">\(R^{2}\)</span> is reported after orthogonalizing the instruments from
+included exogenous variables, so that the model estimated is</p>
+<div class="math notranslate nohighlight">
+\[x_{2i}=\gamma_{0}+\tilde{z}_{2i}\gamma+\eta_{i}\]</div>
+<p>where <span class="math notranslate nohighlight">\(\tilde{Z}_{2}=M_{X_{1}}\tilde{Z}\)</span>. The partial
+<span class="math notranslate nohighlight">\(F\)</span>-statistic is the F-statistic from this regression. It is
+implemented as a standard <span class="math notranslate nohighlight">\(F\)</span>-statistic when the data is assumed
+to be homoskedastic with an <span class="math notranslate nohighlight">\(F_{p_{2},n-p_{2}}\)</span> distribution. In
+all other cases, a quadratic form is used with an asymptotic
+<span class="math notranslate nohighlight">\(\chi_{p_{2}}^{2}\)</span> distribution testing <span class="math notranslate nohighlight">\(H_{0}:\gamma=0\)</span>.</p>
+<p><strong>Shea’s R2</strong></p>
+<p>Shea’s <span class="math notranslate nohighlight">\(R^{2}\)</span> is defined as the ratio of the parameter variances
+under OLS and 2SLS estimation standardized by the unexplained variance
+under each,</p>
+<div class="math notranslate nohighlight">
+\[\frac{\frac{\hat{\sigma}_{OLS,\beta_{i}}^{2}}{1-R_{OLS}^{2}}}{\frac{\hat{\sigma}_{IV,\beta_{i}}^{2}}{1-R_{IV}^{2}}}=\frac{\hat{\sigma}_{OLS,\beta_{i}}^{2}}{\hat{\sigma}_{IV,\beta_{i}}^{2}}\times\frac{1-R_{IV}^{2}}{1-R_{OLS}^{2}}\]</div>
+<p>If the estimator under 2SLS was as good as under OLS, both ratios would
+be 1 and Shea’s <span class="math notranslate nohighlight">\(R^{2}=1\)</span>. On the other hand, the worse the
+<span class="math notranslate nohighlight">\(IV\)</span> fit in terms of either <span class="math notranslate nohighlight">\(R^{2}\)</span> or the parameter
+variances, the lower the value reported by Shea’s <span class="math notranslate nohighlight">\(R^{2}\)</span>.</p>
+<h2 id="kernel-weights-and-bandwidth-selection">Kernel Weights and Bandwidth Selection<a class="headerlink" href="#kernel-weights-and-bandwidth-selection" title="Permalink to this heading">¶</a></h2>
+<p><strong>Kernel weights</strong></p>
+<p>In all formulas, <span class="math notranslate nohighlight">\(m\)</span> is the kernel bandwidth parameter.</p>
+<ul>
+<li><p>Bartlett</p>
+<div class="math notranslate nohighlight">
+\[w_{i}=1-\frac{i}{m+1},\,i&lt;m\]</div>
+</li>
+<li><p>Parzen</p>
+<div class="math notranslate nohighlight">
+\[\begin{split}\begin{aligned}
+z_{i} &amp; =\frac{i}{m+1},\,i&lt;m\\
+w_{i} &amp; =1-6z_{i}^{2}+6z_{i}^{3},z\leq0.5\\
+w_{i} &amp; =2(1-z_{i})^{3},z&gt;0.5\end{aligned}\end{split}\]</div>
+</li>
+<li><p>Quadratic-Spectral</p>
+<div class="math notranslate nohighlight">
+\[\begin{split}\begin{aligned}
+z_{i} &amp; =\frac{6\pi i}{5m}\\
+w_{0} &amp; =1\\
+w_{i} &amp; =3(\sin(z_{i})/z_{i}-\cos(z_{i}))/z_{i}^{2},\:i\geq1\end{aligned}\end{split}\]</div>
+</li>
+</ul>
+<p><strong>Optimal BW selection</strong></p>
+<p>TODO</p>
+<h2 id="constant-detection">Constant Detection<a class="headerlink" href="#constant-detection" title="Permalink to this heading">¶</a></h2>
+<p>Whether a model contains a constant or equivalent is tested using three
+tests. These are executed in order and so once a constant is detected,
+the others are not executed. The simplest method to ensure that a
+constant is correctly detected is to include a columns of 1s.</p>
+<ol class="arabic simple">
+<li><p>A column with only 1.0s</p></li>
+<li><p>A column with a maximum minus minimum equal to 0 and that is not all
+0s.</p></li>
+<li><p>Whether the rank of <span class="math notranslate nohighlight">\(X\)</span> is the same as
+<span class="math notranslate nohighlight">\(\left[1_{N}\:X\right]\)</span>. If these are the same, then the model
+contains a constant equivalent (e.g., dummies for all categories).</p></li>
+</ol>
+<aside class="footnote-list brackets">
+<aside class="footnote brackets" id="id3" role="note">
+<span class="label"><span class="fn-bracket">[</span><a role="doc-backlink" href="#id1">1</a><span class="fn-bracket">]</span></span>
+<p>If the model contains an implicit constant, e.g., all categories of a
+dummy, one of the categories is excluded when computing the test
+statistic. The choice of category to drop has no effect and is
+equivalent to reparameterizing the model with a constant and
+excluding one category of dummy.</p>
+</aside>
+<aside class="footnote brackets" id="id4" role="note">
+<span class="label"><span class="fn-bracket">[</span><a role="doc-backlink" href="#id2">2</a><span class="fn-bracket">]</span></span>
+<p>This somewhat non-obvious choice is driven by Stata compatibility.</p>
+</aside>
+</aside>
+<p class="rubric">References</p>
+<p>Sources used in writing the code include <a class="reference internal" href="../references.html#baltagi" id="id5"><span>[Baltagi]</span></a>, <a class="reference internal" href="../references.html#baumetal" id="id6"><span>[BaumEtAl]</span></a> and <a class="reference internal" href="../references.html#cametal" id="id7"><span>[CamEtAl]</span></a>,
+<a class="reference internal" href="../references.html#camtri05" id="id8"><span>[CamTri05]</span></a>, <a class="reference internal" href="../references.html#camtri09" id="id9"><span>[CamTri09]</span></a>, <a class="reference internal" href="../references.html#greene" id="id10"><span>[Greene]</span></a>, <a class="reference internal" href="../references.html#newwes94" id="id11"><span>[NewWes94]</span></a>, <a class="reference internal" href="../references.html#stata" id="id12"><span>[Stata]</span></a>, <a class="reference internal" href="../references.html#wool10" id="id13"><span>[Wool10]</span></a> and <a class="reference internal" href="../references.html#wool12" id="id14"><span>[Wool12]</span></a>.</p>
+
+
+
+
+
+
+                
+              </article>
+            </div>
+          
+          
+        </div>
+        
+      </main>
+      
+        <footer class="md-footer">
+  
+    
+    <nav class="md-footer__inner md-grid" aria-label="Footer" >
+      
+        
+        <a href="iv/linearmodels.iv.data.IVData.shape.html" class="md-footer__link md-footer__link--prev" aria-label="Previous: linearmodels.iv.data.IVData.shape" rel="prev">
+          <div class="md-footer__button md-icon">
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20 11v2H8l5.5 5.5-1.42 1.42L4.16 12l7.92-7.92L13.5 5.5 8 11h12Z"/></svg>
+          </div>
+          <div class="md-footer__title">
+            <div class="md-ellipsis">
+              <span class="md-footer__direction">
+                Previous
+              </span>
+              linearmodels.iv.data.IVData.shape
+            </div>
+          </div>
+        </a>
+      
+      
+        
+        <a href="../panel/index.html" class="md-footer__link md-footer__link--next" aria-label="Next: Panel Data Model Estimation" rel="next">
+          <div class="md-footer__title">
+            <div class="md-ellipsis">
+              <span class="md-footer__direction">
+                Next
+              </span>
+              Panel Data Model Estimation
+            </div>
+          </div>
+          <div class="md-footer__button md-icon">
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M4 11v2h12l-5.5 5.5 1.42 1.42L19.84 12l-7.92-7.92L10.5 5.5 16 11H4Z"/></svg>
+          </div>
+        </a>
+      
+    </nav>
+  
+  
+  
+  <div class="md-footer-meta md-typeset">
+    
+    <div class="md-footer-meta__inner md-grid">
+      <div class="md-copyright">
+  
+    <div class="md-footer-copyright__highlight">
+        &#169; Copyright 2021, Kevin Sheppard.
+        
+    </div>
+  
+    Created using
+    <a href="https://www.sphinx-doc.org/" target="_blank" rel="noopener">Sphinx</a>
+    6.2.1.
+     and
+    <a href="https://github.com/jbms/sphinx-immaterial/" target="_blank" rel="noopener">Sphinx-Immaterial</a>
+  
+</div>
+      
+        <div class="md-social">
+  
+    
+    
+    <a href="https://github.com/bashtage/linearmodels" target="_blank" rel="noopener" title="Source on github.com" class="md-social__link">
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 496 512"><!--! Font Awesome Free 6.2.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2022 Fonticons, Inc.--><path d="M165.9 397.4c0 2-2.3 3.6-5.2 3.6-3.3.3-5.6-1.3-5.6-3.6 0-2 2.3-3.6 5.2-3.6 3-.3 5.6 1.3 5.6 3.6zm-31.1-4.5c-.7 2 1.3 4.3 4.3 4.9 2.6 1 5.6 0 6.2-2s-1.3-4.3-4.3-5.2c-2.6-.7-5.5.3-6.2 2.3zm44.2-1.7c-2.9.7-4.9 2.6-4.6 4.9.3 2 2.9 3.3 5.9 2.6 2.9-.7 4.9-2.6 4.6-4.6-.3-1.9-3-3.2-5.9-2.9zM244.8 8C106.1 8 0 113.3 0 252c0 110.9 69.8 205.8 169.5 239.2 12.8 2.3 17.3-5.6 17.3-12.1 0-6.2-.3-40.4-.3-61.4 0 0-70 15-84.7-29.8 0 0-11.4-29.1-27.8-36.6 0 0-22.9-15.7 1.6-15.4 0 0 24.9 2 38.6 25.8 21.9 38.6 58.6 27.5 72.9 20.9 2.3-16 8.8-27.1 16-33.7-55.9-6.2-112.3-14.3-112.3-110.5 0-27.5 7.6-41.3 23.6-58.9-2.6-6.5-11.1-33.3 2.6-67.9 20.9-6.5 69 27 69 27 20-5.6 41.5-8.5 62.8-8.5s42.8 2.9 62.8 8.5c0 0 48.1-33.6 69-27 13.7 34.7 5.2 61.4 2.6 67.9 16 17.7 25.8 31.5 25.8 58.9 0 96.5-58.9 104.2-114.8 110.5 9.2 7.9 17 22.9 17 46.4 0 33.7-.3 75.4-.3 83.6 0 6.5 4.6 14.4 17.3 12.1C428.2 457.8 496 362.9 496 252 496 113.3 383.5 8 244.8 8zM97.2 352.9c-1.3 1-1 3.3.7 5.2 1.6 1.6 3.9 2.3 5.2 1 1.3-1 1-3.3-.7-5.2-1.6-1.6-3.9-2.3-5.2-1zm-10.8-8.1c-.7 1.3.3 2.9 2.3 3.9 1.6 1 3.6.7 4.3-.7.7-1.3-.3-2.9-2.3-3.9-2-.6-3.6-.3-4.3.7zm32.4 35.6c-1.6 1.3-1 4.3 1.3 6.2 2.3 2.3 5.2 2.6 6.5 1 1.3-1.3.7-4.3-1.3-6.2-2.2-2.3-5.2-2.6-6.5-1zm-11.4-14.7c-1.6 1-1.6 3.6 0 5.9 1.6 2.3 4.3 3.3 5.6 2.3 1.6-1.3 1.6-3.9 0-6.2-1.4-2.3-4-3.3-5.6-2z"/></svg>
+    </a>
+  
+    
+    
+      
+      
+    
+    <a href="https://pypi.org/project/linearmodels/" target="_blank" rel="noopener" title="pypi.org" class="md-social__link">
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512"><!--! Font Awesome Free 6.2.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2022 Fonticons, Inc.--><path d="M439.8 200.5c-7.7-30.9-22.3-54.2-53.4-54.2h-40.1v47.4c0 36.8-31.2 67.8-66.8 67.8H172.7c-29.2 0-53.4 25-53.4 54.3v101.8c0 29 25.2 46 53.4 54.3 33.8 9.9 66.3 11.7 106.8 0 26.9-7.8 53.4-23.5 53.4-54.3v-40.7H226.2v-13.6h160.2c31.1 0 42.6-21.7 53.4-54.2 11.2-33.5 10.7-65.7 0-108.6zM286.2 404c11.1 0 20.1 9.1 20.1 20.3 0 11.3-9 20.4-20.1 20.4-11 0-20.1-9.2-20.1-20.4.1-11.3 9.1-20.3 20.1-20.3zM167.8 248.1h106.8c29.7 0 53.4-24.5 53.4-54.3V91.9c0-29-24.4-50.7-53.4-55.6-35.8-5.9-74.7-5.6-106.8.1-45.2 8-53.4 24.7-53.4 55.6v40.7h106.9v13.6h-147c-31.1 0-58.3 18.7-66.8 54.2-9.8 40.7-10.2 66.1 0 108.6 7.6 31.6 25.7 54.2 56.8 54.2H101v-48.8c0-35.3 30.5-66.4 66.8-66.4zm-6.7-142.6c-11.1 0-20.1-9.1-20.1-20.3.1-11.3 9-20.4 20.1-20.4 11 0 20.1 9.2 20.1 20.4s-9 20.3-20.1 20.3z"/></svg>
+    </a>
+  
+    
+    
+      
+      
+    
+    <a href="https://doi.org/10.5281/zenodo.2591973" target="_blank" rel="noopener" title="doi.org" class="md-social__link">
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512"><!--! Font Awesome Free 6.2.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2022 Fonticons, Inc.--><path d="M0 216C0 149.7 53.7 96 120 96h8c17.7 0 32 14.3 32 32s-14.3 32-32 32h-8c-30.9 0-56 25.1-56 56v8h64c35.3 0 64 28.7 64 64v64c0 35.3-28.7 64-64 64H64c-35.3 0-64-28.7-64-64V216zm256 0c0-66.3 53.7-120 120-120h8c17.7 0 32 14.3 32 32s-14.3 32-32 32h-8c-30.9 0-56 25.1-56 56v8h64c35.3 0 64 28.7 64 64v64c0 35.3-28.7 64-64 64h-64c-35.3 0-64-28.7-64-64V216z"/></svg>
+    </a>
+  
+</div>
+      
+    </div>
+    
+  </div>
+</footer>
+      
+    </div>
+    <div class="md-dialog" data-md-component="dialog">
+      <div class="md-dialog__inner md-typeset"></div>
+    </div>
+    
+    <script id="__config" type="application/json">{"base": "..", "features": [], "translations": {"clipboard.copied": "Copied to clipboard", "clipboard.copy": "Copy to clipboard", "search.config.lang": "en", "search.config.pipeline": "trimmer, stopWordFilter", "search.config.separator": "[\\s\\-]+", "search.placeholder": "Search", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.placeholder": "Type to start searching", "search.result.term.missing": "Missing", "select.version.title": "Select version"}, "version": {"provider": "mike", "staticVersions": [{"aliases": [], "title": "Release", "version": "https://bashtage.github.io/linearmodels/"}, {"aliases": [], "title": "Development", "version": "https://bashtage.github.io/linearmodels/devel/"}], "versionPath": null}}</script>
+    
+      
+        <script src="../_static/sphinx_immaterial_theme.cea6a0c1d5b0618cf.min.js"></script>
+        <script crossorigin="anonymous" integrity="sha256-Ae2Vz/4ePdIu6ZyI/5ZGsYnb+m0JlOmKPjt6XZ9JJkA=" src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.4/require.min.js"></script>
+        <script>window.MathJax = {"tex": {"inlineMath": [["$", "$"], ["\\(", "\\)"]], "processEscapes": true}, "options": {"ignoreHtmlClass": "tex2jax_ignore|mathjax_ignore|document", "processHtmlClass": "tex2jax_process|mathjax_process|math|output_area"}}</script>
+        <script defer="defer" src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+    
+  </body>
+</html>

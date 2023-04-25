@@ -1,28 +1,786 @@
-<!DOCTYPE html> <html lang=en > <meta charset=utf-8  /> <meta name=viewport  content="width=device-width, initial-scale=1.0" /><meta name=generator  content="Docutils 0.19: https://docutils.sourceforge.io/" /> <meta name=viewport  content="width=device-width,initial-scale=1"> <meta http-equiv=x-ua-compatible  content="ie=edge"> <meta name="lang:clipboard.copy" content="Copy to clipboard"> <meta name="lang:clipboard.copied" content="Copied to clipboard"> <meta name="lang:search.language" content=en > <meta name="lang:search.pipeline.stopwords" content=True > <meta name="lang:search.pipeline.trimmer" content=True > <meta name="lang:search.result.none" content="No matching documents"> <meta name="lang:search.result.one" content="1 matching document"> <meta name="lang:search.result.other" content="# matching documents"> <meta name="lang:search.tokenizer" content="[\s\-]+"> <link href="https://fonts.gstatic.com/" rel=preconnect  crossorigin> <link href="https://fonts.googleapis.com/css?family=Roboto+Mono:400,500,700|Roboto:300,400,400i,700&display=fallback" rel=stylesheet > <style> body, input { font-family: "Roboto", "Helvetica Neue", Helvetica, Arial, sans-serif } code, kbd, pre { font-family: "Roboto Mono", "Courier New", Courier, monospace } </style> <link rel=stylesheet  href="../../_static/stylesheets/application.css"/> <link rel=stylesheet  href="../../_static/stylesheets/application-palette.css"/> <link rel=stylesheet  href="../../_static/stylesheets/application-fixes.css"/> <link rel=stylesheet  href="../../_static/fonts/material-icons.css"/> <meta name=theme-color  content="#2196f3"> <script src="../../_static/javascripts/modernizr.js"></script> <title>Three-stage Least Squares (3SLS) &#8212; linearmodels 4.30.dev3+gddd9602e2 documentation</title> <link rel=apple-touch-icon  sizes=180x180  href="../../_static/icons/apple-touch-icon.png"> <link rel=icon  type="image/png" sizes=32x32  href="../../_static/icons/favicon-32x32.png"> <link rel=icon  type="image/png" sizes=16x16  href="../../_static/icons/favicon-16x16.png"> <link rel=manifest  href="../../_static/icons/site.webmanifest"> <link rel=mask-icon  href="../../_static/icons/safari-pinned-tab.svg" color="#2196f3"> <link rel="shortcut icon" href="../../_static/icons/favicon.ico"> <meta name=msapplication-TileColor  content="#f8f8f8"> <meta name=msapplication-config  content="../../_static/icons/browserconfig.xml"> <style> .highlight { background-color: hsla(0,0%,92.5%,.5) !important; } </style> <link rel=stylesheet  type="text/css" href="../../_static/pygments.css" /> <link rel=stylesheet  type="text/css" href="../../_static/material.css" /> <link rel=stylesheet  type="text/css" href="../../_static/nbsphinx-code-cells.css" /> <script data-url_root="../../" id=documentation_options  src="../../_static/documentation_options.js"></script> <script src="../../_static/jquery.js"></script> <script src="../../_static/underscore.js"></script> <script src="../../_static/_sphinx_javascript_frameworks_compat.js"></script> <script src="../../_static/doctools.js"></script> <script src="../../_static/sphinx_highlight.js"></script> <script crossorigin=anonymous  integrity="sha256-Ae2Vz/4ePdIu6ZyI/5ZGsYnb+m0JlOmKPjt6XZ9JJkA=" src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.4/require.min.js"></script> <script>window.MathJax = {"tex": {"inlineMath": [["$", "$"], ["\\(", "\\)"]], "processEscapes": true}, "options": {"ignoreHtmlClass": "tex2jax_ignore|mathjax_ignore|document", "processHtmlClass": "tex2jax_process|mathjax_process|math|output_area"}}</script> <script defer=defer  src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script> <link rel="shortcut icon" href="../../_static/favicon.ico"/> <link rel=index  title=Index  href="../../genindex.html" /> <link rel=search  title=Search  href="../../search.html" /> <link rel=next  title="Module Reference" href="../reference.html" /> <link rel=prev  title="Using formulas to specify models" href=formulas.html  /> <body dir=ltr data-md-color-primary=blue data-md-color-accent=orange> <svg class=md-svg > <defs data-children-count=0 > <svg xmlns="http://www.w3.org/2000/svg" width=416  height=448  viewBox="0 0 416 448" id=__github ><path fill=currentColor  d="M160 304q0 10-3.125 20.5t-10.75 19T128 352t-18.125-8.5-10.75-19T96 304t3.125-20.5 10.75-19T128 256t18.125 8.5 10.75 19T160 304zm160 0q0 10-3.125 20.5t-10.75 19T288 352t-18.125-8.5-10.75-19T256 304t3.125-20.5 10.75-19T288 256t18.125 8.5 10.75 19T320 304zm40 0q0-30-17.25-51T296 232q-10.25 0-48.75 5.25Q229.5 240 208 240t-39.25-2.75Q130.75 232 120 232q-29.5 0-46.75 21T56 304q0 22 8 38.375t20.25 25.75 30.5 15 35 7.375 37.25 1.75h42q20.5 0 37.25-1.75t35-7.375 30.5-15 20.25-25.75T360 304zm56-44q0 51.75-15.25 82.75-9.5 19.25-26.375 33.25t-35.25 21.5-42.5 11.875-42.875 5.5T212 416q-19.5 0-35.5-.75t-36.875-3.125-38.125-7.5-34.25-12.875T37 371.5t-21.5-28.75Q0 312 0 260q0-59.25 34-99-6.75-20.5-6.75-42.5 0-29 12.75-54.5 27 0 47.5 9.875t47.25 30.875Q171.5 96 212 96q37 0 70 8 26.25-20.5 46.75-30.25T376 64q12.75 25.5 12.75 54.5 0 21.75-6.75 42 34 40 34 99.5z"/></svg> </defs> </svg> <input class=md-toggle  data-md-toggle=drawer  type=checkbox  id=__drawer > <input class=md-toggle  data-md-toggle=search  type=checkbox  id=__search > <label class=md-overlay  data-md-component=overlay  for=__drawer ></label> <a href="#system/examples/three-stage-ls" tabindex=1  class=md-skip > Skip to content </a> <header class=md-header  data-md-component=header > <nav class="md-header-nav md-grid"> <div class="md-flex navheader"> <div class="md-flex__cell md-flex__cell--shrink"> <a href="../../index.html" title="linearmodels 4.30.dev3+gddd9602e2 documentation" class="md-header-nav__button md-logo"> <img src="../../_static/bw-logo.svg" height=26  alt="linearmodels 4.30.dev3+gddd9602e2 documentation logo"> </a> </div> <div class="md-flex__cell md-flex__cell--shrink"> <label class="md-icon md-icon--menu md-header-nav__button" for=__drawer ></label> </div> <div class="md-flex__cell md-flex__cell--stretch"> <div class="md-flex__ellipsis md-header-nav__title" data-md-component=title > <span class=md-header-nav__topic >linearmodels v4.30 (+3)</span> <span class=md-header-nav__topic > Three-stage Least Squares (3SLS) </span> </div> </div> <div class="md-flex__cell md-flex__cell--shrink"> <label class="md-icon md-icon--search md-header-nav__button" for=__search ></label> <div class=md-search  data-md-component=search  role=dialog > <label class=md-search__overlay  for=__search ></label> <div class=md-search__inner  role=search > <form class=md-search__form  action="../../search.html" method=get  name=search > <input type=text  class=md-search__input  name=q  placeholder=Search  autocapitalize=off  autocomplete=off  spellcheck=false  data-md-component=query  data-md-state=active > <label class="md-icon md-search__icon" for=__search ></label> <button type=reset  class="md-icon md-search__icon" data-md-component=reset  tabindex=-1 > &#xE5CD; </button> </form> <div class=md-search__output > <div class=md-search__scrollwrap  data-md-scrollfix> <div class=md-search-result  data-md-component=result > <div class=md-search-result__meta > Type to start searching </div> <ol class=md-search-result__list ></ol> </div> </div> </div> </div> </div> </div> <div class="md-flex__cell md-flex__cell--shrink"> <div class=md-header-nav__source > <a href="https://github.com/bashtage/linearmodels/" title="Go to repository" class=md-source  data-md-source=github > <div class=md-source__icon > <svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" viewBox="0 0 24 24" width=28  height=28 > <use xlink:href="#__github" width=24  height=24 ></use> </svg> </div> <div class=md-source__repository > linearmodels </div> </a> </div> </div> <div class="md-flex__cell md-flex__cell--shrink dropdown"> <button class=dropdownbutton >Versions</button> <div class="dropdown-content md-hero"> <a title=Release  href="https://bashtage.github.io/linearmodels/">Release</a> <a title=Development  href="https://bashtage.github.io/linearmodels/devel/">Development</a> </div> </div> </div> </nav> </header> <div class=md-container > <nav class=md-tabs  data-md-component=tabs > <div class="md-tabs__inner md-grid"> <ul class=md-tabs__list > <li class=md-tabs__item ><a href="../index.html" class=md-tabs__link >System Regression Models</a> </ul> </div> </nav> <main class=md-main > <div class="md-main__inner md-grid" data-md-component=container > <div class="md-sidebar md-sidebar--primary" data-md-component=navigation > <div class=md-sidebar__scrollwrap > <div class=md-sidebar__inner > <nav class="md-nav md-nav--primary" data-md-level=0 > <label class="md-nav__title md-nav__title--site" for=__drawer > <a href="../../index.html" title="linearmodels 4.30.dev3+gddd9602e2 documentation" class="md-nav__button md-logo"> <img src="../../_static/bw-logo.svg" alt=" logo" width=48  height=48 > </a> <a href="../../index.html" title="linearmodels 4.30.dev3+gddd9602e2 documentation">linearmodels v4.30 (+3)</a> </label> <div class=md-nav__source > <a href="https://github.com/bashtage/linearmodels/" title="Go to repository" class=md-source  data-md-source=github > <div class=md-source__icon > <svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" viewBox="0 0 24 24" width=28  height=28 > <use xlink:href="#__github" width=24  height=24 ></use> </svg> </div> <div class=md-source__repository > linearmodels </div> </a> </div> <ul class=md-nav__list > <li class=md-nav__item > <a href="../../iv/index.html" class=md-nav__link >Instrumental Variable Estimation</a> <li class=md-nav__item > <a href="../../panel/index.html" class=md-nav__link >Panel Data Model Estimation</a> <li class=md-nav__item > <a href="../../asset-pricing/index.html" class=md-nav__link >Linear Factor Models for Asset Pricing</a> <li class=md-nav__item > <a href="../index.html" class=md-nav__link >System Regression Models</a> <ul class=md-nav__list > <li class=md-nav__item > <a href=examples.html  class=md-nav__link >Examples</a> <li class=md-nav__item > <a href=formulas.html  class=md-nav__link >Using formulas to specify models</a> <li class=md-nav__item > <input class="md-toggle md-nav__toggle" data-md-toggle=toc  type=checkbox  id=__toc > <label class="md-nav__link md-nav__link--active" for=__toc > Three-stage Least Squares (3SLS) </label> <a href="#" class="md-nav__link md-nav__link--active">Three-stage Least Squares (3SLS)</a> <nav class="md-nav md-nav--secondary"> <label class=md-nav__title  for=__toc >Contents</label> <ul class=md-nav__list  data-md-scrollfix=""> <li class=md-nav__item ><a href="#system-examples-three-stage-ls--page-root" class=md-nav__link >Three-stage Least Squares (3SLS)</a><nav class=md-nav > <ul class=md-nav__list > <li class=md-nav__item ><a href="#Data" class=md-nav__link >Data</a> <li class=md-nav__item ><a href="#Formulas" class=md-nav__link >Formulas</a> <li class=md-nav__item ><a href="#Direct-Model-Specification" class=md-nav__link >Direct Model Specification</a> <li class=md-nav__item ><a href="#System-GMM-Estimation" class=md-nav__link >System GMM Estimation</a> <li class=md-nav__item ><a href="#Simultaneous-Equations" class=md-nav__link >Simultaneous Equations</a> </ul> </nav> <li class=md-nav__item ><a class=md-nav__extra_link  href="../../_sources/system/examples/three-stage-ls.ipynb.txt">Show Source</a> </ul> </nav> <li class=md-nav__item > <a href="../reference.html" class=md-nav__link >Module Reference</a> <li class=md-nav__item > <a href="../mathematical-formula.html" class=md-nav__link >Seemingly Unrelated Regression (SUR/SURE)</a> <li class=md-nav__item > <a href="../mathematical-formula.html#covariance-estimation" class=md-nav__link >Covariance Estimation</a> <li class=md-nav__item > <a href="../mathematical-formula.html#memory-efficient-calculations" class=md-nav__link >Memory efficient calculations</a> <li class=md-nav__item > <a href="../mathematical-formula.html#three-stage-least-squares-3sls" class=md-nav__link >Three Stage Least Squares (3SLS)</a> <li class=md-nav__item > <a href="../mathematical-formula.html#system-generalized-method-of-moments-gmm" class=md-nav__link >System Generalized Method of Moments (GMM)</a> <li class=md-nav__item > <a href="../mathematical-formula.html#testing-covariance-and-correlations" class=md-nav__link >Testing Covariance and Correlations</a> <li class=md-nav__item > <a href="../mathematical-formula.html#system-measures-of-fit-r-2" class=md-nav__link >System Measures of Fit (<span class="math notranslate nohighlight">\(R^{2}\)</span>)</a> </ul> <li class=md-nav__item > <a href="../../utility.html" class=md-nav__link >Utilities</a> <li class=md-nav__item > <a href="../../compatibility.html" class=md-nav__link >Compatibility</a> <li class=md-nav__item > <a href="../../plan.html" class=md-nav__link >Module Plans</a> <li class=md-nav__item > <a href="../../contributing.html" class=md-nav__link >Contributing</a> <li class=md-nav__item > <a href="../../changes.html" class=md-nav__link >Change Log</a> <li class=md-nav__item > <a href="../../references.html" class=md-nav__link >References</a> </ul> </nav> </div> </div> </div> <div class="md-sidebar md-sidebar--secondary" data-md-component=toc > <div class=md-sidebar__scrollwrap > <div class=md-sidebar__inner > <nav class="md-nav md-nav--secondary"> <label class=md-nav__title  for=__toc >Contents</label> <ul class=md-nav__list  data-md-scrollfix=""> <li class=md-nav__item ><a href="#system-examples-three-stage-ls--page-root" class=md-nav__link >Three-stage Least Squares (3SLS)</a><nav class=md-nav > <ul class=md-nav__list > <li class=md-nav__item ><a href="#Data" class=md-nav__link >Data</a> <li class=md-nav__item ><a href="#Formulas" class=md-nav__link >Formulas</a> <li class=md-nav__item ><a href="#Direct-Model-Specification" class=md-nav__link >Direct Model Specification</a> <li class=md-nav__item ><a href="#System-GMM-Estimation" class=md-nav__link >System GMM Estimation</a> <li class=md-nav__item ><a href="#Simultaneous-Equations" class=md-nav__link >Simultaneous Equations</a> </ul> </nav> <li class=md-nav__item ><a class=md-nav__extra_link  href="../../_sources/system/examples/three-stage-ls.ipynb.txt">Show Source</a> <li id=searchbox  class=md-nav__item > </ul> </nav> </div> </div> </div> <div class=md-content > <article class="md-content__inner md-typeset" role=main > <section id="Three-stage-Least-Squares-(3SLS)"> <h1 id=system-examples-three-stage-ls--page-root >Three-stage Least Squares (3SLS)<a class=headerlink  href="#system-examples-three-stage-ls--page-root" title="Permalink to this heading">¶</a></h1> <p>This example demonstrates how a system of simultaneous equations can be jointly estimated using three-stage least squares (3SLS). The simultaneous equations model the wage and number of hours worked. The two equations are</p> <div class="math notranslate nohighlight"> \[\begin{split}\begin{eqnarray} hours &amp; = &amp; \beta_0 + \beta_1 \ln(wage) + \beta_2 educ + \beta_3 age + \beta_4 kidslt6 + \beta_5 nwifeinc + \epsilon^h_i \\ \ln(wage) &amp; = &amp; \gamma_0 + \gamma_1 hours + \gamma_2 educ + \gamma_3 educ^2 + \gamma_4 exper + \epsilon^w_i \end{eqnarray}\end{split}\]</div> <p>Each equation has a single exogenous variables. The instruments for the endogenous variables are the regressors that appear in one equation but not the other.</p> <section id=Data > <h2 id=Data >Data<a class=headerlink  href="#Data" title="Permalink to this heading">¶</a></h2> <p>The data set is the MORZ data set from Wooldridge (2002).</p> <div class="nbinput nblast docutils container"> <div class="prompt highlight-none notranslate"><div class=highlight ><pre><span></span>[1]:
-</pre></div> </div> <div class="input_area highlight-ipython3 notranslate"><div class=highlight ><pre><span></span><span class=kn >from</span> <span class=nn >linearmodels.datasets</span> <span class=kn >import</span> <span class=n >mroz</span>
 
-<span class=n >data</span> <span class=o >=</span> <span class=n >mroz</span><span class=o >.</span><span class=n >load</span><span class=p >()</span>
-</pre></div> </div> </div> <p>Here the relevant variables are selected and missing observations are dropped to avoid warnings.</p> <div class="nbinput nblast docutils container"> <div class="prompt highlight-none notranslate"><div class=highlight ><pre><span></span>[2]:
-</pre></div> </div> <div class="input_area highlight-ipython3 notranslate"><div class=highlight ><pre><span></span><span class=n >data</span> <span class=o >=</span> <span class=n >data</span><span class=p >[</span>
-    <span class=p >[</span><span class=s2 >"hours"</span><span class=p >,</span> <span class=s2 >"educ"</span><span class=p >,</span> <span class=s2 >"age"</span><span class=p >,</span> <span class=s2 >"kidslt6"</span><span class=p >,</span> <span class=s2 >"nwifeinc"</span><span class=p >,</span> <span class=s2 >"lwage"</span><span class=p >,</span> <span class=s2 >"exper"</span><span class=p >,</span> <span class=s2 >"expersq"</span><span class=p >]</span>
-<span class=p >]</span>
-<span class=n >data</span> <span class=o >=</span> <span class=n >data</span><span class=o >.</span><span class=n >dropna</span><span class=p >()</span>
-</pre></div> </div> </div> <p>The main models are imported:</p> <ul class=simple > <li><p><code class="docutils literal notranslate"><span class=pre >IV2SLS</span></code> - single equation 2-stage least squares</p> <li><p><code class="docutils literal notranslate"><span class=pre >IV3SLS</span></code> - system estimation using instrumental variables</p> <li><p><code class="docutils literal notranslate"><span class=pre >SUR</span></code> - system estimation without endogenous variables</p> </ul> <div class="nbinput nblast docutils container"> <div class="prompt highlight-none notranslate"><div class=highlight ><pre><span></span>[3]:
-</pre></div> </div> <div class="input_area highlight-ipython3 notranslate"><div class=highlight ><pre><span></span><span class=kn >from</span> <span class=nn >linearmodels</span> <span class=kn >import</span> <span class=n >IV2SLS</span><span class=p >,</span> <span class=n >IV3SLS</span><span class=p >,</span> <span class=n >SUR</span><span class=p >,</span> <span class=n >IVSystemGMM</span>
-</pre></div> </div> </div> </section> <section id=Formulas > <h2 id=Formulas >Formulas<a class=headerlink  href="#Formulas" title="Permalink to this heading">¶</a></h2> <p>These examples use the formula interface. This is usually simpler when models have exogenous regressors, endogenous regressors and instruments. The syntax is the same as in the 2SLS models.</p> <div class="nbinput docutils container"> <div class="prompt highlight-none notranslate"><div class=highlight ><pre><span></span>[4]:
-</pre></div> </div> <div class="input_area highlight-ipython3 notranslate"><div class=highlight ><pre><span></span><span class=n >hours</span> <span class=o >=</span> <span class=s2 >"hours ~ educ + age + kidslt6 + nwifeinc + [lwage ~ exper + expersq]"</span>
 
-<span class=n >hours_mod</span> <span class=o >=</span> <span class=n >IV2SLS</span><span class=o >.</span><span class=n >from_formula</span><span class=p >(</span><span class=n >hours</span><span class=p >,</span> <span class=n >data</span><span class=p >)</span>
-<span class=n >hours_res</span> <span class=o >=</span> <span class=n >hours_mod</span><span class=o >.</span><span class=n >fit</span><span class=p >(</span><span class=n >cov_type</span><span class=o >=</span><span class=s2 >"unadjusted"</span><span class=p >)</span>
-<span class=nb >print</span><span class=p >(</span><span class=n >hours_res</span><span class=p >)</span>
-</pre></div> </div> </div> <div class="nboutput nblast docutils container"> <div class="prompt empty docutils container"> </div> <div class="output_area docutils container"> <div class=highlight ><pre>
+
+<!doctype html>
+<html lang="en" class="no-js">
+  <head>
+    
+      <meta charset="utf-8">
+      <meta name="viewport" content="width=device-width,initial-scale=1">
+      
+      
+      
+      <link rel="icon" href="../../_static/favicon.ico">
+    
+    
+  
+      
+        <title>Three-stage Least Squares (3SLS) - arch v4.30 (+5)</title>
+      
+    
+
+  <link rel="apple-touch-icon" sizes="180x180" href="../../_static/icons/apple-touch-icon.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="../../_static/icons/favicon-32x32.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="../../_static/icons/favicon-16x16.png">
+  <link rel="manifest" href="../../_static/icons/site.webmanifest">
+  <link rel="mask-icon" href="../../_static/icons/safari-pinned-tab.svg" color="#2196f3">
+  <link rel="shortcut icon" href="../../_static/icons/favicon.ico">
+  <meta name="msapplication-TileColor" content="#f8f8f8">
+  <meta name="msapplication-config" content="../../_static/icons/browserconfig.xml">
+  <style>
+  .highlight {
+    background-color: hsla(0,0%,92.5%,.5) !important;
+  }
+  </style>
+
+    
+      
+        
+        
+          
+          
+          <meta name="theme-color" content="#2094f3">
+        
+      
+      
+
+    
+    
+    
+      
+        
+        
+        <style>:root{--md-text-font:"Roboto";--md-code-font:"Roboto Mono"}</style>
+      
+    
+        <link rel="stylesheet" type="text/css" href="../../_static/sphinx_immaterial_theme.8118e13f191069ea1.min.css" />
+        <link rel="stylesheet" type="text/css" href="../../_static/nbsphinx-code-cells.css" />
+        <link rel="stylesheet" type="text/css" href="../../_static/css/small_fixes.css" />
+    <script>__md_scope=new URL("../..",location),__md_hash=e=>[...e].reduce((e,_)=>(e<<5)-e+_.charCodeAt(0),0),__md_get=(e,_=localStorage,t=__md_scope)=>JSON.parse(_.getItem(t.pathname+"."+e)),__md_set=(e,_,t=localStorage,a=__md_scope)=>{try{t.setItem(a.pathname+"."+e,JSON.stringify(_))}catch(e){}}</script>
+    
+      
+
+    
+    
+    
+  </head>
+  
+  
+    
+    
+    
+    
+    
+    <body dir="ltr" data-md-color-scheme="" data-md-color-primary="blue" data-md-color-accent="orange">
+  
+    
+    
+    <input class="md-toggle" data-md-toggle="drawer" type="checkbox" id="__drawer" autocomplete="off">
+    <input class="md-toggle" data-md-toggle="search" type="checkbox" id="__search" autocomplete="off">
+    <label class="md-overlay" for="__drawer"></label>
+    <div data-md-component="skip">
+      
+        
+        <a href="#Data" class="md-skip">
+          Skip to content
+        </a>
+      
+    </div>
+    <div data-md-component="announce">
+      
+    </div>
+    
+      <div data-md-component="outdated" hidden>
+        
+      </div>
+    
+    
+      
+
+<header class="md-header" data-md-component="header">
+  <nav class="md-header__inner md-grid" aria-label="Header">
+    <a href="../../index.html" title="arch v4.30 (+5)" class="md-header__button md-logo" aria-label="arch v4.30 (+5)" data-md-component="logo">
+      <img src="../../_static/bw-logo.svg" alt="logo">
+    </a>
+    <label class="md-header__button md-icon" for="__drawer">
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M3 6h18v2H3V6m0 5h18v2H3v-2m0 5h18v2H3v-2Z"/></svg>
+    </label>
+    <div class="md-header__title" data-md-component="header-title">
+      <div class="md-header__ellipsis">
+        <div class="md-header__topic">
+          <span class="md-ellipsis">
+            arch v4.30 (+5)
+          </span>
+        </div>
+        <div class="md-header__topic" data-md-component="header-topic">
+          <span class="md-ellipsis">
+            
+              Three-stage Least Squares (3SLS)
+            
+          </span>
+        </div>
+      </div>
+    </div>
+    
+    
+    
+      <label class="md-header__button md-icon" for="__search">
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.516 6.516 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5Z"/></svg>
+      </label>
+      <div class="md-search" data-md-component="search" role="dialog">
+  <label class="md-search__overlay" for="__search"></label>
+  <div class="md-search__inner" role="search">
+    <form class="md-search__form" name="search">
+      <input type="text" class="md-search__input" name="query" aria-label="Search" placeholder="Search" autocapitalize="off" autocorrect="off" autocomplete="off" spellcheck="false" data-md-component="search-query" required>
+      <label class="md-search__icon md-icon" for="__search">
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.516 6.516 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5Z"/></svg>
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20 11v2H8l5.5 5.5-1.42 1.42L4.16 12l7.92-7.92L13.5 5.5 8 11h12Z"/></svg>
+      </label>
+      <nav class="md-search__options" aria-label="Search">
+        
+        <button type="reset" class="md-search__icon md-icon" title="Clear" aria-label="Clear" tabindex="-1">
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M19 6.41 17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12 19 6.41Z"/></svg>
+        </button>
+      </nav>
+      
+    </form>
+    <div class="md-search__output">
+      <div class="md-search__scrollwrap" data-md-scrollfix>
+        <div class="md-search-result" data-md-component="search-result">
+          <div class="md-search-result__meta">
+            Initializing search
+          </div>
+          <ol class="md-search-result__list"></ol>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+    
+    
+      <div class="md-header__source">
+        <a href="https://github.com/bashtage/linearmodels/" title="Go to repository" class="md-source" data-md-component="source">
+  <div class="md-source__icon md-icon">
+    
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 496 512"><!--! Font Awesome Free 6.2.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2022 Fonticons, Inc.--><path d="M165.9 397.4c0 2-2.3 3.6-5.2 3.6-3.3.3-5.6-1.3-5.6-3.6 0-2 2.3-3.6 5.2-3.6 3-.3 5.6 1.3 5.6 3.6zm-31.1-4.5c-.7 2 1.3 4.3 4.3 4.9 2.6 1 5.6 0 6.2-2s-1.3-4.3-4.3-5.2c-2.6-.7-5.5.3-6.2 2.3zm44.2-1.7c-2.9.7-4.9 2.6-4.6 4.9.3 2 2.9 3.3 5.9 2.6 2.9-.7 4.9-2.6 4.6-4.6-.3-1.9-3-3.2-5.9-2.9zM244.8 8C106.1 8 0 113.3 0 252c0 110.9 69.8 205.8 169.5 239.2 12.8 2.3 17.3-5.6 17.3-12.1 0-6.2-.3-40.4-.3-61.4 0 0-70 15-84.7-29.8 0 0-11.4-29.1-27.8-36.6 0 0-22.9-15.7 1.6-15.4 0 0 24.9 2 38.6 25.8 21.9 38.6 58.6 27.5 72.9 20.9 2.3-16 8.8-27.1 16-33.7-55.9-6.2-112.3-14.3-112.3-110.5 0-27.5 7.6-41.3 23.6-58.9-2.6-6.5-11.1-33.3 2.6-67.9 20.9-6.5 69 27 69 27 20-5.6 41.5-8.5 62.8-8.5s42.8 2.9 62.8 8.5c0 0 48.1-33.6 69-27 13.7 34.7 5.2 61.4 2.6 67.9 16 17.7 25.8 31.5 25.8 58.9 0 96.5-58.9 104.2-114.8 110.5 9.2 7.9 17 22.9 17 46.4 0 33.7-.3 75.4-.3 83.6 0 6.5 4.6 14.4 17.3 12.1C428.2 457.8 496 362.9 496 252 496 113.3 383.5 8 244.8 8zM97.2 352.9c-1.3 1-1 3.3.7 5.2 1.6 1.6 3.9 2.3 5.2 1 1.3-1 1-3.3-.7-5.2-1.6-1.6-3.9-2.3-5.2-1zm-10.8-8.1c-.7 1.3.3 2.9 2.3 3.9 1.6 1 3.6.7 4.3-.7.7-1.3-.3-2.9-2.3-3.9-2-.6-3.6-.3-4.3.7zm32.4 35.6c-1.6 1.3-1 4.3 1.3 6.2 2.3 2.3 5.2 2.6 6.5 1 1.3-1.3.7-4.3-1.3-6.2-2.2-2.3-5.2-2.6-6.5-1zm-11.4-14.7c-1.6 1-1.6 3.6 0 5.9 1.6 2.3 4.3 3.3 5.6 2.3 1.6-1.3 1.6-3.9 0-6.2-1.4-2.3-4-3.3-5.6-2z"/></svg>
+  </div>
+  <div class="md-source__repository">
+    linearmodels
+  </div>
+</a>
+      </div>
+    
+  </nav>
+  
+</header>
+    
+    <div class="md-container" data-md-component="container">
+      
+      
+      
+      
+        
+          
+        
+      
+      <main class="md-main" data-md-component="main">
+        <div class="md-main__inner md-grid">
+          
+            
+              
+              <div class="md-sidebar md-sidebar--primary" data-md-component="sidebar" data-md-type="navigation" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+
+
+<nav class="md-nav md-nav--primary" aria-label="Navigation" data-md-level="0">
+  <label class="md-nav__title" for="__drawer">
+    <a href="../../index.html" title="arch v4.30 (+5)" class="md-nav__button md-logo" aria-label="arch v4.30 (+5)" data-md-component="logo">
+      <img src="../../_static/bw-logo.svg" alt="logo">
+    </a>
+    arch v4.30 (+5)
+  </label>
+  
+    <div class="md-nav__source">
+      <a href="https://github.com/bashtage/linearmodels/" title="Go to repository" class="md-source" data-md-component="source">
+  <div class="md-source__icon md-icon">
+    
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 496 512"><!--! Font Awesome Free 6.2.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2022 Fonticons, Inc.--><path d="M165.9 397.4c0 2-2.3 3.6-5.2 3.6-3.3.3-5.6-1.3-5.6-3.6 0-2 2.3-3.6 5.2-3.6 3-.3 5.6 1.3 5.6 3.6zm-31.1-4.5c-.7 2 1.3 4.3 4.3 4.9 2.6 1 5.6 0 6.2-2s-1.3-4.3-4.3-5.2c-2.6-.7-5.5.3-6.2 2.3zm44.2-1.7c-2.9.7-4.9 2.6-4.6 4.9.3 2 2.9 3.3 5.9 2.6 2.9-.7 4.9-2.6 4.6-4.6-.3-1.9-3-3.2-5.9-2.9zM244.8 8C106.1 8 0 113.3 0 252c0 110.9 69.8 205.8 169.5 239.2 12.8 2.3 17.3-5.6 17.3-12.1 0-6.2-.3-40.4-.3-61.4 0 0-70 15-84.7-29.8 0 0-11.4-29.1-27.8-36.6 0 0-22.9-15.7 1.6-15.4 0 0 24.9 2 38.6 25.8 21.9 38.6 58.6 27.5 72.9 20.9 2.3-16 8.8-27.1 16-33.7-55.9-6.2-112.3-14.3-112.3-110.5 0-27.5 7.6-41.3 23.6-58.9-2.6-6.5-11.1-33.3 2.6-67.9 20.9-6.5 69 27 69 27 20-5.6 41.5-8.5 62.8-8.5s42.8 2.9 62.8 8.5c0 0 48.1-33.6 69-27 13.7 34.7 5.2 61.4 2.6 67.9 16 17.7 25.8 31.5 25.8 58.9 0 96.5-58.9 104.2-114.8 110.5 9.2 7.9 17 22.9 17 46.4 0 33.7-.3 75.4-.3 83.6 0 6.5 4.6 14.4 17.3 12.1C428.2 457.8 496 362.9 496 252 496 113.3 383.5 8 244.8 8zM97.2 352.9c-1.3 1-1 3.3.7 5.2 1.6 1.6 3.9 2.3 5.2 1 1.3-1 1-3.3-.7-5.2-1.6-1.6-3.9-2.3-5.2-1zm-10.8-8.1c-.7 1.3.3 2.9 2.3 3.9 1.6 1 3.6.7 4.3-.7.7-1.3-.3-2.9-2.3-3.9-2-.6-3.6-.3-4.3.7zm32.4 35.6c-1.6 1.3-1 4.3 1.3 6.2 2.3 2.3 5.2 2.6 6.5 1 1.3-1.3.7-4.3-1.3-6.2-2.2-2.3-5.2-2.6-6.5-1zm-11.4-14.7c-1.6 1-1.6 3.6 0 5.9 1.6 2.3 4.3 3.3 5.6 2.3 1.6-1.3 1.6-3.9 0-6.2-1.4-2.3-4-3.3-5.6-2z"/></svg>
+  </div>
+  <div class="md-source__repository">
+    linearmodels
+  </div>
+</a>
+    </div>
+  
+  <ul class="md-nav__list" data-md-scrollfix>
+    
+      
+      
+      
+
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../iv/index.html" class="md-nav__link">
+        <span title="/iv/index.rst (reference label)" class="md-ellipsis">Instrumental Variable Estimation</span>
+      </a>
+    </li>
+  
+
+    
+      
+      
+      
+
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../panel/index.html" class="md-nav__link">
+        <span title="/panel/index.rst (reference label)" class="md-ellipsis">Panel Data Model Estimation</span>
+      </a>
+    </li>
+  
+
+    
+      
+      
+      
+
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../asset-pricing/index.html" class="md-nav__link">
+        <span title="/asset-pricing/index.rst (reference label)" class="md-ellipsis">Linear Factor Models for Asset Pricing</span>
+      </a>
+    </li>
+  
+
+    
+      
+      
+      
+
+  
+  
+    
+  
+  
+    
+    <li class="md-nav__item md-nav__item--active md-nav__item--nested">
+      
+      
+        <input class="md-nav__toggle md-toggle" data-md-toggle="__nav_4" type="checkbox" id="__nav_4" checked>
+      
+      
+      
+        
+        <div class="md-nav__link md-nav__link--index ">
+          <a href="../index.html"><span title="/system/index.rst (reference label)" class="md-ellipsis">System Regression Models</span></a>
+          
+            <label for="__nav_4">
+              <span class="md-nav__icon md-icon"></span>
+            </label>
+          
+        </div>
+      
+      <nav class="md-nav" aria-label="System Regression Models" data-md-level="1">
+        <label class="md-nav__title" for="__nav_4">
+          <span class="md-nav__icon md-icon"></span>
+          <span title="/system/index.rst (reference label)" class="md-ellipsis">System Regression Models</span>
+        </label>
+        <ul class="md-nav__list" data-md-scrollfix>
+          
+            
+              
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="examples.html" class="md-nav__link">
+        <span title="/system/examples/examples.ipynb (reference label)" class="md-ellipsis">Examples</span>
+      </a>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="formulas.html" class="md-nav__link">
+        <span title="/system/examples/formulas.ipynb (reference label)" class="md-ellipsis">Using formulas to specify models</span>
+      </a>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+    
+  
+    
+  
+  
+    <li class="md-nav__item md-nav__item--active">
+      
+      
+      <input class="md-nav__toggle md-toggle" data-md-toggle="toc" type="checkbox" id="__toc">
+      
+        <label class="md-nav__link md-nav__link--active" for="__toc">
+          <span title="/system/examples/three-stage-ls.ipynb (reference label)" class="md-ellipsis">Three-<wbr>stage Least Squares <wbr>(3SLS)</span>
+          <span class="md-nav__icon md-icon"></span>
+        </label>
+      
+      <a href="#" class="md-nav__link md-nav__link--active">
+        <span title="/system/examples/three-stage-ls.ipynb (reference label)" class="md-ellipsis">Three-<wbr>stage Least Squares <wbr>(3SLS)</span>
+      </a>
+      
+        
+
+  
+
+<nav class="md-nav md-nav--secondary">
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Contents
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#Data" class="md-nav__link">
+    <span title="/system/examples/three-stage-ls.ipynb#data (reference label)" class="md-ellipsis">Data</span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#Formulas" class="md-nav__link">
+    <span title="/system/examples/three-stage-ls.ipynb#formulas (reference label)" class="md-ellipsis">Formulas</span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#Direct-Model-Specification" class="md-nav__link">
+    <span title="/system/examples/three-stage-ls.ipynb#direct-model-specification (reference label)" class="md-ellipsis">Direct Model Specification</span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#System-GMM-Estimation" class="md-nav__link">
+    <span title="/system/examples/three-stage-ls.ipynb#system-gmm-estimation (reference label)" class="md-ellipsis">System GMM Estimation</span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#Simultaneous-Equations" class="md-nav__link">
+    <span title="/system/examples/three-stage-ls.ipynb#simultaneous-equations (reference label)" class="md-ellipsis">Simultaneous Equations</span>
+  </a>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+      
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../reference.html" class="md-nav__link">
+        <span title="/system/reference.rst (reference label)" class="md-ellipsis">Module Reference</span>
+      </a>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../mathematical-formula.html" class="md-nav__link">
+        <span title="/system/mathematical-formula.rst (reference label)" class="md-ellipsis">Seemingly Unrelated Regression <wbr>(SUR/SURE)</span>
+      </a>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../mathematical-formula.html#covariance-estimation" class="md-nav__link">
+        <span title="/system/mathematical-formula.rst#covariance-estimation (reference label)" class="md-ellipsis">Covariance Estimation</span>
+      </a>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../mathematical-formula.html#memory-efficient-calculations" class="md-nav__link">
+        <span title="/system/mathematical-formula.rst#memory-efficient-calculations (reference label)" class="md-ellipsis">Memory efficient calculations</span>
+      </a>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../mathematical-formula.html#three-stage-least-squares-3sls" class="md-nav__link">
+        <span title="/system/mathematical-formula.rst#three-stage-least-squares-3sls (reference label)" class="md-ellipsis">Three Stage Least Squares <wbr>(3SLS)</span>
+      </a>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../mathematical-formula.html#system-generalized-method-of-moments-gmm" class="md-nav__link">
+        <span title="/system/mathematical-formula.rst#system-generalized-method-of-moments-gmm (reference label)" class="md-ellipsis">System Generalized Method of Moments <wbr>(GMM)</span>
+      </a>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../mathematical-formula.html#testing-covariance-and-correlations" class="md-nav__link">
+        <span title="/system/mathematical-formula.rst#testing-covariance-and-correlations (reference label)" class="md-ellipsis">Testing Covariance and Correlations</span>
+      </a>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../mathematical-formula.html#system-measures-of-fit-r-2" class="md-nav__link">
+        <span title="/system/mathematical-formula.rst#system-measures-of-fit-r-2 (reference label)" class="md-ellipsis">System Measures of Fit <wbr>(R^<wbr>{2})</span>
+      </a>
+    </li>
+  
+
+            
+          
+        </ul>
+      </nav>
+    </li>
+  
+  
+
+    
+      
+      
+      
+
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../utility.html" class="md-nav__link">
+        <span title="/utility.rst (reference label)" class="md-ellipsis">Utilities</span>
+      </a>
+    </li>
+  
+
+    
+      
+      
+      
+
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../compatibility.html" class="md-nav__link">
+        <span title="/compatibility.rst (reference label)" class="md-ellipsis">Compatibility</span>
+      </a>
+    </li>
+  
+
+    
+      
+      
+      
+
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../plan.html" class="md-nav__link">
+        <span title="/plan.rst (reference label)" class="md-ellipsis">Module Plans</span>
+      </a>
+    </li>
+  
+
+    
+      
+      
+      
+
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../contributing.html" class="md-nav__link">
+        <span title="/contributing.rst (reference label)" class="md-ellipsis">Contributing</span>
+      </a>
+    </li>
+  
+
+    
+      
+      
+      
+
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../changes.html" class="md-nav__link">
+        <span title="/changes.rst (reference label)" class="md-ellipsis">Change Log</span>
+      </a>
+    </li>
+  
+
+    
+      
+      
+      
+
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../references.html" class="md-nav__link">
+        <span title="/references.rst (reference label)" class="md-ellipsis">References</span>
+      </a>
+    </li>
+  
+
+    
+  </ul>
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+            
+              
+              <div class="md-sidebar md-sidebar--secondary" data-md-component="sidebar" data-md-type="toc" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+
+  
+
+<nav class="md-nav md-nav--secondary">
+  
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Contents
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#Data" class="md-nav__link">
+    <span title="/system/examples/three-stage-ls.ipynb#data (reference label)" class="md-ellipsis">Data</span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#Formulas" class="md-nav__link">
+    <span title="/system/examples/three-stage-ls.ipynb#formulas (reference label)" class="md-ellipsis">Formulas</span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#Direct-Model-Specification" class="md-nav__link">
+    <span title="/system/examples/three-stage-ls.ipynb#direct-model-specification (reference label)" class="md-ellipsis">Direct Model Specification</span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#System-GMM-Estimation" class="md-nav__link">
+    <span title="/system/examples/three-stage-ls.ipynb#system-gmm-estimation (reference label)" class="md-ellipsis">System GMM Estimation</span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#Simultaneous-Equations" class="md-nav__link">
+    <span title="/system/examples/three-stage-ls.ipynb#simultaneous-equations (reference label)" class="md-ellipsis">Simultaneous Equations</span>
+  </a>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+          
+          
+            <div class="md-content" data-md-component="content">
+              <article class="md-content__inner md-typeset" role="main">
+                  
+
+
+<h1 id="Three-stage-Least-Squares-(3SLS)">Three-stage Least Squares (3SLS)<a class="headerlink" href="#Three-stage-Least-Squares-(3SLS)" title="Permalink to this heading">¶</a></h1>
+<p>This example demonstrates how a system of simultaneous equations can be jointly estimated using three-stage least squares (3SLS). The simultaneous equations model the wage and number of hours worked. The two equations are</p>
+<div class="math notranslate nohighlight">
+\[\begin{split}\begin{eqnarray}
+hours &amp; = &amp; \beta_0 + \beta_1 \ln(wage) + \beta_2 educ + \beta_3 age + \beta_4 kidslt6 + \beta_5 nwifeinc + \epsilon^h_i
+\\
+\ln(wage) &amp; = &amp; \gamma_0 + \gamma_1 hours + \gamma_2 educ + \gamma_3 educ^2 + \gamma_4 exper + \epsilon^w_i
+\end{eqnarray}\end{split}\]</div>
+<p>Each equation has a single exogenous variables. The instruments for the endogenous variables are the regressors that appear in one equation but not the other.</p>
+<h2 id="Data">Data<a class="headerlink" href="#Data" title="Permalink to this heading">¶</a></h2>
+<p>The data set is the MORZ data set from Wooldridge (2002).</p>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span><code>[1]:
+</code></pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><code><span class="kn">from</span> <span class="nn">linearmodels.datasets</span> <span class="kn">import</span> <span class="n">mroz</span>
+
+<span class="n">data</span> <span class="o">=</span> <span class="n">mroz</span><span class="o">.</span><span class="n">load</span><span class="p">()</span>
+</code></pre></div>
+</div>
+</div>
+<p>Here the relevant variables are selected and missing observations are dropped to avoid warnings.</p>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span><code>[2]:
+</code></pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><code><span class="n">data</span> <span class="o">=</span> <span class="n">data</span><span class="p">[</span>
+    <span class="p">[</span><span class="s2">&quot;hours&quot;</span><span class="p">,</span> <span class="s2">&quot;educ&quot;</span><span class="p">,</span> <span class="s2">&quot;age&quot;</span><span class="p">,</span> <span class="s2">&quot;kidslt6&quot;</span><span class="p">,</span> <span class="s2">&quot;nwifeinc&quot;</span><span class="p">,</span> <span class="s2">&quot;lwage&quot;</span><span class="p">,</span> <span class="s2">&quot;exper&quot;</span><span class="p">,</span> <span class="s2">&quot;expersq&quot;</span><span class="p">]</span>
+<span class="p">]</span>
+<span class="n">data</span> <span class="o">=</span> <span class="n">data</span><span class="o">.</span><span class="n">dropna</span><span class="p">()</span>
+</code></pre></div>
+</div>
+</div>
+<p>The main models are imported:</p>
+<ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">IV2SLS</span></code> - single equation 2-stage least squares</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">IV3SLS</span></code> - system estimation using instrumental variables</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">SUR</span></code> - system estimation without endogenous variables</p></li>
+</ul>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span><code>[3]:
+</code></pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><code><span class="kn">from</span> <span class="nn">linearmodels</span> <span class="kn">import</span> <span class="n">IV2SLS</span><span class="p">,</span> <span class="n">IV3SLS</span><span class="p">,</span> <span class="n">SUR</span><span class="p">,</span> <span class="n">IVSystemGMM</span>
+</code></pre></div>
+</div>
+</div>
+<h2 id="Formulas">Formulas<a class="headerlink" href="#Formulas" title="Permalink to this heading">¶</a></h2>
+<p>These examples use the formula interface. This is usually simpler when models have exogenous regressors, endogenous regressors and instruments. The syntax is the same as in the 2SLS models.</p>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span><code>[4]:
+</code></pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><code><span class="n">hours</span> <span class="o">=</span> <span class="s2">&quot;hours ~ educ + age + kidslt6 + nwifeinc + [lwage ~ exper + expersq]&quot;</span>
+
+<span class="n">hours_mod</span> <span class="o">=</span> <span class="n">IV2SLS</span><span class="o">.</span><span class="n">from_formula</span><span class="p">(</span><span class="n">hours</span><span class="p">,</span> <span class="n">data</span><span class="p">)</span>
+<span class="n">hours_res</span> <span class="o">=</span> <span class="n">hours_mod</span><span class="o">.</span><span class="n">fit</span><span class="p">(</span><span class="n">cov_type</span><span class="o">=</span><span class="s2">&quot;unadjusted&quot;</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="n">hours_res</span><span class="p">)</span>
+</code></pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
                           IV-2SLS Estimation Summary
 ==============================================================================
 Dep. Variable:                  hours   R-squared:                      0.1903
 Estimator:                    IV-2SLS   Adj. R-squared:                 0.1807
 No. Observations:                 428   F-statistic:                    399.30
 Date:                Tue, Apr 25 2023   P-value (F-stat)                0.0000
-Time:                        15:29:31   Distribution:                  chi2(5)
+Time:                        16:04:20   Distribution:                  chi2(5)
 Cov. Estimator:            unadjusted
 
                              Parameter Estimates
@@ -40,20 +798,33 @@ Endogenous: lwage
 Instruments: exper, expersq
 Unadjusted Covariance (Homoskedastic)
 Debiased: False
-</pre></div></div> </div> <p>The <span class="math notranslate nohighlight">\(\ln\)</span> wage model can be similarly specified and estimated</p> <div class="nbinput docutils container"> <div class="prompt highlight-none notranslate"><div class=highlight ><pre><span></span>[5]:
-</pre></div> </div> <div class="input_area highlight-ipython3 notranslate"><div class=highlight ><pre><span></span><span class=n >lwage</span> <span class=o >=</span> <span class=s2 >"lwage ~ educ + exper + expersq + [hours ~ age + kidslt6 + nwifeinc]"</span>
+</pre></div></div>
+</div>
+<p>The <span class="math notranslate nohighlight">\(\ln\)</span> wage model can be similarly specified and estimated</p>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span><code>[5]:
+</code></pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><code><span class="n">lwage</span> <span class="o">=</span> <span class="s2">&quot;lwage ~ educ + exper + expersq + [hours ~ age + kidslt6 + nwifeinc]&quot;</span>
 
-<span class=n >lwage_mod</span> <span class=o >=</span> <span class=n >IV2SLS</span><span class=o >.</span><span class=n >from_formula</span><span class=p >(</span><span class=n >lwage</span><span class=p >,</span> <span class=n >data</span><span class=p >)</span>
-<span class=n >lwage_res</span> <span class=o >=</span> <span class=n >lwage_mod</span><span class=o >.</span><span class=n >fit</span><span class=p >(</span><span class=n >cov_type</span><span class=o >=</span><span class=s2 >"unadjusted"</span><span class=p >)</span>
-<span class=nb >print</span><span class=p >(</span><span class=n >lwage_res</span><span class=p >)</span>
-</pre></div> </div> </div> <div class="nboutput nblast docutils container"> <div class="prompt empty docutils container"> </div> <div class="output_area docutils container"> <div class=highlight ><pre>
+<span class="n">lwage_mod</span> <span class="o">=</span> <span class="n">IV2SLS</span><span class="o">.</span><span class="n">from_formula</span><span class="p">(</span><span class="n">lwage</span><span class="p">,</span> <span class="n">data</span><span class="p">)</span>
+<span class="n">lwage_res</span> <span class="o">=</span> <span class="n">lwage_mod</span><span class="o">.</span><span class="n">fit</span><span class="p">(</span><span class="n">cov_type</span><span class="o">=</span><span class="s2">&quot;unadjusted&quot;</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="n">lwage_res</span><span class="p">)</span>
+</code></pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
                           IV-2SLS Estimation Summary
 ==============================================================================
 Dep. Variable:                  lwage   R-squared:                      0.7582
 Estimator:                    IV-2SLS   Adj. R-squared:                 0.7559
 No. Observations:                 428   F-statistic:                    1362.4
 Date:                Tue, Apr 25 2023   P-value (F-stat)                0.0000
-Time:                        15:29:31   Distribution:                  chi2(4)
+Time:                        16:04:20   Distribution:                  chi2(4)
 Cov. Estimator:            unadjusted
 
                              Parameter Estimates
@@ -70,19 +841,33 @@ Endogenous: hours
 Instruments: age, kidslt6, nwifeinc
 Unadjusted Covariance (Homoskedastic)
 Debiased: False
-</pre></div></div> </div> <p>A system can be specified using a dictionary for formulas. The dictionary keys are used as equation labels. Aside from this simple change, the syntax is identical.</p> <p>Here the model is estimated using <code class="docutils literal notranslate"><span class=pre >method="ols"</span></code> which will just simultaneously estimate the two equations but will produce estimates that are identical to separate equations.</p> <div class="nbinput docutils container"> <div class="prompt highlight-none notranslate"><div class=highlight ><pre><span></span>[6]:
-</pre></div> </div> <div class="input_area highlight-ipython3 notranslate"><div class=highlight ><pre><span></span><span class=n >equations</span> <span class=o >=</span> <span class=nb >dict</span><span class=p >(</span><span class=n >hours</span><span class=o >=</span><span class=n >hours</span><span class=p >,</span> <span class=n >lwage</span><span class=o >=</span><span class=n >lwage</span><span class=p >)</span>
-<span class=n >system_2sls</span> <span class=o >=</span> <span class=n >IV3SLS</span><span class=o >.</span><span class=n >from_formula</span><span class=p >(</span><span class=n >equations</span><span class=p >,</span> <span class=n >data</span><span class=p >)</span>
-<span class=n >system_2sls_res</span> <span class=o >=</span> <span class=n >system_2sls</span><span class=o >.</span><span class=n >fit</span><span class=p >(</span><span class=n >method</span><span class=o >=</span><span class=s2 >"ols"</span><span class=p >,</span> <span class=n >cov_type</span><span class=o >=</span><span class=s2 >"unadjusted"</span><span class=p >)</span>
-<span class=nb >print</span><span class=p >(</span><span class=n >system_2sls_res</span><span class=p >)</span>
-</pre></div> </div> </div> <div class="nboutput nblast docutils container"> <div class="prompt empty docutils container"> </div> <div class="output_area docutils container"> <div class=highlight ><pre>
+</pre></div></div>
+</div>
+<p>A system can be specified using a dictionary for formulas. The dictionary keys are used as equation labels. Aside from this simple change, the syntax is identical.</p>
+<p>Here the model is estimated using <code class="docutils literal notranslate"><span class="pre">method=&quot;ols&quot;</span></code> which will just simultaneously estimate the two equations but will produce estimates that are identical to separate equations.</p>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span><code>[6]:
+</code></pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><code><span class="n">equations</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">(</span><span class="n">hours</span><span class="o">=</span><span class="n">hours</span><span class="p">,</span> <span class="n">lwage</span><span class="o">=</span><span class="n">lwage</span><span class="p">)</span>
+<span class="n">system_2sls</span> <span class="o">=</span> <span class="n">IV3SLS</span><span class="o">.</span><span class="n">from_formula</span><span class="p">(</span><span class="n">equations</span><span class="p">,</span> <span class="n">data</span><span class="p">)</span>
+<span class="n">system_2sls_res</span> <span class="o">=</span> <span class="n">system_2sls</span><span class="o">.</span><span class="n">fit</span><span class="p">(</span><span class="n">method</span><span class="o">=</span><span class="s2">&quot;ols&quot;</span><span class="p">,</span> <span class="n">cov_type</span><span class="o">=</span><span class="s2">&quot;unadjusted&quot;</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="n">system_2sls_res</span><span class="p">)</span>
+</code></pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
                            System OLS Estimation Summary
 ===================================================================================
 Estimator:                        OLS   Overall R-squared:                   0.1903
-No. Equations.:                     2   McElroy's R-squared:                 0.1276
-No. Observations:                 428   Judge's (OLS) R-squared:            -2.0961
-Date:                Tue, Apr 25 2023   Berndt's R-squared:                 -0.7279
-Time:                        15:29:31   Dhrymes's R-squared:                 0.1903
+No. Equations.:                     2   McElroy&#39;s R-squared:                 0.1276
+No. Observations:                 428   Judge&#39;s (OLS) R-squared:            -2.0961
+Date:                Tue, Apr 25 2023   Berndt&#39;s R-squared:                 -0.7279
+Time:                        16:04:20   Dhrymes&#39;s R-squared:                 0.1903
                                         Cov. Estimator:                  unadjusted
                                         Num. Constraints:                      None
                   Equation: hours, Dependent Variable: hours
@@ -116,19 +901,32 @@ age, kidslt6, nwifeinc
 
 Covariance Estimator:
 Homoskedastic (Unadjusted) Covariance (Debiased: False, GLS: False)
-</pre></div></div> </div> <p>Using <code class="docutils literal notranslate"><span class=pre >method="gls"</span></code> will use GLS estimates which can be more efficient than the usual estimates. Here only the first equation changes. This is due to the structure of the problem.</p> <div class="nbinput docutils container"> <div class="prompt highlight-none notranslate"><div class=highlight ><pre><span></span>[7]:
-</pre></div> </div> <div class="input_area highlight-ipython3 notranslate"><div class=highlight ><pre><span></span><span class=n >equations</span> <span class=o >=</span> <span class=nb >dict</span><span class=p >(</span><span class=n >hours</span><span class=o >=</span><span class=n >hours</span><span class=p >,</span> <span class=n >lwage</span><span class=o >=</span><span class=n >lwage</span><span class=p >)</span>
-<span class=n >system_3sls</span> <span class=o >=</span> <span class=n >IV3SLS</span><span class=o >.</span><span class=n >from_formula</span><span class=p >(</span><span class=n >equations</span><span class=p >,</span> <span class=n >data</span><span class=p >)</span>
-<span class=n >system_3sls_res</span> <span class=o >=</span> <span class=n >system_3sls</span><span class=o >.</span><span class=n >fit</span><span class=p >(</span><span class=n >method</span><span class=o >=</span><span class=s2 >"gls"</span><span class=p >,</span> <span class=n >cov_type</span><span class=o >=</span><span class=s2 >"unadjusted"</span><span class=p >)</span>
-<span class=nb >print</span><span class=p >(</span><span class=n >system_3sls_res</span><span class=p >)</span>
-</pre></div> </div> </div> <div class="nboutput nblast docutils container"> <div class="prompt empty docutils container"> </div> <div class="output_area docutils container"> <div class=highlight ><pre>
+</pre></div></div>
+</div>
+<p>Using <code class="docutils literal notranslate"><span class="pre">method=&quot;gls&quot;</span></code> will use GLS estimates which can be more efficient than the usual estimates. Here only the first equation changes. This is due to the structure of the problem.</p>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span><code>[7]:
+</code></pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><code><span class="n">equations</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">(</span><span class="n">hours</span><span class="o">=</span><span class="n">hours</span><span class="p">,</span> <span class="n">lwage</span><span class="o">=</span><span class="n">lwage</span><span class="p">)</span>
+<span class="n">system_3sls</span> <span class="o">=</span> <span class="n">IV3SLS</span><span class="o">.</span><span class="n">from_formula</span><span class="p">(</span><span class="n">equations</span><span class="p">,</span> <span class="n">data</span><span class="p">)</span>
+<span class="n">system_3sls_res</span> <span class="o">=</span> <span class="n">system_3sls</span><span class="o">.</span><span class="n">fit</span><span class="p">(</span><span class="n">method</span><span class="o">=</span><span class="s2">&quot;gls&quot;</span><span class="p">,</span> <span class="n">cov_type</span><span class="o">=</span><span class="s2">&quot;unadjusted&quot;</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="n">system_3sls_res</span><span class="p">)</span>
+</code></pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
                            System GLS Estimation Summary
 ===================================================================================
 Estimator:                        GLS   Overall R-squared:                   0.0120
-No. Equations.:                     2   McElroy's R-squared:                 0.0873
-No. Observations:                 428   Judge's (OLS) R-squared:            -2.7778
-Date:                Tue, Apr 25 2023   Berndt's R-squared:                 -0.7279
-Time:                        15:29:31   Dhrymes's R-squared:                 0.0120
+No. Equations.:                     2   McElroy&#39;s R-squared:                 0.0873
+No. Observations:                 428   Judge&#39;s (OLS) R-squared:            -2.7778
+Date:                Tue, Apr 25 2023   Berndt&#39;s R-squared:                 -0.7279
+Time:                        16:04:20   Dhrymes&#39;s R-squared:                 0.0120
                                         Cov. Estimator:                  unadjusted
                                         Num. Constraints:                      None
                   Equation: hours, Dependent Variable: hours
@@ -162,33 +960,54 @@ age, kidslt6, nwifeinc
 
 Covariance Estimator:
 Homoskedastic (Unadjusted) Covariance (Debiased: False, GLS: True)
-</pre></div></div> </div> </section> <section id=Direct-Model-Specification > <h2 id=Direct-Model-Specification >Direct Model Specification<a class=headerlink  href="#Direct-Model-Specification" title="Permalink to this heading">¶</a></h2> <p>The model can be directly specified using a dictionary of dictionaries where the inner dictionaries contain the 4 components of the model:</p> <ul class=simple > <li><p>dependent - The dependent variable</p> <li><p>exog - Exogenous regressors</p> <li><p>endog - Endogenous regressors</p> <li><p>instruments - Instrumental variables</p> </ul> <p>The estimates are the same. This interface is more useful for programmatically generating and estimating models.</p> <div class="nbinput docutils container"> <div class="prompt highlight-none notranslate"><div class=highlight ><pre><span></span>[8]:
-</pre></div> </div> <div class="input_area highlight-ipython3 notranslate"><div class=highlight ><pre><span></span><span class=n >hours</span> <span class=o >=</span> <span class=p >{</span>
-    <span class=s2 >"dependent"</span><span class=p >:</span> <span class=n >data</span><span class=p >[[</span><span class=s2 >"hours"</span><span class=p >]],</span>
-    <span class=s2 >"exog"</span><span class=p >:</span> <span class=n >data</span><span class=p >[[</span><span class=s2 >"educ"</span><span class=p >,</span> <span class=s2 >"age"</span><span class=p >,</span> <span class=s2 >"kidslt6"</span><span class=p >,</span> <span class=s2 >"nwifeinc"</span><span class=p >]],</span>
-    <span class=s2 >"endog"</span><span class=p >:</span> <span class=n >data</span><span class=p >[[</span><span class=s2 >"lwage"</span><span class=p >]],</span>
-    <span class=s2 >"instruments"</span><span class=p >:</span> <span class=n >data</span><span class=p >[[</span><span class=s2 >"exper"</span><span class=p >,</span> <span class=s2 >"expersq"</span><span class=p >]],</span>
-<span class=p >}</span>
+</pre></div></div>
+</div>
+<h2 id="Direct-Model-Specification">Direct Model Specification<a class="headerlink" href="#Direct-Model-Specification" title="Permalink to this heading">¶</a></h2>
+<p>The model can be directly specified using a dictionary of dictionaries where the inner dictionaries contain the 4 components of the model:</p>
+<ul class="simple">
+<li><p>dependent - The dependent variable</p></li>
+<li><p>exog - Exogenous regressors</p></li>
+<li><p>endog - Endogenous regressors</p></li>
+<li><p>instruments - Instrumental variables</p></li>
+</ul>
+<p>The estimates are the same. This interface is more useful for programmatically generating and estimating models.</p>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span><code>[8]:
+</code></pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><code><span class="n">hours</span> <span class="o">=</span> <span class="p">{</span>
+    <span class="s2">&quot;dependent&quot;</span><span class="p">:</span> <span class="n">data</span><span class="p">[[</span><span class="s2">&quot;hours&quot;</span><span class="p">]],</span>
+    <span class="s2">&quot;exog&quot;</span><span class="p">:</span> <span class="n">data</span><span class="p">[[</span><span class="s2">&quot;educ&quot;</span><span class="p">,</span> <span class="s2">&quot;age&quot;</span><span class="p">,</span> <span class="s2">&quot;kidslt6&quot;</span><span class="p">,</span> <span class="s2">&quot;nwifeinc&quot;</span><span class="p">]],</span>
+    <span class="s2">&quot;endog&quot;</span><span class="p">:</span> <span class="n">data</span><span class="p">[[</span><span class="s2">&quot;lwage&quot;</span><span class="p">]],</span>
+    <span class="s2">&quot;instruments&quot;</span><span class="p">:</span> <span class="n">data</span><span class="p">[[</span><span class="s2">&quot;exper&quot;</span><span class="p">,</span> <span class="s2">&quot;expersq&quot;</span><span class="p">]],</span>
+<span class="p">}</span>
 
-<span class=n >lwage</span> <span class=o >=</span> <span class=p >{</span>
-    <span class=s2 >"dependent"</span><span class=p >:</span> <span class=n >data</span><span class=p >[[</span><span class=s2 >"lwage"</span><span class=p >]],</span>
-    <span class=s2 >"exog"</span><span class=p >:</span> <span class=n >data</span><span class=p >[[</span><span class=s2 >"educ"</span><span class=p >,</span> <span class=s2 >"exper"</span><span class=p >,</span> <span class=s2 >"expersq"</span><span class=p >]],</span>
-    <span class=s2 >"endog"</span><span class=p >:</span> <span class=n >data</span><span class=p >[[</span><span class=s2 >"hours"</span><span class=p >]],</span>
-    <span class=s2 >"instruments"</span><span class=p >:</span> <span class=n >data</span><span class=p >[[</span><span class=s2 >"age"</span><span class=p >,</span> <span class=s2 >"kidslt6"</span><span class=p >,</span> <span class=s2 >"nwifeinc"</span><span class=p >]],</span>
-<span class=p >}</span>
+<span class="n">lwage</span> <span class="o">=</span> <span class="p">{</span>
+    <span class="s2">&quot;dependent&quot;</span><span class="p">:</span> <span class="n">data</span><span class="p">[[</span><span class="s2">&quot;lwage&quot;</span><span class="p">]],</span>
+    <span class="s2">&quot;exog&quot;</span><span class="p">:</span> <span class="n">data</span><span class="p">[[</span><span class="s2">&quot;educ&quot;</span><span class="p">,</span> <span class="s2">&quot;exper&quot;</span><span class="p">,</span> <span class="s2">&quot;expersq&quot;</span><span class="p">]],</span>
+    <span class="s2">&quot;endog&quot;</span><span class="p">:</span> <span class="n">data</span><span class="p">[[</span><span class="s2">&quot;hours&quot;</span><span class="p">]],</span>
+    <span class="s2">&quot;instruments&quot;</span><span class="p">:</span> <span class="n">data</span><span class="p">[[</span><span class="s2">&quot;age&quot;</span><span class="p">,</span> <span class="s2">&quot;kidslt6&quot;</span><span class="p">,</span> <span class="s2">&quot;nwifeinc&quot;</span><span class="p">]],</span>
+<span class="p">}</span>
 
-<span class=n >equations</span> <span class=o >=</span> <span class=nb >dict</span><span class=p >(</span><span class=n >hours</span><span class=o >=</span><span class=n >hours</span><span class=p >,</span> <span class=n >lwage</span><span class=o >=</span><span class=n >lwage</span><span class=p >)</span>
-<span class=n >system_3sls</span> <span class=o >=</span> <span class=n >IV3SLS</span><span class=p >(</span><span class=n >equations</span><span class=p >)</span>
-<span class=n >system_3sls_res</span> <span class=o >=</span> <span class=n >system_3sls</span><span class=o >.</span><span class=n >fit</span><span class=p >(</span><span class=n >cov_type</span><span class=o >=</span><span class=s2 >"unadjusted"</span><span class=p >)</span>
-<span class=nb >print</span><span class=p >(</span><span class=n >system_3sls_res</span><span class=p >)</span>
-</pre></div> </div> </div> <div class="nboutput nblast docutils container"> <div class="prompt empty docutils container"> </div> <div class="output_area docutils container"> <div class=highlight ><pre>
+<span class="n">equations</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">(</span><span class="n">hours</span><span class="o">=</span><span class="n">hours</span><span class="p">,</span> <span class="n">lwage</span><span class="o">=</span><span class="n">lwage</span><span class="p">)</span>
+<span class="n">system_3sls</span> <span class="o">=</span> <span class="n">IV3SLS</span><span class="p">(</span><span class="n">equations</span><span class="p">)</span>
+<span class="n">system_3sls_res</span> <span class="o">=</span> <span class="n">system_3sls</span><span class="o">.</span><span class="n">fit</span><span class="p">(</span><span class="n">cov_type</span><span class="o">=</span><span class="s2">&quot;unadjusted&quot;</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="n">system_3sls_res</span><span class="p">)</span>
+</code></pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
                            System GLS Estimation Summary
 ===================================================================================
 Estimator:                        GLS   Overall R-squared:                   0.0120
-No. Equations.:                     2   McElroy's R-squared:                 0.0873
-No. Observations:                 428   Judge's (OLS) R-squared:            -2.7778
-Date:                Tue, Apr 25 2023   Berndt's R-squared:                 -0.7279
-Time:                        15:29:31   Dhrymes's R-squared:                 0.0120
+No. Equations.:                     2   McElroy&#39;s R-squared:                 0.0873
+No. Observations:                 428   Judge&#39;s (OLS) R-squared:            -2.7778
+Date:                Tue, Apr 25 2023   Berndt&#39;s R-squared:                 -0.7279
+Time:                        16:04:20   Dhrymes&#39;s R-squared:                 0.0120
                                         Cov. Estimator:                  unadjusted
                                         Num. Constraints:                      None
                   Equation: hours, Dependent Variable: hours
@@ -222,22 +1041,39 @@ age, kidslt6, nwifeinc
 
 Covariance Estimator:
 Homoskedastic (Unadjusted) Covariance (Debiased: False, GLS: True)
-</pre></div></div> </div> </section> <section id=System-GMM-Estimation > <h2 id=System-GMM-Estimation >System GMM Estimation<a class=headerlink  href="#System-GMM-Estimation" title="Permalink to this heading">¶</a></h2> <p>System GMM is an alternative to 3SLS estimation. It is the natural extension to GMM estimation of IV models. It makes weaker assumptions about instruments than 3SLS does. In particular, instruments are assumed exogenous on an equation-by-equation basis rather than the 3SLS assumption that all instruments are exogenous in all equations.</p> <p>The system GMM estimator is similar to the 3SLS estimator except that it requires making a choice about the moment weighting estimator. Valid options for the weighting estimator are <code class="docutils literal notranslate"><span class=pre >"unadjusted"</span></code> or <code class="docutils literal notranslate"><span class=pre >"homoskedastic"</span></code> which assumes that residuals are conditionally homoskedastic or <code class="docutils literal notranslate"><span class=pre >"robust"</span></code> or <code class="docutils literal notranslate"><span class=pre >"heteroskedastic"</span></code> which allows for conditional heteroskedasticity.</p> <p>The System GMM estimator also supports iterative application where it is possible to iterate until convergence.</p> <p>Here the examples make use of the same data as in the 3SLS example and only use the formula interface. The default uses 2-step (efficient) GMM.</p> <div class="nbinput docutils container"> <div class="prompt highlight-none notranslate"><div class=highlight ><pre><span></span>[9]:
-</pre></div> </div> <div class="input_area highlight-ipython3 notranslate"><div class=highlight ><pre><span></span><span class=n >equations</span> <span class=o >=</span> <span class=nb >dict</span><span class=p >(</span>
-    <span class=n >hours</span><span class=o >=</span><span class=s2 >"hours ~ educ + age + kidslt6 + nwifeinc + [lwage ~ exper + expersq]"</span><span class=p >,</span>
-    <span class=n >lwage</span><span class=o >=</span><span class=s2 >"lwage ~ educ + exper + expersq + [hours ~ age + kidslt6 + nwifeinc]"</span><span class=p >,</span>
-<span class=p >)</span>
-<span class=n >system_gmm</span> <span class=o >=</span> <span class=n >IVSystemGMM</span><span class=o >.</span><span class=n >from_formula</span><span class=p >(</span><span class=n >equations</span><span class=p >,</span> <span class=n >data</span><span class=p >,</span> <span class=n >weight_type</span><span class=o >=</span><span class=s2 >"unadjusted"</span><span class=p >)</span>
-<span class=n >system_gmm_res</span> <span class=o >=</span> <span class=n >system_gmm</span><span class=o >.</span><span class=n >fit</span><span class=p >(</span><span class=n >cov_type</span><span class=o >=</span><span class=s2 >"unadjusted"</span><span class=p >)</span>
-<span class=nb >print</span><span class=p >(</span><span class=n >system_gmm_res</span><span class=p >)</span>
-</pre></div> </div> </div> <div class="nboutput nblast docutils container"> <div class="prompt empty docutils container"> </div> <div class="output_area docutils container"> <div class=highlight ><pre>
+</pre></div></div>
+</div>
+<h2 id="System-GMM-Estimation">System GMM Estimation<a class="headerlink" href="#System-GMM-Estimation" title="Permalink to this heading">¶</a></h2>
+<p>System GMM is an alternative to 3SLS estimation. It is the natural extension to GMM estimation of IV models. It makes weaker assumptions about instruments than 3SLS does. In particular, instruments are assumed exogenous on an equation-by-equation basis rather than the 3SLS assumption that all instruments are exogenous in all equations.</p>
+<p>The system GMM estimator is similar to the 3SLS estimator except that it requires making a choice about the moment weighting estimator. Valid options for the weighting estimator are <code class="docutils literal notranslate"><span class="pre">&quot;unadjusted&quot;</span></code> or <code class="docutils literal notranslate"><span class="pre">&quot;homoskedastic&quot;</span></code> which assumes that residuals are conditionally homoskedastic or <code class="docutils literal notranslate"><span class="pre">&quot;robust&quot;</span></code> or <code class="docutils literal notranslate"><span class="pre">&quot;heteroskedastic&quot;</span></code> which allows for conditional heteroskedasticity.</p>
+<p>The System GMM estimator also supports iterative application where it is possible to iterate until convergence.</p>
+<p>Here the examples make use of the same data as in the 3SLS example and only use the formula interface. The default uses 2-step (efficient) GMM.</p>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span><code>[9]:
+</code></pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><code><span class="n">equations</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">(</span>
+    <span class="n">hours</span><span class="o">=</span><span class="s2">&quot;hours ~ educ + age + kidslt6 + nwifeinc + [lwage ~ exper + expersq]&quot;</span><span class="p">,</span>
+    <span class="n">lwage</span><span class="o">=</span><span class="s2">&quot;lwage ~ educ + exper + expersq + [hours ~ age + kidslt6 + nwifeinc]&quot;</span><span class="p">,</span>
+<span class="p">)</span>
+<span class="n">system_gmm</span> <span class="o">=</span> <span class="n">IVSystemGMM</span><span class="o">.</span><span class="n">from_formula</span><span class="p">(</span><span class="n">equations</span><span class="p">,</span> <span class="n">data</span><span class="p">,</span> <span class="n">weight_type</span><span class="o">=</span><span class="s2">&quot;unadjusted&quot;</span><span class="p">)</span>
+<span class="n">system_gmm_res</span> <span class="o">=</span> <span class="n">system_gmm</span><span class="o">.</span><span class="n">fit</span><span class="p">(</span><span class="n">cov_type</span><span class="o">=</span><span class="s2">&quot;unadjusted&quot;</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="n">system_gmm_res</span><span class="p">)</span>
+</code></pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
                     System 2-Step System GMM Estimation Summary
 ===================================================================================
 Estimator:          2-Step System GMM   Overall R-squared:                   0.0121
-No. Equations.:                     2   McElroy's R-squared:                 0.0871
-No. Observations:                 428   Judge's (OLS) R-squared:            -2.7776
-Date:                Tue, Apr 25 2023   Berndt's R-squared:                 -0.7268
-Time:                        15:29:31   Dhrymes's R-squared:                 0.0121
+No. Equations.:                     2   McElroy&#39;s R-squared:                 0.0871
+No. Observations:                 428   Judge&#39;s (OLS) R-squared:            -2.7776
+Date:                Tue, Apr 25 2023   Berndt&#39;s R-squared:                 -0.7268
+Time:                        16:04:20   Dhrymes&#39;s R-squared:                 0.0121
                                         Cov. Estimator:                  unadjusted
                                         Num. Constraints:                      None
                   Equation: hours, Dependent Variable: hours
@@ -273,20 +1109,33 @@ Covariance Estimator:
 GMM Homoskedastic (Unadjusted) Covariance
 Weight Estimator:
 Homoskedastic (Unadjusted) Weighting (Debiased: False, Center: False)
-</pre></div></div> </div> <p>Robust weighting can be used by setting the <code class="docutils literal notranslate"><span class=pre >weight_type</span></code>. The number of iterations can be set using <code class="docutils literal notranslate"><span class=pre >iter_limit</span></code>. Overall the parameters do not meaningfully change.</p> <div class="nbinput docutils container"> <div class="prompt highlight-none notranslate"><div class=highlight ><pre><span></span>[10]:
-</pre></div> </div> <div class="input_area highlight-ipython3 notranslate"><div class=highlight ><pre><span></span><span class=n >system_gmm</span> <span class=o >=</span> <span class=n >IVSystemGMM</span><span class=o >.</span><span class=n >from_formula</span><span class=p >(</span><span class=n >equations</span><span class=p >,</span> <span class=n >data</span><span class=p >,</span> <span class=n >weight_type</span><span class=o >=</span><span class=s2 >"robust"</span><span class=p >)</span>
-<span class=n >system_gmm_res</span> <span class=o >=</span> <span class=n >system_gmm</span><span class=o >.</span><span class=n >fit</span><span class=p >(</span><span class=n >cov_type</span><span class=o >=</span><span class=s2 >"robust"</span><span class=p >,</span> <span class=n >iter_limit</span><span class=o >=</span><span class=mi >100</span><span class=p >)</span>
-<span class=nb >print</span><span class=p >(</span><span class=s2 >"Number of iterations: "</span> <span class=o >+</span> <span class=nb >str</span><span class=p >(</span><span class=n >system_gmm_res</span><span class=o >.</span><span class=n >iterations</span><span class=p >))</span>
-<span class=nb >print</span><span class=p >(</span><span class=n >system_gmm_res</span><span class=p >)</span>
-</pre></div> </div> </div> <div class="nboutput nblast docutils container"> <div class="prompt empty docutils container"> </div> <div class="output_area docutils container"> <div class=highlight ><pre>
+</pre></div></div>
+</div>
+<p>Robust weighting can be used by setting the <code class="docutils literal notranslate"><span class="pre">weight_type</span></code>. The number of iterations can be set using <code class="docutils literal notranslate"><span class="pre">iter_limit</span></code>. Overall the parameters do not meaningfully change.</p>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span><code>[10]:
+</code></pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><code><span class="n">system_gmm</span> <span class="o">=</span> <span class="n">IVSystemGMM</span><span class="o">.</span><span class="n">from_formula</span><span class="p">(</span><span class="n">equations</span><span class="p">,</span> <span class="n">data</span><span class="p">,</span> <span class="n">weight_type</span><span class="o">=</span><span class="s2">&quot;robust&quot;</span><span class="p">)</span>
+<span class="n">system_gmm_res</span> <span class="o">=</span> <span class="n">system_gmm</span><span class="o">.</span><span class="n">fit</span><span class="p">(</span><span class="n">cov_type</span><span class="o">=</span><span class="s2">&quot;robust&quot;</span><span class="p">,</span> <span class="n">iter_limit</span><span class="o">=</span><span class="mi">100</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Number of iterations: &quot;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="n">system_gmm_res</span><span class="o">.</span><span class="n">iterations</span><span class="p">))</span>
+<span class="nb">print</span><span class="p">(</span><span class="n">system_gmm_res</span><span class="p">)</span>
+</code></pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
 Number of iterations: 20
                     System Iterative System GMM Estimation Summary
 =====================================================================================
 Estimator:         Iterative System GMM   Overall R-squared:                  -0.0345
-No. Equations.:                       2   McElroy's R-squared:                -0.2256
-No. Observations:                   428   Judge's (OLS) R-squared:            -2.9557
-Date:                  Tue, Apr 25 2023   Berndt's R-squared:                 -2.0361
-Time:                          15:29:32   Dhrymes's R-squared:                -0.0345
+No. Equations.:                       2   McElroy&#39;s R-squared:                -0.2256
+No. Observations:                   428   Judge&#39;s (OLS) R-squared:            -2.9557
+Date:                  Tue, Apr 25 2023   Berndt&#39;s R-squared:                 -2.0361
+Time:                          16:04:21   Dhrymes&#39;s R-squared:                -0.0345
                                           Cov. Estimator:                      robust
                                           Num. Constraints:                      None
                   Equation: hours, Dependent Variable: hours
@@ -322,31 +1171,57 @@ Covariance Estimator:
 GMM Heteroskedastic (Robust) Covariance
 Weight Estimator:
 Heteroskedastic (Robust) Weighting (Debiased: False, Center: False)
-</pre></div></div> </div> </section> <section id=Simultaneous-Equations > <h2 id=Simultaneous-Equations >Simultaneous Equations<a class=headerlink  href="#Simultaneous-Equations" title="Permalink to this heading">¶</a></h2> <p>Consider the simple simultaneous equation model</p> <div class="math notranslate nohighlight"> \[\begin{split}\begin{align} y_1 = y_2 + x_1 + \epsilon_1 \\ y_2 = -y_1 + x_2 + \epsilon_1 \\ \end{align}\end{split}\]</div> <p>Substituting each equation in to the other, the reduced form of this model is</p> <div class="math notranslate nohighlight"> \[\begin{split}\begin{align} y_1 = \frac{1}{2}\left(x_1 + x_2 + \epsilon_1 + \epsilon_2\right) \\ y_1 = \frac{1}{2}\left(x_2 - x_1 + \epsilon_2 - \epsilon_1\right) \\ \end{align}\end{split}\]</div> <p>Data from this model is simple to simulate.</p> <div class="nbinput docutils container"> <div class="prompt highlight-none notranslate"><div class=highlight ><pre><span></span>[11]:
-</pre></div> </div> <div class="input_area highlight-ipython3 notranslate"><div class=highlight ><pre><span></span><span class=kn >import</span> <span class=nn >numpy</span> <span class=k >as</span> <span class=nn >np</span>
-<span class=kn >import</span> <span class=nn >pandas</span> <span class=k >as</span> <span class=nn >pd</span>
+</pre></div></div>
+</div>
+<h2 id="Simultaneous-Equations">Simultaneous Equations<a class="headerlink" href="#Simultaneous-Equations" title="Permalink to this heading">¶</a></h2>
+<p>Consider the simple simultaneous equation model</p>
+<div class="math notranslate nohighlight">
+\[\begin{split}\begin{align}
+y_1 = y_2 + x_1 + \epsilon_1 \\
+y_2 = -y_1 + x_2 + \epsilon_1 \\
+\end{align}\end{split}\]</div>
+<p>Substituting each equation in to the other, the reduced form of this model is</p>
+<div class="math notranslate nohighlight">
+\[\begin{split}\begin{align}
+y_1 = \frac{1}{2}\left(x_1 + x_2 + \epsilon_1 + \epsilon_2\right) \\
+y_1 = \frac{1}{2}\left(x_2 - x_1 + \epsilon_2 - \epsilon_1\right) \\
+\end{align}\end{split}\]</div>
+<p>Data from this model is simple to simulate.</p>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span><code>[11]:
+</code></pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><code><span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+<span class="kn">import</span> <span class="nn">pandas</span> <span class="k">as</span> <span class="nn">pd</span>
 
-<span class=n >rs</span> <span class=o >=</span> <span class=n >np</span><span class=o >.</span><span class=n >random</span><span class=o >.</span><span class=n >default_rng</span><span class=p >(</span><span class=mi >20220224</span><span class=p >)</span>
-<span class=n >e</span> <span class=o >=</span> <span class=n >rs</span><span class=o >.</span><span class=n >standard_normal</span><span class=p >((</span><span class=mi >50000</span><span class=p >,</span> <span class=mi >2</span><span class=p >))</span>
-<span class=n >x</span> <span class=o >=</span> <span class=n >rs</span><span class=o >.</span><span class=n >standard_normal</span><span class=p >((</span><span class=mi >50000</span><span class=p >,</span> <span class=mi >2</span><span class=p >))</span>
-<span class=n >y2</span> <span class=o >=</span> <span class=n >x</span><span class=p >[:,</span> <span class=mi >1</span><span class=p >]</span> <span class=o >/</span> <span class=mi >2</span> <span class=o >-</span> <span class=n >x</span><span class=p >[:,</span> <span class=mi >0</span><span class=p >]</span> <span class=o >/</span> <span class=mi >2</span> <span class=o >+</span> <span class=n >e</span><span class=p >[:,</span> <span class=mi >1</span><span class=p >]</span> <span class=o >/</span> <span class=mi >2</span> <span class=o >-</span> <span class=n >e</span><span class=p >[:,</span> <span class=mi >0</span><span class=p >]</span> <span class=o >/</span> <span class=mi >2</span>
-<span class=n >y1</span> <span class=o >=</span> <span class=n >x</span><span class=p >[:,</span> <span class=mi >1</span><span class=p >]</span> <span class=o >/</span> <span class=mi >2</span> <span class=o >+</span> <span class=n >x</span><span class=p >[:,</span> <span class=mi >0</span><span class=p >]</span> <span class=o >/</span> <span class=mi >2</span> <span class=o >+</span> <span class=n >e</span><span class=p >[:,</span> <span class=mi >1</span><span class=p >]</span> <span class=o >/</span> <span class=mi >2</span> <span class=o >+</span> <span class=n >e</span><span class=p >[:,</span> <span class=mi >0</span><span class=p >]</span> <span class=o >/</span> <span class=mi >2</span>
-<span class=n >df</span> <span class=o >=</span> <span class=n >pd</span><span class=o >.</span><span class=n >DataFrame</span><span class=p >(</span><span class=n >np</span><span class=o >.</span><span class=n >column_stack</span><span class=p >([</span><span class=n >y1</span><span class=p >,</span> <span class=n >y2</span><span class=p >,</span> <span class=n >x</span><span class=p >]),</span> <span class=n >columns</span><span class=o >=</span><span class=p >[</span><span class=s2 >"y1"</span><span class=p >,</span> <span class=s2 >"y2"</span><span class=p >,</span> <span class=s2 >"x1"</span><span class=p >,</span> <span class=s2 >"x2"</span><span class=p >])</span>
-<span class=n >in_sample</span> <span class=o >=</span> <span class=n >df</span><span class=o >.</span><span class=n >iloc</span><span class=p >[:</span><span class=o >-</span><span class=mi >10000</span><span class=p >]</span>
-<span class=n >oos</span> <span class=o >=</span> <span class=n >df</span><span class=o >.</span><span class=n >iloc</span><span class=p >[</span><span class=o >-</span><span class=mi >10000</span><span class=p >:]</span>
-<span class=n >mod</span> <span class=o >=</span> <span class=n >IV3SLS</span><span class=o >.</span><span class=n >from_formula</span><span class=p >(</span>
-    <span class=nb >dict</span><span class=p >(</span><span class=n >y1</span><span class=o >=</span><span class=s2 >"y1 ~  x1 + [y2 ~ x2]"</span><span class=p >,</span> <span class=n >y2</span><span class=o >=</span><span class=s2 >"y2 ~ x2 + [y1 ~ x1]"</span><span class=p >),</span> <span class=n >data</span><span class=o >=</span><span class=n >df</span>
-<span class=p >)</span>
-<span class=n >res</span> <span class=o >=</span> <span class=n >mod</span><span class=o >.</span><span class=n >fit</span><span class=p >()</span>
-<span class=nb >print</span><span class=p >(</span><span class=n >res</span><span class=p >)</span>
-</pre></div> </div> </div> <div class="nboutput nblast docutils container"> <div class="prompt empty docutils container"> </div> <div class="output_area docutils container"> <div class=highlight ><pre>
+<span class="n">rs</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">default_rng</span><span class="p">(</span><span class="mi">20220224</span><span class="p">)</span>
+<span class="n">e</span> <span class="o">=</span> <span class="n">rs</span><span class="o">.</span><span class="n">standard_normal</span><span class="p">((</span><span class="mi">50000</span><span class="p">,</span> <span class="mi">2</span><span class="p">))</span>
+<span class="n">x</span> <span class="o">=</span> <span class="n">rs</span><span class="o">.</span><span class="n">standard_normal</span><span class="p">((</span><span class="mi">50000</span><span class="p">,</span> <span class="mi">2</span><span class="p">))</span>
+<span class="n">y2</span> <span class="o">=</span> <span class="n">x</span><span class="p">[:,</span> <span class="mi">1</span><span class="p">]</span> <span class="o">/</span> <span class="mi">2</span> <span class="o">-</span> <span class="n">x</span><span class="p">[:,</span> <span class="mi">0</span><span class="p">]</span> <span class="o">/</span> <span class="mi">2</span> <span class="o">+</span> <span class="n">e</span><span class="p">[:,</span> <span class="mi">1</span><span class="p">]</span> <span class="o">/</span> <span class="mi">2</span> <span class="o">-</span> <span class="n">e</span><span class="p">[:,</span> <span class="mi">0</span><span class="p">]</span> <span class="o">/</span> <span class="mi">2</span>
+<span class="n">y1</span> <span class="o">=</span> <span class="n">x</span><span class="p">[:,</span> <span class="mi">1</span><span class="p">]</span> <span class="o">/</span> <span class="mi">2</span> <span class="o">+</span> <span class="n">x</span><span class="p">[:,</span> <span class="mi">0</span><span class="p">]</span> <span class="o">/</span> <span class="mi">2</span> <span class="o">+</span> <span class="n">e</span><span class="p">[:,</span> <span class="mi">1</span><span class="p">]</span> <span class="o">/</span> <span class="mi">2</span> <span class="o">+</span> <span class="n">e</span><span class="p">[:,</span> <span class="mi">0</span><span class="p">]</span> <span class="o">/</span> <span class="mi">2</span>
+<span class="n">df</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">column_stack</span><span class="p">([</span><span class="n">y1</span><span class="p">,</span> <span class="n">y2</span><span class="p">,</span> <span class="n">x</span><span class="p">]),</span> <span class="n">columns</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;y1&quot;</span><span class="p">,</span> <span class="s2">&quot;y2&quot;</span><span class="p">,</span> <span class="s2">&quot;x1&quot;</span><span class="p">,</span> <span class="s2">&quot;x2&quot;</span><span class="p">])</span>
+<span class="n">in_sample</span> <span class="o">=</span> <span class="n">df</span><span class="o">.</span><span class="n">iloc</span><span class="p">[:</span><span class="o">-</span><span class="mi">10000</span><span class="p">]</span>
+<span class="n">oos</span> <span class="o">=</span> <span class="n">df</span><span class="o">.</span><span class="n">iloc</span><span class="p">[</span><span class="o">-</span><span class="mi">10000</span><span class="p">:]</span>
+<span class="n">mod</span> <span class="o">=</span> <span class="n">IV3SLS</span><span class="o">.</span><span class="n">from_formula</span><span class="p">(</span>
+    <span class="nb">dict</span><span class="p">(</span><span class="n">y1</span><span class="o">=</span><span class="s2">&quot;y1 ~  x1 + [y2 ~ x2]&quot;</span><span class="p">,</span> <span class="n">y2</span><span class="o">=</span><span class="s2">&quot;y2 ~ x2 + [y1 ~ x1]&quot;</span><span class="p">),</span> <span class="n">data</span><span class="o">=</span><span class="n">df</span>
+<span class="p">)</span>
+<span class="n">res</span> <span class="o">=</span> <span class="n">mod</span><span class="o">.</span><span class="n">fit</span><span class="p">()</span>
+<span class="nb">print</span><span class="p">(</span><span class="n">res</span><span class="p">)</span>
+</code></pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
                            System GLS Estimation Summary
 ===================================================================================
 Estimator:                        GLS   Overall R-squared:                   0.0013
-No. Equations.:                     2   McElroy's R-squared:                 0.0014
-No. Observations:               50000   Judge's (OLS) R-squared:             0.0013
-Date:                Tue, Apr 25 2023   Berndt's R-squared:                  0.0027
-Time:                        15:29:32   Dhrymes's R-squared:                 0.0013
+No. Equations.:                     2   McElroy&#39;s R-squared:                 0.0014
+No. Observations:               50000   Judge&#39;s (OLS) R-squared:             0.0013
+Date:                Tue, Apr 25 2023   Berndt&#39;s R-squared:                  0.0027
+Time:                        16:04:21   Dhrymes&#39;s R-squared:                 0.0013
                                         Cov. Estimator:                      robust
                                         Num. Constraints:                      None
                      Equation: y1, Dependent Variable: y1
@@ -375,13 +1250,323 @@ Instruments
 
 Covariance Estimator:
 Heteroskedastic (Robust) Covariance (Debiased: False, GLS: True)
-</pre></div></div> </div> <p>Out-of-sample predictions can be made using the <code class="docutils literal notranslate"><span class=pre >predict</span></code> method along with a <code class="docutils literal notranslate"><span class=pre >DataFrame</span></code> containing the values to use for the predictions. The predictions make use of the out-of-sample values stored above.</p> <div class="nbinput docutils container"> <div class="prompt highlight-none notranslate"><div class=highlight ><pre><span></span>[12]:
-</pre></div> </div> <div class="input_area highlight-ipython3 notranslate"><div class=highlight ><pre><span></span><span class=n >res</span><span class=o >.</span><span class=n >predict</span><span class=p >(</span><span class=n >data</span><span class=o >=</span><span class=n >oos</span><span class=p >,</span> <span class=n >dataframe</span><span class=o >=</span><span class=kc >True</span><span class=p >)</span>
-</pre></div> </div> </div> <div class="nboutput nblast docutils container"> <div class="prompt highlight-none notranslate"><div class=highlight ><pre><span></span>[12]:
-</pre></div> </div> <div class="output_area rendered_html docutils container"> <div> <style scoped=""> .dataframe tbody tr th:only-of-type { vertical-align: middle; } .dataframe tbody tr th { vertical-align: top; } .dataframe thead th { text-align: right; } </style> <table border=1  class=dataframe > <thead> <tr style="text-align: right;"> <th> <th>y1 <th>y2 <tr> <th>40000 <td>-0.125377 <td>0.024812 <tr> <th>40001 <td>0.489893 <td>-0.707565 <tr> <th>40002 <td>-0.189191 <td>-0.727702 <tr> <th>40003 <td>-2.081779 <td>-2.756181 <tr> <th>40004 <td>1.628805 <td>0.227368 <tr> <th>... <td>... <td>... <tr> <th>49995 <td>-0.293820 <td>-0.140007 <tr> <th>49996 <td>-0.462017 <td>1.848988 <tr> <th>49997 <td>0.698136 <td>1.510755 <tr> <th>49998 <td>0.862183 <td>0.732983 <tr> <th>49999 <td>1.118024 <td>1.147715 </table> <p>10000 rows × 2 columns</p> </div></div> </div> <p>These predictions can be compared to making the predicted values using the estimated parameters.</p> <div class="nbinput docutils container"> <div class="prompt highlight-none notranslate"><div class=highlight ><pre><span></span>[13]:
-</pre></div> </div> <div class="input_area highlight-ipython3 notranslate"><div class=highlight ><pre><span></span><span class=n >y1_pred</span> <span class=o >=</span> <span class=n >res</span><span class=o >.</span><span class=n >params</span><span class=o >.</span><span class=n >y1_x1</span> <span class=o >*</span> <span class=n >oos</span><span class=o >.</span><span class=n >x1</span> <span class=o >+</span> <span class=n >res</span><span class=o >.</span><span class=n >params</span><span class=o >.</span><span class=n >y1_y2</span> <span class=o >*</span> <span class=n >oos</span><span class=o >.</span><span class=n >y2</span>
-<span class=n >y2_pred</span> <span class=o >=</span> <span class=n >res</span><span class=o >.</span><span class=n >params</span><span class=o >.</span><span class=n >y2_x2</span> <span class=o >*</span> <span class=n >oos</span><span class=o >.</span><span class=n >x2</span> <span class=o >+</span> <span class=n >res</span><span class=o >.</span><span class=n >params</span><span class=o >.</span><span class=n >y2_y1</span> <span class=o >*</span> <span class=n >oos</span><span class=o >.</span><span class=n >y1</span>
-<span class=n >pred_df</span> <span class=o >=</span> <span class=n >pd</span><span class=o >.</span><span class=n >DataFrame</span><span class=p >({</span><span class=s2 >"y1"</span><span class=p >:</span> <span class=n >y1_pred</span><span class=p >,</span> <span class=s2 >"y2"</span><span class=p >:</span> <span class=n >y2_pred</span><span class=p >})</span>
-<span class=n >pred_df</span>
-</pre></div> </div> </div> <div class="nboutput nblast docutils container"> <div class="prompt highlight-none notranslate"><div class=highlight ><pre><span></span>[13]:
-</pre></div> </div> <div class="output_area rendered_html docutils container"> <div> <style scoped=""> .dataframe tbody tr th:only-of-type { vertical-align: middle; } .dataframe tbody tr th { vertical-align: top; } .dataframe thead th { text-align: right; } </style> <table border=1  class=dataframe > <thead> <tr style="text-align: right;"> <th> <th>y1 <th>y2 <tr> <th>40000 <td>-0.125377 <td>0.024812 <tr> <th>40001 <td>0.489893 <td>-0.707565 <tr> <th>40002 <td>-0.189191 <td>-0.727702 <tr> <th>40003 <td>-2.081779 <td>-2.756181 <tr> <th>40004 <td>1.628805 <td>0.227368 <tr> <th>... <td>... <td>... <tr> <th>49995 <td>-0.293820 <td>-0.140007 <tr> <th>49996 <td>-0.462017 <td>1.848988 <tr> <th>49997 <td>0.698136 <td>1.510755 <tr> <th>49998 <td>0.862183 <td>0.732983 <tr> <th>49999 <td>1.118024 <td>1.147715 </table> <p>10000 rows × 2 columns</p> </div></div> </div> </section> </section> </article> </div> </div> </main> </div> <footer class=md-footer > <div class=md-footer-nav > <nav class="md-footer-nav__inner md-grid"> <a href=formulas.html  title="Using formulas to specify models" class="md-flex md-footer-nav__link md-footer-nav__link--prev" rel=prev > <div class="md-flex__cell md-flex__cell--shrink"> <i class="md-icon md-icon--arrow-back md-footer-nav__button"></i> </div> <div class="md-flex__cell md-flex__cell--stretch md-footer-nav__title"> <span class=md-flex__ellipsis > <span class=md-footer-nav__direction > Previous </span> Using formulas to specify models </span> </div> </a> <a href="../reference.html" title="Module Reference" class="md-flex md-footer-nav__link md-footer-nav__link--next" rel=next > <div class="md-flex__cell md-flex__cell--stretch md-footer-nav__title"><span class=md-flex__ellipsis > <span class=md-footer-nav__direction > Next </span> Module Reference </span> </div> <div class="md-flex__cell md-flex__cell--shrink"><i class="md-icon md-icon--arrow-forward md-footer-nav__button"></i> </div> </a> </nav> </div> <div class="md-footer-meta md-typeset"> <div class="md-footer-meta__inner md-grid"> <div class=md-footer-copyright > <div class=md-footer-copyright__highlight > &#169; Copyright 2017, Kevin Sheppard. </div> Created using <a href="http://www.sphinx-doc.org/">Sphinx</a> 5.3.0. and <a href="https://github.com/bashtage/sphinx-material/">Material for Sphinx</a> </div> </div> </div> </footer> <script src="../../_static/javascripts/application.js"></script> <script>app.initialize({version: "1.0.4", url: {base: ".."}})</script>
+</pre></div></div>
+</div>
+<p>Out-of-sample predictions can be made using the <code class="docutils literal notranslate"><span class="pre">predict</span></code> method along with a <code class="docutils literal notranslate"><span class="pre">DataFrame</span></code> containing the values to use for the predictions. The predictions make use of the out-of-sample values stored above.</p>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span><code>[12]:
+</code></pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><code><span class="n">res</span><span class="o">.</span><span class="n">predict</span><span class="p">(</span><span class="n">data</span><span class="o">=</span><span class="n">oos</span><span class="p">,</span> <span class="n">dataframe</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+</code></pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span><code>[12]:
+</code></pre></div>
+</div>
+<div class="output_area rendered_html docutils container">
+<div>
+<style scoped>
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
+
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+
+    .dataframe thead th {
+        text-align: right;
+    }
+</style>
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th>y1</th>
+      <th>y2</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>40000</th>
+      <td>-0.125377</td>
+      <td>0.024812</td>
+    </tr>
+    <tr>
+      <th>40001</th>
+      <td>0.489893</td>
+      <td>-0.707565</td>
+    </tr>
+    <tr>
+      <th>40002</th>
+      <td>-0.189191</td>
+      <td>-0.727702</td>
+    </tr>
+    <tr>
+      <th>40003</th>
+      <td>-2.081779</td>
+      <td>-2.756181</td>
+    </tr>
+    <tr>
+      <th>40004</th>
+      <td>1.628805</td>
+      <td>0.227368</td>
+    </tr>
+    <tr>
+      <th>...</th>
+      <td>...</td>
+      <td>...</td>
+    </tr>
+    <tr>
+      <th>49995</th>
+      <td>-0.293820</td>
+      <td>-0.140007</td>
+    </tr>
+    <tr>
+      <th>49996</th>
+      <td>-0.462017</td>
+      <td>1.848988</td>
+    </tr>
+    <tr>
+      <th>49997</th>
+      <td>0.698136</td>
+      <td>1.510755</td>
+    </tr>
+    <tr>
+      <th>49998</th>
+      <td>0.862183</td>
+      <td>0.732983</td>
+    </tr>
+    <tr>
+      <th>49999</th>
+      <td>1.118024</td>
+      <td>1.147715</td>
+    </tr>
+  </tbody>
+</table>
+<p>10000 rows × 2 columns</p>
+</div></div>
+</div>
+<p>These predictions can be compared to making the predicted values using the estimated parameters.</p>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span><code>[13]:
+</code></pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><code><span class="n">y1_pred</span> <span class="o">=</span> <span class="n">res</span><span class="o">.</span><span class="n">params</span><span class="o">.</span><span class="n">y1_x1</span> <span class="o">*</span> <span class="n">oos</span><span class="o">.</span><span class="n">x1</span> <span class="o">+</span> <span class="n">res</span><span class="o">.</span><span class="n">params</span><span class="o">.</span><span class="n">y1_y2</span> <span class="o">*</span> <span class="n">oos</span><span class="o">.</span><span class="n">y2</span>
+<span class="n">y2_pred</span> <span class="o">=</span> <span class="n">res</span><span class="o">.</span><span class="n">params</span><span class="o">.</span><span class="n">y2_x2</span> <span class="o">*</span> <span class="n">oos</span><span class="o">.</span><span class="n">x2</span> <span class="o">+</span> <span class="n">res</span><span class="o">.</span><span class="n">params</span><span class="o">.</span><span class="n">y2_y1</span> <span class="o">*</span> <span class="n">oos</span><span class="o">.</span><span class="n">y1</span>
+<span class="n">pred_df</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">({</span><span class="s2">&quot;y1&quot;</span><span class="p">:</span> <span class="n">y1_pred</span><span class="p">,</span> <span class="s2">&quot;y2&quot;</span><span class="p">:</span> <span class="n">y2_pred</span><span class="p">})</span>
+<span class="n">pred_df</span>
+</code></pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span><code>[13]:
+</code></pre></div>
+</div>
+<div class="output_area rendered_html docutils container">
+<div>
+<style scoped>
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
+
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+
+    .dataframe thead th {
+        text-align: right;
+    }
+</style>
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th>y1</th>
+      <th>y2</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>40000</th>
+      <td>-0.125377</td>
+      <td>0.024812</td>
+    </tr>
+    <tr>
+      <th>40001</th>
+      <td>0.489893</td>
+      <td>-0.707565</td>
+    </tr>
+    <tr>
+      <th>40002</th>
+      <td>-0.189191</td>
+      <td>-0.727702</td>
+    </tr>
+    <tr>
+      <th>40003</th>
+      <td>-2.081779</td>
+      <td>-2.756181</td>
+    </tr>
+    <tr>
+      <th>40004</th>
+      <td>1.628805</td>
+      <td>0.227368</td>
+    </tr>
+    <tr>
+      <th>...</th>
+      <td>...</td>
+      <td>...</td>
+    </tr>
+    <tr>
+      <th>49995</th>
+      <td>-0.293820</td>
+      <td>-0.140007</td>
+    </tr>
+    <tr>
+      <th>49996</th>
+      <td>-0.462017</td>
+      <td>1.848988</td>
+    </tr>
+    <tr>
+      <th>49997</th>
+      <td>0.698136</td>
+      <td>1.510755</td>
+    </tr>
+    <tr>
+      <th>49998</th>
+      <td>0.862183</td>
+      <td>0.732983</td>
+    </tr>
+    <tr>
+      <th>49999</th>
+      <td>1.118024</td>
+      <td>1.147715</td>
+    </tr>
+  </tbody>
+</table>
+<p>10000 rows × 2 columns</p>
+</div></div>
+</div>
+
+
+
+
+
+
+                
+              </article>
+            </div>
+          
+          
+        </div>
+        
+      </main>
+      
+        <footer class="md-footer">
+  
+    
+    <nav class="md-footer__inner md-grid" aria-label="Footer" >
+      
+        
+        <a href="formulas.html" class="md-footer__link md-footer__link--prev" aria-label="Previous: Using formulas to specify models" rel="prev">
+          <div class="md-footer__button md-icon">
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20 11v2H8l5.5 5.5-1.42 1.42L4.16 12l7.92-7.92L13.5 5.5 8 11h12Z"/></svg>
+          </div>
+          <div class="md-footer__title">
+            <div class="md-ellipsis">
+              <span class="md-footer__direction">
+                Previous
+              </span>
+              Using formulas to specify models
+            </div>
+          </div>
+        </a>
+      
+      
+        
+        <a href="../reference.html" class="md-footer__link md-footer__link--next" aria-label="Next: Module Reference" rel="next">
+          <div class="md-footer__title">
+            <div class="md-ellipsis">
+              <span class="md-footer__direction">
+                Next
+              </span>
+              Module Reference
+            </div>
+          </div>
+          <div class="md-footer__button md-icon">
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M4 11v2h12l-5.5 5.5 1.42 1.42L19.84 12l-7.92-7.92L10.5 5.5 16 11H4Z"/></svg>
+          </div>
+        </a>
+      
+    </nav>
+  
+  
+  
+  <div class="md-footer-meta md-typeset">
+    
+    <div class="md-footer-meta__inner md-grid">
+      <div class="md-copyright">
+  
+    <div class="md-footer-copyright__highlight">
+        &#169; Copyright 2021, Kevin Sheppard.
+        
+    </div>
+  
+    Created using
+    <a href="https://www.sphinx-doc.org/" target="_blank" rel="noopener">Sphinx</a>
+    6.2.1.
+     and
+    <a href="https://github.com/jbms/sphinx-immaterial/" target="_blank" rel="noopener">Sphinx-Immaterial</a>
+  
+</div>
+      
+        <div class="md-social">
+  
+    
+    
+    <a href="https://github.com/bashtage/linearmodels" target="_blank" rel="noopener" title="Source on github.com" class="md-social__link">
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 496 512"><!--! Font Awesome Free 6.2.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2022 Fonticons, Inc.--><path d="M165.9 397.4c0 2-2.3 3.6-5.2 3.6-3.3.3-5.6-1.3-5.6-3.6 0-2 2.3-3.6 5.2-3.6 3-.3 5.6 1.3 5.6 3.6zm-31.1-4.5c-.7 2 1.3 4.3 4.3 4.9 2.6 1 5.6 0 6.2-2s-1.3-4.3-4.3-5.2c-2.6-.7-5.5.3-6.2 2.3zm44.2-1.7c-2.9.7-4.9 2.6-4.6 4.9.3 2 2.9 3.3 5.9 2.6 2.9-.7 4.9-2.6 4.6-4.6-.3-1.9-3-3.2-5.9-2.9zM244.8 8C106.1 8 0 113.3 0 252c0 110.9 69.8 205.8 169.5 239.2 12.8 2.3 17.3-5.6 17.3-12.1 0-6.2-.3-40.4-.3-61.4 0 0-70 15-84.7-29.8 0 0-11.4-29.1-27.8-36.6 0 0-22.9-15.7 1.6-15.4 0 0 24.9 2 38.6 25.8 21.9 38.6 58.6 27.5 72.9 20.9 2.3-16 8.8-27.1 16-33.7-55.9-6.2-112.3-14.3-112.3-110.5 0-27.5 7.6-41.3 23.6-58.9-2.6-6.5-11.1-33.3 2.6-67.9 20.9-6.5 69 27 69 27 20-5.6 41.5-8.5 62.8-8.5s42.8 2.9 62.8 8.5c0 0 48.1-33.6 69-27 13.7 34.7 5.2 61.4 2.6 67.9 16 17.7 25.8 31.5 25.8 58.9 0 96.5-58.9 104.2-114.8 110.5 9.2 7.9 17 22.9 17 46.4 0 33.7-.3 75.4-.3 83.6 0 6.5 4.6 14.4 17.3 12.1C428.2 457.8 496 362.9 496 252 496 113.3 383.5 8 244.8 8zM97.2 352.9c-1.3 1-1 3.3.7 5.2 1.6 1.6 3.9 2.3 5.2 1 1.3-1 1-3.3-.7-5.2-1.6-1.6-3.9-2.3-5.2-1zm-10.8-8.1c-.7 1.3.3 2.9 2.3 3.9 1.6 1 3.6.7 4.3-.7.7-1.3-.3-2.9-2.3-3.9-2-.6-3.6-.3-4.3.7zm32.4 35.6c-1.6 1.3-1 4.3 1.3 6.2 2.3 2.3 5.2 2.6 6.5 1 1.3-1.3.7-4.3-1.3-6.2-2.2-2.3-5.2-2.6-6.5-1zm-11.4-14.7c-1.6 1-1.6 3.6 0 5.9 1.6 2.3 4.3 3.3 5.6 2.3 1.6-1.3 1.6-3.9 0-6.2-1.4-2.3-4-3.3-5.6-2z"/></svg>
+    </a>
+  
+    
+    
+      
+      
+    
+    <a href="https://pypi.org/project/linearmodels/" target="_blank" rel="noopener" title="pypi.org" class="md-social__link">
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512"><!--! Font Awesome Free 6.2.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2022 Fonticons, Inc.--><path d="M439.8 200.5c-7.7-30.9-22.3-54.2-53.4-54.2h-40.1v47.4c0 36.8-31.2 67.8-66.8 67.8H172.7c-29.2 0-53.4 25-53.4 54.3v101.8c0 29 25.2 46 53.4 54.3 33.8 9.9 66.3 11.7 106.8 0 26.9-7.8 53.4-23.5 53.4-54.3v-40.7H226.2v-13.6h160.2c31.1 0 42.6-21.7 53.4-54.2 11.2-33.5 10.7-65.7 0-108.6zM286.2 404c11.1 0 20.1 9.1 20.1 20.3 0 11.3-9 20.4-20.1 20.4-11 0-20.1-9.2-20.1-20.4.1-11.3 9.1-20.3 20.1-20.3zM167.8 248.1h106.8c29.7 0 53.4-24.5 53.4-54.3V91.9c0-29-24.4-50.7-53.4-55.6-35.8-5.9-74.7-5.6-106.8.1-45.2 8-53.4 24.7-53.4 55.6v40.7h106.9v13.6h-147c-31.1 0-58.3 18.7-66.8 54.2-9.8 40.7-10.2 66.1 0 108.6 7.6 31.6 25.7 54.2 56.8 54.2H101v-48.8c0-35.3 30.5-66.4 66.8-66.4zm-6.7-142.6c-11.1 0-20.1-9.1-20.1-20.3.1-11.3 9-20.4 20.1-20.4 11 0 20.1 9.2 20.1 20.4s-9 20.3-20.1 20.3z"/></svg>
+    </a>
+  
+    
+    
+      
+      
+    
+    <a href="https://doi.org/10.5281/zenodo.2591973" target="_blank" rel="noopener" title="doi.org" class="md-social__link">
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512"><!--! Font Awesome Free 6.2.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2022 Fonticons, Inc.--><path d="M0 216C0 149.7 53.7 96 120 96h8c17.7 0 32 14.3 32 32s-14.3 32-32 32h-8c-30.9 0-56 25.1-56 56v8h64c35.3 0 64 28.7 64 64v64c0 35.3-28.7 64-64 64H64c-35.3 0-64-28.7-64-64V216zm256 0c0-66.3 53.7-120 120-120h8c17.7 0 32 14.3 32 32s-14.3 32-32 32h-8c-30.9 0-56 25.1-56 56v8h64c35.3 0 64 28.7 64 64v64c0 35.3-28.7 64-64 64h-64c-35.3 0-64-28.7-64-64V216z"/></svg>
+    </a>
+  
+</div>
+      
+    </div>
+    
+  </div>
+</footer>
+      
+    </div>
+    <div class="md-dialog" data-md-component="dialog">
+      <div class="md-dialog__inner md-typeset"></div>
+    </div>
+    
+    <script id="__config" type="application/json">{"base": "../..", "features": [], "translations": {"clipboard.copied": "Copied to clipboard", "clipboard.copy": "Copy to clipboard", "search.config.lang": "en", "search.config.pipeline": "trimmer, stopWordFilter", "search.config.separator": "[\\s\\-]+", "search.placeholder": "Search", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.placeholder": "Type to start searching", "search.result.term.missing": "Missing", "select.version.title": "Select version"}, "version": {"provider": "mike", "staticVersions": [{"aliases": [], "title": "Release", "version": "https://bashtage.github.io/linearmodels/"}, {"aliases": [], "title": "Development", "version": "https://bashtage.github.io/linearmodels/devel/"}], "versionPath": null}}</script>
+    
+      
+        <script src="../../_static/sphinx_immaterial_theme.cea6a0c1d5b0618cf.min.js"></script>
+        <script crossorigin="anonymous" integrity="sha256-Ae2Vz/4ePdIu6ZyI/5ZGsYnb+m0JlOmKPjt6XZ9JJkA=" src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.4/require.min.js"></script>
+        <script>window.MathJax = {"tex": {"inlineMath": [["$", "$"], ["\\(", "\\)"]], "processEscapes": true}, "options": {"ignoreHtmlClass": "tex2jax_ignore|mathjax_ignore|document", "processHtmlClass": "tex2jax_process|mathjax_process|math|output_area"}}</script>
+        <script defer="defer" src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+    
+  </body>
+</html>
