@@ -15,7 +15,7 @@
     
   
       
-        <title>Further Examples - linearmodels 4.30</title>
+        <title>Further Examples - linearmodels v4.31 (+2)</title>
       
     
 
@@ -94,7 +94,7 @@
 
 <header class="md-header" data-md-component="header">
   <nav class="md-header__inner md-grid" aria-label="Header">
-    <a href="../../index.html" title="linearmodels 4.30" class="md-header__button md-logo" aria-label="linearmodels 4.30" data-md-component="logo">
+    <a href="../../index.html" title="linearmodels v4.31 (+2)" class="md-header__button md-logo" aria-label="linearmodels v4.31 (+2)" data-md-component="logo">
       <img src="../../_static/bw-logo.svg" alt="logo">
     </a>
     <label class="md-header__button md-icon" for="__drawer">
@@ -104,7 +104,7 @@
       <div class="md-header__ellipsis">
         <div class="md-header__topic">
           <span class="md-ellipsis">
-            linearmodels 4.30
+            linearmodels v4.31 (+2)
           </span>
         </div>
         <div class="md-header__topic" data-md-component="header-topic">
@@ -191,10 +191,10 @@
 
 <nav class="md-nav md-nav--primary" aria-label="Navigation" data-md-level="0">
   <label class="md-nav__title" for="__drawer">
-    <a href="../../index.html" title="linearmodels 4.30" class="md-nav__button md-logo" aria-label="linearmodels 4.30" data-md-component="logo">
+    <a href="../../index.html" title="linearmodels v4.31 (+2)" class="md-nav__button md-logo" aria-label="linearmodels v4.31 (+2)" data-md-component="logo">
       <img src="../../_static/bw-logo.svg" alt="logo">
     </a>
-    linearmodels 4.30
+    linearmodels v4.31 (+2)
   </label>
   
     <div class="md-nav__source">
@@ -1079,7 +1079,7 @@ Dep. Variable:               ldrugexp   R-squared:                      0.1770
 Estimator:                        OLS   Adj. R-squared:                 0.1765
 No. Observations:               10089   F-statistic:                    2262.6
 Date:                Wed, Apr 26 2023   P-value (F-stat)                0.0000
-Time:                        06:35:19   Distribution:                  chi2(6)
+Time:                        15:06:05   Distribution:                  chi2(6)
 Cov. Estimator:                robust
 
                               Parameter Estimates
@@ -1119,7 +1119,7 @@ Dep. Variable:               ldrugexp   R-squared:                      0.0640
 Estimator:                    IV-2SLS   Adj. R-squared:                 0.0634
 No. Observations:               10089   F-statistic:                    2000.9
 Date:                Wed, Apr 26 2023   P-value (F-stat)                0.0000
-Time:                        06:35:19   Distribution:                  chi2(6)
+Time:                        15:06:05   Distribution:                  chi2(6)
 Cov. Estimator:                robust
 
                               Parameter Estimates
@@ -1316,7 +1316,7 @@ H0: All endogenous variables are exogenous
 Statistic: 25.2819
 P-value: 0.0000
 Distributed: chi2(1)
-WaldTestStatistic, id: 0x7fe2856d6fb0
+WaldTestStatistic, id: 0x7f39c5cb6da0
 </pre></div></div>
 </div>
 <p>The Wu-Hausman test is a variant of the Durbin test that uses a slightly different form.</p>
@@ -1339,7 +1339,7 @@ H0: All endogenous variables are exogenous
 Statistic: 25.3253
 P-value: 0.0000
 Distributed: F(1,10081)
-WaldTestStatistic, id: 0x7fe285673af0
+WaldTestStatistic, id: 0x7f39c5c52110
 </pre></div></div>
 </div>
 <p>The test statistic can be directly replicated using the squared t-stat in a 2-stage approach where the first stage regresses the endogenous variable on the controls and instrument and the second stage regresses the dependent variable on the controls, the endogenous regressor and the residuals. If the regressor was in fact exogenous, the residuals should not be correlated with the dependent variable.</p>
@@ -1385,7 +1385,7 @@ H0: Endogenous variables are exogenous
 Statistic: 26.4542
 P-value: 0.0000
 Distributed: chi2(1)
-WaldTestStatistic, id: 0x7fe2851d7fd0
+WaldTestStatistic, id: 0x7f39c57b3fd0
 </pre></div></div>
 </div>
 <p>Wooldridge”s score test is an alternative to the regression test, although it usually has slightly less power since it is an LM rather than a Wald type test.</p>
@@ -1408,7 +1408,7 @@ H0: Endogenous variables are exogenous
 Statistic: 24.9350
 P-value: 0.0000
 Distributed: chi2(1)
-WaldTestStatistic, id: 0x7fe2851d7c10
+WaldTestStatistic, id: 0x7f39c57b3c10
 </pre></div></div>
 </div>
 <h3 id="Exogeneity-Testing">Exogeneity Testing<a class="headerlink" href="#Exogeneity-Testing" title="Permalink to this heading">¶</a></h3>
@@ -1431,7 +1431,7 @@ H0: Expected moment conditions are equal to 0
 Statistic: 1.0475
 P-value: 0.3061
 Distributed: chi2(1)
-WaldTestStatistic, id: 0x7fe2856d5d50
+WaldTestStatistic, id: 0x7f39c5cb5d20
 </pre></div></div>
 </div>
 <p>When all instruments are included the story changes, and some of the additional instrument (<code class="docutils literal notranslate"><span class="pre">lowincome</span></code> or <code class="docutils literal notranslate"><span class="pre">firmsz</span></code>) appear to be endogenous.</p>
@@ -1455,7 +1455,7 @@ H0: Expected moment conditions are equal to 0
 Statistic: 11.5903
 P-value: 0.0089
 Distributed: chi2(3)
-WaldTestStatistic, id: 0x7fe284f01bd0
+WaldTestStatistic, id: 0x7f39c54ddba0
 </pre></div></div>
 </div>
 <h2 id="Single-Instrument-Regressions">Single Instrument Regressions<a class="headerlink" href="#Single-Instrument-Regressions" title="Permalink to this heading">¶</a></h2>
