@@ -8,8 +8,6 @@
 | **Coverage**               | [![codecov](https://codecov.io/gh/bashtage/linearmodels/branch/main/graph/badge.svg)](https://codecov.io/gh/bashtage/linearmodels)                                                                                                                       |
 | **Code Quality**           | [![Codacy Badge](https://api.codacy.com/project/badge/Grade/745a24a69cb2466b95df6a53c83892de)](https://www.codacy.com/manual/bashtage/linearmodels?utm_source=github.com&utm_medium=referral&utm_content=bashtage/linearmodels&utm_campaign=Badge_Grade) |
 |                            | [![codebeat badge](https://codebeat.co/badges/aaae2fb4-72b5-4a66-97cd-77b93488f243)](https://codebeat.co/projects/github-com-bashtage-linearmodels-main)                                                                                                 |
-|                            | [![Code Quality: Python](https://img.shields.io/lgtm/grade/python/g/bashtage/linearmodels.svg?logo=lgtm&logoWidth=18)](https://lgtm.com/projects/g/bashtage/linearmodels/context:python)                                                                 |
-|                            | [![Total Alerts](https://img.shields.io/lgtm/alerts/g/bashtage/linearmodels.svg?logo=lgtm&logoWidth=18)](https://lgtm.com/projects/g/bashtage/linearmodels/alerts)                                                                                       |
 | **Citation**               | [![DOI](https://zenodo.org/badge/82291672.svg)](https://zenodo.org/badge/latestdoi/82291672)                                                                                                                                                             |
 
 Linear (regression) models for Python. Extends
