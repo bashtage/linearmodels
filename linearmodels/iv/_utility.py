@@ -1,7 +1,12 @@
 from __future__ import annotations
 
+from linearmodels.compat.formulaic import FORMULAIC_GTE_0_6, future_ordering
+
 from formulaic import model_matrix
+from formulaic.formula import Formula
 from formulaic.materializers.types import NAAction as fNAAction
+from formulaic.utils.context import capture_context
+from formulaic.utils.layered_mapping import LayeredMapping
 import numpy as np
 from pandas import DataFrame
 
@@ -78,12 +83,27 @@ class IVFormulaParser:
     The general structure of a formula is `dep ~ exog + [endog ~ instr]`
     """
 
-    def __init__(self, formula: str, data: DataFrame, eval_env: int = 2):
+    def __init__(
+        self,
+        formula: str,
+        data: DataFrame,
+        eval_env: int = 2,
+        context: LayeredMapping | None = None,
+    ):
         self._formula = formula
         self._data = data
         self._eval_env = eval_env
+        if not context:
+            self._context = capture_context(context=self._eval_env)
+        else:
+            self._context = context
         self._components: dict[str, str] = {}
         self._parse()
+        if FORMULAIC_GTE_0_6 and not future_ordering():
+            self._formulaic_kwargs = dict(_ordering="sort")
+            self._model_matrix_kwargs = dict(cluster_by="numerical_factors")
+        else:
+            self._model_matrix_kwargs = self._formulaic_kwargs = {}
 
     def _parse(self) -> None:
         blocks = self._formula.strip().split("~")
@@ -154,7 +174,7 @@ class IVFormulaParser:
         dep = model_matrix(
             dep_fmla,
             self._data,
-            context=self._eval_env,
+            context=self._context,
             ensure_full_rank=False,
             na_action=fNAAction("raise"),
         )
@@ -164,12 +184,12 @@ class IVFormulaParser:
     def exog(self) -> DataFrame | None:
         """Exogenous variables"""
         exog_fmla = self.components["exog"]
-        exog = model_matrix(
-            exog_fmla,
+        exog = Formula(exog_fmla, **self._formulaic_kwargs).get_model_matrix(
             self._data,
-            context=self._eval_env,
+            context=self._context,
             ensure_full_rank=True,
             na_action=fNAAction("ignore"),
+            **self._model_matrix_kwargs,
         )
         return self._empty_check(DataFrame(exog))
 
@@ -177,12 +197,12 @@ class IVFormulaParser:
     def endog(self) -> DataFrame | None:
         """Endogenous variables"""
         endog_fmla = "0 +" + self.components["endog"]
-        endog = model_matrix(
-            endog_fmla,
+        endog = Formula(endog_fmla, **self._formulaic_kwargs).get_model_matrix(
             self._data,
-            context=self._eval_env,
+            context=self._context,
             ensure_full_rank=False,
             na_action=fNAAction("raise"),
+            **self._model_matrix_kwargs,
         )
         return self._empty_check(DataFrame(endog))
 
@@ -190,12 +210,12 @@ class IVFormulaParser:
     def instruments(self) -> DataFrame | None:
         """Instruments"""
         instr_fmla = "0 +" + self.components["instruments"]
-        instr = model_matrix(
-            instr_fmla,
+        instr = Formula(instr_fmla, **self._formulaic_kwargs).get_model_matrix(
             self._data,
-            context=self._eval_env,
+            context=self._context,
             ensure_full_rank=False,
             na_action=fNAAction("raise"),
+            **self._model_matrix_kwargs,
         )
         return self._empty_check(DataFrame(instr))
 

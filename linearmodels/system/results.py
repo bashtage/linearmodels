@@ -253,7 +253,7 @@ class SystemResults(_CommonResults):
                 "of eqns or data, but not both."
             )
         pred: DataFrame = self.model.predict(
-            self.params, equations=equations, data=data
+            self.params, equations=equations, data=data, eval_env=3
         )
         if dataframe:
             if missing:
