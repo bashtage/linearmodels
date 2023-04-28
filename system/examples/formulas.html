@@ -15,7 +15,7 @@
     
   
       
-        <title>Using formulas to specify models - linearmodels 4.30</title>
+        <title>Using formulas to specify models - linearmodels 4.31</title>
       
     
 
@@ -94,7 +94,7 @@
 
 <header class="md-header" data-md-component="header">
   <nav class="md-header__inner md-grid" aria-label="Header">
-    <a href="../../index.html" title="linearmodels 4.30" class="md-header__button md-logo" aria-label="linearmodels 4.30" data-md-component="logo">
+    <a href="../../index.html" title="linearmodels 4.31" class="md-header__button md-logo" aria-label="linearmodels 4.31" data-md-component="logo">
       <img src="../../_static/bw-logo.svg" alt="logo">
     </a>
     <label class="md-header__button md-icon" for="__drawer">
@@ -104,7 +104,7 @@
       <div class="md-header__ellipsis">
         <div class="md-header__topic">
           <span class="md-ellipsis">
-            linearmodels 4.30
+            linearmodels 4.31
           </span>
         </div>
         <div class="md-header__topic" data-md-component="header-topic">
@@ -191,10 +191,10 @@
 
 <nav class="md-nav md-nav--primary" aria-label="Navigation" data-md-level="0">
   <label class="md-nav__title" for="__drawer">
-    <a href="../../index.html" title="linearmodels 4.30" class="md-nav__button md-logo" aria-label="linearmodels 4.30" data-md-component="logo">
+    <a href="../../index.html" title="linearmodels 4.31" class="md-nav__button md-logo" aria-label="linearmodels 4.31" data-md-component="logo">
       <img src="../../_static/bw-logo.svg" alt="logo">
     </a>
-    linearmodels 4.30
+    linearmodels 4.31
   </label>
   
     <div class="md-nav__source">
@@ -785,8 +785,8 @@
 Estimator:                        GLS   Overall R-squared:                   0.6951
 No. Equations.:                     2   McElroy&#39;s R-squared:                 0.2197
 No. Observations:                 616   Judge&#39;s (OLS) R-squared:             0.1873
-Date:                Wed, Apr 26 2023   Berndt&#39;s R-squared:                  0.3775
-Time:                        06:34:35   Dhrymes&#39;s R-squared:                 0.6950
+Date:                Fri, Apr 28 2023   Berndt&#39;s R-squared:                  0.3775
+Time:                        14:34:32   Dhrymes&#39;s R-squared:                 0.6950
                                         Cov. Estimator:                  unadjusted
                                         Num. Constraints:                      None
                 Equation: benefits, Dependent Variable: hrbens
@@ -843,8 +843,8 @@ Homoskedastic (Unadjusted) Covariance (Debiased: False, GLS: True)
 Estimator:                        GLS   Overall R-squared:                   0.6951
 No. Equations.:                     2   McElroy&#39;s R-squared:                 0.2197
 No. Observations:                 616   Judge&#39;s (OLS) R-squared:             0.1873
-Date:                Wed, Apr 26 2023   Berndt&#39;s R-squared:                  0.3775
-Time:                        06:34:35   Dhrymes&#39;s R-squared:                 0.6950
+Date:                Fri, Apr 28 2023   Berndt&#39;s R-squared:                  0.3775
+Time:                        14:34:33   Dhrymes&#39;s R-squared:                 0.6950
                                         Cov. Estimator:                  unadjusted
                                         Num. Constraints:                      None
                  Equation: hrbens, Dependent Variable: hrbens
@@ -884,7 +884,10 @@ Homoskedastic (Unadjusted) Covariance (Debiased: False, GLS: True)
 <div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span><code>[5]:
 </code></pre></div>
 </div>
-<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><code><span class="n">labeled_formula</span> <span class="o">=</span> <span class="s2">&quot;&quot;&quot;</span>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><code><span class="c1"># Import ordering to get the future behavior</span>
+<span class="kn">from</span> <span class="nn">linearmodels.__future__</span> <span class="kn">import</span> <span class="n">ordering</span>
+
+<span class="n">labeled_formula</span> <span class="o">=</span> <span class="s2">&quot;&quot;&quot;</span>
 <span class="s2">{benefits: hrbens ~ educ + exper + expersq + union + south + nrtheast + nrthcen + male}</span>
 <span class="s2">{earnings: hrearn ~ educ + exper + expersq + nrtheast + married + male}</span>
 <span class="s2">&quot;&quot;&quot;</span>
@@ -934,35 +937,35 @@ Labeled
 <div class="highlight"><pre>
                            System GLS Estimation Summary
 ===================================================================================
-Estimator:                        GLS   Overall R-squared:                   0.6247
-No. Equations.:                     2   McElroy&#39;s R-squared:                 0.1917
-No. Observations:                 616   Judge&#39;s (OLS) R-squared:             0.1725
-Date:                Wed, Apr 26 2023   Berndt&#39;s R-squared:                  0.6195
-Time:                        06:34:35   Dhrymes&#39;s R-squared:                 0.6239
+Estimator:                        GLS   Overall R-squared:                   0.7073
+No. Equations.:                     2   McElroy&#39;s R-squared:                 0.2188
+No. Observations:                 616   Judge&#39;s (OLS) R-squared:             0.1853
+Date:                Fri, Apr 28 2023   Berndt&#39;s R-squared:                  0.3339
+Time:                        14:34:33   Dhrymes&#39;s R-squared:                 0.7073
                                         Cov. Estimator:                      robust
                                         Num. Constraints:                      None
                 Equation: benefits, Dependent Variable: hrbens
 ==============================================================================
             Parameter  Std. Err.     T-stat    P-value    Lower CI    Upper CI
 ------------------------------------------------------------------------------
-educ           0.0254     0.0054     4.6894     0.0000      0.0148      0.0360
-exper          0.0448     0.0105     4.2823     0.0000      0.0243      0.0653
-expersq       -0.0009     0.0003    -3.3390     0.0008     -0.0014     -0.0004
-male           0.3049     0.0464     6.5736     0.0000      0.2140      0.3959
-nrthcen       -0.1320     0.0573    -2.3024     0.0213     -0.2443     -0.0196
-nrtheast      -0.0450     0.0660    -0.6824     0.4950     -0.1744      0.0843
-south         -0.1685     0.0657    -2.5657     0.0103     -0.2972     -0.0398
-union          0.3652     0.0469     7.7817     0.0000      0.2732      0.4571
+educ           0.0380     0.0048     7.8784     0.0000      0.0286      0.0475
+exper          0.0295     0.0059     4.9663     0.0000      0.0179      0.0412
+expersq       -0.0005     0.0001    -3.4929     0.0005     -0.0008     -0.0002
+union          0.3561     0.0487     7.3156     0.0000      0.2607      0.4515
+south         -0.1893     0.0566    -3.3467     0.0008     -0.3002     -0.0785
+nrtheast      -0.1692     0.0668    -2.5311     0.0114     -0.3002     -0.0382
+nrthcen       -0.2035     0.0561    -3.6286     0.0003     -0.3134     -0.0936
+male           0.2575     0.0477     5.3957     0.0000      0.1640      0.3510
                 Equation: earnings, Dependent Variable: hrearn
 ==============================================================================
             Parameter  Std. Err.     T-stat    P-value    Lower CI    Upper CI
 ------------------------------------------------------------------------------
-educ           0.2840     0.0753     3.7719     0.0002      0.1364      0.4316
-exper          0.0472     0.1777     0.2655     0.7906     -0.3012      0.3955
-expersq        0.0005     0.0047     0.1176     0.9064     -0.0086      0.0097
-male           1.8921     0.2012     9.4044     0.0000      1.4977      2.2864
-married        0.2813     0.2984     0.9426     0.3459     -0.3035      0.8661
-nrtheast      -0.3174     0.3586    -0.8849     0.3762     -1.0202      0.3855
+educ           0.3378     0.0865     3.9055     0.0001      0.1683      0.5073
+exper         -0.0485     0.1904    -0.2548     0.7989     -0.4218      0.3247
+expersq        0.0031     0.0050     0.6202     0.5351     -0.0068      0.0130
+nrtheast      -0.6210     0.4815    -1.2897     0.1972     -1.5648      0.3228
+married        0.3223     0.3086     1.0442     0.2964     -0.2826      0.9272
+male           2.2366     0.2388     9.3645     0.0000      1.7685      2.7047
 ==============================================================================
 
 Covariance Estimator:

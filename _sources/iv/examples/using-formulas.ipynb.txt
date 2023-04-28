@@ -2,22 +2,14 @@
  "cells": [
   {
    "cell_type": "markdown",
-   "metadata": {
-    "pycharm": {
-     "name": "#%% md\n"
-    }
-   },
+   "metadata": {},
    "source": [
     "# Using formulas to specify models"
    ]
   },
   {
    "cell_type": "markdown",
-   "metadata": {
-    "pycharm": {
-     "name": "#%% md\n"
-    }
-   },
+   "metadata": {},
    "source": [
     "## Basic Usage\n",
     "\n",
@@ -65,11 +57,7 @@
   },
   {
    "cell_type": "markdown",
-   "metadata": {
-    "pycharm": {
-     "name": "#%% md\n"
-    }
-   },
+   "metadata": {},
    "source": [
     "## MEPS data\n",
     "\n",
@@ -85,13 +73,13 @@
     "collapsed": true,
     "jupyter": {
      "outputs_hidden": true
-    },
-    "pycharm": {
-     "name": "#%%\n"
     }
    },
    "outputs": [],
    "source": [
+    "# Import ordering to get the future behavior\n",
+    "from linearmodels.__future__ import ordering\n",
+    "\n",
     "import numpy as np\n",
     "from linearmodels.datasets import meps\n",
     "from linearmodels.iv import IV2SLS\n",
@@ -103,11 +91,7 @@
   },
   {
    "cell_type": "markdown",
-   "metadata": {
-    "pycharm": {
-     "name": "#%% md\n"
-    }
-   },
+   "metadata": {},
    "source": [
     "### Estimating a model with a formula\n",
     "\n",
@@ -121,9 +105,6 @@
     "collapsed": true,
     "jupyter": {
      "outputs_hidden": true
-    },
-    "pycharm": {
-     "name": "#%%\n"
     }
    },
    "outputs": [],
@@ -141,9 +122,6 @@
     "collapsed": true,
     "jupyter": {
      "outputs_hidden": true
-    },
-    "pycharm": {
-     "name": "#%%\n"
     }
    },
    "outputs": [],
@@ -154,11 +132,7 @@
   },
   {
    "cell_type": "markdown",
-   "metadata": {
-    "pycharm": {
-     "name": "#%% md\n"
-    }
-   },
+   "metadata": {},
    "source": [
     "### Mathematical expression in formulas\n",
     "\n",
@@ -172,9 +146,6 @@
     "collapsed": true,
     "jupyter": {
      "outputs_hidden": true
-    },
-    "pycharm": {
-     "name": "#%%\n"
     }
    },
    "outputs": [],
@@ -188,11 +159,7 @@
   },
   {
    "cell_type": "markdown",
-   "metadata": {
-    "pycharm": {
-     "name": "#%% md\n"
-    }
-   },
+   "metadata": {},
    "source": [
     "### OLS\n",
     "\n",
@@ -206,9 +173,6 @@
     "collapsed": true,
     "jupyter": {
      "outputs_hidden": true
-    },
-    "pycharm": {
-     "name": "#%%\n"
     }
    },
    "outputs": [],
@@ -221,11 +185,7 @@
   },
   {
    "cell_type": "markdown",
-   "metadata": {
-    "pycharm": {
-     "name": "#%% md\n"
-    }
-   },
+   "metadata": {},
    "source": [
     "### Comparing results\n",
     "\n",
@@ -239,9 +199,6 @@
     "collapsed": true,
     "jupyter": {
      "outputs_hidden": true
-    },
-    "pycharm": {
-     "name": "#%%\n"
     }
    },
    "outputs": [],

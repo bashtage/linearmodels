@@ -1,7 +1,17 @@
+:hero: Models for panel data, system regression, instrumental variables and asset pricing.
+
 .. image:: images/logo-text.svg
    :width: 50%
    :align: left
    :alt: linearmodels logo
+
+
+.. warning::
+
+   The next version of linearmodels will be 5.0 and will change the default sorting order
+   for models created using formulas. You can use the new behavior by adding
+   ``from linearmodels.__future__ import ordering`` to your code.  This
+   version will increase the minimum version of formulaic to 0.6.0.
 
 .. note::
 

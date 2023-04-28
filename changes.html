@@ -15,7 +15,7 @@
     
   
       
-        <title>Change Log - linearmodels 4.30</title>
+        <title>Change Log - linearmodels 4.31</title>
       
     
 
@@ -75,7 +75,7 @@
     <div data-md-component="skip">
       
         
-        <a href="#version-4-29" class="md-skip">
+        <a href="#future-version-5-0" class="md-skip">
           Skip to content
         </a>
       
@@ -93,7 +93,7 @@
 
 <header class="md-header" data-md-component="header">
   <nav class="md-header__inner md-grid" aria-label="Header">
-    <a href="index.html" title="linearmodels 4.30" class="md-header__button md-logo" aria-label="linearmodels 4.30" data-md-component="logo">
+    <a href="index.html" title="linearmodels 4.31" class="md-header__button md-logo" aria-label="linearmodels 4.31" data-md-component="logo">
       <img src="_static/bw-logo.svg" alt="logo">
     </a>
     <label class="md-header__button md-icon" for="__drawer">
@@ -103,7 +103,7 @@
       <div class="md-header__ellipsis">
         <div class="md-header__topic">
           <span class="md-ellipsis">
-            linearmodels 4.30
+            linearmodels 4.31
           </span>
         </div>
         <div class="md-header__topic" data-md-component="header-topic">
@@ -190,10 +190,10 @@
 
 <nav class="md-nav md-nav--primary" aria-label="Navigation" data-md-level="0">
   <label class="md-nav__title" for="__drawer">
-    <a href="index.html" title="linearmodels 4.30" class="md-nav__button md-logo" aria-label="linearmodels 4.30" data-md-component="logo">
+    <a href="index.html" title="linearmodels 4.31" class="md-nav__button md-logo" aria-label="linearmodels 4.31" data-md-component="logo">
       <img src="_static/bw-logo.svg" alt="logo">
     </a>
-    linearmodels 4.30
+    linearmodels 4.31
   </label>
   
     <div class="md-nav__source">
@@ -378,6 +378,27 @@
       Contents
     </label>
     <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#future-version-5-0" class="md-nav__link">
+    <span title="/changes.rst#future-version-5-0 (reference label)" class="md-ellipsis">Future Version 5.<wbr>0</span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#version-4-31" class="md-nav__link">
+    <span title="/changes.rst#version-4-31 (reference label)" class="md-ellipsis">Version 4.<wbr>31</span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#version-4-30" class="md-nav__link">
+    <span title="/changes.rst#version-4-30 (reference label)" class="md-ellipsis">Version 4.<wbr>30</span>
+  </a>
+  
+</li>
       
         <li class="md-nav__item">
   <a href="#version-4-29" class="md-nav__link">
@@ -618,6 +639,27 @@
     <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
       
         <li class="md-nav__item">
+  <a href="#future-version-5-0" class="md-nav__link">
+    <span title="/changes.rst#future-version-5-0 (reference label)" class="md-ellipsis">Future Version 5.<wbr>0</span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#version-4-31" class="md-nav__link">
+    <span title="/changes.rst#version-4-31 (reference label)" class="md-ellipsis">Version 4.<wbr>31</span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#version-4-30" class="md-nav__link">
+    <span title="/changes.rst#version-4-30 (reference label)" class="md-ellipsis">Version 4.<wbr>30</span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
   <a href="#version-4-29" class="md-nav__link">
     <span title="/changes.rst#version-4-29 (reference label)" class="md-ellipsis">Version 4.<wbr>29</span>
   </a>
@@ -821,6 +863,39 @@
 
 
 <h1 id="change-log">Change Log<a class="headerlink" href="#change-log" title="Permalink to this heading">¶</a></h1>
+<h2 id="future-version-5-0">Future Version 5.0<a class="headerlink" href="#future-version-5-0" title="Permalink to this heading">¶</a></h2>
+<div class="warning admonition">
+<p class="admonition-title">Warning</p>
+<p><strong>Not released</strong></p>
+<p>The next version of linearmodels will be 5.0 and will change the default sorting order
+for models created using formulas. You can use the new behavior by adding
+<code class="docutils literal notranslate"><span class="pre">from</span> <span class="pre">linearmodels.__future__</span> <span class="pre">import</span> <span class="pre">ordering</span></code> to your code.  This
+version will increase the minimum version of formulaic to 0.6.0.</p>
+</div>
+<ul class="simple">
+<li><p>Switched variable ordering by default.  Importing <code class="docutils literal notranslate"><span class="pre">linearmodels.__future__.ordering</span></code>
+is a no-op, and has no effect.</p></li>
+</ul>
+<h2 id="version-4-31">Version 4.31<a class="headerlink" href="#version-4-31" title="Permalink to this heading">¶</a></h2>
+<ul class="simple">
+<li><p>Updated formulaic support of 0.6.0 and added optional support for <cite>not</cite> sorting
+variables from formulas.  The default will continue to sort variables. You can
+enable the future behavior now using</p></li>
+</ul>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><code><span class="kn">from</span> <span class="nn">linearmodels.__future__</span> <span class="kn">import</span> <span class="n">ordering</span>
+</code></pre></div>
+</div>
+<ul class="simple">
+<li><p>The key difference between the old and the new behavior is that the old would
+reorder the variables in a formula so that <code class="docutils literal notranslate"><span class="pre">y</span> <span class="pre">~</span> <span class="pre">1</span> <span class="pre">+</span> <span class="pre">x</span> <span class="pre">+</span> <span class="pre">z</span> <span class="pre">+</span> <span class="pre">w</span></code> would return
+parameter estimates in the order <code class="docutils literal notranslate"><span class="pre">1</span></code>, <code class="docutils literal notranslate"><span class="pre">w</span></code>, <code class="docutils literal notranslate"><span class="pre">x</span></code>, <code class="docutils literal notranslate"><span class="pre">z</span></code> due to sorting. The new
+behavior will default to not sorting so that when using <code class="docutils literal notranslate"><span class="pre">y</span> <span class="pre">~</span> <span class="pre">1</span> <span class="pre">+</span> <span class="pre">x</span> <span class="pre">+</span> <span class="pre">z</span> <span class="pre">+</span> <span class="pre">w</span></code>
+will return parameter estimates in the order <code class="docutils literal notranslate"><span class="pre">1</span></code>, <code class="docutils literal notranslate"><span class="pre">x</span></code>, <code class="docutils literal notranslate"><span class="pre">z</span></code>, <code class="docutils literal notranslate"><span class="pre">w</span></code>.</p></li>
+</ul>
+<h2 id="version-4-30">Version 4.30<a class="headerlink" href="#version-4-30" title="Permalink to this heading">¶</a></h2>
+<ul class="simple">
+<li><p>Improved compatability with unreleased versions of NumPy and pandas.</p></li>
+</ul>
 <h2 id="version-4-29">Version 4.29<a class="headerlink" href="#version-4-29" title="Permalink to this heading">¶</a></h2>
 <ul class="simple">
 <li><p>Added average <span class="math notranslate nohighlight">\(R^2\)</span> and average adjusted <span class="math notranslate nohighlight">\(R^2\)</span> properties to

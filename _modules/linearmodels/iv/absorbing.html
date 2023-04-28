@@ -15,7 +15,7 @@
     
   
       
-        <title>linearmodels.iv.absorbing - linearmodels 4.30</title>
+        <title>linearmodels.iv.absorbing - linearmodels 4.31</title>
       
     
 
@@ -88,7 +88,7 @@
 
 <header class="md-header" data-md-component="header">
   <nav class="md-header__inner md-grid" aria-label="Header">
-    <a href="../../../index.html" title="linearmodels 4.30" class="md-header__button md-logo" aria-label="linearmodels 4.30" data-md-component="logo">
+    <a href="../../../index.html" title="linearmodels 4.31" class="md-header__button md-logo" aria-label="linearmodels 4.31" data-md-component="logo">
       <img src="../../../_static/bw-logo.svg" alt="logo">
     </a>
     <label class="md-header__button md-icon" for="__drawer">
@@ -98,7 +98,7 @@
       <div class="md-header__ellipsis">
         <div class="md-header__topic">
           <span class="md-ellipsis">
-            linearmodels 4.30
+            linearmodels 4.31
           </span>
         </div>
         <div class="md-header__topic" data-md-component="header-topic">
@@ -185,10 +185,10 @@
 
 <nav class="md-nav md-nav--primary" aria-label="Navigation" data-md-level="0">
   <label class="md-nav__title" for="__drawer">
-    <a href="../../../index.html" title="linearmodels 4.30" class="md-nav__button md-logo" aria-label="linearmodels 4.30" data-md-component="logo">
+    <a href="../../../index.html" title="linearmodels 4.31" class="md-nav__button md-logo" aria-label="linearmodels 4.31" data-md-component="logo">
       <img src="../../../_static/bw-logo.svg" alt="logo">
     </a>
-    linearmodels 4.30
+    linearmodels 4.31
   </label>
   
     <div class="md-nav__source">
@@ -571,7 +571,7 @@
     <span class="k">for</span> <span class="n">c</span> <span class="ow">in</span> <span class="n">cats</span><span class="p">:</span>
         <span class="c1"># TODO: Bug in pandas-stubs</span>
         <span class="c1">#  https://github.com/pandas-dev/pandas-stubs/issues/97</span>
-        <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">cats</span><span class="p">[</span><span class="n">c</span><span class="p">]</span><span class="o">.</span><span class="n">dtype</span><span class="p">,</span> <span class="n">CategoricalDtype</span><span class="p">):</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">cats</span><span class="p">[</span><span class="n">c</span><span class="p">]</span><span class="o">.</span><span class="n">dtype</span><span class="p">,</span> <span class="n">CategoricalDtype</span><span class="p">):</span>  <span class="c1"># type: ignore</span>
             <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="s2">&quot;cats must contain only categorical variables&quot;</span><span class="p">)</span>
         <span class="c1"># TODO: Bug in pandas-stubs</span>
         <span class="c1">#  https://github.com/pandas-dev/pandas-stubs/issues/97</span>
@@ -1389,7 +1389,7 @@
 <span class="sd">            and retrieved if available. Cache can dramatically speed up</span>
 <span class="sd">            re-fitting large models when the set of absorbed variables and</span>
 <span class="sd">            interactions are identical.</span>
-<span class="sd">        lsmr_options: dict</span>
+<span class="sd">        lsmr_options : dict</span>
 <span class="sd">            Options to ass to scipy.sparse.linalg.lsmr.</span>
 
 <span class="sd">            .. deprecated:: 4.17</span>
@@ -1416,8 +1416,8 @@
 <span class="sd">        is provided.</span>
 
 <span class="sd">        If use_cache is True, then variables are hashed based on their</span>
-<span class="sd">        contents using either a 64 bit value (if xxhash is installed) or</span>
-<span class="sd">        a 256 bit value. This allows variables to be reused in different</span>
+<span class="sd">        contents using either a 64-bit value (if xxhash is installed) or</span>
+<span class="sd">        a 256-bit value. This allows variables to be reused in different</span>
 <span class="sd">        models if the set of absorbing variables and interactions is held</span>
 <span class="sd">        constant.</span>
 

@@ -1,6 +1,41 @@
 Change Log
 ==========
 
+Future Version 5.0
+------------------
+.. warning:: **Not released**
+
+   The next version of linearmodels will be 5.0 and will change the default sorting order
+   for models created using formulas. You can use the new behavior by adding
+   ``from linearmodels.__future__ import ordering`` to your code.  This
+   version will increase the minimum version of formulaic to 0.6.0.
+
+* Switched variable ordering by default.  Importing ``linearmodels.__future__.ordering``
+  is a no-op, and has no effect.
+
+
+
+Version 4.31
+------------
+* Updated formulaic support of 0.6.0 and added optional support for `not` sorting
+  variables from formulas.  The default will continue to sort variables. You can
+  enable the future behavior now using
+
+.. code-block:: python
+
+   from linearmodels.__future__ import ordering
+
+* The key difference between the old and the new behavior is that the old would
+  reorder the variables in a formula so that ``y ~ 1 + x + z + w`` would return
+  parameter estimates in the order ``1``, ``w``, ``x``, ``z`` due to sorting. The new
+  behavior will default to not sorting so that when using ``y ~ 1 + x + z + w``
+  will return parameter estimates in the order ``1``, ``x``, ``z``, ``w``.
+
+Version 4.30
+------------
+* Improved compatability with unreleased versions of NumPy and pandas.
+
+
 Version 4.29
 ------------
 * Added average :math:`R^2` and average adjusted :math:`R^2` properties to
