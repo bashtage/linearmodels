@@ -1,8 +1,3 @@
-span.versionmodified.deprecated {
-  color: #c00;
-  font-weight: bold;
-}
-
 span.classifier:before {
     font-style: normal;
     margin: 0 0.5em;
@@ -10,44 +5,22 @@ span.classifier:before {
     display: inline-block;
 }
 
-div.deprecated, div.versionadded, div.versionchanged {
-    background-color: #FFFFFF;
-    border: .05rem solid;
-    border-color: #459db9;
-    border-radius: .2rem;
-    /* box-shadow: 0 .2rem .5rem #d8d8d8,0 0 .0625rem #d8d8d8!important; */
-    margin: 1.5625em auto;
-    overflow: hidden;
-    padding: 0 .6rem;
-    page-break-inside: avoid;
-    position: relative;
-    transition: color .25s,background-color .25s,border-color .25s;
-    vertical-align: middle;
-    font-size: 0.64rem;
-}
-div.deprecated>p, div.versionadded>p, div.versionchanged>p {
-    margin-bottom: .6rem;
-    margin-top: .6rem;
+span.versionmodified.deprecated, span.versionmodified.changed, span.versionmodified.added {
+   font-weight: bold;
 }
 
-div.deprecated {
-    border-color: #dc3545;
-    background-color: rgba(255, 0, 0, 0.1);
+span.versionmodified.deprecated {
+  color: rgb(203,70,83);
 }
 
-span.versionmodified {
-    font-weight: 600;
+span.versionmodified.changed {
+  color: rgb(238,144,64);
 }
 
-.versionmodified {
-    font-style: italic;
+span.versionmodified.added {
+  color: rgb(72,138,87);
 }
 
-div.deprecated p:before {
-    background-color: #dc3545;
+div.versionadded p.admonition-title, div.deprecated.admonition p.admonition-title, div.versionchanged p.admonition-title {
+    font-weight: normal !important;
 }
-
-span.versionmodified.deprecated:before {
-    color: #dc3545;
-}
-
