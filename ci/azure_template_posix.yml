@@ -23,7 +23,7 @@ jobs:
         PANDAS: 1.0.0
         STATSMODELS: 0.11.0
         XARRAY: 0.15.1
-        FORMULAIC: 0.3.2
+        FORMULAIC: 0.3.4
         test.install: true
       python39_mid:
         python.version: '3.9'
@@ -42,6 +42,7 @@ jobs:
         PANDAS: 1.2.0
         STATSMODELS: 0.12.0
         XARRAY: 0.17.0
+        FORMULAIC: 0.5.2
         test.install: true
       python310_no_cython:
         python.version: '3.10'

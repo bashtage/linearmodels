@@ -62,7 +62,7 @@ def config(request):
     return fmla, model, interface
 
 
-def test_fromula(config):
+def test_formula(config):
     fmla, model, interface = config
     for key in fmla:
         if "[" in fmla[key] and model not in (IVSystemGMM, IV3SLS):
@@ -140,17 +140,18 @@ def test_invalid_predict(config):
 
 def test_parser(config):
     fmla, model, interface = config
-    parser = SystemFormulaParser(fmla, joined, eval_env=5)
+    parser = SystemFormulaParser(fmla, joined, eval_env=1)
     orig_data = parser.data
     assert isinstance(orig_data, dict)
-    assert parser.eval_env == 5
+    assert parser.eval_env == 1
 
-    parser.eval_env = 4
-    assert parser.eval_env == 4
-    exog = parser.exog
-    dep = parser.dependent
-    endog = parser.endog
-    instr = parser.instruments
+    alt_parser = SystemFormulaParser(fmla, joined, eval_env=0)
+    alt_parser.eval_env = 1
+    assert alt_parser.eval_env == 1
+    exog = alt_parser.exog
+    dep = alt_parser.dependent
+    endog = alt_parser.endog
+    instr = alt_parser.instruments
     for key in orig_data:
         eq = orig_data[key]
         if exog[key] is None:
@@ -170,7 +171,7 @@ def test_parser(config):
     labels = parser.equation_labels
     for label in labels:
         assert label in orig_data
-    new_parser = SystemFormulaParser(parser.formula, joined, eval_env=5)
+    new_parser = SystemFormulaParser(parser.formula, joined, eval_env=1)
 
     new_data = new_parser.data
     for key in orig_data:

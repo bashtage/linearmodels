@@ -15,9 +15,10 @@ from __future__ import annotations
 
 from functools import reduce
 import textwrap
-from typing import Literal, Mapping, Sequence, cast
+from typing import Any, Literal, Mapping, Sequence, cast
 import warnings
 
+from formulaic.utils.context import capture_context
 import numpy as np
 from numpy.linalg import inv, lstsq, matrix_rank, solve
 from pandas import DataFrame, Index, Series, concat
@@ -148,7 +149,8 @@ class SystemFormulaParser:
         formula: Mapping[str, str] | str,
         data: DataFrame,
         weights: Mapping[str, ArrayLike] | None = None,
-        eval_env: int = 6,
+        eval_env: int = 2,
+        context: Mapping[str, Any] | None = None,
     ) -> None:
         if not isinstance(formula, (Mapping, str)):
             raise TypeError("formula must be a string or dictionary-like")
@@ -159,6 +161,10 @@ class SystemFormulaParser:
         self._weight_dict: dict[str, Series | None] = {}
         self._eval_env = eval_env
         self._clean_formula: dict[str, str] = {}
+        if context is None:
+            self._context = capture_context(eval_env)
+        else:
+            self._context = context
         self._parse()
 
     @staticmethod
@@ -194,7 +200,7 @@ class SystemFormulaParser:
             for formula_key in formula:
                 f = formula[formula_key]
                 f = self._prevent_autoconst(f)
-                parsers[formula_key] = IVFormulaParser(f, data, eval_env=self._eval_env)
+                parsers[formula_key] = IVFormulaParser(f, data, context=self._context)
 
                 if weights is not None:
                     if formula_key in weights:
@@ -226,7 +232,7 @@ class SystemFormulaParser:
                     key = base_key + f".{count}"
                     count += 1
                 assert isinstance(key, str)
-                parsers[key] = IVFormulaParser(f, data, eval_env=self._eval_env)
+                parsers[key] = IVFormulaParser(f, data, context=self._context)
                 cln_formula[key] = f
                 if weights is not None:
                     if key in weights:
@@ -253,13 +259,14 @@ class SystemFormulaParser:
     @eval_env.setter
     def eval_env(self, value: int) -> None:
         self._eval_env = value
+        self._context = capture_context(self._eval_env)
         # Update parsers for new level
         parsers = self._parsers
         new_parsers = {}
         for key in parsers:
             parser = parsers[key]
             new_parsers[key] = IVFormulaParser(
-                parser._formula, parser._data, self._eval_env
+                parser._formula, parser._data, context=self._context
             )
         self._parsers = new_parsers
 
@@ -569,7 +576,7 @@ class _SystemModelBase:
         *,
         equations: Mapping[str, Mapping[str, ArrayLike]] | None = None,
         data: DataFrame | None = None,
-        eval_env: int = 8,
+        eval_env: int = 1,
     ) -> DataFrame:
         """
         Predict values for additional data
@@ -614,7 +621,9 @@ class _SystemModelBase:
 
         if data is not None:
             assert self.formula is not None
-            parser = SystemFormulaParser(self.formula, data=data, eval_env=eval_env)
+            parser = SystemFormulaParser(
+                self.formula, data=data, context=capture_context(eval_env)
+            )
             equations_d = parser.data
         else:
             if equations is None:
@@ -1539,7 +1548,8 @@ class IV3SLS(_LSSystemModelBase):
         >>> formula = "{eq1: y1 ~ 1 + x1_1 + [x1_2 ~ z1]} {eq2: y2 ~ 1 + x2_1 + [x2_2 ~ z2]}"
         >>> mod = IV3SLS.from_formula(formula, data)
         """
-        parser = SystemFormulaParser(formula, data, weights)
+        context = capture_context(1)
+        parser = SystemFormulaParser(formula, data, weights, context=context)
         eqns = parser.data
         mod = cls(eqns, sigma=sigma)
         mod.formula = formula
@@ -1756,7 +1766,8 @@ class SUR(_LSSystemModelBase):
         >>> formula = "{eq1: y1 ~ 1 + x1_1} {eq2: y2 ~ 1 + x2_1}"
         >>> mod = SUR.from_formula(formula, data)
         """
-        parser = SystemFormulaParser(formula, data, weights)
+        context = capture_context(1)
+        parser = SystemFormulaParser(formula, data, weights, context=context)
         eqns = parser.data
         mod = cls(eqns, sigma=sigma)
         mod.formula = formula
@@ -2154,7 +2165,8 @@ class IVSystemGMM(_SystemModelBase):
         >>> formula = "{eq1: y1 ~ 1 + x1_1 + [x1_2 ~ z1]} {eq2: y2 ~ 1 + x2_1 + [x2_2 ~ z2]}"
         >>> mod = IVSystemGMM.from_formula(formula, data)
         """
-        parser = SystemFormulaParser(formula, data, weights)
+        context = capture_context(1)
+        parser = SystemFormulaParser(formula, data, weights, context=context)
         eqns = parser.data
         mod = cls(eqns, sigma=None, weight_type=weight_type, **weight_config)
         mod.formula = formula

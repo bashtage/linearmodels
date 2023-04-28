@@ -1,4 +1,11 @@
+from linearmodels.compat.formulaic import (
+    FORMULAIC_GTE_0_6,
+    FUTURE_ORDERING,
+    future_ordering,
+)
+
 import pickle
+import sys
 
 from formulaic.errors import FormulaSyntaxError
 import numpy as np
@@ -206,6 +213,9 @@ def test_predict_formula(data, model_and_func, formula):
     assert_frame_equal(pred, pred2)
     assert_allclose(res.fitted_values, pred)
 
+    with pytest.raises(ValueError, match="exog and endog or data must be provided"):
+        mod.predict(res.params)
+
 
 def test_formula_function(data, model_and_func):
     model, func = model_and_func
@@ -364,3 +374,57 @@ def test_formula_escape():
     assert "x 1" in res.params.index
     assert "y space" in str(summ)
     assert "Instruments: z 0" in str(summ)
+
+
+@pytest.mark.skipif(
+    FORMULAIC_GTE_0_6, reason="Can only test warning on legacy formulaic"
+)
+def test_future_ordering_warning():
+    from linearmodels.__future__ import ordering  # noqa: F401
+
+    with pytest.warns(RuntimeWarning, match="Importing ordering from"):
+        fo = future_ordering()
+    assert not fo
+    assert not FUTURE_ORDERING["enabled"]
+    del sys.modules["linearmodels.__future__.ordering"]
+
+
+@pytest.mark.skipif(not FORMULAIC_GTE_0_6, reason="formulaic 0.6.0 or greater required")
+def test_future_ordering():
+    from linearmodels.__future__ import ordering  # noqa: F401
+
+    assert future_ordering()
+    assert FUTURE_ORDERING["enabled"]
+
+    df = pd.DataFrame(
+        np.random.standard_normal((1000, 4)), columns=["w", "x", "y", "z"]
+    )
+
+    mod = IV2SLS.from_formula("y ~ 1 + w + x + z", df)
+    res = mod.fit()
+
+    mod2 = IV2SLS.from_formula("y ~ 1 + z + x + w", df)
+    res2 = mod2.fit()
+    assert set(res.params.index) == set(res2.params.index)
+    assert list(res.params.index) != list(res2.params.index)
+
+    del sys.modules["linearmodels.__future__.ordering"]
+    assert future_ordering()
+    assert FUTURE_ORDERING["enabled"]
+
+    FUTURE_ORDERING["enabled"] = False
+    assert not future_ordering()
+    assert not FUTURE_ORDERING["enabled"]
+
+    df = pd.DataFrame(
+        np.random.standard_normal((1000, 4)), columns=["w", "x", "y", "z"]
+    )
+
+    mod3 = IV2SLS.from_formula("y ~ 1 + w + x + z", df)
+    res3 = mod3.fit()
+
+    mod4 = IV2SLS.from_formula("y ~ 1 + z + x + w", df)
+    res4 = mod4.fit()
+
+    assert set(res3.params.index) == set(res4.params.index)
+    assert list(res3.params.index) == list(res4.params.index)

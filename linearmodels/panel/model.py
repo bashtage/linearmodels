@@ -1,10 +1,13 @@
 from __future__ import annotations
 
-from typing import Mapping, NamedTuple, Type, Union, cast
+from linearmodels.compat.formulaic import FORMULAIC_GTE_0_6, future_ordering
 
-from formulaic import model_matrix
+from typing import Any, Mapping, NamedTuple, Type, Union, cast
+
+from formulaic.formula import Formula
 from formulaic.model_spec import NAAction
 from formulaic.parser.algos.tokenize import tokenize
+from formulaic.utils.context import capture_context
 import numpy as np
 from pandas import Categorical, DataFrame, Index, MultiIndex, Series, get_dummies
 from scipy.linalg import lstsq as sp_lstsq
@@ -141,12 +144,26 @@ class PanelFormulaParser:
     The general structure of a formula is `dep ~ exog`
     """
 
-    def __init__(self, formula: str, data: PanelDataLike, context: int = 2) -> None:
+    def __init__(
+        self,
+        formula: str,
+        data: PanelDataLike,
+        eval_env: int = 2,
+        context: Mapping[str, Any] | None = None,
+    ) -> None:
         self._formula = formula
         self._data = PanelData(data, convert_dummies=False, copy=False)
         self._na_action = NAAction("ignore")
-        self._context = context
+        self._eval_env = eval_env
+        if not context:
+            self._context = capture_context(eval_env)
+        else:
+            self._context = context
         self._dependent = self._exog = None
+        if FORMULAIC_GTE_0_6 and not future_ordering():
+            self._formulaic_kwargs = dict(_ordering="sort")
+        else:
+            self._formulaic_kwargs = {}
         self._parse()
 
     def _parse(self) -> None:
@@ -184,28 +201,36 @@ class PanelFormulaParser:
         return self._time_effect
 
     @property
-    def context(self) -> int:
+    def eval_env(self) -> int:
         """Set or get the eval env depth"""
+        return self._eval_env
+
+    @eval_env.setter
+    def eval_env(self, value: int) -> None:
+        self._context = capture_context(value)
+        self._eval_env = value
+
+    @property
+    def context(self) -> Mapping[str, Any]:
+        """Get the context used in the parser"""
         return self._context
 
     @context.setter
-    def context(self, value: int) -> None:
+    def context(self, value: Mapping[str, Any]) -> None:
+        """Get the context used in the parser"""
         self._context = value
 
     @property
     def data(self) -> tuple[DataFrame, DataFrame]:
         """Returns a tuple containing the dependent, exog, endog"""
-        self._context += 1
         out = self.dependent, self.exog
-        self._context -= 1
         return out
 
     @property
     def dependent(self) -> DataFrame:
         """DataFrame containing the dependent variable"""
         return DataFrame(
-            model_matrix(
-                self._lhs,
+            Formula(self._lhs, **self._formulaic_kwargs).get_model_matrix(
                 self._data.dataframe,
                 context=self._context,
                 na_action=self._na_action,
@@ -216,8 +241,7 @@ class PanelFormulaParser:
     def exog(self) -> DataFrame:
         """DataFrame containing the exogenous variables"""
         return DataFrame(
-            model_matrix(
-                self._rhs,
+            Formula(self._rhs, **self._formulaic_kwargs).get_model_matrix(
                 self._data.dataframe,
                 context=self._context,
                 na_action=self._na_action,
@@ -753,7 +777,8 @@ class _PanelModelBase:
         *,
         exog: PanelDataLike | None = None,
         data: PanelDataLike | None = None,
-        context: int = 4,
+        eval_env: int = 1,
+        context: Mapping[str, Any] | None = None,
     ) -> DataFrame:
         """
         Predict values for additional data
@@ -798,6 +823,8 @@ class _PanelModelBase:
         else:
             assert self._formula is not None
             assert data is not None
+            if context is None:
+                context = capture_context(eval_env)
             parser = PanelFormulaParser(self._formula, data, context=context)
             exog = parser.exog
         x = exog.values
@@ -906,7 +933,7 @@ class PooledOLS(_PanelModelBase):
         >>> mod = PooledOLS.from_formula("y ~ 1 + x1", panel_data.data)
         >>> res = mod.fit()
         """
-        parser = PanelFormulaParser(formula, data)
+        parser = PanelFormulaParser(formula, data, context=capture_context(1))
         dependent, exog = parser.data
         mod = cls(dependent, exog, weights=weights, check_rank=check_rank)
         mod.formula = formula
@@ -1042,7 +1069,8 @@ class PooledOLS(_PanelModelBase):
         *,
         exog: PanelDataLike | None = None,
         data: PanelDataLike | None = None,
-        context: int = 4,
+        eval_env: int = 1,
+        context: Mapping[str, Any] | None = None,
     ) -> DataFrame:
         """
         Predict values for additional data
@@ -1087,6 +1115,8 @@ class PooledOLS(_PanelModelBase):
         else:
             assert self._formula is not None
             assert data is not None
+            if context is None:
+                context = capture_context(eval_env)
             parser = PanelFormulaParser(self._formula, data, context=context)
             exog = parser.exog
         x = exog.values
@@ -1383,7 +1413,7 @@ class PanelOLS(_PanelModelBase):
         >>> mod = PanelOLS.from_formula("y ~ 1 + x1 + EntityEffects", panel_data.data)
         >>> res = mod.fit(cov_type="clustered", cluster_entity=True)
         """
-        parser = PanelFormulaParser(formula, data)
+        parser = PanelFormulaParser(formula, data, context=capture_context(1))
         entity_effect = parser.entity_effect
         time_effect = parser.time_effect
         dependent, exog = parser.data
@@ -2239,7 +2269,7 @@ class BetweenOLS(_PanelModelBase):
         >>> mod = BetweenOLS.from_formula("y ~ 1 + x1", panel_data.data)
         >>> res = mod.fit()
         """
-        parser = PanelFormulaParser(formula, data)
+        parser = PanelFormulaParser(formula, data, context=capture_context(1))
         dependent, exog = parser.data
         mod = cls(dependent, exog, weights=weights, check_rank=check_rank)
         mod.formula = formula
@@ -2541,7 +2571,7 @@ class FirstDifferenceOLS(_PanelModelBase):
         >>> mod = FirstDifferenceOLS.from_formula("y ~ x1", panel_data.data)
         >>> res = mod.fit()
         """
-        parser = PanelFormulaParser(formula, data)
+        parser = PanelFormulaParser(formula, data, context=capture_context(1))
         dependent, exog = parser.data
         mod = cls(dependent, exog, weights=weights, check_rank=check_rank)
         mod.formula = formula
@@ -2635,7 +2665,7 @@ class RandomEffects(_PanelModelBase):
         >>> mod = RandomEffects.from_formula("y ~ 1 + x1", panel_data.data)
         >>> res = mod.fit()
         """
-        parser = PanelFormulaParser(formula, data)
+        parser = PanelFormulaParser(formula, data, context=capture_context(1))
         dependent, exog = parser.data
         mod = cls(dependent, exog, weights=weights, check_rank=check_rank)
         mod.formula = formula
@@ -3137,7 +3167,7 @@ class FamaMacBeth(_PanelModelBase):
         >>> mod = FamaMacBeth.from_formula("y ~ 1 + x1", panel_data.data)
         >>> res = mod.fit()
         """
-        parser = PanelFormulaParser(formula, data)
+        parser = PanelFormulaParser(formula, data, context=capture_context(1))
         dependent, exog = parser.data
         mod = cls(dependent, exog, weights=weights, check_rank=check_rank)
         mod.formula = formula

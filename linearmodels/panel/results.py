@@ -3,8 +3,9 @@ from __future__ import annotations
 from linearmodels.compat.statsmodels import Summary
 
 import datetime as dt
-from typing import Union
+from typing import Any, Mapping, Union
 
+from formulaic.utils.context import capture_context
 import numpy as np
 from pandas import DataFrame, Series, concat
 from property_cached import cached_property
@@ -472,7 +473,11 @@ class PanelResults(_SummaryStr):
         return Series(self._resids.squeeze(), index=self._index, name="residual")
 
     def _out_of_sample(
-        self, exog: ArrayLike | None, data: DataFrame | None, missing: bool
+        self,
+        exog: ArrayLike | None,
+        data: DataFrame | None,
+        missing: bool,
+        context: Mapping[str, Any] | None = None,
     ) -> DataFrame:
         """Interface between model predict and predict for OOS fits"""
         if exog is not None and data is not None:
@@ -480,7 +485,7 @@ class PanelResults(_SummaryStr):
                 "Predictions can only be constructed using one "
                 "of exog or data, but not both."
             )
-        pred = self.model.predict(self.params, exog=exog, data=data)
+        pred = self.model.predict(self.params, exog=exog, data=data, context=context)
         if not missing:
             pred = pred.loc[pred.notnull().all(1)]
         return pred
@@ -534,7 +539,8 @@ class PanelResults(_SummaryStr):
         predictions.
         """
         if not (exog is None and data is None):
-            return self._out_of_sample(exog, data, missing)
+            context = capture_context(1)
+            return self._out_of_sample(exog, data, missing, context=context)
         out = []
         if fitted:
             out.append(self.fitted_values)

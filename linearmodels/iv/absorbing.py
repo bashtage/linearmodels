@@ -172,7 +172,7 @@ def category_product(cats: AnyPandas) -> Series:
     for c in cats:
         # TODO: Bug in pandas-stubs
         #  https://github.com/pandas-dev/pandas-stubs/issues/97
-        if not isinstance(cats[c].dtype, CategoricalDtype):
+        if not isinstance(cats[c].dtype, CategoricalDtype):  # type: ignore
             raise TypeError("cats must contain only categorical variables")
         # TODO: Bug in pandas-stubs
         #  https://github.com/pandas-dev/pandas-stubs/issues/97
