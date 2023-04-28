@@ -990,7 +990,7 @@ class AbsorbingLS:
             and retrieved if available. Cache can dramatically speed up
             re-fitting large models when the set of absorbed variables and
             interactions are identical.
-        lsmr_options: dict
+        lsmr_options : dict
             Options to ass to scipy.sparse.linalg.lsmr.
 
             .. deprecated:: 4.17
@@ -1017,8 +1017,8 @@ class AbsorbingLS:
         is provided.
 
         If use_cache is True, then variables are hashed based on their
-        contents using either a 64 bit value (if xxhash is installed) or
-        a 256 bit value. This allows variables to be reused in different
+        contents using either a 64-bit value (if xxhash is installed) or
+        a 256-bit value. This allows variables to be reused in different
         models if the set of absorbing variables and interactions is held
         constant.
 
