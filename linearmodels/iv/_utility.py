@@ -2,11 +2,12 @@ from __future__ import annotations
 
 from linearmodels.compat.formulaic import FORMULAIC_GTE_0_6, future_ordering
 
+from typing import Any, Mapping
+
 from formulaic import model_matrix
 from formulaic.formula import Formula
 from formulaic.materializers.types import NAAction as fNAAction
 from formulaic.utils.context import capture_context
-from formulaic.utils.layered_mapping import LayeredMapping
 import numpy as np
 from pandas import DataFrame
 
@@ -88,7 +89,7 @@ class IVFormulaParser:
         formula: str,
         data: DataFrame,
         eval_env: int = 2,
-        context: LayeredMapping | None = None,
+        context: Mapping[str, Any] | None = None,
     ):
         self._formula = formula
         self._data = data
@@ -101,9 +102,8 @@ class IVFormulaParser:
         self._parse()
         if FORMULAIC_GTE_0_6 and not future_ordering():
             self._formulaic_kwargs = dict(_ordering="sort")
-            self._model_matrix_kwargs = dict(cluster_by="numerical_factors")
         else:
-            self._model_matrix_kwargs = self._formulaic_kwargs = {}
+            self._formulaic_kwargs = {}
 
     def _parse(self) -> None:
         blocks = self._formula.strip().split("~")
@@ -189,7 +189,6 @@ class IVFormulaParser:
             context=self._context,
             ensure_full_rank=True,
             na_action=fNAAction("ignore"),
-            **self._model_matrix_kwargs,
         )
         return self._empty_check(DataFrame(exog))
 
@@ -202,7 +201,6 @@ class IVFormulaParser:
             context=self._context,
             ensure_full_rank=False,
             na_action=fNAAction("raise"),
-            **self._model_matrix_kwargs,
         )
         return self._empty_check(DataFrame(endog))
 
@@ -215,7 +213,6 @@ class IVFormulaParser:
             context=self._context,
             ensure_full_rank=False,
             na_action=fNAAction("raise"),
-            **self._model_matrix_kwargs,
         )
         return self._empty_check(DataFrame(instr))
 

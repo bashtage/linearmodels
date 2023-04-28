@@ -213,6 +213,9 @@ def test_predict_formula(data, model_and_func, formula):
     assert_frame_equal(pred, pred2)
     assert_allclose(res.fitted_values, pred)
 
+    with pytest.raises(ValueError, match="exog and endog or data must be provided"):
+        mod.predict(res.params)
+
 
 def test_formula_function(data, model_and_func):
     model, func = model_and_func
@@ -371,6 +374,19 @@ def test_formula_escape():
     assert "x 1" in res.params.index
     assert "y space" in str(summ)
     assert "Instruments: z 0" in str(summ)
+
+
+@pytest.mark.skipif(
+    FORMULAIC_GTE_0_6, reason="Can only test warning on legacy formulaic"
+)
+def test_future_ordering_warning():
+    from linearmodels.__future__ import ordering  # noqa: F401
+
+    with pytest.warns(RuntimeWarning, match="Importing ordering from"):
+        fo = future_ordering()
+    assert not fo
+    assert not FUTURE_ORDERING["enabled"]
+    del sys.modules["linearmodels.__future__.ordering"]
 
 
 @pytest.mark.skipif(not FORMULAIC_GTE_0_6, reason="formulaic 0.6.0 or greater required")

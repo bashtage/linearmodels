@@ -1,8 +1,11 @@
 from itertools import product
 import pickle
 
+from formulaic.utils.context import capture_context
+from formulaic.utils.layered_mapping import LayeredMapping
 import numpy as np
 from numpy.testing import assert_allclose
+import pandas as pd
 from pandas import DataFrame, MultiIndex
 from pandas.testing import assert_frame_equal
 import pytest
@@ -132,7 +135,9 @@ def test_basic_formulas_math_op(data, models, formula):
     formula = formula.replace("x0", "np.exp(x0)")
     formula = formula.replace("x1", "sigmoid(x1)")
     model, _ = models
-    res = model.from_formula(formula, joined).fit()
+    mod = model.from_formula(formula, joined)
+    res = mod.fit()
+    mod.predict(res.params, data=joined)
     pred = res.predict(data=joined)
     pred = pred.reindex(res.fitted_values.index)
     assert_allclose(pred.values, res.fitted_values.values)
@@ -276,6 +281,30 @@ def test_parser(data, formula, effects):
     else:
         parser = PanelFormulaParser(formula, joined)
         assert parser.entity_effect
+
+
+def test_parser_context_eval_env(data):
+    joined = data.x
+    if isinstance(data.x, np.ndarray):
+        pytest.skip("Cannot test with numpy arrays")
+
+    joined["y"] = data.y
+    context = capture_context(0)
+    parser = PanelFormulaParser("y ~ x1 + np.exp(x2)", joined, eval_env=1)
+    assert parser.eval_env == 1
+    assert isinstance(parser.exog, pd.DataFrame)
+    ctx = parser.context
+    assert isinstance(ctx, LayeredMapping)
+    parser.context = context
+    assert parser.context is context
+
+    parser = PanelFormulaParser("y ~ x1 + np.exp(x2)", joined, context=context)
+    assert isinstance(parser.exog, pd.DataFrame)
+    assert parser.context is context
+    assert parser.eval_env == 2
+    parser.eval_env = 1
+    assert parser.eval_env == 1
+    assert isinstance(parser.exog, pd.DataFrame)
 
 
 def test_formulas_rank_check(data, models, formula):

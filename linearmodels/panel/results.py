@@ -3,10 +3,9 @@ from __future__ import annotations
 from linearmodels.compat.statsmodels import Summary
 
 import datetime as dt
-from typing import Union
+from typing import Any, Mapping, Union
 
 from formulaic.utils.context import capture_context
-from formulaic.utils.layered_mapping import LayeredMapping
 import numpy as np
 from pandas import DataFrame, Series, concat
 from property_cached import cached_property
@@ -478,7 +477,7 @@ class PanelResults(_SummaryStr):
         exog: ArrayLike | None,
         data: DataFrame | None,
         missing: bool,
-        context: LayeredMapping | None = None,
+        context: Mapping[str, Any] | None = None,
     ) -> DataFrame:
         """Interface between model predict and predict for OOS fits"""
         if exog is not None and data is not None:

@@ -15,11 +15,10 @@ from __future__ import annotations
 
 from functools import reduce
 import textwrap
-from typing import Literal, Mapping, Sequence, cast
+from typing import Any, Literal, Mapping, Sequence, cast
 import warnings
 
 from formulaic.utils.context import capture_context
-from formulaic.utils.layered_mapping import LayeredMapping
 import numpy as np
 from numpy.linalg import inv, lstsq, matrix_rank, solve
 from pandas import DataFrame, Index, Series, concat
@@ -151,7 +150,7 @@ class SystemFormulaParser:
         data: DataFrame,
         weights: Mapping[str, ArrayLike] | None = None,
         eval_env: int = 2,
-        context: LayeredMapping | None = None,
+        context: Mapping[str, Any] | None = None,
     ) -> None:
         if not isinstance(formula, (Mapping, str)):
             raise TypeError("formula must be a string or dictionary-like")

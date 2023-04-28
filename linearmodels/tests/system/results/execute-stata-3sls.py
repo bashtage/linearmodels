@@ -12,7 +12,7 @@ from linearmodels.tests.system._utility import generate_simultaneous_data
 
 data = generate_simultaneous_data()
 all_cols: List[str] = []
-out = []
+out: list[pd.Series] = []
 for key in data:
     eqn = data[key]
     for key in ("exog", "endog"):
@@ -23,7 +23,7 @@ for key in data:
             else:
                 out.append(vals[col])
                 all_cols.append(col)
-out_df = pd.concat(out, 1, sort=False)
+out_df = pd.concat(out, axis=1, sort=False)
 if "const" in out_df:
     out_df.pop("const")
 out_df.to_stata("simulated-3sls.dta", write_index=False)

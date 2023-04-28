@@ -2,13 +2,12 @@ from __future__ import annotations
 
 from linearmodels.compat.formulaic import FORMULAIC_GTE_0_6, future_ordering
 
-from typing import Mapping, NamedTuple, Type, Union, cast
+from typing import Any, Mapping, NamedTuple, Type, Union, cast
 
 from formulaic.formula import Formula
 from formulaic.model_spec import NAAction
 from formulaic.parser.algos.tokenize import tokenize
 from formulaic.utils.context import capture_context
-from formulaic.utils.layered_mapping import LayeredMapping
 import numpy as np
 from pandas import Categorical, DataFrame, Index, MultiIndex, Series, get_dummies
 from scipy.linalg import lstsq as sp_lstsq
@@ -150,7 +149,7 @@ class PanelFormulaParser:
         formula: str,
         data: PanelDataLike,
         eval_env: int = 2,
-        context: LayeredMapping | None = None,
+        context: Mapping[str, Any] | None = None,
     ) -> None:
         self._formula = formula
         self._data = PanelData(data, convert_dummies=False, copy=False)
@@ -163,10 +162,8 @@ class PanelFormulaParser:
         self._dependent = self._exog = None
         if FORMULAIC_GTE_0_6 and not future_ordering():
             self._formulaic_kwargs = dict(_ordering="sort")
-            self._model_matrix_kwargs = dict(cluster_by="numerical_factors")
         else:
-            self._model_matrix_kwargs = self._formulaic_kwargs = {}
-
+            self._formulaic_kwargs = {}
         self._parse()
 
     def _parse(self) -> None:
@@ -214,12 +211,12 @@ class PanelFormulaParser:
         self._eval_env = value
 
     @property
-    def context(self):
+    def context(self) -> Mapping[str, Any]:
         """Get the context used in the parser"""
         return self._context
 
     @context.setter
-    def context(self, value) -> None:
+    def context(self, value: Mapping[str, Any]) -> None:
         """Get the context used in the parser"""
         self._context = value
 
@@ -237,7 +234,6 @@ class PanelFormulaParser:
                 self._data.dataframe,
                 context=self._context,
                 na_action=self._na_action,
-                **self._model_matrix_kwargs,
             )
         )
 
@@ -249,7 +245,6 @@ class PanelFormulaParser:
                 self._data.dataframe,
                 context=self._context,
                 na_action=self._na_action,
-                **self._model_matrix_kwargs,
             )
         )
 
@@ -782,8 +777,8 @@ class _PanelModelBase:
         *,
         exog: PanelDataLike | None = None,
         data: PanelDataLike | None = None,
-        eval_env: int = 4,
-        context: LayeredMapping | None = None,
+        eval_env: int = 1,
+        context: Mapping[str, Any] | None = None,
     ) -> DataFrame:
         """
         Predict values for additional data
@@ -828,8 +823,8 @@ class _PanelModelBase:
         else:
             assert self._formula is not None
             assert data is not None
-            if not context:
-                self._context = capture_context(eval_env)
+            if context is None:
+                context = capture_context(eval_env)
             parser = PanelFormulaParser(self._formula, data, context=context)
             exog = parser.exog
         x = exog.values
@@ -1074,8 +1069,8 @@ class PooledOLS(_PanelModelBase):
         *,
         exog: PanelDataLike | None = None,
         data: PanelDataLike | None = None,
-        eval_env: int = 4,
-        context: LayeredMapping | None = None,
+        eval_env: int = 1,
+        context: Mapping[str, Any] | None = None,
     ) -> DataFrame:
         """
         Predict values for additional data
