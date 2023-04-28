@@ -159,7 +159,7 @@ html_theme_options = {
             "aliases": [],
         },
         {
-            "version": "https://bashtage.github.io/linearmodels/devel/",
+            "version": "https://bashtage.github.io/linearmodels/devel",
             "title": "Development",
             "aliases": [],
         },
