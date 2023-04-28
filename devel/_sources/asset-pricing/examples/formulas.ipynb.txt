@@ -2,11 +2,7 @@
  "cells": [
   {
    "cell_type": "markdown",
-   "metadata": {
-    "pycharm": {
-     "name": "#%% md\n"
-    }
-   },
+   "metadata": {},
    "source": [
     "# Using Formulas\n",
     "\n",
@@ -36,11 +32,7 @@
   },
   {
    "cell_type": "markdown",
-   "metadata": {
-    "pycharm": {
-     "name": "#%% md\n"
-    }
-   },
+   "metadata": {},
    "source": [
     "## Import data and transform to be excess returns\n",
     "\n",
@@ -50,13 +42,12 @@
   {
    "cell_type": "code",
    "execution_count": null,
-   "metadata": {
-    "pycharm": {
-     "name": "#%%\n"
-    }
-   },
+   "metadata": {},
    "outputs": [],
    "source": [
+    "# Import ordering to get the future behavior\n",
+    "from linearmodels.__future__ import ordering\n",
+    "\n",
     "from linearmodels.datasets import french\n",
     "\n",
     "data = french.load()\n",
@@ -66,11 +57,7 @@
   },
   {
    "cell_type": "markdown",
-   "metadata": {
-    "pycharm": {
-     "name": "#%% md\n"
-    }
-   },
+   "metadata": {},
    "source": [
     "## First Syntax\n",
     "\n",
@@ -80,11 +67,7 @@
   {
    "cell_type": "code",
    "execution_count": null,
-   "metadata": {
-    "pycharm": {
-     "name": "#%%\n"
-    }
-   },
+   "metadata": {},
    "outputs": [],
    "source": [
     "from linearmodels.asset_pricing import LinearFactorModel, TradedFactorModel\n",
@@ -97,11 +80,7 @@
   },
   {
    "cell_type": "markdown",
-   "metadata": {
-    "pycharm": {
-     "name": "#%% md\n"
-    }
-   },
+   "metadata": {},
    "source": [
     "## Second Syntax\n",
     "\n",
@@ -111,11 +90,7 @@
   {
    "cell_type": "code",
    "execution_count": null,
-   "metadata": {
-    "pycharm": {
-     "name": "#%%\n"
-    }
-   },
+   "metadata": {},
    "outputs": [],
    "source": [
     "ports = [\"S{0}V{1}\".format(i, j) for i in (1, 3, 5) for j in (1, 3, 5)]\n",
@@ -131,11 +106,7 @@
   },
   {
    "cell_type": "markdown",
-   "metadata": {
-    "pycharm": {
-     "name": "#%% md\n"
-    }
-   },
+   "metadata": {},
    "source": [
     "## Comparing results\n",
     "\n",
@@ -145,11 +116,7 @@
   {
    "cell_type": "code",
    "execution_count": null,
-   "metadata": {
-    "pycharm": {
-     "name": "#%%\n"
-    }
-   },
+   "metadata": {},
    "outputs": [],
    "source": [
     "portfolios = data[ports]\n",

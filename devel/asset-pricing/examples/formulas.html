@@ -15,7 +15,7 @@
     
   
       
-        <title>Using Formulas - linearmodels v4.31 (+2)</title>
+        <title>Using Formulas - linearmodels v4.31 (+5)</title>
       
     
 
@@ -94,7 +94,7 @@
 
 <header class="md-header" data-md-component="header">
   <nav class="md-header__inner md-grid" aria-label="Header">
-    <a href="../../index.html" title="linearmodels v4.31 (+2)" class="md-header__button md-logo" aria-label="linearmodels v4.31 (+2)" data-md-component="logo">
+    <a href="../../index.html" title="linearmodels v4.31 (+5)" class="md-header__button md-logo" aria-label="linearmodels v4.31 (+5)" data-md-component="logo">
       <img src="../../_static/bw-logo.svg" alt="logo">
     </a>
     <label class="md-header__button md-icon" for="__drawer">
@@ -104,7 +104,7 @@
       <div class="md-header__ellipsis">
         <div class="md-header__topic">
           <span class="md-ellipsis">
-            linearmodels v4.31 (+2)
+            linearmodels v4.31 (+5)
           </span>
         </div>
         <div class="md-header__topic" data-md-component="header-topic">
@@ -191,10 +191,10 @@
 
 <nav class="md-nav md-nav--primary" aria-label="Navigation" data-md-level="0">
   <label class="md-nav__title" for="__drawer">
-    <a href="../../index.html" title="linearmodels v4.31 (+2)" class="md-nav__button md-logo" aria-label="linearmodels v4.31 (+2)" data-md-component="logo">
+    <a href="../../index.html" title="linearmodels v4.31 (+5)" class="md-nav__button md-logo" aria-label="linearmodels v4.31 (+5)" data-md-component="logo">
       <img src="../../_static/bw-logo.svg" alt="logo">
     </a>
-    linearmodels v4.31 (+2)
+    linearmodels v4.31 (+5)
   </label>
   
     <div class="md-nav__source">
@@ -675,7 +675,10 @@ LinearFactorModel.from_formula(formula, portfolios=portfolios)
 <div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span><code>[1]:
 </code></pre></div>
 </div>
-<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><code><span class="kn">from</span> <span class="nn">linearmodels.datasets</span> <span class="kn">import</span> <span class="n">french</span>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><code><span class="c1"># Import ordering to get the future behavior</span>
+<span class="kn">from</span> <span class="nn">linearmodels.__future__</span> <span class="kn">import</span> <span class="n">ordering</span>
+
+<span class="kn">from</span> <span class="nn">linearmodels.datasets</span> <span class="kn">import</span> <span class="n">french</span>
 
 <span class="n">data</span> <span class="o">=</span> <span class="n">french</span><span class="o">.</span><span class="n">load</span><span class="p">()</span>
 <span class="nb">print</span><span class="p">(</span><span class="n">french</span><span class="o">.</span><span class="n">DESCR</span><span class="p">)</span>
@@ -756,16 +759,16 @@ S5M5     Large firms, winners
 No. Test Portfolios:                  6   R-squared:                      0.7229
 No. Factors:                          3   J-statistic:                    9.9450
 No. Observations:                   819   P-value                         0.0190
-Date:                  Wed, Apr 26 2023   Distribution:                  chi2(3)
-Time:                          15:05:29
+Date:                  Fri, Apr 28 2023   Distribution:                  chi2(3)
+Time:                          09:50:59
 Cov. Estimator:                  kernel
 
                             Risk Premia Estimates
 ==============================================================================
             Parameter  Std. Err.     T-stat    P-value    Lower CI    Upper CI
 ------------------------------------------------------------------------------
-HML            0.0044     0.0016     2.6929     0.0071      0.0012      0.0075
 MktRF          0.0056     0.0016     3.4051     0.0007      0.0024      0.0088
+HML            0.0044     0.0016     2.6929     0.0071      0.0012      0.0075
 Mom            0.0081     0.0021     3.7457     0.0002      0.0038      0.0123
 ==============================================================================
 
@@ -800,10 +803,10 @@ See full_summary for complete results
                       LinearFactorModel Estimation Summary
 ================================================================================
 No. Test Portfolios:                 18   R-squared:                      0.7723
-No. Factors:                          3   J-statistic:                    86.346
+No. Factors:                          3   J-statistic:                    86.403
 No. Observations:                   819   P-value                         0.0000
-Date:                  Wed, Apr 26 2023   Distribution:                 chi2(14)
-Time:                          15:05:29
+Date:                  Fri, Apr 28 2023   Distribution:                 chi2(14)
+Time:                          09:50:59
 Cov. Estimator:                  robust
 
                             Risk Premia Estimates
@@ -811,8 +814,8 @@ Cov. Estimator:                  robust
             Parameter  Std. Err.     T-stat    P-value    Lower CI    Upper CI
 ------------------------------------------------------------------------------
 risk_free      0.0024     0.0040     0.5940     0.5525     -0.0055      0.0103
-HML            0.0042     0.0010     4.0918     0.0000      0.0022      0.0063
 MktRF          0.0050     0.0044     1.1337     0.2569     -0.0036      0.0136
+HML            0.0042     0.0010     4.0918     0.0000      0.0022      0.0063
 Mom            0.0081     0.0014     5.7058     0.0000      0.0053      0.0109
 ==============================================================================
 
@@ -844,8 +847,8 @@ See full_summary for complete results
 No. Test Portfolios:                 18   R-squared:                      0.7723
 No. Factors:                          3   J-statistic:                    86.403
 No. Observations:                   819   P-value                         0.0000
-Date:                  Wed, Apr 26 2023   Distribution:                 chi2(14)
-Time:                          15:05:29
+Date:                  Fri, Apr 28 2023   Distribution:                 chi2(14)
+Time:                          09:50:59
 Cov. Estimator:                  robust
 
                             Risk Premia Estimates
