@@ -37,7 +37,7 @@ git add ./\*.css
 git add ./\*.ipynb
 git add _sources/.
 git add _static/.
-git status --verbose
+git status
 echo "Change remote"
 git remote set-url origin https://bashtage:"${GH_PAGES_TOKEN}"@github.com/bashtage/linearmodels.git
 echo "Github Actions doc build after commit ${GITHUB_SHA::8}"
