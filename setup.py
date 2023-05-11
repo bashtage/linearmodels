@@ -44,6 +44,10 @@ for filename in glob.iglob("./examples/**", recursive=True):
     if ".png" in filename:
         additional_files.append(filename)
 
+additional_files.extend(glob.glob("./linearmodels/**/*.pyx", recursive=True))
+additional_files.extend(glob.glob("./linearmodels/**/*.pyi", recursive=True))
+additional_files.extend(glob.glob("./linearmodels/**/*.pyd", recursive=True))
+additional_files.extend(glob.glob("./linearmodels/**/*.so", recursive=True))
 
 class BinaryDistribution(Distribution):
     def is_pure(self) -> bool:

@@ -1,11 +1,11 @@
 from __future__ import annotations
 
+from functools import cached_property
 from typing import Any, Type, Union
 
 import numpy as np
 from numpy.linalg import inv
 from pandas import DataFrame, MultiIndex
-from property_cached import cached_property
 
 from linearmodels.iv.covariance import (
     CLUSTER_ERR,
