@@ -15,7 +15,7 @@
     
   
       
-        <title>linearmodels.panel.results - linearmodels v4.32 (+2)</title>
+        <title>linearmodels.panel.results - linearmodels v4.32 (+6)</title>
       
     
 
@@ -48,7 +48,7 @@
         <style>:root{--md-text-font:"Roboto";--md-code-font:"Roboto Mono"}</style>
       
     
-        <link rel="stylesheet" type="text/css" href="../../../_static/sphinx_immaterial_theme.8118e13f191069ea1.min.css" />
+        <link rel="stylesheet" type="text/css" href="../../../_static/sphinx_immaterial_theme.b223ac77c5eb52f42.min.css" />
         <link rel="stylesheet" type="text/css" href="../../../_static/css/small_fixes.css" />
     <script>__md_scope=new URL("../../..",location),__md_hash=e=>[...e].reduce((e,_)=>(e<<5)-e+_.charCodeAt(0),0),__md_get=(e,_=localStorage,t=__md_scope)=>JSON.parse(_.getItem(t.pathname+"."+e)),__md_set=(e,_,t=localStorage,a=__md_scope)=>{try{t.setItem(a.pathname+"."+e,JSON.stringify(_))}catch(e){}}</script>
     
@@ -88,7 +88,7 @@
 
 <header class="md-header" data-md-component="header">
   <nav class="md-header__inner md-grid" aria-label="Header">
-    <a href="../../../index.html" title="linearmodels v4.32 (+2)" class="md-header__button md-logo" aria-label="linearmodels v4.32 (+2)" data-md-component="logo">
+    <a href="../../../index.html" title="linearmodels v4.32 (+6)" class="md-header__button md-logo" aria-label="linearmodels v4.32 (+6)" data-md-component="logo">
       <img src="../../../_static/bw-logo.svg" alt="logo">
     </a>
     <label class="md-header__button md-icon" for="__drawer">
@@ -98,7 +98,7 @@
       <div class="md-header__ellipsis">
         <div class="md-header__topic">
           <span class="md-ellipsis">
-            linearmodels v4.32 (+2)
+            linearmodels v4.32 (+6)
           </span>
         </div>
         <div class="md-header__topic" data-md-component="header-topic">
@@ -185,10 +185,10 @@
 
 <nav class="md-nav md-nav--primary" aria-label="Navigation" data-md-level="0">
   <label class="md-nav__title" for="__drawer">
-    <a href="../../../index.html" title="linearmodels v4.32 (+2)" class="md-nav__button md-logo" aria-label="linearmodels v4.32 (+2)" data-md-component="logo">
+    <a href="../../../index.html" title="linearmodels v4.32 (+6)" class="md-nav__button md-logo" aria-label="linearmodels v4.32 (+6)" data-md-component="logo">
       <img src="../../../_static/bw-logo.svg" alt="logo">
     </a>
-    linearmodels v4.32 (+2)
+    linearmodels v4.32 (+6)
   </label>
   
     <div class="md-nav__source">
@@ -402,12 +402,12 @@
 <span class="kn">from</span> <span class="nn">linearmodels.compat.statsmodels</span> <span class="kn">import</span> <span class="n">Summary</span>
 
 <span class="kn">import</span> <span class="nn">datetime</span> <span class="k">as</span> <span class="nn">dt</span>
+<span class="kn">from</span> <span class="nn">functools</span> <span class="kn">import</span> <span class="n">cached_property</span>
 <span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">Any</span><span class="p">,</span> <span class="n">Mapping</span><span class="p">,</span> <span class="n">Union</span>
 
 <span class="kn">from</span> <span class="nn">formulaic.utils.context</span> <span class="kn">import</span> <span class="n">capture_context</span>
 <span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
 <span class="kn">from</span> <span class="nn">pandas</span> <span class="kn">import</span> <span class="n">DataFrame</span><span class="p">,</span> <span class="n">Series</span><span class="p">,</span> <span class="n">concat</span>
-<span class="kn">from</span> <span class="nn">property_cached</span> <span class="kn">import</span> <span class="n">cached_property</span>
 <span class="kn">from</span> <span class="nn">scipy</span> <span class="kn">import</span> <span class="n">stats</span>
 <span class="kn">from</span> <span class="nn">statsmodels.iolib.summary</span> <span class="kn">import</span> <span class="n">SimpleTable</span><span class="p">,</span> <span class="n">fmt_2cols</span><span class="p">,</span> <span class="n">fmt_params</span>
 
@@ -473,12 +473,12 @@
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Estimated parameters&quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="n">Series</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_params</span><span class="p">,</span> <span class="n">index</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">_var_names</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="s2">&quot;parameter&quot;</span><span class="p">)</span>
 
-<div class="viewcode-block" id="PanelResults.cov"><a class="viewcode-back" href="../../../panel/panel/linearmodels.panel.results.PanelResults.cov.html#linearmodels.panel.results.PanelResults.cov">[docs]</a>    <span class="nd">@cached_property</span>
+    <span class="nd">@cached_property</span>
     <span class="k">def</span> <span class="nf">cov</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">DataFrame</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Estimated covariance of parameters&quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="n">DataFrame</span><span class="p">(</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">_deferred_cov</span><span class="p">(),</span> <span class="n">columns</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">_var_names</span><span class="p">,</span> <span class="n">index</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">_var_names</span>
-        <span class="p">)</span></div>
+        <span class="p">)</span>
 
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">std_errors</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Series</span><span class="p">:</span>
@@ -490,7 +490,7 @@
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Parameter t-statistics&quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="n">Series</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_params</span> <span class="o">/</span> <span class="bp">self</span><span class="o">.</span><span class="n">std_errors</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="s2">&quot;tstat&quot;</span><span class="p">)</span>
 
-<div class="viewcode-block" id="PanelResults.pvalues"><a class="viewcode-back" href="../../../panel/panel/linearmodels.panel.results.PanelResults.pvalues.html#linearmodels.panel.results.PanelResults.pvalues">[docs]</a>    <span class="nd">@cached_property</span>
+    <span class="nd">@cached_property</span>
     <span class="k">def</span> <span class="nf">pvalues</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Series</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Parameter p-vals. Uses t(df_resid) if ``debiased`` is True, else normal</span>
@@ -500,7 +500,7 @@
             <span class="n">pv</span> <span class="o">=</span> <span class="mi">2</span> <span class="o">*</span> <span class="p">(</span><span class="mi">1</span> <span class="o">-</span> <span class="n">stats</span><span class="o">.</span><span class="n">t</span><span class="o">.</span><span class="n">cdf</span><span class="p">(</span><span class="n">abs_tstats</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">df_resid</span><span class="p">))</span>
         <span class="k">else</span><span class="p">:</span>
             <span class="n">pv</span> <span class="o">=</span> <span class="mi">2</span> <span class="o">*</span> <span class="p">(</span><span class="mi">1</span> <span class="o">-</span> <span class="n">stats</span><span class="o">.</span><span class="n">norm</span><span class="o">.</span><span class="n">cdf</span><span class="p">(</span><span class="n">abs_tstats</span><span class="p">))</span>
-        <span class="k">return</span> <span class="n">Series</span><span class="p">(</span><span class="n">pv</span><span class="p">,</span> <span class="n">index</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">_var_names</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="s2">&quot;pvalue&quot;</span><span class="p">)</span></div>
+        <span class="k">return</span> <span class="n">Series</span><span class="p">(</span><span class="n">pv</span><span class="p">,</span> <span class="n">index</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">_var_names</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="s2">&quot;pvalue&quot;</span><span class="p">)</span>
 
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">df_resid</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">int</span><span class="p">:</span>
@@ -1587,7 +1587,7 @@
   
     Created using
     <a href="https://www.sphinx-doc.org/" target="_blank" rel="noopener">Sphinx</a>
-    6.2.1.
+    7.0.0.
      and
     <a href="https://github.com/jbms/sphinx-immaterial/" target="_blank" rel="noopener">Sphinx-Immaterial</a>
   
