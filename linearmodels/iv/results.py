@@ -6,6 +6,7 @@ from __future__ import annotations
 from linearmodels.compat.statsmodels import Summary
 
 import datetime as dt
+from functools import cached_property
 from typing import Any, Sequence, Union
 
 from numpy import (
@@ -23,7 +24,6 @@ from numpy import (
 )
 from numpy.linalg import inv
 from pandas import DataFrame, Series, concat, to_numeric
-from property_cached import cached_property
 import scipy.stats as stats
 from statsmodels.iolib.summary import SimpleTable, fmt_2cols, fmt_params
 from statsmodels.iolib.table import default_txt_fmt

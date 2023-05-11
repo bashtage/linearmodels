@@ -12,7 +12,7 @@ Future Version 5.0
 
 * Switched variable ordering by default.  Importing ``linearmodels.__future__.ordering``
   is a no-op, and has no effect.
-
+* Removed dependence on property-cached in favor of :meth:`functools.cached_property`.
 
 
 Version 4.31

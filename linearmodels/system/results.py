@@ -3,11 +3,11 @@ from __future__ import annotations
 from linearmodels.compat.statsmodels import Summary
 
 import datetime as dt
+from functools import cached_property
 from typing import Any, Dict, Tuple, Union
 
 import numpy as np
 from pandas import DataFrame, Series, concat
-from property_cached import cached_property
 from scipy import stats
 from statsmodels.iolib.summary import SimpleTable, fmt_2cols
 
