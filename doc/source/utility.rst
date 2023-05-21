@@ -29,8 +29,8 @@ Hypothesis Testing
    InvalidTestStatistic
 
 
-Hypothesis Testing
-------------------
+Covariance Estimation
+---------------------
 
 .. currentmodule:: linearmodels.shared.covariance
 
