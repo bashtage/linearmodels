@@ -3,7 +3,8 @@ Covariance and weight estimation for GMM IV estimators
 """
 from __future__ import annotations
 
-from typing import Sequence, cast
+from collections.abc import Sequence
+from typing import cast
 
 from numpy import array, empty, ndarray, repeat, sqrt, zeros_like
 

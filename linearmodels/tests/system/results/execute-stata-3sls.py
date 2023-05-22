@@ -4,14 +4,13 @@ Important cases
 """
 import os
 import subprocess
-from typing import List
 
 import pandas as pd
 
 from linearmodels.tests.system._utility import generate_simultaneous_data
 
 data = generate_simultaneous_data()
-all_cols: List[str] = []
+all_cols: list[str] = []
 out: list[pd.Series] = []
 for key in data:
     eqn = data[key]
@@ -46,7 +45,8 @@ STATA_PATH = os.path.join("C:\\", "Program Files (x86)", "Stata15", "StataMP-64.
 OUTFILE = os.path.join(os.getcwd(), "stata-3sls-results.txt")
 
 header = [
-    r'use "C:\git\linearmodels\linearmodels\tests\system\results\simulated-3sls.dta", clear'
+    r'use "C:\git\linearmodels\linearmodels\tests\system\results\simulated-3sls.dta",'
+    + " clear"
 ]
 
 all_stats = "estout using {outfile}, cells(b(fmt(%13.12g)) t(fmt(%13.12g)) p(fmt(%13.12g))) stats("

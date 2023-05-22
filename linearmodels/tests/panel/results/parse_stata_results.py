@@ -1,6 +1,5 @@
 from io import StringIO
 import os
-from typing import List
 
 import pandas as pd
 
@@ -10,7 +9,7 @@ filename = "stata-panel-simulated-results.txt"
 
 cwd = os.path.split(os.path.abspath(__file__))[0]
 blocks = {}
-block: List[str] = []
+block: list[str] = []
 key = ""
 with open(os.path.join(cwd, filename)) as results:
     for line in results.readlines():

@@ -1,6 +1,9 @@
 skip_tags: true
 clone_depth: 50
 
+image:
+  - Visual Studio 2019
+
 matrix:
     fast_finish: false
 
@@ -12,8 +15,8 @@ environment:
     PYTHONHASHSEED: 31211999
 
   matrix:
-    - PYTHON: C:\Python38-x64
-      PYTHON_VERSION: 3.8
+    - PYTHON: C:\Python311-x64
+      PYTHON_VERSION: 3.11
       PYTHON_ARCH: 64
 
 

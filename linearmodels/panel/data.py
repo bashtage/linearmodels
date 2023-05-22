@@ -1,7 +1,8 @@
 from __future__ import annotations
 
+from collections.abc import Hashable, Sequence
 from itertools import product
-from typing import Hashable, Literal, Sequence, Union, cast, overload
+from typing import Literal, Union, cast, overload
 
 import numpy as np
 from numpy.linalg import lstsq
@@ -454,7 +455,7 @@ class PanelData:
             )
         groups = groups.values2d.astype(np.int64, copy=False)
 
-        weight_sum: dict[int, Series] = {}
+        weight_sum: dict[int, Series | DataFrame] = {}
 
         def weighted_group_mean(
             df: DataFrame, weights: DataFrame, root_w: Float64Array, level: int
@@ -462,11 +463,12 @@ class PanelData:
             scaled_df = cast(DataFrame, root_w * df)
             num = scaled_df.groupby(level=level).transform("sum")
             if level in weight_sum:
-                denom = weight_sum[level]
+                denom = np.asarray(weight_sum[level])
             else:
-                denom = weights.groupby(level=level).transform("sum")
-                weight_sum[level] = denom
-            return np.asarray(num) / np.asarray(denom)
+                denom_df = weights.groupby(level=level).transform("sum")
+                weight_sum[level] = denom_df
+                denom = np.asarray(denom_df)
+            return np.asarray(num) / denom
 
         def demean_pass(
             frame: DataFrame, weights: DataFrame, root_w: Float64Array
@@ -597,10 +599,10 @@ class PanelData:
             frame.iloc[:, :] = w
             sum_weights: DataFrame = frame.groupby(level=level).transform("sum")
             group_mu = weighted_sum / sum_weights
-            out = np.sqrt(w) * (self._frame - group_mu)
+            out_df = np.sqrt(w) * (self._frame - group_mu)
             if not return_panel:
-                return np.asarray(out)
-            return PanelData(out)
+                return np.asarray(out_df)
+            return PanelData(out_df)
 
     def __str__(self) -> str:
         return self.__class__.__name__ + "\n" + str(self._frame)
@@ -615,7 +617,8 @@ class PanelData:
         )
 
     def _repr_html_(self) -> str:
-        return self.__class__.__name__ + "<br/>" + self._frame._repr_html_()
+        html = self._frame._repr_html_()  # type: ignore[operator]
+        return self.__class__.__name__ + "<br/>" + html
 
     def count(self, group: str = "entity") -> DataFrame:
         """

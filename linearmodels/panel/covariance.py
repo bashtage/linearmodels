@@ -1,7 +1,7 @@
 from __future__ import annotations
 
 from functools import cached_property
-from typing import Any, Type, Union
+from typing import Any, Union
 
 import numpy as np
 from numpy.linalg import inv
@@ -589,11 +589,11 @@ CovarianceEstimator = Union[
     ACCovariance,
 ]
 CovarianceEstimatorType = Union[
-    Type[HomoskedasticCovariance],
-    Type[HeteroskedasticCovariance],
-    Type[ClusteredCovariance],
-    Type[DriscollKraay],
-    Type[ACCovariance],
+    type[HomoskedasticCovariance],
+    type[HeteroskedasticCovariance],
+    type[ClusteredCovariance],
+    type[DriscollKraay],
+    type[ACCovariance],
 ]
 
 

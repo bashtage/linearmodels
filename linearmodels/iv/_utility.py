@@ -1,8 +1,7 @@
 from __future__ import annotations
 
-from linearmodels.compat.formulaic import FORMULAIC_GTE_0_6, future_ordering
-
-from typing import Any, Mapping
+from collections.abc import Mapping
+from typing import Any
 
 from formulaic import model_matrix
 from formulaic.formula import Formula
@@ -100,10 +99,6 @@ class IVFormulaParser:
             self._context = context
         self._components: dict[str, str] = {}
         self._parse()
-        if FORMULAIC_GTE_0_6 and not future_ordering():
-            self._formulaic_kwargs = dict(_ordering="sort")
-        else:
-            self._formulaic_kwargs = {}
 
     def _parse(self) -> None:
         blocks = self._formula.strip().split("~")
@@ -184,7 +179,7 @@ class IVFormulaParser:
     def exog(self) -> DataFrame | None:
         """Exogenous variables"""
         exog_fmla = self.components["exog"]
-        exog = Formula(exog_fmla, **self._formulaic_kwargs).get_model_matrix(
+        exog = Formula(exog_fmla).get_model_matrix(
             self._data,
             context=self._context,
             ensure_full_rank=True,
@@ -196,7 +191,7 @@ class IVFormulaParser:
     def endog(self) -> DataFrame | None:
         """Endogenous variables"""
         endog_fmla = "0 +" + self.components["endog"]
-        endog = Formula(endog_fmla, **self._formulaic_kwargs).get_model_matrix(
+        endog = Formula(endog_fmla).get_model_matrix(
             self._data,
             context=self._context,
             ensure_full_rank=False,
@@ -208,7 +203,7 @@ class IVFormulaParser:
     def instruments(self) -> DataFrame | None:
         """Instruments"""
         instr_fmla = "0 +" + self.components["instruments"]
-        instr = Formula(instr_fmla, **self._formulaic_kwargs).get_model_matrix(
+        instr = Formula(instr_fmla).get_model_matrix(
             self._data,
             context=self._context,
             ensure_full_rank=False,

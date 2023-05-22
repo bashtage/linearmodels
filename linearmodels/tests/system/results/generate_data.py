@@ -5,7 +5,6 @@ Important cases
 2. Small sample adjustment
 3. Constraints across equations
 """
-from typing import List
 
 import numpy as np
 import pandas as pd
@@ -27,7 +26,7 @@ for key in missing_data:
     if np.any(locs):
         exog.flat[locs] = np.nan
 
-out: List[pd.DataFrame] = []
+out: list[pd.DataFrame] = []
 for i, dataset in enumerate((basic_data, common_data, missing_data)):
     base = f"mod_{i}"
     for j, key in enumerate(dataset):

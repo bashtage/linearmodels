@@ -1,5 +1,6 @@
 # cython: boundscheck=False, wraparound=False, language_level=3
-cimport cython
+
+
 cimport numpy as np
 
 ctypedef fused any_int:
@@ -9,8 +10,13 @@ ctypedef fused any_int:
     np.int64_t
 
 
-cdef void _remove_node(any_int node, any_int[:,::1] meta, any_int[:,::1] orig_dest,
-                       any_int *next_node, any_int *next_count):
+cdef void _remove_node(
+        any_int node,
+        any_int[:, ::1] meta,
+        any_int[:, ::1] orig_dest,
+        any_int *next_node,
+        any_int *next_count
+):
     """
     Parameters
     ----------
@@ -36,7 +42,7 @@ cdef void _remove_node(any_int node, any_int[:,::1] meta, any_int[:,::1] orig_de
         3. Decrement node's count
         4. Decrement next_node's count
     """
-    cdef any_int next_offset, orig, reverse_offset, reverse_node, next_orig
+    cdef any_int next_offset, orig, reverse_offset, reverse_node, _next_orig
     # 3. Decrement
     meta[node, 1] -= 1
     # 1. Remove forewrd link
@@ -46,8 +52,8 @@ cdef void _remove_node(any_int node, any_int[:,::1] meta, any_int[:,::1] orig_de
     while next_node[0] == -1:
         # Increment since this could have been previously deleted
         next_offset += 1
-        next_orig = orig_dest[next_offset,0]
-        next_node[0] = orig_dest[next_offset,1]
+        _next_orig = orig_dest[next_offset, 0]
+        next_node[0] = orig_dest[next_offset, 1]
     # 4. Remove next_node's link
     orig_dest[next_offset, 1] = -1
 

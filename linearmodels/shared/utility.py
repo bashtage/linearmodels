@@ -1,20 +1,16 @@
 from __future__ import annotations
 
-from collections.abc import MutableMapping
-from typing import (
-    Any,
-    Callable,
+from collections.abc import (
     ItemsView,
     Iterable,
     Iterator,
     KeysView,
     Mapping,
-    Protocol,
+    MutableMapping,
     Sequence,
-    TypeVar,
     ValuesView,
-    cast,
 )
+from typing import Any, Callable, Protocol, TypeVar, cast
 
 import numpy as np
 from pandas import DataFrame, Index, MultiIndex, Series

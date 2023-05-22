@@ -1,5 +1,4 @@
 from collections import defaultdict
-from typing import Dict, List
 
 import pandas as pd
 
@@ -20,8 +19,8 @@ def repl_const(df):
     return df
 
 
-def parse_file(name: str) -> Dict[str, List[str]]:
-    blocks: Dict[str, List[str]] = defaultdict(list)
+def parse_file(name: str) -> dict[str, list[str]]:
+    blocks: dict[str, list[str]] = defaultdict(list)
     current_key = ""
     with open(name) as stata:
         for line in stata:

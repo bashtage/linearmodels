@@ -1,7 +1,8 @@
 from __future__ import annotations
 
 from collections import defaultdict
-from typing import Any, DefaultDict, Hashable, Iterable, TypeVar, Union, cast
+from collections.abc import Hashable, Iterable
+from typing import Any, DefaultDict, TypeVar, Union, cast
 import warnings
 
 from numpy import (
