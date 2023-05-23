@@ -1,5 +1,4 @@
 import os
-from typing import Dict
 
 import numpy as np
 from numpy.testing import assert_allclose
@@ -142,7 +141,7 @@ def test_linear_restriction(data):
     stat = float(np.squeeze(p.T @ np.linalg.inv(c) @ p))
     assert_allclose(stat, ts.stat)
     assert ts.df == nvar
-    formula_dict: Dict[str, float] = {f"{p}": 0 for p in res.params.index}
+    formula_dict: dict[str, float] = {f"{p}": 0 for p in res.params.index}
     ts2 = res.wald_test(formula=formula_dict)
     assert_allclose(ts.stat, ts2.stat)
 

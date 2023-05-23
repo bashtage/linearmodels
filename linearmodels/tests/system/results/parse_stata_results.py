@@ -1,6 +1,5 @@
 from io import StringIO
 import os
-from typing import Dict, List
 
 import pandas as pd
 
@@ -13,8 +12,8 @@ cwd = os.path.split(os.path.abspath(__file__))[0]
 with open(os.path.join(cwd, filename)) as results_file:
     results = results_file.readlines()
 
-blocks: Dict[str, List[str]] = {}
-block: List[str] = []
+blocks: dict[str, list[str]] = {}
+block: list[str] = []
 key = ""
 for line in results:
     if "###!" in line:

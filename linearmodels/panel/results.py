@@ -2,9 +2,10 @@ from __future__ import annotations
 
 from linearmodels.compat.statsmodels import Summary
 
+from collections.abc import Mapping
 import datetime as dt
 from functools import cached_property
-from typing import Any, Mapping, Union
+from typing import Any, Union
 
 from formulaic.utils.context import capture_context
 import numpy as np
@@ -778,7 +779,8 @@ class PanelEffectsResults(PanelResults):
 
         .. math::
 
-          F = \frac{(RSS_{pool}-RSS_{effect})/(df_{pool}-df_{effect})}{RSS_{effect}/df_{effect}}
+          F = \frac{(RSS_{pool}-RSS_{effect})/(df_{pool}-df_{effect})}
+              {RSS_{effect}/df_{effect}}
 
         where :math:`RSS_{pool}` is the residual sum of squares from a no-
         effect (pooled) model. :math:`RSS_{effect}` is the residual sum of

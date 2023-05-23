@@ -2,7 +2,8 @@ from __future__ import annotations
 
 from linearmodels.compat.statsmodels import Summary
 
-from typing import Any, Sequence
+from collections.abc import Sequence
+from typing import Any
 
 import numpy as np
 from pandas import DataFrame, Index, Series, concat

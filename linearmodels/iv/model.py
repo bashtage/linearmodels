@@ -3,7 +3,7 @@ Instrumental variable estimators
 """
 from __future__ import annotations
 
-from typing import Any, Type, TypeVar, Union, cast
+from typing import Any, TypeVar, Union, cast
 import warnings
 
 from numpy import (
@@ -57,7 +57,7 @@ from linearmodels.typing import (
     OptionalNumeric,
 )
 
-IVResultType = Type[Union[IVResults, IVGMMResults, OLSResults]]
+IVResultType = type[Union[IVResults, IVGMMResults, OLSResults]]
 
 __all__ = [
     "COVARIANCE_ESTIMATORS",
@@ -66,6 +66,7 @@ __all__ = [
     "IVLIML",
     "IV2SLS",
     "IVGMMCUE",
+    "IVResultType",
     "_OLS",
 ]
 

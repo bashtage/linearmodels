@@ -16,10 +16,14 @@ STATA_PATH = os.path.join("C:\\", "Program Files (x86)", "Stata13", "StataMP-64.
 OUTFILE = os.path.join(os.getcwd(), "stata-sur-results.txt")
 
 header = [
-    r'use "C:\git\linearmodels\linearmodels\tests\system\results\simulated-sur.dta", clear'
+    r'use "C:\git\linearmodels\linearmodels\tests\system\results\simulated-sur.dta"'
+    + ", clear"
 ]
 
-all_stats = "estout using {outfile}, cells(b(fmt(%13.12g)) t(fmt(%13.12g)) p(fmt(%13.12g))) stats("
+all_stats = (
+    "estout using {outfile}, cells(b(fmt(%13.12g)) "
+    + "t(fmt(%13.12g)) p(fmt(%13.12g))) stats("
+)
 stats = ["chi2_", "F_", "p_", "df_m", "mss_", "r2_", "rss_"]
 for i in range(1, 4):
     all_stats += " ".join([f"{s}{i}" for s in stats]) + " "

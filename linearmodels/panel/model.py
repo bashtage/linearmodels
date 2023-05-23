@@ -1,8 +1,7 @@
 from __future__ import annotations
 
-from linearmodels.compat.formulaic import FORMULAIC_GTE_0_6, future_ordering
-
-from typing import Any, Mapping, NamedTuple, Type, Union, cast
+from collections.abc import Mapping
+from typing import Any, NamedTuple, Union, cast
 
 from formulaic.formula import Formula
 from formulaic.model_spec import NAAction
@@ -71,11 +70,11 @@ CovarianceEstimator = Union[
 ]
 
 CovarianceEstimatorType = Union[
-    Type[ACCovariance],
-    Type[ClusteredCovariance],
-    Type[DriscollKraay],
-    Type[HeteroskedasticCovariance],
-    Type[HomoskedasticCovariance],
+    type[ACCovariance],
+    type[ClusteredCovariance],
+    type[DriscollKraay],
+    type[HeteroskedasticCovariance],
+    type[HomoskedasticCovariance],
 ]
 
 
@@ -160,10 +159,6 @@ class PanelFormulaParser:
         else:
             self._context = context
         self._dependent = self._exog = None
-        if FORMULAIC_GTE_0_6 and not future_ordering():
-            self._formulaic_kwargs = dict(_ordering="sort")
-        else:
-            self._formulaic_kwargs = {}
         self._parse()
 
     def _parse(self) -> None:
@@ -230,7 +225,7 @@ class PanelFormulaParser:
     def dependent(self) -> DataFrame:
         """DataFrame containing the dependent variable"""
         return DataFrame(
-            Formula(self._lhs, **self._formulaic_kwargs).get_model_matrix(
+            Formula(self._lhs).get_model_matrix(
                 self._data.dataframe,
                 context=self._context,
                 na_action=self._na_action,
@@ -241,7 +236,7 @@ class PanelFormulaParser:
     def exog(self) -> DataFrame:
         """DataFrame containing the exogenous variables"""
         return DataFrame(
-            Formula(self._rhs, **self._formulaic_kwargs).get_model_matrix(
+            Formula(self._rhs).get_model_matrix(
                 self._data.dataframe,
                 context=self._context,
                 na_action=self._na_action,
@@ -741,7 +736,9 @@ class _PanelModelBase:
                 cat = Categorical(formatted_clusters.dataframe[col])
                 # TODO: Bug in pandas-stubs
                 #  https://github.com/pandas-dev/pandas-stubs/issues/111
-                formatted_clusters.dataframe[col] = cat.codes.astype(np.int64)  # type: ignore
+                formatted_clusters.dataframe[col] = cat.codes.astype(
+                    np.int64
+                )  # type: ignore
             clusters_frame = formatted_clusters.dataframe
 
         cluster_entity = bool(cov_config_upd.pop("cluster_entity", False))
@@ -2082,7 +2079,9 @@ class BetweenOLS(_PanelModelBase):
                 cluster_max.T, index=index, columns=clusters_panel.vars
             )
             # TODO: Bug in pandas-stubs prevents using Hashable | None
-            clusters_frame = clusters_frame.loc[reindex].astype(np.int64)  # type: ignore
+            clusters_frame = clusters_frame.loc[reindex].astype(
+                np.int64
+            )  # type: ignore
             cov_config_upd["clusters"] = clusters_frame
 
         return cov_config_upd
@@ -2925,9 +2924,9 @@ class FamaMacBeth(_PanelModelBase):
         valid_blocks = wx_df.groupby(level=1).apply(validate_block)
         if not valid_blocks.any():
             err = (
-                "Model cannot be estimated. All blocks of time-series observations are rank\n"
-                "deficient, and so it is not possible to estimate any cross-sectional "
-                "regressions."
+                "Model cannot be estimated. All blocks of time-series observations "
+                "are rank deficient, and so it is not possible to estimate any"
+                "cross-sectional regressions."
             )
             raise ValueError(err)
         if valid_blocks.sum() < exog.shape[1]:

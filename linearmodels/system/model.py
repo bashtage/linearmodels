@@ -13,9 +13,10 @@ Henningsen, A., & Hamann, J. (2007). systemfit: A Package for Estimating
 """
 from __future__ import annotations
 
+from collections.abc import Mapping, Sequence
 from functools import reduce
 import textwrap
-from typing import Any, Literal, Mapping, Sequence, cast
+from typing import Any, Literal, cast
 import warnings
 
 from formulaic.utils.context import capture_context
@@ -1545,7 +1546,7 @@ class IV3SLS(_LSSystemModelBase):
 
         It is also possible to include equation labels when using curly braces
 
-        >>> formula = "{eq1: y1 ~ 1 + x1_1 + [x1_2 ~ z1]} {eq2: y2 ~ 1 + x2_1 + [x2_2 ~ z2]}"
+        >>> formula = "{eq1: y1 ~ x1_1 + [x1_2 ~ z1]} {eq2: y2 ~ 1 + [x2_2 ~ z2]}"
         >>> mod = IV3SLS.from_formula(formula, data)
         """
         context = capture_context(1)
@@ -1751,7 +1752,8 @@ class SUR(_LSSystemModelBase):
 
         >>> import pandas as pd
         >>> import numpy as np
-        >>> data = pd.DataFrame(np.random.randn(500, 4), columns=["y1", "x1_1", "y2", "x2_1"])
+        >>> data = pd.DataFrame(np.random.randn(500, 4),
+        ...                     columns=["y1", "x1_1", "y2", "x2_1"])
         >>> from linearmodels.system import SUR
         >>> formula = {"eq1": "y1 ~ 1 + x1_1", "eq2": "y2 ~ 1 + x2_1"}
         >>> mod = SUR.from_formula(formula, data)
@@ -2162,7 +2164,7 @@ class IVSystemGMM(_SystemModelBase):
 
         It is also possible to include equation labels when using curly braces
 
-        >>> formula = "{eq1: y1 ~ 1 + x1_1 + [x1_2 ~ z1]} {eq2: y2 ~ 1 + x2_1 + [x2_2 ~ z2]}"
+        >>> formula = "{eq1: y1 ~ x1_1 + [x1_2 ~ z1]} {eq2: y2 ~ 1 + [x2_2 ~ z2]}"
         >>> mod = IVSystemGMM.from_formula(formula, data)
         """
         context = capture_context(1)

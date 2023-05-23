@@ -1,0 +1,22 @@
+.. warning::
+
+   Version 5.0 changes the sorting order for models created using formulas.
+   Variables will appear in results in the same order they are entered in
+   the formula string.
+
+
+Version 5.0
+------------
+
+* Increased minimums:
+
+  - Python: 3.9
+  - formulaic: 0.6.1
+  - NumPy: 1.19.0
+  - SciPy: 1.5.0
+  - pandas: 1.1.0
+  - statsmodels: 0.12.0
+
+* Switched variable ordering by default.  Importing ``linearmodels.__future__.ordering``
+  is a no-op, and has no effect.
+* Removed dependence on property-cached in favor of :meth:`functools.cached_property`.

@@ -5,9 +5,10 @@ from __future__ import annotations
 
 from linearmodels.compat.statsmodels import Summary
 
+from collections.abc import Sequence
 import datetime as dt
 from functools import cached_property
-from typing import Any, Sequence, Union
+from typing import Any, Union
 
 from numpy import (
     array,
@@ -721,7 +722,7 @@ class FirstStageResults(_SummaryStr):
             y = w * endog.pandas[[col]].values
             ey = annihilate(y, x)
             partial = _OLS(ey, ez).fit(cov_type=self._cov_type, **self._cov_config)
-            full = individual_results[col]
+            full = individual_results[str(col)]
             params = full.params.values[-nz:]
             params = params[:, None]
             c = asarray(full.cov)[-nz:, -nz:]
@@ -1025,7 +1026,7 @@ class IVResults(_CommonIVResults):
             raise TypeError("variables must be a str or a list of str.")
 
         nobs = self.model.dependent.shape[0]
-        e2 = self.resids.values
+        e2 = asarray(self.resids.values)
         nendog, nexog = self.model.endog.shape[1], self.model.exog.shape[1]
         if variables is None:
             assumed_exog = self.model.endog.ndarray

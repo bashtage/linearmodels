@@ -49,6 +49,7 @@ additional_files.extend(glob.glob("./linearmodels/**/*.pyi", recursive=True))
 additional_files.extend(glob.glob("./linearmodels/**/*.pyd", recursive=True))
 additional_files.extend(glob.glob("./linearmodels/**/*.so", recursive=True))
 
+
 class BinaryDistribution(Distribution):
     def is_pure(self) -> bool:
         return False
@@ -61,7 +62,7 @@ def run_setup(binary: bool = True) -> None:
 
         macros = [("NPY_NO_DEPRECATED_API", "1")]
         # macros.append(('CYTHON_TRACE', '1'))
-        directives: Dict[str, bool] = {}  # {'linetrace': True, 'binding':True}
+        directives: dict[str, bool] = {}  # {'linetrace': True, 'binding':True}
         extension = Extension(
             "linearmodels.panel._utility",
             ["linearmodels/panel/_utility.pyx"],
@@ -111,7 +112,6 @@ def run_setup(binary: bool = True) -> None:
             "Intended Audience :: End Users/Desktop",
             "Intended Audience :: Financial and Insurance Industry",
             "Intended Audience :: Science/Research",
-            "Programming Language :: Python :: 3.8",
             "Programming Language :: Python :: 3.9",
             "Programming Language :: Python :: 3.10",
             "Programming Language :: Python :: 3.11",
@@ -123,7 +123,7 @@ def run_setup(binary: bool = True) -> None:
             "Topic :: Scientific/Engineering",
         ],
         ext_modules=extensions,
-        python_requires=">=3.8",
+        python_requires=">=3.9",
         distclass=BinaryDistribution,
     )
 

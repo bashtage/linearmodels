@@ -1,4 +1,4 @@
-from typing import Dict, Union
+from __future__ import annotations
 
 import numpy as np
 from numpy.testing import assert_allclose
@@ -34,7 +34,7 @@ def model_data(request) -> AttrDict:
                 data[data_key]["exog"] = exog
     else:  # dgp == 'missing'
         data = missing_data
-    cov_kwds: Dict[str, Union[str, bool]] = {"cov_type": "unadjusted"}
+    cov_kwds: dict[str, str | bool] = {"cov_type": "unadjusted"}
     if model_type == "ss":
         cov_kwds["debiased"] = True
     stata_result = stata_results[key]

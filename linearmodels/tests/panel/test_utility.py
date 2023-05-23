@@ -1,4 +1,4 @@
-from typing import List, Union
+from __future__ import annotations
 
 import numpy as np
 from numpy.testing import assert_allclose, assert_array_equal
@@ -230,7 +230,7 @@ def test_preconditioner_subclass():
 @pytest.mark.parametrize("random_state", [None, np.random.RandomState(0)])
 def test_generate_panel_data(missing, const, other_effects, cat_list, random_state):
     if cat_list:
-        ncats: Union[List[int], int] = [13] * other_effects
+        ncats: list[int] | int = [13] * other_effects
     else:
         ncats = 21
 

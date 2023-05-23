@@ -6,7 +6,7 @@ sphinxcontrib.spelling
 sphinx
 jupyter
 notebook
-xarray>=0.13
+xarray>=0.16
 nbformat
 matplotlib
 seaborn

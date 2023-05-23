@@ -4,7 +4,7 @@ from linearmodels.compat.statsmodels import Summary
 
 import datetime as dt
 from functools import cached_property
-from typing import Any, Dict, Tuple, Union
+from typing import Any, Union
 
 import numpy as np
 from pandas import DataFrame, Series, concat
@@ -18,9 +18,9 @@ from linearmodels.shared.io import _str, format_wide, param_table, pval_format
 from linearmodels.shared.utility import AttrDict
 from linearmodels.typing import ArrayLike, Float64Array
 
-__all__ = ["SystemResults", "SystemEquationResult", "GMMSystemResults"]
+__all__ = ["Equation", "SystemResults", "SystemEquationResult", "GMMSystemResults"]
 
-Equation = Union[Tuple[ArrayLike, ArrayLike], Dict[str, ArrayLike]]
+Equation = Union[tuple[ArrayLike, ArrayLike], dict[str, ArrayLike]]
 
 
 class _CommonResults(_SummaryStr):
@@ -123,7 +123,8 @@ class _CommonResults(_SummaryStr):
 
         .. math::
 
-           1 - \frac{\sum_i \sum_j \hat{\epsilon}_{ij}^2}{\sum_i \sum_j \hat{\eta}_{ij}^2}
+           1 - \frac{\sum_i \sum_j \hat{\epsilon}_{ij}^2}
+               {\sum_i \sum_j \hat{\eta}_{ij}^2}
 
         where :math:`\eta` is the residual from a regression on only a
         constant. Note that if a constant is not present in an equation
