@@ -15,7 +15,7 @@
     
   
       
-        <title>linearmodels.system.model - linearmodels v4.32 (+10)</title>
+        <title>linearmodels.system.model - linearmodels v4.32 (+12)</title>
       
     
 
@@ -88,7 +88,7 @@
 
 <header class="md-header" data-md-component="header">
   <nav class="md-header__inner md-grid" aria-label="Header">
-    <a href="../../../index.html" title="linearmodels v4.32 (+10)" class="md-header__button md-logo" aria-label="linearmodels v4.32 (+10)" data-md-component="logo">
+    <a href="../../../index.html" title="linearmodels v4.32 (+12)" class="md-header__button md-logo" aria-label="linearmodels v4.32 (+12)" data-md-component="logo">
       <img src="../../../_static/bw-logo.svg" alt="logo">
     </a>
     <label class="md-header__button md-icon" for="__drawer">
@@ -98,7 +98,7 @@
       <div class="md-header__ellipsis">
         <div class="md-header__topic">
           <span class="md-ellipsis">
-            linearmodels v4.32 (+10)
+            linearmodels v4.32 (+12)
           </span>
         </div>
         <div class="md-header__topic" data-md-component="header-topic">
@@ -185,10 +185,10 @@
 
 <nav class="md-nav md-nav--primary" aria-label="Navigation" data-md-level="0">
   <label class="md-nav__title" for="__drawer">
-    <a href="../../../index.html" title="linearmodels v4.32 (+10)" class="md-nav__button md-logo" aria-label="linearmodels v4.32 (+10)" data-md-component="logo">
+    <a href="../../../index.html" title="linearmodels v4.32 (+12)" class="md-nav__button md-logo" aria-label="linearmodels v4.32 (+12)" data-md-component="logo">
       <img src="../../../_static/bw-logo.svg" alt="logo">
     </a>
-    linearmodels v4.32 (+10)
+    linearmodels v4.32 (+12)
   </label>
   
     <div class="md-nav__source">
@@ -412,9 +412,10 @@
 <span class="sd">&quot;&quot;&quot;</span>
 <span class="kn">from</span> <span class="nn">__future__</span> <span class="kn">import</span> <span class="n">annotations</span>
 
+<span class="kn">from</span> <span class="nn">collections.abc</span> <span class="kn">import</span> <span class="n">Mapping</span><span class="p">,</span> <span class="n">Sequence</span>
 <span class="kn">from</span> <span class="nn">functools</span> <span class="kn">import</span> <span class="n">reduce</span>
 <span class="kn">import</span> <span class="nn">textwrap</span>
-<span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">Any</span><span class="p">,</span> <span class="n">Literal</span><span class="p">,</span> <span class="n">Mapping</span><span class="p">,</span> <span class="n">Sequence</span><span class="p">,</span> <span class="n">cast</span>
+<span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">Any</span><span class="p">,</span> <span class="n">Literal</span><span class="p">,</span> <span class="n">cast</span>
 <span class="kn">import</span> <span class="nn">warnings</span>
 
 <span class="kn">from</span> <span class="nn">formulaic.utils.context</span> <span class="kn">import</span> <span class="n">capture_context</span>
@@ -1944,7 +1945,7 @@
 
 <span class="sd">        It is also possible to include equation labels when using curly braces</span>
 
-<span class="sd">        &gt;&gt;&gt; formula = &quot;{eq1: y1 ~ 1 + x1_1 + [x1_2 ~ z1]} {eq2: y2 ~ 1 + x2_1 + [x2_2 ~ z2]}&quot;</span>
+<span class="sd">        &gt;&gt;&gt; formula = &quot;{eq1: y1 ~ x1_1 + [x1_2 ~ z1]} {eq2: y2 ~ 1 + [x2_2 ~ z2]}&quot;</span>
 <span class="sd">        &gt;&gt;&gt; mod = IV3SLS.from_formula(formula, data)</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="n">context</span> <span class="o">=</span> <span class="n">capture_context</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span>
@@ -2150,7 +2151,8 @@
 
 <span class="sd">        &gt;&gt;&gt; import pandas as pd</span>
 <span class="sd">        &gt;&gt;&gt; import numpy as np</span>
-<span class="sd">        &gt;&gt;&gt; data = pd.DataFrame(np.random.randn(500, 4), columns=[&quot;y1&quot;, &quot;x1_1&quot;, &quot;y2&quot;, &quot;x2_1&quot;])</span>
+<span class="sd">        &gt;&gt;&gt; data = pd.DataFrame(np.random.randn(500, 4),</span>
+<span class="sd">        ...                     columns=[&quot;y1&quot;, &quot;x1_1&quot;, &quot;y2&quot;, &quot;x2_1&quot;])</span>
 <span class="sd">        &gt;&gt;&gt; from linearmodels.system import SUR</span>
 <span class="sd">        &gt;&gt;&gt; formula = {&quot;eq1&quot;: &quot;y1 ~ 1 + x1_1&quot;, &quot;eq2&quot;: &quot;y2 ~ 1 + x2_1&quot;}</span>
 <span class="sd">        &gt;&gt;&gt; mod = SUR.from_formula(formula, data)</span>
@@ -2561,7 +2563,7 @@
 
 <span class="sd">        It is also possible to include equation labels when using curly braces</span>
 
-<span class="sd">        &gt;&gt;&gt; formula = &quot;{eq1: y1 ~ 1 + x1_1 + [x1_2 ~ z1]} {eq2: y2 ~ 1 + x2_1 + [x2_2 ~ z2]}&quot;</span>
+<span class="sd">        &gt;&gt;&gt; formula = &quot;{eq1: y1 ~ x1_1 + [x1_2 ~ z1]} {eq2: y2 ~ 1 + [x2_2 ~ z2]}&quot;</span>
 <span class="sd">        &gt;&gt;&gt; mod = IVSystemGMM.from_formula(formula, data)</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="n">context</span> <span class="o">=</span> <span class="n">capture_context</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span>

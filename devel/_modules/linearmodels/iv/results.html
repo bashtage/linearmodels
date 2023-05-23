@@ -15,7 +15,7 @@
     
   
       
-        <title>linearmodels.iv.results - linearmodels v4.32 (+10)</title>
+        <title>linearmodels.iv.results - linearmodels v4.32 (+12)</title>
       
     
 
@@ -88,7 +88,7 @@
 
 <header class="md-header" data-md-component="header">
   <nav class="md-header__inner md-grid" aria-label="Header">
-    <a href="../../../index.html" title="linearmodels v4.32 (+10)" class="md-header__button md-logo" aria-label="linearmodels v4.32 (+10)" data-md-component="logo">
+    <a href="../../../index.html" title="linearmodels v4.32 (+12)" class="md-header__button md-logo" aria-label="linearmodels v4.32 (+12)" data-md-component="logo">
       <img src="../../../_static/bw-logo.svg" alt="logo">
     </a>
     <label class="md-header__button md-icon" for="__drawer">
@@ -98,7 +98,7 @@
       <div class="md-header__ellipsis">
         <div class="md-header__topic">
           <span class="md-ellipsis">
-            linearmodels v4.32 (+10)
+            linearmodels v4.32 (+12)
           </span>
         </div>
         <div class="md-header__topic" data-md-component="header-topic">
@@ -185,10 +185,10 @@
 
 <nav class="md-nav md-nav--primary" aria-label="Navigation" data-md-level="0">
   <label class="md-nav__title" for="__drawer">
-    <a href="../../../index.html" title="linearmodels v4.32 (+10)" class="md-nav__button md-logo" aria-label="linearmodels v4.32 (+10)" data-md-component="logo">
+    <a href="../../../index.html" title="linearmodels v4.32 (+12)" class="md-nav__button md-logo" aria-label="linearmodels v4.32 (+12)" data-md-component="logo">
       <img src="../../../_static/bw-logo.svg" alt="logo">
     </a>
-    linearmodels v4.32 (+10)
+    linearmodels v4.32 (+12)
   </label>
   
     <div class="md-nav__source">
@@ -404,9 +404,10 @@
 
 <span class="kn">from</span> <span class="nn">linearmodels.compat.statsmodels</span> <span class="kn">import</span> <span class="n">Summary</span>
 
+<span class="kn">from</span> <span class="nn">collections.abc</span> <span class="kn">import</span> <span class="n">Sequence</span>
 <span class="kn">import</span> <span class="nn">datetime</span> <span class="k">as</span> <span class="nn">dt</span>
 <span class="kn">from</span> <span class="nn">functools</span> <span class="kn">import</span> <span class="n">cached_property</span>
-<span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">Any</span><span class="p">,</span> <span class="n">Sequence</span><span class="p">,</span> <span class="n">Union</span>
+<span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">Any</span><span class="p">,</span> <span class="n">Union</span>
 
 <span class="kn">from</span> <span class="nn">numpy</span> <span class="kn">import</span> <span class="p">(</span>
     <span class="n">array</span><span class="p">,</span>
@@ -1120,7 +1121,7 @@
             <span class="n">y</span> <span class="o">=</span> <span class="n">w</span> <span class="o">*</span> <span class="n">endog</span><span class="o">.</span><span class="n">pandas</span><span class="p">[[</span><span class="n">col</span><span class="p">]]</span><span class="o">.</span><span class="n">values</span>
             <span class="n">ey</span> <span class="o">=</span> <span class="n">annihilate</span><span class="p">(</span><span class="n">y</span><span class="p">,</span> <span class="n">x</span><span class="p">)</span>
             <span class="n">partial</span> <span class="o">=</span> <span class="n">_OLS</span><span class="p">(</span><span class="n">ey</span><span class="p">,</span> <span class="n">ez</span><span class="p">)</span><span class="o">.</span><span class="n">fit</span><span class="p">(</span><span class="n">cov_type</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">_cov_type</span><span class="p">,</span> <span class="o">**</span><span class="bp">self</span><span class="o">.</span><span class="n">_cov_config</span><span class="p">)</span>
-            <span class="n">full</span> <span class="o">=</span> <span class="n">individual_results</span><span class="p">[</span><span class="n">col</span><span class="p">]</span>
+            <span class="n">full</span> <span class="o">=</span> <span class="n">individual_results</span><span class="p">[</span><span class="nb">str</span><span class="p">(</span><span class="n">col</span><span class="p">)]</span>
             <span class="n">params</span> <span class="o">=</span> <span class="n">full</span><span class="o">.</span><span class="n">params</span><span class="o">.</span><span class="n">values</span><span class="p">[</span><span class="o">-</span><span class="n">nz</span><span class="p">:]</span>
             <span class="n">params</span> <span class="o">=</span> <span class="n">params</span><span class="p">[:,</span> <span class="kc">None</span><span class="p">]</span>
             <span class="n">c</span> <span class="o">=</span> <span class="n">asarray</span><span class="p">(</span><span class="n">full</span><span class="o">.</span><span class="n">cov</span><span class="p">)[</span><span class="o">-</span><span class="n">nz</span><span class="p">:,</span> <span class="o">-</span><span class="n">nz</span><span class="p">:]</span>
@@ -1424,7 +1425,7 @@
             <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="s2">&quot;variables must be a str or a list of str.&quot;</span><span class="p">)</span>
 
         <span class="n">nobs</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">model</span><span class="o">.</span><span class="n">dependent</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
-        <span class="n">e2</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">resids</span><span class="o">.</span><span class="n">values</span>
+        <span class="n">e2</span> <span class="o">=</span> <span class="n">asarray</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">resids</span><span class="o">.</span><span class="n">values</span><span class="p">)</span>
         <span class="n">nendog</span><span class="p">,</span> <span class="n">nexog</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">model</span><span class="o">.</span><span class="n">endog</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="bp">self</span><span class="o">.</span><span class="n">model</span><span class="o">.</span><span class="n">exog</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span>
         <span class="k">if</span> <span class="n">variables</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
             <span class="n">assumed_exog</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">model</span><span class="o">.</span><span class="n">endog</span><span class="o">.</span><span class="n">ndarray</span>

@@ -15,7 +15,7 @@
     
   
       
-        <title>linearmodels.system.results - linearmodels v4.32 (+10)</title>
+        <title>linearmodels.system.results - linearmodels v4.32 (+12)</title>
       
     
 
@@ -88,7 +88,7 @@
 
 <header class="md-header" data-md-component="header">
   <nav class="md-header__inner md-grid" aria-label="Header">
-    <a href="../../../index.html" title="linearmodels v4.32 (+10)" class="md-header__button md-logo" aria-label="linearmodels v4.32 (+10)" data-md-component="logo">
+    <a href="../../../index.html" title="linearmodels v4.32 (+12)" class="md-header__button md-logo" aria-label="linearmodels v4.32 (+12)" data-md-component="logo">
       <img src="../../../_static/bw-logo.svg" alt="logo">
     </a>
     <label class="md-header__button md-icon" for="__drawer">
@@ -98,7 +98,7 @@
       <div class="md-header__ellipsis">
         <div class="md-header__topic">
           <span class="md-ellipsis">
-            linearmodels v4.32 (+10)
+            linearmodels v4.32 (+12)
           </span>
         </div>
         <div class="md-header__topic" data-md-component="header-topic">
@@ -185,10 +185,10 @@
 
 <nav class="md-nav md-nav--primary" aria-label="Navigation" data-md-level="0">
   <label class="md-nav__title" for="__drawer">
-    <a href="../../../index.html" title="linearmodels v4.32 (+10)" class="md-nav__button md-logo" aria-label="linearmodels v4.32 (+10)" data-md-component="logo">
+    <a href="../../../index.html" title="linearmodels v4.32 (+12)" class="md-nav__button md-logo" aria-label="linearmodels v4.32 (+12)" data-md-component="logo">
       <img src="../../../_static/bw-logo.svg" alt="logo">
     </a>
-    linearmodels v4.32 (+10)
+    linearmodels v4.32 (+12)
   </label>
   
     <div class="md-nav__source">
@@ -403,7 +403,7 @@
 
 <span class="kn">import</span> <span class="nn">datetime</span> <span class="k">as</span> <span class="nn">dt</span>
 <span class="kn">from</span> <span class="nn">functools</span> <span class="kn">import</span> <span class="n">cached_property</span>
-<span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">Any</span><span class="p">,</span> <span class="n">Dict</span><span class="p">,</span> <span class="n">Tuple</span><span class="p">,</span> <span class="n">Union</span>
+<span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">Any</span><span class="p">,</span> <span class="n">Union</span>
 
 <span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
 <span class="kn">from</span> <span class="nn">pandas</span> <span class="kn">import</span> <span class="n">DataFrame</span><span class="p">,</span> <span class="n">Series</span><span class="p">,</span> <span class="n">concat</span>
@@ -417,9 +417,9 @@
 <span class="kn">from</span> <span class="nn">linearmodels.shared.utility</span> <span class="kn">import</span> <span class="n">AttrDict</span>
 <span class="kn">from</span> <span class="nn">linearmodels.typing</span> <span class="kn">import</span> <span class="n">ArrayLike</span><span class="p">,</span> <span class="n">Float64Array</span>
 
-<span class="n">__all__</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;SystemResults&quot;</span><span class="p">,</span> <span class="s2">&quot;SystemEquationResult&quot;</span><span class="p">,</span> <span class="s2">&quot;GMMSystemResults&quot;</span><span class="p">]</span>
+<span class="n">__all__</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;Equation&quot;</span><span class="p">,</span> <span class="s2">&quot;SystemResults&quot;</span><span class="p">,</span> <span class="s2">&quot;SystemEquationResult&quot;</span><span class="p">,</span> <span class="s2">&quot;GMMSystemResults&quot;</span><span class="p">]</span>
 
-<span class="n">Equation</span> <span class="o">=</span> <span class="n">Union</span><span class="p">[</span><span class="n">Tuple</span><span class="p">[</span><span class="n">ArrayLike</span><span class="p">,</span> <span class="n">ArrayLike</span><span class="p">],</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">ArrayLike</span><span class="p">]]</span>
+<span class="n">Equation</span> <span class="o">=</span> <span class="n">Union</span><span class="p">[</span><span class="nb">tuple</span><span class="p">[</span><span class="n">ArrayLike</span><span class="p">,</span> <span class="n">ArrayLike</span><span class="p">],</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">ArrayLike</span><span class="p">]]</span>
 
 
 <span class="k">class</span> <span class="nc">_CommonResults</span><span class="p">(</span><span class="n">_SummaryStr</span><span class="p">):</span>
@@ -522,7 +522,8 @@
 
 <span class="sd">        .. math::</span>
 
-<span class="sd">           1 - \frac{\sum_i \sum_j \hat{\epsilon}_{ij}^2}{\sum_i \sum_j \hat{\eta}_{ij}^2}</span>
+<span class="sd">           1 - \frac{\sum_i \sum_j \hat{\epsilon}_{ij}^2}</span>
+<span class="sd">               {\sum_i \sum_j \hat{\eta}_{ij}^2}</span>
 
 <span class="sd">        where :math:`\eta` is the residual from a regression on only a</span>
 <span class="sd">        constant. Note that if a constant is not present in an equation</span>

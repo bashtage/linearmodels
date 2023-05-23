@@ -15,7 +15,7 @@
     
   
       
-        <title>Three-stage Least Squares (3SLS) - linearmodels v4.32 (+10)</title>
+        <title>Three-stage Least Squares (3SLS) - linearmodels v4.32 (+12)</title>
       
     
 
@@ -94,7 +94,7 @@
 
 <header class="md-header" data-md-component="header">
   <nav class="md-header__inner md-grid" aria-label="Header">
-    <a href="../../index.html" title="linearmodels v4.32 (+10)" class="md-header__button md-logo" aria-label="linearmodels v4.32 (+10)" data-md-component="logo">
+    <a href="../../index.html" title="linearmodels v4.32 (+12)" class="md-header__button md-logo" aria-label="linearmodels v4.32 (+12)" data-md-component="logo">
       <img src="../../_static/bw-logo.svg" alt="logo">
     </a>
     <label class="md-header__button md-icon" for="__drawer">
@@ -104,7 +104,7 @@
       <div class="md-header__ellipsis">
         <div class="md-header__topic">
           <span class="md-ellipsis">
-            linearmodels v4.32 (+10)
+            linearmodels v4.32 (+12)
           </span>
         </div>
         <div class="md-header__topic" data-md-component="header-topic">
@@ -191,10 +191,10 @@
 
 <nav class="md-nav md-nav--primary" aria-label="Navigation" data-md-level="0">
   <label class="md-nav__title" for="__drawer">
-    <a href="../../index.html" title="linearmodels v4.32 (+10)" class="md-nav__button md-logo" aria-label="linearmodels v4.32 (+10)" data-md-component="logo">
+    <a href="../../index.html" title="linearmodels v4.32 (+12)" class="md-nav__button md-logo" aria-label="linearmodels v4.32 (+12)" data-md-component="logo">
       <img src="../../_static/bw-logo.svg" alt="logo">
     </a>
-    linearmodels v4.32 (+10)
+    linearmodels v4.32 (+12)
   </label>
   
     <div class="md-nav__source">
@@ -718,10 +718,7 @@ hours &amp; = &amp; \beta_0 + \beta_1 \ln(wage) + \beta_2 educ + \beta_3 age + \
 <div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span><code>[1]:
 </code></pre></div>
 </div>
-<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><code><span class="c1"># Import ordering to get the future behavior</span>
-<span class="kn">from</span> <span class="nn">linearmodels.__future__</span> <span class="kn">import</span> <span class="n">ordering</span>
-
-<span class="kn">from</span> <span class="nn">linearmodels.datasets</span> <span class="kn">import</span> <span class="n">mroz</span>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><code><span class="kn">from</span> <span class="nn">linearmodels.datasets</span> <span class="kn">import</span> <span class="n">mroz</span>
 
 <span class="n">data</span> <span class="o">=</span> <span class="n">mroz</span><span class="o">.</span><span class="n">load</span><span class="p">()</span>
 </code></pre></div>
@@ -777,8 +774,8 @@ hours &amp; = &amp; \beta_0 + \beta_1 \ln(wage) + \beta_2 educ + \beta_3 age + \
 Dep. Variable:                  hours   R-squared:                      0.1903
 Estimator:                    IV-2SLS   Adj. R-squared:                 0.1807
 No. Observations:                 428   F-statistic:                    399.30
-Date:                Sun, May 21 2023   P-value (F-stat)                0.0000
-Time:                        14:44:13   Distribution:                  chi2(5)
+Date:                Tue, May 23 2023   P-value (F-stat)                0.0000
+Time:                        09:52:29   Distribution:                  chi2(5)
 Cov. Estimator:            unadjusted
 
                              Parameter Estimates
@@ -821,8 +818,8 @@ Debiased: False
 Dep. Variable:                  lwage   R-squared:                      0.7582
 Estimator:                    IV-2SLS   Adj. R-squared:                 0.7559
 No. Observations:                 428   F-statistic:                    1362.4
-Date:                Sun, May 21 2023   P-value (F-stat)                0.0000
-Time:                        14:44:13   Distribution:                  chi2(4)
+Date:                Tue, May 23 2023   P-value (F-stat)                0.0000
+Time:                        09:52:29   Distribution:                  chi2(4)
 Cov. Estimator:            unadjusted
 
                              Parameter Estimates
@@ -864,8 +861,8 @@ Debiased: False
 Estimator:                        OLS   Overall R-squared:                   0.1903
 No. Equations.:                     2   McElroy&#39;s R-squared:                 0.1276
 No. Observations:                 428   Judge&#39;s (OLS) R-squared:            -2.0961
-Date:                Sun, May 21 2023   Berndt&#39;s R-squared:                 -0.7279
-Time:                        14:44:13   Dhrymes&#39;s R-squared:                 0.1903
+Date:                Tue, May 23 2023   Berndt&#39;s R-squared:                 -0.7279
+Time:                        09:52:29   Dhrymes&#39;s R-squared:                 0.1903
                                         Cov. Estimator:                  unadjusted
                                         Num. Constraints:                      None
                   Equation: hours, Dependent Variable: hours
@@ -923,8 +920,8 @@ Homoskedastic (Unadjusted) Covariance (Debiased: False, GLS: False)
 Estimator:                        GLS   Overall R-squared:                   0.0120
 No. Equations.:                     2   McElroy&#39;s R-squared:                 0.0873
 No. Observations:                 428   Judge&#39;s (OLS) R-squared:            -2.7778
-Date:                Sun, May 21 2023   Berndt&#39;s R-squared:                 -0.7279
-Time:                        14:44:13   Dhrymes&#39;s R-squared:                 0.0120
+Date:                Tue, May 23 2023   Berndt&#39;s R-squared:                 -0.7279
+Time:                        09:52:29   Dhrymes&#39;s R-squared:                 0.0120
                                         Cov. Estimator:                  unadjusted
                                         Num. Constraints:                      None
                   Equation: hours, Dependent Variable: hours
@@ -1004,8 +1001,8 @@ Homoskedastic (Unadjusted) Covariance (Debiased: False, GLS: True)
 Estimator:                        GLS   Overall R-squared:                   0.0120
 No. Equations.:                     2   McElroy&#39;s R-squared:                 0.0873
 No. Observations:                 428   Judge&#39;s (OLS) R-squared:            -2.7778
-Date:                Sun, May 21 2023   Berndt&#39;s R-squared:                 -0.7279
-Time:                        14:44:14   Dhrymes&#39;s R-squared:                 0.0120
+Date:                Tue, May 23 2023   Berndt&#39;s R-squared:                 -0.7279
+Time:                        09:52:29   Dhrymes&#39;s R-squared:                 0.0120
                                         Cov. Estimator:                  unadjusted
                                         Num. Constraints:                      None
                   Equation: hours, Dependent Variable: hours
@@ -1070,8 +1067,8 @@ Homoskedastic (Unadjusted) Covariance (Debiased: False, GLS: True)
 Estimator:          2-Step System GMM   Overall R-squared:                   0.0121
 No. Equations.:                     2   McElroy&#39;s R-squared:                 0.0871
 No. Observations:                 428   Judge&#39;s (OLS) R-squared:            -2.7776
-Date:                Sun, May 21 2023   Berndt&#39;s R-squared:                 -0.7268
-Time:                        14:44:14   Dhrymes&#39;s R-squared:                 0.0121
+Date:                Tue, May 23 2023   Berndt&#39;s R-squared:                 -0.7268
+Time:                        09:52:30   Dhrymes&#39;s R-squared:                 0.0121
                                         Cov. Estimator:                  unadjusted
                                         Num. Constraints:                      None
                   Equation: hours, Dependent Variable: hours
@@ -1132,8 +1129,8 @@ Number of iterations: 20
 Estimator:         Iterative System GMM   Overall R-squared:                  -0.0345
 No. Equations.:                       2   McElroy&#39;s R-squared:                -0.2256
 No. Observations:                   428   Judge&#39;s (OLS) R-squared:            -2.9557
-Date:                  Sun, May 21 2023   Berndt&#39;s R-squared:                 -2.0361
-Time:                          14:44:14   Dhrymes&#39;s R-squared:                -0.0345
+Date:                  Tue, May 23 2023   Berndt&#39;s R-squared:                 -2.0361
+Time:                          09:52:30   Dhrymes&#39;s R-squared:                -0.0345
                                           Cov. Estimator:                      robust
                                           Num. Constraints:                      None
                   Equation: hours, Dependent Variable: hours
@@ -1218,8 +1215,8 @@ y_1 = \frac{1}{2}\left(x_2 - x_1 + \epsilon_2 - \epsilon_1\right) \\
 Estimator:                        GLS   Overall R-squared:                   0.0013
 No. Equations.:                     2   McElroy&#39;s R-squared:                 0.0014
 No. Observations:               50000   Judge&#39;s (OLS) R-squared:             0.0013
-Date:                Sun, May 21 2023   Berndt&#39;s R-squared:                  0.0027
-Time:                        14:44:14   Dhrymes&#39;s R-squared:                 0.0013
+Date:                Tue, May 23 2023   Berndt&#39;s R-squared:                  0.0027
+Time:                        09:52:30   Dhrymes&#39;s R-squared:                 0.0013
                                         Cov. Estimator:                      robust
                                         Num. Constraints:                      None
                      Equation: y1, Dependent Variable: y1

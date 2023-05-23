@@ -1,0 +1,1333 @@
+
+
+
+<!doctype html>
+<html lang="en" class="no-js">
+  <head>
+    
+      <meta charset="utf-8">
+      <meta name="viewport" content="width=device-width,initial-scale=1">
+      
+      
+      
+      <link rel="icon" href="../_static/favicon.ico">
+    
+    
+  
+      
+        <title>Version 4 - linearmodels v4.32 (+12)</title>
+      
+    
+
+  <link rel="apple-touch-icon" sizes="180x180" href="../_static/icons/apple-touch-icon.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="../_static/icons/favicon-32x32.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="../_static/icons/favicon-16x16.png">
+  <link rel="manifest" href="../_static/icons/site.webmanifest">
+  <link rel="mask-icon" href="../_static/icons/safari-pinned-tab.svg" color="#2196f3">
+  <link rel="shortcut icon" href="../_static/icons/favicon.ico">
+  <meta name="msapplication-TileColor" content="#f8f8f8">
+  <meta name="msapplication-config" content="../_static/icons/browserconfig.xml">
+
+    
+      
+        
+        
+          
+          
+          <meta name="theme-color" content="#2094f3">
+        
+      
+      
+
+    
+    
+    
+      
+        
+        
+        <style>:root{--md-text-font:"Roboto";--md-code-font:"Roboto Mono"}</style>
+      
+    
+        <link rel="stylesheet" type="text/css" href="../_static/sphinx_immaterial_theme.b223ac77c5eb52f42.min.css" />
+        <link rel="stylesheet" type="text/css" href="../_static/css/small_fixes.css" />
+    <script>__md_scope=new URL("..",location),__md_hash=e=>[...e].reduce((e,_)=>(e<<5)-e+_.charCodeAt(0),0),__md_get=(e,_=localStorage,t=__md_scope)=>JSON.parse(_.getItem(t.pathname+"."+e)),__md_set=(e,_,t=localStorage,a=__md_scope)=>{try{t.setItem(a.pathname+"."+e,JSON.stringify(_))}catch(e){}}</script>
+    
+      
+
+    
+    
+    
+  </head>
+  
+  
+    
+    
+    
+    
+    
+    <body dir="ltr" data-md-color-scheme="" data-md-color-primary="blue" data-md-color-accent="orange">
+  
+    
+    
+    <input class="md-toggle" data-md-toggle="drawer" type="checkbox" id="__drawer" autocomplete="off">
+    <input class="md-toggle" data-md-toggle="search" type="checkbox" id="__search" autocomplete="off">
+    <label class="md-overlay" for="__drawer"></label>
+    <div data-md-component="skip">
+      
+        
+        <a href="#version-4-31" class="md-skip">
+          Skip to content
+        </a>
+      
+    </div>
+    <div data-md-component="announce">
+      
+    </div>
+    
+      <div data-md-component="outdated" hidden>
+        
+      </div>
+    
+    
+      
+
+<header class="md-header" data-md-component="header">
+  <nav class="md-header__inner md-grid" aria-label="Header">
+    <a href="../index.html" title="linearmodels v4.32 (+12)" class="md-header__button md-logo" aria-label="linearmodels v4.32 (+12)" data-md-component="logo">
+      <img src="../_static/bw-logo.svg" alt="logo">
+    </a>
+    <label class="md-header__button md-icon" for="__drawer">
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M3 6h18v2H3V6m0 5h18v2H3v-2m0 5h18v2H3v-2Z"/></svg>
+    </label>
+    <div class="md-header__title" data-md-component="header-title">
+      <div class="md-header__ellipsis">
+        <div class="md-header__topic">
+          <span class="md-ellipsis">
+            linearmodels v4.32 (+12)
+          </span>
+        </div>
+        <div class="md-header__topic" data-md-component="header-topic">
+          <span class="md-ellipsis">
+            
+              Version 4
+            
+          </span>
+        </div>
+      </div>
+    </div>
+    
+    
+    
+      <label class="md-header__button md-icon" for="__search">
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.516 6.516 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5Z"/></svg>
+      </label>
+      <div class="md-search" data-md-component="search" role="dialog">
+  <label class="md-search__overlay" for="__search"></label>
+  <div class="md-search__inner" role="search">
+    <form class="md-search__form" name="search">
+      <input type="text" class="md-search__input" name="query" aria-label="Search" placeholder="Search" autocapitalize="off" autocorrect="off" autocomplete="off" spellcheck="false" data-md-component="search-query" required>
+      <label class="md-search__icon md-icon" for="__search">
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.516 6.516 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5Z"/></svg>
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20 11v2H8l5.5 5.5-1.42 1.42L4.16 12l7.92-7.92L13.5 5.5 8 11h12Z"/></svg>
+      </label>
+      <nav class="md-search__options" aria-label="Search">
+        
+        <button type="reset" class="md-search__icon md-icon" title="Clear" aria-label="Clear" tabindex="-1">
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M19 6.41 17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12 19 6.41Z"/></svg>
+        </button>
+      </nav>
+      
+    </form>
+    <div class="md-search__output">
+      <div class="md-search__scrollwrap" data-md-scrollfix>
+        <div class="md-search-result" data-md-component="search-result">
+          <div class="md-search-result__meta">
+            Initializing search
+          </div>
+          <ol class="md-search-result__list"></ol>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+    
+    
+      <div class="md-header__source">
+        <a href="https://github.com/bashtage/linearmodels/" title="Go to repository" class="md-source" data-md-component="source">
+  <div class="md-source__icon md-icon">
+    
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 496 512"><!--! Font Awesome Free 6.2.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2022 Fonticons, Inc.--><path d="M165.9 397.4c0 2-2.3 3.6-5.2 3.6-3.3.3-5.6-1.3-5.6-3.6 0-2 2.3-3.6 5.2-3.6 3-.3 5.6 1.3 5.6 3.6zm-31.1-4.5c-.7 2 1.3 4.3 4.3 4.9 2.6 1 5.6 0 6.2-2s-1.3-4.3-4.3-5.2c-2.6-.7-5.5.3-6.2 2.3zm44.2-1.7c-2.9.7-4.9 2.6-4.6 4.9.3 2 2.9 3.3 5.9 2.6 2.9-.7 4.9-2.6 4.6-4.6-.3-1.9-3-3.2-5.9-2.9zM244.8 8C106.1 8 0 113.3 0 252c0 110.9 69.8 205.8 169.5 239.2 12.8 2.3 17.3-5.6 17.3-12.1 0-6.2-.3-40.4-.3-61.4 0 0-70 15-84.7-29.8 0 0-11.4-29.1-27.8-36.6 0 0-22.9-15.7 1.6-15.4 0 0 24.9 2 38.6 25.8 21.9 38.6 58.6 27.5 72.9 20.9 2.3-16 8.8-27.1 16-33.7-55.9-6.2-112.3-14.3-112.3-110.5 0-27.5 7.6-41.3 23.6-58.9-2.6-6.5-11.1-33.3 2.6-67.9 20.9-6.5 69 27 69 27 20-5.6 41.5-8.5 62.8-8.5s42.8 2.9 62.8 8.5c0 0 48.1-33.6 69-27 13.7 34.7 5.2 61.4 2.6 67.9 16 17.7 25.8 31.5 25.8 58.9 0 96.5-58.9 104.2-114.8 110.5 9.2 7.9 17 22.9 17 46.4 0 33.7-.3 75.4-.3 83.6 0 6.5 4.6 14.4 17.3 12.1C428.2 457.8 496 362.9 496 252 496 113.3 383.5 8 244.8 8zM97.2 352.9c-1.3 1-1 3.3.7 5.2 1.6 1.6 3.9 2.3 5.2 1 1.3-1 1-3.3-.7-5.2-1.6-1.6-3.9-2.3-5.2-1zm-10.8-8.1c-.7 1.3.3 2.9 2.3 3.9 1.6 1 3.6.7 4.3-.7.7-1.3-.3-2.9-2.3-3.9-2-.6-3.6-.3-4.3.7zm32.4 35.6c-1.6 1.3-1 4.3 1.3 6.2 2.3 2.3 5.2 2.6 6.5 1 1.3-1.3.7-4.3-1.3-6.2-2.2-2.3-5.2-2.6-6.5-1zm-11.4-14.7c-1.6 1-1.6 3.6 0 5.9 1.6 2.3 4.3 3.3 5.6 2.3 1.6-1.3 1.6-3.9 0-6.2-1.4-2.3-4-3.3-5.6-2z"/></svg>
+  </div>
+  <div class="md-source__repository">
+    linearmodels
+  </div>
+</a>
+      </div>
+    
+  </nav>
+  
+</header>
+    
+    <div class="md-container" data-md-component="container">
+      
+      
+      
+      
+        
+          
+        
+      
+      <main class="md-main" data-md-component="main">
+        <div class="md-main__inner md-grid">
+          
+            
+              
+              <div class="md-sidebar md-sidebar--primary" data-md-component="sidebar" data-md-type="navigation" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+
+
+<nav class="md-nav md-nav--primary" aria-label="Navigation" data-md-level="0">
+  <label class="md-nav__title" for="__drawer">
+    <a href="../index.html" title="linearmodels v4.32 (+12)" class="md-nav__button md-logo" aria-label="linearmodels v4.32 (+12)" data-md-component="logo">
+      <img src="../_static/bw-logo.svg" alt="logo">
+    </a>
+    linearmodels v4.32 (+12)
+  </label>
+  
+    <div class="md-nav__source">
+      <a href="https://github.com/bashtage/linearmodels/" title="Go to repository" class="md-source" data-md-component="source">
+  <div class="md-source__icon md-icon">
+    
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 496 512"><!--! Font Awesome Free 6.2.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2022 Fonticons, Inc.--><path d="M165.9 397.4c0 2-2.3 3.6-5.2 3.6-3.3.3-5.6-1.3-5.6-3.6 0-2 2.3-3.6 5.2-3.6 3-.3 5.6 1.3 5.6 3.6zm-31.1-4.5c-.7 2 1.3 4.3 4.3 4.9 2.6 1 5.6 0 6.2-2s-1.3-4.3-4.3-5.2c-2.6-.7-5.5.3-6.2 2.3zm44.2-1.7c-2.9.7-4.9 2.6-4.6 4.9.3 2 2.9 3.3 5.9 2.6 2.9-.7 4.9-2.6 4.6-4.6-.3-1.9-3-3.2-5.9-2.9zM244.8 8C106.1 8 0 113.3 0 252c0 110.9 69.8 205.8 169.5 239.2 12.8 2.3 17.3-5.6 17.3-12.1 0-6.2-.3-40.4-.3-61.4 0 0-70 15-84.7-29.8 0 0-11.4-29.1-27.8-36.6 0 0-22.9-15.7 1.6-15.4 0 0 24.9 2 38.6 25.8 21.9 38.6 58.6 27.5 72.9 20.9 2.3-16 8.8-27.1 16-33.7-55.9-6.2-112.3-14.3-112.3-110.5 0-27.5 7.6-41.3 23.6-58.9-2.6-6.5-11.1-33.3 2.6-67.9 20.9-6.5 69 27 69 27 20-5.6 41.5-8.5 62.8-8.5s42.8 2.9 62.8 8.5c0 0 48.1-33.6 69-27 13.7 34.7 5.2 61.4 2.6 67.9 16 17.7 25.8 31.5 25.8 58.9 0 96.5-58.9 104.2-114.8 110.5 9.2 7.9 17 22.9 17 46.4 0 33.7-.3 75.4-.3 83.6 0 6.5 4.6 14.4 17.3 12.1C428.2 457.8 496 362.9 496 252 496 113.3 383.5 8 244.8 8zM97.2 352.9c-1.3 1-1 3.3.7 5.2 1.6 1.6 3.9 2.3 5.2 1 1.3-1 1-3.3-.7-5.2-1.6-1.6-3.9-2.3-5.2-1zm-10.8-8.1c-.7 1.3.3 2.9 2.3 3.9 1.6 1 3.6.7 4.3-.7.7-1.3-.3-2.9-2.3-3.9-2-.6-3.6-.3-4.3.7zm32.4 35.6c-1.6 1.3-1 4.3 1.3 6.2 2.3 2.3 5.2 2.6 6.5 1 1.3-1.3.7-4.3-1.3-6.2-2.2-2.3-5.2-2.6-6.5-1zm-11.4-14.7c-1.6 1-1.6 3.6 0 5.9 1.6 2.3 4.3 3.3 5.6 2.3 1.6-1.3 1.6-3.9 0-6.2-1.4-2.3-4-3.3-5.6-2z"/></svg>
+  </div>
+  <div class="md-source__repository">
+    linearmodels
+  </div>
+</a>
+    </div>
+  
+  <ul class="md-nav__list" data-md-scrollfix>
+    
+      
+      
+      
+
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../iv/index.html" class="md-nav__link">
+        <span title="/iv/index.rst (reference label)" class="md-ellipsis">Instrumental Variable Estimation</span>
+      </a>
+    </li>
+  
+
+    
+      
+      
+      
+
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../panel/index.html" class="md-nav__link">
+        <span title="/panel/index.rst (reference label)" class="md-ellipsis">Panel Data Model Estimation</span>
+      </a>
+    </li>
+  
+
+    
+      
+      
+      
+
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../asset-pricing/index.html" class="md-nav__link">
+        <span title="/asset-pricing/index.rst (reference label)" class="md-ellipsis">Linear Factor Models for Asset Pricing</span>
+      </a>
+    </li>
+  
+
+    
+      
+      
+      
+
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../system/index.html" class="md-nav__link">
+        <span title="/system/index.rst (reference label)" class="md-ellipsis">System Regression Models</span>
+      </a>
+    </li>
+  
+
+    
+      
+      
+      
+
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../utility.html" class="md-nav__link">
+        <span title="/utility.rst (reference label)" class="md-ellipsis">Utilities</span>
+      </a>
+    </li>
+  
+
+    
+      
+      
+      
+
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../compatibility.html" class="md-nav__link">
+        <span title="/compatibility.rst (reference label)" class="md-ellipsis">Compatibility</span>
+      </a>
+    </li>
+  
+
+    
+      
+      
+      
+
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../plan.html" class="md-nav__link">
+        <span title="/plan.rst (reference label)" class="md-ellipsis">Module Plans</span>
+      </a>
+    </li>
+  
+
+    
+      
+      
+      
+
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../contributing.html" class="md-nav__link">
+        <span title="/contributing.rst (reference label)" class="md-ellipsis">Contributing</span>
+      </a>
+    </li>
+  
+
+    
+      
+      
+      
+
+  
+  
+    
+  
+  
+    
+    <li class="md-nav__item md-nav__item--active md-nav__item--nested">
+      
+      
+        <input class="md-nav__toggle md-toggle" data-md-toggle="__nav_9" type="checkbox" id="__nav_9" checked>
+      
+      
+      
+        
+        <div class="md-nav__link md-nav__link--index ">
+          <a href="../changes.html"><span title="/changes.rst (reference label)" class="md-ellipsis">Change Log</span></a>
+          
+            <label for="__nav_9">
+              <span class="md-nav__icon md-icon"></span>
+            </label>
+          
+        </div>
+      
+      <nav class="md-nav" aria-label="Change Log" data-md-level="1">
+        <label class="md-nav__title" for="__nav_9">
+          <span class="md-nav__icon md-icon"></span>
+          <span title="/changes.rst (reference label)" class="md-ellipsis">Change Log</span>
+        </label>
+        <ul class="md-nav__list" data-md-scrollfix>
+          
+            
+              
+  
+  
+    
+  
+  
+    
+    <li class="md-nav__item md-nav__item--active md-nav__item--nested">
+      
+      
+        <input class="md-nav__toggle md-toggle" data-md-toggle="__nav_9_1" type="checkbox" id="__nav_9_1" checked>
+      
+      
+      
+        
+        <div class="md-nav__link md-nav__link--index ">
+          <a href="../changes.html#version-5-0"><span title="/changes.rst#version-5-0 (reference label)" class="md-ellipsis">Version 5.<wbr>0</span></a>
+          
+            <label for="__nav_9_1">
+              <span class="md-nav__icon md-icon"></span>
+            </label>
+          
+        </div>
+      
+      <nav class="md-nav" aria-label="Version 5.0" data-md-level="2">
+        <label class="md-nav__title" for="__nav_9_1">
+          <span class="md-nav__icon md-icon"></span>
+          <span title="/changes.rst#version-5-0 (reference label)" class="md-ellipsis">Version 5.<wbr>0</span>
+        </label>
+        <ul class="md-nav__list" data-md-scrollfix>
+          
+            
+              
+  
+  
+    
+  
+  
+    
+    <li class="md-nav__item md-nav__item--active md-nav__item--nested">
+      
+      
+        <input class="md-nav__toggle md-toggle" data-md-toggle="__nav_9_1_1" type="checkbox" id="__nav_9_1_1" checked>
+      
+      
+      
+        
+        <div class="md-nav__link md-nav__link--index ">
+          <a href="../changes.html#past-releases"><span title="/changes.rst#past-releases (reference label)" class="md-ellipsis">Past Releases</span></a>
+          
+            <label for="__nav_9_1_1">
+              <span class="md-nav__icon md-icon"></span>
+            </label>
+          
+        </div>
+      
+      <nav class="md-nav" aria-label="Past Releases" data-md-level="3">
+        <label class="md-nav__title" for="__nav_9_1_1">
+          <span class="md-nav__icon md-icon"></span>
+          <span title="/changes.rst#past-releases (reference label)" class="md-ellipsis">Past Releases</span>
+        </label>
+        <ul class="md-nav__list" data-md-scrollfix>
+          
+            
+              
+  
+  
+    
+  
+    
+  
+  
+    <li class="md-nav__item md-nav__item--active">
+      
+      
+      <input class="md-nav__toggle md-toggle" data-md-toggle="toc" type="checkbox" id="__toc">
+      
+        <label class="md-nav__link md-nav__link--active" for="__toc">
+          <span title="/changes/4.0.rst (reference label)" class="md-ellipsis">Version 4</span>
+          <span class="md-nav__icon md-icon"></span>
+        </label>
+      
+      <a href="#" class="md-nav__link md-nav__link--active">
+        <span title="/changes/4.0.rst (reference label)" class="md-ellipsis">Version 4</span>
+      </a>
+      
+        
+
+  
+
+<nav class="md-nav md-nav--secondary">
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Contents
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#version-4-31" class="md-nav__link">
+    <span title="/changes/4.0.rst#version-4-31 (reference label)" class="md-ellipsis">Version 4.<wbr>31</span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#version-4-30" class="md-nav__link">
+    <span title="/changes/4.0.rst#version-4-30 (reference label)" class="md-ellipsis">Version 4.<wbr>30</span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#version-4-29" class="md-nav__link">
+    <span title="/changes/4.0.rst#version-4-29 (reference label)" class="md-ellipsis">Version 4.<wbr>29</span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#version-4-28" class="md-nav__link">
+    <span title="/changes/4.0.rst#version-4-28 (reference label)" class="md-ellipsis">Version 4.<wbr>28</span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#version-4-27" class="md-nav__link">
+    <span title="/changes/4.0.rst#version-4-27 (reference label)" class="md-ellipsis">Version 4.<wbr>27</span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#version-4-26" class="md-nav__link">
+    <span title="/changes/4.0.rst#version-4-26 (reference label)" class="md-ellipsis">Version 4.<wbr>26</span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#version-4-25" class="md-nav__link">
+    <span title="/changes/4.0.rst#version-4-25 (reference label)" class="md-ellipsis">Version 4.<wbr>25</span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#version-4-24" class="md-nav__link">
+    <span title="/changes/4.0.rst#version-4-24 (reference label)" class="md-ellipsis">Version 4.<wbr>24</span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#version-4-21" class="md-nav__link">
+    <span title="/changes/4.0.rst#version-4-21 (reference label)" class="md-ellipsis">Version 4.<wbr>21</span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#version-4-20" class="md-nav__link">
+    <span title="/changes/4.0.rst#version-4-20 (reference label)" class="md-ellipsis">Version 4.<wbr>20</span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#version-4-19" class="md-nav__link">
+    <span title="/changes/4.0.rst#version-4-19 (reference label)" class="md-ellipsis">Version 4.<wbr>19</span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#version-4-18" class="md-nav__link">
+    <span title="/changes/4.0.rst#version-4-18 (reference label)" class="md-ellipsis">Version 4.<wbr>18</span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#version-4-17" class="md-nav__link">
+    <span title="/changes/4.0.rst#version-4-17 (reference label)" class="md-ellipsis">Version 4.<wbr>17</span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#version-4-16" class="md-nav__link">
+    <span title="/changes/4.0.rst#version-4-16 (reference label)" class="md-ellipsis">Version 4.<wbr>16</span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#version-4-15" class="md-nav__link">
+    <span title="/changes/4.0.rst#version-4-15 (reference label)" class="md-ellipsis">Version 4.<wbr>15</span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#version-4-14" class="md-nav__link">
+    <span title="/changes/4.0.rst#version-4-14 (reference label)" class="md-ellipsis">Version 4.<wbr>14</span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#version-4-13" class="md-nav__link">
+    <span title="/changes/4.0.rst#version-4-13 (reference label)" class="md-ellipsis">Version 4.<wbr>13</span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#version-4-12" class="md-nav__link">
+    <span title="/changes/4.0.rst#version-4-12 (reference label)" class="md-ellipsis">Version 4.<wbr>12</span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#version-4-11" class="md-nav__link">
+    <span title="/changes/4.0.rst#version-4-11 (reference label)" class="md-ellipsis">Version 4.<wbr>11</span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#version-4-10" class="md-nav__link">
+    <span title="/changes/4.0.rst#version-4-10 (reference label)" class="md-ellipsis">Version 4.<wbr>10</span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#version-4-9" class="md-nav__link">
+    <span title="/changes/4.0.rst#version-4-9 (reference label)" class="md-ellipsis">Version 4.<wbr>9</span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#version-4-8" class="md-nav__link">
+    <span title="/changes/4.0.rst#version-4-8 (reference label)" class="md-ellipsis">Version 4.<wbr>8</span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#version-4-7" class="md-nav__link">
+    <span title="/changes/4.0.rst#version-4-7 (reference label)" class="md-ellipsis">Version 4.<wbr>7</span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#version-4-6" class="md-nav__link">
+    <span title="/changes/4.0.rst#version-4-6 (reference label)" class="md-ellipsis">Version 4.<wbr>6</span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#version-4-5" class="md-nav__link">
+    <span title="/changes/4.0.rst#version-4-5 (reference label)" class="md-ellipsis">Version 4.<wbr>5</span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#version-4-0" class="md-nav__link">
+    <span title="/changes/4.0.rst#version-4-0 (reference label)" class="md-ellipsis">Version 4.<wbr>0</span>
+  </a>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+      
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="3.0-2.0-1.0.html" class="md-nav__link">
+        <span title="/changes/3.0-2.0-1.0.rst (reference label)" class="md-ellipsis">Version 3.<wbr>0</span>
+      </a>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="3.0-2.0-1.0.html#version-2-0" class="md-nav__link">
+        <span title="/changes/3.0-2.0-1.0.rst#version-2-0 (reference label)" class="md-ellipsis">Version 2.<wbr>0</span>
+      </a>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="3.0-2.0-1.0.html#version-1-0" class="md-nav__link">
+        <span title="/changes/3.0-2.0-1.0.rst#version-1-0 (reference label)" class="md-ellipsis">Version 1.<wbr>0</span>
+      </a>
+    </li>
+  
+
+            
+          
+        </ul>
+      </nav>
+    </li>
+  
+  
+
+            
+          
+        </ul>
+      </nav>
+    </li>
+  
+  
+
+            
+          
+        </ul>
+      </nav>
+    </li>
+  
+  
+
+    
+      
+      
+      
+
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../references.html" class="md-nav__link">
+        <span title="/references.rst (reference label)" class="md-ellipsis">References</span>
+      </a>
+    </li>
+  
+
+    
+  </ul>
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+            
+              
+              <div class="md-sidebar md-sidebar--secondary" data-md-component="sidebar" data-md-type="toc" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+
+  
+
+<nav class="md-nav md-nav--secondary">
+  
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Contents
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#version-4-31" class="md-nav__link">
+    <span title="/changes/4.0.rst#version-4-31 (reference label)" class="md-ellipsis">Version 4.<wbr>31</span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#version-4-30" class="md-nav__link">
+    <span title="/changes/4.0.rst#version-4-30 (reference label)" class="md-ellipsis">Version 4.<wbr>30</span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#version-4-29" class="md-nav__link">
+    <span title="/changes/4.0.rst#version-4-29 (reference label)" class="md-ellipsis">Version 4.<wbr>29</span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#version-4-28" class="md-nav__link">
+    <span title="/changes/4.0.rst#version-4-28 (reference label)" class="md-ellipsis">Version 4.<wbr>28</span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#version-4-27" class="md-nav__link">
+    <span title="/changes/4.0.rst#version-4-27 (reference label)" class="md-ellipsis">Version 4.<wbr>27</span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#version-4-26" class="md-nav__link">
+    <span title="/changes/4.0.rst#version-4-26 (reference label)" class="md-ellipsis">Version 4.<wbr>26</span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#version-4-25" class="md-nav__link">
+    <span title="/changes/4.0.rst#version-4-25 (reference label)" class="md-ellipsis">Version 4.<wbr>25</span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#version-4-24" class="md-nav__link">
+    <span title="/changes/4.0.rst#version-4-24 (reference label)" class="md-ellipsis">Version 4.<wbr>24</span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#version-4-21" class="md-nav__link">
+    <span title="/changes/4.0.rst#version-4-21 (reference label)" class="md-ellipsis">Version 4.<wbr>21</span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#version-4-20" class="md-nav__link">
+    <span title="/changes/4.0.rst#version-4-20 (reference label)" class="md-ellipsis">Version 4.<wbr>20</span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#version-4-19" class="md-nav__link">
+    <span title="/changes/4.0.rst#version-4-19 (reference label)" class="md-ellipsis">Version 4.<wbr>19</span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#version-4-18" class="md-nav__link">
+    <span title="/changes/4.0.rst#version-4-18 (reference label)" class="md-ellipsis">Version 4.<wbr>18</span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#version-4-17" class="md-nav__link">
+    <span title="/changes/4.0.rst#version-4-17 (reference label)" class="md-ellipsis">Version 4.<wbr>17</span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#version-4-16" class="md-nav__link">
+    <span title="/changes/4.0.rst#version-4-16 (reference label)" class="md-ellipsis">Version 4.<wbr>16</span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#version-4-15" class="md-nav__link">
+    <span title="/changes/4.0.rst#version-4-15 (reference label)" class="md-ellipsis">Version 4.<wbr>15</span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#version-4-14" class="md-nav__link">
+    <span title="/changes/4.0.rst#version-4-14 (reference label)" class="md-ellipsis">Version 4.<wbr>14</span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#version-4-13" class="md-nav__link">
+    <span title="/changes/4.0.rst#version-4-13 (reference label)" class="md-ellipsis">Version 4.<wbr>13</span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#version-4-12" class="md-nav__link">
+    <span title="/changes/4.0.rst#version-4-12 (reference label)" class="md-ellipsis">Version 4.<wbr>12</span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#version-4-11" class="md-nav__link">
+    <span title="/changes/4.0.rst#version-4-11 (reference label)" class="md-ellipsis">Version 4.<wbr>11</span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#version-4-10" class="md-nav__link">
+    <span title="/changes/4.0.rst#version-4-10 (reference label)" class="md-ellipsis">Version 4.<wbr>10</span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#version-4-9" class="md-nav__link">
+    <span title="/changes/4.0.rst#version-4-9 (reference label)" class="md-ellipsis">Version 4.<wbr>9</span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#version-4-8" class="md-nav__link">
+    <span title="/changes/4.0.rst#version-4-8 (reference label)" class="md-ellipsis">Version 4.<wbr>8</span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#version-4-7" class="md-nav__link">
+    <span title="/changes/4.0.rst#version-4-7 (reference label)" class="md-ellipsis">Version 4.<wbr>7</span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#version-4-6" class="md-nav__link">
+    <span title="/changes/4.0.rst#version-4-6 (reference label)" class="md-ellipsis">Version 4.<wbr>6</span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#version-4-5" class="md-nav__link">
+    <span title="/changes/4.0.rst#version-4-5 (reference label)" class="md-ellipsis">Version 4.<wbr>5</span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#version-4-0" class="md-nav__link">
+    <span title="/changes/4.0.rst#version-4-0 (reference label)" class="md-ellipsis">Version 4.<wbr>0</span>
+  </a>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+          
+          
+            <div class="md-content" data-md-component="content">
+              <article class="md-content__inner md-typeset" role="main">
+                  
+
+
+<h1 id="version-4">Version 4<a class="headerlink" href="#version-4" title="Permalink to this heading">¶</a></h1>
+<h2 id="version-4-31">Version 4.31<a class="headerlink" href="#version-4-31" title="Permalink to this heading">¶</a></h2>
+<ul class="simple">
+<li><p>Updated formulaic support of 0.6.0 and added optional support for <cite>not</cite> sorting
+variables from formulas.  The default will continue to sort variables. You can
+enable the future behavior now using</p></li>
+</ul>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><code><span class="kn">from</span> <span class="nn">linearmodels.__future__</span> <span class="kn">import</span> <span class="n">ordering</span>
+</code></pre></div>
+</div>
+<ul class="simple">
+<li><p>The key difference between the old and the new behavior is that the old would
+reorder the variables in a formula so that <code class="docutils literal notranslate"><span class="pre">y</span> <span class="pre">~</span> <span class="pre">1</span> <span class="pre">+</span> <span class="pre">x</span> <span class="pre">+</span> <span class="pre">z</span> <span class="pre">+</span> <span class="pre">w</span></code> would return
+parameter estimates in the order <code class="docutils literal notranslate"><span class="pre">1</span></code>, <code class="docutils literal notranslate"><span class="pre">w</span></code>, <code class="docutils literal notranslate"><span class="pre">x</span></code>, <code class="docutils literal notranslate"><span class="pre">z</span></code> due to sorting. The new
+behavior will default to not sorting so that when using <code class="docutils literal notranslate"><span class="pre">y</span> <span class="pre">~</span> <span class="pre">1</span> <span class="pre">+</span> <span class="pre">x</span> <span class="pre">+</span> <span class="pre">z</span> <span class="pre">+</span> <span class="pre">w</span></code>
+will return parameter estimates in the order <code class="docutils literal notranslate"><span class="pre">1</span></code>, <code class="docutils literal notranslate"><span class="pre">x</span></code>, <code class="docutils literal notranslate"><span class="pre">z</span></code>, <code class="docutils literal notranslate"><span class="pre">w</span></code>.</p></li>
+</ul>
+<h2 id="version-4-30">Version 4.30<a class="headerlink" href="#version-4-30" title="Permalink to this heading">¶</a></h2>
+<ul class="simple">
+<li><p>Improved compatability with unreleased versions of NumPy and pandas.</p></li>
+</ul>
+<h2 id="version-4-29">Version 4.29<a class="headerlink" href="#version-4-29" title="Permalink to this heading">¶</a></h2>
+<ul class="simple">
+<li><p>Added average <span class="math notranslate nohighlight">\(R^2\)</span> and average adjusted <span class="math notranslate nohighlight">\(R^2\)</span> properties to
+<a class="reference internal" href="../panel/panel/linearmodels.panel.results.FamaMacBethResults.html#linearmodels.panel.results.FamaMacBethResults" title="linearmodels.panel.results.FamaMacBethResults (Python class) — Results container for Fama MacBeth panel data models"><code class="xref py py-class docutils literal notranslate"><span class="pre">FamaMacBethResults</span></code></a> as
+<a class="reference internal" href="../panel/panel/linearmodels.panel.results.FamaMacBethResults.avg_rsquared.html#linearmodels.panel.results.FamaMacBethResults.avg_rsquared" title="linearmodels.panel.results.FamaMacBethResults.avg_rsquared (Python property) — The average coefficient of determination"><code class="xref py py-meth docutils literal notranslate"><span class="pre">avg_rsquared()</span></code></a> and
+<a class="reference internal" href="../panel/panel/linearmodels.panel.results.FamaMacBethResults.avg_adj_rsquared.html#linearmodels.panel.results.FamaMacBethResults.avg_adj_rsquared" title="linearmodels.panel.results.FamaMacBethResults.avg_adj_rsquared (Python property) — The average coefficient of determination, adjusted for sample size."><code class="xref py py-meth docutils literal notranslate"><span class="pre">avg_adj_rsquared()</span></code></a>.</p></li>
+<li><p>Initial compatability with pandas 2.0 Copy-on-Write feature.</p></li>
+</ul>
+<h2 id="version-4-28">Version 4.28<a class="headerlink" href="#version-4-28" title="Permalink to this heading">¶</a></h2>
+<ul class="simple">
+<li><p>Expanded compatability for formulaic from 0.3.2 to 0.5.2</p></li>
+<li><p>Fixed a few issues related to pandas 2.0</p></li>
+<li><p>Added tests and wheel support for Python 3.11</p></li>
+</ul>
+<h2 id="version-4-27">Version 4.27<a class="headerlink" href="#version-4-27" title="Permalink to this heading">¶</a></h2>
+<ul class="simple">
+<li><p>Switched from patsy for formulaic for linear constraint translation when using
+the formula interface. This allows formulas to be specified using a dictionary
+of constraints in addition to the standard single string of list of strings
+(<a class="reference external" href="https://github.com/bashtage/linearmodels/issues/439">GH439</a>, <a class="reference external" href="https://github.com/bashtage/linearmodels/issues/440">GH440</a>).</p></li>
+<li><p>Fixed a bug when using escaped variable names, e.g., <code class="docutils literal notranslate"><span class="pre">y</span> <span class="pre">~</span> <span class="pre">1</span> <span class="pre">+</span> <span class="pre">`x</span> <span class="pre">3`</span></code>, in panel
+data models (<a class="reference external" href="https://github.com/bashtage/linearmodels/issues/435">GH435</a>).</p></li>
+<li><p>Fixed a bug that affected creating IV models using formulas with missing data (<a class="reference external" href="https://github.com/bashtage/linearmodels/issues/438">GH438</a>).</p></li>
+<li><p>Fixed examples in documentation (<a class="reference external" href="https://github.com/bashtage/linearmodels/issues/434">GH434</a>).</p></li>
+</ul>
+<h2 id="version-4-26">Version 4.26<a class="headerlink" href="#version-4-26" title="Permalink to this heading">¶</a></h2>
+<ul class="simple">
+<li><p>Fixed a bug in <a class="reference internal" href="../iv/iv/linearmodels.iv.model.IV2SLS.html#linearmodels.iv.model.IV2SLS" title="linearmodels.iv.model.IV2SLS (Python class) — Estimation of IV models using two-stage least squares"><code class="xref py py-class docutils literal notranslate"><span class="pre">IV2SLS</span></code></a> and related models
+where <a class="reference internal" href="../iv/iv/linearmodels.iv.model.IV2SLS.predict.html#linearmodels.iv.model.IV2SLS.predict" title="linearmodels.iv.model.IV2SLS.predict (Python method) — Predict values for additional data"><code class="xref py py-func docutils literal notranslate"><span class="pre">predict()</span></code></a> would produce <code class="docutils literal notranslate"><span class="pre">NaN</span></code>
+values when <code class="docutils literal notranslate"><span class="pre">exog</span></code> and <code class="docutils literal notranslate"><span class="pre">endog</span></code> had different indices. An
+<code class="docutils literal notranslate"><span class="pre">IndexWarning</span></code> is now shown.</p></li>
+<li><p>Added <code class="docutils literal notranslate"><span class="pre">stacklevel</span></code> to all warnings to improve accuracy of warning
+location.</p></li>
+</ul>
+<h2 id="version-4-25">Version 4.25<a class="headerlink" href="#version-4-25" title="Permalink to this heading">¶</a></h2>
+<ul class="simple">
+<li><p>Clarified the null in the F-statistic</p></li>
+<li><p>Improved the error message when dependent and exog have different numbers
+of observations</p></li>
+<li><p>Added formulaic as the preferred formula parser</p></li>
+<li><p>Fixed a bug in <a class="reference internal" href="../panel/panel/linearmodels.panel.covariance.ACCovariance.html#linearmodels.panel.covariance.ACCovariance" title="linearmodels.panel.covariance.ACCovariance (Python class) — Autocorrelation robust covariance estimation"><code class="xref py py-class docutils literal notranslate"><span class="pre">ACCovariance</span></code></a> estimator where the number of observations
+was incorrectly overwritten</p></li>
+<li><p>Fixed a bug in <a class="reference internal" href="../panel/panel/linearmodels.panel.results.PanelResults.corr_squared_between.html#linearmodels.panel.results.PanelResults.corr_squared_between" title="linearmodels.panel.results.PanelResults.corr_squared_between (Python property) — Between Coefficient of determination using squared correlation"><code class="xref py py-func docutils literal notranslate"><span class="pre">linearmodels.panel.results.PanelResults.corr_squared_between()</span></code></a>,
+<a class="reference internal" href="../panel/panel/linearmodels.panel.results.PanelResults.corr_squared_overall.html#linearmodels.panel.results.PanelResults.corr_squared_overall" title="linearmodels.panel.results.PanelResults.corr_squared_overall (Python property) — Overall coefficient of determination using squared correlation"><code class="xref py py-func docutils literal notranslate"><span class="pre">linearmodels.panel.results.PanelResults.corr_squared_overall()</span></code></a>, and
+<a class="reference internal" href="../panel/panel/linearmodels.panel.results.PanelResults.corr_squared_within.html#linearmodels.panel.results.PanelResults.corr_squared_within" title="linearmodels.panel.results.PanelResults.corr_squared_within (Python property) — Within coefficient of determination using squared correlation"><code class="xref py py-func docutils literal notranslate"><span class="pre">linearmodels.panel.results.PanelResults.corr_squared_within()</span></code></a> where the correlation
+was not squared.</p></li>
+</ul>
+<h2 id="version-4-24">Version 4.24<a class="headerlink" href="#version-4-24" title="Permalink to this heading">¶</a></h2>
+<ul class="simple">
+<li><p>Added <a class="reference internal" href="../system/system/linearmodels.system.results.SystemResults.breusch_pagan.html#linearmodels.system.results.SystemResults.breusch_pagan" title="linearmodels.system.results.SystemResults.breusch_pagan (Python method) — Breusch-Pagan LM test for no cross-correlation"><code class="xref py py-func docutils literal notranslate"><span class="pre">breusch_pagan()</span></code></a> and
+<a class="reference internal" href="../system/system/linearmodels.system.results.SystemResults.likelihood_ratio.html#linearmodels.system.results.SystemResults.likelihood_ratio" title="linearmodels.system.results.SystemResults.likelihood_ratio (Python method) — Likelihood ratio test of no cross-correlation"><code class="xref py py-func docutils literal notranslate"><span class="pre">likelihood_ratio()</span></code></a> to test
+whether the shock covariance is diagonal.</p></li>
+</ul>
+<h2 id="version-4-21">Version 4.21<a class="headerlink" href="#version-4-21" title="Permalink to this heading">¶</a></h2>
+<ul class="simple">
+<li><p>Fixed a bug that affected <a class="reference internal" href="../system/system/linearmodels.system.model.SUR.html#linearmodels.system.model.SUR" title="linearmodels.system.model.SUR (Python class) — Seemingly unrelated regression estimation (SUR/SURE)"><code class="xref py py-class docutils literal notranslate"><span class="pre">SUR</span></code></a> when estimating
+models using <code class="docutils literal notranslate"><span class="pre">method=&quot;gls&quot;</span></code> and heteroskedasticity-, hac, or cluster-robust
+inference.</p></li>
+<li><p>Added <code class="docutils literal notranslate"><span class="pre">rank_check</span></code> argument to panel-data models that allows the rank
+check to be skipped. Estimating a model that is rank deficient may result
+in unreliable estimates and so caution is needed if using this option.</p></li>
+<li><p>Changed the rank check to use <a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.linalg.lstsq.html#numpy.linalg.lstsq" title="(in NumPy v1.24)"><code class="xref py py-func docutils literal notranslate"><span class="pre">numpy.linalg.lstsq()</span></code></a> which is better
+aligned with parameter estimation than the <a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.linalg.svd.html#numpy.linalg.svd" title="(in NumPy v1.24)"><code class="xref py py-func docutils literal notranslate"><span class="pre">numpy.linalg.svd()</span></code></a>-based
+<a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.linalg.matrix_rank.html#numpy.linalg.matrix_rank" title="(in NumPy v1.24)"><code class="xref py py-func docutils literal notranslate"><span class="pre">numpy.linalg.matrix_rank()</span></code></a>.</p></li>
+<li><p>Changed the default least squares used to <a class="reference external" href="https://docs.scipy.org/doc/scipy/reference/generated/scipy.linalg.lstsq.html#scipy.linalg.lstsq" title="(in SciPy v1.10.1)"><code class="xref py py-func docutils literal notranslate"><span class="pre">scipy.linalg.lstsq()</span></code></a> so
+that the <code class="docutils literal notranslate"><span class="pre">lapack_driver</span></code> can be changed to use QR factorization.</p></li>
+</ul>
+<h2 id="version-4-20">Version 4.20<a class="headerlink" href="#version-4-20" title="Permalink to this heading">¶</a></h2>
+<ul class="simple">
+<li><p>Correct calculation of first-stage F-statistic in IV models.</p></li>
+</ul>
+<h2 id="version-4-19">Version 4.19<a class="headerlink" href="#version-4-19" title="Permalink to this heading">¶</a></h2>
+<ul class="simple">
+<li><p>Minor release to fix a wheel-building issue on Python 3.9</p></li>
+</ul>
+<h2 id="version-4-18">Version 4.18<a class="headerlink" href="#version-4-18" title="Permalink to this heading">¶</a></h2>
+<ul class="simple">
+<li><p>Improved performance of <a class="reference internal" href="../iv/absorbing/linearmodels.iv.absorbing.AbsorbingLS.fit.html#linearmodels.iv.absorbing.AbsorbingLS.fit" title="linearmodels.iv.absorbing.AbsorbingLS.fit (Python method) — Estimate model parameters"><code class="xref py py-meth docutils literal notranslate"><span class="pre">fit()</span></code></a> by
+deferring some operations.</p></li>
+<li><p>Added support for the method available in <a class="reference external" href="https://pypi.org/project/pyhdfe">PyHDFE</a>  in
+<a class="reference internal" href="../iv/absorbing/linearmodels.iv.absorbing.AbsorbingLS.html#linearmodels.iv.absorbing.AbsorbingLS" title="linearmodels.iv.absorbing.AbsorbingLS (Python class) — Linear regression with high-dimensional effects"><code class="xref py py-class docutils literal notranslate"><span class="pre">AbsorbingLS</span></code></a>. These methods can only be
+used when the variables absorbed are categorical (i.e., fixed-effects only) and
+when the model is unweighted.</p></li>
+<li><p>Added alternative measures of <span class="math notranslate nohighlight">\(R^2\)</span> using the squared correlation. See
+<a class="reference internal" href="../panel/panel/linearmodels.panel.results.PanelResults.corr_squared_overall.html#linearmodels.panel.results.PanelResults.corr_squared_overall" title="linearmodels.panel.results.PanelResults.corr_squared_overall (Python property) — Overall coefficient of determination using squared correlation"><code class="xref py py-meth docutils literal notranslate"><span class="pre">corr_squared_overall()</span></code></a>,
+<a class="reference internal" href="../panel/panel/linearmodels.panel.results.PanelResults.corr_squared_within.html#linearmodels.panel.results.PanelResults.corr_squared_within" title="linearmodels.panel.results.PanelResults.corr_squared_within (Python property) — Within coefficient of determination using squared correlation"><code class="xref py py-meth docutils literal notranslate"><span class="pre">corr_squared_within()</span></code></a>, and
+<a class="reference internal" href="../panel/panel/linearmodels.panel.results.PanelResults.corr_squared_between.html#linearmodels.panel.results.PanelResults.corr_squared_between" title="linearmodels.panel.results.PanelResults.corr_squared_between (Python property) — Between Coefficient of determination using squared correlation"><code class="xref py py-meth docutils literal notranslate"><span class="pre">corr_squared_between()</span></code></a> (<a class="reference external" href="https://github.com/bashtage/linearmodels/issues/157">GH157</a>).</p></li>
+<li><p>Added a clustered covariance estimator
+(<a class="reference internal" href="../system/system/linearmodels.system.covariance.ClusteredCovariance.html#linearmodels.system.covariance.ClusteredCovariance" title="linearmodels.system.covariance.ClusteredCovariance (Python class) — Heteroskedastic covariance estimation for system regression"><code class="xref py py-class docutils literal notranslate"><span class="pre">linearmodels.system.covariance.ClusteredCovariance</span></code></a>) for system regressions
+(<a class="reference external" href="https://github.com/bashtage/linearmodels/issues/241">GH241</a>).</p></li>
+<li><p>Fixed a bug in <a class="reference internal" href="../iv/iv/linearmodels.iv.covariance.kernel_optimal_bandwidth.html#linearmodels.iv.covariance.kernel_optimal_bandwidth" title="linearmodels.iv.covariance.kernel_optimal_bandwidth (Python function) — Array of data to use when computing optimal bandwidth"><code class="xref py py-class docutils literal notranslate"><span class="pre">kernel_optimal_bandwidth</span></code></a>
+which used incorrect values for a tuning parameter in the bandwidth estimation
+for the Parzen and Quadratic Spectral kernels (<a class="reference external" href="https://github.com/bashtage/linearmodels/issues/242">GH242</a>).</p></li>
+</ul>
+<h2 id="version-4-17">Version 4.17<a class="headerlink" href="#version-4-17" title="Permalink to this heading">¶</a></h2>
+<ul class="simple">
+<li><p>Fixed various typing issues (<a class="reference external" href="https://github.com/bashtage/linearmodels/issues/239">GH239</a>, <a class="reference external" href="https://github.com/bashtage/linearmodels/issues/240">GH240</a>).</p></li>
+</ul>
+<h2 id="version-4-16">Version 4.16<a class="headerlink" href="#version-4-16" title="Permalink to this heading">¶</a></h2>
+<ul class="simple">
+<li><p>Verify typing using mypy (<a class="reference external" href="https://github.com/bashtage/linearmodels/issues/232">GH232</a>, <a class="reference external" href="https://github.com/bashtage/linearmodels/issues/234">GH234</a>, <a class="reference external" href="https://github.com/bashtage/linearmodels/issues/235">GH235</a>, <a class="reference external" href="https://github.com/bashtage/linearmodels/issues/238">GH238</a>).</p></li>
+<li><p>Added typing to all public-facing classes and methods (<a class="reference external" href="https://github.com/bashtage/linearmodels/issues/228">GH228</a>, <a class="reference external" href="https://github.com/bashtage/linearmodels/issues/229">GH229</a>).</p></li>
+<li><p>Added <a class="reference internal" href="../panel/panel/linearmodels.panel.results.FamaMacBethResults.html#linearmodels.panel.results.FamaMacBethResults" title="linearmodels.panel.results.FamaMacBethResults (Python class) — Results container for Fama MacBeth panel data models"><code class="xref py py-class docutils literal notranslate"><span class="pre">FamaMacBethResults</span></code></a> which has
+the property <a class="reference internal" href="../panel/panel/linearmodels.panel.results.FamaMacBethResults.all_params.html#linearmodels.panel.results.FamaMacBethResults.all_params" title="linearmodels.panel.results.FamaMacBethResults.all_params (Python property) — The set of parameters estimated for each of the time periods"><code class="xref py py-meth docutils literal notranslate"><span class="pre">all_params()</span></code></a>
+that contains a (nobs, nparam) DataFrame of parameters estimated in each time
+period (<a class="reference external" href="https://github.com/bashtage/linearmodels/issues/230">GH230</a>).</p></li>
+</ul>
+<h2 id="version-4-15">Version 4.15<a class="headerlink" href="#version-4-15" title="Permalink to this heading">¶</a></h2>
+<ul class="simple">
+<li><p>Blackened the code.</p></li>
+<li><p>Added McElroy’s and Berndt’s measures of system fit (<a class="reference external" href="https://github.com/bashtage/linearmodels/issues/215">GH215</a>).</p></li>
+<li><p>Removed support for Python 3.5 inline with NEP-29 (<a class="reference external" href="https://github.com/bashtage/linearmodels/issues/222">GH222</a>).</p></li>
+</ul>
+<h2 id="version-4-14">Version 4.14<a class="headerlink" href="#version-4-14" title="Permalink to this heading">¶</a></h2>
+<ul class="simple">
+<li><p>Fixed issue where datasets were not installed with wheels (<a class="reference external" href="https://github.com/bashtage/linearmodels/issues/217">GH217</a>).</p></li>
+<li><p>Switched to property-cached to inherit cached property from property (<a class="reference external" href="https://github.com/bashtage/linearmodels/issues/211">GH211</a>).</p></li>
+<li><p>Removed all use of <code class="docutils literal notranslate"><span class="pre">pandas.Panel</span></code> (<a class="reference external" href="https://github.com/bashtage/linearmodels/issues/211">GH211</a>).</p></li>
+</ul>
+<h2 id="version-4-13">Version 4.13<a class="headerlink" href="#version-4-13" title="Permalink to this heading">¶</a></h2>
+<ul class="simple">
+<li><p>Added <a class="reference internal" href="../iv/absorbing/linearmodels.iv.absorbing.AbsorbingLS.html#linearmodels.iv.absorbing.AbsorbingLS" title="linearmodels.iv.absorbing.AbsorbingLS (Python class) — Linear regression with high-dimensional effects"><code class="xref py py-class docutils literal notranslate"><span class="pre">AbsorbingLS</span></code></a> which allows a large number
+of variables to be absorbed. This model can handle very high-dimensional dummy
+variables and has been tested using up to 1,000,000 categories in a data set
+with 5,000,000 observations.</p></li>
+<li><p>Fixed a bug when estimating weighted panel models that have repeated observations
+(i.e., more than one observation per entity and time id).</p></li>
+<li><p>Added <code class="docutils literal notranslate"><span class="pre">drop_absorbed</span></code> option to <a class="reference internal" href="../panel/panel/linearmodels.panel.model.PanelOLS.html#linearmodels.panel.model.PanelOLS" title="linearmodels.panel.model.PanelOLS (Python class) — One- and two-way fixed effects estimator for panel data"><code class="xref py py-class docutils literal notranslate"><span class="pre">PanelOLS</span></code></a>
+which automatically drops variables that are absorbed by fixed effects.
+(<a class="reference external" href="https://github.com/bashtage/linearmodels/issues/206">GH206</a>)</p></li>
+<li><p>Added optional Cythonized node selection for dropping singletons</p></li>
+<li><p>Added preconditioning to the dummy variable matrix when <code class="docutils literal notranslate"><span class="pre">use_lsmr-True</span></code>
+in <a class="reference internal" href="../panel/panel/linearmodels.panel.model.PanelOLS.fit.html#linearmodels.panel.model.PanelOLS.fit" title="linearmodels.panel.model.PanelOLS.fit (Python method) — Estimate model parameters"><code class="xref py py-func docutils literal notranslate"><span class="pre">fit()</span></code></a>. In models with many
+effects, this can reduce run time by a factor of 4 or more.</p></li>
+</ul>
+<h2 id="version-4-12">Version 4.12<a class="headerlink" href="#version-4-12" title="Permalink to this heading">¶</a></h2>
+<ul class="simple">
+<li><p>Added an option to drop singleton observations in
+<a class="reference internal" href="../panel/panel/linearmodels.panel.model.PanelOLS.html#linearmodels.panel.model.PanelOLS" title="linearmodels.panel.model.PanelOLS (Python class) — One- and two-way fixed effects estimator for panel data"><code class="xref py py-class docutils literal notranslate"><span class="pre">PanelOLS</span></code></a> by setting the keyword argument
+<code class="docutils literal notranslate"><span class="pre">singletons-False</span></code>. When <code class="docutils literal notranslate"><span class="pre">False</span></code>, singelton observations are dropped
+before the model is fit, so the the result is <em>as-if</em> the observations were
+never in <code class="docutils literal notranslate"><span class="pre">exog</span></code> or <code class="docutils literal notranslate"><span class="pre">dependent</span></code>.</p></li>
+<li><p>Added a method to construct the 2-core graph for 2-way effects models, which
+allows singleton observations with no effect on estimated slopes to be
+excluded. (<a class="reference external" href="https://github.com/bashtage/linearmodels/issues/191">GH191</a>)</p></li>
+<li><p>Added support for LSMR estimation of parameters in
+<a class="reference internal" href="../panel/panel/linearmodels.panel.model.PanelOLS.fit.html#linearmodels.panel.model.PanelOLS.fit" title="linearmodels.panel.model.PanelOLS.fit (Python method) — Estimate model parameters"><code class="xref py py-func docutils literal notranslate"><span class="pre">fit()</span></code></a> through the keyword argument
+<code class="docutils literal notranslate"><span class="pre">use_lsmr</span></code>. LSMR is a sparse estimation method that can be used to extend
+<a class="reference internal" href="../panel/panel/linearmodels.panel.model.PanelOLS.html#linearmodels.panel.model.PanelOLS" title="linearmodels.panel.model.PanelOLS (Python class) — One- and two-way fixed effects estimator for panel data"><code class="xref py py-class docutils literal notranslate"><span class="pre">PanelOLS</span></code></a> to more than two effects.</p></li>
+<li><p>Fixed a bug where IV models estimated with only exogenous regressors where
+not being correctly labeled as OLS models in output. (<a class="reference external" href="https://github.com/bashtage/linearmodels/issues/185">GH185</a>)</p></li>
+<li><p>Added <code class="docutils literal notranslate"><span class="pre">wald_test</span></code> to panel-model results.</p></li>
+<li><p>Renamed <code class="docutils literal notranslate"><span class="pre">test_linear_constraint</span></code> to <code class="docutils literal notranslate"><span class="pre">wald_test</span></code></p></li>
+<li><p>Added a low-memory option to <a class="reference internal" href="../panel/panel/linearmodels.panel.model.PanelOLS.fit.html#linearmodels.panel.model.PanelOLS.fit" title="linearmodels.panel.model.PanelOLS.fit (Python method) — Estimate model parameters"><code class="xref py py-func docutils literal notranslate"><span class="pre">fit()</span></code></a>
+that avoids constructing dummy variables. Only used when both <code class="docutils literal notranslate"><span class="pre">entity_effects</span></code>
+and <code class="docutils literal notranslate"><span class="pre">time_effects</span></code> are <code class="docutils literal notranslate"><span class="pre">True</span></code>. By default, the low memory algorithm will be
+used whenever constructing the dummy variable array would require more than
+1 GiB. (<a class="reference external" href="https://github.com/bashtage/linearmodels/issues/182">GH182</a>)</p></li>
+<li><p>Added an option in model comparison (<a class="reference internal" href="../iv/iv/linearmodels.iv.results.compare.html#linearmodels.iv.results.compare" title="linearmodels.iv.results.compare (Python function) — Compare the results of multiple models"><code class="xref py py-func docutils literal notranslate"><span class="pre">compare()</span></code></a> and
+<a class="reference internal" href="../panel/panel/linearmodels.panel.results.compare.html#linearmodels.panel.results.compare" title="linearmodels.panel.results.compare (Python function) — Compare the results of multiple models"><code class="xref py py-func docutils literal notranslate"><span class="pre">compare()</span></code></a>) to report standard errors or pvalues
+instead of t-stats. (<a class="reference external" href="https://github.com/bashtage/linearmodels/issues/178">GH178</a>)</p></li>
+</ul>
+<h2 id="version-4-11">Version 4.11<a class="headerlink" href="#version-4-11" title="Permalink to this heading">¶</a></h2>
+<ul class="simple">
+<li><p>Fixed a bug which did not correctly check the rank of the
+cross-section regression in <a class="reference internal" href="../panel/panel/linearmodels.panel.model.FamaMacBeth.html#linearmodels.panel.model.FamaMacBeth" title="linearmodels.panel.model.FamaMacBeth (Python class) — Pooled coefficient estimator for panel data"><code class="xref py py-class docutils literal notranslate"><span class="pre">FamaMacBeth</span></code></a> (<a class="reference external" href="https://github.com/bashtage/linearmodels/issues/176">GH176</a>)</p></li>
+<li><p>Fixed a bug which failed to correctly check rank conditions when
+specifying asset pricing models (<a class="reference external" href="https://github.com/bashtage/linearmodels/issues/173">GH173</a>)</p></li>
+<li><p>Switched to external package cached-property to manage caching instead of
+custom and less-well-tested solution (<a class="reference external" href="https://github.com/bashtage/linearmodels/issues/172">GH172</a>)</p></li>
+</ul>
+<h2 id="version-4-10">Version 4.10<a class="headerlink" href="#version-4-10" title="Permalink to this heading">¶</a></h2>
+<ul class="simple">
+<li><p>Fixed a bug where weights were incorrectly calculated for HAC covariances
+when the weight function was <code class="docutils literal notranslate"><span class="pre">'parzen'</span></code> or <code class="docutils literal notranslate"><span class="pre">'gallant'</span></code> (<a class="reference external" href="https://github.com/bashtage/linearmodels/issues/170">GH170</a>)</p></li>
+</ul>
+<h2 id="version-4-9">Version 4.9<a class="headerlink" href="#version-4-9" title="Permalink to this heading">¶</a></h2>
+<ul class="simple">
+<li><p>Changed the return type of Wooldridge’s over identification test when
+invalid to <code class="docutils literal notranslate"><span class="pre">InvalidTestStatistic</span></code></p></li>
+<li><p>Add typing information to IV models</p></li>
+<li><p>Allow optimization parameters to be passed to <a class="reference internal" href="../iv/iv/linearmodels.iv.model.IVGMMCUE.html#linearmodels.iv.model.IVGMMCUE" title="linearmodels.iv.model.IVGMMCUE (Python class) — Estimation of IV models using continuously updating GMM"><code class="xref py py-class docutils literal notranslate"><span class="pre">IVGMMCUE</span></code></a></p></li>
+<li><p>Removed internal use of pandas Panel</p></li>
+<li><p>Improved performance in panel models when using
+<a class="reference internal" href="../panel/panel/linearmodels.panel.model.PanelOLS.from_formula.html#linearmodels.panel.model.PanelOLS.from_formula" title="linearmodels.panel.model.PanelOLS.from_formula (Python method) — Create a model from a formula"><code class="xref py py-func docutils literal notranslate"><span class="pre">from_formula()</span></code></a></p></li>
+<li><p>Switched to retaining index column names when original input index is named</p></li>
+<li><p>Modified tests that were not well conceived</p></li>
+<li><p>Added spell check to documentation build</p></li>
+<li><p>Improve docstring for <code class="docutils literal notranslate"><span class="pre">summary</span></code> properties</p></li>
+</ul>
+<h2 id="version-4-8">Version 4.8<a class="headerlink" href="#version-4-8" title="Permalink to this heading">¶</a></h2>
+<ul class="simple">
+<li><p>Corrected bug that prevented single character names in IV formulas</p></li>
+<li><p>Corrected kappa estimation in LIML when there are no exogenous regressors</p></li>
+</ul>
+<h2 id="version-4-7">Version 4.7<a class="headerlink" href="#version-4-7" title="Permalink to this heading">¶</a></h2>
+<ul class="simple">
+<li><p>Improved performance of Panel estimators by optimizing data structure
+construction</p></li>
+</ul>
+<h2 id="version-4-6">Version 4.6<a class="headerlink" href="#version-4-6" title="Permalink to this heading">¶</a></h2>
+<ul class="simple">
+<li><p>Added a license</p></li>
+</ul>
+<h2 id="version-4-5">Version 4.5<a class="headerlink" href="#version-4-5" title="Permalink to this heading">¶</a></h2>
+<ul class="simple">
+<li><p>Added System GMM estimator</p></li>
+<li><p>Added automatic bandwidth for kernel-based GMM weighting estimators</p></li>
+<li><p>Cleaned up HAC estimation across models</p></li>
+<li><p>Added <code class="docutils literal notranslate"><span class="pre">predict</span></code> method to IV, Panel and System model to allow out-of-sample
+prediction and simplify retrieval of in-sample results</p></li>
+<li><p>Fixed small issues with Fama-MacBeth which previously ignored weights</p></li>
+</ul>
+<h2 id="version-4-0">Version 4.0<a class="headerlink" href="#version-4-0" title="Permalink to this heading">¶</a></h2>
+<ul class="simple">
+<li><p>Added Seemingly Unrelated Regression (SUR) Estimator</p></li>
+<li><p>Added Three-stage Least Squares (3SLS) Estimator</p></li>
+</ul>
+
+
+
+
+
+
+                
+              </article>
+            </div>
+          
+          
+        </div>
+        
+      </main>
+      
+        <footer class="md-footer">
+  
+    
+    <nav class="md-footer__inner md-grid" aria-label="Footer" >
+      
+        
+        <a href="../changes.html" class="md-footer__link md-footer__link--prev" aria-label="Previous: Change Log" rel="prev">
+          <div class="md-footer__button md-icon">
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20 11v2H8l5.5 5.5-1.42 1.42L4.16 12l7.92-7.92L13.5 5.5 8 11h12Z"/></svg>
+          </div>
+          <div class="md-footer__title">
+            <div class="md-ellipsis">
+              <span class="md-footer__direction">
+                Previous
+              </span>
+              Change Log
+            </div>
+          </div>
+        </a>
+      
+      
+        
+        <a href="3.0-2.0-1.0.html" class="md-footer__link md-footer__link--next" aria-label="Next: Version 3.0" rel="next">
+          <div class="md-footer__title">
+            <div class="md-ellipsis">
+              <span class="md-footer__direction">
+                Next
+              </span>
+              Version 3.0
+            </div>
+          </div>
+          <div class="md-footer__button md-icon">
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M4 11v2h12l-5.5 5.5 1.42 1.42L19.84 12l-7.92-7.92L10.5 5.5 16 11H4Z"/></svg>
+          </div>
+        </a>
+      
+    </nav>
+  
+  
+  
+  <div class="md-footer-meta md-typeset">
+    
+    <div class="md-footer-meta__inner md-grid">
+      <div class="md-copyright">
+  
+    <div class="md-footer-copyright__highlight">
+        &#169; Copyright 2021, Kevin Sheppard.
+        
+    </div>
+  
+    Created using
+    <a href="https://www.sphinx-doc.org/" target="_blank" rel="noopener">Sphinx</a>
+    7.0.1.
+     and
+    <a href="https://github.com/jbms/sphinx-immaterial/" target="_blank" rel="noopener">Sphinx-Immaterial</a>
+  
+</div>
+      
+        <div class="md-social">
+  
+    
+    
+    <a href="https://github.com/bashtage/linearmodels" target="_blank" rel="noopener" title="Source on github.com" class="md-social__link">
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 496 512"><!--! Font Awesome Free 6.2.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2022 Fonticons, Inc.--><path d="M165.9 397.4c0 2-2.3 3.6-5.2 3.6-3.3.3-5.6-1.3-5.6-3.6 0-2 2.3-3.6 5.2-3.6 3-.3 5.6 1.3 5.6 3.6zm-31.1-4.5c-.7 2 1.3 4.3 4.3 4.9 2.6 1 5.6 0 6.2-2s-1.3-4.3-4.3-5.2c-2.6-.7-5.5.3-6.2 2.3zm44.2-1.7c-2.9.7-4.9 2.6-4.6 4.9.3 2 2.9 3.3 5.9 2.6 2.9-.7 4.9-2.6 4.6-4.6-.3-1.9-3-3.2-5.9-2.9zM244.8 8C106.1 8 0 113.3 0 252c0 110.9 69.8 205.8 169.5 239.2 12.8 2.3 17.3-5.6 17.3-12.1 0-6.2-.3-40.4-.3-61.4 0 0-70 15-84.7-29.8 0 0-11.4-29.1-27.8-36.6 0 0-22.9-15.7 1.6-15.4 0 0 24.9 2 38.6 25.8 21.9 38.6 58.6 27.5 72.9 20.9 2.3-16 8.8-27.1 16-33.7-55.9-6.2-112.3-14.3-112.3-110.5 0-27.5 7.6-41.3 23.6-58.9-2.6-6.5-11.1-33.3 2.6-67.9 20.9-6.5 69 27 69 27 20-5.6 41.5-8.5 62.8-8.5s42.8 2.9 62.8 8.5c0 0 48.1-33.6 69-27 13.7 34.7 5.2 61.4 2.6 67.9 16 17.7 25.8 31.5 25.8 58.9 0 96.5-58.9 104.2-114.8 110.5 9.2 7.9 17 22.9 17 46.4 0 33.7-.3 75.4-.3 83.6 0 6.5 4.6 14.4 17.3 12.1C428.2 457.8 496 362.9 496 252 496 113.3 383.5 8 244.8 8zM97.2 352.9c-1.3 1-1 3.3.7 5.2 1.6 1.6 3.9 2.3 5.2 1 1.3-1 1-3.3-.7-5.2-1.6-1.6-3.9-2.3-5.2-1zm-10.8-8.1c-.7 1.3.3 2.9 2.3 3.9 1.6 1 3.6.7 4.3-.7.7-1.3-.3-2.9-2.3-3.9-2-.6-3.6-.3-4.3.7zm32.4 35.6c-1.6 1.3-1 4.3 1.3 6.2 2.3 2.3 5.2 2.6 6.5 1 1.3-1.3.7-4.3-1.3-6.2-2.2-2.3-5.2-2.6-6.5-1zm-11.4-14.7c-1.6 1-1.6 3.6 0 5.9 1.6 2.3 4.3 3.3 5.6 2.3 1.6-1.3 1.6-3.9 0-6.2-1.4-2.3-4-3.3-5.6-2z"/></svg>
+    </a>
+  
+    
+    
+      
+      
+    
+    <a href="https://pypi.org/project/linearmodels/" target="_blank" rel="noopener" title="pypi.org" class="md-social__link">
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512"><!--! Font Awesome Free 6.2.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2022 Fonticons, Inc.--><path d="M439.8 200.5c-7.7-30.9-22.3-54.2-53.4-54.2h-40.1v47.4c0 36.8-31.2 67.8-66.8 67.8H172.7c-29.2 0-53.4 25-53.4 54.3v101.8c0 29 25.2 46 53.4 54.3 33.8 9.9 66.3 11.7 106.8 0 26.9-7.8 53.4-23.5 53.4-54.3v-40.7H226.2v-13.6h160.2c31.1 0 42.6-21.7 53.4-54.2 11.2-33.5 10.7-65.7 0-108.6zM286.2 404c11.1 0 20.1 9.1 20.1 20.3 0 11.3-9 20.4-20.1 20.4-11 0-20.1-9.2-20.1-20.4.1-11.3 9.1-20.3 20.1-20.3zM167.8 248.1h106.8c29.7 0 53.4-24.5 53.4-54.3V91.9c0-29-24.4-50.7-53.4-55.6-35.8-5.9-74.7-5.6-106.8.1-45.2 8-53.4 24.7-53.4 55.6v40.7h106.9v13.6h-147c-31.1 0-58.3 18.7-66.8 54.2-9.8 40.7-10.2 66.1 0 108.6 7.6 31.6 25.7 54.2 56.8 54.2H101v-48.8c0-35.3 30.5-66.4 66.8-66.4zm-6.7-142.6c-11.1 0-20.1-9.1-20.1-20.3.1-11.3 9-20.4 20.1-20.4 11 0 20.1 9.2 20.1 20.4s-9 20.3-20.1 20.3z"/></svg>
+    </a>
+  
+    
+    
+      
+      
+    
+    <a href="https://doi.org/10.5281/zenodo.2591973" target="_blank" rel="noopener" title="doi.org" class="md-social__link">
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512"><!--! Font Awesome Free 6.2.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2022 Fonticons, Inc.--><path d="M0 216C0 149.7 53.7 96 120 96h8c17.7 0 32 14.3 32 32s-14.3 32-32 32h-8c-30.9 0-56 25.1-56 56v8h64c35.3 0 64 28.7 64 64v64c0 35.3-28.7 64-64 64H64c-35.3 0-64-28.7-64-64V216zm256 0c0-66.3 53.7-120 120-120h8c17.7 0 32 14.3 32 32s-14.3 32-32 32h-8c-30.9 0-56 25.1-56 56v8h64c35.3 0 64 28.7 64 64v64c0 35.3-28.7 64-64 64h-64c-35.3 0-64-28.7-64-64V216z"/></svg>
+    </a>
+  
+</div>
+      
+    </div>
+    
+  </div>
+</footer>
+      
+    </div>
+    <div class="md-dialog" data-md-component="dialog">
+      <div class="md-dialog__inner md-typeset"></div>
+    </div>
+    
+    <script id="__config" type="application/json">{"base": "..", "features": [], "translations": {"clipboard.copied": "Copied to clipboard", "clipboard.copy": "Copy to clipboard", "search.config.lang": "en", "search.config.pipeline": "trimmer, stopWordFilter", "search.config.separator": "[\\s\\-]+", "search.placeholder": "Search", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.placeholder": "Type to start searching", "search.result.term.missing": "Missing", "select.version.title": "Select version"}, "version": {"provider": "mike", "staticVersions": [{"aliases": [], "title": "Release", "version": "https://bashtage.github.io/linearmodels"}, {"aliases": [], "title": "Development", "version": "https://bashtage.github.io/linearmodels/devel"}], "versionPath": null}}</script>
+    
+      
+        <script src="../_static/sphinx_immaterial_theme.cea6a0c1d5b0618cf.min.js"></script>
+        <script crossorigin="anonymous" integrity="sha256-Ae2Vz/4ePdIu6ZyI/5ZGsYnb+m0JlOmKPjt6XZ9JJkA=" src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.4/require.min.js"></script>
+        <script>window.MathJax = {"tex": {"inlineMath": [["$", "$"], ["\\(", "\\)"]], "processEscapes": true}, "options": {"ignoreHtmlClass": "tex2jax_ignore|mathjax_ignore|document", "processHtmlClass": "tex2jax_process|mathjax_process|math|output_area"}}</script>
+        <script defer="defer" src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+    
+  </body>
+</html>
