@@ -15,7 +15,7 @@
     
   
       
-        <title>linearmodels.panel.model - linearmodels 4.31</title>
+        <title>linearmodels.panel.model - linearmodels 5.0</title>
       
     
 
@@ -48,7 +48,7 @@
         <style>:root{--md-text-font:"Roboto";--md-code-font:"Roboto Mono"}</style>
       
     
-        <link rel="stylesheet" type="text/css" href="../../../_static/sphinx_immaterial_theme.8118e13f191069ea1.min.css" />
+        <link rel="stylesheet" type="text/css" href="../../../_static/sphinx_immaterial_theme.b223ac77c5eb52f42.min.css" />
         <link rel="stylesheet" type="text/css" href="../../../_static/css/small_fixes.css" />
     <script>__md_scope=new URL("../../..",location),__md_hash=e=>[...e].reduce((e,_)=>(e<<5)-e+_.charCodeAt(0),0),__md_get=(e,_=localStorage,t=__md_scope)=>JSON.parse(_.getItem(t.pathname+"."+e)),__md_set=(e,_,t=localStorage,a=__md_scope)=>{try{t.setItem(a.pathname+"."+e,JSON.stringify(_))}catch(e){}}</script>
     
@@ -88,7 +88,7 @@
 
 <header class="md-header" data-md-component="header">
   <nav class="md-header__inner md-grid" aria-label="Header">
-    <a href="../../../index.html" title="linearmodels 4.31" class="md-header__button md-logo" aria-label="linearmodels 4.31" data-md-component="logo">
+    <a href="../../../index.html" title="linearmodels 5.0" class="md-header__button md-logo" aria-label="linearmodels 5.0" data-md-component="logo">
       <img src="../../../_static/bw-logo.svg" alt="logo">
     </a>
     <label class="md-header__button md-icon" for="__drawer">
@@ -98,7 +98,7 @@
       <div class="md-header__ellipsis">
         <div class="md-header__topic">
           <span class="md-ellipsis">
-            linearmodels 4.31
+            linearmodels 5.0
           </span>
         </div>
         <div class="md-header__topic" data-md-component="header-topic">
@@ -185,10 +185,10 @@
 
 <nav class="md-nav md-nav--primary" aria-label="Navigation" data-md-level="0">
   <label class="md-nav__title" for="__drawer">
-    <a href="../../../index.html" title="linearmodels 4.31" class="md-nav__button md-logo" aria-label="linearmodels 4.31" data-md-component="logo">
+    <a href="../../../index.html" title="linearmodels 5.0" class="md-nav__button md-logo" aria-label="linearmodels 5.0" data-md-component="logo">
       <img src="../../../_static/bw-logo.svg" alt="logo">
     </a>
-    linearmodels 4.31
+    linearmodels 5.0
   </label>
   
     <div class="md-nav__source">
@@ -399,9 +399,8 @@
 <h1>Source code for linearmodels.panel.model</h1><div class="highlight"><pre>
 <span></span><code><span class="kn">from</span> <span class="nn">__future__</span> <span class="kn">import</span> <span class="n">annotations</span>
 
-<span class="kn">from</span> <span class="nn">linearmodels.compat.formulaic</span> <span class="kn">import</span> <span class="n">FORMULAIC_GTE_0_6</span><span class="p">,</span> <span class="n">future_ordering</span>
-
-<span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">Any</span><span class="p">,</span> <span class="n">Mapping</span><span class="p">,</span> <span class="n">NamedTuple</span><span class="p">,</span> <span class="n">Type</span><span class="p">,</span> <span class="n">Union</span><span class="p">,</span> <span class="n">cast</span>
+<span class="kn">from</span> <span class="nn">collections.abc</span> <span class="kn">import</span> <span class="n">Mapping</span>
+<span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">Any</span><span class="p">,</span> <span class="n">NamedTuple</span><span class="p">,</span> <span class="n">Union</span><span class="p">,</span> <span class="n">cast</span>
 
 <span class="kn">from</span> <span class="nn">formulaic.formula</span> <span class="kn">import</span> <span class="n">Formula</span>
 <span class="kn">from</span> <span class="nn">formulaic.model_spec</span> <span class="kn">import</span> <span class="n">NAAction</span>
@@ -470,11 +469,11 @@
 <span class="p">]</span>
 
 <span class="n">CovarianceEstimatorType</span> <span class="o">=</span> <span class="n">Union</span><span class="p">[</span>
-    <span class="n">Type</span><span class="p">[</span><span class="n">ACCovariance</span><span class="p">],</span>
-    <span class="n">Type</span><span class="p">[</span><span class="n">ClusteredCovariance</span><span class="p">],</span>
-    <span class="n">Type</span><span class="p">[</span><span class="n">DriscollKraay</span><span class="p">],</span>
-    <span class="n">Type</span><span class="p">[</span><span class="n">HeteroskedasticCovariance</span><span class="p">],</span>
-    <span class="n">Type</span><span class="p">[</span><span class="n">HomoskedasticCovariance</span><span class="p">],</span>
+    <span class="nb">type</span><span class="p">[</span><span class="n">ACCovariance</span><span class="p">],</span>
+    <span class="nb">type</span><span class="p">[</span><span class="n">ClusteredCovariance</span><span class="p">],</span>
+    <span class="nb">type</span><span class="p">[</span><span class="n">DriscollKraay</span><span class="p">],</span>
+    <span class="nb">type</span><span class="p">[</span><span class="n">HeteroskedasticCovariance</span><span class="p">],</span>
+    <span class="nb">type</span><span class="p">[</span><span class="n">HomoskedasticCovariance</span><span class="p">],</span>
 <span class="p">]</span>
 
 
@@ -559,10 +558,6 @@
         <span class="k">else</span><span class="p">:</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">_context</span> <span class="o">=</span> <span class="n">context</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_dependent</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_exog</span> <span class="o">=</span> <span class="kc">None</span>
-        <span class="k">if</span> <span class="n">FORMULAIC_GTE_0_6</span> <span class="ow">and</span> <span class="ow">not</span> <span class="n">future_ordering</span><span class="p">():</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">_formulaic_kwargs</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">(</span><span class="n">_ordering</span><span class="o">=</span><span class="s2">&quot;sort&quot;</span><span class="p">)</span>
-        <span class="k">else</span><span class="p">:</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">_formulaic_kwargs</span> <span class="o">=</span> <span class="p">{}</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_parse</span><span class="p">()</span>
 
     <span class="k">def</span> <span class="nf">_parse</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
@@ -629,7 +624,7 @@
     <span class="k">def</span> <span class="nf">dependent</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">DataFrame</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;DataFrame containing the dependent variable&quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="n">DataFrame</span><span class="p">(</span>
-            <span class="n">Formula</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_lhs</span><span class="p">,</span> <span class="o">**</span><span class="bp">self</span><span class="o">.</span><span class="n">_formulaic_kwargs</span><span class="p">)</span><span class="o">.</span><span class="n">get_model_matrix</span><span class="p">(</span>
+            <span class="n">Formula</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_lhs</span><span class="p">)</span><span class="o">.</span><span class="n">get_model_matrix</span><span class="p">(</span>
                 <span class="bp">self</span><span class="o">.</span><span class="n">_data</span><span class="o">.</span><span class="n">dataframe</span><span class="p">,</span>
                 <span class="n">context</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">_context</span><span class="p">,</span>
                 <span class="n">na_action</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">_na_action</span><span class="p">,</span>
@@ -640,7 +635,7 @@
     <span class="k">def</span> <span class="nf">exog</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">DataFrame</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;DataFrame containing the exogenous variables&quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="n">DataFrame</span><span class="p">(</span>
-            <span class="n">Formula</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_rhs</span><span class="p">,</span> <span class="o">**</span><span class="bp">self</span><span class="o">.</span><span class="n">_formulaic_kwargs</span><span class="p">)</span><span class="o">.</span><span class="n">get_model_matrix</span><span class="p">(</span>
+            <span class="n">Formula</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_rhs</span><span class="p">)</span><span class="o">.</span><span class="n">get_model_matrix</span><span class="p">(</span>
                 <span class="bp">self</span><span class="o">.</span><span class="n">_data</span><span class="o">.</span><span class="n">dataframe</span><span class="p">,</span>
                 <span class="n">context</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">_context</span><span class="p">,</span>
                 <span class="n">na_action</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">_na_action</span><span class="p">,</span>
@@ -1140,7 +1135,9 @@
                 <span class="n">cat</span> <span class="o">=</span> <span class="n">Categorical</span><span class="p">(</span><span class="n">formatted_clusters</span><span class="o">.</span><span class="n">dataframe</span><span class="p">[</span><span class="n">col</span><span class="p">])</span>
                 <span class="c1"># TODO: Bug in pandas-stubs</span>
                 <span class="c1">#  https://github.com/pandas-dev/pandas-stubs/issues/111</span>
-                <span class="n">formatted_clusters</span><span class="o">.</span><span class="n">dataframe</span><span class="p">[</span><span class="n">col</span><span class="p">]</span> <span class="o">=</span> <span class="n">cat</span><span class="o">.</span><span class="n">codes</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">int64</span><span class="p">)</span>  <span class="c1"># type: ignore</span>
+                <span class="n">formatted_clusters</span><span class="o">.</span><span class="n">dataframe</span><span class="p">[</span><span class="n">col</span><span class="p">]</span> <span class="o">=</span> <span class="n">cat</span><span class="o">.</span><span class="n">codes</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span>
+                    <span class="n">np</span><span class="o">.</span><span class="n">int64</span>
+                <span class="p">)</span>  <span class="c1"># type: ignore</span>
             <span class="n">clusters_frame</span> <span class="o">=</span> <span class="n">formatted_clusters</span><span class="o">.</span><span class="n">dataframe</span>
 
         <span class="n">cluster_entity</span> <span class="o">=</span> <span class="nb">bool</span><span class="p">(</span><span class="n">cov_config_upd</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="s2">&quot;cluster_entity&quot;</span><span class="p">,</span> <span class="kc">False</span><span class="p">))</span>
@@ -2481,7 +2478,9 @@
                 <span class="n">cluster_max</span><span class="o">.</span><span class="n">T</span><span class="p">,</span> <span class="n">index</span><span class="o">=</span><span class="n">index</span><span class="p">,</span> <span class="n">columns</span><span class="o">=</span><span class="n">clusters_panel</span><span class="o">.</span><span class="n">vars</span>
             <span class="p">)</span>
             <span class="c1"># TODO: Bug in pandas-stubs prevents using Hashable | None</span>
-            <span class="n">clusters_frame</span> <span class="o">=</span> <span class="n">clusters_frame</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span><span class="n">reindex</span><span class="p">]</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">int64</span><span class="p">)</span>  <span class="c1"># type: ignore</span>
+            <span class="n">clusters_frame</span> <span class="o">=</span> <span class="n">clusters_frame</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span><span class="n">reindex</span><span class="p">]</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span>
+                <span class="n">np</span><span class="o">.</span><span class="n">int64</span>
+            <span class="p">)</span>  <span class="c1"># type: ignore</span>
             <span class="n">cov_config_upd</span><span class="p">[</span><span class="s2">&quot;clusters&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">clusters_frame</span>
 
         <span class="k">return</span> <span class="n">cov_config_upd</span>
@@ -3324,9 +3323,9 @@
         <span class="n">valid_blocks</span> <span class="o">=</span> <span class="n">wx_df</span><span class="o">.</span><span class="n">groupby</span><span class="p">(</span><span class="n">level</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span><span class="o">.</span><span class="n">apply</span><span class="p">(</span><span class="n">validate_block</span><span class="p">)</span>
         <span class="k">if</span> <span class="ow">not</span> <span class="n">valid_blocks</span><span class="o">.</span><span class="n">any</span><span class="p">():</span>
             <span class="n">err</span> <span class="o">=</span> <span class="p">(</span>
-                <span class="s2">&quot;Model cannot be estimated. All blocks of time-series observations are rank</span><span class="se">\n</span><span class="s2">&quot;</span>
-                <span class="s2">&quot;deficient, and so it is not possible to estimate any cross-sectional &quot;</span>
-                <span class="s2">&quot;regressions.&quot;</span>
+                <span class="s2">&quot;Model cannot be estimated. All blocks of time-series observations &quot;</span>
+                <span class="s2">&quot;are rank deficient, and so it is not possible to estimate any&quot;</span>
+                <span class="s2">&quot;cross-sectional regressions.&quot;</span>
             <span class="p">)</span>
             <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="n">err</span><span class="p">)</span>
         <span class="k">if</span> <span class="n">valid_blocks</span><span class="o">.</span><span class="n">sum</span><span class="p">()</span> <span class="o">&lt;</span> <span class="n">exog</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">]:</span>
@@ -3602,7 +3601,7 @@
   
     Created using
     <a href="https://www.sphinx-doc.org/" target="_blank" rel="noopener">Sphinx</a>
-    6.2.1.
+    7.0.1.
      and
     <a href="https://github.com/jbms/sphinx-immaterial/" target="_blank" rel="noopener">Sphinx-Immaterial</a>
   
@@ -3646,7 +3645,7 @@
       <div class="md-dialog__inner md-typeset"></div>
     </div>
     
-    <script id="__config" type="application/json">{"base": "../../..", "features": [], "translations": {"clipboard.copied": "Copied to clipboard", "clipboard.copy": "Copy to clipboard", "search.config.lang": "en", "search.config.pipeline": "trimmer, stopWordFilter", "search.config.separator": "[\\s\\-]+", "search.placeholder": "Search", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.placeholder": "Type to start searching", "search.result.term.missing": "Missing", "select.version.title": "Select version"}, "version": {"provider": "mike", "staticVersions": [{"aliases": [], "title": "Release", "version": "https://bashtage.github.io/linearmodels/"}, {"aliases": [], "title": "Development", "version": "https://bashtage.github.io/linearmodels/devel/"}], "versionPath": null}}</script>
+    <script id="__config" type="application/json">{"base": "../../..", "features": [], "translations": {"clipboard.copied": "Copied to clipboard", "clipboard.copy": "Copy to clipboard", "search.config.lang": "en", "search.config.pipeline": "trimmer, stopWordFilter", "search.config.separator": "[\\s\\-]+", "search.placeholder": "Search", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.placeholder": "Type to start searching", "search.result.term.missing": "Missing", "select.version.title": "Select version"}, "version": {"provider": "mike", "staticVersions": [{"aliases": [], "title": "Release", "version": "https://bashtage.github.io/linearmodels"}, {"aliases": [], "title": "Development", "version": "https://bashtage.github.io/linearmodels/devel"}], "versionPath": null}}</script>
     
       
         <script src="../../../_static/sphinx_immaterial_theme.cea6a0c1d5b0618cf.min.js"></script>

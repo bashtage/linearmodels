@@ -15,7 +15,7 @@
     
   
       
-        <title>linearmodels.system.model - linearmodels 4.31</title>
+        <title>linearmodels.system.model - linearmodels 5.0</title>
       
     
 
@@ -48,7 +48,7 @@
         <style>:root{--md-text-font:"Roboto";--md-code-font:"Roboto Mono"}</style>
       
     
-        <link rel="stylesheet" type="text/css" href="../../../_static/sphinx_immaterial_theme.8118e13f191069ea1.min.css" />
+        <link rel="stylesheet" type="text/css" href="../../../_static/sphinx_immaterial_theme.b223ac77c5eb52f42.min.css" />
         <link rel="stylesheet" type="text/css" href="../../../_static/css/small_fixes.css" />
     <script>__md_scope=new URL("../../..",location),__md_hash=e=>[...e].reduce((e,_)=>(e<<5)-e+_.charCodeAt(0),0),__md_get=(e,_=localStorage,t=__md_scope)=>JSON.parse(_.getItem(t.pathname+"."+e)),__md_set=(e,_,t=localStorage,a=__md_scope)=>{try{t.setItem(a.pathname+"."+e,JSON.stringify(_))}catch(e){}}</script>
     
@@ -88,7 +88,7 @@
 
 <header class="md-header" data-md-component="header">
   <nav class="md-header__inner md-grid" aria-label="Header">
-    <a href="../../../index.html" title="linearmodels 4.31" class="md-header__button md-logo" aria-label="linearmodels 4.31" data-md-component="logo">
+    <a href="../../../index.html" title="linearmodels 5.0" class="md-header__button md-logo" aria-label="linearmodels 5.0" data-md-component="logo">
       <img src="../../../_static/bw-logo.svg" alt="logo">
     </a>
     <label class="md-header__button md-icon" for="__drawer">
@@ -98,7 +98,7 @@
       <div class="md-header__ellipsis">
         <div class="md-header__topic">
           <span class="md-ellipsis">
-            linearmodels 4.31
+            linearmodels 5.0
           </span>
         </div>
         <div class="md-header__topic" data-md-component="header-topic">
@@ -185,10 +185,10 @@
 
 <nav class="md-nav md-nav--primary" aria-label="Navigation" data-md-level="0">
   <label class="md-nav__title" for="__drawer">
-    <a href="../../../index.html" title="linearmodels 4.31" class="md-nav__button md-logo" aria-label="linearmodels 4.31" data-md-component="logo">
+    <a href="../../../index.html" title="linearmodels 5.0" class="md-nav__button md-logo" aria-label="linearmodels 5.0" data-md-component="logo">
       <img src="../../../_static/bw-logo.svg" alt="logo">
     </a>
-    linearmodels 4.31
+    linearmodels 5.0
   </label>
   
     <div class="md-nav__source">
@@ -412,9 +412,10 @@
 <span class="sd">&quot;&quot;&quot;</span>
 <span class="kn">from</span> <span class="nn">__future__</span> <span class="kn">import</span> <span class="n">annotations</span>
 
+<span class="kn">from</span> <span class="nn">collections.abc</span> <span class="kn">import</span> <span class="n">Mapping</span><span class="p">,</span> <span class="n">Sequence</span>
 <span class="kn">from</span> <span class="nn">functools</span> <span class="kn">import</span> <span class="n">reduce</span>
 <span class="kn">import</span> <span class="nn">textwrap</span>
-<span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">Any</span><span class="p">,</span> <span class="n">Literal</span><span class="p">,</span> <span class="n">Mapping</span><span class="p">,</span> <span class="n">Sequence</span><span class="p">,</span> <span class="n">cast</span>
+<span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">Any</span><span class="p">,</span> <span class="n">Literal</span><span class="p">,</span> <span class="n">cast</span>
 <span class="kn">import</span> <span class="nn">warnings</span>
 
 <span class="kn">from</span> <span class="nn">formulaic.utils.context</span> <span class="kn">import</span> <span class="n">capture_context</span>
@@ -1944,7 +1945,7 @@
 
 <span class="sd">        It is also possible to include equation labels when using curly braces</span>
 
-<span class="sd">        &gt;&gt;&gt; formula = &quot;{eq1: y1 ~ 1 + x1_1 + [x1_2 ~ z1]} {eq2: y2 ~ 1 + x2_1 + [x2_2 ~ z2]}&quot;</span>
+<span class="sd">        &gt;&gt;&gt; formula = &quot;{eq1: y1 ~ x1_1 + [x1_2 ~ z1]} {eq2: y2 ~ 1 + [x2_2 ~ z2]}&quot;</span>
 <span class="sd">        &gt;&gt;&gt; mod = IV3SLS.from_formula(formula, data)</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="n">context</span> <span class="o">=</span> <span class="n">capture_context</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span>
@@ -2150,7 +2151,8 @@
 
 <span class="sd">        &gt;&gt;&gt; import pandas as pd</span>
 <span class="sd">        &gt;&gt;&gt; import numpy as np</span>
-<span class="sd">        &gt;&gt;&gt; data = pd.DataFrame(np.random.randn(500, 4), columns=[&quot;y1&quot;, &quot;x1_1&quot;, &quot;y2&quot;, &quot;x2_1&quot;])</span>
+<span class="sd">        &gt;&gt;&gt; data = pd.DataFrame(np.random.randn(500, 4),</span>
+<span class="sd">        ...                     columns=[&quot;y1&quot;, &quot;x1_1&quot;, &quot;y2&quot;, &quot;x2_1&quot;])</span>
 <span class="sd">        &gt;&gt;&gt; from linearmodels.system import SUR</span>
 <span class="sd">        &gt;&gt;&gt; formula = {&quot;eq1&quot;: &quot;y1 ~ 1 + x1_1&quot;, &quot;eq2&quot;: &quot;y2 ~ 1 + x2_1&quot;}</span>
 <span class="sd">        &gt;&gt;&gt; mod = SUR.from_formula(formula, data)</span>
@@ -2561,7 +2563,7 @@
 
 <span class="sd">        It is also possible to include equation labels when using curly braces</span>
 
-<span class="sd">        &gt;&gt;&gt; formula = &quot;{eq1: y1 ~ 1 + x1_1 + [x1_2 ~ z1]} {eq2: y2 ~ 1 + x2_1 + [x2_2 ~ z2]}&quot;</span>
+<span class="sd">        &gt;&gt;&gt; formula = &quot;{eq1: y1 ~ x1_1 + [x1_2 ~ z1]} {eq2: y2 ~ 1 + [x2_2 ~ z2]}&quot;</span>
 <span class="sd">        &gt;&gt;&gt; mod = IVSystemGMM.from_formula(formula, data)</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="n">context</span> <span class="o">=</span> <span class="n">capture_context</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span>
@@ -2645,7 +2647,7 @@
   
     Created using
     <a href="https://www.sphinx-doc.org/" target="_blank" rel="noopener">Sphinx</a>
-    6.2.1.
+    7.0.1.
      and
     <a href="https://github.com/jbms/sphinx-immaterial/" target="_blank" rel="noopener">Sphinx-Immaterial</a>
   
@@ -2689,7 +2691,7 @@
       <div class="md-dialog__inner md-typeset"></div>
     </div>
     
-    <script id="__config" type="application/json">{"base": "../../..", "features": [], "translations": {"clipboard.copied": "Copied to clipboard", "clipboard.copy": "Copy to clipboard", "search.config.lang": "en", "search.config.pipeline": "trimmer, stopWordFilter", "search.config.separator": "[\\s\\-]+", "search.placeholder": "Search", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.placeholder": "Type to start searching", "search.result.term.missing": "Missing", "select.version.title": "Select version"}, "version": {"provider": "mike", "staticVersions": [{"aliases": [], "title": "Release", "version": "https://bashtage.github.io/linearmodels/"}, {"aliases": [], "title": "Development", "version": "https://bashtage.github.io/linearmodels/devel/"}], "versionPath": null}}</script>
+    <script id="__config" type="application/json">{"base": "../../..", "features": [], "translations": {"clipboard.copied": "Copied to clipboard", "clipboard.copy": "Copy to clipboard", "search.config.lang": "en", "search.config.pipeline": "trimmer, stopWordFilter", "search.config.separator": "[\\s\\-]+", "search.placeholder": "Search", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.placeholder": "Type to start searching", "search.result.term.missing": "Missing", "select.version.title": "Select version"}, "version": {"provider": "mike", "staticVersions": [{"aliases": [], "title": "Release", "version": "https://bashtage.github.io/linearmodels"}, {"aliases": [], "title": "Development", "version": "https://bashtage.github.io/linearmodels/devel"}], "versionPath": null}}</script>
     
       
         <script src="../../../_static/sphinx_immaterial_theme.cea6a0c1d5b0618cf.min.js"></script>

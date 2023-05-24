@@ -15,7 +15,7 @@
     
   
       
-        <title>linearmodels.iv.results - linearmodels 4.31</title>
+        <title>linearmodels.iv.results - linearmodels 5.0</title>
       
     
 
@@ -48,7 +48,7 @@
         <style>:root{--md-text-font:"Roboto";--md-code-font:"Roboto Mono"}</style>
       
     
-        <link rel="stylesheet" type="text/css" href="../../../_static/sphinx_immaterial_theme.8118e13f191069ea1.min.css" />
+        <link rel="stylesheet" type="text/css" href="../../../_static/sphinx_immaterial_theme.b223ac77c5eb52f42.min.css" />
         <link rel="stylesheet" type="text/css" href="../../../_static/css/small_fixes.css" />
     <script>__md_scope=new URL("../../..",location),__md_hash=e=>[...e].reduce((e,_)=>(e<<5)-e+_.charCodeAt(0),0),__md_get=(e,_=localStorage,t=__md_scope)=>JSON.parse(_.getItem(t.pathname+"."+e)),__md_set=(e,_,t=localStorage,a=__md_scope)=>{try{t.setItem(a.pathname+"."+e,JSON.stringify(_))}catch(e){}}</script>
     
@@ -88,7 +88,7 @@
 
 <header class="md-header" data-md-component="header">
   <nav class="md-header__inner md-grid" aria-label="Header">
-    <a href="../../../index.html" title="linearmodels 4.31" class="md-header__button md-logo" aria-label="linearmodels 4.31" data-md-component="logo">
+    <a href="../../../index.html" title="linearmodels 5.0" class="md-header__button md-logo" aria-label="linearmodels 5.0" data-md-component="logo">
       <img src="../../../_static/bw-logo.svg" alt="logo">
     </a>
     <label class="md-header__button md-icon" for="__drawer">
@@ -98,7 +98,7 @@
       <div class="md-header__ellipsis">
         <div class="md-header__topic">
           <span class="md-ellipsis">
-            linearmodels 4.31
+            linearmodels 5.0
           </span>
         </div>
         <div class="md-header__topic" data-md-component="header-topic">
@@ -185,10 +185,10 @@
 
 <nav class="md-nav md-nav--primary" aria-label="Navigation" data-md-level="0">
   <label class="md-nav__title" for="__drawer">
-    <a href="../../../index.html" title="linearmodels 4.31" class="md-nav__button md-logo" aria-label="linearmodels 4.31" data-md-component="logo">
+    <a href="../../../index.html" title="linearmodels 5.0" class="md-nav__button md-logo" aria-label="linearmodels 5.0" data-md-component="logo">
       <img src="../../../_static/bw-logo.svg" alt="logo">
     </a>
-    linearmodels 4.31
+    linearmodels 5.0
   </label>
   
     <div class="md-nav__source">
@@ -404,8 +404,10 @@
 
 <span class="kn">from</span> <span class="nn">linearmodels.compat.statsmodels</span> <span class="kn">import</span> <span class="n">Summary</span>
 
+<span class="kn">from</span> <span class="nn">collections.abc</span> <span class="kn">import</span> <span class="n">Sequence</span>
 <span class="kn">import</span> <span class="nn">datetime</span> <span class="k">as</span> <span class="nn">dt</span>
-<span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">Any</span><span class="p">,</span> <span class="n">Sequence</span><span class="p">,</span> <span class="n">Union</span>
+<span class="kn">from</span> <span class="nn">functools</span> <span class="kn">import</span> <span class="n">cached_property</span>
+<span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">Any</span><span class="p">,</span> <span class="n">Union</span>
 
 <span class="kn">from</span> <span class="nn">numpy</span> <span class="kn">import</span> <span class="p">(</span>
     <span class="n">array</span><span class="p">,</span>
@@ -422,7 +424,6 @@
 <span class="p">)</span>
 <span class="kn">from</span> <span class="nn">numpy.linalg</span> <span class="kn">import</span> <span class="n">inv</span>
 <span class="kn">from</span> <span class="nn">pandas</span> <span class="kn">import</span> <span class="n">DataFrame</span><span class="p">,</span> <span class="n">Series</span><span class="p">,</span> <span class="n">concat</span><span class="p">,</span> <span class="n">to_numeric</span>
-<span class="kn">from</span> <span class="nn">property_cached</span> <span class="kn">import</span> <span class="n">cached_property</span>
 <span class="kn">import</span> <span class="nn">scipy.stats</span> <span class="k">as</span> <span class="nn">stats</span>
 <span class="kn">from</span> <span class="nn">statsmodels.iolib.summary</span> <span class="kn">import</span> <span class="n">SimpleTable</span><span class="p">,</span> <span class="n">fmt_2cols</span><span class="p">,</span> <span class="n">fmt_params</span>
 <span class="kn">from</span> <span class="nn">statsmodels.iolib.table</span> <span class="kn">import</span> <span class="n">default_txt_fmt</span>
@@ -1036,10 +1037,10 @@
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Coefficient of determination (R**2), ignoring absorbed variables&quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_absorbed_rsquared</span>
 
-<div class="viewcode-block" id="AbsorbingLSResults.absorbed_effects"><a class="viewcode-back" href="../../../iv/absorbing/linearmodels.iv.absorbing.AbsorbingLSResults.absorbed_effects.html#linearmodels.iv.absorbing.AbsorbingLSResults.absorbed_effects">[docs]</a>    <span class="nd">@cached_property</span>
+    <span class="nd">@cached_property</span>
     <span class="k">def</span> <span class="nf">absorbed_effects</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">DataFrame</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Fitted values from only absorbed terms&quot;&quot;&quot;</span>
-        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_absorbed_effects</span><span class="p">()</span></div>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_absorbed_effects</span><span class="p">()</span>
 
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">df_absorbed</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">int</span><span class="p">:</span>
@@ -1072,7 +1073,7 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">_cov_type</span> <span class="o">=</span> <span class="n">cov_type</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_cov_config</span> <span class="o">=</span> <span class="n">cov_config</span>
 
-<div class="viewcode-block" id="FirstStageResults.diagnostics"><a class="viewcode-back" href="../../../iv/iv/linearmodels.iv.results.FirstStageResults.diagnostics.html#linearmodels.iv.absorbing.FirstStageResults.diagnostics">[docs]</a>    <span class="nd">@cached_property</span>
+    <span class="nd">@cached_property</span>
     <span class="k">def</span> <span class="nf">diagnostics</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">DataFrame</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Post estimation diagnostics of first-stage fit</span>
@@ -1120,7 +1121,7 @@
             <span class="n">y</span> <span class="o">=</span> <span class="n">w</span> <span class="o">*</span> <span class="n">endog</span><span class="o">.</span><span class="n">pandas</span><span class="p">[[</span><span class="n">col</span><span class="p">]]</span><span class="o">.</span><span class="n">values</span>
             <span class="n">ey</span> <span class="o">=</span> <span class="n">annihilate</span><span class="p">(</span><span class="n">y</span><span class="p">,</span> <span class="n">x</span><span class="p">)</span>
             <span class="n">partial</span> <span class="o">=</span> <span class="n">_OLS</span><span class="p">(</span><span class="n">ey</span><span class="p">,</span> <span class="n">ez</span><span class="p">)</span><span class="o">.</span><span class="n">fit</span><span class="p">(</span><span class="n">cov_type</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">_cov_type</span><span class="p">,</span> <span class="o">**</span><span class="bp">self</span><span class="o">.</span><span class="n">_cov_config</span><span class="p">)</span>
-            <span class="n">full</span> <span class="o">=</span> <span class="n">individual_results</span><span class="p">[</span><span class="n">col</span><span class="p">]</span>
+            <span class="n">full</span> <span class="o">=</span> <span class="n">individual_results</span><span class="p">[</span><span class="nb">str</span><span class="p">(</span><span class="n">col</span><span class="p">)]</span>
             <span class="n">params</span> <span class="o">=</span> <span class="n">full</span><span class="o">.</span><span class="n">params</span><span class="o">.</span><span class="n">values</span><span class="p">[</span><span class="o">-</span><span class="n">nz</span><span class="p">:]</span>
             <span class="n">params</span> <span class="o">=</span> <span class="n">params</span><span class="p">[:,</span> <span class="kc">None</span><span class="p">]</span>
             <span class="n">c</span> <span class="o">=</span> <span class="n">asarray</span><span class="p">(</span><span class="n">full</span><span class="o">.</span><span class="n">cov</span><span class="p">)[</span><span class="o">-</span><span class="n">nz</span><span class="p">:,</span> <span class="o">-</span><span class="n">nz</span><span class="p">:]</span>
@@ -1164,9 +1165,9 @@
         <span class="k">for</span> <span class="n">col</span> <span class="ow">in</span> <span class="n">out_df</span><span class="p">:</span>
             <span class="n">out_df</span><span class="p">[</span><span class="n">col</span><span class="p">]</span> <span class="o">=</span> <span class="n">to_numeric</span><span class="p">(</span><span class="n">out_df</span><span class="p">[</span><span class="n">col</span><span class="p">],</span> <span class="n">errors</span><span class="o">=</span><span class="s2">&quot;ignore&quot;</span><span class="p">)</span>
 
-        <span class="k">return</span> <span class="n">out_df</span></div>
+        <span class="k">return</span> <span class="n">out_df</span>
 
-<div class="viewcode-block" id="FirstStageResults.individual"><a class="viewcode-back" href="../../../iv/iv/linearmodels.iv.results.FirstStageResults.individual.html#linearmodels.iv.absorbing.FirstStageResults.individual">[docs]</a>    <span class="nd">@cached_property</span>
+    <span class="nd">@cached_property</span>
     <span class="k">def</span> <span class="nf">individual</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">OLSResults</span><span class="p">]:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Individual model results from first-stage regressions</span>
@@ -1189,7 +1190,7 @@
             <span class="n">mod</span> <span class="o">=</span> <span class="n">_OLS</span><span class="p">(</span><span class="n">dep</span><span class="p">,</span> <span class="n">exog_instr</span><span class="p">,</span> <span class="n">weights</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">weights</span><span class="o">.</span><span class="n">ndarray</span><span class="p">)</span>
             <span class="n">res</span><span class="p">[</span><span class="nb">str</span><span class="p">(</span><span class="n">col</span><span class="p">)]</span> <span class="o">=</span> <span class="n">mod</span><span class="o">.</span><span class="n">fit</span><span class="p">(</span><span class="n">cov_type</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">_cov_type</span><span class="p">,</span> <span class="o">**</span><span class="bp">self</span><span class="o">.</span><span class="n">_cov_config</span><span class="p">)</span>
 
-        <span class="k">return</span> <span class="n">res</span></div>
+        <span class="k">return</span> <span class="n">res</span>
 
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">summary</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Summary</span><span class="p">:</span>
@@ -1320,7 +1321,7 @@
         <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">results</span><span class="p">,</span> <span class="n">model</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_kappa</span> <span class="o">=</span> <span class="n">results</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;kappa&quot;</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span>
 
-<div class="viewcode-block" id="IVResults.sargan"><a class="viewcode-back" href="../../../iv/iv/linearmodels.iv.results.IVResults.sargan.html#linearmodels.iv.absorbing.IVResults.sargan">[docs]</a>    <span class="nd">@cached_property</span>
+    <span class="nd">@cached_property</span>
     <span class="k">def</span> <span class="nf">sargan</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">InvalidTestStatistic</span> <span class="o">|</span> <span class="n">WaldTestStatistic</span><span class="p">:</span>
 <span class="w">        </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Sargan test of overidentifying restrictions</span>
@@ -1366,9 +1367,9 @@
         <span class="n">stat</span> <span class="o">=</span> <span class="n">nobs</span> <span class="o">*</span> <span class="p">(</span><span class="mi">1</span> <span class="o">-</span> <span class="p">(</span><span class="n">u</span><span class="o">.</span><span class="n">T</span> <span class="o">@</span> <span class="n">u</span><span class="p">)</span> <span class="o">/</span> <span class="p">(</span><span class="n">eps</span><span class="o">.</span><span class="n">T</span> <span class="o">@</span> <span class="n">eps</span><span class="p">))</span><span class="o">.</span><span class="n">squeeze</span><span class="p">()</span>
         <span class="n">null</span> <span class="o">=</span> <span class="s2">&quot;The model is not overidentified.&quot;</span>
 
-        <span class="k">return</span> <span class="n">WaldTestStatistic</span><span class="p">(</span><span class="n">stat</span><span class="p">,</span> <span class="n">null</span><span class="p">,</span> <span class="n">ninstr</span> <span class="o">-</span> <span class="n">nendog</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="n">name</span><span class="p">)</span></div>
+        <span class="k">return</span> <span class="n">WaldTestStatistic</span><span class="p">(</span><span class="n">stat</span><span class="p">,</span> <span class="n">null</span><span class="p">,</span> <span class="n">ninstr</span> <span class="o">-</span> <span class="n">nendog</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="n">name</span><span class="p">)</span>
 
-<div class="viewcode-block" id="IVResults.basmann"><a class="viewcode-back" href="../../../iv/iv/linearmodels.iv.results.IVResults.basmann.html#linearmodels.iv.absorbing.IVResults.basmann">[docs]</a>    <span class="nd">@cached_property</span>
+    <span class="nd">@cached_property</span>
     <span class="k">def</span> <span class="nf">basmann</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">InvalidTestStatistic</span> <span class="o">|</span> <span class="n">WaldTestStatistic</span><span class="p">:</span>
 <span class="w">        </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Basmann&#39;s test of overidentifying restrictions</span>
@@ -1412,7 +1413,7 @@
         <span class="n">sargan_test</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">sargan</span>
         <span class="n">s</span> <span class="o">=</span> <span class="n">sargan_test</span><span class="o">.</span><span class="n">stat</span>
         <span class="n">stat</span> <span class="o">=</span> <span class="n">s</span> <span class="o">*</span> <span class="p">(</span><span class="n">nobs</span> <span class="o">-</span> <span class="n">nz</span><span class="p">)</span> <span class="o">/</span> <span class="p">(</span><span class="n">nobs</span> <span class="o">-</span> <span class="n">s</span><span class="p">)</span>
-        <span class="k">return</span> <span class="n">WaldTestStatistic</span><span class="p">(</span><span class="n">stat</span><span class="p">,</span> <span class="n">sargan_test</span><span class="o">.</span><span class="n">null</span><span class="p">,</span> <span class="n">sargan_test</span><span class="o">.</span><span class="n">df</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="n">name</span><span class="p">)</span></div>
+        <span class="k">return</span> <span class="n">WaldTestStatistic</span><span class="p">(</span><span class="n">stat</span><span class="p">,</span> <span class="n">sargan_test</span><span class="o">.</span><span class="n">null</span><span class="p">,</span> <span class="n">sargan_test</span><span class="o">.</span><span class="n">df</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="n">name</span><span class="p">)</span>
 
     <span class="k">def</span> <span class="nf">_endogeneity_setup</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span> <span class="n">variables</span><span class="p">:</span> <span class="nb">str</span> <span class="o">|</span> <span class="nb">list</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span>
@@ -1424,7 +1425,7 @@
             <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="s2">&quot;variables must be a str or a list of str.&quot;</span><span class="p">)</span>
 
         <span class="n">nobs</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">model</span><span class="o">.</span><span class="n">dependent</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
-        <span class="n">e2</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">resids</span><span class="o">.</span><span class="n">values</span>
+        <span class="n">e2</span> <span class="o">=</span> <span class="n">asarray</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">resids</span><span class="o">.</span><span class="n">values</span><span class="p">)</span>
         <span class="n">nendog</span><span class="p">,</span> <span class="n">nexog</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">model</span><span class="o">.</span><span class="n">endog</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="bp">self</span><span class="o">.</span><span class="n">model</span><span class="o">.</span><span class="n">exog</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span>
         <span class="k">if</span> <span class="n">variables</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
             <span class="n">assumed_exog</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">model</span><span class="o">.</span><span class="n">endog</span><span class="o">.</span><span class="n">ndarray</span>
@@ -1568,7 +1569,7 @@
         <span class="n">name</span> <span class="o">=</span> <span class="s2">&quot;Wu-Hausman test of exogeneity&quot;</span>
         <span class="k">return</span> <span class="n">WaldTestStatistic</span><span class="p">(</span><span class="n">stat</span><span class="p">,</span> <span class="n">null</span><span class="p">,</span> <span class="n">df</span><span class="p">,</span> <span class="n">df_denom</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="n">name</span><span class="p">)</span></div>
 
-<div class="viewcode-block" id="IVResults.wooldridge_score"><a class="viewcode-back" href="../../../iv/iv/linearmodels.iv.results.IVResults.wooldridge_score.html#linearmodels.iv.absorbing.IVResults.wooldridge_score">[docs]</a>    <span class="nd">@cached_property</span>
+    <span class="nd">@cached_property</span>
     <span class="k">def</span> <span class="nf">wooldridge_score</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">WaldTestStatistic</span><span class="p">:</span>
 <span class="w">        </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Wooldridge&#39;s score test of exogeneity</span>
@@ -1610,9 +1611,9 @@
         <span class="n">df</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">model</span><span class="o">.</span><span class="n">endog</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span>
         <span class="n">null</span> <span class="o">=</span> <span class="s2">&quot;Endogenous variables are exogenous&quot;</span>
         <span class="n">name</span> <span class="o">=</span> <span class="s2">&quot;Wooldridge&#39;s score test of exogeneity&quot;</span>
-        <span class="k">return</span> <span class="n">WaldTestStatistic</span><span class="p">(</span><span class="n">stat</span><span class="p">,</span> <span class="n">null</span><span class="p">,</span> <span class="n">df</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="n">name</span><span class="p">)</span></div>
+        <span class="k">return</span> <span class="n">WaldTestStatistic</span><span class="p">(</span><span class="n">stat</span><span class="p">,</span> <span class="n">null</span><span class="p">,</span> <span class="n">df</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="n">name</span><span class="p">)</span>
 
-<div class="viewcode-block" id="IVResults.wooldridge_regression"><a class="viewcode-back" href="../../../iv/iv/linearmodels.iv.results.IVResults.wooldridge_regression.html#linearmodels.iv.absorbing.IVResults.wooldridge_regression">[docs]</a>    <span class="nd">@cached_property</span>
+    <span class="nd">@cached_property</span>
     <span class="k">def</span> <span class="nf">wooldridge_regression</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">WaldTestStatistic</span><span class="p">:</span>
 <span class="w">        </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Wooldridge&#39;s regression test of exogeneity</span>
@@ -1654,9 +1655,9 @@
         <span class="n">df</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">test_params</span><span class="p">)</span>
         <span class="n">null</span> <span class="o">=</span> <span class="s2">&quot;Endogenous variables are exogenous&quot;</span>
         <span class="n">name</span> <span class="o">=</span> <span class="s2">&quot;Wooldridge&#39;s regression test of exogeneity&quot;</span>
-        <span class="k">return</span> <span class="n">WaldTestStatistic</span><span class="p">(</span><span class="n">stat</span><span class="p">,</span> <span class="n">null</span><span class="p">,</span> <span class="n">df</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="n">name</span><span class="p">)</span></div>
+        <span class="k">return</span> <span class="n">WaldTestStatistic</span><span class="p">(</span><span class="n">stat</span><span class="p">,</span> <span class="n">null</span><span class="p">,</span> <span class="n">df</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="n">name</span><span class="p">)</span>
 
-<div class="viewcode-block" id="IVResults.wooldridge_overid"><a class="viewcode-back" href="../../../iv/iv/linearmodels.iv.results.IVResults.wooldridge_overid.html#linearmodels.iv.absorbing.IVResults.wooldridge_overid">[docs]</a>    <span class="nd">@cached_property</span>
+    <span class="nd">@cached_property</span>
     <span class="k">def</span> <span class="nf">wooldridge_overid</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">InvalidTestStatistic</span> <span class="o">|</span> <span class="n">WaldTestStatistic</span><span class="p">:</span>
 <span class="w">        </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Wooldridge&#39;s score test of overidentification</span>
@@ -1707,9 +1708,9 @@
         <span class="n">stat</span> <span class="o">=</span> <span class="n">res</span><span class="o">.</span><span class="n">nobs</span> <span class="o">*</span> <span class="n">res</span><span class="o">.</span><span class="n">rsquared</span>
         <span class="n">df</span> <span class="o">=</span> <span class="n">ninstr</span> <span class="o">-</span> <span class="n">nendog</span>
         <span class="n">null</span> <span class="o">=</span> <span class="s2">&quot;Model is not overidentified.&quot;</span>
-        <span class="k">return</span> <span class="n">WaldTestStatistic</span><span class="p">(</span><span class="n">stat</span><span class="p">,</span> <span class="n">null</span><span class="p">,</span> <span class="n">df</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="n">name</span><span class="p">)</span></div>
+        <span class="k">return</span> <span class="n">WaldTestStatistic</span><span class="p">(</span><span class="n">stat</span><span class="p">,</span> <span class="n">null</span><span class="p">,</span> <span class="n">df</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="n">name</span><span class="p">)</span>
 
-<div class="viewcode-block" id="IVResults.anderson_rubin"><a class="viewcode-back" href="../../../iv/iv/linearmodels.iv.results.IVResults.anderson_rubin.html#linearmodels.iv.absorbing.IVResults.anderson_rubin">[docs]</a>    <span class="nd">@cached_property</span>
+    <span class="nd">@cached_property</span>
     <span class="k">def</span> <span class="nf">anderson_rubin</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">InvalidTestStatistic</span> <span class="o">|</span> <span class="n">WaldTestStatistic</span><span class="p">:</span>
 <span class="w">        </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Anderson-Rubin test of overidentifying restrictions</span>
@@ -1742,9 +1743,9 @@
         <span class="n">stat</span> <span class="o">=</span> <span class="n">nobs</span> <span class="o">*</span> <span class="n">log</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_liml_kappa</span><span class="p">)</span>
         <span class="n">df</span> <span class="o">=</span> <span class="n">ninstr</span> <span class="o">-</span> <span class="n">nendog</span>
         <span class="n">null</span> <span class="o">=</span> <span class="s2">&quot;The model is not overidentified.&quot;</span>
-        <span class="k">return</span> <span class="n">WaldTestStatistic</span><span class="p">(</span><span class="n">stat</span><span class="p">,</span> <span class="n">null</span><span class="p">,</span> <span class="n">df</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="n">name</span><span class="p">)</span></div>
+        <span class="k">return</span> <span class="n">WaldTestStatistic</span><span class="p">(</span><span class="n">stat</span><span class="p">,</span> <span class="n">null</span><span class="p">,</span> <span class="n">df</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="n">name</span><span class="p">)</span>
 
-<div class="viewcode-block" id="IVResults.basmann_f"><a class="viewcode-back" href="../../../iv/iv/linearmodels.iv.results.IVResults.basmann_f.html#linearmodels.iv.absorbing.IVResults.basmann_f">[docs]</a>    <span class="nd">@cached_property</span>
+    <span class="nd">@cached_property</span>
     <span class="k">def</span> <span class="nf">basmann_f</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">InvalidTestStatistic</span> <span class="o">|</span> <span class="n">WaldTestStatistic</span><span class="p">:</span>
 <span class="w">        </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Basmann&#39;s F test of overidentifying restrictions</span>
@@ -1778,7 +1779,7 @@
         <span class="n">df_denom</span> <span class="o">=</span> <span class="n">nobs</span> <span class="o">-</span> <span class="p">(</span><span class="n">nexog</span> <span class="o">+</span> <span class="n">ninstr</span><span class="p">)</span>
         <span class="n">stat</span> <span class="o">=</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_liml_kappa</span> <span class="o">-</span> <span class="mi">1</span><span class="p">)</span> <span class="o">*</span> <span class="n">df_denom</span> <span class="o">/</span> <span class="n">df</span>
         <span class="n">null</span> <span class="o">=</span> <span class="s2">&quot;The model is not overidentified.&quot;</span>
-        <span class="k">return</span> <span class="n">WaldTestStatistic</span><span class="p">(</span><span class="n">stat</span><span class="p">,</span> <span class="n">null</span><span class="p">,</span> <span class="n">df</span><span class="p">,</span> <span class="n">df_denom</span><span class="o">=</span><span class="n">df_denom</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="n">name</span><span class="p">)</span></div></div>
+        <span class="k">return</span> <span class="n">WaldTestStatistic</span><span class="p">(</span><span class="n">stat</span><span class="p">,</span> <span class="n">null</span><span class="p">,</span> <span class="n">df</span><span class="p">,</span> <span class="n">df_denom</span><span class="o">=</span><span class="n">df_denom</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="n">name</span><span class="p">)</span></div>
 
 
 <div class="viewcode-block" id="IVGMMResults"><a class="viewcode-back" href="../../../iv/iv/linearmodels.iv.results.IVGMMResults.html#linearmodels.iv.absorbing.IVGMMResults">[docs]</a><span class="k">class</span> <span class="nc">IVGMMResults</span><span class="p">(</span><span class="n">_CommonIVResults</span><span class="p">):</span>
@@ -2148,7 +2149,7 @@
   
     Created using
     <a href="https://www.sphinx-doc.org/" target="_blank" rel="noopener">Sphinx</a>
-    6.2.1.
+    7.0.1.
      and
     <a href="https://github.com/jbms/sphinx-immaterial/" target="_blank" rel="noopener">Sphinx-Immaterial</a>
   
@@ -2192,7 +2193,7 @@
       <div class="md-dialog__inner md-typeset"></div>
     </div>
     
-    <script id="__config" type="application/json">{"base": "../../..", "features": [], "translations": {"clipboard.copied": "Copied to clipboard", "clipboard.copy": "Copy to clipboard", "search.config.lang": "en", "search.config.pipeline": "trimmer, stopWordFilter", "search.config.separator": "[\\s\\-]+", "search.placeholder": "Search", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.placeholder": "Type to start searching", "search.result.term.missing": "Missing", "select.version.title": "Select version"}, "version": {"provider": "mike", "staticVersions": [{"aliases": [], "title": "Release", "version": "https://bashtage.github.io/linearmodels/"}, {"aliases": [], "title": "Development", "version": "https://bashtage.github.io/linearmodels/devel/"}], "versionPath": null}}</script>
+    <script id="__config" type="application/json">{"base": "../../..", "features": [], "translations": {"clipboard.copied": "Copied to clipboard", "clipboard.copy": "Copy to clipboard", "search.config.lang": "en", "search.config.pipeline": "trimmer, stopWordFilter", "search.config.separator": "[\\s\\-]+", "search.placeholder": "Search", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.placeholder": "Type to start searching", "search.result.term.missing": "Missing", "select.version.title": "Select version"}, "version": {"provider": "mike", "staticVersions": [{"aliases": [], "title": "Release", "version": "https://bashtage.github.io/linearmodels"}, {"aliases": [], "title": "Development", "version": "https://bashtage.github.io/linearmodels/devel"}], "versionPath": null}}</script>
     
       
         <script src="../../../_static/sphinx_immaterial_theme.cea6a0c1d5b0618cf.min.js"></script>

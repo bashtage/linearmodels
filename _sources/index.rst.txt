@@ -5,14 +5,6 @@
    :align: left
    :alt: linearmodels logo
 
-
-.. warning::
-
-   The next version of linearmodels will be 5.0 and will change the default sorting order
-   for models created using formulas. You can use the new behavior by adding
-   ``from linearmodels.__future__ import ordering`` to your code.  This
-   version will increase the minimum version of formulaic to 0.6.0.
-
 .. note::
 
   `Stable documentation <https://bashtage.github.io/linearmodels/>`_ for the latest release
