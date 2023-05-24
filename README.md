@@ -132,7 +132,6 @@ regression. Currently only the single variable IV estimators are polished.
 
 ### Running
 
-
 -   Python 3.9+
 -   NumPy (1.19+)
 -   SciPy (1.5+)
