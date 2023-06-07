@@ -1501,3 +1501,33 @@ def test_quoted_var_names():
     d = pd.DataFrame({"var a": np.arange(100.0)}, index=mi)
     res = PanelOLS.from_formula("`var a` ~ 1", data=d).fit()
     assert_allclose(res.params, d.mean().iloc[0])
+
+
+def test_entity_into():
+    # GH 534
+    rg = np.random.default_rng(12345)
+    mi = pd.MultiIndex.from_product([np.arange(20), np.arange(5)])
+    df = pd.DataFrame(
+        {
+            "a": rg.standard_normal(100),
+            "b": rg.standard_normal(100),
+        },
+        index=mi,
+    )
+    res = PanelOLS.from_formula("a ~ 1 + b", data=df).fit()
+    ei = res.entity_info
+    assert ei["total"] == 20
+    assert ei["min"] == 5
+    ti = res.time_info
+    assert ti["total"] == 5
+    assert ti["min"] == 20
+
+    df2 = df.drop([2, 4, 6, 8], level=0)
+    df2 = df2.drop(0, level=1)
+    res = PanelOLS.from_formula("a ~ 1 + b", data=df2).fit()
+    ei = res.entity_info
+    assert ei["min"] == 4
+    assert ei["total"] == 16
+    ti = res.time_info
+    assert ti["total"] == 4
+    assert ti["min"] == 16

@@ -91,6 +91,7 @@ def _lstsq(
 
 def panel_structure_stats(ids: IntArray, name: str) -> Series:
     bc = np.bincount(ids)
+    bc = bc[bc > 0]
     index = ["mean", "median", "max", "min", "total"]
     out = [bc.mean(), np.median(bc), bc.max(), bc.min(), bc.shape[0]]
     return Series(out, index=index, name=name)
