@@ -160,7 +160,7 @@ class PanelData:
     can be treated as-if being (1, nobs, nentity).
 
     If the 2-d input is a pandas DataFrame with a 2-level MultiIndex then the
-    input is treated differently.  Index level 0 is assumed ot be entity.
+    input is treated differently.  Index level 0 is assumed to be entity.
     Index level 1 is time.  The columns are the variables.  MultiIndex Series
     are also accepted and treated as single column MultiIndex DataFrames.
 
