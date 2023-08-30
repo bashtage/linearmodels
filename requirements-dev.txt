@@ -18,3 +18,4 @@ sphinx-immaterial
 sphinxcontrib-spelling
 sphinx_autodoc_typehints
 wheel
+jupyter-server>=2.7.2 # not directly required, pinned by Snyk to avoid a vulnerability
