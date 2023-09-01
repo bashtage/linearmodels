@@ -76,7 +76,7 @@ def preconditioner(
     """
     # Dense path
     if not sp.issparse(d):
-        klass = None if type(d) == np.ndarray else d.__class__
+        klass = None if type(d) is np.ndarray else d.__class__
         d_id = id(d)
         d = np.asarray(d)
         if id(d) == d_id or copy:
