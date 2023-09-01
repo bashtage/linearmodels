@@ -1883,7 +1883,7 @@ class PanelOLS(_PanelModelBase):
 
                     # Adjust exog
                     self.exog = PanelData(self.exog.dataframe.iloc[:, retain])
-                    x_effects = x_effects[retain]
+                    x_effects = x_effects[:, retain]
 
         params = _lstsq(x, y, rcond=None)[0]
         nobs = self.dependent.dataframe.shape[0]

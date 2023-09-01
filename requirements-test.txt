@@ -1,9 +1,9 @@
-black[jupyter]==23.3.0
+black[jupyter]==23.7.0
 coverage
 flake8
 isort
 matplotlib
-pytest>=7.0,<7.1
+pytest>=7.3.0
 pytest-xdist
 pytest-cov
 seaborn
