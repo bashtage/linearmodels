@@ -1376,7 +1376,7 @@ def test_repeated_measures_weight():
     res = mod.fit()
     mod = PanelOLS.from_formula("y ~ x + EntityEffects + TimeEffects", df)
     res_un = mod.fit()
-    assert res.params[0] != res_un.params[0]
+    assert res.params.iloc[0] != res_un.params.iloc[0]
 
 
 def test_absorbed(absorbed_data):
