@@ -15,7 +15,7 @@
     
   
       
-        <title>linearmodels.panel.data - linearmodels 5.1</title>
+        <title>linearmodels.panel.data - linearmodels v5.2 (+2)</title>
       
     
 
@@ -48,8 +48,8 @@
         <style>:root{--md-text-font:"Roboto";--md-code-font:"Roboto Mono"}</style>
       
     
-        <link rel="stylesheet" type="text/css" href="../../../_static/sphinx_immaterial_theme.9dcb20399d0097661.min.css" />
-        <link rel="stylesheet" type="text/css" href="../../../_static/css/small_fixes.css" />
+        <link rel="stylesheet" type="text/css" href="../../../_static/sphinx_immaterial_theme.a60204c58f5e4ff66.min.css?v=63f51f50" />
+        <link rel="stylesheet" type="text/css" href="../../../_static/css/small_fixes.css?v=34934119" />
     <script>__md_scope=new URL("../../..",location),__md_hash=e=>[...e].reduce((e,_)=>(e<<5)-e+_.charCodeAt(0),0),__md_get=(e,_=localStorage,t=__md_scope)=>JSON.parse(_.getItem(t.pathname+"."+e)),__md_set=(e,_,t=localStorage,a=__md_scope)=>{try{t.setItem(a.pathname+"."+e,JSON.stringify(_))}catch(e){}}</script>
     
       
@@ -88,7 +88,7 @@
 
 <header class="md-header" data-md-component="header">
   <nav class="md-header__inner md-grid" aria-label="Header">
-    <a href="../../../index.html" title="linearmodels 5.1" class="md-header__button md-logo" aria-label="linearmodels 5.1" data-md-component="logo">
+    <a href="../../../index.html" title="linearmodels v5.2 (+2)" class="md-header__button md-logo" aria-label="linearmodels v5.2 (+2)" data-md-component="logo">
       <img src="../../../_static/bw-logo.svg" alt="logo">
     </a>
     <label class="md-header__button md-icon" for="__drawer">
@@ -98,7 +98,7 @@
       <div class="md-header__ellipsis">
         <div class="md-header__topic">
           <span class="md-ellipsis">
-            linearmodels 5.1
+            linearmodels v5.2 (+2)
           </span>
         </div>
         <div class="md-header__topic" data-md-component="header-topic">
@@ -185,10 +185,10 @@
 
 <nav class="md-nav md-nav--primary" aria-label="Navigation" data-md-level="0">
   <label class="md-nav__title" for="__drawer">
-    <a href="../../../index.html" title="linearmodels 5.1" class="md-nav__button md-logo" aria-label="linearmodels 5.1" data-md-component="logo">
+    <a href="../../../index.html" title="linearmodels v5.2 (+2)" class="md-nav__button md-logo" aria-label="linearmodels v5.2 (+2)" data-md-component="logo">
       <img src="../../../_static/bw-logo.svg" alt="logo">
     </a>
-    linearmodels 5.1
+    linearmodels v5.2 (+2)
   </label>
   
     <div class="md-nav__source">
@@ -432,7 +432,9 @@
 <span class="n">__all__</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;PanelData&quot;</span><span class="p">,</span> <span class="s2">&quot;PanelDataLike&quot;</span><span class="p">]</span>
 
 
-<div class="viewcode-block" id="_Panel"><a class="viewcode-back" href="../../../panel/panel/linearmodels.panel.data._Panel.html#linearmodels.panel.data._Panel">[docs]</a><span class="k">class</span> <span class="nc">_Panel</span><span class="p">:</span>
+<div class="viewcode-block" id="_Panel">
+<a class="viewcode-back" href="../../../panel/panel/linearmodels.panel.data._Panel.html#linearmodels.panel.data._Panel">[docs]</a>
+<span class="k">class</span> <span class="nc">_Panel</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Convert a MI DataFrame to a 3-d structure where columns are items.</span>
 
@@ -465,7 +467,9 @@
         <span class="n">arr</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">asarray</span><span class="p">(</span><span class="n">new_df</span><span class="p">)</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span><span class="o">.</span><span class="n">T</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_values</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">swapaxes</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="n">arr</span><span class="p">,</span> <span class="p">(</span><span class="n">i</span><span class="p">,</span> <span class="n">k</span><span class="p">,</span> <span class="n">j</span><span class="p">)),</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">)</span>
 
-<div class="viewcode-block" id="_Panel.from_array"><a class="viewcode-back" href="../../../panel/panel/linearmodels.panel.data._Panel.from_array.html#linearmodels.panel.data._Panel.from_array">[docs]</a>    <span class="nd">@classmethod</span>
+<div class="viewcode-block" id="_Panel.from_array">
+<a class="viewcode-back" href="../../../panel/panel/linearmodels.panel.data._Panel.from_array.html#linearmodels.panel.data._Panel.from_array">[docs]</a>
+    <span class="nd">@classmethod</span>
     <span class="k">def</span> <span class="nf">from_array</span><span class="p">(</span>
         <span class="bp">cls</span><span class="p">,</span>
         <span class="n">values</span><span class="p">:</span> <span class="n">NumericArray</span><span class="p">,</span>
@@ -481,6 +485,7 @@
         <span class="c1"># TODO: Remove Index when pandas-stubs is fixed</span>
         <span class="n">df</span> <span class="o">=</span> <span class="n">DataFrame</span><span class="p">(</span><span class="n">values_flat</span><span class="p">,</span> <span class="n">index</span><span class="o">=</span><span class="n">multi_index</span><span class="p">,</span> <span class="n">columns</span><span class="o">=</span><span class="n">Index</span><span class="p">(</span><span class="n">items</span><span class="p">))</span>
         <span class="k">return</span> <span class="bp">cls</span><span class="p">(</span><span class="n">df</span><span class="p">)</span></div>
+
 
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">shape</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">tuple</span><span class="p">[</span><span class="nb">int</span><span class="p">,</span> <span class="nb">int</span><span class="p">,</span> <span class="nb">int</span><span class="p">]:</span>
@@ -502,8 +507,12 @@
     <span class="k">def</span> <span class="nf">values</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Float64Array</span><span class="p">:</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_values</span>
 
-<div class="viewcode-block" id="_Panel.to_frame"><a class="viewcode-back" href="../../../panel/panel/linearmodels.panel.data._Panel.to_frame.html#linearmodels.panel.data._Panel.to_frame">[docs]</a>    <span class="k">def</span> <span class="nf">to_frame</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">DataFrame</span><span class="p">:</span>
-        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_frame</span></div></div>
+<div class="viewcode-block" id="_Panel.to_frame">
+<a class="viewcode-back" href="../../../panel/panel/linearmodels.panel.data._Panel.to_frame.html#linearmodels.panel.data._Panel.to_frame">[docs]</a>
+    <span class="k">def</span> <span class="nf">to_frame</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">DataFrame</span><span class="p">:</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_frame</span></div>
+</div>
+
 
 
 <span class="k">def</span> <span class="nf">convert_columns</span><span class="p">(</span><span class="n">s</span><span class="p">:</span> <span class="n">Series</span><span class="p">,</span> <span class="n">drop_first</span><span class="p">:</span> <span class="nb">bool</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">AnyPandas</span><span class="p">:</span>
@@ -524,7 +533,9 @@
     <span class="p">)</span>
 
 
-<div class="viewcode-block" id="PanelData"><a class="viewcode-back" href="../../../panel/panel/linearmodels.panel.data.PanelData.html#linearmodels.panel.data.PanelData">[docs]</a><span class="k">class</span> <span class="nc">PanelData</span><span class="p">:</span>
+<div class="viewcode-block" id="PanelData">
+<a class="viewcode-back" href="../../../panel/panel/linearmodels.panel.data.PanelData.html#linearmodels.panel.data.PanelData">[docs]</a>
+<span class="k">class</span> <span class="nc">PanelData</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Abstraction to handle alternative formats for panel data</span>
 
@@ -687,7 +698,9 @@
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;NumPy ndarray view of panel&quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">panel</span><span class="o">.</span><span class="n">values</span>
 
-<div class="viewcode-block" id="PanelData.drop"><a class="viewcode-back" href="../../../panel/panel/linearmodels.panel.data.PanelData.drop.html#linearmodels.panel.data.PanelData.drop">[docs]</a>    <span class="k">def</span> <span class="nf">drop</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">locs</span><span class="p">:</span> <span class="n">Series</span> <span class="o">|</span> <span class="n">BoolArray</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<div class="viewcode-block" id="PanelData.drop">
+<a class="viewcode-back" href="../../../panel/panel/linearmodels.panel.data.PanelData.drop.html#linearmodels.panel.data.PanelData.drop">[docs]</a>
+    <span class="k">def</span> <span class="nf">drop</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">locs</span><span class="p">:</span> <span class="n">Series</span> <span class="o">|</span> <span class="n">BoolArray</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Drop observations from the panel.</span>
 
@@ -702,6 +715,7 @@
         <span class="c1"># Reset panel and shape after a drop</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_panel</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_shape</span> <span class="o">=</span> <span class="kc">None</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_k</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_t</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_n</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">shape</span></div>
+
 
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">shape</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">tuple</span><span class="p">[</span><span class="nb">int</span><span class="p">,</span> <span class="nb">int</span><span class="p">,</span> <span class="nb">int</span><span class="p">]:</span>
@@ -820,7 +834,9 @@
 
         <span class="k">return</span> <span class="n">PanelData</span><span class="p">(</span><span class="n">resid</span><span class="p">)</span>
 
-<div class="viewcode-block" id="PanelData.general_demean"><a class="viewcode-back" href="../../../panel/panel/linearmodels.panel.data.PanelData.general_demean.html#linearmodels.panel.data.PanelData.general_demean">[docs]</a>    <span class="k">def</span> <span class="nf">general_demean</span><span class="p">(</span>
+<div class="viewcode-block" id="PanelData.general_demean">
+<a class="viewcode-back" href="../../../panel/panel/linearmodels.panel.data.PanelData.general_demean.html#linearmodels.panel.data.PanelData.general_demean">[docs]</a>
+    <span class="k">def</span> <span class="nf">general_demean</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span> <span class="n">groups</span><span class="p">:</span> <span class="n">PanelDataLike</span><span class="p">,</span> <span class="n">weights</span><span class="p">:</span> <span class="n">PanelData</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span>
     <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">PanelData</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
@@ -912,6 +928,7 @@
 
         <span class="k">return</span> <span class="n">PanelData</span><span class="p">(</span><span class="n">current</span><span class="p">)</span></div>
 
+
     <span class="nd">@overload</span>
     <span class="k">def</span> <span class="nf">demean</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span>
@@ -940,7 +957,9 @@
     <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Float64Array</span><span class="p">:</span>
         <span class="o">...</span>
 
-<div class="viewcode-block" id="PanelData.demean"><a class="viewcode-back" href="../../../panel/panel/linearmodels.panel.data.PanelData.demean.html#linearmodels.panel.data.PanelData.demean">[docs]</a>    <span class="k">def</span> <span class="nf">demean</span><span class="p">(</span>
+<div class="viewcode-block" id="PanelData.demean">
+<a class="viewcode-back" href="../../../panel/panel/linearmodels.panel.data.PanelData.demean.html#linearmodels.panel.data.PanelData.demean">[docs]</a>
+    <span class="k">def</span> <span class="nf">demean</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span>
         <span class="n">group</span><span class="p">:</span> <span class="n">Literal</span><span class="p">[</span><span class="s2">&quot;entity&quot;</span><span class="p">,</span> <span class="s2">&quot;time&quot;</span><span class="p">,</span> <span class="s2">&quot;both&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="s2">&quot;entity&quot;</span><span class="p">,</span>
         <span class="n">weights</span><span class="p">:</span> <span class="n">PanelData</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
@@ -1003,6 +1022,7 @@
                 <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">asarray</span><span class="p">(</span><span class="n">out_df</span><span class="p">)</span>
             <span class="k">return</span> <span class="n">PanelData</span><span class="p">(</span><span class="n">out_df</span><span class="p">)</span></div>
 
+
     <span class="k">def</span> <span class="fm">__str__</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="vm">__class__</span><span class="o">.</span><span class="vm">__name__</span> <span class="o">+</span> <span class="s2">&quot;</span><span class="se">\n</span><span class="s2">&quot;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_frame</span><span class="p">)</span>
 
@@ -1019,7 +1039,9 @@
         <span class="n">html</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_frame</span><span class="o">.</span><span class="n">_repr_html_</span><span class="p">()</span>  <span class="c1"># type: ignore[operator]</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="vm">__class__</span><span class="o">.</span><span class="vm">__name__</span> <span class="o">+</span> <span class="s2">&quot;&lt;br/&gt;&quot;</span> <span class="o">+</span> <span class="n">html</span>
 
-<div class="viewcode-block" id="PanelData.count"><a class="viewcode-back" href="../../../panel/panel/linearmodels.panel.data.PanelData.count.html#linearmodels.panel.data.PanelData.count">[docs]</a>    <span class="k">def</span> <span class="nf">count</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">group</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;entity&quot;</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">DataFrame</span><span class="p">:</span>
+<div class="viewcode-block" id="PanelData.count">
+<a class="viewcode-back" href="../../../panel/panel/linearmodels.panel.data.PanelData.count.html#linearmodels.panel.data.PanelData.count">[docs]</a>
+    <span class="k">def</span> <span class="nf">count</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">group</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;entity&quot;</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">DataFrame</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Count number of observations by entity or time</span>
 
@@ -1039,6 +1061,7 @@
 
         <span class="k">return</span> <span class="n">out</span><span class="o">.</span><span class="n">reindex</span><span class="p">(</span><span class="n">reindex</span><span class="p">)</span></div>
 
+
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">index</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">MultiIndex</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Return the index of the multi-index dataframe view&quot;&quot;&quot;</span>
@@ -1046,7 +1069,9 @@
         <span class="k">assert</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">index</span><span class="p">,</span> <span class="n">MultiIndex</span><span class="p">)</span>
         <span class="k">return</span> <span class="n">index</span>
 
-<div class="viewcode-block" id="PanelData.copy"><a class="viewcode-back" href="../../../panel/panel/linearmodels.panel.data.PanelData.copy.html#linearmodels.panel.data.PanelData.copy">[docs]</a>    <span class="k">def</span> <span class="nf">copy</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">PanelData</span><span class="p">:</span>
+<div class="viewcode-block" id="PanelData.copy">
+<a class="viewcode-back" href="../../../panel/panel/linearmodels.panel.data.PanelData.copy.html#linearmodels.panel.data.PanelData.copy">[docs]</a>
+    <span class="k">def</span> <span class="nf">copy</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">PanelData</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Return a deep copy&quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="n">PanelData</span><span class="p">(</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">_frame</span><span class="o">.</span><span class="n">copy</span><span class="p">(),</span>
@@ -1055,7 +1080,10 @@
             <span class="n">drop_first</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">_drop_first</span><span class="p">,</span>
         <span class="p">)</span></div>
 
-<div class="viewcode-block" id="PanelData.mean"><a class="viewcode-back" href="../../../panel/panel/linearmodels.panel.data.PanelData.mean.html#linearmodels.panel.data.PanelData.mean">[docs]</a>    <span class="k">def</span> <span class="nf">mean</span><span class="p">(</span>
+
+<div class="viewcode-block" id="PanelData.mean">
+<a class="viewcode-back" href="../../../panel/panel/linearmodels.panel.data.PanelData.mean.html#linearmodels.panel.data.PanelData.mean">[docs]</a>
+    <span class="k">def</span> <span class="nf">mean</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span> <span class="n">group</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;entity&quot;</span><span class="p">,</span> <span class="n">weights</span><span class="p">:</span> <span class="n">PanelData</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span>
     <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">DataFrame</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
@@ -1090,7 +1118,10 @@
 
         <span class="k">return</span> <span class="n">out</span></div>
 
-<div class="viewcode-block" id="PanelData.first_difference"><a class="viewcode-back" href="../../../panel/panel/linearmodels.panel.data.PanelData.first_difference.html#linearmodels.panel.data.PanelData.first_difference">[docs]</a>    <span class="k">def</span> <span class="nf">first_difference</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">PanelData</span><span class="p">:</span>
+
+<div class="viewcode-block" id="PanelData.first_difference">
+<a class="viewcode-back" href="../../../panel/panel/linearmodels.panel.data.PanelData.first_difference.html#linearmodels.panel.data.PanelData.first_difference">[docs]</a>
+    <span class="k">def</span> <span class="nf">first_difference</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">PanelData</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Compute first differences of variables</span>
 
@@ -1111,6 +1142,7 @@
         <span class="n">diffs_frame</span> <span class="o">=</span> <span class="n">diffs_frame</span><span class="o">.</span><span class="n">reindex</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_frame</span><span class="o">.</span><span class="n">index</span><span class="p">)</span><span class="o">.</span><span class="n">dropna</span><span class="p">(</span><span class="n">how</span><span class="o">=</span><span class="s2">&quot;any&quot;</span><span class="p">)</span>
         <span class="k">return</span> <span class="n">PanelData</span><span class="p">(</span><span class="n">diffs_frame</span><span class="p">)</span></div>
 
+
     <span class="nd">@staticmethod</span>
     <span class="k">def</span> <span class="nf">_minimize_multiindex</span><span class="p">(</span><span class="n">df</span><span class="p">:</span> <span class="n">DataFrame</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">DataFrame</span><span class="p">:</span>
         <span class="n">index_cols</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="n">df</span><span class="o">.</span><span class="n">index</span><span class="o">.</span><span class="n">names</span><span class="p">)</span>
@@ -1124,7 +1156,9 @@
         <span class="n">df</span><span class="o">.</span><span class="n">index</span><span class="o">.</span><span class="n">names</span> <span class="o">=</span> <span class="n">orig_names</span>
         <span class="k">return</span> <span class="n">df</span>
 
-<div class="viewcode-block" id="PanelData.dummies"><a class="viewcode-back" href="../../../panel/panel/linearmodels.panel.data.PanelData.dummies.html#linearmodels.panel.data.PanelData.dummies">[docs]</a>    <span class="k">def</span> <span class="nf">dummies</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">group</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;entity&quot;</span><span class="p">,</span> <span class="n">drop_first</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">DataFrame</span><span class="p">:</span>
+<div class="viewcode-block" id="PanelData.dummies">
+<a class="viewcode-back" href="../../../panel/panel/linearmodels.panel.data.PanelData.dummies.html#linearmodels.panel.data.PanelData.dummies">[docs]</a>
+    <span class="k">def</span> <span class="nf">dummies</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">group</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;entity&quot;</span><span class="p">,</span> <span class="n">drop_first</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">DataFrame</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Generate entity or time dummies</span>
 
@@ -1151,7 +1185,9 @@
         <span class="n">cols</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">entities</span> <span class="k">if</span> <span class="n">group</span> <span class="o">==</span> <span class="s2">&quot;entity&quot;</span> <span class="k">else</span> <span class="bp">self</span><span class="o">.</span><span class="n">time</span>
         <span class="c1"># TODO: Incorrect typing in pandas-stubs not handling Hashable | None</span>
         <span class="n">dummy_cols</span> <span class="o">=</span> <span class="p">[</span><span class="n">c</span> <span class="k">for</span> <span class="n">c</span> <span class="ow">in</span> <span class="n">cols</span> <span class="k">if</span> <span class="n">c</span> <span class="ow">in</span> <span class="n">dummies</span><span class="p">]</span>
-        <span class="k">return</span> <span class="n">dummies</span><span class="p">[</span><span class="n">dummy_cols</span><span class="p">]</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">,</span> <span class="n">copy</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>  <span class="c1"># type: ignore</span></div></div>
+        <span class="k">return</span> <span class="n">dummies</span><span class="p">[</span><span class="n">dummy_cols</span><span class="p">]</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">,</span> <span class="n">copy</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>  <span class="c1"># type: ignore</span></div>
+</div>
+
 
 
 <span class="n">PanelDataLike</span> <span class="o">=</span> <span class="n">Union</span><span class="p">[</span><span class="n">PanelData</span><span class="p">,</span> <span class="n">ArrayLike</span><span class="p">]</span>
@@ -1186,7 +1222,7 @@
   
     Created using
     <a href="https://www.sphinx-doc.org/" target="_blank" rel="noopener">Sphinx</a>
-    7.0.1.
+    7.2.5.
      and
     <a href="https://github.com/jbms/sphinx-immaterial/" target="_blank" rel="noopener">Sphinx-Immaterial</a>
   
@@ -1233,7 +1269,7 @@
     <script id="__config" type="application/json">{"base": "../../..", "features": [], "translations": {"clipboard.copied": "Copied to clipboard", "clipboard.copy": "Copy to clipboard", "search.config.lang": "en", "search.config.pipeline": "trimmer, stopWordFilter", "search.config.separator": "[\\s\\-]+", "search.placeholder": "Search", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.placeholder": "Type to start searching", "search.result.term.missing": "Missing", "select.version.title": "Select version"}, "version": {"provider": "mike", "staticVersions": [{"aliases": [], "title": "Release", "version": "https://bashtage.github.io/linearmodels"}, {"aliases": [], "title": "Development", "version": "https://bashtage.github.io/linearmodels/devel"}], "versionPath": null}}</script>
     
       
-        <script src="../../../_static/sphinx_immaterial_theme.1b5b7a2d5891aec19.min.js"></script>
+        <script src="../../../_static/sphinx_immaterial_theme.1b5b7a2d5891aec19.min.js?v=1e7b0789"></script>
         <script crossorigin="anonymous" integrity="sha256-Ae2Vz/4ePdIu6ZyI/5ZGsYnb+m0JlOmKPjt6XZ9JJkA=" src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.4/require.min.js"></script>
     
   </body>

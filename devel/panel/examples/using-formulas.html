@@ -15,7 +15,7 @@
     
   
       
-        <title>Using formulas to specify models - linearmodels 5.1</title>
+        <title>Using formulas to specify models - linearmodels v5.2 (+2)</title>
       
     
 
@@ -48,9 +48,9 @@
         <style>:root{--md-text-font:"Roboto";--md-code-font:"Roboto Mono"}</style>
       
     
-        <link rel="stylesheet" type="text/css" href="../../_static/sphinx_immaterial_theme.9dcb20399d0097661.min.css" />
+        <link rel="stylesheet" type="text/css" href="../../_static/sphinx_immaterial_theme.a60204c58f5e4ff66.min.css?v=63f51f50" />
         <link rel="stylesheet" type="text/css" href="../../_static/nbsphinx-code-cells.css" />
-        <link rel="stylesheet" type="text/css" href="../../_static/css/small_fixes.css" />
+        <link rel="stylesheet" type="text/css" href="../../_static/css/small_fixes.css?v=34934119" />
     <script>__md_scope=new URL("../..",location),__md_hash=e=>[...e].reduce((e,_)=>(e<<5)-e+_.charCodeAt(0),0),__md_get=(e,_=localStorage,t=__md_scope)=>JSON.parse(_.getItem(t.pathname+"."+e)),__md_set=(e,_,t=localStorage,a=__md_scope)=>{try{t.setItem(a.pathname+"."+e,JSON.stringify(_))}catch(e){}}</script>
     
       
@@ -94,7 +94,7 @@
 
 <header class="md-header" data-md-component="header">
   <nav class="md-header__inner md-grid" aria-label="Header">
-    <a href="../../index.html" title="linearmodels 5.1" class="md-header__button md-logo" aria-label="linearmodels 5.1" data-md-component="logo">
+    <a href="../../index.html" title="linearmodels v5.2 (+2)" class="md-header__button md-logo" aria-label="linearmodels v5.2 (+2)" data-md-component="logo">
       <img src="../../_static/bw-logo.svg" alt="logo">
     </a>
     <label class="md-header__button md-icon" for="__drawer">
@@ -104,7 +104,7 @@
       <div class="md-header__ellipsis">
         <div class="md-header__topic">
           <span class="md-ellipsis">
-            linearmodels 5.1
+            linearmodels v5.2 (+2)
           </span>
         </div>
         <div class="md-header__topic" data-md-component="header-topic">
@@ -191,10 +191,10 @@
 
 <nav class="md-nav md-nav--primary" aria-label="Navigation" data-md-level="0">
   <label class="md-nav__title" for="__drawer">
-    <a href="../../index.html" title="linearmodels 5.1" class="md-nav__button md-logo" aria-label="linearmodels 5.1" data-md-component="logo">
+    <a href="../../index.html" title="linearmodels v5.2 (+2)" class="md-nav__button md-logo" aria-label="linearmodels v5.2 (+2)" data-md-component="logo">
       <img src="../../_static/bw-logo.svg" alt="logo">
     </a>
-    linearmodels 5.1
+    linearmodels v5.2 (+2)
   </label>
   
     <div class="md-nav__source">
@@ -686,14 +686,14 @@
                   
 
 
-<h1 id="Using-formulas-to-specify-models">Using formulas to specify models<a class="headerlink" href="#Using-formulas-to-specify-models" title="Permalink to this heading">¶</a></h1>
+<h1 id="Using-formulas-to-specify-models">Using formulas to specify models<a class="headerlink" href="#Using-formulas-to-specify-models" title="Link to this heading">¶</a></h1>
 <p>All of the models can be specified using formulas. The formulas used here utilize <a class="reference external" href="https://matthewwardrop.github.io/formulaic/">formulaic</a> are similar to those in <a class="reference external" href="http://www.statsmodels.org">statsmodels</a>. The basis formula syntax for a single variable regression would be</p>
 <div class="highlight-none notranslate"><div class="highlight"><pre><span></span><code>y ~ 1 + x
 </code></pre></div>
 </div>
 <p>The formulas used with <code class="docutils literal notranslate"><span class="pre">BetweenOLS</span></code>, <code class="docutils literal notranslate"><span class="pre">PooledOLS</span></code> and <code class="docutils literal notranslate"><span class="pre">RandomEffects</span></code> are completely standard and are identical to <a class="reference external" href="http://www.statsmodels.org">statsmodels</a>. <code class="docutils literal notranslate"><span class="pre">FirstDifferenceOLS</span></code> is nearly identical with the caveat that the model <em>cannot</em> include an intercept.</p>
 <p><code class="docutils literal notranslate"><span class="pre">PanelOLS</span></code>, which implements effects (entity, time or other) has a small extension to the formula which allows entity effects or time effects (or both) to be specified as part of the formula. While it is not possible to specify other effects using the formula interface, these can be included as an optional parameter when using a formula.</p>
-<h2 id="Loading-and-preparing-data">Loading and preparing data<a class="headerlink" href="#Loading-and-preparing-data" title="Permalink to this heading">¶</a></h2>
+<h2 id="Loading-and-preparing-data">Loading and preparing data<a class="headerlink" href="#Loading-and-preparing-data" title="Link to this heading">¶</a></h2>
 <p>When using formulas, a MultiIndex pandas dataframe where the index is entity-time is <strong>required</strong>. Here the Grunfeld data, from “The Determinants of Corporate Investment”, provided by <a class="reference external" href="http://www.statsmodels.org/stable/datasets/generated/grunfeld.html">statsmodels</a>, is used to illustrate the use of formulas. This dataset contains data on firm investment, market value and the stock of plant capital.</p>
 <p><code class="docutils literal notranslate"><span class="pre">set_index</span></code> is used to set the index using variables from the dataset.</p>
 <div class="nbinput docutils container">
@@ -722,9 +722,9 @@ General Motors 1935.0   317.6  3078.5      2.8
                1939.0   330.8  4313.2    203.4
 </pre></div></div>
 </div>
-<h2 id="PanelOLS-with-Entity-Effects">PanelOLS with Entity Effects<a class="headerlink" href="#PanelOLS-with-Entity-Effects" title="Permalink to this heading">¶</a></h2>
+<h2 id="PanelOLS-with-Entity-Effects">PanelOLS with Entity Effects<a class="headerlink" href="#PanelOLS-with-Entity-Effects" title="Link to this heading">¶</a></h2>
 <p>Entity effects are specified using the special command <code class="docutils literal notranslate"><span class="pre">EntityEffects</span></code>. By default a constant is not included, and so if a constant is desired, <code class="docutils literal notranslate"><span class="pre">1+</span></code> should be included in the formula. When including effects, the model and fit are identical whether a constant is included or not.</p>
-<h2 id="PanelOLS-with-Entity-Effects-and-a-constant">PanelOLS with Entity Effects and a constant<a class="headerlink" href="#PanelOLS-with-Entity-Effects-and-a-constant" title="Permalink to this heading">¶</a></h2>
+<h2 id="PanelOLS-with-Entity-Effects-and-a-constant">PanelOLS with Entity Effects and a constant<a class="headerlink" href="#PanelOLS-with-Entity-Effects-and-a-constant" title="Link to this heading">¶</a></h2>
 <p>The constant can be explicitly included using the <code class="docutils literal notranslate"><span class="pre">1</span> <span class="pre">+</span></code> notation. When a constant is included in the model, and additional constraint is imposed that the number of the effects is 0. This allows the constant to be identified using the grand mean of the dependent and the regressors.</p>
 <div class="nbinput docutils container">
 <div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span><code>[2]:
@@ -747,8 +747,8 @@ General Motors 1935.0   317.6  3078.5      2.8
 Dep. Variable:                 invest   R-squared:                        0.7667
 Estimator:                   PanelOLS   R-squared (Between):              0.8223
 No. Observations:                 220   R-squared (Within):               0.7667
-Date:                Tue, Jun 13 2023   R-squared (Overall):              0.8132
-Time:                        13:10:38   Log-likelihood                   -1167.4
+Date:                Fri, Sep 01 2023   R-squared (Overall):              0.8132
+Time:                        08:04:13   Log-likelihood                   -1167.4
 Cov. Estimator:            Unadjusted
                                         F-statistic:                      340.08
 Entities:                          11   P-value                           0.0000
@@ -795,8 +795,8 @@ Included effects: Entity
 Dep. Variable:                 invest   R-squared:                        0.7667
 Estimator:                   PanelOLS   R-squared (Between):              0.8193
 No. Observations:                 220   R-squared (Within):               0.7667
-Date:                Tue, Jun 13 2023   R-squared (Overall):              0.8071
-Time:                        13:10:38   Log-likelihood                   -1167.4
+Date:                Fri, Sep 01 2023   R-squared (Overall):              0.8071
+Time:                        08:04:14   Log-likelihood                   -1167.4
 Cov. Estimator:            Unadjusted
                                         F-statistic:                      340.08
 Entities:                          11   P-value                           0.0000
@@ -825,7 +825,7 @@ Distribution: F(10,207)
 Included effects: Entity
 </pre></div></div>
 </div>
-<h2 id="Panel-with-Entity-and-Time-Effects">Panel with Entity and Time Effects<a class="headerlink" href="#Panel-with-Entity-and-Time-Effects" title="Permalink to this heading">¶</a></h2>
+<h2 id="Panel-with-Entity-and-Time-Effects">Panel with Entity and Time Effects<a class="headerlink" href="#Panel-with-Entity-and-Time-Effects" title="Link to this heading">¶</a></h2>
 <p>Time effects can be similarly included using <code class="docutils literal notranslate"><span class="pre">TimeEffects</span></code>. In many models, time effects can be consistently estimated and so they could be equivalently included in the set of regressors using a categorical variable.</p>
 <div class="nbinput docutils container">
 <div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span><code>[4]:
@@ -848,8 +848,8 @@ Included effects: Entity
 Dep. Variable:                 invest   R-squared:                        0.7253
 Estimator:                   PanelOLS   R-squared (Between):              0.7944
 No. Observations:                 220   R-squared (Within):               0.7566
-Date:                Tue, Jun 13 2023   R-squared (Overall):              0.7856
-Time:                        13:10:38   Log-likelihood                   -1153.0
+Date:                Fri, Sep 01 2023   R-squared (Overall):              0.7856
+Time:                        08:04:14   Log-likelihood                   -1153.0
 Cov. Estimator:            Unadjusted
                                         F-statistic:                      248.15
 Entities:                          11   P-value                           0.0000
@@ -878,7 +878,7 @@ Distribution: F(29,188)
 Included effects: Entity, Time
 </pre></div></div>
 </div>
-<h2 id="Between-OLS">Between OLS<a class="headerlink" href="#Between-OLS" title="Permalink to this heading">¶</a></h2>
+<h2 id="Between-OLS">Between OLS<a class="headerlink" href="#Between-OLS" title="Link to this heading">¶</a></h2>
 <p>The other panel models are straight-forward and are included for completeness.</p>
 <div class="nbinput docutils container">
 <div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span><code>[5]:
@@ -901,8 +901,8 @@ Included effects: Entity, Time
 Dep. Variable:                 invest   R-squared:                        0.8644
 Estimator:                 BetweenOLS   R-squared (Between):              0.8644
 No. Observations:                  11   R-squared (Within):               0.4195
-Date:                Tue, Jun 13 2023   R-squared (Overall):              0.7616
-Time:                        13:10:38   Log-likelihood                   -61.997
+Date:                Fri, Sep 01 2023   R-squared (Overall):              0.7616
+Time:                        08:04:14   Log-likelihood                   -61.997
 Cov. Estimator:            Unadjusted
                                         F-statistic:                      25.500
 Entities:                          11   P-value                           0.0003
@@ -925,7 +925,7 @@ capital        0.0297     0.1746     0.1700     0.8692     -0.3730      0.4323
 ==============================================================================
 </pre></div></div>
 </div>
-<h2 id="First-Difference-OLS">First Difference OLS<a class="headerlink" href="#First-Difference-OLS" title="Permalink to this heading">¶</a></h2>
+<h2 id="First-Difference-OLS">First Difference OLS<a class="headerlink" href="#First-Difference-OLS" title="Link to this heading">¶</a></h2>
 <p>The first difference model must never include a constant since this is not identified after differencing.</p>
 <div class="nbinput docutils container">
 <div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span><code>[6]:
@@ -946,8 +946,8 @@ capital        0.0297     0.1746     0.1700     0.8692     -0.3730      0.4323
 Dep. Variable:                 invest   R-squared:                        0.4287
 Estimator:         FirstDifferenceOLS   R-squared (Between):              0.8643
 No. Observations:                 209   R-squared (Within):               0.7539
-Date:                Tue, Jun 13 2023   R-squared (Overall):              0.8461
-Time:                        13:10:38   Log-likelihood                   -1071.1
+Date:                Fri, Sep 01 2023   R-squared (Overall):              0.8461
+Time:                        08:04:14   Log-likelihood                   -1071.1
 Cov. Estimator:            Unadjusted
                                         F-statistic:                      77.679
 Entities:                          11   P-value                           0.0000
@@ -969,7 +969,7 @@ capital        0.2786     0.0449     6.1990     0.0000      0.1900      0.3673
 ==============================================================================
 </pre></div></div>
 </div>
-<h2 id="Pooled-OLS">Pooled OLS<a class="headerlink" href="#Pooled-OLS" title="Permalink to this heading">¶</a></h2>
+<h2 id="Pooled-OLS">Pooled OLS<a class="headerlink" href="#Pooled-OLS" title="Link to this heading">¶</a></h2>
 <p>The pooled OLS estimator is a special case of <code class="docutils literal notranslate"><span class="pre">PanelOLS</span></code> when there are no effects. It is effectively identical to <code class="docutils literal notranslate"><span class="pre">OLS</span></code> in <code class="docutils literal notranslate"><span class="pre">statsmodels</span></code> (or <code class="docutils literal notranslate"><span class="pre">WLS</span></code>) but is included for completeness.</p>
 <div class="nbinput docutils container">
 <div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span><code>[7]:
@@ -990,8 +990,8 @@ capital        0.2786     0.0449     6.1990     0.0000      0.1900      0.3673
 Dep. Variable:                 invest   R-squared:                        0.8179
 Estimator:                  PooledOLS   R-squared (Between):              0.8426
 No. Observations:                 220   R-squared (Within):               0.7357
-Date:                Tue, Jun 13 2023   R-squared (Overall):              0.8179
-Time:                        13:10:39   Log-likelihood                   -1301.3
+Date:                Fri, Sep 01 2023   R-squared (Overall):              0.8179
+Time:                        08:04:14   Log-likelihood                   -1301.3
 Cov. Estimator:            Unadjusted
                                         F-statistic:                      487.28
 Entities:                          11   P-value                           0.0000
@@ -1081,7 +1081,7 @@ capital        0.2275     0.0242     9.3904     0.0000      0.1798      0.2753
   
     Created using
     <a href="https://www.sphinx-doc.org/" target="_blank" rel="noopener">Sphinx</a>
-    7.0.1.
+    7.2.5.
      and
     <a href="https://github.com/jbms/sphinx-immaterial/" target="_blank" rel="noopener">Sphinx-Immaterial</a>
   
@@ -1128,10 +1128,10 @@ capital        0.2275     0.0242     9.3904     0.0000      0.1798      0.2753
     <script id="__config" type="application/json">{"base": "../..", "features": [], "translations": {"clipboard.copied": "Copied to clipboard", "clipboard.copy": "Copy to clipboard", "search.config.lang": "en", "search.config.pipeline": "trimmer, stopWordFilter", "search.config.separator": "[\\s\\-]+", "search.placeholder": "Search", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.placeholder": "Type to start searching", "search.result.term.missing": "Missing", "select.version.title": "Select version"}, "version": {"provider": "mike", "staticVersions": [{"aliases": [], "title": "Release", "version": "https://bashtage.github.io/linearmodels"}, {"aliases": [], "title": "Development", "version": "https://bashtage.github.io/linearmodels/devel"}], "versionPath": null}}</script>
     
       
-        <script src="../../_static/sphinx_immaterial_theme.1b5b7a2d5891aec19.min.js"></script>
+        <script src="../../_static/sphinx_immaterial_theme.1b5b7a2d5891aec19.min.js?v=1e7b0789"></script>
         <script crossorigin="anonymous" integrity="sha256-Ae2Vz/4ePdIu6ZyI/5ZGsYnb+m0JlOmKPjt6XZ9JJkA=" src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.4/require.min.js"></script>
         <script>window.MathJax = {"tex": {"inlineMath": [["$", "$"], ["\\(", "\\)"]], "processEscapes": true}, "options": {"ignoreHtmlClass": "tex2jax_ignore|mathjax_ignore|document", "processHtmlClass": "tex2jax_process|mathjax_process|math|output_area"}}</script>
-        <script id="MathJax-script" src="../../_static/mathjax/tex-mml-chtml.js"></script>
+        <script id="MathJax-script" src="../../_static/mathjax/tex-mml-chtml.js?v=cadf963e"></script>
     
   </body>
 </html>

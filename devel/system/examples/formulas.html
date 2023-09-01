@@ -15,7 +15,7 @@
     
   
       
-        <title>Using formulas to specify models - linearmodels 5.1</title>
+        <title>Using formulas to specify models - linearmodels v5.2 (+2)</title>
       
     
 
@@ -48,9 +48,9 @@
         <style>:root{--md-text-font:"Roboto";--md-code-font:"Roboto Mono"}</style>
       
     
-        <link rel="stylesheet" type="text/css" href="../../_static/sphinx_immaterial_theme.9dcb20399d0097661.min.css" />
+        <link rel="stylesheet" type="text/css" href="../../_static/sphinx_immaterial_theme.a60204c58f5e4ff66.min.css?v=63f51f50" />
         <link rel="stylesheet" type="text/css" href="../../_static/nbsphinx-code-cells.css" />
-        <link rel="stylesheet" type="text/css" href="../../_static/css/small_fixes.css" />
+        <link rel="stylesheet" type="text/css" href="../../_static/css/small_fixes.css?v=34934119" />
     <script>__md_scope=new URL("../..",location),__md_hash=e=>[...e].reduce((e,_)=>(e<<5)-e+_.charCodeAt(0),0),__md_get=(e,_=localStorage,t=__md_scope)=>JSON.parse(_.getItem(t.pathname+"."+e)),__md_set=(e,_,t=localStorage,a=__md_scope)=>{try{t.setItem(a.pathname+"."+e,JSON.stringify(_))}catch(e){}}</script>
     
       
@@ -94,7 +94,7 @@
 
 <header class="md-header" data-md-component="header">
   <nav class="md-header__inner md-grid" aria-label="Header">
-    <a href="../../index.html" title="linearmodels 5.1" class="md-header__button md-logo" aria-label="linearmodels 5.1" data-md-component="logo">
+    <a href="../../index.html" title="linearmodels v5.2 (+2)" class="md-header__button md-logo" aria-label="linearmodels v5.2 (+2)" data-md-component="logo">
       <img src="../../_static/bw-logo.svg" alt="logo">
     </a>
     <label class="md-header__button md-icon" for="__drawer">
@@ -104,7 +104,7 @@
       <div class="md-header__ellipsis">
         <div class="md-header__topic">
           <span class="md-ellipsis">
-            linearmodels 5.1
+            linearmodels v5.2 (+2)
           </span>
         </div>
         <div class="md-header__topic" data-md-component="header-topic">
@@ -191,10 +191,10 @@
 
 <nav class="md-nav md-nav--primary" aria-label="Navigation" data-md-level="0">
   <label class="md-nav__title" for="__drawer">
-    <a href="../../index.html" title="linearmodels 5.1" class="md-nav__button md-logo" aria-label="linearmodels 5.1" data-md-component="logo">
+    <a href="../../index.html" title="linearmodels v5.2 (+2)" class="md-nav__button md-logo" aria-label="linearmodels v5.2 (+2)" data-md-component="logo">
       <img src="../../_static/bw-logo.svg" alt="logo">
     </a>
-    linearmodels 5.1
+    linearmodels v5.2 (+2)
   </label>
   
     <div class="md-nav__source">
@@ -729,7 +729,7 @@
                   
 
 
-<h1 id="Using-formulas-to-specify-models">Using formulas to specify models<a class="headerlink" href="#Using-formulas-to-specify-models" title="Permalink to this heading">¶</a></h1>
+<h1 id="Using-formulas-to-specify-models">Using formulas to specify models<a class="headerlink" href="#Using-formulas-to-specify-models" title="Link to this heading">¶</a></h1>
 <p>Formulas can be used to specify models using mostly standard <a class="reference external" href="https://matthewwardrop.github.io/formulaic/">formulaic</a> syntax. Since system estimation is more complicated than the specification of a single model, there are two methods available to specify a system:</p>
 <ul class="simple">
 <li><p>Dictionary of formulas</p></li>
@@ -748,7 +748,7 @@
 </code></pre></div>
 </div>
 </div>
-<h2 id="Dictionary">Dictionary<a class="headerlink" href="#Dictionary" title="Permalink to this heading">¶</a></h2>
+<h2 id="Dictionary">Dictionary<a class="headerlink" href="#Dictionary" title="Link to this heading">¶</a></h2>
 <p>The dictionary syntax is virtually identical to standard <a class="reference external" href="https://matthewwardrop.github.io/formulaic/">formulaic syntax</a> where each equation is specified in a key-value pair where the key is the equation label and the value is the formula. It is recommended to use an OrderedDict which will preserve equation order in results. Keys <strong>must</strong> be strings.</p>
 <div class="nbinput nblast docutils container">
 <div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span><code>[2]:
@@ -785,8 +785,8 @@
 Estimator:                        GLS   Overall R-squared:                   0.6951
 No. Equations.:                     2   McElroy&#39;s R-squared:                 0.2197
 No. Observations:                 616   Judge&#39;s (OLS) R-squared:             0.1873
-Date:                Tue, Jun 13 2023   Berndt&#39;s R-squared:                  0.3775
-Time:                        13:10:17   Dhrymes&#39;s R-squared:                 0.6950
+Date:                Fri, Sep 01 2023   Berndt&#39;s R-squared:                  0.3775
+Time:                        08:03:58   Dhrymes&#39;s R-squared:                 0.6950
                                         Cov. Estimator:                  unadjusted
                                         Num. Constraints:                      None
                 Equation: benefits, Dependent Variable: hrbens
@@ -817,7 +817,7 @@ Covariance Estimator:
 Homoskedastic (Unadjusted) Covariance (Debiased: False, GLS: True)
 </pre></div></div>
 </div>
-<h2 id="Curly-Braces">Curly Braces<a class="headerlink" href="#Curly-Braces" title="Permalink to this heading">¶</a></h2>
+<h2 id="Curly-Braces">Curly Braces<a class="headerlink" href="#Curly-Braces" title="Link to this heading">¶</a></h2>
 <p>The same formula can be expressed in a single string by surrounding each equation with braces <code class="docutils literal notranslate"><span class="pre">{}</span></code>.</p>
 <div class="nbinput docutils container">
 <div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span><code>[4]:
@@ -843,8 +843,8 @@ Homoskedastic (Unadjusted) Covariance (Debiased: False, GLS: True)
 Estimator:                        GLS   Overall R-squared:                   0.6951
 No. Equations.:                     2   McElroy&#39;s R-squared:                 0.2197
 No. Observations:                 616   Judge&#39;s (OLS) R-squared:             0.1873
-Date:                Tue, Jun 13 2023   Berndt&#39;s R-squared:                  0.3775
-Time:                        13:10:17   Dhrymes&#39;s R-squared:                 0.6950
+Date:                Fri, Sep 01 2023   Berndt&#39;s R-squared:                  0.3775
+Time:                        08:03:58   Dhrymes&#39;s R-squared:                 0.6950
                                         Cov. Estimator:                  unadjusted
                                         Num. Constraints:                      None
                  Equation: hrbens, Dependent Variable: hrbens
@@ -875,7 +875,7 @@ Covariance Estimator:
 Homoskedastic (Unadjusted) Covariance (Debiased: False, GLS: True)
 </pre></div></div>
 </div>
-<h2 id="Labeled-Formulas">Labeled Formulas<a class="headerlink" href="#Labeled-Formulas" title="Permalink to this heading">¶</a></h2>
+<h2 id="Labeled-Formulas">Labeled Formulas<a class="headerlink" href="#Labeled-Formulas" title="Link to this heading">¶</a></h2>
 <p>When using the curly brace formula specification, the equation names are determined by the dependent variable names. When names are repeated as is the case in some datasets (e.g. a SUR on GDP of multiple countries) then the equation labels will be modified until they are unique. This can produce meaningless equation labels, and so it is possible to pass an equation label using the syntax</p>
 <div class="highlight-none notranslate"><div class="highlight"><pre><span></span><code>{label : dep ~ exog}
 </code></pre></div>
@@ -909,8 +909,8 @@ Labeled
 [&#39;benefits&#39;, &#39;earnings&#39;]
 </pre></div></div>
 </div>
-<h2 id="Other-Options">Other Options<a class="headerlink" href="#Other-Options" title="Permalink to this heading">¶</a></h2>
-<h3 id="Estimation-Weights">Estimation Weights<a class="headerlink" href="#Estimation-Weights" title="Permalink to this heading">¶</a></h3>
+<h2 id="Other-Options">Other Options<a class="headerlink" href="#Other-Options" title="Link to this heading">¶</a></h2>
+<h3 id="Estimation-Weights">Estimation Weights<a class="headerlink" href="#Estimation-Weights" title="Link to this heading">¶</a></h3>
 <p>SUR supports weights which are assumed to be proportional to the inverse variance of the data so that</p>
 <div class="math notranslate nohighlight">
 \[V(y_i \times w_i) = \sigma^2 \,\,\forall i.\]</div>
@@ -934,42 +934,42 @@ Labeled
 <div class="highlight"><pre>
                            System GLS Estimation Summary
 ===================================================================================
-Estimator:                        GLS   Overall R-squared:                   0.6783
-No. Equations.:                     2   McElroy&#39;s R-squared:                 0.2153
-No. Observations:                 616   Judge&#39;s (OLS) R-squared:             0.1867
-Date:                Tue, Jun 13 2023   Berndt&#39;s R-squared:                  0.4410
-Time:                        13:10:17   Dhrymes&#39;s R-squared:                 0.6781
+Estimator:                        GLS   Overall R-squared:                   0.6902
+No. Equations.:                     2   McElroy&#39;s R-squared:                 0.2209
+No. Observations:                 616   Judge&#39;s (OLS) R-squared:             0.1860
+Date:                Fri, Sep 01 2023   Berndt&#39;s R-squared:                  0.3805
+Time:                        08:03:58   Dhrymes&#39;s R-squared:                 0.6901
                                         Cov. Estimator:                      robust
                                         Num. Constraints:                      None
                 Equation: benefits, Dependent Variable: hrbens
 ==============================================================================
             Parameter  Std. Err.     T-stat    P-value    Lower CI    Upper CI
 ------------------------------------------------------------------------------
-educ           0.0343     0.0047     7.2319     0.0000      0.0250      0.0436
-exper          0.0319     0.0064     4.9648     0.0000      0.0193      0.0445
-expersq       -0.0005     0.0002    -3.4992     0.0005     -0.0008     -0.0002
-union          0.3560     0.0509     6.9909     0.0000      0.2562      0.4558
-south         -0.1671     0.0567    -2.9478     0.0032     -0.2783     -0.0560
-nrtheast      -0.0854     0.0656    -1.3024     0.1928     -0.2139      0.0431
-nrthcen       -0.1265     0.0560    -2.2575     0.0240     -0.2362     -0.0167
-male           0.2604     0.0471     5.5328     0.0000      0.1682      0.3527
+educ           0.0358     0.0045     7.8753     0.0000      0.0269      0.0447
+exper          0.0331     0.0053     6.1883     0.0000      0.0226      0.0436
+expersq       -0.0006     0.0001    -4.6122     0.0000     -0.0008     -0.0003
+union          0.3716     0.0493     7.5428     0.0000      0.2751      0.4682
+south         -0.2097     0.0522    -4.0148     0.0001     -0.3121     -0.1073
+nrtheast      -0.1764     0.0634    -2.7831     0.0054     -0.3007     -0.0522
+nrthcen       -0.1979     0.0547    -3.6188     0.0003     -0.3051     -0.0907
+male           0.2800     0.0451     6.2082     0.0000      0.1916      0.3683
                 Equation: earnings, Dependent Variable: hrearn
 ==============================================================================
             Parameter  Std. Err.     T-stat    P-value    Lower CI    Upper CI
 ------------------------------------------------------------------------------
-educ           0.3318     0.0926     3.5849     0.0003      0.1504      0.5132
-exper         -0.0642     0.2139    -0.3003     0.7639     -0.4834      0.3549
-expersq        0.0037     0.0057     0.6573     0.5110     -0.0074      0.0148
-nrtheast      -0.5963     0.4565    -1.3062     0.1915     -1.4911      0.2985
-married        0.5280     0.3548     1.4882     0.1367     -0.1674      1.2235
-male           1.8174     0.2261     8.0385     0.0000      1.3743      2.2605
+educ           0.3655     0.1026     3.5618     0.0004      0.1644      0.5666
+exper         -0.0827     0.2261    -0.3658     0.7145     -0.5260      0.3605
+expersq        0.0041     0.0060     0.6865     0.4924     -0.0076      0.0158
+nrtheast      -0.8761     0.5907    -1.4831     0.1381     -2.0339      0.2817
+married        0.3417     0.3557     0.9605     0.3368     -0.3555      1.0389
+male           1.6549     0.2836     5.8344     0.0000      1.0990      2.2108
 ==============================================================================
 
 Covariance Estimator:
 Heteroskedastic (Robust) Covariance (Debiased: False, GLS: True)
 </pre></div></div>
 </div>
-<h3 id="Prespecified-Residual-Covariance">Prespecified Residual Covariance<a class="headerlink" href="#Prespecified-Residual-Covariance" title="Permalink to this heading">¶</a></h3>
+<h3 id="Prespecified-Residual-Covariance">Prespecified Residual Covariance<a class="headerlink" href="#Prespecified-Residual-Covariance" title="Link to this heading">¶</a></h3>
 <p>Like a standard SUR, it is possible to pass a prespecified residual covariance for use in the GLS step. This is done using the keyword argument <code class="docutils literal notranslate"><span class="pre">sigma</span></code> in the <code class="docutils literal notranslate"><span class="pre">from_formula</span></code> method, and is otherwise identical to passing one to the standard SUR.</p>
 
 
@@ -1038,7 +1038,7 @@ Heteroskedastic (Robust) Covariance (Debiased: False, GLS: True)
   
     Created using
     <a href="https://www.sphinx-doc.org/" target="_blank" rel="noopener">Sphinx</a>
-    7.0.1.
+    7.2.5.
      and
     <a href="https://github.com/jbms/sphinx-immaterial/" target="_blank" rel="noopener">Sphinx-Immaterial</a>
   
@@ -1085,10 +1085,10 @@ Heteroskedastic (Robust) Covariance (Debiased: False, GLS: True)
     <script id="__config" type="application/json">{"base": "../..", "features": [], "translations": {"clipboard.copied": "Copied to clipboard", "clipboard.copy": "Copy to clipboard", "search.config.lang": "en", "search.config.pipeline": "trimmer, stopWordFilter", "search.config.separator": "[\\s\\-]+", "search.placeholder": "Search", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.placeholder": "Type to start searching", "search.result.term.missing": "Missing", "select.version.title": "Select version"}, "version": {"provider": "mike", "staticVersions": [{"aliases": [], "title": "Release", "version": "https://bashtage.github.io/linearmodels"}, {"aliases": [], "title": "Development", "version": "https://bashtage.github.io/linearmodels/devel"}], "versionPath": null}}</script>
     
       
-        <script src="../../_static/sphinx_immaterial_theme.1b5b7a2d5891aec19.min.js"></script>
+        <script src="../../_static/sphinx_immaterial_theme.1b5b7a2d5891aec19.min.js?v=1e7b0789"></script>
         <script crossorigin="anonymous" integrity="sha256-Ae2Vz/4ePdIu6ZyI/5ZGsYnb+m0JlOmKPjt6XZ9JJkA=" src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.4/require.min.js"></script>
         <script>window.MathJax = {"tex": {"inlineMath": [["$", "$"], ["\\(", "\\)"]], "processEscapes": true}, "options": {"ignoreHtmlClass": "tex2jax_ignore|mathjax_ignore|document", "processHtmlClass": "tex2jax_process|mathjax_process|math|output_area"}}</script>
-        <script id="MathJax-script" src="../../_static/mathjax/tex-mml-chtml.js"></script>
+        <script id="MathJax-script" src="../../_static/mathjax/tex-mml-chtml.js?v=cadf963e"></script>
     
   </body>
 </html>

@@ -15,7 +15,7 @@
     
   
       
-        <title>Formulas and Mathematical Detail - linearmodels 5.1</title>
+        <title>Formulas and Mathematical Detail - linearmodels v5.2 (+2)</title>
       
     
 
@@ -48,8 +48,8 @@
         <style>:root{--md-text-font:"Roboto";--md-code-font:"Roboto Mono"}</style>
       
     
-        <link rel="stylesheet" type="text/css" href="../_static/sphinx_immaterial_theme.9dcb20399d0097661.min.css" />
-        <link rel="stylesheet" type="text/css" href="../_static/css/small_fixes.css" />
+        <link rel="stylesheet" type="text/css" href="../_static/sphinx_immaterial_theme.a60204c58f5e4ff66.min.css?v=63f51f50" />
+        <link rel="stylesheet" type="text/css" href="../_static/css/small_fixes.css?v=34934119" />
     <script>__md_scope=new URL("..",location),__md_hash=e=>[...e].reduce((e,_)=>(e<<5)-e+_.charCodeAt(0),0),__md_get=(e,_=localStorage,t=__md_scope)=>JSON.parse(_.getItem(t.pathname+"."+e)),__md_set=(e,_,t=localStorage,a=__md_scope)=>{try{t.setItem(a.pathname+"."+e,JSON.stringify(_))}catch(e){}}</script>
     
       
@@ -93,7 +93,7 @@
 
 <header class="md-header" data-md-component="header">
   <nav class="md-header__inner md-grid" aria-label="Header">
-    <a href="../index.html" title="linearmodels 5.1" class="md-header__button md-logo" aria-label="linearmodels 5.1" data-md-component="logo">
+    <a href="../index.html" title="linearmodels v5.2 (+2)" class="md-header__button md-logo" aria-label="linearmodels v5.2 (+2)" data-md-component="logo">
       <img src="../_static/bw-logo.svg" alt="logo">
     </a>
     <label class="md-header__button md-icon" for="__drawer">
@@ -103,7 +103,7 @@
       <div class="md-header__ellipsis">
         <div class="md-header__topic">
           <span class="md-ellipsis">
-            linearmodels 5.1
+            linearmodels v5.2 (+2)
           </span>
         </div>
         <div class="md-header__topic" data-md-component="header-topic">
@@ -190,10 +190,10 @@
 
 <nav class="md-nav md-nav--primary" aria-label="Navigation" data-md-level="0">
   <label class="md-nav__title" for="__drawer">
-    <a href="../index.html" title="linearmodels 5.1" class="md-nav__button md-logo" aria-label="linearmodels 5.1" data-md-component="logo">
+    <a href="../index.html" title="linearmodels v5.2 (+2)" class="md-nav__button md-logo" aria-label="linearmodels v5.2 (+2)" data-md-component="logo">
       <img src="../_static/bw-logo.svg" alt="logo">
     </a>
-    linearmodels 5.1
+    linearmodels v5.2 (+2)
   </label>
   
     <div class="md-nav__source">
@@ -650,12 +650,12 @@
                   
 
 
-<h1 id="formulas-and-mathematical-detail"><span id="asset-pricing-mathematical-notation"></span>Formulas and Mathematical Detail<a class="headerlink" href="#formulas-and-mathematical-detail" title="Permalink to this heading">¶</a></h1>
+<h1 id="formulas-and-mathematical-detail"><span id="asset-pricing-mathematical-notation"></span>Formulas and Mathematical Detail<a class="headerlink" href="#formulas-and-mathematical-detail" title="Link to this heading">¶</a></h1>
 <p>There are <span class="math notranslate nohighlight">\(N\)</span> test portfolios, <span class="math notranslate nohighlight">\(r_{t}\)</span> (<span class="math notranslate nohighlight">\(p\)</span> by 1)
 which are usually assumed to be excess returns (zero-investment
 portfolios) and <span class="math notranslate nohighlight">\(K\)</span> factors, <span class="math notranslate nohighlight">\(f_{t}\)</span> (<span class="math notranslate nohighlight">\(k\)</span> by 1). For
 return series there are <span class="math notranslate nohighlight">\(T\)</span> observations.</p>
-<h2 id="linear-factor-model-for-traded-factors">Linear Factor Model for Traded Factors<a class="headerlink" href="#linear-factor-model-for-traded-factors" title="Permalink to this heading">¶</a></h2>
+<h2 id="linear-factor-model-for-traded-factors">Linear Factor Model for Traded Factors<a class="headerlink" href="#linear-factor-model-for-traded-factors" title="Link to this heading">¶</a></h2>
 <p>This model is a Seemingly Unrelated Regression (SUR). All models share
 the same regressors so that the model for test portfolio <span class="math notranslate nohighlight">\(i\)</span> is</p>
 <div class="math notranslate nohighlight">
@@ -685,13 +685,13 @@ and <span class="math notranslate nohighlight">\(bw\)</span> is the bandwidth. T
 average returns on the factors, and the covariance of the risk premia
 estimates is based on the factor residuals after demeaning using either
 the simple estimator or the kernel estimator.</p>
-<h3 id="the-j-statistic">The J statistic<a class="headerlink" href="#the-j-statistic" title="Permalink to this heading">¶</a></h3>
+<h3 id="the-j-statistic">The J statistic<a class="headerlink" href="#the-j-statistic" title="Link to this heading">¶</a></h3>
 <p>The J statistic is implemented as</p>
 <div class="math notranslate nohighlight">
 \[J=\hat{\alpha}^{\prime}\hat{\Sigma}_{\alpha}^{-1}\hat{\alpha}^{\prime}\sim\chi_{N}^{2}\]</div>
 <p>where <span class="math notranslate nohighlight">\(\hat{\Sigma}_{\alpha}\)</span> consists of rows and
 columns<span class="math notranslate nohighlight">\(1,(k+1)+1,2(k+1)+1,\ldots\)</span> of <span class="math notranslate nohighlight">\(\hat{\Sigma}\)</span>.</p>
-<h2 id="linear-factor-model-for-non-traded-factors">Linear Factor Model for Non-traded Factors<a class="headerlink" href="#linear-factor-model-for-non-traded-factors" title="Permalink to this heading">¶</a></h2>
+<h2 id="linear-factor-model-for-non-traded-factors">Linear Factor Model for Non-traded Factors<a class="headerlink" href="#linear-factor-model-for-non-traded-factors" title="Link to this heading">¶</a></h2>
 <p>When factors are not traded, the SUR approach cannot be used since the
 expected value of the factor is not equal to its risk premium. One
 solution is to use a multi-step estimator. The first step regresses the
@@ -750,7 +750,7 @@ I_{N}\otimes\left[0\ \hat{\lambda}\right] &amp; \left[1_{N}\,\hat{\beta}\right] 
 <span class="math notranslate nohighlight">\(g_{t}\)</span>, and its form is identical to either the
 heteroskedasticity consistent estimator or the HAC estimator in the
 previous section.</p>
-<h3 id="improved-specification-using-gls">Improved Specification using GLS<a class="headerlink" href="#improved-specification-using-gls" title="Permalink to this heading">¶</a></h3>
+<h3 id="improved-specification-using-gls">Improved Specification using GLS<a class="headerlink" href="#improved-specification-using-gls" title="Link to this heading">¶</a></h3>
 <div class="math notranslate nohighlight">
 \[\begin{split}\left[\begin{array}{c}
 f_{c,t}\otimes\epsilon_{t}\\
@@ -782,7 +782,7 @@ Each block has a 0 columns corresponding to <span class="math notranslate nohigh
 <span class="math notranslate nohighlight">\(g_{t}\)</span>, and its form is identical to either the
 heteroskedasticity consistent estimator or the HAC estimator in the
 previous section.</p>
-<h3 id="id1">The J statistic<a class="headerlink" href="#id1" title="Permalink to this heading">¶</a></h3>
+<h3 id="id1">The J statistic<a class="headerlink" href="#id1" title="Link to this heading">¶</a></h3>
 <p>The J statistic is virtually identical to the <span class="math notranslate nohighlight">\(J\)</span> statistic from
 traded factor model except that it has a difference distribution.</p>
 <div class="math notranslate nohighlight">
@@ -792,7 +792,7 @@ traded factor model except that it has a difference distribution.</p>
 regression of <span class="math notranslate nohighlight">\(N\)</span> average returns on <span class="math notranslate nohighlight">\(K\)</span> factor loadings.
 <span class="math notranslate nohighlight">\(\hat{\Sigma}_{\alpha}\)</span> is the bottom right <span class="math notranslate nohighlight">\(K\times K\)</span>
 block of <span class="math notranslate nohighlight">\(\hat{\Sigma}\)</span>.</p>
-<h2 id="gmm-estimation-of-linear-factor-models">GMM Estimation of Linear Factor Models<a class="headerlink" href="#gmm-estimation-of-linear-factor-models" title="Permalink to this heading">¶</a></h2>
+<h2 id="gmm-estimation-of-linear-factor-models">GMM Estimation of Linear Factor Models<a class="headerlink" href="#gmm-estimation-of-linear-factor-models" title="Link to this heading">¶</a></h2>
 <p>The GMM estimator solves a set of non-linear moment conditions of the
 form</p>
 <div class="math notranslate nohighlight">
@@ -898,7 +898,7 @@ appropriate for efficient GMM,</p>
   
     Created using
     <a href="https://www.sphinx-doc.org/" target="_blank" rel="noopener">Sphinx</a>
-    7.0.1.
+    7.2.5.
      and
     <a href="https://github.com/jbms/sphinx-immaterial/" target="_blank" rel="noopener">Sphinx-Immaterial</a>
   
@@ -945,10 +945,10 @@ appropriate for efficient GMM,</p>
     <script id="__config" type="application/json">{"base": "..", "features": [], "translations": {"clipboard.copied": "Copied to clipboard", "clipboard.copy": "Copy to clipboard", "search.config.lang": "en", "search.config.pipeline": "trimmer, stopWordFilter", "search.config.separator": "[\\s\\-]+", "search.placeholder": "Search", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.placeholder": "Type to start searching", "search.result.term.missing": "Missing", "select.version.title": "Select version"}, "version": {"provider": "mike", "staticVersions": [{"aliases": [], "title": "Release", "version": "https://bashtage.github.io/linearmodels"}, {"aliases": [], "title": "Development", "version": "https://bashtage.github.io/linearmodels/devel"}], "versionPath": null}}</script>
     
       
-        <script src="../_static/sphinx_immaterial_theme.1b5b7a2d5891aec19.min.js"></script>
+        <script src="../_static/sphinx_immaterial_theme.1b5b7a2d5891aec19.min.js?v=1e7b0789"></script>
         <script crossorigin="anonymous" integrity="sha256-Ae2Vz/4ePdIu6ZyI/5ZGsYnb+m0JlOmKPjt6XZ9JJkA=" src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.4/require.min.js"></script>
         <script>window.MathJax = {"tex": {"inlineMath": [["$", "$"], ["\\(", "\\)"]], "processEscapes": true}, "options": {"ignoreHtmlClass": "tex2jax_ignore|mathjax_ignore|document", "processHtmlClass": "tex2jax_process|mathjax_process|math|output_area"}}</script>
-        <script id="MathJax-script" src="../_static/mathjax/tex-mml-chtml.js"></script>
+        <script id="MathJax-script" src="../_static/mathjax/tex-mml-chtml.js?v=cadf963e"></script>
     
   </body>
 </html>

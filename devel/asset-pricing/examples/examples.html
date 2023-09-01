@@ -15,7 +15,7 @@
     
   
       
-        <title>Examples - linearmodels 5.1</title>
+        <title>Examples - linearmodels v5.2 (+2)</title>
       
     
 
@@ -48,9 +48,9 @@
         <style>:root{--md-text-font:"Roboto";--md-code-font:"Roboto Mono"}</style>
       
     
-        <link rel="stylesheet" type="text/css" href="../../_static/sphinx_immaterial_theme.9dcb20399d0097661.min.css" />
+        <link rel="stylesheet" type="text/css" href="../../_static/sphinx_immaterial_theme.a60204c58f5e4ff66.min.css?v=63f51f50" />
         <link rel="stylesheet" type="text/css" href="../../_static/nbsphinx-code-cells.css" />
-        <link rel="stylesheet" type="text/css" href="../../_static/css/small_fixes.css" />
+        <link rel="stylesheet" type="text/css" href="../../_static/css/small_fixes.css?v=34934119" />
     <script>__md_scope=new URL("../..",location),__md_hash=e=>[...e].reduce((e,_)=>(e<<5)-e+_.charCodeAt(0),0),__md_get=(e,_=localStorage,t=__md_scope)=>JSON.parse(_.getItem(t.pathname+"."+e)),__md_set=(e,_,t=localStorage,a=__md_scope)=>{try{t.setItem(a.pathname+"."+e,JSON.stringify(_))}catch(e){}}</script>
     
       
@@ -94,7 +94,7 @@
 
 <header class="md-header" data-md-component="header">
   <nav class="md-header__inner md-grid" aria-label="Header">
-    <a href="../../index.html" title="linearmodels 5.1" class="md-header__button md-logo" aria-label="linearmodels 5.1" data-md-component="logo">
+    <a href="../../index.html" title="linearmodels v5.2 (+2)" class="md-header__button md-logo" aria-label="linearmodels v5.2 (+2)" data-md-component="logo">
       <img src="../../_static/bw-logo.svg" alt="logo">
     </a>
     <label class="md-header__button md-icon" for="__drawer">
@@ -104,7 +104,7 @@
       <div class="md-header__ellipsis">
         <div class="md-header__topic">
           <span class="md-ellipsis">
-            linearmodels 5.1
+            linearmodels v5.2 (+2)
           </span>
         </div>
         <div class="md-header__topic" data-md-component="header-topic">
@@ -191,10 +191,10 @@
 
 <nav class="md-nav md-nav--primary" aria-label="Navigation" data-md-level="0">
   <label class="md-nav__title" for="__drawer">
-    <a href="../../index.html" title="linearmodels 5.1" class="md-nav__button md-logo" aria-label="linearmodels 5.1" data-md-component="logo">
+    <a href="../../index.html" title="linearmodels v5.2 (+2)" class="md-nav__button md-logo" aria-label="linearmodels v5.2 (+2)" data-md-component="logo">
       <img src="../../_static/bw-logo.svg" alt="logo">
     </a>
-    linearmodels 5.1
+    linearmodels v5.2 (+2)
   </label>
   
     <div class="md-nav__source">
@@ -667,11 +667,11 @@
                   
 
 
-<h1 id="Examples">Examples<a class="headerlink" href="#Examples" title="Permalink to this heading">¶</a></h1>
-<h2 id="General-Setup">General Setup<a class="headerlink" href="#General-Setup" title="Permalink to this heading">¶</a></h2>
+<h1 id="Examples">Examples<a class="headerlink" href="#Examples" title="Link to this heading">¶</a></h1>
+<h2 id="General-Setup">General Setup<a class="headerlink" href="#General-Setup" title="Link to this heading">¶</a></h2>
 <p>Models include factors and returns. Factors can be traded or non-traded. Common examples of traded assets include the excess return on the market and the size and value factors. Examples of non-traded assets include macroeconomic shocks and measures of uncertainty.</p>
 <p>Models are tested using a set of test portfolios. Test portfolios are often excess returns although they do not need to be.</p>
-<h2 id="Import-data">Import data<a class="headerlink" href="#Import-data" title="Permalink to this heading">¶</a></h2>
+<h2 id="Import-data">Import data<a class="headerlink" href="#Import-data" title="Link to this heading">¶</a></h2>
 <p>The data used comes from Ken French”s <a class="reference external" href="http://mba.tuck.dartmouth.edu/pages/faculty/ken.french/data_library.html">website</a> and includes 4 factor returns, the excess market, the size factor, the value factor and the momentum factor. The available test portfolios include the 12 industry portfolios, a subset of the size-value two way sort, and a subset of the size-momentum two way sort.</p>
 <div class="nbinput docutils container">
 <div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span><code>[1]:
@@ -732,7 +732,7 @@ S5M5     Large firms, winners
 
 </pre></div></div>
 </div>
-<h2 id="Transform-the-portfolios-to-be-excesses">Transform the portfolios to be excesses<a class="headerlink" href="#Transform-the-portfolios-to-be-excesses" title="Permalink to this heading">¶</a></h2>
+<h2 id="Transform-the-portfolios-to-be-excesses">Transform the portfolios to be excesses<a class="headerlink" href="#Transform-the-portfolios-to-be-excesses" title="Link to this heading">¶</a></h2>
 <p>Subtract the risk-free rate from the test portfolios since these are not zero-investment.</p>
 <div class="nbinput nblast docutils container">
 <div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span><code>[2]:
@@ -742,7 +742,7 @@ S5M5     Large firms, winners
 </code></pre></div>
 </div>
 </div>
-<h2 id="1-Step-Estimation-using-Seemingly-Unrelated-Regression-(SUR)">1-Step Estimation using Seemingly Unrelated Regression (SUR)<a class="headerlink" href="#1-Step-Estimation-using-Seemingly-Unrelated-Regression-(SUR)" title="Permalink to this heading">¶</a></h2>
+<h2 id="1-Step-Estimation-using-Seemingly-Unrelated-Regression-(SUR)">1-Step Estimation using Seemingly Unrelated Regression (SUR)<a class="headerlink" href="#1-Step-Estimation-using-Seemingly-Unrelated-Regression-(SUR)" title="Link to this heading">¶</a></h2>
 <p>When the factors are traded assets, they must price themselves, and so the observed factor returns can be used to consistently estimate the expected factor returns. This also allows a set of seemingly unrelated regressions where each test portfolio is regressed on the factors and a constant to estimate factor loadings and <span class="math notranslate nohighlight">\(\alpha\)</span>s.</p>
 <p>Note that when using this type of model, it is essential that the test portfolios are excess returns. This is not a requirement of the other factor model estimators.</p>
 <p>This specification is a CAP-M since only the market is included. The J-statistic tests whether all model <span class="math notranslate nohighlight">\(\alpha\)</span>s are 0. The CAP-M is unsurprisingly unable to price the test portfolios.</p>
@@ -772,8 +772,8 @@ S5M5     Large firms, winners
 No. Test Portfolios:                  9   R-squared:                      0.6910
 No. Factors:                          1   J-statistic:                    70.034
 No. Observations:                   819   P-value                         0.0000
-Date:                  Tue, Jun 13 2023   Distribution:                  chi2(9)
-Time:                          13:09:59
+Date:                  Fri, Sep 01 2023   Distribution:                  chi2(9)
+Time:                          08:03:42
 Cov. Estimator:                  robust
 
                             Risk Premia Estimates
@@ -811,8 +811,8 @@ See full_summary for complete results
 No. Test Portfolios:                  9   R-squared:                      0.8971
 No. Factors:                          3   J-statistic:                    53.271
 No. Observations:                   819   P-value                         0.0000
-Date:                  Tue, Jun 13 2023   Distribution:                  chi2(9)
-Time:                          13:09:59
+Date:                  Fri, Sep 01 2023   Distribution:                  chi2(9)
+Time:                          08:03:42
 Cov. Estimator:                  robust
 
                             Risk Premia Estimates
@@ -865,8 +865,8 @@ See full_summary for complete results
 No. Test Portfolios:                 12   R-squared:                      0.7118
 No. Factors:                          3   J-statistic:                    61.617
 No. Observations:                   819   P-value                         0.0000
-Date:                  Tue, Jun 13 2023   Distribution:                 chi2(12)
-Time:                          13:09:59
+Date:                  Fri, Sep 01 2023   Distribution:                 chi2(12)
+Time:                          08:03:42
 Cov. Estimator:                  robust
 
                             Risk Premia Estimates
@@ -969,7 +969,7 @@ Other   -0.033345
 Name: alpha, dtype: float64
 </pre></div></div>
 </div>
-<h2 id="2-Step-Estimation">2-Step Estimation<a class="headerlink" href="#2-Step-Estimation" title="Permalink to this heading">¶</a></h2>
+<h2 id="2-Step-Estimation">2-Step Estimation<a class="headerlink" href="#2-Step-Estimation" title="Link to this heading">¶</a></h2>
 <p>When one of more factors are not returns on traded assets, it is necessary to use a two-step procedure (or GMM). In the 2-step estimator, the first estimates factor loadings and the second uses the factor loadings to estimate the risk premia.</p>
 <p>Here all four factors are used to attempt to price the size-momentum portfolios.</p>
 <div class="nbinput docutils container">
@@ -998,8 +998,8 @@ Name: alpha, dtype: float64
 No. Test Portfolios:                  9   R-squared:                      0.9051
 No. Factors:                          4   J-statistic:                    36.929
 No. Observations:                   819   P-value                         0.0000
-Date:                  Tue, Jun 13 2023   Distribution:                  chi2(5)
-Time:                          13:10:01
+Date:                  Fri, Sep 01 2023   Distribution:                  chi2(5)
+Time:                          08:03:43
 Cov. Estimator:                  robust
 
                             Risk Premia Estimates
@@ -1089,8 +1089,8 @@ Mom   -0.253675 -0.015628  0.002744  1.000000
 No. Test Portfolios:                  9   R-squared:                      0.7915
 No. Factors:                          3   J-statistic:                    36.406
 No. Observations:                   819   P-value                         0.0000
-Date:                  Tue, Jun 13 2023   Distribution:                  chi2(6)
-Time:                          13:10:01
+Date:                  Fri, Sep 01 2023   Distribution:                  chi2(6)
+Time:                          08:03:43
 Cov. Estimator:                  robust
 
                             Risk Premia Estimates
@@ -1132,10 +1132,10 @@ See full_summary for complete results
                       LinearFactorModel Estimation Summary
 ================================================================================
 No. Test Portfolios:                  9   R-squared:                      0.7915
-No. Factors:                          3   J-statistic:                    36.005
+No. Factors:                          3   J-statistic:                    36.014
 No. Observations:                   819   P-value                         0.0000
-Date:                  Tue, Jun 13 2023   Distribution:                  chi2(5)
-Time:                          13:10:01
+Date:                  Fri, Sep 01 2023   Distribution:                  chi2(5)
+Time:                          08:03:43
 Cov. Estimator:                  robust
 
                             Risk Premia Estimates
@@ -1174,8 +1174,8 @@ See full_summary for complete results
 No. Test Portfolios:                  9   R-squared:                      0.7915
 No. Factors:                          3   J-statistic:                    25.841
 No. Observations:                   819   P-value                         0.0002
-Date:                  Tue, Jun 13 2023   Distribution:                  chi2(6)
-Time:                          13:10:01
+Date:                  Fri, Sep 01 2023   Distribution:                  chi2(6)
+Time:                          08:03:43
 Cov. Estimator:                  kernel
 
                             Risk Premia Estimates
@@ -1192,7 +1192,7 @@ KernelCovariance, Kernel: bartlett, Bandwidth: 12
 See full_summary for complete results
 </pre></div></div>
 </div>
-<h2 id="GMM-Estimation">GMM Estimation<a class="headerlink" href="#GMM-Estimation" title="Permalink to this heading">¶</a></h2>
+<h2 id="GMM-Estimation">GMM Estimation<a class="headerlink" href="#GMM-Estimation" title="Link to this heading">¶</a></h2>
 <p>The final estimator is the GMM estimator which is similar to estimating the 2-step model in a single step. In practice the GMM estimator is estimated at least twice, once to get an consistent estimate of the covariance of the moment conditions and the second time to efficiently estimate parameters.</p>
 <p>The GMM estimator does not have a closed form and so a non-linear optimizer is required. The default output prints the progress every 10 iterations. Here the model is fit twice, which is the standard method to implement efficient GMM.</p>
 <div class="nbinput docutils container">
@@ -1207,37 +1207,51 @@ See full_summary for complete results
 </code></pre></div>
 </div>
 </div>
-<div class="nboutput nblast docutils container">
+<div class="nboutput docutils container">
 <div class="prompt empty docutils container">
 </div>
 <div class="output_area docutils container">
 <div class="highlight"><pre>
-Iteration: 0, Objective: 47.75791582822472
-Iteration: 10, Objective: 28.102587863294254
-Iteration: 20, Objective: 26.361385291036818
-Iteration: 30, Objective: 26.019667283111943
-Iteration: 40, Objective: 22.325343252976985
-Warning: Desired error not necessarily achieved due to precision loss.
+Iteration: 0, Objective: 47.757915828205064
+Iteration: 10, Objective: 28.10258762356393
+Iteration: 20, Objective: 26.361385223195093
+Iteration: 30, Objective: 26.019666897117403
+Iteration: 40, Objective: 22.325343252976587
          Current function value: 22.325343
          Iterations: 41
-         Function evaluations: 2596
-         Gradient evaluations: 76
-Iteration: 0, Objective: 22.519350283466594
-Iteration: 10, Objective: 22.303730340555415
-Iteration: 20, Objective: 22.226427020276983
-Iteration: 30, Objective: 22.193081228657324
-Warning: Desired error not necessarily achieved due to precision loss.
+         Function evaluations: 2290
+         Gradient evaluations: 67
+</pre></div></div>
+</div>
+<div class="nboutput docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area stderr docutils container">
+<div class="highlight"><pre>
+/opt/hostedtoolcache/Python/3.10.12/x64/lib/python3.10/site-packages/scipy/optimize/_minimize.py:705: OptimizeWarning: Desired error not necessarily achieved due to precision loss.
+  res = _minimize_bfgs(fun, x0, args, jac, callback, **options)
+</pre></div></div>
+</div>
+<div class="nboutput docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+Iteration: 0, Objective: 22.51935032260304
+Iteration: 10, Objective: 22.30373016154284
+Iteration: 20, Objective: 22.226426578376174
+Iteration: 30, Objective: 22.19308259367627
          Current function value: 22.066871
-         Iterations: 39
-         Function evaluations: 2663
-         Gradient evaluations: 78
+         Iterations: 40
+         Function evaluations: 2868
+         Gradient evaluations: 84
                     LinearFactorModelGMM Estimation Summary
 ================================================================================
 No. Test Portfolios:                  9   R-squared:                      0.7904
 No. Factors:                          3   J-statistic:                    22.067
 No. Observations:                   819   P-value                         0.0012
-Date:                  Tue, Jun 13 2023   Distribution:                  chi2(6)
-Time:                          13:10:03
+Date:                  Fri, Sep 01 2023   Distribution:                  chi2(6)
+Time:                          08:03:45
 Cov. Estimator:                  robust
 
                             Risk Premia Estimates
@@ -1252,6 +1266,15 @@ Mom            0.0094     0.0014     6.5139     0.0000      0.0066      0.0123
 Covariance estimator:
 HeteroskedasticCovariance
 See full_summary for complete results
+</pre></div></div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area stderr docutils container">
+<div class="highlight"><pre>
+/opt/hostedtoolcache/Python/3.10.12/x64/lib/python3.10/site-packages/scipy/optimize/_minimize.py:705: OptimizeWarning: Desired error not necessarily achieved due to precision loss.
+  res = _minimize_bfgs(fun, x0, args, jac, callback, **options)
 </pre></div></div>
 </div>
 <p>Kernel HAC estimators can be used with this estimator as well. Using a kernel HAC covariance also implies a Kernel HAC weighting matrix estimator.</p>
@@ -1275,8 +1298,8 @@ See full_summary for complete results
 No. Test Portfolios:                  9   R-squared:                      0.7901
 No. Factors:                          3   J-statistic:                    13.833
 No. Observations:                   819   P-value                         0.0316
-Date:                  Tue, Jun 13 2023   Distribution:                  chi2(6)
-Time:                          13:10:06
+Date:                  Fri, Sep 01 2023   Distribution:                  chi2(6)
+Time:                          08:03:47
 Cov. Estimator:                  kernel
 
                             Risk Premia Estimates
@@ -1293,7 +1316,7 @@ KernelCovariance, Kernel: bartlett, Bandwidth: 20
 See full_summary for complete results
 </pre></div></div>
 </div>
-<h3 id="Iterating-until-convergence">Iterating until convergence<a class="headerlink" href="#Iterating-until-convergence" title="Permalink to this heading">¶</a></h3>
+<h3 id="Iterating-until-convergence">Iterating until convergence<a class="headerlink" href="#Iterating-until-convergence" title="Link to this heading">¶</a></h3>
 <p>The standard approach is efficient and uses 2-steps. The first consistently estimates parameters using a sub-optimal weighting matrix, and the second uses the optimal weighting matrix conditional using the first stage estimates.</p>
 <p>This method can be repeated until convergence, or for a fixed number of steps using the <code class="docutils literal notranslate"><span class="pre">steps</span></code> keyword argument.</p>
 <div class="nbinput docutils container">
@@ -1305,58 +1328,132 @@ See full_summary for complete results
 </code></pre></div>
 </div>
 </div>
-<div class="nboutput nblast docutils container">
+<div class="nboutput docutils container">
 <div class="prompt empty docutils container">
 </div>
 <div class="output_area docutils container">
 <div class="highlight"><pre>
-Iteration: 0, Objective: 47.75791582822472
-Iteration: 25, Objective: 26.280320453422526
-Warning: Desired error not necessarily achieved due to precision loss.
+Iteration: 0, Objective: 47.757915828205064
+Iteration: 25, Objective: 26.28032041813254
+</pre></div></div>
+</div>
+<div class="nboutput docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area stderr docutils container">
+<div class="highlight"><pre>
+/opt/hostedtoolcache/Python/3.10.12/x64/lib/python3.10/site-packages/scipy/optimize/_minimize.py:705: OptimizeWarning: Desired error not necessarily achieved due to precision loss.
+  res = _minimize_bfgs(fun, x0, args, jac, callback, **options)
+</pre></div></div>
+</div>
+<div class="nboutput docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
          Current function value: 22.325343
          Iterations: 41
-         Function evaluations: 2596
-         Gradient evaluations: 76
-Iteration: 0, Objective: 22.519350283466594
-Iteration: 25, Objective: 22.222217729443333
-Warning: Desired error not necessarily achieved due to precision loss.
+         Function evaluations: 2290
+         Gradient evaluations: 67
+Iteration: 0, Objective: 22.51935032260304
+Iteration: 25, Objective: 22.222217305831077
+</pre></div></div>
+</div>
+<div class="nboutput docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area stderr docutils container">
+<div class="highlight"><pre>
+/opt/hostedtoolcache/Python/3.10.12/x64/lib/python3.10/site-packages/scipy/optimize/_minimize.py:705: OptimizeWarning: Desired error not necessarily achieved due to precision loss.
+  res = _minimize_bfgs(fun, x0, args, jac, callback, **options)
+</pre></div></div>
+</div>
+<div class="nboutput docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
          Current function value: 22.066871
-         Iterations: 39
-         Function evaluations: 2663
-         Gradient evaluations: 78
-Iteration: 0, Objective: 22.09415705415857
-Iteration: 25, Objective: 22.09126659209813
-Warning: Desired error not necessarily achieved due to precision loss.
+         Iterations: 40
+         Function evaluations: 2868
+         Gradient evaluations: 84
+Iteration: 0, Objective: 22.094157054785278
+Iteration: 25, Objective: 22.09126662075868
+</pre></div></div>
+</div>
+<div class="nboutput docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area stderr docutils container">
+<div class="highlight"><pre>
+/opt/hostedtoolcache/Python/3.10.12/x64/lib/python3.10/site-packages/scipy/optimize/_minimize.py:705: OptimizeWarning: Desired error not necessarily achieved due to precision loss.
+  res = _minimize_bfgs(fun, x0, args, jac, callback, **options)
+</pre></div></div>
+</div>
+<div class="nboutput docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
          Current function value: 22.089908
          Iterations: 37
-         Function evaluations: 2392
-         Gradient evaluations: 70
-Iteration: 0, Objective: 22.088798284658004
-Iteration: 25, Objective: 22.0887714231204
-Warning: Desired error not necessarily achieved due to precision loss.
+         Function evaluations: 2834
+         Gradient evaluations: 83
+Iteration: 0, Objective: 22.088798292978254
+Iteration: 25, Objective: 22.088771433036005
+</pre></div></div>
+</div>
+<div class="nboutput docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area stderr docutils container">
+<div class="highlight"><pre>
+/opt/hostedtoolcache/Python/3.10.12/x64/lib/python3.10/site-packages/scipy/optimize/_minimize.py:705: OptimizeWarning: Desired error not necessarily achieved due to precision loss.
+  res = _minimize_bfgs(fun, x0, args, jac, callback, **options)
+</pre></div></div>
+</div>
+<div class="nboutput docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
          Current function value: 22.088753
-         Iterations: 37
-         Function evaluations: 2970
-         Gradient evaluations: 87
-Iteration: 0, Objective: 22.088622410712894
-Warning: Desired error not necessarily achieved due to precision loss.
+         Iterations: 38
+         Function evaluations: 3072
+         Gradient evaluations: 90
+Iteration: 0, Objective: 22.088622393405135
+</pre></div></div>
+</div>
+<div class="nboutput docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area stderr docutils container">
+<div class="highlight"><pre>
+/opt/hostedtoolcache/Python/3.10.12/x64/lib/python3.10/site-packages/scipy/optimize/_minimize.py:705: OptimizeWarning: Desired error not necessarily achieved due to precision loss.
+  res = _minimize_bfgs(fun, x0, args, jac, callback, **options)
+</pre></div></div>
+</div>
+<div class="nboutput docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
          Current function value: 22.088622
          Iterations: 4
-         Function evaluations: 1338
-         Gradient evaluations: 39
-Iteration: 0, Objective: 22.08862233395225
-Warning: Desired error not necessarily achieved due to precision loss.
+         Function evaluations: 1473
+         Gradient evaluations: 43
+Iteration: 0, Objective: 22.08862231666835
          Current function value: 22.088622
          Iterations: 3
-         Function evaluations: 1644
-         Gradient evaluations: 48
+         Function evaluations: 1066
+         Gradient evaluations: 31
                     LinearFactorModelGMM Estimation Summary
 ================================================================================
 No. Test Portfolios:                  9   R-squared:                      0.7904
 No. Factors:                          3   J-statistic:                    22.089
 No. Observations:                   819   P-value                         0.0012
-Date:                  Tue, Jun 13 2023   Distribution:                  chi2(6)
-Time:                          13:10:13
+Date:                  Fri, Sep 01 2023   Distribution:                  chi2(6)
+Time:                          08:03:52
 Cov. Estimator:                  robust
 
                             Risk Premia Estimates
@@ -1373,7 +1470,16 @@ HeteroskedasticCovariance
 See full_summary for complete results
 </pre></div></div>
 </div>
-<h3 id="Continuously-Updating-Estimator">Continuously Updating Estimator<a class="headerlink" href="#Continuously-Updating-Estimator" title="Permalink to this heading">¶</a></h3>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area stderr docutils container">
+<div class="highlight"><pre>
+/opt/hostedtoolcache/Python/3.10.12/x64/lib/python3.10/site-packages/scipy/optimize/_minimize.py:705: OptimizeWarning: Desired error not necessarily achieved due to precision loss.
+  res = _minimize_bfgs(fun, x0, args, jac, callback, **options)
+</pre></div></div>
+</div>
+<h3 id="Continuously-Updating-Estimator">Continuously Updating Estimator<a class="headerlink" href="#Continuously-Updating-Estimator" title="Link to this heading">¶</a></h3>
 <p>The Continuously Updating Estimator (CUE) is optionally available using the flag <code class="docutils literal notranslate"><span class="pre">use_cue</span></code>. CUE jointly minimizes the J-statistic as a function of the moment conditions and the weighting matrix, rather than iterating between minimizing the J-statistic for a fixed weighting matrix and updating the weighting matrix.</p>
 <p>Here the results are essentially the same as in the iterative approach.</p>
 <div class="nbinput docutils container">
@@ -1385,37 +1491,51 @@ See full_summary for complete results
 </code></pre></div>
 </div>
 </div>
-<div class="nboutput nblast docutils container">
+<div class="nboutput docutils container">
 <div class="prompt empty docutils container">
 </div>
 <div class="output_area docutils container">
 <div class="highlight"><pre>
-Iteration: 0, Objective: 47.75791582822472
-Iteration: 10, Objective: 28.102587863294254
-Iteration: 20, Objective: 26.361385291036818
-Iteration: 30, Objective: 26.019667283111943
-Iteration: 40, Objective: 22.325343252976985
-Warning: Desired error not necessarily achieved due to precision loss.
+Iteration: 0, Objective: 47.757915828205064
+Iteration: 10, Objective: 28.10258762356393
+Iteration: 20, Objective: 26.361385223195093
+Iteration: 30, Objective: 26.019666897117403
+Iteration: 40, Objective: 22.325343252976587
+</pre></div></div>
+</div>
+<div class="nboutput docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area stderr docutils container">
+<div class="highlight"><pre>
+/opt/hostedtoolcache/Python/3.10.12/x64/lib/python3.10/site-packages/scipy/optimize/_minimize.py:705: OptimizeWarning: Desired error not necessarily achieved due to precision loss.
+  res = _minimize_bfgs(fun, x0, args, jac, callback, **options)
+</pre></div></div>
+</div>
+<div class="nboutput docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
          Current function value: 22.325343
          Iterations: 41
-         Function evaluations: 2596
-         Gradient evaluations: 76
-Iteration: 0, Objective: 22.524477045898372
-Iteration: 10, Objective: 22.386053110614757
-Iteration: 20, Objective: 22.339803929792485
-Iteration: 30, Objective: 22.308307937162958
-Warning: Desired error not necessarily achieved due to precision loss.
+         Function evaluations: 2290
+         Gradient evaluations: 67
+Iteration: 0, Objective: 22.524476475524498
+Iteration: 10, Objective: 22.38605123983711
+Iteration: 20, Objective: 22.339801547879297
+Iteration: 30, Objective: 22.30830643003259
          Current function value: 22.077574
          Iterations: 38
-         Function evaluations: 3650
-         Gradient evaluations: 107
+         Function evaluations: 2834
+         Gradient evaluations: 83
                     LinearFactorModelGMM Estimation Summary
 ================================================================================
 No. Test Portfolios:                  9   R-squared:                      0.7903
 No. Factors:                          3   J-statistic:                    22.719
 No. Observations:                   819   P-value                         0.0009
-Date:                  Tue, Jun 13 2023   Distribution:                  chi2(6)
-Time:                          13:10:21
+Date:                  Fri, Sep 01 2023   Distribution:                  chi2(6)
+Time:                          08:03:57
 Cov. Estimator:                  robust
 
                             Risk Premia Estimates
@@ -1430,6 +1550,15 @@ Mom            0.0094     0.0014     6.4984     0.0000      0.0066      0.0123
 Covariance estimator:
 HeteroskedasticCovariance
 See full_summary for complete results
+</pre></div></div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area stderr docutils container">
+<div class="highlight"><pre>
+/opt/hostedtoolcache/Python/3.10.12/x64/lib/python3.10/site-packages/scipy/optimize/_minimize.py:705: OptimizeWarning: Desired error not necessarily achieved due to precision loss.
+  res = _minimize_bfgs(fun, x0, args, jac, callback, **options)
 </pre></div></div>
 </div>
 
@@ -1499,7 +1628,7 @@ See full_summary for complete results
   
     Created using
     <a href="https://www.sphinx-doc.org/" target="_blank" rel="noopener">Sphinx</a>
-    7.0.1.
+    7.2.5.
      and
     <a href="https://github.com/jbms/sphinx-immaterial/" target="_blank" rel="noopener">Sphinx-Immaterial</a>
   
@@ -1546,10 +1675,10 @@ See full_summary for complete results
     <script id="__config" type="application/json">{"base": "../..", "features": [], "translations": {"clipboard.copied": "Copied to clipboard", "clipboard.copy": "Copy to clipboard", "search.config.lang": "en", "search.config.pipeline": "trimmer, stopWordFilter", "search.config.separator": "[\\s\\-]+", "search.placeholder": "Search", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.placeholder": "Type to start searching", "search.result.term.missing": "Missing", "select.version.title": "Select version"}, "version": {"provider": "mike", "staticVersions": [{"aliases": [], "title": "Release", "version": "https://bashtage.github.io/linearmodels"}, {"aliases": [], "title": "Development", "version": "https://bashtage.github.io/linearmodels/devel"}], "versionPath": null}}</script>
     
       
-        <script src="../../_static/sphinx_immaterial_theme.1b5b7a2d5891aec19.min.js"></script>
+        <script src="../../_static/sphinx_immaterial_theme.1b5b7a2d5891aec19.min.js?v=1e7b0789"></script>
         <script crossorigin="anonymous" integrity="sha256-Ae2Vz/4ePdIu6ZyI/5ZGsYnb+m0JlOmKPjt6XZ9JJkA=" src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.4/require.min.js"></script>
         <script>window.MathJax = {"tex": {"inlineMath": [["$", "$"], ["\\(", "\\)"]], "processEscapes": true}, "options": {"ignoreHtmlClass": "tex2jax_ignore|mathjax_ignore|document", "processHtmlClass": "tex2jax_process|mathjax_process|math|output_area"}}</script>
-        <script id="MathJax-script" src="../../_static/mathjax/tex-mml-chtml.js"></script>
+        <script id="MathJax-script" src="../../_static/mathjax/tex-mml-chtml.js?v=cadf963e"></script>
     
   </body>
 </html>
