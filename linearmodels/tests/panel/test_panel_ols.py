@@ -1344,7 +1344,7 @@ def test_singleton_removal_other_effects(data):
 def test_singleton_removal_mixed(singleton_data, other_effects):
     if other_effects == 1:
         other_effects = PanelData(singleton_data.c).dataframe.iloc[:, [0]]
-    elif other_effects == 2:
+    else:
         other_effects = singleton_data.c
     mod = PanelOLS(singleton_data.y, singleton_data.x, other_effects=other_effects)
     res_keep = mod.fit(use_lsmr=True)
@@ -1534,7 +1534,7 @@ def test_entity_into():
     assert ti["min"] == 16
 
 
-@pytest.mark.parametrize("path", ["use_lsdv", "low_memory"])
+@pytest.mark.parametrize("path", ["use_lsdv", "low_memory", ""])
 def test_absorbed_with_weights(path):
     data = wage_panel.load().copy()
     year = pd.Categorical(data.year)
