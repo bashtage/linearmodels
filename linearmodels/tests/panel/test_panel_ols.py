@@ -6,6 +6,7 @@ from numpy.testing import assert_allclose
 import pandas as pd
 import pytest
 
+from linearmodels.datasets import wage_panel
 from linearmodels.iv.model import IV2SLS
 from linearmodels.panel.data import PanelData
 from linearmodels.panel.model import PanelOLS, PooledOLS
@@ -1343,7 +1344,7 @@ def test_singleton_removal_other_effects(data):
 def test_singleton_removal_mixed(singleton_data, other_effects):
     if other_effects == 1:
         other_effects = PanelData(singleton_data.c).dataframe.iloc[:, [0]]
-    elif other_effects == 2:
+    else:
         other_effects = singleton_data.c
     mod = PanelOLS(singleton_data.y, singleton_data.x, other_effects=other_effects)
     res_keep = mod.fit(use_lsmr=True)
@@ -1531,3 +1532,26 @@ def test_entity_into():
     ti = res.time_info
     assert ti["total"] == 4
     assert ti["min"] == 16
+
+
+@pytest.mark.parametrize("path", ["use_lsdv", "low_memory", ""])
+def test_absorbed_with_weights(path):
+    data = wage_panel.load().copy()
+    year = pd.Categorical(data.year)
+    data = data.set_index(["nr", "year"])
+    data["year"] = year
+    # and random number between 0 and 1 for weights
+    data["rand"] = np.random.rand(data.shape[0])
+    data["absorbe"] = data.groupby("nr")["union"].transform("mean")
+
+    fit_options = {}
+    if path:
+        fit_options[path] = True
+
+    with pytest.warns(AbsorbingEffectWarning, match="Variables have been"):
+        PanelOLS.from_formula(
+            "lwage ~1+absorbe + married + EntityEffects",
+            data=data,
+            weights=data["rand"],
+            drop_absorbed=True,
+        ).fit(**fit_options)

@@ -26,3 +26,13 @@ exclude = '''
 
 [tool.setuptools_scm]
 write_to = "linearmodels/_version.py"
+
+[tool.pyright]
+exclude = [
+    "**/tests/**",
+]
+
+[tool.mypy]
+exclude = [
+    "tests",
+]

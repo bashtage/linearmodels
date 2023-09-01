@@ -1830,7 +1830,7 @@ class PanelOLS(_PanelModelBase):
             if not weighted:
                 y, x, ybar = self._fast_path(low_memory=low_memory)
                 y_effects = np.array([0.0])
-                x_effects = np.zeros(x.shape[1])
+                x_effects = np.zeros(x.shape)
             else:
                 y, x, ybar, y_effects, x_effects = self._weighted_fast_path(
                     low_memory=low_memory
@@ -1883,7 +1883,7 @@ class PanelOLS(_PanelModelBase):
 
                     # Adjust exog
                     self.exog = PanelData(self.exog.dataframe.iloc[:, retain])
-                    x_effects = x_effects[retain]
+                    x_effects = x_effects[:, retain]
 
         params = _lstsq(x, y, rcond=None)[0]
         nobs = self.dependent.dataframe.shape[0]
