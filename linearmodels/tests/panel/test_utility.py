@@ -216,11 +216,11 @@ def test_preconditioner_subclass():
     values = values.view(SubArray)
     val_cond, cond = preconditioner(values, copy=True)
     assert_allclose(np.sqrt((values**2).sum(0)), cond)
-    assert type(val_cond) == type(values)
+    assert type(val_cond) is type(values)
     # Test in-place
     val_cond, cond = preconditioner(values, copy=False)
     assert_allclose(np.sqrt((values**2).sum(0)), np.ones(10))
-    assert type(val_cond) == type(values)
+    assert type(val_cond) is type(values)
 
 
 @pytest.mark.parametrize("missing", [0, 0.2])
