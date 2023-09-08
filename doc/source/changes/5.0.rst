@@ -4,6 +4,12 @@
    Variables will appear in results in the same order they are entered in
    the formula string.
 
+Version 5.2
+-----------
+* Fixed a bug that affected dropping absorbed regressors when using weights (:issue:`546`).
+* Improved the licensing information (:issue:`545`).
+* Improved compatability with recent pandas (:issue:`548`).
+
 Version 5.1
 -----------
 * Fixed a bug that affected the counting of the number of entities and time periods

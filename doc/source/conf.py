@@ -43,6 +43,7 @@ else:
 # extensions coming with Sphinx (named 'sphinx.ext.*') or your custom
 # ones.
 extensions = [
+    "sphinx.ext.napoleon",
     "sphinx.ext.autodoc",
     "sphinx.ext.autosummary",
     "sphinx.ext.extlinks",
@@ -55,8 +56,7 @@ extensions = [
     "sphinx.ext.ifconfig",
     "sphinx.ext.githubpages",
     # "numpydoc",
-    "sphinx.ext.napoleon",
-    "sphinx_autodoc_typehints",
+    # "sphinx_autodoc_typehints",
     "IPython.sphinxext.ipython_console_highlighting",
     "IPython.sphinxext.ipython_directive",
     "nbsphinx",
@@ -147,7 +147,6 @@ html_theme_options = {
     "site_url": "https://bashtage.github.io/linearmodels/",
     "repo_url": "https://github.com/bashtage/linearmodels/",
     "repo_name": "linearmodels",
-    "repo_type": "github",
     "palette": {"primary": "blue", "accent": "orange"},
     "globaltoc_collapse": True,
     "toc_title": "Contents",
@@ -300,6 +299,62 @@ x = panel_data.x1
 napoleon_use_admonition_for_examples = False
 napoleon_use_admonition_for_notes = False
 napoleon_use_admonition_for_references = False
+napoleon_preprocess_types = True
+napoleon_use_param = True
+napoleon_type_aliases = {
+    "array-like": ":term:`array-like <array_like>`",
+    "array_like": ":term:`array_like`",
+    "Figure": "matplotlib.figure.Figure",
+    "Axes": "matplotlib.axes.Axes",
+    "AxesSubplot": "matplotlib.axes.Axes",
+    "DataFrame": "pandas.DataFrame",
+    "Series": "pandas.Series",
+    "BetweenOLS": "linearmodels.panel.model.BetweenOLS",
+    "FamaMacBeth": "linearmodels.panel.model.FamaMacBeth",
+    "FirstDifferenceOLS": "linearmodels.panel.model.FirstDifferenceOLS",
+    "IV2SLS": "linearmodels.iv.model.IV2SLS",
+    "IV3SLS": "linearmodels.system.model.IV3SLS",
+    "IVGMM": "linearmodels.iv.model.IVGMM",
+    "IVGMMCUE": "linearmodels.iv.model.IVGMMCUE",
+    "IVLIML": "linearmodels.iv.model.IVLIML",
+    "IVSystemGMM": "linearmodels.system.model.IVSystemGMM",
+    "LinearFactorModel": "linearmodels.asset_pricing.model.LinearFactorModel",
+    "LinearFactorModelGMM": "linearmodels.asset_pricing.model.LinearFactorModelGMM",
+    "OLS": "linearmodels.iv.model.OLS",
+    "PanelOLS": "linearmodels.panel.model.PanelOLS",
+    "PooledOLS": "linearmodels.panel.model.PooledOLS",
+    "RandomEffects": "linearmodels.panel.model.RandomEffects",
+    "SUR": "linearmodels.system.model.SUR",
+    "TradedFactorModel": "linearmodels.asset_pricing.model.TradedFactorModel",
+    "AbsorbingLSResults": "linearmodels.iv.absorbing.AbsorbingLSResults",
+    "FirstStageResults": "linearmodels.iv.results.FirstStageResults",
+    "IVGMMResults": "linearmodels.iv.results.IVGMMResults",
+    "IVModelComparison": "linearmodels.iv.results.IVModelComparison",
+    "IVResults": "linearmodels.iv.results.IVResults",
+    "InvalidTestStatistic": "linearmodels.shared.InvalidTestStatistic",
+    "OLSResults": "linearmodels.iv.results.OLSResults",
+    "WaldTestStatistic": "linearmodels.shared.hypotheses.WaldTestStatistic",
+    "LinearConstraint": "linearmodels.system.model.LinearConstraint",
+    "PanelEffectsResults": "linearmodels.panel.results.PanelEffectsResults",
+    "PanelModelComparison": "linearmodels.panel.results.PanelModelComparison",
+    "PanelResults": "linearmodels.panel.results.PanelResults",
+    "RandomEffectsResults": "linearmodels.panel.results.RandomEffectsResults",
+    "GMMSystemResults": "linearmodels.system.results.GMMSystemResults",
+    "Summary": "linearmodels.compat.statsmodels.Summary",
+    "SystemEquationResult": "linearmodels.system.results.SystemEquationResult",
+    "SystemResults": "linearmodels.system.results.SystemResults",
+    "GMMFactorModelResults": "linearmodels.asset_pricing.results.GMMFactorModelResults",
+    "LinearFactorModelResults": "linearmodels.asset_pricing.results.LinearFactorModelResults",
+    "PanelData": "linearmodels.panel.data.PanelData",
+    "IVData": "linearmodels.iv.data.IVData",
+    "AttrDict": "linearmodels.shared.utility.AttrDict",
+    "csc_matrix": "scipy.sparse.csc_matrix",
+    "DataArray": "xarray.DataArray",
+    "PanelModelData": "linearmodels.panel.utility.PanelModelData",
+    "ndarray": "numpy.ndarray",
+    "np.ndarray": "numpy.array",
+    "pd.Series": "pandas.Series",
+}
 
 # Create xrefs
 numpydoc_use_autodoc_signature = True
