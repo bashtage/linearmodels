@@ -1,8 +1,7 @@
-.. warning::
-
-   Version 5.0 changes the sorting order for models created using formulas.
-   Variables will appear in results in the same order they are entered in
-   the formula string.
+Version 5.3
+-----------
+- Bumped the minimum formulaic to 0.6.5.
+- Released wheels for Python 3.12.
 
 Version 5.2
 -----------
