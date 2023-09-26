@@ -50,15 +50,6 @@ for f, m in params:
     key += " : " + str(m[0].__name__)
     ids.append(key)
 
-escape_fmlas = fmlas[:2] + fmlas[3:]
-escape_params = list(product(escape_fmlas, models))
-
-escape_ids = []
-for f, m in escape_params:
-    key = "--".join([value for value in f.values()])
-    key += " : " + str(m[0].__name__)
-    escape_ids.append(key)
-
 
 def sigmoid(v):
     return np.exp(v) / (1 + np.exp(v))
@@ -66,13 +57,6 @@ def sigmoid(v):
 
 @pytest.fixture(scope="module", params=params, ids=ids)
 def config(request):
-    fmla, model_interace = request.param
-    model, interface = model_interace
-    return fmla, model, interface
-
-
-@pytest.fixture(scope="module", params=escape_params, ids=escape_ids)
-def escape_config(request):
     fmla, model_interace = request.param
     model, interface = model_interace
     return fmla, model, interface
@@ -198,8 +182,8 @@ def test_parser(config):
                 assert_frame_equal(eq1[key], eq2[key])
 
 
-def test_formula_escaped(escape_config):
-    fmla, model, interface = escape_config
+def test_formula_escaped(config):
+    fmla, model, interface = config
     for key in fmla:
         if "[" in fmla[key] and model not in (IVSystemGMM, IV3SLS):
             return
