@@ -1,8 +1,13 @@
-.. warning::
+Version 5.3
+-----------
+- Bumped the minimum formulaic to 0.6.5.
+- Released wheels for Python 3.12.
 
-   Version 5.0 changes the sorting order for models created using formulas.
-   Variables will appear in results in the same order they are entered in
-   the formula string.
+Version 5.2
+-----------
+* Fixed a bug that affected dropping absorbed regressors when using weights (:issue:`546`).
+* Improved the licensing information (:issue:`545`).
+* Improved compatibility with recent pandas (:issue:`548`).
 
 Version 5.1
 -----------
