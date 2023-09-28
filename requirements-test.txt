@@ -9,3 +9,4 @@ pytest-cov
 seaborn
 xarray>=0.13
 wheel
+pillow>=10.0.1 # not directly required, pinned by Snyk to avoid a vulnerability
