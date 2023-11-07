@@ -26,7 +26,7 @@ jobs:
       CIBW_ARCHS_LINUX: "x86_64"
       CIBW_ARCHS_MACOS: "x86_64"
       CIBW_SKIP: "pp* *-musllinux_* *-win32"
-      CIBW_BEFORE_BUILD: pip install wheel>=41.0.0
+      CIBW_BEFORE_BUILD: python -m pip install wheel>=0.41.0 pip --upgrade
       CIBW_TEST_REQUIRES: pytest pytest-xdist xarray matplotlib
       CIBW_TEST_COMMAND: python -c "import linearmodels; linearmodels.test(['--skip-examples','--skip-slow','-n','2'])"
       # Avoid testing on emulated architectures
