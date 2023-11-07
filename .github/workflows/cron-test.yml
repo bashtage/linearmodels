@@ -18,14 +18,15 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        python: [cp310]
-        os: [ubuntu-20.04, windows-2019]
+        python: [cp311]
+        os: [ubuntu-latest, windows-latest]
     env:
       BUILD_COMMIT: "main"
       CIBW_BUILD: ${{ matrix.python }}-*
       CIBW_ARCHS_LINUX: "x86_64"
       CIBW_ARCHS_MACOS: "x86_64"
       CIBW_SKIP: "pp* *-musllinux_* *-win32"
+      CIBW_BEFORE_BUILD: pip install wheel>=41.0.0
       CIBW_TEST_REQUIRES: pytest pytest-xdist xarray matplotlib
       CIBW_TEST_COMMAND: python -c "import linearmodels; linearmodels.test(['--skip-examples','--skip-slow','-n','2'])"
       # Avoid testing on emulated architectures
