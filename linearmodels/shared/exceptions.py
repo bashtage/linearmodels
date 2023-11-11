@@ -29,6 +29,10 @@ class IndexWarning(Warning):
     pass
 
 
+class VCOVWarning(Warning):
+    pass
+
+
 def missing_warning(missing: BoolArray, stacklevel: int = 4) -> None:
     """Utility function to perform missing value check and warning"""
     if not np.any(missing):
@@ -49,6 +53,7 @@ __all__ = [
     "MemoryWarning",
     "MissingValueWarning",
     "SingletonWarning",
+    "VCOVWarning",
     "missing_warning",
     "missing_value_warning_msg",
 ]

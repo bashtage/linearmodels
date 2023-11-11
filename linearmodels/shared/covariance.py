@@ -1,17 +1,23 @@
 from __future__ import annotations
 
+from itertools import combinations
+
 from numpy import (
     any as npany,
     arange,
     argsort,
     cumsum,
+    diag,
     lexsort,
+    maximum,
     r_,
     unique,
     where,
     zeros,
 )
+from numpy.linalg import eig
 
+from linearmodels.shared.exceptions import VCOVWarning
 from linearmodels.typing import AnyArray, Float64Array, IntArray
 
 
@@ -51,7 +57,7 @@ def cluster_union(clusters: IntArray) -> IntArray:
     Parameters
     ----------
     clusters : ndarray
-        A nobs by 2 array of integer values of cluster group membership.
+        A nobs by d (>=2) array of integer values of cluster group membership.
 
     Returns
     -------
@@ -132,3 +138,101 @@ def cov_kernel(z: Float64Array, w: Float64Array) -> Float64Array:
 
     s /= n
     return s
+
+
+def multi_way_cluster_iter(
+    clusters: Float64Array, xe: Float64Array, group_debias: bool = True
+):
+    """
+    Multi-way clustering
+
+    Sums cluster covariances with an odd number of cluster dimensions,
+    subtracts those with an eve number of cluster dimensions. Whereas
+    cluster covariances with a number of cluster dimensions greater
+    than 1 are computed using the group formed from the
+    intersection of the n dimensions.
+
+    Parameters
+    ----------
+    clusters : ndarray
+        nobs by d (where d is the number of cluster dimensions)
+    xe : ndarray
+        nobs by k
+    group_debias: bool
+        Flag indicating whether to apply small-number of groups adjustment.
+
+    Returns
+    -------
+    ndarray
+       k by k
+    """
+    clus_adj = 1
+
+    xeex = {}
+
+    if clusters.ndim == 1:
+        clusters = clusters[:, None]
+
+    n_cols = arange(clusters.shape[1])
+
+    for i in range(1, clusters.shape[1] + 1):
+
+        for subset_cols in combinations(n_cols, i):
+
+            sign = 1 if len(subset_cols) % 2 else -1
+
+            if len(subset_cols) == 1:
+
+                if group_debias:
+                    clus_adj = group_debias_coefficient(
+                        clusters=clusters[:, subset_cols].flatten(),
+                    )
+
+                xeex[subset_cols] = (
+                    cov_cluster(xe, clusters[:, subset_cols].flatten())
+                    * clus_adj
+                    * sign
+                )
+
+            else:
+                clusu = cluster_union(clusters[:, subset_cols])
+
+                if group_debias:
+                    clus_adj = group_debias_coefficient(
+                        clusters=clusu,
+                    )
+
+                xeex[subset_cols] = cov_cluster(xe, clusu) * clus_adj * sign
+
+    return sum(xeex.values())
+
+
+def cgm_vcov_fix(vcov: Float64Array, toll: float = 1e-10):
+    """
+    VCOV fix à la Cameron, Gelbach & Miller 2011
+
+    Parameters
+    ----------
+    vcov: ndarray
+        k by k variance covariance matrix
+    toll: float
+        toll to set on eig values
+
+    Returns
+    -------
+    ndarray
+       k by k cluster covariance adjusted
+    """
+    from warnings import warn
+
+    if npany(diag(vcov) < 0):
+        evalues, evectors = eig(vcov)
+        vcov = (evectors @ diag(maximum(toll, evalues))) @ evectors.T
+
+        warn(
+            "Non-positive semi-definite VCOV matrix; adjusted "
+            "à la Cameron, Gelbach & Miller 2011",
+            VCOVWarning,
+        )
+
+    return vcov

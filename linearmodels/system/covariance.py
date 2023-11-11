@@ -7,8 +7,7 @@ from numpy.linalg import inv
 
 from linearmodels.asset_pricing.covariance import _HACMixin
 from linearmodels.iv.covariance import cov_cluster
-from linearmodels.panel.covariance import cluster_union
-from linearmodels.shared.covariance import group_debias_coefficient
+from linearmodels.shared.covariance import cluster_union, group_debias_coefficient
 from linearmodels.shared.utility import AttrDict
 from linearmodels.system._utility import (
     LinearConstraint,

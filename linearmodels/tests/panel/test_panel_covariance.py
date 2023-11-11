@@ -190,19 +190,19 @@ def test_clustered_covariance_smoke(panel_data) -> None:
     ).cov
     assert cov.shape == (panel_data.k, panel_data.k)
 
+    cov = ClusteredCovariance(
+        panel_data.y,
+        panel_data.x,
+        panel_data.params,
+        panel_data.entity_ids,
+        panel_data.time_ids,
+        extra_df=0,
+        clusters=panel_data.cluster5,
+    ).cov
+    assert cov.shape == (panel_data.k, panel_data.k)
+
 
 def test_clustered_covariance_error(panel_data) -> None:
-    with pytest.raises(ValueError):
-        ClusteredCovariance(
-            panel_data.y,
-            panel_data.x,
-            panel_data.params,
-            panel_data.entity_ids,
-            panel_data.time_ids,
-            extra_df=0,
-            clusters=panel_data.cluster5,
-        )
-
     with pytest.raises(ValueError):
         ClusteredCovariance(
             panel_data.y,
