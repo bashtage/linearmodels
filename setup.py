@@ -81,7 +81,8 @@ def run_setup(binary: bool = True) -> None:
         license="NCSA",
         description="Linear Panel, Instrumental Variable, Asset Pricing, and System "
         "Regression models for Python",
-        packages=find_namespace_packages(),
+        packages=["linearmodels"]
+        + [f"linearmodels.{v}" for v in find_namespace_packages("linearmodels")],
         package_dir={"linearmodels": "./linearmodels"},
         author="Kevin Sheppard",
         author_email="kevin.k.sheppard@gmail.com",
