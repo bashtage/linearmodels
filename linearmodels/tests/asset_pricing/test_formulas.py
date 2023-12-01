@@ -117,7 +117,7 @@ def test_starting_values_options(data):
 
 def test_escaped_formula(data, model):
     def transform(fmla):
-        names = [f"`{factor.strip().replace('_',' ')}`" for factor in fmla.split("+")]
+        names = [f"`{factor.strip().replace('_', ' ')}`" for factor in fmla.split("+")]
         return " + ".join(names)
 
     formula_factors = transform(FORMULA_FACTORS)

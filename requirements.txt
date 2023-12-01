@@ -7,5 +7,5 @@ Cython>=0.29.34
 pyhdfe>=0.1
 formulaic>=0.6.5
 # versioning
-setuptools_scm[toml]>=7.0.0,<8.0.0
+setuptools_scm[toml]>=8.0.0,<9.0.0
 
