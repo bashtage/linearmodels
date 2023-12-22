@@ -630,7 +630,7 @@ class AbsorbingLSResults(_LSModelResultsBase):
             ("P-value (F-stat):", pval_format(self.f_statistic.pval)),
             ("Distribution:", str(self.f_statistic.dist_name)),
             ("R-squared (No Effects):", _str(round(self.absorbed_rsquared, 5))),
-            ("Varaibles Absorbed:", _str(self.df_absorbed)),
+            ("Variables Absorbed:", _str(self.df_absorbed)),
         ]
 
     @property
