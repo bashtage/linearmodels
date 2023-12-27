@@ -15,7 +15,7 @@
     
   
       
-        <title>statsmodels.iolib.summary - linearmodels v5.4 (+7)</title>
+        <title>statsmodels.iolib.summary - linearmodels v5.4 (+9)</title>
       
     
 
@@ -88,7 +88,7 @@
 
 <header class="md-header" data-md-component="header">
   <nav class="md-header__inner md-grid" aria-label="Header">
-    <a href="../../../index.html" title="linearmodels v5.4 (+7)" class="md-header__button md-logo" aria-label="linearmodels v5.4 (+7)" data-md-component="logo">
+    <a href="../../../index.html" title="linearmodels v5.4 (+9)" class="md-header__button md-logo" aria-label="linearmodels v5.4 (+9)" data-md-component="logo">
       <img src="../../../_static/bw-logo.svg" alt="logo">
     </a>
     <label class="md-header__button md-icon" for="__drawer">
@@ -98,7 +98,7 @@
       <div class="md-header__ellipsis">
         <div class="md-header__topic">
           <span class="md-ellipsis">
-            linearmodels v5.4 (+7)
+            linearmodels v5.4 (+9)
           </span>
         </div>
         <div class="md-header__topic" data-md-component="header-topic">
@@ -185,10 +185,10 @@
 
 <nav class="md-nav md-nav--primary" aria-label="Navigation" data-md-level="0">
   <label class="md-nav__title" for="__drawer">
-    <a href="../../../index.html" title="linearmodels v5.4 (+7)" class="md-nav__button md-logo" aria-label="linearmodels v5.4 (+7)" data-md-component="logo">
+    <a href="../../../index.html" title="linearmodels v5.4 (+9)" class="md-nav__button md-logo" aria-label="linearmodels v5.4 (+9)" data-md-component="logo">
       <img src="../../../_static/bw-logo.svg" alt="logo">
     </a>
-    linearmodels v5.4 (+7)
+    linearmodels v5.4 (+9)
   </label>
   
     <div class="md-nav__source">
@@ -822,11 +822,11 @@
         <span class="c1">#we need to give parameter alpha to conf_int</span>
         <span class="n">results</span><span class="p">,</span> <span class="n">params</span><span class="p">,</span> <span class="n">std_err</span><span class="p">,</span> <span class="n">tvalues</span><span class="p">,</span> <span class="n">pvalues</span><span class="p">,</span> <span class="n">conf_int</span> <span class="o">=</span> <span class="n">results</span>
     <span class="k">else</span><span class="p">:</span>
-        <span class="n">params</span> <span class="o">=</span> <span class="n">results</span><span class="o">.</span><span class="n">params</span>
-        <span class="n">std_err</span> <span class="o">=</span> <span class="n">results</span><span class="o">.</span><span class="n">bse</span>
-        <span class="n">tvalues</span> <span class="o">=</span> <span class="n">results</span><span class="o">.</span><span class="n">tvalues</span>  <span class="c1"># is this sometimes called zvalues</span>
-        <span class="n">pvalues</span> <span class="o">=</span> <span class="n">results</span><span class="o">.</span><span class="n">pvalues</span>
-        <span class="n">conf_int</span> <span class="o">=</span> <span class="n">results</span><span class="o">.</span><span class="n">conf_int</span><span class="p">(</span><span class="n">alpha</span><span class="p">)</span>
+        <span class="n">params</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">asarray</span><span class="p">(</span><span class="n">results</span><span class="o">.</span><span class="n">params</span><span class="p">)</span>
+        <span class="n">std_err</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">asarray</span><span class="p">(</span><span class="n">results</span><span class="o">.</span><span class="n">bse</span><span class="p">)</span>
+        <span class="n">tvalues</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">asarray</span><span class="p">(</span><span class="n">results</span><span class="o">.</span><span class="n">tvalues</span><span class="p">)</span>  <span class="c1"># is this sometimes called zvalues</span>
+        <span class="n">pvalues</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">asarray</span><span class="p">(</span><span class="n">results</span><span class="o">.</span><span class="n">pvalues</span><span class="p">)</span>
+        <span class="n">conf_int</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">asarray</span><span class="p">(</span><span class="n">results</span><span class="o">.</span><span class="n">conf_int</span><span class="p">(</span><span class="n">alpha</span><span class="p">))</span>
     <span class="k">if</span> <span class="n">params</span><span class="o">.</span><span class="n">size</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
         <span class="k">return</span> <span class="n">SimpleTable</span><span class="p">([[</span><span class="s1">&#39;No Model Parameters&#39;</span><span class="p">]])</span>
     <span class="c1"># Dictionary to store the header names for the parameter part of the</span>
@@ -849,7 +849,11 @@
     <span class="n">params_stubs</span> <span class="o">=</span> <span class="n">xname</span>
 
     <span class="n">exog_idx</span> <span class="o">=</span> <span class="n">lrange</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">xname</span><span class="p">))</span>
-
+    <span class="n">params</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">asarray</span><span class="p">(</span><span class="n">params</span><span class="p">)</span>
+    <span class="n">std_err</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">asarray</span><span class="p">(</span><span class="n">std_err</span><span class="p">)</span>
+    <span class="n">tvalues</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">asarray</span><span class="p">(</span><span class="n">tvalues</span><span class="p">)</span>
+    <span class="n">pvalues</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">asarray</span><span class="p">(</span><span class="n">pvalues</span><span class="p">)</span>
+    <span class="n">conf_int</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">asarray</span><span class="p">(</span><span class="n">conf_int</span><span class="p">)</span>
     <span class="n">params_data</span> <span class="o">=</span> <span class="n">lzip</span><span class="p">([</span><span class="n">forg</span><span class="p">(</span><span class="n">params</span><span class="p">[</span><span class="n">i</span><span class="p">],</span> <span class="n">prec</span><span class="o">=</span><span class="mi">4</span><span class="p">)</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="n">exog_idx</span><span class="p">],</span>
                        <span class="p">[</span><span class="n">forg</span><span class="p">(</span><span class="n">std_err</span><span class="p">[</span><span class="n">i</span><span class="p">])</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="n">exog_idx</span><span class="p">],</span>
                        <span class="p">[</span><span class="n">forg</span><span class="p">(</span><span class="n">tvalues</span><span class="p">[</span><span class="n">i</span><span class="p">])</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="n">exog_idx</span><span class="p">],</span>
@@ -868,7 +872,8 @@
 
 <span class="k">def</span> <span class="nf">summary_params_frame</span><span class="p">(</span><span class="n">results</span><span class="p">,</span> <span class="n">yname</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">xname</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">alpha</span><span class="o">=</span><span class="mf">.05</span><span class="p">,</span>
                          <span class="n">use_t</span><span class="o">=</span><span class="kc">True</span><span class="p">):</span>
-<span class="w">    </span><span class="sd">&#39;&#39;&#39;create a summary table for the parameters</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Create a summary table for the parameters</span>
 
 <span class="sd">    Parameters</span>
 <span class="sd">    ----------</span>
@@ -891,7 +896,7 @@
 <span class="sd">    Returns</span>
 <span class="sd">    -------</span>
 <span class="sd">    params_table : SimpleTable instance</span>
-<span class="sd">    &#39;&#39;&#39;</span>
+<span class="sd">    &quot;&quot;&quot;</span>
 
     <span class="c1"># Parameters part of the summary table</span>
     <span class="c1"># ------------------------------------</span>
@@ -928,7 +933,7 @@
 
 <span class="k">def</span> <span class="nf">summary_params_2d</span><span class="p">(</span><span class="n">result</span><span class="p">,</span> <span class="n">extras</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">endog_names</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">exog_names</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
                       <span class="n">title</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
-<span class="w">    </span><span class="sd">&#39;&#39;&#39;create summary table of regression parameters with several equations</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;create summary table of regression parameters with several equations</span>
 
 <span class="sd">    This allows interleaving of parameters with bse and/or tvalues</span>
 
@@ -954,7 +959,7 @@
 <span class="sd">        the merged table with results concatenated for each row of the parameter</span>
 <span class="sd">        array</span>
 
-<span class="sd">    &#39;&#39;&#39;</span>
+<span class="sd">    &quot;&quot;&quot;</span>
     <span class="k">if</span> <span class="n">endog_names</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
         <span class="c1"># TODO: note the [1:] is specific to current MNLogit</span>
         <span class="n">endog_names</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;endog_</span><span class="si">%d</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="n">i</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span>
@@ -989,7 +994,7 @@
 
 <span class="k">def</span> <span class="nf">summary_params_2dflat</span><span class="p">(</span><span class="n">result</span><span class="p">,</span> <span class="n">endog_names</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">exog_names</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">alpha</span><span class="o">=</span><span class="mf">0.05</span><span class="p">,</span>
                           <span class="n">use_t</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">keep_headers</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">endog_cols</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
-<span class="w">    </span><span class="sd">&#39;&#39;&#39;summary table for parameters that are 2d, e.g. multi-equation models</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;summary table for parameters that are 2d, e.g. multi-equation models</span>
 
 <span class="sd">    Parameters</span>
 <span class="sd">    ----------</span>
@@ -1020,7 +1025,7 @@
 <span class="sd">        the merged table with results concatenated for each row of the parameter</span>
 <span class="sd">        array</span>
 
-<span class="sd">    &#39;&#39;&#39;</span>
+<span class="sd">    &quot;&quot;&quot;</span>
 
     <span class="n">res</span> <span class="o">=</span> <span class="n">result</span>
     <span class="n">params</span> <span class="o">=</span> <span class="n">res</span><span class="o">.</span><span class="n">params</span>
@@ -1068,7 +1073,7 @@
 
 
 <span class="k">def</span> <span class="nf">table_extend</span><span class="p">(</span><span class="n">tables</span><span class="p">,</span> <span class="n">keep_headers</span><span class="o">=</span><span class="kc">True</span><span class="p">):</span>
-<span class="w">    </span><span class="sd">&#39;&#39;&#39;extend a list of SimpleTables, adding titles to header of subtables</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;extend a list of SimpleTables, adding titles to header of subtables</span>
 
 <span class="sd">    This function returns the merged table as a deepcopy, in contrast to the</span>
 <span class="sd">    SimpleTable extend method.</span>
@@ -1085,7 +1090,7 @@
 <span class="sd">    table_all : SimpleTable</span>
 <span class="sd">        merged tables as a single SimpleTable instance</span>
 
-<span class="sd">    &#39;&#39;&#39;</span>
+<span class="sd">    &quot;&quot;&quot;</span>
     <span class="kn">from</span> <span class="nn">copy</span> <span class="kn">import</span> <span class="n">deepcopy</span>
     <span class="k">for</span> <span class="n">ii</span><span class="p">,</span> <span class="n">t</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">tables</span><span class="p">[:]):</span> <span class="c1">#[1:]:</span>
         <span class="n">t</span> <span class="o">=</span> <span class="n">deepcopy</span><span class="p">(</span><span class="n">t</span><span class="p">)</span>
@@ -1161,11 +1166,11 @@
         <span class="k">return</span> <span class="nb">str</span><span class="p">(</span><span class="nb">type</span><span class="p">(</span><span class="bp">self</span><span class="p">))</span> <span class="o">+</span> <span class="s1">&#39;</span><span class="se">\n</span><span class="s1">&quot;&quot;&quot;</span><span class="se">\n</span><span class="s1">&#39;</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="fm">__str__</span><span class="p">()</span> <span class="o">+</span> <span class="s1">&#39;</span><span class="se">\n</span><span class="s1">&quot;&quot;&quot;&#39;</span>
 
     <span class="k">def</span> <span class="nf">_repr_html_</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-<span class="w">        </span><span class="sd">&#39;&#39;&#39;Display as HTML in IPython notebook.&#39;&#39;&#39;</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Display as HTML in IPython notebook.&quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">as_html</span><span class="p">()</span>
 
     <span class="k">def</span> <span class="nf">_repr_latex_</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-<span class="w">        </span><span class="sd">&#39;&#39;&#39;Display as LaTeX when converting IPython notebook to PDF.&#39;&#39;&#39;</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Display as LaTeX when converting IPython notebook to PDF.&quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">as_latex</span><span class="p">()</span>
 
 <div class="viewcode-block" id="Summary.add_table_2cols">
@@ -1203,7 +1208,7 @@
 <a class="viewcode-back" href="../../../compatibility/linearmodels.compat.statsmodels.Summary.add_table_params.html#linearmodels.compat.statsmodels.Summary.add_table_params">[docs]</a>
     <span class="k">def</span> <span class="nf">add_table_params</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">res</span><span class="p">,</span> <span class="n">yname</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">xname</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">alpha</span><span class="o">=</span><span class="mf">.05</span><span class="p">,</span>
                          <span class="n">use_t</span><span class="o">=</span><span class="kc">True</span><span class="p">):</span>
-<span class="w">        </span><span class="sd">&#39;&#39;&#39;create and add a table for the parameter estimates</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;create and add a table for the parameter estimates</span>
 
 <span class="sd">        Parameters</span>
 <span class="sd">        ----------</span>
@@ -1224,7 +1229,7 @@
 <span class="sd">        -------</span>
 <span class="sd">        None : table is attached</span>
 
-<span class="sd">        &#39;&#39;&#39;</span>
+<span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">if</span> <span class="n">res</span><span class="o">.</span><span class="n">params</span><span class="o">.</span><span class="n">ndim</span> <span class="o">==</span> <span class="mi">1</span><span class="p">:</span>
             <span class="n">table</span> <span class="o">=</span> <span class="n">summary_params</span><span class="p">(</span><span class="n">res</span><span class="p">,</span> <span class="n">yname</span><span class="o">=</span><span class="n">yname</span><span class="p">,</span> <span class="n">xname</span><span class="o">=</span><span class="n">xname</span><span class="p">,</span> <span class="n">alpha</span><span class="o">=</span><span class="n">alpha</span><span class="p">,</span>
                                    <span class="n">use_t</span><span class="o">=</span><span class="n">use_t</span><span class="p">)</span>
@@ -1240,28 +1245,28 @@
 <div class="viewcode-block" id="Summary.add_extra_txt">
 <a class="viewcode-back" href="../../../compatibility/linearmodels.compat.statsmodels.Summary.add_extra_txt.html#linearmodels.compat.statsmodels.Summary.add_extra_txt">[docs]</a>
     <span class="k">def</span> <span class="nf">add_extra_txt</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">etext</span><span class="p">):</span>
-<span class="w">        </span><span class="sd">&#39;&#39;&#39;add additional text that will be added at the end in text format</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;add additional text that will be added at the end in text format</span>
 
 <span class="sd">        Parameters</span>
 <span class="sd">        ----------</span>
 <span class="sd">        etext : list[str]</span>
 <span class="sd">            string with lines that are added to the text output.</span>
 
-<span class="sd">        &#39;&#39;&#39;</span>
+<span class="sd">        &quot;&quot;&quot;</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">extra_txt</span> <span class="o">=</span> <span class="s1">&#39;</span><span class="se">\n</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">etext</span><span class="p">)</span></div>
 
 
 <div class="viewcode-block" id="Summary.as_text">
 <a class="viewcode-back" href="../../../compatibility/linearmodels.compat.statsmodels.Summary.as_text.html#linearmodels.compat.statsmodels.Summary.as_text">[docs]</a>
     <span class="k">def</span> <span class="nf">as_text</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-<span class="w">        </span><span class="sd">&#39;&#39;&#39;return tables as string</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;return tables as string</span>
 
 <span class="sd">        Returns</span>
 <span class="sd">        -------</span>
 <span class="sd">        txt : str</span>
 <span class="sd">            summary tables and extra text as one string</span>
 
-<span class="sd">        &#39;&#39;&#39;</span>
+<span class="sd">        &quot;&quot;&quot;</span>
         <span class="n">txt</span> <span class="o">=</span> <span class="n">summary_return</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">tables</span><span class="p">,</span> <span class="n">return_fmt</span><span class="o">=</span><span class="s1">&#39;text&#39;</span><span class="p">)</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">extra_txt</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
             <span class="n">txt</span> <span class="o">=</span> <span class="n">txt</span> <span class="o">+</span> <span class="s1">&#39;</span><span class="se">\n\n</span><span class="s1">&#39;</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">extra_txt</span>
@@ -1271,7 +1276,7 @@
 <div class="viewcode-block" id="Summary.as_latex">
 <a class="viewcode-back" href="../../../compatibility/linearmodels.compat.statsmodels.Summary.as_latex.html#linearmodels.compat.statsmodels.Summary.as_latex">[docs]</a>
     <span class="k">def</span> <span class="nf">as_latex</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-<span class="w">        </span><span class="sd">&#39;&#39;&#39;return tables as string</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;return tables as string</span>
 
 <span class="sd">        Returns</span>
 <span class="sd">        -------</span>
@@ -1284,7 +1289,7 @@
 <span class="sd">        It is recommended to use `as_latex_tabular` directly on the individual</span>
 <span class="sd">        tables.</span>
 
-<span class="sd">        &#39;&#39;&#39;</span>
+<span class="sd">        &quot;&quot;&quot;</span>
         <span class="n">latex</span> <span class="o">=</span> <span class="n">summary_return</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">tables</span><span class="p">,</span> <span class="n">return_fmt</span><span class="o">=</span><span class="s1">&#39;latex&#39;</span><span class="p">)</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">extra_txt</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
             <span class="n">latex</span> <span class="o">=</span> <span class="n">latex</span> <span class="o">+</span> <span class="s1">&#39;</span><span class="se">\n\n</span><span class="s1">&#39;</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">extra_txt</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s1">&#39;</span><span class="se">\n</span><span class="s1">&#39;</span><span class="p">,</span> <span class="s1">&#39; </span><span class="se">\\</span><span class="s1">newline</span><span class="se">\n</span><span class="s1"> &#39;</span><span class="p">)</span>
@@ -1294,14 +1299,14 @@
 <div class="viewcode-block" id="Summary.as_csv">
 <a class="viewcode-back" href="../../../compatibility/linearmodels.compat.statsmodels.Summary.as_csv.html#linearmodels.compat.statsmodels.Summary.as_csv">[docs]</a>
     <span class="k">def</span> <span class="nf">as_csv</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-<span class="w">        </span><span class="sd">&#39;&#39;&#39;return tables as string</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;return tables as string</span>
 
 <span class="sd">        Returns</span>
 <span class="sd">        -------</span>
 <span class="sd">        csv : str</span>
 <span class="sd">            concatenated summary tables in comma delimited format</span>
 
-<span class="sd">        &#39;&#39;&#39;</span>
+<span class="sd">        &quot;&quot;&quot;</span>
         <span class="n">csv</span> <span class="o">=</span> <span class="n">summary_return</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">tables</span><span class="p">,</span> <span class="n">return_fmt</span><span class="o">=</span><span class="s1">&#39;csv&#39;</span><span class="p">)</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">extra_txt</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
             <span class="n">csv</span> <span class="o">=</span> <span class="n">csv</span> <span class="o">+</span> <span class="s1">&#39;</span><span class="se">\n\n</span><span class="s1">&#39;</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">extra_txt</span>
@@ -1309,14 +1314,14 @@
 
 
     <span class="k">def</span> <span class="nf">as_html</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-<span class="w">        </span><span class="sd">&#39;&#39;&#39;return tables as string</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;return tables as string</span>
 
 <span class="sd">        Returns</span>
 <span class="sd">        -------</span>
 <span class="sd">        html : str</span>
 <span class="sd">            concatenated summary tables in HTML format</span>
 
-<span class="sd">        &#39;&#39;&#39;</span>
+<span class="sd">        &quot;&quot;&quot;</span>
         <span class="n">html</span> <span class="o">=</span> <span class="n">summary_return</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">tables</span><span class="p">,</span> <span class="n">return_fmt</span><span class="o">=</span><span class="s1">&#39;html&#39;</span><span class="p">)</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">extra_txt</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
             <span class="n">html</span> <span class="o">=</span> <span class="n">html</span> <span class="o">+</span> <span class="s1">&#39;&lt;br/&gt;&lt;br/&gt;&#39;</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">extra_txt</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s1">&#39;</span><span class="se">\n</span><span class="s1">&#39;</span><span class="p">,</span> <span class="s1">&#39;&lt;br/&gt;&#39;</span><span class="p">)</span>
@@ -1399,7 +1404,7 @@
     <script id="__config" type="application/json">{"base": "../../..", "features": [], "translations": {"clipboard.copied": "Copied to clipboard", "clipboard.copy": "Copy to clipboard", "search.config.lang": "en", "search.config.pipeline": "trimmer, stopWordFilter", "search.config.separator": "[\\s\\-]+", "search.placeholder": "Search", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.placeholder": "Type to start searching", "search.result.term.missing": "Missing", "select.version.title": "Select version"}, "version": {"provider": "mike", "staticVersions": [{"aliases": [], "title": "Release", "version": "https://bashtage.github.io/linearmodels"}, {"aliases": [], "title": "Development", "version": "https://bashtage.github.io/linearmodels/devel"}], "versionPath": null}}</script>
     
       
-        <script src="../../../_static/sphinx_immaterial_theme.1b5b7a2d5891aec19.min.js?v=1e7b0789"></script>
+        <script src="../../../_static/sphinx_immaterial_theme.f9d9eeeb247ace16c.min.js?v=8ec58cb5"></script>
         <script crossorigin="anonymous" integrity="sha256-Ae2Vz/4ePdIu6ZyI/5ZGsYnb+m0JlOmKPjt6XZ9JJkA=" src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.4/require.min.js"></script>
     
   </body>
