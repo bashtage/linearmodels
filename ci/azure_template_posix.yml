@@ -60,10 +60,16 @@ jobs:
       python311_latest:
         python.version: '3.11'
         XXHASH: true
-      python311_copy_on_write:
-        python.version: '3.11'
+      python312_latest:
+        python.version: '3.12'
+        XXHASH: true
+      python312_copy_on_write:
+        python.version: '3.12'
         XXHASH: true
         LM_TEST_COPY_ON_WRITE: 1
+      python312_pre:
+        python.version: '3.12'
+        PIP_PRE: true
     maxParallel: 10
 
   steps:

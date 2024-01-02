@@ -1,3 +1,5 @@
+from linearmodels.compat.pandas import ANNUAL_FREQ
+
 import pickle
 import random
 import string
@@ -224,7 +226,7 @@ def test_panel_to_midf():
             ],
         )
     )
-    times = pd.date_range("1999-12-31", freq="A-DEC", periods=7)
+    times = pd.date_range("1999-12-31", freq=ANNUAL_FREQ, periods=7)
     var_names = [f"x.{i}" for i in range(1, 4)]
     df3 = panel_to_frame(x, var_names, times, entities, True)
     mi = pd.MultiIndex.from_product([times, entities])

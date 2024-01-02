@@ -1,5 +1,7 @@
 from __future__ import annotations
 
+from linearmodels.compat.pandas import ANNUAL_FREQ
+
 from typing import Literal
 
 import numpy as np
@@ -121,7 +123,7 @@ def generate_data(
         return AttrDict(y=y, x=x, w=w, c=c, vc1=vc1, vc2=vc2)
 
     entities = ["firm" + str(i) for i in range(n)]
-    time = date_range("1-1-1900", periods=t, freq="A-DEC")
+    time = date_range("1-1-1900", periods=t, freq=ANNUAL_FREQ)
     var_names = ["x" + str(i) for i in range(k)]
     # y = DataFrame(y, index=time, columns=entities)
     y_df = panel_to_frame(

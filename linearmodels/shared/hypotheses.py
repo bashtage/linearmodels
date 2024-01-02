@@ -117,13 +117,13 @@ class InvalidTestStatistic(WaldTestStatistic):
 
     def __init__(self, reason: str, *, name: str | None = None) -> None:
         self._reason = reason
-        super().__init__(np.NaN, "", df=1, df_denom=1, name=name)
+        super().__init__(np.nan, "", df=1, df_denom=1, name=name)
         self.dist_name = "None"
 
     @property
     def pval(self) -> float:
-        """Always returns np.NaN"""
-        return np.NaN
+        """Always returns np.nan"""
+        return np.nan
 
     @property
     def critical_values(self) -> None:
@@ -158,13 +158,13 @@ class InapplicableTestStatistic(WaldTestStatistic):
         if reason is None:
             self._reason = "Test is not applicable to model specification"
 
-        super().__init__(np.NaN, "", df=1, df_denom=1, name=name)
+        super().__init__(np.nan, "", df=1, df_denom=1, name=name)
         self.dist_name = "None"
 
     @property
     def pval(self) -> float:
-        """Always returns np.NaN"""
-        return np.NaN
+        """Always returns np.nan"""
+        return np.nan
 
     @property
     def critical_values(self) -> None:

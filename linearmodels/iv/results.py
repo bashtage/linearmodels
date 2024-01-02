@@ -764,7 +764,11 @@ class FirstStageResults(_SummaryStr):
         ]
         out_df = out_df[cols]
         for col in out_df:
-            out_df[col] = to_numeric(out_df[col], errors="ignore")
+            try:
+                out_df[col] = to_numeric(out_df[col])
+            except ValueError:
+                # If an error is raised, ignore and keep the column
+                pass
 
         return out_df
 
