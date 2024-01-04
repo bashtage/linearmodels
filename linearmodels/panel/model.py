@@ -1878,7 +1878,9 @@ class PanelOLS(_PanelModelBase):
                     if self._constant:
                         assert isinstance(self._constant_index, int)
                         self._constant_index = int(
-                            np.argwhere(np.array(retain) == self._constant_index)
+                            np.squeeze(
+                                np.argwhere(np.array(retain) == self._constant_index)
+                            )
                         )
 
                     # Adjust exog
