@@ -13,3 +13,9 @@ if [[ -n ${FORMULAIC} ]]; then CMD="$CMD formulaic~=${FORMULAIC}"; fi
 if [[ -n ${XXHASH} ]]; then CMD="$CMD xxhash"; fi
 echo "$CMD"
 eval "$CMD"
+
+if [ "${PIP_PRE}" = true ]; then
+  python -m pip uninstall -y numpy pandas scipy matplotlib statsmodels
+  python -m pip install -i https://pypi.anaconda.org/scientific-python-nightly-wheels/simple numpy pandas scipy matplotlib --upgrade --use-deprecated=legacy-resolver
+  python -m pip install git+https://github.com/statsmodels/statsmodels.git --upgrade --no-build-isolation -v
+fi

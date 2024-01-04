@@ -1,5 +1,7 @@
 from __future__ import annotations
 
+from linearmodels.compat.pandas import ANNUAL_FREQ
+
 from collections import defaultdict
 from typing import NamedTuple, TypeVar, cast
 
@@ -613,7 +615,7 @@ def generate_panel_data(
         x.flat[locs] = np.nan
 
     entities = [f"firm{i}" for i in range(n)]
-    time = [dt for dt in date_range("1-1-1900", periods=t, freq="A-DEC")]
+    time = [dt for dt in date_range("1-1-1900", periods=t, freq=ANNUAL_FREQ)]
     var_names = [f"x{i}" for i in range(k)]
     if const:
         var_names[1:] = var_names[:-1]

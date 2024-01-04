@@ -1,5 +1,7 @@
 from __future__ import annotations
 
+from linearmodels.compat.pandas import PD_GTE_21
+
 from collections.abc import Hashable, Sequence
 from itertools import product
 from typing import Literal, Union, cast, overload
@@ -227,7 +229,8 @@ class PanelData:
                 if copy:
                     self._frame = self._frame.copy()
             else:
-                self._frame = DataFrame({var_name: x.T.stack(dropna=False)})
+                options = {"future_stack": True} if PD_GTE_21 else {"dropna": False}
+                self._frame = DataFrame({var_name: x.T.stack(**options)})
         elif isinstance(x, np.ndarray):
             if x.ndim not in (2, 3):
                 raise ValueError("2 or 3-d array required for numpy input")
@@ -298,6 +301,8 @@ class PanelData:
             Boolean array indicating observations to drop with reference to
             the dataframe view of the data
         """
+        if isinstance(locs, Series):
+            locs = np.asarray(locs)
         self._frame = self._frame.loc[~locs.ravel()]
         self._frame = self._minimize_multiindex(self._frame)
         # Reset panel and shape after a drop
