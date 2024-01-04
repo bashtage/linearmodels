@@ -13,6 +13,8 @@ variables:
   TEST_INSTALL: false
   MPLBACKEND: agg
   coverage: true
+  test.install: false
+  pip.pre: false
 
 jobs:
 - template: ci/azure_template_posix.yml

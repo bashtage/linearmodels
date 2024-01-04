@@ -11,4 +11,4 @@ nbformat
 matplotlib
 seaborn
 mypy_extensions>=0.4
-mistune<2
+# mistune<2

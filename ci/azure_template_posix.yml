@@ -56,6 +56,7 @@ jobs:
         XARRAY: 22.0
       python310_latest:
         python.version: '3.10'
+        FORMULAIC: 1.0.1
         XXHASH: true
       python311_latest:
         python.version: '3.11'
@@ -69,7 +70,7 @@ jobs:
         LM_TEST_COPY_ON_WRITE: 1
       python312_pre:
         python.version: '3.12'
-        PIP_PRE: true
+        pip.pre: true
     maxParallel: 10
 
   steps:
@@ -119,7 +120,7 @@ jobs:
       python -c "import linearmodels; linearmodels.test(['-n', 'auto', '--junitxml=../junit/test-results.xml'])"
       popd
     displayName: 'Run tests (site-packages)'
-    condition: eq(variables['test.install'], 'true')
+    condition: and(eq(variables['test.install'], 'true'), ne(variables['pip.pre'], 'true'))
 
   - script: |
       echo "Testing editable install"
@@ -129,7 +130,15 @@ jobs:
       echo pytest -m "${PYTEST_PATTERN}" --junitxml=junit/test-results.xml -n auto --durations=25 ${COVERAGE_OPTS} linearmodels/tests
       pytest -m "${PYTEST_PATTERN}" --junitxml=junit/test-results.xml -n auto --durations=25 ${COVERAGE_OPTS} linearmodels/tests
     displayName: 'Run tests (editable)'
-    condition: ne(variables['test.install'], 'true')
+    condition: and(ne(variables['test.install'], 'true'), ne(variables['pip.pre'], 'true'))
+
+  - script: |
+      echo "Testing pip-pre"
+      echo pytest -m "${PYTEST_PATTERN}" --junitxml=junit/test-results.xml -n auto --durations=25 ${COVERAGE_OPTS} linearmodels/tests
+      pytest -m "${PYTEST_PATTERN}" --junitxml=junit/test-results.xml -n auto --durations=25 ${COVERAGE_OPTS} linearmodels/tests
+    displayName: 'Run tests (pip pre)'
+    condition: eq(variables['pip.pre'], 'true')
+    continueOnError: true
 
   - task: PublishTestResults@2
     inputs:
