@@ -15,7 +15,7 @@
     
   
       
-        <title>Absorbing Regression - linearmodels v5.4 (+16)</title>
+        <title>Absorbing Regression - linearmodels v5.4 (+19)</title>
       
     
 
@@ -94,7 +94,7 @@
 
 <header class="md-header" data-md-component="header">
   <nav class="md-header__inner md-grid" aria-label="Header">
-    <a href="../../index.html" title="linearmodels v5.4 (+16)" class="md-header__button md-logo" aria-label="linearmodels v5.4 (+16)" data-md-component="logo">
+    <a href="../../index.html" title="linearmodels v5.4 (+19)" class="md-header__button md-logo" aria-label="linearmodels v5.4 (+19)" data-md-component="logo">
       <img src="../../_static/bw-logo.svg" alt="logo">
     </a>
     <label class="md-header__button md-icon" for="__drawer">
@@ -104,7 +104,7 @@
       <div class="md-header__ellipsis">
         <div class="md-header__topic">
           <span class="md-ellipsis">
-            linearmodels v5.4 (+16)
+            linearmodels v5.4 (+19)
           </span>
         </div>
         <div class="md-header__topic" data-md-component="header-topic">
@@ -191,10 +191,10 @@
 
 <nav class="md-nav md-nav--primary" aria-label="Navigation" data-md-level="0">
   <label class="md-nav__title" for="__drawer">
-    <a href="../../index.html" title="linearmodels v5.4 (+16)" class="md-nav__button md-logo" aria-label="linearmodels v5.4 (+16)" data-md-component="logo">
+    <a href="../../index.html" title="linearmodels v5.4 (+19)" class="md-nav__button md-logo" aria-label="linearmodels v5.4 (+19)" data-md-component="logo">
       <img src="../../_static/bw-logo.svg" alt="logo">
     </a>
-    linearmodels v5.4 (+16)
+    linearmodels v5.4 (+19)
   </label>
   
     <div class="md-nav__source">
@@ -671,7 +671,7 @@ Dep. Variable:              dependent   R-squared:                          0.83
 Estimator:               Absorbing LS   Adj. R-squared:                     0.7975
 No. Observations:             1000000   F-statistic:                     1.962e+06
 Date:                Thu, Jan 04 2024   P-value (F-stat):                   0.0000
-Time:                        17:55:06   Distribution:                      chi2(2)
+Time:                        19:08:03   Distribution:                      chi2(2)
 Cov. Estimator:                robust   R-squared (No Effects):             0.6664
                                         Variables Absorbed:              1.987e+05
                              Parameter Estimates
@@ -708,7 +708,7 @@ Dep. Variable:              dependent   R-squared:                          0.83
 Estimator:               Absorbing LS   Adj. R-squared:                     0.7975
 No. Observations:             1000000   F-statistic:                     1.962e+06
 Date:                Thu, Jan 04 2024   P-value (F-stat):                   0.0000
-Time:                        17:55:16   Distribution:                      chi2(2)
+Time:                        19:08:12   Distribution:                      chi2(2)
 Cov. Estimator:                robust   R-squared (No Effects):             0.6664
                                         Variables Absorbed:              1.987e+05
                              Parameter Estimates
@@ -752,7 +752,7 @@ exog.1         1.0008     0.0010     989.09     0.0000      0.9989      1.0028
 </div>
 <div class="output_area docutils container">
 <div class="highlight"><pre>
-LSMR Second: 2.837275
+LSMR Second: 2.605002
 </pre></div></div>
 </div>
 <div class="nboutput nblast docutils container">
@@ -760,7 +760,7 @@ LSMR Second: 2.837275
 </div>
 <div class="output_area docutils container">
 <div class="highlight"><pre>
-HDFE Second: 1.561356
+HDFE Second: 1.673454
 </pre></div></div>
 </div>
 <p>LSMR is iterative and does not have a closed form. The tolerance can be set using <code class="docutils literal notranslate"><span class="pre">absorb_options</span></code> which is a dictionary. See <a class="reference external" href="https://docs.scipy.org/doc/scipy-1.2.1/reference/generated/scipy.sparse.linalg.lsmr.html#scipy.sparse.linalg.lsmr">scipy.sparse.linalg.lsmr</a> for details on the options.</p>
@@ -796,6 +796,10 @@ btol = 1.00e-08             maxiter =   198676
      3  2.17247e+02  1.553e+03  6.446e+01   6.4e-01  2.1e-02  2.0e+00  1.3e+00
      4  2.30067e+02  1.551e+03  6.539e-01   6.4e-01  1.9e-04  2.2e+00  1.5e+00
      5  2.30071e+02  1.551e+03  2.662e-01   6.4e-01  7.0e-05  2.4e+00  1.5e+00
+     6  2.29984e+02  1.551e+03  4.542e-03   6.4e-01  1.1e-06  2.6e+00  1.6e+00
+     7  2.29984e+02  1.551e+03  3.999e-03   6.4e-01  9.6e-07  2.7e+00  2.5e+00
+     8  2.29985e+02  1.551e+03  3.882e-03   6.4e-01  8.7e-07  2.9e+00  6.5e+00
+     9  2.29985e+02  1.551e+03  3.882e-03   6.4e-01  8.3e-07  3.0e+00  5.1e+02
 </pre></div></div>
 </div>
 <div class="nboutput docutils container">
@@ -803,10 +807,6 @@ btol = 1.00e-08             maxiter =   198676
 </div>
 <div class="output_area docutils container">
 <div class="highlight"><pre>
-     6  2.29984e+02  1.551e+03  4.542e-03   6.4e-01  1.1e-06  2.6e+00  1.6e+00
-     7  2.29984e+02  1.551e+03  3.999e-03   6.4e-01  9.6e-07  2.7e+00  2.5e+00
-     8  2.29985e+02  1.551e+03  3.882e-03   6.4e-01  8.7e-07  2.9e+00  6.5e+00
-     9  2.29985e+02  1.551e+03  3.882e-03   6.4e-01  8.3e-07  3.0e+00  5.1e+02
     10  2.29990e+02  1.551e+03  3.882e-03   6.4e-01  7.8e-07  3.2e+00  5.5e+02
     13  3.86056e+02  1.551e+03  4.003e-05   6.4e-01  7.2e-09  3.6e+00  8.7e+01
 
@@ -818,13 +818,6 @@ itn   =      13    condA = 8.7e+01
     normx = 2.3e+03
     13  3.86056e+02   1.551e+03  4.003e-05
    6.4e-01  7.2e-09   3.6e+00  8.7e+01
-</pre></div></div>
-</div>
-<div class="nboutput docutils container">
-<div class="prompt empty docutils container">
-</div>
-<div class="output_area docutils container">
-<div class="highlight"><pre>
 
 LSMR            Least-squares solution of  Ax = b
 
@@ -835,25 +828,22 @@ atol = 1.00e-08                 conlim = 1.00e+08
 
 btol = 1.00e-08             maxiter =   198676
 
+</pre></div></div>
+</div>
+<div class="nboutput docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
 
    itn      x(1)       norm r    norm Ar  compatible   LS      norm A   cond A
      0  0.00000e+00  1.001e+03  4.470e+02   1.0e+00  4.5e-04
      1  6.08847e-02  8.953e+02  4.167e+00   8.9e-01  4.7e-03  1.0e+00  1.0e+00
      2  2.15243e-01  8.953e+02  1.484e+00   8.9e-01  1.1e-03  1.5e+00  1.1e+00
      3  2.41447e-01  8.953e+02  6.412e-01   8.9e-01  4.0e-04  1.8e+00  1.4e+00
-</pre></div></div>
-</div>
-<div class="nboutput docutils container">
-<div class="prompt empty docutils container">
-</div>
-<div class="output_area docutils container">
-<div class="highlight"><pre>
      4  2.88004e-01  8.953e+02  6.266e-03   8.9e-01  3.1e-06  2.2e+00  1.3e+00
      5  2.87319e-01  8.953e+02  2.921e-03   8.9e-01  1.4e-06  2.4e+00  1.4e+00
      6  2.87000e-01  8.953e+02  9.868e-04   8.9e-01  4.2e-07  2.6e+00  1.4e+00
-     7  2.87108e-01  8.953e+02  9.866e-04   8.9e-01  4.2e-07  2.6e+00  6.2e+01
-     8  2.87255e-01  8.953e+02  9.866e-04   8.9e-01  3.9e-07  2.9e+00  1.3e+02
-     9  3.62098e-01  8.953e+02  9.857e-04   8.9e-01  3.7e-07  3.0e+00  7.2e+02
 </pre></div></div>
 </div>
 <div class="nboutput docutils container">
@@ -861,6 +851,9 @@ btol = 1.00e-08             maxiter =   198676
 </div>
 <div class="output_area docutils container">
 <div class="highlight"><pre>
+     7  2.87108e-01  8.953e+02  9.866e-04   8.9e-01  4.2e-07  2.6e+00  6.2e+01
+     8  2.87255e-01  8.953e+02  9.866e-04   8.9e-01  3.9e-07  2.9e+00  1.3e+02
+     9  3.62098e-01  8.953e+02  9.857e-04   8.9e-01  3.7e-07  3.0e+00  7.2e+02
     10  9.04265e-01  8.953e+02  9.789e-04   8.9e-01  3.4e-07  3.2e+00  3.1e+01
     12  3.99381e+01  8.953e+02  2.309e-05   8.9e-01  7.4e-09  3.5e+00  3.1e+01
 
@@ -872,6 +865,13 @@ itn   =      12    condA = 3.1e+01
     normx = 6.0e+02
     12  3.99381e+01   8.953e+02  2.309e-05
    8.9e-01  7.4e-09   3.5e+00  3.1e+01
+</pre></div></div>
+</div>
+<div class="nboutput docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
 
 LSMR            Least-squares solution of  Ax = b
 
@@ -882,13 +882,6 @@ atol = 1.00e-08                 conlim = 1.00e+08
 
 btol = 1.00e-08             maxiter =   198676
 
-</pre></div></div>
-</div>
-<div class="nboutput docutils container">
-<div class="prompt empty docutils container">
-</div>
-<div class="output_area docutils container">
-<div class="highlight"><pre>
 
    itn      x(1)       norm r    norm Ar  compatible   LS      norm A   cond A
      0  0.00000e+00  1.000e+03  4.472e+02   1.0e+00  4.5e-04
@@ -896,6 +889,12 @@ btol = 1.00e-08             maxiter =   198676
      2 -7.45416e-01  8.946e+02  1.328e+00   8.9e-01  9.9e-04  1.5e+00  1.1e+00
      3 -8.34706e-01  8.946e+02  1.107e-01   8.9e-01  7.1e-05  1.7e+00  1.5e+00
      4 -8.41880e-01  8.946e+02  7.140e-03   8.9e-01  3.6e-06  2.2e+00  1.8e+00
+     5 -8.42126e-01  8.946e+02  4.176e-03   8.9e-01  2.0e-06  2.4e+00  1.8e+00
+     6 -8.41939e-01  8.946e+02  3.077e-03   8.9e-01  1.3e-06  2.6e+00  2.4e+00
+     7 -8.41643e-01  8.946e+02  3.077e-03   8.9e-01  1.3e-06  2.6e+00  1.9e+02
+     8 -8.40968e-01  8.946e+02  3.077e-03   8.9e-01  1.2e-06  2.9e+00  4.2e+02
+     9  5.02689e-01  8.946e+02  3.060e-03   8.9e-01  1.1e-06  3.0e+00  7.6e+02
+    10  1.66462e+01  8.946e+02  2.851e-03   8.9e-01  9.9e-07  3.2e+00  7.9e+01
 </pre></div></div>
 </div>
 <div class="nboutput nblast docutils container">
@@ -903,12 +902,6 @@ btol = 1.00e-08             maxiter =   198676
 </div>
 <div class="output_area docutils container">
 <div class="highlight"><pre>
-     5 -8.42126e-01  8.946e+02  4.176e-03   8.9e-01  2.0e-06  2.4e+00  1.8e+00
-     6 -8.41939e-01  8.946e+02  3.077e-03   8.9e-01  1.3e-06  2.6e+00  2.4e+00
-     7 -8.41643e-01  8.946e+02  3.077e-03   8.9e-01  1.3e-06  2.6e+00  1.9e+02
-     8 -8.40968e-01  8.946e+02  3.077e-03   8.9e-01  1.2e-06  2.9e+00  4.2e+02
-     9  5.02689e-01  8.946e+02  3.060e-03   8.9e-01  1.1e-06  3.0e+00  7.6e+02
-    10  1.66462e+01  8.946e+02  2.851e-03   8.9e-01  9.9e-07  3.2e+00  7.9e+01
     12  1.22889e+02  8.946e+02  2.454e-05   8.9e-01  7.8e-09  3.5e+00  7.9e+01
 
 LSMR finished
