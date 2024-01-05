@@ -1,7 +1,7 @@
-Verion 5.4
+Verison 5.4
 ----------
-- Compatability with NumPy 2
-- Compatability with recent pandas releases
+- Compatibility with NumPy 2
+- Compatibility with recent pandas releases
 
 Version 5.3
 -----------

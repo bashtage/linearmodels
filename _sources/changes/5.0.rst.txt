@@ -1,3 +1,8 @@
+Verison 5.4
+----------
+- Compatibility with NumPy 2
+- Compatibility with recent pandas releases
+
 Version 5.3
 -----------
 - Bumped the minimum formulaic to 0.6.5.
