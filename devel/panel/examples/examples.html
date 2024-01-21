@@ -15,7 +15,7 @@
     
   
       
-        <title>Examples - linearmodels 5.4</title>
+        <title>Examples - linearmodels v5.5 (+2)</title>
       
     
 
@@ -94,7 +94,7 @@
 
 <header class="md-header" data-md-component="header">
   <nav class="md-header__inner md-grid" aria-label="Header">
-    <a href="../../index.html" title="linearmodels 5.4" class="md-header__button md-logo" aria-label="linearmodels 5.4" data-md-component="logo">
+    <a href="../../index.html" title="linearmodels v5.5 (+2)" class="md-header__button md-logo" aria-label="linearmodels v5.5 (+2)" data-md-component="logo">
       <img src="../../_static/bw-logo.svg" alt="logo">
     </a>
     <label class="md-header__button md-icon" for="__drawer">
@@ -104,7 +104,7 @@
       <div class="md-header__ellipsis">
         <div class="md-header__topic">
           <span class="md-ellipsis">
-            linearmodels 5.4
+            linearmodels v5.5 (+2)
           </span>
         </div>
         <div class="md-header__topic" data-md-component="header-topic">
@@ -191,10 +191,10 @@
 
 <nav class="md-nav md-nav--primary" aria-label="Navigation" data-md-level="0">
   <label class="md-nav__title" for="__drawer">
-    <a href="../../index.html" title="linearmodels 5.4" class="md-nav__button md-logo" aria-label="linearmodels 5.4" data-md-component="logo">
+    <a href="../../index.html" title="linearmodels v5.5 (+2)" class="md-nav__button md-logo" aria-label="linearmodels v5.5 (+2)" data-md-component="logo">
       <img src="../../_static/bw-logo.svg" alt="logo">
     </a>
-    linearmodels 5.4
+    linearmodels v5.5 (+2)
   </label>
   
     <div class="md-nav__source">
@@ -951,6 +951,21 @@
 </code></pre></div>
 </div>
 </div>
+<div class="nboutput docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area stderr docutils container">
+<div class="highlight"><pre>
+/tmp/ipykernel_3265/2820712512.py:1: DeprecationWarning:
+Pyarrow will become a required dependency of pandas in the next major release of pandas (pandas 3.0),
+(to allow more performant data types, such as the Arrow string type, and better interoperability with other libraries)
+but was not found to be installed on your system.
+If this would cause problems for you,
+please provide us feedback at https://github.com/pandas-dev/pandas/issues/54466
+
+  import pandas as pd
+</pre></div></div>
+</div>
 <div class="nboutput nblast docutils container">
 <div class="prompt empty docutils container">
 </div>
@@ -1018,8 +1033,8 @@ nr year
 Dep. Variable:                  lwage   R-squared:                        0.1893
 Estimator:                  PooledOLS   R-squared (Between):              0.2066
 No. Observations:                4360   R-squared (Within):               0.1692
-Date:                Fri, Jan 05 2024   R-squared (Overall):              0.1893
-Time:                        08:25:59   Log-likelihood                   -2982.0
+Date:                Sun, Jan 21 2024   R-squared (Overall):              0.1893
+Time:                        16:22:34   Log-likelihood                   -2982.0
 Cov. Estimator:            Unadjusted
                                         F-statistic:                      72.459
 Entities:                         545   P-value                           0.0000
@@ -1083,8 +1098,8 @@ year.1987      0.1738     0.0494     3.5165     0.0004      0.0769      0.2707
 Dep. Variable:                  lwage   R-squared:                        0.1806
 Estimator:              RandomEffects   R-squared (Between):              0.1853
 No. Observations:                4360   R-squared (Within):               0.1799
-Date:                Fri, Jan 05 2024   R-squared (Overall):              0.1828
-Time:                        08:25:59   Log-likelihood                   -1622.5
+Date:                Sun, Jan 21 2024   R-squared (Overall):              0.1828
+Time:                        16:22:34   Log-likelihood                   -1622.5
 Cov. Estimator:            Unadjusted
                                         F-statistic:                      68.409
 Entities:                         545   P-value                           0.0000
@@ -1231,8 +1246,8 @@ Name: Variance Decomposition, dtype: float64
 Dep. Variable:                  lwage   R-squared:                        0.2155
 Estimator:                 BetweenOLS   R-squared (Between):              0.2155
 No. Observations:                 545   R-squared (Within):               0.1141
-Date:                Fri, Jan 05 2024   R-squared (Overall):              0.1686
-Time:                        08:25:59   Log-likelihood                   -194.54
+Date:                Sun, Jan 21 2024   R-squared (Overall):              0.1686
+Time:                        16:22:34   Log-likelihood                   -194.54
 Cov. Estimator:            Unadjusted
                                         F-statistic:                      24.633
 Entities:                         545   P-value                           0.0000
@@ -1281,7 +1296,7 @@ union          0.2587     0.0460     5.6214     0.0000      0.1683      0.3491
 </code></pre></div>
 </div>
 </div>
-<div class="nboutput docutils container">
+<div class="nboutput nblast docutils container">
 <div class="prompt empty docutils container">
 </div>
 <div class="output_area docutils container">
@@ -1291,8 +1306,8 @@ union          0.2587     0.0460     5.6214     0.0000      0.1683      0.3491
 Dep. Variable:                  lwage   R-squared:                        0.1806
 Estimator:                   PanelOLS   R-squared (Between):             -0.0052
 No. Observations:                4360   R-squared (Within):               0.1806
-Date:                Fri, Jan 05 2024   R-squared (Overall):              0.0807
-Time:                        08:26:00   Log-likelihood                   -1324.8
+Date:                Sun, Jan 21 2024   R-squared (Overall):              0.0807
+Time:                        16:22:34   Log-likelihood                   -1324.8
 Cov. Estimator:            Unadjusted
                                         F-statistic:                      83.851
 Entities:                         545   P-value                           0.0000
@@ -1329,14 +1344,6 @@ Distribution: F(544,3805)
 Included effects: Entity
 </pre></div></div>
 </div>
-<div class="nboutput nblast docutils container">
-<div class="prompt empty docutils container">
-</div>
-<div class="output_area docutils container">
-<div class="highlight"><pre>
-
-</pre></div></div>
-</div>
 <h3 id="Time-Effects">Time Effects<a class="headerlink" href="#Time-Effects" title="Link to this heading">¶</a></h3>
 <p>Time effect can be added using <code class="docutils literal notranslate"><span class="pre">time_effects=True</span></code>. Here the time dummies are removed. Note that the core coefficients are identical. The only change is in the test statistic for poolability since not the “effects” include both entity and time, whereas before only entity were included.</p>
 <h4 id="Effects-vs-Dummies">Effects vs Dummies<a class="headerlink" href="#Effects-vs-Dummies" title="Link to this heading">¶</a></h4>
@@ -1363,8 +1370,8 @@ Included effects: Entity
 Dep. Variable:                  lwage   R-squared:                        0.0216
 Estimator:                   PanelOLS   R-squared (Between):             -0.0052
 No. Observations:                4360   R-squared (Within):              -0.4809
-Date:                Fri, Jan 05 2024   R-squared (Overall):             -0.2253
-Time:                        08:26:00   Log-likelihood                   -1324.8
+Date:                Sun, Jan 21 2024   R-squared (Overall):             -0.2253
+Time:                        16:22:34   Log-likelihood                   -1324.8
 Cov. Estimator:            Unadjusted
                                         F-statistic:                      27.959
 Entities:                         545   P-value                           0.0000
@@ -1424,7 +1431,7 @@ estimator, effects count as lost degrees of freedom. When using entity effects a
 </code></pre></div>
 </div>
 </div>
-<div class="nboutput docutils container">
+<div class="nboutput nblast docutils container">
 <div class="prompt empty docutils container">
 </div>
 <div class="output_area docutils container">
@@ -1434,8 +1441,8 @@ estimator, effects count as lost degrees of freedom. When using entity effects a
 Dep. Variable:                  lwage   R-squared:                        0.0216
 Estimator:                   PanelOLS   R-squared (Between):             -0.0052
 No. Observations:                4360   R-squared (Within):              -0.4809
-Date:                Fri, Jan 05 2024   R-squared (Overall):             -0.2253
-Time:                        08:26:00   Log-likelihood                   -1324.8
+Date:                Sun, Jan 21 2024   R-squared (Overall):             -0.2253
+Time:                        16:22:35   Log-likelihood                   -1324.8
 Cov. Estimator:            Unadjusted
                                         F-statistic:                      27.959
 Entities:                         545   P-value                           0.0000
@@ -1468,14 +1475,6 @@ Other Effect Observations per group (Other Effect):
 Avg Obs: 545.00, Min Obs: 545.00, Max Obs: 545.00, Groups: 8
 </pre></div></div>
 </div>
-<div class="nboutput nblast docutils container">
-<div class="prompt empty docutils container">
-</div>
-<div class="output_area docutils container">
-<div class="highlight"><pre>
-
-</pre></div></div>
-</div>
 <h3 id="Using-first-differences">Using first differences<a class="headerlink" href="#Using-first-differences" title="Link to this heading">¶</a></h3>
 <p>First differencing is an alternative to using fixed effects when there might be correlation. When using first differences, time-invariant variables must be excluded. Additionally, only one linear time-trending variable can be included since this will look like a constant. This variable will soak up all time-trends in the data, and so interpretations of these variable can be challenging.</p>
 <div class="nbinput docutils container">
@@ -1502,8 +1501,8 @@ Avg Obs: 545.00, Min Obs: 545.00, Max Obs: 545.00, Groups: 8
 Dep. Variable:                  lwage   R-squared:                        0.0268
 Estimator:         FirstDifferenceOLS   R-squared (Between):              0.5491
 No. Observations:                3815   R-squared (Within):               0.1763
-Date:                Fri, Jan 05 2024   R-squared (Overall):              0.5328
-Time:                        08:26:00   Log-likelihood                   -2305.5
+Date:                Sun, Jan 21 2024   R-squared (Overall):              0.5328
+Time:                        16:22:35   Log-likelihood                   -2305.5
 Cov. Estimator:            Unadjusted
                                         F-statistic:                      26.208
 Entities:                         545   P-value                           0.0000
@@ -1539,7 +1538,7 @@ married        0.0381     0.0229     1.6633     0.0963     -0.0068      0.0831
 </code></pre></div>
 </div>
 </div>
-<div class="nboutput docutils container">
+<div class="nboutput nblast docutils container">
 <div class="prompt empty docutils container">
 </div>
 <div class="output_area docutils container">
@@ -1592,14 +1591,6 @@ year.1987                                   0.1348       0.1738
 ---------------------------------------------------------------
 
 T-stats reported in parentheses
-</pre></div></div>
-</div>
-<div class="nboutput nblast docutils container">
-<div class="prompt empty docutils container">
-</div>
-<div class="output_area docutils container">
-<div class="highlight"><pre>
-
 </pre></div></div>
 </div>
 <h2 id="Covariance-options">Covariance options<a class="headerlink" href="#Covariance-options" title="Link to this heading">¶</a></h2>
@@ -1727,8 +1718,8 @@ Name: count, dtype: int64
 Dep. Variable:                  lwage   R-squared:                        0.1866
 Estimator:                  PooledOLS   R-squared (Between):              0.2027
 No. Observations:                4360   R-squared (Within):               0.1679
-Date:                Fri, Jan 05 2024   R-squared (Overall):              0.1866
-Time:                        08:26:01   Log-likelihood                   -2989.2
+Date:                Sun, Jan 21 2024   R-squared (Overall):              0.1866
+Time:                        16:22:35   Log-likelihood                   -2989.2
 Cov. Estimator:             Clustered
                                         F-statistic:                      142.61
 Entities:                         545   P-value                           0.0000
