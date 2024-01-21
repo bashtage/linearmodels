@@ -58,12 +58,15 @@ jobs:
         python.version: '3.10'
         FORMULAIC: 1.0.1
         XXHASH: true
+        PYARROW: true
       python311_latest:
         python.version: '3.11'
         XXHASH: true
+        PYARROW: true
       python312_latest:
         python.version: '3.12'
         XXHASH: true
+        PYARROW: true
       python312_copy_on_write:
         python.version: '3.12'
         XXHASH: true
