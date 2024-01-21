@@ -349,7 +349,10 @@ def test_fitted_effects_residuals(both_data_types):
     assert_frame_similar(res.estimated_effects, expected)
 
     fitted_effects = res.fitted_values.values + res.estimated_effects.values
-    expected.iloc[:, 0] = mod.dependent.values2d - fitted_effects
+    idiosyncratic = pd.DataFrame(
+        mod.dependent.values2d - fitted_effects, index=expected.index
+    )
+    expected.iloc[:, 0] = idiosyncratic.iloc[:, 0]
     expected.columns = ["idiosyncratic"]
     assert_allclose(expected, res.idiosyncratic, atol=1e-8)
     assert_frame_similar(res.idiosyncratic, expected)
