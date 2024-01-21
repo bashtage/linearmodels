@@ -1257,7 +1257,8 @@ def test_fitted_effects_residuals(data, entity_eff, time_eff):
     assert_frame_similar(res.idiosyncratic, expected)
 
     fitted_error = res.fitted_values + res.idiosyncratic.values
-    expected.iloc[:, 0] = mod.dependent.values2d - fitted_error
+    estimated_effects = mod.dependent.values2d - fitted_error
+    expected.iloc[:, 0] = estimated_effects.iloc[:, 0]
     expected.columns = ["estimated_effects"]
     assert_allclose(res.estimated_effects, expected, atol=1e-8)
     assert_frame_similar(res.estimated_effects, expected)
