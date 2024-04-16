@@ -15,7 +15,7 @@
     
   
       
-        <title>Using formulas to specify models - linearmodels v5.5 (+4)</title>
+        <title>Using formulas to specify models - linearmodels v5.5 (+6)</title>
       
     
 
@@ -48,7 +48,7 @@
         <style>:root{--md-text-font:"Roboto";--md-code-font:"Roboto Mono"}</style>
       
     
-        <link rel="stylesheet" type="text/css" href="../../_static/sphinx_immaterial_theme.af531f03affe68837.min.css?v=2410bb73" />
+        <link rel="stylesheet" type="text/css" href="../../_static/sphinx_immaterial_theme.359ec555e2989f00f.min.css?v=b000af5c" />
         <link rel="stylesheet" type="text/css" href="../../_static/nbsphinx-code-cells.css" />
         <link rel="stylesheet" type="text/css" href="../../_static/css/small_fixes.css?v=34934119" />
     <script>__md_scope=new URL("../..",location),__md_hash=e=>[...e].reduce((e,_)=>(e<<5)-e+_.charCodeAt(0),0),__md_get=(e,_=localStorage,t=__md_scope)=>JSON.parse(_.getItem(t.pathname+"."+e)),__md_set=(e,_,t=localStorage,a=__md_scope)=>{try{t.setItem(a.pathname+"."+e,JSON.stringify(_))}catch(e){}}</script>
@@ -94,7 +94,7 @@
 
 <header class="md-header" data-md-component="header">
   <nav class="md-header__inner md-grid" aria-label="Header">
-    <a href="../../index.html" title="linearmodels v5.5 (+4)" class="md-header__button md-logo" aria-label="linearmodels v5.5 (+4)" data-md-component="logo">
+    <a href="../../index.html" title="linearmodels v5.5 (+6)" class="md-header__button md-logo" aria-label="linearmodels v5.5 (+6)" data-md-component="logo">
       <img src="../../_static/bw-logo.svg" alt="logo">
     </a>
     <label class="md-header__button md-icon" for="__drawer">
@@ -104,7 +104,7 @@
       <div class="md-header__ellipsis">
         <div class="md-header__topic">
           <span class="md-ellipsis">
-            linearmodels v5.5 (+4)
+            linearmodels v5.5 (+6)
           </span>
         </div>
         <div class="md-header__topic" data-md-component="header-topic">
@@ -191,10 +191,10 @@
 
 <nav class="md-nav md-nav--primary" aria-label="Navigation" data-md-level="0">
   <label class="md-nav__title" for="__drawer">
-    <a href="../../index.html" title="linearmodels v5.5 (+4)" class="md-nav__button md-logo" aria-label="linearmodels v5.5 (+4)" data-md-component="logo">
+    <a href="../../index.html" title="linearmodels v5.5 (+6)" class="md-nav__button md-logo" aria-label="linearmodels v5.5 (+6)" data-md-component="logo">
       <img src="../../_static/bw-logo.svg" alt="logo">
     </a>
-    linearmodels v5.5 (+4)
+    linearmodels v5.5 (+6)
   </label>
   
     <div class="md-nav__source">
@@ -736,7 +736,7 @@
 <li><p>Single formula separated using {}</p></li>
 </ul>
 <p>These examples use data on fringe benefits from F. Vella (1993), “A Simple Estimator for Simultaneous Models with Censored Endogenous Regressors” which appears in Wooldridge (2002). The model consists of two equations, one for hourly wage and the other for hourly benefits. The initial model uses the same regressors in both equations.</p>
-<div class="nbinput docutils container">
+<div class="nbinput nblast docutils container">
 <div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span><code>[1]:
 </code></pre></div>
 </div>
@@ -747,21 +747,6 @@
 <span class="n">data</span> <span class="o">=</span> <span class="n">fringe</span><span class="o">.</span><span class="n">load</span><span class="p">()</span>
 </code></pre></div>
 </div>
-</div>
-<div class="nboutput nblast docutils container">
-<div class="prompt empty docutils container">
-</div>
-<div class="output_area stderr docutils container">
-<div class="highlight"><pre>
-/tmp/ipykernel_2658/4073518346.py:2: DeprecationWarning:
-Pyarrow will become a required dependency of pandas in the next major release of pandas (pandas 3.0),
-(to allow more performant data types, such as the Arrow string type, and better interoperability with other libraries)
-but was not found to be installed on your system.
-If this would cause problems for you,
-please provide us feedback at https://github.com/pandas-dev/pandas/issues/54466
-
-  import pandas as pd
-</pre></div></div>
 </div>
 <h2 id="Dictionary">Dictionary<a class="headerlink" href="#Dictionary" title="Link to this heading">¶</a></h2>
 <p>The dictionary syntax is virtually identical to standard <a class="reference external" href="https://matthewwardrop.github.io/formulaic/">formulaic syntax</a> where each equation is specified in a key-value pair where the key is the equation label and the value is the formula. It is recommended to use an OrderedDict which will preserve equation order in results. Keys <strong>must</strong> be strings.</p>
@@ -800,8 +785,8 @@ please provide us feedback at https://github.com/pandas-dev/pandas/issues/54466
 Estimator:                        GLS   Overall R-squared:                   0.6951
 No. Equations.:                     2   McElroy&#39;s R-squared:                 0.2197
 No. Observations:                 616   Judge&#39;s (OLS) R-squared:             0.1873
-Date:                Sun, Jan 21 2024   Berndt&#39;s R-squared:                  0.3775
-Time:                        16:27:24   Dhrymes&#39;s R-squared:                 0.6950
+Date:                Tue, Apr 16 2024   Berndt&#39;s R-squared:                  0.3775
+Time:                        10:14:49   Dhrymes&#39;s R-squared:                 0.6950
                                         Cov. Estimator:                  unadjusted
                                         Num. Constraints:                      None
                 Equation: benefits, Dependent Variable: hrbens
@@ -858,8 +843,8 @@ Homoskedastic (Unadjusted) Covariance (Debiased: False, GLS: True)
 Estimator:                        GLS   Overall R-squared:                   0.6951
 No. Equations.:                     2   McElroy&#39;s R-squared:                 0.2197
 No. Observations:                 616   Judge&#39;s (OLS) R-squared:             0.1873
-Date:                Sun, Jan 21 2024   Berndt&#39;s R-squared:                  0.3775
-Time:                        16:27:24   Dhrymes&#39;s R-squared:                 0.6950
+Date:                Tue, Apr 16 2024   Berndt&#39;s R-squared:                  0.3775
+Time:                        10:14:49   Dhrymes&#39;s R-squared:                 0.6950
                                         Cov. Estimator:                  unadjusted
                                         Num. Constraints:                      None
                  Equation: hrbens, Dependent Variable: hrbens
@@ -949,35 +934,35 @@ Labeled
 <div class="highlight"><pre>
                            System GLS Estimation Summary
 ===================================================================================
-Estimator:                        GLS   Overall R-squared:                   0.6968
-No. Equations.:                     2   McElroy&#39;s R-squared:                 0.2214
-No. Observations:                 616   Judge&#39;s (OLS) R-squared:             0.1857
-Date:                Sun, Jan 21 2024   Berndt&#39;s R-squared:                  0.3349
-Time:                        16:27:24   Dhrymes&#39;s R-squared:                 0.6967
+Estimator:                        GLS   Overall R-squared:                   0.7373
+No. Equations.:                     2   McElroy&#39;s R-squared:                 0.2280
+No. Observations:                 616   Judge&#39;s (OLS) R-squared:             0.1795
+Date:                Tue, Apr 16 2024   Berndt&#39;s R-squared:                  0.1743
+Time:                        10:14:49   Dhrymes&#39;s R-squared:                 0.7373
                                         Cov. Estimator:                      robust
                                         Num. Constraints:                      None
                 Equation: benefits, Dependent Variable: hrbens
 ==============================================================================
             Parameter  Std. Err.     T-stat    P-value    Lower CI    Upper CI
 ------------------------------------------------------------------------------
-educ           0.0380     0.0047     8.0984     0.0000      0.0288      0.0472
-exper          0.0361     0.0055     6.6185     0.0000      0.0254      0.0468
-expersq       -0.0006     0.0001    -5.1816     0.0000     -0.0009     -0.0004
-union          0.3586     0.0497     7.2151     0.0000      0.2612      0.4560
-south         -0.2081     0.0562    -3.7056     0.0002     -0.3182     -0.0980
-nrtheast      -0.1515     0.0703    -2.1547     0.0312     -0.2894     -0.0137
-nrthcen       -0.2072     0.0575    -3.6056     0.0003     -0.3199     -0.0946
-male           0.2328     0.0472     4.9280     0.0000      0.1402      0.3253
+educ           0.0293     0.0044     6.6308     0.0000      0.0207      0.0380
+exper          0.0373     0.0056     6.6476     0.0000      0.0263      0.0482
+expersq       -0.0006     0.0001    -4.8139     0.0000     -0.0009     -0.0004
+union          0.2778     0.0493     5.6379     0.0000      0.1813      0.3744
+south         -0.1796     0.0550    -3.2655     0.0011     -0.2874     -0.0718
+nrtheast      -0.1425     0.0654    -2.1795     0.0293     -0.2707     -0.0144
+nrthcen       -0.1613     0.0576    -2.8032     0.0051     -0.2742     -0.0485
+male           0.3175     0.0462     6.8715     0.0000      0.2269      0.4080
                 Equation: earnings, Dependent Variable: hrearn
 ==============================================================================
             Parameter  Std. Err.     T-stat    P-value    Lower CI    Upper CI
 ------------------------------------------------------------------------------
-educ           0.3798     0.1156     3.2846     0.0010      0.1532      0.6064
-exper         -0.1297     0.2505    -0.5178     0.6046     -0.6207      0.3612
-expersq        0.0050     0.0065     0.7720     0.4401     -0.0077      0.0178
-nrtheast      -0.6592     0.6389    -1.0318     0.3022     -1.9113      0.5930
-married        0.6156     0.4083     1.5078     0.1316     -0.1846      1.4158
-male           1.8686     0.2652     7.0466     0.0000      1.3488      2.3883
+educ           0.3803     0.1059     3.5899     0.0003      0.1727      0.5879
+exper         -0.1426     0.2382    -0.5984     0.5496     -0.6095      0.3244
+expersq        0.0058     0.0062     0.9403     0.3471     -0.0063      0.0179
+nrtheast      -0.7671     0.5264    -1.4571     0.1451     -1.7988      0.2647
+married        0.5638     0.3899     1.4460     0.1482     -0.2004      1.3279
+male           1.9611     0.2853     6.8733     0.0000      1.4019      2.5204
 ==============================================================================
 
 Covariance Estimator:
