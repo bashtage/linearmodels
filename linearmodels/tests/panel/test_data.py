@@ -400,13 +400,13 @@ def test_dummies(mi_df):
     data = PanelData(mi_df)
     edummy = data.dummies()
     assert edummy.shape == (77, 11)
-    assert np.all(edummy.sum(0) == 7)
+    assert np.all(edummy.sum(axis=0) == 7)
     tdummy = data.dummies(group="time")
     assert tdummy.shape == (77, 7)
-    assert np.all(tdummy.sum(0) == 11)
+    assert np.all(tdummy.sum(axis=0) == 11)
     tdummy_drop = data.dummies(group="time", drop_first=True)
     assert tdummy_drop.shape == (77, 6)
-    assert np.all(tdummy.sum(0) == 11)
+    assert np.all(tdummy.sum(axis=0) == 11)
     with pytest.raises(ValueError):
         data.dummies("unknown")
 

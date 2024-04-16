@@ -3055,7 +3055,7 @@ class FamaMacBeth(_PanelModelBase):
         else:
             avg_adj_r2 = np.nan
         all_params = all_params.iloc[:, 1:-2]
-        params = np.asarray(all_params.mean(0).values[:, None], dtype=float)
+        params = np.asarray(all_params.mean(axis=0).values[:, None], dtype=float)
 
         wy = np.asarray(wy_df)
         wx = np.asarray(wx_df)

@@ -17,6 +17,5 @@ eval "$CMD"
 
 if [ "${PIP_PRE}" = true ]; then
   python -m pip uninstall -y numpy pandas scipy matplotlib statsmodels xarray
-  python -m pip install -i https://pypi.anaconda.org/scientific-python-nightly-wheels/simple numpy pandas scipy matplotlib xarray --upgrade --use-deprecated=legacy-resolver
-  python -m pip install git+https://github.com/statsmodels/statsmodels.git --upgrade --no-build-isolation -v
+  python -m pip install -i https://pypi.anaconda.org/scientific-python-nightly-wheels/simple numpy pandas scipy matplotlib xarray statsmodels --upgrade --use-deprecated=legacy-resolver
 fi

@@ -488,7 +488,7 @@ class PanelResults(_SummaryStr):
             )
         pred = self.model.predict(self.params, exog=exog, data=data, context=context)
         if not missing:
-            pred = pred.loc[pred.notnull().all(1)]
+            pred = pred.loc[pred.notnull().all(axis=1)]
         return pred
 
     def predict(
