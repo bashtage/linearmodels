@@ -2,15 +2,14 @@
 requires = [
   "setuptools>=61",
   "wheel",
-  "setuptools_scm[toml]>=7,<8",
-  "oldest-supported-numpy",
-  "numpy; python_version>='3.13'",
-  "cython>=0.29.34"
+  "setuptools_scm[toml]>=8,<9",
+  "numpy>=2.0.0rc1,<3",
+  "cython>=3.0.10,<4"
 ]
 build-backend = "setuptools.build_meta"
 
 [tool.black]
-target-version = ['py39', 'py310', 'py311']
+target-version = ['py39', 'py310', 'py311', 'py312']
 exclude = '''
 (
     \.egg
