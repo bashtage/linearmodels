@@ -125,9 +125,9 @@ def lsmr_annihilate(
         return empty_like(y)
     use_cache = use_cache and x_hash is not None
     regressor_hash = x_hash if x_hash is not None else ""
-    default_opts: dict[
-        str, bool | float | str | ArrayLike | None | dict[str, Any]
-    ] = dict(atol=1e-8, btol=1e-8, show=False)
+    default_opts: dict[str, bool | float | str | ArrayLike | None | dict[str, Any]] = (
+        dict(atol=1e-8, btol=1e-8, show=False)
+    )
     assert lsmr_options is not None
     default_opts.update(lsmr_options)
     resids = []
@@ -835,8 +835,9 @@ class AbsorbingLS:
     def _first_time_fit(
         self,
         use_cache: bool,
-        absorb_options: None
-        | (dict[str, bool | float | str | ArrayLike | None | dict[str, Any]]),
+        absorb_options: None | (
+            dict[str, bool | float | str | ArrayLike | None | dict[str, Any]]
+        ),
         method: str,
     ) -> None:
         weights = (
@@ -947,8 +948,9 @@ class AbsorbingLS:
         cov_type: str = "robust",
         debiased: bool = False,
         method: str = "auto",
-        absorb_options: None
-        | (dict[str, bool | float | str | ArrayLike | None | dict[str, Any]]) = None,
+        absorb_options: None | (
+            dict[str, bool | float | str | ArrayLike | None | dict[str, Any]]
+        ) = None,
         use_cache: bool = True,
         lsmr_options: dict[str, float | bool] | None = None,
         **cov_config: Any,

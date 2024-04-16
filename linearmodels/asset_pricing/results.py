@@ -1,6 +1,7 @@
 """
 Results for linear factor models
 """
+
 from __future__ import annotations
 
 from linearmodels.compat.statsmodels import Summary

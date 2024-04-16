@@ -254,7 +254,7 @@ class PanelData:
             raise TypeError("Only ndarrays, DataFrames or DataArrays are " "supported")
         if convert_dummies:
             self._frame = expand_categoricals(self._frame, drop_first)
-            self._frame = self._frame.astype(np.float64, copy=False)
+            self._frame = self._frame.astype(np.float64)
 
         time_index = Series(self.index.levels[1])
         if not (
@@ -519,32 +519,29 @@ class PanelData:
         return PanelData(current)
 
     @overload
-    def demean(
+    def demean(  # noqa: E704
         self,
         group: Literal["entity", "time", "both"],
         *,
         return_panel: Literal[False],
-    ) -> Float64Array:
-        ...
+    ) -> Float64Array: ...
 
     @overload
-    def demean(
+    def demean(  # noqa: E704
         self,
         group: Literal["entity", "time", "both"] = ...,
         weights: PanelData | None = ...,
         return_panel: Literal[True] = ...,
         low_memory: bool = ...,
-    ) -> PanelData:
-        ...
+    ) -> PanelData: ...
 
     @overload
-    def demean(
+    def demean(  # noqa: E704
         self,
         group: Literal["entity", "time", "both"],
         weights: PanelData | None,
         return_panel: Literal[False],
-    ) -> Float64Array:
-        ...
+    ) -> Float64Array: ...  # noqa: E704
 
     def demean(
         self,
@@ -757,7 +754,7 @@ class PanelData:
         cols = self.entities if group == "entity" else self.time
         # TODO: Incorrect typing in pandas-stubs not handling Hashable | None
         dummy_cols = [c for c in cols if c in dummies]
-        return dummies[dummy_cols].astype(np.float64, copy=False)  # type: ignore
+        return dummies[dummy_cols].astype(np.float64)  # type: ignore
 
 
 PanelDataLike = Union[PanelData, ArrayLike]
