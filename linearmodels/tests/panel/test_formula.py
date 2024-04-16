@@ -352,4 +352,4 @@ def test_escaped_variable_name():
     )
     mod = PanelOLS.from_formula("`var a` ~ 1", data=data)
     res = mod.fit()
-    assert_allclose(res.params, data.mean(0))
+    assert_allclose(res.params, data.mean(axis=0))
