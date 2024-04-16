@@ -79,6 +79,7 @@ class HomoskedasticCovariance:
     where df is ``extra_df`` and n-df is replace by n-df-k if ``debiased`` is
     ``True``.
     """
+
     ALLOWED_KWARGS: tuple[str, ...] = tuple()
     DEFAULT_KERNEL = "newey-west"
 
@@ -270,6 +271,7 @@ class ClusteredCovariance(HomoskedasticCovariance):
     where g is the number of distinct groups and n is the number of
     observations.
     """
+
     ALLOWED_KWARGS = ("clusters", "group_debias")
 
     def __init__(
@@ -400,6 +402,7 @@ class DriscollKraay(HomoskedasticCovariance):
     where df is ``extra_df`` and n-df is replace by n-df-k if ``debiased`` is
     ``True``. :math:`K(i, bw)` is the kernel weighting function.
     """
+
     ALLOWED_KWARGS = ("kernel", "bandwidth")
     # TODO: Test
 
@@ -517,6 +520,7 @@ class ACCovariance(HomoskedasticCovariance):
     where df is ``extra_df`` and n-df is replace by n-df-k if ``debiased`` is
     ``True``. :math:`K(i, bw)` is the kernel weighting function.
     """
+
     ALLOWED_KWARGS = ("kernel", "bandwidth")
     # TODO: Docstring
 

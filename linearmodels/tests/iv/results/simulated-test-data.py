@@ -12,6 +12,7 @@ Simulation designed to allow following models to be estimated:
 Will also test other configurations - small, covariance-estimators, constant
 
 """
+
 import numpy as np
 from numpy.random import multivariate_normal, seed
 import pandas as pd

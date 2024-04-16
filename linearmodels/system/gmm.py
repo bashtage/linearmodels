@@ -1,6 +1,7 @@
 """
 Covariance and weight estimation for GMM IV estimators
 """
+
 from __future__ import annotations
 
 from collections.abc import Sequence

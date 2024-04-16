@@ -48,6 +48,6 @@ if NP_GTE_121 and TYPE_CHECKING:
         np.ndarray[Any, np.dtype[np.floating[Any]]],  # pragma: no cover
     ]  # pragma: no cover
 else:
-    IntArray = (
-        Float64Array
-    ) = Int64Array = Int32Array = BoolArray = AnyArray = NumericArray = np.ndarray
+    IntArray = Float64Array = Int64Array = Int32Array = BoolArray = AnyArray = (
+        NumericArray
+    ) = np.ndarray

@@ -1,6 +1,7 @@
 """
 Results containers and post-estimation diagnostics for IV models
 """
+
 from __future__ import annotations
 
 from linearmodels.compat.statsmodels import Summary

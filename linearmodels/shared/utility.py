@@ -23,11 +23,9 @@ _VT_co = TypeVar("_VT_co", covariant=True)
 
 
 class SupportsKeysAndGetItem(Protocol[_KT, _VT_co]):
-    def keys(self) -> Iterable[_KT]:
-        ...
+    def keys(self) -> Iterable[_KT]: ...  # noqa: E704
 
-    def __getitem__(self, __k: _KT) -> _VT_co:
-        ...
+    def __getitem__(self, __k: _KT) -> _VT_co: ...  # noqa: E704
 
 
 def _new_attr_dict_(*args: Iterable[tuple[Any, Any]]) -> AttrDict:

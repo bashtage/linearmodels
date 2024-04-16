@@ -1,10 +1,9 @@
 from setuptools import Extension, find_namespace_packages, setup
 from setuptools.dist import Distribution
+from setuptools.errors import CCompilerError, ExecError, PlatformError
 
-from distutils.errors import CCompilerError, DistutilsExecError, DistutilsPlatformError
 import glob
 import os
-from typing import Dict
 
 try:
     from Cython.Build import cythonize
@@ -136,8 +135,8 @@ try:
     run_setup(binary=build_binary)
 except (
     CCompilerError,
-    DistutilsExecError,
-    DistutilsPlatformError,
+    ExecError,
+    PlatformError,
     OSError,
     ValueError,
     ImportError,

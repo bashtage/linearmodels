@@ -10,7 +10,6 @@
 import glob
 import hashlib
 import os
-from typing import Dict, List
 
 from packaging.version import parse
 

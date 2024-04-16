@@ -11,7 +11,10 @@ Henningsen, A., & Hamann, J. (2007). systemfit: A Package for Estimating
     Systems of Simultaneous Equations in R. Journal of Statistical Software,
     23(4), 1 - 40. doi:http://dx.doi.org/10.18637/jss.v023.i04
 """
+
 from __future__ import annotations
+
+from linearmodels.compat.formulaic import monkey_patch_materializers
 
 from collections.abc import Mapping, Sequence
 from functools import reduce
@@ -56,6 +59,9 @@ from linearmodels.system.results import GMMSystemResults, SystemResults
 from linearmodels.typing import ArrayLike, ArraySequence, Float64Array
 
 __all__ = ["SUR", "IV3SLS", "IVSystemGMM", "LinearConstraint"]
+
+# Monkey patch parsers if needed, remove once formulaic updated
+monkey_patch_materializers()
 
 UNKNOWN_EQ_TYPE = """
 Contents of each equation must be either a dictionary with keys "dependent"
@@ -877,8 +883,7 @@ class _SystemModelBase:
         constant: bool,
         total_ss: float,
         *,
-        weight_est: None
-        | (
+        weight_est: None | (
             HomoskedasticWeightMatrix | HeteroskedasticWeightMatrix | KernelWeightMatrix
         ) = None,
     ) -> AttrDict:
