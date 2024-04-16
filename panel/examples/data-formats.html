@@ -15,7 +15,7 @@
     
   
       
-        <title>Data Formats for Panel Data Analysis - linearmodels 5.4</title>
+        <title>Data Formats for Panel Data Analysis - linearmodels 6.0</title>
       
     
 
@@ -48,7 +48,7 @@
         <style>:root{--md-text-font:"Roboto";--md-code-font:"Roboto Mono"}</style>
       
     
-        <link rel="stylesheet" type="text/css" href="../../_static/sphinx_immaterial_theme.af531f03affe68837.min.css?v=2410bb73" />
+        <link rel="stylesheet" type="text/css" href="../../_static/sphinx_immaterial_theme.359ec555e2989f00f.min.css?v=b000af5c" />
         <link rel="stylesheet" type="text/css" href="../../_static/nbsphinx-code-cells.css" />
         <link rel="stylesheet" type="text/css" href="../../_static/css/small_fixes.css?v=34934119" />
     <script>__md_scope=new URL("../..",location),__md_hash=e=>[...e].reduce((e,_)=>(e<<5)-e+_.charCodeAt(0),0),__md_get=(e,_=localStorage,t=__md_scope)=>JSON.parse(_.getItem(t.pathname+"."+e)),__md_set=(e,_,t=localStorage,a=__md_scope)=>{try{t.setItem(a.pathname+"."+e,JSON.stringify(_))}catch(e){}}</script>
@@ -94,7 +94,7 @@
 
 <header class="md-header" data-md-component="header">
   <nav class="md-header__inner md-grid" aria-label="Header">
-    <a href="../../index.html" title="linearmodels 5.4" class="md-header__button md-logo" aria-label="linearmodels 5.4" data-md-component="logo">
+    <a href="../../index.html" title="linearmodels 6.0" class="md-header__button md-logo" aria-label="linearmodels 6.0" data-md-component="logo">
       <img src="../../_static/bw-logo.svg" alt="logo">
     </a>
     <label class="md-header__button md-icon" for="__drawer">
@@ -104,7 +104,7 @@
       <div class="md-header__ellipsis">
         <div class="md-header__topic">
           <span class="md-ellipsis">
-            linearmodels 5.4
+            linearmodels 6.0
           </span>
         </div>
         <div class="md-header__topic" data-md-component="header-topic">
@@ -191,10 +191,10 @@
 
 <nav class="md-nav md-nav--primary" aria-label="Navigation" data-md-level="0">
   <label class="md-nav__title" for="__drawer">
-    <a href="../../index.html" title="linearmodels 5.4" class="md-nav__button md-logo" aria-label="linearmodels 5.4" data-md-component="logo">
+    <a href="../../index.html" title="linearmodels 6.0" class="md-nav__button md-logo" aria-label="linearmodels 6.0" data-md-component="logo">
       <img src="../../_static/bw-logo.svg" alt="logo">
     </a>
-    linearmodels 5.4
+    linearmodels 6.0
   </label>
   
     <div class="md-nav__source">
@@ -757,8 +757,8 @@ fcode  year
 Dep. Variable:                 lscrap   R-squared:                        0.0528
 Estimator:                   PanelOLS   R-squared (Between):             -0.0379
 No. Observations:                 140   R-squared (Within):               0.0528
-Date:                Fri, Jan 05 2024   R-squared (Overall):             -0.0288
-Time:                        08:25:54   Log-likelihood                   -90.459
+Date:                Tue, Apr 16 2024   R-squared (Overall):             -0.0288
+Time:                        17:36:15   Log-likelihood                   -90.459
 Cov. Estimator:            Unadjusted
                                         F-statistic:                      5.0751
 Entities:                          48   P-value                           0.0267
@@ -790,7 +790,7 @@ Included effects: Entity
 </div>
 <div class="output_area stderr docutils container">
 <div class="highlight"><pre>
-/home/runner/work/linearmodels/linearmodels/linearmodels/panel/model.py:1214: MissingValueWarning:
+/home/runner/work/linearmodels/linearmodels/linearmodels/panel/model.py:1219: MissingValueWarning:
 Inputs contain missing values. Dropping rows with missing observations.
   super().__init__(dependent, exog, weights=weights, check_rank=check_rank)
 </pre></div></div>
@@ -834,8 +834,8 @@ Inputs contain missing values. Dropping rows with missing observations.
 Dep. Variable:                    Dep   R-squared:                        0.0528
 Estimator:                   PanelOLS   R-squared (Between):             -0.0379
 No. Observations:                 140   R-squared (Within):               0.0528
-Date:                Fri, Jan 05 2024   R-squared (Overall):             -0.0288
-Time:                        08:25:54   Log-likelihood                   -90.459
+Date:                Tue, Apr 16 2024   R-squared (Overall):             -0.0288
+Time:                        17:36:15   Log-likelihood                   -90.459
 Cov. Estimator:            Unadjusted
                                         F-statistic:                      5.0751
 Entities:                          48   P-value                           0.0267
@@ -867,7 +867,7 @@ Included effects: Entity
 </div>
 <div class="output_area stderr docutils container">
 <div class="highlight"><pre>
-/home/runner/work/linearmodels/linearmodels/linearmodels/panel/model.py:1214: MissingValueWarning:
+/home/runner/work/linearmodels/linearmodels/linearmodels/panel/model.py:1219: MissingValueWarning:
 Inputs contain missing values. Dropping rows with missing observations.
   super().__init__(dependent, exog, weights=weights, check_rank=check_rank)
 </pre></div></div>
@@ -890,25 +890,25 @@ Inputs contain missing values. Dropping rows with missing observations.
 </div>
 <div class="output_area docutils container">
 <div class="highlight"><pre>
-KeysView(&lt;xarray.Dataset&gt;
+KeysView(&lt;xarray.Dataset&gt; Size: 107kB
 Dimensions:   (fcode: 157, year: 3)
 Coordinates:
-  * fcode     (fcode) int64 410032 410440 410495 410500 ... 419482 419483 419486
-  * year      (year) int64 1987 1988 1989
+  * fcode     (fcode) int64 1kB 410032 410440 410495 ... 419482 419483 419486
+  * year      (year) int64 24B 1987 1988 1989
 Data variables: (12/28)
-    employ    (fcode, year) float64 100.0 131.0 123.0 12.0 ... 80.0 90.0 100.0
-    sales     (fcode, year) float64 4.7e+07 4.3e+07 4.9e+07 ... 8.5e+06 9.9e+06
-    avgsal    (fcode, year) float64 3.5e+04 3.7e+04 3.9e+04 ... 1.7e+04 1.8e+04
-    scrap     (fcode, year) float64 nan nan nan nan nan ... 30.0 nan nan nan
-    rework    (fcode, year) float64 nan nan nan nan nan ... nan nan nan nan nan
-    tothrs    (fcode, year) float64 12.0 8.0 8.0 12.0 12.0 ... 20.0 0.0 0.0 40.0
+    employ    (fcode, year) float64 4kB 100.0 131.0 123.0 ... 80.0 90.0 100.0
+    sales     (fcode, year) float64 4kB 4.7e+07 4.3e+07 ... 8.5e+06 9.9e+06
+    avgsal    (fcode, year) float64 4kB 3.5e+04 3.7e+04 ... 1.7e+04 1.8e+04
+    scrap     (fcode, year) float64 4kB nan nan nan nan nan ... 30.0 nan nan nan
+    rework    (fcode, year) float64 4kB nan nan nan nan nan ... nan nan nan nan
+    tothrs    (fcode, year) float64 4kB 12.0 8.0 8.0 12.0 ... 20.0 0.0 0.0 40.0
     ...        ...
-    clsales   (fcode, year) float64 nan -0.08895 0.1306 ... nan 0.1942 0.1525
-    lavgsal   (fcode, year) float64 10.46 10.52 10.57 9.259 ... 9.68 9.741 9.798
-    clavgsal  (fcode, year) float64 nan 0.05557 0.05264 ... nan 0.06063 0.05716
-    cgrant_1  (fcode, year) float64 nan 0.0 0.0 nan 0.0 ... 0.0 0.0 nan 0.0 0.0
-    chrsemp   (fcode, year) float64 nan -8.947 0.1986 nan ... 3.101 nan 0.0 36.0
-    clhrsemp  (fcode, year) float64 nan -1.165 0.04783 nan ... nan 0.0 3.611)
+    clsales   (fcode, year) float64 4kB nan -0.08895 0.1306 ... 0.1942 0.1525
+    lavgsal   (fcode, year) float64 4kB 10.46 10.52 10.57 ... 9.68 9.741 9.798
+    clavgsal  (fcode, year) float64 4kB nan 0.05557 0.05264 ... 0.06063 0.05716
+    cgrant_1  (fcode, year) float64 4kB nan 0.0 0.0 nan 0.0 ... 0.0 nan 0.0 0.0
+    chrsemp   (fcode, year) float64 4kB nan -8.947 0.1986 nan ... nan 0.0 36.0
+    clhrsemp  (fcode, year) float64 4kB nan -1.165 0.04783 nan ... nan 0.0 3.611)
 </pre></div></div>
 </div>
 <div class="nbinput docutils container">
@@ -923,16 +923,6 @@ Data variables: (12/28)
 <div class="nboutput docutils container">
 <div class="prompt empty docutils container">
 </div>
-<div class="output_area stderr docutils container">
-<div class="highlight"><pre>
-/home/runner/work/linearmodels/linearmodels/linearmodels/panel/model.py:1214: MissingValueWarning:
-Inputs contain missing values. Dropping rows with missing observations.
-  super().__init__(dependent, exog, weights=weights, check_rank=check_rank)
-</pre></div></div>
-</div>
-<div class="nboutput nblast docutils container">
-<div class="prompt empty docutils container">
-</div>
 <div class="output_area docutils container">
 <div class="highlight"><pre>
                           PanelOLS Estimation Summary
@@ -940,8 +930,8 @@ Inputs contain missing values. Dropping rows with missing observations.
 Dep. Variable:                    Dep   R-squared:                        0.0528
 Estimator:                   PanelOLS   R-squared (Between):             -0.0379
 No. Observations:                 140   R-squared (Within):               0.0528
-Date:                Fri, Jan 05 2024   R-squared (Overall):             -0.0288
-Time:                        08:25:54   Log-likelihood                   -90.459
+Date:                Tue, Apr 16 2024   R-squared (Overall):             -0.0288
+Time:                        17:36:15   Log-likelihood                   -90.459
 Cov. Estimator:            Unadjusted
                                         F-statistic:                      5.0751
 Entities:                          48   P-value                           0.0267
@@ -966,6 +956,16 @@ P-value: 0.0000
 Distribution: F(47,91)
 
 Included effects: Entity
+</pre></div></div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area stderr docutils container">
+<div class="highlight"><pre>
+/home/runner/work/linearmodels/linearmodels/linearmodels/panel/model.py:1219: MissingValueWarning:
+Inputs contain missing values. Dropping rows with missing observations.
+  super().__init__(dependent, exog, weights=weights, check_rank=check_rank)
 </pre></div></div>
 </div>
 <h2 id="Conversion-of-Categorical-and-Strings-to-Dummies">Conversion of Categorical and Strings to Dummies<a class="headerlink" href="#Conversion-of-Categorical-and-Strings-to-Dummies" title="Link to this heading">¶</a></h2>
@@ -1004,16 +1004,6 @@ Included effects: Entity
 <div class="nboutput docutils container">
 <div class="prompt empty docutils container">
 </div>
-<div class="output_area stderr docutils container">
-<div class="highlight"><pre>
-/home/runner/work/linearmodels/linearmodels/linearmodels/panel/model.py:1214: MissingValueWarning:
-Inputs contain missing values. Dropping rows with missing observations.
-  super().__init__(dependent, exog, weights=weights, check_rank=check_rank)
-</pre></div></div>
-</div>
-<div class="nboutput nblast docutils container">
-<div class="prompt empty docutils container">
-</div>
 <div class="output_area docutils container">
 <div class="highlight"><pre>
 Exogenous variables
@@ -1027,13 +1017,20 @@ fcode  year
 hrsemp      float64
 year_str     object
 dtype: object
+</pre></div></div>
+</div>
+<div class="nboutput docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
                           PanelOLS Estimation Summary
 ================================================================================
 Dep. Variable:                 lscrap   R-squared:                        0.1985
 Estimator:                   PanelOLS   R-squared (Between):             -0.1240
 No. Observations:                 140   R-squared (Within):               0.1985
-Date:                Fri, Jan 05 2024   R-squared (Overall):             -0.0934
-Time:                        08:25:54   Log-likelihood                   -78.765
+Date:                Tue, Apr 16 2024   R-squared (Overall):             -0.0934
+Time:                        17:36:15   Log-likelihood                   -78.765
 Cov. Estimator:            Unadjusted
                                         F-statistic:                      7.3496
 Entities:                          48   P-value                           0.0002
@@ -1062,6 +1059,16 @@ Distribution: F(47,89)
 Included effects: Entity
 </pre></div></div>
 </div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area stderr docutils container">
+<div class="highlight"><pre>
+/home/runner/work/linearmodels/linearmodels/linearmodels/panel/model.py:1219: MissingValueWarning:
+Inputs contain missing values. Dropping rows with missing observations.
+  super().__init__(dependent, exog, weights=weights, check_rank=check_rank)
+</pre></div></div>
+</div>
 <p>Using <code class="docutils literal notranslate"><span class="pre">categorical</span></code>s has the same effect.</p>
 <div class="nbinput docutils container">
 <div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span><code>[10]:
@@ -1083,12 +1090,12 @@ Included effects: Entity
 </div>
 <div class="output_area stderr docutils container">
 <div class="highlight"><pre>
-/home/runner/work/linearmodels/linearmodels/linearmodels/panel/model.py:1214: MissingValueWarning:
+/home/runner/work/linearmodels/linearmodels/linearmodels/panel/model.py:1219: MissingValueWarning:
 Inputs contain missing values. Dropping rows with missing observations.
   super().__init__(dependent, exog, weights=weights, check_rank=check_rank)
 </pre></div></div>
 </div>
-<div class="nboutput nblast docutils container">
+<div class="nboutput docutils container">
 <div class="prompt empty docutils container">
 </div>
 <div class="output_area docutils container">
@@ -1104,13 +1111,20 @@ fcode  year
 hrsemp       float64
 year_cat    category
 dtype: object
+</pre></div></div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
                           PanelOLS Estimation Summary
 ================================================================================
 Dep. Variable:                 lscrap   R-squared:                        0.1985
 Estimator:                   PanelOLS   R-squared (Between):             -0.1240
 No. Observations:                 140   R-squared (Within):               0.1985
-Date:                Fri, Jan 05 2024   R-squared (Overall):             -0.0934
-Time:                        08:25:54   Log-likelihood                   -78.765
+Date:                Tue, Apr 16 2024   R-squared (Overall):             -0.0934
+Time:                        17:36:15   Log-likelihood                   -78.765
 Cov. Estimator:            Unadjusted
                                         F-statistic:                      7.3496
 Entities:                          48   P-value                           0.0002

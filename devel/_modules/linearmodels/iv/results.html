@@ -15,7 +15,7 @@
     
   
       
-        <title>linearmodels.iv.results - linearmodels v5.5 (+9)</title>
+        <title>linearmodels.iv.results - linearmodels 6.0</title>
       
     
 
@@ -88,7 +88,7 @@
 
 <header class="md-header" data-md-component="header">
   <nav class="md-header__inner md-grid" aria-label="Header">
-    <a href="../../../index.html" title="linearmodels v5.5 (+9)" class="md-header__button md-logo" aria-label="linearmodels v5.5 (+9)" data-md-component="logo">
+    <a href="../../../index.html" title="linearmodels 6.0" class="md-header__button md-logo" aria-label="linearmodels 6.0" data-md-component="logo">
       <img src="../../../_static/bw-logo.svg" alt="logo">
     </a>
     <label class="md-header__button md-icon" for="__drawer">
@@ -98,7 +98,7 @@
       <div class="md-header__ellipsis">
         <div class="md-header__topic">
           <span class="md-ellipsis">
-            linearmodels v5.5 (+9)
+            linearmodels 6.0
           </span>
         </div>
         <div class="md-header__topic" data-md-component="header-topic">
@@ -185,10 +185,10 @@
 
 <nav class="md-nav md-nav--primary" aria-label="Navigation" data-md-level="0">
   <label class="md-nav__title" for="__drawer">
-    <a href="../../../index.html" title="linearmodels v5.5 (+9)" class="md-nav__button md-logo" aria-label="linearmodels v5.5 (+9)" data-md-component="logo">
+    <a href="../../../index.html" title="linearmodels 6.0" class="md-nav__button md-logo" aria-label="linearmodels 6.0" data-md-component="logo">
       <img src="../../../_static/bw-logo.svg" alt="logo">
     </a>
-    linearmodels v5.5 (+9)
+    linearmodels 6.0
   </label>
   
     <div class="md-nav__source">
@@ -917,7 +917,7 @@
             <span class="p">)</span>
         <span class="n">pred</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">model</span><span class="o">.</span><span class="n">predict</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">params</span><span class="p">,</span> <span class="n">exog</span><span class="o">=</span><span class="n">exog</span><span class="p">,</span> <span class="n">endog</span><span class="o">=</span><span class="n">endog</span><span class="p">,</span> <span class="n">data</span><span class="o">=</span><span class="n">data</span><span class="p">)</span>
         <span class="k">if</span> <span class="ow">not</span> <span class="n">missing</span><span class="p">:</span>
-            <span class="n">pred</span> <span class="o">=</span> <span class="n">pred</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span><span class="n">pred</span><span class="o">.</span><span class="n">notnull</span><span class="p">()</span><span class="o">.</span><span class="n">all</span><span class="p">(</span><span class="mi">1</span><span class="p">)]</span>
+            <span class="n">pred</span> <span class="o">=</span> <span class="n">pred</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span><span class="n">pred</span><span class="o">.</span><span class="n">notnull</span><span class="p">()</span><span class="o">.</span><span class="n">all</span><span class="p">(</span><span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">)]</span>
         <span class="k">return</span> <span class="n">pred</span>
 
 <div class="viewcode-block" id="OLSResults.predict">
