@@ -8,6 +8,7 @@ import warnings
 from numpy import (
     any as npany,
     arange,
+    array,
     asarray,
     ascontiguousarray,
     average,
@@ -144,7 +145,7 @@ def lsmr_annihilate(
             resid = _VARIABLE_CACHE[regressor_hash][variable_digest]
         else:
             beta = lsmr(x, _y, **default_opts)[0]
-            resid = y[:, i : i + 1] - (x.dot(sp.csc_matrix(beta[:, None]))).A
+            resid = y[:, i : i + 1] - (x.dot(sp.csc_matrix(beta[:, None]))).toarray()
             _VARIABLE_CACHE[regressor_hash][variable_digest] = resid
         resids.append(resid)
     return column_stack(resids)

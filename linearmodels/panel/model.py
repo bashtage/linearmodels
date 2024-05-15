@@ -1483,8 +1483,8 @@ class PanelOLS(_PanelModelBase):
 
         # Purge fitted, weighted values
         sp_cond = diags(cond, format="csc")
-        wx = wx - (wd @ sp_cond @ wx_mean).A
-        wy = wy - (wd @ sp_cond @ wy_mean).A
+        wx = wx - (wd @ sp_cond @ wx_mean).toarray()
+        wy = wy - (wd @ sp_cond @ wy_mean).toarray()
 
         if self.has_constant:
             wy += wy_gm
