@@ -15,7 +15,7 @@
     
   
       
-        <title>linearmodels.panel.model - linearmodels 6.0</title>
+        <title>linearmodels.panel.model - linearmodels v6.1 (+2)</title>
       
     
 
@@ -88,7 +88,7 @@
 
 <header class="md-header" data-md-component="header">
   <nav class="md-header__inner md-grid" aria-label="Header">
-    <a href="../../../index.html" title="linearmodels 6.0" class="md-header__button md-logo" aria-label="linearmodels 6.0" data-md-component="logo">
+    <a href="../../../index.html" title="linearmodels v6.1 (+2)" class="md-header__button md-logo" aria-label="linearmodels v6.1 (+2)" data-md-component="logo">
       <img src="../../../_static/bw-logo.svg" alt="logo">
     </a>
     <label class="md-header__button md-icon" for="__drawer">
@@ -98,7 +98,7 @@
       <div class="md-header__ellipsis">
         <div class="md-header__topic">
           <span class="md-ellipsis">
-            linearmodels 6.0
+            linearmodels v6.1 (+2)
           </span>
         </div>
         <div class="md-header__topic" data-md-component="header-topic">
@@ -185,10 +185,10 @@
 
 <nav class="md-nav md-nav--primary" aria-label="Navigation" data-md-level="0">
   <label class="md-nav__title" for="__drawer">
-    <a href="../../../index.html" title="linearmodels 6.0" class="md-nav__button md-logo" aria-label="linearmodels 6.0" data-md-component="logo">
+    <a href="../../../index.html" title="linearmodels v6.1 (+2)" class="md-nav__button md-logo" aria-label="linearmodels v6.1 (+2)" data-md-component="logo">
       <img src="../../../_static/bw-logo.svg" alt="logo">
     </a>
-    linearmodels 6.0
+    linearmodels v6.1 (+2)
   </label>
   
     <div class="md-nav__source">
@@ -1899,8 +1899,8 @@
 
         <span class="c1"># Purge fitted, weighted values</span>
         <span class="n">sp_cond</span> <span class="o">=</span> <span class="n">diags</span><span class="p">(</span><span class="n">cond</span><span class="p">,</span> <span class="nb">format</span><span class="o">=</span><span class="s2">&quot;csc&quot;</span><span class="p">)</span>
-        <span class="n">wx</span> <span class="o">=</span> <span class="n">wx</span> <span class="o">-</span> <span class="p">(</span><span class="n">wd</span> <span class="o">@</span> <span class="n">sp_cond</span> <span class="o">@</span> <span class="n">wx_mean</span><span class="p">)</span><span class="o">.</span><span class="n">A</span>
-        <span class="n">wy</span> <span class="o">=</span> <span class="n">wy</span> <span class="o">-</span> <span class="p">(</span><span class="n">wd</span> <span class="o">@</span> <span class="n">sp_cond</span> <span class="o">@</span> <span class="n">wy_mean</span><span class="p">)</span><span class="o">.</span><span class="n">A</span>
+        <span class="n">wx</span> <span class="o">=</span> <span class="n">wx</span> <span class="o">-</span> <span class="p">(</span><span class="n">wd</span> <span class="o">@</span> <span class="n">sp_cond</span> <span class="o">@</span> <span class="n">wx_mean</span><span class="p">)</span><span class="o">.</span><span class="n">toarray</span><span class="p">()</span>
+        <span class="n">wy</span> <span class="o">=</span> <span class="n">wy</span> <span class="o">-</span> <span class="p">(</span><span class="n">wd</span> <span class="o">@</span> <span class="n">sp_cond</span> <span class="o">@</span> <span class="n">wy_mean</span><span class="p">)</span><span class="o">.</span><span class="n">toarray</span><span class="p">()</span>
 
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">has_constant</span><span class="p">:</span>
             <span class="n">wy</span> <span class="o">+=</span> <span class="n">wy_gm</span>
@@ -3666,7 +3666,7 @@
   
     Created using
     <a href="https://www.sphinx-doc.org/" target="_blank" rel="noopener">Sphinx</a>
-    7.2.6.
+    7.3.7.
      and
     <a href="https://github.com/jbms/sphinx-immaterial/" target="_blank" rel="noopener">Sphinx-Immaterial</a>
   
