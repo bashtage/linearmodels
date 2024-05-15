@@ -361,13 +361,13 @@ def test_category_product_not_cat(random_gen):
 
 def test_category_interaction():
     c = pd.Series(pd.Categorical([0, 0, 0, 1, 1, 1]))
-    actual = category_interaction(c, precondition=False).A
+    actual = category_interaction(c, precondition=False).toarray()
     expected = np.zeros((6, 2))
     expected[:3, 0] = 1.0
     expected[3:, 1] = 1.0
     assert_allclose(actual, expected)
 
-    actual = category_interaction(c, precondition=True).A
+    actual = category_interaction(c, precondition=True).toarray()
     cond = np.sqrt((expected**2).sum(0))
     expected /= cond
     assert_allclose(actual, expected)
@@ -381,12 +381,12 @@ def test_category_continuous_interaction():
     expected[:3, 0] = v[:3]
     expected[3:, 1] = v[3:]
 
-    assert_allclose(actual.A, expected)
+    assert_allclose(actual.toarray(), expected)
 
     actual = category_continuous_interaction(c, v, precondition=True)
     cond = np.sqrt((expected**2).sum(0))
     expected /= cond
-    assert_allclose(actual.A, expected)
+    assert_allclose(actual.toarray(), expected)
 
 
 def test_category_continuous_interaction_interwoven():
@@ -396,7 +396,7 @@ def test_category_continuous_interaction_interwoven():
     expected = np.zeros((6, 2))
     expected[::2, 0] = v[::2]
     expected[1::2, 1] = v[1::2]
-    assert_allclose(actual.A, expected)
+    assert_allclose(actual.toarray(), expected)
 
 
 def test_interaction_cat_only(cat):
@@ -406,7 +406,7 @@ def test_interaction_cat_only(cat):
     expected = category_interaction(category_product(cat), precondition=False)
     actual = interact.sparse
     assert isinstance(actual, csc_matrix)
-    assert_allclose(expected.A, actual.A)
+    assert_allclose(expected.toarray(), actual.toarray())
 
 
 def test_interaction_cont_only(cont):
@@ -416,7 +416,7 @@ def test_interaction_cont_only(cont):
     expected = cont.to_numpy()
     actual = interact.sparse
     assert isinstance(actual, csc_matrix)
-    assert_allclose(expected, actual.A)
+    assert_allclose(expected, actual.toarray())
 
 
 def test_interaction_cat_cont(cat, cont):
@@ -424,7 +424,7 @@ def test_interaction_cat_cont(cat, cont):
     assert interact.nobs == cat.shape[0]
     assert_frame_equal(cat, interact.cat)
     assert_frame_equal(cont, interact.cont)
-    base = category_interaction(category_product(cat), precondition=False).A
+    base = category_interaction(category_product(cat), precondition=False).toarray()
     expected = []
     for i in range(cont.shape[1]):
         element = base.copy()
@@ -433,13 +433,13 @@ def test_interaction_cat_cont(cat, cont):
     expected = np.column_stack(expected)
     actual = interact.sparse
     assert isinstance(actual, csc_matrix)
-    assert_allclose(expected, interact.sparse.A)
+    assert_allclose(expected, interact.sparse.toarray())
 
 
 def test_interaction_from_frame(cat, cont):
     base = Interaction(cat=cat, cont=cont)
     interact = Interaction.from_frame(pd.concat([cat, cont], axis=1))
-    assert_allclose(base.sparse.A, interact.sparse.A)
+    assert_allclose(base.sparse.toarray(), interact.sparse.toarray())
 
 
 def test_interaction_cat_bad_nobs():
@@ -458,7 +458,7 @@ def test_empty_interaction():
 def test_interaction_cat_cont_convert(cat, cont):
     base = Interaction(cat, cont)
     interact = Interaction(cat.to_numpy(), cont)
-    assert_allclose(base.sparse.A, interact.sparse.A)
+    assert_allclose(base.sparse.toarray(), interact.sparse.toarray())
 
 
 def test_absorbing_regressors(cat, cont, interact, weights):
@@ -486,7 +486,7 @@ def test_absorbing_regressors(cat, cont, interact, weights):
     assert expected.shape == actual.shape
     assert_array_equal(expected.indptr, actual.indptr)
     assert_array_equal(expected.indices, actual.indices)
-    assert_allclose(expected.A, actual.A)
+    assert_allclose(expected.toarray(), actual.toarray())
     assert expected_rank == rank
 
 
@@ -532,11 +532,11 @@ def test_against_ols(ols_data):
         if ols_data.absorb.cat.shape[1] > 0:
             dummies = dummy_matrix(ols_data.absorb.cat, precondition=False)[0]
             assert isinstance(dummies, sp.csc_matrix)
-            absorb.append(dummies.A)
+            absorb.append(dummies.toarray())
         has_dummy = ols_data.absorb.cat.shape[1] > 0
     if ols_data.interactions is not None:
         for interact in ols_data.interactions:
-            absorb.append(interact.sparse.A)
+            absorb.append(interact.sparse.toarray())
     _x = ols_data.x
     if absorb:
         absorb = np.column_stack(absorb)

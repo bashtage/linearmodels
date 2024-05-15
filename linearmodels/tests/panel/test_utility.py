@@ -204,7 +204,7 @@ def test_preconditioner_sparse():
     val_cond, cond = preconditioner(values, copy=True)
     assert_allclose(np.sqrt((values.multiply(values)).sum(0).A1), cond)
     assert id(val_cond) != id(values)
-    assert_array_equal(orig.A, values.A)
+    assert_array_equal(orig.toarray(), values.toarray())
 
 
 def test_preconditioner_subclass():
