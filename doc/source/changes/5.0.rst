@@ -1,10 +1,10 @@
 Verison 5.5
-----------
+-----------
 - Full compatibility with NumPy 2, and NumPy 1.22.3+
 - Compatibility with future pandas releases (3.0.0)
 
 Verison 5.4
-----------
+-----------
 - Compatibility with NumPy 2
 - Compatibility with recent pandas releases
 
