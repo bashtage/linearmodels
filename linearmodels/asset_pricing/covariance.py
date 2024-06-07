@@ -13,7 +13,7 @@ from linearmodels.iv.covariance import (
     cov_kernel,
     kernel_optimal_bandwidth,
 )
-from linearmodels.typing import Float64Array
+import linearmodels.typing.data
 
 
 class _HACMixin:
@@ -61,7 +61,9 @@ class _HACMixin:
             if bandwidth < 0:
                 raise ValueError("bandwidth must be non-negative.")
 
-    def _kernel_cov(self, z: Float64Array) -> Float64Array:
+    def _kernel_cov(
+        self, z: linearmodels.typing.data.Float64Array
+    ) -> linearmodels.typing.data.Float64Array:
         nobs = z.shape[0]
         bw = self.bandwidth
         kernel = self._kernel
@@ -97,7 +99,7 @@ class HeteroskedasticCovariance:
 
     def __init__(
         self,
-        xe: Float64Array,
+        xe: linearmodels.typing.data.Float64Array,
         *,
         jacobian: numpy.ndarray | None = None,
         inv_jacobian: numpy.ndarray | None = None,
@@ -132,7 +134,7 @@ class HeteroskedasticCovariance:
         return {"type": self.__class__.__name__}
 
     @property
-    def s(self) -> Float64Array:
+    def s(self) -> linearmodels.typing.data.Float64Array:
         """
         Score/moment condition covariance
 
@@ -150,7 +152,7 @@ class HeteroskedasticCovariance:
         return (out + out.T) / 2
 
     @property
-    def jacobian(self) -> Float64Array:
+    def jacobian(self) -> linearmodels.typing.data.Float64Array:
         """The Jacobian"""
         if self._jac is None:
             assert self._inv_jac is not None
@@ -159,7 +161,7 @@ class HeteroskedasticCovariance:
         return self._jac
 
     @property
-    def inv_jacobian(self) -> Float64Array:
+    def inv_jacobian(self) -> linearmodels.typing.data.Float64Array:
         """Inverse Jacobian"""
         if self._inv_jac is None:
             assert self._jac is not None
@@ -173,7 +175,7 @@ class HeteroskedasticCovariance:
         return self._square
 
     @property
-    def cov(self) -> Float64Array:
+    def cov(self) -> linearmodels.typing.data.Float64Array:
         """
         Compute parameter covariance
 
@@ -230,7 +232,7 @@ class KernelCovariance(HeteroskedasticCovariance, _HACMixin):
 
     def __init__(
         self,
-        xe: Float64Array,
+        xe: linearmodels.typing.data.Float64Array,
         *,
         jacobian: numpy.ndarray | None = None,
         inv_jacobian: numpy.ndarray | None = None,
@@ -263,7 +265,7 @@ class KernelCovariance(HeteroskedasticCovariance, _HACMixin):
         return out
 
     @property
-    def s(self) -> Float64Array:
+    def s(self) -> linearmodels.typing.data.Float64Array:
         """
         Score/moment condition covariance
 
@@ -290,11 +292,15 @@ class HeteroskedasticWeight:
         Flag indicating to center the moments when computing the weights
     """
 
-    def __init__(self, moments: Float64Array, center: bool = True) -> None:
+    def __init__(
+        self, moments: linearmodels.typing.data.Float64Array, center: bool = True
+    ) -> None:
         self._moments = moments
         self._center = center
 
-    def w(self, moments: Float64Array) -> Float64Array:
+    def w(
+        self, moments: linearmodels.typing.data.Float64Array
+    ) -> linearmodels.typing.data.Float64Array:
         """
         Score/moment condition weighting matrix
 
@@ -336,7 +342,7 @@ class KernelWeight(HeteroskedasticWeight, _HACMixin):
 
     def __init__(
         self,
-        moments: Float64Array,
+        moments: linearmodels.typing.data.Float64Array,
         center: bool = True,
         kernel: str | None = None,
         bandwidth: float | None = None,
@@ -345,7 +351,9 @@ class KernelWeight(HeteroskedasticWeight, _HACMixin):
         _HACMixin.__init__(self, kernel, bandwidth)
         super().__init__(moments, center=center)
 
-    def w(self, moments: Float64Array) -> Float64Array:
+    def w(
+        self, moments: linearmodels.typing.data.Float64Array
+    ) -> linearmodels.typing.data.Float64Array:
         """
         Score/moment condition weighting matrix
 

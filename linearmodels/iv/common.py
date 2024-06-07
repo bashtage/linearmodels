@@ -4,10 +4,10 @@ from numpy import ix_, ptp, squeeze, where
 from numpy.linalg import inv
 
 from linearmodels.shared.hypotheses import InvalidTestStatistic, WaldTestStatistic
-from linearmodels.typing import Float64Array
+import linearmodels.typing.data
 
 
-def find_constant(x: Float64Array) -> int | None:
+def find_constant(x: linearmodels.typing.data.Float64Array) -> int | None:
     """
     Parameters
     ----------
@@ -27,8 +27,8 @@ def find_constant(x: Float64Array) -> int | None:
 
 
 def f_statistic(
-    params: Float64Array,
-    cov: Float64Array,
+    params: linearmodels.typing.data.Float64Array,
+    cov: linearmodels.typing.data.Float64Array,
     debiased: bool,
     resid_df: int,
     const_loc: int | None = None,

@@ -25,7 +25,7 @@ author = "Kevin Sheppard"
 nitpicky = True
 nitpick_ignore = []
 
-for line in open('nitpick-exceptions'):
+for line in open("nitpick-exceptions"):
     if line.strip() == "" or line.startswith("#"):
         continue
     dtype, target = line.split(None, 1)
@@ -421,3 +421,9 @@ numpydoc_xref_aliases = {
 
 autosummary_generate = True
 autoclass_content = "class"
+
+autodoc_type_aliases = {
+    "ArrayLike": "linearmodels.typing.data.ArrayLike",
+    "IntArray": "linearmodels.typing.data.IntArray",
+    "Float64Array": "linearmodels.typing.data.Float64Array",
+}

@@ -1,5 +1,6 @@
-py:class ArrayLike
+# py:class ArrayLike
 py:class IVDataLike
-py:class Float64Array
-py:class IntArray
+# py:class IntArray
+# py:class Float64Array
+
 

@@ -12,13 +12,15 @@ import pandas
 import pandas as pd
 from pandas.api.types import is_numeric_dtype, is_string_dtype
 
-from linearmodels.typing import AnyPandas, ArrayLike, NumericArray
+import linearmodels.typing.data
 
 dim_err = "{0} has too many dims.  Maximum is 2, actual is {1}"
 type_err = "Only ndarrays, DataArrays and Series and DataFrames are supported"
 
 
-def convert_columns(s: pd.Series, drop_first: bool) -> AnyPandas:
+def convert_columns(
+    s: pd.Series, drop_first: bool
+) -> linearmodels.typing.data.AnyPandas:
     if isinstance(s.dtype, pd.CategoricalDtype):
         out = pd.get_dummies(s, drop_first=drop_first)
         # TODO: Remove once pandas typing fixed
@@ -170,7 +172,7 @@ class IVData:
         return self._pandas
 
     @property
-    def ndarray(self) -> NumericArray:
+    def ndarray(self) -> linearmodels.typing.data.NumericArray:
         """ndarray view of data, always 2d"""
         return self._ndarray
 
@@ -203,11 +205,11 @@ class IVData:
     def isnull(self) -> pd.Series:
         return self._pandas.isnull().any(axis=1)
 
-    def drop(self, locs: ArrayLike) -> None:
+    def drop(self, locs: linearmodels.typing.data.ArrayLike) -> None:
         locs = np.asarray(locs)
         self._pandas = self.pandas.loc[~locs]
         self._ndarray = self._ndarray[~locs]
         self._row_labels = list(pd.Series(self._row_labels).loc[~locs])
 
 
-IVDataLike = Union[IVData, ArrayLike]
+IVDataLike = Union[IVData, linearmodels.typing.data.ArrayLike]

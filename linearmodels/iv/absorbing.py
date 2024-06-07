@@ -56,8 +56,7 @@ from linearmodels.panel.utility import (
 from linearmodels.shared.exceptions import missing_warning
 from linearmodels.shared.hypotheses import InvalidTestStatistic, WaldTestStatistic
 from linearmodels.shared.utility import DataFrameWrapper, SeriesWrapper
-from linearmodels.typing import AnyPandas, BoolArray, Float64Array
-from linearmodels.typing.data import ArrayLike
+import linearmodels.typing.data
 
 try:
     from xxhash import xxh64 as hash_func
@@ -85,11 +84,13 @@ def clear_cache() -> None:
 
 def lsmr_annihilate(
     x: sp.csc_matrix,
-    y: Float64Array,
+    y: linearmodels.typing.data.Float64Array,
     use_cache: bool = True,
     x_hash: Hashable | None = None,
-    **lsmr_options: bool | float | str | ArrayLike | None | dict[str, Any],
-) -> Float64Array:
+    **lsmr_options: (
+        bool | float | str | linearmodels.typing.data.ArrayLike | None | dict[str, Any]
+    ),
+) -> linearmodels.typing.data.Float64Array:
     r"""
     Removes projection of x on y from y
 
@@ -126,9 +127,10 @@ def lsmr_annihilate(
         return empty_like(y)
     use_cache = use_cache and x_hash is not None
     regressor_hash = x_hash if x_hash is not None else ""
-    default_opts: dict[str, bool | float | str | ArrayLike | None | dict[str, Any]] = (
-        dict(atol=1e-8, btol=1e-8, show=False)
-    )
+    default_opts: dict[
+        str,
+        bool | float | str | linearmodels.typing.data.ArrayLike | None | dict[str, Any],
+    ] = dict(atol=1e-8, btol=1e-8, show=False)
     assert lsmr_options is not None
     default_opts.update(lsmr_options)
     resids = []
@@ -151,7 +153,7 @@ def lsmr_annihilate(
     return column_stack(resids)
 
 
-def category_product(cats: AnyPandas) -> Series:
+def category_product(cats: linearmodels.typing.data.AnyPandas) -> Series:
     """
     Construct category from all combination of input categories
 
@@ -234,7 +236,9 @@ def category_interaction(
 
 
 def category_continuous_interaction(
-    cat: AnyPandas, cont: AnyPandas, precondition: bool = True
+    cat: linearmodels.typing.data.AnyPandas,
+    cont: linearmodels.typing.data.AnyPandas,
+    precondition: bool = True,
 ) -> sp.csc_matrix:
     """
     Parameters
@@ -312,8 +316,8 @@ class Interaction:
 
     def __init__(
         self,
-        cat: ArrayLike | None = None,
-        cont: ArrayLike | None = None,
+        cat: linearmodels.typing.data.ArrayLike | None = None,
+        cont: linearmodels.typing.data.ArrayLike | None = None,
         nobs: int | None = None,
     ) -> None:
         self._cat = cat
@@ -369,7 +373,7 @@ class Interaction:
     def isnull(self) -> Series:
         return self.cat.isnull().any(axis=1) | self.cont.isnull().any(axis=1)
 
-    def drop(self, locs: BoolArray) -> None:
+    def drop(self, locs: linearmodels.typing.data.BoolArray) -> None:
         self._cat_data.drop(locs)
         self._cont_data.drop(locs)
 
@@ -504,7 +508,7 @@ class AbsorbingRegressor:
         cat: DataFrame | None = None,
         cont: DataFrame | None = None,
         interactions: list[Interaction] | None = None,
-        weights: Float64Array | None = None,
+        weights: linearmodels.typing.data.Float64Array | None = None,
     ):
         self._cat = cat
         self._cont = cont
@@ -664,12 +668,12 @@ class AbsorbingLS:
 
     def __init__(
         self,
-        dependent: ArrayLike,
-        exog: ArrayLike | None = None,
+        dependent: linearmodels.typing.data.ArrayLike,
+        exog: linearmodels.typing.data.ArrayLike | None = None,
         *,
         absorb: InteractionVar | None = None,
         interactions: InteractionVar | Iterable[InteractionVar] | None = None,
-        weights: ArrayLike | None = None,
+        weights: linearmodels.typing.data.ArrayLike | None = None,
         drop_absorbed: bool = False,
     ) -> None:
         self._dependent = IVData(dependent, "dependent")
@@ -710,7 +714,7 @@ class AbsorbingLS:
         self._regressors: sp.csc_matrix | None = None
         self._regressors_hash: tuple[tuple[str, ...], ...] | None = None
 
-    def _drop_missing(self) -> BoolArray:
+    def _drop_missing(self) -> linearmodels.typing.data.BoolArray:
         missing = require(self.dependent.isnull.to_numpy(), requirements="W")
         missing |= self.exog.isnull.to_numpy()
         missing |= self._absorb_inter.cat.isnull().any(axis=1).to_numpy()
@@ -839,12 +843,22 @@ class AbsorbingLS:
         self,
         use_cache: bool,
         absorb_options: None | (
-            dict[str, bool | float | str | ArrayLike | None | dict[str, Any]]
+            dict[
+                str,
+                bool
+                | float
+                | str
+                | linearmodels.typing.data.ArrayLike
+                | None
+                | dict[str, Any],
+            ]
         ),
         method: str,
     ) -> None:
         weights = (
-            cast(Float64Array, self.weights.ndarray) if self._is_weighted else None
+            cast(linearmodels.typing.data.Float64Array, self.weights.ndarray)
+            if self._is_weighted
+            else None
         )
 
         use_hdfe = weights is None and method in ("auto", "hdfe")
@@ -873,7 +887,7 @@ class AbsorbingLS:
         self._constant_absorbed = self._has_constant_exog and areg_constant
 
         dep = self._dependent.ndarray
-        exog = cast(Float64Array, self._exog.ndarray)
+        exog = cast(linearmodels.typing.data.Float64Array, self._exog.ndarray)
 
         root_w = sqrt(self._weight_data.ndarray)
         dep = root_w * dep
@@ -952,7 +966,15 @@ class AbsorbingLS:
         debiased: bool = False,
         method: str = "auto",
         absorb_options: None | (
-            dict[str, bool | float | str | ArrayLike | None | dict[str, Any]]
+            dict[
+                str,
+                bool
+                | float
+                | str
+                | linearmodels.typing.data.ArrayLike
+                | None
+                | dict[str, Any],
+            ]
         ) = None,
         use_cache: bool = True,
         lsmr_options: dict[str, float | bool] | None = None,
@@ -1072,7 +1094,9 @@ class AbsorbingLS:
 
         return AbsorbingLSResults(results, self)
 
-    def resids(self, params: Float64Array) -> Float64Array:
+    def resids(
+        self, params: linearmodels.typing.data.Float64Array
+    ) -> linearmodels.typing.data.Float64Array:
         """
         Compute model residuals
 
@@ -1089,7 +1113,9 @@ class AbsorbingLS:
         resids = self.wresids(params)
         return resids / sqrt(self.weights.ndarray)
 
-    def wresids(self, params: Float64Array) -> Float64Array:
+    def wresids(
+        self, params: linearmodels.typing.data.Float64Array
+    ) -> linearmodels.typing.data.Float64Array:
         """
         Compute weighted model residuals
 
@@ -1116,16 +1142,21 @@ class AbsorbingLS:
         )
 
     def _f_statistic(
-        self, params: Float64Array, cov: Float64Array, debiased: bool
+        self,
+        params: linearmodels.typing.data.Float64Array,
+        cov: linearmodels.typing.data.Float64Array,
+        debiased: bool,
     ) -> WaldTestStatistic | InvalidTestStatistic:
-        const_loc = find_constant(cast(Float64Array, self._exog.ndarray))
+        const_loc = find_constant(
+            cast(linearmodels.typing.data.Float64Array, self._exog.ndarray)
+        )
         resid_df = self._nobs - self._num_params
 
         return f_statistic(params, cov, debiased, resid_df, const_loc)
 
     def _post_estimation(
         self,
-        params: Float64Array,
+        params: linearmodels.typing.data.Float64Array,
         cov_estimator: (
             HomoskedasticCovariance
             | HeteroskedasticCovariance
