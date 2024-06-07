@@ -6,12 +6,13 @@ from collections import defaultdict
 from typing import NamedTuple, TypeVar, cast
 
 import numpy as np
+import numpy.random
+import pandas
 from pandas import DataFrame, concat, date_range
 import scipy.sparse as sp
 
 from linearmodels.shared.utility import panel_to_frame
-from linearmodels.typing import BoolArray, Float64Array, IntArray
-from linearmodels.typing.data import ArrayLike
+import linearmodels.typing.data
 
 try:
     from linearmodels.panel._utility import _drop_singletons
@@ -51,13 +52,17 @@ Variables have been fully absorbed and have removed from the regression:
 
 SparseArray = TypeVar("SparseArray", sp.csc_matrix, sp.csr_matrix, sp.coo_matrix)
 SparseOrDense = TypeVar(
-    "SparseOrDense", Float64Array, sp.csc_matrix, sp.csr_matrix, sp.coo_matrix
+    "SparseOrDense",
+    linearmodels.typing.data.Float64Array,
+    sp.csc_matrix,
+    sp.csr_matrix,
+    sp.coo_matrix,
 )
 
 
 def preconditioner(
     d: SparseOrDense, *, copy: bool = False
-) -> tuple[SparseOrDense, Float64Array]:
+) -> tuple[SparseOrDense, linearmodels.typing.data.Float64Array]:
     """
     Parameters
     ----------
@@ -83,7 +88,7 @@ def preconditioner(
         d = np.asarray(d)
         if id(d) == d_id or copy:
             d = d.copy()
-        cond = cast(Float64Array, np.sqrt((d**2).sum(0)))
+        cond = cast(linearmodels.typing.data.Float64Array, np.sqrt((d**2).sum(0)))
         d /= cond
         if klass is not None:
             d = d.view(klass)
@@ -96,7 +101,7 @@ def preconditioner(
     elif copy:
         d = d.copy()
 
-    cond = cast(Float64Array, np.sqrt(d.multiply(d).sum(0)).A1)
+    cond = cast(linearmodels.typing.data.Float64Array, np.sqrt(d.multiply(d).sum(0)).A1)
     locs = np.zeros_like(d.indices)
     locs[d.indptr[1:-1]] = 1
     locs = np.cumsum(locs)
@@ -108,13 +113,19 @@ def preconditioner(
 
 
 def dummy_matrix(
-    cats: ArrayLike,
+    cats: linearmodels.typing.data.ArrayLike,
     *,
     output_format: str = "csc",
     drop: str = "first",
     drop_all: bool = False,
     precondition: bool = True,
-) -> tuple[sp.csc_matrix | sp.csr_matrix | sp.coo_matrix | Float64Array, Float64Array]:
+) -> tuple[
+    sp.csc_matrix
+    | sp.csr_matrix
+    | sp.coo_matrix
+    | linearmodels.typing.data.Float64Array,
+    linearmodels.typing.data.Float64Array,
+]:
     """
     Parameters
     ----------
@@ -206,7 +217,11 @@ def dummy_matrix(
     return out, cond
 
 
-def _remove_node(node: int, meta: IntArray, orig_dest: IntArray) -> tuple[int, int]:
+def _remove_node(
+    node: int,
+    meta: linearmodels.typing.data.IntArray,
+    orig_dest: linearmodels.typing.data.IntArray,
+) -> tuple[int, int]:
     """
     Parameters
     ----------
@@ -261,7 +276,10 @@ def _remove_node(node: int, meta: IntArray, orig_dest: IntArray) -> tuple[int, i
     return next_node, next_count
 
 
-def _py_drop_singletons(meta: IntArray, orig_dest: IntArray) -> None:
+def _py_drop_singletons(
+    meta: linearmodels.typing.data.IntArray,
+    orig_dest: linearmodels.typing.data.IntArray,
+) -> None:
     """
     Loop through the nodes and recursively drop singleton chains
 
@@ -286,7 +304,9 @@ if not HAS_CYTHON:
     _drop_singletons = _py_drop_singletons  # noqa: F811
 
 
-def in_2core_graph(cats: ArrayLike) -> BoolArray:
+def in_2core_graph(
+    cats: linearmodels.typing.data.ArrayLike,
+) -> linearmodels.typing.data.BoolArray:
     """
     Parameters
     ----------
@@ -337,7 +357,7 @@ def in_2core_graph(cats: ArrayLike) -> BoolArray:
     node_id, count = np.unique(orig_dest[:, 0], return_counts=True)
     offset = np.r_[0, np.where(np.diff(orig_dest[:, 0]) != 0)[0] + 1]
 
-    def min_dtype(*args: IntArray) -> str:
+    def min_dtype(*args: linearmodels.typing.data.IntArray) -> str:
         bits = np.amax([np.log2(max(float(arg.max()), 1.0)) for arg in args])
         return f"int{min(j for j in (8, 16, 32, 64) if bits < (j - 1))}"
 
@@ -358,7 +378,9 @@ def in_2core_graph(cats: ArrayLike) -> BoolArray:
     return retain
 
 
-def in_2core_graph_slow(cats: ArrayLike) -> BoolArray:
+def in_2core_graph_slow(
+    cats: linearmodels.typing.data.ArrayLike,
+) -> linearmodels.typing.data.BoolArray:
     """
     Parameters
     ----------
@@ -398,9 +420,9 @@ def in_2core_graph_slow(cats: ArrayLike) -> BoolArray:
 
 
 def check_absorbed(
-    x: Float64Array,
+    x: linearmodels.typing.data.Float64Array,
     variables: list[str] | tuple[str, ...],
-    x_orig: Float64Array | None = None,
+    x_orig: linearmodels.typing.data.Float64Array | None = None,
 ) -> None:
     """
     Check a regressor matrix for variables absorbed
@@ -447,7 +469,9 @@ def check_absorbed(
 
 
 def not_absorbed(
-    x: Float64Array, has_constant: bool = False, loc: int | None = None
+    x: linearmodels.typing.data.Float64Array,
+    has_constant: bool = False,
+    loc: int | None = None,
 ) -> list[int]:
     """
     Construct a list of the indices of regressors that are not absorbed
@@ -513,10 +537,10 @@ class PanelModelData(NamedTuple):
         DataFrame containing cluster ids.
     """
 
-    data: DataFrame
-    weights: DataFrame
-    other_effects: DataFrame
-    clusters: DataFrame
+    data: pandas.DataFrame
+    weights: pandas.DataFrame
+    other_effects: pandas.DataFrame
+    clusters: pandas.DataFrame
 
 
 def generate_panel_data(
@@ -527,7 +551,7 @@ def generate_panel_data(
     missing: float = 0,
     other_effects: int = 2,
     ncats: int | list[int] = 4,
-    rng: np.random.RandomState | None = None,
+    rng: numpy.random.RandomState | None = None,
 ) -> PanelModelData:
     """
     Simulate panel data for testing
@@ -583,14 +607,14 @@ def generate_panel_data(
     k += int(const)
     x = rng.standard_normal((k, t, n))
     beta = np.arange(1, k + 1)[:, None, None] / k
-    y: Float64Array = (
+    y: linearmodels.typing.data.Float64Array = (
         (x * beta).sum(0)
         + rng.standard_normal((t, n))
         + 2 * rng.standard_normal((1, n))
     )
 
     w = rng.chisquare(5, (t, n)) / 5
-    c: IntArray | None = None
+    c: linearmodels.typing.data.IntArray | None = None
     cats = [f"cat.{i}" for i in range(other_effects)]
     if other_effects:
         if not isinstance(ncats, list):

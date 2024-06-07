@@ -26,6 +26,7 @@ from numpy import (
     squeeze,
 )
 from numpy.linalg import eigvalsh, inv, matrix_rank, pinv
+import pandas
 from pandas import DataFrame, Series, concat
 from scipy.optimize import minimize
 
@@ -50,13 +51,8 @@ from linearmodels.shared.exceptions import IndexWarning, missing_warning
 from linearmodels.shared.hypotheses import InvalidTestStatistic, WaldTestStatistic
 from linearmodels.shared.linalg import has_constant, inv_sqrth
 from linearmodels.shared.utility import DataFrameWrapper, SeriesWrapper
-from linearmodels.typing import (
-    ArrayLike,
-    BoolArray,
-    Float64Array,
-    Numeric,
-    OptionalNumeric,
-)
+import linearmodels.typing
+import linearmodels.typing.data
 
 IVResultType = type[Union[IVResults, IVGMMResults, OLSResults]]
 
@@ -171,8 +167,8 @@ class _IVModelBase:
         instruments: IVDataLike | None,
         *,
         weights: IVDataLike | None = None,
-        fuller: Numeric = 0,
-        kappa: OptionalNumeric = None,
+        fuller: linearmodels.typing.Numeric = 0,
+        kappa: linearmodels.typing.OptionalNumeric = None,
     ):
         self.dependent = IVData(dependent, var_name="dependent")
         nobs: int = self.dependent.shape[0]
@@ -239,11 +235,11 @@ class _IVModelBase:
 
     def predict(
         self,
-        params: ArrayLike,
+        params: linearmodels.typing.data.ArrayLike,
         *,
         exog: IVDataLike | None = None,
         endog: IVDataLike | None = None,
-        data: DataFrame | None = None,
+        data: pandas.DataFrame | None = None,
         eval_env: int = 4,
     ) -> DataFrame:
         """
@@ -349,10 +345,11 @@ class _IVModelBase:
             )
         self._has_constant, self._const_loc = has_constant(x)
 
-    def _drop_missing(self) -> BoolArray:
+    def _drop_missing(self) -> linearmodels.typing.data.BoolArray:
         data = (self.dependent, self.exog, self.endog, self.instruments, self.weights)
         missing = cast(
-            BoolArray, npany(column_stack([dh.isnull for dh in data]), axis=1)
+            linearmodels.typing.data.BoolArray,
+            npany(column_stack([dh.isnull for dh in data]), axis=1),
         )
         if npany(missing):
             if npall(missing):
@@ -369,7 +366,9 @@ class _IVModelBase:
         missing_warning(missing, stacklevel=4)
         return missing
 
-    def wresids(self, params: Float64Array) -> Float64Array:
+    def wresids(
+        self, params: linearmodels.typing.data.Float64Array
+    ) -> linearmodels.typing.data.Float64Array:
         """
         Compute weighted model residuals
 
@@ -390,7 +389,9 @@ class _IVModelBase:
         """
         return self._wy - self._wx @ params
 
-    def resids(self, params: Float64Array) -> Float64Array:
+    def resids(
+        self, params: linearmodels.typing.data.Float64Array
+    ) -> linearmodels.typing.data.Float64Array:
         """
         Compute model residuals
 
@@ -412,24 +413,30 @@ class _IVModelBase:
         return self._has_constant
 
     @property
-    def isnull(self) -> BoolArray:
+    def isnull(self) -> linearmodels.typing.data.BoolArray:
         """Locations of observations with missing values"""
         return self._drop_locs
 
     @property
-    def notnull(self) -> BoolArray:
+    def notnull(self) -> linearmodels.typing.data.BoolArray:
         """Locations of observations included in estimation"""
-        return cast(BoolArray, logical_not(self._drop_locs))
+        return cast(linearmodels.typing.data.BoolArray, logical_not(self._drop_locs))
 
     def _f_statistic(
-        self, params: Float64Array, cov: Float64Array, debiased: bool
+        self,
+        params: linearmodels.typing.data.Float64Array,
+        cov: linearmodels.typing.data.Float64Array,
+        debiased: bool,
     ) -> WaldTestStatistic | InvalidTestStatistic:
         const_loc = find_constant(self._x)
         nobs, nvar = self._x.shape
         return f_statistic(params, cov, debiased, nobs - nvar, const_loc)
 
     def _post_estimation(
-        self, params: Float64Array, cov_estimator: CovarianceEstimator, cov_type: str
+        self,
+        params: linearmodels.typing.data.Float64Array,
+        cov_estimator: CovarianceEstimator,
+        cov_type: str,
     ) -> dict[str, Any]:
         columns = self._columns
         index = self._index
@@ -544,8 +551,8 @@ class _IVLSModelBase(_IVModelBase):
         instruments: IVDataLike | None,
         *,
         weights: IVDataLike | None = None,
-        fuller: Numeric = 0,
-        kappa: OptionalNumeric = None,
+        fuller: linearmodels.typing.Numeric = 0,
+        kappa: linearmodels.typing.OptionalNumeric = None,
     ):
         super().__init__(
             dependent,
@@ -559,8 +566,11 @@ class _IVLSModelBase(_IVModelBase):
 
     @staticmethod
     def estimate_parameters(
-        x: Float64Array, y: Float64Array, z: Float64Array, kappa: Numeric
-    ) -> Float64Array:
+        x: linearmodels.typing.data.Float64Array,
+        y: linearmodels.typing.data.Float64Array,
+        z: linearmodels.typing.data.Float64Array,
+        kappa: linearmodels.typing.Numeric,
+    ) -> linearmodels.typing.data.Float64Array:
         """
         Parameter estimation without error checking
 
@@ -760,8 +770,8 @@ class IVLIML(_IVLSModelBase):
         instruments: IVDataLike | None,
         *,
         weights: IVDataLike | None = None,
-        fuller: Numeric = 0,
-        kappa: OptionalNumeric = None,
+        fuller: linearmodels.typing.Numeric = 0,
+        kappa: linearmodels.typing.OptionalNumeric = None,
     ):
         super().__init__(
             dependent,
@@ -776,11 +786,11 @@ class IVLIML(_IVLSModelBase):
     @staticmethod
     def from_formula(
         formula: str,
-        data: DataFrame,
+        data: pandas.DataFrame,
         *,
         weights: IVDataLike | None = None,
         fuller: float = 0,
-        kappa: OptionalNumeric = None,
+        kappa: linearmodels.typing.OptionalNumeric = None,
     ) -> IVLIML:
         """
         Parameters
@@ -889,7 +899,7 @@ class IV2SLS(_IVLSModelBase):
 
     @staticmethod
     def from_formula(
-        formula: str, data: DataFrame, *, weights: IVDataLike | None = None
+        formula: str, data: pandas.DataFrame, *, weights: IVDataLike | None = None
     ) -> IV2SLS:
         """
         Parameters
@@ -1006,7 +1016,10 @@ class _IVGMMBase(_IVModelBase):
         self._weight_config = self._weight.config
 
     def _gmm_post_estimation(
-        self, params: Float64Array, weight_mat: Float64Array, iters: int
+        self,
+        params: linearmodels.typing.data.Float64Array,
+        weight_mat: linearmodels.typing.data.Float64Array,
+        iters: int,
     ) -> dict[str, Any]:
         """GMM-specific post-estimation results"""
         instr = self._instr_columns
@@ -1021,7 +1034,9 @@ class _IVGMMBase(_IVModelBase):
         return gmm_specific
 
     def _j_statistic(
-        self, params: Float64Array, weight_mat: Float64Array
+        self,
+        params: linearmodels.typing.data.Float64Array,
+        weight_mat: linearmodels.typing.data.Float64Array,
     ) -> WaldTestStatistic:
         """J stat and test"""
         y, x, z = self._wy, self._wx, self._wz
@@ -1106,7 +1121,7 @@ class IVGMM(_IVGMMBase):
     @staticmethod
     def from_formula(
         formula: str,
-        data: DataFrame,
+        data: pandas.DataFrame,
         *,
         weights: IVDataLike | None = None,
         weight_type: str = "robust",
@@ -1162,8 +1177,11 @@ class IVGMM(_IVGMMBase):
 
     @staticmethod
     def estimate_parameters(
-        x: Float64Array, y: Float64Array, z: Float64Array, w: Float64Array
-    ) -> Float64Array:
+        x: linearmodels.typing.data.Float64Array,
+        y: linearmodels.typing.data.Float64Array,
+        z: linearmodels.typing.data.Float64Array,
+        w: linearmodels.typing.data.Float64Array,
+    ) -> linearmodels.typing.data.Float64Array:
         """
         Parameters
         ----------
@@ -1195,7 +1213,7 @@ class IVGMM(_IVGMMBase):
         *,
         iter_limit: int = 2,
         tol: float = 1e-4,
-        initial_weight: Float64Array | None = None,
+        initial_weight: linearmodels.typing.data.Float64Array | None = None,
         cov_type: str = "robust",
         debiased: bool = False,
         **cov_config: Any,
@@ -1214,7 +1232,7 @@ class IVGMM(_IVGMMBase):
             Convergence criteria.  Measured as covariance normalized change in
             parameters across iterations where the covariance estimator is
             based on the first step parameter estimates.
-        initial_weight : ndarray
+        initial_weight : numpy.ndarray
             Initial weighting matrix to use in the first step.  If not
             specified, uses the average outer-product of the set containing
             the exogenous variables and instruments.
@@ -1288,7 +1306,10 @@ class IVGMM(_IVGMMBase):
         return IVGMMResults(results, self)
 
     def _gmm_post_estimation(
-        self, params: Float64Array, weight_mat: Float64Array, iters: int
+        self,
+        params: linearmodels.typing.data.Float64Array,
+        weight_mat: linearmodels.typing.data.Float64Array,
+        iters: int,
     ) -> dict[str, Any]:
         """GMM-specific post-estimation results"""
         instr = self._instr_columns
@@ -1379,7 +1400,7 @@ class IVGMMCUE(_IVGMMBase):
     @staticmethod
     def from_formula(
         formula: str,
-        data: DataFrame,
+        data: pandas.DataFrame,
         *,
         weights: IVDataLike | None = None,
         weight_type: str = "robust",
@@ -1434,7 +1455,11 @@ class IVGMMCUE(_IVGMMBase):
         return mod
 
     def j(
-        self, params: Float64Array, x: Float64Array, y: Float64Array, z: Float64Array
+        self,
+        params: linearmodels.typing.data.Float64Array,
+        x: linearmodels.typing.data.Float64Array,
+        y: linearmodels.typing.data.Float64Array,
+        z: linearmodels.typing.data.Float64Array,
     ) -> float:
         r"""
         Optimization target
@@ -1482,13 +1507,13 @@ class IVGMMCUE(_IVGMMBase):
 
     def estimate_parameters(
         self,
-        starting: Float64Array,
-        x: Float64Array,
-        y: Float64Array,
-        z: Float64Array,
+        starting: linearmodels.typing.data.Float64Array,
+        x: linearmodels.typing.data.Float64Array,
+        y: linearmodels.typing.data.Float64Array,
+        z: linearmodels.typing.data.Float64Array,
         display: bool = False,
         opt_options: dict[str, Any] | None = None,
-    ) -> tuple[Float64Array, int]:
+    ) -> tuple[linearmodels.typing.data.Float64Array, int]:
         r"""
         Parameters
         ----------
@@ -1536,7 +1561,7 @@ class IVGMMCUE(_IVGMMBase):
     def fit(
         self,
         *,
-        starting: Float64Array | Series | None = None,
+        starting: linearmodels.typing.data.Float64Array | pandas.Series | None = None,
         display: bool = False,
         cov_type: str = "robust",
         debiased: bool = False,
@@ -1664,7 +1689,7 @@ class _OLS(IVLIML):
 def _gmm_model_from_formula(
     cls: type[IVGMM] | type[IVGMMCUE],
     formula: str,
-    data: DataFrame,
+    data: pandas.DataFrame,
     weights: IVDataLike | None,
     weight_type: str,
     **weight_config: Any,

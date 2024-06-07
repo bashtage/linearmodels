@@ -19,7 +19,7 @@ from linearmodels.shared.base import _SummaryStr
 from linearmodels.shared.hypotheses import WaldTestStatistic
 from linearmodels.shared.io import _str, pval_format
 from linearmodels.shared.utility import AttrDict
-from linearmodels.typing import Float64Array
+import linearmodels.typing.data
 
 
 class LinearFactorModelResults(_SummaryStr):
@@ -153,8 +153,8 @@ class LinearFactorModelResults(_SummaryStr):
 
     @staticmethod
     def _single_table(
-        params: Float64Array,
-        se: Float64Array,
+        params: linearmodels.typing.data.Float64Array,
+        se: linearmodels.typing.data.Float64Array,
         name: str,
         param_names: list[str] | tuple[str, ...],
         first: bool = False,
@@ -338,7 +338,7 @@ class GMMFactorModelResults(LinearFactorModelResults):
     @property
     def std_errors(self) -> pd.DataFrame:
         """Estimated parameter standard errors"""
-        se = cast(Float64Array, np.sqrt(np.diag(self._cov)))
+        se = cast(linearmodels.typing.data.Float64Array, np.sqrt(np.diag(self._cov)))
         ase = np.sqrt(np.diag(self._alpha_vcv))
         nportfolio, nfactor = self._params.shape
         nloadings = nportfolio * (nfactor - 1)

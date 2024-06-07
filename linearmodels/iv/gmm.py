@@ -6,7 +6,8 @@ from __future__ import annotations
 
 from typing import Any
 
-from numpy import asarray, ndarray, unique
+import numpy
+from numpy import asarray, unique
 from numpy.linalg import inv
 
 from linearmodels.iv.covariance import (
@@ -15,7 +16,7 @@ from linearmodels.iv.covariance import (
     kernel_optimal_bandwidth,
 )
 from linearmodels.shared.covariance import cov_cluster, cov_kernel
-from linearmodels.typing import AnyArray, Float64Array
+import linearmodels.typing.data
 
 
 class HomoskedasticWeightMatrix:
@@ -50,8 +51,11 @@ class HomoskedasticWeightMatrix:
         self._bandwidth: int | None = 0
 
     def weight_matrix(
-        self, x: Float64Array, z: Float64Array, eps: Float64Array
-    ) -> Float64Array:
+        self,
+        x: linearmodels.typing.data.Float64Array,
+        z: linearmodels.typing.data.Float64Array,
+        eps: linearmodels.typing.data.Float64Array,
+    ) -> linearmodels.typing.data.Float64Array:
         """
         Parameters
         ----------
@@ -75,7 +79,7 @@ class HomoskedasticWeightMatrix:
         return w
 
     @property
-    def config(self) -> dict[str, str | bool | ndarray | int | None]:
+    def config(self) -> dict[str, str | bool | numpy.ndarray | int | None]:
         """
         Weight estimator configuration
 
@@ -115,8 +119,11 @@ class HeteroskedasticWeightMatrix(HomoskedasticWeightMatrix):
         super().__init__(center, debiased)
 
     def weight_matrix(
-        self, x: Float64Array, z: Float64Array, eps: Float64Array
-    ) -> Float64Array:
+        self,
+        x: linearmodels.typing.data.Float64Array,
+        z: linearmodels.typing.data.Float64Array,
+        eps: linearmodels.typing.data.Float64Array,
+    ) -> linearmodels.typing.data.Float64Array:
         """
         Parameters
         ----------
@@ -201,8 +208,11 @@ class KernelWeightMatrix(HomoskedasticWeightMatrix):
         self._optimal_bw = optimal_bw
 
     def weight_matrix(
-        self, x: Float64Array, z: Float64Array, eps: Float64Array
-    ) -> Float64Array:
+        self,
+        x: linearmodels.typing.data.Float64Array,
+        z: linearmodels.typing.data.Float64Array,
+        eps: linearmodels.typing.data.Float64Array,
+    ) -> linearmodels.typing.data.Float64Array:
         """
         Parameters
         ----------
@@ -239,7 +249,7 @@ class KernelWeightMatrix(HomoskedasticWeightMatrix):
         return s
 
     @property
-    def config(self) -> dict[str, str | bool | ndarray | int | None]:
+    def config(self) -> dict[str, str | bool | numpy.ndarray | int | None]:
         """
         Weight estimator configuration
 
@@ -277,14 +287,20 @@ class OneWayClusteredWeightMatrix(HomoskedasticWeightMatrix):
     """
 
     def __init__(
-        self, clusters: AnyArray, center: bool = False, debiased: bool = False
+        self,
+        clusters: linearmodels.typing.data.AnyArray,
+        center: bool = False,
+        debiased: bool = False,
     ) -> None:
         super().__init__(center, debiased)
         self._clusters = clusters
 
     def weight_matrix(
-        self, x: Float64Array, z: Float64Array, eps: Float64Array
-    ) -> Float64Array:
+        self,
+        x: linearmodels.typing.data.Float64Array,
+        z: linearmodels.typing.data.Float64Array,
+        eps: linearmodels.typing.data.Float64Array,
+    ) -> linearmodels.typing.data.Float64Array:
         """
         Parameters
         ----------
@@ -324,7 +340,7 @@ class OneWayClusteredWeightMatrix(HomoskedasticWeightMatrix):
         return s
 
     @property
-    def config(self) -> dict[str, str | bool | ndarray | int | None]:
+    def config(self) -> dict[str, str | bool | numpy.ndarray | int | None]:
         """
         Weight estimator configuration
 
@@ -399,11 +415,11 @@ class IVGMMCovariance(HomoskedasticCovariance):
     # TODO: 2-way clustering
     def __init__(
         self,
-        x: Float64Array,
-        y: Float64Array,
-        z: Float64Array,
-        params: Float64Array,
-        w: Float64Array,
+        x: linearmodels.typing.data.Float64Array,
+        y: linearmodels.typing.data.Float64Array,
+        z: linearmodels.typing.data.Float64Array,
+        params: linearmodels.typing.data.Float64Array,
+        w: linearmodels.typing.data.Float64Array,
         cov_type: str = "robust",
         debiased: bool = False,
         **cov_config: str | bool,
@@ -449,7 +465,7 @@ class IVGMMCovariance(HomoskedasticCovariance):
         return out
 
     @property
-    def cov(self) -> Float64Array:
+    def cov(self) -> linearmodels.typing.data.Float64Array:
         x, z, eps, w = self.x, self.z, self.eps, self.w
         nobs = x.shape[0]
         xpz = x.T @ z / nobs
@@ -466,7 +482,9 @@ class IVGMMCovariance(HomoskedasticCovariance):
         return (c + c.T) / 2
 
     @property
-    def config(self) -> dict[str, str | bool | ndarray | int | None]:
-        conf: dict[str, str | bool | ndarray | int | None] = {"debiased": self.debiased}
+    def config(self) -> dict[str, str | bool | numpy.ndarray | int | None]:
+        conf: dict[str, str | bool | numpy.ndarray | int | None] = {
+            "debiased": self.debiased
+        }
         conf.update(self._cov_config)
         return conf

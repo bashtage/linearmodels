@@ -11,25 +11,25 @@ from linearmodels.panel.covariance import (
     HeteroskedasticCovariance,
     HomoskedasticCovariance,
 )
-from linearmodels.typing import Float64Array, Int64Array
+import linearmodels.typing.data
 
 
 class PanelData(NamedTuple):
     n: int
     t: int
     k: int
-    x: Float64Array
-    epsilon: Float64Array
-    params: Float64Array
+    x: linearmodels.typing.data.Float64Array
+    epsilon: linearmodels.typing.data.Float64Array
+    params: linearmodels.typing.data.Float64Array
     df_resid: int
-    y: Float64Array
-    time_ids: Int64Array
-    cluster1: Int64Array
-    entity_ids: Int64Array
-    cluster2: Int64Array
-    cluster3: Int64Array
-    cluster4: Int64Array
-    cluster5: Int64Array
+    y: linearmodels.typing.data.Float64Array
+    time_ids: linearmodels.typing.data.Int64Array
+    cluster1: linearmodels.typing.data.Int64Array
+    entity_ids: linearmodels.typing.data.Int64Array
+    cluster2: linearmodels.typing.data.Int64Array
+    cluster3: linearmodels.typing.data.Int64Array
+    cluster4: linearmodels.typing.data.Int64Array
+    cluster5: linearmodels.typing.data.Int64Array
 
 
 @pytest.fixture

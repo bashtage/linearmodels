@@ -7,6 +7,7 @@ from functools import cached_property
 from typing import Any, Union
 
 import numpy as np
+import pandas
 from pandas import DataFrame, Series, concat
 from scipy import stats
 from statsmodels.iolib.summary import SimpleTable, fmt_2cols
@@ -16,11 +17,14 @@ from linearmodels.shared.base import _SummaryStr
 from linearmodels.shared.hypotheses import InvalidTestStatistic, WaldTestStatistic
 from linearmodels.shared.io import _str, format_wide, param_table, pval_format
 from linearmodels.shared.utility import AttrDict
-from linearmodels.typing import ArrayLike, Float64Array
+import linearmodels.typing.data
 
 __all__ = ["Equation", "SystemResults", "SystemEquationResult", "GMMSystemResults"]
 
-Equation = Union[tuple[ArrayLike, ArrayLike], dict[str, ArrayLike]]
+Equation = Union[
+    tuple[linearmodels.typing.data.ArrayLike, linearmodels.typing.data.ArrayLike],
+    dict[str, linearmodels.typing.data.ArrayLike],
+]
 
 
 class _CommonResults(_SummaryStr):
@@ -243,8 +247,8 @@ class SystemResults(_CommonResults):
 
     def _out_of_sample(
         self,
-        equations: dict[str, dict[str, ArrayLike]] | None,
-        data: DataFrame | None,
+        equations: dict[str, dict[str, linearmodels.typing.data.ArrayLike]] | None,
+        data: pandas.DataFrame | None,
         missing: bool,
         dataframe: bool,
     ) -> dict[str, Series] | DataFrame:
@@ -270,14 +274,16 @@ class SystemResults(_CommonResults):
 
     def predict(
         self,
-        equations: dict[str, dict[str, ArrayLike]] | None = None,
+        equations: (
+            dict[str, dict[str, linearmodels.typing.data.ArrayLike]] | None
+        ) = None,
         *,
-        data: DataFrame | None = None,
+        data: pandas.DataFrame | None = None,
         fitted: bool = True,
         idiosyncratic: bool = False,
         missing: bool = False,
         dataframe: bool = False,
-    ) -> DataFrame | dict:
+    ) -> pandas.DataFrame | dict:
         """
         In- and out-of-sample predictions
 
@@ -806,7 +812,7 @@ class GMMSystemResults(SystemResults):
         self._j_stat = results.j_stat
 
     @property
-    def w(self) -> Float64Array:
+    def w(self) -> linearmodels.typing.data.Float64Array:
         """GMM weight matrix used in estimation"""
         return self._wmat
 

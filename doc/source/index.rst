@@ -67,6 +67,7 @@ linearmodels
    system/index
    utility
    compatibility
+   types
    plan
    contributing
    changes
