@@ -8,6 +8,7 @@ from typing import Literal, Union, cast, overload
 
 import numpy as np
 from numpy.linalg import lstsq
+import pandas
 import pandas as pd
 from pandas import (
     Categorical,
@@ -53,7 +54,7 @@ class _Panel:
     into a minimal pandas Panel-like object
     """
 
-    def __init__(self, df: DataFrame):
+    def __init__(self, df: pandas.DataFrame):
         self._items = df.columns
         index = df.index
         assert isinstance(index, MultiIndex)
@@ -109,7 +110,7 @@ class _Panel:
         return self._frame
 
 
-def convert_columns(s: Series, drop_first: bool) -> AnyPandas:
+def convert_columns(s: pandas.Series, drop_first: bool) -> AnyPandas:
     if is_string_dtype(s.dtype) and s.map(lambda v: isinstance(v, str)).all():
         s = s.astype("category")
 
@@ -121,7 +122,7 @@ def convert_columns(s: Series, drop_first: bool) -> AnyPandas:
     return s
 
 
-def expand_categoricals(x: DataFrame, drop_first: bool) -> DataFrame:
+def expand_categoricals(x: pandas.DataFrame, drop_first: bool) -> DataFrame:
     return concat(
         [convert_columns(x[c], drop_first) for c in x.columns], axis=1, sort=False
     )
@@ -291,7 +292,7 @@ class PanelData:
         """NumPy ndarray view of panel"""
         return self.panel.values
 
-    def drop(self, locs: Series | BoolArray) -> None:
+    def drop(self, locs: pandas.Series | BoolArray) -> None:
         """
         Drop observations from the panel.
 
@@ -463,7 +464,10 @@ class PanelData:
         weight_sum: dict[int, Series | DataFrame] = {}
 
         def weighted_group_mean(
-            df: DataFrame, weights: DataFrame, root_w: Float64Array, level: int
+            df: pandas.DataFrame,
+            weights: pandas.DataFrame,
+            root_w: Float64Array,
+            level: int,
         ) -> Float64Array:
             scaled_df = cast(DataFrame, root_w * df)
             num = scaled_df.groupby(level=level).transform("sum")
@@ -476,7 +480,7 @@ class PanelData:
             return np.asarray(num) / denom
 
         def demean_pass(
-            frame: DataFrame, weights: DataFrame, root_w: Float64Array
+            frame: pandas.DataFrame, weights: pandas.DataFrame, root_w: Float64Array
         ) -> DataFrame:
             levels = groups.shape[1]
             for level in range(levels):
@@ -498,7 +502,7 @@ class PanelData:
         wframe.index = init_index.index
 
         previous = wframe
-        current: DataFrame = demean_pass(previous, weights_df, root_w)
+        current: pandas.DataFrame = demean_pass(previous, weights_df, root_w)
         if groups.shape[1] == 1:
             current.index = self._frame.index
             return PanelData(current)
@@ -660,7 +664,7 @@ class PanelData:
 
     def mean(
         self, group: str = "entity", weights: PanelData | None = None
-    ) -> DataFrame:
+    ) -> pandas.DataFrame:
         """
         Compute data mean by either entity or time group
 
@@ -715,7 +719,7 @@ class PanelData:
         return PanelData(diffs_frame)
 
     @staticmethod
-    def _minimize_multiindex(df: DataFrame) -> DataFrame:
+    def _minimize_multiindex(df: pandas.DataFrame) -> DataFrame:
         index_cols = list(df.index.names)
         orig_names = index_cols[:]
         for i, col in enumerate(index_cols):

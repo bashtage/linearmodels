@@ -7,6 +7,7 @@ from functools import cached_property
 from typing import Any, Union
 
 import numpy as np
+import pandas
 from pandas import DataFrame, Series, concat
 from scipy import stats
 from statsmodels.iolib.summary import SimpleTable, fmt_2cols
@@ -244,7 +245,7 @@ class SystemResults(_CommonResults):
     def _out_of_sample(
         self,
         equations: dict[str, dict[str, ArrayLike]] | None,
-        data: DataFrame | None,
+        data: pandas.DataFrame | None,
         missing: bool,
         dataframe: bool,
     ) -> dict[str, Series] | DataFrame:
@@ -272,12 +273,12 @@ class SystemResults(_CommonResults):
         self,
         equations: dict[str, dict[str, ArrayLike]] | None = None,
         *,
-        data: DataFrame | None = None,
+        data: pandas.DataFrame | None = None,
         fitted: bool = True,
         idiosyncratic: bool = False,
         missing: bool = False,
         dataframe: bool = False,
-    ) -> DataFrame | dict:
+    ) -> pandas.DataFrame | dict:
         """
         In- and out-of-sample predictions
 

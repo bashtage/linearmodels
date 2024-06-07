@@ -8,6 +8,7 @@ import numpy as np
 from numpy.linalg import lstsq
 from numpy.random import RandomState, standard_normal
 from numpy.testing import assert_allclose
+import pandas
 from pandas import Categorical, DataFrame, Series, date_range, get_dummies
 from pandas.testing import assert_frame_equal, assert_series_equal
 
@@ -27,7 +28,12 @@ if not MISSING_XARRAY:
 
 
 def lsdv(
-    y: DataFrame, x: DataFrame, has_const=False, entity=False, time=False, general=None
+    y: pandas.DataFrame,
+    x: pandas.DataFrame,
+    has_const=False,
+    entity=False,
+    time=False,
+    general=None,
 ):
     nvar = x.shape[1]
     temp = x.reset_index()

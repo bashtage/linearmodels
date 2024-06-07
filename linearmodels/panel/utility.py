@@ -6,6 +6,8 @@ from collections import defaultdict
 from typing import NamedTuple, TypeVar, cast
 
 import numpy as np
+import numpy.random
+import pandas
 from pandas import DataFrame, concat, date_range
 import scipy.sparse as sp
 
@@ -513,10 +515,10 @@ class PanelModelData(NamedTuple):
         DataFrame containing cluster ids.
     """
 
-    data: DataFrame
-    weights: DataFrame
-    other_effects: DataFrame
-    clusters: DataFrame
+    data: pandas.DataFrame
+    weights: pandas.DataFrame
+    other_effects: pandas.DataFrame
+    clusters: pandas.DataFrame
 
 
 def generate_panel_data(
@@ -527,7 +529,7 @@ def generate_panel_data(
     missing: float = 0,
     other_effects: int = 2,
     ncats: int | list[int] = 4,
-    rng: np.random.RandomState | None = None,
+    rng: numpy.random.RandomState | None = None,
 ) -> PanelModelData:
     """
     Simulate panel data for testing

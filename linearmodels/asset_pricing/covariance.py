@@ -4,7 +4,8 @@ Covariance estimators for linear factor models
 
 from __future__ import annotations
 
-from numpy import empty, ndarray
+import numpy
+from numpy import empty
 from numpy.linalg import inv
 
 from linearmodels.iv.covariance import (
@@ -19,7 +20,7 @@ class _HACMixin:
     def __init__(self, kernel: str, bandwidth: float | None) -> None:
         self._kernel: str | None = None
         self._bandwidth: float | None = None  # pragma: no cover
-        self._moments: ndarray = empty((0,))  # pragma: no cover
+        self._moments: numpy.ndarray = empty((0,))  # pragma: no cover
         self._check_kernel(kernel)
         self._check_bandwidth(bandwidth)
 
@@ -98,8 +99,8 @@ class HeteroskedasticCovariance:
         self,
         xe: Float64Array,
         *,
-        jacobian: ndarray | None = None,
-        inv_jacobian: ndarray | None = None,
+        jacobian: numpy.ndarray | None = None,
+        inv_jacobian: numpy.ndarray | None = None,
         center: bool = True,
         debiased: bool = False,
         df: int = 0,
@@ -231,8 +232,8 @@ class KernelCovariance(HeteroskedasticCovariance, _HACMixin):
         self,
         xe: Float64Array,
         *,
-        jacobian: ndarray | None = None,
-        inv_jacobian: ndarray | None = None,
+        jacobian: numpy.ndarray | None = None,
+        inv_jacobian: numpy.ndarray | None = None,
         kernel: str | None = None,
         bandwidth: float | None = None,
         center: bool = True,

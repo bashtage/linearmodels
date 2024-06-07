@@ -23,6 +23,15 @@ author = "Kevin Sheppard"
 
 # More warnings
 nitpicky = True
+nitpick_ignore = []
+
+for line in open('nitpick-exceptions'):
+    if line.strip() == "" or line.startswith("#"):
+        continue
+    dtype, target = line.split(None, 1)
+    target = target.strip()
+    nitpick_ignore.append((dtype, target))
+
 
 # The short X.Y version
 full_version = parse(linearmodels.__version__)

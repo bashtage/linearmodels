@@ -7,7 +7,9 @@ from formulaic import model_matrix
 from formulaic.formula import Formula
 from formulaic.materializers.types import NAAction as fNAAction
 from formulaic.utils.context import capture_context
+import numpy
 import numpy as np
+import pandas
 from pandas import DataFrame
 
 from linearmodels.typing import Float64Array
@@ -91,7 +93,7 @@ class IVFormulaParser:
     def __init__(
         self,
         formula: str,
-        data: DataFrame,
+        data: pandas.DataFrame,
         eval_env: int = 2,
         context: Mapping[str, Any] | None = None,
     ):
@@ -222,5 +224,5 @@ class IVFormulaParser:
         return self._components
 
     @staticmethod
-    def _empty_check(arr: DataFrame) -> DataFrame | None:
+    def _empty_check(arr: pandas.DataFrame) -> DataFrame | None:
         return None if arr.shape[1] == 0 else arr

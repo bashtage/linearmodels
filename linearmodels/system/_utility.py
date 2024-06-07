@@ -2,8 +2,10 @@ from __future__ import annotations
 
 from typing import cast
 
+import numpy
 import numpy as np
 from numpy.linalg import inv, matrix_rank
+import pandas
 import pandas as pd
 
 from linearmodels.typing import ArraySequence, Float64Array
@@ -226,8 +228,8 @@ class LinearConstraint:
 
     def __init__(
         self,
-        r: pd.DataFrame | np.ndarray,
-        q: pd.Series | np.ndarray | None = None,
+        r: pandas.DataFrame | numpy.ndarray,
+        q: pandas.Series | numpy.ndarray | None = None,
         num_params: int | None = None,
         require_pandas: bool = True,
     ) -> None:
@@ -297,7 +299,7 @@ class LinearConstraint:
         self._computed = True
 
     @property
-    def r(self) -> pd.DataFrame:
+    def r(self) -> pandas.DataFrame:
         """Constraint loading matrix"""
         return self._r_pd
 
@@ -352,6 +354,6 @@ class LinearConstraint:
         return self._a
 
     @property
-    def q(self) -> pd.Series | np.ndarray:
+    def q(self) -> pandas.Series | numpy.ndarray:
         """Constrain target values"""
         return self._q_pd
