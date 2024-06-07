@@ -19,7 +19,7 @@ from linearmodels.shared.base import _ModelComparison, _SummaryStr
 from linearmodels.shared.hypotheses import WaldTestStatistic, quadratic_form_test
 from linearmodels.shared.io import _str, add_star, pval_format
 from linearmodels.shared.utility import AttrDict
-from linearmodels.typing import ArrayLike, Float64Array
+import linearmodels.typing.data
 
 __all__ = [
     "PanelResults",
@@ -476,7 +476,7 @@ class PanelResults(_SummaryStr):
 
     def _out_of_sample(
         self,
-        exog: ArrayLike | None,
+        exog: linearmodels.typing.data.ArrayLike | None,
         data: pandas.DataFrame | None,
         missing: bool,
         context: Mapping[str, Any] | None = None,
@@ -494,7 +494,7 @@ class PanelResults(_SummaryStr):
 
     def predict(
         self,
-        exog: ArrayLike | None = None,
+        exog: linearmodels.typing.data.ArrayLike | None = None,
         *,
         data: pandas.DataFrame | None = None,
         fitted: bool = True,
@@ -667,8 +667,10 @@ class PanelResults(_SummaryStr):
 
     def wald_test(
         self,
-        restriction: Float64Array | pandas.DataFrame | None = None,
-        value: Float64Array | pandas.Series | None = None,
+        restriction: (
+            linearmodels.typing.data.Float64Array | pandas.DataFrame | None
+        ) = None,
+        value: linearmodels.typing.data.Float64Array | pandas.Series | None = None,
         *,
         formula: str | list[str] | None = None,
     ) -> WaldTestStatistic:

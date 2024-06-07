@@ -7,7 +7,7 @@ import numpy as np
 from pandas import DataFrame, Series
 
 from linearmodels.panel.data import PanelData, PanelDataLike
-from linearmodels.typing import ArrayLike
+import linearmodels.typing.data
 
 
 def get_string(d: Mapping[str, Any], key: str) -> str | None:
@@ -93,7 +93,9 @@ def get_bool(d: Mapping[str, Any], key: str) -> bool:
     return bool(out)
 
 
-def get_array_like(d: Mapping[str, Any], key: str) -> ArrayLike | None:
+def get_array_like(
+    d: Mapping[str, Any], key: str
+) -> linearmodels.typing.data.ArrayLike | None:
     """
     Helper function that gets an array_like or None
 
@@ -112,7 +114,7 @@ def get_array_like(d: Mapping[str, Any], key: str) -> ArrayLike | None:
         not found.
     """
 
-    out: ArrayLike | None = None
+    out: linearmodels.typing.data.ArrayLike | None = None
     if key in d:
         out = d[key]
         if out is not None:

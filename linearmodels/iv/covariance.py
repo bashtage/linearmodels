@@ -25,7 +25,8 @@ from numpy import (
 from numpy.linalg import inv, pinv
 
 from linearmodels.shared.covariance import cov_cluster, cov_kernel
-from linearmodels.typing import AnyArray, Float64Array, Numeric, OptionalNumeric
+import linearmodels.typing
+import linearmodels.typing.data
 
 KernelWeight = Union[
     Callable[[float, float], ndarray],
@@ -41,7 +42,9 @@ property `notnull` contains the locations of the observations that have no
 missing values."""
 
 
-def kernel_weight_bartlett(bw: float, *args: int) -> Float64Array:
+def kernel_weight_bartlett(
+    bw: float, *args: int
+) -> linearmodels.typing.data.Float64Array:
     r"""
     Kernel weights from a Bartlett kernel
 
@@ -64,7 +67,9 @@ def kernel_weight_bartlett(bw: float, *args: int) -> Float64Array:
     return 1 - arange(int(bw) + 1) / (int(bw) + 1)
 
 
-def kernel_weight_quadratic_spectral(bw: float, n: int) -> Float64Array:
+def kernel_weight_quadratic_spectral(
+    bw: float, n: int
+) -> linearmodels.typing.data.Float64Array:
     r"""
     Kernel weights from a quadratic-spectral kernel
 
@@ -107,7 +112,9 @@ def kernel_weight_quadratic_spectral(bw: float, n: int) -> Float64Array:
     return w
 
 
-def kernel_weight_parzen(bw: float, *args: int) -> Float64Array:
+def kernel_weight_parzen(
+    bw: float, *args: int
+) -> linearmodels.typing.data.Float64Array:
     r"""
     Kernel weights from a Parzen kernel
 
@@ -135,7 +142,9 @@ def kernel_weight_parzen(bw: float, *args: int) -> Float64Array:
     return w
 
 
-def kernel_optimal_bandwidth(x: Float64Array, kernel: str = "bartlett") -> int:
+def kernel_optimal_bandwidth(
+    x: linearmodels.typing.data.Float64Array, kernel: str = "bartlett"
+) -> int:
     """
     Parameters
     ----------
@@ -248,12 +257,12 @@ class HomoskedasticCovariance:
 
     def __init__(
         self,
-        x: Float64Array,
-        y: Float64Array,
-        z: Float64Array,
-        params: Float64Array,
+        x: linearmodels.typing.data.Float64Array,
+        y: linearmodels.typing.data.Float64Array,
+        z: linearmodels.typing.data.Float64Array,
+        params: linearmodels.typing.data.Float64Array,
         debiased: bool = False,
-        kappa: Numeric = 1,
+        kappa: linearmodels.typing.Numeric = 1,
     ):
         if not (x.shape[0] == y.shape[0] == z.shape[0]):
             raise ValueError("x, y and z must have the same number of rows")
@@ -285,7 +294,7 @@ class HomoskedasticCovariance:
         )
 
     @property
-    def s(self) -> Float64Array:
+    def s(self) -> linearmodels.typing.data.Float64Array:
         """Score covariance estimate"""
         x, z, eps = self.x, self.z, self.eps
         nobs = x.shape[0]
@@ -300,7 +309,7 @@ class HomoskedasticCovariance:
         return self._scale * s2 * v
 
     @property
-    def cov(self) -> Float64Array:
+    def cov(self) -> linearmodels.typing.data.Float64Array:
         """Covariance of estimated parameters"""
 
         x, z = self.x, self.z
@@ -318,7 +327,7 @@ class HomoskedasticCovariance:
         return (c + c.T) / 2
 
     @property
-    def s2(self) -> Float64Array:
+    def s2(self) -> linearmodels.typing.data.Float64Array:
         """
         Estimated variance of residuals. Small-sample adjusted if debiased.
         """
@@ -384,18 +393,18 @@ class HeteroskedasticCovariance(HomoskedasticCovariance):
 
     def __init__(
         self,
-        x: Float64Array,
-        y: Float64Array,
-        z: Float64Array,
-        params: Float64Array,
+        x: linearmodels.typing.data.Float64Array,
+        y: linearmodels.typing.data.Float64Array,
+        z: linearmodels.typing.data.Float64Array,
+        params: linearmodels.typing.data.Float64Array,
         debiased: bool = False,
-        kappa: Numeric = 1,
+        kappa: linearmodels.typing.Numeric = 1,
     ):
         super().__init__(x, y, z, params, debiased, kappa)
         self._name = "Robust Covariance (Heteroskedastic)"
 
     @property
-    def s(self) -> Float64Array:
+    def s(self) -> linearmodels.typing.data.Float64Array:
         """Heteroskedasticity-robust score covariance estimate"""
         x, z, eps = self.x, self.z, self.eps
         nobs = x.shape[0]
@@ -475,14 +484,14 @@ class KernelCovariance(HomoskedasticCovariance):
 
     def __init__(
         self,
-        x: Float64Array,
-        y: Float64Array,
-        z: Float64Array,
-        params: Float64Array,
+        x: linearmodels.typing.data.Float64Array,
+        y: linearmodels.typing.data.Float64Array,
+        z: linearmodels.typing.data.Float64Array,
+        params: linearmodels.typing.data.Float64Array,
         kernel: str = "bartlett",
-        bandwidth: OptionalNumeric = None,
+        bandwidth: linearmodels.typing.OptionalNumeric = None,
         debiased: bool = False,
-        kappa: Numeric = 1,
+        kappa: linearmodels.typing.Numeric = 1,
     ):
         super().__init__(x, y, z, params, debiased, kappa)
         self._kernels = KERNEL_LOOKUP
@@ -503,7 +512,7 @@ class KernelCovariance(HomoskedasticCovariance):
         return out
 
     @property
-    def s(self) -> Float64Array:
+    def s(self) -> linearmodels.typing.data.Float64Array:
         """HAC score covariance estimate"""
         x, z, eps = self.x, self.z, self.eps
         nobs = x.shape[0]
@@ -595,19 +604,19 @@ class ClusteredCovariance(HomoskedasticCovariance):
 
     def __init__(
         self,
-        x: Float64Array,
-        y: Float64Array,
-        z: Float64Array,
-        params: Float64Array,
-        clusters: AnyArray | None = None,
+        x: linearmodels.typing.data.Float64Array,
+        y: linearmodels.typing.data.Float64Array,
+        z: linearmodels.typing.data.Float64Array,
+        params: linearmodels.typing.data.Float64Array,
+        clusters: linearmodels.typing.data.AnyArray | None = None,
         debiased: bool = False,
-        kappa: Numeric = 1,
+        kappa: linearmodels.typing.Numeric = 1,
     ):
         super().__init__(x, y, z, params, debiased, kappa)
 
         nobs = x.shape[0]
         clusters = arange(nobs) if clusters is None else clusters
-        clusters = cast(AnyArray, asarray(clusters).squeeze())
+        clusters = cast(linearmodels.typing.data.AnyArray, asarray(clusters).squeeze())
         if clusters.shape[0] != nobs:
             raise ValueError(CLUSTER_ERR.format(nobs, clusters.shape[0]))
         self._clusters = clusters
@@ -630,10 +639,12 @@ class ClusteredCovariance(HomoskedasticCovariance):
         return out
 
     @property
-    def s(self) -> Float64Array:
+    def s(self) -> linearmodels.typing.data.Float64Array:
         """Clustered estimator of score covariance"""
 
-        def rescale(s: Float64Array, nc: int, nobs: int) -> Float64Array:
+        def rescale(
+            s: linearmodels.typing.data.Float64Array, nc: int, nobs: int
+        ) -> linearmodels.typing.data.Float64Array:
             scale = float(self._scale * (nc / (nc - 1)) * ((nobs - 1) / nobs))
             return cast(ndarray, s * scale) if self.debiased else s
 

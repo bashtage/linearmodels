@@ -9,7 +9,7 @@ import numpy as np
 from pandas import Series
 from scipy.stats import chi2, f
 
-from linearmodels.typing import ArrayLike
+import linearmodels.typing.data
 
 # Monkey patch parsers if needed, remove once formulaic updated
 monkey_patch_materializers()
@@ -221,10 +221,10 @@ def _reparse_constraint_formula(
 
 
 def quadratic_form_test(
-    params: ArrayLike,
-    cov: ArrayLike,
-    restriction: ArrayLike | None = None,
-    value: ArrayLike | None = None,
+    params: linearmodels.typing.data.ArrayLike,
+    cov: linearmodels.typing.data.ArrayLike,
+    restriction: linearmodels.typing.data.ArrayLike | None = None,
+    value: linearmodels.typing.data.ArrayLike | None = None,
     formula: str | list[str] | dict[str, float] | None = None,
 ) -> WaldTestStatistic:
     if formula is not None and restriction is not None:

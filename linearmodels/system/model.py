@@ -57,7 +57,7 @@ from linearmodels.system.gmm import (
     KernelWeightMatrix,
 )
 from linearmodels.system.results import GMMSystemResults, SystemResults
-from linearmodels.typing import ArrayLike, ArraySequence, Float64Array
+import linearmodels.typing.data
 
 __all__ = ["SUR", "IV3SLS", "IVSystemGMM", "LinearConstraint"]
 
@@ -100,7 +100,9 @@ GMM_COV_EST = {
 }
 
 
-def _missing_weights(weights: Mapping[str, ArrayLike | None]) -> None:
+def _missing_weights(
+    weights: Mapping[str, linearmodels.typing.data.ArrayLike | None]
+) -> None:
     """Raise warning if missing weighs found"""
     missing = [key for key in weights if weights[key] is None]
     if missing:
@@ -109,8 +111,10 @@ def _missing_weights(weights: Mapping[str, ArrayLike | None]) -> None:
 
 
 def _parameters_from_xprod(
-    xpx: Float64Array, xpy: Float64Array, constraints: LinearConstraint | None = None
-) -> Float64Array:
+    xpx: linearmodels.typing.data.Float64Array,
+    xpy: linearmodels.typing.data.Float64Array,
+    constraints: LinearConstraint | None = None,
+) -> linearmodels.typing.data.Float64Array:
     r"""
     Estimate regression parameters from cross produces
 
@@ -156,7 +160,7 @@ class SystemFormulaParser:
         self,
         formula: Mapping[str, str] | str,
         data: pandas.DataFrame,
-        weights: Mapping[str, ArrayLike] | None = None,
+        weights: Mapping[str, linearmodels.typing.data.ArrayLike] | None = None,
         eval_env: int = 2,
         context: Mapping[str, Any] | None = None,
     ) -> None:
@@ -182,7 +186,9 @@ class SystemFormulaParser:
         return formula
 
     @staticmethod
-    def _convert_to_series(value: ArrayLike, name: str) -> Series:
+    def _convert_to_series(
+        value: linearmodels.typing.data.ArrayLike, name: str
+    ) -> Series:
         shape = value.shape
         if len(shape) > 2 or (len(shape) == 2 and min(shape) != 1):
             raise ValueError(f"{name} must be squeezable to 1D.")
@@ -283,8 +289,8 @@ class SystemFormulaParser:
         return list(self._parsers.keys())
 
     @property
-    def data(self) -> dict[str, dict[str, ArrayLike | None]]:
-        out: dict[str, dict[str, ArrayLike | None]] = {}
+    def data(self) -> dict[str, dict[str, linearmodels.typing.data.ArrayLike | None]]:
+        out: dict[str, dict[str, linearmodels.typing.data.ArrayLike | None]] = {}
         dep = self.dependent
         for key in dep:
             out[key] = {"dependent": dep[key]}
@@ -348,10 +354,12 @@ class _SystemModelBase:
     def __init__(
         self,
         equations: Mapping[
-            str, Mapping[str, ArrayLike | None] | Sequence[ArrayLike | None]
+            str,
+            Mapping[str, linearmodels.typing.data.ArrayLike | None]
+            | Sequence[linearmodels.typing.data.ArrayLike | None],
         ],
         *,
-        sigma: ArrayLike | None = None,
+        sigma: linearmodels.typing.data.ArrayLike | None = None,
     ) -> None:
         if not isinstance(equations, Mapping):
             raise TypeError("equations must be a dictionary-like")
@@ -376,13 +384,13 @@ class _SystemModelBase:
         self._instr: list[IVData] = []
         self._endog: list[IVData] = []
 
-        self._y: list[Float64Array] = []
-        self._x: list[Float64Array] = []
-        self._wy: list[Float64Array] = []
-        self._wx: list[Float64Array] = []
-        self._w: list[Float64Array] = []
-        self._z: list[Float64Array] = []
-        self._wz: list[Float64Array] = []
+        self._y: list[linearmodels.typing.data.Float64Array] = []
+        self._x: list[linearmodels.typing.data.Float64Array] = []
+        self._wy: list[linearmodels.typing.data.Float64Array] = []
+        self._wx: list[linearmodels.typing.data.Float64Array] = []
+        self._w: list[linearmodels.typing.data.Float64Array] = []
+        self._z: list[linearmodels.typing.data.Float64Array] = []
+        self._wz: list[linearmodels.typing.data.Float64Array] = []
 
         self._weights: list[IVData] = []
         self._formula: str | dict[str, str] | None = None
@@ -496,10 +504,16 @@ class _SystemModelBase:
             self._weights,
             self._eq_labels,
         ):
-            y = cast(Float64Array, dep.ndarray)
+            y = cast(
+                linearmodels.typing.data.Float64Array,
+                dep.ndarray,
+            )
             x = np.concatenate([exog_ivd.ndarray, endog.ndarray], 1, dtype=float)
             z = np.concatenate([exog_ivd.ndarray, instr.ndarray], 1, dtype=float)
-            w_arr = cast(Float64Array, w.ndarray)
+            w_arr = cast(
+                linearmodels.typing.data.Float64Array,
+                w.ndarray,
+            )
             w_arr = w_arr / np.nanmean(w_arr)
             w_sqrt = np.sqrt(w_arr)
             self._w.append(w_arr)
@@ -580,9 +594,11 @@ class _SystemModelBase:
 
     def predict(
         self,
-        params: ArrayLike,
+        params: linearmodels.typing.data.ArrayLike,
         *,
-        equations: Mapping[str, Mapping[str, ArrayLike]] | None = None,
+        equations: (
+            Mapping[str, Mapping[str, linearmodels.typing.data.ArrayLike]] | None
+        ) = None,
         data: pandas.DataFrame | None = None,
         eval_env: int = 1,
     ) -> DataFrame:
@@ -679,7 +695,12 @@ class _SystemModelBase:
         )
         return out_df
 
-    def _multivariate_ls_fit(self) -> tuple[Float64Array, Float64Array]:
+    def _multivariate_ls_fit(
+        self,
+    ) -> tuple[
+        linearmodels.typing.data.Float64Array,
+        linearmodels.typing.data.Float64Array,
+    ]:
         wy, wx, wxhat = self._wy, self._wx, self._wxhat
         k = len(wxhat)
 
@@ -720,13 +741,18 @@ class _SystemModelBase:
 
     def _gls_estimate(
         self,
-        eps: Float64Array,
+        eps: linearmodels.typing.data.Float64Array,
         nobs: int,
         total_cols: int,
         ci: Sequence[int],
         full_cov: bool,
         debiased: bool,
-    ) -> tuple[Float64Array, Float64Array, Float64Array, Float64Array]:
+    ) -> tuple[
+        linearmodels.typing.data.Float64Array,
+        linearmodels.typing.data.Float64Array,
+        linearmodels.typing.data.Float64Array,
+        linearmodels.typing.data.Float64Array,
+    ]:
         """Core estimation routine for iterative GLS"""
         wy, wx, wxhat = self._wy, self._wx, self._wxhat
 
@@ -765,9 +791,9 @@ class _SystemModelBase:
 
     def _multivariate_ls_finalize(
         self,
-        beta: Float64Array,
-        eps: Float64Array,
-        sigma: Float64Array,
+        beta: linearmodels.typing.data.Float64Array,
+        eps: linearmodels.typing.data.Float64Array,
+        sigma: linearmodels.typing.data.Float64Array,
         cov_type: str,
         **cov_config: bool,
     ) -> SystemResults:
@@ -865,10 +891,10 @@ class _SystemModelBase:
     def _common_indiv_results(
         self,
         index: int,
-        beta: Float64Array,
-        cov: Float64Array,
-        wresid: Float64Array,
-        resid: Float64Array,
+        beta: linearmodels.typing.data.Float64Array,
+        cov: linearmodels.typing.data.Float64Array,
+        wresid: linearmodels.typing.data.Float64Array,
+        resid: linearmodels.typing.data.Float64Array,
         method: str,
         cov_type: str,
         cov_est: (
@@ -945,13 +971,13 @@ class _SystemModelBase:
 
     def _common_results(
         self,
-        beta: Float64Array,
-        cov: Float64Array,
+        beta: linearmodels.typing.data.Float64Array,
+        cov: linearmodels.typing.data.Float64Array,
         method: str,
         iter_count: int,
         nobs: int,
         cov_type: str,
-        sigma: Float64Array,
+        sigma: linearmodels.typing.data.Float64Array,
         individual: AttrDict,
         debiased: bool,
     ) -> AttrDict:
@@ -1003,8 +1029,8 @@ class _SystemModelBase:
 
     def _system_r2(
         self,
-        eps: Float64Array,
-        sigma: Float64Array,
+        eps: linearmodels.typing.data.Float64Array,
+        sigma: linearmodels.typing.data.Float64Array,
         method: str,
         full_cov: bool,
         debiased: bool,
@@ -1014,7 +1040,10 @@ class _SystemModelBase:
 
         # System regression on a constant using weights if provided
         wy, w = self._wy, self._w
-        wi = [cast(Float64Array, np.sqrt(weights)) for weights in w]
+        wi = [
+            cast(linearmodels.typing.data.Float64Array, np.sqrt(weights))
+            for weights in w
+        ]
         if method == "ols":
             est_sigma = np.eye(len(wy))
         else:  # gls
@@ -1063,12 +1092,12 @@ class _SystemModelBase:
 
     def _gls_finalize(
         self,
-        beta: Float64Array,
-        sigma: Float64Array,
-        full_sigma: Float64Array,
-        est_sigma: Float64Array,
-        gls_eps: Float64Array,
-        eps: Float64Array,
+        beta: linearmodels.typing.data.Float64Array,
+        sigma: linearmodels.typing.data.Float64Array,
+        full_sigma: linearmodels.typing.data.Float64Array,
+        est_sigma: linearmodels.typing.data.Float64Array,
+        gls_eps: linearmodels.typing.data.Float64Array,
+        eps: linearmodels.typing.data.Float64Array,
         full_cov: bool,
         cov_type: str,
         iter_count: int,
@@ -1152,12 +1181,14 @@ class _SystemModelBase:
 
         return SystemResults(results)
 
-    def _sigma_scale(self, debiased: bool) -> float | Float64Array:
+    def _sigma_scale(
+        self, debiased: bool
+    ) -> float | linearmodels.typing.data.Float64Array:
         if not debiased:
             return 1.0
         nobs = float(self._wx[0].shape[0])
         scales = np.array([nobs - x.shape[1] for x in self._wx], dtype=np.float64)
-        scales = cast(Float64Array, np.sqrt(nobs / scales))
+        scales = cast(linearmodels.typing.data.Float64Array, np.sqrt(nobs / scales))
         return scales[:, None] @ scales[None, :]
 
     @property
@@ -1431,20 +1462,22 @@ class IV3SLS(_LSSystemModelBase):
     def __init__(
         self,
         equations: Mapping[
-            str, Mapping[str, ArrayLike | None] | Sequence[ArrayLike | None]
+            str,
+            Mapping[str, linearmodels.typing.data.ArrayLike | None]
+            | Sequence[linearmodels.typing.data.ArrayLike | None],
         ],
         *,
-        sigma: ArrayLike | None = None,
+        sigma: linearmodels.typing.data.ArrayLike | None = None,
     ) -> None:
         super().__init__(equations, sigma=sigma)
 
     @classmethod
     def multivariate_iv(
         cls,
-        dependent: ArrayLike,
-        exog: ArrayLike | None = None,
-        endog: ArrayLike | None = None,
-        instruments: ArrayLike | None = None,
+        dependent: linearmodels.typing.data.ArrayLike,
+        exog: linearmodels.typing.data.ArrayLike | None = None,
+        endog: linearmodels.typing.data.ArrayLike | None = None,
+        instruments: linearmodels.typing.data.ArrayLike | None = None,
     ) -> IV3SLS:
         """
         Interface for specification of multivariate IV models
@@ -1499,8 +1532,8 @@ class IV3SLS(_LSSystemModelBase):
         formula: str | dict[str, str],
         data: pandas.DataFrame,
         *,
-        sigma: ArrayLike | None = None,
-        weights: Mapping[str, ArrayLike] | None = None,
+        sigma: linearmodels.typing.data.ArrayLike | None = None,
+        weights: Mapping[str, linearmodels.typing.data.ArrayLike] | None = None,
     ) -> IV3SLS:
         """
         Specify a 3SLS using the formula interface
@@ -1644,10 +1677,12 @@ class SUR(_LSSystemModelBase):
     def __init__(
         self,
         equations: Mapping[
-            str, Mapping[str, ArrayLike | None] | Sequence[ArrayLike | None]
+            str,
+            Mapping[str, linearmodels.typing.data.ArrayLike | None]
+            | Sequence[linearmodels.typing.data.ArrayLike | None],
         ],
         *,
-        sigma: ArrayLike | None = None,
+        sigma: linearmodels.typing.data.ArrayLike | None = None,
     ) -> None:
         if not isinstance(equations, Mapping):
             raise TypeError("equations must be a dictionary-like")
@@ -1669,7 +1704,11 @@ class SUR(_LSSystemModelBase):
         self._model_name = "Seemingly Unrelated Regression (SUR)"
 
     @classmethod
-    def multivariate_ls(cls, dependent: ArrayLike, exog: ArrayLike) -> SUR:
+    def multivariate_ls(
+        cls,
+        dependent: linearmodels.typing.data.ArrayLike,
+        exog: linearmodels.typing.data.ArrayLike,
+    ) -> SUR:
         """
         Interface for specification of multivariate regression models
 
@@ -1719,8 +1758,8 @@ class SUR(_LSSystemModelBase):
         formula: str | dict[str, str],
         data: pandas.DataFrame,
         *,
-        sigma: ArrayLike | None = None,
-        weights: Mapping[str, ArrayLike] | None = None,
+        sigma: linearmodels.typing.data.ArrayLike | None = None,
+        weights: Mapping[str, linearmodels.typing.data.ArrayLike] | None = None,
     ) -> SUR:
         """
         Specify a SUR using the formula interface
@@ -1861,10 +1900,12 @@ class IVSystemGMM(_SystemModelBase):
     def __init__(
         self,
         equations: Mapping[
-            str, Mapping[str, ArrayLike | None] | Sequence[ArrayLike | None]
+            str,
+            Mapping[str, linearmodels.typing.data.ArrayLike | None]
+            | Sequence[linearmodels.typing.data.ArrayLike | None],
         ],
         *,
-        sigma: ArrayLike | None = None,
+        sigma: linearmodels.typing.data.ArrayLike | None = None,
         weight_type: str = "robust",
         **weight_config: bool | str | float,
     ) -> None:
@@ -1890,7 +1931,7 @@ class IVSystemGMM(_SystemModelBase):
         *,
         iter_limit: int = 2,
         tol: float = 1e-6,
-        initial_weight: Float64Array | None = None,
+        initial_weight: linearmodels.typing.data.Float64Array | None = None,
         cov_type: str = "robust",
         **cov_config: bool | float,
     ) -> GMMSystemResults:
@@ -1936,7 +1977,11 @@ class IVSystemGMM(_SystemModelBase):
             w = initial_weight
         assert w is not None
         beta_last = beta = self._blocked_gmm(
-            wx, wy, wz, w=cast(Float64Array, w), constraints=self.constraints
+            wx,
+            wy,
+            wz,
+            w=cast(linearmodels.typing.data.Float64Array, w),
+            constraints=self.constraints,
         )
         _eps = []
         loc = 0
@@ -1956,13 +2001,17 @@ class IVSystemGMM(_SystemModelBase):
             )
             w = self._weight_est.weight_matrix(wx, wz, eps, sigma=sigma)
             beta = self._blocked_gmm(
-                wx, wy, wz, w=cast(Float64Array, w), constraints=self.constraints
+                wx,
+                wy,
+                wz,
+                w=cast(linearmodels.typing.data.Float64Array, w),
+                constraints=self.constraints,
             )
             delta = beta_last - beta
             if vinv is None:
                 winv = np.linalg.inv(w)
                 xpz = blocked_cross_prod(wx, wz, np.eye(k))
-                xpz = cast(Float64Array, xpz / nobs)
+                xpz = cast(linearmodels.typing.data.Float64Array, xpz / nobs)
                 v = (xpz @ winv @ xpz.T) / nobs
                 vinv = inv(v)
             norm = float(np.squeeze(delta.T @ vinv @ delta))
@@ -2010,13 +2059,13 @@ class IVSystemGMM(_SystemModelBase):
 
     @staticmethod
     def _blocked_gmm(
-        x: ArraySequence,
-        y: ArraySequence,
-        z: ArraySequence,
+        x: linearmodels.typing.data.ArraySequence,
+        y: linearmodels.typing.data.ArraySequence,
+        z: linearmodels.typing.data.ArraySequence,
         *,
-        w: Float64Array,
+        w: linearmodels.typing.data.Float64Array,
         constraints: LinearConstraint | None = None,
-    ) -> Float64Array:
+    ) -> linearmodels.typing.data.Float64Array:
         k = len(x)
         xpz = blocked_cross_prod(x, z, np.eye(k))
         wi = np.linalg.inv(w)
@@ -2032,12 +2081,12 @@ class IVSystemGMM(_SystemModelBase):
 
     def _finalize_results(
         self,
-        beta: Float64Array,
-        cov: Float64Array,
-        weps: Float64Array,
-        eps: Float64Array,
-        wmat: Float64Array,
-        sigma: Float64Array,
+        beta: linearmodels.typing.data.Float64Array,
+        cov: linearmodels.typing.data.Float64Array,
+        weps: linearmodels.typing.data.Float64Array,
+        eps: linearmodels.typing.data.Float64Array,
+        wmat: linearmodels.typing.data.Float64Array,
+        sigma: linearmodels.typing.data.Float64Array,
         iter_count: int,
         cov_type: str,
         cov_config: dict[str, bool | float],
@@ -2109,7 +2158,7 @@ class IVSystemGMM(_SystemModelBase):
         formula: str | dict[str, str],
         data: pandas.DataFrame,
         *,
-        weights: dict[str, ArrayLike] | None = None,
+        weights: dict[str, linearmodels.typing.data.ArrayLike] | None = None,
         weight_type: str = "robust",
         **weight_config: bool | str | float,
     ) -> IVSystemGMM:
@@ -2183,7 +2232,9 @@ class IVSystemGMM(_SystemModelBase):
         return mod
 
     def _j_statistic(
-        self, params: Float64Array, weight_mat: Float64Array
+        self,
+        params: linearmodels.typing.data.Float64Array,
+        weight_mat: linearmodels.typing.data.Float64Array,
     ) -> WaldTestStatistic:
         """
         J stat and test

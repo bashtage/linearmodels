@@ -17,7 +17,7 @@ from linearmodels.system._utility import (
     blocked_diag_product,
     blocked_inner_prod,
 )
-from linearmodels.typing import Float64Array, IntArray
+import linearmodels.typing.data
 
 CLUSTERS_FORMAT = """\
 clusters must be an ndarray with as shape (nobs, ncluster) where ncluster is the \
@@ -64,9 +64,9 @@ class HomoskedasticCovariance:
     def __init__(
         self,
         x: list[numpy.ndarray],
-        eps: Float64Array,
-        sigma: Float64Array,
-        full_sigma: Float64Array,
+        eps: linearmodels.typing.data.Float64Array,
+        sigma: linearmodels.typing.data.Float64Array,
+        full_sigma: linearmodels.typing.data.Float64Array,
         *,
         gls: bool = False,
         debiased: bool = False,
@@ -99,7 +99,7 @@ class HomoskedasticCovariance:
         return out + f", id: {hex(id(self))}"
 
     @property
-    def sigma(self) -> Float64Array:
+    def sigma(self) -> linearmodels.typing.data.Float64Array:
         """Error covariance"""
         return self._sigma
 
@@ -107,7 +107,7 @@ class HomoskedasticCovariance:
         # Sigma is pre-debiased
         return 1.0
 
-    def _mvreg_cov(self) -> Float64Array:
+    def _mvreg_cov(self) -> linearmodels.typing.data.Float64Array:
         x = self._x
 
         xeex = blocked_inner_prod(x, self._sigma)
@@ -126,7 +126,7 @@ class HomoskedasticCovariance:
         cov = (cov + cov.T) / 2
         return cov
 
-    def _gls_cov(self) -> Float64Array:
+    def _gls_cov(self) -> linearmodels.typing.data.Float64Array:
         x = self._x
         sigma = self._sigma
         sigma_inv = inv(sigma)
@@ -148,7 +148,7 @@ class HomoskedasticCovariance:
         return cov
 
     @property
-    def cov(self) -> Float64Array:
+    def cov(self) -> linearmodels.typing.data.Float64Array:
         """Parameter covariance"""
         adj = self._adjustment()
         if self._gls:
@@ -206,9 +206,9 @@ class HeteroskedasticCovariance(HomoskedasticCovariance):
     def __init__(
         self,
         x: list[numpy.ndarray],
-        eps: Float64Array,
-        sigma: Float64Array,
-        full_sigma: Float64Array,
+        eps: linearmodels.typing.data.Float64Array,
+        sigma: linearmodels.typing.data.Float64Array,
+        full_sigma: linearmodels.typing.data.Float64Array,
         *,
         gls: bool = False,
         debiased: bool = False,
@@ -249,11 +249,11 @@ class HeteroskedasticCovariance(HomoskedasticCovariance):
 
         self._moments = xe
 
-    def _xeex(self) -> Float64Array:
+    def _xeex(self) -> linearmodels.typing.data.Float64Array:
         nobs = self._moments.shape[0]
         return self._moments.T @ self._moments / nobs
 
-    def _cov(self, gls: bool) -> Float64Array:
+    def _cov(self, gls: bool) -> linearmodels.typing.data.Float64Array:
         x = self._x
         nobs = x[0].shape[0]
         k = len(x)
@@ -276,10 +276,10 @@ class HeteroskedasticCovariance(HomoskedasticCovariance):
         cov = (cov + cov.T) / 2
         return cov / nobs
 
-    def _mvreg_cov(self) -> Float64Array:
+    def _mvreg_cov(self) -> linearmodels.typing.data.Float64Array:
         return self._cov(False)
 
-    def _gls_cov(self) -> Float64Array:
+    def _gls_cov(self) -> linearmodels.typing.data.Float64Array:
         return self._cov(True)
 
     def _adjustment(self) -> float | ndarray:
@@ -354,9 +354,9 @@ class KernelCovariance(HeteroskedasticCovariance, _HACMixin):
     def __init__(
         self,
         x: list[numpy.ndarray],
-        eps: Float64Array,
-        sigma: Float64Array,
-        full_sigma: Float64Array,
+        eps: linearmodels.typing.data.Float64Array,
+        sigma: linearmodels.typing.data.Float64Array,
+        full_sigma: linearmodels.typing.data.Float64Array,
         *,
         gls: bool = False,
         debiased: bool = False,
@@ -381,7 +381,7 @@ class KernelCovariance(HeteroskedasticCovariance, _HACMixin):
         self._str_extra["Kernel"] = kernel
         self._cov_config["kernel"] = kernel
 
-    def _xeex(self) -> Float64Array:
+    def _xeex(self) -> linearmodels.typing.data.Float64Array:
         return self._kernel_cov(self._moments)
 
     @property
@@ -448,14 +448,14 @@ class ClusteredCovariance(HeteroskedasticCovariance):
     def __init__(
         self,
         x: list[numpy.ndarray],
-        eps: Float64Array,
-        sigma: Float64Array,
-        full_sigma: Float64Array,
+        eps: linearmodels.typing.data.Float64Array,
+        sigma: linearmodels.typing.data.Float64Array,
+        full_sigma: linearmodels.typing.data.Float64Array,
         *,
         gls: bool = False,
         debiased: bool = False,
         constraints: LinearConstraint | None = None,
-        clusters: IntArray | None = None,
+        clusters: linearmodels.typing.data.IntArray | None = None,
         group_debias: bool = False,
     ) -> None:
         super().__init__(
@@ -476,7 +476,9 @@ class ClusteredCovariance(HeteroskedasticCovariance):
             self._str_extra["Number of Groups"] = " and ".join(num_cl)
         self._str_extra["Group Debias"] = self._group_debias
 
-    def _check_clusters(self, clusters: IntArray | None) -> IntArray:
+    def _check_clusters(
+        self, clusters: linearmodels.typing.data.IntArray | None
+    ) -> linearmodels.typing.data.IntArray:
         """Check cluster dimension and ensure ndarray"""
         if clusters is None:
             return empty((self._eps.size, 0), dtype=int)
@@ -504,7 +506,7 @@ class ClusteredCovariance(HeteroskedasticCovariance):
         self._nclusters = list(nunique)
         return _clusters
 
-    def _xeex(self) -> Float64Array:
+    def _xeex(self) -> linearmodels.typing.data.Float64Array:
         if self._clusters.shape[1] == 0:
             # Heteroskedastic but not clustered
             return super()._xeex()
@@ -573,8 +575,8 @@ class GMMHomoskedasticCovariance:
         self,
         x: list[numpy.ndarray],
         z: list[numpy.ndarray],
-        eps: Float64Array,
-        w: Float64Array,
+        eps: linearmodels.typing.data.Float64Array,
+        w: linearmodels.typing.data.Float64Array,
         *,
         sigma: numpy.ndarray | None = None,
         debiased: bool = False,
@@ -599,7 +601,7 @@ class GMMHomoskedasticCovariance:
         return out + f", id: {hex(id(self))}"
 
     @property
-    def cov(self) -> Float64Array:
+    def cov(self) -> linearmodels.typing.data.Float64Array:
         """Parameter covariance"""
         x, z = self._x, self._z
         k = len(x)
@@ -632,7 +634,7 @@ class GMMHomoskedasticCovariance:
         cov = (cov + cov.T) / 2
         return adj * cov
 
-    def _omega(self) -> Float64Array:
+    def _omega(self) -> linearmodels.typing.data.Float64Array:
         z = self._z
         nobs = z[0].shape[0]
         sigma = self._sigma
@@ -695,8 +697,8 @@ class GMMHeteroskedasticCovariance(GMMHomoskedasticCovariance):
         self,
         x: list[numpy.ndarray],
         z: list[numpy.ndarray],
-        eps: Float64Array,
-        w: Float64Array,
+        eps: linearmodels.typing.data.Float64Array,
+        w: linearmodels.typing.data.Float64Array,
         *,
         sigma: numpy.ndarray | None = None,
         debiased: bool = False,
@@ -718,7 +720,7 @@ class GMMHeteroskedasticCovariance(GMMHomoskedasticCovariance):
             loc += kz
         self._moments = ze
 
-    def _omega(self) -> Float64Array:
+    def _omega(self) -> linearmodels.typing.data.Float64Array:
         z = self._z
         nobs = z[0].shape[0]
         omega = self._moments.T @ self._moments / nobs
@@ -771,8 +773,8 @@ class GMMKernelCovariance(GMMHeteroskedasticCovariance, _HACMixin):
         self,
         x: list[numpy.ndarray],
         z: list[numpy.ndarray],
-        eps: Float64Array,
-        w: Float64Array,
+        eps: linearmodels.typing.data.Float64Array,
+        w: linearmodels.typing.data.Float64Array,
         *,
         sigma: numpy.ndarray | None = None,
         debiased: bool = False,
@@ -789,7 +791,7 @@ class GMMKernelCovariance(GMMHeteroskedasticCovariance, _HACMixin):
         self._check_kernel(kernel)
         self._cov_config["kernel"] = kernel
 
-    def _omega(self) -> Float64Array:
+    def _omega(self) -> linearmodels.typing.data.Float64Array:
         return self._kernel_cov(self._moments)
 
     @property

@@ -42,7 +42,7 @@ from linearmodels.shared.hypotheses import (
     quadratic_form_test,
 )
 from linearmodels.shared.io import _str, add_star, pval_format
-from linearmodels.typing import ArrayLike, Float64Array
+import linearmodels.typing.data
 
 
 def stub_concat(
@@ -505,9 +505,9 @@ class OLSResults(_LSModelResultsBase):
 
     def _out_of_sample(
         self,
-        exog: ArrayLike | None,
-        endog: ArrayLike | None,
-        data: ArrayLike | None,
+        exog: linearmodels.typing.data.ArrayLike | None,
+        endog: linearmodels.typing.data.ArrayLike | None,
+        data: linearmodels.typing.data.ArrayLike | None,
         missing: bool | None,
     ) -> DataFrame:
         """Interface between model predict and predict for OOS fits"""
@@ -523,8 +523,8 @@ class OLSResults(_LSModelResultsBase):
 
     def predict(
         self,
-        exog: ArrayLike | None = None,
-        endog: ArrayLike | None = None,
+        exog: linearmodels.typing.data.ArrayLike | None = None,
+        endog: linearmodels.typing.data.ArrayLike | None = None,
         *,
         data: pandas.DataFrame | None = None,
         fitted: bool = True,
@@ -1413,7 +1413,7 @@ class IVGMMResults(_CommonIVResults):
         self._j_stat = results["j_stat"]
 
     @property
-    def weight_matrix(self) -> Float64Array:
+    def weight_matrix(self) -> linearmodels.typing.data.Float64Array:
         """Weight matrix used in the final-step GMM estimation"""
         return self._weight_mat
 
