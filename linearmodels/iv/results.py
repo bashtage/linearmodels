@@ -11,6 +11,7 @@ import datetime as dt
 from functools import cached_property
 from typing import Any, Union
 
+import numpy
 from numpy import (
     array,
     asarray,
@@ -25,6 +26,7 @@ from numpy import (
     squeeze,
 )
 from numpy.linalg import inv
+import pandas
 from pandas import DataFrame, Series, concat, to_numeric
 import scipy.stats as stats
 from statsmodels.iolib.summary import SimpleTable, fmt_2cols, fmt_params
@@ -407,8 +409,8 @@ class _LSModelResultsBase(_SummaryStr):
 
     def wald_test(
         self,
-        restriction: DataFrame | ndarray | None = None,
-        value: Series | ndarray | None = None,
+        restriction: pandas.DataFrame | numpy.ndarray | None = None,
+        value: pandas.Series | numpy.ndarray | None = None,
         *,
         formula: str | list[str] | dict[str, float] | None = None,
     ) -> WaldTestStatistic:
@@ -524,7 +526,7 @@ class OLSResults(_LSModelResultsBase):
         exog: ArrayLike | None = None,
         endog: ArrayLike | None = None,
         *,
-        data: DataFrame | None = None,
+        data: pandas.DataFrame | None = None,
         fitted: bool = True,
         idiosyncratic: bool = False,
         missing: bool = False,

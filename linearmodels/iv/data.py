@@ -8,6 +8,7 @@ import copy
 from typing import Any, Union
 
 import numpy as np
+import pandas
 import pandas as pd
 from pandas.api.types import is_numeric_dtype, is_string_dtype
 
@@ -26,7 +27,7 @@ def convert_columns(s: pd.Series, drop_first: bool) -> AnyPandas:
     return s
 
 
-def expand_categoricals(x: pd.DataFrame, drop_first: bool) -> pd.DataFrame:
+def expand_categoricals(x: pandas.DataFrame, drop_first: bool) -> pd.DataFrame:
     if x.shape[1] == 0:
         return x
     return pd.concat(

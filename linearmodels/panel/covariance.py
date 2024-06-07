@@ -5,6 +5,7 @@ from typing import Any, Union
 
 import numpy as np
 from numpy.linalg import inv
+import pandas
 from pandas import DataFrame, MultiIndex
 
 from linearmodels.iv.covariance import (
@@ -669,7 +670,7 @@ class FamaMacBethCovariance(HomoskedasticCovariance):
         y: Float64Array,
         x: Float64Array,
         params: Float64Array,
-        all_params: DataFrame,
+        all_params: pandas.DataFrame,
         *,
         debiased: bool = False,
         bandwidth: float | None = None,

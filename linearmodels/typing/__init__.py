@@ -6,10 +6,7 @@ from typing import TYPE_CHECKING, Any, Optional, Union
 import numpy as np
 from pandas import DataFrame, Series
 
-from .data import ArrayLike
-
-NP_GTE_121 = np.lib.NumpyVersion(np.__version__) >= np.lib.NumpyVersion("1.21.0")
-
+from .data import ArrayLike as ArrayLike
 
 __all__ = [
     "ArrayLike",
@@ -35,7 +32,7 @@ OptionalNumeric = Optional[Union[int, float]]
 AnyPandas = Union[Series, DataFrame]
 Label = Optional[Hashable]
 
-if NP_GTE_121 and TYPE_CHECKING:
+if TYPE_CHECKING:
     Float64Array = np.ndarray[Any, np.dtype[np.float64]]  # pragma: no cover
     Int64Array = np.ndarray[Any, np.dtype[np.int64]]  # pragma: no cover
     Int32Array = np.ndarray[Any, np.dtype[np.int32]]  # pragma: no cover

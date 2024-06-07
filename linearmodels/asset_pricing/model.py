@@ -10,6 +10,7 @@ from formulaic import model_matrix
 from formulaic.materializers.types import NAAction
 import numpy as np
 from numpy.linalg import lstsq
+import pandas
 from pandas import DataFrame
 from scipy.optimize import minimize
 
@@ -134,7 +135,7 @@ class _FactorModelBase:
 
     @staticmethod
     def _prepare_data_from_formula(
-        formula: str, data: DataFrame, portfolios: DataFrame | None
+        formula: str, data: pandas.DataFrame, portfolios: pandas.DataFrame | None
     ) -> tuple[DataFrame, DataFrame, str]:
         orig_formula = formula
         na_action = NAAction("raise")
@@ -203,7 +204,11 @@ class TradedFactorModel(_FactorModelBase):
 
     @classmethod
     def from_formula(
-        cls, formula: str, data: DataFrame, *, portfolios: DataFrame | None = None
+        cls,
+        formula: str,
+        data: pandas.DataFrame,
+        *,
+        portfolios: pandas.DataFrame | None = None,
     ) -> TradedFactorModel:
         """
         Parameters
@@ -517,9 +522,9 @@ class LinearFactorModel(_LinearFactorModelBase):
     def from_formula(
         cls,
         formula: str,
-        data: DataFrame,
+        data: pandas.DataFrame,
         *,
-        portfolios: DataFrame | None = None,
+        portfolios: pandas.DataFrame | None = None,
         risk_free: bool = False,
         sigma: ArrayLike | None = None,
     ) -> LinearFactorModel:
@@ -818,9 +823,9 @@ class LinearFactorModelGMM(_LinearFactorModelBase):
     def from_formula(
         cls,
         formula: str,
-        data: DataFrame,
+        data: pandas.DataFrame,
         *,
-        portfolios: DataFrame | None = None,
+        portfolios: pandas.DataFrame | None = None,
         risk_free: bool = False,
     ) -> LinearFactorModelGMM:
         """

@@ -8,7 +8,6 @@ import warnings
 from numpy import (
     any as npany,
     arange,
-    array,
     asarray,
     ascontiguousarray,
     average,
@@ -31,6 +30,7 @@ from numpy import (
     zeros,
 )
 from numpy.linalg import lstsq
+import pandas
 from pandas import Categorical, CategoricalDtype, DataFrame, Series
 import scipy.sparse as sp
 from scipy.sparse.linalg import lsmr
@@ -211,7 +211,9 @@ def category_product(cats: AnyPandas) -> Series:
     return Series(Categorical(codes), index=cats.index)
 
 
-def category_interaction(cat: Series, precondition: bool = True) -> sp.csc_matrix:
+def category_interaction(
+    cat: pandas.Series, precondition: bool = True
+) -> sp.csc_matrix:
     """
     Parameters
     ----------

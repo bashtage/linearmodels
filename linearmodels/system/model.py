@@ -25,6 +25,7 @@ import warnings
 from formulaic.utils.context import capture_context
 import numpy as np
 from numpy.linalg import inv, lstsq, matrix_rank, solve
+import pandas
 from pandas import DataFrame, Index, Series, concat
 
 from linearmodels.iv._utility import IVFormulaParser
@@ -154,7 +155,7 @@ class SystemFormulaParser:
     def __init__(
         self,
         formula: Mapping[str, str] | str,
-        data: DataFrame,
+        data: pandas.DataFrame,
         weights: Mapping[str, ArrayLike] | None = None,
         eval_env: int = 2,
         context: Mapping[str, Any] | None = None,
@@ -582,7 +583,7 @@ class _SystemModelBase:
         params: ArrayLike,
         *,
         equations: Mapping[str, Mapping[str, ArrayLike]] | None = None,
-        data: DataFrame | None = None,
+        data: pandas.DataFrame | None = None,
         eval_env: int = 1,
     ) -> DataFrame:
         """
@@ -1171,7 +1172,9 @@ class _SystemModelBase:
         """
         return self._constraints
 
-    def add_constraints(self, r: DataFrame, q: Series | None = None) -> None:
+    def add_constraints(
+        self, r: pandas.DataFrame, q: pandas.Series | None = None
+    ) -> None:
         r"""
         Add parameter constraints to a model.
 
@@ -1494,7 +1497,7 @@ class IV3SLS(_LSSystemModelBase):
     def from_formula(
         cls,
         formula: str | dict[str, str],
-        data: DataFrame,
+        data: pandas.DataFrame,
         *,
         sigma: ArrayLike | None = None,
         weights: Mapping[str, ArrayLike] | None = None,
@@ -1714,7 +1717,7 @@ class SUR(_LSSystemModelBase):
     def from_formula(
         cls,
         formula: str | dict[str, str],
-        data: DataFrame,
+        data: pandas.DataFrame,
         *,
         sigma: ArrayLike | None = None,
         weights: Mapping[str, ArrayLike] | None = None,
@@ -2104,7 +2107,7 @@ class IVSystemGMM(_SystemModelBase):
     def from_formula(
         cls,
         formula: str | dict[str, str],
-        data: DataFrame,
+        data: pandas.DataFrame,
         *,
         weights: dict[str, ArrayLike] | None = None,
         weight_type: str = "robust",

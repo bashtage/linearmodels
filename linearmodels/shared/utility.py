@@ -13,6 +13,7 @@ from collections.abc import (
 from typing import Any, Callable, Protocol, TypeVar, cast
 
 import numpy as np
+import pandas
 from pandas import DataFrame, Index, MultiIndex, Series
 
 from linearmodels.typing import AnyArray, Label
@@ -143,7 +144,9 @@ class AttrDict(MutableMapping):
         return self.__private_dict__.__iter__()
 
 
-def ensure_unique_column(col_name: str, df: DataFrame, addition: str = "_") -> str:
+def ensure_unique_column(
+    col_name: str, df: pandas.DataFrame, addition: str = "_"
+) -> str:
     while col_name in df:
         col_name = addition + col_name + addition
     return col_name

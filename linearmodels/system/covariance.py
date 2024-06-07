@@ -2,6 +2,7 @@ from __future__ import annotations
 
 from typing import cast
 
+import numpy
 from numpy import asarray, empty, eye, ndarray, ones, sqrt, vstack, zeros
 from numpy.linalg import inv
 
@@ -62,7 +63,7 @@ class HomoskedasticCovariance:
 
     def __init__(
         self,
-        x: list[ndarray],
+        x: list[numpy.ndarray],
         eps: Float64Array,
         sigma: Float64Array,
         full_sigma: Float64Array,
@@ -204,7 +205,7 @@ class HeteroskedasticCovariance(HomoskedasticCovariance):
 
     def __init__(
         self,
-        x: list[ndarray],
+        x: list[numpy.ndarray],
         eps: Float64Array,
         sigma: Float64Array,
         full_sigma: Float64Array,
@@ -352,7 +353,7 @@ class KernelCovariance(HeteroskedasticCovariance, _HACMixin):
 
     def __init__(
         self,
-        x: list[ndarray],
+        x: list[numpy.ndarray],
         eps: Float64Array,
         sigma: Float64Array,
         full_sigma: Float64Array,
@@ -446,7 +447,7 @@ class ClusteredCovariance(HeteroskedasticCovariance):
 
     def __init__(
         self,
-        x: list[ndarray],
+        x: list[numpy.ndarray],
         eps: Float64Array,
         sigma: Float64Array,
         full_sigma: Float64Array,
@@ -570,12 +571,12 @@ class GMMHomoskedasticCovariance:
 
     def __init__(
         self,
-        x: list[ndarray],
-        z: list[ndarray],
+        x: list[numpy.ndarray],
+        z: list[numpy.ndarray],
         eps: Float64Array,
         w: Float64Array,
         *,
-        sigma: ndarray | None = None,
+        sigma: numpy.ndarray | None = None,
         debiased: bool = False,
         constraints: LinearConstraint | None = None,
     ) -> None:
@@ -692,12 +693,12 @@ class GMMHeteroskedasticCovariance(GMMHomoskedasticCovariance):
 
     def __init__(
         self,
-        x: list[ndarray],
-        z: list[ndarray],
+        x: list[numpy.ndarray],
+        z: list[numpy.ndarray],
         eps: Float64Array,
         w: Float64Array,
         *,
-        sigma: ndarray | None = None,
+        sigma: numpy.ndarray | None = None,
         debiased: bool = False,
         constraints: LinearConstraint | None = None,
     ) -> None:
@@ -768,12 +769,12 @@ class GMMKernelCovariance(GMMHeteroskedasticCovariance, _HACMixin):
 
     def __init__(
         self,
-        x: list[ndarray],
-        z: list[ndarray],
+        x: list[numpy.ndarray],
+        z: list[numpy.ndarray],
         eps: Float64Array,
         w: Float64Array,
         *,
-        sigma: ndarray | None = None,
+        sigma: numpy.ndarray | None = None,
         debiased: bool = False,
         constraints: LinearConstraint | None = None,
         kernel: str = "bartlett",

@@ -26,6 +26,7 @@ from numpy import (
     squeeze,
 )
 from numpy.linalg import eigvalsh, inv, matrix_rank, pinv
+import pandas
 from pandas import DataFrame, Series, concat
 from scipy.optimize import minimize
 
@@ -243,7 +244,7 @@ class _IVModelBase:
         *,
         exog: IVDataLike | None = None,
         endog: IVDataLike | None = None,
-        data: DataFrame | None = None,
+        data: pandas.DataFrame | None = None,
         eval_env: int = 4,
     ) -> DataFrame:
         """
@@ -776,7 +777,7 @@ class IVLIML(_IVLSModelBase):
     @staticmethod
     def from_formula(
         formula: str,
-        data: DataFrame,
+        data: pandas.DataFrame,
         *,
         weights: IVDataLike | None = None,
         fuller: float = 0,
@@ -889,7 +890,7 @@ class IV2SLS(_IVLSModelBase):
 
     @staticmethod
     def from_formula(
-        formula: str, data: DataFrame, *, weights: IVDataLike | None = None
+        formula: str, data: pandas.DataFrame, *, weights: IVDataLike | None = None
     ) -> IV2SLS:
         """
         Parameters
@@ -1106,7 +1107,7 @@ class IVGMM(_IVGMMBase):
     @staticmethod
     def from_formula(
         formula: str,
-        data: DataFrame,
+        data: pandas.DataFrame,
         *,
         weights: IVDataLike | None = None,
         weight_type: str = "robust",
@@ -1214,7 +1215,7 @@ class IVGMM(_IVGMMBase):
             Convergence criteria.  Measured as covariance normalized change in
             parameters across iterations where the covariance estimator is
             based on the first step parameter estimates.
-        initial_weight : ndarray
+        initial_weight : numpy.ndarray
             Initial weighting matrix to use in the first step.  If not
             specified, uses the average outer-product of the set containing
             the exogenous variables and instruments.
@@ -1379,7 +1380,7 @@ class IVGMMCUE(_IVGMMBase):
     @staticmethod
     def from_formula(
         formula: str,
-        data: DataFrame,
+        data: pandas.DataFrame,
         *,
         weights: IVDataLike | None = None,
         weight_type: str = "robust",
@@ -1536,7 +1537,7 @@ class IVGMMCUE(_IVGMMBase):
     def fit(
         self,
         *,
-        starting: Float64Array | Series | None = None,
+        starting: Float64Array | pandas.Series | None = None,
         display: bool = False,
         cov_type: str = "robust",
         debiased: bool = False,
@@ -1664,7 +1665,7 @@ class _OLS(IVLIML):
 def _gmm_model_from_formula(
     cls: type[IVGMM] | type[IVGMMCUE],
     formula: str,
-    data: DataFrame,
+    data: pandas.DataFrame,
     weights: IVDataLike | None,
     weight_type: str,
     **weight_config: Any,

@@ -10,6 +10,7 @@ from formulaic.model_spec import NAAction
 from formulaic.parser.algos.tokenize import tokenize
 from formulaic.utils.context import capture_context
 import numpy as np
+import pandas
 from pandas import Categorical, DataFrame, Index, MultiIndex, Series, get_dummies
 from scipy.linalg import lstsq as sp_lstsq
 from scipy.sparse import csc_matrix, diags
@@ -110,7 +111,11 @@ class FInfo(NamedTuple):
 
 
 def _deferred_f(
-    params: Series, cov: DataFrame, debiased: bool, df_resid: int, f_info: FInfo
+    params: pandas.Series,
+    cov: pandas.DataFrame,
+    debiased: bool,
+    df_resid: int,
+    f_info: FInfo,
 ) -> InvalidTestStatistic | WaldTestStatistic:
     if f_info.is_invalid:
         assert f_info.invalid_test_stat is not None
@@ -724,8 +729,10 @@ class _PanelModelBase:
 
     def _setup_clusters(
         self,
-        cov_config: Mapping[str, bool | float | str | IntArray | DataFrame | PanelData],
-    ) -> dict[str, bool | float | str | IntArray | DataFrame | PanelData]:
+        cov_config: Mapping[
+            str, bool | float | str | IntArray | pandas.DataFrame | PanelData
+        ],
+    ) -> dict[str, bool | float | str | IntArray | pandas.DataFrame | PanelData]:
         cov_config_upd = dict(cov_config)
         cluster_types = ("clusters", "cluster_entity", "cluster_time")
         common = set(cov_config.keys()).intersection(cluster_types)
@@ -735,7 +742,7 @@ class _PanelModelBase:
         cov_config_upd = {k: v for k, v in cov_config.items()}
 
         clusters = get_panel_data_like(cov_config, "clusters")
-        clusters_frame: DataFrame | None = None
+        clusters_frame: pandas.DataFrame | None = None
         if clusters is not None:
             formatted_clusters = self.reformat_clusters(clusters)
             for col in formatted_clusters.dataframe:
@@ -947,7 +954,7 @@ class PooledOLS(_PanelModelBase):
         *,
         cov_type: str = "unadjusted",
         debiased: bool = True,
-        **cov_config: bool | float | str | IntArray | DataFrame | PanelData,
+        **cov_config: bool | float | str | IntArray | pandas.DataFrame | PanelData,
     ) -> PanelResults:
         """
         Estimate model parameters
@@ -1720,7 +1727,7 @@ class PanelOLS(_PanelModelBase):
     def _determine_df_adjustment(
         self,
         cov_type: str,
-        **cov_config: bool | float | str | IntArray | DataFrame | PanelData,
+        **cov_config: bool | float | str | IntArray | pandas.DataFrame | PanelData,
     ) -> bool:
         if cov_type != "clustered" or not self._has_effect:
             return True
@@ -1748,7 +1755,7 @@ class PanelOLS(_PanelModelBase):
         debiased: bool = True,
         auto_df: bool = True,
         count_effects: bool = True,
-        **cov_config: bool | float | str | IntArray | DataFrame | PanelData,
+        **cov_config: bool | float | str | IntArray | pandas.DataFrame | PanelData,
     ) -> PanelEffectsResults:
         """
         Estimate model parameters
@@ -2065,8 +2072,10 @@ class BetweenOLS(_PanelModelBase):
 
     def _setup_clusters(
         self,
-        cov_config: Mapping[str, bool | float | str | IntArray | DataFrame | PanelData],
-    ) -> dict[str, bool | float | str | IntArray | DataFrame | PanelData]:
+        cov_config: Mapping[
+            str, bool | float | str | IntArray | pandas.DataFrame | PanelData
+        ],
+    ) -> dict[str, bool | float | str | IntArray | pandas.DataFrame | PanelData]:
         """Return covariance estimator reformat clusters"""
         cov_config_upd = dict(cov_config)
         if "clusters" not in cov_config:
@@ -2100,7 +2109,7 @@ class BetweenOLS(_PanelModelBase):
         reweight: bool = False,
         cov_type: str = "unadjusted",
         debiased: bool = True,
-        **cov_config: bool | float | str | IntArray | DataFrame | PanelData,
+        **cov_config: bool | float | str | IntArray | pandas.DataFrame | PanelData,
     ) -> PanelResults:
         """
         Estimate model parameters
@@ -2325,8 +2334,10 @@ class FirstDifferenceOLS(_PanelModelBase):
 
     def _setup_clusters(
         self,
-        cov_config: Mapping[str, bool | float | str | IntArray | DataFrame | PanelData],
-    ) -> dict[str, bool | float | str | IntArray | DataFrame | PanelData]:
+        cov_config: Mapping[
+            str, bool | float | str | IntArray | pandas.DataFrame | PanelData
+        ],
+    ) -> dict[str, bool | float | str | IntArray | pandas.DataFrame | PanelData]:
         cov_config_upd = dict(cov_config).copy()
         cluster_types = ("clusters", "cluster_entity")
         common = set(cov_config.keys()).intersection(cluster_types)
@@ -2381,7 +2392,7 @@ class FirstDifferenceOLS(_PanelModelBase):
         *,
         cov_type: str = "unadjusted",
         debiased: bool = True,
-        **cov_config: bool | float | str | IntArray | DataFrame | PanelData,
+        **cov_config: bool | float | str | IntArray | pandas.DataFrame | PanelData,
     ) -> PanelResults:
         """
         Estimate model parameters
@@ -2684,7 +2695,7 @@ class RandomEffects(_PanelModelBase):
         small_sample: bool = False,
         cov_type: str = "unadjusted",
         debiased: bool = True,
-        **cov_config: bool | float | str | IntArray | DataFrame | PanelData,
+        **cov_config: bool | float | str | IntArray | pandas.DataFrame | PanelData,
     ) -> RandomEffectsResults:
         """
         Estimate model parameters
@@ -2920,7 +2931,7 @@ class FamaMacBeth(_PanelModelBase):
             wx[self._not_null], index=exog.notnull().index, columns=exog.columns
         )
 
-        def validate_block(ex: Float64Array | DataFrame) -> bool:
+        def validate_block(ex: Float64Array | pandas.DataFrame) -> bool:
             _ex = np.asarray(ex, dtype=float)
 
             def _mr(ex: Float64Array) -> int:

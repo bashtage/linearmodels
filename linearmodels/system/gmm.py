@@ -7,6 +7,7 @@ from __future__ import annotations
 from collections.abc import Sequence
 from typing import cast
 
+import numpy
 from numpy import array, empty, ndarray, repeat, sqrt, zeros_like
 
 from linearmodels.asset_pricing.covariance import _HACMixin
@@ -100,7 +101,7 @@ class HomoskedasticWeightMatrix:
         z: Sequence[Float64Array],
         eps: Float64Array,
         *,
-        sigma: ndarray,
+        sigma: numpy.ndarray,
     ) -> Float64Array:
         """
         Construct a GMM weight matrix for a model.
@@ -176,7 +177,7 @@ class HeteroskedasticWeightMatrix(HomoskedasticWeightMatrix):
         z: Sequence[Float64Array],
         eps: Float64Array,
         *,
-        sigma: ndarray | None = None,
+        sigma: numpy.ndarray | None = None,
     ) -> Float64Array:
         """
         Construct a GMM weight matrix for a model.
@@ -294,7 +295,7 @@ class KernelWeightMatrix(HeteroskedasticWeightMatrix, _HACMixin):
         z: Sequence[Float64Array],
         eps: Float64Array,
         *,
-        sigma: ndarray | None = None,
+        sigma: numpy.ndarray | None = None,
     ) -> Float64Array:
         """
         Construct a GMM weight matrix for a model.
