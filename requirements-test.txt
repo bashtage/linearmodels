@@ -11,3 +11,4 @@ seaborn
 xarray>=0.13
 wheel
 pyarrow
+pillow>=10.3.0 # not directly required, pinned by Snyk to avoid a vulnerability
