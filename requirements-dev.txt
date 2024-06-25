@@ -19,3 +19,4 @@ sphinx-immaterial
 sphinxcontrib-spelling
 sphinx_autodoc_typehints
 wheel
+anyio>=4.4.0 # not directly required, pinned by Snyk to avoid a vulnerability
