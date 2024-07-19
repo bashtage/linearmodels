@@ -9,6 +9,7 @@ from typing import Any, Union
 
 from formulaic.utils.context import capture_context
 import numpy as np
+import pandas
 from pandas import DataFrame, Series, concat
 from scipy import stats
 from statsmodels.iolib.summary import SimpleTable, fmt_2cols, fmt_params
@@ -18,7 +19,7 @@ from linearmodels.shared.base import _ModelComparison, _SummaryStr
 from linearmodels.shared.hypotheses import WaldTestStatistic, quadratic_form_test
 from linearmodels.shared.io import _str, add_star, pval_format
 from linearmodels.shared.utility import AttrDict
-from linearmodels.typing import ArrayLike, Float64Array
+import linearmodels.typing.data
 
 __all__ = [
     "PanelResults",
@@ -475,8 +476,8 @@ class PanelResults(_SummaryStr):
 
     def _out_of_sample(
         self,
-        exog: ArrayLike | None,
-        data: DataFrame | None,
+        exog: linearmodels.typing.data.ArrayLike | None,
+        data: pandas.DataFrame | None,
         missing: bool,
         context: Mapping[str, Any] | None = None,
     ) -> DataFrame:
@@ -493,9 +494,9 @@ class PanelResults(_SummaryStr):
 
     def predict(
         self,
-        exog: ArrayLike | None = None,
+        exog: linearmodels.typing.data.ArrayLike | None = None,
         *,
-        data: DataFrame | None = None,
+        data: pandas.DataFrame | None = None,
         fitted: bool = True,
         effects: bool = False,
         idiosyncratic: bool = False,
@@ -551,7 +552,7 @@ class PanelResults(_SummaryStr):
             out.append(self.idiosyncratic)
         if len(out) == 0:
             raise ValueError("At least one output must be selected")
-        out_df: DataFrame = concat(out, axis=1)
+        out_df: pandas.DataFrame = concat(out, axis=1)
         if missing:
             index = self._original_index
             out_df = out_df.reindex(index)
@@ -666,8 +667,10 @@ class PanelResults(_SummaryStr):
 
     def wald_test(
         self,
-        restriction: Float64Array | DataFrame | None = None,
-        value: Float64Array | Series | None = None,
+        restriction: (
+            linearmodels.typing.data.Float64Array | pandas.DataFrame | None
+        ) = None,
+        value: linearmodels.typing.data.Float64Array | pandas.Series | None = None,
         *,
         formula: str | list[str] | None = None,
     ) -> WaldTestStatistic:
@@ -811,7 +814,7 @@ class PanelEffectsResults(PanelResults):
         return effects
 
     @property
-    def other_info(self) -> DataFrame | None:
+    def other_info(self) -> pandas.DataFrame | None:
         """Statistics on observations per group for other effects"""
         return self._other_info
 

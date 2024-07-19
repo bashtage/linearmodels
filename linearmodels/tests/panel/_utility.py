@@ -8,6 +8,7 @@ import numpy as np
 from numpy.linalg import lstsq
 from numpy.random import RandomState, standard_normal
 from numpy.testing import assert_allclose
+import pandas
 from pandas import Categorical, DataFrame, Series, date_range, get_dummies
 from pandas.testing import assert_frame_equal, assert_series_equal
 
@@ -27,7 +28,12 @@ if not MISSING_XARRAY:
 
 
 def lsdv(
-    y: DataFrame, x: DataFrame, has_const=False, entity=False, time=False, general=None
+    y: pandas.DataFrame,
+    x: pandas.DataFrame,
+    has_const=False,
+    entity=False,
+    time=False,
+    general=None,
 ):
     nvar = x.shape[1]
     temp = x.reset_index()
@@ -82,13 +88,13 @@ def generate_data(
         np.random.seed(12345)
     else:
         np.random.set_state(rng.get_state())
-    from linearmodels.typing import Float64Array
+    import linearmodels.typing.data
 
     n, t, k = ntk
     k += const
     x = standard_normal((k, t, n))
     beta = np.arange(1, k + 1)[:, None, None] / k
-    y: Float64Array = np.empty((t, n), dtype=np.float64)
+    y: linearmodels.typing.data.Float64Array = np.empty((t, n), dtype=np.float64)
     y[:, :] = (x * beta).sum(0) + standard_normal((t, n)) + 2 * standard_normal((1, n))
     w = np.random.chisquare(5, (t, n)) / 5
     c = np.empty((y.size, 0), dtype=int)

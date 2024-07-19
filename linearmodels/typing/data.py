@@ -16,11 +16,9 @@ except ImportError:
     ArrayLike = Union[np.ndarray, pd.DataFrame, pd.Series]  # type: ignore
 
 
-NP_GTE_121 = np.lib.NumpyVersion(np.__version__) >= np.lib.NumpyVersion("1.21.0")
-
 NDArray = Union[np.ndarray]
 
-if NP_GTE_121 and TYPE_CHECKING:
+if TYPE_CHECKING:
     Float64Array = np.ndarray[Any, np.dtype[np.float64]]  # pragma: no cover
     Int64Array = np.ndarray[Any, np.dtype[np.int64]]  # pragma: no cover
     Int32Array = np.ndarray[Any, np.dtype[np.int32]]  # pragma: no cover

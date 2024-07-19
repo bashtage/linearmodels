@@ -8,6 +8,7 @@ from typing import Literal, Union, cast, overload
 
 import numpy as np
 from numpy.linalg import lstsq
+import pandas
 import pandas as pd
 from pandas import (
     Categorical,
@@ -21,16 +22,7 @@ from pandas import (
 from pandas.api.types import is_datetime64_any_dtype, is_numeric_dtype, is_string_dtype
 
 from linearmodels.shared.utility import ensure_unique_column, panel_to_frame
-from linearmodels.typing import (
-    AnyArray,
-    AnyPandas,
-    ArrayLike,
-    BoolArray,
-    Float64Array,
-    IntArray,
-    Label,
-    NumericArray,
-)
+import linearmodels.typing.data
 
 __all__ = ["PanelData", "PanelDataLike"]
 
@@ -53,7 +45,7 @@ class _Panel:
     into a minimal pandas Panel-like object
     """
 
-    def __init__(self, df: DataFrame):
+    def __init__(self, df: pandas.DataFrame):
         self._items = df.columns
         index = df.index
         assert isinstance(index, MultiIndex)
@@ -71,10 +63,10 @@ class _Panel:
     @classmethod
     def from_array(
         cls,
-        values: NumericArray,
-        items: Sequence[Label],
-        major_axis: Sequence[Label],
-        minor_axis: Sequence[Label],
+        values: linearmodels.typing.data.NumericArray,
+        items: Sequence[linearmodels.typing.data.Label],
+        major_axis: Sequence[linearmodels.typing.data.Label],
+        minor_axis: Sequence[linearmodels.typing.data.Label],
     ) -> _Panel:
         index = list(product(minor_axis, major_axis))
         multi_index = MultiIndex.from_tuples(index)
@@ -102,14 +94,16 @@ class _Panel:
         return self._minor_axis
 
     @property
-    def values(self) -> Float64Array:
+    def values(self) -> linearmodels.typing.data.Float64Array:
         return self._values
 
     def to_frame(self) -> DataFrame:
         return self._frame
 
 
-def convert_columns(s: Series, drop_first: bool) -> AnyPandas:
+def convert_columns(
+    s: pandas.Series, drop_first: bool
+) -> linearmodels.typing.data.AnyPandas:
     if is_string_dtype(s.dtype) and s.map(lambda v: isinstance(v, str)).all():
         s = s.astype("category")
 
@@ -121,7 +115,7 @@ def convert_columns(s: Series, drop_first: bool) -> AnyPandas:
     return s
 
 
-def expand_categoricals(x: DataFrame, drop_first: bool) -> DataFrame:
+def expand_categoricals(x: pandas.DataFrame, drop_first: bool) -> DataFrame:
     return concat(
         [convert_columns(x[c], drop_first) for c in x.columns], axis=1, sort=False
     )
@@ -282,16 +276,16 @@ class PanelData:
         return self._frame
 
     @property
-    def values2d(self) -> AnyArray:
+    def values2d(self) -> linearmodels.typing.data.AnyArray:
         """NumPy ndarray view of dataframe"""
         return np.require(self._frame, requirements="W")
 
     @property
-    def values3d(self) -> AnyArray:
+    def values3d(self) -> linearmodels.typing.data.AnyArray:
         """NumPy ndarray view of panel"""
         return self.panel.values
 
-    def drop(self, locs: Series | BoolArray) -> None:
+    def drop(self, locs: pandas.Series | linearmodels.typing.data.BoolArray) -> None:
         """
         Drop observations from the panel.
 
@@ -346,24 +340,24 @@ class PanelData:
         return self._n
 
     @property
-    def vars(self) -> list[Label]:
+    def vars(self) -> list[linearmodels.typing.data.Label]:
         """List of variable names"""
         return list(self._frame.columns)
 
     @property
-    def time(self) -> list[Label]:
+    def time(self) -> list[linearmodels.typing.data.Label]:
         """List of time index names"""
         index = self.index
         return list(index.levels[1][index.codes[1]].unique())
 
     @property
-    def entities(self) -> list[Label]:
+    def entities(self) -> list[linearmodels.typing.data.Label]:
         """List of entity index names"""
         index = self.index
         return list(index.levels[0][index.codes[0]].unique())
 
     @property
-    def entity_ids(self) -> IntArray:
+    def entity_ids(self) -> linearmodels.typing.data.IntArray:
         """
         Get array containing entity group membership information
 
@@ -376,7 +370,7 @@ class PanelData:
         return np.asarray(index.codes[0])[:, None]
 
     @property
-    def time_ids(self) -> IntArray:
+    def time_ids(self) -> linearmodels.typing.data.IntArray:
         """
         Get array containing time membership information
 
@@ -463,8 +457,11 @@ class PanelData:
         weight_sum: dict[int, Series | DataFrame] = {}
 
         def weighted_group_mean(
-            df: DataFrame, weights: DataFrame, root_w: Float64Array, level: int
-        ) -> Float64Array:
+            df: pandas.DataFrame,
+            weights: pandas.DataFrame,
+            root_w: linearmodels.typing.data.Float64Array,
+            level: int,
+        ) -> linearmodels.typing.data.Float64Array:
             scaled_df = cast(DataFrame, root_w * df)
             num = scaled_df.groupby(level=level).transform("sum")
             if level in weight_sum:
@@ -476,7 +473,9 @@ class PanelData:
             return np.asarray(num) / denom
 
         def demean_pass(
-            frame: DataFrame, weights: DataFrame, root_w: Float64Array
+            frame: pandas.DataFrame,
+            weights: pandas.DataFrame,
+            root_w: linearmodels.typing.data.Float64Array,
         ) -> DataFrame:
             levels = groups.shape[1]
             for level in range(levels):
@@ -492,13 +491,13 @@ class PanelData:
         init_index = DataFrame(groups)
         init_index.set_index(list(init_index.columns), inplace=True)
 
-        root_w = cast(Float64Array, np.sqrt(weights.values2d))
+        root_w = cast(linearmodels.typing.data.Float64Array, np.sqrt(weights.values2d))
         weights_df = DataFrame(weights.values2d, index=init_index.index)
         wframe = cast(DataFrame, root_w * self._frame)
         wframe.index = init_index.index
 
         previous = wframe
-        current: DataFrame = demean_pass(previous, weights_df, root_w)
+        current: pandas.DataFrame = demean_pass(previous, weights_df, root_w)
         if groups.shape[1] == 1:
             current.index = self._frame.index
             return PanelData(current)
@@ -507,7 +506,7 @@ class PanelData:
         max_rmse = np.sqrt(np.asarray(self._frame).var(0).max())
         scale = np.require(self._frame.std(), requirements="W")
         exclude = exclude | (scale < 1e-14 * max_rmse)
-        replacement = cast(Float64Array, np.maximum(scale, 1))
+        replacement = cast(linearmodels.typing.data.Float64Array, np.maximum(scale, 1))
         scale[exclude] = replacement[exclude]
         scale = scale[None, :]
 
@@ -524,7 +523,7 @@ class PanelData:
         group: Literal["entity", "time", "both"],
         *,
         return_panel: Literal[False],
-    ) -> Float64Array: ...
+    ) -> linearmodels.typing.data.Float64Array: ...
 
     @overload
     def demean(  # noqa: E704
@@ -541,7 +540,7 @@ class PanelData:
         group: Literal["entity", "time", "both"],
         weights: PanelData | None,
         return_panel: Literal[False],
-    ) -> Float64Array: ...  # noqa: E704
+    ) -> linearmodels.typing.data.Float64Array: ...  # noqa: E704
 
     def demean(
         self,
@@ -549,7 +548,7 @@ class PanelData:
         weights: PanelData | None = None,
         return_panel: bool = True,
         low_memory: bool = False,
-    ) -> PanelData | Float64Array:
+    ) -> PanelData | linearmodels.typing.data.Float64Array:
         """
         Demeans data by either entity or time group
 
@@ -660,7 +659,7 @@ class PanelData:
 
     def mean(
         self, group: str = "entity", weights: PanelData | None = None
-    ) -> DataFrame:
+    ) -> pandas.DataFrame:
         """
         Compute data mean by either entity or time group
 
@@ -715,7 +714,7 @@ class PanelData:
         return PanelData(diffs_frame)
 
     @staticmethod
-    def _minimize_multiindex(df: DataFrame) -> DataFrame:
+    def _minimize_multiindex(df: pandas.DataFrame) -> DataFrame:
         index_cols = list(df.index.names)
         orig_names = index_cols[:]
         for i, col in enumerate(index_cols):
@@ -757,4 +756,4 @@ class PanelData:
         return dummies[dummy_cols].astype(np.float64)  # type: ignore
 
 
-PanelDataLike = Union[PanelData, ArrayLike]
+PanelDataLike = Union[PanelData, linearmodels.typing.data.ArrayLike]

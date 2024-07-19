@@ -12,10 +12,10 @@ from numpy import (
     zeros,
 )
 
-from linearmodels.typing import AnyArray, Float64Array, IntArray
+import linearmodels.typing.data
 
 
-def group_debias_coefficient(clusters: IntArray) -> float:
+def group_debias_coefficient(clusters: linearmodels.typing.data.IntArray) -> float:
     r"""
     Compute the group debiasing scale.
 
@@ -44,7 +44,9 @@ def group_debias_coefficient(clusters: IntArray) -> float:
     return (ngroups / (ngroups - 1)) * ((n - 1) / n)
 
 
-def cluster_union(clusters: IntArray) -> IntArray:
+def cluster_union(
+    clusters: linearmodels.typing.data.IntArray,
+) -> linearmodels.typing.data.IntArray:
     """
     Compute a set of clusters that is nested within 2 clusters
 
@@ -68,7 +70,10 @@ def cluster_union(clusters: IntArray) -> IntArray:
     return union[resort_locs]
 
 
-def cov_cluster(z: Float64Array, clusters: AnyArray) -> Float64Array:
+def cov_cluster(
+    z: linearmodels.typing.data.Float64Array,
+    clusters: linearmodels.typing.data.AnyArray,
+) -> linearmodels.typing.data.Float64Array:
     """
     Core cluster covariance estimator
 
@@ -102,7 +107,9 @@ def cov_cluster(z: Float64Array, clusters: AnyArray) -> Float64Array:
     return s
 
 
-def cov_kernel(z: Float64Array, w: Float64Array) -> Float64Array:
+def cov_kernel(
+    z: linearmodels.typing.data.Float64Array, w: linearmodels.typing.data.Float64Array
+) -> linearmodels.typing.data.Float64Array:
     """
     Core kernel covariance estimator
 

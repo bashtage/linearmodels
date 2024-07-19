@@ -8,9 +8,10 @@ from formulaic.formula import Formula
 from formulaic.materializers.types import NAAction as fNAAction
 from formulaic.utils.context import capture_context
 import numpy as np
+import pandas
 from pandas import DataFrame
 
-from linearmodels.typing import Float64Array
+import linearmodels.typing.data
 
 from ..compat.formulaic import monkey_patch_materializers
 
@@ -30,7 +31,9 @@ The original error was:
 """
 
 
-def proj(y: Float64Array, x: Float64Array) -> Float64Array:
+def proj(
+    y: linearmodels.typing.data.Float64Array, x: linearmodels.typing.data.Float64Array
+) -> linearmodels.typing.data.Float64Array:
     """
     Projection of y on x from y
 
@@ -51,7 +54,9 @@ def proj(y: Float64Array, x: Float64Array) -> Float64Array:
     return x @ (np.linalg.pinv(x) @ y)
 
 
-def annihilate(y: Float64Array, x: Float64Array) -> Float64Array:
+def annihilate(
+    y: linearmodels.typing.data.Float64Array, x: linearmodels.typing.data.Float64Array
+) -> linearmodels.typing.data.Float64Array:
     """
     Remove projection of y on x from y
 
@@ -91,7 +96,7 @@ class IVFormulaParser:
     def __init__(
         self,
         formula: str,
-        data: DataFrame,
+        data: pandas.DataFrame,
         eval_env: int = 2,
         context: Mapping[str, Any] | None = None,
     ):
@@ -222,5 +227,5 @@ class IVFormulaParser:
         return self._components
 
     @staticmethod
-    def _empty_check(arr: DataFrame) -> DataFrame | None:
+    def _empty_check(arr: pandas.DataFrame) -> DataFrame | None:
         return None if arr.shape[1] == 0 else arr

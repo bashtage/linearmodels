@@ -23,6 +23,15 @@ author = "Kevin Sheppard"
 
 # More warnings
 nitpicky = True
+nitpick_ignore = []
+
+with open("nitpick-exceptions") as nitpick_ex:
+    for line in nitpick_ex:
+        if line.strip() == "" or line.startswith("#"):
+            continue
+        dtype, target = line.split(None, 1)
+        target = target.strip()
+        nitpick_ignore.append((dtype, target))
 
 # The short X.Y version
 full_version = parse(linearmodels.__version__)
@@ -412,3 +421,9 @@ numpydoc_xref_aliases = {
 
 autosummary_generate = True
 autoclass_content = "class"
+
+autodoc_type_aliases = {
+    "ArrayLike": "linearmodels.typing.data.ArrayLike",
+    "IntArray": "linearmodels.typing.data.IntArray",
+    "Float64Array": "linearmodels.typing.data.Float64Array",
+}

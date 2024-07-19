@@ -10,6 +10,7 @@ from formulaic import model_matrix
 from formulaic.materializers.types import NAAction
 import numpy as np
 from numpy.linalg import lstsq
+import pandas
 from pandas import DataFrame
 from scipy.optimize import minimize
 
@@ -29,21 +30,35 @@ from linearmodels.shared.hypotheses import WaldTestStatistic
 from linearmodels.shared.linalg import has_constant
 from linearmodels.shared.typed_getters import get_float, get_string
 from linearmodels.shared.utility import AttrDict
-from linearmodels.typing import ArrayLike, BoolArray, Float64Array
+import linearmodels.typing.data
 
 
 def callback_factory(
     obj: (
-        Callable[[Float64Array, bool, Float64Array], float]
-        | Callable[[Float64Array, bool, HeteroskedasticWeight | KernelWeight], float]
+        Callable[
+            [
+                linearmodels.typing.data.Float64Array,
+                bool,
+                linearmodels.typing.data.Float64Array,
+            ],
+            float,
+        ]
+        | Callable[
+            [
+                linearmodels.typing.data.Float64Array,
+                bool,
+                HeteroskedasticWeight | KernelWeight,
+            ],
+            float,
+        ]
     ),
     args: tuple[bool, Any],
     disp: bool | int = 1,
-) -> Callable[[Float64Array], None]:
+) -> Callable[[linearmodels.typing.data.Float64Array], None]:
     d = {"iter": 0}
     disp = int(disp)
 
-    def callback(params: Float64Array) -> None:
+    def callback(params: linearmodels.typing.data.Float64Array) -> None:
         fval = obj(params, *args)
         if disp > 0 and (d["iter"] % disp == 0):
             print("Iteration: {}, Objective: {}".format(d["iter"], fval))
@@ -80,9 +95,12 @@ class _FactorModelBase:
     def __repr__(self) -> str:
         return self.__str__() + f"\nid: {hex(id(self))}"
 
-    def _drop_missing(self) -> BoolArray:
+    def _drop_missing(self) -> linearmodels.typing.data.BoolArray:
         data = (self.portfolios, self.factors)
-        missing = cast(BoolArray, np.any(np.c_[[dh.isnull for dh in data]], 0))
+        missing = cast(
+            linearmodels.typing.data.BoolArray,
+            np.any(np.c_[[dh.isnull for dh in data]], 0),
+        )
         if any(missing):
             if all(missing):
                 raise ValueError(
@@ -104,8 +122,8 @@ class _FactorModelBase:
             )
         self._drop_missing()
 
-        p = cast(Float64Array, self.portfolios.ndarray)
-        f = cast(Float64Array, self.factors.ndarray)
+        p = cast(linearmodels.typing.data.Float64Array, self.portfolios.ndarray)
+        f = cast(linearmodels.typing.data.Float64Array, self.factors.ndarray)
         if has_constant(p)[0]:
             raise ValueError(
                 "portfolios must not contains a constant or "
@@ -134,7 +152,7 @@ class _FactorModelBase:
 
     @staticmethod
     def _prepare_data_from_formula(
-        formula: str, data: DataFrame, portfolios: DataFrame | None
+        formula: str, data: pandas.DataFrame, portfolios: pandas.DataFrame | None
     ) -> tuple[DataFrame, DataFrame, str]:
         orig_formula = formula
         na_action = NAAction("raise")
@@ -203,7 +221,11 @@ class TradedFactorModel(_FactorModelBase):
 
     @classmethod
     def from_formula(
-        cls, formula: str, data: DataFrame, *, portfolios: DataFrame | None = None
+        cls,
+        formula: str,
+        data: pandas.DataFrame,
+        *,
+        portfolios: pandas.DataFrame | None = None,
     ) -> TradedFactorModel:
         """
         Parameters
@@ -407,7 +429,7 @@ class _LinearFactorModelBase(_FactorModelBase):
         factors: IVDataLike,
         *,
         risk_free: bool = False,
-        sigma: ArrayLike | None = None,
+        sigma: linearmodels.typing.data.ArrayLike | None = None,
     ) -> None:
         self._risk_free = bool(risk_free)
         super().__init__(portfolios, factors)
@@ -509,7 +531,7 @@ class LinearFactorModel(_LinearFactorModelBase):
         factors: IVDataLike,
         *,
         risk_free: bool = False,
-        sigma: ArrayLike | None = None,
+        sigma: linearmodels.typing.data.ArrayLike | None = None,
     ) -> None:
         super().__init__(portfolios, factors, risk_free=risk_free, sigma=sigma)
 
@@ -517,11 +539,11 @@ class LinearFactorModel(_LinearFactorModelBase):
     def from_formula(
         cls,
         formula: str,
-        data: DataFrame,
+        data: pandas.DataFrame,
         *,
-        portfolios: DataFrame | None = None,
+        portfolios: pandas.DataFrame | None = None,
         risk_free: bool = False,
-        sigma: ArrayLike | None = None,
+        sigma: linearmodels.typing.data.ArrayLike | None = None,
     ) -> LinearFactorModel:
         """
         Parameters
@@ -713,8 +735,11 @@ class LinearFactorModel(_LinearFactorModelBase):
         return LinearFactorModelResults(res)
 
     def _jacobian(
-        self, betas: Float64Array, lam: Float64Array, alphas: Float64Array
-    ) -> Float64Array:
+        self,
+        betas: linearmodels.typing.data.Float64Array,
+        lam: linearmodels.typing.data.Float64Array,
+        alphas: linearmodels.typing.data.Float64Array,
+    ) -> linearmodels.typing.data.Float64Array:
         nobs, nf, nport, nrf, s1, s2, s3 = self._boundaries()
         f = self.factors.ndarray
         fc = np.c_[np.ones((nobs, 1)), f]
@@ -743,11 +768,11 @@ class LinearFactorModel(_LinearFactorModelBase):
 
     def _moments(
         self,
-        eps: Float64Array,
-        betas: Float64Array,
-        alphas: Float64Array,
-        pricing_errors: Float64Array,
-    ) -> Float64Array:
+        eps: linearmodels.typing.data.Float64Array,
+        betas: linearmodels.typing.data.Float64Array,
+        alphas: linearmodels.typing.data.Float64Array,
+        pricing_errors: linearmodels.typing.data.Float64Array,
+    ) -> linearmodels.typing.data.Float64Array:
         sigma_inv = self._sigma_inv
 
         f = self.factors.ndarray
@@ -818,9 +843,9 @@ class LinearFactorModelGMM(_LinearFactorModelBase):
     def from_formula(
         cls,
         formula: str,
-        data: DataFrame,
+        data: pandas.DataFrame,
         *,
-        portfolios: DataFrame | None = None,
+        portfolios: pandas.DataFrame | None = None,
         risk_free: bool = False,
     ) -> LinearFactorModelGMM:
         """
@@ -881,7 +906,7 @@ class LinearFactorModelGMM(_LinearFactorModelBase):
         max_iter: int = 1000,
         cov_type: str = "robust",
         debiased: bool = True,
-        starting: ArrayLike | None = None,
+        starting: linearmodels.typing.data.ArrayLike | None = None,
         opt_options: dict[str, Any] | None = None,
         **cov_config: bool | int | str,
     ) -> GMMFactorModelResults:
@@ -1109,7 +1134,9 @@ class LinearFactorModelGMM(_LinearFactorModelBase):
 
         return GMMFactorModelResults(res_dict)
 
-    def _moments(self, parameters: Float64Array, excess_returns: bool) -> Float64Array:
+    def _moments(
+        self, parameters: linearmodels.typing.data.Float64Array, excess_returns: bool
+    ) -> linearmodels.typing.data.Float64Array:
         """Calculate nobs by nmoments moment conditions"""
         nrf = int(not excess_returns)
         p = np.asarray(self.portfolios.ndarray, dtype=float)
@@ -1131,7 +1158,10 @@ class LinearFactorModelGMM(_LinearFactorModelBase):
         return g
 
     def _j(
-        self, parameters: Float64Array, excess_returns: bool, w: Float64Array
+        self,
+        parameters: linearmodels.typing.data.Float64Array,
+        excess_returns: bool,
+        w: linearmodels.typing.data.Float64Array,
     ) -> float:
         """Objective function"""
         g = self._moments(parameters, excess_returns)
@@ -1141,7 +1171,7 @@ class LinearFactorModelGMM(_LinearFactorModelBase):
 
     def _j_cue(
         self,
-        parameters: Float64Array,
+        parameters: linearmodels.typing.data.Float64Array,
         excess_returns: bool,
         weight_est: HeteroskedasticWeight | KernelWeight,
     ) -> float:
@@ -1152,7 +1182,9 @@ class LinearFactorModelGMM(_LinearFactorModelBase):
         w = weight_est.w(g)
         return nobs * float(np.squeeze(gbar.T @ w @ gbar))
 
-    def _jacobian(self, params: Float64Array, excess_returns: bool) -> Float64Array:
+    def _jacobian(
+        self, params: linearmodels.typing.data.Float64Array, excess_returns: bool
+    ) -> linearmodels.typing.data.Float64Array:
         """Jacobian matrix for inference"""
         nobs, k = self.factors.shape
         n = self.portfolios.shape[1]
