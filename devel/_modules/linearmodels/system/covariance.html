@@ -15,7 +15,7 @@
     
   
       
-        <title>linearmodels.system.covariance - linearmodels v6.1 (+7)</title>
+        <title>linearmodels.system.covariance - linearmodels v6.1 (+10)</title>
       
     
 
@@ -88,7 +88,7 @@
 
 <header class="md-header" data-md-component="header">
   <nav class="md-header__inner md-grid" aria-label="Header">
-    <a href="../../../index.html" title="linearmodels v6.1 (+7)" class="md-header__button md-logo" aria-label="linearmodels v6.1 (+7)" data-md-component="logo">
+    <a href="../../../index.html" title="linearmodels v6.1 (+10)" class="md-header__button md-logo" aria-label="linearmodels v6.1 (+10)" data-md-component="logo">
       <img src="../../../_static/bw-logo.svg" alt="logo">
     </a>
     <label class="md-header__button md-icon" for="__drawer">
@@ -98,7 +98,7 @@
       <div class="md-header__ellipsis">
         <div class="md-header__topic">
           <span class="md-ellipsis">
-            linearmodels v6.1 (+7)
+            linearmodels v6.1 (+10)
           </span>
         </div>
         <div class="md-header__topic" data-md-component="header-topic">
@@ -185,10 +185,10 @@
 
 <nav class="md-nav md-nav--primary" aria-label="Navigation" data-md-level="0">
   <label class="md-nav__title" for="__drawer">
-    <a href="../../../index.html" title="linearmodels v6.1 (+7)" class="md-nav__button md-logo" aria-label="linearmodels v6.1 (+7)" data-md-component="logo">
+    <a href="../../../index.html" title="linearmodels v6.1 (+10)" class="md-nav__button md-logo" aria-label="linearmodels v6.1 (+10)" data-md-component="logo">
       <img src="../../../_static/bw-logo.svg" alt="logo">
     </a>
-    linearmodels v6.1 (+7)
+    linearmodels v6.1 (+10)
   </label>
   
     <div class="md-nav__source">
@@ -310,6 +310,22 @@
   
   
     <li class="md-nav__item">
+      <a href="../../../types.html" class="md-nav__link">
+        <span title="/types.rst (reference label)" class="md-ellipsis">Type Aliases</span>
+      </a>
+    </li>
+  
+
+    
+      
+      
+      
+
+  
+  
+  
+  
+    <li class="md-nav__item">
       <a href="../../../plan.html" class="md-nav__link">
         <span title="/plan.rst (reference label)" class="md-ellipsis">Module Plans</span>
       </a>
@@ -401,6 +417,7 @@
 
 <span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">cast</span>
 
+<span class="kn">import</span> <span class="nn">numpy</span>
 <span class="kn">from</span> <span class="nn">numpy</span> <span class="kn">import</span> <span class="n">asarray</span><span class="p">,</span> <span class="n">empty</span><span class="p">,</span> <span class="n">eye</span><span class="p">,</span> <span class="n">ndarray</span><span class="p">,</span> <span class="n">ones</span><span class="p">,</span> <span class="n">sqrt</span><span class="p">,</span> <span class="n">vstack</span><span class="p">,</span> <span class="n">zeros</span>
 <span class="kn">from</span> <span class="nn">numpy.linalg</span> <span class="kn">import</span> <span class="n">inv</span>
 
@@ -415,7 +432,7 @@
     <span class="n">blocked_diag_product</span><span class="p">,</span>
     <span class="n">blocked_inner_prod</span><span class="p">,</span>
 <span class="p">)</span>
-<span class="kn">from</span> <span class="nn">linearmodels.typing</span> <span class="kn">import</span> <span class="n">Float64Array</span><span class="p">,</span> <span class="n">IntArray</span>
+<span class="kn">import</span> <span class="nn">linearmodels.typing.data</span>
 
 <span class="n">CLUSTERS_FORMAT</span> <span class="o">=</span> <span class="s2">&quot;&quot;&quot;</span><span class="se">\</span>
 <span class="s2">clusters must be an ndarray with as shape (nobs, ncluster) where ncluster is the </span><span class="se">\</span>
@@ -463,10 +480,10 @@
 
     <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span>
-        <span class="n">x</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="n">ndarray</span><span class="p">],</span>
-        <span class="n">eps</span><span class="p">:</span> <span class="n">Float64Array</span><span class="p">,</span>
-        <span class="n">sigma</span><span class="p">:</span> <span class="n">Float64Array</span><span class="p">,</span>
-        <span class="n">full_sigma</span><span class="p">:</span> <span class="n">Float64Array</span><span class="p">,</span>
+        <span class="n">x</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="n">numpy</span><span class="o">.</span><span class="n">ndarray</span><span class="p">],</span>
+        <span class="n">eps</span><span class="p">:</span> <span class="n">linearmodels</span><span class="o">.</span><span class="n">typing</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">Float64Array</span><span class="p">,</span>
+        <span class="n">sigma</span><span class="p">:</span> <span class="n">linearmodels</span><span class="o">.</span><span class="n">typing</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">Float64Array</span><span class="p">,</span>
+        <span class="n">full_sigma</span><span class="p">:</span> <span class="n">linearmodels</span><span class="o">.</span><span class="n">typing</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">Float64Array</span><span class="p">,</span>
         <span class="o">*</span><span class="p">,</span>
         <span class="n">gls</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
         <span class="n">debiased</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
@@ -499,7 +516,7 @@
         <span class="k">return</span> <span class="n">out</span> <span class="o">+</span> <span class="sa">f</span><span class="s2">&quot;, id: </span><span class="si">{</span><span class="nb">hex</span><span class="p">(</span><span class="nb">id</span><span class="p">(</span><span class="bp">self</span><span class="p">))</span><span class="si">}</span><span class="s2">&quot;</span>
 
     <span class="nd">@property</span>
-    <span class="k">def</span> <span class="nf">sigma</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Float64Array</span><span class="p">:</span>
+    <span class="k">def</span> <span class="nf">sigma</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">linearmodels</span><span class="o">.</span><span class="n">typing</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">Float64Array</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Error covariance&quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_sigma</span>
 
@@ -507,7 +524,7 @@
         <span class="c1"># Sigma is pre-debiased</span>
         <span class="k">return</span> <span class="mf">1.0</span>
 
-    <span class="k">def</span> <span class="nf">_mvreg_cov</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Float64Array</span><span class="p">:</span>
+    <span class="k">def</span> <span class="nf">_mvreg_cov</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">linearmodels</span><span class="o">.</span><span class="n">typing</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">Float64Array</span><span class="p">:</span>
         <span class="n">x</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_x</span>
 
         <span class="n">xeex</span> <span class="o">=</span> <span class="n">blocked_inner_prod</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_sigma</span><span class="p">)</span>
@@ -526,7 +543,7 @@
         <span class="n">cov</span> <span class="o">=</span> <span class="p">(</span><span class="n">cov</span> <span class="o">+</span> <span class="n">cov</span><span class="o">.</span><span class="n">T</span><span class="p">)</span> <span class="o">/</span> <span class="mi">2</span>
         <span class="k">return</span> <span class="n">cov</span>
 
-    <span class="k">def</span> <span class="nf">_gls_cov</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Float64Array</span><span class="p">:</span>
+    <span class="k">def</span> <span class="nf">_gls_cov</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">linearmodels</span><span class="o">.</span><span class="n">typing</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">Float64Array</span><span class="p">:</span>
         <span class="n">x</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_x</span>
         <span class="n">sigma</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_sigma</span>
         <span class="n">sigma_inv</span> <span class="o">=</span> <span class="n">inv</span><span class="p">(</span><span class="n">sigma</span><span class="p">)</span>
@@ -548,7 +565,7 @@
         <span class="k">return</span> <span class="n">cov</span>
 
     <span class="nd">@property</span>
-    <span class="k">def</span> <span class="nf">cov</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Float64Array</span><span class="p">:</span>
+    <span class="k">def</span> <span class="nf">cov</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">linearmodels</span><span class="o">.</span><span class="n">typing</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">Float64Array</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Parameter covariance&quot;&quot;&quot;</span>
         <span class="n">adj</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_adjustment</span><span class="p">()</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_gls</span><span class="p">:</span>
@@ -608,10 +625,10 @@
 
     <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span>
-        <span class="n">x</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="n">ndarray</span><span class="p">],</span>
-        <span class="n">eps</span><span class="p">:</span> <span class="n">Float64Array</span><span class="p">,</span>
-        <span class="n">sigma</span><span class="p">:</span> <span class="n">Float64Array</span><span class="p">,</span>
-        <span class="n">full_sigma</span><span class="p">:</span> <span class="n">Float64Array</span><span class="p">,</span>
+        <span class="n">x</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="n">numpy</span><span class="o">.</span><span class="n">ndarray</span><span class="p">],</span>
+        <span class="n">eps</span><span class="p">:</span> <span class="n">linearmodels</span><span class="o">.</span><span class="n">typing</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">Float64Array</span><span class="p">,</span>
+        <span class="n">sigma</span><span class="p">:</span> <span class="n">linearmodels</span><span class="o">.</span><span class="n">typing</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">Float64Array</span><span class="p">,</span>
+        <span class="n">full_sigma</span><span class="p">:</span> <span class="n">linearmodels</span><span class="o">.</span><span class="n">typing</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">Float64Array</span><span class="p">,</span>
         <span class="o">*</span><span class="p">,</span>
         <span class="n">gls</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
         <span class="n">debiased</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
@@ -652,11 +669,11 @@
 
         <span class="bp">self</span><span class="o">.</span><span class="n">_moments</span> <span class="o">=</span> <span class="n">xe</span>
 
-    <span class="k">def</span> <span class="nf">_xeex</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Float64Array</span><span class="p">:</span>
+    <span class="k">def</span> <span class="nf">_xeex</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">linearmodels</span><span class="o">.</span><span class="n">typing</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">Float64Array</span><span class="p">:</span>
         <span class="n">nobs</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_moments</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_moments</span><span class="o">.</span><span class="n">T</span> <span class="o">@</span> <span class="bp">self</span><span class="o">.</span><span class="n">_moments</span> <span class="o">/</span> <span class="n">nobs</span>
 
-    <span class="k">def</span> <span class="nf">_cov</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">gls</span><span class="p">:</span> <span class="nb">bool</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Float64Array</span><span class="p">:</span>
+    <span class="k">def</span> <span class="nf">_cov</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">gls</span><span class="p">:</span> <span class="nb">bool</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">linearmodels</span><span class="o">.</span><span class="n">typing</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">Float64Array</span><span class="p">:</span>
         <span class="n">x</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_x</span>
         <span class="n">nobs</span> <span class="o">=</span> <span class="n">x</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
         <span class="n">k</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">x</span><span class="p">)</span>
@@ -679,10 +696,10 @@
         <span class="n">cov</span> <span class="o">=</span> <span class="p">(</span><span class="n">cov</span> <span class="o">+</span> <span class="n">cov</span><span class="o">.</span><span class="n">T</span><span class="p">)</span> <span class="o">/</span> <span class="mi">2</span>
         <span class="k">return</span> <span class="n">cov</span> <span class="o">/</span> <span class="n">nobs</span>
 
-    <span class="k">def</span> <span class="nf">_mvreg_cov</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Float64Array</span><span class="p">:</span>
+    <span class="k">def</span> <span class="nf">_mvreg_cov</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">linearmodels</span><span class="o">.</span><span class="n">typing</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">Float64Array</span><span class="p">:</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_cov</span><span class="p">(</span><span class="kc">False</span><span class="p">)</span>
 
-    <span class="k">def</span> <span class="nf">_gls_cov</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Float64Array</span><span class="p">:</span>
+    <span class="k">def</span> <span class="nf">_gls_cov</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">linearmodels</span><span class="o">.</span><span class="n">typing</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">Float64Array</span><span class="p">:</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_cov</span><span class="p">(</span><span class="kc">True</span><span class="p">)</span>
 
     <span class="k">def</span> <span class="nf">_adjustment</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">float</span> <span class="o">|</span> <span class="n">ndarray</span><span class="p">:</span>
@@ -759,10 +776,10 @@
 
     <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span>
-        <span class="n">x</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="n">ndarray</span><span class="p">],</span>
-        <span class="n">eps</span><span class="p">:</span> <span class="n">Float64Array</span><span class="p">,</span>
-        <span class="n">sigma</span><span class="p">:</span> <span class="n">Float64Array</span><span class="p">,</span>
-        <span class="n">full_sigma</span><span class="p">:</span> <span class="n">Float64Array</span><span class="p">,</span>
+        <span class="n">x</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="n">numpy</span><span class="o">.</span><span class="n">ndarray</span><span class="p">],</span>
+        <span class="n">eps</span><span class="p">:</span> <span class="n">linearmodels</span><span class="o">.</span><span class="n">typing</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">Float64Array</span><span class="p">,</span>
+        <span class="n">sigma</span><span class="p">:</span> <span class="n">linearmodels</span><span class="o">.</span><span class="n">typing</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">Float64Array</span><span class="p">,</span>
+        <span class="n">full_sigma</span><span class="p">:</span> <span class="n">linearmodels</span><span class="o">.</span><span class="n">typing</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">Float64Array</span><span class="p">,</span>
         <span class="o">*</span><span class="p">,</span>
         <span class="n">gls</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
         <span class="n">debiased</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
@@ -787,7 +804,7 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">_str_extra</span><span class="p">[</span><span class="s2">&quot;Kernel&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">kernel</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_cov_config</span><span class="p">[</span><span class="s2">&quot;kernel&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">kernel</span>
 
-    <span class="k">def</span> <span class="nf">_xeex</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Float64Array</span><span class="p">:</span>
+    <span class="k">def</span> <span class="nf">_xeex</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">linearmodels</span><span class="o">.</span><span class="n">typing</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">Float64Array</span><span class="p">:</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_kernel_cov</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_moments</span><span class="p">)</span>
 
     <span class="nd">@property</span>
@@ -856,15 +873,15 @@
 
     <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span>
-        <span class="n">x</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="n">ndarray</span><span class="p">],</span>
-        <span class="n">eps</span><span class="p">:</span> <span class="n">Float64Array</span><span class="p">,</span>
-        <span class="n">sigma</span><span class="p">:</span> <span class="n">Float64Array</span><span class="p">,</span>
-        <span class="n">full_sigma</span><span class="p">:</span> <span class="n">Float64Array</span><span class="p">,</span>
+        <span class="n">x</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="n">numpy</span><span class="o">.</span><span class="n">ndarray</span><span class="p">],</span>
+        <span class="n">eps</span><span class="p">:</span> <span class="n">linearmodels</span><span class="o">.</span><span class="n">typing</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">Float64Array</span><span class="p">,</span>
+        <span class="n">sigma</span><span class="p">:</span> <span class="n">linearmodels</span><span class="o">.</span><span class="n">typing</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">Float64Array</span><span class="p">,</span>
+        <span class="n">full_sigma</span><span class="p">:</span> <span class="n">linearmodels</span><span class="o">.</span><span class="n">typing</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">Float64Array</span><span class="p">,</span>
         <span class="o">*</span><span class="p">,</span>
         <span class="n">gls</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
         <span class="n">debiased</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
         <span class="n">constraints</span><span class="p">:</span> <span class="n">LinearConstraint</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
-        <span class="n">clusters</span><span class="p">:</span> <span class="n">IntArray</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+        <span class="n">clusters</span><span class="p">:</span> <span class="n">linearmodels</span><span class="o">.</span><span class="n">typing</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">IntArray</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
         <span class="n">group_debias</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
     <span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
         <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span>
@@ -885,7 +902,9 @@
             <span class="bp">self</span><span class="o">.</span><span class="n">_str_extra</span><span class="p">[</span><span class="s2">&quot;Number of Groups&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="s2">&quot; and &quot;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">num_cl</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_str_extra</span><span class="p">[</span><span class="s2">&quot;Group Debias&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_group_debias</span>
 
-    <span class="k">def</span> <span class="nf">_check_clusters</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">clusters</span><span class="p">:</span> <span class="n">IntArray</span> <span class="o">|</span> <span class="kc">None</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">IntArray</span><span class="p">:</span>
+    <span class="k">def</span> <span class="nf">_check_clusters</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span> <span class="n">clusters</span><span class="p">:</span> <span class="n">linearmodels</span><span class="o">.</span><span class="n">typing</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">IntArray</span> <span class="o">|</span> <span class="kc">None</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">linearmodels</span><span class="o">.</span><span class="n">typing</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">IntArray</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Check cluster dimension and ensure ndarray&quot;&quot;&quot;</span>
         <span class="k">if</span> <span class="n">clusters</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
             <span class="k">return</span> <span class="n">empty</span><span class="p">((</span><span class="bp">self</span><span class="o">.</span><span class="n">_eps</span><span class="o">.</span><span class="n">size</span><span class="p">,</span> <span class="mi">0</span><span class="p">),</span> <span class="n">dtype</span><span class="o">=</span><span class="nb">int</span><span class="p">)</span>
@@ -913,7 +932,7 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">_nclusters</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="n">nunique</span><span class="p">)</span>
         <span class="k">return</span> <span class="n">_clusters</span>
 
-    <span class="k">def</span> <span class="nf">_xeex</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Float64Array</span><span class="p">:</span>
+    <span class="k">def</span> <span class="nf">_xeex</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">linearmodels</span><span class="o">.</span><span class="n">typing</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">Float64Array</span><span class="p">:</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_clusters</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
             <span class="c1"># Heteroskedastic but not clustered</span>
             <span class="k">return</span> <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="n">_xeex</span><span class="p">()</span>
@@ -983,12 +1002,12 @@
 
     <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span>
-        <span class="n">x</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="n">ndarray</span><span class="p">],</span>
-        <span class="n">z</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="n">ndarray</span><span class="p">],</span>
-        <span class="n">eps</span><span class="p">:</span> <span class="n">Float64Array</span><span class="p">,</span>
-        <span class="n">w</span><span class="p">:</span> <span class="n">Float64Array</span><span class="p">,</span>
+        <span class="n">x</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="n">numpy</span><span class="o">.</span><span class="n">ndarray</span><span class="p">],</span>
+        <span class="n">z</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="n">numpy</span><span class="o">.</span><span class="n">ndarray</span><span class="p">],</span>
+        <span class="n">eps</span><span class="p">:</span> <span class="n">linearmodels</span><span class="o">.</span><span class="n">typing</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">Float64Array</span><span class="p">,</span>
+        <span class="n">w</span><span class="p">:</span> <span class="n">linearmodels</span><span class="o">.</span><span class="n">typing</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">Float64Array</span><span class="p">,</span>
         <span class="o">*</span><span class="p">,</span>
-        <span class="n">sigma</span><span class="p">:</span> <span class="n">ndarray</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+        <span class="n">sigma</span><span class="p">:</span> <span class="n">numpy</span><span class="o">.</span><span class="n">ndarray</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
         <span class="n">debiased</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
         <span class="n">constraints</span><span class="p">:</span> <span class="n">LinearConstraint</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
     <span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
@@ -1011,7 +1030,7 @@
         <span class="k">return</span> <span class="n">out</span> <span class="o">+</span> <span class="sa">f</span><span class="s2">&quot;, id: </span><span class="si">{</span><span class="nb">hex</span><span class="p">(</span><span class="nb">id</span><span class="p">(</span><span class="bp">self</span><span class="p">))</span><span class="si">}</span><span class="s2">&quot;</span>
 
     <span class="nd">@property</span>
-    <span class="k">def</span> <span class="nf">cov</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Float64Array</span><span class="p">:</span>
+    <span class="k">def</span> <span class="nf">cov</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">linearmodels</span><span class="o">.</span><span class="n">typing</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">Float64Array</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Parameter covariance&quot;&quot;&quot;</span>
         <span class="n">x</span><span class="p">,</span> <span class="n">z</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_x</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_z</span>
         <span class="n">k</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">x</span><span class="p">)</span>
@@ -1044,7 +1063,7 @@
         <span class="n">cov</span> <span class="o">=</span> <span class="p">(</span><span class="n">cov</span> <span class="o">+</span> <span class="n">cov</span><span class="o">.</span><span class="n">T</span><span class="p">)</span> <span class="o">/</span> <span class="mi">2</span>
         <span class="k">return</span> <span class="n">adj</span> <span class="o">*</span> <span class="n">cov</span>
 
-    <span class="k">def</span> <span class="nf">_omega</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Float64Array</span><span class="p">:</span>
+    <span class="k">def</span> <span class="nf">_omega</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">linearmodels</span><span class="o">.</span><span class="n">typing</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">Float64Array</span><span class="p">:</span>
         <span class="n">z</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_z</span>
         <span class="n">nobs</span> <span class="o">=</span> <span class="n">z</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
         <span class="n">sigma</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_sigma</span>
@@ -1108,12 +1127,12 @@
 
     <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span>
-        <span class="n">x</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="n">ndarray</span><span class="p">],</span>
-        <span class="n">z</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="n">ndarray</span><span class="p">],</span>
-        <span class="n">eps</span><span class="p">:</span> <span class="n">Float64Array</span><span class="p">,</span>
-        <span class="n">w</span><span class="p">:</span> <span class="n">Float64Array</span><span class="p">,</span>
+        <span class="n">x</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="n">numpy</span><span class="o">.</span><span class="n">ndarray</span><span class="p">],</span>
+        <span class="n">z</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="n">numpy</span><span class="o">.</span><span class="n">ndarray</span><span class="p">],</span>
+        <span class="n">eps</span><span class="p">:</span> <span class="n">linearmodels</span><span class="o">.</span><span class="n">typing</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">Float64Array</span><span class="p">,</span>
+        <span class="n">w</span><span class="p">:</span> <span class="n">linearmodels</span><span class="o">.</span><span class="n">typing</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">Float64Array</span><span class="p">,</span>
         <span class="o">*</span><span class="p">,</span>
-        <span class="n">sigma</span><span class="p">:</span> <span class="n">ndarray</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+        <span class="n">sigma</span><span class="p">:</span> <span class="n">numpy</span><span class="o">.</span><span class="n">ndarray</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
         <span class="n">debiased</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
         <span class="n">constraints</span><span class="p">:</span> <span class="n">LinearConstraint</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
     <span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
@@ -1133,7 +1152,7 @@
             <span class="n">loc</span> <span class="o">+=</span> <span class="n">kz</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_moments</span> <span class="o">=</span> <span class="n">ze</span>
 
-    <span class="k">def</span> <span class="nf">_omega</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Float64Array</span><span class="p">:</span>
+    <span class="k">def</span> <span class="nf">_omega</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">linearmodels</span><span class="o">.</span><span class="n">typing</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">Float64Array</span><span class="p">:</span>
         <span class="n">z</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_z</span>
         <span class="n">nobs</span> <span class="o">=</span> <span class="n">z</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
         <span class="n">omega</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_moments</span><span class="o">.</span><span class="n">T</span> <span class="o">@</span> <span class="bp">self</span><span class="o">.</span><span class="n">_moments</span> <span class="o">/</span> <span class="n">nobs</span>
@@ -1187,12 +1206,12 @@
 
     <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span>
-        <span class="n">x</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="n">ndarray</span><span class="p">],</span>
-        <span class="n">z</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="n">ndarray</span><span class="p">],</span>
-        <span class="n">eps</span><span class="p">:</span> <span class="n">Float64Array</span><span class="p">,</span>
-        <span class="n">w</span><span class="p">:</span> <span class="n">Float64Array</span><span class="p">,</span>
+        <span class="n">x</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="n">numpy</span><span class="o">.</span><span class="n">ndarray</span><span class="p">],</span>
+        <span class="n">z</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="n">numpy</span><span class="o">.</span><span class="n">ndarray</span><span class="p">],</span>
+        <span class="n">eps</span><span class="p">:</span> <span class="n">linearmodels</span><span class="o">.</span><span class="n">typing</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">Float64Array</span><span class="p">,</span>
+        <span class="n">w</span><span class="p">:</span> <span class="n">linearmodels</span><span class="o">.</span><span class="n">typing</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">Float64Array</span><span class="p">,</span>
         <span class="o">*</span><span class="p">,</span>
-        <span class="n">sigma</span><span class="p">:</span> <span class="n">ndarray</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+        <span class="n">sigma</span><span class="p">:</span> <span class="n">numpy</span><span class="o">.</span><span class="n">ndarray</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
         <span class="n">debiased</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
         <span class="n">constraints</span><span class="p">:</span> <span class="n">LinearConstraint</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
         <span class="n">kernel</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;bartlett&quot;</span><span class="p">,</span>
@@ -1207,7 +1226,7 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">_check_kernel</span><span class="p">(</span><span class="n">kernel</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_cov_config</span><span class="p">[</span><span class="s2">&quot;kernel&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">kernel</span>
 
-    <span class="k">def</span> <span class="nf">_omega</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Float64Array</span><span class="p">:</span>
+    <span class="k">def</span> <span class="nf">_omega</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">linearmodels</span><span class="o">.</span><span class="n">typing</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">Float64Array</span><span class="p">:</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_kernel_cov</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_moments</span><span class="p">)</span>
 
     <span class="nd">@property</span>

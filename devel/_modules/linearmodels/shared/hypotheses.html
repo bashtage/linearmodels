@@ -15,7 +15,7 @@
     
   
       
-        <title>linearmodels.shared.hypotheses - linearmodels v6.1 (+7)</title>
+        <title>linearmodels.shared.hypotheses - linearmodels v6.1 (+10)</title>
       
     
 
@@ -88,7 +88,7 @@
 
 <header class="md-header" data-md-component="header">
   <nav class="md-header__inner md-grid" aria-label="Header">
-    <a href="../../../index.html" title="linearmodels v6.1 (+7)" class="md-header__button md-logo" aria-label="linearmodels v6.1 (+7)" data-md-component="logo">
+    <a href="../../../index.html" title="linearmodels v6.1 (+10)" class="md-header__button md-logo" aria-label="linearmodels v6.1 (+10)" data-md-component="logo">
       <img src="../../../_static/bw-logo.svg" alt="logo">
     </a>
     <label class="md-header__button md-icon" for="__drawer">
@@ -98,7 +98,7 @@
       <div class="md-header__ellipsis">
         <div class="md-header__topic">
           <span class="md-ellipsis">
-            linearmodels v6.1 (+7)
+            linearmodels v6.1 (+10)
           </span>
         </div>
         <div class="md-header__topic" data-md-component="header-topic">
@@ -185,10 +185,10 @@
 
 <nav class="md-nav md-nav--primary" aria-label="Navigation" data-md-level="0">
   <label class="md-nav__title" for="__drawer">
-    <a href="../../../index.html" title="linearmodels v6.1 (+7)" class="md-nav__button md-logo" aria-label="linearmodels v6.1 (+7)" data-md-component="logo">
+    <a href="../../../index.html" title="linearmodels v6.1 (+10)" class="md-nav__button md-logo" aria-label="linearmodels v6.1 (+10)" data-md-component="logo">
       <img src="../../../_static/bw-logo.svg" alt="logo">
     </a>
-    linearmodels v6.1 (+7)
+    linearmodels v6.1 (+10)
   </label>
   
     <div class="md-nav__source">
@@ -310,6 +310,22 @@
   
   
     <li class="md-nav__item">
+      <a href="../../../types.html" class="md-nav__link">
+        <span title="/types.rst (reference label)" class="md-ellipsis">Type Aliases</span>
+      </a>
+    </li>
+  
+
+    
+      
+      
+      
+
+  
+  
+  
+  
+    <li class="md-nav__item">
       <a href="../../../plan.html" class="md-nav__link">
         <span title="/plan.rst (reference label)" class="md-ellipsis">Module Plans</span>
       </a>
@@ -408,7 +424,7 @@
 <span class="kn">from</span> <span class="nn">pandas</span> <span class="kn">import</span> <span class="n">Series</span>
 <span class="kn">from</span> <span class="nn">scipy.stats</span> <span class="kn">import</span> <span class="n">chi2</span><span class="p">,</span> <span class="n">f</span>
 
-<span class="kn">from</span> <span class="nn">linearmodels.typing</span> <span class="kn">import</span> <span class="n">ArrayLike</span>
+<span class="kn">import</span> <span class="nn">linearmodels.typing.data</span>
 
 <span class="c1"># Monkey patch parsers if needed, remove once formulaic updated</span>
 <span class="n">monkey_patch_materializers</span><span class="p">()</span>
@@ -626,10 +642,10 @@
 
 
 <span class="k">def</span> <span class="nf">quadratic_form_test</span><span class="p">(</span>
-    <span class="n">params</span><span class="p">:</span> <span class="n">ArrayLike</span><span class="p">,</span>
-    <span class="n">cov</span><span class="p">:</span> <span class="n">ArrayLike</span><span class="p">,</span>
-    <span class="n">restriction</span><span class="p">:</span> <span class="n">ArrayLike</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
-    <span class="n">value</span><span class="p">:</span> <span class="n">ArrayLike</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+    <span class="n">params</span><span class="p">:</span> <span class="n">linearmodels</span><span class="o">.</span><span class="n">typing</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">ArrayLike</span><span class="p">,</span>
+    <span class="n">cov</span><span class="p">:</span> <span class="n">linearmodels</span><span class="o">.</span><span class="n">typing</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">ArrayLike</span><span class="p">,</span>
+    <span class="n">restriction</span><span class="p">:</span> <span class="n">linearmodels</span><span class="o">.</span><span class="n">typing</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">ArrayLike</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+    <span class="n">value</span><span class="p">:</span> <span class="n">linearmodels</span><span class="o">.</span><span class="n">typing</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">ArrayLike</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
     <span class="n">formula</span><span class="p">:</span> <span class="nb">str</span> <span class="o">|</span> <span class="nb">list</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">|</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">float</span><span class="p">]</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">WaldTestStatistic</span><span class="p">:</span>
     <span class="k">if</span> <span class="n">formula</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="ow">and</span> <span class="n">restriction</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>

@@ -49,7 +49,7 @@
    "source": [
     "orig_mi_data = data.set_index([\"fcode\", \"year\"])\n",
     "# Subset to the relevant columns and drop missing to avoid warnings\n",
-    "mi_data = orig_mi_data[[\"lscrap\",\"hrsemp\"]]\n",
+    "mi_data = orig_mi_data[[\"lscrap\", \"hrsemp\"]]\n",
     "mi_data = mi_data.dropna(axis=0, how=\"any\")\n",
     "\n",
     "print(mi_data.head())"

@@ -15,7 +15,7 @@
     
   
       
-        <title>Data Formats for Panel Data Analysis - linearmodels v6.1 (+7)</title>
+        <title>Data Formats for Panel Data Analysis - linearmodels v6.1 (+10)</title>
       
     
 
@@ -94,7 +94,7 @@
 
 <header class="md-header" data-md-component="header">
   <nav class="md-header__inner md-grid" aria-label="Header">
-    <a href="../../index.html" title="linearmodels v6.1 (+7)" class="md-header__button md-logo" aria-label="linearmodels v6.1 (+7)" data-md-component="logo">
+    <a href="../../index.html" title="linearmodels v6.1 (+10)" class="md-header__button md-logo" aria-label="linearmodels v6.1 (+10)" data-md-component="logo">
       <img src="../../_static/bw-logo.svg" alt="logo">
     </a>
     <label class="md-header__button md-icon" for="__drawer">
@@ -104,7 +104,7 @@
       <div class="md-header__ellipsis">
         <div class="md-header__topic">
           <span class="md-ellipsis">
-            linearmodels v6.1 (+7)
+            linearmodels v6.1 (+10)
           </span>
         </div>
         <div class="md-header__topic" data-md-component="header-topic">
@@ -191,10 +191,10 @@
 
 <nav class="md-nav md-nav--primary" aria-label="Navigation" data-md-level="0">
   <label class="md-nav__title" for="__drawer">
-    <a href="../../index.html" title="linearmodels v6.1 (+7)" class="md-nav__button md-logo" aria-label="linearmodels v6.1 (+7)" data-md-component="logo">
+    <a href="../../index.html" title="linearmodels v6.1 (+10)" class="md-nav__button md-logo" aria-label="linearmodels v6.1 (+10)" data-md-component="logo">
       <img src="../../_static/bw-logo.svg" alt="logo">
     </a>
-    linearmodels v6.1 (+7)
+    linearmodels v6.1 (+10)
   </label>
   
     <div class="md-nav__source">
@@ -522,6 +522,22 @@
   
   
     <li class="md-nav__item">
+      <a href="../../types.html" class="md-nav__link">
+        <span title="/types.rst (reference label)" class="md-ellipsis">Type Aliases</span>
+      </a>
+    </li>
+  
+
+    
+      
+      
+      
+
+  
+  
+  
+  
+    <li class="md-nav__item">
       <a href="../../plan.html" class="md-nav__link">
         <span title="/plan.rst (reference label)" class="md-ellipsis">Module Plans</span>
       </a>
@@ -700,7 +716,7 @@
 </div>
 <div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><code><span class="n">orig_mi_data</span> <span class="o">=</span> <span class="n">data</span><span class="o">.</span><span class="n">set_index</span><span class="p">([</span><span class="s2">&quot;fcode&quot;</span><span class="p">,</span> <span class="s2">&quot;year&quot;</span><span class="p">])</span>
 <span class="c1"># Subset to the relevant columns and drop missing to avoid warnings</span>
-<span class="n">mi_data</span> <span class="o">=</span> <span class="n">orig_mi_data</span><span class="p">[[</span><span class="s2">&quot;lscrap&quot;</span><span class="p">,</span><span class="s2">&quot;hrsemp&quot;</span><span class="p">]]</span>
+<span class="n">mi_data</span> <span class="o">=</span> <span class="n">orig_mi_data</span><span class="p">[[</span><span class="s2">&quot;lscrap&quot;</span><span class="p">,</span> <span class="s2">&quot;hrsemp&quot;</span><span class="p">]]</span>
 <span class="n">mi_data</span> <span class="o">=</span> <span class="n">mi_data</span><span class="o">.</span><span class="n">dropna</span><span class="p">(</span><span class="n">axis</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">how</span><span class="o">=</span><span class="s2">&quot;any&quot;</span><span class="p">)</span>
 
 <span class="nb">print</span><span class="p">(</span><span class="n">mi_data</span><span class="o">.</span><span class="n">head</span><span class="p">())</span>
@@ -744,7 +760,7 @@ Dep. Variable:                 lscrap   R-squared:                        0.0528
 Estimator:                   PanelOLS   R-squared (Between):             -0.0379
 No. Observations:                 140   R-squared (Within):               0.0528
 Date:                Fri, Jul 19 2024   R-squared (Overall):             -0.0288
-Time:                        07:13:10   Log-likelihood                   -90.459
+Time:                        17:54:46   Log-likelihood                   -90.459
 Cov. Estimator:            Unadjusted
                                         F-statistic:                      5.0751
 Entities:                          48   P-value                           0.0267
@@ -813,7 +829,7 @@ Dep. Variable:                    Dep   R-squared:                        0.0528
 Estimator:                   PanelOLS   R-squared (Between):             -0.0379
 No. Observations:                 140   R-squared (Within):               0.0528
 Date:                Fri, Jul 19 2024   R-squared (Overall):             -0.0288
-Time:                        07:13:10   Log-likelihood                   -90.459
+Time:                        17:54:46   Log-likelihood                   -90.459
 Cov. Estimator:            Unadjusted
                                         F-statistic:                      5.0751
 Entities:                          48   P-value                           0.0267
@@ -845,7 +861,7 @@ Included effects: Entity
 </div>
 <div class="output_area stderr docutils container">
 <div class="highlight"><pre>
-/home/runner/work/linearmodels/linearmodels/linearmodels/panel/model.py:1219: MissingValueWarning:
+/home/runner/work/linearmodels/linearmodels/linearmodels/panel/model.py:1260: MissingValueWarning:
 Inputs contain missing values. Dropping rows with missing observations.
   super().__init__(dependent, exog, weights=weights, check_rank=check_rank)
 </pre></div></div>
@@ -898,7 +914,7 @@ Dep. Variable:                    Dep   R-squared:                        0.0528
 Estimator:                   PanelOLS   R-squared (Between):             -0.0379
 No. Observations:                 140   R-squared (Within):               0.0528
 Date:                Fri, Jul 19 2024   R-squared (Overall):             -0.0288
-Time:                        07:13:10   Log-likelihood                   -90.459
+Time:                        17:54:46   Log-likelihood                   -90.459
 Cov. Estimator:            Unadjusted
                                         F-statistic:                      5.0751
 Entities:                          48   P-value                           0.0267
@@ -980,7 +996,7 @@ Dep. Variable:                 lscrap   R-squared:                        0.1985
 Estimator:                   PanelOLS   R-squared (Between):             -0.1240
 No. Observations:                 140   R-squared (Within):               0.1985
 Date:                Fri, Jul 19 2024   R-squared (Overall):             -0.0934
-Time:                        07:13:10   Log-likelihood                   -78.765
+Time:                        17:54:46   Log-likelihood                   -78.765
 Cov. Estimator:            Unadjusted
                                         F-statistic:                      7.3496
 Entities:                          48   P-value                           0.0002
@@ -1047,7 +1063,7 @@ Dep. Variable:                 lscrap   R-squared:                        0.1985
 Estimator:                   PanelOLS   R-squared (Between):             -0.1240
 No. Observations:                 140   R-squared (Within):               0.1985
 Date:                Fri, Jul 19 2024   R-squared (Overall):             -0.0934
-Time:                        07:13:11   Log-likelihood                   -78.765
+Time:                        17:54:47   Log-likelihood                   -78.765
 Cov. Estimator:            Unadjusted
                                         F-statistic:                      7.3496
 Entities:                          48   P-value                           0.0002

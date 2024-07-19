@@ -15,7 +15,7 @@
     
   
       
-        <title>linearmodels.asset_pricing.results - linearmodels v6.1 (+7)</title>
+        <title>linearmodels.asset_pricing.results - linearmodels v6.1 (+10)</title>
       
     
 
@@ -88,7 +88,7 @@
 
 <header class="md-header" data-md-component="header">
   <nav class="md-header__inner md-grid" aria-label="Header">
-    <a href="../../../index.html" title="linearmodels v6.1 (+7)" class="md-header__button md-logo" aria-label="linearmodels v6.1 (+7)" data-md-component="logo">
+    <a href="../../../index.html" title="linearmodels v6.1 (+10)" class="md-header__button md-logo" aria-label="linearmodels v6.1 (+10)" data-md-component="logo">
       <img src="../../../_static/bw-logo.svg" alt="logo">
     </a>
     <label class="md-header__button md-icon" for="__drawer">
@@ -98,7 +98,7 @@
       <div class="md-header__ellipsis">
         <div class="md-header__topic">
           <span class="md-ellipsis">
-            linearmodels v6.1 (+7)
+            linearmodels v6.1 (+10)
           </span>
         </div>
         <div class="md-header__topic" data-md-component="header-topic">
@@ -185,10 +185,10 @@
 
 <nav class="md-nav md-nav--primary" aria-label="Navigation" data-md-level="0">
   <label class="md-nav__title" for="__drawer">
-    <a href="../../../index.html" title="linearmodels v6.1 (+7)" class="md-nav__button md-logo" aria-label="linearmodels v6.1 (+7)" data-md-component="logo">
+    <a href="../../../index.html" title="linearmodels v6.1 (+10)" class="md-nav__button md-logo" aria-label="linearmodels v6.1 (+10)" data-md-component="logo">
       <img src="../../../_static/bw-logo.svg" alt="logo">
     </a>
-    linearmodels v6.1 (+7)
+    linearmodels v6.1 (+10)
   </label>
   
     <div class="md-nav__source">
@@ -296,6 +296,22 @@
     <li class="md-nav__item">
       <a href="../../../compatibility.html" class="md-nav__link">
         <span title="/compatibility.rst (reference label)" class="md-ellipsis">Compatibility</span>
+      </a>
+    </li>
+  
+
+    
+      
+      
+      
+
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../types.html" class="md-nav__link">
+        <span title="/types.rst (reference label)" class="md-ellipsis">Type Aliases</span>
       </a>
     </li>
   
@@ -418,7 +434,7 @@
 <span class="kn">from</span> <span class="nn">linearmodels.shared.hypotheses</span> <span class="kn">import</span> <span class="n">WaldTestStatistic</span>
 <span class="kn">from</span> <span class="nn">linearmodels.shared.io</span> <span class="kn">import</span> <span class="n">_str</span><span class="p">,</span> <span class="n">pval_format</span>
 <span class="kn">from</span> <span class="nn">linearmodels.shared.utility</span> <span class="kn">import</span> <span class="n">AttrDict</span>
-<span class="kn">from</span> <span class="nn">linearmodels.typing</span> <span class="kn">import</span> <span class="n">Float64Array</span>
+<span class="kn">import</span> <span class="nn">linearmodels.typing.data</span>
 
 
 <div class="viewcode-block" id="LinearFactorModelResults">
@@ -554,8 +570,8 @@
 
     <span class="nd">@staticmethod</span>
     <span class="k">def</span> <span class="nf">_single_table</span><span class="p">(</span>
-        <span class="n">params</span><span class="p">:</span> <span class="n">Float64Array</span><span class="p">,</span>
-        <span class="n">se</span><span class="p">:</span> <span class="n">Float64Array</span><span class="p">,</span>
+        <span class="n">params</span><span class="p">:</span> <span class="n">linearmodels</span><span class="o">.</span><span class="n">typing</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">Float64Array</span><span class="p">,</span>
+        <span class="n">se</span><span class="p">:</span> <span class="n">linearmodels</span><span class="o">.</span><span class="n">typing</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">Float64Array</span><span class="p">,</span>
         <span class="n">name</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
         <span class="n">param_names</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">|</span> <span class="nb">tuple</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="o">...</span><span class="p">],</span>
         <span class="n">first</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
@@ -742,7 +758,7 @@
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">std_errors</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Estimated parameter standard errors&quot;&quot;&quot;</span>
-        <span class="n">se</span> <span class="o">=</span> <span class="n">cast</span><span class="p">(</span><span class="n">Float64Array</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">diag</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_cov</span><span class="p">)))</span>
+        <span class="n">se</span> <span class="o">=</span> <span class="n">cast</span><span class="p">(</span><span class="n">linearmodels</span><span class="o">.</span><span class="n">typing</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">Float64Array</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">diag</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_cov</span><span class="p">)))</span>
         <span class="n">ase</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">diag</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_alpha_vcv</span><span class="p">))</span>
         <span class="n">nportfolio</span><span class="p">,</span> <span class="n">nfactor</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_params</span><span class="o">.</span><span class="n">shape</span>
         <span class="n">nloadings</span> <span class="o">=</span> <span class="n">nportfolio</span> <span class="o">*</span> <span class="p">(</span><span class="n">nfactor</span> <span class="o">-</span> <span class="mi">1</span><span class="p">)</span>

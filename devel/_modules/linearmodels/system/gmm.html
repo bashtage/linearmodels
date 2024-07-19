@@ -15,7 +15,7 @@
     
   
       
-        <title>linearmodels.system.gmm - linearmodels v6.1 (+7)</title>
+        <title>linearmodels.system.gmm - linearmodels v6.1 (+10)</title>
       
     
 
@@ -88,7 +88,7 @@
 
 <header class="md-header" data-md-component="header">
   <nav class="md-header__inner md-grid" aria-label="Header">
-    <a href="../../../index.html" title="linearmodels v6.1 (+7)" class="md-header__button md-logo" aria-label="linearmodels v6.1 (+7)" data-md-component="logo">
+    <a href="../../../index.html" title="linearmodels v6.1 (+10)" class="md-header__button md-logo" aria-label="linearmodels v6.1 (+10)" data-md-component="logo">
       <img src="../../../_static/bw-logo.svg" alt="logo">
     </a>
     <label class="md-header__button md-icon" for="__drawer">
@@ -98,7 +98,7 @@
       <div class="md-header__ellipsis">
         <div class="md-header__topic">
           <span class="md-ellipsis">
-            linearmodels v6.1 (+7)
+            linearmodels v6.1 (+10)
           </span>
         </div>
         <div class="md-header__topic" data-md-component="header-topic">
@@ -185,10 +185,10 @@
 
 <nav class="md-nav md-nav--primary" aria-label="Navigation" data-md-level="0">
   <label class="md-nav__title" for="__drawer">
-    <a href="../../../index.html" title="linearmodels v6.1 (+7)" class="md-nav__button md-logo" aria-label="linearmodels v6.1 (+7)" data-md-component="logo">
+    <a href="../../../index.html" title="linearmodels v6.1 (+10)" class="md-nav__button md-logo" aria-label="linearmodels v6.1 (+10)" data-md-component="logo">
       <img src="../../../_static/bw-logo.svg" alt="logo">
     </a>
-    linearmodels v6.1 (+7)
+    linearmodels v6.1 (+10)
   </label>
   
     <div class="md-nav__source">
@@ -310,6 +310,22 @@
   
   
     <li class="md-nav__item">
+      <a href="../../../types.html" class="md-nav__link">
+        <span title="/types.rst (reference label)" class="md-ellipsis">Type Aliases</span>
+      </a>
+    </li>
+  
+
+    
+      
+      
+      
+
+  
+  
+  
+  
+    <li class="md-nav__item">
       <a href="../../../plan.html" class="md-nav__link">
         <span title="/plan.rst (reference label)" class="md-ellipsis">Module Plans</span>
       </a>
@@ -406,13 +422,14 @@
 <span class="kn">from</span> <span class="nn">collections.abc</span> <span class="kn">import</span> <span class="n">Sequence</span>
 <span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">cast</span>
 
+<span class="kn">import</span> <span class="nn">numpy</span>
 <span class="kn">from</span> <span class="nn">numpy</span> <span class="kn">import</span> <span class="n">array</span><span class="p">,</span> <span class="n">empty</span><span class="p">,</span> <span class="n">ndarray</span><span class="p">,</span> <span class="n">repeat</span><span class="p">,</span> <span class="n">sqrt</span><span class="p">,</span> <span class="n">zeros_like</span>
 
 <span class="kn">from</span> <span class="nn">linearmodels.asset_pricing.covariance</span> <span class="kn">import</span> <span class="n">_HACMixin</span>
 <span class="kn">from</span> <span class="nn">linearmodels.iv.covariance</span> <span class="kn">import</span> <span class="n">kernel_optimal_bandwidth</span>
 <span class="kn">from</span> <span class="nn">linearmodels.shared.utility</span> <span class="kn">import</span> <span class="n">AttrDict</span>
 <span class="kn">from</span> <span class="nn">linearmodels.system._utility</span> <span class="kn">import</span> <span class="n">blocked_inner_prod</span>
-<span class="kn">from</span> <span class="nn">linearmodels.typing</span> <span class="kn">import</span> <span class="n">Float64Array</span>
+<span class="kn">import</span> <span class="nn">linearmodels.typing.data</span>
 
 
 <div class="viewcode-block" id="HomoskedasticWeightMatrix">
@@ -469,7 +486,11 @@
 
 <div class="viewcode-block" id="HomoskedasticWeightMatrix.sigma">
 <a class="viewcode-back" href="../../../system/system/linearmodels.system.gmm.HomoskedasticWeightMatrix.sigma.html#linearmodels.system.gmm.HomoskedasticWeightMatrix.sigma">[docs]</a>
-    <span class="k">def</span> <span class="nf">sigma</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">eps</span><span class="p">:</span> <span class="n">Float64Array</span><span class="p">,</span> <span class="n">x</span><span class="p">:</span> <span class="n">Sequence</span><span class="p">[</span><span class="n">Float64Array</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="n">Float64Array</span><span class="p">:</span>
+    <span class="k">def</span> <span class="nf">sigma</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span>
+        <span class="n">eps</span><span class="p">:</span> <span class="n">linearmodels</span><span class="o">.</span><span class="n">typing</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">Float64Array</span><span class="p">,</span>
+        <span class="n">x</span><span class="p">:</span> <span class="n">Sequence</span><span class="p">[</span><span class="n">linearmodels</span><span class="o">.</span><span class="n">typing</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">Float64Array</span><span class="p">],</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">linearmodels</span><span class="o">.</span><span class="n">typing</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">Float64Array</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Estimate residual covariance.</span>
 
@@ -502,12 +523,12 @@
 <a class="viewcode-back" href="../../../system/system/linearmodels.system.gmm.HomoskedasticWeightMatrix.weight_matrix.html#linearmodels.system.gmm.HomoskedasticWeightMatrix.weight_matrix">[docs]</a>
     <span class="k">def</span> <span class="nf">weight_matrix</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span>
-        <span class="n">x</span><span class="p">:</span> <span class="n">Sequence</span><span class="p">[</span><span class="n">Float64Array</span><span class="p">],</span>
-        <span class="n">z</span><span class="p">:</span> <span class="n">Sequence</span><span class="p">[</span><span class="n">Float64Array</span><span class="p">],</span>
-        <span class="n">eps</span><span class="p">:</span> <span class="n">Float64Array</span><span class="p">,</span>
+        <span class="n">x</span><span class="p">:</span> <span class="n">Sequence</span><span class="p">[</span><span class="n">linearmodels</span><span class="o">.</span><span class="n">typing</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">Float64Array</span><span class="p">],</span>
+        <span class="n">z</span><span class="p">:</span> <span class="n">Sequence</span><span class="p">[</span><span class="n">linearmodels</span><span class="o">.</span><span class="n">typing</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">Float64Array</span><span class="p">],</span>
+        <span class="n">eps</span><span class="p">:</span> <span class="n">linearmodels</span><span class="o">.</span><span class="n">typing</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">Float64Array</span><span class="p">,</span>
         <span class="o">*</span><span class="p">,</span>
-        <span class="n">sigma</span><span class="p">:</span> <span class="n">ndarray</span><span class="p">,</span>
-    <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Float64Array</span><span class="p">:</span>
+        <span class="n">sigma</span><span class="p">:</span> <span class="n">numpy</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">linearmodels</span><span class="o">.</span><span class="n">typing</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">Float64Array</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Construct a GMM weight matrix for a model.</span>
 
@@ -584,12 +605,12 @@
 <a class="viewcode-back" href="../../../system/system/linearmodels.system.gmm.HeteroskedasticWeightMatrix.weight_matrix.html#linearmodels.system.gmm.HeteroskedasticWeightMatrix.weight_matrix">[docs]</a>
     <span class="k">def</span> <span class="nf">weight_matrix</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span>
-        <span class="n">x</span><span class="p">:</span> <span class="n">Sequence</span><span class="p">[</span><span class="n">Float64Array</span><span class="p">],</span>
-        <span class="n">z</span><span class="p">:</span> <span class="n">Sequence</span><span class="p">[</span><span class="n">Float64Array</span><span class="p">],</span>
-        <span class="n">eps</span><span class="p">:</span> <span class="n">Float64Array</span><span class="p">,</span>
+        <span class="n">x</span><span class="p">:</span> <span class="n">Sequence</span><span class="p">[</span><span class="n">linearmodels</span><span class="o">.</span><span class="n">typing</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">Float64Array</span><span class="p">],</span>
+        <span class="n">z</span><span class="p">:</span> <span class="n">Sequence</span><span class="p">[</span><span class="n">linearmodels</span><span class="o">.</span><span class="n">typing</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">Float64Array</span><span class="p">],</span>
+        <span class="n">eps</span><span class="p">:</span> <span class="n">linearmodels</span><span class="o">.</span><span class="n">typing</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">Float64Array</span><span class="p">,</span>
         <span class="o">*</span><span class="p">,</span>
-        <span class="n">sigma</span><span class="p">:</span> <span class="n">ndarray</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
-    <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Float64Array</span><span class="p">:</span>
+        <span class="n">sigma</span><span class="p">:</span> <span class="n">numpy</span><span class="o">.</span><span class="n">ndarray</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">linearmodels</span><span class="o">.</span><span class="n">typing</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">Float64Array</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Construct a GMM weight matrix for a model.</span>
 
@@ -629,14 +650,17 @@
 
 
     <span class="k">def</span> <span class="nf">_debias_scale</span><span class="p">(</span>
-        <span class="bp">self</span><span class="p">,</span> <span class="n">nobs</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span> <span class="n">x</span><span class="p">:</span> <span class="n">Sequence</span><span class="p">[</span><span class="n">Float64Array</span><span class="p">],</span> <span class="n">z</span><span class="p">:</span> <span class="n">Sequence</span><span class="p">[</span><span class="n">Float64Array</span><span class="p">]</span>
-    <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Float64Array</span><span class="p">:</span>
+        <span class="bp">self</span><span class="p">,</span>
+        <span class="n">nobs</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>
+        <span class="n">x</span><span class="p">:</span> <span class="n">Sequence</span><span class="p">[</span><span class="n">linearmodels</span><span class="o">.</span><span class="n">typing</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">Float64Array</span><span class="p">],</span>
+        <span class="n">z</span><span class="p">:</span> <span class="n">Sequence</span><span class="p">[</span><span class="n">linearmodels</span><span class="o">.</span><span class="n">typing</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">Float64Array</span><span class="p">],</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">linearmodels</span><span class="o">.</span><span class="n">typing</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">Float64Array</span><span class="p">:</span>
         <span class="n">nvar</span> <span class="o">=</span> <span class="n">array</span><span class="p">([</span><span class="n">a</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="k">for</span> <span class="n">a</span> <span class="ow">in</span> <span class="n">x</span><span class="p">])</span>
         <span class="n">ninstr</span> <span class="o">=</span> <span class="n">array</span><span class="p">([</span><span class="n">a</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="k">for</span> <span class="n">a</span> <span class="ow">in</span> <span class="n">z</span><span class="p">])</span>
         <span class="n">nvar</span> <span class="o">=</span> <span class="n">repeat</span><span class="p">(</span><span class="n">nvar</span><span class="p">,</span> <span class="n">ninstr</span><span class="p">)</span>
         <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">_debiased</span><span class="p">:</span>
             <span class="n">nvar</span> <span class="o">=</span> <span class="n">zeros_like</span><span class="p">(</span><span class="n">nvar</span><span class="p">)</span>
-        <span class="n">nvar</span> <span class="o">=</span> <span class="n">cast</span><span class="p">(</span><span class="n">Float64Array</span><span class="p">,</span> <span class="n">sqrt</span><span class="p">(</span><span class="n">nvar</span><span class="p">))[:,</span> <span class="kc">None</span><span class="p">]</span>
+        <span class="n">nvar</span> <span class="o">=</span> <span class="n">cast</span><span class="p">(</span><span class="n">linearmodels</span><span class="o">.</span><span class="n">typing</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">Float64Array</span><span class="p">,</span> <span class="n">sqrt</span><span class="p">(</span><span class="n">nvar</span><span class="p">))[:,</span> <span class="kc">None</span><span class="p">]</span>
         <span class="n">scale</span> <span class="o">=</span> <span class="n">nobs</span> <span class="o">/</span> <span class="p">(</span><span class="n">nobs</span> <span class="o">-</span> <span class="n">nvar</span> <span class="o">@</span> <span class="n">nvar</span><span class="o">.</span><span class="n">T</span><span class="p">)</span>
         <span class="k">return</span> <span class="n">scale</span></div>
 
@@ -708,12 +732,12 @@
 <a class="viewcode-back" href="../../../system/system/linearmodels.system.gmm.KernelWeightMatrix.weight_matrix.html#linearmodels.system.gmm.KernelWeightMatrix.weight_matrix">[docs]</a>
     <span class="k">def</span> <span class="nf">weight_matrix</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span>
-        <span class="n">x</span><span class="p">:</span> <span class="n">Sequence</span><span class="p">[</span><span class="n">Float64Array</span><span class="p">],</span>
-        <span class="n">z</span><span class="p">:</span> <span class="n">Sequence</span><span class="p">[</span><span class="n">Float64Array</span><span class="p">],</span>
-        <span class="n">eps</span><span class="p">:</span> <span class="n">Float64Array</span><span class="p">,</span>
+        <span class="n">x</span><span class="p">:</span> <span class="n">Sequence</span><span class="p">[</span><span class="n">linearmodels</span><span class="o">.</span><span class="n">typing</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">Float64Array</span><span class="p">],</span>
+        <span class="n">z</span><span class="p">:</span> <span class="n">Sequence</span><span class="p">[</span><span class="n">linearmodels</span><span class="o">.</span><span class="n">typing</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">Float64Array</span><span class="p">],</span>
+        <span class="n">eps</span><span class="p">:</span> <span class="n">linearmodels</span><span class="o">.</span><span class="n">typing</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">Float64Array</span><span class="p">,</span>
         <span class="o">*</span><span class="p">,</span>
-        <span class="n">sigma</span><span class="p">:</span> <span class="n">ndarray</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
-    <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Float64Array</span><span class="p">:</span>
+        <span class="n">sigma</span><span class="p">:</span> <span class="n">numpy</span><span class="o">.</span><span class="n">ndarray</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">linearmodels</span><span class="o">.</span><span class="n">typing</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">Float64Array</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Construct a GMM weight matrix for a model.</span>
 
@@ -753,7 +777,9 @@
         <span class="k">return</span> <span class="n">w</span></div>
 
 
-    <span class="k">def</span> <span class="nf">_optimal_bandwidth</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">moments</span><span class="p">:</span> <span class="n">Float64Array</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">float</span><span class="p">:</span>
+    <span class="k">def</span> <span class="nf">_optimal_bandwidth</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span> <span class="n">moments</span><span class="p">:</span> <span class="n">linearmodels</span><span class="o">.</span><span class="n">typing</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">Float64Array</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">float</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Compute optimal bandwidth used in estimation if needed&quot;&quot;&quot;</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_predefined_bw</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
             <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_predefined_bw</span>
