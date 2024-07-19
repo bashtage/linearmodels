@@ -15,7 +15,7 @@
     
   
       
-        <title>Version 4 - linearmodels v6.1 (+6)</title>
+        <title>Version 4 - linearmodels v6.1 (+7)</title>
       
     
 
@@ -48,7 +48,7 @@
         <style>:root{--md-text-font:"Roboto";--md-code-font:"Roboto Mono"}</style>
       
     
-        <link rel="stylesheet" type="text/css" href="../_static/sphinx_immaterial_theme.359ec555e2989f00f.min.css?v=b000af5c" />
+        <link rel="stylesheet" type="text/css" href="../_static/sphinx_immaterial_theme.e0b5691b38cca82da.min.css?v=b1736040" />
         <link rel="stylesheet" type="text/css" href="../_static/css/small_fixes.css?v=34934119" />
     <script>__md_scope=new URL("..",location),__md_hash=e=>[...e].reduce((e,_)=>(e<<5)-e+_.charCodeAt(0),0),__md_get=(e,_=localStorage,t=__md_scope)=>JSON.parse(_.getItem(t.pathname+"."+e)),__md_set=(e,_,t=localStorage,a=__md_scope)=>{try{t.setItem(a.pathname+"."+e,JSON.stringify(_))}catch(e){}}</script>
     
@@ -93,7 +93,7 @@
 
 <header class="md-header" data-md-component="header">
   <nav class="md-header__inner md-grid" aria-label="Header">
-    <a href="../index.html" title="linearmodels v6.1 (+6)" class="md-header__button md-logo" aria-label="linearmodels v6.1 (+6)" data-md-component="logo">
+    <a href="../index.html" title="linearmodels v6.1 (+7)" class="md-header__button md-logo" aria-label="linearmodels v6.1 (+7)" data-md-component="logo">
       <img src="../_static/bw-logo.svg" alt="logo">
     </a>
     <label class="md-header__button md-icon" for="__drawer">
@@ -103,7 +103,7 @@
       <div class="md-header__ellipsis">
         <div class="md-header__topic">
           <span class="md-ellipsis">
-            linearmodels v6.1 (+6)
+            linearmodels v6.1 (+7)
           </span>
         </div>
         <div class="md-header__topic" data-md-component="header-topic">
@@ -190,10 +190,10 @@
 
 <nav class="md-nav md-nav--primary" aria-label="Navigation" data-md-level="0">
   <label class="md-nav__title" for="__drawer">
-    <a href="../index.html" title="linearmodels v6.1 (+6)" class="md-nav__button md-logo" aria-label="linearmodels v6.1 (+6)" data-md-component="logo">
+    <a href="../index.html" title="linearmodels v6.1 (+7)" class="md-nav__button md-logo" aria-label="linearmodels v6.1 (+7)" data-md-component="logo">
       <img src="../_static/bw-logo.svg" alt="logo">
     </a>
-    linearmodels v6.1 (+6)
+    linearmodels v6.1 (+7)
   </label>
   
     <div class="md-nav__source">
@@ -1101,11 +1101,11 @@ will return parameter estimates in the order <code class="docutils literal notra
 <li><p>Switched from patsy for formulaic for linear constraint translation when using
 the formula interface. This allows formulas to be specified using a dictionary
 of constraints in addition to the standard single string of list of strings
-(<a class="reference external" href="https://github.com/bashtage/linearmodels/issues/439">GH439</a>, <a class="reference external" href="https://github.com/bashtage/linearmodels/issues/440">GH440</a>).</p></li>
+(<a class="extlink-issue reference external" href="https://github.com/bashtage/linearmodels/issues/439">GH439</a>, <a class="extlink-issue reference external" href="https://github.com/bashtage/linearmodels/issues/440">GH440</a>).</p></li>
 <li><p>Fixed a bug when using escaped variable names, e.g., <code class="docutils literal notranslate"><span class="pre">y</span> <span class="pre">~</span> <span class="pre">1</span> <span class="pre">+</span> <span class="pre">`x</span> <span class="pre">3`</span></code>, in panel
-data models (<a class="reference external" href="https://github.com/bashtage/linearmodels/issues/435">GH435</a>).</p></li>
-<li><p>Fixed a bug that affected creating IV models using formulas with missing data (<a class="reference external" href="https://github.com/bashtage/linearmodels/issues/438">GH438</a>).</p></li>
-<li><p>Fixed examples in documentation (<a class="reference external" href="https://github.com/bashtage/linearmodels/issues/434">GH434</a>).</p></li>
+data models (<a class="extlink-issue reference external" href="https://github.com/bashtage/linearmodels/issues/435">GH435</a>).</p></li>
+<li><p>Fixed a bug that affected creating IV models using formulas with missing data (<a class="extlink-issue reference external" href="https://github.com/bashtage/linearmodels/issues/438">GH438</a>).</p></li>
+<li><p>Fixed examples in documentation (<a class="extlink-issue reference external" href="https://github.com/bashtage/linearmodels/issues/434">GH434</a>).</p></li>
 </ul>
 <h2 id="version-4-26">Version 4.26<a class="headerlink" href="#version-4-26" title="Link to this heading">¶</a></h2>
 <ul class="simple">
@@ -1143,10 +1143,10 @@ inference.</p></li>
 <li><p>Added <code class="docutils literal notranslate"><span class="pre">rank_check</span></code> argument to panel-data models that allows the rank
 check to be skipped. Estimating a model that is rank deficient may result
 in unreliable estimates and so caution is needed if using this option.</p></li>
-<li><p>Changed the rank check to use <a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.linalg.lstsq.html#numpy.linalg.lstsq" title="(in NumPy v1.26)"><code class="xref py py-func docutils literal notranslate"><span class="pre">numpy.linalg.lstsq()</span></code></a> which is better
-aligned with parameter estimation than the <a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.linalg.svd.html#numpy.linalg.svd" title="(in NumPy v1.26)"><code class="xref py py-func docutils literal notranslate"><span class="pre">numpy.linalg.svd()</span></code></a>-based
-<a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.linalg.matrix_rank.html#numpy.linalg.matrix_rank" title="(in NumPy v1.26)"><code class="xref py py-func docutils literal notranslate"><span class="pre">numpy.linalg.matrix_rank()</span></code></a>.</p></li>
-<li><p>Changed the default least squares used to <a class="reference external" href="https://docs.scipy.org/doc/scipy/reference/generated/scipy.linalg.lstsq.html#scipy.linalg.lstsq" title="(in SciPy v1.13.1)"><code class="xref py py-func docutils literal notranslate"><span class="pre">scipy.linalg.lstsq()</span></code></a> so
+<li><p>Changed the rank check to use <a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.linalg.lstsq.html#numpy.linalg.lstsq" title="(in NumPy v2.0)"><code class="xref py py-func docutils literal notranslate"><span class="pre">numpy.linalg.lstsq()</span></code></a> which is better
+aligned with parameter estimation than the <a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.linalg.svd.html#numpy.linalg.svd" title="(in NumPy v2.0)"><code class="xref py py-func docutils literal notranslate"><span class="pre">numpy.linalg.svd()</span></code></a>-based
+<a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.linalg.matrix_rank.html#numpy.linalg.matrix_rank" title="(in NumPy v2.0)"><code class="xref py py-func docutils literal notranslate"><span class="pre">numpy.linalg.matrix_rank()</span></code></a>.</p></li>
+<li><p>Changed the default least squares used to <a class="reference external" href="https://docs.scipy.org/doc/scipy/reference/generated/scipy.linalg.lstsq.html#scipy.linalg.lstsq" title="(in SciPy v1.14.0)"><code class="xref py py-func docutils literal notranslate"><span class="pre">scipy.linalg.lstsq()</span></code></a> so
 that the <code class="docutils literal notranslate"><span class="pre">lapack_driver</span></code> can be changed to use QR factorization.</p></li>
 </ul>
 <h2 id="version-4-20">Version 4.20<a class="headerlink" href="#version-4-20" title="Link to this heading">¶</a></h2>
@@ -1168,38 +1168,38 @@ when the model is unweighted.</p></li>
 <li><p>Added alternative measures of <span class="math notranslate nohighlight">\(R^2\)</span> using the squared correlation. See
 <a class="reference internal" href="../panel/panel/linearmodels.panel.results.PanelResults.corr_squared_overall.html#linearmodels.panel.results.PanelResults.corr_squared_overall" title="linearmodels.panel.results.PanelResults.corr_squared_overall (Python property) — Overall coefficient of determination using squared correlation"><code class="xref py py-meth docutils literal notranslate"><span class="pre">corr_squared_overall()</span></code></a>,
 <a class="reference internal" href="../panel/panel/linearmodels.panel.results.PanelResults.corr_squared_within.html#linearmodels.panel.results.PanelResults.corr_squared_within" title="linearmodels.panel.results.PanelResults.corr_squared_within (Python property) — Within coefficient of determination using squared correlation"><code class="xref py py-meth docutils literal notranslate"><span class="pre">corr_squared_within()</span></code></a>, and
-<a class="reference internal" href="../panel/panel/linearmodels.panel.results.PanelResults.corr_squared_between.html#linearmodels.panel.results.PanelResults.corr_squared_between" title="linearmodels.panel.results.PanelResults.corr_squared_between (Python property) — Between Coefficient of determination using squared correlation"><code class="xref py py-meth docutils literal notranslate"><span class="pre">corr_squared_between()</span></code></a> (<a class="reference external" href="https://github.com/bashtage/linearmodels/issues/157">GH157</a>).</p></li>
+<a class="reference internal" href="../panel/panel/linearmodels.panel.results.PanelResults.corr_squared_between.html#linearmodels.panel.results.PanelResults.corr_squared_between" title="linearmodels.panel.results.PanelResults.corr_squared_between (Python property) — Between Coefficient of determination using squared correlation"><code class="xref py py-meth docutils literal notranslate"><span class="pre">corr_squared_between()</span></code></a> (<a class="extlink-issue reference external" href="https://github.com/bashtage/linearmodels/issues/157">GH157</a>).</p></li>
 <li><p>Added a clustered covariance estimator
 (<a class="reference internal" href="../system/system/linearmodels.system.covariance.ClusteredCovariance.html#linearmodels.system.covariance.ClusteredCovariance" title="linearmodels.system.covariance.ClusteredCovariance (Python class) — Heteroskedastic covariance estimation for system regression"><code class="xref py py-class docutils literal notranslate"><span class="pre">linearmodels.system.covariance.ClusteredCovariance</span></code></a>) for system regressions
-(<a class="reference external" href="https://github.com/bashtage/linearmodels/issues/241">GH241</a>).</p></li>
+(<a class="extlink-issue reference external" href="https://github.com/bashtage/linearmodels/issues/241">GH241</a>).</p></li>
 <li><p>Fixed a bug in <a class="reference internal" href="../iv/iv/linearmodels.iv.covariance.kernel_optimal_bandwidth.html#linearmodels.iv.covariance.kernel_optimal_bandwidth" title="linearmodels.iv.covariance.kernel_optimal_bandwidth (Python function) — Array of data to use when computing optimal bandwidth"><code class="xref py py-class docutils literal notranslate"><span class="pre">kernel_optimal_bandwidth</span></code></a>
 which used incorrect values for a tuning parameter in the bandwidth estimation
-for the Parzen and Quadratic Spectral kernels (<a class="reference external" href="https://github.com/bashtage/linearmodels/issues/242">GH242</a>).</p></li>
+for the Parzen and Quadratic Spectral kernels (<a class="extlink-issue reference external" href="https://github.com/bashtage/linearmodels/issues/242">GH242</a>).</p></li>
 </ul>
 <h2 id="version-4-17">Version 4.17<a class="headerlink" href="#version-4-17" title="Link to this heading">¶</a></h2>
 <ul class="simple">
-<li><p>Fixed various typing issues (<a class="reference external" href="https://github.com/bashtage/linearmodels/issues/239">GH239</a>, <a class="reference external" href="https://github.com/bashtage/linearmodels/issues/240">GH240</a>).</p></li>
+<li><p>Fixed various typing issues (<a class="extlink-issue reference external" href="https://github.com/bashtage/linearmodels/issues/239">GH239</a>, <a class="extlink-issue reference external" href="https://github.com/bashtage/linearmodels/issues/240">GH240</a>).</p></li>
 </ul>
 <h2 id="version-4-16">Version 4.16<a class="headerlink" href="#version-4-16" title="Link to this heading">¶</a></h2>
 <ul class="simple">
-<li><p>Verify typing using mypy (<a class="reference external" href="https://github.com/bashtage/linearmodels/issues/232">GH232</a>, <a class="reference external" href="https://github.com/bashtage/linearmodels/issues/234">GH234</a>, <a class="reference external" href="https://github.com/bashtage/linearmodels/issues/235">GH235</a>, <a class="reference external" href="https://github.com/bashtage/linearmodels/issues/238">GH238</a>).</p></li>
-<li><p>Added typing to all public-facing classes and methods (<a class="reference external" href="https://github.com/bashtage/linearmodels/issues/228">GH228</a>, <a class="reference external" href="https://github.com/bashtage/linearmodels/issues/229">GH229</a>).</p></li>
+<li><p>Verify typing using mypy (<a class="extlink-issue reference external" href="https://github.com/bashtage/linearmodels/issues/232">GH232</a>, <a class="extlink-issue reference external" href="https://github.com/bashtage/linearmodels/issues/234">GH234</a>, <a class="extlink-issue reference external" href="https://github.com/bashtage/linearmodels/issues/235">GH235</a>, <a class="extlink-issue reference external" href="https://github.com/bashtage/linearmodels/issues/238">GH238</a>).</p></li>
+<li><p>Added typing to all public-facing classes and methods (<a class="extlink-issue reference external" href="https://github.com/bashtage/linearmodels/issues/228">GH228</a>, <a class="extlink-issue reference external" href="https://github.com/bashtage/linearmodels/issues/229">GH229</a>).</p></li>
 <li><p>Added <a class="reference internal" href="../panel/panel/linearmodels.panel.results.FamaMacBethResults.html#linearmodels.panel.results.FamaMacBethResults" title="linearmodels.panel.results.FamaMacBethResults (Python class) — Results container for Fama MacBeth panel data models"><code class="xref py py-class docutils literal notranslate"><span class="pre">FamaMacBethResults</span></code></a> which has
 the property <a class="reference internal" href="../panel/panel/linearmodels.panel.results.FamaMacBethResults.all_params.html#linearmodels.panel.results.FamaMacBethResults.all_params" title="linearmodels.panel.results.FamaMacBethResults.all_params (Python property) — The set of parameters estimated for each of the time periods"><code class="xref py py-meth docutils literal notranslate"><span class="pre">all_params()</span></code></a>
 that contains a (nobs, nparam) DataFrame of parameters estimated in each time
-period (<a class="reference external" href="https://github.com/bashtage/linearmodels/issues/230">GH230</a>).</p></li>
+period (<a class="extlink-issue reference external" href="https://github.com/bashtage/linearmodels/issues/230">GH230</a>).</p></li>
 </ul>
 <h2 id="version-4-15">Version 4.15<a class="headerlink" href="#version-4-15" title="Link to this heading">¶</a></h2>
 <ul class="simple">
 <li><p>Blackened the code.</p></li>
-<li><p>Added McElroy’s and Berndt’s measures of system fit (<a class="reference external" href="https://github.com/bashtage/linearmodels/issues/215">GH215</a>).</p></li>
-<li><p>Removed support for Python 3.5 inline with NEP-29 (<a class="reference external" href="https://github.com/bashtage/linearmodels/issues/222">GH222</a>).</p></li>
+<li><p>Added McElroy’s and Berndt’s measures of system fit (<a class="extlink-issue reference external" href="https://github.com/bashtage/linearmodels/issues/215">GH215</a>).</p></li>
+<li><p>Removed support for Python 3.5 inline with NEP-29 (<a class="extlink-issue reference external" href="https://github.com/bashtage/linearmodels/issues/222">GH222</a>).</p></li>
 </ul>
 <h2 id="version-4-14">Version 4.14<a class="headerlink" href="#version-4-14" title="Link to this heading">¶</a></h2>
 <ul class="simple">
-<li><p>Fixed issue where datasets were not installed with wheels (<a class="reference external" href="https://github.com/bashtage/linearmodels/issues/217">GH217</a>).</p></li>
-<li><p>Switched to property-cached to inherit cached property from property (<a class="reference external" href="https://github.com/bashtage/linearmodels/issues/211">GH211</a>).</p></li>
-<li><p>Removed all use of <code class="docutils literal notranslate"><span class="pre">pandas.Panel</span></code> (<a class="reference external" href="https://github.com/bashtage/linearmodels/issues/211">GH211</a>).</p></li>
+<li><p>Fixed issue where datasets were not installed with wheels (<a class="extlink-issue reference external" href="https://github.com/bashtage/linearmodels/issues/217">GH217</a>).</p></li>
+<li><p>Switched to property-cached to inherit cached property from property (<a class="extlink-issue reference external" href="https://github.com/bashtage/linearmodels/issues/211">GH211</a>).</p></li>
+<li><p>Removed all use of <code class="docutils literal notranslate"><span class="pre">pandas.Panel</span></code> (<a class="extlink-issue reference external" href="https://github.com/bashtage/linearmodels/issues/211">GH211</a>).</p></li>
 </ul>
 <h2 id="version-4-13">Version 4.13<a class="headerlink" href="#version-4-13" title="Link to this heading">¶</a></h2>
 <ul class="simple">
@@ -1211,7 +1211,7 @@ with 5,000,000 observations.</p></li>
 (i.e., more than one observation per entity and time id).</p></li>
 <li><p>Added <code class="docutils literal notranslate"><span class="pre">drop_absorbed</span></code> option to <a class="reference internal" href="../panel/panel/linearmodels.panel.model.PanelOLS.html#linearmodels.panel.model.PanelOLS" title="linearmodels.panel.model.PanelOLS (Python class) — One- and two-way fixed effects estimator for panel data"><code class="xref py py-class docutils literal notranslate"><span class="pre">PanelOLS</span></code></a>
 which automatically drops variables that are absorbed by fixed effects.
-(<a class="reference external" href="https://github.com/bashtage/linearmodels/issues/206">GH206</a>)</p></li>
+(<a class="extlink-issue reference external" href="https://github.com/bashtage/linearmodels/issues/206">GH206</a>)</p></li>
 <li><p>Added optional Cythonized node selection for dropping singletons</p></li>
 <li><p>Added preconditioning to the dummy variable matrix when <code class="docutils literal notranslate"><span class="pre">use_lsmr-True</span></code>
 in <a class="reference internal" href="../panel/panel/linearmodels.panel.model.PanelOLS.fit.html#linearmodels.panel.model.PanelOLS.fit" title="linearmodels.panel.model.PanelOLS.fit (Python method) — Estimate model parameters"><code class="xref py py-func docutils literal notranslate"><span class="pre">fit()</span></code></a>. In models with many
@@ -1226,37 +1226,37 @@ before the model is fit, so the the result is <em>as-if</em> the observations we
 never in <code class="docutils literal notranslate"><span class="pre">exog</span></code> or <code class="docutils literal notranslate"><span class="pre">dependent</span></code>.</p></li>
 <li><p>Added a method to construct the 2-core graph for 2-way effects models, which
 allows singleton observations with no effect on estimated slopes to be
-excluded. (<a class="reference external" href="https://github.com/bashtage/linearmodels/issues/191">GH191</a>)</p></li>
+excluded. (<a class="extlink-issue reference external" href="https://github.com/bashtage/linearmodels/issues/191">GH191</a>)</p></li>
 <li><p>Added support for LSMR estimation of parameters in
 <a class="reference internal" href="../panel/panel/linearmodels.panel.model.PanelOLS.fit.html#linearmodels.panel.model.PanelOLS.fit" title="linearmodels.panel.model.PanelOLS.fit (Python method) — Estimate model parameters"><code class="xref py py-func docutils literal notranslate"><span class="pre">fit()</span></code></a> through the keyword argument
 <code class="docutils literal notranslate"><span class="pre">use_lsmr</span></code>. LSMR is a sparse estimation method that can be used to extend
 <a class="reference internal" href="../panel/panel/linearmodels.panel.model.PanelOLS.html#linearmodels.panel.model.PanelOLS" title="linearmodels.panel.model.PanelOLS (Python class) — One- and two-way fixed effects estimator for panel data"><code class="xref py py-class docutils literal notranslate"><span class="pre">PanelOLS</span></code></a> to more than two effects.</p></li>
 <li><p>Fixed a bug where IV models estimated with only exogenous regressors where
-not being correctly labeled as OLS models in output. (<a class="reference external" href="https://github.com/bashtage/linearmodels/issues/185">GH185</a>)</p></li>
+not being correctly labeled as OLS models in output. (<a class="extlink-issue reference external" href="https://github.com/bashtage/linearmodels/issues/185">GH185</a>)</p></li>
 <li><p>Added <code class="docutils literal notranslate"><span class="pre">wald_test</span></code> to panel-model results.</p></li>
 <li><p>Renamed <code class="docutils literal notranslate"><span class="pre">test_linear_constraint</span></code> to <code class="docutils literal notranslate"><span class="pre">wald_test</span></code></p></li>
 <li><p>Added a low-memory option to <a class="reference internal" href="../panel/panel/linearmodels.panel.model.PanelOLS.fit.html#linearmodels.panel.model.PanelOLS.fit" title="linearmodels.panel.model.PanelOLS.fit (Python method) — Estimate model parameters"><code class="xref py py-func docutils literal notranslate"><span class="pre">fit()</span></code></a>
 that avoids constructing dummy variables. Only used when both <code class="docutils literal notranslate"><span class="pre">entity_effects</span></code>
 and <code class="docutils literal notranslate"><span class="pre">time_effects</span></code> are <code class="docutils literal notranslate"><span class="pre">True</span></code>. By default, the low memory algorithm will be
 used whenever constructing the dummy variable array would require more than
-1 GiB. (<a class="reference external" href="https://github.com/bashtage/linearmodels/issues/182">GH182</a>)</p></li>
+1 GiB. (<a class="extlink-issue reference external" href="https://github.com/bashtage/linearmodels/issues/182">GH182</a>)</p></li>
 <li><p>Added an option in model comparison (<a class="reference internal" href="../iv/iv/linearmodels.iv.results.compare.html#linearmodels.iv.results.compare" title="linearmodels.iv.results.compare (Python function) — Compare the results of multiple models"><code class="xref py py-func docutils literal notranslate"><span class="pre">compare()</span></code></a> and
 <a class="reference internal" href="../panel/panel/linearmodels.panel.results.compare.html#linearmodels.panel.results.compare" title="linearmodels.panel.results.compare (Python function) — Compare the results of multiple models"><code class="xref py py-func docutils literal notranslate"><span class="pre">compare()</span></code></a>) to report standard errors or pvalues
-instead of t-stats. (<a class="reference external" href="https://github.com/bashtage/linearmodels/issues/178">GH178</a>)</p></li>
+instead of t-stats. (<a class="extlink-issue reference external" href="https://github.com/bashtage/linearmodels/issues/178">GH178</a>)</p></li>
 </ul>
 <h2 id="version-4-11">Version 4.11<a class="headerlink" href="#version-4-11" title="Link to this heading">¶</a></h2>
 <ul class="simple">
 <li><p>Fixed a bug which did not correctly check the rank of the
-cross-section regression in <a class="reference internal" href="../panel/panel/linearmodels.panel.model.FamaMacBeth.html#linearmodels.panel.model.FamaMacBeth" title="linearmodels.panel.model.FamaMacBeth (Python class) — Pooled coefficient estimator for panel data"><code class="xref py py-class docutils literal notranslate"><span class="pre">FamaMacBeth</span></code></a> (<a class="reference external" href="https://github.com/bashtage/linearmodels/issues/176">GH176</a>)</p></li>
+cross-section regression in <a class="reference internal" href="../panel/panel/linearmodels.panel.model.FamaMacBeth.html#linearmodels.panel.model.FamaMacBeth" title="linearmodels.panel.model.FamaMacBeth (Python class) — Pooled coefficient estimator for panel data"><code class="xref py py-class docutils literal notranslate"><span class="pre">FamaMacBeth</span></code></a> (<a class="extlink-issue reference external" href="https://github.com/bashtage/linearmodels/issues/176">GH176</a>)</p></li>
 <li><p>Fixed a bug which failed to correctly check rank conditions when
-specifying asset pricing models (<a class="reference external" href="https://github.com/bashtage/linearmodels/issues/173">GH173</a>)</p></li>
+specifying asset pricing models (<a class="extlink-issue reference external" href="https://github.com/bashtage/linearmodels/issues/173">GH173</a>)</p></li>
 <li><p>Switched to external package cached-property to manage caching instead of
-custom and less-well-tested solution (<a class="reference external" href="https://github.com/bashtage/linearmodels/issues/172">GH172</a>)</p></li>
+custom and less-well-tested solution (<a class="extlink-issue reference external" href="https://github.com/bashtage/linearmodels/issues/172">GH172</a>)</p></li>
 </ul>
 <h2 id="version-4-10">Version 4.10<a class="headerlink" href="#version-4-10" title="Link to this heading">¶</a></h2>
 <ul class="simple">
 <li><p>Fixed a bug where weights were incorrectly calculated for HAC covariances
-when the weight function was <code class="docutils literal notranslate"><span class="pre">'parzen'</span></code> or <code class="docutils literal notranslate"><span class="pre">'gallant'</span></code> (<a class="reference external" href="https://github.com/bashtage/linearmodels/issues/170">GH170</a>)</p></li>
+when the weight function was <code class="docutils literal notranslate"><span class="pre">'parzen'</span></code> or <code class="docutils literal notranslate"><span class="pre">'gallant'</span></code> (<a class="extlink-issue reference external" href="https://github.com/bashtage/linearmodels/issues/170">GH170</a>)</p></li>
 </ul>
 <h2 id="version-4-9">Version 4.9<a class="headerlink" href="#version-4-9" title="Link to this heading">¶</a></h2>
 <ul class="simple">
@@ -1367,7 +1367,7 @@ prediction and simplify retrieval of in-sample results</p></li>
   
     Created using
     <a href="https://www.sphinx-doc.org/" target="_blank" rel="noopener">Sphinx</a>
-    7.3.7.
+    7.4.6.
      and
     <a href="https://github.com/jbms/sphinx-immaterial/" target="_blank" rel="noopener">Sphinx-Immaterial</a>
   
