@@ -286,7 +286,7 @@ class TradedFactorModel(_FactorModelBase):
         debiased : bool
             Flag indicating whether to debias the covariance estimator using
             a degree of freedom adjustment
-        **cov_config : dict
+        cov_config : dict
             Additional covariance-specific options.  See Notes.
 
         Returns
@@ -611,7 +611,7 @@ class LinearFactorModel(_LinearFactorModelBase):
         debiased : bool
             Flag indicating whether to debias the covariance estimator using
             a degree of freedom adjustment
-        **cov_config
+        cov_config
             Additional covariance-specific options.  See Notes.
 
         Returns
@@ -942,7 +942,7 @@ class LinearFactorModelGMM(_LinearFactorModelBase):
             optimizing the objective function. If not provided, defers to
             scipy to choose an appropriate optimizer. All minimize inputs
             except ``fun``, ``x0``, and ``args`` can be overridden.
-        **cov_config
+        cov_config
             Additional covariance-specific options.  See Notes.
 
         Returns

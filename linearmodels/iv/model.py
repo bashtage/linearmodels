@@ -638,7 +638,7 @@ class _IVLSModelBase(_IVModelBase):
         debiased : bool
             Flag indicating whether to debiased the covariance estimator using
             a degree of freedom adjustment.
-        **cov_config
+        cov_config
             Additional parameters to pass to covariance estimator. The list
             of optional parameters differ according to ``cov_type``. See
             the documentation of the alternative covariance estimators for
@@ -1250,7 +1250,7 @@ class IVGMM(_IVGMMBase):
         debiased : bool
             Flag indicating whether to debiased the covariance estimator using
             a degree of freedom adjustment.
-        **cov_config
+        cov_config
             Additional parameters to pass to covariance estimator. Supported
             parameters depend on specific covariance structure assumed. See
             :class:`linearmodels.iv.gmm.IVGMMCovariance` for details
@@ -1588,7 +1588,7 @@ class IVGMMCUE(_IVGMMBase):
             optimizing the objective function. If not provided, defers to
             scipy to choose an appropriate optimizer. All minimize inputs
             except ``fun``, ``x0``, and ``args`` can be overridden.
-        **cov_config
+        cov_config
             Additional parameters to pass to covariance estimator. Supported
             parameters depend on specific covariance structure assumed. See
             :class:`linearmodels.iv.gmm.IVGMMCovariance` for details

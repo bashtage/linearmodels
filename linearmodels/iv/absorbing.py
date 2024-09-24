@@ -147,7 +147,7 @@ def lsmr_annihilate(
             resid = _VARIABLE_CACHE[regressor_hash][variable_digest]
         else:
             beta = lsmr(x, _y, **default_opts)[0]
-            resid = y[:, i : i + 1] - (x.dot(sp.csc_matrix(beta[:, None]))).toarray()
+            resid = y[:, i : i + 1] - x.dot(sp.csc_matrix(beta[:, None])).toarray()
             _VARIABLE_CACHE[regressor_hash][variable_digest] = resid
         resids.append(resid)
     return column_stack(resids)
@@ -1025,7 +1025,7 @@ class AbsorbingLS:
 
                Use absorb_options to pass options
 
-        **cov_config
+        cov_config
             Additional parameters to pass to covariance estimator. The list
             of optional parameters differ according to ``cov_type``. See
             the documentation of the alternative covariance estimators for
