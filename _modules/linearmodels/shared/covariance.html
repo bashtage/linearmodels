@@ -15,7 +15,7 @@
     
   
       
-        <title>linearmodels.shared.covariance - linearmodels 6.0</title>
+        <title>linearmodels.shared.covariance - linearmodels 6.1</title>
       
     
 
@@ -48,7 +48,7 @@
         <style>:root{--md-text-font:"Roboto";--md-code-font:"Roboto Mono"}</style>
       
     
-        <link rel="stylesheet" type="text/css" href="../../../_static/sphinx_immaterial_theme.359ec555e2989f00f.min.css?v=b000af5c" />
+        <link rel="stylesheet" type="text/css" href="../../../_static/sphinx_immaterial_theme.3625f807144f53acf.min.css?v=fbfc4466" />
         <link rel="stylesheet" type="text/css" href="../../../_static/css/small_fixes.css?v=34934119" />
     <script>__md_scope=new URL("../../..",location),__md_hash=e=>[...e].reduce((e,_)=>(e<<5)-e+_.charCodeAt(0),0),__md_get=(e,_=localStorage,t=__md_scope)=>JSON.parse(_.getItem(t.pathname+"."+e)),__md_set=(e,_,t=localStorage,a=__md_scope)=>{try{t.setItem(a.pathname+"."+e,JSON.stringify(_))}catch(e){}}</script>
     
@@ -88,7 +88,7 @@
 
 <header class="md-header" data-md-component="header">
   <nav class="md-header__inner md-grid" aria-label="Header">
-    <a href="../../../index.html" title="linearmodels 6.0" class="md-header__button md-logo" aria-label="linearmodels 6.0" data-md-component="logo">
+    <a href="../../../index.html" title="linearmodels 6.1" class="md-header__button md-logo" aria-label="linearmodels 6.1" data-md-component="logo">
       <img src="../../../_static/bw-logo.svg" alt="logo">
     </a>
     <label class="md-header__button md-icon" for="__drawer">
@@ -98,7 +98,7 @@
       <div class="md-header__ellipsis">
         <div class="md-header__topic">
           <span class="md-ellipsis">
-            linearmodels 6.0
+            linearmodels 6.1
           </span>
         </div>
         <div class="md-header__topic" data-md-component="header-topic">
@@ -185,10 +185,10 @@
 
 <nav class="md-nav md-nav--primary" aria-label="Navigation" data-md-level="0">
   <label class="md-nav__title" for="__drawer">
-    <a href="../../../index.html" title="linearmodels 6.0" class="md-nav__button md-logo" aria-label="linearmodels 6.0" data-md-component="logo">
+    <a href="../../../index.html" title="linearmodels 6.1" class="md-nav__button md-logo" aria-label="linearmodels 6.1" data-md-component="logo">
       <img src="../../../_static/bw-logo.svg" alt="logo">
     </a>
-    linearmodels 6.0
+    linearmodels 6.1
   </label>
   
     <div class="md-nav__source">
@@ -310,6 +310,22 @@
   
   
     <li class="md-nav__item">
+      <a href="../../../types.html" class="md-nav__link">
+        <span title="/types.rst (reference label)" class="md-ellipsis">Type Aliases</span>
+      </a>
+    </li>
+  
+
+    
+      
+      
+      
+
+  
+  
+  
+  
+    <li class="md-nav__item">
       <a href="../../../plan.html" class="md-nav__link">
         <span title="/plan.rst (reference label)" class="md-ellipsis">Module Plans</span>
       </a>
@@ -411,12 +427,12 @@
     <span class="n">zeros</span><span class="p">,</span>
 <span class="p">)</span>
 
-<span class="kn">from</span> <span class="nn">linearmodels.typing</span> <span class="kn">import</span> <span class="n">AnyArray</span><span class="p">,</span> <span class="n">Float64Array</span><span class="p">,</span> <span class="n">IntArray</span>
+<span class="kn">import</span> <span class="nn">linearmodels.typing.data</span>
 
 
 <div class="viewcode-block" id="group_debias_coefficient">
 <a class="viewcode-back" href="../../../utility/linearmodels.shared.covariance.group_debias_coefficient.html#linearmodels.shared.covariance.group_debias_coefficient">[docs]</a>
-<span class="k">def</span> <span class="nf">group_debias_coefficient</span><span class="p">(</span><span class="n">clusters</span><span class="p">:</span> <span class="n">IntArray</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">float</span><span class="p">:</span>
+<span class="k">def</span> <span class="nf">group_debias_coefficient</span><span class="p">(</span><span class="n">clusters</span><span class="p">:</span> <span class="n">linearmodels</span><span class="o">.</span><span class="n">typing</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">IntArray</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">float</span><span class="p">:</span>
 <span class="w">    </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Compute the group debiasing scale.</span>
 
@@ -446,7 +462,9 @@
 
 
 
-<span class="k">def</span> <span class="nf">cluster_union</span><span class="p">(</span><span class="n">clusters</span><span class="p">:</span> <span class="n">IntArray</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">IntArray</span><span class="p">:</span>
+<span class="k">def</span> <span class="nf">cluster_union</span><span class="p">(</span>
+    <span class="n">clusters</span><span class="p">:</span> <span class="n">linearmodels</span><span class="o">.</span><span class="n">typing</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">IntArray</span><span class="p">,</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="n">linearmodels</span><span class="o">.</span><span class="n">typing</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">IntArray</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Compute a set of clusters that is nested within 2 clusters</span>
 
@@ -472,7 +490,10 @@
 
 <div class="viewcode-block" id="cov_cluster">
 <a class="viewcode-back" href="../../../utility/linearmodels.shared.covariance.cov_cluster.html#linearmodels.shared.covariance.cov_cluster">[docs]</a>
-<span class="k">def</span> <span class="nf">cov_cluster</span><span class="p">(</span><span class="n">z</span><span class="p">:</span> <span class="n">Float64Array</span><span class="p">,</span> <span class="n">clusters</span><span class="p">:</span> <span class="n">AnyArray</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Float64Array</span><span class="p">:</span>
+<span class="k">def</span> <span class="nf">cov_cluster</span><span class="p">(</span>
+    <span class="n">z</span><span class="p">:</span> <span class="n">linearmodels</span><span class="o">.</span><span class="n">typing</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">Float64Array</span><span class="p">,</span>
+    <span class="n">clusters</span><span class="p">:</span> <span class="n">linearmodels</span><span class="o">.</span><span class="n">typing</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">AnyArray</span><span class="p">,</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="n">linearmodels</span><span class="o">.</span><span class="n">typing</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">Float64Array</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Core cluster covariance estimator</span>
 
@@ -509,7 +530,9 @@
 
 <div class="viewcode-block" id="cov_kernel">
 <a class="viewcode-back" href="../../../utility/linearmodels.shared.covariance.cov_kernel.html#linearmodels.shared.covariance.cov_kernel">[docs]</a>
-<span class="k">def</span> <span class="nf">cov_kernel</span><span class="p">(</span><span class="n">z</span><span class="p">:</span> <span class="n">Float64Array</span><span class="p">,</span> <span class="n">w</span><span class="p">:</span> <span class="n">Float64Array</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Float64Array</span><span class="p">:</span>
+<span class="k">def</span> <span class="nf">cov_kernel</span><span class="p">(</span>
+    <span class="n">z</span><span class="p">:</span> <span class="n">linearmodels</span><span class="o">.</span><span class="n">typing</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">Float64Array</span><span class="p">,</span> <span class="n">w</span><span class="p">:</span> <span class="n">linearmodels</span><span class="o">.</span><span class="n">typing</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">Float64Array</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="n">linearmodels</span><span class="o">.</span><span class="n">typing</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">Float64Array</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Core kernel covariance estimator</span>
 
@@ -571,7 +594,7 @@
   
     Created using
     <a href="https://www.sphinx-doc.org/" target="_blank" rel="noopener">Sphinx</a>
-    7.2.6.
+    8.0.2.
      and
     <a href="https://github.com/jbms/sphinx-immaterial/" target="_blank" rel="noopener">Sphinx-Immaterial</a>
   

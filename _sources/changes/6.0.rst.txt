@@ -1,5 +1,11 @@
 Version 6.0
-------------
+-----------
+* Fixes for the removal of the ``.A`` shorthand for ``.toarray()`` for sparse arrays
+* Small doc fixes
+* Support Python 3.13
+
+Version 6.0
+-----------
 
 * Increased minimums:
 
