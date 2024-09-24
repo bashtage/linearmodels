@@ -1025,7 +1025,7 @@ class AbsorbingLS:
 
                Use absorb_options to pass options
 
-        **cov_config
+        cov_config
             Additional parameters to pass to covariance estimator. The list
             of optional parameters differ according to ``cov_type``. See
             the documentation of the alternative covariance estimators for

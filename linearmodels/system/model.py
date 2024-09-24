@@ -1291,7 +1291,7 @@ class _LSSystemModelBase(_SystemModelBase):
             * "clustered" - Allows for 1 and 2-way clustering of errors
               (Rogers).
 
-        **cov_config
+        cov_config
             Additional parameters to pass to covariance estimator. All
             estimators support debiased which employs a small-sample adjustment
 
@@ -1955,7 +1955,7 @@ class IVSystemGMM(_SystemModelBase):
             * "robust", "heteroskedastic" - Heteroskedasticity robust
               covariance estimator
 
-        **cov_config
+        cov_config
             Additional parameters to pass to covariance estimator. All
             estimators support debiased which employs a small-sample adjustment
 

@@ -1000,7 +1000,7 @@ class PooledOLS(_PanelModelBase):
         debiased : bool
             Flag indicating whether to debiased the covariance estimator using
             a degree of freedom adjustment.
-        **cov_config
+        cov_config
             Additional covariance-specific options.  See Notes.
 
         Returns
@@ -1865,7 +1865,7 @@ class PanelOLS(_PanelModelBase):
             Flag indicating that the covariance estimator should be adjusted
             to account for the estimation of effects in the model. Only used
             if ``auto_df=False``.
-        **cov_config
+        cov_config
             Additional covariance-specific options.  See Notes.
 
         Returns
@@ -2225,7 +2225,7 @@ class BetweenOLS(_PanelModelBase):
         debiased : bool
             Flag indicating whether to debiased the covariance estimator using
             a degree of freedom adjustment.
-        **cov_config
+        cov_config
             Additional covariance-specific options.  See Notes.
 
         Returns
@@ -2527,7 +2527,7 @@ class FirstDifferenceOLS(_PanelModelBase):
         debiased : bool
             Flag indicating whether to debiased the covariance estimator using
             a degree of freedom adjustment.
-        **cov_config
+        cov_config
             Additional covariance-specific options.  See Notes.
 
         Returns
@@ -2842,7 +2842,7 @@ class RandomEffects(_PanelModelBase):
         debiased : bool
             Flag indicating whether to debiased the covariance estimator using
             a degree of freedom adjustment.
-        **cov_config
+        cov_config
             Additional covariance-specific options.  See Notes.
 
         Returns
