@@ -5,6 +5,8 @@ pytest>=7.3.0,<8
 isort>=5.12
 ipython
 matplotlib
+ruff
+flake8
 jupyter
 nbconvert
 nbformat
