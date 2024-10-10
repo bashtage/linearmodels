@@ -12,7 +12,7 @@ import linearmodels.typing.data
 
 
 def blocked_column_product(
-    x: linearmodels.typing.data.ArraySequence, s: linearmodels.typing.data.Float64Array
+    x: linearmodels.typing.ArraySequence, s: linearmodels.typing.data.Float64Array
 ) -> linearmodels.typing.data.Float64Array:
     """
     Parameters
@@ -39,7 +39,7 @@ def blocked_column_product(
 
 
 def blocked_diag_product(
-    x: linearmodels.typing.data.ArraySequence, s: linearmodels.typing.data.Float64Array
+    x: linearmodels.typing.ArraySequence, s: linearmodels.typing.data.Float64Array
 ) -> linearmodels.typing.data.Float64Array:
     """
     Parameters
@@ -68,7 +68,7 @@ def blocked_diag_product(
 
 
 def blocked_inner_prod(
-    x: linearmodels.typing.data.ArraySequence, s: linearmodels.typing.data.Float64Array
+    x: linearmodels.typing.ArraySequence, s: linearmodels.typing.data.Float64Array
 ) -> linearmodels.typing.data.Float64Array:
     r"""
     Parameters
@@ -135,8 +135,8 @@ def blocked_inner_prod(
 
 
 def blocked_cross_prod(
-    x: linearmodels.typing.data.ArraySequence,
-    z: linearmodels.typing.data.ArraySequence,
+    x: linearmodels.typing.ArraySequence,
+    z: linearmodels.typing.ArraySequence,
     s: linearmodels.typing.data.Float64Array,
 ) -> linearmodels.typing.data.Float64Array:
     r"""

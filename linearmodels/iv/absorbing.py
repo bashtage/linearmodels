@@ -153,7 +153,7 @@ def lsmr_annihilate(
     return column_stack(resids)
 
 
-def category_product(cats: linearmodels.typing.data.AnyPandas) -> Series:
+def category_product(cats: linearmodels.typing.AnyPandas) -> Series:
     """
     Construct category from all combination of input categories
 
@@ -236,8 +236,8 @@ def category_interaction(
 
 
 def category_continuous_interaction(
-    cat: linearmodels.typing.data.AnyPandas,
-    cont: linearmodels.typing.data.AnyPandas,
+    cat: linearmodels.typing.AnyPandas,
+    cont: linearmodels.typing.AnyPandas,
     precondition: bool = True,
 ) -> sp.csc_matrix:
     """
