@@ -2059,9 +2059,9 @@ class IVSystemGMM(_SystemModelBase):
 
     @staticmethod
     def _blocked_gmm(
-        x: linearmodels.typing.data.ArraySequence,
-        y: linearmodels.typing.data.ArraySequence,
-        z: linearmodels.typing.data.ArraySequence,
+        x: linearmodels.typing.ArraySequence,
+        y: linearmodels.typing.ArraySequence,
+        z: linearmodels.typing.ArraySequence,
         *,
         w: linearmodels.typing.data.Float64Array,
         constraints: LinearConstraint | None = None,
