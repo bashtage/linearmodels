@@ -6,6 +6,7 @@ isort>=5.12
 ipython
 matplotlib
 ruff
+jupyterlab-code-formatter
 flake8
 jupyter
 nbconvert
