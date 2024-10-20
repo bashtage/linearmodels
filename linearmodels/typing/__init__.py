@@ -4,7 +4,15 @@ from typing import Any, Optional, Union
 import numpy as np
 from pandas import DataFrame, Series
 
-from .data import ArrayLike as ArrayLike
+from .data import (
+    AnyArray as AnyArray,
+    ArrayLike as ArrayLike,
+    BoolArray as BoolArray,
+    Float64Array as Float64Array,
+    Int32Array as Int32Array,
+    Int64Array as Int64Array,
+    IntArray as IntArray,
+)
 
 __all__ = [
     "ArrayLike",
@@ -30,12 +38,6 @@ OptionalNumeric = Optional[Union[int, float]]
 AnyPandas = Union[Series, DataFrame]
 Label = Optional[Hashable]
 
-Float64Array = np.ndarray[Any, np.dtype[np.float64]]  # pragma: no cover
-Int64Array = np.ndarray[Any, np.dtype[np.int64]]  # pragma: no cover
-Int32Array = np.ndarray[Any, np.dtype[np.int32]]  # pragma: no cover
-IntArray = np.ndarray[Any, np.dtype[np.int_]]  # pragma: no cover
-BoolArray = np.ndarray[Any, np.dtype[np.bool_]]  # pragma: no cover
-AnyArray = np.ndarray[Any, Any]  # pragma: no cover
 NumericArray = Union[  # pragma: no cover
     np.ndarray[Any, np.dtype[np.signedinteger[Any]]],  # pragma: no cover
     np.ndarray[Any, np.dtype[np.unsignedinteger[Any]]],  # pragma: no cover
