@@ -573,8 +573,9 @@
    "metadata": {},
    "outputs": [],
    "source": [
-    "v = IV2SLS(data[endog], data[exog + instr], None, None).fit().resids\n",
     "import pandas as pd\n",
+    "\n",
+    "v = IV2SLS(data[endog], data[exog + instr], None, None).fit().resids\n",
     "\n",
     "res_direct = IV2SLS(\n",
     "    data[dep], pd.concat([v, data[exog]], axis=1), data[endog], data[instr]\n",
@@ -802,7 +803,7 @@
    "name": "python",
    "nbconvert_exporter": "python",
    "pygments_lexer": "ipython3",
-   "version": "3.10.12"
+   "version": "3.12.7"
   },
   "pycharm": {
    "stem_cell": {

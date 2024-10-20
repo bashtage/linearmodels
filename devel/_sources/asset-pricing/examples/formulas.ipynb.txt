@@ -67,7 +67,7 @@
    "metadata": {},
    "outputs": [],
    "source": [
-    "from linearmodels.asset_pricing import LinearFactorModel, TradedFactorModel\n",
+    "from linearmodels.asset_pricing import LinearFactorModel\n",
     "\n",
     "formula = \"NoDur + Chems + S1V1 + S5V5 + S1M1 + S5M5 ~ MktRF + HML + Mom\"\n",
     "mod = LinearFactorModel.from_formula(formula, data)\n",
