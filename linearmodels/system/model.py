@@ -1843,7 +1843,7 @@ class IVSystemGMM(_SystemModelBase):
         if weight_type is "unadjusted"
     weight_type : str
         Name of moment condition weight function to use in the GMM estimation
-    **weight_config
+    weight_config
         Additional keyword arguments to pass to the moment condition weight
         function
 
@@ -2185,7 +2185,7 @@ class IVSystemGMM(_SystemModelBase):
             * "unadjusted", "homoskedastic" - Assume moments are homoskedastic
             * "robust", "heteroskedastic" - Allow for heteroskedasticity
 
-        **weight_config
+        weight_config
             Additional keyword arguments to pass to the moment condition weight
             function
 

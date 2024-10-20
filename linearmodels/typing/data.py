@@ -1,6 +1,4 @@
-from __future__ import annotations
-
-from typing import TYPE_CHECKING, Any, Union
+from typing import Any, Union
 
 import numpy as np
 import pandas as pd
@@ -18,18 +16,13 @@ except ImportError:
 
 NDArray = Union[np.ndarray]
 
-if TYPE_CHECKING:
-    Float64Array = np.ndarray[Any, np.dtype[np.float64]]  # pragma: no cover
-    Int64Array = np.ndarray[Any, np.dtype[np.int64]]  # pragma: no cover
-    Int32Array = np.ndarray[Any, np.dtype[np.int32]]  # pragma: no cover
-    IntArray = np.ndarray[Any, np.dtype[np.int_]]  # pragma: no cover
-    BoolArray = np.ndarray[Any, np.dtype[np.bool_]]  # pragma: no cover
-    AnyArray = np.ndarray[Any, Any]  # pragma: no cover
-    Uint32Array = np.ndarray[Any, np.dtype[np.uint32]]  # pragma: no cover
-else:
-    Uint32Array = IntArray = Float64Array = Int64Array = Int32Array = BoolArray = (
-        AnyArray
-    ) = NDArray
+Float64Array = np.ndarray[Any, np.dtype[np.float64]]  # pragma: no cover
+Int64Array = np.ndarray[Any, np.dtype[np.int64]]  # pragma: no cover
+Int32Array = np.ndarray[Any, np.dtype[np.int32]]  # pragma: no cover
+IntArray = np.ndarray[Any, np.dtype[np.int_]]  # pragma: no cover
+BoolArray = np.ndarray[Any, np.dtype[np.bool_]]  # pragma: no cover
+AnyArray = np.ndarray[Any, Any]  # pragma: no cover
+Uint32Array = np.ndarray[Any, np.dtype[np.uint32]]  # pragma: no cover
 
 __all__ = [
     "Float64Array",
