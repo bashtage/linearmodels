@@ -115,7 +115,6 @@
    "metadata": {},
    "outputs": [],
    "source": [
-    "\n",
     "data[\"const\"] = 1\n",
     "controls = [\"const\"] + controls"
    ]
