@@ -963,7 +963,7 @@ class _IVGMMBase(_IVModelBase):
         Observation weights used in estimation
     weight_type : str
         Name of moment condition weight function to use in the GMM estimation
-    **weight_config
+    weight_config
         Additional keyword arguments to pass to the moment condition weight
         function
 
@@ -1066,7 +1066,7 @@ class IVGMM(_IVGMMBase):
         Observation weights used in estimation
     weight_type : str
         Name of moment condition weight function to use in the GMM estimation
-    **weight_config
+    weight_config
         Additional keyword arguments to pass to the moment condition weight
         function
 
@@ -1139,7 +1139,7 @@ class IVGMM(_IVGMMBase):
             Observation weights used in estimation
         weight_type : str
             Name of moment condition weight function to use in the GMM estimation
-        **weight_config
+        weight_config
             Additional keyword arguments to pass to the moment condition weight
             function
 
@@ -1342,7 +1342,7 @@ class IVGMMCUE(_IVGMMBase):
         Observation weights used in estimation
     weight_type : str
         Name of moment condition weight function to use in the GMM estimation
-    **weight_config
+    weight_config
         Additional keyword arguments to pass to the moment condition weight
         function
 
@@ -1418,7 +1418,7 @@ class IVGMMCUE(_IVGMMBase):
             Observation weights used in estimation
         weight_type : str
             Name of moment condition weight function to use in the GMM estimation
-        **weight_config
+        weight_config
             Additional keyword arguments to pass to the moment condition weight
             function
 
@@ -1706,7 +1706,7 @@ def _gmm_model_from_formula(
         Observation weights used in estimation
     weight_type : str
         Name of moment condition weight function to use in the GMM estimation
-    **weight_config
+    weight_config
         Additional keyword arguments to pass to the moment condition weight
         function
 

@@ -140,8 +140,6 @@ class PanelData:
     copy : bool
         Flag indicating whether to copy the input. Only has an effect when
         x is a DataFrame
-    cast : bool
-        Flag indicating to case the data to double precision.
 
     Notes
     -----

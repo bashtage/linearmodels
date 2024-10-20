@@ -1,27 +1,13 @@
 Type Aliases
 ============
 
-.. module:: linearmodels.typing.data
-
-.. automodule:: linearmodels.typing.data
-
-.. autoclass::
-
-   ArrayLike
-   Float64Array
-   Int64Array
-   Int32Array
-   IntArray
-   BoolArray
-   AnyArray
-   Uint32Array = np.ndarray[Any, np.dtype[np.uint32]]  # pragma: no cover
-
-
-.. module:: linearmodels.typing
-
-.. automodule:: linearmodels.typing
-
-.. autoclass::
-
-   Numeric
-   OptionalNumeric
+.. autoclass:: linearmodels.typing.Numeric
+.. autoclass:: linearmodels.typing.OptionalNumeric
+.. autoclass:: linearmodels.typing.data.ArrayLike
+.. autoclass:: linearmodels.typing.data.Float64Array
+.. autoclass:: linearmodels.typing.data.Int64Array
+.. autoclass:: linearmodels.typing.data.Int32Array
+.. autoclass:: linearmodels.typing.data.IntArray
+.. autoclass:: linearmodels.typing.data.BoolArray
+.. autoclass:: linearmodels.typing.data.AnyArray
+.. autoclass:: linearmodels.typing.data.Uint32Array
