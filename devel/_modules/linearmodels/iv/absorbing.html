@@ -15,7 +15,7 @@
     
   
       
-        <title>linearmodels.iv.absorbing - linearmodels v6.2 (+4)</title>
+        <title>linearmodels.iv.absorbing - linearmodels v6.2 (+10)</title>
       
     
 
@@ -88,7 +88,7 @@
 
 <header class="md-header" data-md-component="header">
   <nav class="md-header__inner md-grid" aria-label="Header">
-    <a href="../../../index.html" title="linearmodels v6.2 (+4)" class="md-header__button md-logo" aria-label="linearmodels v6.2 (+4)" data-md-component="logo">
+    <a href="../../../index.html" title="linearmodels v6.2 (+10)" class="md-header__button md-logo" aria-label="linearmodels v6.2 (+10)" data-md-component="logo">
       <img src="../../../_static/bw-logo.svg" alt="logo">
     </a>
     <label class="md-header__button md-icon" for="__drawer">
@@ -98,7 +98,7 @@
       <div class="md-header__ellipsis">
         <div class="md-header__topic">
           <span class="md-ellipsis">
-            linearmodels v6.2 (+4)
+            linearmodels v6.2 (+10)
           </span>
         </div>
         <div class="md-header__topic" data-md-component="header-topic">
@@ -185,10 +185,10 @@
 
 <nav class="md-nav md-nav--primary" aria-label="Navigation" data-md-level="0">
   <label class="md-nav__title" for="__drawer">
-    <a href="../../../index.html" title="linearmodels v6.2 (+4)" class="md-nav__button md-logo" aria-label="linearmodels v6.2 (+4)" data-md-component="logo">
+    <a href="../../../index.html" title="linearmodels v6.2 (+10)" class="md-nav__button md-logo" aria-label="linearmodels v6.2 (+10)" data-md-component="logo">
       <img src="../../../_static/bw-logo.svg" alt="logo">
     </a>
-    linearmodels v6.2 (+4)
+    linearmodels v6.2 (+10)
   </label>
   
     <div class="md-nav__source">
@@ -417,7 +417,8 @@
 
 <span class="kn">from</span> <span class="nn">collections</span> <span class="kn">import</span> <span class="n">defaultdict</span>
 <span class="kn">from</span> <span class="nn">collections.abc</span> <span class="kn">import</span> <span class="n">Hashable</span><span class="p">,</span> <span class="n">Iterable</span>
-<span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">Any</span><span class="p">,</span> <span class="n">DefaultDict</span><span class="p">,</span> <span class="n">TypeVar</span><span class="p">,</span> <span class="n">Union</span><span class="p">,</span> <span class="n">cast</span>
+<span class="kn">import</span> <span class="nn">hashlib</span>
+<span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">Any</span><span class="p">,</span> <span class="n">DefaultDict</span><span class="p">,</span> <span class="n">Union</span><span class="p">,</span> <span class="n">cast</span>
 <span class="kn">import</span> <span class="nn">warnings</span>
 
 <span class="kn">from</span> <span class="nn">numpy</span> <span class="kn">import</span> <span class="p">(</span>
@@ -473,23 +474,43 @@
 <span class="kn">from</span> <span class="nn">linearmodels.shared.utility</span> <span class="kn">import</span> <span class="n">DataFrameWrapper</span><span class="p">,</span> <span class="n">SeriesWrapper</span>
 <span class="kn">import</span> <span class="nn">linearmodels.typing.data</span>
 
+<span class="n">HAVE_XXHASH</span> <span class="o">=</span> <span class="kc">False</span>
 <span class="k">try</span><span class="p">:</span>
-    <span class="kn">from</span> <span class="nn">xxhash</span> <span class="kn">import</span> <span class="n">xxh64</span> <span class="k">as</span> <span class="n">hash_func</span>
-<span class="k">except</span> <span class="ne">ImportError</span><span class="p">:</span>
-    <span class="kn">from</span> <span class="nn">hashlib</span> <span class="kn">import</span> <span class="n">sha256</span> <span class="k">as</span> <span class="n">hash_func</span>
+    <span class="kn">from</span> <span class="nn">xxhash</span> <span class="kn">import</span> <span class="n">xxh64</span>
 
-<span class="n">Hasher</span> <span class="o">=</span> <span class="n">TypeVar</span><span class="p">(</span><span class="s2">&quot;Hasher&quot;</span><span class="p">,</span> <span class="n">bound</span><span class="o">=</span><span class="n">hash_func</span><span class="p">)</span>
+    <span class="n">HAVE_XXHASH</span> <span class="o">=</span> <span class="kc">True</span>
+<span class="k">except</span> <span class="ne">ImportError</span><span class="p">:</span>
+    <span class="k">pass</span>
+
+
+<span class="k">class</span> <span class="nc">Hasher</span><span class="p">:</span>
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_hasher</span><span class="p">:</span> <span class="n">hashlib</span><span class="o">.</span><span class="n">_Hash</span> <span class="o">|</span> <span class="n">xxh64</span>
+        <span class="k">if</span> <span class="n">HAVE_XXHASH</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_hasher</span> <span class="o">=</span> <span class="n">xxh64</span><span class="p">()</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_use_xxh64</span> <span class="o">=</span> <span class="kc">True</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_hasher</span> <span class="o">=</span> <span class="n">hashlib</span><span class="o">.</span><span class="n">sha256</span><span class="p">()</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_use_xxh64</span> <span class="o">=</span> <span class="kc">False</span>
+
+    <span class="k">def</span> <span class="nf">reset</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_use_xxh64</span><span class="p">:</span>
+            <span class="k">assert</span> <span class="nb">isinstance</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_hasher</span><span class="p">,</span> <span class="n">xxh64</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_hasher</span><span class="o">.</span><span class="n">reset</span><span class="p">()</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_hasher</span> <span class="o">=</span> <span class="n">hashlib</span><span class="o">.</span><span class="n">sha256</span><span class="p">()</span>
+
+    <span class="k">def</span> <span class="nf">update</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">data</span><span class="p">:</span> <span class="nb">memoryview</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_hasher</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="n">data</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">digest</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bytes</span><span class="p">:</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_hasher</span><span class="o">.</span><span class="n">digest</span><span class="p">()</span>
+
+    <span class="k">def</span> <span class="nf">hexdigest</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_hasher</span><span class="o">.</span><span class="n">hexdigest</span><span class="p">()</span>
 
 
 <span class="n">_VARIABLE_CACHE</span><span class="p">:</span> <span class="n">DefaultDict</span><span class="p">[</span><span class="n">Hashable</span><span class="p">,</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">ndarray</span><span class="p">]]</span> <span class="o">=</span> <span class="n">defaultdict</span><span class="p">(</span><span class="nb">dict</span><span class="p">)</span>
-
-
-<span class="k">def</span> <span class="nf">_reset</span><span class="p">(</span><span class="n">hasher</span><span class="p">:</span> <span class="n">Hasher</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Hasher</span><span class="p">:</span>
-    <span class="k">try</span><span class="p">:</span>
-        <span class="n">hasher</span><span class="o">.</span><span class="n">reset</span><span class="p">()</span>
-        <span class="k">return</span> <span class="n">hasher</span>
-    <span class="k">except</span> <span class="ne">AttributeError</span><span class="p">:</span>
-        <span class="k">return</span> <span class="n">hash_func</span><span class="p">()</span>
 
 
 <span class="k">def</span> <span class="nf">clear_cache</span><span class="p">()</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
@@ -554,8 +575,8 @@
 
         <span class="n">variable_digest</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span>
         <span class="k">if</span> <span class="n">use_cache</span><span class="p">:</span>
-            <span class="n">hasher</span> <span class="o">=</span> <span class="n">hash_func</span><span class="p">()</span>
-            <span class="n">hasher</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="n">ascontiguousarray</span><span class="p">(</span><span class="n">_y</span><span class="o">.</span><span class="n">data</span><span class="p">))</span>
+            <span class="n">hasher</span> <span class="o">=</span> <span class="n">Hasher</span><span class="p">()</span>
+            <span class="n">hasher</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="nb">memoryview</span><span class="p">(</span><span class="n">ascontiguousarray</span><span class="p">(</span><span class="n">_y</span><span class="o">.</span><span class="n">data</span><span class="p">)))</span>
             <span class="n">variable_digest</span> <span class="o">=</span> <span class="n">hasher</span><span class="o">.</span><span class="n">hexdigest</span><span class="p">()</span>
 
         <span class="k">if</span> <span class="n">use_cache</span> <span class="ow">and</span> <span class="n">variable_digest</span> <span class="ow">in</span> <span class="n">_VARIABLE_CACHE</span><span class="p">[</span><span class="n">regressor_hash</span><span class="p">]:</span>
@@ -568,7 +589,7 @@
     <span class="k">return</span> <span class="n">column_stack</span><span class="p">(</span><span class="n">resids</span><span class="p">)</span>
 
 
-<span class="k">def</span> <span class="nf">category_product</span><span class="p">(</span><span class="n">cats</span><span class="p">:</span> <span class="n">linearmodels</span><span class="o">.</span><span class="n">typing</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">AnyPandas</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Series</span><span class="p">:</span>
+<span class="k">def</span> <span class="nf">category_product</span><span class="p">(</span><span class="n">cats</span><span class="p">:</span> <span class="n">linearmodels</span><span class="o">.</span><span class="n">typing</span><span class="o">.</span><span class="n">AnyPandas</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Series</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Construct category from all combination of input categories</span>
 
@@ -586,7 +607,7 @@
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">cats</span><span class="p">,</span> <span class="n">Series</span><span class="p">):</span>
         <span class="k">return</span> <span class="n">cats</span>
-
+    <span class="k">assert</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">cats</span><span class="p">,</span> <span class="n">DataFrame</span><span class="p">)</span>
     <span class="n">sizes</span> <span class="o">=</span> <span class="p">[]</span>
     <span class="k">for</span> <span class="n">c</span> <span class="ow">in</span> <span class="n">cats</span><span class="p">:</span>
         <span class="c1"># TODO: Bug in pandas-stubs</span>
@@ -612,7 +633,7 @@
     <span class="n">dtype_val</span> <span class="o">=</span> <span class="n">dtype</span><span class="p">(</span><span class="n">dtype_str</span><span class="p">)</span>
     <span class="n">codes</span> <span class="o">=</span> <span class="n">zeros</span><span class="p">(</span><span class="n">nobs</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="n">dtype_val</span><span class="p">)</span>
     <span class="n">cum_size</span> <span class="o">=</span> <span class="mi">0</span>
-    <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">col</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">cats</span><span class="p">):</span>
+    <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">col_name</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">cats</span><span class="p">):</span>
         <span class="k">if</span> <span class="n">dtype_str</span> <span class="o">==</span> <span class="s2">&quot;int8&quot;</span><span class="p">:</span>
             <span class="n">shift</span><span class="p">:</span> <span class="n">int8</span> <span class="o">|</span> <span class="n">int16</span> <span class="o">|</span> <span class="n">int32</span> <span class="o">|</span> <span class="n">int64</span> <span class="o">=</span> <span class="n">int8</span><span class="p">(</span><span class="n">cum_size</span><span class="p">)</span>
         <span class="k">elif</span> <span class="n">dtype_str</span> <span class="o">==</span> <span class="s2">&quot;int16&quot;</span><span class="p">:</span>
@@ -621,7 +642,7 @@
             <span class="n">shift</span> <span class="o">=</span> <span class="n">int32</span><span class="p">(</span><span class="n">cum_size</span><span class="p">)</span>
         <span class="k">else</span><span class="p">:</span>  <span class="c1"># elif dtype_str == &quot;int64&quot;:</span>
             <span class="n">shift</span> <span class="o">=</span> <span class="n">int64</span><span class="p">(</span><span class="n">cum_size</span><span class="p">)</span>
-        <span class="n">cat_codes</span> <span class="o">=</span> <span class="n">asarray</span><span class="p">(</span><span class="n">cats</span><span class="p">[</span><span class="n">col</span><span class="p">]</span><span class="o">.</span><span class="n">cat</span><span class="o">.</span><span class="n">codes</span><span class="p">)</span>
+        <span class="n">cat_codes</span> <span class="o">=</span> <span class="n">asarray</span><span class="p">(</span><span class="n">cats</span><span class="p">[</span><span class="n">col_name</span><span class="p">]</span><span class="o">.</span><span class="n">cat</span><span class="o">.</span><span class="n">codes</span><span class="p">)</span>
         <span class="n">codes</span> <span class="o">+=</span> <span class="n">cat_codes</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="n">dtype_val</span><span class="p">)</span> <span class="o">&lt;&lt;</span> <span class="n">shift</span>
         <span class="n">cum_size</span> <span class="o">+=</span> <span class="n">sizes</span><span class="p">[</span><span class="n">i</span><span class="p">]</span>
 
@@ -651,8 +672,8 @@
 
 
 <span class="k">def</span> <span class="nf">category_continuous_interaction</span><span class="p">(</span>
-    <span class="n">cat</span><span class="p">:</span> <span class="n">linearmodels</span><span class="o">.</span><span class="n">typing</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">AnyPandas</span><span class="p">,</span>
-    <span class="n">cont</span><span class="p">:</span> <span class="n">linearmodels</span><span class="o">.</span><span class="n">typing</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">AnyPandas</span><span class="p">,</span>
+    <span class="n">cat</span><span class="p">:</span> <span class="n">linearmodels</span><span class="o">.</span><span class="n">typing</span><span class="o">.</span><span class="n">AnyPandas</span><span class="p">,</span>
+    <span class="n">cont</span><span class="p">:</span> <span class="n">linearmodels</span><span class="o">.</span><span class="n">typing</span><span class="o">.</span><span class="n">AnyPandas</span><span class="p">,</span>
     <span class="n">precondition</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">sp</span><span class="o">.</span><span class="n">csc_matrix</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
@@ -840,21 +861,23 @@
 <span class="sd">        Construct a hash that will be invariant for any permutation of</span>
 <span class="sd">        inputs that produce the same fit when used as regressors&quot;&quot;&quot;</span>
         <span class="c1"># Sorted hashes of any categoricals</span>
-        <span class="n">hasher</span> <span class="o">=</span> <span class="n">hash_func</span><span class="p">()</span>
+        <span class="n">hasher</span> <span class="o">=</span> <span class="n">Hasher</span><span class="p">()</span>
         <span class="n">cat_hashes</span> <span class="o">=</span> <span class="p">[]</span>
         <span class="n">cat</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">cat</span>
         <span class="k">for</span> <span class="n">col</span> <span class="ow">in</span> <span class="n">cat</span><span class="p">:</span>
-            <span class="n">hasher</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="n">ascontiguousarray</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">cat</span><span class="p">[</span><span class="n">col</span><span class="p">]</span><span class="o">.</span><span class="n">cat</span><span class="o">.</span><span class="n">codes</span><span class="o">.</span><span class="n">to_numpy</span><span class="p">()</span><span class="o">.</span><span class="n">data</span><span class="p">))</span>
+            <span class="n">hasher</span><span class="o">.</span><span class="n">update</span><span class="p">(</span>
+                <span class="nb">memoryview</span><span class="p">(</span><span class="n">ascontiguousarray</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">cat</span><span class="p">[</span><span class="n">col</span><span class="p">]</span><span class="o">.</span><span class="n">cat</span><span class="o">.</span><span class="n">codes</span><span class="o">.</span><span class="n">to_numpy</span><span class="p">()</span><span class="o">.</span><span class="n">data</span><span class="p">))</span>
+            <span class="p">)</span>
             <span class="n">cat_hashes</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">hasher</span><span class="o">.</span><span class="n">hexdigest</span><span class="p">())</span>
-            <span class="n">hasher</span> <span class="o">=</span> <span class="n">_reset</span><span class="p">(</span><span class="n">hasher</span><span class="p">)</span>
+            <span class="n">hasher</span><span class="o">.</span><span class="n">reset</span><span class="p">()</span>
         <span class="n">sorted_hashes</span> <span class="o">=</span> <span class="nb">tuple</span><span class="p">(</span><span class="nb">sorted</span><span class="p">(</span><span class="n">cat_hashes</span><span class="p">))</span>
 
         <span class="n">hashes</span> <span class="o">=</span> <span class="p">[]</span>
         <span class="n">cont</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">cont</span>
         <span class="k">for</span> <span class="n">col</span> <span class="ow">in</span> <span class="n">cont</span><span class="p">:</span>
-            <span class="n">hasher</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="n">ascontiguousarray</span><span class="p">(</span><span class="n">cont</span><span class="p">[</span><span class="n">col</span><span class="p">]</span><span class="o">.</span><span class="n">to_numpy</span><span class="p">())</span><span class="o">.</span><span class="n">data</span><span class="p">)</span>
+            <span class="n">hasher</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="nb">memoryview</span><span class="p">(</span><span class="n">ascontiguousarray</span><span class="p">(</span><span class="n">cont</span><span class="p">[</span><span class="n">col</span><span class="p">]</span><span class="o">.</span><span class="n">to_numpy</span><span class="p">())</span><span class="o">.</span><span class="n">data</span><span class="p">))</span>
             <span class="n">hashes</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">sorted_hashes</span> <span class="o">+</span> <span class="p">(</span><span class="n">hasher</span><span class="o">.</span><span class="n">hexdigest</span><span class="p">(),))</span>
-            <span class="n">hasher</span> <span class="o">=</span> <span class="n">_reset</span><span class="p">(</span><span class="n">hasher</span><span class="p">)</span>
+            <span class="n">hasher</span><span class="o">.</span><span class="n">reset</span><span class="p">()</span>
 
         <span class="k">return</span> <span class="nb">sorted</span><span class="p">(</span><span class="n">hashes</span><span class="p">)</span>
 
@@ -957,26 +980,30 @@
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">hash</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">tuple</span><span class="p">[</span><span class="nb">tuple</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="o">...</span><span class="p">],</span> <span class="o">...</span><span class="p">]:</span>
         <span class="n">hashes</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="nb">tuple</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="o">...</span><span class="p">]]</span> <span class="o">=</span> <span class="p">[]</span>
-        <span class="n">hasher</span> <span class="o">=</span> <span class="n">hash_func</span><span class="p">()</span>
+        <span class="n">hasher</span> <span class="o">=</span> <span class="n">Hasher</span><span class="p">()</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_cat</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
             <span class="k">for</span> <span class="n">col</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_cat</span><span class="p">:</span>
                 <span class="n">hasher</span><span class="o">.</span><span class="n">update</span><span class="p">(</span>
-                    <span class="n">ascontiguousarray</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_cat</span><span class="p">[</span><span class="n">col</span><span class="p">]</span><span class="o">.</span><span class="n">cat</span><span class="o">.</span><span class="n">codes</span><span class="o">.</span><span class="n">to_numpy</span><span class="p">())</span><span class="o">.</span><span class="n">data</span>
+                    <span class="nb">memoryview</span><span class="p">(</span>
+                        <span class="n">ascontiguousarray</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_cat</span><span class="p">[</span><span class="n">col</span><span class="p">]</span><span class="o">.</span><span class="n">cat</span><span class="o">.</span><span class="n">codes</span><span class="o">.</span><span class="n">to_numpy</span><span class="p">())</span><span class="o">.</span><span class="n">data</span>
+                    <span class="p">)</span>
                 <span class="p">)</span>
                 <span class="n">hashes</span><span class="o">.</span><span class="n">append</span><span class="p">((</span><span class="n">hasher</span><span class="o">.</span><span class="n">hexdigest</span><span class="p">(),))</span>
-                <span class="n">hasher</span> <span class="o">=</span> <span class="n">_reset</span><span class="p">(</span><span class="n">hasher</span><span class="p">)</span>
+                <span class="n">hasher</span><span class="o">.</span><span class="n">reset</span><span class="p">()</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_cont</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
             <span class="k">for</span> <span class="n">col</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_cont</span><span class="p">:</span>
-                <span class="n">hasher</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="n">ascontiguousarray</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_cont</span><span class="p">[</span><span class="n">col</span><span class="p">]</span><span class="o">.</span><span class="n">to_numpy</span><span class="p">())</span><span class="o">.</span><span class="n">data</span><span class="p">)</span>
+                <span class="n">hasher</span><span class="o">.</span><span class="n">update</span><span class="p">(</span>
+                    <span class="nb">memoryview</span><span class="p">(</span><span class="n">ascontiguousarray</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_cont</span><span class="p">[</span><span class="n">col</span><span class="p">]</span><span class="o">.</span><span class="n">to_numpy</span><span class="p">())</span><span class="o">.</span><span class="n">data</span><span class="p">)</span>
+                <span class="p">)</span>
                 <span class="n">hashes</span><span class="o">.</span><span class="n">append</span><span class="p">((</span><span class="n">hasher</span><span class="o">.</span><span class="n">hexdigest</span><span class="p">(),))</span>
-                <span class="n">hasher</span> <span class="o">=</span> <span class="n">_reset</span><span class="p">(</span><span class="n">hasher</span><span class="p">)</span>
+                <span class="n">hasher</span><span class="o">.</span><span class="n">reset</span><span class="p">()</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_interactions</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
             <span class="k">for</span> <span class="n">interact</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_interactions</span><span class="p">:</span>
                 <span class="n">hashes</span><span class="o">.</span><span class="n">extend</span><span class="p">(</span><span class="n">interact</span><span class="o">.</span><span class="n">hash</span><span class="p">)</span>
         <span class="c1"># Add weight hash if provided</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_weights</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
-            <span class="n">hasher</span> <span class="o">=</span> <span class="n">hash_func</span><span class="p">()</span>
-            <span class="n">hasher</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="n">ascontiguousarray</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_weights</span><span class="o">.</span><span class="n">data</span><span class="p">))</span>
+            <span class="n">hasher</span> <span class="o">=</span> <span class="n">Hasher</span><span class="p">()</span>
+            <span class="n">hasher</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="nb">memoryview</span><span class="p">(</span><span class="n">ascontiguousarray</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_weights</span><span class="o">.</span><span class="n">data</span><span class="p">)))</span>
             <span class="n">hashes</span><span class="o">.</span><span class="n">append</span><span class="p">((</span><span class="n">hasher</span><span class="o">.</span><span class="n">hexdigest</span><span class="p">(),))</span>
         <span class="k">return</span> <span class="nb">tuple</span><span class="p">(</span><span class="nb">sorted</span><span class="p">(</span><span class="n">hashes</span><span class="p">))</span>
 
@@ -1135,7 +1162,7 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">_index</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_dependent</span><span class="o">.</span><span class="n">rows</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_method</span> <span class="o">=</span> <span class="s2">&quot;Absorbing LS&quot;</span>
 
-        <span class="bp">self</span><span class="o">.</span><span class="n">_const_col</span> <span class="o">=</span> <span class="mi">0</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_const_col</span><span class="p">:</span> <span class="nb">int</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="mi">0</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_has_constant</span> <span class="o">=</span> <span class="kc">False</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_has_constant_exog</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_check_constant</span><span class="p">()</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_constant_absorbed</span> <span class="o">=</span> <span class="kc">False</span>
@@ -1162,7 +1189,7 @@
     <span class="k">def</span> <span class="nf">_check_constant</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
         <span class="n">col_delta</span> <span class="o">=</span> <span class="n">ptp</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">exog</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span> <span class="mi">0</span><span class="p">)</span>
         <span class="n">has_constant</span> <span class="o">=</span> <span class="n">npany</span><span class="p">(</span><span class="n">col_delta</span> <span class="o">==</span> <span class="mi">0</span><span class="p">)</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">_const_col</span> <span class="o">=</span> <span class="n">where</span><span class="p">(</span><span class="n">col_delta</span> <span class="o">==</span> <span class="mi">0</span><span class="p">)[</span><span class="mi">0</span><span class="p">][</span><span class="mi">0</span><span class="p">]</span> <span class="k">if</span> <span class="n">has_constant</span> <span class="k">else</span> <span class="kc">None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_const_col</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">where</span><span class="p">(</span><span class="n">col_delta</span> <span class="o">==</span> <span class="mi">0</span><span class="p">)[</span><span class="mi">0</span><span class="p">][</span><span class="mi">0</span><span class="p">])</span> <span class="k">if</span> <span class="n">has_constant</span> <span class="k">else</span> <span class="kc">None</span>
         <span class="k">return</span> <span class="nb">bool</span><span class="p">(</span><span class="n">has_constant</span><span class="p">)</span>
 
     <span class="k">def</span> <span class="nf">_check_weights</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>

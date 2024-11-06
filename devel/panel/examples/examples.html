@@ -15,7 +15,7 @@
     
   
       
-        <title>Examples - linearmodels v6.2 (+4)</title>
+        <title>Examples - linearmodels v6.2 (+10)</title>
       
     
 
@@ -94,7 +94,7 @@
 
 <header class="md-header" data-md-component="header">
   <nav class="md-header__inner md-grid" aria-label="Header">
-    <a href="../../index.html" title="linearmodels v6.2 (+4)" class="md-header__button md-logo" aria-label="linearmodels v6.2 (+4)" data-md-component="logo">
+    <a href="../../index.html" title="linearmodels v6.2 (+10)" class="md-header__button md-logo" aria-label="linearmodels v6.2 (+10)" data-md-component="logo">
       <img src="../../_static/bw-logo.svg" alt="logo">
     </a>
     <label class="md-header__button md-icon" for="__drawer">
@@ -104,7 +104,7 @@
       <div class="md-header__ellipsis">
         <div class="md-header__topic">
           <span class="md-ellipsis">
-            linearmodels v6.2 (+4)
+            linearmodels v6.2 (+10)
           </span>
         </div>
         <div class="md-header__topic" data-md-component="header-topic">
@@ -191,10 +191,10 @@
 
 <nav class="md-nav md-nav--primary" aria-label="Navigation" data-md-level="0">
   <label class="md-nav__title" for="__drawer">
-    <a href="../../index.html" title="linearmodels v6.2 (+4)" class="md-nav__button md-logo" aria-label="linearmodels v6.2 (+4)" data-md-component="logo">
+    <a href="../../index.html" title="linearmodels v6.2 (+10)" class="md-nav__button md-logo" aria-label="linearmodels v6.2 (+10)" data-md-component="logo">
       <img src="../../_static/bw-logo.svg" alt="logo">
     </a>
-    linearmodels v6.2 (+4)
+    linearmodels v6.2 (+10)
   </label>
   
     <div class="md-nav__source">
@@ -956,6 +956,7 @@
 </code></pre></div>
 </div>
 <div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><code><span class="kn">import</span> <span class="nn">pandas</span> <span class="k">as</span> <span class="nn">pd</span>
+
 <span class="kn">from</span> <span class="nn">linearmodels.datasets</span> <span class="kn">import</span> <span class="n">wage_panel</span>
 
 <span class="n">data</span> <span class="o">=</span> <span class="n">wage_panel</span><span class="o">.</span><span class="n">load</span><span class="p">()</span>
@@ -1014,6 +1015,7 @@ nr year
 </code></pre></div>
 </div>
 <div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><code><span class="kn">import</span> <span class="nn">statsmodels.api</span> <span class="k">as</span> <span class="nn">sm</span>
+
 <span class="kn">from</span> <span class="nn">linearmodels.panel</span> <span class="kn">import</span> <span class="n">PooledOLS</span>
 
 <span class="n">exog_vars</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;black&quot;</span><span class="p">,</span> <span class="s2">&quot;hisp&quot;</span><span class="p">,</span> <span class="s2">&quot;exper&quot;</span><span class="p">,</span> <span class="s2">&quot;expersq&quot;</span><span class="p">,</span> <span class="s2">&quot;married&quot;</span><span class="p">,</span> <span class="s2">&quot;educ&quot;</span><span class="p">,</span> <span class="s2">&quot;union&quot;</span><span class="p">,</span> <span class="s2">&quot;year&quot;</span><span class="p">]</span>
@@ -1034,8 +1036,8 @@ nr year
 Dep. Variable:                  lwage   R-squared:                        0.1893
 Estimator:                  PooledOLS   R-squared (Between):              0.2066
 No. Observations:                4360   R-squared (Within):               0.1692
-Date:                Sun, Oct 20 2024   R-squared (Overall):              0.1893
-Time:                        22:07:42   Log-likelihood                   -2982.0
+Date:                Wed, Nov 06 2024   R-squared (Overall):              0.1893
+Time:                        15:13:13   Log-likelihood                   -2982.0
 Cov. Estimator:            Unadjusted
                                         F-statistic:                      72.459
 Entities:                         545   P-value                           0.0000
@@ -1099,8 +1101,8 @@ year.1987      0.1738     0.0494     3.5165     0.0004      0.0769      0.2707
 Dep. Variable:                  lwage   R-squared:                        0.1806
 Estimator:              RandomEffects   R-squared (Between):              0.1853
 No. Observations:                4360   R-squared (Within):               0.1799
-Date:                Sun, Oct 20 2024   R-squared (Overall):              0.1828
-Time:                        22:07:43   Log-likelihood                   -1622.5
+Date:                Wed, Nov 06 2024   R-squared (Overall):              0.1828
+Time:                        15:13:13   Log-likelihood                   -1622.5
 Cov. Estimator:            Unadjusted
                                         F-statistic:                      68.409
 Entities:                         545   P-value                           0.0000
@@ -1247,8 +1249,8 @@ Name: Variance Decomposition, dtype: float64
 Dep. Variable:                  lwage   R-squared:                        0.2155
 Estimator:                 BetweenOLS   R-squared (Between):              0.2155
 No. Observations:                 545   R-squared (Within):               0.1141
-Date:                Sun, Oct 20 2024   R-squared (Overall):              0.1686
-Time:                        22:07:43   Log-likelihood                   -194.54
+Date:                Wed, Nov 06 2024   R-squared (Overall):              0.1686
+Time:                        15:13:14   Log-likelihood                   -194.54
 Cov. Estimator:            Unadjusted
                                         F-statistic:                      24.633
 Entities:                         545   P-value                           0.0000
@@ -1307,8 +1309,8 @@ union          0.2587     0.0460     5.6214     0.0000      0.1683      0.3491
 Dep. Variable:                  lwage   R-squared:                        0.1806
 Estimator:                   PanelOLS   R-squared (Between):             -0.0052
 No. Observations:                4360   R-squared (Within):               0.1806
-Date:                Sun, Oct 20 2024   R-squared (Overall):              0.0807
-Time:                        22:07:44   Log-likelihood                   -1324.8
+Date:                Wed, Nov 06 2024   R-squared (Overall):              0.0807
+Time:                        15:13:14   Log-likelihood                   -1324.8
 Cov. Estimator:            Unadjusted
                                         F-statistic:                      83.851
 Entities:                         545   P-value                           0.0000
@@ -1371,8 +1373,8 @@ Included effects: Entity
 Dep. Variable:                  lwage   R-squared:                        0.0216
 Estimator:                   PanelOLS   R-squared (Between):             -0.0052
 No. Observations:                4360   R-squared (Within):              -0.4809
-Date:                Sun, Oct 20 2024   R-squared (Overall):             -0.2253
-Time:                        22:07:44   Log-likelihood                   -1324.8
+Date:                Wed, Nov 06 2024   R-squared (Overall):             -0.2253
+Time:                        15:13:14   Log-likelihood                   -1324.8
 Cov. Estimator:            Unadjusted
                                         F-statistic:                      27.959
 Entities:                         545   P-value                           0.0000
@@ -1442,8 +1444,8 @@ estimator, effects count as lost degrees of freedom. When using entity effects a
 Dep. Variable:                  lwage   R-squared:                        0.0216
 Estimator:                   PanelOLS   R-squared (Between):             -0.0052
 No. Observations:                4360   R-squared (Within):              -0.4809
-Date:                Sun, Oct 20 2024   R-squared (Overall):             -0.2253
-Time:                        22:07:44   Log-likelihood                   -1324.8
+Date:                Wed, Nov 06 2024   R-squared (Overall):             -0.2253
+Time:                        15:13:14   Log-likelihood                   -1324.8
 Cov. Estimator:            Unadjusted
                                         F-statistic:                      27.959
 Entities:                         545   P-value                           0.0000
@@ -1502,8 +1504,8 @@ Avg Obs: 545.00, Min Obs: 545.00, Max Obs: 545.00, Groups: 8
 Dep. Variable:                  lwage   R-squared:                        0.0268
 Estimator:         FirstDifferenceOLS   R-squared (Between):              0.5491
 No. Observations:                3815   R-squared (Within):               0.1763
-Date:                Sun, Oct 20 2024   R-squared (Overall):              0.5328
-Time:                        22:07:44   Log-likelihood                   -2305.5
+Date:                Wed, Nov 06 2024   R-squared (Overall):              0.5328
+Time:                        15:13:14   Log-likelihood                   -2305.5
 Cov. Estimator:            Unadjusted
                                         F-statistic:                      26.208
 Entities:                         545   P-value                           0.0000
@@ -1719,8 +1721,8 @@ Name: count, dtype: int64
 Dep. Variable:                  lwage   R-squared:                        0.1866
 Estimator:                  PooledOLS   R-squared (Between):              0.2027
 No. Observations:                4360   R-squared (Within):               0.1679
-Date:                Sun, Oct 20 2024   R-squared (Overall):              0.1866
-Time:                        22:07:44   Log-likelihood                   -2989.2
+Date:                Wed, Nov 06 2024   R-squared (Overall):              0.1866
+Time:                        15:13:15   Log-likelihood                   -2989.2
 Cov. Estimator:             Clustered
                                         F-statistic:                      142.61
 Entities:                         545   P-value                           0.0000

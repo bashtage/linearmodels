@@ -39,9 +39,9 @@
    "outputs": [],
    "source": [
     "# Common libraries\n",
-    "%matplotlib inline\n",
     "import numpy as np\n",
     "import pandas as pd\n",
+    "import seaborn as sns\n",
     "import statsmodels.api as sm"
    ]
   },
@@ -181,7 +181,6 @@
    "outputs": [],
    "source": [
     "import matplotlib.pyplot as plt\n",
-    "import seaborn as sns\n",
     "\n",
     "cov = res.sigma\n",
     "std = np.sqrt(np.diag(res.sigma)[:, None])\n",
@@ -733,6 +732,7 @@
    "outputs": [],
    "source": [
     "import statsmodels.api as sm\n",
+    "\n",
     "from linearmodels.datasets import french\n",
     "\n",
     "data = french.load()\n",

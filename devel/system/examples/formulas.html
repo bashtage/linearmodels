@@ -15,7 +15,7 @@
     
   
       
-        <title>Using formulas to specify models - linearmodels v6.2 (+4)</title>
+        <title>Using formulas to specify models - linearmodels v6.2 (+10)</title>
       
     
 
@@ -94,7 +94,7 @@
 
 <header class="md-header" data-md-component="header">
   <nav class="md-header__inner md-grid" aria-label="Header">
-    <a href="../../index.html" title="linearmodels v6.2 (+4)" class="md-header__button md-logo" aria-label="linearmodels v6.2 (+4)" data-md-component="logo">
+    <a href="../../index.html" title="linearmodels v6.2 (+10)" class="md-header__button md-logo" aria-label="linearmodels v6.2 (+10)" data-md-component="logo">
       <img src="../../_static/bw-logo.svg" alt="logo">
     </a>
     <label class="md-header__button md-icon" for="__drawer">
@@ -104,7 +104,7 @@
       <div class="md-header__ellipsis">
         <div class="md-header__topic">
           <span class="md-ellipsis">
-            linearmodels v6.2 (+4)
+            linearmodels v6.2 (+10)
           </span>
         </div>
         <div class="md-header__topic" data-md-component="header-topic">
@@ -191,10 +191,10 @@
 
 <nav class="md-nav md-nav--primary" aria-label="Navigation" data-md-level="0">
   <label class="md-nav__title" for="__drawer">
-    <a href="../../index.html" title="linearmodels v6.2 (+4)" class="md-nav__button md-logo" aria-label="linearmodels v6.2 (+4)" data-md-component="logo">
+    <a href="../../index.html" title="linearmodels v6.2 (+10)" class="md-nav__button md-logo" aria-label="linearmodels v6.2 (+10)" data-md-component="logo">
       <img src="../../_static/bw-logo.svg" alt="logo">
     </a>
-    linearmodels v6.2 (+4)
+    linearmodels v6.2 (+10)
   </label>
   
     <div class="md-nav__source">
@@ -758,6 +758,7 @@
 </div>
 <div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><code><span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
 <span class="kn">import</span> <span class="nn">pandas</span> <span class="k">as</span> <span class="nn">pd</span>
+
 <span class="kn">from</span> <span class="nn">linearmodels.datasets</span> <span class="kn">import</span> <span class="n">fringe</span>
 
 <span class="n">data</span> <span class="o">=</span> <span class="n">fringe</span><span class="o">.</span><span class="n">load</span><span class="p">()</span>
@@ -801,8 +802,8 @@
 Estimator:                        GLS   Overall R-squared:                   0.6951
 No. Equations.:                     2   McElroy&#39;s R-squared:                 0.2197
 No. Observations:                 616   Judge&#39;s (OLS) R-squared:             0.1873
-Date:                Sun, Oct 20 2024   Berndt&#39;s R-squared:                  0.3775
-Time:                        22:07:25   Dhrymes&#39;s R-squared:                 0.6950
+Date:                Wed, Nov 06 2024   Berndt&#39;s R-squared:                  0.3775
+Time:                        15:12:55   Dhrymes&#39;s R-squared:                 0.6950
                                         Cov. Estimator:                  unadjusted
                                         Num. Constraints:                      None
                 Equation: benefits, Dependent Variable: hrbens
@@ -859,8 +860,8 @@ Homoskedastic (Unadjusted) Covariance (Debiased: False, GLS: True)
 Estimator:                        GLS   Overall R-squared:                   0.6951
 No. Equations.:                     2   McElroy&#39;s R-squared:                 0.2197
 No. Observations:                 616   Judge&#39;s (OLS) R-squared:             0.1873
-Date:                Sun, Oct 20 2024   Berndt&#39;s R-squared:                  0.3775
-Time:                        22:07:25   Dhrymes&#39;s R-squared:                 0.6950
+Date:                Wed, Nov 06 2024   Berndt&#39;s R-squared:                  0.3775
+Time:                        15:12:55   Dhrymes&#39;s R-squared:                 0.6950
                                         Cov. Estimator:                  unadjusted
                                         Num. Constraints:                      None
                  Equation: hrbens, Dependent Variable: hrbens
@@ -950,35 +951,35 @@ Labeled
 <div class="highlight"><pre>
                            System GLS Estimation Summary
 ===================================================================================
-Estimator:                        GLS   Overall R-squared:                   0.5814
-No. Equations.:                     2   McElroy&#39;s R-squared:                 0.1475
-No. Observations:                 616   Judge&#39;s (OLS) R-squared:             0.1344
-Date:                Sun, Oct 20 2024   Berndt&#39;s R-squared:                  0.7389
-Time:                        22:07:25   Dhrymes&#39;s R-squared:                 0.5799
+Estimator:                        GLS   Overall R-squared:                   0.7181
+No. Equations.:                     2   McElroy&#39;s R-squared:                 0.2274
+No. Observations:                 616   Judge&#39;s (OLS) R-squared:             0.1824
+Date:                Wed, Nov 06 2024   Berndt&#39;s R-squared:                  0.2623
+Time:                        15:12:55   Dhrymes&#39;s R-squared:                 0.7181
                                         Cov. Estimator:                      robust
                                         Num. Constraints:                      None
                 Equation: benefits, Dependent Variable: hrbens
 ==============================================================================
             Parameter  Std. Err.     T-stat    P-value    Lower CI    Upper CI
 ------------------------------------------------------------------------------
-educ           0.0349     0.0076     4.5938     0.0000      0.0200      0.0499
-exper          0.0348     0.0167     2.0915     0.0365      0.0022      0.0675
-expersq       -0.0007     0.0004    -1.5984     0.1100     -0.0016      0.0002
-union          0.4078     0.0484     8.4297     0.0000      0.3130      0.5026
-south         -0.1559     0.0657    -2.3739     0.0176     -0.2846     -0.0272
-nrtheast      -0.0264     0.0691    -0.3825     0.7021     -0.1619      0.1090
-nrthcen       -0.1083     0.0575    -1.8842     0.0595     -0.2209      0.0044
-male           0.2569     0.0466     5.5130     0.0000      0.1656      0.3483
+educ           0.0382     0.0045     8.5726     0.0000      0.0295      0.0470
+exper          0.0348     0.0051     6.7792     0.0000      0.0247      0.0448
+expersq       -0.0006     0.0001    -5.6445     0.0000     -0.0008     -0.0004
+union          0.3768     0.0487     7.7454     0.0000      0.2815      0.4722
+south         -0.1858     0.0520    -3.5759     0.0003     -0.2876     -0.0840
+nrtheast      -0.1919     0.0646    -2.9707     0.0030     -0.3185     -0.0653
+nrthcen       -0.1570     0.0556    -2.8238     0.0047     -0.2660     -0.0480
+male           0.2630     0.0476     5.5253     0.0000      0.1697      0.3563
                 Equation: earnings, Dependent Variable: hrearn
 ==============================================================================
             Parameter  Std. Err.     T-stat    P-value    Lower CI    Upper CI
 ------------------------------------------------------------------------------
-educ           0.2520     0.0292     8.6216     0.0000      0.1947      0.3093
-exper          0.1410     0.0608     2.3203     0.0203      0.0219      0.2602
-expersq       -0.0022     0.0016    -1.3707     0.1705     -0.0053      0.0009
-nrtheast       0.1369     0.3130     0.4375     0.6618     -0.4766      0.7505
-married        0.1071     0.1839     0.5824     0.5603     -0.2533      0.4674
-male           2.0453     0.1816     11.264     0.0000      1.6894      2.4012
+educ           0.3609     0.1020     3.5363     0.0004      0.1609      0.5609
+exper         -0.0690     0.2367    -0.2916     0.7706     -0.5330      0.3950
+expersq        0.0040     0.0063     0.6363     0.5246     -0.0083      0.0163
+nrtheast      -0.9948     0.5110    -1.9466     0.0516     -1.9964      0.0068
+married        0.9003     0.4493     2.0039     0.0451      0.0197      1.7809
+male           1.2788     0.3870     3.3041     0.0010      0.5202      2.0374
 ==============================================================================
 
 Covariance Estimator:
