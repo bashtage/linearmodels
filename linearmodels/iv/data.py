@@ -18,9 +18,7 @@ dim_err = "{0} has too many dims.  Maximum is 2, actual is {1}"
 type_err = "Only ndarrays, DataArrays and Series and DataFrames are supported"
 
 
-def convert_columns(
-    s: pd.Series, drop_first: bool
-) -> linearmodels.typing.data.AnyPandas:
+def convert_columns(s: pd.Series, drop_first: bool) -> linearmodels.typing.AnyPandas:
     if isinstance(s.dtype, pd.CategoricalDtype):
         out = pd.get_dummies(s, drop_first=drop_first)
         # TODO: Remove once pandas typing fixed
@@ -172,7 +170,7 @@ class IVData:
         return self._pandas
 
     @property
-    def ndarray(self) -> linearmodels.typing.data.NumericArray:
+    def ndarray(self) -> linearmodels.typing.NumericArray:
         """ndarray view of data, always 2d"""
         return self._ndarray
 

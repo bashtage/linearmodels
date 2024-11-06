@@ -1269,7 +1269,7 @@ class PanelOLS(_PanelModelBase):
         self._singleton_index = None
         self._drop_singletons()
 
-    def _collect_effects(self) -> linearmodels.typing.data.NumericArray:
+    def _collect_effects(self) -> linearmodels.typing.NumericArray:
         if not self._has_effect:
             return np.empty((self.dependent.shape[0], 0))
         effects = []
@@ -1768,8 +1768,8 @@ class PanelOLS(_PanelModelBase):
 
     @staticmethod
     def _is_effect_nested(
-        effects: linearmodels.typing.data.NumericArray,
-        clusters: linearmodels.typing.data.NumericArray,
+        effects: linearmodels.typing.NumericArray,
+        clusters: linearmodels.typing.NumericArray,
     ) -> bool:
         """Determine whether an effect is nested by the covariance clusters"""
         is_nested = np.zeros(effects.shape[1], dtype=bool)

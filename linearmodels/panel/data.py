@@ -63,10 +63,10 @@ class _Panel:
     @classmethod
     def from_array(
         cls,
-        values: linearmodels.typing.data.NumericArray,
-        items: Sequence[linearmodels.typing.data.Label],
-        major_axis: Sequence[linearmodels.typing.data.Label],
-        minor_axis: Sequence[linearmodels.typing.data.Label],
+        values: linearmodels.typing.NumericArray,
+        items: Sequence[linearmodels.typing.Label],
+        major_axis: Sequence[linearmodels.typing.Label],
+        minor_axis: Sequence[linearmodels.typing.Label],
     ) -> _Panel:
         index = list(product(minor_axis, major_axis))
         multi_index = MultiIndex.from_tuples(index)
@@ -103,7 +103,7 @@ class _Panel:
 
 def convert_columns(
     s: pandas.Series, drop_first: bool
-) -> linearmodels.typing.data.AnyPandas:
+) -> linearmodels.typing.AnyPandas:
     if is_string_dtype(s.dtype) and s.map(lambda v: isinstance(v, str)).all():
         s = s.astype("category")
 
@@ -338,18 +338,18 @@ class PanelData:
         return self._n
 
     @property
-    def vars(self) -> list[linearmodels.typing.data.Label]:
+    def vars(self) -> list[linearmodels.typing.Label]:
         """List of variable names"""
         return list(self._frame.columns)
 
     @property
-    def time(self) -> list[linearmodels.typing.data.Label]:
+    def time(self) -> list[linearmodels.typing.Label]:
         """List of time index names"""
         index = self.index
         return list(index.levels[1][index.codes[1]].unique())
 
     @property
-    def entities(self) -> list[linearmodels.typing.data.Label]:
+    def entities(self) -> list[linearmodels.typing.Label]:
         """List of entity index names"""
         index = self.index
         return list(index.levels[0][index.codes[0]].unique())
