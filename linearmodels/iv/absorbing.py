@@ -2,7 +2,8 @@ from __future__ import annotations
 
 from collections import defaultdict
 from collections.abc import Hashable, Iterable
-from typing import Any, DefaultDict, TypeVar, Union, cast
+from hashlib import sha256
+from typing import Any, DefaultDict, Union, cast
 import warnings
 
 from numpy import (
@@ -58,23 +59,41 @@ from linearmodels.shared.hypotheses import InvalidTestStatistic, WaldTestStatist
 from linearmodels.shared.utility import DataFrameWrapper, SeriesWrapper
 import linearmodels.typing.data
 
+HAVE_XXHASH = False
 try:
-    from xxhash import xxh64 as hash_func
-except ImportError:
-    from hashlib import sha256 as hash_func
+    from xxhash import xxh64
 
-Hasher = TypeVar("Hasher", bound=hash_func)
+    HAVE_XXHASH = True
+except ImportError:
+    pass
+
+
+class Hasher:
+    def __init__(self):
+        if HAVE_XXHASH:
+            self._hasher = xxh64()
+            self._use_xx = True
+        else:
+            self._hasher = sha256()
+            self._use_xx = False
+
+    def reset(self):
+        if self._use_xx:
+            self._hasher = xxh64()
+        else:
+            self._hasher.reset()
+
+    def update(self, data: memoryview) -> None:
+        self._hasher.update(data)
+
+    def digest(self) -> bytes:
+        return self._hasher.digest()
+
+    def hexdigest(self) -> str:
+        return self._hasher.hexdigest()
 
 
 _VARIABLE_CACHE: DefaultDict[Hashable, dict[str, ndarray]] = defaultdict(dict)
-
-
-def _reset(hasher: Hasher) -> Hasher:
-    try:
-        hasher.reset()
-        return hasher
-    except AttributeError:
-        return hash_func()
 
 
 def clear_cache() -> None:
@@ -139,8 +158,8 @@ def lsmr_annihilate(
 
         variable_digest = ""
         if use_cache:
-            hasher = hash_func()
-            hasher.update(ascontiguousarray(_y.data))
+            hasher = Hasher()
+            hasher.update(memoryview(ascontiguousarray(_y.data)))
             variable_digest = hasher.hexdigest()
 
         if use_cache and variable_digest in _VARIABLE_CACHE[regressor_hash]:
@@ -153,7 +172,7 @@ def lsmr_annihilate(
     return column_stack(resids)
 
 
-def category_product(cats: linearmodels.typing.data.AnyPandas) -> Series:
+def category_product(cats: linearmodels.typing.AnyPandas) -> Series:
     """
     Construct category from all combination of input categories
 
@@ -171,7 +190,7 @@ def category_product(cats: linearmodels.typing.data.AnyPandas) -> Series:
     """
     if isinstance(cats, Series):
         return cats
-
+    assert isinstance(cats, DataFrame)
     sizes = []
     for c in cats:
         # TODO: Bug in pandas-stubs
@@ -197,7 +216,7 @@ def category_product(cats: linearmodels.typing.data.AnyPandas) -> Series:
     dtype_val = dtype(dtype_str)
     codes = zeros(nobs, dtype=dtype_val)
     cum_size = 0
-    for i, col in enumerate(cats):
+    for i, col_name in enumerate(cats):
         if dtype_str == "int8":
             shift: int8 | int16 | int32 | int64 = int8(cum_size)
         elif dtype_str == "int16":
@@ -206,7 +225,7 @@ def category_product(cats: linearmodels.typing.data.AnyPandas) -> Series:
             shift = int32(cum_size)
         else:  # elif dtype_str == "int64":
             shift = int64(cum_size)
-        cat_codes = asarray(cats[col].cat.codes)
+        cat_codes = asarray(cats[col_name].cat.codes)
         codes += cat_codes.astype(dtype_val) << shift
         cum_size += sizes[i]
 
@@ -236,8 +255,8 @@ def category_interaction(
 
 
 def category_continuous_interaction(
-    cat: linearmodels.typing.data.AnyPandas,
-    cont: linearmodels.typing.data.AnyPandas,
+    cat: linearmodels.typing.AnyPandas,
+    cont: linearmodels.typing.AnyPandas,
     precondition: bool = True,
 ) -> sp.csc_matrix:
     """
@@ -420,21 +439,23 @@ class Interaction:
         Construct a hash that will be invariant for any permutation of
         inputs that produce the same fit when used as regressors"""
         # Sorted hashes of any categoricals
-        hasher = hash_func()
+        hasher = Hasher()
         cat_hashes = []
         cat = self.cat
         for col in cat:
-            hasher.update(ascontiguousarray(self.cat[col].cat.codes.to_numpy().data))
+            hasher.update(
+                memoryview(ascontiguousarray(self.cat[col].cat.codes.to_numpy().data))
+            )
             cat_hashes.append(hasher.hexdigest())
-            hasher = _reset(hasher)
+            hasher.reset()
         sorted_hashes = tuple(sorted(cat_hashes))
 
         hashes = []
         cont = self.cont
         for col in cont:
-            hasher.update(ascontiguousarray(cont[col].to_numpy()).data)
+            hasher.update(memoryview(ascontiguousarray(cont[col].to_numpy()).data))
             hashes.append(sorted_hashes + (hasher.hexdigest(),))
-            hasher = _reset(hasher)
+            hasher.reset()
 
         return sorted(hashes)
 
@@ -531,26 +552,30 @@ class AbsorbingRegressor:
     @property
     def hash(self) -> tuple[tuple[str, ...], ...]:
         hashes: list[tuple[str, ...]] = []
-        hasher = hash_func()
+        hasher = Hasher()
         if self._cat is not None:
             for col in self._cat:
                 hasher.update(
-                    ascontiguousarray(self._cat[col].cat.codes.to_numpy()).data
+                    memoryview(
+                        ascontiguousarray(self._cat[col].cat.codes.to_numpy()).data
+                    )
                 )
                 hashes.append((hasher.hexdigest(),))
-                hasher = _reset(hasher)
+                hasher.reset()
         if self._cont is not None:
             for col in self._cont:
-                hasher.update(ascontiguousarray(self._cont[col].to_numpy()).data)
+                hasher.update(
+                    memoryview(ascontiguousarray(self._cont[col].to_numpy()).data)
+                )
                 hashes.append((hasher.hexdigest(),))
-                hasher = _reset(hasher)
+                hasher.reset()
         if self._interactions is not None:
             for interact in self._interactions:
                 hashes.extend(interact.hash)
         # Add weight hash if provided
         if self._weights is not None:
-            hasher = hash_func()
-            hasher.update(ascontiguousarray(self._weights.data))
+            hasher = Hasher()
+            hasher.update(memoryview(ascontiguousarray(self._weights.data)))
             hashes.append((hasher.hexdigest(),))
         return tuple(sorted(hashes))
 
@@ -706,7 +731,7 @@ class AbsorbingLS:
         self._index = self._dependent.rows
         self._method = "Absorbing LS"
 
-        self._const_col = 0
+        self._const_col: int | None = 0
         self._has_constant = False
         self._has_constant_exog = self._check_constant()
         self._constant_absorbed = False
@@ -733,7 +758,7 @@ class AbsorbingLS:
     def _check_constant(self) -> bool:
         col_delta = ptp(self.exog.ndarray, 0)
         has_constant = npany(col_delta == 0)
-        self._const_col = where(col_delta == 0)[0][0] if has_constant else None
+        self._const_col = int(where(col_delta == 0)[0][0]) if has_constant else None
         return bool(has_constant)
 
     def _check_weights(self) -> None:
