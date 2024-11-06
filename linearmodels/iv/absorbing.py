@@ -2,7 +2,7 @@ from __future__ import annotations
 
 from collections import defaultdict
 from collections.abc import Hashable, Iterable
-from hashlib import sha256
+import hashlib
 from typing import Any, DefaultDict, Union, cast
 import warnings
 
@@ -70,18 +70,20 @@ except ImportError:
 
 class Hasher:
     def __init__(self):
+        self._hasher: hashlib._Hash | xxh64
         if HAVE_XXHASH:
             self._hasher = xxh64()
-            self._use_xx = True
+            self._use_xxh64 = True
         else:
-            self._hasher = sha256()
-            self._use_xx = False
+            self._hasher = hashlib.sha256()
+            self._use_xxh64 = False
 
     def reset(self):
-        if self._use_xx:
-            self._hasher = xxh64()
-        else:
+        if self._use_xxh64:
+            assert isinstance(self._hasher, xxh64)
             self._hasher.reset()
+        else:
+            self._hasher = hashlib.sha256()
 
     def update(self, data: memoryview) -> None:
         self._hasher.update(data)
