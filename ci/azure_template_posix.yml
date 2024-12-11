@@ -100,6 +100,7 @@ jobs:
      flake8 linearmodels
      black --check linearmodels
      isort --check linearmodels
+     ruff check linearmodels
     displayName: 'Check style and formatting'
 
   - script: |

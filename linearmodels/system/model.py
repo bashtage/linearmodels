@@ -14,8 +14,6 @@ Henningsen, A., & Hamann, J. (2007). systemfit: A Package for Estimating
 
 from __future__ import annotations
 
-from linearmodels.compat.formulaic import monkey_patch_materializers
-
 from collections.abc import Mapping, Sequence
 from functools import reduce
 import textwrap
@@ -60,9 +58,6 @@ from linearmodels.system.results import GMMSystemResults, SystemResults
 import linearmodels.typing.data
 
 __all__ = ["SUR", "IV3SLS", "IVSystemGMM", "LinearConstraint"]
-
-# Monkey patch parsers if needed, remove once formulaic updated
-monkey_patch_materializers()
 
 UNKNOWN_EQ_TYPE = """
 Contents of each equation must be either a dictionary with keys "dependent"

@@ -1020,7 +1020,7 @@ class AbsorbingLS:
             * "robust", "heteroskedastic" - Heteroskedasticity robust inference
             * "kernel" - Heteroskedasticity and autocorrelation robust
               inference
-            * "cluster" - One-way cluster dependent inference.
+            * "clustered" - One-way cluster dependent inference.
               Heteroskedasticity robust
 
         debiased : bool

@@ -632,7 +632,7 @@ class _IVLSModelBase(_IVModelBase):
             * "robust", "heteroskedastic" - Heteroskedasticity robust inference
             * "kernel" - Heteroskedasticity and autocorrelation robust
               inference
-            * "cluster" - One-way cluster dependent inference.
+            * "clustered" - One-way cluster dependent inference.
               Heteroskedasticity robust
 
         debiased : bool
@@ -976,7 +976,7 @@ class _IVGMMBase(_IVModelBase):
     * "robust", "heteroskedastic" - Allows for heteroskedasticity by not
       autocorrelation
     * "kernel" - Allows for heteroskedasticity and autocorrelation
-    * "cluster" - Allows for one-way cluster dependence
+    * "clustered" - Allows for one-way cluster dependence
 
     The estimator is defined as
 
@@ -1079,7 +1079,7 @@ class IVGMM(_IVGMMBase):
     * "robust", "heteroskedastic" - Allows for heteroskedasticity by not
       autocorrelation
     * "kernel" - Allows for heteroskedasticity and autocorrelation
-    * "cluster" - Allows for one-way cluster dependence
+    * "clustered" - Allows for one-way cluster dependence
 
     The estimator is defined as
 
@@ -1245,7 +1245,7 @@ class IVGMM(_IVGMMBase):
             * "robust", "heteroskedastic" - Allows for heteroskedasticity but
               not autocorrelation
             * "kernel" - Allows for heteroskedasticity and autocorrelation
-            * "cluster" - Allows for one-way cluster dependence
+            * "clustered" - Allows for one-way cluster dependence
 
         debiased : bool
             Flag indicating whether to debiased the covariance estimator using
@@ -1355,7 +1355,7 @@ class IVGMMCUE(_IVGMMBase):
     * "robust", "heteroskedastic" - Allows for heteroskedasticity by not
       autocorrelation
     * "kernel" - Allows for heteroskedasticity and autocorrelation
-    * "cluster" - Allows for one-way cluster dependence
+    * "clustered" - Allows for one-way cluster dependence
 
     In most circumstances, the ``center`` weight option should be ``True`` to
     avoid starting value dependence.

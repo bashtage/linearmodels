@@ -380,7 +380,7 @@ class IVGMMCovariance(HomoskedasticCovariance):
         * "robust", "heteroskedastic" - Allows for heteroskedasticity by not
           autocorrelation
         * "kernel" - Allows for heteroskedasticity and autocorrelation
-        * "cluster" - Allows for one-way cluster dependence
+        * "clustered" - Allows for one-way cluster dependence
 
     debiased : bool
         Flag indicating whether to debias the covariance estimator
