@@ -15,7 +15,7 @@
     
   
       
-        <title>linearmodels.panel.model - linearmodels v6.2 (+10)</title>
+        <title>linearmodels.panel.model - linearmodels v6.2 (+12)</title>
       
     
 
@@ -88,7 +88,7 @@
 
 <header class="md-header" data-md-component="header">
   <nav class="md-header__inner md-grid" aria-label="Header">
-    <a href="../../../index.html" title="linearmodels v6.2 (+10)" class="md-header__button md-logo" aria-label="linearmodels v6.2 (+10)" data-md-component="logo">
+    <a href="../../../index.html" title="linearmodels v6.2 (+12)" class="md-header__button md-logo" aria-label="linearmodels v6.2 (+12)" data-md-component="logo">
       <img src="../../../_static/bw-logo.svg" alt="logo">
     </a>
     <label class="md-header__button md-icon" for="__drawer">
@@ -98,7 +98,7 @@
       <div class="md-header__ellipsis">
         <div class="md-header__topic">
           <span class="md-ellipsis">
-            linearmodels v6.2 (+10)
+            linearmodels v6.2 (+12)
           </span>
         </div>
         <div class="md-header__topic" data-md-component="header-topic">
@@ -185,10 +185,10 @@
 
 <nav class="md-nav md-nav--primary" aria-label="Navigation" data-md-level="0">
   <label class="md-nav__title" for="__drawer">
-    <a href="../../../index.html" title="linearmodels v6.2 (+10)" class="md-nav__button md-logo" aria-label="linearmodels v6.2 (+10)" data-md-component="logo">
+    <a href="../../../index.html" title="linearmodels v6.2 (+12)" class="md-nav__button md-logo" aria-label="linearmodels v6.2 (+12)" data-md-component="logo">
       <img src="../../../_static/bw-logo.svg" alt="logo">
     </a>
-    linearmodels v6.2 (+10)
+    linearmodels v6.2 (+12)
   </label>
   
     <div class="md-nav__source">
@@ -415,8 +415,6 @@
 <h1>Source code for linearmodels.panel.model</h1><div class="highlight"><pre>
 <span></span><code><span class="kn">from</span> <span class="nn">__future__</span> <span class="kn">import</span> <span class="n">annotations</span>
 
-<span class="kn">from</span> <span class="nn">linearmodels.compat.formulaic</span> <span class="kn">import</span> <span class="n">monkey_patch_materializers</span>
-
 <span class="kn">from</span> <span class="nn">collections.abc</span> <span class="kn">import</span> <span class="n">Mapping</span>
 <span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">Any</span><span class="p">,</span> <span class="n">NamedTuple</span><span class="p">,</span> <span class="n">Union</span><span class="p">,</span> <span class="n">cast</span>
 
@@ -472,9 +470,6 @@
 <span class="kn">from</span> <span class="nn">linearmodels.shared.typed_getters</span> <span class="kn">import</span> <span class="n">get_panel_data_like</span>
 <span class="kn">from</span> <span class="nn">linearmodels.shared.utility</span> <span class="kn">import</span> <span class="n">AttrDict</span><span class="p">,</span> <span class="n">ensure_unique_column</span><span class="p">,</span> <span class="n">panel_to_frame</span>
 <span class="kn">import</span> <span class="nn">linearmodels.typing.data</span>
-
-<span class="c1"># Monkey patch parsers if needed, remove once formulaic updated</span>
-<span class="n">monkey_patch_materializers</span><span class="p">()</span>
 
 <span class="n">CovarianceEstimator</span> <span class="o">=</span> <span class="n">Union</span><span class="p">[</span>
     <span class="n">ACCovariance</span><span class="p">,</span>
