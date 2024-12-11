@@ -13,11 +13,6 @@ from pandas import DataFrame
 
 import linearmodels.typing.data
 
-from ..compat.formulaic import monkey_patch_materializers
-
-# Monkey patch parsers if needed, remove once formulaic updated
-monkey_patch_materializers()
-
 PARSING_ERROR = """
 Conversion of formula blocks to DataFrames failed.
 The formula blocks used for conversion were:

@@ -1,7 +1,5 @@
 from __future__ import annotations
 
-from linearmodels.compat.formulaic import monkey_patch_materializers
-
 from collections.abc import Mapping
 from typing import Any, NamedTuple, Union, cast
 
@@ -57,9 +55,6 @@ from linearmodels.shared.linalg import has_constant
 from linearmodels.shared.typed_getters import get_panel_data_like
 from linearmodels.shared.utility import AttrDict, ensure_unique_column, panel_to_frame
 import linearmodels.typing.data
-
-# Monkey patch parsers if needed, remove once formulaic updated
-monkey_patch_materializers()
 
 CovarianceEstimator = Union[
     ACCovariance,

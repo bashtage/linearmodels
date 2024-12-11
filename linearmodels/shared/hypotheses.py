@@ -1,7 +1,5 @@
 from __future__ import annotations
 
-from linearmodels.compat.formulaic import monkey_patch_materializers
-
 from collections.abc import Mapping
 
 from formulaic.utils.constraints import LinearConstraints
@@ -10,9 +8,6 @@ from pandas import Series
 from scipy.stats import chi2, f
 
 import linearmodels.typing.data
-
-# Monkey patch parsers if needed, remove once formulaic updated
-monkey_patch_materializers()
 
 
 class WaldTestStatistic:
