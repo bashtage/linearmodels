@@ -262,7 +262,8 @@ class LinearConstraint:
                 raise TypeError("q must be a Series or an array")
             if r.shape[0] != q.shape[0]:
                 raise ValueError("Constraint inputs are not shape compatible")
-            q_pd = pd.Series(q, index=r_pd.index)
+            q_pd = pd.Series(q)
+            q_pd.index = r_pd.index
         else:
             q_pd = pd.Series(np.zeros(r_pd.shape[0]), index=r_pd.index)
         self._q_pd = q_pd

@@ -909,3 +909,37 @@ def test_unknown_method():
     mod = SUR(generate_data(k=3))
     with pytest.raises(ValueError, match="method must be 'ols' or 'gls'"):
         mod.fit(method="other")
+
+
+def test_sur_contraint_with_value():
+    n = 100
+    rg = np.random.RandomState(np.random.MT19937(12345))
+    x1 = rg.normal(size=n)
+    x2 = rg.normal(size=n)
+    x3 = rg.normal(size=n)
+
+    y1 = 3 + 1.5 * x1 - 2.0 * x2 + np.random.normal(size=n)
+    y2 = -1 + 0.5 * x2 + 1.2 * x3 + np.random.normal(size=n)
+
+    data = DataFrame({"x1": x1, "x2": x2, "x3": x3, "y1": y1, "y2": y2})
+
+    equations = {"eq1": "y1 ~ x1 + x2", "eq2": "y2 ~ x2 + x3"}
+
+    model = SUR.from_formula(equations, data)
+
+    # coefficients of eq1_x1 and eq2_x2 are equal
+    r = DataFrame(
+        [[0] * 4], columns=model.param_names, index=["rest"], dtype=np.float64
+    )
+    r.iloc[0, 0] = -1
+    r.iloc[0, 2] = 1
+
+    q = Series([0])
+    model.add_constraints(r, q)
+    result = model.fit()
+
+    # No error without q
+    model = SUR.from_formula(equations, data)
+    model.add_constraints(r)
+    result_without_q = model.fit()
+    assert_allclose(result.params, result_without_q.params)
