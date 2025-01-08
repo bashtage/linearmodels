@@ -15,7 +15,7 @@
     
   
       
-        <title>Introduction - linearmodels v6.2 (+12)</title>
+        <title>Introduction - linearmodels v6.2 (+15)</title>
       
     
 
@@ -88,7 +88,7 @@
 
 <header class="md-header" data-md-component="header">
   <nav class="md-header__inner md-grid" aria-label="Header">
-    <a href="../index.html" title="linearmodels v6.2 (+12)" class="md-header__button md-logo" aria-label="linearmodels v6.2 (+12)" data-md-component="logo">
+    <a href="../index.html" title="linearmodels v6.2 (+15)" class="md-header__button md-logo" aria-label="linearmodels v6.2 (+15)" data-md-component="logo">
       <img src="../_static/bw-logo.svg" alt="logo">
     </a>
     <label class="md-header__button md-icon" for="__drawer">
@@ -98,7 +98,7 @@
       <div class="md-header__ellipsis">
         <div class="md-header__topic">
           <span class="md-ellipsis">
-            linearmodels v6.2 (+12)
+            linearmodels v6.2 (+15)
           </span>
         </div>
         <div class="md-header__topic" data-md-component="header-topic">
@@ -185,10 +185,10 @@
 
 <nav class="md-nav md-nav--primary" aria-label="Navigation" data-md-level="0">
   <label class="md-nav__title" for="__drawer">
-    <a href="../index.html" title="linearmodels v6.2 (+12)" class="md-nav__button md-logo" aria-label="linearmodels v6.2 (+12)" data-md-component="logo">
+    <a href="../index.html" title="linearmodels v6.2 (+15)" class="md-nav__button md-logo" aria-label="linearmodels v6.2 (+15)" data-md-component="logo">
       <img src="../_static/bw-logo.svg" alt="logo">
     </a>
-    linearmodels v6.2 (+12)
+    linearmodels v6.2 (+15)
   </label>
   
     <div class="md-nav__source">
@@ -613,9 +613,9 @@ effects).</p>
 This example estimates a fixed effect regression on a panel of the wages of working
 men modeling the log wage as a function of squared experience, a dummy if the
 man is married and a dummy indicating if the man is a union member.</p>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><code><span class="kn">from</span> <span class="nn">linearmodels.panel</span> <span class="kn">import</span> <span class="n">PanelOLS</span>
-<span class="kn">from</span> <span class="nn">linearmodels.datasets</span> <span class="kn">import</span> <span class="n">wage_panel</span>
-<span class="kn">import</span> <span class="nn">statsmodels.api</span> <span class="k">as</span> <span class="nn">sm</span>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><code><span class="kn">from</span><span class="w"> </span><span class="nn">linearmodels.panel</span><span class="w"> </span><span class="kn">import</span> <span class="n">PanelOLS</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">linearmodels.datasets</span><span class="w"> </span><span class="kn">import</span> <span class="n">wage_panel</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">statsmodels.api</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">sm</span>
 <span class="n">data</span> <span class="o">=</span> <span class="n">wage_panel</span><span class="o">.</span><span class="n">load</span><span class="p">()</span>
 <span class="n">data</span> <span class="o">=</span> <span class="n">data</span><span class="o">.</span><span class="n">set_index</span><span class="p">([</span><span class="s1">&#39;nr&#39;</span><span class="p">,</span><span class="s1">&#39;year&#39;</span><span class="p">])</span>
 <span class="n">dependent</span> <span class="o">=</span> <span class="n">data</span><span class="o">.</span><span class="n">lwage</span>

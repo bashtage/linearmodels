@@ -15,7 +15,7 @@
     
   
       
-        <title>linearmodels.system.gmm - linearmodels v6.2 (+12)</title>
+        <title>linearmodels.system.gmm - linearmodels v6.2 (+15)</title>
       
     
 
@@ -88,7 +88,7 @@
 
 <header class="md-header" data-md-component="header">
   <nav class="md-header__inner md-grid" aria-label="Header">
-    <a href="../../../index.html" title="linearmodels v6.2 (+12)" class="md-header__button md-logo" aria-label="linearmodels v6.2 (+12)" data-md-component="logo">
+    <a href="../../../index.html" title="linearmodels v6.2 (+15)" class="md-header__button md-logo" aria-label="linearmodels v6.2 (+15)" data-md-component="logo">
       <img src="../../../_static/bw-logo.svg" alt="logo">
     </a>
     <label class="md-header__button md-icon" for="__drawer">
@@ -98,7 +98,7 @@
       <div class="md-header__ellipsis">
         <div class="md-header__topic">
           <span class="md-ellipsis">
-            linearmodels v6.2 (+12)
+            linearmodels v6.2 (+15)
           </span>
         </div>
         <div class="md-header__topic" data-md-component="header-topic">
@@ -185,10 +185,10 @@
 
 <nav class="md-nav md-nav--primary" aria-label="Navigation" data-md-level="0">
   <label class="md-nav__title" for="__drawer">
-    <a href="../../../index.html" title="linearmodels v6.2 (+12)" class="md-nav__button md-logo" aria-label="linearmodels v6.2 (+12)" data-md-component="logo">
+    <a href="../../../index.html" title="linearmodels v6.2 (+15)" class="md-nav__button md-logo" aria-label="linearmodels v6.2 (+15)" data-md-component="logo">
       <img src="../../../_static/bw-logo.svg" alt="logo">
     </a>
-    linearmodels v6.2 (+12)
+    linearmodels v6.2 (+15)
   </label>
   
     <div class="md-nav__source">
@@ -417,24 +417,24 @@
 <span class="sd">Covariance and weight estimation for GMM IV estimators</span>
 <span class="sd">&quot;&quot;&quot;</span>
 
-<span class="kn">from</span> <span class="nn">__future__</span> <span class="kn">import</span> <span class="n">annotations</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">__future__</span><span class="w"> </span><span class="kn">import</span> <span class="n">annotations</span>
 
-<span class="kn">from</span> <span class="nn">collections.abc</span> <span class="kn">import</span> <span class="n">Sequence</span>
-<span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">cast</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">collections.abc</span><span class="w"> </span><span class="kn">import</span> <span class="n">Sequence</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">typing</span><span class="w"> </span><span class="kn">import</span> <span class="n">cast</span>
 
-<span class="kn">import</span> <span class="nn">numpy</span>
-<span class="kn">from</span> <span class="nn">numpy</span> <span class="kn">import</span> <span class="n">array</span><span class="p">,</span> <span class="n">empty</span><span class="p">,</span> <span class="n">ndarray</span><span class="p">,</span> <span class="n">repeat</span><span class="p">,</span> <span class="n">sqrt</span><span class="p">,</span> <span class="n">zeros_like</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">numpy</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">numpy</span><span class="w"> </span><span class="kn">import</span> <span class="n">array</span><span class="p">,</span> <span class="n">empty</span><span class="p">,</span> <span class="n">ndarray</span><span class="p">,</span> <span class="n">repeat</span><span class="p">,</span> <span class="n">sqrt</span><span class="p">,</span> <span class="n">zeros_like</span>
 
-<span class="kn">from</span> <span class="nn">linearmodels.asset_pricing.covariance</span> <span class="kn">import</span> <span class="n">_HACMixin</span>
-<span class="kn">from</span> <span class="nn">linearmodels.iv.covariance</span> <span class="kn">import</span> <span class="n">kernel_optimal_bandwidth</span>
-<span class="kn">from</span> <span class="nn">linearmodels.shared.utility</span> <span class="kn">import</span> <span class="n">AttrDict</span>
-<span class="kn">from</span> <span class="nn">linearmodels.system._utility</span> <span class="kn">import</span> <span class="n">blocked_inner_prod</span>
-<span class="kn">import</span> <span class="nn">linearmodels.typing.data</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">linearmodels.asset_pricing.covariance</span><span class="w"> </span><span class="kn">import</span> <span class="n">_HACMixin</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">linearmodels.iv.covariance</span><span class="w"> </span><span class="kn">import</span> <span class="n">kernel_optimal_bandwidth</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">linearmodels.shared.utility</span><span class="w"> </span><span class="kn">import</span> <span class="n">AttrDict</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">linearmodels.system._utility</span><span class="w"> </span><span class="kn">import</span> <span class="n">blocked_inner_prod</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">linearmodels.typing.data</span>
 
 
 <div class="viewcode-block" id="HomoskedasticWeightMatrix">
 <a class="viewcode-back" href="../../../system/system/linearmodels.system.gmm.HomoskedasticWeightMatrix.html#linearmodels.system.gmm.HomoskedasticWeightMatrix">[docs]</a>
-<span class="k">class</span> <span class="nc">HomoskedasticWeightMatrix</span><span class="p">:</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">HomoskedasticWeightMatrix</span><span class="p">:</span>
 <span class="w">    </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Homoskedastic (unadjusted) weight estimation</span>
 
@@ -461,14 +461,14 @@
 <span class="sd">    ``center`` has no effect on this estimator since it is always centered.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
 
-    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">center</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span> <span class="n">debiased</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">center</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span> <span class="n">debiased</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_center</span> <span class="o">=</span> <span class="n">center</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_debiased</span> <span class="o">=</span> <span class="n">debiased</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_bandwidth</span><span class="p">:</span> <span class="nb">float</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="mi">0</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_name</span> <span class="o">=</span> <span class="s2">&quot;Homoskedastic (Unadjusted) Weighting&quot;</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_config</span> <span class="o">=</span> <span class="n">AttrDict</span><span class="p">(</span><span class="n">center</span><span class="o">=</span><span class="n">center</span><span class="p">,</span> <span class="n">debiased</span><span class="o">=</span><span class="n">debiased</span><span class="p">)</span>
 
-    <span class="k">def</span> <span class="fm">__str__</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+    <span class="k">def</span><span class="w"> </span><span class="fm">__str__</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
         <span class="n">out</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_name</span>
         <span class="n">extra</span> <span class="o">=</span> <span class="p">[]</span>
         <span class="k">for</span> <span class="n">key</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_str_extra</span><span class="p">:</span>
@@ -477,16 +477,16 @@
             <span class="n">out</span> <span class="o">+=</span> <span class="s2">&quot; (&quot;</span> <span class="o">+</span> <span class="s2">&quot;, &quot;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">extra</span><span class="p">)</span> <span class="o">+</span> <span class="s2">&quot;)&quot;</span>
         <span class="k">return</span> <span class="n">out</span>
 
-    <span class="k">def</span> <span class="fm">__repr__</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+    <span class="k">def</span><span class="w"> </span><span class="fm">__repr__</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="fm">__str__</span><span class="p">()</span> <span class="o">+</span> <span class="sa">f</span><span class="s2">&quot;, id: </span><span class="si">{</span><span class="nb">hex</span><span class="p">(</span><span class="nb">id</span><span class="p">(</span><span class="bp">self</span><span class="p">))</span><span class="si">}</span><span class="s2">&quot;</span>
 
     <span class="nd">@property</span>
-    <span class="k">def</span> <span class="nf">_str_extra</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">AttrDict</span><span class="p">:</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">_str_extra</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">AttrDict</span><span class="p">:</span>
         <span class="k">return</span> <span class="n">AttrDict</span><span class="p">(</span><span class="n">Debiased</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">_debiased</span><span class="p">,</span> <span class="n">Center</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">_center</span><span class="p">)</span>
 
 <div class="viewcode-block" id="HomoskedasticWeightMatrix.sigma">
 <a class="viewcode-back" href="../../../system/system/linearmodels.system.gmm.HomoskedasticWeightMatrix.sigma.html#linearmodels.system.gmm.HomoskedasticWeightMatrix.sigma">[docs]</a>
-    <span class="k">def</span> <span class="nf">sigma</span><span class="p">(</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">sigma</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span>
         <span class="n">eps</span><span class="p">:</span> <span class="n">linearmodels</span><span class="o">.</span><span class="n">typing</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">Float64Array</span><span class="p">,</span>
         <span class="n">x</span><span class="p">:</span> <span class="n">Sequence</span><span class="p">[</span><span class="n">linearmodels</span><span class="o">.</span><span class="n">typing</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">Float64Array</span><span class="p">],</span>
@@ -521,7 +521,7 @@
 
 <div class="viewcode-block" id="HomoskedasticWeightMatrix.weight_matrix">
 <a class="viewcode-back" href="../../../system/system/linearmodels.system.gmm.HomoskedasticWeightMatrix.weight_matrix.html#linearmodels.system.gmm.HomoskedasticWeightMatrix.weight_matrix">[docs]</a>
-    <span class="k">def</span> <span class="nf">weight_matrix</span><span class="p">(</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">weight_matrix</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span>
         <span class="n">x</span><span class="p">:</span> <span class="n">Sequence</span><span class="p">[</span><span class="n">linearmodels</span><span class="o">.</span><span class="n">typing</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">Float64Array</span><span class="p">],</span>
         <span class="n">z</span><span class="p">:</span> <span class="n">Sequence</span><span class="p">[</span><span class="n">linearmodels</span><span class="o">.</span><span class="n">typing</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">Float64Array</span><span class="p">],</span>
@@ -554,7 +554,7 @@
 
 
     <span class="nd">@property</span>
-    <span class="k">def</span> <span class="nf">config</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">AttrDict</span><span class="p">:</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">config</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">AttrDict</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Weight estimator configuration</span>
 
@@ -569,7 +569,7 @@
 
 <div class="viewcode-block" id="HeteroskedasticWeightMatrix">
 <a class="viewcode-back" href="../../../system/system/linearmodels.system.gmm.HeteroskedasticWeightMatrix.html#linearmodels.system.gmm.HeteroskedasticWeightMatrix">[docs]</a>
-<span class="k">class</span> <span class="nc">HeteroskedasticWeightMatrix</span><span class="p">(</span><span class="n">HomoskedasticWeightMatrix</span><span class="p">):</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">HeteroskedasticWeightMatrix</span><span class="p">(</span><span class="n">HomoskedasticWeightMatrix</span><span class="p">):</span>
 <span class="w">    </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Heteroskedasticity robust weight estimation</span>
 
@@ -597,13 +597,13 @@
 <span class="sd">    dependence between the moment conditions.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
 
-    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">center</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span> <span class="n">debiased</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">center</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span> <span class="n">debiased</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
         <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">center</span><span class="p">,</span> <span class="n">debiased</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_name</span> <span class="o">=</span> <span class="s2">&quot;Heteroskedastic (Robust) Weighting&quot;</span>
 
 <div class="viewcode-block" id="HeteroskedasticWeightMatrix.weight_matrix">
 <a class="viewcode-back" href="../../../system/system/linearmodels.system.gmm.HeteroskedasticWeightMatrix.weight_matrix.html#linearmodels.system.gmm.HeteroskedasticWeightMatrix.weight_matrix">[docs]</a>
-    <span class="k">def</span> <span class="nf">weight_matrix</span><span class="p">(</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">weight_matrix</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span>
         <span class="n">x</span><span class="p">:</span> <span class="n">Sequence</span><span class="p">[</span><span class="n">linearmodels</span><span class="o">.</span><span class="n">typing</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">Float64Array</span><span class="p">],</span>
         <span class="n">z</span><span class="p">:</span> <span class="n">Sequence</span><span class="p">[</span><span class="n">linearmodels</span><span class="o">.</span><span class="n">typing</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">Float64Array</span><span class="p">],</span>
@@ -649,7 +649,7 @@
         <span class="k">return</span> <span class="n">w</span></div>
 
 
-    <span class="k">def</span> <span class="nf">_debias_scale</span><span class="p">(</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">_debias_scale</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span>
         <span class="n">nobs</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>
         <span class="n">x</span><span class="p">:</span> <span class="n">Sequence</span><span class="p">[</span><span class="n">linearmodels</span><span class="o">.</span><span class="n">typing</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">Float64Array</span><span class="p">],</span>
@@ -668,7 +668,7 @@
 
 <div class="viewcode-block" id="KernelWeightMatrix">
 <a class="viewcode-back" href="../../../system/system/linearmodels.system.gmm.KernelWeightMatrix.html#linearmodels.system.gmm.KernelWeightMatrix">[docs]</a>
-<span class="k">class</span> <span class="nc">KernelWeightMatrix</span><span class="p">(</span><span class="n">HeteroskedasticWeightMatrix</span><span class="p">,</span> <span class="n">_HACMixin</span><span class="p">):</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">KernelWeightMatrix</span><span class="p">(</span><span class="n">HeteroskedasticWeightMatrix</span><span class="p">,</span> <span class="n">_HACMixin</span><span class="p">):</span>
 <span class="w">    </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Heteroskedasticity robust weight estimation</span>
 
@@ -712,7 +712,7 @@
 <span class="sd">    between the moment conditions.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
 
-    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span>
+    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span>
         <span class="n">center</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
         <span class="n">debiased</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
@@ -730,7 +730,7 @@
 
 <div class="viewcode-block" id="KernelWeightMatrix.weight_matrix">
 <a class="viewcode-back" href="../../../system/system/linearmodels.system.gmm.KernelWeightMatrix.weight_matrix.html#linearmodels.system.gmm.KernelWeightMatrix.weight_matrix">[docs]</a>
-    <span class="k">def</span> <span class="nf">weight_matrix</span><span class="p">(</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">weight_matrix</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span>
         <span class="n">x</span><span class="p">:</span> <span class="n">Sequence</span><span class="p">[</span><span class="n">linearmodels</span><span class="o">.</span><span class="n">typing</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">Float64Array</span><span class="p">],</span>
         <span class="n">z</span><span class="p">:</span> <span class="n">Sequence</span><span class="p">[</span><span class="n">linearmodels</span><span class="o">.</span><span class="n">typing</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">Float64Array</span><span class="p">],</span>
@@ -777,7 +777,7 @@
         <span class="k">return</span> <span class="n">w</span></div>
 
 
-    <span class="k">def</span> <span class="nf">_optimal_bandwidth</span><span class="p">(</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">_optimal_bandwidth</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span> <span class="n">moments</span><span class="p">:</span> <span class="n">linearmodels</span><span class="o">.</span><span class="n">typing</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">Float64Array</span>
     <span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">float</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Compute optimal bandwidth used in estimation if needed&quot;&quot;&quot;</span>
@@ -793,13 +793,13 @@
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_bandwidth</span>
 
     <span class="nd">@property</span>
-    <span class="k">def</span> <span class="nf">bandwidth</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">float</span><span class="p">:</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">bandwidth</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">float</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Bandwidth used to estimate covariance of moment conditions&quot;&quot;&quot;</span>
         <span class="k">assert</span> <span class="bp">self</span><span class="o">.</span><span class="n">_bandwidth</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_bandwidth</span>
 
     <span class="nd">@property</span>
-    <span class="k">def</span> <span class="nf">config</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">AttrDict</span><span class="p">:</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">config</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">AttrDict</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Weight estimator configuration</span>
 

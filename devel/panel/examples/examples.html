@@ -15,7 +15,7 @@
     
   
       
-        <title>Examples - linearmodels v6.2 (+12)</title>
+        <title>Examples - linearmodels v6.2 (+15)</title>
       
     
 
@@ -94,7 +94,7 @@
 
 <header class="md-header" data-md-component="header">
   <nav class="md-header__inner md-grid" aria-label="Header">
-    <a href="../../index.html" title="linearmodels v6.2 (+12)" class="md-header__button md-logo" aria-label="linearmodels v6.2 (+12)" data-md-component="logo">
+    <a href="../../index.html" title="linearmodels v6.2 (+15)" class="md-header__button md-logo" aria-label="linearmodels v6.2 (+15)" data-md-component="logo">
       <img src="../../_static/bw-logo.svg" alt="logo">
     </a>
     <label class="md-header__button md-icon" for="__drawer">
@@ -104,7 +104,7 @@
       <div class="md-header__ellipsis">
         <div class="md-header__topic">
           <span class="md-ellipsis">
-            linearmodels v6.2 (+12)
+            linearmodels v6.2 (+15)
           </span>
         </div>
         <div class="md-header__topic" data-md-component="header-topic">
@@ -191,10 +191,10 @@
 
 <nav class="md-nav md-nav--primary" aria-label="Navigation" data-md-level="0">
   <label class="md-nav__title" for="__drawer">
-    <a href="../../index.html" title="linearmodels v6.2 (+12)" class="md-nav__button md-logo" aria-label="linearmodels v6.2 (+12)" data-md-component="logo">
+    <a href="../../index.html" title="linearmodels v6.2 (+15)" class="md-nav__button md-logo" aria-label="linearmodels v6.2 (+15)" data-md-component="logo">
       <img src="../../_static/bw-logo.svg" alt="logo">
     </a>
-    linearmodels v6.2 (+12)
+    linearmodels v6.2 (+15)
   </label>
   
     <div class="md-nav__source">
@@ -955,9 +955,9 @@
 <div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span><code>[1]:
 </code></pre></div>
 </div>
-<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><code><span class="kn">import</span> <span class="nn">pandas</span> <span class="k">as</span> <span class="nn">pd</span>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><code><span class="kn">import</span><span class="w"> </span><span class="nn">pandas</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">pd</span>
 
-<span class="kn">from</span> <span class="nn">linearmodels.datasets</span> <span class="kn">import</span> <span class="n">wage_panel</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">linearmodels.datasets</span><span class="w"> </span><span class="kn">import</span> <span class="n">wage_panel</span>
 
 <span class="n">data</span> <span class="o">=</span> <span class="n">wage_panel</span><span class="o">.</span><span class="n">load</span><span class="p">()</span>
 <span class="n">year</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">Categorical</span><span class="p">(</span><span class="n">data</span><span class="o">.</span><span class="n">year</span><span class="p">)</span>
@@ -1014,9 +1014,9 @@ nr year
 <div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span><code>[2]:
 </code></pre></div>
 </div>
-<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><code><span class="kn">import</span> <span class="nn">statsmodels.api</span> <span class="k">as</span> <span class="nn">sm</span>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><code><span class="kn">import</span><span class="w"> </span><span class="nn">statsmodels.api</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">sm</span>
 
-<span class="kn">from</span> <span class="nn">linearmodels.panel</span> <span class="kn">import</span> <span class="n">PooledOLS</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">linearmodels.panel</span><span class="w"> </span><span class="kn">import</span> <span class="n">PooledOLS</span>
 
 <span class="n">exog_vars</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;black&quot;</span><span class="p">,</span> <span class="s2">&quot;hisp&quot;</span><span class="p">,</span> <span class="s2">&quot;exper&quot;</span><span class="p">,</span> <span class="s2">&quot;expersq&quot;</span><span class="p">,</span> <span class="s2">&quot;married&quot;</span><span class="p">,</span> <span class="s2">&quot;educ&quot;</span><span class="p">,</span> <span class="s2">&quot;union&quot;</span><span class="p">,</span> <span class="s2">&quot;year&quot;</span><span class="p">]</span>
 <span class="n">exog</span> <span class="o">=</span> <span class="n">sm</span><span class="o">.</span><span class="n">add_constant</span><span class="p">(</span><span class="n">data</span><span class="p">[</span><span class="n">exog_vars</span><span class="p">])</span>
@@ -1036,8 +1036,8 @@ nr year
 Dep. Variable:                  lwage   R-squared:                        0.1893
 Estimator:                  PooledOLS   R-squared (Between):              0.2066
 No. Observations:                4360   R-squared (Within):               0.1692
-Date:                Wed, Dec 11 2024   R-squared (Overall):              0.1893
-Time:                        10:16:01   Log-likelihood                   -2982.0
+Date:                Wed, Jan 08 2025   R-squared (Overall):              0.1893
+Time:                        14:43:13   Log-likelihood                   -2982.0
 Cov. Estimator:            Unadjusted
                                         F-statistic:                      72.459
 Entities:                         545   P-value                           0.0000
@@ -1083,7 +1083,7 @@ year.1987      0.1738     0.0494     3.5165     0.0004      0.0769      0.2707
 <div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span><code>[3]:
 </code></pre></div>
 </div>
-<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><code><span class="kn">from</span> <span class="nn">linearmodels.panel</span> <span class="kn">import</span> <span class="n">RandomEffects</span>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><code><span class="kn">from</span><span class="w"> </span><span class="nn">linearmodels.panel</span><span class="w"> </span><span class="kn">import</span> <span class="n">RandomEffects</span>
 
 <span class="n">mod</span> <span class="o">=</span> <span class="n">RandomEffects</span><span class="p">(</span><span class="n">data</span><span class="o">.</span><span class="n">lwage</span><span class="p">,</span> <span class="n">exog</span><span class="p">)</span>
 <span class="n">re_res</span> <span class="o">=</span> <span class="n">mod</span><span class="o">.</span><span class="n">fit</span><span class="p">()</span>
@@ -1101,8 +1101,8 @@ year.1987      0.1738     0.0494     3.5165     0.0004      0.0769      0.2707
 Dep. Variable:                  lwage   R-squared:                        0.1806
 Estimator:              RandomEffects   R-squared (Between):              0.1853
 No. Observations:                4360   R-squared (Within):               0.1799
-Date:                Wed, Dec 11 2024   R-squared (Overall):              0.1828
-Time:                        10:16:01   Log-likelihood                   -1622.5
+Date:                Wed, Jan 08 2025   R-squared (Overall):              0.1828
+Time:                        14:43:14   Log-likelihood                   -1622.5
 Cov. Estimator:            Unadjusted
                                         F-statistic:                      68.409
 Entities:                         545   P-value                           0.0000
@@ -1229,7 +1229,7 @@ Name: Variance Decomposition, dtype: float64
 <div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span><code>[6]:
 </code></pre></div>
 </div>
-<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><code><span class="kn">from</span> <span class="nn">linearmodels.panel</span> <span class="kn">import</span> <span class="n">BetweenOLS</span>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><code><span class="kn">from</span><span class="w"> </span><span class="nn">linearmodels.panel</span><span class="w"> </span><span class="kn">import</span> <span class="n">BetweenOLS</span>
 
 <span class="n">exog_vars</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;black&quot;</span><span class="p">,</span> <span class="s2">&quot;hisp&quot;</span><span class="p">,</span> <span class="s2">&quot;exper&quot;</span><span class="p">,</span> <span class="s2">&quot;married&quot;</span><span class="p">,</span> <span class="s2">&quot;educ&quot;</span><span class="p">,</span> <span class="s2">&quot;union&quot;</span><span class="p">]</span>
 <span class="n">exog</span> <span class="o">=</span> <span class="n">sm</span><span class="o">.</span><span class="n">add_constant</span><span class="p">(</span><span class="n">data</span><span class="p">[</span><span class="n">exog_vars</span><span class="p">])</span>
@@ -1249,8 +1249,8 @@ Name: Variance Decomposition, dtype: float64
 Dep. Variable:                  lwage   R-squared:                        0.2155
 Estimator:                 BetweenOLS   R-squared (Between):              0.2155
 No. Observations:                 545   R-squared (Within):               0.1141
-Date:                Wed, Dec 11 2024   R-squared (Overall):              0.1686
-Time:                        10:16:01   Log-likelihood                   -194.54
+Date:                Wed, Jan 08 2025   R-squared (Overall):              0.1686
+Time:                        14:43:14   Log-likelihood                   -194.54
 Cov. Estimator:            Unadjusted
                                         F-statistic:                      24.633
 Entities:                         545   P-value                           0.0000
@@ -1289,7 +1289,7 @@ union          0.2587     0.0460     5.6214     0.0000      0.1683      0.3491
 <div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span><code>[7]:
 </code></pre></div>
 </div>
-<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><code><span class="kn">from</span> <span class="nn">linearmodels.panel</span> <span class="kn">import</span> <span class="n">PanelOLS</span>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><code><span class="kn">from</span><span class="w"> </span><span class="nn">linearmodels.panel</span><span class="w"> </span><span class="kn">import</span> <span class="n">PanelOLS</span>
 
 <span class="n">exog_vars</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;expersq&quot;</span><span class="p">,</span> <span class="s2">&quot;union&quot;</span><span class="p">,</span> <span class="s2">&quot;married&quot;</span><span class="p">,</span> <span class="s2">&quot;year&quot;</span><span class="p">]</span>
 <span class="n">exog</span> <span class="o">=</span> <span class="n">sm</span><span class="o">.</span><span class="n">add_constant</span><span class="p">(</span><span class="n">data</span><span class="p">[</span><span class="n">exog_vars</span><span class="p">])</span>
@@ -1309,8 +1309,8 @@ union          0.2587     0.0460     5.6214     0.0000      0.1683      0.3491
 Dep. Variable:                  lwage   R-squared:                        0.1806
 Estimator:                   PanelOLS   R-squared (Between):             -0.0052
 No. Observations:                4360   R-squared (Within):               0.1806
-Date:                Wed, Dec 11 2024   R-squared (Overall):              0.0807
-Time:                        10:16:01   Log-likelihood                   -1324.8
+Date:                Wed, Jan 08 2025   R-squared (Overall):              0.0807
+Time:                        14:43:14   Log-likelihood                   -1324.8
 Cov. Estimator:            Unadjusted
                                         F-statistic:                      83.851
 Entities:                         545   P-value                           0.0000
@@ -1373,8 +1373,8 @@ Included effects: Entity
 Dep. Variable:                  lwage   R-squared:                        0.0216
 Estimator:                   PanelOLS   R-squared (Between):             -0.0052
 No. Observations:                4360   R-squared (Within):              -0.4809
-Date:                Wed, Dec 11 2024   R-squared (Overall):             -0.2253
-Time:                        10:16:02   Log-likelihood                   -1324.8
+Date:                Wed, Jan 08 2025   R-squared (Overall):             -0.2253
+Time:                        14:43:14   Log-likelihood                   -1324.8
 Cov. Estimator:            Unadjusted
                                         F-statistic:                      27.959
 Entities:                         545   P-value                           0.0000
@@ -1419,7 +1419,7 @@ estimator, effects count as lost degrees of freedom. When using entity effects a
 <div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span><code>[9]:
 </code></pre></div>
 </div>
-<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><code><span class="kn">from</span> <span class="nn">linearmodels.panel.data</span> <span class="kn">import</span> <span class="n">PanelData</span>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><code><span class="kn">from</span><span class="w"> </span><span class="nn">linearmodels.panel.data</span><span class="w"> </span><span class="kn">import</span> <span class="n">PanelData</span>
 
 <span class="n">exog_vars</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;expersq&quot;</span><span class="p">,</span> <span class="s2">&quot;union&quot;</span><span class="p">,</span> <span class="s2">&quot;married&quot;</span><span class="p">]</span>
 <span class="n">exog</span> <span class="o">=</span> <span class="n">sm</span><span class="o">.</span><span class="n">add_constant</span><span class="p">(</span><span class="n">data</span><span class="p">[</span><span class="n">exog_vars</span><span class="p">])</span>
@@ -1444,8 +1444,8 @@ estimator, effects count as lost degrees of freedom. When using entity effects a
 Dep. Variable:                  lwage   R-squared:                        0.0216
 Estimator:                   PanelOLS   R-squared (Between):             -0.0052
 No. Observations:                4360   R-squared (Within):              -0.4809
-Date:                Wed, Dec 11 2024   R-squared (Overall):             -0.2253
-Time:                        10:16:02   Log-likelihood                   -1324.8
+Date:                Wed, Jan 08 2025   R-squared (Overall):             -0.2253
+Time:                        14:43:14   Log-likelihood                   -1324.8
 Cov. Estimator:            Unadjusted
                                         F-statistic:                      27.959
 Entities:                         545   P-value                           0.0000
@@ -1484,7 +1484,7 @@ Avg Obs: 545.00, Min Obs: 545.00, Max Obs: 545.00, Groups: 8
 <div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span><code>[10]:
 </code></pre></div>
 </div>
-<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><code><span class="kn">from</span> <span class="nn">linearmodels.panel</span> <span class="kn">import</span> <span class="n">FirstDifferenceOLS</span>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><code><span class="kn">from</span><span class="w"> </span><span class="nn">linearmodels.panel</span><span class="w"> </span><span class="kn">import</span> <span class="n">FirstDifferenceOLS</span>
 
 <span class="n">exog_vars</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;exper&quot;</span><span class="p">,</span> <span class="s2">&quot;expersq&quot;</span><span class="p">,</span> <span class="s2">&quot;union&quot;</span><span class="p">,</span> <span class="s2">&quot;married&quot;</span><span class="p">]</span>
 <span class="n">exog</span> <span class="o">=</span> <span class="n">data</span><span class="p">[</span><span class="n">exog_vars</span><span class="p">]</span>
@@ -1504,8 +1504,8 @@ Avg Obs: 545.00, Min Obs: 545.00, Max Obs: 545.00, Groups: 8
 Dep. Variable:                  lwage   R-squared:                        0.0268
 Estimator:         FirstDifferenceOLS   R-squared (Between):              0.5491
 No. Observations:                3815   R-squared (Within):               0.1763
-Date:                Wed, Dec 11 2024   R-squared (Overall):              0.5328
-Time:                        10:16:02   Log-likelihood                   -2305.5
+Date:                Wed, Jan 08 2025   R-squared (Overall):              0.5328
+Time:                        14:43:14   Log-likelihood                   -2305.5
 Cov. Estimator:            Unadjusted
                                         F-statistic:                      26.208
 Entities:                         545   P-value                           0.0000
@@ -1535,7 +1535,7 @@ married        0.0381     0.0229     1.6633     0.0963     -0.0068      0.0831
 <div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span><code>[11]:
 </code></pre></div>
 </div>
-<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><code><span class="kn">from</span> <span class="nn">linearmodels.panel</span> <span class="kn">import</span> <span class="n">compare</span>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><code><span class="kn">from</span><span class="w"> </span><span class="nn">linearmodels.panel</span><span class="w"> </span><span class="kn">import</span> <span class="n">compare</span>
 
 <span class="nb">print</span><span class="p">(</span><span class="n">compare</span><span class="p">({</span><span class="s2">&quot;BE&quot;</span><span class="p">:</span> <span class="n">be_res</span><span class="p">,</span> <span class="s2">&quot;RE&quot;</span><span class="p">:</span> <span class="n">re_res</span><span class="p">,</span> <span class="s2">&quot;Pooled&quot;</span><span class="p">:</span> <span class="n">pooled_res</span><span class="p">}))</span>
 </code></pre></div>
@@ -1637,7 +1637,7 @@ T-stats reported in parentheses
 <div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span><code>[15]:
 </code></pre></div>
 </div>
-<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><code><span class="kn">from</span> <span class="nn">collections</span> <span class="kn">import</span> <span class="n">OrderedDict</span>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><code><span class="kn">from</span><span class="w"> </span><span class="nn">collections</span><span class="w"> </span><span class="kn">import</span> <span class="n">OrderedDict</span>
 
 <span class="n">res</span> <span class="o">=</span> <span class="n">OrderedDict</span><span class="p">()</span>
 <span class="n">res</span><span class="p">[</span><span class="s2">&quot;Robust&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">robust</span>
@@ -1721,8 +1721,8 @@ Name: count, dtype: int64
 Dep. Variable:                  lwage   R-squared:                        0.1866
 Estimator:                  PooledOLS   R-squared (Between):              0.2027
 No. Observations:                4360   R-squared (Within):               0.1679
-Date:                Wed, Dec 11 2024   R-squared (Overall):              0.1866
-Time:                        10:16:03   Log-likelihood                   -2989.2
+Date:                Wed, Jan 08 2025   R-squared (Overall):              0.1866
+Time:                        14:43:14   Log-likelihood                   -2989.2
 Cov. Estimator:             Clustered
                                         F-statistic:                      142.61
 Entities:                         545   P-value                           0.0000

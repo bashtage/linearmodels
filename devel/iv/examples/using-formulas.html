@@ -15,7 +15,7 @@
     
   
       
-        <title>Using formulas to specify models - linearmodels v6.2 (+12)</title>
+        <title>Using formulas to specify models - linearmodels v6.2 (+15)</title>
       
     
 
@@ -94,7 +94,7 @@
 
 <header class="md-header" data-md-component="header">
   <nav class="md-header__inner md-grid" aria-label="Header">
-    <a href="../../index.html" title="linearmodels v6.2 (+12)" class="md-header__button md-logo" aria-label="linearmodels v6.2 (+12)" data-md-component="logo">
+    <a href="../../index.html" title="linearmodels v6.2 (+15)" class="md-header__button md-logo" aria-label="linearmodels v6.2 (+15)" data-md-component="logo">
       <img src="../../_static/bw-logo.svg" alt="logo">
     </a>
     <label class="md-header__button md-icon" for="__drawer">
@@ -104,7 +104,7 @@
       <div class="md-header__ellipsis">
         <div class="md-header__topic">
           <span class="md-ellipsis">
-            linearmodels v6.2 (+12)
+            linearmodels v6.2 (+15)
           </span>
         </div>
         <div class="md-header__topic" data-md-component="header-topic">
@@ -191,10 +191,10 @@
 
 <nav class="md-nav md-nav--primary" aria-label="Navigation" data-md-level="0">
   <label class="md-nav__title" for="__drawer">
-    <a href="../../index.html" title="linearmodels v6.2 (+12)" class="md-nav__button md-logo" aria-label="linearmodels v6.2 (+12)" data-md-component="logo">
+    <a href="../../index.html" title="linearmodels v6.2 (+15)" class="md-nav__button md-logo" aria-label="linearmodels v6.2 (+15)" data-md-component="logo">
       <img src="../../_static/bw-logo.svg" alt="logo">
     </a>
-    linearmodels v6.2 (+12)
+    linearmodels v6.2 (+15)
   </label>
   
     <div class="md-nav__source">
@@ -751,8 +751,8 @@
 <div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span><code>[1]:
 </code></pre></div>
 </div>
-<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><code><span class="kn">from</span> <span class="nn">linearmodels.datasets</span> <span class="kn">import</span> <span class="n">meps</span>
-<span class="kn">from</span> <span class="nn">linearmodels.iv</span> <span class="kn">import</span> <span class="n">IV2SLS</span>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><code><span class="kn">from</span><span class="w"> </span><span class="nn">linearmodels.datasets</span><span class="w"> </span><span class="kn">import</span> <span class="n">meps</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">linearmodels.iv</span><span class="w"> </span><span class="kn">import</span> <span class="n">IV2SLS</span>
 
 <span class="n">data</span> <span class="o">=</span> <span class="n">meps</span><span class="o">.</span><span class="n">load</span><span class="p">()</span>
 <span class="n">data</span> <span class="o">=</span> <span class="n">data</span><span class="o">.</span><span class="n">dropna</span><span class="p">()</span>
@@ -830,8 +830,8 @@ vgh               vg or good health
 Dep. Variable:               ldrugexp   R-squared:                      0.0640
 Estimator:                    IV-2SLS   Adj. R-squared:                 0.0634
 No. Observations:               10089   F-statistic:                    2000.9
-Date:                Wed, Dec 11 2024   P-value (F-stat)                0.0000
-Time:                        10:16:15   Distribution:                  chi2(6)
+Date:                Wed, Jan 08 2025   P-value (F-stat)                0.0000
+Time:                        14:43:27   Distribution:                  chi2(6)
 Cov. Estimator:                robust
 
                               Parameter Estimates
@@ -890,8 +890,8 @@ Debiased: False
 Dep. Variable:               ldrugexp   R-squared:                      0.1770
 Estimator:                        OLS   Adj. R-squared:                 0.1765
 No. Observations:               10089   F-statistic:                    2262.6
-Date:                Wed, Dec 11 2024   P-value (F-stat)                0.0000
-Time:                        10:16:15   Distribution:                  chi2(6)
+Date:                Wed, Jan 08 2025   P-value (F-stat)                0.0000
+Time:                        14:43:28   Distribution:                  chi2(6)
 Cov. Estimator:                robust
 
                               Parameter Estimates
@@ -914,7 +914,7 @@ hi_empunion     0.0739     0.0260     2.8441     0.0045      0.0230      0.1248
 <div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span><code>[6]:
 </code></pre></div>
 </div>
-<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><code><span class="kn">from</span> <span class="nn">linearmodels.iv</span> <span class="kn">import</span> <span class="n">compare</span>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><code><span class="kn">from</span><span class="w"> </span><span class="nn">linearmodels.iv</span><span class="w"> </span><span class="kn">import</span> <span class="n">compare</span>
 
 <span class="nb">print</span><span class="p">(</span><span class="n">compare</span><span class="p">({</span><span class="s2">&quot;IV&quot;</span><span class="p">:</span> <span class="n">iv_res</span><span class="p">,</span> <span class="s2">&quot;OLS&quot;</span><span class="p">:</span> <span class="n">ols_res</span><span class="p">,</span> <span class="s2">&quot;IV-formula&quot;</span><span class="p">:</span> <span class="n">iv_res2</span><span class="p">}))</span>
 </code></pre></div>

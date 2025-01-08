@@ -15,7 +15,7 @@
     
   
       
-        <title>Comparison with pandas PanelOLS and FamaMacBeth - linearmodels v6.2 (+12)</title>
+        <title>Comparison with pandas PanelOLS and FamaMacBeth - linearmodels v6.2 (+15)</title>
       
     
 
@@ -88,7 +88,7 @@
 
 <header class="md-header" data-md-component="header">
   <nav class="md-header__inner md-grid" aria-label="Header">
-    <a href="../index.html" title="linearmodels v6.2 (+12)" class="md-header__button md-logo" aria-label="linearmodels v6.2 (+12)" data-md-component="logo">
+    <a href="../index.html" title="linearmodels v6.2 (+15)" class="md-header__button md-logo" aria-label="linearmodels v6.2 (+15)" data-md-component="logo">
       <img src="../_static/bw-logo.svg" alt="logo">
     </a>
     <label class="md-header__button md-icon" for="__drawer">
@@ -98,7 +98,7 @@
       <div class="md-header__ellipsis">
         <div class="md-header__topic">
           <span class="md-ellipsis">
-            linearmodels v6.2 (+12)
+            linearmodels v6.2 (+15)
           </span>
         </div>
         <div class="md-header__topic" data-md-component="header-topic">
@@ -185,10 +185,10 @@
 
 <nav class="md-nav md-nav--primary" aria-label="Navigation" data-md-level="0">
   <label class="md-nav__title" for="__drawer">
-    <a href="../index.html" title="linearmodels v6.2 (+12)" class="md-nav__button md-logo" aria-label="linearmodels v6.2 (+12)" data-md-component="logo">
+    <a href="../index.html" title="linearmodels v6.2 (+15)" class="md-nav__button md-logo" aria-label="linearmodels v6.2 (+15)" data-md-component="logo">
       <img src="../_static/bw-logo.svg" alt="logo">
     </a>
-    linearmodels v6.2 (+12)
+    linearmodels v6.2 (+15)
   </label>
   
     <div class="md-nav__source">
@@ -610,11 +610,11 @@ not included in the test statistic.</p></li>
 </ol>
 <p>Here the difference is presented using the canonical Grunfeld data on
 investment.</p>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><code><span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
-<span class="kn">from</span> <span class="nn">statsmodels.datasets</span> <span class="kn">import</span> <span class="n">grunfeld</span>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><code><span class="kn">import</span><span class="w"> </span><span class="nn">numpy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">np</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">statsmodels.datasets</span><span class="w"> </span><span class="kn">import</span> <span class="n">grunfeld</span>
 <span class="n">data</span> <span class="o">=</span> <span class="n">grunfeld</span><span class="o">.</span><span class="n">load_pandas</span><span class="p">()</span><span class="o">.</span><span class="n">data</span>
 <span class="n">data</span><span class="o">.</span><span class="n">year</span> <span class="o">=</span> <span class="n">data</span><span class="o">.</span><span class="n">year</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">int64</span><span class="p">)</span>
-<span class="kn">from</span> <span class="nn">linearmodels</span> <span class="kn">import</span> <span class="n">PanelOLS</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">linearmodels</span><span class="w"> </span><span class="kn">import</span> <span class="n">PanelOLS</span>
 <span class="n">etdata</span> <span class="o">=</span> <span class="n">data</span><span class="o">.</span><span class="n">set_index</span><span class="p">([</span><span class="s1">&#39;firm&#39;</span><span class="p">,</span><span class="s1">&#39;year&#39;</span><span class="p">])</span>
 <span class="n">PanelOLS</span><span class="p">(</span><span class="n">etdata</span><span class="o">.</span><span class="n">invest</span><span class="p">,</span><span class="n">etdata</span><span class="p">[[</span><span class="s1">&#39;value&#39;</span><span class="p">,</span><span class="s1">&#39;capital&#39;</span><span class="p">]],</span><span class="n">entity_effects</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span><span class="o">.</span><span class="n">fit</span><span class="p">(</span><span class="n">debiased</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
 </code></pre></div>
@@ -657,7 +657,7 @@ investment.</p>
 <p>The call to the deprecated pandas PanelOLS is similar. Note the use of the
 time-entity data format.</p>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><code><span class="n">tedata</span> <span class="o">=</span> <span class="n">data</span><span class="o">.</span><span class="n">set_index</span><span class="p">([</span><span class="s1">&#39;year&#39;</span><span class="p">,</span><span class="s1">&#39;firm&#39;</span><span class="p">])</span>
-<span class="kn">from</span> <span class="nn">pandas.stats</span> <span class="kn">import</span> <span class="n">plm</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">pandas.stats</span><span class="w"> </span><span class="kn">import</span> <span class="n">plm</span>
 <span class="n">plm</span><span class="o">.</span><span class="n">PanelOLS</span><span class="p">(</span><span class="n">tedata</span><span class="p">[</span><span class="s1">&#39;invest&#39;</span><span class="p">],</span><span class="n">tedata</span><span class="p">[[</span><span class="s1">&#39;value&#39;</span><span class="p">,</span><span class="s1">&#39;capital&#39;</span><span class="p">]],</span><span class="n">entity_effects</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
 </code></pre></div>
 </div>

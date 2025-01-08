@@ -15,7 +15,7 @@
     
   
       
-        <title>Using Formulas - linearmodels v6.2 (+12)</title>
+        <title>Using Formulas - linearmodels v6.2 (+15)</title>
       
     
 
@@ -94,7 +94,7 @@
 
 <header class="md-header" data-md-component="header">
   <nav class="md-header__inner md-grid" aria-label="Header">
-    <a href="../../index.html" title="linearmodels v6.2 (+12)" class="md-header__button md-logo" aria-label="linearmodels v6.2 (+12)" data-md-component="logo">
+    <a href="../../index.html" title="linearmodels v6.2 (+15)" class="md-header__button md-logo" aria-label="linearmodels v6.2 (+15)" data-md-component="logo">
       <img src="../../_static/bw-logo.svg" alt="logo">
     </a>
     <label class="md-header__button md-icon" for="__drawer">
@@ -104,7 +104,7 @@
       <div class="md-header__ellipsis">
         <div class="md-header__topic">
           <span class="md-ellipsis">
-            linearmodels v6.2 (+12)
+            linearmodels v6.2 (+15)
           </span>
         </div>
         <div class="md-header__topic" data-md-component="header-topic">
@@ -191,10 +191,10 @@
 
 <nav class="md-nav md-nav--primary" aria-label="Navigation" data-md-level="0">
   <label class="md-nav__title" for="__drawer">
-    <a href="../../index.html" title="linearmodels v6.2 (+12)" class="md-nav__button md-logo" aria-label="linearmodels v6.2 (+12)" data-md-component="logo">
+    <a href="../../index.html" title="linearmodels v6.2 (+15)" class="md-nav__button md-logo" aria-label="linearmodels v6.2 (+15)" data-md-component="logo">
       <img src="../../_static/bw-logo.svg" alt="logo">
     </a>
-    linearmodels v6.2 (+12)
+    linearmodels v6.2 (+15)
   </label>
   
     <div class="md-nav__source">
@@ -691,7 +691,7 @@ LinearFactorModel.from_formula(formula, portfolios=portfolios)
 <div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span><code>[1]:
 </code></pre></div>
 </div>
-<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><code><span class="kn">from</span> <span class="nn">linearmodels.datasets</span> <span class="kn">import</span> <span class="n">french</span>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><code><span class="kn">from</span><span class="w"> </span><span class="nn">linearmodels.datasets</span><span class="w"> </span><span class="kn">import</span> <span class="n">french</span>
 
 <span class="n">data</span> <span class="o">=</span> <span class="n">french</span><span class="o">.</span><span class="n">load</span><span class="p">()</span>
 <span class="nb">print</span><span class="p">(</span><span class="n">french</span><span class="o">.</span><span class="n">DESCR</span><span class="p">)</span>
@@ -753,7 +753,7 @@ S5M5     Large firms, winners
 <div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span><code>[2]:
 </code></pre></div>
 </div>
-<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><code><span class="kn">from</span> <span class="nn">linearmodels.asset_pricing</span> <span class="kn">import</span> <span class="n">LinearFactorModel</span>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><code><span class="kn">from</span><span class="w"> </span><span class="nn">linearmodels.asset_pricing</span><span class="w"> </span><span class="kn">import</span> <span class="n">LinearFactorModel</span>
 
 <span class="n">formula</span> <span class="o">=</span> <span class="s2">&quot;NoDur + Chems + S1V1 + S5V5 + S1M1 + S5M5 ~ MktRF + HML + Mom&quot;</span>
 <span class="n">mod</span> <span class="o">=</span> <span class="n">LinearFactorModel</span><span class="o">.</span><span class="n">from_formula</span><span class="p">(</span><span class="n">formula</span><span class="p">,</span> <span class="n">data</span><span class="p">)</span>
@@ -772,8 +772,8 @@ S5M5     Large firms, winners
 No. Test Portfolios:                  6   R-squared:                      0.7229
 No. Factors:                          3   J-statistic:                    9.9450
 No. Observations:                   819   P-value                         0.0190
-Date:                  Wed, Dec 11 2024   Distribution:                  chi2(3)
-Time:                          10:16:03
+Date:                  Wed, Jan 08 2025   Distribution:                  chi2(3)
+Time:                          14:43:11
 Cov. Estimator:                  kernel
 
                             Risk Premia Estimates
@@ -818,8 +818,8 @@ See full_summary for complete results
 No. Test Portfolios:                 18   R-squared:                      0.7723
 No. Factors:                          3   J-statistic:                    86.386
 No. Observations:                   819   P-value                         0.0000
-Date:                  Wed, Dec 11 2024   Distribution:                 chi2(14)
-Time:                          10:16:03
+Date:                  Wed, Jan 08 2025   Distribution:                 chi2(14)
+Time:                          14:43:11
 Cov. Estimator:                  robust
 
                             Risk Premia Estimates
@@ -860,8 +860,8 @@ See full_summary for complete results
 No. Test Portfolios:                 18   R-squared:                      0.7723
 No. Factors:                          3   J-statistic:                    86.386
 No. Observations:                   819   P-value                         0.0000
-Date:                  Wed, Dec 11 2024   Distribution:                 chi2(14)
-Time:                          10:16:04
+Date:                  Wed, Jan 08 2025   Distribution:                 chi2(14)
+Time:                          14:43:11
 Cov. Estimator:                  robust
 
                             Risk Premia Estimates

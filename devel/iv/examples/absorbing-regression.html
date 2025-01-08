@@ -15,7 +15,7 @@
     
   
       
-        <title>Absorbing Regression - linearmodels v6.2 (+12)</title>
+        <title>Absorbing Regression - linearmodels v6.2 (+15)</title>
       
     
 
@@ -94,7 +94,7 @@
 
 <header class="md-header" data-md-component="header">
   <nav class="md-header__inner md-grid" aria-label="Header">
-    <a href="../../index.html" title="linearmodels v6.2 (+12)" class="md-header__button md-logo" aria-label="linearmodels v6.2 (+12)" data-md-component="logo">
+    <a href="../../index.html" title="linearmodels v6.2 (+15)" class="md-header__button md-logo" aria-label="linearmodels v6.2 (+15)" data-md-component="logo">
       <img src="../../_static/bw-logo.svg" alt="logo">
     </a>
     <label class="md-header__button md-icon" for="__drawer">
@@ -104,7 +104,7 @@
       <div class="md-header__ellipsis">
         <div class="md-header__topic">
           <span class="md-ellipsis">
-            linearmodels v6.2 (+12)
+            linearmodels v6.2 (+15)
           </span>
         </div>
         <div class="md-header__topic" data-md-component="header-topic">
@@ -191,10 +191,10 @@
 
 <nav class="md-nav md-nav--primary" aria-label="Navigation" data-md-level="0">
   <label class="md-nav__title" for="__drawer">
-    <a href="../../index.html" title="linearmodels v6.2 (+12)" class="md-nav__button md-logo" aria-label="linearmodels v6.2 (+12)" data-md-component="logo">
+    <a href="../../index.html" title="linearmodels v6.2 (+15)" class="md-nav__button md-logo" aria-label="linearmodels v6.2 (+15)" data-md-component="logo">
       <img src="../../_static/bw-logo.svg" alt="logo">
     </a>
-    linearmodels v6.2 (+12)
+    linearmodels v6.2 (+15)
   </label>
   
     <div class="md-nav__source">
@@ -641,8 +641,8 @@
 <div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span><code>[1]:
 </code></pre></div>
 </div>
-<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><code><span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
-<span class="kn">import</span> <span class="nn">pandas</span> <span class="k">as</span> <span class="nn">pd</span>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><code><span class="kn">import</span><span class="w"> </span><span class="nn">numpy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">np</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">pandas</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">pd</span>
 
 <span class="n">rs</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">RandomState</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>
 <span class="n">nobs</span> <span class="o">=</span> <span class="mi">1_000_000</span>
@@ -669,7 +669,7 @@
 <div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span><code>[2]:
 </code></pre></div>
 </div>
-<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><code><span class="kn">from</span> <span class="nn">linearmodels.iv.absorbing</span> <span class="kn">import</span> <span class="n">AbsorbingLS</span>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><code><span class="kn">from</span><span class="w"> </span><span class="nn">linearmodels.iv.absorbing</span><span class="w"> </span><span class="kn">import</span> <span class="n">AbsorbingLS</span>
 
 <span class="n">mod</span> <span class="o">=</span> <span class="n">AbsorbingLS</span><span class="p">(</span><span class="n">y</span><span class="p">,</span> <span class="n">x</span><span class="p">,</span> <span class="n">absorb</span><span class="o">=</span><span class="n">cats</span><span class="p">)</span>
 <span class="nb">print</span><span class="p">(</span><span class="n">mod</span><span class="o">.</span><span class="n">fit</span><span class="p">())</span>
@@ -686,8 +686,8 @@
 Dep. Variable:              dependent   R-squared:                          0.8377
 Estimator:               Absorbing LS   Adj. R-squared:                     0.7975
 No. Observations:             1000000   F-statistic:                     1.962e+06
-Date:                Wed, Dec 11 2024   P-value (F-stat):                   0.0000
-Time:                        10:15:35   Distribution:                      chi2(2)
+Date:                Wed, Jan 08 2025   P-value (F-stat):                   0.0000
+Time:                        14:42:48   Distribution:                      chi2(2)
 Cov. Estimator:                robust   R-squared (No Effects):             0.6664
                                         Variables Absorbed:              1.987e+05
                              Parameter Estimates
@@ -706,7 +706,7 @@ exog.2         1.0008     0.0010     989.09     0.0000      0.9989      1.0028
 <div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span><code>[3]:
 </code></pre></div>
 </div>
-<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><code><span class="kn">from</span> <span class="nn">linearmodels.iv.absorbing</span> <span class="kn">import</span> <span class="n">AbsorbingLS</span>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><code><span class="kn">from</span><span class="w"> </span><span class="nn">linearmodels.iv.absorbing</span><span class="w"> </span><span class="kn">import</span> <span class="n">AbsorbingLS</span>
 
 <span class="n">mod</span> <span class="o">=</span> <span class="n">AbsorbingLS</span><span class="p">(</span><span class="n">y</span><span class="p">,</span> <span class="n">x</span><span class="p">[:,</span> <span class="mi">1</span><span class="p">:],</span> <span class="n">absorb</span><span class="o">=</span><span class="n">cats</span><span class="p">)</span>
 <span class="nb">print</span><span class="p">(</span><span class="n">mod</span><span class="o">.</span><span class="n">fit</span><span class="p">())</span>
@@ -723,8 +723,8 @@ exog.2         1.0008     0.0010     989.09     0.0000      0.9989      1.0028
 Dep. Variable:              dependent   R-squared:                          0.8377
 Estimator:               Absorbing LS   Adj. R-squared:                     0.7975
 No. Observations:             1000000   F-statistic:                     1.962e+06
-Date:                Wed, Dec 11 2024   P-value (F-stat):                   0.0000
-Time:                        10:15:43   Distribution:                      chi2(2)
+Date:                Wed, Jan 08 2025   P-value (F-stat):                   0.0000
+Time:                        14:42:57   Distribution:                      chi2(2)
 Cov. Estimator:                robust   R-squared (No Effects):             0.6664
                                         Variables Absorbed:              1.987e+05
                              Parameter Estimates
@@ -747,9 +747,9 @@ exog.1         1.0008     0.0010     989.09     0.0000      0.9989      1.0028
 <div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span><code>[4]:
 </code></pre></div>
 </div>
-<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><code><span class="kn">import</span> <span class="nn">datetime</span> <span class="k">as</span> <span class="nn">dt</span>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><code><span class="kn">import</span><span class="w"> </span><span class="nn">datetime</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">dt</span>
 
-<span class="kn">from</span> <span class="nn">linearmodels.iv.absorbing</span> <span class="kn">import</span> <span class="n">AbsorbingLS</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">linearmodels.iv.absorbing</span><span class="w"> </span><span class="kn">import</span> <span class="n">AbsorbingLS</span>
 
 <span class="n">mod</span> <span class="o">=</span> <span class="n">AbsorbingLS</span><span class="p">(</span><span class="n">y</span><span class="p">,</span> <span class="n">x</span><span class="p">[:,</span> <span class="mi">1</span><span class="p">:],</span> <span class="n">absorb</span><span class="o">=</span><span class="n">cats</span><span class="p">)</span>
 
@@ -768,8 +768,8 @@ exog.1         1.0008     0.0010     989.09     0.0000      0.9989      1.0028
 </div>
 <div class="output_area docutils container">
 <div class="highlight"><pre>
-LSMR Second: 6.007842
-HDFE Second: 1.97571
+LSMR Second: 5.064482
+HDFE Second: 1.396417
 </pre></div></div>
 </div>
 <p>LSMR is iterative and does not have a closed form. The tolerance can be set using <code class="docutils literal notranslate"><span class="pre">absorb_options</span></code> which is a dictionary. See <a class="reference external" href="https://docs.scipy.org/doc/scipy-1.2.1/reference/generated/scipy.sparse.linalg.lsmr.html#scipy.sparse.linalg.lsmr">scipy.sparse.linalg.lsmr</a> for details on the options.</p>
