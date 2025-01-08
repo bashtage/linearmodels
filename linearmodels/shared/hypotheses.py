@@ -198,7 +198,7 @@ def _parse_single(constraint: str) -> tuple[str, float]:
 
 
 def _reparse_constraint_formula(
-    formula: str | list[str] | dict[str, float]
+    formula: str | list[str] | dict[str, float],
 ) -> str | dict[str, float]:
     # TODO: Test against variable names constaining , or =
     if isinstance(formula, Mapping):

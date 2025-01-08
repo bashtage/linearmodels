@@ -771,9 +771,7 @@ class _PanelModelBase:
                 cat = Categorical(formatted_clusters.dataframe[col])
                 # TODO: Bug in pandas-stubs
                 #  https://github.com/pandas-dev/pandas-stubs/issues/111
-                formatted_clusters.dataframe[col] = cat.codes.astype(
-                    np.int64
-                )  # type: ignore
+                formatted_clusters.dataframe[col] = cat.codes.astype(np.int64)  # type: ignore
             clusters_frame = formatted_clusters.dataframe
 
         cluster_entity = bool(cov_config_upd.pop("cluster_entity", False))
@@ -2184,9 +2182,7 @@ class BetweenOLS(_PanelModelBase):
                 cluster_max.T, index=index, columns=clusters_panel.vars
             )
             # TODO: Bug in pandas-stubs prevents using Hashable | None
-            clusters_frame = clusters_frame.loc[reindex].astype(
-                np.int64
-            )  # type: ignore
+            clusters_frame = clusters_frame.loc[reindex].astype(np.int64)  # type: ignore
             cov_config_upd["clusters"] = clusters_frame
 
         return cov_config_upd

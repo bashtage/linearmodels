@@ -96,7 +96,7 @@ GMM_COV_EST = {
 
 
 def _missing_weights(
-    weights: Mapping[str, linearmodels.typing.data.ArrayLike | None]
+    weights: Mapping[str, linearmodels.typing.data.ArrayLike | None],
 ) -> None:
     """Raise warning if missing weighs found"""
     missing = [key for key in weights if weights[key] is None]
