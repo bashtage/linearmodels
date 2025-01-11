@@ -69,7 +69,7 @@ except ImportError:
 
 
 class Hasher:
-    def __init__(self):
+    def __init__(self) -> None:
         self._hasher: hashlib._Hash | xxh64
         if HAVE_XXHASH:
             self._hasher = xxh64()
