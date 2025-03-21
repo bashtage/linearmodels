@@ -710,9 +710,9 @@ class FirstStageResults(_SummaryStr):
 
         endog, exog, instr, weights = self.endog, self.exog, self.instr, self.weights
         w = sqrt(weights.ndarray)
-        z = w * instr.ndarray
+        z = w * instr.ndarray.astype(float, copy=False)
         nz = z.shape[1]
-        x = w * exog.ndarray
+        x = w * exog.ndarray.astype(float, copy=False)
         ez = annihilate(z, x)
         individual_results = self.individual
         out_df = DataFrame(

@@ -913,10 +913,10 @@ class AbsorbingLS:
         self._regressors_hash = areg.hash
         self._constant_absorbed = self._has_constant_exog and areg_constant
 
-        dep = self._dependent.ndarray
+        dep = self._dependent.ndarray.astype(float, copy=False)
         exog = cast(linearmodels.typing.data.Float64Array, self._exog.ndarray)
 
-        root_w = sqrt(self._weight_data.ndarray)
+        root_w = sqrt(self._weight_data.ndarray.astype(float, copy=False))
         dep = root_w * dep
         exog = root_w * exog
         denom = root_w.T @ root_w
@@ -931,13 +931,13 @@ class AbsorbingLS:
 
                 absorb_options["drop_singletons"] = False
                 algo = create(self._absorb_inter.cat, **absorb_options)
-                dep_exog = column_stack((dep, exog))
+                dep_exog = column_stack((dep, exog)).astype(float, copy=False)
                 resids = algo.residualize(dep_exog)
                 dep_resid = resids[:, :1]
                 exog_resid = resids[:, 1:]
             else:
                 self._regressors = preconditioner(self._regressors)[0]
-                dep_exog = column_stack((dep, exog))
+                dep_exog = column_stack((dep, exog)).astype(float, copy=False)
                 resid = lsmr_annihilate(
                     self._regressors,
                     dep_exog,

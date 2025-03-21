@@ -146,7 +146,7 @@ def _parameters_from_xprod(
         params_c = solve(xpx, xpy)
         params = cons.t @ params_c + cons.a.T
     else:
-        params = solve(xpx, xpy)
+        params = solve(xpx, xpy).astype(float, copy=False)
     return params
 
 
@@ -760,7 +760,7 @@ class _SystemModelBase:
 
         if not full_cov:
             sigma = np.diag(np.diag(sigma))
-        sigma_inv = inv(sigma)
+        sigma_inv = cast(linearmodels.typing.data.Float64Array, inv(sigma))
 
         k = len(wy)
 
@@ -1045,7 +1045,7 @@ class _SystemModelBase:
             est_sigma = sigma
             if not full_cov:
                 est_sigma = np.diag(np.diag(est_sigma))
-        est_sigma_inv = inv(est_sigma)
+        est_sigma_inv = cast(linearmodels.typing.data.Float64Array, inv(est_sigma))
         nobs = wy[0].shape[0]
         k = len(wy)
         xpx = blocked_inner_prod(wi, est_sigma_inv)

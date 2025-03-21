@@ -442,7 +442,7 @@ class _LinearFactorModelBase(_FactorModelBase):
             self._sigma = np.asarray(sigma)
             vals, vecs = np.linalg.eigh(sigma)
             self._sigma_m12 = vecs @ np.diag(1.0 / np.sqrt(vals)) @ vecs.T
-            self._sigma_inv = np.linalg.inv(self._sigma)
+            self._sigma_inv = np.linalg.inv(self._sigma).astype(float, copy=False)
 
     def __str__(self) -> str:
         out = super().__str__()
@@ -966,10 +966,10 @@ class LinearFactorModelGMM(_LinearFactorModelBase):
             self.portfolios, self.factors, risk_free=self._risk_free
         )
         res = mod.fit()
-        betas = np.asarray(res.betas).ravel()
+        betas_1d = np.asarray(res.betas).ravel()
         lam = np.asarray(res.risk_premia)
         mu = self.factors.ndarray.mean(0)
-        sv = np.r_[betas, lam, mu][:, None]
+        sv = np.r_[betas_1d, lam, mu][:, None]
         if starting is not None:
             starting = np.asarray(starting)
             if starting.ndim == 1:

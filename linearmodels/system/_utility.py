@@ -308,7 +308,11 @@ class LinearConstraint:
         t, left = vecs[:, : k - c], vecs[:, k - c :]
         q = self._qa[:, None]
         a = q.T @ inv(left.T @ r.T) @ left.T
-        self._t, self._l, self._a = t, left, a
+        self._t, self._l, self._a = (
+            cast(linearmodels.typing.data.FloatArray2D, t),
+            cast(linearmodels.typing.data.FloatArray2D, left),
+            cast(linearmodels.typing.data.FloatArray2D, a),
+        )
         self._computed = True
 
     @property
