@@ -192,7 +192,7 @@ class HeteroskedasticCovariance:
             out = ji @ s @ ji.T
         else:
             j = self.jacobian
-            out = inv(j.T @ inv(s) @ j)
+            out = inv(j.T @ inv(s) @ j).astype(float, copy=False)
         out = (scale / 2) * (out + out.T)
         return out
 
@@ -371,4 +371,4 @@ class KernelWeight(HeteroskedasticWeight, _HACMixin):
             moments = moments - moments.mean(0)[None, :]
         out = self._kernel_cov(moments)
 
-        return inv(out)
+        return inv(out).astype(float, copy=False)

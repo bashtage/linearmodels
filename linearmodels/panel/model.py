@@ -54,6 +54,7 @@ from linearmodels.shared.hypotheses import (
 from linearmodels.shared.linalg import has_constant
 from linearmodels.shared.typed_getters import get_panel_data_like
 from linearmodels.shared.utility import AttrDict, ensure_unique_column, panel_to_frame
+from linearmodels.typing import BoolArray
 import linearmodels.typing.data
 
 CovarianceEstimator = Union[
@@ -319,7 +320,9 @@ class _PanelModelBase:
         self._is_weighted = True
         self._name = self.__class__.__name__
         self.weights = self._adapt_weights(weights)
-        self._not_null = np.ones(self.dependent.values2d.shape[0], dtype=bool)
+        self._not_null: BoolArray = np.ones(
+            self.dependent.values2d.shape[0], dtype=bool
+        )
         self._cov_estimators = CovarianceManager(
             self.__class__.__name__,
             HomoskedasticCovariance,
@@ -466,10 +469,11 @@ class _PanelModelBase:
             )
 
         all_missing = np.any(np.isnan(y), axis=1) & np.all(np.isnan(x), axis=1)
-        missing = (
+        missing = np.asarray(
             np.any(np.isnan(y), axis=1)
             | np.any(np.isnan(x), axis=1)
-            | np.any(np.isnan(w), axis=1)
+            | np.any(np.isnan(w), axis=1),
+            dtype=bool,
         )
 
         missing_warning(np.asarray(all_missing ^ missing), stacklevel=4)
@@ -479,7 +483,7 @@ class _PanelModelBase:
             self.weights.drop(missing)
 
             x = cast(linearmodels.typing.data.Float64Array, self.exog.values2d)
-            self._not_null = np.asarray(~missing)
+            self._not_null = cast(BoolArray, np.asarray(~missing))
 
         w_df = self.weights.dataframe
         if np.any(np.asarray(w_df) <= 0):
@@ -778,7 +782,9 @@ class _PanelModelBase:
         if cluster_entity:
             group_ids_arr = self.dependent.entity_ids.squeeze()
             name = "cov.cluster.entity"
-            group_ids = Series(group_ids_arr, index=self.dependent.index, name=name)
+            group_ids: Series[int] = Series(
+                group_ids_arr, index=self.dependent.index, name=name
+            )
             if clusters_frame is not None:
                 clusters_frame[name] = group_ids
             else:
@@ -2021,7 +2027,7 @@ class PanelOLS(_PanelModelBase):
             linearmodels.typing.data.Float64Array, np.sqrt(self.weights.values2d)
         )
         y_ex = root_w * self.dependent.values2d
-        mu_ex = 0
+        mu_ex = np.array(0.0, dtype=float)
         if (
             self.has_constant
             or self.entity_effects
@@ -2469,7 +2475,9 @@ class FirstDifferenceOLS(_PanelModelBase):
         if cluster_entity:
             group_ids = self.dependent.entity_ids.squeeze()
             name = "cov.cluster.entity"
-            group_ids_s = Series(group_ids, index=self.dependent.index, name=name)
+            group_ids_s: Series[int] = Series(
+                group_ids, index=self.dependent.index, name=name
+            )
             if clusters_frame is not None:
                 clusters_frame[name] = group_ids_s
             else:

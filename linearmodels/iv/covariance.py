@@ -104,8 +104,8 @@ def kernel_weight_quadratic_spectral(
         w[0] = 0
         return w
 
-    z = arange(n + 1) / float(bw)
-    w = 6 * pi * z / 5
+    z = arange(n + 1).astype(float) / float(bw)
+    w = cast(linearmodels.typing.data.FloatArray1D, 6 * pi * z / 5)
     w[0] = 1
     w[1:] = 3 / w[1:] ** 2 * (sin(w[1:]) / w[1:] - cos(w[1:]))
 

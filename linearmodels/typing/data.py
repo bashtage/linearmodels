@@ -16,14 +16,15 @@ except ImportError:
 
 NDArray = Union[np.ndarray]
 
-Float64Array = np.ndarray[Any, np.dtype[np.float64]]  # pragma: no cover
-Int64Array = np.ndarray[Any, np.dtype[np.int64]]  # pragma: no cover
-Int32Array = np.ndarray[Any, np.dtype[np.int32]]  # pragma: no cover
-IntArray = np.ndarray[Any, np.dtype[np.int_]]  # pragma: no cover
-BoolArray = np.ndarray[Any, np.dtype[np.bool_]]  # pragma: no cover
-AnyArray = np.ndarray[Any, Any]  # pragma: no cover
-Uint32Array = np.ndarray[Any, np.dtype[np.uint32]]  # pragma: no cover
-
+Float64Array = np.ndarray[tuple[int, ...], np.dtype[np.float64]]  # pragma: no cover
+Int64Array = np.ndarray[tuple[int, ...], np.dtype[np.int64]]  # pragma: no cover
+Int32Array = np.ndarray[tuple[int, ...], np.dtype[np.int32]]  # pragma: no cover
+IntArray = np.ndarray[tuple[int, ...], np.dtype[np.int_]]  # pragma: no cover
+BoolArray = np.ndarray[tuple[int, ...], np.dtype[np.bool_]]  # pragma: no cover
+AnyArray = np.ndarray[tuple[int, ...], Any]  # pragma: no cover
+Uint32Array = np.ndarray[tuple[int, ...], np.dtype[np.uint32]]  # pragma: no cover
+FloatArray1D = np.ndarray[tuple[int], np.dtype[np.float64]]
+FloatArray2D = np.ndarray[tuple[int, int], np.dtype[np.float64]]
 __all__ = [
     "Float64Array",
     "Int32Array",
@@ -33,4 +34,6 @@ __all__ = [
     "AnyArray",
     "Uint32Array",
     "ArrayLike",
+    "FloatArray1D",
+    "FloatArray2D",
 ]

@@ -195,9 +195,15 @@ class PanelData:
                     if x.ndim == 2:
                         x = x.to_pandas()
                     else:
-                        items: list[Hashable] = np.asarray(x.coords[x.dims[0]]).tolist()
-                        major: list[Hashable] = np.asarray(x.coords[x.dims[1]]).tolist()
-                        minor: list[Hashable] = np.asarray(x.coords[x.dims[2]]).tolist()
+                        items: list[Hashable] = cast(
+                            list[Hashable], np.asarray(x.coords[x.dims[0]]).tolist()
+                        )
+                        major: list[Hashable] = cast(
+                            list[Hashable], np.asarray(x.coords[x.dims[1]]).tolist()
+                        )
+                        minor: list[Hashable] = cast(
+                            list[Hashable], np.asarray(x.coords[x.dims[2]]).tolist()
+                        )
                         values = x.values
                         x = panel_to_frame(values, items, major, minor, True)
             except ImportError:
@@ -538,7 +544,7 @@ class PanelData:
         group: Literal["entity", "time", "both"],
         weights: PanelData | None,
         return_panel: Literal[False],
-    ) -> linearmodels.typing.data.Float64Array: ...  # noqa: E704
+    ) -> linearmodels.typing.data.Float64Array: ...
 
     def demean(
         self,

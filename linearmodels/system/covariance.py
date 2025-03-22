@@ -129,7 +129,7 @@ class HomoskedasticCovariance:
     def _gls_cov(self) -> linearmodels.typing.data.Float64Array:
         x = self._x
         sigma = self._sigma
-        sigma_inv = inv(sigma)
+        sigma_inv = cast(linearmodels.typing.data.Float64Array, inv(sigma))
 
         xpx = blocked_inner_prod(x, sigma_inv)
         # Handles case where sigma_inv is not inverse of full_sigma
@@ -229,7 +229,7 @@ class HeteroskedasticCovariance(HomoskedasticCovariance):
         nobs = eps.shape[0]
 
         if gls:
-            weights = inv(sigma)
+            weights = cast(linearmodels.typing.data.Float64Array, inv(sigma))
             bigx = blocked_diag_product(x, weights)
             e = eps.T.ravel()[:, None]
             bigxe = bigx * e
@@ -258,7 +258,9 @@ class HeteroskedasticCovariance(HomoskedasticCovariance):
         nobs = x[0].shape[0]
         k = len(x)
         sigma = self.sigma
-        weights = inv(sigma) if gls else eye(k)
+        weights = (
+            cast(linearmodels.typing.data.Float64Array, inv(sigma)) if gls else eye(k)
+        )
         xpx = blocked_inner_prod(x, weights) / nobs
         xeex = self._xeex()
 

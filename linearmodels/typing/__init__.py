@@ -9,6 +9,7 @@ from .data import (
     ArrayLike as ArrayLike,
     BoolArray as BoolArray,
     Float64Array as Float64Array,
+    FloatArray2D as FloatArray2D,
     Int32Array as Int32Array,
     Int64Array as Int64Array,
     IntArray as IntArray,
@@ -28,6 +29,7 @@ __all__ = [
     "Float64Array",
     "BoolArray",
     "NumericArray",
+    "FloatArray2D",
 ]
 
 ArraySequence = Sequence[np.ndarray]
@@ -39,7 +41,7 @@ AnyPandas = Union[Series, DataFrame]
 Label = Optional[Hashable]
 
 NumericArray = Union[  # pragma: no cover
-    np.ndarray[Any, np.dtype[np.signedinteger[Any]]],  # pragma: no cover
-    np.ndarray[Any, np.dtype[np.unsignedinteger[Any]]],  # pragma: no cover
-    np.ndarray[Any, np.dtype[np.floating[Any]]],  # pragma: no cover
+    np.ndarray[tuple[int, ...], np.dtype[np.signedinteger[Any]]],  # pragma: no cover
+    np.ndarray[tuple[int, ...], np.dtype[np.unsignedinteger[Any]]],  # pragma: no cover
+    np.ndarray[tuple[int, ...], np.dtype[np.floating[Any]]],  # pragma: no cover
 ]  # pragma: no cover
