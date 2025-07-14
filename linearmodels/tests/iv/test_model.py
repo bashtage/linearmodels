@@ -404,7 +404,7 @@ def test_gmm_cue_optimization_options(small_data):
     res_none = mod.fit(display=False)
     opt_options = dict(method="BFGS", options={"disp": False})
     res_bfgs = mod.fit(display=False, opt_options=opt_options)
-    opt_options = dict(method="L-BFGS-B", options={"disp": False})
+    opt_options = dict(method="L-BFGS-B")
     res_lbfgsb = mod.fit(display=False, opt_options=opt_options)
     assert res_none.iterations > 2
     assert res_bfgs.iterations > 2

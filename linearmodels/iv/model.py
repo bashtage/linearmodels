@@ -4,7 +4,7 @@ Instrumental variable estimators
 
 from __future__ import annotations
 
-from typing import Any, TypeVar, Union, cast
+from typing import Any, Callable, TypeVar, Union, cast
 import warnings
 
 from numpy import (
@@ -16,11 +16,14 @@ from numpy import (
     average,
     c_,
     column_stack,
+    dtype,
     eye,
+    float64,
     isscalar,
     logical_not,
     nan,
     nanmean,
+    ndarray,
     ones,
     sqrt,
     squeeze,
@@ -1511,7 +1514,7 @@ class IVGMMCUE(_IVGMMBase):
         x: linearmodels.typing.data.Float64Array,
         y: linearmodels.typing.data.Float64Array,
         z: linearmodels.typing.data.Float64Array,
-        display: bool = False,
+        display: int = 0,
         opt_options: dict[str, Any] | None = None,
     ) -> tuple[linearmodels.typing.data.Float64Array, int]:
         r"""
@@ -1525,8 +1528,8 @@ class IVGMMCUE(_IVGMMBase):
             Regressand matrix (nobs by 1)
         z : ndarray
             Instrument matrix (nobs by ninstr)
-        display : bool
-            Flag indicating whether to display iterative optimizer output
+        display : int
+            Number of iterations between displaying. Set to 0 to suppress output.
         opt_options : dict
             Dictionary containing additional keyword arguments to pass to
             scipy.optimize.minimize.
@@ -1549,12 +1552,34 @@ class IVGMMCUE(_IVGMMBase):
         if opt_options is None:
             opt_options = {}
         assert opt_options is not None
-        options = {"disp": display}
+        options = {}
         if "options" in opt_options:
             opt_options = opt_options.copy()
             options.update(opt_options.pop("options"))
 
-        res = minimize(self.j, starting, args=args, options=options, **opt_options)
+        def callback_factory(
+            _disp: int,
+        ) -> Callable[[ndarray[tuple[int], dtype[float64]]], None]:
+            d = {"iter": 0}
+
+            def _callback(params: ndarray[tuple[int], dtype[float64]]) -> None:
+                fval = self.j(params, *args)
+                if _disp > 0 and (d["iter"] % _disp == 0):
+                    print("Iteration: {}, Objective: {}".format(d["iter"], fval))
+                d["iter"] += 1
+
+            return _callback
+
+        callback = callback_factory(display)
+
+        res = minimize(
+            self.j,
+            starting,
+            args=args,
+            options=options,
+            callback=callback,
+            **opt_options,
+        )
 
         return res.x[:, None], res.nit
 
