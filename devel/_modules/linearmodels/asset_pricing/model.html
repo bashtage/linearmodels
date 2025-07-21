@@ -19,7 +19,7 @@
     
   
       
-        <title>linearmodels.asset_pricing.model - linearmodels v6.2 (+19)</title>
+        <title>linearmodels.asset_pricing.model - linearmodels v6.2 (+22)</title>
       
     
 
@@ -50,7 +50,7 @@
         <style>:root{--md-text-font:"Roboto";--md-code-font:"Roboto Mono"}</style>
       
     
-        <link rel="stylesheet" type="text/css" href="../../../_static/sphinx_immaterial_theme.96fe8683ff2bd71e9.min.css?v=13adf062" />
+        <link rel="stylesheet" type="text/css" href="../../../_static/sphinx_immaterial_theme.6ec1c446c2c357833.min.css?v=e2e8fea8" />
         <link rel="stylesheet" type="text/css" href="../../../_static/css/small_fixes.css?v=34934119" />
     <script>__md_scope=new URL("../../..",location),__md_hash=e=>[...e].reduce(((e,_)=>(e<<5)-e+_.charCodeAt(0)),0),__md_get=(e,_=localStorage,t=__md_scope)=>JSON.parse(_.getItem(t.pathname+"."+e)),__md_set=(e,_,t=localStorage,a=__md_scope)=>{try{t.setItem(a.pathname+"."+e,JSON.stringify(_))}catch(e){}}</script>
     
@@ -91,7 +91,7 @@
 
 <header class="md-header md-header--shadow" data-md-component="header">
   <nav class="md-header__inner md-grid" aria-label="Header">
-    <a href="../../../index.html" title="linearmodels v6.2 (+19)" class="md-header__button md-logo" aria-label="linearmodels v6.2 (+19)" data-md-component="logo">
+    <a href="../../../index.html" title="linearmodels v6.2 (+22)" class="md-header__button md-logo" aria-label="linearmodels v6.2 (+22)" data-md-component="logo">
       <img src="../../../_static/bw-logo.svg" alt="logo">
     </a>
     <label class="md-header__button md-icon" for="__drawer">
@@ -102,7 +102,7 @@
       <div class="md-header__ellipsis">
         <div class="md-header__topic">
           <span class="md-ellipsis">
-            linearmodels v6.2 (+19)
+            linearmodels v6.2 (+22)
           </span>
         </div>
         <div class="md-header__topic" data-md-component="header-topic">
@@ -197,10 +197,10 @@
 
 <nav class="md-nav md-nav--primary" aria-label="Navigation" data-md-level="0">
   <label class="md-nav__title" for="__drawer">
-    <a href="../../../index.html" title="linearmodels v6.2 (+19)" class="md-nav__button md-logo" aria-label="linearmodels v6.2 (+19)" data-md-component="logo">
+    <a href="../../../index.html" title="linearmodels v6.2 (+22)" class="md-nav__button md-logo" aria-label="linearmodels v6.2 (+22)" data-md-component="logo">
       <img src="../../../_static/bw-logo.svg" alt="logo">
     </a>
-    linearmodels v6.2 (+19)
+    linearmodels v6.2 (+22)
   </label>
   
     <div class="md-nav__source">
@@ -1533,7 +1533,7 @@
         <span class="c1"># 2. Step 1 using w = inv(s) from SV</span>
         <span class="n">callback</span> <span class="o">=</span> <span class="n">callback_factory</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_j</span><span class="p">,</span> <span class="n">args</span><span class="p">,</span> <span class="n">disp</span><span class="o">=</span><span class="n">disp</span><span class="p">)</span>
         <span class="n">_default_options</span><span class="p">:</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]</span> <span class="o">=</span> <span class="p">{</span><span class="s2">&quot;callback&quot;</span><span class="p">:</span> <span class="n">callback</span><span class="p">}</span>
-        <span class="n">options</span> <span class="o">=</span> <span class="p">{</span><span class="s2">&quot;disp&quot;</span><span class="p">:</span> <span class="nb">bool</span><span class="p">(</span><span class="n">disp</span><span class="p">),</span> <span class="s2">&quot;maxiter&quot;</span><span class="p">:</span> <span class="n">max_iter</span><span class="p">}</span>
+        <span class="n">options</span> <span class="o">=</span> <span class="p">{</span><span class="s2">&quot;maxiter&quot;</span><span class="p">:</span> <span class="n">max_iter</span><span class="p">}</span>
         <span class="n">opt_options</span> <span class="o">=</span> <span class="p">{}</span> <span class="k">if</span> <span class="n">opt_options</span> <span class="ow">is</span> <span class="kc">None</span> <span class="k">else</span> <span class="n">opt_options</span>
         <span class="n">options</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="n">opt_options</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;options&quot;</span><span class="p">,</span> <span class="p">{}))</span>
         <span class="n">_default_options</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="n">opt_options</span><span class="p">)</span>
@@ -1562,7 +1562,7 @@
                     <span class="n">params</span><span class="p">,</span>
                     <span class="n">args</span><span class="o">=</span><span class="n">args</span><span class="p">,</span>
                     <span class="n">callback</span><span class="o">=</span><span class="n">callback</span><span class="p">,</span>
-                    <span class="n">options</span><span class="o">=</span><span class="p">{</span><span class="s2">&quot;disp&quot;</span><span class="p">:</span> <span class="nb">bool</span><span class="p">(</span><span class="n">disp</span><span class="p">),</span> <span class="s2">&quot;maxiter&quot;</span><span class="p">:</span> <span class="n">max_iter</span><span class="p">},</span>
+                    <span class="n">options</span><span class="o">=</span><span class="p">{</span><span class="s2">&quot;maxiter&quot;</span><span class="p">:</span> <span class="n">max_iter</span><span class="p">},</span>
                 <span class="p">)</span>
                 <span class="n">params</span> <span class="o">=</span> <span class="n">opt_res</span><span class="o">.</span><span class="n">x</span>
                 <span class="n">obj</span> <span class="o">=</span> <span class="n">opt_res</span><span class="o">.</span><span class="n">fun</span>
@@ -1578,7 +1578,7 @@
                 <span class="n">params</span><span class="p">,</span>
                 <span class="n">args</span><span class="o">=</span><span class="n">cue_args</span><span class="p">,</span>
                 <span class="n">callback</span><span class="o">=</span><span class="n">callback</span><span class="p">,</span>
-                <span class="n">options</span><span class="o">=</span><span class="p">{</span><span class="s2">&quot;disp&quot;</span><span class="p">:</span> <span class="nb">bool</span><span class="p">(</span><span class="n">disp</span><span class="p">),</span> <span class="s2">&quot;maxiter&quot;</span><span class="p">:</span> <span class="n">max_iter</span><span class="p">},</span>
+                <span class="n">options</span><span class="o">=</span><span class="p">{</span><span class="s2">&quot;maxiter&quot;</span><span class="p">:</span> <span class="n">max_iter</span><span class="p">},</span>
             <span class="p">)</span>
             <span class="n">params</span> <span class="o">=</span> <span class="n">opt_res</span><span class="o">.</span><span class="n">x</span>
 
