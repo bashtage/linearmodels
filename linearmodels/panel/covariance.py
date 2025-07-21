@@ -5,6 +5,7 @@ from typing import Any, Union
 
 import numpy as np
 from numpy.linalg import inv
+import pandas
 from pandas import DataFrame, MultiIndex
 
 from linearmodels.iv.covariance import (
@@ -21,7 +22,7 @@ from linearmodels.shared.typed_getters import (
     get_float,
     get_string,
 )
-from linearmodels.typing import ArrayLike, Float64Array, IntArray
+import linearmodels.typing.data
 
 __all__ = [
     "HomoskedasticCovariance",
@@ -79,16 +80,17 @@ class HomoskedasticCovariance:
     where df is ``extra_df`` and n-df is replace by n-df-k if ``debiased`` is
     ``True``.
     """
+
     ALLOWED_KWARGS: tuple[str, ...] = tuple()
     DEFAULT_KERNEL = "newey-west"
 
     def __init__(
         self,
-        y: Float64Array,
-        x: Float64Array,
-        params: Float64Array,
-        entity_ids: IntArray | None,
-        time_ids: IntArray | None,
+        y: linearmodels.typing.data.Float64Array,
+        x: linearmodels.typing.data.Float64Array,
+        params: linearmodels.typing.data.Float64Array,
+        entity_ids: linearmodels.typing.data.IntArray | None,
+        time_ids: linearmodels.typing.data.IntArray | None,
         *,
         debiased: bool = False,
         extra_df: int = 0,
@@ -113,7 +115,7 @@ class HomoskedasticCovariance:
         return self._name
 
     @property
-    def eps(self) -> Float64Array:
+    def eps(self) -> linearmodels.typing.data.Float64Array:
         """Model residuals"""
         return self._y - self._x @ self._params
 
@@ -124,13 +126,13 @@ class HomoskedasticCovariance:
         return self._scale * float(np.squeeze(eps.T @ eps)) / self._nobs
 
     @cached_property
-    def cov(self) -> Float64Array:
+    def cov(self) -> linearmodels.typing.data.Float64Array:
         """Estimated covariance"""
         x = self._x
         out = self.s2 * inv(x.T @ x)
         return (out + out.T) / 2
 
-    def deferred_cov(self) -> Float64Array:
+    def deferred_cov(self) -> linearmodels.typing.data.Float64Array:
         """Covariance calculation deferred until executed"""
         return self.cov
 
@@ -184,11 +186,11 @@ class HeteroskedasticCovariance(HomoskedasticCovariance):
 
     def __init__(
         self,
-        y: Float64Array,
-        x: Float64Array,
-        params: Float64Array,
-        entity_ids: IntArray,
-        time_ids: IntArray,
+        y: linearmodels.typing.data.Float64Array,
+        x: linearmodels.typing.data.Float64Array,
+        params: linearmodels.typing.data.Float64Array,
+        entity_ids: linearmodels.typing.data.IntArray,
+        time_ids: linearmodels.typing.data.IntArray,
         *,
         debiased: bool = False,
         extra_df: int = 0,
@@ -199,7 +201,7 @@ class HeteroskedasticCovariance(HomoskedasticCovariance):
         self._name = "Robust"
 
     @cached_property
-    def cov(self) -> Float64Array:
+    def cov(self) -> linearmodels.typing.data.Float64Array:
         """Estimated covariance"""
         x = self._x
         nobs = x.shape[0]
@@ -270,21 +272,22 @@ class ClusteredCovariance(HomoskedasticCovariance):
     where g is the number of distinct groups and n is the number of
     observations.
     """
+
     ALLOWED_KWARGS = ("clusters", "group_debias", "cluster_entity", "cluster_time")
 
     def __init__(
         self,
-        y: Float64Array,
-        x: Float64Array,
-        params: Float64Array,
-        entity_ids: IntArray,
-        time_ids: IntArray,
+        y: linearmodels.typing.data.Float64Array,
+        x: linearmodels.typing.data.Float64Array,
+        params: linearmodels.typing.data.Float64Array,
+        entity_ids: linearmodels.typing.data.IntArray,
+        time_ids: linearmodels.typing.data.IntArray,
         *,
         debiased: bool = False,
         extra_df: int = 0,
         cluster_entity: bool = False,
         cluster_time: bool = False,
-        clusters: ArrayLike | None = None,
+        clusters: linearmodels.typing.data.ArrayLike | None = None,
         group_debias: bool = False,
     ) -> None:
         super().__init__(
@@ -307,7 +310,7 @@ class ClusteredCovariance(HomoskedasticCovariance):
         self._name = "Clustered"
 
     @cached_property
-    def cov(self) -> Float64Array:
+    def cov(self) -> linearmodels.typing.data.Float64Array:
         """Estimated covariance"""
         x = self._x
         nobs = x.shape[0]
@@ -404,16 +407,17 @@ class DriscollKraay(HomoskedasticCovariance):
     where df is ``extra_df`` and n-df is replace by n-df-k if ``debiased`` is
     ``True``. :math:`K(i, bw)` is the kernel weighting function.
     """
+
     ALLOWED_KWARGS = ("kernel", "bandwidth")
     # TODO: Test
 
     def __init__(
         self,
-        y: Float64Array,
-        x: Float64Array,
-        params: Float64Array,
-        entity_ids: IntArray,
-        time_ids: IntArray,
+        y: linearmodels.typing.data.Float64Array,
+        x: linearmodels.typing.data.Float64Array,
+        params: linearmodels.typing.data.Float64Array,
+        entity_ids: linearmodels.typing.data.IntArray,
+        time_ids: linearmodels.typing.data.IntArray,
         *,
         debiased: bool = False,
         extra_df: int = 0,
@@ -428,7 +432,7 @@ class DriscollKraay(HomoskedasticCovariance):
         self._bandwidth = bandwidth
 
     @cached_property
-    def cov(self) -> Float64Array:
+    def cov(self) -> linearmodels.typing.data.Float64Array:
         """Estimated covariance"""
         x = self._x
         nobs = x.shape[0]
@@ -521,16 +525,17 @@ class ACCovariance(HomoskedasticCovariance):
     where df is ``extra_df`` and n-df is replace by n-df-k if ``debiased`` is
     ``True``. :math:`K(i, bw)` is the kernel weighting function.
     """
+
     ALLOWED_KWARGS = ("kernel", "bandwidth")
     # TODO: Docstring
 
     def __init__(
         self,
-        y: Float64Array,
-        x: Float64Array,
-        params: Float64Array,
-        entity_ids: IntArray,
-        time_ids: IntArray,
+        y: linearmodels.typing.data.Float64Array,
+        x: linearmodels.typing.data.Float64Array,
+        params: linearmodels.typing.data.Float64Array,
+        entity_ids: linearmodels.typing.data.IntArray,
+        time_ids: linearmodels.typing.data.IntArray,
         *,
         debiased: bool = False,
         extra_df: int = 0,
@@ -544,13 +549,15 @@ class ACCovariance(HomoskedasticCovariance):
         self._kernel = kernel if kernel is not None else self.DEFAULT_KERNEL
         self._bandwidth = bandwidth
 
-    def _single_cov(self, xe: Float64Array, bw: float) -> Float64Array:
+    def _single_cov(
+        self, xe: linearmodels.typing.data.Float64Array, bw: float
+    ) -> linearmodels.typing.data.Float64Array:
         nobs = xe.shape[0]
         w = KERNEL_LOOKUP[self._kernel](bw, nobs - 1)
         return cov_kernel(xe, w)
 
     @cached_property
-    def cov(self) -> Float64Array:
+    def cov(self) -> linearmodels.typing.data.Float64Array:
         """Estimated covariance"""
         x = self._x
         nobs = x.shape[0]
@@ -667,10 +674,10 @@ class FamaMacBethCovariance(HomoskedasticCovariance):
 
     def __init__(
         self,
-        y: Float64Array,
-        x: Float64Array,
-        params: Float64Array,
-        all_params: DataFrame,
+        y: linearmodels.typing.data.Float64Array,
+        x: linearmodels.typing.data.Float64Array,
+        params: linearmodels.typing.data.Float64Array,
+        all_params: pandas.DataFrame,
         *,
         debiased: bool = False,
         bandwidth: float | None = None,
@@ -696,7 +703,7 @@ class FamaMacBethCovariance(HomoskedasticCovariance):
         return self._bandwidth
 
     @cached_property
-    def cov(self) -> Float64Array:
+    def cov(self) -> linearmodels.typing.data.Float64Array:
         """Estimated covariance"""
         e = np.asarray(self._all_params) - self._params.T
         e = e[np.all(np.isfinite(e), 1)]
@@ -724,11 +731,11 @@ class FamaMacBethCovariance(HomoskedasticCovariance):
 def setup_covariance_estimator(
     cov_estimators: CovarianceManager,
     cov_type: str,
-    y: Float64Array,
-    x: Float64Array,
-    params: Float64Array,
-    entity_ids: IntArray,
-    time_ids: IntArray,
+    y: linearmodels.typing.data.Float64Array,
+    x: linearmodels.typing.data.Float64Array,
+    params: linearmodels.typing.data.Float64Array,
+    entity_ids: linearmodels.typing.data.IntArray,
+    time_ids: linearmodels.typing.data.IntArray,
     *,
     debiased: bool = False,
     extra_df: int = 0,

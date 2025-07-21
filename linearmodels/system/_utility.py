@@ -2,14 +2,18 @@ from __future__ import annotations
 
 from typing import cast
 
+import numpy
 import numpy as np
 from numpy.linalg import inv, matrix_rank
+import pandas
 import pandas as pd
 
-from linearmodels.typing import ArraySequence, Float64Array
+import linearmodels.typing.data
 
 
-def blocked_column_product(x: ArraySequence, s: Float64Array) -> Float64Array:
+def blocked_column_product(
+    x: linearmodels.typing.ArraySequence, s: linearmodels.typing.data.Float64Array
+) -> linearmodels.typing.data.Float64Array:
     """
     Parameters
     ----------
@@ -34,7 +38,9 @@ def blocked_column_product(x: ArraySequence, s: Float64Array) -> Float64Array:
     return np.vstack(out)
 
 
-def blocked_diag_product(x: ArraySequence, s: Float64Array) -> Float64Array:
+def blocked_diag_product(
+    x: linearmodels.typing.ArraySequence, s: linearmodels.typing.data.Float64Array
+) -> linearmodels.typing.data.Float64Array:
     """
     Parameters
     ----------
@@ -61,7 +67,9 @@ def blocked_diag_product(x: ArraySequence, s: Float64Array) -> Float64Array:
     return np.vstack(out)
 
 
-def blocked_inner_prod(x: ArraySequence, s: Float64Array) -> Float64Array:
+def blocked_inner_prod(
+    x: linearmodels.typing.ArraySequence, s: linearmodels.typing.data.Float64Array
+) -> linearmodels.typing.data.Float64Array:
     r"""
     Parameters
     ----------
@@ -127,8 +135,10 @@ def blocked_inner_prod(x: ArraySequence, s: Float64Array) -> Float64Array:
 
 
 def blocked_cross_prod(
-    x: ArraySequence, z: ArraySequence, s: Float64Array
-) -> Float64Array:
+    x: linearmodels.typing.ArraySequence,
+    z: linearmodels.typing.ArraySequence,
+    s: linearmodels.typing.data.Float64Array,
+) -> linearmodels.typing.data.Float64Array:
     r"""
     Parameters
     ----------
@@ -165,7 +175,9 @@ def blocked_cross_prod(
     return np.concatenate(xp, 0)
 
 
-def blocked_full_inner_product(x: Float64Array, s: Float64Array) -> Float64Array:
+def blocked_full_inner_product(
+    x: linearmodels.typing.data.Float64Array, s: linearmodels.typing.data.Float64Array
+) -> linearmodels.typing.data.Float64Array:
     r"""
     Parameters
     ----------
@@ -193,7 +205,9 @@ def blocked_full_inner_product(x: Float64Array, s: Float64Array) -> Float64Array
     return x.T @ sx
 
 
-def inv_matrix_sqrt(s: Float64Array) -> Float64Array:
+def inv_matrix_sqrt(
+    s: linearmodels.typing.data.Float64Array,
+) -> linearmodels.typing.data.Float64Array:
     vecs, vals = np.linalg.eigh(s)
     vecs = 1.0 / np.sqrt(vecs)
     out = vals @ np.diag(vecs) @ vals.T
@@ -226,8 +240,8 @@ class LinearConstraint:
 
     def __init__(
         self,
-        r: pd.DataFrame | np.ndarray,
-        q: pd.Series | np.ndarray | None = None,
+        r: pandas.DataFrame | numpy.ndarray,
+        q: pandas.Series | numpy.ndarray | None = None,
         num_params: int | None = None,
         require_pandas: bool = True,
     ) -> None:
@@ -248,7 +262,8 @@ class LinearConstraint:
                 raise TypeError("q must be a Series or an array")
             if r.shape[0] != q.shape[0]:
                 raise ValueError("Constraint inputs are not shape compatible")
-            q_pd = pd.Series(q, index=r_pd.index)
+            q_pd = pd.Series(q)
+            q_pd.index = r_pd.index
         else:
             q_pd = pd.Series(np.zeros(r_pd.shape[0]), index=r_pd.index)
         self._q_pd = q_pd
@@ -293,16 +308,20 @@ class LinearConstraint:
         t, left = vecs[:, : k - c], vecs[:, k - c :]
         q = self._qa[:, None]
         a = q.T @ inv(left.T @ r.T) @ left.T
-        self._t, self._l, self._a = t, left, a
+        self._t, self._l, self._a = (
+            cast(linearmodels.typing.data.FloatArray2D, t),
+            cast(linearmodels.typing.data.FloatArray2D, left),
+            cast(linearmodels.typing.data.FloatArray2D, a),
+        )
         self._computed = True
 
     @property
-    def r(self) -> pd.DataFrame:
+    def r(self) -> pandas.DataFrame:
         """Constraint loading matrix"""
         return self._r_pd
 
     @property
-    def t(self) -> Float64Array:
+    def t(self) -> linearmodels.typing.data.Float64Array:
         """
         Constraint transformation matrix
 
@@ -321,7 +340,7 @@ class LinearConstraint:
         return self._t
 
     @property
-    def a(self) -> Float64Array:
+    def a(self) -> linearmodels.typing.data.Float64Array:
         r"""
         Transformed constraint target
 
@@ -352,6 +371,6 @@ class LinearConstraint:
         return self._a
 
     @property
-    def q(self) -> pd.Series | np.ndarray:
+    def q(self) -> pandas.Series | numpy.ndarray:
         """Constrain target values"""
         return self._q_pd

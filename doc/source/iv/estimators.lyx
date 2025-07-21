@@ -170,7 +170,7 @@ x_{2i} & =\underset{\textrm{exogenous}}{\underbrace{\gamma_{1}^{\prime}z_{1i}}}+
 The model can be expressed compactly 
 \begin_inset Formula 
 \begin{align*}
-Y & =X_{1}\beta_{1}+X_{2}\beta_{1}+\epsilon=X\beta+\epsilon\\
+Y & =X_{1}\beta_{1}+X_{2}\beta_{2}+\epsilon=X\beta+\epsilon\\
 X_{2} & =Z_{1}\gamma_{1}+Z_{2}\gamma_{2}+u=Z\gamma+u
 \end{align*}
 
@@ -218,7 +218,7 @@ The vector of instruments
 \begin_inset Formula $k$
 \end_inset
 
- matrix if regressors where row 
+ matrix of regressors where row
 \begin_inset Formula $i$
 \end_inset
 

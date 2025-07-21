@@ -1,8 +1,23 @@
-.. warning::
+Verison 5.5
+-----------
+- Full compatibility with NumPy 2, and NumPy 1.22.3+
+- Compatibility with future pandas releases (3.0.0)
 
-   Version 5.0 changes the sorting order for models created using formulas.
-   Variables will appear in results in the same order they are entered in
-   the formula string.
+Verison 5.4
+-----------
+- Compatibility with NumPy 2
+- Compatibility with recent pandas releases
+
+Version 5.3
+-----------
+- Bumped the minimum formulaic to 0.6.5.
+- Released wheels for Python 3.12.
+
+Version 5.2
+-----------
+* Fixed a bug that affected dropping absorbed regressors when using weights (:issue:`546`).
+* Improved the licensing information (:issue:`545`).
+* Improved compatibility with recent pandas (:issue:`548`).
 
 Version 5.1
 -----------
@@ -23,4 +38,4 @@ Version 5.0
 
 * Switched variable ordering by default.  Importing ``linearmodels.__future__.ordering``
   is a no-op, and has no effect.
-* Removed dependence on property-cached in favor of :meth:`functools.cached_property`.
+* Removed dependence on property-cached in favor of :class:`functools.cached_property`.

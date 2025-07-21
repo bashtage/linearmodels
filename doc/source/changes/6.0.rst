@@ -1,0 +1,27 @@
+Version 6.0
+-----------
+* Fixes for the removal of the ``.A`` shorthand for ``.toarray()`` for sparse arrays
+* Small doc fixes
+* Support Python 3.13
+
+Version 6.0
+-----------
+
+* Increased minimums:
+
+  - Python: 3.9
+  - formulaic: 1.0.0
+  - NumPy: 1.22.3
+  - SciPy: 1.8.0
+  - pandas: 1.4.0
+  - statsmodels: 0.13.0
+
+* The key feature of this release is compatibility with NumPy 2. linearmodels
+  wheels are built using NumPy 2.0.0rc1 (or later) and can run on any version
+  of NumPy 1.22.3 or later, including NumPy 2.0.0.
+* Improved compatibility with fuure changes in pandas 3.0.0.
+
+.. note::
+
+   In order to use NumPy 2, the environment must consist of packages
+   that have been built against NumPy 2.0.0rc1 or later.

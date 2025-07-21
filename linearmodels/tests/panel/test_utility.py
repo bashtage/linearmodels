@@ -1,5 +1,3 @@
-from __future__ import annotations
-
 import numpy as np
 from numpy.testing import assert_allclose, assert_array_equal
 import pandas as pd
@@ -204,7 +202,7 @@ def test_preconditioner_sparse():
     val_cond, cond = preconditioner(values, copy=True)
     assert_allclose(np.sqrt((values.multiply(values)).sum(0).A1), cond)
     assert id(val_cond) != id(values)
-    assert_array_equal(orig.A, values.A)
+    assert_array_equal(orig.toarray(), values.toarray())
 
 
 def test_preconditioner_subclass():
@@ -216,11 +214,11 @@ def test_preconditioner_subclass():
     values = values.view(SubArray)
     val_cond, cond = preconditioner(values, copy=True)
     assert_allclose(np.sqrt((values**2).sum(0)), cond)
-    assert type(val_cond) == type(values)
+    assert type(val_cond) is type(values)
     # Test in-place
     val_cond, cond = preconditioner(values, copy=False)
     assert_allclose(np.sqrt((values**2).sum(0)), np.ones(10))
-    assert type(val_cond) == type(values)
+    assert type(val_cond) is type(values)
 
 
 @pytest.mark.parametrize("missing", [0, 0.2])

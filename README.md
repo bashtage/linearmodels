@@ -4,7 +4,6 @@
 | :------------------------- | :------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | **Latest Release**         | [![PyPI version](https://badge.fury.io/py/linearmodels.svg)](https://badge.fury.io/py/linearmodels)                                                                                                                                                      |
 | **Continuous Integration** | [![Build Status](https://dev.azure.com/kevinksheppard/kevinksheppard/_apis/build/status/bashtage.linearmodels?branchName=main)](https://dev.azure.com/kevinksheppard/kevinksheppard/_build/latest?definitionId=2&branchName=main)                        |
-|                            | [![Build status](https://ci.appveyor.com/api/projects/status/7768doy6wrdunmdt/branch/main?svg=true)](https://ci.appveyor.com/project/bashtage/linearmodels/branch/main)                                                                                  |
 | **Coverage**               | [![codecov](https://codecov.io/gh/bashtage/linearmodels/branch/main/graph/badge.svg)](https://codecov.io/gh/bashtage/linearmodels)                                                                                                                       |
 | **Code Quality**           | [![Codacy Badge](https://api.codacy.com/project/badge/Grade/745a24a69cb2466b95df6a53c83892de)](https://www.codacy.com/manual/bashtage/linearmodels?utm_source=github.com&utm_medium=referral&utm_content=bashtage/linearmodels&utm_campaign=Badge_Grade) |
 |                            | [![codebeat badge](https://codebeat.co/badges/aaae2fb4-72b5-4a66-97cd-77b93488f243)](https://codebeat.co/projects/github-com-bashtage-linearmodels-main)                                                                                                 |
@@ -137,12 +136,14 @@ regression. Currently only the single variable IV estimators are polished.
 ### Running
 
 -   Python 3.9+
--   NumPy (1.19+)
--   SciPy (1.5+)
--   pandas (1.1+)
+-   NumPy (1.22+)
+-   SciPy (1.8+)
+-   pandas (1.4+)
 -   statsmodels (0.12+)
+-   formulaic (1.0.0+)
 -   xarray (0.16+, optional)
--   Cython (0.29.34+, optional)
+-   Cython (3.0.10+, optional)
+
 
 ### Testing
 

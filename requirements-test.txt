@@ -1,11 +1,13 @@
-black[jupyter]==23.3.0
+black[jupyter]==24.4.0
 coverage
 flake8
 isort
+colorama
 matplotlib
-pytest>=7.0,<7.1
+pytest>=7.3.0,<8
 pytest-xdist
 pytest-cov
 seaborn
 xarray>=0.13
 wheel
+pyarrow

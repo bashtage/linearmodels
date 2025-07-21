@@ -1,18 +1,20 @@
 """
 Covariance and weight estimation for GMM IV estimators
 """
+
 from __future__ import annotations
 
 from collections.abc import Sequence
 from typing import cast
 
+import numpy
 from numpy import array, empty, ndarray, repeat, sqrt, zeros_like
 
 from linearmodels.asset_pricing.covariance import _HACMixin
 from linearmodels.iv.covariance import kernel_optimal_bandwidth
 from linearmodels.shared.utility import AttrDict
 from linearmodels.system._utility import blocked_inner_prod
-from linearmodels.typing import Float64Array
+import linearmodels.typing.data
 
 
 class HomoskedasticWeightMatrix:
@@ -65,7 +67,11 @@ class HomoskedasticWeightMatrix:
     def _str_extra(self) -> AttrDict:
         return AttrDict(Debiased=self._debiased, Center=self._center)
 
-    def sigma(self, eps: Float64Array, x: Sequence[Float64Array]) -> Float64Array:
+    def sigma(
+        self,
+        eps: linearmodels.typing.data.Float64Array,
+        x: Sequence[linearmodels.typing.data.Float64Array],
+    ) -> linearmodels.typing.data.Float64Array:
         """
         Estimate residual covariance.
 
@@ -95,12 +101,12 @@ class HomoskedasticWeightMatrix:
 
     def weight_matrix(
         self,
-        x: Sequence[Float64Array],
-        z: Sequence[Float64Array],
-        eps: Float64Array,
+        x: Sequence[linearmodels.typing.data.Float64Array],
+        z: Sequence[linearmodels.typing.data.Float64Array],
+        eps: linearmodels.typing.data.Float64Array,
         *,
-        sigma: ndarray,
-    ) -> Float64Array:
+        sigma: numpy.ndarray,
+    ) -> linearmodels.typing.data.Float64Array:
         """
         Construct a GMM weight matrix for a model.
 
@@ -171,12 +177,12 @@ class HeteroskedasticWeightMatrix(HomoskedasticWeightMatrix):
 
     def weight_matrix(
         self,
-        x: Sequence[Float64Array],
-        z: Sequence[Float64Array],
-        eps: Float64Array,
+        x: Sequence[linearmodels.typing.data.Float64Array],
+        z: Sequence[linearmodels.typing.data.Float64Array],
+        eps: linearmodels.typing.data.Float64Array,
         *,
-        sigma: ndarray | None = None,
-    ) -> Float64Array:
+        sigma: numpy.ndarray | None = None,
+    ) -> linearmodels.typing.data.Float64Array:
         """
         Construct a GMM weight matrix for a model.
 
@@ -215,14 +221,17 @@ class HeteroskedasticWeightMatrix(HomoskedasticWeightMatrix):
         return w
 
     def _debias_scale(
-        self, nobs: int, x: Sequence[Float64Array], z: Sequence[Float64Array]
-    ) -> Float64Array:
+        self,
+        nobs: int,
+        x: Sequence[linearmodels.typing.data.Float64Array],
+        z: Sequence[linearmodels.typing.data.Float64Array],
+    ) -> linearmodels.typing.data.Float64Array:
         nvar = array([a.shape[1] for a in x])
         ninstr = array([a.shape[1] for a in z])
         nvar = repeat(nvar, ninstr)
         if not self._debiased:
             nvar = zeros_like(nvar)
-        nvar = cast(Float64Array, sqrt(nvar))[:, None]
+        nvar = cast(linearmodels.typing.data.Float64Array, sqrt(nvar))[:, None]
         scale = nobs / (nobs - nvar @ nvar.T)
         return scale
 
@@ -289,12 +298,12 @@ class KernelWeightMatrix(HeteroskedasticWeightMatrix, _HACMixin):
 
     def weight_matrix(
         self,
-        x: Sequence[Float64Array],
-        z: Sequence[Float64Array],
-        eps: Float64Array,
+        x: Sequence[linearmodels.typing.data.Float64Array],
+        z: Sequence[linearmodels.typing.data.Float64Array],
+        eps: linearmodels.typing.data.Float64Array,
         *,
-        sigma: ndarray | None = None,
-    ) -> Float64Array:
+        sigma: numpy.ndarray | None = None,
+    ) -> linearmodels.typing.data.Float64Array:
         """
         Construct a GMM weight matrix for a model.
 
@@ -333,7 +342,9 @@ class KernelWeightMatrix(HeteroskedasticWeightMatrix, _HACMixin):
 
         return w
 
-    def _optimal_bandwidth(self, moments: Float64Array) -> float:
+    def _optimal_bandwidth(
+        self, moments: linearmodels.typing.data.Float64Array
+    ) -> float:
         """Compute optimal bandwidth used in estimation if needed"""
         if self._predefined_bw is not None:
             return self._predefined_bw

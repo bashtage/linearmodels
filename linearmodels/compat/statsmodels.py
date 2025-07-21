@@ -1,6 +1,4 @@
-from __future__ import annotations
-
-from statsmodels.iolib import summary, summary2
+from statsmodels.iolib import summary
 
 
 class Summary(summary.Summary):

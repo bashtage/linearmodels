@@ -10,7 +10,6 @@
 import glob
 import hashlib
 import os
-from typing import Dict, List
 
 from packaging.version import parse
 
@@ -24,6 +23,15 @@ author = "Kevin Sheppard"
 
 # More warnings
 nitpicky = True
+nitpick_ignore = []
+
+with open("nitpick-exceptions") as nitpick_ex:
+    for line in nitpick_ex:
+        if line.strip() == "" or line.startswith("#"):
+            continue
+        dtype, target = line.split(None, 1)
+        target = target.strip()
+        nitpick_ignore.append((dtype, target))
 
 # The short X.Y version
 full_version = parse(linearmodels.__version__)
@@ -43,6 +51,7 @@ else:
 # extensions coming with Sphinx (named 'sphinx.ext.*') or your custom
 # ones.
 extensions = [
+    "sphinx.ext.napoleon",
     "sphinx.ext.autodoc",
     "sphinx.ext.autosummary",
     "sphinx.ext.extlinks",
@@ -54,9 +63,6 @@ extensions = [
     "sphinx.ext.coverage",
     "sphinx.ext.ifconfig",
     "sphinx.ext.githubpages",
-    # "numpydoc",
-    "sphinx.ext.napoleon",
-    "sphinx_autodoc_typehints",
     "IPython.sphinxext.ipython_console_highlighting",
     "IPython.sphinxext.ipython_directive",
     "nbsphinx",
@@ -108,7 +114,7 @@ templates_path = ["_templates"]
 # You can specify multiple suffix as a list of string:
 #
 # source_suffix = [".rst", ".md"]
-source_suffix = ".rst"
+source_suffix = {".rst": "restructuredtext"}
 
 # The master toctree document.
 master_doc = "index"
@@ -123,7 +129,7 @@ language = "en"
 # List of patterns, relative to source directory, that match files and
 # directories to ignore when looking for source files.
 # This pattern also affects html_static_path and html_extra_path.
-# exclude_patterns: list[str] = []
+exclude_patterns: list[str] = []
 
 # The name of the Pygments (syntax highlighting) style to use.
 pygments_style = "colorful"
@@ -147,7 +153,6 @@ html_theme_options = {
     "site_url": "https://bashtage.github.io/linearmodels/",
     "repo_url": "https://github.com/bashtage/linearmodels/",
     "repo_name": "linearmodels",
-    "repo_type": "github",
     "palette": {"primary": "blue", "accent": "orange"},
     "globaltoc_collapse": True,
     "toc_title": "Contents",
@@ -271,15 +276,13 @@ texinfo_documents = [
 
 # Example configuration for intersphinx: refer to the Python standard library.
 intersphinx_mapping = {
-    "statsmodels": ("https://www.statsmodels.org/dev/", None),
-    "matplotlib": ("https://matplotlib.org/stable/", None),
-    "scipy": ("https://docs.scipy.org/doc/scipy/", None),
-    "python": ("https://docs.python.org/3/", None),
-    "numpy": ("https://numpy.org/doc/stable/", None),
-    "np": ("https://numpy.org/doc/stable/", None),
-    "pandas": ("https://pandas.pydata.org/pandas-docs/stable/", None),
-    "pd": ("https://pandas.pydata.org/pandas-docs/stable/", None),
-    "xarray": ("https://docs.xarray.dev/en/stable/", None),
+    "statsmodels": ("https://www.statsmodels.org/dev", None),
+    "matplotlib": ("https://matplotlib.org/stable", None),
+    "scipy": ("https://docs.scipy.org/doc/scipy", None),
+    "python": ("https://docs.python.org/3", None),
+    "numpy": ("https://numpy.org/doc/stable", None),
+    "pandas": ("https://pandas.pydata.org/pandas-docs/stable", None),
+    "xarray": ("https://docs.xarray.dev/en/stable", None),
 }
 
 extlinks = {"issue": ("https://github.com/bashtage/linearmodels/issues/%s", "GH%s")}
@@ -300,6 +303,62 @@ x = panel_data.x1
 napoleon_use_admonition_for_examples = False
 napoleon_use_admonition_for_notes = False
 napoleon_use_admonition_for_references = False
+napoleon_preprocess_types = True
+napoleon_use_param = True
+napoleon_type_aliases = {
+    "array-like": ":term:`array-like <array_like>`",
+    "array_like": ":term:`array_like`",
+    "Figure": "matplotlib.figure.Figure",
+    "Axes": "matplotlib.axes.Axes",
+    "AxesSubplot": "matplotlib.axes.Axes",
+    "DataFrame": "pandas.DataFrame",
+    "Series": "pandas.Series",
+    "BetweenOLS": "linearmodels.panel.model.BetweenOLS",
+    "FamaMacBeth": "linearmodels.panel.model.FamaMacBeth",
+    "FirstDifferenceOLS": "linearmodels.panel.model.FirstDifferenceOLS",
+    "IV2SLS": "linearmodels.iv.model.IV2SLS",
+    "IV3SLS": "linearmodels.system.model.IV3SLS",
+    "IVGMM": "linearmodels.iv.model.IVGMM",
+    "IVGMMCUE": "linearmodels.iv.model.IVGMMCUE",
+    "IVLIML": "linearmodels.iv.model.IVLIML",
+    "IVSystemGMM": "linearmodels.system.model.IVSystemGMM",
+    "LinearFactorModel": "linearmodels.asset_pricing.model.LinearFactorModel",
+    "LinearFactorModelGMM": "linearmodels.asset_pricing.model.LinearFactorModelGMM",
+    "OLS": "linearmodels.iv.model.OLS",
+    "PanelOLS": "linearmodels.panel.model.PanelOLS",
+    "PooledOLS": "linearmodels.panel.model.PooledOLS",
+    "RandomEffects": "linearmodels.panel.model.RandomEffects",
+    "SUR": "linearmodels.system.model.SUR",
+    "TradedFactorModel": "linearmodels.asset_pricing.model.TradedFactorModel",
+    "AbsorbingLSResults": "linearmodels.iv.absorbing.AbsorbingLSResults",
+    "FirstStageResults": "linearmodels.iv.results.FirstStageResults",
+    "IVGMMResults": "linearmodels.iv.results.IVGMMResults",
+    "IVModelComparison": "linearmodels.iv.results.IVModelComparison",
+    "IVResults": "linearmodels.iv.results.IVResults",
+    "InvalidTestStatistic": "linearmodels.shared.InvalidTestStatistic",
+    "OLSResults": "linearmodels.iv.results.OLSResults",
+    "WaldTestStatistic": "linearmodels.shared.hypotheses.WaldTestStatistic",
+    "LinearConstraint": "linearmodels.system.model.LinearConstraint",
+    "PanelEffectsResults": "linearmodels.panel.results.PanelEffectsResults",
+    "PanelModelComparison": "linearmodels.panel.results.PanelModelComparison",
+    "PanelResults": "linearmodels.panel.results.PanelResults",
+    "RandomEffectsResults": "linearmodels.panel.results.RandomEffectsResults",
+    "GMMSystemResults": "linearmodels.system.results.GMMSystemResults",
+    "Summary": "linearmodels.compat.statsmodels.Summary",
+    "SystemEquationResult": "linearmodels.system.results.SystemEquationResult",
+    "SystemResults": "linearmodels.system.results.SystemResults",
+    "GMMFactorModelResults": "linearmodels.asset_pricing.results.GMMFactorModelResults",
+    "LinearFactorModelResults": "linearmodels.asset_pricing.results.LinearFactorModelResults",
+    "PanelData": "linearmodels.panel.data.PanelData",
+    "IVData": "linearmodels.iv.data.IVData",
+    "AttrDict": "linearmodels.shared.utility.AttrDict",
+    "csc_matrix": "scipy.sparse.csc_matrix",
+    "DataArray": "xarray.DataArray",
+    "PanelModelData": "linearmodels.panel.utility.PanelModelData",
+    "ndarray": "numpy.ndarray",
+    "np.ndarray": "numpy.array",
+    "pd.Series": "pandas.Series",
+}
 
 # Create xrefs
 numpydoc_use_autodoc_signature = True
@@ -360,3 +419,9 @@ numpydoc_xref_aliases = {
 
 autosummary_generate = True
 autoclass_content = "class"
+
+autodoc_type_aliases = {
+    "ArrayLike": "linearmodels.typing.data.ArrayLike",
+    "IntArray": "linearmodels.typing.data.IntArray",
+    "Float64Array": "linearmodels.typing.data.Float64Array",
+}

@@ -7,7 +7,7 @@ import numpy as np
 from pandas import Series
 from scipy.stats import chi2, f
 
-from linearmodels.typing import ArrayLike
+import linearmodels.typing.data
 
 
 class WaldTestStatistic:
@@ -117,13 +117,13 @@ class InvalidTestStatistic(WaldTestStatistic):
 
     def __init__(self, reason: str, *, name: str | None = None) -> None:
         self._reason = reason
-        super().__init__(np.NaN, "", df=1, df_denom=1, name=name)
+        super().__init__(np.nan, "", df=1, df_denom=1, name=name)
         self.dist_name = "None"
 
     @property
     def pval(self) -> float:
-        """Always returns np.NaN"""
-        return np.NaN
+        """Always returns np.nan"""
+        return np.nan
 
     @property
     def critical_values(self) -> None:
@@ -158,13 +158,13 @@ class InapplicableTestStatistic(WaldTestStatistic):
         if reason is None:
             self._reason = "Test is not applicable to model specification"
 
-        super().__init__(np.NaN, "", df=1, df_denom=1, name=name)
+        super().__init__(np.nan, "", df=1, df_denom=1, name=name)
         self.dist_name = "None"
 
     @property
     def pval(self) -> float:
-        """Always returns np.NaN"""
-        return np.NaN
+        """Always returns np.nan"""
+        return np.nan
 
     @property
     def critical_values(self) -> None:
@@ -198,7 +198,7 @@ def _parse_single(constraint: str) -> tuple[str, float]:
 
 
 def _reparse_constraint_formula(
-    formula: str | list[str] | dict[str, float]
+    formula: str | list[str] | dict[str, float],
 ) -> str | dict[str, float]:
     # TODO: Test against variable names constaining , or =
     if isinstance(formula, Mapping):
@@ -216,10 +216,10 @@ def _reparse_constraint_formula(
 
 
 def quadratic_form_test(
-    params: ArrayLike,
-    cov: ArrayLike,
-    restriction: ArrayLike | None = None,
-    value: ArrayLike | None = None,
+    params: linearmodels.typing.data.ArrayLike,
+    cov: linearmodels.typing.data.ArrayLike,
+    restriction: linearmodels.typing.data.ArrayLike | None = None,
+    value: linearmodels.typing.data.ArrayLike | None = None,
     formula: str | list[str] | dict[str, float] | None = None,
 ) -> WaldTestStatistic:
     if formula is not None and restriction is not None:

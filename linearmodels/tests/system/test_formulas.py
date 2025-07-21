@@ -205,6 +205,7 @@ def test_formula_escaped(config):
     escaped_fmla = fix_formula(fmla)
     data = joined.copy()
     data.columns = cols
+
     mod = model.from_formula(escaped_fmla, data)
     pmod = pickle.loads(pickle.dumps(mod))
     mod_fmla = interface(escaped_fmla, data)

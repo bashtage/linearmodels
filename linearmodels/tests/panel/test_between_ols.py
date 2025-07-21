@@ -274,7 +274,8 @@ def test_2way_cluster(data):
     clusters.loc[:, :] = 0
     clusters = clusters.astype(np.int32)
     for entity in mod.dependent.entities:
-        clusters.loc[entity, :] = np.random.randint(33, size=(1, 2))
+        locations = np.random.randint(33, size=(1, 2))
+        clusters.loc[entity] = locations.astype(clusters.dtypes.iloc[0])
 
     res = mod.fit(cov_type="clustered", clusters=clusters, debiased=False)
 
@@ -348,7 +349,10 @@ def test_fitted_effects_residuals(both_data_types):
     assert_frame_similar(res.estimated_effects, expected)
 
     fitted_effects = res.fitted_values.values + res.estimated_effects.values
-    expected.iloc[:, 0] = mod.dependent.values2d - fitted_effects
+    idiosyncratic = pd.DataFrame(
+        mod.dependent.values2d - fitted_effects, index=expected.index
+    )
+    expected.iloc[:, 0] = idiosyncratic.iloc[:, 0]
     expected.columns = ["idiosyncratic"]
     assert_allclose(expected, res.idiosyncratic, atol=1e-8)
     assert_frame_similar(res.idiosyncratic, expected)

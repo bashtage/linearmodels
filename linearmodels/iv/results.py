@@ -1,6 +1,7 @@
 """
 Results containers and post-estimation diagnostics for IV models
 """
+
 from __future__ import annotations
 
 from linearmodels.compat.statsmodels import Summary, Summary2
@@ -10,6 +11,7 @@ import datetime as dt
 from functools import cached_property
 from typing import Any, Union
 
+import numpy
 from numpy import (
     array,
     asarray,
@@ -24,6 +26,7 @@ from numpy import (
     squeeze,
 )
 from numpy.linalg import inv
+import pandas
 from pandas import DataFrame, Series, concat, to_numeric
 import scipy.stats as stats
 from statsmodels.iolib.summary import SimpleTable, fmt_2cols, fmt_params
@@ -39,7 +42,7 @@ from linearmodels.shared.hypotheses import (
     quadratic_form_test,
 )
 from linearmodels.shared.io import _str, add_star, pval_format
-from linearmodels.typing import ArrayLike, Float64Array
+import linearmodels.typing.data
 
 
 def stub_concat(
@@ -411,8 +414,8 @@ class _LSModelResultsBase(_SummaryStr):
 
     def wald_test(
         self,
-        restriction: DataFrame | ndarray | None = None,
-        value: Series | ndarray | None = None,
+        restriction: pandas.DataFrame | numpy.ndarray | None = None,
+        value: pandas.Series | numpy.ndarray | None = None,
         *,
         formula: str | list[str] | dict[str, float] | None = None,
     ) -> WaldTestStatistic:
@@ -507,9 +510,9 @@ class OLSResults(_LSModelResultsBase):
 
     def _out_of_sample(
         self,
-        exog: ArrayLike | None,
-        endog: ArrayLike | None,
-        data: ArrayLike | None,
+        exog: linearmodels.typing.data.ArrayLike | None,
+        endog: linearmodels.typing.data.ArrayLike | None,
+        data: linearmodels.typing.data.ArrayLike | None,
         missing: bool | None,
     ) -> DataFrame:
         """Interface between model predict and predict for OOS fits"""
@@ -520,15 +523,15 @@ class OLSResults(_LSModelResultsBase):
             )
         pred = self.model.predict(self.params, exog=exog, endog=endog, data=data)
         if not missing:
-            pred = pred.loc[pred.notnull().all(1)]
+            pred = pred.loc[pred.notnull().all(axis=1)]
         return pred
 
     def predict(
         self,
-        exog: ArrayLike | None = None,
-        endog: ArrayLike | None = None,
+        exog: linearmodels.typing.data.ArrayLike | None = None,
+        endog: linearmodels.typing.data.ArrayLike | None = None,
         *,
-        data: DataFrame | None = None,
+        data: pandas.DataFrame | None = None,
         fitted: bool = True,
         idiosyncratic: bool = False,
         missing: bool = False,
@@ -635,7 +638,7 @@ class AbsorbingLSResults(_LSModelResultsBase):
             ("P-value (F-stat):", pval_format(self.f_statistic.pval)),
             ("Distribution:", str(self.f_statistic.dist_name)),
             ("R-squared (No Effects):", _str(round(self.absorbed_rsquared, 5))),
-            ("Varaibles Absorbed:", _str(self.df_absorbed)),
+            ("Variables Absorbed:", _str(self.df_absorbed)),
         ]
 
     @property
@@ -712,9 +715,9 @@ class FirstStageResults(_SummaryStr):
 
         endog, exog, instr, weights = self.endog, self.exog, self.instr, self.weights
         w = sqrt(weights.ndarray)
-        z = w * instr.ndarray
+        z = w * instr.ndarray.astype(float, copy=False)
         nz = z.shape[1]
-        x = w * exog.ndarray
+        x = w * exog.ndarray.astype(float, copy=False)
         ez = annihilate(z, x)
         individual_results = self.individual
         out_df = DataFrame(
@@ -769,7 +772,11 @@ class FirstStageResults(_SummaryStr):
         ]
         out_df = out_df[cols]
         for col in out_df:
-            out_df[col] = to_numeric(out_df[col], errors="ignore")
+            try:
+                out_df[col] = to_numeric(out_df[col])
+            except ValueError:
+                # If an error is raised, ignore and keep the column
+                pass
 
         return out_df
 
@@ -1411,7 +1418,7 @@ class IVGMMResults(_CommonIVResults):
         self._j_stat = results["j_stat"]
 
     @property
-    def weight_matrix(self) -> Float64Array:
+    def weight_matrix(self) -> linearmodels.typing.data.Float64Array:
         """Weight matrix used in the final-step GMM estimation"""
         return self._weight_mat
 

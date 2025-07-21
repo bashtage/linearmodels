@@ -11,6 +11,7 @@ set SOURCEDIR=source
 set BUILDDIR=build
 set SPHINXPROJ=linearmodels
 set SPHINXOPTS=
+set PYDEVD_DISABLE_FILE_VALIDATION=1
 
 if "%1" == "" goto help
 
@@ -23,15 +24,18 @@ if errorlevel 9009 (
 	echo.may add the Sphinx directory to PATH.
 	echo.
 	echo.If you don't have Sphinx installed, grab it from
-	echo.http://sphinx-doc.org/
+	echo.https://sphinx-doc.org/
+	set PYDEVD_DISABLE_FILE_VALIDATION=
 	exit /b 1
 )
 
 %SPHINXBUILD% -M %1 %SOURCEDIR% %BUILDDIR% %SPHINXOPTS%
+set PYDEVD_DISABLE_FILE_VALIDATION=
 goto end
 
 :help
 %SPHINXBUILD% -M help %SOURCEDIR% %BUILDDIR% %SPHINXOPTS%
+set PYDEVD_DISABLE_FILE_VALIDATION=
 
 :end
 popd

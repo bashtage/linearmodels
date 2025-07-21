@@ -1,10 +1,9 @@
 from setuptools import Extension, find_namespace_packages, setup
 from setuptools.dist import Distribution
+from setuptools.errors import CCompilerError, ExecError, PlatformError
 
-from distutils.errors import CCompilerError, DistutilsExecError, DistutilsPlatformError
 import glob
 import os
-from typing import Dict
 
 try:
     from Cython.Build import cythonize
@@ -81,7 +80,8 @@ def run_setup(binary: bool = True) -> None:
         license="NCSA",
         description="Linear Panel, Instrumental Variable, Asset Pricing, and System "
         "Regression models for Python",
-        packages=find_namespace_packages(),
+        packages=["linearmodels"]
+        + [f"linearmodels.{v}" for v in find_namespace_packages("linearmodels")],
         package_dir={"linearmodels": "./linearmodels"},
         author="Kevin Sheppard",
         author_email="kevin.k.sheppard@gmail.com",
@@ -115,7 +115,8 @@ def run_setup(binary: bool = True) -> None:
             "Programming Language :: Python :: 3.9",
             "Programming Language :: Python :: 3.10",
             "Programming Language :: Python :: 3.11",
-            "License :: OSI Approved",
+            "Programming Language :: Python :: 3.12",
+            "License :: OSI Approved :: University of Illinois/NCSA Open Source License",
             "Operating System :: MacOS :: MacOS X",
             "Operating System :: Microsoft :: Windows",
             "Operating System :: POSIX",
@@ -134,8 +135,8 @@ try:
     run_setup(binary=build_binary)
 except (
     CCompilerError,
-    DistutilsExecError,
-    DistutilsPlatformError,
+    ExecError,
+    PlatformError,
     OSError,
     ValueError,
     ImportError,

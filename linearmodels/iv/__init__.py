@@ -1,6 +1,6 @@
-from linearmodels.iv.absorbing import AbsorbingLS, Interaction
-from linearmodels.iv.model import IV2SLS, IVGMM, IVGMMCUE, IVLIML
-from linearmodels.iv.results import compare
+from linearmodels.iv.absorbing import AbsorbingLS, Interaction  # flake8: noqa
+from linearmodels.iv.model import IV2SLS, IVGMM, IVGMMCUE, IVLIML  # flake8: noqa
+from linearmodels.iv.results import compare  # flake8: noqa
 
 __all__ = [
     "IV2SLS",

@@ -13,6 +13,7 @@ from collections.abc import (
 from typing import Any, Callable, Protocol, TypeVar, cast
 
 import numpy as np
+import pandas
 from pandas import DataFrame, Index, MultiIndex, Series
 
 from linearmodels.typing import AnyArray, Label
@@ -23,11 +24,9 @@ _VT_co = TypeVar("_VT_co", covariant=True)
 
 
 class SupportsKeysAndGetItem(Protocol[_KT, _VT_co]):
-    def keys(self) -> Iterable[_KT]:
-        ...
+    def keys(self) -> Iterable[_KT]: ...  # noqa: E704
 
-    def __getitem__(self, __k: _KT) -> _VT_co:
-        ...
+    def __getitem__(self, __k: _KT) -> _VT_co: ...  # noqa: E704
 
 
 def _new_attr_dict_(*args: Iterable[tuple[Any, Any]]) -> AttrDict:
@@ -145,7 +144,9 @@ class AttrDict(MutableMapping):
         return self.__private_dict__.__iter__()
 
 
-def ensure_unique_column(col_name: str, df: DataFrame, addition: str = "_") -> str:
+def ensure_unique_column(
+    col_name: str, df: pandas.DataFrame, addition: str = "_"
+) -> str:
     while col_name in df:
         col_name = addition + col_name + addition
     return col_name

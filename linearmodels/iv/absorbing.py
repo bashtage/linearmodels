@@ -2,7 +2,8 @@ from __future__ import annotations
 
 from collections import defaultdict
 from collections.abc import Hashable, Iterable
-from typing import Any, DefaultDict, TypeVar, Union, cast
+import hashlib
+from typing import Any, DefaultDict, Union, cast
 import warnings
 
 from numpy import (
@@ -30,6 +31,7 @@ from numpy import (
     zeros,
 )
 from numpy.linalg import lstsq
+import pandas
 from pandas import Categorical, CategoricalDtype, DataFrame, Series
 import scipy.sparse as sp
 from scipy.sparse.linalg import lsmr
@@ -55,26 +57,45 @@ from linearmodels.panel.utility import (
 from linearmodels.shared.exceptions import missing_warning
 from linearmodels.shared.hypotheses import InvalidTestStatistic, WaldTestStatistic
 from linearmodels.shared.utility import DataFrameWrapper, SeriesWrapper
-from linearmodels.typing import AnyPandas, BoolArray, Float64Array
-from linearmodels.typing.data import ArrayLike
+import linearmodels.typing.data
 
+HAVE_XXHASH = False
 try:
-    from xxhash import xxh64 as hash_func
-except ImportError:
-    from hashlib import sha256 as hash_func
+    from xxhash import xxh64
 
-Hasher = TypeVar("Hasher", bound=hash_func)
+    HAVE_XXHASH = True
+except ImportError:
+    pass
+
+
+class Hasher:
+    def __init__(self) -> None:
+        self._hasher: hashlib._Hash | xxh64
+        if HAVE_XXHASH:
+            self._hasher = xxh64()
+            self._use_xxh64 = True
+        else:
+            self._hasher = hashlib.sha256()
+            self._use_xxh64 = False
+
+    def reset(self):
+        if self._use_xxh64:
+            assert isinstance(self._hasher, xxh64)
+            self._hasher.reset()
+        else:
+            self._hasher = hashlib.sha256()
+
+    def update(self, data: memoryview) -> None:
+        self._hasher.update(data)
+
+    def digest(self) -> bytes:
+        return self._hasher.digest()
+
+    def hexdigest(self) -> str:
+        return self._hasher.hexdigest()
 
 
 _VARIABLE_CACHE: DefaultDict[Hashable, dict[str, ndarray]] = defaultdict(dict)
-
-
-def _reset(hasher: Hasher) -> Hasher:
-    try:
-        hasher.reset()
-        return hasher
-    except AttributeError:
-        return hash_func()
 
 
 def clear_cache() -> None:
@@ -84,11 +105,13 @@ def clear_cache() -> None:
 
 def lsmr_annihilate(
     x: sp.csc_matrix,
-    y: Float64Array,
+    y: linearmodels.typing.data.Float64Array,
     use_cache: bool = True,
     x_hash: Hashable | None = None,
-    **lsmr_options: bool | float | str | ArrayLike | None | dict[str, Any],
-) -> Float64Array:
+    **lsmr_options: (
+        bool | float | str | linearmodels.typing.data.ArrayLike | None | dict[str, Any]
+    ),
+) -> linearmodels.typing.data.Float64Array:
     r"""
     Removes projection of x on y from y
 
@@ -126,7 +149,8 @@ def lsmr_annihilate(
     use_cache = use_cache and x_hash is not None
     regressor_hash = x_hash if x_hash is not None else ""
     default_opts: dict[
-        str, bool | float | str | ArrayLike | None | dict[str, Any]
+        str,
+        bool | float | str | linearmodels.typing.data.ArrayLike | None | dict[str, Any],
     ] = dict(atol=1e-8, btol=1e-8, show=False)
     assert lsmr_options is not None
     default_opts.update(lsmr_options)
@@ -136,21 +160,21 @@ def lsmr_annihilate(
 
         variable_digest = ""
         if use_cache:
-            hasher = hash_func()
-            hasher.update(ascontiguousarray(_y.data))
+            hasher = Hasher()
+            hasher.update(memoryview(ascontiguousarray(_y.data)))
             variable_digest = hasher.hexdigest()
 
         if use_cache and variable_digest in _VARIABLE_CACHE[regressor_hash]:
             resid = _VARIABLE_CACHE[regressor_hash][variable_digest]
         else:
             beta = lsmr(x, _y, **default_opts)[0]
-            resid = y[:, i : i + 1] - (x.dot(sp.csc_matrix(beta[:, None]))).A
+            resid = y[:, i : i + 1] - x.dot(sp.csc_matrix(beta[:, None])).toarray()
             _VARIABLE_CACHE[regressor_hash][variable_digest] = resid
         resids.append(resid)
     return column_stack(resids)
 
 
-def category_product(cats: AnyPandas) -> Series:
+def category_product(cats: linearmodels.typing.AnyPandas) -> Series:
     """
     Construct category from all combination of input categories
 
@@ -168,7 +192,7 @@ def category_product(cats: AnyPandas) -> Series:
     """
     if isinstance(cats, Series):
         return cats
-
+    assert isinstance(cats, DataFrame)
     sizes = []
     for c in cats:
         # TODO: Bug in pandas-stubs
@@ -194,7 +218,7 @@ def category_product(cats: AnyPandas) -> Series:
     dtype_val = dtype(dtype_str)
     codes = zeros(nobs, dtype=dtype_val)
     cum_size = 0
-    for i, col in enumerate(cats):
+    for i, col_name in enumerate(cats):
         if dtype_str == "int8":
             shift: int8 | int16 | int32 | int64 = int8(cum_size)
         elif dtype_str == "int16":
@@ -203,14 +227,16 @@ def category_product(cats: AnyPandas) -> Series:
             shift = int32(cum_size)
         else:  # elif dtype_str == "int64":
             shift = int64(cum_size)
-        cat_codes = asarray(cats[col].cat.codes)
+        cat_codes = asarray(cats[col_name].cat.codes)
         codes += cat_codes.astype(dtype_val) << shift
         cum_size += sizes[i]
 
     return Series(Categorical(codes), index=cats.index)
 
 
-def category_interaction(cat: Series, precondition: bool = True) -> sp.csc_matrix:
+def category_interaction(
+    cat: pandas.Series, precondition: bool = True
+) -> sp.csc_matrix:
     """
     Parameters
     ----------
@@ -231,7 +257,9 @@ def category_interaction(cat: Series, precondition: bool = True) -> sp.csc_matri
 
 
 def category_continuous_interaction(
-    cat: AnyPandas, cont: AnyPandas, precondition: bool = True
+    cat: linearmodels.typing.AnyPandas,
+    cont: linearmodels.typing.AnyPandas,
+    precondition: bool = True,
 ) -> sp.csc_matrix:
     """
     Parameters
@@ -309,8 +337,8 @@ class Interaction:
 
     def __init__(
         self,
-        cat: ArrayLike | None = None,
-        cont: ArrayLike | None = None,
+        cat: linearmodels.typing.data.ArrayLike | None = None,
+        cont: linearmodels.typing.data.ArrayLike | None = None,
         nobs: int | None = None,
     ) -> None:
         self._cat = cat
@@ -366,7 +394,7 @@ class Interaction:
     def isnull(self) -> Series:
         return self.cat.isnull().any(axis=1) | self.cont.isnull().any(axis=1)
 
-    def drop(self, locs: BoolArray) -> None:
+    def drop(self, locs: linearmodels.typing.data.BoolArray) -> None:
         self._cat_data.drop(locs)
         self._cont_data.drop(locs)
 
@@ -413,21 +441,23 @@ class Interaction:
         Construct a hash that will be invariant for any permutation of
         inputs that produce the same fit when used as regressors"""
         # Sorted hashes of any categoricals
-        hasher = hash_func()
+        hasher = Hasher()
         cat_hashes = []
         cat = self.cat
         for col in cat:
-            hasher.update(ascontiguousarray(self.cat[col].cat.codes.to_numpy().data))
+            hasher.update(
+                memoryview(ascontiguousarray(self.cat[col].cat.codes.to_numpy().data))
+            )
             cat_hashes.append(hasher.hexdigest())
-            hasher = _reset(hasher)
+            hasher.reset()
         sorted_hashes = tuple(sorted(cat_hashes))
 
         hashes = []
         cont = self.cont
         for col in cont:
-            hasher.update(ascontiguousarray(cont[col].to_numpy()).data)
+            hasher.update(memoryview(ascontiguousarray(cont[col].to_numpy()).data))
             hashes.append(sorted_hashes + (hasher.hexdigest(),))
-            hasher = _reset(hasher)
+            hasher.reset()
 
         return sorted(hashes)
 
@@ -501,7 +531,7 @@ class AbsorbingRegressor:
         cat: DataFrame | None = None,
         cont: DataFrame | None = None,
         interactions: list[Interaction] | None = None,
-        weights: Float64Array | None = None,
+        weights: linearmodels.typing.data.Float64Array | None = None,
     ):
         self._cat = cat
         self._cont = cont
@@ -524,26 +554,30 @@ class AbsorbingRegressor:
     @property
     def hash(self) -> tuple[tuple[str, ...], ...]:
         hashes: list[tuple[str, ...]] = []
-        hasher = hash_func()
+        hasher = Hasher()
         if self._cat is not None:
             for col in self._cat:
                 hasher.update(
-                    ascontiguousarray(self._cat[col].cat.codes.to_numpy()).data
+                    memoryview(
+                        ascontiguousarray(self._cat[col].cat.codes.to_numpy()).data
+                    )
                 )
                 hashes.append((hasher.hexdigest(),))
-                hasher = _reset(hasher)
+                hasher.reset()
         if self._cont is not None:
             for col in self._cont:
-                hasher.update(ascontiguousarray(self._cont[col].to_numpy()).data)
+                hasher.update(
+                    memoryview(ascontiguousarray(self._cont[col].to_numpy()).data)
+                )
                 hashes.append((hasher.hexdigest(),))
-                hasher = _reset(hasher)
+                hasher.reset()
         if self._interactions is not None:
             for interact in self._interactions:
                 hashes.extend(interact.hash)
         # Add weight hash if provided
         if self._weights is not None:
-            hasher = hash_func()
-            hasher.update(ascontiguousarray(self._weights.data))
+            hasher = Hasher()
+            hasher.update(memoryview(ascontiguousarray(self._weights.data)))
             hashes.append((hasher.hexdigest(),))
         return tuple(sorted(hashes))
 
@@ -661,12 +695,12 @@ class AbsorbingLS:
 
     def __init__(
         self,
-        dependent: ArrayLike,
-        exog: ArrayLike | None = None,
+        dependent: linearmodels.typing.data.ArrayLike,
+        exog: linearmodels.typing.data.ArrayLike | None = None,
         *,
         absorb: InteractionVar | None = None,
         interactions: InteractionVar | Iterable[InteractionVar] | None = None,
-        weights: ArrayLike | None = None,
+        weights: linearmodels.typing.data.ArrayLike | None = None,
         drop_absorbed: bool = False,
     ) -> None:
         self._dependent = IVData(dependent, "dependent")
@@ -699,7 +733,7 @@ class AbsorbingLS:
         self._index = self._dependent.rows
         self._method = "Absorbing LS"
 
-        self._const_col = 0
+        self._const_col: int | None = 0
         self._has_constant = False
         self._has_constant_exog = self._check_constant()
         self._constant_absorbed = False
@@ -707,7 +741,7 @@ class AbsorbingLS:
         self._regressors: sp.csc_matrix | None = None
         self._regressors_hash: tuple[tuple[str, ...], ...] | None = None
 
-    def _drop_missing(self) -> BoolArray:
+    def _drop_missing(self) -> linearmodels.typing.data.BoolArray:
         missing = require(self.dependent.isnull.to_numpy(), requirements="W")
         missing |= self.exog.isnull.to_numpy()
         missing |= self._absorb_inter.cat.isnull().any(axis=1).to_numpy()
@@ -726,7 +760,7 @@ class AbsorbingLS:
     def _check_constant(self) -> bool:
         col_delta = ptp(self.exog.ndarray, 0)
         has_constant = npany(col_delta == 0)
-        self._const_col = where(col_delta == 0)[0][0] if has_constant else None
+        self._const_col = int(where(col_delta == 0)[0][0]) if has_constant else None
         return bool(has_constant)
 
     def _check_weights(self) -> None:
@@ -835,12 +869,23 @@ class AbsorbingLS:
     def _first_time_fit(
         self,
         use_cache: bool,
-        absorb_options: None
-        | (dict[str, bool | float | str | ArrayLike | None | dict[str, Any]]),
+        absorb_options: None | (
+            dict[
+                str,
+                bool
+                | float
+                | str
+                | linearmodels.typing.data.ArrayLike
+                | None
+                | dict[str, Any],
+            ]
+        ),
         method: str,
     ) -> None:
         weights = (
-            cast(Float64Array, self.weights.ndarray) if self._is_weighted else None
+            cast(linearmodels.typing.data.Float64Array, self.weights.ndarray)
+            if self._is_weighted
+            else None
         )
 
         use_hdfe = weights is None and method in ("auto", "hdfe")
@@ -868,10 +913,10 @@ class AbsorbingLS:
         self._regressors_hash = areg.hash
         self._constant_absorbed = self._has_constant_exog and areg_constant
 
-        dep = self._dependent.ndarray
-        exog = cast(Float64Array, self._exog.ndarray)
+        dep = self._dependent.ndarray.astype(float, copy=False)
+        exog = cast(linearmodels.typing.data.Float64Array, self._exog.ndarray)
 
-        root_w = sqrt(self._weight_data.ndarray)
+        root_w = sqrt(self._weight_data.ndarray.astype(float, copy=False))
         dep = root_w * dep
         exog = root_w * exog
         denom = root_w.T @ root_w
@@ -886,13 +931,13 @@ class AbsorbingLS:
 
                 absorb_options["drop_singletons"] = False
                 algo = create(self._absorb_inter.cat, **absorb_options)
-                dep_exog = column_stack((dep, exog))
+                dep_exog = column_stack((dep, exog)).astype(float, copy=False)
                 resids = algo.residualize(dep_exog)
                 dep_resid = resids[:, :1]
                 exog_resid = resids[:, 1:]
             else:
                 self._regressors = preconditioner(self._regressors)[0]
-                dep_exog = column_stack((dep, exog))
+                dep_exog = column_stack((dep, exog)).astype(float, copy=False)
                 resid = lsmr_annihilate(
                     self._regressors,
                     dep_exog,
@@ -947,8 +992,17 @@ class AbsorbingLS:
         cov_type: str = "robust",
         debiased: bool = False,
         method: str = "auto",
-        absorb_options: None
-        | (dict[str, bool | float | str | ArrayLike | None | dict[str, Any]]) = None,
+        absorb_options: None | (
+            dict[
+                str,
+                bool
+                | float
+                | str
+                | linearmodels.typing.data.ArrayLike
+                | None
+                | dict[str, Any],
+            ]
+        ) = None,
         use_cache: bool = True,
         lsmr_options: dict[str, float | bool] | None = None,
         **cov_config: Any,
@@ -966,7 +1020,7 @@ class AbsorbingLS:
             * "robust", "heteroskedastic" - Heteroskedasticity robust inference
             * "kernel" - Heteroskedasticity and autocorrelation robust
               inference
-            * "cluster" - One-way cluster dependent inference.
+            * "clustered" - One-way cluster dependent inference.
               Heteroskedasticity robust
 
         debiased : bool
@@ -998,7 +1052,7 @@ class AbsorbingLS:
 
                Use absorb_options to pass options
 
-        **cov_config
+        cov_config
             Additional parameters to pass to covariance estimator. The list
             of optional parameters differ according to ``cov_type``. See
             the documentation of the alternative covariance estimators for
@@ -1067,7 +1121,9 @@ class AbsorbingLS:
 
         return AbsorbingLSResults(results, self)
 
-    def resids(self, params: Float64Array) -> Float64Array:
+    def resids(
+        self, params: linearmodels.typing.data.Float64Array
+    ) -> linearmodels.typing.data.Float64Array:
         """
         Compute model residuals
 
@@ -1084,7 +1140,9 @@ class AbsorbingLS:
         resids = self.wresids(params)
         return resids / sqrt(self.weights.ndarray)
 
-    def wresids(self, params: Float64Array) -> Float64Array:
+    def wresids(
+        self, params: linearmodels.typing.data.Float64Array
+    ) -> linearmodels.typing.data.Float64Array:
         """
         Compute weighted model residuals
 
@@ -1111,16 +1169,21 @@ class AbsorbingLS:
         )
 
     def _f_statistic(
-        self, params: Float64Array, cov: Float64Array, debiased: bool
+        self,
+        params: linearmodels.typing.data.Float64Array,
+        cov: linearmodels.typing.data.Float64Array,
+        debiased: bool,
     ) -> WaldTestStatistic | InvalidTestStatistic:
-        const_loc = find_constant(cast(Float64Array, self._exog.ndarray))
+        const_loc = find_constant(
+            cast(linearmodels.typing.data.Float64Array, self._exog.ndarray)
+        )
         resid_df = self._nobs - self._num_params
 
         return f_statistic(params, cov, debiased, resid_df, const_loc)
 
     def _post_estimation(
         self,
-        params: Float64Array,
+        params: linearmodels.typing.data.Float64Array,
         cov_estimator: (
             HomoskedasticCovariance
             | HeteroskedasticCovariance

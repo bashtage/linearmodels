@@ -32,14 +32,14 @@ The model can be expressed compactly
 .. math::
 
    \begin{aligned}
-   Y & =X_{1}\beta_{1}+X_{2}\beta_{1}+\epsilon=X\beta+\epsilon\\
+   Y & =X_{1}\beta_{1}+X_{2}\beta_{2}+\epsilon=X\beta+\epsilon\\
    X_{2} & =Z_{1}\gamma_{1}+Z_{2}\gamma_{2}+u=Z\gamma+u\end{aligned}
 
 The vector of instruments :math:`z_{i}` is :math:`p` by 1. There are
 :math:`n` observations for all variables. :math:`k_{c}=1` if the model
 contains a constant (either explicit or implicit, i.e., including all
 categories of a dummy variable). The constant, if included, is in
-:math:`x_{1i}`. :math:`X` is the :math:`n` by :math:`k` matrix if
+:math:`x_{1i}`. :math:`X` is the :math:`n` by :math:`k` matrix of
 regressors where row :math:`i` of :math:`X` is :math:`x_{i}^{\prime}`.
 :math:`X` can be partitioned into :math:`\left[X_{1}\;X_{2}\right]`.
 :math:`Z` is the :math:`n` by :math:`p` matrix of instruments. The
