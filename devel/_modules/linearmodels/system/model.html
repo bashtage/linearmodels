@@ -19,7 +19,7 @@
     
   
       
-        <title>linearmodels.system.model - linearmodels v6.2 (+22)</title>
+        <title>linearmodels.system.model - linearmodels v6.2 (+24)</title>
       
     
 
@@ -91,7 +91,7 @@
 
 <header class="md-header md-header--shadow" data-md-component="header">
   <nav class="md-header__inner md-grid" aria-label="Header">
-    <a href="../../../index.html" title="linearmodels v6.2 (+22)" class="md-header__button md-logo" aria-label="linearmodels v6.2 (+22)" data-md-component="logo">
+    <a href="../../../index.html" title="linearmodels v6.2 (+24)" class="md-header__button md-logo" aria-label="linearmodels v6.2 (+24)" data-md-component="logo">
       <img src="../../../_static/bw-logo.svg" alt="logo">
     </a>
     <label class="md-header__button md-icon" for="__drawer">
@@ -102,7 +102,7 @@
       <div class="md-header__ellipsis">
         <div class="md-header__topic">
           <span class="md-ellipsis">
-            linearmodels v6.2 (+22)
+            linearmodels v6.2 (+24)
           </span>
         </div>
         <div class="md-header__topic" data-md-component="header-topic">
@@ -197,10 +197,10 @@
 
 <nav class="md-nav md-nav--primary" aria-label="Navigation" data-md-level="0">
   <label class="md-nav__title" for="__drawer">
-    <a href="../../../index.html" title="linearmodels v6.2 (+22)" class="md-nav__button md-logo" aria-label="linearmodels v6.2 (+22)" data-md-component="logo">
+    <a href="../../../index.html" title="linearmodels v6.2 (+24)" class="md-nav__button md-logo" aria-label="linearmodels v6.2 (+24)" data-md-component="logo">
       <img src="../../../_static/bw-logo.svg" alt="logo">
     </a>
-    linearmodels v6.2 (+22)
+    linearmodels v6.2 (+24)
   </label>
   
     <div class="md-nav__source">
@@ -608,7 +608,7 @@
     <span class="n">missing</span> <span class="o">=</span> <span class="p">[</span><span class="n">key</span> <span class="k">for</span> <span class="n">key</span> <span class="ow">in</span> <span class="n">weights</span> <span class="k">if</span> <span class="n">weights</span><span class="p">[</span><span class="n">key</span><span class="p">]</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">]</span>
     <span class="k">if</span> <span class="n">missing</span><span class="p">:</span>
         <span class="n">msg</span> <span class="o">=</span> <span class="s2">&quot;Weights not found for equation labels:</span><span class="se">\n</span><span class="si">{}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="s2">&quot;, &quot;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">missing</span><span class="p">))</span>
-        <span class="n">warnings</span><span class="o">.</span><span class="n">warn</span><span class="p">(</span><span class="n">msg</span><span class="p">,</span> <span class="ne">UserWarning</span><span class="p">)</span>
+        <span class="n">warnings</span><span class="o">.</span><span class="n">warn</span><span class="p">(</span><span class="n">msg</span><span class="p">,</span> <span class="ne">UserWarning</span><span class="p">,</span> <span class="n">stacklevel</span><span class="o">=</span><span class="mi">2</span><span class="p">)</span>
 
 
 <span class="k">def</span><span class="w"> </span><span class="nf">_parameters_from_xprod</span><span class="p">(</span>
@@ -2443,6 +2443,7 @@
                 <span class="s2">&quot;matrix not unadjusted (homoskedastic).  sigma will &quot;</span>
                 <span class="s2">&quot;be ignored.&quot;</span><span class="p">,</span>
                 <span class="ne">UserWarning</span><span class="p">,</span>
+                <span class="n">stacklevel</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span>
             <span class="p">)</span>
         <span class="n">weight_type</span> <span class="o">=</span> <span class="n">COV_TYPES</span><span class="p">[</span><span class="n">weight_type</span><span class="p">]</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_weight_est</span> <span class="o">=</span> <span class="n">GMM_W_EST</span><span class="p">[</span><span class="n">weight_type</span><span class="p">](</span><span class="o">**</span><span class="n">weight_config</span><span class="p">)</span>
