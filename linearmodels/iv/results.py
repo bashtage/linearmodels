@@ -3,7 +3,7 @@ Results containers and post-estimation diagnostics for IV models
 """
 from __future__ import annotations
 
-from linearmodels.compat.statsmodels import Summary
+from linearmodels.compat.statsmodels import Summary, Summary2
 
 from collections.abc import Sequence
 import datetime as dt
@@ -110,6 +110,11 @@ class _LSModelResultsBase(_SummaryStr):
 
     @property
     def cov_estimator(self) -> str:
+        """Covariance estimator object used to compute covariance"""
+        return self._cov_estimator
+
+    @property
+    def cov_type(self) -> str:
         """Type of covariance estimator used to compute covariance"""
         return self._cov_type
 
@@ -717,7 +722,7 @@ class FirstStageResults(_SummaryStr):
             columns=[],
         )
         for col in endog.pandas:
-            # TODO: BUG in pandas-stube
+            # TODO: BUG in pandas-stubs
             #  https://github.com/pandas-dev/pandas-stubs/issues/97
             y = w * endog.pandas[[col]].values
             ey = annihilate(y, x)

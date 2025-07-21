@@ -1,3 +1,3 @@
-from .model import LinearFactorModel, LinearFactorModelGMM, TradedFactorModel
+# from linearmodels.asset_pricing.model import LinearFactorModel, LinearFactorModelGMM, TradedFactorModel
 
-__all__ = ["TradedFactorModel", "LinearFactorModelGMM", "LinearFactorModel"]
+# __all__ = ["TradedFactorModel", "LinearFactorModelGMM", "LinearFactorModel"]

@@ -6,7 +6,7 @@ from typing import TYPE_CHECKING, Any, Optional, Union
 import numpy as np
 from pandas import DataFrame, Series
 
-from .data import ArrayLike
+from linearmodels.typing.data import ArrayLike
 
 NP_GTE_121 = np.lib.NumpyVersion(np.__version__) >= np.lib.NumpyVersion("1.21.0")
 

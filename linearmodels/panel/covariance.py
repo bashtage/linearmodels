@@ -270,7 +270,7 @@ class ClusteredCovariance(HomoskedasticCovariance):
     where g is the number of distinct groups and n is the number of
     observations.
     """
-    ALLOWED_KWARGS = ("clusters", "group_debias")
+    ALLOWED_KWARGS = ("clusters", "group_debias", "cluster_entity", "cluster_time")
 
     def __init__(
         self,
@@ -282,6 +282,8 @@ class ClusteredCovariance(HomoskedasticCovariance):
         *,
         debiased: bool = False,
         extra_df: int = 0,
+        cluster_entity: bool = False,
+        cluster_time: bool = False,
         clusters: ArrayLike | None = None,
         group_debias: bool = False,
     ) -> None:
@@ -299,6 +301,8 @@ class ClusteredCovariance(HomoskedasticCovariance):
         nobs = y.shape[0]
         if clusters.shape[0] != nobs:
             raise ValueError(CLUSTER_ERR.format(nobs, clusters.shape[0]))
+        self._cluster_entity = cluster_entity
+        self._cluster_time = cluster_time
         self._clusters = clusters
         self._name = "Clustered"
 
@@ -604,6 +608,7 @@ class CovarianceManager:
         "homoskedastic": HomoskedasticCovariance,
         "robust": HeteroskedasticCovariance,
         "heteroskedastic": HeteroskedasticCovariance,
+        "cluster": ClusteredCovariance,
         "clustered": ClusteredCovariance,
         "driscoll-kraay": DriscollKraay,
         "dk": DriscollKraay,
@@ -729,7 +734,7 @@ def setup_covariance_estimator(
     extra_df: int = 0,
     **cov_config: Any,
 ) -> HomoskedasticCovariance:
-    estimator = cov_estimators[cov_type]
+    estimator = cov_estimators[cov_type.lower()]
     unknown_kwargs = [
         str(key) for key in cov_config if str(key) not in estimator.ALLOWED_KWARGS
     ]
@@ -748,6 +753,8 @@ def setup_covariance_estimator(
     kernel = get_string(cov_config, "kernel")
     bandwidth = get_float(cov_config, "bandwidth")
     group_debias = get_bool(cov_config, "group_debias")
+    cluster_entity = get_bool(cov_config, "cluster_entity")
+    cluster_time = get_bool(cov_config, "cluster_time")
     clusters = get_array_like(cov_config, "clusters")
 
     if estimator is HomoskedasticCovariance:
@@ -767,6 +774,8 @@ def setup_covariance_estimator(
             time_ids,
             debiased=debiased,
             extra_df=extra_df,
+            cluster_entity=cluster_entity,
+            cluster_time=cluster_time,
             clusters=clusters,
             group_debias=group_debias,
         )

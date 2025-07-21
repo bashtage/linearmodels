@@ -145,7 +145,7 @@ class PanelData:
         Flag indicating whether to copy the input. Only has an effect when
         x is a DataFrame
     cast : bool
-        Flag indicating to case the data to double precision.
+        Flag indicating to cast the data to double precision.
 
     Notes
     -----
@@ -264,6 +264,9 @@ class PanelData:
         # self._k, self._t, self._n = self.panel.shape
         self._k, self._t, self._n = self.shape
         self._frame.index.set_names(index_names, inplace=True)
+        self._pandas = self._frame
+        self._row_labels = list(self._pandas.index)
+        self._col_labels = list(self._pandas.columns)
 
     @property
     def panel(self) -> _Panel:

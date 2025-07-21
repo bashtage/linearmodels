@@ -32,11 +32,11 @@ with open("README.md") as readme:
 
 
 additional_files = ["py.typed"]
-for filename in glob.iglob("./linearmodels/datasets/**", recursive=True):
+for filename in glob.iglob("linearmodels/datasets/**", recursive=True):
     if ".csv.bz" in filename:
         additional_files.append(filename.replace("./linearmodels/", ""))
 
-for filename in glob.iglob("./linearmodels/tests/**", recursive=True):
+for filename in glob.iglob("linearmodels/tests/**", recursive=True):
     if ".txt" in filename or ".csv" in filename or ".dta" in filename:
         additional_files.append(filename.replace("./linearmodels/", ""))
 
@@ -44,10 +44,10 @@ for filename in glob.iglob("./examples/**", recursive=True):
     if ".png" in filename:
         additional_files.append(filename)
 
-additional_files.extend(glob.glob("./linearmodels/**/*.pyx", recursive=True))
-additional_files.extend(glob.glob("./linearmodels/**/*.pyi", recursive=True))
-additional_files.extend(glob.glob("./linearmodels/**/*.pyd", recursive=True))
-additional_files.extend(glob.glob("./linearmodels/**/*.so", recursive=True))
+additional_files.extend(glob.glob("linearmodels/**/*.pyx", recursive=True))
+additional_files.extend(glob.glob("linearmodels/**/*.pyi", recursive=True))
+additional_files.extend(glob.glob("linearmodels/**/*.pyd", recursive=True))
+additional_files.extend(glob.glob("linearmodels/**/*.so", recursive=True))
 
 
 class BinaryDistribution(Distribution):

@@ -135,7 +135,7 @@ def get_array_like(d: Mapping[str, Any], key: str) -> ArrayLike | None:
 
 def get_panel_data_like(d: Mapping[str, Any], key: str) -> PanelDataLike | None:
     """
-    Helper function that gets an panel_data_like or None
+    Helper function that gets a panel_data_like or None
 
     Parameters
     ----------
@@ -165,6 +165,47 @@ def get_panel_data_like(d: Mapping[str, Any], key: str) -> PanelDataLike | None:
                 pass
 
             if isinstance(out, panel_data_like):
+                return out
+            else:
+                raise TypeError(
+                    f"{key} found in the dictionary but it is not array-like."
+                )
+    return out
+
+
+def get_iv_panel_data_like(d: Mapping[str, Any], key: str):
+    """
+    Helper function that gets an iv_panel_data_like or None
+
+    Parameters
+    ----------
+    d : Mapping[str, Any]
+        A mapping.
+    key : str
+        The key to lookup.
+
+    Returns
+    -------
+    {iv_panel_data_like, None}
+        The string or None if the key is not in the dictionary. If in the
+        dictionary, a type check is performed and TypeError is raised if
+        not found.
+    """
+    from linearmodels.ivpanel.data import IVPanelData, IVPanelDataLike
+
+    out: IVPanelDataLike | None = None
+    if key in d:
+        out = d[key]
+        if out is not None:
+            iv_panel_data_like: Any = (np.ndarray, DataFrame, Series, IVPanelData)
+            try:
+                import xarray as xr
+
+                iv_panel_data_like += (xr.DataArray,)
+            except ImportError:
+                pass
+
+            if isinstance(out, iv_panel_data_like):
                 return out
             else:
                 raise TypeError(

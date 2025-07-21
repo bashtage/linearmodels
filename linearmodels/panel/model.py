@@ -308,7 +308,7 @@ class _PanelModelBase:
         self.dependent = PanelData(dependent, "Dep")
         self.exog = PanelData(exog, "Exog")
         self._original_shape = self.dependent.shape
-        self._constant = False
+        self._has_constant = False
         self._formula: str | None = None
         self._is_weighted = True
         self._name = self.__class__.__name__
@@ -477,7 +477,7 @@ class _PanelModelBase:
         w_df = w_df / w_df.mean()
         self.weights = PanelData(w_df)
         rank_of_x = self._check_exog_rank()
-        self._constant, self._constant_index = has_constant(x, rank_of_x)
+        self._has_constant, self._constant_index = has_constant(x, rank_of_x)
 
     @property
     def formula(self) -> str | None:
@@ -491,7 +491,7 @@ class _PanelModelBase:
     @property
     def has_constant(self) -> bool:
         """Flag indicating the model a constant or implicit constant"""
-        return self._constant
+        return self._has_constant
 
     def _f_statistic(
         self,
@@ -742,7 +742,7 @@ class _PanelModelBase:
                 )  # type: ignore
             clusters_frame = formatted_clusters.dataframe
 
-        cluster_entity = bool(cov_config_upd.pop("cluster_entity", False))
+        cluster_entity = cov_config_upd["cluster_entity"] if 'cluster_entity' in cov_config_upd else False
         if cluster_entity:
             group_ids_arr = self.dependent.entity_ids.squeeze()
             name = "cov.cluster.entity"
@@ -752,7 +752,7 @@ class _PanelModelBase:
             else:
                 clusters_frame = DataFrame(group_ids)
 
-        cluster_time = bool(cov_config_upd.pop("cluster_time", False))
+        cluster_time = cov_config_upd["cluster_time"] if 'cluster_time' in cov_config_upd else False
         if cluster_time:
             group_ids_arr = self.dependent.time_ids.squeeze()
             name = "cov.cluster.time"
@@ -1033,7 +1033,7 @@ class PooledOLS(_PanelModelBase):
         idiosyncratic = DataFrame(eps, index, ["idiosyncratic"])
         residual_ss = float(np.squeeze(weps.T @ weps))
         e = y
-        if self._constant:
+        if self._has_constant:
             e = e - (w * y).sum() / w.sum()
 
         total_ss = float(np.squeeze(w.T @ (e**2)))
@@ -1301,7 +1301,7 @@ class PanelOLS(_PanelModelBase):
         effects_frame = effects.dataframe
         for col in effects_frame:
             cat = Categorical(effects_frame[col])
-            # TODO: Bug in pandas-stube
+            # TODO: Bug in pandas-stubs
             #  https://github.com/pandas-dev/pandas-stubs/issues/111
             cats[col] = cat.codes.astype(np.int64)  # type: ignore
         cats_df = DataFrame(cats, index=effects_frame.index)
@@ -1506,7 +1506,7 @@ class PanelOLS(_PanelModelBase):
             y_effect, x_effect = np.zeros_like(y), np.zeros_like(x)
             return y, x, ybar, y_effect, x_effect
 
-        drop_first = self._constant
+        drop_first = self._has_constant
         d_l = []
         if self.entity_effects:
             d_l.append(self.dependent.dummies("entity", drop_first=drop_first).values)
@@ -1753,7 +1753,7 @@ class PanelOLS(_PanelModelBase):
         use_lsdv : bool
             Flag indicating to use the Least Squares Dummy Variable estimator
             to eliminate effects.  The default value uses only means and does
-            note require constructing dummy variables for each effect.
+            not require constructing dummy variables for each effect.
         use_lsmr : bool
             Flag indicating to use LSDV with the Sparse Equations and Least
             Squares estimator to eliminate the fixed effects.
@@ -1857,7 +1857,7 @@ class PanelOLS(_PanelModelBase):
             else:
                 # TODO: Need to special case the constant here when determining which
                 #  to retain since we always want to retain the constant if present
-                retain = not_absorbed(x, self._constant, self._constant_index)
+                retain = not_absorbed(x, self._has_constant, self._constant_index)
                 if not retain:
                     raise ValueError(
                         "All columns in exog have been fully absorbed by the included"
@@ -1875,7 +1875,7 @@ class PanelOLS(_PanelModelBase):
                     )
                     x = x[:, retain]
                     # Update constant index loc
-                    if self._constant:
+                    if self._has_constant:
                         assert isinstance(self._constant_index, int)
                         self._constant_index = int(
                             np.argwhere(np.array(retain) == self._constant_index)
@@ -2191,7 +2191,7 @@ class BetweenOLS(_PanelModelBase):
 
         residual_ss = float(np.squeeze(weps.T @ weps))
         e = y
-        if self._constant:
+        if self._has_constant:
             e = y - (w * y).sum() / w.sum()
 
         total_ss = float(np.squeeze(w.T @ (e**2)))
@@ -2309,7 +2309,7 @@ class FirstDifferenceOLS(_PanelModelBase):
         check_rank: bool = True,
     ):
         super().__init__(dependent, exog, weights=weights, check_rank=check_rank)
-        if self._constant:
+        if self._has_constant:
             raise ValueError(
                 "Constants are not allowed in first difference regressions."
             )
