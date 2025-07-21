@@ -286,7 +286,9 @@ def test_panel_entity_lsdv(data):
         d_demean = d.values
 
     xd = np.c_[x.values, d_demean]
-    xd = pd.DataFrame(xd, index=x.index, columns=list(x.columns) + list(d.columns))
+    xd = pd.DataFrame(
+        xd, index=x.index, columns=list(x.columns) + [f"fe_{col}" for col in d.columns]
+    )
 
     ols_mod = IV2SLS(y, xd, None, None)
     res2 = ols_mod.fit(cov_type="unadjusted", debiased=False)
@@ -388,7 +390,9 @@ def test_panel_time_lsdv(large_data):
         d = d - z @ lstsq(z, d, rcond=None)[0]
 
     xd = np.c_[x.values, d]
-    xd = pd.DataFrame(xd, index=x.index, columns=list(x.columns) + d_cols)
+    xd = pd.DataFrame(
+        xd, index=x.index, columns=list(x.columns) + [f"fe_{col}" for col in d_cols]
+    )
 
     ols_mod = IV2SLS(y, xd, None, None)
     res2 = ols_mod.fit(cov_type="unadjusted")
@@ -490,7 +494,11 @@ def test_panel_both_lsdv(data):
 
     xd = np.c_[x.values, d]
     xd = pd.DataFrame(
-        xd, index=x.index, columns=list(x.columns) + list(d1.columns) + list(d2.columns)
+        xd,
+        index=x.index,
+        columns=list(x.columns)
+        + [f"fe_{col}" for col in d1.columns]
+        + [f"te_{col}" for col in d2.columns],
     )
 
     ols_mod = IV2SLS(y, xd, None, None)
@@ -597,7 +605,9 @@ def test_panel_entity_lsdv_weighted(data):
         d = d - z @ lstsq(wz, wd, rcond=None)[0]
 
     xd = np.c_[x.values, d]
-    xd = pd.DataFrame(xd, index=x.index, columns=list(x.columns) + list(d_cols))
+    xd = pd.DataFrame(
+        xd, index=x.index, columns=list(x.columns) + [f"fe_{col}" for col in d_cols]
+    )
 
     ols_mod = IV2SLS(y, xd, None, None, weights=w)
     res2 = ols_mod.fit(cov_type="unadjusted")
@@ -677,7 +687,9 @@ def test_panel_time_lsdv_weighted(large_data):
         d = d - z @ lstsq(wz, wd, rcond=None)[0]
 
     xd = np.c_[x.values, d]
-    xd = pd.DataFrame(xd, index=x.index, columns=list(x.columns) + list(d_cols))
+    xd = pd.DataFrame(
+        xd, index=x.index, columns=list(x.columns) + [f"te_{col}" for col in d_cols]
+    )
 
     ols_mod = IV2SLS(y, xd, None, None, weights=w)
     res2 = ols_mod.fit(cov_type="unadjusted")
@@ -760,7 +772,11 @@ def test_panel_both_lsdv_weighted(data):
 
     xd = np.c_[x.values, d]
     xd = pd.DataFrame(
-        xd, index=x.index, columns=list(x.columns) + list(d1.columns) + list(d2.columns)
+        xd,
+        index=x.index,
+        columns=list(x.columns)
+        + [f"fe_{col}" for col in d1.columns]
+        + [f"te_{col}" for col in d2.columns],
     )
 
     ols_mod = IV2SLS(y, xd, None, None, weights=w)

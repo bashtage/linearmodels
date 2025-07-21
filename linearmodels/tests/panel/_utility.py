@@ -200,13 +200,23 @@ def generate_data(
 
 
 def assert_results_equal(res1, res2, test_fit=True, test_df=True, strict=True):
+    from pandas import Index
+
+    def fix_index(x: Series | DataFrame, n: int):
+        if isinstance(x, Series):
+            out = x.iloc[:n].copy()
+        else:
+            out = x.iloc[:n, :n].copy()
+        out.index = Index(out.index.to_list())
+        return out
+
     n = min(res1.params.shape[0], res2.params.shape[0])
 
-    assert_series_equal(res1.params.iloc[:n], res2.params.iloc[:n])
-    assert_series_equal(res1.pvalues.iloc[:n], res2.pvalues.iloc[:n])
-    assert_series_equal(res1.tstats.iloc[:n], res2.tstats.iloc[:n])
-    assert_frame_equal(res1.cov.iloc[:n, :n], res2.cov.iloc[:n, :n])
-    assert_frame_equal(res1.conf_int().iloc[:n], res2.conf_int().iloc[:n])
+    assert_series_equal(res1.params.iloc[:n], fix_index(res2.params, n))
+    assert_series_equal(res1.pvalues.iloc[:n], fix_index(res2.pvalues, n))
+    assert_series_equal(res1.tstats.iloc[:n], fix_index(res2.tstats, n))
+    assert_frame_equal(res1.cov.iloc[:n, :n], fix_index(res2.cov, n))
+    assert_frame_equal(res1.conf_int().iloc[:n], fix_index(res2.conf_int(), n))
 
     assert_allclose(res1.s2, res2.s2)
 
