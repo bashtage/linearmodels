@@ -102,7 +102,7 @@ def _missing_weights(
     missing = [key for key in weights if weights[key] is None]
     if missing:
         msg = "Weights not found for equation labels:\n{}".format(", ".join(missing))
-        warnings.warn(msg, UserWarning)
+        warnings.warn(msg, UserWarning, stacklevel=2)
 
 
 def _parameters_from_xprod(
@@ -1917,6 +1917,7 @@ class IVSystemGMM(_SystemModelBase):
                 "matrix not unadjusted (homoskedastic).  sigma will "
                 "be ignored.",
                 UserWarning,
+                stacklevel=1,
             )
         weight_type = COV_TYPES[weight_type]
         self._weight_est = GMM_W_EST[weight_type](**weight_config)
