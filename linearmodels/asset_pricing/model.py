@@ -4,7 +4,8 @@ Linear factor models for applications in asset pricing
 
 from __future__ import annotations
 
-from typing import Any, Callable, cast
+from collections.abc import Callable
+from typing import Any, cast
 
 from formulaic import model_matrix
 from formulaic.materializers.types import NAAction

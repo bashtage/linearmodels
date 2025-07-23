@@ -1,0 +1,11 @@
+Version 7.0
+-----------
+
+* Increased minimums:
+
+  - Python: 3.10
+  - formulaic: 1.0.0
+  - NumPy: 1.22.3
+  - SciPy: 1.8.0
+  - pandas: 1.4.0
+  - statsmodels: 0.13.0

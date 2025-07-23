@@ -2,7 +2,6 @@ from linearmodels.compat.statsmodels import Summary
 
 from itertools import product
 import struct
-from typing import Optional
 
 import numpy as np
 from numpy.testing import assert_allclose, assert_array_equal
@@ -597,7 +596,7 @@ def test_instrments():
 
 
 def assert_results_equal(
-    o_res: OLSResults, a_res: AbsorbingLSResults, k: Optional[int] = None
+    o_res: OLSResults, a_res: AbsorbingLSResults, k: int | None = None
 ) -> None:
     if k is None:
         k = a_res.params.shape[0]

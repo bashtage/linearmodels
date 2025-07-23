@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 from collections.abc import (
+    Callable,
     ItemsView,
     Iterable,
     Iterator,
@@ -10,7 +11,7 @@ from collections.abc import (
     Sequence,
     ValuesView,
 )
-from typing import Any, Callable, Protocol, TypeVar, cast
+from typing import Any, Protocol, TypeVar, cast
 
 import numpy as np
 import pandas
