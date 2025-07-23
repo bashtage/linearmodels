@@ -10,7 +10,8 @@ from collections.abc import (
     Sequence,
     ValuesView,
 )
-from typing import Any, Callable, Protocol, TypeVar, cast
+from typing import Any, Protocol, TypeVar, cast
+from collections.abc import Callable
 
 import numpy as np
 import pandas

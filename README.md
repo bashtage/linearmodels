@@ -131,11 +131,11 @@ regression. Currently only the single variable IV estimators are polished.
 
 ### Running
 
--   Python 3.9+
+-   Python 3.10+
 -   NumPy (1.22+)
 -   SciPy (1.8+)
 -   pandas (1.4+)
--   statsmodels (0.12+)
+-   statsmodels (0.13.1+)
 -   formulaic (1.0.0+)
 -   xarray (0.16+, optional)
 -   Cython (3.0.10+, optional)

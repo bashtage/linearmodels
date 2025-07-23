@@ -597,7 +597,7 @@ def test_instrments():
 
 
 def assert_results_equal(
-    o_res: OLSResults, a_res: AbsorbingLSResults, k: Optional[int] = None
+    o_res: OLSResults, a_res: AbsorbingLSResults, k: int | None = None
 ) -> None:
     if k is None:
         k = a_res.params.shape[0]
