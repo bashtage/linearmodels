@@ -367,3 +367,35 @@ def test_formula_escape():
     assert "x 1" in res.params.index
     assert "y space" in str(summ)
     assert "Instruments: z 0" in str(summ)
+
+
+@pytest.mark.parametrize("dtype", [str, "category", object])
+def test_formula_categorical_equiv(data, model_and_func, dtype):
+    model, func = model_and_func
+    data = data.copy()
+    rs = np.random.RandomState(12345)
+    data["d"] = rs.choice(["a", "b", "c", "d"], size=data.shape[0])
+    data["d"] = data["d"].astype(dtype)
+    formula = "y ~ 1 + d + x2 + [x3 ~ z1 + z2]"
+    mod = model.from_formula(formula, data)
+    res = mod.fit()
+    print(res)
+    aug_data = data.copy()
+    aug_data["d[T.b]"] = (data["d"] == "b").astype(float)
+    aug_data["d[T.c]"] = (data["d"] == "c").astype(float)
+    aug_data["d[T.d]"] = (data["d"] == "d").astype(float)
+    exog = ["Intercept", "d[T.b]", "d[T.c]", "d[T.d]", "x2"]
+    endog = ["x3"]
+    instr = ["z1", "z2"]
+    res_direct = model(
+        aug_data["y"], aug_data[exog], aug_data[endog], aug_data[instr]
+    ).fit()
+    assert_allclose(res.rsquared, res_direct.rsquared)
+    assert list(res.params.index) == [
+        "Intercept",
+        "d[T.b]",
+        "d[T.c]",
+        "d[T.d]",
+        "x2",
+        "x3",
+    ]
