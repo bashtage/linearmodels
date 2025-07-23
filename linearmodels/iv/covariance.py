@@ -4,8 +4,8 @@ Covariance estimation for 2SLS and LIML IV estimators
 
 from __future__ import annotations
 
-from typing import Any, Union, cast
 from collections.abc import Callable
+from typing import Any, Union, cast
 
 from mypy_extensions import VarArg
 from numpy import (

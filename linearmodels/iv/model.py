@@ -4,8 +4,8 @@ Instrumental variable estimators
 
 from __future__ import annotations
 
-from typing import Any, TypeVar, Union, cast
 from collections.abc import Callable
+from typing import Any, TypeVar, Union, cast
 import warnings
 
 from numpy import (
