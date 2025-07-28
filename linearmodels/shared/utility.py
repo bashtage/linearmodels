@@ -186,8 +186,8 @@ def panel_to_frame(
 
     Panel(x, items, major_axis, minor_axis).swapaxes(1,2).to_frame()
     """
-    nmajor = np.arange(len(major_axis))
-    nminor = np.arange(len(minor_axis))
+    nmajor = np.arange(len(major_axis)).tolist()
+    nminor = np.arange(len(minor_axis)).tolist()
     final_levels = [major_axis, minor_axis]
     mi = MultiIndex.from_product([nmajor, nminor])
     if x is not None:

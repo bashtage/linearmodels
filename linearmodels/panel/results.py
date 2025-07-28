@@ -437,11 +437,11 @@ class PanelResults(_SummaryStr):
         smry.tables.append(table)
 
         param_data = np.c_[
-            self.params.values[:, None],
-            self.std_errors.values[:, None],
-            self.tstats.values[:, None],
-            self.pvalues.values[:, None],
-            self.conf_int(),
+            self.params.to_numpy()[:, None],
+            self.std_errors.to_numpy()[:, None],
+            self.tstats.to_numpy()[:, None],
+            self.pvalues.to_numpy()[:, None],
+            self.conf_int().to_numpy(),
         ]
         data = []
         for row in param_data:
