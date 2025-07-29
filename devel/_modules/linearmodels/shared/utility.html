@@ -19,7 +19,7 @@
     
   
       
-        <title>linearmodels.shared.utility - linearmodels v6.2 (+32)</title>
+        <title>linearmodels.shared.utility - linearmodels v6.2 (+35)</title>
       
     
 
@@ -91,7 +91,7 @@
 
 <header class="md-header md-header--shadow" data-md-component="header">
   <nav class="md-header__inner md-grid" aria-label="Header">
-    <a href="../../../index.html" title="linearmodels v6.2 (+32)" class="md-header__button md-logo" aria-label="linearmodels v6.2 (+32)" data-md-component="logo">
+    <a href="../../../index.html" title="linearmodels v6.2 (+35)" class="md-header__button md-logo" aria-label="linearmodels v6.2 (+35)" data-md-component="logo">
       <img src="../../../_static/bw-logo.svg" alt="logo">
     </a>
     <label class="md-header__button md-icon" for="__drawer">
@@ -102,7 +102,7 @@
       <div class="md-header__ellipsis">
         <div class="md-header__topic">
           <span class="md-ellipsis">
-            linearmodels v6.2 (+32)
+            linearmodels v6.2 (+35)
           </span>
         </div>
         <div class="md-header__topic" data-md-component="header-topic">
@@ -197,10 +197,10 @@
 
 <nav class="md-nav md-nav--primary" aria-label="Navigation" data-md-level="0">
   <label class="md-nav__title" for="__drawer">
-    <a href="../../../index.html" title="linearmodels v6.2 (+32)" class="md-nav__button md-logo" aria-label="linearmodels v6.2 (+32)" data-md-component="logo">
+    <a href="../../../index.html" title="linearmodels v6.2 (+35)" class="md-nav__button md-logo" aria-label="linearmodels v6.2 (+35)" data-md-component="logo">
       <img src="../../../_static/bw-logo.svg" alt="logo">
     </a>
-    linearmodels v6.2 (+32)
+    linearmodels v6.2 (+35)
   </label>
   
     <div class="md-nav__source">
@@ -716,8 +716,8 @@
 
 <span class="sd">    Panel(x, items, major_axis, minor_axis).swapaxes(1,2).to_frame()</span>
 <span class="sd">    &quot;&quot;&quot;</span>
-    <span class="n">nmajor</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">major_axis</span><span class="p">))</span>
-    <span class="n">nminor</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">minor_axis</span><span class="p">))</span>
+    <span class="n">nmajor</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">major_axis</span><span class="p">))</span><span class="o">.</span><span class="n">tolist</span><span class="p">()</span>
+    <span class="n">nminor</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">minor_axis</span><span class="p">))</span><span class="o">.</span><span class="n">tolist</span><span class="p">()</span>
     <span class="n">final_levels</span> <span class="o">=</span> <span class="p">[</span><span class="n">major_axis</span><span class="p">,</span> <span class="n">minor_axis</span><span class="p">]</span>
     <span class="n">mi</span> <span class="o">=</span> <span class="n">MultiIndex</span><span class="o">.</span><span class="n">from_product</span><span class="p">([</span><span class="n">nmajor</span><span class="p">,</span> <span class="n">nminor</span><span class="p">])</span>
     <span class="k">if</span> <span class="n">x</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
