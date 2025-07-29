@@ -97,19 +97,26 @@ def preconditioner(
     klass = None
     if not isinstance(d, sp.csc_matrix):
         klass = d.__class__
-        d = sp.csc_matrix(d)
-    elif copy:
-        d = d.copy()
+        d_csc = sp.csc_matrix(d)
+    else:
+        assert isinstance(d, sp.csc_matrix)
+        d_csc = d
+        if copy:
+            d_csc = d.copy()
 
-    cond = cast(linearmodels.typing.data.Float64Array, np.sqrt(d.multiply(d).sum(0)).A1)
-    locs = np.zeros_like(d.indices)
-    locs[d.indptr[1:-1]] = 1
+    cond = cast(
+        linearmodels.typing.data.Float64Array, np.sqrt(d_csc.multiply(d_csc).sum(0)).A1
+    )
+    locs = np.zeros_like(d_csc.indices)
+    locs[d_csc.indptr[1:-1]] = 1
     locs = np.cumsum(locs)
-    d.data /= np.take(cond, locs)
+    d_csc.data /= np.take(cond, locs)
     if klass is not None:
-        d = klass(d)
+        d_out = klass(d_csc)
+    else:
+        d_out = d_csc
 
-    return d, cond
+    return d_out, cond
 
 
 def dummy_matrix(
