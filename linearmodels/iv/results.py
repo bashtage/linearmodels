@@ -364,11 +364,11 @@ class _LSModelResultsBase(_SummaryStr):
         smry.tables.append(table)
 
         param_data = c_[
-            self.params.values[:, None],
-            self.std_errors.values[:, None],
-            self.tstats.values[:, None],
-            self.pvalues.values[:, None],
-            self.conf_int(),
+            self.params.to_numpy()[:, None],
+            self.std_errors.to_numpy()[:, None],
+            self.tstats.to_numpy()[:, None],
+            self.pvalues.to_numpy()[:, None],
+            self.conf_int().to_numpy(),
         ]
         data = []
         for row in param_data:
@@ -722,11 +722,11 @@ class FirstStageResults(_SummaryStr):
         for col in endog.pandas:
             # TODO: BUG in pandas-stube
             #  https://github.com/pandas-dev/pandas-stubs/issues/97
-            y = w * endog.pandas[[col]].values
+            y = w * endog.pandas[[col]].to_numpy()
             ey = annihilate(y, x)
             partial = _OLS(ey, ez).fit(cov_type=self._cov_type, **self._cov_config)
             full = individual_results[str(col)]
-            params = full.params.values[-nz:]
+            params = full.params.to_numpy()[-nz:]
             params = params[:, None]
             c = asarray(full.cov)[-nz:, -nz:]
             stat = params.T @ inv(c) @ params
@@ -845,7 +845,7 @@ class FirstStageResults(_SummaryStr):
         params = []
         for var in header:
             res = self.individual[var]
-            v = c_[res.params.values, res.tstats.values]
+            v = c_[res.params.to_numpy(), res.tstats.to_numpy()]
             params.append(v.ravel())
         params_arr = array(params)
         params_fmt = [[_str(val) for val in row] for row in params_arr.T]
@@ -970,7 +970,7 @@ class IVResults(_CommonIVResults):
                 name=name,
             )
 
-        eps = self.resids.values[:, None]
+        eps = self.resids.to_numpy()[:, None]
         u = annihilate(eps, self.model._z)
         stat = nobs * (1 - (u.T @ u) / (eps.T @ eps)).squeeze()
         null = "The model is not overidentified."
@@ -1033,7 +1033,7 @@ class IVResults(_CommonIVResults):
             raise TypeError("variables must be a str or a list of str.")
 
         nobs = self.model.dependent.shape[0]
-        e2 = asarray(self.resids.values)
+        e2 = asarray(self.resids.to_numpy())
         nendog, nexog = self.model.endog.shape[1], self.model.exog.shape[1]
         if variables is None:
             assumed_exog = self.model.endog.ndarray
@@ -1041,9 +1041,9 @@ class IVResults(_CommonIVResults):
             still_endog = empty((nobs, 0))
         else:
             assert isinstance(variables, list)
-            assumed_exog = self.model.endog.pandas[variables].values
+            assumed_exog = self.model.endog.pandas[variables].to_numpy()
             ex = [c for c in self.model.endog.cols if c not in variables]
-            still_endog = self.model.endog.pandas[ex].values
+            still_endog = self.model.endog.pandas[ex].to_numpy()
             aug_exog = c_[self.model.exog.ndarray, assumed_exog]
         ntested = assumed_exog.shape[1]
 
@@ -1052,7 +1052,7 @@ class IVResults(_CommonIVResults):
         mod = IV2SLS(
             self.model.dependent, aug_exog, still_endog, self.model.instruments
         )
-        e0 = mod.fit().resids.values[:, None]
+        e0 = mod.fit().resids.to_numpy()[:, None]
 
         z2 = c_[self.model.exog.ndarray, self.model.instruments.ndarray]
         z1 = c_[z2, assumed_exog]
@@ -1257,8 +1257,8 @@ class IVResults(_CommonIVResults):
         mod = _OLS(self.model.dependent, augx)
         res = mod.fit(cov_type=self.cov_type, **self.cov_config)
         norig = self.model._x.shape[1]
-        test_params = asarray(res.params.values[norig:], dtype=float)
-        test_cov = res.cov.values[norig:, norig:]
+        test_params = asarray(res.params.to_numpy()[norig:], dtype=float)
+        test_cov = res.cov.to_numpy()[norig:, norig:]
         stat = test_params.T @ inv(test_cov) @ test_params
         df = len(test_params)
         null = "Endogenous variables are exogenous"
@@ -1310,7 +1310,7 @@ class IVResults(_CommonIVResults):
         endog_hat = proj(endog.ndarray, c_[exog.ndarray, instruments.ndarray])
         q = instruments.ndarray[:, : (ninstr - nendog)]
         q_res = annihilate(q, c_[self.model.exog.ndarray, endog_hat])
-        test_functions = q_res * self.resids.values[:, None]
+        test_functions = q_res * self.resids.to_numpy()[:, None]
         res = _OLS(ones((nobs, 1)), test_functions).fit(cov_type="unadjusted")
 
         stat = res.nobs * res.rsquared
@@ -1520,9 +1520,9 @@ class IVGMMResults(_CommonIVResults):
                 variable_lst = [variables]
             else:
                 raise TypeError("variables must be a str or a list of str.")
-            exog_e = c_[exog.ndarray, endog.pandas[variable_lst].values]
+            exog_e = c_[exog.ndarray, endog.pandas[variable_lst].to_numpy()]
             ex = [c for c in endog.pandas if c not in variable_lst]
-            endog_e = endog.pandas[ex].values
+            endog_e = endog.pandas[ex].to_numpy()
             null = "Variables {} are exogenous".format(", ".join(variable_lst))
         from linearmodels.iv.model import IVGMM, IVGMMCUE
 
@@ -1637,7 +1637,7 @@ class IVModelComparison(_ModelComparison):
             ],
             axis=1,
         )
-        vals_list = [[i for i in v] for v in vals.T.values]
+        vals_list = [[i for i in v] for v in vals.T.to_numpy()]
         vals_list[2] = [str(v) for v in vals_list[2]]
         for i in range(4, len(vals_list)):
             vals_list[i] = [_str(v) for v in vals_list[i]]
@@ -1650,11 +1650,11 @@ class IVModelComparison(_ModelComparison):
 
         for i in range(len(params)):
             formatted_and_starred = []
-            for v, pv in zip(params.values[i], pvalues[i]):
+            for v, pv in zip(params.to_numpy()[i], pvalues[i]):
                 formatted_and_starred.append(add_star(_str(v), pv, self._stars))
             params_fmt.append(formatted_and_starred)
             precision_fmt = []
-            for v in precision.values[i]:
+            for v in precision.to_numpy()[i]:
                 v_str = _str(v)
                 v_str = f"({v_str})" if v_str.strip() else v_str
                 precision_fmt.append(v_str)
