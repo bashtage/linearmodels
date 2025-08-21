@@ -4,7 +4,7 @@ flake8
 isort
 colorama
 matplotlib
-pytest>=7.3.0,<8
+pytest>=8.4.1,<9
 pytest-xdist
 pytest-cov
 seaborn
