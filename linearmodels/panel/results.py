@@ -333,7 +333,7 @@ class PanelResults(_SummaryStr):
         -----
         Uses a t(df_resid) if ``debiased`` is True, else normal.
         """
-        ci_quantiles = [(1 - level) / 2, 1 - (1 - level) / 2]
+        ci_quantiles = np.array([(1 - level) / 2, 1 - (1 - level) / 2])
         if self._debiased:
             q = stats.t.ppf(ci_quantiles, self.df_resid)
         else:

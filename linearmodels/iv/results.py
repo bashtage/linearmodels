@@ -286,7 +286,7 @@ class _LSModelResultsBase(_SummaryStr):
         -----
         Uses a t(df_resid) if ``debiased`` is True, else normal.
         """
-        ci_quantiles = [(1 - level) / 2, 1 - (1 - level) / 2]
+        ci_quantiles = array([(1 - level) / 2, 1 - (1 - level) / 2])
         if self._debiased:
             q = stats.t.ppf(ci_quantiles, self.df_resid)
         else:
@@ -1348,6 +1348,7 @@ class IVResults(_CommonIVResults):
                 "Test requires more instruments than " "endogenous variables.",
                 name=name,
             )
+        assert self._liml_kappa is not None
         stat = nobs * log(self._liml_kappa)
         df = ninstr - nendog
         null = "The model is not overidentified."
@@ -1385,6 +1386,7 @@ class IVResults(_CommonIVResults):
             )
         df = ninstr - nendog
         df_denom = nobs - (nexog + ninstr)
+        assert self._liml_kappa is not None
         stat = (self._liml_kappa - 1) * df_denom / df
         null = "The model is not overidentified."
         return WaldTestStatistic(stat, null, df, df_denom=df_denom, name=name)
