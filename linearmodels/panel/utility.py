@@ -3,7 +3,7 @@ from __future__ import annotations
 from linearmodels.compat.pandas import ANNUAL_FREQ
 
 from collections import defaultdict
-from typing import NamedTuple, TypeVar, cast
+from typing import Literal, NamedTuple, TypeVar, cast
 
 import numpy as np
 import numpy.random
@@ -122,15 +122,12 @@ def preconditioner(
 def dummy_matrix(
     cats: linearmodels.typing.data.ArrayLike,
     *,
-    output_format: str = "csc",
-    drop: str = "first",
+    output_format: Literal["csc", "csr", "coo"] = "csc",
+    drop: Literal["first", "last"] = "first",
     drop_all: bool = False,
     precondition: bool = True,
 ) -> tuple[
-    sp.csc_matrix
-    | sp.csr_matrix
-    | sp.coo_matrix
-    | linearmodels.typing.data.Float64Array,
+    sp.csc_matrix | sp.csr_matrix | sp.coo_matrix,
     linearmodels.typing.data.Float64Array,
 ]:
     """
@@ -146,7 +143,6 @@ def dummy_matrix(
         * "csc" - sparse matrix in compressed column form
         * "csr" - sparse matrix in compressed row form
         * "coo" - sparse matrix in coordinate form
-        * "array" - dense numpy ndarray
 
     drop: {"first", "last"}
         Exclude either the first or last category. This only applies when
@@ -199,7 +195,7 @@ def dummy_matrix(
         data["cols"].append(cols)
         total_dummies += ncategories - (i > 0)
 
-    if output_format in ("csc", "array"):
+    if output_format == "csc":
         fmt = sp.csc_matrix
     elif output_format == "csr":
         fmt = sp.csr_matrix
@@ -213,9 +209,6 @@ def dummy_matrix(
             (np.concatenate(data["rows"]), np.concatenate(data["cols"])),
         )
     )
-    if output_format == "array":
-        out = out.toarray()
-
     if precondition:
         out, cond = preconditioner(out, copy=False)
     else:

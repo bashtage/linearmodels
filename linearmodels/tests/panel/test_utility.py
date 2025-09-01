@@ -20,7 +20,6 @@ formats = {
     "csc": csc_matrix,
     "csr": csr_matrix,
     "coo": coo_matrix,
-    "array": np.ndarray,
 }
 
 pytestmark = pytest.mark.filterwarnings(
@@ -83,19 +82,15 @@ def test_dummy_precondition():
     c1 = pd.Series(pd.Categorical(["a"] * 5 + ["b"] * 5 + ["c"] * 5))
     c2 = pd.Series(pd.Categorical(["A", "B", "C", "D", "E"] * 3))
     cats = pd.concat([c1, c2], axis=1)
-    out_arr, cond_arr = dummy_matrix(
-        cats, output_format="array", drop="last", precondition=True
-    )
     csc = dummy_matrix(cats, output_format="csc", drop="last", precondition=True)
     out_csc: csc_matrix = csc[0]
     cond_csc: np.ndarray = csc[1]
     csr = dummy_matrix(cats, output_format="csr", drop="last", precondition=True)
     out_csr: csr_matrix = csr[0]
     cond_csr: np.ndarray = csr[1]
-    assert_allclose((out_arr**2).sum(0), np.ones(out_arr.shape[1]))
-    assert_allclose((out_csc.multiply(out_csc)).sum(0).A1, np.ones(out_arr.shape[1]))
-    assert_allclose(cond_arr, cond_csc)
+    assert_allclose((out_csc.multiply(out_csc)).sum(0).A1, np.ones(out_csc.shape[1]))
     assert_allclose(cond_csr, cond_csc)
+    assert isinstance(out_csc, csc_matrix)
     assert isinstance(out_csr, csr_matrix)
 
 
