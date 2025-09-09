@@ -18,7 +18,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        python: [cp311]
+        python: [cp313]
         os: [ubuntu-latest, windows-latest]
     env:
       BUILD_COMMIT: "main"
