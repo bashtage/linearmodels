@@ -19,7 +19,7 @@
     
   
       
-        <title>linearmodels.panel.covariance - linearmodels v6.2 (+51)</title>
+        <title>linearmodels.panel.covariance - linearmodels v6.2 (+54)</title>
       
     
 
@@ -91,7 +91,7 @@
 
 <header class="md-header md-header--shadow" data-md-component="header">
   <nav class="md-header__inner md-grid" aria-label="Header">
-    <a href="../../../index.html" title="linearmodels v6.2 (+51)" class="md-header__button md-logo" aria-label="linearmodels v6.2 (+51)" data-md-component="logo">
+    <a href="../../../index.html" title="linearmodels v6.2 (+54)" class="md-header__button md-logo" aria-label="linearmodels v6.2 (+54)" data-md-component="logo">
       <img src="../../../_static/bw-logo.svg" alt="logo">
     </a>
     <label class="md-header__button md-icon" for="__drawer">
@@ -102,7 +102,7 @@
       <div class="md-header__ellipsis">
         <div class="md-header__topic">
           <span class="md-ellipsis">
-            linearmodels v6.2 (+51)
+            linearmodels v6.2 (+54)
           </span>
         </div>
         <div class="md-header__topic" data-md-component="header-topic">
@@ -197,10 +197,10 @@
 
 <nav class="md-nav md-nav--primary" aria-label="Navigation" data-md-level="0">
   <label class="md-nav__title" for="__drawer">
-    <a href="../../../index.html" title="linearmodels v6.2 (+51)" class="md-nav__button md-logo" aria-label="linearmodels v6.2 (+51)" data-md-component="logo">
+    <a href="../../../index.html" title="linearmodels v6.2 (+54)" class="md-nav__button md-logo" aria-label="linearmodels v6.2 (+54)" data-md-component="logo">
       <img src="../../../_static/bw-logo.svg" alt="logo">
     </a>
-    linearmodels v6.2 (+51)
+    linearmodels v6.2 (+54)
   </label>
   
     <div class="md-nav__source">
@@ -633,12 +633,15 @@
         <span class="n">eps</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">eps</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_scale</span> <span class="o">*</span> <span class="nb">float</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">squeeze</span><span class="p">(</span><span class="n">eps</span><span class="o">.</span><span class="n">T</span> <span class="o">@</span> <span class="n">eps</span><span class="p">))</span> <span class="o">/</span> <span class="bp">self</span><span class="o">.</span><span class="n">_nobs</span>
 
+<div class="viewcode-block" id="HomoskedasticCovariance.cov">
+<a class="viewcode-back" href="../../../panel/panel/linearmodels.panel.covariance.HomoskedasticCovariance.cov.html#linearmodels.panel.covariance.HomoskedasticCovariance.cov">[docs]</a>
     <span class="nd">@cached_property</span>
     <span class="k">def</span><span class="w"> </span><span class="nf">cov</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">linearmodels</span><span class="o">.</span><span class="n">typing</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">Float64Array</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Estimated covariance&quot;&quot;&quot;</span>
         <span class="n">x</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_x</span>
         <span class="n">out</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">s2</span> <span class="o">*</span> <span class="n">inv</span><span class="p">(</span><span class="n">x</span><span class="o">.</span><span class="n">T</span> <span class="o">@</span> <span class="n">x</span><span class="p">)</span>
-        <span class="k">return</span> <span class="p">(</span><span class="n">out</span> <span class="o">+</span> <span class="n">out</span><span class="o">.</span><span class="n">T</span><span class="p">)</span> <span class="o">/</span> <span class="mi">2</span>
+        <span class="k">return</span> <span class="p">(</span><span class="n">out</span> <span class="o">+</span> <span class="n">out</span><span class="o">.</span><span class="n">T</span><span class="p">)</span> <span class="o">/</span> <span class="mi">2</span></div>
+
 
 <div class="viewcode-block" id="HomoskedasticCovariance.deferred_cov">
 <a class="viewcode-back" href="../../../panel/panel/linearmodels.panel.covariance.HomoskedasticCovariance.deferred_cov.html#linearmodels.panel.covariance.HomoskedasticCovariance.deferred_cov">[docs]</a>
@@ -714,6 +717,8 @@
         <span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_name</span> <span class="o">=</span> <span class="s2">&quot;Robust&quot;</span>
 
+<div class="viewcode-block" id="HeteroskedasticCovariance.cov">
+<a class="viewcode-back" href="../../../panel/panel/linearmodels.panel.covariance.HeteroskedasticCovariance.cov.html#linearmodels.panel.covariance.HeteroskedasticCovariance.cov">[docs]</a>
     <span class="nd">@cached_property</span>
     <span class="k">def</span><span class="w"> </span><span class="nf">cov</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">linearmodels</span><span class="o">.</span><span class="n">typing</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">Float64Array</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Estimated covariance&quot;&quot;&quot;</span>
@@ -726,6 +731,7 @@
 
         <span class="n">out</span> <span class="o">=</span> <span class="p">(</span><span class="n">xpxi</span> <span class="o">@</span> <span class="n">xeex</span> <span class="o">@</span> <span class="n">xpxi</span><span class="p">)</span> <span class="o">/</span> <span class="n">nobs</span>
         <span class="k">return</span> <span class="p">(</span><span class="n">out</span> <span class="o">+</span> <span class="n">out</span><span class="o">.</span><span class="n">T</span><span class="p">)</span> <span class="o">/</span> <span class="mi">2</span></div>
+</div>
 
 
 
@@ -822,6 +828,8 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">_clusters</span> <span class="o">=</span> <span class="n">clusters</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_name</span> <span class="o">=</span> <span class="s2">&quot;Clustered&quot;</span>
 
+<div class="viewcode-block" id="ClusteredCovariance.cov">
+<a class="viewcode-back" href="../../../panel/panel/linearmodels.panel.covariance.ClusteredCovariance.cov.html#linearmodels.panel.covariance.ClusteredCovariance.cov">[docs]</a>
     <span class="nd">@cached_property</span>
     <span class="k">def</span><span class="w"> </span><span class="nf">cov</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">linearmodels</span><span class="o">.</span><span class="n">typing</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">Float64Array</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Estimated covariance&quot;&quot;&quot;</span>
@@ -855,6 +863,7 @@
         <span class="n">xeex</span> <span class="o">*=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_scale</span>
         <span class="n">out</span> <span class="o">=</span> <span class="p">(</span><span class="n">xpxi</span> <span class="o">@</span> <span class="n">xeex</span> <span class="o">@</span> <span class="n">xpxi</span><span class="p">)</span> <span class="o">/</span> <span class="n">nobs</span>
         <span class="k">return</span> <span class="p">(</span><span class="n">out</span> <span class="o">+</span> <span class="n">out</span><span class="o">.</span><span class="n">T</span><span class="p">)</span> <span class="o">/</span> <span class="mi">2</span></div>
+</div>
 
 
 
@@ -947,6 +956,8 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">_kernel</span> <span class="o">=</span> <span class="n">kernel</span> <span class="k">if</span> <span class="n">kernel</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="k">else</span> <span class="bp">self</span><span class="o">.</span><span class="n">DEFAULT_KERNEL</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_bandwidth</span> <span class="o">=</span> <span class="n">bandwidth</span>
 
+<div class="viewcode-block" id="DriscollKraay.cov">
+<a class="viewcode-back" href="../../../panel/panel/linearmodels.panel.covariance.DriscollKraay.cov.html#linearmodels.panel.covariance.DriscollKraay.cov">[docs]</a>
     <span class="nd">@cached_property</span>
     <span class="k">def</span><span class="w"> </span><span class="nf">cov</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">linearmodels</span><span class="o">.</span><span class="n">typing</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">Float64Array</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Estimated covariance&quot;&quot;&quot;</span>
@@ -971,6 +982,7 @@
 
         <span class="n">out</span> <span class="o">=</span> <span class="p">(</span><span class="n">xpxi</span> <span class="o">@</span> <span class="n">xeex</span> <span class="o">@</span> <span class="n">xpxi</span><span class="p">)</span> <span class="o">/</span> <span class="n">nobs</span>
         <span class="k">return</span> <span class="p">(</span><span class="n">out</span> <span class="o">+</span> <span class="n">out</span><span class="o">.</span><span class="n">T</span><span class="p">)</span> <span class="o">/</span> <span class="mi">2</span></div>
+</div>
 
 
 
@@ -1075,6 +1087,8 @@
         <span class="n">w</span> <span class="o">=</span> <span class="n">KERNEL_LOOKUP</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">_kernel</span><span class="p">](</span><span class="n">bw</span><span class="p">,</span> <span class="n">nobs</span> <span class="o">-</span> <span class="mi">1</span><span class="p">)</span>
         <span class="k">return</span> <span class="n">cov_kernel</span><span class="p">(</span><span class="n">xe</span><span class="p">,</span> <span class="n">w</span><span class="p">)</span>
 
+<div class="viewcode-block" id="ACCovariance.cov">
+<a class="viewcode-back" href="../../../panel/panel/linearmodels.panel.covariance.ACCovariance.cov.html#linearmodels.panel.covariance.ACCovariance.cov">[docs]</a>
     <span class="nd">@cached_property</span>
     <span class="k">def</span><span class="w"> </span><span class="nf">cov</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">linearmodels</span><span class="o">.</span><span class="n">typing</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">Float64Array</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Estimated covariance&quot;&quot;&quot;</span>
@@ -1109,6 +1123,7 @@
 
         <span class="n">out</span> <span class="o">=</span> <span class="p">(</span><span class="n">xpxi</span> <span class="o">@</span> <span class="n">xeex</span> <span class="o">@</span> <span class="n">xpxi</span><span class="p">)</span> <span class="o">/</span> <span class="n">nobs</span>
         <span class="k">return</span> <span class="p">(</span><span class="n">out</span> <span class="o">+</span> <span class="n">out</span><span class="o">.</span><span class="n">T</span><span class="p">)</span> <span class="o">/</span> <span class="mi">2</span></div>
+</div>
 
 
 
@@ -1211,6 +1226,8 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">_bandwidth</span> <span class="o">=</span> <span class="n">bandwidth</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_kernel</span> <span class="o">=</span> <span class="n">kernel</span> <span class="k">if</span> <span class="n">kernel</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="k">else</span> <span class="bp">self</span><span class="o">.</span><span class="n">DEFAULT_KERNEL</span>
 
+<div class="viewcode-block" id="FamaMacBethCovariance.bandwidth">
+<a class="viewcode-back" href="../../../panel/panel/linearmodels.panel.covariance.FamaMacBethCovariance.bandwidth.html#linearmodels.panel.covariance.FamaMacBethCovariance.bandwidth">[docs]</a>
     <span class="nd">@cached_property</span>
     <span class="k">def</span><span class="w"> </span><span class="nf">bandwidth</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">float</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Estimator bandwidth&quot;&quot;&quot;</span>
@@ -1221,8 +1238,11 @@
             <span class="n">stde</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="n">e</span> <span class="o">/</span> <span class="n">e</span><span class="o">.</span><span class="n">std</span><span class="p">(</span><span class="mi">0</span><span class="p">)[</span><span class="kc">None</span><span class="p">,</span> <span class="p">:],</span> <span class="mi">1</span><span class="p">)</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">_bandwidth</span> <span class="o">=</span> <span class="n">kernel_optimal_bandwidth</span><span class="p">(</span><span class="n">stde</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_kernel</span><span class="p">)</span>
         <span class="k">assert</span> <span class="bp">self</span><span class="o">.</span><span class="n">_bandwidth</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span>
-        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_bandwidth</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_bandwidth</span></div>
 
+
+<div class="viewcode-block" id="FamaMacBethCovariance.cov">
+<a class="viewcode-back" href="../../../panel/panel/linearmodels.panel.covariance.FamaMacBethCovariance.cov.html#linearmodels.panel.covariance.FamaMacBethCovariance.cov">[docs]</a>
     <span class="nd">@cached_property</span>
     <span class="k">def</span><span class="w"> </span><span class="nf">cov</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">linearmodels</span><span class="o">.</span><span class="n">typing</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">Float64Array</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Estimated covariance&quot;&quot;&quot;</span>
@@ -1234,7 +1254,8 @@
         <span class="k">assert</span> <span class="bp">self</span><span class="o">.</span><span class="n">_kernel</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span>
         <span class="n">w</span> <span class="o">=</span> <span class="n">KERNEL_LOOKUP</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">_kernel</span><span class="p">](</span><span class="n">bw</span><span class="p">,</span> <span class="n">nobs</span> <span class="o">-</span> <span class="mi">1</span><span class="p">)</span>
         <span class="n">cov</span> <span class="o">=</span> <span class="n">cov_kernel</span><span class="p">(</span><span class="n">e</span><span class="p">,</span> <span class="n">w</span><span class="p">)</span>
-        <span class="k">return</span> <span class="n">cov</span> <span class="o">/</span> <span class="p">(</span><span class="n">nobs</span> <span class="o">-</span> <span class="nb">int</span><span class="p">(</span><span class="nb">bool</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_debiased</span><span class="p">)))</span>
+        <span class="k">return</span> <span class="n">cov</span> <span class="o">/</span> <span class="p">(</span><span class="n">nobs</span> <span class="o">-</span> <span class="nb">int</span><span class="p">(</span><span class="nb">bool</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_debiased</span><span class="p">)))</span></div>
+
 
     <span class="nd">@property</span>
     <span class="k">def</span><span class="w"> </span><span class="nf">all_params</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">DataFrame</span><span class="p">:</span>

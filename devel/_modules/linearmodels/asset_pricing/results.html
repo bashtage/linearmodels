@@ -19,7 +19,7 @@
     
   
       
-        <title>linearmodels.asset_pricing.results - linearmodels v6.2 (+51)</title>
+        <title>linearmodels.asset_pricing.results - linearmodels v6.2 (+54)</title>
       
     
 
@@ -91,7 +91,7 @@
 
 <header class="md-header md-header--shadow" data-md-component="header">
   <nav class="md-header__inner md-grid" aria-label="Header">
-    <a href="../../../index.html" title="linearmodels v6.2 (+51)" class="md-header__button md-logo" aria-label="linearmodels v6.2 (+51)" data-md-component="logo">
+    <a href="../../../index.html" title="linearmodels v6.2 (+54)" class="md-header__button md-logo" aria-label="linearmodels v6.2 (+54)" data-md-component="logo">
       <img src="../../../_static/bw-logo.svg" alt="logo">
     </a>
     <label class="md-header__button md-icon" for="__drawer">
@@ -102,7 +102,7 @@
       <div class="md-header__ellipsis">
         <div class="md-header__topic">
           <span class="md-ellipsis">
-            linearmodels v6.2 (+51)
+            linearmodels v6.2 (+54)
           </span>
         </div>
         <div class="md-header__topic" data-md-component="header-topic">
@@ -197,10 +197,10 @@
 
 <nav class="md-nav md-nav--primary" aria-label="Navigation" data-md-level="0">
   <label class="md-nav__title" for="__drawer">
-    <a href="../../../index.html" title="linearmodels v6.2 (+51)" class="md-nav__button md-logo" aria-label="linearmodels v6.2 (+51)" data-md-component="logo">
+    <a href="../../../index.html" title="linearmodels v6.2 (+54)" class="md-nav__button md-logo" aria-label="linearmodels v6.2 (+54)" data-md-component="logo">
       <img src="../../../_static/bw-logo.svg" alt="logo">
     </a>
-    linearmodels v6.2 (+51)
+    linearmodels v6.2 (+54)
   </label>
   
     <div class="md-nav__source">
@@ -761,11 +761,16 @@
         <span class="n">se</span> <span class="o">=</span> <span class="n">se</span><span class="o">.</span><span class="n">reshape</span><span class="p">((</span><span class="n">nportfolio</span><span class="p">,</span> <span class="n">nfactor</span><span class="p">))</span>
         <span class="k">return</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">(</span><span class="n">se</span><span class="p">,</span> <span class="n">columns</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">_cols</span><span class="p">,</span> <span class="n">index</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">_portfolio_names</span><span class="p">)</span>
 
+<div class="viewcode-block" id="LinearFactorModelResults.tstats">
+<a class="viewcode-back" href="../../../asset-pricing/asset-pricing/linearmodels.asset_pricing.results.LinearFactorModelResults.tstats.html#linearmodels.asset_pricing.results.LinearFactorModelResults.tstats">[docs]</a>
     <span class="nd">@cached_property</span>
     <span class="k">def</span><span class="w"> </span><span class="nf">tstats</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Parameter t-statistics&quot;&quot;&quot;</span>
-        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">params</span> <span class="o">/</span> <span class="bp">self</span><span class="o">.</span><span class="n">std_errors</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">params</span> <span class="o">/</span> <span class="bp">self</span><span class="o">.</span><span class="n">std_errors</span></div>
 
+
+<div class="viewcode-block" id="LinearFactorModelResults.pvalues">
+<a class="viewcode-back" href="../../../asset-pricing/asset-pricing/linearmodels.asset_pricing.results.LinearFactorModelResults.pvalues.html#linearmodels.asset_pricing.results.LinearFactorModelResults.pvalues">[docs]</a>
     <span class="nd">@cached_property</span>
     <span class="k">def</span><span class="w"> </span><span class="nf">pvalues</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
@@ -773,7 +778,8 @@
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="n">pvals</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">tstats</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
         <span class="n">pvals</span><span class="o">.</span><span class="n">loc</span><span class="p">[:,</span> <span class="p">:]</span> <span class="o">=</span> <span class="mi">2</span> <span class="o">*</span> <span class="p">(</span><span class="mf">1.0</span> <span class="o">-</span> <span class="n">stats</span><span class="o">.</span><span class="n">norm</span><span class="o">.</span><span class="n">cdf</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">abs</span><span class="p">(</span><span class="n">pvals</span><span class="p">)))</span>
-        <span class="k">return</span> <span class="n">pvals</span>
+        <span class="k">return</span> <span class="n">pvals</span></div>
+
 
     <span class="nd">@property</span>
     <span class="k">def</span><span class="w"> </span><span class="nf">cov_estimator</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>

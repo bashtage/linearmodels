@@ -23,7 +23,7 @@
     
   
       
-        <title>Further Examples - linearmodels v6.2 (+51)</title>
+        <title>Further Examples - linearmodels v6.2 (+54)</title>
       
     
 
@@ -101,7 +101,7 @@
 
 <header class="md-header md-header--shadow" data-md-component="header">
   <nav class="md-header__inner md-grid" aria-label="Header">
-    <a href="../../index.html" title="linearmodels v6.2 (+51)" class="md-header__button md-logo" aria-label="linearmodels v6.2 (+51)" data-md-component="logo">
+    <a href="../../index.html" title="linearmodels v6.2 (+54)" class="md-header__button md-logo" aria-label="linearmodels v6.2 (+54)" data-md-component="logo">
       <img src="../../_static/bw-logo.svg" alt="logo">
     </a>
     <label class="md-header__button md-icon" for="__drawer">
@@ -112,7 +112,7 @@
       <div class="md-header__ellipsis">
         <div class="md-header__topic">
           <span class="md-ellipsis">
-            linearmodels v6.2 (+51)
+            linearmodels v6.2 (+54)
           </span>
         </div>
         <div class="md-header__topic" data-md-component="header-topic">
@@ -207,10 +207,10 @@
 
 <nav class="md-nav md-nav--primary" aria-label="Navigation" data-md-level="0">
   <label class="md-nav__title" for="__drawer">
-    <a href="../../index.html" title="linearmodels v6.2 (+51)" class="md-nav__button md-logo" aria-label="linearmodels v6.2 (+51)" data-md-component="logo">
+    <a href="../../index.html" title="linearmodels v6.2 (+54)" class="md-nav__button md-logo" aria-label="linearmodels v6.2 (+54)" data-md-component="logo">
       <img src="../../_static/bw-logo.svg" alt="logo">
     </a>
-    linearmodels v6.2 (+51)
+    linearmodels v6.2 (+54)
   </label>
   
     <div class="md-nav__source">
@@ -1360,7 +1360,7 @@ Dep. Variable:               ldrugexp   R-squared:                      0.1770
 Estimator:                        OLS   Adj. R-squared:                 0.1765
 No. Observations:               10089   F-statistic:                    2262.6
 Date:                Tue, Sep 09 2025   P-value (F-stat)                0.0000
-Time:                        15:58:15   Distribution:                  chi2(6)
+Time:                        17:52:26   Distribution:                  chi2(6)
 Cov. Estimator:                robust
 
                               Parameter Estimates
@@ -1400,7 +1400,7 @@ Dep. Variable:               ldrugexp   R-squared:                      0.0640
 Estimator:                    IV-2SLS   Adj. R-squared:                 0.0634
 No. Observations:               10089   F-statistic:                    2000.9
 Date:                Tue, Sep 09 2025   P-value (F-stat)                0.0000
-Time:                        15:58:15   Distribution:                  chi2(6)
+Time:                        17:52:26   Distribution:                  chi2(6)
 Cov. Estimator:                robust
 
                               Parameter Estimates
@@ -1506,16 +1506,16 @@ Debiased: False
 </div>
 <div class="output_area docutils container">
 <div class="highlight"><pre>
-Iteration: 0, Objective: 1.0464700379606549
-Iteration: 1, Objective: 1.0464502885083113
-Iteration: 2, Objective: 1.0464130360262864
-Iteration: 3, Objective: 1.0463424845749365
-Iteration: 4, Objective: 1.0463088764519721
-Iteration: 5, Objective: 1.046246592354301
-Iteration: 6, Objective: 1.0461351697094212
-Iteration: 7, Objective: 1.0459299505012702
-Iteration: 8, Objective: 1.0455969424541633
-Iteration: 9, Objective: 1.0453647243361393
+Iteration: 0, Objective: 1.046470037960651
+Iteration: 1, Objective: 1.0464502883543296
+Iteration: 2, Objective: 1.0464130356965964
+Iteration: 3, Objective: 1.0463424840551647
+Iteration: 4, Objective: 1.0463088742521145
+Iteration: 5, Objective: 1.0462465870174984
+Iteration: 6, Objective: 1.046135159548402
+Iteration: 7, Objective: 1.0459299321858915
+Iteration: 8, Objective: 1.0455969164423224
+Iteration: 9, Objective: 1.0453647242602209
 </pre></div></div>
 </div>
 <h2 id="Comparing-results">Comparing results<a class="headerlink" href="#Comparing-results" title="Link to this heading">¶</a></h2>
@@ -1602,7 +1602,7 @@ H0: All endogenous variables are exogenous
 Statistic: 25.2819
 P-value: 0.0000
 Distributed: chi2(1)
-WaldTestStatistic, id: 0x7f71e071a1a0
+WaldTestStatistic, id: 0x7f39bbfe18d0
 </pre></div></div>
 </div>
 <p>The Wu-Hausman test is a variant of the Durbin test that uses a slightly different form.</p>
@@ -1625,7 +1625,7 @@ H0: All endogenous variables are exogenous
 Statistic: 25.3253
 P-value: 0.0000
 Distributed: F(1,10081)
-WaldTestStatistic, id: 0x7f71e0935e70
+WaldTestStatistic, id: 0x7f39be4a2810
 </pre></div></div>
 </div>
 <p>The test statistic can be directly replicated using the squared t-stat in a 2-stage approach where the first stage regresses the endogenous variable on the controls and instrument and the second stage regresses the dependent variable on the controls, the endogenous regressor and the residuals. If the regressor was in fact exogenous, the residuals should not be correlated with the dependent variable.</p>
@@ -1671,7 +1671,7 @@ H0: Endogenous variables are exogenous
 Statistic: 26.4542
 P-value: 0.0000
 Distributed: chi2(1)
-WaldTestStatistic, id: 0x7f71ddb46f20
+WaldTestStatistic, id: 0x7f39be3a7430
 </pre></div></div>
 </div>
 <p>Wooldridge”s score test is an alternative to the regression test, although it usually has slightly less power since it is an LM rather than a Wald type test.</p>
@@ -1694,7 +1694,7 @@ H0: Endogenous variables are exogenous
 Statistic: 24.9350
 P-value: 0.0000
 Distributed: chi2(1)
-WaldTestStatistic, id: 0x7f71ddb470a0
+WaldTestStatistic, id: 0x7f39be37d370
 </pre></div></div>
 </div>
 <h3 id="Exogeneity-Testing">Exogeneity Testing<a class="headerlink" href="#Exogeneity-Testing" title="Link to this heading">¶</a></h3>
@@ -1717,7 +1717,7 @@ H0: Expected moment conditions are equal to 0
 Statistic: 1.0475
 P-value: 0.3061
 Distributed: chi2(1)
-WaldTestStatistic, id: 0x7f71de15ae90
+WaldTestStatistic, id: 0x7f39be181250
 </pre></div></div>
 </div>
 <p>When all instruments are included the story changes, and some of the additional instrument (<code class="docutils literal notranslate"><span class="pre">lowincome</span></code> or <code class="docutils literal notranslate"><span class="pre">firmsz</span></code>) appear to be endogenous.</p>
@@ -1741,7 +1741,7 @@ H0: Expected moment conditions are equal to 0
 Statistic: 11.5903
 P-value: 0.0089
 Distributed: chi2(3)
-WaldTestStatistic, id: 0x7f71dd8aae90
+WaldTestStatistic, id: 0x7f39bb27c050
 </pre></div></div>
 </div>
 <h2 id="Single-Instrument-Regressions">Single Instrument Regressions<a class="headerlink" href="#Single-Instrument-Regressions" title="Link to this heading">¶</a></h2>
