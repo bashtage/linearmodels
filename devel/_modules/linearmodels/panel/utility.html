@@ -19,7 +19,7 @@
     
   
       
-        <title>linearmodels.panel.utility - linearmodels v6.2 (+40)</title>
+        <title>linearmodels.panel.utility - linearmodels v6.2 (+45)</title>
       
     
 
@@ -50,7 +50,7 @@
         <style>:root{--md-text-font:"Roboto";--md-code-font:"Roboto Mono"}</style>
       
     
-        <link rel="stylesheet" type="text/css" href="../../../_static/sphinx_immaterial_theme.6ec1c446c2c357833.min.css?v=e2e8fea8" />
+        <link rel="stylesheet" type="text/css" href="../../../_static/sphinx_immaterial_theme.acf80fe7f4d9ef9e2.min.css?v=9e56d0d2" />
         <link rel="stylesheet" type="text/css" href="../../../_static/css/small_fixes.css?v=34934119" />
     <script>__md_scope=new URL("../../..",location),__md_hash=e=>[...e].reduce(((e,_)=>(e<<5)-e+_.charCodeAt(0)),0),__md_get=(e,_=localStorage,t=__md_scope)=>JSON.parse(_.getItem(t.pathname+"."+e)),__md_set=(e,_,t=localStorage,a=__md_scope)=>{try{t.setItem(a.pathname+"."+e,JSON.stringify(_))}catch(e){}}</script>
     
@@ -91,7 +91,7 @@
 
 <header class="md-header md-header--shadow" data-md-component="header">
   <nav class="md-header__inner md-grid" aria-label="Header">
-    <a href="../../../index.html" title="linearmodels v6.2 (+40)" class="md-header__button md-logo" aria-label="linearmodels v6.2 (+40)" data-md-component="logo">
+    <a href="../../../index.html" title="linearmodels v6.2 (+45)" class="md-header__button md-logo" aria-label="linearmodels v6.2 (+45)" data-md-component="logo">
       <img src="../../../_static/bw-logo.svg" alt="logo">
     </a>
     <label class="md-header__button md-icon" for="__drawer">
@@ -102,7 +102,7 @@
       <div class="md-header__ellipsis">
         <div class="md-header__topic">
           <span class="md-ellipsis">
-            linearmodels v6.2 (+40)
+            linearmodels v6.2 (+45)
           </span>
         </div>
         <div class="md-header__topic" data-md-component="header-topic">
@@ -197,10 +197,10 @@
 
 <nav class="md-nav md-nav--primary" aria-label="Navigation" data-md-level="0">
   <label class="md-nav__title" for="__drawer">
-    <a href="../../../index.html" title="linearmodels v6.2 (+40)" class="md-nav__button md-logo" aria-label="linearmodels v6.2 (+40)" data-md-component="logo">
+    <a href="../../../index.html" title="linearmodels v6.2 (+45)" class="md-nav__button md-logo" aria-label="linearmodels v6.2 (+45)" data-md-component="logo">
       <img src="../../../_static/bw-logo.svg" alt="logo">
     </a>
-    linearmodels v6.2 (+40)
+    linearmodels v6.2 (+45)
   </label>
   
     <div class="md-nav__source">
@@ -509,7 +509,7 @@
 <span class="kn">from</span><span class="w"> </span><span class="nn">linearmodels.compat.pandas</span><span class="w"> </span><span class="kn">import</span> <span class="n">ANNUAL_FREQ</span>
 
 <span class="kn">from</span><span class="w"> </span><span class="nn">collections</span><span class="w"> </span><span class="kn">import</span> <span class="n">defaultdict</span>
-<span class="kn">from</span><span class="w"> </span><span class="nn">typing</span><span class="w"> </span><span class="kn">import</span> <span class="n">NamedTuple</span><span class="p">,</span> <span class="n">TypeVar</span><span class="p">,</span> <span class="n">cast</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">typing</span><span class="w"> </span><span class="kn">import</span> <span class="n">Literal</span><span class="p">,</span> <span class="n">NamedTuple</span><span class="p">,</span> <span class="n">TypeVar</span><span class="p">,</span> <span class="n">cast</span>
 
 <span class="kn">import</span><span class="w"> </span><span class="nn">numpy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">np</span>
 <span class="kn">import</span><span class="w"> </span><span class="nn">numpy.random</span>
@@ -628,15 +628,12 @@
 <span class="k">def</span><span class="w"> </span><span class="nf">dummy_matrix</span><span class="p">(</span>
     <span class="n">cats</span><span class="p">:</span> <span class="n">linearmodels</span><span class="o">.</span><span class="n">typing</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">ArrayLike</span><span class="p">,</span>
     <span class="o">*</span><span class="p">,</span>
-    <span class="n">output_format</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;csc&quot;</span><span class="p">,</span>
-    <span class="n">drop</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;first&quot;</span><span class="p">,</span>
+    <span class="n">output_format</span><span class="p">:</span> <span class="n">Literal</span><span class="p">[</span><span class="s2">&quot;csc&quot;</span><span class="p">,</span> <span class="s2">&quot;csr&quot;</span><span class="p">,</span> <span class="s2">&quot;coo&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="s2">&quot;csc&quot;</span><span class="p">,</span>
+    <span class="n">drop</span><span class="p">:</span> <span class="n">Literal</span><span class="p">[</span><span class="s2">&quot;first&quot;</span><span class="p">,</span> <span class="s2">&quot;last&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="s2">&quot;first&quot;</span><span class="p">,</span>
     <span class="n">drop_all</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
     <span class="n">precondition</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">tuple</span><span class="p">[</span>
-    <span class="n">sp</span><span class="o">.</span><span class="n">csc_matrix</span>
-    <span class="o">|</span> <span class="n">sp</span><span class="o">.</span><span class="n">csr_matrix</span>
-    <span class="o">|</span> <span class="n">sp</span><span class="o">.</span><span class="n">coo_matrix</span>
-    <span class="o">|</span> <span class="n">linearmodels</span><span class="o">.</span><span class="n">typing</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">Float64Array</span><span class="p">,</span>
+    <span class="n">sp</span><span class="o">.</span><span class="n">csc_matrix</span> <span class="o">|</span> <span class="n">sp</span><span class="o">.</span><span class="n">csr_matrix</span> <span class="o">|</span> <span class="n">sp</span><span class="o">.</span><span class="n">coo_matrix</span><span class="p">,</span>
     <span class="n">linearmodels</span><span class="o">.</span><span class="n">typing</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">Float64Array</span><span class="p">,</span>
 <span class="p">]:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
@@ -652,7 +649,6 @@
 <span class="sd">        * &quot;csc&quot; - sparse matrix in compressed column form</span>
 <span class="sd">        * &quot;csr&quot; - sparse matrix in compressed row form</span>
 <span class="sd">        * &quot;coo&quot; - sparse matrix in coordinate form</span>
-<span class="sd">        * &quot;array&quot; - dense numpy ndarray</span>
 
 <span class="sd">    drop: {&quot;first&quot;, &quot;last&quot;}</span>
 <span class="sd">        Exclude either the first or last category. This only applies when</span>
@@ -705,7 +701,7 @@
         <span class="n">data</span><span class="p">[</span><span class="s2">&quot;cols&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">cols</span><span class="p">)</span>
         <span class="n">total_dummies</span> <span class="o">+=</span> <span class="n">ncategories</span> <span class="o">-</span> <span class="p">(</span><span class="n">i</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">)</span>
 
-    <span class="k">if</span> <span class="n">output_format</span> <span class="ow">in</span> <span class="p">(</span><span class="s2">&quot;csc&quot;</span><span class="p">,</span> <span class="s2">&quot;array&quot;</span><span class="p">):</span>
+    <span class="k">if</span> <span class="n">output_format</span> <span class="o">==</span> <span class="s2">&quot;csc&quot;</span><span class="p">:</span>
         <span class="n">fmt</span> <span class="o">=</span> <span class="n">sp</span><span class="o">.</span><span class="n">csc_matrix</span>
     <span class="k">elif</span> <span class="n">output_format</span> <span class="o">==</span> <span class="s2">&quot;csr&quot;</span><span class="p">:</span>
         <span class="n">fmt</span> <span class="o">=</span> <span class="n">sp</span><span class="o">.</span><span class="n">csr_matrix</span>
@@ -719,9 +715,6 @@
             <span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">concatenate</span><span class="p">(</span><span class="n">data</span><span class="p">[</span><span class="s2">&quot;rows&quot;</span><span class="p">]),</span> <span class="n">np</span><span class="o">.</span><span class="n">concatenate</span><span class="p">(</span><span class="n">data</span><span class="p">[</span><span class="s2">&quot;cols&quot;</span><span class="p">])),</span>
         <span class="p">)</span>
     <span class="p">)</span>
-    <span class="k">if</span> <span class="n">output_format</span> <span class="o">==</span> <span class="s2">&quot;array&quot;</span><span class="p">:</span>
-        <span class="n">out</span> <span class="o">=</span> <span class="n">out</span><span class="o">.</span><span class="n">toarray</span><span class="p">()</span>
-
     <span class="k">if</span> <span class="n">precondition</span><span class="p">:</span>
         <span class="n">out</span><span class="p">,</span> <span class="n">cond</span> <span class="o">=</span> <span class="n">preconditioner</span><span class="p">(</span><span class="n">out</span><span class="p">,</span> <span class="n">copy</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
     <span class="k">else</span><span class="p">:</span>
