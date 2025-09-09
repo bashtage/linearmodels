@@ -634,7 +634,7 @@ class LinearFactorModel(_LinearFactorModelBase):
 
         # Step 1, n regressions to get B
         fc = np.c_[np.ones((nobs, 1)), f]
-        b = lstsq(fc, p, rcond=None)[0]  # nf+1 by np
+        b = lstsq(fc, p, rcond=None)[0].astype(float)  # nf+1 by np
         eps = p - fc @ b
         if excess_returns:
             betas = b[1:].T

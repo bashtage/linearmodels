@@ -1521,6 +1521,8 @@ class PanelOLS(_PanelModelBase):
             cond_mean = lsmr(wd, wx[:, i], atol=1e-8, btol=1e-8)[0]
             cond_mean /= cond
             wx_mean_l.append(cond_mean)
+        wx_mean: linearmodels.typing.data.Float64Array | csc_matrix
+        wy_mean: linearmodels.typing.data.Float64Array | csc_matrix
         wx_mean = np.column_stack(wx_mean_l)
         wy_mean = lsmr(wd, wy, atol=1e-8, btol=1e-8)[0]
         wy_mean /= cond
