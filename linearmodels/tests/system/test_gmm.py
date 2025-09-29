@@ -134,7 +134,7 @@ def test_formula_equivalence_weights(data):
     weights = {}
     eqn_copy = AttrDict()
     for key in data.eqns:
-        eqn = {k: v for k, v in data.eqns[key].items()}
+        eqn = dict(data.eqns[key].items())
         nobs = eqn["dependent"].shape[0]
         w = np.random.chisquare(2, (nobs, 1)) / 2
         weights[key] = w
@@ -200,15 +200,15 @@ def test_no_constant_smoke():
 
 
 def test_unknown_weight_type(data):
-    with pytest.raises(ValueError, match="Unknown estimator for weight_type"):
+    with pytest.raises(ValueError, match=r"Unknown estimator for weight_type"):
         IVSystemGMM(data.eqns, weight_type="unknown")
 
 
 def test_unknown_cov_type(data):
     mod = IVSystemGMM(data.eqns)
-    with pytest.raises(ValueError, match="Unknown cov_type"):
+    with pytest.raises(ValueError, match=r"Unknown cov_type"):
         mod.fit(cov_type="unknown")
-    with pytest.raises(ValueError, match="Unknown cov_type"):
+    with pytest.raises(ValueError, match=r"Unknown cov_type"):
         mod.fit(cov_type=3)
 
 
@@ -262,7 +262,7 @@ def test_incorrect_sigma_shape(data):
     k = len(data.eqns)
     b = np.random.standard_normal((k + 2, 1))
     sigma = b @ b.T + np.diag(np.ones(k + 2))
-    with pytest.raises(ValueError, match="sigma must be a square matrix"):
+    with pytest.raises(ValueError, match=r"sigma must be a square matrix"):
         IVSystemGMM(data.eqns, weight_type="unadjusted", sigma=sigma)
 
 
@@ -270,7 +270,7 @@ def test_invalid_sigma_usage(data):
     k = len(data.eqns)
     b = np.random.standard_normal((k, 1))
     sigma = b @ b.T + np.diag(np.ones(k))
-    with pytest.warns(UserWarning, match="sigma has been provided"):
+    with pytest.warns(UserWarning, match=r"sigma has been provided"):
         IVSystemGMM(data.eqns, weight_type="robust", sigma=sigma)
 
 

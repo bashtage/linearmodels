@@ -187,7 +187,7 @@ def test_panel_ols_formula(data):
     assert_allclose(res.params, res2.params)
 
     formula = "y ~ x1 + EntityEffects + FixedEffects + x2 "
-    with pytest.raises(ValueError, match="Cannot use both FixedEffects"):
+    with pytest.raises(ValueError, match=r"Cannot use both FixedEffects"):
         PanelOLS.from_formula(formula, joined)
 
 
@@ -244,9 +244,9 @@ def test_formulas_predict_error(data, models, formula):
     model, _ = models
     mod = model.from_formula(formula, joined)
     res = mod.fit()
-    with pytest.raises(ValueError, match="Predictions can only be constructed"):
+    with pytest.raises(ValueError, match=r"Predictions can only be constructed"):
         res.predict(joined, data=joined)
-    with pytest.raises(ValueError, match="Predictions can only be constructed"):
+    with pytest.raises(ValueError, match=r"Predictions can only be constructed"):
         mod.predict(params=res.params, exog=joined, data=joined)
 
     parts = formula.split("~")
@@ -254,7 +254,7 @@ def test_formulas_predict_error(data, models, formula):
     variables = [s.strip() for s in variables]
     x = data.x
     res = model(data.y, x[variables]).fit()
-    with pytest.raises(ValueError, match="Unable to use data when the"):
+    with pytest.raises(ValueError, match=r"Unable to use data when the"):
         res.predict(data=joined)
 
 
@@ -278,7 +278,7 @@ def test_parser(data, formula, effects):
 
     formula += " + FixedEffects "
     if effects:
-        with pytest.raises(ValueError, match="Cannot use both FixedEffects"):
+        with pytest.raises(ValueError, match=r"Cannot use both FixedEffects"):
             PanelFormulaParser(formula, joined)
     else:
         parser = PanelFormulaParser(formula, joined)
@@ -326,13 +326,13 @@ def test_formulas_rank_check(data, models, formula):
         x.iloc[:, -1] /= 10
     for col in x:
         joined[col] = x[col]
-    with pytest.raises(ValueError, match="exog does not have"):
+    with pytest.raises(ValueError, match=r"exog does not have"):
         model.from_formula(formula, joined)
-    with pytest.raises(ValueError, match="exog does not have"):
+    with pytest.raises(ValueError, match=r"exog does not have"):
         model.from_formula(formula, joined, check_rank=True)
-    with pytest.raises(ValueError, match="exog does not have"):
+    with pytest.raises(ValueError, match=r"exog does not have"):
         model(y, x)
-    with pytest.raises(ValueError, match="exog does not have"):
+    with pytest.raises(ValueError, match=r"exog does not have"):
         model(y, x, check_rank=True)
 
     if model == FamaMacBeth:

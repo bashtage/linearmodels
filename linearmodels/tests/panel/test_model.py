@@ -106,28 +106,28 @@ def test_valid_weight_shape(data):
 
 def test_weight_incorrect_shape(data):
     weights = np.ones(np.prod(data.y.shape) - 1)
-    with pytest.raises(ValueError, match="Weights do not have a"):
+    with pytest.raises(ValueError, match=r"Weights do not have a"):
         PanelOLS(data.y, data.x, weights=weights)
 
     weights = np.ones((data.y.shape[0], data.y.shape[1] - 1))
-    with pytest.raises(ValueError, match="Weights do not have a supported shape"):
+    with pytest.raises(ValueError, match=r"Weights do not have a supported shape"):
         PanelOLS(data.y, data.x, weights=weights)
 
 
 def test_invalid_weight_values(data):
     w = PanelData(data.w)
     w.dataframe.iloc[::13, :] = 0.0
-    with pytest.raises(ValueError, match="weights must be strictly positive"):
+    with pytest.raises(ValueError, match=r"weights must be strictly positive"):
         PanelOLS(data.y, data.x, weights=w)
 
     w = PanelData(data.w)
     w.dataframe.iloc[::13, :] = -0.0
-    with pytest.raises(ValueError, match="weights must be strictly positive"):
+    with pytest.raises(ValueError, match=r"weights must be strictly positive"):
         PanelOLS(data.y, data.x, weights=w)
 
     w = PanelData(data.w)
     w.dataframe.iloc[::29, :] = -1.0
-    with pytest.raises(ValueError, match="weights must be strictly positive"):
+    with pytest.raises(ValueError, match=r"weights must be strictly positive"):
         PanelOLS(data.y, data.x, weights=w)
 
 
@@ -172,7 +172,7 @@ def test_incorrect_weight_shape(data):
     else:  # xarray
         return
 
-    with pytest.raises(ValueError, match="Weights do not have "):
+    with pytest.raises(ValueError, match=r"Weights do not have "):
         PanelOLS(data.y, data.x, weights=w)
 
 

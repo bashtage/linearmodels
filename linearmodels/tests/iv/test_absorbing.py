@@ -265,23 +265,23 @@ def test_smoke(data):
 def test_absorbing_exceptions(random_gen):
     absorbed = random_gen.standard_normal((NOBS, 2))
     assert isinstance(absorbed, np.ndarray)
-    with pytest.raises(TypeError, match="absorb must ba a DataFrame"):
+    with pytest.raises(TypeError, match=r"absorb must ba a DataFrame"):
         AbsorbingLS(
             random_gen.standard_normal(NOBS),
             random_gen.standard_normal((NOBS, 2)),
             absorb=absorbed,
         )
-    with pytest.raises(ValueError, match="ASDF"):
+    with pytest.raises(ValueError, match=r"ASDF"):
         AbsorbingLS(
             random_gen.standard_normal(NOBS), random_gen.standard_normal((NOBS - 1, 2))
         )
-    with pytest.raises(ValueError, match="ASDF"):
+    with pytest.raises(ValueError, match=r"ASDF"):
         AbsorbingLS(
             random_gen.standard_normal(NOBS),
             random_gen.standard_normal((NOBS, 2)),
             absorb=pd.DataFrame(random_gen.standard_normal((NOBS - 1, 1))),
         )
-    with pytest.raises(ValueError, match="ASDF"):
+    with pytest.raises(ValueError, match=r"ASDF"):
         AbsorbingLS(
             random_gen.standard_normal(NOBS),
             random_gen.standard_normal((NOBS, 2)),
@@ -298,7 +298,7 @@ def test_absorbing_exceptions(random_gen):
         assert isinstance(mod.absorbed_exog, pd.DataFrame)
     interactions = random_gen.randint(0, 10, size=(NOBS, 2))
     assert isinstance(interactions, np.ndarray)
-    with pytest.raises(TypeError, match="ASDF"):
+    with pytest.raises(TypeError, match=r"ASDF"):
         AbsorbingLS(
             random_gen.standard_normal(NOBS),
             random_gen.standard_normal((NOBS, 2)),
@@ -346,7 +346,7 @@ def test_category_product_too_large(random_gen):
     for i in range(20):
         dfc[str(i)] = random_cat(10, 1000)
     cat = pd.DataFrame(dfc)
-    with pytest.raises(ValueError, match="There are too many cats"):
+    with pytest.raises(ValueError, match=r"There are too many cats"):
         category_product(cat)
 
 
@@ -354,7 +354,7 @@ def test_category_product_not_cat(random_gen):
     cat = pd.DataFrame(
         {str(i): pd.Series(random_gen.randint(0, 10, 1000)) for i in range(3)}
     )
-    with pytest.raises(TypeError, match="cats must contain only"):
+    with pytest.raises(TypeError, match=r"cats must contain only"):
         category_product(cat)
 
 
@@ -442,9 +442,9 @@ def test_interaction_from_frame(cat, cont):
 
 
 def test_interaction_cat_bad_nobs():
-    with pytest.raises(ValueError, match="nobs must be provided when cat"):
+    with pytest.raises(ValueError, match=r"nobs must be provided when cat"):
         Interaction()
-    with pytest.raises(ValueError, match="ASDF"):
+    with pytest.raises(ValueError, match=r"ASDF"):
         Interaction(cat=np.empty((100, 0)), cont=np.empty((100, 0)))
 
 
@@ -704,7 +704,7 @@ def test_fully_absorb(random_gen):
     y = df.y
     x = pd.get_dummies(df.c, drop_first=False)
     mod = AbsorbingLS(y, x, absorb=df[["c"]], drop_absorbed=True)
-    with pytest.raises(ValueError, match="All columns in exog"):
+    with pytest.raises(ValueError, match=r"All columns in exog"):
         mod.fit()
 
 
@@ -719,9 +719,9 @@ def test_lsmr_options(random_gen):
     y = df.y
     x = df.iloc[:, :3]
     mod = AbsorbingLS(y, x, absorb=df[["c"]], drop_absorbed=True)
-    with pytest.warns(FutureWarning, match="lsmr_options"):
+    with pytest.warns(FutureWarning, match=r"lsmr_options"):
         mod.fit(lsmr_options={})
-    with pytest.raises(ValueError, match="absorb_options cannot"):
+    with pytest.raises(ValueError, match=r"absorb_options cannot"):
         mod.fit(lsmr_options={}, absorb_options={})
 
 
@@ -740,7 +740,7 @@ def test_options(random_gen):
     mod.fit(absorb_options={"atol": 1e-7, "btol": 1e-7}, method="lsmr")
 
     mod = AbsorbingLS(y, x[["x0", "x1"]], absorb=df[["x2", "c"]], drop_absorbed=True)
-    with pytest.raises(RuntimeError, match="HDFE has been"):
+    with pytest.raises(RuntimeError, match=r"HDFE has been"):
         mod.fit(absorb_options={"atol": 1e-7, "btol": 1e-7}, method="hdfe")
 
 

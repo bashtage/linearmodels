@@ -79,7 +79,7 @@ def test_numpy_3d():
 def test_numpy_1d():
     n = 11
     x = np.random.random(n)
-    with pytest.raises(ValueError, match="2 or 3-d array required"):
+    with pytest.raises(ValueError, match=r"2 or 3-d array required"):
         PanelData(x)
 
 
@@ -197,18 +197,18 @@ def test_incorrect_dataframe():
         }
     )
     df = df.set_index(["a", "b", "c"])
-    with pytest.raises(ValueError, match="DataFrame input must have"):
+    with pytest.raises(ValueError, match=r"DataFrame input must have"):
         PanelData(df)
 
 
 def test_incorrect_types():
-    with pytest.raises(TypeError, match="Only ndarrays, DataFrames"):
+    with pytest.raises(TypeError, match=r"Only ndarrays, DataFrames"):
         PanelData(list(np.random.randn(10)))
 
 
 @pytest.mark.skipif(MISSING_XARRAY, reason="xarray is not installed")
 def test_incorrect_types_xarray():
-    with pytest.raises(ValueError, match="Only 2-d or 3-d DataArrays"):
+    with pytest.raises(ValueError, match=r"Only 2-d or 3-d DataArrays"):
         PanelData(xr.DataArray(np.random.randn(10)))
 
 
@@ -392,7 +392,7 @@ def test_demean_both_large_t():
 
 def test_demean_invalid(mi_df):
     data = PanelData(mi_df)
-    with pytest.raises(ValueError, match="Group must be one of"):
+    with pytest.raises(ValueError, match=r"Group must be one of"):
         data.demean("unknown")
 
 
@@ -407,7 +407,7 @@ def test_dummies(mi_df):
     tdummy_drop = data.dummies(group="time", drop_first=True)
     assert tdummy_drop.shape == (77, 6)
     assert np.all(tdummy.sum(axis=0) == 11)
-    with pytest.raises(ValueError, match="Group must be one of"):
+    with pytest.raises(ValueError, match=r"Group must be one of"):
         data.dummies("unknown")
 
 
@@ -429,7 +429,7 @@ def test_series_multiindex(mi_df):
 
 def test_invalid_seires(mi_df):
     si = mi_df.reset_index()
-    with pytest.raises(ValueError, match="Series can only be used"):
+    with pytest.raises(ValueError, match=r"Series can only be used"):
         PanelData(si.iloc[:, 0])
 
 
@@ -813,7 +813,7 @@ def test_incorrect_time_axis():
     p = panel_to_frame(
         x, items=var_names, major_axis=time, minor_axis=entities, swap=True
     )
-    with pytest.raises(ValueError, match="The index on the time"):
+    with pytest.raises(ValueError, match=r"The index on the time"):
         PanelData(p)
 
     time = [1, 2, 3]
@@ -822,7 +822,7 @@ def test_incorrect_time_axis():
         x, items=var_names, major_axis=time, minor_axis=entities, swap=True
     )
     p.index = p.index.set_levels(levels=[1, datetime(1960, 1, 1), "a"], level=1)
-    with pytest.raises(ValueError, match="The index on the time dimension"):
+    with pytest.raises(ValueError, match=r"The index on the time dimension"):
         PanelData(p)
 
 
@@ -837,7 +837,7 @@ def test_incorrect_time_axis_xarray():
         coords={"entities": entities, "time": time, "vars": variables},
         dims=["vars", "time", "entities"],
     )
-    with pytest.raises(ValueError, match="The index on the time dimension"):
+    with pytest.raises(ValueError, match=r"The index on the time dimension"):
         PanelData(da)
 
     da = xr.DataArray(
@@ -845,7 +845,7 @@ def test_incorrect_time_axis_xarray():
         coords={"entities": entities, "time": time, "vars": variables},
         dims=["vars", "time", "entities"],
     )
-    with pytest.raises(ValueError, match="The index on the time dimension"):
+    with pytest.raises(ValueError, match=r"The index on the time dimension"):
         PanelData(da)
 
 

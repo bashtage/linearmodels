@@ -763,7 +763,7 @@ class _PanelModelBase:
         if not common:
             return cov_config_upd
 
-        cov_config_upd = {k: v for k, v in cov_config.items()}
+        cov_config_upd = dict(cov_config.items())
 
         clusters = get_panel_data_like(cov_config, "clusters")
         clusters_frame: DataFrame | None = None

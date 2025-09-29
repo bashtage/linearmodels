@@ -74,7 +74,7 @@ def test_diff_data_size(data):
         x = data.x[:, :, :-1]
         y = data.y
 
-    with pytest.raises(ValueError, match="dependent and exog must have the same"):
+    with pytest.raises(ValueError, match=r"dependent and exog must have the same"):
         PooledOLS(y, x)
 
 
@@ -84,7 +84,7 @@ def test_rank_deficient_array(data):
         x.iloc[:, 1] = x.iloc[:, 0]
     else:
         x[1] = x[0]
-    with pytest.raises(ValueError, match="exog does not have full column rank"):
+    with pytest.raises(ValueError, match=r"exog does not have full column rank"):
         PooledOLS(data.y, x)
 
 
@@ -254,5 +254,5 @@ def test_alt_cov(data, cov_type):
 
 def test_uneuqal_samples():
     data = generate_data(False, "pandas")
-    with pytest.raises(ValueError, match="dependent and exog must have"):
+    with pytest.raises(ValueError, match=r"dependent and exog must have"):
         PooledOLS(data.y.iloc[::2], data.x)

@@ -1089,7 +1089,7 @@ class AbsorbingLS:
                 FutureWarning,
                 stacklevel=2,
             )
-            absorb_options = {k: v for k, v in lsmr_options.items()}
+            absorb_options = dict(lsmr_options.items())
         if self._absorbed_dependent is None:
             self._first_time_fit(use_cache, absorb_options, method)
 
@@ -1104,7 +1104,7 @@ class AbsorbingLS:
         cov_estimator = COVARIANCE_ESTIMATORS[cov_type]
         cov_config["debiased"] = debiased
         cov_config["kappa"] = 0.0
-        cov_config_copy = {k: v for k, v in cov_config.items()}
+        cov_config_copy = dict(cov_config.items())
         cov_config_copy.pop("center", None)
         cov_estimator_inst = cov_estimator(
             exog_resid, dep_resid, exog_resid, params, **cov_config_copy

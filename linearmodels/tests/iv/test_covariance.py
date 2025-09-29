@@ -40,7 +40,7 @@ def data():
 
 
 def test_cov_kernel():
-    with pytest.raises(ValueError, match="ASDF"):
+    with pytest.raises(ValueError, match=r"ASDF"):
         cov_kernel(np.arange(100), 1 - np.arange(101) / 101)
 
 
@@ -132,9 +132,9 @@ def test_homoskedastic_cov_kappa_debiased(data):
 
 
 def test_homoskedastic_cov_errors(data):
-    with pytest.raises(ValueError, match="ASDF"):
+    with pytest.raises(ValueError, match=r"ASDF"):
         HomoskedasticCovariance(data.x[:10], data.y, data.z, data.params)
-    with pytest.raises(ValueError, match="ASDF"):
+    with pytest.raises(ValueError, match=r"ASDF"):
         HomoskedasticCovariance(data.x, data.y, data.z, data.params[1:])
 
 
@@ -239,7 +239,7 @@ def test_clustered_cov_debiased(data):
 
 
 def test_clustered_cov_errors(data):
-    with pytest.raises(ValueError, match="ASDF"):
+    with pytest.raises(ValueError, match=r"ASDF"):
         ClusteredCovariance(
             data.x, data.y, data.z, data.params, clusters=data.clusters[:10]
         )
@@ -304,7 +304,7 @@ def test_kernel_covariance_debiased(data, kernel):
 
 
 def test_kernel_covariance_unknown_kernel(data, kernel):
-    with pytest.raises(ValueError, match="ASDF"):
+    with pytest.raises(ValueError, match=r"ASDF"):
         KernelCovariance(
             data.x, data.y, data.z, data.params, kernel=kernel.kernel + "_unknown"
         )
@@ -321,5 +321,5 @@ def test_auto_bandwidth_smoke(data, kernel):
 
 
 def test_auto_bandwidth_unknown_kernel(data, kernel):
-    with pytest.raises(ValueError, match="ASDF"):
+    with pytest.raises(ValueError, match=r"ASDF"):
         kernel_optimal_bandwidth(data.e, kernel.kernel + "_unknown")

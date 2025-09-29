@@ -169,14 +169,14 @@ def test_first_difference_errors(data):
     else:
         x = data.x[:, [0], :]
         y = data.y[[0], :]
-    with pytest.raises(ValueError, match="dependent and exog must have th"):
+    with pytest.raises(ValueError, match=r"dependent and exog must have th"):
         FirstDifferenceOLS(y, x)
 
     if not isinstance(data.x, pd.DataFrame):
         return
     x = data.x.copy()
     x["Intercept"] = 1.0
-    with pytest.raises(ValueError, match="Constants are not allowed"):
+    with pytest.raises(ValueError, match=r"Constants are not allowed"):
         FirstDifferenceOLS(data.y, x)
 
 
@@ -194,7 +194,7 @@ def test_firstdifference_error(data):
         clusters.loc[entity] = np.random.randint(9)
     clusters.iloc[::3, :] = clusters.iloc[::3, :] + 1
 
-    with pytest.raises(ValueError, match="clusters must have the same number"):
+    with pytest.raises(ValueError, match=r"clusters must have the same number"):
         mod.fit(cov_type="clustered", clusters=clusters)
 
 

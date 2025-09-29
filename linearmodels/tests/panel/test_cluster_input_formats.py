@@ -122,19 +122,19 @@ def test_mixed_input(data):
 def test_nested_effects(data):
     y = PanelData(data.y)
     effects = pd.DataFrame(y.entity_ids // 2, index=y.index)
-    with pytest.raises(ValueError, match="Included other effects nest") as exception:
+    with pytest.raises(ValueError, match=r"Included other effects nest") as exception:
         PanelOLS(data.y, data.x, entity_effects=True, other_effects=effects)
     assert "entity effects" in str(exception.value)
 
     effects = pd.DataFrame(y.time_ids // 2, index=y.index)
-    with pytest.raises(ValueError, match="Included other effects nest") as exception:
+    with pytest.raises(ValueError, match=r"Included other effects nest") as exception:
         PanelOLS(data.y, data.x, time_effects=True, other_effects=effects)
     assert "time effects" in str(exception.value)
 
     effects1 = pd.Series(y.entity_ids.squeeze() // 2, index=y.index)
     effects2 = pd.Series(y.entity_ids.squeeze() // 4, index=y.index)
     effects = pd.DataFrame({"eff1": effects1, "eff2": effects2})
-    with pytest.raises(ValueError, match="Included other effects nest") as exception:
+    with pytest.raises(ValueError, match=r"Included other effects nest") as exception:
         PanelOLS(data.y, data.x, other_effects=effects)
     assert "by other effects" in str(exception.value)
     assert "time effects" not in str(exception.value)

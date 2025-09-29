@@ -111,7 +111,7 @@ def test_starting_values_options(data):
     res3 = mod2.fit(starting=sv[:, None], opt_options=oo, disp=0)
     assert_frame_equal(res2.params, res3.params)
 
-    with pytest.raises(ValueError, match="tarting values"):
+    with pytest.raises(ValueError, match=r"tarting values"):
         mod2.fit(starting=sv[:-3], opt_options=oo, disp=0)
 
 

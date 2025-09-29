@@ -113,9 +113,9 @@ def test_xarray_2d() -> None:
 
 
 def test_invalid_types() -> None:
-    with pytest.raises(ValueError, match="x has too many dims."):
+    with pytest.raises(ValueError, match=r"x has too many dims."):
         IVData(np.empty((1, 1, 1)))
-    with pytest.raises(ValueError, match="ASDF"):
+    with pytest.raises(ValueError, match=r"ASDF"):
         IVData(np.empty((10, 2, 2)))
 
     class AnotherClass:
@@ -125,7 +125,7 @@ def test_invalid_types() -> None:
         def ndim(self) -> int:
             return self._ndim
 
-    with pytest.raises(TypeError, match="ASDF"):
+    with pytest.raises(TypeError, match=r"ASDF"):
         # Intentional typing failure
         IVData(AnotherClass())
 
@@ -230,23 +230,23 @@ def test_categorical_keep_first() -> None:
 
 
 def test_nobs_missing_error() -> None:
-    with pytest.raises(ValueError, match="nobs required whe"):
+    with pytest.raises(ValueError, match=r"nobs required whe"):
         IVData(None)
 
 
 def test_incorrect_nobs() -> None:
     x = np.empty((10, 1))
-    with pytest.raises(ValueError, match="Array required to have"):
+    with pytest.raises(ValueError, match=r"Array required to have"):
         IVData(x, nobs=100)
 
 
 def test_mixed_data() -> None:
     s = pd.Series([1, 2, "a", -3.0])
-    with pytest.raises(ValueError, match="Only numeric, string  or categorica"):
+    with pytest.raises(ValueError, match=r"Only numeric, string  or categorica"):
         IVData(s)
 
 
 def test_duplicate_column_names():
     x = pd.DataFrame(np.ones((3, 2)), columns=["x", "x"])
-    with pytest.raises(ValueError, match="ASDF"):
+    with pytest.raises(ValueError, match=r"ASDF"):
         IVData(x)

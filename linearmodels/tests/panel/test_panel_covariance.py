@@ -192,7 +192,7 @@ def test_clustered_covariance_smoke(panel_data) -> None:
 
 
 def test_clustered_covariance_error(panel_data) -> None:
-    with pytest.raises(ValueError, match="Only 1 or 2-way clustering"):
+    with pytest.raises(ValueError, match=r"Only 1 or 2-way clustering"):
         ClusteredCovariance(
             panel_data.y,
             panel_data.x,
@@ -203,7 +203,7 @@ def test_clustered_covariance_error(panel_data) -> None:
             clusters=panel_data.cluster5,
         )
 
-    with pytest.raises(ValueError, match="clusters has the wrong nobs"):
+    with pytest.raises(ValueError, match=r"clusters has the wrong nobs"):
         ClusteredCovariance(
             panel_data.y,
             panel_data.x,
@@ -279,7 +279,7 @@ def test_covariance_manager() -> None:
     cm = CovarianceManager(
         "made-up-class", HomoskedasticCovariance, HeteroskedasticCovariance
     )
-    with pytest.raises(ValueError, match="Requested covariance estimator"):
+    with pytest.raises(ValueError, match=r"Requested covariance estimator"):
         assert cm["clustered"] is not None
 
     with pytest.raises(KeyError):

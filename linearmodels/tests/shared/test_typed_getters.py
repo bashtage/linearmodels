@@ -80,7 +80,7 @@ def test_array_like(arr):
 def test_panel_data_like(panel):
     assert isinstance(get_panel_data_like({"v": panel}, "v"), PANEL_LIKE)
     assert get_panel_data_like({"v": panel}, "a") is None
-    with pytest.raises(TypeError, match="v found in the dictionary"):
+    with pytest.raises(TypeError, match=r"v found in the dictionary"):
         get_panel_data_like({"v": 1}, "v")
-    with pytest.raises(TypeError, match="v found in the dictionary"):
+    with pytest.raises(TypeError, match=r"v found in the dictionary"):
         get_panel_data_like({"v": [1]}, "v")

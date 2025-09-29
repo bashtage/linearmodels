@@ -135,23 +135,23 @@ def test_linear_constraint_errors():
     r[0, 0] = r[1, 1] = 1
     r_df = pd.DataFrame(r)
     q = np.zeros(2)
-    with pytest.raises(TypeError, match="r must be a DataFrame"):
+    with pytest.raises(TypeError, match=r"r must be a DataFrame"):
         LinearConstraint(r)
-    with pytest.raises(TypeError, match="q must be a Seri"):
+    with pytest.raises(TypeError, match=r"q must be a Seri"):
         LinearConstraint(r_df, q)
-    with pytest.raises(TypeError, match="r must be an array or DataFrame"):
+    with pytest.raises(TypeError, match=r"r must be an array or DataFrame"):
         LinearConstraint([[0, 0, 1]])
-    with pytest.raises(ValueError, match="r must be 2-dimensional"):
+    with pytest.raises(ValueError, match=r"r must be 2-dimensional"):
         LinearConstraint(r[0], require_pandas=False)
-    with pytest.raises(TypeError, match="q must be a Series"):
+    with pytest.raises(TypeError, match=r"q must be a Series"):
         LinearConstraint(r_df, q)
-    with pytest.raises(TypeError, match="q must be a Series"):
+    with pytest.raises(TypeError, match=r"q must be a Series"):
         LinearConstraint(r_df, [0, 0])
-    with pytest.raises(TypeError, match="q must be a Series or"):
+    with pytest.raises(TypeError, match=r"q must be a Series or"):
         LinearConstraint(r=np.eye(2), q=[0, 0], require_pandas=False)
-    with pytest.raises(ValueError, match="r is incompatible"):
+    with pytest.raises(ValueError, match=r"r is incompatible"):
         LinearConstraint(r=np.eye(4), q=np.zeros(4), require_pandas=False, num_params=5)
-    with pytest.raises(ValueError, match="Constraint inputs are"):
+    with pytest.raises(ValueError, match=r"Constraint inputs are"):
         LinearConstraint(r=np.eye(4), q=np.zeros(2), require_pandas=False)
 
 

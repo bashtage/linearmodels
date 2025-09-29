@@ -127,7 +127,7 @@ def test_linear_model_time_series_kernel_smoke(data):
 
 def test_linear_model_time_series_error(data):
     mod = TradedFactorModel(data.portfolios, data.factors)
-    with pytest.raises(ValueError, match="Unknown cov_type"):
+    with pytest.raises(ValueError, match=r"Unknown cov_type"):
         mod.fit(cov_type="unknown")
 
 
@@ -161,19 +161,19 @@ def test_errors(data):
         f2 = np.c_[f, f[:, [0]]]
         f = np.c_[np.ones((f.shape[0], 1)), f]
 
-    with pytest.raises(ValueError, match="portfolios must not contain"):
+    with pytest.raises(ValueError, match=r"portfolios must not contain"):
         TradedFactorModel(p, data.factors)
-    with pytest.raises(ValueError, match="portfolios must not contain"):
+    with pytest.raises(ValueError, match=r"portfolios must not contain"):
         TradedFactorModel(p2, data.factors)
-    with pytest.raises(ValueError, match="The number of observations"):
+    with pytest.raises(ValueError, match=r"The number of observations"):
         TradedFactorModel(p3, data.factors)
-    with pytest.raises(ValueError, match="factors must not contain"):
+    with pytest.raises(ValueError, match=r"factors must not contain"):
         TradedFactorModel(data.portfolios, f)
-    with pytest.raises(ValueError, match="factors must not contain"):
+    with pytest.raises(ValueError, match=r"factors must not contain"):
         TradedFactorModel(data.portfolios, f2)
-    with pytest.raises(ValueError, match="Model cannot be estimated"):
+    with pytest.raises(ValueError, match=r"Model cannot be estimated"):
         TradedFactorModel(p5, f5)
-    with pytest.raises(ValueError, match="The number of test portfolio"):
+    with pytest.raises(ValueError, match=r"The number of test portfolio"):
         LinearFactorModel(p4, data.factors)
 
 
@@ -198,17 +198,17 @@ def test_drop_missing(data):
 
 def test_unknown_kernel(data):
     mod = LinearFactorModel(data.portfolios, data.factors)
-    with pytest.raises(ValueError, match="Unknown weight"):
+    with pytest.raises(ValueError, match=r"Unknown weight"):
         mod.fit(cov_type="unknown")
     mod = LinearFactorModelGMM(data.portfolios, data.factors)
-    with pytest.raises(ValueError, match="Unknown weight"):
+    with pytest.raises(ValueError, match=r"Unknown weight"):
         mod.fit(cov_type="unknown")
 
 
 def test_all_missing():
     p = np.nan * np.ones((1000, 10))
     f = np.nan * np.ones((1000, 3))
-    with pytest.raises(ValueError, match="All observations contain missing data"):
+    with pytest.raises(ValueError, match=r"All observations contain missing data"):
         TradedFactorModel(p, f)
 
 

@@ -348,7 +348,7 @@ class TradedFactorModel(_FactorModelBase):
                 kernel=kernel,
             )
             bw = cov_est.bandwidth
-            _cov_config = {k: v for k, v in cov_config.items()}
+            _cov_config = dict(cov_config.items())
             _cov_config["bandwidth"] = bw
             rp_cov_est = KernelCovariance(
                 fe,

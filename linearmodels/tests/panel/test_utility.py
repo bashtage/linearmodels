@@ -63,7 +63,7 @@ def test_dummy_last():
 def test_invalid_format():
     cats = np.zeros([10, 1], dtype=np.int8)
     cats[5:, 0] = 1
-    with pytest.raises(ValueError, match="Unknown format"):
+    with pytest.raises(ValueError, match=r"Unknown format"):
         dummy_matrix(cats, output_format="unknown", precondition=False)
 
 
@@ -262,5 +262,5 @@ def test_all_absorbed_const():
 def test_all_absorbed_exception():
     x_orig = np.random.standard_normal((200, 3))
     x = x_orig * 1e-32
-    with pytest.raises(AbsorbingEffectError, match="All exog variables have been"):
+    with pytest.raises(AbsorbingEffectError, match=r"All exog variables have been"):
         check_absorbed(x, ["a", "b", "c"], x_orig)

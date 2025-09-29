@@ -69,7 +69,7 @@ def test_multiple(data, precision, stars):
         if value.startswith("_"):
             continue
         getattr(comp, value)
-    with pytest.raises(ValueError, match="Unknown precision value"):
+    with pytest.raises(ValueError, match=r"Unknown precision value"):
         compare([res, res2, res3, res4], precision="unknown")
 
 
@@ -98,7 +98,7 @@ def test_incorrect_type(data):
     res = mod.fit()
     mod2 = IV2SLS(mod.dependent.dataframe, mod.exog.dataframe, None, None)
     res2 = mod2.fit()
-    with pytest.raises(TypeError, match="Results from unknown model"):
+    with pytest.raises(TypeError, match=r"Results from unknown model"):
         compare({"model1": res, "model2": res2})
 
 
@@ -152,7 +152,7 @@ def test_predict_exception(generated_data):
     panel_data = PanelData(generated_data.x, copy=True)
     x = panel_data.dataframe
     x.index = np.arange(x.shape[0])
-    with pytest.raises(ValueError, match="exog does not have the correct number"):
+    with pytest.raises(ValueError, match=r"exog does not have the correct number"):
         res.predict(x)
 
 
@@ -162,9 +162,9 @@ def test_predict_exception(generated_data):
 def test_predict_no_selection(generated_data):
     mod = PanelOLS(generated_data.y, generated_data.x, entity_effects=True)
     res = mod.fit()
-    with pytest.raises(ValueError, match="At least one output must be"):
+    with pytest.raises(ValueError, match=r"At least one output must be"):
         res.predict(fitted=False)
-    with pytest.raises(ValueError, match="At least one output must be"):
+    with pytest.raises(ValueError, match=r"At least one output must be"):
         res.predict(fitted=False, effects=False, idiosyncratic=False, missing=True)
 
 
@@ -218,5 +218,5 @@ def test_wald_test(data, constraint_formula):
     assert_allclose(direct, t2.stat)
     assert_allclose(direct, t3.stat)
 
-    with pytest.raises(ValueError, match="restriction and formula cannot"):
+    with pytest.raises(ValueError, match=r"restriction and formula cannot"):
         res.wald_test(restriction, np.zeros(2), formula=constraint_formula)

@@ -277,7 +277,7 @@ def test_clustered_error(cov_data, debias):
     clusters = np.zeros((nobs, 2), dtype=int)
     clusters[:, 0] = np.arange(nobs) % 20
     clusters[:, 1] = np.arange(nobs) % 40
-    with pytest.raises(ValueError, match="clusters must be non-nested"):
+    with pytest.raises(ValueError, match=r"clusters must be non-nested"):
         ClusteredCovariance(
             x,
             eps,
@@ -288,7 +288,7 @@ def test_clustered_error(cov_data, debias):
             clusters=clusters,
         )
     clusters = np.ones((nobs, 3), dtype=int)
-    with pytest.raises(ValueError, match="clusters must be an ndarray"):
+    with pytest.raises(ValueError, match=r"clusters must be an ndarray"):
         ClusteredCovariance(
             x,
             eps,
@@ -299,7 +299,7 @@ def test_clustered_error(cov_data, debias):
             clusters=clusters,
         )
     clusters = np.ones((nobs, 2, 2), dtype=int)
-    with pytest.raises(ValueError, match="clusters must be an ndarray"):
+    with pytest.raises(ValueError, match=r"clusters must be an ndarray"):
         ClusteredCovariance(
             x,
             eps,

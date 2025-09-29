@@ -162,18 +162,18 @@ def test_no_exog(data, model_and_func):
 def test_invalid_formula(data, model_and_func):
     model, func = model_and_func
     formula = "y ~ 1 + x1 + x2 ~ x3 + [x4  x5 ~ z1 z2]"
-    with pytest.raises(ValueError, match="ASDF"):
+    with pytest.raises(ValueError, match=r"ASDF"):
         model.from_formula(formula, data).fit()
-    with pytest.raises(ValueError, match="ASDF"):
+    with pytest.raises(ValueError, match=r"ASDF"):
         func(formula, data).fit()
     formula = "y ~ 1 + x1 + x2 + x3 + x4 + x5 ~ z1 z2"
-    with pytest.raises(ValueError, match="ASDF"):
+    with pytest.raises(ValueError, match=r"ASDF"):
         model.from_formula(formula, data).fit()
     formula = "y y2 ~ 1 + x1 + x2 + x3 + [x4 + x5 ~ + z1 + z2]"
-    with pytest.raises(ValueError, match="ASDF"):
+    with pytest.raises(ValueError, match=r"ASDF"):
         model.from_formula(formula, data).fit()
     formula = "y y2 ~ 1 + x1 + x2 + x3 [ + x4 + x5 ~ z1 + z2]"
-    with pytest.raises(ValueError, match="ASDF"):
+    with pytest.raises(ValueError, match=r"ASDF"):
         model.from_formula(formula, data).fit()
     formula = "y y2 ~ 1 + x1 + x2 + x3 + [x4 + x5 ~ z1 + z2]"
     with pytest.raises(FormulaSyntaxError):
@@ -210,7 +210,7 @@ def test_predict_formula(data, model_and_func, formula):
     assert_frame_equal(pred, pred2)
     assert_allclose(res.fitted_values, pred)
 
-    with pytest.raises(ValueError, match="exog and endog or data must be provided"):
+    with pytest.raises(ValueError, match=r"exog and endog or data must be provided"):
         mod.predict(res.params)
 
 
@@ -237,7 +237,7 @@ def test_formula_function(data, model_and_func):
     assert_allclose(fmla_res.params.values, array_res.params.values, rtol=1e-5)
     assert_allclose(fmla_res.params.values, func_res.params.values, rtol=1e-5)
 
-    with pytest.raises(ValueError, match="ASDF"):
+    with pytest.raises(ValueError, match=r"ASDF"):
         array_res.predict(data=data)
 
 
@@ -273,9 +273,9 @@ def test_predict_formula_error(data, model_and_func, formula):
     res = mod.fit()
     exog = data[["Intercept", "x3", "x4", "x5"]]
     endog = data[["x1", "x2"]]
-    with pytest.raises(ValueError, match="Predictions can only be constructed"):
+    with pytest.raises(ValueError, match=r"Predictions can only be constructed"):
         res.predict(exog, endog, data=data)
-    with pytest.raises(ValueError, match="Predictions can only be constructed"):
+    with pytest.raises(ValueError, match=r"Predictions can only be constructed"):
         mod.predict(res.params, exog=exog, endog=endog, data=data)
 
 
@@ -347,9 +347,9 @@ def test_predict_no_formula_predict_data(data, model_and_func, formula):
     x = np.asarray(mod_fmla.exog.pandas)
     w = np.asarray(mod_fmla.endog.pandas)
     w = w[: mod_fmla.endog.shape[0] // 2]
-    with pytest.raises(ValueError, match="exog and endog must have"):
+    with pytest.raises(ValueError, match=r"exog and endog must have"):
         res.predict(exog=x, endog=w)
-    with pytest.raises(ValueError, match="Unable to"):
+    with pytest.raises(ValueError, match=r"Unable to"):
         res.predict(data=data)
 
 

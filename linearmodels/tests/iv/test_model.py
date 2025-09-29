@@ -90,41 +90,41 @@ def get_all(v):
 def test_rank_deficient_exog_exception(data):
     exog = data.exog.copy()
     exog[:, :2] = 1
-    with pytest.raises(ValueError, match="ASDF"):
+    with pytest.raises(ValueError, match=r"ASDF"):
         IV2SLS(data.dep, exog, data.endog, data.instr)
 
 
 def test_rank_deficient_endog_exception(data):
     endog = data.endog.copy()
     endog[:, :2] = 1
-    with pytest.raises(ValueError, match="regressors [exog endog] do not have"):
+    with pytest.raises(ValueError, match=r"regressors [exog endog] do not have"):
         IV2SLS(data.dep, data.exog, endog, data.instr)
-    with pytest.raises(ValueError, match="ASDF"):
+    with pytest.raises(ValueError, match=r"ASDF"):
         IV2SLS(data.dep, data.exog, data.exog, data.instr)
 
 
 def test_invalid_weights_exception(data):
     weights = np.zeros_like(data.dep)
-    with pytest.raises(ValueError, match="weights must be strictly positive."):
+    with pytest.raises(ValueError, match=r"weights must be strictly positive."):
         IV2SLS(data.dep, data.exog, data.endog, data.instr, weights=weights)
 
 
 def test_rank_deficient_instr_exception(data):
     instr = data.instr.copy()
     instr[:, :2] = 1
-    with pytest.raises(ValueError, match="instruments [exog instruments]"):
+    with pytest.raises(ValueError, match=r"instruments [exog instruments]"):
         IV2SLS(data.dep, data.exog, data.endog, instr)
-    with pytest.raises(ValueError, match="ASDF"):
+    with pytest.raises(ValueError, match=r"ASDF"):
         IV2SLS(data.dep, data.exog, data.endog, data.exog)
 
 
 def test_kappa_error_exception(data):
-    with pytest.raises(ValueError, match="kappa must be None or a scalar"):
+    with pytest.raises(ValueError, match=r"kappa must be None or a scalar"):
         IVLIML(data.dep, data.exog, data.endog, data.instr, kappa=np.array([1]))
 
 
 def test_fuller_error_exception(data):
-    with pytest.raises(ValueError, match="fuller must be None or a scalar"):
+    with pytest.raises(ValueError, match=r"fuller must be None or a scalar"):
         IVLIML(data.dep, data.exog, data.endog, data.instr, fuller=np.array([1]))
 
 
@@ -147,12 +147,12 @@ def test_string_cat_exception(data):
 
 
 def test_no_regressors_exception(data):
-    with pytest.raises(ValueError, match="Model must contain at least one"):
+    with pytest.raises(ValueError, match=r"Model must contain at least one"):
         IV2SLS(data.dep, None, None, None)
 
 
 def test_too_few_instruments_exception(data):
-    with pytest.raises(ValueError, match="The number of instruments"):
+    with pytest.raises(ValueError, match=r"The number of instruments"):
         IV2SLS(data.dep, data.exog, data.endog, None)
 
 
@@ -243,7 +243,7 @@ def test_gmm_cue_starting_vals(data):
     mod = IVGMMCUE(data.dep, data.exog, data.endog, data.instr)
     mod.fit(starting=sv, display=False)
 
-    with pytest.raises(ValueError, match="starting does not have the correct"):
+    with pytest.raises(ValueError, match=r"starting does not have the correct"):
         mod.fit(starting=sv[:-1], display=True)
 
 
@@ -473,9 +473,9 @@ def test_initial_weight_error(data):
     z = np.concatenate([data.exog, data.instr], 1)
     ze = z + np.random.standard_normal(size=z.shape)
     w0 = ze.T @ ze / ze.shape[0]
-    with pytest.raises(ValueError, match="initial_weight must"):
+    with pytest.raises(ValueError, match=r"initial_weight must"):
         mod.fit(initial_weight=w0[:-1, :-1])
-    with pytest.raises(ValueError, match="initial_weight must"):
+    with pytest.raises(ValueError, match=r"initial_weight must"):
         mod.fit(initial_weight=w0[:-1])
 
 

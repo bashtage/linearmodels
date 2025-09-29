@@ -87,12 +87,12 @@ def test_fitted_predict_exception(data, model):
     mod = model(data.dep, None, data.endog, data.instr)
     res = mod.fit()
     df = DataFrame([[1]])
-    with pytest.raises(ValueError, match="Unable to use data when the model was "):
+    with pytest.raises(ValueError, match=r"Unable to use data when the model was "):
         res.predict(data=df)
 
 
 def test_predict_no_selection(data, model):
     mod = model(data.dep, None, data.endog, data.instr)
     res = mod.fit()
-    with pytest.raises(ValueError, match="At least one output must be selected"):
+    with pytest.raises(ValueError, match=r"At least one output must be selected"):
         res.predict(fitted=False, idiosyncratic=False, missing=True)

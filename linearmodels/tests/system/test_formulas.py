@@ -134,7 +134,7 @@ def test_invalid_predict(config):
             return
     mod = model.from_formula(fmla, joined)
     res = mod.fit()
-    with pytest.raises(ValueError, match="Predictions can only"):
+    with pytest.raises(ValueError, match=r"Predictions can only"):
         res.predict(data=joined, equations=mod._equations)
 
 
