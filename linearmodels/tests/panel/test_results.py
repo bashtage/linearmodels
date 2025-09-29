@@ -33,7 +33,7 @@ def generated_data(request):
     )
 
 
-@pytest.mark.parametrize("precision", ("tstats", "std_errors", "pvalues"))
+@pytest.mark.parametrize("precision", ["tstats", "std_errors", "pvalues"])
 def test_single(data, precision):
     dependent = data.set_index(["nr", "year"]).lwage
     exog = add_constant(data.set_index(["nr", "year"])[["expersq", "married", "union"]])
@@ -48,7 +48,7 @@ def test_single(data, precision):
 
 
 @pytest.mark.parametrize("stars", [False, True])
-@pytest.mark.parametrize("precision", ("tstats", "std_errors", "pvalues"))
+@pytest.mark.parametrize("precision", ["tstats", "std_errors", "pvalues"])
 def test_multiple(data, precision, stars):
     dependent = data.set_index(["nr", "year"]).lwage
     exog = add_constant(data.set_index(["nr", "year"])[["expersq", "married", "union"]])
@@ -69,7 +69,7 @@ def test_multiple(data, precision, stars):
         if value.startswith("_"):
             continue
         getattr(comp, value)
-    with pytest.raises(ValueError):
+    with pytest.raises(ValueError, match="Unknown precision value"):
         compare([res, res2, res3, res4], precision="unknown")
 
 
@@ -81,14 +81,14 @@ def test_multiple_no_effects(data):
     res3 = PooledOLS(dependent, exog).fit()
     exog = data.set_index(["nr", "year"])[["exper"]]
     res4 = RandomEffects(dependent, exog).fit()
-    comp = compare(dict(a=res, model2=res3, model3=res4))
+    comp = compare({"a": res, "model2": res3, "model3": res4})
     assert len(comp.rsquared) == 3
     d = dir(comp)
     for value in d:
         if value.startswith("_"):
             continue
         getattr(comp, value)
-    compare(dict(a=res, model2=res3, model3=res4))
+    compare({"a": res, "model2": res3, "model3": res4})
 
 
 def test_incorrect_type(data):
@@ -98,8 +98,8 @@ def test_incorrect_type(data):
     res = mod.fit()
     mod2 = IV2SLS(mod.dependent.dataframe, mod.exog.dataframe, None, None)
     res2 = mod2.fit()
-    with pytest.raises(TypeError):
-        compare(dict(model1=res, model2=res2))
+    with pytest.raises(TypeError, match="Results from unknown model"):
+        compare({"model1": res, "model2": res2})
 
 
 @pytest.mark.filterwarnings(
@@ -162,9 +162,9 @@ def test_predict_exception(generated_data):
 def test_predict_no_selection(generated_data):
     mod = PanelOLS(generated_data.y, generated_data.x, entity_effects=True)
     res = mod.fit()
-    with pytest.raises(ValueError):
+    with pytest.raises(ValueError, match="At least one output must be"):
         res.predict(fitted=False)
-    with pytest.raises(ValueError):
+    with pytest.raises(ValueError, match="At least one output must be"):
         res.predict(fitted=False, effects=False, idiosyncratic=False, missing=True)
 
 
@@ -218,5 +218,5 @@ def test_wald_test(data, constraint_formula):
     assert_allclose(direct, t2.stat)
     assert_allclose(direct, t3.stat)
 
-    with pytest.raises(ValueError):
+    with pytest.raises(ValueError, match="restriction and formula cannot"):
         res.wald_test(restriction, np.zeros(2), formula=constraint_formula)

@@ -29,12 +29,12 @@ def result_checker(res):
             print(attr)
         if attr == "first_stage":
             result_checker(getattr(res, attr))
-        attr = getattr(res, attr)
-        if callable(attr):
-            attr()
+        _attr = getattr(res, attr)
+        if callable(_attr):
+            _attr()
         else:
-            attr
-            str(attr)
+            assert isinstance(_attr, object)
+            str(_attr)
 
 
 def test_results(data, model):
@@ -87,12 +87,12 @@ def test_fitted_predict_exception(data, model):
     mod = model(data.dep, None, data.endog, data.instr)
     res = mod.fit()
     df = DataFrame([[1]])
-    with pytest.raises(ValueError):
+    with pytest.raises(ValueError, match="Unable to use data when the model was "):
         res.predict(data=df)
 
 
 def test_predict_no_selection(data, model):
     mod = model(data.dep, None, data.endog, data.instr)
     res = mod.fit()
-    with pytest.raises(ValueError):
+    with pytest.raises(ValueError, match="At least one output must be selected"):
         res.predict(fitted=False, idiosyncratic=False, missing=True)

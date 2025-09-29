@@ -47,6 +47,6 @@ __all__ = [
     "MemoryWarning",
     "MissingValueWarning",
     "SingletonWarning",
-    "missing_warning",
     "missing_value_warning_msg",
+    "missing_warning",
 ]

@@ -1,11 +1,10 @@
 from __future__ import annotations
 
 from functools import cached_property
-from typing import Any, Union
+from typing import Any, ClassVar, Union
 
 import numpy as np
 from numpy.linalg import inv
-import pandas
 from pandas import DataFrame, MultiIndex
 
 from linearmodels.iv.covariance import (
@@ -25,13 +24,13 @@ from linearmodels.shared.typed_getters import (
 import linearmodels.typing.data
 
 __all__ = [
-    "HomoskedasticCovariance",
-    "HeteroskedasticCovariance",
-    "ClusteredCovariance",
-    "DriscollKraay",
-    "CovarianceManager",
     "ACCovariance",
+    "ClusteredCovariance",
+    "CovarianceManager",
+    "DriscollKraay",
     "FamaMacBethCovariance",
+    "HeteroskedasticCovariance",
+    "HomoskedasticCovariance",
     "setup_covariance_estimator",
 ]
 
@@ -81,7 +80,7 @@ class HomoskedasticCovariance:
     ``True``.
     """
 
-    ALLOWED_KWARGS: tuple[str, ...] = tuple()
+    ALLOWED_KWARGS: tuple[str, ...] = ()
     DEFAULT_KERNEL = "newey-west"
 
     def __init__(
@@ -605,7 +604,7 @@ CovarianceEstimatorType = Union[
 
 
 class CovarianceManager:
-    COVARIANCE_ESTIMATORS: dict[str, CovarianceEstimatorType] = {
+    COVARIANCE_ESTIMATORS: ClassVar[dict[str, CovarianceEstimatorType]] = {
         "unadjusted": HomoskedasticCovariance,
         "conventional": HomoskedasticCovariance,
         "homoskedastic": HomoskedasticCovariance,
@@ -672,7 +671,7 @@ class FamaMacBethCovariance(HomoskedasticCovariance):
         y: linearmodels.typing.data.Float64Array,
         x: linearmodels.typing.data.Float64Array,
         params: linearmodels.typing.data.Float64Array,
-        all_params: pandas.DataFrame,
+        all_params: DataFrame,
         *,
         debiased: bool = False,
         bandwidth: float | None = None,

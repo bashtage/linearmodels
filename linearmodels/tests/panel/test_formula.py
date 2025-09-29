@@ -61,7 +61,9 @@ classes = [PooledOLS, BetweenOLS, FirstDifferenceOLS, RandomEffects, FamaMacBeth
 funcs = [pooled_ols, between_ols, first_difference_ols, random_effects, fama_macbeth]
 
 
-@pytest.fixture(params=list(zip(classes, funcs)), ids=[c.__name__ for c in classes])
+@pytest.fixture(
+    params=list(zip(classes, funcs, strict=False)), ids=[c.__name__ for c in classes]
+)
 def models(request):
     return request.param
 
@@ -120,7 +122,7 @@ def test_basic_formulas(data, models, formula):
     assert_allclose(res.params, ppres.params)
 
     x["Intercept"] = 1.0
-    variables = ["Intercept"] + variables
+    variables = ["Intercept", *variables]
     mod2 = model(data.y, x[variables])
     res2 = mod2.fit()
     assert_allclose(res.params, res2.params)
@@ -185,7 +187,7 @@ def test_panel_ols_formula(data):
     assert_allclose(res.params, res2.params)
 
     formula = "y ~ x1 + EntityEffects + FixedEffects + x2 "
-    with pytest.raises(ValueError):
+    with pytest.raises(ValueError, match="Cannot use both FixedEffects"):
         PanelOLS.from_formula(formula, joined)
 
 
@@ -225,7 +227,7 @@ def test_basic_formulas_predict(data, models, formula):
     pred = res.predict(data=joined)
 
     x["Intercept"] = 1.0
-    variables = ["Intercept"] + variables
+    variables = ["Intercept", *variables]
     mod2 = model(data.y, x[variables])
     res2 = mod2.fit()
     pred2 = res.predict(x[variables])
@@ -242,9 +244,9 @@ def test_formulas_predict_error(data, models, formula):
     model, _ = models
     mod = model.from_formula(formula, joined)
     res = mod.fit()
-    with pytest.raises(ValueError):
+    with pytest.raises(ValueError, match="Predictions can only be constructed"):
         res.predict(joined, data=joined)
-    with pytest.raises(ValueError):
+    with pytest.raises(ValueError, match="Predictions can only be constructed"):
         mod.predict(params=res.params, exog=joined, data=joined)
 
     parts = formula.split("~")
@@ -252,7 +254,7 @@ def test_formulas_predict_error(data, models, formula):
     variables = [s.strip() for s in variables]
     x = data.x
     res = model(data.y, x[variables]).fit()
-    with pytest.raises(ValueError):
+    with pytest.raises(ValueError, match="Unable to use data when the"):
         res.predict(data=joined)
 
 
@@ -276,7 +278,7 @@ def test_parser(data, formula, effects):
 
     formula += " + FixedEffects "
     if effects:
-        with pytest.raises(ValueError):
+        with pytest.raises(ValueError, match="Cannot use both FixedEffects"):
             PanelFormulaParser(formula, joined)
     else:
         parser = PanelFormulaParser(formula, joined)

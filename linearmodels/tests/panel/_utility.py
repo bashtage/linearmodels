@@ -8,12 +8,12 @@ import numpy as np
 from numpy.linalg import lstsq
 from numpy.random import RandomState, standard_normal
 from numpy.testing import assert_allclose
-import pandas
 from pandas import Categorical, DataFrame, Series, date_range, get_dummies
 from pandas.testing import assert_frame_equal, assert_series_equal
 
 from linearmodels.panel.data import PanelData
 from linearmodels.shared.utility import AttrDict, panel_to_frame
+import linearmodels.typing.data
 
 try:
     import xarray  # noqa: F401
@@ -28,8 +28,8 @@ if not MISSING_XARRAY:
 
 
 def lsdv(
-    y: pandas.DataFrame,
-    x: pandas.DataFrame,
+    y: DataFrame,
+    x: DataFrame,
     has_const=False,
     entity=False,
     time=False,
@@ -88,7 +88,6 @@ def generate_data(
         np.random.seed(12345)
     else:
         np.random.set_state(rng.get_state())
-    import linearmodels.typing.data
 
     n, t, k = ntk
     k += const

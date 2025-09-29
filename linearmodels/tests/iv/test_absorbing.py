@@ -60,7 +60,7 @@ class Hasher:
 hasher = Hasher()
 
 
-@pytest.fixture(scope="function")
+@pytest.fixture
 def random_gen(request):
     return np.random.RandomState(12345678)
 
@@ -263,25 +263,25 @@ def test_smoke(data):
 
 
 def test_absorbing_exceptions(random_gen):
-    with pytest.raises(TypeError):
-        absorbed = random_gen.standard_normal((NOBS, 2))
-        assert isinstance(absorbed, np.ndarray)
+    absorbed = random_gen.standard_normal((NOBS, 2))
+    assert isinstance(absorbed, np.ndarray)
+    with pytest.raises(TypeError, match="absorb must ba a DataFrame"):
         AbsorbingLS(
             random_gen.standard_normal(NOBS),
             random_gen.standard_normal((NOBS, 2)),
             absorb=absorbed,
         )
-    with pytest.raises(ValueError):
+    with pytest.raises(ValueError, match="ASDF"):
         AbsorbingLS(
             random_gen.standard_normal(NOBS), random_gen.standard_normal((NOBS - 1, 2))
         )
-    with pytest.raises(ValueError):
+    with pytest.raises(ValueError, match="ASDF"):
         AbsorbingLS(
             random_gen.standard_normal(NOBS),
             random_gen.standard_normal((NOBS, 2)),
             absorb=pd.DataFrame(random_gen.standard_normal((NOBS - 1, 1))),
         )
-    with pytest.raises(ValueError):
+    with pytest.raises(ValueError, match="ASDF"):
         AbsorbingLS(
             random_gen.standard_normal(NOBS),
             random_gen.standard_normal((NOBS, 2)),
@@ -296,9 +296,9 @@ def test_absorbing_exceptions(random_gen):
         assert isinstance(mod.absorbed_dependent, pd.DataFrame)
     with pytest.raises(RuntimeError):
         assert isinstance(mod.absorbed_exog, pd.DataFrame)
-    with pytest.raises(TypeError):
-        interactions = random_gen.randint(0, 10, size=(NOBS, 2))
-        assert isinstance(interactions, np.ndarray)
+    interactions = random_gen.randint(0, 10, size=(NOBS, 2))
+    assert isinstance(interactions, np.ndarray)
+    with pytest.raises(TypeError, match="ASDF"):
         AbsorbingLS(
             random_gen.standard_normal(NOBS),
             random_gen.standard_normal((NOBS, 2)),
@@ -346,7 +346,7 @@ def test_category_product_too_large(random_gen):
     for i in range(20):
         dfc[str(i)] = random_cat(10, 1000)
     cat = pd.DataFrame(dfc)
-    with pytest.raises(ValueError):
+    with pytest.raises(ValueError, match="There are too many cats"):
         category_product(cat)
 
 
@@ -354,7 +354,7 @@ def test_category_product_not_cat(random_gen):
     cat = pd.DataFrame(
         {str(i): pd.Series(random_gen.randint(0, 10, 1000)) for i in range(3)}
     )
-    with pytest.raises(TypeError):
+    with pytest.raises(TypeError, match="cats must contain only"):
         category_product(cat)
 
 
@@ -442,9 +442,9 @@ def test_interaction_from_frame(cat, cont):
 
 
 def test_interaction_cat_bad_nobs():
-    with pytest.raises(ValueError):
+    with pytest.raises(ValueError, match="nobs must be provided when cat"):
         Interaction()
-    with pytest.raises(ValueError):
+    with pytest.raises(ValueError, match="ASDF"):
         Interaction(cat=np.empty((100, 0)), cont=np.empty((100, 0)))
 
 
@@ -494,11 +494,8 @@ def test_absorbing_regressors_hash(cat, cont, interact, weights):
         cat=cat, cont=cont, interactions=interact, weights=weights
     )
     # Build hash
-    hashes = []
-    for col in cat:
-        hashes.append((hasher.single(cat[col].cat.codes.to_numpy().data),))
-    for col in cont:
-        hashes.append((hasher.single(cont[col].to_numpy().data),))
+    hashes = [(hasher.single(cat[col].cat.codes.to_numpy().data),) for col in cat]
+    hashes.extend([(hasher.single(cont[col].to_numpy().data),) for col in cont])
     hashes = sorted(hashes)
     if interact is not None:
         for inter in interact:
@@ -512,7 +509,7 @@ def test_absorbing_regressors_hash(cat, cont, interact, weights):
 def test_empty_absorbing_regressor():
     areg = AbsorbingRegressor()
     assert areg.regressors.shape == (0, 0)
-    assert areg.hash == tuple()
+    assert areg.hash == ()
 
 
 def test_against_ols(ols_data):
@@ -630,11 +627,10 @@ def assert_results_equal(
             assert_allclose(left, right, rtol=2e-4, atol=1e-6)
         elif isinstance(left, pd.Series):
             assert_allclose(left.iloc[:k], right.iloc[:k], rtol=1e-5)
+        elif isinstance(left, float):
+            assert_allclose(left, right, atol=1e-10)
         else:
-            if isinstance(left, float):
-                assert_allclose(left, right, atol=1e-10)
-            else:
-                assert left == right
+            assert left == right
     assert isinstance(a_res.summary, Summary)
     assert isinstance(str(a_res.summary), str)
     assert isinstance(a_res.absorbed_effects, pd.DataFrame)

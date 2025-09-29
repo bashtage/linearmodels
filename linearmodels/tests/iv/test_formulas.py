@@ -17,7 +17,11 @@ from linearmodels.shared.exceptions import IndexWarning
 @pytest.fixture(
     scope="module",
     params=list(
-        zip([IV2SLS, IVLIML, IVGMMCUE, IVGMM], [iv_2sls, iv_liml, iv_gmm_cue, iv_gmm])
+        zip(
+            [IV2SLS, IVLIML, IVGMMCUE, IVGMM],
+            [iv_2sls, iv_liml, iv_gmm_cue, iv_gmm],
+            strict=False,
+        )
     ),
 )
 def model_and_func(request):
@@ -158,18 +162,18 @@ def test_no_exog(data, model_and_func):
 def test_invalid_formula(data, model_and_func):
     model, func = model_and_func
     formula = "y ~ 1 + x1 + x2 ~ x3 + [x4  x5 ~ z1 z2]"
-    with pytest.raises(ValueError):
+    with pytest.raises(ValueError, match="ASDF"):
         model.from_formula(formula, data).fit()
-    with pytest.raises(ValueError):
+    with pytest.raises(ValueError, match="ASDF"):
         func(formula, data).fit()
     formula = "y ~ 1 + x1 + x2 + x3 + x4 + x5 ~ z1 z2"
-    with pytest.raises(ValueError):
+    with pytest.raises(ValueError, match="ASDF"):
         model.from_formula(formula, data).fit()
     formula = "y y2 ~ 1 + x1 + x2 + x3 + [x4 + x5 ~ + z1 + z2]"
-    with pytest.raises(ValueError):
+    with pytest.raises(ValueError, match="ASDF"):
         model.from_formula(formula, data).fit()
     formula = "y y2 ~ 1 + x1 + x2 + x3 [ + x4 + x5 ~ z1 + z2]"
-    with pytest.raises(ValueError):
+    with pytest.raises(ValueError, match="ASDF"):
         model.from_formula(formula, data).fit()
     formula = "y y2 ~ 1 + x1 + x2 + x3 + [x4 + x5 ~ z1 + z2]"
     with pytest.raises(FormulaSyntaxError):
@@ -233,7 +237,7 @@ def test_formula_function(data, model_and_func):
     assert_allclose(fmla_res.params.values, array_res.params.values, rtol=1e-5)
     assert_allclose(fmla_res.params.values, func_res.params.values, rtol=1e-5)
 
-    with pytest.raises(ValueError):
+    with pytest.raises(ValueError, match="ASDF"):
         array_res.predict(data=data)
 
 
@@ -269,9 +273,9 @@ def test_predict_formula_error(data, model_and_func, formula):
     res = mod.fit()
     exog = data[["Intercept", "x3", "x4", "x5"]]
     endog = data[["x1", "x2"]]
-    with pytest.raises(ValueError):
+    with pytest.raises(ValueError, match="Predictions can only be constructed"):
         res.predict(exog, endog, data=data)
-    with pytest.raises(ValueError):
+    with pytest.raises(ValueError, match="Predictions can only be constructed"):
         mod.predict(res.params, exog=exog, endog=endog, data=data)
 
 
@@ -283,17 +287,17 @@ def test_single_character_names(data, model_and_func):
     data["z"] = data["z1"]
     data["a"] = data["z2"]
     fmla = "y ~ 1 + [x ~ z]"
-    model, func = model_and_func
+    model, _ = model_and_func
     mod = model.from_formula(fmla, data)
     mod.fit()
 
     fmla = "y ~ 1 + [x ~ z + a]"
-    model, func = model_and_func
+    model, _ = model_and_func
     mod = model.from_formula(fmla, data)
     mod.fit()
 
     fmla = "y ~ 1 + [x + v ~ z + a]"
-    model, func = model_and_func
+    model, _ = model_and_func
     mod = model.from_formula(fmla, data)
     mod.fit()
 
@@ -339,10 +343,11 @@ def test_predict_no_formula_predict_data(data, model_and_func, formula):
     mod_fmla: IV2SLS = model.from_formula(formula, data)
     mod = model(mod_fmla.dependent, mod_fmla.exog, mod_fmla.endog, mod_fmla.instruments)
     res = mod.fit()
+
+    x = np.asarray(mod_fmla.exog.pandas)
+    w = np.asarray(mod_fmla.endog.pandas)
+    w = w[: mod_fmla.endog.shape[0] // 2]
     with pytest.raises(ValueError, match="exog and endog must have"):
-        x = np.asarray(mod_fmla.exog.pandas)
-        w = np.asarray(mod_fmla.endog.pandas)
-        w = w[: mod_fmla.endog.shape[0] // 2]
         res.predict(exog=x, endog=w)
     with pytest.raises(ValueError, match="Unable to"):
         res.predict(data=data)
@@ -371,7 +376,7 @@ def test_formula_escape():
 
 @pytest.mark.parametrize("dtype", [str, "category", object])
 def test_formula_categorical_equiv(data, model_and_func, dtype):
-    model, func = model_and_func
+    model, _ = model_and_func
     data = data.copy()
     rs = np.random.RandomState(12345)
     data["d"] = rs.choice(["a", "b", "c", "d"], size=data.shape[0])

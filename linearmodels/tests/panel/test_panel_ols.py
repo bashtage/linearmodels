@@ -66,7 +66,9 @@ def large_data(request):
     )
 
 
-singleton_ids = [i for i, p in zip(ids, perms) if p[1] == "pandas" and not p[-1]]
+singleton_ids = [
+    i for i, p in zip(ids, perms, strict=False) if p[1] == "pandas" and not p[-1]
+]
 singleton_perms = [p for p in perms if p[1] == "pandas" and not p[-1]]
 
 
@@ -1015,7 +1017,7 @@ def test_panel_other_incorrect_size(data):
     cats = PanelData(cats)
     cats = cats.dataframe.iloc[: cats.dataframe.shape[0] // 2, :]
 
-    with pytest.raises(ValueError):
+    with pytest.raises(ValueError, match="other_effects must have"):
         PanelOLS(y, x, other_effects=cats)
 
 
@@ -1057,7 +1059,7 @@ def test_alt_rsquared_weighted(data):
 
 
 def test_too_many_effects(data):
-    with pytest.raises(ValueError):
+    with pytest.raises(ValueError, match="At most two effects supported"):
         PanelOLS(
             data.y, data.x, entity_effects=True, time_effects=True, other_effects=data.c
         )
@@ -1095,11 +1097,11 @@ def test_cluster_smoke(data):
     mod.fit(cov_type="clustered", clusters=c2, debiased=False)
     mod.fit(cov_type="clustered", cluster_entity=True, clusters=c1, debiased=False)
     mod.fit(cov_type="clustered", cluster_time=True, clusters=c1, debiased=False)
-    with pytest.raises(ValueError):
+    with pytest.raises(ValueError, match="Only 1 or 2-way clustering supported"):
         mod.fit(cov_type="clustered", cluster_time=True, clusters=c2, debiased=False)
-    with pytest.raises(ValueError):
+    with pytest.raises(ValueError, match="Only 1 or 2-way clustering supported"):
         mod.fit(cov_type="clustered", cluster_entity=True, clusters=c2, debiased=False)
-    with pytest.raises(ValueError):
+    with pytest.raises(ValueError, match="Only 1 or 2-way clustering supported"):
         mod.fit(
             cov_type="clustered",
             cluster_entity=True,
@@ -1107,8 +1109,8 @@ def test_cluster_smoke(data):
             clusters=c1,
             debiased=False,
         )
-    with pytest.raises(ValueError):
-        clusters = c1.dataframe.iloc[: c1.dataframe.shape[0] // 2]
+    clusters = c1.dataframe.iloc[: c1.dataframe.shape[0] // 2]
+    with pytest.raises(ValueError, match="clusters must have the same number "):
         mod.fit(cov_type="clustered", clusters=clusters, debiased=False)
 
 

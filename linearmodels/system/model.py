@@ -17,13 +17,12 @@ from __future__ import annotations
 from collections.abc import Mapping, Sequence
 from functools import reduce
 import textwrap
-from typing import Any, Literal, cast
+from typing import Any, Literal, Optional, cast
 import warnings
 
 from formulaic.utils.context import capture_context
 import numpy as np
 from numpy.linalg import inv, lstsq, matrix_rank, solve
-import pandas
 from pandas import DataFrame, Index, Series, concat
 
 from linearmodels.iv._utility import IVFormulaParser
@@ -57,9 +56,9 @@ from linearmodels.system.gmm import (
 from linearmodels.system.results import GMMSystemResults, SystemResults
 import linearmodels.typing.data
 
-__all__ = ["SUR", "IV3SLS", "IVSystemGMM", "LinearConstraint"]
+__all__ = ["IV3SLS", "SUR", "IVSystemGMM", "LinearConstraint"]
 
-UNKNOWN_EQ_TYPE = """
+UNKNOWN_EQ_TYPE = """\
 Contents of each equation must be either a dictionary with keys "dependent"
 and "exog" or a 2-element tuple of he form (dependent, exog).
 equations[{key}] was {type}
@@ -154,7 +153,7 @@ class SystemFormulaParser:
     def __init__(
         self,
         formula: Mapping[str, str] | str,
-        data: pandas.DataFrame,
+        data: DataFrame,
         weights: Mapping[str, linearmodels.typing.data.ArrayLike] | None = None,
         eval_env: int = 2,
         context: Mapping[str, Any] | None = None,
@@ -189,11 +188,10 @@ class SystemFormulaParser:
             raise ValueError(f"{name} must be squeezable to 1D.")
         if len(shape) == 1:
             value_series = Series(value)
-        else:  # len(shape) == 2 and min(shape) == 1:
-            if isinstance(value, DataFrame):
-                value_series = value.iloc[:, 0]
-            else:
-                value_series = Series(np.squeeze(value))
+        elif isinstance(value, DataFrame):
+            value_series = value.iloc[:, 0]
+        else:
+            value_series = Series(np.squeeze(value))
 
         return value_series
 
@@ -223,9 +221,9 @@ class SystemFormulaParser:
         else:
             formula = formula.replace("\n", " ").strip()
             parts = formula.split("}")
-            for part in parts:
+            for _part in parts:
                 key = base_key = None
-                part = part.strip()
+                part = _part.strip()
                 if part == "":
                     continue
                 part = part.replace("{", "")
@@ -469,7 +467,14 @@ class _SystemModelBase:
             self._has_instruments = self._has_instruments or (instr.shape[1] > 1)
 
         for i, comps in enumerate(
-            zip(self._dependent, self._exog, self._endog, self._instr, self._weights)
+            zip(
+                self._dependent,
+                self._exog,
+                self._endog,
+                self._instr,
+                self._weights,
+                strict=False,
+            )
         ):
             shapes = [a.shape[0] for a in comps]
             if min(shapes) != max(shapes):
@@ -498,15 +503,16 @@ class _SystemModelBase:
             self._instr,
             self._weights,
             self._eq_labels,
+            strict=False,
         ):
             y = cast(
-                linearmodels.typing.data.Float64Array,
+                "linearmodels.typing.data.Float64Array",
                 dep.ndarray,
             )
             x = np.concatenate([exog_ivd.ndarray, endog.ndarray], 1, dtype=float)
             z = np.concatenate([exog_ivd.ndarray, instr.ndarray], 1, dtype=float)
             w_arr = cast(
-                linearmodels.typing.data.Float64Array,
+                "linearmodels.typing.data.Float64Array",
                 w.ndarray,
             )
             w_arr = w_arr / np.nanmean(w_arr)
@@ -523,25 +529,25 @@ class _SystemModelBase:
             if y.shape[0] <= x.shape[1]:
                 raise ValueError(
                     "Fewer observations than variables in "
-                    "equation {eq}".format(eq=label)
+                    "equation `{eq}`".format(eq=label)
                 )
             if matrix_rank(x) < x.shape[1]:
                 raise ValueError(
-                    "Equation {eq} regressor array is not full " "rank".format(eq=label)
+                    "Equation `{eq}` regressor array is not full rank".format(eq=label)
                 )
             if x.shape[1] > z.shape[1]:
                 raise ValueError(
-                    "Equation {eq} has fewer instruments than "
+                    "Equation `{eq}` has fewer instruments than "
                     "endogenous variables.".format(eq=label)
                 )
             if z.shape[1] > z.shape[0]:
                 raise ValueError(
                     "Fewer observations than instruments in "
-                    "equation {eq}".format(eq=label)
+                    "equation `{eq}`".format(eq=label)
                 )
             if matrix_rank(z) < z.shape[1]:
                 raise ValueError(
-                    "Equation {eq} instrument array is full " "rank".format(eq=label)
+                    "Equation {eq} instrument array is full rank".format(eq=label)
                 )
 
         for rhs in self._x:
@@ -594,7 +600,7 @@ class _SystemModelBase:
         equations: (
             Mapping[str, Mapping[str, linearmodels.typing.data.ArrayLike]] | None
         ) = None,
-        data: pandas.DataFrame | None = None,
+        data: DataFrame | None = None,
         eval_env: int = 1,
     ) -> DataFrame:
         """
@@ -658,7 +664,7 @@ class _SystemModelBase:
                 f"Parameters must have {nx} elements; found {params.shape[0]}."
             )
         loc = 0
-        out = dict()
+        out = {}
         for i, label in enumerate(self._eq_labels):
             kx = self._x[i].shape[1]
             if label in equations_d:
@@ -760,7 +766,7 @@ class _SystemModelBase:
 
         if not full_cov:
             sigma = np.diag(np.diag(sigma))
-        sigma_inv = cast(linearmodels.typing.data.Float64Array, inv(sigma))
+        sigma_inv = cast("linearmodels.typing.data.Float64Array", inv(sigma))
 
         k = len(wy)
 
@@ -871,7 +877,7 @@ class _SystemModelBase:
 
         except np.linalg.LinAlgError:
             return InvalidTestStatistic(
-                "Covariance is singular, possibly due " "to constraints.", name=name
+                "Covariance is singular, possibly due to constraints.", name=name
             )
 
         if debiased:
@@ -1036,7 +1042,7 @@ class _SystemModelBase:
         # System regression on a constant using weights if provided
         wy, w = self._wy, self._w
         wi = [
-            cast(linearmodels.typing.data.Float64Array, np.sqrt(weights))
+            cast("linearmodels.typing.data.Float64Array", np.sqrt(weights))
             for weights in w
         ]
         if method == "ols":
@@ -1045,7 +1051,7 @@ class _SystemModelBase:
             est_sigma = sigma
             if not full_cov:
                 est_sigma = np.diag(np.diag(est_sigma))
-        est_sigma_inv = cast(linearmodels.typing.data.Float64Array, inv(est_sigma))
+        est_sigma_inv = cast("linearmodels.typing.data.Float64Array", inv(est_sigma))
         nobs = wy[0].shape[0]
         k = len(wy)
         xpx = blocked_inner_prod(wi, est_sigma_inv)
@@ -1082,7 +1088,7 @@ class _SystemModelBase:
             std_eps_const = eps_const @ sigma_m12
             denom = (std_eps_const**2).sum()
             mcelroy = 1.0 - numerator / denom
-        r2 = dict(mcelroy=mcelroy, berndt=berndt, judge=judge, dhrymes=dhrymes)
+        r2 = {"mcelroy": mcelroy, "berndt": berndt, "judge": judge, "dhrymes": dhrymes}
         return Series(r2)
 
     def _gls_finalize(
@@ -1183,7 +1189,7 @@ class _SystemModelBase:
             return 1.0
         nobs = float(self._wx[0].shape[0])
         scales = np.array([nobs - x.shape[1] for x in self._wx], dtype=np.float64)
-        scales = cast(linearmodels.typing.data.Float64Array, np.sqrt(nobs / scales))
+        scales = cast("linearmodels.typing.data.Float64Array", np.sqrt(nobs / scales))
         return scales[:, None] @ scales[None, :]
 
     @property
@@ -1198,9 +1204,7 @@ class _SystemModelBase:
         """
         return self._constraints
 
-    def add_constraints(
-        self, r: pandas.DataFrame, q: pandas.Series | None = None
-    ) -> None:
+    def add_constraints(self, r: DataFrame, q: Series | None = None) -> None:
         r"""
         Add parameter constraints to a model.
 
@@ -1249,7 +1253,7 @@ class _LSSystemModelBase(_SystemModelBase):
     def fit(
         self,
         *,
-        method: Literal["ols", "gls", None] = None,
+        method: Optional[Literal["ols", "gls"]] = None,
         full_cov: bool = True,
         iterate: bool = False,
         iter_limit: int = 100,
@@ -1311,7 +1315,7 @@ class _LSSystemModelBase(_SystemModelBase):
                 raise ValueError(
                     f"method must be 'ols' or 'gls' when not None. Got {method}."
                 )
-            method = cast(Literal["ols", "gls"], method.lower())
+            method = cast("Literal['ols', 'gls']", method.lower())
 
         cov_type = cov_type.lower()
         if cov_type not in COV_TYPES:
@@ -1525,7 +1529,7 @@ class IV3SLS(_LSSystemModelBase):
     def from_formula(
         cls,
         formula: str | dict[str, str],
-        data: pandas.DataFrame,
+        data: DataFrame,
         *,
         sigma: linearmodels.typing.data.ArrayLike | None = None,
         weights: Mapping[str, linearmodels.typing.data.ArrayLike] | None = None,
@@ -1691,9 +1695,9 @@ class SUR(_LSSystemModelBase):
                 if len(eqn) == 3:
                     w = eqn[-1]
                     eqn = eqn[:2]
-                    eqn = eqn + (None, None) + (w,)
+                    eqn = (*eqn, None, None, w)
                 else:
-                    eqn = eqn + (None, None)
+                    eqn = (*eqn, None, None)
             reformatted[key] = eqn
         super().__init__(reformatted, sigma=sigma)
         self._model_name = "Seemingly Unrelated Regression (SUR)"
@@ -1751,7 +1755,7 @@ class SUR(_LSSystemModelBase):
     def from_formula(
         cls,
         formula: str | dict[str, str],
-        data: pandas.DataFrame,
+        data: DataFrame,
         *,
         sigma: linearmodels.typing.data.ArrayLike | None = None,
         weights: Mapping[str, linearmodels.typing.data.ArrayLike] | None = None,
@@ -1976,7 +1980,7 @@ class IVSystemGMM(_SystemModelBase):
             wx,
             wy,
             wz,
-            w=cast(linearmodels.typing.data.Float64Array, w),
+            w=cast("linearmodels.typing.data.Float64Array", w),
             constraints=self.constraints,
         )
         _eps = []
@@ -2000,14 +2004,14 @@ class IVSystemGMM(_SystemModelBase):
                 wx,
                 wy,
                 wz,
-                w=cast(linearmodels.typing.data.Float64Array, w),
+                w=cast("linearmodels.typing.data.Float64Array", w),
                 constraints=self.constraints,
             )
             delta = beta_last - beta
             if vinv is None:
                 winv = np.linalg.inv(w)
                 xpz = blocked_cross_prod(wx, wz, np.eye(k))
-                xpz = cast(linearmodels.typing.data.Float64Array, xpz / nobs)
+                xpz = cast("linearmodels.typing.data.Float64Array", xpz / nobs)
                 v = (xpz @ winv @ xpz.T) / nobs
                 vinv = inv(v)
             norm = float(np.squeeze(delta.T @ vinv @ delta))
@@ -2045,7 +2049,7 @@ class IVSystemGMM(_SystemModelBase):
             cov.cov,
             weps,
             eps,
-            cast(np.ndarray, w),
+            cast("np.ndarray", w),
             sigma,
             iters - 1,
             cov_type,
@@ -2152,7 +2156,7 @@ class IVSystemGMM(_SystemModelBase):
     def from_formula(
         cls,
         formula: str | dict[str, str],
-        data: pandas.DataFrame,
+        data: DataFrame,
         *,
         weights: dict[str, linearmodels.typing.data.ArrayLike] | None = None,
         weight_type: str = "robust",

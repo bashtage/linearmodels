@@ -66,7 +66,9 @@ class WaldTestStatistic:
     @property
     def critical_values(self) -> dict[str, float] | None:
         """Critical values test for common test sizes"""
-        return dict(zip(["10%", "5%", "1%"], self.dist.ppf([0.9, 0.95, 0.99])))
+        return dict(
+            zip(["10%", "5%", "1%"], self.dist.ppf([0.9, 0.95, 0.99]), strict=False)
+        )
 
     @property
     def null(self) -> str:
@@ -191,8 +193,8 @@ def _parse_single(constraint: str) -> tuple[str, float]:
     parts = constraint.split("=")
     try:
         value = float(parts[-1])
-    except Exception:
-        raise TypeError(_constraint_error.format(cons=constraint))
+    except Exception as exc:
+        raise TypeError(_constraint_error.format(cons=constraint)) from exc
     expr = "=".join(parts[:-1])
     return expr, value
 

@@ -206,7 +206,7 @@ def test_cluster_weight__config(data):
 
 def test_cluster_weight__errors(data):
     wm = OneWayClusteredWeightMatrix(data.clusters[:10])
-    with pytest.raises(ValueError):
+    with pytest.raises(ValueError, match="ASDF"):
         wm.weight_matrix(data.x, data.z, data.e)
 
 
@@ -283,7 +283,7 @@ def test_gmm_covariance_kernel(data, kernel, bandwidth):
 
 
 def test_gmm_covariance_unknown(data):
-    with pytest.raises(ValueError):
+    with pytest.raises(ValueError, match="ASDF"):
         assert isinstance(
             IVGMMCovariance(data.x, data.y, data.z, data.params, data.i, "unknown").cov,
             np.ndarray,

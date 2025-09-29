@@ -17,7 +17,7 @@ FORMULA_PORT = (
     "port_01 + port_02 + port_03 + port_04 + port_05 + port_06 + port_07 + "
     "port_08 + port_09 + port_10"
 )
-FORMULA = " ~ ".join((FORMULA_PORT, FORMULA_FACTORS))
+FORMULA = f"{FORMULA_PORT} ~ {FORMULA_FACTORS}"
 
 
 @pytest.fixture(
@@ -122,7 +122,7 @@ def test_escaped_formula(data, model):
 
     formula_factors = transform(FORMULA_FACTORS)
     formula_port = transform(FORMULA_PORT)
-    formula = " ~ ".join((formula_port, formula_factors))
+    formula = f"{formula_port} ~ {formula_factors}"
     data_rename = data.joined.copy()
     data_rename.columns = [col.replace("_", " ") for col in data_rename]
     mod = model.from_formula(formula, data_rename)

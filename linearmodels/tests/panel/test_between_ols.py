@@ -299,7 +299,7 @@ def test_cluster_error(data):
         clusters.loc[entity] = np.random.randint(9)
     clusters.iloc[::7, :] = 0
 
-    with pytest.raises(ValueError):
+    with pytest.raises(ValueError, match="clusters must not vary within an entity"):
         mod.fit(cov_type="clustered", clusters=clusters, debiased=False)
 
 

@@ -200,15 +200,15 @@ def test_no_constant_smoke():
 
 
 def test_unknown_weight_type(data):
-    with pytest.raises(ValueError):
+    with pytest.raises(ValueError, match="Unknown estimator for weight_type"):
         IVSystemGMM(data.eqns, weight_type="unknown")
 
 
 def test_unknown_cov_type(data):
     mod = IVSystemGMM(data.eqns)
-    with pytest.raises(ValueError):
+    with pytest.raises(ValueError, match="Unknown cov_type"):
         mod.fit(cov_type="unknown")
-    with pytest.raises(ValueError):
+    with pytest.raises(ValueError, match="Unknown cov_type"):
         mod.fit(cov_type=3)
 
 
@@ -262,7 +262,7 @@ def test_incorrect_sigma_shape(data):
     k = len(data.eqns)
     b = np.random.standard_normal((k + 2, 1))
     sigma = b @ b.T + np.diag(np.ones(k + 2))
-    with pytest.raises(ValueError):
+    with pytest.raises(ValueError, match="sigma must be a square matrix"):
         IVSystemGMM(data.eqns, weight_type="unadjusted", sigma=sigma)
 
 
@@ -270,7 +270,7 @@ def test_invalid_sigma_usage(data):
     k = len(data.eqns)
     b = np.random.standard_normal((k, 1))
     sigma = b @ b.T + np.diag(np.ones(k))
-    with pytest.warns(UserWarning):
+    with pytest.warns(UserWarning, match="sigma has been provided"):
         IVSystemGMM(data.eqns, weight_type="robust", sigma=sigma)
 
 
@@ -305,7 +305,7 @@ def test_kernel_equiv(data):
 def test_kernel_optimal_bandwidth(data):
     mod = IVSystemGMM(data.eqns, weight_type="kernel")
     res = mod.fit(cov_type="kernel", debiased=True)
-    nobs = data.eqns[list(data.eqns.keys())[0]].dependent.shape[0]
+    nobs = data.eqns[next(iter(data.eqns.keys()))].dependent.shape[0]
     assert res.weight_config["bandwidth"] == (nobs - 2)
 
     mod = IVSystemGMM(data.eqns, weight_type="kernel", optimal_bw=True)
@@ -344,7 +344,7 @@ def test_heteroskedastic_weight_direct(weight_data, center, debias):
     nobs = ze.shape[0]
     direct = ze.T @ ze / nobs
     if debias:
-        df = [vx.shape[1] * np.ones(vz.shape[1]) for vx, vz in zip(x, z)]
+        df = [vx.shape[1] * np.ones(vz.shape[1]) for vx, vz in zip(x, z, strict=False)]
         df = np.concatenate(df)[:, None]
         df = np.sqrt(df)
         adj = nobs / (nobs - df @ df.T)
@@ -369,7 +369,7 @@ def test_kernel_weight_direct(weight_data, center, debias):
         op = ze[:-i].T @ ze[i:] / nobs
         direct += w[i] * (op + op.T)
     if debias:
-        df = [vx.shape[1] * np.ones(vz.shape[1]) for vx, vz in zip(x, z)]
+        df = [vx.shape[1] * np.ones(vz.shape[1]) for vx, vz in zip(x, z, strict=False)]
         df = np.concatenate(df)[:, None]
         df = np.sqrt(df)
         adj = nobs / (nobs - df @ df.T)
@@ -394,6 +394,6 @@ def test_fitted(data):
     expected = DataFrame(
         expected,
         index=mod._dependent[i].pandas.index,
-        columns=[key for key in res.equations],
+        columns=list(res.equations),
     )
     assert_frame_equal(expected, res.fitted_values)

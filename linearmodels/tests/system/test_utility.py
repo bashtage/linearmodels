@@ -71,7 +71,7 @@ def test_inner_product_short_circuit(data):
 
 
 def test_column_product(data):
-    y, x, sigma = data
+    y, _, sigma = data
     efficient = blocked_column_product(y, sigma)
     nobs = y[0].shape[0]
     omega = np.kron(sigma, np.eye(nobs))
@@ -81,7 +81,7 @@ def test_column_product(data):
 
 
 def test_diag_product(data):
-    y, x, sigma = data
+    _, x, sigma = data
     efficient = blocked_diag_product(x, sigma)
     nobs = x[0].shape[0]
     omega = np.kron(sigma, np.eye(nobs))
@@ -101,7 +101,7 @@ def test_diag_product(data):
 
 
 def test_inv_matrix_sqrt(data):
-    y, x, sigma = data
+    sigma = data[2]
     k = sigma.shape[0]
     sigma_m12 = inv_matrix_sqrt(sigma)
     assert_allclose(sigma_m12 - sigma_m12.T, np.zeros((k, k)))
@@ -135,17 +135,17 @@ def test_linear_constraint_errors():
     r[0, 0] = r[1, 1] = 1
     r_df = pd.DataFrame(r)
     q = np.zeros(2)
-    with pytest.raises(TypeError):
+    with pytest.raises(TypeError, match="r must be a DataFrame"):
         LinearConstraint(r)
-    with pytest.raises(TypeError):
+    with pytest.raises(TypeError, match="q must be a Seri"):
         LinearConstraint(r_df, q)
-    with pytest.raises(TypeError):
+    with pytest.raises(TypeError, match="r must be an array or DataFrame"):
         LinearConstraint([[0, 0, 1]])
-    with pytest.raises(ValueError):
+    with pytest.raises(ValueError, match="r must be 2-dimensional"):
         LinearConstraint(r[0], require_pandas=False)
-    with pytest.raises(TypeError):
+    with pytest.raises(TypeError, match="q must be a Series"):
         LinearConstraint(r_df, q)
-    with pytest.raises(TypeError):
+    with pytest.raises(TypeError, match="q must be a Series"):
         LinearConstraint(r_df, [0, 0])
     with pytest.raises(TypeError, match="q must be a Series or"):
         LinearConstraint(r=np.eye(2), q=[0, 0], require_pandas=False)

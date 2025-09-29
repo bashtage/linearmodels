@@ -16,20 +16,20 @@ from .data import (
 )
 
 __all__ = [
-    "ArrayLike",
-    "Numeric",
-    "OptionalNumeric",
+    "AnyArray",
     "AnyPandas",
-    "Label",
+    "ArrayLike",
     "ArraySequence",
-    "IntArray",
+    "BoolArray",
+    "Float64Array",
+    "FloatArray2D",
     "Int32Array",
     "Int64Array",
-    "AnyArray",
-    "Float64Array",
-    "BoolArray",
+    "IntArray",
+    "Label",
+    "Numeric",
     "NumericArray",
-    "FloatArray2D",
+    "OptionalNumeric",
 ]
 
 ArraySequence = Sequence[np.ndarray]

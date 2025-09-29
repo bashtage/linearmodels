@@ -35,7 +35,7 @@ KernelWeight = Union[
     Callable[[float, VarArg(Any)], ndarray],
 ]
 
-CLUSTER_ERR = """
+CLUSTER_ERR = """\
 clusters has the wrong nobs. Expected {0}, got {1}.  Any missing observation
 in the regression variables have have been dropped.  When using a clustered
 covariance estimator, drop missing data before estimating the model. The model
@@ -106,7 +106,7 @@ def kernel_weight_quadratic_spectral(
         return w
 
     z = arange(n + 1).astype(float) / float(bw)
-    w = cast(linearmodels.typing.data.FloatArray1D, 6 * pi * z / 5)
+    w = cast("linearmodels.typing.data.FloatArray1D", 6 * pi * z / 5)
     w[0] = 1
     w[1:] = 3 / w[1:] ** 2 * (sin(w[1:]) / w[1:] - cos(w[1:]))
 
@@ -539,7 +539,7 @@ class KernelCovariance(HomoskedasticCovariance):
         w = self._kernels[kernel](bw, nobs - 1)
         s = cov_kernel(xhat_e, w)
 
-        return cast(ndarray, self._scale * s)
+        return cast("ndarray", self._scale * s)
 
     @property
     def config(self) -> dict[str, Any]:
@@ -617,7 +617,9 @@ class ClusteredCovariance(HomoskedasticCovariance):
 
         nobs = x.shape[0]
         clusters = arange(nobs) if clusters is None else clusters
-        clusters = cast(linearmodels.typing.data.AnyArray, asarray(clusters).squeeze())
+        clusters = cast(
+            "linearmodels.typing.data.AnyArray", asarray(clusters).squeeze()
+        )
         if clusters.shape[0] != nobs:
             raise ValueError(CLUSTER_ERR.format(nobs, clusters.shape[0]))
         self._clusters = clusters
@@ -647,7 +649,7 @@ class ClusteredCovariance(HomoskedasticCovariance):
             s: linearmodels.typing.data.Float64Array, nc: int, nobs: int
         ) -> linearmodels.typing.data.Float64Array:
             scale = float(self._scale * (nc / (nc - 1)) * ((nobs - 1) / nobs))
-            return cast(ndarray, s * scale) if self.debiased else s
+            return cast("ndarray", s * scale) if self.debiased else s
 
         x, z, eps = self.x, self.z, self.eps
         pinvz = self._pinvz

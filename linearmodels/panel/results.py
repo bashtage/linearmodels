@@ -9,7 +9,6 @@ from typing import Any, Union
 
 from formulaic.utils.context import capture_context
 import numpy as np
-import pandas
 from pandas import DataFrame, Series, concat
 from scipy import stats
 from statsmodels.iolib.summary import SimpleTable, fmt_2cols, fmt_params
@@ -22,10 +21,10 @@ from linearmodels.shared.utility import AttrDict
 import linearmodels.typing.data
 
 __all__ = [
-    "PanelResults",
-    "PanelEffectsResults",
-    "RandomEffectsResults",
     "FamaMacBethResults",
+    "PanelEffectsResults",
+    "PanelResults",
+    "RandomEffectsResults",
     "compare",
 ]
 
@@ -477,7 +476,7 @@ class PanelResults(_SummaryStr):
     def _out_of_sample(
         self,
         exog: linearmodels.typing.data.ArrayLike | None,
-        data: pandas.DataFrame | None,
+        data: DataFrame | None,
         missing: bool,
         context: Mapping[str, Any] | None = None,
     ) -> DataFrame:
@@ -496,7 +495,7 @@ class PanelResults(_SummaryStr):
         self,
         exog: linearmodels.typing.data.ArrayLike | None = None,
         *,
-        data: pandas.DataFrame | None = None,
+        data: DataFrame | None = None,
         fitted: bool = True,
         effects: bool = False,
         idiosyncratic: bool = False,
@@ -552,7 +551,7 @@ class PanelResults(_SummaryStr):
             out.append(self.idiosyncratic)
         if len(out) == 0:
             raise ValueError("At least one output must be selected")
-        out_df: pandas.DataFrame = concat(out, axis=1)
+        out_df: DataFrame = concat(out, axis=1)
         if missing:
             index = self._original_index
             out_df = out_df.reindex(index)
@@ -667,10 +666,8 @@ class PanelResults(_SummaryStr):
 
     def wald_test(
         self,
-        restriction: (
-            linearmodels.typing.data.Float64Array | pandas.DataFrame | None
-        ) = None,
-        value: linearmodels.typing.data.Float64Array | pandas.Series | None = None,
+        restriction: linearmodels.typing.data.Float64Array | DataFrame | None = None,
+        value: linearmodels.typing.data.Float64Array | Series | None = None,
         *,
         formula: str | list[str] | None = None,
     ) -> WaldTestStatistic:
@@ -814,7 +811,7 @@ class PanelEffectsResults(PanelResults):
         return effects
 
     @property
-    def other_info(self) -> pandas.DataFrame | None:
+    def other_info(self) -> DataFrame | None:
         """Statistics on observations per group for other effects"""
         return self._other_info
 
@@ -1068,7 +1065,7 @@ class PanelModelComparison(_ModelComparison):
             ],
             axis=1,
         )
-        vals_lst = [[i for i in v] for v in vals.T.values]
+        vals_lst = [list(v) for v in vals.T.values]
         vals_lst[2] = [str(v) for v in vals_lst[2]]
         for i in range(4, len(vals_lst)):
             f = _str
@@ -1083,7 +1080,7 @@ class PanelModelComparison(_ModelComparison):
         params_stub: list[str] = []
         for i in range(len(params)):
             formatted_and_starred = []
-            for v, pv in zip(params.values[i], pvalues[i]):
+            for v, pv in zip(params.values[i], pvalues[i], strict=False):
                 formatted_and_starred.append(add_star(_str(v), pv, self._stars))
             params_fmt.append(formatted_and_starred)
 

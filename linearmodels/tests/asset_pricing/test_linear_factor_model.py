@@ -338,5 +338,5 @@ def test_linear_model_parameters_risk_free_gls(data):
 @pytest.mark.parametrize("output", ["numpy", "pandas"])
 def test_infeasible(output):
     data = generate_data(nfactor=10, nportfolio=20, nobs=10, output=output)
-    with pytest.raises(ValueError):
+    with pytest.raises(ValueError, match="Model cannot be estimated"):
         LinearFactorModel(data.portfolios, data.factors)

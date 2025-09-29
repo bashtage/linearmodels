@@ -74,7 +74,7 @@ def test_diff_data_size(data):
         x = data.x[:, :, :-1]
         y = data.y
 
-    with pytest.raises(ValueError):
+    with pytest.raises(ValueError, match="dependent and exog must have the same"):
         PooledOLS(y, x)
 
 
@@ -84,7 +84,7 @@ def test_rank_deficient_array(data):
         x.iloc[:, 1] = x.iloc[:, 0]
     else:
         x[1] = x[0]
-    with pytest.raises(ValueError):
+    with pytest.raises(ValueError, match="exog does not have full column rank"):
         PooledOLS(data.y, x)
 
 

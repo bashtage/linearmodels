@@ -8,7 +8,6 @@ from formulaic.formula import Formula
 from formulaic.materializers.types import NAAction as fNAAction
 from formulaic.utils.context import capture_context
 import numpy as np
-import pandas
 from pandas import DataFrame
 
 import linearmodels.typing.data
@@ -91,7 +90,7 @@ class IVFormulaParser:
     def __init__(
         self,
         formula: str,
-        data: pandas.DataFrame,
+        data: DataFrame,
         eval_env: int = 2,
         context: Mapping[str, Any] | None = None,
     ):
@@ -222,5 +221,5 @@ class IVFormulaParser:
         return self._components
 
     @staticmethod
-    def _empty_check(arr: pandas.DataFrame) -> DataFrame | None:
+    def _empty_check(arr: DataFrame) -> DataFrame | None:
         return None if arr.shape[1] == 0 else arr

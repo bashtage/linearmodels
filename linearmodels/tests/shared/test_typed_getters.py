@@ -14,9 +14,10 @@ from linearmodels.shared.typed_getters import (
 )
 
 ARRAY_LIKE: tuple[type, ...] = (np.ndarray, pd.Series, pd.DataFrame)
-PANEL_LIKE: tuple[type, ...] = ARRAY_LIKE + (PanelData,)
+PANEL_LIKE: tuple[type, ...] = (*ARRAY_LIKE, PanelData)
 ARRAYS: tuple[Any, ...] = (np.array([1.0]), pd.Series([1.0]), pd.DataFrame([[1.0]]))
-PANELS: tuple[Any, ...] = ARRAYS + (PanelData(np.array([[[1.0]]])),)
+PANELS: tuple[Any, ...] = (*ARRAYS, PanelData(np.array([[[1.0]]])))
+
 try:
     import xarray as xr
 
@@ -79,7 +80,7 @@ def test_array_like(arr):
 def test_panel_data_like(panel):
     assert isinstance(get_panel_data_like({"v": panel}, "v"), PANEL_LIKE)
     assert get_panel_data_like({"v": panel}, "a") is None
-    with pytest.raises(TypeError):
+    with pytest.raises(TypeError, match="v found in the dictionary"):
         get_panel_data_like({"v": 1}, "v")
-    with pytest.raises(TypeError):
+    with pytest.raises(TypeError, match="v found in the dictionary"):
         get_panel_data_like({"v": [1]}, "v")

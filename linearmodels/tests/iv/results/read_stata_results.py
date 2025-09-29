@@ -89,9 +89,9 @@ def finalize(params, stats, cov, weight_mat):
         "rsquared": "r2",
         "rsquared_adj": "r2_a",
     }
-    for key in fixes:
-        if fixes[key] in out:
-            out[key] = out[fixes[key]]
+    for key, fix_value in fixes.items():
+        if fix_value in out:
+            out[key] = out[fix_value]
         else:
             out[key] = None
     if "chi2" in out:

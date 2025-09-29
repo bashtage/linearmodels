@@ -11,7 +11,7 @@ try:
 
 except ImportError:
     # Always needed to allow optional xarray
-    ArrayLike = Union[np.ndarray, pd.DataFrame, pd.Series]  # type: ignore
+    ArrayLike = Union[np.ndarray, pd.DataFrame, pd.Series]
 
 
 NDArray = Union[np.ndarray]
@@ -26,14 +26,14 @@ Uint32Array = np.ndarray[tuple[int, ...], np.dtype[np.uint32]]  # pragma: no cov
 FloatArray1D = np.ndarray[tuple[int], np.dtype[np.float64]]
 FloatArray2D = np.ndarray[tuple[int, int], np.dtype[np.float64]]
 __all__ = [
+    "AnyArray",
+    "ArrayLike",
+    "BoolArray",
     "Float64Array",
+    "FloatArray1D",
+    "FloatArray2D",
     "Int32Array",
     "Int64Array",
     "IntArray",
-    "BoolArray",
-    "AnyArray",
     "Uint32Array",
-    "ArrayLike",
-    "FloatArray1D",
-    "FloatArray2D",
 ]

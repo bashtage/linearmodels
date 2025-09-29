@@ -20,7 +20,7 @@ w = np.ones((t, 1)) @ w
 w = w / float(w.mean())
 
 items = ["x" + str(i) for i in range(1, k + 1)]
-items = ["intercept"] + items
+items = ["intercept", *items]
 major = list(pd.date_range("12-31-1999", periods=t, freq="A-DEC"))
 minor = [f"firm.{i:0>4}" for i in range(1, n + 1)]
 
@@ -40,7 +40,7 @@ z = pd.concat(
 final_index = pd.MultiIndex.from_product([minor, major])
 final_index.set_names("firm", level=0)
 z = z.reindex(final_index)
-idx = cast(pd.MultiIndex, z.index)
+idx = cast("pd.MultiIndex", z.index)
 idx = idx.set_names(["firm", "time"], level=[0, 1])
 z.index = idx
 

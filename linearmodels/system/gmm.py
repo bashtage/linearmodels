@@ -7,7 +7,6 @@ from __future__ import annotations
 from collections.abc import Sequence
 from typing import cast
 
-import numpy
 from numpy import array, empty, ndarray, repeat, sqrt, zeros_like
 
 from linearmodels.asset_pricing.covariance import _HACMixin
@@ -105,7 +104,7 @@ class HomoskedasticWeightMatrix:
         z: Sequence[linearmodels.typing.data.Float64Array],
         eps: linearmodels.typing.data.Float64Array,
         *,
-        sigma: numpy.ndarray,
+        sigma: ndarray,
     ) -> linearmodels.typing.data.Float64Array:
         """
         Construct a GMM weight matrix for a model.
@@ -127,7 +126,7 @@ class HomoskedasticWeightMatrix:
             Covariance of GMM moment conditions.
         """
         nobs = z[0].shape[0]
-        w = cast(ndarray, blocked_inner_prod(z, sigma) / nobs)
+        w = cast("ndarray", blocked_inner_prod(z, sigma) / nobs)
         return w
 
     @property
@@ -181,7 +180,7 @@ class HeteroskedasticWeightMatrix(HomoskedasticWeightMatrix):
         z: Sequence[linearmodels.typing.data.Float64Array],
         eps: linearmodels.typing.data.Float64Array,
         *,
-        sigma: numpy.ndarray | None = None,
+        sigma: ndarray | None = None,
     ) -> linearmodels.typing.data.Float64Array:
         """
         Construct a GMM weight matrix for a model.
@@ -231,7 +230,7 @@ class HeteroskedasticWeightMatrix(HomoskedasticWeightMatrix):
         nvar = repeat(nvar, ninstr)
         if not self._debiased:
             nvar = zeros_like(nvar)
-        nvar = cast(linearmodels.typing.data.Float64Array, sqrt(nvar))[:, None]
+        nvar = cast("linearmodels.typing.data.Float64Array", sqrt(nvar))[:, None]
         scale = nobs / (nobs - nvar @ nvar.T)
         return scale
 
@@ -302,7 +301,7 @@ class KernelWeightMatrix(HeteroskedasticWeightMatrix, _HACMixin):
         z: Sequence[linearmodels.typing.data.Float64Array],
         eps: linearmodels.typing.data.Float64Array,
         *,
-        sigma: numpy.ndarray | None = None,
+        sigma: ndarray | None = None,
     ) -> linearmodels.typing.data.Float64Array:
         """
         Construct a GMM weight matrix for a model.

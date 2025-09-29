@@ -24,11 +24,11 @@ MODELS = {
 }
 cwd = os.path.split(os.path.abspath(__file__))[0]
 sim_data = cast(
-    pd.DataFrame, pd.read_stata(os.path.join(cwd, "results", "simulated-panel.dta"))
+    "pd.DataFrame", pd.read_stata(os.path.join(cwd, "results", "simulated-panel.dta"))
 )
 sim_data = sim_data.set_index(["firm", "time"])
 
-valid = sorted(list(filter(lambda x: True, list(STATA_RESULTS.keys()))))
+valid = sorted(filter(lambda x: True, list(STATA_RESULTS.keys())))
 
 
 @pytest.fixture(params=valid, scope="module")
@@ -43,7 +43,7 @@ def data(request):
         y_vars = variables[:1]
         x_vars = variables[1:]
     y = sim_data[y_vars]
-    x = sim_data[["intercept"] + x_vars]
+    x = sim_data[["intercept", *x_vars]]
     mod = MODELS[model]
     mod_options = {}
     if model == "fixed_effect":

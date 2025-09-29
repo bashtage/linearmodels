@@ -13,10 +13,10 @@ except ImportError:
 
 try:
     import jupyter_client
-    import matplotlib  # noqa: F401
+    import matplotlib as mpl  # noqa: F401
     from nbconvert.preprocessors import ExecutePreprocessor
     import nbformat
-    import seaborn  # noqa: F401
+    import seaborn as sns  # noqa: F401
 
     kernels = jupyter_client.kernelspec.find_kernel_specs()
 

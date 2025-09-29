@@ -46,7 +46,7 @@ params = list(product(fmlas, models))
 
 ids = []
 for f, m in params:
-    key = "--".join([value for value in f.values()])
+    key = "--".join(list(f.values()))
     key += " : " + str(m[0].__name__)
     ids.append(key)
 
@@ -94,7 +94,7 @@ def test_predict(config):
 
 
 def test_predict_partial(config):
-    fmla, model, interface = config
+    fmla, model, _ = config
     for key in fmla:
         if "[" in fmla[key] and model not in (IVSystemGMM, IV3SLS):
             return
@@ -115,7 +115,7 @@ def test_predict_partial(config):
     eqns = AttrDict()
     for key in list(mod._equations.keys())[1:]:
         eqns[key] = mod._equations[key]
-    final = list(mod._equations.keys())[0]
+    final = next(iter(mod._equations.keys()))
     eqns[final] = {"exog": None, "endog": None}
     pred3 = res.predict(equations=eqns, dataframe=True)
     assert_frame_equal(pred2[pred3.columns], pred3)
@@ -128,18 +128,18 @@ def test_predict_partial(config):
 
 
 def test_invalid_predict(config):
-    fmla, model, interface = config
+    fmla, model, _ = config
     for key in fmla:
         if "[" in fmla[key] and model not in (IVSystemGMM, IV3SLS):
             return
     mod = model.from_formula(fmla, joined)
     res = mod.fit()
-    with pytest.raises(ValueError):
+    with pytest.raises(ValueError, match="Predictions can only"):
         res.predict(data=joined, equations=mod._equations)
 
 
 def test_parser(config):
-    fmla, model, interface = config
+    fmla = config[0]
     parser = SystemFormulaParser(fmla, joined, eval_env=1)
     orig_data = parser.data
     assert isinstance(orig_data, dict)
@@ -177,9 +177,9 @@ def test_parser(config):
     for key in orig_data:
         eq1 = orig_data[key]
         eq2 = new_data[key]
-        for key in eq1:
-            if eq1[key] is not None:
-                assert_frame_equal(eq1[key], eq2[key])
+        for key2 in eq1:
+            if eq1[key2] is not None:
+                assert_frame_equal(eq1[key2], eq2[key2])
 
 
 def test_formula_escaped(config):
@@ -195,10 +195,11 @@ def test_formula_escaped(config):
 
     def fix_formula(fmla):
         mod_fmla = {}
-        for key, eq in fmla.items():
-            for orig in replacements:
-                eq = eq.replace(orig, replacements[orig])
-            mod_fmla[key] = eq
+        for key in fmla:
+            _eq = fmla[key]
+            for orig, replacement_val in replacements.items():
+                _eq = _eq.replace(orig, replacement_val)
+            mod_fmla[key] = _eq
 
         return mod_fmla
 

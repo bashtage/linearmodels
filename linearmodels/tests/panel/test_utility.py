@@ -63,7 +63,7 @@ def test_dummy_last():
 def test_invalid_format():
     cats = np.zeros([10, 1], dtype=np.int8)
     cats[5:, 0] = 1
-    with pytest.raises(ValueError):
+    with pytest.raises(ValueError, match="Unknown format"):
         dummy_matrix(cats, output_format="unknown", precondition=False)
 
 
@@ -125,10 +125,10 @@ def test_drop_singletons_slow():
     cols = {"c1": c1.copy(), "c2": c2.copy()}
     for _ in range(40000):
         last = cols["c1"].shape[0]
-        for col in cols:
-            keep = in_2core_graph_slow(cols[col])
-            for col2 in cols:
-                cols[col2] = cols[col2][keep]
+        for col_value in cols.values():
+            keep = in_2core_graph_slow(col_value)
+            for col2, col2_value in cols.items():
+                cols[col2] = col2_value[keep]
             idx = idx[keep]
         if cols["c1"].shape[0] == last:
             break
@@ -170,7 +170,7 @@ def test_drop_singletons_pandas():
     c2 = rs.randint(0, 20000, (40000, 1))
     df = [
         pd.Series([f"{let}{c}" for c in cat.ravel()], dtype="category")
-        for let, cat in zip("AB", (c1, c2))
+        for let, cat in zip("AB", (c1, c2), strict=False)
     ]
     df = pd.concat(df, axis=1)
     df.columns = ["cat1", "cat2"]

@@ -6,7 +6,7 @@ import pytest
 
 logger = logging.getLogger(__name__)
 
-cow = bool(os.environ.get("LM_TEST_COPY_ON_WRITE", False))
+cow = bool(os.environ.get("LM_TEST_COPY_ON_WRITE", ""))
 if cow:
     try:
         pd.options.mode.copy_on_write = cow
