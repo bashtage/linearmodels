@@ -162,21 +162,21 @@ def test_no_exog(data, model_and_func):
 def test_invalid_formula(data, model_and_func):
     model, func = model_and_func
     formula = "y ~ 1 + x1 + x2 ~ x3 + [x4  x5 ~ z1 z2]"
-    with pytest.raises(ValueError, match=r"ASDF"):
+    with pytest.raises(ValueError, match=r"formula contains more than"):
         model.from_formula(formula, data).fit()
-    with pytest.raises(ValueError, match=r"ASDF"):
+    with pytest.raises(ValueError, match=r"formula contains more than"):
         func(formula, data).fit()
     formula = "y ~ 1 + x1 + x2 + x3 + x4 + x5 ~ z1 z2"
-    with pytest.raises(ValueError, match=r"ASDF"):
+    with pytest.raises(ValueError, match=r"formula not understood"):
         model.from_formula(formula, data).fit()
     formula = "y y2 ~ 1 + x1 + x2 + x3 + [x4 + x5 ~ + z1 + z2]"
-    with pytest.raises(ValueError, match=r"ASDF"):
+    with pytest.raises(ValueError, match=r"instrument block must not start or"):
         model.from_formula(formula, data).fit()
     formula = "y y2 ~ 1 + x1 + x2 + x3 [ + x4 + x5 ~ z1 + z2]"
-    with pytest.raises(ValueError, match=r"ASDF"):
+    with pytest.raises(ValueError, match=r"endogenous block must not start or"):
         model.from_formula(formula, data).fit()
     formula = "y y2 ~ 1 + x1 + x2 + x3 + [x4 + x5 ~ z1 + z2]"
-    with pytest.raises(FormulaSyntaxError):
+    with pytest.raises(FormulaSyntaxError, match=r"Missing operator between"):
         model.from_formula(formula, data).fit()
 
 
@@ -237,7 +237,7 @@ def test_formula_function(data, model_and_func):
     assert_allclose(fmla_res.params.values, array_res.params.values, rtol=1e-5)
     assert_allclose(fmla_res.params.values, func_res.params.values, rtol=1e-5)
 
-    with pytest.raises(ValueError, match=r"ASDF"):
+    with pytest.raises(ValueError, match=r"Unable to use data when the model"):
         array_res.predict(data=data)
 
 

@@ -1097,8 +1097,9 @@ class LinearFactorModelGMM(_LinearFactorModelBase):
         r2 = 1.0 - residual_ss / total_ss
         param_names = []
         for portfolio in self.portfolios.cols:
-            for factor in self.factors.cols:
-                param_names.append(f"beta-{portfolio}-{factor}")
+            param_names.extend(
+                [f"beta-{portfolio}-{factor}" for factor in self.factors.cols]
+            )
         if not excess_returns:
             param_names.append("lambda-risk_free")
         param_names.extend([f"lambda-{f}" for f in self.factors.cols])

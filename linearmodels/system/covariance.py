@@ -4,6 +4,7 @@ from typing import cast
 
 from numpy import asarray, empty, eye, ndarray, ones, sqrt, vstack, zeros
 from numpy.linalg import inv
+from pandas import DataFrame
 
 from linearmodels.asset_pricing.covariance import _HACMixin
 from linearmodels.iv.covariance import cov_cluster
@@ -86,9 +87,9 @@ class HomoskedasticCovariance:
 
     def __str__(self) -> str:
         out = self._name
-        extra: list[str] = []
-        for key in self._str_extra:
-            extra.append(": ".join([str(key), str(self._str_extra[key])]))
+        extra = [
+            ": ".join([str(key), str(self._str_extra[key])]) for key in self._str_extra
+        ]
         if extra:
             out += " (" + ", ".join(extra) + ")"
         return out
@@ -238,7 +239,7 @@ class HeteroskedasticCovariance(HomoskedasticCovariance):
                 xe += bigxe[i * nobs : (i + 1) * nobs]
         else:
             # Do not require blocking when not using GLS
-            k_tot = sum(map(lambda a: a.shape[1], x))
+            k_tot = sum(a.shape[1] for a in x)
             xe = empty((nobs, k_tot))
             loc = 0
             for i in range(k):
@@ -288,9 +289,7 @@ class HeteroskedasticCovariance(HomoskedasticCovariance):
             return 1.0
         ks = [s.shape[1] for s in self._x]
         nobs = self._x[0].shape[0]
-        adj = []
-        for k in ks:
-            adj.append(nobs / (nobs - k) * ones((k, 1)))
+        adj = [nobs / (nobs - k) * ones((k, 1)) for k in ks]
         adj_arr = vstack(adj)
         adj_arr = sqrt(adj_arr)
         # TODO: Check Type
@@ -492,7 +491,6 @@ class ClusteredCovariance(HeteroskedasticCovariance):
         shape = _clusters.shape
         if shape[0] != self._eps.shape[0] or not 1 <= shape[1] <= 2:
             raise ValueError(CLUSTERS_FORMAT, ValueError)
-        from pandas import DataFrame
 
         df = DataFrame(_clusters)
         nunique = df.nunique()
@@ -650,9 +648,7 @@ class GMMHomoskedasticCovariance:
             return 1.0
         k = [s.shape[1] for s in self._x]
         nobs = self._x[0].shape[0]
-        adj = []
-        for i in range(len(k)):
-            adj.append(nobs / (nobs - k[i]) * ones((k[i], 1)))
+        adj = [nobs / (nobs - k[i]) * ones((k[i], 1)) for i in range(len(k))]
         adj_arr = vstack(adj)
         adj_arr = sqrt(adj_arr)
         return adj_arr @ adj_arr.T
@@ -711,7 +707,7 @@ class GMMHeteroskedasticCovariance(GMMHomoskedasticCovariance):
         self._name = "GMM Heteroskedastic (Robust) Covariance"
 
         k = len(z)
-        k_total = sum(map(lambda a: a.shape[1], z))
+        k_total = sum(a.shape[1] for a in z)
         nobs = z[0].shape[0]
         loc = 0
         ze = empty((nobs, k_total))

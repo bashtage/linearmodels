@@ -84,7 +84,7 @@ def test_missing(data, model):
 
 def test_missing_clustered(data):
     mod = IV2SLS(data.dep, data.exog, data.endog, data.instr)
-    with pytest.raises(ValueError, match=r"ASDF"):
+    with pytest.raises(ValueError, match=r"clusters has the wrong nobs"):
         mod.fit(cov_type="clustered", clusters=data.clusters)
     res = mod.fit(cov_type="clustered", clusters=data.clusters_clean)
     mod = IV2SLS(data.dep_clean, data.exog_clean, data.endog_clean, data.instr_clean)

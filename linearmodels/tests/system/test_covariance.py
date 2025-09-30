@@ -73,7 +73,7 @@ def debias(request):
 
 def _xpxi(x):
     """Compute x'x^{-1} from block diagonal x"""
-    kx = sum(map(lambda a: a.shape[1], x))
+    kx = sum(a.shape[1] for a in x)
     k = len(x)
     nobs = x[0].shape[0]
     xpx = np.zeros((kx, kx))

@@ -2,6 +2,7 @@ from __future__ import annotations
 
 from collections.abc import Mapping
 from typing import Any, NamedTuple, Union, cast
+import warnings
 
 from formulaic.formula import Formula
 from formulaic.model_spec import NAAction
@@ -190,7 +191,7 @@ class PanelFormulaParser:
                 start = cln_formula.rfind("+", 0, loc)
                 end = loc + len(effect)
                 cln_formula = cln_formula[:start] + cln_formula[end:]
-        self._lhs, self._rhs = map(lambda s: "0 + " + s.strip(), cln_formula.split("~"))
+        self._lhs, self._rhs = ["0 + " + s.strip() for s in cln_formula.split("~")]
 
     @property
     def entity_effect(self) -> bool:
@@ -419,16 +420,16 @@ class _PanelModelBase:
             and weights.shape[0] == self.dependent.dataframe.shape[0]
         ):
             frame = DataFrame(weights)
-        elif weights.shape[0] == nobs:
+        elif weights.shape[0] == nobs and weights.ndim == 1:
             weights_arr = np.asarray(weights)[:, None]
             weights_arr = weights_arr @ np.ones((1, nentity))
 
             frame.iloc[:, :] = weights_arr
-        elif weights.shape[0] == nentity:
+        elif weights.shape[0] == nentity and weights.ndim == 1:
             weights_arr = np.asarray(weights)[None, :]
             weights_arr = np.ones((nobs, 1)) @ weights_arr
             frame.iloc[:, :] = weights_arr
-        elif weights.shape[0] == nentity * nobs:
+        elif weights.shape[0] == nentity * nobs and weights.size:
             frame = self.dependent.dataframe.copy()
             # raise RuntimeError()
             # TODO: Fix this for pandas 3
@@ -1277,8 +1278,7 @@ class PanelOLS(_PanelModelBase):
         if self.other_effects:
             assert self._other_effect_cats is not None
             other = self._other_effect_cats.dataframe
-            for col in other:
-                effects.append(np.asarray(other[col]).squeeze())
+            effects.extend([np.asarray(other[col]).squeeze() for col in other])
         return np.column_stack(effects)
 
     def _drop_singletons(self) -> None:
@@ -1290,11 +1290,9 @@ class PanelOLS(_PanelModelBase):
         if np.all(retain):
             return
 
-        import warnings as warn
-
         nobs = retain.shape[0]
         ndropped = nobs - retain.sum()
-        warn.warn(
+        warnings.warn(
             f"{ndropped} singleton observations dropped",
             SingletonWarning,
             stacklevel=3,
@@ -1615,7 +1613,6 @@ class PanelOLS(_PanelModelBase):
         reg_size = 8 * nentity * nobs * nreg // 2**20
         low_memory = reg_size > 2**10
         if low_memory:
-            import warnings
 
             warnings.warn(
                 "Using low-memory algorithm to estimate two-way model. Explicitly set "
@@ -1954,7 +1951,6 @@ class PanelOLS(_PanelModelBase):
                 if len(retain) != x.shape[1]:
                     drop = set(range(x.shape[1])).difference(retain)
                     dropped = ", ".join([str(self.exog.vars[i]) for i in drop])
-                    import warnings
 
                     warnings.warn(
                         absorbing_warn_msg.format(absorbed_variables=dropped),
@@ -3083,7 +3079,6 @@ class FamaMacBeth(_PanelModelBase):
             )
             raise ValueError(err)
         if valid_blocks.sum() < exog.shape[1]:
-            import warnings
 
             warnings.warn(
                 "The number of time-series observation available to estimate "
@@ -3094,7 +3089,6 @@ class FamaMacBeth(_PanelModelBase):
                 stacklevel=3,
             )
         elif valid_blocks.sum() < valid_blocks.shape[0]:
-            import warnings
 
             warnings.warn(
                 "{} of the time-series regressions cannot be estimated due to "

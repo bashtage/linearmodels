@@ -184,7 +184,7 @@ class PanelData:
 
         if not isinstance(x, (Series, DataFrame, np.ndarray)):
             try:
-                from xarray import DataArray
+                from xarray import DataArray  # noqa: PLC0415
 
                 if isinstance(x, DataArray):
                     if x.ndim not in (2, 3):

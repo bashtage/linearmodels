@@ -57,9 +57,7 @@ def blocked_diag_product(
     k = len(x)
     out = []
     for i in range(k):
-        row = []
-        for j in range(k):
-            row.append(s[i, j] * x[j])
+        row = [s[i, j] * x[j] for j in range(k)]
         row_arr = np.hstack(row)
         out.append(row_arr)
 

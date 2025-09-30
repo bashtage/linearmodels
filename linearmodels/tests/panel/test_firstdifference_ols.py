@@ -169,7 +169,12 @@ def test_first_difference_errors(data):
     else:
         x = data.x[:, [0], :]
         y = data.y[[0], :]
-    with pytest.raises(ValueError, match=r"dependent and exog must have th"):
+
+    match = r"Panel must have at least 2"
+    if data.y.ndim == 3:
+        match = r"dependent and exog must have the"
+
+    with pytest.raises(ValueError, match=match):
         FirstDifferenceOLS(y, x)
 
     if not isinstance(data.x, pd.DataFrame):
@@ -193,8 +198,11 @@ def test_firstdifference_error(data):
     for entity in mod.dependent.entities:
         clusters.loc[entity] = np.random.randint(9)
     clusters.iloc[::3, :] = clusters.iloc[::3, :] + 1
-
-    with pytest.raises(ValueError, match=r"clusters must have the same number"):
+    if np.prod(data.y.shape) == clusters.shape[0]:
+        match = r"clusters must be identical"
+    else:
+        match = r"clusters must have the same number"
+    with pytest.raises(ValueError, match=match):
         mod.fit(cov_type="clustered", clusters=clusters)
 
 

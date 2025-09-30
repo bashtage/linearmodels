@@ -43,11 +43,11 @@ class Hasher:
     @property
     def hash_func(self):
         try:
-            import xxhash
+            import xxhash  # noqa: PLC0415
 
             return xxhash.xxh64()
         except ImportError:
-            import hashlib
+            import hashlib  # noqa: PLC0415
 
             return hashlib.sha256()
 
@@ -271,17 +271,17 @@ def test_absorbing_exceptions(random_gen):
             random_gen.standard_normal((NOBS, 2)),
             absorb=absorbed,
         )
-    with pytest.raises(ValueError, match=r"ASDF"):
+    with pytest.raises(ValueError, match=r"Array required to have"):
         AbsorbingLS(
             random_gen.standard_normal(NOBS), random_gen.standard_normal((NOBS - 1, 2))
         )
-    with pytest.raises(ValueError, match=r"ASDF"):
+    with pytest.raises(ValueError, match=r"absorb and dependent have different number"):
         AbsorbingLS(
             random_gen.standard_normal(NOBS),
             random_gen.standard_normal((NOBS, 2)),
             absorb=pd.DataFrame(random_gen.standard_normal((NOBS - 1, 1))),
         )
-    with pytest.raises(ValueError, match=r"ASDF"):
+    with pytest.raises(ValueError, match=r"interactions"):
         AbsorbingLS(
             random_gen.standard_normal(NOBS),
             random_gen.standard_normal((NOBS, 2)),
@@ -292,13 +292,13 @@ def test_absorbing_exceptions(random_gen):
         random_gen.standard_normal((NOBS, 2)),
         interactions=random_cat(10, NOBS, frame=True, rs=random_gen),
     )
-    with pytest.raises(RuntimeError):
+    with pytest.raises(RuntimeError, match="fit must be called once before"):
         assert isinstance(mod.absorbed_dependent, pd.DataFrame)
-    with pytest.raises(RuntimeError):
+    with pytest.raises(RuntimeError, match="fit must be called once before"):
         assert isinstance(mod.absorbed_exog, pd.DataFrame)
     interactions = random_gen.randint(0, 10, size=(NOBS, 2))
     assert isinstance(interactions, np.ndarray)
-    with pytest.raises(TypeError, match=r"ASDF"):
+    with pytest.raises(TypeError, match=r"interactions must contain DataFrames"):
         AbsorbingLS(
             random_gen.standard_normal(NOBS),
             random_gen.standard_normal((NOBS, 2)),
@@ -444,7 +444,7 @@ def test_interaction_from_frame(cat, cont):
 def test_interaction_cat_bad_nobs():
     with pytest.raises(ValueError, match=r"nobs must be provided when cat"):
         Interaction()
-    with pytest.raises(ValueError, match=r"ASDF"):
+    with pytest.raises(ValueError, match=r"Both cat and cont are empty"):
         Interaction(cat=np.empty((100, 0)), cont=np.empty((100, 0)))
 
 
@@ -531,8 +531,8 @@ def test_against_ols(ols_data):
             absorb.append(dummies.toarray())
         has_dummy = ols_data.absorb.cat.shape[1] > 0
     if ols_data.interactions is not None:
-        for interact in ols_data.interactions:
-            absorb.append(interact.sparse.toarray())
+        absorb.extend([interact.sparse.toarray() for interact in ols_data.interactions])
+
     _x = ols_data.x
     if absorb:
         absorb = np.column_stack(absorb)

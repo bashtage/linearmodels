@@ -115,7 +115,7 @@ def test_xarray_2d() -> None:
 def test_invalid_types() -> None:
     with pytest.raises(ValueError, match=r"x has too many dims."):
         IVData(np.empty((1, 1, 1)))
-    with pytest.raises(ValueError, match=r"ASDF"):
+    with pytest.raises(ValueError, match=r"x has too many dims"):
         IVData(np.empty((10, 2, 2)))
 
     class AnotherClass:
@@ -125,7 +125,7 @@ def test_invalid_types() -> None:
         def ndim(self) -> int:
             return self._ndim
 
-    with pytest.raises(TypeError, match=r"ASDF"):
+    with pytest.raises(TypeError, match=r"Only ndarrays, DataArrays and Series"):
         # Intentional typing failure
         IVData(AnotherClass())
 
@@ -248,5 +248,5 @@ def test_mixed_data() -> None:
 
 def test_duplicate_column_names():
     x = pd.DataFrame(np.ones((3, 2)), columns=["x", "x"])
-    with pytest.raises(ValueError, match=r"ASDF"):
+    with pytest.raises(ValueError, match=r"DataFrame contains duplicate column names"):
         IVData(x)

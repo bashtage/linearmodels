@@ -30,12 +30,7 @@ TYPES = datatypes
 
 @pytest.fixture(
     params=list(product(PERC_MISSING, TYPES)),
-    ids=list(
-        map(
-            lambda x: str(int(100 * x[0])) + "-" + str(x[1]),
-            product(PERC_MISSING, TYPES),
-        )
-    ),
+    ids=[str(int(100 * x[0])) + "-" + str(x[1]) for x in product(PERC_MISSING, TYPES)],
 )
 def data(request):
     missing, datatype = request.param

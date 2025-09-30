@@ -35,6 +35,7 @@ Designed to work equally well with NumPy, Pandas or xarray data.
 from __future__ import annotations
 
 import os
+import sys
 
 from ._version import version as __version__, version_tuple
 from .asset_pricing.model import (
@@ -92,10 +93,9 @@ def test(
     append: bool = True,
     location: str = "",
 ) -> int:
-    import sys
 
     try:
-        import pytest
+        import pytest  # noqa: PLC0415
     except ImportError as exc:  # pragma: no cover
         raise ImportError("Need pytest to run tests") from exc
 

@@ -706,9 +706,7 @@ class _SystemModelBase:
         k = len(wxhat)
 
         xpx = blocked_inner_prod(wxhat, np.eye(len(wxhat)))
-        _xpy = []
-        for i in range(k):
-            _xpy.append(wxhat[i].T @ wy[i])
+        _xpy = [wxhat[i].T @ wy[i] for i in range(k)]
         xpy = np.vstack(_xpy)
         beta = _parameters_from_xprod(xpx, xpy, constraints=self.constraints)
 
@@ -1167,9 +1165,9 @@ class _SystemModelBase:
         )
 
         # wresid is different between GLS and OLS
-        wresiduals = []
-        for individual_key in individual:
-            wresiduals.append(individual[individual_key].wresid)
+        wresiduals = [
+            individual[individual_key].wresid for individual_key in individual
+        ]
         wresid = np.hstack(wresiduals)
         results["wresid"] = wresid
         results["cov_estimator"] = cov_est
@@ -1970,7 +1968,7 @@ class IVSystemGMM(_SystemModelBase):
         wx, wy, wz = self._wx, self._wy, self._wz
         k = len(wx)
         nobs = wx[0].shape[0]
-        k_total = sum(map(lambda a: a.shape[1], wz))
+        k_total = sum(a.shape[1] for a in wz)
         if initial_weight is None:
             w = blocked_inner_prod(wz, np.eye(k_total)) / nobs
         else:
@@ -2071,8 +2069,7 @@ class IVSystemGMM(_SystemModelBase):
         wi = np.linalg.inv(w)
         xpz_wi_zpx = xpz @ wi @ xpz.T
         zpy_arrs = []
-        for i in range(k):
-            zpy_arrs.append(z[i].T @ y[i])
+        zpy_arrs = [(z[i].T @ y[i]) for i in range(k)]
         zpy = np.vstack(zpy_arrs)
         xpz_wi_zpy = xpz @ wi @ zpy
         params = _parameters_from_xprod(xpz_wi_zpx, xpz_wi_zpy, constraints=constraints)
@@ -2135,9 +2132,9 @@ class IVSystemGMM(_SystemModelBase):
         )
 
         # wresid is different between GLS and OLS
-        wresiduals = []
-        for individual_key in individual:
-            wresiduals.append(individual[individual_key].wresid)
+        wresiduals = [
+            individual[individual_key].wresid for individual_key in individual
+        ]
         wresid = np.hstack(wresiduals)
         results["wresid"] = wresid
         results["wmat"] = wmat
@@ -2271,8 +2268,8 @@ class IVSystemGMM(_SystemModelBase):
         nobs = x[0].shape[0]
         stat = float(nobs * g_bar.T @ np.linalg.inv(weight_mat) @ g_bar.T)
         null = "Expected moment conditions are equal to 0"
-        ninstr = sum(map(lambda a: a.shape[1], z))
-        nvar = sum(map(lambda a: a.shape[1], x))
+        ninstr = sum(a.shape[1] for a in z)
+        nvar = sum(a.shape[1] for a in x)
         ncons = 0 if self.constraints is None else self.constraints.r.shape[0]
 
         return WaldTestStatistic(stat, null, ninstr - (nvar - ncons))

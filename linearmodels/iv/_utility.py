@@ -138,7 +138,7 @@ class IVFormulaParser:
                 exog += exog2
             exog = "0" if not exog else "0 + " + exog
         else:
-            raise ValueError("formula contains more then 2 separators (~)")
+            raise ValueError("formula contains more than 2 separators (~)")
         comp = {
             "dependent": "0 + " + dep,
             "exog": exog,

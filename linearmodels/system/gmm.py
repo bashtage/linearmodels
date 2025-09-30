@@ -52,9 +52,9 @@ class HomoskedasticWeightMatrix:
 
     def __str__(self) -> str:
         out = self._name
-        extra = []
-        for key in self._str_extra:
-            extra.append(": ".join([str(key), str(self._str_extra[key])]))
+        extra = [
+            ": ".join([str(key), str(self._str_extra[key])]) for key in self._str_extra
+        ]
         if extra:
             out += " (" + ", ".join(extra) + ")"
         return out
@@ -203,7 +203,7 @@ class HeteroskedasticWeightMatrix(HomoskedasticWeightMatrix):
         """
         nobs = x[0].shape[0]
         k = len(x)
-        k_total = sum(map(lambda a: a.shape[1], z))
+        k_total = sum(a.shape[1] for a in z)
         ze = empty((nobs, k_total))
         loc = 0
         for i in range(k):
@@ -324,7 +324,7 @@ class KernelWeightMatrix(HeteroskedasticWeightMatrix, _HACMixin):
         """
         nobs = x[0].shape[0]
         k = len(x)
-        k_total = sum(map(lambda a: a.shape[1], z))
+        k_total = sum(a.shape[1] for a in z)
         ze = empty((nobs, k_total))
         loc = 0
         for i in range(k):

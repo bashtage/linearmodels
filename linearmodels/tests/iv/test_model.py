@@ -1,6 +1,7 @@
 import linearmodels.compat.statsmodels
 from linearmodels.compat.statsmodels import Summary
 
+import copy
 import warnings
 
 import numpy as np
@@ -90,16 +91,16 @@ def get_all(v):
 def test_rank_deficient_exog_exception(data):
     exog = data.exog.copy()
     exog[:, :2] = 1
-    with pytest.raises(ValueError, match=r"ASDF"):
+    with pytest.raises(ValueError, match=r"regressors \[exog endog\] do not have"):
         IV2SLS(data.dep, exog, data.endog, data.instr)
 
 
 def test_rank_deficient_endog_exception(data):
     endog = data.endog.copy()
     endog[:, :2] = 1
-    with pytest.raises(ValueError, match=r"regressors [exog endog] do not have"):
+    with pytest.raises(ValueError, match=r"regressors \[exog endog\] do not have"):
         IV2SLS(data.dep, data.exog, endog, data.instr)
-    with pytest.raises(ValueError, match=r"ASDF"):
+    with pytest.raises(ValueError, match=r"regressors \[exog endog\] do not have"):
         IV2SLS(data.dep, data.exog, data.exog, data.instr)
 
 
@@ -112,9 +113,9 @@ def test_invalid_weights_exception(data):
 def test_rank_deficient_instr_exception(data):
     instr = data.instr.copy()
     instr[:, :2] = 1
-    with pytest.raises(ValueError, match=r"instruments [exog instruments]"):
+    with pytest.raises(ValueError, match=r"instruments \[exog instruments\]"):
         IV2SLS(data.dep, data.exog, data.endog, instr)
-    with pytest.raises(ValueError, match=r"ASDF"):
+    with pytest.raises(ValueError, match=r"instruments \[exog instruments\]"):
         IV2SLS(data.dep, data.exog, data.endog, data.exog)
 
 
@@ -312,7 +313,6 @@ def test_model_summary_smoke(data):
 
 
 def test_model_missing(data):
-    import copy
 
     data2 = AttrDict()
     for key in data:

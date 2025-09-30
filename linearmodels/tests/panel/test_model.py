@@ -1,5 +1,6 @@
 from itertools import product
 import pickle
+import warnings
 
 import numpy as np
 from numpy.testing import assert_allclose
@@ -22,12 +23,7 @@ TYPES = datatypes
 
 @pytest.fixture(
     params=list(product(PERC_MISSING, TYPES)),
-    ids=list(
-        map(
-            lambda x: str(int(100 * x[0])) + "-" + str(x[1]),
-            product(PERC_MISSING, TYPES),
-        )
-    ),
+    ids=[str(int(100 * x[0])) + "-" + str(x[1]) for x in product(PERC_MISSING, TYPES)],
 )
 def data(request):
     missing, datatype = request.param
@@ -171,8 +167,11 @@ def test_incorrect_weight_shape(data):
         w = w[None, :, :]
     else:  # xarray
         return
-
-    with pytest.raises(ValueError, match=r"Weights do not have "):
+    if isinstance(data.y, (pd.Series, pd.DataFrame)):
+        match = r"Weights do not have a supported"
+    else:
+        match = r"weights must have the same number"
+    with pytest.raises(ValueError, match=match):
         PanelOLS(data.y, data.x, weights=w)
 
 
@@ -230,7 +229,6 @@ def test_all_missing(data):
     missing = y.isnull | x.isnull
     y.drop(missing)
     x.drop(missing)
-    import warnings
 
     with warnings.catch_warnings(record=True) as w:
         PanelOLS(y.dataframe, x.dataframe).fit()

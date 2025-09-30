@@ -120,7 +120,7 @@ def get_array_like(
         if out is not None:
             array_like: Any = (np.ndarray, DataFrame, Series)
             try:
-                import xarray as xr
+                import xarray as xr  # noqa: PLC0415
 
                 array_like += (xr.DataArray,)
             except ImportError:
@@ -160,7 +160,7 @@ def get_panel_data_like(d: Mapping[str, Any], key: str) -> PanelDataLike | None:
         if out is not None:
             panel_data_like: Any = (np.ndarray, DataFrame, Series, PanelData)
             try:
-                import xarray as xr
+                import xarray as xr  # noqa: PLC0415
 
                 panel_data_like += (xr.DataArray,)
             except ImportError:

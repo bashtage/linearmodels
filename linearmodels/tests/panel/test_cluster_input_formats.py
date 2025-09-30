@@ -61,9 +61,7 @@ def test_string_input(data):
 
     clusters = np.random.randint(0, y.shape[2] // 2, size=(nt, 2))
     temp = {}
-    prim = list(
-        map(lambda s: "".join(s), list(product(ascii_lowercase, ascii_lowercase)))
-    )
+    prim = ["".join(s) for s in product(ascii_lowercase, ascii_lowercase)]
 
     for i in range(clusters.shape[1]):
         name = "effect." + str(i)
@@ -110,9 +108,7 @@ def test_mixed_input(data):
 
     clusters = np.random.randint(0, y.shape[2] // 2, size=(nt, 2))
     temp = {}
-    prim = list(
-        map(lambda s: "".join(s), list(product(ascii_lowercase, ascii_lowercase)))
-    )
+    prim = ["".join(s) for s in product(ascii_lowercase, ascii_lowercase)]
     temp["var.cluster.0"] = pd.Series(np.random.choice(prim, size=nt), index=y.index)
     temp["var.cluster.1"] = pd.Series(clusters[:, 1], index=y.index)
     clusters = pd.DataFrame(temp, index=y.index)

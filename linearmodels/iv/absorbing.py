@@ -417,13 +417,12 @@ class Interaction:
         where :math:`|c_i|` is the number distinct categories in column i.
         """
         if self.cat.shape[1] and self.cont.shape[1]:
-            out = []
-            for col in self.cont:
-                out.append(
-                    category_continuous_interaction(
-                        self.cat, self.cont[col], precondition=False
-                    )
+            out = [
+                category_continuous_interaction(
+                    self.cat, self.cont[col], precondition=False
                 )
+                for col in self.cont
+            ]
             return sp.hstack(out, format="csc")
         elif self.cat.shape[1]:
             return category_interaction(category_product(self.cat), precondition=False)
@@ -924,7 +923,7 @@ class AbsorbingLS:
         assert isinstance(self._regressors, sp.csc_matrix)
         if self._regressors.shape[1] > 0:
             if use_hdfe:
-                from pyhdfe import create
+                from pyhdfe import create  # noqa: PLC0415
 
                 absorb_options["drop_singletons"] = False
                 algo = create(self._absorb_inter.cat, **absorb_options)

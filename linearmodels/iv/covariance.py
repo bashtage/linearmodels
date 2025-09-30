@@ -26,6 +26,7 @@ from numpy import (
 from numpy.linalg import inv, pinv
 
 from linearmodels.shared.covariance import cov_cluster, cov_kernel
+from linearmodels.shared.linalg import has_constant
 import linearmodels.typing
 import linearmodels.typing.data
 
@@ -526,7 +527,6 @@ class KernelCovariance(HomoskedasticCovariance):
         bw = self.config["bandwidth"]
         if bw is None:
             self._auto_bandwidth = True
-            from linearmodels.shared.linalg import has_constant
 
             const, loc = has_constant(xhat)
             sel = ones((xhat.shape[1], 1))

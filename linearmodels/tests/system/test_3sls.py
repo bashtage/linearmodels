@@ -171,7 +171,7 @@ def test_too_few_instruments():
     eqns = {}
     for i in range(2):
         eqns[f"eqn.{i}"] = (dep[:, i], exog, endog, instr)
-    with pytest.raises(ValueError, match=r"Equation eqn"):
+    with pytest.raises(ValueError, match=r"Equation `eqn.0`"):
         IV3SLS(eqns)
 
 
@@ -216,7 +216,7 @@ def test_wrong_input_type():
     eqns = {}
     for i in range(2):
         eqns[i] = (dep[:, i], exog, endog, instr)
-    with pytest.raises(ValueError, match=r"'Equation labels (keys"):
+    with pytest.raises(ValueError, match=r"Equation labels \(keys\)"):
         IV3SLS(eqns)
 
 

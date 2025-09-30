@@ -135,7 +135,7 @@ class IVData:
 
         else:
             try:
-                import xarray as xr
+                import xarray as xr  # noqa: PLC0415
             except ImportError as exc:
                 raise TypeError(type_err) from exc
             if isinstance(x, xr.DataArray):

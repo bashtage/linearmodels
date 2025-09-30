@@ -8,8 +8,10 @@ import numpy as np
 from numpy.linalg import lstsq
 from numpy.random import RandomState, standard_normal
 from numpy.testing import assert_allclose
-from pandas import Categorical, DataFrame, Series, date_range, get_dummies
+from pandas import Categorical, DataFrame, Index, Series, date_range, get_dummies
 from pandas.testing import assert_frame_equal, assert_series_equal
+import xarray as xr
+from xarray.core.dtypes import NA
 
 from linearmodels.panel.data import PanelData
 from linearmodels.shared.utility import AttrDict, panel_to_frame
@@ -161,8 +163,6 @@ def generate_data(
         return AttrDict(y=y_df, x=x_df, w=w_df, c=c_df, vc1=vc1_df, vc2=vc2_df)
 
     assert datatype == "xarray"
-    import xarray as xr
-    from xarray.core.dtypes import NA
 
     x_xr = xr.DataArray(
         PanelData(x_df).values3d,
@@ -199,7 +199,6 @@ def generate_data(
 
 
 def assert_results_equal(res1, res2, test_fit=True, test_df=True, strict=True):
-    from pandas import Index
 
     def fix_index(x: Series | DataFrame, n: int):
         if isinstance(x, Series):
