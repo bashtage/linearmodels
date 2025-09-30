@@ -25,3 +25,4 @@ sphinxcontrib-spelling
 sphinx_autodoc_typehints
 wheel
 flake8-bugbear
+zipp>=3.19.1 # not directly required, pinned by Snyk to avoid a vulnerability
