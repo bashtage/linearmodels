@@ -14,7 +14,6 @@ from scipy import stats
 from statsmodels.iolib.summary import SimpleTable, fmt_2cols, fmt_params
 
 from linearmodels.iv.results import default_txt_fmt, stub_concat, table_concat
-from linearmodels.panel.model import _deferred_f
 from linearmodels.shared.base import _ModelComparison, _SummaryStr
 from linearmodels.shared.hypotheses import WaldTestStatistic, quadratic_form_test
 from linearmodels.shared.io import _str, add_star, pval_format
@@ -626,6 +625,8 @@ class PanelResults(_SummaryStr):
         number of restrictions and inference is made using an :math:`F_{k,df}`
         distribution where df is the residual degree of freedom from the model.
         """
+        from linearmodels.panel.model import _deferred_f  # noqa: PLC0415
+
         return _deferred_f(
             self.params, self.cov, self._debiased, self.df_resid, self._f_info
         )
