@@ -19,7 +19,7 @@
     
   
       
-        <title>linearmodels.panel.data - linearmodels v6.2 (+54)</title>
+        <title>linearmodels.panel.data - linearmodels v6.2 (+59)</title>
       
     
 
@@ -91,7 +91,7 @@
 
 <header class="md-header md-header--shadow" data-md-component="header">
   <nav class="md-header__inner md-grid" aria-label="Header">
-    <a href="../../../index.html" title="linearmodels v6.2 (+54)" class="md-header__button md-logo" aria-label="linearmodels v6.2 (+54)" data-md-component="logo">
+    <a href="../../../index.html" title="linearmodels v6.2 (+59)" class="md-header__button md-logo" aria-label="linearmodels v6.2 (+59)" data-md-component="logo">
       <img src="../../../_static/bw-logo.svg" alt="logo">
     </a>
     <label class="md-header__button md-icon" for="__drawer">
@@ -102,7 +102,7 @@
       <div class="md-header__ellipsis">
         <div class="md-header__topic">
           <span class="md-ellipsis">
-            linearmodels v6.2 (+54)
+            linearmodels v6.2 (+59)
           </span>
         </div>
         <div class="md-header__topic" data-md-component="header-topic">
@@ -197,10 +197,10 @@
 
 <nav class="md-nav md-nav--primary" aria-label="Navigation" data-md-level="0">
   <label class="md-nav__title" for="__drawer">
-    <a href="../../../index.html" title="linearmodels v6.2 (+54)" class="md-nav__button md-logo" aria-label="linearmodels v6.2 (+54)" data-md-component="logo">
+    <a href="../../../index.html" title="linearmodels v6.2 (+59)" class="md-nav__button md-logo" aria-label="linearmodels v6.2 (+59)" data-md-component="logo">
       <img src="../../../_static/bw-logo.svg" alt="logo">
     </a>
-    linearmodels v6.2 (+54)
+    linearmodels v6.2 (+59)
   </label>
   
     <div class="md-nav__source">
@@ -514,7 +514,6 @@
 
 <span class="kn">import</span><span class="w"> </span><span class="nn">numpy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">np</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">numpy.linalg</span><span class="w"> </span><span class="kn">import</span> <span class="n">lstsq</span>
-<span class="kn">import</span><span class="w"> </span><span class="nn">pandas</span>
 <span class="kn">import</span><span class="w"> </span><span class="nn">pandas</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">pd</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">pandas</span><span class="w"> </span><span class="kn">import</span> <span class="p">(</span>
     <span class="n">Categorical</span><span class="p">,</span>
@@ -553,7 +552,7 @@
 <span class="sd">    into a minimal pandas Panel-like object</span>
 <span class="sd">    &quot;&quot;&quot;</span>
 
-    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">df</span><span class="p">:</span> <span class="n">pandas</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">df</span><span class="p">:</span> <span class="n">DataFrame</span><span class="p">):</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_items</span> <span class="o">=</span> <span class="n">df</span><span class="o">.</span><span class="n">columns</span>
         <span class="n">index</span> <span class="o">=</span> <span class="n">df</span><span class="o">.</span><span class="n">index</span>
         <span class="k">assert</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">index</span><span class="p">,</span> <span class="n">MultiIndex</span><span class="p">)</span>
@@ -616,9 +615,7 @@
 
 
 
-<span class="k">def</span><span class="w"> </span><span class="nf">convert_columns</span><span class="p">(</span>
-    <span class="n">s</span><span class="p">:</span> <span class="n">pandas</span><span class="o">.</span><span class="n">Series</span><span class="p">,</span> <span class="n">drop_first</span><span class="p">:</span> <span class="nb">bool</span>
-<span class="p">)</span> <span class="o">-&gt;</span> <span class="n">linearmodels</span><span class="o">.</span><span class="n">typing</span><span class="o">.</span><span class="n">AnyPandas</span><span class="p">:</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">convert_columns</span><span class="p">(</span><span class="n">s</span><span class="p">:</span> <span class="n">Series</span><span class="p">,</span> <span class="n">drop_first</span><span class="p">:</span> <span class="nb">bool</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">linearmodels</span><span class="o">.</span><span class="n">typing</span><span class="o">.</span><span class="n">AnyPandas</span><span class="p">:</span>
     <span class="k">if</span> <span class="n">is_string_dtype</span><span class="p">(</span><span class="n">s</span><span class="o">.</span><span class="n">dtype</span><span class="p">)</span> <span class="ow">and</span> <span class="n">s</span><span class="o">.</span><span class="n">map</span><span class="p">(</span><span class="k">lambda</span> <span class="n">v</span><span class="p">:</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">v</span><span class="p">,</span> <span class="nb">str</span><span class="p">))</span><span class="o">.</span><span class="n">all</span><span class="p">():</span>
         <span class="n">s</span> <span class="o">=</span> <span class="n">s</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="s2">&quot;category&quot;</span><span class="p">)</span>
 
@@ -630,7 +627,7 @@
     <span class="k">return</span> <span class="n">s</span>
 
 
-<span class="k">def</span><span class="w"> </span><span class="nf">expand_categoricals</span><span class="p">(</span><span class="n">x</span><span class="p">:</span> <span class="n">pandas</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">,</span> <span class="n">drop_first</span><span class="p">:</span> <span class="nb">bool</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">DataFrame</span><span class="p">:</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">expand_categoricals</span><span class="p">(</span><span class="n">x</span><span class="p">:</span> <span class="n">DataFrame</span><span class="p">,</span> <span class="n">drop_first</span><span class="p">:</span> <span class="nb">bool</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">DataFrame</span><span class="p">:</span>
     <span class="k">return</span> <span class="n">concat</span><span class="p">(</span>
         <span class="p">[</span><span class="n">convert_columns</span><span class="p">(</span><span class="n">x</span><span class="p">[</span><span class="n">c</span><span class="p">],</span> <span class="n">drop_first</span><span class="p">)</span> <span class="k">for</span> <span class="n">c</span> <span class="ow">in</span> <span class="n">x</span><span class="o">.</span><span class="n">columns</span><span class="p">],</span> <span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">sort</span><span class="o">=</span><span class="kc">False</span>
     <span class="p">)</span>
@@ -704,7 +701,7 @@
 
         <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="p">(</span><span class="n">Series</span><span class="p">,</span> <span class="n">DataFrame</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">)):</span>
             <span class="k">try</span><span class="p">:</span>
-                <span class="kn">from</span><span class="w"> </span><span class="nn">xarray</span><span class="w"> </span><span class="kn">import</span> <span class="n">DataArray</span>
+                <span class="kn">from</span><span class="w"> </span><span class="nn">xarray</span><span class="w"> </span><span class="kn">import</span> <span class="n">DataArray</span>  <span class="c1"># noqa: PLC0415</span>
 
                 <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">DataArray</span><span class="p">):</span>
                     <span class="k">if</span> <span class="n">x</span><span class="o">.</span><span class="n">ndim</span> <span class="ow">not</span> <span class="ow">in</span> <span class="p">(</span><span class="mi">2</span><span class="p">,</span> <span class="mi">3</span><span class="p">):</span>
@@ -713,13 +710,13 @@
                         <span class="n">x</span> <span class="o">=</span> <span class="n">x</span><span class="o">.</span><span class="n">to_pandas</span><span class="p">()</span>
                     <span class="k">else</span><span class="p">:</span>
                         <span class="n">items</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="n">Hashable</span><span class="p">]</span> <span class="o">=</span> <span class="n">cast</span><span class="p">(</span>
-                            <span class="nb">list</span><span class="p">[</span><span class="n">Hashable</span><span class="p">],</span> <span class="n">np</span><span class="o">.</span><span class="n">asarray</span><span class="p">(</span><span class="n">x</span><span class="o">.</span><span class="n">coords</span><span class="p">[</span><span class="n">x</span><span class="o">.</span><span class="n">dims</span><span class="p">[</span><span class="mi">0</span><span class="p">]])</span><span class="o">.</span><span class="n">tolist</span><span class="p">()</span>
+                            <span class="s2">&quot;list[Hashable]&quot;</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">asarray</span><span class="p">(</span><span class="n">x</span><span class="o">.</span><span class="n">coords</span><span class="p">[</span><span class="n">x</span><span class="o">.</span><span class="n">dims</span><span class="p">[</span><span class="mi">0</span><span class="p">]])</span><span class="o">.</span><span class="n">tolist</span><span class="p">()</span>
                         <span class="p">)</span>
                         <span class="n">major</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="n">Hashable</span><span class="p">]</span> <span class="o">=</span> <span class="n">cast</span><span class="p">(</span>
-                            <span class="nb">list</span><span class="p">[</span><span class="n">Hashable</span><span class="p">],</span> <span class="n">np</span><span class="o">.</span><span class="n">asarray</span><span class="p">(</span><span class="n">x</span><span class="o">.</span><span class="n">coords</span><span class="p">[</span><span class="n">x</span><span class="o">.</span><span class="n">dims</span><span class="p">[</span><span class="mi">1</span><span class="p">]])</span><span class="o">.</span><span class="n">tolist</span><span class="p">()</span>
+                            <span class="s2">&quot;list[Hashable]&quot;</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">asarray</span><span class="p">(</span><span class="n">x</span><span class="o">.</span><span class="n">coords</span><span class="p">[</span><span class="n">x</span><span class="o">.</span><span class="n">dims</span><span class="p">[</span><span class="mi">1</span><span class="p">]])</span><span class="o">.</span><span class="n">tolist</span><span class="p">()</span>
                         <span class="p">)</span>
                         <span class="n">minor</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="n">Hashable</span><span class="p">]</span> <span class="o">=</span> <span class="n">cast</span><span class="p">(</span>
-                            <span class="nb">list</span><span class="p">[</span><span class="n">Hashable</span><span class="p">],</span> <span class="n">np</span><span class="o">.</span><span class="n">asarray</span><span class="p">(</span><span class="n">x</span><span class="o">.</span><span class="n">coords</span><span class="p">[</span><span class="n">x</span><span class="o">.</span><span class="n">dims</span><span class="p">[</span><span class="mi">2</span><span class="p">]])</span><span class="o">.</span><span class="n">tolist</span><span class="p">()</span>
+                            <span class="s2">&quot;list[Hashable]&quot;</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">asarray</span><span class="p">(</span><span class="n">x</span><span class="o">.</span><span class="n">coords</span><span class="p">[</span><span class="n">x</span><span class="o">.</span><span class="n">dims</span><span class="p">[</span><span class="mi">2</span><span class="p">]])</span><span class="o">.</span><span class="n">tolist</span><span class="p">()</span>
                         <span class="p">)</span>
                         <span class="n">values</span> <span class="o">=</span> <span class="n">x</span><span class="o">.</span><span class="n">values</span>
                         <span class="n">x</span> <span class="o">=</span> <span class="n">panel_to_frame</span><span class="p">(</span><span class="n">values</span><span class="p">,</span> <span class="n">items</span><span class="p">,</span> <span class="n">major</span><span class="p">,</span> <span class="n">minor</span><span class="p">,</span> <span class="kc">True</span><span class="p">)</span>
@@ -735,7 +732,7 @@
             <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">x</span><span class="o">.</span><span class="n">index</span><span class="p">,</span> <span class="n">MultiIndex</span><span class="p">):</span>
                 <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">x</span><span class="o">.</span><span class="n">index</span><span class="o">.</span><span class="n">levels</span><span class="p">)</span> <span class="o">!=</span> <span class="mi">2</span><span class="p">:</span>
                     <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
-                        <span class="s2">&quot;DataFrame input must have a &quot;</span> <span class="s2">&quot;MultiIndex with 2 levels&quot;</span>
+                        <span class="s2">&quot;DataFrame input must have a MultiIndex with 2 levels&quot;</span>
                     <span class="p">)</span>
                 <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_original</span><span class="p">,</span> <span class="p">(</span><span class="n">DataFrame</span><span class="p">,</span> <span class="n">PanelData</span><span class="p">,</span> <span class="n">Series</span><span class="p">)):</span>
                     <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">2</span><span class="p">):</span>
@@ -766,7 +763,7 @@
             <span class="bp">self</span><span class="o">.</span><span class="n">_fake_panel</span> <span class="o">=</span> <span class="n">panel</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">_frame</span> <span class="o">=</span> <span class="n">panel</span><span class="o">.</span><span class="n">to_frame</span><span class="p">()</span>
         <span class="k">else</span><span class="p">:</span>
-            <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="s2">&quot;Only ndarrays, DataFrames or DataArrays are &quot;</span> <span class="s2">&quot;supported&quot;</span><span class="p">)</span>
+            <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="s2">&quot;Only ndarrays, DataFrames or DataArrays are supported&quot;</span><span class="p">)</span>
         <span class="k">if</span> <span class="n">convert_dummies</span><span class="p">:</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">_frame</span> <span class="o">=</span> <span class="n">expand_categoricals</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_frame</span><span class="p">,</span> <span class="n">drop_first</span><span class="p">)</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">_frame</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_frame</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">)</span>
@@ -777,7 +774,7 @@
             <span class="ow">or</span> <span class="n">is_datetime64_any_dtype</span><span class="p">(</span><span class="n">time_index</span><span class="o">.</span><span class="n">dtype</span><span class="p">)</span>
         <span class="p">):</span>
             <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
-                <span class="s2">&quot;The index on the time dimension must be either &quot;</span> <span class="s2">&quot;numeric or date-like&quot;</span>
+                <span class="s2">&quot;The index on the time dimension must be either numeric or date-like&quot;</span>
             <span class="p">)</span>
         <span class="c1"># self._k, self._t, self._n = self.panel.shape</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_k</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_t</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_n</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">shape</span>
@@ -808,7 +805,7 @@
 
 <div class="viewcode-block" id="PanelData.drop">
 <a class="viewcode-back" href="../../../panel/panel/linearmodels.panel.data.PanelData.drop.html#linearmodels.panel.data.PanelData.drop">[docs]</a>
-    <span class="k">def</span><span class="w"> </span><span class="nf">drop</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">locs</span><span class="p">:</span> <span class="n">pandas</span><span class="o">.</span><span class="n">Series</span> <span class="o">|</span> <span class="n">linearmodels</span><span class="o">.</span><span class="n">typing</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">BoolArray</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">drop</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">locs</span><span class="p">:</span> <span class="n">pd</span><span class="o">.</span><span class="n">Series</span> <span class="o">|</span> <span class="n">linearmodels</span><span class="o">.</span><span class="n">typing</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">BoolArray</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Drop observations from the panel.</span>
 
@@ -983,12 +980,12 @@
         <span class="n">weight_sum</span><span class="p">:</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">int</span><span class="p">,</span> <span class="n">Series</span> <span class="o">|</span> <span class="n">DataFrame</span><span class="p">]</span> <span class="o">=</span> <span class="p">{}</span>
 
         <span class="k">def</span><span class="w"> </span><span class="nf">weighted_group_mean</span><span class="p">(</span>
-            <span class="n">df</span><span class="p">:</span> <span class="n">pandas</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">,</span>
-            <span class="n">weights</span><span class="p">:</span> <span class="n">pandas</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">,</span>
+            <span class="n">df</span><span class="p">:</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">,</span>
+            <span class="n">weights</span><span class="p">:</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">,</span>
             <span class="n">root_w</span><span class="p">:</span> <span class="n">linearmodels</span><span class="o">.</span><span class="n">typing</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">Float64Array</span><span class="p">,</span>
             <span class="n">level</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>
         <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">linearmodels</span><span class="o">.</span><span class="n">typing</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">Float64Array</span><span class="p">:</span>
-            <span class="n">scaled_df</span> <span class="o">=</span> <span class="n">cast</span><span class="p">(</span><span class="n">DataFrame</span><span class="p">,</span> <span class="n">root_w</span> <span class="o">*</span> <span class="n">df</span><span class="p">)</span>
+            <span class="n">scaled_df</span> <span class="o">=</span> <span class="n">cast</span><span class="p">(</span><span class="s2">&quot;DataFrame&quot;</span><span class="p">,</span> <span class="n">root_w</span> <span class="o">*</span> <span class="n">df</span><span class="p">)</span>
             <span class="n">num</span> <span class="o">=</span> <span class="n">scaled_df</span><span class="o">.</span><span class="n">groupby</span><span class="p">(</span><span class="n">level</span><span class="o">=</span><span class="n">level</span><span class="p">)</span><span class="o">.</span><span class="n">transform</span><span class="p">(</span><span class="s2">&quot;sum&quot;</span><span class="p">)</span>
             <span class="k">if</span> <span class="n">level</span> <span class="ow">in</span> <span class="n">weight_sum</span><span class="p">:</span>
                 <span class="n">denom</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">asarray</span><span class="p">(</span><span class="n">weight_sum</span><span class="p">[</span><span class="n">level</span><span class="p">])</span>
@@ -999,8 +996,8 @@
             <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">asarray</span><span class="p">(</span><span class="n">num</span><span class="p">)</span> <span class="o">/</span> <span class="n">denom</span>
 
         <span class="k">def</span><span class="w"> </span><span class="nf">demean_pass</span><span class="p">(</span>
-            <span class="n">frame</span><span class="p">:</span> <span class="n">pandas</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">,</span>
-            <span class="n">weights</span><span class="p">:</span> <span class="n">pandas</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">,</span>
+            <span class="n">frame</span><span class="p">:</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">,</span>
+            <span class="n">weights</span><span class="p">:</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">,</span>
             <span class="n">root_w</span><span class="p">:</span> <span class="n">linearmodels</span><span class="o">.</span><span class="n">typing</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">Float64Array</span><span class="p">,</span>
         <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">DataFrame</span><span class="p">:</span>
             <span class="n">levels</span> <span class="o">=</span> <span class="n">groups</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span>
@@ -1017,13 +1014,15 @@
         <span class="n">init_index</span> <span class="o">=</span> <span class="n">DataFrame</span><span class="p">(</span><span class="n">groups</span><span class="p">)</span>
         <span class="n">init_index</span><span class="o">.</span><span class="n">set_index</span><span class="p">(</span><span class="nb">list</span><span class="p">(</span><span class="n">init_index</span><span class="o">.</span><span class="n">columns</span><span class="p">),</span> <span class="n">inplace</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
 
-        <span class="n">root_w</span> <span class="o">=</span> <span class="n">cast</span><span class="p">(</span><span class="n">linearmodels</span><span class="o">.</span><span class="n">typing</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">Float64Array</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="n">weights</span><span class="o">.</span><span class="n">values2d</span><span class="p">))</span>
+        <span class="n">root_w</span> <span class="o">=</span> <span class="n">cast</span><span class="p">(</span>
+            <span class="s2">&quot;linearmodels.typing.data.Float64Array&quot;</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="n">weights</span><span class="o">.</span><span class="n">values2d</span><span class="p">)</span>
+        <span class="p">)</span>
         <span class="n">weights_df</span> <span class="o">=</span> <span class="n">DataFrame</span><span class="p">(</span><span class="n">weights</span><span class="o">.</span><span class="n">values2d</span><span class="p">,</span> <span class="n">index</span><span class="o">=</span><span class="n">init_index</span><span class="o">.</span><span class="n">index</span><span class="p">)</span>
-        <span class="n">wframe</span> <span class="o">=</span> <span class="n">cast</span><span class="p">(</span><span class="n">DataFrame</span><span class="p">,</span> <span class="n">root_w</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">_frame</span><span class="p">)</span>
+        <span class="n">wframe</span> <span class="o">=</span> <span class="n">cast</span><span class="p">(</span><span class="s2">&quot;DataFrame&quot;</span><span class="p">,</span> <span class="n">root_w</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">_frame</span><span class="p">)</span>
         <span class="n">wframe</span><span class="o">.</span><span class="n">index</span> <span class="o">=</span> <span class="n">init_index</span><span class="o">.</span><span class="n">index</span>
 
         <span class="n">previous</span> <span class="o">=</span> <span class="n">wframe</span>
-        <span class="n">current</span><span class="p">:</span> <span class="n">pandas</span><span class="o">.</span><span class="n">DataFrame</span> <span class="o">=</span> <span class="n">demean_pass</span><span class="p">(</span><span class="n">previous</span><span class="p">,</span> <span class="n">weights_df</span><span class="p">,</span> <span class="n">root_w</span><span class="p">)</span>
+        <span class="n">current</span><span class="p">:</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span> <span class="o">=</span> <span class="n">demean_pass</span><span class="p">(</span><span class="n">previous</span><span class="p">,</span> <span class="n">weights_df</span><span class="p">,</span> <span class="n">root_w</span><span class="p">)</span>
         <span class="k">if</span> <span class="n">groups</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">==</span> <span class="mi">1</span><span class="p">:</span>
             <span class="n">current</span><span class="o">.</span><span class="n">index</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_frame</span><span class="o">.</span><span class="n">index</span>
             <span class="k">return</span> <span class="n">PanelData</span><span class="p">(</span><span class="n">current</span><span class="p">)</span>
@@ -1032,7 +1031,9 @@
         <span class="n">max_rmse</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">asarray</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_frame</span><span class="p">)</span><span class="o">.</span><span class="n">var</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span><span class="o">.</span><span class="n">max</span><span class="p">())</span>
         <span class="n">scale</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">require</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_frame</span><span class="o">.</span><span class="n">std</span><span class="p">(),</span> <span class="n">requirements</span><span class="o">=</span><span class="s2">&quot;W&quot;</span><span class="p">)</span>
         <span class="n">exclude</span> <span class="o">=</span> <span class="n">exclude</span> <span class="o">|</span> <span class="p">(</span><span class="n">scale</span> <span class="o">&lt;</span> <span class="mf">1e-14</span> <span class="o">*</span> <span class="n">max_rmse</span><span class="p">)</span>
-        <span class="n">replacement</span> <span class="o">=</span> <span class="n">cast</span><span class="p">(</span><span class="n">linearmodels</span><span class="o">.</span><span class="n">typing</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">Float64Array</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">maximum</span><span class="p">(</span><span class="n">scale</span><span class="p">,</span> <span class="mi">1</span><span class="p">))</span>
+        <span class="n">replacement</span> <span class="o">=</span> <span class="n">cast</span><span class="p">(</span>
+            <span class="s2">&quot;linearmodels.typing.data.Float64Array&quot;</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">maximum</span><span class="p">(</span><span class="n">scale</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span>
+        <span class="p">)</span>
         <span class="n">scale</span><span class="p">[</span><span class="n">exclude</span><span class="p">]</span> <span class="o">=</span> <span class="n">replacement</span><span class="p">[</span><span class="n">exclude</span><span class="p">]</span>
         <span class="n">scale</span> <span class="o">=</span> <span class="n">scale</span><span class="p">[</span><span class="kc">None</span><span class="p">,</span> <span class="p">:]</span>
 
@@ -1045,7 +1046,7 @@
 
 
     <span class="nd">@overload</span>
-    <span class="k">def</span><span class="w"> </span><span class="nf">demean</span><span class="p">(</span>  <span class="c1"># noqa: E704</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">demean</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span>
         <span class="n">group</span><span class="p">:</span> <span class="n">Literal</span><span class="p">[</span><span class="s2">&quot;entity&quot;</span><span class="p">,</span> <span class="s2">&quot;time&quot;</span><span class="p">,</span> <span class="s2">&quot;both&quot;</span><span class="p">],</span>
         <span class="o">*</span><span class="p">,</span>
@@ -1053,7 +1054,7 @@
     <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">linearmodels</span><span class="o">.</span><span class="n">typing</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">Float64Array</span><span class="p">:</span> <span class="o">...</span>
 
     <span class="nd">@overload</span>
-    <span class="k">def</span><span class="w"> </span><span class="nf">demean</span><span class="p">(</span>  <span class="c1"># noqa: E704</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">demean</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span>
         <span class="n">group</span><span class="p">:</span> <span class="n">Literal</span><span class="p">[</span><span class="s2">&quot;entity&quot;</span><span class="p">,</span> <span class="s2">&quot;time&quot;</span><span class="p">,</span> <span class="s2">&quot;both&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="o">...</span><span class="p">,</span>
         <span class="n">weights</span><span class="p">:</span> <span class="n">PanelData</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="o">...</span><span class="p">,</span>
@@ -1062,7 +1063,7 @@
     <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">PanelData</span><span class="p">:</span> <span class="o">...</span>
 
     <span class="nd">@overload</span>
-    <span class="k">def</span><span class="w"> </span><span class="nf">demean</span><span class="p">(</span>  <span class="c1"># noqa: E704</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">demean</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span>
         <span class="n">group</span><span class="p">:</span> <span class="n">Literal</span><span class="p">[</span><span class="s2">&quot;entity&quot;</span><span class="p">,</span> <span class="s2">&quot;time&quot;</span><span class="p">,</span> <span class="s2">&quot;both&quot;</span><span class="p">],</span>
         <span class="n">weights</span><span class="p">:</span> <span class="n">PanelData</span> <span class="o">|</span> <span class="kc">None</span><span class="p">,</span>
@@ -1107,7 +1108,7 @@
 <span class="sd">        estimation.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">if</span> <span class="n">group</span> <span class="ow">not</span> <span class="ow">in</span> <span class="p">(</span><span class="s2">&quot;entity&quot;</span><span class="p">,</span> <span class="s2">&quot;time&quot;</span><span class="p">,</span> <span class="s2">&quot;both&quot;</span><span class="p">):</span>
-            <span class="k">raise</span> <span class="ne">ValueError</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;Group must be one of &#39;entity&#39;, &#39;time&#39; or &#39;both&#39;&quot;</span><span class="p">)</span>
         <span class="k">if</span> <span class="n">group</span> <span class="o">==</span> <span class="s2">&quot;both&quot;</span><span class="p">:</span>
             <span class="k">if</span> <span class="ow">not</span> <span class="n">low_memory</span><span class="p">:</span>
                 <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_demean_both</span><span class="p">(</span><span class="n">weights</span><span class="p">)</span>
@@ -1124,7 +1125,7 @@
         <span class="k">else</span><span class="p">:</span>
             <span class="n">w</span> <span class="o">=</span> <span class="n">weights</span><span class="o">.</span><span class="n">values2d</span>
             <span class="n">frame</span><span class="p">:</span> <span class="n">DataFrame</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_frame</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
-            <span class="n">frame</span> <span class="o">=</span> <span class="n">cast</span><span class="p">(</span><span class="n">DataFrame</span><span class="p">,</span> <span class="n">w</span> <span class="o">*</span> <span class="n">frame</span><span class="p">)</span>
+            <span class="n">frame</span> <span class="o">=</span> <span class="n">cast</span><span class="p">(</span><span class="s2">&quot;DataFrame&quot;</span><span class="p">,</span> <span class="n">w</span> <span class="o">*</span> <span class="n">frame</span><span class="p">)</span>
             <span class="n">weighted_sum</span><span class="p">:</span> <span class="n">DataFrame</span> <span class="o">=</span> <span class="n">frame</span><span class="o">.</span><span class="n">groupby</span><span class="p">(</span><span class="n">level</span><span class="o">=</span><span class="n">level</span><span class="p">)</span><span class="o">.</span><span class="n">transform</span><span class="p">(</span><span class="s2">&quot;sum&quot;</span><span class="p">)</span>
             <span class="n">frame</span><span class="o">.</span><span class="n">iloc</span><span class="p">[:,</span> <span class="p">:]</span> <span class="o">=</span> <span class="n">w</span>
             <span class="n">sum_weights</span><span class="p">:</span> <span class="n">DataFrame</span> <span class="o">=</span> <span class="n">frame</span><span class="o">.</span><span class="n">groupby</span><span class="p">(</span><span class="n">level</span><span class="o">=</span><span class="n">level</span><span class="p">)</span><span class="o">.</span><span class="n">transform</span><span class="p">(</span><span class="s2">&quot;sum&quot;</span><span class="p">)</span>
@@ -1197,7 +1198,7 @@
 <a class="viewcode-back" href="../../../panel/panel/linearmodels.panel.data.PanelData.mean.html#linearmodels.panel.data.PanelData.mean">[docs]</a>
     <span class="k">def</span><span class="w"> </span><span class="nf">mean</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span> <span class="n">group</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;entity&quot;</span><span class="p">,</span> <span class="n">weights</span><span class="p">:</span> <span class="n">PanelData</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span>
-    <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">pandas</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">:</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Compute data mean by either entity or time group</span>
 
@@ -1219,7 +1220,7 @@
         <span class="k">else</span><span class="p">:</span>
             <span class="n">w</span> <span class="o">=</span> <span class="n">weights</span><span class="o">.</span><span class="n">values2d</span>
             <span class="n">frame</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_frame</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
-            <span class="n">frame</span> <span class="o">=</span> <span class="n">cast</span><span class="p">(</span><span class="n">DataFrame</span><span class="p">,</span> <span class="n">w</span> <span class="o">*</span> <span class="n">frame</span><span class="p">)</span>
+            <span class="n">frame</span> <span class="o">=</span> <span class="n">cast</span><span class="p">(</span><span class="s2">&quot;DataFrame&quot;</span><span class="p">,</span> <span class="n">w</span> <span class="o">*</span> <span class="n">frame</span><span class="p">)</span>
             <span class="n">weighted_sum</span> <span class="o">=</span> <span class="n">frame</span><span class="o">.</span><span class="n">groupby</span><span class="p">(</span><span class="n">level</span><span class="o">=</span><span class="n">level</span><span class="p">)</span><span class="o">.</span><span class="n">sum</span><span class="p">()</span>
             <span class="n">frame</span><span class="o">.</span><span class="n">iloc</span><span class="p">[:,</span> <span class="p">:]</span> <span class="o">=</span> <span class="n">w</span>
             <span class="n">sum_weights</span> <span class="o">=</span> <span class="n">frame</span><span class="o">.</span><span class="n">groupby</span><span class="p">(</span><span class="n">level</span><span class="o">=</span><span class="n">level</span><span class="p">)</span><span class="o">.</span><span class="n">sum</span><span class="p">()</span>
@@ -1256,11 +1257,11 @@
 
 
     <span class="nd">@staticmethod</span>
-    <span class="k">def</span><span class="w"> </span><span class="nf">_minimize_multiindex</span><span class="p">(</span><span class="n">df</span><span class="p">:</span> <span class="n">pandas</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">DataFrame</span><span class="p">:</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">_minimize_multiindex</span><span class="p">(</span><span class="n">df</span><span class="p">:</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">DataFrame</span><span class="p">:</span>
         <span class="n">index_cols</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="n">df</span><span class="o">.</span><span class="n">index</span><span class="o">.</span><span class="n">names</span><span class="p">)</span>
         <span class="n">orig_names</span> <span class="o">=</span> <span class="n">index_cols</span><span class="p">[:]</span>
-        <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">col</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">index_cols</span><span class="p">):</span>
-            <span class="n">col</span> <span class="o">=</span> <span class="n">ensure_unique_column</span><span class="p">(</span><span class="n">col</span><span class="p">,</span> <span class="n">df</span><span class="p">)</span>
+        <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">_col</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">index_cols</span><span class="p">):</span>
+            <span class="n">col</span> <span class="o">=</span> <span class="n">ensure_unique_column</span><span class="p">(</span><span class="n">_col</span><span class="p">,</span> <span class="n">df</span><span class="p">)</span>
             <span class="n">index_cols</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">=</span> <span class="n">col</span>
         <span class="n">df</span><span class="o">.</span><span class="n">index</span><span class="o">.</span><span class="n">names</span> <span class="o">=</span> <span class="n">index_cols</span>
         <span class="n">df</span> <span class="o">=</span> <span class="n">df</span><span class="o">.</span><span class="n">reset_index</span><span class="p">()</span>
@@ -1288,7 +1289,7 @@
 <span class="sd">            Dummy variables</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">if</span> <span class="n">group</span> <span class="ow">not</span> <span class="ow">in</span> <span class="p">(</span><span class="s2">&quot;entity&quot;</span><span class="p">,</span> <span class="s2">&quot;time&quot;</span><span class="p">):</span>
-            <span class="k">raise</span> <span class="ne">ValueError</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;Group must be one of &#39;entity&#39; or &#39;time&#39;&quot;</span><span class="p">)</span>
         <span class="n">axis</span> <span class="o">=</span> <span class="mi">0</span> <span class="k">if</span> <span class="n">group</span> <span class="o">==</span> <span class="s2">&quot;entity&quot;</span> <span class="k">else</span> <span class="mi">1</span>
         <span class="n">labels</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">index</span><span class="o">.</span><span class="n">codes</span>
         <span class="n">levels</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">index</span><span class="o">.</span><span class="n">levels</span>
@@ -1297,7 +1298,7 @@
         <span class="n">cols</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">entities</span> <span class="k">if</span> <span class="n">group</span> <span class="o">==</span> <span class="s2">&quot;entity&quot;</span> <span class="k">else</span> <span class="bp">self</span><span class="o">.</span><span class="n">time</span>
         <span class="c1"># TODO: Incorrect typing in pandas-stubs not handling Hashable | None</span>
         <span class="n">dummy_cols</span> <span class="o">=</span> <span class="p">[</span><span class="n">c</span> <span class="k">for</span> <span class="n">c</span> <span class="ow">in</span> <span class="n">cols</span> <span class="k">if</span> <span class="n">c</span> <span class="ow">in</span> <span class="n">dummies</span><span class="p">]</span>
-        <span class="k">return</span> <span class="n">dummies</span><span class="p">[</span><span class="n">dummy_cols</span><span class="p">]</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">)</span>  <span class="c1"># type: ignore</span></div>
+        <span class="k">return</span> <span class="n">dummies</span><span class="p">[</span><span class="n">dummy_cols</span><span class="p">]</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">)</span></div>
 </div>
 
 

@@ -19,7 +19,7 @@
     
   
       
-        <title>linearmodels.iv.data - linearmodels v6.2 (+54)</title>
+        <title>linearmodels.iv.data - linearmodels v6.2 (+59)</title>
       
     
 
@@ -91,7 +91,7 @@
 
 <header class="md-header md-header--shadow" data-md-component="header">
   <nav class="md-header__inner md-grid" aria-label="Header">
-    <a href="../../../index.html" title="linearmodels v6.2 (+54)" class="md-header__button md-logo" aria-label="linearmodels v6.2 (+54)" data-md-component="logo">
+    <a href="../../../index.html" title="linearmodels v6.2 (+59)" class="md-header__button md-logo" aria-label="linearmodels v6.2 (+59)" data-md-component="logo">
       <img src="../../../_static/bw-logo.svg" alt="logo">
     </a>
     <label class="md-header__button md-icon" for="__drawer">
@@ -102,7 +102,7 @@
       <div class="md-header__ellipsis">
         <div class="md-header__topic">
           <span class="md-ellipsis">
-            linearmodels v6.2 (+54)
+            linearmodels v6.2 (+59)
           </span>
         </div>
         <div class="md-header__topic" data-md-component="header-topic">
@@ -197,10 +197,10 @@
 
 <nav class="md-nav md-nav--primary" aria-label="Navigation" data-md-level="0">
   <label class="md-nav__title" for="__drawer">
-    <a href="../../../index.html" title="linearmodels v6.2 (+54)" class="md-nav__button md-logo" aria-label="linearmodels v6.2 (+54)" data-md-component="logo">
+    <a href="../../../index.html" title="linearmodels v6.2 (+59)" class="md-nav__button md-logo" aria-label="linearmodels v6.2 (+59)" data-md-component="logo">
       <img src="../../../_static/bw-logo.svg" alt="logo">
     </a>
-    linearmodels v6.2 (+54)
+    linearmodels v6.2 (+59)
   </label>
   
     <div class="md-nav__source">
@@ -514,7 +514,6 @@
 <span class="kn">from</span><span class="w"> </span><span class="nn">typing</span><span class="w"> </span><span class="kn">import</span> <span class="n">Any</span><span class="p">,</span> <span class="n">Union</span>
 
 <span class="kn">import</span><span class="w"> </span><span class="nn">numpy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">np</span>
-<span class="kn">import</span><span class="w"> </span><span class="nn">pandas</span>
 <span class="kn">import</span><span class="w"> </span><span class="nn">pandas</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">pd</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">pandas.api.types</span><span class="w"> </span><span class="kn">import</span> <span class="n">is_numeric_dtype</span><span class="p">,</span> <span class="n">is_string_dtype</span>
 
@@ -533,7 +532,7 @@
     <span class="k">return</span> <span class="n">s</span>
 
 
-<span class="k">def</span><span class="w"> </span><span class="nf">expand_categoricals</span><span class="p">(</span><span class="n">x</span><span class="p">:</span> <span class="n">pandas</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">,</span> <span class="n">drop_first</span><span class="p">:</span> <span class="nb">bool</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">:</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">expand_categoricals</span><span class="p">(</span><span class="n">x</span><span class="p">:</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">,</span> <span class="n">drop_first</span><span class="p">:</span> <span class="nb">bool</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">:</span>
     <span class="k">if</span> <span class="n">x</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
         <span class="k">return</span> <span class="n">x</span>
     <span class="k">return</span> <span class="n">pd</span><span class="o">.</span><span class="n">concat</span><span class="p">(</span>
@@ -629,7 +628,7 @@
                 <span class="n">all_numeric</span> <span class="o">=</span> <span class="n">all_numeric</span> <span class="ow">and</span> <span class="n">is_numeric_dtype</span><span class="p">(</span><span class="n">dt</span><span class="p">)</span>
                 <span class="k">if</span> <span class="ow">not</span> <span class="p">(</span><span class="n">is_numeric_dtype</span><span class="p">(</span><span class="n">dt</span><span class="p">)</span> <span class="ow">or</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">dt</span><span class="p">,</span> <span class="n">pd</span><span class="o">.</span><span class="n">CategoricalDtype</span><span class="p">)):</span>
                     <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
-                        <span class="s2">&quot;Only numeric, string  or categorical &quot;</span> <span class="s2">&quot;data permitted&quot;</span>
+                        <span class="s2">&quot;Only numeric, string  or categorical data permitted&quot;</span>
                     <span class="p">)</span>
 
             <span class="k">if</span> <span class="n">convert_dummies</span><span class="p">:</span>
@@ -644,9 +643,9 @@
 
         <span class="k">else</span><span class="p">:</span>
             <span class="k">try</span><span class="p">:</span>
-                <span class="kn">import</span><span class="w"> </span><span class="nn">xarray</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">xr</span>
-            <span class="k">except</span> <span class="ne">ImportError</span><span class="p">:</span>
-                <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="n">type_err</span><span class="p">)</span>
+                <span class="kn">import</span><span class="w"> </span><span class="nn">xarray</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">xr</span>  <span class="c1"># noqa: PLC0415</span>
+            <span class="k">except</span> <span class="ne">ImportError</span> <span class="k">as</span> <span class="n">exc</span><span class="p">:</span>
+                <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="n">type_err</span><span class="p">)</span> <span class="kn">from</span><span class="w"> </span><span class="nn">exc</span>
             <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">xr</span><span class="o">.</span><span class="n">DataArray</span><span class="p">):</span>
                 <span class="k">if</span> <span class="n">x</span><span class="o">.</span><span class="n">ndim</span> <span class="o">==</span> <span class="mi">1</span><span class="p">:</span>
                     <span class="n">x</span> <span class="o">=</span> <span class="n">xr</span><span class="o">.</span><span class="n">concat</span><span class="p">([</span><span class="n">x</span><span class="p">],</span> <span class="n">dim</span><span class="o">=</span><span class="n">var_name</span><span class="p">)</span>
@@ -667,7 +666,7 @@
 
         <span class="k">if</span> <span class="n">nobs</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
             <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_ndarray</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">!=</span> <span class="n">nobs</span><span class="p">:</span>
-                <span class="n">msg</span> <span class="o">=</span> <span class="s2">&quot;Array required to have </span><span class="si">{nobs}</span><span class="s2"> obs, has &quot;</span> <span class="s2">&quot;</span><span class="si">{act}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span>
+                <span class="n">msg</span> <span class="o">=</span> <span class="s2">&quot;Array required to have </span><span class="si">{nobs}</span><span class="s2"> obs, has </span><span class="si">{act}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span>
                     <span class="n">nobs</span><span class="o">=</span><span class="n">nobs</span><span class="p">,</span> <span class="n">act</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">_ndarray</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
                 <span class="p">)</span>
                 <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="n">msg</span><span class="p">)</span>

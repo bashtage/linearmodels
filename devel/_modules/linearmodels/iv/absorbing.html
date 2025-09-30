@@ -19,7 +19,7 @@
     
   
       
-        <title>linearmodels.iv.absorbing - linearmodels v6.2 (+54)</title>
+        <title>linearmodels.iv.absorbing - linearmodels v6.2 (+59)</title>
       
     
 
@@ -91,7 +91,7 @@
 
 <header class="md-header md-header--shadow" data-md-component="header">
   <nav class="md-header__inner md-grid" aria-label="Header">
-    <a href="../../../index.html" title="linearmodels v6.2 (+54)" class="md-header__button md-logo" aria-label="linearmodels v6.2 (+54)" data-md-component="logo">
+    <a href="../../../index.html" title="linearmodels v6.2 (+59)" class="md-header__button md-logo" aria-label="linearmodels v6.2 (+59)" data-md-component="logo">
       <img src="../../../_static/bw-logo.svg" alt="logo">
     </a>
     <label class="md-header__button md-icon" for="__drawer">
@@ -102,7 +102,7 @@
       <div class="md-header__ellipsis">
         <div class="md-header__topic">
           <span class="md-ellipsis">
-            linearmodels v6.2 (+54)
+            linearmodels v6.2 (+59)
           </span>
         </div>
         <div class="md-header__topic" data-md-component="header-topic">
@@ -197,10 +197,10 @@
 
 <nav class="md-nav md-nav--primary" aria-label="Navigation" data-md-level="0">
   <label class="md-nav__title" for="__drawer">
-    <a href="../../../index.html" title="linearmodels v6.2 (+54)" class="md-nav__button md-logo" aria-label="linearmodels v6.2 (+54)" data-md-component="logo">
+    <a href="../../../index.html" title="linearmodels v6.2 (+59)" class="md-nav__button md-logo" aria-label="linearmodels v6.2 (+59)" data-md-component="logo">
       <img src="../../../_static/bw-logo.svg" alt="logo">
     </a>
-    linearmodels v6.2 (+54)
+    linearmodels v6.2 (+59)
   </label>
   
     <div class="md-nav__source">
@@ -537,7 +537,6 @@
     <span class="n">zeros</span><span class="p">,</span>
 <span class="p">)</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">numpy.linalg</span><span class="w"> </span><span class="kn">import</span> <span class="n">lstsq</span>
-<span class="kn">import</span><span class="w"> </span><span class="nn">pandas</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">pandas</span><span class="w"> </span><span class="kn">import</span> <span class="n">Categorical</span><span class="p">,</span> <span class="n">CategoricalDtype</span><span class="p">,</span> <span class="n">DataFrame</span><span class="p">,</span> <span class="n">Series</span>
 <span class="kn">import</span><span class="w"> </span><span class="nn">scipy.sparse</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">sp</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">scipy.sparse.linalg</span><span class="w"> </span><span class="kn">import</span> <span class="n">lsmr</span>
@@ -657,7 +656,7 @@
     <span class="n">default_opts</span><span class="p">:</span> <span class="nb">dict</span><span class="p">[</span>
         <span class="nb">str</span><span class="p">,</span>
         <span class="nb">bool</span> <span class="o">|</span> <span class="nb">float</span> <span class="o">|</span> <span class="nb">str</span> <span class="o">|</span> <span class="n">linearmodels</span><span class="o">.</span><span class="n">typing</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">ArrayLike</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">|</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">],</span>
-    <span class="p">]</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">(</span><span class="n">atol</span><span class="o">=</span><span class="mf">1e-8</span><span class="p">,</span> <span class="n">btol</span><span class="o">=</span><span class="mf">1e-8</span><span class="p">,</span> <span class="n">show</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+    <span class="p">]</span> <span class="o">=</span> <span class="p">{</span><span class="s2">&quot;atol&quot;</span><span class="p">:</span> <span class="mf">1e-8</span><span class="p">,</span> <span class="s2">&quot;btol&quot;</span><span class="p">:</span> <span class="mf">1e-8</span><span class="p">,</span> <span class="s2">&quot;show&quot;</span><span class="p">:</span> <span class="kc">False</span><span class="p">}</span>
     <span class="k">assert</span> <span class="n">lsmr_options</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span>
     <span class="n">default_opts</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="n">lsmr_options</span><span class="p">)</span>
     <span class="n">resids</span> <span class="o">=</span> <span class="p">[]</span>
@@ -703,11 +702,11 @@
     <span class="k">for</span> <span class="n">c</span> <span class="ow">in</span> <span class="n">cats</span><span class="p">:</span>
         <span class="c1"># TODO: Bug in pandas-stubs</span>
         <span class="c1">#  https://github.com/pandas-dev/pandas-stubs/issues/97</span>
-        <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">cats</span><span class="p">[</span><span class="n">c</span><span class="p">]</span><span class="o">.</span><span class="n">dtype</span><span class="p">,</span> <span class="n">CategoricalDtype</span><span class="p">):</span>  <span class="c1"># type: ignore</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">cats</span><span class="p">[</span><span class="n">c</span><span class="p">]</span><span class="o">.</span><span class="n">dtype</span><span class="p">,</span> <span class="n">CategoricalDtype</span><span class="p">):</span>
             <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="s2">&quot;cats must contain only categorical variables&quot;</span><span class="p">)</span>
         <span class="c1"># TODO: Bug in pandas-stubs</span>
         <span class="c1">#  https://github.com/pandas-dev/pandas-stubs/issues/97</span>
-        <span class="n">col</span> <span class="o">=</span> <span class="n">cats</span><span class="p">[</span><span class="n">c</span><span class="p">]</span>  <span class="c1"># type: ignore</span>
+        <span class="n">col</span> <span class="o">=</span> <span class="n">cats</span><span class="p">[</span><span class="n">c</span><span class="p">]</span>
         <span class="n">max_code</span> <span class="o">=</span> <span class="n">col</span><span class="o">.</span><span class="n">cat</span><span class="o">.</span><span class="n">codes</span><span class="o">.</span><span class="n">max</span><span class="p">()</span>
         <span class="n">size</span> <span class="o">=</span> <span class="mi">1</span>
         <span class="k">while</span> <span class="n">max_code</span> <span class="o">&gt;=</span> <span class="mi">2</span><span class="o">**</span><span class="n">size</span><span class="p">:</span>
@@ -740,9 +739,7 @@
     <span class="k">return</span> <span class="n">Series</span><span class="p">(</span><span class="n">Categorical</span><span class="p">(</span><span class="n">codes</span><span class="p">),</span> <span class="n">index</span><span class="o">=</span><span class="n">cats</span><span class="o">.</span><span class="n">index</span><span class="p">)</span>
 
 
-<span class="k">def</span><span class="w"> </span><span class="nf">category_interaction</span><span class="p">(</span>
-    <span class="n">cat</span><span class="p">:</span> <span class="n">pandas</span><span class="o">.</span><span class="n">Series</span><span class="p">,</span> <span class="n">precondition</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span>
-<span class="p">)</span> <span class="o">-&gt;</span> <span class="n">sp</span><span class="o">.</span><span class="n">csc_matrix</span><span class="p">:</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">category_interaction</span><span class="p">(</span><span class="n">cat</span><span class="p">:</span> <span class="n">Series</span><span class="p">,</span> <span class="n">precondition</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">sp</span><span class="o">.</span><span class="n">csc_matrix</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Parameters</span>
 <span class="sd">    ----------</span>
@@ -931,13 +928,12 @@
 <span class="sd">        where :math:`|c_i|` is the number distinct categories in column i.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">cat</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="ow">and</span> <span class="bp">self</span><span class="o">.</span><span class="n">cont</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">]:</span>
-            <span class="n">out</span> <span class="o">=</span> <span class="p">[]</span>
-            <span class="k">for</span> <span class="n">col</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">cont</span><span class="p">:</span>
-                <span class="n">out</span><span class="o">.</span><span class="n">append</span><span class="p">(</span>
-                    <span class="n">category_continuous_interaction</span><span class="p">(</span>
-                        <span class="bp">self</span><span class="o">.</span><span class="n">cat</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">cont</span><span class="p">[</span><span class="n">col</span><span class="p">],</span> <span class="n">precondition</span><span class="o">=</span><span class="kc">False</span>
-                    <span class="p">)</span>
+            <span class="n">out</span> <span class="o">=</span> <span class="p">[</span>
+                <span class="n">category_continuous_interaction</span><span class="p">(</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">cat</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">cont</span><span class="p">[</span><span class="n">col</span><span class="p">],</span> <span class="n">precondition</span><span class="o">=</span><span class="kc">False</span>
                 <span class="p">)</span>
+                <span class="k">for</span> <span class="n">col</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">cont</span>
+            <span class="p">]</span>
             <span class="k">return</span> <span class="n">sp</span><span class="o">.</span><span class="n">hstack</span><span class="p">(</span><span class="n">out</span><span class="p">,</span> <span class="nb">format</span><span class="o">=</span><span class="s2">&quot;csc&quot;</span><span class="p">)</span>
         <span class="k">elif</span> <span class="bp">self</span><span class="o">.</span><span class="n">cat</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">]:</span>
             <span class="k">return</span> <span class="n">category_interaction</span><span class="p">(</span><span class="n">category_product</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">cat</span><span class="p">),</span> <span class="n">precondition</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
@@ -967,7 +963,7 @@
         <span class="n">cont</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">cont</span>
         <span class="k">for</span> <span class="n">col</span> <span class="ow">in</span> <span class="n">cont</span><span class="p">:</span>
             <span class="n">hasher</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="nb">memoryview</span><span class="p">(</span><span class="n">ascontiguousarray</span><span class="p">(</span><span class="n">cont</span><span class="p">[</span><span class="n">col</span><span class="p">]</span><span class="o">.</span><span class="n">to_numpy</span><span class="p">())</span><span class="o">.</span><span class="n">data</span><span class="p">))</span>
-            <span class="n">hashes</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">sorted_hashes</span> <span class="o">+</span> <span class="p">(</span><span class="n">hasher</span><span class="o">.</span><span class="n">hexdigest</span><span class="p">(),))</span>
+            <span class="n">hashes</span><span class="o">.</span><span class="n">append</span><span class="p">((</span><span class="o">*</span><span class="n">sorted_hashes</span><span class="p">,</span> <span class="n">hasher</span><span class="o">.</span><span class="n">hexdigest</span><span class="p">()))</span>
             <span class="n">hasher</span><span class="o">.</span><span class="n">reset</span><span class="p">()</span>
 
         <span class="k">return</span> <span class="nb">sorted</span><span class="p">(</span><span class="n">hashes</span><span class="p">)</span>
@@ -1403,7 +1399,7 @@
         <span class="n">method</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
     <span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
         <span class="n">weights</span> <span class="o">=</span> <span class="p">(</span>
-            <span class="n">cast</span><span class="p">(</span><span class="n">linearmodels</span><span class="o">.</span><span class="n">typing</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">Float64Array</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">weights</span><span class="o">.</span><span class="n">ndarray</span><span class="p">)</span>
+            <span class="n">cast</span><span class="p">(</span><span class="s2">&quot;linearmodels.typing.data.Float64Array&quot;</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">weights</span><span class="o">.</span><span class="n">ndarray</span><span class="p">)</span>
             <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_is_weighted</span>
             <span class="k">else</span> <span class="kc">None</span>
         <span class="p">)</span>
@@ -1434,7 +1430,7 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">_constant_absorbed</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_has_constant_exog</span> <span class="ow">and</span> <span class="n">areg_constant</span>
 
         <span class="n">dep</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_dependent</span><span class="o">.</span><span class="n">ndarray</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="nb">float</span><span class="p">,</span> <span class="n">copy</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
-        <span class="n">exog</span> <span class="o">=</span> <span class="n">cast</span><span class="p">(</span><span class="n">linearmodels</span><span class="o">.</span><span class="n">typing</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">Float64Array</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_exog</span><span class="o">.</span><span class="n">ndarray</span><span class="p">)</span>
+        <span class="n">exog</span> <span class="o">=</span> <span class="n">cast</span><span class="p">(</span><span class="s2">&quot;linearmodels.typing.data.Float64Array&quot;</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_exog</span><span class="o">.</span><span class="n">ndarray</span><span class="p">)</span>
 
         <span class="n">root_w</span> <span class="o">=</span> <span class="n">sqrt</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_weight_data</span><span class="o">.</span><span class="n">ndarray</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="nb">float</span><span class="p">,</span> <span class="n">copy</span><span class="o">=</span><span class="kc">False</span><span class="p">))</span>
         <span class="n">dep</span> <span class="o">=</span> <span class="n">root_w</span> <span class="o">*</span> <span class="n">dep</span>
@@ -1447,7 +1443,7 @@
         <span class="k">assert</span> <span class="nb">isinstance</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_regressors</span><span class="p">,</span> <span class="n">sp</span><span class="o">.</span><span class="n">csc_matrix</span><span class="p">)</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_regressors</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
             <span class="k">if</span> <span class="n">use_hdfe</span><span class="p">:</span>
-                <span class="kn">from</span><span class="w"> </span><span class="nn">pyhdfe</span><span class="w"> </span><span class="kn">import</span> <span class="n">create</span>
+                <span class="kn">from</span><span class="w"> </span><span class="nn">pyhdfe</span><span class="w"> </span><span class="kn">import</span> <span class="n">create</span>  <span class="c1"># noqa: PLC0415</span>
 
                 <span class="n">absorb_options</span><span class="p">[</span><span class="s2">&quot;drop_singletons&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="kc">False</span>
                 <span class="n">algo</span> <span class="o">=</span> <span class="n">create</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_absorb_inter</span><span class="o">.</span><span class="n">cat</span><span class="p">,</span> <span class="o">**</span><span class="n">absorb_options</span><span class="p">)</span>
@@ -1614,7 +1610,7 @@
                 <span class="ne">FutureWarning</span><span class="p">,</span>
                 <span class="n">stacklevel</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span>
             <span class="p">)</span>
-            <span class="n">absorb_options</span> <span class="o">=</span> <span class="p">{</span><span class="n">k</span><span class="p">:</span> <span class="n">v</span> <span class="k">for</span> <span class="n">k</span><span class="p">,</span> <span class="n">v</span> <span class="ow">in</span> <span class="n">lsmr_options</span><span class="o">.</span><span class="n">items</span><span class="p">()}</span>
+            <span class="n">absorb_options</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">(</span><span class="n">lsmr_options</span><span class="o">.</span><span class="n">items</span><span class="p">())</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_absorbed_dependent</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">_first_time_fit</span><span class="p">(</span><span class="n">use_cache</span><span class="p">,</span> <span class="n">absorb_options</span><span class="p">,</span> <span class="n">method</span><span class="p">)</span>
 
@@ -1629,9 +1625,8 @@
         <span class="n">cov_estimator</span> <span class="o">=</span> <span class="n">COVARIANCE_ESTIMATORS</span><span class="p">[</span><span class="n">cov_type</span><span class="p">]</span>
         <span class="n">cov_config</span><span class="p">[</span><span class="s2">&quot;debiased&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">debiased</span>
         <span class="n">cov_config</span><span class="p">[</span><span class="s2">&quot;kappa&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="mf">0.0</span>
-        <span class="n">cov_config_copy</span> <span class="o">=</span> <span class="p">{</span><span class="n">k</span><span class="p">:</span> <span class="n">v</span> <span class="k">for</span> <span class="n">k</span><span class="p">,</span> <span class="n">v</span> <span class="ow">in</span> <span class="n">cov_config</span><span class="o">.</span><span class="n">items</span><span class="p">()}</span>
-        <span class="k">if</span> <span class="s2">&quot;center&quot;</span> <span class="ow">in</span> <span class="n">cov_config_copy</span><span class="p">:</span>
-            <span class="k">del</span> <span class="n">cov_config_copy</span><span class="p">[</span><span class="s2">&quot;center&quot;</span><span class="p">]</span>
+        <span class="n">cov_config_copy</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">(</span><span class="n">cov_config</span><span class="o">.</span><span class="n">items</span><span class="p">())</span>
+        <span class="n">cov_config_copy</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="s2">&quot;center&quot;</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
         <span class="n">cov_estimator_inst</span> <span class="o">=</span> <span class="n">cov_estimator</span><span class="p">(</span>
             <span class="n">exog_resid</span><span class="p">,</span> <span class="n">dep_resid</span><span class="p">,</span> <span class="n">exog_resid</span><span class="p">,</span> <span class="n">params</span><span class="p">,</span> <span class="o">**</span><span class="n">cov_config_copy</span>
         <span class="p">)</span>
@@ -1704,7 +1699,7 @@
         <span class="n">debiased</span><span class="p">:</span> <span class="nb">bool</span><span class="p">,</span>
     <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">WaldTestStatistic</span> <span class="o">|</span> <span class="n">InvalidTestStatistic</span><span class="p">:</span>
         <span class="n">const_loc</span> <span class="o">=</span> <span class="n">find_constant</span><span class="p">(</span>
-            <span class="n">cast</span><span class="p">(</span><span class="n">linearmodels</span><span class="o">.</span><span class="n">typing</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">Float64Array</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_exog</span><span class="o">.</span><span class="n">ndarray</span><span class="p">)</span>
+            <span class="n">cast</span><span class="p">(</span><span class="s2">&quot;linearmodels.typing.data.Float64Array&quot;</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_exog</span><span class="o">.</span><span class="n">ndarray</span><span class="p">)</span>
         <span class="p">)</span>
         <span class="n">resid_df</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_nobs</span> <span class="o">-</span> <span class="bp">self</span><span class="o">.</span><span class="n">_num_params</span>
 

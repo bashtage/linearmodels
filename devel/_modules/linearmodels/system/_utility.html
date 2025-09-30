@@ -19,7 +19,7 @@
     
   
       
-        <title>linearmodels.system._utility - linearmodels v6.2 (+54)</title>
+        <title>linearmodels.system._utility - linearmodels v6.2 (+59)</title>
       
     
 
@@ -91,7 +91,7 @@
 
 <header class="md-header md-header--shadow" data-md-component="header">
   <nav class="md-header__inner md-grid" aria-label="Header">
-    <a href="../../../index.html" title="linearmodels v6.2 (+54)" class="md-header__button md-logo" aria-label="linearmodels v6.2 (+54)" data-md-component="logo">
+    <a href="../../../index.html" title="linearmodels v6.2 (+59)" class="md-header__button md-logo" aria-label="linearmodels v6.2 (+59)" data-md-component="logo">
       <img src="../../../_static/bw-logo.svg" alt="logo">
     </a>
     <label class="md-header__button md-icon" for="__drawer">
@@ -102,7 +102,7 @@
       <div class="md-header__ellipsis">
         <div class="md-header__topic">
           <span class="md-ellipsis">
-            linearmodels v6.2 (+54)
+            linearmodels v6.2 (+59)
           </span>
         </div>
         <div class="md-header__topic" data-md-component="header-topic">
@@ -197,10 +197,10 @@
 
 <nav class="md-nav md-nav--primary" aria-label="Navigation" data-md-level="0">
   <label class="md-nav__title" for="__drawer">
-    <a href="../../../index.html" title="linearmodels v6.2 (+54)" class="md-nav__button md-logo" aria-label="linearmodels v6.2 (+54)" data-md-component="logo">
+    <a href="../../../index.html" title="linearmodels v6.2 (+59)" class="md-nav__button md-logo" aria-label="linearmodels v6.2 (+59)" data-md-component="logo">
       <img src="../../../_static/bw-logo.svg" alt="logo">
     </a>
-    linearmodels v6.2 (+54)
+    linearmodels v6.2 (+59)
   </label>
   
     <div class="md-nav__source">
@@ -508,10 +508,9 @@
 
 <span class="kn">from</span><span class="w"> </span><span class="nn">typing</span><span class="w"> </span><span class="kn">import</span> <span class="n">cast</span>
 
-<span class="kn">import</span><span class="w"> </span><span class="nn">numpy</span>
 <span class="kn">import</span><span class="w"> </span><span class="nn">numpy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">np</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">numpy</span><span class="w"> </span><span class="kn">import</span> <span class="n">ndarray</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">numpy.linalg</span><span class="w"> </span><span class="kn">import</span> <span class="n">inv</span><span class="p">,</span> <span class="n">matrix_rank</span>
-<span class="kn">import</span><span class="w"> </span><span class="nn">pandas</span>
 <span class="kn">import</span><span class="w"> </span><span class="nn">pandas</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">pd</span>
 
 <span class="kn">import</span><span class="w"> </span><span class="nn">linearmodels.typing.data</span>
@@ -564,9 +563,7 @@
     <span class="n">k</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">x</span><span class="p">)</span>
     <span class="n">out</span> <span class="o">=</span> <span class="p">[]</span>
     <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">k</span><span class="p">):</span>
-        <span class="n">row</span> <span class="o">=</span> <span class="p">[]</span>
-        <span class="k">for</span> <span class="n">j</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">k</span><span class="p">):</span>
-            <span class="n">row</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">s</span><span class="p">[</span><span class="n">i</span><span class="p">,</span> <span class="n">j</span><span class="p">]</span> <span class="o">*</span> <span class="n">x</span><span class="p">[</span><span class="n">j</span><span class="p">])</span>
+        <span class="n">row</span> <span class="o">=</span> <span class="p">[</span><span class="n">s</span><span class="p">[</span><span class="n">i</span><span class="p">,</span> <span class="n">j</span><span class="p">]</span> <span class="o">*</span> <span class="n">x</span><span class="p">[</span><span class="n">j</span><span class="p">]</span> <span class="k">for</span> <span class="n">j</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">k</span><span class="p">)]</span>
         <span class="n">row_arr</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">hstack</span><span class="p">(</span><span class="n">row</span><span class="p">)</span>
         <span class="n">out</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">row_arr</span><span class="p">)</span>
 
@@ -604,14 +601,14 @@
     <span class="n">s_is_diag</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">all</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">asarray</span><span class="p">((</span><span class="n">s</span> <span class="o">-</span> <span class="n">np</span><span class="o">.</span><span class="n">diag</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">diag</span><span class="p">(</span><span class="n">s</span><span class="p">)))</span> <span class="o">==</span> <span class="mf">0.0</span><span class="p">))</span>
 
     <span class="n">w0</span> <span class="o">=</span> <span class="n">widths</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
-    <span class="n">homogeneous</span> <span class="o">=</span> <span class="nb">all</span><span class="p">([</span><span class="n">w</span> <span class="o">==</span> <span class="n">w0</span> <span class="k">for</span> <span class="n">w</span> <span class="ow">in</span> <span class="n">widths</span><span class="p">])</span>
+    <span class="n">homogeneous</span> <span class="o">=</span> <span class="nb">all</span><span class="p">(</span><span class="n">w</span> <span class="o">==</span> <span class="n">w0</span> <span class="k">for</span> <span class="n">w</span> <span class="ow">in</span> <span class="n">widths</span><span class="p">)</span>
     <span class="k">if</span> <span class="n">homogeneous</span> <span class="ow">and</span> <span class="ow">not</span> <span class="n">s_is_diag</span><span class="p">:</span>
         <span class="c1"># Fast path when all x have same number of columns</span>
         <span class="c1"># Slower than diag case when k is large since many 0s</span>
         <span class="n">xa</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">hstack</span><span class="p">(</span><span class="n">x</span><span class="p">)</span>
         <span class="k">return</span> <span class="n">xa</span><span class="o">.</span><span class="n">T</span> <span class="o">@</span> <span class="n">xa</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">kron</span><span class="p">(</span><span class="n">s</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">ones</span><span class="p">((</span><span class="n">w0</span><span class="p">,</span> <span class="n">w0</span><span class="p">)))</span>
 
-    <span class="n">cum_width</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">cumsum</span><span class="p">([</span><span class="mi">0</span><span class="p">]</span> <span class="o">+</span> <span class="n">widths</span><span class="p">)</span>
+    <span class="n">cum_width</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">cumsum</span><span class="p">([</span><span class="mi">0</span><span class="p">,</span> <span class="o">*</span><span class="n">widths</span><span class="p">])</span>
     <span class="n">total</span> <span class="o">=</span> <span class="nb">sum</span><span class="p">(</span><span class="n">widths</span><span class="p">)</span>
     <span class="n">out</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">((</span><span class="n">total</span><span class="p">,</span> <span class="n">total</span><span class="p">))</span>
 
@@ -637,7 +634,7 @@
             <span class="n">out</span><span class="p">[</span><span class="n">sel_i</span><span class="p">,</span> <span class="n">sel_j</span><span class="p">]</span> <span class="o">=</span> <span class="n">prod</span>
             <span class="n">out</span><span class="p">[</span><span class="n">sel_j</span><span class="p">,</span> <span class="n">sel_i</span><span class="p">]</span> <span class="o">=</span> <span class="n">prod</span><span class="o">.</span><span class="n">T</span>
 
-    <span class="k">return</span> <span class="n">cast</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span> <span class="n">out</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">cast</span><span class="p">(</span><span class="s2">&quot;np.ndarray&quot;</span><span class="p">,</span> <span class="n">out</span><span class="p">)</span>
 
 
 <span class="k">def</span><span class="w"> </span><span class="nf">blocked_cross_prod</span><span class="p">(</span>
@@ -748,8 +745,8 @@
 
     <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span>
-        <span class="n">r</span><span class="p">:</span> <span class="n">pandas</span><span class="o">.</span><span class="n">DataFrame</span> <span class="o">|</span> <span class="n">numpy</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span>
-        <span class="n">q</span><span class="p">:</span> <span class="n">pandas</span><span class="o">.</span><span class="n">Series</span> <span class="o">|</span> <span class="n">numpy</span><span class="o">.</span><span class="n">ndarray</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+        <span class="n">r</span><span class="p">:</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span> <span class="o">|</span> <span class="n">ndarray</span><span class="p">,</span>
+        <span class="n">q</span><span class="p">:</span> <span class="n">pd</span><span class="o">.</span><span class="n">Series</span> <span class="o">|</span> <span class="n">ndarray</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
         <span class="n">num_params</span><span class="p">:</span> <span class="nb">int</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
         <span class="n">require_pandas</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span>
     <span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
@@ -795,7 +792,7 @@
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_num_params</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
             <span class="k">if</span> <span class="n">r</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">!=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_num_params</span><span class="p">:</span>
                 <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
-                    <span class="s2">&quot;r is incompatible with the number of model &quot;</span> <span class="s2">&quot;parameters&quot;</span>
+                    <span class="s2">&quot;r is incompatible with the number of model parameters&quot;</span>
                 <span class="p">)</span>
         <span class="n">rq</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">c_</span><span class="p">[</span><span class="n">r</span><span class="p">,</span> <span class="n">q</span><span class="p">[:,</span> <span class="kc">None</span><span class="p">]]</span>
         <span class="k">if</span> <span class="ow">not</span> <span class="n">np</span><span class="o">.</span><span class="n">all</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">isfinite</span><span class="p">(</span><span class="n">rq</span><span class="p">))</span> <span class="ow">or</span> <span class="n">matrix_rank</span><span class="p">(</span><span class="n">rq</span><span class="p">)</span> <span class="o">&lt;</span> <span class="n">rq</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]:</span>
@@ -817,14 +814,14 @@
         <span class="n">q</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_qa</span><span class="p">[:,</span> <span class="kc">None</span><span class="p">]</span>
         <span class="n">a</span> <span class="o">=</span> <span class="n">q</span><span class="o">.</span><span class="n">T</span> <span class="o">@</span> <span class="n">inv</span><span class="p">(</span><span class="n">left</span><span class="o">.</span><span class="n">T</span> <span class="o">@</span> <span class="n">r</span><span class="o">.</span><span class="n">T</span><span class="p">)</span> <span class="o">@</span> <span class="n">left</span><span class="o">.</span><span class="n">T</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_t</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_l</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_a</span> <span class="o">=</span> <span class="p">(</span>
-            <span class="n">cast</span><span class="p">(</span><span class="n">linearmodels</span><span class="o">.</span><span class="n">typing</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">FloatArray2D</span><span class="p">,</span> <span class="n">t</span><span class="p">),</span>
-            <span class="n">cast</span><span class="p">(</span><span class="n">linearmodels</span><span class="o">.</span><span class="n">typing</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">FloatArray2D</span><span class="p">,</span> <span class="n">left</span><span class="p">),</span>
-            <span class="n">cast</span><span class="p">(</span><span class="n">linearmodels</span><span class="o">.</span><span class="n">typing</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">FloatArray2D</span><span class="p">,</span> <span class="n">a</span><span class="p">),</span>
+            <span class="n">cast</span><span class="p">(</span><span class="s2">&quot;linearmodels.typing.data.FloatArray2D&quot;</span><span class="p">,</span> <span class="n">t</span><span class="p">),</span>
+            <span class="n">cast</span><span class="p">(</span><span class="s2">&quot;linearmodels.typing.data.FloatArray2D&quot;</span><span class="p">,</span> <span class="n">left</span><span class="p">),</span>
+            <span class="n">cast</span><span class="p">(</span><span class="s2">&quot;linearmodels.typing.data.FloatArray2D&quot;</span><span class="p">,</span> <span class="n">a</span><span class="p">),</span>
         <span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_computed</span> <span class="o">=</span> <span class="kc">True</span>
 
     <span class="nd">@property</span>
-    <span class="k">def</span><span class="w"> </span><span class="nf">r</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">pandas</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">:</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">r</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Constraint loading matrix&quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_r_pd</span>
 
@@ -879,7 +876,7 @@
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_a</span>
 
     <span class="nd">@property</span>
-    <span class="k">def</span><span class="w"> </span><span class="nf">q</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">pandas</span><span class="o">.</span><span class="n">Series</span> <span class="o">|</span> <span class="n">numpy</span><span class="o">.</span><span class="n">ndarray</span><span class="p">:</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">q</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">pd</span><span class="o">.</span><span class="n">Series</span> <span class="o">|</span> <span class="n">ndarray</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Constrain target values&quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_q_pd</span></div>
 

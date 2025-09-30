@@ -19,7 +19,7 @@
     
   
       
-        <title>linearmodels.asset_pricing.model - linearmodels v6.2 (+54)</title>
+        <title>linearmodels.asset_pricing.model - linearmodels v6.2 (+59)</title>
       
     
 
@@ -91,7 +91,7 @@
 
 <header class="md-header md-header--shadow" data-md-component="header">
   <nav class="md-header__inner md-grid" aria-label="Header">
-    <a href="../../../index.html" title="linearmodels v6.2 (+54)" class="md-header__button md-logo" aria-label="linearmodels v6.2 (+54)" data-md-component="logo">
+    <a href="../../../index.html" title="linearmodels v6.2 (+59)" class="md-header__button md-logo" aria-label="linearmodels v6.2 (+59)" data-md-component="logo">
       <img src="../../../_static/bw-logo.svg" alt="logo">
     </a>
     <label class="md-header__button md-icon" for="__drawer">
@@ -102,7 +102,7 @@
       <div class="md-header__ellipsis">
         <div class="md-header__topic">
           <span class="md-ellipsis">
-            linearmodels v6.2 (+54)
+            linearmodels v6.2 (+59)
           </span>
         </div>
         <div class="md-header__topic" data-md-component="header-topic">
@@ -197,10 +197,10 @@
 
 <nav class="md-nav md-nav--primary" aria-label="Navigation" data-md-level="0">
   <label class="md-nav__title" for="__drawer">
-    <a href="../../../index.html" title="linearmodels v6.2 (+54)" class="md-nav__button md-logo" aria-label="linearmodels v6.2 (+54)" data-md-component="logo">
+    <a href="../../../index.html" title="linearmodels v6.2 (+59)" class="md-nav__button md-logo" aria-label="linearmodels v6.2 (+59)" data-md-component="logo">
       <img src="../../../_static/bw-logo.svg" alt="logo">
     </a>
-    linearmodels v6.2 (+54)
+    linearmodels v6.2 (+59)
   </label>
   
     <div class="md-nav__source">
@@ -517,7 +517,6 @@
 <span class="kn">from</span><span class="w"> </span><span class="nn">formulaic.materializers.types</span><span class="w"> </span><span class="kn">import</span> <span class="n">NAAction</span>
 <span class="kn">import</span><span class="w"> </span><span class="nn">numpy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">np</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">numpy.linalg</span><span class="w"> </span><span class="kn">import</span> <span class="n">lstsq</span>
-<span class="kn">import</span><span class="w"> </span><span class="nn">pandas</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">pandas</span><span class="w"> </span><span class="kn">import</span> <span class="n">DataFrame</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">scipy.optimize</span><span class="w"> </span><span class="kn">import</span> <span class="n">minimize</span>
 
@@ -605,7 +604,7 @@
     <span class="k">def</span><span class="w"> </span><span class="nf">_drop_missing</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">linearmodels</span><span class="o">.</span><span class="n">typing</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">BoolArray</span><span class="p">:</span>
         <span class="n">data</span> <span class="o">=</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">portfolios</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">factors</span><span class="p">)</span>
         <span class="n">missing</span> <span class="o">=</span> <span class="n">cast</span><span class="p">(</span>
-            <span class="n">linearmodels</span><span class="o">.</span><span class="n">typing</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">BoolArray</span><span class="p">,</span>
+            <span class="s2">&quot;linearmodels.typing.data.BoolArray&quot;</span><span class="p">,</span>
             <span class="n">np</span><span class="o">.</span><span class="n">any</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">c_</span><span class="p">[[</span><span class="n">dh</span><span class="o">.</span><span class="n">isnull</span> <span class="k">for</span> <span class="n">dh</span> <span class="ow">in</span> <span class="n">data</span><span class="p">]],</span> <span class="mi">0</span><span class="p">),</span>
         <span class="p">)</span>
         <span class="k">if</span> <span class="nb">any</span><span class="p">(</span><span class="n">missing</span><span class="p">):</span>
@@ -629,11 +628,11 @@
             <span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_drop_missing</span><span class="p">()</span>
 
-        <span class="n">p</span> <span class="o">=</span> <span class="n">cast</span><span class="p">(</span><span class="n">linearmodels</span><span class="o">.</span><span class="n">typing</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">Float64Array</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">portfolios</span><span class="o">.</span><span class="n">ndarray</span><span class="p">)</span>
-        <span class="n">f</span> <span class="o">=</span> <span class="n">cast</span><span class="p">(</span><span class="n">linearmodels</span><span class="o">.</span><span class="n">typing</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">Float64Array</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">factors</span><span class="o">.</span><span class="n">ndarray</span><span class="p">)</span>
+        <span class="n">p</span> <span class="o">=</span> <span class="n">cast</span><span class="p">(</span><span class="s2">&quot;linearmodels.typing.data.Float64Array&quot;</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">portfolios</span><span class="o">.</span><span class="n">ndarray</span><span class="p">)</span>
+        <span class="n">f</span> <span class="o">=</span> <span class="n">cast</span><span class="p">(</span><span class="s2">&quot;linearmodels.typing.data.Float64Array&quot;</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">factors</span><span class="o">.</span><span class="n">ndarray</span><span class="p">)</span>
         <span class="k">if</span> <span class="n">has_constant</span><span class="p">(</span><span class="n">p</span><span class="p">)[</span><span class="mi">0</span><span class="p">]:</span>
             <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
-                <span class="s2">&quot;portfolios must not contains a constant or &quot;</span>
+                <span class="s2">&quot;portfolios must not contain a constant or &quot;</span>
                 <span class="s2">&quot;equivalent and must not have rank</span><span class="se">\n</span><span class="s2">&quot;</span>
                 <span class="s2">&quot;less than the dimension of the smaller shape.&quot;</span>
             <span class="p">)</span>
@@ -659,7 +658,7 @@
 
     <span class="nd">@staticmethod</span>
     <span class="k">def</span><span class="w"> </span><span class="nf">_prepare_data_from_formula</span><span class="p">(</span>
-        <span class="n">formula</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">data</span><span class="p">:</span> <span class="n">pandas</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">,</span> <span class="n">portfolios</span><span class="p">:</span> <span class="n">pandas</span><span class="o">.</span><span class="n">DataFrame</span> <span class="o">|</span> <span class="kc">None</span>
+        <span class="n">formula</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">data</span><span class="p">:</span> <span class="n">DataFrame</span><span class="p">,</span> <span class="n">portfolios</span><span class="p">:</span> <span class="n">DataFrame</span> <span class="o">|</span> <span class="kc">None</span>
     <span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">tuple</span><span class="p">[</span><span class="n">DataFrame</span><span class="p">,</span> <span class="n">DataFrame</span><span class="p">,</span> <span class="nb">str</span><span class="p">]:</span>
         <span class="n">orig_formula</span> <span class="o">=</span> <span class="n">formula</span>
         <span class="n">na_action</span> <span class="o">=</span> <span class="n">NAAction</span><span class="p">(</span><span class="s2">&quot;raise&quot;</span><span class="p">)</span>
@@ -734,9 +733,9 @@
     <span class="k">def</span><span class="w"> </span><span class="nf">from_formula</span><span class="p">(</span>
         <span class="bp">cls</span><span class="p">,</span>
         <span class="n">formula</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
-        <span class="n">data</span><span class="p">:</span> <span class="n">pandas</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">,</span>
+        <span class="n">data</span><span class="p">:</span> <span class="n">DataFrame</span><span class="p">,</span>
         <span class="o">*</span><span class="p">,</span>
-        <span class="n">portfolios</span><span class="p">:</span> <span class="n">pandas</span><span class="o">.</span><span class="n">DataFrame</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+        <span class="n">portfolios</span><span class="p">:</span> <span class="n">DataFrame</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
     <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">TradedFactorModel</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Parameters</span>
@@ -862,7 +861,7 @@
                 <span class="n">kernel</span><span class="o">=</span><span class="n">kernel</span><span class="p">,</span>
             <span class="p">)</span>
             <span class="n">bw</span> <span class="o">=</span> <span class="n">cov_est</span><span class="o">.</span><span class="n">bandwidth</span>
-            <span class="n">_cov_config</span> <span class="o">=</span> <span class="p">{</span><span class="n">k</span><span class="p">:</span> <span class="n">v</span> <span class="k">for</span> <span class="n">k</span><span class="p">,</span> <span class="n">v</span> <span class="ow">in</span> <span class="n">cov_config</span><span class="o">.</span><span class="n">items</span><span class="p">()}</span>
+            <span class="n">_cov_config</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">(</span><span class="n">cov_config</span><span class="o">.</span><span class="n">items</span><span class="p">())</span>
             <span class="n">_cov_config</span><span class="p">[</span><span class="s2">&quot;bandwidth&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">bw</span>
             <span class="n">rp_cov_est</span> <span class="o">=</span> <span class="n">KernelCovariance</span><span class="p">(</span>
                 <span class="n">fe</span><span class="p">,</span>
@@ -901,10 +900,10 @@
         <span class="n">param_names</span> <span class="o">=</span> <span class="p">[]</span>
         <span class="k">for</span> <span class="n">portfolio</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">portfolios</span><span class="o">.</span><span class="n">cols</span><span class="p">:</span>
             <span class="n">param_names</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;alpha-</span><span class="si">{</span><span class="n">portfolio</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
-            <span class="k">for</span> <span class="n">factor</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">factors</span><span class="o">.</span><span class="n">cols</span><span class="p">:</span>
-                <span class="n">param_names</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;beta-</span><span class="si">{</span><span class="n">portfolio</span><span class="si">}</span><span class="s2">-</span><span class="si">{</span><span class="n">factor</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
-        <span class="k">for</span> <span class="n">factor</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">factors</span><span class="o">.</span><span class="n">cols</span><span class="p">:</span>
-            <span class="n">param_names</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;lambda-</span><span class="si">{</span><span class="n">factor</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+            <span class="n">param_names</span><span class="o">.</span><span class="n">extend</span><span class="p">(</span>
+                <span class="p">[</span><span class="sa">f</span><span class="s2">&quot;beta-</span><span class="si">{</span><span class="n">portfolio</span><span class="si">}</span><span class="s2">-</span><span class="si">{</span><span class="n">factor</span><span class="si">}</span><span class="s2">&quot;</span> <span class="k">for</span> <span class="n">factor</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">factors</span><span class="o">.</span><span class="n">cols</span><span class="p">]</span>
+            <span class="p">)</span>
+        <span class="n">param_names</span><span class="o">.</span><span class="n">extend</span><span class="p">([</span><span class="sa">f</span><span class="s2">&quot;lambda-</span><span class="si">{</span><span class="n">factor</span><span class="si">}</span><span class="s2">&quot;</span> <span class="k">for</span> <span class="n">factor</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">factors</span><span class="o">.</span><span class="n">cols</span><span class="p">])</span>
 
         <span class="n">res</span> <span class="o">=</span> <span class="n">AttrDict</span><span class="p">(</span>
             <span class="n">params</span><span class="o">=</span><span class="n">params</span><span class="p">,</span>
@@ -1059,9 +1058,9 @@
     <span class="k">def</span><span class="w"> </span><span class="nf">from_formula</span><span class="p">(</span>
         <span class="bp">cls</span><span class="p">,</span>
         <span class="n">formula</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
-        <span class="n">data</span><span class="p">:</span> <span class="n">pandas</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">,</span>
+        <span class="n">data</span><span class="p">:</span> <span class="n">DataFrame</span><span class="p">,</span>
         <span class="o">*</span><span class="p">,</span>
-        <span class="n">portfolios</span><span class="p">:</span> <span class="n">pandas</span><span class="o">.</span><span class="n">DataFrame</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+        <span class="n">portfolios</span><span class="p">:</span> <span class="n">DataFrame</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
         <span class="n">risk_free</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
         <span class="n">sigma</span><span class="p">:</span> <span class="n">linearmodels</span><span class="o">.</span><span class="n">typing</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">ArrayLike</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
     <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">LinearFactorModel</span><span class="p">:</span>
@@ -1215,12 +1214,12 @@
         <span class="n">param_names</span> <span class="o">=</span> <span class="p">[]</span>
         <span class="k">for</span> <span class="n">portfolio</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">portfolios</span><span class="o">.</span><span class="n">cols</span><span class="p">:</span>
             <span class="n">param_names</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;alpha-</span><span class="si">{</span><span class="n">portfolio</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
-            <span class="k">for</span> <span class="n">factor</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">factors</span><span class="o">.</span><span class="n">cols</span><span class="p">:</span>
-                <span class="n">param_names</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;beta-</span><span class="si">{</span><span class="n">portfolio</span><span class="si">}</span><span class="s2">-</span><span class="si">{</span><span class="n">factor</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+            <span class="n">param_names</span><span class="o">.</span><span class="n">extend</span><span class="p">(</span>
+                <span class="p">[</span><span class="sa">f</span><span class="s2">&quot;beta-</span><span class="si">{</span><span class="n">portfolio</span><span class="si">}</span><span class="s2">-</span><span class="si">{</span><span class="n">factor</span><span class="si">}</span><span class="s2">&quot;</span> <span class="k">for</span> <span class="n">factor</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">factors</span><span class="o">.</span><span class="n">cols</span><span class="p">]</span>
+            <span class="p">)</span>
         <span class="k">if</span> <span class="ow">not</span> <span class="n">excess_returns</span><span class="p">:</span>
             <span class="n">param_names</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s2">&quot;lambda-risk_free&quot;</span><span class="p">)</span>
-        <span class="k">for</span> <span class="n">factor</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">factors</span><span class="o">.</span><span class="n">cols</span><span class="p">:</span>
-            <span class="n">param_names</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;lambda-</span><span class="si">{</span><span class="n">factor</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+        <span class="n">param_names</span><span class="o">.</span><span class="n">extend</span><span class="p">([</span><span class="sa">f</span><span class="s2">&quot;lambda-</span><span class="si">{</span><span class="n">factor</span><span class="si">}</span><span class="s2">&quot;</span> <span class="k">for</span> <span class="n">factor</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">factors</span><span class="o">.</span><span class="n">cols</span><span class="p">])</span>
 
         <span class="c1"># Pivot vcv to remove unnecessary and have correct order</span>
         <span class="n">order</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="n">s1</span><span class="p">),</span> <span class="p">(</span><span class="n">nport</span><span class="p">,</span> <span class="n">nf</span> <span class="o">+</span> <span class="mi">1</span><span class="p">))</span>
@@ -1300,7 +1299,7 @@
         <span class="n">sigma_inv</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_sigma_inv</span>
 
         <span class="n">f</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">factors</span><span class="o">.</span><span class="n">ndarray</span>
-        <span class="n">nobs</span><span class="p">,</span> <span class="n">nf</span><span class="p">,</span> <span class="n">nport</span><span class="p">,</span> <span class="n">_</span><span class="p">,</span> <span class="n">s1</span><span class="p">,</span> <span class="n">s2</span><span class="p">,</span> <span class="n">s3</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_boundaries</span><span class="p">()</span>
+        <span class="n">nobs</span><span class="p">,</span> <span class="n">nf</span><span class="p">,</span> <span class="n">nport</span><span class="p">,</span> <span class="n">_</span><span class="p">,</span> <span class="n">_</span><span class="p">,</span> <span class="n">_</span><span class="p">,</span> <span class="n">_</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_boundaries</span><span class="p">()</span>
         <span class="n">fc</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">c_</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">ones</span><span class="p">((</span><span class="n">nobs</span><span class="p">,</span> <span class="mi">1</span><span class="p">)),</span> <span class="n">f</span><span class="p">]</span>
         <span class="n">f_rep</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">tile</span><span class="p">(</span><span class="n">fc</span><span class="p">,</span> <span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="n">nport</span><span class="p">))</span>
         <span class="n">eps_rep</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">tile</span><span class="p">(</span><span class="n">eps</span><span class="p">,</span> <span class="p">(</span><span class="n">nf</span> <span class="o">+</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">))</span>
@@ -1372,9 +1371,9 @@
     <span class="k">def</span><span class="w"> </span><span class="nf">from_formula</span><span class="p">(</span>
         <span class="bp">cls</span><span class="p">,</span>
         <span class="n">formula</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
-        <span class="n">data</span><span class="p">:</span> <span class="n">pandas</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">,</span>
+        <span class="n">data</span><span class="p">:</span> <span class="n">DataFrame</span><span class="p">,</span>
         <span class="o">*</span><span class="p">,</span>
-        <span class="n">portfolios</span><span class="p">:</span> <span class="n">pandas</span><span class="o">.</span><span class="n">DataFrame</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+        <span class="n">portfolios</span><span class="p">:</span> <span class="n">DataFrame</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
         <span class="n">risk_free</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
     <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">LinearFactorModelGMM</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
@@ -1629,8 +1628,9 @@
         <span class="n">r2</span> <span class="o">=</span> <span class="mf">1.0</span> <span class="o">-</span> <span class="n">residual_ss</span> <span class="o">/</span> <span class="n">total_ss</span>
         <span class="n">param_names</span> <span class="o">=</span> <span class="p">[]</span>
         <span class="k">for</span> <span class="n">portfolio</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">portfolios</span><span class="o">.</span><span class="n">cols</span><span class="p">:</span>
-            <span class="k">for</span> <span class="n">factor</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">factors</span><span class="o">.</span><span class="n">cols</span><span class="p">:</span>
-                <span class="n">param_names</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;beta-</span><span class="si">{</span><span class="n">portfolio</span><span class="si">}</span><span class="s2">-</span><span class="si">{</span><span class="n">factor</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+            <span class="n">param_names</span><span class="o">.</span><span class="n">extend</span><span class="p">(</span>
+                <span class="p">[</span><span class="sa">f</span><span class="s2">&quot;beta-</span><span class="si">{</span><span class="n">portfolio</span><span class="si">}</span><span class="s2">-</span><span class="si">{</span><span class="n">factor</span><span class="si">}</span><span class="s2">&quot;</span> <span class="k">for</span> <span class="n">factor</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">factors</span><span class="o">.</span><span class="n">cols</span><span class="p">]</span>
+            <span class="p">)</span>
         <span class="k">if</span> <span class="ow">not</span> <span class="n">excess_returns</span><span class="p">:</span>
             <span class="n">param_names</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s2">&quot;lambda-risk_free&quot;</span><span class="p">)</span>
         <span class="n">param_names</span><span class="o">.</span><span class="n">extend</span><span class="p">([</span><span class="sa">f</span><span class="s2">&quot;lambda-</span><span class="si">{</span><span class="n">f</span><span class="si">}</span><span class="s2">&quot;</span> <span class="k">for</span> <span class="n">f</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">factors</span><span class="o">.</span><span class="n">cols</span><span class="p">])</span>
