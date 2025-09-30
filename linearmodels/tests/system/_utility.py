@@ -48,7 +48,7 @@ def generate_data(
         else:
             data[f"equ.{i}"] = (y, x)
             if included_weights:
-                data[f"equ.{i}"] = tuple(list(data[f"equ.{i}"]) + [w])
+                data[f"equ.{i}"] = (*list(data[f"equ.{i}"]), w)
 
     return data
 
@@ -96,7 +96,7 @@ def generate_3sls_data(
 
     count = 0
     common_shocks = []
-    for i, _p, _en, _instr in zip(range(k), p, en, instr):
+    for i, _p, _en, _instr in zip(range(k), p, en, instr, strict=False):
         total = _p + _en + _instr
         corr = np.eye(_p + _en + _instr + 1)
         corr[_p : _p + _en, _p : _p + _en] = kappa * np.eye(_en)
@@ -141,11 +141,10 @@ def generate_3sls_data(
             }
             if included_weights:
                 data[f"equ.{count}"]["weights"] = w
+        elif included_weights:
+            data[f"equ.{count}"] = (dep, exog, endog, instr, w)
         else:
-            if included_weights:
-                data[f"equ.{count}"] = (dep, exog, endog, instr, w)
-            else:
-                data[f"equ.{count}"] = (dep, exog, endog, instr)
+            data[f"equ.{count}"] = (dep, exog, endog, instr)
         count += 1
 
     return data
@@ -273,7 +272,7 @@ def generate_simultaneous_data(
     deps = convert_to_pandas(np.squeeze(y), "dependent")
     exogs = convert_to_pandas(x, "exog")
     if const:
-        exogs.columns = ["const"] + list(exogs.columns[1:])
+        exogs.columns = ["const", *list(exogs.columns[1:])]
     for i in range(nsystem):
         dep = deps.iloc[:, i]
         idx = sorted(set(range(nsystem)).difference([i]))
@@ -286,7 +285,7 @@ def generate_simultaneous_data(
         exog = exogs.iloc[:, ex_idx]
         idx = set(range(const + nexog, x.shape[1]))
         instr = convert_to_pandas(x[:, sorted(idx.difference(drop))], "instruments")
-        eqn = dict(dependent=dep, exog=exog, endog=endog, instruments=instr)
+        eqn = {"dependent": dep, "exog": exog, "endog": endog, "instruments": instr}
         eqns[dep.name] = eqn
     return eqns
 
@@ -325,7 +324,7 @@ def generate_3sls_data_v2(
             x = np.hstack([np.ones((n, 1)), x])
             exog = np.hstack([np.ones((n, 1)), exog])
         dep = x @ params + eps + nendog * np.random.standard_normal((n, 1))
-        if omitted == "none" or omitted == "drop":
+        if omitted in {"none", "drop"}:
             if exog.shape[1] == 0:
                 exog = None
             if endog.shape[1] == 0:
@@ -340,13 +339,12 @@ def generate_3sls_data_v2(
         for key in eqns:
             eq = eqns[key]
             eqns[key] = (eq.dependent, eq.exog, eq.endog, eq.instruments)
-    else:
-        if omitted == "drop":
-            for key in eqns:
-                eq = eqns[key]
-                for key2 in ("exog", "endog", "instruments"):
-                    if eq[key2] is None:
-                        del eq[key2]
+    elif omitted == "drop":
+        for key in eqns:
+            eq = eqns[key]
+            for key2 in ("exog", "endog", "instruments"):
+                if eq[key2] is None:
+                    del eq[key2]
 
     return eqns
 
@@ -355,8 +353,8 @@ def simple_gmm(y, x, z, robust=True, steps=2):
     y = np.vstack(y)
     k = len(x)
     nobs = x[0].shape[0]
-    kx = sum(map(lambda a: a.shape[1], x))
-    kz = sum(map(lambda a: a.shape[1], z))
+    kx = sum(a.shape[1] for a in x)
+    kz = sum(a.shape[1] for a in z)
     _x = np.zeros((k * nobs, kx))
     idx = 0
     for i in range(len(x)):

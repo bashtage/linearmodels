@@ -11,7 +11,6 @@ from formulaic import model_matrix
 from formulaic.materializers.types import NAAction
 import numpy as np
 from numpy.linalg import lstsq
-import pandas
 from pandas import DataFrame
 from scipy.optimize import minimize
 
@@ -99,7 +98,7 @@ class _FactorModelBase:
     def _drop_missing(self) -> linearmodels.typing.data.BoolArray:
         data = (self.portfolios, self.factors)
         missing = cast(
-            linearmodels.typing.data.BoolArray,
+            "linearmodels.typing.data.BoolArray",
             np.any(np.c_[[dh.isnull for dh in data]], 0),
         )
         if any(missing):
@@ -123,11 +122,11 @@ class _FactorModelBase:
             )
         self._drop_missing()
 
-        p = cast(linearmodels.typing.data.Float64Array, self.portfolios.ndarray)
-        f = cast(linearmodels.typing.data.Float64Array, self.factors.ndarray)
+        p = cast("linearmodels.typing.data.Float64Array", self.portfolios.ndarray)
+        f = cast("linearmodels.typing.data.Float64Array", self.factors.ndarray)
         if has_constant(p)[0]:
             raise ValueError(
-                "portfolios must not contains a constant or "
+                "portfolios must not contain a constant or "
                 "equivalent and must not have rank\n"
                 "less than the dimension of the smaller shape."
             )
@@ -153,7 +152,7 @@ class _FactorModelBase:
 
     @staticmethod
     def _prepare_data_from_formula(
-        formula: str, data: pandas.DataFrame, portfolios: pandas.DataFrame | None
+        formula: str, data: DataFrame, portfolios: DataFrame | None
     ) -> tuple[DataFrame, DataFrame, str]:
         orig_formula = formula
         na_action = NAAction("raise")
@@ -224,9 +223,9 @@ class TradedFactorModel(_FactorModelBase):
     def from_formula(
         cls,
         formula: str,
-        data: pandas.DataFrame,
+        data: DataFrame,
         *,
-        portfolios: pandas.DataFrame | None = None,
+        portfolios: DataFrame | None = None,
     ) -> TradedFactorModel:
         """
         Parameters
@@ -349,7 +348,7 @@ class TradedFactorModel(_FactorModelBase):
                 kernel=kernel,
             )
             bw = cov_est.bandwidth
-            _cov_config = {k: v for k, v in cov_config.items()}
+            _cov_config = dict(cov_config.items())
             _cov_config["bandwidth"] = bw
             rp_cov_est = KernelCovariance(
                 fe,
@@ -388,10 +387,10 @@ class TradedFactorModel(_FactorModelBase):
         param_names = []
         for portfolio in self.portfolios.cols:
             param_names.append(f"alpha-{portfolio}")
-            for factor in self.factors.cols:
-                param_names.append(f"beta-{portfolio}-{factor}")
-        for factor in self.factors.cols:
-            param_names.append(f"lambda-{factor}")
+            param_names.extend(
+                [f"beta-{portfolio}-{factor}" for factor in self.factors.cols]
+            )
+        param_names.extend([f"lambda-{factor}" for factor in self.factors.cols])
 
         res = AttrDict(
             params=params,
@@ -540,9 +539,9 @@ class LinearFactorModel(_LinearFactorModelBase):
     def from_formula(
         cls,
         formula: str,
-        data: pandas.DataFrame,
+        data: DataFrame,
         *,
-        portfolios: pandas.DataFrame | None = None,
+        portfolios: DataFrame | None = None,
         risk_free: bool = False,
         sigma: linearmodels.typing.data.ArrayLike | None = None,
     ) -> LinearFactorModel:
@@ -693,12 +692,12 @@ class LinearFactorModel(_LinearFactorModelBase):
         param_names = []
         for portfolio in self.portfolios.cols:
             param_names.append(f"alpha-{portfolio}")
-            for factor in self.factors.cols:
-                param_names.append(f"beta-{portfolio}-{factor}")
+            param_names.extend(
+                [f"beta-{portfolio}-{factor}" for factor in self.factors.cols]
+            )
         if not excess_returns:
             param_names.append("lambda-risk_free")
-        for factor in self.factors.cols:
-            param_names.append(f"lambda-{factor}")
+        param_names.extend([f"lambda-{factor}" for factor in self.factors.cols])
 
         # Pivot vcv to remove unnecessary and have correct order
         order = np.reshape(np.arange(s1), (nport, nf + 1))
@@ -777,7 +776,7 @@ class LinearFactorModel(_LinearFactorModelBase):
         sigma_inv = self._sigma_inv
 
         f = self.factors.ndarray
-        nobs, nf, nport, _, s1, s2, s3 = self._boundaries()
+        nobs, nf, nport, _, _, _, _ = self._boundaries()
         fc = np.c_[np.ones((nobs, 1)), f]
         f_rep = np.tile(fc, (1, nport))
         eps_rep = np.tile(eps, (nf + 1, 1))
@@ -844,9 +843,9 @@ class LinearFactorModelGMM(_LinearFactorModelBase):
     def from_formula(
         cls,
         formula: str,
-        data: pandas.DataFrame,
+        data: DataFrame,
         *,
-        portfolios: pandas.DataFrame | None = None,
+        portfolios: DataFrame | None = None,
         risk_free: bool = False,
     ) -> LinearFactorModelGMM:
         """
@@ -1098,8 +1097,9 @@ class LinearFactorModelGMM(_LinearFactorModelBase):
         r2 = 1.0 - residual_ss / total_ss
         param_names = []
         for portfolio in self.portfolios.cols:
-            for factor in self.factors.cols:
-                param_names.append(f"beta-{portfolio}-{factor}")
+            param_names.extend(
+                [f"beta-{portfolio}-{factor}" for factor in self.factors.cols]
+            )
         if not excess_returns:
             param_names.append("lambda-risk_free")
         param_names.extend([f"lambda-{f}" for f in self.factors.cols])

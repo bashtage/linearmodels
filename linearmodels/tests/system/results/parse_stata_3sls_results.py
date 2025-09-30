@@ -36,7 +36,7 @@ def process_block(results):
     block = []
     key = None
     for line in param_results[2:]:
-        contents = list(map(lambda s: s.strip(), line.split("\t")))
+        contents = [s.strip() for s in line.split("\t")]
         if contents[0] != "" and contents[1] == "":
             if key is not None:
                 params[key] = parse_block(block)
@@ -53,7 +53,7 @@ def process_block(results):
             stat_values[contents[0]] = float(contents[1])
     stats = stat_values
 
-    variance = list(map(lambda s: s.replace("\t", ","), variance))
+    variance = [s.replace("\t", ",") for s in variance]
     header = variance[0]
     block = []
     for line in variance[1:]:
@@ -61,12 +61,12 @@ def process_block(results):
             continue
         else:
             block.append(line)
-    out = pd.read_csv(StringIO("".join([header] + block)))
+    out = pd.read_csv(StringIO("".join([header, *block])))
     out = out.iloc[:, 1:]
     out.index = header.strip().split(",")[1:]
     vcv = out
 
-    sigma = list(map(lambda s: s.replace("\t", ","), sigma))
+    sigma = [s.replace("\t", ",") for s in sigma]
     sigma = pd.read_csv(StringIO("".join(sigma)), index_col=0)
     return AttrDict(sigma=sigma, params=params, variance=vcv, stats=stats)
 

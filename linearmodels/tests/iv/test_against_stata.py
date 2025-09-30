@@ -23,7 +23,7 @@ HOUSING_DATA.state = HOUSING_DATA.state.astype("category")
 HOUSING_DATA.division = HOUSING_DATA.division.astype("category")
 
 SIMULATED_DATA = cast(
-    pd.DataFrame, pd.read_stata(os.path.join(CWD, "results", "simulated-data.dta"))
+    "pd.DataFrame", pd.read_stata(os.path.join(CWD, "results", "simulated-data.dta"))
 )
 
 filepath = os.path.join(CWD, "results", "stata-iv-housing-results.txt")

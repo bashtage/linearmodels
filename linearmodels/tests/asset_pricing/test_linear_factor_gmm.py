@@ -32,8 +32,7 @@ def test_linear_model_gmm_moments_jacobian(data):
     b = res.betas.values
     for i in range(p.shape[1]):
         eps = p[:, i : (i + 1)] - x @ b[[i]].T
-        for j in range(fc.shape[1]):
-            mom.append(eps * fc[:, [j]])
+        mom.extend([(eps * fc[:, [j]]) for j in range(fc.shape[1])])
     mom.append(f - mu)
     mom_arr = np.hstack(tuple(mom))
 
@@ -43,9 +42,7 @@ def test_linear_model_gmm_moments_jacobian(data):
     # 1,1
     jac[: (nport * (nf + 1)), : nport * nf] = np.kron(np.eye(nport), fc.T @ x / n)
     # 1, 2
-    col = []
-    for i in range(nport):
-        col.append(fc.T @ np.ones((n, 1)) @ b[[i]] / n)
+    col = [(fc.T @ np.ones((n, 1)) @ b[[i]] / n) for i in range(nport)]
     col = np.vstack(tuple(col))
     jac[: (nport * (nf + 1)), nport * nf : nport * nf + nf] = col
     # 1, 3

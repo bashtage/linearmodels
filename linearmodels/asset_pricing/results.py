@@ -338,7 +338,7 @@ class GMMFactorModelResults(LinearFactorModelResults):
     @property
     def std_errors(self) -> pd.DataFrame:
         """Estimated parameter standard errors"""
-        se = cast(linearmodels.typing.data.Float64Array, np.sqrt(np.diag(self._cov)))
+        se = cast("linearmodels.typing.data.Float64Array", np.sqrt(np.diag(self._cov)))
         ase = np.sqrt(np.diag(self._alpha_vcv))
         nportfolio, nfactor = self._params.shape
         nloadings = nportfolio * (nfactor - 1)

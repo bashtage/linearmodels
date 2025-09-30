@@ -11,12 +11,12 @@ from .results import compare
 from .utility import generate_panel_data
 
 __all__ = [
+    "BetweenOLS",
+    "FamaMacBeth",
+    "FirstDifferenceOLS",
     "PanelOLS",
     "PooledOLS",
     "RandomEffects",
-    "FirstDifferenceOLS",
-    "BetweenOLS",
-    "FamaMacBeth",
     "compare",
     "generate_panel_data",
 ]

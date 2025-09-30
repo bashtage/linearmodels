@@ -30,7 +30,6 @@ from numpy import (
     squeeze,
 )
 from numpy.linalg import eigvalsh, inv, matrix_rank, pinv
-import pandas
 from pandas import DataFrame, Series, concat
 from scipy.optimize import minimize
 
@@ -62,13 +61,13 @@ IVResultType = type[Union[IVResults, IVGMMResults, OLSResults]]
 
 __all__ = [
     "COVARIANCE_ESTIMATORS",
-    "WEIGHT_MATRICES",
-    "IVGMM",
-    "IVLIML",
     "IV2SLS",
+    "IVGMM",
     "IVGMMCUE",
-    "IVResultType",
+    "IVLIML",
+    "WEIGHT_MATRICES",
     "_OLS",
+    "IVResultType",
 ]
 
 COVARIANCE_ESTIMATORS = {
@@ -243,7 +242,7 @@ class _IVModelBase:
         *,
         exog: IVDataLike | None = None,
         endog: IVDataLike | None = None,
-        data: pandas.DataFrame | None = None,
+        data: DataFrame | None = None,
         eval_env: int = 4,
     ) -> DataFrame:
         """
@@ -285,7 +284,7 @@ class _IVModelBase:
         """
         if data is not None and not self.formula:
             raise ValueError(
-                "Unable to use data when the model was not " "created using a formula."
+                "Unable to use data when the model was not created using a formula."
             )
         if data is not None and (exog is not None or endog is not None):
             raise ValueError(
@@ -342,17 +341,17 @@ class _IVModelBase:
                 " ({}).".format(self.instruments.shape[1], self.endog.shape[1])
             )
         if matrix_rank(x) < x.shape[1]:
-            raise ValueError("regressors [exog endog] do not have full " "column rank")
+            raise ValueError("regressors [exog endog] do not have full column rank")
         if matrix_rank(z) < z.shape[1]:
             raise ValueError(
-                "instruments [exog instruments]  do not have " "full column rank"
+                "instruments [exog instruments]  do not have full column rank"
             )
         self._has_constant, self._const_loc = has_constant(x)
 
     def _drop_missing(self) -> linearmodels.typing.data.BoolArray:
         data = (self.dependent, self.exog, self.endog, self.instruments, self.weights)
         missing = cast(
-            linearmodels.typing.data.BoolArray,
+            "linearmodels.typing.data.BoolArray",
             npany(column_stack([dh.isnull for dh in data]), axis=1),
         )
         if npany(missing):
@@ -424,7 +423,7 @@ class _IVModelBase:
     @property
     def notnull(self) -> linearmodels.typing.data.BoolArray:
         """Locations of observations included in estimation"""
-        return cast(linearmodels.typing.data.BoolArray, logical_not(self._drop_locs))
+        return cast("linearmodels.typing.data.BoolArray", logical_not(self._drop_locs))
 
     def _f_statistic(
         self,
@@ -679,7 +678,7 @@ class _IVLSModelBase(_IVModelBase):
                     "Unable to estimate kappa. This is most likely occurs if the "
                     f"instrument matrix is rank deficient. The error raised when "
                     f"computing kappa was:\n\n{exc}"
-                )
+                ) from exc
         if kappa is not None:
             est_kappa = kappa
         else:
@@ -694,9 +693,8 @@ class _IVLSModelBase(_IVModelBase):
         cov_estimator = COVARIANCE_ESTIMATORS[cov_type]
         cov_config["debiased"] = debiased
         cov_config["kappa"] = est_kappa
-        cov_config_copy = {k: v for k, v in cov_config.items()}
-        if "center" in cov_config_copy:
-            del cov_config_copy["center"]
+        cov_config_copy = dict(cov_config.items())
+        cov_config_copy.pop("center", None)
         cov_estimator_inst = cov_estimator(wx, wy, wz, params, **cov_config_copy)
 
         results = {"kappa": est_kappa, "liml_kappa": liml_kappa}
@@ -790,7 +788,7 @@ class IVLIML(_IVLSModelBase):
     @staticmethod
     def from_formula(
         formula: str,
-        data: pandas.DataFrame,
+        data: DataFrame,
         *,
         weights: IVDataLike | None = None,
         fuller: float = 0,
@@ -903,7 +901,7 @@ class IV2SLS(_IVLSModelBase):
 
     @staticmethod
     def from_formula(
-        formula: str, data: pandas.DataFrame, *, weights: IVDataLike | None = None
+        formula: str, data: DataFrame, *, weights: IVDataLike | None = None
     ) -> IV2SLS:
         """
         Parameters
@@ -1125,7 +1123,7 @@ class IVGMM(_IVGMMBase):
     @staticmethod
     def from_formula(
         formula: str,
-        data: pandas.DataFrame,
+        data: DataFrame,
         *,
         weights: IVDataLike | None = None,
         weight_type: str = "robust",
@@ -1404,7 +1402,7 @@ class IVGMMCUE(_IVGMMBase):
     @staticmethod
     def from_formula(
         formula: str,
-        data: pandas.DataFrame,
+        data: DataFrame,
         *,
         weights: IVDataLike | None = None,
         weight_type: str = "robust",
@@ -1587,7 +1585,7 @@ class IVGMMCUE(_IVGMMBase):
     def fit(
         self,
         *,
-        starting: linearmodels.typing.data.Float64Array | pandas.Series | None = None,
+        starting: linearmodels.typing.data.Float64Array | Series | None = None,
         display: bool = False,
         cov_type: str = "robust",
         debiased: bool = False,
@@ -1654,9 +1652,7 @@ class IVGMMCUE(_IVGMMBase):
         else:
             starting = asarray(starting)
             if len(starting) != self.exog.shape[1] + self.endog.shape[1]:
-                raise ValueError(
-                    "starting does not have the correct number " "of values"
-                )
+                raise ValueError("starting does not have the correct number of values")
         params, iters = self.estimate_parameters(
             starting, wx, wy, wz, display, opt_options=opt_options
         )
@@ -1713,9 +1709,9 @@ class _OLS(IVLIML):
 
 
 def _gmm_model_from_formula(
-    cls: type[IVGMM] | type[IVGMMCUE],
+    cls: type[IVGMM | IVGMMCUE],
     formula: str,
-    data: pandas.DataFrame,
+    data: DataFrame,
     weights: IVDataLike | None,
     weight_type: str,
     **weight_config: Any,

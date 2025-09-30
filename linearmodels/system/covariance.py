@@ -2,9 +2,9 @@ from __future__ import annotations
 
 from typing import cast
 
-import numpy
 from numpy import asarray, empty, eye, ndarray, ones, sqrt, vstack, zeros
 from numpy.linalg import inv
+from pandas import DataFrame
 
 from linearmodels.asset_pricing.covariance import _HACMixin
 from linearmodels.iv.covariance import cov_cluster
@@ -63,7 +63,7 @@ class HomoskedasticCovariance:
 
     def __init__(
         self,
-        x: list[numpy.ndarray],
+        x: list[ndarray],
         eps: linearmodels.typing.data.Float64Array,
         sigma: linearmodels.typing.data.Float64Array,
         full_sigma: linearmodels.typing.data.Float64Array,
@@ -87,9 +87,9 @@ class HomoskedasticCovariance:
 
     def __str__(self) -> str:
         out = self._name
-        extra: list[str] = []
-        for key in self._str_extra:
-            extra.append(": ".join([str(key), str(self._str_extra[key])]))
+        extra = [
+            ": ".join([str(key), str(self._str_extra[key])]) for key in self._str_extra
+        ]
         if extra:
             out += " (" + ", ".join(extra) + ")"
         return out
@@ -129,7 +129,7 @@ class HomoskedasticCovariance:
     def _gls_cov(self) -> linearmodels.typing.data.Float64Array:
         x = self._x
         sigma = self._sigma
-        sigma_inv = cast(linearmodels.typing.data.Float64Array, inv(sigma))
+        sigma_inv = cast("linearmodels.typing.data.Float64Array", inv(sigma))
 
         xpx = blocked_inner_prod(x, sigma_inv)
         # Handles case where sigma_inv is not inverse of full_sigma
@@ -152,9 +152,9 @@ class HomoskedasticCovariance:
         """Parameter covariance"""
         adj = self._adjustment()
         if self._gls:
-            return cast(ndarray, adj * self._gls_cov())
+            return cast("ndarray", adj * self._gls_cov())
         else:
-            return cast(ndarray, adj * self._mvreg_cov())
+            return cast("ndarray", adj * self._mvreg_cov())
 
     @property
     def cov_config(self) -> AttrDict:
@@ -205,7 +205,7 @@ class HeteroskedasticCovariance(HomoskedasticCovariance):
 
     def __init__(
         self,
-        x: list[numpy.ndarray],
+        x: list[ndarray],
         eps: linearmodels.typing.data.Float64Array,
         sigma: linearmodels.typing.data.Float64Array,
         full_sigma: linearmodels.typing.data.Float64Array,
@@ -229,7 +229,7 @@ class HeteroskedasticCovariance(HomoskedasticCovariance):
         nobs = eps.shape[0]
 
         if gls:
-            weights = cast(linearmodels.typing.data.Float64Array, inv(sigma))
+            weights = cast("linearmodels.typing.data.Float64Array", inv(sigma))
             bigx = blocked_diag_product(x, weights)
             e = eps.T.ravel()[:, None]
             bigxe = bigx * e
@@ -239,7 +239,7 @@ class HeteroskedasticCovariance(HomoskedasticCovariance):
                 xe += bigxe[i * nobs : (i + 1) * nobs]
         else:
             # Do not require blocking when not using GLS
-            k_tot = sum(map(lambda a: a.shape[1], x))
+            k_tot = sum(a.shape[1] for a in x)
             xe = empty((nobs, k_tot))
             loc = 0
             for i in range(k):
@@ -259,7 +259,7 @@ class HeteroskedasticCovariance(HomoskedasticCovariance):
         k = len(x)
         sigma = self.sigma
         weights = (
-            cast(linearmodels.typing.data.Float64Array, inv(sigma)) if gls else eye(k)
+            cast("linearmodels.typing.data.Float64Array", inv(sigma)) if gls else eye(k)
         )
         xpx = blocked_inner_prod(x, weights) / nobs
         xeex = self._xeex()
@@ -289,9 +289,7 @@ class HeteroskedasticCovariance(HomoskedasticCovariance):
             return 1.0
         ks = [s.shape[1] for s in self._x]
         nobs = self._x[0].shape[0]
-        adj = []
-        for k in ks:
-            adj.append(nobs / (nobs - k) * ones((k, 1)))
+        adj = [nobs / (nobs - k) * ones((k, 1)) for k in ks]
         adj_arr = vstack(adj)
         adj_arr = sqrt(adj_arr)
         # TODO: Check Type
@@ -355,7 +353,7 @@ class KernelCovariance(HeteroskedasticCovariance, _HACMixin):
 
     def __init__(
         self,
-        x: list[numpy.ndarray],
+        x: list[ndarray],
         eps: linearmodels.typing.data.Float64Array,
         sigma: linearmodels.typing.data.Float64Array,
         full_sigma: linearmodels.typing.data.Float64Array,
@@ -449,7 +447,7 @@ class ClusteredCovariance(HeteroskedasticCovariance):
 
     def __init__(
         self,
-        x: list[numpy.ndarray],
+        x: list[ndarray],
         eps: linearmodels.typing.data.Float64Array,
         sigma: linearmodels.typing.data.Float64Array,
         full_sigma: linearmodels.typing.data.Float64Array,
@@ -493,7 +491,6 @@ class ClusteredCovariance(HeteroskedasticCovariance):
         shape = _clusters.shape
         if shape[0] != self._eps.shape[0] or not 1 <= shape[1] <= 2:
             raise ValueError(CLUSTERS_FORMAT, ValueError)
-        from pandas import DataFrame
 
         df = DataFrame(_clusters)
         nunique = df.nunique()
@@ -575,12 +572,12 @@ class GMMHomoskedasticCovariance:
 
     def __init__(
         self,
-        x: list[numpy.ndarray],
-        z: list[numpy.ndarray],
+        x: list[ndarray],
+        z: list[ndarray],
         eps: linearmodels.typing.data.Float64Array,
         w: linearmodels.typing.data.Float64Array,
         *,
-        sigma: numpy.ndarray | None = None,
+        sigma: ndarray | None = None,
         debiased: bool = False,
         constraints: LinearConstraint | None = None,
     ) -> None:
@@ -651,9 +648,7 @@ class GMMHomoskedasticCovariance:
             return 1.0
         k = [s.shape[1] for s in self._x]
         nobs = self._x[0].shape[0]
-        adj = []
-        for i in range(len(k)):
-            adj.append(nobs / (nobs - k[i]) * ones((k[i], 1)))
+        adj = [nobs / (nobs - k[i]) * ones((k[i], 1)) for i in range(len(k))]
         adj_arr = vstack(adj)
         adj_arr = sqrt(adj_arr)
         return adj_arr @ adj_arr.T
@@ -697,12 +692,12 @@ class GMMHeteroskedasticCovariance(GMMHomoskedasticCovariance):
 
     def __init__(
         self,
-        x: list[numpy.ndarray],
-        z: list[numpy.ndarray],
+        x: list[ndarray],
+        z: list[ndarray],
         eps: linearmodels.typing.data.Float64Array,
         w: linearmodels.typing.data.Float64Array,
         *,
-        sigma: numpy.ndarray | None = None,
+        sigma: ndarray | None = None,
         debiased: bool = False,
         constraints: LinearConstraint | None = None,
     ) -> None:
@@ -712,7 +707,7 @@ class GMMHeteroskedasticCovariance(GMMHomoskedasticCovariance):
         self._name = "GMM Heteroskedastic (Robust) Covariance"
 
         k = len(z)
-        k_total = sum(map(lambda a: a.shape[1], z))
+        k_total = sum(a.shape[1] for a in z)
         nobs = z[0].shape[0]
         loc = 0
         ze = empty((nobs, k_total))
@@ -773,12 +768,12 @@ class GMMKernelCovariance(GMMHeteroskedasticCovariance, _HACMixin):
 
     def __init__(
         self,
-        x: list[numpy.ndarray],
-        z: list[numpy.ndarray],
+        x: list[ndarray],
+        z: list[ndarray],
         eps: linearmodels.typing.data.Float64Array,
         w: linearmodels.typing.data.Float64Array,
         *,
-        sigma: numpy.ndarray | None = None,
+        sigma: ndarray | None = None,
         debiased: bool = False,
         constraints: LinearConstraint | None = None,
         kernel: str = "bartlett",

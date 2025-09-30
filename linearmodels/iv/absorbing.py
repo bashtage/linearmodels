@@ -31,7 +31,6 @@ from numpy import (
     zeros,
 )
 from numpy.linalg import lstsq
-import pandas
 from pandas import Categorical, CategoricalDtype, DataFrame, Series
 import scipy.sparse as sp
 from scipy.sparse.linalg import lsmr
@@ -151,7 +150,7 @@ def lsmr_annihilate(
     default_opts: dict[
         str,
         bool | float | str | linearmodels.typing.data.ArrayLike | None | dict[str, Any],
-    ] = dict(atol=1e-8, btol=1e-8, show=False)
+    ] = {"atol": 1e-8, "btol": 1e-8, "show": False}
     assert lsmr_options is not None
     default_opts.update(lsmr_options)
     resids = []
@@ -197,11 +196,11 @@ def category_product(cats: linearmodels.typing.AnyPandas) -> Series:
     for c in cats:
         # TODO: Bug in pandas-stubs
         #  https://github.com/pandas-dev/pandas-stubs/issues/97
-        if not isinstance(cats[c].dtype, CategoricalDtype):  # type: ignore
+        if not isinstance(cats[c].dtype, CategoricalDtype):
             raise TypeError("cats must contain only categorical variables")
         # TODO: Bug in pandas-stubs
         #  https://github.com/pandas-dev/pandas-stubs/issues/97
-        col = cats[c]  # type: ignore
+        col = cats[c]
         max_code = col.cat.codes.max()
         size = 1
         while max_code >= 2**size:
@@ -234,9 +233,7 @@ def category_product(cats: linearmodels.typing.AnyPandas) -> Series:
     return Series(Categorical(codes), index=cats.index)
 
 
-def category_interaction(
-    cat: pandas.Series, precondition: bool = True
-) -> sp.csc_matrix:
+def category_interaction(cat: Series, precondition: bool = True) -> sp.csc_matrix:
     """
     Parameters
     ----------
@@ -420,13 +417,12 @@ class Interaction:
         where :math:`|c_i|` is the number distinct categories in column i.
         """
         if self.cat.shape[1] and self.cont.shape[1]:
-            out = []
-            for col in self.cont:
-                out.append(
-                    category_continuous_interaction(
-                        self.cat, self.cont[col], precondition=False
-                    )
+            out = [
+                category_continuous_interaction(
+                    self.cat, self.cont[col], precondition=False
                 )
+                for col in self.cont
+            ]
             return sp.hstack(out, format="csc")
         elif self.cat.shape[1]:
             return category_interaction(category_product(self.cat), precondition=False)
@@ -456,7 +452,7 @@ class Interaction:
         cont = self.cont
         for col in cont:
             hasher.update(memoryview(ascontiguousarray(cont[col].to_numpy()).data))
-            hashes.append(sorted_hashes + (hasher.hexdigest(),))
+            hashes.append((*sorted_hashes, hasher.hexdigest()))
             hasher.reset()
 
         return sorted(hashes)
@@ -883,7 +879,7 @@ class AbsorbingLS:
         method: str,
     ) -> None:
         weights = (
-            cast(linearmodels.typing.data.Float64Array, self.weights.ndarray)
+            cast("linearmodels.typing.data.Float64Array", self.weights.ndarray)
             if self._is_weighted
             else None
         )
@@ -914,7 +910,7 @@ class AbsorbingLS:
         self._constant_absorbed = self._has_constant_exog and areg_constant
 
         dep = self._dependent.ndarray.astype(float, copy=False)
-        exog = cast(linearmodels.typing.data.Float64Array, self._exog.ndarray)
+        exog = cast("linearmodels.typing.data.Float64Array", self._exog.ndarray)
 
         root_w = sqrt(self._weight_data.ndarray.astype(float, copy=False))
         dep = root_w * dep
@@ -927,7 +923,7 @@ class AbsorbingLS:
         assert isinstance(self._regressors, sp.csc_matrix)
         if self._regressors.shape[1] > 0:
             if use_hdfe:
-                from pyhdfe import create
+                from pyhdfe import create  # noqa: PLC0415
 
                 absorb_options["drop_singletons"] = False
                 algo = create(self._absorb_inter.cat, **absorb_options)
@@ -1092,7 +1088,7 @@ class AbsorbingLS:
                 FutureWarning,
                 stacklevel=2,
             )
-            absorb_options = {k: v for k, v in lsmr_options.items()}
+            absorb_options = dict(lsmr_options.items())
         if self._absorbed_dependent is None:
             self._first_time_fit(use_cache, absorb_options, method)
 
@@ -1107,9 +1103,8 @@ class AbsorbingLS:
         cov_estimator = COVARIANCE_ESTIMATORS[cov_type]
         cov_config["debiased"] = debiased
         cov_config["kappa"] = 0.0
-        cov_config_copy = {k: v for k, v in cov_config.items()}
-        if "center" in cov_config_copy:
-            del cov_config_copy["center"]
+        cov_config_copy = dict(cov_config.items())
+        cov_config_copy.pop("center", None)
         cov_estimator_inst = cov_estimator(
             exog_resid, dep_resid, exog_resid, params, **cov_config_copy
         )
@@ -1175,7 +1170,7 @@ class AbsorbingLS:
         debiased: bool,
     ) -> WaldTestStatistic | InvalidTestStatistic:
         const_loc = find_constant(
-            cast(linearmodels.typing.data.Float64Array, self._exog.ndarray)
+            cast("linearmodels.typing.data.Float64Array", self._exog.ndarray)
         )
         resid_df = self._nobs - self._num_params
 

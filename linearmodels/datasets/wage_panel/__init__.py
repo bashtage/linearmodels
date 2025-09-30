@@ -1,5 +1,7 @@
 from pandas import DataFrame
 
+from linearmodels import datasets
+
 DESCR = """
 F. Vella and M. Verbeek (1998), "Whose Wages Do Unions Raise? A Dynamic Model
 of Unionism and Wage Rate Determination for Young Men," Journal of Applied
@@ -21,6 +23,5 @@ occupation               Occupation code
 
 
 def load() -> DataFrame:
-    from linearmodels import datasets
 
     return datasets.load(__file__, "wage_panel.csv.bz2")

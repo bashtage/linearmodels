@@ -15,7 +15,7 @@ def test_3sls_2sls_equiv():
     eqns = generate_3sls_data_v2(k=1)
     tsls_mod = IV3SLS(eqns)
     tsls = tsls_mod.fit(method="ols", cov_type="unadjusted", debiased=False)
-    eqn = eqns[list(eqns.keys())[0]]
+    eqn = eqns[next(iter(eqns.keys()))]
     ivmod = IV2SLS(eqn.dependent, eqn.exog, eqn.endog, eqn.instruments)
     iv = ivmod.fit(cov_type="unadjusted", debiased=False)
     assert_allclose(iv.params, tsls.params)
@@ -34,7 +34,7 @@ def test_3sls_2sls_equiv():
 def test_gmm_equiv():
     eqns = generate_3sls_data_v2(k=1)
     sys_mod = IVSystemGMM(eqns)
-    eqn = eqns[list(eqns.keys())[0]]
+    eqn = eqns[next(iter(eqns.keys()))]
     gmm_mod = IVGMM(eqn.dependent, eqn.exog, eqn.endog, eqn.instruments)
     sys_res = sys_mod.fit()
     gmm_res = gmm_mod.fit()

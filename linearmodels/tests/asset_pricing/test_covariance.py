@@ -20,20 +20,20 @@ def data():
 
 
 def test_kernel_errors(data):
-    with pytest.raises(ValueError):
+    with pytest.raises(ValueError, match=r"Unknown kernel"):
         KernelWeight(data.moments, kernel="unknown")
-    with pytest.raises(ValueError):
+    with pytest.raises(ValueError, match=r"bandwidth must be non-negative"):
         KernelWeight(data.moments, bandwidth=-0.5)
-    with pytest.raises(ValueError):
+    with pytest.raises(ValueError, match=r"Unknown kernel"):
         KernelCovariance(data.moments, jacobian=data.jacobian, kernel="unknown")
-    with pytest.raises(ValueError):
+    with pytest.raises(ValueError, match=r"bandwidth must be non-negative"):
         KernelCovariance(data.moments, jacobian=data.jacobian, bandwidth=-4)
 
 
 def test_no_jacobian(data):
-    with pytest.raises(ValueError):
+    with pytest.raises(ValueError, match=r"One and only one of jacobian"):
         KernelCovariance(data.moments)
-    with pytest.raises(ValueError):
+    with pytest.raises(ValueError, match=r"One and only one of jacobian "):
         KernelCovariance(
             data.moments, jacobian=data.jacobian, inv_jacobian=data.inv_jacobian
         )

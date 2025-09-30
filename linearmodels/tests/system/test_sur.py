@@ -7,6 +7,8 @@ from numpy.testing import assert_allclose
 from pandas import DataFrame, Series, concat
 from pandas.testing import assert_frame_equal, assert_series_equal
 import pytest
+from scipy.sparse import csc_matrix, lil_matrix
+from scipy.sparse.linalg import inv as spinv
 import scipy.stats
 
 from linearmodels.iv.model import _OLS as OLS
@@ -125,12 +127,9 @@ kernels = ["bartlett", "newey-west", "parzen", "gallant", "qs", "andrews"]
 bandwidths = [None, 0, 10]
 debiased = [True, False]
 kernel_params = list(product(kernels, bandwidths, debiased))
-kernel_ids = list(
-    map(
-        lambda p: p[0] + ", BW: " + str(p[1]) + ", Debiased: " + str(p[2]),
-        kernel_params,
-    )
-)
+kernel_ids = [
+    p[0] + ", BW: " + str(p[1]) + ", Debiased: " + str(p[2]) for p in kernel_params
+]
 
 
 @pytest.fixture(params=kernel_params, ids=kernel_ids)
@@ -154,9 +153,9 @@ def test_smoke(data):
 
 
 def test_errors():
-    with pytest.raises(TypeError):
+    with pytest.raises(TypeError, match=r"equations must be a dictionary-like"):
         SUR([])
-    with pytest.raises(TypeError):
+    with pytest.raises(TypeError, match=r"Contents of each equation must be either"):
         SUR({"a": "absde", "b": 12345})
 
     moddata = {
@@ -165,8 +164,8 @@ def test_errors():
             "exog": np.random.standard_normal((100, 5)),
         }
     }
-    with pytest.raises(ValueError):
-        mod = SUR(moddata)
+    mod = SUR(moddata)
+    with pytest.raises(ValueError, match=r"Unknown cov_type"):
         mod.fit(cov_type="unknown")
 
     moddata = {
@@ -175,7 +174,7 @@ def test_errors():
             "exog": np.random.standard_normal((101, 5)),
         }
     }
-    with pytest.raises(ValueError):
+    with pytest.raises(ValueError, match=r"Array required to have"):
         SUR(moddata)
 
     moddata = {
@@ -184,13 +183,13 @@ def test_errors():
             "exog": np.random.standard_normal((10, 20)),
         }
     }
-    with pytest.raises(ValueError):
+    with pytest.raises(ValueError, match=r"Fewer observations than variables"):
         SUR(moddata)
 
     x = np.random.standard_normal((100, 2))
     x = np.c_[x, x]
     moddata = {"a": {"dependent": np.random.standard_normal((100, 1)), "exog": x}}
-    with pytest.raises(ValueError):
+    with pytest.raises(ValueError, match=r"Equation `a` regressor array"):
         SUR(moddata)
 
 
@@ -376,13 +375,13 @@ def test_gls_without_mv_ols_equiv(mvreg_data):
 def test_ols_against_gls(data):
     mod = SUR(data)
     res = mod.fit(method="gls")
-    if isinstance(data[list(data.keys())[0]], dict):
+    if isinstance(data[next(iter(data.keys()))], dict):
         predictions = mod.predict(res.params, equations=data)
         predictions2 = mod.predict(np.asarray(res.params)[:, None], equations=data)
         assert_allclose(predictions, predictions2)
     sigma = res.sigma
     sigma_m12 = inv_matrix_sqrt(np.asarray(sigma))
-    key = list(data.keys())[0]
+    key = next(iter(data.keys()))
 
     if isinstance(data[key], Mapping):
         y = [data[key]["dependent"] for key in data]
@@ -399,8 +398,8 @@ def test_ols_against_gls(data):
         except IndexError:
             w = [np.ones_like(data[key][0]) for key in data]
 
-    wy = [_y * np.sqrt(_w / _w.mean()) for _y, _w in zip(y, w)]
-    wx = [_x * np.sqrt(_w / _w.mean()) for _x, _w in zip(x, w)]
+    wy = [_y * np.sqrt(_w / _w.mean()) for _y, _w in zip(y, w, strict=False)]
+    wx = [_x * np.sqrt(_w / _w.mean()) for _x, _w in zip(x, w, strict=False)]
 
     wy = blocked_column_product(wy, sigma_m12)
     wx = blocked_diag_product(wx, sigma_m12)
@@ -446,24 +445,24 @@ def test_invalid_constraints(data):
     c2.iloc[::11] = 1
     r = concat([c1, c2], axis=1).T
     q = Series([0, 1], index=r.index)
-    with pytest.raises(TypeError):
+    with pytest.raises(TypeError, match=r"r must be a DataFram"):
         mod.add_constraints(r.values)
-    with pytest.raises(TypeError):
+    with pytest.raises(TypeError, match=r"q must be a Series"):
         mod.add_constraints(r, q.values)
 
     # 2. Wrong shape
-    with pytest.raises(ValueError):
+    with pytest.raises(ValueError, match=r"r is incompatible with the"):
         mod.add_constraints(r.iloc[:, :-2])
-    with pytest.raises(ValueError):
+    with pytest.raises(ValueError, match=r"Constraint inputs are not shape"):
         mod.add_constraints(r, q.iloc[:-1])
 
     # 3. Redundant constraint
     r = concat([c1, c1], axis=1).T
-    with pytest.raises(ValueError):
+    with pytest.raises(ValueError, match=r"Constraints must be non-redundant"):
         mod.add_constraints(r)
 
     # 4. Infeasible constraint
-    with pytest.raises(ValueError):
+    with pytest.raises(ValueError, match=r"One or more constraints are"):
         mod.add_constraints(r, q)
 
 
@@ -504,7 +503,7 @@ def test_formula_errors():
     data = DataFrame(
         np.random.standard_normal((500, 4)), columns=["y1", "y2", "x1", "x2"]
     )
-    with pytest.raises(TypeError):
+    with pytest.raises(TypeError, match=r"formula must be a string"):
         SUR.from_formula(np.ones(10), data)
 
 
@@ -580,7 +579,7 @@ def test_formula_partial_weights():
 
 def test_invalid_equation_labels(data):
     data = {i: data[key] for i, key in enumerate(data)}
-    with pytest.raises(ValueError):
+    with pytest.raises(ValueError, match=r"Equation labels \(keys\)"):
         SUR(data)
 
 
@@ -655,13 +654,13 @@ def test_invalid_kernel_options(kernel_options):
         output_dict=True,
     )
     mod = SUR(data)
-    with pytest.raises(TypeError):
-        ko = {k: v for k, v in kernel_options.items()}
-        ko["bandwidth"] = "None"
+    ko = dict(kernel_options.items())
+    ko["bandwidth"] = "None"
+    with pytest.raises(TypeError, match=r"bandwidth must be either None"):
         mod.fit(cov_type="kernel", **ko)
-    with pytest.raises(TypeError):
-        ko = {k: v for k, v in kernel_options.items()}
-        ko["kernel"] = 1
+    ko = dict(kernel_options.items())
+    ko["kernel"] = 1
+    with pytest.raises(TypeError, match=r"kernel must be the name of a kernel"):
         mod.fit(cov_type="kernel", **ko)
 
 
@@ -682,7 +681,7 @@ def test_fitted(data):
     expected = DataFrame(
         expected,
         index=mod._dependent[i].pandas.index,
-        columns=[key for key in res.equations],
+        columns=list(res.equations),
     )
     assert_frame_equal(expected, res.fitted_values)
 
@@ -724,7 +723,7 @@ def test_predict(missing_data):
     assert "idiosyncratic" in pred
     assert_frame_equal(pred["idiosyncratic"], res.resids)
 
-    nobs = missing_data[list(missing_data.keys())[0]]["dependent"].shape[0]
+    nobs = missing_data[next(iter(missing_data.keys()))]["dependent"].shape[0]
     pred = res.predict(fitted=True, idiosyncratic=False, dataframe=True, missing=True)
     assert pred.shape[0] == nobs
 
@@ -739,7 +738,7 @@ def test_predict(missing_data):
 def test_predict_error(missing_data):
     mod = SUR(missing_data)
     res = mod.fit()
-    with pytest.raises(ValueError):
+    with pytest.raises(ValueError, match=r"At least one output must be selected"):
         res.predict(fitted=False, idiosyncratic=False)
 
 
@@ -796,13 +795,11 @@ def direct_gls(eqns, scale):
         y.append(eqns[key]["dependent"])
         x.append(eqns[key]["exog"])
     y = scale * np.vstack(y)
-    from scipy.sparse import csc_matrix, lil_matrix
 
     n, k = x[0].shape
     _x = lil_matrix((len(x) * n, len(x) * k))
     for i, val in enumerate(x):
         _x[i * n : (i + 1) * n, i * k : (i + 1) * k] = val
-    from scipy.sparse.linalg import inv as spinv
 
     b = spinv(csc_matrix(_x.T @ _x)) @ (_x.T @ y)
     e = y - _x @ b
@@ -838,7 +835,7 @@ def test_tvalues_homogeneity(method, cov_type):
     if cov_type == "hac":
         kwargs["bandwidth"] = 1
     elif cov_type == "clustered":
-        key0 = list(eqns.keys())[0]
+        key0 = next(iter(eqns.keys()))
         nobs = eqns[key0]["dependent"].shape[0]
         rs = np.random.RandomState(231823)
         kwargs["clusters"] = rs.randint(0, nobs // 5, size=(nobs, 1))
@@ -907,7 +904,7 @@ def test_likelihood_ratio(k):
 
 def test_unknown_method():
     mod = SUR(generate_data(k=3))
-    with pytest.raises(ValueError, match="method must be 'ols' or 'gls'"):
+    with pytest.raises(ValueError, match=r"method must be 'ols' or 'gls'"):
         mod.fit(method="other")
 
 
