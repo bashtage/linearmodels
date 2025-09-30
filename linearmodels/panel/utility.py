@@ -7,7 +7,6 @@ from typing import Literal, NamedTuple, TypeVar, cast
 
 import numpy as np
 import numpy.random
-import pandas
 from pandas import DataFrame, concat, date_range
 import scipy.sparse as sp
 
@@ -20,6 +19,22 @@ try:
     HAS_CYTHON = True
 except ImportError:
     HAS_CYTHON = False
+
+
+__all__ = [
+    "AbsorbingEffectError",
+    "AbsorbingEffectWarning",
+    "_drop_singletons",
+    "_py_drop_singletons",
+    "_remove_node",
+    "check_absorbed",
+    "dummy_matrix",
+    "generate_panel_data",
+    "in_2core_graph",
+    "in_2core_graph_slow",
+    "not_absorbed",
+    "preconditioner",
+]
 
 
 class AbsorbingEffectError(Exception):
@@ -88,7 +103,7 @@ def preconditioner(
         d = np.asarray(d)
         if id(d) == d_id or copy:
             d = d.copy()
-        cond = cast(linearmodels.typing.data.Float64Array, np.sqrt((d**2).sum(0)))
+        cond = cast("linearmodels.typing.data.Float64Array", np.sqrt((d**2).sum(0)))
         d /= cond
         if klass is not None:
             d = d.view(klass)
@@ -105,7 +120,8 @@ def preconditioner(
             d_csc = d.copy()
 
     cond = cast(
-        linearmodels.typing.data.Float64Array, np.sqrt(d_csc.multiply(d_csc).sum(0)).A1
+        "linearmodels.typing.data.Float64Array",
+        np.sqrt(d_csc.multiply(d_csc).sum(0)).A1,
     )
     locs = np.zeros_like(d_csc.indices)
     locs[d_csc.indptr[1:-1]] = 1
@@ -301,7 +317,7 @@ def _py_drop_singletons(
 
 
 if not HAS_CYTHON:
-    _drop_singletons = _py_drop_singletons  # noqa: F811
+    _drop_singletons = _py_drop_singletons
 
 
 def in_2core_graph(
@@ -345,7 +361,7 @@ def in_2core_graph(
     for i in range(ncats):
         col_order = list(range(ncats))
         col_order.remove(i)
-        col_order = [i] + col_order
+        col_order = [i, *col_order]
         temp = zero_cats[:, col_order]
         idx = np.argsort(temp[:, 0])
         orig_dest_lst.append(temp[idx])
@@ -537,10 +553,10 @@ class PanelModelData(NamedTuple):
         DataFrame containing cluster ids.
     """
 
-    data: pandas.DataFrame
-    weights: pandas.DataFrame
-    other_effects: pandas.DataFrame
-    clusters: pandas.DataFrame
+    data: DataFrame
+    weights: DataFrame
+    other_effects: DataFrame
+    clusters: DataFrame
 
 
 def generate_panel_data(
@@ -639,7 +655,7 @@ def generate_panel_data(
         x.flat[locs] = np.nan
 
     entities = [f"firm{i}" for i in range(n)]
-    time = [dt for dt in date_range("1-1-1900", periods=t, freq=ANNUAL_FREQ)]
+    time = list(date_range("1-1-1900", periods=t, freq=ANNUAL_FREQ))
     var_names = [f"x{i}" for i in range(k)]
     if const:
         var_names[1:] = var_names[:-1]

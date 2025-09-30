@@ -25,7 +25,7 @@ for line in results:
     block.append(line)
 blocks[key] = block
 
-block = blocks[list(blocks.keys())[0]]
+block = blocks[next(iter(blocks.keys()))]
 
 
 def split_block(block):
@@ -105,9 +105,7 @@ def process_params(params):
     reformatted.append(new_line)
     sio = StringIO("\n".join(reformatted))
     values = pd.read_csv(sio, sep="\t", index_col=0, header=None)
-    new_index = []
-    for idx in list(values.index):
-        new_index.append(idx.replace("__", "_"))
+    new_index = [idx.replace("__", "_") for idx in list(values.index)]
     values.index = new_index
     values.index.name = "param"
     values.columns = ["param", "tstat", "pval"]

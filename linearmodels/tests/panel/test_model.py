@@ -1,5 +1,6 @@
 from itertools import product
 import pickle
+import warnings
 
 import numpy as np
 from numpy.testing import assert_allclose
@@ -22,12 +23,7 @@ TYPES = datatypes
 
 @pytest.fixture(
     params=list(product(PERC_MISSING, TYPES)),
-    ids=list(
-        map(
-            lambda x: str(int(100 * x[0])) + "-" + str(x[1]),
-            product(PERC_MISSING, TYPES),
-        )
-    ),
+    ids=[str(int(100 * x[0])) + "-" + str(x[1]) for x in product(PERC_MISSING, TYPES)],
 )
 def data(request):
     missing, datatype = request.param
@@ -106,28 +102,28 @@ def test_valid_weight_shape(data):
 
 def test_weight_incorrect_shape(data):
     weights = np.ones(np.prod(data.y.shape) - 1)
-    with pytest.raises(ValueError):
+    with pytest.raises(ValueError, match=r"Weights do not have a"):
         PanelOLS(data.y, data.x, weights=weights)
 
     weights = np.ones((data.y.shape[0], data.y.shape[1] - 1))
-    with pytest.raises(ValueError):
+    with pytest.raises(ValueError, match=r"Weights do not have a supported shape"):
         PanelOLS(data.y, data.x, weights=weights)
 
 
 def test_invalid_weight_values(data):
     w = PanelData(data.w)
     w.dataframe.iloc[::13, :] = 0.0
-    with pytest.raises(ValueError):
+    with pytest.raises(ValueError, match=r"weights must be strictly positive"):
         PanelOLS(data.y, data.x, weights=w)
 
     w = PanelData(data.w)
     w.dataframe.iloc[::13, :] = -0.0
-    with pytest.raises(ValueError):
+    with pytest.raises(ValueError, match=r"weights must be strictly positive"):
         PanelOLS(data.y, data.x, weights=w)
 
     w = PanelData(data.w)
     w.dataframe.iloc[::29, :] = -1.0
-    with pytest.raises(ValueError):
+    with pytest.raises(ValueError, match=r"weights must be strictly positive"):
         PanelOLS(data.y, data.x, weights=w)
 
 
@@ -171,8 +167,11 @@ def test_incorrect_weight_shape(data):
         w = w[None, :, :]
     else:  # xarray
         return
-
-    with pytest.raises(ValueError):
+    if isinstance(data.y, (pd.Series, pd.DataFrame)):
+        match = r"Weights do not have a supported"
+    else:
+        match = r"weights must have the same number"
+    with pytest.raises(ValueError, match=match):
         PanelOLS(data.y, data.x, weights=w)
 
 
@@ -214,8 +213,8 @@ def test_absorbing_effect(data, intercept):
             extra = [x, absorbed]
         x = np.concatenate(extra, 0)
 
+    mod = PanelOLS(data.y, x, entity_effects=True)
     with pytest.raises(AbsorbingEffectError) as exc_info:
-        mod = PanelOLS(data.y, x, entity_effects=True)
         mod.fit()
     var_names = mod.exog.vars
 
@@ -230,7 +229,6 @@ def test_all_missing(data):
     missing = y.isnull | x.isnull
     y.drop(missing)
     x.drop(missing)
-    import warnings
 
     with warnings.catch_warnings(record=True) as w:
         PanelOLS(y.dataframe, x.dataframe).fit()

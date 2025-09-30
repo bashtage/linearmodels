@@ -7,7 +7,6 @@ from functools import cached_property
 from typing import Any, Union
 
 import numpy as np
-import pandas
 from pandas import DataFrame, Series, concat
 from scipy import stats
 from statsmodels.iolib.summary import SimpleTable, fmt_2cols
@@ -19,7 +18,7 @@ from linearmodels.shared.io import _str, format_wide, param_table, pval_format
 from linearmodels.shared.utility import AttrDict
 import linearmodels.typing.data
 
-__all__ = ["Equation", "SystemResults", "SystemEquationResult", "GMMSystemResults"]
+__all__ = ["Equation", "GMMSystemResults", "SystemEquationResult", "SystemResults"]
 
 Equation = Union[
     tuple[linearmodels.typing.data.ArrayLike, linearmodels.typing.data.ArrayLike],
@@ -248,7 +247,7 @@ class SystemResults(_CommonResults):
     def _out_of_sample(
         self,
         equations: dict[str, dict[str, linearmodels.typing.data.ArrayLike]] | None,
-        data: pandas.DataFrame | None,
+        data: DataFrame | None,
         missing: bool,
         dataframe: bool,
     ) -> dict[str, Series] | DataFrame:
@@ -278,12 +277,12 @@ class SystemResults(_CommonResults):
             dict[str, dict[str, linearmodels.typing.data.ArrayLike]] | None
         ) = None,
         *,
-        data: pandas.DataFrame | None = None,
+        data: DataFrame | None = None,
         fitted: bool = True,
         idiosyncratic: bool = False,
         missing: bool = False,
         dataframe: bool = False,
-    ) -> pandas.DataFrame | dict:
+    ) -> DataFrame | dict:
         """
         In- and out-of-sample predictions
 
@@ -519,12 +518,10 @@ class SystemResults(_CommonResults):
                     formatted.append([" "])
                 smry.tables.append(SimpleTable(formatted, headers=["Instruments"]))
         extra_text = ["Covariance Estimator:"]
-        for line in str(self._cov_estimator).split("\n"):
-            extra_text.append(line)
+        extra_text.extend(list(str(self._cov_estimator).split("\n")))
         if self._weight_estimtor:
             extra_text.append("Weight Estimator:")
-            for line in str(self._weight_estimtor).split("\n"):
-                extra_text.append(line)
+            extra_text.extend(list(str(self._weight_estimtor).split("\n")))
         smry.add_extra_txt(extra_text)
 
         return smry

@@ -1,5 +1,7 @@
 from pandas import DataFrame
 
+from linearmodels import datasets
+
 DESCR = """
 T.A. Mroz (1987), "The Sensitivity of an Empirical Model of Married Women's
 Hours of Work to Economic and Statistical Assumptions," Econometrica 55,
@@ -31,6 +33,5 @@ expersq    exper^2
 
 
 def load() -> DataFrame:
-    from linearmodels import datasets
 
     return datasets.load(__file__, "mroz.csv.bz2")

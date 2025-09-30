@@ -13,10 +13,9 @@ from linearmodels.tests.system._utility import generate_simultaneous_data
 data = generate_simultaneous_data()
 all_cols: list[str] = []
 out: list[pd.Series] = []
-for key in data:
-    eqn = data[key]
-    for key in ("exog", "endog"):
-        vals = eqn[key]
+for eqn in data.values():
+    for key2 in ("exog", "endog"):
+        vals = eqn[key2]
         for col in vals:
             if col in all_cols:
                 continue
@@ -30,7 +29,8 @@ out_df.to_stata("simulated-3sls.dta", write_index=False)
 SEP = """
 
 file open myfile using {outfile}, write append
-file write myfile  "!!!!!!!!!!!!!!!!!!!!!!!!!!!!!! {method} !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!" _n
+file write myfile  \
+"!!!!!!!!!!!!!!!!!!!!!!!!!!!!!! {method} !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!" _n
 file close myfile
 
 """
@@ -47,10 +47,13 @@ OUTFILE = os.path.join(os.getcwd(), "stata-3sls-results.txt")
 
 header = [
     r'use "C:\git\linearmodels\linearmodels\tests\system\results\simulated-3sls.dta",'
-    + " clear"
+    r" clear"
 ]
 
-all_stats = "estout using {outfile}, cells(b(fmt(%13.12g)) t(fmt(%13.12g)) p(fmt(%13.12g))) stats("
+all_stats = (
+    "estout using {outfile}, cells(b(fmt(%13.12g)) t(fmt(%13.12g)) "
+    "p(fmt(%13.12g))) stats("
+)
 stats = ["chi2_", "F_", "p_", "df_m", "mss_", "r2_", "rss_"]
 for i in range(1, 4):
     all_stats += " ".join([f"{s}{i}" for s in stats]) + " "

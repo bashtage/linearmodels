@@ -7,7 +7,6 @@ from __future__ import annotations
 from collections.abc import Sequence
 from typing import cast
 
-import numpy
 from numpy import array, empty, ndarray, repeat, sqrt, zeros_like
 
 from linearmodels.asset_pricing.covariance import _HACMixin
@@ -53,9 +52,9 @@ class HomoskedasticWeightMatrix:
 
     def __str__(self) -> str:
         out = self._name
-        extra = []
-        for key in self._str_extra:
-            extra.append(": ".join([str(key), str(self._str_extra[key])]))
+        extra = [
+            ": ".join([str(key), str(self._str_extra[key])]) for key in self._str_extra
+        ]
         if extra:
             out += " (" + ", ".join(extra) + ")"
         return out
@@ -105,7 +104,7 @@ class HomoskedasticWeightMatrix:
         z: Sequence[linearmodels.typing.data.Float64Array],
         eps: linearmodels.typing.data.Float64Array,
         *,
-        sigma: numpy.ndarray,
+        sigma: ndarray,
     ) -> linearmodels.typing.data.Float64Array:
         """
         Construct a GMM weight matrix for a model.
@@ -127,7 +126,7 @@ class HomoskedasticWeightMatrix:
             Covariance of GMM moment conditions.
         """
         nobs = z[0].shape[0]
-        w = cast(ndarray, blocked_inner_prod(z, sigma) / nobs)
+        w = cast("ndarray", blocked_inner_prod(z, sigma) / nobs)
         return w
 
     @property
@@ -181,7 +180,7 @@ class HeteroskedasticWeightMatrix(HomoskedasticWeightMatrix):
         z: Sequence[linearmodels.typing.data.Float64Array],
         eps: linearmodels.typing.data.Float64Array,
         *,
-        sigma: numpy.ndarray | None = None,
+        sigma: ndarray | None = None,
     ) -> linearmodels.typing.data.Float64Array:
         """
         Construct a GMM weight matrix for a model.
@@ -204,7 +203,7 @@ class HeteroskedasticWeightMatrix(HomoskedasticWeightMatrix):
         """
         nobs = x[0].shape[0]
         k = len(x)
-        k_total = sum(map(lambda a: a.shape[1], z))
+        k_total = sum(a.shape[1] for a in z)
         ze = empty((nobs, k_total))
         loc = 0
         for i in range(k):
@@ -231,7 +230,7 @@ class HeteroskedasticWeightMatrix(HomoskedasticWeightMatrix):
         nvar = repeat(nvar, ninstr)
         if not self._debiased:
             nvar = zeros_like(nvar)
-        nvar = cast(linearmodels.typing.data.Float64Array, sqrt(nvar))[:, None]
+        nvar = cast("linearmodels.typing.data.Float64Array", sqrt(nvar))[:, None]
         scale = nobs / (nobs - nvar @ nvar.T)
         return scale
 
@@ -302,7 +301,7 @@ class KernelWeightMatrix(HeteroskedasticWeightMatrix, _HACMixin):
         z: Sequence[linearmodels.typing.data.Float64Array],
         eps: linearmodels.typing.data.Float64Array,
         *,
-        sigma: numpy.ndarray | None = None,
+        sigma: ndarray | None = None,
     ) -> linearmodels.typing.data.Float64Array:
         """
         Construct a GMM weight matrix for a model.
@@ -325,7 +324,7 @@ class KernelWeightMatrix(HeteroskedasticWeightMatrix, _HACMixin):
         """
         nobs = x[0].shape[0]
         k = len(x)
-        k_total = sum(map(lambda a: a.shape[1], z))
+        k_total = sum(a.shape[1] for a in z)
         ze = empty((nobs, k_total))
         loc = 0
         for i in range(k):

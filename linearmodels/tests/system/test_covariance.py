@@ -24,7 +24,7 @@ covs = [HeteroskedasticCovariance, HomoskedasticCovariance]
 names = ["Heteroskedastic", "Homoskedastic"]
 
 
-@pytest.fixture(params=list(zip(covs, names)))
+@pytest.fixture(params=list(zip(covs, names, strict=False)))
 def cov(request):
     eqns = generate_3sls_data_v2(k=3)
     est = request.param[0]
@@ -39,7 +39,7 @@ def cov(request):
 gmm_covs = [GMMHeteroskedasticCovariance, GMMHomoskedasticCovariance]
 
 
-@pytest.fixture(params=list(zip(gmm_covs, names)))
+@pytest.fixture(params=list(zip(gmm_covs, names, strict=False)))
 def gmm_cov(request):
     eqns = generate_3sls_data_v2(k=3)
     est = request.param[0]
@@ -47,7 +47,7 @@ def gmm_cov(request):
     sigma = np.eye(3)
     x = [eqns[key].exog for key in eqns]
     z = [np.concatenate([eqns[key].exog, eqns[key].instruments], 1) for key in eqns]
-    kz = sum(map(lambda a: a.shape[1], z))
+    kz = sum([a.shape[1] for a in z])
     w = np.eye(kz)
     n = x[0].shape[0]
     eps = np.random.standard_normal((n, 3))
@@ -73,7 +73,7 @@ def debias(request):
 
 def _xpxi(x):
     """Compute x'x^{-1} from block diagonal x"""
-    kx = sum(map(lambda a: a.shape[1], x))
+    kx = sum(a.shape[1] for a in x)
     k = len(x)
     nobs = x[0].shape[0]
     xpx = np.zeros((kx, kx))
@@ -277,7 +277,7 @@ def test_clustered_error(cov_data, debias):
     clusters = np.zeros((nobs, 2), dtype=int)
     clusters[:, 0] = np.arange(nobs) % 20
     clusters[:, 1] = np.arange(nobs) % 40
-    with pytest.raises(ValueError, match="clusters must be non-nested"):
+    with pytest.raises(ValueError, match=r"clusters must be non-nested"):
         ClusteredCovariance(
             x,
             eps,
@@ -288,7 +288,7 @@ def test_clustered_error(cov_data, debias):
             clusters=clusters,
         )
     clusters = np.ones((nobs, 3), dtype=int)
-    with pytest.raises(ValueError, match="clusters must be an ndarray"):
+    with pytest.raises(ValueError, match=r"clusters must be an ndarray"):
         ClusteredCovariance(
             x,
             eps,
@@ -299,7 +299,7 @@ def test_clustered_error(cov_data, debias):
             clusters=clusters,
         )
     clusters = np.ones((nobs, 2, 2), dtype=int)
-    with pytest.raises(ValueError, match="clusters must be an ndarray"):
+    with pytest.raises(ValueError, match=r"clusters must be an ndarray"):
         ClusteredCovariance(
             x,
             eps,

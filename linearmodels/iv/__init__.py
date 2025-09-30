@@ -7,7 +7,7 @@ __all__ = [
     "IVGMM",
     "IVGMMCUE",
     "IVLIML",
-    "compare",
     "AbsorbingLS",
     "Interaction",
+    "compare",
 ]

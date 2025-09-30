@@ -166,7 +166,7 @@ def test_attr_dict():
     with pytest.raises(AttributeError):
         ad.__private_dict__ = None
     with pytest.raises(AttributeError):
-        ad.some_other_key
+        _ = ad.some_other_key
     with pytest.raises(KeyError):
         ad["__private_dict__"] = None
 

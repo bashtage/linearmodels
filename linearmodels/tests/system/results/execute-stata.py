@@ -18,12 +18,12 @@ OUTFILE = os.path.join(os.getcwd(), "stata-sur-results.txt")
 
 header = [
     r'use "C:\git\linearmodels\linearmodels\tests\system\results\simulated-sur.dta"'
-    + ", clear"
+    ", clear"
 ]
 
 all_stats = (
     "estout using {outfile}, cells(b(fmt(%13.12g)) "
-    + "t(fmt(%13.12g)) p(fmt(%13.12g))) stats("
+    "t(fmt(%13.12g)) p(fmt(%13.12g))) stats("
 )
 stats = ["chi2_", "F_", "p_", "df_m", "mss_", "r2_", "rss_"]
 for i in range(1, 4):
@@ -77,7 +77,7 @@ for i, dataset in enumerate((data, common_data, missing_data)):
 
 outcmds = {}
 key_bases = ["basic", "common", "missing"]
-for key_base, cmd in zip(key_bases, cmds):
+for key_base, cmd in zip(key_bases, cmds, strict=False):
     base = "sureg " + cmd
     ss = base + ", small dfk"
     comp = cmd.replace("(", "").strip().split(")")[:-1]
@@ -86,7 +86,7 @@ for key_base, cmd in zip(key_bases, cmds):
     first = [c.split(" ")[1] for c in comp]
     vals = {}
     i = 0
-    for d, f in zip(deps, first):
+    for d, f in zip(deps, first, strict=False):
         vals["y" + str(i)] = d
         vals["x" + str(i)] = f
         i += 1
@@ -107,9 +107,9 @@ file close myfile\n
 """
 with open("sur.do", "w") as stata_file:
     stata_file.write("\n".join(header) + "\n")
-    for outcmd in outcmds:
+    for outcmd, outcmds_value in outcmds.items():
         stata_file.write(sep.format(outfile=OUTFILE, key=outcmd))
-        stata_file.write(outcmds[outcmd] + "\n")
+        stata_file.write(outcmds_value + "\n")
         stata_file.write(f"\n{output}\n\n")
         stata_file.write("\n" * 5)
 

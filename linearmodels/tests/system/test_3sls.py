@@ -132,7 +132,7 @@ def test_direct_simple(data):
 
 
 def test_single_equation(data):
-    key = list(data.keys())[0]
+    key = next(iter(data.keys()))
     data = {key: data[key]}
 
     mod = IV3SLS(data)
@@ -171,7 +171,7 @@ def test_too_few_instruments():
     eqns = {}
     for i in range(2):
         eqns[f"eqn.{i}"] = (dep[:, i], exog, endog, instr)
-    with pytest.raises(ValueError):
+    with pytest.raises(ValueError, match=r"Equation `eqn.0`"):
         IV3SLS(eqns)
 
 
@@ -185,7 +185,7 @@ def test_redundant_instruments():
     eqns = {}
     for i in range(2):
         eqns[f"eqn.{i}"] = (dep[:, i], exog, endog, instr)
-    with pytest.raises(ValueError):
+    with pytest.raises(ValueError, match=r"Equation eqn.0"):
         IV3SLS(eqns)
 
 
@@ -198,7 +198,7 @@ def test_too_many_instruments():
     eqns = {}
     for i in range(2):
         eqns[f"eqn.{i}"] = (dep[:, i], exog, endog, instr)
-    with pytest.raises(ValueError):
+    with pytest.raises(ValueError, match=r"Fewer observations than instruments"):
         IV3SLS(eqns)
 
 
@@ -209,16 +209,14 @@ def test_wrong_input_type():
     endog = np.random.standard_normal((n, 2))
     instr = np.random.standard_normal((n, 1))
     instr = np.concatenate([exog, instr], 1)
-    eqns = []
-    for i in range(2):
-        eqns.append((dep[:, i], exog, endog, instr))
-    with pytest.raises(TypeError):
+    eqns = [(dep[:, i], exog, endog, instr) for i in range(2)]
+    with pytest.raises(TypeError, match=r"equations must be a dictionar"):
         IV3SLS(eqns)
 
     eqns = {}
     for i in range(2):
         eqns[i] = (dep[:, i], exog, endog, instr)
-    with pytest.raises(ValueError):
+    with pytest.raises(ValueError, match=r"Equation labels \(keys\)"):
         IV3SLS(eqns)
 
 
@@ -249,7 +247,7 @@ def test_multivariate_iv_bad_data():
     instr = np.random.standard_normal((n, 3))
     instr = DataFrame(instr, columns=[f"instr.{i}" for i in range(3)])
 
-    with pytest.raises(ValueError):
+    with pytest.raises(ValueError, match=r"At least one of exog or endog"):
         IV3SLS.multivariate_iv(dep, None, None, instr)
 
 
@@ -270,7 +268,7 @@ def test_fitted(data):
     expected = DataFrame(
         expected,
         index=mod._dependent[i].pandas.index,
-        columns=[key for key in res.equations],
+        columns=list(res.equations),
     )
     assert_frame_equal(expected, res.fitted_values)
 
@@ -331,9 +329,9 @@ def test_no_endog():
 
 def test_uneven_shapes():
     data = generate_3sls_data_v2()
-    eq = data[list(data.keys())[0]]
+    eq = data[next(iter(data.keys()))]
     eq["weights"] = np.ones(eq.dependent.shape[0] // 2)
-    with pytest.raises(ValueError):
+    with pytest.raises(ValueError, match=r"Dependent, exogenous, endogenous"):
         IV3SLS(data)
 
 

@@ -3,7 +3,7 @@ from __future__ import annotations
 from linearmodels.compat.statsmodels import Summary
 
 from collections.abc import Sequence
-from typing import Any
+from typing import Any, ClassVar
 
 import numpy as np
 from pandas import DataFrame, Index, Series, concat
@@ -35,8 +35,8 @@ class _ModelComparison(_SummaryStr):
     Base class for model comparisons
     """
 
-    _supported: tuple[type, ...] = tuple()
-    _PRECISION_TYPES = {
+    _supported: tuple[type, ...] = ()
+    _PRECISION_TYPES: ClassVar[dict[str, str]] = {
         "tstats": "T-stats",
         "pvalues": "P-values",
         "std_errors": "Std. Errors",
@@ -128,5 +128,5 @@ class _ModelComparison(_SummaryStr):
         )
         for loc in out.index:
             # TODO: Bug in pandas-stubs
-            out_df.loc[loc] = out[loc].stat, out[loc].pval  # type: ignore
+            out_df.loc[loc] = out[loc].stat, out[loc].pval
         return out_df

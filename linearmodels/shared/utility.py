@@ -14,20 +14,18 @@ from collections.abc import (
 from typing import Any, Protocol, TypeVar, cast
 
 import numpy as np
-import pandas
 from pandas import DataFrame, Index, MultiIndex, Series
 
 from linearmodels.typing import AnyArray, Label
 
 _KT = TypeVar("_KT")
-_VT = TypeVar("_VT")
 _VT_co = TypeVar("_VT_co", covariant=True)
 
 
 class SupportsKeysAndGetItem(Protocol[_KT, _VT_co]):
-    def keys(self) -> Iterable[_KT]: ...  # noqa: E704
+    def keys(self) -> Iterable[_KT]: ...
 
-    def __getitem__(self, __k: _KT) -> _VT_co: ...  # noqa: E704
+    def __getitem__(self, __k: _KT, /) -> _VT_co: ...
 
 
 def _new_attr_dict_(*args: Iterable[tuple[Any, Any]]) -> AttrDict:
@@ -145,9 +143,7 @@ class AttrDict(MutableMapping):
         return self.__private_dict__.__iter__()
 
 
-def ensure_unique_column(
-    col_name: str, df: pandas.DataFrame, addition: str = "_"
-) -> str:
+def ensure_unique_column(col_name: str, df: DataFrame, addition: str = "_") -> str:
     while col_name in df:
         col_name = addition + col_name + addition
     return col_name
@@ -198,7 +194,7 @@ def panel_to_frame(
         df.index = mi.swaplevel()
         df.sort_index(inplace=True)
         final_levels = [minor_axis, major_axis]
-    mi_index = cast(MultiIndex, df.index)
+    mi_index = cast("MultiIndex", df.index)
     df.index = mi_index.set_levels(levels=final_levels, level=[0, 1])
     df.index.names = ["major", "minor"]
     return df

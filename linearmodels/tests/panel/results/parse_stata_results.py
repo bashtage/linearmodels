@@ -13,15 +13,15 @@ block: list[str] = []
 key = ""
 with open(os.path.join(cwd, filename)) as results:
     for line in results.readlines():
-        line = line.strip()
-        if not line:
+        _line = line.strip()
+        if not _line:
             continue
-        if "###!" in line:
+        if "###!" in _line:
             if key:
                 blocks[key] = block
             block = []
-            key = line.split("!")[1]
-        block.append(line)
+            key = _line.split("!")[1]
+        block.append(_line)
     if block:
         blocks[key] = block
 
@@ -65,8 +65,8 @@ def parse_block(block):
 
 def data():
     data_blocks = {}
-    for key in blocks:
-        data_blocks[key] = parse_block(blocks[key])
+    for key, block_val in blocks.items():
+        data_blocks[key] = parse_block(block_val)
     return data_blocks
 
 

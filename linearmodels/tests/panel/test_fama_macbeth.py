@@ -70,7 +70,7 @@ def test_fama_macbeth(data):
 
 
 def test_unknown_cov_type(data):
-    with pytest.raises(ValueError):
+    with pytest.raises(ValueError, match=r"Unknown cov_type"):
         FamaMacBeth(data.y, data.x).fit(cov_type="unknown")
 
 
@@ -138,7 +138,7 @@ def test_block_size_error():
     )
     y = pd.DataFrame(y, index=idx, columns=["y"])
     x = pd.DataFrame(x, index=idx, columns=["x1", "x2"])
-    with pytest.raises(ValueError):
+    with pytest.raises(ValueError, match=r"Model cannot be estimated"):
         FamaMacBeth(y, x)
 
 

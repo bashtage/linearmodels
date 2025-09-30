@@ -11,7 +11,6 @@ import datetime as dt
 from functools import cached_property
 from typing import Any, Union
 
-import numpy
 from numpy import (
     array,
     asarray,
@@ -26,9 +25,8 @@ from numpy import (
     squeeze,
 )
 from numpy.linalg import inv
-import pandas
 from pandas import DataFrame, Series, concat, to_numeric
-import scipy.stats as stats
+from scipy import stats
 from statsmodels.iolib.summary import SimpleTable, fmt_2cols, fmt_params
 from statsmodels.iolib.table import default_txt_fmt
 
@@ -409,8 +407,8 @@ class _LSModelResultsBase(_SummaryStr):
 
     def wald_test(
         self,
-        restriction: pandas.DataFrame | numpy.ndarray | None = None,
-        value: pandas.Series | numpy.ndarray | None = None,
+        restriction: DataFrame | ndarray | None = None,
+        value: Series | ndarray | None = None,
         *,
         formula: str | list[str] | dict[str, float] | None = None,
     ) -> WaldTestStatistic:
@@ -526,7 +524,7 @@ class OLSResults(_LSModelResultsBase):
         exog: linearmodels.typing.data.ArrayLike | None = None,
         endog: linearmodels.typing.data.ArrayLike | None = None,
         *,
-        data: pandas.DataFrame | None = None,
+        data: DataFrame | None = None,
         fitted: bool = True,
         idiosyncratic: bool = False,
         missing: bool = False,
@@ -597,8 +595,8 @@ class OLSResults(_LSModelResultsBase):
             extra_text.append("Endogenous: " + ", ".join(endog.cols))
             extra_text.append("Instruments: " + ", ".join(instruments.cols))
             cov_descr = str(self._cov_estimator)
-            for line in cov_descr.split("\n"):
-                extra_text.append(line)
+            extra_text.extend(list(cov_descr.split("\n")))
+
         return extra_text
 
 
@@ -838,7 +836,7 @@ class FirstStageResults(_SummaryStr):
             if c != "f.dist":
                 vals.append([_str(v) for v in diagnostics[c]])
             else:
-                vals.append([v for v in diagnostics[c]])
+                vals.append(list(diagnostics[c]))
         stubs = [stubs_lookup[s] for s in list(diagnostics.columns)]
         header = list(diagnostics.index)
 
@@ -1015,7 +1013,7 @@ class IVResults(_CommonIVResults):
         name = "Basmann's test of overidentification"
         if ninstr - nendog == 0:
             return InvalidTestStatistic(
-                "Test requires more instruments than " "endogenous variables.",
+                "Test requires more instruments than endogenous variables.",
                 name=name,
             )
         sargan_test = self.sargan
@@ -1303,7 +1301,7 @@ class IVResults(_CommonIVResults):
         name = "Wooldridge's score test of overidentification"
         if ninstr - nendog == 0:
             return InvalidTestStatistic(
-                "Test requires more instruments than " "endogenous variables.",
+                "Test requires more instruments than endogenous variables.",
                 name=name,
             )
 
@@ -1345,7 +1343,7 @@ class IVResults(_CommonIVResults):
         name = "Anderson-Rubin test of overidentification"
         if ninstr - nendog == 0:
             return InvalidTestStatistic(
-                "Test requires more instruments than " "endogenous variables.",
+                "Test requires more instruments than endogenous variables.",
                 name=name,
             )
         assert self._liml_kappa is not None
@@ -1381,7 +1379,7 @@ class IVResults(_CommonIVResults):
         name = "Basmann' F  test of overidentification"
         if ninstr - nendog == 0:
             return InvalidTestStatistic(
-                "Test requires more instruments than " "endogenous variables.",
+                "Test requires more instruments than endogenous variables.",
                 name=name,
             )
         df = ninstr - nendog
@@ -1639,7 +1637,7 @@ class IVModelComparison(_ModelComparison):
             ],
             axis=1,
         )
-        vals_list = [[i for i in v] for v in vals.T.to_numpy()]
+        vals_list = [list(v) for v in vals.T.to_numpy()]
         vals_list[2] = [str(v) for v in vals_list[2]]
         for i in range(4, len(vals_list)):
             vals_list[i] = [_str(v) for v in vals_list[i]]
@@ -1652,7 +1650,7 @@ class IVModelComparison(_ModelComparison):
 
         for i in range(len(params)):
             formatted_and_starred = []
-            for v, pv in zip(params.to_numpy()[i], pvalues[i]):
+            for v, pv in zip(params.to_numpy()[i], pvalues[i], strict=False):
                 formatted_and_starred.append(add_star(_str(v), pv, self._stars))
             params_fmt.append(formatted_and_starred)
             precision_fmt = []

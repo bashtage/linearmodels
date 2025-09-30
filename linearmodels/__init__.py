@@ -35,6 +35,7 @@ Designed to work equally well with NumPy, Pandas or xarray data.
 from __future__ import annotations
 
 import os
+import sys
 
 from ._version import version as __version__, version_tuple
 from .asset_pricing.model import (
@@ -55,34 +56,34 @@ from .panel.model import (
 from .system import IV3SLS, SUR, IVSystemGMM
 
 OLS = _OLS
-WARN_ON_MISSING = os.environ.get("LINEARMODELS_WARN_ON_MISSING", True)
-WARN_ON_MISSING = False if WARN_ON_MISSING in ("0", "False") else True
-DROP_MISSING = os.environ.get("LINEARMODELS_DROP_MISSING", True)
-DROP_MISSING = False if DROP_MISSING in ("0", "False") else True
+WARN_ON_MISSING = os.environ.get("LINEARMODELS_WARN_ON_MISSING", "1")
+WARN_ON_MISSING = False if WARN_ON_MISSING in ("", "0", "false", "False") else True
+DROP_MISSING = os.environ.get("LINEARMODELS_DROP_MISSING", "1")
+DROP_MISSING = False if DROP_MISSING in ("", "0", "false", "False") else True
 
 __all__ = [
-    "AbsorbingLS",
-    "PooledOLS",
-    "PanelOLS",
-    "FirstDifferenceOLS",
-    "BetweenOLS",
-    "RandomEffects",
-    "FamaMacBeth",
-    "IVLIML",
+    "DROP_MISSING",
+    "IV2SLS",
+    "IV3SLS",
     "IVGMM",
     "IVGMMCUE",
-    "IV2SLS",
+    "IVLIML",
     "OLS",
     "SUR",
-    "IV3SLS",
+    "WARN_ON_MISSING",
+    "AbsorbingLS",
+    "BetweenOLS",
+    "FamaMacBeth",
+    "FirstDifferenceOLS",
     "IVSystemGMM",
     "LinearFactorModel",
     "LinearFactorModelGMM",
+    "PanelOLS",
+    "PooledOLS",
+    "RandomEffects",
     "TradedFactorModel",
-    "WARN_ON_MISSING",
-    "DROP_MISSING",
-    "version_tuple",
     "__version__",
+    "version_tuple",
 ]
 
 
@@ -92,12 +93,11 @@ def test(
     append: bool = True,
     location: str = "",
 ) -> int:
-    import sys
 
     try:
-        import pytest
-    except ImportError:  # pragma: no cover
-        raise ImportError("Need pytest to run tests")
+        import pytest  # noqa: PLC0415
+    except ImportError as exc:  # pragma: no cover
+        raise ImportError("Need pytest to run tests") from exc
 
     cmd = ["--tb=auto"]
     if extra_args:
@@ -117,7 +117,7 @@ def test(
         print(pkg)
     if not os.path.exists(pkg):
         raise RuntimeError(f"{pkg} was not found. Unable to run tests")
-    cmd = [pkg] + cmd
+    cmd = [pkg, *cmd]
     print("running: pytest {}".format(" ".join(cmd)))
     status = pytest.main(cmd)
     if exit:  # pragma: no cover

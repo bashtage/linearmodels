@@ -1,5 +1,7 @@
+import linearmodels.compat.statsmodels
 from linearmodels.compat.statsmodels import Summary
 
+import copy
 import warnings
 
 import numpy as np
@@ -25,7 +27,7 @@ def gen_data(n=1000):
     clusters = rs.randint(0, 10, n)
 
     rho = 0.5
-    r = scipy.linalg.toeplitz([1] + (rho + np.linspace(0.1, -0.1, 8)).tolist())
+    r = scipy.linalg.toeplitz([1, *(rho + np.linspace(0.1, -0.1, 8)).tolist()])
     r[-1, 2:] = 0
     r[2:, -1] = 0
     r[-1, -1] = 1
@@ -89,41 +91,41 @@ def get_all(v):
 def test_rank_deficient_exog_exception(data):
     exog = data.exog.copy()
     exog[:, :2] = 1
-    with pytest.raises(ValueError):
+    with pytest.raises(ValueError, match=r"regressors \[exog endog\] do not have"):
         IV2SLS(data.dep, exog, data.endog, data.instr)
 
 
 def test_rank_deficient_endog_exception(data):
     endog = data.endog.copy()
     endog[:, :2] = 1
-    with pytest.raises(ValueError):
+    with pytest.raises(ValueError, match=r"regressors \[exog endog\] do not have"):
         IV2SLS(data.dep, data.exog, endog, data.instr)
-    with pytest.raises(ValueError):
+    with pytest.raises(ValueError, match=r"regressors \[exog endog\] do not have"):
         IV2SLS(data.dep, data.exog, data.exog, data.instr)
 
 
 def test_invalid_weights_exception(data):
     weights = np.zeros_like(data.dep)
-    with pytest.raises(ValueError):
+    with pytest.raises(ValueError, match=r"weights must be strictly positive."):
         IV2SLS(data.dep, data.exog, data.endog, data.instr, weights=weights)
 
 
 def test_rank_deficient_instr_exception(data):
     instr = data.instr.copy()
     instr[:, :2] = 1
-    with pytest.raises(ValueError):
+    with pytest.raises(ValueError, match=r"instruments \[exog instruments\]"):
         IV2SLS(data.dep, data.exog, data.endog, instr)
-    with pytest.raises(ValueError):
+    with pytest.raises(ValueError, match=r"instruments \[exog instruments\]"):
         IV2SLS(data.dep, data.exog, data.endog, data.exog)
 
 
 def test_kappa_error_exception(data):
-    with pytest.raises(ValueError):
+    with pytest.raises(ValueError, match=r"kappa must be None or a scalar"):
         IVLIML(data.dep, data.exog, data.endog, data.instr, kappa=np.array([1]))
 
 
 def test_fuller_error_exception(data):
-    with pytest.raises(ValueError):
+    with pytest.raises(ValueError, match=r"fuller must be None or a scalar"):
         IVLIML(data.dep, data.exog, data.endog, data.instr, fuller=np.array([1]))
 
 
@@ -146,12 +148,12 @@ def test_string_cat_exception(data):
 
 
 def test_no_regressors_exception(data):
-    with pytest.raises(ValueError):
+    with pytest.raises(ValueError, match=r"Model must contain at least one"):
         IV2SLS(data.dep, None, None, None)
 
 
 def test_too_few_instruments_exception(data):
-    with pytest.raises(ValueError):
+    with pytest.raises(ValueError, match=r"The number of instruments"):
         IV2SLS(data.dep, data.exog, data.endog, None)
 
 
@@ -242,7 +244,7 @@ def test_gmm_cue_starting_vals(data):
     mod = IVGMMCUE(data.dep, data.exog, data.endog, data.instr)
     mod.fit(starting=sv, display=False)
 
-    with pytest.raises(ValueError):
+    with pytest.raises(ValueError, match=r"starting does not have the correct"):
         mod.fit(starting=sv[:-1], display=True)
 
 
@@ -301,17 +303,16 @@ def test_model_summary_smoke(data):
     res.__repr__()
     res.__str__()
     res._repr_html_()
-    res.summary
+    assert isinstance(res.summary, linearmodels.compat.statsmodels.Summary)
 
     res = _OLS(data.dep, data.exog).fit()
     res.__repr__()
     res.__str__()
     res._repr_html_()
-    res.summary
+    assert isinstance(res.summary, linearmodels.compat.statsmodels.Summary)
 
 
 def test_model_missing(data):
-    import copy
 
     data2 = AttrDict()
     for key in data:
@@ -402,9 +403,9 @@ def test_gmm_str(data):
 def test_gmm_cue_optimization_options(small_data):
     mod = IVGMMCUE(small_data.dep, small_data.exog, small_data.endog, small_data.instr)
     res_none = mod.fit(display=False)
-    opt_options = dict(method="BFGS", options={"disp": False})
+    opt_options = {"method": "BFGS", "options": {"disp": False}}
     res_bfgs = mod.fit(display=False, opt_options=opt_options)
-    opt_options = dict(method="L-BFGS-B")
+    opt_options = {"method": "L-BFGS-B"}
     res_lbfgsb = mod.fit(display=False, opt_options=opt_options)
     assert res_none.iterations > 2
     assert res_bfgs.iterations > 2
@@ -472,9 +473,9 @@ def test_initial_weight_error(data):
     z = np.concatenate([data.exog, data.instr], 1)
     ze = z + np.random.standard_normal(size=z.shape)
     w0 = ze.T @ ze / ze.shape[0]
-    with pytest.raises(ValueError, match="initial_weight must"):
+    with pytest.raises(ValueError, match=r"initial_weight must"):
         mod.fit(initial_weight=w0[:-1, :-1])
-    with pytest.raises(ValueError, match="initial_weight must"):
+    with pytest.raises(ValueError, match=r"initial_weight must"):
         mod.fit(initial_weight=w0[:-1])
 
 

@@ -27,7 +27,7 @@ variance_options = [
     "vce(cluster cluster_id)",
     "vce(hac bartlett 12)",
 ]
-depvar_with_var = list(zip(depvars, variance_options))
+depvar_with_var = list(zip(depvars, variance_options, strict=False))
 exog_vars = ["", "x3 x4 x5"]
 endog_vars = ["x1", "x1 x2"]
 instr = ["z1", "z1 z2"]
