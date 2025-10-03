@@ -12,3 +12,4 @@ seaborn
 xarray>=0.13
 wheel
 pyarrow
+zipp>=3.19.1 # not directly required, pinned by Snyk to avoid a vulnerability
