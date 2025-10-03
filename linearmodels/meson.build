@@ -59,7 +59,7 @@ else
   # When building from sdist, version.py exists and should be included
   py.install_sources(
     ['_version.py'],
-
+    subdir : 'linearmodels'
   )
 endif
 
