@@ -23,7 +23,7 @@
     
   
       
-        <title>Three-stage Least Squares (3SLS) - linearmodels v6.2 (+70)</title>
+        <title>Three-stage Least Squares (3SLS) - linearmodels v6.2 (+82)</title>
       
     
 
@@ -101,7 +101,7 @@
 
 <header class="md-header md-header--shadow" data-md-component="header">
   <nav class="md-header__inner md-grid" aria-label="Header">
-    <a href="../../index.html" title="linearmodels v6.2 (+70)" class="md-header__button md-logo" aria-label="linearmodels v6.2 (+70)" data-md-component="logo">
+    <a href="../../index.html" title="linearmodels v6.2 (+82)" class="md-header__button md-logo" aria-label="linearmodels v6.2 (+82)" data-md-component="logo">
       <img src="../../_static/bw-logo.svg" alt="logo">
     </a>
     <label class="md-header__button md-icon" for="__drawer">
@@ -112,7 +112,7 @@
       <div class="md-header__ellipsis">
         <div class="md-header__topic">
           <span class="md-ellipsis">
-            linearmodels v6.2 (+70)
+            linearmodels v6.2 (+82)
           </span>
         </div>
         <div class="md-header__topic" data-md-component="header-topic">
@@ -207,10 +207,10 @@
 
 <nav class="md-nav md-nav--primary" aria-label="Navigation" data-md-level="0">
   <label class="md-nav__title" for="__drawer">
-    <a href="../../index.html" title="linearmodels v6.2 (+70)" class="md-nav__button md-logo" aria-label="linearmodels v6.2 (+70)" data-md-component="logo">
+    <a href="../../index.html" title="linearmodels v6.2 (+82)" class="md-nav__button md-logo" aria-label="linearmodels v6.2 (+82)" data-md-component="logo">
       <img src="../../_static/bw-logo.svg" alt="logo">
     </a>
-    linearmodels v6.2 (+70)
+    linearmodels v6.2 (+82)
   </label>
   
     <div class="md-nav__source">
@@ -1027,8 +1027,8 @@ hours &amp; = &amp; \beta_0 + \beta_1 \ln(wage) + \beta_2 educ + \beta_3 age + \
 Dep. Variable:                  hours   R-squared:                      0.1903
 Estimator:                    IV-2SLS   Adj. R-squared:                 0.1807
 No. Observations:                 428   F-statistic:                    399.30
-Date:                Tue, Sep 30 2025   P-value (F-stat)                0.0000
-Time:                        22:20:06   Distribution:                  chi2(5)
+Date:                Fri, Oct 03 2025   P-value (F-stat)                0.0000
+Time:                        17:11:53   Distribution:                  chi2(5)
 Cov. Estimator:            unadjusted
 
                              Parameter Estimates
@@ -1071,8 +1071,8 @@ Debiased: False
 Dep. Variable:                  lwage   R-squared:                      0.7582
 Estimator:                    IV-2SLS   Adj. R-squared:                 0.7559
 No. Observations:                 428   F-statistic:                    1362.4
-Date:                Tue, Sep 30 2025   P-value (F-stat)                0.0000
-Time:                        22:20:06   Distribution:                  chi2(4)
+Date:                Fri, Oct 03 2025   P-value (F-stat)                0.0000
+Time:                        17:11:53   Distribution:                  chi2(4)
 Cov. Estimator:            unadjusted
 
                              Parameter Estimates
@@ -1097,7 +1097,7 @@ Debiased: False
 <div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span><code>[6]:
 </code></pre></div>
 </div>
-<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><code><span class="n">equations</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">(</span><span class="n">hours</span><span class="o">=</span><span class="n">hours</span><span class="p">,</span> <span class="n">lwage</span><span class="o">=</span><span class="n">lwage</span><span class="p">)</span>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><code><span class="n">equations</span> <span class="o">=</span> <span class="p">{</span><span class="s2">&quot;hours&quot;</span><span class="p">:</span> <span class="n">hours</span><span class="p">,</span> <span class="s2">&quot;lwage&quot;</span><span class="p">:</span> <span class="n">lwage</span><span class="p">}</span>
 <span class="n">system_2sls</span> <span class="o">=</span> <span class="n">IV3SLS</span><span class="o">.</span><span class="n">from_formula</span><span class="p">(</span><span class="n">equations</span><span class="p">,</span> <span class="n">data</span><span class="p">)</span>
 <span class="n">system_2sls_res</span> <span class="o">=</span> <span class="n">system_2sls</span><span class="o">.</span><span class="n">fit</span><span class="p">(</span><span class="n">method</span><span class="o">=</span><span class="s2">&quot;ols&quot;</span><span class="p">,</span> <span class="n">cov_type</span><span class="o">=</span><span class="s2">&quot;unadjusted&quot;</span><span class="p">)</span>
 <span class="nb">print</span><span class="p">(</span><span class="n">system_2sls_res</span><span class="p">)</span>
@@ -1114,8 +1114,8 @@ Debiased: False
 Estimator:                        OLS   Overall R-squared:                   0.1903
 No. Equations.:                     2   McElroy&#39;s R-squared:                 0.1276
 No. Observations:                 428   Judge&#39;s (OLS) R-squared:            -2.0961
-Date:                Tue, Sep 30 2025   Berndt&#39;s R-squared:                 -0.7279
-Time:                        22:20:06   Dhrymes&#39;s R-squared:                 0.1903
+Date:                Fri, Oct 03 2025   Berndt&#39;s R-squared:                 -0.7279
+Time:                        17:11:53   Dhrymes&#39;s R-squared:                 0.1903
                                         Cov. Estimator:                  unadjusted
                                         Num. Constraints:                      None
                   Equation: hours, Dependent Variable: hours
@@ -1156,8 +1156,7 @@ Homoskedastic (Unadjusted) Covariance (Debiased: False, GLS: False)
 <div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span><code>[7]:
 </code></pre></div>
 </div>
-<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><code><span class="n">equations</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">(</span><span class="n">hours</span><span class="o">=</span><span class="n">hours</span><span class="p">,</span> <span class="n">lwage</span><span class="o">=</span><span class="n">lwage</span><span class="p">)</span>
-<span class="n">system_3sls</span> <span class="o">=</span> <span class="n">IV3SLS</span><span class="o">.</span><span class="n">from_formula</span><span class="p">(</span><span class="n">equations</span><span class="p">,</span> <span class="n">data</span><span class="p">)</span>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><code><span class="n">system_3sls</span> <span class="o">=</span> <span class="n">IV3SLS</span><span class="o">.</span><span class="n">from_formula</span><span class="p">(</span><span class="n">equations</span><span class="p">,</span> <span class="n">data</span><span class="p">)</span>
 <span class="n">system_3sls_res</span> <span class="o">=</span> <span class="n">system_3sls</span><span class="o">.</span><span class="n">fit</span><span class="p">(</span><span class="n">method</span><span class="o">=</span><span class="s2">&quot;gls&quot;</span><span class="p">,</span> <span class="n">cov_type</span><span class="o">=</span><span class="s2">&quot;unadjusted&quot;</span><span class="p">)</span>
 <span class="nb">print</span><span class="p">(</span><span class="n">system_3sls_res</span><span class="p">)</span>
 </code></pre></div>
@@ -1173,8 +1172,8 @@ Homoskedastic (Unadjusted) Covariance (Debiased: False, GLS: False)
 Estimator:                        GLS   Overall R-squared:                   0.0120
 No. Equations.:                     2   McElroy&#39;s R-squared:                 0.0873
 No. Observations:                 428   Judge&#39;s (OLS) R-squared:            -2.7778
-Date:                Tue, Sep 30 2025   Berndt&#39;s R-squared:                 -0.7279
-Time:                        22:20:06   Dhrymes&#39;s R-squared:                 0.0120
+Date:                Fri, Oct 03 2025   Berndt&#39;s R-squared:                 -0.7279
+Time:                        17:11:53   Dhrymes&#39;s R-squared:                 0.0120
                                         Cov. Estimator:                  unadjusted
                                         Num. Constraints:                      None
                   Equation: hours, Dependent Variable: hours
@@ -1237,7 +1236,7 @@ Homoskedastic (Unadjusted) Covariance (Debiased: False, GLS: True)
     <span class="s2">&quot;instruments&quot;</span><span class="p">:</span> <span class="n">data</span><span class="p">[[</span><span class="s2">&quot;age&quot;</span><span class="p">,</span> <span class="s2">&quot;kidslt6&quot;</span><span class="p">,</span> <span class="s2">&quot;nwifeinc&quot;</span><span class="p">]],</span>
 <span class="p">}</span>
 
-<span class="n">equations</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">(</span><span class="n">hours</span><span class="o">=</span><span class="n">hours</span><span class="p">,</span> <span class="n">lwage</span><span class="o">=</span><span class="n">lwage</span><span class="p">)</span>
+<span class="n">equations</span> <span class="o">=</span> <span class="p">{</span><span class="s2">&quot;hours&quot;</span><span class="p">:</span> <span class="n">hours</span><span class="p">,</span> <span class="s2">&quot;lwage&quot;</span><span class="p">:</span> <span class="n">lwage</span><span class="p">}</span>
 <span class="n">system_3sls</span> <span class="o">=</span> <span class="n">IV3SLS</span><span class="p">(</span><span class="n">equations</span><span class="p">)</span>
 <span class="n">system_3sls_res</span> <span class="o">=</span> <span class="n">system_3sls</span><span class="o">.</span><span class="n">fit</span><span class="p">(</span><span class="n">cov_type</span><span class="o">=</span><span class="s2">&quot;unadjusted&quot;</span><span class="p">)</span>
 <span class="nb">print</span><span class="p">(</span><span class="n">system_3sls_res</span><span class="p">)</span>
@@ -1254,8 +1253,8 @@ Homoskedastic (Unadjusted) Covariance (Debiased: False, GLS: True)
 Estimator:                        GLS   Overall R-squared:                   0.0120
 No. Equations.:                     2   McElroy&#39;s R-squared:                 0.0873
 No. Observations:                 428   Judge&#39;s (OLS) R-squared:            -2.7778
-Date:                Tue, Sep 30 2025   Berndt&#39;s R-squared:                 -0.7279
-Time:                        22:20:06   Dhrymes&#39;s R-squared:                 0.0120
+Date:                Fri, Oct 03 2025   Berndt&#39;s R-squared:                 -0.7279
+Time:                        17:11:53   Dhrymes&#39;s R-squared:                 0.0120
                                         Cov. Estimator:                  unadjusted
                                         Num. Constraints:                      None
                   Equation: hours, Dependent Variable: hours
@@ -1300,10 +1299,10 @@ Homoskedastic (Unadjusted) Covariance (Debiased: False, GLS: True)
 <div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span><code>[9]:
 </code></pre></div>
 </div>
-<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><code><span class="n">equations</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">(</span>
-    <span class="n">hours</span><span class="o">=</span><span class="s2">&quot;hours ~ educ + age + kidslt6 + nwifeinc + [lwage ~ exper + expersq]&quot;</span><span class="p">,</span>
-    <span class="n">lwage</span><span class="o">=</span><span class="s2">&quot;lwage ~ educ + exper + expersq + [hours ~ age + kidslt6 + nwifeinc]&quot;</span><span class="p">,</span>
-<span class="p">)</span>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><code><span class="n">equations</span> <span class="o">=</span> <span class="p">{</span>
+    <span class="s2">&quot;hours&quot;</span><span class="p">:</span> <span class="s2">&quot;hours ~ educ + age + kidslt6 + nwifeinc + [lwage ~ exper + expersq]&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;lwage&quot;</span><span class="p">:</span> <span class="s2">&quot;lwage ~ educ + exper + expersq + [hours ~ age + kidslt6 + nwifeinc]&quot;</span><span class="p">,</span>
+<span class="p">}</span>
 <span class="n">system_gmm</span> <span class="o">=</span> <span class="n">IVSystemGMM</span><span class="o">.</span><span class="n">from_formula</span><span class="p">(</span><span class="n">equations</span><span class="p">,</span> <span class="n">data</span><span class="p">,</span> <span class="n">weight_type</span><span class="o">=</span><span class="s2">&quot;unadjusted&quot;</span><span class="p">)</span>
 <span class="n">system_gmm_res</span> <span class="o">=</span> <span class="n">system_gmm</span><span class="o">.</span><span class="n">fit</span><span class="p">(</span><span class="n">cov_type</span><span class="o">=</span><span class="s2">&quot;unadjusted&quot;</span><span class="p">)</span>
 <span class="nb">print</span><span class="p">(</span><span class="n">system_gmm_res</span><span class="p">)</span>
@@ -1320,8 +1319,8 @@ Homoskedastic (Unadjusted) Covariance (Debiased: False, GLS: True)
 Estimator:          2-Step System GMM   Overall R-squared:                   0.0121
 No. Equations.:                     2   McElroy&#39;s R-squared:                 0.0871
 No. Observations:                 428   Judge&#39;s (OLS) R-squared:            -2.7776
-Date:                Tue, Sep 30 2025   Berndt&#39;s R-squared:                 -0.7268
-Time:                        22:20:07   Dhrymes&#39;s R-squared:                 0.0121
+Date:                Fri, Oct 03 2025   Berndt&#39;s R-squared:                 -0.7268
+Time:                        17:11:53   Dhrymes&#39;s R-squared:                 0.0121
                                         Cov. Estimator:                  unadjusted
                                         Num. Constraints:                      None
                   Equation: hours, Dependent Variable: hours
@@ -1382,8 +1381,8 @@ Number of iterations: 20
 Estimator:         Iterative System GMM   Overall R-squared:                  -0.0345
 No. Equations.:                       2   McElroy&#39;s R-squared:                -0.2256
 No. Observations:                   428   Judge&#39;s (OLS) R-squared:            -2.9557
-Date:                  Tue, Sep 30 2025   Berndt&#39;s R-squared:                 -2.0361
-Time:                          22:20:07   Dhrymes&#39;s R-squared:                -0.0345
+Date:                  Fri, Oct 03 2025   Berndt&#39;s R-squared:                 -2.0361
+Time:                          17:11:53   Dhrymes&#39;s R-squared:                -0.0345
                                           Cov. Estimator:                      robust
                                           Num. Constraints:                      None
                   Equation: hours, Dependent Variable: hours
@@ -1451,7 +1450,7 @@ y_1 = \frac{1}{2}\left(x_2 - x_1 + \epsilon_2 - \epsilon_1\right) \\
 <span class="n">in_sample</span> <span class="o">=</span> <span class="n">df</span><span class="o">.</span><span class="n">iloc</span><span class="p">[:</span><span class="o">-</span><span class="mi">10000</span><span class="p">]</span>
 <span class="n">oos</span> <span class="o">=</span> <span class="n">df</span><span class="o">.</span><span class="n">iloc</span><span class="p">[</span><span class="o">-</span><span class="mi">10000</span><span class="p">:]</span>
 <span class="n">mod</span> <span class="o">=</span> <span class="n">IV3SLS</span><span class="o">.</span><span class="n">from_formula</span><span class="p">(</span>
-    <span class="nb">dict</span><span class="p">(</span><span class="n">y1</span><span class="o">=</span><span class="s2">&quot;y1 ~  x1 + [y2 ~ x2]&quot;</span><span class="p">,</span> <span class="n">y2</span><span class="o">=</span><span class="s2">&quot;y2 ~ x2 + [y1 ~ x1]&quot;</span><span class="p">),</span> <span class="n">data</span><span class="o">=</span><span class="n">df</span>
+    <span class="p">{</span><span class="s2">&quot;y1&quot;</span><span class="p">:</span> <span class="s2">&quot;y1 ~  x1 + [y2 ~ x2]&quot;</span><span class="p">,</span> <span class="s2">&quot;y2&quot;</span><span class="p">:</span> <span class="s2">&quot;y2 ~ x2 + [y1 ~ x1]&quot;</span><span class="p">},</span> <span class="n">data</span><span class="o">=</span><span class="n">df</span>
 <span class="p">)</span>
 <span class="n">res</span> <span class="o">=</span> <span class="n">mod</span><span class="o">.</span><span class="n">fit</span><span class="p">()</span>
 <span class="nb">print</span><span class="p">(</span><span class="n">res</span><span class="p">)</span>
@@ -1468,8 +1467,8 @@ y_1 = \frac{1}{2}\left(x_2 - x_1 + \epsilon_2 - \epsilon_1\right) \\
 Estimator:                        GLS   Overall R-squared:                   0.0013
 No. Equations.:                     2   McElroy&#39;s R-squared:                 0.0014
 No. Observations:               50000   Judge&#39;s (OLS) R-squared:             0.0013
-Date:                Tue, Sep 30 2025   Berndt&#39;s R-squared:                  0.0027
-Time:                        22:20:07   Dhrymes&#39;s R-squared:                 0.0013
+Date:                Fri, Oct 03 2025   Berndt&#39;s R-squared:                  0.0027
+Time:                        17:11:53   Dhrymes&#39;s R-squared:                 0.0013
                                         Cov. Estimator:                      robust
                                         Num. Constraints:                      None
                      Equation: y1, Dependent Variable: y1
