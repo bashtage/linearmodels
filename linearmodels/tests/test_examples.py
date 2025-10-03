@@ -46,7 +46,7 @@ NOTEBOOK_DIR = os.path.abspath(os.path.join(head, "..", "..", "examples"))
 
 nbs = sorted(glob.glob(os.path.join(NOTEBOOK_DIR, "*.ipynb")))
 ids = [os.path.split(nb)[-1].split(".")[0] for nb in nbs]
-if not nbs:  # pragma: no cover
+if nbs:  # pragma: no cover
     @pytest.fixture(params=nbs, ids=ids)
     def notebook(request):
         return request.param

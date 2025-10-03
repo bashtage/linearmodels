@@ -11,7 +11,7 @@ parameters:
 
 jobs:
 
-- job: ${{ parameters.name }} Test
+- job: ${{ parameters.name }}_Test
   pool:
     vmImage: ${{ parameters.vmImage }}
   strategy:
