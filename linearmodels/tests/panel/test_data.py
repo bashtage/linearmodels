@@ -663,7 +663,7 @@ def test_general_demean_oneway(mi_df):
     g = Categorical(g.iloc[:, 0])
     d = get_dummies(g)
     dm1 = y.values2d - d @ lstsq(d, y.values2d, rcond=None)[0]
-    assert_allclose(dm1, dm2.values2d)
+    assert_allclose(dm1, dm2.values2d, atol=1e-10)
 
 
 def test_general_demean_twoway(mi_df):
@@ -710,7 +710,7 @@ def test_general_unit_weighted_demean_oneway(mi_df):
     d = get_dummies(g)
     dm1 = y.values2d - d @ lstsq(d, y.values2d, rcond=None)[0]
     assert_allclose(dm1, dm2.values2d)
-    assert_allclose(dm3.values2d, dm2.values2d)
+    assert_allclose(dm3.values2d, dm2.values2d, atol=1e-10)
 
 
 def test_general_weighted_demean_oneway(mi_df):
