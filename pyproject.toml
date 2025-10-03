@@ -53,7 +53,6 @@ keywords=[
     "statistical inference",
     "econometrics",
 ]
-
 license = "NCSA"
 license-files = [ "LICENSE.md" ]
 maintainers = [
@@ -174,7 +173,6 @@ fix = false
 target-version = "py310"
 
 [tool.ruff.lint]
-typing-modules = ["statsmodels.compat.python", "compat.python"]
 
 select = [
   # pyflakes
@@ -269,7 +267,7 @@ minversion = "8.4.1"
 testpaths = "linearmodels"
 xfail_strict = true
 addopts = "--strict"
-empty_parameter_set_mark = "fail_at_collect"
+empty_parameter_set_mark = "xfail"
 filterwarnings = [
     "ignore:`formatargspec`:DeprecationWarning:statsmodels",
     "ignore:Method .ptp is deprecated:FutureWarning",
@@ -295,7 +293,6 @@ junit_family = "xunit2"
 markers = [
     "slow: mark a test as slow",
     "smoke: mark a test as a coding error (smoke) test"
-
 ]
 
 [tool.isort]
@@ -383,6 +380,7 @@ no_implicit_optional=true
 strict_equality=true
 disallow_untyped_defs=true
 disallow_incomplete_defs=true
+show_error_context=true
 
 [mypy-linearmodels.conftest]
 check_untyped_defs=false

@@ -33,6 +33,7 @@ _cython_tree = [fs.copyfile('__init__.py')]
 cython_args = []
 cython_c_args =  ['-DNPY_NO_DEPRECATED_API=NPY_1_7_API_VERSION']
 if get_option('cython-coverage')
+  message('Building with Cython coverage support')
   cython_args += ['-Xlinetrace=True']
   cython_c_args += ['-DCYTHON_TRACE=1']
 endif

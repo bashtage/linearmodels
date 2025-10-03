@@ -64,6 +64,7 @@ jobs:
         python.version: '3.13'
         XXHASH: true
         PYARROW: true
+        BUILD_FLAGS: '-Csetup-args=-Dcython-coverage=true'
       python313_copy_on_write:
         python.version: '3.12'
         XXHASH: true
