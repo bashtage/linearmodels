@@ -1,23 +1,23 @@
 [build-system]
 build-backend = 'mesonpy'
 requires = [
-    'meson-python',
-    "cython>=3.0.13,<4",  # Sync with CYTHON_MIN_VER in setup
-    "numpy>=2.0.0,<3",
-    "setuptools_scm>=9.2.0,<10",
+  'meson-python',
+  "cython>=3.0.13,<4",  # Sync with CYTHON_MIN_VER in setup
+  "numpy>=2.0.0,<3",
+  "setuptools_scm>=9.2.0,<10",
 ]
 
 [project]
 name = "linearmodels"
 # Keep syned with requirements.txt
 dependencies = [
-    "numpy>=1.22.3,<3",
-    "pandas>=1.4.0",
-    "scipy>=1.8.0",
-    "statsmodels>=0.13.0",
-    "mypy_extensions>=0.4",
-    "pyhdfe>=0.1",
-    "formulaic>=1.2.1",
+  "numpy>=1.22.3,<3",
+  "pandas>=1.4.0",
+  "scipy>=1.8.0",
+  "statsmodels>=0.13.0",
+  "mypy_extensions>=0.4",
+  "pyhdfe>=0.1",
+  "formulaic>=1.2.1",
 ]
 authors = [{ name = "Kevin Sheppard", email = "kevin.k.sheppard@gmail.com" }]
 classifiers = [
@@ -39,19 +39,19 @@ classifiers = [
 description = "Linear Panel, Instrumental Variable, Asset Pricing, and System Regression models for Python"
 version = "7.0.0dev0"
 keywords=[
-    "linear models",
-    "regression",
-    "instrumental variables",
-    "IV",
-    "panel",
-    "fixed effects",
-    "clustered",
-    "heteroskedasticity",
-    "endogeneity",
-    "instruments",
-    "statistics",
-    "statistical inference",
-    "econometrics",
+  "linear models",
+  "regression",
+  "instrumental variables",
+  "IV",
+  "panel",
+  "fixed effects",
+  "clustered",
+  "heteroskedasticity",
+  "endogeneity",
+  "instruments",
+  "statistics",
+  "statistical inference",
+  "econometrics",
 ]
 license = "NCSA"
 license-files = [ "LICENSE.md" ]
@@ -63,78 +63,78 @@ requires-python = ">=3.10"
 
 [project.optional-dependencies]
 test = [
-    # test
-    "pytest>=8.4.1,<9",
-    "pytest-randomly",
-    "pytest-xdist",
-    "pytest-cov",
-    "coverage[toml]",
-    "meson",
-    "ninja",
+  # test
+  "pytest>=8.4.1,<9",
+  "pytest-randomly",
+  "pytest-xdist",
+  "pytest-cov",
+  "coverage[toml]",
+  "meson",
+  "ninja",
 ]
 doc = [
-    # Documentation
-    "setuptools>=61",
-    "wheel",
-    "setuptools_scm[toml]>=8.0.3,<9",
-    "oldest-supported-numpy",
-    "cython>=3.0.13,<4",  # Sync with CYTHON_MIN_VER in setup
-    "numpy >=1.22",
-    "scipy >=1.5.0",
-    "ipython >=8.0.1",
-    "matplotlib >=3.0",
-    "patsy >=0.5.3",
-    "statsmodels >=0.13.5",
-    "jinja2",
-    "sphinx>=7",
-    "seaborn",
-    "numpydoc>=1.0.0",
-    "nbsphinx",
-    "sphinx-immaterial",
-    "jupyter",
-    "notebook",
-    "sphinx-autodoc-typehints",
-    "fonttools>=4.43.0", # not directly required, pinned by Snyk to avoid a vulnerability
-    "jupyterlab>=4.4.8", # not directly required, pinned by Snyk to avoid a vulnerability
-    "ipython>=7",
-    "sphinx_immaterial",
-    "nbconvert",
-    "pickleshare",
-    # Requirements for doc build, in addition to requirements.txt
-    "pandas~=2.3.3",
-    "sphinxcontrib-spelling",
-    "sphinx_autodoc_typehints",
+  # Documentation
+  "setuptools>=61",
+  "wheel",
+  "setuptools_scm[toml]>=8.0.3,<9",
+  "oldest-supported-numpy",
+  "cython>=3.0.13,<4",  # Sync with CYTHON_MIN_VER in setup
+  "numpy >=1.22",
+  "scipy >=1.5.0",
+  "ipython >=8.0.1",
+  "matplotlib >=3.0",
+  "patsy >=0.5.3",
+  "statsmodels >=0.13.5",
+  "jinja2",
+  "sphinx>=7",
+  "seaborn",
+  "numpydoc>=1.0.0",
+  "nbsphinx",
+  "sphinx-immaterial",
+  "jupyter",
+  "notebook",
+  "sphinx-autodoc-typehints",
+  "fonttools>=4.43.0", # not directly required, pinned by Snyk to avoid a vulnerability
+  "jupyterlab>=4.4.8", # not directly required, pinned by Snyk to avoid a vulnerability
+  "ipython>=7",
+  "sphinx_immaterial",
+  "nbconvert",
+  "pickleshare",
+  # Requirements for doc build, in addition to requirements.txt
+  "pandas~=2.3.3",
+  "sphinxcontrib-spelling",
+  "sphinx_autodoc_typehints",
 ]
 dev = [
-    "xarray>=0.16",
-    "pandas-stubsl",
-    "wheel",
-    # versioning
-    "setuptools_scm[toml]>=9.2.0,<10",
-    "packaging",
-    # Performance
-    "cython>=3.0.10",
-    "numba>=0.55",
-    # Graphics
-    "matplotlib>=3",
-    "seaborn",
-    # Tests
-    "pytest>=8.4.1,<9",
-    "pytest-randomly",
-    "pytest-xdist",
-    "pytest-cov",
-    # formatting
-    "black[jupyter]~=25.9.0",
-    "isort~=6.0",
-    "colorama",
-    "flake8",
-    "flake8-bugbear",
-    "mypy>=1.3",
-    "ruff>=0.8.6",
-    "pyupgrade>=3.4.0",
-    "jupyterlab-code-formatter",
-    "jupyterlab>=4.4.8",  # not directly required, pinned by Snyk to avoid a vulnerability
-    "zipp>=3.19.1", # not directly required, pinned by Snyk to avoid a vulnerability
+  "xarray>=0.16",
+  "pandas-stubsl",
+  "wheel",
+  # versioning
+  "setuptools_scm[toml]>=9.2.0,<10",
+  "packaging",
+  # Performance
+  "cython>=3.0.10",
+  "numba>=0.55",
+  # Graphics
+  "matplotlib>=3",
+  "seaborn",
+  # Tests
+  "pytest>=8.4.1,<9",
+  "pytest-randomly",
+  "pytest-xdist",
+  "pytest-cov",
+  # formatting
+  "black[jupyter]~=25.9.0",
+  "isort~=6.0",
+  "colorama",
+  "flake8",
+  "flake8-bugbear",
+  "mypy>=1.3",
+  "ruff>=0.8.6",
+  "pyupgrade>=3.4.0",
+  "jupyterlab-code-formatter",
+  "jupyterlab>=4.4.8",  # not directly required, pinned by Snyk to avoid a vulnerability
+  "zipp>=3.19.1", # not directly required, pinned by Snyk to avoid a vulnerability
 ]
 
 
@@ -151,7 +151,7 @@ setup = ['--vsenv']
 target-version = ['py310', 'py311', 'py312', 'py313']
 exclude = '''
 (
-    \.egg
+  \.egg
   | \.git
   | \.mypy_cache
   | \.oytest_cache
@@ -164,7 +164,7 @@ exclude = '''
 
 [tool.pyright]
 exclude = [
-    "**/tests/**",
+  "**/tests/**",
 ]
 
 [tool.ruff]
@@ -226,33 +226,33 @@ select = [
 ]
 
 ignore = [
-    # Required to allow black formatting
-    # Whitespace before ':' (Needed for black)
-    "E203",
-    # Line too long (### > 88 characters) (Needed for black)
-    "E501",
-    # Multiple statements on one line (colon) (E701)
-    "E701",
-    # Always ignore
-    # TC do not work with doc building
-    # Move application import `linearmodels....` into a type-checking block
-    "TC001",
-    # Move third-party import `...` into a type-checking block
-    "TC002",
-    # Move standard library import `...` into a type-checking block
-    "TC003",
+  # Required to allow black formatting
+  # Whitespace before ':' (Needed for black)
+  "E203",
+  # Line too long (### > 88 characters) (Needed for black)
+  "E501",
+  # Multiple statements on one line (colon) (E701)
+  "E701",
+  # Always ignore
+  # TC do not work with doc building
+  # Move application import `linearmodels....` into a type-checking block
+  "TC001",
+  # Move third-party import `...` into a type-checking block
+  "TC002",
+  # Move standard library import `...` into a type-checking block
+  "TC003",
 
-    #  ### Intentionally disabled
-    # Too many arguments to function call
-    "PLR0913", # 55
-    # Too many branches
-    "PLR0912", # 14
-    # Too many statements
-    "PLR0915", # 21
-    # Magic number
-    "PLR2004",
-    # Like to suggest use [a, *b] instead of [a] + b
-    "RUF005",
+  #  ### Intentionally disabled
+  # Too many arguments to function call
+  "PLR0913", # 55
+  # Too many branches
+  "PLR0912", # 14
+  # Too many statements
+  "PLR0915", # 21
+  # Magic number
+  "PLR2004",
+  # Like to suggest use [a, *b] instead of [a] + b
+  "RUF005",
 ]
 
 [tool.ruff.lint.per-file-ignores]
@@ -269,30 +269,30 @@ xfail_strict = true
 addopts = "--strict"
 empty_parameter_set_mark = "xfail"
 filterwarnings = [
-    "ignore:`formatargspec`:DeprecationWarning:statsmodels",
-    "ignore:Method .ptp is deprecated:FutureWarning",
-    "ignore:Traits should be given:DeprecationWarning",
-    "ignore:Using or importing the ABCs:DeprecationWarning",
-    "ignore:`nbconvert.exporters.exporter_locator` is deprecated:DeprecationWarning",
-    "ignore:Session._key_changed:DeprecationWarning",
-    "ignore:@asynchronous is deprecated:DeprecationWarning",
-    "error:A value is trying to be set::",
-    "error:The pandas.datetime class is deprecated:FutureWarning:",
-    "error:pandas.util.testing is deprecated:FutureWarning:",
-    "error:Support for multi-dimensional indexing:DeprecationWarning",
-    "error:multivariate_ls is deprecated:FutureWarning",
-    "error:invalid value encountered in true_divide:RuntimeWarning",
-    "ignore:The --strict option is deprecated, use --strict-markers instead:pytest.PytestDeprecationWarning",
-    "ignore:`np.bool` is a deprecated alias:DeprecationWarning:pyhdfe",
-    "ignore:defusedxml.cElementTree:DeprecationWarning:nbconvert",
-    "ignore:the imp module is deprecated in favour of importlib:DeprecationWarning:pywintypes",
-    "error:Setting an item of incompatible dtype:FutureWarning:",
+  "ignore:`formatargspec`:DeprecationWarning:statsmodels",
+  "ignore:Method .ptp is deprecated:FutureWarning",
+  "ignore:Traits should be given:DeprecationWarning",
+  "ignore:Using or importing the ABCs:DeprecationWarning",
+  "ignore:`nbconvert.exporters.exporter_locator` is deprecated:DeprecationWarning",
+  "ignore:Session._key_changed:DeprecationWarning",
+  "ignore:@asynchronous is deprecated:DeprecationWarning",
+  "error:A value is trying to be set::",
+  "error:The pandas.datetime class is deprecated:FutureWarning:",
+  "error:pandas.util.testing is deprecated:FutureWarning:",
+  "error:Support for multi-dimensional indexing:DeprecationWarning",
+  "error:multivariate_ls is deprecated:FutureWarning",
+  "error:invalid value encountered in true_divide:RuntimeWarning",
+  "ignore:The --strict option is deprecated, use --strict-markers instead:pytest.PytestDeprecationWarning",
+  "ignore:`np.bool` is a deprecated alias:DeprecationWarning:pyhdfe",
+  "ignore:defusedxml.cElementTree:DeprecationWarning:nbconvert",
+  "ignore:the imp module is deprecated in favour of importlib:DeprecationWarning:pywintypes",
+  "error:Setting an item of incompatible dtype:FutureWarning:",
 
 ]
 junit_family = "xunit2"
 markers = [
-    "slow: mark a test as slow",
-    "smoke: mark a test as a coding error (smoke) test"
+  "slow: mark a test as slow",
+  "smoke: mark a test as a coding error (smoke) test"
 ]
 
 [tool.isort]
@@ -315,12 +315,12 @@ source = ["linearmodels"]
 branch = true
 plugins = ["Cython.Coverage"]
 omit = [
-    # Version file
-    "*/_version.py",
-    # Compatibility code
-    "*/compat/*",
-    "*/results/*",
-    "*/conftest.py",
+  # Version file
+  "*/_version.py",
+  # Compatibility code
+  "*/compat/*",
+  "*/results/*",
+  "*/conftest.py",
 ]
 
 [tool.coverage.report]
@@ -328,43 +328,43 @@ show_missing = true
 ignore_errors = false
 # Regexes for lines to exclude from consideration
 exclude_also = [
-    # Have to re-enable the standard pragma
-    "pragma: no cover",
+  # Have to re-enable the standard pragma
+  "pragma: no cover",
 
-    # Do not complain about missing debug-only code:
-    "def __repr__",
-    "if self\\.debug",
+  # Do not complain about missing debug-only code:
+  "def __repr__",
+  "if self\\.debug",
 
-    # Don't complain if tests don't hit defensive assertion code:
-    "raise NotImplementedError",
-    "except NotImplementedError",
-    "raise AssertionError",
-    # Ignore pass
-    "pass",
-    # Ignore failure messages
-    "pytest.xfail",
-    # Ignore ImportError protection
-    "raise ImportError",
-    "except ImportError",
-    # Ignore type checking code
-    "if TYPE_CHECKING",
-    "elif TYPE_CHECKING",
-    # Cython function declarations
-    "cdef",
-    # Cython functions with void
-    "cdef void",
-    # Numba jit decorators
-    "@jit",
-    # Do not complain if non-runnable code is not run:
-    "if 0:",
-    "if __name__ == .__main__.:",
+  # Don't complain if tests don't hit defensive assertion code:
+  "raise NotImplementedError",
+  "except NotImplementedError",
+  "raise AssertionError",
+  # Ignore pass
+  "pass",
+  # Ignore failure messages
+  "pytest.xfail",
+  # Ignore ImportError protection
+  "raise ImportError",
+  "except ImportError",
+  # Ignore type checking code
+  "if TYPE_CHECKING",
+  "elif TYPE_CHECKING",
+  # Cython function declarations
+  "cdef",
+  # Cython functions with void
+  "cdef void",
+  # Numba jit decorators
+  "@jit",
+  # Do not complain if non-runnable code is not run:
+  "if 0:",
+  "if __name__ == .__main__.:",
 ]
 include = [ "*/linearmodels/*" ]
 omit = [
-    "*/_version.py",
-    "*/compat/*",
-    "*recursions.py",
-    "*samplers.py",
+  "*/_version.py",
+  "*/compat/*",
+  "*recursions.py",
+  "*samplers.py",
 ]
 
 [tool.coverage.html]
@@ -373,7 +373,7 @@ directory = "coverage_html_report"
 [tool.mypy]
 plugins="numpy.typing.mypy_plugin"
 exclude = [
-    "tests",
+  "tests",
 ]
 ignore_missing_imports=true
 no_implicit_optional=true
