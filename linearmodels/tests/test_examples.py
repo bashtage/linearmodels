@@ -47,22 +47,21 @@ NOTEBOOK_DIR = os.path.abspath(os.path.join(head, "..", "..", "examples"))
 nbs = sorted(glob.glob(os.path.join(NOTEBOOK_DIR, "*.ipynb")))
 ids = [os.path.split(nb)[-1].split(".")[0] for nb in nbs]
 if not nbs:  # pragma: no cover
+    @pytest.fixture(params=nbs, ids=ids)
+    def notebook(request):
+        return request.param
+
+    @pytest.mark.slow
+    @pytest.mark.example
+    @pytest.mark.skipif(SKIP, reason="Required packages not available")
+    def test_notebook(notebook):
+        nb_name = os.path.split(notebook)[-1]
+        if MISSING_XARRAY and nb_name in NOTEBOOKS_USING_XARRAY:
+            pytest.skip(f"xarray is required to test {notebook}")
+
+        nb = nbformat.read(notebook, as_version=4)
+        ep = ExecutePreprocessor(allow_errors=False, timeout=120, kernel_name=kernel_name)
+        ep.preprocess(nb, {"metadata": {"path": NOTEBOOK_DIR}})
+
+else:
     pytest.mark.skip(reason="No notebooks found so not tests run")
-
-
-@pytest.fixture(params=nbs, ids=ids)
-def notebook(request):
-    return request.param
-
-
-@pytest.mark.slow
-@pytest.mark.example
-@pytest.mark.skipif(SKIP, reason="Required packages not available")
-def test_notebook(notebook):
-    nb_name = os.path.split(notebook)[-1]
-    if MISSING_XARRAY and nb_name in NOTEBOOKS_USING_XARRAY:
-        pytest.skip(f"xarray is required to test {notebook}")
-
-    nb = nbformat.read(notebook, as_version=4)
-    ep = ExecutePreprocessor(allow_errors=False, timeout=120, kernel_name=kernel_name)
-    ep.preprocess(nb, {"metadata": {"path": NOTEBOOK_DIR}})
