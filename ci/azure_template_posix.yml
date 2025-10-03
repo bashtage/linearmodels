@@ -24,7 +24,7 @@ jobs:
         STATSMODELS: 0.13.1
         XARRAY: 0.21.0
         FORMULAIC: 1.0.2
-        test.install: true
+        test.wheel: true
       python310_mid:
         python.version: '3.10'
         NUMPY: 1.23.0
@@ -34,7 +34,7 @@ jobs:
         XARRAY: 2022.6.0
         XXHASH: true
         FORMULAIC: 1.0.2
-        test.install: true
+        test.wheel: true
       python310_recent:
         python.version: '3.10'
         NUMPY: 1.24.0
@@ -43,7 +43,7 @@ jobs:
         STATSMODELS: 0.14.0
         XARRAY: 2023.4.0
         FORMULAIC: 1.1.0
-        test.install: true
+        test.wheel: true
       python310_latest:
         python.version: '3.10'
         FORMULAIC: 1.2.0
@@ -51,7 +51,7 @@ jobs:
         PYARROW: true
       python310_no_cython:
         python.version: '3.10'
-        LM_NO_BINARY: 1
+        BUILD_FLAGS: '-Csetup-args=-Dno-binary=true'
       python311_latest:
         python.version: '3.11'
         XXHASH: true
@@ -81,7 +81,7 @@ jobs:
     displayName: 'Use Python $(python.version)'
 
   - script: |
-      python -m pip install --upgrade pip wheel
+      python -m pip install --upgrade pip wheel build
       python -m pip install -r requirements.txt
       python -m pip install -r requirements-test.txt
       python -m pip install -r requirements-dev.txt
@@ -102,18 +102,26 @@ jobs:
     displayName: 'Check style and formatting'
 
   - script: |
-      echo "Installing to site packages"
-      python -m pip wheel . --wheel-dir ./dist/ --no-build-isolation
+      echo "Installing to site packages (sdist)"
+      python -m build --sdist . -v  
+      SDIST=$(ls -t ./dist/linearmodels-*.gz | head -1)
+      pip install ${SDIST}
+    displayName: 'Install linearmodels (site-packages)'
+    condition: eq(variables['test.sdist'], 'true')
+
+  - script: |
+      echo "Installing to site packages (wheel)"
+      python -m pip wheel . --wheel-dir ./dist/
       WHL=$(ls -t ./dist/linearmodels-*.whl | head -1)
       pip install ${WHL}
     displayName: 'Install linearmodels (site-packages)'
-    condition: eq(variables['test.install'], 'true')
+    condition: eq(variables['test.wheel'], 'true')
 
   - script: |
-      echo python -m pip install -e . -v --no-build-isolation
-      python -m pip install -e . -v --no-build-isolation
+      echo python -m pip install --no-build-isolation -vv -e . ${FLAGS}
+      python -m pip install --no-build-isolation -vv -e . ${FLAGS}
     displayName: 'Install linearmodels (editable)'
-    condition: ne(variables['test.install'], 'true')
+    condition: and(ne(variables['test.wheel'], 'true'), ne(variables['test.sdist'], 'true'))
 
   - script: |
       echo "Testing site packages"
@@ -122,17 +130,17 @@ jobs:
       python -c "import linearmodels; linearmodels.test(['-n', 'auto', '--junitxml=../junit/test-results.xml'])"
       popd
     displayName: 'Run tests (site-packages)'
-    condition: and(eq(variables['test.install'], 'true'), ne(variables['pip.pre'], 'true'))
+    condition: or(eq(variables['test.wheel'], 'true'), eq(variables['test.sdist'], 'true'))
 
   - script: |
       echo "Testing editable install"
       if [[ ${COVERAGE} == "true" ]]; then
-        export COVERAGE_OPTS="--cov-config .coveragerc --cov=linearmodels --cov-report xml:coverage.xml --cov-report term"
+        export COVERAGE_OPTS="--cov=linearmodels --cov-report xml:coverage.xml --cov-report term"
       fi
       echo pytest -m "${PYTEST_PATTERN}" --junitxml=junit/test-results.xml -n auto --durations=25 ${COVERAGE_OPTS} linearmodels/tests
       pytest -m "${PYTEST_PATTERN}" --junitxml=junit/test-results.xml -n auto --durations=25 ${COVERAGE_OPTS} linearmodels/tests
     displayName: 'Run tests (editable)'
-    condition: and(ne(variables['test.install'], 'true'), ne(variables['pip.pre'], 'true'))
+    condition: and(or(ne(variables['test.wheel'], 'true'), ne(variables['test.sdist'], 'true')), ne(variables['pip.pre'], 'true'))
 
   - script: |
       echo "Testing pip-pre"
