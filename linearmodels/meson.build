@@ -29,7 +29,6 @@ inc_np = include_directories(incdir_numpy, is_system: true)
 # Copy the main __init__.py to the build dir.
 # Some submodules (linalg, special, optimize) add pxd files to this.
 # Needed to trick Cython, it won't do a relative import outside a package
-_cython_tree = [fs.copyfile('__init__.py')]
 cython_args = [
     '-Xcpow=True',
     '-Xboundscheck=False',
