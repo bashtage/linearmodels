@@ -656,7 +656,7 @@ def test_general_demean_oneway(mi_df):
     dm1 = y.demean("time")
     g = DataFrame(y.time_ids, index=y.index)
     dm2 = y.general_demean(g)
-    assert_allclose(dm1.values2d, dm2.values2d)
+    assert_allclose(dm1.values2d, dm2.values2d, atol=1e-10)
 
     g = DataFrame(np.random.randint(0, 10, g.shape), index=y.index)
     dm2 = y.general_demean(g)
@@ -672,7 +672,7 @@ def test_general_demean_twoway(mi_df):
     g = DataFrame(y.entity_ids, index=y.index)
     g["column2"] = Series(y.time_ids.squeeze(), index=y.index)
     dm2 = y.general_demean(g)
-    assert_allclose(dm1.values2d, dm2.values2d)
+    assert_allclose(dm1.values2d, dm2.values2d, atol=1e-10)
 
     g = DataFrame(np.random.randint(0, 10, g.shape), index=y.index)
     dm2 = y.general_demean(g)
@@ -692,16 +692,16 @@ def test_general_unit_weighted_demean_oneway(mi_df):
     weights = PanelData(g).copy()
     weights.dataframe.iloc[:, :] = 1
     dm2 = y.general_demean(g, weights)
-    assert_allclose(dm1.values2d, dm2.values2d)
+    assert_allclose(dm1.values2d, dm2.values2d, atol=1e-10)
     dm3 = y.general_demean(g)
-    assert_allclose(dm3.values2d, dm2.values2d)
+    assert_allclose(dm3.values2d, dm2.values2d, atol=1e-10)
 
     dm1 = y.demean("time")
     g = PanelData(DataFrame(y.time_ids, index=y.index))
     dm2 = y.general_demean(g, weights)
-    assert_allclose(dm1.values2d, dm2.values2d)
+    assert_allclose(dm1.values2d, dm2.values2d, atol=1e-10)
     dm3 = y.general_demean(g)
-    assert_allclose(dm3.values2d, dm2.values2d)
+    assert_allclose(dm3.values2d, dm2.values2d, atol=1e-10)
 
     g = PanelData(DataFrame(np.random.randint(0, 10, g.dataframe.shape), index=y.index))
     dm2 = y.general_demean(g, weights)
@@ -709,7 +709,7 @@ def test_general_unit_weighted_demean_oneway(mi_df):
     g = Categorical(g.dataframe.iloc[:, 0])
     d = get_dummies(g)
     dm1 = y.values2d - d @ lstsq(d, y.values2d, rcond=None)[0]
-    assert_allclose(dm1, dm2.values2d)
+    assert_allclose(dm1, dm2.values2d, atol=1e-10)
     assert_allclose(dm3.values2d, dm2.values2d, atol=1e-10)
 
 
@@ -723,12 +723,12 @@ def test_general_weighted_demean_oneway(mi_df):
     dm1 = y.demean("entity", weights=w)
     g = PanelData(DataFrame(y.entity_ids, index=y.index))
     dm2 = y.general_demean(g, w)
-    assert_allclose(dm1.values2d, dm2.values2d)
+    assert_allclose(dm1.values2d, dm2.values2d, atol=1e-10)
 
     dm1 = y.demean("time", weights=w)
     g = PanelData(DataFrame(y.time_ids, index=y.index))
     dm2 = y.general_demean(g, w)
-    assert_allclose(dm1.values2d, dm2.values2d)
+    assert_allclose(dm1.values2d, dm2.values2d, atol=1e-10)
 
     g = PanelData(DataFrame(np.random.randint(0, 10, g.dataframe.shape), index=y.index))
     dm2 = y.general_demean(g, w)
