@@ -5,3 +5,4 @@ statsmodels>=0.13.0
 mypy_extensions>=0.4
 pyhdfe>=0.1
 formulaic>=1.0.2
+wrapt!=2.0.0rc3
