@@ -16,7 +16,7 @@ jobs:
     vmImage: ${{ parameters.vmImage }}
   strategy:
     matrix:
-      python310_minimums_wheel:
+      python310_minimums:
         python.version: '3.10'
         NUMPY: 1.22.3
         SCIPY: 1.8.0
@@ -24,7 +24,7 @@ jobs:
         STATSMODELS: 0.13.1
         XARRAY: 0.21.0
         FORMULAIC: 1.2.1
-        test.wheel: true
+        PYTEST_PATTERN: "(slow or not slow)"
       python310_mid_sdist:
         python.version: '3.10'
         NUMPY: 1.23.0
@@ -62,11 +62,15 @@ jobs:
         XXHASH: true
         PYARROW: true
         BUILD_FLAGS: '-Csetup-args=-Dno-binary=true'
+      python312_cython_coverage:
+        python.version: '3.12'
+        BUILD_FLAGS: '-Csetup-args=-Dcython-coverage=true'
+        cython.coverage: true
       python313_latest:
         python.version: '3.13'
         XXHASH: true
         PYARROW: true
-        BUILD_FLAGS: '-Csetup-args=-Dcython-coverage=true'
+        PYTEST_PATTERN: "(slow or not slow)"
       python313_copy_on_write:
         python.version: '3.12'
         XXHASH: true
@@ -92,8 +96,7 @@ jobs:
       jupyter kernelspec list
     displayName: 'Install dependencies'
 
-  - script: |
-      python -m pip list
+  - script: python -m pip list
     displayName: 'List Configuration'
 
   - script: |
@@ -127,6 +130,13 @@ jobs:
     condition: and(ne(variables['test.wheel'], 'true'), ne(variables['test.sdist'], 'true'))
 
   - script: |
+      pushd linearmodels/panel
+      cython --verbose -M --fast-fail -3  -X cpow=True -X boundscheck=False -X wraparound=False -X cdivision=True -X binding=True -X linetrace=True _utility.pyx
+      popd
+    displayName: 'Transpile Cython to C for coverage support'
+    condition: eq(variables['cython.coverage'], 'true')
+
+  - script: |
       echo "Testing site packages"
       mkdir test_run_dir
       pushd test_run_dir
@@ -137,16 +147,16 @@ jobs:
 
   - script: |
       echo "Testing editable install"
-      export COVERAGE_OPTS="--cov=linearmodels --cov-report xml:coverage.xml --cov-report term"
-      echo pytest -m "${PYTEST_PATTERN}" --junitxml=junit/test-results.xml -n auto --durations=25 ${COVERAGE_OPTS} ${BUILD_FLAGS} linearmodels/tests 
+      export COVERAGE_OPTS="--cov-config=.coveragerc --cov=linearmodels --cov-branch --cov-report xml:coverage.xml --cov-report term"
+      echo pytest -m "${PYTEST_PATTERN}" --junitxml=junit/test-results.xml -n auto --durations=25 ${COVERAGE_OPTS} linearmodels/tests 
       pytest -m "${PYTEST_PATTERN}" --junitxml=junit/test-results.xml -n auto --durations=25 ${COVERAGE_OPTS} linearmodels/tests
     displayName: 'Run tests (editable)'
     condition: and(and(ne(variables['test.wheel'], 'true'), ne(variables['test.sdist'], 'true')), ne(variables['pip.pre'], 'true'))
 
   - script: |
       echo "Testing pip-pre"
-      export COVERAGE_OPTS="--cov=linearmodels --cov-report xml:coverage.xml --cov-report term"
-      echo pytest -m "${PYTEST_PATTERN}" --junitxml=junit/test-results.xml -n auto --durations=25 ${COVERAGE_OPTS} ${BUILD_FLAGS} linearmodels/tests
+      export COVERAGE_OPTS="--cov-config=.coveragerc --cov=linearmodels --cov-branch --cov-report=xml:coverage.xml --cov-report=term"
+      echo pytest -m "${PYTEST_PATTERN}" --junitxml=junit/test-results.xml -n auto --durations=25 ${COVERAGE_OPTS} linearmodels/tests
       pytest -m "${PYTEST_PATTERN}" --junitxml=junit/test-results.xml -n auto --durations=25 ${COVERAGE_OPTS}  linearmodels/tests
     displayName: 'Run tests (pip pre)'
     condition: eq(variables['pip.pre'], 'true')
