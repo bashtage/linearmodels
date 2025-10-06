@@ -1,0 +1,62 @@
+[run]
+source = linearmodels
+branch = True
+omit =
+    */results/*
+    */_version.py
+    */compat/*
+    */conftest.py
+plugins = Cython.Coverage
+
+[report]
+# Regexes for lines to exclude from consideration
+exclude_lines =
+    # Have to re-enable the standard pragma
+    pragma: no cover
+
+    # Don't complain if tests don't hit defensive assertion code:
+    raise NotImplementedError
+    except NotImplementedError
+    raise AssertionError
+
+    # Ignore pass
+    pass
+
+    # Do not complain about missing debug-only code:
+    def __repr__
+    if self\\.debug
+
+    # Ignore failure messages
+    pytest.xfail
+
+    # Ignore ImportError protection
+    raise ImportError
+    except ImportError
+
+    # Ignore type checking code
+    if TYPE_CHECKING
+    elif TYPE_CHECKING
+
+    # Cython function declarations
+    cdef
+
+    # Cython functions with void
+    cdef void
+
+    # Numba jit decorators
+    @jit
+
+    # Do not complain if non-runnable code is not run:
+    if 0:
+    if __name__ == .__main__.:
+
+include = */linearmodels/*
+omit =
+  */_version.py
+  */compat/*
+  *recursions.py
+  *samplers.py
+ignore_errors = True
+
+[html]
+directory = coverage_html_report

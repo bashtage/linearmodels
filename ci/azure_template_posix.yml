@@ -95,8 +95,7 @@ jobs:
       jupyter kernelspec list
     displayName: 'Install dependencies'
 
-  - script: |
-      python -m pip list
+  - script: python -m pip list
     displayName: 'List Configuration'
 
   - script: |
@@ -131,11 +130,9 @@ jobs:
 
   - script: |
       pushd linearmodels/panel
-      python _cython_coverage.py build_ext --inplace
+      cython --verbose -M --fast-fail -3  -X cpow=True -X boundscheck=False -X wraparound=False -X cdivision=True -X binding=True -X linetrace=True _utility.pyx
       popd
-      echo "linearmodels.panel._utility location"
-      python -c "import linearmodels.panel._utility; print(linearmodels.panel._utility.__file__)"
-    displayName: 'Build ext for Cython Coverage'
+    displayName: 'Transpile Cython to C for coverage support'
     condition: eq(variables['cython.coverage'], 'true')
 
   - script: |

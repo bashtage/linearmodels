@@ -29,17 +29,18 @@ inc_np = include_directories(incdir_numpy, is_system: true)
 # Copy the main __init__.py to the build dir.
 # Some submodules (linalg, special, optimize) add pxd files to this.
 # Needed to trick Cython, it won't do a relative import outside a package
+_cython_tree = [fs.copyfile('__init__.py')]
 cython_args = [
-    '-Xcpow=True',
-    '-Xboundscheck=False',
-    '-Xwraparound=False',
-    '-Xcdivision=True',
-    '-Xbinding=True'
+    '-X cpow=True',
+    '-X boundscheck=False',
+    '-X wraparound=False',
+    '-X cdivision=True',
+    '-X binding=True'
 ]
 cython_c_args =  ['-DNPY_NO_DEPRECATED_API=NPY_1_7_API_VERSION']
 if get_option('cython-coverage')
   message('Building with Cython coverage support')
-  cython_args += ['-Xlinetrace=True']
+  cython_args += ['-X linetrace=True']
   cython_c_args += ['-DCYTHON_TRACE=1']
 endif
 
