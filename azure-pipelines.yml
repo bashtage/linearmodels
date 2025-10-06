@@ -13,6 +13,7 @@ variables:
   PYTHONHASHSEED: 12345678 # Ensure tests are correctly gathered by xdist
   TEST_INSTALL: false
   MPLBACKEND: agg
+  PYTEST_PATTERN: "(not slow)"
   coverage: true
   test.install: false
   pip.pre: false
