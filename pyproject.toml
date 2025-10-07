@@ -37,7 +37,9 @@ classifiers = [
   "Topic :: Scientific/Engineering",
 ]
 description = "Linear Panel, Instrumental Variable, Asset Pricing, and System Regression models for Python"
-version = "7.0.0dev0"
+dynamic = [
+  'version'
+]
 keywords=[
   "linear models",
   "regression",
@@ -146,6 +148,9 @@ changelog = "https://bashtage.github.io/linearmodels/changes.html"
 
 [tool.meson-python.args]
 setup = ['--vsenv']
+
+[tool.setuptools_scm]
+version_file = "arch/_version.py"
 
 [tool.black]
 target-version = ['py310', 'py311', 'py312', 'py313']
