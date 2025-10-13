@@ -37,7 +37,7 @@ jobs:
         with:
           python-version: '3.x'
       
-      - uses: pypa/cibuildwheel@v3.2.0
+      - uses: pypa/cibuildwheel@v3.2.1
         env:
           CIBW_BUILD: ${{ matrix.python }}-*
           CIBW_BEFORE_BUILD: python -m pip install wheel>=0.41.0 pip --upgrade
