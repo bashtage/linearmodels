@@ -7,6 +7,7 @@ parameters:
   # defaults for any parameters that are not specified
   name: ''
   vmImage: ''
+  BUILD_FLAGS: ''
 
 
 jobs:
@@ -112,7 +113,7 @@ jobs:
       python -m build --sdist . -v  
       SDIST=$(ls -t ./dist/linearmodels-*.tar.gz | head -1)
       pip install ${SDIST} -v
-    displayName: 'Install linearmodels (site-packages)'
+    displayName: 'Install linearmodels (site-packages, sdist)'
     condition: eq(variables['test.sdist'], 'true')
 
   - script: |
@@ -120,7 +121,7 @@ jobs:
       python -m pip wheel . --wheel-dir ./dist/
       WHL=$(ls -t ./dist/linearmodels-*.whl | head -1)
       pip install ${WHL} -v
-    displayName: 'Install linearmodels (site-packages)'
+    displayName: 'Install linearmodels (site-packages, wheel)'
     condition: eq(variables['test.wheel'], 'true')
 
   - script: |
