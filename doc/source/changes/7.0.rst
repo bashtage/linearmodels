@@ -1,7 +1,7 @@
 Version 7.0
 -----------
 
-* Increased minimums:
+- Increased minimums:
 
   - Python: 3.10
   - formulaic: 1.0.0
@@ -9,3 +9,10 @@ Version 7.0
   - SciPy: 1.8.0
   - pandas: 1.4.0
   - statsmodels: 0.13.0
+
+- Corrected name of clustered covariance to ``"clustered"`` from ``"cluster"``.
+- Fixed an issue sparse matric behavior changed in SciPy.
+- Switched to meson build system.
+- Improved compatability with future NumPy (2.4+) and pandas (3+) changes.
+- Fixed a bug that affected estimation of :class:`~linearmodels.system.model.SUR`
+  models with constrains of the form ``R beta = q`` where ``q`` was not 0.
