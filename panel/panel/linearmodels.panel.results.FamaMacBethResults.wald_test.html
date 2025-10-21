@@ -1,6 +1,7 @@
 
 
 
+
 <!doctype html>
 <html lang="en" class="no-js">
   <head>
@@ -10,12 +11,19 @@
       
       
       
+      
+        <link rel="prev" href="linearmodels.panel.results.FamaMacBethResults.predict.html">
+      
+      
+        <link rel="next" href="linearmodels.panel.results.FamaMacBethResults.all_params.html">
+      
+      
       <link rel="icon" href="../../_static/favicon.ico">
     
     
   
       
-        <title>linearmodels.panel.results.FamaMacBethResults.wald_test - linearmodels 6.1</title>
+        <title>linearmodels.panel.results.FamaMacBethResults.wald_test - linearmodels 7.0</title>
       
     
 
@@ -31,15 +39,13 @@
     
       
         
-        
-          
-          
-          <meta name="theme-color" content="#2094f3">
-        
       
       
 
+
     
+    
+      
     
     
       
@@ -48,9 +54,9 @@
         <style>:root{--md-text-font:"Roboto";--md-code-font:"Roboto Mono"}</style>
       
     
-        <link rel="stylesheet" type="text/css" href="../../_static/sphinx_immaterial_theme.3625f807144f53acf.min.css?v=fbfc4466" />
+        <link rel="stylesheet" type="text/css" href="../../_static/sphinx_immaterial_theme.acf80fe7f4d9ef9e2.min.css?v=9e56d0d2" />
         <link rel="stylesheet" type="text/css" href="../../_static/css/small_fixes.css?v=34934119" />
-    <script>__md_scope=new URL("../..",location),__md_hash=e=>[...e].reduce((e,_)=>(e<<5)-e+_.charCodeAt(0),0),__md_get=(e,_=localStorage,t=__md_scope)=>JSON.parse(_.getItem(t.pathname+"."+e)),__md_set=(e,_,t=localStorage,a=__md_scope)=>{try{t.setItem(a.pathname+"."+e,JSON.stringify(_))}catch(e){}}</script>
+    <script>__md_scope=new URL("../..",location),__md_hash=e=>[...e].reduce(((e,_)=>(e<<5)-e+_.charCodeAt(0)),0),__md_get=(e,_=localStorage,t=__md_scope)=>JSON.parse(_.getItem(t.pathname+"."+e)),__md_set=(e,_,t=localStorage,a=__md_scope)=>{try{t.setItem(a.pathname+"."+e,JSON.stringify(_))}catch(e){}}</script>
     
       
 
@@ -65,9 +71,8 @@
     
     
     
-    <body dir="ltr" data-md-color-scheme="" data-md-color-primary="blue" data-md-color-accent="orange">
+    <body dir="ltr" data-md-color-scheme="default" data-md-color-primary="blue" data-md-color-accent="orange">
   
-    
     
     <input class="md-toggle" data-md-toggle="drawer" type="checkbox" id="__drawer" autocomplete="off">
     <input class="md-toggle" data-md-toggle="search" type="checkbox" id="__search" autocomplete="off">
@@ -84,26 +89,29 @@
       
     </div>
     
-      <div data-md-component="outdated" hidden>
+      <div data-md-color-scheme="default" data-md-component="outdated" hidden>
         
       </div>
     
     
       
 
-<header class="md-header" data-md-component="header">
+  
+
+<header class="md-header md-header--shadow" data-md-component="header">
   <nav class="md-header__inner md-grid" aria-label="Header">
-    <a href="../../index.html" title="linearmodels 6.1" class="md-header__button md-logo" aria-label="linearmodels 6.1" data-md-component="logo">
+    <a href="../../index.html" title="linearmodels 7.0" class="md-header__button md-logo" aria-label="linearmodels 7.0" data-md-component="logo">
       <img src="../../_static/bw-logo.svg" alt="logo">
     </a>
     <label class="md-header__button md-icon" for="__drawer">
-      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M3 6h18v2H3V6m0 5h18v2H3v-2m0 5h18v2H3v-2Z"/></svg>
+      
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M3 6h18v2H3zm0 5h18v2H3zm0 5h18v2H3z"/></svg>
     </label>
     <div class="md-header__title" data-md-component="header-title">
       <div class="md-header__ellipsis">
         <div class="md-header__topic">
           <span class="md-ellipsis">
-            linearmodels 6.1
+            linearmodels 7.0
           </span>
         </div>
         <div class="md-header__topic" data-md-component="header-topic">
@@ -116,10 +124,14 @@
       </div>
     </div>
     
+      
+    
+    
     
     
       <label class="md-header__button md-icon" for="__search">
-        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.516 6.516 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5Z"/></svg>
+        
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.52 6.52 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5"/></svg>
       </label>
       <div class="md-search" data-md-component="search" role="dialog">
   <label class="md-search__overlay" for="__search"></label>
@@ -127,24 +139,27 @@
     <form class="md-search__form" name="search">
       <input type="text" class="md-search__input" name="query" aria-label="Search" placeholder="Search" autocapitalize="off" autocorrect="off" autocomplete="off" spellcheck="false" data-md-component="search-query" required>
       <label class="md-search__icon md-icon" for="__search">
-        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.516 6.516 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5Z"/></svg>
-        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20 11v2H8l5.5 5.5-1.42 1.42L4.16 12l7.92-7.92L13.5 5.5 8 11h12Z"/></svg>
+        
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.52 6.52 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5"/></svg>
+        
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20 11v2H8l5.5 5.5-1.42 1.42L4.16 12l7.92-7.92L13.5 5.5 8 11z"/></svg>
       </label>
       <nav class="md-search__options" aria-label="Search">
         
         <button type="reset" class="md-search__icon md-icon" title="Clear" aria-label="Clear" tabindex="-1">
-          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M19 6.41 17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12 19 6.41Z"/></svg>
+          
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M19 6.41 17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/></svg>
         </button>
       </nav>
       
     </form>
     <div class="md-search__output">
-      <div class="md-search__scrollwrap" data-md-scrollfix>
+      <div class="md-search__scrollwrap" tabindex="0" data-md-scrollfix>
         <div class="md-search-result" data-md-component="search-result">
           <div class="md-search-result__meta">
             Initializing search
           </div>
-          <ol class="md-search-result__list"></ol>
+          <ol class="md-search-result__list" role="presentation"></ol>
         </div>
       </div>
     </div>
@@ -156,7 +171,7 @@
         <a href="https://github.com/bashtage/linearmodels/" title="Go to repository" class="md-source" data-md-component="source">
   <div class="md-source__icon md-icon">
     
-    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 496 512"><!--! Font Awesome Free 6.2.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2022 Fonticons, Inc.--><path d="M165.9 397.4c0 2-2.3 3.6-5.2 3.6-3.3.3-5.6-1.3-5.6-3.6 0-2 2.3-3.6 5.2-3.6 3-.3 5.6 1.3 5.6 3.6zm-31.1-4.5c-.7 2 1.3 4.3 4.3 4.9 2.6 1 5.6 0 6.2-2s-1.3-4.3-4.3-5.2c-2.6-.7-5.5.3-6.2 2.3zm44.2-1.7c-2.9.7-4.9 2.6-4.6 4.9.3 2 2.9 3.3 5.9 2.6 2.9-.7 4.9-2.6 4.6-4.6-.3-1.9-3-3.2-5.9-2.9zM244.8 8C106.1 8 0 113.3 0 252c0 110.9 69.8 205.8 169.5 239.2 12.8 2.3 17.3-5.6 17.3-12.1 0-6.2-.3-40.4-.3-61.4 0 0-70 15-84.7-29.8 0 0-11.4-29.1-27.8-36.6 0 0-22.9-15.7 1.6-15.4 0 0 24.9 2 38.6 25.8 21.9 38.6 58.6 27.5 72.9 20.9 2.3-16 8.8-27.1 16-33.7-55.9-6.2-112.3-14.3-112.3-110.5 0-27.5 7.6-41.3 23.6-58.9-2.6-6.5-11.1-33.3 2.6-67.9 20.9-6.5 69 27 69 27 20-5.6 41.5-8.5 62.8-8.5s42.8 2.9 62.8 8.5c0 0 48.1-33.6 69-27 13.7 34.7 5.2 61.4 2.6 67.9 16 17.7 25.8 31.5 25.8 58.9 0 96.5-58.9 104.2-114.8 110.5 9.2 7.9 17 22.9 17 46.4 0 33.7-.3 75.4-.3 83.6 0 6.5 4.6 14.4 17.3 12.1C428.2 457.8 496 362.9 496 252 496 113.3 383.5 8 244.8 8zM97.2 352.9c-1.3 1-1 3.3.7 5.2 1.6 1.6 3.9 2.3 5.2 1 1.3-1 1-3.3-.7-5.2-1.6-1.6-3.9-2.3-5.2-1zm-10.8-8.1c-.7 1.3.3 2.9 2.3 3.9 1.6 1 3.6.7 4.3-.7.7-1.3-.3-2.9-2.3-3.9-2-.6-3.6-.3-4.3.7zm32.4 35.6c-1.6 1.3-1 4.3 1.3 6.2 2.3 2.3 5.2 2.6 6.5 1 1.3-1.3.7-4.3-1.3-6.2-2.2-2.3-5.2-2.6-6.5-1zm-11.4-14.7c-1.6 1-1.6 3.6 0 5.9 1.6 2.3 4.3 3.3 5.6 2.3 1.6-1.3 1.6-3.9 0-6.2-1.4-2.3-4-3.3-5.6-2z"/></svg>
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 496 512"><!--! Font Awesome Free 6.7.2 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2024 Fonticons, Inc.--><path d="M165.9 397.4c0 2-2.3 3.6-5.2 3.6-3.3.3-5.6-1.3-5.6-3.6 0-2 2.3-3.6 5.2-3.6 3-.3 5.6 1.3 5.6 3.6m-31.1-4.5c-.7 2 1.3 4.3 4.3 4.9 2.6 1 5.6 0 6.2-2s-1.3-4.3-4.3-5.2c-2.6-.7-5.5.3-6.2 2.3m44.2-1.7c-2.9.7-4.9 2.6-4.6 4.9.3 2 2.9 3.3 5.9 2.6 2.9-.7 4.9-2.6 4.6-4.6-.3-1.9-3-3.2-5.9-2.9M244.8 8C106.1 8 0 113.3 0 252c0 110.9 69.8 205.8 169.5 239.2 12.8 2.3 17.3-5.6 17.3-12.1 0-6.2-.3-40.4-.3-61.4 0 0-70 15-84.7-29.8 0 0-11.4-29.1-27.8-36.6 0 0-22.9-15.7 1.6-15.4 0 0 24.9 2 38.6 25.8 21.9 38.6 58.6 27.5 72.9 20.9 2.3-16 8.8-27.1 16-33.7-55.9-6.2-112.3-14.3-112.3-110.5 0-27.5 7.6-41.3 23.6-58.9-2.6-6.5-11.1-33.3 2.6-67.9 20.9-6.5 69 27 69 27 20-5.6 41.5-8.5 62.8-8.5s42.8 2.9 62.8 8.5c0 0 48.1-33.6 69-27 13.7 34.7 5.2 61.4 2.6 67.9 16 17.7 25.8 31.5 25.8 58.9 0 96.5-58.9 104.2-114.8 110.5 9.2 7.9 17 22.9 17 46.4 0 33.7-.3 75.4-.3 83.6 0 6.5 4.6 14.4 17.3 12.1C428.2 457.8 496 362.9 496 252 496 113.3 383.5 8 244.8 8M97.2 352.9c-1.3 1-1 3.3.7 5.2 1.6 1.6 3.9 2.3 5.2 1 1.3-1 1-3.3-.7-5.2-1.6-1.6-3.9-2.3-5.2-1m-10.8-8.1c-.7 1.3.3 2.9 2.3 3.9 1.6 1 3.6.7 4.3-.7.7-1.3-.3-2.9-2.3-3.9-2-.6-3.6-.3-4.3.7m32.4 35.6c-1.6 1.3-1 4.3 1.3 6.2 2.3 2.3 5.2 2.6 6.5 1 1.3-1.3.7-4.3-1.3-6.2-2.2-2.3-5.2-2.6-6.5-1m-11.4-14.7c-1.6 1-1.6 3.6 0 5.9s4.3 3.3 5.6 2.3c1.6-1.3 1.6-3.9 0-6.2-1.4-2.3-4-3.3-5.6-2"/></svg>
   </div>
   <div class="md-source__repository">
     linearmodels
@@ -188,19 +203,20 @@
                     
 
 
+
 <nav class="md-nav md-nav--primary" aria-label="Navigation" data-md-level="0">
   <label class="md-nav__title" for="__drawer">
-    <a href="../../index.html" title="linearmodels 6.1" class="md-nav__button md-logo" aria-label="linearmodels 6.1" data-md-component="logo">
+    <a href="../../index.html" title="linearmodels 7.0" class="md-nav__button md-logo" aria-label="linearmodels 7.0" data-md-component="logo">
       <img src="../../_static/bw-logo.svg" alt="logo">
     </a>
-    linearmodels 6.1
+    linearmodels 7.0
   </label>
   
     <div class="md-nav__source">
       <a href="https://github.com/bashtage/linearmodels/" title="Go to repository" class="md-source" data-md-component="source">
   <div class="md-source__icon md-icon">
     
-    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 496 512"><!--! Font Awesome Free 6.2.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2022 Fonticons, Inc.--><path d="M165.9 397.4c0 2-2.3 3.6-5.2 3.6-3.3.3-5.6-1.3-5.6-3.6 0-2 2.3-3.6 5.2-3.6 3-.3 5.6 1.3 5.6 3.6zm-31.1-4.5c-.7 2 1.3 4.3 4.3 4.9 2.6 1 5.6 0 6.2-2s-1.3-4.3-4.3-5.2c-2.6-.7-5.5.3-6.2 2.3zm44.2-1.7c-2.9.7-4.9 2.6-4.6 4.9.3 2 2.9 3.3 5.9 2.6 2.9-.7 4.9-2.6 4.6-4.6-.3-1.9-3-3.2-5.9-2.9zM244.8 8C106.1 8 0 113.3 0 252c0 110.9 69.8 205.8 169.5 239.2 12.8 2.3 17.3-5.6 17.3-12.1 0-6.2-.3-40.4-.3-61.4 0 0-70 15-84.7-29.8 0 0-11.4-29.1-27.8-36.6 0 0-22.9-15.7 1.6-15.4 0 0 24.9 2 38.6 25.8 21.9 38.6 58.6 27.5 72.9 20.9 2.3-16 8.8-27.1 16-33.7-55.9-6.2-112.3-14.3-112.3-110.5 0-27.5 7.6-41.3 23.6-58.9-2.6-6.5-11.1-33.3 2.6-67.9 20.9-6.5 69 27 69 27 20-5.6 41.5-8.5 62.8-8.5s42.8 2.9 62.8 8.5c0 0 48.1-33.6 69-27 13.7 34.7 5.2 61.4 2.6 67.9 16 17.7 25.8 31.5 25.8 58.9 0 96.5-58.9 104.2-114.8 110.5 9.2 7.9 17 22.9 17 46.4 0 33.7-.3 75.4-.3 83.6 0 6.5 4.6 14.4 17.3 12.1C428.2 457.8 496 362.9 496 252 496 113.3 383.5 8 244.8 8zM97.2 352.9c-1.3 1-1 3.3.7 5.2 1.6 1.6 3.9 2.3 5.2 1 1.3-1 1-3.3-.7-5.2-1.6-1.6-3.9-2.3-5.2-1zm-10.8-8.1c-.7 1.3.3 2.9 2.3 3.9 1.6 1 3.6.7 4.3-.7.7-1.3-.3-2.9-2.3-3.9-2-.6-3.6-.3-4.3.7zm32.4 35.6c-1.6 1.3-1 4.3 1.3 6.2 2.3 2.3 5.2 2.6 6.5 1 1.3-1.3.7-4.3-1.3-6.2-2.2-2.3-5.2-2.6-6.5-1zm-11.4-14.7c-1.6 1-1.6 3.6 0 5.9 1.6 2.3 4.3 3.3 5.6 2.3 1.6-1.3 1.6-3.9 0-6.2-1.4-2.3-4-3.3-5.6-2z"/></svg>
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 496 512"><!--! Font Awesome Free 6.7.2 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2024 Fonticons, Inc.--><path d="M165.9 397.4c0 2-2.3 3.6-5.2 3.6-3.3.3-5.6-1.3-5.6-3.6 0-2 2.3-3.6 5.2-3.6 3-.3 5.6 1.3 5.6 3.6m-31.1-4.5c-.7 2 1.3 4.3 4.3 4.9 2.6 1 5.6 0 6.2-2s-1.3-4.3-4.3-5.2c-2.6-.7-5.5.3-6.2 2.3m44.2-1.7c-2.9.7-4.9 2.6-4.6 4.9.3 2 2.9 3.3 5.9 2.6 2.9-.7 4.9-2.6 4.6-4.6-.3-1.9-3-3.2-5.9-2.9M244.8 8C106.1 8 0 113.3 0 252c0 110.9 69.8 205.8 169.5 239.2 12.8 2.3 17.3-5.6 17.3-12.1 0-6.2-.3-40.4-.3-61.4 0 0-70 15-84.7-29.8 0 0-11.4-29.1-27.8-36.6 0 0-22.9-15.7 1.6-15.4 0 0 24.9 2 38.6 25.8 21.9 38.6 58.6 27.5 72.9 20.9 2.3-16 8.8-27.1 16-33.7-55.9-6.2-112.3-14.3-112.3-110.5 0-27.5 7.6-41.3 23.6-58.9-2.6-6.5-11.1-33.3 2.6-67.9 20.9-6.5 69 27 69 27 20-5.6 41.5-8.5 62.8-8.5s42.8 2.9 62.8 8.5c0 0 48.1-33.6 69-27 13.7 34.7 5.2 61.4 2.6 67.9 16 17.7 25.8 31.5 25.8 58.9 0 96.5-58.9 104.2-114.8 110.5 9.2 7.9 17 22.9 17 46.4 0 33.7-.3 75.4-.3 83.6 0 6.5 4.6 14.4 17.3 12.1C428.2 457.8 496 362.9 496 252 496 113.3 383.5 8 244.8 8M97.2 352.9c-1.3 1-1 3.3.7 5.2 1.6 1.6 3.9 2.3 5.2 1 1.3-1 1-3.3-.7-5.2-1.6-1.6-3.9-2.3-5.2-1m-10.8-8.1c-.7 1.3.3 2.9 2.3 3.9 1.6 1 3.6.7 4.3-.7.7-1.3-.3-2.9-2.3-3.9-2-.6-3.6-.3-4.3.7m32.4 35.6c-1.6 1.3-1 4.3 1.3 6.2 2.3 2.3 5.2 2.6 6.5 1 1.3-1.3.7-4.3-1.3-6.2-2.2-2.3-5.2-2.6-6.5-1m-11.4-14.7c-1.6 1-1.6 3.6 0 5.9s4.3 3.3 5.6 2.3c1.6-1.3 1.6-3.9 0-6.2-1.4-2.3-4-3.3-5.6-2"/></svg>
   </div>
   <div class="md-source__repository">
     linearmodels
@@ -212,15 +228,22 @@
     
       
       
-      
-
+  
   
   
   
   
     <li class="md-nav__item">
       <a href="../../iv/index.html" class="md-nav__link">
-        <span title="/iv/index.rst (reference label)" class="md-ellipsis">Instrumental Variable Estimation</span>
+        
+  
+  
+  <span class="md-ellipsis">
+    <span title="/iv/index.rst (reference label)"><span>Instrumental Variable Estimation</span></span>
+    
+  </span>
+  
+
       </a>
     </li>
   
@@ -228,307 +251,461 @@
     
       
       
-      
-
   
   
     
   
   
+  
+    
+    
     
     <li class="md-nav__item md-nav__item--active md-nav__item--nested">
       
-      
-        <input class="md-nav__toggle md-toggle" data-md-toggle="__nav_2" type="checkbox" id="__nav_2" checked>
-      
-      
-      
         
-        <div class="md-nav__link md-nav__link--index ">
-          <a href="../index.html"><span title="/panel/index.rst (reference label)" class="md-ellipsis">Panel Data Model Estimation</span></a>
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_2" checked>
+        
           
-            <label for="__nav_2">
-              <span class="md-nav__icon md-icon"></span>
-            </label>
-          
-        </div>
-      
-      <nav class="md-nav" aria-label="Panel Data Model Estimation" data-md-level="1">
-        <label class="md-nav__title" for="__nav_2">
-          <span class="md-nav__icon md-icon"></span>
-          <span title="/panel/index.rst (reference label)" class="md-ellipsis">Panel Data Model Estimation</span>
-        </label>
-        <ul class="md-nav__list" data-md-scrollfix>
-          
+          <div class="md-nav__link md-nav__container">
+            <a href="../index.html" class="md-nav__link ">
+              
+  
+  
+  <span class="md-ellipsis">
+    <span title="/panel/index.rst (reference label)"><span>Panel Data Model Estimation</span></span>
+    
+  </span>
+  
+
+            </a>
             
               
+              <label class="md-nav__link " for="__nav_2" id="__nav_2_label" tabindex="0">
+                <span class="md-nav__icon md-icon"></span>
+              </label>
+            
+          </div>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_2_label" aria-expanded="true">
+          <label class="md-nav__title" for="__nav_2">
+            <span class="md-nav__icon md-icon"></span>
+            <span title="/panel/index.rst (reference label)"><span>Panel Data Model Estimation</span></span>
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
   
   
   
   
     <li class="md-nav__item">
       <a href="../introduction.html" class="md-nav__link">
-        <span title="/panel/introduction.rst (reference label)" class="md-ellipsis">Introduction</span>
+        
+  
+  
+  <span class="md-ellipsis">
+    <span title="/panel/introduction.rst (reference label)"><span>Introduction</span></span>
+    
+  </span>
+  
+
       </a>
     </li>
   
 
-            
-          
+              
             
               
+                
+  
   
   
   
   
     <li class="md-nav__item">
       <a href="../examples/data-formats.html" class="md-nav__link">
-        <span title="/panel/examples/data-formats.ipynb (reference label)" class="md-ellipsis">Data Formats for Panel Data Analysis</span>
+        
+  
+  
+  <span class="md-ellipsis">
+    <span title="/panel/examples/data-formats.ipynb (reference label)"><span>Data Formats for Panel Data Analysis</span></span>
+    
+  </span>
+  
+
       </a>
     </li>
   
 
-            
-          
+              
             
               
+                
+  
   
   
   
   
     <li class="md-nav__item">
       <a href="../examples/examples.html" class="md-nav__link">
-        <span title="/panel/examples/examples.ipynb (reference label)" class="md-ellipsis">Examples</span>
+        
+  
+  
+  <span class="md-ellipsis">
+    <span title="/panel/examples/examples.ipynb (reference label)"><span>Examples</span></span>
+    
+  </span>
+  
+
       </a>
     </li>
   
 
-            
-          
+              
             
               
+                
+  
   
   
   
   
     <li class="md-nav__item">
       <a href="../examples/using-formulas.html" class="md-nav__link">
-        <span title="/panel/examples/using-formulas.ipynb (reference label)" class="md-ellipsis">Using formulas to specify models</span>
+        
+  
+  
+  <span class="md-ellipsis">
+    <span title="/panel/examples/using-formulas.ipynb (reference label)"><span>Using formulas to specify models</span></span>
+    
+  </span>
+  
+
       </a>
     </li>
   
 
-            
-          
+              
             
               
+                
+  
   
   
   
   
     <li class="md-nav__item">
       <a href="../pandas.html" class="md-nav__link">
-        <span title="/panel/pandas.rst (reference label)" class="md-ellipsis">Comparison with pandas Panel<wbr>OLS and Fama<wbr>Mac<wbr>Beth</span>
+        
+  
+  
+  <span class="md-ellipsis">
+    <span title="/panel/pandas.rst (reference label)"><span>Comparison with pandas Panel<wbr>OLS and Fama<wbr>Mac<wbr>Beth</span></span>
+    
+  </span>
+  
+
       </a>
     </li>
   
 
-            
-          
+              
             
               
+                
   
   
     
   
   
+  
+    
+    
     
     <li class="md-nav__item md-nav__item--active md-nav__item--nested">
       
-      
-        <input class="md-nav__toggle md-toggle" data-md-toggle="__nav_2_6" type="checkbox" id="__nav_2_6" checked>
-      
-      
-      
         
-        <div class="md-nav__link md-nav__link--index ">
-          <a href="../reference.html"><span title="/panel/reference.rst (reference label)" class="md-ellipsis">Module Reference</span></a>
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_2_6" checked>
+        
           
-            <label for="__nav_2_6">
-              <span class="md-nav__icon md-icon"></span>
-            </label>
-          
-        </div>
-      
-      <nav class="md-nav" aria-label="Module Reference" data-md-level="2">
-        <label class="md-nav__title" for="__nav_2_6">
-          <span class="md-nav__icon md-icon"></span>
-          <span title="/panel/reference.rst (reference label)" class="md-ellipsis">Module Reference</span>
-        </label>
-        <ul class="md-nav__list" data-md-scrollfix>
-          
+          <div class="md-nav__link md-nav__container">
+            <a href="../reference.html" class="md-nav__link ">
+              
+  
+  
+  <span class="md-ellipsis">
+    <span title="/panel/reference.rst (reference label)"><span>Module Reference</span></span>
+    
+  </span>
+  
+
+            </a>
             
               
+              <label class="md-nav__link " for="__nav_2_6" id="__nav_2_6_label" tabindex="0">
+                <span class="md-nav__icon md-icon"></span>
+              </label>
+            
+          </div>
+        
+        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_2_6_label" aria-expanded="true">
+          <label class="md-nav__title" for="__nav_2_6">
+            <span class="md-nav__icon md-icon"></span>
+            <span title="/panel/reference.rst (reference label)"><span>Module Reference</span></span>
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
   
   
   
   
     <li class="md-nav__item">
       <a href="../reference.html#module-linearmodels.panel.model" class="md-nav__link">
-        <span title="linearmodels.panel.model (Python module)" class="md-ellipsis">Models for Panel Data</span>
+        
+  
+  
+  <span class="md-ellipsis">
+    <span title="linearmodels.panel.model (Python module)"><span>Models for Panel Data</span></span>
+    
+  </span>
+  
+
       </a>
     </li>
   
 
-            
-          
+              
             
               
+                
   
   
     
   
   
+  
+    
+    
     
     <li class="md-nav__item md-nav__item--active md-nav__item--nested">
       
-      
-        <input class="md-nav__toggle md-toggle" data-md-toggle="__nav_2_6_2" type="checkbox" id="__nav_2_6_2" checked>
-      
-      
-      
         
-        <div class="md-nav__link md-nav__link--index ">
-          <a href="../reference.html#module-linearmodels.panel.results"><span title="linearmodels.panel.results (Python module)" class="md-ellipsis">Estimation Results</span></a>
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_2_6_2" checked>
+        
           
-            <label for="__nav_2_6_2">
-              <span class="md-nav__icon md-icon"></span>
-            </label>
-          
-        </div>
-      
-      <nav class="md-nav" aria-label="Estimation Results" data-md-level="3">
-        <label class="md-nav__title" for="__nav_2_6_2">
-          <span class="md-nav__icon md-icon"></span>
-          <span title="linearmodels.panel.results (Python module)" class="md-ellipsis">Estimation Results</span>
-        </label>
-        <ul class="md-nav__list" data-md-scrollfix>
-          
+          <div class="md-nav__link md-nav__container">
+            <a href="../reference.html#module-linearmodels.panel.results" class="md-nav__link ">
+              
+  
+  
+  <span class="md-ellipsis">
+    <span title="linearmodels.panel.results (Python module)"><span>Estimation Results</span></span>
+    
+  </span>
+  
+
+            </a>
             
               
+              <label class="md-nav__link " for="__nav_2_6_2" id="__nav_2_6_2_label" tabindex="0">
+                <span class="md-nav__icon md-icon"></span>
+              </label>
+            
+          </div>
+        
+        <nav class="md-nav" data-md-level="3" aria-labelledby="__nav_2_6_2_label" aria-expanded="true">
+          <label class="md-nav__title" for="__nav_2_6_2">
+            <span class="md-nav__icon md-icon"></span>
+            <span title="linearmodels.panel.results (Python module)"><span>Estimation Results</span></span>
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
   
   
     
   
   
+  
+    
+    
     
     <li class="md-nav__item md-nav__item--active md-nav__item--nested">
       
-      
-        <input class="md-nav__toggle md-toggle" data-md-toggle="__nav_2_6_2_1" type="checkbox" id="__nav_2_6_2_1" checked>
-      
-      
-      
         
-        <div class="md-nav__link md-nav__link--index ">
-          <a href="linearmodels.panel.results.FamaMacBethResults.html"><span title="/panel/panel/linearmodels.panel.results.famamacbethresults.rst (reference label)" class="md-ellipsis">linearmodels.<wbr>panel.<wbr>results.<wbr>Fama<wbr>Mac<wbr>Beth<wbr>Results</span></a>
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_2_6_2_1" checked>
+        
           
-            <label for="__nav_2_6_2_1">
-              <span class="md-nav__icon md-icon"></span>
-            </label>
-          
-        </div>
-      
-      <nav class="md-nav" aria-label="linearmodels.panel.results.FamaMacBethResults" data-md-level="4">
-        <label class="md-nav__title" for="__nav_2_6_2_1">
-          <span class="md-nav__icon md-icon"></span>
-          <span title="/panel/panel/linearmodels.panel.results.famamacbethresults.rst (reference label)" class="md-ellipsis">linearmodels.<wbr>panel.<wbr>results.<wbr>Fama<wbr>Mac<wbr>Beth<wbr>Results</span>
-        </label>
-        <ul class="md-nav__list" data-md-scrollfix>
-          
+          <div class="md-nav__link md-nav__container">
+            <a href="linearmodels.panel.results.FamaMacBethResults.html" class="md-nav__link ">
+              
+  
+  
+  <span class="md-ellipsis">
+    <span title="/panel/panel/linearmodels.panel.results.famamacbethresults.rst (reference label)"><span>linearmodels.<wbr>panel.<wbr>results.<wbr>Fama<wbr>Mac<wbr>Beth<wbr>Results</span></span>
+    
+  </span>
+  
+
+            </a>
             
               
+              <label class="md-nav__link " for="__nav_2_6_2_1" id="__nav_2_6_2_1_label" tabindex="0">
+                <span class="md-nav__icon md-icon"></span>
+              </label>
+            
+          </div>
+        
+        <nav class="md-nav" data-md-level="4" aria-labelledby="__nav_2_6_2_1_label" aria-expanded="true">
+          <label class="md-nav__title" for="__nav_2_6_2_1">
+            <span class="md-nav__icon md-icon"></span>
+            <span title="/panel/panel/linearmodels.panel.results.famamacbethresults.rst (reference label)"><span>linearmodels.<wbr>panel.<wbr>results.<wbr>Fama<wbr>Mac<wbr>Beth<wbr>Results</span></span>
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
   
   
     
   
   
+  
+    
+    
     
     <li class="md-nav__item md-nav__item--active md-nav__item--nested">
       
-      
-        <input class="md-nav__toggle md-toggle" data-md-toggle="__nav_2_6_2_1_1" type="checkbox" id="__nav_2_6_2_1_1" checked>
-      
-      
-      
         
-        <div class="md-nav__link md-nav__link--index ">
-          <a href="linearmodels.panel.results.FamaMacBethResults.html#linearmodels.panel.results.FamaMacBethResults"><span aria-label="Python class" class="objinfo-icon objinfo-icon__data" title="Python class">C</span><span title="linearmodels.panel.results.FamaMacBethResults (Python class) — Results container for Fama MacBeth panel data models" class="md-ellipsis">linearmodels.<wbr>panel.<wbr>results.<wbr>Fama<wbr>Mac<wbr>Beth<wbr>Results</span></a>
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_2_6_2_1_1" checked>
+        
           
-            <label for="__nav_2_6_2_1_1">
-              <span class="md-nav__icon md-icon"></span>
-            </label>
-          
-        </div>
-      
-      <nav class="md-nav" aria-label="linearmodels.panel.results.FamaMacBethResults" data-md-level="5">
-        <label class="md-nav__title" for="__nav_2_6_2_1_1">
-          <span class="md-nav__icon md-icon"></span>
-          <span aria-label="Python class" class="objinfo-icon objinfo-icon__data" title="Python class">C</span><span title="linearmodels.panel.results.FamaMacBethResults (Python class) — Results container for Fama MacBeth panel data models" class="md-ellipsis">linearmodels.<wbr>panel.<wbr>results.<wbr>Fama<wbr>Mac<wbr>Beth<wbr>Results</span>
-        </label>
-        <ul class="md-nav__list" data-md-scrollfix>
-          
+          <div class="md-nav__link md-nav__container">
+            <a href="linearmodels.panel.results.FamaMacBethResults.html#linearmodels.panel.results.FamaMacBethResults" class="md-nav__link ">
+              
+  
+  
+    <span aria-label="Python class" class="objinfo-icon objinfo-icon__data" title="Python class">C</span>
+  
+  <span class="md-ellipsis">
+    <span title="linearmodels.panel.results.FamaMacBethResults (Python class) — Results container for Fama MacBeth panel data models"><span>linearmodels.<wbr>panel.<wbr>results.<wbr>Fama<wbr>Mac<wbr>Beth<wbr>Results</span></span>
+    
+  </span>
+  
+
+            </a>
             
               
+              <label class="md-nav__link " for="__nav_2_6_2_1_1" id="__nav_2_6_2_1_1_label" tabindex="0">
+                <span class="md-nav__icon md-icon"></span>
+              </label>
+            
+          </div>
+        
+        <nav class="md-nav" data-md-level="5" aria-labelledby="__nav_2_6_2_1_1_label" aria-expanded="true">
+          <label class="md-nav__title" for="__nav_2_6_2_1_1">
+            <span class="md-nav__icon md-icon"></span>
+            <span title="linearmodels.panel.results.FamaMacBethResults (Python class) — Results container for Fama MacBeth panel data models"><span>linearmodels.<wbr>panel.<wbr>results.<wbr>Fama<wbr>Mac<wbr>Beth<wbr>Results</span></span>
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
   
   
   
   
     <li class="md-nav__item">
       <a href="linearmodels.panel.results.FamaMacBethResults.conf_int.html" class="md-nav__link">
-        <span title="/panel/panel/linearmodels.panel.results.famamacbethresults.conf_int.rst (reference label)" class="md-ellipsis">linearmodels.<wbr>panel.<wbr>results.<wbr>Fama<wbr>Mac<wbr>Beth<wbr>Results.<wbr>conf_<wbr>int</span>
+        
+  
+  
+  <span class="md-ellipsis">
+    <span title="/panel/panel/linearmodels.panel.results.famamacbethresults.conf_int.rst (reference label)"><span>linearmodels.<wbr>panel.<wbr>results.<wbr>Fama<wbr>Mac<wbr>Beth<wbr>Results.<wbr>conf_<wbr>int</span></span>
+    
+  </span>
+  
+
       </a>
     </li>
   
 
-            
-          
+              
             
               
+                
+  
   
   
   
   
     <li class="md-nav__item">
       <a href="linearmodels.panel.results.FamaMacBethResults.predict.html" class="md-nav__link">
-        <span title="/panel/panel/linearmodels.panel.results.famamacbethresults.predict.rst (reference label)" class="md-ellipsis">linearmodels.<wbr>panel.<wbr>results.<wbr>Fama<wbr>Mac<wbr>Beth<wbr>Results.<wbr>predict</span>
+        
+  
+  
+  <span class="md-ellipsis">
+    <span title="/panel/panel/linearmodels.panel.results.famamacbethresults.predict.rst (reference label)"><span>linearmodels.<wbr>panel.<wbr>results.<wbr>Fama<wbr>Mac<wbr>Beth<wbr>Results.<wbr>predict</span></span>
+    
+  </span>
+  
+
       </a>
     </li>
   
 
-            
-          
+              
             
               
+                
   
   
     
   
     
+  
   
   
     <li class="md-nav__item md-nav__item--active">
       
       
-      <input class="md-nav__toggle md-toggle" data-md-toggle="toc" type="checkbox" id="__toc">
+      <input class="md-nav__toggle md-toggle" type="checkbox" id="__toc">
       
         <label class="md-nav__link md-nav__link--active" for="__toc">
-          <span title="/panel/panel/linearmodels.panel.results.famamacbethresults.wald_test.rst (reference label)" class="md-ellipsis">linearmodels.<wbr>panel.<wbr>results.<wbr>Fama<wbr>Mac<wbr>Beth<wbr>Results.<wbr>wald_<wbr>test</span>
+          
+  
+  
+  <span class="md-ellipsis">
+    <span title="/panel/panel/linearmodels.panel.results.famamacbethresults.wald_test.rst (reference label)"><span>linearmodels.<wbr>panel.<wbr>results.<wbr>Fama<wbr>Mac<wbr>Beth<wbr>Results.<wbr>wald_<wbr>test</span></span>
+    
+  </span>
+  
+
           <span class="md-nav__icon md-icon"></span>
         </label>
       
       <a href="#" class="md-nav__link md-nav__link--active">
-        <span title="/panel/panel/linearmodels.panel.results.famamacbethresults.wald_test.rst (reference label)" class="md-ellipsis">linearmodels.<wbr>panel.<wbr>results.<wbr>Fama<wbr>Mac<wbr>Beth<wbr>Results.<wbr>wald_<wbr>test</span>
+        
+  
+  
+  <span class="md-ellipsis">
+    <span title="/panel/panel/linearmodels.panel.results.famamacbethresults.wald_test.rst (reference label)"><span>linearmodels.<wbr>panel.<wbr>results.<wbr>Fama<wbr>Mac<wbr>Beth<wbr>Results.<wbr>wald_<wbr>test</span></span>
+    
+  </span>
+  
+
       </a>
       
         
@@ -549,7 +726,12 @@
       
         <li class="md-nav__item">
   <a href="#linearmodels.panel.results.FamaMacBethResults.wald_test" class="md-nav__link">
-    <span aria-label="Python method" class="objinfo-icon objinfo-icon__procedure" title="Python method">M</span><span title="linearmodels.panel.results.FamaMacBethResults.wald_test (Python method) — Test linear equality constraints using a Wald test" class="md-ellipsis">Fama<wbr>Mac<wbr>Beth<wbr>Results.<wbr>wald_<wbr>test</span>
+    
+      <span aria-label="Python method" class="objinfo-icon objinfo-icon__procedure" title="Python method">M</span>
+    
+    <span class="md-ellipsis">
+      <span title="linearmodels.panel.results.FamaMacBethResults.wald_test (Python method) — Test linear equality constraints using a Wald test"><span>Fama<wbr>Mac<wbr>Beth<wbr>Results.<wbr>wald_<wbr>test</span></span>
+    </span>
   </a>
   
     <nav class="md-nav" aria-label="FamaMacBethResults.wald_test">
@@ -557,7 +739,10 @@
         
           <li class="md-nav__item">
   <a href="#linearmodels.panel.results.FamaMacBethResults.wald_test-parameters" class="md-nav__link">
-    <span class="md-ellipsis">Parameters</span>
+    
+    <span class="md-ellipsis">
+      <span>Parameters</span>
+    </span>
   </a>
   
     <nav class="md-nav" aria-label="Parameters">
@@ -565,21 +750,36 @@
         
           <li class="md-nav__item">
   <a href="#linearmodels.panel.results.FamaMacBethResults.wald_test.restriction" class="md-nav__link">
-    <span aria-label="Python parameter" class="objinfo-icon objinfo-icon__sub-data" title="Python parameter">p</span><span title="linearmodels.panel.results.FamaMacBethResults.wald_test.restriction (Python parameter) — q by nvar array containing linear weights to apply to parameters when forming the restrictions." class="md-ellipsis">restriction</span>
+    
+      <span aria-label="Python parameter" class="objinfo-icon objinfo-icon__sub-data" title="Python parameter">p</span>
+    
+    <span class="md-ellipsis">
+      <span title="linearmodels.panel.results.FamaMacBethResults.wald_test.restriction (Python parameter) — q by nvar array containing linear weights to apply to parameters when forming the restrictions."><span>restriction</span></span>
+    </span>
   </a>
   
 </li>
         
           <li class="md-nav__item">
   <a href="#linearmodels.panel.results.FamaMacBethResults.wald_test.value" class="md-nav__link">
-    <span aria-label="Python parameter" class="objinfo-icon objinfo-icon__sub-data" title="Python parameter">p</span><span title="linearmodels.panel.results.FamaMacBethResults.wald_test.value (Python parameter) — q element array containing the restricted values." class="md-ellipsis">value</span>
+    
+      <span aria-label="Python parameter" class="objinfo-icon objinfo-icon__sub-data" title="Python parameter">p</span>
+    
+    <span class="md-ellipsis">
+      <span title="linearmodels.panel.results.FamaMacBethResults.wald_test.value (Python parameter) — q element array containing the restricted values."><span>value</span></span>
+    </span>
   </a>
   
 </li>
         
           <li class="md-nav__item">
   <a href="#linearmodels.panel.results.FamaMacBethResults.wald_test.formula" class="md-nav__link">
-    <span aria-label="Python parameter" class="objinfo-icon objinfo-icon__sub-data" title="Python parameter">p</span><span title="linearmodels.panel.results.FamaMacBethResults.wald_test.formula (Python parameter) — formulaic linear constraints." class="md-ellipsis">formula</span>
+    
+      <span aria-label="Python parameter" class="objinfo-icon objinfo-icon__sub-data" title="Python parameter">p</span>
+    
+    <span class="md-ellipsis">
+      <span title="linearmodels.panel.results.FamaMacBethResults.wald_test.formula (Python parameter) — formulaic linear constraints."><span>formula</span></span>
+    </span>
   </a>
   
 </li>
@@ -591,14 +791,20 @@
         
           <li class="md-nav__item">
   <a href="#linearmodels.panel.results.FamaMacBethResults.wald_test-returns" class="md-nav__link">
-    <span class="md-ellipsis">Returns</span>
+    
+    <span class="md-ellipsis">
+      <span>Returns</span>
+    </span>
   </a>
   
 </li>
         
           <li class="md-nav__item">
   <a href="#linearmodels.panel.results.FamaMacBethResults.wald_test-return-type" class="md-nav__link">
-    <span class="md-ellipsis">Return type</span>
+    
+    <span class="md-ellipsis">
+      <span>Return type</span>
+    </span>
   </a>
   
 </li>
@@ -615,702 +821,1103 @@
     </li>
   
 
-            
-          
+              
             
               
+                
+  
   
   
   
   
     <li class="md-nav__item">
       <a href="linearmodels.panel.results.FamaMacBethResults.all_params.html" class="md-nav__link">
-        <span title="/panel/panel/linearmodels.panel.results.famamacbethresults.all_params.rst (reference label)" class="md-ellipsis">linearmodels.<wbr>panel.<wbr>results.<wbr>Fama<wbr>Mac<wbr>Beth<wbr>Results.<wbr>all_<wbr>params</span>
+        
+  
+  
+  <span class="md-ellipsis">
+    <span title="/panel/panel/linearmodels.panel.results.famamacbethresults.all_params.rst (reference label)"><span>linearmodels.<wbr>panel.<wbr>results.<wbr>Fama<wbr>Mac<wbr>Beth<wbr>Results.<wbr>all_<wbr>params</span></span>
+    
+  </span>
+  
+
       </a>
     </li>
   
 
-            
-          
+              
             
               
+                
+  
   
   
   
   
     <li class="md-nav__item">
       <a href="linearmodels.panel.results.FamaMacBethResults.avg_adj_rsquared.html" class="md-nav__link">
-        <span title="/panel/panel/linearmodels.panel.results.famamacbethresults.avg_adj_rsquared.rst (reference label)" class="md-ellipsis">linearmodels.<wbr>panel.<wbr>results.<wbr>Fama<wbr>Mac<wbr>Beth<wbr>Results.<wbr>avg_<wbr>adj_<wbr>rsquared</span>
+        
+  
+  
+  <span class="md-ellipsis">
+    <span title="/panel/panel/linearmodels.panel.results.famamacbethresults.avg_adj_rsquared.rst (reference label)"><span>linearmodels.<wbr>panel.<wbr>results.<wbr>Fama<wbr>Mac<wbr>Beth<wbr>Results.<wbr>avg_<wbr>adj_<wbr>rsquared</span></span>
+    
+  </span>
+  
+
       </a>
     </li>
   
 
-            
-          
+              
             
               
+                
+  
   
   
   
   
     <li class="md-nav__item">
       <a href="linearmodels.panel.results.FamaMacBethResults.avg_rsquared.html" class="md-nav__link">
-        <span title="/panel/panel/linearmodels.panel.results.famamacbethresults.avg_rsquared.rst (reference label)" class="md-ellipsis">linearmodels.<wbr>panel.<wbr>results.<wbr>Fama<wbr>Mac<wbr>Beth<wbr>Results.<wbr>avg_<wbr>rsquared</span>
+        
+  
+  
+  <span class="md-ellipsis">
+    <span title="/panel/panel/linearmodels.panel.results.famamacbethresults.avg_rsquared.rst (reference label)"><span>linearmodels.<wbr>panel.<wbr>results.<wbr>Fama<wbr>Mac<wbr>Beth<wbr>Results.<wbr>avg_<wbr>rsquared</span></span>
+    
+  </span>
+  
+
       </a>
     </li>
   
 
-            
-          
+              
             
               
+                
+  
   
   
   
   
     <li class="md-nav__item">
       <a href="linearmodels.panel.results.FamaMacBethResults.corr_squared_between.html" class="md-nav__link">
-        <span title="/panel/panel/linearmodels.panel.results.famamacbethresults.corr_squared_between.rst (reference label)" class="md-ellipsis">linearmodels.<wbr>panel.<wbr>results.<wbr>Fama<wbr>Mac<wbr>Beth<wbr>Results.<wbr>corr_<wbr>squared_<wbr>between</span>
+        
+  
+  
+  <span class="md-ellipsis">
+    <span title="/panel/panel/linearmodels.panel.results.famamacbethresults.corr_squared_between.rst (reference label)"><span>linearmodels.<wbr>panel.<wbr>results.<wbr>Fama<wbr>Mac<wbr>Beth<wbr>Results.<wbr>corr_<wbr>squared_<wbr>between</span></span>
+    
+  </span>
+  
+
       </a>
     </li>
   
 
-            
-          
+              
             
               
+                
+  
   
   
   
   
     <li class="md-nav__item">
       <a href="linearmodels.panel.results.FamaMacBethResults.corr_squared_overall.html" class="md-nav__link">
-        <span title="/panel/panel/linearmodels.panel.results.famamacbethresults.corr_squared_overall.rst (reference label)" class="md-ellipsis">linearmodels.<wbr>panel.<wbr>results.<wbr>Fama<wbr>Mac<wbr>Beth<wbr>Results.<wbr>corr_<wbr>squared_<wbr>overall</span>
+        
+  
+  
+  <span class="md-ellipsis">
+    <span title="/panel/panel/linearmodels.panel.results.famamacbethresults.corr_squared_overall.rst (reference label)"><span>linearmodels.<wbr>panel.<wbr>results.<wbr>Fama<wbr>Mac<wbr>Beth<wbr>Results.<wbr>corr_<wbr>squared_<wbr>overall</span></span>
+    
+  </span>
+  
+
       </a>
     </li>
   
 
-            
-          
+              
             
               
+                
+  
   
   
   
   
     <li class="md-nav__item">
       <a href="linearmodels.panel.results.FamaMacBethResults.corr_squared_within.html" class="md-nav__link">
-        <span title="/panel/panel/linearmodels.panel.results.famamacbethresults.corr_squared_within.rst (reference label)" class="md-ellipsis">linearmodels.<wbr>panel.<wbr>results.<wbr>Fama<wbr>Mac<wbr>Beth<wbr>Results.<wbr>corr_<wbr>squared_<wbr>within</span>
+        
+  
+  
+  <span class="md-ellipsis">
+    <span title="/panel/panel/linearmodels.panel.results.famamacbethresults.corr_squared_within.rst (reference label)"><span>linearmodels.<wbr>panel.<wbr>results.<wbr>Fama<wbr>Mac<wbr>Beth<wbr>Results.<wbr>corr_<wbr>squared_<wbr>within</span></span>
+    
+  </span>
+  
+
       </a>
     </li>
   
 
-            
-          
+              
             
               
+                
+  
   
   
   
   
     <li class="md-nav__item">
       <a href="linearmodels.panel.results.FamaMacBethResults.cov.html" class="md-nav__link">
-        <span title="/panel/panel/linearmodels.panel.results.famamacbethresults.cov.rst (reference label)" class="md-ellipsis">linearmodels.<wbr>panel.<wbr>results.<wbr>Fama<wbr>Mac<wbr>Beth<wbr>Results.<wbr>cov</span>
+        
+  
+  
+  <span class="md-ellipsis">
+    <span title="/panel/panel/linearmodels.panel.results.famamacbethresults.cov.rst (reference label)"><span>linearmodels.<wbr>panel.<wbr>results.<wbr>Fama<wbr>Mac<wbr>Beth<wbr>Results.<wbr>cov</span></span>
+    
+  </span>
+  
+
       </a>
     </li>
   
 
-            
-          
+              
             
               
+                
+  
   
   
   
   
     <li class="md-nav__item">
       <a href="linearmodels.panel.results.FamaMacBethResults.df_model.html" class="md-nav__link">
-        <span title="/panel/panel/linearmodels.panel.results.famamacbethresults.df_model.rst (reference label)" class="md-ellipsis">linearmodels.<wbr>panel.<wbr>results.<wbr>Fama<wbr>Mac<wbr>Beth<wbr>Results.<wbr>df_<wbr>model</span>
+        
+  
+  
+  <span class="md-ellipsis">
+    <span title="/panel/panel/linearmodels.panel.results.famamacbethresults.df_model.rst (reference label)"><span>linearmodels.<wbr>panel.<wbr>results.<wbr>Fama<wbr>Mac<wbr>Beth<wbr>Results.<wbr>df_<wbr>model</span></span>
+    
+  </span>
+  
+
       </a>
     </li>
   
 
-            
-          
+              
             
               
+                
+  
   
   
   
   
     <li class="md-nav__item">
       <a href="linearmodels.panel.results.FamaMacBethResults.df_resid.html" class="md-nav__link">
-        <span title="/panel/panel/linearmodels.panel.results.famamacbethresults.df_resid.rst (reference label)" class="md-ellipsis">linearmodels.<wbr>panel.<wbr>results.<wbr>Fama<wbr>Mac<wbr>Beth<wbr>Results.<wbr>df_<wbr>resid</span>
+        
+  
+  
+  <span class="md-ellipsis">
+    <span title="/panel/panel/linearmodels.panel.results.famamacbethresults.df_resid.rst (reference label)"><span>linearmodels.<wbr>panel.<wbr>results.<wbr>Fama<wbr>Mac<wbr>Beth<wbr>Results.<wbr>df_<wbr>resid</span></span>
+    
+  </span>
+  
+
       </a>
     </li>
   
 
-            
-          
+              
             
               
+                
+  
   
   
   
   
     <li class="md-nav__item">
       <a href="linearmodels.panel.results.FamaMacBethResults.entity_info.html" class="md-nav__link">
-        <span title="/panel/panel/linearmodels.panel.results.famamacbethresults.entity_info.rst (reference label)" class="md-ellipsis">linearmodels.<wbr>panel.<wbr>results.<wbr>Fama<wbr>Mac<wbr>Beth<wbr>Results.<wbr>entity_<wbr>info</span>
+        
+  
+  
+  <span class="md-ellipsis">
+    <span title="/panel/panel/linearmodels.panel.results.famamacbethresults.entity_info.rst (reference label)"><span>linearmodels.<wbr>panel.<wbr>results.<wbr>Fama<wbr>Mac<wbr>Beth<wbr>Results.<wbr>entity_<wbr>info</span></span>
+    
+  </span>
+  
+
       </a>
     </li>
   
 
-            
-          
+              
             
               
+                
+  
   
   
   
   
     <li class="md-nav__item">
       <a href="linearmodels.panel.results.FamaMacBethResults.estimated_effects.html" class="md-nav__link">
-        <span title="/panel/panel/linearmodels.panel.results.famamacbethresults.estimated_effects.rst (reference label)" class="md-ellipsis">linearmodels.<wbr>panel.<wbr>results.<wbr>Fama<wbr>Mac<wbr>Beth<wbr>Results.<wbr>estimated_<wbr>effects</span>
+        
+  
+  
+  <span class="md-ellipsis">
+    <span title="/panel/panel/linearmodels.panel.results.famamacbethresults.estimated_effects.rst (reference label)"><span>linearmodels.<wbr>panel.<wbr>results.<wbr>Fama<wbr>Mac<wbr>Beth<wbr>Results.<wbr>estimated_<wbr>effects</span></span>
+    
+  </span>
+  
+
       </a>
     </li>
   
 
-            
-          
+              
             
               
+                
+  
   
   
   
   
     <li class="md-nav__item">
       <a href="linearmodels.panel.results.FamaMacBethResults.f_statistic.html" class="md-nav__link">
-        <span title="/panel/panel/linearmodels.panel.results.famamacbethresults.f_statistic.rst (reference label)" class="md-ellipsis">linearmodels.<wbr>panel.<wbr>results.<wbr>Fama<wbr>Mac<wbr>Beth<wbr>Results.<wbr>f_<wbr>statistic</span>
+        
+  
+  
+  <span class="md-ellipsis">
+    <span title="/panel/panel/linearmodels.panel.results.famamacbethresults.f_statistic.rst (reference label)"><span>linearmodels.<wbr>panel.<wbr>results.<wbr>Fama<wbr>Mac<wbr>Beth<wbr>Results.<wbr>f_<wbr>statistic</span></span>
+    
+  </span>
+  
+
       </a>
     </li>
   
 
-            
-          
+              
             
               
+                
+  
   
   
   
   
     <li class="md-nav__item">
       <a href="linearmodels.panel.results.FamaMacBethResults.f_statistic_robust.html" class="md-nav__link">
-        <span title="/panel/panel/linearmodels.panel.results.famamacbethresults.f_statistic_robust.rst (reference label)" class="md-ellipsis">linearmodels.<wbr>panel.<wbr>results.<wbr>Fama<wbr>Mac<wbr>Beth<wbr>Results.<wbr>f_<wbr>statistic_<wbr>robust</span>
+        
+  
+  
+  <span class="md-ellipsis">
+    <span title="/panel/panel/linearmodels.panel.results.famamacbethresults.f_statistic_robust.rst (reference label)"><span>linearmodels.<wbr>panel.<wbr>results.<wbr>Fama<wbr>Mac<wbr>Beth<wbr>Results.<wbr>f_<wbr>statistic_<wbr>robust</span></span>
+    
+  </span>
+  
+
       </a>
     </li>
   
 
-            
-          
+              
             
               
+                
+  
   
   
   
   
     <li class="md-nav__item">
       <a href="linearmodels.panel.results.FamaMacBethResults.fitted_values.html" class="md-nav__link">
-        <span title="/panel/panel/linearmodels.panel.results.famamacbethresults.fitted_values.rst (reference label)" class="md-ellipsis">linearmodels.<wbr>panel.<wbr>results.<wbr>Fama<wbr>Mac<wbr>Beth<wbr>Results.<wbr>fitted_<wbr>values</span>
+        
+  
+  
+  <span class="md-ellipsis">
+    <span title="/panel/panel/linearmodels.panel.results.famamacbethresults.fitted_values.rst (reference label)"><span>linearmodels.<wbr>panel.<wbr>results.<wbr>Fama<wbr>Mac<wbr>Beth<wbr>Results.<wbr>fitted_<wbr>values</span></span>
+    
+  </span>
+  
+
       </a>
     </li>
   
 
-            
-          
+              
             
               
+                
+  
   
   
   
   
     <li class="md-nav__item">
       <a href="linearmodels.panel.results.FamaMacBethResults.idiosyncratic.html" class="md-nav__link">
-        <span title="/panel/panel/linearmodels.panel.results.famamacbethresults.idiosyncratic.rst (reference label)" class="md-ellipsis">linearmodels.<wbr>panel.<wbr>results.<wbr>Fama<wbr>Mac<wbr>Beth<wbr>Results.<wbr>idiosyncratic</span>
+        
+  
+  
+  <span class="md-ellipsis">
+    <span title="/panel/panel/linearmodels.panel.results.famamacbethresults.idiosyncratic.rst (reference label)"><span>linearmodels.<wbr>panel.<wbr>results.<wbr>Fama<wbr>Mac<wbr>Beth<wbr>Results.<wbr>idiosyncratic</span></span>
+    
+  </span>
+  
+
       </a>
     </li>
   
 
-            
-          
+              
             
               
+                
+  
   
   
   
   
     <li class="md-nav__item">
       <a href="linearmodels.panel.results.FamaMacBethResults.loglik.html" class="md-nav__link">
-        <span title="/panel/panel/linearmodels.panel.results.famamacbethresults.loglik.rst (reference label)" class="md-ellipsis">linearmodels.<wbr>panel.<wbr>results.<wbr>Fama<wbr>Mac<wbr>Beth<wbr>Results.<wbr>loglik</span>
+        
+  
+  
+  <span class="md-ellipsis">
+    <span title="/panel/panel/linearmodels.panel.results.famamacbethresults.loglik.rst (reference label)"><span>linearmodels.<wbr>panel.<wbr>results.<wbr>Fama<wbr>Mac<wbr>Beth<wbr>Results.<wbr>loglik</span></span>
+    
+  </span>
+  
+
       </a>
     </li>
   
 
-            
-          
+              
             
               
+                
+  
   
   
   
   
     <li class="md-nav__item">
       <a href="linearmodels.panel.results.FamaMacBethResults.model_ss.html" class="md-nav__link">
-        <span title="/panel/panel/linearmodels.panel.results.famamacbethresults.model_ss.rst (reference label)" class="md-ellipsis">linearmodels.<wbr>panel.<wbr>results.<wbr>Fama<wbr>Mac<wbr>Beth<wbr>Results.<wbr>model_<wbr>ss</span>
+        
+  
+  
+  <span class="md-ellipsis">
+    <span title="/panel/panel/linearmodels.panel.results.famamacbethresults.model_ss.rst (reference label)"><span>linearmodels.<wbr>panel.<wbr>results.<wbr>Fama<wbr>Mac<wbr>Beth<wbr>Results.<wbr>model_<wbr>ss</span></span>
+    
+  </span>
+  
+
       </a>
     </li>
   
 
-            
-          
+              
             
               
+                
+  
   
   
   
   
     <li class="md-nav__item">
       <a href="linearmodels.panel.results.FamaMacBethResults.name.html" class="md-nav__link">
-        <span title="/panel/panel/linearmodels.panel.results.famamacbethresults.name.rst (reference label)" class="md-ellipsis">linearmodels.<wbr>panel.<wbr>results.<wbr>Fama<wbr>Mac<wbr>Beth<wbr>Results.<wbr>name</span>
+        
+  
+  
+  <span class="md-ellipsis">
+    <span title="/panel/panel/linearmodels.panel.results.famamacbethresults.name.rst (reference label)"><span>linearmodels.<wbr>panel.<wbr>results.<wbr>Fama<wbr>Mac<wbr>Beth<wbr>Results.<wbr>name</span></span>
+    
+  </span>
+  
+
       </a>
     </li>
   
 
-            
-          
+              
             
               
+                
+  
   
   
   
   
     <li class="md-nav__item">
       <a href="linearmodels.panel.results.FamaMacBethResults.nobs.html" class="md-nav__link">
-        <span title="/panel/panel/linearmodels.panel.results.famamacbethresults.nobs.rst (reference label)" class="md-ellipsis">linearmodels.<wbr>panel.<wbr>results.<wbr>Fama<wbr>Mac<wbr>Beth<wbr>Results.<wbr>nobs</span>
+        
+  
+  
+  <span class="md-ellipsis">
+    <span title="/panel/panel/linearmodels.panel.results.famamacbethresults.nobs.rst (reference label)"><span>linearmodels.<wbr>panel.<wbr>results.<wbr>Fama<wbr>Mac<wbr>Beth<wbr>Results.<wbr>nobs</span></span>
+    
+  </span>
+  
+
       </a>
     </li>
   
 
-            
-          
+              
             
               
+                
+  
   
   
   
   
     <li class="md-nav__item">
       <a href="linearmodels.panel.results.FamaMacBethResults.params.html" class="md-nav__link">
-        <span title="/panel/panel/linearmodels.panel.results.famamacbethresults.params.rst (reference label)" class="md-ellipsis">linearmodels.<wbr>panel.<wbr>results.<wbr>Fama<wbr>Mac<wbr>Beth<wbr>Results.<wbr>params</span>
+        
+  
+  
+  <span class="md-ellipsis">
+    <span title="/panel/panel/linearmodels.panel.results.famamacbethresults.params.rst (reference label)"><span>linearmodels.<wbr>panel.<wbr>results.<wbr>Fama<wbr>Mac<wbr>Beth<wbr>Results.<wbr>params</span></span>
+    
+  </span>
+  
+
       </a>
     </li>
   
 
-            
-          
+              
             
               
+                
+  
   
   
   
   
     <li class="md-nav__item">
       <a href="linearmodels.panel.results.FamaMacBethResults.pvalues.html" class="md-nav__link">
-        <span title="/panel/panel/linearmodels.panel.results.famamacbethresults.pvalues.rst (reference label)" class="md-ellipsis">linearmodels.<wbr>panel.<wbr>results.<wbr>Fama<wbr>Mac<wbr>Beth<wbr>Results.<wbr>pvalues</span>
+        
+  
+  
+  <span class="md-ellipsis">
+    <span title="/panel/panel/linearmodels.panel.results.famamacbethresults.pvalues.rst (reference label)"><span>linearmodels.<wbr>panel.<wbr>results.<wbr>Fama<wbr>Mac<wbr>Beth<wbr>Results.<wbr>pvalues</span></span>
+    
+  </span>
+  
+
       </a>
     </li>
   
 
-            
-          
+              
             
               
+                
+  
   
   
   
   
     <li class="md-nav__item">
       <a href="linearmodels.panel.results.FamaMacBethResults.resid_ss.html" class="md-nav__link">
-        <span title="/panel/panel/linearmodels.panel.results.famamacbethresults.resid_ss.rst (reference label)" class="md-ellipsis">linearmodels.<wbr>panel.<wbr>results.<wbr>Fama<wbr>Mac<wbr>Beth<wbr>Results.<wbr>resid_<wbr>ss</span>
+        
+  
+  
+  <span class="md-ellipsis">
+    <span title="/panel/panel/linearmodels.panel.results.famamacbethresults.resid_ss.rst (reference label)"><span>linearmodels.<wbr>panel.<wbr>results.<wbr>Fama<wbr>Mac<wbr>Beth<wbr>Results.<wbr>resid_<wbr>ss</span></span>
+    
+  </span>
+  
+
       </a>
     </li>
   
 
-            
-          
+              
             
               
+                
+  
   
   
   
   
     <li class="md-nav__item">
       <a href="linearmodels.panel.results.FamaMacBethResults.resids.html" class="md-nav__link">
-        <span title="/panel/panel/linearmodels.panel.results.famamacbethresults.resids.rst (reference label)" class="md-ellipsis">linearmodels.<wbr>panel.<wbr>results.<wbr>Fama<wbr>Mac<wbr>Beth<wbr>Results.<wbr>resids</span>
+        
+  
+  
+  <span class="md-ellipsis">
+    <span title="/panel/panel/linearmodels.panel.results.famamacbethresults.resids.rst (reference label)"><span>linearmodels.<wbr>panel.<wbr>results.<wbr>Fama<wbr>Mac<wbr>Beth<wbr>Results.<wbr>resids</span></span>
+    
+  </span>
+  
+
       </a>
     </li>
   
 
-            
-          
+              
             
               
+                
+  
   
   
   
   
     <li class="md-nav__item">
       <a href="linearmodels.panel.results.FamaMacBethResults.rsquared.html" class="md-nav__link">
-        <span title="/panel/panel/linearmodels.panel.results.famamacbethresults.rsquared.rst (reference label)" class="md-ellipsis">linearmodels.<wbr>panel.<wbr>results.<wbr>Fama<wbr>Mac<wbr>Beth<wbr>Results.<wbr>rsquared</span>
+        
+  
+  
+  <span class="md-ellipsis">
+    <span title="/panel/panel/linearmodels.panel.results.famamacbethresults.rsquared.rst (reference label)"><span>linearmodels.<wbr>panel.<wbr>results.<wbr>Fama<wbr>Mac<wbr>Beth<wbr>Results.<wbr>rsquared</span></span>
+    
+  </span>
+  
+
       </a>
     </li>
   
 
-            
-          
+              
             
               
+                
+  
   
   
   
   
     <li class="md-nav__item">
       <a href="linearmodels.panel.results.FamaMacBethResults.rsquared_between.html" class="md-nav__link">
-        <span title="/panel/panel/linearmodels.panel.results.famamacbethresults.rsquared_between.rst (reference label)" class="md-ellipsis">linearmodels.<wbr>panel.<wbr>results.<wbr>Fama<wbr>Mac<wbr>Beth<wbr>Results.<wbr>rsquared_<wbr>between</span>
+        
+  
+  
+  <span class="md-ellipsis">
+    <span title="/panel/panel/linearmodels.panel.results.famamacbethresults.rsquared_between.rst (reference label)"><span>linearmodels.<wbr>panel.<wbr>results.<wbr>Fama<wbr>Mac<wbr>Beth<wbr>Results.<wbr>rsquared_<wbr>between</span></span>
+    
+  </span>
+  
+
       </a>
     </li>
   
 
-            
-          
+              
             
               
+                
+  
   
   
   
   
     <li class="md-nav__item">
       <a href="linearmodels.panel.results.FamaMacBethResults.rsquared_overall.html" class="md-nav__link">
-        <span title="/panel/panel/linearmodels.panel.results.famamacbethresults.rsquared_overall.rst (reference label)" class="md-ellipsis">linearmodels.<wbr>panel.<wbr>results.<wbr>Fama<wbr>Mac<wbr>Beth<wbr>Results.<wbr>rsquared_<wbr>overall</span>
+        
+  
+  
+  <span class="md-ellipsis">
+    <span title="/panel/panel/linearmodels.panel.results.famamacbethresults.rsquared_overall.rst (reference label)"><span>linearmodels.<wbr>panel.<wbr>results.<wbr>Fama<wbr>Mac<wbr>Beth<wbr>Results.<wbr>rsquared_<wbr>overall</span></span>
+    
+  </span>
+  
+
       </a>
     </li>
   
 
-            
-          
+              
             
               
+                
+  
   
   
   
   
     <li class="md-nav__item">
       <a href="linearmodels.panel.results.FamaMacBethResults.rsquared_within.html" class="md-nav__link">
-        <span title="/panel/panel/linearmodels.panel.results.famamacbethresults.rsquared_within.rst (reference label)" class="md-ellipsis">linearmodels.<wbr>panel.<wbr>results.<wbr>Fama<wbr>Mac<wbr>Beth<wbr>Results.<wbr>rsquared_<wbr>within</span>
+        
+  
+  
+  <span class="md-ellipsis">
+    <span title="/panel/panel/linearmodels.panel.results.famamacbethresults.rsquared_within.rst (reference label)"><span>linearmodels.<wbr>panel.<wbr>results.<wbr>Fama<wbr>Mac<wbr>Beth<wbr>Results.<wbr>rsquared_<wbr>within</span></span>
+    
+  </span>
+  
+
       </a>
     </li>
   
 
-            
-          
+              
             
               
+                
+  
   
   
   
   
     <li class="md-nav__item">
       <a href="linearmodels.panel.results.FamaMacBethResults.s2.html" class="md-nav__link">
-        <span title="/panel/panel/linearmodels.panel.results.famamacbethresults.s2.rst (reference label)" class="md-ellipsis">linearmodels.<wbr>panel.<wbr>results.<wbr>Fama<wbr>Mac<wbr>Beth<wbr>Results.<wbr>s2</span>
+        
+  
+  
+  <span class="md-ellipsis">
+    <span title="/panel/panel/linearmodels.panel.results.famamacbethresults.s2.rst (reference label)"><span>linearmodels.<wbr>panel.<wbr>results.<wbr>Fama<wbr>Mac<wbr>Beth<wbr>Results.<wbr>s2</span></span>
+    
+  </span>
+  
+
       </a>
     </li>
   
 
-            
-          
+              
             
               
+                
+  
   
   
   
   
     <li class="md-nav__item">
       <a href="linearmodels.panel.results.FamaMacBethResults.std_errors.html" class="md-nav__link">
-        <span title="/panel/panel/linearmodels.panel.results.famamacbethresults.std_errors.rst (reference label)" class="md-ellipsis">linearmodels.<wbr>panel.<wbr>results.<wbr>Fama<wbr>Mac<wbr>Beth<wbr>Results.<wbr>std_<wbr>errors</span>
+        
+  
+  
+  <span class="md-ellipsis">
+    <span title="/panel/panel/linearmodels.panel.results.famamacbethresults.std_errors.rst (reference label)"><span>linearmodels.<wbr>panel.<wbr>results.<wbr>Fama<wbr>Mac<wbr>Beth<wbr>Results.<wbr>std_<wbr>errors</span></span>
+    
+  </span>
+  
+
       </a>
     </li>
   
 
-            
-          
+              
             
               
+                
+  
   
   
   
   
     <li class="md-nav__item">
       <a href="linearmodels.panel.results.FamaMacBethResults.summary.html" class="md-nav__link">
-        <span title="/panel/panel/linearmodels.panel.results.famamacbethresults.summary.rst (reference label)" class="md-ellipsis">linearmodels.<wbr>panel.<wbr>results.<wbr>Fama<wbr>Mac<wbr>Beth<wbr>Results.<wbr>summary</span>
+        
+  
+  
+  <span class="md-ellipsis">
+    <span title="/panel/panel/linearmodels.panel.results.famamacbethresults.summary.rst (reference label)"><span>linearmodels.<wbr>panel.<wbr>results.<wbr>Fama<wbr>Mac<wbr>Beth<wbr>Results.<wbr>summary</span></span>
+    
+  </span>
+  
+
       </a>
     </li>
   
 
-            
-          
+              
             
               
+                
+  
   
   
   
   
     <li class="md-nav__item">
       <a href="linearmodels.panel.results.FamaMacBethResults.time_info.html" class="md-nav__link">
-        <span title="/panel/panel/linearmodels.panel.results.famamacbethresults.time_info.rst (reference label)" class="md-ellipsis">linearmodels.<wbr>panel.<wbr>results.<wbr>Fama<wbr>Mac<wbr>Beth<wbr>Results.<wbr>time_<wbr>info</span>
+        
+  
+  
+  <span class="md-ellipsis">
+    <span title="/panel/panel/linearmodels.panel.results.famamacbethresults.time_info.rst (reference label)"><span>linearmodels.<wbr>panel.<wbr>results.<wbr>Fama<wbr>Mac<wbr>Beth<wbr>Results.<wbr>time_<wbr>info</span></span>
+    
+  </span>
+  
+
       </a>
     </li>
   
 
-            
-          
+              
             
               
+                
+  
   
   
   
   
     <li class="md-nav__item">
       <a href="linearmodels.panel.results.FamaMacBethResults.total_ss.html" class="md-nav__link">
-        <span title="/panel/panel/linearmodels.panel.results.famamacbethresults.total_ss.rst (reference label)" class="md-ellipsis">linearmodels.<wbr>panel.<wbr>results.<wbr>Fama<wbr>Mac<wbr>Beth<wbr>Results.<wbr>total_<wbr>ss</span>
+        
+  
+  
+  <span class="md-ellipsis">
+    <span title="/panel/panel/linearmodels.panel.results.famamacbethresults.total_ss.rst (reference label)"><span>linearmodels.<wbr>panel.<wbr>results.<wbr>Fama<wbr>Mac<wbr>Beth<wbr>Results.<wbr>total_<wbr>ss</span></span>
+    
+  </span>
+  
+
       </a>
     </li>
   
 
-            
-          
+              
             
               
+                
+  
   
   
   
   
     <li class="md-nav__item">
       <a href="linearmodels.panel.results.FamaMacBethResults.tstats.html" class="md-nav__link">
-        <span title="/panel/panel/linearmodels.panel.results.famamacbethresults.tstats.rst (reference label)" class="md-ellipsis">linearmodels.<wbr>panel.<wbr>results.<wbr>Fama<wbr>Mac<wbr>Beth<wbr>Results.<wbr>tstats</span>
+        
+  
+  
+  <span class="md-ellipsis">
+    <span title="/panel/panel/linearmodels.panel.results.famamacbethresults.tstats.rst (reference label)"><span>linearmodels.<wbr>panel.<wbr>results.<wbr>Fama<wbr>Mac<wbr>Beth<wbr>Results.<wbr>tstats</span></span>
+    
+  </span>
+  
+
       </a>
     </li>
   
 
-            
-          
+              
             
               
+                
+  
   
   
   
   
     <li class="md-nav__item">
       <a href="linearmodels.panel.results.FamaMacBethResults.wresids.html" class="md-nav__link">
-        <span title="/panel/panel/linearmodels.panel.results.famamacbethresults.wresids.rst (reference label)" class="md-ellipsis">linearmodels.<wbr>panel.<wbr>results.<wbr>Fama<wbr>Mac<wbr>Beth<wbr>Results.<wbr>wresids</span>
+        
+  
+  
+  <span class="md-ellipsis">
+    <span title="/panel/panel/linearmodels.panel.results.famamacbethresults.wresids.rst (reference label)"><span>linearmodels.<wbr>panel.<wbr>results.<wbr>Fama<wbr>Mac<wbr>Beth<wbr>Results.<wbr>wresids</span></span>
+    
+  </span>
+  
+
       </a>
     </li>
   
 
+              
             
-          
-        </ul>
-      </nav>
+          </ul>
+        </nav>
+      
     </li>
   
   
 
+              
             
-          
-        </ul>
-      </nav>
+          </ul>
+        </nav>
+      
     </li>
   
   
 
-            
-          
+              
             
               
+                
+  
   
   
   
   
     <li class="md-nav__item">
       <a href="linearmodels.panel.results.PanelResults.html" class="md-nav__link">
-        <span title="/panel/panel/linearmodels.panel.results.panelresults.rst (reference label)" class="md-ellipsis">linearmodels.<wbr>panel.<wbr>results.<wbr>Panel<wbr>Results</span>
+        
+  
+  
+  <span class="md-ellipsis">
+    <span title="/panel/panel/linearmodels.panel.results.panelresults.rst (reference label)"><span>linearmodels.<wbr>panel.<wbr>results.<wbr>Panel<wbr>Results</span></span>
+    
+  </span>
+  
+
       </a>
     </li>
   
 
-            
-          
+              
             
               
+                
+  
   
   
   
   
     <li class="md-nav__item">
       <a href="linearmodels.panel.results.PanelEffectsResults.html" class="md-nav__link">
-        <span title="/panel/panel/linearmodels.panel.results.paneleffectsresults.rst (reference label)" class="md-ellipsis">linearmodels.<wbr>panel.<wbr>results.<wbr>Panel<wbr>Effects<wbr>Results</span>
+        
+  
+  
+  <span class="md-ellipsis">
+    <span title="/panel/panel/linearmodels.panel.results.paneleffectsresults.rst (reference label)"><span>linearmodels.<wbr>panel.<wbr>results.<wbr>Panel<wbr>Effects<wbr>Results</span></span>
+    
+  </span>
+  
+
       </a>
     </li>
   
 
-            
-          
+              
             
               
+                
+  
   
   
   
   
     <li class="md-nav__item">
       <a href="linearmodels.panel.results.RandomEffectsResults.html" class="md-nav__link">
-        <span title="/panel/panel/linearmodels.panel.results.randomeffectsresults.rst (reference label)" class="md-ellipsis">linearmodels.<wbr>panel.<wbr>results.<wbr>Random<wbr>Effects<wbr>Results</span>
+        
+  
+  
+  <span class="md-ellipsis">
+    <span title="/panel/panel/linearmodels.panel.results.randomeffectsresults.rst (reference label)"><span>linearmodels.<wbr>panel.<wbr>results.<wbr>Random<wbr>Effects<wbr>Results</span></span>
+    
+  </span>
+  
+
       </a>
     </li>
   
 
-            
-          
+              
             
               
+                
+  
   
   
   
   
     <li class="md-nav__item">
       <a href="linearmodels.panel.results.PanelModelComparison.html" class="md-nav__link">
-        <span title="/panel/panel/linearmodels.panel.results.panelmodelcomparison.rst (reference label)" class="md-ellipsis">linearmodels.<wbr>panel.<wbr>results.<wbr>Panel<wbr>Model<wbr>Comparison</span>
+        
+  
+  
+  <span class="md-ellipsis">
+    <span title="/panel/panel/linearmodels.panel.results.panelmodelcomparison.rst (reference label)"><span>linearmodels.<wbr>panel.<wbr>results.<wbr>Panel<wbr>Model<wbr>Comparison</span></span>
+    
+  </span>
+  
+
       </a>
     </li>
   
 
-            
-          
+              
             
               
+                
+  
   
   
   
   
     <li class="md-nav__item">
       <a href="linearmodels.panel.results.compare.html" class="md-nav__link">
-        <span title="/panel/panel/linearmodels.panel.results.compare.rst (reference label)" class="md-ellipsis">linearmodels.<wbr>panel.<wbr>results.<wbr>compare</span>
+        
+  
+  
+  <span class="md-ellipsis">
+    <span title="/panel/panel/linearmodels.panel.results.compare.rst (reference label)"><span>linearmodels.<wbr>panel.<wbr>results.<wbr>compare</span></span>
+    
+  </span>
+  
+
       </a>
     </li>
   
 
+              
             
-          
-        </ul>
-      </nav>
+          </ul>
+        </nav>
+      
     </li>
   
   
 
-            
-          
+              
             
               
+                
+  
   
   
   
   
     <li class="md-nav__item">
       <a href="../reference.html#module-linearmodels.panel.covariance" class="md-nav__link">
-        <span title="linearmodels.panel.covariance (Python module)" class="md-ellipsis">Panel Model Covariance Estimators</span>
+        
+  
+  
+  <span class="md-ellipsis">
+    <span title="linearmodels.panel.covariance (Python module)"><span>Panel Model Covariance Estimators</span></span>
+    
+  </span>
+  
+
       </a>
     </li>
   
 
-            
-          
+              
             
               
+                
+  
   
   
   
   
     <li class="md-nav__item">
       <a href="../reference.html#module-linearmodels.panel.data" class="md-nav__link">
-        <span title="linearmodels.panel.data (Python module)" class="md-ellipsis">Panel Data Structures</span>
+        
+  
+  
+  <span class="md-ellipsis">
+    <span title="linearmodels.panel.data (Python module)"><span>Panel Data Structures</span></span>
+    
+  </span>
+  
+
       </a>
     </li>
   
 
-            
-          
+              
             
               
+                
+  
   
   
   
   
     <li class="md-nav__item">
       <a href="../reference.html#module-linearmodels.panel.utility" class="md-nav__link">
-        <span title="linearmodels.panel.utility (Python module)" class="md-ellipsis">Test Data Generation</span>
+        
+  
+  
+  <span class="md-ellipsis">
+    <span title="linearmodels.panel.utility (Python module)"><span>Test Data Generation</span></span>
+    
+  </span>
+  
+
       </a>
     </li>
   
 
+              
             
-          
-        </ul>
-      </nav>
+          </ul>
+        </nav>
+      
     </li>
   
   
 
-            
-          
+              
             
               
+                
+  
   
   
   
   
     <li class="md-nav__item">
       <a href="../mathematical-formula.html" class="md-nav__link">
-        <span title="/panel/mathematical-formula.rst (reference label)" class="md-ellipsis">Formulas and Mathematical Detail</span>
+        
+  
+  
+  <span class="md-ellipsis">
+    <span title="/panel/mathematical-formula.rst (reference label)"><span>Formulas and Mathematical Detail</span></span>
+    
+  </span>
+  
+
       </a>
     </li>
   
 
-            
-          
+              
             
               
+                
+  
   
   
   
   
     <li class="md-nav__item">
       <a href="../faq.html" class="md-nav__link">
-        <span title="/panel/faq.rst (reference label)" class="md-ellipsis">Implementation Choices</span>
+        
+  
+  
+  <span class="md-ellipsis">
+    <span title="/panel/faq.rst (reference label)"><span>Implementation Choices</span></span>
+    
+  </span>
+  
+
       </a>
     </li>
   
 
+              
             
-          
-        </ul>
-      </nav>
+          </ul>
+        </nav>
+      
     </li>
   
   
@@ -1318,15 +1925,22 @@
     
       
       
-      
-
+  
   
   
   
   
     <li class="md-nav__item">
       <a href="../../asset-pricing/index.html" class="md-nav__link">
-        <span title="/asset-pricing/index.rst (reference label)" class="md-ellipsis">Linear Factor Models for Asset Pricing</span>
+        
+  
+  
+  <span class="md-ellipsis">
+    <span title="/asset-pricing/index.rst (reference label)"><span>Linear Factor Models for Asset Pricing</span></span>
+    
+  </span>
+  
+
       </a>
     </li>
   
@@ -1334,15 +1948,22 @@
     
       
       
-      
-
+  
   
   
   
   
     <li class="md-nav__item">
       <a href="../../system/index.html" class="md-nav__link">
-        <span title="/system/index.rst (reference label)" class="md-ellipsis">System Regression Models</span>
+        
+  
+  
+  <span class="md-ellipsis">
+    <span title="/system/index.rst (reference label)"><span>System Regression Models</span></span>
+    
+  </span>
+  
+
       </a>
     </li>
   
@@ -1350,15 +1971,22 @@
     
       
       
-      
-
+  
   
   
   
   
     <li class="md-nav__item">
       <a href="../../utility.html" class="md-nav__link">
-        <span title="/utility.rst (reference label)" class="md-ellipsis">Utilities</span>
+        
+  
+  
+  <span class="md-ellipsis">
+    <span title="/utility.rst (reference label)"><span>Utilities</span></span>
+    
+  </span>
+  
+
       </a>
     </li>
   
@@ -1366,15 +1994,22 @@
     
       
       
-      
-
+  
   
   
   
   
     <li class="md-nav__item">
       <a href="../../compatibility.html" class="md-nav__link">
-        <span title="/compatibility.rst (reference label)" class="md-ellipsis">Compatibility</span>
+        
+  
+  
+  <span class="md-ellipsis">
+    <span title="/compatibility.rst (reference label)"><span>Compatibility</span></span>
+    
+  </span>
+  
+
       </a>
     </li>
   
@@ -1382,15 +2017,22 @@
     
       
       
-      
-
+  
   
   
   
   
     <li class="md-nav__item">
       <a href="../../types.html" class="md-nav__link">
-        <span title="/types.rst (reference label)" class="md-ellipsis">Type Aliases</span>
+        
+  
+  
+  <span class="md-ellipsis">
+    <span title="/types.rst (reference label)"><span>Type Aliases</span></span>
+    
+  </span>
+  
+
       </a>
     </li>
   
@@ -1398,15 +2040,22 @@
     
       
       
-      
-
+  
   
   
   
   
     <li class="md-nav__item">
       <a href="../../plan.html" class="md-nav__link">
-        <span title="/plan.rst (reference label)" class="md-ellipsis">Module Plans</span>
+        
+  
+  
+  <span class="md-ellipsis">
+    <span title="/plan.rst (reference label)"><span>Module Plans</span></span>
+    
+  </span>
+  
+
       </a>
     </li>
   
@@ -1414,15 +2063,22 @@
     
       
       
-      
-
+  
   
   
   
   
     <li class="md-nav__item">
       <a href="../../contributing.html" class="md-nav__link">
-        <span title="/contributing.rst (reference label)" class="md-ellipsis">Contributing</span>
+        
+  
+  
+  <span class="md-ellipsis">
+    <span title="/contributing.rst (reference label)"><span>Contributing</span></span>
+    
+  </span>
+  
+
       </a>
     </li>
   
@@ -1430,15 +2086,22 @@
     
       
       
-      
-
+  
   
   
   
   
     <li class="md-nav__item">
       <a href="../../changes.html" class="md-nav__link">
-        <span title="/changes.rst (reference label)" class="md-ellipsis">Change Log</span>
+        
+  
+  
+  <span class="md-ellipsis">
+    <span title="/changes.rst (reference label)"><span>Change Log</span></span>
+    
+  </span>
+  
+
       </a>
     </li>
   
@@ -1446,15 +2109,22 @@
     
       
       
-      
-
+  
   
   
   
   
     <li class="md-nav__item">
       <a href="../../references.html" class="md-nav__link">
-        <span title="/references.rst (reference label)" class="md-ellipsis">References</span>
+        
+  
+  
+  <span class="md-ellipsis">
+    <span title="/references.rst (reference label)"><span>References</span></span>
+    
+  </span>
+  
+
       </a>
     </li>
   
@@ -1487,7 +2157,12 @@
       
         <li class="md-nav__item">
   <a href="#linearmodels.panel.results.FamaMacBethResults.wald_test" class="md-nav__link">
-    <span aria-label="Python method" class="objinfo-icon objinfo-icon__procedure" title="Python method">M</span><span title="linearmodels.panel.results.FamaMacBethResults.wald_test (Python method) — Test linear equality constraints using a Wald test" class="md-ellipsis">Fama<wbr>Mac<wbr>Beth<wbr>Results.<wbr>wald_<wbr>test</span>
+    
+      <span aria-label="Python method" class="objinfo-icon objinfo-icon__procedure" title="Python method">M</span>
+    
+    <span class="md-ellipsis">
+      <span title="linearmodels.panel.results.FamaMacBethResults.wald_test (Python method) — Test linear equality constraints using a Wald test"><span>Fama<wbr>Mac<wbr>Beth<wbr>Results.<wbr>wald_<wbr>test</span></span>
+    </span>
   </a>
   
     <nav class="md-nav" aria-label="FamaMacBethResults.wald_test">
@@ -1495,7 +2170,10 @@
         
           <li class="md-nav__item">
   <a href="#linearmodels.panel.results.FamaMacBethResults.wald_test-parameters" class="md-nav__link">
-    <span class="md-ellipsis">Parameters</span>
+    
+    <span class="md-ellipsis">
+      <span>Parameters</span>
+    </span>
   </a>
   
     <nav class="md-nav" aria-label="Parameters">
@@ -1503,21 +2181,36 @@
         
           <li class="md-nav__item">
   <a href="#linearmodels.panel.results.FamaMacBethResults.wald_test.restriction" class="md-nav__link">
-    <span aria-label="Python parameter" class="objinfo-icon objinfo-icon__sub-data" title="Python parameter">p</span><span title="linearmodels.panel.results.FamaMacBethResults.wald_test.restriction (Python parameter) — q by nvar array containing linear weights to apply to parameters when forming the restrictions." class="md-ellipsis">restriction</span>
+    
+      <span aria-label="Python parameter" class="objinfo-icon objinfo-icon__sub-data" title="Python parameter">p</span>
+    
+    <span class="md-ellipsis">
+      <span title="linearmodels.panel.results.FamaMacBethResults.wald_test.restriction (Python parameter) — q by nvar array containing linear weights to apply to parameters when forming the restrictions."><span>restriction</span></span>
+    </span>
   </a>
   
 </li>
         
           <li class="md-nav__item">
   <a href="#linearmodels.panel.results.FamaMacBethResults.wald_test.value" class="md-nav__link">
-    <span aria-label="Python parameter" class="objinfo-icon objinfo-icon__sub-data" title="Python parameter">p</span><span title="linearmodels.panel.results.FamaMacBethResults.wald_test.value (Python parameter) — q element array containing the restricted values." class="md-ellipsis">value</span>
+    
+      <span aria-label="Python parameter" class="objinfo-icon objinfo-icon__sub-data" title="Python parameter">p</span>
+    
+    <span class="md-ellipsis">
+      <span title="linearmodels.panel.results.FamaMacBethResults.wald_test.value (Python parameter) — q element array containing the restricted values."><span>value</span></span>
+    </span>
   </a>
   
 </li>
         
           <li class="md-nav__item">
   <a href="#linearmodels.panel.results.FamaMacBethResults.wald_test.formula" class="md-nav__link">
-    <span aria-label="Python parameter" class="objinfo-icon objinfo-icon__sub-data" title="Python parameter">p</span><span title="linearmodels.panel.results.FamaMacBethResults.wald_test.formula (Python parameter) — formulaic linear constraints." class="md-ellipsis">formula</span>
+    
+      <span aria-label="Python parameter" class="objinfo-icon objinfo-icon__sub-data" title="Python parameter">p</span>
+    
+    <span class="md-ellipsis">
+      <span title="linearmodels.panel.results.FamaMacBethResults.wald_test.formula (Python parameter) — formulaic linear constraints."><span>formula</span></span>
+    </span>
   </a>
   
 </li>
@@ -1529,14 +2222,20 @@
         
           <li class="md-nav__item">
   <a href="#linearmodels.panel.results.FamaMacBethResults.wald_test-returns" class="md-nav__link">
-    <span class="md-ellipsis">Returns</span>
+    
+    <span class="md-ellipsis">
+      <span>Returns</span>
+    </span>
   </a>
   
 </li>
         
           <li class="md-nav__item">
   <a href="#linearmodels.panel.results.FamaMacBethResults.wald_test-return-type" class="md-nav__link">
-    <span class="md-ellipsis">Return type</span>
+    
+    <span class="md-ellipsis">
+      <span>Return type</span>
+    </span>
   </a>
   
 </li>
@@ -1557,24 +2256,26 @@
           
             <div class="md-content" data-md-component="content">
               <article class="md-content__inner md-typeset" role="main">
+                
+                
                   
 
 
 <h1 id="linearmodels-panel-results-famamacbethresults-wald-test">linearmodels.panel.results.FamaMacBethResults.wald_test<a class="headerlink" href="#linearmodels-panel-results-famamacbethresults-wald-test" title="Link to this heading">¶</a></h1>
 <dl class="py method objdesc">
 <dt class="sig sig-object highlight sig-wrap py" id="linearmodels.panel.results.FamaMacBethResults.wald_test">
-<span class="sig-prename descclassname"><span class="pre">FamaMacBethResults.</span></span><span class="sig-name descname"><span class="pre">wald_test</span></span><span class="sig-paren">(</span><span class="sig-param-decl"><em class="sig-param"><a class="n reference internal" href="#linearmodels.panel.results.FamaMacBethResults.wald_test.restriction" title="linearmodels.panel.results.FamaMacBethResults.wald_test.restriction (Python parameter) — q by nvar array containing linear weights to apply to parameters when forming the restrictions."><span class="n"><span class="pre">restriction</span></span></a><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="desctype"><a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v2.1)"><span class="pre">ndarray</span></a><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><a class="reference external" href="https://pandas.pydata.org/pandas-docs/stable/reference/api/pandas.DataFrame.html#pandas.DataFrame" title="(in pandas v2.2.3)"><span class="pre">DataFrame</span></a><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.12)"><span class="pre">None</span></a></span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><code class="code python default_value docutils literal highlight highlight-python"><span class="kc">None</span></code></em>, </span><span class="sig-param-decl"><em class="sig-param"><a class="n reference internal" href="#linearmodels.panel.results.FamaMacBethResults.wald_test.value" title="linearmodels.panel.results.FamaMacBethResults.wald_test.value (Python parameter) — q element array containing the restricted values."><span class="n"><span class="pre">value</span></span></a><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="desctype"><a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v2.1)"><span class="pre">ndarray</span></a><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><a class="reference external" href="https://pandas.pydata.org/pandas-docs/stable/reference/api/pandas.Series.html#pandas.Series" title="(in pandas v2.2.3)"><span class="pre">Series</span></a><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.12)"><span class="pre">None</span></a></span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><code class="code python default_value docutils literal highlight highlight-python"><span class="kc">None</span></code></em>, </span><span class="sig-param-decl"><em class="sig-param"><span class="o"><span class="pre">*</span></span></em>, </span><span class="sig-param-decl"><em class="sig-param"><a class="n reference internal" href="#linearmodels.panel.results.FamaMacBethResults.wald_test.formula" title="linearmodels.panel.results.FamaMacBethResults.wald_test.formula (Python parameter) — formulaic linear constraints."><span class="n"><span class="pre">formula</span></span></a><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="desctype"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.12)"><span class="pre">str</span></a><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.12)"><span class="pre">list</span></a><span class="p"><span class="pre">[</span></span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.12)"><span class="pre">str</span></a><span class="p"><span class="pre">]</span></span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.12)"><span class="pre">None</span></a></span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><code class="code python default_value docutils literal highlight highlight-python"><span class="kc">None</span></code></em></span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="desctype"><a class="reference internal" href="../../utility/linearmodels.shared.hypotheses.WaldTestStatistic.html#linearmodels.shared.hypotheses.WaldTestStatistic" title="linearmodels.shared.hypotheses.WaldTestStatistic (Python class) — Test statistic holder for Wald-type tests"><span class="pre">WaldTestStatistic</span></a></span></span></span><a class="headerlink" href="#linearmodels.panel.results.FamaMacBethResults.wald_test" title="Link to this definition">¶</a></dt>
+<span class="sig-prename descclassname"><span class="pre">FamaMacBethResults.</span></span><span class="sig-name descname"><span class="pre">wald_test</span></span><span class="sig-paren">(</span><span class="sig-param-decl"><em class="sig-param"><a class="n reference internal" href="#linearmodels.panel.results.FamaMacBethResults.wald_test.restriction" title="linearmodels.panel.results.FamaMacBethResults.wald_test.restriction (Python parameter) — q by nvar array containing linear weights to apply to parameters when forming the restrictions."><span class="n"><span class="pre">restriction</span></span></a><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="desctype"><a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v2.3)"><span class="pre">ndarray</span></a><span class="p"><span class="pre">[</span></span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#tuple" title="(in Python v3.14)"><span class="pre">tuple</span></a><span class="p"><span class="pre">[</span></span><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.14)"><span class="pre">int</span></a><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="p"><span class="pre">...</span></span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">,</span></span><span class="w"> </span><a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.dtype.html#numpy.dtype" title="(in NumPy v2.3)"><span class="pre">dtype</span></a><span class="p"><span class="pre">[</span></span><span class="pre">float64</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><a class="reference external" href="https://pandas.pydata.org/pandas-docs/stable/reference/api/pandas.DataFrame.html#pandas.DataFrame" title="(in pandas v2.3.3)"><span class="pre">DataFrame</span></a><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.14)"><span class="pre">None</span></a></span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><code class="code python default_value docutils literal highlight highlight-python"><span class="kc">None</span></code></em>, </span><span class="sig-param-decl"><em class="sig-param"><a class="n reference internal" href="#linearmodels.panel.results.FamaMacBethResults.wald_test.value" title="linearmodels.panel.results.FamaMacBethResults.wald_test.value (Python parameter) — q element array containing the restricted values."><span class="n"><span class="pre">value</span></span></a><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="desctype"><a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v2.3)"><span class="pre">ndarray</span></a><span class="p"><span class="pre">[</span></span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#tuple" title="(in Python v3.14)"><span class="pre">tuple</span></a><span class="p"><span class="pre">[</span></span><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.14)"><span class="pre">int</span></a><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="p"><span class="pre">...</span></span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">,</span></span><span class="w"> </span><a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.dtype.html#numpy.dtype" title="(in NumPy v2.3)"><span class="pre">dtype</span></a><span class="p"><span class="pre">[</span></span><span class="pre">float64</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><a class="reference external" href="https://pandas.pydata.org/pandas-docs/stable/reference/api/pandas.Series.html#pandas.Series" title="(in pandas v2.3.3)"><span class="pre">Series</span></a><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.14)"><span class="pre">None</span></a></span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><code class="code python default_value docutils literal highlight highlight-python"><span class="kc">None</span></code></em>, </span><span class="sig-param-decl"><em class="sig-param"><span class="o"><span class="pre">*</span></span></em>, </span><span class="sig-param-decl"><em class="sig-param"><a class="n reference internal" href="#linearmodels.panel.results.FamaMacBethResults.wald_test.formula" title="linearmodels.panel.results.FamaMacBethResults.wald_test.formula (Python parameter) — formulaic linear constraints."><span class="n"><span class="pre">formula</span></span></a><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="desctype"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.14)"><span class="pre">str</span></a><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.14)"><span class="pre">list</span></a><span class="p"><span class="pre">[</span></span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.14)"><span class="pre">str</span></a><span class="p"><span class="pre">]</span></span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.14)"><span class="pre">None</span></a></span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><code class="code python default_value docutils literal highlight highlight-python"><span class="kc">None</span></code></em></span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="desctype"><a class="reference internal" href="../../utility/linearmodels.shared.hypotheses.WaldTestStatistic.html#linearmodels.shared.hypotheses.WaldTestStatistic" title="linearmodels.shared.hypotheses.WaldTestStatistic (Python class) — Test statistic holder for Wald-type tests"><span class="pre">WaldTestStatistic</span></a></span></span></span><a class="headerlink" href="#linearmodels.panel.results.FamaMacBethResults.wald_test" title="Link to this definition">¶</a></dt>
 <dd><p>Test linear equality constraints using a Wald test</p>
 <dl class="field-list simple">
 <dt class="field-odd" id="linearmodels.panel.results.FamaMacBethResults.wald_test-parameters">Parameters<span class="colon">:</span><a class="headerlink" href="#linearmodels.panel.results.FamaMacBethResults.wald_test-parameters" title="Permalink to this headline">¶</a></dt>
 <dd class="field-odd"><dl class="simple api-field highlight">
-<dt id="linearmodels.panel.results.FamaMacBethResults.wald_test.restriction"><span class="n sig-name">restriction</span><span class="p">:</span><span class="w"> </span><span class="n"><span class="desctype"><a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v2.1)">ndarray</a><span class="w"> </span><span class="p">|</span><span class="w"> </span><a class="reference external" href="https://pandas.pydata.org/pandas-docs/stable/reference/api/pandas.DataFrame.html#pandas.DataFrame" title="(in pandas v2.2.3)">DataFrame</a><span class="w"> </span><span class="p">|</span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.12)">None</a></span></span><span class="w"> </span><span class="o">=</span><span class="w"> </span><code class="code python default_value docutils literal highlight highlight-python"><span class="kc">None</span></code><a class="headerlink" href="#linearmodels.panel.results.FamaMacBethResults.wald_test.restriction" title="Permalink to this definition">¶</a></dt><dd><p>q by nvar array containing linear weights to apply to parameters
+<dt id="linearmodels.panel.results.FamaMacBethResults.wald_test.restriction"><span class="n sig-name">restriction</span><span class="p">:</span><span class="w"> </span><span class="n"><span class="desctype"><a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v2.3)">ndarray</a><span class="p">[</span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#tuple" title="(in Python v3.14)">tuple</a><span class="p">[</span><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.14)">int</a><span class="p">,</span><span class="w"> </span><span class="p">...</span><span class="p">]</span><span class="p">,</span><span class="w"> </span><a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.dtype.html#numpy.dtype" title="(in NumPy v2.3)">dtype</a><span class="p">[</span>float64<span class="p">]</span><span class="p">]</span><span class="w"> </span><span class="p">|</span><span class="w"> </span><a class="reference external" href="https://pandas.pydata.org/pandas-docs/stable/reference/api/pandas.DataFrame.html#pandas.DataFrame" title="(in pandas v2.3.3)">DataFrame</a><span class="w"> </span><span class="p">|</span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.14)">None</a></span></span><span class="w"> </span><span class="o">=</span><span class="w"> </span><code class="code python default_value docutils literal highlight highlight-python"><span class="kc">None</span></code><a class="headerlink" href="#linearmodels.panel.results.FamaMacBethResults.wald_test.restriction" title="Permalink to this definition">¶</a></dt><dd><p>q by nvar array containing linear weights to apply to parameters
 when forming the restrictions. It is not possible to use both
 restriction and formula.</p>
 </dd>
-<dt id="linearmodels.panel.results.FamaMacBethResults.wald_test.value"><span class="n sig-name">value</span><span class="p">:</span><span class="w"> </span><span class="n"><span class="desctype"><a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v2.1)">ndarray</a><span class="w"> </span><span class="p">|</span><span class="w"> </span><a class="reference external" href="https://pandas.pydata.org/pandas-docs/stable/reference/api/pandas.Series.html#pandas.Series" title="(in pandas v2.2.3)">Series</a><span class="w"> </span><span class="p">|</span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.12)">None</a></span></span><span class="w"> </span><span class="o">=</span><span class="w"> </span><code class="code python default_value docutils literal highlight highlight-python"><span class="kc">None</span></code><a class="headerlink" href="#linearmodels.panel.results.FamaMacBethResults.wald_test.value" title="Permalink to this definition">¶</a></dt><dd><p>q element array containing the restricted values.</p>
+<dt id="linearmodels.panel.results.FamaMacBethResults.wald_test.value"><span class="n sig-name">value</span><span class="p">:</span><span class="w"> </span><span class="n"><span class="desctype"><a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v2.3)">ndarray</a><span class="p">[</span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#tuple" title="(in Python v3.14)">tuple</a><span class="p">[</span><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.14)">int</a><span class="p">,</span><span class="w"> </span><span class="p">...</span><span class="p">]</span><span class="p">,</span><span class="w"> </span><a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.dtype.html#numpy.dtype" title="(in NumPy v2.3)">dtype</a><span class="p">[</span>float64<span class="p">]</span><span class="p">]</span><span class="w"> </span><span class="p">|</span><span class="w"> </span><a class="reference external" href="https://pandas.pydata.org/pandas-docs/stable/reference/api/pandas.Series.html#pandas.Series" title="(in pandas v2.3.3)">Series</a><span class="w"> </span><span class="p">|</span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.14)">None</a></span></span><span class="w"> </span><span class="o">=</span><span class="w"> </span><code class="code python default_value docutils literal highlight highlight-python"><span class="kc">None</span></code><a class="headerlink" href="#linearmodels.panel.results.FamaMacBethResults.wald_test.value" title="Permalink to this definition">¶</a></dt><dd><p>q element array containing the restricted values.</p>
 </dd>
-<dt id="linearmodels.panel.results.FamaMacBethResults.wald_test.formula"><span class="n sig-name">formula</span><span class="p">:</span><span class="w"> </span><span class="n"><span class="desctype"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.12)">str</a><span class="w"> </span><span class="p">|</span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.12)">list</a><span class="p">[</span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.12)">str</a><span class="p">]</span><span class="w"> </span><span class="p">|</span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.12)">None</a></span></span><span class="w"> </span><span class="o">=</span><span class="w"> </span><code class="code python default_value docutils literal highlight highlight-python"><span class="kc">None</span></code><a class="headerlink" href="#linearmodels.panel.results.FamaMacBethResults.wald_test.formula" title="Permalink to this definition">¶</a></dt><dd><p><p>formulaic linear constraints. The simplest formats are one of:</p>
+<dt id="linearmodels.panel.results.FamaMacBethResults.wald_test.formula"><span class="n sig-name">formula</span><span class="p">:</span><span class="w"> </span><span class="n"><span class="desctype"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.14)">str</a><span class="w"> </span><span class="p">|</span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.14)">list</a><span class="p">[</span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.14)">str</a><span class="p">]</span><span class="w"> </span><span class="p">|</span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.14)">None</a></span></span><span class="w"> </span><span class="o">=</span><span class="w"> </span><code class="code python default_value docutils literal highlight highlight-python"><span class="kc">None</span></code><a class="headerlink" href="#linearmodels.panel.results.FamaMacBethResults.wald_test.formula" title="Permalink to this definition">¶</a></dt><dd><p><p>formulaic linear constraints. The simplest formats are one of:</p>
 <ul class="simple">
 <li><p>A single comma-separated string such as “x1=0, x2+x3=1”</p></li>
 <li><p>A list of strings where each element is a single constraint
@@ -1602,15 +2303,15 @@ the corresponding value is the restriction value, e.g.,
 matrix C is <code class="docutils literal notranslate"><span class="pre">restriction</span></code> and v is <code class="docutils literal notranslate"><span class="pre">value</span></code>. The test statistic
 has a <span class="math notranslate nohighlight">\(\chi^2_q\)</span> distribution where q is the number of rows in C.</p>
 <p class="example rubric">Examples</p>
-<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><code><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">linearmodels.datasets</span> <span class="kn">import</span> <span class="n">wage_panel</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="kn">import</span> <span class="nn">statsmodels.api</span> <span class="k">as</span> <span class="nn">sm</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="kn">import</span> <span class="nn">pandas</span> <span class="k">as</span> <span class="nn">pd</span>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><code><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span><span class="w"> </span><span class="nn">linearmodels.datasets</span><span class="w"> </span><span class="kn">import</span> <span class="n">wage_panel</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="kn">import</span><span class="w"> </span><span class="nn">statsmodels.api</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">sm</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="kn">import</span><span class="w"> </span><span class="nn">numpy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">np</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="kn">import</span><span class="w"> </span><span class="nn">pandas</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">pd</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">data</span> <span class="o">=</span> <span class="n">wage_panel</span><span class="o">.</span><span class="n">load</span><span class="p">()</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">year</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">Categorical</span><span class="p">(</span><span class="n">data</span><span class="o">.</span><span class="n">year</span><span class="p">)</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">data</span> <span class="o">=</span> <span class="n">data</span><span class="o">.</span><span class="n">set_index</span><span class="p">([</span><span class="s2">&quot;nr&quot;</span><span class="p">,</span> <span class="s2">&quot;year&quot;</span><span class="p">])</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">data</span><span class="p">[</span><span class="s2">&quot;year&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">year</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">linearmodels.panel</span> <span class="kn">import</span> <span class="n">PanelOLS</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span><span class="w"> </span><span class="nn">linearmodels.panel</span><span class="w"> </span><span class="kn">import</span> <span class="n">PanelOLS</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">exog_vars</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;expersq&quot;</span><span class="p">,</span> <span class="s2">&quot;union&quot;</span><span class="p">,</span> <span class="s2">&quot;married&quot;</span><span class="p">,</span> <span class="s2">&quot;year&quot;</span><span class="p">]</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">exog</span> <span class="o">=</span> <span class="n">sm</span><span class="o">.</span><span class="n">add_constant</span><span class="p">(</span><span class="n">data</span><span class="p">[</span><span class="n">exog_vars</span><span class="p">])</span>
 </code></pre></div>
@@ -1640,6 +2341,14 @@ has a <span class="math notranslate nohighlight">\(\chi^2_q\)</span> distributio
 
 
 
+  
+  
+
+
+
+
+
+
                 
               </article>
             </div>
@@ -1650,42 +2359,6 @@ has a <span class="math notranslate nohighlight">\(\chi^2_q\)</span> distributio
       </main>
       
         <footer class="md-footer">
-  
-    
-    <nav class="md-footer__inner md-grid" aria-label="Footer" >
-      
-        
-        <a href="linearmodels.panel.results.FamaMacBethResults.predict.html" class="md-footer__link md-footer__link--prev" aria-label="Previous: linearmodels.panel.results.FamaMacBethResults.predict" rel="prev">
-          <div class="md-footer__button md-icon">
-            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20 11v2H8l5.5 5.5-1.42 1.42L4.16 12l7.92-7.92L13.5 5.5 8 11h12Z"/></svg>
-          </div>
-          <div class="md-footer__title">
-            <div class="md-ellipsis">
-              <span class="md-footer__direction">
-                Previous
-              </span>
-              linearmodels.panel.results.FamaMacBethResults.predict
-            </div>
-          </div>
-        </a>
-      
-      
-        
-        <a href="linearmodels.panel.results.FamaMacBethResults.all_params.html" class="md-footer__link md-footer__link--next" aria-label="Next: linearmodels.panel.results.FamaMacBethResults.all_params" rel="next">
-          <div class="md-footer__title">
-            <div class="md-ellipsis">
-              <span class="md-footer__direction">
-                Next
-              </span>
-              linearmodels.panel.results.FamaMacBethResults.all_params
-            </div>
-          </div>
-          <div class="md-footer__button md-icon">
-            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M4 11v2h12l-5.5 5.5 1.42 1.42L19.84 12l-7.92-7.92L10.5 5.5 16 11H4Z"/></svg>
-          </div>
-        </a>
-      
-    </nav>
   
   
   
@@ -1701,7 +2374,7 @@ has a <span class="math notranslate nohighlight">\(\chi^2_q\)</span> distributio
   
     Created using
     <a href="https://www.sphinx-doc.org/" target="_blank" rel="noopener">Sphinx</a>
-    8.0.2.
+    8.1.3.
      and
     <a href="https://github.com/jbms/sphinx-immaterial/" target="_blank" rel="noopener">Sphinx-Immaterial</a>
   
@@ -1711,26 +2384,32 @@ has a <span class="math notranslate nohighlight">\(\chi^2_q\)</span> distributio
   
     
     
+    
+    
     <a href="https://github.com/bashtage/linearmodels" target="_blank" rel="noopener" title="Source on github.com" class="md-social__link">
-      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 496 512"><!--! Font Awesome Free 6.2.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2022 Fonticons, Inc.--><path d="M165.9 397.4c0 2-2.3 3.6-5.2 3.6-3.3.3-5.6-1.3-5.6-3.6 0-2 2.3-3.6 5.2-3.6 3-.3 5.6 1.3 5.6 3.6zm-31.1-4.5c-.7 2 1.3 4.3 4.3 4.9 2.6 1 5.6 0 6.2-2s-1.3-4.3-4.3-5.2c-2.6-.7-5.5.3-6.2 2.3zm44.2-1.7c-2.9.7-4.9 2.6-4.6 4.9.3 2 2.9 3.3 5.9 2.6 2.9-.7 4.9-2.6 4.6-4.6-.3-1.9-3-3.2-5.9-2.9zM244.8 8C106.1 8 0 113.3 0 252c0 110.9 69.8 205.8 169.5 239.2 12.8 2.3 17.3-5.6 17.3-12.1 0-6.2-.3-40.4-.3-61.4 0 0-70 15-84.7-29.8 0 0-11.4-29.1-27.8-36.6 0 0-22.9-15.7 1.6-15.4 0 0 24.9 2 38.6 25.8 21.9 38.6 58.6 27.5 72.9 20.9 2.3-16 8.8-27.1 16-33.7-55.9-6.2-112.3-14.3-112.3-110.5 0-27.5 7.6-41.3 23.6-58.9-2.6-6.5-11.1-33.3 2.6-67.9 20.9-6.5 69 27 69 27 20-5.6 41.5-8.5 62.8-8.5s42.8 2.9 62.8 8.5c0 0 48.1-33.6 69-27 13.7 34.7 5.2 61.4 2.6 67.9 16 17.7 25.8 31.5 25.8 58.9 0 96.5-58.9 104.2-114.8 110.5 9.2 7.9 17 22.9 17 46.4 0 33.7-.3 75.4-.3 83.6 0 6.5 4.6 14.4 17.3 12.1C428.2 457.8 496 362.9 496 252 496 113.3 383.5 8 244.8 8zM97.2 352.9c-1.3 1-1 3.3.7 5.2 1.6 1.6 3.9 2.3 5.2 1 1.3-1 1-3.3-.7-5.2-1.6-1.6-3.9-2.3-5.2-1zm-10.8-8.1c-.7 1.3.3 2.9 2.3 3.9 1.6 1 3.6.7 4.3-.7.7-1.3-.3-2.9-2.3-3.9-2-.6-3.6-.3-4.3.7zm32.4 35.6c-1.6 1.3-1 4.3 1.3 6.2 2.3 2.3 5.2 2.6 6.5 1 1.3-1.3.7-4.3-1.3-6.2-2.2-2.3-5.2-2.6-6.5-1zm-11.4-14.7c-1.6 1-1.6 3.6 0 5.9 1.6 2.3 4.3 3.3 5.6 2.3 1.6-1.3 1.6-3.9 0-6.2-1.4-2.3-4-3.3-5.6-2z"/></svg>
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 496 512"><!--! Font Awesome Free 6.7.2 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2024 Fonticons, Inc.--><path d="M165.9 397.4c0 2-2.3 3.6-5.2 3.6-3.3.3-5.6-1.3-5.6-3.6 0-2 2.3-3.6 5.2-3.6 3-.3 5.6 1.3 5.6 3.6m-31.1-4.5c-.7 2 1.3 4.3 4.3 4.9 2.6 1 5.6 0 6.2-2s-1.3-4.3-4.3-5.2c-2.6-.7-5.5.3-6.2 2.3m44.2-1.7c-2.9.7-4.9 2.6-4.6 4.9.3 2 2.9 3.3 5.9 2.6 2.9-.7 4.9-2.6 4.6-4.6-.3-1.9-3-3.2-5.9-2.9M244.8 8C106.1 8 0 113.3 0 252c0 110.9 69.8 205.8 169.5 239.2 12.8 2.3 17.3-5.6 17.3-12.1 0-6.2-.3-40.4-.3-61.4 0 0-70 15-84.7-29.8 0 0-11.4-29.1-27.8-36.6 0 0-22.9-15.7 1.6-15.4 0 0 24.9 2 38.6 25.8 21.9 38.6 58.6 27.5 72.9 20.9 2.3-16 8.8-27.1 16-33.7-55.9-6.2-112.3-14.3-112.3-110.5 0-27.5 7.6-41.3 23.6-58.9-2.6-6.5-11.1-33.3 2.6-67.9 20.9-6.5 69 27 69 27 20-5.6 41.5-8.5 62.8-8.5s42.8 2.9 62.8 8.5c0 0 48.1-33.6 69-27 13.7 34.7 5.2 61.4 2.6 67.9 16 17.7 25.8 31.5 25.8 58.9 0 96.5-58.9 104.2-114.8 110.5 9.2 7.9 17 22.9 17 46.4 0 33.7-.3 75.4-.3 83.6 0 6.5 4.6 14.4 17.3 12.1C428.2 457.8 496 362.9 496 252 496 113.3 383.5 8 244.8 8M97.2 352.9c-1.3 1-1 3.3.7 5.2 1.6 1.6 3.9 2.3 5.2 1 1.3-1 1-3.3-.7-5.2-1.6-1.6-3.9-2.3-5.2-1m-10.8-8.1c-.7 1.3.3 2.9 2.3 3.9 1.6 1 3.6.7 4.3-.7.7-1.3-.3-2.9-2.3-3.9-2-.6-3.6-.3-4.3.7m32.4 35.6c-1.6 1.3-1 4.3 1.3 6.2 2.3 2.3 5.2 2.6 6.5 1 1.3-1.3.7-4.3-1.3-6.2-2.2-2.3-5.2-2.6-6.5-1m-11.4-14.7c-1.6 1-1.6 3.6 0 5.9s4.3 3.3 5.6 2.3c1.6-1.3 1.6-3.9 0-6.2-1.4-2.3-4-3.3-5.6-2"/></svg>
     </a>
   
+    
+    
     
     
       
       
     
     <a href="https://pypi.org/project/linearmodels/" target="_blank" rel="noopener" title="pypi.org" class="md-social__link">
-      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512"><!--! Font Awesome Free 6.2.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2022 Fonticons, Inc.--><path d="M439.8 200.5c-7.7-30.9-22.3-54.2-53.4-54.2h-40.1v47.4c0 36.8-31.2 67.8-66.8 67.8H172.7c-29.2 0-53.4 25-53.4 54.3v101.8c0 29 25.2 46 53.4 54.3 33.8 9.9 66.3 11.7 106.8 0 26.9-7.8 53.4-23.5 53.4-54.3v-40.7H226.2v-13.6h160.2c31.1 0 42.6-21.7 53.4-54.2 11.2-33.5 10.7-65.7 0-108.6zM286.2 404c11.1 0 20.1 9.1 20.1 20.3 0 11.3-9 20.4-20.1 20.4-11 0-20.1-9.2-20.1-20.4.1-11.3 9.1-20.3 20.1-20.3zM167.8 248.1h106.8c29.7 0 53.4-24.5 53.4-54.3V91.9c0-29-24.4-50.7-53.4-55.6-35.8-5.9-74.7-5.6-106.8.1-45.2 8-53.4 24.7-53.4 55.6v40.7h106.9v13.6h-147c-31.1 0-58.3 18.7-66.8 54.2-9.8 40.7-10.2 66.1 0 108.6 7.6 31.6 25.7 54.2 56.8 54.2H101v-48.8c0-35.3 30.5-66.4 66.8-66.4zm-6.7-142.6c-11.1 0-20.1-9.1-20.1-20.3.1-11.3 9-20.4 20.1-20.4 11 0 20.1 9.2 20.1 20.4s-9 20.3-20.1 20.3z"/></svg>
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512"><!--! Font Awesome Free 6.7.2 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2024 Fonticons, Inc.--><path d="M439.8 200.5c-7.7-30.9-22.3-54.2-53.4-54.2h-40.1v47.4c0 36.8-31.2 67.8-66.8 67.8H172.7c-29.2 0-53.4 25-53.4 54.3v101.8c0 29 25.2 46 53.4 54.3 33.8 9.9 66.3 11.7 106.8 0 26.9-7.8 53.4-23.5 53.4-54.3v-40.7H226.2v-13.6h160.2c31.1 0 42.6-21.7 53.4-54.2 11.2-33.5 10.7-65.7 0-108.6M286.2 404c11.1 0 20.1 9.1 20.1 20.3 0 11.3-9 20.4-20.1 20.4-11 0-20.1-9.2-20.1-20.4.1-11.3 9.1-20.3 20.1-20.3M167.8 248.1h106.8c29.7 0 53.4-24.5 53.4-54.3V91.9c0-29-24.4-50.7-53.4-55.6-35.8-5.9-74.7-5.6-106.8.1-45.2 8-53.4 24.7-53.4 55.6v40.7h106.9v13.6h-147c-31.1 0-58.3 18.7-66.8 54.2-9.8 40.7-10.2 66.1 0 108.6 7.6 31.6 25.7 54.2 56.8 54.2H101v-48.8c0-35.3 30.5-66.4 66.8-66.4m-6.7-142.6c-11.1 0-20.1-9.1-20.1-20.3.1-11.3 9-20.4 20.1-20.4 11 0 20.1 9.2 20.1 20.4s-9 20.3-20.1 20.3"/></svg>
     </a>
   
+    
+    
     
     
       
       
     
     <a href="https://doi.org/10.5281/zenodo.2591973" target="_blank" rel="noopener" title="doi.org" class="md-social__link">
-      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512"><!--! Font Awesome Free 6.2.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2022 Fonticons, Inc.--><path d="M0 216C0 149.7 53.7 96 120 96h8c17.7 0 32 14.3 32 32s-14.3 32-32 32h-8c-30.9 0-56 25.1-56 56v8h64c35.3 0 64 28.7 64 64v64c0 35.3-28.7 64-64 64H64c-35.3 0-64-28.7-64-64V216zm256 0c0-66.3 53.7-120 120-120h8c17.7 0 32 14.3 32 32s-14.3 32-32 32h-8c-30.9 0-56 25.1-56 56v8h64c35.3 0 64 28.7 64 64v64c0 35.3-28.7 64-64 64h-64c-35.3 0-64-28.7-64-64V216z"/></svg>
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512"><!--! Font Awesome Free 6.7.2 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2024 Fonticons, Inc.--><path d="M0 216C0 149.7 53.7 96 120 96h8c17.7 0 32 14.3 32 32s-14.3 32-32 32h-8c-30.9 0-56 25.1-56 56v8h64c35.3 0 64 28.7 64 64v64c0 35.3-28.7 64-64 64H64c-35.3 0-64-28.7-64-64V216m256 0c0-66.3 53.7-120 120-120h8c17.7 0 32 14.3 32 32s-14.3 32-32 32h-8c-30.9 0-56 25.1-56 56v8h64c35.3 0 64 28.7 64 64v64c0 35.3-28.7 64-64 64h-64c-35.3 0-64-28.7-64-64V216"/></svg>
     </a>
   
 </div>
@@ -1745,10 +2424,11 @@ has a <span class="math notranslate nohighlight">\(\chi^2_q\)</span> distributio
       <div class="md-dialog__inner md-typeset"></div>
     </div>
     
-    <script id="__config" type="application/json">{"base": "../..", "features": [], "translations": {"clipboard.copied": "Copied to clipboard", "clipboard.copy": "Copy to clipboard", "search.config.lang": "en", "search.config.pipeline": "trimmer, stopWordFilter", "search.config.separator": "[\\s\\-]+", "search.placeholder": "Search", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.placeholder": "Type to start searching", "search.result.term.missing": "Missing", "select.version.title": "Select version"}, "version": {"provider": "mike", "staticVersions": [{"aliases": [], "title": "Release", "version": "https://bashtage.github.io/linearmodels"}, {"aliases": [], "title": "Development", "version": "https://bashtage.github.io/linearmodels/devel"}], "versionPath": null}}</script>
+    
+    <script id="__config" type="application/json">{"base": "../..", "features": [], "translations": {"clipboard.copied": "Copied to clipboard", "clipboard.copy": "Copy to clipboard", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.placeholder": "Type to start searching", "search.result.term.missing": "Missing", "select.version": "Select version"}, "version": {"provider": "mike", "staticVersions": [{"aliases": [], "title": "Release", "version": "https://bashtage.github.io/linearmodels"}, {"aliases": [], "title": "Development", "version": "https://bashtage.github.io/linearmodels/devel"}], "versionPath": null}}</script>
     
       
-        <script src="../../_static/sphinx_immaterial_theme.f9d9eeeb247ace16c.min.js?v=8ec58cb5"></script>
+        <script src="../../_static/sphinx_immaterial_theme.32136f45f91ae6956.min.js?v=a7a9472a"></script>
         <script crossorigin="anonymous" integrity="sha256-Ae2Vz/4ePdIu6ZyI/5ZGsYnb+m0JlOmKPjt6XZ9JJkA=" src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.4/require.min.js"></script>
         <script>window.MathJax = {"tex": {"inlineMath": [["$", "$"], ["\\(", "\\)"]], "processEscapes": true}, "options": {"ignoreHtmlClass": "tex2jax_ignore|mathjax_ignore|document", "processHtmlClass": "tex2jax_process|mathjax_process|math|output_area"}}</script>
         <script id="MathJax-script" src="../../_static/mathjax/tex-mml-chtml.js?v=cadf963e"></script>

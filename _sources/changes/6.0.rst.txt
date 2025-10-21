@@ -4,7 +4,7 @@ Version 6.0
 * Small doc fixes
 * Support Python 3.13
 
-Version 6.0
+Version 6.1
 -----------
 
 * Increased minimums:
