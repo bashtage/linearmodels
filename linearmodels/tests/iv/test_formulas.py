@@ -210,7 +210,9 @@ def test_predict_formula(data, model_and_func, formula):
     assert_frame_equal(pred, pred2)
     assert_allclose(res.fitted_values, pred)
 
-    with pytest.raises(ValueError, match=r"exog and endog or data must be provided"):
+    with pytest.raises(
+        ValueError, match=r"At least one of exog, endog, or data must be provided"
+    ):
         mod.predict(res.params)
 
 
@@ -404,3 +406,37 @@ def test_formula_categorical_equiv(data, model_and_func, dtype):
         "x2",
         "x3",
     ]
+
+
+def test_predict_no_rhs(data, model_and_func):
+    model, _ = model_and_func
+    mod = model.from_formula("y ~", data)
+    res = mod.fit()
+    pred0 = res.predict()
+    pred1 = res.predict(data=data)
+    pred1.columns = pred0.columns
+    assert_frame_equal(pred0, pred1)
+
+
+@pytest.mark.parametrize(
+    "fmla",
+    [
+        "y ~ 1",
+        "y ~ 1 + x3",
+        "y ~ [x1 + x2 ~ 1 + z1 + z2 + z3]",
+        "y ~ 1 + [x1 + x2 ~ z1 + z2 + z3]",
+    ],
+)
+def test_formula_single(data, model_and_func, fmla):
+    model, func = model_and_func
+    res = model.from_formula(fmla, data).fit()
+    pred0 = res.predict()
+    pred1 = res.predict(data=data)
+
+    mod2 = func(fmla, data)
+    res2 = mod2.fit()
+    pred2 = res2.predict(data=data)
+    pred1.columns = pred0.columns
+    pred2.columns = pred0.columns
+    assert_frame_equal(pred1, pred2)
+    assert_frame_equal(pred0, pred1)
