@@ -297,11 +297,6 @@ class _IVModelBase:
         if endog is not None:
             endog = IVData(endog).pandas
         if data is not None:
-            if endog is not None or exog is not None:
-                raise ValueError(
-                    "Predictions can be constructed using either exog and endog "
-                    "or data, but not both."
-                )
             parser = IVFormulaParser(self.formula, data, eval_env=eval_env)
             exog = parser.exog
             endog = parser.endog
