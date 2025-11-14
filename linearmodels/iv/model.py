@@ -50,6 +50,7 @@ from linearmodels.iv.gmm import (
     OneWayClusteredWeightMatrix,
 )
 from linearmodels.iv.results import IVGMMResults, IVResults, OLSResults
+from linearmodels.panel.utility import InvalidFormulaError
 from linearmodels.shared.exceptions import IndexWarning, missing_warning
 from linearmodels.shared.hypotheses import InvalidTestStatistic, WaldTestStatistic
 from linearmodels.shared.linalg import has_constant, inv_sqrth
@@ -291,15 +292,34 @@ class _IVModelBase:
                 "Predictions can only be constructed using one "
                 "of exog/endog or data, but not both."
             )
-        if exog is not None or endog is not None:
+        if exog is not None:
             exog = IVData(exog).pandas
+        if endog is not None:
             endog = IVData(endog).pandas
-        elif data is not None:
+        if data is not None:
+            if endog is not None or exog is not None:
+                raise ValueError(
+                    "Predictions can be constructed using either exog and endog "
+                    "or data, but not both."
+                )
             parser = IVFormulaParser(self.formula, data, eval_env=eval_env)
             exog = parser.exog
             endog = parser.endog
-        else:
-            raise ValueError("exog and endog or data must be provided.")
+            if exog is None and exog is None:
+                raise InvalidFormulaError(
+                    f"Parsed formula ({self.formula}) has no exog and no endog. One "
+                    f"of these must be included in the formula to make a prediction."
+                )
+        if all(a is None for a in (exog, endog, data)):
+            raise ValueError("At least one of exog, endog, or data must be provided.")
+        if exog is None:
+            assert endog is not None
+            exog = IVData(exog, nobs=endog.shape[0]).pandas
+            exog.index = endog.index
+        if endog is None:
+            assert exog is not None
+            endog = IVData(endog, nobs=exog.shape[0]).pandas
+            endog.index = exog.index
         assert exog is not None
         assert endog is not None
         if exog.shape[0] != endog.shape[0]:
