@@ -416,3 +416,27 @@ def test_predict_no_rhs(data, model_and_func):
     pred1 = res.predict(data=data)
     pred1.columns = pred0.columns
     assert_frame_equal(pred0, pred1)
+
+
+@pytest.mark.parametrize(
+    "fmla",
+    [
+        "y ~ 1",
+        "y ~ 1 + x3",
+        "y ~ [x1 + x2 ~ 1 + z1 + z2 + z3]",
+        "y ~ 1 + [x1 + x2 ~ z1 + z2 + z3]",
+    ],
+)
+def test_formula_single(data, model_and_func, fmla):
+    model, func = model_and_func
+    res = model.from_formula(fmla, data).fit()
+    pred0 = res.predict()
+    pred1 = res.predict(data=data)
+
+    mod2 = func(fmla, data)
+    res2 = mod2.fit()
+    pred2 = res2.predict(data=data)
+    pred1.columns = pred0.columns
+    pred2.columns = pred0.columns
+    assert_frame_equal(pred1, pred2)
+    assert_frame_equal(pred0, pred1)

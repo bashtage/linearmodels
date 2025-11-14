@@ -50,7 +50,6 @@ from linearmodels.iv.gmm import (
     OneWayClusteredWeightMatrix,
 )
 from linearmodels.iv.results import IVGMMResults, IVResults, OLSResults
-from linearmodels.panel.utility import InvalidFormulaError
 from linearmodels.shared.exceptions import IndexWarning, missing_warning
 from linearmodels.shared.hypotheses import InvalidTestStatistic, WaldTestStatistic
 from linearmodels.shared.linalg import has_constant, inv_sqrth
@@ -300,11 +299,6 @@ class _IVModelBase:
             parser = IVFormulaParser(self.formula, data, eval_env=eval_env)
             exog = parser.exog
             endog = parser.endog
-            if exog is None and exog is None:
-                raise InvalidFormulaError(
-                    f"Parsed formula ({self.formula}) has no exog and no endog. One "
-                    f"of these must be included in the formula to make a prediction."
-                )
         if all(a is None for a in (exog, endog, data)):
             raise ValueError("At least one of exog, endog, or data must be provided.")
         if exog is None:

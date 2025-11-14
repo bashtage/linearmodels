@@ -24,7 +24,6 @@ except ImportError:
 __all__ = [
     "AbsorbingEffectError",
     "AbsorbingEffectWarning",
-    "InvalidFormulaError",
     "_drop_singletons",
     "_py_drop_singletons",
     "_remove_node",
@@ -689,7 +688,3 @@ def generate_panel_data(
     clusters = concat([vc1_df, vc2_df], sort=False)
     data = concat([y_df, x_df], axis=1, sort=False)
     return PanelModelData(data, w_df, other_eff, clusters)
-
-
-class InvalidFormulaError(Exception):
-    pass
