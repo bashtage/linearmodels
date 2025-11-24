@@ -19,7 +19,7 @@
     
   
       
-        <title>numpy - linearmodels v7.1 (+4)</title>
+        <title>numpy - linearmodels v7.1 (+6)</title>
       
     
 
@@ -91,7 +91,7 @@
 
 <header class="md-header md-header--shadow" data-md-component="header">
   <nav class="md-header__inner md-grid" aria-label="Header">
-    <a href="../index.html" title="linearmodels v7.1 (+4)" class="md-header__button md-logo" aria-label="linearmodels v7.1 (+4)" data-md-component="logo">
+    <a href="../index.html" title="linearmodels v7.1 (+6)" class="md-header__button md-logo" aria-label="linearmodels v7.1 (+6)" data-md-component="logo">
       <img src="../_static/bw-logo.svg" alt="logo">
     </a>
     <label class="md-header__button md-icon" for="__drawer">
@@ -102,7 +102,7 @@
       <div class="md-header__ellipsis">
         <div class="md-header__topic">
           <span class="md-ellipsis">
-            linearmodels v7.1 (+4)
+            linearmodels v7.1 (+6)
           </span>
         </div>
         <div class="md-header__topic" data-md-component="header-topic">
@@ -197,10 +197,10 @@
 
 <nav class="md-nav md-nav--primary" aria-label="Navigation" data-md-level="0">
   <label class="md-nav__title" for="__drawer">
-    <a href="../index.html" title="linearmodels v7.1 (+4)" class="md-nav__button md-logo" aria-label="linearmodels v7.1 (+4)" data-md-component="logo">
+    <a href="../index.html" title="linearmodels v7.1 (+6)" class="md-nav__button md-logo" aria-label="linearmodels v7.1 (+6)" data-md-component="logo">
       <img src="../_static/bw-logo.svg" alt="logo">
     </a>
-    linearmodels v7.1 (+4)
+    linearmodels v7.1 (+6)
   </label>
   
     <div class="md-nav__source">
@@ -1378,6 +1378,23 @@
                 <span class="k">del</span> <span class="n">_wn</span>
             <span class="k">del</span> <span class="n">w</span>
     <span class="k">del</span> <span class="n">_mac_os_check</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">blas_fpe_check</span><span class="p">():</span>
+        <span class="c1"># Check if BLAS adds spurious FPEs, mostly seen on M4 arms with Accelerate.</span>
+        <span class="k">with</span> <span class="n">errstate</span><span class="p">(</span><span class="nb">all</span><span class="o">=</span><span class="s1">&#39;raise&#39;</span><span class="p">):</span>
+            <span class="n">x</span> <span class="o">=</span> <span class="n">ones</span><span class="p">((</span><span class="mi">20</span><span class="p">,</span> <span class="mi">20</span><span class="p">))</span>
+            <span class="k">try</span><span class="p">:</span>
+                <span class="n">x</span> <span class="o">@</span> <span class="n">x</span>
+            <span class="k">except</span> <span class="ne">FloatingPointError</span><span class="p">:</span>
+                <span class="n">res</span> <span class="o">=</span> <span class="n">_core</span><span class="o">.</span><span class="n">_multiarray_umath</span><span class="o">.</span><span class="n">_blas_supports_fpe</span><span class="p">(</span><span class="kc">False</span><span class="p">)</span>
+                <span class="k">if</span> <span class="n">res</span><span class="p">:</span>  <span class="c1"># res was not modified (hardcoded to True for now)</span>
+                    <span class="n">warnings</span><span class="o">.</span><span class="n">warn</span><span class="p">(</span>
+                        <span class="s2">&quot;Spurious warnings given by blas but suppression not &quot;</span>
+                        <span class="s2">&quot;set up on this platform. Please open a NumPy issue.&quot;</span><span class="p">,</span>
+                        <span class="ne">UserWarning</span><span class="p">,</span> <span class="n">stacklevel</span><span class="o">=</span><span class="mi">2</span><span class="p">)</span>
+
+    <span class="n">blas_fpe_check</span><span class="p">()</span>
+    <span class="k">del</span> <span class="n">blas_fpe_check</span>
 
     <span class="k">def</span><span class="w"> </span><span class="nf">hugepage_setup</span><span class="p">():</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
