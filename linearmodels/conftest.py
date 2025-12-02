@@ -9,7 +9,11 @@ logger = logging.getLogger(__name__)
 cow = bool(os.environ.get("LM_TEST_COPY_ON_WRITE", ""))
 if cow:
     try:
-        pd.options.mode.copy_on_write = cow
+        import warnings
+
+        with warnings.catch_warnings():
+            warnings.simplefilter("ignore")
+            pd.options.mode.copy_on_write = cow
     except AttributeError:
         cow = False
 if cow:
