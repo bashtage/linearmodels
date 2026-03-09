@@ -19,7 +19,7 @@
     
   
       
-        <title>numpy - linearmodels v7.1 (+8)</title>
+        <title>numpy - linearmodels v7.1 (+16)</title>
       
     
 
@@ -50,7 +50,7 @@
         <style>:root{--md-text-font:"Roboto";--md-code-font:"Roboto Mono"}</style>
       
     
-        <link rel="stylesheet" type="text/css" href="../_static/sphinx_immaterial_theme.acf80fe7f4d9ef9e2.min.css?v=9e56d0d2" />
+        <link rel="stylesheet" type="text/css" href="../_static/sphinx_immaterial_theme.74c816e3f9967dd6e.min.css?v=6cfe2491" />
         <link rel="stylesheet" type="text/css" href="../_static/css/small_fixes.css?v=34934119" />
     <script>__md_scope=new URL("..",location),__md_hash=e=>[...e].reduce(((e,_)=>(e<<5)-e+_.charCodeAt(0)),0),__md_get=(e,_=localStorage,t=__md_scope)=>JSON.parse(_.getItem(t.pathname+"."+e)),__md_set=(e,_,t=localStorage,a=__md_scope)=>{try{t.setItem(a.pathname+"."+e,JSON.stringify(_))}catch(e){}}</script>
     
@@ -91,7 +91,7 @@
 
 <header class="md-header md-header--shadow" data-md-component="header">
   <nav class="md-header__inner md-grid" aria-label="Header">
-    <a href="../index.html" title="linearmodels v7.1 (+8)" class="md-header__button md-logo" aria-label="linearmodels v7.1 (+8)" data-md-component="logo">
+    <a href="../index.html" title="linearmodels v7.1 (+16)" class="md-header__button md-logo" aria-label="linearmodels v7.1 (+16)" data-md-component="logo">
       <img src="../_static/bw-logo.svg" alt="logo">
     </a>
     <label class="md-header__button md-icon" for="__drawer">
@@ -102,7 +102,7 @@
       <div class="md-header__ellipsis">
         <div class="md-header__topic">
           <span class="md-ellipsis">
-            linearmodels v7.1 (+8)
+            linearmodels v7.1 (+16)
           </span>
         </div>
         <div class="md-header__topic" data-md-component="header-topic">
@@ -197,10 +197,10 @@
 
 <nav class="md-nav md-nav--primary" aria-label="Navigation" data-md-level="0">
   <label class="md-nav__title" for="__drawer">
-    <a href="../index.html" title="linearmodels v7.1 (+8)" class="md-nav__button md-logo" aria-label="linearmodels v7.1 (+8)" data-md-component="logo">
+    <a href="../index.html" title="linearmodels v7.1 (+16)" class="md-nav__button md-logo" aria-label="linearmodels v7.1 (+16)" data-md-component="logo">
       <img src="../_static/bw-logo.svg" alt="logo">
     </a>
-    linearmodels v7.1 (+8)
+    linearmodels v7.1 (+16)
   </label>
   
     <div class="md-nav__source">
@@ -617,10 +617,13 @@
     <span class="k">try</span><span class="p">:</span>
         <span class="kn">from</span><span class="w"> </span><span class="nn">numpy.__config__</span><span class="w"> </span><span class="kn">import</span> <span class="n">show_config</span>
     <span class="k">except</span> <span class="ne">ImportError</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
-        <span class="n">msg</span> <span class="o">=</span> <span class="s2">&quot;&quot;&quot;Error importing numpy: you should not try to import numpy from</span>
-<span class="s2">        its source directory; please exit the numpy source tree, and relaunch</span>
-<span class="s2">        your python interpreter from there.&quot;&quot;&quot;</span>
-        <span class="k">raise</span> <span class="ne">ImportError</span><span class="p">(</span><span class="n">msg</span><span class="p">)</span> <span class="kn">from</span><span class="w"> </span><span class="nn">e</span>
+        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">e</span><span class="p">,</span> <span class="ne">ModuleNotFoundError</span><span class="p">)</span> <span class="ow">and</span> <span class="n">e</span><span class="o">.</span><span class="n">name</span> <span class="o">==</span> <span class="s2">&quot;numpy.__config__&quot;</span><span class="p">:</span>
+            <span class="c1"># The __config__ module itself was not found, so add this info:</span>
+            <span class="n">msg</span> <span class="o">=</span> <span class="s2">&quot;&quot;&quot;Error importing numpy: you should not try to import numpy from</span>
+<span class="s2">            its source directory; please exit the numpy source tree, and relaunch</span>
+<span class="s2">            your python interpreter from there.&quot;&quot;&quot;</span>
+            <span class="k">raise</span> <span class="ne">ImportError</span><span class="p">(</span><span class="n">msg</span><span class="p">)</span> <span class="kn">from</span><span class="w"> </span><span class="nn">e</span>
+        <span class="k">raise</span>
 
     <span class="kn">from</span><span class="w"> </span><span class="nn">.</span><span class="w"> </span><span class="kn">import</span> <span class="n">_core</span>
     <span class="kn">from</span><span class="w"> </span><span class="nn">._core</span><span class="w"> </span><span class="kn">import</span> <span class="p">(</span>
@@ -957,13 +960,11 @@
             <span class="k">pass</span>
     <span class="k">del</span> <span class="n">ta</span>
 
-    <span class="kn">from</span><span class="w"> </span><span class="nn">.</span><span class="w"> </span><span class="kn">import</span> <span class="n">lib</span>
-    <span class="kn">from</span><span class="w"> </span><span class="nn">.</span><span class="w"> </span><span class="kn">import</span> <span class="n">matrixlib</span> <span class="k">as</span> <span class="n">_mat</span>
+    <span class="kn">from</span><span class="w"> </span><span class="nn">.</span><span class="w"> </span><span class="kn">import</span> <span class="n">lib</span><span class="p">,</span> <span class="n">matrixlib</span> <span class="k">as</span> <span class="n">_mat</span>
     <span class="kn">from</span><span class="w"> </span><span class="nn">.lib</span><span class="w"> </span><span class="kn">import</span> <span class="n">scimath</span> <span class="k">as</span> <span class="n">emath</span>
     <span class="kn">from</span><span class="w"> </span><span class="nn">.lib._arraypad_impl</span><span class="w"> </span><span class="kn">import</span> <span class="n">pad</span>
     <span class="kn">from</span><span class="w"> </span><span class="nn">.lib._arraysetops_impl</span><span class="w"> </span><span class="kn">import</span> <span class="p">(</span>
         <span class="n">ediff1d</span><span class="p">,</span>
-        <span class="n">in1d</span><span class="p">,</span>
         <span class="n">intersect1d</span><span class="p">,</span>
         <span class="n">isin</span><span class="p">,</span>
         <span class="n">setdiff1d</span><span class="p">,</span>
@@ -1010,7 +1011,6 @@
         <span class="n">sinc</span><span class="p">,</span>
         <span class="n">sort_complex</span><span class="p">,</span>
         <span class="n">trapezoid</span><span class="p">,</span>
-        <span class="n">trapz</span><span class="p">,</span>
         <span class="n">trim_zeros</span><span class="p">,</span>
         <span class="n">unwrap</span><span class="p">,</span>
         <span class="n">vectorize</span><span class="p">,</span>
@@ -1180,9 +1180,6 @@
     <span class="n">__array_api_version__</span> <span class="o">=</span> <span class="s2">&quot;2024.12&quot;</span>
 
     <span class="kn">from</span><span class="w"> </span><span class="nn">._array_api_info</span><span class="w"> </span><span class="kn">import</span> <span class="n">__array_namespace_info__</span>
-
-    <span class="c1"># now that numpy core module is imported, can initialize limits</span>
-    <span class="n">_core</span><span class="o">.</span><span class="n">getlimits</span><span class="o">.</span><span class="n">_register_known_types</span><span class="p">()</span>
 
     <span class="n">__all__</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span>
         <span class="n">__numpy_submodules__</span> <span class="o">|</span>
@@ -1490,7 +1487,7 @@
   
     Created using
     <a href="https://www.sphinx-doc.org/" target="_blank" rel="noopener">Sphinx</a>
-    8.1.3.
+    9.1.0.
      and
     <a href="https://github.com/jbms/sphinx-immaterial/" target="_blank" rel="noopener">Sphinx-Immaterial</a>
   
