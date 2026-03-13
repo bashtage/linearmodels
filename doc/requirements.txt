@@ -13,3 +13,5 @@ seaborn
 mypy_extensions>=0.4
 # mistune<2
 jupyterlab>=4.4.8 # not directly required, pinned by Snyk to avoid a vulnerability
+fonttools>=4.61.0 # not directly required, pinned by Snyk to avoid a vulnerability
+tornado>=6.5.3 # not directly required, pinned by Snyk to avoid a vulnerability
