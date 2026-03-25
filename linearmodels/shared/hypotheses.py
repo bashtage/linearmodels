@@ -135,6 +135,7 @@ class InvalidTestStatistic(WaldTestStatistic):
     def __str__(self) -> str:
         msg = "Invalid test statistic\n{reason}\n{name}"
         name = "" if self._name is None else self._name
+        assert name is not None
         return msg.format(name=name, reason=self._reason)
 
 
@@ -226,10 +227,11 @@ def quadratic_form_test(
         raise ValueError("restriction and formula cannot be used simultaneously.")
     if formula is not None:
         if not isinstance(params, Series):
-            raise ValueError(
+            raise TypeError(
                 "params must be a pandas Series when using formula= to specify "
                 "linear restrictions (indexed by parameter names)."
             )
+        assert isinstance(params, Series)
         param_names = [str(p) for p in params.index]
         rewritten_constraints = _reparse_constraint_formula(formula)
         lc = LinearConstraints.from_spec(rewritten_constraints, param_names)
