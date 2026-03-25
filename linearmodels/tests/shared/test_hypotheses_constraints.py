@@ -85,7 +85,7 @@ def test_quadratic_form_formula_and_restriction_exclusive():
 
 
 def test_quadratic_form_formula_requires_series_params():
-    with pytest.raises(ValueError, match="pandas Series"):
+    with pytest.raises(TypeError, match="pandas Series"):
         quadratic_form_test(np.array([0.0, 1.0]), np.eye(2), formula="x0=0")
 
 
