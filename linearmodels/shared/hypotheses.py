@@ -196,13 +196,12 @@ def _parse_single(constraint: str) -> tuple[str, float]:
     except Exception as exc:
         raise TypeError(_constraint_error.format(cons=constraint)) from exc
     expr = "=".join(parts[:-1])
-    return expr, value
+    return expr.strip(), value
 
 
 def _reparse_constraint_formula(
     formula: str | list[str] | dict[str, float],
 ) -> str | dict[str, float]:
-    # TODO: Test against variable names constaining , or =
     if isinstance(formula, Mapping):
         return dict(formula)
     if isinstance(formula, str):
@@ -227,6 +226,11 @@ def quadratic_form_test(
     if formula is not None and restriction is not None:
         raise ValueError("restriction and formula cannot be used simultaneously.")
     if formula is not None:
+        if not isinstance(params, Series):
+            raise TypeError(
+                "params must be a pandas Series when using formula= to specify "
+                "linear restrictions (indexed by parameter names)."
+            )
         assert isinstance(params, Series)
         param_names = [str(p) for p in params.index]
         rewritten_constraints = _reparse_constraint_formula(formula)
