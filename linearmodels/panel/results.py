@@ -15,7 +15,12 @@ from statsmodels.iolib.summary import SimpleTable, fmt_2cols, fmt_params
 
 from linearmodels.iv.results import default_txt_fmt, stub_concat, table_concat
 from linearmodels.shared.base import _ModelComparison, _SummaryStr
-from linearmodels.shared.hypotheses import WaldTestStatistic, quadratic_form_test
+from linearmodels.shared.hypotheses import (
+    InapplicableTestStatistic,
+    NormalTestStatistic,
+    WaldTestStatistic,
+    quadratic_form_test,
+)
 from linearmodels.shared.io import _str, add_star, pval_format
 from linearmodels.shared.utility import AttrDict
 import linearmodels.typing.data
@@ -594,6 +599,72 @@ class PanelResults(_SummaryStr):
         return Series(
             self._wresids.squeeze(), index=self._index, name="weighted residual"
         )
+
+    @cached_property
+    def pesaran_cd(self) -> InapplicableTestStatistic | NormalTestStatistic:
+        r"""
+        Pesaran CD test of residual cross-sectional dependence.
+
+        Returns
+        -------
+        NormalTestStatistic
+            Statistic value, distribution and p-value.
+
+        Notes
+        -----
+        Tests the null hypothesis that the model's idiosyncratic shocks are
+        cross-sectionally independent. Let :math:`\hat{\rho}_{ij}` denote the
+        sample correlation of the estimated idiosyncratic shocks for entities
+        :math:`i` and :math:`j`, computed using their common time observations,
+        and let :math:`T_{ij}` denote the number of overlapping observations.
+        The statistic is
+
+        .. math::
+
+           CD = \frac{1}{\sqrt{M}}\sum_{i<j}\sqrt{T_{ij}}\hat{\rho}_{ij},
+
+        where :math:`M` is the number of entity pairs with at least two
+        overlapping observations and finite pairwise correlation estimates.
+        Under the null, the statistic is asymptotically standard normal.
+
+        References
+        ----------
+        Pesaran, M. H. (2021). General diagnostic tests for cross-sectional
+        dependence in panels. Empirical Economics, 60(1), 13-50.
+        """
+        eps = self.idiosyncratic.iloc[:, 0]
+        wide = eps.unstack(level=0)
+        wide = wide.loc[:, wide.notnull().any(axis=0)]
+        nentity = wide.shape[1]
+        if nentity < 2:
+            return InapplicableTestStatistic(
+                reason="Pesaran CD test requires at least two entities.",
+                name="Pesaran CD test",
+            )
+
+        corr = wide.corr(min_periods=2).to_numpy(dtype=float)
+        counts = wide.notnull().to_numpy(dtype=np.int64).T @ wide.notnull().to_numpy(
+            dtype=np.int64
+        )
+        selector = np.tril(np.ones_like(counts, dtype=bool), k=-1)
+        selector &= counts >= 2
+        selector &= np.isfinite(corr)
+        npairs = int(selector.sum())
+        if npairs == 0:
+            return InapplicableTestStatistic(
+                reason=(
+                    "Pesaran CD test requires at least one pair of entities "
+                    "with two or more overlapping observations."
+                ),
+                name="Pesaran CD test",
+            )
+
+        stat = float(
+            np.sum(np.sqrt(counts[selector].astype(float)) * corr[selector])
+            / np.sqrt(npairs)
+        )
+        null = "Idiosyncratic shocks are cross-sectionally independent"
+        return NormalTestStatistic(stat, null, name="Pesaran CD test")
 
     @property
     def f_statistic_robust(self) -> WaldTestStatistic:
