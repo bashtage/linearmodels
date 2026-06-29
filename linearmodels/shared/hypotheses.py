@@ -5,7 +5,7 @@ from collections.abc import Mapping
 from formulaic.utils.constraints import LinearConstraints
 import numpy as np
 from pandas import Series
-from scipy.stats import chi2, f
+from scipy.stats import chi2, f, norm
 
 import linearmodels.typing.data
 
@@ -68,6 +68,88 @@ class WaldTestStatistic:
         """Critical values test for common test sizes"""
         return dict(
             zip(["10%", "5%", "1%"], self.dist.ppf([0.9, 0.95, 0.99]), strict=False)
+        )
+
+    @property
+    def null(self) -> str:
+        """Null hypothesis"""
+        return self._null
+
+    def __str__(self) -> str:
+        name = ""
+        if self._name is not None:
+            name = self._name + "\n"
+        msg = (
+            "{name}H0: {null}\nStatistic: {stat:0.4f}\n"
+            "P-value: {pval:0.4f}\nDistributed: {dist}"
+        )
+        return msg.format(
+            name=name,
+            null=self.null,
+            stat=self.stat,
+            pval=self.pval,
+            dist=self.dist_name,
+        )
+
+    def __repr__(self) -> str:
+        return (
+            self.__str__() + "\n" + self.__class__.__name__ + f", id: {hex(id(self))}"
+        )
+
+
+class NormalTestStatistic:
+    """
+    Test statistic holder for tests with an asymptotic standard normal law.
+
+    Parameters
+    ----------
+    stat : float
+        The test statistic.
+    null : str
+        A statement of the test's null hypothesis.
+    name : str
+        Name of test.
+    two_sided : bool
+        Flag indicating whether p-values and critical values are computed
+        using a two-sided test.
+    """
+
+    def __init__(
+        self,
+        stat: float,
+        null: str,
+        *,
+        name: str | None = None,
+        two_sided: bool = True,
+    ) -> None:
+        self._stat = stat
+        self._null = null
+        self._name = name
+        self._two_sided = two_sided
+        self.dist = norm()
+        self.dist_name = "N(0,1)"
+
+    @property
+    def stat(self) -> float:
+        """Test statistic"""
+        return self._stat
+
+    @property
+    def pval(self) -> float:
+        """P-value of test statistic"""
+        if self._two_sided:
+            return 2 * (1 - self.dist.cdf(abs(self.stat)))
+        return 1 - self.dist.cdf(self.stat)
+
+    @property
+    def critical_values(self) -> dict[str, float]:
+        """Critical values for common test sizes"""
+        if self._two_sided:
+            quantiles = [0.95, 0.975, 0.995]
+        else:
+            quantiles = [0.9, 0.95, 0.99]
+        return dict(
+            zip(["10%", "5%", "1%"], self.dist.ppf(quantiles), strict=False)
         )
 
     @property

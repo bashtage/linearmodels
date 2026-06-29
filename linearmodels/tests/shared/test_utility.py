@@ -16,6 +16,7 @@ from linearmodels.shared.exceptions import missing_warning
 from linearmodels.shared.hypotheses import (
     InapplicableTestStatistic,
     InvalidTestStatistic,
+    NormalTestStatistic,
     WaldTestStatistic,
 )
 from linearmodels.shared.io import add_star, format_wide
@@ -99,6 +100,19 @@ def test_inapplicable_test_statistic():
 
     ts = InapplicableTestStatistic()
     assert "not applicable" in str(ts)
+
+
+def test_normal_test_statistic():
+    ts = NormalTestStatistic(1.5, "_NULL_", name="_NAME_")
+    assert str(hex(id(ts))) in ts.__repr__()
+    assert "_NULL_" in str(ts)
+    assert ts.stat == 1.5
+    assert ts.dist_name == "N(0,1)"
+    assert_allclose(2 * (1 - stats.norm.cdf(1.5)), ts.pval)
+    assert isinstance(ts.critical_values, dict)
+
+    ts = NormalTestStatistic(1.5, "_NULL_", name="_NAME_", two_sided=False)
+    assert_allclose(1 - stats.norm.cdf(1.5), ts.pval)
 
 
 def test_inv_sqrth():
