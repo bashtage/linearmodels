@@ -19,7 +19,7 @@
     
   
       
-        <title>typing - linearmodels v7.1 (+30)</title>
+        <title>typing - linearmodels v7.1 (+32)</title>
       
     
 
@@ -91,7 +91,7 @@
 
 <header class="md-header md-header--shadow" data-md-component="header">
   <nav class="md-header__inner md-grid" aria-label="Header">
-    <a href="../index.html" title="linearmodels v7.1 (+30)" class="md-header__button md-logo" aria-label="linearmodels v7.1 (+30)" data-md-component="logo">
+    <a href="../index.html" title="linearmodels v7.1 (+32)" class="md-header__button md-logo" aria-label="linearmodels v7.1 (+32)" data-md-component="logo">
       <img src="../_static/bw-logo.svg" alt="logo">
     </a>
     <label class="md-header__button md-icon" for="__drawer">
@@ -102,7 +102,7 @@
       <div class="md-header__ellipsis">
         <div class="md-header__topic">
           <span class="md-ellipsis">
-            linearmodels v7.1 (+30)
+            linearmodels v7.1 (+32)
           </span>
         </div>
         <div class="md-header__topic" data-md-component="header-topic">
@@ -197,10 +197,10 @@
 
 <nav class="md-nav md-nav--primary" aria-label="Navigation" data-md-level="0">
   <label class="md-nav__title" for="__drawer">
-    <a href="../index.html" title="linearmodels v7.1 (+30)" class="md-nav__button md-logo" aria-label="linearmodels v7.1 (+30)" data-md-component="logo">
+    <a href="../index.html" title="linearmodels v7.1 (+32)" class="md-nav__button md-logo" aria-label="linearmodels v7.1 (+32)" data-md-component="logo">
       <img src="../_static/bw-logo.svg" alt="logo">
     </a>
-    linearmodels v7.1 (+30)
+    linearmodels v7.1 (+32)
   </label>
   
     <div class="md-nav__source">
@@ -511,7 +511,7 @@
 <span class="sd">* Generic, Protocol, and internal machinery to support generic aliases.</span>
 <span class="sd">  All subscripted types like X[int], Union[int, str] are generic aliases.</span>
 <span class="sd">* Various &quot;special forms&quot; that have unique meanings in type annotations:</span>
-<span class="sd">  NoReturn, Never, ClassVar, Self, Concatenate, Unpack, and others.</span>
+<span class="sd">  Any, Never, ClassVar, Self, Concatenate, Unpack, and others.</span>
 <span class="sd">* Classes whose instances can be type arguments to generic classes and functions:</span>
 <span class="sd">  TypeVar, ParamSpec, TypeVarTuple.</span>
 <span class="sd">* Public helper functions: get_type_hints, overload, cast, final, and others.</span>
@@ -1104,12 +1104,12 @@
 <span class="k">class</span><span class="w"> </span><span class="nc">Any</span><span class="p">(</span><span class="n">metaclass</span><span class="o">=</span><span class="n">_AnyMeta</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Special type indicating an unconstrained type.</span>
 
-<span class="sd">    - Any is compatible with every type.</span>
-<span class="sd">    - Any assumed to have all methods.</span>
-<span class="sd">    - All values assumed to be instances of Any.</span>
+<span class="sd">    - Any is assignable to every type.</span>
+<span class="sd">    - Any assumed to have all methods and attributes.</span>
+<span class="sd">    - All values are assignable to Any.</span>
 
 <span class="sd">    Note that all the above statements are true from the point of view of</span>
-<span class="sd">    static type checkers. At runtime, Any should not be used with instance</span>
+<span class="sd">    static type checkers. At runtime, Any cannot be used with instance</span>
 <span class="sd">    checks.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
 
@@ -1228,7 +1228,7 @@
 
 <span class="sd">    ClassVar accepts only types and cannot be further subscribed.</span>
 
-<span class="sd">    Note that ClassVar is not a class itself, and should not</span>
+<span class="sd">    Note that ClassVar is not a class itself, and cannot</span>
 <span class="sd">    be used with isinstance() or issubclass().</span>
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="n">item</span> <span class="o">=</span> <span class="n">_type_check</span><span class="p">(</span><span class="n">parameters</span><span class="p">,</span> <span class="sa">f</span><span class="s1">&#39;</span><span class="si">{</span><span class="bp">self</span><span class="si">}</span><span class="s1"> accepts only single type.&#39;</span><span class="p">,</span> <span class="n">allow_special_forms</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
@@ -1311,7 +1311,7 @@
 
 <span class="nd">@_SpecialForm</span>
 <span class="k">def</span><span class="w"> </span><span class="nf">Optional</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">parameters</span><span class="p">):</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Optional[X] is equivalent to Union[X, None].&quot;&quot;&quot;</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Optional[X] is equivalent to X | None.&quot;&quot;&quot;</span>
     <span class="n">arg</span> <span class="o">=</span> <span class="n">_type_check</span><span class="p">(</span><span class="n">parameters</span><span class="p">,</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="bp">self</span><span class="si">}</span><span class="s2"> requires a single type.&quot;</span><span class="p">)</span>
     <span class="k">return</span> <span class="n">Union</span><span class="p">[</span><span class="n">arg</span><span class="p">,</span> <span class="nb">type</span><span class="p">(</span><span class="kc">None</span><span class="p">)]</span>
 
@@ -1354,7 +1354,7 @@
 <span class="k">def</span><span class="w"> </span><span class="nf">TypeAlias</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">parameters</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Special form for marking type aliases.</span>
 
-<span class="sd">    Use TypeAlias to indicate that an assignment should</span>
+<span class="sd">    TypeAlias can be used to indicate that an assignment should</span>
 <span class="sd">    be recognized as a proper type alias definition by type</span>
 <span class="sd">    checkers.</span>
 
@@ -1916,31 +1916,35 @@
 
 
 <span class="k">class</span><span class="w"> </span><span class="nc">_GenericAlias</span><span class="p">(</span><span class="n">_BaseGenericAlias</span><span class="p">,</span> <span class="n">_root</span><span class="o">=</span><span class="kc">True</span><span class="p">):</span>
-    <span class="c1"># The type of parameterized generics.</span>
-    <span class="c1">#</span>
-    <span class="c1"># That is, for example, `type(List[int])` is `_GenericAlias`.</span>
-    <span class="c1">#</span>
-    <span class="c1"># Objects which are instances of this class include:</span>
-    <span class="c1"># * Parameterized container types, e.g. `Tuple[int]`, `List[int]`.</span>
-    <span class="c1">#  * Note that native container types, e.g. `tuple`, `list`, use</span>
-    <span class="c1">#    `types.GenericAlias` instead.</span>
-    <span class="c1"># * Parameterized classes:</span>
-    <span class="c1">#     class C[T]: pass</span>
-    <span class="c1">#     # C[int] is a _GenericAlias</span>
-    <span class="c1"># * `Callable` aliases, generic `Callable` aliases, and</span>
-    <span class="c1">#   parameterized `Callable` aliases:</span>
-    <span class="c1">#     T = TypeVar(&#39;T&#39;)</span>
-    <span class="c1">#     # _CallableGenericAlias inherits from _GenericAlias.</span>
-    <span class="c1">#     A = Callable[[], None]  # _CallableGenericAlias</span>
-    <span class="c1">#     B = Callable[[T], None]  # _CallableGenericAlias</span>
-    <span class="c1">#     C = B[int]  # _CallableGenericAlias</span>
-    <span class="c1"># * Parameterized `Final`, `ClassVar`, `TypeGuard`, and `TypeIs`:</span>
-    <span class="c1">#     # All _GenericAlias</span>
-    <span class="c1">#     Final[int]</span>
-    <span class="c1">#     ClassVar[float]</span>
-    <span class="c1">#     TypeGuard[bool]</span>
-    <span class="c1">#     TypeIs[range]</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;The type of parameterized generics.</span>
 
+<span class="sd">    That is, for example, `type(List[int])` is `_GenericAlias`.</span>
+
+<span class="sd">    Objects which are instances of this class include:</span>
+<span class="sd">    * Parameterized container types, e.g. `Tuple[int]`, `List[int]`.</span>
+<span class="sd">     * Note that native container types, e.g. `tuple`, `list`, use</span>
+<span class="sd">       `types.GenericAlias` instead.</span>
+<span class="sd">    * Parameterized classes:</span>
+<span class="sd">        class C[T]: pass</span>
+<span class="sd">        # C[int] is a _GenericAlias</span>
+<span class="sd">    * `Callable` aliases, generic `Callable` aliases, and</span>
+<span class="sd">      parameterized `Callable` aliases:</span>
+<span class="sd">        T = TypeVar(&#39;T&#39;)</span>
+<span class="sd">        # _CallableGenericAlias inherits from _GenericAlias.</span>
+<span class="sd">        A = Callable[[], None]  # _CallableGenericAlias</span>
+<span class="sd">        B = Callable[[T], None]  # _CallableGenericAlias</span>
+<span class="sd">        C = B[int]  # _CallableGenericAlias</span>
+<span class="sd">    * Parameterized `Final`, `ClassVar`, `TypeForm`, `TypeGuard`, and `TypeIs`:</span>
+<span class="sd">        # All _GenericAlias</span>
+<span class="sd">        Final[int]</span>
+<span class="sd">        ClassVar[float]</span>
+<span class="sd">        TypeForm[bytearray]</span>
+<span class="sd">        TypeGuard[bool]</span>
+<span class="sd">        TypeIs[range]</span>
+
+<span class="sd">    Note that instances of this class are not classes (e.g by `inspect.isclass`),</span>
+<span class="sd">    even though they behave like them.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
     <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">origin</span><span class="p">,</span> <span class="n">args</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">inst</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
         <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">origin</span><span class="p">,</span> <span class="n">inst</span><span class="o">=</span><span class="n">inst</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="n">name</span><span class="p">)</span>
         <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">args</span><span class="p">,</span> <span class="nb">tuple</span><span class="p">):</span>
@@ -1972,20 +1976,21 @@
 
     <span class="nd">@_tp_cache</span>
     <span class="k">def</span><span class="w"> </span><span class="fm">__getitem__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">args</span><span class="p">):</span>
-        <span class="c1"># Parameterizes an already-parameterized object.</span>
-        <span class="c1">#</span>
-        <span class="c1"># For example, we arrive here doing something like:</span>
-        <span class="c1">#   T1 = TypeVar(&#39;T1&#39;)</span>
-        <span class="c1">#   T2 = TypeVar(&#39;T2&#39;)</span>
-        <span class="c1">#   T3 = TypeVar(&#39;T3&#39;)</span>
-        <span class="c1">#   class A(Generic[T1]): pass</span>
-        <span class="c1">#   B = A[T2]  # B is a _GenericAlias</span>
-        <span class="c1">#   C = B[T3]  # Invokes _GenericAlias.__getitem__</span>
-        <span class="c1">#</span>
-        <span class="c1"># We also arrive here when parameterizing a generic `Callable` alias:</span>
-        <span class="c1">#   T = TypeVar(&#39;T&#39;)</span>
-        <span class="c1">#   C = Callable[[T], None]</span>
-        <span class="c1">#   C[int]  # Invokes _GenericAlias.__getitem__</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Parameterizes an already-parameterized object.</span>
+
+<span class="sd">        For example, we arrive here doing something like:</span>
+<span class="sd">          T1 = TypeVar(&#39;T1&#39;)</span>
+<span class="sd">          T2 = TypeVar(&#39;T2&#39;)</span>
+<span class="sd">          T3 = TypeVar(&#39;T3&#39;)</span>
+<span class="sd">          class A(Generic[T1]): pass</span>
+<span class="sd">          B = A[T2]  # B is a _GenericAlias</span>
+<span class="sd">          C = B[T3]  # Invokes _GenericAlias.__getitem__</span>
+
+<span class="sd">        We also arrive here when parameterizing a generic `Callable` alias:</span>
+<span class="sd">          T = TypeVar(&#39;T&#39;)</span>
+<span class="sd">          C = Callable[[T], None]</span>
+<span class="sd">          C[int]  # Invokes _GenericAlias.__getitem__</span>
+<span class="sd">        &quot;&quot;&quot;</span>
 
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">__origin__</span> <span class="ow">in</span> <span class="p">(</span><span class="n">Generic</span><span class="p">,</span> <span class="n">Protocol</span><span class="p">):</span>
             <span class="c1"># Can&#39;t subscript Generic[...] or Protocol[...].</span>
@@ -2002,20 +2007,20 @@
         <span class="k">return</span> <span class="n">r</span>
 
     <span class="k">def</span><span class="w"> </span><span class="nf">_determine_new_args</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">args</span><span class="p">):</span>
-        <span class="c1"># Determines new __args__ for __getitem__.</span>
-        <span class="c1">#</span>
-        <span class="c1"># For example, suppose we had:</span>
-        <span class="c1">#   T1 = TypeVar(&#39;T1&#39;)</span>
-        <span class="c1">#   T2 = TypeVar(&#39;T2&#39;)</span>
-        <span class="c1">#   class A(Generic[T1, T2]): pass</span>
-        <span class="c1">#   T3 = TypeVar(&#39;T3&#39;)</span>
-        <span class="c1">#   B = A[int, T3]</span>
-        <span class="c1">#   C = B[str]</span>
-        <span class="c1"># `B.__args__` is `(int, T3)`, so `C.__args__` should be `(int, str)`.</span>
-        <span class="c1"># Unfortunately, this is harder than it looks, because if `T3` is</span>
-        <span class="c1"># anything more exotic than a plain `TypeVar`, we need to consider</span>
-        <span class="c1"># edge cases.</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Determines new __args__ for __getitem__.</span>
 
+<span class="sd">        For example, suppose we had:</span>
+<span class="sd">          T1 = TypeVar(&#39;T1&#39;)</span>
+<span class="sd">          T2 = TypeVar(&#39;T2&#39;)</span>
+<span class="sd">          class A(Generic[T1, T2]): pass</span>
+<span class="sd">          T3 = TypeVar(&#39;T3&#39;)</span>
+<span class="sd">          B = A[int, T3]</span>
+<span class="sd">          C = B[str]</span>
+<span class="sd">        `B.__args__` is `(int, T3)`, so `C.__args__` should be `(int, str)`.</span>
+<span class="sd">        Unfortunately, this is harder than it looks, because if `T3` is</span>
+<span class="sd">        anything more exotic than a plain `TypeVar`, we need to consider</span>
+<span class="sd">        edge cases.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
         <span class="n">params</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">__parameters__</span>
         <span class="c1"># In the example above, this would be {T3: str}</span>
         <span class="k">for</span> <span class="n">param</span> <span class="ow">in</span> <span class="n">params</span><span class="p">:</span>
@@ -2387,7 +2392,7 @@
 <span class="sd">        def foo(**kwargs: Unpack[Movie]): ...</span>
 
 <span class="sd">    Note that there is only some runtime checking of this operator. Not</span>
-<span class="sd">    everything the runtime allows may be accepted by static type checkers.</span>
+<span class="sd">    everything the runtime allows is accepted by static type checkers.</span>
 
 <span class="sd">    For more information, see PEPs 646 and 692.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
@@ -2853,7 +2858,7 @@
 <span class="sd">    Such protocol can be used with isinstance() and issubclass().</span>
 <span class="sd">    Raise TypeError if applied to a non-protocol class.</span>
 <span class="sd">    This allows a simple-minded structural check very similar to</span>
-<span class="sd">    one trick ponies in collections.abc such as Iterable.</span>
+<span class="sd">    one-trick ponies in collections.abc such as Iterable.</span>
 
 <span class="sd">    For example::</span>
 
@@ -2924,8 +2929,8 @@
 <span class="k">def</span><span class="w"> </span><span class="nf">get_type_hints</span><span class="p">(</span><span class="n">obj</span><span class="p">,</span> <span class="n">globalns</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">localns</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">include_extras</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Return type hints for an object.</span>
 
-<span class="sd">    This is often the same as obj.__annotations__, but it handles</span>
-<span class="sd">    forward references encoded as string literals and recursively replaces all</span>
+<span class="sd">    This is often the same as inspect.get_annotations(obj) or obj.__annotations__,</span>
+<span class="sd">    but it handles forward references encoded as string literals and recursively replaces all</span>
 <span class="sd">    &#39;Annotated[T, ...]&#39; with &#39;T&#39; (unless &#39;include_extras=True&#39;).</span>
 
 <span class="sd">    The argument may be a module, class, method, or function. The annotations</span>
@@ -2989,8 +2994,12 @@
         <span class="k">else</span><span class="p">:</span>
             <span class="n">nsobj</span> <span class="o">=</span> <span class="n">obj</span>
             <span class="c1"># Find globalns for the unwrapped object.</span>
+            <span class="n">seen</span> <span class="o">=</span> <span class="p">{</span><span class="nb">id</span><span class="p">(</span><span class="n">nsobj</span><span class="p">)}</span>
             <span class="k">while</span> <span class="nb">hasattr</span><span class="p">(</span><span class="n">nsobj</span><span class="p">,</span> <span class="s1">&#39;__wrapped__&#39;</span><span class="p">):</span>
                 <span class="n">nsobj</span> <span class="o">=</span> <span class="n">nsobj</span><span class="o">.</span><span class="n">__wrapped__</span>
+                <span class="k">if</span> <span class="nb">id</span><span class="p">(</span><span class="n">nsobj</span><span class="p">)</span> <span class="ow">in</span> <span class="n">seen</span><span class="p">:</span>
+                    <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;wrapper loop when unwrapping </span><span class="si">{</span><span class="n">obj</span><span class="si">!r}</span><span class="s1">&#39;</span><span class="p">)</span>
+                <span class="n">seen</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="nb">id</span><span class="p">(</span><span class="n">nsobj</span><span class="p">))</span>
             <span class="n">globalns</span> <span class="o">=</span> <span class="nb">getattr</span><span class="p">(</span><span class="n">nsobj</span><span class="p">,</span> <span class="s1">&#39;__globals__&#39;</span><span class="p">,</span> <span class="p">{})</span>
         <span class="k">if</span> <span class="n">localns</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
             <span class="n">localns</span> <span class="o">=</span> <span class="n">globalns</span>
@@ -3103,7 +3112,7 @@
 
 
 <span class="k">def</span><span class="w"> </span><span class="nf">is_typeddict</span><span class="p">(</span><span class="n">tp</span><span class="p">):</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Check if an annotation is a TypedDict class.</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Check if an object is a TypedDict class.</span>
 
 <span class="sd">    For example::</span>
 
@@ -3217,20 +3226,9 @@
 <span class="k">def</span><span class="w"> </span><span class="nf">overload</span><span class="p">(</span><span class="n">func</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Decorator for overloaded functions/methods.</span>
 
-<span class="sd">    In a stub file, place two or more stub definitions for the same</span>
-<span class="sd">    function in a row, each decorated with @overload.</span>
-
-<span class="sd">    For example::</span>
-
-<span class="sd">        @overload</span>
-<span class="sd">        def utf8(value: None) -&gt; None: ...</span>
-<span class="sd">        @overload</span>
-<span class="sd">        def utf8(value: bytes) -&gt; bytes: ...</span>
-<span class="sd">        @overload</span>
-<span class="sd">        def utf8(value: str) -&gt; bytes: ...</span>
-
-<span class="sd">    In a non-stub file (i.e. a regular .py file), do the same but</span>
-<span class="sd">    follow it with an implementation.  The implementation should *not*</span>
+<span class="sd">    In a non-stub file, place two or more stub definitions for the same</span>
+<span class="sd">    function in a row, each decorated with @overload, followed</span>
+<span class="sd">    by an implementation.  The implementation should *not*</span>
 <span class="sd">    be decorated with @overload::</span>
 
 <span class="sd">        @overload</span>
@@ -3241,6 +3239,16 @@
 <span class="sd">        def utf8(value: str) -&gt; bytes: ...</span>
 <span class="sd">        def utf8(value):</span>
 <span class="sd">            ...  # implementation goes here</span>
+
+<span class="sd">    In a stub file or in an abstract method (for example, in a Protocol definition),</span>
+<span class="sd">    the implementation may be omitted::</span>
+
+<span class="sd">        @overload</span>
+<span class="sd">        def utf8(value: None) -&gt; None: ...</span>
+<span class="sd">        @overload</span>
+<span class="sd">        def utf8(value: bytes) -&gt; bytes: ...</span>
+<span class="sd">        @overload</span>
+<span class="sd">        def utf8(value: str) -&gt; bytes: ...</span>
 
 <span class="sd">    The overloads for a function can be retrieved at runtime using the</span>
 <span class="sd">    get_overloads() function.</span>
@@ -3276,7 +3284,7 @@
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Decorator to indicate final methods and final classes.</span>
 
 <span class="sd">    Use this decorator to indicate to type checkers that the decorated</span>
-<span class="sd">    method cannot be overridden, and decorated class cannot be subclassed.</span>
+<span class="sd">    method cannot be overridden, and the decorated class cannot be subclassed.</span>
 
 <span class="sd">    For example::</span>
 
@@ -3318,7 +3326,7 @@
 <span class="n">V_co</span> <span class="o">=</span> <span class="n">TypeVar</span><span class="p">(</span><span class="s1">&#39;V_co&#39;</span><span class="p">,</span> <span class="n">covariant</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>  <span class="c1"># Any type covariant containers.</span>
 <span class="n">VT_co</span> <span class="o">=</span> <span class="n">TypeVar</span><span class="p">(</span><span class="s1">&#39;VT_co&#39;</span><span class="p">,</span> <span class="n">covariant</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>  <span class="c1"># Value type covariant containers.</span>
 <span class="n">T_contra</span> <span class="o">=</span> <span class="n">TypeVar</span><span class="p">(</span><span class="s1">&#39;T_contra&#39;</span><span class="p">,</span> <span class="n">contravariant</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>  <span class="c1"># Ditto contravariant.</span>
-<span class="c1"># Internal type variable used for Type[].</span>
+<span class="c1"># Internal type bound to class object types.</span>
 <span class="n">CT_co</span> <span class="o">=</span> <span class="n">TypeVar</span><span class="p">(</span><span class="s1">&#39;CT_co&#39;</span><span class="p">,</span> <span class="n">covariant</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">bound</span><span class="o">=</span><span class="nb">type</span><span class="p">)</span>
 
 
@@ -3409,7 +3417,7 @@
 <span class="sd">    And a function that takes a class argument that&#39;s a subclass of</span>
 <span class="sd">    User and returns an instance of the corresponding class::</span>
 
-<span class="sd">        def new_user[U](user_class: Type[U]) -&gt; U:</span>
+<span class="sd">        def new_user[U](user_class: type[U]) -&gt; U:</span>
 <span class="sd">            user = user_class()</span>
 <span class="sd">            # (Here we could write the user object to a database)</span>
 <span class="sd">            return user</span>
@@ -3422,7 +3430,7 @@
 
 <span class="nd">@runtime_checkable</span>
 <span class="k">class</span><span class="w"> </span><span class="nc">SupportsInt</span><span class="p">(</span><span class="n">Protocol</span><span class="p">):</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;An ABC with one abstract method __int__.&quot;&quot;&quot;</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;A protocol with one abstract method __int__.&quot;&quot;&quot;</span>
 
     <span class="vm">__slots__</span> <span class="o">=</span> <span class="p">()</span>
 
@@ -3433,7 +3441,7 @@
 
 <span class="nd">@runtime_checkable</span>
 <span class="k">class</span><span class="w"> </span><span class="nc">SupportsFloat</span><span class="p">(</span><span class="n">Protocol</span><span class="p">):</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;An ABC with one abstract method __float__.&quot;&quot;&quot;</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;A protocol with one abstract method __float__.&quot;&quot;&quot;</span>
 
     <span class="vm">__slots__</span> <span class="o">=</span> <span class="p">()</span>
 
@@ -3444,7 +3452,7 @@
 
 <span class="nd">@runtime_checkable</span>
 <span class="k">class</span><span class="w"> </span><span class="nc">SupportsComplex</span><span class="p">(</span><span class="n">Protocol</span><span class="p">):</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;An ABC with one abstract method __complex__.&quot;&quot;&quot;</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;A protocol with one abstract method __complex__.&quot;&quot;&quot;</span>
 
     <span class="vm">__slots__</span> <span class="o">=</span> <span class="p">()</span>
 
@@ -3455,7 +3463,7 @@
 
 <span class="nd">@runtime_checkable</span>
 <span class="k">class</span><span class="w"> </span><span class="nc">SupportsBytes</span><span class="p">(</span><span class="n">Protocol</span><span class="p">):</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;An ABC with one abstract method __bytes__.&quot;&quot;&quot;</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;A protocol with one abstract method __bytes__.&quot;&quot;&quot;</span>
 
     <span class="vm">__slots__</span> <span class="o">=</span> <span class="p">()</span>
 
@@ -3466,7 +3474,7 @@
 
 <span class="nd">@runtime_checkable</span>
 <span class="k">class</span><span class="w"> </span><span class="nc">SupportsIndex</span><span class="p">(</span><span class="n">Protocol</span><span class="p">):</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;An ABC with one abstract method __index__.&quot;&quot;&quot;</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;A protocol with one abstract method __index__.&quot;&quot;&quot;</span>
 
     <span class="vm">__slots__</span> <span class="o">=</span> <span class="p">()</span>
 
@@ -3477,7 +3485,7 @@
 
 <span class="nd">@runtime_checkable</span>
 <span class="k">class</span><span class="w"> </span><span class="nc">SupportsAbs</span><span class="p">[</span><span class="n">T</span><span class="p">](</span><span class="n">Protocol</span><span class="p">):</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;An ABC with one abstract method __abs__ that is covariant in its return type.&quot;&quot;&quot;</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;A protocol with one abstract method __abs__ that is covariant in its return type.&quot;&quot;&quot;</span>
 
     <span class="vm">__slots__</span> <span class="o">=</span> <span class="p">()</span>
 
@@ -3488,7 +3496,7 @@
 
 <span class="nd">@runtime_checkable</span>
 <span class="k">class</span><span class="w"> </span><span class="nc">SupportsRound</span><span class="p">[</span><span class="n">T</span><span class="p">](</span><span class="n">Protocol</span><span class="p">):</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;An ABC with one abstract method __round__ that is covariant in its return type.&quot;&quot;&quot;</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;A protocol with one abstract method __round__ that is covariant in its return type.&quot;&quot;&quot;</span>
 
     <span class="vm">__slots__</span> <span class="o">=</span> <span class="p">()</span>
 
@@ -3567,7 +3575,7 @@
 
 
 <span class="k">def</span><span class="w"> </span><span class="nf">NamedTuple</span><span class="p">(</span><span class="n">typename</span><span class="p">,</span> <span class="n">fields</span><span class="o">=</span><span class="n">_sentinel</span><span class="p">,</span> <span class="o">/</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Typed version of namedtuple.</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Typed version of collections.namedtuple.</span>
 
 <span class="sd">    Usage::</span>
 
@@ -3579,8 +3587,8 @@
 
 <span class="sd">        Employee = collections.namedtuple(&#39;Employee&#39;, [&#39;name&#39;, &#39;id&#39;])</span>
 
-<span class="sd">    The resulting class has an extra __annotations__ attribute, giving a</span>
-<span class="sd">    dict that maps field names to types.  (The field names are also in</span>
+<span class="sd">    The types for each field name can be retrieved by calling</span>
+<span class="sd">    inspect.get_annotations(Employee).  (The field names are also in</span>
 <span class="sd">    the _fields attribute, which is part of the namedtuple API.)</span>
 <span class="sd">    An alternative equivalent functional syntax is also accepted::</span>
 
@@ -3665,7 +3673,7 @@
 
 <span class="sd">        This method is called when TypedDict is subclassed,</span>
 <span class="sd">        or when TypedDict is instantiated. This way</span>
-<span class="sd">        TypedDict supports all three syntax forms described in its docstring.</span>
+<span class="sd">        TypedDict classes can be created through both class-based and functional syntax.</span>
 <span class="sd">        Subclasses and instances of TypedDict return actual dictionaries.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">for</span> <span class="n">base</span> <span class="ow">in</span> <span class="n">bases</span><span class="p">:</span>
@@ -3778,14 +3786,22 @@
 <span class="sd">        &gt;&gt;&gt; Point2D(x=1, y=2, label=&#39;first&#39;) == dict(x=1, y=2, label=&#39;first&#39;)</span>
 <span class="sd">        True</span>
 
-<span class="sd">    The type info can be accessed via the Point2D.__annotations__ dict, and</span>
-<span class="sd">    the Point2D.__required_keys__ and Point2D.__optional_keys__ frozensets.</span>
+<span class="sd">    The type info can be accessed by calling inspect.get_annotations(Point2D), and</span>
+<span class="sd">    via the Point2D.__required_keys__ and Point2D.__optional_keys__ frozensets.</span>
 <span class="sd">    TypedDict supports an additional equivalent form::</span>
 
 <span class="sd">        Point2D = TypedDict(&#39;Point2D&#39;, {&#39;x&#39;: int, &#39;y&#39;: int, &#39;label&#39;: str})</span>
 
 <span class="sd">    By default, all keys must be present in a TypedDict. It is possible</span>
-<span class="sd">    to override this by specifying totality::</span>
+<span class="sd">    to override this by using the NotRequired and Required special forms::</span>
+
+<span class="sd">        class Point2D(TypedDict):</span>
+<span class="sd">            x: int               # the &quot;x&quot; key must always be present (Required is the default)</span>
+<span class="sd">            y: NotRequired[int]  # the &quot;y&quot; key can be omitted</span>
+
+<span class="sd">    This means that a Point2D TypedDict can have the &quot;y&quot; key omitted, but the &quot;x&quot; key must be present.</span>
+<span class="sd">    Items are required by default, so the Required special form is not necessary in this example.</span>
+<span class="sd">    In addition, the total argument to the TypedDict function can be used to make all items not required::</span>
 
 <span class="sd">        class Point2D(TypedDict, total=False):</span>
 <span class="sd">            x: int</span>
@@ -3794,16 +3810,8 @@
 <span class="sd">    This means that a Point2D TypedDict can have any of the keys omitted. A type</span>
 <span class="sd">    checker is only expected to support a literal False or True as the value of</span>
 <span class="sd">    the total argument. True is the default, and makes all items defined in the</span>
-<span class="sd">    class body be required.</span>
-
-<span class="sd">    The Required and NotRequired special forms can also be used to mark</span>
-<span class="sd">    individual keys as being required or not required::</span>
-
-<span class="sd">        class Point2D(TypedDict):</span>
-<span class="sd">            x: int               # the &quot;x&quot; key must always be present (Required is the default)</span>
-<span class="sd">            y: NotRequired[int]  # the &quot;y&quot; key can be omitted</span>
-
-<span class="sd">    See PEP 655 for more details on Required and NotRequired.</span>
+<span class="sd">    class body be required. The Required special form can be used to mark individual</span>
+<span class="sd">    keys as required in a total=False TypedDict.</span>
 
 <span class="sd">    The ReadOnly special form can be used</span>
 <span class="sd">    to mark individual keys as immutable for type checkers::</span>
@@ -3812,6 +3820,7 @@
 <span class="sd">            id: ReadOnly[int]  # the &quot;id&quot; key must not be modified</span>
 <span class="sd">            username: str      # the &quot;username&quot; key can be changed</span>
 
+<span class="sd">    See PEPs 589, 655, and 705 for more information.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="k">if</span> <span class="n">fields</span> <span class="ow">is</span> <span class="n">_sentinel</span> <span class="ow">or</span> <span class="n">fields</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
         <span class="kn">import</span><span class="w"> </span><span class="nn">warnings</span>
@@ -3858,7 +3867,7 @@
 <span class="sd">            year: int</span>
 
 <span class="sd">        m = Movie(</span>
-<span class="sd">            title=&#39;The Matrix&#39;,  # typechecker error if key is omitted</span>
+<span class="sd">            title=&#39;The Matrix&#39;,  # type checker error if key is omitted</span>
 <span class="sd">            year=1999,</span>
 <span class="sd">        )</span>
 
@@ -3880,7 +3889,7 @@
 <span class="sd">            year: NotRequired[int]</span>
 
 <span class="sd">        m = Movie(</span>
-<span class="sd">            title=&#39;The Matrix&#39;,  # typechecker error if key is omitted</span>
+<span class="sd">            title=&#39;The Matrix&#39;,  # type checker error if key is omitted</span>
 <span class="sd">            year=1999,</span>
 <span class="sd">        )</span>
 <span class="sd">    &quot;&quot;&quot;</span>
@@ -3900,7 +3909,7 @@
 
 <span class="sd">        def mutate_movie(m: Movie) -&gt; None:</span>
 <span class="sd">            m[&quot;year&quot;] = 1992  # allowed</span>
-<span class="sd">            m[&quot;title&quot;] = &quot;The Matrix&quot;  # typechecker error</span>
+<span class="sd">            m[&quot;title&quot;] = &quot;The Matrix&quot;  # type checker error</span>
 
 <span class="sd">    There is no runtime checking for this property.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
@@ -3987,8 +3996,8 @@
 <span class="sd">    classes (text vs. binary, read vs. write vs. read/write,</span>
 <span class="sd">    append-only, unbuffered).  The TextIO and BinaryIO subclasses</span>
 <span class="sd">    below capture the distinctions between text vs. binary, which is</span>
-<span class="sd">    pervasive in the interface; however we currently do not offer a</span>
-<span class="sd">    way to track the other distinctions in the type system.</span>
+<span class="sd">    pervasive in the interface. For more precise types, define a custom</span>
+<span class="sd">    Protocol.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
 
     <span class="vm">__slots__</span> <span class="o">=</span> <span class="p">()</span>
@@ -4078,7 +4087,7 @@
 
 
 <span class="k">class</span><span class="w"> </span><span class="nc">BinaryIO</span><span class="p">(</span><span class="n">IO</span><span class="p">[</span><span class="nb">bytes</span><span class="p">]):</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Typed version of the return of open() in binary mode.&quot;&quot;&quot;</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Typed approximation of the return of open() in binary mode.&quot;&quot;&quot;</span>
 
     <span class="vm">__slots__</span> <span class="o">=</span> <span class="p">()</span>
 
@@ -4092,7 +4101,7 @@
 
 
 <span class="k">class</span><span class="w"> </span><span class="nc">TextIO</span><span class="p">(</span><span class="n">IO</span><span class="p">[</span><span class="nb">str</span><span class="p">]):</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Typed version of the return of open() in text mode.&quot;&quot;&quot;</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Typed approximation of the return of open() in text mode.&quot;&quot;&quot;</span>
 
     <span class="vm">__slots__</span> <span class="o">=</span> <span class="p">()</span>
 
@@ -4159,7 +4168,7 @@
     <span class="n">field_specifiers</span><span class="p">:</span> <span class="nb">tuple</span><span class="p">[</span><span class="nb">type</span><span class="p">[</span><span class="n">Any</span><span class="p">]</span> <span class="o">|</span> <span class="n">Callable</span><span class="p">[</span><span class="o">...</span><span class="p">,</span> <span class="n">Any</span><span class="p">],</span> <span class="o">...</span><span class="p">]</span> <span class="o">=</span> <span class="p">(),</span>
     <span class="o">**</span><span class="n">kwargs</span><span class="p">:</span> <span class="n">Any</span><span class="p">,</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">_IdentityCallable</span><span class="p">:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Decorator to mark an object as providing dataclass-like behaviour.</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Decorator to mark an object as providing dataclass-like behavior.</span>
 
 <span class="sd">    The decorator can be applied to a function, class, or metaclass.</span>
 

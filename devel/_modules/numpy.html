@@ -19,7 +19,7 @@
     
   
       
-        <title>numpy - linearmodels v7.1 (+30)</title>
+        <title>numpy - linearmodels v7.1 (+32)</title>
       
     
 
@@ -91,7 +91,7 @@
 
 <header class="md-header md-header--shadow" data-md-component="header">
   <nav class="md-header__inner md-grid" aria-label="Header">
-    <a href="../index.html" title="linearmodels v7.1 (+30)" class="md-header__button md-logo" aria-label="linearmodels v7.1 (+30)" data-md-component="logo">
+    <a href="../index.html" title="linearmodels v7.1 (+32)" class="md-header__button md-logo" aria-label="linearmodels v7.1 (+32)" data-md-component="logo">
       <img src="../_static/bw-logo.svg" alt="logo">
     </a>
     <label class="md-header__button md-icon" for="__drawer">
@@ -102,7 +102,7 @@
       <div class="md-header__ellipsis">
         <div class="md-header__topic">
           <span class="md-ellipsis">
-            linearmodels v7.1 (+30)
+            linearmodels v7.1 (+32)
           </span>
         </div>
         <div class="md-header__topic" data-md-component="header-topic">
@@ -197,10 +197,10 @@
 
 <nav class="md-nav md-nav--primary" aria-label="Navigation" data-md-level="0">
   <label class="md-nav__title" for="__drawer">
-    <a href="../index.html" title="linearmodels v7.1 (+30)" class="md-nav__button md-logo" aria-label="linearmodels v7.1 (+30)" data-md-component="logo">
+    <a href="../index.html" title="linearmodels v7.1 (+32)" class="md-nav__button md-logo" aria-label="linearmodels v7.1 (+32)" data-md-component="logo">
       <img src="../_static/bw-logo.svg" alt="logo">
     </a>
-    linearmodels v7.1 (+30)
+    linearmodels v7.1 (+32)
   </label>
   
     <div class="md-nav__source">
@@ -558,9 +558,6 @@
 <span class="sd">    Polynomial tools</span>
 <span class="sd">testing</span>
 <span class="sd">    NumPy testing tools</span>
-<span class="sd">distutils</span>
-<span class="sd">    Enhancements to distutils with support for</span>
-<span class="sd">    Fortran compilers support and more (for Python &lt;= 3.11)</span>
 
 <span class="sd">Utilities</span>
 <span class="sd">---------</span>
@@ -1084,7 +1081,6 @@
         <span class="n">hsplit</span><span class="p">,</span>
         <span class="n">kron</span><span class="p">,</span>
         <span class="n">put_along_axis</span><span class="p">,</span>
-        <span class="n">row_stack</span><span class="p">,</span>
         <span class="n">split</span><span class="p">,</span>
         <span class="n">take_along_axis</span><span class="p">,</span>
         <span class="n">tile</span><span class="p">,</span>
@@ -1130,8 +1126,8 @@
     <span class="kn">from</span><span class="w"> </span><span class="nn">.matrixlib</span><span class="w"> </span><span class="kn">import</span> <span class="n">asmatrix</span><span class="p">,</span> <span class="n">bmat</span><span class="p">,</span> <span class="n">matrix</span>
 
     <span class="c1"># public submodules are imported lazily, therefore are accessible from</span>
-    <span class="c1"># __getattr__. Note that `distutils` (deprecated) and `array_api`</span>
-    <span class="c1"># (experimental label) are not added here, because `from numpy import *`</span>
+    <span class="c1"># __getattr__. Note that `array_api`</span>
+    <span class="c1"># (experimental label) is not added here, because `from numpy import *`</span>
     <span class="c1"># must not raise any warnings - that&#39;s too disruptive.</span>
     <span class="n">__numpy_submodules__</span> <span class="o">=</span> <span class="p">{</span>
         <span class="s2">&quot;linalg&quot;</span><span class="p">,</span> <span class="s2">&quot;fft&quot;</span><span class="p">,</span> <span class="s2">&quot;dtypes&quot;</span><span class="p">,</span> <span class="s2">&quot;random&quot;</span><span class="p">,</span> <span class="s2">&quot;polynomial&quot;</span><span class="p">,</span> <span class="s2">&quot;ma&quot;</span><span class="p">,</span>
@@ -1177,7 +1173,7 @@
     <span class="c1"># import with `from numpy import *`.</span>
     <span class="n">__future_scalars__</span> <span class="o">=</span> <span class="p">{</span><span class="s2">&quot;str&quot;</span><span class="p">,</span> <span class="s2">&quot;bytes&quot;</span><span class="p">,</span> <span class="s2">&quot;object&quot;</span><span class="p">}</span>
 
-    <span class="n">__array_api_version__</span> <span class="o">=</span> <span class="s2">&quot;2024.12&quot;</span>
+    <span class="n">__array_api_version__</span> <span class="o">=</span> <span class="s2">&quot;2025.12&quot;</span>
 
     <span class="kn">from</span><span class="w"> </span><span class="nn">._array_api_info</span><span class="w"> </span><span class="kn">import</span> <span class="n">__array_namespace_info__</span>
 
@@ -1253,23 +1249,12 @@
         <span class="k">elif</span> <span class="n">attr</span> <span class="o">==</span> <span class="s2">&quot;char&quot;</span><span class="p">:</span>
             <span class="kn">import</span><span class="w"> </span><span class="nn">numpy.char</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">char</span>
             <span class="k">return</span> <span class="n">char</span>
-        <span class="k">elif</span> <span class="n">attr</span> <span class="o">==</span> <span class="s2">&quot;array_api&quot;</span><span class="p">:</span>
-            <span class="k">raise</span> <span class="ne">AttributeError</span><span class="p">(</span><span class="s2">&quot;`numpy.array_api` is not available from &quot;</span>
-                                 <span class="s2">&quot;numpy 2.0 onwards&quot;</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="kc">None</span><span class="p">)</span>
         <span class="k">elif</span> <span class="n">attr</span> <span class="o">==</span> <span class="s2">&quot;core&quot;</span><span class="p">:</span>
             <span class="kn">import</span><span class="w"> </span><span class="nn">numpy.core</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">core</span>
             <span class="k">return</span> <span class="n">core</span>
         <span class="k">elif</span> <span class="n">attr</span> <span class="o">==</span> <span class="s2">&quot;strings&quot;</span><span class="p">:</span>
             <span class="kn">import</span><span class="w"> </span><span class="nn">numpy.strings</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">strings</span>
             <span class="k">return</span> <span class="n">strings</span>
-        <span class="k">elif</span> <span class="n">attr</span> <span class="o">==</span> <span class="s2">&quot;distutils&quot;</span><span class="p">:</span>
-            <span class="k">if</span> <span class="s1">&#39;distutils&#39;</span> <span class="ow">in</span> <span class="n">__numpy_submodules__</span><span class="p">:</span>
-                <span class="kn">import</span><span class="w"> </span><span class="nn">numpy.distutils</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">distutils</span>
-                <span class="k">return</span> <span class="n">distutils</span>
-            <span class="k">else</span><span class="p">:</span>
-                <span class="k">raise</span> <span class="ne">AttributeError</span><span class="p">(</span><span class="s2">&quot;`numpy.distutils` is not available from &quot;</span>
-                                     <span class="s2">&quot;Python 3.12 onwards&quot;</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="kc">None</span><span class="p">)</span>
-
         <span class="k">if</span> <span class="n">attr</span> <span class="ow">in</span> <span class="n">__future_scalars__</span><span class="p">:</span>
             <span class="c1"># And future warnings for those that will change, but also give</span>
             <span class="c1"># the AttributeError</span>
@@ -1287,14 +1272,6 @@
                 <span class="n">name</span><span class="o">=</span><span class="kc">None</span>
             <span class="p">)</span>
 
-        <span class="k">if</span> <span class="n">attr</span> <span class="o">==</span> <span class="s2">&quot;chararray&quot;</span><span class="p">:</span>
-            <span class="n">warnings</span><span class="o">.</span><span class="n">warn</span><span class="p">(</span>
-                <span class="s2">&quot;`np.chararray` is deprecated and will be removed from &quot;</span>
-                <span class="s2">&quot;the main namespace in the future. Use an array with a string &quot;</span>
-                <span class="s2">&quot;or bytes dtype instead.&quot;</span><span class="p">,</span> <span class="ne">DeprecationWarning</span><span class="p">,</span> <span class="n">stacklevel</span><span class="o">=</span><span class="mi">2</span><span class="p">)</span>
-            <span class="kn">import</span><span class="w"> </span><span class="nn">numpy.char</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">char</span>
-            <span class="k">return</span> <span class="n">char</span><span class="o">.</span><span class="n">chararray</span>
-
         <span class="k">raise</span> <span class="ne">AttributeError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;module </span><span class="si">{</span><span class="vm">__name__</span><span class="si">!r}</span><span class="s2"> has no attribute </span><span class="si">{</span><span class="n">attr</span><span class="si">!r}</span><span class="s2">&quot;</span><span class="p">)</span>
 
     <span class="k">def</span><span class="w"> </span><span class="fm">__dir__</span><span class="p">():</span>
@@ -1303,7 +1280,7 @@
         <span class="p">)</span>
         <span class="n">public_symbols</span> <span class="o">-=</span> <span class="p">{</span>
             <span class="s2">&quot;matrixlib&quot;</span><span class="p">,</span> <span class="s2">&quot;matlib&quot;</span><span class="p">,</span> <span class="s2">&quot;tests&quot;</span><span class="p">,</span> <span class="s2">&quot;conftest&quot;</span><span class="p">,</span> <span class="s2">&quot;version&quot;</span><span class="p">,</span>
-            <span class="s2">&quot;distutils&quot;</span><span class="p">,</span> <span class="s2">&quot;array_api&quot;</span>
+            <span class="s2">&quot;array_api&quot;</span>
         <span class="p">}</span>
         <span class="k">return</span> <span class="nb">list</span><span class="p">(</span><span class="n">public_symbols</span><span class="p">)</span>
 
