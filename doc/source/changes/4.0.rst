@@ -19,7 +19,7 @@ Version 4.31
 
 Version 4.30
 ~~~~~~~~~~~~
-* Improved compatability with unreleased versions of NumPy and pandas.
+* Improved compatibility with unreleased versions of NumPy and pandas.
 
 
 Version 4.29
@@ -28,11 +28,11 @@ Version 4.29
   :class:`~linearmodels.panel.results.FamaMacBethResults` as
   :meth:`~linearmodels.panel.results.FamaMacBethResults.avg_rsquared` and
   :meth:`~linearmodels.panel.results.FamaMacBethResults.avg_adj_rsquared`.
-* Initial compatability with pandas 2.0 Copy-on-Write feature.
+* Initial compatibility with pandas 2.0 Copy-on-Write feature.
 
 Version 4.28
 ~~~~~~~~~~~~
-* Expanded compatability for formulaic from 0.3.2 to 0.5.2
+* Expanded compatibility for formulaic from 0.3.2 to 0.5.2
 * Fixed a few issues related to pandas 2.0
 * Added tests and wheel support for Python 3.11
 
@@ -161,8 +161,8 @@ Version 4.12
 ~~~~~~~~~~~~
 * Added an option to drop singleton observations in
   :class:`~linearmodels.panel.model.PanelOLS` by setting the keyword argument
-  ``singletons-False``. When ``False``, singelton observations are dropped
-  before the model is fit, so the the result is *as-if* the observations were
+  ``singletons-False``. When ``False``, singleton observations are dropped
+  before the model is fit, so the result is *as-if* the observations were
   never in ``exog`` or ``dependent``.
 * Added a method to construct the 2-core graph for 2-way effects models, which
   allows singleton observations with no effect on estimated slopes to be

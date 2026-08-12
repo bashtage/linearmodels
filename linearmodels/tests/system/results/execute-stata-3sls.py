@@ -58,10 +58,7 @@ stats = ["chi2_", "F_", "p_", "df_m", "mss_", "r2_", "rss_"]
 for i in range(1, 4):
     all_stats += " ".join([f"{s}{i}" for s in stats]) + " "
 all_stats += ") append"
-output = (
-    all_stats
-    + "\n"
-    + """
+output = all_stats + "\n" + """
 
 file open myfile using {outfile}, write append
 file write myfile  "*********** Variance ****************" _n
@@ -79,7 +76,6 @@ matrix Sigma = e(Sigma)
 
 estout matrix(Sigma, fmt(%13.12g)) using {outfile}, append
 """
-)
 output = output.format(outfile=OUTFILE)
 
 methods = ("3sls", "2sls", "ols", "sur", "3sls ireg3")

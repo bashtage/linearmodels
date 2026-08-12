@@ -1684,7 +1684,7 @@ class _OLS(IVLIML):
     Computes OLS estimates when required
 
     Private class used when model reduces to OLS. Should use the statsmodels
-    version when neeeding a supported public API.
+    version when needing a supported public API.
 
     Parameters
     ----------
