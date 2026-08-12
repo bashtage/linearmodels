@@ -40,9 +40,7 @@ configs = od
 start = """
 use {dtafile}, clear \n
 xtset firm_id time \n
-""".format(
-    dtafile=dtafile
-)
+""".format(dtafile=dtafile)
 
 _sep = "#################!{config}-{ending}!####################"
 endings = ["", "_light", "_heavy"]

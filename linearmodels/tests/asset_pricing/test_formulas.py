@@ -128,7 +128,8 @@ def test_escaped_formula(data, model):
     mod = model.from_formula(formula, data_rename)
     res = mod.fit()
     ports = [
-        val.strip().replace("`", "").strip() for val in formula.split("~")[0].split("+")
+        val.strip().replace("`", "").strip()
+        for val in formula.split("~", maxsplit=1)[0].split("+")
     ]
     factors = [
         val.strip().replace("`", "").strip() for val in formula.split("~")[1].split("+")

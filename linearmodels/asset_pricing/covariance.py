@@ -93,7 +93,7 @@ class HeteroskedasticCovariance:
     debiased : bool
         Flag indicating to use a debiased estimator. Default is False.
     df : int
-        Degree of freedom value ot use if debiasing. Default is 0.
+        Degree of freedom value to use if debiasing. Default is 0.
     """
 
     def __init__(
@@ -220,7 +220,7 @@ class KernelCovariance(HeteroskedasticCovariance, _HACMixin):
     debiased : bool
         Flag indicating to use a debiased estimator.
     df : int
-        Degree of freedom value ot use if debiasing.
+        Degree of freedom value to use if debiasing.
 
     See Also
     --------
