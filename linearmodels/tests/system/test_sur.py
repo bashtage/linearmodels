@@ -37,7 +37,7 @@ def gen_id(param):
     idstr += "-correl" if param[2] != 0 else ""
     idstr += "-common" if param[3] else ""
     idstr += "-weights" if param[4] else ""
-    idstr += "-dist" if param[4] else "-tuple"
+    idstr += "-dist" if param[5] else "-tuple"
     return idstr
 
 

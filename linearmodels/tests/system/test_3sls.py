@@ -45,8 +45,11 @@ params += add_params
 
 def gen_id(param):
     idstr = "homo" if isinstance(param[0], list) else "hetero"
+    idstr += f"-{param[0]}"
     idstr += "-homo_endog" if isinstance(param[1], list) else "-hetero_endog"
+    idstr += f"-{param[1]}"
     idstr += "-homo_instr" if isinstance(param[2], list) else "-hetero_instr"
+    idstr += f"-{param[2]}"
     idstr += "-const" if param[3] else ""
     idstr += "-correl" if param[4] != 0 else ""
     idstr += "-common" if param[5] else ""

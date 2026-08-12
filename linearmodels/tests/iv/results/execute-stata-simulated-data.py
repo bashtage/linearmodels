@@ -10,9 +10,7 @@ dtafile = join(os.getcwd(), "simulated-data.dta")
 start = """
 use {dtafile}, clear \n
 tsset time \n
-""".format(
-    dtafile=dtafile
-)
+""".format(dtafile=dtafile)
 
 model = r"""
 ivregress {method} {depvar} {exog_var} ///

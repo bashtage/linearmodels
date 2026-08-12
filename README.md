@@ -20,7 +20,7 @@ estimating asset prices:
     -   Pooled regression for panel data
     -   Fama-MacBeth estimation of panel models
 
--   **High-dimensional Regresssion**:
+-   **High-dimensional Regression**:
     -   Absorbing Least Squares
 
 -   **Instrumental Variable estimators**

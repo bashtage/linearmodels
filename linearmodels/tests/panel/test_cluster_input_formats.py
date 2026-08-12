@@ -15,7 +15,7 @@ pytestmark = pytest.mark.filterwarnings(
 
 missing = [0.0, 0.20]
 perms = list(product(missing, datatypes))
-ids = ["-".join(str(param) for param in perms) for perm in perms]
+ids = ["-".join(str(param) for param in perm) for perm in perms]
 
 
 @pytest.fixture(params=perms, ids=ids)
