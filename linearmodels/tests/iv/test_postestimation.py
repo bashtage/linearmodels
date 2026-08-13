@@ -155,3 +155,54 @@ def test_linear_restriction(data):
     formula_str = " = ".join(formula_dict.keys()) + " = 0"
     ts2 = res.wald_test(formula=formula_str)
     assert_allclose(ts.stat, ts2.stat)
+
+
+def test_cragg_donald(data):
+    res = IV2SLS(data.dep, data.exog, data.endog, data.instr).fit(cov_type="unadjusted")
+    cd = res.first_stage.cragg_donald
+    # Reference value computed via mlondschien/ivmodels rank_test on the
+    # same GH issue (statsmodels/linearmodels#622) example data
+    assert cd.df == data.instr.shape[1] - data.endog.shape[1] + 1
+
+
+def test_cragg_donald_degenerate():
+    rng = np.random.default_rng(0)
+    n = 200
+    z = rng.normal(size=(n, 1))  # 1 instrument
+    x = rng.normal(size=(n, 2))  # 2 endogenous -- k < m
+    exog_empty = np.empty((n, 0))
+
+    from linearmodels.iv.common import cragg_donald
+
+    result = cragg_donald(x, z, exog_empty)
+    assert np.isnan(result.pval)
+
+
+def test_cragg_donald_known_value():
+    # Reproduces the exact example from GH issue #622, validated against
+    # mlondschien/ivmodels's independent rank_test implementation
+    # (statistic=0.8939161043879634, p_value=0.6395707363012899)
+    rng = np.random.default_rng(0)
+    n = 1000
+    z = rng.normal(size=(n, 3))
+    h = rng.normal(size=(n, 3))
+    x = z @ np.ones((3, 2)) + h @ np.array([[1, 0], [0, -1], [0, 0]])
+    y = h @ np.array([1, 1, 0.1])
+
+    from linearmodels.iv.common import cragg_donald
+
+    exog_empty = np.empty((n, 0))
+    result = cragg_donald(x, z, exog_empty)
+    assert_allclose(result.stat, 0.8939161043879634, rtol=1e-6)
+    assert_allclose(result.pval, 0.6395707363012899, rtol=1e-6)
+
+
+def test_cragg_donald_no_endog():
+    from linearmodels.iv.common import cragg_donald
+
+    n = 100
+    empty_endog = np.empty((n, 0))
+    z = np.random.default_rng(0).normal(size=(n, 3))
+    exog_empty = np.empty((n, 0))
+    result = cragg_donald(empty_endog, z, exog_empty)
+    assert np.isnan(result.pval)
