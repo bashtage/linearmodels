@@ -19,7 +19,7 @@
     
   
       
-        <title>typing - linearmodels v7.1 (+62)</title>
+        <title>typing - linearmodels v7.1 (+64)</title>
       
     
 
@@ -91,7 +91,7 @@
 
 <header class="md-header md-header--shadow" data-md-component="header">
   <nav class="md-header__inner md-grid" aria-label="Header">
-    <a href="../index.html" title="linearmodels v7.1 (+62)" class="md-header__button md-logo" aria-label="linearmodels v7.1 (+62)" data-md-component="logo">
+    <a href="../index.html" title="linearmodels v7.1 (+64)" class="md-header__button md-logo" aria-label="linearmodels v7.1 (+64)" data-md-component="logo">
       <img src="../_static/bw-logo.svg" alt="logo">
     </a>
     <label class="md-header__button md-icon" for="__drawer">
@@ -102,7 +102,7 @@
       <div class="md-header__ellipsis">
         <div class="md-header__topic">
           <span class="md-ellipsis">
-            linearmodels v7.1 (+62)
+            linearmodels v7.1 (+64)
           </span>
         </div>
         <div class="md-header__topic" data-md-component="header-topic">
@@ -197,10 +197,10 @@
 
 <nav class="md-nav md-nav--primary" aria-label="Navigation" data-md-level="0">
   <label class="md-nav__title" for="__drawer">
-    <a href="../index.html" title="linearmodels v7.1 (+62)" class="md-nav__button md-logo" aria-label="linearmodels v7.1 (+62)" data-md-component="logo">
+    <a href="../index.html" title="linearmodels v7.1 (+64)" class="md-nav__button md-logo" aria-label="linearmodels v7.1 (+64)" data-md-component="logo">
       <img src="../_static/bw-logo.svg" alt="logo">
     </a>
-    linearmodels v7.1 (+62)
+    linearmodels v7.1 (+64)
   </label>
   
     <div class="md-nav__source">
@@ -1341,16 +1341,13 @@
     <span class="c1"># There is no &#39;_type_check&#39; call because arguments to Literal[...] are</span>
     <span class="c1"># values, not types.</span>
     <span class="n">parameters</span> <span class="o">=</span> <span class="n">_flatten_literal_params</span><span class="p">(</span><span class="n">parameters</span><span class="p">)</span>
-    <span class="n">value_and_type_parameters</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="n">_value_and_type_iter</span><span class="p">(</span><span class="n">parameters</span><span class="p">))</span>
-    <span class="n">deduplicated_parameters</span> <span class="o">=</span> <span class="nb">tuple</span><span class="p">(</span>
-        <span class="n">p</span>
-        <span class="k">for</span> <span class="n">p</span><span class="p">,</span> <span class="n">_</span> <span class="ow">in</span> <span class="n">_deduplicate</span><span class="p">(</span>
-            <span class="n">value_and_type_parameters</span><span class="p">,</span>
-            <span class="n">unhashable_fallback</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
-        <span class="p">)</span>
-    <span class="p">)</span>
 
-    <span class="k">return</span> <span class="n">_LiteralGenericAlias</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">deduplicated_parameters</span><span class="p">)</span>
+    <span class="k">try</span><span class="p">:</span>
+        <span class="n">parameters</span> <span class="o">=</span> <span class="nb">tuple</span><span class="p">(</span><span class="n">p</span> <span class="k">for</span> <span class="n">p</span><span class="p">,</span> <span class="n">_</span> <span class="ow">in</span> <span class="n">_deduplicate</span><span class="p">(</span><span class="nb">list</span><span class="p">(</span><span class="n">_value_and_type_iter</span><span class="p">(</span><span class="n">parameters</span><span class="p">))))</span>
+    <span class="k">except</span> <span class="ne">TypeError</span><span class="p">:</span>  <span class="c1"># unhashable parameters</span>
+        <span class="k">pass</span>
+
+    <span class="k">return</span> <span class="n">_LiteralGenericAlias</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">parameters</span><span class="p">)</span>
 
 
 <span class="nd">@_SpecialForm</span>
