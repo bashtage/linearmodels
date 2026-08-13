@@ -676,6 +676,34 @@ class FirstStageResults(_SummaryStr):
         self._cov_config = cov_config
 
     @cached_property
+    def cragg_donald(self) -> WaldTestStatistic | InvalidTestStatistic:
+        """
+        Cragg-Donald test of reduced rank for the joint first-stage regression
+
+        Returns
+        -------
+        WaldTestStatistic
+            Test statistic for the null that the instruments do not
+            jointly identify all endogenous regressors. See
+            linearmodels.iv.common.cragg_donald for details.
+
+        Notes
+        -----
+        Unlike the per-variable F-statistics in ``diagnostics``, this test
+        accounts for correlation among the fitted values of the endogenous
+        regressors, and so correctly flags cases where instruments are
+        individually strong but cannot jointly distinguish between
+        correlated endogenous variables.
+        """
+        from linearmodels.iv.common import cragg_donald
+
+        w = sqrt(self.weights.ndarray)
+        endog = w * self.endog.ndarray.astype(float, copy=False)
+        instr = w * self.instr.ndarray.astype(float, copy=False)
+        exog = w * self.exog.ndarray.astype(float, copy=False)
+        return cragg_donald(endog, instr, exog)
+
+    @cached_property
     def diagnostics(self) -> DataFrame:
         """
         Post estimation diagnostics of first-stage fit
