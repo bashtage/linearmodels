@@ -1759,3 +1759,275 @@ def _gmm_model_from_formula(
     )
     mod.formula = formula
     return mod
+
+
+# ---------------------------------------------------------------------------
+# Private covariance helper for JIVE
+# ---------------------------------------------------------------------------
+
+
+class _JIVECovariance:
+    r"""Heteroskedasticity-robust sandwich covariance for IVJIVE.
+
+    The JIVE estimator solves :math:`\tilde{X}'X\hat\beta = \tilde{X}'y`,
+    where :math:`\tilde{X}_i` is the leave-one-out first-stage prediction.
+    The sandwich covariance is
+
+    .. math::
+
+        n^{-1} (\tilde{X}'X/n)^{-1}
+        \Bigl(n^{-1}\sum_i \hat\epsilon_i^2 \tilde{x}_i \tilde{x}_i'\Bigr)
+        (\tilde{X}'X/n)^{-1}
+
+    Parameters
+    ----------
+    x : ndarray, shape (n, k)
+        Weighted regressors.
+    y : ndarray, shape (n, 1)
+        Weighted dependent variable.
+    x_loo : ndarray, shape (n, k)
+        Leave-one-out first-stage predictions.
+    params : ndarray, shape (k,)
+        JIVE coefficient estimates.
+    debiased : bool
+        Apply small-sample degree-of-freedom adjustment.
+    """
+
+    def __init__(
+        self,
+        x: linearmodels.typing.data.Float64Array,
+        y: linearmodels.typing.data.Float64Array,
+        x_loo: linearmodels.typing.data.Float64Array,
+        params: linearmodels.typing.data.Float64Array,
+        debiased: bool = False,
+    ) -> None:
+        self.x = x
+        self.y = y
+        self.x_loo = x_loo
+        self.params = params
+        self._debiased = debiased
+        self.eps = y - x @ params
+        nobs, nvar = x.shape
+        self._scale: float = nobs / (nobs - nvar) if debiased else 1.0
+        self._name = "JIVE Covariance (Heteroskedastic)"
+
+    @property
+    def cov(self) -> linearmodels.typing.data.Float64Array:
+        """Heteroskedasticity-robust covariance matrix."""
+        x, x_loo, eps = self.x, self.x_loo, self.eps
+        nobs = x.shape[0]
+        bread = inv(x_loo.T @ x / nobs)
+        scores = x_loo * eps
+        meat = self._scale * scores.T @ scores / nobs
+        c = bread @ meat @ bread.T / nobs
+        return (c + c.T) / 2
+
+    @property
+    def s2(self) -> float:
+        """Estimated residual variance."""
+        nobs = self.x.shape[0]
+        return float(self._scale * squeeze(self.eps.T @ self.eps) / nobs)
+
+    @property
+    def debiased(self) -> bool:
+        """Flag indicating whether covariance is degree-of-freedom adjusted."""
+        return self._debiased
+
+    @property
+    def config(self) -> dict[str, Any]:
+        """Covariance configuration parameters."""
+        return {"debiased": self.debiased}
+
+    def __str__(self) -> str:
+        return f"{self._name}\nDebiased: {self._debiased}"
+
+    def __repr__(self) -> str:
+        return self.__str__() + "\n" + self.__class__.__name__ + f", id: {hex(id(self))}"
+
+
+# ---------------------------------------------------------------------------
+# IVJIVE
+# ---------------------------------------------------------------------------
+
+
+class IVJIVE(_IVModelBase):
+    r"""
+    Jackknife Instrumental Variables Estimator (JIVE).
+
+    JIVE replaces the 2SLS first-stage fitted values :math:`\hat{X} = P_Z X`
+    with *leave-one-out* first-stage predictions
+
+    .. math::
+
+        \tilde{X}_i = \frac{(P_Z X)_i - h_i X_i}{1 - h_i},
+        \qquad h_i = z_i'(Z'Z)^{-1}z_i,
+
+    and defines the estimator as
+
+    .. math::
+
+        \hat{\beta}_{\text{JIVE}}
+            = \bigl(\tilde{X}'X\bigr)^{-1} \tilde{X}'y.
+
+    By using leave-one-out predictions, JIVE eliminates the finite-sample
+    bias of 2SLS that arises when the number of instruments is large relative
+    to the sample size.
+
+    Parameters
+    ----------
+    dependent : array_like
+        Endogenous variables (nobs by 1).
+    exog : array_like or None
+        Exogenous regressors (nobs by nexog).
+    endog : array_like or None
+        Endogenous regressors (nobs by nendog).
+    instruments : array_like or None
+        Excluded instruments (nobs by ninstr).
+    weights : array_like or None
+        Observation weights used in estimation.
+
+    Notes
+    -----
+    ``Z`` is the full instrument matrix ``[exog, instruments]``.  The
+    hat-matrix leverage scores :math:`h_i` are computed without forming the
+    full :math:`n \times n` hat matrix:
+
+    .. math::
+
+        h_i = z_i'(Z'Z)^{-1}z_i
+              = \bigl[Z(Z'Z)^{-1}\bigr]_i \cdot z_i.
+
+    Standard errors are always heteroskedasticity-robust (sandwich form
+    with :math:`\tilde{X}` as the score instrument).
+
+    See Also
+    --------
+    IV2SLS, IVLIML, IVGMM, IVGMMCUE
+
+    References
+    ----------
+    Angrist, J. D., Imbens, G. W., & Krueger, A. B. (1999).
+    Jackknife instrumental variables estimation.
+    *Journal of Applied Econometrics*, 14(1), 57-67.
+
+    Examples
+    --------
+    >>> import numpy as np
+    >>> from linearmodels.iv import IVJIVE
+    >>> rng = np.random.default_rng(0)
+    >>> n = 500
+    >>> z = rng.standard_normal((n, 3))
+    >>> x_endog = z[:, 0] + rng.standard_normal(n)
+    >>> exog = np.ones((n, 1))
+    >>> y = x_endog + rng.standard_normal(n)
+    >>> mod = IVJIVE(y, exog, x_endog[:, None], z)
+    >>> res = mod.fit()
+    >>> float(res.params.iloc[-1])   # doctest: +SKIP
+    1.0...
+    """
+
+    def __init__(
+        self,
+        dependent: IVDataLike,
+        exog: IVDataLike | None,
+        endog: IVDataLike | None,
+        instruments: IVDataLike | None,
+        *,
+        weights: IVDataLike | None = None,
+    ) -> None:
+        self._method = "IV-JIVE"
+        super().__init__(dependent, exog, endog, instruments, weights=weights)
+
+    @staticmethod
+    def from_formula(
+        formula: str, data: DataFrame, *, weights: IVDataLike | None = None
+    ) -> IVJIVE:
+        """
+        Parameters
+        ----------
+        formula : str
+            Formula modified for the IV syntax described in the notes section.
+        data : DataFrame
+            DataFrame containing the variables used in the formula.
+        weights : array_like, optional
+            Observation weights used in estimation.
+
+        Returns
+        -------
+        IVJIVE
+            Model instance.
+
+        Notes
+        -----
+        The IV formula modifies the standard formula syntax to include a block
+        of the form ``[endog ~ instruments]``.
+
+        Examples
+        --------
+        >>> from linearmodels.datasets import wage
+        >>> from linearmodels.iv import IVJIVE
+        >>> data = wage.load()
+        >>> formula = 'np.log(wage) ~ 1 + exper + exper ** 2 + [educ ~ sibs + brthord]'
+        >>> mod = IVJIVE.from_formula(formula, data)
+        """
+        parser = IVFormulaParser(formula, data)
+        dep, exog, endog, instr = parser.data
+        mod = IVJIVE(dep, exog, endog, instr, weights=weights)
+        mod.formula = formula
+        return mod
+
+    def fit(
+        self, *, cov_type: str = "robust", debiased: bool = False, **cov_config: Any
+    ) -> IVResults:
+        """
+        Estimate model parameters using the jackknife IV estimator.
+
+        Parameters
+        ----------
+        cov_type : str
+            Accepted for API compatibility; JIVE always uses a
+            heteroskedasticity-robust sandwich covariance.
+        debiased : bool
+            Apply a small-sample degree-of-freedom adjustment.
+        **cov_config
+            Additional keyword arguments (accepted for API compatibility).
+
+        Returns
+        -------
+        IVResults
+            Estimation results.
+
+        References
+        ----------
+        Angrist, J. D., Imbens, G. W., & Krueger, A. B. (1999).
+        Jackknife instrumental variables estimation.
+        *Journal of Applied Econometrics*, 14(1), 57-67.
+        """
+        wy, wx, wz = self._wy, self._wx, self._wz
+
+        # --- Leverage scores (efficient: no n×n hat matrix) ---
+        ZtZ_inv = inv(wz.T @ wz)
+        A = wz @ ZtZ_inv                          # (n, ninstr)
+        h = (A * wz).sum(axis=1)                  # (n,)  h_i = z_i'(Z'Z)^{-1}z_i
+
+        if npany(h >= 1.0 - 1e-10):
+            raise ValueError(
+                "Perfect leverage detected (h_i ≈ 1) in at least one "
+                "observation. JIVE requires all leverage scores to be "
+                "strictly less than 1."
+            )
+
+        # --- First-stage predictions P_Z X ---
+        PZX = A @ (wz.T @ wx)                     # (n, k)
+
+        # --- Leave-one-out predictions X̃_i = (PZX_i - h_i X_i)/(1-h_i) ---
+        X_loo = (PZX - h[:, None] * wx) / (1.0 - h)[:, None]
+
+        # --- JIVE parameter estimate ---
+        params = inv(X_loo.T @ wx) @ (X_loo.T @ wy)   # (k, 1)
+
+        # --- Covariance ---
+        cov_est = _JIVECovariance(wx, wy, X_loo, params, debiased=debiased)
+
+        pe = self._post_estimation(params, cov_est, "robust")
+        return IVResults(pe, self)
