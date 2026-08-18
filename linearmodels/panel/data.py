@@ -368,6 +368,11 @@ class PanelData:
             2d array containing entity ids corresponding dataframe view
         """
         index = self.index
+        if np.any(index.codes[0] < 0):
+            raise ValueError(
+                "The entity index contains missing values (NaN), which are not "
+                "supported and are encoded as -1 in the entity ids."
+            )
         return np.asarray(index.codes[0])[:, None]
 
     @property
@@ -381,6 +386,11 @@ class PanelData:
             2d array containing time ids corresponding dataframe view
         """
         index = self.index
+        if np.any(index.codes[1] < 0):
+            raise ValueError(
+                "The time index contains missing values (NaN), which are not "
+                "supported and are encoded as -1 in the time ids."
+            )
         return np.asarray(index.codes[1])[:, None]
 
     def _demean_both_low_mem(self, weights: PanelData | None) -> PanelData:
