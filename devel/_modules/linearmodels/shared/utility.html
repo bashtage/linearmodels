@@ -19,7 +19,7 @@
     
   
       
-        <title>linearmodels.shared.utility - linearmodels v7.1 (+64)</title>
+        <title>linearmodels.shared.utility - linearmodels v7.1 (+66)</title>
       
     
 
@@ -91,7 +91,7 @@
 
 <header class="md-header md-header--shadow" data-md-component="header">
   <nav class="md-header__inner md-grid" aria-label="Header">
-    <a href="../../../index.html" title="linearmodels v7.1 (+64)" class="md-header__button md-logo" aria-label="linearmodels v7.1 (+64)" data-md-component="logo">
+    <a href="../../../index.html" title="linearmodels v7.1 (+66)" class="md-header__button md-logo" aria-label="linearmodels v7.1 (+66)" data-md-component="logo">
       <img src="../../../_static/bw-logo.svg" alt="logo">
     </a>
     <label class="md-header__button md-icon" for="__drawer">
@@ -102,7 +102,7 @@
       <div class="md-header__ellipsis">
         <div class="md-header__topic">
           <span class="md-ellipsis">
-            linearmodels v7.1 (+64)
+            linearmodels v7.1 (+66)
           </span>
         </div>
         <div class="md-header__topic" data-md-component="header-topic">
@@ -197,10 +197,10 @@
 
 <nav class="md-nav md-nav--primary" aria-label="Navigation" data-md-level="0">
   <label class="md-nav__title" for="__drawer">
-    <a href="../../../index.html" title="linearmodels v7.1 (+64)" class="md-nav__button md-logo" aria-label="linearmodels v7.1 (+64)" data-md-component="logo">
+    <a href="../../../index.html" title="linearmodels v7.1 (+66)" class="md-nav__button md-logo" aria-label="linearmodels v7.1 (+66)" data-md-component="logo">
       <img src="../../../_static/bw-logo.svg" alt="logo">
     </a>
-    linearmodels v7.1 (+64)
+    linearmodels v7.1 (+66)
   </label>
   
     <div class="md-nav__source">
@@ -524,8 +524,8 @@
 
 <span class="kn">from</span><span class="w"> </span><span class="nn">linearmodels.typing</span><span class="w"> </span><span class="kn">import</span> <span class="n">AnyArray</span><span class="p">,</span> <span class="n">Label</span>
 
-<span class="n">_KT</span> <span class="o">=</span> <span class="n">TypeVar</span><span class="p">(</span><span class="s2">&quot;_KT&quot;</span><span class="p">)</span>
-<span class="n">_VT_co</span> <span class="o">=</span> <span class="n">TypeVar</span><span class="p">(</span><span class="s2">&quot;_VT_co&quot;</span><span class="p">,</span> <span class="n">covariant</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+<span class="n">_KT</span> <span class="o">=</span> <span class="n">TypeVar</span><span class="p">(</span><span class="s2">"_KT"</span><span class="p">)</span>
+<span class="n">_VT_co</span> <span class="o">=</span> <span class="n">TypeVar</span><span class="p">(</span><span class="s2">"_VT_co"</span><span class="p">,</span> <span class="n">covariant</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
 
 
 <span class="k">class</span><span class="w"> </span><span class="nc">SupportsKeysAndGetItem</span><span class="p">(</span><span class="n">Protocol</span><span class="p">[</span><span class="n">_KT</span><span class="p">,</span> <span class="n">_VT_co</span><span class="p">]):</span>
@@ -544,9 +544,9 @@
 <div class="viewcode-block" id="AttrDict">
 <a class="viewcode-back" href="../../../utility/linearmodels.shared.utility.AttrDict.html#linearmodels.shared.utility.AttrDict">[docs]</a>
 <span class="k">class</span><span class="w"> </span><span class="nc">AttrDict</span><span class="p">(</span><span class="n">MutableMapping</span><span class="p">):</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="w">    </span><span class="sd">"""</span>
 <span class="sd">    Ordered dictionary-like object that exposes keys as attributes</span>
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="sd">    """</span>
 
 <div class="viewcode-block" id="AttrDict.update">
 <a class="viewcode-back" href="../../../utility/linearmodels.shared.utility.AttrDict.update.html#linearmodels.shared.utility.AttrDict.update">[docs]</a>
@@ -555,26 +555,26 @@
         <span class="o">*</span><span class="n">args</span><span class="p">:</span> <span class="n">SupportsKeysAndGetItem</span><span class="p">[</span><span class="n">Any</span><span class="p">,</span> <span class="n">Any</span><span class="p">]</span> <span class="o">|</span> <span class="n">Iterable</span><span class="p">[</span><span class="nb">tuple</span><span class="p">[</span><span class="n">Any</span><span class="p">,</span> <span class="n">Any</span><span class="p">]],</span>
         <span class="o">**</span><span class="n">kwargs</span><span class="p">:</span> <span class="n">Any</span><span class="p">,</span>
     <span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">"""</span>
 <span class="sd">        Update AD from dictionary or iterable E and F.</span>
 <span class="sd">        If E is present and has a .keys() method, then does:  for k in E: AD[k] = E[k]</span>
 <span class="sd">        If E is present and lacks a .keys() method, then does:  for k, v in E: AD[k] = v</span>
 <span class="sd">        In either case, this is followed by: for k in F:  AD[k] = F[k]</span>
-<span class="sd">        &quot;&quot;&quot;</span>
+<span class="sd">        """</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">__private_dict__</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span></div>
 
 
 <div class="viewcode-block" id="AttrDict.clear">
 <a class="viewcode-back" href="../../../utility/linearmodels.shared.utility.AttrDict.clear.html#linearmodels.shared.utility.AttrDict.clear">[docs]</a>
     <span class="k">def</span><span class="w"> </span><span class="nf">clear</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;Remove all items from AD.&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">"""Remove all items from AD."""</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">__private_dict__</span><span class="o">.</span><span class="n">clear</span><span class="p">()</span></div>
 
 
 <div class="viewcode-block" id="AttrDict.copy">
 <a class="viewcode-back" href="../../../utility/linearmodels.shared.utility.AttrDict.copy.html#linearmodels.shared.utility.AttrDict.copy">[docs]</a>
     <span class="k">def</span><span class="w"> </span><span class="nf">copy</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">AttrDict</span><span class="p">:</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;Create a shallow copy of AD&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">"""Create a shallow copy of AD"""</span>
         <span class="n">ad</span> <span class="o">=</span> <span class="n">AttrDict</span><span class="p">()</span>
         <span class="k">for</span> <span class="n">key</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">__private_dict__</span><span class="o">.</span><span class="n">keys</span><span class="p">():</span>
             <span class="n">ad</span><span class="p">[</span><span class="n">key</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">__private_dict__</span><span class="p">[</span><span class="n">key</span><span class="p">]</span>
@@ -584,31 +584,31 @@
 <div class="viewcode-block" id="AttrDict.keys">
 <a class="viewcode-back" href="../../../utility/linearmodels.shared.utility.AttrDict.keys.html#linearmodels.shared.utility.AttrDict.keys">[docs]</a>
     <span class="k">def</span><span class="w"> </span><span class="nf">keys</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">KeysView</span><span class="p">[</span><span class="n">Any</span><span class="p">]:</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;Return an ordered list-like object providing a view on AD&#39;s keys&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">"""Return an ordered list-like object providing a view on AD's keys"""</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">__private_dict__</span><span class="o">.</span><span class="n">keys</span><span class="p">()</span></div>
 
 
 <div class="viewcode-block" id="AttrDict.items">
 <a class="viewcode-back" href="../../../utility/linearmodels.shared.utility.AttrDict.items.html#linearmodels.shared.utility.AttrDict.items">[docs]</a>
     <span class="k">def</span><span class="w"> </span><span class="nf">items</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">ItemsView</span><span class="p">[</span><span class="n">Any</span><span class="p">,</span> <span class="n">Any</span><span class="p">]:</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;Return an ordered list-like object providing a view on AD&#39;s items&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">"""Return an ordered list-like object providing a view on AD's items"""</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">__private_dict__</span><span class="o">.</span><span class="n">items</span><span class="p">()</span></div>
 
 
 <div class="viewcode-block" id="AttrDict.values">
 <a class="viewcode-back" href="../../../utility/linearmodels.shared.utility.AttrDict.values.html#linearmodels.shared.utility.AttrDict.values">[docs]</a>
     <span class="k">def</span><span class="w"> </span><span class="nf">values</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">ValuesView</span><span class="p">[</span><span class="n">Any</span><span class="p">]:</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;Return an ordered list-like object object providing a view on AD&#39;s values&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">"""Return an ordered list-like object object providing a view on AD's values"""</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">__private_dict__</span><span class="o">.</span><span class="n">values</span><span class="p">()</span></div>
 
 
 <div class="viewcode-block" id="AttrDict.pop">
 <a class="viewcode-back" href="../../../utility/linearmodels.shared.utility.AttrDict.pop.html#linearmodels.shared.utility.AttrDict.pop">[docs]</a>
     <span class="k">def</span><span class="w"> </span><span class="nf">pop</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">key</span><span class="p">:</span> <span class="n">Label</span><span class="p">,</span> <span class="n">default</span><span class="p">:</span> <span class="n">Any</span> <span class="o">=</span> <span class="kc">None</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Any</span><span class="p">:</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">"""</span>
 <span class="sd">        Remove specified key and return the corresponding value.</span>
 <span class="sd">        If key is not found, default is returned if given, otherwise KeyError is raised</span>
-<span class="sd">        &quot;&quot;&quot;</span>
+<span class="sd">        """</span>
 
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">__private_dict__</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="n">key</span><span class="p">,</span> <span class="n">default</span><span class="p">)</span></div>
 
@@ -625,7 +625,7 @@
 
     <span class="k">def</span><span class="w"> </span><span class="fm">__repr__</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
         <span class="n">out</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">__private_dict__</span><span class="o">.</span><span class="fm">__str__</span><span class="p">()</span>
-        <span class="k">return</span> <span class="s2">&quot;AttrDict&quot;</span> <span class="o">+</span> <span class="n">out</span>
+        <span class="k">return</span> <span class="s2">"AttrDict"</span> <span class="o">+</span> <span class="n">out</span>
 
     <span class="k">def</span><span class="w"> </span><span class="fm">__str__</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="fm">__repr__</span><span class="p">()</span>
@@ -633,7 +633,7 @@
     <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">:</span> <span class="n">Mapping</span><span class="p">[</span><span class="n">Any</span><span class="p">,</span> <span class="n">Any</span><span class="p">]</span> <span class="o">|</span> <span class="n">Sequence</span><span class="p">[</span><span class="nb">tuple</span><span class="p">[</span><span class="n">Any</span><span class="p">,</span> <span class="n">Any</span><span class="p">]],</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">:</span> <span class="n">Any</span>
     <span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
-        <span class="bp">self</span><span class="o">.</span><span class="vm">__dict__</span><span class="p">[</span><span class="s2">&quot;__private_dict__&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="vm">__dict__</span><span class="p">[</span><span class="s2">"__private_dict__"</span><span class="p">]</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
 
     <span class="k">def</span><span class="w"> </span><span class="fm">__contains__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">item</span><span class="p">:</span> <span class="n">Label</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">__private_dict__</span><span class="o">.</span><span class="fm">__contains__</span><span class="p">(</span><span class="n">item</span><span class="p">)</span>
@@ -642,8 +642,8 @@
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">__private_dict__</span><span class="p">[</span><span class="n">item</span><span class="p">]</span>
 
     <span class="k">def</span><span class="w"> </span><span class="fm">__setitem__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">key</span><span class="p">:</span> <span class="n">Label</span><span class="p">,</span> <span class="n">value</span><span class="p">:</span> <span class="n">Any</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
-        <span class="k">if</span> <span class="n">key</span> <span class="o">==</span> <span class="s2">&quot;__private_dict__&quot;</span><span class="p">:</span>
-            <span class="k">raise</span> <span class="ne">KeyError</span><span class="p">(</span><span class="s2">&quot;__private_dict__ is reserved and cannot be set.&quot;</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">key</span> <span class="o">==</span> <span class="s2">"__private_dict__"</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">KeyError</span><span class="p">(</span><span class="s2">"__private_dict__ is reserved and cannot be set."</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">__private_dict__</span><span class="p">[</span><span class="n">key</span><span class="p">]</span> <span class="o">=</span> <span class="n">value</span>
 
     <span class="k">def</span><span class="w"> </span><span class="fm">__delitem__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">key</span><span class="p">:</span> <span class="n">Label</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
@@ -655,8 +655,8 @@
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">__private_dict__</span><span class="p">[</span><span class="n">key</span><span class="p">]</span>
 
     <span class="k">def</span><span class="w"> </span><span class="fm">__setattr__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">key</span><span class="p">:</span> <span class="n">Label</span><span class="p">,</span> <span class="n">value</span><span class="p">:</span> <span class="n">Any</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
-        <span class="k">if</span> <span class="n">key</span> <span class="o">==</span> <span class="s2">&quot;__private_dict__&quot;</span><span class="p">:</span>
-            <span class="k">raise</span> <span class="ne">AttributeError</span><span class="p">(</span><span class="s2">&quot;__private_dict__ is invalid&quot;</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">key</span> <span class="o">==</span> <span class="s2">"__private_dict__"</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">AttributeError</span><span class="p">(</span><span class="s2">"__private_dict__ is invalid"</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">__private_dict__</span><span class="p">[</span><span class="n">key</span><span class="p">]</span> <span class="o">=</span> <span class="n">value</span>
 
     <span class="k">def</span><span class="w"> </span><span class="fm">__delattr__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">key</span><span class="p">:</span> <span class="n">Label</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
@@ -673,7 +673,7 @@
 
 
 
-<span class="k">def</span><span class="w"> </span><span class="nf">ensure_unique_column</span><span class="p">(</span><span class="n">col_name</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">df</span><span class="p">:</span> <span class="n">DataFrame</span><span class="p">,</span> <span class="n">addition</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;_&quot;</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">ensure_unique_column</span><span class="p">(</span><span class="n">col_name</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">df</span><span class="p">:</span> <span class="n">DataFrame</span><span class="p">,</span> <span class="n">addition</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">"_"</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
     <span class="k">while</span> <span class="n">col_name</span> <span class="ow">in</span> <span class="n">df</span><span class="p">:</span>
         <span class="n">col_name</span> <span class="o">=</span> <span class="n">addition</span> <span class="o">+</span> <span class="n">col_name</span> <span class="o">+</span> <span class="n">addition</span>
     <span class="k">return</span> <span class="n">col_name</span>
@@ -686,7 +686,7 @@
     <span class="n">minor_axis</span><span class="p">:</span> <span class="n">Sequence</span><span class="p">[</span><span class="n">Label</span><span class="p">]</span> <span class="o">|</span> <span class="n">Index</span><span class="p">,</span>
     <span class="n">swap</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">DataFrame</span><span class="p">:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="w">    </span><span class="sd">"""</span>
 <span class="sd">    Construct a multiindex DataFrame using Panel-like arguments</span>
 
 <span class="sd">    Parameters</span>
@@ -711,7 +711,7 @@
 <span class="sd">    if `swap` is True, it is equivalent to</span>
 
 <span class="sd">    Panel(x, items, major_axis, minor_axis).swapaxes(1,2).to_frame()</span>
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="sd">    """</span>
     <span class="n">nmajor</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">major_axis</span><span class="p">))</span><span class="o">.</span><span class="n">tolist</span><span class="p">()</span>
     <span class="n">nminor</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">minor_axis</span><span class="p">))</span><span class="o">.</span><span class="n">tolist</span><span class="p">()</span>
     <span class="n">final_levels</span> <span class="o">=</span> <span class="p">[</span><span class="n">major_axis</span><span class="p">,</span> <span class="n">minor_axis</span><span class="p">]</span>
@@ -724,25 +724,25 @@
         <span class="n">df</span><span class="o">.</span><span class="n">index</span> <span class="o">=</span> <span class="n">mi</span><span class="o">.</span><span class="n">swaplevel</span><span class="p">()</span>
         <span class="n">df</span><span class="o">.</span><span class="n">sort_index</span><span class="p">(</span><span class="n">inplace</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
         <span class="n">final_levels</span> <span class="o">=</span> <span class="p">[</span><span class="n">minor_axis</span><span class="p">,</span> <span class="n">major_axis</span><span class="p">]</span>
-    <span class="n">mi_index</span> <span class="o">=</span> <span class="n">cast</span><span class="p">(</span><span class="s2">&quot;MultiIndex&quot;</span><span class="p">,</span> <span class="n">df</span><span class="o">.</span><span class="n">index</span><span class="p">)</span>
+    <span class="n">mi_index</span> <span class="o">=</span> <span class="n">cast</span><span class="p">(</span><span class="s2">"MultiIndex"</span><span class="p">,</span> <span class="n">df</span><span class="o">.</span><span class="n">index</span><span class="p">)</span>
     <span class="n">df</span><span class="o">.</span><span class="n">index</span> <span class="o">=</span> <span class="n">mi_index</span><span class="o">.</span><span class="n">set_levels</span><span class="p">(</span><span class="n">levels</span><span class="o">=</span><span class="n">final_levels</span><span class="p">,</span> <span class="n">level</span><span class="o">=</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">])</span>
-    <span class="n">df</span><span class="o">.</span><span class="n">index</span><span class="o">.</span><span class="n">names</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;major&quot;</span><span class="p">,</span> <span class="s2">&quot;minor&quot;</span><span class="p">]</span>
+    <span class="n">df</span><span class="o">.</span><span class="n">index</span><span class="o">.</span><span class="n">names</span> <span class="o">=</span> <span class="p">[</span><span class="s2">"major"</span><span class="p">,</span> <span class="s2">"minor"</span><span class="p">]</span>
     <span class="k">return</span> <span class="n">df</span>
 
 
 <span class="k">class</span><span class="w"> </span><span class="nc">DataFrameWrapper</span><span class="p">:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">    Wrapper around a pandas DataFrame deferring frame&#39;s construction.</span>
+<span class="w">    </span><span class="sd">"""</span>
+<span class="sd">    Wrapper around a pandas DataFrame deferring frame's construction.</span>
 
 <span class="sd">    Parameters</span>
 <span class="sd">    ----------</span>
 <span class="sd">    values : ndarray</span>
-<span class="sd">        The data to use in the DataFrame&#39;s constructor</span>
+<span class="sd">        The data to use in the DataFrame's constructor</span>
 <span class="sd">    columns : list[str]</span>
 <span class="sd">        The column names of the frame</span>
 <span class="sd">    index : {Index, list[str]}</span>
 <span class="sd">        The index to use.</span>
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="sd">    """</span>
 
     <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span>
@@ -762,18 +762,18 @@
 
 
 <span class="k">class</span><span class="w"> </span><span class="nc">SeriesWrapper</span><span class="p">:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">    Wrapper around a pandas Series deferring series&#39; construction.</span>
+<span class="w">    </span><span class="sd">"""</span>
+<span class="sd">    Wrapper around a pandas Series deferring series' construction.</span>
 
 <span class="sd">    Parameters</span>
 <span class="sd">    ----------</span>
 <span class="sd">    values : ndarray</span>
-<span class="sd">        The data to use in the Series&#39; constructor</span>
+<span class="sd">        The data to use in the Series' constructor</span>
 <span class="sd">    name : str</span>
 <span class="sd">        The name of the series</span>
 <span class="sd">    index : {Index, list[str]}</span>
 <span class="sd">        The index to use.</span>
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="sd">    """</span>
 
     <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span>

@@ -23,7 +23,7 @@
     
   
       
-        <title>Introduction - linearmodels v7.1 (+64)</title>
+        <title>Introduction - linearmodels v7.1 (+66)</title>
       
     
 
@@ -100,7 +100,7 @@
 
 <header class="md-header md-header--shadow" data-md-component="header">
   <nav class="md-header__inner md-grid" aria-label="Header">
-    <a href="../index.html" title="linearmodels v7.1 (+64)" class="md-header__button md-logo" aria-label="linearmodels v7.1 (+64)" data-md-component="logo">
+    <a href="../index.html" title="linearmodels v7.1 (+66)" class="md-header__button md-logo" aria-label="linearmodels v7.1 (+66)" data-md-component="logo">
       <img src="../_static/bw-logo.svg" alt="logo">
     </a>
     <label class="md-header__button md-icon" for="__drawer">
@@ -111,7 +111,7 @@
       <div class="md-header__ellipsis">
         <div class="md-header__topic">
           <span class="md-ellipsis">
-            linearmodels v7.1 (+64)
+            linearmodels v7.1 (+66)
           </span>
         </div>
         <div class="md-header__topic" data-md-component="header-topic">
@@ -206,10 +206,10 @@
 
 <nav class="md-nav md-nav--primary" aria-label="Navigation" data-md-level="0">
   <label class="md-nav__title" for="__drawer">
-    <a href="../index.html" title="linearmodels v7.1 (+64)" class="md-nav__button md-logo" aria-label="linearmodels v7.1 (+64)" data-md-component="logo">
+    <a href="../index.html" title="linearmodels v7.1 (+66)" class="md-nav__button md-logo" aria-label="linearmodels v7.1 (+66)" data-md-component="logo">
       <img src="../_static/bw-logo.svg" alt="logo">
     </a>
-    linearmodels v7.1 (+64)
+    linearmodels v7.1 (+66)
   </label>
   
     <div class="md-nav__source">
@@ -995,7 +995,7 @@ also valid to use when projecting the endogenous variables.</p></li>
 <span class="n">instruments</span> <span class="o">=</span> <span class="n">data</span><span class="o">.</span><span class="n">sibs</span>
 
 <span class="n">mod</span> <span class="o">=</span> <span class="n">IV2SLS</span><span class="p">(</span><span class="n">dependent</span><span class="p">,</span> <span class="n">exog</span><span class="p">,</span> <span class="n">endog</span><span class="p">,</span> <span class="n">instruments</span><span class="p">)</span>
-<span class="n">res</span> <span class="o">=</span> <span class="n">mod</span><span class="o">.</span><span class="n">fit</span><span class="p">(</span><span class="n">cov_type</span><span class="o">=</span><span class="s1">&#39;unadjusted&#39;</span><span class="p">)</span>
+<span class="n">res</span> <span class="o">=</span> <span class="n">mod</span><span class="o">.</span><span class="n">fit</span><span class="p">(</span><span class="n">cov_type</span><span class="o">=</span><span class="s1">'unadjusted'</span><span class="p">)</span>
 <span class="n">res</span>
 </code></pre></div>
 </div>
@@ -1105,7 +1105,7 @@ containing cluster membership information.</p></li>
 </ul>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><code><span class="n">mod</span> <span class="o">=</span> <span class="n">IV2SLS</span><span class="p">(</span><span class="n">dependent</span><span class="p">,</span> <span class="n">exog</span><span class="p">,</span> <span class="n">endog</span><span class="p">,</span> <span class="n">instruments</span><span class="p">)</span>
 <span class="n">iq_bands</span> <span class="o">=</span> <span class="n">data</span><span class="o">.</span><span class="n">IQ</span> <span class="o">//</span> <span class="mi">20</span>
-<span class="n">res</span> <span class="o">=</span> <span class="n">mod</span><span class="o">.</span><span class="n">fit</span><span class="p">(</span><span class="n">cov_type</span><span class="o">=</span><span class="s1">&#39;clustered&#39;</span><span class="p">,</span> <span class="n">clusters</span><span class="o">=</span><span class="n">iq_bands</span><span class="p">)</span>
+<span class="n">res</span> <span class="o">=</span> <span class="n">mod</span><span class="o">.</span><span class="n">fit</span><span class="p">(</span><span class="n">cov_type</span><span class="o">=</span><span class="s1">'clustered'</span><span class="p">,</span> <span class="n">clusters</span><span class="o">=</span><span class="n">iq_bands</span><span class="p">)</span>
 </code></pre></div>
 </div>
 <h3 id="gmm-estimation">GMM Estimation<a class="headerlink" href="#gmm-estimation" title="Link to this heading">¶</a></h3>

@@ -23,7 +23,7 @@
     
   
       
-        <title>Using formulas to specify models - linearmodels v7.1 (+64)</title>
+        <title>Using formulas to specify models - linearmodels v7.1 (+66)</title>
       
     
 
@@ -101,7 +101,7 @@
 
 <header class="md-header md-header--shadow" data-md-component="header">
   <nav class="md-header__inner md-grid" aria-label="Header">
-    <a href="../../index.html" title="linearmodels v7.1 (+64)" class="md-header__button md-logo" aria-label="linearmodels v7.1 (+64)" data-md-component="logo">
+    <a href="../../index.html" title="linearmodels v7.1 (+66)" class="md-header__button md-logo" aria-label="linearmodels v7.1 (+66)" data-md-component="logo">
       <img src="../../_static/bw-logo.svg" alt="logo">
     </a>
     <label class="md-header__button md-icon" for="__drawer">
@@ -112,7 +112,7 @@
       <div class="md-header__ellipsis">
         <div class="md-header__topic">
           <span class="md-ellipsis">
-            linearmodels v7.1 (+64)
+            linearmodels v7.1 (+66)
           </span>
         </div>
         <div class="md-header__topic" data-md-component="header-topic">
@@ -207,10 +207,10 @@
 
 <nav class="md-nav md-nav--primary" aria-label="Navigation" data-md-level="0">
   <label class="md-nav__title" for="__drawer">
-    <a href="../../index.html" title="linearmodels v7.1 (+64)" class="md-nav__button md-logo" aria-label="linearmodels v7.1 (+64)" data-md-component="logo">
+    <a href="../../index.html" title="linearmodels v7.1 (+66)" class="md-nav__button md-logo" aria-label="linearmodels v7.1 (+66)" data-md-component="logo">
       <img src="../../_static/bw-logo.svg" alt="logo">
     </a>
-    linearmodels v7.1 (+64)
+    linearmodels v7.1 (+66)
   </label>
   
     <div class="md-nav__source">
@@ -1017,10 +1017,10 @@
 <div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><code><span class="kn">from</span><span class="w"> </span><span class="nn">collections</span><span class="w"> </span><span class="kn">import</span> <span class="n">OrderedDict</span>
 
 <span class="n">formula</span> <span class="o">=</span> <span class="n">OrderedDict</span><span class="p">()</span>
-<span class="n">formula</span><span class="p">[</span><span class="s2">&quot;benefits&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="p">(</span>
-    <span class="s2">&quot;hrbens ~ educ + exper + expersq + union + south + nrtheast + nrthcen + male&quot;</span>
+<span class="n">formula</span><span class="p">[</span><span class="s2">"benefits"</span><span class="p">]</span> <span class="o">=</span> <span class="p">(</span>
+    <span class="s2">"hrbens ~ educ + exper + expersq + union + south + nrtheast + nrthcen + male"</span>
 <span class="p">)</span>
-<span class="n">formula</span><span class="p">[</span><span class="s2">&quot;earnings&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="s2">&quot;hrearn ~ educ + exper + expersq + nrtheast + married + male&quot;</span>
+<span class="n">formula</span><span class="p">[</span><span class="s2">"earnings"</span><span class="p">]</span> <span class="o">=</span> <span class="s2">"hrearn ~ educ + exper + expersq + nrtheast + married + male"</span>
 </code></pre></div>
 </div>
 </div>
@@ -1031,7 +1031,7 @@
 <div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><code><span class="kn">from</span><span class="w"> </span><span class="nn">linearmodels.system</span><span class="w"> </span><span class="kn">import</span> <span class="n">SUR</span>
 
 <span class="n">mod</span> <span class="o">=</span> <span class="n">SUR</span><span class="o">.</span><span class="n">from_formula</span><span class="p">(</span><span class="n">formula</span><span class="p">,</span> <span class="n">data</span><span class="p">)</span>
-<span class="nb">print</span><span class="p">(</span><span class="n">mod</span><span class="o">.</span><span class="n">fit</span><span class="p">(</span><span class="n">cov_type</span><span class="o">=</span><span class="s2">&quot;unadjusted&quot;</span><span class="p">))</span>
+<span class="nb">print</span><span class="p">(</span><span class="n">mod</span><span class="o">.</span><span class="n">fit</span><span class="p">(</span><span class="n">cov_type</span><span class="o">=</span><span class="s2">"unadjusted"</span><span class="p">))</span>
 </code></pre></div>
 </div>
 </div>
@@ -1045,8 +1045,8 @@
 Estimator:                        GLS   Overall R-squared:                   0.6951
 No. Equations.:                     2   McElroy&#39;s R-squared:                 0.2197
 No. Observations:                 616   Judge&#39;s (OLS) R-squared:             0.1873
-Date:                Thu, Aug 13 2026   Berndt&#39;s R-squared:                  0.3775
-Time:                        12:11:56   Dhrymes&#39;s R-squared:                 0.6950
+Date:                Mon, Aug 24 2026   Berndt&#39;s R-squared:                  0.3775
+Time:                        14:28:24   Dhrymes&#39;s R-squared:                 0.6950
                                         Cov. Estimator:                  unadjusted
                                         Num. Constraints:                      None
                 Equation: benefits, Dependent Variable: hrbens
@@ -1083,12 +1083,12 @@ Homoskedastic (Unadjusted) Covariance (Debiased: False, GLS: True)
 <div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span><code>[4]:
 </code></pre></div>
 </div>
-<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><code><span class="n">braces_formula</span> <span class="o">=</span> <span class="s2">&quot;&quot;&quot;</span>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><code><span class="n">braces_formula</span> <span class="o">=</span> <span class="s2">"""</span>
 <span class="s2">{hrbens ~ educ + exper + expersq + union + south + nrtheast + nrthcen + male}</span>
 <span class="s2">{hrearn ~ educ + exper + expersq + nrtheast + married + male}</span>
-<span class="s2">&quot;&quot;&quot;</span>
+<span class="s2">"""</span>
 <span class="n">braces_mod</span> <span class="o">=</span> <span class="n">SUR</span><span class="o">.</span><span class="n">from_formula</span><span class="p">(</span><span class="n">braces_formula</span><span class="p">,</span> <span class="n">data</span><span class="p">)</span>
-<span class="n">braces_res</span> <span class="o">=</span> <span class="n">braces_mod</span><span class="o">.</span><span class="n">fit</span><span class="p">(</span><span class="n">cov_type</span><span class="o">=</span><span class="s2">&quot;unadjusted&quot;</span><span class="p">)</span>
+<span class="n">braces_res</span> <span class="o">=</span> <span class="n">braces_mod</span><span class="o">.</span><span class="n">fit</span><span class="p">(</span><span class="n">cov_type</span><span class="o">=</span><span class="s2">"unadjusted"</span><span class="p">)</span>
 <span class="nb">print</span><span class="p">(</span><span class="n">braces_res</span><span class="p">)</span>
 </code></pre></div>
 </div>
@@ -1103,8 +1103,8 @@ Homoskedastic (Unadjusted) Covariance (Debiased: False, GLS: True)
 Estimator:                        GLS   Overall R-squared:                   0.6951
 No. Equations.:                     2   McElroy&#39;s R-squared:                 0.2197
 No. Observations:                 616   Judge&#39;s (OLS) R-squared:             0.1873
-Date:                Thu, Aug 13 2026   Berndt&#39;s R-squared:                  0.3775
-Time:                        12:11:56   Dhrymes&#39;s R-squared:                 0.6950
+Date:                Mon, Aug 24 2026   Berndt&#39;s R-squared:                  0.3775
+Time:                        14:28:24   Dhrymes&#39;s R-squared:                 0.6950
                                         Cov. Estimator:                  unadjusted
                                         Num. Constraints:                      None
                  Equation: hrbens, Dependent Variable: hrbens
@@ -1144,16 +1144,16 @@ Homoskedastic (Unadjusted) Covariance (Debiased: False, GLS: True)
 <div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span><code>[5]:
 </code></pre></div>
 </div>
-<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><code><span class="n">labeled_formula</span> <span class="o">=</span> <span class="s2">&quot;&quot;&quot;</span>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><code><span class="n">labeled_formula</span> <span class="o">=</span> <span class="s2">"""</span>
 <span class="s2">{benefits: hrbens ~ educ + exper + expersq + union + south + nrtheast + nrthcen + male}</span>
 <span class="s2">{earnings: hrearn ~ educ + exper + expersq + nrtheast + married + male}</span>
-<span class="s2">&quot;&quot;&quot;</span>
+<span class="s2">"""</span>
 <span class="n">labels_mod</span> <span class="o">=</span> <span class="n">SUR</span><span class="o">.</span><span class="n">from_formula</span><span class="p">(</span><span class="n">labeled_formula</span><span class="p">,</span> <span class="n">data</span><span class="p">)</span>
-<span class="n">labeled_res</span> <span class="o">=</span> <span class="n">labels_mod</span><span class="o">.</span><span class="n">fit</span><span class="p">(</span><span class="n">cov_type</span><span class="o">=</span><span class="s2">&quot;unadjusted&quot;</span><span class="p">)</span>
+<span class="n">labeled_res</span> <span class="o">=</span> <span class="n">labels_mod</span><span class="o">.</span><span class="n">fit</span><span class="p">(</span><span class="n">cov_type</span><span class="o">=</span><span class="s2">"unadjusted"</span><span class="p">)</span>
 
-<span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Unlabeled&quot;</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="s2">"Unlabeled"</span><span class="p">)</span>
 <span class="nb">print</span><span class="p">(</span><span class="n">braces_res</span><span class="o">.</span><span class="n">equation_labels</span><span class="p">)</span>
-<span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Labeled&quot;</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="s2">"Labeled"</span><span class="p">)</span>
 <span class="nb">print</span><span class="p">(</span><span class="n">labeled_res</span><span class="o">.</span><span class="n">equation_labels</span><span class="p">)</span>
 </code></pre></div>
 </div>
@@ -1181,7 +1181,7 @@ Labeled
 </code></pre></div>
 </div>
 <div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><code><span class="n">random_weights</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">chisquare</span><span class="p">(</span><span class="mi">5</span><span class="p">,</span> <span class="n">size</span><span class="o">=</span><span class="p">(</span><span class="mi">616</span><span class="p">,</span> <span class="mi">2</span><span class="p">))</span>
-<span class="n">random_weights</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">(</span><span class="n">random_weights</span><span class="p">,</span> <span class="n">columns</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;benefits&quot;</span><span class="p">,</span> <span class="s2">&quot;earnings&quot;</span><span class="p">])</span>
+<span class="n">random_weights</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">(</span><span class="n">random_weights</span><span class="p">,</span> <span class="n">columns</span><span class="o">=</span><span class="p">[</span><span class="s2">"benefits"</span><span class="p">,</span> <span class="s2">"earnings"</span><span class="p">])</span>
 <span class="n">weighted_mod</span> <span class="o">=</span> <span class="n">SUR</span><span class="o">.</span><span class="n">from_formula</span><span class="p">(</span><span class="n">formula</span><span class="p">,</span> <span class="n">data</span><span class="p">,</span> <span class="n">weights</span><span class="o">=</span><span class="n">random_weights</span><span class="p">)</span>
 <span class="nb">print</span><span class="p">(</span><span class="n">weighted_mod</span><span class="o">.</span><span class="n">fit</span><span class="p">())</span>
 </code></pre></div>
@@ -1194,35 +1194,35 @@ Labeled
 <div class="highlight"><pre>
                            System GLS Estimation Summary
 ===================================================================================
-Estimator:                        GLS   Overall R-squared:                   0.6648
-No. Equations.:                     2   McElroy&#39;s R-squared:                 0.1963
-No. Observations:                 616   Judge&#39;s (OLS) R-squared:             0.1575
-Date:                Thu, Aug 13 2026   Berndt&#39;s R-squared:                  0.5017
-Time:                        12:11:56   Dhrymes&#39;s R-squared:                 0.6645
+Estimator:                        GLS   Overall R-squared:                   0.6757
+No. Equations.:                     2   McElroy&#39;s R-squared:                 0.2155
+No. Observations:                 616   Judge&#39;s (OLS) R-squared:             0.1852
+Date:                Mon, Aug 24 2026   Berndt&#39;s R-squared:                  0.4584
+Time:                        14:28:24   Dhrymes&#39;s R-squared:                 0.6756
                                         Cov. Estimator:                      robust
                                         Num. Constraints:                      None
                 Equation: benefits, Dependent Variable: hrbens
 ==============================================================================
             Parameter  Std. Err.     T-stat    P-value    Lower CI    Upper CI
 ------------------------------------------------------------------------------
-educ           0.0328     0.0045     7.3258     0.0000      0.0240      0.0415
-exper          0.0399     0.0059     6.7237     0.0000      0.0282      0.0515
-expersq       -0.0007     0.0001    -5.2695     0.0000     -0.0010     -0.0005
-union          0.3946     0.0461     8.5595     0.0000      0.3042      0.4850
-south         -0.1854     0.0532    -3.4833     0.0005     -0.2897     -0.0811
-nrtheast      -0.1569     0.0636    -2.4660     0.0137     -0.2817     -0.0322
-nrthcen       -0.1379     0.0542    -2.5443     0.0109     -0.2441     -0.0317
-male           0.2666     0.0467     5.7113     0.0000      0.1751      0.3581
+educ           0.0371     0.0050     7.4109     0.0000      0.0273      0.0469
+exper          0.0332     0.0057     5.8407     0.0000      0.0221      0.0443
+expersq       -0.0006     0.0001    -4.1437     0.0000     -0.0008     -0.0003
+union          0.3828     0.0481     7.9564     0.0000      0.2885      0.4771
+south         -0.2150     0.0568    -3.7851     0.0002     -0.3263     -0.1037
+nrtheast      -0.0993     0.0704    -1.4101     0.1585     -0.2373      0.0387
+nrthcen       -0.1627     0.0583    -2.7896     0.0053     -0.2770     -0.0484
+male           0.2383     0.0463     5.1444     0.0000      0.1475      0.3291
                 Equation: earnings, Dependent Variable: hrearn
 ==============================================================================
             Parameter  Std. Err.     T-stat    P-value    Lower CI    Upper CI
 ------------------------------------------------------------------------------
-educ           0.2748     0.0737     3.7316     0.0002      0.1305      0.4192
-exper          0.1187     0.1509     0.7863     0.4317     -0.1771      0.4145
-expersq       -0.0011     0.0039    -0.2897     0.7720     -0.0087      0.0064
-nrtheast      -0.2441     0.4729    -0.5162     0.6057     -1.1711      0.6828
-married        0.0803     0.2711     0.2961     0.7671     -0.4510      0.6116
-male           1.9423     0.2857     6.7984     0.0000      1.3823      2.5023
+educ           0.3405     0.0918     3.7112     0.0002      0.1607      0.5203
+exper         -0.0340     0.2180    -0.1559     0.8761     -0.4612      0.3932
+expersq        0.0028     0.0058     0.4762     0.6339     -0.0086      0.0141
+nrtheast      -0.6933     0.5737    -1.2085     0.2269     -1.8178      0.4311
+married        0.2103     0.3648     0.5764     0.5644     -0.5048      0.9253
+male           1.9291     0.2890     6.6750     0.0000      1.3627      2.4955
 ==============================================================================
 
 Covariance Estimator:

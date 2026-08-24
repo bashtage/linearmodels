@@ -19,7 +19,7 @@
     
   
       
-        <title>linearmodels.iv.data - linearmodels v7.1 (+64)</title>
+        <title>linearmodels.iv.data - linearmodels v7.1 (+66)</title>
       
     
 
@@ -91,7 +91,7 @@
 
 <header class="md-header md-header--shadow" data-md-component="header">
   <nav class="md-header__inner md-grid" aria-label="Header">
-    <a href="../../../index.html" title="linearmodels v7.1 (+64)" class="md-header__button md-logo" aria-label="linearmodels v7.1 (+64)" data-md-component="logo">
+    <a href="../../../index.html" title="linearmodels v7.1 (+66)" class="md-header__button md-logo" aria-label="linearmodels v7.1 (+66)" data-md-component="logo">
       <img src="../../../_static/bw-logo.svg" alt="logo">
     </a>
     <label class="md-header__button md-icon" for="__drawer">
@@ -102,7 +102,7 @@
       <div class="md-header__ellipsis">
         <div class="md-header__topic">
           <span class="md-ellipsis">
-            linearmodels v7.1 (+64)
+            linearmodels v7.1 (+66)
           </span>
         </div>
         <div class="md-header__topic" data-md-component="header-topic">
@@ -197,10 +197,10 @@
 
 <nav class="md-nav md-nav--primary" aria-label="Navigation" data-md-level="0">
   <label class="md-nav__title" for="__drawer">
-    <a href="../../../index.html" title="linearmodels v7.1 (+64)" class="md-nav__button md-logo" aria-label="linearmodels v7.1 (+64)" data-md-component="logo">
+    <a href="../../../index.html" title="linearmodels v7.1 (+66)" class="md-nav__button md-logo" aria-label="linearmodels v7.1 (+66)" data-md-component="logo">
       <img src="../../../_static/bw-logo.svg" alt="logo">
     </a>
-    linearmodels v7.1 (+64)
+    linearmodels v7.1 (+66)
   </label>
   
     <div class="md-nav__source">
@@ -504,9 +504,9 @@
 
 
 <h1>Source code for linearmodels.iv.data</h1><div class="highlight"><pre>
-<span></span><code><span class="sd">&quot;&quot;&quot;</span>
+<span></span><code><span class="sd">"""</span>
 <span class="sd">A data abstraction that allow multiple input data formats</span>
-<span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">"""</span>
 
 <span class="kn">from</span><span class="w"> </span><span class="nn">__future__</span><span class="w"> </span><span class="kn">import</span> <span class="n">annotations</span>
 
@@ -519,15 +519,15 @@
 
 <span class="kn">import</span><span class="w"> </span><span class="nn">linearmodels.typing.data</span>
 
-<span class="n">dim_err</span> <span class="o">=</span> <span class="s2">&quot;</span><span class="si">{0}</span><span class="s2"> has too many dims.  Maximum is 2, actual is </span><span class="si">{1}</span><span class="s2">&quot;</span>
-<span class="n">type_err</span> <span class="o">=</span> <span class="s2">&quot;Only ndarrays, DataArrays and Series and DataFrames are supported&quot;</span>
+<span class="n">dim_err</span> <span class="o">=</span> <span class="s2">"</span><span class="si">{0}</span><span class="s2"> has too many dims.  Maximum is 2, actual is </span><span class="si">{1}</span><span class="s2">"</span>
+<span class="n">type_err</span> <span class="o">=</span> <span class="s2">"Only ndarrays, DataArrays and Series and DataFrames are supported"</span>
 
 
 <span class="k">def</span><span class="w"> </span><span class="nf">convert_columns</span><span class="p">(</span><span class="n">s</span><span class="p">:</span> <span class="n">pd</span><span class="o">.</span><span class="n">Series</span><span class="p">,</span> <span class="n">drop_first</span><span class="p">:</span> <span class="nb">bool</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">linearmodels</span><span class="o">.</span><span class="n">typing</span><span class="o">.</span><span class="n">AnyPandas</span><span class="p">:</span>
     <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">s</span><span class="o">.</span><span class="n">dtype</span><span class="p">,</span> <span class="n">pd</span><span class="o">.</span><span class="n">CategoricalDtype</span><span class="p">):</span>
         <span class="n">out</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">get_dummies</span><span class="p">(</span><span class="n">s</span><span class="p">,</span> <span class="n">drop_first</span><span class="o">=</span><span class="n">drop_first</span><span class="p">)</span>
         <span class="c1"># TODO: Remove once pandas typing fixed</span>
-        <span class="n">out</span><span class="o">.</span><span class="n">columns</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">Index</span><span class="p">([</span><span class="nb">str</span><span class="p">(</span><span class="n">s</span><span class="o">.</span><span class="n">name</span><span class="p">)</span> <span class="o">+</span> <span class="s2">&quot;.&quot;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="n">c</span><span class="p">)</span> <span class="k">for</span> <span class="n">c</span> <span class="ow">in</span> <span class="n">out</span><span class="p">])</span>
+        <span class="n">out</span><span class="o">.</span><span class="n">columns</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">Index</span><span class="p">([</span><span class="nb">str</span><span class="p">(</span><span class="n">s</span><span class="o">.</span><span class="n">name</span><span class="p">)</span> <span class="o">+</span> <span class="s2">"."</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="n">c</span><span class="p">)</span> <span class="k">for</span> <span class="n">c</span> <span class="ow">in</span> <span class="n">out</span><span class="p">])</span>
         <span class="k">return</span> <span class="n">out</span>
     <span class="k">return</span> <span class="n">s</span>
 
@@ -543,7 +543,7 @@
 <div class="viewcode-block" id="IVData">
 <a class="viewcode-back" href="../../../iv/iv/linearmodels.iv.data.IVData.html#linearmodels.iv.data.IVData">[docs]</a>
 <span class="k">class</span><span class="w"> </span><span class="nc">IVData</span><span class="p">:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="w">    </span><span class="sd">"""</span>
 <span class="sd">    Type abstraction for use in univariate models.</span>
 
 <span class="sd">    Parameters</span>
@@ -562,12 +562,12 @@
 <span class="sd">        should be converted to dummy variables</span>
 <span class="sd">    drop_first : bool</span>
 <span class="sd">        Flag indicating to drop first dummy category</span>
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="sd">    """</span>
 
     <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span>
         <span class="n">x</span><span class="p">:</span> <span class="n">IVDataLike</span> <span class="o">|</span> <span class="kc">None</span><span class="p">,</span>
-        <span class="n">var_name</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;x&quot;</span><span class="p">,</span>
+        <span class="n">var_name</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">"x"</span><span class="p">,</span>
         <span class="n">nobs</span><span class="p">:</span> <span class="nb">int</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
         <span class="n">convert_dummies</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span>
         <span class="n">drop_first</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span>
@@ -578,7 +578,7 @@
         <span class="k">if</span> <span class="n">x</span> <span class="ow">is</span> <span class="kc">None</span> <span class="ow">and</span> <span class="n">nobs</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
             <span class="n">x</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">empty</span><span class="p">((</span><span class="n">nobs</span><span class="p">,</span> <span class="mi">0</span><span class="p">))</span>
         <span class="k">elif</span> <span class="n">x</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
-            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;nobs required when x is None&quot;</span><span class="p">)</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">"nobs required when x is None"</span><span class="p">)</span>
 
         <span class="bp">self</span><span class="o">.</span><span class="n">original</span> <span class="o">=</span> <span class="n">x</span>
         <span class="k">assert</span> <span class="n">x</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span>
@@ -596,7 +596,7 @@
             <span class="k">if</span> <span class="n">x</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">==</span> <span class="mi">1</span><span class="p">:</span>
                 <span class="n">cols</span> <span class="o">=</span> <span class="p">[</span><span class="n">var_name</span><span class="p">]</span>
             <span class="k">else</span><span class="p">:</span>
-                <span class="n">cols</span> <span class="o">=</span> <span class="p">[</span><span class="n">var_name</span> <span class="o">+</span> <span class="sa">f</span><span class="s2">&quot;.</span><span class="si">{</span><span class="n">i</span><span class="si">}</span><span class="s2">&quot;</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">x</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">])]</span>
+                <span class="n">cols</span> <span class="o">=</span> <span class="p">[</span><span class="n">var_name</span> <span class="o">+</span> <span class="sa">f</span><span class="s2">".</span><span class="si">{</span><span class="n">i</span><span class="si">}</span><span class="s2">"</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">x</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">])]</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">_pandas</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">index</span><span class="o">=</span><span class="n">index</span><span class="p">,</span> <span class="n">columns</span><span class="o">=</span><span class="n">cols</span><span class="p">)</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">_row_labels</span> <span class="o">=</span> <span class="n">index</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">_col_labels</span> <span class="o">=</span> <span class="n">cols</span>
@@ -609,8 +609,8 @@
             <span class="n">columns</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="n">x</span><span class="o">.</span><span class="n">columns</span><span class="p">)</span>
             <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="nb">set</span><span class="p">(</span><span class="n">columns</span><span class="p">))</span> <span class="o">!=</span> <span class="nb">len</span><span class="p">(</span><span class="n">columns</span><span class="p">):</span>
                 <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
-                    <span class="s2">&quot;DataFrame contains duplicate column names. &quot;</span>
-                    <span class="s2">&quot;All column names must be distinct&quot;</span>
+                    <span class="s2">"DataFrame contains duplicate column names. "</span>
+                    <span class="s2">"All column names must be distinct"</span>
                 <span class="p">)</span>
             <span class="n">all_numeric</span> <span class="o">=</span> <span class="kc">True</span>
             <span class="k">for</span> <span class="n">col</span> <span class="ow">in</span> <span class="n">x</span><span class="p">:</span>
@@ -619,7 +619,7 @@
                     <span class="n">is_string_dtype</span><span class="p">(</span><span class="n">c</span><span class="o">.</span><span class="n">dtype</span><span class="p">)</span>
                     <span class="ow">and</span> <span class="n">c</span><span class="o">.</span><span class="n">map</span><span class="p">(</span><span class="k">lambda</span> <span class="n">v</span><span class="p">:</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">v</span><span class="p">,</span> <span class="nb">str</span><span class="p">))</span><span class="o">.</span><span class="n">all</span><span class="p">()</span>
                 <span class="p">):</span>
-                    <span class="n">c</span> <span class="o">=</span> <span class="n">c</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="s2">&quot;category&quot;</span><span class="p">)</span>
+                    <span class="n">c</span> <span class="o">=</span> <span class="n">c</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="s2">"category"</span><span class="p">)</span>
                     <span class="k">if</span> <span class="ow">not</span> <span class="n">copied</span><span class="p">:</span>
                         <span class="n">x</span> <span class="o">=</span> <span class="n">x</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
                         <span class="n">copied</span> <span class="o">=</span> <span class="kc">True</span>
@@ -628,7 +628,7 @@
                 <span class="n">all_numeric</span> <span class="o">=</span> <span class="n">all_numeric</span> <span class="ow">and</span> <span class="n">is_numeric_dtype</span><span class="p">(</span><span class="n">dt</span><span class="p">)</span>
                 <span class="k">if</span> <span class="ow">not</span> <span class="p">(</span><span class="n">is_numeric_dtype</span><span class="p">(</span><span class="n">dt</span><span class="p">)</span> <span class="ow">or</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">dt</span><span class="p">,</span> <span class="n">pd</span><span class="o">.</span><span class="n">CategoricalDtype</span><span class="p">)):</span>
                     <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
-                        <span class="s2">&quot;Only numeric, string  or categorical data permitted&quot;</span>
+                        <span class="s2">"Only numeric, string  or categorical data permitted"</span>
                     <span class="p">)</span>
 
             <span class="k">if</span> <span class="n">convert_dummies</span><span class="p">:</span>
@@ -656,7 +656,7 @@
                 <span class="n">xr_col_values</span> <span class="o">=</span> <span class="n">x</span><span class="o">.</span><span class="n">coords</span><span class="p">[</span><span class="n">x</span><span class="o">.</span><span class="n">dims</span><span class="p">[</span><span class="mi">1</span><span class="p">]]</span><span class="o">.</span><span class="n">values</span>
                 <span class="n">xr_cols</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="n">xr_col_values</span><span class="p">)</span>
                 <span class="k">if</span> <span class="n">is_numeric_dtype</span><span class="p">(</span><span class="n">xr_col_values</span><span class="o">.</span><span class="n">dtype</span><span class="p">):</span>
-                    <span class="n">xr_cols</span> <span class="o">=</span> <span class="p">[</span><span class="n">var_name</span> <span class="o">+</span> <span class="sa">f</span><span class="s2">&quot;.</span><span class="si">{</span><span class="n">i</span><span class="si">}</span><span class="s2">&quot;</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">x</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">])]</span>
+                    <span class="n">xr_cols</span> <span class="o">=</span> <span class="p">[</span><span class="n">var_name</span> <span class="o">+</span> <span class="sa">f</span><span class="s2">".</span><span class="si">{</span><span class="n">i</span><span class="si">}</span><span class="s2">"</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">x</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">])]</span>
                 <span class="bp">self</span><span class="o">.</span><span class="n">_ndarray</span> <span class="o">=</span> <span class="n">x</span><span class="o">.</span><span class="n">values</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">)</span>
                 <span class="bp">self</span><span class="o">.</span><span class="n">_pandas</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_ndarray</span><span class="p">,</span> <span class="n">columns</span><span class="o">=</span><span class="n">xr_cols</span><span class="p">,</span> <span class="n">index</span><span class="o">=</span><span class="n">index</span><span class="p">)</span>
                 <span class="bp">self</span><span class="o">.</span><span class="n">_row_labels</span> <span class="o">=</span> <span class="n">index</span>
@@ -666,44 +666,44 @@
 
         <span class="k">if</span> <span class="n">nobs</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
             <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_ndarray</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">!=</span> <span class="n">nobs</span><span class="p">:</span>
-                <span class="n">msg</span> <span class="o">=</span> <span class="s2">&quot;Array required to have </span><span class="si">{nobs}</span><span class="s2"> obs, has </span><span class="si">{act}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span>
+                <span class="n">msg</span> <span class="o">=</span> <span class="s2">"Array required to have </span><span class="si">{nobs}</span><span class="s2"> obs, has </span><span class="si">{act}</span><span class="s2">"</span><span class="o">.</span><span class="n">format</span><span class="p">(</span>
                     <span class="n">nobs</span><span class="o">=</span><span class="n">nobs</span><span class="p">,</span> <span class="n">act</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">_ndarray</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
                 <span class="p">)</span>
                 <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="n">msg</span><span class="p">)</span>
 
     <span class="nd">@property</span>
     <span class="k">def</span><span class="w"> </span><span class="nf">pandas</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">:</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;DataFrame view of data&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">"""DataFrame view of data"""</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_pandas</span>
 
     <span class="nd">@property</span>
     <span class="k">def</span><span class="w"> </span><span class="nf">ndarray</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">linearmodels</span><span class="o">.</span><span class="n">typing</span><span class="o">.</span><span class="n">NumericArray</span><span class="p">:</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;ndarray view of data, always 2d&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">"""ndarray view of data, always 2d"""</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_ndarray</span>
 
     <span class="nd">@property</span>
     <span class="k">def</span><span class="w"> </span><span class="nf">shape</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">tuple</span><span class="p">[</span><span class="nb">int</span><span class="p">,</span> <span class="nb">int</span><span class="p">]:</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;Tuple containing shape&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">"""Tuple containing shape"""</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_ndarray</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="bp">self</span><span class="o">.</span><span class="n">_ndarray</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span>
 
     <span class="nd">@property</span>
     <span class="k">def</span><span class="w"> </span><span class="nf">ndim</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">int</span><span class="p">:</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;Number of dimensions&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">"""Number of dimensions"""</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_ndarray</span><span class="o">.</span><span class="n">ndim</span>
 
     <span class="nd">@property</span>
     <span class="k">def</span><span class="w"> </span><span class="nf">cols</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">list</span><span class="p">[</span><span class="n">Any</span><span class="p">]:</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;Column labels&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">"""Column labels"""</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_col_labels</span>
 
     <span class="nd">@property</span>
     <span class="k">def</span><span class="w"> </span><span class="nf">rows</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">list</span><span class="p">[</span><span class="n">Any</span><span class="p">]:</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;Row labels (index)&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">"""Row labels (index)"""</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_row_labels</span>
 
     <span class="nd">@property</span>
     <span class="k">def</span><span class="w"> </span><span class="nf">labels</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">int</span><span class="p">,</span> <span class="n">Any</span><span class="p">]:</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;Dictionary containing row and column labels keyed by axis&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">"""Dictionary containing row and column labels keyed by axis"""</span>
         <span class="k">return</span> <span class="p">{</span><span class="mi">0</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">_row_labels</span><span class="p">,</span> <span class="mi">1</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">_col_labels</span><span class="p">}</span>
 
     <span class="nd">@property</span>

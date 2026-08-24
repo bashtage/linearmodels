@@ -19,7 +19,7 @@
     
   
       
-        <title>linearmodels.asset_pricing.model - linearmodels v7.1 (+64)</title>
+        <title>linearmodels.asset_pricing.model - linearmodels v7.1 (+66)</title>
       
     
 
@@ -91,7 +91,7 @@
 
 <header class="md-header md-header--shadow" data-md-component="header">
   <nav class="md-header__inner md-grid" aria-label="Header">
-    <a href="../../../index.html" title="linearmodels v7.1 (+64)" class="md-header__button md-logo" aria-label="linearmodels v7.1 (+64)" data-md-component="logo">
+    <a href="../../../index.html" title="linearmodels v7.1 (+66)" class="md-header__button md-logo" aria-label="linearmodels v7.1 (+66)" data-md-component="logo">
       <img src="../../../_static/bw-logo.svg" alt="logo">
     </a>
     <label class="md-header__button md-icon" for="__drawer">
@@ -102,7 +102,7 @@
       <div class="md-header__ellipsis">
         <div class="md-header__topic">
           <span class="md-ellipsis">
-            linearmodels v7.1 (+64)
+            linearmodels v7.1 (+66)
           </span>
         </div>
         <div class="md-header__topic" data-md-component="header-topic">
@@ -197,10 +197,10 @@
 
 <nav class="md-nav md-nav--primary" aria-label="Navigation" data-md-level="0">
   <label class="md-nav__title" for="__drawer">
-    <a href="../../../index.html" title="linearmodels v7.1 (+64)" class="md-nav__button md-logo" aria-label="linearmodels v7.1 (+64)" data-md-component="logo">
+    <a href="../../../index.html" title="linearmodels v7.1 (+66)" class="md-nav__button md-logo" aria-label="linearmodels v7.1 (+66)" data-md-component="logo">
       <img src="../../../_static/bw-logo.svg" alt="logo">
     </a>
-    linearmodels v7.1 (+64)
+    linearmodels v7.1 (+66)
   </label>
   
     <div class="md-nav__source">
@@ -504,9 +504,9 @@
 
 
 <h1>Source code for linearmodels.asset_pricing.model</h1><div class="highlight"><pre>
-<span></span><code><span class="sd">&quot;&quot;&quot;</span>
+<span></span><code><span class="sd">"""</span>
 <span class="sd">Linear factor models for applications in asset pricing</span>
-<span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">"""</span>
 
 <span class="kn">from</span><span class="w"> </span><span class="nn">__future__</span><span class="w"> </span><span class="kn">import</span> <span class="n">annotations</span>
 
@@ -561,20 +561,20 @@
     <span class="n">args</span><span class="p">:</span> <span class="nb">tuple</span><span class="p">[</span><span class="nb">bool</span><span class="p">,</span> <span class="n">Any</span><span class="p">],</span>
     <span class="n">disp</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">|</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">1</span><span class="p">,</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Callable</span><span class="p">[[</span><span class="n">linearmodels</span><span class="o">.</span><span class="n">typing</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">Float64Array</span><span class="p">],</span> <span class="kc">None</span><span class="p">]:</span>
-    <span class="n">d</span> <span class="o">=</span> <span class="p">{</span><span class="s2">&quot;iter&quot;</span><span class="p">:</span> <span class="mi">0</span><span class="p">}</span>
+    <span class="n">d</span> <span class="o">=</span> <span class="p">{</span><span class="s2">"iter"</span><span class="p">:</span> <span class="mi">0</span><span class="p">}</span>
     <span class="n">disp</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">disp</span><span class="p">)</span>
 
     <span class="k">def</span><span class="w"> </span><span class="nf">callback</span><span class="p">(</span><span class="n">params</span><span class="p">:</span> <span class="n">linearmodels</span><span class="o">.</span><span class="n">typing</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">Float64Array</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
         <span class="n">fval</span> <span class="o">=</span> <span class="n">obj</span><span class="p">(</span><span class="n">params</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">)</span>
-        <span class="k">if</span> <span class="n">disp</span> <span class="o">&gt;</span> <span class="mi">0</span> <span class="ow">and</span> <span class="p">(</span><span class="n">d</span><span class="p">[</span><span class="s2">&quot;iter&quot;</span><span class="p">]</span> <span class="o">%</span> <span class="n">disp</span> <span class="o">==</span> <span class="mi">0</span><span class="p">):</span>
-            <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Iteration: </span><span class="si">{}</span><span class="s2">, Objective: </span><span class="si">{}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">d</span><span class="p">[</span><span class="s2">&quot;iter&quot;</span><span class="p">],</span> <span class="n">fval</span><span class="p">))</span>
-        <span class="n">d</span><span class="p">[</span><span class="s2">&quot;iter&quot;</span><span class="p">]</span> <span class="o">+=</span> <span class="mi">1</span>
+        <span class="k">if</span> <span class="n">disp</span> <span class="o">&gt;</span> <span class="mi">0</span> <span class="ow">and</span> <span class="p">(</span><span class="n">d</span><span class="p">[</span><span class="s2">"iter"</span><span class="p">]</span> <span class="o">%</span> <span class="n">disp</span> <span class="o">==</span> <span class="mi">0</span><span class="p">):</span>
+            <span class="nb">print</span><span class="p">(</span><span class="s2">"Iteration: </span><span class="si">{}</span><span class="s2">, Objective: </span><span class="si">{}</span><span class="s2">"</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">d</span><span class="p">[</span><span class="s2">"iter"</span><span class="p">],</span> <span class="n">fval</span><span class="p">))</span>
+        <span class="n">d</span><span class="p">[</span><span class="s2">"iter"</span><span class="p">]</span> <span class="o">+=</span> <span class="mi">1</span>
 
     <span class="k">return</span> <span class="n">callback</span>
 
 
 <span class="k">class</span><span class="w"> </span><span class="nc">_FactorModelBase</span><span class="p">:</span>
-<span class="w">    </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
+<span class="w">    </span><span class="sa">r</span><span class="sd">"""</span>
 <span class="sd">    Base class for all factor models.</span>
 
 <span class="sd">    Parameters</span>
@@ -583,11 +583,11 @@
 <span class="sd">        Test portfolio returns (nobs by nportfolio)</span>
 <span class="sd">    factors : array_like</span>
 <span class="sd">        Priced factor returns (nobs by nfactor)</span>
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="sd">    """</span>
 
     <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">portfolios</span><span class="p">:</span> <span class="n">IVDataLike</span><span class="p">,</span> <span class="n">factors</span><span class="p">:</span> <span class="n">IVDataLike</span><span class="p">):</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">portfolios</span> <span class="o">=</span> <span class="n">IVData</span><span class="p">(</span><span class="n">portfolios</span><span class="p">,</span> <span class="n">var_name</span><span class="o">=</span><span class="s2">&quot;portfolio&quot;</span><span class="p">)</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">factors</span> <span class="o">=</span> <span class="n">IVData</span><span class="p">(</span><span class="n">factors</span><span class="p">,</span> <span class="n">var_name</span><span class="o">=</span><span class="s2">&quot;factor&quot;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">portfolios</span> <span class="o">=</span> <span class="n">IVData</span><span class="p">(</span><span class="n">portfolios</span><span class="p">,</span> <span class="n">var_name</span><span class="o">=</span><span class="s2">"portfolio"</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">factors</span> <span class="o">=</span> <span class="n">IVData</span><span class="p">(</span><span class="n">factors</span><span class="p">,</span> <span class="n">var_name</span><span class="o">=</span><span class="s2">"factor"</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_name</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="vm">__class__</span><span class="o">.</span><span class="vm">__name__</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_formula</span><span class="p">:</span> <span class="nb">str</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_validate_data</span><span class="p">()</span>
@@ -595,23 +595,23 @@
     <span class="k">def</span><span class="w"> </span><span class="fm">__str__</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
         <span class="n">out</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="vm">__class__</span><span class="o">.</span><span class="vm">__name__</span>
         <span class="n">f</span><span class="p">,</span> <span class="n">p</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">factors</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="bp">self</span><span class="o">.</span><span class="n">portfolios</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span>
-        <span class="n">out</span> <span class="o">+=</span> <span class="sa">f</span><span class="s2">&quot; with </span><span class="si">{</span><span class="n">f</span><span class="si">}</span><span class="s2"> factors, </span><span class="si">{</span><span class="n">p</span><span class="si">}</span><span class="s2"> test portfolios&quot;</span>
+        <span class="n">out</span> <span class="o">+=</span> <span class="sa">f</span><span class="s2">" with </span><span class="si">{</span><span class="n">f</span><span class="si">}</span><span class="s2"> factors, </span><span class="si">{</span><span class="n">p</span><span class="si">}</span><span class="s2"> test portfolios"</span>
         <span class="k">return</span> <span class="n">out</span>
 
     <span class="k">def</span><span class="w"> </span><span class="fm">__repr__</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
-        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="fm">__str__</span><span class="p">()</span> <span class="o">+</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="se">\n</span><span class="s2">id: </span><span class="si">{</span><span class="nb">hex</span><span class="p">(</span><span class="nb">id</span><span class="p">(</span><span class="bp">self</span><span class="p">))</span><span class="si">}</span><span class="s2">&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="fm">__str__</span><span class="p">()</span> <span class="o">+</span> <span class="sa">f</span><span class="s2">"</span><span class="se">\n</span><span class="s2">id: </span><span class="si">{</span><span class="nb">hex</span><span class="p">(</span><span class="nb">id</span><span class="p">(</span><span class="bp">self</span><span class="p">))</span><span class="si">}</span><span class="s2">"</span>
 
     <span class="k">def</span><span class="w"> </span><span class="nf">_drop_missing</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">linearmodels</span><span class="o">.</span><span class="n">typing</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">BoolArray</span><span class="p">:</span>
         <span class="n">data</span> <span class="o">=</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">portfolios</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">factors</span><span class="p">)</span>
         <span class="n">missing</span> <span class="o">=</span> <span class="n">cast</span><span class="p">(</span>
-            <span class="s2">&quot;linearmodels.typing.data.BoolArray&quot;</span><span class="p">,</span>
+            <span class="s2">"linearmodels.typing.data.BoolArray"</span><span class="p">,</span>
             <span class="n">np</span><span class="o">.</span><span class="n">any</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">c_</span><span class="p">[[</span><span class="n">dh</span><span class="o">.</span><span class="n">isnull</span> <span class="k">for</span> <span class="n">dh</span> <span class="ow">in</span> <span class="n">data</span><span class="p">]],</span> <span class="mi">0</span><span class="p">),</span>
         <span class="p">)</span>
         <span class="k">if</span> <span class="nb">any</span><span class="p">(</span><span class="n">missing</span><span class="p">):</span>
             <span class="k">if</span> <span class="nb">all</span><span class="p">(</span><span class="n">missing</span><span class="p">):</span>
                 <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
-                    <span class="s2">&quot;All observations contain missing data. &quot;</span>
-                    <span class="s2">&quot;Model cannot be estimated.&quot;</span>
+                    <span class="s2">"All observations contain missing data. "</span>
+                    <span class="s2">"Model cannot be estimated."</span>
                 <span class="p">)</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">portfolios</span><span class="o">.</span><span class="n">drop</span><span class="p">(</span><span class="n">missing</span><span class="p">)</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">factors</span><span class="o">.</span><span class="n">drop</span><span class="p">(</span><span class="n">missing</span><span class="p">)</span>
@@ -623,29 +623,29 @@
         <span class="n">f</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">factors</span><span class="o">.</span><span class="n">ndarray</span>
         <span class="k">if</span> <span class="n">p</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">!=</span> <span class="n">f</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]:</span>
             <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
-                <span class="s2">&quot;The number of observations in portfolios and &quot;</span>
-                <span class="s2">&quot;factors is not the same.&quot;</span>
+                <span class="s2">"The number of observations in portfolios and "</span>
+                <span class="s2">"factors is not the same."</span>
             <span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_drop_missing</span><span class="p">()</span>
 
-        <span class="n">p</span> <span class="o">=</span> <span class="n">cast</span><span class="p">(</span><span class="s2">&quot;linearmodels.typing.data.Float64Array&quot;</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">portfolios</span><span class="o">.</span><span class="n">ndarray</span><span class="p">)</span>
-        <span class="n">f</span> <span class="o">=</span> <span class="n">cast</span><span class="p">(</span><span class="s2">&quot;linearmodels.typing.data.Float64Array&quot;</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">factors</span><span class="o">.</span><span class="n">ndarray</span><span class="p">)</span>
+        <span class="n">p</span> <span class="o">=</span> <span class="n">cast</span><span class="p">(</span><span class="s2">"linearmodels.typing.data.Float64Array"</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">portfolios</span><span class="o">.</span><span class="n">ndarray</span><span class="p">)</span>
+        <span class="n">f</span> <span class="o">=</span> <span class="n">cast</span><span class="p">(</span><span class="s2">"linearmodels.typing.data.Float64Array"</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">factors</span><span class="o">.</span><span class="n">ndarray</span><span class="p">)</span>
         <span class="k">if</span> <span class="n">has_constant</span><span class="p">(</span><span class="n">p</span><span class="p">)[</span><span class="mi">0</span><span class="p">]:</span>
             <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
-                <span class="s2">&quot;portfolios must not contain a constant or &quot;</span>
-                <span class="s2">&quot;equivalent and must not have rank</span><span class="se">\n</span><span class="s2">&quot;</span>
-                <span class="s2">&quot;less than the dimension of the smaller shape.&quot;</span>
+                <span class="s2">"portfolios must not contain a constant or "</span>
+                <span class="s2">"equivalent and must not have rank</span><span class="se">\n</span><span class="s2">"</span>
+                <span class="s2">"less than the dimension of the smaller shape."</span>
             <span class="p">)</span>
         <span class="k">if</span> <span class="n">has_constant</span><span class="p">(</span><span class="n">f</span><span class="p">)[</span><span class="mi">0</span><span class="p">]:</span>
-            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;factors must not contain a constant or equivalent.&quot;</span><span class="p">)</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">"factors must not contain a constant or equivalent."</span><span class="p">)</span>
         <span class="k">if</span> <span class="n">np</span><span class="o">.</span><span class="n">linalg</span><span class="o">.</span><span class="n">matrix_rank</span><span class="p">(</span><span class="n">f</span><span class="p">)</span> <span class="o">&lt;</span> <span class="n">f</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">]:</span>
             <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
-                <span class="s2">&quot;Model cannot be estimated. factors do not have full column rank.&quot;</span>
+                <span class="s2">"Model cannot be estimated. factors do not have full column rank."</span>
             <span class="p">)</span>
         <span class="k">if</span> <span class="n">p</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">&lt;</span> <span class="p">(</span><span class="n">f</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">+</span> <span class="mi">1</span><span class="p">):</span>
             <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
-                <span class="s2">&quot;Model cannot be estimated. portfolios must have factors + 1 or &quot;</span>
-                <span class="s2">&quot;more returns to</span><span class="se">\n</span><span class="s2">estimate the model parameters.&quot;</span>
+                <span class="s2">"Model cannot be estimated. portfolios must have factors + 1 or "</span>
+                <span class="s2">"more returns to</span><span class="se">\n</span><span class="s2">estimate the model parameters."</span>
             <span class="p">)</span>
 
     <span class="nd">@property</span>
@@ -661,10 +661,10 @@
         <span class="n">formula</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">data</span><span class="p">:</span> <span class="n">DataFrame</span><span class="p">,</span> <span class="n">portfolios</span><span class="p">:</span> <span class="n">DataFrame</span> <span class="o">|</span> <span class="kc">None</span>
     <span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">tuple</span><span class="p">[</span><span class="n">DataFrame</span><span class="p">,</span> <span class="n">DataFrame</span><span class="p">,</span> <span class="nb">str</span><span class="p">]:</span>
         <span class="n">orig_formula</span> <span class="o">=</span> <span class="n">formula</span>
-        <span class="n">na_action</span> <span class="o">=</span> <span class="n">NAAction</span><span class="p">(</span><span class="s2">&quot;raise&quot;</span><span class="p">)</span>
+        <span class="n">na_action</span> <span class="o">=</span> <span class="n">NAAction</span><span class="p">(</span><span class="s2">"raise"</span><span class="p">)</span>
         <span class="k">if</span> <span class="n">portfolios</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
             <span class="n">factors_mm</span> <span class="o">=</span> <span class="n">model_matrix</span><span class="p">(</span>
-                <span class="n">formula</span> <span class="o">+</span> <span class="s2">&quot; + 0&quot;</span><span class="p">,</span>
+                <span class="n">formula</span> <span class="o">+</span> <span class="s2">" + 0"</span><span class="p">,</span>
                 <span class="n">data</span><span class="p">,</span>
                 <span class="n">context</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span>  <span class="c1"># TODO: self._eval_env,</span>
                 <span class="n">ensure_full_rank</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
@@ -672,9 +672,9 @@
             <span class="p">)</span>
             <span class="n">factors</span> <span class="o">=</span> <span class="n">DataFrame</span><span class="p">(</span><span class="n">factors_mm</span><span class="p">)</span>
         <span class="k">else</span><span class="p">:</span>
-            <span class="n">formula_components</span> <span class="o">=</span> <span class="n">formula</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s2">&quot;~&quot;</span><span class="p">)</span>
+            <span class="n">formula_components</span> <span class="o">=</span> <span class="n">formula</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s2">"~"</span><span class="p">)</span>
             <span class="n">portfolios_mm</span> <span class="o">=</span> <span class="n">model_matrix</span><span class="p">(</span>
-                <span class="n">formula_components</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span> <span class="o">+</span> <span class="s2">&quot; + 0&quot;</span><span class="p">,</span>
+                <span class="n">formula_components</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span> <span class="o">+</span> <span class="s2">" + 0"</span><span class="p">,</span>
                 <span class="n">data</span><span class="p">,</span>
                 <span class="n">context</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span>  <span class="c1"># TODO: self._eval_env,</span>
                 <span class="n">ensure_full_rank</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
@@ -682,7 +682,7 @@
             <span class="p">)</span>
             <span class="n">portfolios</span> <span class="o">=</span> <span class="n">DataFrame</span><span class="p">(</span><span class="n">portfolios_mm</span><span class="p">)</span>
             <span class="n">factors_mm</span> <span class="o">=</span> <span class="n">model_matrix</span><span class="p">(</span>
-                <span class="n">formula_components</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span> <span class="o">+</span> <span class="s2">&quot; + 0&quot;</span><span class="p">,</span>
+                <span class="n">formula_components</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span> <span class="o">+</span> <span class="s2">" + 0"</span><span class="p">,</span>
                 <span class="n">data</span><span class="p">,</span>
                 <span class="n">context</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span>  <span class="c1"># TODO: self._eval_env,</span>
                 <span class="n">ensure_full_rank</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
@@ -696,7 +696,7 @@
 <div class="viewcode-block" id="TradedFactorModel">
 <a class="viewcode-back" href="../../../asset-pricing/asset-pricing/linearmodels.asset_pricing.model.TradedFactorModel.html#linearmodels.asset_pricing.model.TradedFactorModel">[docs]</a>
 <span class="k">class</span><span class="w"> </span><span class="nc">TradedFactorModel</span><span class="p">(</span><span class="n">_FactorModelBase</span><span class="p">):</span>
-<span class="w">    </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
+<span class="w">    </span><span class="sa">r</span><span class="sd">"""</span>
 <span class="sd">    Linear factor models estimator applicable to traded factors</span>
 
 <span class="sd">    Parameters</span>
@@ -722,7 +722,7 @@
 <span class="sd">    tested using the estimated values :math:`\hat{\alpha}_i`. Risk premia,</span>
 <span class="sd">    :math:`\lambda_i` are estimated using the sample averages of the factors,</span>
 <span class="sd">    which must be excess returns on traded portfolios.</span>
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="sd">    """</span>
 
     <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">portfolios</span><span class="p">:</span> <span class="n">IVDataLike</span><span class="p">,</span> <span class="n">factors</span><span class="p">:</span> <span class="n">IVDataLike</span><span class="p">):</span>
         <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">portfolios</span><span class="p">,</span> <span class="n">factors</span><span class="p">)</span>
@@ -737,7 +737,7 @@
         <span class="o">*</span><span class="p">,</span>
         <span class="n">portfolios</span><span class="p">:</span> <span class="n">DataFrame</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
     <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">TradedFactorModel</span><span class="p">:</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">"""</span>
 <span class="sd">        Parameters</span>
 <span class="sd">        ----------</span>
 <span class="sd">        formula : str</span>
@@ -764,15 +764,15 @@
 <span class="sd">        &gt;&gt;&gt; from linearmodels.datasets import french</span>
 <span class="sd">        &gt;&gt;&gt; from linearmodels.asset_pricing import TradedFactorModel</span>
 <span class="sd">        &gt;&gt;&gt; data = french.load()</span>
-<span class="sd">        &gt;&gt;&gt; formula = &quot;S1M1 + S1M5 + S3M3 + S5M1 + S5M5 ~ MktRF + SMB + HML&quot;</span>
+<span class="sd">        &gt;&gt;&gt; formula = "S1M1 + S1M5 + S3M3 + S5M1 + S5M5 ~ MktRF + SMB + HML"</span>
 <span class="sd">        &gt;&gt;&gt; mod = TradedFactorModel.from_formula(formula, data)</span>
 
 <span class="sd">        Using only factors</span>
 
-<span class="sd">        &gt;&gt;&gt; portfolios = data[[&quot;S1M1&quot;, &quot;S1M5&quot;, &quot;S3M1&quot;, &quot;S3M5&quot;, &quot;S5M1&quot;, &quot;S5M5&quot;]]</span>
-<span class="sd">        &gt;&gt;&gt; formula = &quot;MktRF + SMB + HML&quot;</span>
+<span class="sd">        &gt;&gt;&gt; portfolios = data[["S1M1", "S1M5", "S3M1", "S3M5", "S5M1", "S5M5"]]</span>
+<span class="sd">        &gt;&gt;&gt; formula = "MktRF + SMB + HML"</span>
 <span class="sd">        &gt;&gt;&gt; mod = TradedFactorModel.from_formula(formula, data, portfolios=portfolios)</span>
-<span class="sd">        &quot;&quot;&quot;</span>
+<span class="sd">        """</span>
         <span class="n">factors</span><span class="p">,</span> <span class="n">portfolios</span><span class="p">,</span> <span class="n">formula</span> <span class="o">=</span> <span class="bp">cls</span><span class="o">.</span><span class="n">_prepare_data_from_formula</span><span class="p">(</span>
             <span class="n">formula</span><span class="p">,</span> <span class="n">data</span><span class="p">,</span> <span class="n">portfolios</span>
         <span class="p">)</span>
@@ -785,11 +785,11 @@
 <a class="viewcode-back" href="../../../asset-pricing/asset-pricing/linearmodels.asset_pricing.model.TradedFactorModel.fit.html#linearmodels.asset_pricing.model.TradedFactorModel.fit">[docs]</a>
     <span class="k">def</span><span class="w"> </span><span class="nf">fit</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span>
-        <span class="n">cov_type</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;robust&quot;</span><span class="p">,</span>
+        <span class="n">cov_type</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">"robust"</span><span class="p">,</span>
         <span class="n">debiased</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span>
         <span class="o">**</span><span class="n">cov_config</span><span class="p">:</span> <span class="nb">str</span> <span class="o">|</span> <span class="nb">float</span><span class="p">,</span>
     <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">LinearFactorModelResults</span><span class="p">:</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">"""</span>
 <span class="sd">        Estimate model parameters</span>
 
 <span class="sd">        Parameters</span>
@@ -811,14 +811,14 @@
 <span class="sd">        -----</span>
 <span class="sd">        Supported covariance estimators are:</span>
 
-<span class="sd">        * &quot;robust&quot; - Heteroskedasticity-robust covariance estimator</span>
-<span class="sd">        * &quot;kernel&quot; - Heteroskedasticity and Autocorrelation consistent (HAC)</span>
+<span class="sd">        * "robust" - Heteroskedasticity-robust covariance estimator</span>
+<span class="sd">        * "kernel" - Heteroskedasticity and Autocorrelation consistent (HAC)</span>
 <span class="sd">          covariance estimator</span>
 
 <span class="sd">        The kernel covariance estimator takes the optional arguments</span>
-<span class="sd">        ``kernel``, one of &quot;bartlett&quot;, &quot;parzen&quot; or &quot;qs&quot; (quadratic spectral)</span>
+<span class="sd">        ``kernel``, one of "bartlett", "parzen" or "qs" (quadratic spectral)</span>
 <span class="sd">        and ``bandwidth`` (a positive integer).</span>
-<span class="sd">        &quot;&quot;&quot;</span>
+<span class="sd">        """</span>
         <span class="n">p</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">portfolios</span><span class="o">.</span><span class="n">ndarray</span>
         <span class="n">f</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">factors</span><span class="o">.</span><span class="n">ndarray</span>
         <span class="n">nportfolio</span> <span class="o">=</span> <span class="n">p</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span>
@@ -837,20 +837,20 @@
         <span class="p">)</span>
         <span class="n">f_rep</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">tile</span><span class="p">(</span><span class="n">fc</span><span class="p">,</span> <span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="n">nportfolio</span><span class="p">))</span>
         <span class="n">eps_rep</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">tile</span><span class="p">(</span><span class="n">eps</span><span class="p">,</span> <span class="p">(</span><span class="n">nfactor</span> <span class="o">+</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">))</span>  <span class="c1"># 1 2 3 ... 25 1 2 3 ...</span>
-        <span class="n">eps_rep</span> <span class="o">=</span> <span class="n">eps_rep</span><span class="o">.</span><span class="n">ravel</span><span class="p">(</span><span class="n">order</span><span class="o">=</span><span class="s2">&quot;F&quot;</span><span class="p">)</span>
-        <span class="n">eps_rep</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="n">eps_rep</span><span class="p">,</span> <span class="p">(</span><span class="n">nobs</span><span class="p">,</span> <span class="p">(</span><span class="n">nfactor</span> <span class="o">+</span> <span class="mi">1</span><span class="p">)</span> <span class="o">*</span> <span class="n">nportfolio</span><span class="p">),</span> <span class="n">order</span><span class="o">=</span><span class="s2">&quot;F&quot;</span><span class="p">)</span>
+        <span class="n">eps_rep</span> <span class="o">=</span> <span class="n">eps_rep</span><span class="o">.</span><span class="n">ravel</span><span class="p">(</span><span class="n">order</span><span class="o">=</span><span class="s2">"F"</span><span class="p">)</span>
+        <span class="n">eps_rep</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="n">eps_rep</span><span class="p">,</span> <span class="p">(</span><span class="n">nobs</span><span class="p">,</span> <span class="p">(</span><span class="n">nfactor</span> <span class="o">+</span> <span class="mi">1</span><span class="p">)</span> <span class="o">*</span> <span class="n">nportfolio</span><span class="p">),</span> <span class="n">order</span><span class="o">=</span><span class="s2">"F"</span><span class="p">)</span>
         <span class="n">xe</span> <span class="o">=</span> <span class="n">f_rep</span> <span class="o">*</span> <span class="n">eps_rep</span>
         <span class="n">xe</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">c_</span><span class="p">[</span><span class="n">xe</span><span class="p">,</span> <span class="n">fe</span><span class="p">]</span>
-        <span class="k">if</span> <span class="n">cov_type</span> <span class="ow">in</span> <span class="p">(</span><span class="s2">&quot;robust&quot;</span><span class="p">,</span> <span class="s2">&quot;heteroskedastic&quot;</span><span class="p">):</span>
+        <span class="k">if</span> <span class="n">cov_type</span> <span class="ow">in</span> <span class="p">(</span><span class="s2">"robust"</span><span class="p">,</span> <span class="s2">"heteroskedastic"</span><span class="p">):</span>
             <span class="n">cov_est</span> <span class="o">=</span> <span class="n">HeteroskedasticCovariance</span><span class="p">(</span>
                 <span class="n">xe</span><span class="p">,</span> <span class="n">inv_jacobian</span><span class="o">=</span><span class="n">xpxi</span><span class="p">,</span> <span class="n">center</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">debiased</span><span class="o">=</span><span class="n">debiased</span><span class="p">,</span> <span class="n">df</span><span class="o">=</span><span class="n">fc</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span>
             <span class="p">)</span>
             <span class="n">rp_cov_est</span> <span class="o">=</span> <span class="n">HeteroskedasticCovariance</span><span class="p">(</span>
                 <span class="n">fe</span><span class="p">,</span> <span class="n">jacobian</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">eye</span><span class="p">(</span><span class="n">f</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">]),</span> <span class="n">center</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">debiased</span><span class="o">=</span><span class="n">debiased</span><span class="p">,</span> <span class="n">df</span><span class="o">=</span><span class="mi">1</span>
             <span class="p">)</span>
-        <span class="k">elif</span> <span class="n">cov_type</span> <span class="o">==</span> <span class="s2">&quot;kernel&quot;</span><span class="p">:</span>
-            <span class="n">kernel</span> <span class="o">=</span> <span class="n">get_string</span><span class="p">(</span><span class="n">cov_config</span><span class="p">,</span> <span class="s2">&quot;kernel&quot;</span><span class="p">)</span>
-            <span class="n">bandwidth</span> <span class="o">=</span> <span class="n">get_float</span><span class="p">(</span><span class="n">cov_config</span><span class="p">,</span> <span class="s2">&quot;bandwidth&quot;</span><span class="p">)</span>
+        <span class="k">elif</span> <span class="n">cov_type</span> <span class="o">==</span> <span class="s2">"kernel"</span><span class="p">:</span>
+            <span class="n">kernel</span> <span class="o">=</span> <span class="n">get_string</span><span class="p">(</span><span class="n">cov_config</span><span class="p">,</span> <span class="s2">"kernel"</span><span class="p">)</span>
+            <span class="n">bandwidth</span> <span class="o">=</span> <span class="n">get_float</span><span class="p">(</span><span class="n">cov_config</span><span class="p">,</span> <span class="s2">"bandwidth"</span><span class="p">)</span>
             <span class="n">cov_est</span> <span class="o">=</span> <span class="n">KernelCovariance</span><span class="p">(</span>
                 <span class="n">xe</span><span class="p">,</span>
                 <span class="n">inv_jacobian</span><span class="o">=</span><span class="n">xpxi</span><span class="p">,</span>
@@ -862,7 +862,7 @@
             <span class="p">)</span>
             <span class="n">bw</span> <span class="o">=</span> <span class="n">cov_est</span><span class="o">.</span><span class="n">bandwidth</span>
             <span class="n">_cov_config</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">(</span><span class="n">cov_config</span><span class="o">.</span><span class="n">items</span><span class="p">())</span>
-            <span class="n">_cov_config</span><span class="p">[</span><span class="s2">&quot;bandwidth&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">bw</span>
+            <span class="n">_cov_config</span><span class="p">[</span><span class="s2">"bandwidth"</span><span class="p">]</span> <span class="o">=</span> <span class="n">bw</span>
             <span class="n">rp_cov_est</span> <span class="o">=</span> <span class="n">KernelCovariance</span><span class="p">(</span>
                 <span class="n">fe</span><span class="p">,</span>
                 <span class="n">jacobian</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">eye</span><span class="p">(</span><span class="n">f</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">]),</span>
@@ -873,7 +873,7 @@
                 <span class="n">kernel</span><span class="o">=</span><span class="n">kernel</span><span class="p">,</span>
             <span class="p">)</span>
         <span class="k">else</span><span class="p">:</span>
-            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Unknown cov_type: </span><span class="si">{</span><span class="n">cov_type</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s2">"Unknown cov_type: </span><span class="si">{</span><span class="n">cov_type</span><span class="si">}</span><span class="s2">"</span><span class="p">)</span>
         <span class="n">full_vcv</span> <span class="o">=</span> <span class="n">cov_est</span><span class="o">.</span><span class="n">cov</span>
         <span class="n">rp_cov</span> <span class="o">=</span> <span class="n">rp_cov_est</span><span class="o">.</span><span class="n">cov</span>
         <span class="n">vcv</span> <span class="o">=</span> <span class="n">full_vcv</span><span class="p">[:</span><span class="n">nloading</span><span class="p">,</span> <span class="p">:</span><span class="n">nloading</span><span class="p">]</span>
@@ -889,7 +889,7 @@
         <span class="n">alpha_vcv</span> <span class="o">=</span> <span class="n">vcv</span><span class="p">[:</span><span class="n">nportfolio</span><span class="p">,</span> <span class="p">:</span><span class="n">nportfolio</span><span class="p">]</span>
         <span class="n">stat</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">squeeze</span><span class="p">(</span><span class="n">alphas</span><span class="o">.</span><span class="n">T</span> <span class="o">@</span> <span class="n">np</span><span class="o">.</span><span class="n">linalg</span><span class="o">.</span><span class="n">pinv</span><span class="p">(</span><span class="n">alpha_vcv</span><span class="p">)</span> <span class="o">@</span> <span class="n">alphas</span><span class="p">))</span>
         <span class="n">jstat</span> <span class="o">=</span> <span class="n">WaldTestStatistic</span><span class="p">(</span>
-            <span class="n">stat</span><span class="p">,</span> <span class="s2">&quot;All alphas are 0&quot;</span><span class="p">,</span> <span class="n">nportfolio</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="s2">&quot;J-statistic&quot;</span>
+            <span class="n">stat</span><span class="p">,</span> <span class="s2">"All alphas are 0"</span><span class="p">,</span> <span class="n">nportfolio</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="s2">"J-statistic"</span>
         <span class="p">)</span>
         <span class="n">params</span> <span class="o">=</span> <span class="n">b</span><span class="o">.</span><span class="n">T</span>
         <span class="n">betas</span> <span class="o">=</span> <span class="n">b</span><span class="p">[</span><span class="mi">1</span><span class="p">:]</span><span class="o">.</span><span class="n">T</span>
@@ -899,11 +899,11 @@
         <span class="n">r2</span> <span class="o">=</span> <span class="mi">1</span> <span class="o">-</span> <span class="n">residual_ss</span> <span class="o">/</span> <span class="n">total_ss</span>
         <span class="n">param_names</span> <span class="o">=</span> <span class="p">[]</span>
         <span class="k">for</span> <span class="n">portfolio</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">portfolios</span><span class="o">.</span><span class="n">cols</span><span class="p">:</span>
-            <span class="n">param_names</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;alpha-</span><span class="si">{</span><span class="n">portfolio</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+            <span class="n">param_names</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="sa">f</span><span class="s2">"alpha-</span><span class="si">{</span><span class="n">portfolio</span><span class="si">}</span><span class="s2">"</span><span class="p">)</span>
             <span class="n">param_names</span><span class="o">.</span><span class="n">extend</span><span class="p">(</span>
-                <span class="p">[</span><span class="sa">f</span><span class="s2">&quot;beta-</span><span class="si">{</span><span class="n">portfolio</span><span class="si">}</span><span class="s2">-</span><span class="si">{</span><span class="n">factor</span><span class="si">}</span><span class="s2">&quot;</span> <span class="k">for</span> <span class="n">factor</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">factors</span><span class="o">.</span><span class="n">cols</span><span class="p">]</span>
+                <span class="p">[</span><span class="sa">f</span><span class="s2">"beta-</span><span class="si">{</span><span class="n">portfolio</span><span class="si">}</span><span class="s2">-</span><span class="si">{</span><span class="n">factor</span><span class="si">}</span><span class="s2">"</span> <span class="k">for</span> <span class="n">factor</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">factors</span><span class="o">.</span><span class="n">cols</span><span class="p">]</span>
             <span class="p">)</span>
-        <span class="n">param_names</span><span class="o">.</span><span class="n">extend</span><span class="p">([</span><span class="sa">f</span><span class="s2">&quot;lambda-</span><span class="si">{</span><span class="n">factor</span><span class="si">}</span><span class="s2">&quot;</span> <span class="k">for</span> <span class="n">factor</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">factors</span><span class="o">.</span><span class="n">cols</span><span class="p">])</span>
+        <span class="n">param_names</span><span class="o">.</span><span class="n">extend</span><span class="p">([</span><span class="sa">f</span><span class="s2">"lambda-</span><span class="si">{</span><span class="n">factor</span><span class="si">}</span><span class="s2">"</span> <span class="k">for</span> <span class="n">factor</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">factors</span><span class="o">.</span><span class="n">cols</span><span class="p">])</span>
 
         <span class="n">res</span> <span class="o">=</span> <span class="n">AttrDict</span><span class="p">(</span>
             <span class="n">params</span><span class="o">=</span><span class="n">params</span><span class="p">,</span>
@@ -934,9 +934,9 @@
 
 
 <span class="k">class</span><span class="w"> </span><span class="nc">_LinearFactorModelBase</span><span class="p">(</span><span class="n">_FactorModelBase</span><span class="p">):</span>
-<span class="w">    </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
+<span class="w">    </span><span class="sa">r</span><span class="sd">"""</span>
 <span class="sd">    Linear factor model base class</span>
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="sd">    """</span>
 
     <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span>
@@ -962,8 +962,8 @@
     <span class="k">def</span><span class="w"> </span><span class="fm">__str__</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
         <span class="n">out</span> <span class="o">=</span> <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__str__</span><span class="p">()</span>
         <span class="k">if</span> <span class="n">np</span><span class="o">.</span><span class="n">any</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_sigma</span> <span class="o">!=</span> <span class="n">np</span><span class="o">.</span><span class="n">eye</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">portfolios</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">])):</span>
-            <span class="n">out</span> <span class="o">+=</span> <span class="s2">&quot; using GLS&quot;</span>
-        <span class="n">out</span> <span class="o">+=</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="se">\n</span><span class="s2">Estimated risk-free rate: </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">_risk_free</span><span class="si">}</span><span class="s2">&quot;</span>
+            <span class="n">out</span> <span class="o">+=</span> <span class="s2">" using GLS"</span>
+        <span class="n">out</span> <span class="o">+=</span> <span class="sa">f</span><span class="s2">"</span><span class="se">\n</span><span class="s2">Estimated risk-free rate: </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">_risk_free</span><span class="si">}</span><span class="s2">"</span>
 
         <span class="k">return</span> <span class="n">out</span>
 
@@ -973,9 +973,9 @@
         <span class="n">nrp</span> <span class="o">=</span> <span class="n">f</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">+</span> <span class="nb">int</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_risk_free</span><span class="p">)</span>
         <span class="k">if</span> <span class="n">p</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">&lt;</span> <span class="n">nrp</span><span class="p">:</span>
             <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
-                <span class="s2">&quot;The number of test portfolio must be at least as &quot;</span>
-                <span class="s2">&quot;large as the number of risk premia, including the &quot;</span>
-                <span class="s2">&quot;risk free rate if estimated.&quot;</span>
+                <span class="s2">"The number of test portfolio must be at least as "</span>
+                <span class="s2">"large as the number of risk premia, including the "</span>
+                <span class="s2">"risk free rate if estimated."</span>
             <span class="p">)</span>
 
     <span class="k">def</span><span class="w"> </span><span class="nf">_boundaries</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">tuple</span><span class="p">[</span><span class="nb">int</span><span class="p">,</span> <span class="nb">int</span><span class="p">,</span> <span class="nb">int</span><span class="p">,</span> <span class="nb">int</span><span class="p">,</span> <span class="nb">int</span><span class="p">,</span> <span class="nb">int</span><span class="p">,</span> <span class="nb">int</span><span class="p">]:</span>
@@ -993,7 +993,7 @@
 <div class="viewcode-block" id="LinearFactorModel">
 <a class="viewcode-back" href="../../../asset-pricing/asset-pricing/linearmodels.asset_pricing.model.LinearFactorModel.html#linearmodels.asset_pricing.model.LinearFactorModel">[docs]</a>
 <span class="k">class</span><span class="w"> </span><span class="nc">LinearFactorModel</span><span class="p">(</span><span class="n">_LinearFactorModelBase</span><span class="p">):</span>
-<span class="w">    </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
+<span class="w">    </span><span class="sa">r</span><span class="sd">"""</span>
 <span class="sd">    Linear factor model estimator</span>
 
 <span class="sd">    Parameters</span>
@@ -1040,7 +1040,7 @@
 
 <span class="sd">    The model is tested using the estimated values</span>
 <span class="sd">    :math:`\hat{\alpha}_i=\hat{\eta}_i`.</span>
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="sd">    """</span>
 
     <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span>
@@ -1064,7 +1064,7 @@
         <span class="n">risk_free</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
         <span class="n">sigma</span><span class="p">:</span> <span class="n">linearmodels</span><span class="o">.</span><span class="n">typing</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">ArrayLike</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
     <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">LinearFactorModel</span><span class="p">:</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">"""</span>
 <span class="sd">        Parameters</span>
 <span class="sd">        ----------</span>
 <span class="sd">        formula : str</span>
@@ -1098,15 +1098,15 @@
 <span class="sd">        &gt;&gt;&gt; from linearmodels.datasets import french</span>
 <span class="sd">        &gt;&gt;&gt; from linearmodels.asset_pricing import LinearFactorModel</span>
 <span class="sd">        &gt;&gt;&gt; data = french.load()</span>
-<span class="sd">        &gt;&gt;&gt; formula = &quot;S1M1 + S1M5 + S3M3 + S5M1 + S5M5 ~ MktRF + SMB + HML&quot;</span>
+<span class="sd">        &gt;&gt;&gt; formula = "S1M1 + S1M5 + S3M3 + S5M1 + S5M5 ~ MktRF + SMB + HML"</span>
 <span class="sd">        &gt;&gt;&gt; mod = LinearFactorModel.from_formula(formula, data)</span>
 
 <span class="sd">        Using only factors</span>
 
-<span class="sd">        &gt;&gt;&gt; portfolios = data[[&quot;S1M1&quot;, &quot;S1M5&quot;, &quot;S3M1&quot;, &quot;S3M5&quot;, &quot;S5M1&quot;, &quot;S5M5&quot;]]</span>
-<span class="sd">        &gt;&gt;&gt; formula = &quot;MktRF + SMB + HML&quot;</span>
+<span class="sd">        &gt;&gt;&gt; portfolios = data[["S1M1", "S1M5", "S3M1", "S3M5", "S5M1", "S5M5"]]</span>
+<span class="sd">        &gt;&gt;&gt; formula = "MktRF + SMB + HML"</span>
 <span class="sd">        &gt;&gt;&gt; mod = LinearFactorModel.from_formula(formula, data, portfolios=portfolios)</span>
-<span class="sd">        &quot;&quot;&quot;</span>
+<span class="sd">        """</span>
         <span class="n">factors</span><span class="p">,</span> <span class="n">portfolios</span><span class="p">,</span> <span class="n">formula</span> <span class="o">=</span> <span class="bp">cls</span><span class="o">.</span><span class="n">_prepare_data_from_formula</span><span class="p">(</span>
             <span class="n">formula</span><span class="p">,</span> <span class="n">data</span><span class="p">,</span> <span class="n">portfolios</span>
         <span class="p">)</span>
@@ -1119,11 +1119,11 @@
 <a class="viewcode-back" href="../../../asset-pricing/asset-pricing/linearmodels.asset_pricing.model.LinearFactorModel.fit.html#linearmodels.asset_pricing.model.LinearFactorModel.fit">[docs]</a>
     <span class="k">def</span><span class="w"> </span><span class="nf">fit</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span>
-        <span class="n">cov_type</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;robust&quot;</span><span class="p">,</span>
+        <span class="n">cov_type</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">"robust"</span><span class="p">,</span>
         <span class="n">debiased</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span>
         <span class="o">**</span><span class="n">cov_config</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">|</span> <span class="nb">int</span> <span class="o">|</span> <span class="nb">str</span><span class="p">,</span>
     <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">LinearFactorModelResults</span><span class="p">:</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">"""</span>
 <span class="sd">        Estimate model parameters</span>
 
 <span class="sd">        Parameters</span>
@@ -1144,9 +1144,9 @@
 <span class="sd">        Notes</span>
 <span class="sd">        -----</span>
 <span class="sd">        The kernel covariance estimator takes the optional arguments</span>
-<span class="sd">        ``kernel``, one of &quot;bartlett&quot;, &quot;parzen&quot; or &quot;qs&quot; (quadratic spectral)</span>
+<span class="sd">        ``kernel``, one of "bartlett", "parzen" or "qs" (quadratic spectral)</span>
 <span class="sd">        and ``bandwidth`` (a positive integer).</span>
-<span class="sd">        &quot;&quot;&quot;</span>
+<span class="sd">        """</span>
         <span class="n">nobs</span><span class="p">,</span> <span class="n">nf</span><span class="p">,</span> <span class="n">nport</span><span class="p">,</span> <span class="n">nrf</span><span class="p">,</span> <span class="n">s1</span><span class="p">,</span> <span class="n">s2</span><span class="p">,</span> <span class="n">s3</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_boundaries</span><span class="p">()</span>
         <span class="n">excess_returns</span> <span class="o">=</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">_risk_free</span>
         <span class="n">f</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">factors</span><span class="o">.</span><span class="n">ndarray</span>
@@ -1173,9 +1173,9 @@
         <span class="c1"># Jacobian</span>
         <span class="n">jacobian</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_jacobian</span><span class="p">(</span><span class="n">betas</span><span class="p">,</span> <span class="n">lam</span><span class="p">,</span> <span class="n">alphas</span><span class="p">)</span>
 
-        <span class="k">if</span> <span class="n">cov_type</span> <span class="ow">not</span> <span class="ow">in</span> <span class="p">(</span><span class="s2">&quot;robust&quot;</span><span class="p">,</span> <span class="s2">&quot;heteroskedastic&quot;</span><span class="p">,</span> <span class="s2">&quot;kernel&quot;</span><span class="p">):</span>
-            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Unknown weight: </span><span class="si">{</span><span class="n">cov_type</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
-        <span class="k">if</span> <span class="n">cov_type</span> <span class="ow">in</span> <span class="p">(</span><span class="s2">&quot;robust&quot;</span><span class="p">,</span> <span class="s2">&quot;heteroskedastic&quot;</span><span class="p">):</span>
+        <span class="k">if</span> <span class="n">cov_type</span> <span class="ow">not</span> <span class="ow">in</span> <span class="p">(</span><span class="s2">"robust"</span><span class="p">,</span> <span class="s2">"heteroskedastic"</span><span class="p">,</span> <span class="s2">"kernel"</span><span class="p">):</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s2">"Unknown weight: </span><span class="si">{</span><span class="n">cov_type</span><span class="si">}</span><span class="s2">"</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">cov_type</span> <span class="ow">in</span> <span class="p">(</span><span class="s2">"robust"</span><span class="p">,</span> <span class="s2">"heteroskedastic"</span><span class="p">):</span>
             <span class="n">cov_est_inst</span> <span class="o">=</span> <span class="n">HeteroskedasticCovariance</span><span class="p">(</span>
                 <span class="n">moments</span><span class="p">,</span>
                 <span class="n">jacobian</span><span class="o">=</span><span class="n">jacobian</span><span class="p">,</span>
@@ -1183,9 +1183,9 @@
                 <span class="n">debiased</span><span class="o">=</span><span class="n">debiased</span><span class="p">,</span>
                 <span class="n">df</span><span class="o">=</span><span class="n">fc</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span>
             <span class="p">)</span>
-        <span class="k">else</span><span class="p">:</span>  <span class="c1"># &quot;kernel&quot;:</span>
-            <span class="n">bandwidth</span> <span class="o">=</span> <span class="n">get_float</span><span class="p">(</span><span class="n">cov_config</span><span class="p">,</span> <span class="s2">&quot;bandwidth&quot;</span><span class="p">)</span>
-            <span class="n">kernel</span> <span class="o">=</span> <span class="n">get_string</span><span class="p">(</span><span class="n">cov_config</span><span class="p">,</span> <span class="s2">&quot;kernel&quot;</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>  <span class="c1"># "kernel":</span>
+            <span class="n">bandwidth</span> <span class="o">=</span> <span class="n">get_float</span><span class="p">(</span><span class="n">cov_config</span><span class="p">,</span> <span class="s2">"bandwidth"</span><span class="p">)</span>
+            <span class="n">kernel</span> <span class="o">=</span> <span class="n">get_string</span><span class="p">(</span><span class="n">cov_config</span><span class="p">,</span> <span class="s2">"kernel"</span><span class="p">)</span>
             <span class="n">cov_est_inst</span> <span class="o">=</span> <span class="n">KernelCovariance</span><span class="p">(</span>
                 <span class="n">moments</span><span class="p">,</span>
                 <span class="n">jacobian</span><span class="o">=</span><span class="n">jacobian</span><span class="p">,</span>
@@ -1201,7 +1201,7 @@
         <span class="n">alpha_vcv</span> <span class="o">=</span> <span class="n">full_vcv</span><span class="p">[</span><span class="n">s2</span><span class="p">:,</span> <span class="n">s2</span><span class="p">:]</span>
         <span class="n">stat</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">squeeze</span><span class="p">(</span><span class="n">alphas</span><span class="o">.</span><span class="n">T</span> <span class="o">@</span> <span class="n">np</span><span class="o">.</span><span class="n">linalg</span><span class="o">.</span><span class="n">pinv</span><span class="p">(</span><span class="n">alpha_vcv</span><span class="p">)</span> <span class="o">@</span> <span class="n">alphas</span><span class="p">))</span>
         <span class="n">jstat</span> <span class="o">=</span> <span class="n">WaldTestStatistic</span><span class="p">(</span>
-            <span class="n">stat</span><span class="p">,</span> <span class="s2">&quot;All alphas are 0&quot;</span><span class="p">,</span> <span class="n">nport</span> <span class="o">-</span> <span class="n">nf</span> <span class="o">-</span> <span class="n">nrf</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="s2">&quot;J-statistic&quot;</span>
+            <span class="n">stat</span><span class="p">,</span> <span class="s2">"All alphas are 0"</span><span class="p">,</span> <span class="n">nport</span> <span class="o">-</span> <span class="n">nf</span> <span class="o">-</span> <span class="n">nrf</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="s2">"J-statistic"</span>
         <span class="p">)</span>
 
         <span class="n">total_ss</span> <span class="o">=</span> <span class="p">((</span><span class="n">p</span> <span class="o">-</span> <span class="n">p</span><span class="o">.</span><span class="n">mean</span><span class="p">(</span><span class="mi">0</span><span class="p">)[</span><span class="kc">None</span><span class="p">,</span> <span class="p">:])</span> <span class="o">**</span> <span class="mi">2</span><span class="p">)</span><span class="o">.</span><span class="n">sum</span><span class="p">()</span>
@@ -1213,13 +1213,13 @@
         <span class="n">params</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">c_</span><span class="p">[</span><span class="n">alphas</span><span class="p">,</span> <span class="n">betas</span><span class="p">]</span>
         <span class="n">param_names</span> <span class="o">=</span> <span class="p">[]</span>
         <span class="k">for</span> <span class="n">portfolio</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">portfolios</span><span class="o">.</span><span class="n">cols</span><span class="p">:</span>
-            <span class="n">param_names</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;alpha-</span><span class="si">{</span><span class="n">portfolio</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+            <span class="n">param_names</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="sa">f</span><span class="s2">"alpha-</span><span class="si">{</span><span class="n">portfolio</span><span class="si">}</span><span class="s2">"</span><span class="p">)</span>
             <span class="n">param_names</span><span class="o">.</span><span class="n">extend</span><span class="p">(</span>
-                <span class="p">[</span><span class="sa">f</span><span class="s2">&quot;beta-</span><span class="si">{</span><span class="n">portfolio</span><span class="si">}</span><span class="s2">-</span><span class="si">{</span><span class="n">factor</span><span class="si">}</span><span class="s2">&quot;</span> <span class="k">for</span> <span class="n">factor</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">factors</span><span class="o">.</span><span class="n">cols</span><span class="p">]</span>
+                <span class="p">[</span><span class="sa">f</span><span class="s2">"beta-</span><span class="si">{</span><span class="n">portfolio</span><span class="si">}</span><span class="s2">-</span><span class="si">{</span><span class="n">factor</span><span class="si">}</span><span class="s2">"</span> <span class="k">for</span> <span class="n">factor</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">factors</span><span class="o">.</span><span class="n">cols</span><span class="p">]</span>
             <span class="p">)</span>
         <span class="k">if</span> <span class="ow">not</span> <span class="n">excess_returns</span><span class="p">:</span>
-            <span class="n">param_names</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s2">&quot;lambda-risk_free&quot;</span><span class="p">)</span>
-        <span class="n">param_names</span><span class="o">.</span><span class="n">extend</span><span class="p">([</span><span class="sa">f</span><span class="s2">&quot;lambda-</span><span class="si">{</span><span class="n">factor</span><span class="si">}</span><span class="s2">&quot;</span> <span class="k">for</span> <span class="n">factor</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">factors</span><span class="o">.</span><span class="n">cols</span><span class="p">])</span>
+            <span class="n">param_names</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s2">"lambda-risk_free"</span><span class="p">)</span>
+        <span class="n">param_names</span><span class="o">.</span><span class="n">extend</span><span class="p">([</span><span class="sa">f</span><span class="s2">"lambda-</span><span class="si">{</span><span class="n">factor</span><span class="si">}</span><span class="s2">"</span> <span class="k">for</span> <span class="n">factor</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">factors</span><span class="o">.</span><span class="n">cols</span><span class="p">])</span>
 
         <span class="c1"># Pivot vcv to remove unnecessary and have correct order</span>
         <span class="n">order</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="n">s1</span><span class="p">),</span> <span class="p">(</span><span class="n">nport</span><span class="p">,</span> <span class="n">nf</span> <span class="o">+</span> <span class="mi">1</span><span class="p">))</span>
@@ -1230,7 +1230,7 @@
         <span class="n">factor_names</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">factors</span><span class="o">.</span><span class="n">cols</span><span class="p">)</span>
         <span class="n">rp_names</span> <span class="o">=</span> <span class="n">factor_names</span><span class="p">[:]</span>
         <span class="k">if</span> <span class="ow">not</span> <span class="n">excess_returns</span><span class="p">:</span>
-            <span class="n">rp_names</span><span class="o">.</span><span class="n">insert</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="s2">&quot;risk_free&quot;</span><span class="p">)</span>
+            <span class="n">rp_names</span><span class="o">.</span><span class="n">insert</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="s2">"risk_free"</span><span class="p">)</span>
         <span class="n">res</span> <span class="o">=</span> <span class="n">AttrDict</span><span class="p">(</span>
             <span class="n">params</span><span class="o">=</span><span class="n">params</span><span class="p">,</span>
             <span class="n">cov</span><span class="o">=</span><span class="n">full_vcv</span><span class="p">,</span>
@@ -1317,7 +1317,7 @@
 <div class="viewcode-block" id="LinearFactorModelGMM">
 <a class="viewcode-back" href="../../../asset-pricing/asset-pricing/linearmodels.asset_pricing.model.LinearFactorModelGMM.html#linearmodels.asset_pricing.model.LinearFactorModelGMM">[docs]</a>
 <span class="k">class</span><span class="w"> </span><span class="nc">LinearFactorModelGMM</span><span class="p">(</span><span class="n">_LinearFactorModelBase</span><span class="p">):</span>
-<span class="w">    </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
+<span class="w">    </span><span class="sa">r</span><span class="sd">"""</span>
 <span class="sd">    GMM estimator of Linear factor models</span>
 
 <span class="sd">    Parameters</span>
@@ -1358,7 +1358,7 @@
 
 <span class="sd">    The model is tested using the optimized objective function using the</span>
 <span class="sd">    usual GMM J statistic.</span>
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="sd">    """</span>
 
     <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span> <span class="n">portfolios</span><span class="p">:</span> <span class="n">IVDataLike</span><span class="p">,</span> <span class="n">factors</span><span class="p">:</span> <span class="n">IVDataLike</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">risk_free</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span>
@@ -1376,7 +1376,7 @@
         <span class="n">portfolios</span><span class="p">:</span> <span class="n">DataFrame</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
         <span class="n">risk_free</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
     <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">LinearFactorModelGMM</span><span class="p">:</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">"""</span>
 <span class="sd">        Parameters</span>
 <span class="sd">        ----------</span>
 <span class="sd">        formula : str</span>
@@ -1408,15 +1408,15 @@
 <span class="sd">        &gt;&gt;&gt; from linearmodels.datasets import french</span>
 <span class="sd">        &gt;&gt;&gt; from linearmodels.asset_pricing import LinearFactorModel</span>
 <span class="sd">        &gt;&gt;&gt; data = french.load()</span>
-<span class="sd">        &gt;&gt;&gt; formula = &quot;S1M1 + S1M5 + S3M3 + S5M1 + S5M5 ~ MktRF + SMB + HML&quot;</span>
+<span class="sd">        &gt;&gt;&gt; formula = "S1M1 + S1M5 + S3M3 + S5M1 + S5M5 ~ MktRF + SMB + HML"</span>
 <span class="sd">        &gt;&gt;&gt; mod = LinearFactorModel.from_formula(formula, data)</span>
 
 <span class="sd">        Using only factors</span>
 
-<span class="sd">        &gt;&gt;&gt; portfolios = data[[&quot;S1M1&quot;, &quot;S1M5&quot;, &quot;S3M1&quot;, &quot;S3M5&quot;, &quot;S5M1&quot;, &quot;S5M5&quot;]]</span>
-<span class="sd">        &gt;&gt;&gt; formula = &quot;MktRF + SMB + HML&quot;</span>
+<span class="sd">        &gt;&gt;&gt; portfolios = data[["S1M1", "S1M5", "S3M1", "S3M5", "S5M1", "S5M5"]]</span>
+<span class="sd">        &gt;&gt;&gt; formula = "MktRF + SMB + HML"</span>
 <span class="sd">        &gt;&gt;&gt; mod = LinearFactorModel.from_formula(formula, data, portfolios=portfolios)</span>
-<span class="sd">        &quot;&quot;&quot;</span>
+<span class="sd">        """</span>
         <span class="n">factors</span><span class="p">,</span> <span class="n">portfolios</span><span class="p">,</span> <span class="n">formula</span> <span class="o">=</span> <span class="bp">cls</span><span class="o">.</span><span class="n">_prepare_data_from_formula</span><span class="p">(</span>
             <span class="n">formula</span><span class="p">,</span> <span class="n">data</span><span class="p">,</span> <span class="n">portfolios</span>
         <span class="p">)</span>
@@ -1435,13 +1435,13 @@
         <span class="n">steps</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">2</span><span class="p">,</span>
         <span class="n">disp</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">10</span><span class="p">,</span>
         <span class="n">max_iter</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">1000</span><span class="p">,</span>
-        <span class="n">cov_type</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;robust&quot;</span><span class="p">,</span>
+        <span class="n">cov_type</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">"robust"</span><span class="p">,</span>
         <span class="n">debiased</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span>
         <span class="n">starting</span><span class="p">:</span> <span class="n">linearmodels</span><span class="o">.</span><span class="n">typing</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">ArrayLike</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
         <span class="n">opt_options</span><span class="p">:</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
         <span class="o">**</span><span class="n">cov_config</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">|</span> <span class="nb">int</span> <span class="o">|</span> <span class="nb">str</span><span class="p">,</span>
     <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">GMMFactorModelResults</span><span class="p">:</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">"""</span>
 <span class="sd">        Estimate model parameters</span>
 
 <span class="sd">        Parameters</span>
@@ -1484,9 +1484,9 @@
 <span class="sd">        Notes</span>
 <span class="sd">        -----</span>
 <span class="sd">        The kernel covariance estimator takes the optional arguments</span>
-<span class="sd">        ``kernel``, one of &quot;bartlett&quot;, &quot;parzen&quot; or &quot;qs&quot; (quadratic spectral)</span>
+<span class="sd">        ``kernel``, one of "bartlett", "parzen" or "qs" (quadratic spectral)</span>
 <span class="sd">        and ``bandwidth`` (a positive integer).</span>
-<span class="sd">        &quot;&quot;&quot;</span>
+<span class="sd">        """</span>
 
         <span class="n">nobs</span><span class="p">,</span> <span class="n">n</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">portfolios</span><span class="o">.</span><span class="n">shape</span>
         <span class="n">k</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">factors</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span>
@@ -1506,21 +1506,21 @@
             <span class="k">if</span> <span class="n">starting</span><span class="o">.</span><span class="n">ndim</span> <span class="o">==</span> <span class="mi">1</span><span class="p">:</span>
                 <span class="n">starting</span> <span class="o">=</span> <span class="n">starting</span><span class="p">[:,</span> <span class="kc">None</span><span class="p">]</span>
             <span class="k">if</span> <span class="n">starting</span><span class="o">.</span><span class="n">shape</span> <span class="o">!=</span> <span class="n">sv</span><span class="o">.</span><span class="n">shape</span><span class="p">:</span>
-                <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Starting values must have </span><span class="si">{</span><span class="n">sv</span><span class="o">.</span><span class="n">shape</span><span class="si">}</span><span class="s2"> elements.&quot;</span><span class="p">)</span>
+                <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s2">"Starting values must have </span><span class="si">{</span><span class="n">sv</span><span class="o">.</span><span class="n">shape</span><span class="si">}</span><span class="s2"> elements."</span><span class="p">)</span>
             <span class="n">sv</span> <span class="o">=</span> <span class="n">starting</span>
 
         <span class="n">g</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_moments</span><span class="p">(</span><span class="n">sv</span><span class="p">,</span> <span class="n">excess_returns</span><span class="p">)</span>
         <span class="n">g</span> <span class="o">-=</span> <span class="n">g</span><span class="o">.</span><span class="n">mean</span><span class="p">(</span><span class="mi">0</span><span class="p">)[</span><span class="kc">None</span><span class="p">,</span> <span class="p">:]</span> <span class="k">if</span> <span class="n">center</span> <span class="k">else</span> <span class="mi">0</span>
         <span class="n">kernel</span><span class="p">:</span> <span class="nb">str</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span>
         <span class="n">bandwidth</span><span class="p">:</span> <span class="nb">float</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span>
-        <span class="k">if</span> <span class="n">cov_type</span> <span class="ow">not</span> <span class="ow">in</span> <span class="p">(</span><span class="s2">&quot;robust&quot;</span><span class="p">,</span> <span class="s2">&quot;heteroskedastic&quot;</span><span class="p">,</span> <span class="s2">&quot;kernel&quot;</span><span class="p">):</span>
-            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Unknown weight: </span><span class="si">{</span><span class="n">cov_type</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
-        <span class="k">if</span> <span class="n">cov_type</span> <span class="ow">in</span> <span class="p">(</span><span class="s2">&quot;robust&quot;</span><span class="p">,</span> <span class="s2">&quot;heteroskedastic&quot;</span><span class="p">):</span>
+        <span class="k">if</span> <span class="n">cov_type</span> <span class="ow">not</span> <span class="ow">in</span> <span class="p">(</span><span class="s2">"robust"</span><span class="p">,</span> <span class="s2">"heteroskedastic"</span><span class="p">,</span> <span class="s2">"kernel"</span><span class="p">):</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s2">"Unknown weight: </span><span class="si">{</span><span class="n">cov_type</span><span class="si">}</span><span class="s2">"</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">cov_type</span> <span class="ow">in</span> <span class="p">(</span><span class="s2">"robust"</span><span class="p">,</span> <span class="s2">"heteroskedastic"</span><span class="p">):</span>
             <span class="n">weight_est_instance</span> <span class="o">=</span> <span class="n">HeteroskedasticWeight</span><span class="p">(</span><span class="n">g</span><span class="p">,</span> <span class="n">center</span><span class="o">=</span><span class="n">center</span><span class="p">)</span>
             <span class="n">cov_est</span> <span class="o">=</span> <span class="n">HeteroskedasticCovariance</span>
-        <span class="k">else</span><span class="p">:</span>  <span class="c1"># &quot;kernel&quot;:</span>
-            <span class="n">kernel</span> <span class="o">=</span> <span class="n">get_string</span><span class="p">(</span><span class="n">cov_config</span><span class="p">,</span> <span class="s2">&quot;kernel&quot;</span><span class="p">)</span>
-            <span class="n">bandwidth</span> <span class="o">=</span> <span class="n">get_float</span><span class="p">(</span><span class="n">cov_config</span><span class="p">,</span> <span class="s2">&quot;bandwidth&quot;</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>  <span class="c1"># "kernel":</span>
+            <span class="n">kernel</span> <span class="o">=</span> <span class="n">get_string</span><span class="p">(</span><span class="n">cov_config</span><span class="p">,</span> <span class="s2">"kernel"</span><span class="p">)</span>
+            <span class="n">bandwidth</span> <span class="o">=</span> <span class="n">get_float</span><span class="p">(</span><span class="n">cov_config</span><span class="p">,</span> <span class="s2">"bandwidth"</span><span class="p">)</span>
             <span class="n">weight_est_instance</span> <span class="o">=</span> <span class="n">KernelWeight</span><span class="p">(</span>
                 <span class="n">g</span><span class="p">,</span> <span class="n">center</span><span class="o">=</span><span class="n">center</span><span class="p">,</span> <span class="n">kernel</span><span class="o">=</span><span class="n">kernel</span><span class="p">,</span> <span class="n">bandwidth</span><span class="o">=</span><span class="n">bandwidth</span>
             <span class="p">)</span>
@@ -1532,12 +1532,12 @@
 
         <span class="c1"># 2. Step 1 using w = inv(s) from SV</span>
         <span class="n">callback</span> <span class="o">=</span> <span class="n">callback_factory</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_j</span><span class="p">,</span> <span class="n">args</span><span class="p">,</span> <span class="n">disp</span><span class="o">=</span><span class="n">disp</span><span class="p">)</span>
-        <span class="n">_default_options</span><span class="p">:</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]</span> <span class="o">=</span> <span class="p">{</span><span class="s2">&quot;callback&quot;</span><span class="p">:</span> <span class="n">callback</span><span class="p">}</span>
-        <span class="n">options</span> <span class="o">=</span> <span class="p">{</span><span class="s2">&quot;maxiter&quot;</span><span class="p">:</span> <span class="n">max_iter</span><span class="p">}</span>
+        <span class="n">_default_options</span><span class="p">:</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]</span> <span class="o">=</span> <span class="p">{</span><span class="s2">"callback"</span><span class="p">:</span> <span class="n">callback</span><span class="p">}</span>
+        <span class="n">options</span> <span class="o">=</span> <span class="p">{</span><span class="s2">"maxiter"</span><span class="p">:</span> <span class="n">max_iter</span><span class="p">}</span>
         <span class="n">opt_options</span> <span class="o">=</span> <span class="p">{}</span> <span class="k">if</span> <span class="n">opt_options</span> <span class="ow">is</span> <span class="kc">None</span> <span class="k">else</span> <span class="n">opt_options</span>
-        <span class="n">options</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="n">opt_options</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;options&quot;</span><span class="p">,</span> <span class="p">{}))</span>
+        <span class="n">options</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="n">opt_options</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"options"</span><span class="p">,</span> <span class="p">{}))</span>
         <span class="n">_default_options</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="n">opt_options</span><span class="p">)</span>
-        <span class="n">_default_options</span><span class="p">[</span><span class="s2">&quot;options&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">options</span>
+        <span class="n">_default_options</span><span class="p">[</span><span class="s2">"options"</span><span class="p">]</span> <span class="o">=</span> <span class="n">options</span>
         <span class="n">opt_res</span> <span class="o">=</span> <span class="n">minimize</span><span class="p">(</span>
             <span class="n">fun</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">_j</span><span class="p">,</span>
             <span class="n">x0</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">squeeze</span><span class="p">(</span><span class="n">sv</span><span class="p">),</span>
@@ -1562,7 +1562,7 @@
                     <span class="n">params</span><span class="p">,</span>
                     <span class="n">args</span><span class="o">=</span><span class="n">args</span><span class="p">,</span>
                     <span class="n">callback</span><span class="o">=</span><span class="n">callback</span><span class="p">,</span>
-                    <span class="n">options</span><span class="o">=</span><span class="p">{</span><span class="s2">&quot;maxiter&quot;</span><span class="p">:</span> <span class="n">max_iter</span><span class="p">},</span>
+                    <span class="n">options</span><span class="o">=</span><span class="p">{</span><span class="s2">"maxiter"</span><span class="p">:</span> <span class="n">max_iter</span><span class="p">},</span>
                 <span class="p">)</span>
                 <span class="n">params</span> <span class="o">=</span> <span class="n">opt_res</span><span class="o">.</span><span class="n">x</span>
                 <span class="n">obj</span> <span class="o">=</span> <span class="n">opt_res</span><span class="o">.</span><span class="n">fun</span>
@@ -1578,7 +1578,7 @@
                 <span class="n">params</span><span class="p">,</span>
                 <span class="n">args</span><span class="o">=</span><span class="n">cue_args</span><span class="p">,</span>
                 <span class="n">callback</span><span class="o">=</span><span class="n">callback</span><span class="p">,</span>
-                <span class="n">options</span><span class="o">=</span><span class="p">{</span><span class="s2">&quot;maxiter&quot;</span><span class="p">:</span> <span class="n">max_iter</span><span class="p">},</span>
+                <span class="n">options</span><span class="o">=</span><span class="p">{</span><span class="s2">"maxiter"</span><span class="p">:</span> <span class="n">max_iter</span><span class="p">},</span>
             <span class="p">)</span>
             <span class="n">params</span> <span class="o">=</span> <span class="n">opt_res</span><span class="o">.</span><span class="n">x</span>
 
@@ -1614,7 +1614,7 @@
         <span class="n">alpha_vcv</span> <span class="o">=</span> <span class="n">s</span><span class="p">[</span><span class="n">sel</span><span class="p">,</span> <span class="n">sel</span><span class="p">]</span> <span class="o">/</span> <span class="n">nobs</span>
         <span class="n">stat</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_j</span><span class="p">(</span><span class="n">params</span><span class="p">,</span> <span class="n">excess_returns</span><span class="p">,</span> <span class="n">w</span><span class="p">)</span>
         <span class="n">jstat</span> <span class="o">=</span> <span class="n">WaldTestStatistic</span><span class="p">(</span>
-            <span class="n">stat</span><span class="p">,</span> <span class="s2">&quot;All alphas are 0&quot;</span><span class="p">,</span> <span class="n">n</span> <span class="o">-</span> <span class="n">k</span> <span class="o">-</span> <span class="n">nrf</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="s2">&quot;J-statistic&quot;</span>
+            <span class="n">stat</span><span class="p">,</span> <span class="s2">"All alphas are 0"</span><span class="p">,</span> <span class="n">n</span> <span class="o">-</span> <span class="n">k</span> <span class="o">-</span> <span class="n">nrf</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="s2">"J-statistic"</span>
         <span class="p">)</span>
 
         <span class="c1"># R2 calculation</span>
@@ -1629,15 +1629,15 @@
         <span class="n">param_names</span> <span class="o">=</span> <span class="p">[]</span>
         <span class="k">for</span> <span class="n">portfolio</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">portfolios</span><span class="o">.</span><span class="n">cols</span><span class="p">:</span>
             <span class="n">param_names</span><span class="o">.</span><span class="n">extend</span><span class="p">(</span>
-                <span class="p">[</span><span class="sa">f</span><span class="s2">&quot;beta-</span><span class="si">{</span><span class="n">portfolio</span><span class="si">}</span><span class="s2">-</span><span class="si">{</span><span class="n">factor</span><span class="si">}</span><span class="s2">&quot;</span> <span class="k">for</span> <span class="n">factor</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">factors</span><span class="o">.</span><span class="n">cols</span><span class="p">]</span>
+                <span class="p">[</span><span class="sa">f</span><span class="s2">"beta-</span><span class="si">{</span><span class="n">portfolio</span><span class="si">}</span><span class="s2">-</span><span class="si">{</span><span class="n">factor</span><span class="si">}</span><span class="s2">"</span> <span class="k">for</span> <span class="n">factor</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">factors</span><span class="o">.</span><span class="n">cols</span><span class="p">]</span>
             <span class="p">)</span>
         <span class="k">if</span> <span class="ow">not</span> <span class="n">excess_returns</span><span class="p">:</span>
-            <span class="n">param_names</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s2">&quot;lambda-risk_free&quot;</span><span class="p">)</span>
-        <span class="n">param_names</span><span class="o">.</span><span class="n">extend</span><span class="p">([</span><span class="sa">f</span><span class="s2">&quot;lambda-</span><span class="si">{</span><span class="n">f</span><span class="si">}</span><span class="s2">&quot;</span> <span class="k">for</span> <span class="n">f</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">factors</span><span class="o">.</span><span class="n">cols</span><span class="p">])</span>
-        <span class="n">param_names</span><span class="o">.</span><span class="n">extend</span><span class="p">([</span><span class="sa">f</span><span class="s2">&quot;mu-</span><span class="si">{</span><span class="n">f</span><span class="si">}</span><span class="s2">&quot;</span> <span class="k">for</span> <span class="n">f</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">factors</span><span class="o">.</span><span class="n">cols</span><span class="p">])</span>
+            <span class="n">param_names</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s2">"lambda-risk_free"</span><span class="p">)</span>
+        <span class="n">param_names</span><span class="o">.</span><span class="n">extend</span><span class="p">([</span><span class="sa">f</span><span class="s2">"lambda-</span><span class="si">{</span><span class="n">f</span><span class="si">}</span><span class="s2">"</span> <span class="k">for</span> <span class="n">f</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">factors</span><span class="o">.</span><span class="n">cols</span><span class="p">])</span>
+        <span class="n">param_names</span><span class="o">.</span><span class="n">extend</span><span class="p">([</span><span class="sa">f</span><span class="s2">"mu-</span><span class="si">{</span><span class="n">f</span><span class="si">}</span><span class="s2">"</span> <span class="k">for</span> <span class="n">f</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">factors</span><span class="o">.</span><span class="n">cols</span><span class="p">])</span>
         <span class="n">rp_names</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">factors</span><span class="o">.</span><span class="n">cols</span><span class="p">)[:]</span>
         <span class="k">if</span> <span class="ow">not</span> <span class="n">excess_returns</span><span class="p">:</span>
-            <span class="n">rp_names</span><span class="o">.</span><span class="n">insert</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="s2">&quot;risk_free&quot;</span><span class="p">)</span>
+            <span class="n">rp_names</span><span class="o">.</span><span class="n">insert</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="s2">"risk_free"</span><span class="p">)</span>
         <span class="n">params</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">c_</span><span class="p">[</span><span class="n">alphas</span><span class="p">,</span> <span class="n">betas</span><span class="p">]</span>
         <span class="c1"># 5. Return values</span>
         <span class="n">res_dict</span> <span class="o">=</span> <span class="n">AttrDict</span><span class="p">(</span>
@@ -1670,7 +1670,7 @@
     <span class="k">def</span><span class="w"> </span><span class="nf">_moments</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span> <span class="n">parameters</span><span class="p">:</span> <span class="n">linearmodels</span><span class="o">.</span><span class="n">typing</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">Float64Array</span><span class="p">,</span> <span class="n">excess_returns</span><span class="p">:</span> <span class="nb">bool</span>
     <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">linearmodels</span><span class="o">.</span><span class="n">typing</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">Float64Array</span><span class="p">:</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;Calculate nobs by nmoments moment conditions&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">"""Calculate nobs by nmoments moment conditions"""</span>
         <span class="n">nrf</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="ow">not</span> <span class="n">excess_returns</span><span class="p">)</span>
         <span class="n">p</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">asarray</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">portfolios</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="nb">float</span><span class="p">)</span>
         <span class="n">nobs</span><span class="p">,</span> <span class="n">n</span> <span class="o">=</span> <span class="n">p</span><span class="o">.</span><span class="n">shape</span>
@@ -1696,7 +1696,7 @@
         <span class="n">excess_returns</span><span class="p">:</span> <span class="nb">bool</span><span class="p">,</span>
         <span class="n">w</span><span class="p">:</span> <span class="n">linearmodels</span><span class="o">.</span><span class="n">typing</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">Float64Array</span><span class="p">,</span>
     <span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">float</span><span class="p">:</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;Objective function&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">"""Objective function"""</span>
         <span class="n">g</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_moments</span><span class="p">(</span><span class="n">parameters</span><span class="p">,</span> <span class="n">excess_returns</span><span class="p">)</span>
         <span class="n">nobs</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">portfolios</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
         <span class="n">gbar</span> <span class="o">=</span> <span class="n">g</span><span class="o">.</span><span class="n">mean</span><span class="p">(</span><span class="mi">0</span><span class="p">)[:,</span> <span class="kc">None</span><span class="p">]</span>
@@ -1708,7 +1708,7 @@
         <span class="n">excess_returns</span><span class="p">:</span> <span class="nb">bool</span><span class="p">,</span>
         <span class="n">weight_est</span><span class="p">:</span> <span class="n">HeteroskedasticWeight</span> <span class="o">|</span> <span class="n">KernelWeight</span><span class="p">,</span>
     <span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">float</span><span class="p">:</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;CUE Objective function&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">"""CUE Objective function"""</span>
         <span class="n">g</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_moments</span><span class="p">(</span><span class="n">parameters</span><span class="p">,</span> <span class="n">excess_returns</span><span class="p">)</span>
         <span class="n">gbar</span> <span class="o">=</span> <span class="n">g</span><span class="o">.</span><span class="n">mean</span><span class="p">(</span><span class="mi">0</span><span class="p">)[:,</span> <span class="kc">None</span><span class="p">]</span>
         <span class="n">nobs</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">portfolios</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
@@ -1718,7 +1718,7 @@
     <span class="k">def</span><span class="w"> </span><span class="nf">_jacobian</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span> <span class="n">params</span><span class="p">:</span> <span class="n">linearmodels</span><span class="o">.</span><span class="n">typing</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">Float64Array</span><span class="p">,</span> <span class="n">excess_returns</span><span class="p">:</span> <span class="nb">bool</span>
     <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">linearmodels</span><span class="o">.</span><span class="n">typing</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">Float64Array</span><span class="p">:</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;Jacobian matrix for inference&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">"""Jacobian matrix for inference"""</span>
         <span class="n">nobs</span><span class="p">,</span> <span class="n">k</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">factors</span><span class="o">.</span><span class="n">shape</span>
         <span class="n">n</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">portfolios</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span>
         <span class="n">nrf</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="nb">bool</span><span class="p">(</span><span class="ow">not</span> <span class="n">excess_returns</span><span class="p">))</span>

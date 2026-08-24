@@ -23,7 +23,7 @@
     
   
       
-        <title>System Regression Models - linearmodels v7.1 (+64)</title>
+        <title>System Regression Models - linearmodels v7.1 (+66)</title>
       
     
 
@@ -95,7 +95,7 @@
 
 <header class="md-header md-header--shadow" data-md-component="header">
   <nav class="md-header__inner md-grid" aria-label="Header">
-    <a href="../index.html" title="linearmodels v7.1 (+64)" class="md-header__button md-logo" aria-label="linearmodels v7.1 (+64)" data-md-component="logo">
+    <a href="../index.html" title="linearmodels v7.1 (+66)" class="md-header__button md-logo" aria-label="linearmodels v7.1 (+66)" data-md-component="logo">
       <img src="../_static/bw-logo.svg" alt="logo">
     </a>
     <label class="md-header__button md-icon" for="__drawer">
@@ -106,7 +106,7 @@
       <div class="md-header__ellipsis">
         <div class="md-header__topic">
           <span class="md-ellipsis">
-            linearmodels v7.1 (+64)
+            linearmodels v7.1 (+66)
           </span>
         </div>
         <div class="md-header__topic" data-md-component="header-topic">
@@ -201,10 +201,10 @@
 
 <nav class="md-nav md-nav--primary" aria-label="Navigation" data-md-level="0">
   <label class="md-nav__title" for="__drawer">
-    <a href="../index.html" title="linearmodels v7.1 (+64)" class="md-nav__button md-logo" aria-label="linearmodels v7.1 (+64)" data-md-component="logo">
+    <a href="../index.html" title="linearmodels v7.1 (+66)" class="md-nav__button md-logo" aria-label="linearmodels v7.1 (+66)" data-md-component="logo">
       <img src="../_static/bw-logo.svg" alt="logo">
     </a>
-    linearmodels v7.1 (+64)
+    linearmodels v7.1 (+66)
   </label>
   
     <div class="md-nav__source">
@@ -988,12 +988,12 @@ with a dependent and exogenous (stored as a <a class="reference external" href="
 <span class="kn">from</span><span class="w"> </span><span class="nn">linearmodels.system</span><span class="w"> </span><span class="kn">import</span> <span class="n">SUR</span>
 <span class="n">data</span> <span class="o">=</span> <span class="n">sm</span><span class="o">.</span><span class="n">add_constant</span><span class="p">(</span><span class="n">fringe</span><span class="o">.</span><span class="n">load</span><span class="p">())</span>
 <span class="n">equations</span> <span class="o">=</span> <span class="n">OrderedDict</span><span class="p">()</span>
-<span class="n">equations</span><span class="p">[</span><span class="s1">&#39;earnings&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;dependent&#39;</span><span class="p">:</span> <span class="n">data</span><span class="o">.</span><span class="n">hrearn</span><span class="p">,</span>
-                         <span class="s1">&#39;exog&#39;</span><span class="p">:</span> <span class="n">data</span><span class="p">[[</span><span class="s1">&#39;const&#39;</span><span class="p">,</span> <span class="s1">&#39;exper&#39;</span><span class="p">,</span> <span class="s1">&#39;tenure&#39;</span><span class="p">]]}</span>
-<span class="n">equations</span><span class="p">[</span><span class="s1">&#39;benefits&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;dependent&#39;</span><span class="p">:</span> <span class="n">data</span><span class="o">.</span><span class="n">hrbens</span><span class="p">,</span>
-                         <span class="s1">&#39;exog&#39;</span><span class="p">:</span> <span class="n">data</span><span class="p">[[</span><span class="s1">&#39;const&#39;</span><span class="p">,</span> <span class="s1">&#39;exper&#39;</span><span class="p">,</span> <span class="s1">&#39;tenure&#39;</span><span class="p">]]}</span>
+<span class="n">equations</span><span class="p">[</span><span class="s1">'earnings'</span><span class="p">]</span> <span class="o">=</span> <span class="p">{</span><span class="s1">'dependent'</span><span class="p">:</span> <span class="n">data</span><span class="o">.</span><span class="n">hrearn</span><span class="p">,</span>
+                         <span class="s1">'exog'</span><span class="p">:</span> <span class="n">data</span><span class="p">[[</span><span class="s1">'const'</span><span class="p">,</span> <span class="s1">'exper'</span><span class="p">,</span> <span class="s1">'tenure'</span><span class="p">]]}</span>
+<span class="n">equations</span><span class="p">[</span><span class="s1">'benefits'</span><span class="p">]</span> <span class="o">=</span> <span class="p">{</span><span class="s1">'dependent'</span><span class="p">:</span> <span class="n">data</span><span class="o">.</span><span class="n">hrbens</span><span class="p">,</span>
+                         <span class="s1">'exog'</span><span class="p">:</span> <span class="n">data</span><span class="p">[[</span><span class="s1">'const'</span><span class="p">,</span> <span class="s1">'exper'</span><span class="p">,</span> <span class="s1">'tenure'</span><span class="p">]]}</span>
 <span class="n">mod</span> <span class="o">=</span> <span class="n">SUR</span><span class="p">(</span><span class="n">equations</span><span class="p">)</span>
-<span class="n">mod</span><span class="o">.</span><span class="n">fit</span><span class="p">(</span><span class="n">cov_type</span><span class="o">=</span><span class="s1">&#39;unadjusted&#39;</span><span class="p">)</span>
+<span class="n">mod</span><span class="o">.</span><span class="n">fit</span><span class="p">(</span><span class="n">cov_type</span><span class="o">=</span><span class="s1">'unadjusted'</span><span class="p">)</span>
 </code></pre></div>
 </div>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><code>                        <span class="n">System</span> <span class="n">GLS</span> <span class="n">Estimation</span> <span class="n">Summary</span>

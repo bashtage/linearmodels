@@ -23,7 +23,7 @@
     
   
       
-        <title>Using formulas to specify models - linearmodels v7.1 (+64)</title>
+        <title>Using formulas to specify models - linearmodels v7.1 (+66)</title>
       
     
 
@@ -101,7 +101,7 @@
 
 <header class="md-header md-header--shadow" data-md-component="header">
   <nav class="md-header__inner md-grid" aria-label="Header">
-    <a href="../../index.html" title="linearmodels v7.1 (+64)" class="md-header__button md-logo" aria-label="linearmodels v7.1 (+64)" data-md-component="logo">
+    <a href="../../index.html" title="linearmodels v7.1 (+66)" class="md-header__button md-logo" aria-label="linearmodels v7.1 (+66)" data-md-component="logo">
       <img src="../../_static/bw-logo.svg" alt="logo">
     </a>
     <label class="md-header__button md-icon" for="__drawer">
@@ -112,7 +112,7 @@
       <div class="md-header__ellipsis">
         <div class="md-header__topic">
           <span class="md-ellipsis">
-            linearmodels v7.1 (+64)
+            linearmodels v7.1 (+66)
           </span>
         </div>
         <div class="md-header__topic" data-md-component="header-topic">
@@ -207,10 +207,10 @@
 
 <nav class="md-nav md-nav--primary" aria-label="Navigation" data-md-level="0">
   <label class="md-nav__title" for="__drawer">
-    <a href="../../index.html" title="linearmodels v7.1 (+64)" class="md-nav__button md-logo" aria-label="linearmodels v7.1 (+64)" data-md-component="logo">
+    <a href="../../index.html" title="linearmodels v7.1 (+66)" class="md-nav__button md-logo" aria-label="linearmodels v7.1 (+66)" data-md-component="logo">
       <img src="../../_static/bw-logo.svg" alt="logo">
     </a>
-    linearmodels v7.1 (+64)
+    linearmodels v7.1 (+66)
   </label>
   
     <div class="md-nav__source">
@@ -1024,7 +1024,7 @@ vgh               vg or good health
 </code></pre></div>
 </div>
 <div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><code><span class="n">formula</span> <span class="o">=</span> <span class="p">(</span>
-    <span class="s2">&quot;ldrugexp ~ 1 + totchr + female + age + linc + blhisp + [hi_empunion ~ ssiratio]&quot;</span>
+    <span class="s2">"ldrugexp ~ 1 + totchr + female + age + linc + blhisp + [hi_empunion ~ ssiratio]"</span>
 <span class="p">)</span>
 <span class="n">mod</span> <span class="o">=</span> <span class="n">IV2SLS</span><span class="o">.</span><span class="n">from_formula</span><span class="p">(</span><span class="n">formula</span><span class="p">,</span> <span class="n">data</span><span class="p">)</span>
 </code></pre></div>
@@ -1034,7 +1034,7 @@ vgh               vg or good health
 <div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span><code>[3]:
 </code></pre></div>
 </div>
-<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><code><span class="n">iv_res</span> <span class="o">=</span> <span class="n">mod</span><span class="o">.</span><span class="n">fit</span><span class="p">(</span><span class="n">cov_type</span><span class="o">=</span><span class="s2">&quot;robust&quot;</span><span class="p">)</span>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><code><span class="n">iv_res</span> <span class="o">=</span> <span class="n">mod</span><span class="o">.</span><span class="n">fit</span><span class="p">(</span><span class="n">cov_type</span><span class="o">=</span><span class="s2">"robust"</span><span class="p">)</span>
 <span class="nb">print</span><span class="p">(</span><span class="n">iv_res</span><span class="p">)</span>
 </code></pre></div>
 </div>
@@ -1049,8 +1049,8 @@ vgh               vg or good health
 Dep. Variable:               ldrugexp   R-squared:                      0.0640
 Estimator:                    IV-2SLS   Adj. R-squared:                 0.0634
 No. Observations:               10089   F-statistic:                    2000.9
-Date:                Thu, Aug 13 2026   P-value (F-stat)                0.0000
-Time:                        12:12:28   Distribution:                  chi2(6)
+Date:                Mon, Aug 24 2026   P-value (F-stat)                0.0000
+Time:                        14:28:58   Distribution:                  chi2(6)
 Cov. Estimator:                robust
 
                               Parameter Estimates
@@ -1079,10 +1079,10 @@ Debiased: False
 </code></pre></div>
 </div>
 <div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><code><span class="n">formula</span> <span class="o">=</span> <span class="p">(</span>
-    <span class="s2">&quot;np.log(drugexp) ~ 1 + totchr + age + linc + blhisp + [hi_empunion ~ ssiratio]&quot;</span>
+    <span class="s2">"np.log(drugexp) ~ 1 + totchr + age + linc + blhisp + [hi_empunion ~ ssiratio]"</span>
 <span class="p">)</span>
 <span class="n">mod</span> <span class="o">=</span> <span class="n">IV2SLS</span><span class="o">.</span><span class="n">from_formula</span><span class="p">(</span><span class="n">formula</span><span class="p">,</span> <span class="n">data</span><span class="p">)</span>
-<span class="n">iv_res2</span> <span class="o">=</span> <span class="n">mod</span><span class="o">.</span><span class="n">fit</span><span class="p">(</span><span class="n">cov_type</span><span class="o">=</span><span class="s2">&quot;robust&quot;</span><span class="p">)</span>
+<span class="n">iv_res2</span> <span class="o">=</span> <span class="n">mod</span><span class="o">.</span><span class="n">fit</span><span class="p">(</span><span class="n">cov_type</span><span class="o">=</span><span class="s2">"robust"</span><span class="p">)</span>
 </code></pre></div>
 </div>
 </div>
@@ -1092,9 +1092,9 @@ Debiased: False
 <div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span><code>[5]:
 </code></pre></div>
 </div>
-<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><code><span class="n">formula</span> <span class="o">=</span> <span class="s2">&quot;ldrugexp ~ 1 + totchr + female + age + linc + blhisp + hi_empunion&quot;</span>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><code><span class="n">formula</span> <span class="o">=</span> <span class="s2">"ldrugexp ~ 1 + totchr + female + age + linc + blhisp + hi_empunion"</span>
 <span class="n">ols</span> <span class="o">=</span> <span class="n">IV2SLS</span><span class="o">.</span><span class="n">from_formula</span><span class="p">(</span><span class="n">formula</span><span class="p">,</span> <span class="n">data</span><span class="p">)</span>
-<span class="n">ols_res</span> <span class="o">=</span> <span class="n">ols</span><span class="o">.</span><span class="n">fit</span><span class="p">(</span><span class="n">cov_type</span><span class="o">=</span><span class="s2">&quot;robust&quot;</span><span class="p">)</span>
+<span class="n">ols_res</span> <span class="o">=</span> <span class="n">ols</span><span class="o">.</span><span class="n">fit</span><span class="p">(</span><span class="n">cov_type</span><span class="o">=</span><span class="s2">"robust"</span><span class="p">)</span>
 <span class="nb">print</span><span class="p">(</span><span class="n">ols_res</span><span class="p">)</span>
 </code></pre></div>
 </div>
@@ -1109,8 +1109,8 @@ Debiased: False
 Dep. Variable:               ldrugexp   R-squared:                      0.1770
 Estimator:                        OLS   Adj. R-squared:                 0.1765
 No. Observations:               10089   F-statistic:                    2262.6
-Date:                Thu, Aug 13 2026   P-value (F-stat)                0.0000
-Time:                        12:12:28   Distribution:                  chi2(6)
+Date:                Mon, Aug 24 2026   P-value (F-stat)                0.0000
+Time:                        14:28:58   Distribution:                  chi2(6)
 Cov. Estimator:                robust
 
                               Parameter Estimates
@@ -1135,7 +1135,7 @@ hi_empunion     0.0739     0.0260     2.8441     0.0045      0.0230      0.1248
 </div>
 <div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><code><span class="kn">from</span><span class="w"> </span><span class="nn">linearmodels.iv</span><span class="w"> </span><span class="kn">import</span> <span class="n">compare</span>
 
-<span class="nb">print</span><span class="p">(</span><span class="n">compare</span><span class="p">({</span><span class="s2">&quot;IV&quot;</span><span class="p">:</span> <span class="n">iv_res</span><span class="p">,</span> <span class="s2">&quot;OLS&quot;</span><span class="p">:</span> <span class="n">ols_res</span><span class="p">,</span> <span class="s2">&quot;IV-formula&quot;</span><span class="p">:</span> <span class="n">iv_res2</span><span class="p">}))</span>
+<span class="nb">print</span><span class="p">(</span><span class="n">compare</span><span class="p">({</span><span class="s2">"IV"</span><span class="p">:</span> <span class="n">iv_res</span><span class="p">,</span> <span class="s2">"OLS"</span><span class="p">:</span> <span class="n">ols_res</span><span class="p">,</span> <span class="s2">"IV-formula"</span><span class="p">:</span> <span class="n">iv_res2</span><span class="p">}))</span>
 </code></pre></div>
 </div>
 </div>
