@@ -584,7 +584,7 @@ class OLSResults(_LSModelResultsBase):
         return out_df
 
     @property
-    def kappa(self) -> float:
+    def kappa(self) -> float | None:
         """k-class estimator value"""
         return self._kappa
 

@@ -358,7 +358,7 @@ class PanelData:
         return list(index.levels[0][index.codes[0]].unique())
 
     @property
-    def entity_ids(self) -> linearmodels.typing.data.IntArray:
+    def entity_ids(self) -> linearmodels.typing.data.AnyIntArray:
         """
         Get array containing entity group membership information
 
@@ -371,7 +371,7 @@ class PanelData:
         return np.asarray(index.codes[0])[:, None]
 
     @property
-    def time_ids(self) -> linearmodels.typing.data.IntArray:
+    def time_ids(self) -> linearmodels.typing.data.AnyIntArray:
         """
         Get array containing time membership information
 

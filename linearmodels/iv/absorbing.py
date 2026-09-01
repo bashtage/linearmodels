@@ -77,7 +77,7 @@ class Hasher:
             self._hasher = hashlib.sha256()
             self._use_xxh64 = False
 
-    def reset(self):
+    def reset(self) -> None:
         if self._use_xxh64:
             assert isinstance(self._hasher, xxh64)
             self._hasher.reset()
