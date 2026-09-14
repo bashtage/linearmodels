@@ -108,7 +108,7 @@ def lsmr_annihilate(
     use_cache: bool = True,
     x_hash: Hashable | None = None,
     **lsmr_options: (
-        bool | float | str | linearmodels.typing.data.ArrayLike | None | dict[str, Any]
+        bool | float | str | linearmodels.typing.data.ArrayLike | dict[str, Any] | None
     ),
 ) -> linearmodels.typing.data.Float64Array:
     r"""
@@ -149,7 +149,7 @@ def lsmr_annihilate(
     regressor_hash = x_hash if x_hash is not None else ""
     default_opts: dict[
         str,
-        bool | float | str | linearmodels.typing.data.ArrayLike | None | dict[str, Any],
+        bool | float | str | linearmodels.typing.data.ArrayLike | dict[str, Any] | None,
     ] = {"atol": 1e-8, "btol": 1e-8, "show": False}
     assert lsmr_options is not None
     default_opts.update(lsmr_options)
@@ -865,16 +865,17 @@ class AbsorbingLS:
     def _first_time_fit(
         self,
         use_cache: bool,
-        absorb_options: None | (
+        absorb_options: (
             dict[
                 str,
                 bool
                 | float
                 | str
                 | linearmodels.typing.data.ArrayLike
-                | None
-                | dict[str, Any],
+                | dict[str, Any]
+                | None,
             ]
+            | None
         ),
         method: str,
     ) -> None:
@@ -988,16 +989,17 @@ class AbsorbingLS:
         cov_type: str = "robust",
         debiased: bool = False,
         method: str = "auto",
-        absorb_options: None | (
+        absorb_options: (
             dict[
                 str,
                 bool
                 | float
                 | str
                 | linearmodels.typing.data.ArrayLike
-                | None
-                | dict[str, Any],
+                | dict[str, Any]
+                | None,
             ]
+            | None
         ) = None,
         use_cache: bool = True,
         lsmr_options: dict[str, float | bool] | None = None,

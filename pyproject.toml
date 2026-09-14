@@ -256,6 +256,8 @@ ignore = [
   "PLR0915", # 21
   # Magic number
   "PLR2004",
+  # Too many positional arguments
+  "PLR0917",
   # Like to suggest use [a, *b] instead of [a] + b
   "RUF005",
 ]

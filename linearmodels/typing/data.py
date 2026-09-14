@@ -1,4 +1,4 @@
-from typing import Any, Union, TypeAlias
+from typing import Any, Union
 
 import numpy as np
 import pandas as pd
