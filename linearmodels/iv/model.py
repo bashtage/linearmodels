@@ -1031,6 +1031,8 @@ class _IVGMMBase(_IVModelBase):
         params: linearmodels.typing.data.Float64Array,
         weight_mat: linearmodels.typing.data.Float64Array,
         iters: int,
+        cov_type: str = "robust",
+        cov_config: dict[str, Any] | None = None,
     ) -> dict[str, Any]:
         """GMM-specific post-estimation results"""
         instr = self._instr_columns
@@ -1040,9 +1042,92 @@ class _IVGMMBase(_IVModelBase):
             "weight_config": self._weight_type,
             "iterations": iters,
             "j_stat": self._j_statistic(params, weight_mat),
+            "robust_j_stat": self._hansen_lee_j_statistic(
+                params, cov_type, cov_config or {}
+            ),
         }
 
         return gmm_specific
+
+    def _hansen_lee_j_statistic(
+        self,
+        params: linearmodels.typing.data.Float64Array,
+        cov_type: str,
+        cov_config: dict[str, Any],
+    ) -> WaldTestStatistic:
+        r"""
+        Hansen-Lee (2021) misspecification-robust J-test of overidentifying
+        restrictions.
+
+        Unlike the standard J-test, which uses the uncentered moment covariance
+        as the weight matrix, this test uses the *centered* moment covariance
+
+        .. math::
+
+            \hat{S}_c = n^{-1}\sum_{i=1}^{n}
+                (g_i - \bar{g})(g_i - \bar{g})'
+
+        which consistently estimates :math:`\text{Var}(g_i)` even when the
+        model is misspecified (i.e. :math:`E[g_i] \neq 0`).  The statistic is
+
+        .. math::
+
+            J^* = n\,\bar{g}'\hat{S}_c^{-1}\bar{g} \sim \chi^2_q
+
+        where :math:`q = n_{\text{instr}} - n_{\text{var}}`.
+
+        Parameters
+        ----------
+        params : ndarray
+            Estimated model parameters.
+        cov_type : str
+            Covariance type used for the main estimation.  The same type is
+            used to compute :math:`\hat{S}_c` (heteroskedastic, clustered,
+            kernel, or homoskedastic).
+        cov_config : dict
+            Configuration for the covariance estimator (e.g. ``clusters``,
+            ``bandwidth``, ``kernel``).
+
+        Returns
+        -------
+        WaldTestStatistic
+
+        References
+        ----------
+        Hansen, B. E. & Lee, S. (2021). Inference for iterated GMM under
+        misspecification. *Econometrica*, 89(3), 1419–1447.
+        """
+        y, x, z = self._wy, self._wx, self._wz
+        nobs, nvar, ninstr = y.shape[0], x.shape[1], z.shape[1]
+        eps = y - x @ params
+        g_bar = (z * eps).mean(0)
+
+        debiased = bool(cov_config.get("debiased", False))
+        if cov_type in ("robust", "heteroskedastic"):
+            score_cov: HomoskedasticWeightMatrix = HeteroskedasticWeightMatrix(
+                center=True, debiased=debiased
+            )
+        elif cov_type in ("unadjusted", "homoskedastic"):
+            score_cov = HomoskedasticWeightMatrix(center=True, debiased=debiased)
+        elif cov_type == "clustered":
+            score_cov = OneWayClusteredWeightMatrix(
+                clusters=cov_config["clusters"], center=True, debiased=debiased
+            )
+        elif cov_type == "kernel":
+            score_cov = KernelWeightMatrix(
+                kernel=str(cov_config.get("kernel", "bartlett")),
+                bandwidth=cov_config.get("bandwidth", None),
+                center=True,
+                debiased=debiased,
+            )
+        else:
+            score_cov = HeteroskedasticWeightMatrix(center=True, debiased=debiased)
+
+        s_c = score_cov.weight_matrix(x, z, eps)
+        stat = float(nobs * g_bar @ pinv(s_c) @ g_bar)
+        null = "Expected moment conditions are equal to 0"
+        name = "Hansen-Lee misspecification-robust J-test"
+        return WaldTestStatistic(stat, null, ninstr - nvar, name=name)
 
     def _j_statistic(
         self,
@@ -1310,7 +1395,7 @@ class IVGMM(_IVGMMBase):
         )
 
         results = self._post_estimation(params, cov_estimator, cov_type)
-        gmm_pe = self._gmm_post_estimation(params, wmat, iters)
+        gmm_pe = self._gmm_post_estimation(params, wmat, iters, cov_type, cov_config)
 
         results.update(gmm_pe)
 
@@ -1321,6 +1406,8 @@ class IVGMM(_IVGMMBase):
         params: linearmodels.typing.data.Float64Array,
         weight_mat: linearmodels.typing.data.Float64Array,
         iters: int,
+        cov_type: str = "robust",
+        cov_config: dict[str, Any] | None = None,
     ) -> dict[str, Any]:
         """GMM-specific post-estimation results"""
         instr = self._instr_columns
@@ -1330,6 +1417,9 @@ class IVGMM(_IVGMMBase):
             "weight_config": self._weight_type,
             "iterations": iters,
             "j_stat": self._j_statistic(params, weight_mat),
+            "robust_j_stat": self._hansen_lee_j_statistic(
+                params, cov_type, cov_config or {}
+            ),
         }
 
         return gmm_specific
@@ -1673,7 +1763,7 @@ class IVGMMCUE(_IVGMMBase):
             wx, wy, wz, params, wmat, cov_type, **cov_config
         )
         results = self._post_estimation(params, cov_estimator, cov_type)
-        gmm_pe = self._gmm_post_estimation(params, wmat, iters)
+        gmm_pe = self._gmm_post_estimation(params, wmat, iters, cov_type, cov_config)
         results.update(gmm_pe)
 
         return IVGMMResults(results, self)

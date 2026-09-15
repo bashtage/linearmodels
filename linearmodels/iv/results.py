@@ -1411,6 +1411,7 @@ class IVGMMResults(_CommonIVResults):
         self._weight_config = results["weight_config"]
         self._iterations = results["iterations"]
         self._j_stat = results["j_stat"]
+        self._robust_j_stat = results["robust_j_stat"]
 
     @property
     def weight_matrix(self) -> linearmodels.typing.data.Float64Array:
@@ -1459,6 +1460,72 @@ class IVGMMResults(_CommonIVResults):
         freedom is :math:`q = n_{instr} - n_{endog}`.
         """
         return self._j_stat
+
+    @property
+    def robust_j_stat(self) -> WaldTestStatistic:
+        r"""
+        Hansen-Lee (2021) misspecification-robust J-test of overidentifying
+        restrictions
+
+        Returns
+        -------
+        WaldTestStatistic
+            Robust J statistic test of overidentifying restrictions
+
+        Notes
+        -----
+        Unlike the standard J-statistic, which uses the uncentered moment
+        covariance as the weighting matrix, this test uses the *centered*
+        moment covariance
+
+        .. math ::
+
+          \hat{S}_c = n^{-1}\sum_{i=1}^{n}(g_i - \bar{g})(g_i - \bar{g})'
+
+        which is consistent even when the model is misspecified
+        (:math:`E[g_i] \neq 0`).  The statistic is
+
+        .. math ::
+
+          J^* = n\,\bar{g}'\hat{S}_c^{-1}\bar{g} \sim \chi^2_q
+
+        where :math:`q = n_{\text{instr}} - n_{\text{var}}` is the degree of
+        overidentification.
+
+        Under correct specification :math:`J^*` has the same :math:`\chi^2_q`
+        null distribution as the standard J-test.  Under misspecification
+        :math:`J^*` diverges at rate :math:`n`, making it a consistent test
+        for model misspecification.
+
+        References
+        ----------
+        Hansen, B. E. & Lee, S. (2021). Inference for iterated GMM under
+        misspecification. *Econometrica*, 89(3), 1419–1447.
+        """
+        return self._robust_j_stat
+
+    def _top_right(self) -> list[tuple[str, str]]:
+        j = self.j_stat
+        rj = self.robust_j_stat
+        return [
+            ("J-statistic:", _str(j.stat)),
+            ("P-value (J-stat):", pval_format(j.pval)),
+            ("Distribution (J-stat):", str(j.dist_name)),
+            ("HL J-statistic:", _str(rj.stat)),
+            ("P-value (HL J-stat):", pval_format(rj.pval)),
+            ("Distribution (HL J-stat):", str(rj.dist_name)),
+            ("Iterations:", str(self.iterations)),
+        ]
+
+    def _update_extra_text(self, extra_text: list[str]) -> list[str]:
+        instruments = self.model.instruments
+        if instruments.shape[1] > 0:
+            endog = self.model.endog
+            extra_text.append("Endogenous: " + ", ".join(endog.cols))
+            extra_text.append("Instruments: " + ", ".join(instruments.cols))
+            cov_descr = str(self._cov_estimator)
+            extra_text.extend(list(cov_descr.split("\n")))
+        return extra_text
 
     def c_stat(self, variables: list[str] | str | None = None) -> WaldTestStatistic:
         r"""
