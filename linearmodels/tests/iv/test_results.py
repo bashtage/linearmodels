@@ -34,7 +34,7 @@ def result_checker(res):
             _attr()
         else:
             assert isinstance(_attr, object)
-            str(_attr)
+            assert isinstance(str(_attr), str)
 
 
 def test_results(data, model):

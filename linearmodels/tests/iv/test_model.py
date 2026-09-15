@@ -394,10 +394,10 @@ def test_first_stage_summary(data):
 
 def test_gmm_str(data):
     mod = IVGMM(data.dep, data.exog, data.endog, data.instr)
-    str(mod.fit(cov_type="unadjusted"))
-    str(mod.fit(cov_type="robust"))
-    str(mod.fit(cov_type="clustered", clusters=data.clusters))
-    str(mod.fit(cov_type="kernel"))
+    assert isinstance(str(mod.fit(cov_type="unadjusted")), str)
+    assert isinstance(str(mod.fit(cov_type="robust")), str)
+    assert isinstance(str(mod.fit(cov_type="clustered", clusters=data.clusters)), str)
+    assert isinstance(str(mod.fit(cov_type="kernel")), str)
 
 
 def test_gmm_cue_optimization_options(small_data):

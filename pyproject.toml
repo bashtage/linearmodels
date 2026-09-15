@@ -126,13 +126,13 @@ dev = [
   "pytest-xdist",
   "pytest-cov",
   # formatting
-  "black[jupyter]~=25.9.0",
-  "isort~=6.0",
+  "black[jupyter]~=26.5.0",
+  "isort~=9.0",
   "colorama",
   "flake8",
   "flake8-bugbear",
   "mypy>=1.3",
-  "ruff>=0.8.6",
+  "ruff>=0.16.0",
   "pyupgrade>=3.4.0",
   "jupyterlab-code-formatter",
   "jupyterlab>=4.4.8",  # not directly required, pinned by Snyk to avoid a vulnerability
@@ -153,7 +153,7 @@ setup = ['--vsenv']
 version_file = "arch/_version.py"
 
 [tool.black]
-target-version = ['py310', 'py311', 'py312', 'py313']
+target-version = ['py310', 'py311', 'py312', 'py313', 'py314']
 exclude = '''
 (
   \.egg

@@ -1,10 +1,11 @@
-black[jupyter]~=25.9.0
+black[jupyter]~=26.5.0
 coverage
 flake8
 isort
+ruff
 colorama
 matplotlib
-pytest>=8.4.1,<9
+pytest>=9,<10
 pytest-xdist
 pytest-cov
 pytest-randomly
