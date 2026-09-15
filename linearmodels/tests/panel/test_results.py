@@ -2,8 +2,10 @@ from itertools import product
 
 import numpy as np
 from numpy.testing import assert_allclose
+import pandas as pd
 from pandas.testing import assert_series_equal
 import pytest
+from scipy import stats
 from statsmodels.tools.tools import add_constant
 
 from linearmodels.datasets import wage_panel
@@ -11,6 +13,10 @@ from linearmodels.iv.model import IV2SLS
 from linearmodels.panel.data import PanelData
 from linearmodels.panel.model import PanelOLS, PooledOLS, RandomEffects
 from linearmodels.panel.results import compare
+from linearmodels.shared.hypotheses import (
+    InapplicableTestStatistic,
+    NormalTestStatistic,
+)
 from linearmodels.tests.panel._utility import datatypes, generate_data
 
 
@@ -23,6 +29,20 @@ perc_missing = [0.0, 0.02, 0.20]
 has_const = [True, False]
 perms = list(product(perc_missing, datatypes, has_const))
 ids = ["-".join(str(param) for param in perm) for perm in perms]
+
+
+def direct_pesaran_cd(idiosyncratic):
+    wide = idiosyncratic.iloc[:, 0].unstack(level=0)
+    wide = wide.loc[:, wide.notnull().any(axis=0)]
+    corr = wide.corr(min_periods=2).to_numpy(dtype=float)
+    counts = wide.notnull().to_numpy(dtype=np.int64)
+    overlaps = counts.T @ counts
+    selector = np.tril(np.ones_like(overlaps, dtype=bool), k=-1)
+    selector &= overlaps >= 2
+    selector &= np.isfinite(corr)
+    npairs = int(selector.sum())
+    stat = np.sum(np.sqrt(overlaps[selector].astype(float)) * corr[selector])
+    return stat / np.sqrt(npairs)
 
 
 @pytest.fixture(params=perms, ids=ids)
@@ -89,6 +109,35 @@ def test_multiple_no_effects(data):
             continue
         getattr(comp, value)
     compare({"a": res, "model2": res3, "model3": res4})
+
+
+def test_pesaran_cd(data):
+    dependent = data.set_index(["nr", "year"]).lwage
+    exog = add_constant(data.set_index(["nr", "year"])[["expersq", "married", "union"]])
+    res = PanelOLS(dependent, exog, entity_effects=True).fit()
+    cd = res.pesaran_cd
+    assert isinstance(cd, NormalTestStatistic)
+    direct = direct_pesaran_cd(res.idiosyncratic)
+    assert_allclose(cd.stat, direct)
+    assert_allclose(cd.pval, 2 * (1 - stats.norm.cdf(abs(direct))))
+
+
+def test_pesaran_cd_unbalanced():
+    data = generate_data(0.2, "pandas", const=True, ntk=(40, 8, 3))
+    res = PanelOLS(data.y, data.x, entity_effects=True).fit()
+    cd = res.pesaran_cd
+    assert isinstance(cd, NormalTestStatistic)
+    assert_allclose(cd.stat, direct_pesaran_cd(res.idiosyncratic))
+
+
+def test_pesaran_cd_inapplicable():
+    index = pd.MultiIndex.from_product([["firm0"], range(8)], names=["firm", "time"])
+    y = pd.Series(np.linspace(0.0, 1.0, 8), index=index, name="y")
+    x = pd.DataFrame({"const": 1.0, "x1": np.linspace(-1.0, 1.0, 8)}, index=index)
+    res = PooledOLS(y, x).fit()
+    cd = res.pesaran_cd
+    assert isinstance(cd, InapplicableTestStatistic)
+    assert np.isnan(cd.pval)
 
 
 def test_incorrect_type(data):
