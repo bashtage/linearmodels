@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 from collections.abc import Mapping
+from typing import Any
 
 from formulaic.utils.constraints import LinearConstraints
 import numpy as np
@@ -46,6 +47,7 @@ class WaldTestStatistic:
         self.df = df
         self.df_denom = df_denom
         self._name = name
+        self.dist: Any
         if df_denom is None:
             self.dist = chi2(df)
             self.dist_name = f"chi2({df})"

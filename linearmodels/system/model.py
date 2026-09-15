@@ -909,8 +909,11 @@ class _SystemModelBase:
         constant: bool,
         total_ss: float,
         *,
-        weight_est: None | (
-            HomoskedasticWeightMatrix | HeteroskedasticWeightMatrix | KernelWeightMatrix
+        weight_est: (
+            HomoskedasticWeightMatrix
+            | HeteroskedasticWeightMatrix
+            | KernelWeightMatrix
+            | None
         ) = None,
     ) -> AttrDict:
         loc = 0

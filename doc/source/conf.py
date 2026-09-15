@@ -90,7 +90,7 @@ for file_to_copy in files:
     full_name = os.path.split(file_to_copy)[-1]
     folder, file_name = full_name.split("_")
     if not file_name.endswith("ipynb"):
-        file_name = "_".join((folder, file_name))
+        file_name = f"{folder}_{file_name}"
     out_dir = os.path.join(folder, "examples")
     if not os.path.exists(out_dir):
         os.makedirs(out_dir, exist_ok=True)

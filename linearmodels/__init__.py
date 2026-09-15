@@ -56,10 +56,10 @@ from .panel.model import (
 from .system import IV3SLS, SUR, IVSystemGMM
 
 OLS = _OLS
-WARN_ON_MISSING = os.environ.get("LINEARMODELS_WARN_ON_MISSING", "1")
-WARN_ON_MISSING = False if WARN_ON_MISSING in ("", "0", "false", "False") else True
-DROP_MISSING = os.environ.get("LINEARMODELS_DROP_MISSING", "1")
-DROP_MISSING = False if DROP_MISSING in ("", "0", "false", "False") else True
+_WARN_ON_MISSING = os.environ.get("LINEARMODELS_WARN_ON_MISSING", "1")
+WARN_ON_MISSING = False if _WARN_ON_MISSING in ("", "0", "false", "False") else True
+_DROP_MISSING = os.environ.get("LINEARMODELS_DROP_MISSING", "1")
+DROP_MISSING = False if _DROP_MISSING in ("", "0", "false", "False") else True
 
 __all__ = [
     "DROP_MISSING",

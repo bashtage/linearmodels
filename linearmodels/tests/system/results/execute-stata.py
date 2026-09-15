@@ -16,10 +16,7 @@ from linearmodels.tests.system._utility import generate_data
 STATA_PATH = os.path.join("C:\\", "Program Files (x86)", "Stata13", "StataMP-64.exe")
 OUTFILE = os.path.join(os.getcwd(), "stata-sur-results.txt")
 
-header = [
-    r'use "C:\git\linearmodels\linearmodels\tests\system\results\simulated-sur.dta"'
-    ", clear"
-]
+header = r'use "C:\git\linearmodels\linearmodels\tests\system\results\simulated-sur.dta", clear'
 
 all_stats = (
     "estout using {outfile}, cells(b(fmt(%13.12g)) "

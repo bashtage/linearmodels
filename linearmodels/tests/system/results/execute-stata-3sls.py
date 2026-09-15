@@ -45,10 +45,8 @@ reg3 (dependent_0 dependent_1 dependent_2 exog_1 exog_2 exog_3 exog_4 exog_5) //
 STATA_PATH = os.path.join("C:\\", "Program Files (x86)", "Stata15", "StataMP-64.exe")
 OUTFILE = os.path.join(os.getcwd(), "stata-3sls-results.txt")
 
-header = [
-    r'use "C:\git\linearmodels\linearmodels\tests\system\results\simulated-3sls.dta",'
-    r" clear"
-]
+header = r'use "C:\git\linearmodels\linearmodels\tests\system\results\simulated-3sls.dta", clear'
+
 
 all_stats = (
     "estout using {outfile}, cells(b(fmt(%13.12g)) t(fmt(%13.12g)) "

@@ -20,7 +20,7 @@ if cow:
     logger.critical("Copy on Write testing enabled")
 
 
-def pytest_configure(config):
+def pytest_configure(config: pytest.Config) -> None:
     # Minimal config to simplify running tests from lm.test()
     config.addinivalue_line("markers", "example: mark a test as an example")
     config.addinivalue_line("markers", "slow: mark a test as slow")
@@ -32,7 +32,7 @@ def pytest_configure(config):
     )
 
 
-def pytest_addoption(parser):
+def pytest_addoption(parser: pytest.Parser) -> None:
     parser.addoption("--skip-slow", action="store_true", help="skip slow tests")
     parser.addoption("--only-slow", action="store_true", help="run only slow tests")
     parser.addoption("--skip-smoke", action="store_true", help="skip smoke tests")
@@ -40,7 +40,7 @@ def pytest_addoption(parser):
     parser.addoption("--skip-examples", action="store_true", help="skip examples tests")
 
 
-def pytest_runtest_setup(item):
+def pytest_runtest_setup(item: pytest.Item) -> None:
     if "slow" in item.keywords and item.config.getoption("--skip-slow"):
         pytest.skip("skipping due to --skip-slow")
 
