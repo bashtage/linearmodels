@@ -19,7 +19,7 @@
     
   
       
-        <title>linearmodels.iv.absorbing - linearmodels v7.1 (+68)</title>
+        <title>linearmodels.iv.absorbing - linearmodels v7.1 (+72)</title>
       
     
 
@@ -91,7 +91,7 @@
 
 <header class="md-header md-header--shadow" data-md-component="header">
   <nav class="md-header__inner md-grid" aria-label="Header">
-    <a href="../../../index.html" title="linearmodels v7.1 (+68)" class="md-header__button md-logo" aria-label="linearmodels v7.1 (+68)" data-md-component="logo">
+    <a href="../../../index.html" title="linearmodels v7.1 (+72)" class="md-header__button md-logo" aria-label="linearmodels v7.1 (+72)" data-md-component="logo">
       <img src="../../../_static/bw-logo.svg" alt="logo">
     </a>
     <label class="md-header__button md-icon" for="__drawer">
@@ -102,7 +102,7 @@
       <div class="md-header__ellipsis">
         <div class="md-header__topic">
           <span class="md-ellipsis">
-            linearmodels v7.1 (+68)
+            linearmodels v7.1 (+72)
           </span>
         </div>
         <div class="md-header__topic" data-md-component="header-topic">
@@ -197,10 +197,10 @@
 
 <nav class="md-nav md-nav--primary" aria-label="Navigation" data-md-level="0">
   <label class="md-nav__title" for="__drawer">
-    <a href="../../../index.html" title="linearmodels v7.1 (+68)" class="md-nav__button md-logo" aria-label="linearmodels v7.1 (+68)" data-md-component="logo">
+    <a href="../../../index.html" title="linearmodels v7.1 (+72)" class="md-nav__button md-logo" aria-label="linearmodels v7.1 (+72)" data-md-component="logo">
       <img src="../../../_static/bw-logo.svg" alt="logo">
     </a>
-    linearmodels v7.1 (+68)
+    linearmodels v7.1 (+72)
   </label>
   
     <div class="md-nav__source">
@@ -583,7 +583,7 @@
             <span class="bp">self</span><span class="o">.</span><span class="n">_hasher</span> <span class="o">=</span> <span class="n">hashlib</span><span class="o">.</span><span class="n">sha256</span><span class="p">()</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">_use_xxh64</span> <span class="o">=</span> <span class="kc">False</span>
 
-    <span class="k">def</span><span class="w"> </span><span class="nf">reset</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">reset</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_use_xxh64</span><span class="p">:</span>
             <span class="k">assert</span> <span class="nb">isinstance</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_hasher</span><span class="p">,</span> <span class="n">xxh64</span><span class="p">)</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">_hasher</span><span class="o">.</span><span class="n">reset</span><span class="p">()</span>
@@ -614,7 +614,7 @@
     <span class="n">use_cache</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span>
     <span class="n">x_hash</span><span class="p">:</span> <span class="n">Hashable</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
     <span class="o">**</span><span class="n">lsmr_options</span><span class="p">:</span> <span class="p">(</span>
-        <span class="nb">bool</span> <span class="o">|</span> <span class="nb">float</span> <span class="o">|</span> <span class="nb">str</span> <span class="o">|</span> <span class="n">linearmodels</span><span class="o">.</span><span class="n">typing</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">ArrayLike</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">|</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]</span>
+        <span class="nb">bool</span> <span class="o">|</span> <span class="nb">float</span> <span class="o">|</span> <span class="nb">str</span> <span class="o">|</span> <span class="n">linearmodels</span><span class="o">.</span><span class="n">typing</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">ArrayLike</span> <span class="o">|</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]</span> <span class="o">|</span> <span class="kc">None</span>
     <span class="p">),</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">linearmodels</span><span class="o">.</span><span class="n">typing</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">Float64Array</span><span class="p">:</span>
 <span class="w">    </span><span class="sa">r</span><span class="sd">"""</span>
@@ -655,7 +655,7 @@
     <span class="n">regressor_hash</span> <span class="o">=</span> <span class="n">x_hash</span> <span class="k">if</span> <span class="n">x_hash</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="k">else</span> <span class="s2">""</span>
     <span class="n">default_opts</span><span class="p">:</span> <span class="nb">dict</span><span class="p">[</span>
         <span class="nb">str</span><span class="p">,</span>
-        <span class="nb">bool</span> <span class="o">|</span> <span class="nb">float</span> <span class="o">|</span> <span class="nb">str</span> <span class="o">|</span> <span class="n">linearmodels</span><span class="o">.</span><span class="n">typing</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">ArrayLike</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">|</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">],</span>
+        <span class="nb">bool</span> <span class="o">|</span> <span class="nb">float</span> <span class="o">|</span> <span class="nb">str</span> <span class="o">|</span> <span class="n">linearmodels</span><span class="o">.</span><span class="n">typing</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">ArrayLike</span> <span class="o">|</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]</span> <span class="o">|</span> <span class="kc">None</span><span class="p">,</span>
     <span class="p">]</span> <span class="o">=</span> <span class="p">{</span><span class="s2">"atol"</span><span class="p">:</span> <span class="mf">1e-8</span><span class="p">,</span> <span class="s2">"btol"</span><span class="p">:</span> <span class="mf">1e-8</span><span class="p">,</span> <span class="s2">"show"</span><span class="p">:</span> <span class="kc">False</span><span class="p">}</span>
     <span class="k">assert</span> <span class="n">lsmr_options</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span>
     <span class="n">default_opts</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="n">lsmr_options</span><span class="p">)</span>
@@ -1385,16 +1385,17 @@
     <span class="k">def</span><span class="w"> </span><span class="nf">_first_time_fit</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span>
         <span class="n">use_cache</span><span class="p">:</span> <span class="nb">bool</span><span class="p">,</span>
-        <span class="n">absorb_options</span><span class="p">:</span> <span class="kc">None</span> <span class="o">|</span> <span class="p">(</span>
+        <span class="n">absorb_options</span><span class="p">:</span> <span class="p">(</span>
             <span class="nb">dict</span><span class="p">[</span>
                 <span class="nb">str</span><span class="p">,</span>
                 <span class="nb">bool</span>
                 <span class="o">|</span> <span class="nb">float</span>
                 <span class="o">|</span> <span class="nb">str</span>
                 <span class="o">|</span> <span class="n">linearmodels</span><span class="o">.</span><span class="n">typing</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">ArrayLike</span>
-                <span class="o">|</span> <span class="kc">None</span>
-                <span class="o">|</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">],</span>
+                <span class="o">|</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]</span>
+                <span class="o">|</span> <span class="kc">None</span><span class="p">,</span>
             <span class="p">]</span>
+            <span class="o">|</span> <span class="kc">None</span>
         <span class="p">),</span>
         <span class="n">method</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
     <span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
@@ -1510,16 +1511,17 @@
         <span class="n">cov_type</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">"robust"</span><span class="p">,</span>
         <span class="n">debiased</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
         <span class="n">method</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">"auto"</span><span class="p">,</span>
-        <span class="n">absorb_options</span><span class="p">:</span> <span class="kc">None</span> <span class="o">|</span> <span class="p">(</span>
+        <span class="n">absorb_options</span><span class="p">:</span> <span class="p">(</span>
             <span class="nb">dict</span><span class="p">[</span>
                 <span class="nb">str</span><span class="p">,</span>
                 <span class="nb">bool</span>
                 <span class="o">|</span> <span class="nb">float</span>
                 <span class="o">|</span> <span class="nb">str</span>
                 <span class="o">|</span> <span class="n">linearmodels</span><span class="o">.</span><span class="n">typing</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">ArrayLike</span>
-                <span class="o">|</span> <span class="kc">None</span>
-                <span class="o">|</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">],</span>
+                <span class="o">|</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]</span>
+                <span class="o">|</span> <span class="kc">None</span><span class="p">,</span>
             <span class="p">]</span>
+            <span class="o">|</span> <span class="kc">None</span>
         <span class="p">)</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
         <span class="n">use_cache</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span>
         <span class="n">lsmr_options</span><span class="p">:</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">float</span> <span class="o">|</span> <span class="nb">bool</span><span class="p">]</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>

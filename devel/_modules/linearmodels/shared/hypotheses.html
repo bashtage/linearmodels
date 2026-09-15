@@ -19,7 +19,7 @@
     
   
       
-        <title>linearmodels.shared.hypotheses - linearmodels v7.1 (+68)</title>
+        <title>linearmodels.shared.hypotheses - linearmodels v7.1 (+72)</title>
       
     
 
@@ -91,7 +91,7 @@
 
 <header class="md-header md-header--shadow" data-md-component="header">
   <nav class="md-header__inner md-grid" aria-label="Header">
-    <a href="../../../index.html" title="linearmodels v7.1 (+68)" class="md-header__button md-logo" aria-label="linearmodels v7.1 (+68)" data-md-component="logo">
+    <a href="../../../index.html" title="linearmodels v7.1 (+72)" class="md-header__button md-logo" aria-label="linearmodels v7.1 (+72)" data-md-component="logo">
       <img src="../../../_static/bw-logo.svg" alt="logo">
     </a>
     <label class="md-header__button md-icon" for="__drawer">
@@ -102,7 +102,7 @@
       <div class="md-header__ellipsis">
         <div class="md-header__topic">
           <span class="md-ellipsis">
-            linearmodels v7.1 (+68)
+            linearmodels v7.1 (+72)
           </span>
         </div>
         <div class="md-header__topic" data-md-component="header-topic">
@@ -197,10 +197,10 @@
 
 <nav class="md-nav md-nav--primary" aria-label="Navigation" data-md-level="0">
   <label class="md-nav__title" for="__drawer">
-    <a href="../../../index.html" title="linearmodels v7.1 (+68)" class="md-nav__button md-logo" aria-label="linearmodels v7.1 (+68)" data-md-component="logo">
+    <a href="../../../index.html" title="linearmodels v7.1 (+72)" class="md-nav__button md-logo" aria-label="linearmodels v7.1 (+72)" data-md-component="logo">
       <img src="../../../_static/bw-logo.svg" alt="logo">
     </a>
-    linearmodels v7.1 (+68)
+    linearmodels v7.1 (+72)
   </label>
   
     <div class="md-nav__source">
@@ -507,6 +507,7 @@
 <span></span><code><span class="kn">from</span><span class="w"> </span><span class="nn">__future__</span><span class="w"> </span><span class="kn">import</span> <span class="n">annotations</span>
 
 <span class="kn">from</span><span class="w"> </span><span class="nn">collections.abc</span><span class="w"> </span><span class="kn">import</span> <span class="n">Mapping</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">typing</span><span class="w"> </span><span class="kn">import</span> <span class="n">Any</span>
 
 <span class="kn">from</span><span class="w"> </span><span class="nn">formulaic.utils.constraints</span><span class="w"> </span><span class="kn">import</span> <span class="n">LinearConstraints</span>
 <span class="kn">import</span><span class="w"> </span><span class="nn">numpy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">np</span>
@@ -554,6 +555,7 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">df</span> <span class="o">=</span> <span class="n">df</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">df_denom</span> <span class="o">=</span> <span class="n">df_denom</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_name</span> <span class="o">=</span> <span class="n">name</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">dist</span><span class="p">:</span> <span class="n">Any</span>
         <span class="k">if</span> <span class="n">df_denom</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">dist</span> <span class="o">=</span> <span class="n">chi2</span><span class="p">(</span><span class="n">df</span><span class="p">)</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">dist_name</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">"chi2(</span><span class="si">{</span><span class="n">df</span><span class="si">}</span><span class="s2">)"</span>
