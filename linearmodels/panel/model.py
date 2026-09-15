@@ -93,6 +93,12 @@ def _lstsq(
 
 
 def panel_structure_stats(ids: linearmodels.typing.data.IntArray, name: str) -> Series:
+    ids = np.asarray(ids)
+    if np.any(ids < 0):
+        raise ValueError(
+            f"{name} cannot be computed: ids must be non-negative integers. "
+            "Negative ids indicate missing values (NaN) in the panel index."
+        )
     bc = np.bincount(ids)
     bc = bc[bc > 0]
     index = ["mean", "median", "max", "min", "total"]

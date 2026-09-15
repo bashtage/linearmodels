@@ -4,13 +4,13 @@ from itertools import product
 import numpy as np
 from numpy.linalg import lstsq, pinv
 from numpy.testing import assert_allclose, assert_equal
-from pandas import Categorical, DataFrame, Series, date_range, get_dummies
+from pandas import Categorical, DataFrame, MultiIndex, Series, date_range, get_dummies
 from pandas.api.types import is_string_dtype
 from pandas.testing import assert_frame_equal, assert_index_equal
 import pytest
 
 from linearmodels.panel.data import PanelData, _Panel
-from linearmodels.panel.model import PanelOLS
+from linearmodels.panel.model import PanelOLS, panel_structure_stats
 from linearmodels.shared.utility import panel_to_frame
 from linearmodels.tests.panel._utility import MISSING_XARRAY, datatypes, generate_data
 
@@ -221,6 +221,33 @@ def test_ids(mi_df):
     assert len(np.unique(tids)) == 7
     for i in range(11):
         assert np.ptp(tids[i::7]) == 0
+
+
+def test_entity_ids_with_missing_index():
+    n, t = 4, 3
+    index = MultiIndex.from_tuples(
+        [(np.nan if i == 0 else f"e{i}", j) for i in range(n) for j in range(1, t + 1)],
+        names=["entity", "time"],
+    )
+    data = PanelData(DataFrame(np.random.standard_normal((n * t, 2)), index=index))
+    with pytest.raises(ValueError, match="entity index contains missing"):
+        _ = data.entity_ids
+
+
+def test_time_ids_with_missing_index():
+    n, t = 4, 3
+    index = MultiIndex.from_tuples(
+        [(f"e{i}", np.nan if j == 1 else j) for i in range(n) for j in range(1, t + 1)],
+        names=["entity", "time"],
+    )
+    data = PanelData(DataFrame(np.random.standard_normal((n * t, 2)), index=index))
+    with pytest.raises(ValueError, match="time index contains missing"):
+        _ = data.time_ids
+
+
+def test_panel_structure_stats_negative_ids():
+    with pytest.raises(ValueError, match="non-negative"):
+        panel_structure_stats(np.array([0, 1, -1]), "test")
 
 
 def test_str_repr(mi_df):
