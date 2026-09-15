@@ -834,7 +834,7 @@ n_{obs}/(n_{obs}-k)\Sigma_{XX}^{-1}\hat{S}_{HAC}\Sigma_{XX}^{-1}
 where 
 \begin_inset Formula 
 \begin{align*}
-\hat{S}_{HAC} & =\hat{\Gamma}_{0}+\sum_{i=1}^{bw}K(i,bw)(\hat{\Gamma}_{1}+\hat{\Gamma}_{1}^{\prime})\\
+\hat{S}_{HAC} & =\hat{\Gamma}_{0}+\sum_{i=1}^{bw}K(i,bw)(\hat{\Gamma}_{i}+\hat{\Gamma}_{i}^{\prime})\\
 \hat{\Gamma}_{i} & =\sum_{t=i+1}^{T}\xi_{t}^{\prime}\xi_{t}\\
 \xi_{t} & =\sum_{i=1}^{n_{t}}\hat{\epsilon}_{it}x_{it}
 \end{align*}
