@@ -514,6 +514,30 @@ def test_first_difference(data):
     x.first_difference()
 
 
+def test_first_difference_orders_time_when_first_entity_enters_late():
+    idx = MultiIndex.from_tuples(
+        [
+            (0, 2002),
+            (0, 2003),
+            (1, 2000),
+            (1, 2001),
+            (1, 2002),
+            (1, 2003),
+        ],
+        names=["firm", "year"],
+    )
+    toy = DataFrame({"y": [20.0, 30.0, 0.0, 1.0, 2.0, 3.0]}, index=idx)
+    got = PanelData(toy).first_difference().dataframe
+    expected = DataFrame(
+        {"y": [10.0, 1.0, 1.0, 1.0]},
+        index=MultiIndex.from_tuples(
+            [(0, 2003), (1, 2001), (1, 2002), (1, 2003)],
+            names=["firm", "year"],
+        ),
+    )
+    assert_frame_equal(got, expected)
+
+
 def test_demean_simple_weighted(data):
     x = PanelData(data.x)
     w = PanelData(data.w)
