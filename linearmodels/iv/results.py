@@ -1056,7 +1056,7 @@ class IVResults(_CommonIVResults):
         z1 = c_[z2, assumed_exog]
 
         e1 = proj(e0, z1)
-        e2 = proj(e2, self.model.instruments.ndarray)
+        e2 = proj(e2, z2)
         return e0, e1, e2, nobs, nexog, nendog, ntested
 
     def durbin(self, variables: str | list[str] | None = None) -> WaldTestStatistic:
