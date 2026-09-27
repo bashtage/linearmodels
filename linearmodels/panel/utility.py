@@ -514,6 +514,16 @@ def not_absorbed(
         const = x[:, [loc]]
         sub = x[:, check]
         x = sub - const @ np.linalg.lstsq(const, sub, rcond=None)[0]
+        new_norm = np.linalg.norm(x, axis=0)
+        orig_norm = np.linalg.norm(sub, axis=0)
+        norm_ratio = np.divide(
+            new_norm,
+            orig_norm,
+            out=np.zeros_like(new_norm),
+            where=orig_norm != 0,
+        )
+        if np.all(norm_ratio**2 < np.finfo(float).eps):
+            return [loc]
     xpx = x.T @ x
     vals, _ = np.linalg.eigh(xpx)
     if vals.max() == 0.0:
