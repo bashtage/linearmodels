@@ -288,6 +288,41 @@ before computing the fitted value. The best practice is to pass a DataFrame
 with a 2-level MultiIndex containing the entity- and time-ids."""
 
 
+def _row_index(value: PanelDataLike) -> Index | None:
+    """Row index of a labelled panel input, or None for a raw array."""
+    if isinstance(value, PanelData):
+        return value.dataframe.index
+    if isinstance(value, (Series, DataFrame)):
+        return value.index
+    return None
+
+
+def _check_row_alignment(
+    dependent: PanelDataLike,
+    **labelled: PanelDataLike | None,
+) -> None:
+    """Reject labelled inputs whose row index is not the dependent index.
+
+    Estimation pairs rows by position. A pandas object with the same values
+    in a different order would attach those values to the wrong observation.
+    Raw arrays stay positional.
+    """
+    base = _row_index(dependent)
+    if base is None:
+        return
+    for name, value in labelled.items():
+        if value is None:
+            continue
+        other = _row_index(value)
+        if other is None or len(other) != len(base) or base.equals(other):
+            continue
+        raise ValueError(
+            f"The row index of {name} does not match dependent. "
+            "Rows are paired by position, so a pandas input has to use "
+            "the same index in the same order."
+        )
+
+
 class _PanelModelBase:
     r"""
     Base class for all panel models
@@ -318,6 +353,7 @@ class _PanelModelBase:
         weights: PanelDataLike | None = None,
         check_rank: bool = True,
     ) -> None:
+        _check_row_alignment(dependent, exog=exog, weights=weights)
         self.dependent = PanelData(dependent, "Dep")
         self.exog = PanelData(exog, "Exog")
         self._original_shape = self.dependent.shape
@@ -1262,6 +1298,7 @@ class PanelOLS(_PanelModelBase):
         check_rank: bool = True,
     ) -> None:
         super().__init__(dependent, exog, weights=weights, check_rank=check_rank)
+        _check_row_alignment(dependent, other_effects=other_effects)
 
         self._entity_effects = entity_effects
         self._time_effects = time_effects
