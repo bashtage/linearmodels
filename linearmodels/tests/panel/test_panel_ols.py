@@ -1437,6 +1437,20 @@ def test_fully_absorbed():
         PanelOLS(y, x, drop_absorbed=True, entity_effects=True).fit()
 
 
+def test_fully_absorbed_with_constant():
+    x = np.arange(10)
+    x = np.repeat(x, (2,))
+    y = x + np.random.standard_normal(x.shape[0])
+    mi = pd.MultiIndex.from_product([np.arange(10), [1, 2]])
+    x = pd.DataFrame({"const": 1.0, "x": x}, index=mi)
+    y = pd.Series(y, index=mi, name="y")
+
+    with pytest.warns(AbsorbingEffectWarning, match="x"):
+        res = PanelOLS(y, x, drop_absorbed=True, entity_effects=True).fit()
+
+    assert list(res.params.index) == ["const"]
+
+
 def test_zero_endog():
     x = np.arange(10)
     x = np.repeat(x, (2,))[:, None]
