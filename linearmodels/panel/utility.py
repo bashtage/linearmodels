@@ -513,7 +513,21 @@ def not_absorbed(
         check = [i for i in range(x.shape[1]) if i != loc]
         const = x[:, [loc]]
         sub = x[:, check]
-        x = sub - const @ np.linalg.lstsq(const, sub, rcond=None)[0]
+        resid = sub - const @ np.linalg.lstsq(const, sub, rcond=None)[0]
+        # A column that is constant on each entity is restored as its grand
+        # mean. Projecting that column on the intercept leaves only roundoff.
+        # The eigenvalue tolerance is relative to that roundoff, so it keeps
+        # the column. Compare with the column's own norm instead, and only
+        # when every non-constant column vanishes: a mix of absorbed and
+        # varying columns still uses the rank test below.
+        orig_norm = np.linalg.norm(sub, axis=0)
+        new_norm = np.linalg.norm(resid, axis=0)
+        with np.errstate(divide="ignore", invalid="ignore"):
+            ratio = (new_norm / orig_norm) ** 2
+        vanished = (orig_norm == 0.0) | (ratio < np.finfo(float).eps)
+        if bool(np.all(vanished)):
+            return [loc]
+        x = resid
     xpx = x.T @ x
     vals, _ = np.linalg.eigh(xpx)
     if vals.max() == 0.0:
