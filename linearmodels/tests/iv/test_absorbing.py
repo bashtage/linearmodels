@@ -1,3 +1,4 @@
+from linearmodels.compat.scipy import csc_array, diags_array
 from linearmodels.compat.statsmodels import Summary
 
 from itertools import product
@@ -9,7 +10,6 @@ import pandas as pd
 from pandas.testing import assert_frame_equal, assert_series_equal
 import pytest
 import scipy.sparse as sp
-from scipy.sparse import csc_matrix
 
 from linearmodels.iv._utility import annihilate
 from linearmodels.iv.absorbing import (
@@ -404,7 +404,7 @@ def test_interaction_cat_only(cat):
     assert_frame_equal(cat, interact.cat)
     expected = category_interaction(category_product(cat), precondition=False)
     actual = interact.sparse
-    assert isinstance(actual, csc_matrix)
+    assert isinstance(actual, csc_array)
     assert_allclose(expected.toarray(), actual.toarray())
 
 
@@ -414,7 +414,7 @@ def test_interaction_cont_only(cont):
     assert_frame_equal(cont, interact.cont)
     expected = cont.to_numpy()
     actual = interact.sparse
-    assert isinstance(actual, csc_matrix)
+    assert isinstance(actual, csc_array)
     assert_allclose(expected, actual.toarray())
 
 
@@ -431,7 +431,7 @@ def test_interaction_cat_cont(cat, cont):
         expected.append(element)
     expected = np.column_stack(expected)
     actual = interact.sparse
-    assert isinstance(actual, csc_matrix)
+    assert isinstance(actual, csc_array)
     assert_allclose(expected, interact.sparse.toarray())
 
 
@@ -450,7 +450,7 @@ def test_interaction_cat_bad_nobs():
 
 def test_empty_interaction():
     interact = Interaction(nobs=100)
-    assert isinstance(interact.sparse, csc_matrix)
+    assert isinstance(interact.sparse, csc_array)
     assert interact.sparse.shape == (100, 0)
 
 
@@ -472,7 +472,7 @@ def test_absorbing_regressors(cat, cont, interact, weights):
         expected_rank += pd.Series(cat[col].cat.codes).nunique() - (i > 0)
     expected.append(dummy_matrix(cat, precondition=False)[0])
     expected_rank += cont.shape[1]
-    expected.append(csc_matrix(cont))
+    expected.append(csc_array(cont))
     if interact is not None:
         for inter in interact:
             interact_mat = inter.sparse
@@ -480,7 +480,7 @@ def test_absorbing_regressors(cat, cont, interact, weights):
             expected.append(interact_mat)
     expected = sp.hstack(expected, format="csc")
     if weights is not None:
-        expected = (sp.diags(np.sqrt(weights)).dot(expected)).asformat("csc")
+        expected = (diags_array(np.sqrt(weights)).dot(expected)).asformat("csc")
     actual = areg.regressors
     assert expected.shape == actual.shape
     assert_array_equal(expected.indptr, actual.indptr)
@@ -527,7 +527,7 @@ def test_against_ols(ols_data):
         absorb.append(ols_data.absorb.cont.to_numpy())
         if ols_data.absorb.cat.shape[1] > 0:
             dummies = dummy_matrix(ols_data.absorb.cat, precondition=False)[0]
-            assert isinstance(dummies, sp.csc_matrix)
+            assert isinstance(dummies, csc_array)
             absorb.append(dummies.toarray())
         has_dummy = ols_data.absorb.cat.shape[1] > 0
     if ols_data.interactions is not None:
@@ -746,7 +746,7 @@ def test_options(random_gen):
 
 def test_lsmr_annihilate_empty():
     gen = np.random.default_rng(0)
-    x = csc_matrix(gen.standard_normal((1000, 2)))
+    x = csc_array(gen.standard_normal((1000, 2)))
     y = np.empty((1000, 0))
     y_out = lsmr_annihilate(x, y)
     assert y_out.shape == y.shape

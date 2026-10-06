@@ -192,7 +192,7 @@ def panel_to_frame(
     df = DataFrame(x, columns=Index(items), index=mi)
     if swap:
         df.index = mi.swaplevel()
-        df.sort_index(inplace=True)
+        df = df.sort_index()
         final_levels = [minor_axis, major_axis]
     mi_index = cast("MultiIndex", df.index)
     df.index = mi_index.set_levels(levels=final_levels, level=[0, 1])

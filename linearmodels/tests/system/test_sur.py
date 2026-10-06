@@ -1,3 +1,5 @@
+from linearmodels.compat.scipy import csc_array, lil_array
+
 from collections.abc import Mapping
 from itertools import product
 import warnings
@@ -7,7 +9,6 @@ from numpy.testing import assert_allclose
 from pandas import DataFrame, Series, concat
 from pandas.testing import assert_frame_equal, assert_series_equal
 import pytest
-from scipy.sparse import csc_matrix, lil_matrix
 from scipy.sparse.linalg import inv as spinv
 import scipy.stats
 
@@ -797,11 +798,11 @@ def direct_gls(eqns, scale):
     y = scale * np.vstack(y)
 
     n, k = x[0].shape
-    _x = lil_matrix((len(x) * n, len(x) * k))
+    _x = lil_array((len(x) * n, len(x) * k))
     for i, val in enumerate(x):
         _x[i * n : (i + 1) * n, i * k : (i + 1) * k] = val
 
-    b = spinv(csc_matrix(_x.T @ _x)) @ (_x.T @ y)
+    b = spinv(csc_array(_x.T @ _x)) @ (_x.T @ y)
     e = y - _x @ b
     e = e.reshape((-1, n)).T
     sigma = e.T @ e / n

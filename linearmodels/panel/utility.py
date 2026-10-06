@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 from linearmodels.compat.pandas import ANNUAL_FREQ
+from linearmodels.compat.scipy import coo_array, csc_array, csr_array
 
 from collections import defaultdict
 from typing import Literal, NamedTuple, TypeVar, cast
@@ -65,13 +66,13 @@ Variables have been fully absorbed and have removed from the regression:
 {absorbed_variables}
 """
 
-SparseArray = TypeVar("SparseArray", sp.csc_matrix, sp.csr_matrix, sp.coo_matrix)
+SparseArray = TypeVar("SparseArray", csr_array, csc_array, coo_array)
 SparseOrDense = TypeVar(
     "SparseOrDense",
     linearmodels.typing.data.Float64Array,
-    sp.csc_matrix,
-    sp.csr_matrix,
-    sp.coo_matrix,
+    csc_array,
+    csr_array,
+    coo_array,
 )
 
 
@@ -91,7 +92,7 @@ def preconditioner(
     -------
     d : array_like
         Array with same type as input array. If copy is False, and d is
-        an ndarray or a csc_matrix, then the operation is inplace
+        an ndarray or a csc_array, then the operation is inplace
     cond : ndarray
         Array of conditioning numbers defined as the square root of the column
         2-norms (nvar,)
@@ -110,18 +111,18 @@ def preconditioner(
         return d, cond
 
     klass = None
-    if not isinstance(d, sp.csc_matrix):
+    if not isinstance(d, csc_array):
         klass = d.__class__
-        d_csc = sp.csc_matrix(d)
+        d_csc = csc_array(d)
     else:
-        assert isinstance(d, sp.csc_matrix)
+        assert isinstance(d, csc_array)
         d_csc = d
         if copy:
             d_csc = d.copy()
 
     cond = cast(
         "linearmodels.typing.data.Float64Array",
-        np.sqrt(d_csc.multiply(d_csc).sum(0)).A1,
+        np.asarray(np.sqrt(d_csc.multiply(d_csc).sum(0))).ravel(),
     )
     locs = np.zeros_like(d_csc.indices)
     locs[d_csc.indptr[1:-1]] = 1
@@ -143,7 +144,7 @@ def dummy_matrix(
     drop_all: bool = False,
     precondition: bool = True,
 ) -> tuple[
-    sp.csc_matrix | sp.csr_matrix | sp.coo_matrix,
+    csc_array | csr_array | coo_array,
     linearmodels.typing.data.Float64Array,
 ]:
     """
@@ -153,12 +154,12 @@ def dummy_matrix(
         Array containing the category codes of pandas categoricals
         (nobs, ncats)
     output_format: {"csc", "csr", "coo", "array"}
-        Output format. Default is csc (csc_matrix). Supported output
+        Output format. Default is csc (csc_array). Supported output
         formats are:
 
-        * "csc" - sparse matrix in compressed column form
-        * "csr" - sparse matrix in compressed row form
-        * "coo" - sparse matrix in coordinate form
+        * "csc" - sparse array in compressed column form
+        * "csr" - sparse array in compressed row form
+        * "coo" - sparse array in coordinate form
 
     drop: {"first", "last"}
         Exclude either the first or last category. This only applies when
@@ -212,11 +213,11 @@ def dummy_matrix(
         total_dummies += ncategories - (i > 0)
 
     if output_format == "csc":
-        fmt = sp.csc_matrix
+        fmt = csc_array
     elif output_format == "csr":
-        fmt = sp.csr_matrix
+        fmt = csr_array
     elif output_format == "coo":
-        fmt = sp.coo_matrix
+        fmt = coo_array
     else:
         raise ValueError(f"Unknown format: {output_format}")
     out = fmt(

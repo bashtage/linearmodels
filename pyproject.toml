@@ -294,7 +294,8 @@ filterwarnings = [
   "ignore:defusedxml.cElementTree:DeprecationWarning:nbconvert",
   "ignore:the imp module is deprecated in favour of importlib:DeprecationWarning:pywintypes",
   "error:Setting an item of incompatible dtype:FutureWarning:",
-
+  "error:Constructing a DataFrame from a list of sequences with mismatched::",
+  "error:assert_index_equal will check the::",
 ]
 junit_family = "xunit2"
 markers = [

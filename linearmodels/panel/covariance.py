@@ -438,7 +438,7 @@ class DriscollKraay(HomoskedasticCovariance):
         assert self._time_ids is not None
         xe_df = DataFrame(xe, index=self._time_ids.squeeze())
         xe_df = xe_df.groupby(level=0).sum()
-        xe_df.sort_index(inplace=True)
+        xe_df = xe_df.sort_index()
         xe_nobs = xe_df.shape[0]
         bw = self._bandwidth
         if self._bandwidth is None:

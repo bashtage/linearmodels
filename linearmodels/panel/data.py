@@ -264,7 +264,7 @@ class PanelData:
             )
         # self._k, self._t, self._n = self.panel.shape
         self._k, self._t, self._n = self.shape
-        self._frame.index.set_names(index_names, inplace=True)
+        self._frame.index = self._frame.index.set_names(index_names)
 
     @property
     def panel(self) -> _Panel:
@@ -503,7 +503,7 @@ class PanelData:
 
         # Swap out the index for better performance
         init_index = DataFrame(groups)
-        init_index.set_index(list(init_index.columns), inplace=True)
+        init_index = init_index.set_index(list(init_index.columns))
 
         root_w = cast(
             "linearmodels.typing.data.Float64Array", np.sqrt(weights.values2d)
