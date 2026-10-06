@@ -19,7 +19,7 @@
     
   
       
-        <title>linearmodels.iv.absorbing - linearmodels v7.1 (+90)</title>
+        <title>linearmodels.iv.absorbing - linearmodels v7.1 (+94)</title>
       
     
 
@@ -91,7 +91,7 @@
 
 <header class="md-header md-header--shadow" data-md-component="header">
   <nav class="md-header__inner md-grid" aria-label="Header">
-    <a href="../../../index.html" title="linearmodels v7.1 (+90)" class="md-header__button md-logo" aria-label="linearmodels v7.1 (+90)" data-md-component="logo">
+    <a href="../../../index.html" title="linearmodels v7.1 (+94)" class="md-header__button md-logo" aria-label="linearmodels v7.1 (+94)" data-md-component="logo">
       <img src="../../../_static/bw-logo.svg" alt="logo">
     </a>
     <label class="md-header__button md-icon" for="__drawer">
@@ -102,7 +102,7 @@
       <div class="md-header__ellipsis">
         <div class="md-header__topic">
           <span class="md-ellipsis">
-            linearmodels v7.1 (+90)
+            linearmodels v7.1 (+94)
           </span>
         </div>
         <div class="md-header__topic" data-md-component="header-topic">
@@ -197,10 +197,10 @@
 
 <nav class="md-nav md-nav--primary" aria-label="Navigation" data-md-level="0">
   <label class="md-nav__title" for="__drawer">
-    <a href="../../../index.html" title="linearmodels v7.1 (+90)" class="md-nav__button md-logo" aria-label="linearmodels v7.1 (+90)" data-md-component="logo">
+    <a href="../../../index.html" title="linearmodels v7.1 (+94)" class="md-nav__button md-logo" aria-label="linearmodels v7.1 (+94)" data-md-component="logo">
       <img src="../../../_static/bw-logo.svg" alt="logo">
     </a>
-    linearmodels v7.1 (+90)
+    linearmodels v7.1 (+94)
   </label>
   
     <div class="md-nav__source">
@@ -506,6 +506,8 @@
 <h1>Source code for linearmodels.iv.absorbing</h1><div class="highlight"><pre>
 <span></span><code><span class="kn">from</span><span class="w"> </span><span class="nn">__future__</span><span class="w"> </span><span class="kn">import</span> <span class="n">annotations</span>
 
+<span class="kn">from</span><span class="w"> </span><span class="nn">linearmodels.compat.scipy</span><span class="w"> </span><span class="kn">import</span> <span class="n">csc_array</span><span class="p">,</span> <span class="n">diags_array</span>
+
 <span class="kn">from</span><span class="w"> </span><span class="nn">collections</span><span class="w"> </span><span class="kn">import</span> <span class="n">defaultdict</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">collections.abc</span><span class="w"> </span><span class="kn">import</span> <span class="n">Hashable</span><span class="p">,</span> <span class="n">Iterable</span>
 <span class="kn">import</span><span class="w"> </span><span class="nn">hashlib</span>
@@ -609,7 +611,7 @@
 
 
 <span class="k">def</span><span class="w"> </span><span class="nf">lsmr_annihilate</span><span class="p">(</span>
-    <span class="n">x</span><span class="p">:</span> <span class="n">sp</span><span class="o">.</span><span class="n">csc_matrix</span><span class="p">,</span>
+    <span class="n">x</span><span class="p">:</span> <span class="n">csc_array</span><span class="p">,</span>
     <span class="n">y</span><span class="p">:</span> <span class="n">linearmodels</span><span class="o">.</span><span class="n">typing</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">Float64Array</span><span class="p">,</span>
     <span class="n">use_cache</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span>
     <span class="n">x_hash</span><span class="p">:</span> <span class="n">Hashable</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
@@ -622,7 +624,7 @@
 
 <span class="sd">    Parameters</span>
 <span class="sd">    ----------</span>
-<span class="sd">    x : csc_matrix</span>
+<span class="sd">    x : csc_array</span>
 <span class="sd">        Sparse array of regressors</span>
 <span class="sd">    y : ndarray</span>
 <span class="sd">        Array with shape (nobs, nvar)</span>
@@ -673,7 +675,7 @@
             <span class="n">resid</span> <span class="o">=</span> <span class="n">_VARIABLE_CACHE</span><span class="p">[</span><span class="n">regressor_hash</span><span class="p">][</span><span class="n">variable_digest</span><span class="p">]</span>
         <span class="k">else</span><span class="p">:</span>
             <span class="n">beta</span> <span class="o">=</span> <span class="n">lsmr</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">_y</span><span class="p">,</span> <span class="o">**</span><span class="n">default_opts</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span>
-            <span class="n">resid</span> <span class="o">=</span> <span class="n">y</span><span class="p">[:,</span> <span class="n">i</span> <span class="p">:</span> <span class="n">i</span> <span class="o">+</span> <span class="mi">1</span><span class="p">]</span> <span class="o">-</span> <span class="n">x</span><span class="o">.</span><span class="n">dot</span><span class="p">(</span><span class="n">sp</span><span class="o">.</span><span class="n">csc_matrix</span><span class="p">(</span><span class="n">beta</span><span class="p">[:,</span> <span class="kc">None</span><span class="p">]))</span><span class="o">.</span><span class="n">toarray</span><span class="p">()</span>
+            <span class="n">resid</span> <span class="o">=</span> <span class="n">y</span><span class="p">[:,</span> <span class="n">i</span> <span class="p">:</span> <span class="n">i</span> <span class="o">+</span> <span class="mi">1</span><span class="p">]</span> <span class="o">-</span> <span class="n">x</span><span class="o">.</span><span class="n">dot</span><span class="p">(</span><span class="n">csc_array</span><span class="p">(</span><span class="n">beta</span><span class="p">[:,</span> <span class="kc">None</span><span class="p">]))</span><span class="o">.</span><span class="n">toarray</span><span class="p">()</span>
             <span class="n">_VARIABLE_CACHE</span><span class="p">[</span><span class="n">regressor_hash</span><span class="p">][</span><span class="n">variable_digest</span><span class="p">]</span> <span class="o">=</span> <span class="n">resid</span>
         <span class="n">resids</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">resid</span><span class="p">)</span>
     <span class="k">return</span> <span class="n">column_stack</span><span class="p">(</span><span class="n">resids</span><span class="p">)</span>
@@ -739,7 +741,7 @@
     <span class="k">return</span> <span class="n">Series</span><span class="p">(</span><span class="n">Categorical</span><span class="p">(</span><span class="n">codes</span><span class="p">),</span> <span class="n">index</span><span class="o">=</span><span class="n">cats</span><span class="o">.</span><span class="n">index</span><span class="p">)</span>
 
 
-<span class="k">def</span><span class="w"> </span><span class="nf">category_interaction</span><span class="p">(</span><span class="n">cat</span><span class="p">:</span> <span class="n">Series</span><span class="p">,</span> <span class="n">precondition</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">sp</span><span class="o">.</span><span class="n">csc_matrix</span><span class="p">:</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">category_interaction</span><span class="p">(</span><span class="n">cat</span><span class="p">:</span> <span class="n">Series</span><span class="p">,</span> <span class="n">precondition</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">csc_array</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">"""</span>
 <span class="sd">    Parameters</span>
 <span class="sd">    ----------</span>
@@ -750,12 +752,12 @@
 
 <span class="sd">    Returns</span>
 <span class="sd">    -------</span>
-<span class="sd">    csc_matrix</span>
+<span class="sd">    csc_array</span>
 <span class="sd">        Sparse matrix of dummies with unit column norm</span>
 <span class="sd">    """</span>
     <span class="n">codes</span> <span class="o">=</span> <span class="n">asarray</span><span class="p">(</span><span class="n">category_product</span><span class="p">(</span><span class="n">cat</span><span class="p">)</span><span class="o">.</span><span class="n">cat</span><span class="o">.</span><span class="n">codes</span><span class="p">)[:,</span> <span class="kc">None</span><span class="p">]</span>
     <span class="n">mat</span> <span class="o">=</span> <span class="n">dummy_matrix</span><span class="p">(</span><span class="n">codes</span><span class="p">,</span> <span class="n">precondition</span><span class="o">=</span><span class="n">precondition</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span>
-    <span class="k">assert</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">mat</span><span class="p">,</span> <span class="n">sp</span><span class="o">.</span><span class="n">csc_matrix</span><span class="p">)</span>
+    <span class="k">assert</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">mat</span><span class="p">,</span> <span class="n">csc_array</span><span class="p">)</span>
     <span class="k">return</span> <span class="n">mat</span>
 
 
@@ -763,7 +765,7 @@
     <span class="n">cat</span><span class="p">:</span> <span class="n">linearmodels</span><span class="o">.</span><span class="n">typing</span><span class="o">.</span><span class="n">AnyPandas</span><span class="p">,</span>
     <span class="n">cont</span><span class="p">:</span> <span class="n">linearmodels</span><span class="o">.</span><span class="n">typing</span><span class="o">.</span><span class="n">AnyPandas</span><span class="p">,</span>
     <span class="n">precondition</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span>
-<span class="p">)</span> <span class="o">-&gt;</span> <span class="n">sp</span><span class="o">.</span><span class="n">csc_matrix</span><span class="p">:</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="n">csc_array</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">"""</span>
 <span class="sd">    Parameters</span>
 <span class="sd">    ----------</span>
@@ -776,16 +778,16 @@
 
 <span class="sd">    Returns</span>
 <span class="sd">    -------</span>
-<span class="sd">    csc_matrix</span>
+<span class="sd">    csc_array</span>
 <span class="sd">        Sparse matrix of dummy interactions with unit column norm</span>
 <span class="sd">    """</span>
     <span class="n">codes</span> <span class="o">=</span> <span class="n">category_product</span><span class="p">(</span><span class="n">cat</span><span class="p">)</span><span class="o">.</span><span class="n">cat</span><span class="o">.</span><span class="n">codes</span>
-    <span class="n">interact</span> <span class="o">=</span> <span class="n">sp</span><span class="o">.</span><span class="n">csc_matrix</span><span class="p">((</span><span class="n">cont</span><span class="o">.</span><span class="n">to_numpy</span><span class="p">()</span><span class="o">.</span><span class="n">flat</span><span class="p">,</span> <span class="p">(</span><span class="n">arange</span><span class="p">(</span><span class="n">codes</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]),</span> <span class="n">codes</span><span class="p">)))</span>
+    <span class="n">interact</span> <span class="o">=</span> <span class="n">csc_array</span><span class="p">((</span><span class="n">cont</span><span class="o">.</span><span class="n">to_numpy</span><span class="p">()</span><span class="o">.</span><span class="n">flat</span><span class="p">,</span> <span class="p">(</span><span class="n">arange</span><span class="p">(</span><span class="n">codes</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]),</span> <span class="n">codes</span><span class="p">)))</span>
     <span class="k">if</span> <span class="ow">not</span> <span class="n">precondition</span><span class="p">:</span>
         <span class="k">return</span> <span class="n">interact</span>
     <span class="k">else</span><span class="p">:</span>
         <span class="n">contioned</span> <span class="o">=</span> <span class="n">preconditioner</span><span class="p">(</span><span class="n">interact</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span>
-        <span class="k">assert</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">contioned</span><span class="p">,</span> <span class="n">sp</span><span class="o">.</span><span class="n">csc_matrix</span><span class="p">)</span>
+        <span class="k">assert</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">contioned</span><span class="p">,</span> <span class="n">csc_array</span><span class="p">)</span>
         <span class="k">return</span> <span class="n">contioned</span>
 
 
@@ -907,13 +909,13 @@
 
 
     <span class="nd">@property</span>
-    <span class="k">def</span><span class="w"> </span><span class="nf">sparse</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">sp</span><span class="o">.</span><span class="n">csc_matrix</span><span class="p">:</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">sparse</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">csc_array</span><span class="p">:</span>
 <span class="w">        </span><span class="sa">r</span><span class="sd">"""</span>
 <span class="sd">        Construct a sparse interaction matrix</span>
 
 <span class="sd">        Returns</span>
 <span class="sd">        -------</span>
-<span class="sd">        csc_matrix</span>
+<span class="sd">        csc_array</span>
 <span class="sd">            Dummy interaction constructed from the cartesian product of</span>
 <span class="sd">            the categories and each of the continuous variables.</span>
 
@@ -938,9 +940,9 @@
         <span class="k">elif</span> <span class="bp">self</span><span class="o">.</span><span class="n">cat</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">]:</span>
             <span class="k">return</span> <span class="n">category_interaction</span><span class="p">(</span><span class="n">category_product</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">cat</span><span class="p">),</span> <span class="n">precondition</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
         <span class="k">elif</span> <span class="bp">self</span><span class="o">.</span><span class="n">cont</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">]:</span>
-            <span class="k">return</span> <span class="n">sp</span><span class="o">.</span><span class="n">csc_matrix</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_cont_data</span><span class="o">.</span><span class="n">ndarray</span><span class="p">)</span>
+            <span class="k">return</span> <span class="n">csc_array</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_cont_data</span><span class="o">.</span><span class="n">ndarray</span><span class="p">)</span>
         <span class="k">else</span><span class="p">:</span>  <span class="c1"># empty interaction</span>
-            <span class="k">return</span> <span class="n">sp</span><span class="o">.</span><span class="n">csc_matrix</span><span class="p">(</span><span class="n">empty</span><span class="p">((</span><span class="bp">self</span><span class="o">.</span><span class="n">_cat_data</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="mi">0</span><span class="p">)))</span>
+            <span class="k">return</span> <span class="n">csc_array</span><span class="p">(</span><span class="n">empty</span><span class="p">((</span><span class="bp">self</span><span class="o">.</span><span class="n">_cat_data</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="mi">0</span><span class="p">)))</span>
 
     <span class="nd">@property</span>
     <span class="k">def</span><span class="w"> </span><span class="nf">hash</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">list</span><span class="p">[</span><span class="nb">tuple</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="o">...</span><span class="p">]]:</span>
@@ -1095,16 +1097,16 @@
         <span class="k">return</span> <span class="nb">tuple</span><span class="p">(</span><span class="nb">sorted</span><span class="p">(</span><span class="n">hashes</span><span class="p">))</span>
 
     <span class="nd">@property</span>
-    <span class="k">def</span><span class="w"> </span><span class="nf">regressors</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">sp</span><span class="o">.</span><span class="n">csc_matrix</span><span class="p">:</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">regressors</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">csc_array</span><span class="p">:</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_regressors</span><span class="p">()</span>
 
-    <span class="k">def</span><span class="w"> </span><span class="nf">_regressors</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">sp</span><span class="o">.</span><span class="n">csc_matrix</span><span class="p">:</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">_regressors</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">csc_array</span><span class="p">:</span>
         <span class="n">regressors</span> <span class="o">=</span> <span class="p">[]</span>
 
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_cat</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="ow">and</span> <span class="bp">self</span><span class="o">.</span><span class="n">_cat</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
             <span class="n">regressors</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">dummy_matrix</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_cat</span><span class="p">,</span> <span class="n">precondition</span><span class="o">=</span><span class="kc">False</span><span class="p">)[</span><span class="mi">0</span><span class="p">])</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_cont</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="ow">and</span> <span class="bp">self</span><span class="o">.</span><span class="n">_cont</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
-            <span class="n">regressors</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">sp</span><span class="o">.</span><span class="n">csc_matrix</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_cont</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="nb">float</span><span class="p">)</span><span class="o">.</span><span class="n">to_numpy</span><span class="p">()))</span>
+            <span class="n">regressors</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">csc_array</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_cont</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="nb">float</span><span class="p">)</span><span class="o">.</span><span class="n">to_numpy</span><span class="p">()))</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_interactions</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
             <span class="n">regressors</span><span class="o">.</span><span class="n">extend</span><span class="p">([</span><span class="n">interact</span><span class="o">.</span><span class="n">sparse</span> <span class="k">for</span> <span class="n">interact</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_interactions</span><span class="p">])</span>
 
@@ -1114,12 +1116,12 @@
             <span class="bp">self</span><span class="o">.</span><span class="n">_approx_rank</span> <span class="o">=</span> <span class="n">approx_rank</span>
             <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_weights</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
                 <span class="k">return</span> <span class="p">(</span>
-                    <span class="n">sp</span><span class="o">.</span><span class="n">diags</span><span class="p">(</span><span class="n">sqrt</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_weights</span><span class="o">.</span><span class="n">squeeze</span><span class="p">()))</span><span class="o">.</span><span class="n">dot</span><span class="p">(</span><span class="n">regressor_mat</span><span class="p">)</span>
+                    <span class="n">diags_array</span><span class="p">(</span><span class="n">sqrt</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_weights</span><span class="o">.</span><span class="n">squeeze</span><span class="p">()))</span><span class="o">.</span><span class="n">dot</span><span class="p">(</span><span class="n">regressor_mat</span><span class="p">)</span>
                 <span class="p">)</span><span class="o">.</span><span class="n">asformat</span><span class="p">(</span><span class="s2">"csc"</span><span class="p">)</span>
             <span class="k">return</span> <span class="n">regressor_mat</span>
         <span class="k">else</span><span class="p">:</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">_approx_rank</span> <span class="o">=</span> <span class="mi">0</span>
-            <span class="k">return</span> <span class="n">sp</span><span class="o">.</span><span class="n">csc_matrix</span><span class="p">(</span><span class="n">empty</span><span class="p">((</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">)))</span></div>
+            <span class="k">return</span> <span class="n">csc_array</span><span class="p">(</span><span class="n">empty</span><span class="p">((</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">)))</span></div>
 
 
 
@@ -1254,7 +1256,7 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">_has_constant_exog</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_check_constant</span><span class="p">()</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_constant_absorbed</span> <span class="o">=</span> <span class="kc">False</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_num_params</span> <span class="o">=</span> <span class="mi">0</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">_regressors</span><span class="p">:</span> <span class="n">sp</span><span class="o">.</span><span class="n">csc_matrix</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_regressors</span><span class="p">:</span> <span class="n">csc_array</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_regressors_hash</span><span class="p">:</span> <span class="nb">tuple</span><span class="p">[</span><span class="nb">tuple</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="o">...</span><span class="p">],</span> <span class="o">...</span><span class="p">]</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span>
 
     <span class="k">def</span><span class="w"> </span><span class="nf">_drop_missing</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">linearmodels</span><span class="o">.</span><span class="n">typing</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">BoolArray</span><span class="p">:</span>
@@ -1441,7 +1443,7 @@
         <span class="n">mu_exog</span> <span class="o">=</span> <span class="p">(</span><span class="n">root_w</span><span class="o">.</span><span class="n">T</span> <span class="o">@</span> <span class="n">exog</span><span class="p">)</span> <span class="o">/</span> <span class="n">denom</span>
 
         <span class="n">absorb_options</span> <span class="o">=</span> <span class="p">{}</span> <span class="k">if</span> <span class="n">absorb_options</span> <span class="ow">is</span> <span class="kc">None</span> <span class="k">else</span> <span class="n">absorb_options</span>
-        <span class="k">assert</span> <span class="nb">isinstance</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_regressors</span><span class="p">,</span> <span class="n">sp</span><span class="o">.</span><span class="n">csc_matrix</span><span class="p">)</span>
+        <span class="k">assert</span> <span class="nb">isinstance</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_regressors</span><span class="p">,</span> <span class="n">csc_array</span><span class="p">)</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_regressors</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
             <span class="k">if</span> <span class="n">use_hdfe</span><span class="p">:</span>
                 <span class="kn">from</span><span class="w"> </span><span class="nn">pyhdfe</span><span class="w"> </span><span class="kn">import</span> <span class="n">create</span>  <span class="c1"># noqa: PLC0415</span>

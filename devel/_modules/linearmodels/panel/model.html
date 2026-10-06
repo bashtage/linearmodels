@@ -19,7 +19,7 @@
     
   
       
-        <title>linearmodels.panel.model - linearmodels v7.1 (+90)</title>
+        <title>linearmodels.panel.model - linearmodels v7.1 (+94)</title>
       
     
 
@@ -91,7 +91,7 @@
 
 <header class="md-header md-header--shadow" data-md-component="header">
   <nav class="md-header__inner md-grid" aria-label="Header">
-    <a href="../../../index.html" title="linearmodels v7.1 (+90)" class="md-header__button md-logo" aria-label="linearmodels v7.1 (+90)" data-md-component="logo">
+    <a href="../../../index.html" title="linearmodels v7.1 (+94)" class="md-header__button md-logo" aria-label="linearmodels v7.1 (+94)" data-md-component="logo">
       <img src="../../../_static/bw-logo.svg" alt="logo">
     </a>
     <label class="md-header__button md-icon" for="__drawer">
@@ -102,7 +102,7 @@
       <div class="md-header__ellipsis">
         <div class="md-header__topic">
           <span class="md-ellipsis">
-            linearmodels v7.1 (+90)
+            linearmodels v7.1 (+94)
           </span>
         </div>
         <div class="md-header__topic" data-md-component="header-topic">
@@ -197,10 +197,10 @@
 
 <nav class="md-nav md-nav--primary" aria-label="Navigation" data-md-level="0">
   <label class="md-nav__title" for="__drawer">
-    <a href="../../../index.html" title="linearmodels v7.1 (+90)" class="md-nav__button md-logo" aria-label="linearmodels v7.1 (+90)" data-md-component="logo">
+    <a href="../../../index.html" title="linearmodels v7.1 (+94)" class="md-nav__button md-logo" aria-label="linearmodels v7.1 (+94)" data-md-component="logo">
       <img src="../../../_static/bw-logo.svg" alt="logo">
     </a>
-    linearmodels v7.1 (+90)
+    linearmodels v7.1 (+94)
   </label>
   
     <div class="md-nav__source">
@@ -506,6 +506,8 @@
 <h1>Source code for linearmodels.panel.model</h1><div class="highlight"><pre>
 <span></span><code><span class="kn">from</span><span class="w"> </span><span class="nn">__future__</span><span class="w"> </span><span class="kn">import</span> <span class="n">annotations</span>
 
+<span class="kn">from</span><span class="w"> </span><span class="nn">linearmodels.compat.scipy</span><span class="w"> </span><span class="kn">import</span> <span class="n">csc_array</span><span class="p">,</span> <span class="n">diags_array</span>
+
 <span class="kn">from</span><span class="w"> </span><span class="nn">collections.abc</span><span class="w"> </span><span class="kn">import</span> <span class="n">Mapping</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">typing</span><span class="w"> </span><span class="kn">import</span> <span class="n">Any</span><span class="p">,</span> <span class="n">NamedTuple</span><span class="p">,</span> <span class="n">Union</span><span class="p">,</span> <span class="n">cast</span>
 <span class="kn">import</span><span class="w"> </span><span class="nn">warnings</span>
@@ -517,7 +519,6 @@
 <span class="kn">import</span><span class="w"> </span><span class="nn">numpy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">np</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">pandas</span><span class="w"> </span><span class="kn">import</span> <span class="n">Categorical</span><span class="p">,</span> <span class="n">DataFrame</span><span class="p">,</span> <span class="n">Index</span><span class="p">,</span> <span class="n">MultiIndex</span><span class="p">,</span> <span class="n">Series</span><span class="p">,</span> <span class="n">get_dummies</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">scipy.linalg</span><span class="w"> </span><span class="kn">import</span> <span class="n">lstsq</span> <span class="k">as</span> <span class="n">sp_lstsq</span>
-<span class="kn">from</span><span class="w"> </span><span class="nn">scipy.sparse</span><span class="w"> </span><span class="kn">import</span> <span class="n">csc_matrix</span><span class="p">,</span> <span class="n">diags</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">scipy.sparse.linalg</span><span class="w"> </span><span class="kn">import</span> <span class="n">lsmr</span>
 
 <span class="kn">from</span><span class="w"> </span><span class="nn">linearmodels.panel.covariance</span><span class="w"> </span><span class="kn">import</span> <span class="p">(</span>
@@ -2022,7 +2023,7 @@
 
         <span class="n">wy_gm</span> <span class="o">=</span> <span class="n">wybar</span>
         <span class="n">wx_gm</span> <span class="o">=</span> <span class="n">root_w</span> <span class="o">*</span> <span class="p">(</span><span class="n">w</span><span class="o">.</span><span class="n">T</span> <span class="o">@</span> <span class="n">x</span> <span class="o">/</span> <span class="n">w</span><span class="o">.</span><span class="n">sum</span><span class="p">())</span>
-        <span class="n">root_w_sparse</span> <span class="o">=</span> <span class="n">csc_matrix</span><span class="p">(</span><span class="n">root_w</span><span class="p">)</span>
+        <span class="n">root_w_sparse</span> <span class="o">=</span> <span class="n">csc_array</span><span class="p">(</span><span class="n">root_w</span><span class="p">)</span>
 
         <span class="n">cats_l</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span>
             <span class="n">linearmodels</span><span class="o">.</span><span class="n">typing</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">IntArray</span> <span class="o">|</span> <span class="n">linearmodels</span><span class="o">.</span><span class="n">typing</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">Float64Array</span>
@@ -2037,7 +2038,7 @@
         <span class="n">cats</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">concatenate</span><span class="p">(</span><span class="n">cats_l</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span>
 
         <span class="n">wd</span><span class="p">,</span> <span class="n">cond</span> <span class="o">=</span> <span class="n">dummy_matrix</span><span class="p">(</span><span class="n">cats</span><span class="p">,</span> <span class="n">precondition</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
-        <span class="k">assert</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">wd</span><span class="p">,</span> <span class="n">csc_matrix</span><span class="p">)</span>
+        <span class="k">assert</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">wd</span><span class="p">,</span> <span class="n">csc_array</span><span class="p">)</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_is_weighted</span><span class="p">:</span>
             <span class="n">wd</span> <span class="o">=</span> <span class="n">wd</span><span class="o">.</span><span class="n">multiply</span><span class="p">(</span><span class="n">root_w_sparse</span><span class="p">)</span>
 
@@ -2046,18 +2047,18 @@
             <span class="n">cond_mean</span> <span class="o">=</span> <span class="n">lsmr</span><span class="p">(</span><span class="n">wd</span><span class="p">,</span> <span class="n">wx</span><span class="p">[:,</span> <span class="n">i</span><span class="p">],</span> <span class="n">atol</span><span class="o">=</span><span class="mf">1e-8</span><span class="p">,</span> <span class="n">btol</span><span class="o">=</span><span class="mf">1e-8</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span>
             <span class="n">cond_mean</span> <span class="o">/=</span> <span class="n">cond</span>
             <span class="n">wx_mean_l</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">cond_mean</span><span class="p">)</span>
-        <span class="n">wx_mean</span><span class="p">:</span> <span class="n">linearmodels</span><span class="o">.</span><span class="n">typing</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">Float64Array</span> <span class="o">|</span> <span class="n">csc_matrix</span>
-        <span class="n">wy_mean</span><span class="p">:</span> <span class="n">linearmodels</span><span class="o">.</span><span class="n">typing</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">Float64Array</span> <span class="o">|</span> <span class="n">csc_matrix</span>
+        <span class="n">wx_mean</span><span class="p">:</span> <span class="n">linearmodels</span><span class="o">.</span><span class="n">typing</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">Float64Array</span> <span class="o">|</span> <span class="n">csc_array</span>
+        <span class="n">wy_mean</span><span class="p">:</span> <span class="n">linearmodels</span><span class="o">.</span><span class="n">typing</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">Float64Array</span> <span class="o">|</span> <span class="n">csc_array</span>
         <span class="n">wx_mean</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">column_stack</span><span class="p">(</span><span class="n">wx_mean_l</span><span class="p">)</span>
         <span class="n">wy_mean</span> <span class="o">=</span> <span class="n">lsmr</span><span class="p">(</span><span class="n">wd</span><span class="p">,</span> <span class="n">wy</span><span class="p">,</span> <span class="n">atol</span><span class="o">=</span><span class="mf">1e-8</span><span class="p">,</span> <span class="n">btol</span><span class="o">=</span><span class="mf">1e-8</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span>
         <span class="n">wy_mean</span> <span class="o">/=</span> <span class="n">cond</span>
         <span class="n">wy_mean</span> <span class="o">=</span> <span class="n">wy_mean</span><span class="p">[:,</span> <span class="kc">None</span><span class="p">]</span>
 
-        <span class="n">wx_mean</span> <span class="o">=</span> <span class="n">csc_matrix</span><span class="p">(</span><span class="n">wx_mean</span><span class="p">)</span>
-        <span class="n">wy_mean</span> <span class="o">=</span> <span class="n">csc_matrix</span><span class="p">(</span><span class="n">wy_mean</span><span class="p">)</span>
+        <span class="n">wx_mean</span> <span class="o">=</span> <span class="n">csc_array</span><span class="p">(</span><span class="n">wx_mean</span><span class="p">)</span>
+        <span class="n">wy_mean</span> <span class="o">=</span> <span class="n">csc_array</span><span class="p">(</span><span class="n">wy_mean</span><span class="p">)</span>
 
         <span class="c1"># Purge fitted, weighted values</span>
-        <span class="n">sp_cond</span> <span class="o">=</span> <span class="n">diags</span><span class="p">(</span><span class="n">cond</span><span class="p">,</span> <span class="nb">format</span><span class="o">=</span><span class="s2">"csc"</span><span class="p">)</span>
+        <span class="n">sp_cond</span> <span class="o">=</span> <span class="n">diags_array</span><span class="p">(</span><span class="n">cond</span><span class="p">,</span> <span class="nb">format</span><span class="o">=</span><span class="s2">"csc"</span><span class="p">)</span>
         <span class="n">wx</span> <span class="o">=</span> <span class="n">wx</span> <span class="o">-</span> <span class="p">(</span><span class="n">wd</span> <span class="o">@</span> <span class="n">sp_cond</span> <span class="o">@</span> <span class="n">wx_mean</span><span class="p">)</span><span class="o">.</span><span class="n">toarray</span><span class="p">()</span>
         <span class="n">wy</span> <span class="o">=</span> <span class="n">wy</span> <span class="o">-</span> <span class="p">(</span><span class="n">wd</span> <span class="o">@</span> <span class="n">sp_cond</span> <span class="o">@</span> <span class="n">wy_mean</span><span class="p">)</span><span class="o">.</span><span class="n">toarray</span><span class="p">()</span>
 

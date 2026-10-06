@@ -19,7 +19,7 @@
     
   
       
-        <title>linearmodels.panel.data - linearmodels v7.1 (+90)</title>
+        <title>linearmodels.panel.data - linearmodels v7.1 (+94)</title>
       
     
 
@@ -91,7 +91,7 @@
 
 <header class="md-header md-header--shadow" data-md-component="header">
   <nav class="md-header__inner md-grid" aria-label="Header">
-    <a href="../../../index.html" title="linearmodels v7.1 (+90)" class="md-header__button md-logo" aria-label="linearmodels v7.1 (+90)" data-md-component="logo">
+    <a href="../../../index.html" title="linearmodels v7.1 (+94)" class="md-header__button md-logo" aria-label="linearmodels v7.1 (+94)" data-md-component="logo">
       <img src="../../../_static/bw-logo.svg" alt="logo">
     </a>
     <label class="md-header__button md-icon" for="__drawer">
@@ -102,7 +102,7 @@
       <div class="md-header__ellipsis">
         <div class="md-header__topic">
           <span class="md-ellipsis">
-            linearmodels v7.1 (+90)
+            linearmodels v7.1 (+94)
           </span>
         </div>
         <div class="md-header__topic" data-md-component="header-topic">
@@ -197,10 +197,10 @@
 
 <nav class="md-nav md-nav--primary" aria-label="Navigation" data-md-level="0">
   <label class="md-nav__title" for="__drawer">
-    <a href="../../../index.html" title="linearmodels v7.1 (+90)" class="md-nav__button md-logo" aria-label="linearmodels v7.1 (+90)" data-md-component="logo">
+    <a href="../../../index.html" title="linearmodels v7.1 (+94)" class="md-nav__button md-logo" aria-label="linearmodels v7.1 (+94)" data-md-component="logo">
       <img src="../../../_static/bw-logo.svg" alt="logo">
     </a>
-    linearmodels v7.1 (+90)
+    linearmodels v7.1 (+94)
   </label>
   
     <div class="md-nav__source">
@@ -781,7 +781,7 @@
             <span class="p">)</span>
         <span class="c1"># self._k, self._t, self._n = self.panel.shape</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_k</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_t</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_n</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">shape</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">_frame</span><span class="o">.</span><span class="n">index</span><span class="o">.</span><span class="n">set_names</span><span class="p">(</span><span class="n">index_names</span><span class="p">,</span> <span class="n">inplace</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_frame</span><span class="o">.</span><span class="n">index</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_frame</span><span class="o">.</span><span class="n">index</span><span class="o">.</span><span class="n">set_names</span><span class="p">(</span><span class="n">index_names</span><span class="p">)</span>
 
     <span class="nd">@property</span>
     <span class="k">def</span><span class="w"> </span><span class="nf">panel</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">_Panel</span><span class="p">:</span>
@@ -1025,7 +1025,7 @@
 
         <span class="c1"># Swap out the index for better performance</span>
         <span class="n">init_index</span> <span class="o">=</span> <span class="n">DataFrame</span><span class="p">(</span><span class="n">groups</span><span class="p">)</span>
-        <span class="n">init_index</span><span class="o">.</span><span class="n">set_index</span><span class="p">(</span><span class="nb">list</span><span class="p">(</span><span class="n">init_index</span><span class="o">.</span><span class="n">columns</span><span class="p">),</span> <span class="n">inplace</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+        <span class="n">init_index</span> <span class="o">=</span> <span class="n">init_index</span><span class="o">.</span><span class="n">set_index</span><span class="p">(</span><span class="nb">list</span><span class="p">(</span><span class="n">init_index</span><span class="o">.</span><span class="n">columns</span><span class="p">))</span>
 
         <span class="n">root_w</span> <span class="o">=</span> <span class="n">cast</span><span class="p">(</span>
             <span class="s2">"linearmodels.typing.data.Float64Array"</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="n">weights</span><span class="o">.</span><span class="n">values2d</span><span class="p">)</span>
