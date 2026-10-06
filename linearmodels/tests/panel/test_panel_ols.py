@@ -1437,6 +1437,42 @@ def test_fully_absorbed():
         PanelOLS(y, x, drop_absorbed=True, entity_effects=True).fit()
 
 
+def test_drop_absorbed_constant_when_regressor_is_time_invariant():
+    # Entity effects absorb a within-entity constant. With an intercept, the
+    # grand mean is added back and roundoff used to keep the column.
+    rng = np.random.RandomState(0)
+    idx = pd.MultiIndex.from_product(
+        [np.arange(30), np.arange(5)], names=["firm", "year"]
+    )
+    educ = np.repeat(np.arange(30, dtype=float), 5)
+    varying = rng.standard_normal(len(idx))
+    y = 1.7 + 0.4 * educ + 0.25 * varying + rng.standard_normal(len(idx))
+    frame = pd.DataFrame(
+        {"y": y, "educ": educ, "educ_shift": educ - 12.0, "x": varying},
+        index=idx,
+    )
+    intercepts = []
+    for term in ("educ", "educ_shift"):
+        with pytest.warns(AbsorbingEffectWarning, match=term):
+            res = PanelOLS.from_formula(
+                f"y ~ 1 + {term} + EntityEffects",
+                data=frame,
+                drop_absorbed=True,
+            ).fit()
+        assert term not in res.params.index
+        intercepts.append(float(res.params["Intercept"]))
+    assert_allclose(intercepts[0], intercepts[1])
+
+    with pytest.warns(AbsorbingEffectWarning, match="educ"):
+        kept = PanelOLS.from_formula(
+            "y ~ 1 + educ + x + EntityEffects",
+            data=frame,
+            drop_absorbed=True,
+        ).fit()
+    assert "educ" not in kept.params.index
+    assert "x" in kept.params.index
+
+
 def test_zero_endog():
     x = np.arange(10)
     x = np.repeat(x, (2,))[:, None]
