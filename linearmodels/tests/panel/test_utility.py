@@ -199,7 +199,7 @@ def test_preconditioner_sparse():
     values = csc_array(rs.standard_normal((100, 10)))
     orig = values.copy()
     val_cond, cond = preconditioner(values, copy=True)
-    assert_allclose(np.asarray(np.sqrt((values.multiply(values)).sum(0)).ravel()), cond)
+    assert_allclose(np.asarray(np.sqrt((values.multiply(values)).sum(0))).ravel(), cond)
     assert id(val_cond) != id(values)
     assert_array_equal(orig.toarray(), values.toarray())
 
