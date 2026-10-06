@@ -51,6 +51,10 @@ def parse_block(block):
                 params[-1].append(line[0])
             except ValueError:
                 pass
+    max_len = max(map(len, params))
+    for row in params:
+        while len(row) < max_len:
+            row.append(None)
     params = pd.DataFrame(params, columns=["variable", "params", "tstats"])
     params = repl_const(params.set_index("variable"))
     stats = params.loc[params.tstats.isnull(), "params"]

@@ -1,5 +1,7 @@
 from __future__ import annotations
 
+from linearmodels.compat.scipy import csc_array, diags_array
+
 from collections import defaultdict
 from collections.abc import Hashable, Iterable
 import hashlib
@@ -103,7 +105,7 @@ def clear_cache() -> None:
 
 
 def lsmr_annihilate(
-    x: sp.csc_matrix,
+    x: csc_array,
     y: linearmodels.typing.data.Float64Array,
     use_cache: bool = True,
     x_hash: Hashable | None = None,
@@ -116,7 +118,7 @@ def lsmr_annihilate(
 
     Parameters
     ----------
-    x : csc_matrix
+    x : csc_array
         Sparse array of regressors
     y : ndarray
         Array with shape (nobs, nvar)
@@ -167,7 +169,7 @@ def lsmr_annihilate(
             resid = _VARIABLE_CACHE[regressor_hash][variable_digest]
         else:
             beta = lsmr(x, _y, **default_opts)[0]
-            resid = y[:, i : i + 1] - x.dot(sp.csc_matrix(beta[:, None])).toarray()
+            resid = y[:, i : i + 1] - x.dot(csc_array(beta[:, None])).toarray()
             _VARIABLE_CACHE[regressor_hash][variable_digest] = resid
         resids.append(resid)
     return column_stack(resids)
@@ -233,7 +235,7 @@ def category_product(cats: linearmodels.typing.AnyPandas) -> Series:
     return Series(Categorical(codes), index=cats.index)
 
 
-def category_interaction(cat: Series, precondition: bool = True) -> sp.csc_matrix:
+def category_interaction(cat: Series, precondition: bool = True) -> csc_array:
     """
     Parameters
     ----------
@@ -244,12 +246,12 @@ def category_interaction(cat: Series, precondition: bool = True) -> sp.csc_matri
 
     Returns
     -------
-    csc_matrix
+    csc_array
         Sparse matrix of dummies with unit column norm
     """
     codes = asarray(category_product(cat).cat.codes)[:, None]
     mat = dummy_matrix(codes, precondition=precondition)[0]
-    assert isinstance(mat, sp.csc_matrix)
+    assert isinstance(mat, csc_array)
     return mat
 
 
@@ -257,7 +259,7 @@ def category_continuous_interaction(
     cat: linearmodels.typing.AnyPandas,
     cont: linearmodels.typing.AnyPandas,
     precondition: bool = True,
-) -> sp.csc_matrix:
+) -> csc_array:
     """
     Parameters
     ----------
@@ -270,16 +272,16 @@ def category_continuous_interaction(
 
     Returns
     -------
-    csc_matrix
+    csc_array
         Sparse matrix of dummy interactions with unit column norm
     """
     codes = category_product(cat).cat.codes
-    interact = sp.csc_matrix((cont.to_numpy().flat, (arange(codes.shape[0]), codes)))
+    interact = csc_array((cont.to_numpy().flat, (arange(codes.shape[0]), codes)))
     if not precondition:
         return interact
     else:
         contioned = preconditioner(interact)[0]
-        assert isinstance(contioned, sp.csc_matrix)
+        assert isinstance(contioned, csc_array)
         return contioned
 
 
@@ -396,13 +398,13 @@ class Interaction:
         self._cont_data.drop(locs)
 
     @property
-    def sparse(self) -> sp.csc_matrix:
+    def sparse(self) -> csc_array:
         r"""
         Construct a sparse interaction matrix
 
         Returns
         -------
-        csc_matrix
+        csc_array
             Dummy interaction constructed from the cartesian product of
             the categories and each of the continuous variables.
 
@@ -427,9 +429,9 @@ class Interaction:
         elif self.cat.shape[1]:
             return category_interaction(category_product(self.cat), precondition=False)
         elif self.cont.shape[1]:
-            return sp.csc_matrix(self._cont_data.ndarray)
+            return csc_array(self._cont_data.ndarray)
         else:  # empty interaction
-            return sp.csc_matrix(empty((self._cat_data.shape[0], 0)))
+            return csc_array(empty((self._cat_data.shape[0], 0)))
 
     @property
     def hash(self) -> list[tuple[str, ...]]:
@@ -578,16 +580,16 @@ class AbsorbingRegressor:
         return tuple(sorted(hashes))
 
     @property
-    def regressors(self) -> sp.csc_matrix:
+    def regressors(self) -> csc_array:
         return self._regressors()
 
-    def _regressors(self) -> sp.csc_matrix:
+    def _regressors(self) -> csc_array:
         regressors = []
 
         if self._cat is not None and self._cat.shape[1] > 0:
             regressors.append(dummy_matrix(self._cat, precondition=False)[0])
         if self._cont is not None and self._cont.shape[1] > 0:
-            regressors.append(sp.csc_matrix(self._cont.astype(float).to_numpy()))
+            regressors.append(csc_array(self._cont.astype(float).to_numpy()))
         if self._interactions is not None:
             regressors.extend([interact.sparse for interact in self._interactions])
 
@@ -597,12 +599,12 @@ class AbsorbingRegressor:
             self._approx_rank = approx_rank
             if self._weights is not None:
                 return (
-                    sp.diags(sqrt(self._weights.squeeze())).dot(regressor_mat)
+                    diags_array(sqrt(self._weights.squeeze())).dot(regressor_mat)
                 ).asformat("csc")
             return regressor_mat
         else:
             self._approx_rank = 0
-            return sp.csc_matrix(empty((0, 0)))
+            return csc_array(empty((0, 0)))
 
 
 class AbsorbingLS:
@@ -734,7 +736,7 @@ class AbsorbingLS:
         self._has_constant_exog = self._check_constant()
         self._constant_absorbed = False
         self._num_params = 0
-        self._regressors: sp.csc_matrix | None = None
+        self._regressors: csc_array | None = None
         self._regressors_hash: tuple[tuple[str, ...], ...] | None = None
 
     def _drop_missing(self) -> linearmodels.typing.data.BoolArray:
@@ -921,7 +923,7 @@ class AbsorbingLS:
         mu_exog = (root_w.T @ exog) / denom
 
         absorb_options = {} if absorb_options is None else absorb_options
-        assert isinstance(self._regressors, sp.csc_matrix)
+        assert isinstance(self._regressors, csc_array)
         if self._regressors.shape[1] > 0:
             if use_hdfe:
                 from pyhdfe import create  # noqa: PLC0415

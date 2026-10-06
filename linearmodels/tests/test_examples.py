@@ -21,7 +21,7 @@ try:
     kernels = jupyter_client.kernelspec.find_kernel_specs()
 
     plat_win = sys.platform.startswith("win")
-    if plat_win and sys.version_info >= (3, 8):  # pragma: no cover
+    if plat_win and (3, 8) <= sys.version_info < (3, 15):  # pragma: no cover
         import asyncio
 
         try:

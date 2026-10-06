@@ -1,5 +1,7 @@
 from __future__ import annotations
 
+from linearmodels.compat.scipy import csc_array, diags_array
+
 from collections.abc import Mapping
 from typing import Any, NamedTuple, Union, cast
 import warnings
@@ -11,7 +13,6 @@ from formulaic.utils.context import capture_context
 import numpy as np
 from pandas import Categorical, DataFrame, Index, MultiIndex, Series, get_dummies
 from scipy.linalg import lstsq as sp_lstsq
-from scipy.sparse import csc_matrix, diags
 from scipy.sparse.linalg import lsmr
 
 from linearmodels.panel.covariance import (
@@ -1499,7 +1500,7 @@ class PanelOLS(_PanelModelBase):
 
         wy_gm = wybar
         wx_gm = root_w * (w.T @ x / w.sum())
-        root_w_sparse = csc_matrix(root_w)
+        root_w_sparse = csc_array(root_w)
 
         cats_l: list[
             linearmodels.typing.data.IntArray | linearmodels.typing.data.Float64Array
@@ -1514,7 +1515,7 @@ class PanelOLS(_PanelModelBase):
         cats = np.concatenate(cats_l, 1)
 
         wd, cond = dummy_matrix(cats, precondition=True)
-        assert isinstance(wd, csc_matrix)
+        assert isinstance(wd, csc_array)
         if self._is_weighted:
             wd = wd.multiply(root_w_sparse)
 
@@ -1523,18 +1524,18 @@ class PanelOLS(_PanelModelBase):
             cond_mean = lsmr(wd, wx[:, i], atol=1e-8, btol=1e-8)[0]
             cond_mean /= cond
             wx_mean_l.append(cond_mean)
-        wx_mean: linearmodels.typing.data.Float64Array | csc_matrix
-        wy_mean: linearmodels.typing.data.Float64Array | csc_matrix
+        wx_mean: linearmodels.typing.data.Float64Array | csc_array
+        wy_mean: linearmodels.typing.data.Float64Array | csc_array
         wx_mean = np.column_stack(wx_mean_l)
         wy_mean = lsmr(wd, wy, atol=1e-8, btol=1e-8)[0]
         wy_mean /= cond
         wy_mean = wy_mean[:, None]
 
-        wx_mean = csc_matrix(wx_mean)
-        wy_mean = csc_matrix(wy_mean)
+        wx_mean = csc_array(wx_mean)
+        wy_mean = csc_array(wy_mean)
 
         # Purge fitted, weighted values
-        sp_cond = diags(cond, format="csc")
+        sp_cond = diags_array(cond, format="csc")
         wx = wx - (wd @ sp_cond @ wx_mean).toarray()
         wy = wy - (wd @ sp_cond @ wy_mean).toarray()
 

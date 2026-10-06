@@ -67,7 +67,7 @@ def test_numpy_3d():
         minor_axis=items,
         swap=True,
     )
-    expected_frame.index.set_names(["entity", "time"], inplace=True)
+    expected_frame.index = expected_frame.index.set_names(["entity", "time"])
     assert_frame_equal(dh.dataframe, expected_frame)
 
 
@@ -901,7 +901,7 @@ def test_named_index(data):
         assert pdata.dataframe.index.levels[0].name == data.x.index.levels[0].name
         assert pdata.dataframe.index.levels[1].name == data.x.index.levels[1].name
 
-        data.x.index.set_names([None, None], inplace=True)
+        data.x.index = data.x.index.set_names([None, None])
         pdata = PanelData(data.x)
 
     assert pdata.dataframe.index.levels[0].name == "entity"
@@ -914,7 +914,7 @@ def test_fake_panel_properties(mi_df):
     nvar = mi_df.shape[1]
     assert panel.shape == (nvar, ntime, nentity)
     assert_index_equal(panel.items, mi_df.columns)
-    assert_index_equal(panel.major_axis, mi_df.index.levels[1])
+    assert_index_equal(panel.major_axis, mi_df.index.levels[1], check_freq=False)
     assert_index_equal(panel.minor_axis, mi_df.index.levels[0])
     df = panel.to_frame()
     assert_frame_equal(df, mi_df)
