@@ -69,6 +69,27 @@ def test_wu_hausman(data):
     assert_allclose(res.wu_hausman("x1").pval, 0.6944, rtol=1e-3)
 
 
+def test_durbin_wu_hausman_invariant_to_instrument_shift(data):
+    # A constant shift of the excluded instruments does not change the
+    # column space once the exogenous block contains a constant, so the
+    # 2SLS coefficient and both exogeneity statistics stay put.
+    stats = []
+    params = []
+    for shift in (0.0, 1.0, 5.0):
+        instr = data.instr.copy()
+        instr["z1"] = instr["z1"] + shift
+        instr["z2"] = instr["z2"] + 0.5 * shift
+        res = IV2SLS(data.dep, data.exog, data.endog[["x1"]], instr).fit(
+            cov_type="unadjusted"
+        )
+        stats.append((res.durbin().stat, res.wu_hausman().stat))
+        params.append(np.asarray(res.params))
+    assert_allclose(params[1], params[0], rtol=0, atol=1e-10)
+    assert_allclose(params[2], params[0], rtol=0, atol=1e-10)
+    assert_allclose(stats[1], stats[0], rtol=0, atol=1e-8)
+    assert_allclose(stats[2], stats[0], rtol=0, atol=1e-8)
+
+
 def test_wooldridge_score(data):
     res = IV2SLS(data.dep, data.exog, data.endog[["x1", "x2"]], data.instr).fit(
         cov_type="robust"
