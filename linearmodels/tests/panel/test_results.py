@@ -1,9 +1,12 @@
 from itertools import product
+import warnings
 
 import numpy as np
 from numpy.testing import assert_allclose
+import pandas as pd
 from pandas.testing import assert_series_equal
 import pytest
+from scipy import stats
 from statsmodels.tools.tools import add_constant
 
 from linearmodels.datasets import wage_panel
@@ -11,6 +14,7 @@ from linearmodels.iv.model import IV2SLS
 from linearmodels.panel.data import PanelData
 from linearmodels.panel.model import PanelOLS, PooledOLS, RandomEffects
 from linearmodels.panel.results import compare
+from linearmodels.shared.hypotheses import InvalidTestStatistic, WaldTestStatistic
 from linearmodels.tests.panel._utility import datatypes, generate_data
 
 
@@ -222,38 +226,206 @@ def test_wald_test(data, constraint_formula):
         res.wald_test(restriction, np.zeros(2), formula=constraint_formula)
 
 
-@pytest.mark.parametrize("constant", (False, True), ids=("", "constant"))
-@pytest.mark.parametrize("sigmamore", (False, True), ids=("", "sigmamore"))
-@pytest.mark.parametrize("sigmaless", (False, True), ids=("", "sigmaless"))
-def test_wu_hausman(recwarn, data, constant, sigmamore, sigmaless):
-    if sigmamore and sigmaless:
-        return
+# Values computed in Stata (hausman fe re, with the sigmamore and sigmaless
+# options and with constant, using xtreg, fe and xtreg, re)
+STATA_HAUSMAN = {
+    "": (7.190854126884934, 0.0274489582259534),
+    "include_constant": (7.190854126885962, 0.0660570908629669),
+    "sigmaless": (6.953506564342694, 0.0309075965524561),
+    "include_constant-sigmaless": (6.953506564340507, 0.0733945334224529),
+    "sigmamore": (6.945610047252053, 0.0310298689573541),
+    "include_constant-sigmamore": (6.94561004725098, 0.0736517192483979),
+}
+HAUSMAN_NAMES = ["exper", "expersq"]
+
+
+def hausman_by_hand(re_res, fe_res, names=HAUSMAN_NAMES):
+    delta = (fe_res.params - re_res.params)[names].to_numpy()
+    diff = (fe_res.cov - re_res.cov).loc[names, names].to_numpy()
+    return float(delta @ np.linalg.pinv(diff) @ delta)
+
+
+@pytest.fixture
+def hausman_data(data):
     data = data.set_index(["nr", "year"])
-    dependent = data["hours"]
-    exog = add_constant(data[["exper", "expersq"]])
+    return data["hours"], data[HAUSMAN_NAMES]
+
+
+@pytest.fixture
+def re_fe(hausman_data):
+    dependent, regressors = hausman_data
+    exog = add_constant(regressors)
     re_res = RandomEffects(dependent, exog).fit()
     fe_res = PanelOLS(dependent, exog, entity_effects=True).fit()
+    return re_res, fe_res
+
+
+@pytest.mark.parametrize("variant", ["", "sigmamore", "sigmaless"])
+@pytest.mark.parametrize("constant", [False, True], ids=["", "include_constant"])
+def test_wu_hausman_stata(re_fe, constant, variant):
+    re_res, fe_res = re_fe
     opts = {
         "include_constant": constant,
-        "sigmamore": sigmamore,
-        "sigmaless": sigmaless,
+        "sigmamore": variant == "sigmamore",
+        "sigmaless": variant == "sigmaless",
     }
-    wald, estimates = re_res.wu_hausman(other=fe_res, **opts)
     if constant:
-        warnings = {str(warn.message) for warn in recwarn}
-        assert "(Var(b0) - Var(b1) is not positive definite)" in warnings
-        assert estimates.shape == (3, 4)
+        # The covariance difference is not positive definite with the constant
+        with pytest.warns(UserWarning, match="not positive definite") as record:
+            wald, estimates = re_res.wu_hausman(other=fe_res, **opts)
+        assert all(issubclass(warn.category, UserWarning) for warn in record)
+        names = ["const", *HAUSMAN_NAMES]
+        assert estimates["Std. Err."].isna().any()
     else:
-        assert estimates.shape == (2, 4)
-    stata_results = {
-        "": (7.190854126884934, 0.0274489582259534),
-        "include_constant": (7.190854126885962, 0.0660570908629669),
-        "sigmaless": (6.953506564342694, 0.0309075965524561),
-        "include_constant-sigmaless": (6.953506564340507, 0.0733945334224529),
-        "sigmamore": (6.945610047252053, 0.0310298689573541),
-        "include_constant-sigmamore": (6.94561004725098, 0.0736517192483979),
-    }
-    test_id = "-".join([key for key, val in opts.items() if val is True])
-    expected_stat, expected_pval = stata_results[test_id]
+        with warnings.catch_warnings():
+            warnings.simplefilter("error")
+            wald, estimates = re_res.wu_hausman(other=fe_res, **opts)
+        names = HAUSMAN_NAMES
+        assert estimates["Std. Err."].notna().all()
+    expected_stat, expected_pval = STATA_HAUSMAN[
+        "-".join(k for k, v in opts.items() if v)
+    ]
+    assert isinstance(wald, WaldTestStatistic)
+    assert not isinstance(wald, InvalidTestStatistic)
     assert wald.stat == pytest.approx(expected_stat, abs=1e-9)
     assert wald.pval == pytest.approx(expected_pval, abs=1e-9)
+    assert wald.df == len(names)
+    assert wald.dist_name == f"chi2({len(names)})"
+
+    assert list(estimates.index) == names
+    assert list(estimates.columns) == ["b0", "b1", "b0-b1", "Std. Err."]
+    assert_allclose(estimates["b0"], fe_res.params[names])
+    assert_allclose(estimates["b1"], re_res.params[names])
+    assert_allclose(estimates["b0-b1"], estimates["b0"] - estimates["b1"])
+
+
+def test_wu_hausman_formula(re_fe):
+    re_res, fe_res = re_fe
+    expected = hausman_by_hand(re_res, fe_res)
+    wald, estimates = re_res.wu_hausman(fe_res)
+    assert_allclose(wald.stat, expected)
+    assert_allclose(wald.pval, stats.chi2.sf(expected, 2))
+    assert wald.df == 2
+    assert "No systematic difference" in wald.null
+    assert "Hausman specification test" in str(wald)
+    diff = (fe_res.cov - re_res.cov).loc[HAUSMAN_NAMES, HAUSMAN_NAMES]
+    assert_allclose(estimates["Std. Err."], np.sqrt(np.diag(diff)))
+
+
+@pytest.mark.parametrize("re_constant", [True, False], ids=["re-const", "re-noconst"])
+@pytest.mark.parametrize("fe_constant", [True, False], ids=["fe-const", "fe-noconst"])
+@pytest.mark.parametrize(
+    "include_constant", [False, True], ids=["", "include_constant"]
+)
+def test_wu_hausman_constants(hausman_data, re_constant, fe_constant, include_constant):
+    dependent, regressors = hausman_data
+    re_exog = add_constant(regressors) if re_constant else regressors
+    fe_exog = add_constant(regressors) if fe_constant else regressors
+    re_res = RandomEffects(dependent, re_exog).fit()
+    fe_res = PanelOLS(dependent, fe_exog, entity_effects=True).fit()
+    with warnings.catch_warnings():
+        # Warnings are only possible when the constant is part of the test
+        warnings.simplefilter("ignore", UserWarning)
+        wald, estimates = re_res.wu_hausman(fe_res, include_constant=include_constant)
+    # The constant can only be compared when both models have one
+    names = (
+        ["const"] if include_constant and re_constant and fe_constant else []
+    ) + HAUSMAN_NAMES
+    assert list(estimates.index) == names
+    assert wald.df == len(names)
+    expected = hausman_by_hand(re_res, fe_res, names)
+    assert_allclose(wald.stat, expected, atol=1e-12)
+
+
+def test_wu_hausman_negative_statistic():
+    # In small samples Var(b0) - Var(b1) is often indefinite, and the
+    # statistic can be negative, in which case the test is not valid
+    rg = np.random.default_rng(3)
+    index = pd.MultiIndex.from_product([np.arange(12), np.arange(3)])
+    effects = np.repeat(rg.standard_normal(12), 3)
+    x = pd.DataFrame(rg.standard_normal((36, 2)), index=index, columns=["x0", "x1"])
+    y = pd.Series(
+        x.sum(axis=1).to_numpy() + effects + rg.standard_normal(36), index=index
+    )
+    fe_res = PanelOLS(y, x, entity_effects=True).fit()
+    re_res = RandomEffects(y, add_constant(x)).fit()
+    with pytest.warns(UserWarning, match="not positive definite"):
+        test, estimates = re_res.wu_hausman(fe_res)
+    assert isinstance(test, InvalidTestStatistic)
+    assert np.isnan(test.stat)
+    assert np.isnan(test.pval)
+    assert "negative" in str(test)
+    assert "Hausman specification test" in str(test)
+    assert list(estimates.index) == ["x0", "x1"]
+    assert hausman_by_hand(re_res, fe_res, ["x0", "x1"]) < 0
+
+
+def test_wu_hausman_conflicting_options(re_fe):
+    re_res, fe_res = re_fe
+    with pytest.raises(ValueError, match="cannot both be True"):
+        re_res.wu_hausman(fe_res, sigmamore=True, sigmaless=True)
+
+
+@pytest.mark.parametrize(
+    "other", [None, "fe", np.arange(3)], ids=["none", "str", "array"]
+)
+def test_wu_hausman_invalid_other(re_fe, other):
+    re_res, _ = re_fe
+    with pytest.raises(TypeError, match="other must be the results of a panel model"):
+        re_res.wu_hausman(other)
+
+
+@pytest.mark.parametrize("which", ["other", "self"])
+@pytest.mark.parametrize(
+    ("cov_type", "cov_config"),
+    [
+        ("robust", {}),
+        ("clustered", {"cluster_entity": True}),
+        ("kernel", {}),
+        ("autocorrelated", {}),
+    ],
+)
+def test_wu_hausman_requires_unadjusted_cov(hausman_data, which, cov_type, cov_config):
+    dependent, regressors = hausman_data
+    exog = add_constant(regressors)
+    re_kwargs = fe_kwargs = {}
+    if which == "self":
+        re_kwargs = {"cov_type": cov_type, **cov_config}
+    else:
+        fe_kwargs = {"cov_type": cov_type, **cov_config}
+    re_res = RandomEffects(dependent, exog).fit(**re_kwargs)
+    fe_res = PanelOLS(dependent, exog, entity_effects=True).fit(**fe_kwargs)
+    with pytest.raises(TypeError, match="unadjusted covariance estimator"):
+        re_res.wu_hausman(fe_res)
+
+
+def test_wu_hausman_conventional_covariance(hausman_data):
+    # "conventional" and "homoskedastic" are aliases of the unadjusted estimator
+    dependent, regressors = hausman_data
+    exog = add_constant(regressors)
+    re_res = RandomEffects(dependent, exog).fit(cov_type="homoskedastic")
+    fe_res = PanelOLS(dependent, exog, entity_effects=True).fit(cov_type="conventional")
+    wald, _ = re_res.wu_hausman(fe_res)
+    assert_allclose(wald.stat, STATA_HAUSMAN[""][0], atol=1e-9)
+
+
+def test_wu_hausman_different_observations(hausman_data):
+    dependent, regressors = hausman_data
+    exog = add_constant(regressors)
+    re_res = RandomEffects(dependent, exog).fit()
+    fe_res = PanelOLS(dependent.iloc[:-8], exog.iloc[:-8], entity_effects=True).fit()
+    with pytest.raises(ValueError, match="same observations"):
+        re_res.wu_hausman(fe_res)
+
+
+def test_wu_hausman_no_common_coefficients(hausman_data, data):
+    dependent, _ = hausman_data
+    data = data.set_index(["nr", "year"])
+    re_res = RandomEffects(dependent, add_constant(data[HAUSMAN_NAMES])).fit()
+    fe_res = PanelOLS(dependent, data[["married", "union"]], entity_effects=True).fit()
+    with pytest.raises(ValueError, match="coefficients in common"):
+        re_res.wu_hausman(fe_res)
+    # Only the constant is shared
+    fe_const = PanelOLS(dependent, add_constant(data[["married"]]), entity_effects=True)
+    with pytest.raises(ValueError, match="coefficients in common"):
+        re_res.wu_hausman(fe_const.fit())

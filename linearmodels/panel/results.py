@@ -5,7 +5,7 @@ from linearmodels.compat.statsmodels import Summary
 from collections.abc import Mapping
 import datetime as dt
 from functools import cached_property
-from typing import Any, Tuple, Union
+from typing import Any, Union
 import warnings
 
 from formulaic.utils.context import capture_context
@@ -15,8 +15,8 @@ from scipy import stats
 from statsmodels.iolib.summary import SimpleTable, fmt_2cols, fmt_params
 
 from linearmodels.iv.results import default_txt_fmt, stub_concat, table_concat
+from linearmodels.panel.covariance import HomoskedasticCovariance
 from linearmodels.shared.base import _ModelComparison, _SummaryStr
-from linearmodels.panel.covariance import ClusteredCovariance, HeteroskedasticCovariance
 from linearmodels.shared.hypotheses import (
     InvalidTestStatistic,
     WaldTestStatistic,
@@ -887,6 +887,16 @@ class PanelEffectsResults(PanelResults):
         return Series(vals, index=index, name="Variance Decomposition")
 
 
+def _has_unadjusted_cov(res: PanelResults) -> bool:
+    """Test whether results use the unadjusted covariance estimator
+
+    The robust, clustered, kernel and autocorrelation-robust estimators all
+    derive from the unadjusted estimator, so the exact type must be checked.
+    """
+    estimator = getattr(res._deferred_cov, "__self__", None)
+    return type(estimator) is HomoskedasticCovariance
+
+
 class RandomEffectsResults(PanelResults):
     """
     Results container for random effect panel data models
@@ -917,122 +927,170 @@ class RandomEffectsResults(PanelResults):
         include_constant: bool = False,
         sigmamore: bool = False,
         sigmaless: bool = False,
-    ) -> Tuple[Union[InvalidTestStatistic, WaldTestStatistic], DataFrame]:
+    ) -> tuple[InvalidTestStatistic | WaldTestStatistic, DataFrame]:
         r"""
-        Perform Hausman specification test against other regression results.
+        Hausman specification test against results from a consistent model
 
         Parameters
         ----------
         other : PanelResults
-            Result from panel regression known to be consistent. Typically
-            fixed effects regression.
-        include_constant : bool, optional
-            Flag indicating whether to include the constant term in the comparison.
-        sigmamore : bool, optional
-            Flag indicating whether to base the test on the estimated parameter
-            covariance from the efficient model.
-        sigmaless : bool, optional
-            Flag indicating whether to base the test on the estimated parameter
-            covariance from the consistent model.
+            Results from a model that is consistent whether or not the null
+            hypothesis is true, typically a fixed effects (entity effects)
+            model estimated using the same observations and regressors as
+            this model.
+        include_constant : bool
+            Flag indicating whether to include the constant in the comparison.
+            The default is False.
+        sigmamore : bool
+            Flag indicating whether to base both covariance estimates on the
+            error variance estimated by this model, which is efficient under
+            the null. Cannot be used with ``sigmaless``.
+        sigmaless : bool
+            Flag indicating whether to base both covariance estimates on the
+            error variance estimated by ``other``. Cannot be used with
+            ``sigmamore``.
 
         Returns
         -------
-        WaldTestStatistic
-            Object containing test statistic, p-value, distribution and null
+        WaldTestStatistic or InvalidTestStatistic
+            Object containing test statistic, p-value, distribution and null.
+            An InvalidTestStatistic is returned when the statistic is negative.
         DataFrame
-            Overview of coefficients used in the test, and their differences and standard errors
+            The coefficients included in the test. The columns are ``b0``
+            (from ``other``), ``b1`` (from this model), their difference
+            ``b0-b1`` and ``Std. Err.``, the standard error of the difference.
+            The standard error is NaN if the variance of the difference is
+            negative.
+
+        Raises
+        ------
+        TypeError
+            If ``other`` is not a panel results object, or if either model
+            was not estimated using the unadjusted covariance estimator.
+        ValueError
+            If ``sigmamore`` and ``sigmaless`` are both True, if the models
+            use different numbers of observations, or if the models do not
+            have any coefficients in common.
 
         Notes
         -----
-        The test is computed by
+        The test statistic is
+
         .. math::
-            H=(b_{1}-b_{0})'\big(\operatorname{Var}(b_{0})-\operatorname{Var}(b_{1})\big)^{-1}(b_{1}-b_{0})
 
-            where :math:`b_{1}` is the array of coefficients from the model known to be consistent,
-            and :math:`b_{1}` is the array of coefficients from the model known to be efficient
-            (this model).
+            H = (b_0 - b_1)^{\prime} (V_0 - V_1)^{-1} (b_0 - b_1)
 
+        where :math:`b_0` and :math:`V_0` are the coefficients and covariance
+        from ``other``, which is consistent under both the null and the
+        alternative, and :math:`b_1` and :math:`V_1` are from this model,
+        which is efficient under the null. The null hypothesis is that there
+        is no systematic difference in the coefficients, which for a fixed
+        effects model compared with a random effects model means that the
+        effects are uncorrelated with the regressors. The statistic is
+        asymptotically :math:`\chi^2_k`, where :math:`k` is the number of
+        coefficients compared.
+
+        Only coefficients found in both models are compared. The constant is
+        excluded unless ``include_constant`` is True.
+
+        The result is only meaningful when :math:`V_0 - V_1` is positive
+        definite, which is guaranteed in large samples if the null is true. If
+        it is not, a warning is issued and a generalized inverse is used. If
+        the resulting statistic is negative, the data do not satisfy the
+        assumptions of the test and an InvalidTestStatistic is returned.
+
+        Both models must use the default unadjusted covariance estimator, and
+        the statistic requires that ``other`` is estimated using the same
+        observations as this model.
+
+        References
+        ----------
+        Hausman, J. A. (1978). Specification tests in econometrics.
+        Econometrica, 46(6), 1251-1271.
+
+        Examples
+        --------
+        >>> from linearmodels import PanelOLS, RandomEffects
+        >>> fe_res = PanelOLS(y, x, entity_effects=True).fit()
+        >>> re_res = RandomEffects(y, x).fit()
+        >>> test, estimates = re_res.wu_hausman(fe_res)
+        >>> print(test)
         """
-
-        def alt_cov(res: PanelResults, s2: float) -> DataFrame:
-            """
-            Calculate covariance using the supplied error variance. Based on
-            https://github.com/bashtage/linearmodels/blob/4.17/linearmodels/panel/covariance.py#L119
-            """
-            cov_obj = res._deferred_cov.__self__
-            x = cov_obj._x
-            out = s2 * np.linalg.inv(x.T @ x)
-            out = (out + out.T) / 2
-            return DataFrame(
-                out, columns=res.model.exog.vars, index=res.model.exog.vars
-            )
-
-        def matrix_positive_definite(mat: Union[NDArray, DataFrame]) -> bool:
-            """
-            Check if matrix is positive definite.
-            """
-            if np.array_equal(mat, mat.T):
-                try:
-                    np.linalg.cholesky(mat)
-                    return True
-                except np.linalg.LinAlgError:
-                    pass
-            return False
-
+        if not isinstance(other, PanelResults):
+            raise TypeError("other must be the results of a panel model.")
         if sigmamore and sigmaless:
-            raise ValueError("Conflicting test parameters")
-
-        invalid_cov = (ClusteredCovariance, HeteroskedasticCovariance)
-        if any(
-            isinstance(res._deferred_cov.__self__, invalid_cov) for res in (other, self)
-        ):
+            raise ValueError("sigmamore and sigmaless cannot both be True.")
+        if not (_has_unadjusted_cov(self) and _has_unadjusted_cov(other)):
             raise TypeError(
-                "Hausman test cannot be used with clustered or robust covariance"
+                "The Hausman test can only be used with models estimated using "
+                "the unadjusted covariance estimator."
+            )
+        if self.nobs != other.nobs:
+            raise ValueError(
+                "The models must be estimated using the same observations. "
+                f"This model uses {self.nobs} and other uses {other.nobs}."
             )
 
-        common_cols = set(other.params.index) & set(self.params.index)
+        in_other = set(other.params.index)
+        common = [name for name in self.params.index if name in in_other]
         if not include_constant:
-            if other.model.has_constant:
-                common_cols.discard(other.model.exog.vars[other.model._constant_index])
-            if self.model.has_constant:
-                common_cols.discard(self.model.exog.vars[self.model._constant_index])
+            constants: set[Any] = set()
+            for res in (self, other):
+                if res.model.has_constant:
+                    loc = res.model._constant_index
+                    assert isinstance(loc, int)
+                    constants.add(res.model.exog.vars[loc])
+            common = [name for name in common if name not in constants]
+        if not common:
+            raise ValueError("The models do not have any coefficients in common.")
 
-        common_cols = sorted(common_cols)
-        b0 = other.params[common_cols]
-        b1 = self.params[common_cols]
-        var0 = (other.cov if not sigmamore else alt_cov(other, s2=self.s2)).loc[
-            common_cols, common_cols
-        ]
-        var1 = (self.cov if not sigmaless else alt_cov(self, s2=other.s2)).loc[
-            common_cols, common_cols
-        ]
+        # The unadjusted covariance is s2 * inv(x'x), so using the error
+        # variance of the other model only requires rescaling.
+        cov0 = other.cov
+        cov1 = self.cov
+        if sigmamore:
+            cov0 = cov0 * (self.s2 / other.s2)
+        elif sigmaless:
+            cov1 = cov1 * (other.s2 / self.s2)
 
-        var_diff = var0 - var1
+        b0 = other.params[common]
+        b1 = self.params[common]
         b_diff = b0 - b1
-        std_errors = Series(np.sqrt(np.diagonal(var_diff)), index=var0.index)
+        var_diff = cov0.loc[common, common] - cov1.loc[common, common]
+        diag = np.diag(var_diff)
+        std_errors = Series(np.sqrt(np.where(diag >= 0, diag, np.nan)), index=common)
         estimates = DataFrame(
-            data={"b0": b0, "b1": b1, "b0-b1": b_diff, "Std. Err.": std_errors}
+            {"b0": b0, "b1": b1, "b0-b1": b_diff, "Std. Err.": std_errors}
         )
-        if not matrix_positive_definite(var_diff):
-            warnings.warn("(Var(b0) - Var(b1) is not positive definite)")
-            inv = np.linalg.inv
-        else:
-            inv = np.linalg.pinv
-        test_stat = b_diff.T @ inv(var_diff) @ b_diff
 
-        test: Union[InvalidTestStatistic, WaldTestStatistic]
-        if test_stat >= 0:
-            test = WaldTestStatistic(
-                test_stat,
-                null="No systematic difference in coefficients between models",
-                df=b0.size,
-                name="Hausman specification test",
-            )
+        diff = var_diff.to_numpy()
+        delta = b_diff.to_numpy()
+        try:
+            np.linalg.cholesky(diff)
+            positive_definite = True
+        except np.linalg.LinAlgError:
+            positive_definite = False
+        if positive_definite:
+            stat = float(delta @ np.linalg.solve(diff, delta))
         else:
-            test = InvalidTestStatistic(
-                "chi2<0. Model does not meet the assumptions of the Hausman test."
+            warnings.warn(
+                "Var(b0) - Var(b1) is not positive definite. A generalized "
+                "inverse is used to compute the statistic.",
+                UserWarning,
+                stacklevel=2,
             )
-        return test, estimates
+            stat = float(delta @ np.linalg.pinv(diff, hermitian=True) @ delta)
+
+        name = "Hausman specification test"
+        if stat < 0:
+            invalid = InvalidTestStatistic(
+                "The statistic is negative, so the models do not meet the "
+                "assumptions of the Hausman test.",
+                name=name,
+            )
+            return invalid, estimates
+        null = "No systematic difference in coefficients between models"
+        return WaldTestStatistic(stat, null, len(common), name=name), estimates
 
 
 PanelModelResults = Union[PanelEffectsResults, PanelResults, RandomEffectsResults]
