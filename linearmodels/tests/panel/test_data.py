@@ -914,7 +914,10 @@ def test_fake_panel_properties(mi_df):
     nvar = mi_df.shape[1]
     assert panel.shape == (nvar, ntime, nentity)
     assert_index_equal(panel.items, mi_df.columns)
-    assert_index_equal(panel.major_axis, mi_df.index.levels[1], check_freq=False)
+    try:
+        assert_index_equal(panel.major_axis, mi_df.index.levels[1], check_freq=False)
+    except TypeError:
+        assert_index_equal(panel.major_axis, mi_df.index.levels[1])
     assert_index_equal(panel.minor_axis, mi_df.index.levels[0])
     df = panel.to_frame()
     assert_frame_equal(df, mi_df)
