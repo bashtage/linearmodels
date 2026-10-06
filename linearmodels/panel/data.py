@@ -48,7 +48,10 @@ class _Panel:
         self._items = df.columns
         index = df.index
         assert isinstance(index, MultiIndex)
-        self._major_axis = Index(index.levels[1][index.codes[1]]).unique()
+        # Time is required to be numeric or datetime. Order of first appearance
+        # is not that order: a late-entering first entity puts later dates first,
+        # and first_difference then subtracts non-adjacent periods.
+        self._major_axis = Index(index.levels[1][index.codes[1]]).unique().sort_values()
         self._minor_axis = Index(index.levels[0][index.codes[0]]).unique()
         self._full_index = MultiIndex.from_product([self._minor_axis, self._major_axis])
         new_df = df.reindex(self._full_index)
