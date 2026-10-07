@@ -82,3 +82,34 @@ def test_extra_df(data):
     res = mod.fit()
     res_extra = mod.fit(extra_df=10)
     assert np.all(np.diag(res_extra.cov) > np.diag(res.cov))
+
+
+def test_weighted_quasi_demeaning():
+    # With weights that are constant within each entity, the weighted
+    # estimator is WLS on the quasi-demeaned data using the same theta.
+    rng = np.random.default_rng(0)
+    nentity, nobs = 40, 5
+    index = pd.MultiIndex.from_product([np.arange(nentity), np.arange(nobs)])
+    effects = np.repeat(rng.standard_normal(nentity), nobs)
+    x = pd.DataFrame(
+        {
+            "const": 1.0,
+            "x1": rng.standard_normal(nentity * nobs),
+            "x2": rng.standard_normal(nentity * nobs),
+        },
+        index=index,
+    )
+    y = x @ np.array([1.0, 0.5, -0.3]) + effects + rng.standard_normal(nentity * nobs)
+    y = y.to_frame("y")
+    w = pd.Series(np.repeat(rng.uniform(0.3, 3.0, nentity), nobs), index=index)
+
+    res = RandomEffects(y, x, weights=w).fit()
+
+    theta = np.asarray(res.theta.reindex(index.get_level_values(0)))
+    y_demeaned = y.to_numpy() - theta * y.groupby(level=0).transform("mean")
+    x_demeaned = x.to_numpy() - theta * x.groupby(level=0).transform("mean")
+    root_w = np.sqrt(w.to_numpy())[:, None]
+    expected = np.linalg.lstsq(
+        root_w * x_demeaned.to_numpy(), root_w * y_demeaned.to_numpy(), rcond=None
+    )[0]
+    assert_allclose(res.params, np.squeeze(expected))

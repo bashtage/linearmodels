@@ -2934,8 +2934,8 @@ class RandomEffects(_PanelModelBase):
         reindex = index.levels[0][index.codes[0]]
         wybar = (theta * wybar).loc[reindex]
         wxbar = (theta * wxbar).loc[reindex]
-        wy -= wybar.values
-        wx -= wxbar.values
+        wy -= root_w * wybar.values
+        wx -= root_w * wxbar.values
         params = _lstsq(wx, wy, rcond=None)[0]
 
         df_resid = wy.shape[0] - wx.shape[1]
