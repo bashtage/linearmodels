@@ -1352,6 +1352,11 @@ class _LSSystemModelBase(_SystemModelBase):
             delta = float(np.sqrt(np.mean(diff**2)))
             iter_count += 1
 
+        if iterate and self._sigma is None:
+            # The covariance uses the residual covariance at the final estimates
+            # rather than the one from the first step
+            full_sigma = (eps.T @ eps / nobs) * self._sigma_scale(debiased)
+
         sigma_m12 = inv_matrix_sqrt(sigma)
         wy = blocked_column_product(self._wy, sigma_m12)
         wx = blocked_diag_product(self._wx, sigma_m12)

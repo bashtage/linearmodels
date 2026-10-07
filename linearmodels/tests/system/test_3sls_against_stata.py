@@ -81,3 +81,18 @@ def test_pval(fit):
 def test_sigma(fit):
     stata, result, rtol = fit
     assert_allclose(stata.sigma.values, result.sigma, rtol=rtol)
+
+
+def test_iterated_tstats():
+    # The covariance of the iterated estimator uses the final residual covariance,
+    # as in Stata's ireg3
+    stata = results["3sls ireg3"]
+    res = IV3SLS(generate_simultaneous_data()).fit(
+        cov_type="unadjusted", method="gls", iterate=True
+    )
+    for idx in res.tstats.index:
+        dep = "_".join(idx.split("_")[:2])
+        variable = "_".join(idx.split("_")[2:])
+        variable = "_cons" if variable == "const" else variable
+        stata_val = stata.params[dep].loc[variable, "tstat"]
+        assert_allclose(stata_val, res.tstats[idx], rtol=1e-6)
