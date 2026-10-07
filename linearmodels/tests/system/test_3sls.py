@@ -165,6 +165,38 @@ def test_single_equation(data):
     assert_allclose(np.diag(res.cov), np.diag(out.cov))
 
 
+@pytest.mark.parametrize("common_exog", [True, False])
+def test_weighted_against_transformed_data(common_exog):
+    # Weighted 3SLS is 3SLS on the data scaled by the square root of the
+    # (normalized) weights, including in the first stage
+    data = generate_3sls_data(
+        n=250,
+        k=3,
+        p=3,
+        en=2,
+        instr=3,
+        const=True,
+        rho=0.8,
+        common_exog=common_exog,
+        included_weights=True,
+        output_dict=True,
+    )
+    res = IV3SLS(data).fit(cov_type="unadjusted")
+
+    y = []
+    x = []
+    z = []
+    for val in data.values():
+        w = np.sqrt(val["weights"] / val["weights"].mean())
+        y.append(val["dependent"] * w)
+        x.append(np.concatenate([val["exog"], val["endog"]], 1) * w)
+        z.append(np.concatenate([val["exog"], val["instruments"]], 1) * w)
+    out = simple_3sls(y, x, z)
+    assert_allclose(res.params.values, out.beta1.squeeze())
+    assert_allclose(res.sigma, out.sigma)
+    assert_allclose(np.diag(res.cov), np.diag(out.cov))
+
+
 def test_too_few_instruments():
     n = 200
     dep = np.random.standard_normal((n, 2))
