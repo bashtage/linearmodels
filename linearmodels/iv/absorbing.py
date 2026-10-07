@@ -984,6 +984,7 @@ class AbsorbingLS:
         self._absorbed_exog = DataFrame(
             exog_resid, index=self._exog.pandas.index, columns=self._columns
         )
+        self._num_params += exog_resid.shape[1]
 
     def fit(
         self,
@@ -1102,7 +1103,6 @@ class AbsorbingLS:
             params = empty((0, 1))
         else:
             params = lstsq(exog_resid, dep_resid, rcond=None)[0]
-            self._num_params += exog_resid.shape[1]
 
         cov_estimator = COVARIANCE_ESTIMATORS[cov_type]
         cov_config["debiased"] = debiased

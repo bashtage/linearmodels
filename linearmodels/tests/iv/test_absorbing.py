@@ -262,6 +262,16 @@ def test_smoke(data):
     assert isinstance(str(res.summary), str)
 
 
+def test_refit_does_not_change_df_model():
+    data = generate_data()
+    mod = AbsorbingLS(data.y, data.x, absorb=data.absorb, interactions=data.interactions)
+    res = mod.fit(debiased=True)
+    res2 = mod.fit(debiased=True)
+    assert res2.df_model == res.df_model
+    assert res2.df_resid == res.df_resid
+    assert_allclose(res2.f_statistic.pval, res.f_statistic.pval)
+
+
 def test_absorbing_exceptions(random_gen):
     absorbed = random_gen.standard_normal((NOBS, 2))
     assert isinstance(absorbed, np.ndarray)
