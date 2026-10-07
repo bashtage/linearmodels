@@ -152,6 +152,62 @@ def test_c_stat_exception(data):
         res.c_stat(variables=("x1", "x2"))
 
 
+def test_weighted_sargan_wu_hausman(data):
+    # R code (AER):
+    # m <- ivreg(y_robust ~ x3 + x4 + x5 + x1 | x3 + x4 + x5 + z1 + z2,
+    #            data = d, weights = weights)
+    # summary(m, diagnostics = TRUE)
+    res = IV2SLS(
+        data.dep,
+        data.exog,
+        data.endog[["x1"]],
+        data.instr,
+        weights=SIMULATED_DATA.weights,
+    ).fit(cov_type="unadjusted")
+    assert_allclose(res.sargan.stat, 1.3091639082, rtol=1e-6)
+    assert_allclose(res.wu_hausman().stat, 0.0126420296, rtol=1e-6)
+
+
+def test_weighted_diagnostics_match_rescaled_data(data):
+    # Weighted estimation is OLS/IV on data scaled by the root of the weights,
+    # so the specification tests must agree with the rescaled unweighted model
+    w = SIMULATED_DATA.weights / SIMULATED_DATA.weights.mean()
+    root_w = np.sqrt(w)
+    dep = data.dep * root_w
+    exog = data.exog.mul(root_w, axis=0)
+    endog_s = data.endog.mul(root_w, axis=0)
+    instr = data.instr.mul(root_w, axis=0)
+    for endog in (["x1"], ["x1", "x2"]):
+        res = IV2SLS(data.dep, data.exog, data.endog[endog], data.instr, weights=w).fit(
+            cov_type="robust"
+        )
+        expected = IV2SLS(dep, exog, endog_s[endog], instr).fit(cov_type="robust")
+        names = ["wooldridge_score", "wooldridge_regression"]
+        if len(endog) == 1:
+            # Overidentification tests need more instruments than endogenous
+            names += ["sargan", "basmann", "wooldridge_overid"]
+        for name in names:
+            assert_allclose(
+                getattr(res, name).stat, getattr(expected, name).stat, rtol=1e-8
+            )
+        for name in ("durbin", "wu_hausman"):
+            assert_allclose(
+                getattr(res, name)().stat, getattr(expected, name)().stat, rtol=1e-8
+            )
+            assert_allclose(
+                getattr(res, name)("x1").stat,
+                getattr(expected, name)("x1").stat,
+                rtol=1e-8,
+            )
+
+    res = IVGMM(data.dep, data.exog, data.endog, data.instr, weights=w).fit(
+        cov_type="robust"
+    )
+    expected = IVGMM(dep, exog, endog_s, instr).fit(cov_type="robust")
+    assert_allclose(res.c_stat().stat, expected.c_stat().stat, rtol=1e-8)
+    assert_allclose(res.c_stat("x1").stat, expected.c_stat("x1").stat, rtol=1e-8)
+
+
 def test_linear_restriction(data):
     res = IV2SLS(data.dep, data.exog, data.endog, data.instr).fit(cov_type="robust")
     nvar = len(res.params)
