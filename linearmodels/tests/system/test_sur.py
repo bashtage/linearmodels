@@ -789,6 +789,23 @@ def test_system_r2_direct():
     assert_allclose(ref, res.system_rsquared.berndt, atol=1e-3, rtol=1e-3)
 
 
+def test_iterated_gls_cov_uses_final_sigma():
+    eqns = generate_data(k=3, p=3, const=True)
+    res = SUR(eqns).fit(cov_type="unadjusted", iterate=True, iter_limit=500, tol=1e-12)
+    assert res.iterations > 2
+
+    xs = [np.asarray(eqns[key]["exog"]) for key in eqns]
+    nobs = xs[0].shape[0]
+    x = np.zeros((len(xs) * nobs, sum(xi.shape[1] for xi in xs)))
+    col = 0
+    for i, xi in enumerate(xs):
+        x[i * nobs : (i + 1) * nobs, col : col + xi.shape[1]] = xi
+        col += xi.shape[1]
+    sigma_inv = np.linalg.inv(np.asarray(res.sigma))
+    expected = np.linalg.inv(x.T @ np.kron(sigma_inv, np.eye(nobs)) @ x)
+    assert_allclose(res.cov, expected, rtol=1e-6)
+
+
 def direct_gls(eqns, scale):
     y = []
     x = []
