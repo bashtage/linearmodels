@@ -32,6 +32,7 @@ from statsmodels.iolib.table import default_txt_fmt
 
 import linearmodels
 from linearmodels.iv._utility import annihilate, proj
+from linearmodels.iv.common import _kleibergen_paap, cragg_donald, cragg_donald_f
 from linearmodels.iv.data import IVData
 from linearmodels.shared.base import _ModelComparison, _SummaryStr
 from linearmodels.shared.hypotheses import (
@@ -207,9 +208,9 @@ class _LSModelResultsBase(_SummaryStr):
         Parameter p-vals. Uses t(df_resid) if ``debiased`` is True, else normal
         """
         if self.debiased:
-            pvals = 2 - 2 * stats.t.cdf(abs(self.tstats), self.df_resid)
+            pvals = 2 * stats.t.sf(abs(self.tstats), self.df_resid)
         else:
-            pvals = 2 - 2 * stats.norm.cdf(abs(self.tstats))
+            pvals = 2 * stats.norm.sf(abs(self.tstats))
 
         return Series(pvals, index=self._vars, name="pvalue")
 
@@ -675,6 +676,172 @@ class FirstStageResults(_SummaryStr):
         self._cov_type = cov_type
         self._cov_config = cov_config
 
+    def _weighted_arrays(
+        self,
+    ) -> tuple[
+        linearmodels.typing.data.Float64Array,
+        linearmodels.typing.data.Float64Array,
+        linearmodels.typing.data.Float64Array,
+    ]:
+        """Weighted endogenous, instrument and exogenous arrays"""
+        w = sqrt(self.weights.ndarray)
+        endog = w * self.endog.ndarray.astype(float, copy=False)
+        instr = w * self.instr.ndarray.astype(float, copy=False)
+        exog = w * self.exog.ndarray.astype(float, copy=False)
+        return endog, instr, exog
+
+    @cached_property
+    def cragg_donald(self) -> WaldTestStatistic | InvalidTestStatistic:
+        r"""
+        Cragg-Donald test of underidentification
+
+        Returns
+        -------
+        WaldTestStatistic or InvalidTestStatistic
+            Test statistic for the null that the first-stage coefficient
+            matrix does not have full column rank, so that the model is
+            underidentified. It is distributed chi2(ninstr - nendog + 1).
+            An InvalidTestStatistic is returned if the model has no
+            endogenous regressors or the statistic is not defined.
+
+        Warnings
+        --------
+        The statistic requires conditionally homoskedastic and serially
+        uncorrelated errors and **ignores the covariance estimator used to fit
+        the model**. When the model uses a robust, clustered or kernel
+        covariance, use :attr:`kleibergen_paap`. The null is that the model is
+        underidentified, so rejecting it does not show that the instruments
+        are strong. The p-value is asymptotic and is unreliable when the
+        instruments are weak.
+
+        See Also
+        --------
+        cragg_donald_f
+            The F form of the statistic.
+        kleibergen_paap
+            Generalization that does not require homoskedastic errors.
+
+        Notes
+        -----
+        The statistic accounts for correlation between the endogenous
+        regressors, unlike the per-variable F-statistics in ``diagnostics``.
+        It equals ``ninstr`` times the classical F-statistic when there is
+        one endogenous regressor. See :func:`linearmodels.iv.common.cragg_donald`
+        for the definition.
+        """
+        return cragg_donald(*self._weighted_arrays())
+
+    @cached_property
+    def cragg_donald_f(self) -> float:
+        r"""
+        Cragg-Donald Wald F statistic
+
+        Returns
+        -------
+        float
+            The Cragg-Donald statistic divided by the number of excluded
+            instruments, or NaN if it is not defined.
+
+        Warnings
+        --------
+        Stock-Yogo critical values are only valid for conditionally
+        homoskedastic and serially uncorrelated errors, and they are not
+        provided here. The statistic ignores the covariance estimator used to
+        fit the model. It is not a test and has no p-value, and a value above a
+        critical value does not guarantee reliable inference with 2SLS.
+
+        Notes
+        -----
+        This is the statistic that Stock and Yogo (2005) tabulate critical
+        values for, and Stata's ``ivreg2`` reports it as the "Cragg-Donald
+        Wald F statistic". See :func:`linearmodels.iv.common.cragg_donald_f`.
+        """
+        return cragg_donald_f(*self._weighted_arrays())
+
+    @cached_property
+    def _kleibergen_paap(
+        self,
+    ) -> tuple[WaldTestStatistic | InvalidTestStatistic, float]:
+        return _kleibergen_paap(
+            *self._weighted_arrays(), self._cov_type, self._cov_config
+        )
+
+    @property
+    def kleibergen_paap(self) -> WaldTestStatistic | InvalidTestStatistic:
+        r"""
+        Kleibergen-Paap rk LM test of underidentification
+
+        Returns
+        -------
+        WaldTestStatistic or InvalidTestStatistic
+            Test statistic for the null that the first-stage coefficient
+            matrix does not have full column rank, so that the model is
+            underidentified. It is distributed chi2(ninstr - nendog + 1). An
+            InvalidTestStatistic is returned if the model has no endogenous
+            regressors or the statistic is not defined, including when two-way
+            clustering is used.
+
+        Warnings
+        --------
+        The statistic is asymptotic and is only as robust as the model's
+        covariance estimator. It needs many observations relative to the number
+        of instruments times the number of endogenous regressors, and many
+        clusters if the model is clustered. If the covariance is rank deficient
+        a warning is issued and the result should not be relied upon. The null
+        is that the model is underidentified, so this is not a test for weak
+        instruments: rejecting it does not show that the instruments are
+        strong.
+
+        See Also
+        --------
+        kleibergen_paap_f
+            The rk Wald F statistic.
+        cragg_donald
+            The version that requires homoskedastic errors.
+
+        Notes
+        -----
+        The statistic uses the same covariance estimator as the model:
+        unadjusted, robust, clustered (one-way) or kernel. The ``debiased``
+        option of the model has no effect on it. With the unadjusted
+        covariance it is Anderson's canonical correlation LM statistic. It
+        corresponds to the "Kleibergen-Paap rk LM statistic" reported by
+        Stata's ``ivreg2``. See :func:`linearmodels.iv.common.kleibergen_paap`
+        for the definition and for conventions that differ from Stata.
+        """
+        return self._kleibergen_paap[0]
+
+    @property
+    def kleibergen_paap_f(self) -> float:
+        r"""
+        Kleibergen-Paap rk Wald F statistic
+
+        Returns
+        -------
+        float
+            The rk Wald F statistic, or NaN if it is not defined.
+
+        Warnings
+        --------
+        The statistic is not a test and has no p-value. Stock-Yogo critical
+        values were derived for conditionally homoskedastic and serially
+        uncorrelated errors and are not valid for this statistic when the
+        errors are not i.i.d. Comparing the two is only a heuristic. With one
+        endogenous regressor the effective F-statistic of Olea and Pflueger
+        (2013), which is not implemented here, is better founded. A large
+        value does not guarantee that 2SLS confidence intervals have correct
+        coverage. See also the warnings for :attr:`kleibergen_paap`.
+
+        Notes
+        -----
+        A robust analogue of the Cragg-Donald F statistic that uses the same
+        covariance estimator as the model. With the unadjusted covariance it
+        is the Cragg-Donald F statistic. Stata's ``ivreg2`` reports it as the
+        "Kleibergen-Paap rk Wald F statistic". See
+        :func:`linearmodels.iv.common.kleibergen_paap_f` for the definition.
+        """
+        return self._kleibergen_paap[1]
+
     @cached_property
     def diagnostics(self) -> DataFrame:
         """
@@ -1031,7 +1198,7 @@ class IVResults(_CommonIVResults):
             raise TypeError("variables must be a str or a list of str.")
 
         nobs = self.model.dependent.shape[0]
-        w = sqrt(self.model.weights.ndarray)
+        w = self.model._sqrt_weights
         e2 = asarray(self.wresids.to_numpy())
         nendog, nexog = self.model.endog.shape[1], self.model.exog.shape[1]
         if variables is None:
@@ -1213,7 +1380,7 @@ class IVResults(_CommonIVResults):
         """
         from linearmodels.iv.model import _OLS
 
-        w = sqrt(self.model.weights.ndarray)
+        w = self.model._sqrt_weights
         e = annihilate(self.model._wy, self.model._wx)
         r = annihilate(self.model.endog.ndarray * w, self.model._wz)
         nobs = e.shape[0]
@@ -1256,7 +1423,10 @@ class IVResults(_CommonIVResults):
         """
         from linearmodels.iv.model import _OLS
 
-        w = sqrt(self.model.weights.ndarray)
+        w = self.model._sqrt_weights
+        # The first-stage residuals are computed on the weighted data. They are
+        # divided by the root weights since _OLS applies the weights again
+        # when it forms its own weighted regressors.
         r = annihilate(self.model.endog.ndarray * w, self.model._wz) / w
         augx = c_[self.model._x, r]
         mod = _OLS(self.model.dependent, augx, weights=self.model.weights)
@@ -1312,7 +1482,7 @@ class IVResults(_CommonIVResults):
                 name=name,
             )
 
-        w = sqrt(self.model.weights.ndarray)
+        w = self.model._sqrt_weights
         endog_hat = proj(endog.ndarray * w, self.model._wz)
         q = instruments.ndarray[:, : (ninstr - nendog)] * w
         q_res = annihilate(q, c_[exog.ndarray * w, endog_hat])
@@ -1485,25 +1655,30 @@ class IVGMMResults(_CommonIVResults):
 
         Notes
         -----
-        The C statistic iv the difference between the model estimated by
-        assuming one or more of the endogenous variables is actually
-        exogenous.  The test is implemented as the difference between the
-        J statistic s of two GMM estimations where both use the same weighting
-        matrix.  The use of a common weighting matrix is required for the C
-        statistic to be positive.
+        The C statistic is the difference between the J statistics of two GMM
+        estimates of the model, where one or more of the endogenous variables
+        are assumed to be exogenous in the first.  Both J statistics use the
+        same estimate of the covariance of the moment conditions.  Using a
+        common covariance estimate is required for the C statistic to be
+        non-negative.
 
-        The first model is a estimated uses GMM estimation where one or more
-        of the endogenous variables are assumed to be endogenous.  The model
-        would be relatively efficient if the assumption were true, and two
-        quantities are computed, the J statistic, :math:`J_e`, and the
-        moment weighting matrix, :math:`W_e`.
+        The first model treats the tested variables as exogenous.  Its moment
+        conditions are the exogenous variables, the tested variables and the
+        instruments.  The model would be relatively efficient if the
+        assumption were true, and two quantities are computed, the J
+        statistic, :math:`J_e`, and the estimated covariance of the moment
+        conditions, :math:`S_e`, which is the inverse of the weight matrix
+        :math:`W_e` used to compute the efficient estimate.
 
-        WLOG assume the q variables tested are in the final q positions so that
-        the first :math:`n_{exog} + n_{instr}` rows and columns correspond to
-        the moment conditions in the original model. The second J statistic is
-        computed using parameters estimated using the original moment
-        conditions along with the upper left block of :math:`W_e`.  Denote this
-        values as :math:`J_c` where the c is used to indicate consistent.
+        The moment conditions of the original model, the exogenous variables
+        and the instruments, are a subset of the moment conditions in the
+        first model.  Let :math:`S_{e,c}` be the sub-matrix of :math:`S_e`
+        that contains the rows and columns of the original moment conditions,
+        which excludes those for the tested variables.  The second J
+        statistic, :math:`J_c`, is computed using the weight matrix
+        :math:`S_{e,c}^{-1}` and parameters that are estimated from the
+        original moment conditions using this weight matrix.  Note that this
+        is not the same as the sub-matrix of :math:`W_e`.
 
         The test statistic is then
 
@@ -1512,7 +1687,17 @@ class IVGMMResults(_CommonIVResults):
           J_e - J_c \sim \chi^2_{m}
 
         where :math:`m` is the number of variables whose exogeneity is being
-        tested.
+        tested.  If the original model is just identified, :math:`J_c=0` and
+        the C statistic is the J statistic of the first model.
+
+        The covariance of the moment conditions in the first model is
+        estimated using the same ``weight_type`` and weight configuration as
+        the model that the statistic is computed from, e.g., clustered or
+        kernel, so that the statistic is valid under the same assumptions
+        about the moment conditions.
+
+        See Hayashi (2000), pp. 218-221 and 232-234, or Baum, Schaffer and
+        Stillman (2003), section 4.4, for details.
         """
         dependent, instruments = self.model.dependent, self.model.instruments
         exog, endog = self.model.exog, self.model.endog
@@ -1534,7 +1719,18 @@ class IVGMMResults(_CommonIVResults):
             null = "Variables {} are exogenous".format(", ".join(variable_lst))
         from linearmodels.iv.model import IVGMM, IVGMMCUE
 
-        mod = IVGMM(dependent, exog_e, endog_e, instruments, weights=self.model.weights)
+        assert isinstance(self.model, (IVGMM, IVGMMCUE))
+        # The covariance of the moment conditions is estimated in the same way
+        # as in the model being tested
+        mod = IVGMM(
+            dependent,
+            exog_e,
+            endog_e,
+            instruments,
+            weights=self.model.weights,
+            weight_type=self.model._weight_type,
+            **self.model._weight_kwargs,
+        )
         res_e = mod.fit(cov_type=self.cov_type, **self.cov_config)
         assert isinstance(res_e, IVGMMResults)
         j_e = res_e.j_stat.stat
@@ -1542,11 +1738,19 @@ class IVGMMResults(_CommonIVResults):
         x = self.model._wx
         y = self.model._wy
         z = self.model._wz
-        nz = z.shape[1]
-        weight_mat_c = asarray(res_e.weight_matrix)[:nz, :nz]
+        # The moment conditions of the model above are ordered [exog, tested,
+        # instruments], and the original model's are [exog, instruments].
+        nexog, ninstr = exog.shape[1], instruments.shape[1]
+        ntested = exog_e.shape[1] - nexog
+        original = list(range(nexog)) + list(
+            range(nexog + ntested, nexog + ntested + ninstr)
+        )
+        # Use the sub-matrix of the covariance S_e = W_e^{-1}, not of W_e, so
+        # that both J statistics are built from the same estimate of S_e
+        cov_e = inv(asarray(res_e.weight_matrix))
+        weight_mat_c = inv(cov_e[original][:, original])
         params_c = mod.estimate_parameters(x, y, z, weight_mat_c)
 
-        assert isinstance(self.model, (IVGMM, IVGMMCUE))
         j_c = self.model._j_statistic(params_c, weight_mat_c).stat
 
         stat = j_e - j_c

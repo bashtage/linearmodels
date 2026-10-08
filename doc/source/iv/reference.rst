@@ -64,6 +64,24 @@ Estimation Results
    FirstStageResults
    compare
 
+.. _iv-module-reference-rank-tests:
+
+Tests of the First-Stage Rank
+-----------------------------
+
+.. module:: linearmodels.iv.common
+   :synopsis: Tests of the rank of the first-stage coefficient matrix
+
+.. currentmodule:: linearmodels.iv.common
+
+.. autosummary::
+   :toctree: iv/
+
+   cragg_donald
+   cragg_donald_f
+   kleibergen_paap
+   kleibergen_paap_f
+
 .. _iv-module-reference-covariance:
 
 Instrumental Variable Covariance Estimation

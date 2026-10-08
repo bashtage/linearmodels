@@ -7,6 +7,7 @@ import pytest
 from statsmodels.tools.tools import add_constant
 
 from linearmodels.iv import IV2SLS, IVGMM
+from linearmodels.iv.common import cragg_donald
 from linearmodels.shared.utility import AttrDict
 
 CWD = os.path.split(os.path.abspath(__file__))[0]
@@ -171,7 +172,7 @@ def test_weighted_sargan_wu_hausman(data):
 def test_weighted_diagnostics_match_rescaled_data(data):
     # Weighted estimation is OLS/IV on data scaled by the root of the weights,
     # so the specification tests must agree with the rescaled unweighted model
-    w = SIMULATED_DATA.weights / SIMULATED_DATA.weights.mean()
+    w = SIMULATED_DATA.weights
     root_w = np.sqrt(w)
     dep = data.dep * root_w
     exog = data.exog.mul(root_w, axis=0)
@@ -200,12 +201,18 @@ def test_weighted_diagnostics_match_rescaled_data(data):
                 rtol=1e-8,
             )
 
-    res = IVGMM(data.dep, data.exog, data.endog, data.instr, weights=w).fit(
-        cov_type="robust"
-    )
-    expected = IVGMM(dep, exog, endog_s, instr).fit(cov_type="robust")
-    assert_allclose(res.c_stat().stat, expected.c_stat().stat, rtol=1e-8)
-    assert_allclose(res.c_stat("x1").stat, expected.c_stat("x1").stat, rtol=1e-8)
+    # One endogenous variable is overidentified, two is just identified
+    for endog in (["x1"], ["x1", "x2"]):
+        res = IVGMM(data.dep, data.exog, data.endog[endog], data.instr, weights=w).fit(
+            cov_type="robust"
+        )
+        expected = IVGMM(dep, exog, endog_s[endog], instr).fit(cov_type="robust")
+        for variables in (None, "x1"):
+            assert_allclose(
+                res.c_stat(variables).stat,
+                expected.c_stat(variables).stat,
+                rtol=1e-8,
+            )
 
 
 def test_linear_restriction(data):
@@ -232,3 +239,59 @@ def test_linear_restriction(data):
     formula_str = " = ".join(formula_dict.keys()) + " = 0"
     ts2 = res.wald_test(formula=formula_str)
     assert_allclose(ts.stat, ts2.stat)
+
+
+def test_cragg_donald(data):
+    res = IV2SLS(data.dep, data.exog, data.endog, data.instr).fit(cov_type="unadjusted")
+    cd = res.first_stage.cragg_donald
+    assert cd.df == data.instr.shape[1] - data.endog.shape[1] + 1
+    # The Cragg-Donald Wald F statistic reported by ivreg2 (computed using the
+    # R port ivreg2r 0.1.0) is 0.507579977028276. The statistic is the F
+    # statistic multiplied by the number of excluded instruments.
+    assert_allclose(res.first_stage.cragg_donald_f, 0.507579977028276, rtol=1e-8)
+    assert_allclose(cd.stat, 2 * 0.507579977028276, rtol=1e-8)
+
+
+def test_cragg_donald_null_hypothesis(data):
+    # The null is underidentification, not that the model is identified
+    res = IV2SLS(data.dep, data.exog, data.endog, data.instr).fit(cov_type="unadjusted")
+    cd = res.first_stage.cragg_donald
+    assert "underidentified" in cd.null
+    assert "full column rank" in cd.null
+    assert "jointly identify" not in cd.null
+
+
+def test_cragg_donald_degenerate():
+    rng = np.random.default_rng(0)
+    n = 200
+    z = rng.normal(size=(n, 1))  # 1 instrument
+    x = rng.normal(size=(n, 2))  # 2 endogenous -- k < m
+    exog_empty = np.empty((n, 0))
+
+    result = cragg_donald(x, z, exog_empty)
+    assert np.isnan(result.pval)
+
+
+def test_cragg_donald_known_value():
+    # Reproduces the exact example from GH issue #622, validated against
+    # mlondschien/ivmodels's independent rank_test implementation
+    # (statistic=0.8939161043879634, p_value=0.6395707363012899)
+    rng = np.random.default_rng(0)
+    n = 1000
+    z = rng.normal(size=(n, 3))
+    h = rng.normal(size=(n, 3))
+    x = z @ np.ones((3, 2)) + h @ np.array([[1, 0], [0, -1], [0, 0]])
+
+    exog_empty = np.empty((n, 0))
+    result = cragg_donald(x, z, exog_empty)
+    assert_allclose(result.stat, 0.8939161043879634, rtol=1e-6)
+    assert_allclose(result.pval, 0.6395707363012899, rtol=1e-6)
+
+
+def test_cragg_donald_no_endog():
+    n = 100
+    empty_endog = np.empty((n, 0))
+    z = np.random.default_rng(0).normal(size=(n, 3))
+    exog_empty = np.empty((n, 0))
+    result = cragg_donald(empty_endog, z, exog_empty)
+    assert np.isnan(result.pval)
