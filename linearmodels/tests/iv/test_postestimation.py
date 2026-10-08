@@ -7,6 +7,7 @@ import pytest
 from statsmodels.tools.tools import add_constant
 
 from linearmodels.iv import IV2SLS, IVGMM
+from linearmodels.iv.common import cragg_donald
 from linearmodels.shared.utility import AttrDict
 
 CWD = os.path.split(os.path.abspath(__file__))[0]
@@ -237,9 +238,21 @@ def test_linear_restriction(data):
 def test_cragg_donald(data):
     res = IV2SLS(data.dep, data.exog, data.endog, data.instr).fit(cov_type="unadjusted")
     cd = res.first_stage.cragg_donald
-    # Reference value computed via mlondschien/ivmodels rank_test on the
-    # same GH issue (statsmodels/linearmodels#622) example data
     assert cd.df == data.instr.shape[1] - data.endog.shape[1] + 1
+    # The Cragg-Donald Wald F statistic reported by ivreg2 (computed using the
+    # R port ivreg2r 0.1.0) is 0.507579977028276. The statistic is the F
+    # statistic multiplied by the number of excluded instruments.
+    assert_allclose(res.first_stage.cragg_donald_f, 0.507579977028276, rtol=1e-8)
+    assert_allclose(cd.stat, 2 * 0.507579977028276, rtol=1e-8)
+
+
+def test_cragg_donald_null_hypothesis(data):
+    # The null is underidentification, not that the model is identified
+    res = IV2SLS(data.dep, data.exog, data.endog, data.instr).fit(cov_type="unadjusted")
+    cd = res.first_stage.cragg_donald
+    assert "underidentified" in cd.null
+    assert "full column rank" in cd.null
+    assert "jointly identify" not in cd.null
 
 
 def test_cragg_donald_degenerate():
@@ -248,8 +261,6 @@ def test_cragg_donald_degenerate():
     z = rng.normal(size=(n, 1))  # 1 instrument
     x = rng.normal(size=(n, 2))  # 2 endogenous -- k < m
     exog_empty = np.empty((n, 0))
-
-    from linearmodels.iv.common import cragg_donald
 
     result = cragg_donald(x, z, exog_empty)
     assert np.isnan(result.pval)
@@ -264,9 +275,6 @@ def test_cragg_donald_known_value():
     z = rng.normal(size=(n, 3))
     h = rng.normal(size=(n, 3))
     x = z @ np.ones((3, 2)) + h @ np.array([[1, 0], [0, -1], [0, 0]])
-    y = h @ np.array([1, 1, 0.1])
-
-    from linearmodels.iv.common import cragg_donald
 
     exog_empty = np.empty((n, 0))
     result = cragg_donald(x, z, exog_empty)
@@ -275,8 +283,6 @@ def test_cragg_donald_known_value():
 
 
 def test_cragg_donald_no_endog():
-    from linearmodels.iv.common import cragg_donald
-
     n = 100
     empty_endog = np.empty((n, 0))
     z = np.random.default_rng(0).normal(size=(n, 3))

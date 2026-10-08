@@ -32,6 +32,7 @@ from statsmodels.iolib.table import default_txt_fmt
 
 import linearmodels
 from linearmodels.iv._utility import annihilate, proj
+from linearmodels.iv.common import _kleibergen_paap, cragg_donald, cragg_donald_f
 from linearmodels.iv.data import IVData
 from linearmodels.shared.base import _ModelComparison, _SummaryStr
 from linearmodels.shared.hypotheses import (
@@ -675,33 +676,171 @@ class FirstStageResults(_SummaryStr):
         self._cov_type = cov_type
         self._cov_config = cov_config
 
-    @cached_property
-    def cragg_donald(self) -> WaldTestStatistic | InvalidTestStatistic:
-        """
-        Cragg-Donald test of reduced rank for the joint first-stage regression
-
-        Returns
-        -------
-        WaldTestStatistic
-            Test statistic for the null that the instruments do not
-            jointly identify all endogenous regressors. See
-            linearmodels.iv.common.cragg_donald for details.
-
-        Notes
-        -----
-        Unlike the per-variable F-statistics in ``diagnostics``, this test
-        accounts for correlation among the fitted values of the endogenous
-        regressors, and so correctly flags cases where instruments are
-        individually strong but cannot jointly distinguish between
-        correlated endogenous variables.
-        """
-        from linearmodels.iv.common import cragg_donald
-
+    def _weighted_arrays(
+        self,
+    ) -> tuple[
+        linearmodels.typing.data.Float64Array,
+        linearmodels.typing.data.Float64Array,
+        linearmodels.typing.data.Float64Array,
+    ]:
+        """Weighted endogenous, instrument and exogenous arrays"""
         w = sqrt(self.weights.ndarray)
         endog = w * self.endog.ndarray.astype(float, copy=False)
         instr = w * self.instr.ndarray.astype(float, copy=False)
         exog = w * self.exog.ndarray.astype(float, copy=False)
-        return cragg_donald(endog, instr, exog)
+        return endog, instr, exog
+
+    @cached_property
+    def cragg_donald(self) -> WaldTestStatistic | InvalidTestStatistic:
+        r"""
+        Cragg-Donald test of underidentification
+
+        Returns
+        -------
+        WaldTestStatistic or InvalidTestStatistic
+            Test statistic for the null that the first-stage coefficient
+            matrix does not have full column rank, so that the model is
+            underidentified. It is distributed chi2(ninstr - nendog + 1).
+            An InvalidTestStatistic is returned if the model has no
+            endogenous regressors or the statistic is not defined.
+
+        Warnings
+        --------
+        The statistic requires conditionally homoskedastic and serially
+        uncorrelated errors and **ignores the covariance estimator used to fit
+        the model**. When the model uses a robust, clustered or kernel
+        covariance, use :attr:`kleibergen_paap`. The null is that the model is
+        underidentified, so rejecting it does not show that the instruments
+        are strong. The p-value is asymptotic and is unreliable when the
+        instruments are weak.
+
+        See Also
+        --------
+        cragg_donald_f
+            The F form of the statistic.
+        kleibergen_paap
+            Generalization that does not require homoskedastic errors.
+
+        Notes
+        -----
+        The statistic accounts for correlation between the endogenous
+        regressors, unlike the per-variable F-statistics in ``diagnostics``.
+        It equals ``ninstr`` times the classical F-statistic when there is
+        one endogenous regressor. See :func:`linearmodels.iv.common.cragg_donald`
+        for the definition.
+        """
+        return cragg_donald(*self._weighted_arrays())
+
+    @cached_property
+    def cragg_donald_f(self) -> float:
+        r"""
+        Cragg-Donald Wald F statistic
+
+        Returns
+        -------
+        float
+            The Cragg-Donald statistic divided by the number of excluded
+            instruments, or NaN if it is not defined.
+
+        Warnings
+        --------
+        Stock-Yogo critical values are only valid for conditionally
+        homoskedastic and serially uncorrelated errors, and they are not
+        provided here. The statistic ignores the covariance estimator used to
+        fit the model. It is not a test and has no p-value, and a value above a
+        critical value does not guarantee reliable inference with 2SLS.
+
+        Notes
+        -----
+        This is the statistic that Stock and Yogo (2005) tabulate critical
+        values for, and Stata's ``ivreg2`` reports it as the "Cragg-Donald
+        Wald F statistic". See :func:`linearmodels.iv.common.cragg_donald_f`.
+        """
+        return cragg_donald_f(*self._weighted_arrays())
+
+    @cached_property
+    def _kleibergen_paap(
+        self,
+    ) -> tuple[WaldTestStatistic | InvalidTestStatistic, float]:
+        return _kleibergen_paap(
+            *self._weighted_arrays(), self._cov_type, self._cov_config
+        )
+
+    @property
+    def kleibergen_paap(self) -> WaldTestStatistic | InvalidTestStatistic:
+        r"""
+        Kleibergen-Paap rk LM test of underidentification
+
+        Returns
+        -------
+        WaldTestStatistic or InvalidTestStatistic
+            Test statistic for the null that the first-stage coefficient
+            matrix does not have full column rank, so that the model is
+            underidentified. It is distributed chi2(ninstr - nendog + 1). An
+            InvalidTestStatistic is returned if the model has no endogenous
+            regressors or the statistic is not defined, including when two-way
+            clustering is used.
+
+        Warnings
+        --------
+        The statistic is asymptotic and is only as robust as the model's
+        covariance estimator. It needs many observations relative to the number
+        of instruments times the number of endogenous regressors, and many
+        clusters if the model is clustered. If the covariance is rank deficient
+        a warning is issued and the result should not be relied upon. The null
+        is that the model is underidentified, so this is not a test for weak
+        instruments: rejecting it does not show that the instruments are
+        strong.
+
+        See Also
+        --------
+        kleibergen_paap_f
+            The rk Wald F statistic.
+        cragg_donald
+            The version that requires homoskedastic errors.
+
+        Notes
+        -----
+        The statistic uses the same covariance estimator as the model:
+        unadjusted, robust, clustered (one-way) or kernel. The ``debiased``
+        option of the model has no effect on it. With the unadjusted
+        covariance it is Anderson's canonical correlation LM statistic. It
+        corresponds to the "Kleibergen-Paap rk LM statistic" reported by
+        Stata's ``ivreg2``. See :func:`linearmodels.iv.common.kleibergen_paap`
+        for the definition and for conventions that differ from Stata.
+        """
+        return self._kleibergen_paap[0]
+
+    @property
+    def kleibergen_paap_f(self) -> float:
+        r"""
+        Kleibergen-Paap rk Wald F statistic
+
+        Returns
+        -------
+        float
+            The rk Wald F statistic, or NaN if it is not defined.
+
+        Warnings
+        --------
+        The statistic is not a test and has no p-value. Stock-Yogo critical
+        values were derived for conditionally homoskedastic and serially
+        uncorrelated errors and are not valid for this statistic when the
+        errors are not i.i.d. Comparing the two is only a heuristic. With one
+        endogenous regressor the effective F-statistic of Olea and Pflueger
+        (2013), which is not implemented here, is better founded. A large
+        value does not guarantee that 2SLS confidence intervals have correct
+        coverage. See also the warnings for :attr:`kleibergen_paap`.
+
+        Notes
+        -----
+        A robust analogue of the Cragg-Donald F statistic that uses the same
+        covariance estimator as the model. With the unadjusted covariance it
+        is the Cragg-Donald F statistic. Stata's ``ivreg2`` reports it as the
+        "Kleibergen-Paap rk Wald F statistic". See
+        :func:`linearmodels.iv.common.kleibergen_paap_f` for the definition.
+        """
+        return self._kleibergen_paap[1]
 
     @cached_property
     def diagnostics(self) -> DataFrame:
