@@ -196,3 +196,75 @@ where both the moment condition and the moment score estimator change with
 parameter values. ``starting`` allows a user-specified set of starting values
 to be used in-place of the default starting values and ``display`` controls
 whether iterative output is printed during estimation.
+
+Testing Identification
+======================
+The results of every IV estimator have a ``first_stage`` attribute that
+contains tests of whether the instruments identify the model. The model is
+identified when the matrix of coefficients on the excluded instruments in the
+first-stage regressions has full column rank, so that there are at least as
+many informative instruments as there are endogenous regressors.
+
+.. code-block:: python
+
+   res = IV2SLS(dependent, exog, endog, instruments).fit(cov_type="robust")
+   first_stage = res.first_stage
+   first_stage.kleibergen_paap     # rk LM test of underidentification
+   first_stage.kleibergen_paap_f   # rk Wald F statistic
+   first_stage.cragg_donald        # Cragg-Donald test of underidentification
+   first_stage.cragg_donald_f      # Cragg-Donald Wald F statistic
+
+The null hypothesis of the two tests is that the first-stage coefficient matrix
+is rank deficient, so that the model is **underidentified**. The tests have a
+:math:`\chi^2_{p_2 - k_2 + 1}` distribution, where :math:`p_2` is the number of
+excluded instruments and :math:`k_2` is the number of endogenous regressors.
+When there are no endogenous regressors, or when the statistics are not
+defined, for example if the endogenous regressors are collinear, the tests are
+reported as an :class:`~linearmodels.shared.hypotheses.InvalidTestStatistic`.
+
+* :func:`~linearmodels.iv.common.cragg_donald` requires conditionally
+  homoskedastic and serially uncorrelated errors. It does **not** use the
+  covariance estimator that was used to fit the model.
+* :func:`~linearmodels.iv.common.kleibergen_paap` uses the covariance estimator
+  that was used to fit the model: unadjusted, robust, one-way clustered or
+  kernel. With the unadjusted covariance it is Anderson's canonical correlation
+  LM statistic. The test follows ``ranktest`` and Stata's ``ivreg2``
+  "Kleibergen-Paap rk LM statistic".
+
+The F statistics, :func:`~linearmodels.iv.common.cragg_donald_f` and
+:func:`~linearmodels.iv.common.kleibergen_paap_f`, are the statistics that are
+commonly compared with weak-instrument critical values. They are the
+statistics that ``ivreg2`` reports as the "Cragg-Donald Wald F statistic" and
+the "Kleibergen-Paap rk Wald F statistic". They do not have p-values.
+
+.. warning::
+
+   These statistics are easy to over-interpret.
+
+   * The null is that the model is underidentified. Rejecting it does **not**
+     show that the instruments are strong. The test rejects with probability
+     near one when the instruments are weak enough for 2SLS to be badly biased
+     and its tests to be badly sized. These are not tests of weak instruments.
+   * Stock-Yogo critical values apply only to the Cragg-Donald F statistic
+     when the errors are conditionally homoskedastic and serially
+     uncorrelated. They are not valid for the Kleibergen-Paap F statistic when
+     the errors are not i.i.d. and comparing them is only a heuristic. For one
+     endogenous regressor, the effective F statistic of Olea and Pflueger
+     (2013) is better founded. It is not implemented, and neither are
+     weak-instrument robust confidence sets.
+   * The Cragg-Donald statistic ignores heteroskedasticity, clustering and
+     serial correlation. The Kleibergen-Paap statistic is only as robust as
+     the covariance estimator used for it. If the dependence in the data is not
+     modeled, both can reject far too often when the instruments and
+     first-stage errors are clustered or persistent. With few clusters the
+     clustered test can be conservative, and a kernel bandwidth that is too
+     short does not remove the over-rejection.
+   * The tests are asymptotic. The Kleibergen-Paap statistic uses a covariance
+     matrix with :math:`p_2 k_2` rows, so it needs :math:`n` to be large relative to
+     :math:`p_2 k_2` and many clusters when clustering. A warning is issued if
+     the covariance is rank deficient, and the result should not be relied
+     upon.
+   * Using the outcome of a test to decide whether to proceed with IV
+     estimation distorts the inference that follows.
+   * The Bartlett kernel bandwidth here is one less than the ``bw()`` that
+     ``ivreg2`` uses for the same weights.
