@@ -264,7 +264,9 @@ def test_smoke(data):
 
 def test_refit_does_not_change_df_model():
     data = generate_data()
-    mod = AbsorbingLS(data.y, data.x, absorb=data.absorb, interactions=data.interactions)
+    mod = AbsorbingLS(
+        data.y, data.x, absorb=data.absorb, interactions=data.interactions
+    )
     res = mod.fit(debiased=True)
     res2 = mod.fit(debiased=True)
     assert res2.df_model == res.df_model

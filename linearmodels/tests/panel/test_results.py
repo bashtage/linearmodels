@@ -27,7 +27,6 @@ from linearmodels.shared.hypotheses import (
     NormalTestStatistic,
     WaldTestStatistic,
 )
-from linearmodels.shared.hypotheses import 
 from linearmodels.tests.panel._utility import datatypes, generate_data
 
 
