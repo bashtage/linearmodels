@@ -1,0 +1,6 @@
+﻿linearmodels.iv.common.cragg\_donald\_f
+=======================================
+
+.. currentmodule:: linearmodels.iv.common
+
+.. autofunction:: cragg_donald_f

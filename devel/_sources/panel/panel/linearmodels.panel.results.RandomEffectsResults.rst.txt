@@ -4,7 +4,7 @@
 .. currentmodule:: linearmodels.panel.results
 
 .. autoclass:: RandomEffectsResults
-   :exclude-members: conf_int,predict,wald_test,
+   :exclude-members: conf_int,predict,wald_test,wu_hausman,
 
    
    
@@ -16,6 +16,7 @@
       ~RandomEffectsResults.conf_int
       ~RandomEffectsResults.predict
       ~RandomEffectsResults.wald_test
+      ~RandomEffectsResults.wu_hausman
    
    
    

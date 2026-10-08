@@ -23,8 +23,12 @@
    .. autosummary::
       :toctree:
 
+      ~FirstStageResults.cragg_donald
+      ~FirstStageResults.cragg_donald_f
       ~FirstStageResults.diagnostics
       ~FirstStageResults.individual
+      ~FirstStageResults.kleibergen_paap
+      ~FirstStageResults.kleibergen_paap_f
       ~FirstStageResults.summary
    
    

@@ -19,7 +19,7 @@
     
   
       
-        <title>linearmodels.panel.results - linearmodels v7.1 (+105)</title>
+        <title>linearmodels.panel.results - linearmodels v7.1 (+116)</title>
       
     
 
@@ -91,7 +91,7 @@
 
 <header class="md-header md-header--shadow" data-md-component="header">
   <nav class="md-header__inner md-grid" aria-label="Header">
-    <a href="../../../index.html" title="linearmodels v7.1 (+105)" class="md-header__button md-logo" aria-label="linearmodels v7.1 (+105)" data-md-component="logo">
+    <a href="../../../index.html" title="linearmodels v7.1 (+116)" class="md-header__button md-logo" aria-label="linearmodels v7.1 (+116)" data-md-component="logo">
       <img src="../../../_static/bw-logo.svg" alt="logo">
     </a>
     <label class="md-header__button md-icon" for="__drawer">
@@ -102,7 +102,7 @@
       <div class="md-header__ellipsis">
         <div class="md-header__topic">
           <span class="md-ellipsis">
-            linearmodels v7.1 (+105)
+            linearmodels v7.1 (+116)
           </span>
         </div>
         <div class="md-header__topic" data-md-component="header-topic">
@@ -197,10 +197,10 @@
 
 <nav class="md-nav md-nav--primary" aria-label="Navigation" data-md-level="0">
   <label class="md-nav__title" for="__drawer">
-    <a href="../../../index.html" title="linearmodels v7.1 (+105)" class="md-nav__button md-logo" aria-label="linearmodels v7.1 (+105)" data-md-component="logo">
+    <a href="../../../index.html" title="linearmodels v7.1 (+116)" class="md-nav__button md-logo" aria-label="linearmodels v7.1 (+116)" data-md-component="logo">
       <img src="../../../_static/bw-logo.svg" alt="logo">
     </a>
-    linearmodels v7.1 (+105)
+    linearmodels v7.1 (+116)
   </label>
   
     <div class="md-nav__source">
@@ -512,6 +512,7 @@
 <span class="kn">import</span><span class="w"> </span><span class="nn">datetime</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">dt</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">functools</span><span class="w"> </span><span class="kn">import</span> <span class="n">cached_property</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">typing</span><span class="w"> </span><span class="kn">import</span> <span class="n">Any</span><span class="p">,</span> <span class="n">Union</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">warnings</span>
 
 <span class="kn">from</span><span class="w"> </span><span class="nn">formulaic.utils.context</span><span class="w"> </span><span class="kn">import</span> <span class="n">capture_context</span>
 <span class="kn">import</span><span class="w"> </span><span class="nn">numpy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">np</span>
@@ -520,8 +521,13 @@
 <span class="kn">from</span><span class="w"> </span><span class="nn">statsmodels.iolib.summary</span><span class="w"> </span><span class="kn">import</span> <span class="n">SimpleTable</span><span class="p">,</span> <span class="n">fmt_2cols</span><span class="p">,</span> <span class="n">fmt_params</span>
 
 <span class="kn">from</span><span class="w"> </span><span class="nn">linearmodels.iv.results</span><span class="w"> </span><span class="kn">import</span> <span class="n">default_txt_fmt</span><span class="p">,</span> <span class="n">stub_concat</span><span class="p">,</span> <span class="n">table_concat</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">linearmodels.panel.covariance</span><span class="w"> </span><span class="kn">import</span> <span class="n">HomoskedasticCovariance</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">linearmodels.shared.base</span><span class="w"> </span><span class="kn">import</span> <span class="n">_ModelComparison</span><span class="p">,</span> <span class="n">_SummaryStr</span>
-<span class="kn">from</span><span class="w"> </span><span class="nn">linearmodels.shared.hypotheses</span><span class="w"> </span><span class="kn">import</span> <span class="n">WaldTestStatistic</span><span class="p">,</span> <span class="n">quadratic_form_test</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">linearmodels.shared.hypotheses</span><span class="w"> </span><span class="kn">import</span> <span class="p">(</span>
+    <span class="n">InvalidTestStatistic</span><span class="p">,</span>
+    <span class="n">WaldTestStatistic</span><span class="p">,</span>
+    <span class="n">quadratic_form_test</span><span class="p">,</span>
+<span class="p">)</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">linearmodels.shared.io</span><span class="w"> </span><span class="kn">import</span> <span class="n">_str</span><span class="p">,</span> <span class="n">add_star</span><span class="p">,</span> <span class="n">pval_format</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">linearmodels.shared.utility</span><span class="w"> </span><span class="kn">import</span> <span class="n">AttrDict</span>
 <span class="kn">import</span><span class="w"> </span><span class="nn">linearmodels.typing.data</span>
@@ -1408,6 +1414,16 @@
 
 
 
+<span class="k">def</span><span class="w"> </span><span class="nf">_has_unadjusted_cov</span><span class="p">(</span><span class="n">res</span><span class="p">:</span> <span class="n">PanelResults</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">"""Test whether results use the unadjusted covariance estimator</span>
+
+<span class="sd">    The robust, clustered, kernel and autocorrelation-robust estimators all</span>
+<span class="sd">    derive from the unadjusted estimator, so the exact type must be checked.</span>
+<span class="sd">    """</span>
+    <span class="n">estimator</span> <span class="o">=</span> <span class="nb">getattr</span><span class="p">(</span><span class="n">res</span><span class="o">.</span><span class="n">_deferred_cov</span><span class="p">,</span> <span class="s2">"__self__"</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
+    <span class="k">return</span> <span class="nb">type</span><span class="p">(</span><span class="n">estimator</span><span class="p">)</span> <span class="ow">is</span> <span class="n">HomoskedasticCovariance</span>
+
+
 <div class="viewcode-block" id="RandomEffectsResults">
 <a class="viewcode-back" href="../../../panel/panel/linearmodels.panel.results.RandomEffectsResults.html#linearmodels.panel.results.RandomEffectsResults">[docs]</a>
 <span class="k">class</span><span class="w"> </span><span class="nc">RandomEffectsResults</span><span class="p">(</span><span class="n">PanelResults</span><span class="p">):</span>
@@ -1432,7 +1448,181 @@
     <span class="nd">@property</span>
     <span class="k">def</span><span class="w"> </span><span class="nf">theta</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">DataFrame</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">"""Values used in generalized demeaning"""</span>
-        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_theta</span></div>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_theta</span>
+
+<div class="viewcode-block" id="RandomEffectsResults.wu_hausman">
+<a class="viewcode-back" href="../../../panel/panel/linearmodels.panel.results.RandomEffectsResults.wu_hausman.html#linearmodels.panel.results.RandomEffectsResults.wu_hausman">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">wu_hausman</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span>
+        <span class="n">other</span><span class="p">:</span> <span class="n">PanelResults</span><span class="p">,</span>
+        <span class="n">include_constant</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
+        <span class="n">sigmamore</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
+        <span class="n">sigmaless</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">tuple</span><span class="p">[</span><span class="n">InvalidTestStatistic</span> <span class="o">|</span> <span class="n">WaldTestStatistic</span><span class="p">,</span> <span class="n">DataFrame</span><span class="p">]:</span>
+<span class="w">        </span><span class="sa">r</span><span class="sd">"""</span>
+<span class="sd">        Hausman specification test against results from a consistent model</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        other : PanelResults</span>
+<span class="sd">            Results from a model that is consistent whether or not the null</span>
+<span class="sd">            hypothesis is true, typically a fixed effects (entity effects)</span>
+<span class="sd">            model estimated using the same observations and regressors as</span>
+<span class="sd">            this model.</span>
+<span class="sd">        include_constant : bool</span>
+<span class="sd">            Flag indicating whether to include the constant in the comparison.</span>
+<span class="sd">            The default is False.</span>
+<span class="sd">        sigmamore : bool</span>
+<span class="sd">            Flag indicating whether to base both covariance estimates on the</span>
+<span class="sd">            error variance estimated by this model, which is efficient under</span>
+<span class="sd">            the null. Cannot be used with ``sigmaless``.</span>
+<span class="sd">        sigmaless : bool</span>
+<span class="sd">            Flag indicating whether to base both covariance estimates on the</span>
+<span class="sd">            error variance estimated by ``other``. Cannot be used with</span>
+<span class="sd">            ``sigmamore``.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        WaldTestStatistic or InvalidTestStatistic</span>
+<span class="sd">            Object containing test statistic, p-value, distribution and null.</span>
+<span class="sd">            An InvalidTestStatistic is returned when the statistic is negative.</span>
+<span class="sd">        DataFrame</span>
+<span class="sd">            The coefficients included in the test. The columns are ``b0``</span>
+<span class="sd">            (from ``other``), ``b1`` (from this model), their difference</span>
+<span class="sd">            ``b0-b1`` and ``Std. Err.``, the standard error of the difference.</span>
+<span class="sd">            The standard error is NaN if the variance of the difference is</span>
+<span class="sd">            negative.</span>
+
+<span class="sd">        Raises</span>
+<span class="sd">        ------</span>
+<span class="sd">        TypeError</span>
+<span class="sd">            If ``other`` is not a panel results object, or if either model</span>
+<span class="sd">            was not estimated using the unadjusted covariance estimator.</span>
+<span class="sd">        ValueError</span>
+<span class="sd">            If ``sigmamore`` and ``sigmaless`` are both True, if the models</span>
+<span class="sd">            use different numbers of observations, or if the models do not</span>
+<span class="sd">            have any coefficients in common.</span>
+
+<span class="sd">        Notes</span>
+<span class="sd">        -----</span>
+<span class="sd">        The test statistic is</span>
+
+<span class="sd">        .. math::</span>
+
+<span class="sd">            H = (b_0 - b_1)^{\prime} (V_0 - V_1)^{-1} (b_0 - b_1)</span>
+
+<span class="sd">        where :math:`b_0` and :math:`V_0` are the coefficients and covariance</span>
+<span class="sd">        from ``other``, which is consistent under both the null and the</span>
+<span class="sd">        alternative, and :math:`b_1` and :math:`V_1` are from this model,</span>
+<span class="sd">        which is efficient under the null. The null hypothesis is that there</span>
+<span class="sd">        is no systematic difference in the coefficients, which for a fixed</span>
+<span class="sd">        effects model compared with a random effects model means that the</span>
+<span class="sd">        effects are uncorrelated with the regressors. The statistic is</span>
+<span class="sd">        asymptotically :math:`\chi^2_k`, where :math:`k` is the number of</span>
+<span class="sd">        coefficients compared.</span>
+
+<span class="sd">        Only coefficients found in both models are compared. The constant is</span>
+<span class="sd">        excluded unless ``include_constant`` is True.</span>
+
+<span class="sd">        The result is only meaningful when :math:`V_0 - V_1` is positive</span>
+<span class="sd">        definite, which is guaranteed in large samples if the null is true. If</span>
+<span class="sd">        it is not, a warning is issued and a generalized inverse is used. If</span>
+<span class="sd">        the resulting statistic is negative, the data do not satisfy the</span>
+<span class="sd">        assumptions of the test and an InvalidTestStatistic is returned.</span>
+
+<span class="sd">        Both models must use the default unadjusted covariance estimator, and</span>
+<span class="sd">        the statistic requires that ``other`` is estimated using the same</span>
+<span class="sd">        observations as this model.</span>
+
+<span class="sd">        References</span>
+<span class="sd">        ----------</span>
+<span class="sd">        Hausman, J. A. (1978). Specification tests in econometrics.</span>
+<span class="sd">        Econometrica, 46(6), 1251-1271.</span>
+
+<span class="sd">        Examples</span>
+<span class="sd">        --------</span>
+<span class="sd">        &gt;&gt;&gt; from linearmodels import PanelOLS, RandomEffects</span>
+<span class="sd">        &gt;&gt;&gt; fe_res = PanelOLS(y, x, entity_effects=True).fit()</span>
+<span class="sd">        &gt;&gt;&gt; re_res = RandomEffects(y, x).fit()</span>
+<span class="sd">        &gt;&gt;&gt; test, estimates = re_res.wu_hausman(fe_res)</span>
+<span class="sd">        &gt;&gt;&gt; print(test)</span>
+<span class="sd">        """</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">other</span><span class="p">,</span> <span class="n">PanelResults</span><span class="p">):</span>
+            <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="s2">"other must be the results of a panel model."</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">sigmamore</span> <span class="ow">and</span> <span class="n">sigmaless</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">"sigmamore and sigmaless cannot both be True."</span><span class="p">)</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="p">(</span><span class="n">_has_unadjusted_cov</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="ow">and</span> <span class="n">_has_unadjusted_cov</span><span class="p">(</span><span class="n">other</span><span class="p">)):</span>
+            <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span>
+                <span class="s2">"The Hausman test can only be used with models estimated using "</span>
+                <span class="s2">"the unadjusted covariance estimator."</span>
+            <span class="p">)</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">nobs</span> <span class="o">!=</span> <span class="n">other</span><span class="o">.</span><span class="n">nobs</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
+                <span class="s2">"The models must be estimated using the same observations. "</span>
+                <span class="sa">f</span><span class="s2">"This model uses </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">nobs</span><span class="si">}</span><span class="s2"> and other uses </span><span class="si">{</span><span class="n">other</span><span class="o">.</span><span class="n">nobs</span><span class="si">}</span><span class="s2">."</span>
+            <span class="p">)</span>
+
+        <span class="n">in_other</span> <span class="o">=</span> <span class="nb">set</span><span class="p">(</span><span class="n">other</span><span class="o">.</span><span class="n">params</span><span class="o">.</span><span class="n">index</span><span class="p">)</span>
+        <span class="n">common</span> <span class="o">=</span> <span class="p">[</span><span class="n">name</span> <span class="k">for</span> <span class="n">name</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">params</span><span class="o">.</span><span class="n">index</span> <span class="k">if</span> <span class="n">name</span> <span class="ow">in</span> <span class="n">in_other</span><span class="p">]</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">include_constant</span><span class="p">:</span>
+            <span class="n">constants</span><span class="p">:</span> <span class="nb">set</span><span class="p">[</span><span class="n">Any</span><span class="p">]</span> <span class="o">=</span> <span class="nb">set</span><span class="p">()</span>
+            <span class="k">for</span> <span class="n">res</span> <span class="ow">in</span> <span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">other</span><span class="p">):</span>
+                <span class="k">if</span> <span class="n">res</span><span class="o">.</span><span class="n">model</span><span class="o">.</span><span class="n">has_constant</span><span class="p">:</span>
+                    <span class="n">loc</span> <span class="o">=</span> <span class="n">res</span><span class="o">.</span><span class="n">model</span><span class="o">.</span><span class="n">_constant_index</span>
+                    <span class="k">assert</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">loc</span><span class="p">,</span> <span class="nb">int</span><span class="p">)</span>
+                    <span class="n">constants</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">res</span><span class="o">.</span><span class="n">model</span><span class="o">.</span><span class="n">exog</span><span class="o">.</span><span class="n">vars</span><span class="p">[</span><span class="n">loc</span><span class="p">])</span>
+            <span class="n">common</span> <span class="o">=</span> <span class="p">[</span><span class="n">name</span> <span class="k">for</span> <span class="n">name</span> <span class="ow">in</span> <span class="n">common</span> <span class="k">if</span> <span class="n">name</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">constants</span><span class="p">]</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">common</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">"The models do not have any coefficients in common."</span><span class="p">)</span>
+
+        <span class="c1"># The unadjusted covariance is s2 * inv(x'x), so using the error</span>
+        <span class="c1"># variance of the other model only requires rescaling.</span>
+        <span class="n">cov0</span> <span class="o">=</span> <span class="n">other</span><span class="o">.</span><span class="n">cov</span>
+        <span class="n">cov1</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">cov</span>
+        <span class="k">if</span> <span class="n">sigmamore</span><span class="p">:</span>
+            <span class="n">cov0</span> <span class="o">=</span> <span class="n">cov0</span> <span class="o">*</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">s2</span> <span class="o">/</span> <span class="n">other</span><span class="o">.</span><span class="n">s2</span><span class="p">)</span>
+        <span class="k">elif</span> <span class="n">sigmaless</span><span class="p">:</span>
+            <span class="n">cov1</span> <span class="o">=</span> <span class="n">cov1</span> <span class="o">*</span> <span class="p">(</span><span class="n">other</span><span class="o">.</span><span class="n">s2</span> <span class="o">/</span> <span class="bp">self</span><span class="o">.</span><span class="n">s2</span><span class="p">)</span>
+
+        <span class="n">b0</span> <span class="o">=</span> <span class="n">other</span><span class="o">.</span><span class="n">params</span><span class="p">[</span><span class="n">common</span><span class="p">]</span>
+        <span class="n">b1</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">params</span><span class="p">[</span><span class="n">common</span><span class="p">]</span>
+        <span class="n">b_diff</span> <span class="o">=</span> <span class="n">b0</span> <span class="o">-</span> <span class="n">b1</span>
+        <span class="n">var_diff</span> <span class="o">=</span> <span class="n">cov0</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span><span class="n">common</span><span class="p">,</span> <span class="n">common</span><span class="p">]</span> <span class="o">-</span> <span class="n">cov1</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span><span class="n">common</span><span class="p">,</span> <span class="n">common</span><span class="p">]</span>
+        <span class="n">diag</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">diag</span><span class="p">(</span><span class="n">var_diff</span><span class="p">)</span>
+        <span class="n">std_errors</span> <span class="o">=</span> <span class="n">Series</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">where</span><span class="p">(</span><span class="n">diag</span> <span class="o">&gt;=</span> <span class="mi">0</span><span class="p">,</span> <span class="n">diag</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">nan</span><span class="p">)),</span> <span class="n">index</span><span class="o">=</span><span class="n">common</span><span class="p">)</span>
+        <span class="n">estimates</span> <span class="o">=</span> <span class="n">DataFrame</span><span class="p">(</span>
+            <span class="p">{</span><span class="s2">"b0"</span><span class="p">:</span> <span class="n">b0</span><span class="p">,</span> <span class="s2">"b1"</span><span class="p">:</span> <span class="n">b1</span><span class="p">,</span> <span class="s2">"b0-b1"</span><span class="p">:</span> <span class="n">b_diff</span><span class="p">,</span> <span class="s2">"Std. Err."</span><span class="p">:</span> <span class="n">std_errors</span><span class="p">}</span>
+        <span class="p">)</span>
+
+        <span class="n">diff</span> <span class="o">=</span> <span class="n">var_diff</span><span class="o">.</span><span class="n">to_numpy</span><span class="p">()</span>
+        <span class="n">delta</span> <span class="o">=</span> <span class="n">b_diff</span><span class="o">.</span><span class="n">to_numpy</span><span class="p">()</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="n">np</span><span class="o">.</span><span class="n">linalg</span><span class="o">.</span><span class="n">cholesky</span><span class="p">(</span><span class="n">diff</span><span class="p">)</span>
+            <span class="n">positive_definite</span> <span class="o">=</span> <span class="kc">True</span>
+        <span class="k">except</span> <span class="n">np</span><span class="o">.</span><span class="n">linalg</span><span class="o">.</span><span class="n">LinAlgError</span><span class="p">:</span>
+            <span class="n">positive_definite</span> <span class="o">=</span> <span class="kc">False</span>
+        <span class="k">if</span> <span class="n">positive_definite</span><span class="p">:</span>
+            <span class="n">stat</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="n">delta</span> <span class="o">@</span> <span class="n">np</span><span class="o">.</span><span class="n">linalg</span><span class="o">.</span><span class="n">solve</span><span class="p">(</span><span class="n">diff</span><span class="p">,</span> <span class="n">delta</span><span class="p">))</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">warnings</span><span class="o">.</span><span class="n">warn</span><span class="p">(</span>
+                <span class="s2">"Var(b0) - Var(b1) is not positive definite. A generalized "</span>
+                <span class="s2">"inverse is used to compute the statistic."</span><span class="p">,</span>
+                <span class="ne">UserWarning</span><span class="p">,</span>
+                <span class="n">stacklevel</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span>
+            <span class="p">)</span>
+            <span class="n">stat</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="n">delta</span> <span class="o">@</span> <span class="n">np</span><span class="o">.</span><span class="n">linalg</span><span class="o">.</span><span class="n">pinv</span><span class="p">(</span><span class="n">diff</span><span class="p">,</span> <span class="n">hermitian</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span> <span class="o">@</span> <span class="n">delta</span><span class="p">)</span>
+
+        <span class="n">name</span> <span class="o">=</span> <span class="s2">"Hausman specification test"</span>
+        <span class="k">if</span> <span class="n">stat</span> <span class="o">&lt;</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="n">invalid</span> <span class="o">=</span> <span class="n">InvalidTestStatistic</span><span class="p">(</span>
+                <span class="s2">"The statistic is negative, so the models do not meet the "</span>
+                <span class="s2">"assumptions of the Hausman test."</span><span class="p">,</span>
+                <span class="n">name</span><span class="o">=</span><span class="n">name</span><span class="p">,</span>
+            <span class="p">)</span>
+            <span class="k">return</span> <span class="n">invalid</span><span class="p">,</span> <span class="n">estimates</span>
+        <span class="n">null</span> <span class="o">=</span> <span class="s2">"No systematic difference in coefficients between models"</span>
+        <span class="k">return</span> <span class="n">WaldTestStatistic</span><span class="p">(</span><span class="n">stat</span><span class="p">,</span> <span class="n">null</span><span class="p">,</span> <span class="nb">len</span><span class="p">(</span><span class="n">common</span><span class="p">),</span> <span class="n">name</span><span class="o">=</span><span class="n">name</span><span class="p">),</span> <span class="n">estimates</span></div>
+</div>
 
 
 

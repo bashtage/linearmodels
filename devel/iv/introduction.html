@@ -23,7 +23,7 @@
     
   
       
-        <title>Introduction - linearmodels v7.1 (+105)</title>
+        <title>Introduction - linearmodels v7.1 (+116)</title>
       
     
 
@@ -100,7 +100,7 @@
 
 <header class="md-header md-header--shadow" data-md-component="header">
   <nav class="md-header__inner md-grid" aria-label="Header">
-    <a href="../index.html" title="linearmodels v7.1 (+105)" class="md-header__button md-logo" aria-label="linearmodels v7.1 (+105)" data-md-component="logo">
+    <a href="../index.html" title="linearmodels v7.1 (+116)" class="md-header__button md-logo" aria-label="linearmodels v7.1 (+116)" data-md-component="logo">
       <img src="../_static/bw-logo.svg" alt="logo">
     </a>
     <label class="md-header__button md-icon" for="__drawer">
@@ -111,7 +111,7 @@
       <div class="md-header__ellipsis">
         <div class="md-header__topic">
           <span class="md-ellipsis">
-            linearmodels v7.1 (+105)
+            linearmodels v7.1 (+116)
           </span>
         </div>
         <div class="md-header__topic" data-md-component="header-topic">
@@ -206,10 +206,10 @@
 
 <nav class="md-nav md-nav--primary" aria-label="Navigation" data-md-level="0">
   <label class="md-nav__title" for="__drawer">
-    <a href="../index.html" title="linearmodels v7.1 (+105)" class="md-nav__button md-logo" aria-label="linearmodels v7.1 (+105)" data-md-component="logo">
+    <a href="../index.html" title="linearmodels v7.1 (+116)" class="md-nav__button md-logo" aria-label="linearmodels v7.1 (+116)" data-md-component="logo">
       <img src="../_static/bw-logo.svg" alt="logo">
     </a>
-    linearmodels v7.1 (+105)
+    linearmodels v7.1 (+116)
   </label>
   
     <div class="md-nav__source">
@@ -422,6 +422,16 @@
         
       </ul>
     </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#testing-identification" class="md-nav__link">
+    
+    <span class="md-ellipsis">
+      <span title="/iv/introduction.rst#testing-identification (reference label)"><span>Testing Identification</span></span>
+    </span>
+  </a>
   
 </li>
       
@@ -939,6 +949,16 @@
   
 </li>
       
+        <li class="md-nav__item">
+  <a href="#testing-identification" class="md-nav__link">
+    
+    <span class="md-ellipsis">
+      <span title="/iv/introduction.rst#testing-identification (reference label)"><span>Testing Identification</span></span>
+    </span>
+  </a>
+  
+</li>
+      
     </ul>
   
 </nav>
@@ -1125,6 +1145,75 @@ where both the moment condition and the moment score estimator change with
 parameter values. <code class="docutils literal notranslate"><span class="pre">starting</span></code> allows a user-specified set of starting values
 to be used in-place of the default starting values and <code class="docutils literal notranslate"><span class="pre">display</span></code> controls
 whether iterative output is printed during estimation.</p>
+<h2 id="testing-identification">Testing Identification<a class="headerlink" href="#testing-identification" title="Link to this heading">¶</a></h2>
+<p>The results of every IV estimator have a <code class="docutils literal notranslate"><span class="pre">first_stage</span></code> attribute that
+contains tests of whether the instruments identify the model. The model is
+identified when the matrix of coefficients on the excluded instruments in the
+first-stage regressions has full column rank, so that there are at least as
+many informative instruments as there are endogenous regressors.</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><code><span class="n">res</span> <span class="o">=</span> <span class="n">IV2SLS</span><span class="p">(</span><span class="n">dependent</span><span class="p">,</span> <span class="n">exog</span><span class="p">,</span> <span class="n">endog</span><span class="p">,</span> <span class="n">instruments</span><span class="p">)</span><span class="o">.</span><span class="n">fit</span><span class="p">(</span><span class="n">cov_type</span><span class="o">=</span><span class="s2">"robust"</span><span class="p">)</span>
+<span class="n">first_stage</span> <span class="o">=</span> <span class="n">res</span><span class="o">.</span><span class="n">first_stage</span>
+<span class="n">first_stage</span><span class="o">.</span><span class="n">kleibergen_paap</span>     <span class="c1"># rk LM test of underidentification</span>
+<span class="n">first_stage</span><span class="o">.</span><span class="n">kleibergen_paap_f</span>   <span class="c1"># rk Wald F statistic</span>
+<span class="n">first_stage</span><span class="o">.</span><span class="n">cragg_donald</span>        <span class="c1"># Cragg-Donald test of underidentification</span>
+<span class="n">first_stage</span><span class="o">.</span><span class="n">cragg_donald_f</span>      <span class="c1"># Cragg-Donald Wald F statistic</span>
+</code></pre></div>
+</div>
+<p>The null hypothesis of the two tests is that the first-stage coefficient matrix
+is rank deficient, so that the model is <strong>underidentified</strong>. The tests have a
+<span class="math notranslate nohighlight">\(\chi^2_{p_2 - k_2 + 1}\)</span> distribution, where <span class="math notranslate nohighlight">\(p_2\)</span> is the number of
+excluded instruments and <span class="math notranslate nohighlight">\(k_2\)</span> is the number of endogenous regressors.
+When there are no endogenous regressors, or when the statistics are not
+defined, for example if the endogenous regressors are collinear, the tests are
+reported as an <a class="reference internal" href="../utility/linearmodels.shared.hypotheses.InvalidTestStatistic.html#linearmodels.shared.hypotheses.InvalidTestStatistic" title="linearmodels.shared.hypotheses.InvalidTestStatistic (Python class) — Class returned if a requested test is not valid for a model"><code class="xref py py-class docutils literal notranslate"><span class="pre">InvalidTestStatistic</span></code></a>.</p>
+<ul class="simple">
+<li><p><a class="reference internal" href="iv/linearmodels.iv.common.cragg_donald.html#linearmodels.iv.common.cragg_donald" title="linearmodels.iv.common.cragg_donald (Python function) — Cragg-Donald test of reduced rank for the first-stage regression"><code class="xref py py-func docutils literal notranslate"><span class="pre">cragg_donald()</span></code></a> requires conditionally
+homoskedastic and serially uncorrelated errors. It does <strong>not</strong> use the
+covariance estimator that was used to fit the model.</p></li>
+<li><p><a class="reference internal" href="iv/linearmodels.iv.common.kleibergen_paap.html#linearmodels.iv.common.kleibergen_paap" title="linearmodels.iv.common.kleibergen_paap (Python function) — Kleibergen-Paap rk LM test of underidentification"><code class="xref py py-func docutils literal notranslate"><span class="pre">kleibergen_paap()</span></code></a> uses the covariance estimator
+that was used to fit the model: unadjusted, robust, one-way clustered or
+kernel. With the unadjusted covariance it is Anderson’s canonical correlation
+LM statistic. The test follows <code class="docutils literal notranslate"><span class="pre">ranktest</span></code> and Stata’s <code class="docutils literal notranslate"><span class="pre">ivreg2</span></code>
+“Kleibergen-Paap rk LM statistic”.</p></li>
+</ul>
+<p>The F statistics, <a class="reference internal" href="iv/linearmodels.iv.common.cragg_donald_f.html#linearmodels.iv.common.cragg_donald_f" title="linearmodels.iv.common.cragg_donald_f (Python function) — Cragg-Donald Wald F statistic"><code class="xref py py-func docutils literal notranslate"><span class="pre">cragg_donald_f()</span></code></a> and
+<a class="reference internal" href="iv/linearmodels.iv.common.kleibergen_paap_f.html#linearmodels.iv.common.kleibergen_paap_f" title="linearmodels.iv.common.kleibergen_paap_f (Python function) — Kleibergen-Paap rk Wald F statistic"><code class="xref py py-func docutils literal notranslate"><span class="pre">kleibergen_paap_f()</span></code></a>, are the statistics that are
+commonly compared with weak-instrument critical values. They are the
+statistics that <code class="docutils literal notranslate"><span class="pre">ivreg2</span></code> reports as the “Cragg-Donald Wald F statistic” and
+the “Kleibergen-Paap rk Wald F statistic”. They do not have p-values.</p>
+<div class="warning admonition">
+<p class="admonition-title">Warning</p>
+<p>These statistics are easy to over-interpret.</p>
+<ul class="simple">
+<li><p>The null is that the model is underidentified. Rejecting it does <strong>not</strong>
+show that the instruments are strong. The test rejects with probability
+near one when the instruments are weak enough for 2SLS to be badly biased
+and its tests to be badly sized. These are not tests of weak instruments.</p></li>
+<li><p>Stock-Yogo critical values apply only to the Cragg-Donald F statistic
+when the errors are conditionally homoskedastic and serially
+uncorrelated. They are not valid for the Kleibergen-Paap F statistic when
+the errors are not i.i.d. and comparing them is only a heuristic. For one
+endogenous regressor, the effective F statistic of Olea and Pflueger
+(2013) is better founded. It is not implemented, and neither are
+weak-instrument robust confidence sets.</p></li>
+<li><p>The Cragg-Donald statistic ignores heteroskedasticity, clustering and
+serial correlation. The Kleibergen-Paap statistic is only as robust as
+the covariance estimator used for it. If the dependence in the data is not
+modeled, both can reject far too often when the instruments and
+first-stage errors are clustered or persistent. With few clusters the
+clustered test can be conservative, and a kernel bandwidth that is too
+short does not remove the over-rejection.</p></li>
+<li><p>The tests are asymptotic. The Kleibergen-Paap statistic uses a covariance
+matrix with <span class="math notranslate nohighlight">\(p_2 k_2\)</span> rows, so it needs <span class="math notranslate nohighlight">\(n\)</span> to be large relative to
+<span class="math notranslate nohighlight">\(p_2 k_2\)</span> and many clusters when clustering. A warning is issued if
+the covariance is rank deficient, and the result should not be relied
+upon.</p></li>
+<li><p>Using the outcome of a test to decide whether to proceed with IV
+estimation distorts the inference that follows.</p></li>
+<li><p>The Bartlett kernel bandwidth here is one less than the <code class="docutils literal notranslate"><span class="pre">bw()</span></code> that
+<code class="docutils literal notranslate"><span class="pre">ivreg2</span></code> uses for the same weights.</p></li>
+</ul>
+</div>
 
 
 
