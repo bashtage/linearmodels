@@ -19,7 +19,7 @@
     
   
       
-        <title>linearmodels.iv.model - linearmodels v7.1 (+127)</title>
+        <title>linearmodels.iv.model - linearmodels v7.1 (+129)</title>
       
     
 
@@ -91,7 +91,7 @@
 
 <header class="md-header md-header--shadow" data-md-component="header">
   <nav class="md-header__inner md-grid" aria-label="Header">
-    <a href="../../../index.html" title="linearmodels v7.1 (+127)" class="md-header__button md-logo" aria-label="linearmodels v7.1 (+127)" data-md-component="logo">
+    <a href="../../../index.html" title="linearmodels v7.1 (+129)" class="md-header__button md-logo" aria-label="linearmodels v7.1 (+129)" data-md-component="logo">
       <img src="../../../_static/bw-logo.svg" alt="logo">
     </a>
     <label class="md-header__button md-icon" for="__drawer">
@@ -102,7 +102,7 @@
       <div class="md-header__ellipsis">
         <div class="md-header__topic">
           <span class="md-ellipsis">
-            linearmodels v7.1 (+127)
+            linearmodels v7.1 (+129)
           </span>
         </div>
         <div class="md-header__topic" data-md-component="header-topic">
@@ -197,10 +197,10 @@
 
 <nav class="md-nav md-nav--primary" aria-label="Navigation" data-md-level="0">
   <label class="md-nav__title" for="__drawer">
-    <a href="../../../index.html" title="linearmodels v7.1 (+127)" class="md-nav__button md-logo" aria-label="linearmodels v7.1 (+127)" data-md-component="logo">
+    <a href="../../../index.html" title="linearmodels v7.1 (+129)" class="md-nav__button md-logo" aria-label="linearmodels v7.1 (+129)" data-md-component="logo">
       <img src="../../../_static/bw-logo.svg" alt="logo">
     </a>
-    linearmodels v7.1 (+127)
+    linearmodels v7.1 (+129)
   </label>
   
     <div class="md-nav__source">
@@ -1908,7 +1908,8 @@
 <span class="sd">    * "clustered" - Allows for one-way cluster dependence</span>
 
 <span class="sd">    In most circumstances, the ``center`` weight option should be ``True`` to</span>
-<span class="sd">    avoid starting value dependence.</span>
+<span class="sd">    avoid starting value dependence. It is ``True`` unless ``center`` is</span>
+<span class="sd">    passed in ``weight_config``.</span>
 
 <span class="sd">    .. math::</span>
 
@@ -1935,6 +1936,9 @@
         <span class="o">**</span><span class="n">weight_config</span><span class="p">:</span> <span class="n">Any</span><span class="p">,</span>
     <span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_method</span> <span class="o">=</span> <span class="s2">"IV-GMM-CUE"</span>
+        <span class="c1"># The default has to be set before the weight estimator is created</span>
+        <span class="k">if</span> <span class="s2">"center"</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">weight_config</span><span class="p">:</span>
+            <span class="n">weight_config</span><span class="p">[</span><span class="s2">"center"</span><span class="p">]</span> <span class="o">=</span> <span class="kc">True</span>
         <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span>
             <span class="n">dependent</span><span class="p">,</span>
             <span class="n">exog</span><span class="p">,</span>
@@ -1944,8 +1948,6 @@
             <span class="n">weight_type</span><span class="o">=</span><span class="n">weight_type</span><span class="p">,</span>
             <span class="o">**</span><span class="n">weight_config</span><span class="p">,</span>
         <span class="p">)</span>
-        <span class="k">if</span> <span class="s2">"center"</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">weight_config</span><span class="p">:</span>
-            <span class="n">weight_config</span><span class="p">[</span><span class="s2">"center"</span><span class="p">]</span> <span class="o">=</span> <span class="kc">True</span>
 
 <div class="viewcode-block" id="IVGMMCUE.from_formula">
 <a class="viewcode-back" href="../../../iv/iv/linearmodels.iv.model.IVGMMCUE.from_formula.html#linearmodels.iv.model.IVGMMCUE.from_formula">[docs]</a>
