@@ -732,11 +732,12 @@ class _SystemModelBase:
                 self._xhat.append(x)
                 self._wxhat.append(self._wx[i])
             else:
-                delta = lstsq(z, x, rcond=None)[0]
-                xhat = z @ delta
-                self._xhat.append(xhat)
-                w = self._w[i]
-                self._wxhat.append(xhat * np.sqrt(w))
+                # Project the weighted regressors on the weighted instruments so that
+                # the first stage uses the same weights as the second stage
+                wx, wz = self._wx[i], self._wz[i]
+                delta = lstsq(wz, wx, rcond=None)[0]
+                self._xhat.append(z @ delta)
+                self._wxhat.append(wz @ delta)
 
     def _gls_estimate(
         self,

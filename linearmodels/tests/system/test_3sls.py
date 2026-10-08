@@ -7,6 +7,7 @@ from pandas import DataFrame
 from pandas.testing import assert_frame_equal, assert_series_equal
 import pytest
 
+from linearmodels.iv import IV2SLS
 from linearmodels.system.model import IV3SLS
 from linearmodels.tests.system._utility import (
     generate_3sls_data,
@@ -163,6 +164,76 @@ def test_single_equation(data):
     assert_allclose(res.sigma, out.sigma)
     assert_allclose(np.asarray(res.resids), out.eps)
     assert_allclose(np.diag(res.cov), np.diag(out.cov))
+
+
+@pytest.mark.parametrize("common_exog", [True, False])
+def test_weighted_against_transformed_data(common_exog):
+    # Weighted 3SLS is 3SLS on the data scaled by the square root of the
+    # (normalized) weights, including in the first stage
+    data = generate_3sls_data(
+        n=250,
+        k=3,
+        p=3,
+        en=2,
+        instr=3,
+        const=True,
+        rho=0.8,
+        common_exog=common_exog,
+        included_weights=True,
+        output_dict=True,
+    )
+    res = IV3SLS(data).fit(cov_type="unadjusted")
+
+    y = []
+    x = []
+    z = []
+    for val in data.values():
+        w = np.sqrt(val["weights"] / val["weights"].mean())
+        y.append(val["dependent"] * w)
+        x.append(np.concatenate([val["exog"], val["endog"]], 1) * w)
+        z.append(np.concatenate([val["exog"], val["instruments"]], 1) * w)
+    out = simple_3sls(y, x, z)
+    assert_allclose(res.params.values, out.beta1.squeeze())
+    assert_allclose(res.sigma, out.sigma)
+    assert_allclose(np.diag(res.cov), np.diag(out.cov))
+
+
+def test_weighted_just_identified_against_iv2sls():
+    # With the same instruments in every equation and each equation exactly
+    # identified, 3SLS reduces to equation-by-equation 2SLS, also with weights
+    rs = np.random.RandomState(1234)
+    n = 500
+    z = rs.standard_normal((n, 2))
+    x = rs.standard_normal(n)
+    e = rs.standard_normal((n, 2))
+    v = rs.standard_normal((n, 2)) + 0.5 * e
+    endog = z @ np.array([[1.0, -0.3], [0.5, 1.0]]) + v
+    exog = pd.DataFrame({"const": np.ones(n), "x": x})
+    dep = np.column_stack(
+        [1 + 0.5 * x + endog[:, 0] + e[:, 0], -1 + x - 0.5 * endog[:, 1] + e[:, 1]]
+    )
+    weights = rs.uniform(0.2, 3, n)
+    instr = pd.DataFrame({"z": z[:, 0]})
+    eqns = {}
+    for i in range(2):
+        eqns[f"eq{i}"] = {
+            "dependent": dep[:, i],
+            "exog": exog,
+            "endog": pd.DataFrame({f"endog{i}": endog[:, i]}),
+            "instruments": instr,
+            "weights": weights,
+        }
+    res = IV3SLS(eqns).fit(cov_type="unadjusted")
+    for key, eqn in eqns.items():
+        iv2sls = IV2SLS(
+            eqn["dependent"],
+            eqn["exog"],
+            eqn["endog"],
+            eqn["instruments"],
+            weights=weights,
+        ).fit(cov_type="unadjusted")
+        params = res.params[[f"{key}_{col}" for col in iv2sls.params.index]]
+        assert_allclose(params.values, iv2sls.params.values)
 
 
 def test_too_few_instruments():
