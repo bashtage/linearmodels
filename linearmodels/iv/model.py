@@ -1025,6 +1025,9 @@ class _IVGMMBase(_IVModelBase):
         self._weight = weight_matrix_estimator(**weight_config)
         self._weight_type = weight_type
         self._weight_config = self._weight.config
+        # The arguments needed to create another weight estimator of this
+        # type. config does not contain all of them, e.g., optimal_bw
+        self._weight_kwargs = dict(weight_config)
 
     def _gmm_post_estimation(
         self,
@@ -1128,6 +1131,9 @@ class IVGMM(_IVGMMBase):
         self._weight = weight_matrix_estimator(**weight_config)
         self._weight_type = weight_type
         self._weight_config = self._weight.config
+        # The arguments needed to create another weight estimator of this
+        # type. config does not contain all of them, e.g., optimal_bw
+        self._weight_kwargs = dict(weight_config)
 
     @staticmethod
     def from_formula(

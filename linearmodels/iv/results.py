@@ -1520,6 +1520,12 @@ class IVGMMResults(_CommonIVResults):
         tested.  If the original model is just identified, :math:`J_c=0` and
         the C statistic is the J statistic of the first model.
 
+        The covariance of the moment conditions in the first model is
+        estimated using the same ``weight_type`` and weight configuration as
+        the model that the statistic is computed from, e.g., clustered or
+        kernel, so that the statistic is valid under the same assumptions
+        about the moment conditions.
+
         See Hayashi (2000), pp. 218-221 and 232-234, or Baum, Schaffer and
         Stillman (2003), section 4.4, for details.
         """
@@ -1543,7 +1549,18 @@ class IVGMMResults(_CommonIVResults):
             null = "Variables {} are exogenous".format(", ".join(variable_lst))
         from linearmodels.iv.model import IVGMM, IVGMMCUE
 
-        mod = IVGMM(dependent, exog_e, endog_e, instruments, weights=self.model.weights)
+        assert isinstance(self.model, (IVGMM, IVGMMCUE))
+        # The covariance of the moment conditions is estimated in the same way
+        # as in the model being tested
+        mod = IVGMM(
+            dependent,
+            exog_e,
+            endog_e,
+            instruments,
+            weights=self.model.weights,
+            weight_type=self.model._weight_type,
+            **self.model._weight_kwargs,
+        )
         res_e = mod.fit(cov_type=self.cov_type, **self.cov_config)
         assert isinstance(res_e, IVGMMResults)
         j_e = res_e.j_stat.stat
@@ -1564,7 +1581,6 @@ class IVGMMResults(_CommonIVResults):
         weight_mat_c = inv(cov_e[original][:, original])
         params_c = mod.estimate_parameters(x, y, z, weight_mat_c)
 
-        assert isinstance(self.model, (IVGMM, IVGMMCUE))
         j_c = self.model._j_statistic(params_c, weight_mat_c).stat
 
         stat = j_e - j_c

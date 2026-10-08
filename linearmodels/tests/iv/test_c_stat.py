@@ -5,9 +5,12 @@ The reference values in results/c-stat-reference.csv were produced by
 results/c-stat-reference.R, a base R implementation of the definition in
 Hayashi (2000) and Baum, Schaffer and Stillman (2003, section 4.4). Before it
 writes the reference values the script checks that it reproduces results from
-Stata that are used elsewhere in the tests: ivregress gmm on the housing data,
-including the Hansen J statistic of an overidentified model, and estat
-endogenous / estat overid on the simulated data.
+Stata that are used elsewhere in the tests: ivregress gmm on the housing and
+simulated data, including the Hansen J statistic of overidentified models for
+the robust, unadjusted, clustered and kernel weight matrices with and without
+centering, and estat endogenous / estat overid on the simulated data. The
+weighted scenarios use linearmodels' convention for weights, which the Stata
+comparisons of GMM models in this package do not cover.
 
 Almost all of the Stata-based tests of the C statistic use a model that is
 just identified. Then the restricted J statistic is identically 0 and the
@@ -22,7 +25,7 @@ from numpy.testing import assert_allclose
 import pandas as pd
 import pytest
 
-from linearmodels.iv import IVGMM, IVGMMCUE
+from linearmodels.iv import IV2SLS, IVGMM, IVGMMCUE
 
 CWD = os.path.split(os.path.abspath(__file__))[0]
 RESULTS = os.path.join(CWD, "results")
@@ -47,12 +50,19 @@ def build_model(row, model=IVGMM):
     else:
         data, dep = SIMULATED, SIMULATED.y_robust
     weights = data.weights if row.weighted else None
+    # The way that the covariance of the moment conditions is estimated
+    config = {"weight_type": row.weight_type, "center": bool(row.center)}
+    if row.weight_type == "kernel":
+        config.update({"kernel": "bartlett", "bandwidth": int(row.bandwidth)})
+    elif row.weight_type == "clustered":
+        config["clusters"] = pd.factorize(data[row.clusters])[0]
     return model(
         dep,
         data[row.exog.split()],
         data[row.endog.split()],
         data[row.instruments.split()],
         weights=weights,
+        **config,
     )
 
 
@@ -83,6 +93,10 @@ def test_reference_has_overidentified_models():
     # Strongly rejecting and non-rejecting examples
     assert (REFERENCE.pvalue < 1e-6).any()
     assert (REFERENCE.pvalue > 0.5).any()
+    # Every estimator of the covariance of the moment conditions, centered or not
+    assert set(REFERENCE.weight_type) == {"robust", "unadjusted", "kernel", "clustered"}
+    assert REFERENCE.center.any()
+    assert not REFERENCE.center.all()
 
 
 def test_c_stat_just_identified_is_j_of_model_with_exogenous_tested():
@@ -127,8 +141,100 @@ def test_c_stat_depends_on_the_data_not_the_estimator(model):
         data[ref.exog.split()],
         data[ref.endog.split()],
         data[ref.instruments.split()],
+        center=False,
     ).fit(cov_type="robust")
     assert_allclose(res.c_stat(["x2"]).stat, ref.c_stat, rtol=1e-6)
+
+
+def test_c_stat_cue_uses_its_weight_config():
+    # c_stat uses the same weight matrix as the model it is computed from
+    ref = REFERENCE.set_index("id").loc["sim_e2_i4_x2"]
+    data = SIMULATED
+    args = (
+        data.y_robust,
+        data[ref.exog.split()],
+        data[ref.endog.split()],
+        data[ref.instruments.split()],
+    )
+    cue = IVGMMCUE(*args, center=True).fit().c_stat(["x2"]).stat
+    centered = IVGMM(*args, center=True).fit().c_stat(["x2"]).stat
+    uncentered = IVGMM(*args, center=False).fit().c_stat(["x2"]).stat
+    assert_allclose(cue, centered, rtol=1e-8)
+    assert abs(cue - uncentered) > 1e-3
+
+
+DURBIN_SPECS = [
+    (["const", "x3"], ["x1", "x2"], ["z1", "z2", "x4", "x5"], ["x1"]),
+    (["const", "x3"], ["x1", "x2"], ["z1", "z2", "x4", "x5"], ["x2", "x1"]),
+    (["const"], ["x1", "x2", "x3"], ["z1", "z2", "x4", "x5"], ["x2", "x3"]),
+    (["const", "x3", "x4", "x5"], ["x1"], ["z1", "z2"], None),
+    (["const", "x3", "x4", "x5"], ["x1", "x2"], ["z1", "z2"], None),
+]
+
+
+@pytest.mark.parametrize(("exog", "endog", "instr", "tested"), DURBIN_SPECS)
+def test_c_stat_unadjusted_weight_is_durbin(exog, endog, instr, tested):
+    # With a homoskedastic weight matrix the C statistic is algebraically the
+    # Durbin statistic of 2SLS, which is validated against Stata elsewhere.
+    # This relies on a constant, so that the residuals have mean zero
+    data = SIMULATED
+    args = (data.y_robust, data[exog], data[endog], data[instr])
+    c_stat = IVGMM(*args, weight_type="unadjusted").fit().c_stat(tested)
+    durbin = IV2SLS(*args).fit().durbin(tested)
+    assert_allclose(c_stat.stat, durbin.stat, rtol=1e-9)
+    assert c_stat.df == durbin.df
+
+
+def test_c_stat_uses_the_weight_matrix_of_the_model():
+    # Before the weight matrix was used, every one of these gave the robust value
+    ref = REFERENCE.set_index("id").loc["sim_e2_i4_x1"]
+    data = SIMULATED
+    args = (
+        data.y_robust,
+        data[ref.exog.split()],
+        data[ref.endog.split()],
+        data[ref.instruments.split()],
+    )
+    configs = [
+        {"weight_type": "robust"},
+        {"weight_type": "unadjusted"},
+        {"weight_type": "kernel", "bandwidth": 6},
+        {"weight_type": "clustered", "clusters": data.cluster_id.to_numpy()},
+    ]
+    stats = [IVGMM(*args, **cfg).fit().c_stat("x1").stat for cfg in configs]
+    assert_allclose(stats[0], ref.c_stat, rtol=1e-6)
+    assert len({round(s, 6) for s in stats}) == len(stats)
+
+
+def test_c_stat_kernel_optimal_bandwidth():
+    # optimal_bw must be used when the first model is estimated. Otherwise it
+    # silently uses the default of nobs - 2 lags
+    ref = REFERENCE.set_index("id").loc["sim_e2_i4_x1"]
+    data = SIMULATED
+    exog, endog = ref.exog.split(), ref.endog.split()
+    instr = ref.instruments.split()
+    args = (data.y_robust, data[exog], data[endog], data[instr])
+    optimal = IVGMM(*args, weight_type="kernel", optimal_bw=True)
+    default = IVGMM(*args, weight_type="kernel")
+    c_optimal = optimal.fit().c_stat("x1").stat
+    c_default = default.fit().c_stat("x1").stat
+    assert c_optimal >= 0
+    assert abs(c_optimal - c_default) > 1e-3
+
+    # The bandwidth that the first model selects, which treats x1 as exogenous
+    first = IVGMM(
+        data.y_robust,
+        data[[*exog, "x1"]],
+        data[["x2"]],
+        data[instr],
+        weight_type="kernel",
+        optimal_bw=True,
+    )
+    first.fit()
+    bandwidth = first._weight.bandwidth
+    assert 0 < bandwidth < len(data) - 2
+    fixed = IVGMM(*args, weight_type="kernel", bandwidth=bandwidth)
+    assert_allclose(c_optimal, fixed.fit().c_stat("x1").stat, rtol=1e-10)
 
 
 def random_model(seed, weighted):
