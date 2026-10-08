@@ -445,6 +445,23 @@ class _IVModelBase:
         nobs, nvar = self._x.shape
         return f_statistic(params, cov, debiased, nobs - nvar, const_loc)
 
+    def _estimate_kappa(self) -> float:
+        """The value of kappa in LIML, which is the same for any estimator"""
+        y, x, z = self._wy, self._wx, self._wz
+        is_exog = self._regressor_is_exog
+        e = c_[y, x[:, ~is_exog]]
+        x1 = x[:, is_exog]
+
+        ez = e - z @ (pinv(z) @ e)
+        if x1.shape[1] == 0:  # No exogenous regressors
+            ex1 = e
+        else:
+            ex1 = e - x1 @ (pinv(x1) @ e)
+
+        vpmzv_sqinv = inv_sqrth(ez.T @ ez)
+        q = vpmzv_sqinv @ (ex1.T @ ex1) @ vpmzv_sqinv
+        return min(eigvalsh(q))
+
     def _post_estimation(
         self,
         params: linearmodels.typing.data.Float64Array,
@@ -612,22 +629,6 @@ class _IVLSModelBase(_IVModelBase):
         p1 = (x.T @ x) * (1 - kappa) + kappa * ((x.T @ z) @ (pinvz @ x))
         p2 = (x.T @ y) * (1 - kappa) + kappa * ((x.T @ z) @ (pinvz @ y))
         return inv(p1) @ p2
-
-    def _estimate_kappa(self) -> float:
-        y, x, z = self._wy, self._wx, self._wz
-        is_exog = self._regressor_is_exog
-        e = c_[y, x[:, ~is_exog]]
-        x1 = x[:, is_exog]
-
-        ez = e - z @ (pinv(z) @ e)
-        if x1.shape[1] == 0:  # No exogenous regressors
-            ex1 = e
-        else:
-            ex1 = e - x1 @ (pinv(x1) @ e)
-
-        vpmzv_sqinv = inv_sqrth(ez.T @ ez)
-        q = vpmzv_sqinv @ (ex1.T @ ex1) @ vpmzv_sqinv
-        return min(eigvalsh(q))
 
     def fit(
         self, *, cov_type: str = "robust", debiased: bool = False, **cov_config: Any
