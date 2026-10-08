@@ -140,8 +140,8 @@ class NormalTestStatistic:
     def pval(self) -> float:
         """P-value of test statistic"""
         if self._two_sided:
-            return 2 * (1 - self.dist.cdf(abs(self.stat)))
-        return 1 - self.dist.cdf(self.stat)
+            return 2 * self.dist.sf(abs(self.stat))
+        return self.dist.sf(self.stat)
 
     @property
     def critical_values(self) -> dict[str, float]:
@@ -150,9 +150,7 @@ class NormalTestStatistic:
             quantiles = [0.95, 0.975, 0.995]
         else:
             quantiles = [0.9, 0.95, 0.99]
-        return dict(
-            zip(["10%", "5%", "1%"], self.dist.ppf(quantiles), strict=False)
-        )
+        return dict(zip(["10%", "5%", "1%"], self.dist.ppf(quantiles), strict=False))
 
     @property
     def null(self) -> str:

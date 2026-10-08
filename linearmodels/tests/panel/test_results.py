@@ -119,7 +119,7 @@ def test_pesaran_cd(data):
     assert isinstance(cd, NormalTestStatistic)
     direct = direct_pesaran_cd(res.idiosyncratic)
     assert_allclose(cd.stat, direct)
-    assert_allclose(cd.pval, 2 * (1 - stats.norm.cdf(abs(direct))))
+    assert_allclose(cd.pval, 2 * stats.norm.sf(abs(direct)))
 
 
 def test_pesaran_cd_unbalanced():

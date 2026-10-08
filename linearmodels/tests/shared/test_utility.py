@@ -83,6 +83,11 @@ def test_wald_statistic():
     assert_allclose(1 - stats.f.cdf(1.0, 1, 1000), ts.pval)
 
 
+def test_wald_statistic_unnamed():
+    ts = WaldTestStatistic(1.0, "_NULL_", 1)
+    assert str(ts).startswith("H0: _NULL_\nStatistic: 1.0000\n")
+
+
 def test_invalid_test_statistic():
     ts = InvalidTestStatistic("_REASON_", name="_NAME_")
     assert str(hex(id(ts))) in ts.__repr__()
@@ -107,12 +112,62 @@ def test_normal_test_statistic():
     assert str(hex(id(ts))) in ts.__repr__()
     assert "_NULL_" in str(ts)
     assert ts.stat == 1.5
+    assert ts.null == "_NULL_"
     assert ts.dist_name == "N(0,1)"
-    assert_allclose(2 * (1 - stats.norm.cdf(1.5)), ts.pval)
+    assert_allclose(ts.pval, 0.1336144025377161, rtol=1e-12)
     assert isinstance(ts.critical_values, dict)
 
     ts = NormalTestStatistic(1.5, "_NULL_", name="_NAME_", two_sided=False)
-    assert_allclose(1 - stats.norm.cdf(1.5), ts.pval)
+    assert_allclose(ts.pval, 0.06680720126885807, rtol=1e-12)
+
+
+def test_normal_test_statistic_str():
+    ts = NormalTestStatistic(1.5, "_NULL_", name="_NAME_")
+    expected = (
+        "_NAME_\nH0: _NULL_\nStatistic: 1.5000\nP-value: 0.1336\nDistributed: N(0,1)"
+    )
+    assert str(ts) == expected
+    assert repr(ts) == expected + "\nNormalTestStatistic, id: " + hex(id(ts))
+
+    ts = NormalTestStatistic(1.5, "_NULL_")
+    assert str(ts) == expected.replace("_NAME_\n", "")
+
+
+@pytest.mark.parametrize("stat", [1.5, -1.5])
+def test_normal_test_statistic_sides(stat):
+    two_sided = NormalTestStatistic(stat, "_NULL_")
+    assert_allclose(two_sided.pval, 0.1336144025377161, rtol=1e-12)
+    # One-sided p-value is for the alternative that the statistic is large
+    one_sided = NormalTestStatistic(stat, "_NULL_", two_sided=False)
+    expected = 0.06680720126885807 if stat > 0 else 0.9331927987311419
+    assert_allclose(one_sided.pval, expected, rtol=1e-12)
+
+
+def test_normal_test_statistic_critical_values():
+    # Reference values are qnorm([0.95, 0.975, 0.995]) and
+    # qnorm([0.9, 0.95, 0.99]) from R
+    ts = NormalTestStatistic(0.0, "_NULL_")
+    crit = ts.critical_values
+    assert list(crit) == ["10%", "5%", "1%"]
+    expected = [1.644853626951472, 1.959963984540054, 2.5758293035489]
+    assert_allclose(list(crit.values()), expected, rtol=1e-12)
+
+    ts = NormalTestStatistic(0.0, "_NULL_", two_sided=False)
+    crit = ts.critical_values
+    assert list(crit) == ["10%", "5%", "1%"]
+    expected = [1.281551565544601, 1.644853626951472, 2.326347874040841]
+    assert_allclose(list(crit.values()), expected, rtol=1e-12)
+
+
+def test_normal_test_statistic_tail():
+    # 1 - cdf(z) loses all precision in the tail and is exactly 0 for z > 8.3.
+    # Reference values are 2 * pnorm(-9) and pnorm(-9) from R.
+    ts = NormalTestStatistic(9.0, "_NULL_")
+    assert_allclose(ts.pval, 2.257176811907682e-19, rtol=1e-12)
+    ts = NormalTestStatistic(9.0, "_NULL_", two_sided=False)
+    assert_allclose(ts.pval, 1.128588405953841e-19, rtol=1e-12)
+    ts = NormalTestStatistic(-9.0, "_NULL_", two_sided=False)
+    assert_allclose(ts.pval, 1.0, rtol=1e-12)
 
 
 def test_inv_sqrth():
