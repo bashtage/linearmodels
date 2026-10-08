@@ -83,6 +83,22 @@ def test_wald_statistic():
     assert_allclose(1 - stats.f.cdf(1.0, 1, 1000), ts.pval)
 
 
+@pytest.mark.parametrize(
+    ("stat", "df", "df_denom", "expected"),
+    [
+        (1.0, 1, None, 0.3173105078629141),
+        (100.0, 1, None, 1.523970604832105e-23),
+        (60.0, 3, None, 5.878230727906913e-13),
+        (120.0, 2, 500, 2.720014074486352e-43),
+    ],
+)
+def test_wald_statistic_pval_tail(stat, df, df_denom, expected):
+    # Reference values are pchisq and pf with lower.tail=FALSE in R. 1 - cdf is
+    # not accurate in the tail.
+    ts = WaldTestStatistic(stat, "_NULL_", df, df_denom)
+    assert_allclose(ts.pval, expected, rtol=1e-10)
+
+
 def test_wald_statistic_unnamed():
     ts = WaldTestStatistic(1.0, "_NULL_", 1)
     assert str(ts).startswith("H0: _NULL_\nStatistic: 1.0000\n")

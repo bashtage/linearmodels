@@ -890,7 +890,7 @@ def test_brequsch_pagan(k):
     assert isinstance(stat, WaldTestStatistic)
     assert_allclose(stat.stat, direct)
     assert stat.df == 3
-    assert_allclose(stat.pval, 1.0 - scipy.stats.chi2(3).cdf(direct))
+    assert_allclose(stat.pval, scipy.stats.chi2(3).sf(direct))
     assert "Residuals are uncorrelated" in stat.null
     assert "Breusch-Pagan" in str(stat)
 
@@ -915,7 +915,7 @@ def test_likelihood_ratio(k):
     assert isinstance(stat, WaldTestStatistic)
     assert_allclose(stat.stat, direct)
     assert stat.df == 3
-    assert_allclose(stat.pval, 1.0 - scipy.stats.chi2(3).cdf(direct))
+    assert_allclose(stat.pval, scipy.stats.chi2(3).sf(direct))
     assert "Covariance is diagonal" in stat.null
     assert "Likelihood Ratio Test" in str(stat)
 
