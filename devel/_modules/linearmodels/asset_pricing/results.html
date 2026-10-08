@@ -19,7 +19,7 @@
     
   
       
-        <title>linearmodels.asset_pricing.results - linearmodels v7.1 (+103)</title>
+        <title>linearmodels.asset_pricing.results - linearmodels v7.1 (+105)</title>
       
     
 
@@ -91,7 +91,7 @@
 
 <header class="md-header md-header--shadow" data-md-component="header">
   <nav class="md-header__inner md-grid" aria-label="Header">
-    <a href="../../../index.html" title="linearmodels v7.1 (+103)" class="md-header__button md-logo" aria-label="linearmodels v7.1 (+103)" data-md-component="logo">
+    <a href="../../../index.html" title="linearmodels v7.1 (+105)" class="md-header__button md-logo" aria-label="linearmodels v7.1 (+105)" data-md-component="logo">
       <img src="../../../_static/bw-logo.svg" alt="logo">
     </a>
     <label class="md-header__button md-icon" for="__drawer">
@@ -102,7 +102,7 @@
       <div class="md-header__ellipsis">
         <div class="md-header__topic">
           <span class="md-ellipsis">
-            linearmodels v7.1 (+103)
+            linearmodels v7.1 (+105)
           </span>
         </div>
         <div class="md-header__topic" data-md-component="header-topic">
@@ -197,10 +197,10 @@
 
 <nav class="md-nav md-nav--primary" aria-label="Navigation" data-md-level="0">
   <label class="md-nav__title" for="__drawer">
-    <a href="../../../index.html" title="linearmodels v7.1 (+103)" class="md-nav__button md-logo" aria-label="linearmodels v7.1 (+103)" data-md-component="logo">
+    <a href="../../../index.html" title="linearmodels v7.1 (+105)" class="md-nav__button md-logo" aria-label="linearmodels v7.1 (+105)" data-md-component="logo">
       <img src="../../../_static/bw-logo.svg" alt="logo">
     </a>
-    linearmodels v7.1 (+103)
+    linearmodels v7.1 (+105)
   </label>
   
     <div class="md-nav__source">
@@ -630,7 +630,7 @@
         <span class="n">rp</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">asarray</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">risk_premia</span><span class="p">)[:,</span> <span class="kc">None</span><span class="p">]</span>
         <span class="n">se</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">asarray</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">risk_premia_se</span><span class="p">)[:,</span> <span class="kc">None</span><span class="p">]</span>
         <span class="n">tstats</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">asarray</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">risk_premia</span> <span class="o">/</span> <span class="bp">self</span><span class="o">.</span><span class="n">risk_premia_se</span><span class="p">)</span>
-        <span class="n">pvalues</span> <span class="o">=</span> <span class="mi">2</span> <span class="o">*</span> <span class="p">(</span><span class="mi">1</span> <span class="o">-</span> <span class="n">stats</span><span class="o">.</span><span class="n">norm</span><span class="o">.</span><span class="n">cdf</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">abs</span><span class="p">(</span><span class="n">tstats</span><span class="p">)))</span>
+        <span class="n">pvalues</span> <span class="o">=</span> <span class="mi">2</span> <span class="o">*</span> <span class="n">stats</span><span class="o">.</span><span class="n">norm</span><span class="o">.</span><span class="n">sf</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">abs</span><span class="p">(</span><span class="n">tstats</span><span class="p">))</span>
         <span class="n">ci</span> <span class="o">=</span> <span class="n">rp</span> <span class="o">+</span> <span class="n">se</span> <span class="o">*</span> <span class="n">stats</span><span class="o">.</span><span class="n">norm</span><span class="o">.</span><span class="n">ppf</span><span class="p">([[</span><span class="mf">0.025</span><span class="p">,</span> <span class="mf">0.975</span><span class="p">]])</span>
         <span class="n">param_data</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">c_</span><span class="p">[</span><span class="n">rp</span><span class="p">,</span> <span class="n">se</span><span class="p">,</span> <span class="n">tstats</span><span class="p">[:,</span> <span class="kc">None</span><span class="p">],</span> <span class="n">pvalues</span><span class="p">[:,</span> <span class="kc">None</span><span class="p">],</span> <span class="n">ci</span><span class="p">]</span>
         <span class="n">data</span> <span class="o">=</span> <span class="p">[]</span>
@@ -668,7 +668,7 @@
         <span class="n">first</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
     <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">SimpleTable</span><span class="p">:</span>
         <span class="n">tstats</span> <span class="o">=</span> <span class="n">params</span> <span class="o">/</span> <span class="n">se</span>
-        <span class="n">pvalues</span> <span class="o">=</span> <span class="mi">2</span> <span class="o">*</span> <span class="p">(</span><span class="mi">1</span> <span class="o">-</span> <span class="n">stats</span><span class="o">.</span><span class="n">norm</span><span class="o">.</span><span class="n">cdf</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">abs</span><span class="p">(</span><span class="n">tstats</span><span class="p">)))</span>
+        <span class="n">pvalues</span> <span class="o">=</span> <span class="mi">2</span> <span class="o">*</span> <span class="n">stats</span><span class="o">.</span><span class="n">norm</span><span class="o">.</span><span class="n">sf</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">abs</span><span class="p">(</span><span class="n">tstats</span><span class="p">))</span>
         <span class="n">ci</span> <span class="o">=</span> <span class="n">params</span> <span class="o">+</span> <span class="n">se</span> <span class="o">*</span> <span class="n">stats</span><span class="o">.</span><span class="n">norm</span><span class="o">.</span><span class="n">ppf</span><span class="p">([[</span><span class="mf">0.025</span><span class="p">,</span> <span class="mf">0.975</span><span class="p">]])</span>
         <span class="n">param_data</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">c_</span><span class="p">[</span><span class="n">params</span><span class="p">,</span> <span class="n">se</span><span class="p">,</span> <span class="n">tstats</span><span class="p">,</span> <span class="n">pvalues</span><span class="p">,</span> <span class="n">ci</span><span class="p">]</span>
 
@@ -777,7 +777,7 @@
 <span class="sd">        Parameter p-vals. Uses t(df_resid) if ``debiased`` is True, else normal</span>
 <span class="sd">        """</span>
         <span class="n">pvals</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">tstats</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
-        <span class="n">pvals</span><span class="o">.</span><span class="n">loc</span><span class="p">[:,</span> <span class="p">:]</span> <span class="o">=</span> <span class="mi">2</span> <span class="o">*</span> <span class="p">(</span><span class="mf">1.0</span> <span class="o">-</span> <span class="n">stats</span><span class="o">.</span><span class="n">norm</span><span class="o">.</span><span class="n">cdf</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">abs</span><span class="p">(</span><span class="n">pvals</span><span class="p">)))</span>
+        <span class="n">pvals</span><span class="o">.</span><span class="n">loc</span><span class="p">[:,</span> <span class="p">:]</span> <span class="o">=</span> <span class="mi">2</span> <span class="o">*</span> <span class="n">stats</span><span class="o">.</span><span class="n">norm</span><span class="o">.</span><span class="n">sf</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">abs</span><span class="p">(</span><span class="n">pvals</span><span class="p">))</span>
         <span class="k">return</span> <span class="n">pvals</span></div>
 
 
