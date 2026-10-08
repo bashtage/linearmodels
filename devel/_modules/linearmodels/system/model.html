@@ -19,7 +19,7 @@
     
   
       
-        <title>linearmodels.system.model - linearmodels v7.1 (+98)</title>
+        <title>linearmodels.system.model - linearmodels v7.1 (+101)</title>
       
     
 
@@ -91,7 +91,7 @@
 
 <header class="md-header md-header--shadow" data-md-component="header">
   <nav class="md-header__inner md-grid" aria-label="Header">
-    <a href="../../../index.html" title="linearmodels v7.1 (+98)" class="md-header__button md-logo" aria-label="linearmodels v7.1 (+98)" data-md-component="logo">
+    <a href="../../../index.html" title="linearmodels v7.1 (+101)" class="md-header__button md-logo" aria-label="linearmodels v7.1 (+101)" data-md-component="logo">
       <img src="../../../_static/bw-logo.svg" alt="logo">
     </a>
     <label class="md-header__button md-icon" for="__drawer">
@@ -102,7 +102,7 @@
       <div class="md-header__ellipsis">
         <div class="md-header__topic">
           <span class="md-ellipsis">
-            linearmodels v7.1 (+98)
+            linearmodels v7.1 (+101)
           </span>
         </div>
         <div class="md-header__topic" data-md-component="header-topic">
@@ -197,10 +197,10 @@
 
 <nav class="md-nav md-nav--primary" aria-label="Navigation" data-md-level="0">
   <label class="md-nav__title" for="__drawer">
-    <a href="../../../index.html" title="linearmodels v7.1 (+98)" class="md-nav__button md-logo" aria-label="linearmodels v7.1 (+98)" data-md-component="logo">
+    <a href="../../../index.html" title="linearmodels v7.1 (+101)" class="md-nav__button md-logo" aria-label="linearmodels v7.1 (+101)" data-md-component="logo">
       <img src="../../../_static/bw-logo.svg" alt="logo">
     </a>
-    linearmodels v7.1 (+98)
+    linearmodels v7.1 (+101)
   </label>
   
     <div class="md-nav__source">
@@ -1238,11 +1238,12 @@
                 <span class="bp">self</span><span class="o">.</span><span class="n">_xhat</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">x</span><span class="p">)</span>
                 <span class="bp">self</span><span class="o">.</span><span class="n">_wxhat</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_wx</span><span class="p">[</span><span class="n">i</span><span class="p">])</span>
             <span class="k">else</span><span class="p">:</span>
-                <span class="n">delta</span> <span class="o">=</span> <span class="n">lstsq</span><span class="p">(</span><span class="n">z</span><span class="p">,</span> <span class="n">x</span><span class="p">,</span> <span class="n">rcond</span><span class="o">=</span><span class="kc">None</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span>
-                <span class="n">xhat</span> <span class="o">=</span> <span class="n">z</span> <span class="o">@</span> <span class="n">delta</span>
-                <span class="bp">self</span><span class="o">.</span><span class="n">_xhat</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">xhat</span><span class="p">)</span>
-                <span class="n">w</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_w</span><span class="p">[</span><span class="n">i</span><span class="p">]</span>
-                <span class="bp">self</span><span class="o">.</span><span class="n">_wxhat</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">xhat</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="n">w</span><span class="p">))</span>
+                <span class="c1"># Project the weighted regressors on the weighted instruments so that</span>
+                <span class="c1"># the first stage uses the same weights as the second stage</span>
+                <span class="n">wx</span><span class="p">,</span> <span class="n">wz</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_wx</span><span class="p">[</span><span class="n">i</span><span class="p">],</span> <span class="bp">self</span><span class="o">.</span><span class="n">_wz</span><span class="p">[</span><span class="n">i</span><span class="p">]</span>
+                <span class="n">delta</span> <span class="o">=</span> <span class="n">lstsq</span><span class="p">(</span><span class="n">wz</span><span class="p">,</span> <span class="n">wx</span><span class="p">,</span> <span class="n">rcond</span><span class="o">=</span><span class="kc">None</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">_xhat</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">z</span> <span class="o">@</span> <span class="n">delta</span><span class="p">)</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">_wxhat</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">wz</span> <span class="o">@</span> <span class="n">delta</span><span class="p">)</span>
 
     <span class="k">def</span><span class="w"> </span><span class="nf">_gls_estimate</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span>
