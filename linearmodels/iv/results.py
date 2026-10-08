@@ -968,8 +968,8 @@ class IVResults(_CommonIVResults):
                 name=name,
             )
 
-        eps = self.resids.to_numpy()[:, None]
-        u = annihilate(eps, self.model._z)
+        eps = self.wresids.to_numpy()[:, None]
+        u = annihilate(eps, self.model._wz)
         stat = nobs * (1 - (u.T @ u) / (eps.T @ eps)).squeeze()
         null = "The model is not overidentified."
 
@@ -1031,7 +1031,8 @@ class IVResults(_CommonIVResults):
             raise TypeError("variables must be a str or a list of str.")
 
         nobs = self.model.dependent.shape[0]
-        e2 = asarray(self.resids.to_numpy())
+        w = sqrt(self.model.weights.ndarray)
+        e2 = asarray(self.wresids.to_numpy())
         nendog, nexog = self.model.endog.shape[1], self.model.exog.shape[1]
         if variables is None:
             assumed_exog = self.model.endog.ndarray
@@ -1048,12 +1049,16 @@ class IVResults(_CommonIVResults):
         from linearmodels.iv import IV2SLS
 
         mod = IV2SLS(
-            self.model.dependent, aug_exog, still_endog, self.model.instruments
+            self.model.dependent,
+            aug_exog,
+            still_endog,
+            self.model.instruments,
+            weights=self.model.weights,
         )
-        e0 = mod.fit().resids.to_numpy()[:, None]
+        e0 = mod.fit().wresids.to_numpy()[:, None]
 
-        z2 = c_[self.model.exog.ndarray, self.model.instruments.ndarray]
-        z1 = c_[z2, assumed_exog]
+        z2 = self.model._wz
+        z1 = c_[z2, assumed_exog * w]
 
         e1 = proj(e0, z1)
         e2 = proj(e2, z2)
@@ -1208,10 +1213,11 @@ class IVResults(_CommonIVResults):
         """
         from linearmodels.iv.model import _OLS
 
-        e = annihilate(self.model.dependent.ndarray, self.model._x)
-        r = annihilate(self.model.endog.ndarray, self.model._z)
+        w = sqrt(self.model.weights.ndarray)
+        e = annihilate(self.model._wy, self.model._wx)
+        r = annihilate(self.model.endog.ndarray * w, self.model._wz)
         nobs = e.shape[0]
-        r = annihilate(r, self.model._x)
+        r = annihilate(r, self.model._wx)
         res = _OLS(ones((nobs, 1)), r * e).fit(cov_type="unadjusted")
         stat = res.nobs - res.resid_ss
         df = self.model.endog.shape[1]
@@ -1250,9 +1256,10 @@ class IVResults(_CommonIVResults):
         """
         from linearmodels.iv.model import _OLS
 
-        r = annihilate(self.model.endog.ndarray, self.model._z)
+        w = sqrt(self.model.weights.ndarray)
+        r = annihilate(self.model.endog.ndarray * w, self.model._wz) / w
         augx = c_[self.model._x, r]
-        mod = _OLS(self.model.dependent, augx)
+        mod = _OLS(self.model.dependent, augx, weights=self.model.weights)
         res = mod.fit(cov_type=self.cov_type, **self.cov_config)
         norig = self.model._x.shape[1]
         test_params = asarray(res.params.to_numpy()[norig:], dtype=float)
@@ -1305,10 +1312,11 @@ class IVResults(_CommonIVResults):
                 name=name,
             )
 
-        endog_hat = proj(endog.ndarray, c_[exog.ndarray, instruments.ndarray])
-        q = instruments.ndarray[:, : (ninstr - nendog)]
-        q_res = annihilate(q, c_[self.model.exog.ndarray, endog_hat])
-        test_functions = q_res * self.resids.to_numpy()[:, None]
+        w = sqrt(self.model.weights.ndarray)
+        endog_hat = proj(endog.ndarray * w, self.model._wz)
+        q = instruments.ndarray[:, : (ninstr - nendog)] * w
+        q_res = annihilate(q, c_[exog.ndarray * w, endog_hat])
+        test_functions = q_res * self.wresids.to_numpy()[:, None]
         res = _OLS(ones((nobs, 1)), test_functions).fit(cov_type="unadjusted")
 
         stat = res.nobs * res.rsquared
@@ -1526,14 +1534,14 @@ class IVGMMResults(_CommonIVResults):
             null = "Variables {} are exogenous".format(", ".join(variable_lst))
         from linearmodels.iv.model import IVGMM, IVGMMCUE
 
-        mod = IVGMM(dependent, exog_e, endog_e, instruments)
+        mod = IVGMM(dependent, exog_e, endog_e, instruments, weights=self.model.weights)
         res_e = mod.fit(cov_type=self.cov_type, **self.cov_config)
         assert isinstance(res_e, IVGMMResults)
         j_e = res_e.j_stat.stat
 
-        x = self.model._x
-        y = self.model._y
-        z = self.model._z
+        x = self.model._wx
+        y = self.model._wy
+        z = self.model._wz
         nz = z.shape[1]
         weight_mat_c = asarray(res_e.weight_matrix)[:nz, :nz]
         params_c = mod.estimate_parameters(x, y, z, weight_mat_c)
