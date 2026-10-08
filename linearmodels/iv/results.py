@@ -207,9 +207,9 @@ class _LSModelResultsBase(_SummaryStr):
         Parameter p-vals. Uses t(df_resid) if ``debiased`` is True, else normal
         """
         if self.debiased:
-            pvals = 2 - 2 * stats.t.cdf(abs(self.tstats), self.df_resid)
+            pvals = 2 * stats.t.sf(abs(self.tstats), self.df_resid)
         else:
-            pvals = 2 - 2 * stats.norm.cdf(abs(self.tstats))
+            pvals = 2 * stats.norm.sf(abs(self.tstats))
 
         return Series(pvals, index=self._vars, name="pvalue")
 

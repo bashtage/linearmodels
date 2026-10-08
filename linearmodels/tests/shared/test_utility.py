@@ -73,13 +73,13 @@ def test_wald_statistic():
     assert ts.df_denom is None
     assert ts.dist_name == "chi2(1)"
     assert isinstance(ts.critical_values, dict)
-    assert_allclose(1 - stats.chi2.cdf(1.0, 1), ts.pval)
+    assert_allclose(stats.chi2.sf(1.0, 1), ts.pval)
 
     ts = WaldTestStatistic(1.0, "_NULL_", 1, 1000, name="_NAME_")
     assert ts.df == 1
     assert ts.df_denom == 1000
     assert ts.dist_name == "F(1,1000)"
-    assert_allclose(1 - stats.f.cdf(1.0, 1, 1000), ts.pval)
+    assert_allclose(stats.f.sf(1.0, 1, 1000), ts.pval)
 
 
 def test_invalid_test_statistic():

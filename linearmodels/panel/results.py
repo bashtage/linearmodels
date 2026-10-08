@@ -99,9 +99,9 @@ class PanelResults(_SummaryStr):
         """
         abs_tstats = np.abs(self.tstats)
         if self._debiased:
-            pv = 2 * (1 - stats.t.cdf(abs_tstats, self.df_resid))
+            pv = 2 * stats.t.sf(abs_tstats, self.df_resid)
         else:
-            pv = 2 * (1 - stats.norm.cdf(abs_tstats))
+            pv = 2 * stats.norm.sf(abs_tstats)
         return Series(pv, index=self._var_names, name="pvalue")
 
     @property
