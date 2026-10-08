@@ -1031,7 +1031,7 @@ class IVResults(_CommonIVResults):
             raise TypeError("variables must be a str or a list of str.")
 
         nobs = self.model.dependent.shape[0]
-        w = sqrt(self.model.weights.ndarray)
+        w = self.model._sqrt_weights
         e2 = asarray(self.wresids.to_numpy())
         nendog, nexog = self.model.endog.shape[1], self.model.exog.shape[1]
         if variables is None:
@@ -1213,7 +1213,7 @@ class IVResults(_CommonIVResults):
         """
         from linearmodels.iv.model import _OLS
 
-        w = sqrt(self.model.weights.ndarray)
+        w = self.model._sqrt_weights
         e = annihilate(self.model._wy, self.model._wx)
         r = annihilate(self.model.endog.ndarray * w, self.model._wz)
         nobs = e.shape[0]
@@ -1256,7 +1256,10 @@ class IVResults(_CommonIVResults):
         """
         from linearmodels.iv.model import _OLS
 
-        w = sqrt(self.model.weights.ndarray)
+        w = self.model._sqrt_weights
+        # The first-stage residuals are computed on the weighted data. They are
+        # divided by the root weights since _OLS applies the weights again
+        # when it forms its own weighted regressors.
         r = annihilate(self.model.endog.ndarray * w, self.model._wz) / w
         augx = c_[self.model._x, r]
         mod = _OLS(self.model.dependent, augx, weights=self.model.weights)
@@ -1312,7 +1315,7 @@ class IVResults(_CommonIVResults):
                 name=name,
             )
 
-        w = sqrt(self.model.weights.ndarray)
+        w = self.model._sqrt_weights
         endog_hat = proj(endog.ndarray * w, self.model._wz)
         q = instruments.ndarray[:, : (ninstr - nendog)] * w
         q_res = annihilate(q, c_[exog.ndarray * w, endog_hat])
