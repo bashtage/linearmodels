@@ -1369,7 +1369,8 @@ class IVGMMCUE(_IVGMMBase):
     * "clustered" - Allows for one-way cluster dependence
 
     In most circumstances, the ``center`` weight option should be ``True`` to
-    avoid starting value dependence.
+    avoid starting value dependence. It is ``True`` unless ``center`` is
+    passed in ``weight_config``.
 
     .. math::
 
@@ -1396,6 +1397,9 @@ class IVGMMCUE(_IVGMMBase):
         **weight_config: Any,
     ) -> None:
         self._method = "IV-GMM-CUE"
+        # The default has to be set before the weight estimator is created
+        if "center" not in weight_config:
+            weight_config["center"] = True
         super().__init__(
             dependent,
             exog,
@@ -1405,8 +1409,6 @@ class IVGMMCUE(_IVGMMBase):
             weight_type=weight_type,
             **weight_config,
         )
-        if "center" not in weight_config:
-            weight_config["center"] = True
 
     @staticmethod
     def from_formula(

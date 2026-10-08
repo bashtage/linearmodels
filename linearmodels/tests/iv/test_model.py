@@ -215,7 +215,14 @@ def test_gmm_cue(small_data):
     mod = IVGMMCUE(small_data.dep, small_data.exog, small_data.endog, small_data.instr)
     res = mod.fit(display=False)
     assert res.iterations > 2
-    mod2 = IVGMM(small_data.dep, small_data.exog, small_data.endog, small_data.instr)
+    # CUE centers by default
+    mod2 = IVGMM(
+        small_data.dep,
+        small_data.exog,
+        small_data.endog,
+        small_data.instr,
+        center=True,
+    )
     res2 = mod2.fit()
     assert res.j_stat.stat <= res2.j_stat.stat
 
@@ -411,7 +418,14 @@ def test_gmm_cue_optimization_options(small_data):
     assert res_bfgs.iterations > 2
     assert res_lbfgsb.iterations >= 1
 
-    mod2 = IVGMM(small_data.dep, small_data.exog, small_data.endog, small_data.instr)
+    # CUE centers by default
+    mod2 = IVGMM(
+        small_data.dep,
+        small_data.exog,
+        small_data.endog,
+        small_data.instr,
+        center=True,
+    )
     res2 = mod2.fit()
     assert res_none.j_stat.stat <= res2.j_stat.stat
     assert res_bfgs.j_stat.stat <= res2.j_stat.stat
