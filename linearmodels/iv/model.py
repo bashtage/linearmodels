@@ -188,8 +188,9 @@ class _IVModelBase:
         self.weights = IVData(weights, var_name="weights", nobs=nobs)
 
         self._drop_locs = self._drop_missing()
+        # Weighted data is data scaled by the square root of the weights
+        self._sqrt_weights = w = sqrt(self.weights.ndarray)
         # dependent variable
-        w = sqrt(self.weights.ndarray)
         self._y = self.dependent.ndarray
         self._wy = self._y * w
         # model regressors
@@ -466,7 +467,7 @@ class _IVModelBase:
         w = self.weights.ndarray
         e = self._wy
         if self.has_constant:
-            e = e - sqrt(self.weights.ndarray) * average(self._y, weights=w)
+            e = e - self._sqrt_weights * average(self._y, weights=w)
 
         total_ss = float(squeeze(e.T @ e))
         r2 = 1 - residual_ss / total_ss

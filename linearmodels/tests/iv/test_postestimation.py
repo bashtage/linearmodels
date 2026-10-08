@@ -171,7 +171,7 @@ def test_weighted_sargan_wu_hausman(data):
 def test_weighted_diagnostics_match_rescaled_data(data):
     # Weighted estimation is OLS/IV on data scaled by the root of the weights,
     # so the specification tests must agree with the rescaled unweighted model
-    w = SIMULATED_DATA.weights / SIMULATED_DATA.weights.mean()
+    w = SIMULATED_DATA.weights
     root_w = np.sqrt(w)
     dep = data.dep * root_w
     exog = data.exog.mul(root_w, axis=0)
@@ -200,12 +200,18 @@ def test_weighted_diagnostics_match_rescaled_data(data):
                 rtol=1e-8,
             )
 
-    res = IVGMM(data.dep, data.exog, data.endog, data.instr, weights=w).fit(
-        cov_type="robust"
-    )
-    expected = IVGMM(dep, exog, endog_s, instr).fit(cov_type="robust")
-    assert_allclose(res.c_stat().stat, expected.c_stat().stat, rtol=1e-8)
-    assert_allclose(res.c_stat("x1").stat, expected.c_stat("x1").stat, rtol=1e-8)
+    # One endogenous variable is overidentified, two is just identified
+    for endog in (["x1"], ["x1", "x2"]):
+        res = IVGMM(data.dep, data.exog, data.endog[endog], data.instr, weights=w).fit(
+            cov_type="robust"
+        )
+        expected = IVGMM(dep, exog, endog_s[endog], instr).fit(cov_type="robust")
+        for variables in (None, "x1"):
+            assert_allclose(
+                res.c_stat(variables).stat,
+                expected.c_stat(variables).stat,
+                rtol=1e-8,
+            )
 
 
 def test_linear_restriction(data):
