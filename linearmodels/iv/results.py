@@ -1437,7 +1437,17 @@ class IVGMMResults(_CommonIVResults):
 
     @property
     def weight_config(self) -> dict[str, Any]:
-        """Weighting matrix configuration used in estimation"""
+        """
+        Weighting matrix configuration used in estimation
+
+        Notes
+        -----
+        The keys depend on ``weight_type``. For a kernel weight matrix,
+        ``bandwidth`` is the bandwidth used to compute the final weight
+        matrix, which is not None even if it was selected automatically. The
+        configuration can be passed to a new model along with ``weight_type``
+        to create a model with the same type of weight matrix estimator.
+        """
         return self._weight_config
 
     @property

@@ -1037,7 +1037,7 @@ class _IVGMMBase(_IVModelBase):
         gmm_specific = {
             "weight_mat": DataFrame(weight_mat, columns=instr, index=instr),
             "weight_type": self._weight_type,
-            "weight_config": self._weight_type,
+            "weight_config": self._weight.config,
             "iterations": iters,
             "j_stat": self._j_statistic(params, weight_mat),
         }
@@ -1327,7 +1327,7 @@ class IVGMM(_IVGMMBase):
         gmm_specific = {
             "weight_mat": DataFrame(weight_mat, columns=instr, index=instr),
             "weight_type": self._weight_type,
-            "weight_config": self._weight_type,
+            "weight_config": self._weight.config,
             "iterations": iters,
             "j_stat": self._j_statistic(params, weight_mat),
         }
