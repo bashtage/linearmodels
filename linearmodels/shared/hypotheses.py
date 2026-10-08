@@ -63,7 +63,7 @@ class WaldTestStatistic:
     @property
     def pval(self) -> float:
         """P-value of test statistic"""
-        return 1 - self.dist.cdf(self.stat)
+        return self.dist.sf(self.stat)
 
     @property
     def critical_values(self) -> dict[str, float] | None:

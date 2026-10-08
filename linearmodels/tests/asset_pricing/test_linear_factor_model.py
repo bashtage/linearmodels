@@ -108,7 +108,7 @@ def test_linear_model_parameters(data):
     acov = cov[: block1 : (nf + 1), : block1 : (nf + 1)]
     jstat = float(np.squeeze(alphas.T @ np.linalg.pinv(acov) @ alphas))
     assert_allclose(res.j_statistic.stat, jstat)
-    assert_allclose(res.j_statistic.pval, 1 - stats.chi2(nport - nf).cdf(jstat))
+    assert_allclose(res.j_statistic.pval, stats.chi2(nport - nf).sf(jstat))
 
     get_all(res)
 
@@ -220,7 +220,7 @@ def test_linear_model_parameters_risk_free(data):
     assert_allclose(res.cov.values[: block1 : (nf + 1), : block1 : (nf + 1)], acov)
     assert_allclose(res.j_statistic.stat, jstat, rtol=1e-1)
     assert_allclose(
-        res.j_statistic.pval, 1 - stats.chi2(nport - nf - 1).cdf(jstat), rtol=1e-2
+        res.j_statistic.pval, stats.chi2(nport - nf - 1).sf(jstat), rtol=1e-2
     )
 
     get_all(res)
@@ -328,7 +328,7 @@ def test_linear_model_parameters_risk_free_gls(data):
     assert_allclose(res.cov.values[: block1 : (nf + 1), : block1 : (nf + 1)], acov)
     assert_allclose(res.j_statistic.stat, jstat, rtol=1e-1)
     assert_allclose(
-        res.j_statistic.pval, 1 - stats.chi2(nport - nf - 1).cdf(jstat), rtol=1e-2
+        res.j_statistic.pval, stats.chi2(nport - nf - 1).sf(jstat), rtol=1e-2
     )
     assert isinstance(res.pvalues, pd.DataFrame)
     assert np.all(res.pvalues <= 1.0)
