@@ -1,0 +1,6 @@
+linearmodels.shared.hypotheses.NormalTestStatistic.null
+=======================================================
+
+.. currentmodule:: linearmodels.shared.hypotheses
+
+.. autoproperty:: NormalTestStatistic.null

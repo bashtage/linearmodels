@@ -46,6 +46,7 @@
       ~FamaMacBethResults.name
       ~FamaMacBethResults.nobs
       ~FamaMacBethResults.params
+      ~FamaMacBethResults.pesaran_cd
       ~FamaMacBethResults.pvalues
       ~FamaMacBethResults.resid_ss
       ~FamaMacBethResults.resids

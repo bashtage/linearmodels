@@ -43,6 +43,7 @@
       ~PanelResults.name
       ~PanelResults.nobs
       ~PanelResults.params
+      ~PanelResults.pesaran_cd
       ~PanelResults.pvalues
       ~PanelResults.resid_ss
       ~PanelResults.resids

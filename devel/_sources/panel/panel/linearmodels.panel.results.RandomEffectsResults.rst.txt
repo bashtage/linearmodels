@@ -44,6 +44,7 @@
       ~RandomEffectsResults.name
       ~RandomEffectsResults.nobs
       ~RandomEffectsResults.params
+      ~RandomEffectsResults.pesaran_cd
       ~RandomEffectsResults.pvalues
       ~RandomEffectsResults.resid_ss
       ~RandomEffectsResults.resids

@@ -19,7 +19,7 @@
     
   
       
-        <title>linearmodels.panel.results - linearmodels v7.1 (+116)</title>
+        <title>linearmodels.panel.results - linearmodels v7.1 (+125)</title>
       
     
 
@@ -91,7 +91,7 @@
 
 <header class="md-header md-header--shadow" data-md-component="header">
   <nav class="md-header__inner md-grid" aria-label="Header">
-    <a href="../../../index.html" title="linearmodels v7.1 (+116)" class="md-header__button md-logo" aria-label="linearmodels v7.1 (+116)" data-md-component="logo">
+    <a href="../../../index.html" title="linearmodels v7.1 (+125)" class="md-header__button md-logo" aria-label="linearmodels v7.1 (+125)" data-md-component="logo">
       <img src="../../../_static/bw-logo.svg" alt="logo">
     </a>
     <label class="md-header__button md-icon" for="__drawer">
@@ -102,7 +102,7 @@
       <div class="md-header__ellipsis">
         <div class="md-header__topic">
           <span class="md-ellipsis">
-            linearmodels v7.1 (+116)
+            linearmodels v7.1 (+125)
           </span>
         </div>
         <div class="md-header__topic" data-md-component="header-topic">
@@ -197,10 +197,10 @@
 
 <nav class="md-nav md-nav--primary" aria-label="Navigation" data-md-level="0">
   <label class="md-nav__title" for="__drawer">
-    <a href="../../../index.html" title="linearmodels v7.1 (+116)" class="md-nav__button md-logo" aria-label="linearmodels v7.1 (+116)" data-md-component="logo">
+    <a href="../../../index.html" title="linearmodels v7.1 (+125)" class="md-nav__button md-logo" aria-label="linearmodels v7.1 (+125)" data-md-component="logo">
       <img src="../../../_static/bw-logo.svg" alt="logo">
     </a>
-    linearmodels v7.1 (+116)
+    linearmodels v7.1 (+125)
   </label>
   
     <div class="md-nav__source">
@@ -524,7 +524,9 @@
 <span class="kn">from</span><span class="w"> </span><span class="nn">linearmodels.panel.covariance</span><span class="w"> </span><span class="kn">import</span> <span class="n">HomoskedasticCovariance</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">linearmodels.shared.base</span><span class="w"> </span><span class="kn">import</span> <span class="n">_ModelComparison</span><span class="p">,</span> <span class="n">_SummaryStr</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">linearmodels.shared.hypotheses</span><span class="w"> </span><span class="kn">import</span> <span class="p">(</span>
+    <span class="n">InapplicableTestStatistic</span><span class="p">,</span>
     <span class="n">InvalidTestStatistic</span><span class="p">,</span>
+    <span class="n">NormalTestStatistic</span><span class="p">,</span>
     <span class="n">WaldTestStatistic</span><span class="p">,</span>
     <span class="n">quadratic_form_test</span><span class="p">,</span>
 <span class="p">)</span>
@@ -1120,6 +1122,75 @@
         <span class="k">return</span> <span class="n">Series</span><span class="p">(</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">_wresids</span><span class="o">.</span><span class="n">squeeze</span><span class="p">(),</span> <span class="n">index</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">_index</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="s2">"weighted residual"</span>
         <span class="p">)</span>
+
+<div class="viewcode-block" id="PanelResults.pesaran_cd">
+<a class="viewcode-back" href="../../../panel/panel/linearmodels.panel.results.PanelResults.pesaran_cd.html#linearmodels.panel.results.PanelResults.pesaran_cd">[docs]</a>
+    <span class="nd">@cached_property</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">pesaran_cd</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">InapplicableTestStatistic</span> <span class="o">|</span> <span class="n">NormalTestStatistic</span><span class="p">:</span>
+<span class="w">        </span><span class="sa">r</span><span class="sd">"""</span>
+<span class="sd">        Pesaran CD test of residual cross-sectional dependence.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        NormalTestStatistic</span>
+<span class="sd">            Statistic value, distribution and p-value.</span>
+
+<span class="sd">        Notes</span>
+<span class="sd">        -----</span>
+<span class="sd">        Tests the null hypothesis that the model's idiosyncratic shocks are</span>
+<span class="sd">        cross-sectionally independent. Let :math:`\hat{\rho}_{ij}` denote the</span>
+<span class="sd">        sample correlation of the estimated idiosyncratic shocks for entities</span>
+<span class="sd">        :math:`i` and :math:`j`, computed using their common time observations,</span>
+<span class="sd">        and let :math:`T_{ij}` denote the number of overlapping observations.</span>
+<span class="sd">        The statistic is</span>
+
+<span class="sd">        .. math::</span>
+
+<span class="sd">           CD = \frac{1}{\sqrt{M}}\sum_{i&lt;j}\sqrt{T_{ij}}\hat{\rho}_{ij},</span>
+
+<span class="sd">        where :math:`M` is the number of entity pairs with at least two</span>
+<span class="sd">        overlapping observations and finite pairwise correlation estimates.</span>
+<span class="sd">        Under the null, the statistic is asymptotically standard normal.</span>
+
+<span class="sd">        References</span>
+<span class="sd">        ----------</span>
+<span class="sd">        Pesaran, M. H. (2021). General diagnostic tests for cross-sectional</span>
+<span class="sd">        dependence in panels. Empirical Economics, 60(1), 13-50.</span>
+<span class="sd">        """</span>
+        <span class="n">eps</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">idiosyncratic</span><span class="o">.</span><span class="n">iloc</span><span class="p">[:,</span> <span class="mi">0</span><span class="p">]</span>
+        <span class="n">wide</span> <span class="o">=</span> <span class="n">eps</span><span class="o">.</span><span class="n">unstack</span><span class="p">(</span><span class="n">level</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
+        <span class="n">wide</span> <span class="o">=</span> <span class="n">wide</span><span class="o">.</span><span class="n">loc</span><span class="p">[:,</span> <span class="n">wide</span><span class="o">.</span><span class="n">notnull</span><span class="p">()</span><span class="o">.</span><span class="n">any</span><span class="p">(</span><span class="n">axis</span><span class="o">=</span><span class="mi">0</span><span class="p">)]</span>
+        <span class="n">nentity</span> <span class="o">=</span> <span class="n">wide</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span>
+        <span class="k">if</span> <span class="n">nentity</span> <span class="o">&lt;</span> <span class="mi">2</span><span class="p">:</span>
+            <span class="k">return</span> <span class="n">InapplicableTestStatistic</span><span class="p">(</span>
+                <span class="n">reason</span><span class="o">=</span><span class="s2">"Pesaran CD test requires at least two entities."</span><span class="p">,</span>
+                <span class="n">name</span><span class="o">=</span><span class="s2">"Pesaran CD test"</span><span class="p">,</span>
+            <span class="p">)</span>
+
+        <span class="n">corr</span> <span class="o">=</span> <span class="n">wide</span><span class="o">.</span><span class="n">corr</span><span class="p">(</span><span class="n">min_periods</span><span class="o">=</span><span class="mi">2</span><span class="p">)</span><span class="o">.</span><span class="n">to_numpy</span><span class="p">(</span><span class="n">dtype</span><span class="o">=</span><span class="nb">float</span><span class="p">)</span>
+        <span class="n">counts</span> <span class="o">=</span> <span class="n">wide</span><span class="o">.</span><span class="n">notnull</span><span class="p">()</span><span class="o">.</span><span class="n">to_numpy</span><span class="p">(</span><span class="n">dtype</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">int64</span><span class="p">)</span><span class="o">.</span><span class="n">T</span> <span class="o">@</span> <span class="n">wide</span><span class="o">.</span><span class="n">notnull</span><span class="p">()</span><span class="o">.</span><span class="n">to_numpy</span><span class="p">(</span>
+            <span class="n">dtype</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">int64</span>
+        <span class="p">)</span>
+        <span class="n">selector</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">tril</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">ones_like</span><span class="p">(</span><span class="n">counts</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="nb">bool</span><span class="p">),</span> <span class="n">k</span><span class="o">=-</span><span class="mi">1</span><span class="p">)</span>
+        <span class="n">selector</span> <span class="o">&amp;=</span> <span class="n">counts</span> <span class="o">&gt;=</span> <span class="mi">2</span>
+        <span class="n">selector</span> <span class="o">&amp;=</span> <span class="n">np</span><span class="o">.</span><span class="n">isfinite</span><span class="p">(</span><span class="n">corr</span><span class="p">)</span>
+        <span class="n">npairs</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">selector</span><span class="o">.</span><span class="n">sum</span><span class="p">())</span>
+        <span class="k">if</span> <span class="n">npairs</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="k">return</span> <span class="n">InapplicableTestStatistic</span><span class="p">(</span>
+                <span class="n">reason</span><span class="o">=</span><span class="p">(</span>
+                    <span class="s2">"Pesaran CD test requires at least one pair of entities "</span>
+                    <span class="s2">"with two or more overlapping observations."</span>
+                <span class="p">),</span>
+                <span class="n">name</span><span class="o">=</span><span class="s2">"Pesaran CD test"</span><span class="p">,</span>
+            <span class="p">)</span>
+
+        <span class="n">stat</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span>
+            <span class="n">np</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="n">counts</span><span class="p">[</span><span class="n">selector</span><span class="p">]</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="nb">float</span><span class="p">))</span> <span class="o">*</span> <span class="n">corr</span><span class="p">[</span><span class="n">selector</span><span class="p">])</span>
+            <span class="o">/</span> <span class="n">np</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="n">npairs</span><span class="p">)</span>
+        <span class="p">)</span>
+        <span class="n">null</span> <span class="o">=</span> <span class="s2">"Idiosyncratic shocks are cross-sectionally independent"</span>
+        <span class="k">return</span> <span class="n">NormalTestStatistic</span><span class="p">(</span><span class="n">stat</span><span class="p">,</span> <span class="n">null</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="s2">"Pesaran CD test"</span><span class="p">)</span></div>
+
 
     <span class="nd">@property</span>
     <span class="k">def</span><span class="w"> </span><span class="nf">f_statistic_robust</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">WaldTestStatistic</span><span class="p">:</span>

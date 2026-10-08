@@ -1,0 +1,6 @@
+linearmodels.shared.hypotheses.NormalTestStatistic.pval
+=======================================================
+
+.. currentmodule:: linearmodels.shared.hypotheses
+
+.. autoproperty:: NormalTestStatistic.pval

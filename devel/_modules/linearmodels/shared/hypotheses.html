@@ -19,7 +19,7 @@
     
   
       
-        <title>linearmodels.shared.hypotheses - linearmodels v7.1 (+116)</title>
+        <title>linearmodels.shared.hypotheses - linearmodels v7.1 (+125)</title>
       
     
 
@@ -91,7 +91,7 @@
 
 <header class="md-header md-header--shadow" data-md-component="header">
   <nav class="md-header__inner md-grid" aria-label="Header">
-    <a href="../../../index.html" title="linearmodels v7.1 (+116)" class="md-header__button md-logo" aria-label="linearmodels v7.1 (+116)" data-md-component="logo">
+    <a href="../../../index.html" title="linearmodels v7.1 (+125)" class="md-header__button md-logo" aria-label="linearmodels v7.1 (+125)" data-md-component="logo">
       <img src="../../../_static/bw-logo.svg" alt="logo">
     </a>
     <label class="md-header__button md-icon" for="__drawer">
@@ -102,7 +102,7 @@
       <div class="md-header__ellipsis">
         <div class="md-header__topic">
           <span class="md-ellipsis">
-            linearmodels v7.1 (+116)
+            linearmodels v7.1 (+125)
           </span>
         </div>
         <div class="md-header__topic" data-md-component="header-topic">
@@ -197,10 +197,10 @@
 
 <nav class="md-nav md-nav--primary" aria-label="Navigation" data-md-level="0">
   <label class="md-nav__title" for="__drawer">
-    <a href="../../../index.html" title="linearmodels v7.1 (+116)" class="md-nav__button md-logo" aria-label="linearmodels v7.1 (+116)" data-md-component="logo">
+    <a href="../../../index.html" title="linearmodels v7.1 (+125)" class="md-nav__button md-logo" aria-label="linearmodels v7.1 (+125)" data-md-component="logo">
       <img src="../../../_static/bw-logo.svg" alt="logo">
     </a>
-    linearmodels v7.1 (+116)
+    linearmodels v7.1 (+125)
   </label>
   
     <div class="md-nav__source">
@@ -512,7 +512,7 @@
 <span class="kn">from</span><span class="w"> </span><span class="nn">formulaic.utils.constraints</span><span class="w"> </span><span class="kn">import</span> <span class="n">LinearConstraints</span>
 <span class="kn">import</span><span class="w"> </span><span class="nn">numpy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">np</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">pandas</span><span class="w"> </span><span class="kn">import</span> <span class="n">Series</span>
-<span class="kn">from</span><span class="w"> </span><span class="nn">scipy.stats</span><span class="w"> </span><span class="kn">import</span> <span class="n">chi2</span><span class="p">,</span> <span class="n">f</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">scipy.stats</span><span class="w"> </span><span class="kn">import</span> <span class="n">chi2</span><span class="p">,</span> <span class="n">f</span><span class="p">,</span> <span class="n">norm</span>
 
 <span class="kn">import</span><span class="w"> </span><span class="nn">linearmodels.typing.data</span>
 
@@ -608,6 +608,89 @@
 
 
 
+<div class="viewcode-block" id="NormalTestStatistic">
+<a class="viewcode-back" href="../../../utility/linearmodels.shared.hypotheses.NormalTestStatistic.html#linearmodels.shared.hypotheses.NormalTestStatistic">[docs]</a>
+<span class="k">class</span><span class="w"> </span><span class="nc">NormalTestStatistic</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">"""</span>
+<span class="sd">    Test statistic holder for tests with an asymptotic standard normal law.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    stat : float</span>
+<span class="sd">        The test statistic.</span>
+<span class="sd">    null : str</span>
+<span class="sd">        A statement of the test's null hypothesis.</span>
+<span class="sd">    name : str</span>
+<span class="sd">        Name of test.</span>
+<span class="sd">    two_sided : bool</span>
+<span class="sd">        Flag indicating whether p-values and critical values are computed</span>
+<span class="sd">        using a two-sided test.</span>
+<span class="sd">    """</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span>
+        <span class="n">stat</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span>
+        <span class="n">null</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
+        <span class="o">*</span><span class="p">,</span>
+        <span class="n">name</span><span class="p">:</span> <span class="nb">str</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+        <span class="n">two_sided</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_stat</span> <span class="o">=</span> <span class="n">stat</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_null</span> <span class="o">=</span> <span class="n">null</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_name</span> <span class="o">=</span> <span class="n">name</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_two_sided</span> <span class="o">=</span> <span class="n">two_sided</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">dist</span> <span class="o">=</span> <span class="n">norm</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">dist_name</span> <span class="o">=</span> <span class="s2">"N(0,1)"</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">stat</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">float</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">"""Test statistic"""</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_stat</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">pval</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">float</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">"""P-value of test statistic"""</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_two_sided</span><span class="p">:</span>
+            <span class="k">return</span> <span class="mi">2</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">dist</span><span class="o">.</span><span class="n">sf</span><span class="p">(</span><span class="nb">abs</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">stat</span><span class="p">))</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">dist</span><span class="o">.</span><span class="n">sf</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">stat</span><span class="p">)</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">critical_values</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">float</span><span class="p">]:</span>
+<span class="w">        </span><span class="sd">"""Critical values for common test sizes"""</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_two_sided</span><span class="p">:</span>
+            <span class="n">quantiles</span> <span class="o">=</span> <span class="p">[</span><span class="mf">0.95</span><span class="p">,</span> <span class="mf">0.975</span><span class="p">,</span> <span class="mf">0.995</span><span class="p">]</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">quantiles</span> <span class="o">=</span> <span class="p">[</span><span class="mf">0.9</span><span class="p">,</span> <span class="mf">0.95</span><span class="p">,</span> <span class="mf">0.99</span><span class="p">]</span>
+        <span class="k">return</span> <span class="nb">dict</span><span class="p">(</span><span class="nb">zip</span><span class="p">([</span><span class="s2">"10%"</span><span class="p">,</span> <span class="s2">"5%"</span><span class="p">,</span> <span class="s2">"1%"</span><span class="p">],</span> <span class="bp">self</span><span class="o">.</span><span class="n">dist</span><span class="o">.</span><span class="n">ppf</span><span class="p">(</span><span class="n">quantiles</span><span class="p">),</span> <span class="n">strict</span><span class="o">=</span><span class="kc">False</span><span class="p">))</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">null</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">"""Null hypothesis"""</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_null</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="fm">__str__</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+        <span class="n">name</span> <span class="o">=</span> <span class="s2">""</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_name</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">name</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_name</span> <span class="o">+</span> <span class="s2">"</span><span class="se">\n</span><span class="s2">"</span>
+        <span class="n">msg</span> <span class="o">=</span> <span class="p">(</span>
+            <span class="s2">"</span><span class="si">{name}</span><span class="s2">H0: </span><span class="si">{null}</span><span class="se">\n</span><span class="s2">Statistic: </span><span class="si">{stat:0.4f}</span><span class="se">\n</span><span class="s2">"</span>
+            <span class="s2">"P-value: </span><span class="si">{pval:0.4f}</span><span class="se">\n</span><span class="s2">Distributed: </span><span class="si">{dist}</span><span class="s2">"</span>
+        <span class="p">)</span>
+        <span class="k">return</span> <span class="n">msg</span><span class="o">.</span><span class="n">format</span><span class="p">(</span>
+            <span class="n">name</span><span class="o">=</span><span class="n">name</span><span class="p">,</span>
+            <span class="n">null</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">null</span><span class="p">,</span>
+            <span class="n">stat</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">stat</span><span class="p">,</span>
+            <span class="n">pval</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">pval</span><span class="p">,</span>
+            <span class="n">dist</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">dist_name</span><span class="p">,</span>
+        <span class="p">)</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="fm">__repr__</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+        <span class="k">return</span> <span class="p">(</span>
+            <span class="bp">self</span><span class="o">.</span><span class="fm">__str__</span><span class="p">()</span> <span class="o">+</span> <span class="s2">"</span><span class="se">\n</span><span class="s2">"</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="vm">__class__</span><span class="o">.</span><span class="vm">__name__</span> <span class="o">+</span> <span class="sa">f</span><span class="s2">", id: </span><span class="si">{</span><span class="nb">hex</span><span class="p">(</span><span class="nb">id</span><span class="p">(</span><span class="bp">self</span><span class="p">))</span><span class="si">}</span><span class="s2">"</span>
+        <span class="p">)</span></div>
+
+
+
 <span class="k">class</span><span class="w"> </span><span class="nc">InvalidTestWarning</span><span class="p">(</span><span class="ne">UserWarning</span><span class="p">):</span>
     <span class="k">pass</span>
 
@@ -653,6 +736,8 @@
 
 
 
+<div class="viewcode-block" id="InapplicableTestStatistic">
+<a class="viewcode-back" href="../../../utility/linearmodels.shared.hypotheses.InapplicableTestStatistic.html#linearmodels.shared.hypotheses.InapplicableTestStatistic">[docs]</a>
 <span class="k">class</span><span class="w"> </span><span class="nc">InapplicableTestStatistic</span><span class="p">(</span><span class="n">WaldTestStatistic</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">"""</span>
 <span class="sd">    Class returned if a requested test is not applicable for a specification</span>
@@ -690,7 +775,8 @@
     <span class="k">def</span><span class="w"> </span><span class="fm">__str__</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
         <span class="n">msg</span> <span class="o">=</span> <span class="s2">"Irrelevant test statistic</span><span class="se">\n</span><span class="si">{reason}</span><span class="se">\n</span><span class="si">{name}</span><span class="s2">"</span>
         <span class="n">name</span> <span class="o">=</span> <span class="s2">""</span> <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_name</span> <span class="ow">is</span> <span class="kc">None</span> <span class="k">else</span> <span class="bp">self</span><span class="o">.</span><span class="n">_name</span>
-        <span class="k">return</span> <span class="n">msg</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">name</span><span class="o">=</span><span class="n">name</span><span class="p">,</span> <span class="n">reason</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">_reason</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">msg</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">name</span><span class="o">=</span><span class="n">name</span><span class="p">,</span> <span class="n">reason</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">_reason</span><span class="p">)</span></div>
+
 
 
 <span class="n">_constraint_error</span> <span class="o">=</span> <span class="s2">"""</span>

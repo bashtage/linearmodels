@@ -1,0 +1,6 @@
+linearmodels.panel.results.PanelEffectsResults.pesaran\_cd
+==========================================================
+
+.. currentmodule:: linearmodels.panel.results
+
+.. autoproperty:: PanelEffectsResults.pesaran_cd

@@ -26,7 +26,9 @@ Hypothesis Testing
    :toctree: utility/
 
    WaldTestStatistic
+   NormalTestStatistic
    InvalidTestStatistic
+   InapplicableTestStatistic
 
 
 Covariance Estimation
