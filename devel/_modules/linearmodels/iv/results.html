@@ -19,7 +19,7 @@
     
   
       
-        <title>linearmodels.iv.results - linearmodels v7.1 (+101)</title>
+        <title>linearmodels.iv.results - linearmodels v7.1 (+103)</title>
       
     
 
@@ -91,7 +91,7 @@
 
 <header class="md-header md-header--shadow" data-md-component="header">
   <nav class="md-header__inner md-grid" aria-label="Header">
-    <a href="../../../index.html" title="linearmodels v7.1 (+101)" class="md-header__button md-logo" aria-label="linearmodels v7.1 (+101)" data-md-component="logo">
+    <a href="../../../index.html" title="linearmodels v7.1 (+103)" class="md-header__button md-logo" aria-label="linearmodels v7.1 (+103)" data-md-component="logo">
       <img src="../../../_static/bw-logo.svg" alt="logo">
     </a>
     <label class="md-header__button md-icon" for="__drawer">
@@ -102,7 +102,7 @@
       <div class="md-header__ellipsis">
         <div class="md-header__topic">
           <span class="md-ellipsis">
-            linearmodels v7.1 (+101)
+            linearmodels v7.1 (+103)
           </span>
         </div>
         <div class="md-header__topic" data-md-component="header-topic">
@@ -197,10 +197,10 @@
 
 <nav class="md-nav md-nav--primary" aria-label="Navigation" data-md-level="0">
   <label class="md-nav__title" for="__drawer">
-    <a href="../../../index.html" title="linearmodels v7.1 (+101)" class="md-nav__button md-logo" aria-label="linearmodels v7.1 (+101)" data-md-component="logo">
+    <a href="../../../index.html" title="linearmodels v7.1 (+103)" class="md-nav__button md-logo" aria-label="linearmodels v7.1 (+103)" data-md-component="logo">
       <img src="../../../_static/bw-logo.svg" alt="logo">
     </a>
-    linearmodels v7.1 (+101)
+    linearmodels v7.1 (+103)
   </label>
   
     <div class="md-nav__source">
@@ -1499,8 +1499,8 @@
                 <span class="n">name</span><span class="o">=</span><span class="n">name</span><span class="p">,</span>
             <span class="p">)</span>
 
-        <span class="n">eps</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">resids</span><span class="o">.</span><span class="n">to_numpy</span><span class="p">()[:,</span> <span class="kc">None</span><span class="p">]</span>
-        <span class="n">u</span> <span class="o">=</span> <span class="n">annihilate</span><span class="p">(</span><span class="n">eps</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">model</span><span class="o">.</span><span class="n">_z</span><span class="p">)</span>
+        <span class="n">eps</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">wresids</span><span class="o">.</span><span class="n">to_numpy</span><span class="p">()[:,</span> <span class="kc">None</span><span class="p">]</span>
+        <span class="n">u</span> <span class="o">=</span> <span class="n">annihilate</span><span class="p">(</span><span class="n">eps</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">model</span><span class="o">.</span><span class="n">_wz</span><span class="p">)</span>
         <span class="n">stat</span> <span class="o">=</span> <span class="n">nobs</span> <span class="o">*</span> <span class="p">(</span><span class="mi">1</span> <span class="o">-</span> <span class="p">(</span><span class="n">u</span><span class="o">.</span><span class="n">T</span> <span class="o">@</span> <span class="n">u</span><span class="p">)</span> <span class="o">/</span> <span class="p">(</span><span class="n">eps</span><span class="o">.</span><span class="n">T</span> <span class="o">@</span> <span class="n">eps</span><span class="p">))</span><span class="o">.</span><span class="n">squeeze</span><span class="p">()</span>
         <span class="n">null</span> <span class="o">=</span> <span class="s2">"The model is not overidentified."</span>
 
@@ -1566,7 +1566,8 @@
             <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="s2">"variables must be a str or a list of str."</span><span class="p">)</span>
 
         <span class="n">nobs</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">model</span><span class="o">.</span><span class="n">dependent</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
-        <span class="n">e2</span> <span class="o">=</span> <span class="n">asarray</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">resids</span><span class="o">.</span><span class="n">to_numpy</span><span class="p">())</span>
+        <span class="n">w</span> <span class="o">=</span> <span class="n">sqrt</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">model</span><span class="o">.</span><span class="n">weights</span><span class="o">.</span><span class="n">ndarray</span><span class="p">)</span>
+        <span class="n">e2</span> <span class="o">=</span> <span class="n">asarray</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">wresids</span><span class="o">.</span><span class="n">to_numpy</span><span class="p">())</span>
         <span class="n">nendog</span><span class="p">,</span> <span class="n">nexog</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">model</span><span class="o">.</span><span class="n">endog</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="bp">self</span><span class="o">.</span><span class="n">model</span><span class="o">.</span><span class="n">exog</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span>
         <span class="k">if</span> <span class="n">variables</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
             <span class="n">assumed_exog</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">model</span><span class="o">.</span><span class="n">endog</span><span class="o">.</span><span class="n">ndarray</span>
@@ -1583,12 +1584,16 @@
         <span class="kn">from</span><span class="w"> </span><span class="nn">linearmodels.iv</span><span class="w"> </span><span class="kn">import</span> <span class="n">IV2SLS</span>
 
         <span class="n">mod</span> <span class="o">=</span> <span class="n">IV2SLS</span><span class="p">(</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">model</span><span class="o">.</span><span class="n">dependent</span><span class="p">,</span> <span class="n">aug_exog</span><span class="p">,</span> <span class="n">still_endog</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">model</span><span class="o">.</span><span class="n">instruments</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">model</span><span class="o">.</span><span class="n">dependent</span><span class="p">,</span>
+            <span class="n">aug_exog</span><span class="p">,</span>
+            <span class="n">still_endog</span><span class="p">,</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">model</span><span class="o">.</span><span class="n">instruments</span><span class="p">,</span>
+            <span class="n">weights</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">model</span><span class="o">.</span><span class="n">weights</span><span class="p">,</span>
         <span class="p">)</span>
-        <span class="n">e0</span> <span class="o">=</span> <span class="n">mod</span><span class="o">.</span><span class="n">fit</span><span class="p">()</span><span class="o">.</span><span class="n">resids</span><span class="o">.</span><span class="n">to_numpy</span><span class="p">()[:,</span> <span class="kc">None</span><span class="p">]</span>
+        <span class="n">e0</span> <span class="o">=</span> <span class="n">mod</span><span class="o">.</span><span class="n">fit</span><span class="p">()</span><span class="o">.</span><span class="n">wresids</span><span class="o">.</span><span class="n">to_numpy</span><span class="p">()[:,</span> <span class="kc">None</span><span class="p">]</span>
 
-        <span class="n">z2</span> <span class="o">=</span> <span class="n">c_</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">model</span><span class="o">.</span><span class="n">exog</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">model</span><span class="o">.</span><span class="n">instruments</span><span class="o">.</span><span class="n">ndarray</span><span class="p">]</span>
-        <span class="n">z1</span> <span class="o">=</span> <span class="n">c_</span><span class="p">[</span><span class="n">z2</span><span class="p">,</span> <span class="n">assumed_exog</span><span class="p">]</span>
+        <span class="n">z2</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">model</span><span class="o">.</span><span class="n">_wz</span>
+        <span class="n">z1</span> <span class="o">=</span> <span class="n">c_</span><span class="p">[</span><span class="n">z2</span><span class="p">,</span> <span class="n">assumed_exog</span> <span class="o">*</span> <span class="n">w</span><span class="p">]</span>
 
         <span class="n">e1</span> <span class="o">=</span> <span class="n">proj</span><span class="p">(</span><span class="n">e0</span><span class="p">,</span> <span class="n">z1</span><span class="p">)</span>
         <span class="n">e2</span> <span class="o">=</span> <span class="n">proj</span><span class="p">(</span><span class="n">e2</span><span class="p">,</span> <span class="n">z2</span><span class="p">)</span>
@@ -1751,10 +1756,11 @@
 <span class="sd">        """</span>
         <span class="kn">from</span><span class="w"> </span><span class="nn">linearmodels.iv.model</span><span class="w"> </span><span class="kn">import</span> <span class="n">_OLS</span>
 
-        <span class="n">e</span> <span class="o">=</span> <span class="n">annihilate</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">model</span><span class="o">.</span><span class="n">dependent</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">model</span><span class="o">.</span><span class="n">_x</span><span class="p">)</span>
-        <span class="n">r</span> <span class="o">=</span> <span class="n">annihilate</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">model</span><span class="o">.</span><span class="n">endog</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">model</span><span class="o">.</span><span class="n">_z</span><span class="p">)</span>
+        <span class="n">w</span> <span class="o">=</span> <span class="n">sqrt</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">model</span><span class="o">.</span><span class="n">weights</span><span class="o">.</span><span class="n">ndarray</span><span class="p">)</span>
+        <span class="n">e</span> <span class="o">=</span> <span class="n">annihilate</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">model</span><span class="o">.</span><span class="n">_wy</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">model</span><span class="o">.</span><span class="n">_wx</span><span class="p">)</span>
+        <span class="n">r</span> <span class="o">=</span> <span class="n">annihilate</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">model</span><span class="o">.</span><span class="n">endog</span><span class="o">.</span><span class="n">ndarray</span> <span class="o">*</span> <span class="n">w</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">model</span><span class="o">.</span><span class="n">_wz</span><span class="p">)</span>
         <span class="n">nobs</span> <span class="o">=</span> <span class="n">e</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
-        <span class="n">r</span> <span class="o">=</span> <span class="n">annihilate</span><span class="p">(</span><span class="n">r</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">model</span><span class="o">.</span><span class="n">_x</span><span class="p">)</span>
+        <span class="n">r</span> <span class="o">=</span> <span class="n">annihilate</span><span class="p">(</span><span class="n">r</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">model</span><span class="o">.</span><span class="n">_wx</span><span class="p">)</span>
         <span class="n">res</span> <span class="o">=</span> <span class="n">_OLS</span><span class="p">(</span><span class="n">ones</span><span class="p">((</span><span class="n">nobs</span><span class="p">,</span> <span class="mi">1</span><span class="p">)),</span> <span class="n">r</span> <span class="o">*</span> <span class="n">e</span><span class="p">)</span><span class="o">.</span><span class="n">fit</span><span class="p">(</span><span class="n">cov_type</span><span class="o">=</span><span class="s2">"unadjusted"</span><span class="p">)</span>
         <span class="n">stat</span> <span class="o">=</span> <span class="n">res</span><span class="o">.</span><span class="n">nobs</span> <span class="o">-</span> <span class="n">res</span><span class="o">.</span><span class="n">resid_ss</span>
         <span class="n">df</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">model</span><span class="o">.</span><span class="n">endog</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span>
@@ -1796,9 +1802,10 @@
 <span class="sd">        """</span>
         <span class="kn">from</span><span class="w"> </span><span class="nn">linearmodels.iv.model</span><span class="w"> </span><span class="kn">import</span> <span class="n">_OLS</span>
 
-        <span class="n">r</span> <span class="o">=</span> <span class="n">annihilate</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">model</span><span class="o">.</span><span class="n">endog</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">model</span><span class="o">.</span><span class="n">_z</span><span class="p">)</span>
+        <span class="n">w</span> <span class="o">=</span> <span class="n">sqrt</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">model</span><span class="o">.</span><span class="n">weights</span><span class="o">.</span><span class="n">ndarray</span><span class="p">)</span>
+        <span class="n">r</span> <span class="o">=</span> <span class="n">annihilate</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">model</span><span class="o">.</span><span class="n">endog</span><span class="o">.</span><span class="n">ndarray</span> <span class="o">*</span> <span class="n">w</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">model</span><span class="o">.</span><span class="n">_wz</span><span class="p">)</span> <span class="o">/</span> <span class="n">w</span>
         <span class="n">augx</span> <span class="o">=</span> <span class="n">c_</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">model</span><span class="o">.</span><span class="n">_x</span><span class="p">,</span> <span class="n">r</span><span class="p">]</span>
-        <span class="n">mod</span> <span class="o">=</span> <span class="n">_OLS</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">model</span><span class="o">.</span><span class="n">dependent</span><span class="p">,</span> <span class="n">augx</span><span class="p">)</span>
+        <span class="n">mod</span> <span class="o">=</span> <span class="n">_OLS</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">model</span><span class="o">.</span><span class="n">dependent</span><span class="p">,</span> <span class="n">augx</span><span class="p">,</span> <span class="n">weights</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">model</span><span class="o">.</span><span class="n">weights</span><span class="p">)</span>
         <span class="n">res</span> <span class="o">=</span> <span class="n">mod</span><span class="o">.</span><span class="n">fit</span><span class="p">(</span><span class="n">cov_type</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">cov_type</span><span class="p">,</span> <span class="o">**</span><span class="bp">self</span><span class="o">.</span><span class="n">cov_config</span><span class="p">)</span>
         <span class="n">norig</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">model</span><span class="o">.</span><span class="n">_x</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span>
         <span class="n">test_params</span> <span class="o">=</span> <span class="n">asarray</span><span class="p">(</span><span class="n">res</span><span class="o">.</span><span class="n">params</span><span class="o">.</span><span class="n">to_numpy</span><span class="p">()[</span><span class="n">norig</span><span class="p">:],</span> <span class="n">dtype</span><span class="o">=</span><span class="nb">float</span><span class="p">)</span>
@@ -1854,10 +1861,11 @@
                 <span class="n">name</span><span class="o">=</span><span class="n">name</span><span class="p">,</span>
             <span class="p">)</span>
 
-        <span class="n">endog_hat</span> <span class="o">=</span> <span class="n">proj</span><span class="p">(</span><span class="n">endog</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span> <span class="n">c_</span><span class="p">[</span><span class="n">exog</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span> <span class="n">instruments</span><span class="o">.</span><span class="n">ndarray</span><span class="p">])</span>
-        <span class="n">q</span> <span class="o">=</span> <span class="n">instruments</span><span class="o">.</span><span class="n">ndarray</span><span class="p">[:,</span> <span class="p">:</span> <span class="p">(</span><span class="n">ninstr</span> <span class="o">-</span> <span class="n">nendog</span><span class="p">)]</span>
-        <span class="n">q_res</span> <span class="o">=</span> <span class="n">annihilate</span><span class="p">(</span><span class="n">q</span><span class="p">,</span> <span class="n">c_</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">model</span><span class="o">.</span><span class="n">exog</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span> <span class="n">endog_hat</span><span class="p">])</span>
-        <span class="n">test_functions</span> <span class="o">=</span> <span class="n">q_res</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">resids</span><span class="o">.</span><span class="n">to_numpy</span><span class="p">()[:,</span> <span class="kc">None</span><span class="p">]</span>
+        <span class="n">w</span> <span class="o">=</span> <span class="n">sqrt</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">model</span><span class="o">.</span><span class="n">weights</span><span class="o">.</span><span class="n">ndarray</span><span class="p">)</span>
+        <span class="n">endog_hat</span> <span class="o">=</span> <span class="n">proj</span><span class="p">(</span><span class="n">endog</span><span class="o">.</span><span class="n">ndarray</span> <span class="o">*</span> <span class="n">w</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">model</span><span class="o">.</span><span class="n">_wz</span><span class="p">)</span>
+        <span class="n">q</span> <span class="o">=</span> <span class="n">instruments</span><span class="o">.</span><span class="n">ndarray</span><span class="p">[:,</span> <span class="p">:</span> <span class="p">(</span><span class="n">ninstr</span> <span class="o">-</span> <span class="n">nendog</span><span class="p">)]</span> <span class="o">*</span> <span class="n">w</span>
+        <span class="n">q_res</span> <span class="o">=</span> <span class="n">annihilate</span><span class="p">(</span><span class="n">q</span><span class="p">,</span> <span class="n">c_</span><span class="p">[</span><span class="n">exog</span><span class="o">.</span><span class="n">ndarray</span> <span class="o">*</span> <span class="n">w</span><span class="p">,</span> <span class="n">endog_hat</span><span class="p">])</span>
+        <span class="n">test_functions</span> <span class="o">=</span> <span class="n">q_res</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">wresids</span><span class="o">.</span><span class="n">to_numpy</span><span class="p">()[:,</span> <span class="kc">None</span><span class="p">]</span>
         <span class="n">res</span> <span class="o">=</span> <span class="n">_OLS</span><span class="p">(</span><span class="n">ones</span><span class="p">((</span><span class="n">nobs</span><span class="p">,</span> <span class="mi">1</span><span class="p">)),</span> <span class="n">test_functions</span><span class="p">)</span><span class="o">.</span><span class="n">fit</span><span class="p">(</span><span class="n">cov_type</span><span class="o">=</span><span class="s2">"unadjusted"</span><span class="p">)</span>
 
         <span class="n">stat</span> <span class="o">=</span> <span class="n">res</span><span class="o">.</span><span class="n">nobs</span> <span class="o">*</span> <span class="n">res</span><span class="o">.</span><span class="n">rsquared</span>
@@ -2087,14 +2095,14 @@
             <span class="n">null</span> <span class="o">=</span> <span class="s2">"Variables </span><span class="si">{}</span><span class="s2"> are exogenous"</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="s2">", "</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">variable_lst</span><span class="p">))</span>
         <span class="kn">from</span><span class="w"> </span><span class="nn">linearmodels.iv.model</span><span class="w"> </span><span class="kn">import</span> <span class="n">IVGMM</span><span class="p">,</span> <span class="n">IVGMMCUE</span>
 
-        <span class="n">mod</span> <span class="o">=</span> <span class="n">IVGMM</span><span class="p">(</span><span class="n">dependent</span><span class="p">,</span> <span class="n">exog_e</span><span class="p">,</span> <span class="n">endog_e</span><span class="p">,</span> <span class="n">instruments</span><span class="p">)</span>
+        <span class="n">mod</span> <span class="o">=</span> <span class="n">IVGMM</span><span class="p">(</span><span class="n">dependent</span><span class="p">,</span> <span class="n">exog_e</span><span class="p">,</span> <span class="n">endog_e</span><span class="p">,</span> <span class="n">instruments</span><span class="p">,</span> <span class="n">weights</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">model</span><span class="o">.</span><span class="n">weights</span><span class="p">)</span>
         <span class="n">res_e</span> <span class="o">=</span> <span class="n">mod</span><span class="o">.</span><span class="n">fit</span><span class="p">(</span><span class="n">cov_type</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">cov_type</span><span class="p">,</span> <span class="o">**</span><span class="bp">self</span><span class="o">.</span><span class="n">cov_config</span><span class="p">)</span>
         <span class="k">assert</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">res_e</span><span class="p">,</span> <span class="n">IVGMMResults</span><span class="p">)</span>
         <span class="n">j_e</span> <span class="o">=</span> <span class="n">res_e</span><span class="o">.</span><span class="n">j_stat</span><span class="o">.</span><span class="n">stat</span>
 
-        <span class="n">x</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">model</span><span class="o">.</span><span class="n">_x</span>
-        <span class="n">y</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">model</span><span class="o">.</span><span class="n">_y</span>
-        <span class="n">z</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">model</span><span class="o">.</span><span class="n">_z</span>
+        <span class="n">x</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">model</span><span class="o">.</span><span class="n">_wx</span>
+        <span class="n">y</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">model</span><span class="o">.</span><span class="n">_wy</span>
+        <span class="n">z</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">model</span><span class="o">.</span><span class="n">_wz</span>
         <span class="n">nz</span> <span class="o">=</span> <span class="n">z</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span>
         <span class="n">weight_mat_c</span> <span class="o">=</span> <span class="n">asarray</span><span class="p">(</span><span class="n">res_e</span><span class="o">.</span><span class="n">weight_matrix</span><span class="p">)[:</span><span class="n">nz</span><span class="p">,</span> <span class="p">:</span><span class="n">nz</span><span class="p">]</span>
         <span class="n">params_c</span> <span class="o">=</span> <span class="n">mod</span><span class="o">.</span><span class="n">estimate_parameters</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">z</span><span class="p">,</span> <span class="n">weight_mat_c</span><span class="p">)</span>
