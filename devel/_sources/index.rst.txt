@@ -36,6 +36,7 @@ from `statsmodels <https://statsmodels.org>`_:
 * Limited Information ML (LIML, :class:`~linearmodels.iv.model.IVLIML`)
 * Generalized Method of Moments (GMM, :class:`~linearmodels.iv.model.IVGMM`)
 * Continuously Updating GMM (CUE-GMM, :class:`~linearmodels.iv.model.IVGMMCUE`)
+* Jackknife IV (JIVE, :class:`~linearmodels.iv.model.IVJIVE`)
 
 
 **System Regression Estimators**

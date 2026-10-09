@@ -19,7 +19,7 @@
     
   
       
-        <title>linearmodels.iv.model - linearmodels v7.1 (+133)</title>
+        <title>linearmodels.iv.model - linearmodels v7.1 (+141)</title>
       
     
 
@@ -91,7 +91,7 @@
 
 <header class="md-header md-header--shadow" data-md-component="header">
   <nav class="md-header__inner md-grid" aria-label="Header">
-    <a href="../../../index.html" title="linearmodels v7.1 (+133)" class="md-header__button md-logo" aria-label="linearmodels v7.1 (+133)" data-md-component="logo">
+    <a href="../../../index.html" title="linearmodels v7.1 (+141)" class="md-header__button md-logo" aria-label="linearmodels v7.1 (+141)" data-md-component="logo">
       <img src="../../../_static/bw-logo.svg" alt="logo">
     </a>
     <label class="md-header__button md-icon" for="__drawer">
@@ -102,7 +102,7 @@
       <div class="md-header__ellipsis">
         <div class="md-header__topic">
           <span class="md-ellipsis">
-            linearmodels v7.1 (+133)
+            linearmodels v7.1 (+141)
           </span>
         </div>
         <div class="md-header__topic" data-md-component="header-topic">
@@ -197,10 +197,10 @@
 
 <nav class="md-nav md-nav--primary" aria-label="Navigation" data-md-level="0">
   <label class="md-nav__title" for="__drawer">
-    <a href="../../../index.html" title="linearmodels v7.1 (+133)" class="md-nav__button md-logo" aria-label="linearmodels v7.1 (+133)" data-md-component="logo">
+    <a href="../../../index.html" title="linearmodels v7.1 (+141)" class="md-nav__button md-logo" aria-label="linearmodels v7.1 (+141)" data-md-component="logo">
       <img src="../../../_static/bw-logo.svg" alt="logo">
     </a>
-    linearmodels v7.1 (+133)
+    linearmodels v7.1 (+141)
   </label>
   
     <div class="md-nav__source">
@@ -535,7 +535,7 @@
     <span class="n">sqrt</span><span class="p">,</span>
     <span class="n">squeeze</span><span class="p">,</span>
 <span class="p">)</span>
-<span class="kn">from</span><span class="w"> </span><span class="nn">numpy.linalg</span><span class="w"> </span><span class="kn">import</span> <span class="n">eigvalsh</span><span class="p">,</span> <span class="n">inv</span><span class="p">,</span> <span class="n">matrix_rank</span><span class="p">,</span> <span class="n">pinv</span><span class="p">,</span> <span class="n">solve</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">numpy.linalg</span><span class="w"> </span><span class="kn">import</span> <span class="n">LinAlgError</span><span class="p">,</span> <span class="n">eigvalsh</span><span class="p">,</span> <span class="n">inv</span><span class="p">,</span> <span class="n">matrix_rank</span><span class="p">,</span> <span class="n">pinv</span><span class="p">,</span> <span class="n">qr</span><span class="p">,</span> <span class="n">solve</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">pandas</span><span class="w"> </span><span class="kn">import</span> <span class="n">DataFrame</span><span class="p">,</span> <span class="n">Series</span><span class="p">,</span> <span class="n">concat</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">scipy.optimize</span><span class="w"> </span><span class="kn">import</span> <span class="n">minimize</span>
 
@@ -951,6 +951,23 @@
         <span class="n">nobs</span><span class="p">,</span> <span class="n">nvar</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_x</span><span class="o">.</span><span class="n">shape</span>
         <span class="k">return</span> <span class="n">f_statistic</span><span class="p">(</span><span class="n">params</span><span class="p">,</span> <span class="n">cov</span><span class="p">,</span> <span class="n">debiased</span><span class="p">,</span> <span class="n">nobs</span> <span class="o">-</span> <span class="n">nvar</span><span class="p">,</span> <span class="n">const_loc</span><span class="p">)</span>
 
+    <span class="k">def</span><span class="w"> </span><span class="nf">_estimate_kappa</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">float</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">"""The value of kappa in LIML, which is the same for any estimator"""</span>
+        <span class="n">y</span><span class="p">,</span> <span class="n">x</span><span class="p">,</span> <span class="n">z</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_wy</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_wx</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_wz</span>
+        <span class="n">is_exog</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_regressor_is_exog</span>
+        <span class="n">e</span> <span class="o">=</span> <span class="n">c_</span><span class="p">[</span><span class="n">y</span><span class="p">,</span> <span class="n">x</span><span class="p">[:,</span> <span class="o">~</span><span class="n">is_exog</span><span class="p">]]</span>
+        <span class="n">x1</span> <span class="o">=</span> <span class="n">x</span><span class="p">[:,</span> <span class="n">is_exog</span><span class="p">]</span>
+
+        <span class="n">ez</span> <span class="o">=</span> <span class="n">e</span> <span class="o">-</span> <span class="n">z</span> <span class="o">@</span> <span class="p">(</span><span class="n">pinv</span><span class="p">(</span><span class="n">z</span><span class="p">)</span> <span class="o">@</span> <span class="n">e</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">x1</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>  <span class="c1"># No exogenous regressors</span>
+            <span class="n">ex1</span> <span class="o">=</span> <span class="n">e</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">ex1</span> <span class="o">=</span> <span class="n">e</span> <span class="o">-</span> <span class="n">x1</span> <span class="o">@</span> <span class="p">(</span><span class="n">pinv</span><span class="p">(</span><span class="n">x1</span><span class="p">)</span> <span class="o">@</span> <span class="n">e</span><span class="p">)</span>
+
+        <span class="n">vpmzv_sqinv</span> <span class="o">=</span> <span class="n">inv_sqrth</span><span class="p">(</span><span class="n">ez</span><span class="o">.</span><span class="n">T</span> <span class="o">@</span> <span class="n">ez</span><span class="p">)</span>
+        <span class="n">q</span> <span class="o">=</span> <span class="n">vpmzv_sqinv</span> <span class="o">@</span> <span class="p">(</span><span class="n">ex1</span><span class="o">.</span><span class="n">T</span> <span class="o">@</span> <span class="n">ex1</span><span class="p">)</span> <span class="o">@</span> <span class="n">vpmzv_sqinv</span>
+        <span class="k">return</span> <span class="nb">min</span><span class="p">(</span><span class="n">eigvalsh</span><span class="p">(</span><span class="n">q</span><span class="p">))</span>
+
     <span class="k">def</span><span class="w"> </span><span class="nf">_post_estimation</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span>
         <span class="n">params</span><span class="p">:</span> <span class="n">linearmodels</span><span class="o">.</span><span class="n">typing</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">Float64Array</span><span class="p">,</span>
@@ -1118,22 +1135,6 @@
         <span class="n">p1</span> <span class="o">=</span> <span class="p">(</span><span class="n">x</span><span class="o">.</span><span class="n">T</span> <span class="o">@</span> <span class="n">x</span><span class="p">)</span> <span class="o">*</span> <span class="p">(</span><span class="mi">1</span> <span class="o">-</span> <span class="n">kappa</span><span class="p">)</span> <span class="o">+</span> <span class="n">kappa</span> <span class="o">*</span> <span class="p">((</span><span class="n">x</span><span class="o">.</span><span class="n">T</span> <span class="o">@</span> <span class="n">z</span><span class="p">)</span> <span class="o">@</span> <span class="p">(</span><span class="n">pinvz</span> <span class="o">@</span> <span class="n">x</span><span class="p">))</span>
         <span class="n">p2</span> <span class="o">=</span> <span class="p">(</span><span class="n">x</span><span class="o">.</span><span class="n">T</span> <span class="o">@</span> <span class="n">y</span><span class="p">)</span> <span class="o">*</span> <span class="p">(</span><span class="mi">1</span> <span class="o">-</span> <span class="n">kappa</span><span class="p">)</span> <span class="o">+</span> <span class="n">kappa</span> <span class="o">*</span> <span class="p">((</span><span class="n">x</span><span class="o">.</span><span class="n">T</span> <span class="o">@</span> <span class="n">z</span><span class="p">)</span> <span class="o">@</span> <span class="p">(</span><span class="n">pinvz</span> <span class="o">@</span> <span class="n">y</span><span class="p">))</span>
         <span class="k">return</span> <span class="n">inv</span><span class="p">(</span><span class="n">p1</span><span class="p">)</span> <span class="o">@</span> <span class="n">p2</span>
-
-    <span class="k">def</span><span class="w"> </span><span class="nf">_estimate_kappa</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">float</span><span class="p">:</span>
-        <span class="n">y</span><span class="p">,</span> <span class="n">x</span><span class="p">,</span> <span class="n">z</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_wy</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_wx</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_wz</span>
-        <span class="n">is_exog</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_regressor_is_exog</span>
-        <span class="n">e</span> <span class="o">=</span> <span class="n">c_</span><span class="p">[</span><span class="n">y</span><span class="p">,</span> <span class="n">x</span><span class="p">[:,</span> <span class="o">~</span><span class="n">is_exog</span><span class="p">]]</span>
-        <span class="n">x1</span> <span class="o">=</span> <span class="n">x</span><span class="p">[:,</span> <span class="n">is_exog</span><span class="p">]</span>
-
-        <span class="n">ez</span> <span class="o">=</span> <span class="n">e</span> <span class="o">-</span> <span class="n">z</span> <span class="o">@</span> <span class="p">(</span><span class="n">pinv</span><span class="p">(</span><span class="n">z</span><span class="p">)</span> <span class="o">@</span> <span class="n">e</span><span class="p">)</span>
-        <span class="k">if</span> <span class="n">x1</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>  <span class="c1"># No exogenous regressors</span>
-            <span class="n">ex1</span> <span class="o">=</span> <span class="n">e</span>
-        <span class="k">else</span><span class="p">:</span>
-            <span class="n">ex1</span> <span class="o">=</span> <span class="n">e</span> <span class="o">-</span> <span class="n">x1</span> <span class="o">@</span> <span class="p">(</span><span class="n">pinv</span><span class="p">(</span><span class="n">x1</span><span class="p">)</span> <span class="o">@</span> <span class="n">e</span><span class="p">)</span>
-
-        <span class="n">vpmzv_sqinv</span> <span class="o">=</span> <span class="n">inv_sqrth</span><span class="p">(</span><span class="n">ez</span><span class="o">.</span><span class="n">T</span> <span class="o">@</span> <span class="n">ez</span><span class="p">)</span>
-        <span class="n">q</span> <span class="o">=</span> <span class="n">vpmzv_sqinv</span> <span class="o">@</span> <span class="p">(</span><span class="n">ex1</span><span class="o">.</span><span class="n">T</span> <span class="o">@</span> <span class="n">ex1</span><span class="p">)</span> <span class="o">@</span> <span class="n">vpmzv_sqinv</span>
-        <span class="k">return</span> <span class="nb">min</span><span class="p">(</span><span class="n">eigvalsh</span><span class="p">(</span><span class="n">q</span><span class="p">))</span>
 
     <span class="k">def</span><span class="w"> </span><span class="nf">fit</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">cov_type</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">"robust"</span><span class="p">,</span> <span class="n">debiased</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span> <span class="o">**</span><span class="n">cov_config</span><span class="p">:</span> <span class="n">Any</span>
@@ -2351,6 +2352,339 @@
     <span class="p">)</span>
     <span class="n">mod</span><span class="o">.</span><span class="n">formula</span> <span class="o">=</span> <span class="n">formula</span>
     <span class="k">return</span> <span class="n">mod</span>
+
+
+<span class="k">class</span><span class="w"> </span><span class="nc">_UncenteredHomoskedasticWeightMatrix</span><span class="p">(</span><span class="n">HomoskedasticWeightMatrix</span><span class="p">):</span>
+<span class="w">    </span><span class="sa">r</span><span class="sd">"""</span>
+<span class="sd">    Homoskedastic covariance of the moment conditions, without centering</span>
+
+<span class="sd">    The homoskedastic covariance estimators of the IV models use the uncentered</span>
+<span class="sd">    variance :math:`\hat{\epsilon}'\hat{\epsilon}/n` of the residuals.</span>
+<span class="sd">    HomoskedasticWeightMatrix always subtracts the mean of the residuals, which</span>
+<span class="sd">    only has no effect if the mean is zero. The mean of the weighted residuals</span>
+<span class="sd">    is not zero in a weighted model that has a constant.</span>
+<span class="sd">    """</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">weight_matrix</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span>
+        <span class="n">x</span><span class="p">:</span> <span class="n">linearmodels</span><span class="o">.</span><span class="n">typing</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">Float64Array</span><span class="p">,</span>
+        <span class="n">z</span><span class="p">:</span> <span class="n">linearmodels</span><span class="o">.</span><span class="n">typing</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">Float64Array</span><span class="p">,</span>
+        <span class="n">eps</span><span class="p">:</span> <span class="n">linearmodels</span><span class="o">.</span><span class="n">typing</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">Float64Array</span><span class="p">,</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">linearmodels</span><span class="o">.</span><span class="n">typing</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">Float64Array</span><span class="p">:</span>
+        <span class="n">nobs</span><span class="p">,</span> <span class="n">nvar</span> <span class="o">=</span> <span class="n">x</span><span class="o">.</span><span class="n">shape</span>
+        <span class="n">s2</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="n">squeeze</span><span class="p">(</span><span class="n">eps</span><span class="o">.</span><span class="n">T</span> <span class="o">@</span> <span class="n">eps</span><span class="p">))</span> <span class="o">/</span> <span class="n">nobs</span>
+        <span class="n">w</span> <span class="o">=</span> <span class="n">s2</span> <span class="o">*</span> <span class="n">z</span><span class="o">.</span><span class="n">T</span> <span class="o">@</span> <span class="n">z</span> <span class="o">/</span> <span class="n">nobs</span>
+        <span class="n">w</span> <span class="o">*=</span> <span class="mi">1</span> <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">_debiased</span> <span class="k">else</span> <span class="n">nobs</span> <span class="o">/</span> <span class="p">(</span><span class="n">nobs</span> <span class="o">-</span> <span class="n">nvar</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">w</span>
+
+
+<span class="k">class</span><span class="w"> </span><span class="nc">_JIVECovariance</span><span class="p">(</span><span class="n">IVGMMCovariance</span><span class="p">):</span>
+<span class="w">    </span><span class="sa">r</span><span class="sd">"""</span>
+<span class="sd">    Covariance of the JIVE estimator</span>
+
+<span class="sd">    JIVE is the IV estimator that uses the leave-one-out first-stage</span>
+<span class="sd">    predictions :math:`\tilde{X}` as the instruments, and</span>
+<span class="sd">    :math:`\hat\beta=(\tilde{X}'X)^{-1}\tilde{X}'y`. This is a just identified</span>
+<span class="sd">    GMM estimator with moment conditions :math:`\tilde{x}_i\epsilon_i`, so the</span>
+<span class="sd">    covariance is</span>
+
+<span class="sd">    .. math::</span>
+
+<span class="sd">        n^{-1}(\tilde{X}'X/n)^{-1} S (X'\tilde{X}/n)^{-1}</span>
+
+<span class="sd">    where :math:`S` is an estimate of the covariance of</span>
+<span class="sd">    :math:`\tilde{x}_i\hat\epsilon_i`, and :math:`\hat\epsilon_i` is the</span>
+<span class="sd">    residual computed with :math:`X` and not :math:`\tilde{X}`. The choices of</span>
+<span class="sd">    :math:`S` are the same as in the other IV models.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    x : ndarray</span>
+<span class="sd">        Weighted regressors (nobs by nvar)</span>
+<span class="sd">    y : ndarray</span>
+<span class="sd">        Weighted dependent variable (nobs by 1)</span>
+<span class="sd">    x_loo : ndarray</span>
+<span class="sd">        Weighted leave-one-out first-stage predictions (nobs by nvar)</span>
+<span class="sd">    params : ndarray</span>
+<span class="sd">        Estimated model parameters (nvar by 1)</span>
+<span class="sd">    cov_type : str</span>
+<span class="sd">        Covariance estimator to use. See IVJIVE.fit for the choices.</span>
+<span class="sd">    debiased : bool</span>
+<span class="sd">        Flag indicating whether to debias the covariance estimator</span>
+<span class="sd">    cov_config</span>
+<span class="sd">        Optional keyword arguments that are specific to a particular cov_type</span>
+<span class="sd">    """</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span>
+        <span class="n">x</span><span class="p">:</span> <span class="n">linearmodels</span><span class="o">.</span><span class="n">typing</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">Float64Array</span><span class="p">,</span>
+        <span class="n">y</span><span class="p">:</span> <span class="n">linearmodels</span><span class="o">.</span><span class="n">typing</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">Float64Array</span><span class="p">,</span>
+        <span class="n">x_loo</span><span class="p">:</span> <span class="n">linearmodels</span><span class="o">.</span><span class="n">typing</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">Float64Array</span><span class="p">,</span>
+        <span class="n">params</span><span class="p">:</span> <span class="n">linearmodels</span><span class="o">.</span><span class="n">typing</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">Float64Array</span><span class="p">,</span>
+        <span class="n">cov_type</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">"robust"</span><span class="p">,</span>
+        <span class="n">debiased</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
+        <span class="o">**</span><span class="n">cov_config</span><span class="p">:</span> <span class="nb">str</span> <span class="o">|</span> <span class="nb">bool</span><span class="p">,</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="c1"># The weight matrix has no effect in a just identified model</span>
+        <span class="n">w</span> <span class="o">=</span> <span class="n">eye</span><span class="p">(</span><span class="n">x</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">])</span>
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">x_loo</span><span class="p">,</span> <span class="n">params</span><span class="p">,</span> <span class="n">w</span><span class="p">,</span> <span class="n">cov_type</span><span class="p">,</span> <span class="n">debiased</span><span class="p">,</span> <span class="o">**</span><span class="n">cov_config</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_name</span> <span class="o">=</span> <span class="s2">"JIVE Covariance"</span>
+        <span class="k">if</span> <span class="n">cov_type</span> <span class="ow">in</span> <span class="p">(</span><span class="s2">"unadjusted"</span><span class="p">,</span> <span class="s2">"homoskedastic"</span><span class="p">):</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_score_cov_estimator</span> <span class="o">=</span> <span class="n">_UncenteredHomoskedasticWeightMatrix</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">cov</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">linearmodels</span><span class="o">.</span><span class="n">typing</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">Float64Array</span><span class="p">:</span>
+        <span class="c1"># Not the GMM covariance with an identity weight matrix, which forms</span>
+        <span class="c1"># the inverse of (X'X~)(X~'X) and squares the condition number. That is</span>
+        <span class="c1"># not accurate when the regressors have different scales</span>
+        <span class="n">x</span><span class="p">,</span> <span class="n">x_loo</span><span class="p">,</span> <span class="n">eps</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">x</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">z</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">eps</span>
+        <span class="n">nobs</span> <span class="o">=</span> <span class="n">x</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+        <span class="n">score_cov</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_score_cov_estimator</span><span class="p">(</span>
+            <span class="n">debiased</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">debiased</span><span class="p">,</span> <span class="o">**</span><span class="bp">self</span><span class="o">.</span><span class="n">_cov_config</span>
+        <span class="p">)</span>
+        <span class="n">s</span> <span class="o">=</span> <span class="n">score_cov</span><span class="o">.</span><span class="n">weight_matrix</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">x_loo</span><span class="p">,</span> <span class="n">eps</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_cov_config</span> <span class="o">=</span> <span class="n">score_cov</span><span class="o">.</span><span class="n">config</span>
+        <span class="n">bread</span> <span class="o">=</span> <span class="n">inv</span><span class="p">(</span><span class="n">x_loo</span><span class="o">.</span><span class="n">T</span> <span class="o">@</span> <span class="n">x</span> <span class="o">/</span> <span class="n">nobs</span><span class="p">)</span>
+        <span class="n">c</span> <span class="o">=</span> <span class="n">bread</span> <span class="o">@</span> <span class="n">s</span> <span class="o">@</span> <span class="n">bread</span><span class="o">.</span><span class="n">T</span> <span class="o">/</span> <span class="n">nobs</span>
+        <span class="k">return</span> <span class="p">(</span><span class="n">c</span> <span class="o">+</span> <span class="n">c</span><span class="o">.</span><span class="n">T</span><span class="p">)</span> <span class="o">/</span> <span class="mi">2</span>
+
+
+<div class="viewcode-block" id="IVJIVE">
+<a class="viewcode-back" href="../../../iv/iv/linearmodels.iv.model.IVJIVE.html#linearmodels.iv.model.IVJIVE">[docs]</a>
+<span class="k">class</span><span class="w"> </span><span class="nc">IVJIVE</span><span class="p">(</span><span class="n">_IVModelBase</span><span class="p">):</span>
+<span class="w">    </span><span class="sa">r</span><span class="sd">"""</span>
+<span class="sd">    Jackknife instrumental variables estimator (JIVE)</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    dependent : array_like</span>
+<span class="sd">        Dependent variable (nobs by 1)</span>
+<span class="sd">    exog : array_like</span>
+<span class="sd">        Exogenous regressors  (nobs by nexog)</span>
+<span class="sd">    endog : array_like</span>
+<span class="sd">        Endogenous regressors (nobs by nendog)</span>
+<span class="sd">    instruments : array_like</span>
+<span class="sd">        Instrumental variables (nobs by ninstr)</span>
+<span class="sd">    weights : array_like</span>
+<span class="sd">        Observation weights used in estimation</span>
+
+<span class="sd">    Notes</span>
+<span class="sd">    -----</span>
+<span class="sd">    JIVE replaces the 2SLS first-stage fitted values :math:`\hat{X}=P_ZX` with</span>
+<span class="sd">    leave-one-out predictions. The prediction for observation :math:`i` is the</span>
+<span class="sd">    fitted value from a first stage regression that does not use observation</span>
+<span class="sd">    :math:`i`</span>
+
+<span class="sd">    .. math::</span>
+
+<span class="sd">        \tilde{x}_i = \frac{\hat{x}_i - h_i x_i}{1 - h_i},</span>
+<span class="sd">        \qquad h_i = z_i'(Z'Z)^{-1}z_i,</span>
+
+<span class="sd">    where :math:`Z` contains the exogenous regressors and the instruments and</span>
+<span class="sd">    :math:`h_i` is the leverage of observation :math:`i`. The estimator is</span>
+
+<span class="sd">    .. math::</span>
+
+<span class="sd">        \hat{\beta}_{JIVE} = (\tilde{X}'X)^{-1} \tilde{X}'y.</span>
+
+<span class="sd">    This is the estimator that is called JIVE1 by Angrist, Imbens and Krueger</span>
+<span class="sd">    (1999). Exogenous regressors are in :math:`Z`, so they are their own</span>
+<span class="sd">    leave-one-out predictions. In a weighted model the estimator is applied to</span>
+<span class="sd">    the data that has been multiplied by the square root of the weights.</span>
+
+<span class="sd">    The leverages are used to compute :math:`\tilde{X}` without estimating</span>
+<span class="sd">    :math:`n` regressions, using a QR decomposition of :math:`Z`. The estimator</span>
+<span class="sd">    cannot be computed if an observation has a leverage of 1, which happens if</span>
+<span class="sd">    it is the only observation that has a non-zero value of one of the</span>
+<span class="sd">    instruments, e.g., a dummy variable that is 1 for a single observation.</span>
+
+<span class="sd">    The covariance estimators are the same as in the other IV models, and are</span>
+<span class="sd">    computed using :math:`\tilde{X}` as the instruments. See</span>
+<span class="sd">    :meth:`~linearmodels.iv.model.IVJIVE.fit`. These are valid when the number</span>
+<span class="sd">    of instruments is small relative to the strength of the first stage. They</span>
+<span class="sd">    can understate the uncertainty when there are many instruments (see</span>
+<span class="sd">    Chao, Swanson, Hausman, Newey and Woutersen, 2012).</span>
+
+<span class="sd">    JIVE reduces the many instruments bias of 2SLS, but it can have a larger</span>
+<span class="sd">    variance, particularly when the instruments are weak (see Davidson and</span>
+<span class="sd">    MacKinnon, 2006).</span>
+
+<span class="sd">    See Also</span>
+<span class="sd">    --------</span>
+<span class="sd">    IV2SLS, IVLIML, IVGMM, IVGMMCUE</span>
+
+<span class="sd">    References</span>
+<span class="sd">    ----------</span>
+<span class="sd">    Angrist, J. D., Imbens, G. W., &amp; Krueger, A. B. (1999). Jackknife</span>
+<span class="sd">    instrumental variables estimation. *Journal of Applied Econometrics*,</span>
+<span class="sd">    14(1), 57-67.</span>
+
+<span class="sd">    Chao, J. C., Swanson, N. R., Hausman, J. A., Newey, W. K., &amp; Woutersen, T.</span>
+<span class="sd">    (2012). Asymptotic distribution of JIVE in a heteroskedastic IV regression</span>
+<span class="sd">    with many instruments. *Econometric Theory*, 28(1), 42-86.</span>
+
+<span class="sd">    Davidson, R., &amp; MacKinnon, J. G. (2006). The case against JIVE. *Journal of</span>
+<span class="sd">    Applied Econometrics*, 21(6), 827-833.</span>
+
+<span class="sd">    Examples</span>
+<span class="sd">    --------</span>
+<span class="sd">    &gt;&gt;&gt; import numpy as np</span>
+<span class="sd">    &gt;&gt;&gt; from linearmodels.iv import IVJIVE</span>
+<span class="sd">    &gt;&gt;&gt; rng = np.random.default_rng(0)</span>
+<span class="sd">    &gt;&gt;&gt; n = 500</span>
+<span class="sd">    &gt;&gt;&gt; z = rng.standard_normal((n, 3))</span>
+<span class="sd">    &gt;&gt;&gt; x = z[:, 0] + rng.standard_normal(n)</span>
+<span class="sd">    &gt;&gt;&gt; exog = np.ones((n, 1))</span>
+<span class="sd">    &gt;&gt;&gt; y = x + rng.standard_normal(n)</span>
+<span class="sd">    &gt;&gt;&gt; mod = IVJIVE(y, exog, x[:, None], z)</span>
+<span class="sd">    &gt;&gt;&gt; res = mod.fit()</span>
+<span class="sd">    """</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span>
+        <span class="n">dependent</span><span class="p">:</span> <span class="n">IVDataLike</span><span class="p">,</span>
+        <span class="n">exog</span><span class="p">:</span> <span class="n">IVDataLike</span> <span class="o">|</span> <span class="kc">None</span><span class="p">,</span>
+        <span class="n">endog</span><span class="p">:</span> <span class="n">IVDataLike</span> <span class="o">|</span> <span class="kc">None</span><span class="p">,</span>
+        <span class="n">instruments</span><span class="p">:</span> <span class="n">IVDataLike</span> <span class="o">|</span> <span class="kc">None</span><span class="p">,</span>
+        <span class="o">*</span><span class="p">,</span>
+        <span class="n">weights</span><span class="p">:</span> <span class="n">IVDataLike</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_method</span> <span class="o">=</span> <span class="s2">"IV-JIVE"</span>
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">dependent</span><span class="p">,</span> <span class="n">exog</span><span class="p">,</span> <span class="n">endog</span><span class="p">,</span> <span class="n">instruments</span><span class="p">,</span> <span class="n">weights</span><span class="o">=</span><span class="n">weights</span><span class="p">)</span>
+
+<div class="viewcode-block" id="IVJIVE.from_formula">
+<a class="viewcode-back" href="../../../iv/iv/linearmodels.iv.model.IVJIVE.from_formula.html#linearmodels.iv.model.IVJIVE.from_formula">[docs]</a>
+    <span class="nd">@staticmethod</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">from_formula</span><span class="p">(</span>
+        <span class="n">formula</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">data</span><span class="p">:</span> <span class="n">DataFrame</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">weights</span><span class="p">:</span> <span class="n">IVDataLike</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">IVJIVE</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">"""</span>
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        formula : str</span>
+<span class="sd">            Formula modified for the IV syntax described in the notes section</span>
+<span class="sd">        data : DataFrame</span>
+<span class="sd">            DataFrame containing the variables used in the formula</span>
+<span class="sd">        weights : array_like</span>
+<span class="sd">            Observation weights used in estimation</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        IVJIVE</span>
+<span class="sd">            Model instance</span>
+
+<span class="sd">        Notes</span>
+<span class="sd">        -----</span>
+<span class="sd">        The IV formula modifies the standard formula syntax to include a</span>
+<span class="sd">        block of the form [endog ~ instruments] which is used to indicate</span>
+<span class="sd">        the list of endogenous variables and instruments.  The general</span>
+<span class="sd">        structure of an IV formula is `dependent ~ exog [endog ~ instruments]`</span>
+
+<span class="sd">        Examples</span>
+<span class="sd">        --------</span>
+<span class="sd">        &gt;&gt;&gt; from linearmodels.datasets import wage</span>
+<span class="sd">        &gt;&gt;&gt; from linearmodels.iv import IVJIVE</span>
+<span class="sd">        &gt;&gt;&gt; data = wage.load()</span>
+<span class="sd">        &gt;&gt;&gt; formula = "np.log(wage) ~ 1 + exper + exper ** 2 + brthord + [educ ~ sibs]"</span>
+<span class="sd">        &gt;&gt;&gt; mod = IVJIVE.from_formula(formula, data)</span>
+<span class="sd">        """</span>
+        <span class="n">parser</span> <span class="o">=</span> <span class="n">IVFormulaParser</span><span class="p">(</span><span class="n">formula</span><span class="p">,</span> <span class="n">data</span><span class="p">)</span>
+        <span class="n">dep</span><span class="p">,</span> <span class="n">exog</span><span class="p">,</span> <span class="n">endog</span><span class="p">,</span> <span class="n">instr</span> <span class="o">=</span> <span class="n">parser</span><span class="o">.</span><span class="n">data</span>
+        <span class="n">mod</span> <span class="o">=</span> <span class="n">IVJIVE</span><span class="p">(</span><span class="n">dep</span><span class="p">,</span> <span class="n">exog</span><span class="p">,</span> <span class="n">endog</span><span class="p">,</span> <span class="n">instr</span><span class="p">,</span> <span class="n">weights</span><span class="o">=</span><span class="n">weights</span><span class="p">)</span>
+        <span class="n">mod</span><span class="o">.</span><span class="n">formula</span> <span class="o">=</span> <span class="n">formula</span>
+        <span class="k">return</span> <span class="n">mod</span></div>
+
+
+<div class="viewcode-block" id="IVJIVE.fit">
+<a class="viewcode-back" href="../../../iv/iv/linearmodels.iv.model.IVJIVE.fit.html#linearmodels.iv.model.IVJIVE.fit">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">fit</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">cov_type</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">"robust"</span><span class="p">,</span> <span class="n">debiased</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span> <span class="o">**</span><span class="n">cov_config</span><span class="p">:</span> <span class="n">Any</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">IVResults</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">"""</span>
+<span class="sd">        Estimate model parameters</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        cov_type : str</span>
+<span class="sd">            Name of covariance estimator to use. Supported covariance</span>
+<span class="sd">            estimators are:</span>
+
+<span class="sd">            * "unadjusted", "homoskedastic" - Classic homoskedastic inference</span>
+<span class="sd">            * "robust", "heteroskedastic" - Heteroskedasticity robust inference</span>
+<span class="sd">            * "kernel" - Heteroskedasticity and autocorrelation robust</span>
+<span class="sd">              inference</span>
+<span class="sd">            * "clustered" - One-way cluster dependent inference.</span>
+<span class="sd">              Heteroskedasticity robust</span>
+
+<span class="sd">        debiased : bool</span>
+<span class="sd">            Flag indicating whether to debiased the covariance estimator using</span>
+<span class="sd">            a degree of freedom adjustment.</span>
+<span class="sd">        cov_config</span>
+<span class="sd">            Additional parameters to pass to covariance estimator. The list</span>
+<span class="sd">            of optional parameters differ according to ``cov_type``. See</span>
+<span class="sd">            the documentation of the alternative covariance estimators for</span>
+<span class="sd">            the complete list of available commands.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        IVResults</span>
+<span class="sd">            Results container</span>
+
+<span class="sd">        Notes</span>
+<span class="sd">        -----</span>
+<span class="sd">        The covariance estimators are the same as in the other IV models with</span>
+<span class="sd">        the leave-one-out first-stage predictions as the instruments. The</span>
+<span class="sd">        additional parameters depend on the estimator: ``kernel`` and</span>
+<span class="sd">        ``bandwidth`` for "kernel" and ``clusters`` for "clustered".  The</span>
+<span class="sd">        defaults are used if none are provided.</span>
+
+<span class="sd">        Since JIVE is not a k-class estimator, ``kappa`` is None in the</span>
+<span class="sd">        results.</span>
+
+<span class="sd">        See Also</span>
+<span class="sd">        --------</span>
+<span class="sd">        linearmodels.iv.gmm.IVGMMCovariance</span>
+<span class="sd">        """</span>
+        <span class="n">wy</span><span class="p">,</span> <span class="n">wx</span><span class="p">,</span> <span class="n">wz</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_wy</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_wx</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_wz</span>
+
+        <span class="c1"># The leverages and the first-stage predictions from an orthonormal</span>
+        <span class="c1"># basis of Z. This is much more accurate than forming (Z'Z)^{-1} when</span>
+        <span class="c1"># the instruments are highly correlated, which is common with many</span>
+        <span class="c1"># instruments</span>
+        <span class="n">q</span><span class="p">,</span> <span class="n">_</span> <span class="o">=</span> <span class="n">qr</span><span class="p">(</span><span class="n">wz</span><span class="p">)</span>
+        <span class="n">leverage</span> <span class="o">=</span> <span class="p">(</span><span class="n">q</span> <span class="o">*</span> <span class="n">q</span><span class="p">)</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">npany</span><span class="p">(</span><span class="n">leverage</span> <span class="o">&gt;=</span> <span class="mf">1.0</span> <span class="o">-</span> <span class="mf">1e-10</span><span class="p">):</span>
+            <span class="n">nbad</span> <span class="o">=</span> <span class="nb">int</span><span class="p">((</span><span class="n">leverage</span> <span class="o">&gt;=</span> <span class="mf">1.0</span> <span class="o">-</span> <span class="mf">1e-10</span><span class="p">)</span><span class="o">.</span><span class="n">sum</span><span class="p">())</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
+                <span class="sa">f</span><span class="s2">"JIVE cannot be computed since </span><span class="si">{</span><span class="n">nbad</span><span class="si">}</span><span class="s2"> observation(s) have a "</span>
+                <span class="s2">"leverage of 1. This happens when an observation is the only "</span>
+                <span class="s2">"one with a non-zero value of one of the instruments, e.g., a "</span>
+                <span class="s2">"dummy variable that is 1 for a single observation."</span>
+            <span class="p">)</span>
+
+        <span class="n">xhat</span> <span class="o">=</span> <span class="n">q</span> <span class="o">@</span> <span class="p">(</span><span class="n">q</span><span class="o">.</span><span class="n">T</span> <span class="o">@</span> <span class="n">wx</span><span class="p">)</span>
+        <span class="n">x_loo</span> <span class="o">=</span> <span class="p">(</span><span class="n">xhat</span> <span class="o">-</span> <span class="n">leverage</span><span class="p">[:,</span> <span class="kc">None</span><span class="p">]</span> <span class="o">*</span> <span class="n">wx</span><span class="p">)</span> <span class="o">/</span> <span class="p">(</span><span class="mf">1.0</span> <span class="o">-</span> <span class="n">leverage</span><span class="p">)[:,</span> <span class="kc">None</span><span class="p">]</span>
+        <span class="c1"># Exogenous regressors are in Z and so are their own predictions</span>
+        <span class="n">is_exog</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_regressor_is_exog</span>
+        <span class="n">x_loo</span><span class="p">[:,</span> <span class="n">is_exog</span><span class="p">]</span> <span class="o">=</span> <span class="n">wx</span><span class="p">[:,</span> <span class="n">is_exog</span><span class="p">]</span>
+
+        <span class="n">params</span> <span class="o">=</span> <span class="n">solve</span><span class="p">(</span><span class="n">x_loo</span><span class="o">.</span><span class="n">T</span> <span class="o">@</span> <span class="n">wx</span><span class="p">,</span> <span class="n">x_loo</span><span class="o">.</span><span class="n">T</span> <span class="o">@</span> <span class="n">wy</span><span class="p">)</span>
+
+        <span class="n">cov_estimator</span> <span class="o">=</span> <span class="n">_JIVECovariance</span><span class="p">(</span>
+            <span class="n">wx</span><span class="p">,</span> <span class="n">wy</span><span class="p">,</span> <span class="n">x_loo</span><span class="p">,</span> <span class="n">params</span><span class="p">,</span> <span class="n">cov_type</span><span class="p">,</span> <span class="n">debiased</span><span class="p">,</span> <span class="o">**</span><span class="n">cov_config</span>
+        <span class="p">)</span>
+        <span class="n">results</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_post_estimation</span><span class="p">(</span><span class="n">params</span><span class="p">,</span> <span class="n">cov_estimator</span><span class="p">,</span> <span class="n">cov_type</span><span class="p">)</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="n">liml_kappa</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_estimate_kappa</span><span class="p">()</span>
+        <span class="k">except</span> <span class="n">LinAlgError</span><span class="p">:</span>
+            <span class="c1"># Only needed for two tests of overidentification</span>
+            <span class="n">liml_kappa</span> <span class="o">=</span> <span class="n">nan</span>
+        <span class="n">results</span><span class="p">[</span><span class="s2">"liml_kappa"</span><span class="p">]</span> <span class="o">=</span> <span class="n">liml_kappa</span>
+        <span class="c1"># JIVE is not a k-class estimator</span>
+        <span class="n">results</span><span class="p">[</span><span class="s2">"kappa"</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="k">return</span> <span class="n">IVResults</span><span class="p">(</span><span class="n">results</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span></div>
+</div>
+
 </code></pre></div>
 
 

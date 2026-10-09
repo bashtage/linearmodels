@@ -23,7 +23,7 @@
     
   
       
-        <title>Introduction - linearmodels v7.1 (+133)</title>
+        <title>Introduction - linearmodels v7.1 (+141)</title>
       
     
 
@@ -100,7 +100,7 @@
 
 <header class="md-header md-header--shadow" data-md-component="header">
   <nav class="md-header__inner md-grid" aria-label="Header">
-    <a href="../index.html" title="linearmodels v7.1 (+133)" class="md-header__button md-logo" aria-label="linearmodels v7.1 (+133)" data-md-component="logo">
+    <a href="../index.html" title="linearmodels v7.1 (+141)" class="md-header__button md-logo" aria-label="linearmodels v7.1 (+141)" data-md-component="logo">
       <img src="../_static/bw-logo.svg" alt="logo">
     </a>
     <label class="md-header__button md-icon" for="__drawer">
@@ -111,7 +111,7 @@
       <div class="md-header__ellipsis">
         <div class="md-header__topic">
           <span class="md-ellipsis">
-            linearmodels v7.1 (+133)
+            linearmodels v7.1 (+141)
           </span>
         </div>
         <div class="md-header__topic" data-md-component="header-topic">
@@ -206,10 +206,10 @@
 
 <nav class="md-nav md-nav--primary" aria-label="Navigation" data-md-level="0">
   <label class="md-nav__title" for="__drawer">
-    <a href="../index.html" title="linearmodels v7.1 (+133)" class="md-nav__button md-logo" aria-label="linearmodels v7.1 (+133)" data-md-component="logo">
+    <a href="../index.html" title="linearmodels v7.1 (+141)" class="md-nav__button md-logo" aria-label="linearmodels v7.1 (+141)" data-md-component="logo">
       <img src="../_static/bw-logo.svg" alt="logo">
     </a>
-    linearmodels v7.1 (+133)
+    linearmodels v7.1 (+141)
   </label>
   
     <div class="md-nav__source">
@@ -364,6 +364,16 @@
     
     <span class="md-ellipsis">
       <span title="/iv/introduction.rst#liml-estimation (reference label)"><span>LIML Estimation</span></span>
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#jive-estimation" class="md-nav__link">
+    
+    <span class="md-ellipsis">
+      <span title="/iv/introduction.rst#jive-estimation (reference label)"><span>JIVE Estimation</span></span>
     </span>
   </a>
   
@@ -894,6 +904,16 @@
 </li>
         
           <li class="md-nav__item">
+  <a href="#jive-estimation" class="md-nav__link">
+    
+    <span class="md-ellipsis">
+      <span title="/iv/introduction.rst#jive-estimation (reference label)"><span>JIVE Estimation</span></span>
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
   <a href="#gmm-and-gmm-cue-estimation" class="md-nav__link">
     
     <span class="md-ellipsis">
@@ -1044,7 +1064,7 @@ also valid to use when projecting the endogenous variables.</p></li>
 </code></pre></div>
 </div>
 <h2 id="estimators">Estimators<a class="headerlink" href="#estimators" title="Link to this heading">¶</a></h2>
-<p>Four methods to estimate models are available.</p>
+<p>Five methods to estimate models are available.</p>
 <ul class="simple">
 <li><p>Two-stage least squares (2SLS) <a class="reference internal" href="iv/linearmodels.iv.model.IV2SLS.html#linearmodels.iv.model.IV2SLS" title="linearmodels.iv.model.IV2SLS (Python class) — Estimation of IV models using two-stage least squares"><code class="xref py py-class docutils literal notranslate"><span class="pre">IV2SLS</span></code></a></p></li>
 <li><p>Limited Information Maximum Likelihood (LIML) and related k-class
@@ -1052,6 +1072,7 @@ estimators <a class="reference internal" href="iv/linearmodels.iv.model.IVLIML.h
 <li><p>Generalized Method of Moments (GMM) <a class="reference internal" href="iv/linearmodels.iv.model.IVGMM.html#linearmodels.iv.model.IVGMM" title="linearmodels.iv.model.IVGMM (Python class) — Estimation of IV models using the generalized method of moments (GMM)"><code class="xref py py-class docutils literal notranslate"><span class="pre">IVGMM</span></code></a></p></li>
 <li><p>Generalized Method of Moments using the Continuously Updating Estimator
 (CUE) <a class="reference internal" href="iv/linearmodels.iv.model.IVGMMCUE.html#linearmodels.iv.model.IVGMMCUE" title="linearmodels.iv.model.IVGMMCUE (Python class) — Estimation of IV models using continuously updating GMM"><code class="xref py py-class docutils literal notranslate"><span class="pre">IVGMMCUE</span></code></a></p></li>
+<li><p>Jackknife IV Estimator (JIVE) <a class="reference internal" href="iv/linearmodels.iv.model.IVJIVE.html#linearmodels.iv.model.IVJIVE" title="linearmodels.iv.model.IVJIVE (Python class) — Jackknife instrumental variables estimator (JIVE)"><code class="xref py py-class docutils literal notranslate"><span class="pre">IVJIVE</span></code></a></p></li>
 </ul>
 <p>All estimator require the same four key inputs, <code class="docutils literal notranslate"><span class="pre">dependent</span></code>, <code class="docutils literal notranslate"><span class="pre">exog</span></code> ,
 <code class="docutils literal notranslate"><span class="pre">endog</span></code>  and <code class="docutils literal notranslate"><span class="pre">instruments</span></code>. In addition to these four required
@@ -1073,6 +1094,11 @@ finite sample correction to the usual LIML estimator.</p></li>
 <li><p><code class="docutils literal notranslate"><span class="pre">kappa</span></code> allows a user-specified value of <span class="math notranslate nohighlight">\(\kappa\)</span> to be provided in
 which case the LIML estimated value of <span class="math notranslate nohighlight">\(\kappa\)</span> is ignored.</p></li>
 </ul>
+<h4 id="jive-estimation">JIVE Estimation<a class="headerlink" href="#jive-estimation" title="Link to this heading">¶</a></h4>
+<p>The JIVE estimator has no optional arguments. It uses first-stage
+predictions that leave out each observation as the instruments, which reduces
+the bias of 2SLS when there are many instruments. The covariance estimators
+that are available for the other estimators can be used with <code class="docutils literal notranslate"><span class="pre">fit</span></code>.</p>
 <h4 id="gmm-and-gmm-cue-estimation">GMM and GMM-CUE Estimation<a class="headerlink" href="#gmm-and-gmm-cue-estimation" title="Link to this heading">¶</a></h4>
 <ul>
 <li><p><code class="docutils literal notranslate"><span class="pre">weight_type</span></code> accepts a string which indicates the type of weighting

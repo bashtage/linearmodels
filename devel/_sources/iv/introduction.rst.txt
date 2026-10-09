@@ -79,7 +79,7 @@ same four required inputs:
 
 Estimators
 ==========
-Four methods to estimate models are available.
+Five methods to estimate models are available.
 
 * Two-stage least squares (2SLS) :class:`~linearmodels.iv.model.IV2SLS`
 * Limited Information Maximum Likelihood (LIML) and related k-class
@@ -87,6 +87,7 @@ Four methods to estimate models are available.
 * Generalized Method of Moments (GMM) :class:`~linearmodels.iv.model.IVGMM`
 * Generalized Method of Moments using the Continuously Updating Estimator
   (CUE) :class:`~linearmodels.iv.model.IVGMMCUE`
+* Jackknife IV Estimator (JIVE) :class:`~linearmodels.iv.model.IVJIVE`
 
 All estimator require the same four key inputs, ``dependent``, ``exog`` ,
 ``endog``  and ``instruments``. In addition to these four required
@@ -114,6 +115,13 @@ Two optional arguments can be used to alter the estimation method when using IVL
   finite sample correction to the usual LIML estimator.
 * ``kappa`` allows a user-specified value of :math:`\kappa` to be provided in
   which case the LIML estimated value of :math:`\kappa` is ignored.
+
+JIVE Estimation
+^^^^^^^^^^^^^^^
+The JIVE estimator has no optional arguments. It uses first-stage
+predictions that leave out each observation as the instruments, which reduces
+the bias of 2SLS when there are many instruments. The covariance estimators
+that are available for the other estimators can be used with ``fit``.
 
 GMM and GMM-CUE Estimation
 ^^^^^^^^^^^^^^^^^^^^^^^^^^
