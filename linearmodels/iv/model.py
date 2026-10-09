@@ -29,7 +29,7 @@ from numpy import (
     sqrt,
     squeeze,
 )
-from numpy.linalg import eigvalsh, inv, matrix_rank, pinv
+from numpy.linalg import eigvalsh, inv, matrix_rank, pinv, solve
 from pandas import DataFrame, Series, concat
 from scipy.optimize import minimize
 
@@ -1044,9 +1044,43 @@ class _IVGMMBase(_IVModelBase):
             "weight_config": self._weight.config,
             "iterations": iters,
             "j_stat": self._j_statistic(params, weight_mat),
+            "centered_j_stat": self._centered_j_statistic(params),
         }
 
         return gmm_specific
+
+    def _centered_j_statistic(
+        self, params: linearmodels.typing.data.Float64Array
+    ) -> WaldTestStatistic | InvalidTestStatistic:
+        """
+        J statistic that uses a centered estimate of the moment covariance
+
+        The covariance of the moment conditions is estimated using the same
+        estimator as the model, i.e., the one selected by ``weight_type`` and
+        ``weight_config``, except that the mean of the moment conditions is
+        always subtracted, and it is evaluated at ``params``.
+        """
+        y, x, z = self._wy, self._wx, self._wz
+        nobs, nvar, ninstr = y.shape[0], x.shape[1], z.shape[1]
+        name = "Centered J-test of overidentifying restrictions"
+        eps = y - x @ params
+        g_bar = (z * eps).mean(0)
+
+        weight_matrix_estimator = WEIGHT_MATRICES[self._weight_type]
+        centered = weight_matrix_estimator(**{**self._weight_kwargs, "center": True})
+        s_c = centered.weight_matrix(x, z, eps)
+        if matrix_rank(s_c, hermitian=True) < ninstr:
+            # The centered cluster sums add to zero, so a clustered estimator
+            # has rank at most one less than the number of clusters
+            reason = (
+                "The centered covariance of the moment conditions is singular, "
+                "so the statistic is not defined. This occurs, for example, "
+                "when there are too few clusters."
+            )
+            return InvalidTestStatistic(reason, name=name)
+        stat = float(nobs * g_bar @ solve(s_c, g_bar))
+        null = "Expected moment conditions are equal to 0"
+        return WaldTestStatistic(stat, null, ninstr - nvar, name=name)
 
     def _j_statistic(
         self,
@@ -1337,6 +1371,7 @@ class IVGMM(_IVGMMBase):
             "weight_config": self._weight.config,
             "iterations": iters,
             "j_stat": self._j_statistic(params, weight_mat),
+            "centered_j_stat": self._centered_j_statistic(params),
         }
 
         return gmm_specific
