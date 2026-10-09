@@ -21,6 +21,7 @@ Instrumental Variable Estimation
    IVLIML
    IVGMM
    IVGMMCUE
+   IVJIVE
    _OLS
 
 Absorbing Least Squares

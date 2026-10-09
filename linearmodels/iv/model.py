@@ -29,7 +29,7 @@ from numpy import (
     sqrt,
     squeeze,
 )
-from numpy.linalg import eigvalsh, inv, matrix_rank, pinv, solve
+from numpy.linalg import LinAlgError, eigvalsh, inv, matrix_rank, pinv, qr, solve
 from pandas import DataFrame, Series, concat
 from scipy.optimize import minimize
 
@@ -445,6 +445,23 @@ class _IVModelBase:
         nobs, nvar = self._x.shape
         return f_statistic(params, cov, debiased, nobs - nvar, const_loc)
 
+    def _estimate_kappa(self) -> float:
+        """The value of kappa in LIML, which is the same for any estimator"""
+        y, x, z = self._wy, self._wx, self._wz
+        is_exog = self._regressor_is_exog
+        e = c_[y, x[:, ~is_exog]]
+        x1 = x[:, is_exog]
+
+        ez = e - z @ (pinv(z) @ e)
+        if x1.shape[1] == 0:  # No exogenous regressors
+            ex1 = e
+        else:
+            ex1 = e - x1 @ (pinv(x1) @ e)
+
+        vpmzv_sqinv = inv_sqrth(ez.T @ ez)
+        q = vpmzv_sqinv @ (ex1.T @ ex1) @ vpmzv_sqinv
+        return min(eigvalsh(q))
+
     def _post_estimation(
         self,
         params: linearmodels.typing.data.Float64Array,
@@ -612,22 +629,6 @@ class _IVLSModelBase(_IVModelBase):
         p1 = (x.T @ x) * (1 - kappa) + kappa * ((x.T @ z) @ (pinvz @ x))
         p2 = (x.T @ y) * (1 - kappa) + kappa * ((x.T @ z) @ (pinvz @ y))
         return inv(p1) @ p2
-
-    def _estimate_kappa(self) -> float:
-        y, x, z = self._wy, self._wx, self._wz
-        is_exog = self._regressor_is_exog
-        e = c_[y, x[:, ~is_exog]]
-        x1 = x[:, is_exog]
-
-        ez = e - z @ (pinv(z) @ e)
-        if x1.shape[1] == 0:  # No exogenous regressors
-            ex1 = e
-        else:
-            ex1 = e - x1 @ (pinv(x1) @ e)
-
-        vpmzv_sqinv = inv_sqrth(ez.T @ ez)
-        q = vpmzv_sqinv @ (ex1.T @ ex1) @ vpmzv_sqinv
-        return min(eigvalsh(q))
 
     def fit(
         self, *, cov_type: str = "robust", debiased: bool = False, **cov_config: Any
@@ -1803,3 +1804,327 @@ def _gmm_model_from_formula(
     )
     mod.formula = formula
     return mod
+
+
+class _UncenteredHomoskedasticWeightMatrix(HomoskedasticWeightMatrix):
+    r"""
+    Homoskedastic covariance of the moment conditions, without centering
+
+    The homoskedastic covariance estimators of the IV models use the uncentered
+    variance :math:`\hat{\epsilon}'\hat{\epsilon}/n` of the residuals.
+    HomoskedasticWeightMatrix always subtracts the mean of the residuals, which
+    only has no effect if the mean is zero. The mean of the weighted residuals
+    is not zero in a weighted model that has a constant.
+    """
+
+    def weight_matrix(
+        self,
+        x: linearmodels.typing.data.Float64Array,
+        z: linearmodels.typing.data.Float64Array,
+        eps: linearmodels.typing.data.Float64Array,
+    ) -> linearmodels.typing.data.Float64Array:
+        nobs, nvar = x.shape
+        s2 = float(squeeze(eps.T @ eps)) / nobs
+        w = s2 * z.T @ z / nobs
+        w *= 1 if not self._debiased else nobs / (nobs - nvar)
+        return w
+
+
+class _JIVECovariance(IVGMMCovariance):
+    r"""
+    Covariance of the JIVE estimator
+
+    JIVE is the IV estimator that uses the leave-one-out first-stage
+    predictions :math:`\tilde{X}` as the instruments, and
+    :math:`\hat\beta=(\tilde{X}'X)^{-1}\tilde{X}'y`. This is a just identified
+    GMM estimator with moment conditions :math:`\tilde{x}_i\epsilon_i`, so the
+    covariance is
+
+    .. math::
+
+        n^{-1}(\tilde{X}'X/n)^{-1} S (X'\tilde{X}/n)^{-1}
+
+    where :math:`S` is an estimate of the covariance of
+    :math:`\tilde{x}_i\hat\epsilon_i`, and :math:`\hat\epsilon_i` is the
+    residual computed with :math:`X` and not :math:`\tilde{X}`. The choices of
+    :math:`S` are the same as in the other IV models.
+
+    Parameters
+    ----------
+    x : ndarray
+        Weighted regressors (nobs by nvar)
+    y : ndarray
+        Weighted dependent variable (nobs by 1)
+    x_loo : ndarray
+        Weighted leave-one-out first-stage predictions (nobs by nvar)
+    params : ndarray
+        Estimated model parameters (nvar by 1)
+    cov_type : str
+        Covariance estimator to use. See IVJIVE.fit for the choices.
+    debiased : bool
+        Flag indicating whether to debias the covariance estimator
+    cov_config
+        Optional keyword arguments that are specific to a particular cov_type
+    """
+
+    def __init__(
+        self,
+        x: linearmodels.typing.data.Float64Array,
+        y: linearmodels.typing.data.Float64Array,
+        x_loo: linearmodels.typing.data.Float64Array,
+        params: linearmodels.typing.data.Float64Array,
+        cov_type: str = "robust",
+        debiased: bool = False,
+        **cov_config: str | bool,
+    ) -> None:
+        # The weight matrix has no effect in a just identified model
+        w = eye(x.shape[1])
+        super().__init__(x, y, x_loo, params, w, cov_type, debiased, **cov_config)
+        self._name = "JIVE Covariance"
+        if cov_type in ("unadjusted", "homoskedastic"):
+            self._score_cov_estimator = _UncenteredHomoskedasticWeightMatrix
+
+    @property
+    def cov(self) -> linearmodels.typing.data.Float64Array:
+        # Not the GMM covariance with an identity weight matrix, which forms
+        # the inverse of (X'X~)(X~'X) and squares the condition number. That is
+        # not accurate when the regressors have different scales
+        x, x_loo, eps = self.x, self.z, self.eps
+        nobs = x.shape[0]
+        score_cov = self._score_cov_estimator(
+            debiased=self.debiased, **self._cov_config
+        )
+        s = score_cov.weight_matrix(x, x_loo, eps)
+        self._cov_config = score_cov.config
+        bread = inv(x_loo.T @ x / nobs)
+        c = bread @ s @ bread.T / nobs
+        return (c + c.T) / 2
+
+
+class IVJIVE(_IVModelBase):
+    r"""
+    Jackknife instrumental variables estimator (JIVE)
+
+    Parameters
+    ----------
+    dependent : array_like
+        Dependent variable (nobs by 1)
+    exog : array_like
+        Exogenous regressors  (nobs by nexog)
+    endog : array_like
+        Endogenous regressors (nobs by nendog)
+    instruments : array_like
+        Instrumental variables (nobs by ninstr)
+    weights : array_like
+        Observation weights used in estimation
+
+    Notes
+    -----
+    JIVE replaces the 2SLS first-stage fitted values :math:`\hat{X}=P_ZX` with
+    leave-one-out predictions. The prediction for observation :math:`i` is the
+    fitted value from a first stage regression that does not use observation
+    :math:`i`
+
+    .. math::
+
+        \tilde{x}_i = \frac{\hat{x}_i - h_i x_i}{1 - h_i},
+        \qquad h_i = z_i'(Z'Z)^{-1}z_i,
+
+    where :math:`Z` contains the exogenous regressors and the instruments and
+    :math:`h_i` is the leverage of observation :math:`i`. The estimator is
+
+    .. math::
+
+        \hat{\beta}_{JIVE} = (\tilde{X}'X)^{-1} \tilde{X}'y.
+
+    This is the estimator that is called JIVE1 by Angrist, Imbens and Krueger
+    (1999). Exogenous regressors are in :math:`Z`, so they are their own
+    leave-one-out predictions. In a weighted model the estimator is applied to
+    the data that has been multiplied by the square root of the weights.
+
+    The leverages are used to compute :math:`\tilde{X}` without estimating
+    :math:`n` regressions, using a QR decomposition of :math:`Z`. The estimator
+    cannot be computed if an observation has a leverage of 1, which happens if
+    it is the only observation that has a non-zero value of one of the
+    instruments, e.g., a dummy variable that is 1 for a single observation.
+
+    The covariance estimators are the same as in the other IV models, and are
+    computed using :math:`\tilde{X}` as the instruments. See
+    :meth:`~linearmodels.iv.model.IVJIVE.fit`. These are valid when the number
+    of instruments is small relative to the strength of the first stage. They
+    can understate the uncertainty when there are many instruments (see
+    Chao, Swanson, Hausman, Newey and Woutersen, 2012).
+
+    JIVE reduces the many instruments bias of 2SLS, but it can have a larger
+    variance, particularly when the instruments are weak (see Davidson and
+    MacKinnon, 2006).
+
+    See Also
+    --------
+    IV2SLS, IVLIML, IVGMM, IVGMMCUE
+
+    References
+    ----------
+    Angrist, J. D., Imbens, G. W., & Krueger, A. B. (1999). Jackknife
+    instrumental variables estimation. *Journal of Applied Econometrics*,
+    14(1), 57-67.
+
+    Chao, J. C., Swanson, N. R., Hausman, J. A., Newey, W. K., & Woutersen, T.
+    (2012). Asymptotic distribution of JIVE in a heteroskedastic IV regression
+    with many instruments. *Econometric Theory*, 28(1), 42-86.
+
+    Davidson, R., & MacKinnon, J. G. (2006). The case against JIVE. *Journal of
+    Applied Econometrics*, 21(6), 827-833.
+
+    Examples
+    --------
+    >>> import numpy as np
+    >>> from linearmodels.iv import IVJIVE
+    >>> rng = np.random.default_rng(0)
+    >>> n = 500
+    >>> z = rng.standard_normal((n, 3))
+    >>> x = z[:, 0] + rng.standard_normal(n)
+    >>> exog = np.ones((n, 1))
+    >>> y = x + rng.standard_normal(n)
+    >>> mod = IVJIVE(y, exog, x[:, None], z)
+    >>> res = mod.fit()
+    """
+
+    def __init__(
+        self,
+        dependent: IVDataLike,
+        exog: IVDataLike | None,
+        endog: IVDataLike | None,
+        instruments: IVDataLike | None,
+        *,
+        weights: IVDataLike | None = None,
+    ) -> None:
+        self._method = "IV-JIVE"
+        super().__init__(dependent, exog, endog, instruments, weights=weights)
+
+    @staticmethod
+    def from_formula(
+        formula: str, data: DataFrame, *, weights: IVDataLike | None = None
+    ) -> IVJIVE:
+        """
+        Parameters
+        ----------
+        formula : str
+            Formula modified for the IV syntax described in the notes section
+        data : DataFrame
+            DataFrame containing the variables used in the formula
+        weights : array_like
+            Observation weights used in estimation
+
+        Returns
+        -------
+        IVJIVE
+            Model instance
+
+        Notes
+        -----
+        The IV formula modifies the standard formula syntax to include a
+        block of the form [endog ~ instruments] which is used to indicate
+        the list of endogenous variables and instruments.  The general
+        structure of an IV formula is `dependent ~ exog [endog ~ instruments]`
+
+        Examples
+        --------
+        >>> from linearmodels.datasets import wage
+        >>> from linearmodels.iv import IVJIVE
+        >>> data = wage.load()
+        >>> formula = "np.log(wage) ~ 1 + exper + exper ** 2 + brthord + [educ ~ sibs]"
+        >>> mod = IVJIVE.from_formula(formula, data)
+        """
+        parser = IVFormulaParser(formula, data)
+        dep, exog, endog, instr = parser.data
+        mod = IVJIVE(dep, exog, endog, instr, weights=weights)
+        mod.formula = formula
+        return mod
+
+    def fit(
+        self, *, cov_type: str = "robust", debiased: bool = False, **cov_config: Any
+    ) -> IVResults:
+        """
+        Estimate model parameters
+
+        Parameters
+        ----------
+        cov_type : str
+            Name of covariance estimator to use. Supported covariance
+            estimators are:
+
+            * "unadjusted", "homoskedastic" - Classic homoskedastic inference
+            * "robust", "heteroskedastic" - Heteroskedasticity robust inference
+            * "kernel" - Heteroskedasticity and autocorrelation robust
+              inference
+            * "clustered" - One-way cluster dependent inference.
+              Heteroskedasticity robust
+
+        debiased : bool
+            Flag indicating whether to debiased the covariance estimator using
+            a degree of freedom adjustment.
+        cov_config
+            Additional parameters to pass to covariance estimator. The list
+            of optional parameters differ according to ``cov_type``. See
+            the documentation of the alternative covariance estimators for
+            the complete list of available commands.
+
+        Returns
+        -------
+        IVResults
+            Results container
+
+        Notes
+        -----
+        The covariance estimators are the same as in the other IV models with
+        the leave-one-out first-stage predictions as the instruments. The
+        additional parameters depend on the estimator: ``kernel`` and
+        ``bandwidth`` for "kernel" and ``clusters`` for "clustered".  The
+        defaults are used if none are provided.
+
+        Since JIVE is not a k-class estimator, ``kappa`` is None in the
+        results.
+
+        See Also
+        --------
+        linearmodels.iv.gmm.IVGMMCovariance
+        """
+        wy, wx, wz = self._wy, self._wx, self._wz
+
+        # The leverages and the first-stage predictions from an orthonormal
+        # basis of Z. This is much more accurate than forming (Z'Z)^{-1} when
+        # the instruments are highly correlated, which is common with many
+        # instruments
+        q, _ = qr(wz)
+        leverage = (q * q).sum(axis=1)
+        if npany(leverage >= 1.0 - 1e-10):
+            nbad = int((leverage >= 1.0 - 1e-10).sum())
+            raise ValueError(
+                f"JIVE cannot be computed since {nbad} observation(s) have a "
+                "leverage of 1. This happens when an observation is the only "
+                "one with a non-zero value of one of the instruments, e.g., a "
+                "dummy variable that is 1 for a single observation."
+            )
+
+        xhat = q @ (q.T @ wx)
+        x_loo = (xhat - leverage[:, None] * wx) / (1.0 - leverage)[:, None]
+        # Exogenous regressors are in Z and so are their own predictions
+        is_exog = self._regressor_is_exog
+        x_loo[:, is_exog] = wx[:, is_exog]
+
+        params = solve(x_loo.T @ wx, x_loo.T @ wy)
+
+        cov_estimator = _JIVECovariance(
+            wx, wy, x_loo, params, cov_type, debiased, **cov_config
+        )
+        results = self._post_estimation(params, cov_estimator, cov_type)
+        try:
+            liml_kappa = self._estimate_kappa()
+        except LinAlgError:
+            # Only needed for two tests of overidentification
+            liml_kappa = nan
+        results["liml_kappa"] = liml_kappa
+        # JIVE is not a k-class estimator
+        results["kappa"] = None
+        return IVResults(results, self)
