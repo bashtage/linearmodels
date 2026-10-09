@@ -16,69 +16,67 @@ jobs:
   pool:
     vmImage: ${{ parameters.vmImage }}
   strategy:
+    # Variables of an entry
+    #   python.version   Version of Python. 3.15-dev is the newest 3.15, including
+    #                    release candidates.
+    #   PACKAGES         Installed in a single pip command with requirements.txt and
+    #                    requirements-test.txt, so that pip also picks versions of
+    #                    matplotlib, xarray, ... that work with the pins.
+    #   PYTEST_PATTERN   (slow or not slow) also runs the slow tests
+    #   test.sdist, test.wheel
+    #                    Build and install the package in site-packages and test it
+    #   BUILD_FLAGS      Options for building the Cython extension
+    #   cython.coverage  Create the C file that coverage uses to report on the Cython
+    #                    code. This only works up to Python 3.12 and with
+    #                    COVERAGE_CORE=ctrace.
+    #   style            Run the style checks
+    #   nightly          Install nightly builds of numpy, scipy, pandas, ...
+    #   experimental     Do not fail when the tests fail and do not collect coverage
     matrix:
-      python310_minimums:
-        python.version: '3.10'
-        NUMPY: 1.22.3
-        SCIPY: 1.8.0
-        PANDAS: 1.3.0
-        STATSMODELS: 0.13.1
-        XARRAY: 0.21.0
-        FORMULAIC: 1.2.1
+      python314_latest:
+        python.version: '3.14'
+        PACKAGES: 'xxhash'
         PYTEST_PATTERN: "(slow or not slow)"
-      python310_mid_sdist:
-        python.version: '3.10'
-        NUMPY: 1.23.0
-        SCIPY: 1.9.0
-        PANDAS: 1.4.0
-        STATSMODELS: 0.13.1
-        XARRAY: 2022.6.0
-        XXHASH: true
-        FORMULAIC: 1.2.1
-        test.sdist: true
-      python310_recent_wheel:
-        python.version: '3.10'
-        NUMPY: 1.24.0
-        SCIPY: 1.12.0
-        PANDAS: 2.0.0
-        STATSMODELS: 0.14.0
-        XARRAY: 2023.4.0
-        FORMULAIC: 1.2.1
-        test.wheel: true
-      python310_latest:
-        python.version: '3.10'
-        FORMULAIC: 1.2.1
-        XXHASH: true
-        PYARROW: true
-      python311_latest:
-        python.version: '3.11'
-        XXHASH: true
-        PYARROW: true
-      python312_latest:
-        python.version: '3.12'
-        XXHASH: true
-        PYARROW: true
-      python312_latest_no_binary:
-        python.version: '3.12'
-        XXHASH: true
-        PYARROW: true
+        style: true
+      python314_no_binary:
+        python.version: '3.14'
+        PACKAGES: 'xxhash'
         BUILD_FLAGS: '-Csetup-args=-Dno-binary=true'
+      # pandas 2.3, the last 2.x, with copy-on-write, which pandas 3 always uses
+      python313_recent_wheel:
+        python.version: '3.13'
+        PACKAGES: 'xxhash numpy==2.2.6 scipy==1.15.3 pandas==2.3.3 statsmodels==0.14.5'
+        LM_TEST_COPY_ON_WRITE: 1
+        test.wheel: true
+      # numpy 2.0, the first 2.x, and pandas 2.2, which renamed annual dates to YE-DEC
       python312_cython_coverage:
         python.version: '3.12'
+        PACKAGES: 'xxhash numpy==2.0.2 scipy==1.13.1 pandas==2.2.3 statsmodels==0.14.4'
         BUILD_FLAGS: '-Csetup-args=-Dcython-coverage=true'
         cython.coverage: true
-      python313_latest:
-        python.version: '3.13'
-        XXHASH: true
-        PYARROW: true
+        COVERAGE_CORE: ctrace
+      # pandas 2.0, the newest without DataFrame.stack(future_stack)
+      python311_mid_sdist:
+        python.version: '3.11'
+        PACKAGES: 'xxhash numpy==1.24.4 scipy==1.10.1 pandas==2.0.3 statsmodels==0.14.0'
+        test.sdist: true
+      # The oldest versions that linearmodels supports. statsmodels 0.13.1 is the
+      # oldest with a wheel for Python 3.10.
+      python310_minimums:
+        python.version: '3.10'
+        PACKAGES: 'numpy==1.22.3 scipy==1.8.0 pandas==1.4.0 statsmodels==0.13.1 xarray==0.21.0 formulaic==1.2.1 pyhdfe==0.1.0'
         PYTEST_PATTERN: "(slow or not slow)"
-      python313_copy_on_write:
-        python.version: '3.12'
-        XXHASH: true
-        LM_TEST_COPY_ON_WRITE: 1
-      python313_pre:
-        python.version: '3.13'
-        pip.pre: true
+        style: true
+      python314_pre:
+        python.version: '3.14'
+        PACKAGES: 'xxhash'
+        nightly: true
+        experimental: true
+      python315_latest:
+        python.version: '3.15-dev'
+        PACKAGES: 'xxhash'
+        experimental: true
+        style: true
     maxParallel: 10
 
   steps:
@@ -86,19 +84,23 @@ jobs:
     inputs:
       versionSpec: '$(python.version)'
       architecture: 'x64'
+      # Needed to download a release candidate
+      allowUnstable: true
     displayName: 'Use Python $(python.version)'
 
   - script: |
+      set -e
       python -m pip install --upgrade pip wheel build
-      python -m pip install -r requirements.txt
-      python -m pip install -r requirements-test.txt
       python -m pip install -r requirements-dev.txt
-      source ci/install-posix.sh      
+      python -m pip install ${PACKAGES} -r requirements.txt -r requirements-test.txt
       jupyter kernelspec list
     displayName: 'Install dependencies'
 
-  - script: python -m pip list
-    displayName: 'List Configuration'
+  - script: |
+      python -m pip install --pre --upgrade --no-deps --retries 10 --timeout 60 -i https://pypi.anaconda.org/scientific-python-nightly-wheels/simple --extra-index-url https://pypi.org/simple numpy pandas scipy matplotlib xarray statsmodels pyarrow
+    displayName: 'Install nightly builds'
+    condition: eq(variables['nightly'], 'true')
+    continueOnError: true
 
   - script: |
      flake8 linearmodels
@@ -107,6 +109,7 @@ jobs:
      ruff check linearmodels
      flake8 linearmodels
     displayName: 'Check style and formatting'
+    condition: eq(variables['style'], 'true')
 
   - script: |
       echo "Installing to site packages (sdist)"
@@ -118,7 +121,7 @@ jobs:
 
   - script: |
       echo "Installing to site packages (wheel)"
-      python -m pip wheel . --wheel-dir ./dist/
+      python -m pip wheel . --no-deps --wheel-dir ./dist/
       WHL=$(ls -t ./dist/linearmodels-*.whl | head -1)
       pip install ${WHL} -v
     displayName: 'Install linearmodels (site-packages, wheel)'
@@ -137,6 +140,10 @@ jobs:
     displayName: 'Transpile Cython to C for coverage support'
     condition: eq(variables['cython.coverage'], 'true')
 
+  # After linearmodels is installed so that this shows what is tested
+  - script: python -m pip list
+    displayName: 'List Configuration'
+
   - script: |
       echo "Testing site packages"
       mkdir test_run_dir
@@ -152,15 +159,14 @@ jobs:
       echo pytest -m "${PYTEST_PATTERN}" --junitxml=junit/test-results.xml -n auto --durations=25 ${COVERAGE_OPTS} linearmodels/tests 
       pytest -m "${PYTEST_PATTERN}" --junitxml=junit/test-results.xml -n auto --durations=25 ${COVERAGE_OPTS} linearmodels/tests
     displayName: 'Run tests (editable)'
-    condition: and(and(ne(variables['test.wheel'], 'true'), ne(variables['test.sdist'], 'true')), ne(variables['pip.pre'], 'true'))
+    condition: and(ne(variables['test.wheel'], 'true'), ne(variables['test.sdist'], 'true'), ne(variables['experimental'], 'true'))
 
   - script: |
-      echo "Testing pip-pre"
-      export COVERAGE_OPTS="--cov-config=.coveragerc --cov=linearmodels --cov-branch --cov-report=xml:coverage.xml --cov-report=term"
-      echo pytest -m "${PYTEST_PATTERN}" --junitxml=junit/test-results.xml -n auto --durations=25 ${COVERAGE_OPTS} linearmodels/tests
-      pytest -m "${PYTEST_PATTERN}" --junitxml=junit/test-results.xml -n auto --durations=25 ${COVERAGE_OPTS}  linearmodels/tests
-    displayName: 'Run tests (pip pre)'
-    condition: eq(variables['pip.pre'], 'true')
+      echo "Testing experimental configuration"
+      echo pytest -m "${PYTEST_PATTERN}" --junitxml=junit/test-results.xml -n auto --durations=25 linearmodels/tests
+      pytest -m "${PYTEST_PATTERN}" --junitxml=junit/test-results.xml -n auto --durations=25 linearmodels/tests
+    displayName: 'Run tests (experimental)'
+    condition: eq(variables['experimental'], 'true')
     continueOnError: true
 
   - task: PublishTestResults@2
@@ -172,11 +178,11 @@ jobs:
   - task: PublishCodeCoverageResults@2
     inputs:
       summaryFileLocation: '$(System.DefaultWorkingDirectory)/**/coverage.xml'
-    condition: and(ne(variables['test.sdist'], 'true'), ne(variables['test.wheel'], 'true'))
+    condition: and(ne(variables['test.sdist'], 'true'), ne(variables['test.wheel'], 'true'), ne(variables['experimental'], 'true'))
 
   - script: |
       curl -Os https://uploader.codecov.io/latest/linux/codecov
       chmod +x codecov
       ./codecov -f coverage.xml -F adder -F subtractor
     displayName: 'Codecov upload'
-    condition: and(ne(variables['test.sdist'], 'true'), ne(variables['test.wheel'], 'true'))
+    condition: and(ne(variables['test.sdist'], 'true'), ne(variables['test.wheel'], 'true'), ne(variables['experimental'], 'true'))
