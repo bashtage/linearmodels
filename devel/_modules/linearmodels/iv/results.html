@@ -19,7 +19,7 @@
     
   
       
-        <title>linearmodels.iv.results - linearmodels v7.1 (+131)</title>
+        <title>linearmodels.iv.results - linearmodels v7.1 (+133)</title>
       
     
 
@@ -91,7 +91,7 @@
 
 <header class="md-header md-header--shadow" data-md-component="header">
   <nav class="md-header__inner md-grid" aria-label="Header">
-    <a href="../../../index.html" title="linearmodels v7.1 (+131)" class="md-header__button md-logo" aria-label="linearmodels v7.1 (+131)" data-md-component="logo">
+    <a href="../../../index.html" title="linearmodels v7.1 (+133)" class="md-header__button md-logo" aria-label="linearmodels v7.1 (+133)" data-md-component="logo">
       <img src="../../../_static/bw-logo.svg" alt="logo">
     </a>
     <label class="md-header__button md-icon" for="__drawer">
@@ -102,7 +102,7 @@
       <div class="md-header__ellipsis">
         <div class="md-header__topic">
           <span class="md-ellipsis">
-            linearmodels v7.1 (+131)
+            linearmodels v7.1 (+133)
           </span>
         </div>
         <div class="md-header__topic" data-md-component="header-topic">
@@ -197,10 +197,10 @@
 
 <nav class="md-nav md-nav--primary" aria-label="Navigation" data-md-level="0">
   <label class="md-nav__title" for="__drawer">
-    <a href="../../../index.html" title="linearmodels v7.1 (+131)" class="md-nav__button md-logo" aria-label="linearmodels v7.1 (+131)" data-md-component="logo">
+    <a href="../../../index.html" title="linearmodels v7.1 (+133)" class="md-nav__button md-logo" aria-label="linearmodels v7.1 (+133)" data-md-component="logo">
       <img src="../../../_static/bw-logo.svg" alt="logo">
     </a>
-    linearmodels v7.1 (+131)
+    linearmodels v7.1 (+133)
   </label>
   
     <div class="md-nav__source">
@@ -2154,6 +2154,7 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">_weight_config</span> <span class="o">=</span> <span class="n">results</span><span class="p">[</span><span class="s2">"weight_config"</span><span class="p">]</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_iterations</span> <span class="o">=</span> <span class="n">results</span><span class="p">[</span><span class="s2">"iterations"</span><span class="p">]</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_j_stat</span> <span class="o">=</span> <span class="n">results</span><span class="p">[</span><span class="s2">"j_stat"</span><span class="p">]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_centered_j_stat</span> <span class="o">=</span> <span class="n">results</span><span class="p">[</span><span class="s2">"centered_j_stat"</span><span class="p">]</span>
 
     <span class="nd">@property</span>
     <span class="k">def</span><span class="w"> </span><span class="nf">weight_matrix</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">linearmodels</span><span class="o">.</span><span class="n">typing</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">Float64Array</span><span class="p">:</span>
@@ -2212,6 +2213,75 @@
 <span class="sd">        freedom is :math:`q = n_{instr} - n_{endog}`.</span>
 <span class="sd">        """</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_j_stat</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">centered_j_stat</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">InvalidTestStatistic</span> <span class="o">|</span> <span class="n">WaldTestStatistic</span><span class="p">:</span>
+<span class="w">        </span><span class="sa">r</span><span class="sd">"""</span>
+<span class="sd">        J-test of overidentifying restrictions using a centered moment covariance</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        WaldTestStatistic</span>
+<span class="sd">            J statistic test of overidentifying restrictions that uses a</span>
+<span class="sd">            covariance of the moment conditions that has been centered.</span>
+<span class="sd">            An InvalidTestStatistic is returned if that covariance is</span>
+<span class="sd">            singular, which can happen if there are too few clusters.</span>
+
+<span class="sd">        Notes</span>
+<span class="sd">        -----</span>
+<span class="sd">        The statistic is defined as</span>
+
+<span class="sd">        .. math ::</span>
+
+<span class="sd">          n \bar{g}'\hat{S}_c^{-1}\bar{g} \sim \chi^2_q</span>
+
+<span class="sd">        where :math:`\bar{g} = n^{-1}\sum \hat{\epsilon}_i z_i`,</span>
+<span class="sd">        :math:`z_i` includes both the exogenous variables and instruments,</span>
+<span class="sd">        :math:`\hat{\epsilon}_i` are the model residuals and the degree of</span>
+<span class="sd">        freedom is :math:`q = n_{instr} - n_{endog}`. :math:`\hat{S}_c` is the</span>
+<span class="sd">        estimator of the variance of :math:`\sqrt{n}\bar{g}` selected by</span>
+<span class="sd">        ``weight_type`` and ``weight_config``, applied to the centered moment</span>
+<span class="sd">        conditions :math:`g_i - \bar{g}` and evaluated at the final parameter</span>
+<span class="sd">        estimates. For ``weight_type="robust"`` it is</span>
+
+<span class="sd">        .. math ::</span>
+
+<span class="sd">          \hat{S}_c = n^{-1}\sum_{i=1}^{n}(g_i - \bar{g})(g_i - \bar{g})'</span>
+
+<span class="sd">        :math:`\hat{S}_c` and the :math:`W` of :attr:`j_stat` estimate the same</span>
+<span class="sd">        quantity when the model is correctly specified, and so the</span>
+<span class="sd">        statistics have the same asymptotic :math:`\chi^2_q` null</span>
+<span class="sd">        distribution. If the model is misspecified, :math:`E[g_i] \neq 0`,</span>
+<span class="sd">        both statistics are consistent tests and grow at rate :math:`n`, but</span>
+<span class="sd">        the uncentered estimator also contains :math:`\bar{g}\bar{g}'`. When</span>
+<span class="sd">        it is evaluated using weights from the final parameter estimates, as</span>
+<span class="sd">        in iterated GMM, this bounds the J statistic by :math:`n`, however</span>
+<span class="sd">        large the violation of the moment conditions, whereas the centered</span>
+<span class="sd">        statistic is not bounded. For ``weight_type="robust"`` and converged</span>
+<span class="sd">        iterated GMM, the two are related by</span>
+<span class="sd">        :math:`n \bar{g}'\hat{S}_c^{-1}\bar{g} = J / (1 - J / n)`, where</span>
+<span class="sd">        :math:`J` is the statistic in :attr:`j_stat`. This relationship is</span>
+<span class="sd">        :math:`J / (1 - s J / n)` if the estimator is scaled by</span>
+<span class="sd">        :math:`s = n / (n - k)` because ``debiased`` is ``True``. The</span>
+<span class="sd">        difference matters when :math:`J / n` is not small.</span>
+
+<span class="sd">        Centering has no effect when ``weight_type`` is "unadjusted",</span>
+<span class="sd">        since that estimator uses the residual variance about its mean, and</span>
+<span class="sd">        the statistic then coincides with :attr:`j_stat` up to the step of</span>
+<span class="sd">        the estimation at which the weight matrix is evaluated.</span>
+<span class="sd">        It also has no effect in :class:`~linearmodels.iv.model.IVGMMCUE`</span>
+<span class="sd">        models unless ``center=False`` was set.</span>
+
+<span class="sd">        References</span>
+<span class="sd">        ----------</span>
+<span class="sd">        Hall, A. R. (2000). Covariance matrix estimation and the power of the</span>
+<span class="sd">        overidentifying restrictions test. *Econometrica*, 68(6), 1517-1528.</span>
+
+<span class="sd">        Hansen, B. E. and Lee, S. (2021). Inference for iterated GMM under</span>
+<span class="sd">        misspecification. *Econometrica*, 89(3), 1419-1447. Theorem 1 and</span>
+<span class="sd">        Example 1 discuss the centered weight matrix.</span>
+<span class="sd">        """</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_centered_j_stat</span>
 
 <div class="viewcode-block" id="IVGMMResults.c_stat">
 <a class="viewcode-back" href="../../../iv/iv/linearmodels.iv.results.IVGMMResults.c_stat.html#linearmodels.iv.absorbing.IVGMMResults.c_stat">[docs]</a>

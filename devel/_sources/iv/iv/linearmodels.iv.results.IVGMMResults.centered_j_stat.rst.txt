@@ -1,0 +1,6 @@
+linearmodels.iv.results.IVGMMResults.centered\_j\_stat
+======================================================
+
+.. currentmodule:: linearmodels.iv.results
+
+.. autoproperty:: IVGMMResults.centered_j_stat

@@ -27,6 +27,7 @@
    .. autosummary::
       :toctree:
 
+      ~IVGMMResults.centered_j_stat
       ~IVGMMResults.cov
       ~IVGMMResults.cov_config
       ~IVGMMResults.cov_estimator
