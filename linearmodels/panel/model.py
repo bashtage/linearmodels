@@ -11,7 +11,15 @@ from formulaic.model_spec import NAAction
 from formulaic.parser.algos.tokenize import tokenize
 from formulaic.utils.context import capture_context
 import numpy as np
-from pandas import Categorical, DataFrame, Index, MultiIndex, Series, get_dummies
+from pandas import (
+    Categorical,
+    DataFrame,
+    Index,
+    MultiIndex,
+    RangeIndex,
+    Series,
+    get_dummies,
+)
 from scipy.linalg import lstsq as sp_lstsq
 from scipy.sparse.linalg import lsmr
 
@@ -289,6 +297,74 @@ before computing the fitted value. The best practice is to pass a DataFrame
 with a 2-level MultiIndex containing the entity- and time-ids."""
 
 
+def _is_default_index(index: Index) -> bool:
+    """Whether an index only numbers the rows, i.e., it is 0, 1, ..., n-1"""
+    return not isinstance(index, MultiIndex) and index.equals(RangeIndex(len(index)))
+
+
+def _is_labelled(value: object) -> bool:
+    """Whether the rows of an input are identified by labels.
+
+    pandas, xarray and PanelData inputs carry labels. Raw arrays do not, and
+    are paired with the other inputs by position. The same is true of a pandas
+    Series or DataFrame that has a default index (and default columns if it
+    does not have a MultiIndex) since there are no labels to compare.
+    """
+    if isinstance(value, Series):
+        return not _is_default_index(value.index)
+    if isinstance(value, DataFrame):
+        if isinstance(value.index, MultiIndex):
+            return True
+        return not (_is_default_index(value.index) and _is_default_index(value.columns))
+    if isinstance(value, PanelData):
+        return True
+    try:
+        from xarray import DataArray  # noqa: PLC0415
+    except ImportError:
+        return False
+    return isinstance(value, DataArray)
+
+
+def _labels_1d(value: Series | DataFrame | Any) -> Index:
+    """Row labels of a Series, DataFrame or one-dimensional DataArray"""
+    if isinstance(value, (Series, DataFrame)):
+        return value.index
+    return value.get_index(value.dims[0])
+
+
+def _differs(labels: Index, expected: Index) -> bool:
+    """Whether labels, other than a default index, are not the expected labels"""
+    return not _is_default_index(labels) and not labels.equals(expected)
+
+
+def _misaligned(name: str, what: str) -> ValueError:
+    return ValueError(
+        f"{what} of {name} does not match dependent. Rows are paired by "
+        "position, so an input with labels (pandas or xarray) must use the "
+        "same labels in the same order as dependent. Use a NumPy array to pair "
+        "the values by position."
+    )
+
+
+def _check_row_alignment(name: str, labels: Index, expected: Index) -> None:
+    """Reject labelled inputs whose row index is not the dependent index.
+
+    Estimation pairs rows by position. An input with the same values in a
+    different order would attach those values to the wrong observation.
+
+    Inputs with a different number of rows are not checked here since these
+    are reported using a length-specific error message. A default index has
+    no labels and is paired by position.
+    """
+    if (
+        len(labels) != len(expected)
+        or _is_default_index(labels)
+        or labels.equals(expected)
+    ):
+        return
+    raise _misaligned(name, "The row index")
+
+
 class _PanelModelBase:
     r"""
     Base class for all panel models
@@ -303,6 +379,10 @@ class _PanelModelBase:
         Weights to use in estimation.  Assumes residual variance is
         proportional to inverse of weight to that the residual time
         the weight should be homoskedastic.
+        Weights can be given for each observation, for each time period,
+        for each entity or for each combination of time period and entity.
+        Weights with labels must use the same labels, in the same order,
+        as dependent. See :ref:`panel-input-alignment`.
     check_rank : bool
         Flag indicating whether to perform a rank check on the exogenous
         variables to ensure that the model is identified. Skipping this
@@ -321,6 +401,9 @@ class _PanelModelBase:
     ) -> None:
         self.dependent = PanelData(dependent, "Dep")
         self.exog = PanelData(exog, "Exog")
+        self._dependent_labelled = _is_labelled(dependent)
+        if self._dependent_labelled and _is_labelled(exog):
+            _check_row_alignment("exog", self.exog.index, self.dependent.index)
         self._original_shape = self.dependent.shape
         self._constant = False
         self._formula: str | None = None
@@ -382,6 +465,8 @@ class _PanelModelBase:
                 "clusters must have the same number of entities "
                 "and time periods as the model data."
             )
+        if self._dependent_labelled and _is_labelled(clusters):
+            _check_row_alignment("clusters", clusters_pd.index, self._original_index)
         clusters_pd.drop(~self.not_null)
         return clusters_pd.copy()
 
@@ -408,11 +493,19 @@ class _PanelModelBase:
             frame.columns = Index(["weight"])
             return PanelData(frame)
 
-        frame = DataFrame(columns=self.dependent.entities, index=self.dependent.time)
         nobs, nentity = self.exog.nobs, self.exog.nentity
+        index = self.dependent.index
+        entities = index.get_level_values(0).unique()
+        times = index.get_level_values(1).unique()
+        labelled = self._dependent_labelled and _is_labelled(weights)
 
         if weights.ndim == 3 or weights.shape == (nobs, nentity):
-            return PanelData(weights)
+            panel = PanelData(weights)
+            if isinstance(weights, PanelData):
+                if labelled:
+                    _check_row_alignment("weights", panel.index, index)
+                return panel
+            return self._grid_to_rows(panel, labelled)
 
         if isinstance(weights, np.ndarray):
             weights = cast("linearmodels.typing.data.Float64Array", np.squeeze(weights))
@@ -426,24 +519,67 @@ class _PanelModelBase:
             and isinstance(weights.index, MultiIndex)
             and weights.shape[0] == self.dependent.dataframe.shape[0]
         ):
-            frame = DataFrame(weights)
+            panel = PanelData(DataFrame(weights))
+            if labelled:
+                _check_row_alignment("weights", panel.index, index)
+            return panel
         elif weights.shape[0] == nobs and weights.ndim == 1:
+            if labelled and _differs(_labels_1d(weights), times):
+                raise _misaligned("weights", "The time index")
             weights_arr = np.asarray(weights)[:, None]
             weights_arr = weights_arr @ np.ones((1, nentity))
-
-            frame.iloc[:, :] = weights_arr
+            grid = DataFrame(weights_arr, index=times, columns=entities)
         elif weights.shape[0] == nentity and weights.ndim == 1:
+            if labelled and _differs(_labels_1d(weights), entities):
+                raise _misaligned("weights", "The entity index")
             weights_arr = np.asarray(weights)[None, :]
             weights_arr = np.ones((nobs, 1)) @ weights_arr
-            frame.iloc[:, :] = weights_arr
+            grid = DataFrame(weights_arr, index=times, columns=entities)
         elif weights.shape[0] == nentity * nobs and weights.size:
+            if labelled:
+                _check_row_alignment("weights", _labels_1d(weights), index)
             frame = self.dependent.dataframe.copy()
-            # raise RuntimeError()
             # TODO: Fix this for pandas 3
             frame.iloc[:, :] = np.asarray(weights)[:, None]
+            return PanelData(frame)
         else:
             raise ValueError("Weights do not have a supported shape.")
-        return PanelData(frame)
+        return self._grid_to_rows(PanelData(grid), False)
+
+    def _grid_to_rows(self, grid: PanelData, labelled: bool) -> PanelData:
+        """
+        Place values defined on a time by entity grid on the rows of dependent
+
+        Parameters
+        ----------
+        grid : PanelData
+            Values for every entity and time period, stacked by entity.
+        labelled : bool
+            Whether the labels in grid have to match the entities and time
+            periods of dependent. If False, the position along each axis of the
+            grid is paired with the entities and time periods of dependent in
+            order of appearance.
+
+        Returns
+        -------
+        PanelData
+            Values with the same rows as dependent. If dependent is not
+            balanced or the grid has the wrong shape then grid is returned
+            and the mismatch is reported when the data are validated.
+        """
+        index = self.dependent.index
+        grid_index = MultiIndex.from_product(
+            [index.get_level_values(0).unique(), index.get_level_values(1).unique()]
+        )
+        rows = grid.dataframe
+        if len(rows) != len(grid_index) or len(index) != len(grid_index):
+            return grid
+        if labelled and not rows.index.equals(grid_index):
+            raise _misaligned("weights", "The time and entity index")
+        rows = rows.set_axis(grid_index, axis=0)
+        if not grid_index.equals(index):
+            rows = rows.reindex(index)
+        return PanelData(rows)
 
     def _check_exog_rank(self) -> int:
         if not self._check_rank:
@@ -899,6 +1035,10 @@ class PooledOLS(_PanelModelBase):
         Weights to use in estimation.  Assumes residual variance is
         proportional to inverse of weight to that the residual time
         the weight should be homoskedastic.
+        Weights can be given for each observation, for each time period,
+        for each entity or for each combination of time period and entity.
+        Weights with labels must use the same labels, in the same order,
+        as dependent. See :ref:`panel-input-alignment`.
     check_rank : bool
         Flag indicating whether to perform a rank check on the exogenous
         variables to ensure that the model is identified. Skipping this
@@ -1197,6 +1337,10 @@ class PanelOLS(_PanelModelBase):
         Weights to use in estimation.  Assumes residual variance is
         proportional to inverse of weight to that the residual time
         the weight should be homoskedastic.
+        Weights can be given for each observation, for each time period,
+        for each entity or for each combination of time period and entity.
+        Weights with labels must use the same labels, in the same order,
+        as dependent. See :ref:`panel-input-alignment`.
     entity_effects : bool
         Flag whether to include entity (fixed) effects in the model
     time_effects : bool
@@ -1268,7 +1412,10 @@ class PanelOLS(_PanelModelBase):
         self._time_effects = time_effects
         self._other_effect_cats: PanelData | None = None
         self._singletons = singletons
-        self._other_effects = self._validate_effects(other_effects)
+        self._other_effects = self._validate_effects(
+            other_effects,
+            labelled=self._dependent_labelled and _is_labelled(other_effects),
+        )
         self._has_effect = entity_effects or time_effects or self.other_effects
         self._drop_absorbed = drop_absorbed
         self._singleton_index = None
@@ -1330,7 +1477,9 @@ class PanelOLS(_PanelModelBase):
         out += additional
         return out
 
-    def _validate_effects(self, effects: PanelDataLike | None) -> bool:
+    def _validate_effects(
+        self, effects: PanelDataLike | None, labelled: bool = False
+    ) -> bool:
         """Check model effects"""
         if effects is None:
             return False
@@ -1341,6 +1490,8 @@ class PanelOLS(_PanelModelBase):
                 "other_effects must have the same number of "
                 "entities and time periods as dependent."
             )
+        if labelled:
+            _check_row_alignment("other_effects", effects.index, self._original_index)
 
         num_effects = effects.nvar
         if num_effects + self.entity_effects + self.time_effects > 2:
@@ -2123,6 +2274,10 @@ class BetweenOLS(_PanelModelBase):
         Weights to use in estimation.  Assumes residual variance is
         proportional to inverse of weight to that the residual time
         the weight should be homoskedastic.
+        Weights can be given for each observation, for each time period,
+        for each entity or for each combination of time period and entity.
+        Weights with labels must use the same labels, in the same order,
+        as dependent. See :ref:`panel-input-alignment`.
 
     Notes
     -----
@@ -2404,6 +2559,10 @@ class FirstDifferenceOLS(_PanelModelBase):
         Weights to use in estimation.  Assumes residual variance is
         proportional to inverse of weight to that the residual time
         the weight should be homoskedastic.
+        Weights can be given for each observation, for each time period,
+        for each entity or for each combination of time period and entity.
+        Weights with labels must use the same labels, in the same order,
+        as dependent. See :ref:`panel-input-alignment`.
 
     Notes
     -----
@@ -2734,6 +2893,10 @@ class RandomEffects(_PanelModelBase):
         Weights to use in estimation.  Assumes residual variance is
         proportional to inverse of weight to that the residual time
         the weight should be homoskedastic.
+        Weights can be given for each observation, for each time period,
+        for each entity or for each combination of time period and entity.
+        Weights with labels must use the same labels, in the same order,
+        as dependent. See :ref:`panel-input-alignment`.
 
     Notes
     -----
@@ -3018,6 +3181,10 @@ class FamaMacBeth(_PanelModelBase):
         Weights to use in estimation.  Assumes residual variance is
         proportional to inverse of weight to that the residual time
         the weight should be homoskedastic.
+        Weights can be given for each observation, for each time period,
+        for each entity or for each combination of time period and entity.
+        Weights with labels must use the same labels, in the same order,
+        as dependent. See :ref:`panel-input-alignment`.
 
     Notes
     -----

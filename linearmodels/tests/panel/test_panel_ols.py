@@ -1473,6 +1473,31 @@ def test_drop_absorbed_constant_when_regressor_is_time_invariant():
     assert "x" in kept.params.index
 
 
+def test_reordered_pandas_index_is_rejected():
+    rng = np.random.RandomState(1)
+    idx = pd.MultiIndex.from_product(
+        [np.arange(12), np.arange(4)], names=["firm", "year"]
+    )
+    x = pd.Series(rng.standard_normal(len(idx)), index=idx, name="x")
+    y = pd.Series(0.5 * x.to_numpy() + rng.standard_normal(len(idx)), index=idx)
+    other = pd.Series(np.arange(len(idx)) % 3, index=idx, name="g")
+    weights = pd.Series(rng.chisquare(5, len(idx)), index=idx, name="w")
+
+    matched = PanelOLS(y, x, entity_effects=True).fit()
+    both = PanelOLS(y.iloc[::-1], x.iloc[::-1], entity_effects=True).fit()
+    assert_allclose(both.params, matched.params)
+
+    with pytest.raises(ValueError, match="exog"):
+        PanelOLS(y, x.iloc[::-1], entity_effects=True)
+    with pytest.raises(ValueError, match="weights"):
+        PanelOLS(y, x, weights=weights.iloc[::-1], entity_effects=True)
+    with pytest.raises(ValueError, match="other_effects"):
+        PanelOLS(y, x, other_effects=other.iloc[::-1])
+
+    # A raw array stays positional.
+    PanelOLS(y, np.asarray(x)[:, None], entity_effects=True)
+
+
 def test_zero_endog():
     x = np.arange(10)
     x = np.repeat(x, (2,))[:, None]
