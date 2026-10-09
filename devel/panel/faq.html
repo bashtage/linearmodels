@@ -23,7 +23,7 @@
     
   
       
-        <title>Implementation Choices - linearmodels v7.1 (+129)</title>
+        <title>Implementation Choices - linearmodels v7.1 (+131)</title>
       
     
 
@@ -100,7 +100,7 @@
 
 <header class="md-header md-header--shadow" data-md-component="header">
   <nav class="md-header__inner md-grid" aria-label="Header">
-    <a href="../index.html" title="linearmodels v7.1 (+129)" class="md-header__button md-logo" aria-label="linearmodels v7.1 (+129)" data-md-component="logo">
+    <a href="../index.html" title="linearmodels v7.1 (+131)" class="md-header__button md-logo" aria-label="linearmodels v7.1 (+131)" data-md-component="logo">
       <img src="../_static/bw-logo.svg" alt="logo">
     </a>
     <label class="md-header__button md-icon" for="__drawer">
@@ -111,7 +111,7 @@
       <div class="md-header__ellipsis">
         <div class="md-header__topic">
           <span class="md-ellipsis">
-            linearmodels v7.1 (+129)
+            linearmodels v7.1 (+131)
           </span>
         </div>
         <div class="md-header__topic" data-md-component="header-topic">
@@ -206,10 +206,10 @@
 
 <nav class="md-nav md-nav--primary" aria-label="Navigation" data-md-level="0">
   <label class="md-nav__title" for="__drawer">
-    <a href="../index.html" title="linearmodels v7.1 (+129)" class="md-nav__button md-logo" aria-label="linearmodels v7.1 (+129)" data-md-component="logo">
+    <a href="../index.html" title="linearmodels v7.1 (+131)" class="md-nav__button md-logo" aria-label="linearmodels v7.1 (+131)" data-md-component="logo">
       <img src="../_static/bw-logo.svg" alt="logo">
     </a>
-    linearmodels v7.1 (+129)
+    linearmodels v7.1 (+131)
   </label>
   
     <div class="md-nav__source">
@@ -529,6 +529,16 @@
 </li>
       
         <li class="md-nav__item">
+  <a href="#aligning-inputs" class="md-nav__link">
+    
+    <span class="md-ellipsis">
+      <span title="/panel/faq.rst#aligning-inputs (reference label)"><span>Aligning Inputs</span></span>
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
   <a href="#r-2-definitions" class="md-nav__link">
     
     <span class="md-ellipsis">
@@ -798,6 +808,16 @@
 </li>
       
         <li class="md-nav__item">
+  <a href="#aligning-inputs" class="md-nav__link">
+    
+    <span class="md-ellipsis">
+      <span title="/panel/faq.rst#aligning-inputs (reference label)"><span>Aligning Inputs</span></span>
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
   <a href="#r-2-definitions" class="md-nav__link">
     
     <span class="md-ellipsis">
@@ -832,6 +852,40 @@ to adjust for estimated effects. <code class="docutils literal notranslate"><spa
 the case and automatically adjust the degree of freedom. This can be
 overridden using by setting the fit option <code class="docutils literal notranslate"><span class="pre">auto_df=False</span></code> and then
 changing the value of <code class="docutils literal notranslate"><span class="pre">count_effects</span></code>.</p>
+<h2 id="aligning-inputs"><span id="panel-input-alignment"></span>Aligning Inputs<a class="headerlink" href="#aligning-inputs" title="Link to this heading">¶</a></h2>
+<p>The rows of <code class="docutils literal notranslate"><span class="pre">dependent</span></code>, <code class="docutils literal notranslate"><span class="pre">exog</span></code>, <code class="docutils literal notranslate"><span class="pre">weights</span></code>, <code class="docutils literal notranslate"><span class="pre">other_effects</span></code> and
+the <code class="docutils literal notranslate"><span class="pre">clusters</span></code> used in covariance estimation are paired by position. To
+prevent a value from being attached to the wrong observation, an input that
+carries labels (a pandas <code class="docutils literal notranslate"><span class="pre">Series</span></code> or <code class="docutils literal notranslate"><span class="pre">DataFrame</span></code>, an xarray <code class="docutils literal notranslate"><span class="pre">DataArray</span></code>,
+or <a class="reference internal" href="panel/linearmodels.panel.data.PanelData.html#linearmodels.panel.data.PanelData" title="linearmodels.panel.data.PanelData (Python class) — Abstraction to handle alternative formats for panel data"><code class="xref py py-class docutils literal notranslate"><span class="pre">PanelData</span></code></a>) must use the same labels, in
+the same order, as <code class="docutils literal notranslate"><span class="pre">dependent</span></code>. A <code class="docutils literal notranslate"><span class="pre">ValueError</span></code> is raised if the labels
+differ, for example when the values of a regressor have been reversed or sorted
+differently from the outcome. Reindex the input to the index of <code class="docutils literal notranslate"><span class="pre">dependent</span></code>
+to correct this.</p>
+<p>NumPy arrays do not have labels and are always paired by position. The same
+is true of a pandas object that only has a default index, 0, 1, …, n-1, (and
+default columns, if it is a <code class="docutils literal notranslate"><span class="pre">DataFrame</span></code> without a MultiIndex) since there are
+no labels to compare. Use <code class="docutils literal notranslate"><span class="pre">to_numpy()</span></code> to explicitly pair the values of any
+other pandas object by position.</p>
+<p>Weights can be provided in any of the following shapes, where <code class="docutils literal notranslate"><span class="pre">nobs</span></code> is the
+number of time periods and <code class="docutils literal notranslate"><span class="pre">nentity</span></code> is the number of entities.</p>
+<ul class="simple">
+<li><p>A single weight for each observation, either as a 1-d array with
+<code class="docutils literal notranslate"><span class="pre">nobs</span> <span class="pre">*</span> <span class="pre">nentity</span></code> values or as a Series or DataFrame with the same MultiIndex
+as <code class="docutils literal notranslate"><span class="pre">dependent</span></code>.</p></li>
+<li><p>A single weight for each time period, as a 1-d array or Series with <code class="docutils literal notranslate"><span class="pre">nobs</span></code>
+values. The weight is used for every entity.</p></li>
+<li><p>A single weight for each entity, as a 1-d array or Series with <code class="docutils literal notranslate"><span class="pre">nentity</span></code>
+values. The weight is used for every time period.</p></li>
+<li><p>A weight for each time period and entity, as a 2-d array or a DataFrame with
+<code class="docutils literal notranslate"><span class="pre">nobs</span></code> rows and <code class="docutils literal notranslate"><span class="pre">nentity</span></code> columns.</p></li>
+</ul>
+<p>Weights that are defined for each time period, for each entity or for each
+combination of the two are matched to the time periods and entities in the
+order that they first appear in <code class="docutils literal notranslate"><span class="pre">dependent</span></code>. This is the case even if the
+rows of <code class="docutils literal notranslate"><span class="pre">dependent</span></code> are not sorted by entity and then time. When these
+weights are a pandas object, the index (and columns) must contain the time
+periods and entities in this order.</p>
 <h2 id="r-2-definitions"><span class="math notranslate nohighlight">\(R^2\)</span> definitions<a class="headerlink" href="#r-2-definitions" title="Link to this heading">¶</a></h2>
 <p>The <span class="math notranslate nohighlight">\(R^2\)</span> definitions are all designed so that the reported value will
 match the original model using the estimated parameters.  This differs from
