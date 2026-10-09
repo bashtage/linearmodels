@@ -72,6 +72,8 @@ def reference_cases():
     cases = []
     for key, group in REFERENCE.groupby(KEYS, sort=False):
         row = dict(zip(KEYS, key, strict=True))
+        # groupby keys are np.bool_ in some pandas versions
+        row["debiased"] = bool(row["debiased"])
         kernel = f"-{row['kernel']}" if row["kernel"] else ""
         small = "small" if row["debiased"] else "asy"
         weighted = "-w" if row["weights"] else ""
@@ -115,7 +117,7 @@ def test_against_r(row, group):
     assert_allclose(res.rsquared, group.r2.iloc[0], rtol=1e-8)
     assert_allclose(res.f_statistic.stat, group.fstat.iloc[0], rtol=1e-7)
     assert res.cov_type == row["cov_type"]
-    assert res.debiased is bool(row["debiased"])
+    assert res.debiased is row["debiased"]
 
 
 def test_reference_covers_everything():
