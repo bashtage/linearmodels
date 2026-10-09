@@ -8,6 +8,8 @@ labelled inputs are accepted for every supported shape of weights, and that
 raw arrays continue to be paired by position.
 """
 
+from linearmodels.compat.pandas import ANNUAL_FREQ
+
 import numpy as np
 from numpy.testing import assert_allclose
 import pandas as pd
@@ -43,7 +45,7 @@ MODEL_IDS = [m.__name__ for m in MODELS]
 def make_labels(style):
     if style == "str-date":
         entities = pd.Index([f"firm{i}" for i in range(NENTITY)])
-        times = pd.date_range("2001-12-31", periods=NTIME, freq="YE")
+        times = pd.date_range("2001-12-31", periods=NTIME, freq=ANNUAL_FREQ)
     else:
         entities = pd.Index(np.arange(100, 100 + NENTITY))
         times = pd.Index(np.arange(1990, 1990 + NTIME))
@@ -499,7 +501,7 @@ def test_wide_dependent_and_exog():
 
 def test_single_entity_wide_weights():
     # A single entity makes the time by entity grid as long as the panel
-    times = pd.date_range("2001-12-31", periods=10, freq="YE")
+    times = pd.date_range("2001-12-31", periods=10, freq=ANNUAL_FREQ)
     index = pd.MultiIndex.from_product([["a"], times])
     rng = np.random.default_rng(3)
     y = pd.Series(rng.standard_normal(10), index=index)
