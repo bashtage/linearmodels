@@ -1084,12 +1084,12 @@ class IVResults(_CommonIVResults):
     ----------
     results : dict[str, any]
         A dictionary of results from the model estimation.
-    model : {IV2SLS, IVLIML}
+    model : {IV2SLS, IVLIML, IVJIVE}
         The model used to estimate parameters.
     """
 
     def __init__(
-        self, results: dict[str, Any], model: linearmodels.iv.model._IVLSModelBase
+        self, results: dict[str, Any], model: linearmodels.iv.model._IVModelBase
     ) -> None:
         super().__init__(results, model)
         self._kappa = results.get("kappa", 1)
