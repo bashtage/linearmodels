@@ -16,7 +16,9 @@ variables:
   PYTEST_PATTERN: "(not slow)"
   coverage: true
   test.install: false
-  pip.pre: false
+  nightly: false
+  experimental: false
+  style: false
 
 jobs:
 - template: ci/azure_template_posix.yml
