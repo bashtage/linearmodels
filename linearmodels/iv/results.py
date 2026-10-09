@@ -1589,6 +1589,7 @@ class IVGMMResults(_CommonIVResults):
         self._weight_config = results["weight_config"]
         self._iterations = results["iterations"]
         self._j_stat = results["j_stat"]
+        self._centered_j_stat = results["centered_j_stat"]
 
     @property
     def weight_matrix(self) -> linearmodels.typing.data.Float64Array:
@@ -1647,6 +1648,75 @@ class IVGMMResults(_CommonIVResults):
         freedom is :math:`q = n_{instr} - n_{endog}`.
         """
         return self._j_stat
+
+    @property
+    def centered_j_stat(self) -> InvalidTestStatistic | WaldTestStatistic:
+        r"""
+        J-test of overidentifying restrictions using a centered moment covariance
+
+        Returns
+        -------
+        WaldTestStatistic
+            J statistic test of overidentifying restrictions that uses a
+            covariance of the moment conditions that has been centered.
+            An InvalidTestStatistic is returned if that covariance is
+            singular, which can happen if there are too few clusters.
+
+        Notes
+        -----
+        The statistic is defined as
+
+        .. math ::
+
+          n \bar{g}'\hat{S}_c^{-1}\bar{g} \sim \chi^2_q
+
+        where :math:`\bar{g} = n^{-1}\sum \hat{\epsilon}_i z_i`,
+        :math:`z_i` includes both the exogenous variables and instruments,
+        :math:`\hat{\epsilon}_i` are the model residuals and the degree of
+        freedom is :math:`q = n_{instr} - n_{endog}`. :math:`\hat{S}_c` is the
+        estimator of the variance of :math:`\sqrt{n}\bar{g}` selected by
+        ``weight_type`` and ``weight_config``, applied to the centered moment
+        conditions :math:`g_i - \bar{g}` and evaluated at the final parameter
+        estimates. For ``weight_type="robust"`` it is
+
+        .. math ::
+
+          \hat{S}_c = n^{-1}\sum_{i=1}^{n}(g_i - \bar{g})(g_i - \bar{g})'
+
+        :math:`\hat{S}_c` and the :math:`W` of :attr:`j_stat` estimate the same
+        quantity when the model is correctly specified, and so the
+        statistics have the same asymptotic :math:`\chi^2_q` null
+        distribution. If the model is misspecified, :math:`E[g_i] \neq 0`,
+        both statistics are consistent tests and grow at rate :math:`n`, but
+        the uncentered estimator also contains :math:`\bar{g}\bar{g}'`. When
+        it is evaluated using weights from the final parameter estimates, as
+        in iterated GMM, this bounds the J statistic by :math:`n`, however
+        large the violation of the moment conditions, whereas the centered
+        statistic is not bounded. For ``weight_type="robust"`` and converged
+        iterated GMM, the two are related by
+        :math:`n \bar{g}'\hat{S}_c^{-1}\bar{g} = J / (1 - J / n)`, where
+        :math:`J` is the statistic in :attr:`j_stat`. This relationship is
+        :math:`J / (1 - s J / n)` if the estimator is scaled by
+        :math:`s = n / (n - k)` because ``debiased`` is ``True``. The
+        difference matters when :math:`J / n` is not small.
+
+        Centering has no effect when ``weight_type`` is "unadjusted",
+        since that estimator uses the residual variance about its mean, and
+        the statistic then coincides with :attr:`j_stat` up to the step of
+        the estimation at which the weight matrix is evaluated.
+        It also has no effect in :class:`~linearmodels.iv.model.IVGMMCUE`
+        models unless ``center=False`` was set.
+
+        References
+        ----------
+        Hall, A. R. (2000). Covariance matrix estimation and the power of the
+        overidentifying restrictions test. *Econometrica*, 68(6), 1517-1528.
+
+        Hansen, B. E. and Lee, S. (2021). Inference for iterated GMM under
+        misspecification. *Econometrica*, 89(3), 1419-1447. Theorem 1 and
+        Example 1 discuss the centered weight matrix.
+        """
+        return self._centered_j_stat
 
     def c_stat(self, variables: list[str] | str | None = None) -> WaldTestStatistic:
         r"""
