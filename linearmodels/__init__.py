@@ -1,6 +1,8 @@
 """
-Linear (regression) models for Python. Extends statsmodels with Panel regression,
-instrumental variable estimators and system estimators:
+Linear (regression) models for Python.
+
+Extends statsmodels with Panel regression, instrumental variable estimators and
+system estimators:
 
 -  Panel models:
 
