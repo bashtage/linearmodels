@@ -29,6 +29,8 @@ from linearmodels.iv.gmm import (
 from linearmodels.shared.hypotheses import InvalidTestStatistic, WaldTestStatistic
 import linearmodels.typing.data
 
+__all__ = ["cragg_donald", "cragg_donald_f", "kleibergen_paap", "kleibergen_paap_f"]
+
 # The null of the rank tests: the first-stage coefficient matrix is rank
 # deficient, which means that the model is not identified.
 _RANK_NULL = (

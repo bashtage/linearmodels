@@ -43,6 +43,16 @@ from linearmodels.shared.hypotheses import (
 from linearmodels.shared.io import _str, add_star, pval_format
 import linearmodels.typing.data
 
+__all__ = [
+    "AbsorbingLSResults",
+    "FirstStageResults",
+    "IVGMMResults",
+    "IVModelComparison",
+    "IVResults",
+    "OLSResults",
+    "compare",
+]
+
 
 def stub_concat(
     lists: Sequence[list[str] | tuple[str, ...]], sep: str = "="
