@@ -75,8 +75,8 @@ def test_c_stat_against_r(row):
     res = build_model(row).fit(cov_type="robust")
     c_stat = res.c_stat(row.tested.split() or None)
     assert_allclose(c_stat.stat, row.c_stat, rtol=1e-6)
-    # pval is 1 - cdf, so it cannot resolve tail probabilities below about 1e-16
-    assert_allclose(c_stat.pval, row.pvalue, rtol=1e-5, atol=1e-12)
+    # pval is the survival function, so it is accurate far into the tail: no atol
+    assert_allclose(c_stat.pval, row.pvalue, rtol=1e-8)
     assert c_stat.df == row.df
     # The Hansen J statistic of the original model uses the same GMM steps
     assert_allclose(res.j_stat.stat, row.hansen_j, rtol=1e-6, atol=1e-8)
