@@ -100,7 +100,7 @@ class WaldTestStatistic:
 
 
 class NormalTestStatistic:
-    """
+    r"""
     Test statistic holder for tests with an asymptotic standard normal law.
 
     Parameters
@@ -109,11 +109,23 @@ class NormalTestStatistic:
         The test statistic.
     null : str
         A statement of the test's null hypothesis.
-    name : str
+    name : str, optional
         Name of test.
-    two_sided : bool
+    two_sided : bool, optional
         Flag indicating whether p-values and critical values are computed
-        using a two-sided test.
+        using a two-sided test. The default is True.
+
+    Notes
+    -----
+    A two-sided test rejects the null if the absolute value of the statistic
+    :math:`s` is large. The p-value is :math:`2\Pr(Z > |s|)`, where :math:`Z`
+    has a standard normal distribution, and the critical values for tests of
+    size 10%, 5% and 1% are the 0.95, 0.975 and 0.995 quantiles of the standard
+    normal.
+
+    A one-sided test rejects the null if the statistic is large. The p-value is
+    :math:`\Pr(Z > s)`, which is close to 1 if the statistic is large and
+    negative, and the critical values are the 0.9, 0.95 and 0.99 quantiles.
     """
 
     def __init__(
