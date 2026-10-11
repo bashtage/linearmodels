@@ -158,6 +158,10 @@ class PanelData:
     Index level 1 is time.  The columns are the variables.  MultiIndex Series
     are also accepted and treated as single column MultiIndex DataFrames.
 
+    Missing values (NaN) in the entity or time index are not supported. The
+    methods that group by the index raise a ValueError if the level that they
+    use has a missing label.
+
     Raises
     ------
     TypeError
@@ -270,6 +274,7 @@ class PanelData:
     def panel(self) -> _Panel:
         """pandas Panel view of data"""
         if self._panel is None:
+            self._check_index(0, 1)
             self._panel = _Panel(self._frame)
         assert self._panel is not None
         return self._panel
@@ -360,6 +365,30 @@ class PanelData:
         index = self.index
         return list(index.levels[0][index.codes[0]].unique())
 
+    def _check_index(self, *levels: int) -> None:
+        """
+        Raise a ValueError if a level of the index has missing values (NaN)
+
+        Parameters
+        ----------
+        *levels : int
+            Levels to check, 0 for the entity and 1 for the time
+
+        Notes
+        -----
+        pandas encodes a missing label as -1 in the codes of the level. The
+        operations that group by a level have to use this to reject it since
+        a groupby drops the rows that have a missing label, and the codes
+        select the last label.
+        """
+        for level in levels:
+            if np.any(self.index.codes[level] < 0):
+                name = "entity" if level == 0 else "time"
+                raise ValueError(
+                    f"The {name} index contains missing values (NaN), which are not "
+                    f"supported and are encoded as -1 in the {name} ids."
+                )
+
     @property
     def entity_ids(self) -> linearmodels.typing.data.AnyIntArray:
         """
@@ -370,13 +399,8 @@ class PanelData:
         ndarray
             2d array containing entity ids corresponding dataframe view
         """
-        index = self.index
-        if np.any(index.codes[0] < 0):
-            raise ValueError(
-                "The entity index contains missing values (NaN), which are not "
-                "supported and are encoded as -1 in the entity ids."
-            )
-        return np.asarray(index.codes[0])[:, None]
+        self._check_index(0)
+        return np.asarray(self.index.codes[0])[:, None]
 
     @property
     def time_ids(self) -> linearmodels.typing.data.AnyIntArray:
@@ -388,13 +412,8 @@ class PanelData:
         ndarray
             2d array containing time ids corresponding dataframe view
         """
-        index = self.index
-        if np.any(index.codes[1] < 0):
-            raise ValueError(
-                "The time index contains missing values (NaN), which are not "
-                "supported and are encoded as -1 in the time ids."
-            )
-        return np.asarray(index.codes[1])[:, None]
+        self._check_index(1)
+        return np.asarray(self.index.codes[1])[:, None]
 
     def _demean_both_low_mem(self, weights: PanelData | None) -> PanelData:
         groups = PanelData(
@@ -597,6 +616,7 @@ class PanelData:
         """
         if group not in ("entity", "time", "both"):
             raise ValueError("Group must be one of 'entity', 'time' or 'both'")
+        self._check_index(*{"entity": (0,), "time": (1,), "both": (0, 1)}[group])
         if group == "both":
             if not low_memory:
                 return self._demean_both(weights)
@@ -654,6 +674,7 @@ class PanelData:
             Counts according to type. Either (entity by var) or (time by var)
         """
         level = 0 if group == "entity" else 1
+        self._check_index(level)
         reindex = self.entities if group == "entity" else self.time
         out = self._frame.groupby(level=level).count()
 
@@ -694,6 +715,7 @@ class PanelData:
             Data mean according to type. Either (entity by var) or (time by var)
         """
         level = 0 if group == "entity" else 1
+        self._check_index(level)
         if weights is None:
             mu = self._frame.groupby(level=level).mean()
         else:
@@ -764,6 +786,7 @@ class PanelData:
         if group not in ("entity", "time"):
             raise ValueError("Group must be one of 'entity' or 'time'")
         axis = 0 if group == "entity" else 1
+        self._check_index(axis)
         labels = self.index.codes
         levels = self.index.levels
         cat = Categorical(levels[axis][labels[axis]])
