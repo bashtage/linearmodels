@@ -5,6 +5,7 @@ from linearmodels.compat.scipy import csc_array, diags_array
 from collections import defaultdict
 from collections.abc import Hashable, Iterable
 import hashlib
+from inspect import signature
 from typing import Any, DefaultDict, Union, cast
 import warnings
 
@@ -104,6 +105,92 @@ def clear_cache() -> None:
     _VARIABLE_CACHE.clear()
 
 
+def _options_key(options: dict[str, Any]) -> tuple[Any, ...]:
+    """
+    Hashable key that identifies options of an absorption algorithm
+
+    Parameters
+    ----------
+    options : dict
+        The options. A value can be an array or a dict.
+
+    Returns
+    -------
+    tuple
+        Key that is equal when the options are equal. The ``show`` option is
+        left out since it only controls what is printed.
+    """
+    key = []
+    for name in sorted(options):
+        value = options[name]
+        if name == "show":
+            continue
+        if isinstance(value, dict):
+            value = _options_key(value)
+        elif isinstance(value, (ndarray, list, tuple)):
+            array = asarray(value)
+            value = (array.shape, str(array.dtype), array.tobytes())
+        key.append((name, value))
+    return tuple(key)
+
+
+def _absorb_args(
+    method: str, use_cache: bool, absorb_options: dict[str, Any] | None
+) -> tuple[Any, ...]:
+    """The arguments of AbsorbingLS.fit that determine the absorbed variables"""
+    options = {} if absorb_options is None else absorb_options
+    return method, use_cache, _options_key(options)
+
+
+def _check_absorb_options(options: dict[str, Any], use_hdfe: bool, method: str) -> None:
+    """
+    Raise a ValueError if options are those of the algorithm that is not used
+
+    Parameters
+    ----------
+    options : dict
+        The options of the algorithm that absorbs the variables
+    use_hdfe : bool
+        Flag indicating that pyhdfe absorbs the variables and not LSMR
+    method : str
+        The method that was passed to fit
+
+    Notes
+    -----
+    The algorithm depends on the method and the model, and "auto" uses HDFE if
+    it can. The options of LSMR that are passed to pyhdfe.create, and the options
+    of pyhdfe.create that are passed to lsmr, are a TypeError that does not
+    say why. The options of the two algorithms have different names.
+    """
+    from pyhdfe import create  # noqa: PLC0415
+
+    lsmr_names = set(signature(lsmr).parameters) - {"A", "b"}
+    hdfe_names = set(signature(create).parameters) - {"ids"}
+    wrong = sorted(set(options).intersection(lsmr_names if use_hdfe else hdfe_names))
+    if not wrong:
+        return
+    names = ", ".join(f"'{name}'" for name in wrong)
+    why = f'method is "{method}"'
+    if use_hdfe:
+        if method == "auto":
+            why += " and the model can be absorbed using HDFE"
+        raise ValueError(
+            f"absorb_options contains options of scipy.sparse.linalg.lsmr ({names}) "
+            "that pyhdfe.create does not have. The variables are absorbed using "
+            f'HDFE because {why}. Use method="lsmr" to absorb them using LSMR.'
+        )
+    if method == "auto":
+        why += (
+            " and the model cannot be absorbed using HDFE, which requires that it "
+            "is not weighted and that the absorbed variables are all categorical"
+        )
+    raise ValueError(
+        f"absorb_options contains options of pyhdfe.create ({names}) that "
+        "scipy.sparse.linalg.lsmr does not have. The variables are absorbed "
+        f"using LSMR because {why}. Use options of LSMR or remove them."
+    )
+
+
 def lsmr_annihilate(
     x: csc_array,
     y: linearmodels.typing.data.Float64Array,
@@ -144,17 +231,21 @@ def lsmr_annihilate(
         \hat{\epsilon}_{j} = y_{j} - x^\prime \hat{\beta}
 
     where :math:`\hat{\beta}` is computed using lsmr.
+
+    The cache identifies residuals using `x_hash`, the values of the column
+    of `y` and the options passed to lsmr, since residuals computed using
+    other options are not the same.
     """
     if y.shape[1] == 0:
         return empty_like(y)
     use_cache = use_cache and x_hash is not None
-    regressor_hash = x_hash if x_hash is not None else ""
     default_opts: dict[
         str,
         bool | float | str | linearmodels.typing.data.ArrayLike | dict[str, Any] | None,
     ] = {"atol": 1e-8, "btol": 1e-8, "show": False}
     assert lsmr_options is not None
     default_opts.update(lsmr_options)
+    cache_key = (x_hash, _options_key(default_opts))
     resids = []
     for i in range(y.shape[1]):
         _y = y[:, i : i + 1]
@@ -165,12 +256,13 @@ def lsmr_annihilate(
             hasher.update(memoryview(ascontiguousarray(_y.data)))
             variable_digest = hasher.hexdigest()
 
-        if use_cache and variable_digest in _VARIABLE_CACHE[regressor_hash]:
-            resid = _VARIABLE_CACHE[regressor_hash][variable_digest]
+        if use_cache and variable_digest in _VARIABLE_CACHE[cache_key]:
+            resid = _VARIABLE_CACHE[cache_key][variable_digest]
         else:
             beta = lsmr(x, _y, **default_opts)[0]
             resid = y[:, i : i + 1] - x.dot(csc_array(beta[:, None])).toarray()
-            _VARIABLE_CACHE[regressor_hash][variable_digest] = resid
+            if use_cache:
+                _VARIABLE_CACHE[cache_key][variable_digest] = resid
         resids.append(resid)
     return column_stack(resids)
 
@@ -723,6 +815,8 @@ class AbsorbingLS:
         self._prepare_interactions()
         self._absorbed_dependent: DataFrame | None = None
         self._absorbed_exog: DataFrame | None = None
+        # The arguments of fit that were used to absorb the variables
+        self._absorb_args: tuple[Any, ...] | None = None
 
         self._check_shape()
         self._original_index = self._dependent.pandas.index
@@ -881,6 +975,11 @@ class AbsorbingLS:
         ),
         method: str,
     ) -> None:
+        # Absorbing is repeated when fit uses other options, so start from the
+        # state of a model that has not been fit
+        absorb_args = _absorb_args(method, use_cache, absorb_options)
+        self._num_params = 0
+        self._columns = self._exog.cols
         weights = (
             cast("linearmodels.typing.data.Float64Array", self.weights.ndarray)
             if self._is_weighted
@@ -922,9 +1021,10 @@ class AbsorbingLS:
         mu_dep = (root_w.T @ dep) / denom
         mu_exog = (root_w.T @ exog) / denom
 
-        absorb_options = {} if absorb_options is None else absorb_options
+        absorb_options = {} if absorb_options is None else dict(absorb_options)
         assert isinstance(self._regressors, csc_array)
         if self._regressors.shape[1] > 0:
+            _check_absorb_options(absorb_options, use_hdfe, method)
             if use_hdfe:
                 from pyhdfe import create  # noqa: PLC0415
 
@@ -985,6 +1085,22 @@ class AbsorbingLS:
             exog_resid, index=self._exog.pandas.index, columns=self._columns
         )
         self._num_params += exog_resid.shape[1]
+        self._absorb_args = absorb_args
+
+    def _discard_stale_absorption(
+        self,
+        method: str,
+        use_cache: bool,
+        absorb_options: dict[str, Any] | None,
+        lsmr_options: dict[str, float | bool] | None,
+    ) -> None:
+        """Discard the absorbed variables if fit uses other options to absorb"""
+        if absorb_options is not None and lsmr_options is not None:
+            return  # fit raises an error
+        options = lsmr_options if absorb_options is None else absorb_options
+        if _absorb_args(method, use_cache, options) != self._absorb_args:
+            self._absorbed_dependent = None
+            self._absorbed_exog = None
 
     def fit(
         self,
@@ -1039,7 +1155,11 @@ class AbsorbingLS:
         absorb_options : dict
             Dictionary of options to pass to the absorber. Passed to either
             scipy.sparse.linalg.lsmr or pyhdfe.create depending on the method used
-            to absorb the absorbed regressors.
+            to absorb the absorbed regressors. The options have to be those of
+            the algorithm that is used, which is HDFE if method is "auto" and the
+            model can be absorbed using it. A ValueError is raised for options
+            of LSMR if the variables are absorbed using HDFE, and for options
+            of pyhdfe.create if they are absorbed using LSMR.
         use_cache : bool
             Flag indicating whether the variables, once purged from the
             absorbed variables and interactions, should be stored in the cache,
@@ -1047,11 +1167,14 @@ class AbsorbingLS:
             re-fitting large models when the set of absorbed variables and
             interactions are identical.
         lsmr_options : dict
-            Options to ass to scipy.sparse.linalg.lsmr.
+            Options to pass to scipy.sparse.linalg.lsmr. If they are not empty,
+            method "auto" absorbs the variables using LSMR, and method "hdfe"
+            raises a ValueError.
 
             .. deprecated:: 4.17
 
-               Use absorb_options to pass options
+               Use absorb_options to pass options. ``lsmr_options`` will be
+               removed in linearmodels 8.0.
 
         cov_config
             Additional parameters to pass to covariance estimator. The list
@@ -1076,7 +1199,14 @@ class AbsorbingLS:
         contents using either a 64-bit value (if xxhash is installed) or
         a 256-bit value. This allows variables to be reused in different
         models if the set of absorbing variables and interactions is held
-        constant.
+        constant. The options used to absorb the variables are part of
+        what identifies them.
+
+        The variables are absorbed when fit is called for the first time. A
+        later call uses the same absorbed variables if ``method``,
+        ``absorb_options`` and ``use_cache`` have the same values, so that
+        changing only the covariance estimator is fast. If any of them differs,
+        the variables are absorbed again using the new values.
 
         See also
         --------
@@ -1085,11 +1215,22 @@ class AbsorbingLS:
         linearmodels.iv.covariance.KernelCovariance
         linearmodels.iv.covariance.ClusteredCovariance
         """
+        if lsmr_options and absorb_options is None:
+            # The options are options of LSMR, so they can not be passed to HDFE
+            if method == "hdfe":
+                raise ValueError(
+                    "lsmr_options are options of scipy.sparse.linalg.lsmr and "
+                    'cannot be used with method="hdfe". Use method="lsmr" or '
+                    'method="auto", which uses LSMR if lsmr_options are given.'
+                )
+            method = "lsmr" if method == "auto" else method
+        self._discard_stale_absorption(method, use_cache, absorb_options, lsmr_options)
         if lsmr_options is not None:
             if absorb_options is not None:
                 raise ValueError("absorb_options cannot be used with lsmr_options")
             warnings.warn(
-                "lsmr_options is deprecated.  Use absorb_options.",
+                "lsmr_options is deprecated and will be removed in linearmodels "
+                "8.0. Use absorb_options.",
                 FutureWarning,
                 stacklevel=2,
             )

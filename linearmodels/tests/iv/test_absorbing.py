@@ -557,7 +557,8 @@ def test_against_ols(ols_data):
                 absorb = (1.0 / root_w) * wabsorb
         rank = np.linalg.matrix_rank(absorb)
         if rank < absorb.shape[1]:
-            a, b = np.linalg.eig(absorb.T @ absorb)
+            # The matrix is symmetric: eigh has real eigenvectors, eig may not
+            a, b = np.linalg.eigh(absorb.T @ absorb)
             order = np.argsort(a)[::-1]
             a, b = a[order], b[:, order]
             z = absorb @ b
@@ -754,6 +755,29 @@ def test_options(random_gen):
     mod = AbsorbingLS(y, x[["x0", "x1"]], absorb=df[["x2", "c"]], drop_absorbed=True)
     with pytest.raises(RuntimeError, match=r"HDFE has been"):
         mod.fit(absorb_options={"atol": 1e-7, "btol": 1e-7}, method="hdfe")
+
+
+def test_absorb_options_are_not_modified(random_gen):
+    absorb = random_gen.randint(0, 10, size=1000)
+    x = random_gen.standard_normal((1000, 3))
+    y = random_gen.standard_normal(1000)
+    dfd = {f"x{i}": pd.Series(x[:, i]) for i in range(3)}
+    dfd.update({"c": pd.Series(absorb, dtype="category"), "y": pd.Series(y)})
+    df = pd.DataFrame(dfd)
+
+    y = df.y
+    x = df.iloc[:, :3]
+    # HDFE sets drop_singletons for pyhdfe, which must not change the caller's dict
+    options = {"compute_degrees": False}
+    AbsorbingLS(y, x, absorb=df[["c"]]).fit(absorb_options=options)
+    assert options == {"compute_degrees": False}
+
+    # Otherwise these options could not be used by LSMR, which rejects drop_singletons
+    options = {}
+    AbsorbingLS(y, x, absorb=df[["c"]]).fit(absorb_options=options)
+    mod = AbsorbingLS(y, x, absorb=df[["c"]])
+    mod.fit(absorb_options=options, method="lsmr", use_cache=False)
+    assert options == {}
 
 
 def test_lsmr_annihilate_empty():
