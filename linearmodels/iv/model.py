@@ -17,15 +17,18 @@ from numpy import (
     average,
     c_,
     column_stack,
+    diag,
     dtype,
     eye,
     float64,
+    isfinite,
     isscalar,
     logical_not,
     nan,
     nanmean,
     ndarray,
     ones,
+    outer,
     sqrt,
     squeeze,
 )
@@ -1070,7 +1073,17 @@ class _IVGMMBase(_IVModelBase):
         weight_matrix_estimator = WEIGHT_MATRICES[self._weight_type]
         centered = weight_matrix_estimator(**{**self._weight_kwargs, "center": True})
         s_c = centered.weight_matrix(x, z, eps)
-        if matrix_rank(s_c, hermitian=True) < ninstr:
+        # The rank is that of the correlation matrix of the moment conditions,
+        # so that it does not depend on the units in which the instruments are
+        # measured. The tolerance of the rank test is relative to the largest
+        # eigenvalue, and so it treats the covariance as singular if the
+        # variances of the moment conditions differ by a factor of about 1e16
+        variances = diag(s_c)
+        singular = not (npall(isfinite(s_c)) and npall(variances > 0))
+        if not singular:
+            std = sqrt(variances)
+            singular = matrix_rank(s_c / outer(std, std), hermitian=True) < ninstr
+        if singular:
             # The centered cluster sums add to zero, so a clustered estimator
             # has rank at most one less than the number of clusters
             reason = (

@@ -1656,7 +1656,7 @@ class IVGMMResults(_CommonIVResults):
 
         Returns
         -------
-        WaldTestStatistic
+        WaldTestStatistic or InvalidTestStatistic
             J statistic test of overidentifying restrictions that uses a
             covariance of the moment conditions that has been centered.
             An InvalidTestStatistic is returned if that covariance is
@@ -1706,6 +1706,12 @@ class IVGMMResults(_CommonIVResults):
         the estimation at which the weight matrix is evaluated.
         It also has no effect in :class:`~linearmodels.iv.model.IVGMMCUE`
         models unless ``center=False`` was set.
+
+        In a weighted model the moment conditions are
+        :math:`w_i z_i \hat{\epsilon}_i`, where :math:`w_i` are the weights of
+        the model, as in :attr:`j_stat`. The statistic and the test of whether
+        the covariance is singular do not depend on the units in which the
+        variables are measured.
 
         References
         ----------
