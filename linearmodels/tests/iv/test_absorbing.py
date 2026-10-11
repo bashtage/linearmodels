@@ -557,7 +557,8 @@ def test_against_ols(ols_data):
                 absorb = (1.0 / root_w) * wabsorb
         rank = np.linalg.matrix_rank(absorb)
         if rank < absorb.shape[1]:
-            a, b = np.linalg.eig(absorb.T @ absorb)
+            # The matrix is symmetric: eigh has real eigenvectors, eig may not
+            a, b = np.linalg.eigh(absorb.T @ absorb)
             order = np.argsort(a)[::-1]
             a, b = a[order], b[:, order]
             z = absorb @ b
