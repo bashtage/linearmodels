@@ -13,8 +13,6 @@ from linearmodels.datasets import wage_panel
 from linearmodels.iv.model import IV2SLS
 from linearmodels.panel.data import PanelData
 from linearmodels.panel.model import (
-    BetweenOLS,
-    FamaMacBeth,
     FirstDifferenceOLS,
     PanelOLS,
     PooledOLS,
@@ -227,30 +225,18 @@ def test_pesaran_cd_plm_wage_panel(data):
 
 
 @pytest.mark.parametrize(
-    "estimator",
-    [
-        "pooled",
-        "entity",
-        "entity-time",
-        "random",
-        "between",
-        "first-difference",
-        "fama-macbeth",
-    ],
+    "estimator", ["pooled", "entity", "random", "first-difference"]
 )
 def test_pesaran_cd_all_estimators(estimator):
+    # The estimators where the test is not applicable are in
+    # test_results_pesaran_cd.py
     frame = pesaran_panel(**PESARAN_PANELS["unbalanced-dependent"])
     exog = add_constant(frame[["x"]])
     models = {
         "pooled": lambda: PooledOLS(frame.y, exog),
         "entity": lambda: PanelOLS(frame.y, frame[["x"]], entity_effects=True),
-        "entity-time": lambda: PanelOLS(
-            frame.y, frame[["x"]], entity_effects=True, time_effects=True
-        ),
         "random": lambda: RandomEffects(frame.y, exog),
-        "between": lambda: BetweenOLS(frame.y, exog),
         "first-difference": lambda: FirstDifferenceOLS(frame.y, frame[["x"]]),
-        "fama-macbeth": lambda: FamaMacBeth(frame.y, exog),
     }
     res = models[estimator]().fit()
     cd = res.pesaran_cd

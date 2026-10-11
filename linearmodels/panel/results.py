@@ -604,6 +604,19 @@ class PanelResults(_SummaryStr):
             self._wresids.squeeze(), index=self._index, name="weighted residual"
         )
 
+    def _pesaran_cd_inapplicable(self) -> str | None:
+        """Reason why the Pesaran CD test is not valid for the model, if any"""
+        from linearmodels.panel.model import BetweenOLS  # noqa: PLC0415
+
+        if isinstance(self.model, BetweenOLS):
+            return (
+                "The Pesaran CD test is not applicable to BetweenOLS. The model "
+                "is fitted to the entity means, so it has no time-varying "
+                "residuals, and the series implied by its coefficients is not "
+                "the model's error."
+            )
+        return None
+
     @cached_property
     def pesaran_cd(self) -> InapplicableTestStatistic | NormalTestStatistic:
         r"""
@@ -611,17 +624,19 @@ class PanelResults(_SummaryStr):
 
         Returns
         -------
-        NormalTestStatistic
-            Statistic value, distribution and p-value.
+        NormalTestStatistic or InapplicableTestStatistic
+            Statistic value, distribution and p-value. If the test is not
+            valid for the model, an InapplicableTestStatistic that explains
+            why in its reason.
 
         Notes
         -----
         Tests the null hypothesis that the model's idiosyncratic shocks are
-        cross-sectionally independent. Let :math:`\hat{\rho}_{ij}` denote the
-        sample correlation of the estimated idiosyncratic shocks for entities
-        :math:`i` and :math:`j`, computed using their common time observations,
-        and let :math:`T_{ij}` denote the number of overlapping observations.
-        The statistic is
+        cross-sectionally independent [1]_. Let :math:`\hat{\rho}_{ij}` denote
+        the sample correlation of the estimated idiosyncratic shocks for
+        entities :math:`i` and :math:`j`, computed using their common time
+        observations, and let :math:`T_{ij}` denote the number of overlapping
+        observations. The statistic is
 
         .. math::
 
@@ -631,11 +646,55 @@ class PanelResults(_SummaryStr):
         overlapping observations and finite pairwise correlation estimates.
         Under the null, the statistic is asymptotically standard normal.
 
+        The shocks are the model's ``idiosyncratic`` values, so the weights of
+        a weighted model are not applied to them, and the shocks of
+        ``FirstDifferenceOLS`` are in levels rather than the residuals of the
+        differenced equation. Since the correlations are computed over time,
+        the test assumes that the shocks are not serially correlated, and it
+        over-rejects if they are persistent.
+
+        The test is not valid for every model and an InapplicableTestStatistic
+        is returned for the following.
+
+        * ``BetweenOLS``. The model is fitted to the entity means, so it has
+          no time-varying residuals, and the series implied by its
+          coefficients is not the model's error.
+        * ``FamaMacBeth``. The model's errors are the residuals of the
+          period-by-period cross-sectional regressions. The series implied by
+          the averaged coefficients contains the common, time-varying term
+          :math:`(\beta_t - \bar{\beta})^{\prime}x_{it}`, so it is
+          cross-sectionally dependent by construction. Fama-MacBeth inference
+          is also already robust to cross-sectional dependence.
+        * Models with time effects, and models with other effects that
+          change over time for some entity and have a group of several
+          entities that is missing from some periods, such as period,
+          industry-by-period or decade effects. These effects demean the
+          residuals across entities that are observed in the same periods,
+          which makes the residuals negatively correlated across entities
+          and biases the statistic downwards. For example, when the model
+          has time effects and the errors are independent, the statistic is
+          centered at about :math:`-\sqrt{T/2}` and its standard deviation
+          is far below 1, so it is not standard normal [2]_. Other effects
+          that do not change over time for an entity, or that are present
+          in every period, are not affected.
+
+        The statistic is computed from dense N by N matrices of pairwise
+        correlations and numbers of overlapping observations, where N is the
+        number of entities. Computing them takes about 450 MB of memory when
+        N is 4,000, and the memory use is proportional to the square of N.
+
         References
         ----------
-        Pesaran, M. H. (2021). General diagnostic tests for cross-sectional
-        dependence in panels. Empirical Economics, 60(1), 13-50.
+        .. [1] Pesaran, M. H. (2021). General diagnostic tests for
+           cross-sectional dependence in panels. Empirical Economics, 60(1),
+           13-50.
+        .. [2] Juodis, A. and Reese, S. (2022). The incidental parameters
+           problem in testing for remaining cross-section correlation.
+           Journal of Business & Economic Statistics, 40(3), 1191-1203.
         """
+        reason = self._pesaran_cd_inapplicable()
+        if reason is not None:
+            return InapplicableTestStatistic(reason=reason, name="Pesaran CD test")
         eps = self.idiosyncratic.iloc[:, 0]
         wide = eps.unstack(level=0)
         wide = wide.loc[:, wide.notnull().any(axis=0)]
@@ -817,6 +876,31 @@ class PanelResults(_SummaryStr):
         )
 
 
+def _is_concentrated_in_time(groups: Any, entity_ids: Any, time_ids: Any) -> bool:
+    """
+    Test whether groups of entities change over time and are missing in periods
+
+    Removing the mean of a group that is the same in every period for an
+    entity does not change the correlations over time. Removing the mean of a
+    group that changes over time and is not observed in every period removes a
+    component that varies over time and is shared by the entities in the group.
+    A group with a single entity is not shared.
+    """
+    frame = DataFrame(
+        {
+            "group": np.asarray(groups).ravel(),
+            "entity": np.asarray(entity_ids).ravel(),
+            "time": np.asarray(time_ids).ravel(),
+        }
+    )
+    if frame.groupby("entity")["group"].nunique().max() <= 1:
+        return False
+    by_group = frame.groupby("group")
+    shared = by_group["entity"].nunique() > 1
+    nperiod = frame["time"].nunique()
+    return bool((by_group["time"].nunique()[shared] < nperiod).any())
+
+
 class PanelEffectsResults(PanelResults):
     """
     Results container for panel data models that include effects
@@ -834,6 +918,28 @@ class PanelEffectsResults(PanelResults):
         self._sigma2_effects = res.sigma2_effects
         self._r2_ex_effects = res.r2_ex_effects
         self._effects = res.effects
+
+    def _pesaran_cd_inapplicable(self) -> str | None:
+        reason = (
+            "The Pesaran CD test is not applicable to models with {effect}. "
+            "These effects demean the residuals across entities that are "
+            "observed in the same periods, which makes the residuals "
+            "negatively correlated across entities and biases the statistic "
+            "downwards, away from its null distribution (Juodis and Reese, "
+            "2022)."
+        )
+        if self._time_effect:
+            return reason.format(effect="time effects")
+        if self._other_effect:
+            other = self.model._other_effect_cats.dataframe
+            entity_ids = self.model.dependent.entity_ids
+            time_ids = self.model.dependent.time_ids
+            for col in other:
+                if _is_concentrated_in_time(other[col], entity_ids, time_ids):
+                    return reason.format(
+                        effect="other effects that are concentrated in some periods"
+                    )
+        return super()._pesaran_cd_inapplicable()
 
     @property
     def f_pooled(self) -> WaldTestStatistic:
@@ -1273,6 +1379,17 @@ class FamaMacBethResults(PanelResults):
         self._all_params = res.all_params
         self._avg_r2 = res.avg_r2
         self._avg_adj_r2 = res.avg_adj_r2
+
+    def _pesaran_cd_inapplicable(self) -> str | None:
+        return (
+            "The Pesaran CD test is not applicable to FamaMacBeth. The errors "
+            "of the model are the residuals of the period-by-period "
+            "cross-sectional regressions. The series implied by the averaged "
+            "coefficients contains the common, time-varying term "
+            "(beta_t - beta_bar)'x_it, so it is cross-sectionally dependent by "
+            "construction. Fama-MacBeth inference is already robust to "
+            "cross-sectional dependence."
+        )
 
     @property
     def all_params(self) -> DataFrame:
