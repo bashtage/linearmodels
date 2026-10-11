@@ -55,6 +55,7 @@ from linearmodels.panel.utility import (
     not_absorbed,
     preconditioner,
 )
+from linearmodels.shared.alignment import is_default_index
 from linearmodels.shared.exceptions import missing_warning
 from linearmodels.shared.hypotheses import InvalidTestStatistic, WaldTestStatistic
 from linearmodels.shared.utility import DataFrameWrapper, SeriesWrapper
@@ -391,7 +392,11 @@ class Interaction:
 
     @property
     def isnull(self) -> Series:
-        return self.cat.isnull().any(axis=1) | self.cont.isnull().any(axis=1)
+        cat_null = self.cat.isnull().any(axis=1)
+        cont_null = self.cont.isnull().any(axis=1)
+        # Rows are paired by position since cat and cont need not have labels
+        index = cont_null.index if is_default_index(cat_null.index) else cat_null.index
+        return Series(cat_null.to_numpy() | cont_null.to_numpy(), index=index)
 
     def drop(self, locs: linearmodels.typing.data.BoolArray) -> None:
         self._cat_data.drop(locs)
