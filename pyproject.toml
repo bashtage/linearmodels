@@ -2,7 +2,7 @@
 build-backend = 'mesonpy'
 requires = [
   'meson-python',
-  "cython>=3.0.13,<4",  # Sync with the Cython check in meson.build
+  "cython>=3.1.0,<4",  # Sync with the Cython check in meson.build
   "numpy>=2.0.0,<3",
   "setuptools_scm>=9.2.0,<10",
 ]
@@ -84,7 +84,7 @@ doc = [
   "setuptools>=61",
   "wheel",
   "setuptools_scm[toml]>=9.2.0,<10",
-  "cython>=3.0.13,<4",  # Sync with the Cython check in meson.build
+  "cython>=3.1.0,<4",  # Sync with the Cython check in meson.build
   "numpy >=1.22",
   "scipy >=1.5.0",
   "ipython >=8.0.1",
@@ -113,7 +113,7 @@ dev = [
   "setuptools_scm[toml]>=9.2.0,<10",
   "packaging",
   # Performance
-  "cython>=3.0.13,<4",
+  "cython>=3.1.0,<4",
   "numba>=0.55",
   # Graphics
   "matplotlib>=3",
@@ -268,7 +268,7 @@ ignore = [
 minversion = "9.0"
 testpaths = "linearmodels"
 xfail_strict = true
-addopts = "--strict-markers"
+strict = true
 empty_parameter_set_mark = "xfail"
 filterwarnings = [
   "ignore:`formatargspec`:DeprecationWarning:statsmodels",

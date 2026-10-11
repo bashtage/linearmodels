@@ -165,7 +165,7 @@ Python, NumPy and the other dependencies.
 ### Building from source
 
 -   A C compiler
--   Cython (3.0.13+)
+-   Cython (3.1.0+)
 -   meson-python
 -   NumPy (2.0+)
 -   setuptools_scm (9.2+)
