@@ -757,6 +757,29 @@ def test_options(random_gen):
         mod.fit(absorb_options={"atol": 1e-7, "btol": 1e-7}, method="hdfe")
 
 
+def test_absorb_options_are_not_modified(random_gen):
+    absorb = random_gen.randint(0, 10, size=1000)
+    x = random_gen.standard_normal((1000, 3))
+    y = random_gen.standard_normal(1000)
+    dfd = {f"x{i}": pd.Series(x[:, i]) for i in range(3)}
+    dfd.update({"c": pd.Series(absorb, dtype="category"), "y": pd.Series(y)})
+    df = pd.DataFrame(dfd)
+
+    y = df.y
+    x = df.iloc[:, :3]
+    # HDFE sets drop_singletons for pyhdfe, which must not change the caller's dict
+    options = {"compute_degrees": False}
+    AbsorbingLS(y, x, absorb=df[["c"]]).fit(absorb_options=options)
+    assert options == {"compute_degrees": False}
+
+    # Otherwise these options could not be used by LSMR, which rejects drop_singletons
+    options = {}
+    AbsorbingLS(y, x, absorb=df[["c"]]).fit(absorb_options=options)
+    mod = AbsorbingLS(y, x, absorb=df[["c"]])
+    mod.fit(absorb_options=options, method="lsmr", use_cache=False)
+    assert options == {}
+
+
 def test_lsmr_annihilate_empty():
     gen = np.random.default_rng(0)
     x = csc_array(gen.standard_normal((1000, 2)))

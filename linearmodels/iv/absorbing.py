@@ -922,7 +922,7 @@ class AbsorbingLS:
         mu_dep = (root_w.T @ dep) / denom
         mu_exog = (root_w.T @ exog) / denom
 
-        absorb_options = {} if absorb_options is None else absorb_options
+        absorb_options = {} if absorb_options is None else dict(absorb_options)
         assert isinstance(self._regressors, csc_array)
         if self._regressors.shape[1] > 0:
             if use_hdfe:
