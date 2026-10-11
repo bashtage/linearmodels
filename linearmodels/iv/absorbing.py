@@ -5,6 +5,7 @@ from linearmodels.compat.scipy import csc_array, diags_array
 from collections import defaultdict
 from collections.abc import Hashable, Iterable
 import hashlib
+from inspect import signature
 from typing import Any, DefaultDict, Union, cast
 import warnings
 
@@ -139,6 +140,55 @@ def _absorb_args(
     """The arguments of AbsorbingLS.fit that determine the absorbed variables"""
     options = {} if absorb_options is None else absorb_options
     return method, use_cache, _options_key(options)
+
+
+def _check_absorb_options(options: dict[str, Any], use_hdfe: bool, method: str) -> None:
+    """
+    Raise a ValueError if options are those of the algorithm that is not used
+
+    Parameters
+    ----------
+    options : dict
+        The options of the algorithm that absorbs the variables
+    use_hdfe : bool
+        Flag indicating that pyhdfe absorbs the variables and not LSMR
+    method : str
+        The method that was passed to fit
+
+    Notes
+    -----
+    The algorithm depends on the method and the model, and "auto" uses HDFE if
+    it can. The options of LSMR that are passed to pyhdfe.create, and the options
+    of pyhdfe.create that are passed to lsmr, are a TypeError that does not
+    say why. The options of the two algorithms have different names.
+    """
+    from pyhdfe import create  # noqa: PLC0415
+
+    lsmr_names = set(signature(lsmr).parameters) - {"A", "b"}
+    hdfe_names = set(signature(create).parameters) - {"ids"}
+    wrong = sorted(set(options).intersection(lsmr_names if use_hdfe else hdfe_names))
+    if not wrong:
+        return
+    names = ", ".join(f"'{name}'" for name in wrong)
+    why = f'method is "{method}"'
+    if use_hdfe:
+        if method == "auto":
+            why += " and the model can be absorbed using HDFE"
+        raise ValueError(
+            f"absorb_options contains options of scipy.sparse.linalg.lsmr ({names}) "
+            "that pyhdfe.create does not have. The variables are absorbed using "
+            f'HDFE because {why}. Use method="lsmr" to absorb them using LSMR.'
+        )
+    if method == "auto":
+        why += (
+            " and the model cannot be absorbed using HDFE, which requires that it "
+            "is not weighted and that the absorbed variables are all categorical"
+        )
+    raise ValueError(
+        f"absorb_options contains options of pyhdfe.create ({names}) that "
+        "scipy.sparse.linalg.lsmr does not have. The variables are absorbed "
+        f"using LSMR because {why}. Use options of LSMR or remove them."
+    )
 
 
 def lsmr_annihilate(
@@ -974,6 +1024,7 @@ class AbsorbingLS:
         absorb_options = {} if absorb_options is None else dict(absorb_options)
         assert isinstance(self._regressors, csc_array)
         if self._regressors.shape[1] > 0:
+            _check_absorb_options(absorb_options, use_hdfe, method)
             if use_hdfe:
                 from pyhdfe import create  # noqa: PLC0415
 
@@ -1104,7 +1155,11 @@ class AbsorbingLS:
         absorb_options : dict
             Dictionary of options to pass to the absorber. Passed to either
             scipy.sparse.linalg.lsmr or pyhdfe.create depending on the method used
-            to absorb the absorbed regressors.
+            to absorb the absorbed regressors. The options have to be those of
+            the algorithm that is used, which is HDFE if method is "auto" and the
+            model can be absorbed using it. A ValueError is raised for options
+            of LSMR if the variables are absorbed using HDFE, and for options
+            of pyhdfe.create if they are absorbed using LSMR.
         use_cache : bool
             Flag indicating whether the variables, once purged from the
             absorbed variables and interactions, should be stored in the cache,
@@ -1112,7 +1167,9 @@ class AbsorbingLS:
             re-fitting large models when the set of absorbed variables and
             interactions are identical.
         lsmr_options : dict
-            Options to pass to scipy.sparse.linalg.lsmr.
+            Options to pass to scipy.sparse.linalg.lsmr. If they are not empty,
+            method "auto" absorbs the variables using LSMR, and method "hdfe"
+            raises a ValueError.
 
             .. deprecated:: 4.17
 
@@ -1158,6 +1215,15 @@ class AbsorbingLS:
         linearmodels.iv.covariance.KernelCovariance
         linearmodels.iv.covariance.ClusteredCovariance
         """
+        if lsmr_options and absorb_options is None:
+            # The options are options of LSMR, so they can not be passed to HDFE
+            if method == "hdfe":
+                raise ValueError(
+                    "lsmr_options are options of scipy.sparse.linalg.lsmr and "
+                    'cannot be used with method="hdfe". Use method="lsmr" or '
+                    'method="auto", which uses LSMR if lsmr_options are given.'
+                )
+            method = "lsmr" if method == "auto" else method
         self._discard_stale_absorption(method, use_cache, absorb_options, lsmr_options)
         if lsmr_options is not None:
             if absorb_options is not None:
