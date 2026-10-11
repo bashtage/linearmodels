@@ -1439,7 +1439,6 @@ class IVGMMCUE(_IVGMMBase):
         weight_type: str = "robust",
         **weight_config: Any,
     ) -> None:
-        self._method = "IV-GMM-CUE"
         # The default has to be set before the weight estimator is created
         if "center" not in weight_config:
             weight_config["center"] = True
@@ -1452,6 +1451,8 @@ class IVGMMCUE(_IVGMMBase):
             weight_type=weight_type,
             **weight_config,
         )
+        # Set after the base class, which sets the method to IV-GMM
+        self._method = "IV-GMM-CUE"
 
     @staticmethod
     def from_formula(
