@@ -21,7 +21,10 @@ try:
     kernels = jupyter_client.kernelspec.find_kernel_specs()
 
     plat_win = sys.platform.startswith("win")
-    if plat_win and (3, 8) <= sys.version_info < (3, 15):  # pragma: no cover
+    # The default Proactor event loop on Windows lacks the add_reader that zmq needs,
+    # and zmq warns that it falls back to a selector thread. The policy functions
+    # that avoid this are deprecated in Python 3.14, so only use them before that.
+    if plat_win and sys.version_info < (3, 14):  # pragma: no cover
         import asyncio
 
         try:
@@ -55,6 +58,10 @@ def notebook(request):
     return request.param
 
 
+# Windows, Python 3.14+: ignore the zmq warning about the Proactor loop (see above)
+@pytest.mark.filterwarnings(
+    "ignore:Proactor event loop does not implement add_reader:RuntimeWarning"
+)
 @pytest.mark.slow
 @pytest.mark.example
 @pytest.mark.skipif(SKIP, reason="Required packages not available")
