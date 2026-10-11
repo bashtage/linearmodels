@@ -1047,11 +1047,12 @@ class AbsorbingLS:
             re-fitting large models when the set of absorbed variables and
             interactions are identical.
         lsmr_options : dict
-            Options to ass to scipy.sparse.linalg.lsmr.
+            Options to pass to scipy.sparse.linalg.lsmr.
 
             .. deprecated:: 4.17
 
-               Use absorb_options to pass options
+               Use absorb_options to pass options. ``lsmr_options`` will be
+               removed in linearmodels 8.0.
 
         cov_config
             Additional parameters to pass to covariance estimator. The list
@@ -1089,7 +1090,8 @@ class AbsorbingLS:
             if absorb_options is not None:
                 raise ValueError("absorb_options cannot be used with lsmr_options")
             warnings.warn(
-                "lsmr_options is deprecated.  Use absorb_options.",
+                "lsmr_options is deprecated and will be removed in linearmodels "
+                "8.0. Use absorb_options.",
                 FutureWarning,
                 stacklevel=2,
             )
