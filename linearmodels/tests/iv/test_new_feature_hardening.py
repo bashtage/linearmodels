@@ -18,7 +18,7 @@ from numpy.testing import assert_allclose
 import pandas as pd
 import pytest
 
-from linearmodels.iv import IV2SLS, IVGMM, IVGMMCUE
+from linearmodels.iv import IV2SLS, IVGMM, IVGMMCUE, IVJIVE, IVLIML
 from linearmodels.iv.common import (
     cragg_donald,
     cragg_donald_f,
@@ -124,6 +124,91 @@ def rank_design(seed, nobs=300, ninstr=4, nendog=2, weighted=False):
     return x, z, exog, w
 
 
+COV_CASES = [
+    ("unadjusted", None),
+    ("robust", None),
+    ("clustered", {"clusters": np.arange(300) // 10}),
+    ("kernel", {"bandwidth": 4}),
+]
+
+
+def all_rank_statistics(endog, instr, exog):
+    out = [cragg_donald(endog, instr, exog).stat, cragg_donald_f(endog, instr, exog)]
+    for cov_type, config in COV_CASES:
+        out.append(kleibergen_paap(endog, instr, exog, cov_type, config).stat)
+        out.append(kleibergen_paap_f(endog, instr, exog, cov_type, config))
+    return np.array(out)
+
+
+def test_rank_statistics_do_not_depend_on_the_scale_of_the_weights():
+    # The arrays are the data multiplied by the square root of the weights
+    x, z, exog, w = rank_design(1, weighted=True)
+    root = np.sqrt(w)[:, None]
+    base = all_rank_statistics(root * x, root * z, root * exog)
+    assert np.isfinite(base).all()
+    for scale in (1e-6, 1 / 37.5, 37.5, 1e6):
+        factor = np.sqrt(scale)
+        arrays = [factor * root * a for a in (x, z, exog)]
+        assert_allclose(all_rank_statistics(*arrays), base, rtol=1e-8)
+
+
+def test_first_stage_does_not_depend_on_the_scale_of_the_weights():
+    y, exog, endog, z, w = simulate(2, weighted=True)
+    options = {"cov_type": "clustered", "clusters": np.arange(y.shape[0]) // 10}
+    base = IV2SLS(y, exog, endog, z, weights=w).fit(**options).first_stage
+    scaled = IV2SLS(y, exog, endog, z, weights=37.5 * w).fit(**options).first_stage
+    ones = IV2SLS(y, exog, endog, z, weights=np.ones(y.shape[0])).fit(**options)
+    plain = IV2SLS(y, exog, endog, z).fit(**options)
+    for name in ("kleibergen_paap_f", "cragg_donald_f"):
+        assert_allclose(getattr(scaled, name), getattr(base, name), rtol=1e-10)
+        assert_allclose(
+            getattr(ones.first_stage, name), getattr(plain.first_stage, name)
+        )
+    assert_allclose(scaled.kleibergen_paap.stat, base.kleibergen_paap.stat)
+    # The weights matter
+    assert not np.isclose(base.kleibergen_paap_f, plain.first_stage.kleibergen_paap_f)
+
+
+def test_the_constant_of_a_weighted_model_is_the_root_of_the_weights():
+    # The functions use the weighted arrays, including the constant
+    y, exog, endog, z, w = simulate(3, weighted=True)
+    first_stage = (
+        IV2SLS(y, exog, endog, z, weights=w).fit(cov_type="robust").first_stage
+    )
+    root = np.sqrt(w / w.mean())[:, None]
+    stat = kleibergen_paap(root * endog, root * z, root * exog, "robust").stat
+    assert_allclose(stat, first_stage.kleibergen_paap.stat, rtol=1e-10)
+    assert_allclose(
+        cragg_donald_f(root * endog, root * z, root * exog),
+        first_stage.cragg_donald_f,
+        rtol=1e-10,
+    )
+    # A column of ones is not the constant of the weighted model
+    unit_constant = exog.copy()
+    unit_constant[:, 0] = 1.0
+    wrong = kleibergen_paap(root * endog, root * z, unit_constant, "robust").stat
+    assert not np.isclose(wrong, first_stage.kleibergen_paap.stat, rtol=1e-3)
+
+
+@pytest.mark.parametrize("estimator", [IV2SLS, IVLIML, IVGMM, IVGMMCUE, IVJIVE])
+@pytest.mark.parametrize("weighted", [False, True])
+@pytest.mark.parametrize("cov_type", ["unadjusted", "robust", "clustered"])
+def test_first_stage_rank_tests_do_not_depend_on_the_estimator(
+    estimator, cov_type, weighted
+):
+    y, exog, endog, z, w = simulate(12, ninstr=4, nendog=2, weighted=weighted)
+    options = {}
+    if cov_type == "clustered":
+        options["clusters"] = np.arange(y.shape[0]) // 10
+    reference = IV2SLS(y, exog, endog, z, weights=w).fit(cov_type=cov_type, **options)
+    res = estimator(y, exog, endog, z, weights=w).fit(cov_type=cov_type, **options)
+    expected, actual = reference.first_stage, res.first_stage
+    assert_allclose(actual.kleibergen_paap.stat, expected.kleibergen_paap.stat)
+    assert_allclose(actual.kleibergen_paap_f, expected.kleibergen_paap_f)
+    assert_allclose(actual.cragg_donald.stat, expected.cragg_donald.stat)
+    assert_allclose(actual.cragg_donald_f, expected.cragg_donald_f)
+
+
 @pytest.mark.parametrize(("ninstr", "nendog"), [(4, 2), (5, 1), (6, 2), (5, 3)])
 def test_number_of_clusters_needed(ninstr, nendog):
     # The covariance of the LM statistic has dimension ninstr - nendog + 1, and
@@ -169,6 +254,25 @@ def test_number_of_clusters_needed_through_the_model():
         _ = first_stage(df).kleibergen_paap_f
     with pytest.warns(UserWarning, match="rank deficient"):
         _ = first_stage(df - 1).kleibergen_paap
+
+
+def test_cragg_donald_ignores_the_covariance_estimator_and_clusters():
+    y, exog, endog, z, w = simulate(15, weighted=True)
+    mod = IV2SLS(y, exog, endog, z, weights=w)
+    clusters = np.arange(y.shape[0]) // 10
+    fits = [
+        mod.fit(cov_type="unadjusted"),
+        mod.fit(cov_type="robust"),
+        mod.fit(cov_type="clustered", clusters=clusters),
+        mod.fit(cov_type="kernel", bandwidth=4),
+    ]
+    cragg = [fit.first_stage.cragg_donald.stat for fit in fits]
+    cragg_f = [fit.first_stage.cragg_donald_f for fit in fits]
+    assert_allclose(cragg, cragg[0])
+    assert_allclose(cragg_f, cragg_f[0])
+    # and the Kleibergen-Paap statistic uses it
+    kp = [fit.first_stage.kleibergen_paap.stat for fit in fits]
+    assert len({round(value, 6) for value in kp}) == len(kp)
 
 
 # ----------------------------------------------------------------------------

@@ -728,6 +728,13 @@ class FirstStageResults(_SummaryStr):
         It equals ``ninstr`` times the classical F-statistic when there is
         one endogenous regressor. See :func:`linearmodels.iv.common.cragg_donald`
         for the definition.
+
+        In a weighted model the statistic is computed from the data multiplied
+        by the square root of the weights of the model, which are scaled to
+        have mean 1. It does not depend on the scale of the weights. It does not
+        use a covariance estimator, and so it does not depend on the clusters
+        or the kernel of the model, and is the same for every covariance
+        estimator.
         """
         return cragg_donald(*self._weighted_arrays())
 
@@ -755,6 +762,10 @@ class FirstStageResults(_SummaryStr):
         This is the statistic that Stock and Yogo (2005) tabulate critical
         values for, and Stata's ``ivreg2`` reports it as the "Cragg-Donald
         Wald F statistic". See :func:`linearmodels.iv.common.cragg_donald_f`.
+
+        The weights are used as for :attr:`cragg_donald`, and the statistic
+        does not depend on the scale of the weights or on the clusters of the
+        model.
         """
         return cragg_donald_f(*self._weighted_arrays())
 
@@ -812,6 +823,15 @@ class FirstStageResults(_SummaryStr):
         corresponds to the "Kleibergen-Paap rk LM statistic" reported by
         Stata's ``ivreg2``. See :func:`linearmodels.iv.common.kleibergen_paap`
         for the definition and for conventions that differ from Stata.
+
+        In a weighted model the scores are those of the weighted first-stage
+        regressions, and the statistic does not depend on the scale of the
+        weights. A clustered covariance estimator uses the ``clusters`` that
+        were passed to ``fit``. There must be at least ``ninstr - nendog + 1``
+        clusters, or ``ninstr - nendog + 2`` for :attr:`kleibergen_paap_f`, and
+        a warning is issued if there are fewer. A kernel covariance estimator
+        uses the kernel and the bandwidth of the model, including a bandwidth
+        that the model selected.
         """
         return self._rk_lm
 
@@ -843,6 +863,11 @@ class FirstStageResults(_SummaryStr):
         is the Cragg-Donald F statistic. Stata's ``ivreg2`` reports it as the
         "Kleibergen-Paap rk Wald F statistic". See
         :func:`linearmodels.iv.common.kleibergen_paap_f` for the definition.
+
+        The weights, clusters and kernel are used as for
+        :attr:`kleibergen_paap`. With a clustered covariance estimator there
+        must be at least ``ninstr - nendog + 2`` clusters, and a warning is
+        issued if there are fewer.
         """
         return self._rk_wald_f
 

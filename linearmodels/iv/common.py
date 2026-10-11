@@ -254,6 +254,21 @@ def cragg_donald(
     times the classical F-statistic when there is a single endogenous
     regressor. The F form, ``CD / k``, is reported by :func:`cragg_donald_f`.
 
+    **Weights.** In a weighted model, each of the arrays has to be multiplied
+    by the square root of the observation weights, including the constant
+    column of ``exog``. The constant is then a column of the square roots of
+    the weights and not a column of ones, since the first-stage regressions
+    are weighted. The sample size :math:`n` is the number of rows, and not the
+    sum of the weights. The statistic does not change if all of the weights are
+    multiplied by the same constant. The results of the IV models do this
+    using weights that have been scaled to have mean 1.
+
+    **Clusters.** The statistic does not use a covariance estimator, and so
+    does not depend on clusters. It is the same for a model that is estimated
+    with a clustered, kernel or robust covariance estimator as it is for one
+    with an unadjusted covariance estimator. See :func:`kleibergen_paap` for a
+    statistic that does.
+
     References
     ----------
     Cragg, J. G., & Donald, S. G. (1993). Testing identifiability and
@@ -322,6 +337,11 @@ def cragg_donald_f(
     regression. It is the statistic that Stock and Yogo (2005) tabulate
     critical values for. It is reported by Stata's ``ivreg2`` as the
     "Cragg-Donald Wald F statistic".
+
+    The weights are used as in :func:`cragg_donald`. Each array, including the
+    constant of ``exog``, is multiplied by the square root of the weights in a
+    weighted model, and the statistic does not depend on the scale of the
+    weights or on clusters.
 
     References
     ----------
@@ -533,7 +553,8 @@ def kleibergen_paap(
     ------
     ValueError
         If ``cov_type`` is not supported, or is "clustered" and
-        ``cov_config`` does not contain ``clusters``.
+        ``cov_config`` does not contain ``clusters`` or ``clusters`` does not
+        have an element for each row of the arrays.
 
     Warnings
     --------
@@ -547,14 +568,15 @@ def kleibergen_paap(
     instruments and first-stage errors are clustered or persistent.
 
     The covariance has dimension :math:`km \times km` and is poorly estimated
-    unless :math:`n` is large relative to :math:`km`. With clustering it needs
-    many clusters, and with few clusters the test can be very conservative.
-    A kernel bandwidth that is too short for the dependence does not remove
-    the over-rejection. If there are too few clusters or observations the
-    covariance is rank deficient. A warning is issued, a generalized inverse
-    is used and the degrees of freedom are reduced, but the result should not
-    be relied on. The chi-square approximation is also less reliable with
-    many instruments.
+    unless :math:`n` is large relative to :math:`km`. It is formed as a dense
+    matrix, and so the memory that is needed grows with :math:`(km)^2`. With
+    clustering it needs many clusters, and with few clusters the test can be
+    very conservative. A kernel bandwidth that is too short for the dependence
+    does not remove the over-rejection. If there are too few clusters or
+    observations the covariance is rank deficient. A warning is issued, a
+    generalized inverse is used and the degrees of freedom are reduced, but
+    the result should not be relied on. The chi-square approximation is also
+    less reliable with many instruments.
 
     The null is that the model is underidentified. Rejecting it does not
     show that the instruments are strong, so this is not a test for weak
@@ -608,6 +630,23 @@ def kleibergen_paap(
     conventions differ: the Bartlett weight on lag :math:`j` here is
     :math:`1 - j/(b+1)`, so a Stata bandwidth of :math:`b+1` corresponds to a
     ``bandwidth`` of :math:`b`.
+
+    **Weights.** In a weighted model, each of the arrays has to be multiplied
+    by the square root of the observation weights, including the constant
+    column of ``exog``, as for :func:`cragg_donald`. The scores are then those
+    of the weighted first-stage regressions, and the covariance estimator is
+    applied to them. The statistic does not change if all of the weights are
+    multiplied by the same constant.
+
+    **Clusters.** With "clustered", the scores are summed within the clusters
+    in ``cov_config["clusters"]``. ``clusters`` has one element for each row
+    of the arrays, in the order of the rows. It is a 1-d array, or a 2-d array
+    with a single column. Two-way clustering is not supported. The LM
+    statistic is a quadratic form in a covariance with :math:`k-m+1` rows,
+    whose rank is at most the number of clusters, and so it needs at least
+    :math:`k-m+1` clusters. The scores of the Wald F statistic of
+    :func:`kleibergen_paap_f` sum to zero, and so it needs one more cluster.
+    A warning is issued if there are fewer clusters.
 
     References
     ----------
@@ -699,7 +738,17 @@ def kleibergen_paap_f(
     where :math:`M` is the number of clusters. With ``cov_type`` equal to
     "unadjusted" or "homoskedastic" the statistic is the Cragg-Donald F
     statistic from :func:`cragg_donald_f`. These are the definitions used by
-    Stata's ``ivreg2`` for the "Kleibergen-Paap rk Wald F statistic".
+    Stata's ``ivreg2`` for the "Kleibergen-Paap rk Wald F statistic" (Baum,
+    Schaffer and Stillman, 2007).
+
+    The weights and clusters are used as in :func:`kleibergen_paap`. In a
+    weighted model, each of the arrays, including the constant of ``exog``, has
+    to be multiplied by the square root of the weights, and the statistic does
+    not depend on their scale. The clusters have one element for each row of
+    the arrays. If there are :math:`m` endogenous regressors, the scores of the
+    Wald statistic sum to zero, so that at least :math:`k-m+2` clusters are
+    needed, which is one more than for :func:`kleibergen_paap`. A warning is
+    issued if there are fewer clusters.
 
     References
     ----------
