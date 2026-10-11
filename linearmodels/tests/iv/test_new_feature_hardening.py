@@ -11,13 +11,14 @@ Checks of the instrumental variable features that were added after version 7.0
 
 import inspect
 import re
+import warnings
 
 import numpy as np
 from numpy.testing import assert_allclose
 import pandas as pd
 import pytest
 
-from linearmodels.iv import IVGMM, IVGMMCUE
+from linearmodels.iv import IV2SLS, IVGMM, IVGMMCUE
 from linearmodels.iv.common import (
     cragg_donald,
     cragg_donald_f,
@@ -110,6 +111,64 @@ def test_sources_are_listed(name):
     references = doc.split("References\n----------\n")[1]
     for source in SOURCES[name]:
         assert source in references
+
+
+def rank_design(seed, nobs=300, ninstr=4, nendog=2, weighted=False):
+    rng = np.random.default_rng(seed)
+    exog = np.column_stack([np.ones(nobs), rng.standard_normal(nobs)])
+    z = rng.standard_normal((nobs, ninstr))
+    pi = 0.4 * rng.standard_normal((ninstr, nendog))
+    scale = np.exp(0.5 * z[:, [0]])
+    x = z @ pi + 0.5 * exog[:, [1]] + scale * rng.standard_normal((nobs, nendog))
+    w = rng.uniform(0.3, 3.0, nobs) if weighted else None
+    return x, z, exog, w
+
+
+@pytest.mark.parametrize(("ninstr", "nendog"), [(4, 2), (5, 1), (6, 2), (5, 3)])
+def test_number_of_clusters_needed(ninstr, nendog):
+    # The covariance of the LM statistic has dimension ninstr - nendog + 1, and
+    # that of the Wald F statistic has scores with a mean of zero, so that it
+    # needs one more cluster. The LM statistic is computed without the Wald
+    # covariance, and so does not warn if it is full rank
+    x, z, exog, _ = rank_design(11, nobs=240, ninstr=ninstr, nendog=nendog)
+    df = ninstr - nendog + 1
+
+    def config(nclusters):
+        return {"clusters": np.arange(x.shape[0]) % nclusters}
+
+    with warnings.catch_warnings():
+        warnings.filterwarnings("error", message=".*rank deficient.*")
+        lm = kleibergen_paap(x, z, exog, "clustered", config(df))
+        wald = kleibergen_paap_f(x, z, exog, "clustered", config(df + 1))
+    assert lm.df == df
+    assert np.isfinite(lm.stat)
+    assert np.isfinite(wald)
+    with pytest.warns(UserWarning, match="rank deficient"):
+        short = kleibergen_paap_f(x, z, exog, "clustered", config(df))
+    assert np.isfinite(short)
+    with pytest.warns(UserWarning, match="rank deficient"):
+        lm_short = kleibergen_paap(x, z, exog, "clustered", config(df - 1))
+    assert lm_short.df == df - 1
+
+
+def test_number_of_clusters_needed_through_the_model():
+    # The covariance of the model has to be full rank, which needs more clusters
+    y, exog, endog, z, w = simulate(13, nobs=240, ninstr=6, nendog=2, weighted=True)
+    df = 5
+
+    def first_stage(nclusters):
+        clusters = np.arange(y.shape[0]) % nclusters
+        mod = IV2SLS(y, exog, endog, z, weights=w)
+        return mod.fit(cov_type="clustered", clusters=clusters).first_stage
+
+    with warnings.catch_warnings():
+        warnings.filterwarnings("error", message=".*rank deficient.*")
+        assert first_stage(df).kleibergen_paap.df == df
+        assert np.isfinite(first_stage(df + 1).kleibergen_paap_f)
+    with pytest.warns(UserWarning, match="rank deficient"):
+        _ = first_stage(df).kleibergen_paap_f
+    with pytest.warns(UserWarning, match="rank deficient"):
+        _ = first_stage(df - 1).kleibergen_paap
 
 
 # ----------------------------------------------------------------------------

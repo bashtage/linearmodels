@@ -759,12 +759,16 @@ class FirstStageResults(_SummaryStr):
         return cragg_donald_f(*self._weighted_arrays())
 
     @cached_property
-    def _kleibergen_paap(
-        self,
-    ) -> tuple[WaldTestStatistic | InvalidTestStatistic, float]:
+    def _rk_lm(self) -> WaldTestStatistic | InvalidTestStatistic:
+        return _kleibergen_paap(
+            *self._weighted_arrays(), self._cov_type, self._cov_config, wald=False
+        )[0]
+
+    @cached_property
+    def _rk_wald_f(self) -> float:
         return _kleibergen_paap(
             *self._weighted_arrays(), self._cov_type, self._cov_config
-        )
+        )[1]
 
     @property
     def kleibergen_paap(self) -> WaldTestStatistic | InvalidTestStatistic:
@@ -809,7 +813,7 @@ class FirstStageResults(_SummaryStr):
         Stata's ``ivreg2``. See :func:`linearmodels.iv.common.kleibergen_paap`
         for the definition and for conventions that differ from Stata.
         """
-        return self._kleibergen_paap[0]
+        return self._rk_lm
 
     @property
     def kleibergen_paap_f(self) -> float:
@@ -840,7 +844,7 @@ class FirstStageResults(_SummaryStr):
         "Kleibergen-Paap rk Wald F statistic". See
         :func:`linearmodels.iv.common.kleibergen_paap_f` for the definition.
         """
-        return self._kleibergen_paap[1]
+        return self._rk_wald_f
 
     @cached_property
     def diagnostics(self) -> DataFrame:

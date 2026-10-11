@@ -423,8 +423,17 @@ def _kleibergen_paap(
     exog: linearmodels.typing.data.Float64Array,
     cov_type: str,
     cov_config: dict[str, Any] | None,
+    *,
+    wald: bool = True,
 ) -> tuple[WaldTestStatistic | InvalidTestStatistic, float]:
-    """Compute the rk LM test and the rk Wald F-statistic"""
+    """
+    Compute the rk LM test and the rk Wald F-statistic
+
+    The F-statistic is NaN if wald is False. The covariance of the scores of
+    the Wald statistic is not computed in that case. Its rank can be less than
+    the rank of the covariance of the LM statistic, and so it can warn when
+    the LM statistic is well-defined.
+    """
     name = "Kleibergen-Paap rk LM Test"
     family = _cov_family(cov_type)
     config = {} if cov_config is None else dict(cov_config)
@@ -463,17 +472,19 @@ def _kleibergen_paap(
         return singular, nan
     lm_chi2, lm_df = lm_result
     lm_test = WaldTestStatistic(lm_chi2, _RANK_NULL, lm_df, name=name)
-
-    # The Wald version uses the first-stage residuals to form the scores
-    residuals = dec.x - dec.z @ dec.pihat
-    wald_result = _rk_chi2(dec, residuals, family, config)
-    dof = dec.nobs - dec.ninstr - dec.nexog
-    if family == "clustered":
-        nclusters = unique(config["clusters"]).shape[0]
-        scale = dof * (nclusters - 1) / nclusters / (dec.nobs - 1)
-    else:
-        scale = dof / dec.nobs
-    f = nan if wald_result is None else wald_result[0] * scale / dec.ninstr
+    f = nan
+    if wald:
+        # The Wald version uses the first-stage residuals to form the scores
+        residuals = dec.x - dec.z @ dec.pihat
+        wald_result = _rk_chi2(dec, residuals, family, config)
+        dof = dec.nobs - dec.ninstr - dec.nexog
+        if family == "clustered":
+            nclusters = unique(config["clusters"]).shape[0]
+            scale = dof * (nclusters - 1) / nclusters / (dec.nobs - 1)
+        else:
+            scale = dof / dec.nobs
+        if wald_result is not None:
+            f = wald_result[0] * scale / dec.ninstr
     return lm_test, f
 
 
@@ -607,7 +618,7 @@ def kleibergen_paap(
     the rank of a matrix using the Kleibergen-Paap rk statistic. *Statistical
     Software Components* S456865, Boston College.
     """
-    return _kleibergen_paap(endog, instr, exog, cov_type, cov_config)[0]
+    return _kleibergen_paap(endog, instr, exog, cov_type, cov_config, wald=False)[0]
 
 
 def kleibergen_paap_f(
