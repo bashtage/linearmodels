@@ -93,7 +93,7 @@ doc = [
   "jinja2",
   "sphinx>=7",
   "seaborn",
-  "numpydoc>=1.0.0",
+  "numpydoc>=1.10",
   "nbsphinx",
   "sphinx-immaterial",
   "jupyter",
@@ -132,6 +132,7 @@ dev = [
   "mypy>=1.3",
   "ruff>=0.16.0",
   "pyupgrade>=3.4.0",
+  "numpydoc>=1.10",  # The exclude_files setting of numpydoc lint needs 1.10
   "jupyterlab-code-formatter",
   "jupyterlab>=4.4.8",  # not directly required, pinned by Snyk to avoid a vulnerability
   "zipp>=3.19.1", # not directly required, pinned by Snyk to avoid a vulnerability
