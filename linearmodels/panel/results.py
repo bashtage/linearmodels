@@ -966,6 +966,36 @@ def _has_unadjusted_cov(res: PanelResults) -> bool:
     return type(estimator) is HomoskedasticCovariance
 
 
+def _check_same_sample(res: PanelResults, other: PanelResults) -> None:
+    """Check that two sets of results use the same data and weights"""
+    if res.nobs != other.nobs:
+        raise ValueError(
+            "The models must be estimated using the same observations. "
+            f"This model uses {res.nobs} and other uses {other.nobs}."
+        )
+    model, other_model = res.model, other.model
+    if not model.dependent.index.equals(other_model.dependent.index):
+        raise ValueError(
+            "The models must be estimated using the same observations. The "
+            "entities and time periods of the observations differ."
+        )
+    if not np.allclose(
+        model.dependent.values2d, other_model.dependent.values2d, rtol=1e-10, atol=0.0
+    ):
+        raise ValueError(
+            "The models must have the same dependent variable, but the "
+            "dependent variables of the models differ."
+        )
+    # Weights are rescaled to have mean 1, so only the relative weights matter
+    if not np.allclose(
+        model.weights.values2d, other_model.weights.values2d, rtol=1e-10, atol=0.0
+    ):
+        raise ValueError(
+            "The models must be estimated using the same weights, but the "
+            "weights of the models differ."
+        )
+
+
 class HausmanTestResults(NamedTuple):
     """
     Results of a Hausman specification test.
@@ -974,8 +1004,9 @@ class HausmanTestResults(NamedTuple):
     ----------
     statistic : WaldTestStatistic or InvalidTestStatistic
         The test statistic with its p-value, distribution and null hypothesis.
-        An InvalidTestStatistic is used if the statistic is negative, which
-        means that the models do not meet the assumptions of the test.
+        An InvalidTestStatistic is used if the statistic is negative or not
+        finite, which means that the models do not meet the assumptions of the
+        test.
     estimates : DataFrame
         The coefficients included in the test. The columns are ``b0`` (from
         the model that is consistent under both hypotheses, ``other``), ``b1``
@@ -1047,8 +1078,8 @@ class RandomEffectsResults(PanelResults):
         other : PanelResults
             Results from a model that is consistent whether or not the null
             hypothesis is true, typically a fixed effects (entity effects)
-            model estimated using the same observations and regressors as
-            this model.
+            model estimated using the same observations, dependent variable,
+            regressors and weights as this model.
         include_constant : bool, optional
             Flag indicating whether to include the constant in the comparison.
             The default is False.
@@ -1068,8 +1099,8 @@ class RandomEffectsResults(PanelResults):
             test statistic, p-value, distribution and null as a
             WaldTestStatistic, and ``estimates``, a DataFrame with the
             coefficients included in the test. An InvalidTestStatistic is
-            returned as the statistic when the statistic is negative. The
-            columns of ``estimates`` are ``b0`` (from ``other``),
+            returned as the statistic when the statistic is negative or not
+            finite. The columns of ``estimates`` are ``b0`` (from ``other``),
             ``b1`` (from this model), their difference ``b0-b1`` and
             ``Std. Err.``, the standard error of the difference. The standard
             error is NaN if the variance of the difference is negative.
@@ -1081,8 +1112,9 @@ class RandomEffectsResults(PanelResults):
             was not estimated using the unadjusted covariance estimator.
         ValueError
             If ``sigmamore`` and ``sigmaless`` are both True, if the models
-            use different numbers of observations, or if the models do not
-            have any coefficients in common.
+            were not estimated using the same observations, dependent variable
+            and weights, or if the models do not have any coefficients in
+            common.
 
         Notes
         -----
@@ -1108,12 +1140,26 @@ class RandomEffectsResults(PanelResults):
         The result is only meaningful when :math:`V_0 - V_1` is positive
         definite, which is guaranteed in large samples if the null is true. If
         it is not, a warning is issued and a generalized inverse is used. If
-        the resulting statistic is negative, the data do not satisfy the
-        assumptions of the test and an InvalidTestStatistic is returned.
+        the resulting statistic is negative or not finite, the data do not
+        satisfy the assumptions of the test and an InvalidTestStatistic is
+        returned. This can happen, for example, if ``other`` is a pooled
+        model, since the unadjusted covariance of a pooled model ignores the
+        entity effects.
 
-        Both models must use the default unadjusted covariance estimator, and
-        the statistic requires that ``other`` is estimated using the same
-        observations as this model.
+        Both models must use the default unadjusted covariance estimator. The
+        statistic also requires that the models are estimated using the same
+        observations, the same dependent variable and the same weights, which
+        are checked. The regressors are not checked: only coefficients with
+        the same name in both models are compared.
+
+        Effects that are included in ``other`` but not in this model are not
+        tested separately. For example, if ``other`` includes time effects
+        and this model does not, the null hypothesis is that the regressors
+        are uncorrelated with the entity effects and with the time effects,
+        and the test can reject because of the time effects. To test only the
+        entity effects, include the time dummies as regressors in this model.
+        Only the coefficients found in both models are compared, so the
+        coefficients on the time dummies are not part of the test.
 
         References
         ----------
@@ -1141,11 +1187,7 @@ class RandomEffectsResults(PanelResults):
                 "The Hausman test can only be used with models estimated using "
                 "the unadjusted covariance estimator."
             )
-        if self.nobs != other.nobs:
-            raise ValueError(
-                "The models must be estimated using the same observations. "
-                f"This model uses {self.nobs} and other uses {other.nobs}."
-            )
+        _check_same_sample(self, other)
 
         in_other = set(other.params.index)
         common = [name for name in self.params.index if name in in_other]
@@ -1181,6 +1223,14 @@ class RandomEffectsResults(PanelResults):
 
         diff = var_diff.to_numpy()
         delta = b_diff.to_numpy()
+        name = "Hausman specification test"
+        if not (np.all(np.isfinite(diff)) and np.all(np.isfinite(delta))):
+            invalid = InvalidTestStatistic(
+                "The coefficients or covariances of the models are not finite, "
+                "so the statistic cannot be computed.",
+                name=name,
+            )
+            return HausmanTestResults(invalid, estimates)
         try:
             np.linalg.cholesky(diff)
             positive_definite = True
@@ -1197,10 +1247,10 @@ class RandomEffectsResults(PanelResults):
             )
             stat = float(delta @ np.linalg.pinv(diff, hermitian=True) @ delta)
 
-        name = "Hausman specification test"
-        if stat < 0:
+        if not np.isfinite(stat) or stat < 0:
+            problem = "not finite" if not np.isfinite(stat) else "negative"
             invalid = InvalidTestStatistic(
-                "The statistic is negative, so the models do not meet the "
+                f"The statistic is {problem}, so the models do not meet the "
                 "assumptions of the Hausman test.",
                 name=name,
             )

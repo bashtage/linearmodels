@@ -4,6 +4,7 @@ the checks that the models are comparable.
 """
 
 import pickle
+import warnings
 
 import numpy as np
 from numpy.testing import assert_allclose
@@ -15,9 +16,13 @@ from statsmodels.tools.tools import add_constant
 
 from linearmodels.datasets import wage_panel
 from linearmodels.iv.results import IVResults
-from linearmodels.panel import PanelOLS, RandomEffects
+from linearmodels.panel import PanelOLS, PooledOLS, RandomEffects
 import linearmodels.panel.results
-from linearmodels.panel.results import HausmanTestResults, RandomEffectsResults
+from linearmodels.panel.results import (
+    HausmanTestResults,
+    PanelEffectsResults,
+    RandomEffectsResults,
+)
 from linearmodels.shared.hypotheses import InvalidTestStatistic, WaldTestStatistic
 
 HAUSMAN_NAMES = ["exper", "expersq"]
@@ -165,3 +170,161 @@ def test_hausman_pval(hausman_results):
     re_res, fe_res = hausman_results
     result = re_res.hausman(fe_res)
     assert_allclose(result.statistic.pval, stats.chi2.sf(result.statistic.stat, 2))
+
+
+def weighted_results(wage, re_weights, fe_weights):
+    n = wage.shape[0]
+    base = pd.Series(1.0 + (np.arange(n) % 5), index=wage.index)
+    exog = add_constant(wage[HAUSMAN_NAMES])
+    re_res = RandomEffects(wage["hours"], exog, weights=re_weights(base)).fit()
+    fe_res = PanelOLS(
+        wage["hours"], exog, entity_effects=True, weights=fe_weights(base)
+    ).fit()
+    return re_res, fe_res
+
+
+def unweighted(base):
+    return None
+
+
+def weighted(base):
+    return base
+
+
+@pytest.mark.parametrize(
+    ("re_weights", "fe_weights"),
+    [(unweighted, weighted), (weighted, unweighted)],
+    ids=["fe-weighted", "re-weighted"],
+)
+def test_hausman_different_weights(wage, re_weights, fe_weights):
+    re_res, fe_res = weighted_results(wage, re_weights, fe_weights)
+    with pytest.raises(ValueError, match="same weights"):
+        re_res.hausman(fe_res)
+
+
+def test_hausman_different_weight_values(wage):
+    re_res, fe_res = weighted_results(wage, weighted, lambda base: base[::-1].array)
+    with pytest.raises(ValueError, match="same weights"):
+        re_res.hausman(fe_res)
+
+
+def test_hausman_same_weights(wage):
+    re_res, fe_res = weighted_results(wage, weighted, weighted)
+    result = re_res.hausman(fe_res)
+    assert isinstance(result.statistic, WaldTestStatistic)
+    assert not isinstance(result.statistic, InvalidTestStatistic)
+    assert_allclose(result.statistic.stat, hausman_by_hand(re_res, fe_res))
+    # The weights are only relevant up to scale
+    scaled = weighted_results(wage, weighted, lambda base: 3.0 * base)
+    scaled_result = scaled[0].hausman(scaled[1])
+    assert_allclose(scaled_result.statistic.stat, result.statistic.stat, rtol=1e-8)
+
+
+def test_hausman_different_dependent(wage):
+    exog = add_constant(wage[HAUSMAN_NAMES])
+    fe_res = PanelOLS(wage["lwage"], exog, entity_effects=True).fit()
+    re_res = RandomEffects(wage["hours"], exog).fit()
+    with pytest.raises(ValueError, match="same dependent variable"):
+        re_res.hausman(fe_res)
+    # A transformed dependent variable is also a different dependent variable
+    re_res = RandomEffects(np.exp(wage["lwage"]), exog).fit()
+    with pytest.raises(ValueError, match="same dependent variable"):
+        re_res.hausman(fe_res)
+
+
+def test_hausman_renamed_dependent(wage):
+    exog = add_constant(wage[HAUSMAN_NAMES])
+    fe_res = PanelOLS(wage["hours"], exog, entity_effects=True).fit()
+    re_res = RandomEffects(wage["hours"].rename("other_name"), exog).fit()
+    result = re_res.hausman(fe_res)
+    assert isinstance(result.statistic, WaldTestStatistic)
+    assert_allclose(result.statistic.stat, hausman_by_hand(re_res, fe_res))
+
+
+def test_hausman_different_rows_same_count(wage):
+    # The first entity has 8 observations, as does the last entity
+    exog = add_constant(wage[HAUSMAN_NAMES])
+    nobs = wage.shape[0]
+    first = RandomEffects(wage["hours"].iloc[8:], exog.iloc[8:]).fit()
+    last = PanelOLS(
+        wage["hours"].iloc[: nobs - 8], exog.iloc[: nobs - 8], entity_effects=True
+    ).fit()
+    assert first.nobs == last.nobs
+    with pytest.raises(ValueError, match="same observations"):
+        first.hausman(last)
+
+
+@pytest.mark.parametrize("bad", [np.nan, np.inf])
+def test_hausman_non_finite_is_invalid(wage, bad):
+    exog = add_constant(wage[HAUSMAN_NAMES])
+    re_res = RandomEffects(wage["hours"], exog).fit()
+    fe_res = PanelOLS(wage["hours"], exog, entity_effects=True).fit()
+    fe_res.cov = fe_res.cov * bad
+    with warnings.catch_warnings():
+        warnings.simplefilter("error")
+        result = re_res.hausman(fe_res)
+    assert isinstance(result.statistic, InvalidTestStatistic)
+    assert np.isnan(result.statistic.stat)
+    assert np.isnan(result.statistic.pval)
+    assert "not finite" in str(result.statistic)
+    assert list(result.estimates.index) == HAUSMAN_NAMES
+    assert not np.isfinite(result.estimates["Std. Err."]).any()
+    assert "Invalid test statistic" in str(result)
+
+
+def test_hausman_non_finite_coefficients_is_invalid(wage, monkeypatch):
+    exog = add_constant(wage[HAUSMAN_NAMES])
+    re_res = RandomEffects(wage["hours"], exog).fit()
+    fe_res = PanelOLS(wage["hours"], exog, entity_effects=True).fit()
+    params = fe_res.params.copy()
+    params["exper"] = np.nan
+    monkeypatch.setattr(PanelEffectsResults, "params", property(lambda self: params))
+    with warnings.catch_warnings():
+        warnings.simplefilter("error")
+        result = re_res.hausman(fe_res)
+    assert isinstance(result.statistic, InvalidTestStatistic)
+    assert "not finite" in str(result.statistic)
+
+
+def test_hausman_pooled_is_invalid(wage):
+    # The unadjusted covariance of the pooled model ignores the entity effects
+    # and it is not consistent under the alternative
+    exog = add_constant(wage[["expersq", "union", "married"]])
+    re_res = RandomEffects(wage["lwage"], exog).fit()
+    pooled = PooledOLS(wage["lwage"], exog).fit()
+    with pytest.warns(UserWarning, match="not positive definite"):
+        result = re_res.hausman(pooled)
+    assert isinstance(result.statistic, InvalidTestStatistic)
+    assert np.isnan(result.statistic.stat)
+    assert np.isnan(result.statistic.pval)
+    assert "negative" in str(result.statistic)
+    assert "do not meet the assumptions of the Hausman test" in str(result.statistic)
+    assert list(result.estimates.index) == ["expersq", "union", "married"]
+
+
+def test_hausman_two_way_fixed_effects(wage):
+    # A model with time effects is accepted as other. The test then also
+    # examines the time effects, so the dummies should be in this model.
+    years = pd.get_dummies(
+        wage.index.get_level_values("year"), prefix="y", drop_first=True, dtype=float
+    )
+    years.index = wage.index
+    names = ["expersq", "union", "married"]
+    exog = add_constant(wage[names])
+    fe_res = PanelOLS(wage["lwage"], exog, entity_effects=True, time_effects=True).fit()
+
+    re_plain = RandomEffects(wage["lwage"], exog).fit()
+    plain = re_plain.hausman(fe_res)
+    assert isinstance(plain.statistic, WaldTestStatistic)
+    assert list(plain.estimates.index) == names
+
+    re_dummies = RandomEffects(wage["lwage"], pd.concat([exog, years], axis=1)).fit()
+    with_dummies = re_dummies.hausman(fe_res)
+    assert isinstance(with_dummies.statistic, WaldTestStatistic)
+    # Only the coefficients that are in both models are compared
+    assert list(with_dummies.estimates.index) == names
+    assert with_dummies.statistic.df == len(names)
+    assert_allclose(
+        with_dummies.statistic.stat, hausman_by_hand(re_dummies, fe_res, names)
+    )
+    assert not np.isclose(with_dummies.statistic.stat, plain.statistic.stat)
