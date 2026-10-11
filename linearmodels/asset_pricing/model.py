@@ -25,6 +25,7 @@ from linearmodels.asset_pricing.results import (
     LinearFactorModelResults,
 )
 from linearmodels.iv.data import IVData, IVDataLike
+from linearmodels.shared.alignment import check_alignment, row_labels
 from linearmodels.shared.exceptions import missing_warning
 from linearmodels.shared.hypotheses import WaldTestStatistic
 from linearmodels.shared.linalg import has_constant
@@ -82,6 +83,11 @@ class _FactorModelBase:
     def __init__(self, portfolios: IVDataLike, factors: IVDataLike):
         self.portfolios = IVData(portfolios, var_name="portfolio")
         self.factors = IVData(factors, var_name="factor")
+        check_alignment(
+            row_labels(self.portfolios),
+            {"factors": self.factors},
+            reference="portfolios",
+        )
         self._name = self.__class__.__name__
         self._formula: str | None = None
         self._validate_data()
@@ -214,6 +220,18 @@ class TradedFactorModel(_FactorModelBase):
     tested using the estimated values :math:`\hat{\alpha}_i`. Risk premia,
     :math:`\lambda_i` are estimated using the sample averages of the factors,
     which must be excess returns on traded portfolios.
+
+    Rows are paired by position, so that the first row of ``factors`` is the
+    factor return in the period of the first row of ``portfolios``. If both
+    ``portfolios`` and ``factors`` carry labels (a pandas Series or DataFrame
+    with an index other than the default 0, 1, ..., n-1, or an xarray
+    DataArray with coordinates), ``factors`` must use the same index, in the
+    same order, as ``portfolios``, so that a return cannot be attached to the
+    wrong period. A ``ValueError`` is raised if the index differs. Either
+    reindex ``factors`` to the index of ``portfolios``, or call
+    ``to_numpy()`` to pair its values by position. NumPy arrays and pandas
+    objects with a default index do not carry labels and are always paired by
+    position.
     """
 
     def __init__(self, portfolios: IVDataLike, factors: IVDataLike):
@@ -523,6 +541,18 @@ class LinearFactorModel(_LinearFactorModelBase):
 
     The model is tested using the estimated values
     :math:`\hat{\alpha}_i=\hat{\eta}_i`.
+
+    Rows are paired by position, so that the first row of ``factors`` is the
+    factor return in the period of the first row of ``portfolios``. If both
+    ``portfolios`` and ``factors`` carry labels (a pandas Series or DataFrame
+    with an index other than the default 0, 1, ..., n-1, or an xarray
+    DataArray with coordinates), ``factors`` must use the same index, in the
+    same order, as ``portfolios``, so that a return cannot be attached to the
+    wrong period. A ``ValueError`` is raised if the index differs. Either
+    reindex ``factors`` to the index of ``portfolios``, or call
+    ``to_numpy()`` to pair its values by position. NumPy arrays and pandas
+    objects with a default index do not carry labels and are always paired by
+    position.
     """
 
     def __init__(
@@ -832,6 +862,18 @@ class LinearFactorModelGMM(_LinearFactorModelBase):
 
     The model is tested using the optimized objective function using the
     usual GMM J statistic.
+
+    Rows are paired by position, so that the first row of ``factors`` is the
+    factor return in the period of the first row of ``portfolios``. If both
+    ``portfolios`` and ``factors`` carry labels (a pandas Series or DataFrame
+    with an index other than the default 0, 1, ..., n-1, or an xarray
+    DataArray with coordinates), ``factors`` must use the same index, in the
+    same order, as ``portfolios``, so that a return cannot be attached to the
+    wrong period. A ``ValueError`` is raised if the index differs. Either
+    reindex ``factors`` to the index of ``portfolios``, or call
+    ``to_numpy()`` to pair its values by position. NumPy arrays and pandas
+    objects with a default index do not carry labels and are always paired by
+    position.
     """
 
     def __init__(
