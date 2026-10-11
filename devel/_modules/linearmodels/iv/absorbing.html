@@ -19,7 +19,7 @@
     
   
       
-        <title>linearmodels.iv.absorbing - linearmodels v7.1 (+144)</title>
+        <title>linearmodels.iv.absorbing - linearmodels v7.1 (+153)</title>
       
     
 
@@ -91,7 +91,7 @@
 
 <header class="md-header md-header--shadow" data-md-component="header">
   <nav class="md-header__inner md-grid" aria-label="Header">
-    <a href="../../../index.html" title="linearmodels v7.1 (+144)" class="md-header__button md-logo" aria-label="linearmodels v7.1 (+144)" data-md-component="logo">
+    <a href="../../../index.html" title="linearmodels v7.1 (+153)" class="md-header__button md-logo" aria-label="linearmodels v7.1 (+153)" data-md-component="logo">
       <img src="../../../_static/bw-logo.svg" alt="logo">
     </a>
     <label class="md-header__button md-icon" for="__drawer">
@@ -102,7 +102,7 @@
       <div class="md-header__ellipsis">
         <div class="md-header__topic">
           <span class="md-ellipsis">
-            linearmodels v7.1 (+144)
+            linearmodels v7.1 (+153)
           </span>
         </div>
         <div class="md-header__topic" data-md-component="header-topic">
@@ -197,10 +197,10 @@
 
 <nav class="md-nav md-nav--primary" aria-label="Navigation" data-md-level="0">
   <label class="md-nav__title" for="__drawer">
-    <a href="../../../index.html" title="linearmodels v7.1 (+144)" class="md-nav__button md-logo" aria-label="linearmodels v7.1 (+144)" data-md-component="logo">
+    <a href="../../../index.html" title="linearmodels v7.1 (+153)" class="md-nav__button md-logo" aria-label="linearmodels v7.1 (+153)" data-md-component="logo">
       <img src="../../../_static/bw-logo.svg" alt="logo">
     </a>
-    linearmodels v7.1 (+144)
+    linearmodels v7.1 (+153)
   </label>
   
     <div class="md-nav__source">
@@ -511,6 +511,7 @@
 <span class="kn">from</span><span class="w"> </span><span class="nn">collections</span><span class="w"> </span><span class="kn">import</span> <span class="n">defaultdict</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">collections.abc</span><span class="w"> </span><span class="kn">import</span> <span class="n">Hashable</span><span class="p">,</span> <span class="n">Iterable</span>
 <span class="kn">import</span><span class="w"> </span><span class="nn">hashlib</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">inspect</span><span class="w"> </span><span class="kn">import</span> <span class="n">signature</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">typing</span><span class="w"> </span><span class="kn">import</span> <span class="n">Any</span><span class="p">,</span> <span class="n">DefaultDict</span><span class="p">,</span> <span class="n">Union</span><span class="p">,</span> <span class="n">cast</span>
 <span class="kn">import</span><span class="w"> </span><span class="nn">warnings</span>
 
@@ -610,6 +611,92 @@
     <span class="n">_VARIABLE_CACHE</span><span class="o">.</span><span class="n">clear</span><span class="p">()</span>
 
 
+<span class="k">def</span><span class="w"> </span><span class="nf">_options_key</span><span class="p">(</span><span class="n">options</span><span class="p">:</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="nb">tuple</span><span class="p">[</span><span class="n">Any</span><span class="p">,</span> <span class="o">...</span><span class="p">]:</span>
+<span class="w">    </span><span class="sd">"""</span>
+<span class="sd">    Hashable key that identifies options of an absorption algorithm</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    options : dict</span>
+<span class="sd">        The options. A value can be an array or a dict.</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    tuple</span>
+<span class="sd">        Key that is equal when the options are equal. The ``show`` option is</span>
+<span class="sd">        left out since it only controls what is printed.</span>
+<span class="sd">    """</span>
+    <span class="n">key</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="k">for</span> <span class="n">name</span> <span class="ow">in</span> <span class="nb">sorted</span><span class="p">(</span><span class="n">options</span><span class="p">):</span>
+        <span class="n">value</span> <span class="o">=</span> <span class="n">options</span><span class="p">[</span><span class="n">name</span><span class="p">]</span>
+        <span class="k">if</span> <span class="n">name</span> <span class="o">==</span> <span class="s2">"show"</span><span class="p">:</span>
+            <span class="k">continue</span>
+        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">value</span><span class="p">,</span> <span class="nb">dict</span><span class="p">):</span>
+            <span class="n">value</span> <span class="o">=</span> <span class="n">_options_key</span><span class="p">(</span><span class="n">value</span><span class="p">)</span>
+        <span class="k">elif</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">value</span><span class="p">,</span> <span class="p">(</span><span class="n">ndarray</span><span class="p">,</span> <span class="nb">list</span><span class="p">,</span> <span class="nb">tuple</span><span class="p">)):</span>
+            <span class="n">array</span> <span class="o">=</span> <span class="n">asarray</span><span class="p">(</span><span class="n">value</span><span class="p">)</span>
+            <span class="n">value</span> <span class="o">=</span> <span class="p">(</span><span class="n">array</span><span class="o">.</span><span class="n">shape</span><span class="p">,</span> <span class="nb">str</span><span class="p">(</span><span class="n">array</span><span class="o">.</span><span class="n">dtype</span><span class="p">),</span> <span class="n">array</span><span class="o">.</span><span class="n">tobytes</span><span class="p">())</span>
+        <span class="n">key</span><span class="o">.</span><span class="n">append</span><span class="p">((</span><span class="n">name</span><span class="p">,</span> <span class="n">value</span><span class="p">))</span>
+    <span class="k">return</span> <span class="nb">tuple</span><span class="p">(</span><span class="n">key</span><span class="p">)</span>
+
+
+<span class="k">def</span><span class="w"> </span><span class="nf">_absorb_args</span><span class="p">(</span>
+    <span class="n">method</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">use_cache</span><span class="p">:</span> <span class="nb">bool</span><span class="p">,</span> <span class="n">absorb_options</span><span class="p">:</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]</span> <span class="o">|</span> <span class="kc">None</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">tuple</span><span class="p">[</span><span class="n">Any</span><span class="p">,</span> <span class="o">...</span><span class="p">]:</span>
+<span class="w">    </span><span class="sd">"""The arguments of AbsorbingLS.fit that determine the absorbed variables"""</span>
+    <span class="n">options</span> <span class="o">=</span> <span class="p">{}</span> <span class="k">if</span> <span class="n">absorb_options</span> <span class="ow">is</span> <span class="kc">None</span> <span class="k">else</span> <span class="n">absorb_options</span>
+    <span class="k">return</span> <span class="n">method</span><span class="p">,</span> <span class="n">use_cache</span><span class="p">,</span> <span class="n">_options_key</span><span class="p">(</span><span class="n">options</span><span class="p">)</span>
+
+
+<span class="k">def</span><span class="w"> </span><span class="nf">_check_absorb_options</span><span class="p">(</span><span class="n">options</span><span class="p">:</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">],</span> <span class="n">use_hdfe</span><span class="p">:</span> <span class="nb">bool</span><span class="p">,</span> <span class="n">method</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">"""</span>
+<span class="sd">    Raise a ValueError if options are those of the algorithm that is not used</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    options : dict</span>
+<span class="sd">        The options of the algorithm that absorbs the variables</span>
+<span class="sd">    use_hdfe : bool</span>
+<span class="sd">        Flag indicating that pyhdfe absorbs the variables and not LSMR</span>
+<span class="sd">    method : str</span>
+<span class="sd">        The method that was passed to fit</span>
+
+<span class="sd">    Notes</span>
+<span class="sd">    -----</span>
+<span class="sd">    The algorithm depends on the method and the model, and "auto" uses HDFE if</span>
+<span class="sd">    it can. The options of LSMR that are passed to pyhdfe.create, and the options</span>
+<span class="sd">    of pyhdfe.create that are passed to lsmr, are a TypeError that does not</span>
+<span class="sd">    say why. The options of the two algorithms have different names.</span>
+<span class="sd">    """</span>
+    <span class="kn">from</span><span class="w"> </span><span class="nn">pyhdfe</span><span class="w"> </span><span class="kn">import</span> <span class="n">create</span>  <span class="c1"># noqa: PLC0415</span>
+
+    <span class="n">lsmr_names</span> <span class="o">=</span> <span class="nb">set</span><span class="p">(</span><span class="n">signature</span><span class="p">(</span><span class="n">lsmr</span><span class="p">)</span><span class="o">.</span><span class="n">parameters</span><span class="p">)</span> <span class="o">-</span> <span class="p">{</span><span class="s2">"A"</span><span class="p">,</span> <span class="s2">"b"</span><span class="p">}</span>
+    <span class="n">hdfe_names</span> <span class="o">=</span> <span class="nb">set</span><span class="p">(</span><span class="n">signature</span><span class="p">(</span><span class="n">create</span><span class="p">)</span><span class="o">.</span><span class="n">parameters</span><span class="p">)</span> <span class="o">-</span> <span class="p">{</span><span class="s2">"ids"</span><span class="p">}</span>
+    <span class="n">wrong</span> <span class="o">=</span> <span class="nb">sorted</span><span class="p">(</span><span class="nb">set</span><span class="p">(</span><span class="n">options</span><span class="p">)</span><span class="o">.</span><span class="n">intersection</span><span class="p">(</span><span class="n">lsmr_names</span> <span class="k">if</span> <span class="n">use_hdfe</span> <span class="k">else</span> <span class="n">hdfe_names</span><span class="p">))</span>
+    <span class="k">if</span> <span class="ow">not</span> <span class="n">wrong</span><span class="p">:</span>
+        <span class="k">return</span>
+    <span class="n">names</span> <span class="o">=</span> <span class="s2">", "</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="sa">f</span><span class="s2">"'</span><span class="si">{</span><span class="n">name</span><span class="si">}</span><span class="s2">'"</span> <span class="k">for</span> <span class="n">name</span> <span class="ow">in</span> <span class="n">wrong</span><span class="p">)</span>
+    <span class="n">why</span> <span class="o">=</span> <span class="sa">f</span><span class="s1">'method is "</span><span class="si">{</span><span class="n">method</span><span class="si">}</span><span class="s1">"'</span>
+    <span class="k">if</span> <span class="n">use_hdfe</span><span class="p">:</span>
+        <span class="k">if</span> <span class="n">method</span> <span class="o">==</span> <span class="s2">"auto"</span><span class="p">:</span>
+            <span class="n">why</span> <span class="o">+=</span> <span class="s2">" and the model can be absorbed using HDFE"</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
+            <span class="sa">f</span><span class="s2">"absorb_options contains options of scipy.sparse.linalg.lsmr (</span><span class="si">{</span><span class="n">names</span><span class="si">}</span><span class="s2">) "</span>
+            <span class="s2">"that pyhdfe.create does not have. The variables are absorbed using "</span>
+            <span class="sa">f</span><span class="s1">'HDFE because </span><span class="si">{</span><span class="n">why</span><span class="si">}</span><span class="s1">. Use method="lsmr" to absorb them using LSMR.'</span>
+        <span class="p">)</span>
+    <span class="k">if</span> <span class="n">method</span> <span class="o">==</span> <span class="s2">"auto"</span><span class="p">:</span>
+        <span class="n">why</span> <span class="o">+=</span> <span class="p">(</span>
+            <span class="s2">" and the model cannot be absorbed using HDFE, which requires that it "</span>
+            <span class="s2">"is not weighted and that the absorbed variables are all categorical"</span>
+        <span class="p">)</span>
+    <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
+        <span class="sa">f</span><span class="s2">"absorb_options contains options of pyhdfe.create (</span><span class="si">{</span><span class="n">names</span><span class="si">}</span><span class="s2">) that "</span>
+        <span class="s2">"scipy.sparse.linalg.lsmr does not have. The variables are absorbed "</span>
+        <span class="sa">f</span><span class="s2">"using LSMR because </span><span class="si">{</span><span class="n">why</span><span class="si">}</span><span class="s2">. Use options of LSMR or remove them."</span>
+    <span class="p">)</span>
+
+
 <span class="k">def</span><span class="w"> </span><span class="nf">lsmr_annihilate</span><span class="p">(</span>
     <span class="n">x</span><span class="p">:</span> <span class="n">csc_array</span><span class="p">,</span>
     <span class="n">y</span><span class="p">:</span> <span class="n">linearmodels</span><span class="o">.</span><span class="n">typing</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">Float64Array</span><span class="p">,</span>
@@ -650,17 +737,21 @@
 <span class="sd">        \hat{\epsilon}_{j} = y_{j} - x^\prime \hat{\beta}</span>
 
 <span class="sd">    where :math:`\hat{\beta}` is computed using lsmr.</span>
+
+<span class="sd">    The cache identifies residuals using `x_hash`, the values of the column</span>
+<span class="sd">    of `y` and the options passed to lsmr, since residuals computed using</span>
+<span class="sd">    other options are not the same.</span>
 <span class="sd">    """</span>
     <span class="k">if</span> <span class="n">y</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
         <span class="k">return</span> <span class="n">empty_like</span><span class="p">(</span><span class="n">y</span><span class="p">)</span>
     <span class="n">use_cache</span> <span class="o">=</span> <span class="n">use_cache</span> <span class="ow">and</span> <span class="n">x_hash</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span>
-    <span class="n">regressor_hash</span> <span class="o">=</span> <span class="n">x_hash</span> <span class="k">if</span> <span class="n">x_hash</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="k">else</span> <span class="s2">""</span>
     <span class="n">default_opts</span><span class="p">:</span> <span class="nb">dict</span><span class="p">[</span>
         <span class="nb">str</span><span class="p">,</span>
         <span class="nb">bool</span> <span class="o">|</span> <span class="nb">float</span> <span class="o">|</span> <span class="nb">str</span> <span class="o">|</span> <span class="n">linearmodels</span><span class="o">.</span><span class="n">typing</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">ArrayLike</span> <span class="o">|</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]</span> <span class="o">|</span> <span class="kc">None</span><span class="p">,</span>
     <span class="p">]</span> <span class="o">=</span> <span class="p">{</span><span class="s2">"atol"</span><span class="p">:</span> <span class="mf">1e-8</span><span class="p">,</span> <span class="s2">"btol"</span><span class="p">:</span> <span class="mf">1e-8</span><span class="p">,</span> <span class="s2">"show"</span><span class="p">:</span> <span class="kc">False</span><span class="p">}</span>
     <span class="k">assert</span> <span class="n">lsmr_options</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span>
     <span class="n">default_opts</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="n">lsmr_options</span><span class="p">)</span>
+    <span class="n">cache_key</span> <span class="o">=</span> <span class="p">(</span><span class="n">x_hash</span><span class="p">,</span> <span class="n">_options_key</span><span class="p">(</span><span class="n">default_opts</span><span class="p">))</span>
     <span class="n">resids</span> <span class="o">=</span> <span class="p">[]</span>
     <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">y</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">]):</span>
         <span class="n">_y</span> <span class="o">=</span> <span class="n">y</span><span class="p">[:,</span> <span class="n">i</span> <span class="p">:</span> <span class="n">i</span> <span class="o">+</span> <span class="mi">1</span><span class="p">]</span>
@@ -671,12 +762,13 @@
             <span class="n">hasher</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="nb">memoryview</span><span class="p">(</span><span class="n">ascontiguousarray</span><span class="p">(</span><span class="n">_y</span><span class="o">.</span><span class="n">data</span><span class="p">)))</span>
             <span class="n">variable_digest</span> <span class="o">=</span> <span class="n">hasher</span><span class="o">.</span><span class="n">hexdigest</span><span class="p">()</span>
 
-        <span class="k">if</span> <span class="n">use_cache</span> <span class="ow">and</span> <span class="n">variable_digest</span> <span class="ow">in</span> <span class="n">_VARIABLE_CACHE</span><span class="p">[</span><span class="n">regressor_hash</span><span class="p">]:</span>
-            <span class="n">resid</span> <span class="o">=</span> <span class="n">_VARIABLE_CACHE</span><span class="p">[</span><span class="n">regressor_hash</span><span class="p">][</span><span class="n">variable_digest</span><span class="p">]</span>
+        <span class="k">if</span> <span class="n">use_cache</span> <span class="ow">and</span> <span class="n">variable_digest</span> <span class="ow">in</span> <span class="n">_VARIABLE_CACHE</span><span class="p">[</span><span class="n">cache_key</span><span class="p">]:</span>
+            <span class="n">resid</span> <span class="o">=</span> <span class="n">_VARIABLE_CACHE</span><span class="p">[</span><span class="n">cache_key</span><span class="p">][</span><span class="n">variable_digest</span><span class="p">]</span>
         <span class="k">else</span><span class="p">:</span>
             <span class="n">beta</span> <span class="o">=</span> <span class="n">lsmr</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">_y</span><span class="p">,</span> <span class="o">**</span><span class="n">default_opts</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span>
             <span class="n">resid</span> <span class="o">=</span> <span class="n">y</span><span class="p">[:,</span> <span class="n">i</span> <span class="p">:</span> <span class="n">i</span> <span class="o">+</span> <span class="mi">1</span><span class="p">]</span> <span class="o">-</span> <span class="n">x</span><span class="o">.</span><span class="n">dot</span><span class="p">(</span><span class="n">csc_array</span><span class="p">(</span><span class="n">beta</span><span class="p">[:,</span> <span class="kc">None</span><span class="p">]))</span><span class="o">.</span><span class="n">toarray</span><span class="p">()</span>
-            <span class="n">_VARIABLE_CACHE</span><span class="p">[</span><span class="n">regressor_hash</span><span class="p">][</span><span class="n">variable_digest</span><span class="p">]</span> <span class="o">=</span> <span class="n">resid</span>
+            <span class="k">if</span> <span class="n">use_cache</span><span class="p">:</span>
+                <span class="n">_VARIABLE_CACHE</span><span class="p">[</span><span class="n">cache_key</span><span class="p">][</span><span class="n">variable_digest</span><span class="p">]</span> <span class="o">=</span> <span class="n">resid</span>
         <span class="n">resids</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">resid</span><span class="p">)</span>
     <span class="k">return</span> <span class="n">column_stack</span><span class="p">(</span><span class="n">resids</span><span class="p">)</span>
 
@@ -1243,6 +1335,8 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">_prepare_interactions</span><span class="p">()</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_absorbed_dependent</span><span class="p">:</span> <span class="n">DataFrame</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_absorbed_exog</span><span class="p">:</span> <span class="n">DataFrame</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="c1"># The arguments of fit that were used to absorb the variables</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_absorb_args</span><span class="p">:</span> <span class="nb">tuple</span><span class="p">[</span><span class="n">Any</span><span class="p">,</span> <span class="o">...</span><span class="p">]</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span>
 
         <span class="bp">self</span><span class="o">.</span><span class="n">_check_shape</span><span class="p">()</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_original_index</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_dependent</span><span class="o">.</span><span class="n">pandas</span><span class="o">.</span><span class="n">index</span>
@@ -1401,6 +1495,11 @@
         <span class="p">),</span>
         <span class="n">method</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
     <span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="c1"># Absorbing is repeated when fit uses other options, so start from the</span>
+        <span class="c1"># state of a model that has not been fit</span>
+        <span class="n">absorb_args</span> <span class="o">=</span> <span class="n">_absorb_args</span><span class="p">(</span><span class="n">method</span><span class="p">,</span> <span class="n">use_cache</span><span class="p">,</span> <span class="n">absorb_options</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_num_params</span> <span class="o">=</span> <span class="mi">0</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_columns</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_exog</span><span class="o">.</span><span class="n">cols</span>
         <span class="n">weights</span> <span class="o">=</span> <span class="p">(</span>
             <span class="n">cast</span><span class="p">(</span><span class="s2">"linearmodels.typing.data.Float64Array"</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">weights</span><span class="o">.</span><span class="n">ndarray</span><span class="p">)</span>
             <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_is_weighted</span>
@@ -1442,9 +1541,10 @@
         <span class="n">mu_dep</span> <span class="o">=</span> <span class="p">(</span><span class="n">root_w</span><span class="o">.</span><span class="n">T</span> <span class="o">@</span> <span class="n">dep</span><span class="p">)</span> <span class="o">/</span> <span class="n">denom</span>
         <span class="n">mu_exog</span> <span class="o">=</span> <span class="p">(</span><span class="n">root_w</span><span class="o">.</span><span class="n">T</span> <span class="o">@</span> <span class="n">exog</span><span class="p">)</span> <span class="o">/</span> <span class="n">denom</span>
 
-        <span class="n">absorb_options</span> <span class="o">=</span> <span class="p">{}</span> <span class="k">if</span> <span class="n">absorb_options</span> <span class="ow">is</span> <span class="kc">None</span> <span class="k">else</span> <span class="n">absorb_options</span>
+        <span class="n">absorb_options</span> <span class="o">=</span> <span class="p">{}</span> <span class="k">if</span> <span class="n">absorb_options</span> <span class="ow">is</span> <span class="kc">None</span> <span class="k">else</span> <span class="nb">dict</span><span class="p">(</span><span class="n">absorb_options</span><span class="p">)</span>
         <span class="k">assert</span> <span class="nb">isinstance</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_regressors</span><span class="p">,</span> <span class="n">csc_array</span><span class="p">)</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_regressors</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="n">_check_absorb_options</span><span class="p">(</span><span class="n">absorb_options</span><span class="p">,</span> <span class="n">use_hdfe</span><span class="p">,</span> <span class="n">method</span><span class="p">)</span>
             <span class="k">if</span> <span class="n">use_hdfe</span><span class="p">:</span>
                 <span class="kn">from</span><span class="w"> </span><span class="nn">pyhdfe</span><span class="w"> </span><span class="kn">import</span> <span class="n">create</span>  <span class="c1"># noqa: PLC0415</span>
 
@@ -1505,6 +1605,22 @@
             <span class="n">exog_resid</span><span class="p">,</span> <span class="n">index</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">_exog</span><span class="o">.</span><span class="n">pandas</span><span class="o">.</span><span class="n">index</span><span class="p">,</span> <span class="n">columns</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">_columns</span>
         <span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_num_params</span> <span class="o">+=</span> <span class="n">exog_resid</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_absorb_args</span> <span class="o">=</span> <span class="n">absorb_args</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">_discard_stale_absorption</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span>
+        <span class="n">method</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
+        <span class="n">use_cache</span><span class="p">:</span> <span class="nb">bool</span><span class="p">,</span>
+        <span class="n">absorb_options</span><span class="p">:</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]</span> <span class="o">|</span> <span class="kc">None</span><span class="p">,</span>
+        <span class="n">lsmr_options</span><span class="p">:</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">float</span> <span class="o">|</span> <span class="nb">bool</span><span class="p">]</span> <span class="o">|</span> <span class="kc">None</span><span class="p">,</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">"""Discard the absorbed variables if fit uses other options to absorb"""</span>
+        <span class="k">if</span> <span class="n">absorb_options</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="ow">and</span> <span class="n">lsmr_options</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="k">return</span>  <span class="c1"># fit raises an error</span>
+        <span class="n">options</span> <span class="o">=</span> <span class="n">lsmr_options</span> <span class="k">if</span> <span class="n">absorb_options</span> <span class="ow">is</span> <span class="kc">None</span> <span class="k">else</span> <span class="n">absorb_options</span>
+        <span class="k">if</span> <span class="n">_absorb_args</span><span class="p">(</span><span class="n">method</span><span class="p">,</span> <span class="n">use_cache</span><span class="p">,</span> <span class="n">options</span><span class="p">)</span> <span class="o">!=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_absorb_args</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_absorbed_dependent</span> <span class="o">=</span> <span class="kc">None</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_absorbed_exog</span> <span class="o">=</span> <span class="kc">None</span>
 
 <div class="viewcode-block" id="AbsorbingLS.fit">
 <a class="viewcode-back" href="../../../iv/absorbing/linearmodels.iv.absorbing.AbsorbingLS.fit.html#linearmodels.iv.absorbing.AbsorbingLS.fit">[docs]</a>
@@ -1561,7 +1677,11 @@
 <span class="sd">        absorb_options : dict</span>
 <span class="sd">            Dictionary of options to pass to the absorber. Passed to either</span>
 <span class="sd">            scipy.sparse.linalg.lsmr or pyhdfe.create depending on the method used</span>
-<span class="sd">            to absorb the absorbed regressors.</span>
+<span class="sd">            to absorb the absorbed regressors. The options have to be those of</span>
+<span class="sd">            the algorithm that is used, which is HDFE if method is "auto" and the</span>
+<span class="sd">            model can be absorbed using it. A ValueError is raised for options</span>
+<span class="sd">            of LSMR if the variables are absorbed using HDFE, and for options</span>
+<span class="sd">            of pyhdfe.create if they are absorbed using LSMR.</span>
 <span class="sd">        use_cache : bool</span>
 <span class="sd">            Flag indicating whether the variables, once purged from the</span>
 <span class="sd">            absorbed variables and interactions, should be stored in the cache,</span>
@@ -1569,11 +1689,14 @@
 <span class="sd">            re-fitting large models when the set of absorbed variables and</span>
 <span class="sd">            interactions are identical.</span>
 <span class="sd">        lsmr_options : dict</span>
-<span class="sd">            Options to ass to scipy.sparse.linalg.lsmr.</span>
+<span class="sd">            Options to pass to scipy.sparse.linalg.lsmr. If they are not empty,</span>
+<span class="sd">            method "auto" absorbs the variables using LSMR, and method "hdfe"</span>
+<span class="sd">            raises a ValueError.</span>
 
 <span class="sd">            .. deprecated:: 4.17</span>
 
-<span class="sd">               Use absorb_options to pass options</span>
+<span class="sd">               Use absorb_options to pass options. ``lsmr_options`` will be</span>
+<span class="sd">               removed in linearmodels 8.0.</span>
 
 <span class="sd">        cov_config</span>
 <span class="sd">            Additional parameters to pass to covariance estimator. The list</span>
@@ -1598,7 +1721,14 @@
 <span class="sd">        contents using either a 64-bit value (if xxhash is installed) or</span>
 <span class="sd">        a 256-bit value. This allows variables to be reused in different</span>
 <span class="sd">        models if the set of absorbing variables and interactions is held</span>
-<span class="sd">        constant.</span>
+<span class="sd">        constant. The options used to absorb the variables are part of</span>
+<span class="sd">        what identifies them.</span>
+
+<span class="sd">        The variables are absorbed when fit is called for the first time. A</span>
+<span class="sd">        later call uses the same absorbed variables if ``method``,</span>
+<span class="sd">        ``absorb_options`` and ``use_cache`` have the same values, so that</span>
+<span class="sd">        changing only the covariance estimator is fast. If any of them differs,</span>
+<span class="sd">        the variables are absorbed again using the new values.</span>
 
 <span class="sd">        See also</span>
 <span class="sd">        --------</span>
@@ -1607,11 +1737,22 @@
 <span class="sd">        linearmodels.iv.covariance.KernelCovariance</span>
 <span class="sd">        linearmodels.iv.covariance.ClusteredCovariance</span>
 <span class="sd">        """</span>
+        <span class="k">if</span> <span class="n">lsmr_options</span> <span class="ow">and</span> <span class="n">absorb_options</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="c1"># The options are options of LSMR, so they can not be passed to HDFE</span>
+            <span class="k">if</span> <span class="n">method</span> <span class="o">==</span> <span class="s2">"hdfe"</span><span class="p">:</span>
+                <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
+                    <span class="s2">"lsmr_options are options of scipy.sparse.linalg.lsmr and "</span>
+                    <span class="s1">'cannot be used with method="hdfe". Use method="lsmr" or '</span>
+                    <span class="s1">'method="auto", which uses LSMR if lsmr_options are given.'</span>
+                <span class="p">)</span>
+            <span class="n">method</span> <span class="o">=</span> <span class="s2">"lsmr"</span> <span class="k">if</span> <span class="n">method</span> <span class="o">==</span> <span class="s2">"auto"</span> <span class="k">else</span> <span class="n">method</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_discard_stale_absorption</span><span class="p">(</span><span class="n">method</span><span class="p">,</span> <span class="n">use_cache</span><span class="p">,</span> <span class="n">absorb_options</span><span class="p">,</span> <span class="n">lsmr_options</span><span class="p">)</span>
         <span class="k">if</span> <span class="n">lsmr_options</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
             <span class="k">if</span> <span class="n">absorb_options</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
                 <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">"absorb_options cannot be used with lsmr_options"</span><span class="p">)</span>
             <span class="n">warnings</span><span class="o">.</span><span class="n">warn</span><span class="p">(</span>
-                <span class="s2">"lsmr_options is deprecated.  Use absorb_options."</span><span class="p">,</span>
+                <span class="s2">"lsmr_options is deprecated and will be removed in linearmodels "</span>
+                <span class="s2">"8.0. Use absorb_options."</span><span class="p">,</span>
                 <span class="ne">FutureWarning</span><span class="p">,</span>
                 <span class="n">stacklevel</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span>
             <span class="p">)</span>
