@@ -1,6 +1,9 @@
 """
 Checks of the instrumental variable features that were added after version 7.0
 
+* IVJIVE: the docstring examples, formulas with weights and missing values,
+  prediction, comparison with the other estimators, the summary and the
+  first-stage tests of the rank.
 * The tests of the rank of the first-stage coefficient matrix, which are
   cragg_donald, cragg_donald_f, kleibergen_paap and kleibergen_paap_f: that the
   documentation is well-formed, and the behavior with weights and clusters that
@@ -9,6 +12,7 @@ Checks of the instrumental variable features that were added after version 7.0
   GMM, weights, clusters, kernels and singular covariances.
 """
 
+import doctest
 import inspect
 import re
 import warnings
@@ -18,6 +22,7 @@ from numpy.testing import assert_allclose
 import pandas as pd
 import pytest
 
+from linearmodels.datasets import wage
 from linearmodels.iv import IV2SLS, IVGMM, IVGMMCUE, IVJIVE, IVLIML
 from linearmodels.iv.common import (
     cragg_donald,
@@ -25,7 +30,9 @@ from linearmodels.iv.common import (
     kleibergen_paap,
     kleibergen_paap_f,
 )
+import linearmodels.iv.model
 from linearmodels.iv.results import FirstStageResults, IVGMMResults
+from linearmodels.shared.exceptions import MissingValueWarning
 from linearmodels.shared.hypotheses import InvalidTestStatistic, WaldTestStatistic
 
 
@@ -45,6 +52,50 @@ def simulate(seed, nobs=300, ninstr=4, nendog=1, violation=0.0, weighted=False):
     y = exog @ [1.0, 0.5] + endog.sum(1) + violation * z[:, -1] + u
     w = rng.uniform(0.3, 3.0, nobs) if weighted else None
     return y, exog, endog, z, w
+
+
+# ----------------------------------------------------------------------------
+# IVJIVE
+# ----------------------------------------------------------------------------
+
+
+def run_docstring_examples(obj, name):
+    """Run the examples in the docstrings of an object and of its members"""
+    finder = doctest.DocTestFinder(exclude_empty=True)
+    failures = []
+    with_examples = set()
+    for test in finder.find(obj, name, globs={}):
+        runner = doctest.DocTestRunner(optionflags=doctest.ELLIPSIS)
+        with warnings.catch_warnings():
+            warnings.simplefilter("ignore", MissingValueWarning)
+            runner.run(test, out=failures.append)
+        if test.examples:
+            with_examples.add(test.name)
+    return with_examples, failures
+
+
+def test_jive_docstring_examples_run():
+    with_examples, failures = run_docstring_examples(IVJIVE, "IVJIVE")
+    assert not failures, "".join(failures)
+    assert {"IVJIVE", "IVJIVE.from_formula"} <= with_examples
+
+
+def test_jive_from_formula_example_has_every_term():
+    # exper ** 2 is the power of a set of terms in a formula, which is exper, and
+    # not its square. Without I() the example silently omits the term that it
+    # names
+    doc = IVJIVE.from_formula.__doc__
+    formula = re.search(r'formula = "(.*)"', doc).group(1)
+    assert "exper ** 2" not in formula.replace("I(exper ** 2)", "")
+    with warnings.catch_warnings():
+        warnings.simplefilter("ignore", MissingValueWarning)
+        mod = IVJIVE.from_formula(formula, wage.load())
+    assert "I(exper ** 2)" in list(mod.fit().params.index)
+
+
+def test_jive_is_in_the_model_module_all():
+    assert "IVJIVE" in linearmodels.iv.model.__all__
+    assert linearmodels.iv.model.IVJIVE is IVJIVE
 
 
 # ----------------------------------------------------------------------------

@@ -68,6 +68,7 @@ __all__ = [
     "IV2SLS",
     "IVGMM",
     "IVGMMCUE",
+    "IVJIVE",
     "IVLIML",
     "WEIGHT_MATRICES",
     "_OLS",
@@ -2056,13 +2057,20 @@ class IVJIVE(_IVModelBase):
         block of the form [endog ~ instruments] which is used to indicate
         the list of endogenous variables and instruments.  The general
         structure of an IV formula is `dependent ~ exog [endog ~ instruments]`
+        and it must be the case that the formula expressions constructed from
+        blocks `dependent ~ exog endog` and `dependent ~ exog instruments` are
+        both valid formulas.
+
+        A constant must be explicitly included using "1 +" if required. Use
+        `I(exper ** 2)` for the square of a variable, since `exper ** 2` is
+        the power of a set of terms in a formula, which is `exper`.
 
         Examples
         --------
         >>> from linearmodels.datasets import wage
         >>> from linearmodels.iv import IVJIVE
         >>> data = wage.load()
-        >>> formula = "np.log(wage) ~ 1 + exper + exper ** 2 + brthord + [educ ~ sibs]"
+        >>> formula = "np.log(wage) ~ 1 + exper + I(exper ** 2) + brthord + [educ ~ sibs]"
         >>> mod = IVJIVE.from_formula(formula, data)
         """
         parser = IVFormulaParser(formula, data)
