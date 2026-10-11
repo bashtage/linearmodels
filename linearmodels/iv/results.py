@@ -24,7 +24,7 @@ from numpy import (
     sqrt,
     squeeze,
 )
-from numpy.linalg import inv
+from numpy.linalg import LinAlgError, inv
 from pandas import DataFrame, Series, concat, to_numeric
 from scipy import stats
 from statsmodels.iolib.summary import SimpleTable, fmt_2cols, fmt_params
@@ -1667,8 +1667,12 @@ class IVGMMResults(_CommonIVResults):
 
         Returns
         -------
-        WaldTestStatistic
-            J statistic  test of overidentifying restrictions
+        WaldTestStatistic or InvalidTestStatistic
+            J statistic  test of overidentifying restrictions.
+            An InvalidTestStatistic is returned if the estimate of the
+            covariance of the moment conditions that was inverted to compute
+            the weight matrix is singular, which can happen if there are too
+            few clusters.
 
         Notes
         -----
@@ -1685,6 +1689,17 @@ class IVGMMResults(_CommonIVResults):
         :math:`\hat{\epsilon}_i` are the model residuals. :math:`W` is a consistent
         estimator of the variance of :math:`\sqrt{n}\bar{g}`. The degree of
         freedom is :math:`q = n_{instr} - n_{endog}`.
+
+        The statistic is not defined if the estimate of the covariance of the
+        moment conditions that is inverted to compute the weight matrix is
+        singular. A clustered estimate that uses G clusters has rank at most
+        G, and at most G - 1 if the moment conditions are centered (``center``
+        is True), because the centered cluster sums add to zero. There have to
+        be at least as many clusters as moment conditions, and more if they are
+        centered. The rank of a kernel or robust estimate is bounded in the
+        same way by the number of observations. Whether the estimate is
+        singular does not depend on the units in which the variables are
+        measured.
         """
         return self._j_stat
 
@@ -1763,7 +1778,9 @@ class IVGMMResults(_CommonIVResults):
         """
         return self._centered_j_stat
 
-    def c_stat(self, variables: list[str] | str | None = None) -> WaldTestStatistic:
+    def c_stat(
+        self, variables: list[str] | str | None = None
+    ) -> InvalidTestStatistic | WaldTestStatistic:
         r"""
         C-test of endogeneity
 
@@ -1775,8 +1792,11 @@ class IVGMMResults(_CommonIVResults):
 
         Returns
         -------
-        WaldTestStatistic
-            Object containing test statistic, p-value, distribution and null
+        WaldTestStatistic or InvalidTestStatistic
+            Object containing test statistic, p-value, distribution and null.
+            An InvalidTestStatistic is returned if the covariance of the
+            moment conditions of the first model is singular, which can happen
+            if there are too few clusters.
 
         Notes
         -----
@@ -1821,6 +1841,16 @@ class IVGMMResults(_CommonIVResults):
         kernel, so that the statistic is valid under the same assumptions
         about the moment conditions.
 
+        The first model has a moment condition for each tested variable that
+        the model does not have. The estimate of the covariance of its moment
+        conditions has to be nonsingular, and the statistic is invalid if it is
+        not. A clustered estimate that uses G clusters has rank at most G, and
+        at most G - 1 if the moment conditions are centered (``center`` is
+        True), because the centered cluster sums add to zero. There have to be
+        at least as many clusters as moment conditions in the first model, and
+        more if they are centered. The rank of a kernel or robust estimate is
+        bounded in the same way by the number of observations.
+
         See Hayashi (2000), pp. 218-221 and 232-234, or Baum, Schaffer and
         Stillman (2003), section 4.4, for details.
         """
@@ -1856,8 +1886,21 @@ class IVGMMResults(_CommonIVResults):
             weight_type=self.model._weight_type,
             **self.model._weight_kwargs,
         )
-        res_e = mod.fit(cov_type=self.cov_type, **self.cov_config)
+        reason = (
+            "The covariance of the moment conditions of the model that treats "
+            "the tested variables as exogenous is singular, so the statistic "
+            "is not defined. This occurs, for example, when there are too few "
+            "clusters, since that model has a moment condition for each tested "
+            "variable that this model does not."
+        )
+        try:
+            res_e = mod.fit(cov_type=self.cov_type, **self.cov_config)
+        except LinAlgError:
+            # The covariance of the moment conditions is exactly singular
+            return InvalidTestStatistic(reason, name="C-statistic")
         assert isinstance(res_e, IVGMMResults)
+        if isinstance(res_e.j_stat, InvalidTestStatistic):
+            return InvalidTestStatistic(reason, name="C-statistic")
         j_e = res_e.j_stat.stat
 
         x = self.model._wx
