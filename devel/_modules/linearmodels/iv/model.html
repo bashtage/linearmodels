@@ -19,7 +19,7 @@
     
   
       
-        <title>linearmodels.iv.model - linearmodels v7.1 (+153)</title>
+        <title>linearmodels.iv.model - linearmodels v7.1 (+155)</title>
       
     
 
@@ -91,7 +91,7 @@
 
 <header class="md-header md-header--shadow" data-md-component="header">
   <nav class="md-header__inner md-grid" aria-label="Header">
-    <a href="../../../index.html" title="linearmodels v7.1 (+153)" class="md-header__button md-logo" aria-label="linearmodels v7.1 (+153)" data-md-component="logo">
+    <a href="../../../index.html" title="linearmodels v7.1 (+155)" class="md-header__button md-logo" aria-label="linearmodels v7.1 (+155)" data-md-component="logo">
       <img src="../../../_static/bw-logo.svg" alt="logo">
     </a>
     <label class="md-header__button md-icon" for="__drawer">
@@ -102,7 +102,7 @@
       <div class="md-header__ellipsis">
         <div class="md-header__topic">
           <span class="md-ellipsis">
-            linearmodels v7.1 (+153)
+            linearmodels v7.1 (+155)
           </span>
         </div>
         <div class="md-header__topic" data-md-component="header-topic">
@@ -197,10 +197,10 @@
 
 <nav class="md-nav md-nav--primary" aria-label="Navigation" data-md-level="0">
   <label class="md-nav__title" for="__drawer">
-    <a href="../../../index.html" title="linearmodels v7.1 (+153)" class="md-nav__button md-logo" aria-label="linearmodels v7.1 (+153)" data-md-component="logo">
+    <a href="../../../index.html" title="linearmodels v7.1 (+155)" class="md-nav__button md-logo" aria-label="linearmodels v7.1 (+155)" data-md-component="logo">
       <img src="../../../_static/bw-logo.svg" alt="logo">
     </a>
-    linearmodels v7.1 (+153)
+    linearmodels v7.1 (+155)
   </label>
   
     <div class="md-nav__source">
@@ -1971,7 +1971,6 @@
         <span class="n">weight_type</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">"robust"</span><span class="p">,</span>
         <span class="o">**</span><span class="n">weight_config</span><span class="p">:</span> <span class="n">Any</span><span class="p">,</span>
     <span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">_method</span> <span class="o">=</span> <span class="s2">"IV-GMM-CUE"</span>
         <span class="c1"># The default has to be set before the weight estimator is created</span>
         <span class="k">if</span> <span class="s2">"center"</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">weight_config</span><span class="p">:</span>
             <span class="n">weight_config</span><span class="p">[</span><span class="s2">"center"</span><span class="p">]</span> <span class="o">=</span> <span class="kc">True</span>
@@ -1984,6 +1983,8 @@
             <span class="n">weight_type</span><span class="o">=</span><span class="n">weight_type</span><span class="p">,</span>
             <span class="o">**</span><span class="n">weight_config</span><span class="p">,</span>
         <span class="p">)</span>
+        <span class="c1"># Set after the base class, which sets the method to IV-GMM</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_method</span> <span class="o">=</span> <span class="s2">"IV-GMM-CUE"</span>
 
 <div class="viewcode-block" id="IVGMMCUE.from_formula">
 <a class="viewcode-back" href="../../../iv/iv/linearmodels.iv.model.IVGMMCUE.from_formula.html#linearmodels.iv.model.IVGMMCUE.from_formula">[docs]</a>
