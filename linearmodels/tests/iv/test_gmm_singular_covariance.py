@@ -16,6 +16,10 @@ very large, negative or arbitrary numbers. They have to be invalid, as the
 centered J statistic is. All of the expected values below are computed from the
 definitions, without any of the weight matrix classes.
 
+The objective function of IVGMMCUE is a function of the inverse of the
+covariance, and so it is not defined either. IVGMMCUE.fit has to raise a
+ValueError that says why, before it optimizes the function.
+
 Whether NumPy raises a LinAlgError when it inverts a covariance that is
 singular depends on rounding, and so on the platform. It does so if the matrix
 is exactly singular, and otherwise returns the inverse of the noise. The
@@ -454,3 +458,115 @@ def test_units_of_the_instruments_do_not_matter(nclusters, scale):
         assert_allclose(res_scaled.c_stat().stat, res.c_stat().stat, rtol=1e-5)
     else:
         check_invalid(res_scaled.c_stat(), "C-statistic")
+
+
+# ----------------------------------------------------------------------------
+# IVGMMCUE, which inverts the covariance in the objective that it minimizes
+# ----------------------------------------------------------------------------
+
+
+def cue_model(data, nclusters, **config):
+    y, exog, endog, instr = data
+    clusters = np.arange(y.shape[0]) % nclusters
+    mod = IVGMMCUE(
+        y,
+        exog,
+        endog,
+        instr,
+        weight_type="clustered",
+        clusters=clusters,
+        **config,
+    )
+    return mod, clusters
+
+
+def cue_criterion(data, params, nclusters, center):
+    """The objective of continuously updating GMM at params, from the definition"""
+    x, y, z, _, _ = arrays(data)
+    g = z * (y - x @ params)[:, None]
+    gbar = g.mean(0)
+    cov = clustered_cov(np.arange(y.shape[0]) % nclusters, center)(g)
+    return y.shape[0] * gbar @ np.linalg.solve(cov, gbar)
+
+
+# The model has 4 moment conditions. Centered cluster sums add to zero, so that the
+# covariance is singular unless there are more clusters than moment conditions, and
+# at least as many are needed if the moment conditions are not centered
+CUE_SINGULAR = [
+    pytest.param(2, {}, id="default-2"),
+    pytest.param(3, {}, id="default-3"),
+    pytest.param(4, {}, id="default-4"),
+    pytest.param(4, {"center": True}, id="center-4"),
+    pytest.param(2, {"center": False}, id="uncentered-2"),
+    pytest.param(3, {"center": False}, id="uncentered-3"),
+]
+
+
+@pytest.mark.parametrize(("nclusters", "config"), CUE_SINGULAR)
+def test_cue_too_few_clusters(nclusters, config):
+    # This was a LinAlgError (Singular matrix) from the objective function, which
+    # is a ValueError in recent versions of NumPy and says nothing about the cause
+    mod, clusters = cue_model(ONE_ENDOG, nclusters, **config)
+    with pytest.raises(ValueError, match="too few clusters") as exc_info:
+        mod.fit(cov_type="clustered", clusters=clusters)
+    assert exc_info.type is ValueError
+    message = str(exc_info.value)
+    assert f"{nclusters} clusters" in message
+    assert "4 moment conditions" in message
+    assert "more clusters" in message
+    assert "singular" in message
+
+
+def test_cue_too_few_clusters_with_starting_values():
+    mod, clusters = cue_model(ONE_ENDOG, 3)
+    starting = pd.Series([1.0, 0.0, 0.5], index=["const", "w", "x"])
+    with pytest.raises(ValueError, match="too few clusters") as exc_info:
+        mod.fit(starting=starting, cov_type="clustered", clusters=clusters)
+    assert exc_info.type is ValueError
+
+
+def test_cue_too_few_clusters_is_found_before_the_optimization(monkeypatch):
+    def minimize(*args, **kwargs):
+        raise AssertionError("the objective is not defined, do not optimize it")
+
+    monkeypatch.setattr(linearmodels.iv.model, "minimize", minimize)
+    mod, clusters = cue_model(ONE_ENDOG, 3)
+    with pytest.raises(ValueError, match="too few clusters"):
+        mod.fit(cov_type="clustered", clusters=clusters)
+
+
+@pytest.mark.parametrize(
+    ("nclusters", "center"),
+    [(5, True), (6, True), (12, True), (4, False), (5, False), (12, False)],
+)
+def test_cue_with_enough_clusters_is_not_changed(nclusters, center):
+    # The first three of these have more clusters than moment conditions. A model
+    # that is not centered can have as many
+    mod, clusters = cue_model(ONE_ENDOG, nclusters, center=center)
+    res = mod.fit(cov_type="clustered", clusters=clusters)
+    assert np.all(np.isfinite(res.params))
+    assert np.all(np.isfinite(res.std_errors))
+    params = res.params[["const", "w", "x"]].to_numpy()
+    expected = cue_criterion(ONE_ENDOG, params, nclusters, center)
+    assert_allclose(res.j_stat.stat, expected, rtol=1e-6)
+    # The default is to center the moment conditions
+    if center:
+        default, _ = cue_model(ONE_ENDOG, nclusters)
+        res_default = default.fit(cov_type="clustered", clusters=clusters)
+        assert_allclose(res_default.params, res.params)
+
+
+@pytest.mark.parametrize("weight_type", ["kernel", "robust"])
+@pytest.mark.parametrize("nobs", [4, 5, 8])
+def test_cue_too_few_observations(weight_type, nobs):
+    # The rank of a covariance of centered moment conditions is at most nobs - 1
+    data = small_sample(nobs)
+    mod = IVGMMCUE(*data, weight_type=weight_type)
+    if nobs > 4:
+        res = mod.fit()
+        assert np.isfinite(res.j_stat.stat)
+        return
+    with pytest.raises(ValueError, match="too few observations") as exc_info:
+        mod.fit()
+    assert exc_info.type is ValueError
+    assert "4 moment conditions" in str(exc_info.value)

@@ -31,6 +31,7 @@ from numpy import (
     outer,
     sqrt,
     squeeze,
+    unique,
 )
 from numpy.linalg import LinAlgError, eigvalsh, inv, matrix_rank, pinv, qr, solve
 from pandas import DataFrame, Series, concat
@@ -1528,6 +1529,11 @@ class IVGMMCUE(_IVGMMBase):
     avoid starting value dependence. It is ``True`` unless ``center`` is
     passed in ``weight_config``.
 
+    The covariance of the moment conditions has to be nonsingular. A clustered
+    covariance that is estimated from G clusters has rank at most G, and at
+    most G - 1 if the moment conditions are centered, so that there have to be
+    more clusters than moment conditions if ``center`` is ``True``.
+
     .. math::
 
       \hat{\beta}_{cue} & =\min_{\beta}\bar{g}(\beta)'W(\beta)^{-1}g(\beta)\\
@@ -1762,6 +1768,51 @@ class IVGMMCUE(_IVGMMBase):
 
         return res.x[:, None], res.nit
 
+    def _check_moment_covariance(self) -> None:
+        """
+        Raise a ValueError if the covariance of the moment conditions is singular
+
+        The objective function uses the inverse of the covariance, so it is not
+        defined if the covariance is singular. The rank of the covariance does
+        not depend on the parameters, other than for special values such as
+        residuals that are all 0, and so it is tested at the first step
+        estimates of two-step GMM.
+        """
+        wy, wx, wz = self._wy, self._wx, self._wz
+        nobs, nmoment = wz.shape
+        params = IVGMM.estimate_parameters(wx, wy, wz, inv(wz.T @ wz / nobs))
+        if not _is_singular(self._weight.weight_matrix(wx, wz, wy - wx @ params)):
+            return
+        if isinstance(self._weight, OneWayClusteredWeightMatrix):
+            nclusters = len(unique(asarray(self._weight_config["clusters"])))
+            centered = self._weight_config["center"]
+            rank = nclusters - 1 if centered else nclusters
+            rank_reason = (
+                "one less than the number of clusters, since the cluster sums of "
+                "centered moment conditions add to zero"
+                if centered
+                else "the number of clusters"
+            )
+            msg = (
+                f"The clustered covariance of the {nmoment} moment conditions is "
+                f"singular because there are too few clusters ({nclusters} "
+                f"clusters). Its rank is at most {rank}, {rank_reason}. The "
+                "objective function of the continuously updating GMM estimator "
+                "uses the inverse of the covariance, so it is not defined. Use "
+                "more clusters than moment conditions, or a weight_type that does "
+                "not use clusters."
+            )
+        else:
+            msg = (
+                f"The covariance of the {nmoment} moment conditions is singular, "
+                f"which occurs if there are too few observations ({nobs}) for the "
+                "number of moment conditions. The objective function of the "
+                "continuously updating GMM estimator uses the inverse of the "
+                "covariance, so it is not defined. Use more observations or fewer "
+                "moment conditions."
+            )
+        raise ValueError(msg)
+
     def fit(
         self,
         *,
@@ -1804,6 +1855,15 @@ class IVGMMCUE(_IVGMMBase):
         IVGMMResults
             Results container
 
+        Raises
+        ------
+        ValueError
+            If the covariance of the moment conditions is singular, which
+            occurs if there are too few clusters or observations. The
+            number of clusters has to be larger than the number of moment
+            conditions if the moment conditions are centered, which is the
+            default.
+
         Notes
         -----
         Starting values are computed by IVGMM.
@@ -1815,6 +1875,7 @@ class IVGMMCUE(_IVGMMBase):
         self._check_clusters(cov_config)
         wy, wx, wz = self._wy, self._wx, self._wz
         weight_matrix = self._weight.weight_matrix
+        self._check_moment_covariance()
         if starting is None:
             exog = None if self.exog.shape[1] == 0 else self.exog
             endog = None if self.endog.shape[1] == 0 else self.endog
