@@ -5,7 +5,7 @@ from linearmodels.compat.statsmodels import Summary
 from collections.abc import Mapping
 import datetime as dt
 from functools import cached_property
-from typing import Any, Union
+from typing import Any, NamedTuple, Union
 import warnings
 
 from formulaic.utils.context import capture_context
@@ -30,6 +30,7 @@ import linearmodels.typing.data
 
 __all__ = [
     "FamaMacBethResults",
+    "HausmanTestResults",
     "PanelEffectsResults",
     "PanelResults",
     "RandomEffectsResults",
@@ -965,6 +966,48 @@ def _has_unadjusted_cov(res: PanelResults) -> bool:
     return type(estimator) is HomoskedasticCovariance
 
 
+class HausmanTestResults(NamedTuple):
+    """
+    Results of a Hausman specification test.
+
+    Parameters
+    ----------
+    statistic : WaldTestStatistic or InvalidTestStatistic
+        The test statistic with its p-value, distribution and null hypothesis.
+        An InvalidTestStatistic is used if the statistic is negative, which
+        means that the models do not meet the assumptions of the test.
+    estimates : DataFrame
+        The coefficients included in the test. The columns are ``b0`` (from
+        the model that is consistent under both hypotheses, ``other``), ``b1``
+        (from the model that is efficient under the null), their difference
+        ``b0-b1`` and ``Std. Err.``, the standard error of the difference.
+        The standard error is NaN if the variance of the difference is
+        negative.
+
+    See Also
+    --------
+    RandomEffectsResults.hausman
+        Compute the Hausman specification test.
+
+    Notes
+    -----
+    The results are a named tuple, so the statistic and the estimates can be
+    unpacked as in ``statistic, estimates = results`` or read using the
+    ``statistic`` and ``estimates`` fields. Printing the results shows the
+    statistic followed by the table of estimates.
+    """
+
+    statistic: WaldTestStatistic | InvalidTestStatistic
+    estimates: DataFrame
+
+    def __str__(self) -> str:
+        legend = "b0: consistent under H0 and H1, b1: efficient under H0"
+        return f"{self.statistic}\n\nCoefficients ({legend})\n{self.estimates}"
+
+    def __repr__(self) -> str:
+        return self.__str__()
+
+
 class RandomEffectsResults(PanelResults):
     """
     Results container for random effect panel data models
@@ -989,15 +1032,15 @@ class RandomEffectsResults(PanelResults):
         """Values used in generalized demeaning"""
         return self._theta
 
-    def wu_hausman(
+    def hausman(
         self,
         other: PanelResults,
         include_constant: bool = False,
         sigmamore: bool = False,
         sigmaless: bool = False,
-    ) -> tuple[InvalidTestStatistic | WaldTestStatistic, DataFrame]:
+    ) -> HausmanTestResults:
         r"""
-        Hausman specification test against results from a consistent model
+        Hausman specification test against results from a consistent model.
 
         Parameters
         ----------
@@ -1006,29 +1049,30 @@ class RandomEffectsResults(PanelResults):
             hypothesis is true, typically a fixed effects (entity effects)
             model estimated using the same observations and regressors as
             this model.
-        include_constant : bool
+        include_constant : bool, optional
             Flag indicating whether to include the constant in the comparison.
             The default is False.
-        sigmamore : bool
+        sigmamore : bool, optional
             Flag indicating whether to base both covariance estimates on the
             error variance estimated by this model, which is efficient under
-            the null. Cannot be used with ``sigmaless``.
-        sigmaless : bool
+            the null. Cannot be used with ``sigmaless``. The default is False.
+        sigmaless : bool, optional
             Flag indicating whether to base both covariance estimates on the
             error variance estimated by ``other``. Cannot be used with
-            ``sigmamore``.
+            ``sigmamore``. The default is False.
 
         Returns
         -------
-        WaldTestStatistic or InvalidTestStatistic
-            Object containing test statistic, p-value, distribution and null.
-            An InvalidTestStatistic is returned when the statistic is negative.
-        DataFrame
-            The coefficients included in the test. The columns are ``b0``
-            (from ``other``), ``b1`` (from this model), their difference
-            ``b0-b1`` and ``Std. Err.``, the standard error of the difference.
-            The standard error is NaN if the variance of the difference is
-            negative.
+        HausmanTestResults
+            A named tuple with the fields ``statistic``, which contains the
+            test statistic, p-value, distribution and null as a
+            WaldTestStatistic, and ``estimates``, a DataFrame with the
+            coefficients included in the test. An InvalidTestStatistic is
+            returned as the statistic when the statistic is negative. The
+            columns of ``estimates`` are ``b0`` (from ``other``),
+            ``b1`` (from this model), their difference ``b0-b1`` and
+            ``Std. Err.``, the standard error of the difference. The standard
+            error is NaN if the variance of the difference is negative.
 
         Raises
         ------
@@ -1081,8 +1125,12 @@ class RandomEffectsResults(PanelResults):
         >>> from linearmodels import PanelOLS, RandomEffects
         >>> fe_res = PanelOLS(y, x, entity_effects=True).fit()
         >>> re_res = RandomEffects(y, x).fit()
-        >>> test, estimates = re_res.wu_hausman(fe_res)
-        >>> print(test)
+        >>> results = re_res.hausman(fe_res)
+        >>> print(results)
+
+        The statistic and the estimates can be unpacked.
+
+        >>> test, estimates = results
         """
         if not isinstance(other, PanelResults):
             raise TypeError("other must be the results of a panel model.")
@@ -1156,9 +1204,10 @@ class RandomEffectsResults(PanelResults):
                 "assumptions of the Hausman test.",
                 name=name,
             )
-            return invalid, estimates
+            return HausmanTestResults(invalid, estimates)
         null = "No systematic difference in coefficients between models"
-        return WaldTestStatistic(stat, null, len(common), name=name), estimates
+        wald = WaldTestStatistic(stat, null, len(common), name=name)
+        return HausmanTestResults(wald, estimates)
 
 
 PanelModelResults = Union[PanelEffectsResults, PanelResults, RandomEffectsResults]
