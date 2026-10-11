@@ -1,9 +1,16 @@
 """
 Checks of the instrumental variable features that were added after version 7.0
 
+* The tests of the rank of the first-stage coefficient matrix, which are
+  cragg_donald, cragg_donald_f, kleibergen_paap and kleibergen_paap_f: that the
+  documentation is well-formed, and the behavior with weights and clusters that
+  it describes.
 * IVGMMResults.centered_j_stat: the units of the data, continuously updating
   GMM, weights, clusters, kernels and singular covariances.
 """
+
+import inspect
+import re
 
 import numpy as np
 from numpy.testing import assert_allclose
@@ -11,7 +18,13 @@ import pandas as pd
 import pytest
 
 from linearmodels.iv import IVGMM, IVGMMCUE
-from linearmodels.iv.results import IVGMMResults
+from linearmodels.iv.common import (
+    cragg_donald,
+    cragg_donald_f,
+    kleibergen_paap,
+    kleibergen_paap_f,
+)
+from linearmodels.iv.results import FirstStageResults, IVGMMResults
 from linearmodels.shared.hypotheses import InvalidTestStatistic, WaldTestStatistic
 
 
@@ -31,6 +44,72 @@ def simulate(seed, nobs=300, ninstr=4, nendog=1, violation=0.0, weighted=False):
     y = exog @ [1.0, 0.5] + endog.sum(1) + violation * z[:, -1] + u
     w = rng.uniform(0.3, 3.0, nobs) if weighted else None
     return y, exog, endog, z, w
+
+
+# ----------------------------------------------------------------------------
+# Tests of the rank of the first-stage coefficient matrix
+# ----------------------------------------------------------------------------
+
+DOCUMENTED = {
+    "cragg_donald": cragg_donald,
+    "cragg_donald_f": cragg_donald_f,
+    "kleibergen_paap": kleibergen_paap,
+    "kleibergen_paap_f": kleibergen_paap_f,
+    "FirstStageResults.cragg_donald": FirstStageResults.cragg_donald,
+    "FirstStageResults.cragg_donald_f": FirstStageResults.cragg_donald_f,
+    "FirstStageResults.kleibergen_paap": FirstStageResults.kleibergen_paap,
+    "FirstStageResults.kleibergen_paap_f": FirstStageResults.kleibergen_paap_f,
+}
+
+
+def footnote_problems(doc):
+    """Footnotes that are defined and not cited, and citations not defined"""
+    defined = set(re.findall(r"^\s*\.\. \[(\w+)\]", doc, flags=re.MULTILINE))
+    cited = set(re.findall(r"\[(\w+)\]_", doc))
+    return sorted(defined - cited), sorted(cited - defined)
+
+
+def test_footnote_check_finds_problems():
+    doc = "Text [1]_\n\nReferences\n----------\n.. [1] A\n.. [2] B\n"
+    assert footnote_problems(doc) == (["2"], [])
+    assert footnote_problems("A citation [3]_") == ([], ["3"])
+    assert footnote_problems("References\n----------\nA\n\nB\n") == ([], [])
+
+
+@pytest.mark.parametrize("name", list(DOCUMENTED))
+def test_footnotes_are_cited(name):
+    # Sphinx warns "Footnote [n] is not referenced" for each of them. Use
+    # author-year references, as other docstrings do, or cite the footnotes
+    doc = inspect.getdoc(DOCUMENTED[name])
+    assert footnote_problems(doc) == ([], [])
+
+
+SOURCES = {
+    "cragg_donald": [
+        "Cragg, J. G., & Donald, S. G. (1993)",
+        "Anderson, T. W. (1951)",
+        "Stock, J. H., & Yogo, M. (2005)",
+    ],
+    "cragg_donald_f": ["Stock, J. H., & Yogo, M. (2005)"],
+    "kleibergen_paap": [
+        "Kleibergen, F., & Paap, R. (2006)",
+        "Kleibergen, F., & Schaffer, M. E. (2007)",
+    ],
+    "kleibergen_paap_f": [
+        "Kleibergen, F., & Paap, R. (2006)",
+        "Olea, J. L. M., & Pflueger, C. (2013)",
+        "Baum, C. F., Schaffer, M. E., & Stillman, S. (2007)",
+    ],
+}
+
+
+@pytest.mark.parametrize("name", list(SOURCES))
+def test_sources_are_listed(name):
+    # Removing the footnote markup keeps the references
+    doc = inspect.getdoc(DOCUMENTED[name])
+    references = doc.split("References\n----------\n")[1]
+    for source in SOURCES[name]:
+        assert source in references
 
 
 # ----------------------------------------------------------------------------

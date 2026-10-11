@@ -217,7 +217,7 @@ def cragg_donald(
     :math:`\chi^2` approximation is poor, and 2SLS can be badly biased and
     its tests badly sized even when the null is rejected.
 
-    The p-value is asymptotic. Stock-Yogo (2005) critical values for weak
+    The p-value is asymptotic. Stock and Yogo (2005) critical values for weak
     instruments apply to the F form under i.i.d. errors and are not
     provided here. Choosing whether to use an instrumental variable
     estimator based on the outcome of a test like this one distorts the
@@ -235,7 +235,8 @@ def cragg_donald(
     Let :math:`X = Z\Pi + V`, where :math:`\Pi` is the :math:`k \times m`
     matrix of first-stage coefficients on the excluded instruments, after
     the exogenous regressors have been partialled out. The null hypothesis
-    is :math:`\mathrm{rank}(\Pi) < m`. The statistic is
+    is :math:`\mathrm{rank}(\Pi) < m`. The statistic is the minimum
+    eigenvalue statistic of Cragg and Donald (1993),
 
     .. math::
 
@@ -246,7 +247,8 @@ def cragg_donald(
     instruments, and :math:`c` is the number of exogenous regressors.
     :math:`r^2_{\min}/(1 - r^2_{\min})` is the smallest eigenvalue of
     :math:`(X'M_ZX)^{-1}X'P_ZX`. The statistic is asymptotically
-    :math:`\chi^2_{k-m+1}` under the null.
+    :math:`\chi^2_{k-m+1}` under the null. Anderson (1951) derived a test of
+    the rank that is a function of the canonical correlations.
 
     The statistic is **not** the first-stage F-statistic. It equals :math:`k`
     times the classical F-statistic when there is a single endogenous
@@ -254,15 +256,17 @@ def cragg_donald(
 
     References
     ----------
-    .. [1] Cragg, J. G., & Donald, S. G. (1993). Testing identifiability
-       and specification in instrumental variable models. Econometric
-       Theory, 9(2), 222-240.
-    .. [2] Anderson, T. W. (1951). Estimating linear restrictions on
-       regression coefficients for multivariate normal distributions.
-       Annals of Mathematical Statistics, 22(3), 327-351.
-    .. [3] Stock, J. H., & Yogo, M. (2005). Testing for weak instruments in
-       linear IV regression. In Identification and Inference for Econometric
-       Models. Cambridge University Press.
+    Cragg, J. G., & Donald, S. G. (1993). Testing identifiability and
+    specification in instrumental variable models. *Econometric Theory*, 9(2),
+    222-240.
+
+    Anderson, T. W. (1951). Estimating linear restrictions on regression
+    coefficients for multivariate normal distributions. *Annals of
+    Mathematical Statistics*, 22(3), 327-351.
+
+    Stock, J. H., & Yogo, M. (2005). Testing for weak instruments in linear IV
+    regression. In *Identification and Inference for Econometric Models*.
+    Cambridge University Press.
     """
     name = "Cragg-Donald Test"
     dec = _first_stage_rank(endog, instr, exog, name)
@@ -321,9 +325,9 @@ def cragg_donald_f(
 
     References
     ----------
-    .. [1] Stock, J. H., & Yogo, M. (2005). Testing for weak instruments in
-       linear IV regression. In Identification and Inference for Econometric
-       Models. Cambridge University Press.
+    Stock, J. H., & Yogo, M. (2005). Testing for weak instruments in linear IV
+    regression. In *Identification and Inference for Econometric Models*.
+    Cambridge University Press.
     """
     test = cragg_donald(endog, instr, exog)
     if isinstance(test, InvalidTestStatistic):
@@ -596,12 +600,12 @@ def kleibergen_paap(
 
     References
     ----------
-    .. [1] Kleibergen, F., & Paap, R. (2006). Generalized reduced rank tests
-       using the singular value decomposition. Journal of Econometrics,
-       133(1), 97-126.
-    .. [2] Kleibergen, F., & Schaffer, M. E. (2007). ranktest: Stata module
-       to test the rank of a matrix using the Kleibergen-Paap rk statistic.
-       Statistical Software Components S456865, Boston College.
+    Kleibergen, F., & Paap, R. (2006). Generalized reduced rank tests using the
+    singular value decomposition. *Journal of Econometrics*, 133(1), 97-126.
+
+    Kleibergen, F., & Schaffer, M. E. (2007). ranktest: Stata module to test
+    the rank of a matrix using the Kleibergen-Paap rk statistic. *Statistical
+    Software Components* S456865, Boston College.
     """
     return _kleibergen_paap(endog, instr, exog, cov_type, cov_config)[0]
 
@@ -688,15 +692,15 @@ def kleibergen_paap_f(
 
     References
     ----------
-    .. [1] Kleibergen, F., & Paap, R. (2006). Generalized reduced rank tests
-       using the singular value decomposition. Journal of Econometrics,
-       133(1), 97-126.
-    .. [2] Olea, J. L. M., & Pflueger, C. (2013). A robust test for weak
-       instruments. Journal of Business & Economic Statistics, 31(3),
-       358-369.
-    .. [3] Baum, C. F., Schaffer, M. E., & Stillman, S. (2007). Enhanced
-       routines for instrumental variables/GMM estimation and testing. Stata
-       Journal, 7(4), 465-506.
+    Kleibergen, F., & Paap, R. (2006). Generalized reduced rank tests using the
+    singular value decomposition. *Journal of Econometrics*, 133(1), 97-126.
+
+    Olea, J. L. M., & Pflueger, C. (2013). A robust test for weak instruments.
+    *Journal of Business & Economic Statistics*, 31(3), 358-369.
+
+    Baum, C. F., Schaffer, M. E., & Stillman, S. (2007). Enhanced routines for
+    instrumental variables/GMM estimation and testing. *Stata Journal*, 7(4),
+    465-506.
     """
     return _kleibergen_paap(endog, instr, exog, cov_type, cov_config)[1]
 
