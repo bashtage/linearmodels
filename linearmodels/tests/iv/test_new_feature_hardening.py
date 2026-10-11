@@ -14,6 +14,7 @@ Checks of the instrumental variable features that were added after version 7.0
 
 import doctest
 import inspect
+import pickle
 import re
 import warnings
 
@@ -23,7 +24,7 @@ import pandas as pd
 import pytest
 
 from linearmodels.datasets import wage
-from linearmodels.iv import IV2SLS, IVGMM, IVGMMCUE, IVJIVE, IVLIML
+from linearmodels.iv import IV2SLS, IVGMM, IVGMMCUE, IVJIVE, IVLIML, compare
 from linearmodels.iv.common import (
     cragg_donald,
     cragg_donald_f,
@@ -52,6 +53,27 @@ def simulate(seed, nobs=300, ninstr=4, nendog=1, violation=0.0, weighted=False):
     y = exog @ [1.0, 0.5] + endog.sum(1) + violation * z[:, -1] + u
     w = rng.uniform(0.3, 3.0, nobs) if weighted else None
     return y, exog, endog, z, w
+
+
+def simulated_frame(seed, nobs=200, weighted=True):
+    """The same type of data in a DataFrame, with names for a formula"""
+    y, exog, endog, z, w = simulate(seed, nobs=nobs, ninstr=3, weighted=weighted)
+    data = pd.DataFrame(
+        {
+            "y": y,
+            "x1": exog[:, 1],
+            "x2": endog[:, 0],
+            "z1": z[:, 0],
+            "z2": z[:, 1],
+            "z3": z[:, 2],
+        }
+    )
+    if weighted:
+        data["w"] = w
+    return data
+
+
+FORMULA = "y ~ 1 + x1 + [x2 ~ z1 + z2 + z3]"
 
 
 # ----------------------------------------------------------------------------
@@ -96,6 +118,184 @@ def test_jive_from_formula_example_has_every_term():
 def test_jive_is_in_the_model_module_all():
     assert "IVJIVE" in linearmodels.iv.model.__all__
     assert linearmodels.iv.model.IVJIVE is IVJIVE
+
+
+def test_jive_from_formula_weights_and_missing_values():
+    # Only the exogenous regressors of a formula can contain missing values
+    data = simulated_frame(1)
+    data.loc[[4, 77, 10], "x1"] = np.nan
+    with pytest.warns(MissingValueWarning, match="missing values"):
+        mod = IVJIVE.from_formula(FORMULA, data, weights=data.w)
+    res = mod.fit()
+    keep = data.notnull().all(axis=1)
+    clean = data[keep]
+    expected = IVJIVE.from_formula(FORMULA, clean, weights=clean.w).fit()
+    unweighted = IVJIVE.from_formula(FORMULA, clean).fit()
+    assert res.nobs == keep.sum() == 197
+    assert list(res.params.index) == ["Intercept", "x1", "x2"]
+    assert_allclose(res.params, expected.params, rtol=1e-10)
+    assert_allclose(res.cov, expected.cov, rtol=1e-10)
+    assert_allclose(res.resids, expected.resids, rtol=1e-10)
+    # The weights are used
+    assert not np.allclose(res.params, unweighted.params, rtol=1e-3)
+    assert mod.formula == FORMULA
+
+
+def test_jive_predict_with_formula_data_and_weights():
+    data = simulated_frame(2)
+    res = IVJIVE.from_formula(FORMULA, data, weights=data.w).fit(cov_type="robust")
+    new = data.iloc[:7]
+    x_new = np.column_stack([np.ones(7), new.x1, new.x2])
+    expected = x_new @ res.params.to_numpy()
+    pred = res.predict(data=new)
+    assert list(pred.columns) == ["predictions"]
+    assert pred.index.equals(new.index)
+    assert_allclose(pred.to_numpy().squeeze(), expected, rtol=1e-12)
+    # The dependent variable and the instruments are not needed
+    only_regressors = res.predict(data=new[["x1", "x2"]])
+    assert_allclose(only_regressors.to_numpy().squeeze(), expected, rtol=1e-12)
+    # In sample predictions are the fitted values, whatever the weights
+    in_sample = res.predict(data=data)
+    assert_allclose(in_sample.to_numpy(), res.fitted_values.to_numpy(), rtol=1e-10)
+    assert_allclose(res.predict().to_numpy(), res.fitted_values.to_numpy())
+    # Values of the regressors are an alternative to data
+    exog_new = new[["x1"]].assign(const=1.0)[["const", "x1"]]
+    arrays = res.predict(exog_new, new[["x2"]])
+    assert_allclose(arrays.to_numpy().squeeze(), expected, rtol=1e-12)
+    with pytest.raises(ValueError, match="but not both"):
+        res.predict(new[["x1"]], new[["x2"]], data=new)
+
+
+def test_jive_compare_with_other_estimators_and_weights():
+    y, exog, endog, z, w = simulate(3, weighted=True)
+    results = {
+        "JIVE": IVJIVE(y, exog, endog, z, weights=w).fit(),
+        "2SLS": IV2SLS(y, exog, endog, z, weights=w).fit(),
+        "LIML": IVLIML(y, exog, endog, z, weights=w).fit(),
+        "GMM": IVGMM(y, exog, endog, z, weights=w).fit(),
+    }
+    comparison = compare(results)
+    assert list(comparison.params.columns) == list(results)
+    for name, res in results.items():
+        assert_allclose(comparison.params[name].to_numpy(), res.params.to_numpy())
+        assert_allclose(comparison.tstats[name].to_numpy(), res.tstats.to_numpy())
+        assert_allclose(comparison.rsquared[name], res.rsquared)
+        assert comparison.nobs[name] == res.nobs
+    methods = comparison.estimator_method
+    assert methods.to_dict() == {
+        "JIVE": "IV-JIVE",
+        "2SLS": "IV-2SLS",
+        "LIML": "IV-LIML",
+        "GMM": "IV-GMM",
+    }
+    assert set(comparison.cov_estimator) == {"robust"}
+    text = str(comparison.summary)
+    for label in ("JIVE", "2SLS", "LIML", "GMM", "IV-JIVE", "IV-GMM"):
+        assert label in text
+    # A list of results, stars and the other precisions
+    as_list = compare(list(results.values()), precision="std_errors", stars=True)
+    assert_allclose(as_list.std_errors.iloc[:, 0], results["JIVE"].std_errors)
+    assert "***" in str(as_list.summary)
+
+
+def test_jive_compare_formula_models():
+    data = simulated_frame(4)
+    results = {
+        "JIVE": IVJIVE.from_formula(FORMULA, data, weights=data.w).fit(),
+        "2SLS": IV2SLS.from_formula(FORMULA, data, weights=data.w).fit(),
+    }
+    comparison = compare(results)
+    assert list(comparison.params.index) == ["Intercept", "x1", "x2"]
+    assert_allclose(comparison.params["JIVE"], results["JIVE"].params)
+
+
+@pytest.mark.parametrize("cov_type", ["unadjusted", "robust", "kernel", "clustered"])
+def test_jive_summary_with_weights_and_small_sample_adjustment(cov_type):
+    y, exog, endog, z, w = simulate(5, weighted=True)
+    options = {}
+    if cov_type == "kernel":
+        options["bandwidth"] = 3
+    elif cov_type == "clustered":
+        options["clusters"] = np.arange(y.shape[0]) // 12
+    res = IVJIVE(y, exog, endog, z, weights=w).fit(
+        cov_type=cov_type, debiased=True, **options
+    )
+    text = str(res.summary)
+    assert "IV-JIVE" in text
+    assert "Debiased: True" in text
+    assert "JIVE Covariance" in text
+    # The model F-statistic of a debiased model is an F
+    assert res.f_statistic.dist_name.startswith("F(")
+    assert res.f_statistic.dist_name in text
+    assert "Endogenous: endog" in text
+    assert "Instruments: instruments.0" in text
+    assert max(len(line) for line in text.split("\n")) <= 78
+
+
+@pytest.mark.parametrize("weighted", [False, True])
+@pytest.mark.parametrize(
+    ("cov_type", "options"),
+    [
+        ("unadjusted", {}),
+        ("robust", {}),
+        ("clustered", {"clusters": np.arange(300) // 10}),
+        ("kernel", {"kernel": "bartlett", "bandwidth": 4}),
+    ],
+)
+def test_jive_first_stage_rank_tests_match_2sls(cov_type, options, weighted):
+    # The first stage does not depend on the estimator, only on the covariance
+    # estimator, the weights and the clusters of the model
+    y, exog, endog, z, w = simulate(10, ninstr=5, nendog=2, weighted=weighted)
+    jive = IVJIVE(y, exog, endog, z, weights=w).fit(cov_type=cov_type, **options)
+    tsls = IV2SLS(y, exog, endog, z, weights=w).fit(cov_type=cov_type, **options)
+    stats_jive, stats_tsls = jive.first_stage, tsls.first_stage
+    assert type(stats_jive.kleibergen_paap) is WaldTestStatistic
+    assert stats_jive.kleibergen_paap.df == 4
+    for name in ("kleibergen_paap_f", "cragg_donald_f"):
+        assert_allclose(getattr(stats_jive, name), getattr(stats_tsls, name))
+    for name in ("kleibergen_paap", "cragg_donald"):
+        assert_allclose(getattr(stats_jive, name).stat, getattr(stats_tsls, name).stat)
+
+
+@pytest.mark.parametrize("estimator", [IV2SLS, IVLIML, IVGMM, IVGMMCUE, IVJIVE])
+@pytest.mark.parametrize("cov_type", ["unadjusted", "robust", "kernel", "clustered"])
+def test_first_stage_of_every_estimator_and_covariance(estimator, cov_type):
+    # The covariance configuration of the results is used by the first stage,
+    # and differs by the estimator
+    y, exog, endog, z, w = simulate(30, nobs=200, ninstr=3, weighted=True)
+    options = {}
+    if cov_type == "clustered":
+        options["clusters"] = np.arange(200) // 10
+    elif cov_type == "kernel":
+        options["bandwidth"] = 3
+    res = estimator(y, exog, endog, z, weights=w).fit(cov_type=cov_type, **options)
+    first_stage = res.first_stage
+    assert "First Stage Estimation Results" in str(first_stage)
+    assert first_stage.diagnostics.shape == (1, 6)
+    assert type(first_stage.kleibergen_paap) is WaldTestStatistic
+    assert first_stage.kleibergen_paap.df == 3
+    assert np.isfinite(first_stage.kleibergen_paap_f)
+    assert np.isfinite(first_stage.cragg_donald_f)
+
+
+@pytest.mark.parametrize("estimator", [IV2SLS, IVGMM, IVGMMCUE, IVJIVE])
+def test_results_can_be_pickled(estimator):
+    y, exog, endog, z, w = simulate(31, nobs=200, ninstr=3, weighted=True)
+    clusters = np.arange(200) // 10
+    res = estimator(y, exog, endog, z, weights=w).fit(
+        cov_type="clustered", clusters=clusters
+    )
+    clone = pickle.loads(pickle.dumps(res))
+    assert_allclose(clone.params, res.params)
+    assert_allclose(clone.cov, res.cov)
+    assert str(clone.summary) == str(res.summary)
+    first_stage, original = clone.first_stage, res.first_stage
+    assert_allclose(first_stage.kleibergen_paap.stat, original.kleibergen_paap.stat)
+    assert_allclose(first_stage.kleibergen_paap_f, original.kleibergen_paap_f)
+    assert_allclose(first_stage.cragg_donald_f, original.cragg_donald_f)
+    if isinstance(res, IVGMMResults):
+        assert_allclose(clone.centered_j_stat.stat, res.centered_j_stat.stat)
+        assert str(clone.centered_j_stat) == str(res.centered_j_stat)
 
 
 # ----------------------------------------------------------------------------
