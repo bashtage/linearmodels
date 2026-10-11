@@ -39,6 +39,7 @@ from scipy.optimize import minimize
 from linearmodels.iv._utility import IVFormulaParser
 from linearmodels.iv.common import f_statistic, find_constant
 from linearmodels.iv.covariance import (
+    KERNEL_LOOKUP,
     ClusteredCovariance,
     HeteroskedasticCovariance,
     HomoskedasticCovariance,
@@ -1892,6 +1893,21 @@ class _JIVECovariance(IVGMMCovariance):
     ) -> None:
         # The weight matrix has no effect in a just identified model
         w = eye(x.shape[1])
+        if cov_type == "kernel":
+            kernel = cov_config.get("kernel", "bartlett")
+            if kernel not in KERNEL_LOOKUP:
+                raise ValueError(f"Unknown kernel: {kernel}")
+            # Select the bandwidth using the data unless it is given, as in
+            # IV2SLS and IVLIML. The default of the weight matrix estimator is
+            # nobs - 2, which is not a consistent covariance estimator
+            cov_config = {"optimal_bw": True, **cov_config}
+        elif cov_type == "clustered":
+            clusters = cov_config.get("clusters")
+            if clusters is not None and asarray(clusters).squeeze().ndim > 1:
+                raise ValueError(
+                    "IVJIVE supports one-way clustering only. clusters must be "
+                    "a 1-d array, or a 2-d array with a single column."
+                )
         super().__init__(x, y, x_loo, params, w, cov_type, debiased, **cov_config)
         self._name = "JIVE Covariance"
         if cov_type in ("unadjusted", "homoskedastic"):
@@ -2092,9 +2108,13 @@ class IVJIVE(_IVModelBase):
         -----
         The covariance estimators are the same as in the other IV models with
         the leave-one-out first-stage predictions as the instruments. The
-        additional parameters depend on the estimator: ``kernel`` and
-        ``bandwidth`` for "kernel" and ``clusters`` for "clustered".  The
-        defaults are used if none are provided.
+        additional parameters depend on the estimator: ``kernel`` (the default
+        is "bartlett") and ``bandwidth`` for "kernel" and ``clusters`` for
+        "clustered". If ``bandwidth`` is not provided it is selected using the
+        data, as in :class:`~linearmodels.iv.model.IV2SLS`, and the bandwidth
+        that was used is in ``cov_config`` of the results. "clustered" is
+        one-way clustering, and ``clusters`` has one element for each
+        observation.
 
         Since JIVE is not a k-class estimator, ``kappa`` is None in the
         results.
