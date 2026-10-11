@@ -75,6 +75,7 @@ test = [
   "pytest-xdist",
   "pytest-cov",
   "coverage[toml]",
+  "xarray>=0.16",  # The tests import xarray
   "meson",
   "ninja",
 ]
