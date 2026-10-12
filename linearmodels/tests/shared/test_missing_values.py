@@ -114,10 +114,9 @@ def build(name, missing=True):
     return MODELS[name](rng, missing)
 
 
-def nobs_after_dropping(name, missing=True):
-    """The observations that are left, which the system results sum over equations"""
-    nobs = NOBS - MISSING_ROWS if missing else NOBS
-    return 2 * nobs if name == "SUR" else nobs
+def nobs_after_dropping(missing=True):
+    """The observations that are left, which are in each equation of a system"""
+    return NOBS - MISSING_ROWS if missing else NOBS
 
 
 @pytest.fixture(autouse=True)
@@ -131,7 +130,7 @@ def warn_on_missing(monkeypatch):
 def test_missing_values_are_dropped_with_a_warning(name):
     with pytest.warns(MissingValueWarning, match=MESSAGE):
         model = build(name)
-    assert model.fit().nobs == nobs_after_dropping(name)
+    assert model.fit().nobs == nobs_after_dropping()
 
 
 @pytest.mark.parametrize("name", MODELS)
@@ -139,7 +138,7 @@ def test_no_warning_if_nothing_is_missing(name):
     with warnings.catch_warnings():
         warnings.simplefilter("error", MissingValueWarning)
         model = build(name, missing=False)
-    assert model.fit().nobs == nobs_after_dropping(name, missing=False)
+    assert model.fit().nobs == nobs_after_dropping(missing=False)
 
 
 @pytest.mark.parametrize("name", MODELS)
@@ -149,7 +148,7 @@ def test_warn_on_missing_false_turns_the_warning_off(name, monkeypatch):
         warnings.simplefilter("error", MissingValueWarning)
         model = build(name)
     # The observations are dropped as before
-    assert model.fit().nobs == nobs_after_dropping(name)
+    assert model.fit().nobs == nobs_after_dropping()
 
 
 @pytest.mark.parametrize("name", MODELS)
@@ -159,7 +158,7 @@ def test_warnings_filter_ignore(name):
         warnings.simplefilter("ignore", MissingValueWarning)
         model = build(name)
     assert not [w for w in record if issubclass(w.category, MissingValueWarning)]
-    assert model.fit().nobs == nobs_after_dropping(name)
+    assert model.fit().nobs == nobs_after_dropping()
 
 
 @pytest.mark.parametrize("name", MODELS)

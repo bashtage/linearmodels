@@ -897,7 +897,8 @@ class _SystemModelBase:
             key = self._eq_labels[i]
             individual[key] = stats
 
-        nobs = eps.size
+        # All equations use the same observations
+        nobs = eps.shape[0]
         results = self._common_results(
             beta, cov, "OLS", 0, nobs, cov_type, sigma, individual, debiased
         )
@@ -1226,8 +1227,8 @@ class _SystemModelBase:
             key = self._eq_labels[i]
             individual[key] = stats
 
-        # Populate results dictionary
-        nobs = eps.size
+        # Populate results dictionary. All equations use the same observations
+        nobs = eps.shape[0]
         results = self._common_results(
             beta,
             cov,
@@ -2245,8 +2246,8 @@ class IVSystemGMM(_SystemModelBase):
             key = self._eq_labels[i]
             individual[key] = stats
 
-        # Populate results dictionary
-        nobs = eps.size
+        # Populate results dictionary. All equations use the same observations
+        nobs = eps.shape[0]
         results = self._common_results(
             beta, cov, method, iter_count, nobs, cov_type, sigma, individual, debiased
         )

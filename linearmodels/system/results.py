@@ -203,6 +203,28 @@ class SystemResults(_CommonResults):
     ----------
     results : AttrDict
         Dictionary of model estimation results
+
+    Notes
+    -----
+    All equations of a system use the same observations. Observations with a
+    missing value in any variable of any equation are dropped from all of the
+    equations, and the models raise an error if the equations have different
+    numbers of observations. ``nobs`` is the number of observations of each
+    equation, as it is for the results of each equation. The number of
+    observations of all the equations is ``nobs`` times the number of equations,
+    and the residual degrees of freedom, ``df_resid``, which are used by the
+    p-values and the confidence intervals of a debiased covariance, are that
+    number less the number of parameters.
+
+    .. versionchanged:: 7.1
+
+       ``nobs`` was the number of observations of all the equations, which is
+       the number of observations of each equation times the number of
+       equations. The summary of the results reported the number of
+       observations of each equation. ``nobs`` is now the number of
+       observations of each equation. ``df_resid``, the p-values and the
+       confidence intervals use the observations of all the equations, as they
+       did, and do not change.
     """
 
     def __init__(self, results: AttrDict) -> None:
@@ -210,6 +232,8 @@ class SystemResults(_CommonResults):
         self._individual = AttrDict()
         for key in results.individual:
             self._individual[key] = SystemEquationResult(results.individual[key])
+        # The residual degrees of freedom count the observations of all equations
+        self._df_resid = len(self._individual) * self._nobs - self._df_model
         self._system_r2 = results.system_r2
         self._sigma = results.sigma
         self._model = results.model
@@ -224,6 +248,30 @@ class SystemResults(_CommonResults):
     def model(self) -> linearmodels.system.model.IV3SLS:
         """Model used in estimation"""
         return self._model
+
+    @property
+    def nobs(self) -> int:
+        """
+        Number of observations in each equation.
+
+        Notes
+        -----
+        All equations use the same observations. The number of observations of
+        all the equations is ``nobs`` times the number of equations.
+        """
+        return self._nobs
+
+    @property
+    def df_resid(self) -> int:
+        """
+        Residual degree of freedom.
+
+        Notes
+        -----
+        The number of observations of all the equations, which is ``nobs`` times
+        the number of equations, less the number of parameters.
+        """
+        return self._df_resid
 
     @property
     def equations(self) -> AttrDict:
@@ -466,7 +514,7 @@ class SystemResults(_CommonResults):
         top_left = [
             ("Estimator:", self._method),
             ("No. Equations.:", str(len(self.equation_labels))),
-            ("No. Observations:", str(self.resids.shape[0])),
+            ("No. Observations:", str(self.nobs)),
             ("Date:", self._datetime.strftime("%a, %b %d %Y")),
             ("Time:", self._datetime.strftime("%H:%M:%S")),
             ("", ""),
