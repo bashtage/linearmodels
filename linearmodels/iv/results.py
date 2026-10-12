@@ -667,7 +667,20 @@ class AbsorbingLSResults(_LSModelResultsBase):
 
     @cached_property
     def absorbed_effects(self) -> DataFrame:
-        """Fitted values from only absorbed terms"""
+        """
+        Fitted values from only absorbed terms
+
+        The part of ``fitted_values`` that the absorbed terms explain, which is
+        ``fitted_values - exog @ params``, in the units of the dependent variable. It
+        has one value for each observation. It is the contribution of the effects, the
+        interactions and the continuous variables that were absorbed, and of any
+        regressor in ``exog`` that was dropped because it was absorbed.
+
+        If ``exog`` contains a constant and the effects include a categorical
+        variable, the constant has the mean of the effects and the absorbed terms have
+        mean 0, using the weights of the model. Otherwise the absorbed terms include
+        the mean.
+        """
         return self._absorbed_effects()
 
     @property
