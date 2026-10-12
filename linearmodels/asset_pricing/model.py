@@ -1324,7 +1324,7 @@ class LinearFactorModelGMM(_LinearFactorModelBase):
         alphas = g.mean(0)[sel, None]
         # The alphas are averages of moments, whose covariance at the estimates
         # accounts for the estimation of the parameters
-        alpha_vcv = cov_est_inst.moment_cov[sel, sel]
+        alpha_vcv = cov_est_inst._moment_cov[sel, sel]
         if use_cue:
             # The objective that was minimized updates the weight matrix
             stat = self._j_cue(params, excess_returns, weight_est_instance)

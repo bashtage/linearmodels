@@ -201,7 +201,7 @@ class HeteroskedasticCovariance:
         return out
 
     @property
-    def moment_cov(self) -> linearmodels.typing.data.Float64Array:
+    def _moment_cov(self) -> linearmodels.typing.data.Float64Array:
         r"""
         Covariance of the average moment conditions at the estimates.
 
@@ -228,6 +228,9 @@ class HeteroskedasticCovariance:
         singular, with rank equal to the number of moment conditions less the
         number of parameters. It is zero if the Jacobian is square, since the
         moment conditions are then zero at the estimates.
+
+        This is used for the standard errors of the alphas of
+        ``LinearFactorModelGMM``. It is private, and not part of the API.
         """
         s = self.s
         if self.square:
