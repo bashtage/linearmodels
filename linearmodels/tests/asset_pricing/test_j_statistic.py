@@ -80,6 +80,50 @@ def test_j_statistic_does_not_depend_on_row_order(risk_free, seed):
 
 
 @pytest.mark.parametrize("risk_free", [False, True])
+@pytest.mark.parametrize("use_sigma", [False, True])
+@pytest.mark.parametrize("cov_type", ["robust", "kernel"])
+def test_j_statistic_does_not_depend_on_portfolio_order(risk_free, use_sigma, cov_type):
+    # Reordering the portfolios (and sigma in the same way) reorders the pricing
+    # errors, their covariance and the restrictions in the same way, and leaves the
+    # statistic of the space where the pricing errors lie unchanged
+    portfolios, factors = simulate_data(300, 7, 2, seed=3)
+    sigma = np.cov(portfolios.T) if use_sigma else None
+    config = {"bandwidth": 4} if cov_type == "kernel" else {}
+    mod = LinearFactorModel(portfolios, factors, risk_free=risk_free, sigma=sigma)
+    base = mod.fit(cov_type=cov_type, **config).j_statistic.stat
+    for i in range(4):
+        order = np.random.default_rng(i).permutation(portfolios.shape[1])
+        assert not np.array_equal(order, np.arange(portfolios.shape[1]))
+        reordered = None if sigma is None else sigma[np.ix_(order, order)]
+        mod = LinearFactorModel(
+            portfolios[:, order], factors, risk_free=risk_free, sigma=reordered
+        )
+        stat = mod.fit(cov_type=cov_type, **config).j_statistic.stat
+        assert_allclose(stat, base, rtol=1e-8)
+
+
+def test_j_statistic_helper_does_not_depend_on_the_basis():
+    # Only the space that is orthogonal to the restrictions matters, and not the
+    # basis Q of that space that is used to compute the statistic
+    rng = np.random.default_rng(3)
+    nportfolio, nrestriction = 8, 3
+    restrictions = rng.standard_normal((nportfolio, nrestriction))
+    q = np.linalg.svd(restrictions)[0][:, nrestriction:]
+    g = rng.standard_normal((nportfolio, nportfolio))
+    vcv = g @ g.T + np.eye(nportfolio)
+    alphas = q @ rng.standard_normal((nportfolio - nrestriction, 1))
+    expected = _j_statistic(alphas, vcv, restrictions).stat
+    other_basis = restrictions @ rng.standard_normal((nrestriction, nrestriction))
+    assert_allclose(_j_statistic(alphas, vcv, other_basis).stat, expected, rtol=1e-10)
+    # The same statistic for any other orthonormal basis of the space
+    rotation = np.linalg.qr(rng.standard_normal((5, 5)))[0]
+    qr = q @ rotation
+    qa = qr.T @ alphas
+    rotated = float(np.squeeze(qa.T @ np.linalg.solve(qr.T @ vcv @ qr, qa)))
+    assert_allclose(rotated, expected, rtol=1e-10)
+
+
+@pytest.mark.parametrize("risk_free", [False, True])
 def test_j_statistic_just_identified(risk_free):
     # With as many portfolios as risk premia the pricing errors are 0
     nrp = 2 + int(risk_free)
