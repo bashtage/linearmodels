@@ -3,6 +3,9 @@ References
 
 .. rubric:: References
 
+.. [AngImbKru] Angrist, Joshua D., Guido W. Imbens, and Alan B. Krueger. "Jackknife instrumental
+    variables estimation." *Journal of Applied Econometrics* 14, no. 1 (1999): 57-67.
+
 .. [Baltagi] Baltagi, Badi. *Econometric analysis of panel data*. John Wiley & Sons, 2008.
 
 .. [Bryzgalova] Bryzgalova, Svetlana. "Spurious factors in linear asset pricing models."
@@ -20,10 +23,23 @@ References
 .. [CamTri09] Cameron, Adrian Colin, and Pravin K. Trivedi. *Microeconometrics using stata*.
     Vol. 5. College Station, TX: Stata press, 2009.
 
+.. [ChaoEtAl] Chao, John C., Norman R. Swanson, Jerry A. Hausman, Whitney K. Newey, and Tiemen
+    Woutersen. "Asymptotic distribution of JIVE in a heteroskedastic IV regression with many
+    instruments." *Econometric Theory* 28, no. 1 (2012): 42-86.
+
 .. [Cochrane] Cochrane, John H. *Asset Pricing:(Revised Edition)*. Princeton University Press,
     2009.
 
+.. [DavMac06] Davidson, Russell, and James G. MacKinnon. "The case against JIVE." *Journal of
+    Applied Econometrics* 21, no. 6 (2006): 827-833.
+
 .. [Greene] Greene, William H. *Econometric analysis*. Pearson Education, 2003.
+
+.. [Hall00] Hall, Alastair R. "Covariance matrix estimation and the power of the overidentifying
+    restrictions test." *Econometrica* 68, no. 6 (2000): 1517-1528.
+
+.. [HansenLee] Hansen, Bruce E., and Seojeong Lee. "Inference for iterated GMM under
+    misspecification." *Econometrica* 89, no. 3 (2021): 1419-1447.
 
 .. [Henningsen] Henningsen, A., & Hamann, J. (2007). systemfit: A Package for Estimating
     Systems of Simultaneous Equations in R. Journal of Statistical Software,
