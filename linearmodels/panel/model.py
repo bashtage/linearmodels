@@ -523,9 +523,10 @@ class _PanelModelBase:
         return PanelData(rows)
 
     def _check_exog_rank(self) -> int:
-        if not self._check_rank:
-            return self.exog.shape[1]
         x = cast("linearmodels.typing.data.Float64Array", self.exog.values2d)
+        if not self._check_rank:
+            # The shape of the PanelData is (variables, periods, entities)
+            return x.shape[1]
         _, _, rank_of_x, _ = _lstsq(x, np.ones(x.shape[0]))
         if rank_of_x < x.shape[1]:
             raise ValueError(
