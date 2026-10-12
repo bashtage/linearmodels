@@ -11,10 +11,16 @@ converted with ``np.asarray`` when it is received.
 from __future__ import annotations
 
 from typing import Any
+import warnings
 
 import numpy as np
 from pandas import DataFrame, Series
 from pandas.api.types import is_complex_dtype
+
+try:
+    from numpy.exceptions import VisibleDeprecationWarning
+except ImportError:  # NumPy < 1.25
+    VisibleDeprecationWarning = np.VisibleDeprecationWarning
 
 __all__ = [
     "as_array_like",
@@ -125,7 +131,15 @@ def as_array_like(value: Any, name: str) -> Any:
         reject_complex(value, name)
         return value
     try:
-        out = np.asarray(value)
+        with warnings.catch_warnings():
+            # NumPy < 1.24 warns and makes an object array of the rows of a ragged
+            # sequence instead of raising
+            warnings.simplefilter("ignore", VisibleDeprecationWarning)
+            out = np.asarray(value)
+        if out.dtype == object and any(
+            isinstance(item, (list, tuple, np.ndarray)) for item in out.flat
+        ):
+            raise ValueError("the nested sequences have different lengths")
     except ValueError as exc:
         raise ValueError(
             f"{name} could not be converted to an array. Nested sequences must "

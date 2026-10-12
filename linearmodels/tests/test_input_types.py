@@ -400,6 +400,25 @@ def test_ragged_list_raises_and_names_the_input(data):
         build_iv(IV2SLS, data, weights=ragged)
 
 
+def test_ragged_list_as_object_array_raises(data, monkeypatch):
+    # NumPy < 1.24 makes an object array of the rows of a ragged list, with a
+    # warning, instead of raising
+    asarray = np.asarray
+
+    def old_asarray(value, *args, **kwargs):
+        try:
+            return asarray(value, *args, **kwargs)
+        except ValueError:
+            out = np.empty(len(value), dtype=object)
+            out[:] = list(value)
+            return out
+
+    monkeypatch.setattr(np, "asarray", old_asarray)
+    ragged = [[1.0, 2.0], [3.0]] + [[1.0]] * (NOBS - 2)
+    with pytest.raises(ValueError, match="weights could not be converted"):
+        build_iv(IV2SLS, data, weights=ragged)
+
+
 def test_wrong_number_of_observations_in_a_list(data):
     with pytest.raises(ValueError, match="exog has the wrong number of observations"):
         IV2SLS(
