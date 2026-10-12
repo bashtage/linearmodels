@@ -65,6 +65,18 @@ def test_hasconstant():
     assert hc is True
 
 
+def test_hasconstant_more_than_one():
+    x = np.random.randn(100, 3)
+    x[:, 0] = 1
+    x[:, 1] = 1
+    assert has_constant(x) == (True, 0)
+    x[:, 0] = 2
+    x[:, 1] = 3
+    assert has_constant(x) == (True, 0)
+    x[:, 0] = np.random.randn(100)
+    assert has_constant(x) == (True, 1)
+
+
 def test_wald_statistic():
     ts = WaldTestStatistic(1.0, "_NULL_", 1, name="_NAME_")
     assert str(hex(id(ts))) in ts.__repr__()

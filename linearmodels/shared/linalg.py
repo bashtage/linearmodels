@@ -23,13 +23,14 @@ def has_constant(x: Float64Array, x_rank: int | None = None) -> tuple[bool, int]
     loc : int
         Column location of constant
     """
+    # With more than one constant column, the location is that of the first
     if np.any(np.all(x == 1, axis=0)):
-        loc = int(np.squeeze(np.argwhere(np.all(x == 1, axis=0))))
+        loc = int(np.argmax(np.all(x == 1, axis=0)))
         return True, loc
 
     if np.any((np.ptp(x, axis=0) == 0) & ~np.all(x == 0, axis=0)):
         loc_arr = (np.ptp(x, axis=0) == 0) & ~np.all(x == 0, axis=0)
-        loc = int(np.squeeze(np.argwhere(loc_arr)))
+        loc = int(np.argmax(loc_arr))
         return True, loc
 
     n = x.shape[0]

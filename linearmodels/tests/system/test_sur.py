@@ -195,6 +195,11 @@ def test_errors():
         SUR(moddata)
 
 
+def test_unknown_equation_type_message():
+    with pytest.raises(TypeError, match=r"equations\[a\] was <class 'str'>"):
+        SUR({"a": "absde", "b": 12345})
+
+
 @pytest.mark.parametrize("bad", [0.0, -1.0, np.inf, -np.inf])
 def test_weights_not_strictly_positive(bad):
     eqns = generate_data(k=2, p=2, included_weights=True)

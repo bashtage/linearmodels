@@ -259,7 +259,9 @@ def test_redundant_instruments():
     eqns = {}
     for i in range(2):
         eqns[f"eqn.{i}"] = (dep[:, i], exog, endog, instr)
-    with pytest.raises(ValueError, match=r"Equation eqn.0"):
+    with pytest.raises(
+        ValueError, match=r"Equation eqn.0 instrument array is not full"
+    ):
         IV3SLS(eqns)
 
 

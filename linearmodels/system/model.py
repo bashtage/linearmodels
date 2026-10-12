@@ -465,7 +465,7 @@ class _SystemModelBase:
                 else:
                     self._weights.append(IVData(np.ones(dep.shape)))
             else:
-                msg = UNKNOWN_EQ_TYPE.format(key=key, type=type(vars))
+                msg = UNKNOWN_EQ_TYPE.format(key=key, type=type(eq_data))
                 raise TypeError(msg)
         self._has_instruments = False
         for instr in self._instr:
@@ -558,7 +558,7 @@ class _SystemModelBase:
                 )
             if matrix_rank(z) < z.shape[1]:
                 raise ValueError(
-                    "Equation {eq} instrument array is full rank".format(eq=label)
+                    "Equation {eq} instrument array is not full rank".format(eq=label)
                 )
 
         for rhs in self._x:
