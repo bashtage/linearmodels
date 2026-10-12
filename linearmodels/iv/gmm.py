@@ -12,9 +12,11 @@ from numpy.linalg import inv
 from linearmodels.iv.covariance import (
     KERNEL_LOOKUP,
     HomoskedasticCovariance,
+    check_cluster_columns,
     kernel_optimal_bandwidth,
 )
 from linearmodels.shared.covariance import cov_cluster, cov_kernel
+from linearmodels.shared.inputs import as_ndarray
 import linearmodels.typing.data
 
 
@@ -276,8 +278,11 @@ class OneWayClusteredWeightMatrix(HomoskedasticWeightMatrix):
 
     Parameters
     ----------
-    clusters : ndarray
-        Array indicating cluster membership
+    clusters : array_like
+        Cluster membership. Either a 1-d array with an element for each
+        observation or a 2-d array with a single column, since only one-way
+        clustering is supported. A ``ValueError`` is raised if it has more
+        columns.
     center : bool
         Flag indicating whether to center the moment conditions by subtracting
         the mean before computing the weight matrix.
@@ -292,6 +297,8 @@ class OneWayClusteredWeightMatrix(HomoskedasticWeightMatrix):
         debiased: bool = False,
     ) -> None:
         super().__init__(center, debiased)
+        clusters = as_ndarray(clusters, "clusters")
+        check_cluster_columns(clusters, 1)
         self._clusters = clusters
 
     def weight_matrix(

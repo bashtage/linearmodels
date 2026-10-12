@@ -2,7 +2,7 @@ from __future__ import annotations
 
 from typing import cast
 
-from numpy import asarray, empty, eye, ndarray, ones, sqrt, vstack, zeros
+from numpy import empty, eye, ndarray, ones, sqrt, vstack, zeros
 from numpy.linalg import inv
 from pandas import DataFrame
 
@@ -10,6 +10,7 @@ from linearmodels.asset_pricing.covariance import _HACMixin
 from linearmodels.iv.covariance import cov_cluster
 from linearmodels.panel.covariance import cluster_union
 from linearmodels.shared.covariance import group_debias_coefficient
+from linearmodels.shared.inputs import as_ndarray
 from linearmodels.shared.utility import AttrDict
 from linearmodels.system._utility import (
     LinearConstraint,
@@ -411,7 +412,7 @@ class ClusteredCovariance(HeteroskedasticCovariance):
         Flag indicating to apply a small sample adjustment
     constraints : {None, LinearConstraint}
         Constraints used in estimation, if any
-    clusters : ndarray
+    clusters : array_like
         Optional array of cluster id.  Must be integer valued, and have shape
         (nobs, ncluster) where ncluster is 1 or 2.
     group_debias : bool
@@ -482,15 +483,15 @@ class ClusteredCovariance(HeteroskedasticCovariance):
         """Check cluster dimension and ensure ndarray"""
         if clusters is None:
             return empty((self._eps.size, 0), dtype=int)
-        _clusters = asarray(clusters)
+        _clusters = as_ndarray(clusters, "clusters")
 
         if _clusters.ndim not in (1, 2):
-            raise ValueError(CLUSTERS_FORMAT, ValueError)
+            raise ValueError(CLUSTERS_FORMAT)
         elif _clusters.ndim == 1:
             _clusters = _clusters[:, None]
         shape = _clusters.shape
         if shape[0] != self._eps.shape[0] or not 1 <= shape[1] <= 2:
-            raise ValueError(CLUSTERS_FORMAT, ValueError)
+            raise ValueError(CLUSTERS_FORMAT)
 
         df = DataFrame(_clusters)
         nunique = df.nunique()

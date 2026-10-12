@@ -424,6 +424,127 @@ def test_column_name_as_weights_raises(cls, data):
     assert_allclose(mod.weights.ndarray[:, 0], expected)
 
 
+# --------------------------------------------------------------------------- #
+# Clusters
+# --------------------------------------------------------------------------- #
+CLUSTER_KINDS = [
+    "list",
+    "tuple",
+    "ndarray",
+    "ndarray2d",
+    "series",
+    "series_unnamed",
+    "dataframe",
+    "ivdata",
+    "strings",
+    "categorical",
+    *(["dataarray"] if HAS_XARRAY else []),
+]
+
+
+def make_clusters(value, kind):
+    if kind == "strings":
+        return value.astype(str)
+    if kind == "categorical":
+        return value.astype(str).astype("category")
+    return make(value, kind)
+
+
+def fit_clustered(cls, data, clusters, **kw):
+    mod = build_iv(cls, data)
+    return estimates(mod.fit(cov_type="clustered", clusters=clusters, **kw))
+
+
+@pytest.mark.parametrize("cls", FAST_ESTIMATORS, ids=FAST_IDS)
+@pytest.mark.parametrize("kind", CLUSTER_KINDS)
+def test_iv_clusters_containers(data, cls, kind):
+    expected = fit_clustered(cls, data, data["clusters"].to_numpy())
+    clusters = make_clusters(data["clusters"], kind)
+    assert_allclose(fit_clustered(cls, data, clusters), expected, rtol=1e-10)
+
+
+@pytest.mark.parametrize("kind", ["list", "tuple", "series", "strings", "categorical"])
+def test_iv_cue_clusters_containers(data, kind):
+    expected = fit_clustered(IVGMMCUE, data, data["clusters"].to_numpy())
+    clusters = make_clusters(data["clusters"], kind)
+    assert_allclose(fit_clustered(IVGMMCUE, data, clusters), expected, rtol=1e-6)
+
+
+@pytest.mark.parametrize("cls", [IVGMM, IVGMMCUE], ids=["IVGMM", "IVGMMCUE"])
+@pytest.mark.parametrize("kind", ["list", "tuple", "series", "strings", "categorical"])
+def test_gmm_weight_config_clusters_containers(data, cls, kind):
+    def fit(clusters):
+        mod = cls(
+            data["dependent"],
+            data["exog"],
+            data["endog"],
+            data["instruments"],
+            weight_type="clustered",
+            clusters=clusters,
+        )
+        return estimates(mod.fit())
+
+    expected = fit(data["clusters"].to_numpy())
+    assert_allclose(fit(make_clusters(data["clusters"], kind)), expected, rtol=1e-6)
+
+
+@pytest.mark.parametrize("cls", [IV2SLS, IVLIML], ids=["IV2SLS", "IVLIML"])
+@pytest.mark.parametrize(
+    "kind", ["list2d", "tuple", "ndarray", "dataframe", *XARRAY_KINDS[:1]]
+)
+def test_iv_two_way_clusters_containers(data, cls, kind):
+    expected = fit_clustered(cls, data, data["clusters2"].to_numpy())
+    clusters = make(data["clusters2"], kind)
+    assert_allclose(fit_clustered(cls, data, clusters), expected, rtol=1e-10)
+
+
+@pytest.mark.parametrize("cls", [IV2SLS, IVLIML], ids=["IV2SLS", "IVLIML"])
+def test_three_cluster_columns_raise(data, cls):
+    clusters = np.c_[data["clusters2"].to_numpy(), data["clusters"].to_numpy()]
+    mod = build_iv(cls, data)
+    match = r"clusters must be a 1-d array or a 2-d array with 1 or 2 columns"
+    with pytest.raises(ValueError, match=match):
+        mod.fit(cov_type="clustered", clusters=clusters)
+    with pytest.raises(ValueError, match=match):
+        mod.fit(cov_type="clustered", clusters=clusters.tolist())
+    with pytest.raises(ValueError, match=match):
+        mod.fit(cov_type="clustered", clusters=np.zeros((NOBS, 0)))
+
+
+@pytest.mark.parametrize(
+    "cls", [IVGMM, IVGMMCUE, IVJIVE], ids=["IVGMM", "IVGMMCUE", "IVJIVE"]
+)
+@pytest.mark.parametrize("columns", [2, 3])
+def test_multiple_cluster_columns_raise_in_one_way_estimators(data, cls, columns):
+    clusters = np.c_[data["clusters2"].to_numpy(), data["clusters"].to_numpy()]
+    mod = build_iv(cls, data)
+    with pytest.raises(ValueError, match="clusters") as exc:
+        mod.fit(cov_type="clustered", clusters=clusters[:, :columns])
+    message = str(exc.value)
+    assert "single column" in message or "one-way" in message
+
+
+@pytest.mark.parametrize("cls", [IVGMM, IVGMMCUE], ids=["IVGMM", "IVGMMCUE"])
+def test_weight_config_cluster_columns_raise(data, cls):
+    with pytest.raises(ValueError, match="clusters must be a 1-d array or a 2-d array"):
+        cls(
+            data["dependent"],
+            data["exog"],
+            data["endog"],
+            data["instruments"],
+            weight_type="clustered",
+            clusters=data["clusters2"],
+        )
+
+
+@pytest.mark.parametrize("cls", IV_ESTIMATORS, ids=IV_IDS)
+def test_complex_clusters_raise(data, cls):
+    mod = build_iv(cls, data)
+    clusters = data["clusters"].to_numpy().astype(complex)
+    with pytest.raises(TypeError, match="clusters has a complex dtype"):
+        mod.fit(cov_type="clustered", clusters=clusters)
+
+
 @pytest.mark.parametrize("cls", ALL_IV, ids=ALL_IV_IDS)
 @pytest.mark.parametrize("bad", [0.0, -1.0])
 def test_iv_weights_must_be_strictly_positive(data, cls, bad):
@@ -569,6 +690,34 @@ def test_interaction_rejects_complex_values(absorbing):
         Interaction(cat=cats, cont=cont.astype(complex))
     with pytest.raises(TypeError, match="cat has a complex dtype"):
         Interaction(cat=cats.to_numpy().astype(complex), cont=cont)
+
+
+@pytest.mark.parametrize("kind", ["list2d", "tuple", "ndarray", "dataframe"])
+def test_absorbing_two_way_clusters_containers(absorbing, kind):
+    mod = build_absorbing(absorbing)
+    expected = mod.fit(cov_type="clustered", clusters=absorbing["clusters2"].to_numpy())
+    clusters = make(absorbing["clusters2"], kind)
+    res = mod.fit(cov_type="clustered", clusters=clusters)
+    assert_allclose(res.cov, expected.cov, rtol=1e-10)
+
+
+@pytest.mark.parametrize("kind", ["list", "tuple", "series", "ndarray2d"])
+def test_absorbing_clusters_containers(absorbing, kind):
+    mod = build_absorbing(absorbing)
+    expected = mod.fit(cov_type="clustered", clusters=absorbing["clusters"].to_numpy())
+    clusters = make(absorbing["clusters"], kind)
+    res = mod.fit(cov_type="clustered", clusters=clusters)
+    assert_allclose(res.cov, expected.cov, rtol=1e-10)
+
+
+def test_absorbing_three_cluster_columns_raise(absorbing):
+    clusters = np.c_[
+        absorbing["clusters2"].to_numpy(), absorbing["clusters"].to_numpy()
+    ]
+    mod = build_absorbing(absorbing)
+    match = r"clusters must be a 1-d array or a 2-d array with 1 or 2 columns"
+    with pytest.raises(ValueError, match=match):
+        mod.fit(cov_type="clustered", clusters=clusters)
 
 
 # --------------------------------------------------------------------------- #
@@ -822,6 +971,16 @@ def test_system_predict_accepts_lists(system):
     assert_allclose(new.to_numpy(), expected.to_numpy())
     new = res.predict(equations=listed, dataframe=True)
     assert_allclose(new.to_numpy(), expected.to_numpy())
+
+
+@pytest.mark.parametrize("cls", [SUR, IV3SLS], ids=["SUR", "IV3SLS"])
+@pytest.mark.parametrize("kind", ["list", "tuple", "series", "strings"])
+def test_system_clusters_containers(system, cls, kind):
+    mod = cls(equations(system, cls))
+    expected = mod.fit(cov_type="clustered", clusters=system["clusters"].to_numpy())
+    clusters = make_clusters(system["clusters"], kind)
+    res = mod.fit(cov_type="clustered", clusters=clusters)
+    assert_allclose(res.cov, expected.cov, rtol=1e-10)
 
 
 # --------------------------------------------------------------------------- #
