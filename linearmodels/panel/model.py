@@ -1083,9 +1083,9 @@ class PooledOLS(_PanelModelBase):
         ----------
         cov_type : str
             Name of covariance estimator. See Notes.
-        debiased : bool
-            Flag indicating whether to debiased the covariance estimator using
-            a degree of freedom adjustment.
+        debiased : bool, optional
+            Flag indicating whether to debias the covariance estimator using
+            a degree of freedom adjustment. The default is True. See Notes.
         cov_config
             Additional covariance-specific options.  See Notes.
 
@@ -1115,6 +1115,12 @@ class PooledOLS(_PanelModelBase):
           * ``cluster_entity`` - Boolean flag indicating to use entity
             clusters
           * ``cluster_time`` - Boolean indicating to use time clusters
+          * ``group_debias`` - Boolean flag indicating whether to apply an
+            adjustment for the number of clusters. It multiplies the
+            covariance by g / (g - 1) * (n - 1) / n, where g is the number
+            of distinct clusters and n is the number of observations. With
+            two-way clustering, it is applied to each of the three one-way
+            covariances that are combined. The default is False.
 
         * "kernel" - Driscoll-Kraay HAC estimator. Configurations options are:
 
@@ -1123,6 +1129,14 @@ class PooledOLS(_PanelModelBase):
             estimator similar to the Newey-West covariance estimator.
           * ``bandwidth`` - Bandwidth to use when computing the kernel.  If
             not provided, a naive default is used.
+
+        ``debiased=True``, which is the default, scales the covariance by
+        n / (n - k), where k is the number of regressors, and uses the t and
+        F distributions for inference.
+
+        ``debiased=True`` and ``group_debias=True`` give the clustered
+        covariance of Stata's ``regress ..., vce(cluster ...)``.
+        See :ref:`panel-small-sample`.
         """
         y = self.dependent.values2d
         x = self.exog.values2d
@@ -1332,6 +1346,18 @@ class PanelOLS(_PanelModelBase):
 
     Model supports at most 2 effects.  These can be entity-time, entity-other,
     time-other or 2 other.
+
+    A variable in ``exog`` is absorbed if the effects explain all of it. The
+    algorithms that remove the effects are exact only up to rounding error, or up to
+    a relative error of about 1e-8 if they are iterative, so a variable is treated
+    as absorbed if less than 1e-5 of its norm is left after the effects are
+    removed, whatever its units. It is treated in the same way if it is collinear
+    with the variables before it once the effects are removed. An
+    ``AbsorbingEffectError`` is raised for such a variable. If ``drop_absorbed`` is
+    True, the variable is dropped and an ``AbsorbingEffectWarning`` is raised, and the
+    constant is never dropped. The norm includes the mean of the variable, so a
+    variable with a large mean and little other variation, less than 1e-5 of its norm,
+    is also treated as absorbed. Subtract its mean to avoid this.
     """
 
     def __init__(
@@ -1949,9 +1975,11 @@ class PanelOLS(_PanelModelBase):
             regressors in the model and requires more than 1 GiB .
         cov_type : str
             Name of covariance estimator. See Notes.
-        debiased : bool
-            Flag indicating whether to debiased the covariance estimator using
-            a degree of freedom adjustment.
+        debiased : bool, optional
+            Flag indicating whether to debias the covariance estimator using
+            a degree of freedom adjustment. The default is True. The
+            estimated effects are counted in the degrees of freedom whether
+            or not ``debiased`` is True. See Notes.
         auto_df : bool
             Flag indicating that the treatment of estimated effects in degree
             of freedom adjustment is automatically handled. This is useful
@@ -1991,6 +2019,12 @@ class PanelOLS(_PanelModelBase):
           * ``cluster_entity`` - Boolean flag indicating to use entity
             clusters
           * ``cluster_time`` - Boolean indicating to use time clusters
+          * ``group_debias`` - Boolean flag indicating whether to apply an
+            adjustment for the number of clusters. It multiplies the
+            covariance by g / (g - 1) * (n - 1) / n, where g is the number
+            of distinct clusters and n is the number of observations. With
+            two-way clustering, it is applied to each of the three one-way
+            covariances that are combined. The default is False.
 
         * "kernel" - Driscoll-Kraay HAC estimator. Configurations options are:
 
@@ -1999,6 +2033,23 @@ class PanelOLS(_PanelModelBase):
             estimator similar to the Newey-West covariance estimator.
           * ``bandwidth`` - Bandwidth to use when computing the kernel.  If
             not provided, a naive default is used.
+
+        ``debiased=True``, which is the default, scales the covariance by
+        n / (n - k), where k is the number of regressors, and uses the t and
+        F distributions for inference.
+
+        ``debiased=True`` and ``group_debias=True`` give the clustered
+        covariance of Stata's ``xtreg, fe vce(cluster ...)``.
+        See :ref:`panel-small-sample`.
+
+        PanelOLS counts the effects that it estimates in the degrees of
+        freedom, which is ``extra_df`` of the covariance estimator. If d is
+        the number of effects, the covariance is scaled by n / (n - d - k)
+        if ``debiased`` is True and by n / (n - d) if it is False. If
+        ``auto_df`` is True, the effects are not counted when the model has
+        a single effect and each of its groups is in one cluster, for
+        example entity effects with ``cluster_entity=True``. Use
+        ``auto_df=False`` and ``count_effects`` to choose.
         """
 
         weighted = np.any(self.weights.values2d != 1.0)
@@ -2036,12 +2087,15 @@ class PanelOLS(_PanelModelBase):
                 drop_first = True
 
         if self.entity_effects or self.time_effects or self.other_effects:
+            # The regressors before the effects were removed set the scale of each
+            # column, so the check does not depend on the units of the variables
+            x_orig = np.sqrt(self.weights.values2d) * self.exog.values2d
             if not self._drop_absorbed:
-                check_absorbed(x, [str(var) for var in self.exog.vars])
+                check_absorbed(x, [str(var) for var in self.exog.vars], x_orig)
             else:
                 # TODO: Need to special case the constant here when determining which
                 #  to retain since we always want to retain the constant if present
-                retain = not_absorbed(x, self._constant, self._constant_index)
+                retain = not_absorbed(x, self._constant, self._constant_index, x_orig)
                 if not retain:
                     raise ValueError(
                         "All columns in exog have been fully absorbed by the included"
@@ -2316,9 +2370,9 @@ class BetweenOLS(_PanelModelBase):
             are accounted for when reweighting. Has no effect on balanced data.
         cov_type : str
             Name of covariance estimator. See Notes.
-        debiased : bool
-            Flag indicating whether to debiased the covariance estimator using
-            a degree of freedom adjustment.
+        debiased : bool, optional
+            Flag indicating whether to debias the covariance estimator using
+            a degree of freedom adjustment. The default is True. See Notes.
         cov_config
             Additional covariance-specific options.  See Notes.
 
@@ -2345,9 +2399,19 @@ class BetweenOLS(_PanelModelBase):
           * ``clusters`` - Input containing 1 or 2 variables.
             Clusters should be integer values, although other types will
             be coerced to integer values by treating as categorical variables
+          * ``group_debias`` - Boolean flag indicating whether to apply an
+            adjustment for the number of clusters. It multiplies the
+            covariance by g / (g - 1) * (n - 1) / n, where g is the number
+            of distinct clusters and n is the number of observations. With
+            two-way clustering, it is applied to each of the three one-way
+            covariances that are combined. The default is False.
 
         When using a clustered covariance estimator, all cluster ids must be
         identical within an entity.
+
+        ``debiased=True``, which is the default, scales the covariance by
+        n / (n - k), where k is the number of regressors, and uses the t and
+        F distributions for inference. See :ref:`panel-small-sample`.
         """
         y, x, w = self._prepare_between()
         if np.all(self.weights.values2d == 1.0) and not reweight:
@@ -2620,9 +2684,9 @@ class FirstDifferenceOLS(_PanelModelBase):
         ----------
         cov_type : str
             Name of covariance estimator. See Notes.
-        debiased : bool
-            Flag indicating whether to debiased the covariance estimator using
-            a degree of freedom adjustment.
+        debiased : bool, optional
+            Flag indicating whether to debias the covariance estimator using
+            a degree of freedom adjustment. The default is True. See Notes.
         cov_config
             Additional covariance-specific options.  See Notes.
 
@@ -2652,6 +2716,12 @@ class FirstDifferenceOLS(_PanelModelBase):
             be coerced to integer values by treating as categorical variables
           * ``cluster_entity`` - Boolean flag indicating to use entity
             clusters
+          * ``group_debias`` - Boolean flag indicating whether to apply an
+            adjustment for the number of clusters. It multiplies the
+            covariance by g / (g - 1) * (n - 1) / n, where g is the number
+            of distinct clusters and n is the number of observations. With
+            two-way clustering, it is applied to each of the three one-way
+            covariances that are combined. The default is False.
 
         * "kernel" - Driscoll-Kraay HAC estimator. Configurations options are:
 
@@ -2664,6 +2734,10 @@ class FirstDifferenceOLS(_PanelModelBase):
         When using a clustered covariance estimator, all cluster ids must be
         identical within a first difference.  In most scenarios, this requires
         ids to be identical within an entity.
+
+        ``debiased=True``, which is the default, scales the covariance by
+        n / (n - k), where k is the number of regressors, and uses the t and
+        F distributions for inference. See :ref:`panel-small-sample`.
         """
         y_fd = self.dependent.first_difference()
         time_ids = y_fd.time_ids
@@ -2942,9 +3016,9 @@ class RandomEffects(_PanelModelBase):
             the random effect.
         cov_type : str
             Name of covariance estimator (see notes). Default is "unadjusted".
-        debiased : bool
-            Flag indicating whether to debiased the covariance estimator using
-            a degree of freedom adjustment.
+        debiased : bool, optional
+            Flag indicating whether to debias the covariance estimator using
+            a degree of freedom adjustment. The default is True. See Notes.
         cov_config
             Additional covariance-specific options.  See Notes.
 
@@ -2974,6 +3048,12 @@ class RandomEffects(_PanelModelBase):
           * ``cluster_entity`` - Boolean flag indicating to use entity
             clusters
           * ``cluster_time`` - Boolean indicating to use time clusters
+          * ``group_debias`` - Boolean flag indicating whether to apply an
+            adjustment for the number of clusters. It multiplies the
+            covariance by g / (g - 1) * (n - 1) / n, where g is the number
+            of distinct clusters and n is the number of observations. With
+            two-way clustering, it is applied to each of the three one-way
+            covariances that are combined. The default is False.
 
         * "kernel" - Driscoll-Kraay HAC estimator. Configurations options are:
 
@@ -2982,6 +3062,14 @@ class RandomEffects(_PanelModelBase):
             estimator similar to the Newey-West covariance estimator.
           * ``bandwidth`` - Bandwidth to use when computing the kernel.  If
             not provided, a naive default is used.
+
+        ``debiased=True``, which is the default, scales the covariance by
+        n / (n - k), where k is the number of regressors, and uses the t and
+        F distributions for inference.
+
+        ``debiased=True`` and ``group_debias=True`` give the clustered
+        covariance of Stata's ``xtreg, re vce(cluster ...)``.
+        See :ref:`panel-small-sample`.
         """
         w = self.weights.values2d
         root_w = cast("linearmodels.typing.data.Float64Array", np.sqrt(w))

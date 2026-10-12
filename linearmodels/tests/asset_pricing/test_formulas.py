@@ -10,6 +10,7 @@ from linearmodels.asset_pricing.model import (
     LinearFactorModelGMM,
     TradedFactorModel,
 )
+from linearmodels.shared.exceptions import MissingValueWarning
 from linearmodels.tests.asset_pricing._utility import generate_data
 
 FORMULA_FACTORS = "factor_01 + factor_02 + factor_03"
@@ -71,6 +72,28 @@ def test_traded_model_formula(data, model):
     assert_frame_equal(res1.params, res2.params)
     assert mod1.formula == FORMULA_FACTORS
     assert mod2.formula is None
+
+
+@pytest.mark.parametrize("portfolios_in_formula", [True, False])
+def test_formula_missing_values(data, model, portfolios_in_formula):
+    # Observations with a missing value are dropped, with a warning, as for arrays
+    joined = data.joined.copy()
+    joined.loc[joined.index[3], "factor_01"] = np.nan
+    joined.loc[joined.index[10], "port_02"] = np.nan
+    joined.loc[joined.index[20], ["factor_03", "port_05"]] = np.nan
+    keep = joined.notnull().all(axis=1)
+    assert (~keep).sum() == 3
+    expected = model(data.portfolios.loc[keep], data.factors.loc[keep])
+    if portfolios_in_formula:
+        formula, portfolios = FORMULA, None
+    else:
+        formula, portfolios = FORMULA_FACTORS, joined[data.portfolios.columns]
+    with pytest.warns(MissingValueWarning):
+        mod = model.from_formula(formula, joined, portfolios=portfolios)
+    assert_frame_equal(mod.factors.pandas, expected.factors.pandas)
+    assert_frame_equal(mod.portfolios.pandas, expected.portfolios.pandas)
+    if model is not LinearFactorModelGMM:
+        assert_frame_equal(mod.fit().params, expected.fit().params)
 
 
 @pytest.mark.slow

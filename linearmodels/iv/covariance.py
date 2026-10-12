@@ -37,11 +37,11 @@ KernelWeight = Union[
 ]
 
 CLUSTER_ERR = """\
-clusters has the wrong nobs. Expected {0}, got {1}.  Any missing observation
-in the regression variables have have been dropped.  When using a clustered
-covariance estimator, drop missing data before estimating the model. The model
-property `notnull` contains the locations of the observations that have no
-missing values."""
+clusters has the wrong nobs. Expected {0}, got {1}. Observations with a missing
+value in the regression variables are dropped when the model is created, so
+clusters must have one row for each of the remaining observations. When using a
+clustered covariance estimator, drop the observations with missing values from
+the data and from clusters before estimating the model."""
 
 
 def kernel_weight_bartlett(
@@ -232,6 +232,11 @@ class HomoskedasticCovariance:
         Flag indicating whether to use a small-sample adjustment
     kappa : float
         Value of kappa in k-class estimator
+    extra_df : int, optional
+        Degrees of freedom that the model uses in addition to the nvar columns
+        of x, for example the absorbed effects of AbsorbingLS. The default is 0.
+        It is only used if ``debiased`` is True, when n / (n-k) becomes
+        n / (n-k-extra_df).
 
     Notes
     -----
@@ -247,7 +252,8 @@ class HomoskedasticCovariance:
 
       s^2 = n^{-1} \sum_{i=1}^n \hat{\epsilon}_i^2
 
-    If ``debiased`` is true, then :math:`s^2` is scaled by n / (n-k).
+    If ``debiased`` is true, then :math:`s^2` is scaled by n / (n-k-df), where k is
+    the number of columns of x and df is ``extra_df``.
 
     .. math::
 
@@ -265,6 +271,7 @@ class HomoskedasticCovariance:
         params: linearmodels.typing.data.Float64Array,
         debiased: bool = False,
         kappa: linearmodels.typing.Numeric = 1,
+        extra_df: int = 0,
     ):
         if not (x.shape[0] == y.shape[0] == z.shape[0]):
             raise ValueError("x, y and z must have the same number of rows")
@@ -280,7 +287,13 @@ class HomoskedasticCovariance:
         self._kappa = kappa
         self._pinvz = pinv(z)
         nobs, nvar = x.shape
-        self._scale: float = nobs / (nobs - nvar) if self._debiased else 1.0
+        if self._debiased and extra_df > 0 and nobs - nvar - extra_df <= 0:
+            raise ValueError(
+                "The small-sample adjustment of a debiased covariance needs more "
+                f"observations ({nobs}) than the {nvar} columns of x and the "
+                f"{extra_df} degrees of freedom that are used in addition."
+            )
+        self._scale: float = nobs / (nobs - nvar - extra_df) if self._debiased else 1.0
         self._name = "Unadjusted Covariance (Homoskedastic)"
 
     def __str__(self) -> str:
@@ -366,6 +379,11 @@ class HeteroskedasticCovariance(HomoskedasticCovariance):
         Flag indicating whether to use a small-sample adjustment
     kappa : float
         Value of kappa in k-class estimator
+    extra_df : int, optional
+        Degrees of freedom that the model uses in addition to the nvar columns
+        of x, for example the absorbed effects of AbsorbingLS. The default is 0.
+        It is only used if ``debiased`` is True, when n / (n-k) becomes
+        n / (n-k-extra_df).
 
     Notes
     -----
@@ -383,7 +401,8 @@ class HeteroskedasticCovariance(HomoskedasticCovariance):
 
     where :math:`\hat{\gamma}=(Z'Z)^{-1}(Z'X)` and
     :math:`\hat{x}_i = z_i\hat{\gamma}`. If ``debiased`` is true, then
-    :math:`S` is scaled by n / (n-k).
+    :math:`S` is scaled by n / (n-k-df), where k is the number of columns of x and
+    df is ``extra_df``.
 
     .. math::
 
@@ -401,8 +420,9 @@ class HeteroskedasticCovariance(HomoskedasticCovariance):
         params: linearmodels.typing.data.Float64Array,
         debiased: bool = False,
         kappa: linearmodels.typing.Numeric = 1,
+        extra_df: int = 0,
     ):
-        super().__init__(x, y, z, params, debiased, kappa)
+        super().__init__(x, y, z, params, debiased, kappa, extra_df)
         self._name = "Robust Covariance (Heteroskedastic)"
 
     @property
@@ -445,6 +465,11 @@ class KernelCovariance(HomoskedasticCovariance):
         Flag indicating whether to use a small-sample adjustment
     kappa : float
         Value of kappa in k-class estimator
+    extra_df : int, optional
+        Degrees of freedom that the model uses in addition to the nvar columns
+        of x, for example the absorbed effects of AbsorbingLS. The default is 0.
+        It is only used if ``debiased`` is True, when n / (n-k) becomes
+        n / (n-k-extra_df).
 
     Notes
     -----
@@ -468,7 +493,7 @@ class KernelCovariance(HomoskedasticCovariance):
     where :math:`\hat{\gamma}=(Z'Z)^{-1}(Z'X)`,
     :math:`\hat{x}_i = z_i\hat{\gamma}` and :math:`K(i,bw)` is a weight that
     depends on the kernel. If ``debiased`` is true, then :math:`S` is scaled
-    by n / (n-k).
+    by n / (n-k-df), where k is the number of columns of x and df is ``extra_df``.
 
     .. math::
 
@@ -494,8 +519,9 @@ class KernelCovariance(HomoskedasticCovariance):
         bandwidth: linearmodels.typing.OptionalNumeric = None,
         debiased: bool = False,
         kappa: linearmodels.typing.Numeric = 1,
+        extra_df: int = 0,
     ):
-        super().__init__(x, y, z, params, debiased, kappa)
+        super().__init__(x, y, z, params, debiased, kappa, extra_df)
         self._kernels = KERNEL_LOOKUP
         self._kernel = kernel
         self._bandwidth = bandwidth
@@ -572,6 +598,11 @@ class ClusteredCovariance(HomoskedasticCovariance):
         Either nobs by ncluster where ncluster is 1 or 2.
     kappa : float
         Value of kappa in k-class estimator
+    extra_df : int, optional
+        Degrees of freedom that the model uses in addition to the nvar columns
+        of x, for example the absorbed effects of AbsorbingLS. The default is 0.
+        It is only used if ``debiased`` is True, when n / (n-k) becomes
+        n / (n-k-extra_df).
 
 
     Notes
@@ -592,8 +623,8 @@ class ClusteredCovariance(HomoskedasticCovariance):
     where :math:`\hat{\gamma}=(Z'Z)^{-1}(Z'X)` and
     :math:`\hat{x}_i = z_i\hat{\gamma}`.  :math:`\mathcal{G}_g` contains the
     indices of elements in cluster g. If ``debiased`` is true, then
-    :math:`S` is scaled by g(n - 1) / ((g-1)(n-k)) where g is the number
-    of groups..
+    :math:`S` is scaled by g(n - 1) / ((g-1)(n-k-df)) where g is the number
+    of groups, k is the number of columns of x and df is ``extra_df``.
 
     .. math::
 
@@ -612,8 +643,9 @@ class ClusteredCovariance(HomoskedasticCovariance):
         clusters: linearmodels.typing.data.AnyArray | None = None,
         debiased: bool = False,
         kappa: linearmodels.typing.Numeric = 1,
+        extra_df: int = 0,
     ):
-        super().__init__(x, y, z, params, debiased, kappa)
+        super().__init__(x, y, z, params, debiased, kappa, extra_df)
 
         nobs = x.shape[0]
         clusters = arange(nobs) if clusters is None else clusters

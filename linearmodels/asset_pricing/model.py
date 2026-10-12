@@ -161,7 +161,9 @@ class _FactorModelBase:
         formula: str, data: DataFrame, portfolios: DataFrame | None
     ) -> tuple[DataFrame, DataFrame, str]:
         orig_formula = formula
-        na_action = NAAction("raise")
+        # Missing values are kept so that the model drops the observations with a
+        # missing value in the portfolios or the factors, as it does for arrays
+        na_action = NAAction("ignore")
         if portfolios is not None:
             factors_mm = model_matrix(
                 formula + " + 0",

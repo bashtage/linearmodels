@@ -6,7 +6,18 @@ from linearmodels.typing import BoolArray
 
 
 class MissingValueWarning(Warning):
-    pass
+    """
+    Warning that observations with missing values were dropped.
+
+    Notes
+    -----
+    A model drops the observations that have a missing value in any of its inputs
+    when it is created, and issues this warning if it drops any. The warning is on
+    by default. Set ``linearmodels.WARN_ON_MISSING = False`` or the environment
+    variable ``LINEARMODELS_WARN_ON_MISSING=0`` to turn it off for every model. To
+    change it for part of a program, use a warnings filter for this class, with the
+    action ``"ignore"`` or ``"error"``.
+    """
 
 
 missing_value_warning_msg = """

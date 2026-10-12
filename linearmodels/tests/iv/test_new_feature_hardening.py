@@ -657,24 +657,31 @@ def test_centered_j_cue_without_centering(weight_type, weighted):
 def test_centered_j_cue_with_too_few_clusters(weighted):
     # The centered cluster sums add to zero, so that the covariance has at most
     # nclusters - 1 non-zero eigenvalues, and the model has 5 moment conditions.
-    # The uncentered covariance of the CUE has nclusters
+    # The uncentered covariance has nclusters. The objective function of the CUE
+    # is constant if there are as many clusters as moment conditions, so that the
+    # CUE needs 6 clusters, which are enough for the centered covariance too, and
+    # the case where only the uncentered covariance can be estimated is the
+    # two-step estimator
     y, exog, endog, z, w = simulate(23, ninstr=3, violation=0.3, weighted=weighted)
     outcomes = {}
     for nclusters in (5, 6):
-        mod = IVGMMCUE(
-            y,
-            exog,
-            endog,
-            z,
-            weights=w,
-            weight_type="clustered",
-            clusters=np.arange(y.shape[0]) % nclusters,
-            center=False,
-        )
+        config = {
+            "weights": w,
+            "weight_type": "clustered",
+            "clusters": np.arange(y.shape[0]) % nclusters,
+            "center": False,
+        }
+        mod = IVGMM(y, exog, endog, z, **config)
         res = mod.fit()
         outcomes[nclusters] = res
         assert np.isfinite(res.j_stat.stat)
         assert res.j_stat.df == 2
+        cue = IVGMMCUE(y, exog, endog, z, **config)
+        if nclusters == 5:
+            with pytest.raises(ValueError, match="as many clusters"):
+                cue.fit()
+        else:
+            assert type(cue.fit().centered_j_stat) is WaldTestStatistic
     invalid = outcomes[5].centered_j_stat
     assert isinstance(invalid, InvalidTestStatistic)
     assert np.isnan(invalid.stat)

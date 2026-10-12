@@ -241,6 +241,27 @@ def simple_3sls(y, x, z):
     return out
 
 
+def weighted_fit_measures(eqn, params):
+    """
+    Residuals and sums of squares of a weighted equation, by direct computation
+
+    The residuals do not use the weights. The weighted residuals and the sums of
+    squares use the weights, normalized to have mean 1, and the total sum of squares
+    is about the weighted mean.
+    """
+    y = eqn["dependent"]
+    x = np.column_stack([eqn[k] for k in ("exog", "endog") if eqn.get(k) is not None])
+    w = eqn["weights"] / eqn["weights"].mean()
+    resid = y - x @ np.asarray(params)[:, None]
+    mean = (w * y).sum() / w.sum()
+    return AttrDict(
+        resid=resid,
+        wresid=np.sqrt(w) * resid,
+        rss=(w * resid**2).sum(),
+        tss=(w * (y - mean) ** 2).sum(),
+    )
+
+
 def convert_to_pandas(a, base):
     k = a.shape[1]
     cols = [base + f"_{i}" for i in range(k)]
