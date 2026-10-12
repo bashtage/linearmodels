@@ -3337,17 +3337,16 @@ class FamaMacBeth(_PanelModelBase):
         if valid_blocks.sum() < exog.shape[1]:
 
             warnings.warn(
-                "The number of time-series observation available to estimate "
-                "cross-sectional\nregressions, {}, is less than the number of "
-                "parameters in the model. Parameter\ninference is not "
-                "available.".format(valid_blocks.sum()),
+                "The number of cross-sectional regressions that can be estimated, "
+                "{}, is less than the number of parameters in the model. Parameter "
+                "inference is not available.".format(valid_blocks.sum()),
                 InferenceUnavailableWarning,
                 stacklevel=3,
             )
         elif valid_blocks.sum() < valid_blocks.shape[0]:
 
             warnings.warn(
-                "{} of the time-series regressions cannot be estimated due to "
+                "{} of the cross-sectional regressions cannot be estimated due to "
                 "deficient rank.".format(valid_blocks.shape[0] - valid_blocks.sum()),
                 MissingValueWarning,
                 stacklevel=3,
