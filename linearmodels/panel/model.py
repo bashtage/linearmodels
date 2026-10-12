@@ -157,9 +157,9 @@ def _hotelling_f(
     """
     Robust Wald test of FamaMacBeth, with Hotelling's T-squared reference
 
-    The parameters are the average of nperiod estimates. If debiased, the Wald
-    statistic W is multiplied by (nperiod - df) / (df * (nperiod - 1)) and
-    compared with an F(df, nperiod - df) distribution. This is Hotelling's
+    The parameters are the average of T estimates, and T is the argument nperiod.
+    If debiased, the Wald statistic W is multiplied by (T - df) / (df * (T - 1))
+    and compared with an F(df, T - df) distribution. This is Hotelling's
     T-squared test, which is exact when the estimates are independent and normal
     and the covariance is the covariance of their average. If not debiased the
     statistic is W, and the distribution is chi2(df).

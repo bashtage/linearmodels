@@ -411,11 +411,12 @@ def hotelling_by_hand(estimates, *, bandwidth=0, debiased=True):
     Wald statistic of the slopes, Hotelling's F and its p-value, from the T estimates
 
     The first column of the estimates is the constant, and the tested parameters
-    are the others. With the covariance of the average of the estimates, the Wald
-    statistic is T times the Hotelling's T-squared of the slopes if debiased, and
-    F = (T - k) / (k (T - 1)) W has an F distribution with k and T - k degrees of
-    freedom. If not debiased the distribution of W is chi-squared with k degrees
-    of freedom
+    are the others. The Wald statistic W uses the covariance of the average of
+    the estimates, which is their sample covariance, with the divisor T - 1 if
+    debiased, divided by T. W is then Hotelling's T-squared statistic of the
+    slopes, and F = (T - k) / (k (T - 1)) W has an F distribution with k and T - k
+    degrees of freedom. If not debiased the distribution of W is chi-squared with
+    k degrees of freedom
     """
     nperiod, nslope = estimates.shape[0], estimates.shape[1] - 1
     params, cov, _, _ = by_hand(estimates, debiased=debiased, bandwidth=bandwidth)

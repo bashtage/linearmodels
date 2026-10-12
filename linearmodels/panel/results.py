@@ -1462,10 +1462,10 @@ class FamaMacBethResults(PanelResults):
         the standard covariance of their average (``cov_type`` equal to
         "unadjusted", "homoskedastic", "robust" or "heteroskedastic"). With
         the kernel covariance it is an approximation, since the estimates are
-        not independent and the covariance is a HAC estimate. With one tested
-        parameter, :math:`F` is the square of the t-statistic and the
-        distribution is the square of the :math:`t_{T-1}` distribution, so that
-        the p-value is that of the parameter.
+        not independent and the covariance is an estimate of the long-run
+        covariance. With one tested parameter, :math:`F` is the square of the
+        t-statistic and the distribution is the square of the :math:`t_{T-1}`
+        distribution, so that the p-value is that of the parameter.
 
         The covariance is estimated from only :math:`T` estimates, which makes
         :math:`W/k` stochastically larger than an :math:`F_{k,df}` variable
