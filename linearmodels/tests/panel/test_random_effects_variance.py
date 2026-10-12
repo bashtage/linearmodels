@@ -31,6 +31,7 @@ import numpy as np
 from numpy.testing import assert_allclose
 import pandas as pd
 import pytest
+from scipy.linalg import qr
 
 from linearmodels.datasets import wage_panel
 from linearmodels.panel import PanelOLS, RandomEffects
@@ -116,7 +117,7 @@ def lsdv_variance(data, columns, weights):
     return float(np.sum((wy - wexog @ beta) ** 2)) / (data.shape[0] - rank)
 
 
-def swar_reference(y, x, weights=None):
+def swar_reference(y, x, weights=None, small_sample=False):
     """
     The estimators of Swamy and Arora written out, with the ranks of the regressions
 
@@ -143,11 +144,26 @@ def swar_reference(y, x, weights=None):
     yb = weighted_means(y.to_frame()).iloc[:, 0].groupby(entity).first().to_numpy()
     count = y.groupby(entity).size().to_numpy().astype(float)
     rank_between = int(np.linalg.matrix_rank(xb))
-    resid = yb - xb @ np.linalg.lstsq(xb, yb, rcond=None)[0]
-    tbar = nentity / np.sum(1 / count)
-    sigma2_effects = float(np.sum(resid**2)) / (nentity - rank_between)
-    sigma2_effects = max(0.0, sigma2_effects - sigma2_eps / tbar)
-    return sigma2_eps, sigma2_effects, rank_within, rank_between
+    if not small_sample:
+        resid = yb - xb @ np.linalg.lstsq(xb, yb, rcond=None)[0]
+        tbar = nentity / np.sum(1 / count)
+        sigma2_effects = float(np.sum(resid**2)) / (nentity - rank_between)
+        sigma2_effects = max(0.0, sigma2_effects - sigma2_eps / tbar)
+        return sigma2_eps, sigma2_effects, rank_within, rank_between
+    # Baltagi and Chang (1994) for unbalanced panels: the means are weighted by the
+    # number of observations. This is the regression of the data replaced by the
+    # means of the entities. The trace uses columns that are not collinear
+    root_t = np.sqrt(count)
+    coef = np.linalg.lstsq(root_t[:, None] * xb, root_t * yb, rcond=None)[0]
+    rss = float(np.sum(count * (yb - xb @ coef) ** 2))
+    basis = qr(xb, pivoting=True, mode="economic")[2][:rank_between]
+    xr = xb[:, basis]
+    trace = np.trace(
+        np.linalg.inv((count[:, None] * xr).T @ xr)
+        @ ((count[:, None] * xr).T @ (count[:, None] * xr))
+    )
+    sigma2_effects = (rss - (nentity - rank_between) * sigma2_eps) / (nobs - trace)
+    return sigma2_eps, max(0.0, float(sigma2_effects)), rank_within, rank_between
 
 
 @pytest.mark.parametrize("weighted", [False, True], ids=["unweighted", "weighted"])
@@ -171,11 +187,14 @@ def test_idiosyncratic_variance_is_that_of_the_fixed_effects(data, design):
     assert_allclose(re_res.variance_decomposition["Residual"], fe_res.s2)
 
 
+@pytest.mark.parametrize("small_sample", [False, True])
 @pytest.mark.parametrize("design", list(DESIGNS))
-def test_variance_components_against_estimators_written_out(data, design):
+def test_variance_components_against_estimators_written_out(data, design, small_sample):
     columns = DESIGNS[design]
-    res = RandomEffects(data["y"], data[columns]).fit()
-    sigma2_eps, sigma2_effects, *_ = swar_reference(data["y"], data[columns])
+    res = RandomEffects(data["y"], data[columns]).fit(small_sample=small_sample)
+    sigma2_eps, sigma2_effects, *_ = swar_reference(
+        data["y"], data[columns], small_sample=small_sample
+    )
     decomposition = res.variance_decomposition
     assert_allclose(decomposition["Residual"], sigma2_eps)
     assert_allclose(decomposition["Effects"], sigma2_effects)
@@ -217,9 +236,13 @@ def test_the_designs_have_regressors_that_the_regressions_do_not_estimate():
         assert ranks == (1 + len(DUMMIES), between), balance
 
 
-def wage_data():
-    """The wage panel of the notebook"""
+def wage_data(unbalanced):
+    """The wage panel of the notebook, and its unbalanced version in the R script"""
     data = wage_panel.load()
+    if unbalanced:
+        year, nr = data["year"], data["nr"]
+        drop = ((nr * 7 + year * 13) % 5 == 0) & ((nr + year) % 3 != 0)
+        data = data.loc[~drop]
     year = pd.Categorical(data["year"])
     data = data.set_index(["nr", "year"])
     data["year"] = year
@@ -230,6 +253,16 @@ def wage_data():
 TIME_INVARIANT = ["black", "hisp", "exper", "expersq", "married", "educ", "union"]
 PLM_COLUMNS = {
     "notebook": ["const", *TIME_INVARIANT, "year"],
+    "year-dummies": [
+        "const",
+        "black",
+        "hisp",
+        "expersq",
+        "married",
+        "educ",
+        "union",
+        "year",
+    ],
     "time-invariant": ["const", *TIME_INVARIANT],
     "time-varying": ["const", "expersq", "married", "union"],
 }
@@ -237,6 +270,8 @@ PLM_CASES = [
     ("balanced", "notebook"),
     ("balanced", "time-invariant"),
     ("balanced", "time-varying"),
+    ("unbalanced", "year-dummies"),
+    ("unbalanced", "time-invariant"),
 ]
 
 
@@ -253,9 +288,11 @@ def plm_reference():
 @pytest.mark.parametrize(("balance", "model"), PLM_CASES)
 def test_random_effects_against_plm(plm_reference, balance, model):
     expected = plm_reference[f"{balance}-{model}"]
-    data = wage_data()
+    unbalanced = balance == "unbalanced"
+    data = wage_data(unbalanced)
     mod = RandomEffects(data["lwage"], data[PLM_COLUMNS[model]])
-    res = mod.fit()
+    # plm uses the estimator of Baltagi and Chang (1994) for an unbalanced panel
+    res = mod.fit(small_sample=unbalanced)
     assert res.nobs == expected["nobs"]
     decomposition = res.variance_decomposition
     assert_allclose(decomposition["Residual"], expected["sigma2_idios"], rtol=1e-8)
@@ -273,6 +310,7 @@ def test_random_effects_against_plm(plm_reference, balance, model):
     sigma2_eps, sigma2_effects, rank_within, rank_between = swar_reference(
         mod.dependent.dataframe["lwage"],
         mod.exog.dataframe,
+        small_sample=unbalanced,
     )
     nentity = entities.nunique()
     assert expected["df_within"] == res.nobs - nentity - rank_within

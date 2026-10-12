@@ -3001,6 +3001,11 @@ class RandomEffects(_PanelModelBase):
            (less one for the constant in the within regression), so that the
            variances, theta and the estimates were slightly different for models with
            time-invariant or collinear regressors, and for models without a constant.
+           With ``small_sample`` and an unbalanced panel, the residuals of the between
+           regression that the estimator of Baltagi and Chang (1994) uses are those of
+           the regression that weights the entities by their numbers of observations.
+           Earlier versions used the residuals of the unweighted regression of the
+           means, which gave a different variance of the effects.
         """
         w = self.weights.values2d
         root_w = cast("linearmodels.typing.data.Float64Array", np.sqrt(w))
@@ -3037,7 +3042,15 @@ class RandomEffects(_PanelModelBase):
         t = np.asarray(self.dependent.count("entity"))
         unbalanced = np.ptp(t) != 0
         if small_sample and unbalanced:
-            ssr = float(np.squeeze((t * wu).T @ wu))
+            # The between regression of the estimator of Baltagi and Chang (1994) is
+            # the regression of the data replaced by the means of the entities. It
+            # weights the means by the numbers of observations, as the trace below
+            # does, and the residuals of the regression of the means do not
+            root_t = np.sqrt(t)
+            xbar, ybar = np.asarray(wxbar), np.asarray(wybar)
+            params_t = _lstsq(root_t * xbar, root_t * ybar, rcond=None)[0]
+            wu_t = ybar - xbar @ params_t
+            ssr = float(np.squeeze((t * wu_t).T @ wu_t))
             wx_df = cast("DataFrame", root_w * self.exog.dataframe)
             means = wx_df.groupby(level=0).transform("mean").values
             denom = means.T @ means
