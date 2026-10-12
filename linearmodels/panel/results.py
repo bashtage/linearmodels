@@ -1380,6 +1380,32 @@ class FamaMacBethResults(PanelResults):
         self._avg_r2 = res.avg_r2
         self._avg_adj_r2 = res.avg_adj_r2
 
+    @property
+    def df_resid(self) -> int:
+        """
+        Degrees of freedom of the t distribution used for inference.
+
+        Returns
+        -------
+        int
+            T - 1, where T is the number of cross-sectional regressions that
+            are averaged.
+
+        Notes
+        -----
+        The parameters are the average of T cross-sectional estimates, and
+        their covariance is estimated from the same T estimates. If
+        ``debiased`` is True, p-values and confidence intervals use a t
+        distribution with T - 1 degrees of freedom, as in Fama and MacBeth
+        (1973), and ``f_statistic_robust`` uses an F distribution with this
+        denominator degree of freedom. The periods whose cross-section cannot
+        be estimated are not counted. This is not nobs minus nvar, which is the
+        residual degree of freedom of the pooled regression and the one that
+        ``f_statistic``, the classical F-statistic of the pooled regression,
+        uses.
+        """
+        return self._df_resid
+
     def _pesaran_cd_inapplicable(self) -> str | None:
         return (
             "The Pesaran CD test is not applicable to FamaMacBeth. The errors "
