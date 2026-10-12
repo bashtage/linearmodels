@@ -1671,7 +1671,9 @@ class IVGMMResults(_CommonIVResults):
             J statistic  test of overidentifying restrictions.
             An InvalidTestStatistic is returned if the estimate of the
             covariance of the moment conditions that was inverted to compute
-            the weight matrix is singular, which can happen if there are too
+            the weight matrix is singular. This can only happen at the final
+            estimates of IVGMMCUE, since IVGMM and IVGMMCUE raise a
+            ValueError if it is singular, which is the case if there are too
             few clusters.
 
         Notes
@@ -1700,6 +1702,13 @@ class IVGMMResults(_CommonIVResults):
         same way by the number of observations. Whether the estimate is
         singular does not depend on the units in which the variables are
         measured.
+
+        ``IVGMM.fit`` raises a ``ValueError`` if the estimate is singular in
+        any step, and ``IVGMMCUE.fit`` raises one if it is singular at the
+        first step estimates, since the weight matrix and the objective
+        function are not defined. The statistic is invalid only if the
+        estimate of ``IVGMMCUE`` is singular at its final estimates and not at
+        the first step estimates.
         """
         return self._j_stat
 
@@ -1895,8 +1904,10 @@ class IVGMMResults(_CommonIVResults):
         )
         try:
             res_e = mod.fit(cov_type=self.cov_type, **self.cov_config)
-        except LinAlgError:
-            # The covariance of the moment conditions is exactly singular
+        except (LinAlgError, ValueError):
+            # The covariance of the moment conditions is singular: fit raises
+            # a ValueError, and NumPy raises a LinAlgError if it is exactly
+            # singular. LinAlgError is not a ValueError in NumPy 1.x
             return InvalidTestStatistic(reason, name="C-statistic")
         assert isinstance(res_e, IVGMMResults)
         if isinstance(res_e.j_stat, InvalidTestStatistic):
