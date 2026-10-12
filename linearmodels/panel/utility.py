@@ -737,7 +737,6 @@ def generate_panel_data(
 
     vcats = [f"varcat.{i}" for i in range(2)]
     vc2 = np.ones((2, t, 1)) @ _integers(rng, n // 2, (2, 1, n))
-    vc1 = vc2[[0]]
 
     if const:
         x[0] = 1.0
@@ -771,14 +770,9 @@ def generate_panel_data(
         c, items=cats, major_axis=time, minor_axis=entities, swap=True
     )
     other_eff = c_df.reindex(index)
-    vc1_df = panel_to_frame(
-        vc1, items=vcats[:1], major_axis=time, minor_axis=entities, swap=True
-    )
-    vc1_df = vc1_df.reindex(index)
-    vc2_df = panel_to_frame(
+    clusters = panel_to_frame(
         vc2, items=vcats, major_axis=time, minor_axis=entities, swap=True
     )
-    vc2_df = vc2_df.reindex(index)
-    clusters = concat([vc1_df, vc2_df], sort=False)
+    clusters = clusters.reindex(index)
     data = concat([y_df, x_df], axis=1, sort=False)
     return PanelModelData(data, w_df, other_eff, clusters)

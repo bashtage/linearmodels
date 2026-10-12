@@ -5,6 +5,7 @@ from numpy.testing import assert_allclose, assert_array_equal
 import pandas as pd
 import pytest
 
+from linearmodels.panel import PanelOLS
 from linearmodels.panel.utility import (
     AbsorbingEffectError,
     PanelModelData,
@@ -288,6 +289,41 @@ def test_generate_panel_data_random_state_is_unchanged():
             [2, 1, 1, 0, 3, 1, 2, 1, 3, 0, 0, 2, 2, 0, 0, 1, 1, 2],
         ],
     )
+
+
+def test_generate_panel_data_clusters_random_state_is_unchanged():
+    # The clusters are the draws that the second column of the clusters had
+    result = generate_panel_data(
+        nentity=6,
+        ntime=3,
+        nexog=2,
+        other_effects=2,
+        ncats=[3, 5],
+        rng=np.random.RandomState(7),
+    )
+    first_periods = result.clusters.iloc[::3]
+    assert_array_equal(first_periods["varcat.0"], [2, 2, 0, 2, 0, 0])
+    assert_array_equal(first_periods["varcat.1"], [1, 0, 1, 0, 2, 2])
+
+
+@pytest.mark.parametrize("missing", [0, 0.1])
+def test_generate_panel_data_clusters(missing):
+    # The clusters have one row for each observation, and two variables
+    result = generate_panel_data(nentity=20, ntime=5, missing=missing)
+    assert result.clusters.shape == (result.data.shape[0], 2)
+    assert result.clusters.index.equals(result.data.index)
+    assert not result.clusters.isnull().any().any()
+    assert result.clusters.to_numpy().max() < 10
+    assert list(result.clusters.columns) == ["varcat.0", "varcat.1"]
+    # They are the clusters of the entities: the same in all periods of an entity
+    assert (result.clusters.groupby(level=0).nunique() == 1).all().all()
+    # And can be used in a covariance
+    data = result.data.dropna()
+    clusters = result.clusters.loc[data.index]
+    res = PanelOLS(data["y"], data[["x0", "x1"]], entity_effects=True).fit(
+        cov_type="clustered", clusters=clusters
+    )
+    assert np.all(np.isfinite(res.params))
 
 
 def test_not_absorbed_const():
