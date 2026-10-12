@@ -1596,6 +1596,7 @@ LABELLED_CLUSTER_KINDS = [
     *(["dataarray_grid"] if HAS_XARRAY else []),
 ]
 ARRAY_CLUSTER_KINDS = ["grid", "grid3d", "grid_list"]
+TEXT_CLUSTER_KINDS = ["strings_ndarray", "strings_list"]
 
 
 @pytest.mark.parametrize("cls", PATH_MODELS, ids=PATH_IDS)
@@ -1611,6 +1612,15 @@ def test_panel_clusters_containers(panel, panel_reference, cls, kind):
 @pytest.mark.parametrize("kind", ARRAY_CLUSTER_KINDS)
 def test_panel_array_clusters_containers(panel, panel_reference, cls, kind):
     # Arrays have the layout of the data, and no labels
+    mod = panel_reference[cls]
+    expected = setup_clusters(mod, panel["clusters"])
+    clusters = make_panel_clusters(panel["clusters"], kind)
+    assert_array_equal(setup_clusters(mod, clusters), expected)
+
+
+@pytest.mark.parametrize("cls", PATH_MODELS, ids=PATH_IDS)
+@pytest.mark.parametrize("kind", TEXT_CLUSTER_KINDS)
+def test_panel_text_clusters_containers(panel, panel_reference, cls, kind):
     mod = panel_reference[cls]
     expected = setup_clusters(mod, panel["clusters"])
     clusters = make_panel_clusters(panel["clusters"], kind)
@@ -1686,6 +1696,16 @@ def test_panel_unlabelled_clusters_with_entity_or_time_clusters(
         else make_panel_clusters(panel["clusters"], kind)
     )
     assert_array_equal(setup_clusters(mod, clusters, **{option: True}), expected)
+
+
+@pytest.mark.parametrize("cls", CLUSTER_MODELS, ids=CLUSTER_IDS)
+def test_panel_text_and_categorical_clusters_are_labels(panel, panel_reference, cls):
+    # Clusters that are not numbers are coerced to integers as categories
+    mod = panel_reference[cls]
+    expected = setup_clusters(mod, panel["clusters"])
+    text = "g" + panel["clusters"].astype(int).astype(str)
+    for value in (text, text.astype("category")):
+        assert_array_equal(setup_clusters(mod, value), expected)
 
 
 @pytest.mark.parametrize("cls", CLUSTER_MODELS, ids=CLUSTER_IDS)

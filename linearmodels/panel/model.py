@@ -12,6 +12,7 @@ from formulaic.parser.algos.tokenize import tokenize
 from formulaic.utils.context import capture_context
 import numpy as np
 from pandas import Categorical, DataFrame, Index, MultiIndex, Series, get_dummies
+from pandas.api.types import is_numeric_dtype
 from scipy.linalg import lstsq as sp_lstsq
 from scipy.sparse.linalg import lsmr
 
@@ -488,6 +489,13 @@ class _PanelModelBase:
             # The values are paired with the rows of dependent by position, and so
             # they have the labels of these rows
             frame = frame.set_axis(self._original_index, axis=0)
+            changed = True
+        categories = [col for col in frame if not is_numeric_dtype(frame[col].dtype)]
+        if categories:
+            # Text and categories identify the clusters, but they are not numbers
+            frame = frame.copy()
+            for col in categories:
+                frame[col] = Categorical(frame[col]).codes.astype(np.int64)
             changed = True
         if changed:
             clusters_pd = PanelData(frame, convert_dummies=False)
