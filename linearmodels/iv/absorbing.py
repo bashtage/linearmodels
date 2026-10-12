@@ -4,6 +4,7 @@ from linearmodels.compat.scipy import csc_array, diags_array
 
 from collections import defaultdict
 from collections.abc import Hashable, Iterable
+from copy import deepcopy
 import hashlib
 from inspect import signature
 from typing import Any, DefaultDict, Union, cast
@@ -457,7 +458,9 @@ class Interaction:
         nobs = max(cat_nobs, cont_nobs)
         if cat is None and cont is None:
             if self._nobs is not None:
-                self._cont_data = self._cat_data = IVData(None, "none", nobs=self._nobs)
+                # Separate objects, since drop modifies them in place
+                self._cat_data = IVData(None, "none", nobs=self._nobs)
+                self._cont_data = IVData(None, "none", nobs=self._nobs)
             else:
                 raise ValueError("nobs must be provided when cat and cont are None")
             return
@@ -833,6 +836,7 @@ class AbsorbingLS:
         self._weights = weights
         self._is_weighted = False
         self._drop_absorbed = drop_absorbed
+        self._weight_data: IVData
         self._check_weights()
 
         self._interactions = interactions
@@ -862,16 +866,28 @@ class AbsorbingLS:
     def _drop_missing(self) -> linearmodels.typing.data.BoolArray:
         missing = require(self.dependent.isnull.to_numpy(), requirements="W")
         missing |= self.exog.isnull.to_numpy()
+        missing |= self._weight_data.isnull.to_numpy()
         missing |= self._absorb_inter.cat.isnull().any(axis=1).to_numpy()
         missing |= self._absorb_inter.cont.isnull().any(axis=1).to_numpy()
         for interact in self._interaction_list:
             missing |= interact.isnull.to_numpy()
         if npany(missing):
+            if missing.all():
+                raise ValueError(
+                    "All observations contain missing data. Model cannot be estimated."
+                )
+            # drop modifies an Interaction, which the caller may use again
+            self._absorb_inter = deepcopy(self._absorb_inter)
+            self._interaction_list = deepcopy(self._interaction_list)
             self.dependent.drop(missing)
             self.exog.drop(missing)
             self._absorb_inter.drop(missing)
             for interact in self._interaction_list:
                 interact.drop(missing)
+            # Weights have mean 1 in the sample used to estimate the model
+            weights = self._weight_data.ndarray[~missing]
+            self._weight_data = IVData(weights / weights.mean(), "weights")
+            self._nobs = self.dependent.shape[0]
         missing_warning(missing, stacklevel=4)
         return missing
 
@@ -1233,6 +1249,12 @@ class AbsorbingLS:
         The see the docstring of specific covariance estimator for a list of
         supported options. Defaults are used if no covariance configuration
         is provided.
+
+        Observations with a missing value in ``dependent``, ``exog``,
+        ``weights``, ``absorb`` or ``interactions`` are dropped when the model
+        is created. When ``cov_type`` is "clustered", ``clusters`` must have
+        one row for each of the remaining observations, so the rows of
+        ``clusters`` that belong to dropped observations must be dropped too.
 
         If use_cache is True, then variables are hashed based on their
         contents using either a 64-bit value (if xxhash is installed) or
