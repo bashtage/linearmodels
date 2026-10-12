@@ -883,7 +883,7 @@ class FirstStageResults(_SummaryStr):
 
     @cached_property
     def diagnostics(self) -> DataFrame:
-        """
+        r"""
         Post estimation diagnostics of first-stage fit
 
         Returns
@@ -899,9 +899,11 @@ class FirstStageResults(_SummaryStr):
               the instrument have been orthogonalized to the exogenous
               regressors in the model.
             * f.stat - Test that all coefficients are zero in the model
-              used to estimate the partial R-squared. Uses a standard F-test
-              when the covariance estimator is unadjusted - otherwise uses a
-              Wald test statistic with a chi2 distribution.
+              used to estimate the partial R-squared. If the covariance
+              estimator is unadjusted, it is the Wald statistic divided by
+              the number of excluded instruments, and it has an F
+              distribution. Otherwise it is the Wald statistic, which has a
+              chi2 distribution. See Notes.
             * f.pval - P-value of the test that all coefficients are zero
               in the model used to estimate the partial R-squared
             * f.dist - Distribution of f.stat
@@ -909,6 +911,26 @@ class FirstStageResults(_SummaryStr):
               between the projected and orthogonalized instrument on the
               orthogonalized endogenous regressor where the orthogonalization
               is with respect to the other included variables in the model.
+
+        Notes
+        -----
+        ``f.stat`` is the Wald statistic of the test that the coefficients on
+        the :math:`q` excluded instruments are 0 in the first-stage regression,
+        which is computed using the covariance estimator of the model.
+
+        If ``cov_type`` is "unadjusted" (or "homoskedastic"), the statistic is
+        divided by :math:`q` and its p-value uses an :math:`F_{q,n-k}`
+        distribution, where :math:`k` is the number of exogenous regressors
+        plus the number of excluded instruments. This is the textbook
+        F-statistic only if the model was fit with ``debiased=True``. Without
+        it, the covariance estimator divides by :math:`n` and not by
+        :math:`n-k`, and the statistic is :math:`n/(n-k)` times larger.
+
+        For all other covariance estimators, ``f.stat`` is the Wald statistic
+        and it has a :math:`\chi^2_q` distribution. It is not divided by
+        :math:`q`. Software that reports an F-statistic for a test that is
+        robust to heteroskedasticity, for example ``ivreg`` in R, reports the
+        Wald statistic divided by :math:`q`.
         """
         from linearmodels.iv.model import _OLS, IV2SLS
 
@@ -1143,9 +1165,19 @@ class IVResults(_CommonIVResults):
         WaldTestStatistic
             Object containing test statistic, p-value, distribution and null
 
+        See Also
+        --------
+        wooldridge_overid
+            Test of the overidentifying restrictions that is robust to
+            heteroskedasticity.
+
         Notes
         -----
         Requires more instruments than endogenous variables
+
+        The test assumes that the errors are homoskedastic. It does not use the
+        covariance estimator that was used to fit the model, so it is the same
+        for every ``cov_type``.
 
         Tests the ratio of re-projected IV regression residual variance to
         variance of the IV residuals.
@@ -1191,9 +1223,19 @@ class IVResults(_CommonIVResults):
         WaldTestStatistic
             Object containing test statistic, p-value, distribution and null
 
+        See Also
+        --------
+        wooldridge_overid
+            Test of the overidentifying restrictions that is robust to
+            heteroskedasticity.
+
         Notes
         -----
         Requires more instruments than endogenous variables
+
+        The test assumes that the errors are homoskedastic. It does not use the
+        covariance estimator that was used to fit the model, so it is the same
+        for every ``cov_type``.
 
         Tests is a small-sample version of Sargan's test that has the same
         distribution.
@@ -1285,8 +1327,20 @@ class IVResults(_CommonIVResults):
         WaldTestStatistic
             Object containing test statistic, p-value, distribution and null
 
+        See Also
+        --------
+        wooldridge_regression
+            Test of exogeneity that uses the covariance estimator that was
+            used to fit the model.
+        wooldridge_score
+            Test of exogeneity that is robust to heteroskedasticity.
+
         Notes
         -----
+        The test assumes that the errors are homoskedastic. It does not use the
+        covariance estimator that was used to fit the model, so it is the same
+        for every ``cov_type``.
+
         Test statistic is difference between sum of squared OLS and sum of
         squared IV residuals where each set of residuals has been projected
         onto the set of instruments in the IV model.
@@ -1340,8 +1394,20 @@ class IVResults(_CommonIVResults):
         WaldTestStatistic
             Object containing test statistic, p-value, distribution and null
 
+        See Also
+        --------
+        wooldridge_regression
+            Test of exogeneity that uses the covariance estimator that was
+            used to fit the model.
+        wooldridge_score
+            Test of exogeneity that is robust to heteroskedasticity.
+
         Notes
         -----
+        The test assumes that the errors are homoskedastic. It does not use the
+        covariance estimator that was used to fit the model, so it is the same
+        for every ``cov_type``.
+
         Test statistic is difference between sum of squared OLS and sum of
         squared IV residuals where each set of residuals has been projected
         onto the set of instruments in the IV model.
