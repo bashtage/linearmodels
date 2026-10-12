@@ -8,7 +8,8 @@ whose rows are in a different order from dependent would silently be attached
 to the wrong observations. These tests check that this is rejected, that inputs
 that carry no labels (NumPy arrays and pandas objects with a default index) are
 paired by position, and that inputs that use the labels of dependent are
-accepted.
+accepted. If no dependent variable carries labels, the first of the other inputs
+that does sets the labels, and the inputs after it have to use them.
 """
 
 import numpy as np
@@ -287,19 +288,110 @@ def test_everything_reordered_together_is_allowed(simple, cls, kind, inputs):
 
 
 @pytest.mark.parametrize(("cls", "kind", "inputs"), MODELS)
-def test_unlabelled_dependent_is_not_checked(simple, cls, kind, inputs):
-    # There are no labels to compare to, so the inputs are paired by position
-    replace = {("eq1", "dependent"): simple.data["eq1"]["dependent"].to_numpy()}
-    for name in inputs:
-        replace[("eq1", name)] = reverse(simple.data["eq1"][name])
+def test_unlabelled_dependent_is_paired_by_position(simple, cls, kind, inputs):
+    # There are no labels in the dependent variable of eq1, so its inputs are
+    # paired with it by position. They use the labels of the other equations
+    dependent = simple.data["eq1"]["dependent"].to_numpy()
+    replace = {("eq1", "dependent"): dependent}
+    for label in LABELS:
+        for name in ["dependent", *inputs]:
+            replace.setdefault((label, name), reverse(simple.data[label][name]))
     mod = cls(equations(simple, kind, weights=True, replace=replace))
     assert_allclose(
         mod._exog[0].ndarray, reverse(simple.data["eq1"]["exog"]).to_numpy()
     )
-    # The other equations are compared to their own dependent
-    replace = {("eq2", name): reverse(simple.data["eq2"][name]) for name in inputs}
-    replace[("eq2", "dependent")] = simple.data["eq2"]["dependent"].to_numpy()
-    cls(equations(simple, kind, weights=True, replace=replace))
+    assert_allclose(mod._y[0], dependent[:, None])
+    # The same is true of the other equations
+    dependent = simple.data["eq2"]["dependent"].to_numpy()
+    replace = {("eq2", "dependent"): dependent}
+    for label in LABELS:
+        for name in ["dependent", *inputs]:
+            replace.setdefault((label, name), reverse(simple.data[label][name]))
+    mod = cls(equations(simple, kind, weights=True, replace=replace))
+    assert_allclose(mod._y[1], dependent[:, None])
+
+
+@pytest.mark.parametrize(("cls", "kind", "inputs"), MODELS)
+@pytest.mark.parametrize("corruption", list(CORRUPTIONS))
+@pytest.mark.parametrize("label", LABELS)
+def test_inputs_use_the_labels_of_the_system(
+    simple, cls, kind, inputs, label, corruption
+):
+    # The dependent variable of the equation has no labels. Its inputs have to use
+    # the labels of the dependent variables of the other equations
+    reference = "eq2" if label == "eq1" else "eq1"
+    arrays_ = {(label, "dependent"): simple.data[label]["dependent"].to_numpy()}
+    cls(equations(simple, kind, weights=True, replace=arrays_))
+    for name in inputs:
+        bad = CORRUPTIONS[corruption](simple.data[label][name])
+        replace = {**arrays_, (label, name): bad}
+        match = (
+            f"row index of {name} in equation '{label}' does not match "
+            f"dependent in equation '{reference}'"
+        )
+        with pytest.raises(ValueError, match=match):
+            cls(equations(simple, kind, weights=True, replace=replace))
+
+
+@pytest.mark.parametrize(("cls", "kind", "inputs"), MODELS)
+@pytest.mark.parametrize("corruption", list(CORRUPTIONS))
+def test_first_input_with_labels_sets_the_labels(simple, cls, kind, inputs, corruption):
+    # No dependent variable has labels, so the first input with labels sets them
+    arrays_ = {
+        (label, "dependent"): simple.data[label]["dependent"].to_numpy()
+        for label in LABELS
+    }
+    cls(equations(simple, kind, weights=True, replace=arrays_))
+    for label in LABELS:
+        for name in inputs:
+            if (label, name) == ("eq1", "exog"):
+                continue
+            bad = CORRUPTIONS[corruption](simple.data[label][name])
+            replace = {**arrays_, (label, name): bad}
+            match = (
+                f"row index of {name} in equation '{label}' does not match "
+                "exog in equation 'eq1'"
+            )
+            with pytest.raises(ValueError, match=match):
+                cls(equations(simple, kind, weights=True, replace=replace))
+    # If it is exog in eq1 that has changed, the next input is the one that
+    # does not match
+    bad = CORRUPTIONS[corruption](simple.data["eq1"]["exog"])
+    replace = {**arrays_, ("eq1", "exog"): bad}
+    second = "endog" if kind == "iv" else "weights"
+    match = (
+        f"row index of {second} in equation 'eq1' does not match "
+        "exog in equation 'eq1'"
+    )
+    with pytest.raises(ValueError, match=match):
+        cls(equations(simple, kind, weights=True, replace=replace))
+
+
+@pytest.mark.parametrize(("cls", "kind", "inputs"), MODELS)
+def test_inputs_without_labels_do_not_set_the_labels(simple, cls, kind, inputs):
+    # Nothing in eq1 has labels, and so exog in eq2 is the first input with labels
+    arrays_ = {
+        (label, "dependent"): simple.data[label]["dependent"].to_numpy()
+        for label in LABELS
+    }
+    for name in inputs:
+        arrays_[("eq1", name)] = simple.data["eq1"][name].to_numpy()
+    cls(equations(simple, kind, weights=True, replace=arrays_))
+    bad = {**arrays_, ("eq3", "exog"): reverse(simple.data["eq3"]["exog"])}
+    match = "row index of exog in equation 'eq3' does not match exog in equation 'eq2'"
+    with pytest.raises(ValueError, match=match):
+        cls(equations(simple, kind, weights=True, replace=bad))
+    # A default index has no labels, and so the next input sets them
+    exog = simple.data["eq2"]["exog"]
+    flipped = pd.DataFrame(exog.to_numpy()[::-1], columns=exog.columns)
+    replace = {**bad, ("eq2", "exog"): flipped}
+    second = "endog" if kind == "iv" else "weights"
+    match = (
+        f"row index of exog in equation 'eq3' does not match {second} in "
+        "equation 'eq2'"
+    )
+    with pytest.raises(ValueError, match=match):
+        cls(equations(simple, kind, weights=True, replace=replace))
 
 
 @pytest.mark.parametrize(("cls", "kind", "inputs"), MODELS)
@@ -438,6 +530,8 @@ def test_multivariate_ls(multi):
     assert_same_arrays(mod, raw)
     with pytest.raises(ValueError, match="row index of exog in equation 'y0'"):
         SUR.multivariate_ls(multi.dependent, reverse(multi.exog))
+    # An array dependent has no labels, so exog sets them
+    SUR.multivariate_ls(multi.dependent.to_numpy(), multi.exog)
     # An array has no labels
     mod = SUR.multivariate_ls(multi.dependent, multi.exog.to_numpy()[::-1])
     assert_allclose(mod._exog[0].ndarray, multi.exog.to_numpy()[::-1])
@@ -468,6 +562,20 @@ def test_multivariate_iv(multi):
         # Arrays have no labels
         args[name] = getattr(multi, name).to_numpy()[::-1]
         IV3SLS.multivariate_iv(multi.dependent, **args)
+
+
+def test_multivariate_iv_inputs_must_agree_without_labels_in_dependent(multi):
+    dependent = multi.dependent.to_numpy()
+    IV3SLS.multivariate_iv(dependent, multi.exog, multi.endog, multi.instruments)
+    args = {"exog": multi.exog, "endog": multi.endog, "instruments": multi.instruments}
+    match = r"row index of instruments in equation 'dependent\.0' does not match exog"
+    with pytest.raises(ValueError, match=match):
+        IV3SLS.multivariate_iv(
+            dependent, **{**args, "instruments": reverse(multi.instruments)}
+        )
+    match = r"row index of endog in equation 'dependent\.0' does not match exog"
+    with pytest.raises(ValueError, match=match):
+        IV3SLS.multivariate_iv(dependent, **{**args, "endog": reverse(multi.endog)})
 
 
 # Formulas use a single DataFrame
@@ -578,13 +686,62 @@ def test_clusters_use_the_first_labelled_dependent(simple, cls, kind):
     match = "row index of clusters does not match dependent in equation 'eq2'"
     with pytest.raises(ValueError, match=match):
         mod.fit(cov_type="clustered", clusters=reverse(simple.clusters))
-    # No labels in dependent. Clusters are paired by position
+
+
+@pytest.mark.parametrize(("cls", "kind"), LS_MODELS)
+def test_clusters_use_the_labels_of_the_first_input_with_labels(simple, cls, kind):
+    # No dependent variable has labels, so clusters use the labels of exog in eq1
     replace = {
         (label, "dependent"): simple.data[label]["dependent"].to_numpy()
         for label in LABELS
     }
     mod = cls(equations(simple, kind, replace=replace))
+    res = mod.fit(cov_type="clustered", clusters=simple.clusters)
+    raw = mod.fit(cov_type="clustered", clusters=simple.clusters.to_numpy())
+    assert_allclose(res.std_errors, raw.std_errors)
+    match = "row index of clusters does not match exog in equation 'eq1'"
+    for corrupt in CORRUPTIONS.values():
+        with pytest.raises(ValueError, match=match):
+            mod.fit(cov_type="clustered", clusters=corrupt(simple.clusters))
+    # Without labels in any input there is nothing to compare
+    mod = cls(equations(simple, kind, raw=True))
     mod.fit(cov_type="clustered", clusters=reverse(simple.clusters))
+    # weights can be the only input with labels
+    replace = {
+        (label, name): simple.data[label][name].to_numpy()
+        for label in LABELS
+        for name in ["dependent", "exog", "endog", "instruments"]
+        if (kind == "iv" or name in ("dependent", "exog"))
+    }
+    for label in ("eq1", "eq3"):
+        replace[(label, "weights")] = simple.data[label]["weights"].to_numpy()
+    weighted = cls(equations(simple, kind, weights=True, replace=replace))
+    weighted.fit(cov_type="clustered", clusters=simple.clusters)
+    match = "row index of clusters does not match weights in equation 'eq2'"
+    with pytest.raises(ValueError, match=match):
+        weighted.fit(cov_type="clustered", clusters=reverse(simple.clusters))
+
+
+@pytest.mark.parametrize(("cls", "kind"), LS_MODELS)
+def test_clusters_and_missing_values_without_labels_in_dependent(simple, cls, kind):
+    exog = simple.data["eq2"]["exog"].copy()
+    exog.iloc[7, 1] = np.nan
+    replace = {
+        (label, "dependent"): simple.data[label]["dependent"].to_numpy()
+        for label in LABELS
+    }
+    replace[("eq2", "exog")] = exog
+    with pytest.warns(MissingValueWarning):
+        mod = cls(equations(simple, kind, replace=replace))
+    mask = np.ones(NOBS, dtype=bool)
+    mask[7] = False
+    kept = simple.clusters[mask]
+    res = mod.fit(cov_type="clustered", clusters=kept)
+    raw = mod.fit(cov_type="clustered", clusters=kept.to_numpy())
+    assert_allclose(res.std_errors, raw.std_errors)
+    match = "row index of clusters does not match exog in equation 'eq1'"
+    with pytest.raises(ValueError, match=match):
+        mod.fit(cov_type="clustered", clusters=reverse(kept))
 
 
 @pytest.mark.parametrize(("cls", "kind"), LS_MODELS)

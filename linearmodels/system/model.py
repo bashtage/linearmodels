@@ -30,6 +30,7 @@ from linearmodels.iv.data import IVData
 from linearmodels.shared.alignment import (
     check_alignment,
     check_row_alignment,
+    reference_labels,
     row_labels,
 )
 from linearmodels.shared.exceptions import missing_warning
@@ -583,7 +584,7 @@ class _SystemModelBase:
         self._constant_loc = constant_loc
 
     def _check_alignment(self) -> None:
-        """Check that inputs with labels use the labels of dependent"""
+        """Check that inputs with labels use the labels of dependent, or the first"""
         nobs = [dep.shape[0] for dep in self._dependent]
         for i, label in enumerate(self._eq_labels):
             if nobs[i] != nobs[0]:
@@ -593,37 +594,54 @@ class _SystemModelBase:
                     f"observations, but in equation {self._eq_labels[0]!r} it has "
                     f"{nobs[0]}."
                 )
+        # The dependent variables of all equations use the same labels
         reference: Index | None = None
         reference_name = ""
         for i, label in enumerate(self._eq_labels):
             dependent_name = f"dependent in equation {label!r}"
             expected = row_labels(self._dependent[i])
-            if expected is not None:
-                if reference is None:
-                    reference, reference_name = expected, dependent_name
-                else:
-                    check_row_alignment(
-                        dependent_name, expected, reference, reference_name
-                    )
-            inputs = {
-                f"exog in equation {label!r}": self._exog[i],
-                f"endog in equation {label!r}": self._endog[i],
-                f"instruments in equation {label!r}": self._instr[i],
-                f"weights in equation {label!r}": self._weights[i],
-            }
-            check_alignment(expected, inputs, reference=dependent_name)
-
-    def _check_clusters(self, config: Mapping[str, Any]) -> None:
-        """Check that clusters with labels use the labels of dependent"""
+            if expected is None:
+                continue
+            if reference is None:
+                reference, reference_name = expected, dependent_name
+            else:
+                check_row_alignment(dependent_name, expected, reference, reference_name)
+        equation_inputs: list[list[tuple[str, object]]] = [
+            [
+                (f"exog in equation {label!r}", self._exog[i]),
+                (f"endog in equation {label!r}", self._endog[i]),
+                (f"instruments in equation {label!r}", self._instr[i]),
+                (f"weights in equation {label!r}", self._weights[i]),
+            ]
+            for i, label in enumerate(self._eq_labels)
+        ]
+        # If no dependent variable has labels, the first input with labels sets them
+        self._labels, self._labels_name = reference_labels(
+            reference,
+            [item for items in equation_inputs for item in items],
+            reference=reference_name,
+        )
         for i, label in enumerate(self._eq_labels):
+            # The inputs of an equation use the labels of its own dependent variable
+            # if it has labels, and the labels of the system otherwise
             expected = row_labels(self._dependent[i])
-            if expected is not None:
+            if expected is None:
+                check_alignment(
+                    self._labels, equation_inputs[i], reference=self._labels_name
+                )
+            else:
                 check_alignment(
                     expected,
-                    {"clusters": config.get("clusters")},
+                    equation_inputs[i],
                     reference=f"dependent in equation {label!r}",
                 )
-                return
+
+    def _check_clusters(self, config: Mapping[str, Any]) -> None:
+        """Check that clusters with labels use the labels of the system"""
+        labels = None if self._labels is None else self._labels[~self._drop_locs]
+        check_alignment(
+            labels, {"clusters": config.get("clusters")}, reference=self._labels_name
+        )
 
     def _drop_missing(self) -> None:
         k = len(self._dependent)
@@ -639,6 +657,7 @@ class _SystemModelBase:
                     missing |= np.asarray(nulls)
 
         missing_warning(missing, stacklevel=4)
+        self._drop_locs = missing
         if np.any(missing):
             for i in range(k):
                 self._dependent[i].drop(missing)
@@ -1567,7 +1586,10 @@ class IV3SLS(_LSSystemModelBase):
     is raised if an index differs. Either reindex the input to the index of
     the dependent variable, or call ``to_numpy()`` to pair its values by
     position. NumPy arrays and pandas objects with a default index do not
-    carry labels and are always paired by position.
+    carry labels and are always paired by position. If none of the dependent
+    variables carries labels, the inputs that do must use the same index as the
+    first of them that does, in the order ``exog``, ``endog``, ``instruments``
+    and ``weights`` of each equation.
     The same rule applies to ``clusters`` passed to ``fit``.
     """
 
@@ -1798,7 +1820,10 @@ class SUR(_LSSystemModelBase):
     is raised if an index differs. Either reindex the input to the index of
     the dependent variable, or call ``to_numpy()`` to pair its values by
     position. NumPy arrays and pandas objects with a default index do not
-    carry labels and are always paired by position.
+    carry labels and are always paired by position. If none of the dependent
+    variables carries labels, the inputs that do must use the same index as the
+    first of them that does, in the order ``exog``, ``endog``, ``instruments``
+    and ``weights`` of each equation.
     The same rule applies to ``clusters`` passed to ``fit``.
     """
 
@@ -2037,7 +2062,10 @@ class IVSystemGMM(_SystemModelBase):
     is raised if an index differs. Either reindex the input to the index of
     the dependent variable, or call ``to_numpy()`` to pair its values by
     position. NumPy arrays and pandas objects with a default index do not
-    carry labels and are always paired by position.
+    carry labels and are always paired by position. If none of the dependent
+    variables carries labels, the inputs that do must use the same index as the
+    first of them that does, in the order ``exog``, ``endog``, ``instruments``
+    and ``weights`` of each equation.
     """
 
     def __init__(

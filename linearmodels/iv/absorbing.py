@@ -59,7 +59,12 @@ from linearmodels.panel.utility import (
     not_absorbed,
     preconditioner,
 )
-from linearmodels.shared.alignment import check_alignment, is_default_index, row_labels
+from linearmodels.shared.alignment import (
+    check_alignment,
+    is_default_index,
+    reference_labels,
+    row_labels,
+)
 from linearmodels.shared.exceptions import missing_warning
 from linearmodels.shared.hypotheses import InvalidTestStatistic, WaldTestStatistic
 from linearmodels.shared.inputs import as_array_like
@@ -886,8 +891,10 @@ class AbsorbingLS:
     ``dependent``. Either reindex the input to the index of ``dependent``, or
     call ``to_numpy()`` to pair its values by position. NumPy arrays and
     pandas objects with a default index do not carry labels and are always
-    paired by position. The same rule applies to ``clusters`` passed to
-    ``fit``.
+    paired by position. If ``dependent`` does not carry labels, the inputs
+    that do must use the same index as the first of ``exog``, ``absorb``,
+    ``interactions`` and ``weights`` that does. The same rule applies to
+    ``clusters`` passed to ``fit``.
 
     See also
     --------
@@ -1036,17 +1043,21 @@ class AbsorbingLS:
                 )
 
     def _check_alignment(self) -> None:
-        """Check that inputs with labels use the labels of dependent"""
-        expected = row_labels(self._dependent)
-        check_alignment(expected, {"exog": self._exog, "weights": self._weights})
+        """Check that inputs with labels use the labels of dependent, or the first"""
+        inputs: list[tuple[str, object]] = [("exog", self._exog)]
         interactions: list[tuple[str, Interaction]] = [("absorb", self._absorb_inter)]
         single = isinstance(self._interactions, (DataFrame, Interaction))
         for i, interact in enumerate(self._interaction_list):
             name = "interactions" if single else f"interactions[{i}]"
             interactions.append((name, interact))
         for name, interact in interactions:
-            check_alignment(expected, {name: interact.cat})
-            check_alignment(expected, {name: interact.cont})
+            inputs.extend([(name, interact.cat), (name, interact.cont)])
+        inputs.append(("weights", self._weights))
+        # If dependent has no labels, the first input with labels sets the labels
+        self._labels, self._labels_name = reference_labels(
+            row_labels(self._dependent), inputs
+        )
+        check_alignment(self._labels, inputs, reference=self._labels_name)
 
     @property
     def absorbed_dependent(self) -> DataFrame:
@@ -1443,8 +1454,12 @@ class AbsorbingLS:
                 stacklevel=2,
             )
             absorb_options = dict(lsmr_options.items())
+        # Clusters are for the observations that are used to estimate the model
+        labels = None if self._labels is None else self._labels[~self._drop_locs]
         check_alignment(
-            row_labels(self._dependent), {"clusters": cov_config.get("clusters")}
+            labels,
+            {"clusters": cov_config.get("clusters")},
+            reference=self._labels_name,
         )
         if self._absorbed_dependent is None:
             self._first_time_fit(use_cache, absorb_options, method)

@@ -12,6 +12,7 @@ from linearmodels.shared.alignment import (
     is_labelled,
     labels_1d,
     misaligned,
+    reference_labels,
     row_labels,
 )
 
@@ -215,3 +216,79 @@ def test_check_alignment(series, frame, default_frame, index):
     bad = {"a": frame, "b": frame.iloc[::-1], "c": series.iloc[::-1]}
     with pytest.raises(ValueError, match="row index of b"):
         check_alignment(index, bad)
+
+
+def test_check_alignment_first_input_with_labels_is_the_reference(
+    series, frame, default_frame, index
+):
+    # dependent has no labels, so the first input that has labels sets them
+    check_alignment(None, {"exog": frame, "weights": series})
+    reversed_frame = frame.iloc[::-1]
+    with pytest.raises(ValueError, match="row index of weights does not match exog"):
+        check_alignment(None, {"exog": frame, "weights": series.iloc[::-1]})
+    with pytest.raises(ValueError, match="row index of weights does not match exog"):
+        check_alignment(None, {"exog": reversed_frame, "weights": series})
+    # Arrays, missing inputs and a default index do not set the labels
+    inputs = {
+        "none": None,
+        "array": np.ones((N, 2)),
+        "default": default_frame,
+        "x": frame,
+        "y": series,
+    }
+    check_alignment(None, inputs)
+    with pytest.raises(ValueError, match="row index of y does not match x"):
+        check_alignment(None, {**inputs, "y": series.iloc[::-1]})
+    # The labels of dependent are used if there are any
+    with pytest.raises(ValueError, match="row index of x does not match dependent"):
+        check_alignment(index[::-1], inputs)
+    # Inputs can be given in order as pairs, where a name can be used twice
+    pairs = [("absorb", frame), ("absorb", series), ("weights", reversed_frame)]
+    with pytest.raises(ValueError, match="row index of weights does not match absorb"):
+        check_alignment(None, pairs)
+    check_alignment(None, pairs[:2])
+
+
+def test_check_alignment_reference_name(series, frame, index):
+    # The name of dependent is used when it sets the labels
+    with pytest.raises(ValueError, match="row index of x does not match the dependent"):
+        check_alignment(index, {"x": frame.iloc[::-1]}, reference="the dependent")
+    # Otherwise it is the first input
+    with pytest.raises(ValueError, match="row index of y does not match x"):
+        check_alignment(
+            None, {"x": frame, "y": series.iloc[::-1]}, reference="the dependent"
+        )
+    with pytest.raises(ValueError, match=r"in the same order as x\. Either reindex y"):
+        check_alignment(None, {"x": frame, "y": series.iloc[::-1]})
+
+
+def test_reference_labels(series, frame, default_frame, index):
+    labels, name = reference_labels(index, {"exog": frame.iloc[::-1]})
+    assert labels is index
+    assert name == "dependent"
+    labels, name = reference_labels(index, {"exog": frame}, reference="y")
+    assert labels is index
+    assert name == "y"
+    # The first input with labels is the reference without dependent
+    inputs = {"a": None, "b": np.ones(N), "c": default_frame, "d": series, "e": frame}
+    labels, name = reference_labels(None, inputs)
+    assert labels is not None
+    assert labels.equals(index)
+    assert name == "d"
+    labels, name = reference_labels(None, {"e": frame.iloc[::-1], "d": series})
+    assert labels is not None
+    assert labels.equals(index[::-1])
+    assert name == "e"
+    # pairs are used in order
+    labels, name = reference_labels(None, [("x", np.ones(N)), ("x", series)])
+    assert labels is not None
+    assert name == "x"
+    # There are no labels to use
+    labels, name = reference_labels(
+        None, {"a": None, "b": np.ones(N), "c": default_frame}
+    )
+    assert labels is None
+    assert name == "dependent"
+    labels, name = reference_labels(None, {}, reference="y")
+    assert labels is None
+    assert name == "y"

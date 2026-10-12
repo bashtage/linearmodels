@@ -55,7 +55,11 @@ from linearmodels.iv.gmm import (
     OneWayClusteredWeightMatrix,
 )
 from linearmodels.iv.results import IVGMMResults, IVResults, OLSResults
-from linearmodels.shared.alignment import check_alignment, row_labels
+from linearmodels.shared.alignment import (
+    check_alignment,
+    reference_labels,
+    row_labels,
+)
 from linearmodels.shared.exceptions import IndexWarning, missing_warning
 from linearmodels.shared.hypotheses import InvalidTestStatistic, WaldTestStatistic
 from linearmodels.shared.linalg import has_constant, inv_sqrth
@@ -189,15 +193,18 @@ class _IVModelBase:
         if weights is None:
             weights = ones(self.dependent.shape)
         weights_data = IVData(weights, var_name="weights")
-        check_alignment(
-            row_labels(self.dependent),
-            {
-                "exog": self.exog,
-                "endog": self.endog,
-                "instruments": self.instruments,
-                "weights": weights_data,
-            },
+        inputs = {
+            "exog": self.exog,
+            "endog": self.endog,
+            "instruments": self.instruments,
+            "weights": weights_data,
+        }
+        # The inputs with labels use the labels of dependent. If dependent has no
+        # labels, they use the labels of the first of them that has labels
+        self._labels, self._labels_name = reference_labels(
+            row_labels(self.dependent), inputs
         )
+        check_alignment(self._labels, inputs, reference=self._labels_name)
         weights = weights_data.ndarray
         if npany(weights <= 0):
             raise ValueError("weights must be strictly positive.")
@@ -402,9 +409,11 @@ class _IVModelBase:
         return missing
 
     def _check_clusters(self, config: Mapping[str, Any]) -> None:
-        """Check that clusters with labels use the labels of dependent"""
+        """Check that clusters with labels use the labels of the other inputs"""
+        # Clusters are for the observations that are used to estimate the model
+        labels = None if self._labels is None else self._labels[self.notnull]
         check_alignment(
-            row_labels(self.dependent), {"clusters": config.get("clusters")}
+            labels, {"clusters": config.get("clusters")}, reference=self._labels_name
         )
 
     def wresids(
@@ -804,8 +813,10 @@ class IVLIML(_IVLSModelBase):
     ``dependent``. Either reindex the input to the index of ``dependent``, or
     call ``to_numpy()`` to pair its values by position. NumPy arrays and
     pandas objects with a default index do not carry labels and are always
-    paired by position. The same rule applies to ``clusters`` passed to
-    ``fit``.
+    paired by position. If ``dependent`` does not carry labels, the inputs
+    that do must use the same index as the first of ``exog``, ``endog``,
+    ``instruments`` and ``weights`` that does. The same rule applies to
+    ``clusters`` passed to ``fit``.
 
     .. todo::
 
@@ -937,8 +948,10 @@ class IV2SLS(_IVLSModelBase):
     ``dependent``. Either reindex the input to the index of ``dependent``, or
     call ``to_numpy()`` to pair its values by position. NumPy arrays and
     pandas objects with a default index do not carry labels and are always
-    paired by position. The same rule applies to ``clusters`` passed to
-    ``fit``.
+    paired by position. If ``dependent`` does not carry labels, the inputs
+    that do must use the same index as the first of ``exog``, ``endog``,
+    ``instruments`` and ``weights`` that does. The same rule applies to
+    ``clusters`` passed to ``fit``.
 
     .. todo::
 
@@ -1305,8 +1318,10 @@ class IVGMM(_IVGMMBase):
     ``dependent``. Either reindex the input to the index of ``dependent``, or
     call ``to_numpy()`` to pair its values by position. NumPy arrays and
     pandas objects with a default index do not carry labels and are always
-    paired by position. The same rule applies to ``clusters`` passed to
-    ``fit`` or in ``weight_config``.
+    paired by position. If ``dependent`` does not carry labels, the inputs
+    that do must use the same index as the first of ``exog``, ``endog``,
+    ``instruments`` and ``weights`` that does. The same rule applies to
+    ``clusters`` passed to ``fit`` or in ``weight_config``.
 
     The weight matrix is the inverse of an estimate of the covariance of the
     moment conditions, so that the estimate has to be nonsingular. A clustered
@@ -1642,8 +1657,10 @@ class IVGMMCUE(_IVGMMBase):
     ``dependent``. Either reindex the input to the index of ``dependent``, or
     call ``to_numpy()`` to pair its values by position. NumPy arrays and
     pandas objects with a default index do not carry labels and are always
-    paired by position. The same rule applies to ``clusters`` passed to
-    ``fit`` or in ``weight_config``.
+    paired by position. If ``dependent`` does not carry labels, the inputs
+    that do must use the same index as the first of ``exog``, ``endog``,
+    ``instruments`` and ``weights`` that does. The same rule applies to
+    ``clusters`` passed to ``fit`` or in ``weight_config``.
 
     See Also
     --------
@@ -2034,8 +2051,10 @@ class _OLS(IVLIML):
     ``weights`` differs from the index of ``dependent``. Either reindex the
     input to the index of ``dependent``, or call ``to_numpy()`` to pair its
     values by position. NumPy arrays and pandas objects with a default index
-    do not carry labels and are always paired by position. The same rule
-    applies to ``clusters`` passed to ``fit``.
+    do not carry labels and are always paired by position. If ``dependent``
+    does not carry labels, the inputs that do must use the same index as the
+    first of ``exog`` and ``weights`` that does. The same rule applies to
+    ``clusters`` passed to ``fit``.
 
     See Also
     --------
@@ -2275,8 +2294,10 @@ class IVJIVE(_IVModelBase):
     ``dependent``. Either reindex the input to the index of ``dependent``, or
     call ``to_numpy()`` to pair its values by position. NumPy arrays and
     pandas objects with a default index do not carry labels and are always
-    paired by position. The same rule applies to ``clusters`` passed to
-    ``fit``.
+    paired by position. If ``dependent`` does not carry labels, the inputs
+    that do must use the same index as the first of ``exog``, ``endog``,
+    ``instruments`` and ``weights`` that does. The same rule applies to
+    ``clusters`` passed to ``fit``.
 
     See Also
     --------

@@ -368,7 +368,8 @@ class _PanelModelBase:
         Weights can be given for each observation, for each time period,
         for each entity or for each combination of time period and entity.
         Weights with labels must use the same labels, in the same order,
-        as dependent. See :ref:`panel-input-alignment`.
+        as dependent or, if dependent has no labels, as exog. See
+        :ref:`panel-input-alignment`.
     check_rank : bool
         Flag indicating whether to perform a rank check on the exogenous
         variables to ensure that the model is identified. Skipping this
@@ -387,9 +388,12 @@ class _PanelModelBase:
     ) -> None:
         self.dependent = _panel_data(dependent, "dependent", "Dep")
         self.exog = _panel_data(exog, "exog", "Exog")
-        self._dependent_labelled = _is_labelled(dependent)
-        if self._dependent_labelled and _is_labelled(exog):
-            check_row_alignment("exog", self.exog.index, self.dependent.index)
+        # The inputs with labels use the labels of dependent. If dependent has no
+        # labels, they use the labels of the first of them that has labels
+        self._labels: Index | None = None
+        self._labels_name = "dependent"
+        self._check_labels("dependent", self.dependent.index, _is_labelled(dependent))
+        self._check_labels("exog", self.exog.index, _is_labelled(exog))
         self._original_shape = self.dependent.shape
         self._constant = False
         self._formula: str | None = None
@@ -423,6 +427,33 @@ class _PanelModelBase:
 
     def __repr__(self) -> str:
         return self.__str__() + "\nid: " + str(hex(id(self)))
+
+    def _check_labels(self, name: str, labels: Index, labelled: bool) -> None:
+        """
+        Check the labels of an input against the labels of the other inputs
+
+        Parameters
+        ----------
+        name : str
+            The name of the input, which is used in the message.
+        labels : Index
+            The labels of the rows of the input.
+        labelled : bool
+            Whether the input carries labels. If not, it is paired with the
+            other inputs by position and there is nothing to check.
+
+        Notes
+        -----
+        The labels of the first input with labels are saved, so that the inputs
+        that follow it have to use them.
+        """
+        if not labelled:
+            return
+        if self._labels is None:
+            if isinstance(labels, MultiIndex):
+                self._labels, self._labels_name = labels, name
+            return
+        check_row_alignment(name, labels, self._labels, self._labels_name)
 
     def _panel_rows(self, value: Any, name: str, var_name: str) -> PanelData:
         """
@@ -489,11 +520,15 @@ class _PanelModelBase:
                 "clusters must have the same number of entities "
                 "and time periods as the model data."
             )
-        if self._dependent_labelled and labelled:
-            check_row_alignment("clusters", clusters_pd.index, self._original_index)
+        if labelled and self._labels is not None:
+            check_row_alignment(
+                "clusters", clusters_pd.index, self._labels, self._labels_name
+            )
         frame = clusters_pd.dataframe
         changed = False
-        if not labelled and frame.shape[0] == len(self._original_index):
+        if frame.shape[0] == len(self._original_index) and not frame.index.equals(
+            self._original_index
+        ):
             # The values are paired with the rows of dependent by position, and so
             # they have the labels of these rows
             frame = frame.set_axis(self._original_index, axis=0)
@@ -541,13 +576,18 @@ class _PanelModelBase:
         index = self.dependent.index
         entities = index.get_level_values(0).unique()
         times = index.get_level_values(1).unique()
-        labelled = self._dependent_labelled and _is_labelled(weights)
+        labelled = _is_labelled(weights)
+        # Weights for each time period or entity have to use the time periods or
+        # entities of the inputs with labels, if there are any
+        reference = self._labels
+        if reference is not None:
+            ref_entities = reference.get_level_values(0).unique()
+            ref_times = reference.get_level_values(1).unique()
 
         if weights.ndim == 3 or weights.shape == (nobs, nentity):
             panel = _panel_data(weights, "weights", "x")
             if isinstance(weights, PanelData):
-                if labelled:
-                    check_row_alignment("weights", panel.index, index)
+                self._check_labels("weights", panel.index, labelled)
                 return panel
             return self._grid_to_rows(panel, labelled)
 
@@ -564,24 +604,31 @@ class _PanelModelBase:
             and weights.shape[0] == self.dependent.dataframe.shape[0]
         ):
             panel = PanelData(DataFrame(weights))
-            if labelled:
-                check_row_alignment("weights", panel.index, index)
+            self._check_labels("weights", panel.index, labelled)
             return panel
         elif weights.shape[0] == nobs and weights.ndim == 1:
-            if labelled and differs(labels_1d(weights), times):
-                raise misaligned("weights", "The time index")
+            if (
+                labelled
+                and reference is not None
+                and differs(labels_1d(weights), ref_times)
+            ):
+                raise misaligned("weights", "The time index", self._labels_name)
             weights_arr = np.asarray(weights)[:, None]
             weights_arr = weights_arr @ np.ones((1, nentity))
             grid = DataFrame(weights_arr, index=times, columns=entities)
         elif weights.shape[0] == nentity and weights.ndim == 1:
-            if labelled and differs(labels_1d(weights), entities):
-                raise misaligned("weights", "The entity index")
+            if (
+                labelled
+                and reference is not None
+                and differs(labels_1d(weights), ref_entities)
+            ):
+                raise misaligned("weights", "The entity index", self._labels_name)
             weights_arr = np.asarray(weights)[None, :]
             weights_arr = np.ones((nobs, 1)) @ weights_arr
             grid = DataFrame(weights_arr, index=times, columns=entities)
         elif weights.shape[0] == nentity * nobs and weights.size:
             if labelled:
-                check_row_alignment("weights", labels_1d(weights), index)
+                self._check_labels("weights", labels_1d(weights), labelled)
             frame = self.dependent.dataframe.copy()
             # TODO: Fix this for pandas 3
             frame.iloc[:, :] = np.asarray(weights)[:, None]
@@ -599,10 +646,10 @@ class _PanelModelBase:
         grid : PanelData
             Values for every entity and time period, stacked by entity.
         labelled : bool
-            Whether the labels in grid have to match the entities and time
-            periods of dependent. If False, the position along each axis of the
-            grid is paired with the entities and time periods of dependent in
-            order of appearance.
+            Whether the grid carries labels, which have to match the entities and
+            time periods of the inputs with labels. If False, the position along
+            each axis of the grid is paired with the entities and time periods
+            of dependent in order of appearance.
 
         Returns
         -------
@@ -618,8 +665,20 @@ class _PanelModelBase:
         rows = grid.dataframe
         if len(rows) != len(grid_index) or len(index) != len(grid_index):
             return grid
-        if labelled and not rows.index.equals(grid_index):
-            raise misaligned("weights", "The time and entity index")
+        if labelled and self._labels is None:
+            self._check_labels("weights", rows.index, labelled)
+        elif labelled:
+            assert self._labels is not None
+            expected = MultiIndex.from_product(
+                [
+                    self._labels.get_level_values(0).unique(),
+                    self._labels.get_level_values(1).unique(),
+                ]
+            )
+            if len(expected) == len(rows) and not rows.index.equals(expected):
+                raise misaligned(
+                    "weights", "The time and entity index", self._labels_name
+                )
         rows = rows.set_axis(grid_index, axis=0)
         if not grid_index.equals(index):
             rows = rows.reindex(index)
@@ -1097,7 +1156,8 @@ class PooledOLS(_PanelModelBase):
         Weights can be given for each observation, for each time period,
         for each entity or for each combination of time period and entity.
         Weights with labels must use the same labels, in the same order,
-        as dependent. See :ref:`panel-input-alignment`.
+        as dependent or, if dependent has no labels, as exog. See
+        :ref:`panel-input-alignment`.
     check_rank : bool
         Flag indicating whether to perform a rank check on the exogenous
         variables to ensure that the model is identified. Skipping this
@@ -1429,7 +1489,8 @@ class PanelOLS(_PanelModelBase):
         Weights can be given for each observation, for each time period,
         for each entity or for each combination of time period and entity.
         Weights with labels must use the same labels, in the same order,
-        as dependent. See :ref:`panel-input-alignment`.
+        as dependent or, if dependent has no labels, as exog. See
+        :ref:`panel-input-alignment`.
     entity_effects : bool
         Flag whether to include entity (fixed) effects in the model
     time_effects : bool
@@ -1515,8 +1576,7 @@ class PanelOLS(_PanelModelBase):
         self._other_effect_cats: PanelData | None = None
         self._singletons = singletons
         self._other_effects = self._validate_effects(
-            other_effects,
-            labelled=self._dependent_labelled and _is_labelled(other_effects),
+            other_effects, labelled=_is_labelled(other_effects)
         )
         self._has_effect = entity_effects or time_effects or self.other_effects
         self._drop_absorbed = drop_absorbed
@@ -1592,8 +1652,7 @@ class PanelOLS(_PanelModelBase):
                 "other_effects must have the same number of "
                 "entities and time periods as dependent."
             )
-        if labelled:
-            check_row_alignment("other_effects", effects.index, self._original_index)
+        self._check_labels("other_effects", effects.index, labelled)
 
         num_effects = effects.nvar
         if num_effects + self.entity_effects + self.time_effects > 2:
@@ -2421,7 +2480,8 @@ class BetweenOLS(_PanelModelBase):
         Weights can be given for each observation, for each time period,
         for each entity or for each combination of time period and entity.
         Weights with labels must use the same labels, in the same order,
-        as dependent. See :ref:`panel-input-alignment`.
+        as dependent or, if dependent has no labels, as exog. See
+        :ref:`panel-input-alignment`.
 
     Notes
     -----
@@ -2730,7 +2790,8 @@ class FirstDifferenceOLS(_PanelModelBase):
         Weights can be given for each observation, for each time period,
         for each entity or for each combination of time period and entity.
         Weights with labels must use the same labels, in the same order,
-        as dependent. See :ref:`panel-input-alignment`.
+        as dependent or, if dependent has no labels, as exog. See
+        :ref:`panel-input-alignment`.
 
     Notes
     -----
@@ -3088,7 +3149,8 @@ class RandomEffects(_PanelModelBase):
         Weights can be given for each observation, for each time period,
         for each entity or for each combination of time period and entity.
         Weights with labels must use the same labels, in the same order,
-        as dependent. See :ref:`panel-input-alignment`.
+        as dependent or, if dependent has no labels, as exog. See
+        :ref:`panel-input-alignment`.
 
     Notes
     -----
@@ -3405,7 +3467,8 @@ class FamaMacBeth(_PanelModelBase):
         Weights can be given for each observation, for each time period,
         for each entity or for each combination of time period and entity.
         Weights with labels must use the same labels, in the same order,
-        as dependent. See :ref:`panel-input-alignment`.
+        as dependent or, if dependent has no labels, as exog. See
+        :ref:`panel-input-alignment`.
 
     Notes
     -----

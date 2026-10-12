@@ -52,7 +52,7 @@ def check_cluster_columns(
     clusters: linearmodels.typing.data.AnyArray, max_columns: int
 ) -> None:
     """
-    Check that clusters has the number of variables that an estimator supports
+    Check that clusters has the number of variables that an estimator supports.
 
     Parameters
     ----------
