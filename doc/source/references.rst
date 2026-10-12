@@ -41,6 +41,9 @@ References
 .. [HansenLee] Hansen, Bruce E., and Seojeong Lee. "Inference for iterated GMM under
     misspecification." *Econometrica* 89, no. 3 (2021): 1419-1447.
 
+.. [Hausman78] Hausman, Jerry A. "Specification tests in econometrics." *Econometrica* 46, no. 6
+    (1978): 1251-1271.
+
 .. [Henningsen] Henningsen, A., & Hamann, J. (2007). systemfit: A Package for Estimating
     Systems of Simultaneous Equations in R. Journal of Statistical Software,
     23(4), 1 - 40. doi:http://dx.doi.org/10.18637/jss.v023.i04
@@ -49,8 +52,15 @@ References
     methods of moments: Applications in finance." *Journal of Business & Economic Statistics* 20,
     no. 4 (2002): 470-481.
 
+.. [JuodisReese] Juodis, A., and S. Reese. "The incidental parameters problem in testing for
+    remaining cross-section correlation." *Journal of Business & Economic Statistics* 40,
+    no. 3 (2022): 1191-1203.
+
 .. [NewWes94] Newey, Whitney K., and Kenneth D. West. "Automatic Lag Selection in Covariance
     Matrix Estimation." *The Review of Economic Studies* (1994): 631-653.
+
+.. [Pesaran21] Pesaran, M. Hashem. "General diagnostic tests for cross-sectional dependence in
+    panels." *Empirical Economics* 60, no. 1 (2021): 13-50.
 
 .. [Stata] StataCorp. 2013. *Stata 13 Base Reference Manual*. College Station, TX: Stata Press.
 
