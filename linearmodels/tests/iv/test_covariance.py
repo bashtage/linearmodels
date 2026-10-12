@@ -323,3 +323,45 @@ def test_auto_bandwidth_smoke(data, kernel):
 def test_auto_bandwidth_unknown_kernel(data, kernel):
     with pytest.raises(ValueError, match=r"Unknown kerne"):
         kernel_optimal_bandwidth(data.e, kernel.kernel + "_unknown")
+
+
+@pytest.mark.parametrize(
+    "cls", [HomoskedasticCovariance, HeteroskedasticCovariance, KernelCovariance]
+)
+def test_extra_df(data, cls):
+    options = {"bandwidth": 2} if cls is KernelCovariance else {}
+    c = cls(data.x, data.y, data.z, data.params, debiased=True, **options)
+    c2 = cls(data.x, data.y, data.z, data.params, debiased=True, extra_df=7, **options)
+    scale = (data.nobs - data.nvar) / (data.nobs - data.nvar - 7)
+    assert_allclose(c2.s, scale * c.s)
+    assert_allclose(c2.cov, scale * c.cov)
+    assert_allclose(c2.s2, scale * c.s2)
+    # The degrees of freedom are only used if the covariance is debiased
+    plain = cls(data.x, data.y, data.z, data.params, **options)
+    c3 = cls(data.x, data.y, data.z, data.params, extra_df=7, **options)
+    assert_allclose(c3.cov, plain.cov)
+    with pytest.raises(ValueError, match=r"needs more observations"):
+        cls(
+            data.x,
+            data.y,
+            data.z,
+            data.params,
+            debiased=True,
+            extra_df=data.nobs - data.nvar,
+            **options,
+        )
+
+
+def test_clustered_extra_df(data):
+    clusters = np.arange(data.nobs) % 11
+    kwargs = {"clusters": clusters, "debiased": True}
+    c = ClusteredCovariance(data.x, data.y, data.z, data.params, **kwargs)
+    c2 = ClusteredCovariance(data.x, data.y, data.z, data.params, extra_df=7, **kwargs)
+    scale = (data.nobs - data.nvar) / (data.nobs - data.nvar - 7)
+    assert_allclose(c2.s, scale * c.s)
+    assert_allclose(c2.cov, scale * c.cov)
+    plain = ClusteredCovariance(data.x, data.y, data.z, data.params, clusters=clusters)
+    c3 = ClusteredCovariance(
+        data.x, data.y, data.z, data.params, clusters=clusters, extra_df=7
+    )
+    assert_allclose(c3.cov, plain.cov)
