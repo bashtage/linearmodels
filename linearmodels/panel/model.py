@@ -1341,7 +1341,9 @@ class PanelOLS(_PanelModelBase):
     with the variables before it once the effects are removed. An
     ``AbsorbingEffectError`` is raised for such a variable. If ``drop_absorbed`` is
     True, the variable is dropped and an ``AbsorbingEffectWarning`` is raised, and the
-    constant is never dropped.
+    constant is never dropped. The norm includes the mean of the variable, so a
+    variable with a large mean and little other variation, less than 1e-5 of its norm,
+    is also treated as absorbed. Subtract its mean to avoid this.
     """
 
     def __init__(

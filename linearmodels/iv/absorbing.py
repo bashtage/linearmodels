@@ -776,6 +776,9 @@ class AbsorbingLS:
     effects are removed. An ``AbsorbingEffectError`` is raised for such a
     variable. If ``drop_absorbed`` is True, the variable is dropped and an
     ``AbsorbingEffectWarning`` is raised, and the constant is never dropped.
+    The norm includes the mean of the variable, so a variable with a large mean
+    and little other variation, less than 1e-5 of its norm, is also treated as
+    absorbed. Subtract its mean to avoid this.
 
     Rows are paired by position. An input that carries labels (a pandas
     Series or DataFrame with an index other than the default 0, 1, ..., n-1,
