@@ -21,7 +21,11 @@ from linearmodels.system._utility import (
     inv_matrix_sqrt,
 )
 from linearmodels.system.model import SUR
-from linearmodels.tests.system._utility import generate_data, simple_sur
+from linearmodels.tests.system._utility import (
+    generate_data,
+    simple_sur,
+    weighted_fit_measures,
+)
 
 p = [3, [1, 2, 3, 4, 5, 5, 4, 3, 2, 1]]
 const = [True, False]
@@ -787,6 +791,65 @@ def test_system_r2_direct():
     assert_allclose(ref, res.system_rsquared.mcelroy)
     ref = reference_berndt(res.resids, y)
     assert_allclose(ref, res.system_rsquared.berndt, atol=1e-3, rtol=1e-3)
+
+
+@pytest.mark.parametrize("method", ["ols", "gls"])
+def test_weighted_residuals_and_r2(method):
+    eqns = generate_data(k=3, p=3, const=True, rho=0.8, included_weights=True)
+    res = SUR(eqns).fit(method=method)
+    rss = tss = 0.0
+    for key, eqn in eqns.items():
+        eq_res = res.equations[key]
+        direct = weighted_fit_measures(eqn, eq_res.params)
+        # The residuals are those of the model and do not use the weights
+        assert_allclose(eq_res.resids, direct.resid.squeeze())
+        assert_allclose(res.resids[key], direct.resid.squeeze())
+        assert_allclose(
+            eq_res.fitted_values + eq_res.resids, eqn["dependent"].squeeze()
+        )
+        if method == "ols":
+            assert_allclose(eq_res.wresids, direct.wresid.squeeze())
+        assert_allclose(eq_res.resid_ss, direct.rss)
+        assert_allclose(eq_res.total_ss, direct.tss)
+        assert_allclose(eq_res.rsquared, 1 - direct.rss / direct.tss)
+        rss += direct.rss
+        tss += direct.tss
+    assert_allclose(res.resid_ss, rss)
+    assert_allclose(res.rsquared, 1 - rss / tss)
+
+
+@pytest.mark.parametrize("method", ["ols", "gls"])
+def test_weighted_system_r2_single_equation(method):
+    # With one equation and a constant, every measure is the R2 of the equation
+    eqns = generate_data(k=1, p=3, const=True, included_weights=True)
+    res = SUR(eqns).fit(method=method)
+    direct = weighted_fit_measures(eqns["equ.0"], res.params)
+    r2 = 1 - direct.rss / direct.tss
+    assert_allclose(res.rsquared, r2)
+    for name in ("mcelroy", "berndt", "judge", "dhrymes"):
+        assert_allclose(res.system_rsquared[name], r2)
+
+
+@pytest.mark.parametrize("method", ["ols", "gls"])
+def test_weighted_residual_correlation_tests(method):
+    # The tests use the residuals scaled by the weights, which estimate the residual
+    # covariance
+    eqns = generate_data(k=3, p=3, const=True, rho=0.8, included_weights=True)
+    res = SUR(eqns).fit(method=method)
+    wresid = np.column_stack(
+        [
+            weighted_fit_measures(eqn, res.equations[key].params).wresid
+            for key, eqn in eqns.items()
+        ]
+    )
+    nobs = wresid.shape[0]
+    corr = np.corrcoef(wresid.T)
+    assert_allclose(
+        res.breusch_pagan().stat, nobs * (corr[np.tril_indices(3, -1)] ** 2).sum()
+    )
+    sigma = wresid.T @ wresid / nobs
+    lr = nobs * (np.log(np.diag(sigma)).sum() - np.linalg.slogdet(sigma)[1])
+    assert_allclose(res.likelihood_ratio().stat, lr)
 
 
 def test_iterated_gls_cov_uses_final_sigma():
