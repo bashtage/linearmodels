@@ -1868,17 +1868,22 @@ class PanelOLS(_PanelModelBase):
         effects: linearmodels.typing.NumericArray,
         clusters: linearmodels.typing.NumericArray,
     ) -> bool:
-        """Determine whether an effect is nested by the covariance clusters"""
-        is_nested = np.zeros(effects.shape[1], dtype=bool)
-        for i, e in enumerate(effects.T):
+        """
+        Determine whether the effects are nested by the covariance clusters
+
+        An effect is nested if each of its groups is in one group of every one of
+        the cluster variables, so that the result does not depend on their order.
+        """
+        for e in effects.T:
             _e = (e - e.min()).astype(np.int64)
             e_count = len(np.unique(_e))
             for c in clusters.T:
                 _c = (c - c.min()).astype(np.int64)
                 cmax = _c.max()
                 ec = _e * (cmax + 1) + _c
-                is_nested[i] = len(np.unique(ec)) == e_count
-        return bool(np.all(is_nested))
+                if len(np.unique(ec)) != e_count:
+                    return False
+        return True
 
     def _determine_df_adjustment(
         self,
@@ -1957,7 +1962,9 @@ class PanelOLS(_PanelModelBase):
             of freedom adjustment is automatically handled. This is useful
             since clustered standard errors that are clustered using the same
             variable as an effect do not require degree of freedom correction
-            while other estimators such as the unadjusted covariance do.
+            while other estimators such as the unadjusted covariance do. With
+            two cluster variables, the effect has to be nested in both of them,
+            which means that each of its groups is in one group of each variable.
         count_effects : bool
             Flag indicating that the covariance estimator should be adjusted
             to account for the estimation of effects in the model. Only used
