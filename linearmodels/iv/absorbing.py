@@ -1221,10 +1221,9 @@ class AbsorbingLS:
             * "clustered" - One-way cluster dependent inference.
               Heteroskedasticity robust
 
-        debiased : bool, optional
-            Flag indicating whether to adjust the covariance estimator for the
-            degrees of freedom that the model uses, which include the absorbed
-            terms. The default is False. See Notes.
+        debiased : bool
+            Flag indicating whether to debiased the covariance estimator using
+            a degree of freedom adjustment.
         method : str
             One of:
 
