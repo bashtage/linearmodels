@@ -469,3 +469,48 @@ def test_predict_simultaneous_equations():
     assert_allclose(
         res.params.y2_x2 * df.x2 + res.params.y2_y1 * df.y1, exog_pred_data.iloc[:, 1]
     )
+
+
+def test_common_regressors_different_instruments():
+    # The regressors are the same in both equations but the instruments are not, so
+    # three-stage least squares differs from equation by equation 2SLS
+    rng = np.random.default_rng(1)
+    nobs = 400
+    exog = np.column_stack([np.ones(nobs), rng.standard_normal(nobs)])
+    z = rng.standard_normal((nobs, 4))
+    e = 0.8 * rng.standard_normal((nobs, 1)) + 0.6 * rng.standard_normal((nobs, 2))
+    endog = (
+        0.7 * z[:, [0]]
+        + 0.7 * z[:, [2]]
+        + 0.5 * e.sum(1, keepdims=True)
+        + rng.standard_normal((nobs, 1))
+    )
+    y = [
+        exog @ np.array([1.0, 0.5]) + 0.8 * endog[:, 0] + e[:, 0],
+        exog @ np.array([-1.0, 0.3]) + 0.4 * endog[:, 0] + e[:, 1],
+    ]
+    instruments = [z[:, :2], z[:, 2:]]
+    eqns = {
+        f"eq{i}": {
+            "dependent": y[i],
+            "exog": exog,
+            "endog": endog,
+            "instruments": instruments[i],
+        }
+        for i in range(2)
+    }
+    res = IV3SLS(eqns).fit()
+    assert res.method == "GLS"
+    x = [np.column_stack([exog, endog])] * 2
+    zs = [np.column_stack([exog, instruments[i]]) for i in range(2)]
+    out = simple_3sls([v[:, None] for v in y], x, zs)
+    assert_allclose(res.params.values, out.beta1.squeeze())
+    assert not np.allclose(res.params, IV3SLS(eqns).fit(method="ols").params)
+
+    # With the same instruments there is nothing to gain from GLS
+    shared = z[:, :2]
+    for eqn in eqns.values():
+        eqn["instruments"] = shared
+    mod = IV3SLS(eqns)
+    assert mod._common_exog
+    assert mod.fit().method == "OLS"
