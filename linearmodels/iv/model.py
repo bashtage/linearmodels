@@ -201,10 +201,13 @@ class _IVModelBase:
         weights = weights_data.ndarray
         if npany(weights <= 0):
             raise ValueError("weights must be strictly positive.")
-        weights = weights / nanmean(weights)
         self.weights = IVData(weights, var_name="weights", nobs=nobs)
 
         self._drop_locs = self._drop_missing()
+        # The weights have mean 1 in the sample that is used to estimate the model,
+        # which does not include the observations that were dropped
+        kept = self.weights.ndarray
+        self.weights = IVData(kept / nanmean(kept), var_name="weights")
         # Weighted data is data scaled by the square root of the weights
         self._sqrt_weights = w = sqrt(self.weights.ndarray)
         # dependent variable

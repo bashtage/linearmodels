@@ -37,6 +37,7 @@ from linearmodels.iv import (
     Interaction,
 )
 from linearmodels.iv.data import IVData
+from linearmodels.shared.exceptions import MissingValueWarning
 from linearmodels.system import IV3SLS, SUR, IVSystemGMM
 
 try:
@@ -543,6 +544,82 @@ def test_complex_clusters_raise(data, cls):
     clusters = data["clusters"].to_numpy().astype(complex)
     with pytest.raises(TypeError, match="clusters has a complex dtype"):
         mod.fit(cov_type="clustered", clusters=clusters)
+
+
+# --------------------------------------------------------------------------- #
+# Weights and missing values
+# --------------------------------------------------------------------------- #
+MISSING_ROWS = {"dependent": [3, 40], "endog": [17], "exog": [25], "instruments": [9]}
+
+
+def with_missing(data):
+    """Data where some of the observations have a missing value"""
+    out = {k: v.copy() for k, v in data.items()}
+    dropped = []
+    for name, rows in MISSING_ROWS.items():
+        for row in rows:
+            if isinstance(out[name], pd.DataFrame):
+                out[name].iloc[row, 0 if name == "instruments" else 1] = np.nan
+            else:
+                out[name].iloc[row] = np.nan
+            dropped.append(row)
+    keep = np.ones(NOBS, dtype=bool)
+    keep[dropped] = False
+    return out, keep
+
+
+def results_arrays(res):
+    return {
+        "params": np.asarray(res.params),
+        "cov": np.asarray(res.cov),
+        "resids": np.asarray(res.resids),
+        "wresids": np.asarray(res.wresids),
+        "resid_ss": res.resid_ss,
+        "s2": res.s2,
+        "total_ss": res.total_ss,
+        "rsquared": res.rsquared,
+        "nobs": res.nobs,
+    }
+
+
+@pytest.mark.parametrize("cls", FAST_ESTIMATORS, ids=FAST_IDS)
+def test_weights_are_normalized_after_dropping_missing_values(data, cls):
+    # A weight is relative to the weights of the observations that are used, and
+    # so the model is the same model as the one fit to the complete observations
+    values, keep = with_missing(data)
+    with pytest.warns(MissingValueWarning):
+        res = build_iv(cls, values).fit()
+    manual = {k: v.loc[keep].reset_index(drop=True) for k, v in data.items()}
+    expected = build_iv(cls, manual).fit()
+    actual = results_arrays(res)
+    for key, value in results_arrays(expected).items():
+        assert_allclose(actual[key], value, rtol=1e-10, err_msg=key)
+    # The weights have mean 1
+    assert_allclose(res.model.weights.ndarray.mean(), 1.0)
+
+
+def test_cue_weights_are_normalized_after_dropping_missing_values(data):
+    values, keep = with_missing(data)
+    with pytest.warns(MissingValueWarning):
+        res = build_iv(IVGMMCUE, values).fit()
+    manual = {k: v.loc[keep].reset_index(drop=True) for k, v in data.items()}
+    expected = build_iv(IVGMMCUE, manual).fit()
+    assert_allclose(res.resid_ss, expected.resid_ss, rtol=1e-6)
+    assert_allclose(res.s2, expected.s2, rtol=1e-6)
+    assert_allclose(res.total_ss, expected.total_ss, rtol=1e-6)
+
+
+def test_weights_with_missing_values_in_the_weights(data):
+    values = {k: v.copy() for k, v in data.items()}
+    values["weights"].iloc[[5, 6]] = np.nan
+    keep = np.ones(NOBS, dtype=bool)
+    keep[[5, 6]] = False
+    with pytest.warns(MissingValueWarning):
+        res = build_iv(IV2SLS, values).fit()
+    manual = {k: v.loc[keep].reset_index(drop=True) for k, v in data.items()}
+    expected = build_iv(IV2SLS, manual).fit()
+    assert_allclose(res.resid_ss, expected.resid_ss, rtol=1e-12)
+    assert_allclose(res.params, expected.params, rtol=1e-12)
 
 
 @pytest.mark.parametrize("cls", ALL_IV, ids=ALL_IV_IDS)
