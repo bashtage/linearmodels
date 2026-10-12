@@ -48,6 +48,13 @@ and :math:`bw` is the bandwidth. The reported risk premia are just the
 average returns on the factors, and the covariance of the risk premia
 estimates is based on the factor residuals after demeaning using either
 the simple estimator or the kernel estimator.
+If the covariance is debiased, :math:`df=K+1` is the number of regressors of
+each regression. The risk premia are sample means, so that their covariance
+uses :math:`T-1` in place of :math:`T-df`, and the covariance between the
+risk premia and the other parameters uses the geometric mean of the two
+divisors, :math:`\sqrt{\left(T-df\right)\left(T-1\right)}`. The block of the
+covariance of the parameters for the risk premia is then the square of their
+reported standard errors.
 
 The J statistic
 ~~~~~~~~~~~~~~~

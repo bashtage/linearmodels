@@ -231,6 +231,27 @@ where
  The reported risk premia are just the average returns on the factors, and
  the covariance of the risk premia estimates is based on the factor residuals
  after demeaning using either the simple estimator or the kernel estimator.
+ If the covariance is debiased, 
+\begin_inset Formula $df=K+1$
+\end_inset
+
+ is the number of regressors of each regression.
+ The risk premia are sample means, so that their covariance uses 
+\begin_inset Formula $T-1$
+\end_inset
+
+ in place of 
+\begin_inset Formula $T-df$
+\end_inset
+
+, and the covariance between the risk premia and the other parameters uses
+ the geometric mean of the two divisors, 
+\begin_inset Formula $\sqrt{\left(T-df\right)\left(T-1\right)}$
+\end_inset
+
+.
+ The block of the covariance of the parameters for the risk premia is
+ then the square of their reported standard errors.
  
 \end_layout
 

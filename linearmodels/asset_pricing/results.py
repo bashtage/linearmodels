@@ -323,7 +323,16 @@ class LinearFactorModelResults(_SummaryStr):
 
     @property
     def risk_premia_se(self) -> pd.Series:
-        """Estimated factor risk premia standard errors"""
+        """
+        Estimated factor risk premia standard errors.
+
+        Notes
+        -----
+        These are the square roots of the diagonal of the block of ``cov`` for
+        the risk premia. For ``TradedFactorModel`` the risk premia are the
+        sample means of the factors. If the covariance is debiased, they use
+        a divisor of nobs - 1.
+        """
         se = np.sqrt(np.diag(self._rp_cov))
         return pd.Series(se, index=self._rp_names)
 

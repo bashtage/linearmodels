@@ -110,7 +110,14 @@ def test_linear_model_time_series(data):
     xe = np.c_[x * e, f - f.mean(0)[None, :]]
     xeex_direct = xe.T @ xe / nobs
     cov = xpxi_direct @ xeex_direct @ xpxi_direct / (nobs - nfp1)
+    # The risk premia are sample means, so their covariance uses nobs - 1, and the
+    # covariance between the two sets of parameters the geometric mean of the scales
+    scale = np.ones(cov.shape[0])
+    scale[-nf:] = np.sqrt((nobs - nfp1) / (nobs - 1))
+    cov = cov * np.outer(scale, scale)
     assert_allclose(cov, np.asarray(res.cov))
+    assert_allclose(cov[-nf:, -nf:], np.cov(f.T) / nobs)
+    assert_allclose(np.diag(cov)[-nf:], res.risk_premia_se**2)
 
     alphas = np.array(all_params)[0::nfp1][:, None]
     alpha_cov = cov[0 : (nfp1 * nport) : nfp1, 0 : (nfp1 * nport) : nfp1]

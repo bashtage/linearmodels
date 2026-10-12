@@ -349,22 +349,23 @@ class TradedFactorModel(_FactorModelBase):
         **cov_config: str | float,
     ) -> LinearFactorModelResults:
         """
-        Estimate model parameters
+        Estimate model parameters.
 
         Parameters
         ----------
-        cov_type : str
-            Name of covariance estimator
-        debiased : bool
+        cov_type : {"robust", "heteroskedastic", "kernel"}, optional
+            Name of covariance estimator. The default is ``"robust"``.
+        debiased : bool, optional
             Flag indicating whether to debias the covariance estimator using
-            a degree of freedom adjustment
-        cov_config : dict
-            Additional covariance-specific options.  See Notes.
+            a degree of freedom adjustment. The default is True. See Notes.
+        **cov_config
+            Additional covariance-specific options for the kernel covariance
+            estimator: ``kernel`` and ``bandwidth``. See Notes.
 
         Returns
         -------
         LinearFactorModelResults
-            Results class with parameter estimates, covariance and test statistics
+            Results class with parameter estimates, covariance and test statistics.
 
         Notes
         -----
@@ -377,6 +378,30 @@ class TradedFactorModel(_FactorModelBase):
         The kernel covariance estimator takes the optional arguments
         ``kernel``, one of "bartlett", "parzen" or "qs" (quadratic spectral)
         and ``bandwidth`` (a positive integer).
+
+        If ``debiased`` is True, the covariance of the parameters of the
+        time-series regressions (the alphas and the loadings) is divided by
+        nobs - nfactor - 1, the number of observations less the number of
+        regressors, instead of by nobs. The risk premia are the sample means of
+        the factors, so that their covariance, which is the block of ``cov`` for
+        the risk premia and the source of ``risk_premia_se``, is divided by
+        nobs - 1. The covariance between the two groups of parameters is divided
+        by the geometric mean of the two scales, so that the covariance matrix
+        remains positive semi-definite. If ``debiased`` is False, the covariance
+        is divided by nobs.
+
+        .. versionchanged:: 7.1
+
+           The block of ``cov`` for the risk premia was divided by
+           nobs - nfactor - 1, while ``risk_premia_se`` used nobs - 1. Both use
+           nobs - 1 now, so that the block of ``cov`` for the risk premia is
+           smaller by the factor (nobs - nfactor - 1) / (nobs - 1), for example by
+           5.1% with 60 observations and 3 factors, and equals
+           ``risk_premia_se`` squared. The covariance between the risk premia
+           and the other parameters, which used nobs - nfactor - 1, is now smaller
+           by the square root of the same factor. The covariance of the
+           alphas and the loadings, ``risk_premia_se`` and the covariance with
+           ``debiased=False`` do not change.
         """
         p = self.portfolios.ndarray
         f = self.factors.ndarray
@@ -435,6 +460,13 @@ class TradedFactorModel(_FactorModelBase):
             raise ValueError(f"Unknown cov_type: {cov_type}")
         full_vcv = cov_est.cov
         rp_cov = rp_cov_est.cov
+        if debiased:
+            # The risk premia are sample means, so their covariance uses nobs - 1 and
+            # not the nobs - (nfactor + 1) of the time-series regressions. The
+            # covariance between the two uses the geometric mean of the two scales
+            adj = np.ones(nloading + nfactor)
+            adj[nloading:] = np.sqrt((nobs - fc.shape[1]) / (nobs - 1))
+            full_vcv = full_vcv * np.outer(adj, adj)
         vcv = full_vcv[:nloading, :nloading]
 
         # Rearrange VCV
