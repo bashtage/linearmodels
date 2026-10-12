@@ -37,6 +37,16 @@ from linearmodels.iv import (
     Interaction,
 )
 from linearmodels.iv.data import IVData
+from linearmodels.panel import (
+    BetweenOLS,
+    FamaMacBeth,
+    FirstDifferenceOLS,
+    PanelOLS,
+    PooledOLS,
+    RandomEffects,
+)
+from linearmodels.panel.data import PanelData
+from linearmodels.panel.utility import dummy_matrix
 from linearmodels.shared.exceptions import MissingValueWarning
 from linearmodels.system import IV3SLS, SUR, IVSystemGMM
 
@@ -857,6 +867,20 @@ def test_absorbing_three_cluster_columns_raise(absorbing):
         mod.fit(cov_type="clustered", clusters=clusters)
 
 
+def test_dummy_matrix_accepts_lists_and_rejects_other_shapes(absorbing):
+    cats = absorbing["absorb"]
+    codes = np.column_stack([cats[c].cat.codes for c in cats])
+    expected = dummy_matrix(cats, precondition=False)[0].toarray()
+    for value in (codes, codes.tolist(), tuple(map(tuple, codes.tolist()))):
+        assert_array_equal(
+            dummy_matrix(value, precondition=False)[0].toarray(), expected
+        )
+    with pytest.raises(ValueError, match="cats must be a DataFrame or a 2-d array"):
+        dummy_matrix(codes[:, 0])
+    with pytest.raises(TypeError, match="cats must only contain categorical"):
+        dummy_matrix(pd.DataFrame(codes))
+
+
 # --------------------------------------------------------------------------- #
 # Systems of equations
 # --------------------------------------------------------------------------- #
@@ -1211,3 +1235,486 @@ def test_factor_model_text_input_raises(factors_data, name):
     values[name] = np.full(values[name].shape, "abc")
     with pytest.raises(TypeError, match=rf"{name[:-1]} must contain numbers"):
         TradedFactorModel(**values)
+
+
+# --------------------------------------------------------------------------- #
+# Panel models
+# --------------------------------------------------------------------------- #
+PN, PT = 12, 6
+PANEL_MODELS = [
+    PooledOLS,
+    PanelOLS,
+    RandomEffects,
+    BetweenOLS,
+    FirstDifferenceOLS,
+    FamaMacBeth,
+]
+PANEL_IDS = [c.__name__ for c in PANEL_MODELS]
+# FamaMacBeth does not have clustered covariance estimators
+CLUSTER_MODELS = PANEL_MODELS[:-1]
+CLUSTER_IDS = PANEL_IDS[:-1]
+# The estimators with a different treatment of the data and of the clusters
+WEIGHT_MODELS = [PooledOLS, PanelOLS]
+WEIGHT_IDS = ["PooledOLS", "PanelOLS"]
+PATH_MODELS = [PooledOLS, BetweenOLS, FirstDifferenceOLS]
+PATH_IDS = ["PooledOLS", "BetweenOLS", "FirstDifferenceOLS"]
+
+
+def panel_data(seed=5):
+    rng = np.random.default_rng(seed)
+    entities = [f"e{i:02d}" for i in range(PN)]
+    index = pd.MultiIndex.from_product([entities, range(PT)], names=["entity", "time"])
+    nrows = PN * PT
+    exog = pd.DataFrame(
+        rng.standard_normal((nrows, 2)), index=index, columns=["x1", "x2"]
+    )
+    alpha = np.repeat(rng.standard_normal(PN), PT)
+    dependent = pd.Series(
+        alpha + exog.x1 - 0.5 * exog.x2 + rng.standard_normal(nrows),
+        index=index,
+        name="y",
+    )
+    weights = pd.Series(
+        np.exp(0.3 * rng.standard_normal(nrows)), index=index, name="wt"
+    )
+    # Constant within an entity, so that every estimator accepts them
+    entity_group = np.repeat(np.arange(PN) % 4, PT)
+    clusters = pd.Series(entity_group, index=index, name="cl")
+    clusters2 = pd.DataFrame(
+        {"c1": entity_group, "c2": np.tile(np.arange(PT) % 3, PN)}, index=index
+    )
+    other = pd.DataFrame({"oe": (np.arange(nrows) * 7) % 5}, index=index)
+    return {
+        "dependent": dependent,
+        "exog": exog,
+        "weights": weights,
+        "clusters": clusters,
+        "clusters2": clusters2,
+        "other": other,
+        "time_weights": pd.Series(np.exp(0.3 * rng.standard_normal(PT)), name="tw"),
+        "entity_weights": pd.Series(
+            np.exp(0.3 * rng.standard_normal(PN)), index=entities, name="ew"
+        ),
+    }
+
+
+@pytest.fixture(scope="module")
+def panel():
+    return panel_data()
+
+
+def grid(value):
+    """A time by entity array of a variable of a panel"""
+    series = value.iloc[:, 0] if isinstance(value, pd.DataFrame) else value
+    return series.to_numpy().reshape(PN, PT).T
+
+
+def cube(value):
+    frame = value.to_frame() if isinstance(value, pd.Series) else value
+    return np.stack([grid(frame[c]) for c in frame])
+
+
+def make_panel(value, kind):
+    """A variable, or the variables, of a panel in another container"""
+    frame = value.to_frame() if isinstance(value, pd.Series) else value
+    series = value.iloc[:, 0] if isinstance(value, pd.DataFrame) else value
+    entities = list(series.index.get_level_values(0).unique())
+    times = list(range(PT))
+    makers = {
+        "series": lambda: series,
+        "dataframe": lambda: frame,
+        "panel_data": lambda: PanelData(frame, convert_dummies=False),
+        "grid": lambda: grid(series),
+        "grid3d": lambda: grid(series)[None],
+        "cube": lambda: cube(frame),
+        "wide": lambda: pd.DataFrame(grid(series), index=times, columns=entities),
+        "dataarray_grid": lambda: xr.DataArray(
+            grid(series),
+            dims=["time", "entity"],
+            coords={"time": times, "entity": entities},
+        ),
+        "dataarray_cube": lambda: xr.DataArray(
+            cube(frame),
+            dims=["var", "time", "entity"],
+            coords={"var": list(frame.columns), "time": times, "entity": entities},
+        ),
+    }
+    return makers[kind]()
+
+
+def build_panel(cls, panel, **replace):
+    values = {
+        "dependent": panel["dependent"],
+        "exog": panel["exog"],
+        "weights": None,
+        **replace,
+    }
+    kw = {"entity_effects": True} if cls is PanelOLS else {}
+    return cls(values["dependent"], values["exog"], weights=values["weights"], **kw)
+
+
+def panel_arrays(mod):
+    """The numbers that are used in estimation"""
+    return [mod.dependent.values2d, mod.exog.values2d, mod.weights.values2d]
+
+
+def assert_same_panel(mod, other):
+    for new, old in zip(panel_arrays(mod), panel_arrays(other), strict=True):
+        assert_array_equal(new, old)
+
+
+@pytest.fixture(scope="module")
+def panel_reference(panel):
+    return {cls: build_panel(cls, panel) for cls in PANEL_MODELS}
+
+
+DEPENDENT_KINDS = [
+    "series",
+    "dataframe",
+    "panel_data",
+    "grid",
+    "grid3d",
+    "wide",
+    *(["dataarray_grid"] if HAS_XARRAY else []),
+]
+EXOG_KINDS = [
+    "dataframe",
+    "panel_data",
+    "cube",
+    *(["dataarray_cube"] if HAS_XARRAY else []),
+]
+PANEL_TYPE_ERROR = r"{name}: Only ndarrays, DataFrames or DataArrays are supported"
+
+
+@pytest.mark.parametrize("cls", PANEL_MODELS, ids=PANEL_IDS)
+@pytest.mark.parametrize("kind", DEPENDENT_KINDS)
+def test_panel_dependent_containers(panel, panel_reference, cls, kind):
+    mod = build_panel(cls, panel, dependent=make_panel(panel["dependent"], kind))
+    assert_same_panel(mod, panel_reference[cls])
+
+
+@pytest.mark.parametrize("cls", PANEL_MODELS, ids=PANEL_IDS)
+@pytest.mark.parametrize("kind", EXOG_KINDS)
+def test_panel_exog_containers(panel, panel_reference, cls, kind):
+    mod = build_panel(cls, panel, exog=make_panel(panel["exog"], kind))
+    assert_same_panel(mod, panel_reference[cls])
+
+
+@pytest.mark.parametrize("kind", DEPENDENT_KINDS)
+def test_panel_dependent_containers_give_the_same_estimates(panel, kind):
+    expected = estimates(build_panel(PooledOLS, panel).fit())
+    mod = build_panel(PooledOLS, panel, dependent=make_panel(panel["dependent"], kind))
+    assert_allclose(estimates(mod.fit()), expected, rtol=1e-10)
+
+
+@pytest.mark.parametrize("kind", EXOG_KINDS)
+def test_panel_exog_containers_give_the_same_estimates(panel, kind):
+    expected = estimates(build_panel(PooledOLS, panel).fit())
+    mod = build_panel(PooledOLS, panel, exog=make_panel(panel["exog"], kind))
+    assert_allclose(estimates(mod.fit()), expected, rtol=1e-10)
+
+
+@pytest.mark.parametrize("cls", PANEL_MODELS, ids=PANEL_IDS)
+@pytest.mark.parametrize("name", ["dependent", "exog"])
+@pytest.mark.parametrize("kind", ["list", "tuple", "nested"])
+def test_panel_data_rejects_lists_and_names_the_input(panel, cls, name, kind):
+    array = grid(panel[name]) if name == "dependent" else cube(panel[name])
+    value = {"list": panel[name].to_numpy().tolist(), "nested": array.tolist()}
+    value["tuple"] = tuple(value["list"])
+    with pytest.raises(TypeError, match=PANEL_TYPE_ERROR.format(name=name)) as exc:
+        build_panel(cls, panel, **{name: value[kind]})
+    assert "Got list" in str(exc.value) or "Got tuple" in str(exc.value)
+
+
+@pytest.mark.parametrize("name", ["dependent", "exog"])
+def test_panel_data_rejects_other_types_and_names_the_input(panel, name):
+    for value in (5.0, "abc", {"a": 1}):
+        with pytest.raises(TypeError, match=PANEL_TYPE_ERROR.format(name=name)):
+            build_panel(PooledOLS, panel, **{name: value})
+
+
+@pytest.mark.parametrize("name", ["dependent", "exog"])
+def test_panel_array_with_the_wrong_dimensions_names_the_input(panel, name):
+    with pytest.raises(ValueError, match=rf"{name}: 2 or 3-d array required"):
+        build_panel(PooledOLS, panel, **{name: np.zeros(PN * PT)})
+    with pytest.raises(ValueError, match=rf"{name}: 2 or 3-d array required"):
+        build_panel(PooledOLS, panel, **{name: np.zeros((2, 2, 2, 2))})
+
+
+@pytest.mark.parametrize("cls", PANEL_MODELS, ids=PANEL_IDS)
+@pytest.mark.parametrize("name", ["dependent", "exog", "weights"])
+def test_panel_complex_input_raises(panel, cls, name):
+    base = {"dependent": grid, "exog": cube, "weights": grid}[name]
+    source = panel[name]
+    for value in (base(source).astype(complex), source.astype(complex)):
+        with warnings.catch_warnings():
+            warnings.simplefilter("error")
+            with pytest.raises(TypeError, match=rf"{name}.*complex dtype"):
+                build_panel(cls, panel, **{name: value})
+
+
+def test_panel_text_input_raises_and_names_the_input(panel):
+    with pytest.raises(TypeError, match=r"dependent: .*must contain numbers"):
+        build_panel(PooledOLS, panel, dependent=np.full((PT, PN), "abc"))
+    with pytest.raises(TypeError, match="weights must contain numbers"):
+        build_panel(PooledOLS, panel, weights=np.full(PN * PT, "abc"))
+
+
+def test_panel_predict_rejects_lists_and_names_the_input(panel):
+    mod = build_panel(PooledOLS, panel)
+    res = mod.fit()
+    exog = panel["exog"]
+    expected = mod.predict(res.params, exog=exog)
+    for kind in ("dataframe", "panel_data", "cube"):
+        new = mod.predict(res.params, exog=make_panel(exog, kind))
+        assert_allclose(new.to_numpy(), expected.to_numpy())
+        new = res.predict(exog=make_panel(exog, kind))
+        assert_allclose(new.to_numpy(), expected.to_numpy())
+    for value in (exog.to_numpy().tolist(), cube(exog).tolist()):
+        with pytest.raises(TypeError, match="exog: Only ndarrays, DataFrames"):
+            mod.predict(res.params, exog=value)
+        with pytest.raises(TypeError, match="exog: Only ndarrays, DataFrames"):
+            res.predict(exog=value)
+    with pytest.raises(TypeError, match=r"exog.*complex dtype"):
+        res.predict(exog=cube(exog).astype(complex))
+
+
+def test_panel_data_class_still_rejects_lists():
+    with pytest.raises(TypeError, match="Only ndarrays, DataFrames or DataArrays"):
+        PanelData([[1.0, 2.0], [3.0, 4.0]])
+    with pytest.raises(TypeError, match="Got list"):
+        PanelData([[1.0, 2.0], [3.0, 4.0]])
+    with pytest.raises(TypeError, match="x has a complex dtype"):
+        PanelData(np.ones((2, 2), dtype=complex))
+
+
+def test_panel_formula_column_name_as_weights_and_bad_data(panel):
+    data = pd.concat([panel["dependent"], panel["exog"], panel["weights"]], axis=1)
+    formula = "y ~ 1 + x1 + x2"
+    with pytest.raises(TypeError, match=r"weights must be array_like.*data\['wt'\]"):
+        PooledOLS.from_formula(formula, data, weights="wt")
+    mod = PooledOLS.from_formula(formula, data, weights=data["wt"])
+    assert mod.weights.values2d.shape == (PN * PT, 1)
+    with pytest.raises(TypeError, match="data: Only ndarrays, DataFrames"):
+        PooledOLS.from_formula(formula, data.to_numpy().tolist())
+
+
+WEIGHT_KINDS = [
+    "series",
+    "dataframe",
+    "panel_data",
+    "list",
+    "tuple",
+    "ndarray",
+    "grid",
+    "grid_list",
+    "wide",
+    "grid3d",
+    *(["dataarray_grid"] if HAS_XARRAY else []),
+]
+
+
+def make_weights(value, kind):
+    if kind == "list":
+        return value.tolist()
+    if kind == "tuple":
+        return tuple(value.tolist())
+    if kind == "ndarray":
+        return value.to_numpy()
+    if kind == "grid_list":
+        return grid(value).tolist()
+    return make_panel(value, kind)
+
+
+@pytest.mark.parametrize("cls", WEIGHT_MODELS, ids=WEIGHT_IDS)
+@pytest.mark.parametrize("kind", WEIGHT_KINDS)
+def test_panel_weights_containers(panel, cls, kind):
+    expected = build_panel(cls, panel, weights=panel["weights"])
+    mod = build_panel(cls, panel, weights=make_weights(panel["weights"], kind))
+    assert_same_panel(mod, expected)
+
+
+@pytest.mark.parametrize("kind", ["list", "tuple", "grid_list"])
+def test_panel_weights_lists_give_the_same_estimates(panel, kind):
+    expected = estimates(build_panel(PanelOLS, panel, weights=panel["weights"]).fit())
+    weights = make_weights(panel["weights"], kind)
+    mod = build_panel(PanelOLS, panel, weights=weights)
+    assert_allclose(estimates(mod.fit()), expected, rtol=1e-10)
+
+
+@pytest.mark.parametrize("cls", WEIGHT_MODELS, ids=WEIGHT_IDS)
+@pytest.mark.parametrize("kind", ["series", "list", "tuple", "ndarray"])
+@pytest.mark.parametrize("shape", ["time_weights", "entity_weights"])
+def test_panel_weights_of_each_time_or_entity(panel, cls, kind, shape):
+    value = panel[shape]
+    expected = build_panel(cls, panel, weights=value)
+    new = value if kind == "series" else make(value, kind)
+    mod = build_panel(cls, panel, weights=new)
+    assert_same_panel(mod, expected)
+
+
+def test_panel_weights_of_each_time_are_used_for_every_entity(panel):
+    mod = build_panel(PooledOLS, panel, weights=panel["time_weights"].tolist())
+    expected = np.tile(panel["time_weights"].to_numpy(), PN)
+    assert_allclose(mod.weights.values2d[:, 0], expected / expected.mean())
+    mod = build_panel(PooledOLS, panel, weights=panel["entity_weights"].tolist())
+    expected = np.repeat(panel["entity_weights"].to_numpy(), PT)
+    assert_allclose(mod.weights.values2d[:, 0], expected / expected.mean())
+
+
+# --------------------------------------------------------------------------- #
+# Panel clusters and effects
+# --------------------------------------------------------------------------- #
+def make_panel_clusters(value, kind):
+    series = value.iloc[:, 0] if isinstance(value, pd.DataFrame) else value
+    text = "g" + series.astype(int).astype(str)
+    makers = {
+        "list": series.tolist,
+        "tuple": lambda: tuple(series.tolist()),
+        "ndarray": series.to_numpy,
+        "strings_ndarray": text.to_numpy,
+        "strings_list": text.tolist,
+        "grid_list": lambda: grid(series).tolist(),
+        "cube_list": lambda: cube(value).tolist(),
+    }
+    if kind in makers:
+        return makers[kind]()
+    return make_panel(value, kind)
+
+
+def setup_clusters(mod, clusters, **kw):
+    """The clusters that the estimator passes to the covariance estimator"""
+    return np.asarray(mod._setup_clusters({"clusters": clusters, **kw})["clusters"])
+
+
+ONE_D_KINDS = ["list", "tuple", "ndarray"]
+LABELLED_CLUSTER_KINDS = [
+    "series",
+    "dataframe",
+    "panel_data",
+    "wide",
+    *(["dataarray_grid"] if HAS_XARRAY else []),
+]
+
+
+@pytest.mark.parametrize("cls", PATH_MODELS, ids=PATH_IDS)
+@pytest.mark.parametrize("kind", [*ONE_D_KINDS, *LABELLED_CLUSTER_KINDS])
+def test_panel_clusters_containers(panel, panel_reference, cls, kind):
+    mod = panel_reference[cls]
+    expected = setup_clusters(mod, panel["clusters"])
+    clusters = make_panel_clusters(panel["clusters"], kind)
+    assert_array_equal(setup_clusters(mod, clusters), expected)
+
+
+@pytest.mark.parametrize("cls", CLUSTER_MODELS, ids=CLUSTER_IDS)
+@pytest.mark.parametrize("kind", ["list", "ndarray"])
+def test_panel_one_dimensional_clusters_give_the_same_estimates(panel, cls, kind):
+    mod = build_panel(cls, panel)
+    expected = estimates(mod.fit(cov_type="clustered", clusters=panel["clusters"]))
+    clusters = make_panel_clusters(panel["clusters"], kind)
+    res = mod.fit(cov_type="clustered", clusters=clusters)
+    assert_allclose(estimates(res), expected, rtol=1e-10)
+
+
+@pytest.mark.parametrize("cls", [PooledOLS, PanelOLS, RandomEffects], ids=PANEL_IDS[:3])
+@pytest.mark.parametrize("kind", ["dataframe", "panel_data", "cube", "cube_list"])
+def test_panel_two_way_clusters_containers(panel, panel_reference, cls, kind):
+    mod = panel_reference[cls]
+    expected = setup_clusters(mod, panel["clusters2"])
+    clusters = make_panel_clusters(panel["clusters2"], kind)
+    assert_array_equal(setup_clusters(mod, clusters), expected)
+
+
+def test_panel_two_way_clusters_from_arrays_give_the_same_estimates(panel):
+    mod = build_panel(PooledOLS, panel)
+    expected = mod.fit(cov_type="clustered", clusters=panel["clusters2"])
+    res = mod.fit(cov_type="clustered", clusters=cube(panel["clusters2"]))
+    assert_allclose(res.cov, expected.cov, rtol=1e-10)
+    res = mod.fit(cov_type="clustered", clusters=cube(panel["clusters2"]).tolist())
+    assert_allclose(res.cov, expected.cov, rtol=1e-10)
+
+
+@pytest.mark.parametrize("cls", CLUSTER_MODELS, ids=CLUSTER_IDS)
+def test_panel_one_dimensional_clusters_must_have_a_value_for_each_row(
+    panel_reference, cls
+):
+    mod = panel_reference[cls]
+    with pytest.raises(ValueError, match="clusters is 1-d and has"):
+        mod.fit(cov_type="clustered", clusters=np.arange(PN * PT - 1))
+    with pytest.raises(ValueError, match="clusters is 1-d and has"):
+        mod.fit(cov_type="clustered", clusters=list(range(PN)))
+
+
+def test_panel_clusters_with_missing_values_in_the_model(panel):
+    # The clusters have a value for each row of dependent, including the rows
+    # that are dropped because they have a missing value
+    dependent = panel["dependent"].copy()
+    dependent.iloc[[3, 30]] = np.nan
+    with pytest.warns(MissingValueWarning):
+        mod = PooledOLS(dependent, panel["exog"])
+    expected = mod.fit(cov_type="clustered", clusters=panel["clusters"])
+    for clusters in (panel["clusters"].to_numpy(), panel["clusters"].tolist()):
+        res = mod.fit(cov_type="clustered", clusters=clusters)
+        assert_allclose(res.cov, expected.cov, rtol=1e-10)
+
+
+@pytest.mark.parametrize("cls", CLUSTER_MODELS, ids=CLUSTER_IDS)
+def test_panel_complex_clusters_raise(panel_reference, panel, cls):
+    mod = panel_reference[cls]
+    clusters = panel["clusters"].to_numpy().astype(complex)
+    with pytest.raises(TypeError, match=r"clusters.*complex dtype"):
+        mod.fit(cov_type="clustered", clusters=clusters)
+
+
+def test_panel_three_cluster_variables_raise(panel_reference, panel):
+    mod = panel_reference[PooledOLS]
+    clusters = panel["clusters2"].assign(c3=panel["clusters"])
+    with pytest.raises(ValueError, match="Only 1 or 2-way clustering supported"):
+        mod.fit(cov_type="clustered", clusters=clusters)
+
+
+OTHER_KINDS = ["dataframe", "series", "grid", "list", "tuple", "ndarray", "grid_list"]
+
+
+@pytest.mark.parametrize("kind", OTHER_KINDS)
+def test_panel_other_effects_containers(panel, kind):
+    expected = PanelOLS(panel["dependent"], panel["exog"], other_effects=panel["other"])
+    other = panel["other"]
+    if kind in ("list", "tuple", "ndarray", "grid_list"):
+        value = make_panel_clusters(other, kind)
+    else:
+        value = make_panel(other, kind)
+    mod = PanelOLS(panel["dependent"], panel["exog"], other_effects=value)
+    assert_same_panel(mod, expected)
+    assert_array_equal(
+        mod._other_effect_cats.values2d, expected._other_effect_cats.values2d
+    )
+
+
+def test_panel_other_effects_lists_give_the_same_estimates(panel):
+    expected = PanelOLS(
+        panel["dependent"], panel["exog"], other_effects=panel["other"]
+    ).fit()
+    value = panel["other"]["oe"].tolist()
+    res = PanelOLS(panel["dependent"], panel["exog"], other_effects=value).fit()
+    assert_allclose(estimates(res), estimates(expected), rtol=1e-10)
+
+
+def test_panel_other_effects_errors_name_the_input(panel):
+    with pytest.raises(ValueError, match="other_effects is 1-d and has"):
+        PanelOLS(panel["dependent"], panel["exog"], other_effects=np.arange(PN))
+    with pytest.raises(TypeError, match=r"other_effects.*complex dtype"):
+        PanelOLS(
+            panel["dependent"],
+            panel["exog"],
+            other_effects=panel["other"].to_numpy()[:, 0].astype(complex),
+        )
+
+
+def test_reformat_clusters_accepts_lists(panel_reference, panel):
+    mod = panel_reference[PooledOLS]
+    expected = mod.reformat_clusters(panel["clusters"])
+    for value in (panel["clusters"].tolist(), panel["clusters"].to_numpy()):
+        new = mod.reformat_clusters(value)
+        assert_array_equal(new.values2d, expected.values2d)
+        assert new.index.equals(expected.index)

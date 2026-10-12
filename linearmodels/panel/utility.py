@@ -8,7 +8,7 @@ from typing import Literal, NamedTuple, TypeVar, cast
 
 import numpy as np
 import numpy.random
-from pandas import DataFrame, concat, date_range
+from pandas import CategoricalDtype, DataFrame, concat, date_range
 import scipy.sparse as sp
 
 from linearmodels.shared.utility import panel_to_frame
@@ -150,9 +150,10 @@ def dummy_matrix(
     """
     Parameters
     ----------
-    cats: {DataFrame, ndarray}
+    cats : DataFrame or array_like
         Array containing the category codes of pandas categoricals
-        (nobs, ncats)
+        (nobs, ncats). A DataFrame must only contain categoricals. A
+        ``ValueError`` is raised if an array does not have 2 dimensions.
     output_format: {"csc", "csr", "coo", "array"}
         Output format. Default is csc (csc_array). Supported output
         formats are:
@@ -179,9 +180,21 @@ def dummy_matrix(
         Conditioning number of each column
     """
     if isinstance(cats, DataFrame):
+        for col in cats:
+            if not isinstance(cats[col].dtype, CategoricalDtype):
+                raise TypeError(
+                    "cats must only contain categorical columns, but the column "
+                    f"{col!r} has dtype {cats[col].dtype}. Pass the category codes "
+                    "as an array to use other columns."
+                )
         codes = np.column_stack([np.asarray(cats[c].cat.codes) for c in cats])
     else:
         codes = np.asarray(cats)
+        if codes.ndim != 2:
+            raise ValueError(
+                "cats must be a DataFrame or a 2-d array with a column for each "
+                f"set of categories, but it has {codes.ndim} dimension(s)."
+            )
 
     data: dict[str, list[np.ndarray]] = defaultdict(list)
     total_dummies = 0
