@@ -475,7 +475,7 @@ class Interaction:
 
     @property
     def nobs(self) -> int:
-        """Number of observations, which drop reduces"""
+        """Number of observations, which drop reduces."""
         assert self._nobs is not None
         return self._nobs
 
@@ -531,7 +531,7 @@ class Interaction:
 
     def drop(self, locs: linearmodels.typing.data.BoolArray) -> None:
         """
-        Drop observations
+        Drop observations.
 
         Parameters
         ----------
