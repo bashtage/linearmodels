@@ -7,15 +7,20 @@ Validation and messages of AbsorbingLS and the IV models.
   models that can use HDFE.
 * Interaction.drop modifies the instance, and nobs must be the number of observations
   that remain.
+* The message about the length of clusters names only what the models have.
 """
+
+import re
 
 import numpy as np
 from numpy.testing import assert_allclose
 import pandas as pd
 import pytest
 
+from linearmodels.iv import IV2SLS, IVLIML
 import linearmodels.iv.absorbing
 from linearmodels.iv.absorbing import AbsorbingLS, Interaction
+from linearmodels.iv.covariance import CLUSTER_ERR
 from linearmodels.shared.exceptions import MissingValueWarning
 
 NOBS = 200
@@ -192,3 +197,48 @@ def test_nobs_of_the_interactions_of_a_model_with_missing_values(data):
     assert [i.nobs for i in mod._interaction_list] == [NOBS - 2]
     # The interaction of the caller is not modified
     assert interaction.nobs == NOBS
+
+
+def test_cluster_message_names_only_what_the_models_have(data):
+    y, x, cats = data
+    y = y.copy()
+    y.iloc[3] = np.nan
+    clusters = np.arange(NOBS) % 7  # One row for each observation before the drop
+    z = pd.DataFrame(
+        np.random.default_rng(2).standard_normal((NOBS, 2)), columns=["z0", "z1"]
+    )
+    endog = (z.sum(axis=1) + x["x0"]).to_frame("e")
+    models = {
+        "IV2SLS": IV2SLS(y, x, endog, z),
+        "IVLIML": IVLIML(y, x, endog, z),
+        "AbsorbingLS": AbsorbingLS(y, x, absorb=cats),
+    }
+    for name, mod in models.items():
+        with pytest.raises(ValueError, match="clusters has the wrong nobs") as info:
+            mod.fit(cov_type="clustered", clusters=clusters)
+        message = str(info.value)
+        assert f"Expected {NOBS - 1}, got {NOBS}." in message
+        assert "have have" not in message
+        assert "missing" in message
+        for attribute in re.findall(r"`([^`]+)`", message):
+            assert hasattr(mod, attribute), f"{name} does not have {attribute}"
+    # The shared text does not name any attribute of any model
+    assert "`" not in CLUSTER_ERR
+
+
+def test_clusters_that_are_dropped_with_the_data_are_accepted(data):
+    # The advice of the message works
+    y, x, cats = data
+    y = y.copy()
+    y.iloc[3] = np.nan
+    clusters = np.arange(NOBS) % 7
+    keep = np.ones(NOBS, dtype=bool)
+    keep[3] = False
+    mod = AbsorbingLS(y[keep], x[keep], absorb=cats[keep])
+    res = mod.fit(cov_type="clustered", clusters=clusters[keep])
+    assert res.nobs == NOBS - 1
+    # The rows are the rows of the model that drops them
+    auto = AbsorbingLS(y, x, absorb=cats)
+    assert_allclose(
+        auto.fit(cov_type="clustered", clusters=clusters[keep]).params, res.params
+    )
