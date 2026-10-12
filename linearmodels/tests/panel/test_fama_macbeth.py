@@ -1,4 +1,5 @@
 from itertools import product
+import re
 import warnings
 
 import numpy as np
@@ -456,3 +457,49 @@ def test_weighted_inference(use_weights):
     assert res.df_resid == 9
     assert_allclose(res.pvalues, pvalues, rtol=1e-10)
     assert_allclose(res.conf_int(), interval, rtol=1e-10)
+
+
+def no_cross_section_data(case):
+    """Panels in which none of the cross-sections can be estimated"""
+    rg = np.random.default_rng(0)
+    nperiod = 24
+    if case == "single-entity":
+        # One entity, so that every cross-section has a single observation
+        index = pd.MultiIndex.from_product(
+            [["000001"], pd.date_range("2010-01-31", periods=nperiod, freq="ME")]
+        )
+        x = pd.DataFrame(rg.standard_normal((nperiod, 3)), index=index)
+    elif case == "time-only-regressor":
+        # A regressor that is the same for every entity in a period
+        index = pd.MultiIndex.from_product([range(20), range(nperiod)])
+        market = np.tile(rg.standard_normal(nperiod), 20)
+        x = pd.DataFrame({"market": market}, index=index)
+    else:
+        # Two entities for three regressors
+        index = pd.MultiIndex.from_product([range(2), range(nperiod)])
+        x = pd.DataFrame(rg.standard_normal((2 * nperiod, 2)), index=index)
+    x.insert(0, "const", 1.0)
+    y = pd.Series(rg.standard_normal(x.shape[0]), index=index, name="y")
+    return y, x
+
+
+@pytest.mark.parametrize(
+    "case", ["single-entity", "time-only-regressor", "fewer-entities"]
+)
+def test_no_cross_section_can_be_estimated(case):
+    # #427: the message had a typo, "anycross-sectional", and spoke of blocks of
+    # time-series observations. It has to say what is needed and what to do
+    y, x = no_cross_section_data(case)
+    with pytest.raises(ValueError, match=r"Model cannot be estimated") as exc:
+        FamaMacBeth(y, x)
+    message = str(exc.value)
+    assert "anycross" not in message
+    assert "blocks" not in message
+    # Each sentence starts after a space
+    assert re.search(r"[a-z]\.[A-Za-z]", message) is None
+    assert "one cross-sectional regression for each time period" in message
+    assert "at least as many entities as regressors" in message
+    assert "regressors must vary across entities within a period" in message
+    assert "depends only on time is collinear with the constant" in message
+    assert "single entity" in message
+    assert "estimate a time-series regression" in message

@@ -3148,6 +3148,13 @@ class FamaMacBeth(_PanelModelBase):
     implementation based on regressing all observation in a single
     time period is "as-if" time effects are included.
 
+    Each period needs at least as many entities as regressors, and the
+    regressors must vary across the entities of the period, so that they are
+    not collinear: a regressor that depends only on time is collinear with the
+    constant. Periods whose cross-section is rank deficient are dropped with a
+    warning, and T counts only the periods that are used. It is an error if no
+    period can be used.
+
     Parameter inference is made using the set of T parameter estimates with
     either the standard covariance estimator or a kernel-based covariance,
     depending on ``cov_type``. Since the parameters are the averages of the T
@@ -3200,9 +3207,17 @@ class FamaMacBeth(_PanelModelBase):
         valid_blocks = wx_df.groupby(level=1).apply(validate_block)
         if not valid_blocks.any():
             err = (
-                "Model cannot be estimated. All blocks of time-series observations "
-                "are rank deficient, and so it is not possible to estimate any"
-                "cross-sectional regressions."
+                "Model cannot be estimated. Fama-MacBeth estimates one "
+                "cross-sectional regression for each time period, using the "
+                "entities that are observed in the period, and none of these "
+                "regressions can be estimated. A cross-section needs at least "
+                "as many entities as regressors, and its regressors must not be "
+                "collinear, so the regressors must vary across entities within "
+                "a period. A regressor that depends only on time is collinear "
+                "with the constant, and a panel with a single entity has one "
+                "observation in each cross-section. Use more entities, remove "
+                "the regressors that do not vary across entities, or, for a "
+                "single entity, estimate a time-series regression."
             )
             raise ValueError(err)
         if valid_blocks.sum() < exog.shape[1]:
