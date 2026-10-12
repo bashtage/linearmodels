@@ -1123,7 +1123,11 @@ class LinearFactorModelGMM(_LinearFactorModelBase):
         sel = slice(0, (n * (k + 1)), (k + 1))
         alphas = g.mean(0)[sel, None]
         alpha_vcv = s[sel, sel] / nobs
-        stat = self._j(params, excess_returns, w)
+        if use_cue:
+            # The objective that was minimized updates the weight matrix
+            stat = self._j_cue(params, excess_returns, weight_est_instance)
+        else:
+            stat = self._j(params, excess_returns, w)
         jstat = WaldTestStatistic(
             stat, "All alphas are 0", n - k - nrf, name="J-statistic"
         )
