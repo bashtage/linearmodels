@@ -19,7 +19,7 @@
     
   
       
-        <title>linearmodels.iv.absorbing - linearmodels v7.1 (+193)</title>
+        <title>linearmodels.iv.absorbing - linearmodels v7.1 (+195)</title>
       
     
 
@@ -91,7 +91,7 @@
 
 <header class="md-header md-header--shadow" data-md-component="header">
   <nav class="md-header__inner md-grid" aria-label="Header">
-    <a href="../../../index.html" title="linearmodels v7.1 (+193)" class="md-header__button md-logo" aria-label="linearmodels v7.1 (+193)" data-md-component="logo">
+    <a href="../../../index.html" title="linearmodels v7.1 (+195)" class="md-header__button md-logo" aria-label="linearmodels v7.1 (+195)" data-md-component="logo">
       <img src="../../../_static/bw-logo.svg" alt="logo">
     </a>
     <label class="md-header__button md-icon" for="__drawer">
@@ -102,7 +102,7 @@
       <div class="md-header__ellipsis">
         <div class="md-header__topic">
           <span class="md-ellipsis">
-            linearmodels v7.1 (+193)
+            linearmodels v7.1 (+195)
           </span>
         </div>
         <div class="md-header__topic" data-md-component="header-topic">
@@ -197,10 +197,10 @@
 
 <nav class="md-nav md-nav--primary" aria-label="Navigation" data-md-level="0">
   <label class="md-nav__title" for="__drawer">
-    <a href="../../../index.html" title="linearmodels v7.1 (+193)" class="md-nav__button md-logo" aria-label="linearmodels v7.1 (+193)" data-md-component="logo">
+    <a href="../../../index.html" title="linearmodels v7.1 (+195)" class="md-nav__button md-logo" aria-label="linearmodels v7.1 (+195)" data-md-component="logo">
       <img src="../../../_static/bw-logo.svg" alt="logo">
     </a>
-    linearmodels v7.1 (+193)
+    linearmodels v7.1 (+195)
   </label>
   
     <div class="md-nav__source">
@@ -510,6 +510,7 @@
 
 <span class="kn">from</span><span class="w"> </span><span class="nn">collections</span><span class="w"> </span><span class="kn">import</span> <span class="n">defaultdict</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">collections.abc</span><span class="w"> </span><span class="kn">import</span> <span class="n">Hashable</span><span class="p">,</span> <span class="n">Iterable</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">copy</span><span class="w"> </span><span class="kn">import</span> <span class="n">deepcopy</span>
 <span class="kn">import</span><span class="w"> </span><span class="nn">hashlib</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">inspect</span><span class="w"> </span><span class="kn">import</span> <span class="n">signature</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">typing</span><span class="w"> </span><span class="kn">import</span> <span class="n">Any</span><span class="p">,</span> <span class="n">DefaultDict</span><span class="p">,</span> <span class="n">Union</span><span class="p">,</span> <span class="n">cast</span>
@@ -965,7 +966,9 @@
         <span class="n">nobs</span> <span class="o">=</span> <span class="nb">max</span><span class="p">(</span><span class="n">cat_nobs</span><span class="p">,</span> <span class="n">cont_nobs</span><span class="p">)</span>
         <span class="k">if</span> <span class="n">cat</span> <span class="ow">is</span> <span class="kc">None</span> <span class="ow">and</span> <span class="n">cont</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
             <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_nobs</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
-                <span class="bp">self</span><span class="o">.</span><span class="n">_cont_data</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_cat_data</span> <span class="o">=</span> <span class="n">IVData</span><span class="p">(</span><span class="kc">None</span><span class="p">,</span> <span class="s2">"none"</span><span class="p">,</span> <span class="n">nobs</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">_nobs</span><span class="p">)</span>
+                <span class="c1"># Separate objects, since drop modifies them in place</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">_cat_data</span> <span class="o">=</span> <span class="n">IVData</span><span class="p">(</span><span class="kc">None</span><span class="p">,</span> <span class="s2">"none"</span><span class="p">,</span> <span class="n">nobs</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">_nobs</span><span class="p">)</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">_cont_data</span> <span class="o">=</span> <span class="n">IVData</span><span class="p">(</span><span class="kc">None</span><span class="p">,</span> <span class="s2">"none"</span><span class="p">,</span> <span class="n">nobs</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">_nobs</span><span class="p">)</span>
             <span class="k">else</span><span class="p">:</span>
                 <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">"nobs must be provided when cat and cont are None"</span><span class="p">)</span>
             <span class="k">return</span>
@@ -1353,6 +1356,7 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">_weights</span> <span class="o">=</span> <span class="n">weights</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_is_weighted</span> <span class="o">=</span> <span class="kc">False</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_drop_absorbed</span> <span class="o">=</span> <span class="n">drop_absorbed</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_weight_data</span><span class="p">:</span> <span class="n">IVData</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_check_weights</span><span class="p">()</span>
 
         <span class="bp">self</span><span class="o">.</span><span class="n">_interactions</span> <span class="o">=</span> <span class="n">interactions</span>
@@ -1382,16 +1386,28 @@
     <span class="k">def</span><span class="w"> </span><span class="nf">_drop_missing</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">linearmodels</span><span class="o">.</span><span class="n">typing</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">BoolArray</span><span class="p">:</span>
         <span class="n">missing</span> <span class="o">=</span> <span class="n">require</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">dependent</span><span class="o">.</span><span class="n">isnull</span><span class="o">.</span><span class="n">to_numpy</span><span class="p">(),</span> <span class="n">requirements</span><span class="o">=</span><span class="s2">"W"</span><span class="p">)</span>
         <span class="n">missing</span> <span class="o">|=</span> <span class="bp">self</span><span class="o">.</span><span class="n">exog</span><span class="o">.</span><span class="n">isnull</span><span class="o">.</span><span class="n">to_numpy</span><span class="p">()</span>
+        <span class="n">missing</span> <span class="o">|=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_weight_data</span><span class="o">.</span><span class="n">isnull</span><span class="o">.</span><span class="n">to_numpy</span><span class="p">()</span>
         <span class="n">missing</span> <span class="o">|=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_absorb_inter</span><span class="o">.</span><span class="n">cat</span><span class="o">.</span><span class="n">isnull</span><span class="p">()</span><span class="o">.</span><span class="n">any</span><span class="p">(</span><span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span><span class="o">.</span><span class="n">to_numpy</span><span class="p">()</span>
         <span class="n">missing</span> <span class="o">|=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_absorb_inter</span><span class="o">.</span><span class="n">cont</span><span class="o">.</span><span class="n">isnull</span><span class="p">()</span><span class="o">.</span><span class="n">any</span><span class="p">(</span><span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span><span class="o">.</span><span class="n">to_numpy</span><span class="p">()</span>
         <span class="k">for</span> <span class="n">interact</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_interaction_list</span><span class="p">:</span>
             <span class="n">missing</span> <span class="o">|=</span> <span class="n">interact</span><span class="o">.</span><span class="n">isnull</span><span class="o">.</span><span class="n">to_numpy</span><span class="p">()</span>
         <span class="k">if</span> <span class="n">npany</span><span class="p">(</span><span class="n">missing</span><span class="p">):</span>
+            <span class="k">if</span> <span class="n">missing</span><span class="o">.</span><span class="n">all</span><span class="p">():</span>
+                <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
+                    <span class="s2">"All observations contain missing data. Model cannot be estimated."</span>
+                <span class="p">)</span>
+            <span class="c1"># drop modifies an Interaction, which the caller may use again</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_absorb_inter</span> <span class="o">=</span> <span class="n">deepcopy</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_absorb_inter</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_interaction_list</span> <span class="o">=</span> <span class="n">deepcopy</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_interaction_list</span><span class="p">)</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">dependent</span><span class="o">.</span><span class="n">drop</span><span class="p">(</span><span class="n">missing</span><span class="p">)</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">exog</span><span class="o">.</span><span class="n">drop</span><span class="p">(</span><span class="n">missing</span><span class="p">)</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">_absorb_inter</span><span class="o">.</span><span class="n">drop</span><span class="p">(</span><span class="n">missing</span><span class="p">)</span>
             <span class="k">for</span> <span class="n">interact</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_interaction_list</span><span class="p">:</span>
                 <span class="n">interact</span><span class="o">.</span><span class="n">drop</span><span class="p">(</span><span class="n">missing</span><span class="p">)</span>
+            <span class="c1"># Weights have mean 1 in the sample used to estimate the model</span>
+            <span class="n">weights</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_weight_data</span><span class="o">.</span><span class="n">ndarray</span><span class="p">[</span><span class="o">~</span><span class="n">missing</span><span class="p">]</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_weight_data</span> <span class="o">=</span> <span class="n">IVData</span><span class="p">(</span><span class="n">weights</span> <span class="o">/</span> <span class="n">weights</span><span class="o">.</span><span class="n">mean</span><span class="p">(),</span> <span class="s2">"weights"</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_nobs</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">dependent</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
         <span class="n">missing_warning</span><span class="p">(</span><span class="n">missing</span><span class="p">,</span> <span class="n">stacklevel</span><span class="o">=</span><span class="mi">4</span><span class="p">)</span>
         <span class="k">return</span> <span class="n">missing</span>
 
@@ -1755,6 +1771,12 @@
 <span class="sd">        The see the docstring of specific covariance estimator for a list of</span>
 <span class="sd">        supported options. Defaults are used if no covariance configuration</span>
 <span class="sd">        is provided.</span>
+
+<span class="sd">        Observations with a missing value in ``dependent``, ``exog``,</span>
+<span class="sd">        ``weights``, ``absorb`` or ``interactions`` are dropped when the model</span>
+<span class="sd">        is created. When ``cov_type`` is "clustered", ``clusters`` must have</span>
+<span class="sd">        one row for each of the remaining observations, so the rows of</span>
+<span class="sd">        ``clusters`` that belong to dropped observations must be dropped too.</span>
 
 <span class="sd">        If use_cache is True, then variables are hashed based on their</span>
 <span class="sd">        contents using either a 64-bit value (if xxhash is installed) or</span>
