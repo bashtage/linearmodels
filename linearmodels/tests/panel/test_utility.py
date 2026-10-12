@@ -224,7 +224,9 @@ def test_preconditioner_subclass():
 @pytest.mark.parametrize("const", [True, False])
 @pytest.mark.parametrize("other_effects", [0, 1, 2])
 @pytest.mark.parametrize("cat_list", [True, False])
-@pytest.mark.parametrize("random_state", [None, np.random.RandomState(0)])
+@pytest.mark.parametrize(
+    "random_state", [None, np.random.RandomState(0), np.random.default_rng(0)]
+)
 def test_generate_panel_data(missing, const, other_effects, cat_list, random_state):
     if cat_list:
         ncats: list[int] | int = [13] * other_effects
@@ -232,7 +234,11 @@ def test_generate_panel_data(missing, const, other_effects, cat_list, random_sta
         ncats = 21
 
     dataset = generate_panel_data(
-        missing=missing, const=const, other_effects=other_effects, ncats=ncats
+        missing=missing,
+        const=const,
+        other_effects=other_effects,
+        ncats=ncats,
+        rng=random_state,
     )
 
     assert isinstance(dataset, PanelModelData)
@@ -242,6 +248,46 @@ def test_generate_panel_data(missing, const, other_effects, cat_list, random_sta
         assert "const" in dataset.data
         assert (dataset.data["const"].dropna() == 1.0).all()
     assert dataset.other_effects.shape == (dataset.data.shape[0], other_effects)
+
+
+@pytest.mark.parametrize("make_rng", [np.random.RandomState, np.random.default_rng])
+def test_generate_panel_data_rng(make_rng):
+    # A Generator has integers and not randint. The same seed gives the same data
+    options = {"nentity": 30, "ntime": 5, "other_effects": 2, "ncats": [3, 4]}
+    first = generate_panel_data(rng=make_rng(1234), **options)
+    second = generate_panel_data(rng=make_rng(1234), **options)
+    other = generate_panel_data(rng=make_rng(4321), **options)
+    for result in (first, second, other):
+        assert result.data.shape == (150, 6)
+        assert result.other_effects.shape == (150, 2)
+    pd.testing.assert_frame_equal(first.data, second.data)
+    pd.testing.assert_frame_equal(first.other_effects, second.other_effects)
+    pd.testing.assert_frame_equal(first.clusters, second.clusters)
+    assert not first.data.equals(other.data)
+    # The categories of the effects are integers in the ranges
+    effects = first.other_effects
+    assert set(effects["cat.0"].unique()) <= set(range(3))
+    assert set(effects["cat.1"].unique()) <= set(range(4))
+
+
+def test_generate_panel_data_random_state_is_unchanged():
+    # The draws of a RandomState do not depend on Generators being accepted
+    result = generate_panel_data(
+        nentity=6,
+        ntime=3,
+        nexog=2,
+        other_effects=2,
+        ncats=[3, 5],
+        rng=np.random.RandomState(7),
+    )
+    effects = result.other_effects.to_numpy().T
+    assert_array_equal(
+        effects,
+        [
+            [1, 0, 1, 2, 1, 0, 1, 1, 0, 2, 0, 2, 2, 1, 1, 0, 1, 1],
+            [2, 1, 1, 0, 3, 1, 2, 1, 3, 0, 0, 2, 2, 0, 0, 1, 1, 2],
+        ],
+    )
 
 
 def test_not_absorbed_const():

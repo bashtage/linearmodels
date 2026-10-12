@@ -642,6 +642,17 @@ class PanelModelData(NamedTuple):
     clusters: DataFrame
 
 
+def _integers(
+    rng: numpy.random.RandomState | numpy.random.Generator,
+    high: int,
+    size: tuple[int, ...],
+) -> linearmodels.typing.data.IntArray:
+    """Random integers in [0, high) from a RandomState or a Generator"""
+    if isinstance(rng, numpy.random.Generator):
+        return rng.integers(0, high, size)
+    return rng.randint(0, high, size)
+
+
 def generate_panel_data(
     nentity: int = 971,
     ntime: int = 7,
@@ -650,7 +661,7 @@ def generate_panel_data(
     missing: float = 0,
     other_effects: int = 2,
     ncats: int | list[int] = 4,
-    rng: numpy.random.RandomState | None = None,
+    rng: numpy.random.RandomState | numpy.random.Generator | None = None,
 ) -> PanelModelData:
     """
     Simulate panel data for testing
@@ -673,9 +684,9 @@ def generate_panel_data(
         The number of categories to use in other_effects and variance
         clusters. If list-like, then it must have as many elements
         as other_effects.
-    rng : RandomState
-        A NumPy RandomState instance. If not provided, one is initialized
-        using a fixed seed.
+    rng : RandomState or Generator
+        A NumPy RandomState or Generator instance. If not provided, a
+        RandomState is initialized using a fixed seed.
 
     Returns
     -------
@@ -721,11 +732,11 @@ def generate_panel_data(
         _c = []
         for i in range(other_effects):
             nc = ncats[i]
-            _c.append(rng.randint(0, nc, (1, t, n)))
+            _c.append(_integers(rng, nc, (1, t, n)))
         c = np.concatenate(_c, 0)
 
     vcats = [f"varcat.{i}" for i in range(2)]
-    vc2 = np.ones((2, t, 1)) @ rng.randint(0, n // 2, (2, 1, n))
+    vc2 = np.ones((2, t, 1)) @ _integers(rng, n // 2, (2, 1, n))
     vc1 = vc2[[0]]
 
     if const:
