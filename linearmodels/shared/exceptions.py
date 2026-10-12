@@ -29,6 +29,33 @@ class IndexWarning(Warning):
     pass
 
 
+class DefaultBandwidthWarning(UserWarning):
+    """
+    Warning that a kernel estimator uses the bandwidth that it selects by default.
+
+    Notes
+    -----
+    The default bandwidth of the kernel estimators of the covariance of the
+    moment conditions used by :class:`~linearmodels.iv.model.IVGMM` and
+    :class:`~linearmodels.iv.model.IVGMMCUE` changed in linearmodels 7.1. When
+    neither ``bandwidth`` nor ``optimal_bw`` is given, the bandwidth is now
+    estimated from the data. Earlier versions used ``nobs - 2``, which is not a
+    consistent estimator of the covariance. The estimates, standard errors and
+    J statistic can differ from those of earlier versions.
+
+    The warning is a ``UserWarning``, so it is shown by default. It is issued
+    once by each call to ``fit`` that uses the new default for the weight
+    matrix (``weight_type="kernel"``) or for the parameter covariance
+    (``cov_type="kernel"``), and once by a
+    :class:`~linearmodels.iv.gmm.KernelWeightMatrix` or
+    :class:`~linearmodels.iv.gmm.IVGMMCovariance` that is used directly.
+
+    Pass ``optimal_bw=False`` or ``bandwidth=nobs - 2`` to restore the
+    previous bandwidth. Passing ``bandwidth`` or ``optimal_bw`` silences the
+    warning, and ``optimal_bw=True`` keeps the new default.
+    """
+
+
 def missing_warning(missing: BoolArray, stacklevel: int = 4) -> None:
     """Utility function to perform missing value check and warning"""
     if not np.any(missing):
@@ -43,6 +70,7 @@ def missing_warning(missing: BoolArray, stacklevel: int = 4) -> None:
 
 
 __all__ = [
+    "DefaultBandwidthWarning",
     "IndexWarning",
     "InferenceUnavailableWarning",
     "MemoryWarning",

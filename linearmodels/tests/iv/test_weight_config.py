@@ -42,8 +42,9 @@ CONFIGS = [
         {"bandwidth": 3, "kernel": "parzen"},
         {"bandwidth": 3, "kernel": "parzen"},
     ),
-    # The default bandwidth is nobs - 2
-    ("kernel", {}, {"bandwidth": NOBS - 2, "kernel": "bartlett"}),
+    # The default bandwidth was nobs - 2 before 7.1. It is estimated from the
+    # data now, which is tested in test_gmm_kernel_bandwidth.py
+    ("kernel", {"optimal_bw": False}, {"bandwidth": NOBS - 2, "kernel": "bartlett"}),
     ("clustered", {"clusters": CLUSTERS}, {"clusters": CLUSTERS}),
 ]
 MODELS = [IVGMM, IVGMMCUE]

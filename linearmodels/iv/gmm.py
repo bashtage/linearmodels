@@ -4,7 +4,9 @@ Covariance and weight estimation for GMM IV estimators
 
 from __future__ import annotations
 
+from collections.abc import Mapping
 from typing import Any
+import warnings
 
 from numpy import asarray, ndarray, unique
 from numpy.linalg import inv
@@ -15,7 +17,61 @@ from linearmodels.iv.covariance import (
     kernel_optimal_bandwidth,
 )
 from linearmodels.shared.covariance import cov_cluster, cov_kernel
+from linearmodels.shared.exceptions import DefaultBandwidthWarning
 import linearmodels.typing.data
+
+
+def _uses_default_bandwidth(config: Mapping[str, Any]) -> bool:
+    """Whether neither bandwidth nor optimal_bw selects the kernel bandwidth"""
+    return config.get("bandwidth") is None and config.get("optimal_bw") is None
+
+
+def _default_bandwidth_message(*, weights: bool, covariance: bool) -> str:
+    """Message of the warning that the default bandwidth changed in 7.1"""
+    used, restore = [], []
+    if weights:
+        used.append('the weight matrix (weight_type="kernel")')
+        restore.append(
+            "in the weight configuration for the weight matrix, for example "
+            'IVGMM(dependent, exog, endog, instruments, weight_type="kernel", '
+            "optimal_bw=False)"
+        )
+    if covariance:
+        used.append('the parameter covariance (cov_type="kernel")')
+        restore.append(
+            "to fit for the covariance, for example "
+            'fit(cov_type="kernel", optimal_bw=False)'
+        )
+    results = (
+        "estimates, standard errors and J statistic" if weights else "standard errors"
+    )
+    return (
+        "The default bandwidth of the kernel estimators of the covariance of the "
+        "moment conditions changed in linearmodels 7.1. Neither bandwidth nor "
+        f"optimal_bw was given, so the bandwidth of {' and '.join(used)} is "
+        "estimated from the data. In 7.0 and earlier it was nobs - 2, which is not "
+        f"a consistent estimator, so the {results} can differ from those of "
+        "earlier versions. To restore the previous behavior, pass optimal_bw=False "
+        "(or bandwidth=nobs - 2, where nobs is the number of observations used in "
+        f"the estimation) {', and '.join(restore)}. Passing bandwidth or "
+        "optimal_bw silences this warning, and optimal_bw=True selects the "
+        "bandwidth from the data without a warning."
+    )
+
+
+def _warn_default_bandwidth(
+    *, weights: bool, covariance: bool, stacklevel: int
+) -> None:
+    """
+    Warn that a kernel estimator uses the bandwidth selected by default
+
+    The default bandwidth was nobs - 2 before linearmodels 7.1.
+    """
+    warnings.warn(
+        _default_bandwidth_message(weights=weights, covariance=covariance),
+        DefaultBandwidthWarning,
+        stacklevel=stacklevel,
+    )
 
 
 class HomoskedasticWeightMatrix:
@@ -154,18 +210,24 @@ class KernelWeightMatrix(HomoskedasticWeightMatrix):
 
     Parameters
     ----------
-    kernel : str
-        Name of kernel weighting function to use
-    bandwidth : {int, None}
-        Bandwidth to use when computing kernel weights
-    center : bool
+    kernel : str, optional
+        Name of kernel weighting function to use. The default is "bartlett".
+    bandwidth : int, optional
+        Bandwidth to use when computing kernel weights. If not provided, the
+        bandwidth is selected by ``optimal_bw``.
+    center : bool, optional
         Flag indicating whether to center the moment conditions by subtracting
-        the mean before computing the weight matrix.
-    debiased : bool
-        Flag indicating whether to use small-sample adjustments
-    optimal_bw : bool
-        Flag indicating whether to estimate the optimal bandwidth, when
-        bandwidth is None.  If False, nobs - 2 is used
+        the mean before computing the weight matrix. The default is False.
+    debiased : bool, optional
+        Flag indicating whether to use small-sample adjustments. The default
+        is False.
+    optimal_bw : bool, optional
+        Flag indicating whether to estimate the bandwidth from the data when
+        ``bandwidth`` is not provided. If False, nobs - 2 is used. If True,
+        the bandwidth is estimated using
+        :func:`~linearmodels.iv.covariance.kernel_optimal_bandwidth`. The
+        default also estimates the bandwidth, but it issues a
+        ``DefaultBandwidthWarning`` since it changed in 7.1.
 
     Notes
     -----
@@ -184,6 +246,15 @@ class KernelWeightMatrix(HomoskedasticWeightMatrix):
     where :math:`k(j)` is the kernel weight for lag j and :math:`z_i`
     contains both the exogenous regressors and instruments..
 
+    If neither ``bandwidth`` nor ``optimal_bw`` is given, the bandwidth is
+    estimated from the data every time that the weight matrix is computed.
+    In 7.0 and earlier the default was ``nobs - 2``, which is not a consistent
+    estimator of the covariance of the moment conditions. Using the default
+    issues a ``DefaultBandwidthWarning`` (a ``UserWarning``), once for each
+    instance. The previous behavior is restored by ``optimal_bw=False`` or by
+    ``bandwidth=nobs - 2``. Passing ``bandwidth`` or ``optimal_bw`` silences the
+    warning, and ``optimal_bw=True`` selects the new default without it.
+
     See Also
     --------
     linearmodels.iv.covariance.kernel_weight_bartlett,
@@ -197,14 +268,18 @@ class KernelWeightMatrix(HomoskedasticWeightMatrix):
         bandwidth: int | None = None,
         center: bool = False,
         debiased: bool = False,
-        optimal_bw: bool = False,
+        optimal_bw: bool | None = None,
     ) -> None:
         super().__init__(center, debiased)
         self._bandwidth = bandwidth
         self._orig_bandwidth = bandwidth
         self._kernel = kernel
         self._kernels = KERNEL_LOOKUP
-        self._optimal_bw = optimal_bw
+        # Selecting the bandwidth from the data is the default since 7.1, and it
+        # warns since the default was nobs - 2
+        self._default_bandwidth = bandwidth is None and optimal_bw is None
+        self._optimal_bw = True if optimal_bw is None else optimal_bw
+        self._warned = False
 
     def weight_matrix(
         self,
@@ -233,6 +308,10 @@ class KernelWeightMatrix(HomoskedasticWeightMatrix):
         ze -= mu
 
         if self._orig_bandwidth is None and self._optimal_bw:
+            if self._default_bandwidth and not self._warned:
+                # Once for each instance, and not for each call
+                self._warned = True
+                _warn_default_bandwidth(weights=True, covariance=False, stacklevel=3)
             g = ze / ze.std(0)[None, :]
             g = g.sum(1)
             self._bandwidth = kernel_optimal_bandwidth(g, self._kernel)
@@ -396,7 +475,20 @@ class IVGMMCovariance(HomoskedasticCovariance):
       :class:`~linearmodels.iv.covariance.KernelCovariance` for details on
       available kernels
     * ``bandwidth``: Bandwidth to use when computing the weight.  If not
-      provided, nobs - 2 is used.
+      provided, it is selected by ``optimal_bw``.
+    * ``optimal_bw``: Flag indicating whether to estimate the bandwidth from
+      the data when ``bandwidth`` is not provided. If False, nobs - 2 is used.
+      If True, the bandwidth is estimated using
+      :func:`~linearmodels.iv.covariance.kernel_optimal_bandwidth`.
+
+    If neither ``bandwidth`` nor ``optimal_bw`` is given, the bandwidth is
+    estimated from the data. In 7.0 and earlier the default was ``nobs - 2``,
+    which is not a consistent estimator of the covariance of the moment
+    conditions. Using the default issues a ``DefaultBandwidthWarning`` (a
+    ``UserWarning``). The previous behavior is restored by ``optimal_bw=False``
+    or by ``bandwidth=nobs - 2``. Passing ``bandwidth`` or ``optimal_bw``
+    silences the warning, and ``optimal_bw=True`` selects the new default
+    without it.
 
     **cluster**
 
@@ -471,9 +563,12 @@ class IVGMMCovariance(HomoskedasticCovariance):
         xpzw = xpz @ w
         xpzwzpx_inv = inv(xpzw @ xpz.T)
 
-        score_cov = self._score_cov_estimator(
-            debiased=self.debiased, **self._cov_config
-        )
+        cov_config = self._cov_config
+        if self._cov_type == "kernel" and _uses_default_bandwidth(cov_config):
+            # The warning is for the covariance, and not for the weight estimator
+            _warn_default_bandwidth(weights=False, covariance=True, stacklevel=3)
+            cov_config = {**cov_config, "optimal_bw": True}
+        score_cov = self._score_cov_estimator(debiased=self.debiased, **cov_config)
         s = score_cov.weight_matrix(x, z, eps)
         self._cov_config = score_cov.config
 

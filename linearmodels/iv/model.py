@@ -52,6 +52,8 @@ from linearmodels.iv.gmm import (
     IVGMMCovariance,
     KernelWeightMatrix,
     OneWayClusteredWeightMatrix,
+    _uses_default_bandwidth,
+    _warn_default_bandwidth,
 )
 from linearmodels.iv.results import IVGMMResults, IVResults, OLSResults
 from linearmodels.shared.alignment import check_alignment, row_labels
@@ -1072,12 +1074,50 @@ class _IVGMMBase(_IVModelBase):
 
         self._check_clusters(weight_config)
         weight_matrix_estimator = WEIGHT_MATRICES[weight_type]
+        # Kernel weights without a bandwidth select it from the data. fit warns
+        # about the change of this default, and makes the choice explicit so that
+        # the weight estimators and models that are created from the arguments
+        # do not warn as well
+        self._default_weight_bandwidth = (
+            weight_matrix_estimator is KernelWeightMatrix
+            and _uses_default_bandwidth(weight_config)
+        )
+        if self._default_weight_bandwidth:
+            weight_config = {**weight_config, "optimal_bw": True}
         self._weight = weight_matrix_estimator(**weight_config)
         self._weight_type = weight_type
         self._weight_config = self._weight.config
         # The arguments needed to create another weight estimator of this
         # type. config does not contain all of them, e.g., optimal_bw
         self._weight_kwargs = dict(weight_config)
+
+    def _check_default_bandwidth(
+        self, cov_type: str, cov_config: dict[str, Any]
+    ) -> dict[str, Any]:
+        """
+        Warn once if a kernel estimator in a fit uses the default bandwidth
+
+        The default of the bandwidth of the kernel weight matrix and of the
+        kernel covariance is to estimate it from the data since 7.1. It was
+        nobs - 2 before.
+
+        Returns
+        -------
+        dict
+            The covariance configuration. If the covariance uses the default
+            bandwidth, ``optimal_bw`` is set so that the covariance estimator
+            that is created from the configuration does not warn again.
+        """
+        covariance = cov_type == "kernel" and _uses_default_bandwidth(cov_config)
+        weights = self._default_weight_bandwidth
+        if weights or covariance:
+            # Warn at the call to fit, which is above this method and fit
+            _warn_default_bandwidth(
+                weights=weights, covariance=covariance, stacklevel=4
+            )
+        if covariance:
+            cov_config = {**cov_config, "optimal_bw": True}
+        return cov_config
 
     def _gmm_post_estimation(
         self,
@@ -1197,6 +1237,23 @@ class IVGMM(_IVGMMBase):
 
     where :math:`W` is a positive definite weight matrix and :math:`Z`
     contains both the exogenous regressors and the instruments.
+
+    The bandwidth of a kernel weight matrix (``weight_type="kernel"``) is
+    ``bandwidth`` if it is given in ``weight_config``. If neither ``bandwidth``
+    nor ``optimal_bw`` is given, it is estimated from the data, as the
+    bandwidth of the kernel covariance of :class:`~linearmodels.iv.model.IV2SLS`
+    and :class:`~linearmodels.iv.model.IVLIML` is. In 7.0 and earlier it was
+    ``nobs - 2``, which is not a consistent estimator, so the estimates,
+    standard errors and J statistic can be different. ``fit`` issues a
+    ``DefaultBandwidthWarning`` (a ``UserWarning``) when it uses the default.
+    To restore the previous behavior, pass ``optimal_bw=False`` or
+    ``bandwidth=nobs - 2`` in ``weight_config``, for example
+    ``IVGMM(dependent, exog, endog, instruments, weight_type="kernel",
+    optimal_bw=False)``. Passing ``bandwidth`` or ``optimal_bw`` silences the
+    warning, and ``optimal_bw=True`` selects the bandwidth from the data
+    without it. The same holds for ``cov_type="kernel"`` in ``fit``. See
+    :class:`~linearmodels.iv.gmm.KernelWeightMatrix` and
+    :class:`~linearmodels.iv.gmm.IVGMMCovariance`.
 
     Rows are paired by position. An input that carries labels (a pandas
     Series or DataFrame with an index other than the default 0, 1, ..., n-1,
@@ -1384,11 +1441,25 @@ class IVGMM(_IVGMMBase):
         IVGMMResults
             Results container
 
-        See also
+        See Also
         --------
         linearmodels.iv.gmm.IVGMMCovariance
+
+        Notes
+        -----
+        If ``cov_type`` is "kernel" and neither ``bandwidth`` nor
+        ``optimal_bw`` is in ``cov_config``, the bandwidth of the covariance
+        is estimated from the data. In 7.0 and earlier it was ``nobs - 2``.
+        ``fit`` issues a ``DefaultBandwidthWarning`` (a ``UserWarning``) once
+        for each call when the covariance, or the kernel weight matrix of the
+        model, uses the default bandwidth. To restore the previous covariance,
+        pass ``optimal_bw=False`` or ``bandwidth=nobs - 2`` in ``cov_config``,
+        for example ``fit(cov_type="kernel", optimal_bw=False)``. Passing
+        ``bandwidth`` or ``optimal_bw`` silences the warning, and
+        ``optimal_bw=True`` selects the bandwidth from the data without it.
         """
         self._check_clusters(cov_config)
+        cov_config = self._check_default_bandwidth(cov_type, cov_config)
         wy, wx, wz = self._wy, self._wx, self._wz
         nobs = wy.shape[0]
         weight_matrix = self._weight.weight_matrix
@@ -1492,6 +1563,24 @@ class IVGMMCUE(_IVGMMBase):
 
     where :math:`W(\beta)` is a weight matrix that depends on :math:`\beta`
     through :math:`\epsilon_i = y_i - x_i\beta`.
+
+    The bandwidth of a kernel weight matrix (``weight_type="kernel"``) is
+    ``bandwidth`` if it is given in ``weight_config``. If neither ``bandwidth``
+    nor ``optimal_bw`` is given, it is estimated from the data at every
+    evaluation of the objective function, as the bandwidth of the kernel
+    covariance of :class:`~linearmodels.iv.model.IV2SLS` and
+    :class:`~linearmodels.iv.model.IVLIML` is. In 7.0 and earlier it was
+    ``nobs - 2``, which is not a consistent estimator, so the estimates,
+    standard errors and J statistic can be different. ``fit`` issues a
+    ``DefaultBandwidthWarning`` (a ``UserWarning``) when it uses the default.
+    To restore the previous behavior, pass ``optimal_bw=False`` or
+    ``bandwidth=nobs - 2`` in ``weight_config``, for example
+    ``IVGMMCUE(dependent, exog, endog, instruments, weight_type="kernel",
+    optimal_bw=False)``. Passing ``bandwidth`` or ``optimal_bw`` silences the
+    warning, and ``optimal_bw=True`` selects the bandwidth from the data
+    without it. The same holds for ``cov_type="kernel"`` in ``fit``. See
+    :class:`~linearmodels.iv.gmm.KernelWeightMatrix` and
+    :class:`~linearmodels.iv.gmm.IVGMMCovariance`.
 
     Rows are paired by position. An input that carries labels (a pandas
     Series or DataFrame with an index other than the default 0, 1, ..., n-1,
@@ -1761,15 +1850,27 @@ class IVGMMCUE(_IVGMMBase):
         IVGMMResults
             Results container
 
+        See Also
+        --------
+        linearmodels.iv.gmm.IVGMMCovariance
+
         Notes
         -----
         Starting values are computed by IVGMM.
 
-        See also
-        --------
-        linearmodels.iv.gmm.IVGMMCovariance
+        If ``cov_type`` is "kernel" and neither ``bandwidth`` nor
+        ``optimal_bw`` is in ``cov_config``, the bandwidth of the covariance
+        is estimated from the data. In 7.0 and earlier it was ``nobs - 2``.
+        ``fit`` issues a ``DefaultBandwidthWarning`` (a ``UserWarning``) once
+        for each call when the covariance, or the kernel weight matrix of the
+        model, uses the default bandwidth. To restore the previous covariance,
+        pass ``optimal_bw=False`` or ``bandwidth=nobs - 2`` in ``cov_config``,
+        for example ``fit(cov_type="kernel", optimal_bw=False)``. Passing
+        ``bandwidth`` or ``optimal_bw`` silences the warning, and
+        ``optimal_bw=True`` selects the bandwidth from the data without it.
         """
         self._check_clusters(cov_config)
+        cov_config = self._check_default_bandwidth(cov_type, cov_config)
         wy, wx, wz = self._wy, self._wx, self._wz
         weight_matrix = self._weight.weight_matrix
         if starting is None:
@@ -1777,6 +1878,13 @@ class IVGMMCUE(_IVGMMBase):
             endog = None if self.endog.shape[1] == 0 else self.endog
             instr = None if self.instruments.shape[1] == 0 else self.instruments
 
+            weight_config = dict(self._weight_config)
+            if self._weight_type == "kernel":
+                # The bandwidth of the starting values is the one that was given,
+                # and nobs - 2 if none was, as it has always been. optimal_bw
+                # selects the bandwidth of the objective only. Being explicit
+                # keeps the new default from being used, and from warning
+                weight_config["optimal_bw"] = False
             res = IVGMM(
                 self.dependent,
                 exog,
@@ -1784,7 +1892,7 @@ class IVGMMCUE(_IVGMMBase):
                 instr,
                 weights=self.weights,
                 weight_type=self._weight_type,
-                **self._weight_config,
+                **weight_config,
             ).fit()
             starting = asarray(res.params)
         else:
@@ -1979,8 +2087,10 @@ class _JIVECovariance(IVGMMCovariance):
             if kernel not in KERNEL_LOOKUP:
                 raise ValueError(f"Unknown kernel: {kernel}")
             # Select the bandwidth using the data unless it is given, as in
-            # IV2SLS and IVLIML. The default of the weight matrix estimator is
-            # nobs - 2, which is not a consistent covariance estimator
+            # IV2SLS and IVLIML. This is the default of the weight matrix
+            # estimator since 7.1, and it is explicit here so that it does not
+            # warn about the change. The default was nobs - 2 before, which is
+            # not a consistent covariance estimator
             cov_config = {"optimal_bw": True, **cov_config}
         elif cov_type == "clustered":
             clusters = cov_config.get("clusters")
