@@ -61,7 +61,7 @@ def test_exog_only_and_with_exog_are_unchanged(data):
     assert only_exog.fit().params.shape[0] == NDEP * exog.shape[1]
     full = IV3SLS.multivariate_iv(dependent, exog, endog, instruments).fit()
     assert full.params.shape[0] == NDEP * (exog.shape[1] + endog.shape[1])
-    # exog and endog without instruments: nothing identifies the endogenous variables
+    # endog without instruments: nothing identifies the endogenous variables
     with pytest.raises(ValueError, match=r"endogenous variables"):
         IV3SLS.multivariate_iv(dependent, endog=endog)
 
