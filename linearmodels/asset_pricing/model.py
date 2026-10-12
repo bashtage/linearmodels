@@ -136,9 +136,20 @@ class _FactorModelBase:
                 "equivalent and must not have rank\n"
                 "less than the dimension of the smaller shape."
             )
-        if has_constant(f)[0]:
+        rank = np.linalg.matrix_rank(f)
+        constant = has_constant(f, rank)[0]
+        if constant and rank < f.shape[1]:
+            # has_constant is also True if the columns are collinear. Collinear
+            # factors have a constant if a column is constant, or, for a matrix
+            # with more rows than columns, if a constant is in the span of the
+            # columns
+            nobs = f.shape[0]
+            aug_rank = np.linalg.matrix_rank(np.c_[np.ones((nobs, 1)), f])
+            constant_column = np.any((np.ptp(f, axis=0) == 0) & ~np.all(f == 0, axis=0))
+            constant = bool(constant_column or (nobs > f.shape[1] and aug_rank == rank))
+        if constant:
             raise ValueError("factors must not contain a constant or equivalent.")
-        if np.linalg.matrix_rank(f) < f.shape[1]:
+        if rank < f.shape[1]:
             raise ValueError(
                 "Model cannot be estimated. factors do not have full column rank."
             )
