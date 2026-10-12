@@ -26,6 +26,7 @@ from linearmodels.iv.gmm import (
     KernelWeightMatrix,
     OneWayClusteredWeightMatrix,
 )
+from linearmodels.shared.exceptions import unknown_option_error
 from linearmodels.shared.hypotheses import InvalidTestStatistic, WaldTestStatistic
 import linearmodels.typing.data
 
@@ -54,7 +55,8 @@ def _cov_family(cov_type: str) -> str:
     for family, aliases in _COV_FAMILIES.items():
         if name in aliases:
             return family
-    raise ValueError(f"Unsupported cov_type: {cov_type}")
+    supported = [alias for aliases in _COV_FAMILIES.values() for alias in aliases]
+    raise unknown_option_error("cov_type", cov_type, supported)
 
 
 def find_constant(x: linearmodels.typing.data.Float64Array) -> int | None:

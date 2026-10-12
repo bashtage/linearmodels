@@ -468,9 +468,9 @@ def test_names():
 
 def test_unsupported_cov_type():
     x, z, exog = random_design(108)
-    with pytest.raises(ValueError, match="Unsupported cov_type"):
+    with pytest.raises(ValueError, match="Unknown cov_type"):
         kleibergen_paap(x, z, exog, "unknown")
-    with pytest.raises(ValueError, match="Unsupported cov_type"):
+    with pytest.raises(ValueError, match="Unknown cov_type"):
         kleibergen_paap_f(x, z, exog, "unknown")
 
 

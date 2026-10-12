@@ -15,6 +15,7 @@ from linearmodels.iv.covariance import (
     kernel_optimal_bandwidth,
 )
 from linearmodels.shared.covariance import cluster_union, group_debias_coefficient
+from linearmodels.shared.exceptions import lookup_option, unknown_option_error
 from linearmodels.shared.typed_getters import (
     get_array_like,
     get_bool,
@@ -444,7 +445,7 @@ class DriscollKraay(HomoskedasticCovariance):
         if self._bandwidth is None:
             bw = float(np.floor(4 * (xe_nobs / 100) ** (2 / 9)))
         assert bw is not None
-        w = KERNEL_LOOKUP[self._kernel](bw, xe_nobs - 1)
+        w = lookup_option(KERNEL_LOOKUP, self._kernel, "kernel")(bw, xe_nobs - 1)
         xeex = cov_kernel(np.asarray(xe_df), w) * (xe_nobs / nobs)
         xeex *= self._scale
 
@@ -548,7 +549,7 @@ class ACCovariance(HomoskedasticCovariance):
         self, xe: linearmodels.typing.data.Float64Array, bw: float
     ) -> linearmodels.typing.data.Float64Array:
         nobs = xe.shape[0]
-        w = KERNEL_LOOKUP[self._kernel](bw, nobs - 1)
+        w = lookup_option(KERNEL_LOOKUP, self._kernel, "kernel")(bw, nobs - 1)
         return cov_kernel(xe, w)
 
     @cached_property
@@ -625,14 +626,21 @@ class CovarianceManager:
         self._supported = cov_estimators
 
     def __getitem__(self, item: str) -> CovarianceEstimatorType:
+        # The names that the model supports, not all of the names that are known
+        supported = [
+            name
+            for name, estimator in self.COVARIANCE_ESTIMATORS.items()
+            if estimator in self._supported
+        ]
         if item not in self.COVARIANCE_ESTIMATORS:
-            raise KeyError("Unknown covariance estimator type.")
+            raise unknown_option_error("cov_type", item, supported)
         cov_est = self.COVARIANCE_ESTIMATORS[item]
         if cov_est not in self._supported:
-            raise ValueError(
+            problem = (
                 "Requested covariance estimator is not supported "
                 "for the {}.".format(self._estimator)
             )
+            raise unknown_option_error("cov_type", item, supported, problem=problem)
         return cov_est
 
 
@@ -705,7 +713,7 @@ class FamaMacBethCovariance(HomoskedasticCovariance):
 
         bw = self.bandwidth
         assert self._kernel is not None
-        w = KERNEL_LOOKUP[self._kernel](bw, nobs - 1)
+        w = lookup_option(KERNEL_LOOKUP, self._kernel, "kernel")(bw, nobs - 1)
         cov = cov_kernel(e, w)
         return cov / (nobs - int(bool(self._debiased)))
 

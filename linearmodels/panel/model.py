@@ -53,6 +53,7 @@ from linearmodels.shared.exceptions import (
     MissingValueWarning,
     SingletonWarning,
     missing_warning,
+    unknown_option_error,
 )
 from linearmodels.shared.hypotheses import (
     InapplicableTestStatistic,
@@ -3338,7 +3339,14 @@ class FamaMacBeth(_PanelModelBase):
             "heteroskedastic",
             "kernel",
         ):
-            raise ValueError("Unknown cov_type")
+            supported = (
+                "heteroskedastic",
+                "homoskedastic",
+                "kernel",
+                "robust",
+                "unadjusted",
+            )
+            raise unknown_option_error("cov_type", cov_type, supported)
 
         bandwidth = 0.0 if cov_type != "kernel" else bandwidth
         cov = FamaMacBethCovariance(

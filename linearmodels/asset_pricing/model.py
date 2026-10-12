@@ -26,12 +26,15 @@ from linearmodels.asset_pricing.results import (
 )
 from linearmodels.iv.data import IVData, IVDataLike
 from linearmodels.shared.alignment import check_alignment, row_labels
-from linearmodels.shared.exceptions import missing_warning
+from linearmodels.shared.exceptions import missing_warning, unknown_option_error
 from linearmodels.shared.hypotheses import WaldTestStatistic
 from linearmodels.shared.linalg import has_constant
 from linearmodels.shared.typed_getters import get_float, get_string
 from linearmodels.shared.utility import AttrDict
 import linearmodels.typing.data
+
+# The names of the covariance estimators of the models
+COV_TYPES = ("heteroskedastic", "kernel", "robust")
 
 
 def callback_factory(
@@ -378,7 +381,7 @@ class TradedFactorModel(_FactorModelBase):
                 kernel=kernel,
             )
         else:
-            raise ValueError(f"Unknown cov_type: {cov_type}")
+            raise unknown_option_error("cov_type", cov_type, COV_TYPES)
         full_vcv = cov_est.cov
         rp_cov = rp_cov_est.cov
         vcv = full_vcv[:nloading, :nloading]
@@ -681,8 +684,8 @@ class LinearFactorModel(_LinearFactorModelBase):
         # Jacobian
         jacobian = self._jacobian(betas, lam, alphas)
 
-        if cov_type not in ("robust", "heteroskedastic", "kernel"):
-            raise ValueError(f"Unknown weight: {cov_type}")
+        if cov_type not in COV_TYPES:
+            raise unknown_option_error("cov_type", cov_type, COV_TYPES)
         if cov_type in ("robust", "heteroskedastic"):
             cov_est_inst = HeteroskedasticCovariance(
                 moments,
@@ -1024,8 +1027,8 @@ class LinearFactorModelGMM(_LinearFactorModelBase):
         g -= g.mean(0)[None, :] if center else 0
         kernel: str | None = None
         bandwidth: float | None = None
-        if cov_type not in ("robust", "heteroskedastic", "kernel"):
-            raise ValueError(f"Unknown weight: {cov_type}")
+        if cov_type not in COV_TYPES:
+            raise unknown_option_error("cov_type", cov_type, COV_TYPES)
         if cov_type in ("robust", "heteroskedastic"):
             weight_est_instance = HeteroskedasticWeight(g, center=center)
             cov_est = HeteroskedasticCovariance

@@ -198,10 +198,10 @@ def test_drop_missing(data):
 
 def test_unknown_kernel(data):
     mod = LinearFactorModel(data.portfolios, data.factors)
-    with pytest.raises(ValueError, match=r"Unknown weight"):
+    with pytest.raises(ValueError, match=r"Unknown cov_type"):
         mod.fit(cov_type="unknown")
     mod = LinearFactorModelGMM(data.portfolios, data.factors)
-    with pytest.raises(ValueError, match=r"Unknown weight"):
+    with pytest.raises(ValueError, match=r"Unknown cov_type"):
         mod.fit(cov_type="unknown")
 
 
