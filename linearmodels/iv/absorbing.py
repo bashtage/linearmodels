@@ -768,6 +768,15 @@ class AbsorbingLS:
     estimates a particular restricted set of parameters that captures the
     effect of non-redundant components in z.
 
+    A variable in ``exog`` is absorbed if the effects explain all of it. The
+    algorithms that absorb the effects stop with a relative error of about
+    1e-8, so a variable is treated as absorbed if less than 1e-5 of its norm
+    is left after the effects are removed, whatever its units. It is treated
+    in the same way if it is collinear with the variables before it once the
+    effects are removed. An ``AbsorbingEffectError`` is raised for such a
+    variable. If ``drop_absorbed`` is True, the variable is dropped and an
+    ``AbsorbingEffectWarning`` is raised, and the constant is never dropped.
+
     Rows are paired by position. An input that carries labels (a pandas
     Series or DataFrame with an index other than the default 0, 1, ..., n-1,
     or an xarray DataArray with coordinates) must use the same index, in the
@@ -1113,7 +1122,9 @@ class AbsorbingLS:
             check_absorbed(exog_resid, self.exog.cols, exog)
         else:
             ncol = exog_resid.shape[1]
-            retain = not_absorbed(exog_resid)
+            retain = not_absorbed(
+                exog_resid, self._constant_absorbed, self._const_col, exog
+            )
             if not retain:
                 raise ValueError(
                     "All columns in exog have been fully absorbed by the "
