@@ -3,9 +3,8 @@ Change Log
 
 .. include:: changes/7.0.rst
 
-=============
 Past Releases
-=============
+-------------
 
 .. toctree::
    :maxdepth: 1
