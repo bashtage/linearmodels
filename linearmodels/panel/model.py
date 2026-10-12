@@ -147,6 +147,46 @@ def _deferred_f(
     return wald
 
 
+def _hotelling_f(
+    params: Series,
+    cov: DataFrame,
+    debiased: bool,
+    nperiod: int,
+    f_info: FInfo,
+) -> InvalidTestStatistic | WaldTestStatistic:
+    """
+    Robust Wald test of FamaMacBeth, with Hotelling's T-squared reference
+
+    The parameters are the average of nperiod estimates. If debiased, the Wald
+    statistic W is multiplied by (nperiod - df) / (df * (nperiod - 1)) and
+    compared with an F(df, nperiod - df) distribution. This is Hotelling's
+    T-squared test, which is exact when the estimates are independent and normal
+    and the covariance is the covariance of their average. If not debiased the
+    statistic is W, and the distribution is chi2(df).
+    """
+    if f_info.is_invalid:
+        assert f_info.invalid_test_stat is not None
+        return f_info.invalid_test_stat
+    sel = f_info.sel
+    name = f_info.name
+    df = int(sel.sum())
+    null = "All parameters ex. constant are zero"
+    if debiased and nperiod <= df:
+        reason = (
+            f"The test needs more periods than tested parameters. The {df} tested "
+            f"parameters are the averages of the estimates of {nperiod} periods, "
+            f"so that their covariance has rank at most {nperiod - 1}."
+        )
+        return InvalidTestStatistic(reason, name=name)
+    test_params = np.asarray(params)[sel]
+    test_cov = np.asarray(cov)[sel][:, sel]
+    wald_stat = float(test_params.T @ np.linalg.inv(test_cov) @ test_params)
+    if not debiased:
+        return WaldTestStatistic(wald_stat, null, df, name=name)
+    scale = (nperiod - df) / (df * (nperiod - 1))
+    return WaldTestStatistic(scale * wald_stat, null, df, nperiod - df, name=name)
+
+
 class PanelFormulaParser:
     """
     Parse formulas for OLS and IV models
@@ -3165,11 +3205,28 @@ class FamaMacBeth(_PanelModelBase):
     distribution if ``debiased`` is True, which is the default, and the normal
     distribution otherwise.
 
+    The joint test that the k parameters other than the constant are zero,
+    ``f_statistic_robust`` of the results, is Hotelling's :math:`T^2` test
+    [2]_. The Wald statistic W of the k parameters is multiplied by
+    (T - k) / (k (T - 1)) and compared with an F distribution with k and T - k
+    degrees of freedom if ``debiased`` is True, and W is compared with a
+    chi-squared distribution with k degrees of freedom otherwise. The F test is
+    exact if the T estimates are independent draws from the same normal
+    distribution and ``cov_type`` is not "kernel". With the kernel covariance
+    it is an approximation. With one tested parameter it is the squared
+    t-statistic, with the p-value of the t distribution with T - 1 degrees of
+    freedom. An F distribution with k and T - 1 degrees of freedom, or with
+    the degrees of freedom of the pooled regression, rejects a true null
+    hypothesis too often when k is larger than 1, see
+    :attr:`~linearmodels.panel.results.FamaMacBethResults.f_statistic_robust`.
+
     References
     ----------
     .. [1] Fama, E. F. and MacBeth, J. D. (1973). Risk, return, and
        equilibrium: Empirical tests. Journal of Political Economy, 81(3),
        607-636.
+    .. [2] Hotelling, H. (1931). The generalization of Student's ratio.
+       The Annals of Mathematical Statistics, 2(3), 360-378.
     """
 
     def __init__(
@@ -3296,12 +3353,24 @@ class FamaMacBeth(_PanelModelBase):
         use the normal distribution. The estimates and the standard errors
         do not depend on the distribution.
 
+        The joint test of the parameters other than the constant,
+        ``f_statistic_robust`` of the results, is Hotelling's :math:`T^2` test.
+        If ``debiased`` is True, the Wald statistic of the k tested parameters
+        is multiplied by (T - k) / (k (T - 1)), and the p-value is computed from
+        an F distribution with k and T - k degrees of freedom. If ``debiased``
+        is False, the statistic is compared with a chi-squared distribution with
+        k degrees of freedom. See
+        :attr:`~linearmodels.panel.results.FamaMacBethResults.f_statistic_robust`.
+
         .. versionchanged:: 7.1
 
            The p-values and confidence intervals use T - 1 degrees of freedom.
            Earlier versions used nobs - nvar degrees of freedom, those of a
            pooled regression, which is close to the normal distribution when
-           there are many observations.
+           there are many observations. ``f_statistic_robust`` uses Hotelling's
+           reference. Earlier versions divided the Wald statistic by k and used
+           an F distribution with k and nobs - nvar degrees of freedom, which
+           rejects a true null hypothesis too often when k is larger than 1.
         """
         y = cast("linearmodels.typing.data.Float64Array", self._y)
         x = cast("linearmodels.typing.data.Float64Array", self._x)

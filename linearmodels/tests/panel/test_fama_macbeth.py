@@ -10,18 +10,27 @@ import pytest
 from scipy import stats
 from statsmodels.regression.linear_model import OLS
 
+from linearmodels.panel import model as panel_model
 from linearmodels.panel.data import PanelData
 from linearmodels.panel.model import FamaMacBeth
 from linearmodels.shared.exceptions import (
     InferenceUnavailableWarning,
     MissingValueWarning,
 )
+from linearmodels.shared.hypotheses import InvalidTestStatistic
+from linearmodels.shared.io import pval_format
 from linearmodels.tests.panel._utility import (
     access_attributes,
     assert_frame_similar,
     datatypes,
     generate_data,
 )
+
+try:
+    # Not named test_mvmean, which pytest would collect as a test
+    from statsmodels.stats.multivariate import test_mvmean as hotelling_test
+except ImportError:  # pragma: no cover
+    hotelling_test = None
 
 pytestmark = pytest.mark.filterwarnings(
     "ignore::linearmodels.shared.exceptions.MissingValueWarning"
@@ -397,20 +406,107 @@ def test_estimates_and_standard_errors_are_those_of_the_estimates():
     assert_allclose(not_debiased.std_errors, debiased.std_errors * np.sqrt(9 / 10))
 
 
+def hotelling_by_hand(estimates, *, bandwidth=0, debiased=True):
+    """
+    Wald statistic of the slopes, Hotelling's F and its p-value, from the T estimates
+
+    The first column of the estimates is the constant, and the tested parameters
+    are the others. With the covariance of the average of the estimates, the Wald
+    statistic is T times the Hotelling's T-squared of the slopes if debiased, and
+    F = (T - k) / (k (T - 1)) W has an F distribution with k and T - k degrees of
+    freedom. If not debiased the distribution of W is chi-squared with k degrees
+    of freedom
+    """
+    nperiod, nslope = estimates.shape[0], estimates.shape[1] - 1
+    params, cov, _, _ = by_hand(estimates, debiased=debiased, bandwidth=bandwidth)
+    slopes, slope_cov = params[1:], cov[1:, 1:]
+    wald = float(slopes @ np.linalg.solve(slope_cov, slopes))
+    if not debiased:
+        return wald, wald, stats.chi2(nslope).sf(wald)
+    stat = (nperiod - nslope) / (nslope * (nperiod - 1)) * wald
+    return wald, stat, stats.f(nslope, nperiod - nslope).sf(stat)
+
+
+@pytest.mark.parametrize(
+    ("cov_type", "bandwidth"),
+    [("unadjusted", None), ("robust", None), ("kernel", 0), ("kernel", 2)],
+)
+@pytest.mark.parametrize("nperiod", [8, 10, 20])
+@pytest.mark.parametrize("nreg", [1, 2, 3, 5])
+def test_robust_f_statistic_is_hotellings_t_squared(nreg, nperiod, cov_type, bandwidth):
+    # The Wald statistic of the slopes is multiplied by (T - k) / (k (T - 1)) and
+    # compared with an F distribution with k and T - k degrees of freedom
+    y, x = fama_macbeth_panel(
+        nentity=40, nperiod=nperiod, nreg=nreg, seed=100 * nreg + nperiod
+    )
+    res = FamaMacBeth(y, x).fit(
+        cov_type=cov_type, kernel="bartlett", bandwidth=bandwidth
+    )
+    _, stat, pvalue = hotelling_by_hand(cross_sections(y, x), bandwidth=bandwidth or 0)
+    robust = res.f_statistic_robust
+    assert robust.df == nreg
+    assert robust.df_denom == nperiod - nreg
+    assert robust.dist_name == f"F({nreg},{nperiod - nreg})"
+    assert_allclose(robust.stat, stat, rtol=1e-10)
+    assert_allclose(robust.pval, pvalue, rtol=1e-10)
+    # The previous reference distributions were wrong when nreg > 1
+    wald = robust.stat * nreg * (nperiod - 1) / (nperiod - nreg)
+    if nreg > 1:
+        assert robust.pval > stats.f(nreg, nperiod - 1).sf(wald / nreg)
+        assert robust.pval > stats.f(nreg, int(res.nobs) - nreg - 1).sf(wald / nreg)
+
+
+@pytest.mark.skipif(hotelling_test is None, reason="statsmodels has no test_mvmean")
+@pytest.mark.parametrize("cov_type", ["unadjusted", "robust"])
+@pytest.mark.parametrize(("nperiod", "nreg"), [(10, 3), (10, 5), (20, 3), (20, 5)])
+def test_robust_f_statistic_matches_statsmodels(nperiod, nreg, cov_type):
+    # The standard covariance of the average of the T estimates gives the
+    # one-sample Hotelling test of statsmodels for the slopes
+    y, x = fama_macbeth_panel(nentity=40, nperiod=nperiod, nreg=nreg, seed=nperiod)
+    res = FamaMacBeth(y, x).fit(cov_type=cov_type)
+    slopes = cross_sections(y, x).iloc[:, 1:].to_numpy()
+    expected = hotelling_test(slopes, mean_null=np.zeros(nreg))
+    assert expected.df == (nreg, nperiod - nreg)
+    robust = res.f_statistic_robust
+    assert_allclose(robust.stat, expected.statistic, rtol=1e-10)
+    assert_allclose(robust.pval, expected.pvalue, rtol=1e-10)
+    # The Wald statistic is the T-squared statistic of statsmodels
+    wald = robust.stat * nreg * (nperiod - 1) / (nperiod - nreg)
+    assert_allclose(wald, expected.t2, rtol=1e-10)
+
+
+@pytest.mark.parametrize("nperiod", [4, 12, 30])
+@pytest.mark.parametrize("cov_type", ["unadjusted", "kernel"])
+def test_robust_f_statistic_one_regressor_is_the_t_test(nperiod, cov_type):
+    # With a single parameter besides the constant F(1, T - 1) is t(T - 1)
+    # squared, and the statistic is the square of the t-statistic
+    y, x = fama_macbeth_panel(nentity=40, nperiod=nperiod, nreg=1, seed=13 + nperiod)
+    bandwidth = 1 if cov_type == "kernel" else None
+    res = FamaMacBeth(y, x).fit(cov_type=cov_type, bandwidth=bandwidth)
+    robust = res.f_statistic_robust
+    assert robust.df == 1
+    assert robust.df_denom == nperiod - 1
+    assert_allclose(robust.stat, res.tstats["x0"] ** 2, rtol=1e-10)
+    assert_allclose(robust.pval, res.pvalues["x0"], rtol=1e-10)
+    assert_allclose(
+        robust.pval, 2 * stats.t(nperiod - 1).sf(abs(res.tstats["x0"])), rtol=1e-10
+    )
+
+
 def test_robust_f_statistic_degrees_of_freedom():
-    # The Wald test of the parameters other than the constant is compared with
-    # an F distribution with T - 1 denominator degrees of freedom. The classical
-    # F-statistic of the pooled regression keeps nobs - nvar
+    # The classical F-statistic of the pooled regression keeps nobs - nvar
+    # denominator degrees of freedom, and the robust one uses T - k
     y, x = fama_macbeth_panel(nentity=40, nperiod=15, nreg=2, seed=7)
     res = FamaMacBeth(y, x).fit()
     robust = res.f_statistic_robust
     assert robust.df == 2
-    assert robust.df_denom == 14
+    assert robust.df_denom == 13
+    assert res.df_resid == 14
     slopes = res.params.iloc[1:].to_numpy()
     cov = res.cov.iloc[1:, 1:].to_numpy()
     wald = float(slopes @ np.linalg.solve(cov, slopes))
-    assert_allclose(robust.stat, wald / 2, rtol=1e-10)
-    assert_allclose(robust.pval, stats.f(2, 14).sf(wald / 2), rtol=1e-10)
+    assert_allclose(robust.stat, 13 / (2 * 14) * wald, rtol=1e-10)
+    assert_allclose(robust.pval, stats.f(2, 13).sf(13 / 28 * wald), rtol=1e-10)
 
     # The classical F-statistic is that of the pooled regression that uses the
     # average of the estimates, with nobs - nvar degrees of freedom
@@ -422,14 +518,52 @@ def test_robust_f_statistic_degrees_of_freedom():
     assert_allclose(res.f_statistic.stat, classical, rtol=1e-10)
 
 
-def test_robust_f_statistic_one_regressor_is_the_t_test():
-    # With a single parameter besides the constant F(1, T - 1) is t(T - 1) squared
-    y, x = fama_macbeth_panel(nentity=40, nperiod=12, nreg=1, seed=13)
-    res = FamaMacBeth(y, x).fit()
+@pytest.mark.parametrize("bandwidth", [0, 2])
+def test_robust_f_statistic_dropped_periods(bandwidth):
+    # T is the number of periods that are estimated, 21 of the 25 periods, and
+    # the dropped periods are not part of the statistic or of its degrees of
+    # freedom
+    y, x = dropped_periods_panel()
+    with pytest.warns(MissingValueWarning, match=r"4 of the time-series regressions"):
+        mod = FamaMacBeth(y, x)
+    cov_type = "kernel" if bandwidth else "unadjusted"
+    res = mod.fit(cov_type=cov_type, kernel="bartlett", bandwidth=bandwidth)
+    estimates = cross_sections(y, x)
+    assert estimates.shape[0] == 21
+    _, stat, pvalue = hotelling_by_hand(estimates, bandwidth=bandwidth)
     robust = res.f_statistic_robust
-    assert robust.df_denom == 11
-    assert_allclose(robust.stat, res.tstats["x0"] ** 2, rtol=1e-10)
-    assert_allclose(robust.pval, res.pvalues["x0"], rtol=1e-10)
+    assert (robust.df, robust.df_denom) == (2, 19)
+    assert_allclose(robust.stat, stat, rtol=1e-10)
+    assert_allclose(robust.pval, pvalue, rtol=1e-10)
+    # which is not the statistic with the 25 periods or the periods of the panel
+    wald = robust.stat * 2 * 20 / 19
+    for periods in (25, 24):
+        wrong = (periods - 2) / (2 * (periods - 1)) * wald
+        assert not np.isclose(wrong, robust.stat, rtol=1e-3)
+
+
+def test_robust_f_statistic_weighted():
+    y, x = fama_macbeth_panel(nentity=40, nperiod=12, nreg=3, seed=29)
+    rg = np.random.default_rng(31)
+    weights = pd.Series(rg.uniform(0.5, 2.0, size=y.shape[0]), index=y.index)
+    res = FamaMacBeth(y, x, weights=weights).fit()
+    _, stat, pvalue = hotelling_by_hand(cross_sections(y, x, weights))
+    assert_allclose(res.f_statistic_robust.stat, stat, rtol=1e-10)
+    assert_allclose(res.f_statistic_robust.pval, pvalue, rtol=1e-10)
+
+
+@pytest.mark.parametrize("nreg", [1, 3])
+def test_not_debiased_uses_the_chi_squared_distribution(nreg):
+    # Without the small sample adjustment the statistic is the Wald statistic
+    # and the distribution is chi-squared. This is not Hotelling's reference
+    y, x = fama_macbeth_panel(nentity=40, nperiod=10, nreg=nreg, seed=17 + nreg)
+    res = FamaMacBeth(y, x).fit(debiased=False)
+    wald, _, pvalue = hotelling_by_hand(cross_sections(y, x), debiased=False)
+    robust = res.f_statistic_robust
+    assert robust.dist_name == f"chi2({nreg})"
+    assert robust.df_denom is None
+    assert_allclose(robust.stat, wald, rtol=1e-10)
+    assert_allclose(robust.pval, pvalue, rtol=1e-10)
 
 
 def test_not_debiased_uses_normal_distribution():
@@ -443,6 +577,99 @@ def test_not_debiased_uses_normal_distribution():
     )
     # F-test of the slopes is a chi-squared test
     assert res.f_statistic_robust.dist_name == "chi2(1)"
+
+
+def test_robust_f_statistic_needs_more_periods_than_parameters():
+    # With T periods the covariance of the average of the estimates has rank at
+    # most T - 1, and Hotelling's test needs T > k. The covariance is singular
+    # otherwise, and the inverse of it was numerical noise
+    y, x = fama_macbeth_panel(nentity=20, nperiod=3, nreg=3, seed=3)
+    with pytest.warns(InferenceUnavailableWarning):
+        mod = FamaMacBeth(y, x)
+    res = mod.fit()
+    robust = res.f_statistic_robust
+    assert isinstance(robust, InvalidTestStatistic)
+    assert np.isnan(robust.stat)
+    assert np.isnan(robust.pval)
+    assert "more periods than tested parameters" in str(robust)
+    assert "The 3 tested parameters" in str(robust)
+    assert "of 3 periods" in str(robust)
+    assert isinstance(str(res.summary), str)
+    # One more period is enough
+    y, x = fama_macbeth_panel(nentity=20, nperiod=4, nreg=3, seed=3)
+    res = FamaMacBeth(y, x).fit()
+    robust = res.f_statistic_robust
+    assert (robust.df, robust.df_denom) == (3, 1)
+    assert np.isfinite(robust.stat)
+    # Without the small sample adjustment the statistic is not changed
+    chi2_stat = FamaMacBeth(y, x).fit(debiased=False).f_statistic_robust
+    assert chi2_stat.dist_name == "chi2(3)"
+
+
+def test_robust_f_statistic_only_constant():
+    y, x = fama_macbeth_panel(nentity=40, nperiod=10, nreg=1, seed=5)
+    res = FamaMacBeth(y, x[["const"]]).fit()
+    assert isinstance(res.f_statistic_robust, InvalidTestStatistic)
+    assert "only a constant" in str(res.f_statistic_robust)
+
+
+def test_robust_f_statistic_without_a_constant():
+    # Every parameter is tested, and the constant is not in the model
+    y, x = fama_macbeth_panel(nentity=40, nperiod=10, nreg=3, seed=9)
+    x = x.drop(columns="const")
+    res = FamaMacBeth(y, x).fit()
+    estimates = cross_sections(y, x)
+    mean = estimates.mean().to_numpy()
+    cov = np.cov(estimates.to_numpy().T, ddof=1) / 10
+    wald = float(mean @ np.linalg.solve(cov, mean))
+    stat = (10 - 3) / (3 * 9) * wald
+    robust = res.f_statistic_robust
+    assert (robust.df, robust.df_denom) == (3, 7)
+    assert_allclose(robust.stat, stat, rtol=1e-10)
+    assert_allclose(robust.pval, stats.f(3, 7).sf(stat), rtol=1e-10)
+
+
+def test_robust_f_statistic_is_in_the_summary():
+    y, x = fama_macbeth_panel(nentity=40, nperiod=10, nreg=2, seed=21)
+    res = FamaMacBeth(y, x).fit()
+    summary = str(res.summary)
+    assert "F(2,8)" in summary
+    assert pval_format(res.f_statistic_robust.pval) in summary
+
+
+@pytest.mark.parametrize(
+    ("nreg", "nperiod", "size_of_t_minus_1"),
+    [(1, 10, 0.05), (3, 10, 0.105), (5, 10, 0.245), (3, 20, 0.072), (5, 20, 0.112)],
+)
+def test_size_of_the_robust_f_statistic(nreg, nperiod, size_of_t_minus_1):
+    # The T estimates are independent normal vectors with the same distribution,
+    # which is the setting of Hotelling's test, and the null hypothesis is true.
+    # The test rejects in 5% of the samples at the 5% level. The test that
+    # compared W / k with F(k, T - 1) rejected in the share that is given, which
+    # is 5% only if there is one tested parameter. The shares are from a
+    # simulation with 20,000 replications in which the cross-sections are
+    # estimated from simulated panels, and not drawn
+    rg = np.random.default_rng(1000 * nreg + nperiod)
+    reps = 1000
+    f_info = panel_model.FInfo(
+        np.r_[False, np.ones(nreg, dtype=bool)],
+        "Model F-statistic (robust)",
+        None,
+        False,
+    )
+    reject, reject_t_minus_1 = 0, 0
+    for _ in range(reps):
+        estimates = rg.standard_normal((nperiod, nreg + 1))
+        # The covariance of the average of the estimates, that FamaMacBeth uses
+        cov = np.cov(estimates.T) / nperiod
+        test = panel_model._hotelling_f(estimates.mean(0), cov, True, nperiod, f_info)
+        wald = test.stat * nreg * (nperiod - 1) / (nperiod - nreg)
+        reject += test.pval < 0.05
+        reject_t_minus_1 += stats.f(nreg, nperiod - 1).sf(wald / nreg) < 0.05
+    # The standard error of the share of 1,000 samples is 0.7 percentage points
+    # at 5%, and 1.4 at 25%
+    assert abs(reject / reps - 0.05) < 0.02
+    assert abs(reject_t_minus_1 / reps - size_of_t_minus_1) < 0.03
 
 
 @pytest.mark.parametrize("use_weights", [True, False])
