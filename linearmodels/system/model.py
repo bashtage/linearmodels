@@ -443,12 +443,13 @@ class _SystemModelBase:
                 endog = IVData(eq_data[2], var_name=endog_name, nobs=dep.shape[0])
                 if endog.shape[1] > 0:
                     current_id += (id(eq_data[2]),)
-                ids.append(current_id)
                 self._endog.append(endog)
 
-                self._instr.append(
-                    IVData(eq_data[3], var_name=instr_name, nobs=dep.shape[0])
-                )
+                instr = IVData(eq_data[3], var_name=instr_name, nobs=dep.shape[0])
+                if instr.shape[1] > 0:
+                    current_id += (id(eq_data[3]),)
+                ids.append(current_id)
+                self._instr.append(instr)
                 if len(eq_data) == 5:
                     weights_name = "weights_" + str(i)
                     self._weights.append(IVData(eq_data[4], var_name=weights_name))
@@ -469,10 +470,12 @@ class _SystemModelBase:
                 self._endog.append(endog)
                 if "endog" in eq_data:
                     current_id += (id(eq_data["endog"]),)
-                ids.append(current_id)
 
                 instr_values = eq_data.get("instruments", None)
                 instr = IVData(instr_values, var_name=instr_name, nobs=dep.shape[0])
+                if "instruments" in eq_data:
+                    current_id += (id(instr_values),)
+                ids.append(current_id)
                 self._instr.append(instr)
 
                 if "weights" in eq_data:
