@@ -522,7 +522,9 @@ def test_robust_f_statistic_dropped_periods(bandwidth):
     # the dropped periods are not part of the statistic or of its degrees of
     # freedom
     y, x = dropped_periods_panel()
-    with pytest.warns(MissingValueWarning, match=r"4 of the time-series regressions"):
+    # The count of the dropped periods, and not the words that describe the
+    # regressions, which are time-series or cross-sectional in different versions
+    with pytest.warns(MissingValueWarning, match=r"4 of the .*regressions"):
         mod = FamaMacBeth(y, x)
     cov_type = "kernel" if bandwidth else "unadjusted"
     res = mod.fit(cov_type=cov_type, kernel="bartlett", bandwidth=bandwidth)
