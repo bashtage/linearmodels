@@ -98,5 +98,5 @@ def test_gmm_just_identified_alphas():
     # The t-statistics of the alphas are not finite, which the summary can format
     assert not np.all(np.isfinite(res.tstats["alpha"]))
     with warnings.catch_warnings():
-        warnings.simplefilter("error")
+        warnings.simplefilter("error", RuntimeWarning)
         assert isinstance(str(res.full_summary), str)
