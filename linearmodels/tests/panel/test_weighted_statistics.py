@@ -13,6 +13,9 @@ the references:
   regression on the dummy variables of the effects.
 * RandomEffects: there is no other implementation of the model with these weights,
   and the F-statistic is the Wald statistic of the unadjusted covariance.
+
+FamaMacBeth: the weights are rescaled to have a mean of one. The statistics have to
+depend on the relative weights only, and use the retained observations.
 """
 
 import numpy as np
@@ -23,11 +26,13 @@ import statsmodels.api as sm
 
 from linearmodels.panel import (
     BetweenOLS,
+    FamaMacBeth,
     FirstDifferenceOLS,
     PanelOLS,
     PooledOLS,
     RandomEffects,
 )
+from linearmodels.shared.exceptions import MissingValueWarning
 
 
 def make_data(unbalanced, seed=0, nentity=24, nperiod=6):
@@ -232,3 +237,88 @@ def test_weights_are_relative(data, model):
     assert_allclose(scaled.rsquared, res.rsquared)
     assert_allclose(scaled.resid_ss, res.resid_ss)
     assert_allclose(scaled.s2, res.s2)
+
+
+def fama_macbeth_reference(data, weights):
+    """The average of the period regressions, with their weighted fit measures"""
+    columns = ["const", "x1", "x2"]
+    # The weights are normalized to have a mean of one in the sample
+    weights = weights / weights.mean()
+    betas, r2, adjusted_r2 = [], [], []
+    for _, period in data.groupby(level=1):
+        w = weights.loc[period.index].to_numpy()
+        x, y = period[columns].to_numpy(), period["y"].to_numpy()
+        beta = np.linalg.lstsq(np.sqrt(w)[:, None] * x, np.sqrt(w) * y, rcond=None)[0]
+        betas.append(beta)
+        sse = float(np.sum(w * (y - x @ beta) ** 2))
+        tss = float(np.sum(w * (y - np.sum(w * y) / np.sum(w)) ** 2))
+        nobs, nvar = x.shape
+        r2.append(1 - sse / tss)
+        adjusted_r2.append(1 - (sse / (nobs - nvar)) / (tss / (nobs - 1)))
+    params = np.mean(betas, axis=0)
+    w = weights.to_numpy()
+    resid = data["y"].to_numpy() - data[columns].to_numpy() @ params
+    resid_ss = float(np.sum(w * resid**2))
+    mean = float(np.sum(w * data["y"].to_numpy()) / np.sum(w))
+    total_ss = float(np.sum(w * (data["y"].to_numpy() - mean) ** 2))
+    return params, resid_ss, total_ss, np.mean(r2), np.mean(adjusted_r2)
+
+
+def test_fama_macbeth_weighted_statistics(data):
+    weights = data["w"]
+    res = FamaMacBeth(data["y"], data[["const", "x1", "x2"]], weights=weights).fit()
+    params, resid_ss, total_ss, avg_r2, avg_adjusted_r2 = fama_macbeth_reference(
+        data, weights
+    )
+    assert_allclose(res.params, params)
+    assert_allclose(res.avg_rsquared, avg_r2)
+    assert_allclose(res.avg_adj_rsquared, avg_adjusted_r2)
+    assert_allclose(res.resid_ss, resid_ss)
+    assert_allclose(res.total_ss, total_ss)
+    assert_allclose(res.rsquared, 1 - resid_ss / total_ss)
+    assert_allclose(res.model_ss, total_ss - resid_ss)
+    nobs = data.shape[0]
+    assert_allclose(res.s2, resid_ss / (nobs - 3))
+    # The classical F-statistic uses the pooled sums of squares
+    num = total_ss - resid_ss
+    assert_allclose(res.f_statistic.stat, (num / 2) / (resid_ss / (nobs - 3)))
+
+
+def test_fama_macbeth_constant_weights_are_unweighted(data):
+    res = FamaMacBeth(data["y"], data[["const", "x1", "x2"]]).fit()
+    weights = pd.Series(2.5, index=data.index)
+    weighted = FamaMacBeth(data["y"], data[["const", "x1", "x2"]], weights=weights)
+    weighted = weighted.fit()
+    for name in ("rsquared", "resid_ss", "total_ss", "s2", "loglik"):
+        assert_allclose(getattr(weighted, name), getattr(res, name), err_msg=name)
+    assert_allclose(weighted.wresids, res.wresids)
+    assert_allclose(weighted.f_statistic.stat, res.f_statistic.stat)
+
+
+@pytest.mark.parametrize("scale", [0.1, 3.7])
+def test_fama_macbeth_weights_are_relative(data, scale):
+    cols = data[["const", "x1", "x2"]]
+    res = FamaMacBeth(data["y"], cols, weights=data["w"]).fit()
+    scaled = FamaMacBeth(data["y"], cols, weights=scale * data["w"]).fit()
+    for name in ("rsquared", "resid_ss", "total_ss", "s2", "loglik"):
+        assert_allclose(getattr(scaled, name), getattr(res, name), err_msg=name)
+    assert_allclose(scaled.wresids, res.wresids)
+    assert_allclose(scaled.f_statistic.stat, res.f_statistic.stat)
+    assert_allclose(scaled.params, res.params)
+    assert_allclose(scaled.cov, res.cov)
+
+
+def test_fama_macbeth_missing_values_are_dropped_with_the_weights(data):
+    # The retained weights are rescaled to have a mean of one
+    cols = ["const", "x1", "x2"]
+    missing = data.copy()
+    missing.iloc[[2, 9, 20, 41], missing.columns.get_loc("x1")] = np.nan
+    with pytest.warns(MissingValueWarning):
+        mod = FamaMacBeth(missing["y"], missing[cols], weights=missing["w"])
+    res = mod.fit()
+    kept = missing.dropna(subset=["x1"])
+    manual = FamaMacBeth(kept["y"], kept[cols], weights=0.37 * kept["w"]).fit()
+    for name in ("rsquared", "resid_ss", "total_ss", "s2", "loglik", "nobs"):
+        assert_allclose(getattr(res, name), getattr(manual, name), err_msg=name)
+    assert_allclose(res.wresids, manual.wresids)
+    assert_allclose(res.params, manual.params)

@@ -3195,13 +3195,10 @@ class FamaMacBeth(_PanelModelBase):
         self._validate_blocks()
 
     def _validate_blocks(self) -> None:
-        x = self._x
-        root_w = np.sqrt(self._w)
-        wx = root_w * x
-
         exog = self.exog.dataframe
+        root_w = np.sqrt(self.weights.values2d)
         wx_df = DataFrame(
-            wx[self._not_null], index=exog.notnull().index, columns=exog.columns
+            root_w * self.exog.values2d, index=exog.index, columns=exog.columns
         )
 
         def validate_block(
@@ -3314,19 +3311,21 @@ class FamaMacBeth(_PanelModelBase):
            pooled regression, which is close to the normal distribution when
            there are many observations.
         """
-        y = cast("linearmodels.typing.data.Float64Array", self._y)
-        x = cast("linearmodels.typing.data.Float64Array", self._x)
-        root_w = cast("linearmodels.typing.data.Float64Array", np.sqrt(self._w))
+        # The retained observations and their weights, which are scaled to have a
+        # mean of one once the observations with missing values are dropped
+        y = cast("linearmodels.typing.data.Float64Array", self.dependent.values2d)
+        x = cast("linearmodels.typing.data.Float64Array", self.exog.values2d)
+        root_w = cast(
+            "linearmodels.typing.data.Float64Array", np.sqrt(self.weights.values2d)
+        )
         wy = cast("linearmodels.typing.data.Float64Array", root_w * y)
         wx = cast("linearmodels.typing.data.Float64Array", root_w * x)
 
         dep = self.dependent.dataframe
         exog = self.exog.dataframe
         index = self.dependent.index
-        wy_df = DataFrame(wy[self._not_null], index=index, columns=dep.columns)
-        wx_df = DataFrame(
-            wx[self._not_null], index=exog.notnull().index, columns=exog.columns
-        )
+        wy_df = DataFrame(wy, index=index, columns=dep.columns)
+        wx_df = DataFrame(wx, index=exog.index, columns=exog.columns)
 
         yx = DataFrame(
             np.c_[wy_df.values, wx_df.values],
@@ -3335,6 +3334,7 @@ class FamaMacBeth(_PanelModelBase):
         )
 
         has_constant = self.has_constant
+        loadings = self._constant_loadings() if has_constant else None
 
         def single(z: DataFrame) -> Series:
             exog = z.iloc[:, 1:].values
@@ -3348,8 +3348,10 @@ class FamaMacBeth(_PanelModelBase):
                 return Series([np.nan] * (len(z.columns) + 2), index=cols)
             err = dep - exog @ params
             sse = float(np.squeeze(err.T @ err))
-            if has_constant:
-                dep_demean = dep - dep.mean()
+            if loadings is not None:
+                # The constant of the weighted data is not a column of ones
+                const = exog @ loadings
+                dep_demean = dep - const * ((const.T @ dep) / (const.T @ const))
                 tss = float(np.squeeze(dep_demean.T @ dep_demean))
             else:
                 tss = float(np.squeeze(dep.T @ dep))
@@ -3384,7 +3386,7 @@ class FamaMacBeth(_PanelModelBase):
         weps = wy - wx @ params
         w = self.weights.values2d
         residual_ss = float(np.squeeze(weps.T @ weps))
-        y = e = self.dependent.values2d
+        e = y
         if self.has_constant:
             e = y - (w * y).sum() / w.sum()
         total_ss = float(np.squeeze(w.T @ (e**2)))
