@@ -510,15 +510,26 @@ class ACCovariance(HomoskedasticCovariance):
 
     .. math::
 
-      \xi_t & = \epsilon_{it} x_{it} \\
-      \hat{S} & = n / (N(n-df))  \sum_{i=1}^N S_i \\
+      \xi_{it} & = \epsilon_{it} x_{it} \\
+      \hat{S} & = (n-df)^{-1} \sum_{i=1}^N S_i \\
       \hat{S}_i & = \sum_{j=0}^{bw} K(j, bw) \hat{S}_{ij} \\
       \hat{S}_{i0} & = \sum_{t=1}^{T} \xi'_{it} \xi_{it} \\
       \hat{S}_{ij} & = \sum_{t=1}^{T-j} \xi'_{it} \xi_{it+j} + \xi'_{it+j} \xi_{it}
 
 
     where df is ``extra_df`` and n-df is replace by n-df-k if ``debiased`` is
-    ``True``. :math:`K(i, bw)` is the kernel weighting function.
+    ``True``. :math:`K(i, bw)` is the kernel weighting function. The sums of an
+    entity are over the lags of its observations, so that observations that follow
+    each other are one lag apart even if a period is missing between them.
+
+    .. versionchanged:: 7.1
+
+       The entities are not weighted by their numbers of observations: each
+       entity contributes the sum of the products of its scores. Earlier versions
+       divided the sum of each entity by its number of observations and averaged
+       over the entities, which is the same for a balanced panel. For an unbalanced
+       panel the covariance, e.g., with a bandwidth of 0, was not the heteroskedasticity
+       robust covariance, and differed from the covariance of other packages.
     """
 
     ALLOWED_KWARGS = ("kernel", "bandwidth")
@@ -574,13 +585,14 @@ class ACCovariance(HomoskedasticCovariance):
         xe_index = xe_df.index
         assert isinstance(xe_index, MultiIndex)
         entities = xe_index.levels[0]
-        nentity = len(entities)
         xeex = np.zeros((xe_df.shape[1], xe_df.shape[1]))
         for entity in entities:
             _xe = np.asarray(xe_df.loc[entity])
             _bw = min(_xe.shape[0] - 1.0, bw)
-            xeex += self._single_cov(_xe, _bw)
-        xeex /= nentity
+            # The sum of the products of the scores of the entity, which the kernel
+            # covariance divides by the number of observations of the entity
+            xeex += self._single_cov(_xe, _bw) * _xe.shape[0]
+        xeex /= nobs
         xeex *= self._scale
 
         out = (xpxi @ xeex @ xpxi) / nobs
