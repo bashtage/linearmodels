@@ -27,6 +27,11 @@ from pandas import DataFrame, Index, Series, concat
 
 from linearmodels.iv._utility import IVFormulaParser
 from linearmodels.iv.data import IVData
+from linearmodels.shared.alignment import (
+    check_alignment,
+    check_row_alignment,
+    row_labels,
+)
 from linearmodels.shared.exceptions import missing_warning
 from linearmodels.shared.hypotheses import InvalidTestStatistic, WaldTestStatistic
 from linearmodels.shared.linalg import has_constant
@@ -485,6 +490,7 @@ class _SystemModelBase:
                     "{eq}".format(eq=self._eq_labels[i])
                 )
 
+        self._check_alignment()
         self._drop_missing()
         self._common_exog = len(set(ids)) == 1
         if self._common_exog:
@@ -558,6 +564,49 @@ class _SystemModelBase:
             constant, index=[d.cols[0] for d in self._dependent]
         )
         self._constant_loc = constant_loc
+
+    def _check_alignment(self) -> None:
+        """Check that inputs with labels use the labels of dependent"""
+        nobs = [dep.shape[0] for dep in self._dependent]
+        for i, label in enumerate(self._eq_labels):
+            if nobs[i] != nobs[0]:
+                raise ValueError(
+                    "All equations must have the same number of observations. "
+                    f"The dependent variable in equation {label!r} has {nobs[i]} "
+                    f"observations, but in equation {self._eq_labels[0]!r} it has "
+                    f"{nobs[0]}."
+                )
+        reference: Index | None = None
+        reference_name = ""
+        for i, label in enumerate(self._eq_labels):
+            dependent_name = f"dependent in equation {label!r}"
+            expected = row_labels(self._dependent[i])
+            if expected is not None:
+                if reference is None:
+                    reference, reference_name = expected, dependent_name
+                else:
+                    check_row_alignment(
+                        dependent_name, expected, reference, reference_name
+                    )
+            inputs = {
+                f"exog in equation {label!r}": self._exog[i],
+                f"endog in equation {label!r}": self._endog[i],
+                f"instruments in equation {label!r}": self._instr[i],
+                f"weights in equation {label!r}": self._weights[i],
+            }
+            check_alignment(expected, inputs, reference=dependent_name)
+
+    def _check_clusters(self, config: Mapping[str, Any]) -> None:
+        """Check that clusters with labels use the labels of dependent"""
+        for i, label in enumerate(self._eq_labels):
+            expected = row_labels(self._dependent[i])
+            if expected is not None:
+                check_alignment(
+                    expected,
+                    {"clusters": config.get("clusters")},
+                    reference=f"dependent in equation {label!r}",
+                )
+                return
 
     def _drop_missing(self) -> None:
         k = len(self._dependent)
@@ -1308,6 +1357,7 @@ class _LSSystemModelBase(_SystemModelBase):
         linearmodels.system.covariance.KernelCovariance
         linearmodels.system.covariance.ClusteredCovariance
         """
+        self._check_clusters(cov_config)
         if method is None:
             method = (
                 "ols" if (self._common_exog and self._constraints is None) else "gls"
@@ -1463,6 +1513,19 @@ class IV3SLS(_LSSystemModelBase):
         \Omega = \Sigma \otimes I_N
 
     where :math:`\Sigma` is the covariance matrix of the residuals.
+
+    Rows are paired by position, both within an equation and across the
+    equations. An input that carries labels (a pandas Series or DataFrame
+    with an index other than the default 0, 1, ..., n-1, or an xarray
+    DataArray with coordinates) must use the same index, in the same order,
+    as the dependent variable of its equation, so that a value cannot be
+    attached to the wrong observation. The dependent variables that carry
+    labels must also use the same index in every equation. A ``ValueError``
+    is raised if an index differs. Either reindex the input to the index of
+    the dependent variable, or call ``to_numpy()`` to pair its values by
+    position. NumPy arrays and pandas objects with a default index do not
+    carry labels and are always paired by position.
+    The same rule applies to ``clusters`` passed to ``fit``.
     """
 
     def __init__(
@@ -1678,6 +1741,19 @@ class SUR(_LSSystemModelBase):
 
     SUR is a special case of 3SLS where there are no endogenous regressors and
     no instruments.
+
+    Rows are paired by position, both within an equation and across the
+    equations. An input that carries labels (a pandas Series or DataFrame
+    with an index other than the default 0, 1, ..., n-1, or an xarray
+    DataArray with coordinates) must use the same index, in the same order,
+    as the dependent variable of its equation, so that a value cannot be
+    attached to the wrong observation. The dependent variables that carry
+    labels must also use the same index in every equation. A ``ValueError``
+    is raised if an index differs. Either reindex the input to the index of
+    the dependent variable, or call ``to_numpy()`` to pair its values by
+    position. NumPy arrays and pandas objects with a default index do not
+    carry labels and are always paired by position.
+    The same rule applies to ``clusters`` passed to ``fit``.
     """
 
     def __init__(
@@ -1901,6 +1977,18 @@ class IVSystemGMM(_SystemModelBase):
         \hat{\beta}_{GMM} & = (X'ZW^{-1}Z'X)^{-1}X'ZW^{-1}Z'Y \\
 
     where :math:`W` is a positive definite weighting matrix.
+
+    Rows are paired by position, both within an equation and across the
+    equations. An input that carries labels (a pandas Series or DataFrame
+    with an index other than the default 0, 1, ..., n-1, or an xarray
+    DataArray with coordinates) must use the same index, in the same order,
+    as the dependent variable of its equation, so that a value cannot be
+    attached to the wrong observation. The dependent variables that carry
+    labels must also use the same index in every equation. A ``ValueError``
+    is raised if an index differs. Either reindex the input to the index of
+    the dependent variable, or call ``to_numpy()`` to pair its values by
+    position. NumPy arrays and pandas objects with a default index do not
+    carry labels and are always paired by position.
     """
 
     def __init__(

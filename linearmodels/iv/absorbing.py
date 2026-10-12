@@ -56,6 +56,7 @@ from linearmodels.panel.utility import (
     not_absorbed,
     preconditioner,
 )
+from linearmodels.shared.alignment import check_alignment, is_default_index, row_labels
 from linearmodels.shared.exceptions import missing_warning
 from linearmodels.shared.hypotheses import InvalidTestStatistic, WaldTestStatistic
 from linearmodels.shared.utility import DataFrameWrapper, SeriesWrapper
@@ -396,6 +397,11 @@ class Interaction:
     For each variable in `cont`, computes the interaction of the variable
     and the cartesian product of the categories.
 
+    If both ``cat`` and ``cont`` carry labels (a pandas Series or DataFrame
+    with an index other than the default 0, 1, ..., n-1, or an xarray
+    DataArray with coordinates), they must use the same index, in the same
+    order.
+
     Examples
     --------
     >>> import numpy as np
@@ -461,6 +467,9 @@ class Interaction:
         self._cont_data = IVData(cont, "cont", nobs=nobs, convert_dummies=False)
         if self._cat_data.shape[1] == self._cont_data.shape[1] == 0:
             raise ValueError("Both cat and cont are empty arrays")
+        check_alignment(
+            row_labels(self._cat_data), {"cont": self._cont_data}, reference="cat"
+        )
         cat_data = self._cat_data.pandas
         convert = [
             col for col in cat_data if not (isinstance(cat_data[col], CategoricalDtype))
@@ -483,7 +492,11 @@ class Interaction:
 
     @property
     def isnull(self) -> Series:
-        return self.cat.isnull().any(axis=1) | self.cont.isnull().any(axis=1)
+        cat_null = self.cat.isnull().any(axis=1)
+        cont_null = self.cont.isnull().any(axis=1)
+        # Rows are paired by position since cat and cont need not have labels
+        index = cont_null.index if is_default_index(cat_null.index) else cat_null.index
+        return Series(cat_null.to_numpy() | cont_null.to_numpy(), index=index)
 
     def drop(self, locs: linearmodels.typing.data.BoolArray) -> None:
         self._cat_data.drop(locs)
@@ -752,6 +765,18 @@ class AbsorbingLS:
     estimates a particular restricted set of parameters that captures the
     effect of non-redundant components in z.
 
+    Rows are paired by position. An input that carries labels (a pandas
+    Series or DataFrame with an index other than the default 0, 1, ..., n-1,
+    or an xarray DataArray with coordinates) must use the same index, in the
+    same order, as ``dependent``, so that a value cannot be attached to the
+    wrong observation. A ``ValueError`` is raised if the index of ``exog``,
+    ``absorb``, ``interactions`` or ``weights`` differs from the index of
+    ``dependent``. Either reindex the input to the index of ``dependent``, or
+    call ``to_numpy()`` to pair its values by position. NumPy arrays and
+    pandas objects with a default index do not carry labels and are always
+    paired by position. The same rule applies to ``clusters`` passed to
+    ``fit``.
+
     See also
     --------
     Interaction
@@ -819,6 +844,7 @@ class AbsorbingLS:
         self._absorb_args: tuple[Any, ...] | None = None
 
         self._check_shape()
+        self._check_alignment()
         self._original_index = self._dependent.pandas.index
         self._drop_locs = self._drop_missing()
         self._columns = self._exog.cols
@@ -879,6 +905,19 @@ class AbsorbingLS:
                     "interactions ({}) and dependent have different number of "
                     "observations".format(str(interact))
                 )
+
+    def _check_alignment(self) -> None:
+        """Check that inputs with labels use the labels of dependent"""
+        expected = row_labels(self._dependent)
+        check_alignment(expected, {"exog": self._exog, "weights": self._weights})
+        interactions: list[tuple[str, Interaction]] = [("absorb", self._absorb_inter)]
+        single = isinstance(self._interactions, (DataFrame, Interaction))
+        for i, interact in enumerate(self._interaction_list):
+            name = "interactions" if single else f"interactions[{i}]"
+            interactions.append((name, interact))
+        for name, interact in interactions:
+            check_alignment(expected, {name: interact.cat})
+            check_alignment(expected, {name: interact.cont})
 
     @property
     def absorbed_dependent(self) -> DataFrame:
@@ -1235,6 +1274,9 @@ class AbsorbingLS:
                 stacklevel=2,
             )
             absorb_options = dict(lsmr_options.items())
+        check_alignment(
+            row_labels(self._dependent), {"clusters": cov_config.get("clusters")}
+        )
         if self._absorbed_dependent is None:
             self._first_time_fit(use_cache, absorb_options, method)
 

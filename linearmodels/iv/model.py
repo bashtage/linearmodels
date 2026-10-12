@@ -4,7 +4,7 @@ Instrumental variable estimators
 
 from __future__ import annotations
 
-from collections.abc import Callable
+from collections.abc import Callable, Mapping
 from typing import Any, TypeVar, Union, cast
 import warnings
 
@@ -54,6 +54,7 @@ from linearmodels.iv.gmm import (
     OneWayClusteredWeightMatrix,
 )
 from linearmodels.iv.results import IVGMMResults, IVResults, OLSResults
+from linearmodels.shared.alignment import check_alignment, row_labels
 from linearmodels.shared.exceptions import IndexWarning, missing_warning
 from linearmodels.shared.hypotheses import InvalidTestStatistic, WaldTestStatistic
 from linearmodels.shared.linalg import has_constant, inv_sqrth
@@ -186,7 +187,17 @@ class _IVModelBase:
         self._original_index = self.dependent.pandas.index
         if weights is None:
             weights = ones(self.dependent.shape)
-        weights = IVData(weights).ndarray
+        weights_data = IVData(weights)
+        check_alignment(
+            row_labels(self.dependent),
+            {
+                "exog": self.exog,
+                "endog": self.endog,
+                "instruments": self.instruments,
+                "weights": weights_data,
+            },
+        )
+        weights = weights_data.ndarray
         if npany(weights <= 0):
             raise ValueError("weights must be strictly positive.")
         weights = weights / nanmean(weights)
@@ -383,6 +394,12 @@ class _IVModelBase:
 
         missing_warning(missing, stacklevel=4)
         return missing
+
+    def _check_clusters(self, config: Mapping[str, Any]) -> None:
+        """Check that clusters with labels use the labels of dependent"""
+        check_alignment(
+            row_labels(self.dependent), {"clusters": config.get("clusters")}
+        )
 
     def wresids(
         self, params: linearmodels.typing.data.Float64Array
@@ -682,6 +699,7 @@ class _IVLSModelBase(_IVModelBase):
         linearmodels.iv.covariance.KernelCovariance
         linearmodels.iv.covariance.ClusteredCovariance
         """
+        self._check_clusters(cov_config)
         wy, wx, wz = self._wy, self._wx, self._wz
         kappa = self._kappa
 
@@ -770,6 +788,18 @@ class IVLIML(_IVLSModelBase):
     .. math::
 
       \kappa-\alpha/(n-n_{instr})
+
+    Rows are paired by position. An input that carries labels (a pandas
+    Series or DataFrame with an index other than the default 0, 1, ..., n-1,
+    or an xarray DataArray with coordinates) must use the same index, in the
+    same order, as ``dependent``, so that a value cannot be attached to the
+    wrong observation. A ``ValueError`` is raised if the index of ``exog``,
+    ``endog``, ``instruments`` or ``weights`` differs from the index of
+    ``dependent``. Either reindex the input to the index of ``dependent``, or
+    call ``to_numpy()`` to pair its values by position. NumPy arrays and
+    pandas objects with a default index do not carry labels and are always
+    paired by position. The same rule applies to ``clusters`` passed to
+    ``fit``.
 
     .. todo::
 
@@ -891,6 +921,18 @@ class IV2SLS(_IVLSModelBase):
 
     The 2SLS estimator is a special case of a k-class estimator with
     :math:`\kappa=1`,
+
+    Rows are paired by position. An input that carries labels (a pandas
+    Series or DataFrame with an index other than the default 0, 1, ..., n-1,
+    or an xarray DataArray with coordinates) must use the same index, in the
+    same order, as ``dependent``, so that a value cannot be attached to the
+    wrong observation. A ``ValueError`` is raised if the index of ``exog``,
+    ``endog``, ``instruments`` or ``weights`` differs from the index of
+    ``dependent``. Either reindex the input to the index of ``dependent``, or
+    call ``to_numpy()`` to pair its values by position. NumPy arrays and
+    pandas objects with a default index do not carry labels and are always
+    paired by position. The same rule applies to ``clusters`` passed to
+    ``fit``.
 
     .. todo::
 
@@ -1028,6 +1070,7 @@ class _IVGMMBase(_IVModelBase):
         super().__init__(dependent, exog, endog, instruments, weights=weights)
         self._method = "IV-GMM"
 
+        self._check_clusters(weight_config)
         weight_matrix_estimator = WEIGHT_MATRICES[weight_type]
         self._weight = weight_matrix_estimator(**weight_config)
         self._weight_type = weight_type
@@ -1155,6 +1198,18 @@ class IVGMM(_IVGMMBase):
     where :math:`W` is a positive definite weight matrix and :math:`Z`
     contains both the exogenous regressors and the instruments.
 
+    Rows are paired by position. An input that carries labels (a pandas
+    Series or DataFrame with an index other than the default 0, 1, ..., n-1,
+    or an xarray DataArray with coordinates) must use the same index, in the
+    same order, as ``dependent``, so that a value cannot be attached to the
+    wrong observation. A ``ValueError`` is raised if the index of ``exog``,
+    ``endog``, ``instruments`` or ``weights`` differs from the index of
+    ``dependent``. Either reindex the input to the index of ``dependent``, or
+    call ``to_numpy()`` to pair its values by position. NumPy arrays and
+    pandas objects with a default index do not carry labels and are always
+    paired by position. The same rule applies to ``clusters`` passed to
+    ``fit`` or in ``weight_config``.
+
     .. todo::
 
       * VCV: bootstrap
@@ -1175,16 +1230,15 @@ class IVGMM(_IVGMMBase):
         weight_type: str = "robust",
         **weight_config: Any,
     ):
-        super().__init__(dependent, exog, endog, instruments, weights=weights)
-        self._method = "IV-GMM"
-
-        weight_matrix_estimator = WEIGHT_MATRICES[weight_type]
-        self._weight = weight_matrix_estimator(**weight_config)
-        self._weight_type = weight_type
-        self._weight_config = self._weight.config
-        # The arguments needed to create another weight estimator of this
-        # type. config does not contain all of them, e.g., optimal_bw
-        self._weight_kwargs = dict(weight_config)
+        super().__init__(
+            dependent,
+            exog,
+            endog,
+            instruments,
+            weights=weights,
+            weight_type=weight_type,
+            **weight_config,
+        )
 
     @staticmethod
     def from_formula(
@@ -1334,6 +1388,7 @@ class IVGMM(_IVGMMBase):
         --------
         linearmodels.iv.gmm.IVGMMCovariance
         """
+        self._check_clusters(cov_config)
         wy, wx, wz = self._wy, self._wx, self._wz
         nobs = wy.shape[0]
         weight_matrix = self._weight.weight_matrix
@@ -1437,6 +1492,18 @@ class IVGMMCUE(_IVGMMBase):
 
     where :math:`W(\beta)` is a weight matrix that depends on :math:`\beta`
     through :math:`\epsilon_i = y_i - x_i\beta`.
+
+    Rows are paired by position. An input that carries labels (a pandas
+    Series or DataFrame with an index other than the default 0, 1, ..., n-1,
+    or an xarray DataArray with coordinates) must use the same index, in the
+    same order, as ``dependent``, so that a value cannot be attached to the
+    wrong observation. A ``ValueError`` is raised if the index of ``exog``,
+    ``endog``, ``instruments`` or ``weights`` differs from the index of
+    ``dependent``. Either reindex the input to the index of ``dependent``, or
+    call ``to_numpy()`` to pair its values by position. NumPy arrays and
+    pandas objects with a default index do not carry labels and are always
+    paired by position. The same rule applies to ``clusters`` passed to
+    ``fit`` or in ``weight_config``.
 
     See Also
     --------
@@ -1702,6 +1769,7 @@ class IVGMMCUE(_IVGMMBase):
         --------
         linearmodels.iv.gmm.IVGMMCovariance
         """
+        self._check_clusters(cov_config)
         wy, wx, wz = self._wy, self._wx, self._wz
         weight_matrix = self._weight.weight_matrix
         if starting is None:
@@ -1760,6 +1828,17 @@ class _OLS(IVLIML):
     -----
     Uses IV2SLS internally by setting endog and instruments to None.
     Uses IVLIML with kappa=0 to estimate OLS models.
+
+    Rows are paired by position. An input that carries labels (a pandas
+    Series or DataFrame with an index other than the default 0, 1, ..., n-1,
+    or an xarray DataArray with coordinates) must use the same index, in the
+    same order, as ``dependent``, so that a value cannot be attached to the
+    wrong observation. A ``ValueError`` is raised if the index of ``exog`` or
+    ``weights`` differs from the index of ``dependent``. Either reindex the
+    input to the index of ``dependent``, or call ``to_numpy()`` to pair its
+    values by position. NumPy arrays and pandas objects with a default index
+    do not carry labels and are always paired by position. The same rule
+    applies to ``clusters`` passed to ``fit``.
 
     See Also
     --------
@@ -1990,6 +2069,18 @@ class IVJIVE(_IVModelBase):
     variance, particularly when the instruments are weak (see Davidson and
     MacKinnon, 2006).
 
+    Rows are paired by position. An input that carries labels (a pandas
+    Series or DataFrame with an index other than the default 0, 1, ..., n-1,
+    or an xarray DataArray with coordinates) must use the same index, in the
+    same order, as ``dependent``, so that a value cannot be attached to the
+    wrong observation. A ``ValueError`` is raised if the index of ``exog``,
+    ``endog``, ``instruments`` or ``weights`` differs from the index of
+    ``dependent``. Either reindex the input to the index of ``dependent``, or
+    call ``to_numpy()`` to pair its values by position. NumPy arrays and
+    pandas objects with a default index do not carry labels and are always
+    paired by position. The same rule applies to ``clusters`` passed to
+    ``fit``.
+
     See Also
     --------
     IV2SLS, IVLIML, IVGMM, IVGMMCUE
@@ -2132,6 +2223,7 @@ class IVJIVE(_IVModelBase):
         --------
         linearmodels.iv.gmm.IVGMMCovariance
         """
+        self._check_clusters(cov_config)
         wy, wx, wz = self._wy, self._wx, self._wz
 
         # The leverages and the first-stage predictions from an orthonormal

@@ -11,15 +11,7 @@ from formulaic.model_spec import NAAction
 from formulaic.parser.algos.tokenize import tokenize
 from formulaic.utils.context import capture_context
 import numpy as np
-from pandas import (
-    Categorical,
-    DataFrame,
-    Index,
-    MultiIndex,
-    RangeIndex,
-    Series,
-    get_dummies,
-)
+from pandas import Categorical, DataFrame, Index, MultiIndex, Series, get_dummies
 from scipy.linalg import lstsq as sp_lstsq
 from scipy.sparse.linalg import lsmr
 
@@ -47,6 +39,13 @@ from linearmodels.panel.utility import (
     dummy_matrix,
     in_2core_graph,
     not_absorbed,
+)
+from linearmodels.shared.alignment import (
+    check_row_alignment,
+    differs,
+    is_labelled,
+    labels_1d,
+    misaligned,
 )
 from linearmodels.shared.exceptions import (
     InferenceUnavailableWarning,
@@ -297,72 +296,14 @@ before computing the fitted value. The best practice is to pass a DataFrame
 with a 2-level MultiIndex containing the entity- and time-ids."""
 
 
-def _is_default_index(index: Index) -> bool:
-    """Whether an index only numbers the rows, i.e., it is 0, 1, ..., n-1"""
-    return not isinstance(index, MultiIndex) and index.equals(RangeIndex(len(index)))
-
-
 def _is_labelled(value: object) -> bool:
-    """Whether the rows of an input are identified by labels.
+    """Whether the rows of a panel input are identified by labels.
 
-    pandas, xarray and PanelData inputs carry labels. Raw arrays do not, and
-    are paired with the other inputs by position. The same is true of a pandas
-    Series or DataFrame that has a default index (and default columns if it
-    does not have a MultiIndex) since there are no labels to compare.
+    The columns of a DataFrame that has a default index also carry labels, since
+    they identify the entities when the frame is time by entity. See
+    :func:`linearmodels.shared.alignment.is_labelled`.
     """
-    if isinstance(value, Series):
-        return not _is_default_index(value.index)
-    if isinstance(value, DataFrame):
-        if isinstance(value.index, MultiIndex):
-            return True
-        return not (_is_default_index(value.index) and _is_default_index(value.columns))
-    if isinstance(value, PanelData):
-        return True
-    try:
-        from xarray import DataArray  # noqa: PLC0415
-    except ImportError:
-        return False
-    return isinstance(value, DataArray)
-
-
-def _labels_1d(value: Series | DataFrame | Any) -> Index:
-    """Row labels of a Series, DataFrame or one-dimensional DataArray"""
-    if isinstance(value, (Series, DataFrame)):
-        return value.index
-    return value.get_index(value.dims[0])
-
-
-def _differs(labels: Index, expected: Index) -> bool:
-    """Whether labels, other than a default index, are not the expected labels"""
-    return not _is_default_index(labels) and not labels.equals(expected)
-
-
-def _misaligned(name: str, what: str) -> ValueError:
-    return ValueError(
-        f"{what} of {name} does not match dependent. Rows are paired by "
-        "position, so an input with labels (pandas or xarray) must use the "
-        "same labels in the same order as dependent. Use a NumPy array to pair "
-        "the values by position."
-    )
-
-
-def _check_row_alignment(name: str, labels: Index, expected: Index) -> None:
-    """Reject labelled inputs whose row index is not the dependent index.
-
-    Estimation pairs rows by position. An input with the same values in a
-    different order would attach those values to the wrong observation.
-
-    Inputs with a different number of rows are not checked here since these
-    are reported using a length-specific error message. A default index has
-    no labels and is paired by position.
-    """
-    if (
-        len(labels) != len(expected)
-        or _is_default_index(labels)
-        or labels.equals(expected)
-    ):
-        return
-    raise _misaligned(name, "The row index")
+    return is_labelled(value, columns=True)
 
 
 class _PanelModelBase:
@@ -403,7 +344,7 @@ class _PanelModelBase:
         self.exog = PanelData(exog, "Exog")
         self._dependent_labelled = _is_labelled(dependent)
         if self._dependent_labelled and _is_labelled(exog):
-            _check_row_alignment("exog", self.exog.index, self.dependent.index)
+            check_row_alignment("exog", self.exog.index, self.dependent.index)
         self._original_shape = self.dependent.shape
         self._constant = False
         self._formula: str | None = None
@@ -466,7 +407,7 @@ class _PanelModelBase:
                 "and time periods as the model data."
             )
         if self._dependent_labelled and _is_labelled(clusters):
-            _check_row_alignment("clusters", clusters_pd.index, self._original_index)
+            check_row_alignment("clusters", clusters_pd.index, self._original_index)
         clusters_pd.drop(~self.not_null)
         return clusters_pd.copy()
 
@@ -503,7 +444,7 @@ class _PanelModelBase:
             panel = PanelData(weights)
             if isinstance(weights, PanelData):
                 if labelled:
-                    _check_row_alignment("weights", panel.index, index)
+                    check_row_alignment("weights", panel.index, index)
                 return panel
             return self._grid_to_rows(panel, labelled)
 
@@ -521,23 +462,23 @@ class _PanelModelBase:
         ):
             panel = PanelData(DataFrame(weights))
             if labelled:
-                _check_row_alignment("weights", panel.index, index)
+                check_row_alignment("weights", panel.index, index)
             return panel
         elif weights.shape[0] == nobs and weights.ndim == 1:
-            if labelled and _differs(_labels_1d(weights), times):
-                raise _misaligned("weights", "The time index")
+            if labelled and differs(labels_1d(weights), times):
+                raise misaligned("weights", "The time index")
             weights_arr = np.asarray(weights)[:, None]
             weights_arr = weights_arr @ np.ones((1, nentity))
             grid = DataFrame(weights_arr, index=times, columns=entities)
         elif weights.shape[0] == nentity and weights.ndim == 1:
-            if labelled and _differs(_labels_1d(weights), entities):
-                raise _misaligned("weights", "The entity index")
+            if labelled and differs(labels_1d(weights), entities):
+                raise misaligned("weights", "The entity index")
             weights_arr = np.asarray(weights)[None, :]
             weights_arr = np.ones((nobs, 1)) @ weights_arr
             grid = DataFrame(weights_arr, index=times, columns=entities)
         elif weights.shape[0] == nentity * nobs and weights.size:
             if labelled:
-                _check_row_alignment("weights", _labels_1d(weights), index)
+                check_row_alignment("weights", labels_1d(weights), index)
             frame = self.dependent.dataframe.copy()
             # TODO: Fix this for pandas 3
             frame.iloc[:, :] = np.asarray(weights)[:, None]
@@ -575,7 +516,7 @@ class _PanelModelBase:
         if len(rows) != len(grid_index) or len(index) != len(grid_index):
             return grid
         if labelled and not rows.index.equals(grid_index):
-            raise _misaligned("weights", "The time and entity index")
+            raise misaligned("weights", "The time and entity index")
         rows = rows.set_axis(grid_index, axis=0)
         if not grid_index.equals(index):
             rows = rows.reindex(index)
@@ -1491,7 +1432,7 @@ class PanelOLS(_PanelModelBase):
                 "entities and time periods as dependent."
             )
         if labelled:
-            _check_row_alignment("other_effects", effects.index, self._original_index)
+            check_row_alignment("other_effects", effects.index, self._original_index)
 
         num_effects = effects.nvar
         if num_effects + self.entity_effects + self.time_effects > 2:
