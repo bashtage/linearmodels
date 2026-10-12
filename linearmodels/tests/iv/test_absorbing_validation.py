@@ -8,6 +8,7 @@ Validation and messages of AbsorbingLS and the IV models.
 * Interaction.drop modifies the instance, and nobs must be the number of observations
   that remain.
 * The message about the length of clusters names only what the models have.
+* The message about the estimation of kappa is grammatical.
 """
 
 import re
@@ -21,6 +22,7 @@ from linearmodels.iv import IV2SLS, IVLIML
 import linearmodels.iv.absorbing
 from linearmodels.iv.absorbing import AbsorbingLS, Interaction
 from linearmodels.iv.covariance import CLUSTER_ERR
+from linearmodels.iv.model import _IVModelBase
 from linearmodels.shared.exceptions import MissingValueWarning
 
 NOBS = 200
@@ -242,3 +244,23 @@ def test_clusters_that_are_dropped_with_the_data_are_accepted(data):
     assert_allclose(
         auto.fit(cov_type="clustered", clusters=clusters[keep]).params, res.params
     )
+
+
+def test_liml_kappa_message(data, monkeypatch):
+    y, x, _ = data
+    rng = np.random.default_rng(3)
+    z = pd.DataFrame(rng.standard_normal((NOBS, 2)), columns=["z0", "z1"])
+    endog = (z.sum(axis=1) + rng.standard_normal(NOBS)).to_frame("e")
+
+    def fail(self):
+        raise np.linalg.LinAlgError("Eigenvalues did not converge")
+
+    monkeypatch.setattr(_IVModelBase, "_estimate_kappa", fail)
+    with pytest.raises(ValueError, match="Unable to estimate kappa") as info:
+        IVLIML(y, x, endog, z).fit()
+    message = str(info.value)
+    assert (
+        "This most likely occurs if the instrument matrix is rank deficient." in message
+    )
+    assert "This is most likely" not in message
+    assert "Eigenvalues did not converge" in message
