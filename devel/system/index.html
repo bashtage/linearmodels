@@ -23,7 +23,7 @@
     
   
       
-        <title>System Regression Models - linearmodels v7.1 (+223)</title>
+        <title>System Regression Models - linearmodels v7.1 (+236)</title>
       
     
 
@@ -95,7 +95,7 @@
 
 <header class="md-header md-header--shadow" data-md-component="header">
   <nav class="md-header__inner md-grid" aria-label="Header">
-    <a href="../index.html" title="linearmodels v7.1 (+223)" class="md-header__button md-logo" aria-label="linearmodels v7.1 (+223)" data-md-component="logo">
+    <a href="../index.html" title="linearmodels v7.1 (+236)" class="md-header__button md-logo" aria-label="linearmodels v7.1 (+236)" data-md-component="logo">
       <img src="../_static/bw-logo.svg" alt="logo">
     </a>
     <label class="md-header__button md-icon" for="__drawer">
@@ -106,7 +106,7 @@
       <div class="md-header__ellipsis">
         <div class="md-header__topic">
           <span class="md-ellipsis">
-            linearmodels v7.1 (+223)
+            linearmodels v7.1 (+236)
           </span>
         </div>
         <div class="md-header__topic" data-md-component="header-topic">
@@ -201,10 +201,10 @@
 
 <nav class="md-nav md-nav--primary" aria-label="Navigation" data-md-level="0">
   <label class="md-nav__title" for="__drawer">
-    <a href="../index.html" title="linearmodels v7.1 (+223)" class="md-nav__button md-logo" aria-label="linearmodels v7.1 (+223)" data-md-component="logo">
+    <a href="../index.html" title="linearmodels v7.1 (+236)" class="md-nav__button md-logo" aria-label="linearmodels v7.1 (+236)" data-md-component="logo">
       <img src="../_static/bw-logo.svg" alt="logo">
     </a>
-    linearmodels v7.1 (+223)
+    linearmodels v7.1 (+236)
   </label>
   
     <div class="md-nav__source">
@@ -779,6 +779,29 @@
   
   
     <li class="md-nav__item">
+      <a href="../input-alignment.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    <span title="/input-alignment.rst (reference label)"><span>Aligning Inputs</span></span>
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+  
+    <li class="md-nav__item">
       <a href="../utility.html" class="md-nav__link">
         
   
@@ -1030,6 +1053,10 @@ Squares (<a class="reference internal" href="system/linearmodels.system.model.IV
 SUR which allows variables to be either exogenous or endogenous, and when there are endogenous
 variables, for instruments to be used.  SUR is a special case of 3SLS where there are no
 endogenous variables or instruments. 3SLS allows systems of IV equations to be jointly estimated.</p>
+<p>The rows of the variables of each equation are paired by position. An input that carries
+labels, such as a pandas <code class="docutils literal notranslate"><span class="pre">Series</span></code> or <code class="docutils literal notranslate"><span class="pre">DataFrame</span></code> with an index, must have the same
+labels, in the same order, as the <code class="docutils literal notranslate"><span class="pre">dependent</span></code> of its equation, and the dependent
+variables of the equations must share their labels. See <a class="reference internal" href="../input-alignment.html#input-alignment"><span class="std std-ref">Aligning Inputs</span></a>.</p>
 <div class="toctree-wrapper compound">
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="examples/examples.html">Examples</a></li>

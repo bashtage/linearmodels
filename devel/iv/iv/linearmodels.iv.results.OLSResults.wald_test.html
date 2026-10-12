@@ -23,7 +23,7 @@
     
   
       
-        <title>linearmodels.iv.results.OLSResults.wald_test - linearmodels v7.1 (+223)</title>
+        <title>linearmodels.iv.results.OLSResults.wald_test - linearmodels v7.1 (+236)</title>
       
     
 
@@ -100,7 +100,7 @@
 
 <header class="md-header md-header--shadow" data-md-component="header">
   <nav class="md-header__inner md-grid" aria-label="Header">
-    <a href="../../index.html" title="linearmodels v7.1 (+223)" class="md-header__button md-logo" aria-label="linearmodels v7.1 (+223)" data-md-component="logo">
+    <a href="../../index.html" title="linearmodels v7.1 (+236)" class="md-header__button md-logo" aria-label="linearmodels v7.1 (+236)" data-md-component="logo">
       <img src="../../_static/bw-logo.svg" alt="logo">
     </a>
     <label class="md-header__button md-icon" for="__drawer">
@@ -111,7 +111,7 @@
       <div class="md-header__ellipsis">
         <div class="md-header__topic">
           <span class="md-ellipsis">
-            linearmodels v7.1 (+223)
+            linearmodels v7.1 (+236)
           </span>
         </div>
         <div class="md-header__topic" data-md-component="header-topic">
@@ -206,10 +206,10 @@
 
 <nav class="md-nav md-nav--primary" aria-label="Navigation" data-md-level="0">
   <label class="md-nav__title" for="__drawer">
-    <a href="../../index.html" title="linearmodels v7.1 (+223)" class="md-nav__button md-logo" aria-label="linearmodels v7.1 (+223)" data-md-component="logo">
+    <a href="../../index.html" title="linearmodels v7.1 (+236)" class="md-nav__button md-logo" aria-label="linearmodels v7.1 (+236)" data-md-component="logo">
       <img src="../../_static/bw-logo.svg" alt="logo">
     </a>
-    linearmodels v7.1 (+223)
+    linearmodels v7.1 (+236)
   </label>
   
     <div class="md-nav__source">
@@ -1833,6 +1833,29 @@
   
   
     <li class="md-nav__item">
+      <a href="../../input-alignment.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    <span title="/input-alignment.rst (reference label)"><span>Aligning Inputs</span></span>
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+  
+    <li class="md-nav__item">
       <a href="../../utility.html" class="md-nav__link">
         
   
@@ -2142,7 +2165,11 @@ as “x1=x2=x3=0”</p></li>
 the corresponding value is the restriction value, e.g.,
 {“x1”: 0, “x2+x3”: 1}.</p></li>
 </ul>
-<p>It is not possible to use both <code class="docutils literal notranslate"><span class="pre">restriction</span></code> and <code class="docutils literal notranslate"><span class="pre">formula</span></code>.</p>
+<p>It is not possible to use both <code class="docutils literal notranslate"><span class="pre">restriction</span></code> and <code class="docutils literal notranslate"><span class="pre">formula</span></code>.
+The names in the restrictions are the entries of the index of
+<code class="docutils literal notranslate"><span class="pre">params</span></code>. A name that is not valid Python, for example one that
+contains <code class="docutils literal notranslate"><span class="pre">:</span></code> or <code class="docutils literal notranslate"><span class="pre">[</span></code> such as <code class="docutils literal notranslate"><span class="pre">exper:black</span></code>, must be enclosed in
+back-ticks, e.g., <code class="docutils literal notranslate"><span class="pre">&quot;`exper:black`</span> <span class="pre">=</span> <span class="pre">0&quot;</span></code>.</p>
 </p>
 </dd>
 </dl>
@@ -2174,13 +2201,21 @@ has a <span class="math notranslate nohighlight">\(\chi^2_q\)</span> distributio
 <span class="gp">&gt;&gt;&gt; </span><span class="n">wald_res</span> <span class="o">=</span> <span class="n">res</span><span class="o">.</span><span class="n">wald_test</span><span class="p">(</span><span class="n">restriction</span><span class="p">,</span> <span class="n">value</span><span class="p">)</span>
 </code></pre></div>
 </div>
-<p>Using the formula interface to test the same restrictions</p>
-<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><code><span class="gp">&gt;&gt;&gt; </span><span class="n">formula</span> <span class="o">=</span> <span class="s2">"exper = I(exper**2) = 0"</span>
+<p>Using the formula interface to test the same restrictions. The names
+are those in the index of <code class="docutils literal notranslate"><span class="pre">params</span></code>, which has <code class="docutils literal notranslate"><span class="pre">I(exper</span> <span class="pre">**</span> <span class="pre">2)</span></code></p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><code><span class="gp">&gt;&gt;&gt; </span><span class="n">formula</span> <span class="o">=</span> <span class="s2">"exper = I(exper ** 2) = 0"</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">wald_res</span> <span class="o">=</span> <span class="n">res</span><span class="o">.</span><span class="n">wald_test</span><span class="p">(</span><span class="n">formula</span><span class="o">=</span><span class="n">formula</span><span class="p">)</span>
 </code></pre></div>
 </div>
 <p>Using the formula interface with a list</p>
-<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><code><span class="gp">&gt;&gt;&gt; </span><span class="n">wald_res</span> <span class="o">=</span> <span class="n">res</span><span class="o">.</span><span class="n">wald_test</span><span class="p">(</span><span class="n">formula</span><span class="o">=</span><span class="p">[</span><span class="s2">"exper = 0"</span><span class="p">,</span> <span class="s2">"I(exper**2) = 0"</span><span class="p">])</span>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><code><span class="gp">&gt;&gt;&gt; </span><span class="n">wald_res</span> <span class="o">=</span> <span class="n">res</span><span class="o">.</span><span class="n">wald_test</span><span class="p">(</span><span class="n">formula</span><span class="o">=</span><span class="p">[</span><span class="s2">"exper = 0"</span><span class="p">,</span> <span class="s2">"I(exper ** 2) = 0"</span><span class="p">])</span>
+</code></pre></div>
+</div>
+<p>A name that is not valid Python, such as an interaction, is enclosed in
+back-ticks</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><code><span class="gp">&gt;&gt;&gt; </span><span class="n">formula</span> <span class="o">=</span> <span class="s2">"np.log(wage) ~ 1 + exper + black + exper:black + [educ ~ sibs]"</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">res</span> <span class="o">=</span> <span class="n">IV2SLS</span><span class="o">.</span><span class="n">from_formula</span><span class="p">(</span><span class="n">formula</span><span class="p">,</span> <span class="n">data</span><span class="p">)</span><span class="o">.</span><span class="n">fit</span><span class="p">()</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">wald_res</span> <span class="o">=</span> <span class="n">res</span><span class="o">.</span><span class="n">wald_test</span><span class="p">(</span><span class="n">formula</span><span class="o">=</span><span class="s2">"`exper:black` = 0"</span><span class="p">)</span>
 </code></pre></div>
 </div>
 </dd></dl>

@@ -19,7 +19,7 @@
     
   
       
-        <title>linearmodels.panel.results - linearmodels v7.1 (+223)</title>
+        <title>linearmodels.panel.results - linearmodels v7.1 (+236)</title>
       
     
 
@@ -91,7 +91,7 @@
 
 <header class="md-header md-header--shadow" data-md-component="header">
   <nav class="md-header__inner md-grid" aria-label="Header">
-    <a href="../../../index.html" title="linearmodels v7.1 (+223)" class="md-header__button md-logo" aria-label="linearmodels v7.1 (+223)" data-md-component="logo">
+    <a href="../../../index.html" title="linearmodels v7.1 (+236)" class="md-header__button md-logo" aria-label="linearmodels v7.1 (+236)" data-md-component="logo">
       <img src="../../../_static/bw-logo.svg" alt="logo">
     </a>
     <label class="md-header__button md-icon" for="__drawer">
@@ -102,7 +102,7 @@
       <div class="md-header__ellipsis">
         <div class="md-header__topic">
           <span class="md-ellipsis">
-            linearmodels v7.1 (+223)
+            linearmodels v7.1 (+236)
           </span>
         </div>
         <div class="md-header__topic" data-md-component="header-topic">
@@ -197,10 +197,10 @@
 
 <nav class="md-nav md-nav--primary" aria-label="Navigation" data-md-level="0">
   <label class="md-nav__title" for="__drawer">
-    <a href="../../../index.html" title="linearmodels v7.1 (+223)" class="md-nav__button md-logo" aria-label="linearmodels v7.1 (+223)" data-md-component="logo">
+    <a href="../../../index.html" title="linearmodels v7.1 (+236)" class="md-nav__button md-logo" aria-label="linearmodels v7.1 (+236)" data-md-component="logo">
       <img src="../../../_static/bw-logo.svg" alt="logo">
     </a>
-    linearmodels v7.1 (+223)
+    linearmodels v7.1 (+236)
   </label>
   
     <div class="md-nav__source">
@@ -300,6 +300,29 @@
   
   <span class="md-ellipsis">
     <span title="/system/index.rst (reference label)"><span>System Regression Models</span></span>
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../input-alignment.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    <span title="/input-alignment.rst (reference label)"><span>Aligning Inputs</span></span>
     
   </span>
   
@@ -1098,7 +1121,29 @@
 
 <span class="sd">        Notes</span>
 <span class="sd">        -----</span>
-<span class="sd">        NaN filled when models do not include effects.</span>
+<span class="sd">        The combined effect of all of the effects in the model, in one column.</span>
+<span class="sd">        It is the sum of the entity, time and other effects of each</span>
+<span class="sd">        observation. The effects are not available separately.</span>
+<span class="sd">        See :ref:`panel-estimated-effects` for how to recover the entity and</span>
+<span class="sd">        time effects of a model that has both.</span>
+
+<span class="sd">        The estimated effects have no standard errors or any other inference.</span>
+<span class="sd">        They are not estimated consistently when the number of time periods is</span>
+<span class="sd">        fixed. The effect of an entity is estimated from its observations, so</span>
+<span class="sd">        the error does not shrink when the number of entities grows. To make</span>
+<span class="sd">        inference about the effects of a small number of entities, include</span>
+<span class="sd">        them as dummy variables in the regression.</span>
+
+<span class="sd">        The values are NaN for models that do not have effects, which are</span>
+<span class="sd">        PooledOLS, FirstDifferenceOLS and FamaMacBeth. They are 0 for a</span>
+<span class="sd">        PanelOLS model without effects.</span>
+
+<span class="sd">        The effects of RandomEffects are theta times the entity mean of the</span>
+<span class="sd">        difference between the dependent variable and the fitted values, where</span>
+<span class="sd">        theta is in the results. They are all 0 if the estimated variance of</span>
+<span class="sd">        the random effect is negative and so it is set to 0, since theta is</span>
+<span class="sd">        then 0 and the model is pooled OLS. ``variance_decomposition`` shows</span>
+<span class="sd">        whether this is the case.</span>
 <span class="sd">        """</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_effects</span>
 
@@ -1367,6 +1412,11 @@
 <span class="sd">              {"x1": 0, "x2+x3": 1}.</span>
 
 <span class="sd">            It is not possible to use both ``restriction`` and ``formula``.</span>
+<span class="sd">            The names in the restrictions are the entries of the index of</span>
+<span class="sd">            ``params``. A name that is not valid Python, for example one that</span>
+<span class="sd">            contains ``:`` or ``[`` such as ``C(year)[T.1987]:educ``, must be</span>
+<span class="sd">            enclosed in back-ticks, e.g.,</span>
+<span class="sd">            ``"`C(year)[T.1987]:educ` = 0"``.</span>
 
 <span class="sd">        Returns</span>
 <span class="sd">        -------</span>
@@ -1408,6 +1458,15 @@
 
 <span class="sd">        &gt;&gt;&gt; formula = "union = married = 0"</span>
 <span class="sd">        &gt;&gt;&gt; wald_res = fe_res.wald_test(formula=formula)</span>
+
+<span class="sd">        A name that is not valid Python, such as the interaction of a</span>
+<span class="sd">        categorical variable with a regressor, is enclosed in back-ticks</span>
+
+<span class="sd">        &gt;&gt;&gt; from linearmodels import PooledOLS</span>
+<span class="sd">        &gt;&gt;&gt; mod = PooledOLS.from_formula("lwage ~ 1 + union + C(year) * educ", data)</span>
+<span class="sd">        &gt;&gt;&gt; res = mod.fit(cov_type="clustered", cluster_entity=True)</span>
+<span class="sd">        &gt;&gt;&gt; null = "`C(year)[T.1987]:educ` = 0, `C(year)[T.1986]:educ` = 0"</span>
+<span class="sd">        &gt;&gt;&gt; wald_res = res.wald_test(formula=null)</span>
 <span class="sd">        """</span>
         <span class="k">return</span> <span class="n">quadratic_form_test</span><span class="p">(</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">params</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">cov</span><span class="p">,</span> <span class="n">restriction</span><span class="o">=</span><span class="n">restriction</span><span class="p">,</span> <span class="n">value</span><span class="o">=</span><span class="n">value</span><span class="p">,</span> <span class="n">formula</span><span class="o">=</span><span class="n">formula</span>

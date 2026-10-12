@@ -23,7 +23,7 @@
     
   
       
-        <title>Introduction - linearmodels v7.1 (+223)</title>
+        <title>Introduction - linearmodels v7.1 (+236)</title>
       
     
 
@@ -79,6 +79,11 @@
     <label class="md-overlay" for="__drawer"></label>
     <div data-md-component="skip">
       
+        
+        <a href="#aligning-inputs" class="md-skip">
+          Skip to content
+        </a>
+      
     </div>
     <div data-md-component="announce">
       
@@ -95,7 +100,7 @@
 
 <header class="md-header md-header--shadow" data-md-component="header">
   <nav class="md-header__inner md-grid" aria-label="Header">
-    <a href="../index.html" title="linearmodels v7.1 (+223)" class="md-header__button md-logo" aria-label="linearmodels v7.1 (+223)" data-md-component="logo">
+    <a href="../index.html" title="linearmodels v7.1 (+236)" class="md-header__button md-logo" aria-label="linearmodels v7.1 (+236)" data-md-component="logo">
       <img src="../_static/bw-logo.svg" alt="logo">
     </a>
     <label class="md-header__button md-icon" for="__drawer">
@@ -106,7 +111,7 @@
       <div class="md-header__ellipsis">
         <div class="md-header__topic">
           <span class="md-ellipsis">
-            linearmodels v7.1 (+223)
+            linearmodels v7.1 (+236)
           </span>
         </div>
         <div class="md-header__topic" data-md-component="header-topic">
@@ -201,10 +206,10 @@
 
 <nav class="md-nav md-nav--primary" aria-label="Navigation" data-md-level="0">
   <label class="md-nav__title" for="__drawer">
-    <a href="../index.html" title="linearmodels v7.1 (+223)" class="md-nav__button md-logo" aria-label="linearmodels v7.1 (+223)" data-md-component="logo">
+    <a href="../index.html" title="linearmodels v7.1 (+236)" class="md-nav__button md-logo" aria-label="linearmodels v7.1 (+236)" data-md-component="logo">
       <img src="../_static/bw-logo.svg" alt="logo">
     </a>
-    linearmodels v7.1 (+223)
+    linearmodels v7.1 (+236)
   </label>
   
     <div class="md-nav__source">
@@ -327,6 +332,19 @@
       
       <input class="md-nav__toggle md-toggle" type="checkbox" id="__toc">
       
+        <label class="md-nav__link md-nav__link--active" for="__toc">
+          
+  
+  
+  <span class="md-ellipsis">
+    <span title="/asset-pricing/introduction.rst (reference label)"><span>Introduction</span></span>
+    
+  </span>
+  
+
+          <span class="md-nav__icon md-icon"></span>
+        </label>
+      
       <a href="#" class="md-nav__link md-nav__link--active">
         
   
@@ -338,6 +356,36 @@
   
 
       </a>
+      
+        
+
+  
+
+<nav class="md-nav md-nav--secondary">
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Contents
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#aligning-inputs" class="md-nav__link">
+    
+    <span class="md-ellipsis">
+      <span title="/asset-pricing/introduction.rst#aligning-inputs (reference label)"><span>Aligning Inputs</span></span>
+    </span>
+  </a>
+  
+</li>
+      
+    </ul>
+  
+</nav>
       
     </li>
   
@@ -462,6 +510,29 @@
   
   <span class="md-ellipsis">
     <span title="/system/index.rst (reference label)"><span>System Regression Models</span></span>
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../input-alignment.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    <span title="/input-alignment.rst (reference label)"><span>Aligning Inputs</span></span>
     
   </span>
   
@@ -651,6 +722,24 @@
   
   
   
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Contents
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#aligning-inputs" class="md-nav__link">
+    
+    <span class="md-ellipsis">
+      <span title="/asset-pricing/introduction.rst#aligning-inputs (reference label)"><span>Aligning Inputs</span></span>
+    </span>
+  </a>
+  
+</li>
+      
+    </ul>
+  
 </nav>
                   </div>
                 </div>
@@ -729,6 +818,11 @@ prior to estimation.</p>
 <span class="n">See</span> <span class="n">full_summary</span> <span class="k">for</span> <span class="n">complete</span> <span class="n">results</span>
 </code></pre></div>
 </div>
+<h2 id="aligning-inputs">Aligning Inputs<a class="headerlink" href="#aligning-inputs" title="Link to this heading">¶</a></h2>
+<p>The rows of <code class="docutils literal notranslate"><span class="pre">portfolios</span></code> and <code class="docutils literal notranslate"><span class="pre">factors</span></code> are paired by position. A <code class="docutils literal notranslate"><span class="pre">factors</span></code>
+input that carries labels, such as a pandas <code class="docutils literal notranslate"><span class="pre">DataFrame</span></code> with a date index,
+must use the same labels, in the same order, as <code class="docutils literal notranslate"><span class="pre">portfolios</span></code>. See
+<a class="reference internal" href="../input-alignment.html#input-alignment"><span class="std std-ref">Aligning Inputs</span></a>.</p>
 
 
 

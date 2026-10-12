@@ -23,7 +23,7 @@
     
   
       
-        <title>linearmodels.panel.results.PanelEffectsResults.estimated_effects - linearmodels v7.1 (+223)</title>
+        <title>linearmodels.panel.results.PanelEffectsResults.estimated_effects - linearmodels v7.1 (+236)</title>
       
     
 
@@ -100,7 +100,7 @@
 
 <header class="md-header md-header--shadow" data-md-component="header">
   <nav class="md-header__inner md-grid" aria-label="Header">
-    <a href="../../index.html" title="linearmodels v7.1 (+223)" class="md-header__button md-logo" aria-label="linearmodels v7.1 (+223)" data-md-component="logo">
+    <a href="../../index.html" title="linearmodels v7.1 (+236)" class="md-header__button md-logo" aria-label="linearmodels v7.1 (+236)" data-md-component="logo">
       <img src="../../_static/bw-logo.svg" alt="logo">
     </a>
     <label class="md-header__button md-icon" for="__drawer">
@@ -111,7 +111,7 @@
       <div class="md-header__ellipsis">
         <div class="md-header__topic">
           <span class="md-ellipsis">
-            linearmodels v7.1 (+223)
+            linearmodels v7.1 (+236)
           </span>
         </div>
         <div class="md-header__topic" data-md-component="header-topic">
@@ -206,10 +206,10 @@
 
 <nav class="md-nav md-nav--primary" aria-label="Navigation" data-md-level="0">
   <label class="md-nav__title" for="__drawer">
-    <a href="../../index.html" title="linearmodels v7.1 (+223)" class="md-nav__button md-logo" aria-label="linearmodels v7.1 (+223)" data-md-component="logo">
+    <a href="../../index.html" title="linearmodels v7.1 (+236)" class="md-nav__button md-logo" aria-label="linearmodels v7.1 (+236)" data-md-component="logo">
       <img src="../../_static/bw-logo.svg" alt="logo">
     </a>
-    linearmodels v7.1 (+223)
+    linearmodels v7.1 (+236)
   </label>
   
     <div class="md-nav__source">
@@ -1995,6 +1995,29 @@
   
   
     <li class="md-nav__item">
+      <a href="../../input-alignment.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    <span title="/input-alignment.rst (reference label)"><span>Aligning Inputs</span></span>
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+  
+    <li class="md-nav__item">
       <a href="../../utility.html" class="md-nav__link">
         
   
@@ -2207,7 +2230,26 @@
 <span class="property"><span class="k"><span class="pre">property</span></span><span class="w"> </span></span><span class="sig-prename descclassname"><span class="pre">PanelEffectsResults.</span></span><span class="sig-name descname"><span class="pre">estimated_effects</span></span><span class="p"> <span class="pre">:</span> </span><span class="desctype"><a class="reference external" href="https://pandas.pydata.org/pandas-docs/stable/reference/api/pandas.Series.html#pandas.Series" title="(in pandas v3.0.6)"><span class="pre">Series</span></a></span><a class="headerlink" href="#linearmodels.panel.results.PanelEffectsResults.estimated_effects" title="Link to this definition">¶</a></dt>
 <dd><p>Estimated effects</p>
 <p class="rubric">Notes</p>
-<p>NaN filled when models do not include effects.</p>
+<p>The combined effect of all of the effects in the model, in one column.
+It is the sum of the entity, time and other effects of each
+observation. The effects are not available separately.
+See <a class="reference internal" href="../faq.html#panel-estimated-effects"><span class="std std-ref">Estimated Effects</span></a> for how to recover the entity and
+time effects of a model that has both.</p>
+<p>The estimated effects have no standard errors or any other inference.
+They are not estimated consistently when the number of time periods is
+fixed. The effect of an entity is estimated from its observations, so
+the error does not shrink when the number of entities grows. To make
+inference about the effects of a small number of entities, include
+them as dummy variables in the regression.</p>
+<p>The values are NaN for models that do not have effects, which are
+PooledOLS, FirstDifferenceOLS and FamaMacBeth. They are 0 for a
+PanelOLS model without effects.</p>
+<p>The effects of RandomEffects are theta times the entity mean of the
+difference between the dependent variable and the fitted values, where
+theta is in the results. They are all 0 if the estimated variance of
+the random effect is negative and so it is set to 0, since theta is
+then 0 and the model is pooled OLS. <code class="docutils literal notranslate"><span class="pre">variance_decomposition</span></code> shows
+whether this is the case.</p>
 </dd></dl>
 
 

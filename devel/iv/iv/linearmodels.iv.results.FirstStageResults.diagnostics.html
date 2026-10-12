@@ -23,7 +23,7 @@
     
   
       
-        <title>linearmodels.iv.results.FirstStageResults.diagnostics - linearmodels v7.1 (+223)</title>
+        <title>linearmodels.iv.results.FirstStageResults.diagnostics - linearmodels v7.1 (+236)</title>
       
     
 
@@ -100,7 +100,7 @@
 
 <header class="md-header md-header--shadow" data-md-component="header">
   <nav class="md-header__inner md-grid" aria-label="Header">
-    <a href="../../index.html" title="linearmodels v7.1 (+223)" class="md-header__button md-logo" aria-label="linearmodels v7.1 (+223)" data-md-component="logo">
+    <a href="../../index.html" title="linearmodels v7.1 (+236)" class="md-header__button md-logo" aria-label="linearmodels v7.1 (+236)" data-md-component="logo">
       <img src="../../_static/bw-logo.svg" alt="logo">
     </a>
     <label class="md-header__button md-icon" for="__drawer">
@@ -111,7 +111,7 @@
       <div class="md-header__ellipsis">
         <div class="md-header__topic">
           <span class="md-ellipsis">
-            linearmodels v7.1 (+223)
+            linearmodels v7.1 (+236)
           </span>
         </div>
         <div class="md-header__topic" data-md-component="header-topic">
@@ -206,10 +206,10 @@
 
 <nav class="md-nav md-nav--primary" aria-label="Navigation" data-md-level="0">
   <label class="md-nav__title" for="__drawer">
-    <a href="../../index.html" title="linearmodels v7.1 (+223)" class="md-nav__button md-logo" aria-label="linearmodels v7.1 (+223)" data-md-component="logo">
+    <a href="../../index.html" title="linearmodels v7.1 (+236)" class="md-nav__button md-logo" aria-label="linearmodels v7.1 (+236)" data-md-component="logo">
       <img src="../../_static/bw-logo.svg" alt="logo">
     </a>
-    linearmodels v7.1 (+223)
+    linearmodels v7.1 (+236)
   </label>
   
     <div class="md-nav__source">
@@ -1229,6 +1229,29 @@
   
   
     <li class="md-nav__item">
+      <a href="../../input-alignment.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    <span title="/input-alignment.rst (reference label)"><span>Aligning Inputs</span></span>
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+  
+    <li class="md-nav__item">
       <a href="../../utility.html" class="md-nav__link">
         
   
@@ -1478,9 +1501,11 @@ variable on instruments where both the exogenous variable and
 the instrument have been orthogonalized to the exogenous
 regressors in the model.</p></li>
 <li><p>f.stat - Test that all coefficients are zero in the model
-used to estimate the partial R-squared. Uses a standard F-test
-when the covariance estimator is unadjusted - otherwise uses a
-Wald test statistic with a chi2 distribution.</p></li>
+used to estimate the partial R-squared. If the covariance
+estimator is unadjusted, it is the Wald statistic divided by
+the number of excluded instruments, and it has an F
+distribution. Otherwise it is the Wald statistic, which has a
+chi2 distribution. See Notes.</p></li>
 <li><p>f.pval - P-value of the test that all coefficients are zero
 in the model used to estimate the partial R-squared</p></li>
 <li><p>f.dist - Distribution of f.stat</p></li>
@@ -1495,6 +1520,22 @@ is with respect to the other included variables in the model.</p></li>
 <dd class="field-even"><p><a class="reference external" href="https://pandas.pydata.org/pandas-docs/stable/reference/api/pandas.DataFrame.html#pandas.DataFrame" title="(in pandas v3.0.6)"><code class="xref py py-class docutils literal notranslate"><span class="pre">pandas.DataFrame</span></code></a></p>
 </dd>
 </dl>
+<p class="rubric">Notes</p>
+<p><code class="docutils literal notranslate"><span class="pre">f.stat</span></code> is the Wald statistic of the test that the coefficients on
+the <span class="math notranslate nohighlight">\(q\)</span> excluded instruments are 0 in the first-stage regression,
+which is computed using the covariance estimator of the model.</p>
+<p>If <code class="docutils literal notranslate"><span class="pre">cov_type</span></code> is “unadjusted” (or “homoskedastic”), the statistic is
+divided by <span class="math notranslate nohighlight">\(q\)</span> and its p-value uses an <span class="math notranslate nohighlight">\(F_{q,n-k}\)</span>
+distribution, where <span class="math notranslate nohighlight">\(k\)</span> is the number of exogenous regressors
+plus the number of excluded instruments. This is the textbook
+F-statistic only if the model was fit with <code class="docutils literal notranslate"><span class="pre">debiased=True</span></code>. Without
+it, the covariance estimator divides by <span class="math notranslate nohighlight">\(n\)</span> and not by
+<span class="math notranslate nohighlight">\(n-k\)</span>, and the statistic is <span class="math notranslate nohighlight">\(n/(n-k)\)</span> times larger.</p>
+<p>For all other covariance estimators, <code class="docutils literal notranslate"><span class="pre">f.stat</span></code> is the Wald statistic
+and it has a <span class="math notranslate nohighlight">\(\chi^2_q\)</span> distribution. It is not divided by
+<span class="math notranslate nohighlight">\(q\)</span>. Software that reports an F-statistic for a test that is
+robust to heteroskedasticity, for example <code class="docutils literal notranslate"><span class="pre">ivreg</span></code> in R, reports the
+Wald statistic divided by <span class="math notranslate nohighlight">\(q\)</span>.</p>
 </dd></dl>
 
 
@@ -1592,6 +1633,8 @@ is with respect to the other included variables in the model.</p></li>
       
         <script src="../../_static/sphinx_immaterial_theme.32136f45f91ae6956.min.js?v=a7a9472a"></script>
         <script crossorigin="anonymous" integrity="sha256-Ae2Vz/4ePdIu6ZyI/5ZGsYnb+m0JlOmKPjt6XZ9JJkA=" src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.4/require.min.js"></script>
+        <script>window.MathJax = {"tex": {"inlineMath": [["$", "$"], ["\\(", "\\)"]], "processEscapes": true}, "options": {"ignoreHtmlClass": "tex2jax_ignore|mathjax_ignore|document", "processHtmlClass": "tex2jax_process|mathjax_process|math|output_area"}}</script>
+        <script id="MathJax-script" src="../../_static/mathjax/tex-mml-chtml.js"></script>
     
   </body>
 </html>

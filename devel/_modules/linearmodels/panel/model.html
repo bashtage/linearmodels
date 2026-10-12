@@ -19,7 +19,7 @@
     
   
       
-        <title>linearmodels.panel.model - linearmodels v7.1 (+223)</title>
+        <title>linearmodels.panel.model - linearmodels v7.1 (+236)</title>
       
     
 
@@ -91,7 +91,7 @@
 
 <header class="md-header md-header--shadow" data-md-component="header">
   <nav class="md-header__inner md-grid" aria-label="Header">
-    <a href="../../../index.html" title="linearmodels v7.1 (+223)" class="md-header__button md-logo" aria-label="linearmodels v7.1 (+223)" data-md-component="logo">
+    <a href="../../../index.html" title="linearmodels v7.1 (+236)" class="md-header__button md-logo" aria-label="linearmodels v7.1 (+236)" data-md-component="logo">
       <img src="../../../_static/bw-logo.svg" alt="logo">
     </a>
     <label class="md-header__button md-icon" for="__drawer">
@@ -102,7 +102,7 @@
       <div class="md-header__ellipsis">
         <div class="md-header__topic">
           <span class="md-ellipsis">
-            linearmodels v7.1 (+223)
+            linearmodels v7.1 (+236)
           </span>
         </div>
         <div class="md-header__topic" data-md-component="header-topic">
@@ -197,10 +197,10 @@
 
 <nav class="md-nav md-nav--primary" aria-label="Navigation" data-md-level="0">
   <label class="md-nav__title" for="__drawer">
-    <a href="../../../index.html" title="linearmodels v7.1 (+223)" class="md-nav__button md-logo" aria-label="linearmodels v7.1 (+223)" data-md-component="logo">
+    <a href="../../../index.html" title="linearmodels v7.1 (+236)" class="md-nav__button md-logo" aria-label="linearmodels v7.1 (+236)" data-md-component="logo">
       <img src="../../../_static/bw-logo.svg" alt="logo">
     </a>
-    linearmodels v7.1 (+223)
+    linearmodels v7.1 (+236)
   </label>
   
     <div class="md-nav__source">
@@ -300,6 +300,29 @@
   
   <span class="md-ellipsis">
     <span title="/system/index.rst (reference label)"><span>System Regression Models</span></span>
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../input-alignment.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    <span title="/input-alignment.rst (reference label)"><span>Aligning Inputs</span></span>
     
   </span>
   
@@ -1596,9 +1619,9 @@
 <span class="sd">        ----------</span>
 <span class="sd">        cov_type : str</span>
 <span class="sd">            Name of covariance estimator. See Notes.</span>
-<span class="sd">        debiased : bool</span>
-<span class="sd">            Flag indicating whether to debiased the covariance estimator using</span>
-<span class="sd">            a degree of freedom adjustment.</span>
+<span class="sd">        debiased : bool, optional</span>
+<span class="sd">            Flag indicating whether to debias the covariance estimator using</span>
+<span class="sd">            a degree of freedom adjustment. The default is True. See Notes.</span>
 <span class="sd">        cov_config</span>
 <span class="sd">            Additional covariance-specific options.  See Notes.</span>
 
@@ -1628,6 +1651,12 @@
 <span class="sd">          * ``cluster_entity`` - Boolean flag indicating to use entity</span>
 <span class="sd">            clusters</span>
 <span class="sd">          * ``cluster_time`` - Boolean indicating to use time clusters</span>
+<span class="sd">          * ``group_debias`` - Boolean flag indicating whether to apply an</span>
+<span class="sd">            adjustment for the number of clusters. It multiplies the</span>
+<span class="sd">            covariance by g / (g - 1) * (n - 1) / n, where g is the number</span>
+<span class="sd">            of distinct clusters and n is the number of observations. With</span>
+<span class="sd">            two-way clustering, it is applied to each of the three one-way</span>
+<span class="sd">            covariances that are combined. The default is False.</span>
 
 <span class="sd">        * "kernel" - Driscoll-Kraay HAC estimator. Configurations options are:</span>
 
@@ -1636,6 +1665,14 @@
 <span class="sd">            estimator similar to the Newey-West covariance estimator.</span>
 <span class="sd">          * ``bandwidth`` - Bandwidth to use when computing the kernel.  If</span>
 <span class="sd">            not provided, a naive default is used.</span>
+
+<span class="sd">        ``debiased=True``, which is the default, scales the covariance by</span>
+<span class="sd">        n / (n - k), where k is the number of regressors, and uses the t and</span>
+<span class="sd">        F distributions for inference.</span>
+
+<span class="sd">        ``debiased=True`` and ``group_debias=True`` give the clustered</span>
+<span class="sd">        covariance of Stata's ``regress ..., vce(cluster ...)``.</span>
+<span class="sd">        See :ref:`panel-small-sample`.</span>
 <span class="sd">        """</span>
         <span class="n">y</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">dependent</span><span class="o">.</span><span class="n">values2d</span>
         <span class="n">x</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">exog</span><span class="o">.</span><span class="n">values2d</span>
@@ -2474,9 +2511,11 @@
 <span class="sd">            regressors in the model and requires more than 1 GiB .</span>
 <span class="sd">        cov_type : str</span>
 <span class="sd">            Name of covariance estimator. See Notes.</span>
-<span class="sd">        debiased : bool</span>
-<span class="sd">            Flag indicating whether to debiased the covariance estimator using</span>
-<span class="sd">            a degree of freedom adjustment.</span>
+<span class="sd">        debiased : bool, optional</span>
+<span class="sd">            Flag indicating whether to debias the covariance estimator using</span>
+<span class="sd">            a degree of freedom adjustment. The default is True. The</span>
+<span class="sd">            estimated effects are counted in the degrees of freedom whether</span>
+<span class="sd">            or not ``debiased`` is True. See Notes.</span>
 <span class="sd">        auto_df : bool</span>
 <span class="sd">            Flag indicating that the treatment of estimated effects in degree</span>
 <span class="sd">            of freedom adjustment is automatically handled. This is useful</span>
@@ -2516,6 +2555,12 @@
 <span class="sd">          * ``cluster_entity`` - Boolean flag indicating to use entity</span>
 <span class="sd">            clusters</span>
 <span class="sd">          * ``cluster_time`` - Boolean indicating to use time clusters</span>
+<span class="sd">          * ``group_debias`` - Boolean flag indicating whether to apply an</span>
+<span class="sd">            adjustment for the number of clusters. It multiplies the</span>
+<span class="sd">            covariance by g / (g - 1) * (n - 1) / n, where g is the number</span>
+<span class="sd">            of distinct clusters and n is the number of observations. With</span>
+<span class="sd">            two-way clustering, it is applied to each of the three one-way</span>
+<span class="sd">            covariances that are combined. The default is False.</span>
 
 <span class="sd">        * "kernel" - Driscoll-Kraay HAC estimator. Configurations options are:</span>
 
@@ -2524,6 +2569,23 @@
 <span class="sd">            estimator similar to the Newey-West covariance estimator.</span>
 <span class="sd">          * ``bandwidth`` - Bandwidth to use when computing the kernel.  If</span>
 <span class="sd">            not provided, a naive default is used.</span>
+
+<span class="sd">        ``debiased=True``, which is the default, scales the covariance by</span>
+<span class="sd">        n / (n - k), where k is the number of regressors, and uses the t and</span>
+<span class="sd">        F distributions for inference.</span>
+
+<span class="sd">        ``debiased=True`` and ``group_debias=True`` give the clustered</span>
+<span class="sd">        covariance of Stata's ``xtreg, fe vce(cluster ...)``.</span>
+<span class="sd">        See :ref:`panel-small-sample`.</span>
+
+<span class="sd">        PanelOLS counts the effects that it estimates in the degrees of</span>
+<span class="sd">        freedom, which is ``extra_df`` of the covariance estimator. If d is</span>
+<span class="sd">        the number of effects, the covariance is scaled by n / (n - d - k)</span>
+<span class="sd">        if ``debiased`` is True and by n / (n - d) if it is False. If</span>
+<span class="sd">        ``auto_df`` is True, the effects are not counted when the model has</span>
+<span class="sd">        a single effect and each of its groups is in one cluster, for</span>
+<span class="sd">        example entity effects with ``cluster_entity=True``. Use</span>
+<span class="sd">        ``auto_df=False`` and ``count_effects`` to choose.</span>
 <span class="sd">        """</span>
 
         <span class="n">weighted</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">any</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">weights</span><span class="o">.</span><span class="n">values2d</span> <span class="o">!=</span> <span class="mf">1.0</span><span class="p">)</span>
@@ -2847,9 +2909,9 @@
 <span class="sd">            are accounted for when reweighting. Has no effect on balanced data.</span>
 <span class="sd">        cov_type : str</span>
 <span class="sd">            Name of covariance estimator. See Notes.</span>
-<span class="sd">        debiased : bool</span>
-<span class="sd">            Flag indicating whether to debiased the covariance estimator using</span>
-<span class="sd">            a degree of freedom adjustment.</span>
+<span class="sd">        debiased : bool, optional</span>
+<span class="sd">            Flag indicating whether to debias the covariance estimator using</span>
+<span class="sd">            a degree of freedom adjustment. The default is True. See Notes.</span>
 <span class="sd">        cov_config</span>
 <span class="sd">            Additional covariance-specific options.  See Notes.</span>
 
@@ -2876,9 +2938,19 @@
 <span class="sd">          * ``clusters`` - Input containing 1 or 2 variables.</span>
 <span class="sd">            Clusters should be integer values, although other types will</span>
 <span class="sd">            be coerced to integer values by treating as categorical variables</span>
+<span class="sd">          * ``group_debias`` - Boolean flag indicating whether to apply an</span>
+<span class="sd">            adjustment for the number of clusters. It multiplies the</span>
+<span class="sd">            covariance by g / (g - 1) * (n - 1) / n, where g is the number</span>
+<span class="sd">            of distinct clusters and n is the number of observations. With</span>
+<span class="sd">            two-way clustering, it is applied to each of the three one-way</span>
+<span class="sd">            covariances that are combined. The default is False.</span>
 
 <span class="sd">        When using a clustered covariance estimator, all cluster ids must be</span>
 <span class="sd">        identical within an entity.</span>
+
+<span class="sd">        ``debiased=True``, which is the default, scales the covariance by</span>
+<span class="sd">        n / (n - k), where k is the number of regressors, and uses the t and</span>
+<span class="sd">        F distributions for inference. See :ref:`panel-small-sample`.</span>
 <span class="sd">        """</span>
         <span class="n">y</span><span class="p">,</span> <span class="n">x</span><span class="p">,</span> <span class="n">w</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_prepare_between</span><span class="p">()</span>
         <span class="k">if</span> <span class="n">np</span><span class="o">.</span><span class="n">all</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">weights</span><span class="o">.</span><span class="n">values2d</span> <span class="o">==</span> <span class="mf">1.0</span><span class="p">)</span> <span class="ow">and</span> <span class="ow">not</span> <span class="n">reweight</span><span class="p">:</span>
@@ -3160,9 +3232,9 @@
 <span class="sd">        ----------</span>
 <span class="sd">        cov_type : str</span>
 <span class="sd">            Name of covariance estimator. See Notes.</span>
-<span class="sd">        debiased : bool</span>
-<span class="sd">            Flag indicating whether to debiased the covariance estimator using</span>
-<span class="sd">            a degree of freedom adjustment.</span>
+<span class="sd">        debiased : bool, optional</span>
+<span class="sd">            Flag indicating whether to debias the covariance estimator using</span>
+<span class="sd">            a degree of freedom adjustment. The default is True. See Notes.</span>
 <span class="sd">        cov_config</span>
 <span class="sd">            Additional covariance-specific options.  See Notes.</span>
 
@@ -3192,6 +3264,12 @@
 <span class="sd">            be coerced to integer values by treating as categorical variables</span>
 <span class="sd">          * ``cluster_entity`` - Boolean flag indicating to use entity</span>
 <span class="sd">            clusters</span>
+<span class="sd">          * ``group_debias`` - Boolean flag indicating whether to apply an</span>
+<span class="sd">            adjustment for the number of clusters. It multiplies the</span>
+<span class="sd">            covariance by g / (g - 1) * (n - 1) / n, where g is the number</span>
+<span class="sd">            of distinct clusters and n is the number of observations. With</span>
+<span class="sd">            two-way clustering, it is applied to each of the three one-way</span>
+<span class="sd">            covariances that are combined. The default is False.</span>
 
 <span class="sd">        * "kernel" - Driscoll-Kraay HAC estimator. Configurations options are:</span>
 
@@ -3204,6 +3282,10 @@
 <span class="sd">        When using a clustered covariance estimator, all cluster ids must be</span>
 <span class="sd">        identical within a first difference.  In most scenarios, this requires</span>
 <span class="sd">        ids to be identical within an entity.</span>
+
+<span class="sd">        ``debiased=True``, which is the default, scales the covariance by</span>
+<span class="sd">        n / (n - k), where k is the number of regressors, and uses the t and</span>
+<span class="sd">        F distributions for inference. See :ref:`panel-small-sample`.</span>
 <span class="sd">        """</span>
         <span class="n">y_fd</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">dependent</span><span class="o">.</span><span class="n">first_difference</span><span class="p">()</span>
         <span class="n">time_ids</span> <span class="o">=</span> <span class="n">y_fd</span><span class="o">.</span><span class="n">time_ids</span>
@@ -3494,9 +3576,9 @@
 <span class="sd">            the random effect.</span>
 <span class="sd">        cov_type : str</span>
 <span class="sd">            Name of covariance estimator (see notes). Default is "unadjusted".</span>
-<span class="sd">        debiased : bool</span>
-<span class="sd">            Flag indicating whether to debiased the covariance estimator using</span>
-<span class="sd">            a degree of freedom adjustment.</span>
+<span class="sd">        debiased : bool, optional</span>
+<span class="sd">            Flag indicating whether to debias the covariance estimator using</span>
+<span class="sd">            a degree of freedom adjustment. The default is True. See Notes.</span>
 <span class="sd">        cov_config</span>
 <span class="sd">            Additional covariance-specific options.  See Notes.</span>
 
@@ -3526,6 +3608,12 @@
 <span class="sd">          * ``cluster_entity`` - Boolean flag indicating to use entity</span>
 <span class="sd">            clusters</span>
 <span class="sd">          * ``cluster_time`` - Boolean indicating to use time clusters</span>
+<span class="sd">          * ``group_debias`` - Boolean flag indicating whether to apply an</span>
+<span class="sd">            adjustment for the number of clusters. It multiplies the</span>
+<span class="sd">            covariance by g / (g - 1) * (n - 1) / n, where g is the number</span>
+<span class="sd">            of distinct clusters and n is the number of observations. With</span>
+<span class="sd">            two-way clustering, it is applied to each of the three one-way</span>
+<span class="sd">            covariances that are combined. The default is False.</span>
 
 <span class="sd">        * "kernel" - Driscoll-Kraay HAC estimator. Configurations options are:</span>
 
@@ -3534,6 +3622,14 @@
 <span class="sd">            estimator similar to the Newey-West covariance estimator.</span>
 <span class="sd">          * ``bandwidth`` - Bandwidth to use when computing the kernel.  If</span>
 <span class="sd">            not provided, a naive default is used.</span>
+
+<span class="sd">        ``debiased=True``, which is the default, scales the covariance by</span>
+<span class="sd">        n / (n - k), where k is the number of regressors, and uses the t and</span>
+<span class="sd">        F distributions for inference.</span>
+
+<span class="sd">        ``debiased=True`` and ``group_debias=True`` give the clustered</span>
+<span class="sd">        covariance of Stata's ``xtreg, re vce(cluster ...)``.</span>
+<span class="sd">        See :ref:`panel-small-sample`.</span>
 <span class="sd">        """</span>
         <span class="n">w</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">weights</span><span class="o">.</span><span class="n">values2d</span>
         <span class="n">root_w</span> <span class="o">=</span> <span class="n">cast</span><span class="p">(</span><span class="s2">"linearmodels.typing.data.Float64Array"</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="n">w</span><span class="p">))</span>

@@ -23,7 +23,7 @@
     
   
       
-        <title>Formulas and Mathematical Detail - linearmodels v7.1 (+223)</title>
+        <title>Formulas and Mathematical Detail - linearmodels v7.1 (+236)</title>
       
     
 
@@ -100,7 +100,7 @@
 
 <header class="md-header md-header--shadow" data-md-component="header">
   <nav class="md-header__inner md-grid" aria-label="Header">
-    <a href="../index.html" title="linearmodels v7.1 (+223)" class="md-header__button md-logo" aria-label="linearmodels v7.1 (+223)" data-md-component="logo">
+    <a href="../index.html" title="linearmodels v7.1 (+236)" class="md-header__button md-logo" aria-label="linearmodels v7.1 (+236)" data-md-component="logo">
       <img src="../_static/bw-logo.svg" alt="logo">
     </a>
     <label class="md-header__button md-icon" for="__drawer">
@@ -111,7 +111,7 @@
       <div class="md-header__ellipsis">
         <div class="md-header__topic">
           <span class="md-ellipsis">
-            linearmodels v7.1 (+223)
+            linearmodels v7.1 (+236)
           </span>
         </div>
         <div class="md-header__topic" data-md-component="header-topic">
@@ -206,10 +206,10 @@
 
 <nav class="md-nav md-nav--primary" aria-label="Navigation" data-md-level="0">
   <label class="md-nav__title" for="__drawer">
-    <a href="../index.html" title="linearmodels v7.1 (+223)" class="md-nav__button md-logo" aria-label="linearmodels v7.1 (+223)" data-md-component="logo">
+    <a href="../index.html" title="linearmodels v7.1 (+236)" class="md-nav__button md-logo" aria-label="linearmodels v7.1 (+236)" data-md-component="logo">
       <img src="../_static/bw-logo.svg" alt="logo">
     </a>
-    linearmodels v7.1 (+223)
+    linearmodels v7.1 (+236)
   </label>
   
     <div class="md-nav__source">
@@ -532,6 +532,16 @@
   
 </li>
         
+          <li class="md-nav__item">
+  <a href="#jackknife-instrumental-variables-jive" class="md-nav__link">
+    
+    <span class="md-ellipsis">
+      <span title="/iv/mathematical-formula.rst#jackknife-instrumental-variables-jive (reference label)"><span>Jackknife Instrumental Variables <wbr>(JIVE)</span></span>
+    </span>
+  </a>
+  
+</li>
+        
       </ul>
     </nav>
   
@@ -633,6 +643,16 @@
     
     <span class="md-ellipsis">
       <span title="/iv/mathematical-formula.rst#gmm-weight-estimators (reference label)"><span>GMM Weight Estimators</span></span>
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#jive-covariance" class="md-nav__link">
+    
+    <span class="md-ellipsis">
+      <span title="/iv/mathematical-formula.rst#jive-covariance (reference label)"><span>JIVE Covariance</span></span>
     </span>
   </a>
   
@@ -786,6 +806,29 @@
   
   <span class="md-ellipsis">
     <span title="/system/index.rst (reference label)"><span>System Regression Models</span></span>
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../input-alignment.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    <span title="/input-alignment.rst (reference label)"><span>Aligning Inputs</span></span>
     
   </span>
   
@@ -1042,6 +1085,16 @@
   
 </li>
         
+          <li class="md-nav__item">
+  <a href="#jackknife-instrumental-variables-jive" class="md-nav__link">
+    
+    <span class="md-ellipsis">
+      <span title="/iv/mathematical-formula.rst#jackknife-instrumental-variables-jive (reference label)"><span>Jackknife Instrumental Variables <wbr>(JIVE)</span></span>
+    </span>
+  </a>
+  
+</li>
+        
       </ul>
     </nav>
   
@@ -1143,6 +1196,16 @@
     
     <span class="md-ellipsis">
       <span title="/iv/mathematical-formula.rst#gmm-weight-estimators (reference label)"><span>GMM Weight Estimators</span></span>
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#jive-covariance" class="md-nav__link">
+    
+    <span class="md-ellipsis">
+      <span title="/iv/mathematical-formula.rst#jive-covariance (reference label)"><span>JIVE Covariance</span></span>
     </span>
   </a>
   
@@ -1271,6 +1334,15 @@ defined <span class="math notranslate nohighlight">\(P_{X}=X\left(X^{\prime}X\ri
 projection matrix for <span class="math notranslate nohighlight">\(Z\)</span> is similarly defined only using
 <span class="math notranslate nohighlight">\(Z\)</span>. The annihilator matrix for <span class="math notranslate nohighlight">\(X\)</span> is
 <span class="math notranslate nohighlight">\(M_{X}=I-P_{X}\)</span>.</p>
+<p>Observation weights, <span class="math notranslate nohighlight">\(w_{i}\)</span>, are scaled to have a mean of 1. When
+a model uses weights, estimation is performed on the weighted variables
+<span class="math notranslate nohighlight">\(\sqrt{w_{i}}y_{i}\)</span>, <span class="math notranslate nohighlight">\(\sqrt{w_{i}}x_{i}\)</span> and
+<span class="math notranslate nohighlight">\(\sqrt{w_{i}}z_{i}\)</span>, which take the place of <span class="math notranslate nohighlight">\(y_{i}\)</span>,
+<span class="math notranslate nohighlight">\(x_{i}\)</span> and <span class="math notranslate nohighlight">\(z_{i}\)</span> in the formulas below. This includes the
+covariance estimators, the specification tests and the first-stage
+statistics. The parameters, covariance and test statistics of a weighted
+model are therefore those of the unweighted model that is estimated
+using the weighted variables.</p>
 <h2 id="parameter-estimation">Parameter Estimation<a class="headerlink" href="#parameter-estimation" title="Link to this heading">¶</a></h2>
 <h3 id="two-stage-least-squares-2sls">Two-stage Least Squares (2SLS)<a class="headerlink" href="#two-stage-least-squares-2sls" title="Link to this heading">¶</a></h3>
 <p>The 2SLS estimator is</p>
@@ -1305,6 +1377,37 @@ the eigenvalues.</p>
 and <span class="math notranslate nohighlight">\(\hat{\epsilon}_{i}=y_{i}-x_{i}\beta\)</span>. Unlike standard GMM,
 the weight matrix, <span class="math notranslate nohighlight">\(W\)</span> directly depends on the model parameters
 <span class="math notranslate nohighlight">\(\beta\)</span> and so it is not possible to use a closed form estimator.</p>
+<h3 id="jackknife-instrumental-variables-jive">Jackknife Instrumental Variables (JIVE)<a class="headerlink" href="#jackknife-instrumental-variables-jive" title="Link to this heading">¶</a></h3>
+<p>The 2SLS fitted value of a regressor, <span class="math notranslate nohighlight">\(\hat{x}_{i}\)</span>, the
+<span class="math notranslate nohighlight">\(i\)</span>th row of <span class="math notranslate nohighlight">\(\hat{X}=P_{Z}X\)</span>, is computed from a first
+stage that uses observation <span class="math notranslate nohighlight">\(i\)</span>. This links <span class="math notranslate nohighlight">\(\hat{x}_{i}\)</span> to
+the error <span class="math notranslate nohighlight">\(\epsilon_{i}\)</span>, which is the source of the bias of 2SLS
+towards OLS when there are many instruments. The jackknife IV estimator
+(JIVE1) of Angrist, Imbens and Krueger (1999) replaces the fitted values
+with leave-one-out predictions. Row <span class="math notranslate nohighlight">\(i\)</span> of <span class="math notranslate nohighlight">\(\tilde{X}\)</span> is
+the prediction of <span class="math notranslate nohighlight">\(x_{i}\)</span> from the first-stage regression of
+<span class="math notranslate nohighlight">\(X\)</span> on <span class="math notranslate nohighlight">\(Z\)</span> that is estimated without observation <span class="math notranslate nohighlight">\(i\)</span>,</p>
+<div class="math notranslate nohighlight">
+\[\tilde{x}_{i}^{\prime}=z_{i}^{\prime}\left(Z_{(-i)}^{\prime}Z_{(-i)}\right)^{-1}Z_{(-i)}^{\prime}X_{(-i)}\]</div>
+<p>where the subscript <span class="math notranslate nohighlight">\((-i)\)</span> indicates that row <span class="math notranslate nohighlight">\(i\)</span> has been
+removed. The first stage does not have to be estimated <span class="math notranslate nohighlight">\(n\)</span> times,
+since</p>
+<div class="math notranslate nohighlight">
+\[\tilde{x}_{i}=\frac{\hat{x}_{i}-h_{i}x_{i}}{1-h_{i}},\qquad h_{i}=z_{i}^{\prime}\left(Z^{\prime}Z\right)^{-1}z_{i}\]</div>
+<p>where <span class="math notranslate nohighlight">\(h_{i}\)</span> is the leverage of observation <span class="math notranslate nohighlight">\(i\)</span>, the
+<span class="math notranslate nohighlight">\(i\)</span>th diagonal element of <span class="math notranslate nohighlight">\(P_{Z}\)</span>. The exogenous
+regressors are in <span class="math notranslate nohighlight">\(Z\)</span>, so that they are their own predictions,
+<span class="math notranslate nohighlight">\(\tilde{x}_{1i}=x_{1i}\)</span>, and only the endogenous regressors are
+replaced. The JIVE estimator is the IV estimator that uses
+<span class="math notranslate nohighlight">\(\tilde{X}\)</span> as the instruments for <span class="math notranslate nohighlight">\(X\)</span>,</p>
+<div class="math notranslate nohighlight">
+\[\hat{\beta}_{JIVE}=\left(\tilde{X}^{\prime}X\right)^{-1}\tilde{X}^{\prime}y\]</div>
+<p>which replaces <span class="math notranslate nohighlight">\(\hat{X}\)</span> with <span class="math notranslate nohighlight">\(\tilde{X}\)</span> in
+<span class="math notranslate nohighlight">\(\hat{\beta}_{2SLS}=\left(\hat{X}^{\prime}X\right)^{-1}\hat{X}^{\prime}y\)</span>.
+The estimator cannot be computed if <span class="math notranslate nohighlight">\(h_{i}=1\)</span> for an observation.
+This happens if the observation is the only one with a non-zero value of
+one of the instruments, for example a dummy variable that is 1 for a
+single observation.</p>
 <h2 id="basic-statistics">Basic Statistics<a class="headerlink" href="#basic-statistics" title="Link to this heading">¶</a></h2>
 <p>Let <span class="math notranslate nohighlight">\(\hat{\epsilon}=y-X\hat{\beta}\)</span>. The residual sum of squares
 (RSS) is <span class="math notranslate nohighlight">\(\hat{\epsilon}^{\prime}\hat{\epsilon}\)</span>, the model sum of
@@ -1465,7 +1568,65 @@ the demeaned moment conditions defined as
 used in-place of <span class="math notranslate nohighlight">\(g_{i}\)</span> in the robust, kernel and clustered
 estimators. The unadjusted estimator is always centered, and so this
 option has no effect.</p>
+<h3 id="jive-covariance">JIVE Covariance<a class="headerlink" href="#jive-covariance" title="Link to this heading">¶</a></h3>
+<p>JIVE is a just identified IV estimator that solves the moment conditions
+<span class="math notranslate nohighlight">\(n^{-1}\sum_{i=1}^{n}\tilde{x}_{i}\hat{\epsilon}_{i}=0\)</span>, where
+<span class="math notranslate nohighlight">\(\hat{\epsilon}_{i}=y_{i}-x_{i}^{\prime}\hat{\beta}_{JIVE}\)</span> is
+computed using <span class="math notranslate nohighlight">\(X\)</span> and not <span class="math notranslate nohighlight">\(\tilde{X}\)</span>. Its covariance is</p>
+<div class="math notranslate nohighlight">
+\[\hat{\Sigma}=n^{-1}\left(\frac{\tilde{X}^{\prime}X}{n}\right)^{-1}\hat{S}\left(\frac{X^{\prime}\tilde{X}}{n}\right)^{-1}\]</div>
+<p>where <span class="math notranslate nohighlight">\(\hat{S}\)</span> is an estimator of the covariance of the moment
+conditions <span class="math notranslate nohighlight">\(\tilde{x}_{i}\hat{\epsilon}_{i}\)</span>. The estimators are
+those of the GMM covariance, with <span class="math notranslate nohighlight">\(\tilde{x}_{i}\)</span> in place of
+<span class="math notranslate nohighlight">\(z_{i}\)</span>. The unadjusted estimator is
+<span class="math notranslate nohighlight">\(\hat{S}=s^{2}n^{-1}\tilde{X}^{\prime}\tilde{X}\)</span> with
+<span class="math notranslate nohighlight">\(s^{2}=n^{-1}\hat{\epsilon}^{\prime}\hat{\epsilon}\)</span>, which is not
+centered. The robust estimator is
+<span class="math notranslate nohighlight">\(\hat{S}=n^{-1}\sum_{i=1}^{n}\hat{\epsilon}_{i}^{2}\tilde{x}_{i}\tilde{x}_{i}^{\prime}\)</span>.
+The kernel and one-way clustered estimators are defined as for the GMM
+covariance. The bandwidth of the kernel estimator is selected using the
+data if it is not provided. Two-way clustering is not available. If the
+debiased flag is used, <span class="math notranslate nohighlight">\(\hat{S}\)</span> is rescaled as in the GMM
+covariance estimators.</p>
+<p><strong>Inference with many instruments</strong></p>
+<p>These covariance estimators treat <span class="math notranslate nohighlight">\(\tilde{X}\)</span> as if it were a
+fixed set of instruments. Chao, Swanson, Hausman, Newey and Woutersen
+(2012) derive the distribution of JIVE when the number of instruments,
+<span class="math notranslate nohighlight">\(K\)</span>, grows with the sample size. JIVE is consistent and
+asymptotically normal if <span class="math notranslate nohighlight">\(\sqrt{K}/r_{n}\to0\)</span>, where <span class="math notranslate nohighlight">\(r_{n}\)</span>
+is the concentration parameter, which measures the strength of the
+instruments. The asymptotic variance is the sum of the term that is
+estimated above and a second term of order <span class="math notranslate nohighlight">\(K/r_{n}\)</span>. The second
+term depends on the variances of the errors of the first stage and of
+the model and on their covariance. It can be ignored if
+<span class="math notranslate nohighlight">\(K/r_{n}\to0\)</span>, but not if <span class="math notranslate nohighlight">\(K\)</span> is large relative to the
+strength of the instruments. The covariance estimators above omit it,
+and so they can understate the uncertainty in the latter case. In a
+simulation with <span class="math notranslate nohighlight">\(n=200\)</span>, <span class="math notranslate nohighlight">\(K=100\)</span> instruments that each have
+a first-stage coefficient of 0.05, and a correlation of 0.95 between the
+errors of the first stage and of the model, a 95% confidence interval
+that used the robust covariance contained the true value in about 85% of
+2,000 replications. The variance estimator that includes the second term
+is not implemented.</p>
+<p>Davidson and MacKinnon (2006) compare two variants of JIVE with 2SLS and
+LIML in Monte Carlo experiments. They find that JIVE is always more
+dispersed than 2SLS, often very much so, that it is almost always
+inferior to LIML, and that it performs particularly badly when the
+instruments are weak.</p>
 <h2 id="post-estimation">Post-estimation<a class="headerlink" href="#post-estimation" title="Link to this heading">¶</a></h2>
+<p>A model that uses weights is tested using the weighted variables, as
+described in the notation. Sargan’s, Basmann’s, Anderson-Rubin,
+Basmann’s F, Durbin’s and the Wu-Hausman tests assume that the errors
+are homoskedastic, and so they do not use the covariance estimator that
+was used to fit the model. Wooldridge’s score tests of exogeneity and of
+the overidentifying restrictions are robust to heteroskedasticity, and
+they also do not depend on the covariance estimator. Wooldridge’s
+regression test of exogeneity uses the covariance estimator that was
+used to fit the model, and so it has the robustness of that estimator.
+The J-statistic and the C-statistic of the GMM estimators use the
+estimator of the covariance of the moment conditions that is selected by
+the weight type, and not the covariance estimator that is selected in
+the call to fit.</p>
 <h3 id="sls-and-liml-post-estimation-results">2SLS and LIML Post-estimation Results<a class="headerlink" href="#sls-and-liml-post-estimation-results" title="Link to this heading">¶</a></h3>
 <p><strong>Sargan</strong></p>
 <p>Sargan’s test of over-identifying restrictions examines whether the
@@ -1523,19 +1684,19 @@ regression of the endogenous on all exogenous variables and
 <p>The test statistic is <span class="math notranslate nohighlight">\(nR^{2}\sim\chi_{q}^{2}\)</span> from the
 regression.</p>
 <p><strong>Anderson-Rubin</strong></p>
-<p>The Andersen-Rubin test of overidentification examines the magnitude of
+<p>The Anderson-Rubin test of overidentification examines the magnitude of
 the LIML <span class="math notranslate nohighlight">\(\hat{\kappa}\)</span>which should be close to unity when the
 model is not overidentified.</p>
 <div class="math notranslate nohighlight">
 \[n\ln(\hat{\kappa})\sim\chi_{q}^{2}\]</div>
 <p>where <span class="math notranslate nohighlight">\(q=p-k_{2}\)</span>.</p>
-<p><strong>Basman’s F</strong></p>
+<p><strong>Basmann’s F</strong></p>
 <p>Basmann’s F test of overidentification also examines the magnitude of
 the LIML <span class="math notranslate nohighlight">\(\hat{\kappa}\)</span>. The test statistic is</p>
 <div class="math notranslate nohighlight">
 \[\hat{\kappa}(n-p)/q\sim F_{q,n-n_{instr}}\]</div>
 <p>where <span class="math notranslate nohighlight">\(q=p-k_{2}\)</span>.</p>
-<p><strong>Durbin and Wu-Haussman</strong></p>
+<p><strong>Durbin and Wu-Hausman</strong></p>
 <p>Durbin’s and the Wu-Hausman tests of exogeneity test of exogeneity is
 depends on the variance of the residuals when come endogenous variables
 are treated as exogenous against the case where they are treated as
@@ -1565,18 +1726,75 @@ defined</p>
 <p>where <span class="math notranslate nohighlight">\(\bar{g}=n^{-1}\sum\hat{\epsilon}_{i}z_{i}\)</span> and <span class="math notranslate nohighlight">\(W\)</span> is
 a consistent estimator of the variance of <span class="math notranslate nohighlight">\(\sqrt{n}\bar{g}\)</span>. The
 degree of freedom is <span class="math notranslate nohighlight">\(q=p-k_{2}\)</span>.</p>
-<p><strong>C-stat</strong></p>
-<p>The C-statistic tests exogeneity by treating a the set of endogenous
-variables as exogenous. In practice this means that are included in the
-GMM moment conditions, and so a likelihood-ratio-like test statistic can
-be computed as</p>
+<p><strong>Centered J-stat</strong></p>
+<p>The estimators of the covariance of the moment conditions that are used
+to compute the weight matrix subtract the mean of the moment conditions
+only if the center flag is true, and the unadjusted estimator always
+does. Let <span class="math notranslate nohighlight">\(g_{i}=z_{i}\hat{\epsilon}_{i}\)</span>, and let
+<span class="math notranslate nohighlight">\(W=n^{-1}\sum_{i=1}^{n}g_{i}g_{i}^{\prime}\)</span> and
+<span class="math notranslate nohighlight">\(W_{c}=n^{-1}\sum_{i=1}^{n}\left(g_{i}-\bar{g}\right)\left(g_{i}-\bar{g}\right)^{\prime}\)</span>
+be the robust estimators that do not center and that center the moment
+conditions, so that <span class="math notranslate nohighlight">\(W=W_{c}+\bar{g}\bar{g}^{\prime}\)</span>. If the
+model is correctly specified, the moment conditions have mean zero at
+the true parameters and the two estimators are asymptotically
+equivalent. If it is not, <span class="math notranslate nohighlight">\(\bar{g}\)</span> does not converge to zero, and
+<span class="math notranslate nohighlight">\(W\)</span> also contains <span class="math notranslate nohighlight">\(\bar{g}\bar{g}^{\prime}\)</span>. When both are
+evaluated using the same parameters, the Sherman-Morrison formula shows
+that the J-statistic and the centered J-statistic,
+<span class="math notranslate nohighlight">\(J_{c}=n\bar{g}^{\prime}W_{c}^{-1}\bar{g}\)</span>, are related by</p>
 <div class="math notranslate nohighlight">
-\[J_{e}-J_{c}\sim\chi_{m}^{2}\]</div>
-<p>where <span class="math notranslate nohighlight">\(J_{e}\)</span> is the J-statistic treating the tested variables as
-exogenous and <span class="math notranslate nohighlight">\(J_{c}\)</span> leaves then as endogenous. The optimal
-weighting matrix is computed from the expanded model (efficient) and
-used to estimate parameters in both models. This ensures that the test
-statistic is positive.</p>
+\[J=n\bar{g}^{\prime}W^{-1}\bar{g}=\frac{J_{c}}{1+J_{c}/n},\qquad J_{c}=\frac{J}{1-J/n}\]</div>
+<p>The J-statistic is therefore smaller than <span class="math notranslate nohighlight">\(n\)</span> however large the
+violation of the moment conditions, while the centered J-statistic is
+not bounded. The relationship is exact when the weight matrix is the
+robust estimator that does not center, evaluated at the final
+parameters, as in iterated GMM that has converged. In two-step GMM the
+weight matrix is computed from the first-step parameters, and the
+relationship is approximate. The centered J-statistic has the same
+asymptotic distribution as the J-statistic when the moment conditions
+hold, and it is available as the attribute centered_j_stat of the
+results (Hall, 2000; Hansen and Lee, 2021). It uses the estimator of the
+covariance that is selected by the weight type of the model, applied to
+the centered moment conditions and evaluated at the final parameter
+estimates. The cluster sums of centered moment conditions add to zero,
+and so a clustered estimate that uses <span class="math notranslate nohighlight">\(g\)</span> clusters has rank at
+most <span class="math notranslate nohighlight">\(g-1\)</span>. The statistic is not defined if the estimate is
+singular, which requires more clusters than moment conditions.</p>
+<p><strong>C-stat</strong></p>
+<p>The C-statistic tests the exogeneity of <span class="math notranslate nohighlight">\(m\)</span> of the endogenous
+variables by treating them as exogenous, so that they are included in
+the moment conditions,
+<span class="math notranslate nohighlight">\(z_{i}^{e}=\left(z_{i}^{\prime},x_{t,i}^{\prime}\right)^{\prime}\)</span>,
+where <span class="math notranslate nohighlight">\(x_{t,i}\)</span> are the tested variables. A likelihood-ratio-like
+test statistic is computed as</p>
+<div class="math notranslate nohighlight">
+\[C=J_{e}-J_{c}\sim\chi_{m}^{2}\]</div>
+<p>where <span class="math notranslate nohighlight">\(J_{e}\)</span> is the J-statistic of the model that treats the
+tested variables as exogenous and <span class="math notranslate nohighlight">\(J_{c}\)</span> is the J-statistic of
+the model that leaves them as endogenous. Both J-statistics use the same
+estimate of the covariance of the moment conditions. Let <span class="math notranslate nohighlight">\(S_{e}\)</span>
+be the estimate of the covariance of <span class="math notranslate nohighlight">\(z_{i}^{e}\hat{\epsilon}_{i}\)</span>
+computed from the first-step residuals of the model that treats the
+variables as exogenous. It is computed using the estimator that is
+selected by the weight type of the model, for example robust, kernel or
+clustered. The weight matrix of that model is <span class="math notranslate nohighlight">\(S_{e}^{-1}\)</span>, and
+<span class="math notranslate nohighlight">\(J_{e}\)</span> is its J-statistic. The moment conditions of the original
+model are a subset of the moment conditions of this model. Let
+<span class="math notranslate nohighlight">\(S_{e,c}\)</span> be the sub-matrix of <span class="math notranslate nohighlight">\(S_{e}\)</span> that contains the
+rows and columns of the original moment conditions. The original model
+is estimated using the weight matrix <span class="math notranslate nohighlight">\(S_{e,c}^{-1}\)</span>, and
+<span class="math notranslate nohighlight">\(J_{c}\)</span> is its J-statistic. Note that <span class="math notranslate nohighlight">\(S_{e,c}^{-1}\)</span> is the
+inverse of the sub-matrix of <span class="math notranslate nohighlight">\(S_{e}\)</span>, which is not the sub-matrix
+of <span class="math notranslate nohighlight">\(S_{e}^{-1}\)</span>.</p>
+<p>Using a common estimate of the covariance ensures that the test
+statistic is not negative, since
+<span class="math notranslate nohighlight">\(g_{e}^{\prime}S_{e}^{-1}g_{e}\geq g_{c}^{\prime}S_{e,c}^{-1}g_{c}\)</span>
+for any parameters, where <span class="math notranslate nohighlight">\(g_{e}\)</span> and <span class="math notranslate nohighlight">\(g_{c}\)</span> are the
+average moment conditions of the two models. If the original model is
+just identified then <span class="math notranslate nohighlight">\(J_{c}=0\)</span> and the C-statistic is
+<span class="math notranslate nohighlight">\(J_{e}\)</span>. The statistic is not defined if <span class="math notranslate nohighlight">\(S_{e}\)</span> is
+singular, which requires more clusters than the moment conditions of the
+model that treats the variables as exogenous.</p>
 <h2 id="first-stage-estimation-analysis">First-stage Estimation Analysis<a class="headerlink" href="#first-stage-estimation-analysis" title="Link to this heading">¶</a></h2>
 <p><strong>Partial R2 and Partial F-statistic</strong></p>
 <p>The <span class="math notranslate nohighlight">\(R^{2}\)</span> is reported after orthogonalizing the instruments from
@@ -1584,11 +1802,20 @@ included exogenous variables, so that the model estimated is</p>
 <div class="math notranslate nohighlight">
 \[x_{2i}=\gamma_{0}+\tilde{z}_{2i}\gamma+\eta_{i}\]</div>
 <p>where <span class="math notranslate nohighlight">\(\tilde{Z}_{2}=M_{X_{1}}\tilde{Z}\)</span>. The partial
-<span class="math notranslate nohighlight">\(F\)</span>-statistic is the F-statistic from this regression. It is
-implemented as a standard <span class="math notranslate nohighlight">\(F\)</span>-statistic when the data is assumed
-to be homoskedastic with an <span class="math notranslate nohighlight">\(F_{p_{2},n-p_{2}}\)</span> distribution. In
-all other cases, a quadratic form is used with an asymptotic
-<span class="math notranslate nohighlight">\(\chi_{p_{2}}^{2}\)</span> distribution testing <span class="math notranslate nohighlight">\(H_{0}:\gamma=0\)</span>.</p>
+<span class="math notranslate nohighlight">\(F\)</span>-statistic tests <span class="math notranslate nohighlight">\(H_{0}:\gamma=0\)</span> in this regression. It
+is the Wald statistic
+<span class="math notranslate nohighlight">\(W=\hat{\gamma}^{\prime}\hat{V}_{\gamma}^{-1}\hat{\gamma}\)</span>, where
+<span class="math notranslate nohighlight">\(\hat{V}_{\gamma}\)</span> is the covariance of <span class="math notranslate nohighlight">\(\hat{\gamma}\)</span>
+estimated using the covariance estimator of the model. If the covariance
+is unadjusted, the statistic is reported as <span class="math notranslate nohighlight">\(W/p_{2}\)</span> with an
+<span class="math notranslate nohighlight">\(F_{p_{2},n-p}\)</span> distribution. This is the classical
+<span class="math notranslate nohighlight">\(F\)</span>-statistic only if the debiased flag is used. Otherwise, the
+covariance uses <span class="math notranslate nohighlight">\(n^{-1}\)</span> in place of <span class="math notranslate nohighlight">\(\left(n-p\right)^{-1}\)</span>
+and the statistic is <span class="math notranslate nohighlight">\(n/\left(n-p\right)\)</span> times larger. In all
+other cases, <span class="math notranslate nohighlight">\(W\)</span> is reported with an asymptotic
+<span class="math notranslate nohighlight">\(\chi_{p_{2}}^{2}\)</span> distribution. It is not divided by
+<span class="math notranslate nohighlight">\(p_{2}\)</span>, which is how other software reports the
+<span class="math notranslate nohighlight">\(F\)</span>-statistic of a robust test.</p>
 <p><strong>Shea’s R2</strong></p>
 <p>Shea’s <span class="math notranslate nohighlight">\(R^{2}\)</span> is defined as the ratio of the parameter variances
 under OLS and 2SLS estimation standardized by the unexplained variance
@@ -1623,7 +1850,31 @@ w_{i} &amp; =3(\sin(z_{i})/z_{i}-\cos(z_{i}))/z_{i}^{2},\:i\geq1\end{aligned}\en
 </li>
 </ul>
 <p><strong>Optimal BW selection</strong></p>
-<p>TODO</p>
+<p>If the bandwidth of a kernel estimator is not provided, it is selected
+using the data with the plug-in method of Newey and West (1994). The
+method uses a scalar series, <span class="math notranslate nohighlight">\(g_{i}\)</span>, that is a sum of the scores
+or moment conditions. In the 2SLS and LIML covariances, <span class="math notranslate nohighlight">\(g_{i}\)</span> is
+the sum of <span class="math notranslate nohighlight">\(\hat{x}_{ij}\hat{\epsilon}_{i}\)</span> over the regressors
+other than the constant, where <span class="math notranslate nohighlight">\(\hat{x}_{ij}\)</span> are the first-stage
+fitted values. In the GMM weight matrix and covariance and in the JIVE
+covariance, the moment conditions are divided by their standard
+deviations before they are summed. The moment conditions are
+<span class="math notranslate nohighlight">\(z_{ij}\hat{\epsilon}_{i}\)</span>, and
+<span class="math notranslate nohighlight">\(\tilde{x}_{ij}\hat{\epsilon}_{i}\)</span> in JIVE. Let</p>
+<div class="math notranslate nohighlight">
+\[\hat{\sigma}_{j}=T^{-1}\sum_{i=j+1}^{T}g_{i}g_{i-j},\qquad\hat{s}^{(0)}=\hat{\sigma}_{0}+2\sum_{j=1}^{m^{*}}\hat{\sigma}_{j},\qquad\hat{s}^{(q)}=2\sum_{j=1}^{m^{*}}j^{q}\hat{\sigma}_{j}\]</div>
+<p>where <span class="math notranslate nohighlight">\(T\)</span> is the number of observations. The number of
+autocovariances, <span class="math notranslate nohighlight">\(m^{*}\)</span>, and the constants <span class="math notranslate nohighlight">\(q\)</span> and
+<span class="math notranslate nohighlight">\(c_{q}\)</span> depend on the kernel. For the Bartlett kernel,
+<span class="math notranslate nohighlight">\(q=1\)</span>, <span class="math notranslate nohighlight">\(c_{q}=1.1447\)</span> and
+<span class="math notranslate nohighlight">\(m^{*}=\lceil4\left(T/100\right)^{2/9}\rceil\)</span>. For the quadratic
+spectral kernel, <span class="math notranslate nohighlight">\(q=2\)</span>, <span class="math notranslate nohighlight">\(c_{q}=1.3221\)</span> and
+<span class="math notranslate nohighlight">\(m^{*}=\lceil4\left(T/100\right)^{2/25}\rceil\)</span>. For the Parzen
+kernel, <span class="math notranslate nohighlight">\(q=2\)</span>, <span class="math notranslate nohighlight">\(c_{q}=2.6614\)</span> and
+<span class="math notranslate nohighlight">\(m^{*}=\lceil4\left(T/100\right)^{4/25}\rceil\)</span>. The bandwidth is</p>
+<div class="math notranslate nohighlight">
+\[\hat{m}=\left\lceil c_{q}\left[\left(\frac{\hat{s}^{(q)}}{\hat{s}^{(0)}}\right)^{2}\right]^{\frac{1}{2q+1}}T^{\frac{1}{2q+1}}\right\rceil\]</div>
+<p>or <span class="math notranslate nohighlight">\(T-1\)</span>, if that is smaller.</p>
 <h2 id="constant-detection">Constant Detection<a class="headerlink" href="#constant-detection" title="Link to this heading">¶</a></h2>
 <p>Whether a model contains a constant or equivalent is tested using three
 tests. These are executed in order and so once a constant is detected,
@@ -1652,8 +1903,9 @@ excluding one category of dummy.</p>
 </aside>
 </aside>
 <p class="rubric">References</p>
-<p>Sources used in writing the code include <a class="reference internal" href="../references.html#baltagi" id="id5"><span>[Baltagi]</span></a>, <a class="reference internal" href="../references.html#baumetal" id="id6"><span>[BaumEtAl]</span></a> and <a class="reference internal" href="../references.html#cametal" id="id7"><span>[CamEtAl]</span></a>,
-<a class="reference internal" href="../references.html#camtri05" id="id8"><span>[CamTri05]</span></a>, <a class="reference internal" href="../references.html#camtri09" id="id9"><span>[CamTri09]</span></a>, <a class="reference internal" href="../references.html#greene" id="id10"><span>[Greene]</span></a>, <a class="reference internal" href="../references.html#newwes94" id="id11"><span>[NewWes94]</span></a>, <a class="reference internal" href="../references.html#stata" id="id12"><span>[Stata]</span></a>, <a class="reference internal" href="../references.html#wool10" id="id13"><span>[Wool10]</span></a> and <a class="reference internal" href="../references.html#wool12" id="id14"><span>[Wool12]</span></a>.</p>
+<p>Sources used in writing the code include <a class="reference internal" href="../references.html#angimbkru" id="id5"><span>[AngImbKru]</span></a>, <a class="reference internal" href="../references.html#baltagi" id="id6"><span>[Baltagi]</span></a>, <a class="reference internal" href="../references.html#baumetal" id="id7"><span>[BaumEtAl]</span></a> and <a class="reference internal" href="../references.html#cametal" id="id8"><span>[CamEtAl]</span></a>,
+<a class="reference internal" href="../references.html#camtri05" id="id9"><span>[CamTri05]</span></a>, <a class="reference internal" href="../references.html#camtri09" id="id10"><span>[CamTri09]</span></a>, <a class="reference internal" href="../references.html#chaoetal" id="id11"><span>[ChaoEtAl]</span></a>, <a class="reference internal" href="../references.html#davmac06" id="id12"><span>[DavMac06]</span></a>, <a class="reference internal" href="../references.html#greene" id="id13"><span>[Greene]</span></a>, <a class="reference internal" href="../references.html#hall00" id="id14"><span>[Hall00]</span></a>, <a class="reference internal" href="../references.html#hansenlee" id="id15"><span>[HansenLee]</span></a>,
+<a class="reference internal" href="../references.html#newwes94" id="id16"><span>[NewWes94]</span></a>, <a class="reference internal" href="../references.html#stata" id="id17"><span>[Stata]</span></a>, <a class="reference internal" href="../references.html#wool10" id="id18"><span>[Wool10]</span></a> and <a class="reference internal" href="../references.html#wool12" id="id19"><span>[Wool12]</span></a>.</p>
 
 
 
