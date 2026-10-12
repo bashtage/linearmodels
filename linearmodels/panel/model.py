@@ -607,6 +607,10 @@ class _PanelModelBase:
         weps_const = y
         num_df = x.shape[1]
         name = "Model F-statistic (homoskedastic)"
+        if df_resid <= 0:
+            return InvalidTestStatistic(
+                "The model has no residual degrees of freedom", name=name
+            )
         if self.has_constant:
             if num_df == 1:
                 return InvalidTestStatistic("Model contains only a constant", name=name)
@@ -2205,17 +2209,29 @@ class PanelOLS(_PanelModelBase):
                 df_num -= 1
             weps_pooled = wy - wx @ _lstsq(wx, wy, rcond=None)[0]
             resid_ss_pooled = float(np.squeeze(weps_pooled.T @ weps_pooled))
-            num = (resid_ss_pooled - resid_ss) / df_num
-
-            denom = resid_ss / df_denom
-            stat = num / denom
-            f_pooled = WaldTestStatistic(
-                stat,
-                "Effects are zero",
-                df_num,
-                df_denom=df_denom,
-                name="Pooled F-statistic",
+            name = "Pooled F-statistic"
+            f_pooled: (
+                WaldTestStatistic | InapplicableTestStatistic | InvalidTestStatistic
             )
+            if df_num <= 0:
+                # A single entity (or period) with a constant: the effect is the constant
+                f_pooled = InapplicableTestStatistic(
+                    reason="The effects do not use any degrees of freedom", name=name
+                )
+            elif df_denom <= 0:
+                f_pooled = InvalidTestStatistic(
+                    "The model has no residual degrees of freedom", name=name
+                )
+            else:
+                num = (resid_ss_pooled - resid_ss) / df_num
+                denom = resid_ss / df_denom
+                f_pooled = WaldTestStatistic(
+                    num / denom,
+                    "Effects are zero",
+                    df_num,
+                    df_denom=df_denom,
+                    name=name,
+                )
             res.update(f_pooled=f_pooled)
             effects = DataFrame(
                 eps_effects - eps,
