@@ -49,6 +49,16 @@ projection matrix for :math:`Z` is similarly defined only using
 :math:`Z`. The annihilator matrix for :math:`X` is
 :math:`M_{X}=I-P_{X}`.
 
+Observation weights, :math:`w_{i}`, are scaled to have a mean of 1. When
+a model uses weights, estimation is performed on the weighted variables
+:math:`\sqrt{w_{i}}y_{i}`, :math:`\sqrt{w_{i}}x_{i}` and
+:math:`\sqrt{w_{i}}z_{i}`, which take the place of :math:`y_{i}`,
+:math:`x_{i}` and :math:`z_{i}` in the formulas below. This includes the
+covariance estimators, the specification tests and the first-stage
+statistics. The parameters, covariance and test statistics of a weighted
+model are therefore those of the unweighted model that is estimated
+using the weighted variables.
+
 Parameter Estimation
 --------------------
 
@@ -106,6 +116,43 @@ where
 and :math:`\hat{\epsilon}_{i}=y_{i}-x_{i}\beta`. Unlike standard GMM,
 the weight matrix, :math:`W` directly depends on the model parameters
 :math:`\beta` and so it is not possible to use a closed form estimator.
+
+Jackknife Instrumental Variables (JIVE)
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+The 2SLS fitted value of a regressor, :math:`\hat{x}_{i}`, the
+:math:`i`\ th row of :math:`\hat{X}=P_{Z}X`, is computed from a first
+stage that uses observation :math:`i`. This links :math:`\hat{x}_{i}` to
+the error :math:`\epsilon_{i}`, which is the source of the bias of 2SLS
+towards OLS when there are many instruments. The jackknife IV estimator
+(JIVE1) of Angrist, Imbens and Krueger (1999) replaces the fitted values
+with leave-one-out predictions. Row :math:`i` of :math:`\tilde{X}` is
+the prediction of :math:`x_{i}` from the first-stage regression of
+:math:`X` on :math:`Z` that is estimated without observation :math:`i`,
+
+.. math:: \tilde{x}_{i}^{\prime}=z_{i}^{\prime}\left(Z_{(-i)}^{\prime}Z_{(-i)}\right)^{-1}Z_{(-i)}^{\prime}X_{(-i)}
+
+where the subscript :math:`(-i)` indicates that row :math:`i` has been
+removed. The first stage does not have to be estimated :math:`n` times,
+since
+
+.. math:: \tilde{x}_{i}=\frac{\hat{x}_{i}-h_{i}x_{i}}{1-h_{i}},\qquad h_{i}=z_{i}^{\prime}\left(Z^{\prime}Z\right)^{-1}z_{i}
+
+where :math:`h_{i}` is the leverage of observation :math:`i`, the
+:math:`i`\ th diagonal element of :math:`P_{Z}`. The exogenous
+regressors are in :math:`Z`, so that they are their own predictions,
+:math:`\tilde{x}_{1i}=x_{1i}`, and only the endogenous regressors are
+replaced. The JIVE estimator is the IV estimator that uses
+:math:`\tilde{X}` as the instruments for :math:`X`,
+
+.. math:: \hat{\beta}_{JIVE}=\left(\tilde{X}^{\prime}X\right)^{-1}\tilde{X}^{\prime}y
+
+which replaces :math:`\hat{X}` with :math:`\tilde{X}` in
+:math:`\hat{\beta}_{2SLS}=\left(\hat{X}^{\prime}X\right)^{-1}\hat{X}^{\prime}y`.
+The estimator cannot be computed if :math:`h_{i}=1` for an observation.
+This happens if the observation is the only one with a non-zero value of
+one of the instruments, for example a dummy variable that is 1 for a
+single observation.
 
 Basic Statistics
 ----------------
@@ -341,8 +388,74 @@ used in-place of :math:`g_{i}` in the robust, kernel and clustered
 estimators. The unadjusted estimator is always centered, and so this
 option has no effect.
 
+JIVE Covariance
+~~~~~~~~~~~~~~~
+
+JIVE is a just identified IV estimator that solves the moment conditions
+:math:`n^{-1}\sum_{i=1}^{n}\tilde{x}_{i}\hat{\epsilon}_{i}=0`, where
+:math:`\hat{\epsilon}_{i}=y_{i}-x_{i}^{\prime}\hat{\beta}_{JIVE}` is
+computed using :math:`X` and not :math:`\tilde{X}`. Its covariance is
+
+.. math:: \hat{\Sigma}=n^{-1}\left(\frac{\tilde{X}^{\prime}X}{n}\right)^{-1}\hat{S}\left(\frac{X^{\prime}\tilde{X}}{n}\right)^{-1}
+
+where :math:`\hat{S}` is an estimator of the covariance of the moment
+conditions :math:`\tilde{x}_{i}\hat{\epsilon}_{i}`. The estimators are
+those of the GMM covariance, with :math:`\tilde{x}_{i}` in place of
+:math:`z_{i}`. The unadjusted estimator is
+:math:`\hat{S}=s^{2}n^{-1}\tilde{X}^{\prime}\tilde{X}` with
+:math:`s^{2}=n^{-1}\hat{\epsilon}^{\prime}\hat{\epsilon}`, which is not
+centered. The robust estimator is
+:math:`\hat{S}=n^{-1}\sum_{i=1}^{n}\hat{\epsilon}_{i}^{2}\tilde{x}_{i}\tilde{x}_{i}^{\prime}`.
+The kernel and one-way clustered estimators are defined as for the GMM
+covariance. The bandwidth of the kernel estimator is selected using the
+data if it is not provided. Two-way clustering is not available. If the
+debiased flag is used, :math:`\hat{S}` is rescaled as in the GMM
+covariance estimators.
+
+**Inference with many instruments**
+
+These covariance estimators treat :math:`\tilde{X}` as if it were a
+fixed set of instruments. Chao, Swanson, Hausman, Newey and Woutersen
+(2012) derive the distribution of JIVE when the number of instruments,
+:math:`K`, grows with the sample size. JIVE is consistent and
+asymptotically normal if :math:`\sqrt{K}/r_{n}\to0`, where :math:`r_{n}`
+is the concentration parameter, which measures the strength of the
+instruments. The asymptotic variance is the sum of the term that is
+estimated above and a second term of order :math:`K/r_{n}`. The second
+term depends on the variances of the errors of the first stage and of
+the model and on their covariance. It can be ignored if
+:math:`K/r_{n}\to0`, but not if :math:`K` is large relative to the
+strength of the instruments. The covariance estimators above omit it,
+and so they can understate the uncertainty in the latter case. In a
+simulation with :math:`n=200`, :math:`K=100` instruments that each have
+a first-stage coefficient of 0.05, and a correlation of 0.95 between the
+errors of the first stage and of the model, a 95% confidence interval
+that used the robust covariance contained the true value in about 85% of
+2,000 replications. The variance estimator that includes the second term
+is not implemented.
+
+Davidson and MacKinnon (2006) compare two variants of JIVE with 2SLS and
+LIML in Monte Carlo experiments. They find that JIVE is always more
+dispersed than 2SLS, often very much so, that it is almost always
+inferior to LIML, and that it performs particularly badly when the
+instruments are weak.
+
 Post-estimation
 ---------------
+
+A model that uses weights is tested using the weighted variables, as
+described in the notation. Sargan’s, Basmann’s, Anderson-Rubin,
+Basmann’s F, Durbin’s and the Wu-Hausman tests assume that the errors
+are homoskedastic, and so they do not use the covariance estimator that
+was used to fit the model. Wooldridge’s score tests of exogeneity and of
+the overidentifying restrictions are robust to heteroskedasticity, and
+they also do not depend on the covariance estimator. Wooldridge’s
+regression test of exogeneity uses the covariance estimator that was
+used to fit the model, and so it has the robustness of that estimator.
+The J-statistic and the C-statistic of the GMM estimators use the
+estimator of the covariance of the moment conditions that is selected by
+the weight type, and not the covariance estimator that is selected in
+the call to fit.
 
 2SLS and LIML Post-estimation Results
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -419,7 +532,7 @@ regression.
 
 **Anderson-Rubin**
 
-The Andersen-Rubin test of overidentification examines the magnitude of
+The Anderson-Rubin test of overidentification examines the magnitude of
 the LIML :math:`\hat{\kappa}`\ which should be close to unity when the
 model is not overidentified.
 
@@ -427,7 +540,7 @@ model is not overidentified.
 
 where :math:`q=p-k_{2}`.
 
-**Basman’s F**
+**Basmann’s F**
 
 Basmann’s F test of overidentification also examines the magnitude of
 the LIML :math:`\hat{\kappa}`. The test statistic is
@@ -436,7 +549,7 @@ the LIML :math:`\hat{\kappa}`. The test statistic is
 
 where :math:`q=p-k_{2}`.
 
-**Durbin and Wu-Haussman**
+**Durbin and Wu-Hausman**
 
 Durbin’s and the Wu-Hausman tests of exogeneity test of exogeneity is
 depends on the variance of the residuals when come endogenous variables
@@ -479,20 +592,81 @@ where :math:`\bar{g}=n^{-1}\sum\hat{\epsilon}_{i}z_{i}` and :math:`W` is
 a consistent estimator of the variance of :math:`\sqrt{n}\bar{g}`. The
 degree of freedom is :math:`q=p-k_{2}`.
 
+**Centered J-stat**
+
+The estimators of the covariance of the moment conditions that are used
+to compute the weight matrix subtract the mean of the moment conditions
+only if the center flag is true, and the unadjusted estimator always
+does. Let :math:`g_{i}=z_{i}\hat{\epsilon}_{i}`, and let
+:math:`W=n^{-1}\sum_{i=1}^{n}g_{i}g_{i}^{\prime}` and
+:math:`W_{c}=n^{-1}\sum_{i=1}^{n}\left(g_{i}-\bar{g}\right)\left(g_{i}-\bar{g}\right)^{\prime}`
+be the robust estimators that do not center and that center the moment
+conditions, so that :math:`W=W_{c}+\bar{g}\bar{g}^{\prime}`. If the
+model is correctly specified, the moment conditions have mean zero at
+the true parameters and the two estimators are asymptotically
+equivalent. If it is not, :math:`\bar{g}` does not converge to zero, and
+:math:`W` also contains :math:`\bar{g}\bar{g}^{\prime}`. When both are
+evaluated using the same parameters, the Sherman-Morrison formula shows
+that the J-statistic and the centered J-statistic,
+:math:`J_{c}=n\bar{g}^{\prime}W_{c}^{-1}\bar{g}`, are related by
+
+.. math:: J=n\bar{g}^{\prime}W^{-1}\bar{g}=\frac{J_{c}}{1+J_{c}/n},\qquad J_{c}=\frac{J}{1-J/n}
+
+The J-statistic is therefore smaller than :math:`n` however large the
+violation of the moment conditions, while the centered J-statistic is
+not bounded. The relationship is exact when the weight matrix is the
+robust estimator that does not center, evaluated at the final
+parameters, as in iterated GMM that has converged. In two-step GMM the
+weight matrix is computed from the first-step parameters, and the
+relationship is approximate. The centered J-statistic has the same
+asymptotic distribution as the J-statistic when the moment conditions
+hold, and it is available as the attribute centered_j_stat of the
+results (Hall, 2000; Hansen and Lee, 2021). It uses the estimator of the
+covariance that is selected by the weight type of the model, applied to
+the centered moment conditions and evaluated at the final parameter
+estimates. The cluster sums of centered moment conditions add to zero,
+and so a clustered estimate that uses :math:`g` clusters has rank at
+most :math:`g-1`. The statistic is not defined if the estimate is
+singular, which requires more clusters than moment conditions.
+
 **C-stat**
 
-The C-statistic tests exogeneity by treating a the set of endogenous
-variables as exogenous. In practice this means that are included in the
-GMM moment conditions, and so a likelihood-ratio-like test statistic can
-be computed as
+The C-statistic tests the exogeneity of :math:`m` of the endogenous
+variables by treating them as exogenous, so that they are included in
+the moment conditions,
+:math:`z_{i}^{e}=\left(z_{i}^{\prime},x_{t,i}^{\prime}\right)^{\prime}`,
+where :math:`x_{t,i}` are the tested variables. A likelihood-ratio-like
+test statistic is computed as
 
-.. math:: J_{e}-J_{c}\sim\chi_{m}^{2}
+.. math:: C=J_{e}-J_{c}\sim\chi_{m}^{2}
 
-where :math:`J_{e}` is the J-statistic treating the tested variables as
-exogenous and :math:`J_{c}` leaves then as endogenous. The optimal
-weighting matrix is computed from the expanded model (efficient) and
-used to estimate parameters in both models. This ensures that the test
-statistic is positive.
+where :math:`J_{e}` is the J-statistic of the model that treats the
+tested variables as exogenous and :math:`J_{c}` is the J-statistic of
+the model that leaves them as endogenous. Both J-statistics use the same
+estimate of the covariance of the moment conditions. Let :math:`S_{e}`
+be the estimate of the covariance of :math:`z_{i}^{e}\hat{\epsilon}_{i}`
+computed from the first-step residuals of the model that treats the
+variables as exogenous. It is computed using the estimator that is
+selected by the weight type of the model, for example robust, kernel or
+clustered. The weight matrix of that model is :math:`S_{e}^{-1}`, and
+:math:`J_{e}` is its J-statistic. The moment conditions of the original
+model are a subset of the moment conditions of this model. Let
+:math:`S_{e,c}` be the sub-matrix of :math:`S_{e}` that contains the
+rows and columns of the original moment conditions. The original model
+is estimated using the weight matrix :math:`S_{e,c}^{-1}`, and
+:math:`J_{c}` is its J-statistic. Note that :math:`S_{e,c}^{-1}` is the
+inverse of the sub-matrix of :math:`S_{e}`, which is not the sub-matrix
+of :math:`S_{e}^{-1}`.
+
+Using a common estimate of the covariance ensures that the test
+statistic is not negative, since
+:math:`g_{e}^{\prime}S_{e}^{-1}g_{e}\geq g_{c}^{\prime}S_{e,c}^{-1}g_{c}`
+for any parameters, where :math:`g_{e}` and :math:`g_{c}` are the
+average moment conditions of the two models. If the original model is
+just identified then :math:`J_{c}=0` and the C-statistic is
+:math:`J_{e}`. The statistic is not defined if :math:`S_{e}` is
+singular, which requires more clusters than the moment conditions of the
+model that treats the variables as exogenous.
 
 First-stage Estimation Analysis
 -------------------------------
@@ -505,11 +679,20 @@ included exogenous variables, so that the model estimated is
 .. math:: x_{2i}=\gamma_{0}+\tilde{z}_{2i}\gamma+\eta_{i}
 
 where :math:`\tilde{Z}_{2}=M_{X_{1}}\tilde{Z}`. The partial
-:math:`F`-statistic is the F-statistic from this regression. It is
-implemented as a standard :math:`F`-statistic when the data is assumed
-to be homoskedastic with an :math:`F_{p_{2},n-p_{2}}` distribution. In
-all other cases, a quadratic form is used with an asymptotic
-:math:`\chi_{p_{2}}^{2}` distribution testing :math:`H_{0}:\gamma=0`.
+:math:`F`-statistic tests :math:`H_{0}:\gamma=0` in this regression. It
+is the Wald statistic
+:math:`W=\hat{\gamma}^{\prime}\hat{V}_{\gamma}^{-1}\hat{\gamma}`, where
+:math:`\hat{V}_{\gamma}` is the covariance of :math:`\hat{\gamma}`
+estimated using the covariance estimator of the model. If the covariance
+is unadjusted, the statistic is reported as :math:`W/p_{2}` with an
+:math:`F_{p_{2},n-p}` distribution. This is the classical
+:math:`F`-statistic only if the debiased flag is used. Otherwise, the
+covariance uses :math:`n^{-1}` in place of :math:`\left(n-p\right)^{-1}`
+and the statistic is :math:`n/\left(n-p\right)` times larger. In all
+other cases, :math:`W` is reported with an asymptotic
+:math:`\chi_{p_{2}}^{2}` distribution. It is not divided by
+:math:`p_{2}`, which is how other software reports the
+:math:`F`-statistic of a robust test.
 
 **Shea’s R2**
 
@@ -555,7 +738,33 @@ In all formulas, :math:`m` is the kernel bandwidth parameter.
 
 **Optimal BW selection**
 
-TODO
+If the bandwidth of a kernel estimator is not provided, it is selected
+using the data with the plug-in method of Newey and West (1994). The
+method uses a scalar series, :math:`g_{i}`, that is a sum of the scores
+or moment conditions. In the 2SLS and LIML covariances, :math:`g_{i}` is
+the sum of :math:`\hat{x}_{ij}\hat{\epsilon}_{i}` over the regressors
+other than the constant, where :math:`\hat{x}_{ij}` are the first-stage
+fitted values. In the GMM weight matrix and covariance and in the JIVE
+covariance, the moment conditions are divided by their standard
+deviations before they are summed. The moment conditions are
+:math:`z_{ij}\hat{\epsilon}_{i}`, and
+:math:`\tilde{x}_{ij}\hat{\epsilon}_{i}` in JIVE. Let
+
+.. math:: \hat{\sigma}_{j}=T^{-1}\sum_{i=j+1}^{T}g_{i}g_{i-j},\qquad\hat{s}^{(0)}=\hat{\sigma}_{0}+2\sum_{j=1}^{m^{*}}\hat{\sigma}_{j},\qquad\hat{s}^{(q)}=2\sum_{j=1}^{m^{*}}j^{q}\hat{\sigma}_{j}
+
+where :math:`T` is the number of observations. The number of
+autocovariances, :math:`m^{*}`, and the constants :math:`q` and
+:math:`c_{q}` depend on the kernel. For the Bartlett kernel,
+:math:`q=1`, :math:`c_{q}=1.1447` and
+:math:`m^{*}=\lceil4\left(T/100\right)^{2/9}\rceil`. For the quadratic
+spectral kernel, :math:`q=2`, :math:`c_{q}=1.3221` and
+:math:`m^{*}=\lceil4\left(T/100\right)^{2/25}\rceil`. For the Parzen
+kernel, :math:`q=2`, :math:`c_{q}=2.6614` and
+:math:`m^{*}=\lceil4\left(T/100\right)^{4/25}\rceil`. The bandwidth is
+
+.. math:: \hat{m}=\left\lceil c_{q}\left[\left(\frac{\hat{s}^{(q)}}{\hat{s}^{(0)}}\right)^{2}\right]^{\frac{1}{2q+1}}T^{\frac{1}{2q+1}}\right\rceil
+
+or :math:`T-1`, if that is smaller.
 
 Constant Detection
 ------------------

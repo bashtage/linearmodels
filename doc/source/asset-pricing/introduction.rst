@@ -67,3 +67,10 @@ prior to estimation.
     Covariance estimator:
     KernelCovariance, Kernel: bartlett, Bandwidth: 4
     See full_summary for complete results
+
+Aligning Inputs
+===============
+The rows of ``portfolios`` and ``factors`` are paired by position. A ``factors``
+input that carries labels, such as a pandas ``DataFrame`` with a date index,
+must use the same labels, in the same order, as ``portfolios``. See
+:ref:`input-alignment`.

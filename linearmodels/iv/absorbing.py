@@ -743,7 +743,9 @@ class AbsorbingLS:
 
     Notes
     -----
-    Capable of estimating models with millions of effects.
+    Capable of estimating models with millions of effects. The model is not a
+    panel estimator. See :ref:`iv-absorbing-ls` for when to use it and when to
+    use :class:`~linearmodels.panel.model.PanelOLS`.
 
     Estimates models of the form
 

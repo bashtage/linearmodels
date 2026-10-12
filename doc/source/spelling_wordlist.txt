@@ -234,3 +234,5 @@ partialled
 ranktest
 docstring
 numpydoc
+partialling
+autocovariances
