@@ -3150,7 +3150,19 @@ class FamaMacBeth(_PanelModelBase):
 
     Parameter inference is made using the set of T parameter estimates with
     either the standard covariance estimator or a kernel-based covariance,
-    depending on ``cov_type``.
+    depending on ``cov_type``. Since the parameters are the averages of the T
+    cross-sectional estimates, the t-statistics are compared with a t
+    distribution with T - 1 degrees of freedom, which is the convention of
+    Fama and MacBeth [1]_. T is the number of periods whose cross-sectional
+    regression is estimated. The p-values and confidence intervals use this
+    distribution if ``debiased`` is True, which is the default, and the normal
+    distribution otherwise.
+
+    References
+    ----------
+    .. [1] Fama, E. F. and MacBeth, J. D. (1973). Risk, return, and
+       equilibrium: Empirical tests. Journal of Political Economy, 81(3),
+       607-636.
     """
 
     def __init__(
@@ -3228,7 +3240,10 @@ class FamaMacBeth(_PanelModelBase):
             Name of covariance estimator (see notes). Default is "unadjusted".
         debiased : bool
             Flag indicating whether to debiased the covariance estimator using
-            a degree of freedom adjustment.
+            a degree of freedom adjustment, which uses T - 1 instead of T when
+            the covariance of the T estimates is computed, and to use a t
+            distribution with T - 1 degrees of freedom for inference. If
+            False, inference uses the normal distribution.
         bandwidth : float
             The bandwidth to use when cov_type is "kernel". If None, it is
             automatically computed.
@@ -3252,7 +3267,26 @@ class FamaMacBeth(_PanelModelBase):
 
         * "unadjusted", "homoskedastic", "robust", "heteroskedastic" use the
           standard covariance estimator of the T parameter estimates.
-        * "kernel" is a HAC estimator. Configurations options are:
+        * "kernel" is a HAC estimator of the covariance of the T parameter
+          estimates. The configuration options are ``kernel`` and ``bandwidth``.
+
+        The parameters are the averages of the T cross-sectional estimates, and
+        T is the number of periods whose cross-sectional regression is
+        estimated: periods that cannot be estimated are not counted. If
+        ``debiased`` is True, which is the default, the p-values and
+        confidence intervals use a t distribution with T - 1 degrees of
+        freedom, which is the convention of Fama and MacBeth (1973) and is the
+        ``df_resid`` of the results. The standard and the kernel covariance
+        estimators use the same distribution. If ``debiased`` is False, they
+        use the normal distribution. The estimates and the standard errors
+        do not depend on the distribution.
+
+        .. versionchanged:: 7.1
+
+           The p-values and confidence intervals use T - 1 degrees of freedom.
+           Earlier versions used nobs - nvar degrees of freedom, those of a
+           pooled regression, which is close to the normal distribution when
+           there are many observations.
         """
         y = cast("linearmodels.typing.data.Float64Array", self._y)
         x = cast("linearmodels.typing.data.Float64Array", self._x)
@@ -3351,9 +3385,15 @@ class FamaMacBeth(_PanelModelBase):
             bandwidth=bandwidth,
         )
 
-        df_resid = wy.shape[0] - params.shape[0]
+        # T is the number of cross-sectional estimates that are averaged, the
+        # periods that could be estimated, which are also the periods that the
+        # covariance uses. Inference uses t(T - 1)
+        nperiod = int(np.isfinite(np.asarray(all_params)).all(axis=1).sum())
+        df_resid = nperiod - 1
+        # The classical F-statistic is that of the pooled regression
+        pooled_df_resid = wy.shape[0] - params.shape[0]
         res = self._postestimation(
-            params, cov, debiased, df_resid, weps, wy, wx, root_w
+            params, cov, debiased, pooled_df_resid, weps, wy, wx, root_w
         )
         index = self.dependent.index
         res.update(
