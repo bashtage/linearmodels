@@ -19,7 +19,7 @@
     
   
       
-        <title>linearmodels.iv.covariance - linearmodels v7.1 (+239)</title>
+        <title>linearmodels.iv.covariance - linearmodels v7.1 (+245)</title>
       
     
 
@@ -91,7 +91,7 @@
 
 <header class="md-header md-header--shadow" data-md-component="header">
   <nav class="md-header__inner md-grid" aria-label="Header">
-    <a href="../../../index.html" title="linearmodels v7.1 (+239)" class="md-header__button md-logo" aria-label="linearmodels v7.1 (+239)" data-md-component="logo">
+    <a href="../../../index.html" title="linearmodels v7.1 (+245)" class="md-header__button md-logo" aria-label="linearmodels v7.1 (+245)" data-md-component="logo">
       <img src="../../../_static/bw-logo.svg" alt="logo">
     </a>
     <label class="md-header__button md-icon" for="__drawer">
@@ -102,7 +102,7 @@
       <div class="md-header__ellipsis">
         <div class="md-header__topic">
           <span class="md-ellipsis">
-            linearmodels v7.1 (+239)
+            linearmodels v7.1 (+245)
           </span>
         </div>
         <div class="md-header__topic" data-md-component="header-topic">
@@ -197,10 +197,10 @@
 
 <nav class="md-nav md-nav--primary" aria-label="Navigation" data-md-level="0">
   <label class="md-nav__title" for="__drawer">
-    <a href="../../../index.html" title="linearmodels v7.1 (+239)" class="md-nav__button md-logo" aria-label="linearmodels v7.1 (+239)" data-md-component="logo">
+    <a href="../../../index.html" title="linearmodels v7.1 (+245)" class="md-nav__button md-logo" aria-label="linearmodels v7.1 (+245)" data-md-component="logo">
       <img src="../../../_static/bw-logo.svg" alt="logo">
     </a>
-    linearmodels v7.1 (+239)
+    linearmodels v7.1 (+245)
   </label>
   
     <div class="md-nav__source">
@@ -775,6 +775,11 @@
 <span class="sd">        Flag indicating whether to use a small-sample adjustment</span>
 <span class="sd">    kappa : float</span>
 <span class="sd">        Value of kappa in k-class estimator</span>
+<span class="sd">    extra_df : int, optional</span>
+<span class="sd">        Degrees of freedom that the model uses in addition to the nvar columns</span>
+<span class="sd">        of x, for example the absorbed effects of AbsorbingLS. The default is 0.</span>
+<span class="sd">        It is only used if ``debiased`` is True, when n / (n-k) becomes</span>
+<span class="sd">        n / (n-k-extra_df).</span>
 
 <span class="sd">    Notes</span>
 <span class="sd">    -----</span>
@@ -790,7 +795,8 @@
 
 <span class="sd">      s^2 = n^{-1} \sum_{i=1}^n \hat{\epsilon}_i^2</span>
 
-<span class="sd">    If ``debiased`` is true, then :math:`s^2` is scaled by n / (n-k).</span>
+<span class="sd">    If ``debiased`` is true, then :math:`s^2` is scaled by n / (n-k-df), where k is</span>
+<span class="sd">    the number of columns of x and df is ``extra_df``.</span>
 
 <span class="sd">    .. math::</span>
 
@@ -808,6 +814,7 @@
         <span class="n">params</span><span class="p">:</span> <span class="n">linearmodels</span><span class="o">.</span><span class="n">typing</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">Float64Array</span><span class="p">,</span>
         <span class="n">debiased</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
         <span class="n">kappa</span><span class="p">:</span> <span class="n">linearmodels</span><span class="o">.</span><span class="n">typing</span><span class="o">.</span><span class="n">Numeric</span> <span class="o">=</span> <span class="mi">1</span><span class="p">,</span>
+        <span class="n">extra_df</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">0</span><span class="p">,</span>
     <span class="p">):</span>
         <span class="k">if</span> <span class="ow">not</span> <span class="p">(</span><span class="n">x</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">==</span> <span class="n">y</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">==</span> <span class="n">z</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]):</span>
             <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">"x, y and z must have the same number of rows"</span><span class="p">)</span>
@@ -823,7 +830,13 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">_kappa</span> <span class="o">=</span> <span class="n">kappa</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_pinvz</span> <span class="o">=</span> <span class="n">pinv</span><span class="p">(</span><span class="n">z</span><span class="p">)</span>
         <span class="n">nobs</span><span class="p">,</span> <span class="n">nvar</span> <span class="o">=</span> <span class="n">x</span><span class="o">.</span><span class="n">shape</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">_scale</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="n">nobs</span> <span class="o">/</span> <span class="p">(</span><span class="n">nobs</span> <span class="o">-</span> <span class="n">nvar</span><span class="p">)</span> <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_debiased</span> <span class="k">else</span> <span class="mf">1.0</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_debiased</span> <span class="ow">and</span> <span class="n">extra_df</span> <span class="o">&gt;</span> <span class="mi">0</span> <span class="ow">and</span> <span class="n">nobs</span> <span class="o">-</span> <span class="n">nvar</span> <span class="o">-</span> <span class="n">extra_df</span> <span class="o">&lt;=</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
+                <span class="s2">"The small-sample adjustment of a debiased covariance needs more "</span>
+                <span class="sa">f</span><span class="s2">"observations (</span><span class="si">{</span><span class="n">nobs</span><span class="si">}</span><span class="s2">) than the </span><span class="si">{</span><span class="n">nvar</span><span class="si">}</span><span class="s2"> columns of x and the "</span>
+                <span class="sa">f</span><span class="s2">"</span><span class="si">{</span><span class="n">extra_df</span><span class="si">}</span><span class="s2"> degrees of freedom that are used in addition."</span>
+            <span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_scale</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="n">nobs</span> <span class="o">/</span> <span class="p">(</span><span class="n">nobs</span> <span class="o">-</span> <span class="n">nvar</span> <span class="o">-</span> <span class="n">extra_df</span><span class="p">)</span> <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_debiased</span> <span class="k">else</span> <span class="mf">1.0</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_name</span> <span class="o">=</span> <span class="s2">"Unadjusted Covariance (Homoskedastic)"</span>
 
     <span class="k">def</span><span class="w"> </span><span class="fm">__str__</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
@@ -912,6 +925,11 @@
 <span class="sd">        Flag indicating whether to use a small-sample adjustment</span>
 <span class="sd">    kappa : float</span>
 <span class="sd">        Value of kappa in k-class estimator</span>
+<span class="sd">    extra_df : int, optional</span>
+<span class="sd">        Degrees of freedom that the model uses in addition to the nvar columns</span>
+<span class="sd">        of x, for example the absorbed effects of AbsorbingLS. The default is 0.</span>
+<span class="sd">        It is only used if ``debiased`` is True, when n / (n-k) becomes</span>
+<span class="sd">        n / (n-k-extra_df).</span>
 
 <span class="sd">    Notes</span>
 <span class="sd">    -----</span>
@@ -929,7 +947,8 @@
 
 <span class="sd">    where :math:`\hat{\gamma}=(Z'Z)^{-1}(Z'X)` and</span>
 <span class="sd">    :math:`\hat{x}_i = z_i\hat{\gamma}`. If ``debiased`` is true, then</span>
-<span class="sd">    :math:`S` is scaled by n / (n-k).</span>
+<span class="sd">    :math:`S` is scaled by n / (n-k-df), where k is the number of columns of x and</span>
+<span class="sd">    df is ``extra_df``.</span>
 
 <span class="sd">    .. math::</span>
 
@@ -947,8 +966,9 @@
         <span class="n">params</span><span class="p">:</span> <span class="n">linearmodels</span><span class="o">.</span><span class="n">typing</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">Float64Array</span><span class="p">,</span>
         <span class="n">debiased</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
         <span class="n">kappa</span><span class="p">:</span> <span class="n">linearmodels</span><span class="o">.</span><span class="n">typing</span><span class="o">.</span><span class="n">Numeric</span> <span class="o">=</span> <span class="mi">1</span><span class="p">,</span>
+        <span class="n">extra_df</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">0</span><span class="p">,</span>
     <span class="p">):</span>
-        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">z</span><span class="p">,</span> <span class="n">params</span><span class="p">,</span> <span class="n">debiased</span><span class="p">,</span> <span class="n">kappa</span><span class="p">)</span>
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">z</span><span class="p">,</span> <span class="n">params</span><span class="p">,</span> <span class="n">debiased</span><span class="p">,</span> <span class="n">kappa</span><span class="p">,</span> <span class="n">extra_df</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_name</span> <span class="o">=</span> <span class="s2">"Robust Covariance (Heteroskedastic)"</span>
 
     <span class="nd">@property</span>
@@ -994,6 +1014,11 @@
 <span class="sd">        Flag indicating whether to use a small-sample adjustment</span>
 <span class="sd">    kappa : float</span>
 <span class="sd">        Value of kappa in k-class estimator</span>
+<span class="sd">    extra_df : int, optional</span>
+<span class="sd">        Degrees of freedom that the model uses in addition to the nvar columns</span>
+<span class="sd">        of x, for example the absorbed effects of AbsorbingLS. The default is 0.</span>
+<span class="sd">        It is only used if ``debiased`` is True, when n / (n-k) becomes</span>
+<span class="sd">        n / (n-k-extra_df).</span>
 
 <span class="sd">    Notes</span>
 <span class="sd">    -----</span>
@@ -1017,7 +1042,7 @@
 <span class="sd">    where :math:`\hat{\gamma}=(Z'Z)^{-1}(Z'X)`,</span>
 <span class="sd">    :math:`\hat{x}_i = z_i\hat{\gamma}` and :math:`K(i,bw)` is a weight that</span>
 <span class="sd">    depends on the kernel. If ``debiased`` is true, then :math:`S` is scaled</span>
-<span class="sd">    by n / (n-k).</span>
+<span class="sd">    by n / (n-k-df), where k is the number of columns of x and df is ``extra_df``.</span>
 
 <span class="sd">    .. math::</span>
 
@@ -1043,8 +1068,9 @@
         <span class="n">bandwidth</span><span class="p">:</span> <span class="n">linearmodels</span><span class="o">.</span><span class="n">typing</span><span class="o">.</span><span class="n">OptionalNumeric</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
         <span class="n">debiased</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
         <span class="n">kappa</span><span class="p">:</span> <span class="n">linearmodels</span><span class="o">.</span><span class="n">typing</span><span class="o">.</span><span class="n">Numeric</span> <span class="o">=</span> <span class="mi">1</span><span class="p">,</span>
+        <span class="n">extra_df</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">0</span><span class="p">,</span>
     <span class="p">):</span>
-        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">z</span><span class="p">,</span> <span class="n">params</span><span class="p">,</span> <span class="n">debiased</span><span class="p">,</span> <span class="n">kappa</span><span class="p">)</span>
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">z</span><span class="p">,</span> <span class="n">params</span><span class="p">,</span> <span class="n">debiased</span><span class="p">,</span> <span class="n">kappa</span><span class="p">,</span> <span class="n">extra_df</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_kernels</span> <span class="o">=</span> <span class="n">KERNEL_LOOKUP</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_kernel</span> <span class="o">=</span> <span class="n">kernel</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_bandwidth</span> <span class="o">=</span> <span class="n">bandwidth</span>
@@ -1124,6 +1150,11 @@
 <span class="sd">        Either nobs by ncluster where ncluster is 1 or 2.</span>
 <span class="sd">    kappa : float</span>
 <span class="sd">        Value of kappa in k-class estimator</span>
+<span class="sd">    extra_df : int, optional</span>
+<span class="sd">        Degrees of freedom that the model uses in addition to the nvar columns</span>
+<span class="sd">        of x, for example the absorbed effects of AbsorbingLS. The default is 0.</span>
+<span class="sd">        It is only used if ``debiased`` is True, when n / (n-k) becomes</span>
+<span class="sd">        n / (n-k-extra_df).</span>
 
 
 <span class="sd">    Notes</span>
@@ -1144,8 +1175,8 @@
 <span class="sd">    where :math:`\hat{\gamma}=(Z'Z)^{-1}(Z'X)` and</span>
 <span class="sd">    :math:`\hat{x}_i = z_i\hat{\gamma}`.  :math:`\mathcal{G}_g` contains the</span>
 <span class="sd">    indices of elements in cluster g. If ``debiased`` is true, then</span>
-<span class="sd">    :math:`S` is scaled by g(n - 1) / ((g-1)(n-k)) where g is the number</span>
-<span class="sd">    of groups..</span>
+<span class="sd">    :math:`S` is scaled by g(n - 1) / ((g-1)(n-k-df)) where g is the number</span>
+<span class="sd">    of groups, k is the number of columns of x and df is ``extra_df``.</span>
 
 <span class="sd">    .. math::</span>
 
@@ -1164,8 +1195,9 @@
         <span class="n">clusters</span><span class="p">:</span> <span class="n">linearmodels</span><span class="o">.</span><span class="n">typing</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">AnyArray</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
         <span class="n">debiased</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
         <span class="n">kappa</span><span class="p">:</span> <span class="n">linearmodels</span><span class="o">.</span><span class="n">typing</span><span class="o">.</span><span class="n">Numeric</span> <span class="o">=</span> <span class="mi">1</span><span class="p">,</span>
+        <span class="n">extra_df</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">0</span><span class="p">,</span>
     <span class="p">):</span>
-        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">z</span><span class="p">,</span> <span class="n">params</span><span class="p">,</span> <span class="n">debiased</span><span class="p">,</span> <span class="n">kappa</span><span class="p">)</span>
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">z</span><span class="p">,</span> <span class="n">params</span><span class="p">,</span> <span class="n">debiased</span><span class="p">,</span> <span class="n">kappa</span><span class="p">,</span> <span class="n">extra_df</span><span class="p">)</span>
 
         <span class="n">nobs</span> <span class="o">=</span> <span class="n">x</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
         <span class="n">clusters</span> <span class="o">=</span> <span class="n">arange</span><span class="p">(</span><span class="n">nobs</span><span class="p">)</span> <span class="k">if</span> <span class="n">clusters</span> <span class="ow">is</span> <span class="kc">None</span> <span class="k">else</span> <span class="n">clusters</span>

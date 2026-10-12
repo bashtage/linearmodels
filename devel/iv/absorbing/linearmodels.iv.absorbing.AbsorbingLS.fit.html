@@ -23,7 +23,7 @@
     
   
       
-        <title>linearmodels.iv.absorbing.AbsorbingLS.fit - linearmodels v7.1 (+239)</title>
+        <title>linearmodels.iv.absorbing.AbsorbingLS.fit - linearmodels v7.1 (+245)</title>
       
     
 
@@ -100,7 +100,7 @@
 
 <header class="md-header md-header--shadow" data-md-component="header">
   <nav class="md-header__inner md-grid" aria-label="Header">
-    <a href="../../index.html" title="linearmodels v7.1 (+239)" class="md-header__button md-logo" aria-label="linearmodels v7.1 (+239)" data-md-component="logo">
+    <a href="../../index.html" title="linearmodels v7.1 (+245)" class="md-header__button md-logo" aria-label="linearmodels v7.1 (+245)" data-md-component="logo">
       <img src="../../_static/bw-logo.svg" alt="logo">
     </a>
     <label class="md-header__button md-icon" for="__drawer">
@@ -111,7 +111,7 @@
       <div class="md-header__ellipsis">
         <div class="md-header__topic">
           <span class="md-ellipsis">
-            linearmodels v7.1 (+239)
+            linearmodels v7.1 (+245)
           </span>
         </div>
         <div class="md-header__topic" data-md-component="header-topic">
@@ -206,10 +206,10 @@
 
 <nav class="md-nav md-nav--primary" aria-label="Navigation" data-md-level="0">
   <label class="md-nav__title" for="__drawer">
-    <a href="../../index.html" title="linearmodels v7.1 (+239)" class="md-nav__button md-logo" aria-label="linearmodels v7.1 (+239)" data-md-component="logo">
+    <a href="../../index.html" title="linearmodels v7.1 (+245)" class="md-nav__button md-logo" aria-label="linearmodels v7.1 (+245)" data-md-component="logo">
       <img src="../../_static/bw-logo.svg" alt="logo">
     </a>
-    linearmodels v7.1 (+239)
+    linearmodels v7.1 (+245)
   </label>
   
     <div class="md-nav__source">
@@ -1794,6 +1794,25 @@ a 256-bit value. This allows variables to be reused in different
 models if the set of absorbing variables and interactions is held
 constant. The options used to absorb the variables are part of
 what identifies them.</p>
+<p>If <code class="docutils literal notranslate"><span class="pre">debiased</span></code> is True, the covariance estimator is adjusted for the
+degrees of freedom that the model uses: the k regressors in <code class="docutils literal notranslate"><span class="pre">exog</span></code> that
+are estimated and the d degrees of freedom of the absorbed terms. They are
+the dummy variables of the effects, with one less if <code class="docutils literal notranslate"><span class="pre">exog</span></code> has a
+constant and one less for each effect after the first, the absorbed
+continuous variables and the interactions, which is <code class="docutils literal notranslate"><span class="pre">df_absorbed</span></code>. The
+unadjusted, robust and kernel covariances are multiplied by n / (n - k - d),
+and the clustered covariance by g (n - 1) / ((g - 1) (n - k - d)) where g
+is the number of clusters. The result is that of the regression of the
+dependent variable on <code class="docutils literal notranslate"><span class="pre">exog</span></code> and the dummy variables of the effects. It
+is also that of <code class="docutils literal notranslate"><span class="pre">PanelOLS(debiased=True)</span></code> with the same effects, using
+<code class="docutils literal notranslate"><span class="pre">group_debias=True</span></code> for the clustered covariance. The exception is a
+clustered covariance when there is a single categorical effect and each of
+its categories is in one cluster of every cluster variable: its degrees of
+freedom are not counted, since the effect is nested in the clusters, as in
+<code class="docutils literal notranslate"><span class="pre">PanelOLS</span></code> and Stata. Unlike <code class="docutils literal notranslate"><span class="pre">PanelOLS</span></code>, nothing is adjusted if
+<code class="docutils literal notranslate"><span class="pre">debiased</span></code> is False. The t and F distributions of the results use
+<code class="docutils literal notranslate"><span class="pre">df_resid</span></code> whatever the covariance estimator. A <code class="docutils literal notranslate"><span class="pre">ValueError</span></code> is raised if
+<code class="docutils literal notranslate"><span class="pre">debiased</span></code> is True and the model has no degrees of freedom left.</p>
 <p>The variables are absorbed when fit is called for the first time. A
 later call uses the same absorbed variables if <code class="docutils literal notranslate"><span class="pre">method</span></code>,
 <code class="docutils literal notranslate"><span class="pre">absorb_options</span></code> and <code class="docutils literal notranslate"><span class="pre">use_cache</span></code> have the same values, so that
