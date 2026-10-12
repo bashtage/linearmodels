@@ -19,7 +19,7 @@
     
   
       
-        <title>linearmodels.panel.results - linearmodels v7.1 (+205)</title>
+        <title>linearmodels.panel.results - linearmodels v7.1 (+218)</title>
       
     
 
@@ -91,7 +91,7 @@
 
 <header class="md-header md-header--shadow" data-md-component="header">
   <nav class="md-header__inner md-grid" aria-label="Header">
-    <a href="../../../index.html" title="linearmodels v7.1 (+205)" class="md-header__button md-logo" aria-label="linearmodels v7.1 (+205)" data-md-component="logo">
+    <a href="../../../index.html" title="linearmodels v7.1 (+218)" class="md-header__button md-logo" aria-label="linearmodels v7.1 (+218)" data-md-component="logo">
       <img src="../../../_static/bw-logo.svg" alt="logo">
     </a>
     <label class="md-header__button md-icon" for="__drawer">
@@ -102,7 +102,7 @@
       <div class="md-header__ellipsis">
         <div class="md-header__topic">
           <span class="md-ellipsis">
-            linearmodels v7.1 (+205)
+            linearmodels v7.1 (+218)
           </span>
         </div>
         <div class="md-header__topic" data-md-component="header-topic">
@@ -197,10 +197,10 @@
 
 <nav class="md-nav md-nav--primary" aria-label="Navigation" data-md-level="0">
   <label class="md-nav__title" for="__drawer">
-    <a href="../../../index.html" title="linearmodels v7.1 (+205)" class="md-nav__button md-logo" aria-label="linearmodels v7.1 (+205)" data-md-component="logo">
+    <a href="../../../index.html" title="linearmodels v7.1 (+218)" class="md-nav__button md-logo" aria-label="linearmodels v7.1 (+218)" data-md-component="logo">
       <img src="../../../_static/bw-logo.svg" alt="logo">
     </a>
-    linearmodels v7.1 (+205)
+    linearmodels v7.1 (+218)
   </label>
   
     <div class="md-nav__source">
@@ -1169,11 +1169,19 @@
 <span class="sd">        Under the null, the statistic is asymptotically standard normal.</span>
 
 <span class="sd">        The shocks are the model's ``idiosyncratic`` values, so the weights of</span>
-<span class="sd">        a weighted model are not applied to them, and the shocks of</span>
-<span class="sd">        ``FirstDifferenceOLS`` are in levels rather than the residuals of the</span>
-<span class="sd">        differenced equation. Since the correlations are computed over time,</span>
-<span class="sd">        the test assumes that the shocks are not serially correlated, and it</span>
-<span class="sd">        over-rejects if they are persistent.</span>
+<span class="sd">        a weighted model are not applied to them. The exception is</span>
+<span class="sd">        ``FirstDifferenceOLS``, which uses ``resids``, the residuals of the</span>
+<span class="sd">        differenced equation, as ``plm::pcdtest`` does for a pooled regression</span>
+<span class="sd">        of the differenced data. Its ``idiosyncratic`` values are in levels,</span>
+<span class="sd">        and are persistent when the errors are, for example a random walk,</span>
+<span class="sd">        which is when first differences are used. Since the correlations are</span>
+<span class="sd">        computed over time, the test assumes that the shocks are not serially</span>
+<span class="sd">        correlated, and it over-rejects if they are persistent. Conversely, if</span>
+<span class="sd">        the errors in levels are serially uncorrelated, the residuals of</span>
+<span class="sd">        ``FirstDifferenceOLS`` are negatively autocorrelated (an MA(1) with</span>
+<span class="sd">        autocorrelation -0.5) and the test over-rejects, with a size of about</span>
+<span class="sd">        11% at the nominal 5% level in large panels. The test is then better</span>
+<span class="sd">        applied to a ``PanelOLS`` model with entity effects.</span>
 
 <span class="sd">        The test is not valid for every model and an InapplicableTestStatistic</span>
 <span class="sd">        is returned for the following.</span>
@@ -1214,10 +1222,15 @@
 <span class="sd">           problem in testing for remaining cross-section correlation.</span>
 <span class="sd">           Journal of Business &amp; Economic Statistics, 40(3), 1191-1203.</span>
 <span class="sd">        """</span>
+        <span class="kn">from</span><span class="w"> </span><span class="nn">linearmodels.panel.model</span><span class="w"> </span><span class="kn">import</span> <span class="n">FirstDifferenceOLS</span>  <span class="c1"># noqa: PLC0415</span>
+
         <span class="n">reason</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_pesaran_cd_inapplicable</span><span class="p">()</span>
         <span class="k">if</span> <span class="n">reason</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
             <span class="k">return</span> <span class="n">InapplicableTestStatistic</span><span class="p">(</span><span class="n">reason</span><span class="o">=</span><span class="n">reason</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="s2">"Pesaran CD test"</span><span class="p">)</span>
-        <span class="n">eps</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">idiosyncratic</span><span class="o">.</span><span class="n">iloc</span><span class="p">[:,</span> <span class="mi">0</span><span class="p">]</span>
+        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">model</span><span class="p">,</span> <span class="n">FirstDifferenceOLS</span><span class="p">):</span>
+            <span class="n">eps</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">resids</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">eps</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">idiosyncratic</span><span class="o">.</span><span class="n">iloc</span><span class="p">[:,</span> <span class="mi">0</span><span class="p">]</span>
         <span class="n">wide</span> <span class="o">=</span> <span class="n">eps</span><span class="o">.</span><span class="n">unstack</span><span class="p">(</span><span class="n">level</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
         <span class="n">wide</span> <span class="o">=</span> <span class="n">wide</span><span class="o">.</span><span class="n">loc</span><span class="p">[:,</span> <span class="n">wide</span><span class="o">.</span><span class="n">notnull</span><span class="p">()</span><span class="o">.</span><span class="n">any</span><span class="p">(</span><span class="n">axis</span><span class="o">=</span><span class="mi">0</span><span class="p">)]</span>
         <span class="n">nentity</span> <span class="o">=</span> <span class="n">wide</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span>
@@ -1920,6 +1933,32 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">_all_params</span> <span class="o">=</span> <span class="n">res</span><span class="o">.</span><span class="n">all_params</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_avg_r2</span> <span class="o">=</span> <span class="n">res</span><span class="o">.</span><span class="n">avg_r2</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_avg_adj_r2</span> <span class="o">=</span> <span class="n">res</span><span class="o">.</span><span class="n">avg_adj_r2</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">df_resid</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">int</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">"""</span>
+<span class="sd">        Degrees of freedom of the t distribution used for inference.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        int</span>
+<span class="sd">            T - 1, where T is the number of cross-sectional regressions that</span>
+<span class="sd">            are averaged.</span>
+
+<span class="sd">        Notes</span>
+<span class="sd">        -----</span>
+<span class="sd">        The parameters are the average of T cross-sectional estimates, and</span>
+<span class="sd">        their covariance is estimated from the same T estimates. If</span>
+<span class="sd">        ``debiased`` is True, p-values and confidence intervals use a t</span>
+<span class="sd">        distribution with T - 1 degrees of freedom, as in Fama and MacBeth</span>
+<span class="sd">        (1973), and ``f_statistic_robust`` uses an F distribution with this</span>
+<span class="sd">        denominator degree of freedom. The periods whose cross-section cannot</span>
+<span class="sd">        be estimated are not counted. This is not nobs minus nvar, which is the</span>
+<span class="sd">        residual degree of freedom of the pooled regression and the one that</span>
+<span class="sd">        ``f_statistic``, the classical F-statistic of the pooled regression,</span>
+<span class="sd">        uses.</span>
+<span class="sd">        """</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_df_resid</span>
 
     <span class="k">def</span><span class="w"> </span><span class="nf">_pesaran_cd_inapplicable</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span> <span class="o">|</span> <span class="kc">None</span><span class="p">:</span>
         <span class="k">return</span> <span class="p">(</span>

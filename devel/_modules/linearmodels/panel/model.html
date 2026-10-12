@@ -19,7 +19,7 @@
     
   
       
-        <title>linearmodels.panel.model - linearmodels v7.1 (+205)</title>
+        <title>linearmodels.panel.model - linearmodels v7.1 (+218)</title>
       
     
 
@@ -91,7 +91,7 @@
 
 <header class="md-header md-header--shadow" data-md-component="header">
   <nav class="md-header__inner md-grid" aria-label="Header">
-    <a href="../../../index.html" title="linearmodels v7.1 (+205)" class="md-header__button md-logo" aria-label="linearmodels v7.1 (+205)" data-md-component="logo">
+    <a href="../../../index.html" title="linearmodels v7.1 (+218)" class="md-header__button md-logo" aria-label="linearmodels v7.1 (+218)" data-md-component="logo">
       <img src="../../../_static/bw-logo.svg" alt="logo">
     </a>
     <label class="md-header__button md-icon" for="__drawer">
@@ -102,7 +102,7 @@
       <div class="md-header__ellipsis">
         <div class="md-header__topic">
           <span class="md-ellipsis">
-            linearmodels v7.1 (+205)
+            linearmodels v7.1 (+218)
           </span>
         </div>
         <div class="md-header__topic" data-md-component="header-topic">
@@ -197,10 +197,10 @@
 
 <nav class="md-nav md-nav--primary" aria-label="Navigation" data-md-level="0">
   <label class="md-nav__title" for="__drawer">
-    <a href="../../../index.html" title="linearmodels v7.1 (+205)" class="md-nav__button md-logo" aria-label="linearmodels v7.1 (+205)" data-md-component="logo">
+    <a href="../../../index.html" title="linearmodels v7.1 (+218)" class="md-nav__button md-logo" aria-label="linearmodels v7.1 (+218)" data-md-component="logo">
       <img src="../../../_static/bw-logo.svg" alt="logo">
     </a>
-    linearmodels v7.1 (+205)
+    linearmodels v7.1 (+218)
   </label>
   
     <div class="md-nav__source">
@@ -3704,9 +3704,28 @@
 <span class="sd">    implementation based on regressing all observation in a single</span>
 <span class="sd">    time period is "as-if" time effects are included.</span>
 
+<span class="sd">    Each period needs at least as many entities as regressors, and the</span>
+<span class="sd">    regressors must vary across the entities of the period, so that they are</span>
+<span class="sd">    not collinear: a regressor that depends only on time is collinear with the</span>
+<span class="sd">    constant. Periods whose cross-section is rank deficient are dropped with a</span>
+<span class="sd">    warning, and T counts only the periods that are used. It is an error if no</span>
+<span class="sd">    period can be used.</span>
+
 <span class="sd">    Parameter inference is made using the set of T parameter estimates with</span>
 <span class="sd">    either the standard covariance estimator or a kernel-based covariance,</span>
-<span class="sd">    depending on ``cov_type``.</span>
+<span class="sd">    depending on ``cov_type``. Since the parameters are the averages of the T</span>
+<span class="sd">    cross-sectional estimates, the t-statistics are compared with a t</span>
+<span class="sd">    distribution with T - 1 degrees of freedom, which is the convention of</span>
+<span class="sd">    Fama and MacBeth [1]_. T is the number of periods whose cross-sectional</span>
+<span class="sd">    regression is estimated. The p-values and confidence intervals use this</span>
+<span class="sd">    distribution if ``debiased`` is True, which is the default, and the normal</span>
+<span class="sd">    distribution otherwise.</span>
+
+<span class="sd">    References</span>
+<span class="sd">    ----------</span>
+<span class="sd">    .. [1] Fama, E. F. and MacBeth, J. D. (1973). Risk, return, and</span>
+<span class="sd">       equilibrium: Empirical tests. Journal of Political Economy, 81(3),</span>
+<span class="sd">       607-636.</span>
 <span class="sd">    """</span>
 
     <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span>
@@ -3744,9 +3763,17 @@
         <span class="n">valid_blocks</span> <span class="o">=</span> <span class="n">wx_df</span><span class="o">.</span><span class="n">groupby</span><span class="p">(</span><span class="n">level</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span><span class="o">.</span><span class="n">apply</span><span class="p">(</span><span class="n">validate_block</span><span class="p">)</span>
         <span class="k">if</span> <span class="ow">not</span> <span class="n">valid_blocks</span><span class="o">.</span><span class="n">any</span><span class="p">():</span>
             <span class="n">err</span> <span class="o">=</span> <span class="p">(</span>
-                <span class="s2">"Model cannot be estimated. All blocks of time-series observations "</span>
-                <span class="s2">"are rank deficient, and so it is not possible to estimate any"</span>
-                <span class="s2">"cross-sectional regressions."</span>
+                <span class="s2">"Model cannot be estimated. Fama-MacBeth estimates one "</span>
+                <span class="s2">"cross-sectional regression for each time period, using the "</span>
+                <span class="s2">"entities that are observed in the period, and none of these "</span>
+                <span class="s2">"regressions can be estimated. A cross-section needs at least "</span>
+                <span class="s2">"as many entities as regressors, and its regressors must not be "</span>
+                <span class="s2">"collinear, so the regressors must vary across entities within "</span>
+                <span class="s2">"a period. A regressor that depends only on time is collinear "</span>
+                <span class="s2">"with the constant, and a panel with a single entity has one "</span>
+                <span class="s2">"observation in each cross-section. Use more entities, remove "</span>
+                <span class="s2">"the regressors that do not vary across entities, or, for a "</span>
+                <span class="s2">"single entity, estimate a time-series regression."</span>
             <span class="p">)</span>
             <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="n">err</span><span class="p">)</span>
         <span class="k">if</span> <span class="n">valid_blocks</span><span class="o">.</span><span class="n">sum</span><span class="p">()</span> <span class="o">&lt;</span> <span class="n">exog</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">]:</span>
@@ -3786,7 +3813,10 @@
 <span class="sd">            Name of covariance estimator (see notes). Default is "unadjusted".</span>
 <span class="sd">        debiased : bool</span>
 <span class="sd">            Flag indicating whether to debiased the covariance estimator using</span>
-<span class="sd">            a degree of freedom adjustment.</span>
+<span class="sd">            a degree of freedom adjustment, which uses T - 1 instead of T when</span>
+<span class="sd">            the covariance of the T estimates is computed, and to use a t</span>
+<span class="sd">            distribution with T - 1 degrees of freedom for inference. If</span>
+<span class="sd">            False, inference uses the normal distribution.</span>
 <span class="sd">        bandwidth : float</span>
 <span class="sd">            The bandwidth to use when cov_type is "kernel". If None, it is</span>
 <span class="sd">            automatically computed.</span>
@@ -3810,7 +3840,26 @@
 
 <span class="sd">        * "unadjusted", "homoskedastic", "robust", "heteroskedastic" use the</span>
 <span class="sd">          standard covariance estimator of the T parameter estimates.</span>
-<span class="sd">        * "kernel" is a HAC estimator. Configurations options are:</span>
+<span class="sd">        * "kernel" is a HAC estimator of the covariance of the T parameter</span>
+<span class="sd">          estimates. The configuration options are ``kernel`` and ``bandwidth``.</span>
+
+<span class="sd">        The parameters are the averages of the T cross-sectional estimates, and</span>
+<span class="sd">        T is the number of periods whose cross-sectional regression is</span>
+<span class="sd">        estimated: periods that cannot be estimated are not counted. If</span>
+<span class="sd">        ``debiased`` is True, which is the default, the p-values and</span>
+<span class="sd">        confidence intervals use a t distribution with T - 1 degrees of</span>
+<span class="sd">        freedom, which is the convention of Fama and MacBeth (1973) and is the</span>
+<span class="sd">        ``df_resid`` of the results. The standard and the kernel covariance</span>
+<span class="sd">        estimators use the same distribution. If ``debiased`` is False, they</span>
+<span class="sd">        use the normal distribution. The estimates and the standard errors</span>
+<span class="sd">        do not depend on the distribution.</span>
+
+<span class="sd">        .. versionchanged:: 7.1</span>
+
+<span class="sd">           The p-values and confidence intervals use T - 1 degrees of freedom.</span>
+<span class="sd">           Earlier versions used nobs - nvar degrees of freedom, those of a</span>
+<span class="sd">           pooled regression, which is close to the normal distribution when</span>
+<span class="sd">           there are many observations.</span>
 <span class="sd">        """</span>
         <span class="n">y</span> <span class="o">=</span> <span class="n">cast</span><span class="p">(</span><span class="s2">"linearmodels.typing.data.Float64Array"</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_y</span><span class="p">)</span>
         <span class="n">x</span> <span class="o">=</span> <span class="n">cast</span><span class="p">(</span><span class="s2">"linearmodels.typing.data.Float64Array"</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_x</span><span class="p">)</span>
@@ -3909,9 +3958,15 @@
             <span class="n">bandwidth</span><span class="o">=</span><span class="n">bandwidth</span><span class="p">,</span>
         <span class="p">)</span>
 
-        <span class="n">df_resid</span> <span class="o">=</span> <span class="n">wy</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">-</span> <span class="n">params</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+        <span class="c1"># T is the number of cross-sectional estimates that are averaged, the</span>
+        <span class="c1"># periods that could be estimated, which are also the periods that the</span>
+        <span class="c1"># covariance uses. Inference uses t(T - 1)</span>
+        <span class="n">nperiod</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">isfinite</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">asarray</span><span class="p">(</span><span class="n">all_params</span><span class="p">))</span><span class="o">.</span><span class="n">all</span><span class="p">(</span><span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span><span class="o">.</span><span class="n">sum</span><span class="p">())</span>
+        <span class="n">df_resid</span> <span class="o">=</span> <span class="n">nperiod</span> <span class="o">-</span> <span class="mi">1</span>
+        <span class="c1"># The classical F-statistic is that of the pooled regression</span>
+        <span class="n">pooled_df_resid</span> <span class="o">=</span> <span class="n">wy</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">-</span> <span class="n">params</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
         <span class="n">res</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_postestimation</span><span class="p">(</span>
-            <span class="n">params</span><span class="p">,</span> <span class="n">cov</span><span class="p">,</span> <span class="n">debiased</span><span class="p">,</span> <span class="n">df_resid</span><span class="p">,</span> <span class="n">weps</span><span class="p">,</span> <span class="n">wy</span><span class="p">,</span> <span class="n">wx</span><span class="p">,</span> <span class="n">root_w</span>
+            <span class="n">params</span><span class="p">,</span> <span class="n">cov</span><span class="p">,</span> <span class="n">debiased</span><span class="p">,</span> <span class="n">pooled_df_resid</span><span class="p">,</span> <span class="n">weps</span><span class="p">,</span> <span class="n">wy</span><span class="p">,</span> <span class="n">wx</span><span class="p">,</span> <span class="n">root_w</span>
         <span class="p">)</span>
         <span class="n">index</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">dependent</span><span class="o">.</span><span class="n">index</span>
         <span class="n">res</span><span class="o">.</span><span class="n">update</span><span class="p">(</span>

@@ -23,7 +23,7 @@
     
   
       
-        <title>linearmodels.panel.results.PanelEffectsResults.pesaran_cd - linearmodels v7.1 (+205)</title>
+        <title>linearmodels.panel.results.PanelEffectsResults.pesaran_cd - linearmodels v7.1 (+218)</title>
       
     
 
@@ -100,7 +100,7 @@
 
 <header class="md-header md-header--shadow" data-md-component="header">
   <nav class="md-header__inner md-grid" aria-label="Header">
-    <a href="../../index.html" title="linearmodels v7.1 (+205)" class="md-header__button md-logo" aria-label="linearmodels v7.1 (+205)" data-md-component="logo">
+    <a href="../../index.html" title="linearmodels v7.1 (+218)" class="md-header__button md-logo" aria-label="linearmodels v7.1 (+218)" data-md-component="logo">
       <img src="../../_static/bw-logo.svg" alt="logo">
     </a>
     <label class="md-header__button md-icon" for="__drawer">
@@ -111,7 +111,7 @@
       <div class="md-header__ellipsis">
         <div class="md-header__topic">
           <span class="md-ellipsis">
-            linearmodels v7.1 (+205)
+            linearmodels v7.1 (+218)
           </span>
         </div>
         <div class="md-header__topic" data-md-component="header-topic">
@@ -206,10 +206,10 @@
 
 <nav class="md-nav md-nav--primary" aria-label="Navigation" data-md-level="0">
   <label class="md-nav__title" for="__drawer">
-    <a href="../../index.html" title="linearmodels v7.1 (+205)" class="md-nav__button md-logo" aria-label="linearmodels v7.1 (+205)" data-md-component="logo">
+    <a href="../../index.html" title="linearmodels v7.1 (+218)" class="md-nav__button md-logo" aria-label="linearmodels v7.1 (+218)" data-md-component="logo">
       <img src="../../_static/bw-logo.svg" alt="logo">
     </a>
-    linearmodels v7.1 (+205)
+    linearmodels v7.1 (+218)
   </label>
   
     <div class="md-nav__source">
@@ -2281,11 +2281,19 @@ observations. The statistic is</p>
 overlapping observations and finite pairwise correlation estimates.
 Under the null, the statistic is asymptotically standard normal.</p>
 <p>The shocks are the model’s <code class="docutils literal notranslate"><span class="pre">idiosyncratic</span></code> values, so the weights of
-a weighted model are not applied to them, and the shocks of
-<code class="docutils literal notranslate"><span class="pre">FirstDifferenceOLS</span></code> are in levels rather than the residuals of the
-differenced equation. Since the correlations are computed over time,
-the test assumes that the shocks are not serially correlated, and it
-over-rejects if they are persistent.</p>
+a weighted model are not applied to them. The exception is
+<code class="docutils literal notranslate"><span class="pre">FirstDifferenceOLS</span></code>, which uses <code class="docutils literal notranslate"><span class="pre">resids</span></code>, the residuals of the
+differenced equation, as <code class="docutils literal notranslate"><span class="pre">plm::pcdtest</span></code> does for a pooled regression
+of the differenced data. Its <code class="docutils literal notranslate"><span class="pre">idiosyncratic</span></code> values are in levels,
+and are persistent when the errors are, for example a random walk,
+which is when first differences are used. Since the correlations are
+computed over time, the test assumes that the shocks are not serially
+correlated, and it over-rejects if they are persistent. Conversely, if
+the errors in levels are serially uncorrelated, the residuals of
+<code class="docutils literal notranslate"><span class="pre">FirstDifferenceOLS</span></code> are negatively autocorrelated (an MA(1) with
+autocorrelation -0.5) and the test over-rejects, with a size of about
+11% at the nominal 5% level in large panels. The test is then better
+applied to a <code class="docutils literal notranslate"><span class="pre">PanelOLS</span></code> model with entity effects.</p>
 <p>The test is not valid for every model and an InapplicableTestStatistic
 is returned for the following.</p>
 <ul class="simple">
