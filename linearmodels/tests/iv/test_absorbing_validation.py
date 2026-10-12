@@ -5,6 +5,8 @@ Validation and messages of AbsorbingLS and the IV models.
   and nothing else. It used LSMR for any other name.
 * The FutureWarning of lsmr_options says what to use instead, which needs a method on
   models that can use HDFE.
+* Interaction.drop modifies the instance, and nobs must be the number of observations
+  that remain.
 """
 
 import numpy as np
@@ -13,7 +15,8 @@ import pandas as pd
 import pytest
 
 import linearmodels.iv.absorbing
-from linearmodels.iv.absorbing import AbsorbingLS
+from linearmodels.iv.absorbing import AbsorbingLS, Interaction
+from linearmodels.shared.exceptions import MissingValueWarning
 
 NOBS = 200
 
@@ -129,3 +132,63 @@ def test_lsmr_options_warning_says_how_to_migrate(data, spy_lsmr):
 def test_deprecation_note_in_docstring_names_the_method():
     doc = AbsorbingLS.fit.__doc__
     assert 'Use absorb_options with method="lsmr"' in " ".join(doc.split())
+
+
+@pytest.mark.parametrize("kind", ["both", "cat", "cont", "none", "frame"])
+def test_interaction_drop(kind):
+    rng = np.random.default_rng(1)
+    cat = pd.DataFrame({"c": pd.Categorical(rng.integers(0, 4, 50))})
+    cont = pd.DataFrame(rng.standard_normal((50, 2)), columns=["a", "b"])
+    if kind == "both":
+        inter = Interaction(cat, cont)
+    elif kind == "cat":
+        inter = Interaction(cat)
+    elif kind == "cont":
+        inter = Interaction(cont=cont)
+    elif kind == "none":
+        inter = Interaction(nobs=50)
+    else:
+        inter = Interaction.from_frame(pd.concat([cat, cont], axis=1))
+    assert inter.nobs == 50
+    locs = np.zeros(50, dtype=bool)
+    locs[[0, 7, 49]] = True
+    cat_before, cont_before = inter.cat.copy(), inter.cont.copy()
+
+    assert inter.drop(locs) is None
+    assert inter.nobs == 47
+    assert inter.cat.shape[0] == inter.cont.shape[0] == 47
+    assert inter.sparse.shape[0] == 47
+    assert inter.isnull.shape[0] == 47
+    pd.testing.assert_frame_equal(inter.cat, cat_before.loc[~locs])
+    pd.testing.assert_frame_equal(inter.cont, cont_before.loc[~locs])
+
+    # A second call drops from the remaining observations
+    more = np.zeros(47, dtype=bool)
+    more[:5] = True
+    inter.drop(more)
+    assert inter.nobs == 42
+    assert inter.sparse.shape[0] == 42
+
+
+def test_interaction_drop_is_documented():
+    doc = Interaction.drop.__doc__
+    assert doc is not None
+    flat = " ".join(doc.split())
+    assert "in place" in flat
+    assert "nothing is returned" in flat
+    assert Interaction.nobs.__doc__
+
+
+def test_nobs_of_the_interactions_of_a_model_with_missing_values(data):
+    y, x, cats = data
+    x = x.copy()
+    x.iloc[[3, 50], 0] = np.nan
+    cont = pd.DataFrame({"k": np.arange(NOBS, dtype=float)})
+    interaction = Interaction(cats[["g0"]], cont)
+    with pytest.warns(MissingValueWarning):
+        mod = AbsorbingLS(y, x, absorb=cats, interactions=interaction)
+    assert mod.dependent.shape[0] == NOBS - 2
+    assert mod._absorb_inter.nobs == NOBS - 2
+    assert [i.nobs for i in mod._interaction_list] == [NOBS - 2]
+    # The interaction of the caller is not modified
+    assert interaction.nobs == NOBS

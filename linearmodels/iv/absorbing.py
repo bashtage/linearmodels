@@ -475,6 +475,7 @@ class Interaction:
 
     @property
     def nobs(self) -> int:
+        """Number of observations, which drop reduces"""
         assert self._nobs is not None
         return self._nobs
 
@@ -529,8 +530,24 @@ class Interaction:
         return Series(cat_null.to_numpy() | cont_null.to_numpy(), index=index)
 
     def drop(self, locs: linearmodels.typing.data.BoolArray) -> None:
+        """
+        Drop observations
+
+        Parameters
+        ----------
+        locs : ndarray
+            Boolean array with one element for each observation, which is True
+            for the observations to drop.
+
+        Notes
+        -----
+        The instance is modified in place and nothing is returned. Afterwards
+        ``nobs``, ``cat``, ``cont``, ``sparse`` and ``hash`` use only the
+        remaining observations.
+        """
         self._cat_data.drop(locs)
         self._cont_data.drop(locs)
+        self._nobs = self._cat_data.shape[0]
 
     @property
     def sparse(self) -> csc_array:
