@@ -3,6 +3,7 @@ from numpy.testing import assert_allclose
 import pytest
 from scipy.optimize import minimize
 
+import linearmodels.asset_pricing.model as model_module
 from linearmodels.asset_pricing.model import LinearFactorModel, LinearFactorModelGMM
 from linearmodels.tests.asset_pricing._utility import generate_data, get_all
 
@@ -155,3 +156,25 @@ def test_linear_model_gmm_cue_j_statistic():
         options={"gtol": 1e-9, "maxiter": 5000},
     )
     assert_allclose(res.j_statistic.stat, best.fun, rtol=1e-4)
+
+
+@pytest.mark.parametrize("kwargs", [{"steps": 3}, {"use_cue": True}])
+def test_linear_model_gmm_opt_options_every_step(monkeypatch, kwargs):
+    # The options of the optimizer apply to every minimization of the estimator
+    data = generate_data(nfactor=1, nportfolio=4, nobs=300, output="numpy")
+    calls = []
+    minimize_original = minimize
+
+    def recording_minimize(*args, **kw):
+        calls.append(kw)
+        return minimize_original(*args, **kw)
+
+    monkeypatch.setattr(model_module, "minimize", recording_minimize)
+    opt_options = {"method": "L-BFGS-B", "tol": 1e-8, "options": {"maxcor": 7}}
+    mod = LinearFactorModelGMM(data.portfolios, data.factors)
+    mod.fit(disp=0, opt_options=opt_options, **kwargs)
+    assert len(calls) >= 2
+    for call in calls:
+        assert call["method"] == "L-BFGS-B"
+        assert call["tol"] == 1e-8
+        assert call["options"] == {"maxiter": 1000, "maxcor": 7}
