@@ -1383,13 +1383,13 @@ class FamaMacBethResults(PanelResults):
     @property
     def df_resid(self) -> int:
         """
-        Degrees of freedom of the t distribution used for inference
+        Degrees of freedom of the t distribution used for inference.
 
         Returns
         -------
         int
             T - 1, where T is the number of cross-sectional regressions that
-            are averaged
+            are averaged.
 
         Notes
         -----
