@@ -27,6 +27,11 @@ the inverse of the noise. Both fits raise the same ValueError on every platform,
 and a model that cannot be estimated has no statistics to test. The C statistic
 estimates another model, which has more moment conditions, and is invalid if
 that model cannot be estimated.
+
+The objective function of IVGMMCUE is also constant, and not only undefined, if
+the moment conditions are not centered and there are as many clusters as moment
+conditions. IVGMMCUE.fit raises a ValueError then too, so that there have to be
+more clusters than moment conditions with every value of center.
 """
 
 import numpy as np
@@ -498,8 +503,10 @@ def cue_criterion(data, params, nclusters, center):
 
 
 # The model has 4 moment conditions. Centered cluster sums add to zero, so that the
-# covariance is singular unless there are more clusters than moment conditions, and
-# at least as many are needed if the moment conditions are not centered
+# covariance is singular unless there are more clusters than moment conditions. If
+# the moment conditions are not centered the covariance is singular with fewer
+# clusters than moment conditions, and the objective function is constant with
+# as many (see test_cue_uncentered_with_as_many_clusters_as_moments)
 CUE_SINGULAR = [
     pytest.param(2, {}, id="default-2"),
     pytest.param(3, {}, id="default-3"),
@@ -525,6 +532,73 @@ def test_cue_too_few_clusters(nclusters, config):
     assert "singular" in message
 
 
+@pytest.mark.parametrize("debiased", [False, True])
+def test_cue_uncentered_with_as_many_clusters_as_moments(debiased):
+    # The covariance is not singular, but the objective function is
+    # 1'Xi(Xi'Xi)^{-1}Xi'1 = 4 for all parameters, with Xi the matrix of the 4
+    # cluster sums of the moment conditions, which is square. It is divided by
+    # the small sample adjustment of the clustered covariance if it is debiased.
+    # The model fitted without an error, and the estimates were the starting
+    # values
+    mod, clusters = cue_model(ONE_ENDOG, 4, center=False, debiased=debiased)
+    nobs, nvar = 120, 3
+    scale = (nobs - 1) / (nobs - nvar) * 4 / 3 if debiased else 1.0
+    rng = np.random.default_rng(0)
+    for params in rng.standard_normal((5, 3)) * 3 + [1.0, 0.0, 0.5]:
+        value = mod.j(params, mod._wx, mod._wy, mod._wz)
+        assert_allclose(value, 4.0 / scale, rtol=1e-9)
+        if not debiased:
+            assert_allclose(cue_criterion(ONE_ENDOG, params, 4, False), 4.0, rtol=1e-9)
+    with pytest.raises(ValueError, match="as many clusters") as exc_info:
+        mod.fit(cov_type="clustered", clusters=clusters)
+    assert exc_info.type is ValueError
+    message = str(exc_info.value)
+    assert "as many clusters (4 clusters) as there are moment conditions" in message
+    assert "4 moment conditions" in message
+    assert "not centered" in message
+    assert "the same for every value of the parameters" in message
+    assert "Use more clusters than moment conditions" in message
+
+
+def test_cue_uncentered_with_as_many_clusters_as_moments_with_starting_values():
+    mod, clusters = cue_model(ONE_ENDOG, 4, center=False)
+    starting = pd.Series([1.0, 0.0, 0.5], index=["const", "w", "x"])
+    with pytest.raises(ValueError, match="as many clusters"):
+        mod.fit(starting=starting, cov_type="clustered", clusters=clusters)
+
+
+def test_cue_uncentered_with_as_many_clusters_as_moments_is_found_first(monkeypatch):
+    def minimize(*args, **kwargs):
+        raise AssertionError("the objective is constant, do not optimize it")
+
+    monkeypatch.setattr(linearmodels.iv.model, "minimize", minimize)
+    mod, clusters = cue_model(ONE_ENDOG, 4, center=False)
+    with pytest.raises(ValueError, match="as many clusters"):
+        mod.fit(cov_type="clustered", clusters=clusters)
+
+
+@pytest.mark.parametrize("center", [False, True])
+@pytest.mark.parametrize("nclusters", [2, 3, 4, 5, 6, 8])
+def test_cue_and_ivgmm_clusters(nclusters, center):
+    # IVGMMCUE needs more clusters than the 4 moment conditions, with every
+    # value of center. IVGMM needs a nonsingular covariance, which is one cluster
+    # less if the moment conditions are not centered
+    if nclusters > 4:
+        mod, clusters = cue_model(ONE_ENDOG, nclusters, center=center)
+        res = mod.fit(cov_type="clustered", clusters=clusters)
+        assert np.all(np.isfinite(res.params))
+        assert np.all(np.isfinite(res.std_errors))
+    else:
+        mod, clusters = cue_model(ONE_ENDOG, nclusters, center=center)
+        with pytest.raises(ValueError, match="clusters") as exc_info:
+            mod.fit(cov_type="clustered", clusters=clusters)
+        assert exc_info.type is ValueError
+    if nonsingular(4, nclusters, center):
+        assert np.all(np.isfinite(fit(ONE_ENDOG, nclusters, center).params))
+    else:
+        check_too_few_clusters(ONE_ENDOG, nclusters, center)
+
+
 def test_cue_too_few_clusters_with_starting_values():
     mod, clusters = cue_model(ONE_ENDOG, 3)
     starting = pd.Series([1.0, 0.0, 0.5], index=["const", "w", "x"])
@@ -545,11 +619,10 @@ def test_cue_too_few_clusters_is_found_before_the_optimization(monkeypatch):
 
 @pytest.mark.parametrize(
     ("nclusters", "center"),
-    [(5, True), (6, True), (12, True), (4, False), (5, False), (12, False)],
+    [(5, True), (6, True), (12, True), (5, False), (6, False), (12, False)],
 )
 def test_cue_with_enough_clusters_is_not_changed(nclusters, center):
-    # The first three of these have more clusters than moment conditions. A model
-    # that is not centered can have as many
+    # These have more clusters than the 4 moment conditions
     mod, clusters = cue_model(ONE_ENDOG, nclusters, center=center)
     res = mod.fit(cov_type="clustered", clusters=clusters)
     assert np.all(np.isfinite(res.params))

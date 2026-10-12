@@ -1609,7 +1609,12 @@ class IVGMMCUE(_IVGMMBase):
     The covariance of the moment conditions has to be nonsingular. A clustered
     covariance that is estimated from G clusters has rank at most G, and at
     most G - 1 if the moment conditions are centered, so that there have to be
-    more clusters than moment conditions if ``center`` is ``True``.
+    more clusters than moment conditions if ``center`` is ``True``. If
+    ``center`` is ``False`` and there are as many clusters as moment
+    conditions, the covariance is nonsingular but the objective function is
+    the same for every value of the parameters, so that there is nothing to
+    optimize. There have to be more clusters than moment conditions whether or
+    not the moment conditions are centered.
 
     .. math::
 
@@ -1847,22 +1852,48 @@ class IVGMMCUE(_IVGMMBase):
 
     def _check_moment_covariance(self) -> None:
         """
-        Raise a ValueError if the covariance of the moment conditions is singular
+        Raise a ValueError if the objective function is not defined or constant
 
-        The objective function uses the inverse of the covariance, so it is not
-        defined if the covariance is singular. The rank of the covariance does
-        not depend on the parameters, other than for special values such as
-        residuals that are all 0, and so it is tested at the first step
-        estimates of two-step GMM.
+        The objective function uses the inverse of the covariance of the moment
+        conditions, so it is not defined if the covariance is singular. The rank
+        of the covariance does not depend on the parameters, other than for
+        special values such as residuals that are all 0, and so it is tested at
+        the first step estimates of two-step GMM.
+
+        If the covariance is clustered, the moment conditions are not centered
+        and there are as many clusters as moment conditions, the covariance is
+        not singular but the objective function is the same for all values of
+        the parameters. The cluster sums of the moment conditions are the rows
+        of a square matrix, Xi, the average of the moment conditions is
+        Xi'1 / n, and the covariance is Xi'Xi / n, so that the objective function
+        is 1'Xi(Xi'Xi)^{-1}Xi'1, which is the number of clusters whenever Xi is
+        nonsingular (it is divided by the small sample adjustment if debiased).
         """
         wy, wx, wz = self._wy, self._wx, self._wz
-        nobs = wz.shape[0]
+        nobs, nmoment = wz.shape
         params = IVGMM.estimate_parameters(wx, wy, wz, inv(wz.T @ wz / nobs))
         self._raise_if_singular(
             self._weight.weight_matrix(wx, wz, wy - wx @ params),
             "The objective function of the continuously updating GMM estimator "
             "uses the inverse of the covariance, so it is not defined.",
         )
+        if not isinstance(self._weight, OneWayClusteredWeightMatrix):
+            return
+        nclusters = len(unique(asarray(self._weight_config["clusters"])))
+        # Fewer clusters, or centered moment conditions, give a singular covariance
+        if nclusters > nmoment:
+            return
+        msg = (
+            f"The clustered covariance of the {nmoment} moment conditions is "
+            f"estimated from as many clusters ({nclusters} clusters) as there "
+            "are moment conditions, and the moment conditions are not centered. "
+            "The objective function of the continuously updating GMM estimator "
+            "is then the same for every value of the parameters, so that there is "
+            "nothing to optimize and the estimates would be the starting values. "
+            "Use more clusters than moment conditions, or a weight_type that "
+            "does not use clusters."
+        )
+        raise ValueError(msg)
 
     def fit(
         self,
@@ -1910,10 +1941,11 @@ class IVGMMCUE(_IVGMMBase):
         ------
         ValueError
             If the covariance of the moment conditions is singular, which
-            occurs if there are too few clusters or observations. The
-            number of clusters has to be larger than the number of moment
-            conditions if the moment conditions are centered, which is the
-            default.
+            occurs if there are too few clusters or observations, or if the
+            moment conditions are not centered and there are as many clusters
+            as moment conditions, so that the objective function is constant.
+            The number of clusters has to be larger than the number of moment
+            conditions.
 
         Notes
         -----
