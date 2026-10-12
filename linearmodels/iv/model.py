@@ -1364,12 +1364,15 @@ class IVGMM(_IVGMMBase):
     moment conditions, so that the estimate has to be nonsingular. A clustered
     estimate from G clusters has rank at most G, and at most G - 1 if the
     moment conditions are centered (``center`` is ``True``), since the
-    centered cluster sums add to zero. There have to be more clusters than
-    moment conditions. The rank of a kernel or robust estimate is bounded in
-    the same way by the number of observations. ``fit`` raises a
-    ``ValueError`` that says so if the estimate is singular, since the
-    estimates would be numerical noise. The estimate is not used, and so it
-    is not tested, if ``iter_limit`` is 1.
+    centered cluster sums add to zero. There have to be at least as many
+    clusters as moment conditions, and more if they are centered. The first
+    step moment conditions of an exactly identified model add to zero as well,
+    so that it needs more clusters than moment conditions with every value of
+    ``center``. The rank of a kernel or robust estimate is bounded in the same
+    way by the number of observations. ``fit`` raises a ``ValueError`` that
+    says so if the estimate is singular, since the estimates would be
+    numerical noise. The estimate is not used, and so it is not tested, if
+    ``iter_limit`` is 1.
 
     .. todo::
 
@@ -1550,9 +1553,10 @@ class IVGMM(_IVGMMBase):
         ValueError
             If the estimate of the covariance of the moment conditions is
             singular, which occurs if there are too few clusters or
-            observations. The number of clusters has to be larger than the
-            number of moment conditions. The estimate is not used if
-            ``iter_limit`` is 1.
+            observations. A clustered estimate needs at least as many clusters
+            as moment conditions, and more if the moment conditions are
+            centered or the model is exactly identified. The estimate is not
+            used if ``iter_limit`` is 1.
 
         See Also
         --------
