@@ -3080,7 +3080,9 @@ class RandomEffects(_PanelModelBase):
         means of the entities are removed (experience, if the model has year
         dummies) is not in the within regression, and a regressor that is collinear
         with the others in the means of the entities (the year dummies and the
-        constant in a balanced panel) is not in the between regression.
+        constant in a balanced panel) is not in the between regression. A
+        ``ValueError`` is raised if either regression has no residual degrees of
+        freedom, since the variances cannot be estimated.
 
         .. versionchanged:: 7.1
 
@@ -3093,7 +3095,10 @@ class RandomEffects(_PanelModelBase):
            regression that the estimator of Baltagi and Chang (1994) uses are those of
            the regression that weights the entities by their numbers of observations.
            Earlier versions used the residuals of the unweighted regression of the
-           means, which gave a different variance of the effects.
+           means, which gave a different variance of the effects. Models that do not
+           have residual degrees of freedom in the regressions raise a
+           ``ValueError``. Earlier versions raised an error from NumPy or SciPy,
+           or returned variances that were not defined.
         """
         w = self.weights.values2d
         root_w = cast("linearmodels.typing.data.Float64Array", np.sqrt(w))
@@ -3125,7 +3130,25 @@ class RandomEffects(_PanelModelBase):
 
         nobs = weps.shape[0]
         neffects = wu.shape[0]
-        sigma2_e = float(np.squeeze(weps.T @ weps)) / (nobs - neffects - rank_within)
+        df_within = nobs - neffects - rank_within
+        df_between = neffects - rank_between
+        if df_within <= 0:
+            raise ValueError(
+                "The variance of the idiosyncratic error cannot be estimated since "
+                "the within regression has no residual degrees of freedom. The model "
+                f"has {nobs} observations of {neffects} entities, and the regressors "
+                f"that vary within entities have a rank of {rank_within}, so that "
+                f"at least {neffects + rank_within + 1} observations are needed."
+            )
+        if df_between <= 0:
+            raise ValueError(
+                "The variance of the effects cannot be estimated since the between "
+                "regression has no residual degrees of freedom. The model has "
+                f"{neffects} entities, and the means of the regressors have a rank "
+                f"of {rank_between}, so that at least {rank_between + 1} entities "
+                "are needed."
+            )
+        sigma2_e = float(np.squeeze(weps.T @ weps)) / df_within
         ssr = float(np.squeeze(wu.T @ wu))
         t = np.asarray(self.dependent.count("entity"))
         unbalanced = np.ptp(t) != 0
@@ -3149,12 +3172,10 @@ class RandomEffects(_PanelModelBase):
             # in all entities. The pseudo inverse uses the regressors that are not
             # collinear
             tr = np.trace(np.linalg.pinv(denom, hermitian=True) @ num)
-            sigma2_u = max(
-                0, (ssr - (neffects - rank_between) * sigma2_e) / (nobs - tr)
-            )
+            sigma2_u = max(0, (ssr - df_between * sigma2_e) / (nobs - tr))
         else:
             t_bar = neffects / ((1.0 / t).sum())
-            sigma2_u = max(0, ssr / (neffects - rank_between) - sigma2_e / t_bar)
+            sigma2_u = max(0, ssr / df_between - sigma2_e / t_bar)
         rho = sigma2_u / (sigma2_u + sigma2_e)
 
         theta = 1.0 - np.sqrt(sigma2_e / (t * sigma2_u + sigma2_e))
