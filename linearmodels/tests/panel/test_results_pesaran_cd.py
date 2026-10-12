@@ -1,8 +1,14 @@
 """
-Tests of PanelResults.pesaran_cd: which models the test is applicable to.
+Tests of PanelResults.pesaran_cd: which models the test is applicable to, and
+the residuals that FirstDifferenceOLS uses.
+
+The reference values of FirstDifferenceOLS in results/pesaran-cd-fd-reference.csv
+were produced by results/pesaran-cd-fd-reference.R, which computes the statistic
+from the residuals of the differenced equation using the R package plm.
 """
 
 from itertools import combinations
+import os
 
 import numpy as np
 from numpy.testing import assert_allclose
@@ -23,6 +29,8 @@ from linearmodels.shared.hypotheses import (
     InapplicableTestStatistic,
     NormalTestStatistic,
 )
+
+RESULTS = os.path.join(os.path.split(os.path.abspath(__file__))[0], "results")
 
 
 def cd_panel(seed=0, nentity=30, nperiod=8, loading=0.0):
@@ -91,6 +99,10 @@ def cd_models(frame):
         ),
         "random": (lambda: RandomEffects(y, xc), True),
         "first-difference": (lambda: FirstDifferenceOLS(y, x), True),
+        "first-difference-weighted": (
+            lambda: FirstDifferenceOLS(y, x, weights=weights),
+            True,
+        ),
         # Time-invariant groups of entities, and groups unrelated to the periods
         "other-group": (lambda: PanelOLS(y, xc, other_effects=entity % 3), True),
         "entity-other-random": (
@@ -156,7 +168,13 @@ def test_pesaran_cd_applicability(name):
     cd = res.pesaran_cd
     if applicable:
         assert isinstance(cd, NormalTestStatistic)
-        expected = brute_force_cd(res.idiosyncratic)
+        if name.startswith("first-difference"):
+            # The residuals of the differenced equation, not the shocks in
+            # levels, and the weights are not applied to them
+            shocks = res.resids.to_frame()
+        else:
+            shocks = res.idiosyncratic
+        expected = brute_force_cd(shocks)
         assert_allclose(cd.stat, expected, rtol=1e-10)
         assert_allclose(cd.pval, 2 * stats.norm.sf(abs(expected)), rtol=1e-10)
         return
@@ -240,12 +258,63 @@ def test_pesaran_cd_time_invariant_other_effects_unbalanced():
     assert_allclose(cd.stat, brute_force_cd(res.idiosyncratic), rtol=1e-10)
 
 
-def test_pesaran_cd_first_difference_uses_levels():
-    # The shocks are in levels and not the residuals of the differenced equation
-    frame = cd_panel(seed=3, nentity=40, nperiod=8)
+def test_pesaran_cd_first_difference_closed_form():
+    # With N entities that are observed in T periods there are T - 1 residuals
+    # of the differenced equation for each, so that
+    # CD = sqrt(2 (T - 1) / (N (N - 1))) * the sum of the N (N - 1) / 2 correlations
+    nentity, nperiod = 40, 8
+    frame = cd_panel(seed=3, nentity=nentity, nperiod=nperiod)
+    y = frame.y.to_numpy().reshape(nentity, nperiod)
+    x = frame.x.to_numpy().reshape(nentity, nperiod)
+    dy, dx = np.diff(y, axis=1), np.diff(x, axis=1)
+    beta = np.sum(dx * dy) / np.sum(dx * dx)
+    corr = np.corrcoef(dy - beta * dx)
+    pairs = corr[np.triu_indices(nentity, k=1)]
+    expected = np.sqrt(2 * (nperiod - 1) / (nentity * (nentity - 1))) * pairs.sum()
+
     res = FirstDifferenceOLS(frame.y, frame[["x"]]).fit()
+    assert_allclose(res.params.iloc[0], beta, rtol=1e-10)
     cd = res.pesaran_cd
     assert isinstance(cd, NormalTestStatistic)
-    assert_allclose(cd.stat, brute_force_cd(res.idiosyncratic), rtol=1e-10)
-    differenced = brute_force_cd(res.resids.to_frame())
-    assert not np.isclose(cd.stat, differenced, rtol=1e-3)
+    assert_allclose(cd.stat, expected, rtol=1e-10)
+    assert_allclose(cd.pval, 2 * stats.norm.sf(abs(expected)), rtol=1e-10)
+    # It is not the statistic of the shocks in levels
+    assert not np.isclose(cd.stat, brute_force_cd(res.idiosyncratic), rtol=1e-3)
+
+
+def test_pesaran_cd_first_difference_two_periods():
+    # There is one difference for each entity, so that no pair of entities has
+    # two overlapping residuals. The shocks in levels have two for every pair
+    frame = cd_panel(seed=2, nentity=10, nperiod=2)
+    res = FirstDifferenceOLS(frame.y, frame[["x"]]).fit()
+    assert res.resids.shape[0] == 10
+    cd = res.pesaran_cd
+    assert isinstance(cd, InapplicableTestStatistic)
+    assert "two or more overlapping observations" in str(cd)
+
+
+FD_PANELS = pd.read_csv(os.path.join(RESULTS, "pesaran-cd-fd-panels.csv"))
+FD_REFERENCE = pd.read_csv(os.path.join(RESULTS, "pesaran-cd-fd-reference.csv"))
+
+
+@pytest.mark.parametrize(
+    "row",
+    [pytest.param(row, id=row.case) for row in FD_REFERENCE.itertuples(index=False)],
+)
+def test_pesaran_cd_first_difference_plm(row):
+    panel = FD_PANELS.loc[FD_PANELS.case == row.case].set_index(["entity", "time"])
+    res = FirstDifferenceOLS(panel.y, panel[["x"]]).fit()
+    # The reference uses the same differences and the same estimate
+    assert res.nobs == row.nobs
+    assert_allclose(res.params.iloc[0], row.coef, rtol=1e-8)
+    # Pairs of entities with at least two residuals at the same times
+    seen = res.resids.unstack(level=0).notnull().to_numpy(dtype=int)
+    assert np.tril(seen.T @ seen >= 2, k=-1).sum() == row.npairs
+
+    cd = res.pesaran_cd
+    assert isinstance(cd, NormalTestStatistic)
+    assert_allclose(cd.stat, row.cd_stat, rtol=1e-8)
+    assert_allclose(cd.pval, row.cd_pvalue, rtol=1e-8)
+    # The shocks in levels give the reference of the levels, which is not the same
+    assert_allclose(brute_force_cd(res.idiosyncratic), row.cd_levels, rtol=1e-8)
+    assert not np.isclose(cd.stat, row.cd_levels, rtol=1e-2)

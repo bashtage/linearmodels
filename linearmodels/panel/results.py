@@ -647,11 +647,14 @@ class PanelResults(_SummaryStr):
         Under the null, the statistic is asymptotically standard normal.
 
         The shocks are the model's ``idiosyncratic`` values, so the weights of
-        a weighted model are not applied to them, and the shocks of
-        ``FirstDifferenceOLS`` are in levels rather than the residuals of the
-        differenced equation. Since the correlations are computed over time,
-        the test assumes that the shocks are not serially correlated, and it
-        over-rejects if they are persistent.
+        a weighted model are not applied to them. The exception is
+        ``FirstDifferenceOLS``, which uses ``resids``, the residuals of the
+        differenced equation, as ``plm::pcdtest`` does for a pooled regression
+        of the differenced data. Its ``idiosyncratic`` values are in levels,
+        and are persistent when the errors are, for example a random walk,
+        which is when first differences are used. Since the correlations are
+        computed over time, the test assumes that the shocks are not serially
+        correlated, and it over-rejects if they are persistent.
 
         The test is not valid for every model and an InapplicableTestStatistic
         is returned for the following.
@@ -692,10 +695,15 @@ class PanelResults(_SummaryStr):
            problem in testing for remaining cross-section correlation.
            Journal of Business & Economic Statistics, 40(3), 1191-1203.
         """
+        from linearmodels.panel.model import FirstDifferenceOLS  # noqa: PLC0415
+
         reason = self._pesaran_cd_inapplicable()
         if reason is not None:
             return InapplicableTestStatistic(reason=reason, name="Pesaran CD test")
-        eps = self.idiosyncratic.iloc[:, 0]
+        if isinstance(self.model, FirstDifferenceOLS):
+            eps = self.resids
+        else:
+            eps = self.idiosyncratic.iloc[:, 0]
         wide = eps.unstack(level=0)
         wide = wide.loc[:, wide.notnull().any(axis=0)]
         nentity = wide.shape[1]
