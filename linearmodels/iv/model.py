@@ -1824,8 +1824,8 @@ class IVGMMCUE(_IVGMMBase):
         Parameters
         ----------
         starting : ndarray
-            Starting values to use in optimization.  If not provided, 2SLS
-            estimates are used.
+            Starting values to use in optimization.  If not provided, the
+            estimates of IVGMM are used. See Notes.
         display : bool
             Flag indicating whether to display optimization output
         cov_type : str
@@ -1856,7 +1856,11 @@ class IVGMMCUE(_IVGMMBase):
 
         Notes
         -----
-        Starting values are computed by IVGMM.
+        Starting values are computed by IVGMM with the weight type and
+        configuration of the model, except that the bandwidth of a kernel
+        weight matrix is ``bandwidth`` if it was given and ``nobs - 2`` if it
+        was not. ``optimal_bw`` selects the bandwidth of the objective
+        function only.
 
         If ``cov_type`` is "kernel" and neither ``bandwidth`` nor
         ``optimal_bw`` is in ``cov_config``, the bandwidth of the covariance
