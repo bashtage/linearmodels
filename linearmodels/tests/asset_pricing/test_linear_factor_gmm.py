@@ -1,5 +1,6 @@
 import numpy as np
 from numpy.testing import assert_allclose
+import pandas as pd
 import pytest
 from scipy.optimize import minimize
 
@@ -178,3 +179,23 @@ def test_linear_model_gmm_opt_options_every_step(monkeypatch, kwargs):
         assert call["method"] == "L-BFGS-B"
         assert call["tol"] == 1e-8
         assert call["options"] == {"maxiter": 1000, "maxcor": 7}
+
+
+@pytest.mark.parametrize("nfactor", [1, 3])
+@pytest.mark.parametrize("risk_free", [False, True])
+def test_linear_model_gmm_std_errors_layout(nfactor, risk_free):
+    # Each row is a portfolio, with the standard error of the alpha followed by the
+    # standard errors of the loadings, which are the standard errors in cov
+    data = generate_data(nfactor=nfactor, nportfolio=8, nobs=500, output="pandas")
+    mod = LinearFactorModelGMM(data.portfolios, data.factors, risk_free=risk_free)
+    res = mod.fit(cov_type="robust", disp=0)
+    cov = res.cov
+    alpha_se = np.sqrt(np.diag(res._alpha_vcv))
+    expected = pd.DataFrame(0.0, index=res.params.index, columns=res.params.columns)
+    for i, portfolio in enumerate(expected.index):
+        expected.loc[portfolio, "alpha"] = alpha_se[i]
+        for factor in data.factors.columns:
+            name = f"beta-{portfolio}-{factor}"
+            expected.loc[portfolio, factor] = np.sqrt(cov.loc[name, name])
+    assert_allclose(res.std_errors, expected)
+    assert_allclose(res.tstats, res.params / expected)
