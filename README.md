@@ -152,7 +152,7 @@ Python, NumPy and the other dependencies.
 ### Running
 
 -   Python 3.10+
--   NumPy (1.22.3+)
+-   NumPy (1.23.5+)
 -   SciPy (1.8+)
 -   pandas (1.4+)
 -   statsmodels (0.13.1+)
