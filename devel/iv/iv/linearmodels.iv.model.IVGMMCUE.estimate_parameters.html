@@ -23,7 +23,7 @@
     
   
       
-        <title>linearmodels.iv.model.IVGMMCUE.estimate_parameters - linearmodels v7.1 (+315)</title>
+        <title>linearmodels.iv.model.IVGMMCUE.estimate_parameters - linearmodels v7.1 (+327)</title>
       
     
 
@@ -100,7 +100,7 @@
 
 <header class="md-header md-header--shadow" data-md-component="header">
   <nav class="md-header__inner md-grid" aria-label="Header">
-    <a href="../../index.html" title="linearmodels v7.1 (+315)" class="md-header__button md-logo" aria-label="linearmodels v7.1 (+315)" data-md-component="logo">
+    <a href="../../index.html" title="linearmodels v7.1 (+327)" class="md-header__button md-logo" aria-label="linearmodels v7.1 (+327)" data-md-component="logo">
       <img src="../../_static/bw-logo.svg" alt="logo">
     </a>
     <label class="md-header__button md-icon" for="__drawer">
@@ -111,7 +111,7 @@
       <div class="md-header__ellipsis">
         <div class="md-header__topic">
           <span class="md-ellipsis">
-            linearmodels v7.1 (+315)
+            linearmodels v7.1 (+327)
           </span>
         </div>
         <div class="md-header__topic" data-md-component="header-topic">
@@ -206,10 +206,10 @@
 
 <nav class="md-nav md-nav--primary" aria-label="Navigation" data-md-level="0">
   <label class="md-nav__title" for="__drawer">
-    <a href="../../index.html" title="linearmodels v7.1 (+315)" class="md-nav__button md-logo" aria-label="linearmodels v7.1 (+315)" data-md-component="logo">
+    <a href="../../index.html" title="linearmodels v7.1 (+327)" class="md-nav__button md-logo" aria-label="linearmodels v7.1 (+327)" data-md-component="logo">
       <img src="../../_static/bw-logo.svg" alt="logo">
     </a>
-    linearmodels v7.1 (+315)
+    linearmodels v7.1 (+327)
   </label>
   
     <div class="md-nav__source">
@@ -1787,7 +1787,11 @@ scipy.optimize.minimize.</p>
 </dl>
 <p class="rubric">Notes</p>
 <p>Exposed to facilitate estimation with other data, e.g., bootstrapped
-samples.  Performs no error checking.</p>
+samples.  Performs no error checking. The bandwidth of a kernel weight
+matrix that is estimated from the data is the one that is estimated
+from the data of the model, see
+<a class="reference internal" href="linearmodels.iv.model.IVGMMCUE.j.html#linearmodels.iv.model.IVGMMCUE.j" title="linearmodels.iv.model.IVGMMCUE.j (Python method) — Optimization target"><code class="xref py py-meth docutils literal notranslate"><span class="pre">j()</span></code></a>, and not from <code class="docutils literal notranslate"><span class="pre">x</span></code>, <code class="docutils literal notranslate"><span class="pre">y</span></code>
+and <code class="docutils literal notranslate"><span class="pre">z</span></code>.</p>
 <div class="seealso admonition">
 <p class="admonition-title">See also</p>
 <p><a class="reference external" href="https://docs.scipy.org/doc/scipy/reference/generated/scipy.optimize.minimize.html#scipy.optimize.minimize" title="(in SciPy v1.18.0)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">scipy.optimize.minimize</span></code></a></p>

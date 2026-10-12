@@ -19,7 +19,7 @@
     
   
       
-        <title>linearmodels.system.model - linearmodels v7.1 (+315)</title>
+        <title>linearmodels.system.model - linearmodels v7.1 (+327)</title>
       
     
 
@@ -91,7 +91,7 @@
 
 <header class="md-header md-header--shadow" data-md-component="header">
   <nav class="md-header__inner md-grid" aria-label="Header">
-    <a href="../../../index.html" title="linearmodels v7.1 (+315)" class="md-header__button md-logo" aria-label="linearmodels v7.1 (+315)" data-md-component="logo">
+    <a href="../../../index.html" title="linearmodels v7.1 (+327)" class="md-header__button md-logo" aria-label="linearmodels v7.1 (+327)" data-md-component="logo">
       <img src="../../../_static/bw-logo.svg" alt="logo">
     </a>
     <label class="md-header__button md-icon" for="__drawer">
@@ -102,7 +102,7 @@
       <div class="md-header__ellipsis">
         <div class="md-header__topic">
           <span class="md-ellipsis">
-            linearmodels v7.1 (+315)
+            linearmodels v7.1 (+327)
           </span>
         </div>
         <div class="md-header__topic" data-md-component="header-topic">
@@ -197,10 +197,10 @@
 
 <nav class="md-nav md-nav--primary" aria-label="Navigation" data-md-level="0">
   <label class="md-nav__title" for="__drawer">
-    <a href="../../../index.html" title="linearmodels v7.1 (+315)" class="md-nav__button md-logo" aria-label="linearmodels v7.1 (+315)" data-md-component="logo">
+    <a href="../../../index.html" title="linearmodels v7.1 (+327)" class="md-nav__button md-logo" aria-label="linearmodels v7.1 (+327)" data-md-component="logo">
       <img src="../../../_static/bw-logo.svg" alt="logo">
     </a>
-    linearmodels v7.1 (+315)
+    linearmodels v7.1 (+327)
   </label>
   
     <div class="md-nav__source">
@@ -556,6 +556,7 @@
 
 <span class="kn">from</span><span class="w"> </span><span class="nn">linearmodels.iv._utility</span><span class="w"> </span><span class="kn">import</span> <span class="n">IVFormulaParser</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">linearmodels.iv.data</span><span class="w"> </span><span class="kn">import</span> <span class="n">IVData</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">linearmodels.iv.gmm</span><span class="w"> </span><span class="kn">import</span> <span class="n">_uses_default_bandwidth</span><span class="p">,</span> <span class="n">_warn_default_bandwidth</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">linearmodels.shared.alignment</span><span class="w"> </span><span class="kn">import</span> <span class="p">(</span>
     <span class="n">check_alignment</span><span class="p">,</span>
     <span class="n">check_row_alignment</span><span class="p">,</span>
@@ -2609,6 +2610,34 @@
 
 <span class="sd">    where :math:`W` is a positive definite weighting matrix.</span>
 
+<span class="sd">    The weight matrix is the inverse of an estimate of the covariance of the</span>
+<span class="sd">    moment conditions. ``weight_type`` selects the estimator: "unadjusted"</span>
+<span class="sd">    ("homoskedastic"), "robust" ("heteroskedastic") or "kernel" (``"hac"``), and</span>
+<span class="sd">    ``weight_config`` contains its options. These are ``center`` and</span>
+<span class="sd">    ``debiased`` for all of them, and ``kernel``, ``bandwidth`` and</span>
+<span class="sd">    ``optimal_bw`` for "kernel".</span>
+
+<span class="sd">    The bandwidth of a kernel weight matrix (``weight_type="kernel"``) is</span>
+<span class="sd">    ``bandwidth`` if it is given in ``weight_config``, and ``nobs - 2`` if</span>
+<span class="sd">    ``optimal_bw`` is ``False``. Otherwise, which is the default and what</span>
+<span class="sd">    ``optimal_bw=True`` does, it is estimated from the data, from the</span>
+<span class="sd">    residuals that the weight matrix is computed from. These are the residuals</span>
+<span class="sd">    of the first step estimates in two-step GMM, which is the default. In 7.0</span>
+<span class="sd">    and earlier the default was ``nobs - 2``, which is not a consistent</span>
+<span class="sd">    estimator of the covariance of the moment conditions, so the estimates,</span>
+<span class="sd">    standard errors and J statistic can be different. ``fit`` issues a</span>
+<span class="sd">    ``DefaultBandwidthWarning`` (a ``UserWarning``) when it uses the default.</span>
+<span class="sd">    To restore the previous behavior, pass ``optimal_bw=False`` or</span>
+<span class="sd">    ``bandwidth=nobs - 2``, where ``nobs`` is the number of observations of</span>
+<span class="sd">    each equation, in ``weight_config``, for example</span>
+<span class="sd">    ``IVSystemGMM(equations, weight_type="kernel", optimal_bw=False)``. Passing</span>
+<span class="sd">    ``bandwidth`` or ``optimal_bw`` silences the warning, and</span>
+<span class="sd">    ``optimal_bw=True`` selects the bandwidth from the data without it. The</span>
+<span class="sd">    kernel covariance of the parameters (``cov_type="kernel"`` in ``fit``) is</span>
+<span class="sd">    not affected, since it has always estimated its bandwidth from the data</span>
+<span class="sd">    unless ``bandwidth`` is given. See</span>
+<span class="sd">    :class:`~linearmodels.system.gmm.KernelWeightMatrix`.</span>
+
 <span class="sd">    Rows are paired by position, both within an equation and across the</span>
 <span class="sd">    equations. An input that carries labels (a pandas Series or DataFrame</span>
 <span class="sd">    with an index other than the default 0, 1, ..., n-1, or an xarray</span>
@@ -2653,6 +2682,14 @@
                 <span class="n">stacklevel</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span>
             <span class="p">)</span>
         <span class="n">weight_type</span> <span class="o">=</span> <span class="n">COV_TYPES</span><span class="p">[</span><span class="n">weight_type</span><span class="p">]</span>
+        <span class="c1"># Kernel weights without a bandwidth select it from the data. fit warns</span>
+        <span class="c1"># about the change of this default, and makes the choice explicit so that</span>
+        <span class="c1"># the weight estimator does not warn as well</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_default_weight_bandwidth</span> <span class="o">=</span> <span class="p">(</span>
+            <span class="n">weight_type</span> <span class="o">==</span> <span class="s2">"kernel"</span> <span class="ow">and</span> <span class="n">_uses_default_bandwidth</span><span class="p">(</span><span class="n">weight_config</span><span class="p">)</span>
+        <span class="p">)</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_default_weight_bandwidth</span><span class="p">:</span>
+            <span class="n">weight_config</span> <span class="o">=</span> <span class="p">{</span><span class="o">**</span><span class="n">weight_config</span><span class="p">,</span> <span class="s2">"optimal_bw"</span><span class="p">:</span> <span class="kc">True</span><span class="p">}</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_weight_est</span> <span class="o">=</span> <span class="n">GMM_W_EST</span><span class="p">[</span><span class="n">weight_type</span><span class="p">](</span><span class="o">**</span><span class="n">weight_config</span><span class="p">)</span>
 
 <div class="viewcode-block" id="IVSystemGMM.fit">
@@ -2685,15 +2722,30 @@
 <span class="sd">            * "unadjusted", "homoskedastic" - Classic covariance estimator</span>
 <span class="sd">            * "robust", "heteroskedastic" - Heteroskedasticity robust</span>
 <span class="sd">              covariance estimator</span>
+<span class="sd">            * "kernel", ``"hac"`` - Heteroskedasticity and autocorrelation</span>
+<span class="sd">              robust covariance estimator</span>
 
 <span class="sd">        cov_config</span>
 <span class="sd">            Additional parameters to pass to covariance estimator. All</span>
-<span class="sd">            estimators support debiased which employs a small-sample adjustment</span>
+<span class="sd">            estimators support debiased which employs a small-sample adjustment.</span>
+<span class="sd">            "kernel" also supports kernel, the name of the kernel, and</span>
+<span class="sd">            bandwidth, which is estimated from the data if it is not given.</span>
 
 <span class="sd">        Returns</span>
 <span class="sd">        -------</span>
 <span class="sd">        GMMSystemResults</span>
 <span class="sd">            Estimation results</span>
+
+<span class="sd">        Notes</span>
+<span class="sd">        -----</span>
+<span class="sd">        If the model has a kernel weight matrix (``weight_type="kernel"``) and</span>
+<span class="sd">        neither ``bandwidth`` nor ``optimal_bw`` was given when it was created,</span>
+<span class="sd">        the bandwidth of the weight matrix is estimated from the data. In 7.0</span>
+<span class="sd">        and earlier it was ``nobs - 2``. ``fit`` issues a</span>
+<span class="sd">        ``DefaultBandwidthWarning`` (a ``UserWarning``) once for each call when</span>
+<span class="sd">        the model uses the default bandwidth. See the notes of</span>
+<span class="sd">        :class:`~linearmodels.system.model.IVSystemGMM` for how to restore the</span>
+<span class="sd">        previous bandwidth.</span>
 <span class="sd">        """</span>
         <span class="k">if</span> <span class="n">cov_type</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">COV_TYPES</span><span class="p">:</span>
             <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s2">"Unknown cov_type: </span><span class="si">{</span><span class="n">cov_type</span><span class="si">}</span><span class="s2">"</span><span class="p">)</span>
@@ -2702,6 +2754,12 @@
         <span class="n">k</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">wx</span><span class="p">)</span>
         <span class="n">nobs</span> <span class="o">=</span> <span class="n">wx</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
         <span class="n">k_total</span> <span class="o">=</span> <span class="nb">sum</span><span class="p">(</span><span class="n">a</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="k">for</span> <span class="n">a</span> <span class="ow">in</span> <span class="n">wz</span><span class="p">)</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_default_weight_bandwidth</span><span class="p">:</span>
+            <span class="c1"># Once for each call to fit, however many iterations it needs. The</span>
+            <span class="c1"># warning refers to the call to fit</span>
+            <span class="n">_warn_default_bandwidth</span><span class="p">(</span>
+                <span class="n">weights</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">covariance</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">stacklevel</span><span class="o">=</span><span class="mi">3</span><span class="p">,</span> <span class="n">model</span><span class="o">=</span><span class="s2">"IVSystemGMM"</span>
+            <span class="p">)</span>
         <span class="k">if</span> <span class="n">initial_weight</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
             <span class="n">w</span> <span class="o">=</span> <span class="n">blocked_inner_prod</span><span class="p">(</span><span class="n">wz</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">eye</span><span class="p">(</span><span class="n">k_total</span><span class="p">))</span> <span class="o">/</span> <span class="n">nobs</span>
         <span class="k">else</span><span class="p">:</span>

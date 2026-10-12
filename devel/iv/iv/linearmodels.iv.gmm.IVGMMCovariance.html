@@ -23,7 +23,7 @@
     
   
       
-        <title>linearmodels.iv.gmm.IVGMMCovariance - linearmodels v7.1 (+315)</title>
+        <title>linearmodels.iv.gmm.IVGMMCovariance - linearmodels v7.1 (+327)</title>
       
     
 
@@ -100,7 +100,7 @@
 
 <header class="md-header md-header--shadow" data-md-component="header">
   <nav class="md-header__inner md-grid" aria-label="Header">
-    <a href="../../index.html" title="linearmodels v7.1 (+315)" class="md-header__button md-logo" aria-label="linearmodels v7.1 (+315)" data-md-component="logo">
+    <a href="../../index.html" title="linearmodels v7.1 (+327)" class="md-header__button md-logo" aria-label="linearmodels v7.1 (+327)" data-md-component="logo">
       <img src="../../_static/bw-logo.svg" alt="logo">
     </a>
     <label class="md-header__button md-icon" for="__drawer">
@@ -111,7 +111,7 @@
       <div class="md-header__ellipsis">
         <div class="md-header__topic">
           <span class="md-ellipsis">
-            linearmodels v7.1 (+315)
+            linearmodels v7.1 (+327)
           </span>
         </div>
         <div class="md-header__topic" data-md-component="header-topic">
@@ -206,10 +206,10 @@
 
 <nav class="md-nav md-nav--primary" aria-label="Navigation" data-md-level="0">
   <label class="md-nav__title" for="__drawer">
-    <a href="../../index.html" title="linearmodels v7.1 (+315)" class="md-nav__button md-logo" aria-label="linearmodels v7.1 (+315)" data-md-component="logo">
+    <a href="../../index.html" title="linearmodels v7.1 (+327)" class="md-nav__button md-logo" aria-label="linearmodels v7.1 (+327)" data-md-component="logo">
       <img src="../../_static/bw-logo.svg" alt="logo">
     </a>
-    linearmodels v7.1 (+315)
+    linearmodels v7.1 (+327)
   </label>
   
     <div class="md-nav__source">
@@ -1701,8 +1701,20 @@ autocorrelation</p></li>
 <a class="reference internal" href="linearmodels.iv.covariance.KernelCovariance.html#linearmodels.iv.covariance.KernelCovariance" title="linearmodels.iv.covariance.KernelCovariance (Python class) — Kernel weighted (HAC) covariance estimation"><code class="xref py py-class docutils literal notranslate"><span class="pre">KernelCovariance</span></code></a> for details on
 available kernels</p></li>
 <li><p><code class="docutils literal notranslate"><span class="pre">bandwidth</span></code>: Bandwidth to use when computing the weight.  If not
-provided, nobs - 2 is used.</p></li>
+provided, it is selected by <code class="docutils literal notranslate"><span class="pre">optimal_bw</span></code>.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">optimal_bw</span></code>: Flag indicating whether to estimate the bandwidth from
+the data when <code class="docutils literal notranslate"><span class="pre">bandwidth</span></code> is not provided. If False, nobs - 2 is used.
+If True, the bandwidth is estimated using
+<a class="reference internal" href="linearmodels.iv.covariance.kernel_optimal_bandwidth.html#linearmodels.iv.covariance.kernel_optimal_bandwidth" title="linearmodels.iv.covariance.kernel_optimal_bandwidth (Python function) — Array of data to use when computing optimal bandwidth"><code class="xref py py-func docutils literal notranslate"><span class="pre">kernel_optimal_bandwidth()</span></code></a>.</p></li>
 </ul>
+<p>If neither <code class="docutils literal notranslate"><span class="pre">bandwidth</span></code> nor <code class="docutils literal notranslate"><span class="pre">optimal_bw</span></code> is given, the bandwidth is
+estimated from the data. In 7.0 and earlier the default was <code class="docutils literal notranslate"><span class="pre">nobs</span> <span class="pre">-</span> <span class="pre">2</span></code>,
+which is not a consistent estimator of the covariance of the moment
+conditions. Using the default issues a <code class="docutils literal notranslate"><span class="pre">DefaultBandwidthWarning</span></code> (a
+<code class="docutils literal notranslate"><span class="pre">UserWarning</span></code>). The previous behavior is restored by <code class="docutils literal notranslate"><span class="pre">optimal_bw=False</span></code>
+or by <code class="docutils literal notranslate"><span class="pre">bandwidth=nobs</span> <span class="pre">-</span> <span class="pre">2</span></code>. Passing <code class="docutils literal notranslate"><span class="pre">bandwidth</span></code> or <code class="docutils literal notranslate"><span class="pre">optimal_bw</span></code>
+silences the warning, and <code class="docutils literal notranslate"><span class="pre">optimal_bw=True</span></code> selects the new default
+without it.</p>
 <p><strong>cluster</strong></p>
 <ul class="simple">
 <li><p><code class="docutils literal notranslate"><span class="pre">clusters</span></code>: Array containing the cluster indices.  See

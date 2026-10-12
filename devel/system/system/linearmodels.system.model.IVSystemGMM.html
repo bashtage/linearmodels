@@ -23,7 +23,7 @@
     
   
       
-        <title>linearmodels.system.model.IVSystemGMM - linearmodels v7.1 (+315)</title>
+        <title>linearmodels.system.model.IVSystemGMM - linearmodels v7.1 (+327)</title>
       
     
 
@@ -100,7 +100,7 @@
 
 <header class="md-header md-header--shadow" data-md-component="header">
   <nav class="md-header__inner md-grid" aria-label="Header">
-    <a href="../../index.html" title="linearmodels v7.1 (+315)" class="md-header__button md-logo" aria-label="linearmodels v7.1 (+315)" data-md-component="logo">
+    <a href="../../index.html" title="linearmodels v7.1 (+327)" class="md-header__button md-logo" aria-label="linearmodels v7.1 (+327)" data-md-component="logo">
       <img src="../../_static/bw-logo.svg" alt="logo">
     </a>
     <label class="md-header__button md-icon" for="__drawer">
@@ -111,7 +111,7 @@
       <div class="md-header__ellipsis">
         <div class="md-header__topic">
           <span class="md-ellipsis">
-            linearmodels v7.1 (+315)
+            linearmodels v7.1 (+327)
           </span>
         </div>
         <div class="md-header__topic" data-md-component="header-topic">
@@ -206,10 +206,10 @@
 
 <nav class="md-nav md-nav--primary" aria-label="Navigation" data-md-level="0">
   <label class="md-nav__title" for="__drawer">
-    <a href="../../index.html" title="linearmodels v7.1 (+315)" class="md-nav__button md-logo" aria-label="linearmodels v7.1 (+315)" data-md-component="logo">
+    <a href="../../index.html" title="linearmodels v7.1 (+327)" class="md-nav__button md-logo" aria-label="linearmodels v7.1 (+327)" data-md-component="logo">
       <img src="../../_static/bw-logo.svg" alt="logo">
     </a>
-    linearmodels v7.1 (+315)
+    linearmodels v7.1 (+327)
   </label>
   
     <div class="md-nav__source">
@@ -1757,6 +1757,32 @@ by</p>
 <div class="math notranslate nohighlight">
 \[\begin{split}\hat{\beta}_{GMM} &amp; = (X'ZW^{-1}Z'X)^{-1}X'ZW^{-1}Z'Y \\\end{split}\]</div>
 <p>where <span class="math notranslate nohighlight">\(W\)</span> is a positive definite weighting matrix.</p>
+<p>The weight matrix is the inverse of an estimate of the covariance of the
+moment conditions. <code class="docutils literal notranslate"><span class="pre">weight_type</span></code> selects the estimator: “unadjusted”
+(“homoskedastic”), “robust” (“heteroskedastic”) or “kernel” (<code class="docutils literal notranslate"><span class="pre">&quot;hac&quot;</span></code>), and
+<code class="docutils literal notranslate"><span class="pre">weight_config</span></code> contains its options. These are <code class="docutils literal notranslate"><span class="pre">center</span></code> and
+<code class="docutils literal notranslate"><span class="pre">debiased</span></code> for all of them, and <code class="docutils literal notranslate"><span class="pre">kernel</span></code>, <code class="docutils literal notranslate"><span class="pre">bandwidth</span></code> and
+<code class="docutils literal notranslate"><span class="pre">optimal_bw</span></code> for “kernel”.</p>
+<p>The bandwidth of a kernel weight matrix (<code class="docutils literal notranslate"><span class="pre">weight_type=&quot;kernel&quot;</span></code>) is
+<code class="docutils literal notranslate"><span class="pre">bandwidth</span></code> if it is given in <code class="docutils literal notranslate"><span class="pre">weight_config</span></code>, and <code class="docutils literal notranslate"><span class="pre">nobs</span> <span class="pre">-</span> <span class="pre">2</span></code> if
+<code class="docutils literal notranslate"><span class="pre">optimal_bw</span></code> is <code class="docutils literal notranslate"><span class="pre">False</span></code>. Otherwise, which is the default and what
+<code class="docutils literal notranslate"><span class="pre">optimal_bw=True</span></code> does, it is estimated from the data, from the
+residuals that the weight matrix is computed from. These are the residuals
+of the first step estimates in two-step GMM, which is the default. In 7.0
+and earlier the default was <code class="docutils literal notranslate"><span class="pre">nobs</span> <span class="pre">-</span> <span class="pre">2</span></code>, which is not a consistent
+estimator of the covariance of the moment conditions, so the estimates,
+standard errors and J statistic can be different. <code class="docutils literal notranslate"><span class="pre">fit</span></code> issues a
+<code class="docutils literal notranslate"><span class="pre">DefaultBandwidthWarning</span></code> (a <code class="docutils literal notranslate"><span class="pre">UserWarning</span></code>) when it uses the default.
+To restore the previous behavior, pass <code class="docutils literal notranslate"><span class="pre">optimal_bw=False</span></code> or
+<code class="docutils literal notranslate"><span class="pre">bandwidth=nobs</span> <span class="pre">-</span> <span class="pre">2</span></code>, where <code class="docutils literal notranslate"><span class="pre">nobs</span></code> is the number of observations of
+each equation, in <code class="docutils literal notranslate"><span class="pre">weight_config</span></code>, for example
+<code class="docutils literal notranslate"><span class="pre">IVSystemGMM(equations,</span> <span class="pre">weight_type=&quot;kernel&quot;,</span> <span class="pre">optimal_bw=False)</span></code>. Passing
+<code class="docutils literal notranslate"><span class="pre">bandwidth</span></code> or <code class="docutils literal notranslate"><span class="pre">optimal_bw</span></code> silences the warning, and
+<code class="docutils literal notranslate"><span class="pre">optimal_bw=True</span></code> selects the bandwidth from the data without it. The
+kernel covariance of the parameters (<code class="docutils literal notranslate"><span class="pre">cov_type=&quot;kernel&quot;</span></code> in <code class="docutils literal notranslate"><span class="pre">fit</span></code>) is
+not affected, since it has always estimated its bandwidth from the data
+unless <code class="docutils literal notranslate"><span class="pre">bandwidth</span></code> is given. See
+<a class="reference internal" href="linearmodels.system.gmm.KernelWeightMatrix.html#linearmodels.system.gmm.KernelWeightMatrix" title="linearmodels.system.gmm.KernelWeightMatrix (Python class) — Heteroskedasticity robust weight estimation"><code class="xref py py-class docutils literal notranslate"><span class="pre">KernelWeightMatrix</span></code></a>.</p>
 <p>Rows are paired by position, both within an equation and across the
 equations. An input that carries labels (a pandas Series or DataFrame
 with an index other than the default 0, 1, …, n-1, or an xarray

@@ -23,7 +23,7 @@
     
   
       
-        <title>linearmodels.iv.model.IVGMM.fit - linearmodels v7.1 (+315)</title>
+        <title>linearmodels.iv.model.IVGMM.fit - linearmodels v7.1 (+327)</title>
       
     
 
@@ -100,7 +100,7 @@
 
 <header class="md-header md-header--shadow" data-md-component="header">
   <nav class="md-header__inner md-grid" aria-label="Header">
-    <a href="../../index.html" title="linearmodels v7.1 (+315)" class="md-header__button md-logo" aria-label="linearmodels v7.1 (+315)" data-md-component="logo">
+    <a href="../../index.html" title="linearmodels v7.1 (+327)" class="md-header__button md-logo" aria-label="linearmodels v7.1 (+327)" data-md-component="logo">
       <img src="../../_static/bw-logo.svg" alt="logo">
     </a>
     <label class="md-header__button md-icon" for="__drawer">
@@ -111,7 +111,7 @@
       <div class="md-header__ellipsis">
         <div class="md-header__topic">
           <span class="md-ellipsis">
-            linearmodels v7.1 (+315)
+            linearmodels v7.1 (+327)
           </span>
         </div>
         <div class="md-header__topic" data-md-component="header-topic">
@@ -206,10 +206,10 @@
 
 <nav class="md-nav md-nav--primary" aria-label="Navigation" data-md-level="0">
   <label class="md-nav__title" for="__drawer">
-    <a href="../../index.html" title="linearmodels v7.1 (+315)" class="md-nav__button md-logo" aria-label="linearmodels v7.1 (+315)" data-md-component="logo">
+    <a href="../../index.html" title="linearmodels v7.1 (+327)" class="md-nav__button md-logo" aria-label="linearmodels v7.1 (+327)" data-md-component="logo">
       <img src="../../_static/bw-logo.svg" alt="logo">
     </a>
-    linearmodels v7.1 (+315)
+    linearmodels v7.1 (+327)
   </label>
   
     <div class="md-nav__source">
@@ -1815,6 +1815,17 @@ configuration is provided.</p>
 <p class="admonition-title">See also</p>
 <p><a class="reference internal" href="linearmodels.iv.gmm.IVGMMCovariance.html#linearmodels.iv.gmm.IVGMMCovariance" title="linearmodels.iv.gmm.IVGMMCovariance (Python class) — Covariance estimation for GMM models"><code class="xref py py-obj docutils literal notranslate"><span class="pre">linearmodels.iv.gmm.IVGMMCovariance</span></code></a></p>
 </div>
+<p class="rubric">Notes</p>
+<p>If <code class="docutils literal notranslate"><span class="pre">cov_type</span></code> is “kernel” and neither <code class="docutils literal notranslate"><span class="pre">bandwidth</span></code> nor
+<code class="docutils literal notranslate"><span class="pre">optimal_bw</span></code> is in <code class="docutils literal notranslate"><span class="pre">cov_config</span></code>, the bandwidth of the covariance
+is estimated from the data. In 7.0 and earlier it was <code class="docutils literal notranslate"><span class="pre">nobs</span> <span class="pre">-</span> <span class="pre">2</span></code>.
+<code class="docutils literal notranslate"><span class="pre">fit</span></code> issues a <code class="docutils literal notranslate"><span class="pre">DefaultBandwidthWarning</span></code> (a <code class="docutils literal notranslate"><span class="pre">UserWarning</span></code>) once
+for each call when the covariance, or the kernel weight matrix of the
+model, uses the default bandwidth. To restore the previous covariance,
+pass <code class="docutils literal notranslate"><span class="pre">optimal_bw=False</span></code> or <code class="docutils literal notranslate"><span class="pre">bandwidth=nobs</span> <span class="pre">-</span> <span class="pre">2</span></code> in <code class="docutils literal notranslate"><span class="pre">cov_config</span></code>,
+for example <code class="docutils literal notranslate"><span class="pre">fit(cov_type=&quot;kernel&quot;,</span> <span class="pre">optimal_bw=False)</span></code>. Passing
+<code class="docutils literal notranslate"><span class="pre">bandwidth</span></code> or <code class="docutils literal notranslate"><span class="pre">optimal_bw</span></code> silences the warning, and
+<code class="docutils literal notranslate"><span class="pre">optimal_bw=True</span></code> selects the bandwidth from the data without it.</p>
 </dd></dl>
 
 

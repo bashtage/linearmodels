@@ -19,7 +19,7 @@
     
   
       
-        <title>linearmodels.shared.exceptions - linearmodels v7.1 (+315)</title>
+        <title>linearmodels.shared.exceptions - linearmodels v7.1 (+327)</title>
       
     
 
@@ -91,7 +91,7 @@
 
 <header class="md-header md-header--shadow" data-md-component="header">
   <nav class="md-header__inner md-grid" aria-label="Header">
-    <a href="../../../index.html" title="linearmodels v7.1 (+315)" class="md-header__button md-logo" aria-label="linearmodels v7.1 (+315)" data-md-component="logo">
+    <a href="../../../index.html" title="linearmodels v7.1 (+327)" class="md-header__button md-logo" aria-label="linearmodels v7.1 (+327)" data-md-component="logo">
       <img src="../../../_static/bw-logo.svg" alt="logo">
     </a>
     <label class="md-header__button md-icon" for="__drawer">
@@ -102,7 +102,7 @@
       <div class="md-header__ellipsis">
         <div class="md-header__topic">
           <span class="md-ellipsis">
-            linearmodels v7.1 (+315)
+            linearmodels v7.1 (+327)
           </span>
         </div>
         <div class="md-header__topic" data-md-component="header-topic">
@@ -197,10 +197,10 @@
 
 <nav class="md-nav md-nav--primary" aria-label="Navigation" data-md-level="0">
   <label class="md-nav__title" for="__drawer">
-    <a href="../../../index.html" title="linearmodels v7.1 (+315)" class="md-nav__button md-logo" aria-label="linearmodels v7.1 (+315)" data-md-component="logo">
+    <a href="../../../index.html" title="linearmodels v7.1 (+327)" class="md-nav__button md-logo" aria-label="linearmodels v7.1 (+327)" data-md-component="logo">
       <img src="../../../_static/bw-logo.svg" alt="logo">
     </a>
-    linearmodels v7.1 (+315)
+    linearmodels v7.1 (+327)
   </label>
   
     <div class="md-nav__source">
@@ -572,6 +572,40 @@
     <span class="k">pass</span>
 
 
+<span class="k">class</span><span class="w"> </span><span class="nc">DefaultBandwidthWarning</span><span class="p">(</span><span class="ne">UserWarning</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">"""</span>
+<span class="sd">    Warning that a kernel estimator uses the bandwidth that it selects by default.</span>
+
+<span class="sd">    This warning will be removed in linearmodels 8.0, when the estimated</span>
+<span class="sd">    bandwidth has been the default for a release.</span>
+
+<span class="sd">    Notes</span>
+<span class="sd">    -----</span>
+<span class="sd">    The default bandwidth of the kernel estimators of the covariance of the</span>
+<span class="sd">    moment conditions used by :class:`~linearmodels.iv.model.IVGMM`,</span>
+<span class="sd">    :class:`~linearmodels.iv.model.IVGMMCUE` and</span>
+<span class="sd">    :class:`~linearmodels.system.model.IVSystemGMM` changed in linearmodels</span>
+<span class="sd">    7.1. When neither ``bandwidth`` nor ``optimal_bw`` is given, the bandwidth</span>
+<span class="sd">    is now estimated from the data. Earlier versions used ``nobs - 2``, which</span>
+<span class="sd">    is not a consistent estimator of the covariance. The estimates, standard</span>
+<span class="sd">    errors and J statistic can differ from those of earlier versions.</span>
+
+<span class="sd">    The warning is a ``UserWarning``, so it is shown by default. It is issued</span>
+<span class="sd">    once by each call to ``fit`` that uses the new default for the weight</span>
+<span class="sd">    matrix (``weight_type="kernel"``) or, in ``IVGMM`` and ``IVGMMCUE``, for</span>
+<span class="sd">    the parameter covariance (``cov_type="kernel"``), and once by a</span>
+<span class="sd">    :class:`~linearmodels.iv.gmm.KernelWeightMatrix`,</span>
+<span class="sd">    :class:`~linearmodels.system.gmm.KernelWeightMatrix` or</span>
+<span class="sd">    :class:`~linearmodels.iv.gmm.IVGMMCovariance` that is used directly.</span>
+<span class="sd">    ``IVSystemGMM`` estimated the bandwidth of its kernel covariance from the</span>
+<span class="sd">    data before, and so only its weight matrix uses a new default.</span>
+
+<span class="sd">    Pass ``optimal_bw=False`` or ``bandwidth=nobs - 2`` to restore the</span>
+<span class="sd">    previous bandwidth. Passing ``bandwidth`` or ``optimal_bw`` silences the</span>
+<span class="sd">    warning, and ``optimal_bw=True`` keeps the new default.</span>
+<span class="sd">    """</span>
+
+
 <span class="k">def</span><span class="w"> </span><span class="nf">missing_warning</span><span class="p">(</span><span class="n">missing</span><span class="p">:</span> <span class="n">BoolArray</span><span class="p">,</span> <span class="n">stacklevel</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">4</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">"""Utility function to perform missing value check and warning"""</span>
     <span class="k">if</span> <span class="ow">not</span> <span class="n">np</span><span class="o">.</span><span class="n">any</span><span class="p">(</span><span class="n">missing</span><span class="p">):</span>
@@ -586,6 +620,7 @@
 
 
 <span class="n">__all__</span> <span class="o">=</span> <span class="p">[</span>
+    <span class="s2">"DefaultBandwidthWarning"</span><span class="p">,</span>
     <span class="s2">"IndexWarning"</span><span class="p">,</span>
     <span class="s2">"InferenceUnavailableWarning"</span><span class="p">,</span>
     <span class="s2">"MemoryWarning"</span><span class="p">,</span>

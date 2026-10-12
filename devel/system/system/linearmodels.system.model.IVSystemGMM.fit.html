@@ -23,7 +23,7 @@
     
   
       
-        <title>linearmodels.system.model.IVSystemGMM.fit - linearmodels v7.1 (+315)</title>
+        <title>linearmodels.system.model.IVSystemGMM.fit - linearmodels v7.1 (+327)</title>
       
     
 
@@ -100,7 +100,7 @@
 
 <header class="md-header md-header--shadow" data-md-component="header">
   <nav class="md-header__inner md-grid" aria-label="Header">
-    <a href="../../index.html" title="linearmodels v7.1 (+315)" class="md-header__button md-logo" aria-label="linearmodels v7.1 (+315)" data-md-component="logo">
+    <a href="../../index.html" title="linearmodels v7.1 (+327)" class="md-header__button md-logo" aria-label="linearmodels v7.1 (+327)" data-md-component="logo">
       <img src="../../_static/bw-logo.svg" alt="logo">
     </a>
     <label class="md-header__button md-icon" for="__drawer">
@@ -111,7 +111,7 @@
       <div class="md-header__ellipsis">
         <div class="md-header__topic">
           <span class="md-ellipsis">
-            linearmodels v7.1 (+315)
+            linearmodels v7.1 (+327)
           </span>
         </div>
         <div class="md-header__topic" data-md-component="header-topic">
@@ -206,10 +206,10 @@
 
 <nav class="md-nav md-nav--primary" aria-label="Navigation" data-md-level="0">
   <label class="md-nav__title" for="__drawer">
-    <a href="../../index.html" title="linearmodels v7.1 (+315)" class="md-nav__button md-logo" aria-label="linearmodels v7.1 (+315)" data-md-component="logo">
+    <a href="../../index.html" title="linearmodels v7.1 (+327)" class="md-nav__button md-logo" aria-label="linearmodels v7.1 (+327)" data-md-component="logo">
       <img src="../../_static/bw-logo.svg" alt="logo">
     </a>
-    linearmodels v7.1 (+315)
+    linearmodels v7.1 (+327)
   </label>
   
     <div class="md-nav__source">
@@ -1681,11 +1681,15 @@ the exogenous variables and instruments.</p>
 <li><p>”unadjusted”, “homoskedastic” - Classic covariance estimator</p></li>
 <li><p>”robust”, “heteroskedastic” - Heteroskedasticity robust
 covariance estimator</p></li>
+<li><p>”kernel”, <code class="docutils literal notranslate"><span class="pre">&quot;hac&quot;</span></code> - Heteroskedasticity and autocorrelation
+robust covariance estimator</p></li>
 </ul>
 </p>
 </dd>
 <dt id="linearmodels.system.model.IVSystemGMM.fit.cov_config"><span class="o">**</span><span class="n sig-name">cov_config</span><span class="p">:</span><span class="w"> </span><span class="n"><span class="desctype"><a class="reference external" href="https://docs.python.org/3/builtins/functions.html#bool" title="(in Python v3.15)">bool</a><span class="w"> </span><span class="p">|</span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/builtins/functions.html#float" title="(in Python v3.15)">float</a></span></span><a class="headerlink" href="#linearmodels.system.model.IVSystemGMM.fit.cov_config" title="Permalink to this definition">¶</a></dt><dd><p>Additional parameters to pass to covariance estimator. All
-estimators support debiased which employs a small-sample adjustment</p>
+estimators support debiased which employs a small-sample adjustment.
+“kernel” also supports kernel, the name of the kernel, and
+bandwidth, which is estimated from the data if it is not given.</p>
 </dd>
 </dl>
 </dd>
@@ -1696,6 +1700,15 @@ estimators support debiased which employs a small-sample adjustment</p>
 <dd class="field-odd"><p><a class="reference internal" href="linearmodels.system.results.GMMSystemResults.html#linearmodels.system.results.GMMSystemResults" title="linearmodels.system.results.GMMSystemResults (Python class) — Results from GMM System Estimators"><code class="xref py py-class docutils literal notranslate"><span class="pre">linearmodels.system.results.GMMSystemResults</span></code></a></p>
 </dd>
 </dl>
+<p class="rubric">Notes</p>
+<p>If the model has a kernel weight matrix (<code class="docutils literal notranslate"><span class="pre">weight_type=&quot;kernel&quot;</span></code>) and
+neither <code class="docutils literal notranslate"><span class="pre">bandwidth</span></code> nor <code class="docutils literal notranslate"><span class="pre">optimal_bw</span></code> was given when it was created,
+the bandwidth of the weight matrix is estimated from the data. In 7.0
+and earlier it was <code class="docutils literal notranslate"><span class="pre">nobs</span> <span class="pre">-</span> <span class="pre">2</span></code>. <code class="docutils literal notranslate"><span class="pre">fit</span></code> issues a
+<code class="docutils literal notranslate"><span class="pre">DefaultBandwidthWarning</span></code> (a <code class="docutils literal notranslate"><span class="pre">UserWarning</span></code>) once for each call when
+the model uses the default bandwidth. See the notes of
+<a class="reference internal" href="linearmodels.system.model.IVSystemGMM.html#linearmodels.system.model.IVSystemGMM" title="linearmodels.system.model.IVSystemGMM (Python class) — System Generalized Method of Moments (GMM) estimation of linear IV models"><code class="xref py py-class docutils literal notranslate"><span class="pre">IVSystemGMM</span></code></a> for how to restore the
+previous bandwidth.</p>
 </dd></dl>
 
 

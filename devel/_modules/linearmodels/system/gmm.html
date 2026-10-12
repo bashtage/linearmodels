@@ -19,7 +19,7 @@
     
   
       
-        <title>linearmodels.system.gmm - linearmodels v7.1 (+315)</title>
+        <title>linearmodels.system.gmm - linearmodels v7.1 (+327)</title>
       
     
 
@@ -91,7 +91,7 @@
 
 <header class="md-header md-header--shadow" data-md-component="header">
   <nav class="md-header__inner md-grid" aria-label="Header">
-    <a href="../../../index.html" title="linearmodels v7.1 (+315)" class="md-header__button md-logo" aria-label="linearmodels v7.1 (+315)" data-md-component="logo">
+    <a href="../../../index.html" title="linearmodels v7.1 (+327)" class="md-header__button md-logo" aria-label="linearmodels v7.1 (+327)" data-md-component="logo">
       <img src="../../../_static/bw-logo.svg" alt="logo">
     </a>
     <label class="md-header__button md-icon" for="__drawer">
@@ -102,7 +102,7 @@
       <div class="md-header__ellipsis">
         <div class="md-header__topic">
           <span class="md-ellipsis">
-            linearmodels v7.1 (+315)
+            linearmodels v7.1 (+327)
           </span>
         </div>
         <div class="md-header__topic" data-md-component="header-topic">
@@ -197,10 +197,10 @@
 
 <nav class="md-nav md-nav--primary" aria-label="Navigation" data-md-level="0">
   <label class="md-nav__title" for="__drawer">
-    <a href="../../../index.html" title="linearmodels v7.1 (+315)" class="md-nav__button md-logo" aria-label="linearmodels v7.1 (+315)" data-md-component="logo">
+    <a href="../../../index.html" title="linearmodels v7.1 (+327)" class="md-nav__button md-logo" aria-label="linearmodels v7.1 (+327)" data-md-component="logo">
       <img src="../../../_static/bw-logo.svg" alt="logo">
     </a>
-    linearmodels v7.1 (+315)
+    linearmodels v7.1 (+327)
   </label>
   
     <div class="md-nav__source">
@@ -540,6 +540,7 @@
 
 <span class="kn">from</span><span class="w"> </span><span class="nn">linearmodels.asset_pricing.covariance</span><span class="w"> </span><span class="kn">import</span> <span class="n">_HACMixin</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">linearmodels.iv.covariance</span><span class="w"> </span><span class="kn">import</span> <span class="n">kernel_optimal_bandwidth</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">linearmodels.iv.gmm</span><span class="w"> </span><span class="kn">import</span> <span class="n">_warn_default_bandwidth</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">linearmodels.shared.utility</span><span class="w"> </span><span class="kn">import</span> <span class="n">AttrDict</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">linearmodels.system._utility</span><span class="w"> </span><span class="kn">import</span> <span class="n">blocked_inner_prod</span>
 <span class="kn">import</span><span class="w"> </span><span class="nn">linearmodels.typing.data</span>
@@ -799,13 +800,16 @@
 <span class="sd">        * "parzen", "gallant" : Parzen's kernel</span>
 <span class="sd">        * "qs", "quadratic-spectral", "andrews" : Quadratic spectral kernel</span>
 
-<span class="sd">    bandwidth : float</span>
-<span class="sd">        Bandwidth to use for the kernel.  If not provided the optimal</span>
-<span class="sd">        bandwidth will be estimated.</span>
-<span class="sd">    optimal_bw : bool</span>
-<span class="sd">        Flag indicating whether to estimate the optimal bandwidth, when</span>
-<span class="sd">        bandwidth is None.  If False, nobs - 2 is used</span>
-
+<span class="sd">    bandwidth : float, optional</span>
+<span class="sd">        Bandwidth to use for the kernel. If not provided, the bandwidth is</span>
+<span class="sd">        selected by ``optimal_bw``.</span>
+<span class="sd">    optimal_bw : bool, optional</span>
+<span class="sd">        Flag indicating whether to estimate the bandwidth from the data when</span>
+<span class="sd">        ``bandwidth`` is not provided. If False, nobs - 2 is used. If True, the</span>
+<span class="sd">        bandwidth is estimated using</span>
+<span class="sd">        :func:`~linearmodels.iv.covariance.kernel_optimal_bandwidth`. The</span>
+<span class="sd">        default also estimates the bandwidth, but it issues a</span>
+<span class="sd">        ``DefaultBandwidthWarning`` since it changed in 7.1.</span>
 
 <span class="sd">    Notes</span>
 <span class="sd">    -----</span>
@@ -823,6 +827,15 @@
 <span class="sd">    for equation j and :math:`\epsilon_{ji}` is the error for equation j for</span>
 <span class="sd">    observation i.  This form allows for heteroskedasticity and autocorrelation</span>
 <span class="sd">    between the moment conditions.</span>
+
+<span class="sd">    If neither ``bandwidth`` nor ``optimal_bw`` is given, the bandwidth is</span>
+<span class="sd">    estimated from the data every time that the weight matrix is computed.</span>
+<span class="sd">    In 7.0 and earlier the default was ``nobs - 2``, which is not a consistent</span>
+<span class="sd">    estimator of the covariance of the moment conditions. Using the default</span>
+<span class="sd">    issues a ``DefaultBandwidthWarning`` (a ``UserWarning``), once for each</span>
+<span class="sd">    instance. The previous behavior is restored by ``optimal_bw=False`` or by</span>
+<span class="sd">    ``bandwidth=nobs - 2``. Passing ``bandwidth`` or ``optimal_bw`` silences the</span>
+<span class="sd">    warning, and ``optimal_bw=True`` selects the new default without it.</span>
 <span class="sd">    """</span>
 
     <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span>
@@ -831,7 +844,7 @@
         <span class="n">debiased</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
         <span class="n">kernel</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">"bartlett"</span><span class="p">,</span>
         <span class="n">bandwidth</span><span class="p">:</span> <span class="nb">float</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
-        <span class="n">optimal_bw</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
+        <span class="n">optimal_bw</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
     <span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
         <span class="n">_HACMixin</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">kernel</span><span class="p">,</span> <span class="n">bandwidth</span><span class="p">)</span>
         <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">center</span><span class="p">,</span> <span class="n">debiased</span><span class="p">)</span>
@@ -839,7 +852,11 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">_check_kernel</span><span class="p">(</span><span class="n">kernel</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_check_bandwidth</span><span class="p">(</span><span class="n">bandwidth</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_predefined_bw</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_bandwidth</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">_optimal_bw</span> <span class="o">=</span> <span class="n">optimal_bw</span>
+        <span class="c1"># Selecting the bandwidth from the data is the default since 7.1, and it</span>
+        <span class="c1"># warns since the default was nobs - 2</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_default_bandwidth</span> <span class="o">=</span> <span class="n">bandwidth</span> <span class="ow">is</span> <span class="kc">None</span> <span class="ow">and</span> <span class="n">optimal_bw</span> <span class="ow">is</span> <span class="kc">None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_optimal_bw</span> <span class="o">=</span> <span class="kc">True</span> <span class="k">if</span> <span class="n">optimal_bw</span> <span class="ow">is</span> <span class="kc">None</span> <span class="k">else</span> <span class="n">optimal_bw</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_warned</span> <span class="o">=</span> <span class="kc">False</span>
 
 <div class="viewcode-block" id="KernelWeightMatrix.weight_matrix">
 <a class="viewcode-back" href="../../../system/system/linearmodels.system.gmm.KernelWeightMatrix.weight_matrix.html#linearmodels.system.gmm.KernelWeightMatrix.weight_matrix">[docs]</a>
@@ -899,6 +916,12 @@
         <span class="k">elif</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">_optimal_bw</span><span class="p">:</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">_bandwidth</span> <span class="o">=</span> <span class="n">moments</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">-</span> <span class="mi">2</span>
         <span class="k">else</span><span class="p">:</span>
+            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_default_bandwidth</span> <span class="ow">and</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">_warned</span><span class="p">:</span>
+                <span class="c1"># Once for each instance, and not for each call</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">_warned</span> <span class="o">=</span> <span class="kc">True</span>
+                <span class="n">_warn_default_bandwidth</span><span class="p">(</span>
+                    <span class="n">weights</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">covariance</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">stacklevel</span><span class="o">=</span><span class="mi">4</span><span class="p">,</span> <span class="n">model</span><span class="o">=</span><span class="s2">"IVSystemGMM"</span>
+                <span class="p">)</span>
             <span class="n">m</span> <span class="o">=</span> <span class="n">moments</span> <span class="o">/</span> <span class="n">moments</span><span class="o">.</span><span class="n">std</span><span class="p">(</span><span class="mi">0</span><span class="p">)[</span><span class="kc">None</span><span class="p">,</span> <span class="p">:]</span>
             <span class="n">m</span> <span class="o">=</span> <span class="n">m</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">_bandwidth</span> <span class="o">=</span> <span class="n">kernel_optimal_bandwidth</span><span class="p">(</span><span class="n">m</span><span class="p">,</span> <span class="n">kernel</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">kernel</span><span class="p">)</span>
@@ -919,10 +942,13 @@
 <span class="sd">        Returns</span>
 <span class="sd">        -------</span>
 <span class="sd">        AttrDict</span>
-<span class="sd">            Dictionary containing weight estimator configuration information</span>
+<span class="sd">            Dictionary containing weight estimator configuration information.</span>
+<span class="sd">            The bandwidth is None if the bandwidth was not given and the weight</span>
+<span class="sd">            matrix has not been computed, as in ``IVSystemGMM.fit`` with</span>
+<span class="sd">            ``iter_limit=1``.</span>
 <span class="sd">        """</span>
         <span class="n">out</span> <span class="o">=</span> <span class="n">AttrDict</span><span class="p">([(</span><span class="n">k</span><span class="p">,</span> <span class="n">v</span><span class="p">)</span> <span class="k">for</span> <span class="n">k</span><span class="p">,</span> <span class="n">v</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_config</span><span class="o">.</span><span class="n">items</span><span class="p">()])</span>
-        <span class="n">out</span><span class="p">[</span><span class="s2">"bandwidth"</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">bandwidth</span>
+        <span class="n">out</span><span class="p">[</span><span class="s2">"bandwidth"</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_bandwidth</span>
         <span class="k">return</span> <span class="n">out</span></div>
 
 </code></pre></div>
