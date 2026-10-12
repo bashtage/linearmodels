@@ -311,6 +311,35 @@ def test_clustered_error(cov_data, debias):
         )
 
 
+@pytest.mark.parametrize("group_debias", [True, False])
+@pytest.mark.parametrize("case", ["missing", "single", "missing-two-way"])
+def test_clustered_missing_and_single_cluster_error(
+    cov_data, debias, group_debias, case
+):
+    x, _, eps, sigma = cov_data
+    nobs = eps.shape[0]
+    missing = (np.arange(nobs) % 41).astype(float)
+    missing[[3, 10, 20]] = np.nan
+    clusters = {
+        "missing": missing,
+        "single": np.zeros(nobs, dtype=int),
+        "missing-two-way": np.column_stack([np.arange(nobs) % 37, missing]),
+    }[case]
+    match = "at least two" if case == "single" else "missing values"
+    est = ClusteredCovariance(
+        x,
+        eps,
+        sigma,
+        sigma,
+        gls=False,
+        debiased=debias,
+        clusters=clusters,
+        group_debias=group_debias,
+    )
+    with pytest.raises(ValueError, match=match):
+        assert est.cov is not None
+
+
 def test_gmm_homoskedastic_direct(cov_data, debias):
     x, z, eps, sigma = cov_data
     k = len(x)
