@@ -148,6 +148,18 @@ class _FactorModelBase:
                 "more returns to\nestimate the model parameters."
             )
 
+    def _check_debiased(self, debiased: bool) -> None:
+        """Debiasing needs more observations than regressors in the regressions"""
+        nobs, nfactor = self.factors.shape
+        if debiased and nobs <= nfactor + 1:
+            raise ValueError(
+                "The covariance cannot be debiased when the number of observations "
+                f"({nobs}) is not larger than the number of factors plus one "
+                f"({nfactor + 1}), the number of regressors of each time-series "
+                "regression, since there are no residual degrees of freedom. Use "
+                "debiased=False or more observations."
+            )
+
     @property
     def formula(self) -> str | None:
         return self._formula
@@ -326,6 +338,7 @@ class TradedFactorModel(_FactorModelBase):
         ``kernel``, one of "bartlett", "parzen" or "qs" (quadratic spectral)
         and ``bandwidth`` (a positive integer).
         """
+        self._check_debiased(debiased)
         p = self.portfolios.ndarray
         f = self.factors.ndarray
         nportfolio = p.shape[1]
@@ -657,6 +670,7 @@ class LinearFactorModel(_LinearFactorModelBase):
         ``kernel``, one of "bartlett", "parzen" or "qs" (quadratic spectral)
         and ``bandwidth`` (a positive integer).
         """
+        self._check_debiased(debiased)
         nobs, nf, nport, nrf, s1, s2, s3 = self._boundaries()
         excess_returns = not self._risk_free
         f = self.factors.ndarray
@@ -1009,7 +1023,9 @@ class LinearFactorModelGMM(_LinearFactorModelBase):
         mod = LinearFactorModel(
             self.portfolios, self.factors, risk_free=self._risk_free
         )
-        res = mod.fit()
+        # The starting values do not use the covariance, which cannot be debiased
+        # if there are no residual degrees of freedom in the first stage
+        res = mod.fit(debiased=False)
         betas_1d = np.asarray(res.betas).ravel()
         lam = np.asarray(res.risk_premia)
         mu = self.factors.ndarray.mean(0)
