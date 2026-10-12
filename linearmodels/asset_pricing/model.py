@@ -958,16 +958,18 @@ class LinearFactorModelGMM(_LinearFactorModelBase):
         Examples
         --------
         >>> from linearmodels.datasets import french
-        >>> from linearmodels.asset_pricing import LinearFactorModel
+        >>> from linearmodels.asset_pricing import LinearFactorModelGMM
         >>> data = french.load()
         >>> formula = "S1M1 + S1M5 + S3M3 + S5M1 + S5M5 ~ MktRF + SMB + HML"
-        >>> mod = LinearFactorModel.from_formula(formula, data)
+        >>> mod = LinearFactorModelGMM.from_formula(formula, data)
 
         Using only factors
 
         >>> portfolios = data[["S1M1", "S1M5", "S3M1", "S3M5", "S5M1", "S5M5"]]
         >>> formula = "MktRF + SMB + HML"
-        >>> mod = LinearFactorModel.from_formula(formula, data, portfolios=portfolios)
+        >>> mod = LinearFactorModelGMM.from_formula(
+        ...     formula, data, portfolios=portfolios
+        ... )
         """
         context = capture_context(1)
         factors, portfolios, formula = cls._prepare_data_from_formula(
