@@ -287,13 +287,28 @@ class LinearFactorModelResults(_SummaryStr):
         Returns
         -------
         WaldTestStatistic
-            Test statistic for null that model prices test portfolios
+            Test statistic for null that model prices test portfolios. An
+            ``InvalidTestStatistic`` if the statistic cannot be computed.
 
         Notes
         -----
-        Joint test that all estimated :math:`\hat{\alpha}_i` are zero.
-        Implemented using a Wald test using the estimated parameter
-        covariance.
+        Joint test that all estimated :math:`\hat{\alpha}_i` are zero, which
+        depends on the model.
+
+        * ``TradedFactorModel``: A Wald test using the estimated covariance of
+          the :math:`N` alphas. The statistic has a :math:`\chi^2_N` distribution.
+        * ``LinearFactorModel``: The quadratic form
+          :math:`\hat{\alpha}^\prime \hat{V}^{+} \hat{\alpha}` where
+          :math:`\hat{V}^{+}` is the generalized inverse of rank
+          :math:`N - K - n_{rf}` of the estimated covariance of the alphas,
+          which has that rank in theory because the alphas satisfy
+          :math:`K + n_{rf}` linear restrictions. :math:`K` is the number of
+          factors and :math:`n_{rf}` is 1 if the risk-free rate is estimated and
+          0 otherwise. The statistic has a :math:`\chi^2_{N-K-n_{rf}}`
+          distribution. See the model documentation for details.
+        * ``LinearFactorModelGMM``: The value of the GMM objective function at
+          the estimates. The statistic has a :math:`\chi^2_{N-K-n_{rf}}`
+          distribution.
         """
 
         return self._jstat

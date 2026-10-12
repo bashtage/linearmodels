@@ -724,18 +724,19 @@ The J statistic
 \end_layout
 
 \begin_layout Standard
-The J statistic is virtually identical to the 
+The J statistic is similar to the 
 \begin_inset Formula $J$
 \end_inset
 
- statistic from traded factor model except that it has a difference distribution.
+ statistic from traded factor model except that the pricing errors satisfy
+ linear restrictions and that the statistic has a different distribution.
 \end_layout
 
 \begin_layout Standard
 \noindent
 \begin_inset Formula 
 \[
-J=\hat{\alpha}^{\prime}\hat{\Sigma}_{\alpha}^{-1}\hat{\alpha}^{\prime}\sim\chi_{N-K}^{2}
+J=\hat{\alpha}^{\prime}\hat{\Sigma}_{\alpha}^{+}\hat{\alpha}=\left(Q^{\prime}\hat{\alpha}\right)^{\prime}\left(Q^{\prime}\hat{\Sigma}_{\alpha}Q\right)^{-1}\left(Q^{\prime}\hat{\alpha}\right)\sim\chi_{N-K-n_{rf}}^{2}
 \]
 
 \end_inset
@@ -745,7 +746,12 @@ J=\hat{\alpha}^{\prime}\hat{\Sigma}_{\alpha}^{-1}\hat{\alpha}^{\prime}\sim\chi_{
 
 \begin_layout Standard
 \noindent
-The loss of degrees of freedom occurs since 
+where 
+\begin_inset Formula $n_{rf}$
+\end_inset
+
+ is 1 if the risk free rate is estimated and 0 if it is not. The loss of
+ degrees of freedom occurs since 
 \begin_inset Formula $\hat{\alpha}=\hat{\eta}$
 \end_inset
 
@@ -753,24 +759,89 @@ The loss of degrees of freedom occurs since
 \begin_inset Formula $N$
 \end_inset
 
- average returns on 
-\begin_inset Formula $K$
+ average returns on the 
+\begin_inset Formula $K+n_{rf}$
 \end_inset
 
- factor loadings.
- 
+ columns of the factor loadings. The second stage estimates make 
+\begin_inset Formula $\hat{\alpha}$
+\end_inset
+
+ orthogonal to the 
+\begin_inset Formula $K+n_{rf}$
+\end_inset
+
+ columns of 
+\begin_inset Formula $\Sigma^{-1}\hat{\beta}_{c}$
+\end_inset
+
+, where 
+\begin_inset Formula $\Sigma$
+\end_inset
+
+ is the covariance used in the GLS version or the identity matrix, so that 
+\begin_inset Formula $\hat{\alpha}$
+\end_inset
+
+ lies in a space with 
+\begin_inset Formula $N-K-n_{rf}$
+\end_inset
+
+ dimensions and its covariance has rank 
+\begin_inset Formula $N-K-n_{rf}$
+\end_inset
+
+ in theory. 
 \begin_inset Formula $\hat{\Sigma}_{\alpha}$
 \end_inset
 
- is the bottom right 
-\begin_inset Formula $K\times K$
-\end_inset
-
- block of 
+ is the block of 
 \begin_inset Formula $\hat{\Sigma}$
 \end_inset
 
-.
+ that contains the covariance of 
+\begin_inset Formula $\hat{\alpha}$
+\end_inset
+
+. The columns of 
+\begin_inset Formula $Q$
+\end_inset
+
+ are an orthonormal basis of the space that is orthogonal to the columns of
+ 
+\begin_inset Formula $\Sigma^{-1}\hat{\beta}_{c}$
+\end_inset
+
+, and 
+\begin_inset Formula $\hat{\Sigma}_{\alpha}^{+}=Q\left(Q^{\prime}\hat{\Sigma}_{\alpha}Q\right)^{-1}Q^{\prime}$
+\end_inset
+
+ is the generalized inverse of 
+\begin_inset Formula $\hat{\Sigma}_{\alpha}$
+\end_inset
+
+ with rank 
+\begin_inset Formula $N-K-n_{rf}$
+\end_inset
+
+. The statistic is the Wald statistic of the 
+\begin_inset Formula $N-K-n_{rf}$
+\end_inset
+
+ linear combinations of the pricing errors that are not restricted to be
+ zero. If 
+\begin_inset Formula $\hat{\Sigma}_{\alpha}$
+\end_inset
+
+ were exactly singular in the directions of the columns of 
+\begin_inset Formula $\Sigma^{-1}\hat{\beta}_{c}$
+\end_inset
+
+, as the covariance of the pricing errors is in theory, 
+\begin_inset Formula $\hat{\Sigma}_{\alpha}^{+}$
+\end_inset
+
+ would be its Moore-Penrose pseudo-inverse.
 \end_layout
 
 \begin_layout Subsection

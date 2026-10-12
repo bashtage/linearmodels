@@ -27,7 +27,7 @@ from linearmodels.asset_pricing.results import (
 from linearmodels.iv.data import IVData, IVDataLike
 from linearmodels.shared.alignment import check_alignment, row_labels
 from linearmodels.shared.exceptions import missing_warning
-from linearmodels.shared.hypotheses import WaldTestStatistic
+from linearmodels.shared.hypotheses import InvalidTestStatistic, WaldTestStatistic
 from linearmodels.shared.linalg import has_constant
 from linearmodels.shared.typed_getters import get_float, get_string
 from linearmodels.shared.utility import AttrDict
@@ -66,6 +66,58 @@ def callback_factory(
         d["iter"] += 1
 
     return callback
+
+
+def _j_statistic(
+    alphas: linearmodels.typing.data.Float64Array,
+    alpha_vcv: linearmodels.typing.data.Float64Array,
+    restrictions: linearmodels.typing.data.Float64Array,
+) -> WaldTestStatistic:
+    r"""
+    J statistic of the pricing errors of a two-pass estimator.
+
+    Parameters
+    ----------
+    alphas : ndarray
+        The pricing errors (nportfolio by 1), which satisfy
+        ``restrictions.T @ alphas = 0``.
+    alpha_vcv : ndarray
+        The estimated covariance of the pricing errors (nportfolio by nportfolio).
+    restrictions : ndarray
+        The nportfolio by nrestriction matrix of the restrictions that the pricing
+        errors satisfy, which has full column rank.
+
+    Returns
+    -------
+    WaldTestStatistic
+        The statistic :math:`\hat{\alpha}^{\prime}\hat{V}^{+}\hat{\alpha}`, where
+        :math:`\hat{V}^{+}=Q(Q^{\prime}\hat{V}Q)^{-1}Q^{\prime}` is the generalized
+        inverse of :math:`\hat{V}` with rank nportfolio less nrestriction, and the
+        columns of :math:`Q` are an orthonormal basis of the space that is
+        orthogonal to the columns of ``restrictions``. An ``InvalidTestStatistic``
+        if :math:`Q^{\prime}\hat{V}Q` is singular.
+    """
+    name = "J-statistic"
+    null = "All alphas are 0"
+    nportfolio, nrestriction = restrictions.shape
+    df = nportfolio - nrestriction
+    if df == 0:
+        return WaldTestStatistic(0.0, null, df, name=name)
+    # The pricing errors are in the span of the last df columns of u
+    q = np.linalg.svd(restrictions)[0][:, nrestriction:]
+    vcv = q.T @ alpha_vcv @ q
+    vals, vecs = np.linalg.eigh((vcv + vcv.T) / 2)
+    if not vals[0] > df * np.finfo(float).eps * vals[-1]:
+        reason = (
+            "The estimated covariance of the pricing errors has a rank smaller "
+            f"than the {df} degrees of freedom of the statistic, so that the "
+            "J-statistic cannot be computed. This occurs when the number of "
+            "observations is small relative to the number of portfolios."
+        )
+        return InvalidTestStatistic(reason, name=name)
+    coefs = vecs.T @ (q.T @ alphas)
+    stat = float(np.sum(coefs**2 / vals[:, None]))
+    return WaldTestStatistic(stat, null, df, name=name)
 
 
 class _FactorModelBase:
@@ -542,7 +594,53 @@ class LinearFactorModel(_LinearFactorModelBase):
     is used in the second stage if ``sigma`` is provided.
 
     The model is tested using the estimated values
-    :math:`\hat{\alpha}_i=\hat{\eta}_i`.
+    :math:`\hat{\alpha}_i=\hat{\eta}_i`, the pricing errors. With :math:`N`
+    test portfolios, :math:`K` factors and :math:`n_{rf}` equal to 1 if the
+    risk-free rate is estimated and 0 if it is not, the second stage estimates
+    make the pricing errors orthogonal to the :math:`K + n_{rf}` columns of
+    :math:`\Sigma^{-1}\hat{\beta}_c`. Here :math:`\hat{\beta}_c` contains the
+    estimated factor loadings, preceded by a column of ones if the risk-free
+    rate is estimated, and :math:`\Sigma` is ``sigma``, or the identity if it
+    is not provided. The pricing errors therefore lie in a space with
+    :math:`N - K - n_{rf}` dimensions, and the covariance of the pricing errors
+    has rank :math:`N - K - n_{rf}`. The J-statistic is
+
+    .. math::
+
+        J = \hat{\alpha}^\prime \hat{V}^{+} \hat{\alpha}
+          = (Q^\prime\hat{\alpha})^\prime (Q^\prime \hat{V} Q)^{-1}
+            (Q^\prime\hat{\alpha})
+
+    where :math:`\hat{V}` is the estimated covariance of the pricing errors,
+    :math:`\hat{V}^{+}=Q(Q^\prime \hat{V} Q)^{-1}Q^\prime` is the generalized
+    inverse of :math:`\hat{V}` with rank :math:`N - K - n_{rf}`, and the
+    :math:`N - K - n_{rf}` columns of :math:`Q` are an orthonormal basis of the
+    space that is orthogonal to the columns of :math:`\Sigma^{-1}\hat{\beta}_c`.
+    It is the Wald statistic of the :math:`N - K - n_{rf}` linear combinations
+    of the pricing errors that are not restricted to be zero, and has an
+    asymptotic :math:`\chi^2_{N-K-n_{rf}}` distribution. If :math:`\hat{V}`
+    were exactly singular in the directions of the columns of
+    :math:`\Sigma^{-1}\hat{\beta}_c`, as the covariance of the pricing errors
+    is in theory, :math:`\hat{V}^{+}` would be its Moore-Penrose pseudo-inverse.
+    If :math:`Q^\prime \hat{V} Q` is singular, which can occur when there are
+    few observations, the J-statistic is an ``InvalidTestStatistic``.
+
+    .. versionchanged:: 7.1
+
+       The J-statistic used the Moore-Penrose pseudo-inverse of
+       :math:`\hat{V}` with its default tolerance, which also inverts the
+       directions in which the covariance is null in theory. Its eigenvalues
+       are small but not zero in a sample. The statistic was therefore too
+       large: by 4% in the median and by up to 30% in 200 simulated samples of
+       a correct model with 250 observations, 25 portfolios and 3 factors,
+       where the 5% test rejected 12.5% of the samples (10.0% now; with 1,000
+       observations 7.5% and 5.5%). The covariance can be far from singular in
+       those directions when there are few portfolios: the J-statistic of the
+       five portfolios and three factors of the Fama-French example in the
+       documentation is 41.6 and was 100.6. If the risk-free rate was
+       estimated, an eigenvalue that is numerically zero was inverted as well,
+       and the statistic changed in the third digit when the observations were
+       only reordered.
 
     Rows are paired by position, so that the first row of ``factors`` is the
     factor return in the period of the first row of ``portfolios``. If both
@@ -657,7 +755,7 @@ class LinearFactorModel(_LinearFactorModelBase):
         ``kernel``, one of "bartlett", "parzen" or "qs" (quadratic spectral)
         and ``bandwidth`` (a positive integer).
         """
-        nobs, nf, nport, nrf, s1, s2, s3 = self._boundaries()
+        nobs, nf, nport, _, s1, s2, s3 = self._boundaries()
         excess_returns = not self._risk_free
         f = self.factors.ndarray
         p = self.portfolios.ndarray
@@ -709,10 +807,9 @@ class LinearFactorModel(_LinearFactorModelBase):
         # VCV
         full_vcv = cov_est_inst.cov
         alpha_vcv = full_vcv[s2:, s2:]
-        stat = float(np.squeeze(alphas.T @ np.linalg.pinv(alpha_vcv) @ alphas))
-        jstat = WaldTestStatistic(
-            stat, "All alphas are 0", nport - nf - nrf, name="J-statistic"
-        )
+        # The second stage estimates make the pricing errors orthogonal to the
+        # columns of sigma^-1 [1 betas]
+        jstat = _j_statistic(alphas, alpha_vcv, self._sigma_inv @ betas)
 
         total_ss = ((p - p.mean(0)[None, :]) ** 2).sum()
         residual_ss = (eps**2).sum()

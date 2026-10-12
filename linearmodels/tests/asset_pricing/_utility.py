@@ -1,5 +1,6 @@
 import numpy as np
 import pandas as pd
+from scipy.linalg import null_space
 
 from linearmodels.shared.utility import AttrDict
 
@@ -30,6 +31,27 @@ def generate_data(
     return AttrDict(factors=factors, portfolios=portfolios)
 
 
+def simulate_data(nobs=300, nportfolio=7, nfactor=2, seed=0, alpha=True):
+    """
+    Simulate returns that have a factor structure, with a local random generator.
+
+    The portfolios have pricing errors, which increase with the portfolio number, if
+    alpha is True.
+    """
+    rng = np.random.default_rng(seed)
+    rho = 0.2
+    e = rng.standard_normal((nobs, nfactor))
+    factors = rho * rng.standard_normal((nobs, 1)) + np.sqrt(1 - rho**2) * e
+    factors = np.sqrt(0.20**2 / 12) * factors
+    factors += (np.arange(1, nfactor + 1) / (10 * nfactor) / 12)[None, :]
+    idio = np.sqrt(0.10**2 / 12) * rng.standard_normal((nobs, nportfolio))
+    betas = rng.chisquare(2, (nfactor, nportfolio)) / 2.0
+    portfolios = factors @ betas + idio
+    if alpha:
+        portfolios = portfolios + (np.arange(nportfolio) / nportfolio / 100)[None, :]
+    return portfolios, factors
+
+
 def get_all(res):
     attrs = dir(res)
     for attr_name in attrs:
@@ -37,3 +59,18 @@ def get_all(res):
             continue
         attr = getattr(res, attr_name)
         assert not callable(attr)
+
+
+def textbook_j_stat(alphas, vcv, restrictions):
+    """
+    The J statistic of the pricing errors of a two-pass estimator.
+
+    The pricing errors satisfy restrictions.T @ alphas = 0, so that they are in the
+    space orthogonal to the columns of restrictions, which has dimension
+    nportfolio - nrestriction. The statistic is the Wald statistic of the
+    coordinates of the pricing errors in that space, (Q'a)'(Q'VQ)^-1(Q'a), where the
+    columns of Q are a basis of that space.
+    """
+    q = null_space(restrictions.T)
+    qa = q.T @ alphas
+    return float(np.squeeze(qa.T @ np.linalg.solve(q.T @ vcv @ q, qa)))

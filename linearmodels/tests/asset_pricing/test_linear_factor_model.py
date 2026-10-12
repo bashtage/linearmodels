@@ -11,7 +11,11 @@ from linearmodels.iv.covariance import (
     kernel_optimal_bandwidth,
     kernel_weight_bartlett,
 )
-from linearmodels.tests.asset_pricing._utility import generate_data, get_all
+from linearmodels.tests.asset_pricing._utility import (
+    generate_data,
+    get_all,
+    textbook_j_stat,
+)
 
 
 @pytest.fixture(params=["numpy", "pandas"])
@@ -106,7 +110,10 @@ def test_linear_model_parameters(data):
     assert_allclose(cov, res.cov)
 
     acov = cov[: block1 : (nf + 1), : block1 : (nf + 1)]
-    jstat = float(np.squeeze(alphas.T @ np.linalg.pinv(acov) @ alphas))
+    # The alphas are orthogonal to the loadings, so that the covariance of the alphas
+    # has rank nport - nf
+    assert_allclose(b.T @ alphas, 0.0, atol=1e-14)
+    jstat = textbook_j_stat(alphas, acov, b)
     assert_allclose(res.j_statistic.stat, jstat)
     assert_allclose(res.j_statistic.pval, stats.chi2(nport - nf).sf(jstat))
 
@@ -216,12 +223,13 @@ def test_linear_model_parameters_risk_free(data):
     assert np.all(res.pvalues <= 1.0)
 
     acov = cov[: block1 : (nf + 1), : block1 : (nf + 1)]
-    jstat = float(np.squeeze(alphas.T @ np.linalg.pinv(acov) @ alphas))
+    # The alphas are orthogonal to the constant and the loadings, so that the
+    # covariance of the alphas has rank nport - nf - 1
+    assert_allclose(bc.T @ alphas, 0.0, atol=1e-14)
+    jstat = textbook_j_stat(alphas, acov, bc)
     assert_allclose(res.cov.values[: block1 : (nf + 1), : block1 : (nf + 1)], acov)
-    assert_allclose(res.j_statistic.stat, jstat, rtol=1e-1)
-    assert_allclose(
-        res.j_statistic.pval, stats.chi2(nport - nf - 1).sf(jstat), rtol=1e-2
-    )
+    assert_allclose(res.j_statistic.stat, jstat)
+    assert_allclose(res.j_statistic.pval, stats.chi2(nport - nf - 1).sf(jstat))
 
     get_all(res)
 
@@ -324,12 +332,13 @@ def test_linear_model_parameters_risk_free_gls(data):
     assert_allclose(cov, res.cov)
 
     acov = cov[: block1 : (nf + 1), : block1 : (nf + 1)]
-    jstat = float(np.squeeze(alphas.T @ np.linalg.pinv(acov) @ alphas))
+    # The alphas are orthogonal to the columns of sigma^-1 [1 betas], so that the
+    # covariance of the alphas has rank nport - nf - 1
+    assert_allclose((sigma_inv @ bc).T @ alphas, 0.0, atol=1e-10)
+    jstat = textbook_j_stat(alphas, acov, sigma_inv @ bc)
     assert_allclose(res.cov.values[: block1 : (nf + 1), : block1 : (nf + 1)], acov)
-    assert_allclose(res.j_statistic.stat, jstat, rtol=1e-1)
-    assert_allclose(
-        res.j_statistic.pval, stats.chi2(nport - nf - 1).sf(jstat), rtol=1e-2
-    )
+    assert_allclose(res.j_statistic.stat, jstat)
+    assert_allclose(res.j_statistic.pval, stats.chi2(nport - nf - 1).sf(jstat))
     assert isinstance(res.pvalues, pd.DataFrame)
     assert np.all(res.pvalues <= 1.0)
     get_all(res)

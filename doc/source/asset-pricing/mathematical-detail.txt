@@ -179,16 +179,34 @@ previous section.
 The J statistic
 ~~~~~~~~~~~~~~~
 
-The J statistic is virtually identical to the :math:`J` statistic from
-traded factor model except that it has a difference distribution.
+The J statistic is similar to the :math:`J` statistic from traded factor
+model except that the pricing errors satisfy linear restrictions and that the
+statistic has a different distribution.
 
-.. math:: J=\hat{\alpha}^{\prime}\hat{\Sigma}_{\alpha}^{-1}\hat{\alpha}^{\prime}\sim\chi_{N-K}^{2}
+.. math:: J=\hat{\alpha}^{\prime}\hat{\Sigma}_{\alpha}^{+}\hat{\alpha}=\left(Q^{\prime}\hat{\alpha}\right)^{\prime}\left(Q^{\prime}\hat{\Sigma}_{\alpha}Q\right)^{-1}\left(Q^{\prime}\hat{\alpha}\right)\sim\chi_{N-K-n_{rf}}^{2}
 
-The loss of degrees of freedom occurs since
+where :math:`n_{rf}` is 1 if the risk free rate is estimated and 0 if it is
+not. The loss of degrees of freedom occurs since
 :math:`\hat{\alpha}=\hat{\eta}` which are regression residuals from a
-regression of :math:`N` average returns on :math:`K` factor loadings.
-:math:`\hat{\Sigma}_{\alpha}` is the bottom right :math:`K\times K`
-block of :math:`\hat{\Sigma}`.
+regression of :math:`N` average returns on the :math:`K+n_{rf}` columns of
+the factor loadings. The second stage estimates make :math:`\hat{\alpha}`
+orthogonal to the :math:`K+n_{rf}` columns of
+:math:`\Sigma^{-1}\hat{\beta}_{c}`, where :math:`\Sigma` is the covariance
+used in the GLS version or the identity matrix, so that
+:math:`\hat{\alpha}` lies in a space with :math:`N-K-n_{rf}` dimensions and
+its covariance has rank :math:`N-K-n_{rf}` in theory.
+:math:`\hat{\Sigma}_{\alpha}` is the block of :math:`\hat{\Sigma}` that
+contains the covariance of :math:`\hat{\alpha}`. The columns of :math:`Q`
+are an orthonormal basis of the space that is orthogonal to the columns of
+:math:`\Sigma^{-1}\hat{\beta}_{c}`, and
+:math:`\hat{\Sigma}_{\alpha}^{+}=Q\left(Q^{\prime}\hat{\Sigma}_{\alpha}Q\right)^{-1}Q^{\prime}`
+is the generalized inverse of :math:`\hat{\Sigma}_{\alpha}` with rank
+:math:`N-K-n_{rf}`. The statistic is the Wald statistic of the
+:math:`N-K-n_{rf}` linear combinations of the pricing errors that are not
+restricted to be zero. If :math:`\hat{\Sigma}_{\alpha}` were exactly singular
+in the directions of the columns of :math:`\Sigma^{-1}\hat{\beta}_{c}`, as the
+covariance of the pricing errors is in theory,
+:math:`\hat{\Sigma}_{\alpha}^{+}` would be its Moore-Penrose pseudo-inverse.
 
 GMM Estimation of Linear Factor Models
 --------------------------------------
