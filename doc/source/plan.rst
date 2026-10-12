@@ -13,6 +13,7 @@ Univariate
 * LIML/k-class - :class:`linearmodels.iv.model.IVLIML`
 * GMM IV Estimation - :class:`linearmodels.iv.model.IVGMM`
 * GMM-CUE Estimation - :class:`linearmodels.iv.model.IVGMMCUE`
+* JIVE - :class:`linearmodels.iv.model.IVJIVE`
 
 Panel
 =====

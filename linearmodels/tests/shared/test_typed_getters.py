@@ -50,6 +50,15 @@ def test_bool():
         get_bool({"v": 1.0}, "v")
 
 
+def test_numpy_scalars():
+    for value in (np.int32(3), np.int64(3), np.float32(3), np.float64(3)):
+        out = get_float({"v": value}, "v")
+        assert out == 3.0
+        assert type(out) is float
+    assert get_bool({"v": np.True_}, "v") is True
+    assert get_bool({"v": np.False_}, "v") is False
+
+
 def test_float():
     assert get_float({"v": True}, "v") == 1.0
     assert get_float({"v": True}, "a") is None

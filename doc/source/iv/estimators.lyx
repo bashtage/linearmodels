@@ -291,6 +291,42 @@ The vector of instruments
 .
 \end_layout
 
+\begin_layout Standard
+\noindent
+Observation weights, 
+\begin_inset Formula $w_{i}$
+\end_inset
+
+, are scaled to have a mean of 1.
+ When a model uses weights, estimation is performed on the weighted variables 
+\begin_inset Formula $\sqrt{w_{i}}y_{i}$
+\end_inset
+
+, 
+\begin_inset Formula $\sqrt{w_{i}}x_{i}$
+\end_inset
+
+ and 
+\begin_inset Formula $\sqrt{w_{i}}z_{i}$
+\end_inset
+
+, which take the place of 
+\begin_inset Formula $y_{i}$
+\end_inset
+
+, 
+\begin_inset Formula $x_{i}$
+\end_inset
+
+ and 
+\begin_inset Formula $z_{i}$
+\end_inset
+
+ in the formulas below.
+ This includes the covariance estimators, the specification tests and the first-stage statistics.
+ The parameters, covariance and test statistics of a weighted model are therefore those of the unweighted model that is estimated using the weighted variables.
+\end_layout
+
 \begin_layout Subsection*
 \noindent
 Parameter Estimation
@@ -445,6 +481,171 @@ where
 
  and so it is not possible to use a closed form estimator.
  
+\end_layout
+
+\begin_layout Subsubsection*
+\noindent
+Jackknife Instrumental Variables (JIVE)
+\end_layout
+
+\begin_layout Standard
+\noindent
+The 2SLS fitted value of a regressor, 
+\begin_inset Formula $\hat{x}_{i}$
+\end_inset
+
+, the 
+\begin_inset Formula $i$
+\end_inset
+
+th row of 
+\begin_inset Formula $\hat{X}=P_{Z}X$
+\end_inset
+
+, is computed from a first stage that uses observation 
+\begin_inset Formula $i$
+\end_inset
+
+.
+ This links 
+\begin_inset Formula $\hat{x}_{i}$
+\end_inset
+
+ to the error 
+\begin_inset Formula $\epsilon_{i}$
+\end_inset
+
+, which is the source of the bias of 2SLS towards OLS when there are many instruments.
+ The jackknife IV estimator (JIVE1) of Angrist, Imbens and Krueger (1999) replaces the fitted values with leave-one-out predictions.
+ Row 
+\begin_inset Formula $i$
+\end_inset
+
+ of 
+\begin_inset Formula $\tilde{X}$
+\end_inset
+
+ is the prediction of 
+\begin_inset Formula $x_{i}$
+\end_inset
+
+ from the first-stage regression of 
+\begin_inset Formula $X$
+\end_inset
+
+ on 
+\begin_inset Formula $Z$
+\end_inset
+
+ that is estimated without observation 
+\begin_inset Formula $i$
+\end_inset
+
+, 
+\begin_inset Formula 
+\[
+\tilde{x}_{i}^{\prime}=z_{i}^{\prime}\left(Z_{(-i)}^{\prime}Z_{(-i)}\right)^{-1}Z_{(-i)}^{\prime}X_{(-i)}
+\]
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+\noindent
+where the subscript 
+\begin_inset Formula $(-i)$
+\end_inset
+
+ indicates that row 
+\begin_inset Formula $i$
+\end_inset
+
+ has been removed.
+ The first stage does not have to be estimated 
+\begin_inset Formula $n$
+\end_inset
+
+ times, since 
+\begin_inset Formula 
+\[
+\tilde{x}_{i}=\frac{\hat{x}_{i}-h_{i}x_{i}}{1-h_{i}},\qquad h_{i}=z_{i}^{\prime}\left(Z^{\prime}Z\right)^{-1}z_{i}
+\]
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+\noindent
+where 
+\begin_inset Formula $h_{i}$
+\end_inset
+
+ is the leverage of observation 
+\begin_inset Formula $i$
+\end_inset
+
+, the 
+\begin_inset Formula $i$
+\end_inset
+
+th diagonal element of 
+\begin_inset Formula $P_{Z}$
+\end_inset
+
+.
+ The exogenous regressors are in 
+\begin_inset Formula $Z$
+\end_inset
+
+, so that they are their own predictions, 
+\begin_inset Formula $\tilde{x}_{1i}=x_{1i}$
+\end_inset
+
+, and only the endogenous regressors are replaced.
+ The JIVE estimator is the IV estimator that uses 
+\begin_inset Formula $\tilde{X}$
+\end_inset
+
+ as the instruments for 
+\begin_inset Formula $X$
+\end_inset
+
+, 
+\begin_inset Formula 
+\[
+\hat{\beta}_{JIVE}=\left(\tilde{X}^{\prime}X\right)^{-1}\tilde{X}^{\prime}y
+\]
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+\noindent
+which replaces 
+\begin_inset Formula $\hat{X}$
+\end_inset
+
+ with 
+\begin_inset Formula $\tilde{X}$
+\end_inset
+
+ in 
+\begin_inset Formula $\hat{\beta}_{2SLS}=\left(\hat{X}^{\prime}X\right)^{-1}\hat{X}^{\prime}y$
+\end_inset
+
+.
+ The estimator cannot be computed if 
+\begin_inset Formula $h_{i}=1$
+\end_inset
+
+ for an observation.
+ This happens if the observation is the only one with a non-zero value of one of the instruments, for example a dummy variable that is 1 for a single observation.
 \end_layout
 
 \begin_layout Subsection*
@@ -1166,9 +1367,159 @@ The GMM optimal weight estimators are identical to the the estimators of
  
 \end_layout
 
+\begin_layout Subsubsection*
+\noindent
+JIVE Covariance
+\end_layout
+
+\begin_layout Standard
+\noindent
+JIVE is a just identified IV estimator that solves the moment conditions 
+\begin_inset Formula $n^{-1}\sum_{i=1}^{n}\tilde{x}_{i}\hat{\epsilon}_{i}=0$
+\end_inset
+
+, where 
+\begin_inset Formula $\hat{\epsilon}_{i}=y_{i}-x_{i}^{\prime}\hat{\beta}_{JIVE}$
+\end_inset
+
+ is computed using 
+\begin_inset Formula $X$
+\end_inset
+
+ and not 
+\begin_inset Formula $\tilde{X}$
+\end_inset
+
+.
+ Its covariance is 
+\begin_inset Formula 
+\[
+\hat{\Sigma}=n^{-1}\left(\frac{\tilde{X}^{\prime}X}{n}\right)^{-1}\hat{S}\left(\frac{X^{\prime}\tilde{X}}{n}\right)^{-1}
+\]
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+\noindent
+where 
+\begin_inset Formula $\hat{S}$
+\end_inset
+
+ is an estimator of the covariance of the moment conditions 
+\begin_inset Formula $\tilde{x}_{i}\hat{\epsilon}_{i}$
+\end_inset
+
+.
+ The estimators are those of the GMM covariance, with 
+\begin_inset Formula $\tilde{x}_{i}$
+\end_inset
+
+ in place of 
+\begin_inset Formula $z_{i}$
+\end_inset
+
+.
+ The unadjusted estimator is 
+\begin_inset Formula $\hat{S}=s^{2}n^{-1}\tilde{X}^{\prime}\tilde{X}$
+\end_inset
+
+ with 
+\begin_inset Formula $s^{2}=n^{-1}\hat{\epsilon}^{\prime}\hat{\epsilon}$
+\end_inset
+
+, which is not centered.
+ The robust estimator is 
+\begin_inset Formula $\hat{S}=n^{-1}\sum_{i=1}^{n}\hat{\epsilon}_{i}^{2}\tilde{x}_{i}\tilde{x}_{i}^{\prime}$
+\end_inset
+
+.
+ The kernel and one-way clustered estimators are defined as for the GMM covariance.
+ The bandwidth of the kernel estimator is selected using the data if it is not provided.
+ Two-way clustering is not available.
+ If the debiased flag is used, 
+\begin_inset Formula $\hat{S}$
+\end_inset
+
+ is rescaled as in the GMM covariance estimators.
+\end_layout
+
+\begin_layout Standard
+\noindent
+
+\series bold
+Inference with many instruments
+\end_layout
+
+\begin_layout Standard
+\noindent
+These covariance estimators treat 
+\begin_inset Formula $\tilde{X}$
+\end_inset
+
+ as if it were a fixed set of instruments.
+ Chao, Swanson, Hausman, Newey and Woutersen (2012) derive the distribution of JIVE when the number of instruments, 
+\begin_inset Formula $K$
+\end_inset
+
+, grows with the sample size.
+ JIVE is consistent and asymptotically normal if 
+\begin_inset Formula $\sqrt{K}/r_{n}\to0$
+\end_inset
+
+, where 
+\begin_inset Formula $r_{n}$
+\end_inset
+
+ is the concentration parameter, which measures the strength of the instruments.
+ The asymptotic variance is the sum of the term that is estimated above and a second term of order 
+\begin_inset Formula $K/r_{n}$
+\end_inset
+
+.
+ The second term depends on the variances of the errors of the first stage and of the model and on their covariance.
+ It can be ignored if 
+\begin_inset Formula $K/r_{n}\to0$
+\end_inset
+
+, but not if 
+\begin_inset Formula $K$
+\end_inset
+
+ is large relative to the strength of the instruments.
+ The covariance estimators above omit it, and so they can understate the uncertainty in the latter case.
+ In a simulation with 
+\begin_inset Formula $n=200$
+\end_inset
+
+, 
+\begin_inset Formula $K=100$
+\end_inset
+
+ instruments that each have a first-stage coefficient of 0.05, and a correlation of 0.95 between the errors of the first stage and of the model, a 95% confidence interval that used the robust covariance contained the true value in about 85% of 2,000 replications.
+ The variance estimator that includes the second term is not implemented.
+\end_layout
+
+\begin_layout Standard
+\noindent
+Davidson and MacKinnon (2006) compare two variants of JIVE with 2SLS and LIML in Monte Carlo experiments.
+ They find that JIVE is always more dispersed than 2SLS, often very much so, that it is almost always inferior to LIML, and that it performs particularly badly when the instruments are weak.
+\end_layout
+
 \begin_layout Subsection*
 \noindent
 Post-estimation
+\end_layout
+
+\begin_layout Standard
+\noindent
+A model that uses weights is tested using the weighted variables, as described in the notation.
+ Sargan's, Basmann's, Anderson-Rubin, Basmann's F, Durbin's and the Wu-Hausman tests assume that the errors are homoskedastic, and so they do not use the covariance estimator that was used to fit the model.
+ Wooldridge's score tests of exogeneity and of the overidentifying restrictions are robust to heteroskedasticity, and they also do not depend on the covariance estimator.
+ Wooldridge's regression test of exogeneity uses the covariance estimator that was used to fit the model, and so it has the robustness of that estimator.
+ The J-statistic and the C-statistic of the GMM estimators use the estimator of the covariance of the moment conditions that is selected by the weight type, and not the covariance estimator that is selected in the call to fit.
 \end_layout
 
 \begin_layout Subsubsection*
@@ -1439,7 +1790,7 @@ Anderson-Rubin
 \begin_layout Standard
 \noindent
 \align left
-The Andersen-Rubin test of overidentification examines the magnitude of
+The Anderson-Rubin test of overidentification examines the magnitude of
  the LIML 
 \begin_inset Formula $\hat{\kappa}$
 \end_inset
@@ -1474,7 +1825,7 @@ where
 \noindent
 
 \series bold
-Basman's F
+Basmann's F
 \end_layout
 
 \begin_layout Standard
@@ -1509,7 +1860,7 @@ where
 \noindent
 
 \series bold
-Durbin and Wu-Haussman
+Durbin and Wu-Hausman
 \end_layout
 
 \begin_layout Standard
@@ -1629,18 +1980,107 @@ where
 \noindent
 
 \series bold
+Centered J-stat
+\end_layout
+
+\begin_layout Standard
+\noindent
+The estimators of the covariance of the moment conditions that are used to compute the weight matrix subtract the mean of the moment conditions only if the center flag is true, and the unadjusted estimator always does.
+ Let 
+\begin_inset Formula $g_{i}=z_{i}\hat{\epsilon}_{i}$
+\end_inset
+
+, and let 
+\begin_inset Formula $W=n^{-1}\sum_{i=1}^{n}g_{i}g_{i}^{\prime}$
+\end_inset
+
+ and 
+\begin_inset Formula $W_{c}=n^{-1}\sum_{i=1}^{n}\left(g_{i}-\bar{g}\right)\left(g_{i}-\bar{g}\right)^{\prime}$
+\end_inset
+
+ be the robust estimators that do not center and that center the moment conditions, so that 
+\begin_inset Formula $W=W_{c}+\bar{g}\bar{g}^{\prime}$
+\end_inset
+
+.
+ If the model is correctly specified, the moment conditions have mean zero at the true parameters and the two estimators are asymptotically equivalent.
+ If it is not, 
+\begin_inset Formula $\bar{g}$
+\end_inset
+
+ does not converge to zero, and 
+\begin_inset Formula $W$
+\end_inset
+
+ also contains 
+\begin_inset Formula $\bar{g}\bar{g}^{\prime}$
+\end_inset
+
+.
+ When both are evaluated using the same parameters, the Sherman-Morrison formula shows that the J-statistic and the centered J-statistic, 
+\begin_inset Formula $J_{c}=n\bar{g}^{\prime}W_{c}^{-1}\bar{g}$
+\end_inset
+
+, are related by 
+\begin_inset Formula 
+\[
+J=n\bar{g}^{\prime}W^{-1}\bar{g}=\frac{J_{c}}{1+J_{c}/n},\qquad J_{c}=\frac{J}{1-J/n}
+\]
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+\noindent
+The J-statistic is therefore smaller than 
+\begin_inset Formula $n$
+\end_inset
+
+ however large the violation of the moment conditions, while the centered J-statistic is not bounded.
+ The relationship is exact when the weight matrix is the robust estimator that does not center, evaluated at the final parameters, as in iterated GMM that has converged.
+ In two-step GMM the weight matrix is computed from the first-step parameters, and the relationship is approximate.
+ The centered J-statistic has the same asymptotic distribution as the J-statistic when the moment conditions hold, and it is available as the attribute centered_j_stat of the results (Hall, 2000; Hansen and Lee, 2021).
+ It uses the estimator of the covariance that is selected by the weight type of the model, applied to the centered moment conditions and evaluated at the final parameter estimates.
+ The cluster sums of centered moment conditions add to zero, and so a clustered estimate that uses 
+\begin_inset Formula $g$
+\end_inset
+
+ clusters has rank at most 
+\begin_inset Formula $g-1$
+\end_inset
+
+.
+ The statistic is not defined if the estimate is singular, which requires more clusters than moment conditions.
+\end_layout
+
+\begin_layout Standard
+\noindent
+
+\series bold
 C-stat
 \end_layout
 
 \begin_layout Standard
 \noindent
-The C-statistic tests exogeneity by treating a the set of endogenous variables
- as exogenous.
- In practice this means that are included in the GMM moment conditions,
- and so a likelihood-ratio-like test statistic can be computed as 
+The C-statistic tests the exogeneity of 
+\begin_inset Formula $m$
+\end_inset
+
+ of the endogenous variables by treating them as exogenous, so that they are included in the moment conditions, 
+\begin_inset Formula $z_{i}^{e}=\left(z_{i}^{\prime},x_{t,i}^{\prime}\right)^{\prime}$
+\end_inset
+
+, where 
+\begin_inset Formula $x_{t,i}$
+\end_inset
+
+ are the tested variables.
+ A likelihood-ratio-like test statistic is computed as 
 \begin_inset Formula 
 \[
-J_{e}-J_{c}\sim\chi_{m}^{2}
+C=J_{e}-J_{c}\sim\chi_{m}^{2}
 \]
 
 \end_inset
@@ -1654,15 +2094,94 @@ where
 \begin_inset Formula $J_{e}$
 \end_inset
 
- is the J-statistic treating the tested variables as exogenous and 
+ is the J-statistic of the model that treats the tested variables as exogenous and 
 \begin_inset Formula $J_{c}$
 \end_inset
 
- leaves then as endogenous.
- The optimal weighting matrix is computed from the expanded model (efficient)
- and used to estimate parameters in both models.
- This ensures that the test statistic is positive.
- 
+ is the J-statistic of the model that leaves them as endogenous.
+ Both J-statistics use the same estimate of the covariance of the moment conditions.
+ Let 
+\begin_inset Formula $S_{e}$
+\end_inset
+
+ be the estimate of the covariance of 
+\begin_inset Formula $z_{i}^{e}\hat{\epsilon}_{i}$
+\end_inset
+
+ computed from the first-step residuals of the model that treats the variables as exogenous.
+ It is computed using the estimator that is selected by the weight type of the model, for example robust, kernel or clustered.
+ The weight matrix of that model is 
+\begin_inset Formula $S_{e}^{-1}$
+\end_inset
+
+, and 
+\begin_inset Formula $J_{e}$
+\end_inset
+
+ is its J-statistic.
+ The moment conditions of the original model are a subset of the moment conditions of this model.
+ Let 
+\begin_inset Formula $S_{e,c}$
+\end_inset
+
+ be the sub-matrix of 
+\begin_inset Formula $S_{e}$
+\end_inset
+
+ that contains the rows and columns of the original moment conditions.
+ The original model is estimated using the weight matrix 
+\begin_inset Formula $S_{e,c}^{-1}$
+\end_inset
+
+, and 
+\begin_inset Formula $J_{c}$
+\end_inset
+
+ is its J-statistic.
+ Note that 
+\begin_inset Formula $S_{e,c}^{-1}$
+\end_inset
+
+ is the inverse of the sub-matrix of 
+\begin_inset Formula $S_{e}$
+\end_inset
+
+, which is not the sub-matrix of 
+\begin_inset Formula $S_{e}^{-1}$
+\end_inset
+
+.
+\end_layout
+
+\begin_layout Standard
+\noindent
+Using a common estimate of the covariance ensures that the test statistic is not negative, since 
+\begin_inset Formula $g_{e}^{\prime}S_{e}^{-1}g_{e}\geq g_{c}^{\prime}S_{e,c}^{-1}g_{c}$
+\end_inset
+
+ for any parameters, where 
+\begin_inset Formula $g_{e}$
+\end_inset
+
+ and 
+\begin_inset Formula $g_{c}$
+\end_inset
+
+ are the average moment conditions of the two models.
+ If the original model is just identified then 
+\begin_inset Formula $J_{c}=0$
+\end_inset
+
+ and the C-statistic is 
+\begin_inset Formula $J_{e}$
+\end_inset
+
+.
+ The statistic is not defined if 
+\begin_inset Formula $S_{e}$
+\end_inset
+
+ is singular, which requires more clusters than the moment conditions of the model that treats the variables as exogenous.
 \end_layout
 
 \begin_layout Subsection*
@@ -1706,25 +2225,69 @@ where
 \begin_inset Formula $F$
 \end_inset
 
--statistic is the F-statistic from this regression.
- It is implemented as a standard 
-\begin_inset Formula $F$
-\end_inset
-
--statistic when the data is assumed to be homoskedastic with an 
-\begin_inset Formula $F_{p_{2},n-p_{2}}$
-\end_inset
-
- distribution.
- In all other cases, a quadratic form is used with an asymptotic 
-\begin_inset Formula $\chi_{p_{2}}^{2}$
-\end_inset
-
- distribution testing 
+-statistic tests 
 \begin_inset Formula $H_{0}:\gamma=0$
 \end_inset
 
-.
+ in this regression.
+ It is the Wald statistic 
+\begin_inset Formula $W=\hat{\gamma}^{\prime}\hat{V}_{\gamma}^{-1}\hat{\gamma}$
+\end_inset
+
+, where 
+\begin_inset Formula $\hat{V}_{\gamma}$
+\end_inset
+
+ is the covariance of 
+\begin_inset Formula $\hat{\gamma}$
+\end_inset
+
+ estimated using the covariance estimator of the model.
+ If the covariance is unadjusted, the statistic is reported as 
+\begin_inset Formula $W/p_{2}$
+\end_inset
+
+ with an 
+\begin_inset Formula $F_{p_{2},n-p}$
+\end_inset
+
+ distribution.
+ This is the classical 
+\begin_inset Formula $F$
+\end_inset
+
+-statistic only if the debiased flag is used.
+ Otherwise, the covariance uses 
+\begin_inset Formula $n^{-1}$
+\end_inset
+
+ in place of 
+\begin_inset Formula $\left(n-p\right)^{-1}$
+\end_inset
+
+ and the statistic is 
+\begin_inset Formula $n/\left(n-p\right)$
+\end_inset
+
+ times larger.
+ In all other cases, 
+\begin_inset Formula $W$
+\end_inset
+
+ is reported with an asymptotic 
+\begin_inset Formula $\chi_{p_{2}}^{2}$
+\end_inset
+
+ distribution.
+ It is not divided by 
+\begin_inset Formula $p_{2}$
+\end_inset
+
+, which is how other software reports the 
+\begin_inset Formula $F$
+\end_inset
+
+-statistic of a robust test.
 \end_layout
 
 \begin_layout Standard
@@ -1846,7 +2409,123 @@ Optimal BW selection
 
 \begin_layout Standard
 \noindent
-TODO
+If the bandwidth of a kernel estimator is not provided, it is selected using the data with the plug-in method of Newey and West (1994).
+ The method uses a scalar series, 
+\begin_inset Formula $g_{i}$
+\end_inset
+
+, that is a sum of the scores or moment conditions.
+ In the 2SLS and LIML covariances, 
+\begin_inset Formula $g_{i}$
+\end_inset
+
+ is the sum of 
+\begin_inset Formula $\hat{x}_{ij}\hat{\epsilon}_{i}$
+\end_inset
+
+ over the regressors other than the constant, where 
+\begin_inset Formula $\hat{x}_{ij}$
+\end_inset
+
+ are the first-stage fitted values.
+ In the GMM weight matrix and covariance and in the JIVE covariance, the moment conditions are divided by their standard deviations before they are summed.
+ The moment conditions are 
+\begin_inset Formula $z_{ij}\hat{\epsilon}_{i}$
+\end_inset
+
+, and 
+\begin_inset Formula $\tilde{x}_{ij}\hat{\epsilon}_{i}$
+\end_inset
+
+ in JIVE.
+ Let 
+\begin_inset Formula 
+\[
+\hat{\sigma}_{j}=T^{-1}\sum_{i=j+1}^{T}g_{i}g_{i-j},\qquad \hat{s}^{(0)}=\hat{\sigma}_{0}+2\sum_{j=1}^{m^{*}}\hat{\sigma}_{j},\qquad \hat{s}^{(q)}=2\sum_{j=1}^{m^{*}}j^{q}\hat{\sigma}_{j}
+\]
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+\noindent
+where 
+\begin_inset Formula $T$
+\end_inset
+
+ is the number of observations.
+ The number of autocovariances, 
+\begin_inset Formula $m^{*}$
+\end_inset
+
+, and the constants 
+\begin_inset Formula $q$
+\end_inset
+
+ and 
+\begin_inset Formula $c_{q}$
+\end_inset
+
+ depend on the kernel.
+ For the Bartlett kernel, 
+\begin_inset Formula $q=1$
+\end_inset
+
+, 
+\begin_inset Formula $c_{q}=1.1447$
+\end_inset
+
+ and 
+\begin_inset Formula $m^{*}=\lceil4\left(T/100\right)^{2/9}\rceil$
+\end_inset
+
+.
+ For the quadratic spectral kernel, 
+\begin_inset Formula $q=2$
+\end_inset
+
+, 
+\begin_inset Formula $c_{q}=1.3221$
+\end_inset
+
+ and 
+\begin_inset Formula $m^{*}=\lceil4\left(T/100\right)^{2/25}\rceil$
+\end_inset
+
+.
+ For the Parzen kernel, 
+\begin_inset Formula $q=2$
+\end_inset
+
+, 
+\begin_inset Formula $c_{q}=2.6614$
+\end_inset
+
+ and 
+\begin_inset Formula $m^{*}=\lceil4\left(T/100\right)^{4/25}\rceil$
+\end_inset
+
+.
+ The bandwidth is 
+\begin_inset Formula 
+\[
+\hat{m}=\left\lceil c_{q}\left[\left(\frac{\hat{s}^{(q)}}{\hat{s}^{(0)}}\right)^{2}\right]^{\frac{1}{2q+1}}T^{\frac{1}{2q+1}}\right\rceil
+\]
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+\noindent
+or 
+\begin_inset Formula $T-1$
+\end_inset
+
+, if that is smaller.
 \end_layout
 
 \begin_layout Subsection*

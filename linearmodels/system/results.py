@@ -218,6 +218,7 @@ class SystemResults(_CommonResults):
         if results.constraints is not None:
             self._num_constraints = str(results.constraints.r.shape[0])
         self._weight_estimtor = results.get("weight_estimator", None)
+        self._weighted_resid = results.weighted_resid
 
     @property
     def model(self) -> linearmodels.system.model.IV3SLS:
@@ -557,7 +558,8 @@ class SystemResults(_CommonResults):
         .. [1] Greene, William H. Econometric analysis. Pearson Education, 2003.
         """
         name = "Breusch-Pagan LM Test"
-        resids = self.resids
+        # The residuals scaled by the weights, which estimate the residual covariance
+        resids = np.asarray(self._weighted_resid)
         if resids.shape[1] == 1:
             return InvalidTestStatistic(
                 "Cannot test correlation when the system contains a single "
@@ -567,7 +569,7 @@ class SystemResults(_CommonResults):
         r = np.corrcoef(resids.T)
         k = r.shape[0]
         distinct_corr = np.tril(r, -1)
-        stat = self.resids.shape[0] * (distinct_corr**2).sum()
+        stat = resids.shape[0] * (distinct_corr**2).sum()
         return WaldTestStatistic(
             stat,
             "Residuals are uncorrelated",
@@ -611,7 +613,8 @@ class SystemResults(_CommonResults):
         .. [1] Greene, William H. Econometric analysis. Pearson Education, 2003.
         """
         name = "Likelihood Ratio Test for Diagonal Covariance"
-        resids = np.asarray(self.resids)
+        # The residuals scaled by the weights, which estimate the residual covariance
+        resids = np.asarray(self._weighted_resid)
         if resids.shape[1] == 1:
             return InvalidTestStatistic(
                 "Cannot test covariance structure when the system contains a single "
