@@ -711,9 +711,9 @@ class LinearFactorModel(_LinearFactorModelBase):
         ``kernel``, one of "bartlett", "parzen" or "qs" (quadratic spectral)
         and ``bandwidth`` (a positive integer).
         """
-        self._check_debiased(debiased)
         nobs, nf, nport, nrf, s1, s2, s3 = self._boundaries()
         excess_returns = not self._risk_free
+        self._check_debiased(debiased)
         f = self.factors.ndarray
         p = self.portfolios.ndarray
         nport = p.shape[1]
