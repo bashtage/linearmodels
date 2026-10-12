@@ -712,7 +712,7 @@ class _IVLSModelBase(_IVModelBase):
             liml_kappa = nan
             if kappa is None:
                 raise ValueError(
-                    "Unable to estimate kappa. This is most likely occurs if the "
+                    "Unable to estimate kappa. This most likely occurs if the "
                     f"instrument matrix is rank deficient. The error raised when "
                     f"computing kappa was:\n\n{exc}"
                 ) from exc

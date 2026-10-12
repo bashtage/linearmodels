@@ -37,11 +37,11 @@ KernelWeight = Union[
 ]
 
 CLUSTER_ERR = """\
-clusters has the wrong nobs. Expected {0}, got {1}.  Any missing observation
-in the regression variables have have been dropped.  When using a clustered
-covariance estimator, drop missing data before estimating the model. The model
-property `notnull` contains the locations of the observations that have no
-missing values."""
+clusters has the wrong nobs. Expected {0}, got {1}. Observations with a missing
+value in the regression variables are dropped when the model is created, so
+clusters must have one row for each of the remaining observations. When using a
+clustered covariance estimator, drop the observations with missing values from
+the data and from clusters before estimating the model."""
 
 
 def kernel_weight_bartlett(

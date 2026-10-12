@@ -137,6 +137,33 @@ def _options_key(options: dict[str, Any]) -> tuple[Any, ...]:
     return tuple(key)
 
 
+def _check_method(method: str) -> str:
+    """
+    Check the method used to absorb the variables
+
+    Parameters
+    ----------
+    method : str
+        The method that was passed to fit
+
+    Returns
+    -------
+    str
+        The method in lower case
+
+    Raises
+    ------
+    ValueError
+        If method is not "auto", "hdfe" or "lsmr", whatever its case
+    """
+    if isinstance(method, str) and method.lower() in ("auto", "hdfe", "lsmr"):
+        return method.lower()
+    raise ValueError(
+        'method must be one of "auto", "hdfe" or "lsmr", whatever its case. '
+        f"Got {method!r}."
+    )
+
+
 def _absorb_args(
     method: str, use_cache: bool, absorb_options: dict[str, Any] | None
 ) -> tuple[Any, ...]:
@@ -474,6 +501,7 @@ class Interaction:
 
     @property
     def nobs(self) -> int:
+        """Number of observations, which drop reduces."""
         assert self._nobs is not None
         return self._nobs
 
@@ -528,8 +556,24 @@ class Interaction:
         return Series(cat_null.to_numpy() | cont_null.to_numpy(), index=index)
 
     def drop(self, locs: linearmodels.typing.data.BoolArray) -> None:
+        """
+        Drop observations.
+
+        Parameters
+        ----------
+        locs : ndarray
+            Boolean array with one element for each observation, which is True
+            for the observations to drop.
+
+        Notes
+        -----
+        The instance is modified in place and nothing is returned. Afterwards
+        ``nobs``, ``cat``, ``cont``, ``sparse`` and ``hash`` use only the
+        remaining observations.
+        """
         self._cat_data.drop(locs)
         self._cont_data.drop(locs)
+        self._nobs = self._cat_data.shape[0]
 
     @property
     def sparse(self) -> csc_array:
@@ -1247,8 +1291,9 @@ class AbsorbingLS:
         debiased : bool
             Flag indicating whether to debiased the covariance estimator using
             a degree of freedom adjustment.
-        method : str
-            One of:
+        method : {"auto", "hdfe", "lsmr"}, optional
+            The algorithm that absorbs the variables. The name is not case
+            sensitive, and a ValueError is raised for any other value. One of:
 
             * "auto" - (Default). Use HDFE when applicable and fallback to LSMR.
             * "lsmr" - Force LSMR.
@@ -1277,8 +1322,8 @@ class AbsorbingLS:
 
             .. deprecated:: 4.17
 
-               Use absorb_options to pass options. ``lsmr_options`` will be
-               removed in linearmodels 8.0.
+               Use absorb_options with method="lsmr" to pass options.
+               ``lsmr_options`` will be removed in linearmodels 8.0.
 
         cov_config
             Additional parameters to pass to covariance estimator. The list
@@ -1345,6 +1390,7 @@ class AbsorbingLS:
         linearmodels.iv.covariance.KernelCovariance
         linearmodels.iv.covariance.ClusteredCovariance
         """
+        method = _check_method(method)
         if lsmr_options and absorb_options is None:
             # The options are options of LSMR, so they can not be passed to HDFE
             if method == "hdfe":
@@ -1360,7 +1406,8 @@ class AbsorbingLS:
                 raise ValueError("absorb_options cannot be used with lsmr_options")
             warnings.warn(
                 "lsmr_options is deprecated and will be removed in linearmodels "
-                "8.0. Use absorb_options.",
+                '8.0. Use absorb_options with method="lsmr", which passes the options '
+                "to scipy.sparse.linalg.lsmr.",
                 FutureWarning,
                 stacklevel=2,
             )
