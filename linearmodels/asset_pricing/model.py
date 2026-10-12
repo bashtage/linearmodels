@@ -917,6 +917,18 @@ class LinearFactorModelGMM(_LinearFactorModelBase):
     where :math:`r_{it}` is the return on test portfolio i and
     :math:`f_t` are the factor returns.
 
+    There are :math:`N (K + 1) + K` moment conditions, where :math:`N` is the
+    number of test portfolios and :math:`K` is the number of factors. The number
+    of observations must exceed the number of moment conditions, since the
+    covariance of the moment conditions, which weights them, is singular
+    otherwise. A ``ValueError`` is raised if it does not.
+
+    .. versionchanged:: 7.1
+
+       A ``ValueError`` is raised if the number of observations does not exceed
+       the number of moment conditions. The estimator raised a ``LinAlgError``
+       or returned a J-statistic that was NaN or arbitrary, such as -4.6e35.
+
     The model is tested using the optimized objective function using the
     usual GMM J statistic.
 
@@ -937,6 +949,22 @@ class LinearFactorModelGMM(_LinearFactorModelBase):
         self, portfolios: IVDataLike, factors: IVDataLike, *, risk_free: bool = False
     ) -> None:
         super().__init__(portfolios, factors, risk_free=risk_free)
+
+    def _validate_additional_data(self) -> None:
+        super()._validate_additional_data()
+        nobs, nfactor = self.factors.shape
+        nportfolio = self.portfolios.shape[1]
+        nmoment = nportfolio * (nfactor + 1) + nfactor
+        if nobs <= nmoment:
+            raise ValueError(
+                f"The number of observations ({nobs}) must exceed the number of "
+                f"moment conditions ({nmoment}) of the GMM estimator, since the "
+                "covariance of the moment conditions is singular otherwise. The "
+                "number of moment conditions is nportfolio * (nfactor + 1) + "
+                f"nfactor, where nportfolio is {nportfolio} and nfactor is "
+                f"{nfactor}. Use more observations, fewer portfolios or fewer "
+                "factors."
+            )
 
     @classmethod
     def from_formula(
