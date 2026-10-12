@@ -1196,6 +1196,58 @@ class _IVGMMBase(_IVModelBase):
         null = "Expected moment conditions are equal to 0"
         return WaldTestStatistic(stat, null, ninstr - nvar)
 
+    def _raise_if_singular(
+        self,
+        moment_cov: linearmodels.typing.data.Float64Array,
+        consequence: str,
+    ) -> None:
+        """
+        Raise a ValueError if the covariance of the moment conditions is singular
+
+        Parameters
+        ----------
+        moment_cov : ndarray
+            Estimate of the covariance of the moment conditions (ninstr by
+            ninstr).
+        consequence : str
+            Sentence that says why the estimator needs the inverse of the
+            covariance. It ends with the period.
+
+        Raises
+        ------
+        ValueError
+            If the covariance is singular. The message says that there are too
+            few clusters or observations and how many are needed.
+        """
+        if not _is_singular(moment_cov):
+            return
+        nobs, nmoment = self._wz.shape
+        if isinstance(self._weight, OneWayClusteredWeightMatrix):
+            nclusters = len(unique(asarray(self._weight_config["clusters"])))
+            centered = self._weight_config["center"]
+            rank = nclusters - 1 if centered else nclusters
+            rank_reason = (
+                "one less than the number of clusters, since the cluster sums of "
+                "centered moment conditions add to zero"
+                if centered
+                else "the number of clusters"
+            )
+            msg = (
+                f"The clustered covariance of the {nmoment} moment conditions is "
+                f"singular because there are too few clusters ({nclusters} "
+                f"clusters). Its rank is at most {rank}, {rank_reason}. "
+                f"{consequence} Use more clusters than moment conditions, or a "
+                "weight_type that does not use clusters."
+            )
+        else:
+            msg = (
+                f"The covariance of the {nmoment} moment conditions is singular, "
+                f"which occurs if there are too few observations ({nobs}) for the "
+                f"number of moment conditions. {consequence} Use more "
+                "observations or fewer moment conditions."
+            )
+        raise ValueError(msg)
+
 
 class IVGMM(_IVGMMBase):
     r"""
@@ -1250,6 +1302,17 @@ class IVGMM(_IVGMMBase):
     pandas objects with a default index do not carry labels and are always
     paired by position. The same rule applies to ``clusters`` passed to
     ``fit`` or in ``weight_config``.
+
+    The weight matrix is the inverse of an estimate of the covariance of the
+    moment conditions, so that the estimate has to be nonsingular. A clustered
+    estimate from G clusters has rank at most G, and at most G - 1 if the
+    moment conditions are centered (``center`` is ``True``), since the
+    centered cluster sums add to zero. There have to be more clusters than
+    moment conditions. The rank of a kernel or robust estimate is bounded in
+    the same way by the number of observations. ``fit`` raises a
+    ``ValueError`` that says so if the estimate is singular, since the
+    estimates would be numerical noise. The estimate is not used, and so it
+    is not tested, if ``iter_limit`` is 1.
 
     .. todo::
 
@@ -1425,6 +1488,15 @@ class IVGMM(_IVGMMBase):
         IVGMMResults
             Results container
 
+        Raises
+        ------
+        ValueError
+            If the estimate of the covariance of the moment conditions is
+            singular, which occurs if there are too few clusters or
+            observations. The number of clusters has to be larger than the
+            number of moment conditions. The estimate is not used if
+            ``iter_limit`` is 1.
+
         See also
         --------
         linearmodels.iv.gmm.IVGMMCovariance
@@ -1448,6 +1520,11 @@ class IVGMM(_IVGMMBase):
         while iters < iter_limit and norm > tol:
             eps = wy - wx @ params
             moment_cov = weight_matrix(wx, wz, eps)
+            self._raise_if_singular(
+                moment_cov,
+                "The weight matrix of the GMM estimator is the inverse of the "
+                "covariance, so it is not defined.",
+            )
             wmat = inv(moment_cov)
             params = self.estimate_parameters(wx, wy, wz, wmat)
             delta = params - _params
@@ -1779,39 +1856,13 @@ class IVGMMCUE(_IVGMMBase):
         estimates of two-step GMM.
         """
         wy, wx, wz = self._wy, self._wx, self._wz
-        nobs, nmoment = wz.shape
+        nobs = wz.shape[0]
         params = IVGMM.estimate_parameters(wx, wy, wz, inv(wz.T @ wz / nobs))
-        if not _is_singular(self._weight.weight_matrix(wx, wz, wy - wx @ params)):
-            return
-        if isinstance(self._weight, OneWayClusteredWeightMatrix):
-            nclusters = len(unique(asarray(self._weight_config["clusters"])))
-            centered = self._weight_config["center"]
-            rank = nclusters - 1 if centered else nclusters
-            rank_reason = (
-                "one less than the number of clusters, since the cluster sums of "
-                "centered moment conditions add to zero"
-                if centered
-                else "the number of clusters"
-            )
-            msg = (
-                f"The clustered covariance of the {nmoment} moment conditions is "
-                f"singular because there are too few clusters ({nclusters} "
-                f"clusters). Its rank is at most {rank}, {rank_reason}. The "
-                "objective function of the continuously updating GMM estimator "
-                "uses the inverse of the covariance, so it is not defined. Use "
-                "more clusters than moment conditions, or a weight_type that does "
-                "not use clusters."
-            )
-        else:
-            msg = (
-                f"The covariance of the {nmoment} moment conditions is singular, "
-                f"which occurs if there are too few observations ({nobs}) for the "
-                "number of moment conditions. The objective function of the "
-                "continuously updating GMM estimator uses the inverse of the "
-                "covariance, so it is not defined. Use more observations or fewer "
-                "moment conditions."
-            )
-        raise ValueError(msg)
+        self._raise_if_singular(
+            self._weight.weight_matrix(wx, wz, wy - wx @ params),
+            "The objective function of the continuously updating GMM estimator "
+            "uses the inverse of the covariance, so it is not defined.",
+        )
 
     def fit(
         self,

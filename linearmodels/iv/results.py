@@ -1895,8 +1895,10 @@ class IVGMMResults(_CommonIVResults):
         )
         try:
             res_e = mod.fit(cov_type=self.cov_type, **self.cov_config)
-        except LinAlgError:
-            # The covariance of the moment conditions is exactly singular
+        except (LinAlgError, ValueError):
+            # The covariance of the moment conditions is singular: fit raises
+            # a ValueError, and NumPy raises a LinAlgError if it is exactly
+            # singular. LinAlgError is not a ValueError in NumPy 1.x
             return InvalidTestStatistic(reason, name="C-statistic")
         assert isinstance(res_e, IVGMMResults)
         if isinstance(res_e.j_stat, InvalidTestStatistic):

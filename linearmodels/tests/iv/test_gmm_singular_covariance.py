@@ -18,13 +18,15 @@ definitions, without any of the weight matrix classes.
 
 The objective function of IVGMMCUE is a function of the inverse of the
 covariance, and so it is not defined either. IVGMMCUE.fit has to raise a
-ValueError that says why, before it optimizes the function.
-
-Whether NumPy raises a LinAlgError when it inverts a covariance that is
-singular depends on rounding, and so on the platform. It does so if the matrix
-is exactly singular, and otherwise returns the inverse of the noise. The
-estimates are not changed by the statistics, and a model whose estimation fails
-has no results to test.
+ValueError that says why, before it optimizes the function. So does IVGMM.fit,
+since the estimates of two-step GMM are numerical noise when the weight matrix
+is the inverse of a singular covariance. Whether NumPy raises a LinAlgError when
+it inverts a covariance that is singular depends on rounding, and so on the
+platform: it does so if the matrix is exactly singular, and otherwise returns
+the inverse of the noise. Both fits raise the same ValueError on every platform,
+and a model that cannot be estimated has no statistics to test. The C statistic
+estimates another model, which has more moment conditions, and is invalid if
+that model cannot be estimated.
 """
 
 import numpy as np
@@ -34,7 +36,7 @@ import pandas as pd
 import pytest
 from scipy import stats
 
-from linearmodels.iv import IVGMM, IVGMMCUE
+from linearmodels.iv import IV2SLS, IVGMM, IVGMMCUE
 import linearmodels.iv.model
 from linearmodels.shared.hypotheses import InvalidTestStatistic, WaldTestStatistic
 
@@ -172,11 +174,7 @@ def nonsingular(nmoments, nclusters, center):
 
 
 def fit(data, nclusters, center, model=IVGMM, weights=None, **kwargs):
-    """
-    Model of the data with the clusters arange(nobs) % nclusters
-
-    Returns None if estimation fails because the covariance is exactly singular.
-    """
+    """Fit the model of the data with the clusters arange(nobs) % nclusters"""
     y, exog, endog, instr = data
     clusters = np.arange(y.shape[0]) % nclusters
     mod = model(
@@ -189,12 +187,22 @@ def fit(data, nclusters, center, model=IVGMM, weights=None, **kwargs):
         clusters=clusters,
         center=center,
     )
-    try:
-        return mod.fit(cov_type="clustered", clusters=clusters, **kwargs)
-    except LinAlgError:
-        # Only a singular covariance can be the reason
-        assert not nonsingular(exog.shape[1] + instr.shape[1], nclusters, center)
-        return None
+    return mod.fit(cov_type="clustered", clusters=clusters, **kwargs)
+
+
+def check_too_few_clusters(data, nclusters, center, **kwargs):
+    """The covariance of the moments of the model is singular and fit raises"""
+    nmoments = data[1].shape[1] + data[3].shape[1]
+    assert not nonsingular(nmoments, nclusters, center)
+    with pytest.raises(ValueError, match="too few clusters") as exc_info:
+        fit(data, nclusters, center, **kwargs)
+    # LinAlgError is a ValueError in recent versions of NumPy
+    assert exc_info.type is ValueError
+    message = str(exc_info.value)
+    assert f"({nclusters} clusters)" in message
+    assert f"{nmoments} moment conditions" in message
+    assert "singular" in message
+    assert "Use more clusters than moment conditions" in message
 
 
 def check_invalid(stat, name):
@@ -228,12 +236,12 @@ def test_c_stat_with_too_few_clusters_is_invalid(nclusters):
     # With 3 and 4 clusters the statistic was -3.7e15 and -7.4e16. The model has 4
     # moments and the model for the statistic has 5, and so the covariance of the
     # moments that it estimates is singular unless there are at least 5 clusters
-    res = fit(ONE_ENDOG, nclusters, center=False)
-    if res is None:
-        # With 3 clusters the covariance of the model's own 4 moments is singular
-        # too, and NumPy 1.x raised when the model was estimated
+    if nclusters == 3:
+        # The covariance of the model's own 4 moments is singular too, so that
+        # the model is not estimated
+        check_too_few_clusters(ONE_ENDOG, nclusters, center=False)
         return
-    check_invalid(res.c_stat(), "C-statistic")
+    check_invalid(fit(ONE_ENDOG, nclusters, center=False).c_stat(), "C-statistic")
 
 
 def test_c_stat_with_enough_clusters_is_unchanged():
@@ -261,10 +269,10 @@ C_STAT_MODELS = [
 @pytest.mark.parametrize("nclusters", [2, 3, 4, 5, 6, 8])
 @pytest.mark.parametrize(("data", "tested"), C_STAT_MODELS)
 def test_c_stat_few_clusters(data, tested, nclusters, center):
-    res = fit(data, nclusters, center)
-    if res is None:
+    if not nonsingular(data[1].shape[1] + data[3].shape[1], nclusters, center):
+        check_too_few_clusters(data, nclusters, center)
         return
-    c_stat = res.c_stat(tested)
+    c_stat = fit(data, nclusters, center).c_stat(tested)
     ntested = data[2].shape[1] if tested is None else len(tested)
     nmoments = data[1].shape[1] + data[3].shape[1] + ntested
     if not nonsingular(nmoments, nclusters, center):
@@ -320,14 +328,12 @@ def test_c_stat_when_inverting_the_covariance_raises(monkeypatch):
 @pytest.mark.parametrize("center", [False, True])
 @pytest.mark.parametrize("nclusters", [2, 3, 4, 5, 6, 8])
 def test_j_stat_few_clusters(nclusters, center):
-    res = fit(ONE_ENDOG, nclusters, center)
-    if res is None:
-        return
-    j_stat = res.j_stat
     if not nonsingular(4, nclusters, center):
-        # Between -3e15 and 2e15, or a plausible number in a few cases
-        check_invalid(j_stat, J_NAME)
+        # The statistic was between -3e15 and 2e15, or a plausible number in a
+        # few cases, and there was a LinAlgError in some
+        check_too_few_clusters(ONE_ENDOG, nclusters, center)
         return
+    j_stat = fit(ONE_ENDOG, nclusters, center).j_stat
     x, y, z, _, _ = arrays(ONE_ENDOG)
     cov = clustered_cov(np.arange(120) % nclusters, center)
     check_valid(j_stat, reference_j(x, y, z, cov), df=1)
@@ -339,10 +345,11 @@ def test_j_stat_few_clusters(nclusters, center):
 def test_j_and_centered_j_stat_are_checked_separately(nclusters, center):
     # The statistic that is not centered is valid with as many clusters as moments,
     # whereas the centered statistic always centers the moments
-    res = fit(ONE_ENDOG, nclusters, center)
-    if res is None:
+    if not nonsingular(4, nclusters, center):
+        check_too_few_clusters(ONE_ENDOG, nclusters, center)
         return
-    assert (type(res.j_stat) is WaldTestStatistic) == nonsingular(4, nclusters, center)
+    res = fit(ONE_ENDOG, nclusters, center)
+    assert type(res.j_stat) is WaldTestStatistic
     assert (type(res.centered_j_stat) is WaldTestStatistic) == (nclusters >= 5)
 
 
@@ -358,20 +365,20 @@ def test_j_stat_without_a_covariance_estimate_is_unchanged():
 
 @pytest.mark.parametrize("iter_limit", [2, 3, 100])
 def test_j_stat_iterated(iter_limit):
-    res = fit(ONE_ENDOG, 3, center=False, iter_limit=iter_limit)
-    if res is not None:
-        check_invalid(res.j_stat, J_NAME)
+    check_too_few_clusters(ONE_ENDOG, 3, center=False, iter_limit=iter_limit)
     res = fit(ONE_ENDOG, 20, center=False, iter_limit=iter_limit)
     assert type(res.j_stat) is WaldTestStatistic
     assert np.isfinite(res.j_stat.stat)
 
 
-@pytest.mark.filterwarnings("ignore:invalid value encountered in sqrt:RuntimeWarning")
 def test_summary_and_attributes_with_an_invalid_statistic():
-    res = fit(ONE_ENDOG, 3, center=False)
-    if res is None:
-        return
-    check_invalid(res.j_stat, J_NAME)
+    # The model can be estimated with 4 clusters, but not its C statistic or its
+    # centered J statistic
+    res = fit(ONE_ENDOG, 4, center=False)
+    check_invalid(res.c_stat(), "C-statistic")
+    check_invalid(
+        res.centered_j_stat, "Centered J-test of overidentifying restrictions"
+    )
     assert "Parameter Estimates" in str(res.summary)
     assert np.all(np.isfinite(res.params))
     assert res.weight_type == "clustered"
@@ -389,14 +396,13 @@ def test_small_samples_j_stat(weight_type, nobs):
     # nobs - 1, and so the covariance of the 4 moments is singular if nobs = 4
     data = small_sample(nobs)
     mod = IVGMM(*data, weight_type=weight_type, center=True)
-    try:
-        j_stat = mod.fit().j_stat
-    except LinAlgError:
-        assert nobs == 4
-        return
     if nobs == 4:
-        check_invalid(j_stat, J_NAME)
+        with pytest.raises(ValueError, match="too few observations") as exc_info:
+            mod.fit()
+        assert exc_info.type is ValueError
+        assert "4 moment conditions" in str(exc_info.value)
         return
+    j_stat = mod.fit().j_stat
     x, y, z, _, _ = arrays(data)
     bandwidth = nobs - 2 if weight_type == "kernel" else 0
     expected = reference_j(x, y, z, bartlett_cov(bandwidth, center=True))
@@ -429,16 +435,14 @@ def test_small_samples_c_stat(weight_type, nobs, center):
 def test_weights(nclusters):
     rng = np.random.default_rng(1234)
     weights = np.exp(0.5 * rng.standard_normal(120))
-    res = fit(ONE_ENDOG, nclusters, center=False, weights=weights)
-    if res is None:
+    if nclusters == 3:
+        check_too_few_clusters(ONE_ENDOG, nclusters, False, weights=weights)
         return
+    res = fit(ONE_ENDOG, nclusters, center=False, weights=weights)
     sw = np.sqrt(weights / weights.mean())
     x, y, z, z_e, original = arrays(ONE_ENDOG, sqrt_weights=sw)
     cov = clustered_cov(np.arange(120) % nclusters, center=False)
-    if nclusters >= 4:
-        check_valid(res.j_stat, reference_j(x, y, z, cov), df=1)
-    else:
-        check_invalid(res.j_stat, J_NAME)
+    check_valid(res.j_stat, reference_j(x, y, z, cov), df=1)
     if nclusters >= 5:
         check_valid(res.c_stat(), reference_c(x, y, z_e, original, cov), df=1)
     else:
@@ -574,3 +578,268 @@ def test_cue_too_few_observations(weight_type, nobs):
         mod.fit()
     assert exc_info.type is ValueError
     assert "4 moment conditions" in str(exc_info.value)
+
+
+# ----------------------------------------------------------------------------
+# IVGMM does not estimate a model with a singular covariance, and estimates the
+# other models as it did
+# ----------------------------------------------------------------------------
+
+IVGMM_CONSEQUENCE = (
+    "The weight matrix of the GMM estimator is the inverse of the covariance, so "
+    "it is not defined."
+)
+CUE_CONSEQUENCE = (
+    "The objective function of the continuously updating GMM estimator uses the "
+    "inverse of the covariance, so it is not defined."
+)
+
+
+def exactly_identified_data(nobs=120):
+    """2 exog, 1 endog and 1 instrument: 3 moments and 3 parameters"""
+    rng = np.random.default_rng(3)
+    z = pd.DataFrame(rng.standard_normal((nobs, 1)), columns=["z0"])
+    x = pd.DataFrame({"x": z.sum(axis=1) + rng.standard_normal(nobs)})
+    exog = pd.DataFrame({"const": 1.0, "w": rng.standard_normal(nobs)})
+    y = pd.Series(1 + 0.5 * x.x + rng.standard_normal(nobs), name="y")
+    return y, exog, x, z
+
+
+EXACTLY_IDENTIFIED = exactly_identified_data()
+
+
+@pytest.mark.parametrize("center", [False, True])
+@pytest.mark.parametrize("nclusters", [2, 3])
+def test_ivgmm_message_has_the_form_of_the_cue_message(nclusters, center):
+    # The same message, except for the sentence that says why the inverse is needed
+    with pytest.raises(ValueError, match="too few clusters") as ivgmm:
+        fit(ONE_ENDOG, nclusters, center)
+    with pytest.raises(ValueError, match="too few clusters") as cue:
+        fit(ONE_ENDOG, nclusters, center, model=IVGMMCUE)
+    message = str(ivgmm.value)
+    assert IVGMM_CONSEQUENCE in message
+    assert CUE_CONSEQUENCE in str(cue.value)
+    assert message.replace(IVGMM_CONSEQUENCE, CUE_CONSEQUENCE) == str(cue.value)
+    rank = nclusters - 1 if center else nclusters
+    assert f"Its rank is at most {rank}," in message
+
+
+def test_ivgmm_message_with_too_few_observations_has_the_form_of_the_cue_message():
+    data = small_sample(4)
+    with pytest.raises(ValueError, match="too few observations") as ivgmm:
+        IVGMM(*data, center=True).fit()
+    with pytest.raises(ValueError, match="too few observations") as cue:
+        IVGMMCUE(*data).fit()
+    message = str(ivgmm.value)
+    assert "(4) for the number of moment conditions" in message
+    assert message.replace(IVGMM_CONSEQUENCE, CUE_CONSEQUENCE) == str(cue.value)
+
+
+@pytest.mark.parametrize("nclusters", [2, 3])
+def test_ivgmm_with_the_report_of_the_bug(nclusters):
+    # The estimate of the coefficient on x was 1.697 with 3 clusters when it is
+    # 0.5, the standard errors were NaN, and it was a LinAlgError on some
+    # platforms. There is nothing to estimate
+    check_too_few_clusters(ONE_ENDOG, nclusters, center=False)
+
+
+@pytest.mark.parametrize("nclusters", [2, 3])
+@pytest.mark.parametrize("center", [False, True])
+def test_ivgmm_exactly_identified_with_too_few_clusters(nclusters, center):
+    # The weight matrix does not matter for the estimates of an exactly identified
+    # model, but the noise in it did: the estimates were 10 away from the IV
+    # estimates with 3 clusters, and the standard errors were not numbers. The
+    # moment conditions at the first step estimates of an exactly identified
+    # model add to zero, so that 3 clusters are not enough for its 3 moment
+    # conditions even if they are not centered
+    with pytest.raises(ValueError, match="too few clusters") as exc_info:
+        fit(EXACTLY_IDENTIFIED, nclusters, center)
+    assert exc_info.type is ValueError
+    assert "3 moment conditions" in str(exc_info.value)
+    assert f"({nclusters} clusters)" in str(exc_info.value)
+
+
+@pytest.mark.parametrize("nclusters", [4, 5, 12])
+@pytest.mark.parametrize("center", [False, True])
+def test_ivgmm_exactly_identified_with_enough_clusters(nclusters, center):
+    res = fit(EXACTLY_IDENTIFIED, nclusters, center)
+    iv = IV2SLS(*EXACTLY_IDENTIFIED).fit()
+    assert_allclose(res.params, iv.params, rtol=1e-8)
+    assert np.all(np.isfinite(res.std_errors))
+
+
+# params, std_errors, J, centered J and C statistics of valid models, which are
+# the same as before the models with a singular covariance were not estimated.
+# nan is an invalid statistic: 4 clusters are not enough for the centered
+# covariance of the 4 moments, or for the 5 moments of the C statistic
+REFERENCE = {
+    "one_endog_4_uncentered": (
+        ONE_ENDOG,
+        4,
+        False,
+        {},
+        None,
+        [1.1060294133733184, -0.09579152673627506, 0.5112972864437724],
+        [0.12262127936353251, 0.05938494098579946, 0.014495052398286558],
+        0.7641884453729715,
+        np.nan,
+        np.nan,
+    ),
+    "one_endog_5_uncentered": (
+        ONE_ENDOG,
+        5,
+        False,
+        {},
+        None,
+        [1.1686397759103972, 0.02314636167513907, 0.4759766716861976],
+        [0.02478733188229867, 0.10956469961382122, 0.043802173882083066],
+        0.2854469335292345,
+        0.2766732068378109,
+        0.8759754606839069,
+    ),
+    "one_endog_5_centered": (
+        ONE_ENDOG,
+        5,
+        True,
+        {},
+        None,
+        [1.170136490148785, 0.022642982069993402, 0.47318217390609696],
+        [0.02477994933455665, 0.10910357791629804, 0.04336862649295782],
+        0.30272957956427843,
+        0.31356562792598913,
+        np.nan,
+    ),
+    "one_endog_12_centered": (
+        ONE_ENDOG,
+        12,
+        True,
+        {},
+        None,
+        [1.1416369745714467, -0.030890652538546615, 0.5142191592177071],
+        [0.08948919724364655, 0.0900933799632663, 0.03672622060720279],
+        0.5092695078373961,
+        0.511039165481266,
+        0.3666652130379392,
+    ),
+    "one_endog_12_iterated": (
+        ONE_ENDOG,
+        12,
+        False,
+        {"iter_limit": 5},
+        None,
+        [1.138693223505445, -0.03130105409944977, 0.514937395372159],
+        [0.08941806134708769, 0.09013853082731596, 0.036698020920592794],
+        0.48939723718769423,
+        0.5102753816307153,
+        0.3276841075791217,
+    ),
+    "two_endog_6_uncentered": (
+        TWO_ENDOG,
+        6,
+        False,
+        {},
+        ["x1"],
+        [0.9880803474466319, 0.4146283703294095, -0.3076604194012811],
+        [0.024254582559327085, 0.07723707544855464, 0.018531865035777875],
+        0.7736276096934414,
+        1.0570377720126551,
+        0.12392028655991782,
+    ),
+    "two_endog_12_centered": (
+        TWO_ENDOG,
+        12,
+        True,
+        {},
+        None,
+        [1.017400423332445, 0.3946521531745319, -0.32124858101494413],
+        [0.05108132199782605, 0.06125247442528457, 0.03134643143047266],
+        0.4445148871191505,
+        0.4406830165857778,
+        5.354334781473466,
+    ),
+}
+
+
+def check_stat(stat, expected, name, df):
+    if np.isnan(expected):
+        check_invalid(stat, name)
+    else:
+        check_valid(stat, expected, df)
+
+
+@pytest.mark.parametrize("name", REFERENCE)
+def test_ivgmm_with_a_nonsingular_covariance_is_unchanged(name):
+    data, nclusters, center, kwargs, tested, params, std_errors, j, cj, c = REFERENCE[
+        name
+    ]
+    res = fit(data, nclusters, center, **kwargs)
+    assert_allclose(res.params, params, rtol=1e-8)
+    assert_allclose(res.std_errors, std_errors, rtol=1e-8)
+    check_stat(res.j_stat, j, J_NAME, df=1)
+    check_stat(
+        res.centered_j_stat, cj, "Centered J-test of overidentifying restrictions", 1
+    )
+    ntested = data[2].shape[1] if tested is None else len(tested)
+    check_stat(res.c_stat(tested), c, "C-statistic", df=ntested)
+
+
+@pytest.mark.parametrize("name", REFERENCE)
+def test_ivgmm_with_a_nonsingular_covariance_is_the_definition(name):
+    data, nclusters, center, kwargs, _, params, _, j, _, _ = REFERENCE[name]
+    x, y, z, _, _ = arrays(data)
+    cov = clustered_cov(np.arange(y.shape[0]) % nclusters, center)
+    # Two steps unless iter_limit is given, which the definition does not do
+    if "iter_limit" not in kwargs:
+        assert_allclose(reference_params(x, y, z, cov), params, rtol=1e-8)
+        assert_allclose(reference_j(x, y, z, cov), j, rtol=1e-8)
+
+
+def reference_params(x, y, z, cov):
+    """Two-step GMM estimates, from the definition"""
+    first = gmm_params(x, y, z, np.linalg.inv(z.T @ z / y.shape[0]))
+    w = np.linalg.inv(cov(z * (y - x @ first)[:, None]))
+    return gmm_params(x, y, z, w)
+
+
+def test_ivgmm_one_step_does_not_use_the_covariance():
+    # The weight matrix is (Z'Z/n)^{-1}, so there is nothing to be singular
+    res = fit(ONE_ENDOG, 2, center=False, iter_limit=1)
+    x, y, z, _, _ = arrays(ONE_ENDOG)
+    expected = gmm_params(x, y, z, np.linalg.inv(z.T @ z / y.shape[0]))
+    assert_allclose(res.params, expected, rtol=1e-8)
+    assert res.iterations == 1
+
+
+@pytest.mark.parametrize("iter_limit", [2, 5])
+def test_ivgmm_with_an_initial_weight_still_tests_the_covariance(iter_limit):
+    initial_weight = np.eye(4)
+    check_too_few_clusters(
+        ONE_ENDOG, 3, False, initial_weight=initial_weight, iter_limit=iter_limit
+    )
+
+
+def test_ivgmm_is_not_estimated_if_the_covariance_is_singular_in_a_later_step(
+    monkeypatch,
+):
+    # The covariance is estimated at every step and not only at the first
+    calls = []
+    original = linearmodels.iv.model._is_singular
+
+    def second_call_is_singular(cov):
+        calls.append(1)
+        return len(calls) == 2 or original(cov)
+
+    monkeypatch.setattr(linearmodels.iv.model, "_is_singular", second_call_is_singular)
+    with pytest.raises(ValueError, match="too few clusters"):
+        fit(ONE_ENDOG, 12, center=False, iter_limit=5, tol=0.0)
+    assert len(calls) == 2
+
+
+def test_c_stat_is_invalid_if_the_model_of_the_statistic_cannot_be_estimated():
+    # It has 5 moment conditions and needs 5 clusters, whereas the model that was
+    # estimated has 4. The model of the statistic raises, as fit does, and the
+    # statistic does not
+    res = fit(ONE_ENDOG, 4, center=False)
+    c_stat = res.c_stat()
+    check_invalid(c_stat, "C-statistic")
+    assert "singular" in str(c_stat)
