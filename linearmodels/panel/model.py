@@ -1346,6 +1346,18 @@ class PanelOLS(_PanelModelBase):
 
     Model supports at most 2 effects.  These can be entity-time, entity-other,
     time-other or 2 other.
+
+    A variable in ``exog`` is absorbed if the effects explain all of it. The
+    algorithms that remove the effects are exact only up to rounding error, or up to
+    a relative error of about 1e-8 if they are iterative, so a variable is treated
+    as absorbed if less than 1e-5 of its norm is left after the effects are
+    removed, whatever its units. It is treated in the same way if it is collinear
+    with the variables before it once the effects are removed. An
+    ``AbsorbingEffectError`` is raised for such a variable. If ``drop_absorbed`` is
+    True, the variable is dropped and an ``AbsorbingEffectWarning`` is raised, and the
+    constant is never dropped. The norm includes the mean of the variable, so a
+    variable with a large mean and little other variation, less than 1e-5 of its norm,
+    is also treated as absorbed. Subtract its mean to avoid this.
     """
 
     def __init__(
@@ -2075,12 +2087,15 @@ class PanelOLS(_PanelModelBase):
                 drop_first = True
 
         if self.entity_effects or self.time_effects or self.other_effects:
+            # The regressors before the effects were removed set the scale of each
+            # column, so the check does not depend on the units of the variables
+            x_orig = np.sqrt(self.weights.values2d) * self.exog.values2d
             if not self._drop_absorbed:
-                check_absorbed(x, [str(var) for var in self.exog.vars])
+                check_absorbed(x, [str(var) for var in self.exog.vars], x_orig)
             else:
                 # TODO: Need to special case the constant here when determining which
                 #  to retain since we always want to retain the constant if present
-                retain = not_absorbed(x, self._constant, self._constant_index)
+                retain = not_absorbed(x, self._constant, self._constant_index, x_orig)
                 if not retain:
                     raise ValueError(
                         "All columns in exog have been fully absorbed by the included"
