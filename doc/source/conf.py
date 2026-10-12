@@ -7,6 +7,7 @@
 # https://www.sphinx-doc.org/en/master/usage/configuration.html#project-information
 
 
+import datetime
 import glob
 import hashlib
 import os
@@ -18,7 +19,9 @@ import linearmodels
 # -- Project information -----------------------------------------------------
 
 project = "linearmodels"
-copyright = "2021, Kevin Sheppard"
+# The first year is the one in LICENSE.md.  Sphinx corrects the last year when
+# SOURCE_DATE_EPOCH is set, so reproducible builds remain reproducible.
+copyright = f"2017-{datetime.date.today().year}, Kevin Sheppard"
 author = "Kevin Sheppard"
 
 # More warnings
