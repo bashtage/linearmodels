@@ -136,6 +136,33 @@ def _options_key(options: dict[str, Any]) -> tuple[Any, ...]:
     return tuple(key)
 
 
+def _check_method(method: str) -> str:
+    """
+    Check the method used to absorb the variables
+
+    Parameters
+    ----------
+    method : str
+        The method that was passed to fit
+
+    Returns
+    -------
+    str
+        The method in lower case
+
+    Raises
+    ------
+    ValueError
+        If method is not "auto", "hdfe" or "lsmr", whatever its case
+    """
+    if isinstance(method, str) and method.lower() in ("auto", "hdfe", "lsmr"):
+        return method.lower()
+    raise ValueError(
+        'method must be one of "auto", "hdfe" or "lsmr", whatever its case. '
+        f"Got {method!r}."
+    )
+
+
 def _absorb_args(
     method: str, use_cache: bool, absorb_options: dict[str, Any] | None
 ) -> tuple[Any, ...]:
@@ -1198,8 +1225,9 @@ class AbsorbingLS:
         debiased : bool
             Flag indicating whether to debiased the covariance estimator using
             a degree of freedom adjustment.
-        method : str
-            One of:
+        method : {"auto", "hdfe", "lsmr"}, optional
+            The algorithm that absorbs the variables. The name is not case
+            sensitive, and a ValueError is raised for any other value. One of:
 
             * "auto" - (Default). Use HDFE when applicable and fallback to LSMR.
             * "lsmr" - Force LSMR.
@@ -1276,6 +1304,7 @@ class AbsorbingLS:
         linearmodels.iv.covariance.KernelCovariance
         linearmodels.iv.covariance.ClusteredCovariance
         """
+        method = _check_method(method)
         if lsmr_options and absorb_options is None:
             # The options are options of LSMR, so they can not be passed to HDFE
             if method == "hdfe":
