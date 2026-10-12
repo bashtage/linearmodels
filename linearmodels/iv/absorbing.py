@@ -31,6 +31,7 @@ from numpy import (
     require,
     sqrt,
     squeeze,
+    unique,
     where,
     zeros,
 )
@@ -142,6 +143,31 @@ def _absorb_args(
     """The arguments of AbsorbingLS.fit that determine the absorbed variables"""
     options = {} if absorb_options is None else absorb_options
     return method, use_cache, _options_key(options)
+
+
+def _is_nested(
+    effect: linearmodels.typing.data.IntArray,
+    cluster: linearmodels.typing.data.AnyArray,
+) -> bool:
+    """
+    Test whether every category of an effect is in a single cluster
+
+    Parameters
+    ----------
+    effect : ndarray
+        Integer codes of the categories of the effect, with shape (nobs,)
+    cluster : ndarray
+        Cluster of each observation, with shape (nobs,)
+
+    Returns
+    -------
+    bool
+        True if each category of the effect has observations in one cluster only
+    """
+    _, effect_codes = unique(effect, return_inverse=True)
+    _, cluster_codes = unique(cluster, return_inverse=True)
+    pairs = unique(effect_codes * (cluster_codes.max() + 1) + cluster_codes)
+    return bool(pairs.shape[0] == effect_codes.max() + 1)
 
 
 def _check_absorb_options(options: dict[str, Any], use_hdfe: bool, method: str) -> None:
@@ -1195,9 +1221,10 @@ class AbsorbingLS:
             * "clustered" - One-way cluster dependent inference.
               Heteroskedasticity robust
 
-        debiased : bool
-            Flag indicating whether to debiased the covariance estimator using
-            a degree of freedom adjustment.
+        debiased : bool, optional
+            Flag indicating whether to adjust the covariance estimator for the
+            degrees of freedom that the model uses, which include the absorbed
+            terms. The default is False. See Notes.
         method : str
             One of:
 
@@ -1263,6 +1290,24 @@ class AbsorbingLS:
         constant. The options used to absorb the variables are part of
         what identifies them.
 
+        If ``debiased`` is True, the covariance estimator is adjusted for the
+        degrees of freedom that the model uses: the k regressors in ``exog`` that
+        are estimated and the d degrees of freedom of the absorbed terms. They are
+        the dummy variables of the effects, with one less if ``exog`` has a
+        constant and one less for each effect after the first, the absorbed
+        continuous variables and the interactions, which is ``df_absorbed``. The
+        unadjusted, robust and kernel covariances are multiplied by n / (n - k - d),
+        and the clustered covariance by g (n - 1) / ((g - 1) (n - k - d)) where g
+        is the number of clusters. The result is that of the regression of the
+        dependent variable on ``exog`` and the dummy variables of the effects, and
+        of ``PanelOLS(debiased=True)`` with the same effects. The exception is a
+        clustered covariance when there is a single categorical effect and each of
+        its categories is in one cluster of every cluster variable: its degrees of
+        freedom are not counted, since the effect is nested in the clusters, as in
+        ``PanelOLS`` and Stata. Unlike ``PanelOLS``, nothing is adjusted if
+        ``debiased`` is False. The t and F distributions of the results use
+        ``df_resid`` whatever the covariance estimator.
+
         The variables are absorbed when fit is called for the first time. A
         later call uses the same absorbed variables if ``method``,
         ``absorb_options`` and ``use_cache`` have the same values, so that
@@ -1314,6 +1359,10 @@ class AbsorbingLS:
         cov_config["kappa"] = 0.0
         cov_config_copy = dict(cov_config.items())
         cov_config_copy.pop("center", None)
+        if debiased:
+            cov_config_copy["extra_df"] = self._absorbed_df(
+                cov_estimator, cov_config.get("clusters")
+            )
         cov_estimator_inst = cov_estimator(
             exog_resid, dep_resid, exog_resid, params, **cov_config_copy
         )
@@ -1324,6 +1373,56 @@ class AbsorbingLS:
         results["df_model"] = self._num_params
 
         return AbsorbingLSResults(results, self)
+
+    def _absorbed_df(
+        self,
+        cov_estimator: type[
+            HomoskedasticCovariance
+            | HeteroskedasticCovariance
+            | KernelCovariance
+            | ClusteredCovariance
+        ],
+        clusters: linearmodels.typing.data.ArrayLike | None,
+    ) -> int:
+        """
+        Degrees of freedom of the absorbed terms that a debiased covariance counts
+
+        Parameters
+        ----------
+        cov_estimator : type
+            The class of the covariance estimator
+        clusters : array_like
+            The clusters that are passed to fit, if any
+
+        Returns
+        -------
+        int
+            The degrees of freedom of the absorbed terms: the dummy variables of the
+            effects, the absorbed continuous variables and the interactions, less the
+            overlap with a constant in exog. They are the same as df_absorbed, except
+            that a clustered covariance does not count the degrees of freedom of a
+            single categorical effect that is nested in all of the clusters, as
+            PanelOLS does.
+        """
+        assert isinstance(self._absorbed_exog, DataFrame)
+        absorbed = self._num_params - self._absorbed_exog.shape[1]
+        cat = self._absorb_inter.cat
+        if (
+            cov_estimator is not ClusteredCovariance
+            or clusters is None
+            or cat.shape[1] != 1
+        ):
+            return absorbed
+        cluster_array = asarray(clusters).squeeze()
+        if cluster_array.shape[0] != self._nobs:
+            return absorbed  # The covariance estimator raises an error
+        columns = [cluster_array] if cluster_array.ndim == 1 else list(cluster_array.T)
+        codes = asarray(cat.iloc[:, 0].cat.codes).astype(int64)
+        if not all(_is_nested(codes, column) for column in columns):
+            return absorbed
+        # The dummy variables of the effect, less one if the constant takes one
+        effect_df = unique(codes).shape[0] - int(self._has_constant_exog)
+        return absorbed - effect_df
 
     def resids(
         self, params: linearmodels.typing.data.Float64Array
