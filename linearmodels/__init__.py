@@ -40,6 +40,20 @@ Designed to work equally well with NumPy, Pandas or xarray data.
 
 Notes
 -----
+A model drops the observations that have a missing value in any of its inputs when
+it is created, and issues a ``MissingValueWarning`` if it drops any. The warning
+can be turned off in three ways:
+
+-  Set ``linearmodels.WARN_ON_MISSING = False``. It applies to every model that is
+   created afterwards.
+-  Set the environment variable ``LINEARMODELS_WARN_ON_MISSING`` before importing
+   linearmodels. The values ``""``, ``"0"``, ``"false"`` and ``"False"`` turn the
+   warning off. Any other value leaves it on.
+-  Use a warnings filter, for example
+   ``warnings.simplefilter("ignore", MissingValueWarning)``, where
+   ``MissingValueWarning`` is imported from ``linearmodels.shared.exceptions``. The
+   filter applies where it is set, for example inside ``warnings.catch_warnings()``.
+
 ``linearmodels.DROP_MISSING`` and the environment variable
 ``LINEARMODELS_DROP_MISSING`` have never had any effect, because observations with
 missing values are always dropped. They are deprecated and will be removed in
