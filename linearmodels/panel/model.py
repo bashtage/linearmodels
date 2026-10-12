@@ -162,7 +162,9 @@ def _hotelling_f(
     and compared with an F(df, T - df) distribution. This is Hotelling's
     T-squared test, which is exact when the estimates are independent and normal
     and the covariance is the covariance of their average. If not debiased the
-    statistic is W, and the distribution is chi2(df).
+    statistic is W, and the distribution is chi2(df). The covariance of df
+    parameters that are averages of T estimates has rank at most T - 1, so that
+    the statistic is invalid unless T is larger than df.
     """
     if f_info.is_invalid:
         assert f_info.invalid_test_stat is not None
@@ -171,7 +173,7 @@ def _hotelling_f(
     name = f_info.name
     df = int(sel.sum())
     null = "All parameters ex. constant are zero"
-    if debiased and nperiod <= df:
+    if nperiod <= df:
         reason = (
             f"The test needs more periods than tested parameters. The {df} tested "
             f"parameters are the averages of the estimates of {nperiod} periods, "
@@ -3206,14 +3208,15 @@ class FamaMacBeth(_PanelModelBase):
     distribution otherwise.
 
     The joint test that the k parameters other than the constant are zero,
-    ``f_statistic_robust`` of the results, is Hotelling's :math:`T^2` test
+    ``f_statistic_robust`` of the results, is the Hotelling T-squared test
     [2]_. The Wald statistic W of the k parameters is multiplied by
     (T - k) / (k (T - 1)) and compared with an F distribution with k and T - k
     degrees of freedom if ``debiased`` is True, and W is compared with a
     chi-squared distribution with k degrees of freedom otherwise. The F test is
     exact if the T estimates are independent draws from the same normal
     distribution and ``cov_type`` is not "kernel". With the kernel covariance
-    it is an approximation. With one tested parameter it is the squared
+    it is only an approximation, which can reject a true null hypothesis far
+    too often when T is small. With one tested parameter it is the squared
     t-statistic, with the p-value of the t distribution with T - 1 degrees of
     freedom. An F distribution with k and T - 1 degrees of freedom, or with
     the degrees of freedom of the pooled regression, rejects a true null
@@ -3354,7 +3357,7 @@ class FamaMacBeth(_PanelModelBase):
         do not depend on the distribution.
 
         The joint test of the parameters other than the constant,
-        ``f_statistic_robust`` of the results, is Hotelling's :math:`T^2` test.
+        ``f_statistic_robust`` of the results, is the Hotelling T-squared test.
         If ``debiased`` is True, the Wald statistic of the k tested parameters
         is multiplied by (T - k) / (k (T - 1)), and the p-value is computed from
         an F distribution with k and T - k degrees of freedom. If ``debiased``
