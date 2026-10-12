@@ -743,7 +743,9 @@ class AbsorbingLS:
 
     Notes
     -----
-    Capable of estimating models with millions of effects.
+    Capable of estimating models with millions of effects. The model is not a
+    panel estimator. See :ref:`iv-absorbing-ls` for when to use it and when to
+    use :class:`~linearmodels.panel.model.PanelOLS`.
 
     Estimates models of the form
 
@@ -767,9 +769,6 @@ class AbsorbingLS:
     z can contain factors that are perfectly linearly dependent. LSMR
     estimates a particular restricted set of parameters that captures the
     effect of non-redundant components in z.
-
-    The model is not a panel estimator. See :ref:`iv-absorbing-ls` for when to
-    use it and when to use :class:`~linearmodels.panel.model.PanelOLS`.
 
     Rows are paired by position. An input that carries labels (a pandas
     Series or DataFrame with an index other than the default 0, 1, ..., n-1,
