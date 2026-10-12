@@ -465,9 +465,7 @@ def no_cross_section_data(case):
     nperiod = 24
     if case == "single-entity":
         # One entity, so that every cross-section has a single observation
-        index = pd.MultiIndex.from_product(
-            [["000001"], pd.date_range("2010-01-31", periods=nperiod, freq="ME")]
-        )
+        index = pd.MultiIndex.from_product([["000001"], range(nperiod)])
         x = pd.DataFrame(rg.standard_normal((nperiod, 3)), index=index)
     elif case == "time-only-regressor":
         # A regressor that is the same for every entity in a period
