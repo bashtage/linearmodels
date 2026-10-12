@@ -19,7 +19,7 @@
     
   
       
-        <title>linearmodels.system.model - linearmodels v7.1 (+291)</title>
+        <title>linearmodels.system.model - linearmodels v7.1 (+294)</title>
       
     
 
@@ -91,7 +91,7 @@
 
 <header class="md-header md-header--shadow" data-md-component="header">
   <nav class="md-header__inner md-grid" aria-label="Header">
-    <a href="../../../index.html" title="linearmodels v7.1 (+291)" class="md-header__button md-logo" aria-label="linearmodels v7.1 (+291)" data-md-component="logo">
+    <a href="../../../index.html" title="linearmodels v7.1 (+294)" class="md-header__button md-logo" aria-label="linearmodels v7.1 (+294)" data-md-component="logo">
       <img src="../../../_static/bw-logo.svg" alt="logo">
     </a>
     <label class="md-header__button md-icon" for="__drawer">
@@ -102,7 +102,7 @@
       <div class="md-header__ellipsis">
         <div class="md-header__topic">
           <span class="md-ellipsis">
-            linearmodels v7.1 (+291)
+            linearmodels v7.1 (+294)
           </span>
         </div>
         <div class="md-header__topic" data-md-component="header-topic">
@@ -197,10 +197,10 @@
 
 <nav class="md-nav md-nav--primary" aria-label="Navigation" data-md-level="0">
   <label class="md-nav__title" for="__drawer">
-    <a href="../../../index.html" title="linearmodels v7.1 (+291)" class="md-nav__button md-logo" aria-label="linearmodels v7.1 (+291)" data-md-component="logo">
+    <a href="../../../index.html" title="linearmodels v7.1 (+294)" class="md-nav__button md-logo" aria-label="linearmodels v7.1 (+294)" data-md-component="logo">
       <img src="../../../_static/bw-logo.svg" alt="logo">
     </a>
-    linearmodels v7.1 (+291)
+    linearmodels v7.1 (+294)
   </label>
   
     <div class="md-nav__source">
@@ -1050,6 +1050,11 @@
                 <span class="s2">"linearmodels.typing.data.Float64Array"</span><span class="p">,</span>
                 <span class="n">w</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span>
             <span class="p">)</span>
+            <span class="k">if</span> <span class="n">np</span><span class="o">.</span><span class="n">any</span><span class="p">(</span><span class="n">w_arr</span> <span class="o">&lt;=</span> <span class="mi">0</span><span class="p">)</span> <span class="ow">or</span> <span class="ow">not</span> <span class="n">np</span><span class="o">.</span><span class="n">all</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">isfinite</span><span class="p">(</span><span class="n">w_arr</span><span class="p">)):</span>
+                <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
+                    <span class="sa">f</span><span class="s2">"weights in equation </span><span class="si">{</span><span class="n">label</span><span class="si">!r}</span><span class="s2"> must be strictly positive and "</span>
+                    <span class="s2">"finite."</span>
+                <span class="p">)</span>
             <span class="n">w_arr</span> <span class="o">=</span> <span class="n">w_arr</span> <span class="o">/</span> <span class="n">np</span><span class="o">.</span><span class="n">nanmean</span><span class="p">(</span><span class="n">w_arr</span><span class="p">)</span>
             <span class="n">w_sqrt</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="n">w_arr</span><span class="p">)</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">_w</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">w_arr</span><span class="p">)</span>
