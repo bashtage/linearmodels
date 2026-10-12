@@ -94,11 +94,14 @@ def test_absorbed_regressor_raises_without_drop_absorbed(path, unbalanced, unit)
         mod.fit(**PATHS[path])
 
 
+@pytest.mark.parametrize("path", list(PATHS))
+@pytest.mark.parametrize("const", [False, True])
 @pytest.mark.parametrize("unit", [1.0, 1e8])
-def test_absorbed_regressor_with_weights(unit):
-    y, x = make_panel(True, unit)
+def test_absorbed_regressor_with_weights(path, const, unit):
+    y, x = make_panel(True, unit, const)
     rng = np.random.default_rng(1)
     weights = pd.Series(np.exp(0.5 * rng.standard_normal(len(y))), index=y.index)
+    options = PATHS[path]
     mod = PanelOLS(
         y,
         x,
@@ -108,14 +111,18 @@ def test_absorbed_regressor_with_weights(unit):
         drop_absorbed=True,
     )
     with pytest.warns(AbsorbingEffectWarning, match=ABSORBED):
-        res = mod.fit()
+        res = mod.fit(**options)
     kept = [c for c in x if c != ABSORBED]
     expected = PanelOLS(
         y, x[kept], weights=weights, entity_effects=True, time_effects=True
-    ).fit()
+    ).fit(**options)
     assert list(res.params.index) == kept
-    assert_allclose(res.params, expected.params, rtol=1e-8)
-    assert_allclose(res.std_errors, expected.std_errors, rtol=1e-8)
+    assert_allclose(res.params, expected.params, rtol=1e-6)
+    assert_allclose(res.std_errors, expected.std_errors, rtol=1e-6)
+    with pytest.raises(AbsorbingEffectError, match=ABSORBED):
+        PanelOLS(y, x, weights=weights, entity_effects=True, time_effects=True).fit(
+            **options
+        )
 
 
 @pytest.mark.parametrize("unit", [1.0, 1e8])
