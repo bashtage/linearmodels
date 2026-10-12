@@ -37,6 +37,7 @@ from numpy import (
 )
 from numpy.linalg import lstsq
 from pandas import Categorical, CategoricalDtype, DataFrame, Series
+from pandas.api.types import is_numeric_dtype
 import scipy.sparse as sp
 from scipy.sparse.linalg import lsmr
 
@@ -58,9 +59,15 @@ from linearmodels.panel.utility import (
     not_absorbed,
     preconditioner,
 )
-from linearmodels.shared.alignment import check_alignment, is_default_index, row_labels
+from linearmodels.shared.alignment import (
+    check_alignment,
+    is_default_index,
+    reference_labels,
+    row_labels,
+)
 from linearmodels.shared.exceptions import missing_warning
 from linearmodels.shared.hypotheses import InvalidTestStatistic, WaldTestStatistic
+from linearmodels.shared.inputs import as_array_like
 from linearmodels.shared.utility import DataFrameWrapper, SeriesWrapper
 import linearmodels.typing.data
 
@@ -438,13 +445,14 @@ class Interaction:
 
     Parameters
     ----------
-    cat : {ndarray, Series, DataFrame, DataArray}
+    cat : array_like
         Variables to treat as categoricals. Best format is a Categorical
         Series or DataFrame containing Categorical Series. Other formats
         are converted to Categorical Series, column-by-column. cats has
         shape (nobs, ncat).
-    cont : {ndarray, Series, DataFrame, DataArray}
-        Variables to treat as continuous, (nobs, ncont).
+    cont : array_like
+        Variables to treat as continuous, (nobs, ncont). A ``TypeError`` is
+        raised if the values are complex or cannot be converted to float64.
 
     Notes
     -----
@@ -492,8 +500,9 @@ class Interaction:
         cont: linearmodels.typing.data.ArrayLike | None = None,
         nobs: int | None = None,
     ) -> None:
-        self._cat = cat
-        self._cont = cont
+        # Lists and tuples are arrays, which have the shape that is used below
+        self._cat = None if cat is None else as_array_like(cat, "cat")
+        self._cont = None if cont is None else as_array_like(cont, "cont")
         self._cat_data = self._iv_data
         self._cont_data = self._iv_data
         self._nobs = nobs
@@ -671,10 +680,27 @@ class Interaction:
         >>> interact.sparse.shape # Cart product of all cats, 5!, times ncont, 6
         (100000, 720)
         """
+        return Interaction._from_frame(frame, "frame")
+
+    @staticmethod
+    def _from_frame(frame: DataFrame, name: str) -> Interaction:
+        """from_frame, where name is used to refer to frame in error messages"""
+        if not isinstance(frame, DataFrame):
+            raise TypeError(f"{name} must be a DataFrame. Got {type(frame).__name__}.")
         cat_cols = [
             col for col in frame if isinstance(frame[col].dtype, CategoricalDtype)
         ]
         cont_cols = [col for col in frame if col not in cat_cols]
+        for col in cont_cols:
+            dtype = frame[col].dtype
+            if not is_numeric_dtype(dtype):
+                raise TypeError(
+                    f"The column {col!r} of {name} has dtype {dtype}. The columns "
+                    "that do not have a categorical dtype are treated as continuous "
+                    "variables and must be numeric. Convert the columns that "
+                    f"contain categories to categorical, for example using "
+                    f"{name}[{col!r}].astype('category')."
+                )
         # TODO: Bug in pandas-stubs
         #   https://github.com/pandas-dev/pandas-stubs/issues/97
         frame_cats = frame[cat_cols]
@@ -793,21 +819,25 @@ class AbsorbingLS:
     ----------
     dependent : array_like
         Endogenous variables (nobs by 1)
-    exog : array_like
+    exog : array_like, optional
         Exogenous regressors  (nobs by nexog)
-    absorb: {DataFrame, Interaction}
+    absorb : DataFrame or Interaction, optional
         The effects or continuous variables to absorb. When using a DataFrame,
         effects must be categorical variables. Other variable types are treated
-        as continuous variables that should be absorbed. When using an
-        Interaction, variables in the `cat` argument are treated as effects
-        and variables in the `cont` argument are treated as continuous.
-    interactions : {DataFrame, Interaction, list[DataFrame, Interaction]}
+        as continuous variables that should be absorbed, so they must be
+        numeric, and a ``TypeError`` is raised for columns of strings, which
+        have to be converted to categorical. When using an Interaction,
+        variables in the `cat` argument are treated as effects and variables in
+        the `cont` argument are treated as continuous.
+    interactions : DataFrame, Interaction or list of DataFrame or Interaction, optional
         Interactions containing both categorical and continuous variables.  Each
         interaction is constructed using the Cartesian product of the categorical
         variables to produce the dummy, which are then separately interacted with
-        each continuous variable.
-    weights : array_like
-        Observation weights used in estimation
+        each continuous variable. The columns of a DataFrame follow the rules of
+        ``absorb``.
+    weights : array_like, optional
+        Observation weights used in estimation. All weights must be strictly
+        positive or missing.
     drop_absorbed : bool
         Flag indicating whether to drop absorbed variables
 
@@ -861,8 +891,10 @@ class AbsorbingLS:
     ``dependent``. Either reindex the input to the index of ``dependent``, or
     call ``to_numpy()`` to pair its values by position. NumPy arrays and
     pandas objects with a default index do not carry labels and are always
-    paired by position. The same rule applies to ``clusters`` passed to
-    ``fit``.
+    paired by position. If ``dependent`` does not carry labels, the inputs
+    that do must use the same index as the first of ``exog``, ``absorb``,
+    ``interactions`` and ``weights`` that does. The same rule applies to
+    ``clusters`` passed to ``fit``.
 
     See also
     --------
@@ -910,7 +942,7 @@ class AbsorbingLS:
         self._exog = IVData(exog, "exog", nobs=self._nobs)
         self._absorb = absorb
         if isinstance(absorb, DataFrame):
-            self._absorb_inter = Interaction.from_frame(absorb)
+            self._absorb_inter = Interaction._from_frame(absorb, "absorb")
         elif absorb is None:
             self._absorb_inter = Interaction(None, None, nobs)
         elif isinstance(absorb, Interaction):
@@ -990,7 +1022,9 @@ class AbsorbingLS:
             self._weight_data = IVData(ones(nobs), "weights")
         else:
             self._is_weighted = True
-            weights = IVData(self._weights).ndarray
+            weights = IVData(self._weights, var_name="weights").ndarray
+            if npany(weights <= 0):
+                raise ValueError("weights must be strictly positive.")
             weights = weights / nanmean(weights)
             self._weight_data = IVData(weights, var_name="weights", nobs=self._nobs)
 
@@ -1009,17 +1043,21 @@ class AbsorbingLS:
                 )
 
     def _check_alignment(self) -> None:
-        """Check that inputs with labels use the labels of dependent"""
-        expected = row_labels(self._dependent)
-        check_alignment(expected, {"exog": self._exog, "weights": self._weights})
+        """Check that inputs with labels use the labels of dependent, or the first"""
+        inputs: list[tuple[str, object]] = [("exog", self._exog)]
         interactions: list[tuple[str, Interaction]] = [("absorb", self._absorb_inter)]
         single = isinstance(self._interactions, (DataFrame, Interaction))
         for i, interact in enumerate(self._interaction_list):
             name = "interactions" if single else f"interactions[{i}]"
             interactions.append((name, interact))
         for name, interact in interactions:
-            check_alignment(expected, {name: interact.cat})
-            check_alignment(expected, {name: interact.cont})
+            inputs.extend([(name, interact.cat), (name, interact.cont)])
+        inputs.append(("weights", self._weights))
+        # If dependent has no labels, the first input with labels sets the labels
+        self._labels, self._labels_name = reference_labels(
+            row_labels(self._dependent), inputs
+        )
+        check_alignment(self._labels, inputs, reference=self._labels_name)
 
     @property
     def absorbed_dependent(self) -> DataFrame:
@@ -1085,13 +1123,17 @@ class AbsorbingLS:
         if self._interactions is None:
             return
         elif isinstance(self._interactions, DataFrame):
-            self._interaction_list = [Interaction.from_frame(self._interactions)]
+            self._interaction_list = [
+                Interaction._from_frame(self._interactions, "interactions")
+            ]
         elif isinstance(self._interactions, Interaction):
             self._interaction_list = [self._interactions]
         else:
             for interact in self._interactions:
                 if isinstance(interact, DataFrame):
-                    self._interaction_list.append(Interaction.from_frame(interact))
+                    self._interaction_list.append(
+                        Interaction._from_frame(interact, "interactions")
+                    )
                 elif isinstance(interact, Interaction):
                     self._interaction_list.append(interact)
                 else:
@@ -1412,8 +1454,12 @@ class AbsorbingLS:
                 stacklevel=2,
             )
             absorb_options = dict(lsmr_options.items())
+        # Clusters are for the observations that are used to estimate the model
+        labels = None if self._labels is None else self._labels[~self._drop_locs]
         check_alignment(
-            row_labels(self._dependent), {"clusters": cov_config.get("clusters")}
+            labels,
+            {"clusters": cov_config.get("clusters")},
+            reference=self._labels_name,
         )
         if self._absorbed_dependent is None:
             self._first_time_fit(use_cache, absorb_options, method)

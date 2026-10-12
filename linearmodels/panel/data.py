@@ -20,6 +20,7 @@ from pandas import (
 )
 from pandas.api.types import is_datetime64_any_dtype, is_numeric_dtype, is_string_dtype
 
+from linearmodels.shared.inputs import as_float64, reject_complex
 from linearmodels.shared.utility import ensure_unique_column, panel_to_frame
 import linearmodels.typing.data
 
@@ -127,8 +128,10 @@ class PanelData:
 
     Parameters
     ----------
-    x : {ndarray, Series, DataFrame, DataArray}
-       Input data
+    x : DataFrame, Series, ndarray, DataArray or PanelData
+        Input data. A list or a tuple raises a ``TypeError``, since the layout
+        of the data would not be known. A ``TypeError`` is also raised if the
+        data are complex or cannot be converted to float64.
     var_name : str
         Variable name to use when naming variables in NumPy arrays or
         xarray DataArrays
@@ -188,6 +191,8 @@ class PanelData:
         if isinstance(x, PanelData):
             x = x.dataframe
         self._original = x
+        # Complex values would be converted to float64 without their imaginary part
+        reject_complex(x, var_name)
 
         if not isinstance(x, (Series, DataFrame, np.ndarray)):
             try:
@@ -235,7 +240,10 @@ class PanelData:
                 self._frame = DataFrame({var_name: x.T.stack(**options)})
         elif isinstance(x, np.ndarray):
             if x.ndim not in (2, 3):
-                raise ValueError("2 or 3-d array required for numpy input")
+                raise ValueError(
+                    "2 or 3-d array required for numpy input. The array has "
+                    f"{x.ndim} dimension(s)."
+                )
             if x.ndim == 2:
                 x = x[None, :, :]
 
@@ -246,17 +254,29 @@ class PanelData:
             entities = [entity_str.format(i) for i in range(n)]
             time = list(range(t))
             assert isinstance(x, np.ndarray)
-            x = x.astype(np.float64, copy=False)
+            if x.dtype != np.float64:
+                x = as_float64(x, var_name)
             panel = _Panel.from_array(
                 x, items=variables, major_axis=time, minor_axis=entities
             )
             self._fake_panel = panel
             self._frame = panel.to_frame()
         else:
-            raise TypeError("Only ndarrays, DataFrames or DataArrays are supported")
+            raise TypeError(
+                "Only ndarrays, DataFrames or DataArrays are supported. A DataFrame "
+                "or Series needs a MultiIndex with 2 levels (entity and time), or "
+                "time as the index and entities as the columns if it is a DataFrame. "
+                f"Got {type(x).__name__}."
+            )
         if convert_dummies:
             self._frame = expand_categoricals(self._frame, drop_first)
-            self._frame = self._frame.astype(np.float64)
+            try:
+                self._frame = self._frame.astype(np.float64)
+            except (TypeError, ValueError) as exc:
+                raise TypeError(
+                    f"{var_name} must contain numbers, strings or categories, but "
+                    f"it cannot be converted to float64: {exc}"
+                ) from exc
 
         time_index = Series(self.index.levels[1])
         if not (

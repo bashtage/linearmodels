@@ -26,6 +26,7 @@ from numpy import (
 from numpy.linalg import inv, pinv
 
 from linearmodels.shared.covariance import cov_cluster, cov_kernel
+from linearmodels.shared.inputs import as_ndarray
 from linearmodels.shared.linalg import has_constant
 import linearmodels.typing
 import linearmodels.typing.data
@@ -42,6 +43,73 @@ value in the regression variables are dropped when the model is created, so
 clusters must have one row for each of the remaining observations. When using a
 clustered covariance estimator, drop the observations with missing values from
 the data and from clusters before estimating the model."""
+
+CLUSTER_COLUMNS_ERR = """\
+clusters must be a 1-d array or a 2-d array with {0}, but its shape is {1}."""
+
+
+def check_cluster_columns(
+    clusters: linearmodels.typing.data.AnyArray, max_columns: int
+) -> None:
+    """
+    Check that clusters has the number of variables that an estimator supports.
+
+    Parameters
+    ----------
+    clusters : ndarray
+        Cluster membership, either a 1-d array or an array with a column for
+        each of the variables to cluster on.
+    max_columns : int
+        The number of clustering variables that the estimator supports, 1 or 2.
+
+    Raises
+    ------
+    ValueError
+        If clusters has more than 2 dimensions or does not have 1 to
+        max_columns columns.
+    """
+    if clusters.ndim == 1 or (
+        clusters.ndim == 2 and 1 <= clusters.shape[1] <= max_columns
+    ):
+        return
+    supported = (
+        "a single column (one-way clustering)"
+        if max_columns == 1
+        else "1 or 2 columns (one-way or two-way clustering)"
+    )
+    raise ValueError(CLUSTER_COLUMNS_ERR.format(supported, clusters.shape))
+
+
+def as_cluster_array(
+    clusters: linearmodels.typing.data.ArrayLike, max_columns: int
+) -> linearmodels.typing.data.AnyArray:
+    """
+    Convert clusters to an array and check the number of variables.
+
+    Parameters
+    ----------
+    clusters : array_like
+        Cluster membership, either a 1-d array or an array with a column for
+        each of the variables to cluster on.
+    max_columns : int
+        The number of clustering variables that the estimator supports, 1 or 2.
+
+    Returns
+    -------
+    ndarray
+        The cluster membership as an array.
+
+    Raises
+    ------
+    TypeError
+        If clusters is not array_like, or has a complex dtype.
+    ValueError
+        If clusters has more than 2 dimensions or does not have 1 to
+        max_columns columns.
+    """
+    clusters = as_ndarray(clusters, "clusters")
+    check_cluster_columns(clusters, max_columns)
+    return clusters
 
 
 def kernel_weight_bartlett(
@@ -593,9 +661,10 @@ class ClusteredCovariance(HomoskedasticCovariance):
         Estimated model parameters (nvar by 1)
     debiased : bool
         Flag indicating whether to use a small-sample adjustment
-    clusters : ndarray
+    clusters : array_like
         Cluster group assignment.  If not provided, uses clusters of 1.
-        Either nobs by ncluster where ncluster is 1 or 2.
+        Either nobs by ncluster where ncluster is 1 or 2. A ``ValueError`` is
+        raised for more columns.
     kappa : float
         Value of kappa in k-class estimator
     extra_df : int, optional
@@ -650,10 +719,12 @@ class ClusteredCovariance(HomoskedasticCovariance):
         nobs = x.shape[0]
         clusters = arange(nobs) if clusters is None else clusters
         clusters = cast(
-            "linearmodels.typing.data.AnyArray", asarray(clusters).squeeze()
+            "linearmodels.typing.data.AnyArray",
+            as_ndarray(clusters, "clusters").squeeze(),
         )
         if clusters.shape[0] != nobs:
             raise ValueError(CLUSTER_ERR.format(nobs, clusters.shape[0]))
+        check_cluster_columns(clusters, 2)
         self._clusters = clusters
         if clusters.ndim == 1:
             self._num_clusters = [len(unique(clusters))]

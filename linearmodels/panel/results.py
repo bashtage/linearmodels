@@ -515,8 +515,10 @@ class PanelResults(_SummaryStr):
 
         Parameters
         ----------
-        exog : array_like
-            Exogenous values to use in out-of-sample prediction (nobs by nexog)
+        exog : PanelData, DataFrame, Series, ndarray or DataArray, optional
+            Exogenous values to use in out-of-sample prediction (nobs by nexog).
+            The containers are those of ``exog`` in the model. A list or a tuple
+            raises a ``TypeError`` that names ``exog``.
         data : DataFrame
             DataFrame to use for out-of-sample predictions when model was
             constructed using a formula.
