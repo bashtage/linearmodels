@@ -1162,9 +1162,12 @@ class _SystemModelBase:
         cov_estimator = COV_EST[cov_type]
         gls_eps = np.reshape(gls_eps, (k, gls_eps.shape[0] // k)).T
         eps = np.reshape(eps, (k, eps.shape[0] // k)).T
+        # The covariance combines the weighted regressors with the residuals, so the
+        # residuals must be weighted as well
+        weps = eps * np.sqrt(np.hstack(self._w))
         cov_est = cov_estimator(
             self._wxhat,
-            eps,
+            weps,
             sigma,
             full_sigma,
             gls=True,

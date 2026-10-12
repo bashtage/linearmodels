@@ -11,6 +11,7 @@ from pandas.testing import assert_frame_equal, assert_series_equal
 import pytest
 from scipy.sparse.linalg import inv as spinv
 import scipy.stats
+import statsmodels.api as sm
 
 from linearmodels.iv.model import _OLS as OLS
 from linearmodels.shared.hypotheses import InvalidTestStatistic, WaldTestStatistic
@@ -804,6 +805,52 @@ def test_iterated_gls_cov_uses_final_sigma():
     sigma_inv = np.linalg.inv(np.asarray(res.sigma))
     expected = np.linalg.inv(x.T @ np.kron(sigma_inv, np.eye(nobs)) @ x)
     assert_allclose(res.cov, expected, rtol=1e-6)
+
+
+def test_weighted_gls_robust_covariance_against_wls():
+    # With one equation, GLS is WLS and the robust covariance is HC0
+    rng = np.random.default_rng(20261012)
+    nobs = 200
+    x = np.column_stack([np.ones(nobs), rng.standard_normal((nobs, 2))])
+    y = x @ np.array([1.0, 0.5, -0.3]) + rng.standard_normal(nobs) * (
+        1 + np.abs(x[:, 1])
+    )
+    w = rng.chisquare(5, nobs) / 5
+    ref = sm.WLS(y, x, weights=w / w.mean()).fit(cov_type="HC0")
+    eqns = {"a": {"dependent": y[:, None], "exog": x, "weights": w[:, None]}}
+    for method in ("ols", "gls"):
+        res = SUR(eqns).fit(method=method, cov_type="robust")
+        assert_allclose(res.params, ref.params)
+        assert_allclose(res.std_errors, ref.bse)
+
+
+def scale_by_sqrt_weights(eqns):
+    """The same equations without weights, with the data scaled by sqrt(weights)"""
+    scaled = {}
+    for key, eqn in eqns.items():
+        w = np.sqrt(eqn["weights"] / eqn["weights"].mean())
+        scaled[key] = {k: v * w for k, v in eqn.items() if k != "weights"}
+    return scaled
+
+
+@pytest.mark.parametrize("method", ["ols", "gls"])
+@pytest.mark.parametrize("cov_type", ["unadjusted", "robust", "kernel", "clustered"])
+def test_weighted_covariance_is_covariance_of_scaled_data(method, cov_type):
+    # Weighted estimation is estimation on the data scaled by the square root of the
+    # normalized weights, so the covariance must be the same for every estimator
+    eqns = generate_data(k=3, p=3, const=True, rho=0.8, included_weights=True)
+    nobs = eqns["equ.0"]["dependent"].shape[0]
+    kwargs = {}
+    if cov_type == "kernel":
+        kwargs["bandwidth"] = 3
+    elif cov_type == "clustered":
+        kwargs["clusters"] = np.random.default_rng(0).integers(0, 25, nobs)
+    res = SUR(eqns).fit(method=method, cov_type=cov_type, **kwargs)
+    scaled = SUR(scale_by_sqrt_weights(eqns)).fit(
+        method=method, cov_type=cov_type, **kwargs
+    )
+    assert_allclose(res.params, scaled.params)
+    assert_allclose(res.cov, scaled.cov)
 
 
 def direct_gls(eqns, scale):
