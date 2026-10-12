@@ -194,6 +194,11 @@ def test_errors():
         SUR(moddata)
 
 
+def test_unknown_equation_type_message():
+    with pytest.raises(TypeError, match=r"equations\[a\] was <class 'str'>"):
+        SUR({"a": "absde", "b": 12345})
+
+
 @pytest.mark.smoke
 def test_mv_reg_smoke(mvreg_data):
     dependent, exog = mvreg_data
