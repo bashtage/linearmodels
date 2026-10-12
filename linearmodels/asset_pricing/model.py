@@ -25,9 +25,10 @@ from linearmodels.asset_pricing.results import (
     LinearFactorModelResults,
 )
 from linearmodels.iv.data import IVData, IVDataLike
+from linearmodels.shared import hypotheses
 from linearmodels.shared.alignment import check_alignment, row_labels
 from linearmodels.shared.exceptions import missing_warning
-from linearmodels.shared.hypotheses import InvalidTestStatistic, WaldTestStatistic
+from linearmodels.shared.hypotheses import WaldTestStatistic
 from linearmodels.shared.linalg import has_constant
 from linearmodels.shared.typed_getters import get_float, get_string
 from linearmodels.shared.utility import AttrDict
@@ -114,7 +115,7 @@ def _j_statistic(
             "J-statistic cannot be computed. This occurs when the number of "
             "observations is small relative to the number of portfolios."
         )
-        return InvalidTestStatistic(reason, name=name)
+        return hypotheses.InvalidTestStatistic(reason, name=name)
     coefs = vecs.T @ (q.T @ alphas)
     stat = float(np.sum(coefs**2 / vals[:, None]))
     return WaldTestStatistic(stat, null, df, name=name)
