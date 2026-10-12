@@ -2437,10 +2437,20 @@ class BetweenOLS(_PanelModelBase):
 
         wx = root_w * x
         wy = root_w * y
-        params = _lstsq(wx, wy, rcond=None)[0]
+        params, _, rank, _ = _lstsq(wx, wy, rcond=None)
+        if self._check_rank and rank < x.shape[1]:
+            raise ValueError(
+                "The regressors are collinear in the means of the entities, which "
+                f"are the {y.shape[0]} observations of the regression, so that the "
+                "parameters are not identified. This happens if there are fewer "
+                "entities than regressors, or if a regressor is a combination of "
+                "the others only in the means, e.g., the dummy variables of the "
+                "periods and the constant in a balanced panel. If you wish to "
+                "proceed, you can set check_rank=False."
+            )
 
         df_resid = y.shape[0] - x.shape[1]
-        df_model = (x.shape[1],)
+        df_model = x.shape[1]
         nobs = y.shape[0]
         cov_config = self._setup_clusters(cov_config)
         extra_df = 0
