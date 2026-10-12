@@ -1,6 +1,22 @@
 # py:class ArrayLike
-py:class IVDataLike
 # py:class IntArray
 # py:class Float64Array
 
+# NumPy documents its sized scalar types as attributes, not as classes, so the
+# py:class cross-references to the dtypes in the array type aliases never resolve.
+# Add a line here if another dtype shows up in the type of a documented object.
+py:class numpy.float64
+py:class numpy.int64
+py:class numpy.int32
+py:class numpy.uint32
 
+# Private classes used in the annotations of public classes and methods
+py:class linearmodels.iv.model._IVModelBase
+py:class linearmodels.iv.model._IVGMMBase
+
+# Protocol of the arguments of AttrDict.update
+py:class linearmodels.shared.utility.SupportsKeysAndGetItem
+
+# changes/5.0.rst: the Python documentation lists functools.cached_property as a
+# function (decorator), so the :class: role used there does not find it.
+py:class functools.cached_property
