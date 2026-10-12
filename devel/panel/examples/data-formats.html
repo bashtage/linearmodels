@@ -23,7 +23,7 @@
     
   
       
-        <title>Data Formats for Panel Data Analysis - linearmodels v7.1 (+277)</title>
+        <title>Data Formats for Panel Data Analysis - linearmodels v7.1 (+291)</title>
       
     
 
@@ -101,7 +101,7 @@
 
 <header class="md-header md-header--shadow" data-md-component="header">
   <nav class="md-header__inner md-grid" aria-label="Header">
-    <a href="../../index.html" title="linearmodels v7.1 (+277)" class="md-header__button md-logo" aria-label="linearmodels v7.1 (+277)" data-md-component="logo">
+    <a href="../../index.html" title="linearmodels v7.1 (+291)" class="md-header__button md-logo" aria-label="linearmodels v7.1 (+291)" data-md-component="logo">
       <img src="../../_static/bw-logo.svg" alt="logo">
     </a>
     <label class="md-header__button md-icon" for="__drawer">
@@ -112,7 +112,7 @@
       <div class="md-header__ellipsis">
         <div class="md-header__topic">
           <span class="md-ellipsis">
-            linearmodels v7.1 (+277)
+            linearmodels v7.1 (+291)
           </span>
         </div>
         <div class="md-header__topic" data-md-component="header-topic">
@@ -207,10 +207,10 @@
 
 <nav class="md-nav md-nav--primary" aria-label="Navigation" data-md-level="0">
   <label class="md-nav__title" for="__drawer">
-    <a href="../../index.html" title="linearmodels v7.1 (+277)" class="md-nav__button md-logo" aria-label="linearmodels v7.1 (+277)" data-md-component="logo">
+    <a href="../../index.html" title="linearmodels v7.1 (+291)" class="md-nav__button md-logo" aria-label="linearmodels v7.1 (+291)" data-md-component="logo">
       <img src="../../_static/bw-logo.svg" alt="logo">
     </a>
-    linearmodels v7.1 (+277)
+    linearmodels v7.1 (+291)
   </label>
   
     <div class="md-nav__source">
@@ -410,6 +410,16 @@
     
     <span class="md-ellipsis">
       <span title="/panel/examples/data-formats.ipynb#conversion-of-categorical-and-strings-to-dummies (reference label)"><span>Conversion of Categorical and Strings to Dummies</span></span>
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#Aligning-inputs" class="md-nav__link">
+    
+    <span class="md-ellipsis">
+      <span title="/panel/examples/data-formats.ipynb#aligning-inputs (reference label)"><span>Aligning inputs</span></span>
     </span>
   </a>
   
@@ -871,6 +881,16 @@
   
 </li>
       
+        <li class="md-nav__item">
+  <a href="#Aligning-inputs" class="md-nav__link">
+    
+    <span class="md-ellipsis">
+      <span title="/panel/examples/data-formats.ipynb#aligning-inputs (reference label)"><span>Aligning inputs</span></span>
+    </span>
+  </a>
+  
+</li>
+      
     </ul>
   
 </nav>
@@ -891,7 +911,7 @@
 <p>There are two primary methods to express data:</p>
 <ul class="simple">
 <li><p>MultiIndex DataFrames where the outer index is the entity and the inner is the time index. This requires using pandas.</p></li>
-<li><p>3D structures were dimension 0 (outer) is variable, dimension 1 is time index and dimension 2 is the entity index. It is also possible to use a 2D data structure with dimensions (t, n) which is treated as a 3D data structure having dimensions (1, t, n). These 3D data structures can be pandas, NumPy or xarray.</p></li>
+<li><p>3D structures where dimension 0 (outer) is variable, dimension 1 is time index and dimension 2 is the entity index. It is also possible to use a 2D data structure with dimensions (t, n) which is treated as a 3D data structure having dimensions (1, t, n). These 3D data structures can be pandas, NumPy or xarray.</p></li>
 </ul>
 <h2 id="MultiIndex-DataFrames">MultiIndex DataFrames<a class="headerlink" href="#MultiIndex-DataFrames" title="Link to this heading">¶</a></h2>
 <p>The most precise data format to use is a MultiIndex <code class="docutils literal notranslate"><span class="pre">DataFrame</span></code>. This is the most precise since only single columns can preserve all types within a panel. For example, it is not possible to span a single Categorical variable across multiple columns when using a pandas <code class="docutils literal notranslate"><span class="pre">Panel</span></code>.</p>
@@ -964,7 +984,7 @@ fcode  year
 410563 1987  1.791759   0.00000
 </pre></div></div>
 </div>
-<p>The <code class="docutils literal notranslate"><span class="pre">MultiIndex</span></code> <code class="docutils literal notranslate"><span class="pre">DataFrame</span></code> can be used to initialized the model. When only referencing a single series, the <code class="docutils literal notranslate"><span class="pre">MultiIndex</span></code> <code class="docutils literal notranslate"><span class="pre">Series</span></code> representation can be used.</p>
+<p>The <code class="docutils literal notranslate"><span class="pre">MultiIndex</span></code> <code class="docutils literal notranslate"><span class="pre">DataFrame</span></code> can be used to initialize the model. When only referencing a single series, the <code class="docutils literal notranslate"><span class="pre">MultiIndex</span></code> <code class="docutils literal notranslate"><span class="pre">Series</span></code> representation can be used.</p>
 <div class="nbinput docutils container">
 <div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span><code>[3]:
 </code></pre></div>
@@ -987,7 +1007,7 @@ Dep. Variable:                 lscrap   R-squared:                        0.0528
 Estimator:                   PanelOLS   R-squared (Between):             -0.0379
 No. Observations:                 140   R-squared (Within):               0.0528
 Date:                Mon, Oct 12 2026   R-squared (Overall):             -0.0288
-Time:                        18:38:45   Log-likelihood                   -90.459
+Time:                        18:43:35   Log-likelihood                   -90.459
 Cov. Estimator:            Unadjusted
                                         F-statistic:                      5.0751
 Entities:                          48   P-value                           0.0267
@@ -1015,9 +1035,9 @@ Included effects: Entity
 </pre></div></div>
 </div>
 <h2 id="NumPy-arrays">NumPy arrays<a class="headerlink" href="#NumPy-arrays" title="Link to this heading">¶</a></h2>
-<p>3D NumPy arrays can be used to hand panel data where the three axes are <code class="docutils literal notranslate"><span class="pre">0</span></code>, items, <code class="docutils literal notranslate"><span class="pre">1</span></code>, time and <code class="docutils literal notranslate"><span class="pre">2</span></code>, entity. NumPy arrays are not usually the best format for data since the results all use generic variable names.</p>
+<p>3D NumPy arrays can be used to handle panel data where the three axes are <code class="docutils literal notranslate"><span class="pre">0</span></code>, items, <code class="docutils literal notranslate"><span class="pre">1</span></code>, time and <code class="docutils literal notranslate"><span class="pre">2</span></code>, entity. NumPy arrays are not usually the best format for data since the results all use generic variable names.</p>
 <p>Pandas dropped support for their Panel in 0.25.</p>
-<div class="nbinput docutils container">
+<div class="nbinput nblast docutils container">
 <div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span><code>[4]:
 </code></pre></div>
 </div>
@@ -1030,19 +1050,9 @@ Included effects: Entity
 <span class="n">ntime</span> <span class="o">=</span> <span class="n">mi_data</span><span class="o">.</span><span class="n">index</span><span class="o">.</span><span class="n">levels</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
 <span class="n">np_lscrap</span> <span class="o">=</span> <span class="n">np_lscrap</span><span class="o">.</span><span class="n">reshape</span><span class="p">((</span><span class="n">nentity</span><span class="p">,</span> <span class="n">ntime</span><span class="p">))</span><span class="o">.</span><span class="n">T</span>
 <span class="n">np_hrsemp</span> <span class="o">=</span> <span class="n">np_hrsemp</span><span class="o">.</span><span class="n">reshape</span><span class="p">((</span><span class="n">nentity</span><span class="p">,</span> <span class="n">ntime</span><span class="p">))</span><span class="o">.</span><span class="n">T</span>
-<span class="n">np_hrsemp</span><span class="o">.</span><span class="n">shape</span> <span class="o">=</span> <span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="n">ntime</span><span class="p">,</span> <span class="n">nentity</span><span class="p">)</span>
+<span class="n">np_hrsemp</span> <span class="o">=</span> <span class="n">np_hrsemp</span><span class="o">.</span><span class="n">reshape</span><span class="p">((</span><span class="mi">1</span><span class="p">,</span> <span class="n">ntime</span><span class="p">,</span> <span class="n">nentity</span><span class="p">))</span>
 </code></pre></div>
 </div>
-</div>
-<div class="nboutput nblast docutils container">
-<div class="prompt empty docutils container">
-</div>
-<div class="output_area stderr docutils container">
-<div class="highlight"><pre>
-/tmp/ipykernel_3803/408858665.py:10: DeprecationWarning: Setting the shape on a NumPy array has been deprecated in NumPy 2.5.
-As an alternative, you can create a new view using np.reshape (with copy=False if needed).
-  np_hrsemp.shape = (1, ntime, nentity)
-</pre></div></div>
 </div>
 <div class="nbinput docutils container">
 <div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span><code>[5]:
@@ -1066,7 +1076,7 @@ Dep. Variable:                    Dep   R-squared:                        0.0528
 Estimator:                   PanelOLS   R-squared (Between):             -0.0379
 No. Observations:                 140   R-squared (Within):               0.0528
 Date:                Mon, Oct 12 2026   R-squared (Overall):             -0.0288
-Time:                        18:38:45   Log-likelihood                   -90.459
+Time:                        18:43:35   Log-likelihood                   -90.459
 Cov. Estimator:            Unadjusted
                                         F-statistic:                      5.0751
 Entities:                          48   P-value                           0.0267
@@ -1104,8 +1114,8 @@ Inputs contain missing values. Dropping rows with missing observations.
 </pre></div></div>
 </div>
 <h2 id="xarray-DataArrays">xarray DataArrays<a class="headerlink" href="#xarray-DataArrays" title="Link to this heading">¶</a></h2>
-<p>xarray is a relatively new entrant into the set of packages used for data structures. The data structures provided by <code class="docutils literal notranslate"><span class="pre">xarray</span></code> are relevant in the context of panel models since pandas <code class="docutils literal notranslate"><span class="pre">Panel</span></code> is scheduled for removal in the futures, and so the only 3d data format that will remain viable is an <code class="docutils literal notranslate"><span class="pre">xarray</span></code> <code class="docutils literal notranslate"><span class="pre">DataArray</span></code>. <code class="docutils literal notranslate"><span class="pre">DataArray</span></code>s are similar to pandas <code class="docutils literal notranslate"><span class="pre">Panel</span></code> although <code class="docutils literal notranslate"><span class="pre">DataArrays</span></code> use some difference notation. In principle it is possible to express the same information in a
-<code class="docutils literal notranslate"><span class="pre">DataArray</span></code> as one can in a <code class="docutils literal notranslate"><span class="pre">Panel</span></code></p>
+<p>xarray is a relatively new entrant into the set of packages used for data structures. The data structures provided by <code class="docutils literal notranslate"><span class="pre">xarray</span></code> are relevant in the context of panel models since pandas <code class="docutils literal notranslate"><span class="pre">Panel</span></code> has been removed, and so the only 3d data format that remains viable is an <code class="docutils literal notranslate"><span class="pre">xarray</span></code> <code class="docutils literal notranslate"><span class="pre">DataArray</span></code>. <code class="docutils literal notranslate"><span class="pre">DataArray</span></code>s are similar to pandas <code class="docutils literal notranslate"><span class="pre">Panel</span></code> although <code class="docutils literal notranslate"><span class="pre">DataArrays</span></code> use some different notation. In principle it is possible to express the same information in a <code class="docutils literal notranslate"><span class="pre">DataArray</span></code> as one can in a
+<code class="docutils literal notranslate"><span class="pre">Panel</span></code></p>
 <div class="nbinput docutils container">
 <div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span><code>[6]:
 </code></pre></div>
@@ -1151,7 +1161,7 @@ Dep. Variable:                    Dep   R-squared:                        0.0528
 Estimator:                   PanelOLS   R-squared (Between):             -0.0379
 No. Observations:                 140   R-squared (Within):               0.0528
 Date:                Mon, Oct 12 2026   R-squared (Overall):             -0.0288
-Time:                        18:38:45   Log-likelihood                   -90.459
+Time:                        18:43:35   Log-likelihood                   -90.459
 Cov. Estimator:            Unadjusted
                                         F-statistic:                      5.0751
 Entities:                          48   P-value                           0.0267
@@ -1233,7 +1243,7 @@ Dep. Variable:                 lscrap   R-squared:                        0.1985
 Estimator:                   PanelOLS   R-squared (Between):             -0.1240
 No. Observations:                 140   R-squared (Within):               0.1985
 Date:                Mon, Oct 12 2026   R-squared (Overall):             -0.0934
-Time:                        18:38:45   Log-likelihood                   -78.765
+Time:                        18:43:35   Log-likelihood                   -78.765
 Cov. Estimator:            Unadjusted
                                         F-statistic:                      7.3496
 Entities:                          48   P-value                           0.0002
@@ -1300,7 +1310,7 @@ Dep. Variable:                 lscrap   R-squared:                        0.1985
 Estimator:                   PanelOLS   R-squared (Between):             -0.1240
 No. Observations:                 140   R-squared (Within):               0.1985
 Date:                Mon, Oct 12 2026   R-squared (Overall):             -0.0934
-Time:                        18:38:45   Log-likelihood                   -78.765
+Time:                        18:43:35   Log-likelihood                   -78.765
 Cov. Estimator:            Unadjusted
                                         F-statistic:                      7.3496
 Entities:                          48   P-value                           0.0002
@@ -1327,6 +1337,34 @@ P-value: 0.0000
 Distribution: F(47,89)
 
 Included effects: Entity
+</pre></div></div>
+</div>
+<h2 id="Aligning-inputs">Aligning inputs<a class="headerlink" href="#Aligning-inputs" title="Link to this heading">¶</a></h2>
+<p>The rows of <code class="docutils literal notranslate"><span class="pre">dependent</span></code> and <code class="docutils literal notranslate"><span class="pre">exog</span></code> are paired by position. An input that has labels, such as a pandas <code class="docutils literal notranslate"><span class="pre">Series</span></code> or <code class="docutils literal notranslate"><span class="pre">DataFrame</span></code>, must therefore use the same labels, in the same order, as <code class="docutils literal notranslate"><span class="pre">dependent</span></code>, and a <code class="docutils literal notranslate"><span class="pre">ValueError</span></code> is raised if it does not, since the values would be attached to the wrong observations. NumPy arrays do not have labels and are always paired by position.</p>
+<p>Here the regressor is sorted by year and then firm, while the dependent variable is sorted by firm and then year. <code class="docutils literal notranslate"><span class="pre">reindex</span></code> puts the rows of the regressor in the order of the dependent variable.</p>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span><code>[11]:
+</code></pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><code><span class="n">hrsemp</span> <span class="o">=</span> <span class="n">mi_data</span><span class="o">.</span><span class="n">hrsemp</span><span class="o">.</span><span class="n">sort_index</span><span class="p">(</span><span class="n">level</span><span class="o">=</span><span class="s2">"year"</span><span class="p">)</span>
+<span class="k">try</span><span class="p">:</span>
+    <span class="n">PanelOLS</span><span class="p">(</span><span class="n">mi_data</span><span class="o">.</span><span class="n">lscrap</span><span class="p">,</span> <span class="n">hrsemp</span><span class="p">,</span> <span class="n">entity_effects</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+<span class="k">except</span> <span class="ne">ValueError</span> <span class="k">as</span> <span class="n">exc</span><span class="p">:</span>
+    <span class="nb">print</span><span class="p">(</span><span class="n">exc</span><span class="p">)</span>
+
+<span class="n">hrsemp</span> <span class="o">=</span> <span class="n">hrsemp</span><span class="o">.</span><span class="n">reindex</span><span class="p">(</span><span class="n">mi_data</span><span class="o">.</span><span class="n">index</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="n">PanelOLS</span><span class="p">(</span><span class="n">mi_data</span><span class="o">.</span><span class="n">lscrap</span><span class="p">,</span> <span class="n">hrsemp</span><span class="p">,</span> <span class="n">entity_effects</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span><span class="o">.</span><span class="n">fit</span><span class="p">()</span><span class="o">.</span><span class="n">params</span><span class="p">)</span>
+</code></pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+The row index of exog does not match dependent. Rows are paired by position, so an input with labels (pandas or xarray) must use the same labels in the same order as dependent. Either reindex exog to the index of dependent, or call .to_numpy() on it to pair the values by position.
+hrsemp   -0.005419
+Name: parameter, dtype: float64
 </pre></div></div>
 </div>
 

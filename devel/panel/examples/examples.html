@@ -23,7 +23,7 @@
     
   
       
-        <title>Examples - linearmodels v7.1 (+277)</title>
+        <title>Examples - linearmodels v7.1 (+291)</title>
       
     
 
@@ -101,7 +101,7 @@
 
 <header class="md-header md-header--shadow" data-md-component="header">
   <nav class="md-header__inner md-grid" aria-label="Header">
-    <a href="../../index.html" title="linearmodels v7.1 (+277)" class="md-header__button md-logo" aria-label="linearmodels v7.1 (+277)" data-md-component="logo">
+    <a href="../../index.html" title="linearmodels v7.1 (+291)" class="md-header__button md-logo" aria-label="linearmodels v7.1 (+291)" data-md-component="logo">
       <img src="../../_static/bw-logo.svg" alt="logo">
     </a>
     <label class="md-header__button md-icon" for="__drawer">
@@ -112,7 +112,7 @@
       <div class="md-header__ellipsis">
         <div class="md-header__topic">
           <span class="md-ellipsis">
-            linearmodels v7.1 (+277)
+            linearmodels v7.1 (+291)
           </span>
         </div>
         <div class="md-header__topic" data-md-component="header-topic">
@@ -207,10 +207,10 @@
 
 <nav class="md-nav md-nav--primary" aria-label="Navigation" data-md-level="0">
   <label class="md-nav__title" for="__drawer">
-    <a href="../../index.html" title="linearmodels v7.1 (+277)" class="md-nav__button md-logo" aria-label="linearmodels v7.1 (+277)" data-md-component="logo">
+    <a href="../../index.html" title="linearmodels v7.1 (+291)" class="md-nav__button md-logo" aria-label="linearmodels v7.1 (+291)" data-md-component="logo">
       <img src="../../_static/bw-logo.svg" alt="logo">
     </a>
-    linearmodels v7.1 (+277)
+    linearmodels v7.1 (+291)
   </label>
   
     <div class="md-nav__source">
@@ -576,6 +576,42 @@
       <span title="/panel/examples/examples.ipynb#comparing-models (reference label)"><span>Comparing models</span></span>
     </span>
   </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#Specification-tests" class="md-nav__link">
+    
+    <span class="md-ellipsis">
+      <span title="/panel/examples/examples.ipynb#specification-tests (reference label)"><span>Specification tests</span></span>
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Specification tests">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#Hausman-test" class="md-nav__link">
+    
+    <span class="md-ellipsis">
+      <span title="/panel/examples/examples.ipynb#hausman-test (reference label)"><span>Hausman test</span></span>
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#Pesaran-CD-test" class="md-nav__link">
+    
+    <span class="md-ellipsis">
+      <span title="/panel/examples/examples.ipynb#pesaran-cd-test (reference label)"><span>Pesaran CD test</span></span>
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
   
 </li>
       
@@ -1198,6 +1234,42 @@
 </li>
       
         <li class="md-nav__item">
+  <a href="#Specification-tests" class="md-nav__link">
+    
+    <span class="md-ellipsis">
+      <span title="/panel/examples/examples.ipynb#specification-tests (reference label)"><span>Specification tests</span></span>
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Specification tests">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#Hausman-test" class="md-nav__link">
+    
+    <span class="md-ellipsis">
+      <span title="/panel/examples/examples.ipynb#hausman-test (reference label)"><span>Hausman test</span></span>
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#Pesaran-CD-test" class="md-nav__link">
+    
+    <span class="md-ellipsis">
+      <span title="/panel/examples/examples.ipynb#pesaran-cd-test (reference label)"><span>Pesaran CD test</span></span>
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
   <a href="#Covariance-options" class="md-nav__link">
     
     <span class="md-ellipsis">
@@ -1266,7 +1338,7 @@
 <ol class="upperalpha simple" start="6">
 <li><p>Vella and M. Verbeek (1998), “Whose Wages Do Unions Raise? A Dynamic Model of Unionism and Wage Rate Determination for Young Men,” <em>Journal of Applied Econometrics</em> 13, 163-183.</p></li>
 </ol>
-<p>The data set consists of wages and characteristics for men during the 1980s. The entity identifier is <code class="docutils literal notranslate"><span class="pre">nr</span></code> and the time identified is <code class="docutils literal notranslate"><span class="pre">year</span></code>. This data is used extensively in Chapter 14 of <em>Introduction to Econometrics</em> by Jeffrey Wooldridge.</p>
+<p>The data set consists of wages and characteristics for men during the 1980s. The entity identifier is <code class="docutils literal notranslate"><span class="pre">nr</span></code> and the time identifier is <code class="docutils literal notranslate"><span class="pre">year</span></code>. This data is used extensively in Chapter 14 of <em>Introduction to Econometrics</em> by Jeffrey Wooldridge.</p>
 <p>Here a <code class="docutils literal notranslate"><span class="pre">MultiIndex</span></code> <code class="docutils literal notranslate"><span class="pre">DataFrame</span></code> is used to hold the data in a format that can be understood as a panel. Before setting the index, a year <code class="docutils literal notranslate"><span class="pre">Categorical</span></code> is created which facilitated making dummies.</p>
 <div class="nbinput docutils container">
 <div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span><code>[1]:
@@ -1326,7 +1398,7 @@ nr year
 </pre></div></div>
 </div>
 <h2 id="Basic-regression-on-panel-data">Basic regression on panel data<a class="headerlink" href="#Basic-regression-on-panel-data" title="Link to this heading">¶</a></h2>
-<p><code class="docutils literal notranslate"><span class="pre">PooledOLS</span></code> is just plain OLS that understands that various panel data structures. It is useful as a base model. Here the log wage is modeled using all of the variables and time dummies.</p>
+<p><code class="docutils literal notranslate"><span class="pre">PooledOLS</span></code> is just plain OLS that understands the various panel data structures. It is useful as a base model. Here the log wage is modeled using all of the variables and time dummies.</p>
 <div class="nbinput docutils container">
 <div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span><code>[2]:
 </code></pre></div>
@@ -1354,7 +1426,7 @@ Dep. Variable:                  lwage   R-squared:                        0.1893
 Estimator:                  PooledOLS   R-squared (Between):              0.2066
 No. Observations:                4360   R-squared (Within):               0.1692
 Date:                Mon, Oct 12 2026   R-squared (Overall):              0.1893
-Time:                        18:38:51   Log-likelihood                   -2982.0
+Time:                        18:43:40   Log-likelihood                   -2982.0
 Cov. Estimator:            Unadjusted
                                         F-statistic:                      72.459
 Entities:                         545   P-value                           0.0000
@@ -1395,7 +1467,7 @@ year.1987      0.1738     0.0494     3.5165     0.0004      0.0769      0.2707
 \[y_{it} = x_{it}\beta + \alpha_{i} + \epsilon_{it}\]</div>
 <p>where <span class="math notranslate nohighlight">\(\alpha_i\)</span> affects all values of entity i. When the <span class="math notranslate nohighlight">\(\alpha_i\)</span> are uncorrelated with the regressors in <span class="math notranslate nohighlight">\(x_{it}\)</span>, a random effects model can be used to efficiently estimate parameters of this model.</p>
 <h3 id="Random-effects">Random effects<a class="headerlink" href="#Random-effects" title="Link to this heading">¶</a></h3>
-<p>The random effects model is virtually identical to the pooled OLS model except that is accounts for the structure of the model and so is more efficient. Random effects uses a quasi-demeaning strategy which subtracts the time average of the within entity values to account for the common shock.</p>
+<p>The random effects model is virtually identical to the pooled OLS model except that it accounts for the structure of the model and so is more efficient. Random effects uses a quasi-demeaning strategy which subtracts the time average of the within entity values to account for the common shock.</p>
 <div class="nbinput docutils container">
 <div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span><code>[3]:
 </code></pre></div>
@@ -1419,7 +1491,7 @@ Dep. Variable:                  lwage   R-squared:                        0.1806
 Estimator:              RandomEffects   R-squared (Between):              0.1853
 No. Observations:                4360   R-squared (Within):               0.1799
 Date:                Mon, Oct 12 2026   R-squared (Overall):              0.1828
-Time:                        18:38:51   Log-likelihood                   -1622.5
+Time:                        18:43:40   Log-likelihood                   -1622.5
 Cov. Estimator:            Unadjusted
                                         F-statistic:                      68.409
 Entities:                         545   P-value                           0.0000
@@ -1475,7 +1547,7 @@ Percent due to Effects    0.464438
 Name: Variance Decomposition, dtype: float64
 </pre></div></div>
 </div>
-<p>The coefficient <span class="math notranslate nohighlight">\(\theta_i\)</span> determines how much demeaning takes place. When this value is 1, the RE model reduces to the pooled model since this occurs when there is no variance in the effects. When panels are unbalanced it will vary across entities, but in this balanced panel all values are the same.</p>
+<p>The coefficient <span class="math notranslate nohighlight">\(\theta_i\)</span> determines how much demeaning takes place. When this value is 0, the RE model reduces to the pooled model since this occurs when there is no variance in the effects, and when it is 1, the RE model reduces to the fixed effects (within) estimator. When panels are unbalanced it will vary across entities, but in this balanced panel all values are the same.</p>
 <div class="nbinput docutils container">
 <div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span><code>[5]:
 </code></pre></div>
@@ -1540,7 +1612,7 @@ Name: Variance Decomposition, dtype: float64
 </div></div>
 </div>
 <h3 id="The-between-estimator">The between estimator<a class="headerlink" href="#The-between-estimator" title="Link to this heading">¶</a></h3>
-<p>The between estimator is an alternative, usually less efficient estimator, can can be used to estimate model parameters. It is particular simple since it first computes the time averages of <span class="math notranslate nohighlight">\(y\)</span> and <span class="math notranslate nohighlight">\(x\)</span> and then runs a simple regression using these averages.</p>
+<p>The between estimator is an alternative, usually less efficient, estimator that can be used to estimate model parameters. It is particularly simple since it first computes the time averages of <span class="math notranslate nohighlight">\(y\)</span> and <span class="math notranslate nohighlight">\(x\)</span> and then runs a simple regression using these averages.</p>
 <p>The year dummies are dropped since the averaging removes differences due to the year. <code class="docutils literal notranslate"><span class="pre">expersq</span></code> was also dropped since it is fairly co-linear with <code class="docutils literal notranslate"><span class="pre">exper</span></code>. These results are broadly similar to the previous models.</p>
 <div class="nbinput docutils container">
 <div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span><code>[6]:
@@ -1567,7 +1639,7 @@ Dep. Variable:                  lwage   R-squared:                        0.2155
 Estimator:                 BetweenOLS   R-squared (Between):              0.2155
 No. Observations:                 545   R-squared (Within):               0.1141
 Date:                Mon, Oct 12 2026   R-squared (Overall):              0.1686
-Time:                        18:38:51   Log-likelihood                   -194.54
+Time:                        18:43:40   Log-likelihood                   -194.54
 Cov. Estimator:            Unadjusted
                                         F-statistic:                      24.633
 Entities:                         545   P-value                           0.0000
@@ -1595,7 +1667,7 @@ union          0.2587     0.0460     5.6214     0.0000      0.1683      0.3491
 </pre></div></div>
 </div>
 <h4 id="Other-options">Other options<a class="headerlink" href="#Other-options" title="Link to this heading">¶</a></h4>
-<p>The <code class="docutils literal notranslate"><span class="pre">fit</span></code> method of <code class="docutils literal notranslate"><span class="pre">BetweenOLS</span></code> takes an optional input <code class="docutils literal notranslate"><span class="pre">reweight</span></code> which uses GLS-like weighting when panels are unbalanced. In this dataset the panel is balanced and so using this option would have no effect. By default this is <code class="docutils literal notranslate"><span class="pre">False</span></code> and so the averages are directly used in OLS even when there are difference numbers of observations across entities.</p>
+<p>The <code class="docutils literal notranslate"><span class="pre">fit</span></code> method of <code class="docutils literal notranslate"><span class="pre">BetweenOLS</span></code> takes an optional input <code class="docutils literal notranslate"><span class="pre">reweight</span></code> which uses GLS-like weighting when panels are unbalanced. In this dataset the panel is balanced and so using this option would have no effect. By default this is <code class="docutils literal notranslate"><span class="pre">False</span></code> and so the averages are directly used in OLS even when there are different numbers of observations across entities.</p>
 <h2 id="Handling-correlated-effects">Handling correlated effects<a class="headerlink" href="#Handling-correlated-effects" title="Link to this heading">¶</a></h2>
 <p>When effects are correlated with the regressors the RE and BE estimators are not consistent. The usual solution is to use Fixed Effects which are available in <code class="docutils literal notranslate"><span class="pre">PanelOLS</span></code>. Fixed effects are called <code class="docutils literal notranslate"><span class="pre">entity_effects</span></code> when applied to entities and <code class="docutils literal notranslate"><span class="pre">time_effects</span></code> when applied to the time dimension:</p>
 <h3 id="Including-fixed-effects">Including fixed effects<a class="headerlink" href="#Including-fixed-effects" title="Link to this heading">¶</a></h3>
@@ -1627,7 +1699,7 @@ Dep. Variable:                  lwage   R-squared:                        0.1806
 Estimator:                   PanelOLS   R-squared (Between):             -0.0052
 No. Observations:                4360   R-squared (Within):               0.1806
 Date:                Mon, Oct 12 2026   R-squared (Overall):              0.0807
-Time:                        18:38:51   Log-likelihood                   -1324.8
+Time:                        18:43:40   Log-likelihood                   -1324.8
 Cov. Estimator:            Unadjusted
                                         F-statistic:                      83.851
 Entities:                         545   P-value                           0.0000
@@ -1665,9 +1737,9 @@ Included effects: Entity
 </pre></div></div>
 </div>
 <h3 id="Time-Effects">Time Effects<a class="headerlink" href="#Time-Effects" title="Link to this heading">¶</a></h3>
-<p>Time effect can be added using <code class="docutils literal notranslate"><span class="pre">time_effects=True</span></code>. Here the time dummies are removed. Note that the core coefficients are identical. The only change is in the test statistic for poolability since not the “effects” include both entity and time, whereas before only entity were included.</p>
+<p>Time effect can be added using <code class="docutils literal notranslate"><span class="pre">time_effects=True</span></code>. Here the time dummies are removed. Note that the core coefficients are identical. The only change is in the test statistic for poolability since now the “effects” include both entity and time, whereas before only entity were included.</p>
 <h4 id="Effects-vs-Dummies">Effects vs Dummies<a class="headerlink" href="#Effects-vs-Dummies" title="Link to this heading">¶</a></h4>
-<p>For variable which can be consistently estimated, such as time effects in the usual large N, fixed T panel, it is not necessary to include these as effects. They can instead be implemented as dummy variables.</p>
+<p>For variables which can be consistently estimated, such as time effects in the usual large N, fixed T panel, it is not necessary to include these as effects. They can instead be implemented as dummy variables.</p>
 <div class="nbinput docutils container">
 <div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span><code>[8]:
 </code></pre></div>
@@ -1691,7 +1763,7 @@ Dep. Variable:                  lwage   R-squared:                        0.0216
 Estimator:                   PanelOLS   R-squared (Between):             -0.0052
 No. Observations:                4360   R-squared (Within):              -0.4809
 Date:                Mon, Oct 12 2026   R-squared (Overall):             -0.2253
-Time:                        18:38:52   Log-likelihood                   -1324.8
+Time:                        18:43:40   Log-likelihood                   -1324.8
 Cov. Estimator:            Unadjusted
                                         F-statistic:                      27.959
 Entities:                         545   P-value                           0.0000
@@ -1722,16 +1794,16 @@ Included effects: Entity, Time
 </pre></div></div>
 </div>
 <h4 id="Other-Options">Other Options<a class="headerlink" href="#Other-Options" title="Link to this heading">¶</a></h4>
-<p>Some additional options are available when using <code class="docutils literal notranslate"><span class="pre">PanelOLS</span></code> and effects. The <code class="docutils literal notranslate"><span class="pre">use_lsdv</span></code> can be used to force the model to be estimated using dummy variables. This is not necessary and will be slower in most circumstances. This options is primarily included for testing. <code class="docutils literal notranslate"><span class="pre">auto_df</span></code> instructs <code class="docutils literal notranslate"><span class="pre">PanelOLS</span></code> to determine the degree of freedom adjustment to make. Unlike most other estimators, the treatment of effects depends on the covariance estimator. For example, when using a classic covariance
+<p>Some additional options are available when using <code class="docutils literal notranslate"><span class="pre">PanelOLS</span></code> and effects. The <code class="docutils literal notranslate"><span class="pre">use_lsdv</span></code> can be used to force the model to be estimated using dummy variables. This is not necessary and will be slower in most circumstances. This option is primarily included for testing. <code class="docutils literal notranslate"><span class="pre">auto_df</span></code> instructs <code class="docutils literal notranslate"><span class="pre">PanelOLS</span></code> to determine the degree of freedom adjustment to make. Unlike most other estimators, the treatment of effects depends on the covariance estimator. For example, when using a classic covariance
 estimator, effects count as lost degrees of freedom. When using entity effects and clustering by entity, they do not. Setting <code class="docutils literal notranslate"><span class="pre">auto_df=False</span></code> will allow the entities to be counted or not, depending on the value of <code class="docutils literal notranslate"><span class="pre">count_effects</span></code>.</p>
 <h3 id="Other-Effects">Other Effects<a class="headerlink" href="#Other-Effects" title="Link to this heading">¶</a></h3>
-<p><code class="docutils literal notranslate"><span class="pre">PanelOLS</span></code> can be used to estimated models with up to 2-effects fixed effects. These can include any combination of</p>
+<p><code class="docutils literal notranslate"><span class="pre">PanelOLS</span></code> can be used to estimate models with up to 2-effects fixed effects. These can include any combination of</p>
 <ul class="simple">
 <li><p>Entity effects</p></li>
 <li><p>Time effects</p></li>
 <li><p>Other effects</p></li>
 </ul>
-<p>Other effects are specified using the <code class="docutils literal notranslate"><span class="pre">other_effects</span></code> input of <code class="docutils literal notranslate"><span class="pre">PanelOLS</span></code>. The input should have the same number of observations as the <code class="docutils literal notranslate"><span class="pre">engog</span></code> and can have 1 or two columns. Below we reproduce the model fitted with time effects only using <code class="docutils literal notranslate"><span class="pre">other_effects</span></code> to set the effect.</p>
+<p>Other effects are specified using the <code class="docutils literal notranslate"><span class="pre">other_effects</span></code> input of <code class="docutils literal notranslate"><span class="pre">PanelOLS</span></code>. The input should have the same number of observations as the <code class="docutils literal notranslate"><span class="pre">exog</span></code> and can have 1 or two columns. Below we reproduce the model fitted with entity and time effects using <code class="docutils literal notranslate"><span class="pre">other_effects</span></code> to set the time effect.</p>
 <div class="nbinput docutils container">
 <div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span><code>[9]:
 </code></pre></div>
@@ -1762,7 +1834,7 @@ Dep. Variable:                  lwage   R-squared:                        0.0216
 Estimator:                   PanelOLS   R-squared (Between):             -0.0052
 No. Observations:                4360   R-squared (Within):              -0.4809
 Date:                Mon, Oct 12 2026   R-squared (Overall):             -0.2253
-Time:                        18:38:52   Log-likelihood                   -1324.8
+Time:                        18:43:40   Log-likelihood                   -1324.8
 Cov. Estimator:            Unadjusted
                                         F-statistic:                      27.959
 Entities:                         545   P-value                           0.0000
@@ -1796,7 +1868,7 @@ Avg Obs: 545.00, Min Obs: 545.00, Max Obs: 545.00, Groups: 8
 </pre></div></div>
 </div>
 <h3 id="Using-first-differences">Using first differences<a class="headerlink" href="#Using-first-differences" title="Link to this heading">¶</a></h3>
-<p>First differencing is an alternative to using fixed effects when there might be correlation. When using first differences, time-invariant variables must be excluded. Additionally, only one linear time-trending variable can be included since this will look like a constant. This variable will soak up all time-trends in the data, and so interpretations of these variable can be challenging.</p>
+<p>First differencing is an alternative to using fixed effects when there might be correlation. When using first differences, time-invariant variables must be excluded. Additionally, only one linear time-trending variable can be included since this will look like a constant. This variable will soak up all time-trends in the data, and so interpretations of these variables can be challenging.</p>
 <div class="nbinput docutils container">
 <div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span><code>[10]:
 </code></pre></div>
@@ -1822,7 +1894,7 @@ Dep. Variable:                  lwage   R-squared:                        0.0268
 Estimator:         FirstDifferenceOLS   R-squared (Between):              0.5491
 No. Observations:                3815   R-squared (Within):               0.1763
 Date:                Mon, Oct 12 2026   R-squared (Overall):              0.5328
-Time:                        18:38:52   Log-likelihood                   -2305.5
+Time:                        18:43:40   Log-likelihood                   -2305.5
 Cov. Estimator:            Unadjusted
                                         F-statistic:                      26.208
 Entities:                         545   P-value                           0.0000
@@ -1913,11 +1985,105 @@ year.1987                                   0.1348       0.1738
 T-stats reported in parentheses
 </pre></div></div>
 </div>
+<h2 id="Specification-tests">Specification tests<a class="headerlink" href="#Specification-tests" title="Link to this heading">¶</a></h2>
+<p>The results of the panel models include two specification tests. The Hausman test examines whether the effects are correlated with the regressors, since random effects is only consistent if they are not. The Pesaran CD test examines whether the idiosyncratic shocks of different entities are correlated.</p>
+<h3 id="Hausman-test">Hausman test<a class="headerlink" href="#Hausman-test" title="Link to this heading">¶</a></h3>
+<p>The Hausman test compares the random effects estimates with those of a model that is consistent whether or not the effects are correlated with the regressors, usually a fixed effects model. If the effects are uncorrelated with the regressors, both estimators are consistent and random effects is more efficient. If they are correlated, only the fixed effects estimator is consistent. The test is a method of the random effects results, and its argument is the results of the other model. Both models
+must use the default unadjusted covariance estimator.</p>
+<p>The random effects model above includes the year dummies, and so it is compared with the fixed effects model that has entity and time effects, <code class="docutils literal notranslate"><span class="pre">fe_te_res</span></code>. The test compares the coefficients that are in both models, which are <code class="docutils literal notranslate"><span class="pre">expersq</span></code>, <code class="docutils literal notranslate"><span class="pre">married</span></code> and <code class="docutils literal notranslate"><span class="pre">union</span></code>. The time effects are not coefficients, and so only the entity effects are tested.</p>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span><code>[12]:
+</code></pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><code><span class="n">re_res</span><span class="o">.</span><span class="n">hausman</span><span class="p">(</span><span class="n">fe_te_res</span><span class="p">)</span>
+</code></pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span><code>[12]:
+</code></pre></div>
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+Hausman specification test
+H0: No systematic difference in coefficients between models
+Statistic: 27.3004
+P-value: 0.0000
+Distributed: chi2(3)
+
+Coefficients (b0: consistent under H0 and H1, b1: efficient under H0)
+               b0        b1     b0-b1  Std. Err.
+expersq -0.005185 -0.004729 -0.000456   0.000146
+married  0.046680  0.063814 -0.017134   0.007333
+union    0.080002  0.105867 -0.025865   0.007352
+</pre></div></div>
+</div>
+<p>The p-value is close to 0, and so the null is rejected. There is evidence that the effects are correlated with the regressors, so that the random effects estimates are not consistent and the fixed effects estimates should be used. The random effects coefficients on <code class="docutils literal notranslate"><span class="pre">married</span></code> and <code class="docutils literal notranslate"><span class="pre">union</span></code> are larger than the fixed effects ones, which is consistent with unobserved characteristics that raise wages being more common among married men and union members.</p>
+<p>The result is a <code class="docutils literal notranslate"><span class="pre">HausmanTestResults</span></code> named tuple. Its fields are <code class="docutils literal notranslate"><span class="pre">statistic</span></code>, the test statistic with its p-value, and <code class="docutils literal notranslate"><span class="pre">estimates</span></code>, the coefficients that were compared and the standard error of their difference, and so <code class="docutils literal notranslate"><span class="pre">statistic,</span> <span class="pre">estimates</span> <span class="pre">=</span> <span class="pre">re_res.hausman(fe_te_res)</span></code> also works.</p>
+<h3 id="Pesaran-CD-test">Pesaran CD test<a class="headerlink" href="#Pesaran-CD-test" title="Link to this heading">¶</a></h3>
+<p>The Pesaran CD test examines the null that the idiosyncratic shocks of different entities are uncorrelated. Its statistic is a scaled sum of the correlations over time of the shocks of each pair of entities, and it is asymptotically standard normal under the null. The test is the property <code class="docutils literal notranslate"><span class="pre">pesaran_cd</span></code> of the results, and it is computed from the idiosyncratic shocks, <code class="docutils literal notranslate"><span class="pre">idiosyncratic</span></code>.</p>
+<p>The test is applied here to fixed effects and random effects models with the same regressors and without year effects, which cannot be used with this test, as explained below.</p>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span><code>[13]:
+</code></pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><code><span class="n">exog_vars</span> <span class="o">=</span> <span class="p">[</span><span class="s2">"expersq"</span><span class="p">,</span> <span class="s2">"union"</span><span class="p">,</span> <span class="s2">"married"</span><span class="p">]</span>
+<span class="n">exog</span> <span class="o">=</span> <span class="n">sm</span><span class="o">.</span><span class="n">add_constant</span><span class="p">(</span><span class="n">data</span><span class="p">[</span><span class="n">exog_vars</span><span class="p">])</span>
+<span class="n">fe_cd_res</span> <span class="o">=</span> <span class="n">PanelOLS</span><span class="p">(</span><span class="n">data</span><span class="o">.</span><span class="n">lwage</span><span class="p">,</span> <span class="n">exog</span><span class="p">,</span> <span class="n">entity_effects</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span><span class="o">.</span><span class="n">fit</span><span class="p">()</span>
+<span class="n">re_cd_res</span> <span class="o">=</span> <span class="n">RandomEffects</span><span class="p">(</span><span class="n">data</span><span class="o">.</span><span class="n">lwage</span><span class="p">,</span> <span class="n">exog</span><span class="p">)</span><span class="o">.</span><span class="n">fit</span><span class="p">()</span>
+<span class="nb">print</span><span class="p">(</span><span class="s2">"Fixed effects"</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="n">fe_cd_res</span><span class="o">.</span><span class="n">pesaran_cd</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="s2">"</span><span class="se">\n</span><span class="s2">Random effects"</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="n">re_cd_res</span><span class="o">.</span><span class="n">pesaran_cd</span><span class="p">)</span>
+</code></pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+Fixed effects
+Pesaran CD test
+H0: Idiosyncratic shocks are cross-sectionally independent
+Statistic: 7.8113
+P-value: 0.0000
+Distributed: N(0,1)
+
+Random effects
+Pesaran CD test
+H0: Idiosyncratic shocks are cross-sectionally independent
+Statistic: 6.7654
+P-value: 0.0000
+Distributed: N(0,1)
+</pre></div></div>
+</div>
+<p>Both statistics are far in the tail of the standard normal distribution, and so independence is rejected: the wages of different men are correlated after the individual effects have been removed. Some of this dependence might be due to the common changes in wages over time, which these models do not include.</p>
+<p><code class="docutils literal notranslate"><span class="pre">pesaran_cd</span></code> returns an <code class="docutils literal notranslate"><span class="pre">InapplicableTestStatistic</span></code> instead of a test statistic for models with time effects, since time effects demean the residuals across the entities that are observed in the same periods, which makes the residuals negatively correlated across entities and biases the statistic downwards. Year dummies that are included as regressors have the same effect on the residuals, which is why they are left out above. The test is also not applicable to <code class="docutils literal notranslate"><span class="pre">BetweenOLS</span></code> and
+<code class="docutils literal notranslate"><span class="pre">FamaMacBeth</span></code>. Printing the result shows why.</p>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span><code>[14]:
+</code></pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><code><span class="nb">print</span><span class="p">(</span><span class="n">fe_te_res</span><span class="o">.</span><span class="n">pesaran_cd</span><span class="p">)</span>
+</code></pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+Irrelevant test statistic
+The Pesaran CD test is not applicable to models with time effects. These effects demean the residuals across entities that are observed in the same periods, which makes the residuals negatively correlated across entities and biases the statistic downwards, away from its null distribution (Juodis and Reese, 2022).
+Pesaran CD test
+</pre></div></div>
+</div>
 <h2 id="Covariance-options">Covariance options<a class="headerlink" href="#Covariance-options" title="Link to this heading">¶</a></h2>
 <h3 id="Heteroskedasticity-Robust-Covariance">Heteroskedasticity Robust Covariance<a class="headerlink" href="#Heteroskedasticity-Robust-Covariance" title="Link to this heading">¶</a></h3>
-<p>White”s robust covariance can be used by setting <code class="docutils literal notranslate"><span class="pre">cov_type=&quot;robust</span></code>. This estimator adds some robustness against certain types of specification issues but should not be used when using fixed effects (entity effects) since it is no longer robust. Instead a clustered covariance is required.</p>
+<p>White’s robust covariance can be used by setting <code class="docutils literal notranslate"><span class="pre">cov_type=&quot;robust&quot;</span></code>. This estimator adds some robustness against certain types of specification issues but should not be used when using fixed effects (entity effects) since it is no longer robust. Instead a clustered covariance is required.</p>
 <div class="nbinput nblast docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span><code>[12]:
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span><code>[15]:
 </code></pre></div>
 </div>
 <div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><code><span class="n">exog_vars</span> <span class="o">=</span> <span class="p">[</span><span class="s2">"black"</span><span class="p">,</span> <span class="s2">"hisp"</span><span class="p">,</span> <span class="s2">"exper"</span><span class="p">,</span> <span class="s2">"expersq"</span><span class="p">,</span> <span class="s2">"married"</span><span class="p">,</span> <span class="s2">"educ"</span><span class="p">,</span> <span class="s2">"union"</span><span class="p">]</span>
@@ -1928,9 +2094,9 @@ T-stats reported in parentheses
 </div>
 </div>
 <h3 id="Clustered-by-Entity">Clustered by Entity<a class="headerlink" href="#Clustered-by-Entity" title="Link to this heading">¶</a></h3>
-<p>The usual variable to cluster are are entity or entity and time. The can be implemented using <code class="docutils literal notranslate"><span class="pre">cov_type=&quot;clustered&quot;</span></code> and the additional keyword arguments <code class="docutils literal notranslate"><span class="pre">cluster_entity=True</span></code> and/or <code class="docutils literal notranslate"><span class="pre">cluster_time=True</span></code>.</p>
+<p>The usual variables to cluster on are entity or entity and time. These can be implemented using <code class="docutils literal notranslate"><span class="pre">cov_type=&quot;clustered&quot;</span></code> and the additional keyword arguments <code class="docutils literal notranslate"><span class="pre">cluster_entity=True</span></code> and/or <code class="docutils literal notranslate"><span class="pre">cluster_time=True</span></code>.</p>
 <div class="nbinput nblast docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span><code>[13]:
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span><code>[16]:
 </code></pre></div>
 </div>
 <div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><code><span class="n">clust_entity</span> <span class="o">=</span> <span class="n">mod</span><span class="o">.</span><span class="n">fit</span><span class="p">(</span><span class="n">cov_type</span><span class="o">=</span><span class="s2">"clustered"</span><span class="p">,</span> <span class="n">cluster_entity</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
@@ -1939,7 +2105,7 @@ T-stats reported in parentheses
 </div>
 <p>This next example clusters by both.</p>
 <div class="nbinput nblast docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span><code>[14]:
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span><code>[17]:
 </code></pre></div>
 </div>
 <div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><code><span class="n">clust_entity_time</span> <span class="o">=</span> <span class="n">mod</span><span class="o">.</span><span class="n">fit</span><span class="p">(</span>
@@ -1948,10 +2114,11 @@ T-stats reported in parentheses
 </code></pre></div>
 </div>
 </div>
-<p>An <code class="docutils literal notranslate"><span class="pre">OrderedDict</span></code> is used to hold the results for comparing models. This allows the models to be named as well as for the order of the models to be specified. A standard <code class="docutils literal notranslate"><span class="pre">dict</span></code> will produce effectively random order.</p>
-<p>Clustering on entity reduced the t-stats across the board. This suggests there is important correlation in the residuals per entity. Clustering by both also decreases the t-stats which suggests that there is cross-sectional dependence in the data. <em>Note</em>: clustering by entity addresses correlation across time and clustering by time controls for correlation between entities in a time period.</p>
+<p>An <code class="docutils literal notranslate"><span class="pre">OrderedDict</span></code> is used to hold the results for comparing models. This allows the models to be named as well as for the order of the models to be specified. A standard <code class="docutils literal notranslate"><span class="pre">dict</span></code> also preserves the order in which the models are added.</p>
+<p>Clustering on entity reduced the t-stats across the board. This suggests there is important correlation in the residuals per entity. Clustering by both entity and time gives t-stats that are close to those from clustering by entity alone, some larger and some smaller, and so most of the reduction relative to the robust covariance comes from the correlation within an entity. <em>Note</em>: clustering by entity addresses correlation across time and clustering by time controls for correlation between
+entities in a time period.</p>
 <div class="nbinput docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span><code>[15]:
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span><code>[18]:
 </code></pre></div>
 </div>
 <div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><code><span class="kn">from</span><span class="w"> </span><span class="nn">collections</span><span class="w"> </span><span class="kn">import</span> <span class="n">OrderedDict</span>
@@ -2008,7 +2175,7 @@ T-stats reported in parentheses
 <h3 id="Other-clusters">Other clusters<a class="headerlink" href="#Other-clusters" title="Link to this heading">¶</a></h3>
 <p>Other clusters can be used by directly passing integer arrays (1 or 2 columns, or a 1-d array) using the input <code class="docutils literal notranslate"><span class="pre">clusters</span></code>. This example clustered by occupation, which is probably not a reliable variable to cluster on since there are only 9 groups and the usual theory for clustered standard errors requires that the number of clusters is large.</p>
 <div class="nbinput docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span><code>[16]:
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span><code>[19]:
 </code></pre></div>
 </div>
 <div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><code><span class="n">clust_entity</span> <span class="o">=</span> <span class="n">mod</span><span class="o">.</span><span class="n">fit</span><span class="p">(</span><span class="n">cov_type</span><span class="o">=</span><span class="s2">"clustered"</span><span class="p">,</span> <span class="n">clusters</span><span class="o">=</span><span class="n">data</span><span class="o">.</span><span class="n">occupation</span><span class="p">)</span>
@@ -2039,7 +2206,7 @@ Dep. Variable:                  lwage   R-squared:                        0.1866
 Estimator:                  PooledOLS   R-squared (Between):              0.2027
 No. Observations:                4360   R-squared (Within):               0.1679
 Date:                Mon, Oct 12 2026   R-squared (Overall):              0.1866
-Time:                        18:38:52   Log-likelihood                   -2989.2
+Time:                        18:43:41   Log-likelihood                   -2989.2
 Cov. Estimator:             Clustered
                                         F-statistic:                      142.61
 Entities:                         545   P-value                           0.0000

@@ -19,7 +19,7 @@
     
   
       
-        <title>linearmodels.iv.absorbing - linearmodels v7.1 (+277)</title>
+        <title>linearmodels.iv.absorbing - linearmodels v7.1 (+291)</title>
       
     
 
@@ -91,7 +91,7 @@
 
 <header class="md-header md-header--shadow" data-md-component="header">
   <nav class="md-header__inner md-grid" aria-label="Header">
-    <a href="../../../index.html" title="linearmodels v7.1 (+277)" class="md-header__button md-logo" aria-label="linearmodels v7.1 (+277)" data-md-component="logo">
+    <a href="../../../index.html" title="linearmodels v7.1 (+291)" class="md-header__button md-logo" aria-label="linearmodels v7.1 (+291)" data-md-component="logo">
       <img src="../../../_static/bw-logo.svg" alt="logo">
     </a>
     <label class="md-header__button md-icon" for="__drawer">
@@ -102,7 +102,7 @@
       <div class="md-header__ellipsis">
         <div class="md-header__topic">
           <span class="md-ellipsis">
-            linearmodels v7.1 (+277)
+            linearmodels v7.1 (+291)
           </span>
         </div>
         <div class="md-header__topic" data-md-component="header-topic">
@@ -197,10 +197,10 @@
 
 <nav class="md-nav md-nav--primary" aria-label="Navigation" data-md-level="0">
   <label class="md-nav__title" for="__drawer">
-    <a href="../../../index.html" title="linearmodels v7.1 (+277)" class="md-nav__button md-logo" aria-label="linearmodels v7.1 (+277)" data-md-component="logo">
+    <a href="../../../index.html" title="linearmodels v7.1 (+291)" class="md-nav__button md-logo" aria-label="linearmodels v7.1 (+291)" data-md-component="logo">
       <img src="../../../_static/bw-logo.svg" alt="logo">
     </a>
-    linearmodels v7.1 (+277)
+    linearmodels v7.1 (+291)
   </label>
   
     <div class="md-nav__source">
@@ -2104,6 +2104,13 @@
 
         <span class="k">return</span> <span class="n">f_statistic</span><span class="p">(</span><span class="n">params</span><span class="p">,</span> <span class="n">cov</span><span class="p">,</span> <span class="n">debiased</span><span class="p">,</span> <span class="n">resid_df</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_const_loc</span><span class="p">)</span>
 
+    <span class="k">def</span><span class="w"> </span><span class="nf">_retained_exog</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">linearmodels</span><span class="o">.</span><span class="n">typing</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">Float64Array</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">"""The regressors that were estimated, in the units of exog"""</span>
+        <span class="n">locs</span> <span class="o">=</span> <span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">_exog</span><span class="o">.</span><span class="n">cols</span><span class="o">.</span><span class="n">index</span><span class="p">(</span><span class="n">col</span><span class="p">)</span> <span class="k">for</span> <span class="n">col</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_columns</span><span class="p">]</span>
+        <span class="k">return</span> <span class="n">cast</span><span class="p">(</span>
+            <span class="s2">"linearmodels.typing.data.Float64Array"</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_exog</span><span class="o">.</span><span class="n">ndarray</span><span class="p">[:,</span> <span class="n">locs</span><span class="p">]</span>
+        <span class="p">)</span>
+
     <span class="k">def</span><span class="w"> </span><span class="nf">_post_estimation</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span>
         <span class="n">params</span><span class="p">:</span> <span class="n">linearmodels</span><span class="o">.</span><span class="n">typing</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">Float64Array</span><span class="p">,</span>
@@ -2125,8 +2132,9 @@
             <span class="n">columns</span><span class="o">=</span><span class="p">[</span><span class="s2">"fitted_values"</span><span class="p">],</span>
         <span class="p">)</span>
         <span class="k">assert</span> <span class="nb">isinstance</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_absorbed_dependent</span><span class="p">,</span> <span class="n">DataFrame</span><span class="p">)</span>
+        <span class="c1"># The part of the fitted values that is not explained by the regressors</span>
         <span class="n">absorbed_effects</span> <span class="o">=</span> <span class="n">DataFrameWrapper</span><span class="p">(</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">_absorbed_dependent</span><span class="o">.</span><span class="n">to_numpy</span><span class="p">()</span> <span class="o">-</span> <span class="n">fitted_values</span><span class="p">,</span>
+            <span class="n">fitted_values</span> <span class="o">-</span> <span class="bp">self</span><span class="o">.</span><span class="n">_retained_exog</span><span class="p">()</span> <span class="o">@</span> <span class="n">params</span><span class="p">,</span>
             <span class="n">columns</span><span class="o">=</span><span class="p">[</span><span class="s2">"absorbed_effects"</span><span class="p">],</span>
             <span class="n">index</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">_dependent</span><span class="o">.</span><span class="n">rows</span><span class="p">,</span>
         <span class="p">)</span>

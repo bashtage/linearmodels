@@ -19,7 +19,7 @@
     
   
       
-        <title>linearmodels.iv.results - linearmodels v7.1 (+277)</title>
+        <title>linearmodels.iv.results - linearmodels v7.1 (+291)</title>
       
     
 
@@ -91,7 +91,7 @@
 
 <header class="md-header md-header--shadow" data-md-component="header">
   <nav class="md-header__inner md-grid" aria-label="Header">
-    <a href="../../../index.html" title="linearmodels v7.1 (+277)" class="md-header__button md-logo" aria-label="linearmodels v7.1 (+277)" data-md-component="logo">
+    <a href="../../../index.html" title="linearmodels v7.1 (+291)" class="md-header__button md-logo" aria-label="linearmodels v7.1 (+291)" data-md-component="logo">
       <img src="../../../_static/bw-logo.svg" alt="logo">
     </a>
     <label class="md-header__button md-icon" for="__drawer">
@@ -102,7 +102,7 @@
       <div class="md-header__ellipsis">
         <div class="md-header__topic">
           <span class="md-ellipsis">
-            linearmodels v7.1 (+277)
+            linearmodels v7.1 (+291)
           </span>
         </div>
         <div class="md-header__topic" data-md-component="header-topic">
@@ -197,10 +197,10 @@
 
 <nav class="md-nav md-nav--primary" aria-label="Navigation" data-md-level="0">
   <label class="md-nav__title" for="__drawer">
-    <a href="../../../index.html" title="linearmodels v7.1 (+277)" class="md-nav__button md-logo" aria-label="linearmodels v7.1 (+277)" data-md-component="logo">
+    <a href="../../../index.html" title="linearmodels v7.1 (+291)" class="md-nav__button md-logo" aria-label="linearmodels v7.1 (+291)" data-md-component="logo">
       <img src="../../../_static/bw-logo.svg" alt="logo">
     </a>
-    linearmodels v7.1 (+277)
+    linearmodels v7.1 (+291)
   </label>
   
     <div class="md-nav__source">
@@ -1206,7 +1206,20 @@
 <a class="viewcode-back" href="../../../iv/absorbing/linearmodels.iv.absorbing.AbsorbingLSResults.absorbed_effects.html#linearmodels.iv.absorbing.AbsorbingLSResults.absorbed_effects">[docs]</a>
     <span class="nd">@cached_property</span>
     <span class="k">def</span><span class="w"> </span><span class="nf">absorbed_effects</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">DataFrame</span><span class="p">:</span>
-<span class="w">        </span><span class="sd">"""Fitted values from only absorbed terms"""</span>
+<span class="w">        </span><span class="sd">"""</span>
+<span class="sd">        Fitted values from only absorbed terms</span>
+
+<span class="sd">        The part of ``fitted_values`` that the absorbed terms explain, which is</span>
+<span class="sd">        ``fitted_values - exog @ params``, in the units of the dependent variable. It</span>
+<span class="sd">        has one value for each observation. It is the contribution of the effects, the</span>
+<span class="sd">        interactions and the continuous variables that were absorbed, and of any</span>
+<span class="sd">        regressor in ``exog`` that was dropped because it was absorbed.</span>
+
+<span class="sd">        If ``exog`` contains a constant and the effects include a categorical</span>
+<span class="sd">        variable, the constant has the mean of the effects and the absorbed terms have</span>
+<span class="sd">        mean 0, using the weights of the model. Otherwise the absorbed terms include</span>
+<span class="sd">        the mean.</span>
+<span class="sd">        """</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_absorbed_effects</span><span class="p">()</span></div>
 
 

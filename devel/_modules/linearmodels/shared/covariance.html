@@ -19,7 +19,7 @@
     
   
       
-        <title>linearmodels.shared.covariance - linearmodels v7.1 (+277)</title>
+        <title>linearmodels.shared.covariance - linearmodels v7.1 (+291)</title>
       
     
 
@@ -91,7 +91,7 @@
 
 <header class="md-header md-header--shadow" data-md-component="header">
   <nav class="md-header__inner md-grid" aria-label="Header">
-    <a href="../../../index.html" title="linearmodels v7.1 (+277)" class="md-header__button md-logo" aria-label="linearmodels v7.1 (+277)" data-md-component="logo">
+    <a href="../../../index.html" title="linearmodels v7.1 (+291)" class="md-header__button md-logo" aria-label="linearmodels v7.1 (+291)" data-md-component="logo">
       <img src="../../../_static/bw-logo.svg" alt="logo">
     </a>
     <label class="md-header__button md-icon" for="__drawer">
@@ -102,7 +102,7 @@
       <div class="md-header__ellipsis">
         <div class="md-header__topic">
           <span class="md-ellipsis">
-            linearmodels v7.1 (+277)
+            linearmodels v7.1 (+291)
           </span>
         </div>
         <div class="md-header__topic" data-md-component="header-topic">
@@ -197,10 +197,10 @@
 
 <nav class="md-nav md-nav--primary" aria-label="Navigation" data-md-level="0">
   <label class="md-nav__title" for="__drawer">
-    <a href="../../../index.html" title="linearmodels v7.1 (+277)" class="md-nav__button md-logo" aria-label="linearmodels v7.1 (+277)" data-md-component="logo">
+    <a href="../../../index.html" title="linearmodels v7.1 (+291)" class="md-nav__button md-logo" aria-label="linearmodels v7.1 (+291)" data-md-component="logo">
       <img src="../../../_static/bw-logo.svg" alt="logo">
     </a>
-    linearmodels v7.1 (+277)
+    linearmodels v7.1 (+291)
   </label>
   
     <div class="md-nav__source">
@@ -538,6 +538,7 @@
     <span class="n">where</span><span class="p">,</span>
     <span class="n">zeros</span><span class="p">,</span>
 <span class="p">)</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">pandas</span><span class="w"> </span><span class="kn">import</span> <span class="n">isnull</span>
 
 <span class="kn">import</span><span class="w"> </span><span class="nn">linearmodels.typing.data</span>
 
@@ -620,8 +621,21 @@
 <span class="sd">    -------</span>
 <span class="sd">    ndarray</span>
 <span class="sd">       k by k cluster asymptotic covariance</span>
+
+<span class="sd">    Raises</span>
+<span class="sd">    ------</span>
+<span class="sd">    ValueError</span>
+<span class="sd">        If clusters contains missing values, since the observations they belong to</span>
+<span class="sd">        cannot be assigned to a cluster, or has fewer than two groups.</span>
 <span class="sd">    """</span>
+    <span class="k">if</span> <span class="n">isnull</span><span class="p">(</span><span class="n">clusters</span><span class="p">)</span><span class="o">.</span><span class="n">any</span><span class="p">():</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">"clusters cannot contain missing values."</span><span class="p">)</span>
     <span class="n">num_clusters</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">unique</span><span class="p">(</span><span class="n">clusters</span><span class="p">))</span>
+    <span class="k">if</span> <span class="n">num_clusters</span> <span class="o">&lt;</span> <span class="mi">2</span><span class="p">:</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
+            <span class="s2">"A clustered covariance requires at least two clusters, but clusters "</span>
+            <span class="s2">"has one group."</span>
+        <span class="p">)</span>
 
     <span class="n">sort_args</span> <span class="o">=</span> <span class="n">argsort</span><span class="p">(</span><span class="n">clusters</span><span class="p">)</span>
     <span class="n">clusters</span> <span class="o">=</span> <span class="n">clusters</span><span class="p">[</span><span class="n">sort_args</span><span class="p">]</span>

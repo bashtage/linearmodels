@@ -17,7 +17,7 @@
     "\n",
     "F. Vella and M. Verbeek (1998), \"Whose Wages Do Unions Raise? A Dynamic Model of Unionism and Wage Rate Determination for Young Men,\" _Journal of Applied Econometrics_ 13, 163-183.\n",
     "\n",
-    "The data set consists of wages and characteristics for men during the 1980s.  The entity identifier is ``nr`` and the time identified is ``year``.  This data is used extensively in Chapter 14 of _Introduction to Econometrics_ by Jeffrey Wooldridge.\n",
+    "The data set consists of wages and characteristics for men during the 1980s.  The entity identifier is ``nr`` and the time identifier is ``year``.  This data is used extensively in Chapter 14 of _Introduction to Econometrics_ by Jeffrey Wooldridge.\n",
     "\n",
     "Here a ``MultiIndex`` ``DataFrame`` is used to hold the data in a format that can be understood as a panel. Before setting the index, a year ``Categorical`` is created which facilitated making dummies."
    ]
@@ -45,7 +45,7 @@
    "metadata": {},
    "source": [
     "## Basic regression on panel data\n",
-    "``PooledOLS`` is just plain OLS that understands that various panel data structures. It is useful as a base model. Here the log wage is modeled using all of the variables and time dummies."
+    "``PooledOLS`` is just plain OLS that understands the various panel data structures. It is useful as a base model. Here the log wage is modeled using all of the variables and time dummies."
    ]
   },
   {
@@ -82,7 +82,7 @@
    "metadata": {},
    "source": [
     "### Random effects\n",
-    "The random effects model is virtually identical to the pooled OLS model except that is accounts for the structure of the model and so is more efficient. Random effects uses a quasi-demeaning strategy which subtracts the time average of the within entity values to account for the common shock."
+    "The random effects model is virtually identical to the pooled OLS model except that it accounts for the structure of the model and so is more efficient. Random effects uses a quasi-demeaning strategy which subtracts the time average of the within entity values to account for the common shock."
    ]
   },
   {
@@ -118,7 +118,7 @@
    "cell_type": "markdown",
    "metadata": {},
    "source": [
-    "The coefficient $\\theta_i$ determines how much demeaning takes place.  When this value is 1, the RE model reduces to the pooled model since this occurs when there is no variance in the effects.  When panels are unbalanced it will vary across entities, but in this balanced panel all values are the same."
+    "The coefficient $\\theta_i$ determines how much demeaning takes place.  When this value is 0, the RE model reduces to the pooled model since this occurs when there is no variance in the effects, and when it is 1, the RE model reduces to the fixed effects (within) estimator.  When panels are unbalanced it will vary across entities, but in this balanced panel all values are the same."
    ]
   },
   {
@@ -135,7 +135,7 @@
    "metadata": {},
    "source": [
     "### The between estimator\n",
-    "The between estimator is an alternative, usually less efficient estimator, can can be used to estimate model parameters.  It is particular simple since it first computes the time averages of $y$ and $x$ and then runs a simple regression using these averages.\n",
+    "The between estimator is an alternative, usually less efficient, estimator that can be used to estimate model parameters.  It is particularly simple since it first computes the time averages of $y$ and $x$ and then runs a simple regression using these averages.\n",
     "\n",
     "The year dummies are dropped since the averaging removes differences due to the year.  ``expersq`` was also dropped since it is fairly co-linear with ``exper``. These results are broadly similar to the previous models."
    ]
@@ -160,7 +160,7 @@
    "metadata": {},
    "source": [
     "#### Other options\n",
-    "The ``fit`` method of ``BetweenOLS`` takes an optional input ``reweight`` which uses GLS-like weighting when panels are unbalanced.  In this dataset the panel is balanced and so using this option would have no effect. By default this is ``False`` and so the averages are directly used in OLS even when there are difference numbers of observations across entities."
+    "The ``fit`` method of ``BetweenOLS`` takes an optional input ``reweight`` which uses GLS-like weighting when panels are unbalanced.  In this dataset the panel is balanced and so using this option would have no effect. By default this is ``False`` and so the averages are directly used in OLS even when there are different numbers of observations across entities."
    ]
   },
   {
@@ -203,10 +203,10 @@
    "metadata": {},
    "source": [
     "### Time Effects\n",
-    "Time effect can be added using ``time_effects=True``.  Here the time dummies are removed. Note that the core coefficients are identical. The only change is in the test statistic for poolability since not the \"effects\" include both entity and time, whereas before only entity were included.\n",
+    "Time effect can be added using ``time_effects=True``.  Here the time dummies are removed. Note that the core coefficients are identical. The only change is in the test statistic for poolability since now the \"effects\" include both entity and time, whereas before only entity were included.\n",
     "\n",
     "#### Effects vs Dummies\n",
-    "For variable which can be consistently estimated, such as time effects in the usual large N, fixed T panel, it is not necessary to include these as effects.  They can instead be implemented as dummy variables.  "
+    "For variables which can be consistently estimated, such as time effects in the usual large N, fixed T panel, it is not necessary to include these as effects.  They can instead be implemented as dummy variables.  "
    ]
   },
   {
@@ -227,7 +227,7 @@
    "metadata": {},
    "source": [
     "#### Other Options\n",
-    "Some additional options are available when using ``PanelOLS`` and effects.  The ``use_lsdv`` can be used to force the model to be estimated using dummy variables.  This is not necessary and will be slower in most circumstances.  This options is primarily included for testing.  ``auto_df`` instructs ``PanelOLS`` to determine the degree of freedom adjustment to make.  Unlike most other estimators, the treatment of effects depends on the covariance estimator.  For example, when using a classic covariance estimator, effects count as lost degrees of freedom.  When using entity effects and clustering by entity, they do not.  Setting ``auto_df=False`` will allow the entities to be counted or not, depending on the value of ``count_effects``."
+    "Some additional options are available when using ``PanelOLS`` and effects.  The ``use_lsdv`` can be used to force the model to be estimated using dummy variables.  This is not necessary and will be slower in most circumstances.  This option is primarily included for testing.  ``auto_df`` instructs ``PanelOLS`` to determine the degree of freedom adjustment to make.  Unlike most other estimators, the treatment of effects depends on the covariance estimator.  For example, when using a classic covariance estimator, effects count as lost degrees of freedom.  When using entity effects and clustering by entity, they do not.  Setting ``auto_df=False`` will allow the entities to be counted or not, depending on the value of ``count_effects``."
    ]
   },
   {
@@ -236,13 +236,13 @@
    "source": [
     "### Other Effects\n",
     "\n",
-    "`PanelOLS` can be used to estimated models with up to 2-effects fixed effects. These can include any combination of\n",
+    "`PanelOLS` can be used to estimate models with up to 2-effects fixed effects. These can include any combination of\n",
     "\n",
     "* Entity effects\n",
     "* Time effects\n",
     "* Other effects\n",
     "\n",
-    "Other effects are specified using the `other_effects` input of `PanelOLS`. The input should have the same number of observations as the `engog` and can have 1 or two columns.  Below we reproduce the model fitted with time effects only using `other_effects` to set the effect."
+    "Other effects are specified using the `other_effects` input of `PanelOLS`. The input should have the same number of observations as the `exog` and can have 1 or two columns.  Below we reproduce the model fitted with entity and time effects using `other_effects` to set the time effect."
    ]
   },
   {
@@ -270,7 +270,7 @@
    "metadata": {},
    "source": [
     "### Using first differences\n",
-    "First differencing is an alternative to using fixed effects when there might be correlation.  When using first differences, time-invariant variables must be excluded.  Additionally, only one linear time-trending variable can be included since this will look like a constant.  This variable will soak up all time-trends in the data, and so interpretations of these variable can be challenging."
+    "First differencing is an alternative to using fixed effects when there might be correlation.  When using first differences, time-invariant variables must be excluded.  Additionally, only one linear time-trending variable can be included since this will look like a constant.  This variable will soak up all time-trends in the data, and so interpretations of these variables can be challenging."
    ]
   },
   {
@@ -311,6 +311,84 @@
    "cell_type": "markdown",
    "metadata": {},
    "source": [
+    "## Specification tests\n",
+    "\n",
+    "The results of the panel models include two specification tests. The Hausman test examines whether the effects are correlated with the regressors, since random effects is only consistent if they are not. The Pesaran CD test examines whether the idiosyncratic shocks of different entities are correlated.\n",
+    "\n",
+    "### Hausman test\n",
+    "\n",
+    "The Hausman test compares the random effects estimates with those of a model that is consistent whether or not the effects are correlated with the regressors, usually a fixed effects model. If the effects are uncorrelated with the regressors, both estimators are consistent and random effects is more efficient. If they are correlated, only the fixed effects estimator is consistent. The test is a method of the random effects results, and its argument is the results of the other model. Both models must use the default unadjusted covariance estimator.\n",
+    "\n",
+    "The random effects model above includes the year dummies, and so it is compared with the fixed effects model that has entity and time effects, `fe_te_res`. The test compares the coefficients that are in both models, which are `expersq`, `married` and `union`. The time effects are not coefficients, and so only the entity effects are tested."
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "re_res.hausman(fe_te_res)"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "The p-value is close to 0, and so the null is rejected. There is evidence that the effects are correlated with the regressors, so that the random effects estimates are not consistent and the fixed effects estimates should be used. The random effects coefficients on `married` and `union` are larger than the fixed effects ones, which is consistent with unobserved characteristics that raise wages being more common among married men and union members.\n",
+    "\n",
+    "The result is a `HausmanTestResults` named tuple. Its fields are `statistic`, the test statistic with its p-value, and `estimates`, the coefficients that were compared and the standard error of their difference, and so `statistic, estimates = re_res.hausman(fe_te_res)` also works."
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "### Pesaran CD test\n",
+    "\n",
+    "The Pesaran CD test examines the null that the idiosyncratic shocks of different entities are uncorrelated. Its statistic is a scaled sum of the correlations over time of the shocks of each pair of entities, and it is asymptotically standard normal under the null. The test is the property `pesaran_cd` of the results, and it is computed from the idiosyncratic shocks, `idiosyncratic`.\n",
+    "\n",
+    "The test is applied here to fixed effects and random effects models with the same regressors and without year effects, which cannot be used with this test, as explained below."
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "exog_vars = [\"expersq\", \"union\", \"married\"]\n",
+    "exog = sm.add_constant(data[exog_vars])\n",
+    "fe_cd_res = PanelOLS(data.lwage, exog, entity_effects=True).fit()\n",
+    "re_cd_res = RandomEffects(data.lwage, exog).fit()\n",
+    "print(\"Fixed effects\")\n",
+    "print(fe_cd_res.pesaran_cd)\n",
+    "print(\"\\nRandom effects\")\n",
+    "print(re_cd_res.pesaran_cd)"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "Both statistics are far in the tail of the standard normal distribution, and so independence is rejected: the wages of different men are correlated after the individual effects have been removed. Some of this dependence might be due to the common changes in wages over time, which these models do not include.\n",
+    "\n",
+    "`pesaran_cd` returns an `InapplicableTestStatistic` instead of a test statistic for models with time effects, since time effects demean the residuals across the entities that are observed in the same periods, which makes the residuals negatively correlated across entities and biases the statistic downwards. Year dummies that are included as regressors have the same effect on the residuals, which is why they are left out above. The test is also not applicable to `BetweenOLS` and `FamaMacBeth`. Printing the result shows why."
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "print(fe_te_res.pesaran_cd)"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
     "## Covariance options"
    ]
   },
@@ -319,7 +397,7 @@
    "metadata": {},
    "source": [
     "### Heteroskedasticity Robust Covariance\n",
-    "White\"s robust covariance can be used by setting ``cov_type=\"robust``. This estimator adds some robustness against certain types of specification issues but should not be used when using fixed effects (entity effects) since it is no longer robust.  Instead a clustered covariance is required."
+    "White's robust covariance can be used by setting ``cov_type=\"robust\"``. This estimator adds some robustness against certain types of specification issues but should not be used when using fixed effects (entity effects) since it is no longer robust.  Instead a clustered covariance is required."
    ]
   },
   {
@@ -339,7 +417,7 @@
    "metadata": {},
    "source": [
     "### Clustered by Entity\n",
-    "The usual variable to cluster are are entity or entity and time.  The can be implemented using ``cov_type=\"clustered\"`` and the additional keyword arguments ``cluster_entity=True`` and/or ``cluster_time=True``. "
+    "The usual variables to cluster on are entity or entity and time.  These can be implemented using ``cov_type=\"clustered\"`` and the additional keyword arguments ``cluster_entity=True`` and/or ``cluster_time=True``. "
    ]
   },
   {
@@ -373,9 +451,9 @@
    "cell_type": "markdown",
    "metadata": {},
    "source": [
-    "An ``OrderedDict`` is used to hold the results for comparing models.  This allows the models to be named as well as for the order of the models to be specified.  A standard ``dict`` will produce effectively random order.\n",
+    "An ``OrderedDict`` is used to hold the results for comparing models.  This allows the models to be named as well as for the order of the models to be specified.  A standard ``dict`` also preserves the order in which the models are added.\n",
     "\n",
-    "Clustering on entity reduced the t-stats across the board.  This suggests there is important correlation in the residuals per entity. Clustering by both also decreases the t-stats which suggests that there is cross-sectional dependence in the data. *Note*: clustering by entity addresses correlation across time and clustering by time controls for correlation between entities in a time period."
+    "Clustering on entity reduced the t-stats across the board.  This suggests there is important correlation in the residuals per entity. Clustering by both entity and time gives t-stats that are close to those from clustering by entity alone, some larger and some smaller, and so most of the reduction relative to the robust covariance comes from the correlation within an entity. *Note*: clustering by entity addresses correlation across time and clustering by time controls for correlation between entities in a time period."
    ]
   },
   {

@@ -23,7 +23,7 @@
     
   
       
-        <title>Examples - linearmodels v7.1 (+277)</title>
+        <title>Examples - linearmodels v7.1 (+291)</title>
       
     
 
@@ -101,7 +101,7 @@
 
 <header class="md-header md-header--shadow" data-md-component="header">
   <nav class="md-header__inner md-grid" aria-label="Header">
-    <a href="../../index.html" title="linearmodels v7.1 (+277)" class="md-header__button md-logo" aria-label="linearmodels v7.1 (+277)" data-md-component="logo">
+    <a href="../../index.html" title="linearmodels v7.1 (+291)" class="md-header__button md-logo" aria-label="linearmodels v7.1 (+291)" data-md-component="logo">
       <img src="../../_static/bw-logo.svg" alt="logo">
     </a>
     <label class="md-header__button md-icon" for="__drawer">
@@ -112,7 +112,7 @@
       <div class="md-header__ellipsis">
         <div class="md-header__topic">
           <span class="md-ellipsis">
-            linearmodels v7.1 (+277)
+            linearmodels v7.1 (+291)
           </span>
         </div>
         <div class="md-header__topic" data-md-component="header-topic">
@@ -207,10 +207,10 @@
 
 <nav class="md-nav md-nav--primary" aria-label="Navigation" data-md-level="0">
   <label class="md-nav__title" for="__drawer">
-    <a href="../../index.html" title="linearmodels v7.1 (+277)" class="md-nav__button md-logo" aria-label="linearmodels v7.1 (+277)" data-md-component="logo">
+    <a href="../../index.html" title="linearmodels v7.1 (+291)" class="md-nav__button md-logo" aria-label="linearmodels v7.1 (+291)" data-md-component="logo">
       <img src="../../_static/bw-logo.svg" alt="logo">
     </a>
-    linearmodels v7.1 (+277)
+    linearmodels v7.1 (+291)
   </label>
   
     <div class="md-nav__source">
@@ -1239,7 +1239,7 @@
 <p>Since there are multiple series, a GLS estimator that accounts for the cross-sectional heteroskedasticity as well as the correlation of residuals can be estimated</p>
 <div class="math notranslate nohighlight">
 \[\hat{\beta}_{GLS} = \left(X^\prime \Omega^{-1} X\right)^{-1}X^\prime  \Omega^{-1} Y\]</div>
-<p>where <span class="math notranslate nohighlight">\(\Omega^{-1} = \Sigma^{-1} \otimes I_{T}\)</span>, <span class="math notranslate nohighlight">\(\Sigma_{ij}\)</span> is the covariance between <span class="math notranslate nohighlight">\(\epsilon_i\)</span> and <span class="math notranslate nohighlight">\(\epsilon_j\)</span> and <span class="math notranslate nohighlight">\(T\)</span> is the number of observations. The GLS estimator is only beneficial when the regressors in different models differ and when residuals are correlated. There GLS estimates are identical to the multivariate OLS estimates when all regressors are common.</p>
+<p>where <span class="math notranslate nohighlight">\(\Omega^{-1} = \Sigma^{-1} \otimes I_{T}\)</span>, <span class="math notranslate nohighlight">\(\Sigma_{ij}\)</span> is the covariance between <span class="math notranslate nohighlight">\(\epsilon_i\)</span> and <span class="math notranslate nohighlight">\(\epsilon_j\)</span> and <span class="math notranslate nohighlight">\(T\)</span> is the number of observations. The GLS estimator is only beneficial when the regressors in different models differ and when residuals are correlated. The GLS estimates are identical to the multivariate OLS estimates when all regressors are common.</p>
 <div class="nbinput nblast docutils container">
 <div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span><code>[1]:
 </code></pre></div>
@@ -1253,7 +1253,7 @@
 </div>
 </div>
 <h2 id="Data">Data<a class="headerlink" href="#Data" title="Link to this heading">¶</a></h2>
-<p>Two data sets will be used. The first is from Munnell which looks at the effect of capital on state GDP. This example follows the example in Chapter 10 in recent editions of Greene”s <em>Econometric Analysis</em>.</p>
+<p>Two data sets will be used. The first is from Munnell which looks at the effect of capital on state GDP. This example follows the example in Chapter 10 in recent editions of Greene’s <em>Econometric Analysis</em>.</p>
 <p>The data is state-level but the model is estimated in region. The first step is to aggregate the data by region. All capital measures are summed and the unemployment rate is averaged using weights proportional to the total employment in each state.</p>
 <div class="nbinput nblast docutils container">
 <div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span><code>[2]:
@@ -1304,7 +1304,7 @@
 </div>
 </div>
 <h2 id="Basic-Usage">Basic Usage<a class="headerlink" href="#Basic-Usage" title="Link to this heading">¶</a></h2>
-<p>Seemingly Unrelated Models are fairly complex and each equation could have a different number of regressors. As a result, it is not possibly to use standard <code class="docutils literal notranslate"><span class="pre">pandas</span></code> or <code class="docutils literal notranslate"><span class="pre">numpy</span></code> data structures, and so dictionaries (or technically dictionary-like objects) are used. In practice, it is strongly recommended to use a <code class="docutils literal notranslate"><span class="pre">OrderedDictionary</span></code> from the <code class="docutils literal notranslate"><span class="pre">collections</span></code> module. This ensures that equation order will be preserved. In addition, the dictionary must have the following structure:</p>
+<p>Seemingly Unrelated Models are fairly complex and each equation could have a different number of regressors. As a result, it is not possible to use standard <code class="docutils literal notranslate"><span class="pre">pandas</span></code> or <code class="docutils literal notranslate"><span class="pre">numpy</span></code> data structures, and so dictionaries (or technically dictionary-like objects) are used. In practice, it is strongly recommended to use an <code class="docutils literal notranslate"><span class="pre">OrderedDict</span></code> from the <code class="docutils literal notranslate"><span class="pre">collections</span></code> module. This ensures that equation order will be preserved. In addition, the dictionary must have the following structure:</p>
 <ul class="simple">
 <li><p><code class="docutils literal notranslate"><span class="pre">keys</span></code> <strong>must be strings</strong> and will be used as equation labels</p></li>
 <li><p>The value associated with each key must be either a dictionary or a tuple.</p>
@@ -1314,7 +1314,7 @@
 </ul>
 </li>
 </ul>
-<p>This example uses the dictionary syntax to contain the data for each region and uses the region identified as the equation label.</p>
+<p>This example uses the dictionary syntax to contain the data for each region and uses the region identifier as the equation label.</p>
 <div class="nbinput nblast docutils container">
 <div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span><code>[4]:
 </code></pre></div>
@@ -1333,7 +1333,7 @@
 </div>
 </div>
 <p>Fitting the model is virtually identical to fitting any other model with the exception of the special data structure required.</p>
-<p>The fitting options here ensure that the homoskedastic covariance estimator are used (<code class="docutils literal notranslate"><span class="pre">cov_type=&quot;unadjusted&quot;</span></code>) and that a small sample adjustment is applied. By default, GLS is used (this can be overridden using <code class="docutils literal notranslate"><span class="pre">method=&quot;ols&quot;</span></code>.</p>
+<p>The fitting options here ensure that the homoskedastic covariance estimator is used (<code class="docutils literal notranslate"><span class="pre">cov_type=&quot;unadjusted&quot;</span></code>). No small sample adjustment is applied, which is the default (<code class="docutils literal notranslate"><span class="pre">debiased=False</span></code>). By default, GLS is used (this can be overridden using <code class="docutils literal notranslate"><span class="pre">method=&quot;ols&quot;</span></code>).</p>
 <div class="nbinput nblast docutils container">
 <div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span><code>[5]:
 </code></pre></div>
@@ -1378,129 +1378,129 @@
 <div class="output_area rendered_html docutils container">
 <style type="text/css">
 </style>
-<table id="T_84d08">
+<table id="T_9d3fd">
   <thead>
     <tr>
       <th class="blank level0" >&nbsp;</th>
-      <th id="T_84d08_level0_col0" class="col_heading level0 col0" >GF</th>
-      <th id="T_84d08_level0_col1" class="col_heading level0 col1" >SW</th>
-      <th id="T_84d08_level0_col2" class="col_heading level0 col2" >WC</th>
-      <th id="T_84d08_level0_col3" class="col_heading level0 col3" >MT</th>
-      <th id="T_84d08_level0_col4" class="col_heading level0 col4" >NE</th>
-      <th id="T_84d08_level0_col5" class="col_heading level0 col5" >MA</th>
-      <th id="T_84d08_level0_col6" class="col_heading level0 col6" >SO</th>
-      <th id="T_84d08_level0_col7" class="col_heading level0 col7" >MW</th>
-      <th id="T_84d08_level0_col8" class="col_heading level0 col8" >CN</th>
+      <th id="T_9d3fd_level0_col0" class="col_heading level0 col0" >GF</th>
+      <th id="T_9d3fd_level0_col1" class="col_heading level0 col1" >SW</th>
+      <th id="T_9d3fd_level0_col2" class="col_heading level0 col2" >WC</th>
+      <th id="T_9d3fd_level0_col3" class="col_heading level0 col3" >MT</th>
+      <th id="T_9d3fd_level0_col4" class="col_heading level0 col4" >NE</th>
+      <th id="T_9d3fd_level0_col5" class="col_heading level0 col5" >MA</th>
+      <th id="T_9d3fd_level0_col6" class="col_heading level0 col6" >SO</th>
+      <th id="T_9d3fd_level0_col7" class="col_heading level0 col7" >MW</th>
+      <th id="T_9d3fd_level0_col8" class="col_heading level0 col8" >CN</th>
     </tr>
   </thead>
   <tbody>
     <tr>
-      <th id="T_84d08_level0_row0" class="row_heading level0 row0" >GF</th>
-      <td id="T_84d08_row0_col0" class="data row0 col0" >1.000</td>
-      <td id="T_84d08_row0_col1" class="data row0 col1" >0.173</td>
-      <td id="T_84d08_row0_col2" class="data row0 col2" >0.447</td>
-      <td id="T_84d08_row0_col3" class="data row0 col3" >-0.547</td>
-      <td id="T_84d08_row0_col4" class="data row0 col4" >0.525</td>
-      <td id="T_84d08_row0_col5" class="data row0 col5" >0.425</td>
-      <td id="T_84d08_row0_col6" class="data row0 col6" >0.763</td>
-      <td id="T_84d08_row0_col7" class="data row0 col7" >0.167</td>
-      <td id="T_84d08_row0_col8" class="data row0 col8" >0.325</td>
+      <th id="T_9d3fd_level0_row0" class="row_heading level0 row0" >GF</th>
+      <td id="T_9d3fd_row0_col0" class="data row0 col0" >1.000</td>
+      <td id="T_9d3fd_row0_col1" class="data row0 col1" >0.173</td>
+      <td id="T_9d3fd_row0_col2" class="data row0 col2" >0.447</td>
+      <td id="T_9d3fd_row0_col3" class="data row0 col3" >-0.547</td>
+      <td id="T_9d3fd_row0_col4" class="data row0 col4" >0.525</td>
+      <td id="T_9d3fd_row0_col5" class="data row0 col5" >0.425</td>
+      <td id="T_9d3fd_row0_col6" class="data row0 col6" >0.763</td>
+      <td id="T_9d3fd_row0_col7" class="data row0 col7" >0.167</td>
+      <td id="T_9d3fd_row0_col8" class="data row0 col8" >0.325</td>
     </tr>
     <tr>
-      <th id="T_84d08_level0_row1" class="row_heading level0 row1" >SW</th>
-      <td id="T_84d08_row1_col0" class="data row1 col0" >0.173</td>
-      <td id="T_84d08_row1_col1" class="data row1 col1" >1.000</td>
-      <td id="T_84d08_row1_col2" class="data row1 col2" >0.697</td>
-      <td id="T_84d08_row1_col3" class="data row1 col3" >-0.290</td>
-      <td id="T_84d08_row1_col4" class="data row1 col4" >0.489</td>
-      <td id="T_84d08_row1_col5" class="data row1 col5" >0.132</td>
-      <td id="T_84d08_row1_col6" class="data row1 col6" >0.314</td>
-      <td id="T_84d08_row1_col7" class="data row1 col7" >0.565</td>
-      <td id="T_84d08_row1_col8" class="data row1 col8" >0.119</td>
+      <th id="T_9d3fd_level0_row1" class="row_heading level0 row1" >SW</th>
+      <td id="T_9d3fd_row1_col0" class="data row1 col0" >0.173</td>
+      <td id="T_9d3fd_row1_col1" class="data row1 col1" >1.000</td>
+      <td id="T_9d3fd_row1_col2" class="data row1 col2" >0.697</td>
+      <td id="T_9d3fd_row1_col3" class="data row1 col3" >-0.290</td>
+      <td id="T_9d3fd_row1_col4" class="data row1 col4" >0.489</td>
+      <td id="T_9d3fd_row1_col5" class="data row1 col5" >0.132</td>
+      <td id="T_9d3fd_row1_col6" class="data row1 col6" >0.314</td>
+      <td id="T_9d3fd_row1_col7" class="data row1 col7" >0.565</td>
+      <td id="T_9d3fd_row1_col8" class="data row1 col8" >0.119</td>
     </tr>
     <tr>
-      <th id="T_84d08_level0_row2" class="row_heading level0 row2" >WC</th>
-      <td id="T_84d08_row2_col0" class="data row2 col0" >0.447</td>
-      <td id="T_84d08_row2_col1" class="data row2 col1" >0.697</td>
-      <td id="T_84d08_row2_col2" class="data row2 col2" >1.000</td>
-      <td id="T_84d08_row2_col3" class="data row2 col3" >-0.537</td>
-      <td id="T_84d08_row2_col4" class="data row2 col4" >0.343</td>
-      <td id="T_84d08_row2_col5" class="data row2 col5" >0.130</td>
-      <td id="T_84d08_row2_col6" class="data row2 col6" >0.505</td>
-      <td id="T_84d08_row2_col7" class="data row2 col7" >0.574</td>
-      <td id="T_84d08_row2_col8" class="data row2 col8" >0.037</td>
+      <th id="T_9d3fd_level0_row2" class="row_heading level0 row2" >WC</th>
+      <td id="T_9d3fd_row2_col0" class="data row2 col0" >0.447</td>
+      <td id="T_9d3fd_row2_col1" class="data row2 col1" >0.697</td>
+      <td id="T_9d3fd_row2_col2" class="data row2 col2" >1.000</td>
+      <td id="T_9d3fd_row2_col3" class="data row2 col3" >-0.537</td>
+      <td id="T_9d3fd_row2_col4" class="data row2 col4" >0.343</td>
+      <td id="T_9d3fd_row2_col5" class="data row2 col5" >0.130</td>
+      <td id="T_9d3fd_row2_col6" class="data row2 col6" >0.505</td>
+      <td id="T_9d3fd_row2_col7" class="data row2 col7" >0.574</td>
+      <td id="T_9d3fd_row2_col8" class="data row2 col8" >0.037</td>
     </tr>
     <tr>
-      <th id="T_84d08_level0_row3" class="row_heading level0 row3" >MT</th>
-      <td id="T_84d08_row3_col0" class="data row3 col0" >-0.547</td>
-      <td id="T_84d08_row3_col1" class="data row3 col1" >-0.290</td>
-      <td id="T_84d08_row3_col2" class="data row3 col2" >-0.537</td>
-      <td id="T_84d08_row3_col3" class="data row3 col3" >1.000</td>
-      <td id="T_84d08_row3_col4" class="data row3 col4" >-0.241</td>
-      <td id="T_84d08_row3_col5" class="data row3 col5" >-0.322</td>
-      <td id="T_84d08_row3_col6" class="data row3 col6" >-0.351</td>
-      <td id="T_84d08_row3_col7" class="data row3 col7" >-0.058</td>
-      <td id="T_84d08_row3_col8" class="data row3 col8" >0.091</td>
+      <th id="T_9d3fd_level0_row3" class="row_heading level0 row3" >MT</th>
+      <td id="T_9d3fd_row3_col0" class="data row3 col0" >-0.547</td>
+      <td id="T_9d3fd_row3_col1" class="data row3 col1" >-0.290</td>
+      <td id="T_9d3fd_row3_col2" class="data row3 col2" >-0.537</td>
+      <td id="T_9d3fd_row3_col3" class="data row3 col3" >1.000</td>
+      <td id="T_9d3fd_row3_col4" class="data row3 col4" >-0.241</td>
+      <td id="T_9d3fd_row3_col5" class="data row3 col5" >-0.322</td>
+      <td id="T_9d3fd_row3_col6" class="data row3 col6" >-0.351</td>
+      <td id="T_9d3fd_row3_col7" class="data row3 col7" >-0.058</td>
+      <td id="T_9d3fd_row3_col8" class="data row3 col8" >0.091</td>
     </tr>
     <tr>
-      <th id="T_84d08_level0_row4" class="row_heading level0 row4" >NE</th>
-      <td id="T_84d08_row4_col0" class="data row4 col0" >0.525</td>
-      <td id="T_84d08_row4_col1" class="data row4 col1" >0.489</td>
-      <td id="T_84d08_row4_col2" class="data row4 col2" >0.343</td>
-      <td id="T_84d08_row4_col3" class="data row4 col3" >-0.241</td>
-      <td id="T_84d08_row4_col4" class="data row4 col4" >1.000</td>
-      <td id="T_84d08_row4_col5" class="data row4 col5" >0.259</td>
-      <td id="T_84d08_row4_col6" class="data row4 col6" >0.783</td>
-      <td id="T_84d08_row4_col7" class="data row4 col7" >0.269</td>
-      <td id="T_84d08_row4_col8" class="data row4 col8" >0.200</td>
+      <th id="T_9d3fd_level0_row4" class="row_heading level0 row4" >NE</th>
+      <td id="T_9d3fd_row4_col0" class="data row4 col0" >0.525</td>
+      <td id="T_9d3fd_row4_col1" class="data row4 col1" >0.489</td>
+      <td id="T_9d3fd_row4_col2" class="data row4 col2" >0.343</td>
+      <td id="T_9d3fd_row4_col3" class="data row4 col3" >-0.241</td>
+      <td id="T_9d3fd_row4_col4" class="data row4 col4" >1.000</td>
+      <td id="T_9d3fd_row4_col5" class="data row4 col5" >0.259</td>
+      <td id="T_9d3fd_row4_col6" class="data row4 col6" >0.783</td>
+      <td id="T_9d3fd_row4_col7" class="data row4 col7" >0.269</td>
+      <td id="T_9d3fd_row4_col8" class="data row4 col8" >0.200</td>
     </tr>
     <tr>
-      <th id="T_84d08_level0_row5" class="row_heading level0 row5" >MA</th>
-      <td id="T_84d08_row5_col0" class="data row5 col0" >0.425</td>
-      <td id="T_84d08_row5_col1" class="data row5 col1" >0.132</td>
-      <td id="T_84d08_row5_col2" class="data row5 col2" >0.130</td>
-      <td id="T_84d08_row5_col3" class="data row5 col3" >-0.322</td>
-      <td id="T_84d08_row5_col4" class="data row5 col4" >0.259</td>
-      <td id="T_84d08_row5_col5" class="data row5 col5" >1.000</td>
-      <td id="T_84d08_row5_col6" class="data row5 col6" >0.388</td>
-      <td id="T_84d08_row5_col7" class="data row5 col7" >-0.037</td>
-      <td id="T_84d08_row5_col8" class="data row5 col8" >0.713</td>
+      <th id="T_9d3fd_level0_row5" class="row_heading level0 row5" >MA</th>
+      <td id="T_9d3fd_row5_col0" class="data row5 col0" >0.425</td>
+      <td id="T_9d3fd_row5_col1" class="data row5 col1" >0.132</td>
+      <td id="T_9d3fd_row5_col2" class="data row5 col2" >0.130</td>
+      <td id="T_9d3fd_row5_col3" class="data row5 col3" >-0.322</td>
+      <td id="T_9d3fd_row5_col4" class="data row5 col4" >0.259</td>
+      <td id="T_9d3fd_row5_col5" class="data row5 col5" >1.000</td>
+      <td id="T_9d3fd_row5_col6" class="data row5 col6" >0.388</td>
+      <td id="T_9d3fd_row5_col7" class="data row5 col7" >-0.037</td>
+      <td id="T_9d3fd_row5_col8" class="data row5 col8" >0.713</td>
     </tr>
     <tr>
-      <th id="T_84d08_level0_row6" class="row_heading level0 row6" >SO</th>
-      <td id="T_84d08_row6_col0" class="data row6 col0" >0.763</td>
-      <td id="T_84d08_row6_col1" class="data row6 col1" >0.314</td>
-      <td id="T_84d08_row6_col2" class="data row6 col2" >0.505</td>
-      <td id="T_84d08_row6_col3" class="data row6 col3" >-0.351</td>
-      <td id="T_84d08_row6_col4" class="data row6 col4" >0.783</td>
-      <td id="T_84d08_row6_col5" class="data row6 col5" >0.388</td>
-      <td id="T_84d08_row6_col6" class="data row6 col6" >1.000</td>
-      <td id="T_84d08_row6_col7" class="data row6 col7" >0.366</td>
-      <td id="T_84d08_row6_col8" class="data row6 col8" >0.350</td>
+      <th id="T_9d3fd_level0_row6" class="row_heading level0 row6" >SO</th>
+      <td id="T_9d3fd_row6_col0" class="data row6 col0" >0.763</td>
+      <td id="T_9d3fd_row6_col1" class="data row6 col1" >0.314</td>
+      <td id="T_9d3fd_row6_col2" class="data row6 col2" >0.505</td>
+      <td id="T_9d3fd_row6_col3" class="data row6 col3" >-0.351</td>
+      <td id="T_9d3fd_row6_col4" class="data row6 col4" >0.783</td>
+      <td id="T_9d3fd_row6_col5" class="data row6 col5" >0.388</td>
+      <td id="T_9d3fd_row6_col6" class="data row6 col6" >1.000</td>
+      <td id="T_9d3fd_row6_col7" class="data row6 col7" >0.366</td>
+      <td id="T_9d3fd_row6_col8" class="data row6 col8" >0.350</td>
     </tr>
     <tr>
-      <th id="T_84d08_level0_row7" class="row_heading level0 row7" >MW</th>
-      <td id="T_84d08_row7_col0" class="data row7 col0" >0.167</td>
-      <td id="T_84d08_row7_col1" class="data row7 col1" >0.565</td>
-      <td id="T_84d08_row7_col2" class="data row7 col2" >0.574</td>
-      <td id="T_84d08_row7_col3" class="data row7 col3" >-0.058</td>
-      <td id="T_84d08_row7_col4" class="data row7 col4" >0.269</td>
-      <td id="T_84d08_row7_col5" class="data row7 col5" >-0.037</td>
-      <td id="T_84d08_row7_col6" class="data row7 col6" >0.366</td>
-      <td id="T_84d08_row7_col7" class="data row7 col7" >1.000</td>
-      <td id="T_84d08_row7_col8" class="data row7 col8" >0.298</td>
+      <th id="T_9d3fd_level0_row7" class="row_heading level0 row7" >MW</th>
+      <td id="T_9d3fd_row7_col0" class="data row7 col0" >0.167</td>
+      <td id="T_9d3fd_row7_col1" class="data row7 col1" >0.565</td>
+      <td id="T_9d3fd_row7_col2" class="data row7 col2" >0.574</td>
+      <td id="T_9d3fd_row7_col3" class="data row7 col3" >-0.058</td>
+      <td id="T_9d3fd_row7_col4" class="data row7 col4" >0.269</td>
+      <td id="T_9d3fd_row7_col5" class="data row7 col5" >-0.037</td>
+      <td id="T_9d3fd_row7_col6" class="data row7 col6" >0.366</td>
+      <td id="T_9d3fd_row7_col7" class="data row7 col7" >1.000</td>
+      <td id="T_9d3fd_row7_col8" class="data row7 col8" >0.298</td>
     </tr>
     <tr>
-      <th id="T_84d08_level0_row8" class="row_heading level0 row8" >CN</th>
-      <td id="T_84d08_row8_col0" class="data row8 col0" >0.325</td>
-      <td id="T_84d08_row8_col1" class="data row8 col1" >0.119</td>
-      <td id="T_84d08_row8_col2" class="data row8 col2" >0.037</td>
-      <td id="T_84d08_row8_col3" class="data row8 col3" >0.091</td>
-      <td id="T_84d08_row8_col4" class="data row8 col4" >0.200</td>
-      <td id="T_84d08_row8_col5" class="data row8 col5" >0.713</td>
-      <td id="T_84d08_row8_col6" class="data row8 col6" >0.350</td>
-      <td id="T_84d08_row8_col7" class="data row8 col7" >0.298</td>
-      <td id="T_84d08_row8_col8" class="data row8 col8" >1.000</td>
+      <th id="T_9d3fd_level0_row8" class="row_heading level0 row8" >CN</th>
+      <td id="T_9d3fd_row8_col0" class="data row8 col0" >0.325</td>
+      <td id="T_9d3fd_row8_col1" class="data row8 col1" >0.119</td>
+      <td id="T_9d3fd_row8_col2" class="data row8 col2" >0.037</td>
+      <td id="T_9d3fd_row8_col3" class="data row8 col3" >0.091</td>
+      <td id="T_9d3fd_row8_col4" class="data row8 col4" >0.200</td>
+      <td id="T_9d3fd_row8_col5" class="data row8 col5" >0.713</td>
+      <td id="T_9d3fd_row8_col6" class="data row8 col6" >0.350</td>
+      <td id="T_9d3fd_row8_col7" class="data row8 col7" >0.298</td>
+      <td id="T_9d3fd_row8_col8" class="data row8 col8" >1.000</td>
     </tr>
   </tbody>
 </table></div>
@@ -1543,7 +1543,7 @@ Estimator:                        GLS   Overall R-squared:                   0.9
 No. Equations.:                     9   McElroy&#39;s R-squared:                 0.9988
 No. Observations:                  17   Judge&#39;s (OLS) R-squared:             0.9937
 Date:                Mon, Oct 12 2026   Berndt&#39;s R-squared:                  1.0000
-Time:                        18:38:27   Dhrymes&#39;s R-squared:                 0.9937
+Time:                        18:43:16   Dhrymes&#39;s R-squared:                 0.9937
                                         Cov. Estimator:                  unadjusted
                                         Num. Constraints:                      None
                    Equation: GF, Dependent Variable: lnGSP
@@ -1572,7 +1572,7 @@ UNEMP         -0.0156     0.0025    -6.2950     0.0000     -0.0205     -0.0108
 ==============================================================================
 </pre></div></div>
 </div>
-<p>Individual results are contained in a dictionary located at the attribute <code class="docutils literal notranslate"><span class="pre">equations</span></code> and can be accessed using equation labels (available using the attribute <code class="docutils literal notranslate"><span class="pre">equation_labels</span></code>). Additional information about the model is presented in this view. The West Coast results are show.</p>
+<p>Individual results are contained in a dictionary located at the attribute <code class="docutils literal notranslate"><span class="pre">equations</span></code> and can be accessed using equation labels (available using the attribute <code class="docutils literal notranslate"><span class="pre">equation_labels</span></code>). Additional information about the model is presented in this view. The West Coast results are shown.</p>
 <div class="nbinput docutils container">
 <div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span><code>[9]:
 </code></pre></div>
@@ -1593,7 +1593,7 @@ Dep. Variable:                  lnGSP   Adj. R-squared:                 0.9900
 Estimator:                        GLS   Cov. Estimator:             unadjusted
 No. Observations:                  17   F-statistic:                    2862.4
 Date:                Mon, Oct 12 2026   P-value (F-stat)                0.0000
-Time:                        18:38:27   Distribution:                  chi2(6)
+Time:                        18:43:16   Distribution:                  chi2(6)
 
                              Parameter Estimates
 ==============================================================================
@@ -1633,114 +1633,114 @@ Homoskedastic (Unadjusted) Covariance (Debiased: False, GLS: True)
 <div class="output_area rendered_html docutils container">
 <style type="text/css">
 </style>
-<table id="T_8e42b">
+<table id="T_227be">
   <thead>
     <tr>
       <th class="blank level0" >&nbsp;</th>
-      <th id="T_8e42b_level0_col0" class="col_heading level0 col0" >Intercept</th>
-      <th id="T_8e42b_level0_col1" class="col_heading level0 col1" >lnPC</th>
-      <th id="T_8e42b_level0_col2" class="col_heading level0 col2" >lnHWY</th>
-      <th id="T_8e42b_level0_col3" class="col_heading level0 col3" >lnWATER</th>
-      <th id="T_8e42b_level0_col4" class="col_heading level0 col4" >lnUTIL</th>
-      <th id="T_8e42b_level0_col5" class="col_heading level0 col5" >lnEMP</th>
-      <th id="T_8e42b_level0_col6" class="col_heading level0 col6" >UNEMP</th>
+      <th id="T_227be_level0_col0" class="col_heading level0 col0" >Intercept</th>
+      <th id="T_227be_level0_col1" class="col_heading level0 col1" >lnPC</th>
+      <th id="T_227be_level0_col2" class="col_heading level0 col2" >lnHWY</th>
+      <th id="T_227be_level0_col3" class="col_heading level0 col3" >lnWATER</th>
+      <th id="T_227be_level0_col4" class="col_heading level0 col4" >lnUTIL</th>
+      <th id="T_227be_level0_col5" class="col_heading level0 col5" >lnEMP</th>
+      <th id="T_227be_level0_col6" class="col_heading level0 col6" >UNEMP</th>
     </tr>
   </thead>
   <tbody>
     <tr>
-      <th id="T_8e42b_level0_row0" class="row_heading level0 row0" >GF</th>
-      <td id="T_8e42b_row0_col0" class="data row0 col0" >12.310</td>
-      <td id="T_8e42b_row0_col1" class="data row0 col1" >-0.201</td>
-      <td id="T_8e42b_row0_col2" class="data row0 col2" >-1.886</td>
-      <td id="T_8e42b_row0_col3" class="data row0 col3" >0.178</td>
-      <td id="T_8e42b_row0_col4" class="data row0 col4" >1.190</td>
-      <td id="T_8e42b_row0_col5" class="data row0 col5" >0.953</td>
-      <td id="T_8e42b_row0_col6" class="data row0 col6" >-0.003</td>
+      <th id="T_227be_level0_row0" class="row_heading level0 row0" >GF</th>
+      <td id="T_227be_row0_col0" class="data row0 col0" >12.310</td>
+      <td id="T_227be_row0_col1" class="data row0 col1" >-0.201</td>
+      <td id="T_227be_row0_col2" class="data row0 col2" >-1.886</td>
+      <td id="T_227be_row0_col3" class="data row0 col3" >0.178</td>
+      <td id="T_227be_row0_col4" class="data row0 col4" >1.190</td>
+      <td id="T_227be_row0_col5" class="data row0 col5" >0.953</td>
+      <td id="T_227be_row0_col6" class="data row0 col6" >-0.003</td>
     </tr>
     <tr>
-      <th id="T_8e42b_level0_row1" class="row_heading level0 row1" >SW</th>
-      <td id="T_8e42b_row1_col0" class="data row1 col0" >4.083</td>
-      <td id="T_8e42b_row1_col1" class="data row1 col1" >0.077</td>
-      <td id="T_8e42b_row1_col2" class="data row1 col2" >-0.131</td>
-      <td id="T_8e42b_row1_col3" class="data row1 col3" >-0.136</td>
-      <td id="T_8e42b_row1_col4" class="data row1 col4" >0.522</td>
-      <td id="T_8e42b_row1_col5" class="data row1 col5" >0.539</td>
-      <td id="T_8e42b_row1_col6" class="data row1 col6" >-0.016</td>
+      <th id="T_227be_level0_row1" class="row_heading level0 row1" >SW</th>
+      <td id="T_227be_row1_col0" class="data row1 col0" >4.083</td>
+      <td id="T_227be_row1_col1" class="data row1 col1" >0.077</td>
+      <td id="T_227be_row1_col2" class="data row1 col2" >-0.131</td>
+      <td id="T_227be_row1_col3" class="data row1 col3" >-0.136</td>
+      <td id="T_227be_row1_col4" class="data row1 col4" >0.522</td>
+      <td id="T_227be_row1_col5" class="data row1 col5" >0.539</td>
+      <td id="T_227be_row1_col6" class="data row1 col6" >-0.016</td>
     </tr>
     <tr>
-      <th id="T_8e42b_level0_row2" class="row_heading level0 row2" >WC</th>
-      <td id="T_8e42b_row2_col0" class="data row2 col0" >1.960</td>
-      <td id="T_8e42b_row2_col1" class="data row2 col1" >0.170</td>
-      <td id="T_8e42b_row2_col2" class="data row2 col2" >0.132</td>
-      <td id="T_8e42b_row2_col3" class="data row2 col3" >-0.347</td>
-      <td id="T_8e42b_row2_col4" class="data row2 col4" >0.090</td>
-      <td id="T_8e42b_row2_col5" class="data row2 col5" >1.070</td>
-      <td id="T_8e42b_row2_col6" class="data row2 col6" >-0.006</td>
+      <th id="T_227be_level0_row2" class="row_heading level0 row2" >WC</th>
+      <td id="T_227be_row2_col0" class="data row2 col0" >1.960</td>
+      <td id="T_227be_row2_col1" class="data row2 col1" >0.170</td>
+      <td id="T_227be_row2_col2" class="data row2 col2" >0.132</td>
+      <td id="T_227be_row2_col3" class="data row2 col3" >-0.347</td>
+      <td id="T_227be_row2_col4" class="data row2 col4" >0.090</td>
+      <td id="T_227be_row2_col5" class="data row2 col5" >1.070</td>
+      <td id="T_227be_row2_col6" class="data row2 col6" >-0.006</td>
     </tr>
     <tr>
-      <th id="T_8e42b_level0_row3" class="row_heading level0 row3" >MT</th>
-      <td id="T_8e42b_row3_col0" class="data row3 col0" >3.463</td>
-      <td id="T_8e42b_row3_col1" class="data row3 col1" >-0.115</td>
-      <td id="T_8e42b_row3_col2" class="data row3 col2" >0.180</td>
-      <td id="T_8e42b_row3_col3" class="data row3 col3" >0.262</td>
-      <td id="T_8e42b_row3_col4" class="data row3 col4" >-0.330</td>
-      <td id="T_8e42b_row3_col5" class="data row3 col5" >1.079</td>
-      <td id="T_8e42b_row3_col6" class="data row3 col6" >-0.001</td>
+      <th id="T_227be_level0_row3" class="row_heading level0 row3" >MT</th>
+      <td id="T_227be_row3_col0" class="data row3 col0" >3.463</td>
+      <td id="T_227be_row3_col1" class="data row3 col1" >-0.115</td>
+      <td id="T_227be_row3_col2" class="data row3 col2" >0.180</td>
+      <td id="T_227be_row3_col3" class="data row3 col3" >0.262</td>
+      <td id="T_227be_row3_col4" class="data row3 col4" >-0.330</td>
+      <td id="T_227be_row3_col5" class="data row3 col5" >1.079</td>
+      <td id="T_227be_row3_col6" class="data row3 col6" >-0.001</td>
     </tr>
     <tr>
-      <th id="T_8e42b_level0_row4" class="row_heading level0 row4" >NE</th>
-      <td id="T_8e42b_row4_col0" class="data row4 col0" >-12.294</td>
-      <td id="T_8e42b_row4_col1" class="data row4 col1" >0.118</td>
-      <td id="T_8e42b_row4_col2" class="data row4 col2" >0.934</td>
-      <td id="T_8e42b_row4_col3" class="data row4 col3" >-0.557</td>
-      <td id="T_8e42b_row4_col4" class="data row4 col4" >-0.290</td>
-      <td id="T_8e42b_row4_col5" class="data row4 col5" >2.494</td>
-      <td id="T_8e42b_row4_col6" class="data row4 col6" >0.020</td>
+      <th id="T_227be_level0_row4" class="row_heading level0 row4" >NE</th>
+      <td id="T_227be_row4_col0" class="data row4 col0" >-12.294</td>
+      <td id="T_227be_row4_col1" class="data row4 col1" >0.118</td>
+      <td id="T_227be_row4_col2" class="data row4 col2" >0.934</td>
+      <td id="T_227be_row4_col3" class="data row4 col3" >-0.557</td>
+      <td id="T_227be_row4_col4" class="data row4 col4" >-0.290</td>
+      <td id="T_227be_row4_col5" class="data row4 col5" >2.494</td>
+      <td id="T_227be_row4_col6" class="data row4 col6" >0.020</td>
     </tr>
     <tr>
-      <th id="T_8e42b_level0_row5" class="row_heading level0 row5" >MA</th>
-      <td id="T_8e42b_row5_col0" class="data row5 col0" >-18.616</td>
-      <td id="T_8e42b_row5_col1" class="data row5 col1" >-0.311</td>
-      <td id="T_8e42b_row5_col2" class="data row5 col2" >3.060</td>
-      <td id="T_8e42b_row5_col3" class="data row5 col3" >-0.109</td>
-      <td id="T_8e42b_row5_col4" class="data row5 col4" >-1.659</td>
-      <td id="T_8e42b_row5_col5" class="data row5 col5" >2.186</td>
-      <td id="T_8e42b_row5_col6" class="data row5 col6" >0.018</td>
+      <th id="T_227be_level0_row5" class="row_heading level0 row5" >MA</th>
+      <td id="T_227be_row5_col0" class="data row5 col0" >-18.616</td>
+      <td id="T_227be_row5_col1" class="data row5 col1" >-0.311</td>
+      <td id="T_227be_row5_col2" class="data row5 col2" >3.060</td>
+      <td id="T_227be_row5_col3" class="data row5 col3" >-0.109</td>
+      <td id="T_227be_row5_col4" class="data row5 col4" >-1.659</td>
+      <td id="T_227be_row5_col5" class="data row5 col5" >2.186</td>
+      <td id="T_227be_row5_col6" class="data row5 col6" >0.018</td>
     </tr>
     <tr>
-      <th id="T_8e42b_level0_row6" class="row_heading level0 row6" >SO</th>
-      <td id="T_8e42b_row6_col0" class="data row6 col0" >3.162</td>
-      <td id="T_8e42b_row6_col1" class="data row6 col1" >-0.063</td>
-      <td id="T_8e42b_row6_col2" class="data row6 col2" >-0.641</td>
-      <td id="T_8e42b_row6_col3" class="data row6 col3" >-0.081</td>
-      <td id="T_8e42b_row6_col4" class="data row6 col4" >0.281</td>
-      <td id="T_8e42b_row6_col5" class="data row6 col5" >1.620</td>
-      <td id="T_8e42b_row6_col6" class="data row6 col6" >0.008</td>
+      <th id="T_227be_level0_row6" class="row_heading level0 row6" >SO</th>
+      <td id="T_227be_row6_col0" class="data row6 col0" >3.162</td>
+      <td id="T_227be_row6_col1" class="data row6 col1" >-0.063</td>
+      <td id="T_227be_row6_col2" class="data row6 col2" >-0.641</td>
+      <td id="T_227be_row6_col3" class="data row6 col3" >-0.081</td>
+      <td id="T_227be_row6_col4" class="data row6 col4" >0.281</td>
+      <td id="T_227be_row6_col5" class="data row6 col5" >1.620</td>
+      <td id="T_227be_row6_col6" class="data row6 col6" >0.008</td>
     </tr>
     <tr>
-      <th id="T_8e42b_level0_row7" class="row_heading level0 row7" >MW</th>
-      <td id="T_8e42b_row7_col0" class="data row7 col0" >-9.258</td>
-      <td id="T_8e42b_row7_col1" class="data row7 col1" >0.096</td>
-      <td id="T_8e42b_row7_col2" class="data row7 col2" >1.612</td>
-      <td id="T_8e42b_row7_col3" class="data row7 col3" >0.694</td>
-      <td id="T_8e42b_row7_col4" class="data row7 col4" >-0.340</td>
-      <td id="T_8e42b_row7_col5" class="data row7 col5" >-0.062</td>
-      <td id="T_8e42b_row7_col6" class="data row7 col6" >-0.031</td>
+      <th id="T_227be_level0_row7" class="row_heading level0 row7" >MW</th>
+      <td id="T_227be_row7_col0" class="data row7 col0" >-9.258</td>
+      <td id="T_227be_row7_col1" class="data row7 col1" >0.096</td>
+      <td id="T_227be_row7_col2" class="data row7 col2" >1.612</td>
+      <td id="T_227be_row7_col3" class="data row7 col3" >0.694</td>
+      <td id="T_227be_row7_col4" class="data row7 col4" >-0.340</td>
+      <td id="T_227be_row7_col5" class="data row7 col5" >-0.062</td>
+      <td id="T_227be_row7_col6" class="data row7 col6" >-0.031</td>
     </tr>
     <tr>
-      <th id="T_8e42b_level0_row8" class="row_heading level0 row8" >CN</th>
-      <td id="T_8e42b_row8_col0" class="data row8 col0" >-3.405</td>
-      <td id="T_8e42b_row8_col1" class="data row8 col1" >0.295</td>
-      <td id="T_8e42b_row8_col2" class="data row8 col2" >0.934</td>
-      <td id="T_8e42b_row8_col3" class="data row8 col3" >0.539</td>
-      <td id="T_8e42b_row8_col4" class="data row8 col4" >0.003</td>
-      <td id="T_8e42b_row8_col5" class="data row8 col5" >-0.321</td>
-      <td id="T_8e42b_row8_col6" class="data row8 col6" >-0.029</td>
+      <th id="T_227be_level0_row8" class="row_heading level0 row8" >CN</th>
+      <td id="T_227be_row8_col0" class="data row8 col0" >-3.405</td>
+      <td id="T_227be_row8_col1" class="data row8 col1" >0.295</td>
+      <td id="T_227be_row8_col2" class="data row8 col2" >0.934</td>
+      <td id="T_227be_row8_col3" class="data row8 col3" >0.539</td>
+      <td id="T_227be_row8_col4" class="data row8 col4" >0.003</td>
+      <td id="T_227be_row8_col5" class="data row8 col5" >-0.321</td>
+      <td id="T_227be_row8_col6" class="data row8 col6" >-0.029</td>
     </tr>
   </tbody>
 </table></div>
 </div>
-<p>These results can be compared to the results in Greene – they are unsurprisingly identical.</p>
+<p>These results can be compared to the FGLS estimates in Table 10.1 of Greene, which is shown below. They agree with the table, up to differences in the last printed digit, except for three printed entries that look like misprints: the entries for <code class="docutils literal notranslate"><span class="pre">UNEMP</span></code> in SW and for <code class="docutils literal notranslate"><span class="pre">lnUTIL</span></code> in WC have a misplaced decimal point, and the entry for <code class="docutils literal notranslate"><span class="pre">lnPC</span></code> in NE has the opposite sign. The estimates also agree with an independent computation of the FGLS estimator.</p>
 <div class="nbinput docutils container">
 <div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span><code>[11]:
 </code></pre></div>
@@ -1757,7 +1757,7 @@ Homoskedastic (Unadjusted) Covariance (Debiased: False, GLS: True)
 </div>
 </div>
 <p>The GLS estimation method requires stronger assumptions for parameter estimates to be consistent. If these are violated then it might be the case that OLS is still consistent (in some sense) and so OLS can be used by passing <code class="docutils literal notranslate"><span class="pre">method=&quot;ols&quot;</span></code> when calling <code class="docutils literal notranslate"><span class="pre">fit</span></code>.</p>
-<p>These results can be compared to Greene”s table – they are identical except the final value which seems to have a small typo.</p>
+<p>These results can be compared to the OLS estimates in Table 10.1, which is shown above. They agree with the table, up to differences in the last printed digit, except for five printed entries: <code class="docutils literal notranslate"><span class="pre">UNEMP</span></code> for CN, which is the final value, has a misplaced decimal point, <code class="docutils literal notranslate"><span class="pre">lnEMP</span></code> for MA has two digits transposed, and the intercepts for GF and SO and <code class="docutils literal notranslate"><span class="pre">lnUTIL</span></code> for SO differ by about 0.003 to 0.005.</p>
 <div class="nbinput docutils container">
 <div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span><code>[12]:
 </code></pre></div>
@@ -1783,124 +1783,124 @@ Homoskedastic (Unadjusted) Covariance (Debiased: False, GLS: True)
 <div class="output_area rendered_html docutils container">
 <style type="text/css">
 </style>
-<table id="T_d326a">
+<table id="T_dfe18">
   <thead>
     <tr>
       <th class="blank level0" >&nbsp;</th>
-      <th id="T_d326a_level0_col0" class="col_heading level0 col0" >Intercept</th>
-      <th id="T_d326a_level0_col1" class="col_heading level0 col1" >lnPC</th>
-      <th id="T_d326a_level0_col2" class="col_heading level0 col2" >lnHWY</th>
-      <th id="T_d326a_level0_col3" class="col_heading level0 col3" >lnWATER</th>
-      <th id="T_d326a_level0_col4" class="col_heading level0 col4" >lnUTIL</th>
-      <th id="T_d326a_level0_col5" class="col_heading level0 col5" >lnEMP</th>
-      <th id="T_d326a_level0_col6" class="col_heading level0 col6" >UNEMP</th>
-      <th id="T_d326a_level0_col7" class="col_heading level0 col7" >R2</th>
+      <th id="T_dfe18_level0_col0" class="col_heading level0 col0" >Intercept</th>
+      <th id="T_dfe18_level0_col1" class="col_heading level0 col1" >lnPC</th>
+      <th id="T_dfe18_level0_col2" class="col_heading level0 col2" >lnHWY</th>
+      <th id="T_dfe18_level0_col3" class="col_heading level0 col3" >lnWATER</th>
+      <th id="T_dfe18_level0_col4" class="col_heading level0 col4" >lnUTIL</th>
+      <th id="T_dfe18_level0_col5" class="col_heading level0 col5" >lnEMP</th>
+      <th id="T_dfe18_level0_col6" class="col_heading level0 col6" >UNEMP</th>
+      <th id="T_dfe18_level0_col7" class="col_heading level0 col7" >R2</th>
     </tr>
   </thead>
   <tbody>
     <tr>
-      <th id="T_d326a_level0_row0" class="row_heading level0 row0" >GF</th>
-      <td id="T_d326a_row0_col0" class="data row0 col0" >11.567</td>
-      <td id="T_d326a_row0_col1" class="data row0 col1" >0.002</td>
-      <td id="T_d326a_row0_col2" class="data row0 col2" >-2.029</td>
-      <td id="T_d326a_row0_col3" class="data row0 col3" >0.101</td>
-      <td id="T_d326a_row0_col4" class="data row0 col4" >1.358</td>
-      <td id="T_d326a_row0_col5" class="data row0 col5" >0.805</td>
-      <td id="T_d326a_row0_col6" class="data row0 col6" >-0.007</td>
-      <td id="T_d326a_row0_col7" class="data row0 col7" >0.997</td>
+      <th id="T_dfe18_level0_row0" class="row_heading level0 row0" >GF</th>
+      <td id="T_dfe18_row0_col0" class="data row0 col0" >11.567</td>
+      <td id="T_dfe18_row0_col1" class="data row0 col1" >0.002</td>
+      <td id="T_dfe18_row0_col2" class="data row0 col2" >-2.029</td>
+      <td id="T_dfe18_row0_col3" class="data row0 col3" >0.101</td>
+      <td id="T_dfe18_row0_col4" class="data row0 col4" >1.358</td>
+      <td id="T_dfe18_row0_col5" class="data row0 col5" >0.805</td>
+      <td id="T_dfe18_row0_col6" class="data row0 col6" >-0.007</td>
+      <td id="T_dfe18_row0_col7" class="data row0 col7" >0.997</td>
     </tr>
     <tr>
-      <th id="T_d326a_level0_row1" class="row_heading level0 row1" >SW</th>
-      <td id="T_d326a_row1_col0" class="data row1 col0" >3.028</td>
-      <td id="T_d326a_row1_col1" class="data row1 col1" >0.164</td>
-      <td id="T_d326a_row1_col2" class="data row1 col2" >-0.075</td>
-      <td id="T_d326a_row1_col3" class="data row1 col3" >-0.169</td>
-      <td id="T_d326a_row1_col4" class="data row1 col4" >0.637</td>
-      <td id="T_d326a_row1_col5" class="data row1 col5" >0.362</td>
-      <td id="T_d326a_row1_col6" class="data row1 col6" >-0.017</td>
-      <td id="T_d326a_row1_col7" class="data row1 col7" >0.998</td>
+      <th id="T_dfe18_level0_row1" class="row_heading level0 row1" >SW</th>
+      <td id="T_dfe18_row1_col0" class="data row1 col0" >3.028</td>
+      <td id="T_dfe18_row1_col1" class="data row1 col1" >0.164</td>
+      <td id="T_dfe18_row1_col2" class="data row1 col2" >-0.075</td>
+      <td id="T_dfe18_row1_col3" class="data row1 col3" >-0.169</td>
+      <td id="T_dfe18_row1_col4" class="data row1 col4" >0.637</td>
+      <td id="T_dfe18_row1_col5" class="data row1 col5" >0.362</td>
+      <td id="T_dfe18_row1_col6" class="data row1 col6" >-0.017</td>
+      <td id="T_dfe18_row1_col7" class="data row1 col7" >0.998</td>
     </tr>
     <tr>
-      <th id="T_d326a_level0_row2" class="row_heading level0 row2" >WC</th>
-      <td id="T_d326a_row2_col0" class="data row2 col0" >3.590</td>
-      <td id="T_d326a_row2_col1" class="data row2 col1" >0.295</td>
-      <td id="T_d326a_row2_col2" class="data row2 col2" >0.174</td>
-      <td id="T_d326a_row2_col3" class="data row2 col3" >-0.226</td>
-      <td id="T_d326a_row2_col4" class="data row2 col4" >-0.214</td>
-      <td id="T_d326a_row2_col5" class="data row2 col5" >0.917</td>
-      <td id="T_d326a_row2_col6" class="data row2 col6" >-0.008</td>
-      <td id="T_d326a_row2_col7" class="data row2 col7" >0.994</td>
+      <th id="T_dfe18_level0_row2" class="row_heading level0 row2" >WC</th>
+      <td id="T_dfe18_row2_col0" class="data row2 col0" >3.590</td>
+      <td id="T_dfe18_row2_col1" class="data row2 col1" >0.295</td>
+      <td id="T_dfe18_row2_col2" class="data row2 col2" >0.174</td>
+      <td id="T_dfe18_row2_col3" class="data row2 col3" >-0.226</td>
+      <td id="T_dfe18_row2_col4" class="data row2 col4" >-0.214</td>
+      <td id="T_dfe18_row2_col5" class="data row2 col5" >0.917</td>
+      <td id="T_dfe18_row2_col6" class="data row2 col6" >-0.008</td>
+      <td id="T_dfe18_row2_col7" class="data row2 col7" >0.994</td>
     </tr>
     <tr>
-      <th id="T_d326a_level0_row3" class="row_heading level0 row3" >MT</th>
-      <td id="T_d326a_row3_col0" class="data row3 col0" >6.378</td>
-      <td id="T_d326a_row3_col1" class="data row3 col1" >-0.153</td>
-      <td id="T_d326a_row3_col2" class="data row3 col2" >-0.123</td>
-      <td id="T_d326a_row3_col3" class="data row3 col3" >0.306</td>
-      <td id="T_d326a_row3_col4" class="data row3 col4" >-0.533</td>
-      <td id="T_d326a_row3_col5" class="data row3 col5" >1.344</td>
-      <td id="T_d326a_row3_col6" class="data row3 col6" >0.005</td>
-      <td id="T_d326a_row3_col7" class="data row3 col7" >0.999</td>
+      <th id="T_dfe18_level0_row3" class="row_heading level0 row3" >MT</th>
+      <td id="T_dfe18_row3_col0" class="data row3 col0" >6.378</td>
+      <td id="T_dfe18_row3_col1" class="data row3 col1" >-0.153</td>
+      <td id="T_dfe18_row3_col2" class="data row3 col2" >-0.123</td>
+      <td id="T_dfe18_row3_col3" class="data row3 col3" >0.306</td>
+      <td id="T_dfe18_row3_col4" class="data row3 col4" >-0.533</td>
+      <td id="T_dfe18_row3_col5" class="data row3 col5" >1.344</td>
+      <td id="T_dfe18_row3_col6" class="data row3 col6" >0.005</td>
+      <td id="T_dfe18_row3_col7" class="data row3 col7" >0.999</td>
     </tr>
     <tr>
-      <th id="T_d326a_level0_row4" class="row_heading level0 row4" >NE</th>
-      <td id="T_d326a_row4_col0" class="data row4 col0" >-13.730</td>
-      <td id="T_d326a_row4_col1" class="data row4 col1" >-0.020</td>
-      <td id="T_d326a_row4_col2" class="data row4 col2" >0.662</td>
-      <td id="T_d326a_row4_col3" class="data row4 col3" >-0.969</td>
-      <td id="T_d326a_row4_col4" class="data row4 col4" >-0.107</td>
-      <td id="T_d326a_row4_col5" class="data row4 col5" >3.380</td>
-      <td id="T_d326a_row4_col6" class="data row4 col6" >0.034</td>
-      <td id="T_d326a_row4_col7" class="data row4 col7" >0.985</td>
+      <th id="T_dfe18_level0_row4" class="row_heading level0 row4" >NE</th>
+      <td id="T_dfe18_row4_col0" class="data row4 col0" >-13.730</td>
+      <td id="T_dfe18_row4_col1" class="data row4 col1" >-0.020</td>
+      <td id="T_dfe18_row4_col2" class="data row4 col2" >0.662</td>
+      <td id="T_dfe18_row4_col3" class="data row4 col3" >-0.969</td>
+      <td id="T_dfe18_row4_col4" class="data row4 col4" >-0.107</td>
+      <td id="T_dfe18_row4_col5" class="data row4 col5" >3.380</td>
+      <td id="T_dfe18_row4_col6" class="data row4 col6" >0.034</td>
+      <td id="T_dfe18_row4_col7" class="data row4 col7" >0.985</td>
     </tr>
     <tr>
-      <th id="T_d326a_level0_row5" class="row_heading level0 row5" >MA</th>
-      <td id="T_d326a_row5_col0" class="data row5 col0" >-22.855</td>
-      <td id="T_d326a_row5_col1" class="data row5 col1" >-0.378</td>
-      <td id="T_d326a_row5_col2" class="data row5 col2" >3.348</td>
-      <td id="T_d326a_row5_col3" class="data row5 col3" >-0.264</td>
-      <td id="T_d326a_row5_col4" class="data row5 col4" >-1.778</td>
-      <td id="T_d326a_row5_col5" class="data row5 col5" >2.673</td>
-      <td id="T_d326a_row5_col6" class="data row5 col6" >0.026</td>
-      <td id="T_d326a_row5_col7" class="data row5 col7" >0.986</td>
+      <th id="T_dfe18_level0_row5" class="row_heading level0 row5" >MA</th>
+      <td id="T_dfe18_row5_col0" class="data row5 col0" >-22.855</td>
+      <td id="T_dfe18_row5_col1" class="data row5 col1" >-0.378</td>
+      <td id="T_dfe18_row5_col2" class="data row5 col2" >3.348</td>
+      <td id="T_dfe18_row5_col3" class="data row5 col3" >-0.264</td>
+      <td id="T_dfe18_row5_col4" class="data row5 col4" >-1.778</td>
+      <td id="T_dfe18_row5_col5" class="data row5 col5" >2.673</td>
+      <td id="T_dfe18_row5_col6" class="data row5 col6" >0.026</td>
+      <td id="T_dfe18_row5_col7" class="data row5 col7" >0.986</td>
     </tr>
     <tr>
-      <th id="T_d326a_level0_row6" class="row_heading level0 row6" >SO</th>
-      <td id="T_d326a_row6_col0" class="data row6 col0" >3.927</td>
-      <td id="T_d326a_row6_col1" class="data row6 col1" >0.043</td>
-      <td id="T_d326a_row6_col2" class="data row6 col2" >-0.773</td>
-      <td id="T_d326a_row6_col3" class="data row6 col3" >-0.035</td>
-      <td id="T_d326a_row6_col4" class="data row6 col4" >0.140</td>
-      <td id="T_d326a_row6_col5" class="data row6 col5" >1.665</td>
-      <td id="T_d326a_row6_col6" class="data row6 col6" >0.008</td>
-      <td id="T_d326a_row6_col7" class="data row6 col7" >0.994</td>
+      <th id="T_dfe18_level0_row6" class="row_heading level0 row6" >SO</th>
+      <td id="T_dfe18_row6_col0" class="data row6 col0" >3.927</td>
+      <td id="T_dfe18_row6_col1" class="data row6 col1" >0.043</td>
+      <td id="T_dfe18_row6_col2" class="data row6 col2" >-0.773</td>
+      <td id="T_dfe18_row6_col3" class="data row6 col3" >-0.035</td>
+      <td id="T_dfe18_row6_col4" class="data row6 col4" >0.140</td>
+      <td id="T_dfe18_row6_col5" class="data row6 col5" >1.665</td>
+      <td id="T_dfe18_row6_col6" class="data row6 col6" >0.008</td>
+      <td id="T_dfe18_row6_col7" class="data row6 col7" >0.994</td>
     </tr>
     <tr>
-      <th id="T_d326a_level0_row7" class="row_heading level0 row7" >MW</th>
-      <td id="T_d326a_row7_col0" class="data row7 col0" >-9.111</td>
-      <td id="T_d326a_row7_col1" class="data row7 col1" >0.233</td>
-      <td id="T_d326a_row7_col2" class="data row7 col2" >1.604</td>
-      <td id="T_d326a_row7_col3" class="data row7 col3" >0.717</td>
-      <td id="T_d326a_row7_col4" class="data row7 col4" >-0.356</td>
-      <td id="T_d326a_row7_col5" class="data row7 col5" >-0.259</td>
-      <td id="T_d326a_row7_col6" class="data row7 col6" >-0.034</td>
-      <td id="T_d326a_row7_col7" class="data row7 col7" >0.989</td>
+      <th id="T_dfe18_level0_row7" class="row_heading level0 row7" >MW</th>
+      <td id="T_dfe18_row7_col0" class="data row7 col0" >-9.111</td>
+      <td id="T_dfe18_row7_col1" class="data row7 col1" >0.233</td>
+      <td id="T_dfe18_row7_col2" class="data row7 col2" >1.604</td>
+      <td id="T_dfe18_row7_col3" class="data row7 col3" >0.717</td>
+      <td id="T_dfe18_row7_col4" class="data row7 col4" >-0.356</td>
+      <td id="T_dfe18_row7_col5" class="data row7 col5" >-0.259</td>
+      <td id="T_dfe18_row7_col6" class="data row7 col6" >-0.034</td>
+      <td id="T_dfe18_row7_col7" class="data row7 col7" >0.989</td>
     </tr>
     <tr>
-      <th id="T_d326a_level0_row8" class="row_heading level0 row8" >CN</th>
-      <td id="T_d326a_row8_col0" class="data row8 col0" >-5.621</td>
-      <td id="T_d326a_row8_col1" class="data row8 col1" >0.386</td>
-      <td id="T_d326a_row8_col2" class="data row8 col2" >1.267</td>
-      <td id="T_d326a_row8_col3" class="data row8 col3" >0.546</td>
-      <td id="T_d326a_row8_col4" class="data row8 col4" >-0.108</td>
-      <td id="T_d326a_row8_col5" class="data row8 col5" >-0.475</td>
-      <td id="T_d326a_row8_col6" class="data row8 col6" >-0.031</td>
-      <td id="T_d326a_row8_col7" class="data row8 col7" >0.995</td>
+      <th id="T_dfe18_level0_row8" class="row_heading level0 row8" >CN</th>
+      <td id="T_dfe18_row8_col0" class="data row8 col0" >-5.621</td>
+      <td id="T_dfe18_row8_col1" class="data row8 col1" >0.386</td>
+      <td id="T_dfe18_row8_col2" class="data row8 col2" >1.267</td>
+      <td id="T_dfe18_row8_col3" class="data row8 col3" >0.546</td>
+      <td id="T_dfe18_row8_col4" class="data row8 col4" >-0.108</td>
+      <td id="T_dfe18_row8_col5" class="data row8 col5" >-0.475</td>
+      <td id="T_dfe18_row8_col6" class="data row8 col6" >-0.031</td>
+      <td id="T_dfe18_row8_col7" class="data row8 col7" >0.995</td>
     </tr>
   </tbody>
 </table></div>
 </div>
-<p>The parameter estimates for one coefficient – unemployment – can be compared across the two estimation methods.</p>
+<p>The parameter estimates for one coefficient – private capital (<code class="docutils literal notranslate"><span class="pre">lnPC</span></code>) – can be compared across the two estimation methods.</p>
 <div class="nbinput docutils container">
 <div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span><code>[13]:
 </code></pre></div>
@@ -2017,7 +2017,7 @@ Homoskedastic (Unadjusted) Covariance (Debiased: False, GLS: True)
 </table>
 </div></div>
 </div>
-<p>The parameters and their standard errors match those reported in Greene.</p>
+<p>The parameters and their standard errors match those in Table 10.3 of Greene, which is shown below, except for the FGLS estimate for NE, which has the opposite sign in the printed table.</p>
 <div class="nbinput docutils container">
 <div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span><code>[14]:
 </code></pre></div>
@@ -2140,7 +2140,7 @@ Estimator:                        OLS   Overall R-squared:                   0.2
 No. Equations.:                     2   McElroy&#39;s R-squared:                 0.2926
 No. Observations:                 616   Judge&#39;s (OLS) R-squared:             0.2087
 Date:                Mon, Oct 12 2026   Berndt&#39;s R-squared:                  0.4822
-Time:                        18:38:28   Dhrymes&#39;s R-squared:                 0.2087
+Time:                        18:43:17   Dhrymes&#39;s R-squared:                 0.2087
                                         Cov. Estimator:                  unadjusted
                                         Num. Constraints:                      None
                  Equation: hrearn, Dependent Variable: hrearn
@@ -2183,7 +2183,7 @@ Covariance Estimator:
 Homoskedastic (Unadjusted) Covariance (Debiased: False, GLS: False)
 </pre></div></div>
 </div>
-<p>The estimator can be forced to use GLS by setting <code class="docutils literal notranslate"><span class="pre">method=&quot;gls&quot;</span></code>. As can be seen below, the parameter estimates and standard errors do not change even though two-stage GLS is used. The <span class="math notranslate nohighlight">\(R^2\)</span> <strong>does change</strong> since the left-hand side variable is transformed by the GLS weighting before estimation.</p>
+<p>The estimator can be forced to use GLS by setting <code class="docutils literal notranslate"><span class="pre">method=&quot;gls&quot;</span></code>. As can be seen below, the parameter estimates, standard errors and <span class="math notranslate nohighlight">\(R^2\)</span> do not change even though two-stage GLS is used.</p>
 <div class="nbinput docutils container">
 <div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span><code>[17]:
 </code></pre></div>
@@ -2203,7 +2203,7 @@ Estimator:                        GLS   Overall R-squared:                   0.2
 No. Equations.:                     2   McElroy&#39;s R-squared:                 0.2926
 No. Observations:                 616   Judge&#39;s (OLS) R-squared:             0.2087
 Date:                Mon, Oct 12 2026   Berndt&#39;s R-squared:                  0.4822
-Time:                        18:38:28   Dhrymes&#39;s R-squared:                 0.2087
+Time:                        18:43:17   Dhrymes&#39;s R-squared:                 0.2087
                                         Cov. Estimator:                  unadjusted
                                         Num. Constraints:                      None
                  Equation: hrearn, Dependent Variable: hrearn
@@ -2275,7 +2275,7 @@ Estimator:                        GLS   Overall R-squared:                   0.1
 No. Equations.:                     2   McElroy&#39;s R-squared:                 0.2762
 No. Observations:                 616   Judge&#39;s (OLS) R-squared:             0.1685
 Date:                Mon, Oct 12 2026   Berndt&#39;s R-squared:                  0.4504
-Time:                        18:38:28   Dhrymes&#39;s R-squared:                 0.1685
+Time:                        18:43:17   Dhrymes&#39;s R-squared:                 0.1685
                                         Cov. Estimator:                  unadjusted
                                         Num. Constraints:                      None
                  Equation: hrearn, Dependent Variable: hrearn
@@ -2328,7 +2328,7 @@ Estimator:              Iterative GLS   Overall R-squared:                   0.1
 No. Equations.:                     2   McElroy&#39;s R-squared:                 0.2749
 No. Observations:                 616   Judge&#39;s (OLS) R-squared:             0.1685
 Date:                Mon, Oct 12 2026   Berndt&#39;s R-squared:                  0.4532
-Time:                        18:38:28   Dhrymes&#39;s R-squared:                 0.1685
+Time:                        18:43:17   Dhrymes&#39;s R-squared:                 0.1685
                                         Cov. Estimator:                  unadjusted
                                         Num. Constraints:                      None
                  Equation: hrearn, Dependent Variable: hrearn
@@ -2379,9 +2379,9 @@ Homoskedastic (Unadjusted) Covariance (Debiased: False, GLS: True)
 </pre></div></div>
 </div>
 <h3 id="Alternative-Covariance-Estimators">Alternative Covariance Estimators<a class="headerlink" href="#Alternative-Covariance-Estimators" title="Link to this heading">¶</a></h3>
-<p>The estimator supports heteroskedasticity robust covariance estimation b setting <code class="docutils literal notranslate"><span class="pre">cov_type=&quot;robust&quot;</span></code>. The estimator allows for arbitrary correlation across series with the same time index but not correlation across time periods, which is the same assumption as in the unadjusted estimator. The main difference is that this estimator will correct standard errors for dependence between regressors (or squared regressors) and squared residuals.</p>
+<p>The estimator supports heteroskedasticity robust covariance estimation by setting <code class="docutils literal notranslate"><span class="pre">cov_type=&quot;robust&quot;</span></code>. The estimator allows for arbitrary correlation across series with the same time index but not correlation across time periods, which is the same assumption as in the unadjusted estimator. The main difference is that this estimator will correct standard errors for dependence between regressors (or squared regressors) and squared residuals.</p>
 <h4 id="Heteroskedasticity-Robust-Covariance-Estimation">Heteroskedasticity Robust Covariance Estimation<a class="headerlink" href="#Heteroskedasticity-Robust-Covariance-Estimation" title="Link to this heading">¶</a></h4>
-<p>In the fringe benefit model there are some large differences between standard errors computed using the the homoskedastic covariance estimator and the heteroskedasticity robust covariance estimator (e.g., <code class="docutils literal notranslate"><span class="pre">exper</span></code>).</p>
+<p>In the fringe benefit model there are some large differences between standard errors computed using the homoskedastic covariance estimator and the heteroskedasticity robust covariance estimator (e.g., <code class="docutils literal notranslate"><span class="pre">exper</span></code>).</p>
 <div class="nbinput docutils container">
 <div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span><code>[21]:
 </code></pre></div>
@@ -2402,7 +2402,7 @@ Estimator:                        GLS   Overall R-squared:                   0.1
 No. Equations.:                     2   McElroy&#39;s R-squared:                 0.2762
 No. Observations:                 616   Judge&#39;s (OLS) R-squared:             0.1685
 Date:                Mon, Oct 12 2026   Berndt&#39;s R-squared:                  0.4504
-Time:                        18:38:28   Dhrymes&#39;s R-squared:                 0.1685
+Time:                        18:43:17   Dhrymes&#39;s R-squared:                 0.1685
                                         Cov. Estimator:                      robust
                                         Num. Constraints:                      None
                  Equation: hrearn, Dependent Variable: hrearn
@@ -2434,7 +2434,7 @@ Covariance Estimator:
 Heteroskedastic (Robust) Covariance (Debiased: False, GLS: True)
 </pre></div></div>
 </div>
-<p>Other supported covariance estimators include <code class="docutils literal notranslate"><span class="pre">&quot;kernel</span></code>” which implements a HAC and <code class="docutils literal notranslate"><span class="pre">&quot;clustered&quot;</span></code> which supports 1 and 2-way clustering.</p>
+<p>Other supported covariance estimators include <code class="docutils literal notranslate"><span class="pre">&quot;kernel&quot;</span></code> which implements a HAC and <code class="docutils literal notranslate"><span class="pre">&quot;clustered&quot;</span></code> which supports 1 and 2-way clustering.</p>
 <h4 id="Kernel-(HAC)">Kernel (HAC)<a class="headerlink" href="#Kernel-(HAC)" title="Link to this heading">¶</a></h4>
 <p>The supported kernels are <code class="docutils literal notranslate"><span class="pre">&quot;bartlett&quot;</span></code> (Newey-West), <code class="docutils literal notranslate"><span class="pre">&quot;parzen&quot;</span></code> (Gallant), and <code class="docutils literal notranslate"><span class="pre">qs</span></code> (Quadratic Spectral, Andrews). This example uses the Parzen kernel. The kernel’s bandwidth is computed automatically if the parameter <code class="docutils literal notranslate"><span class="pre">bandwidth</span></code> is not provided.</p>
 <div class="nbinput docutils container">
@@ -2457,7 +2457,7 @@ Estimator:                        GLS   Overall R-squared:                   0.1
 No. Equations.:                     2   McElroy&#39;s R-squared:                 0.2762
 No. Observations:                 616   Judge&#39;s (OLS) R-squared:             0.1685
 Date:                Mon, Oct 12 2026   Berndt&#39;s R-squared:                  0.4504
-Time:                        18:38:28   Dhrymes&#39;s R-squared:                 0.1685
+Time:                        18:43:17   Dhrymes&#39;s R-squared:                 0.1685
                                         Cov. Estimator:                      kernel
                                         Num. Constraints:                      None
                  Equation: hrearn, Dependent Variable: hrearn
@@ -2513,7 +2513,7 @@ Estimator:                        GLS   Overall R-squared:                   0.1
 No. Equations.:                     2   McElroy&#39;s R-squared:                 0.2762
 No. Observations:                 616   Judge&#39;s (OLS) R-squared:             0.1685
 Date:                Mon, Oct 12 2026   Berndt&#39;s R-squared:                  0.4504
-Time:                        18:38:28   Dhrymes&#39;s R-squared:                 0.1685
+Time:                        18:43:17   Dhrymes&#39;s R-squared:                 0.1685
                                         Cov. Estimator:                   clustered
                                         Num. Constraints:                      None
                  Equation: hrearn, Dependent Variable: hrearn
@@ -2573,7 +2573,7 @@ Dep. Variable:                  lnGSP   Adj. R-squared:                 0.9945
 Estimator:                        GLS   Cov. Estimator:             unadjusted
 No. Observations:                  17   F-statistic:                    549.95
 Date:                Mon, Oct 12 2026   P-value (F-stat)                0.0000
-Time:                        18:38:28   Distribution:                  F(6,90)
+Time:                        18:43:17   Distribution:                  F(6,90)
 
                              Parameter Estimates
 ==============================================================================
@@ -2677,7 +2677,7 @@ rest6       1.0       0.0
 rest7       0.0       1.0
 </pre></div></div>
 </div>
-<p>The constraint can be added to an existing model using the <code class="docutils literal notranslate"><span class="pre">add_constraint</span></code> method. This method requires one input, <code class="docutils literal notranslate"><span class="pre">r</span></code> and optionally <code class="docutils literal notranslate"><span class="pre">q</span></code>. if <code class="docutils literal notranslate"><span class="pre">q</span></code> is not provided, it is set to 0.</p>
+<p>The constraint can be added to an existing model using the <code class="docutils literal notranslate"><span class="pre">add_constraints</span></code> method. This method requires one input, <code class="docutils literal notranslate"><span class="pre">r</span></code> and optionally <code class="docutils literal notranslate"><span class="pre">q</span></code>. if <code class="docutils literal notranslate"><span class="pre">q</span></code> is not provided, it is set to 0.</p>
 <p>Here the constraint is added, the model is estimated, and the parameters for unemployment are displayed. They all have the same value.</p>
 <div class="nbinput docutils container">
 <div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span><code>[27]:
@@ -2712,7 +2712,7 @@ Name: params, dtype: float64
 <div class="math notranslate nohighlight">
 \[\beta_{var,0} - \beta_{var,j} = 0\]</div>
 <p>so that the restriction is identical to the previous, only applied to all variables excluding the constant.</p>
-<p>Here the estimated from the first two equations are shown. All coefficients except the intercept are identical across equations.</p>
+<p>Here the estimates from the first two equations are shown. All coefficients except the intercept are identical across equations.</p>
 <p><strong>Note</strong>: When linear constraints are imposed, the parameter covariance matrix will be singular. Caution is needed to ensure test statistics are meaningful.</p>
 <div class="nbinput docutils container">
 <div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span><code>[28]:
@@ -2744,7 +2744,7 @@ Estimator:                        GLS   Overall R-squared:                   0.9
 No. Equations.:                     9   McElroy&#39;s R-squared:                 0.9891
 No. Observations:                  17   Judge&#39;s (OLS) R-squared:             0.9777
 Date:                Mon, Oct 12 2026   Berndt&#39;s R-squared:                  0.9974
-Time:                        18:38:28   Dhrymes&#39;s R-squared:                 0.9777
+Time:                        18:43:17   Dhrymes&#39;s R-squared:                 0.9777
                                         Cov. Estimator:                      robust
                                         Num. Constraints:                        48
                    Equation: GF, Dependent Variable: lnGSP
@@ -2804,7 +2804,7 @@ Estimator:                        OLS   Overall R-squared:                   0.6
 No. Equations.:                     6   McElroy&#39;s R-squared:                 0.8776
 No. Observations:                 819   Judge&#39;s (OLS) R-squared:             0.6564
 Date:                Mon, Oct 12 2026   Berndt&#39;s R-squared:                  0.9773
-Time:                        18:38:29   Dhrymes&#39;s R-squared:                 0.6564
+Time:                        18:43:18   Dhrymes&#39;s R-squared:                 0.6564
                                         Cov. Estimator:                  unadjusted
                                         Num. Constraints:                      None
                    Equation: S1V1, Dependent Variable: S1V1
@@ -2850,7 +2850,7 @@ Homoskedastic (Unadjusted) Covariance (Debiased: False, GLS: False)
 </pre></div></div>
 </div>
 <h3 id="Using-GLS-with-common-regressors">Using GLS with common regressors<a class="headerlink" href="#Using-GLS-with-common-regressors" title="Link to this heading">¶</a></h3>
-<p>As noted previously, forcing GLS has no effect (except on changing the <span class="math notranslate nohighlight">\(R^2\)</span>). This can be seen below.</p>
+<p>As noted previously, forcing GLS has no effect. This can be seen below.</p>
 <div class="nbinput docutils container">
 <div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span><code>[30]:
 </code></pre></div>
@@ -2870,7 +2870,7 @@ Estimator:                        GLS   Overall R-squared:                   0.6
 No. Equations.:                     6   McElroy&#39;s R-squared:                 0.8776
 No. Observations:                 819   Judge&#39;s (OLS) R-squared:             0.6564
 Date:                Mon, Oct 12 2026   Berndt&#39;s R-squared:                  0.9773
-Time:                        18:38:29   Dhrymes&#39;s R-squared:                 0.6564
+Time:                        18:43:18   Dhrymes&#39;s R-squared:                 0.6564
                                         Cov. Estimator:                  unadjusted
                                         Num. Constraints:                      None
                    Equation: S1V1, Dependent Variable: S1V1

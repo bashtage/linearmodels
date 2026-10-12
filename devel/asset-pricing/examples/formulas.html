@@ -23,7 +23,7 @@
     
   
       
-        <title>Using Formulas - linearmodels v7.1 (+277)</title>
+        <title>Using Formulas - linearmodels v7.1 (+291)</title>
       
     
 
@@ -101,7 +101,7 @@
 
 <header class="md-header md-header--shadow" data-md-component="header">
   <nav class="md-header__inner md-grid" aria-label="Header">
-    <a href="../../index.html" title="linearmodels v7.1 (+277)" class="md-header__button md-logo" aria-label="linearmodels v7.1 (+277)" data-md-component="logo">
+    <a href="../../index.html" title="linearmodels v7.1 (+291)" class="md-header__button md-logo" aria-label="linearmodels v7.1 (+291)" data-md-component="logo">
       <img src="../../_static/bw-logo.svg" alt="logo">
     </a>
     <label class="md-header__button md-icon" for="__drawer">
@@ -112,7 +112,7 @@
       <div class="md-header__ellipsis">
         <div class="md-header__topic">
           <span class="md-ellipsis">
-            linearmodels v7.1 (+277)
+            linearmodels v7.1 (+291)
           </span>
         </div>
         <div class="md-header__topic" data-md-component="header-topic">
@@ -207,10 +207,10 @@
 
 <nav class="md-nav md-nav--primary" aria-label="Navigation" data-md-level="0">
   <label class="md-nav__title" for="__drawer">
-    <a href="../../index.html" title="linearmodels v7.1 (+277)" class="md-nav__button md-logo" aria-label="linearmodels v7.1 (+277)" data-md-component="logo">
+    <a href="../../index.html" title="linearmodels v7.1 (+291)" class="md-nav__button md-logo" aria-label="linearmodels v7.1 (+291)" data-md-component="logo">
       <img src="../../_static/bw-logo.svg" alt="logo">
     </a>
-    linearmodels v7.1 (+277)
+    linearmodels v7.1 (+291)
   </label>
   
     <div class="md-nav__source">
@@ -888,8 +888,8 @@
 
 
 <h1 id="Using-Formulas">Using Formulas<a class="headerlink" href="#Using-Formulas" title="Link to this heading">¶</a></h1>
-<p>The asset pricing model estimators all all formulas. Since the models have multiple dependent variables (test portfolios) as well as multiple independent variables (factors), the standard <a class="reference external" href="https://github.com/matthewwardrop/formulaic/">formulaic</a> syntax needs to be modified. There are two methods to use formulas. The first specified both the test portfolio and the factors. The second specifies only the factors and the test portfolios are passed using an optional keyword argument. The second
-syntax exists since in many models the number of test portfolios might be large and interest is usually in modifying the factors.</p>
+<p>The asset pricing model estimators all support formulas. Since the models have multiple dependent variables (test portfolios) as well as multiple independent variables (factors), the standard <a class="reference external" href="https://github.com/matthewwardrop/formulaic/">formulaic</a> syntax needs to be modified. There are two methods to use formulas. The first specifies both the test portfolio and the factors. The second specifies only the factors and the test portfolios are passed using an optional keyword argument. The
+second syntax exists since in many models the number of test portfolios might be large and interest is usually in modifying the factors.</p>
 <h2 id="Available-Syntax">Available Syntax<a class="headerlink" href="#Available-Syntax" title="Link to this heading">¶</a></h2>
 <h3 id="Test-Portfolios-and-Factors">Test Portfolios and Factors<a class="headerlink" href="#Test-Portfolios-and-Factors" title="Link to this heading">¶</a></h3>
 <p>The first syntax can be expressed as</p>
@@ -904,7 +904,7 @@ LinearFactorModel.from_formula(formula, portfolios=portfolios)
 </code></pre></div>
 </div>
 <h2 id="Import-data-and-transform-to-be-excess-returns">Import data and transform to be excess returns<a class="headerlink" href="#Import-data-and-transform-to-be-excess-returns" title="Link to this heading">¶</a></h2>
-<p>The data used comes from Ken French”s <a class="reference external" href="http://mba.tuck.dartmouth.edu/pages/faculty/ken.french/data_library.html">website</a> and includes 4 factor returns, the excess market, the size factor, the value factor and the momentum factor. The available test portfolios include the 12 industry portfolios, a subset of the size-value two way sort, and a subset of the size-momentum two way sort.</p>
+<p>The data used comes from Ken French’s <a class="reference external" href="http://mba.tuck.dartmouth.edu/pages/faculty/ken.french/data_library.html">website</a> and includes 4 factor returns, the excess market, the size factor, the value factor and the momentum factor. The available test portfolios include the 12 industry portfolios, a subset of the size-value two way sort, and a subset of the size-momentum two way sort.</p>
 <div class="nbinput docutils container">
 <div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span><code>[1]:
 </code></pre></div>
@@ -991,7 +991,7 @@ No. Test Portfolios:                  6   R-squared:                      0.7229
 No. Factors:                          3   J-statistic:                    9.9450
 No. Observations:                   819   P-value                         0.0190
 Date:                  Mon, Oct 12 2026   Distribution:                  chi2(3)
-Time:                          18:38:38
+Time:                          18:43:27
 Cov. Estimator:                  kernel
 
                             Risk Premia Estimates
@@ -1037,7 +1037,7 @@ No. Test Portfolios:                 18   R-squared:                      0.7723
 No. Factors:                          3   J-statistic:                    86.369
 No. Observations:                   819   P-value                         0.0000
 Date:                  Mon, Oct 12 2026   Distribution:                 chi2(14)
-Time:                          18:38:38
+Time:                          18:43:27
 Cov. Estimator:                  robust
 
                             Risk Premia Estimates
@@ -1079,7 +1079,7 @@ No. Test Portfolios:                 18   R-squared:                      0.7723
 No. Factors:                          3   J-statistic:                    86.369
 No. Observations:                   819   P-value                         0.0000
 Date:                  Mon, Oct 12 2026   Distribution:                 chi2(14)
-Time:                          18:38:38
+Time:                          18:43:27
 Cov. Estimator:                  robust
 
                             Risk Premia Estimates

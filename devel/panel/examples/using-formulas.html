@@ -23,7 +23,7 @@
     
   
       
-        <title>Using formulas to specify models - linearmodels v7.1 (+277)</title>
+        <title>Using formulas to specify models - linearmodels v7.1 (+291)</title>
       
     
 
@@ -101,7 +101,7 @@
 
 <header class="md-header md-header--shadow" data-md-component="header">
   <nav class="md-header__inner md-grid" aria-label="Header">
-    <a href="../../index.html" title="linearmodels v7.1 (+277)" class="md-header__button md-logo" aria-label="linearmodels v7.1 (+277)" data-md-component="logo">
+    <a href="../../index.html" title="linearmodels v7.1 (+291)" class="md-header__button md-logo" aria-label="linearmodels v7.1 (+291)" data-md-component="logo">
       <img src="../../_static/bw-logo.svg" alt="logo">
     </a>
     <label class="md-header__button md-icon" for="__drawer">
@@ -112,7 +112,7 @@
       <div class="md-header__ellipsis">
         <div class="md-header__topic">
           <span class="md-ellipsis">
-            linearmodels v7.1 (+277)
+            linearmodels v7.1 (+291)
           </span>
         </div>
         <div class="md-header__topic" data-md-component="header-topic">
@@ -207,10 +207,10 @@
 
 <nav class="md-nav md-nav--primary" aria-label="Navigation" data-md-level="0">
   <label class="md-nav__title" for="__drawer">
-    <a href="../../index.html" title="linearmodels v7.1 (+277)" class="md-nav__button md-logo" aria-label="linearmodels v7.1 (+277)" data-md-component="logo">
+    <a href="../../index.html" title="linearmodels v7.1 (+291)" class="md-nav__button md-logo" aria-label="linearmodels v7.1 (+291)" data-md-component="logo">
       <img src="../../_static/bw-logo.svg" alt="logo">
     </a>
-    linearmodels v7.1 (+277)
+    linearmodels v7.1 (+291)
   </label>
   
     <div class="md-nav__source">
@@ -948,7 +948,7 @@
 
 
 <h1 id="Using-formulas-to-specify-models">Using formulas to specify models<a class="headerlink" href="#Using-formulas-to-specify-models" title="Link to this heading">¶</a></h1>
-<p>All of the models can be specified using formulas. The formulas used here utilize <a class="reference external" href="https://matthewwardrop.github.io/formulaic/">formulaic</a> are similar to those in <a class="reference external" href="http://www.statsmodels.org">statsmodels</a>. The basis formula syntax for a single variable regression would be</p>
+<p>All of the models can be specified using formulas. The formulas used here utilize <a class="reference external" href="https://matthewwardrop.github.io/formulaic/">formulaic</a> and are similar to those in <a class="reference external" href="http://www.statsmodels.org">statsmodels</a>. The basic formula syntax for a single variable regression would be</p>
 <div class="highlight-none notranslate"><div class="highlight"><pre><span></span><code>y ~ 1 + x
 </code></pre></div>
 </div>
@@ -986,7 +986,7 @@ General Motors 1935.0   317.6  3078.5      2.8
 <h2 id="PanelOLS-with-Entity-Effects">PanelOLS with Entity Effects<a class="headerlink" href="#PanelOLS-with-Entity-Effects" title="Link to this heading">¶</a></h2>
 <p>Entity effects are specified using the special command <code class="docutils literal notranslate"><span class="pre">EntityEffects</span></code>. By default a constant is not included, and so if a constant is desired, <code class="docutils literal notranslate"><span class="pre">1+</span></code> should be included in the formula. When including effects, the model and fit are identical whether a constant is included or not.</p>
 <h2 id="PanelOLS-with-Entity-Effects-and-a-constant">PanelOLS with Entity Effects and a constant<a class="headerlink" href="#PanelOLS-with-Entity-Effects-and-a-constant" title="Link to this heading">¶</a></h2>
-<p>The constant can be explicitly included using the <code class="docutils literal notranslate"><span class="pre">1</span> <span class="pre">+</span></code> notation. When a constant is included in the model, and additional constraint is imposed that the number of the effects is 0. This allows the constant to be identified using the grand mean of the dependent and the regressors.</p>
+<p>The constant can be explicitly included using the <code class="docutils literal notranslate"><span class="pre">1</span> <span class="pre">+</span></code> notation. When a constant is included in the model, an additional constraint is imposed that the sum of the effects is 0. This allows the constant to be identified using the grand mean of the dependent and the regressors.</p>
 <div class="nbinput docutils container">
 <div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span><code>[2]:
 </code></pre></div>
@@ -1009,7 +1009,7 @@ Dep. Variable:                 invest   R-squared:                        0.7667
 Estimator:                   PanelOLS   R-squared (Between):              0.8223
 No. Observations:                 220   R-squared (Within):               0.7667
 Date:                Mon, Oct 12 2026   R-squared (Overall):              0.8132
-Time:                        18:38:55   Log-likelihood                   -1167.4
+Time:                        18:43:45   Log-likelihood                   -1167.4
 Cov. Estimator:            Unadjusted
                                         F-statistic:                      340.08
 Entities:                          11   P-value                           0.0000
@@ -1057,7 +1057,7 @@ Dep. Variable:                 invest   R-squared:                        0.7667
 Estimator:                   PanelOLS   R-squared (Between):              0.8193
 No. Observations:                 220   R-squared (Within):               0.7667
 Date:                Mon, Oct 12 2026   R-squared (Overall):              0.8071
-Time:                        18:38:56   Log-likelihood                   -1167.4
+Time:                        18:43:45   Log-likelihood                   -1167.4
 Cov. Estimator:            Unadjusted
                                         F-statistic:                      340.08
 Entities:                          11   P-value                           0.0000
@@ -1110,7 +1110,7 @@ Dep. Variable:                 invest   R-squared:                        0.7253
 Estimator:                   PanelOLS   R-squared (Between):              0.7944
 No. Observations:                 220   R-squared (Within):               0.7566
 Date:                Mon, Oct 12 2026   R-squared (Overall):              0.7856
-Time:                        18:38:56   Log-likelihood                   -1153.0
+Time:                        18:43:45   Log-likelihood                   -1153.0
 Cov. Estimator:            Unadjusted
                                         F-statistic:                      248.15
 Entities:                          11   P-value                           0.0000
@@ -1163,7 +1163,7 @@ Dep. Variable:                 invest   R-squared:                        0.8644
 Estimator:                 BetweenOLS   R-squared (Between):              0.8644
 No. Observations:                  11   R-squared (Within):               0.4195
 Date:                Mon, Oct 12 2026   R-squared (Overall):              0.7616
-Time:                        18:38:56   Log-likelihood                   -61.997
+Time:                        18:43:45   Log-likelihood                   -61.997
 Cov. Estimator:            Unadjusted
                                         F-statistic:                      25.500
 Entities:                          11   P-value                           0.0003
@@ -1208,7 +1208,7 @@ Dep. Variable:                 invest   R-squared:                        0.4287
 Estimator:         FirstDifferenceOLS   R-squared (Between):              0.8643
 No. Observations:                 209   R-squared (Within):               0.7539
 Date:                Mon, Oct 12 2026   R-squared (Overall):              0.8461
-Time:                        18:38:56   Log-likelihood                   -1071.1
+Time:                        18:43:45   Log-likelihood                   -1071.1
 Cov. Estimator:            Unadjusted
                                         F-statistic:                      77.679
 Entities:                          11   P-value                           0.0000
@@ -1252,7 +1252,7 @@ Dep. Variable:                 invest   R-squared:                        0.8179
 Estimator:                  PooledOLS   R-squared (Between):              0.8426
 No. Observations:                 220   R-squared (Within):               0.7357
 Date:                Mon, Oct 12 2026   R-squared (Overall):              0.8179
-Time:                        18:38:56   Log-likelihood                   -1301.3
+Time:                        18:43:45   Log-likelihood                   -1301.3
 Cov. Estimator:            Unadjusted
                                         F-statistic:                      487.28
 Entities:                          11   P-value                           0.0000
