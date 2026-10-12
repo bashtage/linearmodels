@@ -61,7 +61,7 @@ def get_float(d: Mapping[str, Any], key: str) -> float | None:
     if key in d:
         out = d[key]
         if out is not None:
-            if isinstance(out, (int, float, np.floating)):
+            if isinstance(out, (int, float, np.integer, np.floating)):
                 return float(out)
             else:
                 raise TypeError(f"{key} found in the dictionary but it is not a float.")
@@ -88,7 +88,7 @@ def get_bool(d: Mapping[str, Any], key: str) -> bool:
     out: bool | None = False
     if key in d:
         out = d[key]
-        if not (out is None or isinstance(out, bool)):
+        if not (out is None or isinstance(out, (bool, np.bool_))):
             raise TypeError(f"{key} found in the dictionary but it is not a bool.")
     return bool(out)
 

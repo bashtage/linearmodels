@@ -177,6 +177,17 @@ def test_errors(data):
         LinearFactorModel(p4, data.factors)
 
 
+def test_errors_more_than_one_constant(data):
+    nobs = data.portfolios.shape[0]
+    ones = np.ones((nobs, 1))
+    portfolios = np.asarray(data.portfolios)
+    factors = np.asarray(data.factors)
+    with pytest.raises(ValueError, match=r"factors must not contain"):
+        TradedFactorModel(portfolios, np.c_[factors, ones, ones])
+    with pytest.raises(ValueError, match=r"portfolios must not contain"):
+        TradedFactorModel(np.c_[portfolios, ones, 2 * ones], factors)
+
+
 def test_drop_missing(data):
     p = data.portfolios
     if isinstance(p, pd.DataFrame):
