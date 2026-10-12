@@ -595,12 +595,32 @@ class _PanelModelBase:
         """Flag indicating the model a constant or implicit constant"""
         return self._constant
 
+    def _constant_loadings(self) -> linearmodels.typing.data.Float64Array:
+        """
+        Coefficients of the regressors that combine them into a constant
+
+        Returns
+        -------
+        ndarray
+            The (nvar, 1) coefficients a such that exog @ a is a column of ones.
+            They exist if the model has a constant, which can be implicit.
+
+        Notes
+        -----
+        The data are weighted or transformed before the model is estimated. The
+        constant is transformed in the same way, and it is not a column of ones.
+        Since the transformations are linear, it is the transformed regressors
+        times these coefficients.
+        """
+        exog = self.exog.values2d
+        ones = np.ones((exog.shape[0], 1))
+        return _lstsq(exog, ones)[0]
+
     def _f_statistic(
         self,
         weps: linearmodels.typing.data.Float64Array,
         y: linearmodels.typing.data.Float64Array,
         x: linearmodels.typing.data.Float64Array,
-        root_w: linearmodels.typing.data.Float64Array,
         df_resid: int,
     ) -> WaldTestStatistic | InvalidTestStatistic:
         """Compute model F-statistic"""
@@ -612,10 +632,10 @@ class _PanelModelBase:
                 return InvalidTestStatistic("Model contains only a constant", name=name)
 
             num_df -= 1
-            weps_const = cast(
-                "linearmodels.typing.data.Float64Array",
-                y - float(np.squeeze((root_w.T @ y) / (root_w.T @ root_w))),
-            )
+            # The restricted model only has the transformed constant
+            const = x @ self._constant_loadings()
+            mean = float(np.squeeze((const.T @ y) / (const.T @ const)))
+            weps_const = cast("linearmodels.typing.data.Float64Array", y - const * mean)
 
         resid_ss = float(np.squeeze(weps.T @ weps))
         num = float(np.squeeze(weps_const.T @ weps_const - resid_ss))
@@ -775,11 +795,10 @@ class _PanelModelBase:
         weps: linearmodels.typing.data.Float64Array,
         y: linearmodels.typing.data.Float64Array,
         x: linearmodels.typing.data.Float64Array,
-        root_w: linearmodels.typing.data.Float64Array,
     ) -> AttrDict:
         """Common post-estimation values"""
         f_info = self._f_statistic_robust(params)
-        f_stat = self._f_statistic(weps, y, x, root_w, df_resid)
+        f_stat = self._f_statistic(weps, y, x, df_resid)
         r2o, r2w, r2b = self._rsquared(params)
         c2o, c2w, c2b = self._rsquared_corr(params)
         f_pooled = InapplicableTestStatistic(
@@ -1171,9 +1190,7 @@ class PooledOLS(_PanelModelBase):
         total_ss = float(np.squeeze(w.T @ (e**2)))
         r2 = 1 - residual_ss / total_ss
 
-        res = self._postestimation(
-            params, cov, debiased, df_resid, weps, wy, wx, root_w
-        )
+        res = self._postestimation(params, cov, debiased, df_resid, weps, wy, wx)
         res.update(
             {
                 "df_resid": df_resid,
@@ -2137,7 +2154,7 @@ class PanelOLS(_PanelModelBase):
             1 - resid_ss / total_ss_ex_effect if total_ss_ex_effect > 0.0 else 0.0
         )
 
-        res = self._postestimation(params, cov, debiased, df_resid, weps, y, x, root_w)
+        res = self._postestimation(params, cov, debiased, df_resid, weps, y, x)
         ######################################
         # Pooled f-stat
         ######################################
@@ -2407,9 +2424,7 @@ class BetweenOLS(_PanelModelBase):
         total_ss = float(np.squeeze(w.T @ (e**2)))
         r2 = 1 - residual_ss / total_ss
 
-        res = self._postestimation(
-            params, cov, debiased, df_resid, weps, wy, wx, root_w
-        )
+        res = self._postestimation(params, cov, debiased, df_resid, weps, wy, wx)
         res.update(
             {
                 "df_resid": df_resid,
@@ -2741,9 +2756,7 @@ class FirstDifferenceOLS(_PanelModelBase):
         total_ss = float(np.squeeze(w.T @ (y**2)))
         r2 = 1 - residual_ss / total_ss
 
-        res = self._postestimation(
-            params, cov, debiased, df_resid, weps, wy, wx, root_w
-        )
+        res = self._postestimation(params, cov, debiased, df_resid, weps, wy, wx)
         res.update(
             {
                 "df_resid": df_resid,
@@ -3081,9 +3094,7 @@ class RandomEffects(_PanelModelBase):
         total_ss = float(np.squeeze(wy_demeaned.T @ wy_demeaned))
         r2 = 1 - residual_ss / total_ss
 
-        res = self._postestimation(
-            params, cov, debiased, df_resid, weps, wy, wx, root_w
-        )
+        res = self._postestimation(params, cov, debiased, df_resid, weps, wy, wx)
         res.update(
             {
                 "df_resid": df_resid,
@@ -3372,7 +3383,6 @@ class FamaMacBeth(_PanelModelBase):
         eps = self.dependent.values2d - fitted.values
         weps = wy - wx @ params
         w = self.weights.values2d
-        root_w = cast("linearmodels.typing.data.Float64Array", np.sqrt(w))
         residual_ss = float(np.squeeze(weps.T @ weps))
         y = e = self.dependent.values2d
         if self.has_constant:
@@ -3407,9 +3417,7 @@ class FamaMacBeth(_PanelModelBase):
         df_resid = nperiod - 1
         # The classical F-statistic is that of the pooled regression
         pooled_df_resid = wy.shape[0] - params.shape[0]
-        res = self._postestimation(
-            params, cov, debiased, pooled_df_resid, weps, wy, wx, root_w
-        )
+        res = self._postestimation(params, cov, debiased, pooled_df_resid, weps, wy, wx)
         index = self.dependent.index
         res.update(
             {
