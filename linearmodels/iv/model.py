@@ -17,15 +17,18 @@ from numpy import (
     average,
     c_,
     column_stack,
+    diag,
     dtype,
     eye,
     float64,
+    isfinite,
     isscalar,
     logical_not,
     nan,
     nanmean,
     ndarray,
     ones,
+    outer,
     sqrt,
     squeeze,
 )
@@ -36,6 +39,7 @@ from scipy.optimize import minimize
 from linearmodels.iv._utility import IVFormulaParser
 from linearmodels.iv.common import f_statistic, find_constant
 from linearmodels.iv.covariance import (
+    KERNEL_LOOKUP,
     ClusteredCovariance,
     HeteroskedasticCovariance,
     HomoskedasticCovariance,
@@ -64,6 +68,7 @@ __all__ = [
     "IV2SLS",
     "IVGMM",
     "IVGMMCUE",
+    "IVJIVE",
     "IVLIML",
     "WEIGHT_MATRICES",
     "_OLS",
@@ -1070,7 +1075,17 @@ class _IVGMMBase(_IVModelBase):
         weight_matrix_estimator = WEIGHT_MATRICES[self._weight_type]
         centered = weight_matrix_estimator(**{**self._weight_kwargs, "center": True})
         s_c = centered.weight_matrix(x, z, eps)
-        if matrix_rank(s_c, hermitian=True) < ninstr:
+        # The rank is that of the correlation matrix of the moment conditions,
+        # so that it does not depend on the units in which the instruments are
+        # measured. The tolerance of the rank test is relative to the largest
+        # eigenvalue, and so it treats the covariance as singular if the
+        # variances of the moment conditions differ by a factor of about 1e16
+        variances = diag(s_c)
+        singular = not (npall(isfinite(s_c)) and npall(variances > 0))
+        if not singular:
+            std = sqrt(variances)
+            singular = matrix_rank(s_c / outer(std, std), hermitian=True) < ninstr
+        if singular:
             # The centered cluster sums add to zero, so a clustered estimator
             # has rank at most one less than the number of clusters
             reason = (
@@ -1880,6 +1895,21 @@ class _JIVECovariance(IVGMMCovariance):
     ) -> None:
         # The weight matrix has no effect in a just identified model
         w = eye(x.shape[1])
+        if cov_type == "kernel":
+            kernel = cov_config.get("kernel", "bartlett")
+            if kernel not in KERNEL_LOOKUP:
+                raise ValueError(f"Unknown kernel: {kernel}")
+            # Select the bandwidth using the data unless it is given, as in
+            # IV2SLS and IVLIML. The default of the weight matrix estimator is
+            # nobs - 2, which is not a consistent covariance estimator
+            cov_config = {"optimal_bw": True, **cov_config}
+        elif cov_type == "clustered":
+            clusters = cov_config.get("clusters")
+            if clusters is not None and asarray(clusters).squeeze().ndim > 1:
+                raise ValueError(
+                    "IVJIVE supports one-way clustering only. clusters must be "
+                    "a 1-d array, or a 2-d array with a single column."
+                )
         super().__init__(x, y, x_loo, params, w, cov_type, debiased, **cov_config)
         self._name = "JIVE Covariance"
         if cov_type in ("unadjusted", "homoskedastic"):
@@ -2028,13 +2058,20 @@ class IVJIVE(_IVModelBase):
         block of the form [endog ~ instruments] which is used to indicate
         the list of endogenous variables and instruments.  The general
         structure of an IV formula is `dependent ~ exog [endog ~ instruments]`
+        and it must be the case that the formula expressions constructed from
+        blocks `dependent ~ exog endog` and `dependent ~ exog instruments` are
+        both valid formulas.
+
+        A constant must be explicitly included using "1 +" if required. Use
+        `I(exper ** 2)` for the square of a variable, since `exper ** 2` is
+        the power of a set of terms in a formula, which is `exper`.
 
         Examples
         --------
         >>> from linearmodels.datasets import wage
         >>> from linearmodels.iv import IVJIVE
         >>> data = wage.load()
-        >>> formula = "np.log(wage) ~ 1 + exper + exper ** 2 + brthord + [educ ~ sibs]"
+        >>> formula = "np.log(wage) ~ 1 + exper + I(exper ** 2) + brthord + [educ ~ sibs]"
         >>> mod = IVJIVE.from_formula(formula, data)
         """
         parser = IVFormulaParser(formula, data)
@@ -2080,9 +2117,13 @@ class IVJIVE(_IVModelBase):
         -----
         The covariance estimators are the same as in the other IV models with
         the leave-one-out first-stage predictions as the instruments. The
-        additional parameters depend on the estimator: ``kernel`` and
-        ``bandwidth`` for "kernel" and ``clusters`` for "clustered".  The
-        defaults are used if none are provided.
+        additional parameters depend on the estimator: ``kernel`` (the default
+        is "bartlett") and ``bandwidth`` for "kernel" and ``clusters`` for
+        "clustered". If ``bandwidth`` is not provided it is selected using the
+        data, as in :class:`~linearmodels.iv.model.IV2SLS`, and the bandwidth
+        that was used is in ``cov_config`` of the results. "clustered" is
+        one-way clustering, and ``clusters`` has one element for each
+        observation.
 
         Since JIVE is not a k-class estimator, ``kappa`` is None in the
         results.

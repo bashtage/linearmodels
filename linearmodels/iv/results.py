@@ -738,6 +738,13 @@ class FirstStageResults(_SummaryStr):
         It equals ``ninstr`` times the classical F-statistic when there is
         one endogenous regressor. See :func:`linearmodels.iv.common.cragg_donald`
         for the definition.
+
+        In a weighted model the statistic is computed from the data multiplied
+        by the square root of the weights of the model, which are scaled to
+        have mean 1. It does not depend on the scale of the weights. It does not
+        use a covariance estimator, and so it does not depend on the clusters
+        or the kernel of the model, and is the same for every covariance
+        estimator.
         """
         return cragg_donald(*self._weighted_arrays())
 
@@ -765,16 +772,24 @@ class FirstStageResults(_SummaryStr):
         This is the statistic that Stock and Yogo (2005) tabulate critical
         values for, and Stata's ``ivreg2`` reports it as the "Cragg-Donald
         Wald F statistic". See :func:`linearmodels.iv.common.cragg_donald_f`.
+
+        The weights are used as for :attr:`cragg_donald`, and the statistic
+        does not depend on the scale of the weights or on the clusters of the
+        model.
         """
         return cragg_donald_f(*self._weighted_arrays())
 
     @cached_property
-    def _kleibergen_paap(
-        self,
-    ) -> tuple[WaldTestStatistic | InvalidTestStatistic, float]:
+    def _rk_lm(self) -> WaldTestStatistic | InvalidTestStatistic:
+        return _kleibergen_paap(
+            *self._weighted_arrays(), self._cov_type, self._cov_config, wald=False
+        )[0]
+
+    @cached_property
+    def _rk_wald_f(self) -> float:
         return _kleibergen_paap(
             *self._weighted_arrays(), self._cov_type, self._cov_config
-        )
+        )[1]
 
     @property
     def kleibergen_paap(self) -> WaldTestStatistic | InvalidTestStatistic:
@@ -818,8 +833,17 @@ class FirstStageResults(_SummaryStr):
         corresponds to the "Kleibergen-Paap rk LM statistic" reported by
         Stata's ``ivreg2``. See :func:`linearmodels.iv.common.kleibergen_paap`
         for the definition and for conventions that differ from Stata.
+
+        In a weighted model the scores are those of the weighted first-stage
+        regressions, and the statistic does not depend on the scale of the
+        weights. A clustered covariance estimator uses the ``clusters`` that
+        were passed to ``fit``. There must be at least ``ninstr - nendog + 1``
+        clusters, or ``ninstr - nendog + 2`` for :attr:`kleibergen_paap_f`, and
+        a warning is issued if there are fewer. A kernel covariance estimator
+        uses the kernel and the bandwidth of the model, including a bandwidth
+        that the model selected.
         """
-        return self._kleibergen_paap[0]
+        return self._rk_lm
 
     @property
     def kleibergen_paap_f(self) -> float:
@@ -849,8 +873,13 @@ class FirstStageResults(_SummaryStr):
         is the Cragg-Donald F statistic. Stata's ``ivreg2`` reports it as the
         "Kleibergen-Paap rk Wald F statistic". See
         :func:`linearmodels.iv.common.kleibergen_paap_f` for the definition.
+
+        The weights, clusters and kernel are used as for
+        :attr:`kleibergen_paap`. With a clustered covariance estimator there
+        must be at least ``ninstr - nendog + 2`` clusters, and a warning is
+        issued if there are fewer.
         """
-        return self._kleibergen_paap[1]
+        return self._rk_wald_f
 
     @cached_property
     def diagnostics(self) -> DataFrame:
@@ -1666,7 +1695,7 @@ class IVGMMResults(_CommonIVResults):
 
         Returns
         -------
-        WaldTestStatistic
+        WaldTestStatistic or InvalidTestStatistic
             J statistic test of overidentifying restrictions that uses a
             covariance of the moment conditions that has been centered.
             An InvalidTestStatistic is returned if that covariance is
@@ -1716,6 +1745,12 @@ class IVGMMResults(_CommonIVResults):
         the estimation at which the weight matrix is evaluated.
         It also has no effect in :class:`~linearmodels.iv.model.IVGMMCUE`
         models unless ``center=False`` was set.
+
+        In a weighted model the moment conditions are
+        :math:`w_i z_i \hat{\epsilon}_i`, where :math:`w_i` are the weights of
+        the model, as in :attr:`j_stat`. The statistic and the test of whether
+        the covariance is singular do not depend on the units in which the
+        variables are measured.
 
         References
         ----------
