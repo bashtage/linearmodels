@@ -23,7 +23,7 @@
     
   
       
-        <title>linearmodels.iv.model.IVGMMCUE - linearmodels v7.1 (+177)</title>
+        <title>linearmodels.iv.model.IVGMMCUE - linearmodels v7.1 (+193)</title>
       
     
 
@@ -100,7 +100,7 @@
 
 <header class="md-header md-header--shadow" data-md-component="header">
   <nav class="md-header__inner md-grid" aria-label="Header">
-    <a href="../../index.html" title="linearmodels v7.1 (+177)" class="md-header__button md-logo" aria-label="linearmodels v7.1 (+177)" data-md-component="logo">
+    <a href="../../index.html" title="linearmodels v7.1 (+193)" class="md-header__button md-logo" aria-label="linearmodels v7.1 (+193)" data-md-component="logo">
       <img src="../../_static/bw-logo.svg" alt="logo">
     </a>
     <label class="md-header__button md-icon" for="__drawer">
@@ -111,7 +111,7 @@
       <div class="md-header__ellipsis">
         <div class="md-header__topic">
           <span class="md-ellipsis">
-            linearmodels v7.1 (+177)
+            linearmodels v7.1 (+193)
           </span>
         </div>
         <div class="md-header__topic" data-md-component="header-topic">
@@ -206,10 +206,10 @@
 
 <nav class="md-nav md-nav--primary" aria-label="Navigation" data-md-level="0">
   <label class="md-nav__title" for="__drawer">
-    <a href="../../index.html" title="linearmodels v7.1 (+177)" class="md-nav__button md-logo" aria-label="linearmodels v7.1 (+177)" data-md-component="logo">
+    <a href="../../index.html" title="linearmodels v7.1 (+193)" class="md-nav__button md-logo" aria-label="linearmodels v7.1 (+193)" data-md-component="logo">
       <img src="../../_static/bw-logo.svg" alt="logo">
     </a>
-    linearmodels v7.1 (+177)
+    linearmodels v7.1 (+193)
   </label>
   
     <div class="md-nav__source">
@@ -1882,6 +1882,17 @@ passed in <code class="docutils literal notranslate"><span class="pre">weight_co
 g(\beta) &amp; =n^{-1}\sum_{i=1}^{n}z_{i}(y_{i}-x_{i}\beta)\end{split}\]</div>
 <p>where <span class="math notranslate nohighlight">\(W(\beta)\)</span> is a weight matrix that depends on <span class="math notranslate nohighlight">\(\beta\)</span>
 through <span class="math notranslate nohighlight">\(\epsilon_i = y_i - x_i\beta\)</span>.</p>
+<p>Rows are paired by position. An input that carries labels (a pandas
+Series or DataFrame with an index other than the default 0, 1, …, n-1,
+or an xarray DataArray with coordinates) must use the same index, in the
+same order, as <code class="docutils literal notranslate"><span class="pre">dependent</span></code>, so that a value cannot be attached to the
+wrong observation. A <code class="docutils literal notranslate"><span class="pre">ValueError</span></code> is raised if the index of <code class="docutils literal notranslate"><span class="pre">exog</span></code>,
+<code class="docutils literal notranslate"><span class="pre">endog</span></code>, <code class="docutils literal notranslate"><span class="pre">instruments</span></code> or <code class="docutils literal notranslate"><span class="pre">weights</span></code> differs from the index of
+<code class="docutils literal notranslate"><span class="pre">dependent</span></code>. Either reindex the input to the index of <code class="docutils literal notranslate"><span class="pre">dependent</span></code>, or
+call <code class="docutils literal notranslate"><span class="pre">to_numpy()</span></code> to pair its values by position. NumPy arrays and
+pandas objects with a default index do not carry labels and are always
+paired by position. The same rule applies to <code class="docutils literal notranslate"><span class="pre">clusters</span></code> passed to
+<code class="docutils literal notranslate"><span class="pre">fit</span></code> or in <code class="docutils literal notranslate"><span class="pre">weight_config</span></code>.</p>
 <div class="seealso admonition">
 <p class="admonition-title">See also</p>
 <p><a class="reference internal" href="linearmodels.iv.model.IV2SLS.html#linearmodels.iv.model.IV2SLS" title="linearmodels.iv.model.IV2SLS (Python class) — Estimation of IV models using two-stage least squares"><code class="xref py py-obj docutils literal notranslate"><span class="pre">linearmodels.iv.model.IV2SLS</span></code></a>, <a class="reference internal" href="linearmodels.iv.model.IVLIML.html#linearmodels.iv.model.IVLIML" title="linearmodels.iv.model.IVLIML (Python class) — Limited information ML and k-class estimation of IV models"><code class="xref py py-obj docutils literal notranslate"><span class="pre">linearmodels.iv.model.IVLIML</span></code></a>, <a class="reference internal" href="linearmodels.iv.model.IVGMM.html#linearmodels.iv.model.IVGMM" title="linearmodels.iv.model.IVGMM (Python class) — Estimation of IV models using the generalized method of moments (GMM)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">linearmodels.iv.model.IVGMM</span></code></a></p>

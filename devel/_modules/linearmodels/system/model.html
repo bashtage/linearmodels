@@ -19,7 +19,7 @@
     
   
       
-        <title>linearmodels.system.model - linearmodels v7.1 (+177)</title>
+        <title>linearmodels.system.model - linearmodels v7.1 (+193)</title>
       
     
 
@@ -91,7 +91,7 @@
 
 <header class="md-header md-header--shadow" data-md-component="header">
   <nav class="md-header__inner md-grid" aria-label="Header">
-    <a href="../../../index.html" title="linearmodels v7.1 (+177)" class="md-header__button md-logo" aria-label="linearmodels v7.1 (+177)" data-md-component="logo">
+    <a href="../../../index.html" title="linearmodels v7.1 (+193)" class="md-header__button md-logo" aria-label="linearmodels v7.1 (+193)" data-md-component="logo">
       <img src="../../../_static/bw-logo.svg" alt="logo">
     </a>
     <label class="md-header__button md-icon" for="__drawer">
@@ -102,7 +102,7 @@
       <div class="md-header__ellipsis">
         <div class="md-header__topic">
           <span class="md-ellipsis">
-            linearmodels v7.1 (+177)
+            linearmodels v7.1 (+193)
           </span>
         </div>
         <div class="md-header__topic" data-md-component="header-topic">
@@ -197,10 +197,10 @@
 
 <nav class="md-nav md-nav--primary" aria-label="Navigation" data-md-level="0">
   <label class="md-nav__title" for="__drawer">
-    <a href="../../../index.html" title="linearmodels v7.1 (+177)" class="md-nav__button md-logo" aria-label="linearmodels v7.1 (+177)" data-md-component="logo">
+    <a href="../../../index.html" title="linearmodels v7.1 (+193)" class="md-nav__button md-logo" aria-label="linearmodels v7.1 (+193)" data-md-component="logo">
       <img src="../../../_static/bw-logo.svg" alt="logo">
     </a>
-    linearmodels v7.1 (+177)
+    linearmodels v7.1 (+193)
   </label>
   
     <div class="md-nav__source">
@@ -533,6 +533,11 @@
 
 <span class="kn">from</span><span class="w"> </span><span class="nn">linearmodels.iv._utility</span><span class="w"> </span><span class="kn">import</span> <span class="n">IVFormulaParser</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">linearmodels.iv.data</span><span class="w"> </span><span class="kn">import</span> <span class="n">IVData</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">linearmodels.shared.alignment</span><span class="w"> </span><span class="kn">import</span> <span class="p">(</span>
+    <span class="n">check_alignment</span><span class="p">,</span>
+    <span class="n">check_row_alignment</span><span class="p">,</span>
+    <span class="n">row_labels</span><span class="p">,</span>
+<span class="p">)</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">linearmodels.shared.exceptions</span><span class="w"> </span><span class="kn">import</span> <span class="n">missing_warning</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">linearmodels.shared.hypotheses</span><span class="w"> </span><span class="kn">import</span> <span class="n">InvalidTestStatistic</span><span class="p">,</span> <span class="n">WaldTestStatistic</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">linearmodels.shared.linalg</span><span class="w"> </span><span class="kn">import</span> <span class="n">has_constant</span>
@@ -991,6 +996,7 @@
                     <span class="s2">"</span><span class="si">{eq}</span><span class="s2">"</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">eq</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">_eq_labels</span><span class="p">[</span><span class="n">i</span><span class="p">])</span>
                 <span class="p">)</span>
 
+        <span class="bp">self</span><span class="o">.</span><span class="n">_check_alignment</span><span class="p">()</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_drop_missing</span><span class="p">()</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_common_exog</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="nb">set</span><span class="p">(</span><span class="n">ids</span><span class="p">))</span> <span class="o">==</span> <span class="mi">1</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_common_exog</span><span class="p">:</span>
@@ -1064,6 +1070,49 @@
             <span class="n">constant</span><span class="p">,</span> <span class="n">index</span><span class="o">=</span><span class="p">[</span><span class="n">d</span><span class="o">.</span><span class="n">cols</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="k">for</span> <span class="n">d</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_dependent</span><span class="p">]</span>
         <span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_constant_loc</span> <span class="o">=</span> <span class="n">constant_loc</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">_check_alignment</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">"""Check that inputs with labels use the labels of dependent"""</span>
+        <span class="n">nobs</span> <span class="o">=</span> <span class="p">[</span><span class="n">dep</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="k">for</span> <span class="n">dep</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_dependent</span><span class="p">]</span>
+        <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">label</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_eq_labels</span><span class="p">):</span>
+            <span class="k">if</span> <span class="n">nobs</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">!=</span> <span class="n">nobs</span><span class="p">[</span><span class="mi">0</span><span class="p">]:</span>
+                <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
+                    <span class="s2">"All equations must have the same number of observations. "</span>
+                    <span class="sa">f</span><span class="s2">"The dependent variable in equation </span><span class="si">{</span><span class="n">label</span><span class="si">!r}</span><span class="s2"> has </span><span class="si">{</span><span class="n">nobs</span><span class="p">[</span><span class="n">i</span><span class="p">]</span><span class="si">}</span><span class="s2"> "</span>
+                    <span class="sa">f</span><span class="s2">"observations, but in equation </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">_eq_labels</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="si">!r}</span><span class="s2"> it has "</span>
+                    <span class="sa">f</span><span class="s2">"</span><span class="si">{</span><span class="n">nobs</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="si">}</span><span class="s2">."</span>
+                <span class="p">)</span>
+        <span class="n">reference</span><span class="p">:</span> <span class="n">Index</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="n">reference_name</span> <span class="o">=</span> <span class="s2">""</span>
+        <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">label</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_eq_labels</span><span class="p">):</span>
+            <span class="n">dependent_name</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">"dependent in equation </span><span class="si">{</span><span class="n">label</span><span class="si">!r}</span><span class="s2">"</span>
+            <span class="n">expected</span> <span class="o">=</span> <span class="n">row_labels</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_dependent</span><span class="p">[</span><span class="n">i</span><span class="p">])</span>
+            <span class="k">if</span> <span class="n">expected</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+                <span class="k">if</span> <span class="n">reference</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+                    <span class="n">reference</span><span class="p">,</span> <span class="n">reference_name</span> <span class="o">=</span> <span class="n">expected</span><span class="p">,</span> <span class="n">dependent_name</span>
+                <span class="k">else</span><span class="p">:</span>
+                    <span class="n">check_row_alignment</span><span class="p">(</span>
+                        <span class="n">dependent_name</span><span class="p">,</span> <span class="n">expected</span><span class="p">,</span> <span class="n">reference</span><span class="p">,</span> <span class="n">reference_name</span>
+                    <span class="p">)</span>
+            <span class="n">inputs</span> <span class="o">=</span> <span class="p">{</span>
+                <span class="sa">f</span><span class="s2">"exog in equation </span><span class="si">{</span><span class="n">label</span><span class="si">!r}</span><span class="s2">"</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">_exog</span><span class="p">[</span><span class="n">i</span><span class="p">],</span>
+                <span class="sa">f</span><span class="s2">"endog in equation </span><span class="si">{</span><span class="n">label</span><span class="si">!r}</span><span class="s2">"</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">_endog</span><span class="p">[</span><span class="n">i</span><span class="p">],</span>
+                <span class="sa">f</span><span class="s2">"instruments in equation </span><span class="si">{</span><span class="n">label</span><span class="si">!r}</span><span class="s2">"</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">_instr</span><span class="p">[</span><span class="n">i</span><span class="p">],</span>
+                <span class="sa">f</span><span class="s2">"weights in equation </span><span class="si">{</span><span class="n">label</span><span class="si">!r}</span><span class="s2">"</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">_weights</span><span class="p">[</span><span class="n">i</span><span class="p">],</span>
+            <span class="p">}</span>
+            <span class="n">check_alignment</span><span class="p">(</span><span class="n">expected</span><span class="p">,</span> <span class="n">inputs</span><span class="p">,</span> <span class="n">reference</span><span class="o">=</span><span class="n">dependent_name</span><span class="p">)</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">_check_clusters</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">config</span><span class="p">:</span> <span class="n">Mapping</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">"""Check that clusters with labels use the labels of dependent"""</span>
+        <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">label</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_eq_labels</span><span class="p">):</span>
+            <span class="n">expected</span> <span class="o">=</span> <span class="n">row_labels</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_dependent</span><span class="p">[</span><span class="n">i</span><span class="p">])</span>
+            <span class="k">if</span> <span class="n">expected</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+                <span class="n">check_alignment</span><span class="p">(</span>
+                    <span class="n">expected</span><span class="p">,</span>
+                    <span class="p">{</span><span class="s2">"clusters"</span><span class="p">:</span> <span class="n">config</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"clusters"</span><span class="p">)},</span>
+                    <span class="n">reference</span><span class="o">=</span><span class="sa">f</span><span class="s2">"dependent in equation </span><span class="si">{</span><span class="n">label</span><span class="si">!r}</span><span class="s2">"</span><span class="p">,</span>
+                <span class="p">)</span>
+                <span class="k">return</span>
 
     <span class="k">def</span><span class="w"> </span><span class="nf">_drop_missing</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
         <span class="n">k</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_dependent</span><span class="p">)</span>
@@ -1814,6 +1863,7 @@
 <span class="sd">        linearmodels.system.covariance.KernelCovariance</span>
 <span class="sd">        linearmodels.system.covariance.ClusteredCovariance</span>
 <span class="sd">        """</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_check_clusters</span><span class="p">(</span><span class="n">cov_config</span><span class="p">)</span>
         <span class="k">if</span> <span class="n">method</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
             <span class="n">method</span> <span class="o">=</span> <span class="p">(</span>
                 <span class="s2">"ols"</span> <span class="k">if</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_common_exog</span> <span class="ow">and</span> <span class="bp">self</span><span class="o">.</span><span class="n">_constraints</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">)</span> <span class="k">else</span> <span class="s2">"gls"</span>
@@ -1971,6 +2021,19 @@
 <span class="sd">        \Omega = \Sigma \otimes I_N</span>
 
 <span class="sd">    where :math:`\Sigma` is the covariance matrix of the residuals.</span>
+
+<span class="sd">    Rows are paired by position, both within an equation and across the</span>
+<span class="sd">    equations. An input that carries labels (a pandas Series or DataFrame</span>
+<span class="sd">    with an index other than the default 0, 1, ..., n-1, or an xarray</span>
+<span class="sd">    DataArray with coordinates) must use the same index, in the same order,</span>
+<span class="sd">    as the dependent variable of its equation, so that a value cannot be</span>
+<span class="sd">    attached to the wrong observation. The dependent variables that carry</span>
+<span class="sd">    labels must also use the same index in every equation. A ``ValueError``</span>
+<span class="sd">    is raised if an index differs. Either reindex the input to the index of</span>
+<span class="sd">    the dependent variable, or call ``to_numpy()`` to pair its values by</span>
+<span class="sd">    position. NumPy arrays and pandas objects with a default index do not</span>
+<span class="sd">    carry labels and are always paired by position.</span>
+<span class="sd">    The same rule applies to ``clusters`` passed to ``fit``.</span>
 <span class="sd">    """</span>
 
     <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span>
@@ -2195,6 +2258,19 @@
 
 <span class="sd">    SUR is a special case of 3SLS where there are no endogenous regressors and</span>
 <span class="sd">    no instruments.</span>
+
+<span class="sd">    Rows are paired by position, both within an equation and across the</span>
+<span class="sd">    equations. An input that carries labels (a pandas Series or DataFrame</span>
+<span class="sd">    with an index other than the default 0, 1, ..., n-1, or an xarray</span>
+<span class="sd">    DataArray with coordinates) must use the same index, in the same order,</span>
+<span class="sd">    as the dependent variable of its equation, so that a value cannot be</span>
+<span class="sd">    attached to the wrong observation. The dependent variables that carry</span>
+<span class="sd">    labels must also use the same index in every equation. A ``ValueError``</span>
+<span class="sd">    is raised if an index differs. Either reindex the input to the index of</span>
+<span class="sd">    the dependent variable, or call ``to_numpy()`` to pair its values by</span>
+<span class="sd">    position. NumPy arrays and pandas objects with a default index do not</span>
+<span class="sd">    carry labels and are always paired by position.</span>
+<span class="sd">    The same rule applies to ``clusters`` passed to ``fit``.</span>
 <span class="sd">    """</span>
 
     <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span>
@@ -2427,6 +2503,18 @@
 <span class="sd">        \hat{\beta}_{GMM} &amp; = (X'ZW^{-1}Z'X)^{-1}X'ZW^{-1}Z'Y \\</span>
 
 <span class="sd">    where :math:`W` is a positive definite weighting matrix.</span>
+
+<span class="sd">    Rows are paired by position, both within an equation and across the</span>
+<span class="sd">    equations. An input that carries labels (a pandas Series or DataFrame</span>
+<span class="sd">    with an index other than the default 0, 1, ..., n-1, or an xarray</span>
+<span class="sd">    DataArray with coordinates) must use the same index, in the same order,</span>
+<span class="sd">    as the dependent variable of its equation, so that a value cannot be</span>
+<span class="sd">    attached to the wrong observation. The dependent variables that carry</span>
+<span class="sd">    labels must also use the same index in every equation. A ``ValueError``</span>
+<span class="sd">    is raised if an index differs. Either reindex the input to the index of</span>
+<span class="sd">    the dependent variable, or call ``to_numpy()`` to pair its values by</span>
+<span class="sd">    position. NumPy arrays and pandas objects with a default index do not</span>
+<span class="sd">    carry labels and are always paired by position.</span>
 <span class="sd">    """</span>
 
     <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span>

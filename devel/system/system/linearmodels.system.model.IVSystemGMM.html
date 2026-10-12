@@ -23,7 +23,7 @@
     
   
       
-        <title>linearmodels.system.model.IVSystemGMM - linearmodels v7.1 (+177)</title>
+        <title>linearmodels.system.model.IVSystemGMM - linearmodels v7.1 (+193)</title>
       
     
 
@@ -100,7 +100,7 @@
 
 <header class="md-header md-header--shadow" data-md-component="header">
   <nav class="md-header__inner md-grid" aria-label="Header">
-    <a href="../../index.html" title="linearmodels v7.1 (+177)" class="md-header__button md-logo" aria-label="linearmodels v7.1 (+177)" data-md-component="logo">
+    <a href="../../index.html" title="linearmodels v7.1 (+193)" class="md-header__button md-logo" aria-label="linearmodels v7.1 (+193)" data-md-component="logo">
       <img src="../../_static/bw-logo.svg" alt="logo">
     </a>
     <label class="md-header__button md-icon" for="__drawer">
@@ -111,7 +111,7 @@
       <div class="md-header__ellipsis">
         <div class="md-header__topic">
           <span class="md-ellipsis">
-            linearmodels v7.1 (+177)
+            linearmodels v7.1 (+193)
           </span>
         </div>
         <div class="md-header__topic" data-md-component="header-topic">
@@ -206,10 +206,10 @@
 
 <nav class="md-nav md-nav--primary" aria-label="Navigation" data-md-level="0">
   <label class="md-nav__title" for="__drawer">
-    <a href="../../index.html" title="linearmodels v7.1 (+177)" class="md-nav__button md-logo" aria-label="linearmodels v7.1 (+177)" data-md-component="logo">
+    <a href="../../index.html" title="linearmodels v7.1 (+193)" class="md-nav__button md-logo" aria-label="linearmodels v7.1 (+193)" data-md-component="logo">
       <img src="../../_static/bw-logo.svg" alt="logo">
     </a>
-    linearmodels v7.1 (+177)
+    linearmodels v7.1 (+193)
   </label>
   
     <div class="md-nav__source">
@@ -1731,6 +1731,17 @@ by</p>
 <div class="math notranslate nohighlight">
 \[\begin{split}\hat{\beta}_{GMM} &amp; = (X'ZW^{-1}Z'X)^{-1}X'ZW^{-1}Z'Y \\\end{split}\]</div>
 <p>where <span class="math notranslate nohighlight">\(W\)</span> is a positive definite weighting matrix.</p>
+<p>Rows are paired by position, both within an equation and across the
+equations. An input that carries labels (a pandas Series or DataFrame
+with an index other than the default 0, 1, …, n-1, or an xarray
+DataArray with coordinates) must use the same index, in the same order,
+as the dependent variable of its equation, so that a value cannot be
+attached to the wrong observation. The dependent variables that carry
+labels must also use the same index in every equation. A <code class="docutils literal notranslate"><span class="pre">ValueError</span></code>
+is raised if an index differs. Either reindex the input to the index of
+the dependent variable, or call <code class="docutils literal notranslate"><span class="pre">to_numpy()</span></code> to pair its values by
+position. NumPy arrays and pandas objects with a default index do not
+carry labels and are always paired by position.</p>
 <p class="rubric">Methods</p>
 <table class="autosummary longtable docutils data align-default">
 <tbody>

@@ -19,7 +19,7 @@
     
   
       
-        <title>linearmodels.asset_pricing.model - linearmodels v7.1 (+177)</title>
+        <title>linearmodels.asset_pricing.model - linearmodels v7.1 (+193)</title>
       
     
 
@@ -91,7 +91,7 @@
 
 <header class="md-header md-header--shadow" data-md-component="header">
   <nav class="md-header__inner md-grid" aria-label="Header">
-    <a href="../../../index.html" title="linearmodels v7.1 (+177)" class="md-header__button md-logo" aria-label="linearmodels v7.1 (+177)" data-md-component="logo">
+    <a href="../../../index.html" title="linearmodels v7.1 (+193)" class="md-header__button md-logo" aria-label="linearmodels v7.1 (+193)" data-md-component="logo">
       <img src="../../../_static/bw-logo.svg" alt="logo">
     </a>
     <label class="md-header__button md-icon" for="__drawer">
@@ -102,7 +102,7 @@
       <div class="md-header__ellipsis">
         <div class="md-header__topic">
           <span class="md-ellipsis">
-            linearmodels v7.1 (+177)
+            linearmodels v7.1 (+193)
           </span>
         </div>
         <div class="md-header__topic" data-md-component="header-topic">
@@ -197,10 +197,10 @@
 
 <nav class="md-nav md-nav--primary" aria-label="Navigation" data-md-level="0">
   <label class="md-nav__title" for="__drawer">
-    <a href="../../../index.html" title="linearmodels v7.1 (+177)" class="md-nav__button md-logo" aria-label="linearmodels v7.1 (+177)" data-md-component="logo">
+    <a href="../../../index.html" title="linearmodels v7.1 (+193)" class="md-nav__button md-logo" aria-label="linearmodels v7.1 (+193)" data-md-component="logo">
       <img src="../../../_static/bw-logo.svg" alt="logo">
     </a>
-    linearmodels v7.1 (+177)
+    linearmodels v7.1 (+193)
   </label>
   
     <div class="md-nav__source">
@@ -531,6 +531,7 @@
     <span class="n">LinearFactorModelResults</span><span class="p">,</span>
 <span class="p">)</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">linearmodels.iv.data</span><span class="w"> </span><span class="kn">import</span> <span class="n">IVData</span><span class="p">,</span> <span class="n">IVDataLike</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">linearmodels.shared.alignment</span><span class="w"> </span><span class="kn">import</span> <span class="n">check_alignment</span><span class="p">,</span> <span class="n">row_labels</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">linearmodels.shared.exceptions</span><span class="w"> </span><span class="kn">import</span> <span class="n">missing_warning</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">linearmodels.shared.hypotheses</span><span class="w"> </span><span class="kn">import</span> <span class="n">WaldTestStatistic</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">linearmodels.shared.linalg</span><span class="w"> </span><span class="kn">import</span> <span class="n">has_constant</span>
@@ -588,6 +589,11 @@
     <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">portfolios</span><span class="p">:</span> <span class="n">IVDataLike</span><span class="p">,</span> <span class="n">factors</span><span class="p">:</span> <span class="n">IVDataLike</span><span class="p">):</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">portfolios</span> <span class="o">=</span> <span class="n">IVData</span><span class="p">(</span><span class="n">portfolios</span><span class="p">,</span> <span class="n">var_name</span><span class="o">=</span><span class="s2">"portfolio"</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">factors</span> <span class="o">=</span> <span class="n">IVData</span><span class="p">(</span><span class="n">factors</span><span class="p">,</span> <span class="n">var_name</span><span class="o">=</span><span class="s2">"factor"</span><span class="p">)</span>
+        <span class="n">check_alignment</span><span class="p">(</span>
+            <span class="n">row_labels</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">portfolios</span><span class="p">),</span>
+            <span class="p">{</span><span class="s2">"factors"</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">factors</span><span class="p">},</span>
+            <span class="n">reference</span><span class="o">=</span><span class="s2">"portfolios"</span><span class="p">,</span>
+        <span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_name</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="vm">__class__</span><span class="o">.</span><span class="vm">__name__</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_formula</span><span class="p">:</span> <span class="nb">str</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_validate_data</span><span class="p">()</span>
@@ -722,6 +728,18 @@
 <span class="sd">    tested using the estimated values :math:`\hat{\alpha}_i`. Risk premia,</span>
 <span class="sd">    :math:`\lambda_i` are estimated using the sample averages of the factors,</span>
 <span class="sd">    which must be excess returns on traded portfolios.</span>
+
+<span class="sd">    Rows are paired by position, so that the first row of ``factors`` is the</span>
+<span class="sd">    factor return in the period of the first row of ``portfolios``. If both</span>
+<span class="sd">    ``portfolios`` and ``factors`` carry labels (a pandas Series or DataFrame</span>
+<span class="sd">    with an index other than the default 0, 1, ..., n-1, or an xarray</span>
+<span class="sd">    DataArray with coordinates), ``factors`` must use the same index, in the</span>
+<span class="sd">    same order, as ``portfolios``, so that a return cannot be attached to the</span>
+<span class="sd">    wrong period. A ``ValueError`` is raised if the index differs. Either</span>
+<span class="sd">    reindex ``factors`` to the index of ``portfolios``, or call</span>
+<span class="sd">    ``to_numpy()`` to pair its values by position. NumPy arrays and pandas</span>
+<span class="sd">    objects with a default index do not carry labels and are always paired by</span>
+<span class="sd">    position.</span>
 <span class="sd">    """</span>
 
     <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">portfolios</span><span class="p">:</span> <span class="n">IVDataLike</span><span class="p">,</span> <span class="n">factors</span><span class="p">:</span> <span class="n">IVDataLike</span><span class="p">):</span>
@@ -1040,6 +1058,18 @@
 
 <span class="sd">    The model is tested using the estimated values</span>
 <span class="sd">    :math:`\hat{\alpha}_i=\hat{\eta}_i`.</span>
+
+<span class="sd">    Rows are paired by position, so that the first row of ``factors`` is the</span>
+<span class="sd">    factor return in the period of the first row of ``portfolios``. If both</span>
+<span class="sd">    ``portfolios`` and ``factors`` carry labels (a pandas Series or DataFrame</span>
+<span class="sd">    with an index other than the default 0, 1, ..., n-1, or an xarray</span>
+<span class="sd">    DataArray with coordinates), ``factors`` must use the same index, in the</span>
+<span class="sd">    same order, as ``portfolios``, so that a return cannot be attached to the</span>
+<span class="sd">    wrong period. A ``ValueError`` is raised if the index differs. Either</span>
+<span class="sd">    reindex ``factors`` to the index of ``portfolios``, or call</span>
+<span class="sd">    ``to_numpy()`` to pair its values by position. NumPy arrays and pandas</span>
+<span class="sd">    objects with a default index do not carry labels and are always paired by</span>
+<span class="sd">    position.</span>
 <span class="sd">    """</span>
 
     <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span>
@@ -1358,6 +1388,18 @@
 
 <span class="sd">    The model is tested using the optimized objective function using the</span>
 <span class="sd">    usual GMM J statistic.</span>
+
+<span class="sd">    Rows are paired by position, so that the first row of ``factors`` is the</span>
+<span class="sd">    factor return in the period of the first row of ``portfolios``. If both</span>
+<span class="sd">    ``portfolios`` and ``factors`` carry labels (a pandas Series or DataFrame</span>
+<span class="sd">    with an index other than the default 0, 1, ..., n-1, or an xarray</span>
+<span class="sd">    DataArray with coordinates), ``factors`` must use the same index, in the</span>
+<span class="sd">    same order, as ``portfolios``, so that a return cannot be attached to the</span>
+<span class="sd">    wrong period. A ``ValueError`` is raised if the index differs. Either</span>
+<span class="sd">    reindex ``factors`` to the index of ``portfolios``, or call</span>
+<span class="sd">    ``to_numpy()`` to pair its values by position. NumPy arrays and pandas</span>
+<span class="sd">    objects with a default index do not carry labels and are always paired by</span>
+<span class="sd">    position.</span>
 <span class="sd">    """</span>
 
     <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span>

@@ -23,7 +23,7 @@
     
   
       
-        <title>Contributing - linearmodels v7.1 (+177)</title>
+        <title>Contributing - linearmodels v7.1 (+193)</title>
       
     
 
@@ -79,6 +79,11 @@
     <label class="md-overlay" for="__drawer"></label>
     <div data-md-component="skip">
       
+        
+        <a href="#docstring-conventions" class="md-skip">
+          Skip to content
+        </a>
+      
     </div>
     <div data-md-component="announce">
       
@@ -95,7 +100,7 @@
 
 <header class="md-header md-header--shadow" data-md-component="header">
   <nav class="md-header__inner md-grid" aria-label="Header">
-    <a href="index.html" title="linearmodels v7.1 (+177)" class="md-header__button md-logo" aria-label="linearmodels v7.1 (+177)" data-md-component="logo">
+    <a href="index.html" title="linearmodels v7.1 (+193)" class="md-header__button md-logo" aria-label="linearmodels v7.1 (+193)" data-md-component="logo">
       <img src="_static/bw-logo.svg" alt="logo">
     </a>
     <label class="md-header__button md-icon" for="__drawer">
@@ -106,7 +111,7 @@
       <div class="md-header__ellipsis">
         <div class="md-header__topic">
           <span class="md-ellipsis">
-            linearmodels v7.1 (+177)
+            linearmodels v7.1 (+193)
           </span>
         </div>
         <div class="md-header__topic" data-md-component="header-topic">
@@ -201,10 +206,10 @@
 
 <nav class="md-nav md-nav--primary" aria-label="Navigation" data-md-level="0">
   <label class="md-nav__title" for="__drawer">
-    <a href="index.html" title="linearmodels v7.1 (+177)" class="md-nav__button md-logo" aria-label="linearmodels v7.1 (+177)" data-md-component="logo">
+    <a href="index.html" title="linearmodels v7.1 (+193)" class="md-nav__button md-logo" aria-label="linearmodels v7.1 (+193)" data-md-component="logo">
       <img src="_static/bw-logo.svg" alt="logo">
     </a>
-    linearmodels v7.1 (+177)
+    linearmodels v7.1 (+193)
   </label>
   
     <div class="md-nav__source">
@@ -420,6 +425,19 @@
       
       <input class="md-nav__toggle md-toggle" type="checkbox" id="__toc">
       
+        <label class="md-nav__link md-nav__link--active" for="__toc">
+          
+  
+  
+  <span class="md-ellipsis">
+    <span title="/contributing.rst (reference label)"><span>Contributing</span></span>
+    
+  </span>
+  
+
+          <span class="md-nav__icon md-icon"></span>
+        </label>
+      
       <a href="#" class="md-nav__link md-nav__link--active">
         
   
@@ -431,6 +449,52 @@
   
 
       </a>
+      
+        
+
+  
+
+<nav class="md-nav md-nav--secondary">
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Contents
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#docstring-conventions" class="md-nav__link">
+    
+    <span class="md-ellipsis">
+      <span title="docstring-conventions (reference label)"><span>Docstring conventions</span></span>
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Docstring conventions">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#checking-docstrings" class="md-nav__link">
+    
+    <span class="md-ellipsis">
+      <span title="/contributing.rst#checking-docstrings (reference label)"><span>Checking docstrings</span></span>
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+    </ul>
+  
+</nav>
       
     </li>
   
@@ -501,6 +565,40 @@
   
   
   
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Contents
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#docstring-conventions" class="md-nav__link">
+    
+    <span class="md-ellipsis">
+      <span title="docstring-conventions (reference label)"><span>Docstring conventions</span></span>
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Docstring conventions">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#checking-docstrings" class="md-nav__link">
+    
+    <span class="md-ellipsis">
+      <span title="/contributing.rst#checking-docstrings (reference label)"><span>Checking docstrings</span></span>
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+    </ul>
+  
 </nav>
                   </div>
                 </div>
@@ -534,6 +632,90 @@ linear models are always welcome.</p>
 <p><strong>Github</strong></p>
 <p>Fork the repo, make a branch with your new feature/documentation/typos
 and submit a pull request.</p>
+<h2 id="docstring-conventions"><span id="id1"></span>Docstring conventions<a class="headerlink" href="#docstring-conventions" title="Link to this heading">¶</a></h2>
+<p>Docstrings use the <a class="reference external" href="https://numpydoc.readthedocs.io/en/latest/format.html">numpydoc</a>
+format. Every module, class, function, method and property needs one, unless its name
+starts with an underscore. Apply these nine rules to every docstring that you write or
+change.</p>
+<ol class="arabic simple">
+<li><p>Put <code class="docutils literal notranslate"><span class="pre">,</span> <span class="pre">optional</span></code> after the type of every parameter that has a default. The default
+value goes in the description, never in the type line.</p></li>
+<li><p>Write a union of types as <code class="docutils literal notranslate"><span class="pre">int</span> <span class="pre">or</span> <span class="pre">str</span></code>. Use curly braces only for a set of literal
+values, written with plain quotes: <code class="docutils literal notranslate"><span class="pre">{&quot;robust&quot;,</span> <span class="pre">&quot;unadjusted&quot;}</span></code>. List every value that
+the code accepts, aliases included.</p></li>
+<li><p>Do not subscript types. Write <code class="docutils literal notranslate"><span class="pre">list</span> <span class="pre">of</span> <span class="pre">str</span></code> and <code class="docutils literal notranslate"><span class="pre">dict</span> <span class="pre">of</span> <span class="pre">str</span> <span class="pre">to</span> <span class="pre">DataFrame</span></code>, not
+<code class="docutils literal notranslate"><span class="pre">list[str]</span></code> and <code class="docutils literal notranslate"><span class="pre">dict[str,</span> <span class="pre">DataFrame]</span></code>.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">array_like</span></code> means that the value is converted with <code class="docutils literal notranslate"><span class="pre">np.asarray</span></code> and then used as
+an array. <code class="docutils literal notranslate"><span class="pre">ndarray</span></code> means that it must already be an array. <code class="docutils literal notranslate"><span class="pre">sequence</span> <span class="pre">of</span> <span class="pre">X</span></code> means
+that it is only iterated over or indexed.</p></li>
+<li><p>Use <code class="docutils literal notranslate"><span class="pre">bool</span></code>, <code class="docutils literal notranslate"><span class="pre">int</span></code>, <code class="docutils literal notranslate"><span class="pre">str</span></code> and <code class="docutils literal notranslate"><span class="pre">callable</span></code>, not <code class="docutils literal notranslate"><span class="pre">boolean</span></code>, <code class="docutils literal notranslate"><span class="pre">integer</span></code>,
+<code class="docutils literal notranslate"><span class="pre">string</span></code> or <code class="docutils literal notranslate"><span class="pre">function</span></code>. Document <code class="docutils literal notranslate"><span class="pre">**cov_config</span></code> and <code class="docutils literal notranslate"><span class="pre">**weight_config</span></code> with
+their stars, and list their keys.</p></li>
+<li><p>Use the standard section names only, with underlines exactly as long as the header.
+Write <code class="docutils literal notranslate"><span class="pre">See</span> <span class="pre">Also</span></code>, not <code class="docutils literal notranslate"><span class="pre">See</span> <span class="pre">also</span></code>. In order, the sections are <code class="docutils literal notranslate"><span class="pre">Parameters</span></code>,
+<code class="docutils literal notranslate"><span class="pre">Attributes</span></code>, <code class="docutils literal notranslate"><span class="pre">Methods</span></code>, <code class="docutils literal notranslate"><span class="pre">Returns</span></code>, <code class="docutils literal notranslate"><span class="pre">Yields</span></code>, <code class="docutils literal notranslate"><span class="pre">Other</span> <span class="pre">Parameters</span></code>,
+<code class="docutils literal notranslate"><span class="pre">Raises</span></code>, <code class="docutils literal notranslate"><span class="pre">Warns</span></code>, <code class="docutils literal notranslate"><span class="pre">Warnings</span></code>, <code class="docutils literal notranslate"><span class="pre">See</span> <span class="pre">Also</span></code>, <code class="docutils literal notranslate"><span class="pre">Notes</span></code>, <code class="docutils literal notranslate"><span class="pre">References</span></code> and
+<code class="docutils literal notranslate"><span class="pre">Examples</span></code>.</p></li>
+<li><p>A <code class="docutils literal notranslate"><span class="pre">Returns</span></code> section gives concrete types, such as <code class="docutils literal notranslate"><span class="pre">Series</span></code> or <code class="docutils literal notranslate"><span class="pre">IVResults</span></code>. It
+names what the function returns, not what it accepts.</p></li>
+<li><p>Every documented parameter exists, and every parameter is documented, in the order of
+the signature.</p></li>
+<li><p>A real bug that you find while editing a docstring goes in its own <code class="docutils literal notranslate"><span class="pre">BUG</span></code> commit.</p></li>
+</ol>
+<p>For example:</p>
+<div class="highlight-text notranslate"><div class="highlight"><pre><span></span><code>Parameters
+----------
+cats : DataFrame or array_like
+    Category codes of pandas categoricals, with shape (nobs, ncats).
+output_format : {"csc", "csr", "coo"}, optional
+    Format of the sparse output. The default is ``"csc"``.
+drop : {"first", "last"}, optional
+    Whether to exclude the first or the last category. The default is ``"first"``.
+</code></pre></div>
+</div>
+<h3 id="checking-docstrings">Checking docstrings<a class="headerlink" href="#checking-docstrings" title="Link to this heading">¶</a></h3>
+<p><code class="docutils literal notranslate"><span class="pre">numpydoc</span> <span class="pre">lint</span></code> checks docstrings. It needs numpydoc 1.10 or later. Run it from the
+root of the repository. It prints one line for each violation, and exits with status 1 if
+there is any violation:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><code>python<span class="w"> </span>-m<span class="w"> </span>pip<span class="w"> </span>install<span class="w"> </span><span class="s2">"numpydoc&gt;=1.10"</span>
+python<span class="w"> </span>-m<span class="w"> </span>numpydoc<span class="w"> </span>lint<span class="w"> </span><span class="k">$(</span>git<span class="w"> </span>ls-files<span class="w"> </span><span class="s2">"linearmodels/*.py"</span><span class="k">)</span><span class="w"> </span>--config<span class="w"> </span>.
+</code></pre></div>
+</div>
+<p>In PowerShell, write <code class="docutils literal notranslate"><span class="pre">(git</span> <span class="pre">ls-files</span> <span class="pre">&quot;linearmodels/*.py&quot;)</span></code> for the file list. To check
+only some files, pass their paths instead. On Windows, also run Python in UTF-8 mode, for
+example with <code class="docutils literal notranslate"><span class="pre">python</span> <span class="pre">-X</span> <span class="pre">utf8</span></code>, because numpydoc reads the files with the system
+encoding and some docstrings contain non-ASCII characters.</p>
+<p>The <code class="docutils literal notranslate"><span class="pre">[tool.numpydoc_validation]</span></code> table in <code class="docutils literal notranslate"><span class="pre">pyproject.toml</span></code> sets what is checked.</p>
+<ul class="simple">
+<li><p>Every numpydoc check is enforced except <code class="docutils literal notranslate"><span class="pre">ES01</span></code> (no extended summary), <code class="docutils literal notranslate"><span class="pre">SA01</span></code> (no
+<code class="docutils literal notranslate"><span class="pre">See</span> <span class="pre">Also</span></code> section) and <code class="docutils literal notranslate"><span class="pre">EX01</span></code> (no <code class="docutils literal notranslate"><span class="pre">Examples</span></code> section). The enforced checks
+include the punctuation of summaries and of parameter and return descriptions
+(<code class="docutils literal notranslate"><span class="pre">SS03</span></code>, <code class="docutils literal notranslate"><span class="pre">PR08</span></code>, <code class="docutils literal notranslate"><span class="pre">PR09</span></code>, <code class="docutils literal notranslate"><span class="pre">RT04</span></code> and <code class="docutils literal notranslate"><span class="pre">RT05</span></code>), the description of every
+<code class="docutils literal notranslate"><span class="pre">See</span> <span class="pre">Also</span></code> entry (<code class="docutils literal notranslate"><span class="pre">SA04</span></code>), parameters that match the signature (<code class="docutils literal notranslate"><span class="pre">PR01</span></code>, <code class="docutils literal notranslate"><span class="pre">PR02</span></code>
+and <code class="docutils literal notranslate"><span class="pre">PR03</span></code>), and the names and order of the sections (<code class="docutils literal notranslate"><span class="pre">GL06</span></code> and <code class="docutils literal notranslate"><span class="pre">GL07</span></code>).
+Numpydoc does not check rules 1 to 4 and 9, the keys listed under rule 5 or the types
+named under rule 7. Check them in review.</p></li>
+<li><p>Module docstrings are required (<code class="docutils literal notranslate"><span class="pre">GL08</span></code> applies to modules), including the docstrings
+of <code class="docutils literal notranslate"><span class="pre">__init__.py</span></code> files. One line is enough.</p></li>
+<li><p>The linter skips tests, <code class="docutils literal notranslate"><span class="pre">conftest.py</span></code>, <code class="docutils literal notranslate"><span class="pre">_version.py</span></code>, special methods such as
+<code class="docutils literal notranslate"><span class="pre">__init__</span></code> (document the constructor in the class docstring), functions defined
+inside other functions, and every name with a leading underscore. The exceptions are
+the public members of private base classes, such as <code class="docutils literal notranslate"><span class="pre">_IVModelBase.predict</span></code>, which the
+reference pages show on the public subclasses, and <code class="docutils literal notranslate"><span class="pre">_OLS</span></code>, <code class="docutils literal notranslate"><span class="pre">_Panel</span></code> and
+<code class="docutils literal notranslate"><span class="pre">LinearConstraint</span></code>, which the reference pages list.</p></li>
+<li><p>The linter cannot see decorators, so it asks for a <code class="docutils literal notranslate"><span class="pre">Returns</span></code> section and an infinitive
+verb in the summary of every property. The configuration ignores both checks for a
+docstring without a <code class="docutils literal notranslate"><span class="pre">Parameters</span></code> section, so a property needs only a summary. A
+method without parameters that returns a value, such as <code class="docutils literal notranslate"><span class="pre">PanelData.copy</span></code>, still needs
+a <code class="docutils literal notranslate"><span class="pre">Returns</span></code> section, but the linter does not check it.
+<code class="docutils literal notranslate"><span class="pre">python</span> <span class="pre">-m</span> <span class="pre">numpydoc</span> <span class="pre">validate</span> <span class="pre">linearmodels.panel.data.PanelData.copy</span></code> does; ignore
+<code class="docutils literal notranslate"><span class="pre">ES01</span></code>, <code class="docutils literal notranslate"><span class="pre">SA01</span></code> and <code class="docutils literal notranslate"><span class="pre">EX01</span></code> in its output.</p></li>
+<li><p>Some declarations cannot satisfy the linter. A property setter and an <code class="docutils literal notranslate"><span class="pre">&#64;overload</span></code>
+stub cannot have a docstring that is shown in the documentation: write
+<code class="docutils literal notranslate"><span class="pre">#</span> <span class="pre">numpydoc</span> <span class="pre">ignore=GL08</span></code> on its <code class="docutils literal notranslate"><span class="pre">def</span></code> line. A <code class="docutils literal notranslate"><span class="pre">NamedTuple</span></code> has no <code class="docutils literal notranslate"><span class="pre">__init__</span></code>, so
+the linter reports its fields as unknown parameters: document them under <code class="docutils literal notranslate"><span class="pre">Parameters</span></code>
+and write <code class="docutils literal notranslate"><span class="pre">#</span> <span class="pre">numpydoc</span> <span class="pre">ignore=PR02</span></code> on its <code class="docutils literal notranslate"><span class="pre">class</span></code> line.</p></li>
+</ul>
 
 
 

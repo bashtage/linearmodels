@@ -19,7 +19,7 @@
     
   
       
-        <title>linearmodels.iv.model - linearmodels v7.1 (+177)</title>
+        <title>linearmodels.iv.model - linearmodels v7.1 (+193)</title>
       
     
 
@@ -91,7 +91,7 @@
 
 <header class="md-header md-header--shadow" data-md-component="header">
   <nav class="md-header__inner md-grid" aria-label="Header">
-    <a href="../../../index.html" title="linearmodels v7.1 (+177)" class="md-header__button md-logo" aria-label="linearmodels v7.1 (+177)" data-md-component="logo">
+    <a href="../../../index.html" title="linearmodels v7.1 (+193)" class="md-header__button md-logo" aria-label="linearmodels v7.1 (+193)" data-md-component="logo">
       <img src="../../../_static/bw-logo.svg" alt="logo">
     </a>
     <label class="md-header__button md-icon" for="__drawer">
@@ -102,7 +102,7 @@
       <div class="md-header__ellipsis">
         <div class="md-header__topic">
           <span class="md-ellipsis">
-            linearmodels v7.1 (+177)
+            linearmodels v7.1 (+193)
           </span>
         </div>
         <div class="md-header__topic" data-md-component="header-topic">
@@ -197,10 +197,10 @@
 
 <nav class="md-nav md-nav--primary" aria-label="Navigation" data-md-level="0">
   <label class="md-nav__title" for="__drawer">
-    <a href="../../../index.html" title="linearmodels v7.1 (+177)" class="md-nav__button md-logo" aria-label="linearmodels v7.1 (+177)" data-md-component="logo">
+    <a href="../../../index.html" title="linearmodels v7.1 (+193)" class="md-nav__button md-logo" aria-label="linearmodels v7.1 (+193)" data-md-component="logo">
       <img src="../../../_static/bw-logo.svg" alt="logo">
     </a>
-    linearmodels v7.1 (+177)
+    linearmodels v7.1 (+193)
   </label>
   
     <div class="md-nav__source">
@@ -510,7 +510,7 @@
 
 <span class="kn">from</span><span class="w"> </span><span class="nn">__future__</span><span class="w"> </span><span class="kn">import</span> <span class="n">annotations</span>
 
-<span class="kn">from</span><span class="w"> </span><span class="nn">collections.abc</span><span class="w"> </span><span class="kn">import</span> <span class="n">Callable</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">collections.abc</span><span class="w"> </span><span class="kn">import</span> <span class="n">Callable</span><span class="p">,</span> <span class="n">Mapping</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">typing</span><span class="w"> </span><span class="kn">import</span> <span class="n">Any</span><span class="p">,</span> <span class="n">TypeVar</span><span class="p">,</span> <span class="n">Union</span><span class="p">,</span> <span class="n">cast</span>
 <span class="kn">import</span><span class="w"> </span><span class="nn">warnings</span>
 
@@ -560,6 +560,7 @@
     <span class="n">OneWayClusteredWeightMatrix</span><span class="p">,</span>
 <span class="p">)</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">linearmodels.iv.results</span><span class="w"> </span><span class="kn">import</span> <span class="n">IVGMMResults</span><span class="p">,</span> <span class="n">IVResults</span><span class="p">,</span> <span class="n">OLSResults</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">linearmodels.shared.alignment</span><span class="w"> </span><span class="kn">import</span> <span class="n">check_alignment</span><span class="p">,</span> <span class="n">row_labels</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">linearmodels.shared.exceptions</span><span class="w"> </span><span class="kn">import</span> <span class="n">IndexWarning</span><span class="p">,</span> <span class="n">missing_warning</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">linearmodels.shared.hypotheses</span><span class="w"> </span><span class="kn">import</span> <span class="n">InvalidTestStatistic</span><span class="p">,</span> <span class="n">WaldTestStatistic</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">linearmodels.shared.linalg</span><span class="w"> </span><span class="kn">import</span> <span class="n">has_constant</span><span class="p">,</span> <span class="n">inv_sqrth</span>
@@ -692,7 +693,17 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">_original_index</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">dependent</span><span class="o">.</span><span class="n">pandas</span><span class="o">.</span><span class="n">index</span>
         <span class="k">if</span> <span class="n">weights</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
             <span class="n">weights</span> <span class="o">=</span> <span class="n">ones</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">dependent</span><span class="o">.</span><span class="n">shape</span><span class="p">)</span>
-        <span class="n">weights</span> <span class="o">=</span> <span class="n">IVData</span><span class="p">(</span><span class="n">weights</span><span class="p">)</span><span class="o">.</span><span class="n">ndarray</span>
+        <span class="n">weights_data</span> <span class="o">=</span> <span class="n">IVData</span><span class="p">(</span><span class="n">weights</span><span class="p">)</span>
+        <span class="n">check_alignment</span><span class="p">(</span>
+            <span class="n">row_labels</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">dependent</span><span class="p">),</span>
+            <span class="p">{</span>
+                <span class="s2">"exog"</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">exog</span><span class="p">,</span>
+                <span class="s2">"endog"</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">endog</span><span class="p">,</span>
+                <span class="s2">"instruments"</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">instruments</span><span class="p">,</span>
+                <span class="s2">"weights"</span><span class="p">:</span> <span class="n">weights_data</span><span class="p">,</span>
+            <span class="p">},</span>
+        <span class="p">)</span>
+        <span class="n">weights</span> <span class="o">=</span> <span class="n">weights_data</span><span class="o">.</span><span class="n">ndarray</span>
         <span class="k">if</span> <span class="n">npany</span><span class="p">(</span><span class="n">weights</span> <span class="o">&lt;=</span> <span class="mi">0</span><span class="p">):</span>
             <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">"weights must be strictly positive."</span><span class="p">)</span>
         <span class="n">weights</span> <span class="o">=</span> <span class="n">weights</span> <span class="o">/</span> <span class="n">nanmean</span><span class="p">(</span><span class="n">weights</span><span class="p">)</span>
@@ -889,6 +900,12 @@
 
         <span class="n">missing_warning</span><span class="p">(</span><span class="n">missing</span><span class="p">,</span> <span class="n">stacklevel</span><span class="o">=</span><span class="mi">4</span><span class="p">)</span>
         <span class="k">return</span> <span class="n">missing</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">_check_clusters</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">config</span><span class="p">:</span> <span class="n">Mapping</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">"""Check that clusters with labels use the labels of dependent"""</span>
+        <span class="n">check_alignment</span><span class="p">(</span>
+            <span class="n">row_labels</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">dependent</span><span class="p">),</span> <span class="p">{</span><span class="s2">"clusters"</span><span class="p">:</span> <span class="n">config</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"clusters"</span><span class="p">)}</span>
+        <span class="p">)</span>
 
     <span class="k">def</span><span class="w"> </span><span class="nf">wresids</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span> <span class="n">params</span><span class="p">:</span> <span class="n">linearmodels</span><span class="o">.</span><span class="n">typing</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">Float64Array</span>
@@ -1188,6 +1205,7 @@
 <span class="sd">        linearmodels.iv.covariance.KernelCovariance</span>
 <span class="sd">        linearmodels.iv.covariance.ClusteredCovariance</span>
 <span class="sd">        """</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_check_clusters</span><span class="p">(</span><span class="n">cov_config</span><span class="p">)</span>
         <span class="n">wy</span><span class="p">,</span> <span class="n">wx</span><span class="p">,</span> <span class="n">wz</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_wy</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_wx</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_wz</span>
         <span class="n">kappa</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_kappa</span>
 
@@ -1278,6 +1296,18 @@
 <span class="sd">    .. math::</span>
 
 <span class="sd">      \kappa-\alpha/(n-n_{instr})</span>
+
+<span class="sd">    Rows are paired by position. An input that carries labels (a pandas</span>
+<span class="sd">    Series or DataFrame with an index other than the default 0, 1, ..., n-1,</span>
+<span class="sd">    or an xarray DataArray with coordinates) must use the same index, in the</span>
+<span class="sd">    same order, as ``dependent``, so that a value cannot be attached to the</span>
+<span class="sd">    wrong observation. A ``ValueError`` is raised if the index of ``exog``,</span>
+<span class="sd">    ``endog``, ``instruments`` or ``weights`` differs from the index of</span>
+<span class="sd">    ``dependent``. Either reindex the input to the index of ``dependent``, or</span>
+<span class="sd">    call ``to_numpy()`` to pair its values by position. NumPy arrays and</span>
+<span class="sd">    pandas objects with a default index do not carry labels and are always</span>
+<span class="sd">    paired by position. The same rule applies to ``clusters`` passed to</span>
+<span class="sd">    ``fit``.</span>
 
 <span class="sd">    .. todo::</span>
 
@@ -1405,6 +1435,18 @@
 
 <span class="sd">    The 2SLS estimator is a special case of a k-class estimator with</span>
 <span class="sd">    :math:`\kappa=1`,</span>
+
+<span class="sd">    Rows are paired by position. An input that carries labels (a pandas</span>
+<span class="sd">    Series or DataFrame with an index other than the default 0, 1, ..., n-1,</span>
+<span class="sd">    or an xarray DataArray with coordinates) must use the same index, in the</span>
+<span class="sd">    same order, as ``dependent``, so that a value cannot be attached to the</span>
+<span class="sd">    wrong observation. A ``ValueError`` is raised if the index of ``exog``,</span>
+<span class="sd">    ``endog``, ``instruments`` or ``weights`` differs from the index of</span>
+<span class="sd">    ``dependent``. Either reindex the input to the index of ``dependent``, or</span>
+<span class="sd">    call ``to_numpy()`` to pair its values by position. NumPy arrays and</span>
+<span class="sd">    pandas objects with a default index do not carry labels and are always</span>
+<span class="sd">    paired by position. The same rule applies to ``clusters`` passed to</span>
+<span class="sd">    ``fit``.</span>
 
 <span class="sd">    .. todo::</span>
 
@@ -1546,6 +1588,7 @@
         <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">dependent</span><span class="p">,</span> <span class="n">exog</span><span class="p">,</span> <span class="n">endog</span><span class="p">,</span> <span class="n">instruments</span><span class="p">,</span> <span class="n">weights</span><span class="o">=</span><span class="n">weights</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_method</span> <span class="o">=</span> <span class="s2">"IV-GMM"</span>
 
+        <span class="bp">self</span><span class="o">.</span><span class="n">_check_clusters</span><span class="p">(</span><span class="n">weight_config</span><span class="p">)</span>
         <span class="n">weight_matrix_estimator</span> <span class="o">=</span> <span class="n">WEIGHT_MATRICES</span><span class="p">[</span><span class="n">weight_type</span><span class="p">]</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_weight</span> <span class="o">=</span> <span class="n">weight_matrix_estimator</span><span class="p">(</span><span class="o">**</span><span class="n">weight_config</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_weight_type</span> <span class="o">=</span> <span class="n">weight_type</span>
@@ -1675,6 +1718,18 @@
 <span class="sd">    where :math:`W` is a positive definite weight matrix and :math:`Z`</span>
 <span class="sd">    contains both the exogenous regressors and the instruments.</span>
 
+<span class="sd">    Rows are paired by position. An input that carries labels (a pandas</span>
+<span class="sd">    Series or DataFrame with an index other than the default 0, 1, ..., n-1,</span>
+<span class="sd">    or an xarray DataArray with coordinates) must use the same index, in the</span>
+<span class="sd">    same order, as ``dependent``, so that a value cannot be attached to the</span>
+<span class="sd">    wrong observation. A ``ValueError`` is raised if the index of ``exog``,</span>
+<span class="sd">    ``endog``, ``instruments`` or ``weights`` differs from the index of</span>
+<span class="sd">    ``dependent``. Either reindex the input to the index of ``dependent``, or</span>
+<span class="sd">    call ``to_numpy()`` to pair its values by position. NumPy arrays and</span>
+<span class="sd">    pandas objects with a default index do not carry labels and are always</span>
+<span class="sd">    paired by position. The same rule applies to ``clusters`` passed to</span>
+<span class="sd">    ``fit`` or in ``weight_config``.</span>
+
 <span class="sd">    .. todo::</span>
 
 <span class="sd">      * VCV: bootstrap</span>
@@ -1695,16 +1750,15 @@
         <span class="n">weight_type</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">"robust"</span><span class="p">,</span>
         <span class="o">**</span><span class="n">weight_config</span><span class="p">:</span> <span class="n">Any</span><span class="p">,</span>
     <span class="p">):</span>
-        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">dependent</span><span class="p">,</span> <span class="n">exog</span><span class="p">,</span> <span class="n">endog</span><span class="p">,</span> <span class="n">instruments</span><span class="p">,</span> <span class="n">weights</span><span class="o">=</span><span class="n">weights</span><span class="p">)</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">_method</span> <span class="o">=</span> <span class="s2">"IV-GMM"</span>
-
-        <span class="n">weight_matrix_estimator</span> <span class="o">=</span> <span class="n">WEIGHT_MATRICES</span><span class="p">[</span><span class="n">weight_type</span><span class="p">]</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">_weight</span> <span class="o">=</span> <span class="n">weight_matrix_estimator</span><span class="p">(</span><span class="o">**</span><span class="n">weight_config</span><span class="p">)</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">_weight_type</span> <span class="o">=</span> <span class="n">weight_type</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">_weight_config</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_weight</span><span class="o">.</span><span class="n">config</span>
-        <span class="c1"># The arguments needed to create another weight estimator of this</span>
-        <span class="c1"># type. config does not contain all of them, e.g., optimal_bw</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">_weight_kwargs</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">(</span><span class="n">weight_config</span><span class="p">)</span>
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span>
+            <span class="n">dependent</span><span class="p">,</span>
+            <span class="n">exog</span><span class="p">,</span>
+            <span class="n">endog</span><span class="p">,</span>
+            <span class="n">instruments</span><span class="p">,</span>
+            <span class="n">weights</span><span class="o">=</span><span class="n">weights</span><span class="p">,</span>
+            <span class="n">weight_type</span><span class="o">=</span><span class="n">weight_type</span><span class="p">,</span>
+            <span class="o">**</span><span class="n">weight_config</span><span class="p">,</span>
+        <span class="p">)</span>
 
 <div class="viewcode-block" id="IVGMM.from_formula">
 <a class="viewcode-back" href="../../../iv/iv/linearmodels.iv.model.IVGMM.from_formula.html#linearmodels.iv.model.IVGMM.from_formula">[docs]</a>
@@ -1862,6 +1916,7 @@
 <span class="sd">        --------</span>
 <span class="sd">        linearmodels.iv.gmm.IVGMMCovariance</span>
 <span class="sd">        """</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_check_clusters</span><span class="p">(</span><span class="n">cov_config</span><span class="p">)</span>
         <span class="n">wy</span><span class="p">,</span> <span class="n">wx</span><span class="p">,</span> <span class="n">wz</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_wy</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_wx</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_wz</span>
         <span class="n">nobs</span> <span class="o">=</span> <span class="n">wy</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
         <span class="n">weight_matrix</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_weight</span><span class="o">.</span><span class="n">weight_matrix</span>
@@ -1969,6 +2024,18 @@
 
 <span class="sd">    where :math:`W(\beta)` is a weight matrix that depends on :math:`\beta`</span>
 <span class="sd">    through :math:`\epsilon_i = y_i - x_i\beta`.</span>
+
+<span class="sd">    Rows are paired by position. An input that carries labels (a pandas</span>
+<span class="sd">    Series or DataFrame with an index other than the default 0, 1, ..., n-1,</span>
+<span class="sd">    or an xarray DataArray with coordinates) must use the same index, in the</span>
+<span class="sd">    same order, as ``dependent``, so that a value cannot be attached to the</span>
+<span class="sd">    wrong observation. A ``ValueError`` is raised if the index of ``exog``,</span>
+<span class="sd">    ``endog``, ``instruments`` or ``weights`` differs from the index of</span>
+<span class="sd">    ``dependent``. Either reindex the input to the index of ``dependent``, or</span>
+<span class="sd">    call ``to_numpy()`` to pair its values by position. NumPy arrays and</span>
+<span class="sd">    pandas objects with a default index do not carry labels and are always</span>
+<span class="sd">    paired by position. The same rule applies to ``clusters`` passed to</span>
+<span class="sd">    ``fit`` or in ``weight_config``.</span>
 
 <span class="sd">    See Also</span>
 <span class="sd">    --------</span>
@@ -2245,6 +2312,7 @@
 <span class="sd">        --------</span>
 <span class="sd">        linearmodels.iv.gmm.IVGMMCovariance</span>
 <span class="sd">        """</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_check_clusters</span><span class="p">(</span><span class="n">cov_config</span><span class="p">)</span>
         <span class="n">wy</span><span class="p">,</span> <span class="n">wx</span><span class="p">,</span> <span class="n">wz</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_wy</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_wx</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_wz</span>
         <span class="n">weight_matrix</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_weight</span><span class="o">.</span><span class="n">weight_matrix</span>
         <span class="k">if</span> <span class="n">starting</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
@@ -2307,6 +2375,17 @@
 <span class="sd">    -----</span>
 <span class="sd">    Uses IV2SLS internally by setting endog and instruments to None.</span>
 <span class="sd">    Uses IVLIML with kappa=0 to estimate OLS models.</span>
+
+<span class="sd">    Rows are paired by position. An input that carries labels (a pandas</span>
+<span class="sd">    Series or DataFrame with an index other than the default 0, 1, ..., n-1,</span>
+<span class="sd">    or an xarray DataArray with coordinates) must use the same index, in the</span>
+<span class="sd">    same order, as ``dependent``, so that a value cannot be attached to the</span>
+<span class="sd">    wrong observation. A ``ValueError`` is raised if the index of ``exog`` or</span>
+<span class="sd">    ``weights`` differs from the index of ``dependent``. Either reindex the</span>
+<span class="sd">    input to the index of ``dependent``, or call ``to_numpy()`` to pair its</span>
+<span class="sd">    values by position. NumPy arrays and pandas objects with a default index</span>
+<span class="sd">    do not carry labels and are always paired by position. The same rule</span>
+<span class="sd">    applies to ``clusters`` passed to ``fit``.</span>
 
 <span class="sd">    See Also</span>
 <span class="sd">    --------</span>
@@ -2540,6 +2619,18 @@
 <span class="sd">    variance, particularly when the instruments are weak (see Davidson and</span>
 <span class="sd">    MacKinnon, 2006).</span>
 
+<span class="sd">    Rows are paired by position. An input that carries labels (a pandas</span>
+<span class="sd">    Series or DataFrame with an index other than the default 0, 1, ..., n-1,</span>
+<span class="sd">    or an xarray DataArray with coordinates) must use the same index, in the</span>
+<span class="sd">    same order, as ``dependent``, so that a value cannot be attached to the</span>
+<span class="sd">    wrong observation. A ``ValueError`` is raised if the index of ``exog``,</span>
+<span class="sd">    ``endog``, ``instruments`` or ``weights`` differs from the index of</span>
+<span class="sd">    ``dependent``. Either reindex the input to the index of ``dependent``, or</span>
+<span class="sd">    call ``to_numpy()`` to pair its values by position. NumPy arrays and</span>
+<span class="sd">    pandas objects with a default index do not carry labels and are always</span>
+<span class="sd">    paired by position. The same rule applies to ``clusters`` passed to</span>
+<span class="sd">    ``fit``.</span>
+
 <span class="sd">    See Also</span>
 <span class="sd">    --------</span>
 <span class="sd">    IV2SLS, IVLIML, IVGMM, IVGMMCUE</span>
@@ -2687,6 +2778,7 @@
 <span class="sd">        --------</span>
 <span class="sd">        linearmodels.iv.gmm.IVGMMCovariance</span>
 <span class="sd">        """</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_check_clusters</span><span class="p">(</span><span class="n">cov_config</span><span class="p">)</span>
         <span class="n">wy</span><span class="p">,</span> <span class="n">wx</span><span class="p">,</span> <span class="n">wz</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_wy</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_wx</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_wz</span>
 
         <span class="c1"># The leverages and the first-stage predictions from an orthonormal</span>
