@@ -232,6 +232,38 @@ def test_weighted_against_transformed_data(common_exog):
     assert_allclose(np.diag(res.cov), np.diag(out.cov))
 
 
+@pytest.mark.parametrize("method", ["ols", "gls"])
+@pytest.mark.parametrize("cov_type", ["unadjusted", "robust", "kernel", "clustered"])
+def test_weighted_covariance_is_covariance_of_scaled_data(method, cov_type):
+    # Weighted estimation is estimation on the data scaled by the square root of the
+    # normalized weights, so the covariance must be the same for every estimator
+    data = generate_3sls_data(
+        n=250,
+        k=3,
+        p=3,
+        en=2,
+        instr=3,
+        const=True,
+        rho=0.8,
+        common_exog=False,
+        included_weights=True,
+        output_dict=True,
+    )
+    scaled = {}
+    for key, eqn in data.items():
+        w = np.sqrt(eqn["weights"] / eqn["weights"].mean())
+        scaled[key] = {k: v * w for k, v in eqn.items() if k != "weights"}
+    kwargs = {}
+    if cov_type == "kernel":
+        kwargs["bandwidth"] = 3
+    elif cov_type == "clustered":
+        kwargs["clusters"] = np.random.default_rng(0).integers(0, 25, 250)
+    res = IV3SLS(data).fit(method=method, cov_type=cov_type, **kwargs)
+    expected = IV3SLS(scaled).fit(method=method, cov_type=cov_type, **kwargs)
+    assert_allclose(res.params, expected.params)
+    assert_allclose(res.cov, expected.cov)
+
+
 def test_weighted_just_identified_against_iv2sls():
     # With the same instruments in every equation and each equation exactly
     # identified, 3SLS reduces to equation-by-equation 2SLS, also with weights
