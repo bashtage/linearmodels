@@ -312,6 +312,24 @@ def test_kernel_optimal_bandwidth(data):
     mod.fit(cov_type="kernel", debiased=True)
 
 
+@pytest.mark.parametrize(
+    "options",
+    [{}, {"bandwidth": 5}, {"optimal_bw": False}, {"optimal_bw": True}],
+    ids=["default", "bandwidth", "not_optimal_bw", "optimal_bw"],
+)
+def test_kernel_weights_with_one_step(options):
+    # The first step does not use the weight matrix, so its bandwidth is not
+    # known. It was an AssertionError if the bandwidth was not given
+    eqns = generate_3sls_data_v2(k=2, n=200)
+    res = IVSystemGMM(eqns, weight_type="kernel", **options).fit(iter_limit=1)
+    assert res.weight_config["bandwidth"] == options.get("bandwidth")
+    assert res.weight_config["center"] is False
+    robust = IVSystemGMM(eqns, weight_type="robust").fit(iter_limit=1)
+    assert_allclose(res.params, robust.params, rtol=1e-12)
+    assert_allclose(res.w, robust.w, rtol=1e-12)
+    assert_allclose(res.j_stat.stat, robust.j_stat.stat, rtol=1e-10)
+
+
 def test_homoskedastic_weight_direct(weight_data, center, debias):
     wm = HomoskedasticWeightMatrix(center, debias)
     x, z, eps, sigma = weight_data

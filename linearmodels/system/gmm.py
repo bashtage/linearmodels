@@ -370,8 +370,11 @@ class KernelWeightMatrix(HeteroskedasticWeightMatrix, _HACMixin):
         Returns
         -------
         AttrDict
-            Dictionary containing weight estimator configuration information
+            Dictionary containing weight estimator configuration information.
+            The bandwidth is None if the bandwidth was not given and the weight
+            matrix has not been computed, as in ``IVSystemGMM.fit`` with
+            ``iter_limit=1``.
         """
         out = AttrDict([(k, v) for k, v in self._config.items()])
-        out["bandwidth"] = self.bandwidth
+        out["bandwidth"] = self._bandwidth
         return out
