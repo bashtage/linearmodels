@@ -1012,11 +1012,11 @@ class _PanelModelBase:
 
         cov_config_upd = dict(cov_config.items())
 
-        clusters = cov_config.get("clusters")
-        if clusters is not None:
+        given = cov_config.get("clusters")
+        if given is not None:
             # Lists and tuples are converted to arrays
-            clusters = as_array_like(clusters, "clusters")
-        clusters = get_panel_data_like({"clusters": clusters}, "clusters")
+            given = as_array_like(given, "clusters")
+        clusters = get_panel_data_like({"clusters": given}, "clusters")
         clusters_frame: DataFrame | None = None
         if clusters is not None:
             formatted_clusters = self.reformat_clusters(clusters)
