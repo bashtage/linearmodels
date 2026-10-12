@@ -1385,6 +1385,13 @@ class AbsorbingLS:
 
         return f_statistic(params, cov, debiased, resid_df, const_loc)
 
+    def _retained_exog(self) -> linearmodels.typing.data.Float64Array:
+        """The regressors that were estimated, in the units of exog"""
+        locs = [self._exog.cols.index(col) for col in self._columns]
+        return cast(
+            "linearmodels.typing.data.Float64Array", self._exog.ndarray[:, locs]
+        )
+
     def _post_estimation(
         self,
         params: linearmodels.typing.data.Float64Array,
@@ -1406,8 +1413,9 @@ class AbsorbingLS:
             columns=["fitted_values"],
         )
         assert isinstance(self._absorbed_dependent, DataFrame)
+        # The part of the fitted values that is not explained by the regressors
         absorbed_effects = DataFrameWrapper(
-            self._absorbed_dependent.to_numpy() - fitted_values,
+            fitted_values - self._retained_exog() @ params,
             columns=["absorbed_effects"],
             index=self._dependent.rows,
         )
