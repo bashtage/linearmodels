@@ -305,9 +305,17 @@ napoleon_use_admonition_for_notes = False
 napoleon_use_admonition_for_references = False
 napoleon_preprocess_types = True
 napoleon_use_param = True
-napoleon_type_aliases = {
-    "array-like": ":term:`array-like <array_like>`",
-    "array_like": ":term:`array_like`",
+# Sphinx 9 napoleon merges napoleon_type_aliases into autodoc_type_aliases, in
+# place, when a class docstring lists a parameter or an attribute without a type
+# and napoleon looks for the annotation of that name in the class.  From then on
+# autodoc shows the annotation ``DataFrame | None`` of every signature that it
+# builds as ``TypeAliasForwardRef('pandas.DataFrame') | None``, and warns that
+# the class TypeAliasForwardRef cannot be found.  Which signatures are affected
+# depends on the order in which the pages are built.  The docstrings give the
+# types, so there is nothing to look up.
+napoleon_attr_annotations = False
+# Type names used in docstrings that are expanded to the object they refer to
+type_xref_aliases = {
     "Figure": "matplotlib.figure.Figure",
     "Axes": "matplotlib.axes.Axes",
     "AxesSubplot": "matplotlib.axes.Axes",
@@ -331,20 +339,24 @@ napoleon_type_aliases = {
     "RandomEffects": "linearmodels.panel.model.RandomEffects",
     "SUR": "linearmodels.system.model.SUR",
     "TradedFactorModel": "linearmodels.asset_pricing.model.TradedFactorModel",
+    "AbsorbingLS": "linearmodels.iv.absorbing.AbsorbingLS",
     "AbsorbingLSResults": "linearmodels.iv.absorbing.AbsorbingLSResults",
     "FirstStageResults": "linearmodels.iv.results.FirstStageResults",
     "IVGMMResults": "linearmodels.iv.results.IVGMMResults",
     "IVModelComparison": "linearmodels.iv.results.IVModelComparison",
     "IVResults": "linearmodels.iv.results.IVResults",
-    "InvalidTestStatistic": "linearmodels.shared.InvalidTestStatistic",
+    "InvalidTestStatistic": "linearmodels.shared.hypotheses.InvalidTestStatistic",
+    "InapplicableTestStatistic": "linearmodels.shared.hypotheses.InapplicableTestStatistic",
     "OLSResults": "linearmodels.iv.results.OLSResults",
     "WaldTestStatistic": "linearmodels.shared.hypotheses.WaldTestStatistic",
     "NormalTestStatistic": "linearmodels.shared.hypotheses.NormalTestStatistic",
     "LinearConstraint": "linearmodels.system.model.LinearConstraint",
+    "FamaMacBethResults": "linearmodels.panel.results.FamaMacBethResults",
     "PanelEffectsResults": "linearmodels.panel.results.PanelEffectsResults",
     "PanelModelComparison": "linearmodels.panel.results.PanelModelComparison",
     "PanelResults": "linearmodels.panel.results.PanelResults",
     "RandomEffectsResults": "linearmodels.panel.results.RandomEffectsResults",
+    "HausmanTestResults": "linearmodels.panel.results.HausmanTestResults",
     "GMMSystemResults": "linearmodels.system.results.GMMSystemResults",
     "Summary": "linearmodels.compat.statsmodels.Summary",
     "SystemEquationResult": "linearmodels.system.results.SystemEquationResult",
@@ -355,71 +367,31 @@ napoleon_type_aliases = {
     "IVData": "linearmodels.iv.data.IVData",
     "AttrDict": "linearmodels.shared.utility.AttrDict",
     "csc_matrix": "scipy.sparse.csc_matrix",
+    "csc_array": "scipy.sparse.csc_array",
+    "csr_array": "scipy.sparse.csr_array",
+    "coo_array": "scipy.sparse.coo_array",
     "DataArray": "xarray.DataArray",
     "PanelModelData": "linearmodels.panel.utility.PanelModelData",
     "ndarray": "numpy.ndarray",
-    "np.ndarray": "numpy.array",
+    "np.ndarray": "numpy.ndarray",
+    "pd.DataFrame": "pandas.DataFrame",
     "pd.Series": "pandas.Series",
+}
+
+napoleon_type_aliases = {
+    "array-like": ":term:`array-like <array_like>`",
+    "array_like": ":term:`array_like`",
+    "callable": ":term:`callable`",
+    "scalar": ":term:`scalar`",
+    "sequence": ":term:`sequence`",
+    **type_xref_aliases,
 }
 
 # Create xrefs
 numpydoc_use_autodoc_signature = True
 numpydoc_xref_param_type = True
 numpydoc_class_members_toctree = False
-numpydoc_xref_aliases = {
-    "Figure": "matplotlib.figure.Figure",
-    "Axes": "matplotlib.axes.Axes",
-    "AxesSubplot": "matplotlib.axes.Axes",
-    "DataFrame": "pandas.DataFrame",
-    "Series": "pandas.Series",
-    "BetweenOLS": "linearmodels.panel.model.BetweenOLS",
-    "FamaMacBeth": "linearmodels.panel.model.FamaMacBeth",
-    "FirstDifferenceOLS": "linearmodels.panel.model.FirstDifferenceOLS",
-    "IV2SLS": "linearmodels.iv.model.IV2SLS",
-    "IV3SLS": "linearmodels.system.model.IV3SLS",
-    "IVGMM": "linearmodels.iv.model.IVGMM",
-    "IVGMMCUE": "linearmodels.iv.model.IVGMMCUE",
-    "IVJIVE": "linearmodels.iv.model.IVJIVE",
-    "IVLIML": "linearmodels.iv.model.IVLIML",
-    "IVSystemGMM": "linearmodels.system.model.IVSystemGMM",
-    "LinearFactorModel": "linearmodels.asset_pricing.model.LinearFactorModel",
-    "LinearFactorModelGMM": "linearmodels.asset_pricing.model.LinearFactorModelGMM",
-    "OLS": "linearmodels.iv.model.OLS",
-    "PanelOLS": "linearmodels.panel.model.PanelOLS",
-    "PooledOLS": "linearmodels.panel.model.PooledOLS",
-    "RandomEffects": "linearmodels.panel.model.RandomEffects",
-    "SUR": "linearmodels.system.model.SUR",
-    "TradedFactorModel": "linearmodels.asset_pricing.model.TradedFactorModel",
-    "AbsorbingLSResults": "linearmodels.iv.absorbing.AbsorbingLSResults",
-    "FirstStageResults": "linearmodels.iv.results.FirstStageResults",
-    "IVGMMResults": "linearmodels.iv.results.IVGMMResults",
-    "IVModelComparison": "linearmodels.iv.results.IVModelComparison",
-    "IVResults": "linearmodels.iv.results.IVResults",
-    "InvalidTestStatistic": "linearmodels.shared.InvalidTestStatistic",
-    "OLSResults": "linearmodels.iv.results.OLSResults",
-    "WaldTestStatistic": "linearmodels.shared.hypotheses.WaldTestStatistic",
-    "NormalTestStatistic": "linearmodels.shared.hypotheses.NormalTestStatistic",
-    "LinearConstraint": "linearmodels.system.model.LinearConstraint",
-    "PanelEffectsResults": "linearmodels.panel.results.PanelEffectsResults",
-    "PanelModelComparison": "linearmodels.panel.results.PanelModelComparison",
-    "PanelResults": "linearmodels.panel.results.PanelResults",
-    "RandomEffectsResults": "linearmodels.panel.results.RandomEffectsResults",
-    "GMMSystemResults": "linearmodels.system.results.GMMSystemResults",
-    "Summary": "linearmodels.compat.statsmodels.Summary",
-    "SystemEquationResult": "linearmodels.system.results.SystemEquationResult",
-    "SystemResults": "linearmodels.system.results.SystemResults",
-    "GMMFactorModelResults": "linearmodels.asset_pricing.results.GMMFactorModelResults",
-    "LinearFactorModelResults": "linearmodels.asset_pricing.results.LinearFactorModelResults",
-    "PanelData": "linearmodels.panel.data.PanelData",
-    "IVData": "linearmodels.iv.data.IVData",
-    "AttrDict": "linearmodels.shared.utility.AttrDict",
-    "csc_matrix": "scipy.sparse.csc_matrix",
-    "DataArray": "xarray.DataArray",
-    "PanelModelData": "linearmodels.panel.utility.PanelModelData",
-    "ndarray": "numpy.ndarray",
-    "np.ndarray": "numpy.array",
-    "pd.Series": "pandas.Series",
-}
+numpydoc_xref_aliases = type_xref_aliases
 
 autosummary_generate = True
 autoclass_content = "class"
@@ -429,3 +401,29 @@ autodoc_type_aliases = {
     "IntArray": "linearmodels.typing.data.IntArray",
     "Float64Array": "linearmodels.typing.data.Float64Array",
 }
+
+# sphinx_immaterial: autodoc cannot evaluate the annotations of the generated
+# __new__ of a NamedTuple, so the signature of PanelModelData shows the bare
+# name DataFrame, which cannot be resolved
+python_type_aliases = {"DataFrame": "pandas.DataFrame"}
+
+# nbsphinx starts one kernel for each notebook.  ipykernel 7 logs a warning each
+# time a kernel starts over TCP without encryption, which is the default, and
+# Sphinx prints it as if it were a warning of the documentation build.
+nbsphinx_execute_arguments = ["--IPKernelApp.log_level=ERROR"]
+
+
+def skip_collections_abc_members(app, what, name, obj, skip, options):
+    """
+    Do not document the methods that AttrDict inherits from collections.abc
+
+    The docstrings of get, popitem and setdefault are not numpydoc.  Napoleon
+    turns them into cross-references to types which do not exist.
+    """
+    if getattr(obj, "__module__", None) == "collections.abc":
+        return True
+    return None
+
+
+def setup(app):
+    app.connect("autodoc-skip-member", skip_collections_abc_members)
