@@ -654,7 +654,12 @@ class PanelResults(_SummaryStr):
         and are persistent when the errors are, for example a random walk,
         which is when first differences are used. Since the correlations are
         computed over time, the test assumes that the shocks are not serially
-        correlated, and it over-rejects if they are persistent.
+        correlated, and it over-rejects if they are persistent. Conversely, if
+        the errors in levels are serially uncorrelated, the residuals of
+        ``FirstDifferenceOLS`` are negatively autocorrelated (an MA(1) with
+        autocorrelation -0.5) and the test over-rejects, with a size of about
+        11% at the nominal 5% level in large panels. The test is then better
+        applied to a ``PanelOLS`` model with entity effects.
 
         The test is not valid for every model and an InapplicableTestStatistic
         is returned for the following.
