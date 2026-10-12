@@ -860,6 +860,11 @@ class _PanelModelBase:
                 #  https://github.com/pandas-dev/pandas-stubs/issues/111
                 formatted_clusters.dataframe[col] = cat.codes.astype(np.int64)
             clusters_frame = formatted_clusters.dataframe
+            if self._singleton_index is not None:
+                # The clusters have a value for each observation that is not missing.
+                # The singletons are dropped from the data of the model, and so are
+                # the clusters that are made from it below, which do not need this
+                clusters_frame = clusters_frame.loc[~self._singleton_index]
 
         cluster_entity = bool(cov_config_upd.pop("cluster_entity", False))
         if cluster_entity:
@@ -882,8 +887,6 @@ class _PanelModelBase:
                 clusters_frame[name] = group_ids
             else:
                 clusters_frame = DataFrame(group_ids)
-        if self._singleton_index is not None and clusters_frame is not None:
-            clusters_frame = clusters_frame.loc[~self._singleton_index]
 
         if clusters_frame is not None:
             cov_config_upd["clusters"] = np.asarray(clusters_frame)
