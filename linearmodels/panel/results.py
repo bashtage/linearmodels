@@ -829,6 +829,11 @@ class PanelResults(_SummaryStr):
               {"x1": 0, "x2+x3": 1}.
 
             It is not possible to use both ``restriction`` and ``formula``.
+            The names in the restrictions are the entries of the index of
+            ``params``. A name that is not valid Python, for example one that
+            contains ``:`` or ``[`` such as ``C(year)[T.1987]:educ``, must be
+            enclosed in back-ticks, e.g.,
+            ``"`C(year)[T.1987]:educ` = 0"``.
 
         Returns
         -------
@@ -870,6 +875,15 @@ class PanelResults(_SummaryStr):
 
         >>> formula = "union = married = 0"
         >>> wald_res = fe_res.wald_test(formula=formula)
+
+        A name that is not valid Python, such as the interaction of a
+        categorical variable with a regressor, is enclosed in back-ticks
+
+        >>> from linearmodels import PooledOLS
+        >>> mod = PooledOLS.from_formula("lwage ~ 1 + union + C(year) * educ", data)
+        >>> res = mod.fit(cov_type="clustered", cluster_entity=True)
+        >>> null = "`C(year)[T.1987]:educ` = 0, `C(year)[T.1986]:educ` = 0"
+        >>> wald_res = res.wald_test(formula=null)
         """
         return quadratic_form_test(
             self.params, self.cov, restriction=restriction, value=value, formula=formula

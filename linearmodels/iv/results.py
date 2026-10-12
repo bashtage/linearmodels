@@ -447,6 +447,10 @@ class _LSModelResultsBase(_SummaryStr):
               {"x1": 0, "x2+x3": 1}.
 
             It is not possible to use both ``restriction`` and ``formula``.
+            The names in the restrictions are the entries of the index of
+            ``params``. A name that is not valid Python, for example one that
+            contains ``:`` or ``[`` such as ``exper:black``, must be enclosed in
+            back-ticks, e.g., ``"`exper:black` = 0"``.
 
         Returns
         -------
@@ -475,14 +479,22 @@ class _LSModelResultsBase(_SummaryStr):
         >>> value = np.array([0, 0])
         >>> wald_res = res.wald_test(restriction, value)
 
-        Using the formula interface to test the same restrictions
+        Using the formula interface to test the same restrictions. The names
+        are those in the index of ``params``, which has ``I(exper ** 2)``
 
-        >>> formula = "exper = I(exper**2) = 0"
+        >>> formula = "exper = I(exper ** 2) = 0"
         >>> wald_res = res.wald_test(formula=formula)
 
         Using the formula interface with a list
 
-        >>> wald_res = res.wald_test(formula=["exper = 0", "I(exper**2) = 0"])
+        >>> wald_res = res.wald_test(formula=["exper = 0", "I(exper ** 2) = 0"])
+
+        A name that is not valid Python, such as an interaction, is enclosed in
+        back-ticks
+
+        >>> formula = "np.log(wage) ~ 1 + exper + black + exper:black + [educ ~ sibs]"
+        >>> res = IV2SLS.from_formula(formula, data).fit()
+        >>> wald_res = res.wald_test(formula="`exper:black` = 0")
         """
         return quadratic_form_test(
             self._params,
