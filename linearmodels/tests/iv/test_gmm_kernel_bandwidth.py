@@ -373,6 +373,11 @@ def test_warning_class():
     )
     assert not issubclass(DefaultBandwidthWarning, FutureWarning)
     assert DefaultBandwidthWarning.__doc__
+    # The class is not deprecated, but the warning will be removed in 8.0
+    doc = " ".join(DefaultBandwidthWarning.__doc__.split())
+    assert "This warning will be removed in linearmodels 8.0" in doc
+    assert "the estimated bandwidth has been the default for a release" in doc
+    assert "deprecated" not in doc
 
 
 def test_warning_message(args):
@@ -391,6 +396,8 @@ def test_warning_message(args):
     # and any of the arguments silences the warning
     assert "silences this warning" in message
     assert "bandwidth or optimal_bw" in message
+    # which will not be issued from 8.0, in one sentence at the end
+    assert message.endswith(" This warning will be removed in linearmodels 8.0.")
 
 
 def count_weight_matrices(mod):

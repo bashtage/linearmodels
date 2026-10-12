@@ -33,6 +33,9 @@ class DefaultBandwidthWarning(UserWarning):
     """
     Warning that a kernel estimator uses the bandwidth that it selects by default.
 
+    This warning will be removed in linearmodels 8.0, when the estimated
+    bandwidth has been the default for a release.
+
     Notes
     -----
     The default bandwidth of the kernel estimators of the covariance of the

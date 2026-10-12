@@ -63,7 +63,8 @@ def _default_bandwidth_message(
         "(or bandwidth=nobs - 2, where nobs is the number of observations used in "
         f"the estimation) {', and '.join(restore)}. Passing bandwidth or "
         "optimal_bw silences this warning, and optimal_bw=True selects the "
-        "bandwidth from the data without a warning."
+        "bandwidth from the data without a warning. This warning will be removed "
+        "in linearmodels 8.0."
     )
 
 

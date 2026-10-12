@@ -397,6 +397,8 @@ def test_warning_message(eqns):
     # and any of the arguments silences the warning
     assert "silences this warning" in message
     assert "bandwidth or optimal_bw" in message
+    # which will not be issued from 8.0
+    assert message.endswith(" This warning will be removed in linearmodels 8.0.")
 
 
 def test_warning_message_has_the_form_of_the_message_of_ivgmm(eqns):
