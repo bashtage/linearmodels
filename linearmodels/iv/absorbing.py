@@ -994,6 +994,8 @@ class AbsorbingLS:
         else:
             self._is_weighted = True
             weights = IVData(self._weights, var_name="weights").ndarray
+            if npany(weights <= 0):
+                raise ValueError("weights must be strictly positive.")
             weights = weights / nanmean(weights)
             self._weight_data = IVData(weights, var_name="weights", nobs=self._nobs)
 

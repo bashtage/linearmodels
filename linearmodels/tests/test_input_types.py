@@ -734,6 +734,23 @@ def test_absorbing_complex_input_raises(absorbing, name):
         build_absorbing(absorbing, **{name: value})
 
 
+@pytest.mark.parametrize("bad", [0.0, -1.0])
+@pytest.mark.parametrize("kind", ["series", "list"])
+def test_absorbing_weights_must_be_strictly_positive(absorbing, bad, kind):
+    weights = absorbing["weights"].copy()
+    weights.iloc[7] = bad
+    with pytest.raises(ValueError, match="weights must be strictly positive"):
+        build_absorbing(absorbing, weights=make(weights, kind))
+
+
+def test_absorbing_nan_weights_are_dropped_as_missing(absorbing):
+    weights = absorbing["weights"].copy()
+    weights.iloc[7] = np.nan
+    with pytest.warns(MissingValueWarning):
+        res = build_absorbing(absorbing, weights=weights).fit()
+    assert res.nobs == NOBS - 1
+
+
 def test_interaction_accepts_lists(absorbing):
     cats = absorbing["absorb"][["a"]]
     cont = absorbing["exog"][["w1"]]
