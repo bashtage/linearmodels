@@ -174,6 +174,9 @@ def test_dummy_absorbed_by_two_effects_with_the_default_method():
 CONSTANT_ORDERS = [
     ("const", "x0", "x1", ABSORBED),
     ("x0", "const", "x1", ABSORBED),
+    (ABSORBED, "const", "x0", "x1"),
+    ("x0", ABSORBED, "const", "x1"),
+    ("x0", "x1", ABSORBED, "const"),
 ]
 
 

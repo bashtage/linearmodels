@@ -39,7 +39,7 @@ from pandas import Categorical, CategoricalDtype, DataFrame, Series
 import scipy.sparse as sp
 from scipy.sparse.linalg import lsmr
 
-from linearmodels.iv.common import f_statistic, find_constant
+from linearmodels.iv.common import f_statistic
 from linearmodels.iv.data import IVData
 from linearmodels.iv.model import (
     COVARIANCE_ESTIMATORS,
@@ -867,6 +867,8 @@ class AbsorbingLS:
         self._const_col: int | None = 0
         self._has_constant = False
         self._has_constant_exog = self._check_constant()
+        # Location of the constant among the regressors, which changes if some are dropped
+        self._const_loc: int | None = self._const_col
         self._constant_absorbed = False
         self._num_params = 0
         self._regressors: csc_array | None = None
@@ -1118,10 +1120,11 @@ class AbsorbingLS:
             dep_resid += root_w * mu_dep
             exog_resid += root_w * mu_exog
 
+        ncol = exog_resid.shape[1]
+        retain = list(range(ncol))
         if not self._drop_absorbed:
             check_absorbed(exog_resid, self.exog.cols, exog)
         else:
-            ncol = exog_resid.shape[1]
             retain = not_absorbed(
                 exog_resid, self._constant_absorbed, self._const_col, exog
             )
@@ -1142,6 +1145,10 @@ class AbsorbingLS:
             exog_resid = exog_resid[:, retain]
             self._columns = [self._columns[i] for i in retain]
 
+        # The location of the constant among the retained regressors, which is not
+        # the location in exog if a regressor before it was dropped
+        const_col = self._const_col
+        self._const_loc = retain.index(const_col) if const_col in retain else None
         self._absorbed_dependent = DataFrame(
             dep_resid,
             index=self._dependent.pandas.index,
@@ -1389,12 +1396,9 @@ class AbsorbingLS:
         cov: linearmodels.typing.data.Float64Array,
         debiased: bool,
     ) -> WaldTestStatistic | InvalidTestStatistic:
-        const_loc = find_constant(
-            cast("linearmodels.typing.data.Float64Array", self._exog.ndarray)
-        )
         resid_df = self._nobs - self._num_params
 
-        return f_statistic(params, cov, debiased, resid_df, const_loc)
+        return f_statistic(params, cov, debiased, resid_df, self._const_loc)
 
     def _post_estimation(
         self,
@@ -1441,8 +1445,8 @@ class AbsorbingLS:
         e = self._absorbed_dependent.to_numpy()  # already scaled by root_w
         # If absorbing contains a constant, but exog does not, no need to demean
         assert isinstance(self._absorbed_exog, DataFrame)
-        if self._const_col is not None:
-            col = self._const_col
+        if self._const_loc is not None:
+            col = self._const_loc
             x = self._absorbed_exog.to_numpy()[:, col : col + 1]
             mu = (lstsq(x, e, rcond=None)[0]).squeeze()
             e = e - x * mu
