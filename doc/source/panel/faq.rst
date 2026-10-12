@@ -6,13 +6,189 @@ Implementation Choices
 While the implementation of the panel estimators is similar to Stata, there
 are some differenced worth noting.
 
+.. _panel-small-sample:
+
+Small-sample Adjustments
+========================
+The ``fit`` method of every panel estimator has ``debiased=True`` as its
+default. This is the case for :class:`~linearmodels.panel.model.PooledOLS`,
+:class:`~linearmodels.panel.model.PanelOLS`,
+:class:`~linearmodels.panel.model.BetweenOLS`,
+:class:`~linearmodels.panel.model.FirstDifferenceOLS`,
+:class:`~linearmodels.panel.model.RandomEffects` and
+:class:`~linearmodels.panel.model.FamaMacBeth`. The IV estimators, including
+:class:`~linearmodels.iv.absorbing.AbsorbingLS`, have ``debiased=False``.
+
+With ``debiased=True``, the covariance is scaled by :math:`n/(n-k)`, where
+:math:`n` is the number of observations and :math:`k` is the number of
+regressors. The p-values and the confidence intervals of the parameters use a
+Student's t distribution with the residual degrees of freedom, and the joint
+tests of significance use an F distribution. With ``debiased=False`` the
+covariance is not scaled by this factor, and the normal and :math:`\chi^2`
+distributions are used. :class:`~linearmodels.panel.model.PanelOLS` is an
+exception, see `Counting the Effects`_.
+
+The clustered covariance, ``cov_type="clustered"``, has a second adjustment,
+which is for the number of clusters. ``group_debias=True`` multiplies the
+covariance by :math:`g/(g-1) \times (n-1)/n`, where :math:`g` is the number of
+distinct clusters. With two-way clustering, it is applied to each of the three
+one-way covariances that are combined. The default is ``group_debias=False``.
+
+Matching Stata
+**************
+Stata's ``regress`` with ``vce(cluster)`` scales the clustered covariance by
+:math:`g/(g-1) \times (n-1)/(n-k)`. This is ``debiased=True``, which is the
+default, together with ``group_debias=True``.
+
+.. code-block:: python
+
+    from linearmodels import PooledOLS
+    from linearmodels.datasets import wage_panel
+
+    data = wage_panel.load().set_index(["nr", "year"])
+    mod = PooledOLS.from_formula("lwage ~ 1 + expersq + married + union", data)
+    res = mod.fit(
+        cov_type="clustered", cluster_entity=True, debiased=True, group_debias=True
+    )
+
+The standard errors agree with those of the same regression in R,
+``sandwich::vcovCL(model, cluster = ~nr, type = "HC1", cadjust = TRUE)``,
+which uses the same formula. The default, ``group_debias=False``, gives smaller
+standard errors, which matters when there are few clusters. If the clusters are
+defined by a variable with two values, the ratio of the default standard errors
+to those of Stata is :math:`\sqrt{n(g-1)/((n-1)g)}`, which is close to
+:math:`\sqrt{1/2}`, or 71%, if :math:`g=2` and :math:`n` is large. Few clusters,
+such as two, give unreliable standard errors whichever adjustment is used. The
+tests of the package that compare clustered covariances with Stata's
+``regress`` and ``xtreg`` use ``debiased=True`` and ``group_debias=True``.
+
+``xtreg`` and ``regress`` with a dummy variable for each entity count the effects
+differently when the effects are nested in the clusters, so expect differences if
+you compare the estimators with both commands.
+
+Counting the Effects
+********************
+:class:`~linearmodels.panel.model.PanelOLS` counts the effects that it estimates
+in its degrees of freedom, which is the ``extra_df`` of its covariance
+estimators. If :math:`d` is the number of effects, the covariance is scaled by
+:math:`n/(n-d-k)` if ``debiased`` is ``True``, and by :math:`n/(n-d)` if it is
+``False``, so that the effects are counted whether or not ``debiased`` is
+``True``. With ``debiased=True``, the unadjusted and robust standard errors are
+those of the regression that includes a dummy variable for each effect. The
+number of effects is the number of entities for entity effects, the number of
+time periods for time effects and the number of groups for each of the other
+effects. One is subtracted from the number of each of the effects after the first,
+and from the number of the first if the model has a constant, because the
+effects are not separately identified. Counting the effects is not needed when
+they are nested in the clusters, which is described next.
+
 Clustered Covariance with Fixed Effects
 =======================================
 When using clustered standard errors and entity effects, it is not necessary
 to adjust for estimated effects. ``PanelOLS`` attempts to detect when this is
-the case and automatically adjust the degree of freedom. This can be
-overridden using by setting the fit option ``auto_df=False`` and then
-changing the value of ``count_effects``.
+the case and automatically adjust the degree of freedom. This is done when
+the model has a single effect and every group of the effect is in one cluster,
+for example entity effects clustered by entity. The effects are counted in all
+other cases. This can be overridden by setting the fit option ``auto_df=False``
+and then changing the value of ``count_effects``.
+
+.. _panel-estimated-effects:
+
+Estimated Effects
+=================
+``estimated_effects`` in the results is the combined effect of all of the
+effects in the model. It is a ``DataFrame`` with one column, the sum of the
+entity, time and other effects of each observation, and the effects are not
+available separately. It is ``NaN`` for
+:class:`~linearmodels.panel.model.PooledOLS`,
+:class:`~linearmodels.panel.model.FirstDifferenceOLS` and
+:class:`~linearmodels.panel.model.FamaMacBeth`, and 0 for a
+:class:`~linearmodels.panel.model.PanelOLS` model without effects. It adds to
+``fitted_values`` and ``idiosyncratic`` to give the dependent variable.
+
+The effects do not have standard errors or any other inference, since they are
+not estimated consistently when the number of time periods is fixed. The effect
+of an entity is estimated from its :math:`T` observations, so the error does not
+shrink when the number of entities grows. In a simulation with
+:math:`T=5` and 200, 2,000 and 20,000 entities, the standard deviation of the
+error of the estimated entity effects was 0.441, 0.452 and 0.445, which is
+close to :math:`\sigma/\sqrt{T}=0.447`, where :math:`\sigma=1` is the standard
+deviation of the idiosyncratic shocks. If you need inference for the effects of
+a small number of entities, include the effects as dummy variables in the
+regression, for example in :class:`~linearmodels.panel.model.PooledOLS`, and use
+the results for the parameters of the dummy variables.
+
+The estimated effects of :class:`~linearmodels.panel.model.RandomEffects` are
+:math:`\hat{\theta}_i` times the entity mean of :math:`y-x^{\prime}\hat{\beta}`,
+where :math:`\hat{\theta}_i = 1-\sqrt{\hat{\sigma}^2_\epsilon/(T_i\hat{\sigma}^2_u +
+\hat{\sigma}^2_\epsilon)}` and :math:`\hat{\sigma}^2_u` is the estimated variance
+of the random effect. The estimate is set to 0 if it is negative. Then
+:math:`\hat{\theta}_i=0`, the model is the same as pooled OLS, and all of the
+estimated effects are 0. This is a property of the data, not a bug: the
+variation between the entities is not larger than the idiosyncratic shocks
+imply. The ``Effects`` entry of ``variance_decomposition`` is 0 and ``theta`` is
+0 in the results when this happens.
+
+Splitting Entity and Time Effects
+*********************************
+The sum of an entity effect and a time effect is exactly additive, so the two
+can be recovered from the combined effect, up to a constant that can be moved
+from one to the other. The function below regresses the estimated effects on a
+set of dummy variables for the entities and a set for the time periods, using
+sparse matrices. The fit is exact, also in an unbalanced panel. Compare the
+differences of the effects, or normalize them, for example by setting the first
+time effect to 0.
+
+.. code-block:: python
+
+    import numpy as np
+    import pandas as pd
+    import statsmodels.api as sm
+    from scipy.sparse import csr_array, hstack
+    from scipy.sparse.linalg import lsqr
+
+    from linearmodels import PanelOLS
+    from linearmodels.datasets import wage_panel
+
+
+    def split_effects(res):
+        effects = res.estimated_effects.iloc[:, 0]
+        entity = pd.Categorical(effects.index.get_level_values(0))
+        time = pd.Categorical(effects.index.get_level_values(1))
+
+        def dummies(cat):
+            n = len(cat)
+            return csr_array(
+                (np.ones(n), (np.arange(n), cat.codes)), shape=(n, len(cat.categories))
+            )
+
+        design = hstack([dummies(entity), dummies(time)]).tocsr()
+        solution = lsqr(
+            design, effects.to_numpy(), atol=1e-14, btol=1e-14, iter_lim=10000
+        )[0]
+        k = len(entity.categories)
+        return (
+            pd.Series(solution[:k], index=entity.categories),
+            pd.Series(solution[k:], index=time.categories),
+        )
+
+
+    data = wage_panel.load().set_index(["nr", "year"])
+    exog = sm.add_constant(data[["expersq"]])
+    mod = PanelOLS(data.lwage, exog, entity_effects=True, time_effects=True)
+    entity_effects, time_effects = split_effects(mod.fit())
+    time_effects - time_effects.iloc[0]
+
+.. _panel-absorbing-ls:
+
+AbsorbingLS or PanelOLS
+=======================
+:class:`~linearmodels.panel.model.PanelOLS` has up to two effects. It has the
+statistics of a panel estimator, and inference that matches Stata's ``xtreg``.
+:class:`~linearmodels.iv.absorbing.AbsorbingLS` can absorb any number of effects,
+and effects interacted with continuous variables, and it is designed for models
+with very many groups. It is not a panel estimator, and it reports the
+statistics of a regression. See :ref:`iv-absorbing-ls` for more.
 
 .. _panel-input-alignment:
 
