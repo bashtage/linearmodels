@@ -29,6 +29,8 @@ from linearmodels.iv.gmm import (
 from linearmodels.shared.hypotheses import InvalidTestStatistic, WaldTestStatistic
 import linearmodels.typing.data
 
+__all__ = ["cragg_donald", "cragg_donald_f", "kleibergen_paap", "kleibergen_paap_f"]
+
 # The null of the rank tests: the first-stage coefficient matrix is rank
 # deficient, which means that the model is not identified.
 _RANK_NULL = (
@@ -217,7 +219,7 @@ def cragg_donald(
     :math:`\chi^2` approximation is poor, and 2SLS can be badly biased and
     its tests badly sized even when the null is rejected.
 
-    The p-value is asymptotic. Stock-Yogo (2005) critical values for weak
+    The p-value is asymptotic. Stock and Yogo (2005) critical values for weak
     instruments apply to the F form under i.i.d. errors and are not
     provided here. Choosing whether to use an instrumental variable
     estimator based on the outcome of a test like this one distorts the
@@ -235,7 +237,8 @@ def cragg_donald(
     Let :math:`X = Z\Pi + V`, where :math:`\Pi` is the :math:`k \times m`
     matrix of first-stage coefficients on the excluded instruments, after
     the exogenous regressors have been partialled out. The null hypothesis
-    is :math:`\mathrm{rank}(\Pi) < m`. The statistic is
+    is :math:`\mathrm{rank}(\Pi) < m`. The statistic is the minimum
+    eigenvalue statistic of Cragg and Donald (1993),
 
     .. math::
 
@@ -246,23 +249,41 @@ def cragg_donald(
     instruments, and :math:`c` is the number of exogenous regressors.
     :math:`r^2_{\min}/(1 - r^2_{\min})` is the smallest eigenvalue of
     :math:`(X'M_ZX)^{-1}X'P_ZX`. The statistic is asymptotically
-    :math:`\chi^2_{k-m+1}` under the null.
+    :math:`\chi^2_{k-m+1}` under the null. Anderson (1951) derived a test of
+    the rank that is a function of the canonical correlations.
 
     The statistic is **not** the first-stage F-statistic. It equals :math:`k`
     times the classical F-statistic when there is a single endogenous
     regressor. The F form, ``CD / k``, is reported by :func:`cragg_donald_f`.
 
+    **Weights.** In a weighted model, each of the arrays has to be multiplied
+    by the square root of the observation weights, including the constant
+    column of ``exog``. The constant is then a column of the square roots of
+    the weights and not a column of ones, since the first-stage regressions
+    are weighted. The sample size :math:`n` is the number of rows, and not the
+    sum of the weights. The statistic does not change if all of the weights are
+    multiplied by the same constant. The results of the IV models do this
+    using weights that have been scaled to have mean 1.
+
+    **Clusters.** The statistic does not use a covariance estimator, and so
+    does not depend on clusters. It is the same for a model that is estimated
+    with a clustered, kernel or robust covariance estimator as it is for one
+    with an unadjusted covariance estimator. See :func:`kleibergen_paap` for a
+    statistic that does.
+
     References
     ----------
-    .. [1] Cragg, J. G., & Donald, S. G. (1993). Testing identifiability
-       and specification in instrumental variable models. Econometric
-       Theory, 9(2), 222-240.
-    .. [2] Anderson, T. W. (1951). Estimating linear restrictions on
-       regression coefficients for multivariate normal distributions.
-       Annals of Mathematical Statistics, 22(3), 327-351.
-    .. [3] Stock, J. H., & Yogo, M. (2005). Testing for weak instruments in
-       linear IV regression. In Identification and Inference for Econometric
-       Models. Cambridge University Press.
+    Cragg, J. G., & Donald, S. G. (1993). Testing identifiability and
+    specification in instrumental variable models. *Econometric Theory*, 9(2),
+    222-240.
+
+    Anderson, T. W. (1951). Estimating linear restrictions on regression
+    coefficients for multivariate normal distributions. *Annals of
+    Mathematical Statistics*, 22(3), 327-351.
+
+    Stock, J. H., & Yogo, M. (2005). Testing for weak instruments in linear IV
+    regression. In *Identification and Inference for Econometric Models*.
+    Cambridge University Press.
     """
     name = "Cragg-Donald Test"
     dec = _first_stage_rank(endog, instr, exog, name)
@@ -319,11 +340,16 @@ def cragg_donald_f(
     critical values for. It is reported by Stata's ``ivreg2`` as the
     "Cragg-Donald Wald F statistic".
 
+    The weights are used as in :func:`cragg_donald`. Each array, including the
+    constant of ``exog``, is multiplied by the square root of the weights in a
+    weighted model, and the statistic does not depend on the scale of the
+    weights or on clusters.
+
     References
     ----------
-    .. [1] Stock, J. H., & Yogo, M. (2005). Testing for weak instruments in
-       linear IV regression. In Identification and Inference for Econometric
-       Models. Cambridge University Press.
+    Stock, J. H., & Yogo, M. (2005). Testing for weak instruments in linear IV
+    regression. In *Identification and Inference for Econometric Models*.
+    Cambridge University Press.
     """
     test = cragg_donald(endog, instr, exog)
     if isinstance(test, InvalidTestStatistic):
@@ -419,8 +445,17 @@ def _kleibergen_paap(
     exog: linearmodels.typing.data.Float64Array,
     cov_type: str,
     cov_config: dict[str, Any] | None,
+    *,
+    wald: bool = True,
 ) -> tuple[WaldTestStatistic | InvalidTestStatistic, float]:
-    """Compute the rk LM test and the rk Wald F-statistic"""
+    """
+    Compute the rk LM test and the rk Wald F-statistic
+
+    The F-statistic is NaN if wald is False. The covariance of the scores of
+    the Wald statistic is not computed in that case. Its rank can be less than
+    the rank of the covariance of the LM statistic, and so it can warn when
+    the LM statistic is well-defined.
+    """
     name = "Kleibergen-Paap rk LM Test"
     family = _cov_family(cov_type)
     config = {} if cov_config is None else dict(cov_config)
@@ -459,17 +494,19 @@ def _kleibergen_paap(
         return singular, nan
     lm_chi2, lm_df = lm_result
     lm_test = WaldTestStatistic(lm_chi2, _RANK_NULL, lm_df, name=name)
-
-    # The Wald version uses the first-stage residuals to form the scores
-    residuals = dec.x - dec.z @ dec.pihat
-    wald_result = _rk_chi2(dec, residuals, family, config)
-    dof = dec.nobs - dec.ninstr - dec.nexog
-    if family == "clustered":
-        nclusters = unique(config["clusters"]).shape[0]
-        scale = dof * (nclusters - 1) / nclusters / (dec.nobs - 1)
-    else:
-        scale = dof / dec.nobs
-    f = nan if wald_result is None else wald_result[0] * scale / dec.ninstr
+    f = nan
+    if wald:
+        # The Wald version uses the first-stage residuals to form the scores
+        residuals = dec.x - dec.z @ dec.pihat
+        wald_result = _rk_chi2(dec, residuals, family, config)
+        dof = dec.nobs - dec.ninstr - dec.nexog
+        if family == "clustered":
+            nclusters = unique(config["clusters"]).shape[0]
+            scale = dof * (nclusters - 1) / nclusters / (dec.nobs - 1)
+        else:
+            scale = dof / dec.nobs
+        if wald_result is not None:
+            f = wald_result[0] * scale / dec.ninstr
     return lm_test, f
 
 
@@ -518,7 +555,8 @@ def kleibergen_paap(
     ------
     ValueError
         If ``cov_type`` is not supported, or is "clustered" and
-        ``cov_config`` does not contain ``clusters``.
+        ``cov_config`` does not contain ``clusters`` or ``clusters`` does not
+        have an element for each row of the arrays.
 
     Warnings
     --------
@@ -532,14 +570,15 @@ def kleibergen_paap(
     instruments and first-stage errors are clustered or persistent.
 
     The covariance has dimension :math:`km \times km` and is poorly estimated
-    unless :math:`n` is large relative to :math:`km`. With clustering it needs
-    many clusters, and with few clusters the test can be very conservative.
-    A kernel bandwidth that is too short for the dependence does not remove
-    the over-rejection. If there are too few clusters or observations the
-    covariance is rank deficient. A warning is issued, a generalized inverse
-    is used and the degrees of freedom are reduced, but the result should not
-    be relied on. The chi-square approximation is also less reliable with
-    many instruments.
+    unless :math:`n` is large relative to :math:`km`. It is formed as a dense
+    matrix, and so the memory that is needed grows with :math:`(km)^2`. With
+    clustering it needs many clusters, and with few clusters the test can be
+    very conservative. A kernel bandwidth that is too short for the dependence
+    does not remove the over-rejection. If there are too few clusters or
+    observations the covariance is rank deficient. A warning is issued, a
+    generalized inverse is used and the degrees of freedom are reduced, but
+    the result should not be relied on. The chi-square approximation is also
+    less reliable with many instruments.
 
     The null is that the model is underidentified. Rejecting it does not
     show that the instruments are strong, so this is not a test for weak
@@ -594,16 +633,33 @@ def kleibergen_paap(
     :math:`1 - j/(b+1)`, so a Stata bandwidth of :math:`b+1` corresponds to a
     ``bandwidth`` of :math:`b`.
 
+    **Weights.** In a weighted model, each of the arrays has to be multiplied
+    by the square root of the observation weights, including the constant
+    column of ``exog``, as for :func:`cragg_donald`. The scores are then those
+    of the weighted first-stage regressions, and the covariance estimator is
+    applied to them. The statistic does not change if all of the weights are
+    multiplied by the same constant.
+
+    **Clusters.** With "clustered", the scores are summed within the clusters
+    in ``cov_config["clusters"]``. ``clusters`` has one element for each row
+    of the arrays, in the order of the rows. It is a 1-d array, or a 2-d array
+    with a single column. Two-way clustering is not supported. The LM
+    statistic is a quadratic form in a covariance with :math:`k-m+1` rows,
+    whose rank is at most the number of clusters, and so it needs at least
+    :math:`k-m+1` clusters. The scores of the Wald F statistic of
+    :func:`kleibergen_paap_f` sum to zero, and so it needs one more cluster.
+    A warning is issued if there are fewer clusters.
+
     References
     ----------
-    .. [1] Kleibergen, F., & Paap, R. (2006). Generalized reduced rank tests
-       using the singular value decomposition. Journal of Econometrics,
-       133(1), 97-126.
-    .. [2] Kleibergen, F., & Schaffer, M. E. (2007). ranktest: Stata module
-       to test the rank of a matrix using the Kleibergen-Paap rk statistic.
-       Statistical Software Components S456865, Boston College.
+    Kleibergen, F., & Paap, R. (2006). Generalized reduced rank tests using the
+    singular value decomposition. *Journal of Econometrics*, 133(1), 97-126.
+
+    Kleibergen, F., & Schaffer, M. E. (2007). ranktest: Stata module to test
+    the rank of a matrix using the Kleibergen-Paap rk statistic. *Statistical
+    Software Components* S456865, Boston College.
     """
-    return _kleibergen_paap(endog, instr, exog, cov_type, cov_config)[0]
+    return _kleibergen_paap(endog, instr, exog, cov_type, cov_config, wald=False)[0]
 
 
 def kleibergen_paap_f(
@@ -684,19 +740,29 @@ def kleibergen_paap_f(
     where :math:`M` is the number of clusters. With ``cov_type`` equal to
     "unadjusted" or "homoskedastic" the statistic is the Cragg-Donald F
     statistic from :func:`cragg_donald_f`. These are the definitions used by
-    Stata's ``ivreg2`` for the "Kleibergen-Paap rk Wald F statistic".
+    Stata's ``ivreg2`` for the "Kleibergen-Paap rk Wald F statistic" (Baum,
+    Schaffer and Stillman, 2007).
+
+    The weights and clusters are used as in :func:`kleibergen_paap`. In a
+    weighted model, each of the arrays, including the constant of ``exog``, has
+    to be multiplied by the square root of the weights, and the statistic does
+    not depend on their scale. The clusters have one element for each row of
+    the arrays. If there are :math:`m` endogenous regressors, the scores of the
+    Wald statistic sum to zero, so that at least :math:`k-m+2` clusters are
+    needed, which is one more than for :func:`kleibergen_paap`. A warning is
+    issued if there are fewer clusters.
 
     References
     ----------
-    .. [1] Kleibergen, F., & Paap, R. (2006). Generalized reduced rank tests
-       using the singular value decomposition. Journal of Econometrics,
-       133(1), 97-126.
-    .. [2] Olea, J. L. M., & Pflueger, C. (2013). A robust test for weak
-       instruments. Journal of Business & Economic Statistics, 31(3),
-       358-369.
-    .. [3] Baum, C. F., Schaffer, M. E., & Stillman, S. (2007). Enhanced
-       routines for instrumental variables/GMM estimation and testing. Stata
-       Journal, 7(4), 465-506.
+    Kleibergen, F., & Paap, R. (2006). Generalized reduced rank tests using the
+    singular value decomposition. *Journal of Econometrics*, 133(1), 97-126.
+
+    Olea, J. L. M., & Pflueger, C. (2013). A robust test for weak instruments.
+    *Journal of Business & Economic Statistics*, 31(3), 358-369.
+
+    Baum, C. F., Schaffer, M. E., & Stillman, S. (2007). Enhanced routines for
+    instrumental variables/GMM estimation and testing. *Stata Journal*, 7(4),
+    465-506.
     """
     return _kleibergen_paap(endog, instr, exog, cov_type, cov_config)[1]
 

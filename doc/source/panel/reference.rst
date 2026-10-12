@@ -41,6 +41,7 @@ Estimation Results
    PanelResults
    PanelEffectsResults
    RandomEffectsResults
+   HausmanTestResults
    PanelModelComparison
    compare
 

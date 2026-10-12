@@ -491,14 +491,113 @@ def test_cov_type_aliases(alias):
 @pytest.mark.parametrize("kernel", ["bartlett", "parzen", "qs"])
 def test_kernel_options(kernel):
     y, exog, endog, z = simulate(29)
-    default = IVJIVE(y, exog, endog, z).fit(cov_type="kernel", kernel=kernel)
-    again = IVJIVE(y, exog, endog, z).fit(
-        cov_type="kernel", kernel=kernel, bandwidth=y.shape[0] - 2
-    )
+    mod = IVJIVE(y, exog, endog, z)
+    default = mod.fit(cov_type="kernel", kernel=kernel)
+    # As in the other IV models, the bandwidth is selected using the data if it
+    # is not given. It is not nobs - 2, which is not a consistent estimator
+    chosen = default.cov_config["bandwidth"]
+    assert 1 <= chosen < y.shape[0] / 4
+    again = mod.fit(cov_type="kernel", kernel=kernel, bandwidth=chosen)
     assert_allclose(default.cov, again.cov, rtol=1e-12)
-    short = IVJIVE(y, exog, endog, z).fit(cov_type="kernel", kernel=kernel, bandwidth=2)
+    long = mod.fit(cov_type="kernel", kernel=kernel, bandwidth=y.shape[0] - 2)
+    assert not np.allclose(default.cov, long.cov)
+    short = mod.fit(cov_type="kernel", kernel=kernel, bandwidth=2)
     assert not np.allclose(default.cov, short.cov)
     assert short.cov_config["kernel"] == kernel
+
+
+def test_kernel_bandwidth_is_selected_using_the_data_in_a_weighted_model():
+    # A bandwidth of nobs - 2 is a covariance estimator that is not consistent,
+    # and it understates the standard errors
+    y, exog, endog, z = simulate(6, nobs=500)
+    w = np.random.default_rng(6).uniform(0.3, 2.0, y.shape[0])
+    mod = IVJIVE(y, exog, endog, z, weights=w)
+    res = mod.fit(cov_type="kernel")
+    bandwidth = res.cov_config["bandwidth"]
+    assert 1 <= bandwidth < 40
+    assert res.cov_config["kernel"] == "bartlett"
+    # It is the bandwidth that the model would use if it was given
+    same = mod.fit(cov_type="kernel", bandwidth=bandwidth)
+    assert_allclose(res.cov, same.cov, rtol=1e-12)
+    assert same.cov_config["bandwidth"] == bandwidth
+    # nobs - 2 is the default of IVGMM, and gives smaller standard errors
+    long = mod.fit(cov_type="kernel", bandwidth=y.shape[0] - 2)
+    assert long.cov_config["bandwidth"] == y.shape[0] - 2
+    assert (long.std_errors < 0.9 * same.std_errors).any()
+    # Each kernel selects a bandwidth
+    for kernel in ("bartlett", "parzen", "qs"):
+        chosen = mod.fit(cov_type="kernel", kernel=kernel).cov_config["bandwidth"]
+        assert 1 <= chosen < y.shape[0] / 4
+
+
+def test_first_stage_uses_the_bandwidth_that_was_selected():
+    # As for IV2SLS, the first stage uses the bandwidth of the model, which is
+    # the one that was selected when it was not given
+    y, exog, endog, z = simulate(6, nobs=500)
+    mod = IVJIVE(y, exog, endog, z)
+    res = mod.fit(cov_type="kernel")
+    bandwidth = res.cov_config["bandwidth"]
+    explicit = mod.fit(cov_type="kernel", bandwidth=bandwidth).first_stage
+    first_stage = res.first_stage
+    assert np.isfinite(first_stage.kleibergen_paap.stat)
+    assert_allclose(first_stage.kleibergen_paap.stat, explicit.kleibergen_paap.stat)
+    assert_allclose(first_stage.kleibergen_paap_f, explicit.kleibergen_paap_f)
+    long = mod.fit(cov_type="kernel", bandwidth=y.shape[0] - 2).first_stage
+    assert not np.isclose(long.kleibergen_paap.stat, first_stage.kleibergen_paap.stat)
+
+
+def test_kernel_bandwidth_depends_on_the_data():
+    # Autocorrelated errors need a longer bandwidth than independent errors
+    rng = np.random.default_rng(7)
+    nobs = 800
+    z = rng.standard_normal((nobs, 3))
+    v = rng.standard_normal(nobs)
+    chosen = {}
+    for rho in (0.0, 0.8):
+        u = np.zeros(nobs)
+        innovations = rng.standard_normal(nobs) + 0.5 * v
+        for t in range(1, nobs):
+            u[t] = rho * u[t - 1] + innovations[t]
+        x = z @ [0.6, 0.4, 0.3] + v
+        y = 1 + x + u
+        res = IVJIVE(y, np.ones((nobs, 1)), x[:, None], z).fit(cov_type="kernel")
+        chosen[rho] = res.cov_config["bandwidth"]
+    assert chosen[0.8] > chosen[0.0]
+    assert chosen[0.0] < 20
+
+
+def test_kernel_confidence_intervals_cover():
+    # With a bandwidth of nobs - 2, the coverage of nominal 95% intervals was
+    # about 0.65. A fixed seed is used. The standard error of a coverage
+    # frequency is about 0.016 for 200 replications
+    rng = np.random.default_rng(8)
+    nobs, reps = 250, 200
+    covered = np.zeros(reps, dtype=bool)
+    for rep in range(reps):
+        z = rng.standard_normal((nobs, 4))
+        v = rng.standard_normal(nobs)
+        x = z @ [0.5, 0.4, 0.3, 0.2] + v
+        y = 1 + x + 0.5 * v + rng.standard_normal(nobs)
+        res = IVJIVE(y, np.ones((nobs, 1)), x[:, None], z).fit(cov_type="kernel")
+        lower, upper = res.conf_int().iloc[-1]
+        covered[rep] = lower <= 1.0 <= upper
+    assert 0.88 < covered.mean() < 0.995
+
+
+def test_two_way_clusters_are_not_supported():
+    y, exog, endog, z = simulate(9)
+    nobs = y.shape[0]
+    two_way = np.column_stack([np.arange(nobs) // 10, np.arange(nobs) % 7])
+    # The other models do support two-way clustering
+    IV2SLS(y, exog, endog, z).fit(cov_type="clustered", clusters=two_way)
+    with pytest.raises(ValueError, match="one-way clustering"):
+        IVJIVE(y, exog, endog, z).fit(cov_type="clustered", clusters=two_way)
+    # A column is one-way clustering
+    column = IVJIVE(y, exog, endog, z).fit(
+        cov_type="clustered", clusters=two_way[:, :1]
+    )
+    flat = IVJIVE(y, exog, endog, z).fit(cov_type="clustered", clusters=two_way[:, 0])
+    assert_allclose(column.cov, flat.cov, rtol=1e-12)
 
 
 def test_cov_config_is_not_shared_between_fits():
@@ -538,9 +637,15 @@ def test_invalid_cov_type():
 
 
 def test_unknown_kernel():
+    # The error is the one of the other IV models, whether or not the bandwidth
+    # is selected using the data
     y, exog, endog, z = simulate(8)
-    with pytest.raises(KeyError):
+    with pytest.raises(ValueError, match="Unknown kernel: unknown"):
         IVJIVE(y, exog, endog, z).fit(cov_type="kernel", kernel="unknown")
+    with pytest.raises(ValueError, match="Unknown kernel: unknown"):
+        IVJIVE(y, exog, endog, z).fit(cov_type="kernel", kernel="unknown", bandwidth=3)
+    with pytest.raises(ValueError, match="Unknown kernel: unknown"):
+        IV2SLS(y, exog, endog, z).fit(cov_type="kernel", kernel="unknown")
 
 
 def test_options_for_a_different_covariance_estimator_are_not_ignored():

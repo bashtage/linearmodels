@@ -4,7 +4,9 @@ from linearmodels.compat.scipy import csc_array, diags_array
 
 from collections import defaultdict
 from collections.abc import Hashable, Iterable
+from copy import deepcopy
 import hashlib
+from inspect import signature
 from typing import Any, DefaultDict, Union, cast
 import warnings
 
@@ -29,6 +31,7 @@ from numpy import (
     require,
     sqrt,
     squeeze,
+    unique,
     where,
     zeros,
 )
@@ -37,7 +40,7 @@ from pandas import Categorical, CategoricalDtype, DataFrame, Series
 import scipy.sparse as sp
 from scipy.sparse.linalg import lsmr
 
-from linearmodels.iv.common import f_statistic, find_constant
+from linearmodels.iv.common import f_statistic
 from linearmodels.iv.data import IVData
 from linearmodels.iv.model import (
     COVARIANCE_ESTIMATORS,
@@ -55,6 +58,7 @@ from linearmodels.panel.utility import (
     not_absorbed,
     preconditioner,
 )
+from linearmodels.shared.alignment import check_alignment, is_default_index, row_labels
 from linearmodels.shared.exceptions import missing_warning
 from linearmodels.shared.hypotheses import InvalidTestStatistic, WaldTestStatistic
 from linearmodels.shared.utility import DataFrameWrapper, SeriesWrapper
@@ -104,6 +108,144 @@ def clear_cache() -> None:
     _VARIABLE_CACHE.clear()
 
 
+def _options_key(options: dict[str, Any]) -> tuple[Any, ...]:
+    """
+    Hashable key that identifies options of an absorption algorithm
+
+    Parameters
+    ----------
+    options : dict
+        The options. A value can be an array or a dict.
+
+    Returns
+    -------
+    tuple
+        Key that is equal when the options are equal. The ``show`` option is
+        left out since it only controls what is printed.
+    """
+    key = []
+    for name in sorted(options):
+        value = options[name]
+        if name == "show":
+            continue
+        if isinstance(value, dict):
+            value = _options_key(value)
+        elif isinstance(value, (ndarray, list, tuple)):
+            array = asarray(value)
+            value = (array.shape, str(array.dtype), array.tobytes())
+        key.append((name, value))
+    return tuple(key)
+
+
+def _check_method(method: str) -> str:
+    """
+    Check the method used to absorb the variables
+
+    Parameters
+    ----------
+    method : str
+        The method that was passed to fit
+
+    Returns
+    -------
+    str
+        The method in lower case
+
+    Raises
+    ------
+    ValueError
+        If method is not "auto", "hdfe" or "lsmr", whatever its case
+    """
+    if isinstance(method, str) and method.lower() in ("auto", "hdfe", "lsmr"):
+        return method.lower()
+    raise ValueError(
+        'method must be one of "auto", "hdfe" or "lsmr", whatever its case. '
+        f"Got {method!r}."
+    )
+
+
+def _absorb_args(
+    method: str, use_cache: bool, absorb_options: dict[str, Any] | None
+) -> tuple[Any, ...]:
+    """The arguments of AbsorbingLS.fit that determine the absorbed variables"""
+    options = {} if absorb_options is None else absorb_options
+    return method, use_cache, _options_key(options)
+
+
+def _is_nested(
+    effect: linearmodels.typing.data.IntArray,
+    cluster: linearmodels.typing.data.AnyArray,
+) -> bool:
+    """
+    Test whether every category of an effect is in a single cluster
+
+    Parameters
+    ----------
+    effect : ndarray
+        Integer codes of the categories of the effect, with shape (nobs,)
+    cluster : ndarray
+        Cluster of each observation, with shape (nobs,)
+
+    Returns
+    -------
+    bool
+        True if each category of the effect has observations in one cluster only
+    """
+    _, effect_codes = unique(effect, return_inverse=True)
+    _, cluster_codes = unique(cluster, return_inverse=True)
+    pairs = unique(effect_codes * (cluster_codes.max() + 1) + cluster_codes)
+    return bool(pairs.shape[0] == effect_codes.max() + 1)
+
+
+def _check_absorb_options(options: dict[str, Any], use_hdfe: bool, method: str) -> None:
+    """
+    Raise a ValueError if options are those of the algorithm that is not used
+
+    Parameters
+    ----------
+    options : dict
+        The options of the algorithm that absorbs the variables
+    use_hdfe : bool
+        Flag indicating that pyhdfe absorbs the variables and not LSMR
+    method : str
+        The method that was passed to fit
+
+    Notes
+    -----
+    The algorithm depends on the method and the model, and "auto" uses HDFE if
+    it can. The options of LSMR that are passed to pyhdfe.create, and the options
+    of pyhdfe.create that are passed to lsmr, are a TypeError that does not
+    say why. The options of the two algorithms have different names.
+    """
+    from pyhdfe import create  # noqa: PLC0415
+
+    lsmr_names = set(signature(lsmr).parameters) - {"A", "b"}
+    hdfe_names = set(signature(create).parameters) - {"ids"}
+    wrong = sorted(set(options).intersection(lsmr_names if use_hdfe else hdfe_names))
+    if not wrong:
+        return
+    names = ", ".join(f"'{name}'" for name in wrong)
+    why = f'method is "{method}"'
+    if use_hdfe:
+        if method == "auto":
+            why += " and the model can be absorbed using HDFE"
+        raise ValueError(
+            f"absorb_options contains options of scipy.sparse.linalg.lsmr ({names}) "
+            "that pyhdfe.create does not have. The variables are absorbed using "
+            f'HDFE because {why}. Use method="lsmr" to absorb them using LSMR.'
+        )
+    if method == "auto":
+        why += (
+            " and the model cannot be absorbed using HDFE, which requires that it "
+            "is not weighted and that the absorbed variables are all categorical"
+        )
+    raise ValueError(
+        f"absorb_options contains options of pyhdfe.create ({names}) that "
+        "scipy.sparse.linalg.lsmr does not have. The variables are absorbed "
+        f"using LSMR because {why}. Use options of LSMR or remove them."
+    )
+
+
 def lsmr_annihilate(
     x: csc_array,
     y: linearmodels.typing.data.Float64Array,
@@ -144,17 +286,21 @@ def lsmr_annihilate(
         \hat{\epsilon}_{j} = y_{j} - x^\prime \hat{\beta}
 
     where :math:`\hat{\beta}` is computed using lsmr.
+
+    The cache identifies residuals using `x_hash`, the values of the column
+    of `y` and the options passed to lsmr, since residuals computed using
+    other options are not the same.
     """
     if y.shape[1] == 0:
         return empty_like(y)
     use_cache = use_cache and x_hash is not None
-    regressor_hash = x_hash if x_hash is not None else ""
     default_opts: dict[
         str,
         bool | float | str | linearmodels.typing.data.ArrayLike | dict[str, Any] | None,
     ] = {"atol": 1e-8, "btol": 1e-8, "show": False}
     assert lsmr_options is not None
     default_opts.update(lsmr_options)
+    cache_key = (x_hash, _options_key(default_opts))
     resids = []
     for i in range(y.shape[1]):
         _y = y[:, i : i + 1]
@@ -165,12 +311,13 @@ def lsmr_annihilate(
             hasher.update(memoryview(ascontiguousarray(_y.data)))
             variable_digest = hasher.hexdigest()
 
-        if use_cache and variable_digest in _VARIABLE_CACHE[regressor_hash]:
-            resid = _VARIABLE_CACHE[regressor_hash][variable_digest]
+        if use_cache and variable_digest in _VARIABLE_CACHE[cache_key]:
+            resid = _VARIABLE_CACHE[cache_key][variable_digest]
         else:
             beta = lsmr(x, _y, **default_opts)[0]
             resid = y[:, i : i + 1] - x.dot(csc_array(beta[:, None])).toarray()
-            _VARIABLE_CACHE[regressor_hash][variable_digest] = resid
+            if use_cache:
+                _VARIABLE_CACHE[cache_key][variable_digest] = resid
         resids.append(resid)
     return column_stack(resids)
 
@@ -304,6 +451,11 @@ class Interaction:
     For each variable in `cont`, computes the interaction of the variable
     and the cartesian product of the categories.
 
+    If both ``cat`` and ``cont`` carry labels (a pandas Series or DataFrame
+    with an index other than the default 0, 1, ..., n-1, or an xarray
+    DataArray with coordinates), they must use the same index, in the same
+    order.
+
     Examples
     --------
     >>> import numpy as np
@@ -349,6 +501,7 @@ class Interaction:
 
     @property
     def nobs(self) -> int:
+        """Number of observations, which drop reduces."""
         assert self._nobs is not None
         return self._nobs
 
@@ -359,7 +512,9 @@ class Interaction:
         nobs = max(cat_nobs, cont_nobs)
         if cat is None and cont is None:
             if self._nobs is not None:
-                self._cont_data = self._cat_data = IVData(None, "none", nobs=self._nobs)
+                # Separate objects, since drop modifies them in place
+                self._cat_data = IVData(None, "none", nobs=self._nobs)
+                self._cont_data = IVData(None, "none", nobs=self._nobs)
             else:
                 raise ValueError("nobs must be provided when cat and cont are None")
             return
@@ -369,6 +524,9 @@ class Interaction:
         self._cont_data = IVData(cont, "cont", nobs=nobs, convert_dummies=False)
         if self._cat_data.shape[1] == self._cont_data.shape[1] == 0:
             raise ValueError("Both cat and cont are empty arrays")
+        check_alignment(
+            row_labels(self._cat_data), {"cont": self._cont_data}, reference="cat"
+        )
         cat_data = self._cat_data.pandas
         convert = [
             col for col in cat_data if not (isinstance(cat_data[col], CategoricalDtype))
@@ -391,11 +549,31 @@ class Interaction:
 
     @property
     def isnull(self) -> Series:
-        return self.cat.isnull().any(axis=1) | self.cont.isnull().any(axis=1)
+        cat_null = self.cat.isnull().any(axis=1)
+        cont_null = self.cont.isnull().any(axis=1)
+        # Rows are paired by position since cat and cont need not have labels
+        index = cont_null.index if is_default_index(cat_null.index) else cat_null.index
+        return Series(cat_null.to_numpy() | cont_null.to_numpy(), index=index)
 
     def drop(self, locs: linearmodels.typing.data.BoolArray) -> None:
+        """
+        Drop observations.
+
+        Parameters
+        ----------
+        locs : ndarray
+            Boolean array with one element for each observation, which is True
+            for the observations to drop.
+
+        Notes
+        -----
+        The instance is modified in place and nothing is returned. Afterwards
+        ``nobs``, ``cat``, ``cont``, ``sparse`` and ``hash`` use only the
+        remaining observations.
+        """
         self._cat_data.drop(locs)
         self._cont_data.drop(locs)
+        self._nobs = self._cat_data.shape[0]
 
     @property
     def sparse(self) -> csc_array:
@@ -635,7 +813,9 @@ class AbsorbingLS:
 
     Notes
     -----
-    Capable of estimating models with millions of effects.
+    Capable of estimating models with millions of effects. The model is not a
+    panel estimator. See :ref:`iv-absorbing-ls` for when to use it and when to
+    use :class:`~linearmodels.panel.model.PanelOLS`.
 
     Estimates models of the form
 
@@ -659,6 +839,30 @@ class AbsorbingLS:
     z can contain factors that are perfectly linearly dependent. LSMR
     estimates a particular restricted set of parameters that captures the
     effect of non-redundant components in z.
+
+    A variable in ``exog`` is absorbed if the effects explain all of it. The
+    algorithms that absorb the effects stop with a relative error of about
+    1e-8, so a variable is treated as absorbed if less than 1e-5 of its norm
+    is left after the effects are removed, whatever its units. It is treated
+    in the same way if it is collinear with the variables before it once the
+    effects are removed. An ``AbsorbingEffectError`` is raised for such a
+    variable. If ``drop_absorbed`` is True, the variable is dropped and an
+    ``AbsorbingEffectWarning`` is raised, and the constant is never dropped.
+    The norm includes the mean of the variable, so a variable with a large mean
+    and little other variation, less than 1e-5 of its norm, is also treated as
+    absorbed. Subtract its mean to avoid this.
+
+    Rows are paired by position. An input that carries labels (a pandas
+    Series or DataFrame with an index other than the default 0, 1, ..., n-1,
+    or an xarray DataArray with coordinates) must use the same index, in the
+    same order, as ``dependent``, so that a value cannot be attached to the
+    wrong observation. A ``ValueError`` is raised if the index of ``exog``,
+    ``absorb``, ``interactions`` or ``weights`` differs from the index of
+    ``dependent``. Either reindex the input to the index of ``dependent``, or
+    call ``to_numpy()`` to pair its values by position. NumPy arrays and
+    pandas objects with a default index do not carry labels and are always
+    paired by position. The same rule applies to ``clusters`` passed to
+    ``fit``.
 
     See also
     --------
@@ -716,6 +920,7 @@ class AbsorbingLS:
         self._weights = weights
         self._is_weighted = False
         self._drop_absorbed = drop_absorbed
+        self._weight_data: IVData
         self._check_weights()
 
         self._interactions = interactions
@@ -723,8 +928,11 @@ class AbsorbingLS:
         self._prepare_interactions()
         self._absorbed_dependent: DataFrame | None = None
         self._absorbed_exog: DataFrame | None = None
+        # The arguments of fit that were used to absorb the variables
+        self._absorb_args: tuple[Any, ...] | None = None
 
         self._check_shape()
+        self._check_alignment()
         self._original_index = self._dependent.pandas.index
         self._drop_locs = self._drop_missing()
         self._columns = self._exog.cols
@@ -734,6 +942,8 @@ class AbsorbingLS:
         self._const_col: int | None = 0
         self._has_constant = False
         self._has_constant_exog = self._check_constant()
+        # Location of the constant among the regressors, which changes if some are dropped
+        self._const_loc: int | None = self._const_col
         self._constant_absorbed = False
         self._num_params = 0
         self._regressors: csc_array | None = None
@@ -742,16 +952,28 @@ class AbsorbingLS:
     def _drop_missing(self) -> linearmodels.typing.data.BoolArray:
         missing = require(self.dependent.isnull.to_numpy(), requirements="W")
         missing |= self.exog.isnull.to_numpy()
+        missing |= self._weight_data.isnull.to_numpy()
         missing |= self._absorb_inter.cat.isnull().any(axis=1).to_numpy()
         missing |= self._absorb_inter.cont.isnull().any(axis=1).to_numpy()
         for interact in self._interaction_list:
             missing |= interact.isnull.to_numpy()
         if npany(missing):
+            if missing.all():
+                raise ValueError(
+                    "All observations contain missing data. Model cannot be estimated."
+                )
+            # drop modifies an Interaction, which the caller may use again
+            self._absorb_inter = deepcopy(self._absorb_inter)
+            self._interaction_list = deepcopy(self._interaction_list)
             self.dependent.drop(missing)
             self.exog.drop(missing)
             self._absorb_inter.drop(missing)
             for interact in self._interaction_list:
                 interact.drop(missing)
+            # Weights have mean 1 in the sample used to estimate the model
+            weights = self._weight_data.ndarray[~missing]
+            self._weight_data = IVData(weights / weights.mean(), "weights")
+            self._nobs = self.dependent.shape[0]
         missing_warning(missing, stacklevel=4)
         return missing
 
@@ -785,6 +1007,19 @@ class AbsorbingLS:
                     "interactions ({}) and dependent have different number of "
                     "observations".format(str(interact))
                 )
+
+    def _check_alignment(self) -> None:
+        """Check that inputs with labels use the labels of dependent"""
+        expected = row_labels(self._dependent)
+        check_alignment(expected, {"exog": self._exog, "weights": self._weights})
+        interactions: list[tuple[str, Interaction]] = [("absorb", self._absorb_inter)]
+        single = isinstance(self._interactions, (DataFrame, Interaction))
+        for i, interact in enumerate(self._interaction_list):
+            name = "interactions" if single else f"interactions[{i}]"
+            interactions.append((name, interact))
+        for name, interact in interactions:
+            check_alignment(expected, {name: interact.cat})
+            check_alignment(expected, {name: interact.cont})
 
     @property
     def absorbed_dependent(self) -> DataFrame:
@@ -881,6 +1116,11 @@ class AbsorbingLS:
         ),
         method: str,
     ) -> None:
+        # Absorbing is repeated when fit uses other options, so start from the
+        # state of a model that has not been fit
+        absorb_args = _absorb_args(method, use_cache, absorb_options)
+        self._num_params = 0
+        self._columns = self._exog.cols
         weights = (
             cast("linearmodels.typing.data.Float64Array", self.weights.ndarray)
             if self._is_weighted
@@ -922,9 +1162,10 @@ class AbsorbingLS:
         mu_dep = (root_w.T @ dep) / denom
         mu_exog = (root_w.T @ exog) / denom
 
-        absorb_options = {} if absorb_options is None else absorb_options
+        absorb_options = {} if absorb_options is None else dict(absorb_options)
         assert isinstance(self._regressors, csc_array)
         if self._regressors.shape[1] > 0:
+            _check_absorb_options(absorb_options, use_hdfe, method)
             if use_hdfe:
                 from pyhdfe import create  # noqa: PLC0415
 
@@ -954,11 +1195,14 @@ class AbsorbingLS:
             dep_resid += root_w * mu_dep
             exog_resid += root_w * mu_exog
 
+        ncol = exog_resid.shape[1]
+        retain = list(range(ncol))
         if not self._drop_absorbed:
             check_absorbed(exog_resid, self.exog.cols, exog)
         else:
-            ncol = exog_resid.shape[1]
-            retain = not_absorbed(exog_resid)
+            retain = not_absorbed(
+                exog_resid, self._constant_absorbed, self._const_col, exog
+            )
             if not retain:
                 raise ValueError(
                     "All columns in exog have been fully absorbed by the "
@@ -976,6 +1220,10 @@ class AbsorbingLS:
             exog_resid = exog_resid[:, retain]
             self._columns = [self._columns[i] for i in retain]
 
+        # The location of the constant among the retained regressors, which is not
+        # the location in exog if a regressor before it was dropped
+        const_col = self._const_col
+        self._const_loc = retain.index(const_col) if const_col in retain else None
         self._absorbed_dependent = DataFrame(
             dep_resid,
             index=self._dependent.pandas.index,
@@ -985,6 +1233,22 @@ class AbsorbingLS:
             exog_resid, index=self._exog.pandas.index, columns=self._columns
         )
         self._num_params += exog_resid.shape[1]
+        self._absorb_args = absorb_args
+
+    def _discard_stale_absorption(
+        self,
+        method: str,
+        use_cache: bool,
+        absorb_options: dict[str, Any] | None,
+        lsmr_options: dict[str, float | bool] | None,
+    ) -> None:
+        """Discard the absorbed variables if fit uses other options to absorb"""
+        if absorb_options is not None and lsmr_options is not None:
+            return  # fit raises an error
+        options = lsmr_options if absorb_options is None else absorb_options
+        if _absorb_args(method, use_cache, options) != self._absorb_args:
+            self._absorbed_dependent = None
+            self._absorbed_exog = None
 
     def fit(
         self,
@@ -1027,8 +1291,9 @@ class AbsorbingLS:
         debiased : bool
             Flag indicating whether to debiased the covariance estimator using
             a degree of freedom adjustment.
-        method : str
-            One of:
+        method : {"auto", "hdfe", "lsmr"}, optional
+            The algorithm that absorbs the variables. The name is not case
+            sensitive, and a ValueError is raised for any other value. One of:
 
             * "auto" - (Default). Use HDFE when applicable and fallback to LSMR.
             * "lsmr" - Force LSMR.
@@ -1039,7 +1304,11 @@ class AbsorbingLS:
         absorb_options : dict
             Dictionary of options to pass to the absorber. Passed to either
             scipy.sparse.linalg.lsmr or pyhdfe.create depending on the method used
-            to absorb the absorbed regressors.
+            to absorb the absorbed regressors. The options have to be those of
+            the algorithm that is used, which is HDFE if method is "auto" and the
+            model can be absorbed using it. A ValueError is raised for options
+            of LSMR if the variables are absorbed using HDFE, and for options
+            of pyhdfe.create if they are absorbed using LSMR.
         use_cache : bool
             Flag indicating whether the variables, once purged from the
             absorbed variables and interactions, should be stored in the cache,
@@ -1047,11 +1316,14 @@ class AbsorbingLS:
             re-fitting large models when the set of absorbed variables and
             interactions are identical.
         lsmr_options : dict
-            Options to ass to scipy.sparse.linalg.lsmr.
+            Options to pass to scipy.sparse.linalg.lsmr. If they are not empty,
+            method "auto" absorbs the variables using LSMR, and method "hdfe"
+            raises a ValueError.
 
             .. deprecated:: 4.17
 
-               Use absorb_options to pass options
+               Use absorb_options with method="lsmr" to pass options.
+               ``lsmr_options`` will be removed in linearmodels 8.0.
 
         cov_config
             Additional parameters to pass to covariance estimator. The list
@@ -1072,11 +1344,44 @@ class AbsorbingLS:
         supported options. Defaults are used if no covariance configuration
         is provided.
 
+        Observations with a missing value in ``dependent``, ``exog``,
+        ``weights``, ``absorb`` or ``interactions`` are dropped when the model
+        is created. When ``cov_type`` is "clustered", ``clusters`` must have
+        one row for each of the remaining observations, so the rows of
+        ``clusters`` that belong to dropped observations must be dropped too.
+
         If use_cache is True, then variables are hashed based on their
         contents using either a 64-bit value (if xxhash is installed) or
         a 256-bit value. This allows variables to be reused in different
         models if the set of absorbing variables and interactions is held
-        constant.
+        constant. The options used to absorb the variables are part of
+        what identifies them.
+
+        If ``debiased`` is True, the covariance estimator is adjusted for the
+        degrees of freedom that the model uses: the k regressors in ``exog`` that
+        are estimated and the d degrees of freedom of the absorbed terms. They are
+        the dummy variables of the effects, with one less if ``exog`` has a
+        constant and one less for each effect after the first, the absorbed
+        continuous variables and the interactions, which is ``df_absorbed``. The
+        unadjusted, robust and kernel covariances are multiplied by n / (n - k - d),
+        and the clustered covariance by g (n - 1) / ((g - 1) (n - k - d)) where g
+        is the number of clusters. The result is that of the regression of the
+        dependent variable on ``exog`` and the dummy variables of the effects. It
+        is also that of ``PanelOLS(debiased=True)`` with the same effects, using
+        ``group_debias=True`` for the clustered covariance. The exception is a
+        clustered covariance when there is a single categorical effect and each of
+        its categories is in one cluster of every cluster variable: its degrees of
+        freedom are not counted, since the effect is nested in the clusters, as in
+        ``PanelOLS`` and Stata. Unlike ``PanelOLS``, nothing is adjusted if
+        ``debiased`` is False. The t and F distributions of the results use
+        ``df_resid`` whatever the covariance estimator. A ``ValueError`` is raised if
+        ``debiased`` is True and the model has no degrees of freedom left.
+
+        The variables are absorbed when fit is called for the first time. A
+        later call uses the same absorbed variables if ``method``,
+        ``absorb_options`` and ``use_cache`` have the same values, so that
+        changing only the covariance estimator is fast. If any of them differs,
+        the variables are absorbed again using the new values.
 
         See also
         --------
@@ -1085,15 +1390,31 @@ class AbsorbingLS:
         linearmodels.iv.covariance.KernelCovariance
         linearmodels.iv.covariance.ClusteredCovariance
         """
+        method = _check_method(method)
+        if lsmr_options and absorb_options is None:
+            # The options are options of LSMR, so they can not be passed to HDFE
+            if method == "hdfe":
+                raise ValueError(
+                    "lsmr_options are options of scipy.sparse.linalg.lsmr and "
+                    'cannot be used with method="hdfe". Use method="lsmr" or '
+                    'method="auto", which uses LSMR if lsmr_options are given.'
+                )
+            method = "lsmr" if method == "auto" else method
+        self._discard_stale_absorption(method, use_cache, absorb_options, lsmr_options)
         if lsmr_options is not None:
             if absorb_options is not None:
                 raise ValueError("absorb_options cannot be used with lsmr_options")
             warnings.warn(
-                "lsmr_options is deprecated.  Use absorb_options.",
+                "lsmr_options is deprecated and will be removed in linearmodels "
+                '8.0. Use absorb_options with method="lsmr", which passes the options '
+                "to scipy.sparse.linalg.lsmr.",
                 FutureWarning,
                 stacklevel=2,
             )
             absorb_options = dict(lsmr_options.items())
+        check_alignment(
+            row_labels(self._dependent), {"clusters": cov_config.get("clusters")}
+        )
         if self._absorbed_dependent is None:
             self._first_time_fit(use_cache, absorb_options, method)
 
@@ -1109,6 +1430,10 @@ class AbsorbingLS:
         cov_config["kappa"] = 0.0
         cov_config_copy = dict(cov_config.items())
         cov_config_copy.pop("center", None)
+        if debiased:
+            cov_config_copy["extra_df"] = self._absorbed_df(
+                cov_estimator, cov_config.get("clusters")
+            )
         cov_estimator_inst = cov_estimator(
             exog_resid, dep_resid, exog_resid, params, **cov_config_copy
         )
@@ -1119,6 +1444,56 @@ class AbsorbingLS:
         results["df_model"] = self._num_params
 
         return AbsorbingLSResults(results, self)
+
+    def _absorbed_df(
+        self,
+        cov_estimator: type[
+            HomoskedasticCovariance
+            | HeteroskedasticCovariance
+            | KernelCovariance
+            | ClusteredCovariance
+        ],
+        clusters: linearmodels.typing.data.ArrayLike | None,
+    ) -> int:
+        """
+        Degrees of freedom of the absorbed terms that a debiased covariance counts
+
+        Parameters
+        ----------
+        cov_estimator : type
+            The class of the covariance estimator
+        clusters : array_like
+            The clusters that are passed to fit, if any
+
+        Returns
+        -------
+        int
+            The degrees of freedom of the absorbed terms: the dummy variables of the
+            effects, the absorbed continuous variables and the interactions, less the
+            overlap with a constant in exog. They are the same as df_absorbed, except
+            that a clustered covariance does not count the degrees of freedom of a
+            single categorical effect that is nested in all of the clusters, as
+            PanelOLS does.
+        """
+        assert isinstance(self._absorbed_exog, DataFrame)
+        absorbed = self._num_params - self._absorbed_exog.shape[1]
+        cat = self._absorb_inter.cat
+        if (
+            cov_estimator is not ClusteredCovariance
+            or clusters is None
+            or cat.shape[1] != 1
+        ):
+            return absorbed
+        cluster_array = asarray(clusters).squeeze()
+        if cluster_array.shape[0] != self._nobs:
+            return absorbed  # The covariance estimator raises an error
+        columns = [cluster_array] if cluster_array.ndim == 1 else list(cluster_array.T)
+        codes = asarray(cat.iloc[:, 0].cat.codes).astype(int64)
+        if not all(_is_nested(codes, column) for column in columns):
+            return absorbed
+        # The dummy variables of the effect, less one if the constant takes one
+        effect_df = unique(codes).shape[0] - int(self._has_constant_exog)
+        return absorbed - effect_df
 
     def resids(
         self, params: linearmodels.typing.data.Float64Array
@@ -1173,12 +1548,9 @@ class AbsorbingLS:
         cov: linearmodels.typing.data.Float64Array,
         debiased: bool,
     ) -> WaldTestStatistic | InvalidTestStatistic:
-        const_loc = find_constant(
-            cast("linearmodels.typing.data.Float64Array", self._exog.ndarray)
-        )
         resid_df = self._nobs - self._num_params
 
-        return f_statistic(params, cov, debiased, resid_df, const_loc)
+        return f_statistic(params, cov, debiased, resid_df, self._const_loc)
 
     def _post_estimation(
         self,
@@ -1225,8 +1597,8 @@ class AbsorbingLS:
         e = self._absorbed_dependent.to_numpy()  # already scaled by root_w
         # If absorbing contains a constant, but exog does not, no need to demean
         assert isinstance(self._absorbed_exog, DataFrame)
-        if self._const_col is not None:
-            col = self._const_col
+        if self._const_loc is not None:
+            col = self._const_loc
             x = self._absorbed_exog.to_numpy()[:, col : col + 1]
             mu = (lstsq(x, e, rcond=None)[0]).squeeze()
             e = e - x * mu

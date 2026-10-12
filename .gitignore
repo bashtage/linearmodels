@@ -40,6 +40,9 @@ doc/source/asset-pricing/asset-pricing/
 doc/source/iv/iv/
 doc/source/panel/panel/
 doc/source/system/system/
+doc/source/compatibility/
+doc/source/iv/absorbing/
+doc/source/utility/
 
 # PyInstaller
 #  Usually these files are written by a python script from a template

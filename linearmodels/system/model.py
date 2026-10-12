@@ -27,6 +27,11 @@ from pandas import DataFrame, Index, Series, concat
 
 from linearmodels.iv._utility import IVFormulaParser
 from linearmodels.iv.data import IVData
+from linearmodels.shared.alignment import (
+    check_alignment,
+    check_row_alignment,
+    row_labels,
+)
 from linearmodels.shared.exceptions import missing_warning
 from linearmodels.shared.hypotheses import InvalidTestStatistic, WaldTestStatistic
 from linearmodels.shared.linalg import has_constant
@@ -460,7 +465,7 @@ class _SystemModelBase:
                 else:
                     self._weights.append(IVData(np.ones(dep.shape)))
             else:
-                msg = UNKNOWN_EQ_TYPE.format(key=key, type=type(vars))
+                msg = UNKNOWN_EQ_TYPE.format(key=key, type=type(eq_data))
                 raise TypeError(msg)
         self._has_instruments = False
         for instr in self._instr:
@@ -485,6 +490,7 @@ class _SystemModelBase:
                     "{eq}".format(eq=self._eq_labels[i])
                 )
 
+        self._check_alignment()
         self._drop_missing()
         self._common_exog = len(set(ids)) == 1
         if self._common_exog:
@@ -547,7 +553,7 @@ class _SystemModelBase:
                 )
             if matrix_rank(z) < z.shape[1]:
                 raise ValueError(
-                    "Equation {eq} instrument array is full rank".format(eq=label)
+                    "Equation {eq} instrument array is not full rank".format(eq=label)
                 )
 
         for rhs in self._x:
@@ -558,6 +564,49 @@ class _SystemModelBase:
             constant, index=[d.cols[0] for d in self._dependent]
         )
         self._constant_loc = constant_loc
+
+    def _check_alignment(self) -> None:
+        """Check that inputs with labels use the labels of dependent"""
+        nobs = [dep.shape[0] for dep in self._dependent]
+        for i, label in enumerate(self._eq_labels):
+            if nobs[i] != nobs[0]:
+                raise ValueError(
+                    "All equations must have the same number of observations. "
+                    f"The dependent variable in equation {label!r} has {nobs[i]} "
+                    f"observations, but in equation {self._eq_labels[0]!r} it has "
+                    f"{nobs[0]}."
+                )
+        reference: Index | None = None
+        reference_name = ""
+        for i, label in enumerate(self._eq_labels):
+            dependent_name = f"dependent in equation {label!r}"
+            expected = row_labels(self._dependent[i])
+            if expected is not None:
+                if reference is None:
+                    reference, reference_name = expected, dependent_name
+                else:
+                    check_row_alignment(
+                        dependent_name, expected, reference, reference_name
+                    )
+            inputs = {
+                f"exog in equation {label!r}": self._exog[i],
+                f"endog in equation {label!r}": self._endog[i],
+                f"instruments in equation {label!r}": self._instr[i],
+                f"weights in equation {label!r}": self._weights[i],
+            }
+            check_alignment(expected, inputs, reference=dependent_name)
+
+    def _check_clusters(self, config: Mapping[str, Any]) -> None:
+        """Check that clusters with labels use the labels of dependent"""
+        for i, label in enumerate(self._eq_labels):
+            expected = row_labels(self._dependent[i])
+            if expected is not None:
+                check_alignment(
+                    expected,
+                    {"clusters": config.get("clusters")},
+                    reference=f"dependent in equation {label!r}",
+                )
+                return
 
     def _drop_missing(self) -> None:
         k = len(self._dependent)
@@ -812,6 +861,15 @@ class _SystemModelBase:
         )
         cov = cov_est.cov
 
+        # eps are the weighted residuals. The residuals do not use the weights
+        loc = 0
+        resids = []
+        for i in range(k):
+            nb = self._x[i].shape[1]
+            resids.append(self._y[i] - self._x[i] @ beta[loc : loc + nb])
+            loc += nb
+        resid = np.hstack(resids)
+
         individual = AttrDict()
         debiased = cov_config.get("debiased", False)
         for i in range(k):
@@ -827,7 +885,7 @@ class _SystemModelBase:
                 beta,
                 cov,
                 eps,
-                eps,
+                resid,
                 "OLS",
                 cov_type,
                 cov_est,
@@ -843,12 +901,14 @@ class _SystemModelBase:
         results = self._common_results(
             beta, cov, "OLS", 0, nobs, cov_type, sigma, individual, debiased
         )
-        results["wresid"] = results.resid
+        results["wresid"] = eps
         results["cov_estimator"] = cov_est
         results["cov_config"] = cov_est.cov_config
         individual = results["individual"]
         r2s = [individual[eq].r2 for eq in individual]
-        results["system_r2"] = self._system_r2(eps, sigma, "ols", False, debiased, r2s)
+        results["system_r2"] = self._system_r2(
+            resid, sigma, "ols", False, debiased, r2s
+        )
 
         return SystemResults(results)
 
@@ -956,9 +1016,12 @@ class _SystemModelBase:
         stats["wresid"] = e
         stats["nobs"] = nobs
         stats["df_model"] = df
+        # The residuals do not use the weights, but the sum of squares does
+        weighted_resid = resid[:, [i]] * np.sqrt(self._w[i])
         stats["resid"] = resid[:, [i]]
+        stats["weighted_resid"] = weighted_resid
         stats["fitted"] = self._x[i] @ b
-        stats["resid_ss"] = float(np.squeeze(resid[:, [i]].T @ resid[:, [i]]))
+        stats["resid_ss"] = float(np.squeeze(weighted_resid.T @ weighted_resid))
         stats["total_ss"] = total_ss
         stats["r2"] = 1.0 - stats.resid_ss / stats.total_ss
         stats["r2a"] = 1.0 - (stats.resid_ss / df_r) / (stats.total_ss / df_c)
@@ -1002,16 +1065,19 @@ class _SystemModelBase:
 
         total_ss = resid_ss = 0.0
         residuals = []
+        weighted_residuals = []
         for key in individual:
             total_ss += individual[key].total_ss
             resid_ss += individual[key].resid_ss
             residuals.append(individual[key].resid)
+            weighted_residuals.append(individual[key].weighted_resid)
         resid = np.hstack(residuals)
 
         results["resid_ss"] = resid_ss
         results["total_ss"] = total_ss
         results["r2"] = 1.0 - results.resid_ss / results.total_ss
         results["resid"] = resid
+        results["weighted_resid"] = np.hstack(weighted_residuals)
         results["constraints"] = self._constraints
         results["model"] = self
 
@@ -1065,7 +1131,10 @@ class _SystemModelBase:
             xpy[i : (i + 1)] = wi[i].T @ sy
 
         mu = _parameters_from_xprod(xpx, xpy)
-        eps_const = np.hstack([self._y[j] - mu[j] for j in range(k)])
+        # eps are residuals that do not use the weights. The measures use the weighted
+        # residuals of the model and of the regression on a constant
+        eps = eps * np.hstack(wi)
+        eps_const = np.hstack([wi[j] * (self._y[j] - mu[j]) for j in range(k)])
         # Judge
         judge = 1 - (eps**2).sum() / (eps_const**2).sum()
         # Dhrymes
@@ -1308,6 +1377,7 @@ class _LSSystemModelBase(_SystemModelBase):
         linearmodels.system.covariance.KernelCovariance
         linearmodels.system.covariance.ClusteredCovariance
         """
+        self._check_clusters(cov_config)
         if method is None:
             method = (
                 "ols" if (self._common_exog and self._constraints is None) else "gls"
@@ -1463,6 +1533,19 @@ class IV3SLS(_LSSystemModelBase):
         \Omega = \Sigma \otimes I_N
 
     where :math:`\Sigma` is the covariance matrix of the residuals.
+
+    Rows are paired by position, both within an equation and across the
+    equations. An input that carries labels (a pandas Series or DataFrame
+    with an index other than the default 0, 1, ..., n-1, or an xarray
+    DataArray with coordinates) must use the same index, in the same order,
+    as the dependent variable of its equation, so that a value cannot be
+    attached to the wrong observation. The dependent variables that carry
+    labels must also use the same index in every equation. A ``ValueError``
+    is raised if an index differs. Either reindex the input to the index of
+    the dependent variable, or call ``to_numpy()`` to pair its values by
+    position. NumPy arrays and pandas objects with a default index do not
+    carry labels and are always paired by position.
+    The same rule applies to ``clusters`` passed to ``fit``.
     """
 
     def __init__(
@@ -1678,6 +1761,19 @@ class SUR(_LSSystemModelBase):
 
     SUR is a special case of 3SLS where there are no endogenous regressors and
     no instruments.
+
+    Rows are paired by position, both within an equation and across the
+    equations. An input that carries labels (a pandas Series or DataFrame
+    with an index other than the default 0, 1, ..., n-1, or an xarray
+    DataArray with coordinates) must use the same index, in the same order,
+    as the dependent variable of its equation, so that a value cannot be
+    attached to the wrong observation. The dependent variables that carry
+    labels must also use the same index in every equation. A ``ValueError``
+    is raised if an index differs. Either reindex the input to the index of
+    the dependent variable, or call ``to_numpy()`` to pair its values by
+    position. NumPy arrays and pandas objects with a default index do not
+    carry labels and are always paired by position.
+    The same rule applies to ``clusters`` passed to ``fit``.
     """
 
     def __init__(
@@ -1901,6 +1997,18 @@ class IVSystemGMM(_SystemModelBase):
         \hat{\beta}_{GMM} & = (X'ZW^{-1}Z'X)^{-1}X'ZW^{-1}Z'Y \\
 
     where :math:`W` is a positive definite weighting matrix.
+
+    Rows are paired by position, both within an equation and across the
+    equations. An input that carries labels (a pandas Series or DataFrame
+    with an index other than the default 0, 1, ..., n-1, or an xarray
+    DataArray with coordinates) must use the same index, in the same order,
+    as the dependent variable of its equation, so that a value cannot be
+    attached to the wrong observation. The dependent variables that carry
+    labels must also use the same index in every equation. A ``ValueError``
+    is raised if an index differs. Either reindex the input to the index of
+    the dependent variable, or call ``to_numpy()`` to pair its values by
+    position. NumPy arrays and pandas objects with a default index do not
+    carry labels and are always paired by position.
     """
 
     def __init__(

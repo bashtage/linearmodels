@@ -557,7 +557,8 @@ def test_against_ols(ols_data):
                 absorb = (1.0 / root_w) * wabsorb
         rank = np.linalg.matrix_rank(absorb)
         if rank < absorb.shape[1]:
-            a, b = np.linalg.eig(absorb.T @ absorb)
+            # The matrix is symmetric: eigh has real eigenvectors, eig may not
+            a, b = np.linalg.eigh(absorb.T @ absorb)
             order = np.argsort(a)[::-1]
             a, b = a[order], b[:, order]
             z = absorb @ b
@@ -756,9 +757,101 @@ def test_options(random_gen):
         mod.fit(absorb_options={"atol": 1e-7, "btol": 1e-7}, method="hdfe")
 
 
+def test_absorb_options_are_not_modified(random_gen):
+    absorb = random_gen.randint(0, 10, size=1000)
+    x = random_gen.standard_normal((1000, 3))
+    y = random_gen.standard_normal(1000)
+    dfd = {f"x{i}": pd.Series(x[:, i]) for i in range(3)}
+    dfd.update({"c": pd.Series(absorb, dtype="category"), "y": pd.Series(y)})
+    df = pd.DataFrame(dfd)
+
+    y = df.y
+    x = df.iloc[:, :3]
+    # HDFE sets drop_singletons for pyhdfe, which must not change the caller's dict
+    options = {"compute_degrees": False}
+    AbsorbingLS(y, x, absorb=df[["c"]]).fit(absorb_options=options)
+    assert options == {"compute_degrees": False}
+
+    # Otherwise these options could not be used by LSMR, which rejects drop_singletons
+    options = {}
+    AbsorbingLS(y, x, absorb=df[["c"]]).fit(absorb_options=options)
+    mod = AbsorbingLS(y, x, absorb=df[["c"]])
+    mod.fit(absorb_options=options, method="lsmr", use_cache=False)
+    assert options == {}
+
+
 def test_lsmr_annihilate_empty():
     gen = np.random.default_rng(0)
     x = csc_array(gen.standard_normal((1000, 2)))
     y = np.empty((1000, 0))
     y_out = lsmr_annihilate(x, y)
     assert y_out.shape == y.shape
+
+
+@pytest.mark.parametrize(
+    "labels", ["both", "cat", "cont", "neither", "cat-only", "cont-only"]
+)
+def test_interaction_without_labels_pairs_by_position(labels):
+    # Only cat or cont is labelled, or one is missing. Missing flags are paired
+    # by position and do not depend on the labels
+    rng = np.random.default_rng(0)
+    nobs = 30
+    index = pd.Index([f"r{i}" for i in range(nobs)])
+    cat = pd.DataFrame({"g": pd.Categorical(rng.integers(0, 4, nobs))}, index=index)
+    cont = pd.DataFrame({"c": rng.standard_normal(nobs)}, index=index)
+    cat.iloc[5, 0] = np.nan
+    cont.iloc[11, 0] = np.nan
+    cats = {"both": cat, "cat": cat, "cont": cat.to_numpy(), "neither": cat.to_numpy()}
+    conts = {
+        "both": cont,
+        "cat": cont.to_numpy(),
+        "cont": cont,
+        "neither": cont.to_numpy(),
+    }
+    if labels == "cat-only":
+        interaction = Interaction(cat=cat)
+        expected = np.zeros(nobs, dtype=bool)
+        expected[5] = True
+    elif labels == "cont-only":
+        interaction = Interaction(cont=cont)
+        expected = np.zeros(nobs, dtype=bool)
+        expected[11] = True
+    else:
+        interaction = Interaction(cat=cats[labels], cont=conts[labels])
+        expected = np.zeros(nobs, dtype=bool)
+        expected[[5, 11]] = True
+    isnull = interaction.isnull
+    assert isnull.shape == (nobs,)
+    assert_array_equal(isnull.to_numpy(), expected)
+    interaction.drop(expected)
+    assert interaction.cat.shape[0] == interaction.cont.shape[0]
+
+
+@pytest.mark.parametrize("labels", ["cat", "cont", "cat-only", "cont-only"])
+def test_interactions_without_labels(labels):
+    # AbsorbingLS pairs a labelled dependent variable with interactions that
+    # only partly have labels by position
+    rng = np.random.default_rng(1)
+    nobs = 60
+    index = pd.Index([f"r{i}" for i in range(nobs)])
+    y = pd.Series(rng.standard_normal(nobs), index=index)
+    x = pd.DataFrame({"x": rng.standard_normal(nobs)}, index=index)
+    cat = pd.DataFrame({"g": pd.Categorical(rng.integers(0, 4, nobs))}, index=index)
+    cont = pd.DataFrame({"c": rng.standard_normal(nobs)}, index=index)
+    interactions = {
+        "cat": Interaction(cat=cat.to_numpy(), cont=cont),
+        "cont": Interaction(cat=cat, cont=cont.to_numpy()),
+        "cat-only": Interaction(cat=cat),
+        "cont-only": Interaction(cont=cont),
+    }
+    mod = AbsorbingLS(y, x, interactions=interactions[labels])
+    res = mod.fit()
+    raw = AbsorbingLS(
+        y.to_numpy(),
+        x.to_numpy(),
+        interactions=Interaction(
+            cat=None if labels == "cont-only" else cat.to_numpy(),
+            cont=None if labels == "cat-only" else cont.to_numpy(),
+        ),
+    ).fit()
+    assert_allclose(res.params, raw.params)

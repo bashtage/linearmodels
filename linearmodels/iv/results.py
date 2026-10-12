@@ -24,7 +24,7 @@ from numpy import (
     sqrt,
     squeeze,
 )
-from numpy.linalg import inv
+from numpy.linalg import LinAlgError, inv
 from pandas import DataFrame, Series, concat, to_numeric
 from scipy import stats
 from statsmodels.iolib.summary import SimpleTable, fmt_2cols, fmt_params
@@ -42,6 +42,16 @@ from linearmodels.shared.hypotheses import (
 )
 from linearmodels.shared.io import _str, add_star, pval_format
 import linearmodels.typing.data
+
+__all__ = [
+    "AbsorbingLSResults",
+    "FirstStageResults",
+    "IVGMMResults",
+    "IVModelComparison",
+    "IVResults",
+    "OLSResults",
+    "compare",
+]
 
 
 def stub_concat(
@@ -437,6 +447,10 @@ class _LSModelResultsBase(_SummaryStr):
               {"x1": 0, "x2+x3": 1}.
 
             It is not possible to use both ``restriction`` and ``formula``.
+            The names in the restrictions are the entries of the index of
+            ``params``. A name that is not valid Python, for example one that
+            contains ``:`` or ``[`` such as ``exper:black``, must be enclosed in
+            back-ticks, e.g., ``"`exper:black` = 0"``.
 
         Returns
         -------
@@ -465,14 +479,22 @@ class _LSModelResultsBase(_SummaryStr):
         >>> value = np.array([0, 0])
         >>> wald_res = res.wald_test(restriction, value)
 
-        Using the formula interface to test the same restrictions
+        Using the formula interface to test the same restrictions. The names
+        are those in the index of ``params``, which has ``I(exper ** 2)``
 
-        >>> formula = "exper = I(exper**2) = 0"
+        >>> formula = "exper = I(exper ** 2) = 0"
         >>> wald_res = res.wald_test(formula=formula)
 
         Using the formula interface with a list
 
-        >>> wald_res = res.wald_test(formula=["exper = 0", "I(exper**2) = 0"])
+        >>> wald_res = res.wald_test(formula=["exper = 0", "I(exper ** 2) = 0"])
+
+        A name that is not valid Python, such as an interaction, is enclosed in
+        back-ticks
+
+        >>> formula = "np.log(wage) ~ 1 + exper + black + exper:black + [educ ~ sibs]"
+        >>> res = IV2SLS.from_formula(formula, data).fit()
+        >>> wald_res = res.wald_test(formula="`exper:black` = 0")
         """
         return quadratic_form_test(
             self._params,
@@ -515,7 +537,10 @@ class OLSResults(_LSModelResultsBase):
                 "Predictions can only be constructed using one "
                 "of exog/endog or data, but not both."
             )
-        pred = self.model.predict(self.params, exog=exog, endog=endog, data=data)
+        # Variables of the formula are those of the frame that called OLSResults.predict
+        pred = self.model.predict(
+            self.params, exog=exog, endog=endog, data=data, eval_env=4
+        )
         if not missing:
             pred = pred.loc[pred.notnull().all(axis=1)]
         return pred
@@ -728,6 +753,13 @@ class FirstStageResults(_SummaryStr):
         It equals ``ninstr`` times the classical F-statistic when there is
         one endogenous regressor. See :func:`linearmodels.iv.common.cragg_donald`
         for the definition.
+
+        In a weighted model the statistic is computed from the data multiplied
+        by the square root of the weights of the model, which are scaled to
+        have mean 1. It does not depend on the scale of the weights. It does not
+        use a covariance estimator, and so it does not depend on the clusters
+        or the kernel of the model, and is the same for every covariance
+        estimator.
         """
         return cragg_donald(*self._weighted_arrays())
 
@@ -755,16 +787,24 @@ class FirstStageResults(_SummaryStr):
         This is the statistic that Stock and Yogo (2005) tabulate critical
         values for, and Stata's ``ivreg2`` reports it as the "Cragg-Donald
         Wald F statistic". See :func:`linearmodels.iv.common.cragg_donald_f`.
+
+        The weights are used as for :attr:`cragg_donald`, and the statistic
+        does not depend on the scale of the weights or on the clusters of the
+        model.
         """
         return cragg_donald_f(*self._weighted_arrays())
 
     @cached_property
-    def _kleibergen_paap(
-        self,
-    ) -> tuple[WaldTestStatistic | InvalidTestStatistic, float]:
+    def _rk_lm(self) -> WaldTestStatistic | InvalidTestStatistic:
+        return _kleibergen_paap(
+            *self._weighted_arrays(), self._cov_type, self._cov_config, wald=False
+        )[0]
+
+    @cached_property
+    def _rk_wald_f(self) -> float:
         return _kleibergen_paap(
             *self._weighted_arrays(), self._cov_type, self._cov_config
-        )
+        )[1]
 
     @property
     def kleibergen_paap(self) -> WaldTestStatistic | InvalidTestStatistic:
@@ -808,8 +848,17 @@ class FirstStageResults(_SummaryStr):
         corresponds to the "Kleibergen-Paap rk LM statistic" reported by
         Stata's ``ivreg2``. See :func:`linearmodels.iv.common.kleibergen_paap`
         for the definition and for conventions that differ from Stata.
+
+        In a weighted model the scores are those of the weighted first-stage
+        regressions, and the statistic does not depend on the scale of the
+        weights. A clustered covariance estimator uses the ``clusters`` that
+        were passed to ``fit``. There must be at least ``ninstr - nendog + 1``
+        clusters, or ``ninstr - nendog + 2`` for :attr:`kleibergen_paap_f`, and
+        a warning is issued if there are fewer. A kernel covariance estimator
+        uses the kernel and the bandwidth of the model, including a bandwidth
+        that the model selected.
         """
-        return self._kleibergen_paap[0]
+        return self._rk_lm
 
     @property
     def kleibergen_paap_f(self) -> float:
@@ -839,12 +888,17 @@ class FirstStageResults(_SummaryStr):
         is the Cragg-Donald F statistic. Stata's ``ivreg2`` reports it as the
         "Kleibergen-Paap rk Wald F statistic". See
         :func:`linearmodels.iv.common.kleibergen_paap_f` for the definition.
+
+        The weights, clusters and kernel are used as for
+        :attr:`kleibergen_paap`. With a clustered covariance estimator there
+        must be at least ``ninstr - nendog + 2`` clusters, and a warning is
+        issued if there are fewer.
         """
-        return self._kleibergen_paap[1]
+        return self._rk_wald_f
 
     @cached_property
     def diagnostics(self) -> DataFrame:
-        """
+        r"""
         Post estimation diagnostics of first-stage fit
 
         Returns
@@ -860,9 +914,11 @@ class FirstStageResults(_SummaryStr):
               the instrument have been orthogonalized to the exogenous
               regressors in the model.
             * f.stat - Test that all coefficients are zero in the model
-              used to estimate the partial R-squared. Uses a standard F-test
-              when the covariance estimator is unadjusted - otherwise uses a
-              Wald test statistic with a chi2 distribution.
+              used to estimate the partial R-squared. If the covariance
+              estimator is unadjusted, it is the Wald statistic divided by
+              the number of excluded instruments, and it has an F
+              distribution. Otherwise it is the Wald statistic, which has a
+              chi2 distribution. See Notes.
             * f.pval - P-value of the test that all coefficients are zero
               in the model used to estimate the partial R-squared
             * f.dist - Distribution of f.stat
@@ -870,6 +926,26 @@ class FirstStageResults(_SummaryStr):
               between the projected and orthogonalized instrument on the
               orthogonalized endogenous regressor where the orthogonalization
               is with respect to the other included variables in the model.
+
+        Notes
+        -----
+        ``f.stat`` is the Wald statistic of the test that the coefficients on
+        the :math:`q` excluded instruments are 0 in the first-stage regression,
+        which is computed using the covariance estimator of the model.
+
+        If ``cov_type`` is "unadjusted" (or "homoskedastic"), the statistic is
+        divided by :math:`q` and its p-value uses an :math:`F_{q,n-k}`
+        distribution, where :math:`k` is the number of exogenous regressors
+        plus the number of excluded instruments. This is the textbook
+        F-statistic only if the model was fit with ``debiased=True``. Without
+        it, the covariance estimator divides by :math:`n` and not by
+        :math:`n-k`, and the statistic is :math:`n/(n-k)` times larger.
+
+        For all other covariance estimators, ``f.stat`` is the Wald statistic
+        and it has a :math:`\chi^2_q` distribution. It is not divided by
+        :math:`q`. Software that reports an F-statistic for a test that is
+        robust to heteroskedasticity, for example ``ivreg`` in R, reports the
+        Wald statistic divided by :math:`q`.
         """
         from linearmodels.iv.model import _OLS, IV2SLS
 
@@ -1104,9 +1180,19 @@ class IVResults(_CommonIVResults):
         WaldTestStatistic
             Object containing test statistic, p-value, distribution and null
 
+        See Also
+        --------
+        wooldridge_overid
+            Test of the overidentifying restrictions that is robust to
+            heteroskedasticity.
+
         Notes
         -----
         Requires more instruments than endogenous variables
+
+        The test assumes that the errors are homoskedastic. It does not use the
+        covariance estimator that was used to fit the model, so it is the same
+        for every ``cov_type``.
 
         Tests the ratio of re-projected IV regression residual variance to
         variance of the IV residuals.
@@ -1152,9 +1238,19 @@ class IVResults(_CommonIVResults):
         WaldTestStatistic
             Object containing test statistic, p-value, distribution and null
 
+        See Also
+        --------
+        wooldridge_overid
+            Test of the overidentifying restrictions that is robust to
+            heteroskedasticity.
+
         Notes
         -----
         Requires more instruments than endogenous variables
+
+        The test assumes that the errors are homoskedastic. It does not use the
+        covariance estimator that was used to fit the model, so it is the same
+        for every ``cov_type``.
 
         Tests is a small-sample version of Sargan's test that has the same
         distribution.
@@ -1246,8 +1342,20 @@ class IVResults(_CommonIVResults):
         WaldTestStatistic
             Object containing test statistic, p-value, distribution and null
 
+        See Also
+        --------
+        wooldridge_regression
+            Test of exogeneity that uses the covariance estimator that was
+            used to fit the model.
+        wooldridge_score
+            Test of exogeneity that is robust to heteroskedasticity.
+
         Notes
         -----
+        The test assumes that the errors are homoskedastic. It does not use the
+        covariance estimator that was used to fit the model, so it is the same
+        for every ``cov_type``.
+
         Test statistic is difference between sum of squared OLS and sum of
         squared IV residuals where each set of residuals has been projected
         onto the set of instruments in the IV model.
@@ -1301,8 +1409,20 @@ class IVResults(_CommonIVResults):
         WaldTestStatistic
             Object containing test statistic, p-value, distribution and null
 
+        See Also
+        --------
+        wooldridge_regression
+            Test of exogeneity that uses the covariance estimator that was
+            used to fit the model.
+        wooldridge_score
+            Test of exogeneity that is robust to heteroskedasticity.
+
         Notes
         -----
+        The test assumes that the errors are homoskedastic. It does not use the
+        covariance estimator that was used to fit the model, so it is the same
+        for every ``cov_type``.
+
         Test statistic is difference between sum of squared OLS and sum of
         squared IV residuals where each set of residuals has been projected
         onto the set of instruments in the IV model.
@@ -1628,8 +1748,14 @@ class IVGMMResults(_CommonIVResults):
 
         Returns
         -------
-        WaldTestStatistic
-            J statistic  test of overidentifying restrictions
+        WaldTestStatistic or InvalidTestStatistic
+            J statistic  test of overidentifying restrictions.
+            An InvalidTestStatistic is returned if the estimate of the
+            covariance of the moment conditions that was inverted to compute
+            the weight matrix is singular. This can only happen at the final
+            estimates of IVGMMCUE, since IVGMM and IVGMMCUE raise a
+            ValueError if it is singular, which is the case if there are too
+            few clusters.
 
         Notes
         -----
@@ -1646,6 +1772,24 @@ class IVGMMResults(_CommonIVResults):
         :math:`\hat{\epsilon}_i` are the model residuals. :math:`W` is a consistent
         estimator of the variance of :math:`\sqrt{n}\bar{g}`. The degree of
         freedom is :math:`q = n_{instr} - n_{endog}`.
+
+        The statistic is not defined if the estimate of the covariance of the
+        moment conditions that is inverted to compute the weight matrix is
+        singular. A clustered estimate that uses G clusters has rank at most
+        G, and at most G - 1 if the moment conditions are centered (``center``
+        is True), because the centered cluster sums add to zero. There have to
+        be at least as many clusters as moment conditions, and more if they are
+        centered. The rank of a kernel or robust estimate is bounded in the
+        same way by the number of observations. Whether the estimate is
+        singular does not depend on the units in which the variables are
+        measured.
+
+        ``IVGMM.fit`` raises a ``ValueError`` if the estimate is singular in
+        any step, and ``IVGMMCUE.fit`` raises one if it is singular at the
+        first step estimates, since the weight matrix and the objective
+        function are not defined. The statistic is invalid only if the
+        estimate of ``IVGMMCUE`` is singular at its final estimates and not at
+        the first step estimates.
         """
         return self._j_stat
 
@@ -1656,7 +1800,7 @@ class IVGMMResults(_CommonIVResults):
 
         Returns
         -------
-        WaldTestStatistic
+        WaldTestStatistic or InvalidTestStatistic
             J statistic test of overidentifying restrictions that uses a
             covariance of the moment conditions that has been centered.
             An InvalidTestStatistic is returned if that covariance is
@@ -1707,6 +1851,12 @@ class IVGMMResults(_CommonIVResults):
         It also has no effect in :class:`~linearmodels.iv.model.IVGMMCUE`
         models unless ``center=False`` was set.
 
+        In a weighted model the moment conditions are
+        :math:`w_i z_i \hat{\epsilon}_i`, where :math:`w_i` are the weights of
+        the model, as in :attr:`j_stat`. The statistic and the test of whether
+        the covariance is singular do not depend on the units in which the
+        variables are measured.
+
         References
         ----------
         Hall, A. R. (2000). Covariance matrix estimation and the power of the
@@ -1718,7 +1868,9 @@ class IVGMMResults(_CommonIVResults):
         """
         return self._centered_j_stat
 
-    def c_stat(self, variables: list[str] | str | None = None) -> WaldTestStatistic:
+    def c_stat(
+        self, variables: list[str] | str | None = None
+    ) -> InvalidTestStatistic | WaldTestStatistic:
         r"""
         C-test of endogeneity
 
@@ -1730,8 +1882,11 @@ class IVGMMResults(_CommonIVResults):
 
         Returns
         -------
-        WaldTestStatistic
-            Object containing test statistic, p-value, distribution and null
+        WaldTestStatistic or InvalidTestStatistic
+            Object containing test statistic, p-value, distribution and null.
+            An InvalidTestStatistic is returned if the covariance of the
+            moment conditions of the first model is singular, which can happen
+            if there are too few clusters.
 
         Notes
         -----
@@ -1776,6 +1931,16 @@ class IVGMMResults(_CommonIVResults):
         kernel, so that the statistic is valid under the same assumptions
         about the moment conditions.
 
+        The first model has a moment condition for each tested variable that
+        the model does not have. The estimate of the covariance of its moment
+        conditions has to be nonsingular, and the statistic is invalid if it is
+        not. A clustered estimate that uses G clusters has rank at most G, and
+        at most G - 1 if the moment conditions are centered (``center`` is
+        True), because the centered cluster sums add to zero. There have to be
+        at least as many clusters as moment conditions in the first model, and
+        more if they are centered. The rank of a kernel or robust estimate is
+        bounded in the same way by the number of observations.
+
         See Hayashi (2000), pp. 218-221 and 232-234, or Baum, Schaffer and
         Stillman (2003), section 4.4, for details.
         """
@@ -1811,8 +1976,23 @@ class IVGMMResults(_CommonIVResults):
             weight_type=self.model._weight_type,
             **self.model._weight_kwargs,
         )
-        res_e = mod.fit(cov_type=self.cov_type, **self.cov_config)
+        reason = (
+            "The covariance of the moment conditions of the model that treats "
+            "the tested variables as exogenous is singular, so the statistic "
+            "is not defined. This occurs, for example, when there are too few "
+            "clusters, since that model has a moment condition for each tested "
+            "variable that this model does not."
+        )
+        try:
+            res_e = mod.fit(cov_type=self.cov_type, **self.cov_config)
+        except (LinAlgError, ValueError):
+            # The covariance of the moment conditions is singular: fit raises
+            # a ValueError, and NumPy raises a LinAlgError if it is exactly
+            # singular. LinAlgError is not a ValueError in NumPy 1.x
+            return InvalidTestStatistic(reason, name="C-statistic")
         assert isinstance(res_e, IVGMMResults)
+        if isinstance(res_e.j_stat, InvalidTestStatistic):
+            return InvalidTestStatistic(reason, name="C-statistic")
         j_e = res_e.j_stat.stat
 
         x = self.model._wx

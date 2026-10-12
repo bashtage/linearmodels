@@ -17,8 +17,7 @@ jobs:
     vmImage: ${{ parameters.vmImage }}
   strategy:
     # Variables of an entry
-    #   python.version   Version of Python. 3.15-dev is the newest 3.15, including
-    #                    release candidates.
+    #   python.version   Version of Python
     #   PACKAGES         Installed in a single pip command with requirements.txt and
     #                    requirements-test.txt, so that pip also picks versions of
     #                    matplotlib, xarray, ... that work with the pins.
@@ -73,9 +72,8 @@ jobs:
         nightly: true
         experimental: true
       python315_latest:
-        python.version: '3.15-dev'
+        python.version: '3.15'
         PACKAGES: 'xxhash'
-        experimental: true
         style: true
     maxParallel: 10
 
@@ -103,11 +101,11 @@ jobs:
     continueOnError: true
 
   - script: |
+     set -e
      flake8 linearmodels
      black --check linearmodels
      isort --check linearmodels
      ruff check linearmodels
-     flake8 linearmodels
     displayName: 'Check style and formatting'
     condition: eq(variables['style'], 'true')
 

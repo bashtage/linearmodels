@@ -15,10 +15,13 @@ estimating asset prices:
 
 -   **Panel models**:
     -   Fixed effects (maximum two-way)
+    -   Random effects
     -   First difference regression
     -   Between estimator for panel data
     -   Pooled regression for panel data
     -   Fama-MacBeth estimation of panel models
+    -   Specification tests: the Hausman test of random effects against
+        fixed effects and the Pesaran CD test of cross-sectional dependence
 
 -   **High-dimensional Regression**:
     -   Absorbing Least Squares
@@ -28,6 +31,9 @@ estimating asset prices:
     -   Limited Information Maximum Likelihood
     -   k-class Estimators
     -   Generalized Method of Moments, also with continuously updating
+    -   Jackknife IV (JIVE)
+    -   Specification tests: the Cragg-Donald and Kleibergen-Paap rank tests
+        of the first stage (underidentification)
 
 -   **Factor Asset Pricing Models**:
     -   2- and 3-step estimation
@@ -89,7 +95,7 @@ mod = IV2SLS.from_formula('np.log(wage) ~ 1 + exper + exper ** 2 + [educ ~ mothe
 The expressions in the `[ ]` indicate endogenous regressors (before `~`)
 and the instruments.
 
-## Installing
+## Installation
 
 The latest release can be installed using pip
 
@@ -97,7 +103,13 @@ The latest release can be installed using pip
 pip install linearmodels
 ```
 
-The main branch can be installed by cloning the repo and running setup
+Binary wheels are available for Windows, macOS and Linux. Without a wheel, pip
+builds linearmodels from source, which requires a C compiler.
+
+The main branch can be installed by cloning the repo and building it with pip.
+The build uses [meson-python](https://mesonbuild.com/meson-python/), and pip
+installs the other build requirements (Cython, NumPy and setuptools_scm)
+automatically.
 
 ```bash
 git clone https://github.com/bashtage/linearmodels
@@ -105,18 +117,23 @@ cd linearmodels
 pip install .
 ```
 
+To work on linearmodels, install the requirements and then build an editable
+install
+
+```bash
+python -m pip install -r requirements.txt -r requirements-dev.txt
+python -m pip install -e . --no-build-isolation
+```
+
 ## Documentation
 
 [Stable Documentation](https://bashtage.github.io/linearmodels/) is
-built on every tagged version using
-[doctr](https://github.com/drdoctr/doctr).
+built by [GitHub Actions](https://github.com/bashtage/linearmodels/blob/main/.github/workflows/generate-documentation.yml)
+when a release is published.
 [Development Documentation](https://bashtage.github.io/linearmodels/devel)
-is automatically built on every successful build of main.
+is built by the same workflow on every push to main.
 
 ## Plan and status
-
-Should eventually add some useful linear model estimators such as panel
-regression. Currently only the single variable IV estimators are polished.
 
 -   Linear Instrumental variable estimation - **complete**
 -   Linear Panel model estimation - **complete**
@@ -128,21 +145,34 @@ regression. Currently only the single variable IV estimators are polished.
 
 ## Requirements
 
+**linearmodels 7.1 is the last release that supports Python 3.10 and NumPy 1.x
+(NumPy < 2).** Later releases will raise the minimum supported versions of
+Python, NumPy and the other dependencies.
+
 ### Running
 
 -   Python 3.10+
--   NumPy (1.22+)
+-   NumPy (1.22.3+)
 -   SciPy (1.8+)
 -   pandas (1.4+)
 -   statsmodels (0.13.1+)
--   formulaic (1.0.0+)
+-   formulaic (1.2.1+)
+-   pyhdfe (0.1+)
+-   mypy_extensions (0.4+)
+-   packaging
 -   xarray (0.16+, optional)
--   Cython (3.0.10+, optional)
 
+### Building from source
+
+-   A C compiler
+-   Cython (3.1.0+)
+-   meson-python
+-   NumPy (2.0+)
+-   setuptools_scm (9.2+)
 
 ### Testing
 
--   py.test
+-   pytest (9.0+)
 
 ### Documentation
 

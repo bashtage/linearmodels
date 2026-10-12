@@ -11,15 +11,7 @@ from formulaic.model_spec import NAAction
 from formulaic.parser.algos.tokenize import tokenize
 from formulaic.utils.context import capture_context
 import numpy as np
-from pandas import (
-    Categorical,
-    DataFrame,
-    Index,
-    MultiIndex,
-    RangeIndex,
-    Series,
-    get_dummies,
-)
+from pandas import Categorical, DataFrame, Index, MultiIndex, Series, get_dummies
 from scipy.linalg import lstsq as sp_lstsq
 from scipy.sparse.linalg import lsmr
 
@@ -47,6 +39,13 @@ from linearmodels.panel.utility import (
     dummy_matrix,
     in_2core_graph,
     not_absorbed,
+)
+from linearmodels.shared.alignment import (
+    check_row_alignment,
+    differs,
+    is_labelled,
+    labels_1d,
+    misaligned,
 )
 from linearmodels.shared.exceptions import (
     InferenceUnavailableWarning,
@@ -297,72 +296,14 @@ before computing the fitted value. The best practice is to pass a DataFrame
 with a 2-level MultiIndex containing the entity- and time-ids."""
 
 
-def _is_default_index(index: Index) -> bool:
-    """Whether an index only numbers the rows, i.e., it is 0, 1, ..., n-1"""
-    return not isinstance(index, MultiIndex) and index.equals(RangeIndex(len(index)))
-
-
 def _is_labelled(value: object) -> bool:
-    """Whether the rows of an input are identified by labels.
+    """Whether the rows of a panel input are identified by labels.
 
-    pandas, xarray and PanelData inputs carry labels. Raw arrays do not, and
-    are paired with the other inputs by position. The same is true of a pandas
-    Series or DataFrame that has a default index (and default columns if it
-    does not have a MultiIndex) since there are no labels to compare.
+    The columns of a DataFrame that has a default index also carry labels, since
+    they identify the entities when the frame is time by entity. See
+    :func:`linearmodels.shared.alignment.is_labelled`.
     """
-    if isinstance(value, Series):
-        return not _is_default_index(value.index)
-    if isinstance(value, DataFrame):
-        if isinstance(value.index, MultiIndex):
-            return True
-        return not (_is_default_index(value.index) and _is_default_index(value.columns))
-    if isinstance(value, PanelData):
-        return True
-    try:
-        from xarray import DataArray  # noqa: PLC0415
-    except ImportError:
-        return False
-    return isinstance(value, DataArray)
-
-
-def _labels_1d(value: Series | DataFrame | Any) -> Index:
-    """Row labels of a Series, DataFrame or one-dimensional DataArray"""
-    if isinstance(value, (Series, DataFrame)):
-        return value.index
-    return value.get_index(value.dims[0])
-
-
-def _differs(labels: Index, expected: Index) -> bool:
-    """Whether labels, other than a default index, are not the expected labels"""
-    return not _is_default_index(labels) and not labels.equals(expected)
-
-
-def _misaligned(name: str, what: str) -> ValueError:
-    return ValueError(
-        f"{what} of {name} does not match dependent. Rows are paired by "
-        "position, so an input with labels (pandas or xarray) must use the "
-        "same labels in the same order as dependent. Use a NumPy array to pair "
-        "the values by position."
-    )
-
-
-def _check_row_alignment(name: str, labels: Index, expected: Index) -> None:
-    """Reject labelled inputs whose row index is not the dependent index.
-
-    Estimation pairs rows by position. An input with the same values in a
-    different order would attach those values to the wrong observation.
-
-    Inputs with a different number of rows are not checked here since these
-    are reported using a length-specific error message. A default index has
-    no labels and is paired by position.
-    """
-    if (
-        len(labels) != len(expected)
-        or _is_default_index(labels)
-        or labels.equals(expected)
-    ):
-        return
-    raise _misaligned(name, "The row index")
+    return is_labelled(value, columns=True)
 
 
 class _PanelModelBase:
@@ -403,7 +344,7 @@ class _PanelModelBase:
         self.exog = PanelData(exog, "Exog")
         self._dependent_labelled = _is_labelled(dependent)
         if self._dependent_labelled and _is_labelled(exog):
-            _check_row_alignment("exog", self.exog.index, self.dependent.index)
+            check_row_alignment("exog", self.exog.index, self.dependent.index)
         self._original_shape = self.dependent.shape
         self._constant = False
         self._formula: str | None = None
@@ -466,7 +407,7 @@ class _PanelModelBase:
                 "and time periods as the model data."
             )
         if self._dependent_labelled and _is_labelled(clusters):
-            _check_row_alignment("clusters", clusters_pd.index, self._original_index)
+            check_row_alignment("clusters", clusters_pd.index, self._original_index)
         clusters_pd.drop(~self.not_null)
         return clusters_pd.copy()
 
@@ -503,7 +444,7 @@ class _PanelModelBase:
             panel = PanelData(weights)
             if isinstance(weights, PanelData):
                 if labelled:
-                    _check_row_alignment("weights", panel.index, index)
+                    check_row_alignment("weights", panel.index, index)
                 return panel
             return self._grid_to_rows(panel, labelled)
 
@@ -521,23 +462,23 @@ class _PanelModelBase:
         ):
             panel = PanelData(DataFrame(weights))
             if labelled:
-                _check_row_alignment("weights", panel.index, index)
+                check_row_alignment("weights", panel.index, index)
             return panel
         elif weights.shape[0] == nobs and weights.ndim == 1:
-            if labelled and _differs(_labels_1d(weights), times):
-                raise _misaligned("weights", "The time index")
+            if labelled and differs(labels_1d(weights), times):
+                raise misaligned("weights", "The time index")
             weights_arr = np.asarray(weights)[:, None]
             weights_arr = weights_arr @ np.ones((1, nentity))
             grid = DataFrame(weights_arr, index=times, columns=entities)
         elif weights.shape[0] == nentity and weights.ndim == 1:
-            if labelled and _differs(_labels_1d(weights), entities):
-                raise _misaligned("weights", "The entity index")
+            if labelled and differs(labels_1d(weights), entities):
+                raise misaligned("weights", "The entity index")
             weights_arr = np.asarray(weights)[None, :]
             weights_arr = np.ones((nobs, 1)) @ weights_arr
             grid = DataFrame(weights_arr, index=times, columns=entities)
         elif weights.shape[0] == nentity * nobs and weights.size:
             if labelled:
-                _check_row_alignment("weights", _labels_1d(weights), index)
+                check_row_alignment("weights", labels_1d(weights), index)
             frame = self.dependent.dataframe.copy()
             # TODO: Fix this for pandas 3
             frame.iloc[:, :] = np.asarray(weights)[:, None]
@@ -575,7 +516,7 @@ class _PanelModelBase:
         if len(rows) != len(grid_index) or len(index) != len(grid_index):
             return grid
         if labelled and not rows.index.equals(grid_index):
-            raise _misaligned("weights", "The time and entity index")
+            raise misaligned("weights", "The time and entity index")
         rows = rows.set_axis(grid_index, axis=0)
         if not grid_index.equals(index):
             rows = rows.reindex(index)
@@ -1142,9 +1083,9 @@ class PooledOLS(_PanelModelBase):
         ----------
         cov_type : str
             Name of covariance estimator. See Notes.
-        debiased : bool
-            Flag indicating whether to debiased the covariance estimator using
-            a degree of freedom adjustment.
+        debiased : bool, optional
+            Flag indicating whether to debias the covariance estimator using
+            a degree of freedom adjustment. The default is True. See Notes.
         cov_config
             Additional covariance-specific options.  See Notes.
 
@@ -1174,6 +1115,12 @@ class PooledOLS(_PanelModelBase):
           * ``cluster_entity`` - Boolean flag indicating to use entity
             clusters
           * ``cluster_time`` - Boolean indicating to use time clusters
+          * ``group_debias`` - Boolean flag indicating whether to apply an
+            adjustment for the number of clusters. It multiplies the
+            covariance by g / (g - 1) * (n - 1) / n, where g is the number
+            of distinct clusters and n is the number of observations. With
+            two-way clustering, it is applied to each of the three one-way
+            covariances that are combined. The default is False.
 
         * "kernel" - Driscoll-Kraay HAC estimator. Configurations options are:
 
@@ -1182,6 +1129,14 @@ class PooledOLS(_PanelModelBase):
             estimator similar to the Newey-West covariance estimator.
           * ``bandwidth`` - Bandwidth to use when computing the kernel.  If
             not provided, a naive default is used.
+
+        ``debiased=True``, which is the default, scales the covariance by
+        n / (n - k), where k is the number of regressors, and uses the t and
+        F distributions for inference.
+
+        ``debiased=True`` and ``group_debias=True`` give the clustered
+        covariance of Stata's ``regress ..., vce(cluster ...)``.
+        See :ref:`panel-small-sample`.
         """
         y = self.dependent.values2d
         x = self.exog.values2d
@@ -1391,6 +1346,18 @@ class PanelOLS(_PanelModelBase):
 
     Model supports at most 2 effects.  These can be entity-time, entity-other,
     time-other or 2 other.
+
+    A variable in ``exog`` is absorbed if the effects explain all of it. The
+    algorithms that remove the effects are exact only up to rounding error, or up to
+    a relative error of about 1e-8 if they are iterative, so a variable is treated
+    as absorbed if less than 1e-5 of its norm is left after the effects are
+    removed, whatever its units. It is treated in the same way if it is collinear
+    with the variables before it once the effects are removed. An
+    ``AbsorbingEffectError`` is raised for such a variable. If ``drop_absorbed`` is
+    True, the variable is dropped and an ``AbsorbingEffectWarning`` is raised, and the
+    constant is never dropped. The norm includes the mean of the variable, so a
+    variable with a large mean and little other variation, less than 1e-5 of its norm,
+    is also treated as absorbed. Subtract its mean to avoid this.
     """
 
     def __init__(
@@ -1491,7 +1458,7 @@ class PanelOLS(_PanelModelBase):
                 "entities and time periods as dependent."
             )
         if labelled:
-            _check_row_alignment("other_effects", effects.index, self._original_index)
+            check_row_alignment("other_effects", effects.index, self._original_index)
 
         num_effects = effects.nvar
         if num_effects + self.entity_effects + self.time_effects > 2:
@@ -2008,9 +1975,11 @@ class PanelOLS(_PanelModelBase):
             regressors in the model and requires more than 1 GiB .
         cov_type : str
             Name of covariance estimator. See Notes.
-        debiased : bool
-            Flag indicating whether to debiased the covariance estimator using
-            a degree of freedom adjustment.
+        debiased : bool, optional
+            Flag indicating whether to debias the covariance estimator using
+            a degree of freedom adjustment. The default is True. The
+            estimated effects are counted in the degrees of freedom whether
+            or not ``debiased`` is True. See Notes.
         auto_df : bool
             Flag indicating that the treatment of estimated effects in degree
             of freedom adjustment is automatically handled. This is useful
@@ -2050,6 +2019,12 @@ class PanelOLS(_PanelModelBase):
           * ``cluster_entity`` - Boolean flag indicating to use entity
             clusters
           * ``cluster_time`` - Boolean indicating to use time clusters
+          * ``group_debias`` - Boolean flag indicating whether to apply an
+            adjustment for the number of clusters. It multiplies the
+            covariance by g / (g - 1) * (n - 1) / n, where g is the number
+            of distinct clusters and n is the number of observations. With
+            two-way clustering, it is applied to each of the three one-way
+            covariances that are combined. The default is False.
 
         * "kernel" - Driscoll-Kraay HAC estimator. Configurations options are:
 
@@ -2058,6 +2033,23 @@ class PanelOLS(_PanelModelBase):
             estimator similar to the Newey-West covariance estimator.
           * ``bandwidth`` - Bandwidth to use when computing the kernel.  If
             not provided, a naive default is used.
+
+        ``debiased=True``, which is the default, scales the covariance by
+        n / (n - k), where k is the number of regressors, and uses the t and
+        F distributions for inference.
+
+        ``debiased=True`` and ``group_debias=True`` give the clustered
+        covariance of Stata's ``xtreg, fe vce(cluster ...)``.
+        See :ref:`panel-small-sample`.
+
+        PanelOLS counts the effects that it estimates in the degrees of
+        freedom, which is ``extra_df`` of the covariance estimator. If d is
+        the number of effects, the covariance is scaled by n / (n - d - k)
+        if ``debiased`` is True and by n / (n - d) if it is False. If
+        ``auto_df`` is True, the effects are not counted when the model has
+        a single effect and each of its groups is in one cluster, for
+        example entity effects with ``cluster_entity=True``. Use
+        ``auto_df=False`` and ``count_effects`` to choose.
         """
 
         weighted = np.any(self.weights.values2d != 1.0)
@@ -2095,12 +2087,15 @@ class PanelOLS(_PanelModelBase):
                 drop_first = True
 
         if self.entity_effects or self.time_effects or self.other_effects:
+            # The regressors before the effects were removed set the scale of each
+            # column, so the check does not depend on the units of the variables
+            x_orig = np.sqrt(self.weights.values2d) * self.exog.values2d
             if not self._drop_absorbed:
-                check_absorbed(x, [str(var) for var in self.exog.vars])
+                check_absorbed(x, [str(var) for var in self.exog.vars], x_orig)
             else:
                 # TODO: Need to special case the constant here when determining which
                 #  to retain since we always want to retain the constant if present
-                retain = not_absorbed(x, self._constant, self._constant_index)
+                retain = not_absorbed(x, self._constant, self._constant_index, x_orig)
                 if not retain:
                     raise ValueError(
                         "All columns in exog have been fully absorbed by the included"
@@ -2375,9 +2370,9 @@ class BetweenOLS(_PanelModelBase):
             are accounted for when reweighting. Has no effect on balanced data.
         cov_type : str
             Name of covariance estimator. See Notes.
-        debiased : bool
-            Flag indicating whether to debiased the covariance estimator using
-            a degree of freedom adjustment.
+        debiased : bool, optional
+            Flag indicating whether to debias the covariance estimator using
+            a degree of freedom adjustment. The default is True. See Notes.
         cov_config
             Additional covariance-specific options.  See Notes.
 
@@ -2404,9 +2399,19 @@ class BetweenOLS(_PanelModelBase):
           * ``clusters`` - Input containing 1 or 2 variables.
             Clusters should be integer values, although other types will
             be coerced to integer values by treating as categorical variables
+          * ``group_debias`` - Boolean flag indicating whether to apply an
+            adjustment for the number of clusters. It multiplies the
+            covariance by g / (g - 1) * (n - 1) / n, where g is the number
+            of distinct clusters and n is the number of observations. With
+            two-way clustering, it is applied to each of the three one-way
+            covariances that are combined. The default is False.
 
         When using a clustered covariance estimator, all cluster ids must be
         identical within an entity.
+
+        ``debiased=True``, which is the default, scales the covariance by
+        n / (n - k), where k is the number of regressors, and uses the t and
+        F distributions for inference. See :ref:`panel-small-sample`.
         """
         y, x, w = self._prepare_between()
         if np.all(self.weights.values2d == 1.0) and not reweight:
@@ -2679,9 +2684,9 @@ class FirstDifferenceOLS(_PanelModelBase):
         ----------
         cov_type : str
             Name of covariance estimator. See Notes.
-        debiased : bool
-            Flag indicating whether to debiased the covariance estimator using
-            a degree of freedom adjustment.
+        debiased : bool, optional
+            Flag indicating whether to debias the covariance estimator using
+            a degree of freedom adjustment. The default is True. See Notes.
         cov_config
             Additional covariance-specific options.  See Notes.
 
@@ -2711,6 +2716,12 @@ class FirstDifferenceOLS(_PanelModelBase):
             be coerced to integer values by treating as categorical variables
           * ``cluster_entity`` - Boolean flag indicating to use entity
             clusters
+          * ``group_debias`` - Boolean flag indicating whether to apply an
+            adjustment for the number of clusters. It multiplies the
+            covariance by g / (g - 1) * (n - 1) / n, where g is the number
+            of distinct clusters and n is the number of observations. With
+            two-way clustering, it is applied to each of the three one-way
+            covariances that are combined. The default is False.
 
         * "kernel" - Driscoll-Kraay HAC estimator. Configurations options are:
 
@@ -2723,6 +2734,10 @@ class FirstDifferenceOLS(_PanelModelBase):
         When using a clustered covariance estimator, all cluster ids must be
         identical within a first difference.  In most scenarios, this requires
         ids to be identical within an entity.
+
+        ``debiased=True``, which is the default, scales the covariance by
+        n / (n - k), where k is the number of regressors, and uses the t and
+        F distributions for inference. See :ref:`panel-small-sample`.
         """
         y_fd = self.dependent.first_difference()
         time_ids = y_fd.time_ids
@@ -3001,9 +3016,9 @@ class RandomEffects(_PanelModelBase):
             the random effect.
         cov_type : str
             Name of covariance estimator (see notes). Default is "unadjusted".
-        debiased : bool
-            Flag indicating whether to debiased the covariance estimator using
-            a degree of freedom adjustment.
+        debiased : bool, optional
+            Flag indicating whether to debias the covariance estimator using
+            a degree of freedom adjustment. The default is True. See Notes.
         cov_config
             Additional covariance-specific options.  See Notes.
 
@@ -3033,6 +3048,12 @@ class RandomEffects(_PanelModelBase):
           * ``cluster_entity`` - Boolean flag indicating to use entity
             clusters
           * ``cluster_time`` - Boolean indicating to use time clusters
+          * ``group_debias`` - Boolean flag indicating whether to apply an
+            adjustment for the number of clusters. It multiplies the
+            covariance by g / (g - 1) * (n - 1) / n, where g is the number
+            of distinct clusters and n is the number of observations. With
+            two-way clustering, it is applied to each of the three one-way
+            covariances that are combined. The default is False.
 
         * "kernel" - Driscoll-Kraay HAC estimator. Configurations options are:
 
@@ -3041,6 +3062,14 @@ class RandomEffects(_PanelModelBase):
             estimator similar to the Newey-West covariance estimator.
           * ``bandwidth`` - Bandwidth to use when computing the kernel.  If
             not provided, a naive default is used.
+
+        ``debiased=True``, which is the default, scales the covariance by
+        n / (n - k), where k is the number of regressors, and uses the t and
+        F distributions for inference.
+
+        ``debiased=True`` and ``group_debias=True`` give the clustered
+        covariance of Stata's ``xtreg, re vce(cluster ...)``.
+        See :ref:`panel-small-sample`.
         """
         w = self.weights.values2d
         root_w = cast("linearmodels.typing.data.Float64Array", np.sqrt(w))
@@ -3207,9 +3236,28 @@ class FamaMacBeth(_PanelModelBase):
     implementation based on regressing all observation in a single
     time period is "as-if" time effects are included.
 
+    Each period needs at least as many entities as regressors, and the
+    regressors must vary across the entities of the period, so that they are
+    not collinear: a regressor that depends only on time is collinear with the
+    constant. Periods whose cross-section is rank deficient are dropped with a
+    warning, and T counts only the periods that are used. It is an error if no
+    period can be used.
+
     Parameter inference is made using the set of T parameter estimates with
     either the standard covariance estimator or a kernel-based covariance,
-    depending on ``cov_type``.
+    depending on ``cov_type``. Since the parameters are the averages of the T
+    cross-sectional estimates, the t-statistics are compared with a t
+    distribution with T - 1 degrees of freedom, which is the convention of
+    Fama and MacBeth [1]_. T is the number of periods whose cross-sectional
+    regression is estimated. The p-values and confidence intervals use this
+    distribution if ``debiased`` is True, which is the default, and the normal
+    distribution otherwise.
+
+    References
+    ----------
+    .. [1] Fama, E. F. and MacBeth, J. D. (1973). Risk, return, and
+       equilibrium: Empirical tests. Journal of Political Economy, 81(3),
+       607-636.
     """
 
     def __init__(
@@ -3247,9 +3295,17 @@ class FamaMacBeth(_PanelModelBase):
         valid_blocks = wx_df.groupby(level=1).apply(validate_block)
         if not valid_blocks.any():
             err = (
-                "Model cannot be estimated. All blocks of time-series observations "
-                "are rank deficient, and so it is not possible to estimate any"
-                "cross-sectional regressions."
+                "Model cannot be estimated. Fama-MacBeth estimates one "
+                "cross-sectional regression for each time period, using the "
+                "entities that are observed in the period, and none of these "
+                "regressions can be estimated. A cross-section needs at least "
+                "as many entities as regressors, and its regressors must not be "
+                "collinear, so the regressors must vary across entities within "
+                "a period. A regressor that depends only on time is collinear "
+                "with the constant, and a panel with a single entity has one "
+                "observation in each cross-section. Use more entities, remove "
+                "the regressors that do not vary across entities, or, for a "
+                "single entity, estimate a time-series regression."
             )
             raise ValueError(err)
         if valid_blocks.sum() < exog.shape[1]:
@@ -3287,7 +3343,10 @@ class FamaMacBeth(_PanelModelBase):
             Name of covariance estimator (see notes). Default is "unadjusted".
         debiased : bool
             Flag indicating whether to debiased the covariance estimator using
-            a degree of freedom adjustment.
+            a degree of freedom adjustment, which uses T - 1 instead of T when
+            the covariance of the T estimates is computed, and to use a t
+            distribution with T - 1 degrees of freedom for inference. If
+            False, inference uses the normal distribution.
         bandwidth : float
             The bandwidth to use when cov_type is "kernel". If None, it is
             automatically computed.
@@ -3311,7 +3370,26 @@ class FamaMacBeth(_PanelModelBase):
 
         * "unadjusted", "homoskedastic", "robust", "heteroskedastic" use the
           standard covariance estimator of the T parameter estimates.
-        * "kernel" is a HAC estimator. Configurations options are:
+        * "kernel" is a HAC estimator of the covariance of the T parameter
+          estimates. The configuration options are ``kernel`` and ``bandwidth``.
+
+        The parameters are the averages of the T cross-sectional estimates, and
+        T is the number of periods whose cross-sectional regression is
+        estimated: periods that cannot be estimated are not counted. If
+        ``debiased`` is True, which is the default, the p-values and
+        confidence intervals use a t distribution with T - 1 degrees of
+        freedom, which is the convention of Fama and MacBeth (1973) and is the
+        ``df_resid`` of the results. The standard and the kernel covariance
+        estimators use the same distribution. If ``debiased`` is False, they
+        use the normal distribution. The estimates and the standard errors
+        do not depend on the distribution.
+
+        .. versionchanged:: 7.1
+
+           The p-values and confidence intervals use T - 1 degrees of freedom.
+           Earlier versions used nobs - nvar degrees of freedom, those of a
+           pooled regression, which is close to the normal distribution when
+           there are many observations.
         """
         y = cast("linearmodels.typing.data.Float64Array", self._y)
         x = cast("linearmodels.typing.data.Float64Array", self._x)
@@ -3410,9 +3488,15 @@ class FamaMacBeth(_PanelModelBase):
             bandwidth=bandwidth,
         )
 
-        df_resid = wy.shape[0] - params.shape[0]
+        # T is the number of cross-sectional estimates that are averaged, the
+        # periods that could be estimated, which are also the periods that the
+        # covariance uses. Inference uses t(T - 1)
+        nperiod = int(np.isfinite(np.asarray(all_params)).all(axis=1).sum())
+        df_resid = nperiod - 1
+        # The classical F-statistic is that of the pooled regression
+        pooled_df_resid = wy.shape[0] - params.shape[0]
         res = self._postestimation(
-            params, cov, debiased, df_resid, weps, wy, wx, root_w
+            params, cov, debiased, pooled_df_resid, weps, wy, wx, root_w
         )
         index = self.dependent.index
         res.update(

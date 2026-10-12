@@ -2,15 +2,15 @@
 meson-python>=0.18.0
 meson
 ninja
-setuptools_scm[toml]>=8.0.3,<9
+setuptools_scm[toml]>=9.2.0,<10
 packaging
 wheel
 
 # Performance
-cython>=3.0.10
+cython>=3.1.0,<4
 
 # Testing
-pytest>=8.4.1,<9
+pytest>=9,<10
 pytest-xdist
 pytest-cov
 pytest-randomly
@@ -35,7 +35,7 @@ jupyterlab-code-formatter
 nbconvert
 nbformat
 nbsphinx
-numpydoc
+numpydoc>=1.10
 seaborn
 sphinx
 sphinx-immaterial

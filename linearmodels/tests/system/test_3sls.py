@@ -13,6 +13,7 @@ from linearmodels.tests.system._utility import (
     generate_3sls_data,
     generate_3sls_data_v2,
     simple_3sls,
+    weighted_fit_measures,
 )
 
 nexog = [3, [1, 2, 3, 4, 5]]
@@ -166,6 +167,39 @@ def test_single_equation(data):
     assert_allclose(np.diag(res.cov), np.diag(out.cov))
 
 
+@pytest.mark.parametrize("method", ["ols", "gls"])
+def test_weighted_residuals_and_r2(method):
+    data = generate_3sls_data(
+        n=250,
+        k=3,
+        p=3,
+        en=2,
+        instr=3,
+        const=True,
+        rho=0.8,
+        common_exog=False,
+        included_weights=True,
+        output_dict=True,
+    )
+    res = IV3SLS(data).fit(method=method)
+    rss = tss = 0.0
+    for key, eqn in data.items():
+        eq_res = res.equations[key]
+        direct = weighted_fit_measures(eqn, eq_res.params)
+        # The residuals are those of the model and do not use the weights
+        assert_allclose(eq_res.resids, direct.resid.squeeze())
+        assert_allclose(
+            eq_res.fitted_values + eq_res.resids, eqn["dependent"].squeeze()
+        )
+        if method == "ols":
+            assert_allclose(eq_res.wresids, direct.wresid.squeeze())
+        assert_allclose(eq_res.resid_ss, direct.rss)
+        assert_allclose(eq_res.rsquared, 1 - direct.rss / direct.tss)
+        rss += direct.rss
+        tss += direct.tss
+    assert_allclose(res.rsquared, 1 - rss / tss)
+
+
 @pytest.mark.parametrize("common_exog", [True, False])
 def test_weighted_against_transformed_data(common_exog):
     # Weighted 3SLS is 3SLS on the data scaled by the square root of the
@@ -259,7 +293,9 @@ def test_redundant_instruments():
     eqns = {}
     for i in range(2):
         eqns[f"eqn.{i}"] = (dep[:, i], exog, endog, instr)
-    with pytest.raises(ValueError, match=r"Equation eqn.0"):
+    with pytest.raises(
+        ValueError, match=r"Equation eqn.0 instrument array is not full"
+    ):
         IV3SLS(eqns)
 
 

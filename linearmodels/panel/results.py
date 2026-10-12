@@ -5,7 +5,7 @@ from linearmodels.compat.statsmodels import Summary
 from collections.abc import Mapping
 import datetime as dt
 from functools import cached_property
-from typing import Any, Union
+from typing import Any, NamedTuple, Union
 import warnings
 
 from formulaic.utils.context import capture_context
@@ -30,6 +30,7 @@ import linearmodels.typing.data
 
 __all__ = [
     "FamaMacBethResults",
+    "HausmanTestResults",
     "PanelEffectsResults",
     "PanelResults",
     "RandomEffectsResults",
@@ -577,7 +578,29 @@ class PanelResults(_SummaryStr):
 
         Notes
         -----
-        NaN filled when models do not include effects.
+        The combined effect of all of the effects in the model, in one column.
+        It is the sum of the entity, time and other effects of each
+        observation. The effects are not available separately.
+        See :ref:`panel-estimated-effects` for how to recover the entity and
+        time effects of a model that has both.
+
+        The estimated effects have no standard errors or any other inference.
+        They are not estimated consistently when the number of time periods is
+        fixed. The effect of an entity is estimated from its observations, so
+        the error does not shrink when the number of entities grows. To make
+        inference about the effects of a small number of entities, include
+        them as dummy variables in the regression.
+
+        The values are NaN for models that do not have effects, which are
+        PooledOLS, FirstDifferenceOLS and FamaMacBeth. They are 0 for a
+        PanelOLS model without effects.
+
+        The effects of RandomEffects are theta times the entity mean of the
+        difference between the dependent variable and the fitted values, where
+        theta is in the results. They are all 0 if the estimated variance of
+        the random effect is negative and so it is set to 0, since theta is
+        then 0 and the model is pooled OLS. ``variance_decomposition`` shows
+        whether this is the case.
         """
         return self._effects
 
@@ -603,6 +626,19 @@ class PanelResults(_SummaryStr):
             self._wresids.squeeze(), index=self._index, name="weighted residual"
         )
 
+    def _pesaran_cd_inapplicable(self) -> str | None:
+        """Reason why the Pesaran CD test is not valid for the model, if any"""
+        from linearmodels.panel.model import BetweenOLS  # noqa: PLC0415
+
+        if isinstance(self.model, BetweenOLS):
+            return (
+                "The Pesaran CD test is not applicable to BetweenOLS. The model "
+                "is fitted to the entity means, so it has no time-varying "
+                "residuals, and the series implied by its coefficients is not "
+                "the model's error."
+            )
+        return None
+
     @cached_property
     def pesaran_cd(self) -> InapplicableTestStatistic | NormalTestStatistic:
         r"""
@@ -610,17 +646,19 @@ class PanelResults(_SummaryStr):
 
         Returns
         -------
-        NormalTestStatistic
-            Statistic value, distribution and p-value.
+        NormalTestStatistic or InapplicableTestStatistic
+            Statistic value, distribution and p-value. If the test is not
+            valid for the model, an InapplicableTestStatistic that explains
+            why in its reason.
 
         Notes
         -----
         Tests the null hypothesis that the model's idiosyncratic shocks are
-        cross-sectionally independent. Let :math:`\hat{\rho}_{ij}` denote the
-        sample correlation of the estimated idiosyncratic shocks for entities
-        :math:`i` and :math:`j`, computed using their common time observations,
-        and let :math:`T_{ij}` denote the number of overlapping observations.
-        The statistic is
+        cross-sectionally independent [1]_. Let :math:`\hat{\rho}_{ij}` denote
+        the sample correlation of the estimated idiosyncratic shocks for
+        entities :math:`i` and :math:`j`, computed using their common time
+        observations, and let :math:`T_{ij}` denote the number of overlapping
+        observations. The statistic is
 
         .. math::
 
@@ -630,12 +668,69 @@ class PanelResults(_SummaryStr):
         overlapping observations and finite pairwise correlation estimates.
         Under the null, the statistic is asymptotically standard normal.
 
+        The shocks are the model's ``idiosyncratic`` values, so the weights of
+        a weighted model are not applied to them. The exception is
+        ``FirstDifferenceOLS``, which uses ``resids``, the residuals of the
+        differenced equation, as ``plm::pcdtest`` does for a pooled regression
+        of the differenced data. Its ``idiosyncratic`` values are in levels,
+        and are persistent when the errors are, for example a random walk,
+        which is when first differences are used. Since the correlations are
+        computed over time, the test assumes that the shocks are not serially
+        correlated, and it over-rejects if they are persistent. Conversely, if
+        the errors in levels are serially uncorrelated, the residuals of
+        ``FirstDifferenceOLS`` are negatively autocorrelated (an MA(1) with
+        autocorrelation -0.5) and the test over-rejects, with a size of about
+        11% at the nominal 5% level in large panels. The test is then better
+        applied to a ``PanelOLS`` model with entity effects.
+
+        The test is not valid for every model and an InapplicableTestStatistic
+        is returned for the following.
+
+        * ``BetweenOLS``. The model is fitted to the entity means, so it has
+          no time-varying residuals, and the series implied by its
+          coefficients is not the model's error.
+        * ``FamaMacBeth``. The model's errors are the residuals of the
+          period-by-period cross-sectional regressions. The series implied by
+          the averaged coefficients contains the common, time-varying term
+          :math:`(\beta_t - \bar{\beta})^{\prime}x_{it}`, so it is
+          cross-sectionally dependent by construction. Fama-MacBeth inference
+          is also already robust to cross-sectional dependence.
+        * Models with time effects, and models with other effects that
+          change over time for some entity and have a group of several
+          entities that is missing from some periods, such as period,
+          industry-by-period or decade effects. These effects demean the
+          residuals across entities that are observed in the same periods,
+          which makes the residuals negatively correlated across entities
+          and biases the statistic downwards. For example, when the model
+          has time effects and the errors are independent, the statistic is
+          centered at about :math:`-\sqrt{T/2}` and its standard deviation
+          is far below 1, so it is not standard normal [2]_. Other effects
+          that do not change over time for an entity, or that are present
+          in every period, are not affected.
+
+        The statistic is computed from dense N by N matrices of pairwise
+        correlations and numbers of overlapping observations, where N is the
+        number of entities. Computing them takes about 450 MB of memory when
+        N is 4,000, and the memory use is proportional to the square of N.
+
         References
         ----------
-        Pesaran, M. H. (2021). General diagnostic tests for cross-sectional
-        dependence in panels. Empirical Economics, 60(1), 13-50.
+        .. [1] Pesaran, M. H. (2021). General diagnostic tests for
+           cross-sectional dependence in panels. Empirical Economics, 60(1),
+           13-50.
+        .. [2] Juodis, A. and Reese, S. (2022). The incidental parameters
+           problem in testing for remaining cross-section correlation.
+           Journal of Business & Economic Statistics, 40(3), 1191-1203.
         """
-        eps = self.idiosyncratic.iloc[:, 0]
+        from linearmodels.panel.model import FirstDifferenceOLS  # noqa: PLC0415
+
+        reason = self._pesaran_cd_inapplicable()
+        if reason is not None:
+            return InapplicableTestStatistic(reason=reason, name="Pesaran CD test")
+        if isinstance(self.model, FirstDifferenceOLS):
+            eps = self.resids
+        else:
+            eps = self.idiosyncratic.iloc[:, 0]
         wide = eps.unstack(level=0)
         wide = wide.loc[:, wide.notnull().any(axis=0)]
         nentity = wide.shape[1]
@@ -769,6 +864,11 @@ class PanelResults(_SummaryStr):
               {"x1": 0, "x2+x3": 1}.
 
             It is not possible to use both ``restriction`` and ``formula``.
+            The names in the restrictions are the entries of the index of
+            ``params``. A name that is not valid Python, for example one that
+            contains ``:`` or ``[`` such as ``C(year)[T.1987]:educ``, must be
+            enclosed in back-ticks, e.g.,
+            ``"`C(year)[T.1987]:educ` = 0"``.
 
         Returns
         -------
@@ -810,10 +910,44 @@ class PanelResults(_SummaryStr):
 
         >>> formula = "union = married = 0"
         >>> wald_res = fe_res.wald_test(formula=formula)
+
+        A name that is not valid Python, such as the interaction of a
+        categorical variable with a regressor, is enclosed in back-ticks
+
+        >>> from linearmodels import PooledOLS
+        >>> mod = PooledOLS.from_formula("lwage ~ 1 + union + C(year) * educ", data)
+        >>> res = mod.fit(cov_type="clustered", cluster_entity=True)
+        >>> null = "`C(year)[T.1987]:educ` = 0, `C(year)[T.1986]:educ` = 0"
+        >>> wald_res = res.wald_test(formula=null)
         """
         return quadratic_form_test(
             self.params, self.cov, restriction=restriction, value=value, formula=formula
         )
+
+
+def _is_concentrated_in_time(groups: Any, entity_ids: Any, time_ids: Any) -> bool:
+    """
+    Test whether groups of entities change over time and are missing in periods
+
+    Removing the mean of a group that is the same in every period for an
+    entity does not change the correlations over time. Removing the mean of a
+    group that changes over time and is not observed in every period removes a
+    component that varies over time and is shared by the entities in the group.
+    A group with a single entity is not shared.
+    """
+    frame = DataFrame(
+        {
+            "group": np.asarray(groups).ravel(),
+            "entity": np.asarray(entity_ids).ravel(),
+            "time": np.asarray(time_ids).ravel(),
+        }
+    )
+    if frame.groupby("entity")["group"].nunique().max() <= 1:
+        return False
+    by_group = frame.groupby("group")
+    shared = by_group["entity"].nunique() > 1
+    nperiod = frame["time"].nunique()
+    return bool((by_group["time"].nunique()[shared] < nperiod).any())
 
 
 class PanelEffectsResults(PanelResults):
@@ -833,6 +967,28 @@ class PanelEffectsResults(PanelResults):
         self._sigma2_effects = res.sigma2_effects
         self._r2_ex_effects = res.r2_ex_effects
         self._effects = res.effects
+
+    def _pesaran_cd_inapplicable(self) -> str | None:
+        reason = (
+            "The Pesaran CD test is not applicable to models with {effect}. "
+            "These effects demean the residuals across entities that are "
+            "observed in the same periods, which makes the residuals "
+            "negatively correlated across entities and biases the statistic "
+            "downwards, away from its null distribution (Juodis and Reese, "
+            "2022)."
+        )
+        if self._time_effect:
+            return reason.format(effect="time effects")
+        if self._other_effect:
+            other = self.model._other_effect_cats.dataframe
+            entity_ids = self.model.dependent.entity_ids
+            time_ids = self.model.dependent.time_ids
+            for col in other:
+                if _is_concentrated_in_time(other[col], entity_ids, time_ids):
+                    return reason.format(
+                        effect="other effects that are concentrated in some periods"
+                    )
+        return super()._pesaran_cd_inapplicable()
 
     @property
     def f_pooled(self) -> WaldTestStatistic:
@@ -965,6 +1121,79 @@ def _has_unadjusted_cov(res: PanelResults) -> bool:
     return type(estimator) is HomoskedasticCovariance
 
 
+def _check_same_sample(res: PanelResults, other: PanelResults) -> None:
+    """Check that two sets of results use the same data and weights"""
+    if res.nobs != other.nobs:
+        raise ValueError(
+            "The models must be estimated using the same observations. "
+            f"This model uses {res.nobs} and other uses {other.nobs}."
+        )
+    model, other_model = res.model, other.model
+    if not model.dependent.index.equals(other_model.dependent.index):
+        raise ValueError(
+            "The models must be estimated using the same observations. The "
+            "entities and time periods of the observations differ."
+        )
+    if not np.allclose(
+        model.dependent.values2d, other_model.dependent.values2d, rtol=1e-10, atol=0.0
+    ):
+        raise ValueError(
+            "The models must have the same dependent variable, but the "
+            "dependent variables of the models differ."
+        )
+    # Weights are rescaled to have mean 1, so only the relative weights matter
+    if not np.allclose(
+        model.weights.values2d, other_model.weights.values2d, rtol=1e-10, atol=0.0
+    ):
+        raise ValueError(
+            "The models must be estimated using the same weights, but the "
+            "weights of the models differ."
+        )
+
+
+class HausmanTestResults(NamedTuple):
+    """
+    Results of a Hausman specification test.
+
+    Parameters
+    ----------
+    statistic : WaldTestStatistic or InvalidTestStatistic
+        The test statistic with its p-value, distribution and null hypothesis.
+        An InvalidTestStatistic is used if the statistic is negative or not
+        finite, which means that the models do not meet the assumptions of the
+        test.
+    estimates : DataFrame
+        The coefficients included in the test. The columns are ``b0`` (from
+        the model that is consistent under both hypotheses, ``other``), ``b1``
+        (from the model that is efficient under the null), their difference
+        ``b0-b1`` and ``Std. Err.``, the standard error of the difference.
+        The standard error is NaN if the variance of the difference is
+        negative.
+
+    See Also
+    --------
+    RandomEffectsResults.hausman
+        Compute the Hausman specification test.
+
+    Notes
+    -----
+    The results are a named tuple, so the statistic and the estimates can be
+    unpacked as in ``statistic, estimates = results`` or read using the
+    ``statistic`` and ``estimates`` fields. Printing the results shows the
+    statistic followed by the table of estimates.
+    """
+
+    statistic: WaldTestStatistic | InvalidTestStatistic
+    estimates: DataFrame
+
+    def __str__(self) -> str:
+        legend = "b0: consistent under H0 and H1, b1: efficient under H0"
+        return f"{self.statistic}\n\nCoefficients ({legend})\n{self.estimates}"
+
+    def __repr__(self) -> str:
+        return self.__str__()
+
+
 class RandomEffectsResults(PanelResults):
     """
     Results container for random effect panel data models
@@ -989,46 +1218,47 @@ class RandomEffectsResults(PanelResults):
         """Values used in generalized demeaning"""
         return self._theta
 
-    def wu_hausman(
+    def hausman(
         self,
         other: PanelResults,
         include_constant: bool = False,
         sigmamore: bool = False,
         sigmaless: bool = False,
-    ) -> tuple[InvalidTestStatistic | WaldTestStatistic, DataFrame]:
+    ) -> HausmanTestResults:
         r"""
-        Hausman specification test against results from a consistent model
+        Hausman specification test against results from a consistent model.
 
         Parameters
         ----------
         other : PanelResults
             Results from a model that is consistent whether or not the null
             hypothesis is true, typically a fixed effects (entity effects)
-            model estimated using the same observations and regressors as
-            this model.
-        include_constant : bool
+            model estimated using the same observations, dependent variable,
+            regressors and weights as this model.
+        include_constant : bool, optional
             Flag indicating whether to include the constant in the comparison.
             The default is False.
-        sigmamore : bool
+        sigmamore : bool, optional
             Flag indicating whether to base both covariance estimates on the
             error variance estimated by this model, which is efficient under
-            the null. Cannot be used with ``sigmaless``.
-        sigmaless : bool
+            the null. Cannot be used with ``sigmaless``. The default is False.
+        sigmaless : bool, optional
             Flag indicating whether to base both covariance estimates on the
             error variance estimated by ``other``. Cannot be used with
-            ``sigmamore``.
+            ``sigmamore``. The default is False.
 
         Returns
         -------
-        WaldTestStatistic or InvalidTestStatistic
-            Object containing test statistic, p-value, distribution and null.
-            An InvalidTestStatistic is returned when the statistic is negative.
-        DataFrame
-            The coefficients included in the test. The columns are ``b0``
-            (from ``other``), ``b1`` (from this model), their difference
-            ``b0-b1`` and ``Std. Err.``, the standard error of the difference.
-            The standard error is NaN if the variance of the difference is
-            negative.
+        HausmanTestResults
+            A named tuple with the fields ``statistic``, which contains the
+            test statistic, p-value, distribution and null as a
+            WaldTestStatistic, and ``estimates``, a DataFrame with the
+            coefficients included in the test. An InvalidTestStatistic is
+            returned as the statistic when the statistic is negative or not
+            finite. The columns of ``estimates`` are ``b0`` (from ``other``),
+            ``b1`` (from this model), their difference ``b0-b1`` and
+            ``Std. Err.``, the standard error of the difference. The standard
+            error is NaN if the variance of the difference is negative.
 
         Raises
         ------
@@ -1037,8 +1267,9 @@ class RandomEffectsResults(PanelResults):
             was not estimated using the unadjusted covariance estimator.
         ValueError
             If ``sigmamore`` and ``sigmaless`` are both True, if the models
-            use different numbers of observations, or if the models do not
-            have any coefficients in common.
+            were not estimated using the same observations, dependent variable
+            and weights, or if the models do not have any coefficients in
+            common.
 
         Notes
         -----
@@ -1064,12 +1295,26 @@ class RandomEffectsResults(PanelResults):
         The result is only meaningful when :math:`V_0 - V_1` is positive
         definite, which is guaranteed in large samples if the null is true. If
         it is not, a warning is issued and a generalized inverse is used. If
-        the resulting statistic is negative, the data do not satisfy the
-        assumptions of the test and an InvalidTestStatistic is returned.
+        the resulting statistic is negative or not finite, the data do not
+        satisfy the assumptions of the test and an InvalidTestStatistic is
+        returned. This can happen, for example, if ``other`` is a pooled
+        model, since the unadjusted covariance of a pooled model ignores the
+        entity effects.
 
-        Both models must use the default unadjusted covariance estimator, and
-        the statistic requires that ``other`` is estimated using the same
-        observations as this model.
+        Both models must use the default unadjusted covariance estimator. The
+        statistic also requires that the models are estimated using the same
+        observations, the same dependent variable and the same weights, which
+        are checked. The regressors are not checked: only coefficients with
+        the same name in both models are compared.
+
+        Effects that are included in ``other`` but not in this model are not
+        tested separately. For example, if ``other`` includes time effects
+        and this model does not, the null hypothesis is that the regressors
+        are uncorrelated with the entity effects and with the time effects,
+        and the test can reject because of the time effects. To test only the
+        entity effects, include the time dummies as regressors in this model.
+        Only the coefficients found in both models are compared, so the
+        coefficients on the time dummies are not part of the test.
 
         References
         ----------
@@ -1081,8 +1326,12 @@ class RandomEffectsResults(PanelResults):
         >>> from linearmodels import PanelOLS, RandomEffects
         >>> fe_res = PanelOLS(y, x, entity_effects=True).fit()
         >>> re_res = RandomEffects(y, x).fit()
-        >>> test, estimates = re_res.wu_hausman(fe_res)
-        >>> print(test)
+        >>> results = re_res.hausman(fe_res)
+        >>> print(results)
+
+        The statistic and the estimates can be unpacked.
+
+        >>> test, estimates = results
         """
         if not isinstance(other, PanelResults):
             raise TypeError("other must be the results of a panel model.")
@@ -1093,11 +1342,7 @@ class RandomEffectsResults(PanelResults):
                 "The Hausman test can only be used with models estimated using "
                 "the unadjusted covariance estimator."
             )
-        if self.nobs != other.nobs:
-            raise ValueError(
-                "The models must be estimated using the same observations. "
-                f"This model uses {self.nobs} and other uses {other.nobs}."
-            )
+        _check_same_sample(self, other)
 
         in_other = set(other.params.index)
         common = [name for name in self.params.index if name in in_other]
@@ -1133,6 +1378,14 @@ class RandomEffectsResults(PanelResults):
 
         diff = var_diff.to_numpy()
         delta = b_diff.to_numpy()
+        name = "Hausman specification test"
+        if not (np.all(np.isfinite(diff)) and np.all(np.isfinite(delta))):
+            invalid = InvalidTestStatistic(
+                "The coefficients or covariances of the models are not finite, "
+                "so the statistic cannot be computed.",
+                name=name,
+            )
+            return HausmanTestResults(invalid, estimates)
         try:
             np.linalg.cholesky(diff)
             positive_definite = True
@@ -1149,16 +1402,17 @@ class RandomEffectsResults(PanelResults):
             )
             stat = float(delta @ np.linalg.pinv(diff, hermitian=True) @ delta)
 
-        name = "Hausman specification test"
-        if stat < 0:
+        if not np.isfinite(stat) or stat < 0:
+            problem = "not finite" if not np.isfinite(stat) else "negative"
             invalid = InvalidTestStatistic(
-                "The statistic is negative, so the models do not meet the "
+                f"The statistic is {problem}, so the models do not meet the "
                 "assumptions of the Hausman test.",
                 name=name,
             )
-            return invalid, estimates
+            return HausmanTestResults(invalid, estimates)
         null = "No systematic difference in coefficients between models"
-        return WaldTestStatistic(stat, null, len(common), name=name), estimates
+        wald = WaldTestStatistic(stat, null, len(common), name=name)
+        return HausmanTestResults(wald, estimates)
 
 
 PanelModelResults = Union[PanelEffectsResults, PanelResults, RandomEffectsResults]
@@ -1174,6 +1428,43 @@ class FamaMacBethResults(PanelResults):
         self._all_params = res.all_params
         self._avg_r2 = res.avg_r2
         self._avg_adj_r2 = res.avg_adj_r2
+
+    @property
+    def df_resid(self) -> int:
+        """
+        Degrees of freedom of the t distribution used for inference.
+
+        Returns
+        -------
+        int
+            T - 1, where T is the number of cross-sectional regressions that
+            are averaged.
+
+        Notes
+        -----
+        The parameters are the average of T cross-sectional estimates, and
+        their covariance is estimated from the same T estimates. If
+        ``debiased`` is True, p-values and confidence intervals use a t
+        distribution with T - 1 degrees of freedom, as in Fama and MacBeth
+        (1973), and ``f_statistic_robust`` uses an F distribution with this
+        denominator degree of freedom. The periods whose cross-section cannot
+        be estimated are not counted. This is not nobs minus nvar, which is the
+        residual degree of freedom of the pooled regression and the one that
+        ``f_statistic``, the classical F-statistic of the pooled regression,
+        uses.
+        """
+        return self._df_resid
+
+    def _pesaran_cd_inapplicable(self) -> str | None:
+        return (
+            "The Pesaran CD test is not applicable to FamaMacBeth. The errors "
+            "of the model are the residuals of the period-by-period "
+            "cross-sectional regressions. The series implied by the averaged "
+            "coefficients contains the common, time-varying term "
+            "(beta_t - beta_bar)'x_it, so it is cross-sectionally dependent by "
+            "construction. Fama-MacBeth inference is already robust to "
+            "cross-sectional dependence."
+        )
 
     @property
     def all_params(self) -> DataFrame:
