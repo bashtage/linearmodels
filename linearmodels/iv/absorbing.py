@@ -1256,8 +1256,8 @@ class AbsorbingLS:
 
             .. deprecated:: 4.17
 
-               Use absorb_options to pass options. ``lsmr_options`` will be
-               removed in linearmodels 8.0.
+               Use absorb_options with method="lsmr" to pass options.
+               ``lsmr_options`` will be removed in linearmodels 8.0.
 
         cov_config
             Additional parameters to pass to covariance estimator. The list
@@ -1320,7 +1320,8 @@ class AbsorbingLS:
                 raise ValueError("absorb_options cannot be used with lsmr_options")
             warnings.warn(
                 "lsmr_options is deprecated and will be removed in linearmodels "
-                "8.0. Use absorb_options.",
+                '8.0. Use absorb_options with method="lsmr", which passes the options '
+                "to scipy.sparse.linalg.lsmr.",
                 FutureWarning,
                 stacklevel=2,
             )

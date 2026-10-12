@@ -3,6 +3,8 @@ Validation and messages of AbsorbingLS and the IV models.
 
 * AbsorbingLS.fit accepts the methods "auto", "hdfe" and "lsmr", whatever their case,
   and nothing else. It used LSMR for any other name.
+* The FutureWarning of lsmr_options says what to use instead, which needs a method on
+  models that can use HDFE.
 """
 
 import numpy as np
@@ -105,3 +107,25 @@ def test_method_with_another_case_does_not_absorb_again(data, monkeypatch):
     assert len(calls) == 1
     mod.fit(method="LSMR")
     assert len(calls) == 2
+
+
+def test_lsmr_options_warning_says_how_to_migrate(data, spy_lsmr):
+    y, x, cats = data
+    options = {"atol": 1e-9, "btol": 1e-9}
+    with pytest.warns(FutureWarning, match=r'absorb_options with method="lsmr"') as rec:
+        old = AbsorbingLS(y, x, absorb=cats).fit(lsmr_options=options)
+    assert len([w for w in rec if issubclass(w.category, FutureWarning)]) == 1
+    assert len(spy_lsmr) == 1
+
+    # The advice of the warning gives the same results without a warning. The model
+    # can be absorbed using HDFE, and then the options of LSMR need the method.
+    new = AbsorbingLS(y, x, absorb=cats).fit(method="lsmr", absorb_options=options)
+    assert_allclose(new.params, old.params, rtol=1e-12)
+    assert_allclose(new.std_errors, old.std_errors, rtol=1e-12)
+    with pytest.raises(ValueError, match=r'method="lsmr"'):
+        AbsorbingLS(y, x, absorb=cats).fit(absorb_options=options)
+
+
+def test_deprecation_note_in_docstring_names_the_method():
+    doc = AbsorbingLS.fit.__doc__
+    assert 'Use absorb_options with method="lsmr"' in " ".join(doc.split())
