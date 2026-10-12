@@ -187,6 +187,20 @@ def test_idiosyncratic_variance_is_that_of_the_fixed_effects(data, design):
     assert_allclose(re_res.variance_decomposition["Residual"], fe_res.s2)
 
 
+@pytest.mark.parametrize("scale", [1e3, 1e6, 1e8])
+def test_variance_does_not_depend_on_the_units_of_a_regressor_that_does_not_vary(
+    data, scale
+):
+    # Removing the means of a regressor that does not vary within entities leaves
+    # rounding error, which is large next to the other regressors if its units are
+    # large, and it is not a coefficient of the within regression
+    columns = DESIGNS["time-invariant"]
+    scaled = data.assign(z=data["z"] * np.pi * scale)
+    res = RandomEffects(scaled["y"], scaled[columns]).fit()
+    expected = lsdv_variance(scaled, columns, None)
+    assert_allclose(res.variance_decomposition["Residual"], expected)
+
+
 @pytest.mark.parametrize("small_sample", [False, True])
 @pytest.mark.parametrize("design", list(DESIGNS))
 def test_variance_components_against_estimators_written_out(data, design, small_sample):

@@ -3110,8 +3110,13 @@ class RandomEffects(_PanelModelBase):
         x = demeaned_exog.values2d
         # The regressors that do not vary within entities (a constant, a time-invariant
         # regressor) or that are collinear once the means are removed have no
-        # coefficient in the within regression, and do not use a degree of freedom
-        rank_within = _lstsq(x, y, rcond=None)[2]
+        # coefficient in the within regression, and do not use a degree of freedom.
+        # Removing the means leaves rounding error in a regressor that does not vary,
+        # which is large if its units are large, so the rank is that of the regressors
+        # in the units that they had before the means were removed
+        x_norm = np.sqrt(((root_w * self.exog.values2d) ** 2).sum(0))
+        x_norm[x_norm == 0.0] = 1.0
+        rank_within = _lstsq(x / x_norm, y, rcond=None)[2]
         if self.has_constant:
             w_sum = w.sum()
             y_gm = (w * self.dependent.values2d).sum(0) / w_sum
