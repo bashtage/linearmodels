@@ -21,6 +21,38 @@ from linearmodels.shared.io import _str, pval_format
 from linearmodels.shared.utility import AttrDict
 import linearmodels.typing.data
 
+# Rounding makes the variance of a parameter that is known exactly, such as the alpha
+# of a model that is just identified, a tiny positive or negative number and not 0. In
+# simulations of such models the most negative variance was 2e-13 times the largest
+# variance of the covariance. A variance that is negative by no more than this multiple
+# of the largest variance is zero up to rounding. A more negative variance is not.
+_VARIANCE_RTOL = 1e-10
+
+
+def _std_errors(
+    cov: linearmodels.typing.data.Float64Array,
+) -> linearmodels.typing.data.Float64Array:
+    """
+    Standard errors, the square roots of the diagonal of a covariance.
+
+    Parameters
+    ----------
+    cov : ndarray
+        Covariance matrix of the parameters.
+
+    Returns
+    -------
+    ndarray
+        The square roots of the diagonal of ``cov``. A variance that is negative
+        by no more than ``_VARIANCE_RTOL`` times the largest absolute variance
+        is zero up to rounding, and its standard error is 0. The standard error
+        of a variance that is more negative is NaN, with a ``RuntimeWarning``.
+    """
+    variances = np.array(np.diag(cov), dtype=float)
+    tol = _VARIANCE_RTOL * np.max(np.abs(variances))
+    variances[(variances < 0) & (variances >= -tol)] = 0.0
+    return cast("linearmodels.typing.data.Float64Array", np.sqrt(variances))
+
 
 class LinearFactorModelResults(_SummaryStr):
     """
@@ -247,9 +279,26 @@ class LinearFactorModelResults(_SummaryStr):
 
     @property
     def std_errors(self) -> pd.DataFrame:
-        """Estimated parameter standard errors"""
-        se = np.sqrt(np.diag(self._cov))
-        assert isinstance(se, np.ndarray)
+        """
+        Estimated parameter standard errors.
+
+        Notes
+        -----
+        These are the square roots of the diagonal of ``cov``. The standard error
+        of a parameter that is known exactly is 0, for example the alpha of a
+        model that is just identified, whose variance is zero. Rounding can make
+        such a variance a tiny negative number, and a variance that is negative
+        by no more than ``1e-10`` times the largest variance of ``cov`` is
+        treated as zero. The standard error of a variance that is more negative
+        is NaN, with a ``RuntimeWarning``.
+
+        .. versionchanged:: 7.1
+
+           The standard errors of the alphas of a ``LinearFactorModel`` that is
+           just identified were NaN, with a ``RuntimeWarning``, if rounding made
+           their variances negative, which was about -3e-19 in most samples.
+        """
+        se = _std_errors(self._cov)
         nportfolio, nfactor = self._params.shape
         nloadings = nportfolio * nfactor
         se = se[:nloadings]
@@ -331,9 +380,11 @@ class LinearFactorModelResults(_SummaryStr):
         These are the square roots of the diagonal of the block of ``cov`` for
         the risk premia. For ``TradedFactorModel`` the risk premia are the
         sample means of the factors. If the covariance is debiased, they use
-        a divisor of nobs - 1.
+        a divisor of nobs - 1. A variance that is negative by no more than
+        ``1e-10`` times the largest variance is zero up to rounding, and its
+        standard error is 0. See ``std_errors``.
         """
-        se = np.sqrt(np.diag(self._rp_cov))
+        se = _std_errors(self._rp_cov)
         return pd.Series(se, index=self._rp_names)
 
     @property
@@ -374,10 +425,13 @@ class GMMFactorModelResults(LinearFactorModelResults):
         errors are the square roots of the diagonal of the covariance of the
         average moment conditions at the estimates,
         :math:`(S - G (G^\prime S^{-1} G)^{-1} G^\prime) / (T - df)`, which accounts
-        for the estimation of the parameters. See ``LinearFactorModelGMM``.
+        for the estimation of the parameters. See ``LinearFactorModelGMM``. A
+        variance that is negative by no more than ``1e-10`` times the largest
+        variance is zero up to rounding, and its standard error is 0. See
+        ``LinearFactorModelResults.std_errors``.
         """
-        se = cast("linearmodels.typing.data.Float64Array", np.sqrt(np.diag(self._cov)))
-        ase = np.sqrt(np.diag(self._alpha_vcv))
+        se = _std_errors(self._cov)
+        ase = _std_errors(self._alpha_vcv)
         nportfolio, nfactor = self._params.shape
         nloadings = nportfolio * (nfactor - 1)
         # One row for each portfolio: the alpha, followed by the loadings
