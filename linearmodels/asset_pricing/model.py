@@ -97,6 +97,13 @@ def _j_statistic(
         columns of :math:`Q` are an orthonormal basis of the space that is
         orthogonal to the columns of ``restrictions``. An ``InvalidTestStatistic``
         if :math:`Q^{\prime}\hat{V}Q` is singular.
+
+    Notes
+    -----
+    The statistic depends on the space that is orthogonal to the columns of
+    ``restrictions`` and not on the basis :math:`Q` of the space, so that it does
+    not depend on the order of the portfolios. No tolerance decides the rank of
+    :math:`\hat{V}`, which is the dimension of that space.
     """
     name = "J-statistic"
     null = "All alphas are 0"
@@ -636,27 +643,54 @@ class LinearFactorModel(_LinearFactorModelBase):
     rate is estimated, and :math:`\Sigma` is ``sigma``, or the identity if it
     is not provided. The pricing errors therefore lie in a space with
     :math:`N - K - n_{rf}` dimensions, and the covariance of the pricing errors
-    has rank :math:`N - K - n_{rf}`. The J-statistic is
+    has rank :math:`N - K - n_{rf}`.
+
+    The J-statistic is the Wald statistic of the pricing errors in the space
+    where they lie,
 
     .. math::
 
-        J = \hat{\alpha}^\prime \hat{V}^{+} \hat{\alpha}
-          = (Q^\prime\hat{\alpha})^\prime (Q^\prime \hat{V} Q)^{-1}
+        J = (Q^\prime\hat{\alpha})^\prime (Q^\prime \hat{V} Q)^{-1}
             (Q^\prime\hat{\alpha})
 
-    where :math:`\hat{V}` is the estimated covariance of the pricing errors,
-    :math:`\hat{V}^{+}=Q(Q^\prime \hat{V} Q)^{-1}Q^\prime` is the generalized
-    inverse of :math:`\hat{V}` with rank :math:`N - K - n_{rf}`, and the
-    :math:`N - K - n_{rf}` columns of :math:`Q` are an orthonormal basis of the
-    space that is orthogonal to the columns of :math:`\Sigma^{-1}\hat{\beta}_c`.
-    It is the Wald statistic of the :math:`N - K - n_{rf}` linear combinations
-    of the pricing errors that are not restricted to be zero, and has an
-    asymptotic :math:`\chi^2_{N-K-n_{rf}}` distribution. If :math:`\hat{V}`
-    were exactly singular in the directions of the columns of
-    :math:`\Sigma^{-1}\hat{\beta}_c`, as the covariance of the pricing errors
-    is in theory, :math:`\hat{V}^{+}` would be its Moore-Penrose pseudo-inverse.
-    If :math:`Q^\prime \hat{V} Q` is singular, which can occur when there are
-    few observations, the J-statistic is an ``InvalidTestStatistic``.
+    where :math:`\hat{V}` is the estimated covariance of the pricing errors and
+    :math:`Q` is an :math:`N` by :math:`N - K - n_{rf}` matrix whose orthonormal
+    columns span the space that is orthogonal to the columns of
+    :math:`\Sigma^{-1}\hat{\beta}_c`. The :math:`N - K - n_{rf}` elements of
+    :math:`Q^\prime\hat{\alpha}` are the coordinates of the pricing errors in
+    that space, and :math:`Q^\prime \hat{V} Q` is their estimated covariance.
+    The statistic tests the null that all of the pricing errors are zero, and
+    has an asymptotic :math:`\chi^2_{N-K-n_{rf}}` distribution. It can also be
+    written :math:`\hat{\alpha}^\prime \hat{V}^{+} \hat{\alpha}` for
+    :math:`\hat{V}^{+}=Q(Q^\prime \hat{V} Q)^{-1}Q^\prime`, which has rank
+    :math:`N - K - n_{rf}`. If :math:`\hat{V}` were exactly singular in the
+    directions of the columns of :math:`\Sigma^{-1}\hat{\beta}_c`, as the
+    covariance of the pricing errors is in theory, :math:`\hat{V}^{+}` would be
+    its Moore-Penrose pseudo-inverse.
+
+    In a sample, :math:`\hat{V}` is not exactly singular. The Moore-Penrose
+    pseudo-inverse of :math:`\hat{V}` would either invert the directions that
+    are null in theory, which makes the statistic too large, or need a
+    tolerance that decides which eigenvalues are treated as zero. The
+    J-statistic instead projects the pricing errors on the space where they lie
+    and uses the rank that the model implies, :math:`N - K - n_{rf}`, so that no
+    tolerance decides which eigenvalues are treated as zero.
+
+    The statistic depends on the space and not on the basis of the space: any
+    other orthonormal basis, :math:`QR` for an orthogonal matrix :math:`R`,
+    gives the same value. It therefore does not depend on the order of the test
+    portfolios. Reordering the columns of ``portfolios``, and the rows and
+    columns of ``sigma`` in the same way, reorders :math:`\hat{\alpha}`,
+    :math:`\hat{V}` and the rows of :math:`\Sigma^{-1}\hat{\beta}_c` in the
+    same way and does not change the statistic. It also does not depend on the
+    order of the observations if ``cov_type`` is ``"robust"``, but the kernel
+    covariance estimators use the order of the observations.
+
+    If :math:`Q^\prime \hat{V} Q` is numerically singular, which can occur when
+    there are few observations, the J-statistic is an ``InvalidTestStatistic``.
+    If the number of test portfolios is the number of risk premia,
+    :math:`N = K + n_{rf}`, the pricing errors are zero and the statistic is 0
+    with 0 degrees of freedom.
 
     .. versionchanged:: 7.1
 
