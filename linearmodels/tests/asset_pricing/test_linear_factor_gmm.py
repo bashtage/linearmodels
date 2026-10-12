@@ -2,8 +2,10 @@ import numpy as np
 from numpy.testing import assert_allclose
 import pandas as pd
 import pytest
+from scipy.optimize import minimize
 
-from linearmodels.asset_pricing.model import LinearFactorModelGMM
+import linearmodels.asset_pricing.model as model_module
+from linearmodels.asset_pricing.model import LinearFactorModel, LinearFactorModelGMM
 from linearmodels.tests.asset_pricing._utility import generate_data, get_all
 
 
@@ -108,6 +110,75 @@ def test_linear_model_gmm_cue_smoke(data):
     mod = LinearFactorModelGMM(data.portfolios, data.factors, risk_free=True)
     res = mod.fit(cov_type="robust", disp=10, use_cue=True)
     get_all(res)
+
+
+def cue_moments(theta, p, f):
+    """Moment conditions of the model with excess returns, written out directly"""
+    nobs, nport = p.shape
+    nfactor = f.shape[1]
+    betas = theta[: nport * nfactor].reshape(nport, nfactor)
+    lam = theta[nport * nfactor : nport * nfactor + nfactor]
+    mu = theta[nport * nfactor + nfactor :]
+    fe = f - mu
+    eps = p - (betas @ lam)[None, :] - fe @ betas.T
+    fc = np.column_stack([np.ones(nobs), f])
+    return np.column_stack([np.hstack([fc * eps[:, [i]] for i in range(nport)]), fe])
+
+
+def cue_objective(theta, p, f):
+    g = cue_moments(theta, p, f)
+    gc = g - g.mean(0)
+    w = np.linalg.inv(gc.T @ gc / g.shape[0])
+    return g.shape[0] * float(g.mean(0) @ w @ g.mean(0))
+
+
+def test_linear_model_gmm_cue_j_statistic():
+    # The J statistic is the minimized value of the continuously updated objective,
+    # which uses the weight matrix at the estimates and not at the starting values
+    rng = np.random.default_rng(3)
+    nobs, nport, nfactor = 150, 8, 2
+    f = 0.05 * (
+        0.2 * rng.standard_normal((nobs, 1)) + rng.standard_normal((nobs, nfactor))
+    )
+    f += np.arange(1, nfactor + 1)[None, :] / 1200
+    betas = rng.chisquare(2, (nfactor, nport)) / 2
+    p = f @ betas + 0.03 * rng.standard_normal((nobs, nport))
+    p += np.arange(nport)[None, :] / nport / 200
+    res = LinearFactorModelGMM(p, f).fit(use_cue=True, disp=0)
+    start = LinearFactorModel(p, f).fit()
+    theta0 = np.r_[
+        np.asarray(start.betas).ravel(), np.asarray(start.risk_premia), f.mean(0)
+    ]
+    best = minimize(
+        cue_objective,
+        theta0,
+        args=(p, f),
+        method="BFGS",
+        options={"gtol": 1e-9, "maxiter": 5000},
+    )
+    assert_allclose(res.j_statistic.stat, best.fun, rtol=1e-4)
+
+
+@pytest.mark.parametrize("kwargs", [{"steps": 3}, {"use_cue": True}])
+def test_linear_model_gmm_opt_options_every_step(monkeypatch, kwargs):
+    # The options of the optimizer apply to every minimization of the estimator
+    data = generate_data(nfactor=1, nportfolio=4, nobs=300, output="numpy")
+    calls = []
+    minimize_original = minimize
+
+    def recording_minimize(*args, **kw):
+        calls.append(kw)
+        return minimize_original(*args, **kw)
+
+    monkeypatch.setattr(model_module, "minimize", recording_minimize)
+    opt_options = {"method": "L-BFGS-B", "tol": 1e-8, "options": {"maxcor": 7}}
+    mod = LinearFactorModelGMM(data.portfolios, data.factors)
+    mod.fit(disp=0, opt_options=opt_options, **kwargs)
+    assert len(calls) >= 2
+    for call in calls:
+        assert call["method"] == "L-BFGS-B"
+        assert call["tol"] == 1e-8
+        assert call["options"] == {"maxiter": 1000, "maxcor": 7}
 
 
 @pytest.mark.parametrize("nfactor", [1, 3])
