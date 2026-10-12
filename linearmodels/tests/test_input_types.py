@@ -751,6 +751,49 @@ def test_absorbing_nan_weights_are_dropped_as_missing(absorbing):
     assert res.nobs == NOBS - 1
 
 
+def test_absorbing_string_effects_raise_and_say_to_use_categoricals(absorbing):
+    strings = absorbing["absorb"].astype(str)
+    with pytest.raises(TypeError, match=r"column 'a' of absorb has dtype") as exc:
+        build_absorbing(absorbing, absorb=strings)
+    message = str(exc.value)
+    assert "categorical" in message
+    assert "astype('category')" in message
+    # Categorical effects work, and so do numeric variables to absorb
+    build_absorbing(absorbing, absorb=strings.astype("category"))
+    numeric = absorbing["absorb"].apply(lambda s: s.cat.codes.astype(float))
+    build_absorbing(absorbing, absorb=numeric)
+
+
+def test_absorbing_string_effects_in_interactions_raise(absorbing):
+    frame = pd.DataFrame(
+        {"g": absorbing["absorb"].a.astype(str), "c": absorbing["exog"].w1}
+    )
+    with pytest.raises(TypeError, match=r"column 'g' of interactions"):
+        AbsorbingLS(
+            absorbing["dependent"],
+            absorbing["exog"],
+            absorb=absorbing["absorb"],
+            interactions=frame,
+        )
+    with pytest.raises(TypeError, match=r"column 'g' of interactions"):
+        AbsorbingLS(
+            absorbing["dependent"],
+            absorbing["exog"],
+            absorb=absorbing["absorb"],
+            interactions=[frame],
+        )
+    with pytest.raises(TypeError, match=r"column 'g' of frame"):
+        Interaction.from_frame(frame)
+
+
+def test_absorbing_container_errors_name_the_input(absorbing):
+    codes = np.column_stack([absorbing["absorb"][c].cat.codes for c in "ab"])
+    with pytest.raises(TypeError, match="absorb must"):
+        build_absorbing(absorbing, absorb=codes)
+    with pytest.raises(TypeError, match="frame must be a DataFrame"):
+        Interaction.from_frame(codes)
+
+
 def test_interaction_accepts_lists(absorbing):
     cats = absorbing["absorb"][["a"]]
     cont = absorbing["exog"][["w1"]]

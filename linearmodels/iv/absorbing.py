@@ -37,6 +37,7 @@ from numpy import (
 )
 from numpy.linalg import lstsq
 from pandas import Categorical, CategoricalDtype, DataFrame, Series
+from pandas.api.types import is_numeric_dtype
 import scipy.sparse as sp
 from scipy.sparse.linalg import lsmr
 
@@ -674,10 +675,27 @@ class Interaction:
         >>> interact.sparse.shape # Cart product of all cats, 5!, times ncont, 6
         (100000, 720)
         """
+        return Interaction._from_frame(frame, "frame")
+
+    @staticmethod
+    def _from_frame(frame: DataFrame, name: str) -> Interaction:
+        """from_frame, where name is used to refer to frame in error messages"""
+        if not isinstance(frame, DataFrame):
+            raise TypeError(f"{name} must be a DataFrame. Got {type(frame).__name__}.")
         cat_cols = [
             col for col in frame if isinstance(frame[col].dtype, CategoricalDtype)
         ]
         cont_cols = [col for col in frame if col not in cat_cols]
+        for col in cont_cols:
+            dtype = frame[col].dtype
+            if not is_numeric_dtype(dtype):
+                raise TypeError(
+                    f"The column {col!r} of {name} has dtype {dtype}. The columns "
+                    "that do not have a categorical dtype are treated as continuous "
+                    "variables and must be numeric. Convert the columns that "
+                    f"contain categories to categorical, for example using "
+                    f"{name}[{col!r}].astype('category')."
+                )
         # TODO: Bug in pandas-stubs
         #   https://github.com/pandas-dev/pandas-stubs/issues/97
         frame_cats = frame[cat_cols]
@@ -796,21 +814,25 @@ class AbsorbingLS:
     ----------
     dependent : array_like
         Endogenous variables (nobs by 1)
-    exog : array_like
+    exog : array_like, optional
         Exogenous regressors  (nobs by nexog)
-    absorb: {DataFrame, Interaction}
+    absorb : DataFrame or Interaction, optional
         The effects or continuous variables to absorb. When using a DataFrame,
         effects must be categorical variables. Other variable types are treated
-        as continuous variables that should be absorbed. When using an
-        Interaction, variables in the `cat` argument are treated as effects
-        and variables in the `cont` argument are treated as continuous.
-    interactions : {DataFrame, Interaction, list[DataFrame, Interaction]}
+        as continuous variables that should be absorbed, so they must be
+        numeric, and a ``TypeError`` is raised for columns of strings, which
+        have to be converted to categorical. When using an Interaction,
+        variables in the `cat` argument are treated as effects and variables in
+        the `cont` argument are treated as continuous.
+    interactions : DataFrame, Interaction or list of DataFrame or Interaction, optional
         Interactions containing both categorical and continuous variables.  Each
         interaction is constructed using the Cartesian product of the categorical
         variables to produce the dummy, which are then separately interacted with
-        each continuous variable.
-    weights : array_like
-        Observation weights used in estimation
+        each continuous variable. The columns of a DataFrame follow the rules of
+        ``absorb``.
+    weights : array_like, optional
+        Observation weights used in estimation. All weights must be strictly
+        positive or missing.
     drop_absorbed : bool
         Flag indicating whether to drop absorbed variables
 
@@ -913,7 +935,7 @@ class AbsorbingLS:
         self._exog = IVData(exog, "exog", nobs=self._nobs)
         self._absorb = absorb
         if isinstance(absorb, DataFrame):
-            self._absorb_inter = Interaction.from_frame(absorb)
+            self._absorb_inter = Interaction._from_frame(absorb, "absorb")
         elif absorb is None:
             self._absorb_inter = Interaction(None, None, nobs)
         elif isinstance(absorb, Interaction):
@@ -1090,13 +1112,17 @@ class AbsorbingLS:
         if self._interactions is None:
             return
         elif isinstance(self._interactions, DataFrame):
-            self._interaction_list = [Interaction.from_frame(self._interactions)]
+            self._interaction_list = [
+                Interaction._from_frame(self._interactions, "interactions")
+            ]
         elif isinstance(self._interactions, Interaction):
             self._interaction_list = [self._interactions]
         else:
             for interact in self._interactions:
                 if isinstance(interact, DataFrame):
-                    self._interaction_list.append(Interaction.from_frame(interact))
+                    self._interaction_list.append(
+                        Interaction._from_frame(interact, "interactions")
+                    )
                 elif isinstance(interact, Interaction):
                     self._interaction_list.append(interact)
                 else:
