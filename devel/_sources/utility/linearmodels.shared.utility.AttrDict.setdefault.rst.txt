@@ -1,8 +1,0 @@
-:orphan:
-
-linearmodels.shared.utility.AttrDict.setdefault
-===============================================
-
-.. currentmodule:: linearmodels.shared.utility
-
-.. automethod:: AttrDict.setdefault

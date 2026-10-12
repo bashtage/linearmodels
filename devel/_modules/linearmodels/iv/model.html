@@ -19,7 +19,7 @@
     
   
       
-        <title>linearmodels.iv.model - linearmodels v7.1 (+195)</title>
+        <title>linearmodels.iv.model - linearmodels v7.1 (+205)</title>
       
     
 
@@ -91,7 +91,7 @@
 
 <header class="md-header md-header--shadow" data-md-component="header">
   <nav class="md-header__inner md-grid" aria-label="Header">
-    <a href="../../../index.html" title="linearmodels v7.1 (+195)" class="md-header__button md-logo" aria-label="linearmodels v7.1 (+195)" data-md-component="logo">
+    <a href="../../../index.html" title="linearmodels v7.1 (+205)" class="md-header__button md-logo" aria-label="linearmodels v7.1 (+205)" data-md-component="logo">
       <img src="../../../_static/bw-logo.svg" alt="logo">
     </a>
     <label class="md-header__button md-icon" for="__drawer">
@@ -102,7 +102,7 @@
       <div class="md-header__ellipsis">
         <div class="md-header__topic">
           <span class="md-ellipsis">
-            linearmodels v7.1 (+195)
+            linearmodels v7.1 (+205)
           </span>
         </div>
         <div class="md-header__topic" data-md-component="header-topic">
@@ -197,10 +197,10 @@
 
 <nav class="md-nav md-nav--primary" aria-label="Navigation" data-md-level="0">
   <label class="md-nav__title" for="__drawer">
-    <a href="../../../index.html" title="linearmodels v7.1 (+195)" class="md-nav__button md-logo" aria-label="linearmodels v7.1 (+195)" data-md-component="logo">
+    <a href="../../../index.html" title="linearmodels v7.1 (+205)" class="md-nav__button md-logo" aria-label="linearmodels v7.1 (+205)" data-md-component="logo">
       <img src="../../../_static/bw-logo.svg" alt="logo">
     </a>
-    linearmodels v7.1 (+195)
+    linearmodels v7.1 (+205)
   </label>
   
     <div class="md-nav__source">
@@ -537,6 +537,7 @@
     <span class="n">outer</span><span class="p">,</span>
     <span class="n">sqrt</span><span class="p">,</span>
     <span class="n">squeeze</span><span class="p">,</span>
+    <span class="n">unique</span><span class="p">,</span>
 <span class="p">)</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">numpy.linalg</span><span class="w"> </span><span class="kn">import</span> <span class="n">LinAlgError</span><span class="p">,</span> <span class="n">eigvalsh</span><span class="p">,</span> <span class="n">inv</span><span class="p">,</span> <span class="n">matrix_rank</span><span class="p">,</span> <span class="n">pinv</span><span class="p">,</span> <span class="n">qr</span><span class="p">,</span> <span class="n">solve</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">pandas</span><span class="w"> </span><span class="kn">import</span> <span class="n">DataFrame</span><span class="p">,</span> <span class="n">Series</span><span class="p">,</span> <span class="n">concat</span>
@@ -1523,6 +1524,36 @@
 
 
 
+<span class="k">def</span><span class="w"> </span><span class="nf">_is_singular</span><span class="p">(</span><span class="n">cov</span><span class="p">:</span> <span class="n">linearmodels</span><span class="o">.</span><span class="n">typing</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">Float64Array</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">"""</span>
+<span class="sd">    Test whether the covariance of the moment conditions is singular</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    cov : ndarray</span>
+<span class="sd">        Estimate of the covariance of the moment conditions (ninstr by ninstr)</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    bool</span>
+<span class="sd">        True if the covariance is not finite, has a variance that is not</span>
+<span class="sd">        positive or its correlation matrix does not have full rank.</span>
+
+<span class="sd">    Notes</span>
+<span class="sd">    -----</span>
+<span class="sd">    The rank is that of the correlation matrix of the moment conditions, so</span>
+<span class="sd">    that it does not depend on the units in which the instruments are</span>
+<span class="sd">    measured. The tolerance of the rank test is relative to the largest</span>
+<span class="sd">    eigenvalue, and so it treats the covariance as singular if the variances</span>
+<span class="sd">    of the moment conditions differ by a factor of about 1e16.</span>
+<span class="sd">    """</span>
+    <span class="n">variances</span> <span class="o">=</span> <span class="n">diag</span><span class="p">(</span><span class="n">cov</span><span class="p">)</span>
+    <span class="k">if</span> <span class="ow">not</span> <span class="p">(</span><span class="n">npall</span><span class="p">(</span><span class="n">isfinite</span><span class="p">(</span><span class="n">cov</span><span class="p">))</span> <span class="ow">and</span> <span class="n">npall</span><span class="p">(</span><span class="n">variances</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">)):</span>
+        <span class="k">return</span> <span class="kc">True</span>
+    <span class="n">std</span> <span class="o">=</span> <span class="n">sqrt</span><span class="p">(</span><span class="n">variances</span><span class="p">)</span>
+    <span class="k">return</span> <span class="nb">bool</span><span class="p">(</span><span class="n">matrix_rank</span><span class="p">(</span><span class="n">cov</span> <span class="o">/</span> <span class="n">outer</span><span class="p">(</span><span class="n">std</span><span class="p">,</span> <span class="n">std</span><span class="p">),</span> <span class="n">hermitian</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span> <span class="o">&lt;</span> <span class="n">cov</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
+
+
 <span class="k">class</span><span class="w"> </span><span class="nc">_IVGMMBase</span><span class="p">(</span><span class="n">_IVModelBase</span><span class="p">):</span>
 <span class="w">    </span><span class="sa">r</span><span class="sd">"""</span>
 <span class="sd">    Estimation of IV models using the generalized method of moments (GMM)</span>
@@ -1602,6 +1633,7 @@
         <span class="n">params</span><span class="p">:</span> <span class="n">linearmodels</span><span class="o">.</span><span class="n">typing</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">Float64Array</span><span class="p">,</span>
         <span class="n">weight_mat</span><span class="p">:</span> <span class="n">linearmodels</span><span class="o">.</span><span class="n">typing</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">Float64Array</span><span class="p">,</span>
         <span class="n">iters</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>
+        <span class="n">moment_cov</span><span class="p">:</span> <span class="n">linearmodels</span><span class="o">.</span><span class="n">typing</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">Float64Array</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
     <span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]:</span>
 <span class="w">        </span><span class="sd">"""GMM-specific post-estimation results"""</span>
         <span class="n">instr</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_instr_columns</span>
@@ -1610,7 +1642,7 @@
             <span class="s2">"weight_type"</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">_weight_type</span><span class="p">,</span>
             <span class="s2">"weight_config"</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">_weight</span><span class="o">.</span><span class="n">config</span><span class="p">,</span>
             <span class="s2">"iterations"</span><span class="p">:</span> <span class="n">iters</span><span class="p">,</span>
-            <span class="s2">"j_stat"</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">_j_statistic</span><span class="p">(</span><span class="n">params</span><span class="p">,</span> <span class="n">weight_mat</span><span class="p">),</span>
+            <span class="s2">"j_stat"</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">_j_statistic</span><span class="p">(</span><span class="n">params</span><span class="p">,</span> <span class="n">weight_mat</span><span class="p">,</span> <span class="n">moment_cov</span><span class="p">),</span>
             <span class="s2">"centered_j_stat"</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">_centered_j_statistic</span><span class="p">(</span><span class="n">params</span><span class="p">),</span>
         <span class="p">}</span>
 
@@ -1636,17 +1668,7 @@
         <span class="n">weight_matrix_estimator</span> <span class="o">=</span> <span class="n">WEIGHT_MATRICES</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">_weight_type</span><span class="p">]</span>
         <span class="n">centered</span> <span class="o">=</span> <span class="n">weight_matrix_estimator</span><span class="p">(</span><span class="o">**</span><span class="p">{</span><span class="o">**</span><span class="bp">self</span><span class="o">.</span><span class="n">_weight_kwargs</span><span class="p">,</span> <span class="s2">"center"</span><span class="p">:</span> <span class="kc">True</span><span class="p">})</span>
         <span class="n">s_c</span> <span class="o">=</span> <span class="n">centered</span><span class="o">.</span><span class="n">weight_matrix</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">z</span><span class="p">,</span> <span class="n">eps</span><span class="p">)</span>
-        <span class="c1"># The rank is that of the correlation matrix of the moment conditions,</span>
-        <span class="c1"># so that it does not depend on the units in which the instruments are</span>
-        <span class="c1"># measured. The tolerance of the rank test is relative to the largest</span>
-        <span class="c1"># eigenvalue, and so it treats the covariance as singular if the</span>
-        <span class="c1"># variances of the moment conditions differ by a factor of about 1e16</span>
-        <span class="n">variances</span> <span class="o">=</span> <span class="n">diag</span><span class="p">(</span><span class="n">s_c</span><span class="p">)</span>
-        <span class="n">singular</span> <span class="o">=</span> <span class="ow">not</span> <span class="p">(</span><span class="n">npall</span><span class="p">(</span><span class="n">isfinite</span><span class="p">(</span><span class="n">s_c</span><span class="p">))</span> <span class="ow">and</span> <span class="n">npall</span><span class="p">(</span><span class="n">variances</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">))</span>
-        <span class="k">if</span> <span class="ow">not</span> <span class="n">singular</span><span class="p">:</span>
-            <span class="n">std</span> <span class="o">=</span> <span class="n">sqrt</span><span class="p">(</span><span class="n">variances</span><span class="p">)</span>
-            <span class="n">singular</span> <span class="o">=</span> <span class="n">matrix_rank</span><span class="p">(</span><span class="n">s_c</span> <span class="o">/</span> <span class="n">outer</span><span class="p">(</span><span class="n">std</span><span class="p">,</span> <span class="n">std</span><span class="p">),</span> <span class="n">hermitian</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span> <span class="o">&lt;</span> <span class="n">ninstr</span>
-        <span class="k">if</span> <span class="n">singular</span><span class="p">:</span>
+        <span class="k">if</span> <span class="n">_is_singular</span><span class="p">(</span><span class="n">s_c</span><span class="p">):</span>
             <span class="c1"># The centered cluster sums add to zero, so a clustered estimator</span>
             <span class="c1"># has rank at most one less than the number of clusters</span>
             <span class="n">reason</span> <span class="o">=</span> <span class="p">(</span>
@@ -1663,10 +1685,29 @@
         <span class="bp">self</span><span class="p">,</span>
         <span class="n">params</span><span class="p">:</span> <span class="n">linearmodels</span><span class="o">.</span><span class="n">typing</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">Float64Array</span><span class="p">,</span>
         <span class="n">weight_mat</span><span class="p">:</span> <span class="n">linearmodels</span><span class="o">.</span><span class="n">typing</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">Float64Array</span><span class="p">,</span>
-    <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">WaldTestStatistic</span><span class="p">:</span>
-<span class="w">        </span><span class="sd">"""J stat and test"""</span>
+        <span class="n">moment_cov</span><span class="p">:</span> <span class="n">linearmodels</span><span class="o">.</span><span class="n">typing</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">Float64Array</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">WaldTestStatistic</span> <span class="o">|</span> <span class="n">InvalidTestStatistic</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">"""</span>
+<span class="sd">        J stat and test</span>
+
+<span class="sd">        moment_cov is the estimate of the covariance of the moment conditions</span>
+<span class="sd">        that was inverted to compute weight_mat, if there is one. The statistic</span>
+<span class="sd">        is not defined if it is singular, since weight_mat is then numerical</span>
+<span class="sd">        noise. The test is applied to the covariance and not to weight_mat,</span>
+<span class="sd">        because the inverse of a singular covariance is not always found to be</span>
+<span class="sd">        singular.</span>
+<span class="sd">        """</span>
         <span class="n">y</span><span class="p">,</span> <span class="n">x</span><span class="p">,</span> <span class="n">z</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_wy</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_wx</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_wz</span>
         <span class="n">nobs</span><span class="p">,</span> <span class="n">nvar</span><span class="p">,</span> <span class="n">ninstr</span> <span class="o">=</span> <span class="n">y</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">x</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="n">z</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span>
+        <span class="k">if</span> <span class="n">moment_cov</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="ow">and</span> <span class="n">_is_singular</span><span class="p">(</span><span class="n">moment_cov</span><span class="p">):</span>
+            <span class="n">reason</span> <span class="o">=</span> <span class="p">(</span>
+                <span class="s2">"The covariance of the moment conditions that is inverted to "</span>
+                <span class="s2">"compute the weight matrix is singular, so the statistic is "</span>
+                <span class="s2">"not defined. This occurs, for example, when there are too "</span>
+                <span class="s2">"few clusters."</span>
+            <span class="p">)</span>
+            <span class="n">name</span> <span class="o">=</span> <span class="s2">"J-test of overidentifying restrictions"</span>
+            <span class="k">return</span> <span class="n">InvalidTestStatistic</span><span class="p">(</span><span class="n">reason</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="n">name</span><span class="p">)</span>
         <span class="n">eps</span> <span class="o">=</span> <span class="n">y</span> <span class="o">-</span> <span class="n">x</span> <span class="o">@</span> <span class="n">params</span>
         <span class="n">g_bar</span> <span class="o">=</span> <span class="p">(</span><span class="n">z</span> <span class="o">*</span> <span class="n">eps</span><span class="p">)</span><span class="o">.</span><span class="n">mean</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>
         <span class="n">stat</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="n">nobs</span> <span class="o">*</span> <span class="n">g_bar</span><span class="o">.</span><span class="n">T</span> <span class="o">@</span> <span class="n">weight_mat</span> <span class="o">@</span> <span class="n">g_bar</span><span class="o">.</span><span class="n">T</span><span class="p">)</span>
@@ -1931,9 +1972,11 @@
 
         <span class="n">iters</span><span class="p">,</span> <span class="n">norm</span> <span class="o">=</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">10</span> <span class="o">*</span> <span class="n">tol</span> <span class="o">+</span> <span class="mi">1</span>
         <span class="n">vinv</span> <span class="o">=</span> <span class="n">eye</span><span class="p">(</span><span class="n">params</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
+        <span class="n">moment_cov</span><span class="p">:</span> <span class="n">linearmodels</span><span class="o">.</span><span class="n">typing</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">Float64Array</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span>
         <span class="k">while</span> <span class="n">iters</span> <span class="o">&lt;</span> <span class="n">iter_limit</span> <span class="ow">and</span> <span class="n">norm</span> <span class="o">&gt;</span> <span class="n">tol</span><span class="p">:</span>
             <span class="n">eps</span> <span class="o">=</span> <span class="n">wy</span> <span class="o">-</span> <span class="n">wx</span> <span class="o">@</span> <span class="n">params</span>
-            <span class="n">wmat</span> <span class="o">=</span> <span class="n">inv</span><span class="p">(</span><span class="n">weight_matrix</span><span class="p">(</span><span class="n">wx</span><span class="p">,</span> <span class="n">wz</span><span class="p">,</span> <span class="n">eps</span><span class="p">))</span>
+            <span class="n">moment_cov</span> <span class="o">=</span> <span class="n">weight_matrix</span><span class="p">(</span><span class="n">wx</span><span class="p">,</span> <span class="n">wz</span><span class="p">,</span> <span class="n">eps</span><span class="p">)</span>
+            <span class="n">wmat</span> <span class="o">=</span> <span class="n">inv</span><span class="p">(</span><span class="n">moment_cov</span><span class="p">)</span>
             <span class="n">params</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">estimate_parameters</span><span class="p">(</span><span class="n">wx</span><span class="p">,</span> <span class="n">wy</span><span class="p">,</span> <span class="n">wz</span><span class="p">,</span> <span class="n">wmat</span><span class="p">)</span>
             <span class="n">delta</span> <span class="o">=</span> <span class="n">params</span> <span class="o">-</span> <span class="n">_params</span>
             <span class="k">if</span> <span class="n">iters</span> <span class="o">==</span> <span class="mi">1</span><span class="p">:</span>
@@ -1950,7 +1993,7 @@
         <span class="p">)</span>
 
         <span class="n">results</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_post_estimation</span><span class="p">(</span><span class="n">params</span><span class="p">,</span> <span class="n">cov_estimator</span><span class="p">,</span> <span class="n">cov_type</span><span class="p">)</span>
-        <span class="n">gmm_pe</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_gmm_post_estimation</span><span class="p">(</span><span class="n">params</span><span class="p">,</span> <span class="n">wmat</span><span class="p">,</span> <span class="n">iters</span><span class="p">)</span>
+        <span class="n">gmm_pe</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_gmm_post_estimation</span><span class="p">(</span><span class="n">params</span><span class="p">,</span> <span class="n">wmat</span><span class="p">,</span> <span class="n">iters</span><span class="p">,</span> <span class="n">moment_cov</span><span class="p">)</span>
 
         <span class="n">results</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="n">gmm_pe</span><span class="p">)</span>
 
@@ -1962,6 +2005,7 @@
         <span class="n">params</span><span class="p">:</span> <span class="n">linearmodels</span><span class="o">.</span><span class="n">typing</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">Float64Array</span><span class="p">,</span>
         <span class="n">weight_mat</span><span class="p">:</span> <span class="n">linearmodels</span><span class="o">.</span><span class="n">typing</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">Float64Array</span><span class="p">,</span>
         <span class="n">iters</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>
+        <span class="n">moment_cov</span><span class="p">:</span> <span class="n">linearmodels</span><span class="o">.</span><span class="n">typing</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">Float64Array</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
     <span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]:</span>
 <span class="w">        </span><span class="sd">"""GMM-specific post-estimation results"""</span>
         <span class="n">instr</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_instr_columns</span>
@@ -1970,7 +2014,7 @@
             <span class="s2">"weight_type"</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">_weight_type</span><span class="p">,</span>
             <span class="s2">"weight_config"</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">_weight</span><span class="o">.</span><span class="n">config</span><span class="p">,</span>
             <span class="s2">"iterations"</span><span class="p">:</span> <span class="n">iters</span><span class="p">,</span>
-            <span class="s2">"j_stat"</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">_j_statistic</span><span class="p">(</span><span class="n">params</span><span class="p">,</span> <span class="n">weight_mat</span><span class="p">),</span>
+            <span class="s2">"j_stat"</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">_j_statistic</span><span class="p">(</span><span class="n">params</span><span class="p">,</span> <span class="n">weight_mat</span><span class="p">,</span> <span class="n">moment_cov</span><span class="p">),</span>
             <span class="s2">"centered_j_stat"</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">_centered_j_statistic</span><span class="p">(</span><span class="n">params</span><span class="p">),</span>
         <span class="p">}</span>
 
@@ -2016,6 +2060,11 @@
 <span class="sd">    In most circumstances, the ``center`` weight option should be ``True`` to</span>
 <span class="sd">    avoid starting value dependence. It is ``True`` unless ``center`` is</span>
 <span class="sd">    passed in ``weight_config``.</span>
+
+<span class="sd">    The covariance of the moment conditions has to be nonsingular. A clustered</span>
+<span class="sd">    covariance that is estimated from G clusters has rank at most G, and at</span>
+<span class="sd">    most G - 1 if the moment conditions are centered, so that there have to be</span>
+<span class="sd">    more clusters than moment conditions if ``center`` is ``True``.</span>
 
 <span class="sd">    .. math::</span>
 
@@ -2260,6 +2309,51 @@
         <span class="k">return</span> <span class="n">res</span><span class="o">.</span><span class="n">x</span><span class="p">[:,</span> <span class="kc">None</span><span class="p">],</span> <span class="n">res</span><span class="o">.</span><span class="n">nit</span></div>
 
 
+    <span class="k">def</span><span class="w"> </span><span class="nf">_check_moment_covariance</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">"""</span>
+<span class="sd">        Raise a ValueError if the covariance of the moment conditions is singular</span>
+
+<span class="sd">        The objective function uses the inverse of the covariance, so it is not</span>
+<span class="sd">        defined if the covariance is singular. The rank of the covariance does</span>
+<span class="sd">        not depend on the parameters, other than for special values such as</span>
+<span class="sd">        residuals that are all 0, and so it is tested at the first step</span>
+<span class="sd">        estimates of two-step GMM.</span>
+<span class="sd">        """</span>
+        <span class="n">wy</span><span class="p">,</span> <span class="n">wx</span><span class="p">,</span> <span class="n">wz</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_wy</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_wx</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_wz</span>
+        <span class="n">nobs</span><span class="p">,</span> <span class="n">nmoment</span> <span class="o">=</span> <span class="n">wz</span><span class="o">.</span><span class="n">shape</span>
+        <span class="n">params</span> <span class="o">=</span> <span class="n">IVGMM</span><span class="o">.</span><span class="n">estimate_parameters</span><span class="p">(</span><span class="n">wx</span><span class="p">,</span> <span class="n">wy</span><span class="p">,</span> <span class="n">wz</span><span class="p">,</span> <span class="n">inv</span><span class="p">(</span><span class="n">wz</span><span class="o">.</span><span class="n">T</span> <span class="o">@</span> <span class="n">wz</span> <span class="o">/</span> <span class="n">nobs</span><span class="p">))</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">_is_singular</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_weight</span><span class="o">.</span><span class="n">weight_matrix</span><span class="p">(</span><span class="n">wx</span><span class="p">,</span> <span class="n">wz</span><span class="p">,</span> <span class="n">wy</span> <span class="o">-</span> <span class="n">wx</span> <span class="o">@</span> <span class="n">params</span><span class="p">)):</span>
+            <span class="k">return</span>
+        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_weight</span><span class="p">,</span> <span class="n">OneWayClusteredWeightMatrix</span><span class="p">):</span>
+            <span class="n">nclusters</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">unique</span><span class="p">(</span><span class="n">asarray</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_weight_config</span><span class="p">[</span><span class="s2">"clusters"</span><span class="p">])))</span>
+            <span class="n">centered</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_weight_config</span><span class="p">[</span><span class="s2">"center"</span><span class="p">]</span>
+            <span class="n">rank</span> <span class="o">=</span> <span class="n">nclusters</span> <span class="o">-</span> <span class="mi">1</span> <span class="k">if</span> <span class="n">centered</span> <span class="k">else</span> <span class="n">nclusters</span>
+            <span class="n">rank_reason</span> <span class="o">=</span> <span class="p">(</span>
+                <span class="s2">"one less than the number of clusters, since the cluster sums of "</span>
+                <span class="s2">"centered moment conditions add to zero"</span>
+                <span class="k">if</span> <span class="n">centered</span>
+                <span class="k">else</span> <span class="s2">"the number of clusters"</span>
+            <span class="p">)</span>
+            <span class="n">msg</span> <span class="o">=</span> <span class="p">(</span>
+                <span class="sa">f</span><span class="s2">"The clustered covariance of the </span><span class="si">{</span><span class="n">nmoment</span><span class="si">}</span><span class="s2"> moment conditions is "</span>
+                <span class="sa">f</span><span class="s2">"singular because there are too few clusters (</span><span class="si">{</span><span class="n">nclusters</span><span class="si">}</span><span class="s2"> "</span>
+                <span class="sa">f</span><span class="s2">"clusters). Its rank is at most </span><span class="si">{</span><span class="n">rank</span><span class="si">}</span><span class="s2">, </span><span class="si">{</span><span class="n">rank_reason</span><span class="si">}</span><span class="s2">. The "</span>
+                <span class="s2">"objective function of the continuously updating GMM estimator "</span>
+                <span class="s2">"uses the inverse of the covariance, so it is not defined. Use "</span>
+                <span class="s2">"more clusters than moment conditions, or a weight_type that does "</span>
+                <span class="s2">"not use clusters."</span>
+            <span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">msg</span> <span class="o">=</span> <span class="p">(</span>
+                <span class="sa">f</span><span class="s2">"The covariance of the </span><span class="si">{</span><span class="n">nmoment</span><span class="si">}</span><span class="s2"> moment conditions is singular, "</span>
+                <span class="sa">f</span><span class="s2">"which occurs if there are too few observations (</span><span class="si">{</span><span class="n">nobs</span><span class="si">}</span><span class="s2">) for the "</span>
+                <span class="s2">"number of moment conditions. The objective function of the "</span>
+                <span class="s2">"continuously updating GMM estimator uses the inverse of the "</span>
+                <span class="s2">"covariance, so it is not defined. Use more observations or fewer "</span>
+                <span class="s2">"moment conditions."</span>
+            <span class="p">)</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="n">msg</span><span class="p">)</span>
+
 <div class="viewcode-block" id="IVGMMCUE.fit">
 <a class="viewcode-back" href="../../../iv/iv/linearmodels.iv.model.IVGMMCUE.fit.html#linearmodels.iv.model.IVGMMCUE.fit">[docs]</a>
     <span class="k">def</span><span class="w"> </span><span class="nf">fit</span><span class="p">(</span>
@@ -2304,6 +2398,15 @@
 <span class="sd">        IVGMMResults</span>
 <span class="sd">            Results container</span>
 
+<span class="sd">        Raises</span>
+<span class="sd">        ------</span>
+<span class="sd">        ValueError</span>
+<span class="sd">            If the covariance of the moment conditions is singular, which</span>
+<span class="sd">            occurs if there are too few clusters or observations. The</span>
+<span class="sd">            number of clusters has to be larger than the number of moment</span>
+<span class="sd">            conditions if the moment conditions are centered, which is the</span>
+<span class="sd">            default.</span>
+
 <span class="sd">        Notes</span>
 <span class="sd">        -----</span>
 <span class="sd">        Starting values are computed by IVGMM.</span>
@@ -2315,6 +2418,7 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">_check_clusters</span><span class="p">(</span><span class="n">cov_config</span><span class="p">)</span>
         <span class="n">wy</span><span class="p">,</span> <span class="n">wx</span><span class="p">,</span> <span class="n">wz</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_wy</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_wx</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_wz</span>
         <span class="n">weight_matrix</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_weight</span><span class="o">.</span><span class="n">weight_matrix</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_check_moment_covariance</span><span class="p">()</span>
         <span class="k">if</span> <span class="n">starting</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
             <span class="n">exog</span> <span class="o">=</span> <span class="kc">None</span> <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">exog</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">==</span> <span class="mi">0</span> <span class="k">else</span> <span class="bp">self</span><span class="o">.</span><span class="n">exog</span>
             <span class="n">endog</span> <span class="o">=</span> <span class="kc">None</span> <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">endog</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">==</span> <span class="mi">0</span> <span class="k">else</span> <span class="bp">self</span><span class="o">.</span><span class="n">endog</span>
@@ -2338,14 +2442,15 @@
             <span class="n">starting</span><span class="p">,</span> <span class="n">wx</span><span class="p">,</span> <span class="n">wy</span><span class="p">,</span> <span class="n">wz</span><span class="p">,</span> <span class="n">display</span><span class="p">,</span> <span class="n">opt_options</span><span class="o">=</span><span class="n">opt_options</span>
         <span class="p">)</span>
         <span class="n">eps</span> <span class="o">=</span> <span class="n">wy</span> <span class="o">-</span> <span class="n">wx</span> <span class="o">@</span> <span class="n">params</span>
-        <span class="n">wmat</span> <span class="o">=</span> <span class="n">inv</span><span class="p">(</span><span class="n">weight_matrix</span><span class="p">(</span><span class="n">wx</span><span class="p">,</span> <span class="n">wz</span><span class="p">,</span> <span class="n">eps</span><span class="p">))</span>
+        <span class="n">moment_cov</span> <span class="o">=</span> <span class="n">weight_matrix</span><span class="p">(</span><span class="n">wx</span><span class="p">,</span> <span class="n">wz</span><span class="p">,</span> <span class="n">eps</span><span class="p">)</span>
+        <span class="n">wmat</span> <span class="o">=</span> <span class="n">inv</span><span class="p">(</span><span class="n">moment_cov</span><span class="p">)</span>
 
         <span class="n">cov_config</span><span class="p">[</span><span class="s2">"debiased"</span><span class="p">]</span> <span class="o">=</span> <span class="n">debiased</span>
         <span class="n">cov_estimator</span> <span class="o">=</span> <span class="n">IVGMMCovariance</span><span class="p">(</span>
             <span class="n">wx</span><span class="p">,</span> <span class="n">wy</span><span class="p">,</span> <span class="n">wz</span><span class="p">,</span> <span class="n">params</span><span class="p">,</span> <span class="n">wmat</span><span class="p">,</span> <span class="n">cov_type</span><span class="p">,</span> <span class="o">**</span><span class="n">cov_config</span>
         <span class="p">)</span>
         <span class="n">results</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_post_estimation</span><span class="p">(</span><span class="n">params</span><span class="p">,</span> <span class="n">cov_estimator</span><span class="p">,</span> <span class="n">cov_type</span><span class="p">)</span>
-        <span class="n">gmm_pe</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_gmm_post_estimation</span><span class="p">(</span><span class="n">params</span><span class="p">,</span> <span class="n">wmat</span><span class="p">,</span> <span class="n">iters</span><span class="p">)</span>
+        <span class="n">gmm_pe</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_gmm_post_estimation</span><span class="p">(</span><span class="n">params</span><span class="p">,</span> <span class="n">wmat</span><span class="p">,</span> <span class="n">iters</span><span class="p">,</span> <span class="n">moment_cov</span><span class="p">)</span>
         <span class="n">results</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="n">gmm_pe</span><span class="p">)</span>
 
         <span class="k">return</span> <span class="n">IVGMMResults</span><span class="p">(</span><span class="n">results</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span></div>
@@ -2854,7 +2959,7 @@
       <div class="md-copyright">
   
     <div class="md-footer-copyright__highlight">
-        &#169; Copyright 2021, Kevin Sheppard.
+        &#169; Copyright 2017-2026, Kevin Sheppard.
         
     </div>
   

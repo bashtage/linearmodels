@@ -1,8 +1,0 @@
-:orphan:
-
-linearmodels.shared.utility.AttrDict.get
-========================================
-
-.. currentmodule:: linearmodels.shared.utility
-
-.. automethod:: AttrDict.get

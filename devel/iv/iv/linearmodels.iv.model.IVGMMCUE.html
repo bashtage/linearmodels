@@ -23,7 +23,7 @@
     
   
       
-        <title>linearmodels.iv.model.IVGMMCUE - linearmodels v7.1 (+195)</title>
+        <title>linearmodels.iv.model.IVGMMCUE - linearmodels v7.1 (+205)</title>
       
     
 
@@ -100,7 +100,7 @@
 
 <header class="md-header md-header--shadow" data-md-component="header">
   <nav class="md-header__inner md-grid" aria-label="Header">
-    <a href="../../index.html" title="linearmodels v7.1 (+195)" class="md-header__button md-logo" aria-label="linearmodels v7.1 (+195)" data-md-component="logo">
+    <a href="../../index.html" title="linearmodels v7.1 (+205)" class="md-header__button md-logo" aria-label="linearmodels v7.1 (+205)" data-md-component="logo">
       <img src="../../_static/bw-logo.svg" alt="logo">
     </a>
     <label class="md-header__button md-icon" for="__drawer">
@@ -111,7 +111,7 @@
       <div class="md-header__ellipsis">
         <div class="md-header__topic">
           <span class="md-ellipsis">
-            linearmodels v7.1 (+195)
+            linearmodels v7.1 (+205)
           </span>
         </div>
         <div class="md-header__topic" data-md-component="header-topic">
@@ -206,10 +206,10 @@
 
 <nav class="md-nav md-nav--primary" aria-label="Navigation" data-md-level="0">
   <label class="md-nav__title" for="__drawer">
-    <a href="../../index.html" title="linearmodels v7.1 (+195)" class="md-nav__button md-logo" aria-label="linearmodels v7.1 (+195)" data-md-component="logo">
+    <a href="../../index.html" title="linearmodels v7.1 (+205)" class="md-nav__button md-logo" aria-label="linearmodels v7.1 (+205)" data-md-component="logo">
       <img src="../../_static/bw-logo.svg" alt="logo">
     </a>
-    linearmodels v7.1 (+195)
+    linearmodels v7.1 (+205)
   </label>
   
     <div class="md-nav__source">
@@ -1877,6 +1877,10 @@ autocorrelation</p></li>
 <p>In most circumstances, the <code class="docutils literal notranslate"><span class="pre">center</span></code> weight option should be <code class="docutils literal notranslate"><span class="pre">True</span></code> to
 avoid starting value dependence. It is <code class="docutils literal notranslate"><span class="pre">True</span></code> unless <code class="docutils literal notranslate"><span class="pre">center</span></code> is
 passed in <code class="docutils literal notranslate"><span class="pre">weight_config</span></code>.</p>
+<p>The covariance of the moment conditions has to be nonsingular. A clustered
+covariance that is estimated from G clusters has rank at most G, and at
+most G - 1 if the moment conditions are centered, so that there have to be
+more clusters than moment conditions if <code class="docutils literal notranslate"><span class="pre">center</span></code> is <code class="docutils literal notranslate"><span class="pre">True</span></code>.</p>
 <div class="math notranslate nohighlight">
 \[\begin{split}\hat{\beta}_{cue} &amp; =\min_{\beta}\bar{g}(\beta)'W(\beta)^{-1}g(\beta)\\
 g(\beta) &amp; =n^{-1}\sum_{i=1}^{n}z_{i}(y_{i}-x_{i}\beta)\end{split}\]</div>
@@ -1975,7 +1979,7 @@ paired by position. The same rule applies to <code class="docutils literal notra
       <div class="md-copyright">
   
     <div class="md-footer-copyright__highlight">
-        &#169; Copyright 2021, Kevin Sheppard.
+        &#169; Copyright 2017-2026, Kevin Sheppard.
         
     </div>
   

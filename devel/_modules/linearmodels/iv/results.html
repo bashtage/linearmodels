@@ -19,7 +19,7 @@
     
   
       
-        <title>linearmodels.iv.results - linearmodels v7.1 (+195)</title>
+        <title>linearmodels.iv.results - linearmodels v7.1 (+205)</title>
       
     
 
@@ -91,7 +91,7 @@
 
 <header class="md-header md-header--shadow" data-md-component="header">
   <nav class="md-header__inner md-grid" aria-label="Header">
-    <a href="../../../index.html" title="linearmodels v7.1 (+195)" class="md-header__button md-logo" aria-label="linearmodels v7.1 (+195)" data-md-component="logo">
+    <a href="../../../index.html" title="linearmodels v7.1 (+205)" class="md-header__button md-logo" aria-label="linearmodels v7.1 (+205)" data-md-component="logo">
       <img src="../../../_static/bw-logo.svg" alt="logo">
     </a>
     <label class="md-header__button md-icon" for="__drawer">
@@ -102,7 +102,7 @@
       <div class="md-header__ellipsis">
         <div class="md-header__topic">
           <span class="md-ellipsis">
-            linearmodels v7.1 (+195)
+            linearmodels v7.1 (+205)
           </span>
         </div>
         <div class="md-header__topic" data-md-component="header-topic">
@@ -197,10 +197,10 @@
 
 <nav class="md-nav md-nav--primary" aria-label="Navigation" data-md-level="0">
   <label class="md-nav__title" for="__drawer">
-    <a href="../../../index.html" title="linearmodels v7.1 (+195)" class="md-nav__button md-logo" aria-label="linearmodels v7.1 (+195)" data-md-component="logo">
+    <a href="../../../index.html" title="linearmodels v7.1 (+205)" class="md-nav__button md-logo" aria-label="linearmodels v7.1 (+205)" data-md-component="logo">
       <img src="../../../_static/bw-logo.svg" alt="logo">
     </a>
-    linearmodels v7.1 (+195)
+    linearmodels v7.1 (+205)
   </label>
   
     <div class="md-nav__source">
@@ -530,7 +530,7 @@
     <span class="n">sqrt</span><span class="p">,</span>
     <span class="n">squeeze</span><span class="p">,</span>
 <span class="p">)</span>
-<span class="kn">from</span><span class="w"> </span><span class="nn">numpy.linalg</span><span class="w"> </span><span class="kn">import</span> <span class="n">inv</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">numpy.linalg</span><span class="w"> </span><span class="kn">import</span> <span class="n">LinAlgError</span><span class="p">,</span> <span class="n">inv</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">pandas</span><span class="w"> </span><span class="kn">import</span> <span class="n">DataFrame</span><span class="p">,</span> <span class="n">Series</span><span class="p">,</span> <span class="n">concat</span><span class="p">,</span> <span class="n">to_numeric</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">scipy</span><span class="w"> </span><span class="kn">import</span> <span class="n">stats</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">statsmodels.iolib.summary</span><span class="w"> </span><span class="kn">import</span> <span class="n">SimpleTable</span><span class="p">,</span> <span class="n">fmt_2cols</span><span class="p">,</span> <span class="n">fmt_params</span>
@@ -2232,8 +2232,12 @@
 
 <span class="sd">        Returns</span>
 <span class="sd">        -------</span>
-<span class="sd">        WaldTestStatistic</span>
-<span class="sd">            J statistic  test of overidentifying restrictions</span>
+<span class="sd">        WaldTestStatistic or InvalidTestStatistic</span>
+<span class="sd">            J statistic  test of overidentifying restrictions.</span>
+<span class="sd">            An InvalidTestStatistic is returned if the estimate of the</span>
+<span class="sd">            covariance of the moment conditions that was inverted to compute</span>
+<span class="sd">            the weight matrix is singular, which can happen if there are too</span>
+<span class="sd">            few clusters.</span>
 
 <span class="sd">        Notes</span>
 <span class="sd">        -----</span>
@@ -2250,6 +2254,17 @@
 <span class="sd">        :math:`\hat{\epsilon}_i` are the model residuals. :math:`W` is a consistent</span>
 <span class="sd">        estimator of the variance of :math:`\sqrt{n}\bar{g}`. The degree of</span>
 <span class="sd">        freedom is :math:`q = n_{instr} - n_{endog}`.</span>
+
+<span class="sd">        The statistic is not defined if the estimate of the covariance of the</span>
+<span class="sd">        moment conditions that is inverted to compute the weight matrix is</span>
+<span class="sd">        singular. A clustered estimate that uses G clusters has rank at most</span>
+<span class="sd">        G, and at most G - 1 if the moment conditions are centered (``center``</span>
+<span class="sd">        is True), because the centered cluster sums add to zero. There have to</span>
+<span class="sd">        be at least as many clusters as moment conditions, and more if they are</span>
+<span class="sd">        centered. The rank of a kernel or robust estimate is bounded in the</span>
+<span class="sd">        same way by the number of observations. Whether the estimate is</span>
+<span class="sd">        singular does not depend on the units in which the variables are</span>
+<span class="sd">        measured.</span>
 <span class="sd">        """</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_j_stat</span>
 
@@ -2330,7 +2345,9 @@
 
 <div class="viewcode-block" id="IVGMMResults.c_stat">
 <a class="viewcode-back" href="../../../iv/iv/linearmodels.iv.results.IVGMMResults.c_stat.html#linearmodels.iv.absorbing.IVGMMResults.c_stat">[docs]</a>
-    <span class="k">def</span><span class="w"> </span><span class="nf">c_stat</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">variables</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">|</span> <span class="nb">str</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">WaldTestStatistic</span><span class="p">:</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">c_stat</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span> <span class="n">variables</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">|</span> <span class="nb">str</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">InvalidTestStatistic</span> <span class="o">|</span> <span class="n">WaldTestStatistic</span><span class="p">:</span>
 <span class="w">        </span><span class="sa">r</span><span class="sd">"""</span>
 <span class="sd">        C-test of endogeneity</span>
 
@@ -2342,8 +2359,11 @@
 
 <span class="sd">        Returns</span>
 <span class="sd">        -------</span>
-<span class="sd">        WaldTestStatistic</span>
-<span class="sd">            Object containing test statistic, p-value, distribution and null</span>
+<span class="sd">        WaldTestStatistic or InvalidTestStatistic</span>
+<span class="sd">            Object containing test statistic, p-value, distribution and null.</span>
+<span class="sd">            An InvalidTestStatistic is returned if the covariance of the</span>
+<span class="sd">            moment conditions of the first model is singular, which can happen</span>
+<span class="sd">            if there are too few clusters.</span>
 
 <span class="sd">        Notes</span>
 <span class="sd">        -----</span>
@@ -2388,6 +2408,16 @@
 <span class="sd">        kernel, so that the statistic is valid under the same assumptions</span>
 <span class="sd">        about the moment conditions.</span>
 
+<span class="sd">        The first model has a moment condition for each tested variable that</span>
+<span class="sd">        the model does not have. The estimate of the covariance of its moment</span>
+<span class="sd">        conditions has to be nonsingular, and the statistic is invalid if it is</span>
+<span class="sd">        not. A clustered estimate that uses G clusters has rank at most G, and</span>
+<span class="sd">        at most G - 1 if the moment conditions are centered (``center`` is</span>
+<span class="sd">        True), because the centered cluster sums add to zero. There have to be</span>
+<span class="sd">        at least as many clusters as moment conditions in the first model, and</span>
+<span class="sd">        more if they are centered. The rank of a kernel or robust estimate is</span>
+<span class="sd">        bounded in the same way by the number of observations.</span>
+
 <span class="sd">        See Hayashi (2000), pp. 218-221 and 232-234, or Baum, Schaffer and</span>
 <span class="sd">        Stillman (2003), section 4.4, for details.</span>
 <span class="sd">        """</span>
@@ -2423,8 +2453,21 @@
             <span class="n">weight_type</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">model</span><span class="o">.</span><span class="n">_weight_type</span><span class="p">,</span>
             <span class="o">**</span><span class="bp">self</span><span class="o">.</span><span class="n">model</span><span class="o">.</span><span class="n">_weight_kwargs</span><span class="p">,</span>
         <span class="p">)</span>
-        <span class="n">res_e</span> <span class="o">=</span> <span class="n">mod</span><span class="o">.</span><span class="n">fit</span><span class="p">(</span><span class="n">cov_type</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">cov_type</span><span class="p">,</span> <span class="o">**</span><span class="bp">self</span><span class="o">.</span><span class="n">cov_config</span><span class="p">)</span>
+        <span class="n">reason</span> <span class="o">=</span> <span class="p">(</span>
+            <span class="s2">"The covariance of the moment conditions of the model that treats "</span>
+            <span class="s2">"the tested variables as exogenous is singular, so the statistic "</span>
+            <span class="s2">"is not defined. This occurs, for example, when there are too few "</span>
+            <span class="s2">"clusters, since that model has a moment condition for each tested "</span>
+            <span class="s2">"variable that this model does not."</span>
+        <span class="p">)</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="n">res_e</span> <span class="o">=</span> <span class="n">mod</span><span class="o">.</span><span class="n">fit</span><span class="p">(</span><span class="n">cov_type</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">cov_type</span><span class="p">,</span> <span class="o">**</span><span class="bp">self</span><span class="o">.</span><span class="n">cov_config</span><span class="p">)</span>
+        <span class="k">except</span> <span class="n">LinAlgError</span><span class="p">:</span>
+            <span class="c1"># The covariance of the moment conditions is exactly singular</span>
+            <span class="k">return</span> <span class="n">InvalidTestStatistic</span><span class="p">(</span><span class="n">reason</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="s2">"C-statistic"</span><span class="p">)</span>
         <span class="k">assert</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">res_e</span><span class="p">,</span> <span class="n">IVGMMResults</span><span class="p">)</span>
+        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">res_e</span><span class="o">.</span><span class="n">j_stat</span><span class="p">,</span> <span class="n">InvalidTestStatistic</span><span class="p">):</span>
+            <span class="k">return</span> <span class="n">InvalidTestStatistic</span><span class="p">(</span><span class="n">reason</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="s2">"C-statistic"</span><span class="p">)</span>
         <span class="n">j_e</span> <span class="o">=</span> <span class="n">res_e</span><span class="o">.</span><span class="n">j_stat</span><span class="o">.</span><span class="n">stat</span>
 
         <span class="n">x</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">model</span><span class="o">.</span><span class="n">_wx</span>
@@ -2673,7 +2716,7 @@
       <div class="md-copyright">
   
     <div class="md-footer-copyright__highlight">
-        &#169; Copyright 2021, Kevin Sheppard.
+        &#169; Copyright 2017-2026, Kevin Sheppard.
         
     </div>
   
