@@ -9,6 +9,7 @@ from numpy import (
     where,
     zeros,
 )
+from pandas import isnull
 
 import linearmodels.typing.data
 
@@ -86,8 +87,21 @@ def cov_cluster(
     -------
     ndarray
        k by k cluster asymptotic covariance
+
+    Raises
+    ------
+    ValueError
+        If clusters contains missing values, since the observations they belong to
+        cannot be assigned to a cluster, or has fewer than two groups.
     """
+    if isnull(clusters).any():
+        raise ValueError("clusters cannot contain missing values.")
     num_clusters = len(unique(clusters))
+    if num_clusters < 2:
+        raise ValueError(
+            "A clustered covariance requires at least two clusters, but clusters "
+            "has one group."
+        )
 
     sort_args = argsort(clusters)
     clusters = clusters[sort_args]
