@@ -575,8 +575,9 @@ class _PanelModelBase:
             self._not_null = cast("BoolArray", np.asarray(~missing))
 
         w_df = self.weights.dataframe
-        if np.any(np.asarray(w_df) <= 0):
-            raise ValueError("weights must be strictly positive.")
+        w_values = np.asarray(w_df)
+        if np.any(w_values <= 0) or np.any(np.isinf(w_values)):
+            raise ValueError("weights must be strictly positive and finite.")
         w_df = w_df / w_df.mean()
         self.weights = PanelData(w_df)
         rank_of_x = self._check_exog_rank()
