@@ -241,7 +241,12 @@ def test_pesaran_cd_all_estimators(estimator):
     res = models[estimator]().fit()
     cd = res.pesaran_cd
     assert isinstance(cd, NormalTestStatistic)
-    expected = brute_force_pesaran_cd(res.idiosyncratic)
+    if estimator == "first-difference":
+        # The residuals of the differenced equation, not the shocks in levels
+        shocks = res.resids.to_frame()
+    else:
+        shocks = res.idiosyncratic
+    expected = brute_force_pesaran_cd(shocks)
     assert_allclose(cd.stat, expected, rtol=1e-10)
     assert_allclose(cd.pval, 2 * stats.norm.sf(abs(expected)), rtol=1e-10)
 

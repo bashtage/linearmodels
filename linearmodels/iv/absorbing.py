@@ -31,15 +31,17 @@ from numpy import (
     require,
     sqrt,
     squeeze,
+    unique,
     where,
     zeros,
 )
 from numpy.linalg import lstsq
 from pandas import Categorical, CategoricalDtype, DataFrame, Series
+from pandas.api.types import is_numeric_dtype
 import scipy.sparse as sp
 from scipy.sparse.linalg import lsmr
 
-from linearmodels.iv.common import f_statistic, find_constant
+from linearmodels.iv.common import f_statistic
 from linearmodels.iv.data import IVData
 from linearmodels.iv.model import (
     COVARIANCE_ESTIMATORS,
@@ -57,9 +59,15 @@ from linearmodels.panel.utility import (
     not_absorbed,
     preconditioner,
 )
-from linearmodels.shared.alignment import check_alignment, is_default_index, row_labels
+from linearmodels.shared.alignment import (
+    check_alignment,
+    is_default_index,
+    reference_labels,
+    row_labels,
+)
 from linearmodels.shared.exceptions import lookup_option, missing_warning
 from linearmodels.shared.hypotheses import InvalidTestStatistic, WaldTestStatistic
+from linearmodels.shared.inputs import as_array_like
 from linearmodels.shared.utility import DataFrameWrapper, SeriesWrapper
 import linearmodels.typing.data
 
@@ -136,12 +144,64 @@ def _options_key(options: dict[str, Any]) -> tuple[Any, ...]:
     return tuple(key)
 
 
+def _check_method(method: str) -> str:
+    """
+    Check the method used to absorb the variables
+
+    Parameters
+    ----------
+    method : str
+        The method that was passed to fit
+
+    Returns
+    -------
+    str
+        The method in lower case
+
+    Raises
+    ------
+    ValueError
+        If method is not "auto", "hdfe" or "lsmr", whatever its case
+    """
+    if isinstance(method, str) and method.lower() in ("auto", "hdfe", "lsmr"):
+        return method.lower()
+    raise ValueError(
+        'method must be one of "auto", "hdfe" or "lsmr", whatever its case. '
+        f"Got {method!r}."
+    )
+
+
 def _absorb_args(
     method: str, use_cache: bool, absorb_options: dict[str, Any] | None
 ) -> tuple[Any, ...]:
     """The arguments of AbsorbingLS.fit that determine the absorbed variables"""
     options = {} if absorb_options is None else absorb_options
     return method, use_cache, _options_key(options)
+
+
+def _is_nested(
+    effect: linearmodels.typing.data.IntArray,
+    cluster: linearmodels.typing.data.AnyArray,
+) -> bool:
+    """
+    Test whether every category of an effect is in a single cluster
+
+    Parameters
+    ----------
+    effect : ndarray
+        Integer codes of the categories of the effect, with shape (nobs,)
+    cluster : ndarray
+        Cluster of each observation, with shape (nobs,)
+
+    Returns
+    -------
+    bool
+        True if each category of the effect has observations in one cluster only
+    """
+    _, effect_codes = unique(effect, return_inverse=True)
+    _, cluster_codes = unique(cluster, return_inverse=True)
+    pairs = unique(effect_codes * (cluster_codes.max() + 1) + cluster_codes)
+    return bool(pairs.shape[0] == effect_codes.max() + 1)
 
 
 def _check_absorb_options(options: dict[str, Any], use_hdfe: bool, method: str) -> None:
@@ -385,13 +445,14 @@ class Interaction:
 
     Parameters
     ----------
-    cat : {ndarray, Series, DataFrame, DataArray}
+    cat : array_like
         Variables to treat as categoricals. Best format is a Categorical
         Series or DataFrame containing Categorical Series. Other formats
         are converted to Categorical Series, column-by-column. cats has
         shape (nobs, ncat).
-    cont : {ndarray, Series, DataFrame, DataArray}
-        Variables to treat as continuous, (nobs, ncont).
+    cont : array_like
+        Variables to treat as continuous, (nobs, ncont). A ``TypeError`` is
+        raised if the values are complex or cannot be converted to float64.
 
     Notes
     -----
@@ -439,8 +500,9 @@ class Interaction:
         cont: linearmodels.typing.data.ArrayLike | None = None,
         nobs: int | None = None,
     ) -> None:
-        self._cat = cat
-        self._cont = cont
+        # Lists and tuples are arrays, which have the shape that is used below
+        self._cat = None if cat is None else as_array_like(cat, "cat")
+        self._cont = None if cont is None else as_array_like(cont, "cont")
         self._cat_data = self._iv_data
         self._cont_data = self._iv_data
         self._nobs = nobs
@@ -448,6 +510,7 @@ class Interaction:
 
     @property
     def nobs(self) -> int:
+        """Number of observations, which drop reduces."""
         assert self._nobs is not None
         return self._nobs
 
@@ -502,8 +565,24 @@ class Interaction:
         return Series(cat_null.to_numpy() | cont_null.to_numpy(), index=index)
 
     def drop(self, locs: linearmodels.typing.data.BoolArray) -> None:
+        """
+        Drop observations.
+
+        Parameters
+        ----------
+        locs : ndarray
+            Boolean array with one element for each observation, which is True
+            for the observations to drop.
+
+        Notes
+        -----
+        The instance is modified in place and nothing is returned. Afterwards
+        ``nobs``, ``cat``, ``cont``, ``sparse`` and ``hash`` use only the
+        remaining observations.
+        """
         self._cat_data.drop(locs)
         self._cont_data.drop(locs)
+        self._nobs = self._cat_data.shape[0]
 
     @property
     def sparse(self) -> csc_array:
@@ -601,10 +680,27 @@ class Interaction:
         >>> interact.sparse.shape # Cart product of all cats, 5!, times ncont, 6
         (100000, 720)
         """
+        return Interaction._from_frame(frame, "frame")
+
+    @staticmethod
+    def _from_frame(frame: DataFrame, name: str) -> Interaction:
+        """from_frame, where name is used to refer to frame in error messages"""
+        if not isinstance(frame, DataFrame):
+            raise TypeError(f"{name} must be a DataFrame. Got {type(frame).__name__}.")
         cat_cols = [
             col for col in frame if isinstance(frame[col].dtype, CategoricalDtype)
         ]
         cont_cols = [col for col in frame if col not in cat_cols]
+        for col in cont_cols:
+            dtype = frame[col].dtype
+            if not is_numeric_dtype(dtype):
+                raise TypeError(
+                    f"The column {col!r} of {name} has dtype {dtype}. The columns "
+                    "that do not have a categorical dtype are treated as continuous "
+                    "variables and must be numeric. Convert the columns that "
+                    f"contain categories to categorical, for example using "
+                    f"{name}[{col!r}].astype('category')."
+                )
         # TODO: Bug in pandas-stubs
         #   https://github.com/pandas-dev/pandas-stubs/issues/97
         frame_cats = frame[cat_cols]
@@ -723,27 +819,33 @@ class AbsorbingLS:
     ----------
     dependent : array_like
         Endogenous variables (nobs by 1)
-    exog : array_like
+    exog : array_like, optional
         Exogenous regressors  (nobs by nexog)
-    absorb: {DataFrame, Interaction}
+    absorb : DataFrame or Interaction, optional
         The effects or continuous variables to absorb. When using a DataFrame,
         effects must be categorical variables. Other variable types are treated
-        as continuous variables that should be absorbed. When using an
-        Interaction, variables in the `cat` argument are treated as effects
-        and variables in the `cont` argument are treated as continuous.
-    interactions : {DataFrame, Interaction, list[DataFrame, Interaction]}
+        as continuous variables that should be absorbed, so they must be
+        numeric, and a ``TypeError`` is raised for columns of strings, which
+        have to be converted to categorical. When using an Interaction,
+        variables in the `cat` argument are treated as effects and variables in
+        the `cont` argument are treated as continuous.
+    interactions : DataFrame, Interaction or list of DataFrame or Interaction, optional
         Interactions containing both categorical and continuous variables.  Each
         interaction is constructed using the Cartesian product of the categorical
         variables to produce the dummy, which are then separately interacted with
-        each continuous variable.
-    weights : array_like
-        Observation weights used in estimation
+        each continuous variable. The columns of a DataFrame follow the rules of
+        ``absorb``.
+    weights : array_like, optional
+        Observation weights used in estimation. All weights must be strictly
+        positive or missing.
     drop_absorbed : bool
         Flag indicating whether to drop absorbed variables
 
     Notes
     -----
-    Capable of estimating models with millions of effects.
+    Capable of estimating models with millions of effects. The model is not a
+    panel estimator. See :ref:`iv-absorbing-ls` for when to use it and when to
+    use :class:`~linearmodels.panel.model.PanelOLS`.
 
     Estimates models of the form
 
@@ -768,6 +870,18 @@ class AbsorbingLS:
     estimates a particular restricted set of parameters that captures the
     effect of non-redundant components in z.
 
+    A variable in ``exog`` is absorbed if the effects explain all of it. The
+    algorithms that absorb the effects stop with a relative error of about
+    1e-8, so a variable is treated as absorbed if less than 1e-5 of its norm
+    is left after the effects are removed, whatever its units. It is treated
+    in the same way if it is collinear with the variables before it once the
+    effects are removed. An ``AbsorbingEffectError`` is raised for such a
+    variable. If ``drop_absorbed`` is True, the variable is dropped and an
+    ``AbsorbingEffectWarning`` is raised, and the constant is never dropped.
+    The norm includes the mean of the variable, so a variable with a large mean
+    and little other variation, less than 1e-5 of its norm, is also treated as
+    absorbed. Subtract its mean to avoid this.
+
     Rows are paired by position. An input that carries labels (a pandas
     Series or DataFrame with an index other than the default 0, 1, ..., n-1,
     or an xarray DataArray with coordinates) must use the same index, in the
@@ -777,8 +891,10 @@ class AbsorbingLS:
     ``dependent``. Either reindex the input to the index of ``dependent``, or
     call ``to_numpy()`` to pair its values by position. NumPy arrays and
     pandas objects with a default index do not carry labels and are always
-    paired by position. The same rule applies to ``clusters`` passed to
-    ``fit``.
+    paired by position. If ``dependent`` does not carry labels, the inputs
+    that do must use the same index as the first of ``exog``, ``absorb``,
+    ``interactions`` and ``weights`` that does. The same rule applies to
+    ``clusters`` passed to ``fit``.
 
     See also
     --------
@@ -826,7 +942,7 @@ class AbsorbingLS:
         self._exog = IVData(exog, "exog", nobs=self._nobs)
         self._absorb = absorb
         if isinstance(absorb, DataFrame):
-            self._absorb_inter = Interaction.from_frame(absorb)
+            self._absorb_inter = Interaction._from_frame(absorb, "absorb")
         elif absorb is None:
             self._absorb_inter = Interaction(None, None, nobs)
         elif isinstance(absorb, Interaction):
@@ -858,6 +974,8 @@ class AbsorbingLS:
         self._const_col: int | None = 0
         self._has_constant = False
         self._has_constant_exog = self._check_constant()
+        # Location of the constant among the regressors, which changes if some are dropped
+        self._const_loc: int | None = self._const_col
         self._constant_absorbed = False
         self._num_params = 0
         self._regressors: csc_array | None = None
@@ -904,7 +1022,9 @@ class AbsorbingLS:
             self._weight_data = IVData(ones(nobs), "weights")
         else:
             self._is_weighted = True
-            weights = IVData(self._weights).ndarray
+            weights = IVData(self._weights, var_name="weights").ndarray
+            if npany(weights <= 0):
+                raise ValueError("weights must be strictly positive.")
             weights = weights / nanmean(weights)
             self._weight_data = IVData(weights, var_name="weights", nobs=self._nobs)
 
@@ -923,17 +1043,21 @@ class AbsorbingLS:
                 )
 
     def _check_alignment(self) -> None:
-        """Check that inputs with labels use the labels of dependent"""
-        expected = row_labels(self._dependent)
-        check_alignment(expected, {"exog": self._exog, "weights": self._weights})
+        """Check that inputs with labels use the labels of dependent, or the first"""
+        inputs: list[tuple[str, object]] = [("exog", self._exog)]
         interactions: list[tuple[str, Interaction]] = [("absorb", self._absorb_inter)]
         single = isinstance(self._interactions, (DataFrame, Interaction))
         for i, interact in enumerate(self._interaction_list):
             name = "interactions" if single else f"interactions[{i}]"
             interactions.append((name, interact))
         for name, interact in interactions:
-            check_alignment(expected, {name: interact.cat})
-            check_alignment(expected, {name: interact.cont})
+            inputs.extend([(name, interact.cat), (name, interact.cont)])
+        inputs.append(("weights", self._weights))
+        # If dependent has no labels, the first input with labels sets the labels
+        self._labels, self._labels_name = reference_labels(
+            row_labels(self._dependent), inputs
+        )
+        check_alignment(self._labels, inputs, reference=self._labels_name)
 
     @property
     def absorbed_dependent(self) -> DataFrame:
@@ -999,13 +1123,17 @@ class AbsorbingLS:
         if self._interactions is None:
             return
         elif isinstance(self._interactions, DataFrame):
-            self._interaction_list = [Interaction.from_frame(self._interactions)]
+            self._interaction_list = [
+                Interaction._from_frame(self._interactions, "interactions")
+            ]
         elif isinstance(self._interactions, Interaction):
             self._interaction_list = [self._interactions]
         else:
             for interact in self._interactions:
                 if isinstance(interact, DataFrame):
-                    self._interaction_list.append(Interaction.from_frame(interact))
+                    self._interaction_list.append(
+                        Interaction._from_frame(interact, "interactions")
+                    )
                 elif isinstance(interact, Interaction):
                     self._interaction_list.append(interact)
                 else:
@@ -1109,11 +1237,14 @@ class AbsorbingLS:
             dep_resid += root_w * mu_dep
             exog_resid += root_w * mu_exog
 
+        ncol = exog_resid.shape[1]
+        retain = list(range(ncol))
         if not self._drop_absorbed:
             check_absorbed(exog_resid, self.exog.cols, exog)
         else:
-            ncol = exog_resid.shape[1]
-            retain = not_absorbed(exog_resid)
+            retain = not_absorbed(
+                exog_resid, self._constant_absorbed, self._const_col, exog
+            )
             if not retain:
                 raise ValueError(
                     "All columns in exog have been fully absorbed by the "
@@ -1131,6 +1262,10 @@ class AbsorbingLS:
             exog_resid = exog_resid[:, retain]
             self._columns = [self._columns[i] for i in retain]
 
+        # The location of the constant among the retained regressors, which is not
+        # the location in exog if a regressor before it was dropped
+        const_col = self._const_col
+        self._const_loc = retain.index(const_col) if const_col in retain else None
         self._absorbed_dependent = DataFrame(
             dep_resid,
             index=self._dependent.pandas.index,
@@ -1198,8 +1333,9 @@ class AbsorbingLS:
         debiased : bool
             Flag indicating whether to debiased the covariance estimator using
             a degree of freedom adjustment.
-        method : str
-            One of:
+        method : {"auto", "hdfe", "lsmr"}, optional
+            The algorithm that absorbs the variables. The name is not case
+            sensitive, and a ValueError is raised for any other value. One of:
 
             * "auto" - (Default). Use HDFE when applicable and fallback to LSMR.
             * "lsmr" - Force LSMR.
@@ -1228,8 +1364,8 @@ class AbsorbingLS:
 
             .. deprecated:: 4.17
 
-               Use absorb_options to pass options. ``lsmr_options`` will be
-               removed in linearmodels 8.0.
+               Use absorb_options with method="lsmr" to pass options.
+               ``lsmr_options`` will be removed in linearmodels 8.0.
 
         cov_config
             Additional parameters to pass to covariance estimator. The list
@@ -1263,6 +1399,26 @@ class AbsorbingLS:
         constant. The options used to absorb the variables are part of
         what identifies them.
 
+        If ``debiased`` is True, the covariance estimator is adjusted for the
+        degrees of freedom that the model uses: the k regressors in ``exog`` that
+        are estimated and the d degrees of freedom of the absorbed terms. They are
+        the dummy variables of the effects, with one less if ``exog`` has a
+        constant and one less for each effect after the first, the absorbed
+        continuous variables and the interactions, which is ``df_absorbed``. The
+        unadjusted, robust and kernel covariances are multiplied by n / (n - k - d),
+        and the clustered covariance by g (n - 1) / ((g - 1) (n - k - d)) where g
+        is the number of clusters. The result is that of the regression of the
+        dependent variable on ``exog`` and the dummy variables of the effects. It
+        is also that of ``PanelOLS(debiased=True)`` with the same effects, using
+        ``group_debias=True`` for the clustered covariance. The exception is a
+        clustered covariance when there is a single categorical effect and each of
+        its categories is in one cluster of every cluster variable: its degrees of
+        freedom are not counted, since the effect is nested in the clusters, as in
+        ``PanelOLS`` and Stata. Unlike ``PanelOLS``, nothing is adjusted if
+        ``debiased`` is False. The t and F distributions of the results use
+        ``df_resid`` whatever the covariance estimator. A ``ValueError`` is raised if
+        ``debiased`` is True and the model has no degrees of freedom left.
+
         The variables are absorbed when fit is called for the first time. A
         later call uses the same absorbed variables if ``method``,
         ``absorb_options`` and ``use_cache`` have the same values, so that
@@ -1276,6 +1432,7 @@ class AbsorbingLS:
         linearmodels.iv.covariance.KernelCovariance
         linearmodels.iv.covariance.ClusteredCovariance
         """
+        method = _check_method(method)
         if lsmr_options and absorb_options is None:
             # The options are options of LSMR, so they can not be passed to HDFE
             if method == "hdfe":
@@ -1291,13 +1448,18 @@ class AbsorbingLS:
                 raise ValueError("absorb_options cannot be used with lsmr_options")
             warnings.warn(
                 "lsmr_options is deprecated and will be removed in linearmodels "
-                "8.0. Use absorb_options.",
+                '8.0. Use absorb_options with method="lsmr", which passes the options '
+                "to scipy.sparse.linalg.lsmr.",
                 FutureWarning,
                 stacklevel=2,
             )
             absorb_options = dict(lsmr_options.items())
+        # Clusters are for the observations that are used to estimate the model
+        labels = None if self._labels is None else self._labels[~self._drop_locs]
         check_alignment(
-            row_labels(self._dependent), {"clusters": cov_config.get("clusters")}
+            labels,
+            {"clusters": cov_config.get("clusters")},
+            reference=self._labels_name,
         )
         if self._absorbed_dependent is None:
             self._first_time_fit(use_cache, absorb_options, method)
@@ -1314,6 +1476,10 @@ class AbsorbingLS:
         cov_config["kappa"] = 0.0
         cov_config_copy = dict(cov_config.items())
         cov_config_copy.pop("center", None)
+        if debiased:
+            cov_config_copy["extra_df"] = self._absorbed_df(
+                cov_estimator, cov_config.get("clusters")
+            )
         cov_estimator_inst = cov_estimator(
             exog_resid, dep_resid, exog_resid, params, **cov_config_copy
         )
@@ -1324,6 +1490,56 @@ class AbsorbingLS:
         results["df_model"] = self._num_params
 
         return AbsorbingLSResults(results, self)
+
+    def _absorbed_df(
+        self,
+        cov_estimator: type[
+            HomoskedasticCovariance
+            | HeteroskedasticCovariance
+            | KernelCovariance
+            | ClusteredCovariance
+        ],
+        clusters: linearmodels.typing.data.ArrayLike | None,
+    ) -> int:
+        """
+        Degrees of freedom of the absorbed terms that a debiased covariance counts
+
+        Parameters
+        ----------
+        cov_estimator : type
+            The class of the covariance estimator
+        clusters : array_like
+            The clusters that are passed to fit, if any
+
+        Returns
+        -------
+        int
+            The degrees of freedom of the absorbed terms: the dummy variables of the
+            effects, the absorbed continuous variables and the interactions, less the
+            overlap with a constant in exog. They are the same as df_absorbed, except
+            that a clustered covariance does not count the degrees of freedom of a
+            single categorical effect that is nested in all of the clusters, as
+            PanelOLS does.
+        """
+        assert isinstance(self._absorbed_exog, DataFrame)
+        absorbed = self._num_params - self._absorbed_exog.shape[1]
+        cat = self._absorb_inter.cat
+        if (
+            cov_estimator is not ClusteredCovariance
+            or clusters is None
+            or cat.shape[1] != 1
+        ):
+            return absorbed
+        cluster_array = asarray(clusters).squeeze()
+        if cluster_array.shape[0] != self._nobs:
+            return absorbed  # The covariance estimator raises an error
+        columns = [cluster_array] if cluster_array.ndim == 1 else list(cluster_array.T)
+        codes = asarray(cat.iloc[:, 0].cat.codes).astype(int64)
+        if not all(_is_nested(codes, column) for column in columns):
+            return absorbed
+        # The dummy variables of the effect, less one if the constant takes one
+        effect_df = unique(codes).shape[0] - int(self._has_constant_exog)
+        return absorbed - effect_df
 
     def resids(
         self, params: linearmodels.typing.data.Float64Array
@@ -1378,12 +1594,16 @@ class AbsorbingLS:
         cov: linearmodels.typing.data.Float64Array,
         debiased: bool,
     ) -> WaldTestStatistic | InvalidTestStatistic:
-        const_loc = find_constant(
-            cast("linearmodels.typing.data.Float64Array", self._exog.ndarray)
-        )
         resid_df = self._nobs - self._num_params
 
-        return f_statistic(params, cov, debiased, resid_df, const_loc)
+        return f_statistic(params, cov, debiased, resid_df, self._const_loc)
+
+    def _retained_exog(self) -> linearmodels.typing.data.Float64Array:
+        """The regressors that were estimated, in the units of exog"""
+        locs = [self._exog.cols.index(col) for col in self._columns]
+        return cast(
+            "linearmodels.typing.data.Float64Array", self._exog.ndarray[:, locs]
+        )
 
     def _post_estimation(
         self,
@@ -1406,8 +1626,9 @@ class AbsorbingLS:
             columns=["fitted_values"],
         )
         assert isinstance(self._absorbed_dependent, DataFrame)
+        # The part of the fitted values that is not explained by the regressors
         absorbed_effects = DataFrameWrapper(
-            self._absorbed_dependent.to_numpy() - fitted_values,
+            fitted_values - self._retained_exog() @ params,
             columns=["absorbed_effects"],
             index=self._dependent.rows,
         )
@@ -1430,8 +1651,8 @@ class AbsorbingLS:
         e = self._absorbed_dependent.to_numpy()  # already scaled by root_w
         # If absorbing contains a constant, but exog does not, no need to demean
         assert isinstance(self._absorbed_exog, DataFrame)
-        if self._const_col is not None:
-            col = self._const_col
+        if self._const_loc is not None:
+            col = self._const_loc
             x = self._absorbed_exog.to_numpy()[:, col : col + 1]
             mu = (lstsq(x, e, rcond=None)[0]).squeeze()
             e = e - x * mu

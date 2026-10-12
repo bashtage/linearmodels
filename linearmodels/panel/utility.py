@@ -8,7 +8,7 @@ from typing import Literal, NamedTuple, TypeVar, cast
 
 import numpy as np
 import numpy.random
-from pandas import DataFrame, concat, date_range
+from pandas import CategoricalDtype, DataFrame, concat, date_range
 import scipy.sparse as sp
 
 from linearmodels.shared.utility import panel_to_frame
@@ -150,9 +150,10 @@ def dummy_matrix(
     """
     Parameters
     ----------
-    cats: {DataFrame, ndarray}
+    cats : DataFrame or array_like
         Array containing the category codes of pandas categoricals
-        (nobs, ncats)
+        (nobs, ncats). A DataFrame must only contain categoricals. A
+        ``ValueError`` is raised if an array does not have 2 dimensions.
     output_format: {"csc", "csr", "coo", "array"}
         Output format. Default is csc (csc_array). Supported output
         formats are:
@@ -179,9 +180,21 @@ def dummy_matrix(
         Conditioning number of each column
     """
     if isinstance(cats, DataFrame):
+        for col in cats:
+            if not isinstance(cats[col].dtype, CategoricalDtype):
+                raise TypeError(
+                    "cats must only contain categorical columns, but the column "
+                    f"{col!r} has dtype {cats[col].dtype}. Pass the category codes "
+                    "as an array to use other columns."
+                )
         codes = np.column_stack([np.asarray(cats[c].cat.codes) for c in cats])
     else:
         codes = np.asarray(cats)
+        if codes.ndim != 2:
+            raise ValueError(
+                "cats must be a DataFrame or a 2-d array with a column for each "
+                f"set of categories, but it has {codes.ndim} dimension(s)."
+            )
 
     data: dict[str, list[np.ndarray]] = defaultdict(list)
     total_dummies = 0
@@ -436,6 +449,100 @@ def in_2core_graph_slow(
     return retain
 
 
+# A column is absorbed if less than this share of its norm, measured before the effects
+# were absorbed, is left. Both iterative algorithms that absorb effects, LSMR and the
+# method of alternating projections (HDFE), stop with an error of about 1e-8 of the
+# norm of the data, and the error is up to 100 times larger when the effects are only
+# weakly connected. The tolerance is well above that, and far above machine precision.
+_ABSORBED_TOL = 1e-5
+
+
+def _absorbed_columns(
+    x: linearmodels.typing.data.Float64Array,
+    x_orig: linearmodels.typing.data.Float64Array | None = None,
+    constant: int | None = None,
+) -> list[tuple[int, list[int]]]:
+    """
+    Find the columns that are absorbed or collinear with the columns before them
+
+    Parameters
+    ----------
+    x : ndarray
+        Regressors after the effects were absorbed, with shape (nobs, ncol).
+    x_orig : ndarray, optional
+        Regressors before the effects were absorbed, with the same shape as x.
+        Only the norm of each column is used. If not provided, x is assumed to be
+        exact, and only columns that are collinear with the columns before them
+        are found.
+    constant : int, optional
+        The location of a constant column. It is retained, and the other columns
+        are compared with it first, so that a column that was restored as its
+        grand mean is found.
+
+    Returns
+    -------
+    list of tuple of (int, list of int)
+        The columns to drop, in order. Each is paired with the sorted indices
+        of the columns in the relation that makes it redundant: the column
+        itself and the retained columns that it depends on.
+
+    Notes
+    -----
+    Every column is divided by the norm that it had before the effects were
+    absorbed, so that a column of size 1 is not touched by the effects and a
+    column of size 0 was absorbed entirely. The columns are processed in order,
+    and a column is dropped if less than ``_ABSORBED_TOL`` of it is left after it
+    is orthogonalized to the retained columns before it. The tolerance does not
+    depend on the units of the columns, and is above the error of the algorithms
+    that absorb the effects. Without x_orig, the columns are divided by their own
+    norm and the tolerance is the one of ``numpy.linalg.matrix_rank``.
+    """
+    tol = _ABSORBED_TOL if x_orig is not None else max(x.shape) * np.finfo(float).eps
+    nobs, ncol = x.shape
+    order = list(range(ncol))
+    if constant is not None:
+        order.remove(constant)
+        order.insert(0, constant)
+    norms = np.linalg.norm(x if x_orig is None else x_orig, axis=0)
+
+    basis = np.empty((nobs, ncol))  # Orthonormal basis of the retained columns
+    nbasis = 0
+    unit_constant = None
+    retained: list[int] = []
+    scale: dict[int, float] = {}
+    absorbed: list[tuple[int, list[int]]] = []
+    for j in order:
+        col = x[:, j]
+        norm = float(norms[j])
+        if x_orig is None and unit_constant is not None:
+            # Without the original data, measure the part that is not constant
+            norm = float(np.linalg.norm(col - unit_constant * (unit_constant @ col)))
+        scale[j] = norm if norm > 0.0 else 1.0
+        scaled = col / scale[j]
+        resid = scaled
+        for _ in range(2):  # Orthogonalizing twice removes the rounding error
+            resid = resid - basis[:, :nbasis] @ (basis[:, :nbasis].T @ resid)
+        size = float(np.linalg.norm(resid))
+        if j == constant or size >= tol:
+            retained.append(j)
+            if size > 0.0:
+                basis[:, nbasis] = resid / size
+                if j == constant:
+                    unit_constant = basis[:, nbasis]
+                nbasis += 1
+            continue
+
+        # The relation is the column and the retained columns that make it redundant
+        relation = [j]
+        if retained:
+            others = x[:, retained] / np.array([scale[i] for i in retained])
+            coefs = np.linalg.lstsq(others, scaled, rcond=None)[0]
+            share = np.abs(coefs) * np.linalg.norm(others, axis=0)
+            relation.extend(i for i, s in zip(retained, share, strict=True) if s >= tol)
+        absorbed.append((j, sorted(relation)))
+    return absorbed
+
+
 def check_absorbed(
     x: linearmodels.typing.data.Float64Array,
     variables: list[str] | tuple[str, ...],
@@ -447,48 +554,50 @@ def check_absorbed(
     Parameters
     ----------
     x : ndarray
-        Regressor matrix to check
-    variables : list[str]
-        List of variable names
-    x_orig : ndarray
-        Original data. If provided uses a norm check to ascertain if all
-        variables have been absorbed.
+        Regressor matrix to check, after the effects were absorbed.
+    variables : list of str
+        List of variable names.
+    x_orig : ndarray, optional
+        Regressors before the effects were absorbed, with the same shape as x. A
+        column of x is absorbed if less than 1e-5 of the norm of the same
+        column of x_orig is left, so that the check does not depend on the units
+        of the variables and detects the columns that the algorithm that
+        absorbed the effects left with an error of its tolerance. If not
+        provided, only columns that are collinear with other columns are
+        found.
+
+    Raises
+    ------
+    AbsorbingEffectError
+        If a column is absorbed by the effects or is collinear with other
+        columns after the effects are removed.
     """
     if x.size == 0:
         return
 
-    rank = np.linalg.matrix_rank(x)
-    if rank < x.shape[1]:
-        xpx = x.T @ x
-        vals, vecs = np.linalg.eigh(xpx)
-        nabsorbed = x.shape[1] - rank
-        tol = np.sort(vals)[nabsorbed - 1]
-        absorbed = vals <= tol
-        absorbed_vecs = vecs[:, absorbed]
-        rows = []
-        for i in range(nabsorbed):
-            abs_vec = np.abs(absorbed_vecs[:, i])
-            tol = abs_vec.max() * np.finfo(np.float64).eps * abs_vec.shape[0]
-            vars_idx = np.where(np.abs(absorbed_vecs[:, i]) > tol)[0]
-            rows.append(" " * 10 + ", ".join(str(variables[vi]) for vi in vars_idx))
-        absorbed_variables = "\n".join(rows)
-        msg = absorbing_error_msg.format(absorbed_variables=absorbed_variables)
-        raise AbsorbingEffectError(msg)
-    if x_orig is None:
+    absorbed = _absorbed_columns(x, x_orig)
+    if not absorbed:
         return
-
-    new_norm = np.linalg.norm(x, axis=0)
-    orig_norm = np.linalg.norm(x_orig, axis=0)
-    if np.all(((new_norm / orig_norm) ** 2) < np.finfo(float).eps):
-        raise AbsorbingEffectError(
-            "All exog variables have been absorbed. The model cannot be estimated."
-        )
+    if x_orig is not None:
+        with np.errstate(divide="ignore", invalid="ignore"):
+            size = np.linalg.norm(x, axis=0) / np.linalg.norm(x_orig, axis=0)
+        if np.all(~(size >= _ABSORBED_TOL)):
+            raise AbsorbingEffectError(
+                "All exog variables have been absorbed. The model cannot be estimated."
+            )
+    rows = [
+        " " * 10 + ", ".join(str(variables[i]) for i in relation)
+        for _, relation in absorbed
+    ]
+    msg = absorbing_error_msg.format(absorbed_variables="\n".join(rows))
+    raise AbsorbingEffectError(msg)
 
 
 def not_absorbed(
     x: linearmodels.typing.data.Float64Array,
     has_constant: bool = False,
     loc: int | None = None,
+    x_orig: linearmodels.typing.data.Float64Array | None = None,
 ) -> list[int]:
     """
     Construct a list of the indices of regressors that are not absorbed
@@ -496,59 +605,31 @@ def not_absorbed(
     Parameters
     ----------
     x : ndarray
-        Regressor matrix to check
-    has_constant : bool
-        Flag indicating that x has a constant column
-    loc : int
-        The location of the constant column
+        Regressor matrix to check, after the effects were absorbed.
+    has_constant : bool, optional
+        Flag indicating that x has a constant column. The default is False.
+    loc : int, optional
+        The location of the constant column. It is always retained, and the
+        other columns are compared with it first.
+    x_orig : ndarray, optional
+        Regressors before the effects were absorbed, with the same shape as x. A
+        column of x is absorbed if less than 1e-5 of the norm of the same
+        column of x_orig is left, so that the check does not depend on the units
+        of the variables. A column is also dropped if it is collinear with the
+        retained columns before it, using the same tolerance. If not provided,
+        only columns that are collinear with other columns are dropped.
 
     Returns
     -------
-    retain : list[int]
-        List of columns to retain
+    list of int
+        List of columns to retain.
     """
-    if np.linalg.matrix_rank(x) == x.shape[1]:
-        return list(range(x.shape[1]))
+    constant = None
     if has_constant:
         assert isinstance(loc, int)
-        check = [i for i in range(x.shape[1]) if i != loc]
-        const = x[:, [loc]]
-        sub = x[:, check]
-        resid = sub - const @ np.linalg.lstsq(const, sub, rcond=None)[0]
-        # A column that is constant on each entity is restored as its grand
-        # mean. Projecting that column on the intercept leaves only roundoff.
-        # The eigenvalue tolerance is relative to that roundoff, so it keeps
-        # the column. Compare with the column's own norm instead, and only
-        # when every non-constant column vanishes: a mix of absorbed and
-        # varying columns still uses the rank test below.
-        orig_norm = np.linalg.norm(sub, axis=0)
-        new_norm = np.linalg.norm(resid, axis=0)
-        with np.errstate(divide="ignore", invalid="ignore"):
-            ratio = (new_norm / orig_norm) ** 2
-        vanished = (orig_norm == 0.0) | (ratio < np.finfo(float).eps)
-        if bool(np.all(vanished)):
-            return [loc]
-        x = resid
-    xpx = x.T @ x
-    vals, _ = np.linalg.eigh(xpx)
-    if vals.max() == 0.0:
-        if has_constant:
-            assert isinstance(loc, int)
-            return [loc]
-        return []
-
-    tol = vals.max() * x.shape[1] * np.finfo(np.float64).eps
-    absorbed = vals < tol
-    nabsorbed = absorbed.sum()
-    _, r = np.linalg.qr(x)
-    threshold = np.sort(np.abs(np.diag(r)))[nabsorbed]
-    drop = np.where(np.abs(np.diag(r)) < threshold)[0]
-    retain: set[int] = set(range(x.shape[1])).difference(drop)
-    if has_constant:
-        assert isinstance(loc, int)
-        retain = {idx + (idx >= loc) for idx in retain}
-        retain.update({loc})
-    return sorted(retain)
+        constant = loc
+    dropped = {i for i, _ in _absorbed_columns(x, x_orig, constant)}
+    return [i for i in range(x.shape[1]) if i not in dropped]
 
 
 class PanelModelData(NamedTuple):

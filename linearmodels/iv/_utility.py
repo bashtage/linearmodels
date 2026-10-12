@@ -175,7 +175,7 @@ class IVFormulaParser:
             self._data,
             context=self._context,
             ensure_full_rank=False,
-            na_action=fNAAction("raise"),
+            na_action=fNAAction("ignore"),
         )
         return DataFrame(dep)
 
@@ -199,7 +199,7 @@ class IVFormulaParser:
             self._data,
             context=self._context,
             ensure_full_rank=False,
-            na_action=fNAAction("raise"),
+            na_action=fNAAction("ignore"),
         )
         return self._empty_check(DataFrame(endog))
 
@@ -211,7 +211,7 @@ class IVFormulaParser:
             self._data,
             context=self._context,
             ensure_full_rank=False,
-            na_action=fNAAction("raise"),
+            na_action=fNAAction("ignore"),
         )
         return self._empty_check(DataFrame(instr))
 

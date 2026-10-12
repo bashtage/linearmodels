@@ -55,7 +55,11 @@ from linearmodels.iv.gmm import (
     OneWayClusteredWeightMatrix,
 )
 from linearmodels.iv.results import IVGMMResults, IVResults, OLSResults
-from linearmodels.shared.alignment import check_alignment, row_labels
+from linearmodels.shared.alignment import (
+    check_alignment,
+    reference_labels,
+    row_labels,
+)
 from linearmodels.shared.exceptions import (
     IndexWarning,
     lookup_option,
@@ -193,23 +197,29 @@ class _IVModelBase:
         self._original_index = self.dependent.pandas.index
         if weights is None:
             weights = ones(self.dependent.shape)
-        weights_data = IVData(weights)
-        check_alignment(
-            row_labels(self.dependent),
-            {
-                "exog": self.exog,
-                "endog": self.endog,
-                "instruments": self.instruments,
-                "weights": weights_data,
-            },
+        weights_data = IVData(weights, var_name="weights")
+        inputs = {
+            "exog": self.exog,
+            "endog": self.endog,
+            "instruments": self.instruments,
+            "weights": weights_data,
+        }
+        # The inputs with labels use the labels of dependent. If dependent has no
+        # labels, they use the labels of the first of them that has labels
+        self._labels, self._labels_name = reference_labels(
+            row_labels(self.dependent), inputs
         )
+        check_alignment(self._labels, inputs, reference=self._labels_name)
         weights = weights_data.ndarray
         if npany(weights <= 0):
             raise ValueError("weights must be strictly positive.")
-        weights = weights / nanmean(weights)
         self.weights = IVData(weights, var_name="weights", nobs=nobs)
 
         self._drop_locs = self._drop_missing()
+        # The weights have mean 1 in the sample that is used to estimate the model,
+        # which does not include the observations that were dropped
+        kept = self.weights.ndarray
+        self.weights = IVData(kept / nanmean(kept), var_name="weights")
         # Weighted data is data scaled by the square root of the weights
         self._sqrt_weights = w = sqrt(self.weights.ndarray)
         # dependent variable
@@ -266,7 +276,7 @@ class _IVModelBase:
         exog: IVDataLike | None = None,
         endog: IVDataLike | None = None,
         data: DataFrame | None = None,
-        eval_env: int = 4,
+        eval_env: int = 2,
     ) -> DataFrame:
         """
         Predict values for additional data
@@ -282,8 +292,10 @@ class _IVModelBase:
         data : DataFrame
             Values to use when making predictions from a model constructed
             from a formula
-        eval_env : int
-            Depth of use when evaluating formulas.
+        eval_env : int, optional
+            Depth of the stack frame whose variables are used when evaluating the
+            formula, counted from the formula parser. The default is 2, which is
+            the frame that calls predict.
 
         Returns
         -------
@@ -315,9 +327,9 @@ class _IVModelBase:
                 "of exog/endog or data, but not both."
             )
         if exog is not None:
-            exog = IVData(exog).pandas
+            exog = IVData(exog, var_name="exog").pandas
         if endog is not None:
-            endog = IVData(endog).pandas
+            endog = IVData(endog, var_name="endog").pandas
         if data is not None:
             parser = IVFormulaParser(self.formula, data, eval_env=eval_env)
             exog = parser.exog
@@ -402,9 +414,11 @@ class _IVModelBase:
         return missing
 
     def _check_clusters(self, config: Mapping[str, Any]) -> None:
-        """Check that clusters with labels use the labels of dependent"""
+        """Check that clusters with labels use the labels of the other inputs"""
+        # Clusters are for the observations that are used to estimate the model
+        labels = None if self._labels is None else self._labels[self.notnull]
         check_alignment(
-            row_labels(self.dependent), {"clusters": config.get("clusters")}
+            labels, {"clusters": config.get("clusters")}, reference=self._labels_name
         )
 
     def wresids(
@@ -715,7 +729,7 @@ class _IVLSModelBase(_IVModelBase):
             liml_kappa = nan
             if kappa is None:
                 raise ValueError(
-                    "Unable to estimate kappa. This is most likely occurs if the "
+                    "Unable to estimate kappa. This most likely occurs if the "
                     f"instrument matrix is rank deficient. The error raised when "
                     f"computing kappa was:\n\n{exc}"
                 ) from exc
@@ -804,8 +818,10 @@ class IVLIML(_IVLSModelBase):
     ``dependent``. Either reindex the input to the index of ``dependent``, or
     call ``to_numpy()`` to pair its values by position. NumPy arrays and
     pandas objects with a default index do not carry labels and are always
-    paired by position. The same rule applies to ``clusters`` passed to
-    ``fit``.
+    paired by position. If ``dependent`` does not carry labels, the inputs
+    that do must use the same index as the first of ``exog``, ``endog``,
+    ``instruments`` and ``weights`` that does. The same rule applies to
+    ``clusters`` passed to ``fit``.
 
     .. todo::
 
@@ -937,8 +953,10 @@ class IV2SLS(_IVLSModelBase):
     ``dependent``. Either reindex the input to the index of ``dependent``, or
     call ``to_numpy()`` to pair its values by position. NumPy arrays and
     pandas objects with a default index do not carry labels and are always
-    paired by position. The same rule applies to ``clusters`` passed to
-    ``fit``.
+    paired by position. If ``dependent`` does not carry labels, the inputs
+    that do must use the same index as the first of ``exog``, ``endog``,
+    ``instruments`` and ``weights`` that does. The same rule applies to
+    ``clusters`` passed to ``fit``.
 
     .. todo::
 
@@ -1203,6 +1221,58 @@ class _IVGMMBase(_IVModelBase):
         null = "Expected moment conditions are equal to 0"
         return WaldTestStatistic(stat, null, ninstr - nvar)
 
+    def _raise_if_singular(
+        self,
+        moment_cov: linearmodels.typing.data.Float64Array,
+        consequence: str,
+    ) -> None:
+        """
+        Raise a ValueError if the covariance of the moment conditions is singular
+
+        Parameters
+        ----------
+        moment_cov : ndarray
+            Estimate of the covariance of the moment conditions (ninstr by
+            ninstr).
+        consequence : str
+            Sentence that says why the estimator needs the inverse of the
+            covariance. It ends with the period.
+
+        Raises
+        ------
+        ValueError
+            If the covariance is singular. The message says that there are too
+            few clusters or observations and how many are needed.
+        """
+        if not _is_singular(moment_cov):
+            return
+        nobs, nmoment = self._wz.shape
+        if isinstance(self._weight, OneWayClusteredWeightMatrix):
+            nclusters = len(unique(asarray(self._weight_config["clusters"])))
+            centered = self._weight_config["center"]
+            rank = nclusters - 1 if centered else nclusters
+            rank_reason = (
+                "one less than the number of clusters, since the cluster sums of "
+                "centered moment conditions add to zero"
+                if centered
+                else "the number of clusters"
+            )
+            msg = (
+                f"The clustered covariance of the {nmoment} moment conditions is "
+                f"singular because there are too few clusters ({nclusters} "
+                f"clusters). Its rank is at most {rank}, {rank_reason}. "
+                f"{consequence} Use more clusters than moment conditions, or a "
+                "weight_type that does not use clusters."
+            )
+        else:
+            msg = (
+                f"The covariance of the {nmoment} moment conditions is singular, "
+                f"which occurs if there are too few observations ({nobs}) for the "
+                f"number of moment conditions. {consequence} Use more "
+                "observations or fewer moment conditions."
+            )
+        raise ValueError(msg)
+
 
 class IVGMM(_IVGMMBase):
     r"""
@@ -1255,8 +1325,24 @@ class IVGMM(_IVGMMBase):
     ``dependent``. Either reindex the input to the index of ``dependent``, or
     call ``to_numpy()`` to pair its values by position. NumPy arrays and
     pandas objects with a default index do not carry labels and are always
-    paired by position. The same rule applies to ``clusters`` passed to
-    ``fit`` or in ``weight_config``.
+    paired by position. If ``dependent`` does not carry labels, the inputs
+    that do must use the same index as the first of ``exog``, ``endog``,
+    ``instruments`` and ``weights`` that does. The same rule applies to
+    ``clusters`` passed to ``fit`` or in ``weight_config``.
+
+    The weight matrix is the inverse of an estimate of the covariance of the
+    moment conditions, so that the estimate has to be nonsingular. A clustered
+    estimate from G clusters has rank at most G, and at most G - 1 if the
+    moment conditions are centered (``center`` is ``True``), since the
+    centered cluster sums add to zero. There have to be at least as many
+    clusters as moment conditions, and more if they are centered. The first
+    step moment conditions of an exactly identified model add to zero as well,
+    so that it needs more clusters than moment conditions with every value of
+    ``center``. The rank of a kernel or robust estimate is bounded in the same
+    way by the number of observations. ``fit`` raises a ``ValueError`` that
+    says so if the estimate is singular, since the estimates would be
+    numerical noise. The estimate is not used, and so it is not tested, if
+    ``iter_limit`` is 1.
 
     .. todo::
 
@@ -1432,6 +1518,16 @@ class IVGMM(_IVGMMBase):
         IVGMMResults
             Results container
 
+        Raises
+        ------
+        ValueError
+            If the estimate of the covariance of the moment conditions is
+            singular, which occurs if there are too few clusters or
+            observations. A clustered estimate needs at least as many clusters
+            as moment conditions, and more if the moment conditions are
+            centered or the model is exactly identified. The estimate is not
+            used if ``iter_limit`` is 1.
+
         See also
         --------
         linearmodels.iv.gmm.IVGMMCovariance
@@ -1455,6 +1551,11 @@ class IVGMM(_IVGMMBase):
         while iters < iter_limit and norm > tol:
             eps = wy - wx @ params
             moment_cov = weight_matrix(wx, wz, eps)
+            self._raise_if_singular(
+                moment_cov,
+                "The weight matrix of the GMM estimator is the inverse of the "
+                "covariance, so it is not defined.",
+            )
             wmat = inv(moment_cov)
             params = self.estimate_parameters(wx, wy, wz, wmat)
             delta = params - _params
@@ -1539,7 +1640,12 @@ class IVGMMCUE(_IVGMMBase):
     The covariance of the moment conditions has to be nonsingular. A clustered
     covariance that is estimated from G clusters has rank at most G, and at
     most G - 1 if the moment conditions are centered, so that there have to be
-    more clusters than moment conditions if ``center`` is ``True``.
+    more clusters than moment conditions if ``center`` is ``True``. If
+    ``center`` is ``False`` and there are as many clusters as moment
+    conditions, the covariance is nonsingular but the objective function is
+    the same for every value of the parameters, so that there is nothing to
+    optimize. There have to be more clusters than moment conditions whether or
+    not the moment conditions are centered.
 
     .. math::
 
@@ -1558,8 +1664,10 @@ class IVGMMCUE(_IVGMMBase):
     ``dependent``. Either reindex the input to the index of ``dependent``, or
     call ``to_numpy()`` to pair its values by position. NumPy arrays and
     pandas objects with a default index do not carry labels and are always
-    paired by position. The same rule applies to ``clusters`` passed to
-    ``fit`` or in ``weight_config``.
+    paired by position. If ``dependent`` does not carry labels, the inputs
+    that do must use the same index as the first of ``exog``, ``endog``,
+    ``instruments`` and ``weights`` that does. The same rule applies to
+    ``clusters`` passed to ``fit`` or in ``weight_config``.
 
     See Also
     --------
@@ -1777,47 +1885,47 @@ class IVGMMCUE(_IVGMMBase):
 
     def _check_moment_covariance(self) -> None:
         """
-        Raise a ValueError if the covariance of the moment conditions is singular
+        Raise a ValueError if the objective function is not defined or constant
 
-        The objective function uses the inverse of the covariance, so it is not
-        defined if the covariance is singular. The rank of the covariance does
-        not depend on the parameters, other than for special values such as
-        residuals that are all 0, and so it is tested at the first step
-        estimates of two-step GMM.
+        The objective function uses the inverse of the covariance of the moment
+        conditions, so it is not defined if the covariance is singular. The rank
+        of the covariance does not depend on the parameters, other than for
+        special values such as residuals that are all 0, and so it is tested at
+        the first step estimates of two-step GMM.
+
+        If the covariance is clustered, the moment conditions are not centered
+        and there are as many clusters as moment conditions, the covariance is
+        not singular but the objective function is the same for all values of
+        the parameters. The cluster sums of the moment conditions are the rows
+        of a square matrix, Xi, the average of the moment conditions is
+        Xi'1 / n, and the covariance is Xi'Xi / n, so that the objective function
+        is 1'Xi(Xi'Xi)^{-1}Xi'1, which is the number of clusters whenever Xi is
+        nonsingular (it is divided by the small sample adjustment if debiased).
         """
         wy, wx, wz = self._wy, self._wx, self._wz
         nobs, nmoment = wz.shape
         params = IVGMM.estimate_parameters(wx, wy, wz, inv(wz.T @ wz / nobs))
-        if not _is_singular(self._weight.weight_matrix(wx, wz, wy - wx @ params)):
+        self._raise_if_singular(
+            self._weight.weight_matrix(wx, wz, wy - wx @ params),
+            "The objective function of the continuously updating GMM estimator "
+            "uses the inverse of the covariance, so it is not defined.",
+        )
+        if not isinstance(self._weight, OneWayClusteredWeightMatrix):
             return
-        if isinstance(self._weight, OneWayClusteredWeightMatrix):
-            nclusters = len(unique(asarray(self._weight_config["clusters"])))
-            centered = self._weight_config["center"]
-            rank = nclusters - 1 if centered else nclusters
-            rank_reason = (
-                "one less than the number of clusters, since the cluster sums of "
-                "centered moment conditions add to zero"
-                if centered
-                else "the number of clusters"
-            )
-            msg = (
-                f"The clustered covariance of the {nmoment} moment conditions is "
-                f"singular because there are too few clusters ({nclusters} "
-                f"clusters). Its rank is at most {rank}, {rank_reason}. The "
-                "objective function of the continuously updating GMM estimator "
-                "uses the inverse of the covariance, so it is not defined. Use "
-                "more clusters than moment conditions, or a weight_type that does "
-                "not use clusters."
-            )
-        else:
-            msg = (
-                f"The covariance of the {nmoment} moment conditions is singular, "
-                f"which occurs if there are too few observations ({nobs}) for the "
-                "number of moment conditions. The objective function of the "
-                "continuously updating GMM estimator uses the inverse of the "
-                "covariance, so it is not defined. Use more observations or fewer "
-                "moment conditions."
-            )
+        nclusters = len(unique(asarray(self._weight_config["clusters"])))
+        # Fewer clusters, or centered moment conditions, give a singular covariance
+        if nclusters > nmoment:
+            return
+        msg = (
+            f"The clustered covariance of the {nmoment} moment conditions is "
+            f"estimated from as many clusters ({nclusters} clusters) as there "
+            "are moment conditions, and the moment conditions are not centered. "
+            "The objective function of the continuously updating GMM estimator "
+            "is then the same for every value of the parameters, so that there is "
+            "nothing to optimize and the estimates would be the starting values. "
+            "Use more clusters than moment conditions, or a weight_type that "
+            "does not use clusters."
+        )
         raise ValueError(msg)
 
     def fit(
@@ -1866,10 +1974,11 @@ class IVGMMCUE(_IVGMMBase):
         ------
         ValueError
             If the covariance of the moment conditions is singular, which
-            occurs if there are too few clusters or observations. The
-            number of clusters has to be larger than the number of moment
-            conditions if the moment conditions are centered, which is the
-            default.
+            occurs if there are too few clusters or observations, or if the
+            moment conditions are not centered and there are as many clusters
+            as moment conditions, so that the objective function is constant.
+            The number of clusters has to be larger than the number of moment
+            conditions.
 
         Notes
         -----
@@ -1949,8 +2058,10 @@ class _OLS(IVLIML):
     ``weights`` differs from the index of ``dependent``. Either reindex the
     input to the index of ``dependent``, or call ``to_numpy()`` to pair its
     values by position. NumPy arrays and pandas objects with a default index
-    do not carry labels and are always paired by position. The same rule
-    applies to ``clusters`` passed to ``fit``.
+    do not carry labels and are always paired by position. If ``dependent``
+    does not carry labels, the inputs that do must use the same index as the
+    first of ``exog`` and ``weights`` that does. The same rule applies to
+    ``clusters`` passed to ``fit``.
 
     See Also
     --------
@@ -2190,8 +2301,10 @@ class IVJIVE(_IVModelBase):
     ``dependent``. Either reindex the input to the index of ``dependent``, or
     call ``to_numpy()`` to pair its values by position. NumPy arrays and
     pandas objects with a default index do not carry labels and are always
-    paired by position. The same rule applies to ``clusters`` passed to
-    ``fit``.
+    paired by position. If ``dependent`` does not carry labels, the inputs
+    that do must use the same index as the first of ``exog``, ``endog``,
+    ``instruments`` and ``weights`` that does. The same rule applies to
+    ``clusters`` passed to ``fit``.
 
     See Also
     --------

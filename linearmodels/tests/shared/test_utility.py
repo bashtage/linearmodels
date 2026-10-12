@@ -12,6 +12,7 @@ import pytest
 from scipy import stats
 
 import linearmodels
+from linearmodels.shared.covariance import cov_cluster
 from linearmodels.shared.exceptions import missing_warning
 from linearmodels.shared.hypotheses import (
     InapplicableTestStatistic,
@@ -63,6 +64,18 @@ def test_hasconstant():
     x[1::2, 1] = 0
     hc, loc = has_constant(x)
     assert hc is True
+
+
+def test_hasconstant_more_than_one():
+    x = np.random.randn(100, 3)
+    x[:, 0] = 1
+    x[:, 1] = 1
+    assert has_constant(x) == (True, 0)
+    x[:, 0] = 2
+    x[:, 1] = 3
+    assert has_constant(x) == (True, 0)
+    x[:, 0] = np.random.randn(100)
+    assert has_constant(x) == (True, 1)
 
 
 def test_wald_statistic():
@@ -338,3 +351,33 @@ def test_add_star(pvalue):
 
     result = add_star("", pvalue, True)
     assert expected == result
+
+
+def test_cov_cluster():
+    rng = np.random.default_rng(0)
+    z = rng.standard_normal((60, 3))
+    clusters = np.arange(60) % 7
+    expected = np.zeros((3, 3))
+    for group in range(7):
+        total = z[clusters == group].sum(0)
+        expected += np.outer(total, total)
+    assert_allclose(cov_cluster(z, clusters), expected / 60)
+
+
+@pytest.mark.parametrize("dtype", [float, object])
+def test_cov_cluster_missing(dtype):
+    # The scores of the observations with a missing cluster would be left out of the
+    # covariance, apart from the first one
+    z = np.random.default_rng(0).standard_normal((60, 3))
+    clusters = (np.arange(60) % 7).astype(dtype)
+    clusters[[4, 20, 33]] = np.nan
+    with pytest.raises(ValueError, match="missing values"):
+        cov_cluster(z, clusters)
+
+
+def test_cov_cluster_one_cluster():
+    # The scores sum to zero for the estimated parameters, so the covariance of a
+    # single cluster would be zero
+    z = np.random.default_rng(0).standard_normal((60, 3))
+    with pytest.raises(ValueError, match="at least two clusters"):
+        cov_cluster(z, np.zeros(60, dtype=int))

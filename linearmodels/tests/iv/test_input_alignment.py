@@ -6,7 +6,9 @@ labelled input whose rows are in a different order from dependent would
 silently be attached to the wrong observations. These tests check that this
 is rejected, that inputs that carry no labels (NumPy arrays and pandas objects
 with a default index) are paired by position, and that inputs that use the
-labels of dependent are accepted.
+labels of dependent are accepted. If dependent carries no labels, the first of
+the other inputs that does sets the labels, and the inputs after it have to use
+them.
 """
 
 import numpy as np
@@ -248,8 +250,9 @@ def test_reversed_default_index_has_labels(simple, cls):
 
 
 @pytest.mark.parametrize("cls", ESTIMATORS, ids=ESTIMATOR_IDS)
-def test_unlabelled_dependent_is_not_checked(simple, cls):
-    # There are no labels to compare to, so the inputs are paired by position
+def test_unlabelled_dependent_is_paired_by_position(simple, cls):
+    # There are no labels in dependent, so the other inputs are paired with it by
+    # position. They use the same labels as each other
     y = simple.dependent.to_numpy()
     for corrupt in CORRUPTIONS.values():
         mod = cls(
@@ -262,7 +265,119 @@ def test_unlabelled_dependent_is_not_checked(simple, cls):
         assert_allclose(mod.exog.ndarray, corrupt(simple.exog).to_numpy())
         assert_allclose(mod.dependent.ndarray, y[:, None])
     # The same holds if dependent has a default index
-    cls(pd.Series(y), reverse(simple.exog), simple.endog, simple.instruments)
+    flipped = (reverse(simple.exog), reverse(simple.endog), reverse(simple.instruments))
+    cls(pd.Series(y), *flipped)
+
+
+UNLABELLED_DEPENDENT = {
+    "numpy": lambda y: y.to_numpy(),
+    "default-index": lambda y: pd.Series(y.to_numpy(), name=y.name),
+}
+
+
+@pytest.mark.parametrize("cls", ESTIMATORS, ids=ESTIMATOR_IDS)
+@pytest.mark.parametrize("form", list(UNLABELLED_DEPENDENT))
+@pytest.mark.parametrize("corruption", list(CORRUPTIONS))
+@pytest.mark.parametrize("name", INPUTS)
+def test_inputs_must_agree_when_dependent_has_no_labels(
+    simple, cls, form, name, corruption
+):
+    dependent = UNLABELLED_DEPENDENT[form](simple.dependent)
+    build(cls, simple, dependent=dependent, weights=simple.weights)
+    bad = CORRUPTIONS[corruption](getattr(simple, name))
+    # exog sets the labels. If it is the input that changed, endog is the first
+    # input that does not use them
+    other = "endog" if name == "exog" else name
+    replace = {"dependent": dependent, "weights": simple.weights, name: bad}
+    with pytest.raises(ValueError, match=f"row index of {other} does not match exog"):
+        build(cls, simple, **replace)
+
+
+@pytest.mark.parametrize("cls", ESTIMATORS, ids=ESTIMATOR_IDS)
+def test_message_names_the_input_that_sets_the_labels(simple, cls):
+    y = simple.dependent.to_numpy()
+    with pytest.raises(ValueError, match="does not match") as exc:
+        cls(y, simple.exog, simple.endog, reverse(simple.instruments))
+    message = str(exc.value)
+    assert message.startswith("The row index of instruments does not match exog.")
+    assert "in the same order as exog" in message
+    assert "reindex instruments to the index of exog" in message
+    assert ".to_numpy()" in message
+
+
+@pytest.mark.parametrize("cls", ESTIMATORS, ids=ESTIMATOR_IDS)
+def test_inputs_without_labels_do_not_set_the_labels(simple, cls):
+    y, exog = simple.dependent.to_numpy(), simple.exog.to_numpy()
+    cls(y, exog, simple.endog, simple.instruments)
+    # endog is the first input with labels
+    match = "row index of instruments does not match endog"
+    with pytest.raises(ValueError, match=match):
+        cls(y, exog, simple.endog, reverse(simple.instruments))
+    match = "row index of weights does not match endog"
+    with pytest.raises(ValueError, match=match):
+        cls(y, exog, simple.endog, simple.instruments, weights=reverse(simple.weights))
+    # A default index has no labels, so exog does not set them
+    default = pd.DataFrame(exog, columns=simple.exog.columns)
+    with pytest.raises(ValueError, match=match):
+        cls(
+            y,
+            default,
+            simple.endog,
+            simple.instruments,
+            weights=reverse(simple.weights),
+        )
+    # Only one input has labels
+    cls(y, exog, simple.endog.to_numpy(), reverse(simple.instruments))
+    cls(y, exog, reverse(simple.endog), simple.instruments.to_numpy())
+    # weights set the labels if no other input has them
+    raw = [y, exog, simple.endog.to_numpy(), simple.instruments.to_numpy()]
+    cls(*raw, weights=reverse(simple.weights))
+
+
+@pytest.mark.parametrize("corruption", list(CORRUPTIONS))
+def test_inputs_must_agree_for_every_index_style(data, corruption):
+    y = data.dependent.to_numpy()
+    IV2SLS(y, data.exog, data.endog, data.instruments)
+    bad = CORRUPTIONS[corruption](data.instruments)
+    with pytest.raises(
+        ValueError, match="row index of instruments does not match exog"
+    ):
+        IV2SLS(y, data.exog, data.endog, bad)
+
+
+def test_ols_inputs_must_agree_when_dependent_has_no_labels(simple):
+    y = simple.dependent.to_numpy()
+    OLS(y, simple.exog, weights=simple.weights)
+    with pytest.raises(ValueError, match="row index of weights does not match exog"):
+        OLS(y, simple.exog, weights=reverse(simple.weights))
+    with pytest.raises(ValueError, match="row index of weights does not match exog"):
+        IV2SLS(y, simple.exog, None, None, weights=relabel(simple.weights))
+    mod = OLS(y, simple.exog)
+    mod.fit(cov_type="clustered", clusters=simple.clusters)
+    with pytest.raises(ValueError, match="row index of clusters does not match exog"):
+        mod.fit(cov_type="clustered", clusters=reverse(simple.clusters))
+
+
+@pytest.mark.parametrize("cls", ESTIMATORS, ids=ESTIMATOR_IDS)
+def test_ivdata_inputs_set_the_labels_when_dependent_has_none(simple, cls):
+    y = simple.dependent.to_numpy()
+    cls(y, IVData(simple.exog), simple.endog, simple.instruments)
+    with pytest.raises(ValueError, match="row index of endog does not match exog"):
+        cls(y, IVData(reverse(simple.exog)), simple.endog, simple.instruments)
+    # IVData built from an array has no labels
+    cls(y, IVData(simple.exog.to_numpy()[::-1]), simple.endog, simple.instruments)
+
+
+@pytest.mark.parametrize("cls", ESTIMATORS, ids=ESTIMATOR_IDS)
+def test_xarray_inputs_set_the_labels_when_dependent_has_none(simple, cls):
+    y = simple.dependent.to_numpy()
+    exog = to_xarray(simple.exog)
+    cls(y, exog, simple.endog, simple.instruments)
+    with pytest.raises(ValueError, match="row index of endog does not match exog"):
+        cls(y, to_xarray(reverse(simple.exog)), simple.endog, simple.instruments)
+    # A DataArray without coordinates has no labels
+    no_coords = to_xarray(reverse(simple.exog), coords=False)
+    cls(y, no_coords, simple.endog, simple.instruments)
 
 
 @pytest.mark.parametrize("cls", ESTIMATORS, ids=ESTIMATOR_IDS)
@@ -450,6 +565,58 @@ def test_clusters_index_styles(data, corruption):
     bad = CORRUPTIONS[corruption](data.clusters)
     with pytest.raises(ValueError, match="row index of clusters does not match"):
         mod.fit(cov_type="clustered", clusters=bad)
+
+
+@pytest.mark.parametrize("cls", FAST, ids=FAST_IDS)
+def test_clusters_use_the_labels_of_the_first_input_with_labels(simple, cls):
+    y = simple.dependent.to_numpy()
+    mod = cls(y, simple.exog, simple.endog, simple.instruments)
+    res = mod.fit(cov_type="clustered", clusters=simple.clusters)
+    raw = mod.fit(cov_type="clustered", clusters=simple.clusters.to_numpy())
+    assert_allclose(res.std_errors, raw.std_errors)
+    for corrupt in CORRUPTIONS.values():
+        match = "row index of clusters does not match exog"
+        with pytest.raises(ValueError, match=match):
+            mod.fit(cov_type="clustered", clusters=corrupt(simple.clusters))
+    # Without labels in any input there is nothing to compare
+    mod = cls(*simple.raw())
+    mod.fit(cov_type="clustered", clusters=reverse(simple.clusters))
+    # weights can be the only input with labels
+    weighted = cls(*simple.raw(), weights=simple.weights)
+    weighted.fit(cov_type="clustered", clusters=simple.clusters)
+    match = "row index of clusters does not match weights"
+    with pytest.raises(ValueError, match=match):
+        weighted.fit(cov_type="clustered", clusters=reverse(simple.clusters))
+
+
+@pytest.mark.parametrize("cls", FAST, ids=FAST_IDS)
+def test_clusters_and_missing_values_without_labels_in_dependent(simple, cls):
+    exog = simple.exog.copy()
+    exog.iloc[7, 1] = np.nan
+    y = simple.dependent.to_numpy()
+    with pytest.warns(MissingValueWarning):
+        mod = cls(y, exog, simple.endog, simple.instruments)
+    kept = simple.clusters[mod.notnull]
+    assert len(kept) == NOBS - 1
+    res = mod.fit(cov_type="clustered", clusters=kept)
+    raw = mod.fit(cov_type="clustered", clusters=kept.to_numpy())
+    assert_allclose(res.std_errors, raw.std_errors)
+    with pytest.raises(ValueError, match="row index of clusters does not match exog"):
+        mod.fit(cov_type="clustered", clusters=reverse(kept))
+
+
+@pytest.mark.parametrize("cls", GMM, ids=GMM_IDS)
+def test_weight_clusters_use_the_labels_of_the_first_input_with_labels(simple, cls):
+    y = simple.dependent.to_numpy()
+    args = (y, simple.exog, simple.endog, simple.instruments)
+    clustered = {"weight_type": "clustered"}
+    cls(*args, clusters=simple.clusters, **clustered)
+    for corrupt in CORRUPTIONS.values():
+        match = "row index of clusters does not match exog"
+        with pytest.raises(ValueError, match=match):
+            cls(*args, clusters=corrupt(simple.clusters), **clustered)
+    # Arrays have no labels
+    cls(*args, clusters=reverse(simple.clusters).to_numpy(), **clustered)
 
 
 @pytest.mark.parametrize("cls", WITH_CLUSTERS, ids=WITH_CLUSTERS_IDS)
@@ -805,6 +972,85 @@ def test_absorbing_unlabelled_dependent_is_not_checked(abs_simple):
         absorb=reverse(abs_simple.cats),
         weights=reverse(abs_simple.weights),
     )
+
+
+def test_absorbing_inputs_must_agree_when_dependent_has_no_labels(abs_simple):
+    y = abs_simple.dependent.to_numpy()
+    x, cats, w = abs_simple.exog, abs_simple.cats, abs_simple.weights
+    AbsorbingLS(y, x, absorb=cats, weights=w)
+    for corrupt in CORRUPTIONS.values():
+        # exog sets the labels
+        with pytest.raises(ValueError, match="row index of absorb does not match exog"):
+            AbsorbingLS(y, x, absorb=corrupt(cats))
+        with pytest.raises(
+            ValueError, match="row index of weights does not match exog"
+        ):
+            AbsorbingLS(y, x, absorb=cats, weights=corrupt(w))
+        with pytest.raises(ValueError, match="row index of absorb does not match exog"):
+            AbsorbingLS(y, corrupt(x), absorb=cats)
+        # exog is an array, so absorb sets the labels
+        match = "row index of weights does not match absorb"
+        with pytest.raises(ValueError, match=match):
+            AbsorbingLS(y, x.to_numpy(), absorb=cats, weights=corrupt(w))
+    # Only one input has labels
+    unlabelled = reverse(cats).reset_index(drop=True)
+    AbsorbingLS(y, x.to_numpy(), absorb=unlabelled, weights=reverse(w))
+    AbsorbingLS(y, reverse(x), absorb=cats.reset_index(drop=True))
+
+
+def test_absorbing_interactions_must_agree_when_dependent_has_no_labels(abs_simple):
+    y = abs_simple.dependent.to_numpy()
+    x = abs_simple.exog.to_numpy()
+    cat, cont = abs_simple.cats, abs_simple.cont
+    frame = pd.concat([cat[["g"]], cont[["c0"]]], axis=1)
+    flipped = Interaction(cat=reverse(cat[["h"]]), cont=reverse(cont[["c1"]]))
+    iact = Interaction(cat=cat[["h"]], cont=cont[["c1"]])
+    AbsorbingLS(y, x, interactions=[frame, iact])
+    match = r"row index of interactions\[1\] does not match interactions\[0\]"
+    with pytest.raises(ValueError, match=match):
+        AbsorbingLS(y, x, interactions=[frame, flipped])
+    match = "row index of weights does not match interactions"
+    with pytest.raises(ValueError, match=match):
+        AbsorbingLS(y, x, interactions=iact, weights=reverse(abs_simple.weights))
+    # An Interaction with arrays has no labels
+    arrays_ = Interaction(cat=cat[["h"]].to_numpy()[::-1], cont=cont[["c1"]])
+    AbsorbingLS(y, x, interactions=[frame, arrays_])
+
+
+def test_absorbing_clusters_use_the_labels_of_the_first_input_with_labels(abs_simple):
+    y = abs_simple.dependent.to_numpy()
+    mod = AbsorbingLS(y, abs_simple.exog, absorb=abs_simple.cats)
+    res = mod.fit(cov_type="clustered", clusters=abs_simple.clusters)
+    raw = mod.fit(cov_type="clustered", clusters=abs_simple.clusters.to_numpy())
+    assert_allclose(res.std_errors, raw.std_errors)
+    for corrupt in CORRUPTIONS.values():
+        match = "row index of clusters does not match exog"
+        with pytest.raises(ValueError, match=match):
+            mod.fit(cov_type="clustered", clusters=corrupt(abs_simple.clusters))
+    # absorb sets the labels if exog has none
+    mod = AbsorbingLS(y, abs_simple.exog.to_numpy(), absorb=abs_simple.cats)
+    match = "row index of clusters does not match absorb"
+    with pytest.raises(ValueError, match=match):
+        mod.fit(cov_type="clustered", clusters=reverse(abs_simple.clusters))
+    # The clusters are checked before the effects are absorbed
+    assert mod._absorbed_dependent is None
+    # Without labels in any input there is nothing to compare
+    raw_model = AbsorbingLS(
+        y, abs_simple.exog.to_numpy(), absorb=abs_simple.cats.reset_index(drop=True)
+    )
+    raw_model.fit(cov_type="clustered", clusters=reverse(abs_simple.clusters))
+
+
+def test_absorbing_missing_values_without_labels_in_dependent(abs_simple):
+    exog = abs_simple.exog.copy()
+    exog.iloc[4, 1] = np.nan
+    y = abs_simple.dependent.to_numpy()
+    with pytest.warns(MissingValueWarning):
+        mod = AbsorbingLS(y, exog, absorb=abs_simple.cats)
+    kept = abs_simple.clusters[~np.asarray(exog.isnull().any(axis=1))]
+    mod.fit(cov_type="clustered", clusters=kept)
+    with pytest.raises(ValueError, match="row index of clusters does not match exog"):
+        mod.fit(cov_type="clustered", clusters=reverse(kept))
 
 
 def test_absorbing_clusters(abs_simple):

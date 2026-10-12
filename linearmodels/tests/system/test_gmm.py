@@ -14,7 +14,12 @@ from linearmodels.system.gmm import (
     HomoskedasticWeightMatrix,
     KernelWeightMatrix,
 )
-from linearmodels.tests.system._utility import generate_3sls_data_v2, simple_gmm
+from linearmodels.tests.system._utility import (
+    generate_3sls_data,
+    generate_3sls_data_v2,
+    simple_gmm,
+    weighted_fit_measures,
+)
 
 params = list(product([1, 2], [True, False]))
 
@@ -397,3 +402,35 @@ def test_fitted(data):
         columns=list(res.equations),
     )
     assert_frame_equal(expected, res.fitted_values)
+
+
+@pytest.mark.parametrize("weight_type", ["robust", "unadjusted"])
+def test_weighted_residuals_and_r2(weight_type):
+    eqns = generate_3sls_data(
+        n=250,
+        k=3,
+        p=3,
+        en=2,
+        instr=3,
+        const=True,
+        rho=0.8,
+        common_exog=False,
+        included_weights=True,
+        output_dict=True,
+    )
+    res = IVSystemGMM(eqns, weight_type=weight_type).fit()
+    rss = tss = 0.0
+    for key, eqn in eqns.items():
+        eq_res = res.equations[key]
+        direct = weighted_fit_measures(eqn, eq_res.params)
+        # The residuals are those of the model and do not use the weights
+        assert_allclose(eq_res.resids, direct.resid.squeeze())
+        assert_allclose(eq_res.wresids, direct.wresid.squeeze())
+        assert_allclose(
+            eq_res.fitted_values + eq_res.resids, eqn["dependent"].squeeze()
+        )
+        assert_allclose(eq_res.resid_ss, direct.rss)
+        assert_allclose(eq_res.rsquared, 1 - direct.rss / direct.tss)
+        rss += direct.rss
+        tss += direct.tss
+    assert_allclose(res.rsquared, 1 - rss / tss)

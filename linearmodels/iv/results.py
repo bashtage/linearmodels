@@ -447,6 +447,10 @@ class _LSModelResultsBase(_SummaryStr):
               {"x1": 0, "x2+x3": 1}.
 
             It is not possible to use both ``restriction`` and ``formula``.
+            The names in the restrictions are the entries of the index of
+            ``params``. A name that is not valid Python, for example one that
+            contains ``:`` or ``[`` such as ``exper:black``, must be enclosed in
+            back-ticks, e.g., ``"`exper:black` = 0"``.
 
         Returns
         -------
@@ -475,14 +479,22 @@ class _LSModelResultsBase(_SummaryStr):
         >>> value = np.array([0, 0])
         >>> wald_res = res.wald_test(restriction, value)
 
-        Using the formula interface to test the same restrictions
+        Using the formula interface to test the same restrictions. The names
+        are those in the index of ``params``, which has ``I(exper ** 2)``
 
-        >>> formula = "exper = I(exper**2) = 0"
+        >>> formula = "exper = I(exper ** 2) = 0"
         >>> wald_res = res.wald_test(formula=formula)
 
         Using the formula interface with a list
 
-        >>> wald_res = res.wald_test(formula=["exper = 0", "I(exper**2) = 0"])
+        >>> wald_res = res.wald_test(formula=["exper = 0", "I(exper ** 2) = 0"])
+
+        A name that is not valid Python, such as an interaction, is enclosed in
+        back-ticks
+
+        >>> formula = "np.log(wage) ~ 1 + exper + black + exper:black + [educ ~ sibs]"
+        >>> res = IV2SLS.from_formula(formula, data).fit()
+        >>> wald_res = res.wald_test(formula="`exper:black` = 0")
         """
         return quadratic_form_test(
             self._params,
@@ -525,7 +537,10 @@ class OLSResults(_LSModelResultsBase):
                 "Predictions can only be constructed using one "
                 "of exog/endog or data, but not both."
             )
-        pred = self.model.predict(self.params, exog=exog, endog=endog, data=data)
+        # Variables of the formula are those of the frame that called OLSResults.predict
+        pred = self.model.predict(
+            self.params, exog=exog, endog=endog, data=data, eval_env=4
+        )
         if not missing:
             pred = pred.loc[pred.notnull().all(axis=1)]
         return pred
@@ -652,7 +667,20 @@ class AbsorbingLSResults(_LSModelResultsBase):
 
     @cached_property
     def absorbed_effects(self) -> DataFrame:
-        """Fitted values from only absorbed terms"""
+        """
+        Fitted values from only absorbed terms
+
+        The part of ``fitted_values`` that the absorbed terms explain, which is
+        ``fitted_values - exog @ params``, in the units of the dependent variable. It
+        has one value for each observation. It is the contribution of the effects, the
+        interactions and the continuous variables that were absorbed, and of any
+        regressor in ``exog`` that was dropped because it was absorbed.
+
+        If ``exog`` contains a constant and the effects include a categorical
+        variable, the constant has the mean of the effects and the absorbed terms have
+        mean 0, using the weights of the model. Otherwise the absorbed terms include
+        the mean.
+        """
         return self._absorbed_effects()
 
     @property
@@ -883,7 +911,7 @@ class FirstStageResults(_SummaryStr):
 
     @cached_property
     def diagnostics(self) -> DataFrame:
-        """
+        r"""
         Post estimation diagnostics of first-stage fit
 
         Returns
@@ -899,9 +927,11 @@ class FirstStageResults(_SummaryStr):
               the instrument have been orthogonalized to the exogenous
               regressors in the model.
             * f.stat - Test that all coefficients are zero in the model
-              used to estimate the partial R-squared. Uses a standard F-test
-              when the covariance estimator is unadjusted - otherwise uses a
-              Wald test statistic with a chi2 distribution.
+              used to estimate the partial R-squared. If the covariance
+              estimator is unadjusted, it is the Wald statistic divided by
+              the number of excluded instruments, and it has an F
+              distribution. Otherwise it is the Wald statistic, which has a
+              chi2 distribution. See Notes.
             * f.pval - P-value of the test that all coefficients are zero
               in the model used to estimate the partial R-squared
             * f.dist - Distribution of f.stat
@@ -909,6 +939,26 @@ class FirstStageResults(_SummaryStr):
               between the projected and orthogonalized instrument on the
               orthogonalized endogenous regressor where the orthogonalization
               is with respect to the other included variables in the model.
+
+        Notes
+        -----
+        ``f.stat`` is the Wald statistic of the test that the coefficients on
+        the :math:`q` excluded instruments are 0 in the first-stage regression,
+        which is computed using the covariance estimator of the model.
+
+        If ``cov_type`` is "unadjusted" (or "homoskedastic"), the statistic is
+        divided by :math:`q` and its p-value uses an :math:`F_{q,n-k}`
+        distribution, where :math:`k` is the number of exogenous regressors
+        plus the number of excluded instruments. This is the textbook
+        F-statistic only if the model was fit with ``debiased=True``. Without
+        it, the covariance estimator divides by :math:`n` and not by
+        :math:`n-k`, and the statistic is :math:`n/(n-k)` times larger.
+
+        For all other covariance estimators, ``f.stat`` is the Wald statistic
+        and it has a :math:`\chi^2_q` distribution. It is not divided by
+        :math:`q`. Software that reports an F-statistic for a test that is
+        robust to heteroskedasticity, for example ``ivreg`` in R, reports the
+        Wald statistic divided by :math:`q`.
         """
         from linearmodels.iv.model import _OLS, IV2SLS
 
@@ -1143,9 +1193,19 @@ class IVResults(_CommonIVResults):
         WaldTestStatistic
             Object containing test statistic, p-value, distribution and null
 
+        See Also
+        --------
+        wooldridge_overid
+            Test of the overidentifying restrictions that is robust to
+            heteroskedasticity.
+
         Notes
         -----
         Requires more instruments than endogenous variables
+
+        The test assumes that the errors are homoskedastic. It does not use the
+        covariance estimator that was used to fit the model, so it is the same
+        for every ``cov_type``.
 
         Tests the ratio of re-projected IV regression residual variance to
         variance of the IV residuals.
@@ -1191,9 +1251,19 @@ class IVResults(_CommonIVResults):
         WaldTestStatistic
             Object containing test statistic, p-value, distribution and null
 
+        See Also
+        --------
+        wooldridge_overid
+            Test of the overidentifying restrictions that is robust to
+            heteroskedasticity.
+
         Notes
         -----
         Requires more instruments than endogenous variables
+
+        The test assumes that the errors are homoskedastic. It does not use the
+        covariance estimator that was used to fit the model, so it is the same
+        for every ``cov_type``.
 
         Tests is a small-sample version of Sargan's test that has the same
         distribution.
@@ -1285,8 +1355,20 @@ class IVResults(_CommonIVResults):
         WaldTestStatistic
             Object containing test statistic, p-value, distribution and null
 
+        See Also
+        --------
+        wooldridge_regression
+            Test of exogeneity that uses the covariance estimator that was
+            used to fit the model.
+        wooldridge_score
+            Test of exogeneity that is robust to heteroskedasticity.
+
         Notes
         -----
+        The test assumes that the errors are homoskedastic. It does not use the
+        covariance estimator that was used to fit the model, so it is the same
+        for every ``cov_type``.
+
         Test statistic is difference between sum of squared OLS and sum of
         squared IV residuals where each set of residuals has been projected
         onto the set of instruments in the IV model.
@@ -1340,8 +1422,20 @@ class IVResults(_CommonIVResults):
         WaldTestStatistic
             Object containing test statistic, p-value, distribution and null
 
+        See Also
+        --------
+        wooldridge_regression
+            Test of exogeneity that uses the covariance estimator that was
+            used to fit the model.
+        wooldridge_score
+            Test of exogeneity that is robust to heteroskedasticity.
+
         Notes
         -----
+        The test assumes that the errors are homoskedastic. It does not use the
+        covariance estimator that was used to fit the model, so it is the same
+        for every ``cov_type``.
+
         Test statistic is difference between sum of squared OLS and sum of
         squared IV residuals where each set of residuals has been projected
         onto the set of instruments in the IV model.
@@ -1671,7 +1765,9 @@ class IVGMMResults(_CommonIVResults):
             J statistic  test of overidentifying restrictions.
             An InvalidTestStatistic is returned if the estimate of the
             covariance of the moment conditions that was inverted to compute
-            the weight matrix is singular, which can happen if there are too
+            the weight matrix is singular. This can only happen at the final
+            estimates of IVGMMCUE, since IVGMM and IVGMMCUE raise a
+            ValueError if it is singular, which is the case if there are too
             few clusters.
 
         Notes
@@ -1700,6 +1796,13 @@ class IVGMMResults(_CommonIVResults):
         same way by the number of observations. Whether the estimate is
         singular does not depend on the units in which the variables are
         measured.
+
+        ``IVGMM.fit`` raises a ``ValueError`` if the estimate is singular in
+        any step, and ``IVGMMCUE.fit`` raises one if it is singular at the
+        first step estimates, since the weight matrix and the objective
+        function are not defined. The statistic is invalid only if the
+        estimate of ``IVGMMCUE`` is singular at its final estimates and not at
+        the first step estimates.
         """
         return self._j_stat
 
@@ -1895,8 +1998,10 @@ class IVGMMResults(_CommonIVResults):
         )
         try:
             res_e = mod.fit(cov_type=self.cov_type, **self.cov_config)
-        except LinAlgError:
-            # The covariance of the moment conditions is exactly singular
+        except (LinAlgError, ValueError):
+            # The covariance of the moment conditions is singular: fit raises
+            # a ValueError, and NumPy raises a LinAlgError if it is exactly
+            # singular. LinAlgError is not a ValueError in NumPy 1.x
             return InvalidTestStatistic(reason, name="C-statistic")
         assert isinstance(res_e, IVGMMResults)
         if isinstance(res_e.j_stat, InvalidTestStatistic):

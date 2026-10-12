@@ -63,7 +63,7 @@ jobs:
       # oldest with a wheel for Python 3.10.
       python310_minimums:
         python.version: '3.10'
-        PACKAGES: 'numpy==1.22.3 scipy==1.8.0 pandas==1.4.0 statsmodels==0.13.1 xarray==0.21.0 formulaic==1.2.1 pyhdfe==0.1.0'
+        PACKAGES: 'numpy==1.23.5 scipy==1.8.0 pandas==1.4.0 statsmodels==0.13.1 xarray==0.21.0 formulaic==1.2.1 pyhdfe==0.1.0'
         PYTEST_PATTERN: "(slow or not slow)"
         style: true
       python314_pre:

@@ -11,11 +11,16 @@ would be silently attached to the wrong observations.
 Inputs without labels, such as NumPy arrays and pandas objects that only have
 a default index (0, 1, ..., n-1), are paired by position and only need to have
 the right shape.
+
+If the dependent variable does not carry labels, the first of the other inputs
+that carries labels sets the labels instead, and the inputs that carry labels
+after it must use them. Two inputs with labels in a different order would
+otherwise be silently attached to the wrong observations in the same way.
 """
 
 from __future__ import annotations
 
-from collections.abc import Mapping
+from collections.abc import Iterable, Mapping
 from typing import Any
 
 from pandas import DataFrame, Index, MultiIndex, RangeIndex, Series
@@ -222,9 +227,54 @@ def check_row_alignment(
     raise misaligned(name, "The row index", reference)
 
 
+def reference_labels(
+    expected: Index | None,
+    inputs: Mapping[str, object] | Iterable[tuple[str, object]],
+    *,
+    reference: str = "dependent",
+) -> tuple[Index | None, str]:
+    """
+    The labels that the inputs have to use, and the input that they belong to.
+
+    The dependent variable sets the labels if it carries labels. If it does not,
+    the first of the inputs that carries labels sets them, so that two inputs
+    that carry labels cannot be attached to the wrong observations either.
+
+    Parameters
+    ----------
+    expected : Index or None
+        Labels of the rows of the dependent variable. None if the dependent
+        variable does not carry labels.
+    inputs : dict of str to object or iterable of tuple of (str, object)
+        The inputs in order, keyed by the name to use in the message. Inputs
+        that are None or do not carry labels are not considered. The same name
+        can be used more than once if the inputs are given as pairs.
+    reference : str, optional
+        Description of the dependent variable. The default is "dependent".
+
+    Returns
+    -------
+    Index or None
+        The labels of the rows. None if neither the dependent variable nor any
+        of the inputs carries labels.
+    str
+        Description of the input that sets the labels, which is the name of the
+        first input with labels when the dependent variable does not carry
+        labels.
+    """
+    if expected is not None:
+        return expected, reference
+    items = inputs.items() if isinstance(inputs, Mapping) else inputs
+    for name, value in items:
+        labels = row_labels(value)
+        if labels is not None:
+            return labels, name
+    return None, reference
+
+
 def check_alignment(
     expected: Index | None,
-    inputs: Mapping[str, object],
+    inputs: Mapping[str, object] | Iterable[tuple[str, object]],
     *,
     reference: str = "dependent",
 ) -> None:
@@ -235,11 +285,12 @@ def check_alignment(
     ----------
     expected : Index or None
         Labels of the rows of the reference, usually dependent. If None, the
-        reference does not carry labels and so there is nothing to compare to:
-        all inputs are paired by position.
-    inputs : dict of str to object
-        The inputs to check, keyed by the name to use in the message. Inputs
-        that are None or do not carry labels are not checked.
+        reference does not carry labels, and the first input that carries
+        labels is the reference instead.
+    inputs : dict of str to object or iterable of tuple of (str, object)
+        The inputs to check, keyed by the name to use in the message, or pairs
+        of the name and the input, in the order of the arguments. Inputs that
+        are None or do not carry labels are not checked.
     reference : str, optional
         Description of the input that sets the labels. The default is
         "dependent".
@@ -252,10 +303,13 @@ def check_alignment(
     See Also
     --------
     row_labels : Row labels of an input, if it carries labels.
+    reference_labels : The labels that the inputs have to use.
     """
+    items = list(inputs.items() if isinstance(inputs, Mapping) else inputs)
+    expected, reference = reference_labels(expected, items, reference=reference)
     if expected is None:
         return
-    for name, value in inputs.items():
+    for name, value in items:
         labels = row_labels(value)
         if labels is not None:
             check_row_alignment(name, labels, expected, reference)

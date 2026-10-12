@@ -164,7 +164,9 @@ class _FactorModelBase:
         formula: str, data: DataFrame, portfolios: DataFrame | None
     ) -> tuple[DataFrame, DataFrame, str]:
         orig_formula = formula
-        na_action = NAAction("raise")
+        # Missing values are kept so that the model drops the observations with a
+        # missing value in the portfolios or the factors, as it does for arrays
+        na_action = NAAction("ignore")
         if portfolios is not None:
             factors_mm = model_matrix(
                 formula + " + 0",
@@ -1046,17 +1048,21 @@ class LinearFactorModelGMM(_LinearFactorModelBase):
 
         # 2. Step 1 using w = inv(s) from SV
         callback = callback_factory(self._j, args, disp=disp)
-        _default_options: dict[str, Any] = {"callback": callback}
         options = {"maxiter": max_iter}
         opt_options = {} if opt_options is None else opt_options
         options.update(opt_options.get("options", {}))
-        _default_options.update(opt_options)
-        _default_options["options"] = options
+
+        def minimize_kwargs(
+            callback: Callable[[linearmodels.typing.data.Float64Array], None],
+        ) -> dict[str, Any]:
+            # The options of the user apply to every minimization
+            return {"callback": callback, **opt_options, "options": options}
+
         opt_res = minimize(
             fun=self._j,
             x0=np.squeeze(sv),
             args=args,
-            **_default_options,
+            **minimize_kwargs(callback),
         )
         params = opt_res.x
         last_obj = opt_res.fun
@@ -1075,8 +1081,7 @@ class LinearFactorModelGMM(_LinearFactorModelBase):
                     self._j,
                     params,
                     args=args,
-                    callback=callback,
-                    options={"maxiter": max_iter},
+                    **minimize_kwargs(callback),
                 )
                 params = opt_res.x
                 obj = opt_res.fun
@@ -1091,8 +1096,7 @@ class LinearFactorModelGMM(_LinearFactorModelBase):
                 self._j_cue,
                 params,
                 args=cue_args,
-                callback=callback,
-                options={"maxiter": max_iter},
+                **minimize_kwargs(callback),
             )
             params = opt_res.x
 
@@ -1126,7 +1130,11 @@ class LinearFactorModelGMM(_LinearFactorModelBase):
         sel = slice(0, (n * (k + 1)), (k + 1))
         alphas = g.mean(0)[sel, None]
         alpha_vcv = s[sel, sel] / nobs
-        stat = self._j(params, excess_returns, w)
+        if use_cue:
+            # The objective that was minimized updates the weight matrix
+            stat = self._j_cue(params, excess_returns, weight_est_instance)
+        else:
+            stat = self._j(params, excess_returns, w)
         jstat = WaldTestStatistic(
             stat, "All alphas are 0", n - k - nrf, name="J-statistic"
         )

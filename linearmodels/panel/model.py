@@ -11,7 +11,16 @@ from formulaic.model_spec import NAAction
 from formulaic.parser.algos.tokenize import tokenize
 from formulaic.utils.context import capture_context
 import numpy as np
-from pandas import Categorical, DataFrame, Index, MultiIndex, Series, get_dummies
+from pandas import (
+    Categorical,
+    DataFrame,
+    Index,
+    MultiIndex,
+    Series,
+    factorize,
+    get_dummies,
+)
+from pandas.api.types import is_numeric_dtype
 from scipy.linalg import lstsq as sp_lstsq
 from scipy.sparse.linalg import lsmr
 
@@ -60,6 +69,7 @@ from linearmodels.shared.hypotheses import (
     InvalidTestStatistic,
     WaldTestStatistic,
 )
+from linearmodels.shared.inputs import as_array_like, as_float64
 from linearmodels.shared.linalg import has_constant
 from linearmodels.shared.typed_getters import get_panel_data_like
 from linearmodels.shared.utility import AttrDict, ensure_unique_column, panel_to_frame
@@ -148,6 +158,32 @@ def _deferred_f(
     return wald
 
 
+def _panel_data(value: Any, name: str, var_name: str, **kwargs: Any) -> PanelData:
+    """
+    PanelData of an input of a model.
+
+    Parameters
+    ----------
+    value : object
+        The input.
+    name : str
+        The name of the parameter, which is added to the messages of the errors.
+    var_name : str
+        The name to use for the variables of NumPy inputs.
+    **kwargs
+        Keyword arguments for PanelData.
+
+    Returns
+    -------
+    PanelData
+        The panel data.
+    """
+    try:
+        return PanelData(value, var_name, **kwargs)
+    except (TypeError, ValueError) as exc:
+        raise type(exc)(f"{name}: {exc}") from exc
+
+
 class PanelFormulaParser:
     """
     Parse formulas for OLS and IV models
@@ -174,7 +210,7 @@ class PanelFormulaParser:
         context: Mapping[str, Any] | None = None,
     ) -> None:
         self._formula = formula
-        self._data = PanelData(data, convert_dummies=False, copy=False)
+        self._data = _panel_data(data, "data", "x", convert_dummies=False, copy=False)
         self._na_action = NAAction("ignore")
         self._eval_env = eval_env
         if not context:
@@ -313,18 +349,28 @@ class _PanelModelBase:
 
     Parameters
     ----------
-    dependent : array_like
-        Dependent (left-hand-side) variable (time by entity)
-    exog : array_like
-        Exogenous or right-hand-side variables (variable by time by entity).
-    weights : array_like
+    dependent : PanelData, DataFrame, Series, ndarray or DataArray
+        Dependent (left-hand-side) variable (time by entity). A DataFrame or
+        Series with a 2-level MultiIndex (entity, then time), a DataFrame with
+        time as the index and entities as the columns, a 2-d (time by entity)
+        NumPy array or DataArray, or a PanelData. A list, a tuple or any other
+        container raises a ``TypeError`` that names ``dependent``, since the
+        entities and time periods need labels or a layout.
+    exog : PanelData, DataFrame, Series, ndarray or DataArray
+        Exogenous or right-hand-side variables (variable by time by entity). The
+        containers are those of ``dependent``, where a DataFrame has a column for
+        each variable and an array or DataArray with several variables has 3
+        dimensions (variable by time by entity). A list, a tuple or any other
+        container raises a ``TypeError`` that names ``exog``.
+    weights : array_like, optional
         Weights to use in estimation.  Assumes residual variance is
         proportional to inverse of weight to that the residual time
         the weight should be homoskedastic.
         Weights can be given for each observation, for each time period,
         for each entity or for each combination of time period and entity.
         Weights with labels must use the same labels, in the same order,
-        as dependent. See :ref:`panel-input-alignment`.
+        as dependent or, if dependent has no labels, as exog. See
+        :ref:`panel-input-alignment`.
     check_rank : bool
         Flag indicating whether to perform a rank check on the exogenous
         variables to ensure that the model is identified. Skipping this
@@ -341,11 +387,14 @@ class _PanelModelBase:
         weights: PanelDataLike | None = None,
         check_rank: bool = True,
     ) -> None:
-        self.dependent = PanelData(dependent, "Dep")
-        self.exog = PanelData(exog, "Exog")
-        self._dependent_labelled = _is_labelled(dependent)
-        if self._dependent_labelled and _is_labelled(exog):
-            check_row_alignment("exog", self.exog.index, self.dependent.index)
+        self.dependent = _panel_data(dependent, "dependent", "Dep")
+        self.exog = _panel_data(exog, "exog", "Exog")
+        # The inputs with labels use the labels of dependent. If dependent has no
+        # labels, they use the labels of the first of them that has labels
+        self._labels: Index | None = None
+        self._labels_name = "dependent"
+        self._check_labels("dependent", self.dependent.index, _is_labelled(dependent))
+        self._check_labels("exog", self.exog.index, _is_labelled(exog))
         self._original_shape = self.dependent.shape
         self._constant = False
         self._formula: str | None = None
@@ -380,6 +429,68 @@ class _PanelModelBase:
     def __repr__(self) -> str:
         return self.__str__() + "\nid: " + str(hex(id(self)))
 
+    def _check_labels(self, name: str, labels: Index, labelled: bool) -> None:
+        """
+        Check the labels of an input against the labels of the other inputs
+
+        Parameters
+        ----------
+        name : str
+            The name of the input, which is used in the message.
+        labels : Index
+            The labels of the rows of the input.
+        labelled : bool
+            Whether the input carries labels. If not, it is paired with the
+            other inputs by position and there is nothing to check.
+
+        Notes
+        -----
+        The labels of the first input with labels are saved, so that the inputs
+        that follow it have to use them.
+        """
+        if not labelled:
+            return
+        if self._labels is None:
+            if isinstance(labels, MultiIndex):
+                self._labels, self._labels_name = labels, name
+            return
+        check_row_alignment(name, labels, self._labels, self._labels_name)
+
+    def _panel_rows(self, value: Any, name: str, var_name: str) -> PanelData:
+        """
+        PanelData of an input that has the shape of the data, e.g., clusters
+
+        Parameters
+        ----------
+        value : array_like
+            The input. A 1-d array has a value for each row of dependent, in the
+            order of the rows of dependent, since it only has one variable.
+            Anything else follows the rules of PanelData, after lists and tuples
+            are converted to arrays.
+        name : str
+            The name of the parameter, which is added to the messages of the
+            errors.
+        var_name : str
+            The name to use for the variable when it is a NumPy array.
+
+        Returns
+        -------
+        PanelData
+            The input as panel data, without the conversion of categories to
+            dummy variables.
+        """
+        value = as_array_like(value, name)
+        if isinstance(value, np.ndarray) and value.ndim == 1:
+            nrows = len(self._original_index)
+            if value.shape[0] != nrows:
+                raise ValueError(
+                    f"{name} is 1-d and has {value.shape[0]} values, but dependent "
+                    f"has {nrows} rows. A 1-d array must have a value for each row "
+                    "of dependent, in the order of the rows of dependent."
+                )
+            value = DataFrame({var_name: value}, index=self._original_index)
+        return _panel_data(value, name, var_name, convert_dummies=False)
+
     def reformat_clusters(
         self, clusters: linearmodels.typing.data.IntArray | PanelDataLike
     ) -> PanelData:
@@ -389,7 +500,8 @@ class _PanelModelBase:
         Parameters
         ----------
         clusters : array_like
-            Values to use for variance clustering
+            Values to use for variance clustering. A 1-d array has one value
+            for each row of dependent, in the order of the rows of dependent.
 
         Returns
         -------
@@ -401,14 +513,36 @@ class _PanelModelBase:
         -----
         This is exposed for testing and is not normally needed for estimation
         """
-        clusters_pd = PanelData(clusters, var_name="cov.cluster", convert_dummies=False)
+        clusters = as_array_like(clusters, "clusters")
+        labelled = _is_labelled(clusters)
+        clusters_pd = self._panel_rows(clusters, "clusters", "cov.cluster")
         if clusters_pd.shape[1:] != self._original_shape[1:]:
             raise ValueError(
                 "clusters must have the same number of entities "
                 "and time periods as the model data."
             )
-        if self._dependent_labelled and _is_labelled(clusters):
-            check_row_alignment("clusters", clusters_pd.index, self._original_index)
+        if labelled and self._labels is not None:
+            check_row_alignment(
+                "clusters", clusters_pd.index, self._labels, self._labels_name
+            )
+        frame = clusters_pd.dataframe
+        changed = False
+        if frame.shape[0] == len(self._original_index) and not frame.index.equals(
+            self._original_index
+        ):
+            # The values are paired with the rows of dependent by position, and so
+            # they have the labels of these rows
+            frame = frame.set_axis(self._original_index, axis=0)
+            changed = True
+        categories = [col for col in frame if not is_numeric_dtype(frame[col].dtype)]
+        if categories:
+            # Text and categories identify the clusters, but they are not numbers
+            frame = frame.copy()
+            for col in categories:
+                frame[col] = Categorical(frame[col]).codes.astype(np.int64)
+            changed = True
+        if changed:
+            clusters_pd = PanelData(frame, convert_dummies=False)
         clusters_pd.drop(~self.not_null)
         return clusters_pd.copy()
 
@@ -435,17 +569,26 @@ class _PanelModelBase:
             frame.columns = Index(["weight"])
             return PanelData(frame)
 
+        # Lists and tuples are converted to arrays, so that ndim and shape exist
+        weights = as_array_like(weights, "weights")
+        if isinstance(weights, np.ndarray):
+            weights = as_float64(weights, "weights")
         nobs, nentity = self.exog.nobs, self.exog.nentity
         index = self.dependent.index
         entities = index.get_level_values(0).unique()
         times = index.get_level_values(1).unique()
-        labelled = self._dependent_labelled and _is_labelled(weights)
+        labelled = _is_labelled(weights)
+        # Weights for each time period or entity have to use the time periods or
+        # entities of the inputs with labels, if there are any
+        reference = self._labels
+        if reference is not None:
+            ref_entities = reference.get_level_values(0).unique()
+            ref_times = reference.get_level_values(1).unique()
 
         if weights.ndim == 3 or weights.shape == (nobs, nentity):
-            panel = PanelData(weights)
+            panel = _panel_data(weights, "weights", "x")
             if isinstance(weights, PanelData):
-                if labelled:
-                    check_row_alignment("weights", panel.index, index)
+                self._check_labels("weights", panel.index, labelled)
                 return panel
             return self._grid_to_rows(panel, labelled)
 
@@ -462,24 +605,31 @@ class _PanelModelBase:
             and weights.shape[0] == self.dependent.dataframe.shape[0]
         ):
             panel = PanelData(DataFrame(weights))
-            if labelled:
-                check_row_alignment("weights", panel.index, index)
+            self._check_labels("weights", panel.index, labelled)
             return panel
         elif weights.shape[0] == nobs and weights.ndim == 1:
-            if labelled and differs(labels_1d(weights), times):
-                raise misaligned("weights", "The time index")
+            if (
+                labelled
+                and reference is not None
+                and differs(labels_1d(weights), ref_times)
+            ):
+                raise misaligned("weights", "The time index", self._labels_name)
             weights_arr = np.asarray(weights)[:, None]
             weights_arr = weights_arr @ np.ones((1, nentity))
             grid = DataFrame(weights_arr, index=times, columns=entities)
         elif weights.shape[0] == nentity and weights.ndim == 1:
-            if labelled and differs(labels_1d(weights), entities):
-                raise misaligned("weights", "The entity index")
+            if (
+                labelled
+                and reference is not None
+                and differs(labels_1d(weights), ref_entities)
+            ):
+                raise misaligned("weights", "The entity index", self._labels_name)
             weights_arr = np.asarray(weights)[None, :]
             weights_arr = np.ones((nobs, 1)) @ weights_arr
             grid = DataFrame(weights_arr, index=times, columns=entities)
         elif weights.shape[0] == nentity * nobs and weights.size:
             if labelled:
-                check_row_alignment("weights", labels_1d(weights), index)
+                self._check_labels("weights", labels_1d(weights), labelled)
             frame = self.dependent.dataframe.copy()
             # TODO: Fix this for pandas 3
             frame.iloc[:, :] = np.asarray(weights)[:, None]
@@ -497,10 +647,10 @@ class _PanelModelBase:
         grid : PanelData
             Values for every entity and time period, stacked by entity.
         labelled : bool
-            Whether the labels in grid have to match the entities and time
-            periods of dependent. If False, the position along each axis of the
-            grid is paired with the entities and time periods of dependent in
-            order of appearance.
+            Whether the grid carries labels, which have to match the entities and
+            time periods of the inputs with labels. If False, the position along
+            each axis of the grid is paired with the entities and time periods
+            of dependent in order of appearance.
 
         Returns
         -------
@@ -516,8 +666,20 @@ class _PanelModelBase:
         rows = grid.dataframe
         if len(rows) != len(grid_index) or len(index) != len(grid_index):
             return grid
-        if labelled and not rows.index.equals(grid_index):
-            raise misaligned("weights", "The time and entity index")
+        if labelled and self._labels is None:
+            self._check_labels("weights", rows.index, labelled)
+        elif labelled:
+            assert self._labels is not None
+            expected = MultiIndex.from_product(
+                [
+                    self._labels.get_level_values(0).unique(),
+                    self._labels.get_level_values(1).unique(),
+                ]
+            )
+            if len(expected) == len(rows) and not rows.index.equals(expected):
+                raise misaligned(
+                    "weights", "The time and entity index", self._labels_name
+                )
         rows = rows.set_axis(grid_index, axis=0)
         if not grid_index.equals(index):
             rows = rows.reindex(index)
@@ -851,7 +1013,11 @@ class _PanelModelBase:
 
         cov_config_upd = dict(cov_config.items())
 
-        clusters = get_panel_data_like(cov_config, "clusters")
+        given = cov_config.get("clusters")
+        if given is not None:
+            # Lists and tuples are converted to arrays
+            given = as_array_like(given, "clusters")
+        clusters = get_panel_data_like({"clusters": given}, "clusters")
         clusters_frame: DataFrame | None = None
         if clusters is not None:
             formatted_clusters = self.reformat_clusters(clusters)
@@ -907,8 +1073,10 @@ class _PanelModelBase:
         ----------
         params : array_like
             Model parameters (nvar by 1)
-        exog : array_like
-            Exogenous regressors (nobs by nvar)
+        exog : PanelData, DataFrame, Series, ndarray or DataArray, optional
+            Exogenous regressors (nobs by nvar). The containers are those of
+            ``exog`` in the model. A list or a tuple raises a ``TypeError`` that
+            names ``exog``.
         data : DataFrame
             Values to use when making predictions from a model constructed
             from a formula
@@ -939,7 +1107,7 @@ class _PanelModelBase:
                 "of exog or data, but not both."
             )
         if exog is not None:
-            exog = PanelData(exog).dataframe
+            exog = _panel_data(exog, "exog", "x").dataframe
         else:
             assert self._formula is not None
             assert data is not None
@@ -969,18 +1137,28 @@ class PooledOLS(_PanelModelBase):
 
     Parameters
     ----------
-    dependent : array_like
-        Dependent (left-hand-side) variable (time by entity)
-    exog : array_like
-        Exogenous or right-hand-side variables (variable by time by entity).
-    weights : array_like
+    dependent : PanelData, DataFrame, Series, ndarray or DataArray
+        Dependent (left-hand-side) variable (time by entity). A DataFrame or
+        Series with a 2-level MultiIndex (entity, then time), a DataFrame with
+        time as the index and entities as the columns, a 2-d (time by entity)
+        NumPy array or DataArray, or a PanelData. A list, a tuple or any other
+        container raises a ``TypeError`` that names ``dependent``, since the
+        entities and time periods need labels or a layout.
+    exog : PanelData, DataFrame, Series, ndarray or DataArray
+        Exogenous or right-hand-side variables (variable by time by entity). The
+        containers are those of ``dependent``, where a DataFrame has a column for
+        each variable and an array or DataArray with several variables has 3
+        dimensions (variable by time by entity). A list, a tuple or any other
+        container raises a ``TypeError`` that names ``exog``.
+    weights : array_like, optional
         Weights to use in estimation.  Assumes residual variance is
         proportional to inverse of weight to that the residual time
         the weight should be homoskedastic.
         Weights can be given for each observation, for each time period,
         for each entity or for each combination of time period and entity.
         Weights with labels must use the same labels, in the same order,
-        as dependent. See :ref:`panel-input-alignment`.
+        as dependent or, if dependent has no labels, as exog. See
+        :ref:`panel-input-alignment`.
     check_rank : bool
         Flag indicating whether to perform a rank check on the exogenous
         variables to ensure that the model is identified. Skipping this
@@ -1024,11 +1202,12 @@ class PooledOLS(_PanelModelBase):
         formula : str
             Formula to transform into model. Conforms to formulaic formula
             rules.
-        data : array_like
+        data : PanelData or DataFrame
             Data structure that can be coerced into a PanelData.  In most
             cases, this should be a multi-index DataFrame where the level 0
-            index contains the entities and the level 1 contains the time.
-        weights: array_like
+            index contains the entities and the level 1 contains the time. A
+            list or a tuple raises a ``TypeError`` that names ``data``.
+        weights : array_like, optional
             Weights to use in estimation.  Assumes residual variance is
             proportional to inverse of weight to that the residual times
             the weight should be homoskedastic.
@@ -1084,9 +1263,9 @@ class PooledOLS(_PanelModelBase):
         ----------
         cov_type : str
             Name of covariance estimator. See Notes.
-        debiased : bool
-            Flag indicating whether to debiased the covariance estimator using
-            a degree of freedom adjustment.
+        debiased : bool, optional
+            Flag indicating whether to debias the covariance estimator using
+            a degree of freedom adjustment. The default is True. See Notes.
         cov_config
             Additional covariance-specific options.  See Notes.
 
@@ -1110,12 +1289,22 @@ class PooledOLS(_PanelModelBase):
           White's estimator
         * "clustered` - One- or two-way clustering.  Configuration options are:
 
-          * ``clusters`` - Input containing 1 or 2 variables.
+          * ``clusters`` - Input containing 1 or 2 variables. This can be
+            a pandas object or PanelData with the index of ``dependent``, a 1-d
+            array or list with a value for each row of ``dependent`` in the
+            order of its rows, or an array or list with the layout of
+            ``dependent`` (time by entity, or variable by time by entity).
             Clusters should be integer values, although other types will
             be coerced to integer values by treating as categorical variables
           * ``cluster_entity`` - Boolean flag indicating to use entity
             clusters
           * ``cluster_time`` - Boolean indicating to use time clusters
+          * ``group_debias`` - Boolean flag indicating whether to apply an
+            adjustment for the number of clusters. It multiplies the
+            covariance by g / (g - 1) * (n - 1) / n, where g is the number
+            of distinct clusters and n is the number of observations. With
+            two-way clustering, it is applied to each of the three one-way
+            covariances that are combined. The default is False.
 
         * "kernel" - Driscoll-Kraay HAC estimator. Configurations options are:
 
@@ -1124,6 +1313,14 @@ class PooledOLS(_PanelModelBase):
             estimator similar to the Newey-West covariance estimator.
           * ``bandwidth`` - Bandwidth to use when computing the kernel.  If
             not provided, a naive default is used.
+
+        ``debiased=True``, which is the default, scales the covariance by
+        n / (n - k), where k is the number of regressors, and uses the t and
+        F distributions for inference.
+
+        ``debiased=True`` and ``group_debias=True`` give the clustered
+        covariance of Stata's ``regress ..., vce(cluster ...)``.
+        See :ref:`panel-small-sample`.
         """
         y = self.dependent.values2d
         x = self.exog.values2d
@@ -1210,8 +1407,10 @@ class PooledOLS(_PanelModelBase):
         ----------
         params : array_like
             Model parameters (nvar by 1)
-        exog : array_like
-            Exogenous regressors (nobs by nvar)
+        exog : PanelData, DataFrame, Series, ndarray or DataArray, optional
+            Exogenous regressors (nobs by nvar). The containers are those of
+            ``exog`` in the model. A list or a tuple raises a ``TypeError`` that
+            names ``exog``.
         data : DataFrame
             Values to use when making predictions from a model constructed
             from a formula
@@ -1242,7 +1441,7 @@ class PooledOLS(_PanelModelBase):
                 "of exog or data, but not both."
             )
         if exog is not None:
-            exog = PanelData(exog).dataframe
+            exog = _panel_data(exog, "exog", "x").dataframe
         else:
             assert self._formula is not None
             assert data is not None
@@ -1271,25 +1470,36 @@ class PanelOLS(_PanelModelBase):
 
     Parameters
     ----------
-    dependent : array_like
-        Dependent (left-hand-side) variable (time by entity).
-    exog : array_like
-        Exogenous or right-hand-side variables (variable by time by entity).
-    weights : array_like
+    dependent : PanelData, DataFrame, Series, ndarray or DataArray
+        Dependent (left-hand-side) variable (time by entity). A DataFrame or
+        Series with a 2-level MultiIndex (entity, then time), a DataFrame with
+        time as the index and entities as the columns, a 2-d (time by entity)
+        NumPy array or DataArray, or a PanelData. A list, a tuple or any other
+        container raises a ``TypeError`` that names ``dependent``, since the
+        entities and time periods need labels or a layout.
+    exog : PanelData, DataFrame, Series, ndarray or DataArray
+        Exogenous or right-hand-side variables (variable by time by entity). The
+        containers are those of ``dependent``, where a DataFrame has a column for
+        each variable and an array or DataArray with several variables has 3
+        dimensions (variable by time by entity). A list, a tuple or any other
+        container raises a ``TypeError`` that names ``exog``.
+    weights : array_like, optional
         Weights to use in estimation.  Assumes residual variance is
         proportional to inverse of weight to that the residual time
         the weight should be homoskedastic.
         Weights can be given for each observation, for each time period,
         for each entity or for each combination of time period and entity.
         Weights with labels must use the same labels, in the same order,
-        as dependent. See :ref:`panel-input-alignment`.
+        as dependent or, if dependent has no labels, as exog. See
+        :ref:`panel-input-alignment`.
     entity_effects : bool
         Flag whether to include entity (fixed) effects in the model
     time_effects : bool
         Flag whether to include time effects in the model
-    other_effects : array_like
+    other_effects : array_like, optional
         Category codes to use for any effects that are not entity or time
-        effects. Each variable is treated as an effect.
+        effects. Each variable is treated as an effect. A 1-d array or list has
+        a value for each row of dependent, in the order of the rows of dependent.
     singletons : bool
         Flag indicating whether to drop singleton observation
     drop_absorbed : bool
@@ -1333,6 +1543,18 @@ class PanelOLS(_PanelModelBase):
 
     Model supports at most 2 effects.  These can be entity-time, entity-other,
     time-other or 2 other.
+
+    A variable in ``exog`` is absorbed if the effects explain all of it. The
+    algorithms that remove the effects are exact only up to rounding error, or up to
+    a relative error of about 1e-8 if they are iterative, so a variable is treated
+    as absorbed if less than 1e-5 of its norm is left after the effects are
+    removed, whatever its units. It is treated in the same way if it is collinear
+    with the variables before it once the effects are removed. An
+    ``AbsorbingEffectError`` is raised for such a variable. If ``drop_absorbed`` is
+    True, the variable is dropped and an ``AbsorbingEffectWarning`` is raised, and the
+    constant is never dropped. The norm includes the mean of the variable, so a
+    variable with a large mean and little other variation, less than 1e-5 of its norm,
+    is also treated as absorbed. Subtract its mean to avoid this.
     """
 
     def __init__(
@@ -1355,8 +1577,7 @@ class PanelOLS(_PanelModelBase):
         self._other_effect_cats: PanelData | None = None
         self._singletons = singletons
         self._other_effects = self._validate_effects(
-            other_effects,
-            labelled=self._dependent_labelled and _is_labelled(other_effects),
+            other_effects, labelled=_is_labelled(other_effects)
         )
         self._has_effect = entity_effects or time_effects or self.other_effects
         self._drop_absorbed = drop_absorbed
@@ -1425,15 +1646,14 @@ class PanelOLS(_PanelModelBase):
         """Check model effects"""
         if effects is None:
             return False
-        effects = PanelData(effects, var_name="OtherEffect", convert_dummies=False)
+        effects = self._panel_rows(effects, "other_effects", "OtherEffect")
 
         if effects.shape[1:] != self._original_shape[1:]:
             raise ValueError(
                 "other_effects must have the same number of "
                 "entities and time periods as dependent."
             )
-        if labelled:
-            check_row_alignment("other_effects", effects.index, self._original_index)
+        self._check_labels("other_effects", effects.index, labelled)
 
         num_effects = effects.nvar
         if num_effects + self.entity_effects + self.time_effects > 2:
@@ -1517,11 +1737,12 @@ class PanelOLS(_PanelModelBase):
             TimeEffects which can be used to specify that the model should
             contain an entity effect or a time effect, respectively. See
             Examples.
-        data : array_like
+        data : PanelData or DataFrame
             Data structure that can be coerced into a PanelData.  In most
             cases, this should be a multi-index DataFrame where the level 0
-            index contains the entities and the level 1 contains the time.
-        weights: array_like
+            index contains the entities and the level 1 contains the time. A
+            list or a tuple raises a ``TypeError`` that names ``data``.
+        weights : array_like, optional
             Weights to use in estimation.  Assumes residual variance is
             proportional to inverse of weight to that the residual time
             the weight should be homoskedastic.
@@ -1950,9 +2171,11 @@ class PanelOLS(_PanelModelBase):
             regressors in the model and requires more than 1 GiB .
         cov_type : str
             Name of covariance estimator. See Notes.
-        debiased : bool
-            Flag indicating whether to debiased the covariance estimator using
-            a degree of freedom adjustment.
+        debiased : bool, optional
+            Flag indicating whether to debias the covariance estimator using
+            a degree of freedom adjustment. The default is True. The
+            estimated effects are counted in the degrees of freedom whether
+            or not ``debiased`` is True. See Notes.
         auto_df : bool
             Flag indicating that the treatment of estimated effects in degree
             of freedom adjustment is automatically handled. This is useful
@@ -1986,12 +2209,22 @@ class PanelOLS(_PanelModelBase):
           White's estimator
         * "clustered` - One- or two-way clustering.  Configuration options are:
 
-          * ``clusters`` - Input containing 1 or 2 variables.
+          * ``clusters`` - Input containing 1 or 2 variables. This can be
+            a pandas object or PanelData with the index of ``dependent``, a 1-d
+            array or list with a value for each row of ``dependent`` in the
+            order of its rows, or an array or list with the layout of
+            ``dependent`` (time by entity, or variable by time by entity).
             Clusters should be integer valued, although other types will
             be coerced to integer values by treating as categorical variables
           * ``cluster_entity`` - Boolean flag indicating to use entity
             clusters
           * ``cluster_time`` - Boolean indicating to use time clusters
+          * ``group_debias`` - Boolean flag indicating whether to apply an
+            adjustment for the number of clusters. It multiplies the
+            covariance by g / (g - 1) * (n - 1) / n, where g is the number
+            of distinct clusters and n is the number of observations. With
+            two-way clustering, it is applied to each of the three one-way
+            covariances that are combined. The default is False.
 
         * "kernel" - Driscoll-Kraay HAC estimator. Configurations options are:
 
@@ -2000,6 +2233,23 @@ class PanelOLS(_PanelModelBase):
             estimator similar to the Newey-West covariance estimator.
           * ``bandwidth`` - Bandwidth to use when computing the kernel.  If
             not provided, a naive default is used.
+
+        ``debiased=True``, which is the default, scales the covariance by
+        n / (n - k), where k is the number of regressors, and uses the t and
+        F distributions for inference.
+
+        ``debiased=True`` and ``group_debias=True`` give the clustered
+        covariance of Stata's ``xtreg, fe vce(cluster ...)``.
+        See :ref:`panel-small-sample`.
+
+        PanelOLS counts the effects that it estimates in the degrees of
+        freedom, which is ``extra_df`` of the covariance estimator. If d is
+        the number of effects, the covariance is scaled by n / (n - d - k)
+        if ``debiased`` is True and by n / (n - d) if it is False. If
+        ``auto_df`` is True, the effects are not counted when the model has
+        a single effect and each of its groups is in one cluster, for
+        example entity effects with ``cluster_entity=True``. Use
+        ``auto_df=False`` and ``count_effects`` to choose.
         """
 
         weighted = np.any(self.weights.values2d != 1.0)
@@ -2037,12 +2287,15 @@ class PanelOLS(_PanelModelBase):
                 drop_first = True
 
         if self.entity_effects or self.time_effects or self.other_effects:
+            # The regressors before the effects were removed set the scale of each
+            # column, so the check does not depend on the units of the variables
+            x_orig = np.sqrt(self.weights.values2d) * self.exog.values2d
             if not self._drop_absorbed:
-                check_absorbed(x, [str(var) for var in self.exog.vars])
+                check_absorbed(x, [str(var) for var in self.exog.vars], x_orig)
             else:
                 # TODO: Need to special case the constant here when determining which
                 #  to retain since we always want to retain the constant if present
-                retain = not_absorbed(x, self._constant, self._constant_index)
+                retain = not_absorbed(x, self._constant, self._constant_index, x_orig)
                 if not retain:
                     raise ValueError(
                         "All columns in exog have been fully absorbed by the included"
@@ -2208,18 +2461,28 @@ class BetweenOLS(_PanelModelBase):
 
     Parameters
     ----------
-    dependent : array_like
-        Dependent (left-hand-side) variable (time by entity)
-    exog : array_like
-        Exogenous or right-hand-side variables (variable by time by entity).
-    weights : array_like
+    dependent : PanelData, DataFrame, Series, ndarray or DataArray
+        Dependent (left-hand-side) variable (time by entity). A DataFrame or
+        Series with a 2-level MultiIndex (entity, then time), a DataFrame with
+        time as the index and entities as the columns, a 2-d (time by entity)
+        NumPy array or DataArray, or a PanelData. A list, a tuple or any other
+        container raises a ``TypeError`` that names ``dependent``, since the
+        entities and time periods need labels or a layout.
+    exog : PanelData, DataFrame, Series, ndarray or DataArray
+        Exogenous or right-hand-side variables (variable by time by entity). The
+        containers are those of ``dependent``, where a DataFrame has a column for
+        each variable and an array or DataArray with several variables has 3
+        dimensions (variable by time by entity). A list, a tuple or any other
+        container raises a ``TypeError`` that names ``exog``.
+    weights : array_like, optional
         Weights to use in estimation.  Assumes residual variance is
         proportional to inverse of weight to that the residual time
         the weight should be homoskedastic.
         Weights can be given for each observation, for each time period,
         for each entity or for each combination of time period and entity.
         Weights with labels must use the same labels, in the same order,
-        as dependent. See :ref:`panel-input-alignment`.
+        as dependent or, if dependent has no labels, as exog. See
+        :ref:`panel-input-alignment`.
 
     Notes
     -----
@@ -2317,9 +2580,9 @@ class BetweenOLS(_PanelModelBase):
             are accounted for when reweighting. Has no effect on balanced data.
         cov_type : str
             Name of covariance estimator. See Notes.
-        debiased : bool
-            Flag indicating whether to debiased the covariance estimator using
-            a degree of freedom adjustment.
+        debiased : bool, optional
+            Flag indicating whether to debias the covariance estimator using
+            a degree of freedom adjustment. The default is True. See Notes.
         cov_config
             Additional covariance-specific options.  See Notes.
 
@@ -2343,12 +2606,26 @@ class BetweenOLS(_PanelModelBase):
           White's estimator
         * "clustered` - One- or two-way clustering.  Configuration options are:
 
-          * ``clusters`` - Input containing 1 or 2 variables.
+          * ``clusters`` - Input containing 1 or 2 variables. This can be
+            a pandas object or PanelData with the index of ``dependent``, a 1-d
+            array or list with a value for each row of ``dependent`` in the
+            order of its rows, or an array or list with the layout of
+            ``dependent`` (time by entity, or variable by time by entity).
             Clusters should be integer values, although other types will
             be coerced to integer values by treating as categorical variables
+          * ``group_debias`` - Boolean flag indicating whether to apply an
+            adjustment for the number of clusters. It multiplies the
+            covariance by g / (g - 1) * (n - 1) / n, where g is the number
+            of distinct clusters and n is the number of observations. With
+            two-way clustering, it is applied to each of the three one-way
+            covariances that are combined. The default is False.
 
         When using a clustered covariance estimator, all cluster ids must be
         identical within an entity.
+
+        ``debiased=True``, which is the default, scales the covariance by
+        n / (n - k), where k is the number of regressors, and uses the t and
+        F distributions for inference. See :ref:`panel-small-sample`.
         """
         y, x, w = self._prepare_between()
         if np.all(self.weights.values2d == 1.0) and not reweight:
@@ -2447,11 +2724,12 @@ class BetweenOLS(_PanelModelBase):
         formula : str
             Formula to transform into model. Conforms to formulaic formula
             rules.
-        data : array_like
+        data : PanelData or DataFrame
             Data structure that can be coerced into a PanelData.  In most
             cases, this should be a multi-index DataFrame where the level 0
-            index contains the entities and the level 1 contains the time.
-        weights: array_like
+            index contains the entities and the level 1 contains the time. A
+            list or a tuple raises a ``TypeError`` that names ``data``.
+        weights : array_like, optional
             Weights to use in estimation.  Assumes residual variance is
             proportional to inverse of weight to that the residual times
             the weight should be homoskedastic.
@@ -2493,18 +2771,28 @@ class FirstDifferenceOLS(_PanelModelBase):
 
     Parameters
     ----------
-    dependent : array_like
-        Dependent (left-hand-side) variable (time by entity)
-    exog : array_like
-        Exogenous or right-hand-side variables (variable by time by entity).
-    weights : array_like
+    dependent : PanelData, DataFrame, Series, ndarray or DataArray
+        Dependent (left-hand-side) variable (time by entity). A DataFrame or
+        Series with a 2-level MultiIndex (entity, then time), a DataFrame with
+        time as the index and entities as the columns, a 2-d (time by entity)
+        NumPy array or DataArray, or a PanelData. A list, a tuple or any other
+        container raises a ``TypeError`` that names ``dependent``, since the
+        entities and time periods need labels or a layout.
+    exog : PanelData, DataFrame, Series, ndarray or DataArray
+        Exogenous or right-hand-side variables (variable by time by entity). The
+        containers are those of ``dependent``, where a DataFrame has a column for
+        each variable and an array or DataArray with several variables has 3
+        dimensions (variable by time by entity). A list, a tuple or any other
+        container raises a ``TypeError`` that names ``exog``.
+    weights : array_like, optional
         Weights to use in estimation.  Assumes residual variance is
         proportional to inverse of weight to that the residual time
         the weight should be homoskedastic.
         Weights can be given for each observation, for each time period,
         for each entity or for each combination of time period and entity.
         Weights with labels must use the same labels, in the same order,
-        as dependent. See :ref:`panel-input-alignment`.
+        as dependent or, if dependent has no labels, as exog. See
+        :ref:`panel-input-alignment`.
 
     Notes
     -----
@@ -2621,9 +2909,9 @@ class FirstDifferenceOLS(_PanelModelBase):
         ----------
         cov_type : str
             Name of covariance estimator. See Notes.
-        debiased : bool
-            Flag indicating whether to debiased the covariance estimator using
-            a degree of freedom adjustment.
+        debiased : bool, optional
+            Flag indicating whether to debias the covariance estimator using
+            a degree of freedom adjustment. The default is True. See Notes.
         cov_config
             Additional covariance-specific options.  See Notes.
 
@@ -2648,11 +2936,21 @@ class FirstDifferenceOLS(_PanelModelBase):
           White's estimator
         * "clustered` - White's.  Configuration options are:
 
-          * ``clusters`` - Input containing 1 or 2 variables.
+          * ``clusters`` - Input containing 1 or 2 variables. This can be
+            a pandas object or PanelData with the index of ``dependent``, a 1-d
+            array or list with a value for each row of ``dependent`` in the
+            order of its rows, or an array or list with the layout of
+            ``dependent`` (time by entity, or variable by time by entity).
             Clusters should be integer values, although other types will
             be coerced to integer values by treating as categorical variables
           * ``cluster_entity`` - Boolean flag indicating to use entity
             clusters
+          * ``group_debias`` - Boolean flag indicating whether to apply an
+            adjustment for the number of clusters. It multiplies the
+            covariance by g / (g - 1) * (n - 1) / n, where g is the number
+            of distinct clusters and n is the number of observations. With
+            two-way clustering, it is applied to each of the three one-way
+            covariances that are combined. The default is False.
 
         * "kernel" - Driscoll-Kraay HAC estimator. Configurations options are:
 
@@ -2665,6 +2963,10 @@ class FirstDifferenceOLS(_PanelModelBase):
         When using a clustered covariance estimator, all cluster ids must be
         identical within a first difference.  In most scenarios, this requires
         ids to be identical within an entity.
+
+        ``debiased=True``, which is the default, scales the covariance by
+        n / (n - k), where k is the number of regressors, and uses the t and
+        F distributions for inference. See :ref:`panel-small-sample`.
         """
         y_fd = self.dependent.first_difference()
         time_ids = y_fd.time_ids
@@ -2781,11 +3083,12 @@ class FirstDifferenceOLS(_PanelModelBase):
         formula : str
             Formula to transform into model. Conforms to formulaic formula
             rules.
-        data : array_like
+        data : PanelData or DataFrame
             Data structure that can be coerced into a PanelData.  In most
             cases, this should be a multi-index DataFrame where the level 0
-            index contains the entities and the level 1 contains the time.
-        weights: array_like
+            index contains the entities and the level 1 contains the time. A
+            list or a tuple raises a ``TypeError`` that names ``data``.
+        weights : array_like, optional
             Weights to use in estimation.  Assumes residual variance is
             proportional to inverse of weight to that the residual times
             the weight should be homoskedastic.
@@ -2827,18 +3130,28 @@ class RandomEffects(_PanelModelBase):
 
     Parameters
     ----------
-    dependent : array_like
-        Dependent (left-hand-side) variable (time by entity)
-    exog : array_like
-        Exogenous or right-hand-side variables (variable by time by entity).
-    weights : array_like
+    dependent : PanelData, DataFrame, Series, ndarray or DataArray
+        Dependent (left-hand-side) variable (time by entity). A DataFrame or
+        Series with a 2-level MultiIndex (entity, then time), a DataFrame with
+        time as the index and entities as the columns, a 2-d (time by entity)
+        NumPy array or DataArray, or a PanelData. A list, a tuple or any other
+        container raises a ``TypeError`` that names ``dependent``, since the
+        entities and time periods need labels or a layout.
+    exog : PanelData, DataFrame, Series, ndarray or DataArray
+        Exogenous or right-hand-side variables (variable by time by entity). The
+        containers are those of ``dependent``, where a DataFrame has a column for
+        each variable and an array or DataArray with several variables has 3
+        dimensions (variable by time by entity). A list, a tuple or any other
+        container raises a ``TypeError`` that names ``exog``.
+    weights : array_like, optional
         Weights to use in estimation.  Assumes residual variance is
         proportional to inverse of weight to that the residual time
         the weight should be homoskedastic.
         Weights can be given for each observation, for each time period,
         for each entity or for each combination of time period and entity.
         Weights with labels must use the same labels, in the same order,
-        as dependent. See :ref:`panel-input-alignment`.
+        as dependent or, if dependent has no labels, as exog. See
+        :ref:`panel-input-alignment`.
 
     Notes
     -----
@@ -2879,11 +3192,12 @@ class RandomEffects(_PanelModelBase):
         formula : str
             Formula to transform into model. Conforms to formulaic formula
             rules.
-        data : array_like
+        data : PanelData or DataFrame
             Data structure that can be coerced into a PanelData.  In most
             cases, this should be a multi-index DataFrame where the level 0
-            index contains the entities and the level 1 contains the time.
-        weights: array_like
+            index contains the entities and the level 1 contains the time. A
+            list or a tuple raises a ``TypeError`` that names ``data``.
+        weights : array_like, optional
             Weights to use in estimation.  Assumes residual variance is
             proportional to inverse of weight to that the residual times
             the weight should be homoskedastic.
@@ -2943,9 +3257,9 @@ class RandomEffects(_PanelModelBase):
             the random effect.
         cov_type : str
             Name of covariance estimator (see notes). Default is "unadjusted".
-        debiased : bool
-            Flag indicating whether to debiased the covariance estimator using
-            a degree of freedom adjustment.
+        debiased : bool, optional
+            Flag indicating whether to debias the covariance estimator using
+            a degree of freedom adjustment. The default is True. See Notes.
         cov_config
             Additional covariance-specific options.  See Notes.
 
@@ -2969,12 +3283,22 @@ class RandomEffects(_PanelModelBase):
           White's estimator
         * "clustered` - One- or two-way clustering.  Configuration options are:
 
-          * ``clusters`` - Input containing 1 or 2 variables.
+          * ``clusters`` - Input containing 1 or 2 variables. This can be
+            a pandas object or PanelData with the index of ``dependent``, a 1-d
+            array or list with a value for each row of ``dependent`` in the
+            order of its rows, or an array or list with the layout of
+            ``dependent`` (time by entity, or variable by time by entity).
             Clusters should be integer values, although other types will
             be coerced to integer values by treating as categorical variables
           * ``cluster_entity`` - Boolean flag indicating to use entity
             clusters
           * ``cluster_time`` - Boolean indicating to use time clusters
+          * ``group_debias`` - Boolean flag indicating whether to apply an
+            adjustment for the number of clusters. It multiplies the
+            covariance by g / (g - 1) * (n - 1) / n, where g is the number
+            of distinct clusters and n is the number of observations. With
+            two-way clustering, it is applied to each of the three one-way
+            covariances that are combined. The default is False.
 
         * "kernel" - Driscoll-Kraay HAC estimator. Configurations options are:
 
@@ -2983,6 +3307,14 @@ class RandomEffects(_PanelModelBase):
             estimator similar to the Newey-West covariance estimator.
           * ``bandwidth`` - Bandwidth to use when computing the kernel.  If
             not provided, a naive default is used.
+
+        ``debiased=True``, which is the default, scales the covariance by
+        n / (n - k), where k is the number of regressors, and uses the t and
+        F distributions for inference.
+
+        ``debiased=True`` and ``group_debias=True`` give the clustered
+        covariance of Stata's ``xtreg, re vce(cluster ...)``.
+        See :ref:`panel-small-sample`.
         """
         w = self.weights.values2d
         root_w = cast("linearmodels.typing.data.Float64Array", np.sqrt(w))
@@ -3035,12 +3367,13 @@ class RandomEffects(_PanelModelBase):
         wx: linearmodels.typing.data.Float64Array = np.asarray(
             root_w * self.exog.values2d, dtype=float
         )
-        index = self.dependent.index
-        reindex = index.levels[0][index.codes[0]]
-        wybar = (theta * wybar).loc[reindex]
-        wxbar = (theta * wxbar).loc[reindex]
-        wy -= root_w * wybar.values
-        wx -= root_w * wxbar.values
+        # The entity means are in the order in which the entities appear. Rows are
+        # selected by position since dependent and exog need not have the same labels
+        entity_loc = factorize(self.dependent.index.get_level_values(0))[0]
+        wybar_rows = np.asarray(theta * wybar)[entity_loc]
+        wxbar_rows = np.asarray(theta * wxbar)[entity_loc]
+        wy -= root_w * wybar_rows
+        wx -= root_w * wxbar_rows
         params = _lstsq(wx, wy, rcond=None)[0]
 
         df_resid = wy.shape[0] - wx.shape[1]
@@ -3115,18 +3448,28 @@ class FamaMacBeth(_PanelModelBase):
 
     Parameters
     ----------
-    dependent : array_like
-        Dependent (left-hand-side) variable (time by entity)
-    exog : array_like
-        Exogenous or right-hand-side variables (variable by time by entity).
-    weights : array_like
+    dependent : PanelData, DataFrame, Series, ndarray or DataArray
+        Dependent (left-hand-side) variable (time by entity). A DataFrame or
+        Series with a 2-level MultiIndex (entity, then time), a DataFrame with
+        time as the index and entities as the columns, a 2-d (time by entity)
+        NumPy array or DataArray, or a PanelData. A list, a tuple or any other
+        container raises a ``TypeError`` that names ``dependent``, since the
+        entities and time periods need labels or a layout.
+    exog : PanelData, DataFrame, Series, ndarray or DataArray
+        Exogenous or right-hand-side variables (variable by time by entity). The
+        containers are those of ``dependent``, where a DataFrame has a column for
+        each variable and an array or DataArray with several variables has 3
+        dimensions (variable by time by entity). A list, a tuple or any other
+        container raises a ``TypeError`` that names ``exog``.
+    weights : array_like, optional
         Weights to use in estimation.  Assumes residual variance is
         proportional to inverse of weight to that the residual time
         the weight should be homoskedastic.
         Weights can be given for each observation, for each time period,
         for each entity or for each combination of time period and entity.
         Weights with labels must use the same labels, in the same order,
-        as dependent. See :ref:`panel-input-alignment`.
+        as dependent or, if dependent has no labels, as exog. See
+        :ref:`panel-input-alignment`.
 
     Notes
     -----
@@ -3149,9 +3492,28 @@ class FamaMacBeth(_PanelModelBase):
     implementation based on regressing all observation in a single
     time period is "as-if" time effects are included.
 
+    Each period needs at least as many entities as regressors, and the
+    regressors must vary across the entities of the period, so that they are
+    not collinear: a regressor that depends only on time is collinear with the
+    constant. Periods whose cross-section is rank deficient are dropped with a
+    warning, and T counts only the periods that are used. It is an error if no
+    period can be used.
+
     Parameter inference is made using the set of T parameter estimates with
     either the standard covariance estimator or a kernel-based covariance,
-    depending on ``cov_type``.
+    depending on ``cov_type``. Since the parameters are the averages of the T
+    cross-sectional estimates, the t-statistics are compared with a t
+    distribution with T - 1 degrees of freedom, which is the convention of
+    Fama and MacBeth [1]_. T is the number of periods whose cross-sectional
+    regression is estimated. The p-values and confidence intervals use this
+    distribution if ``debiased`` is True, which is the default, and the normal
+    distribution otherwise.
+
+    References
+    ----------
+    .. [1] Fama, E. F. and MacBeth, J. D. (1973). Risk, return, and
+       equilibrium: Empirical tests. Journal of Political Economy, 81(3),
+       607-636.
     """
 
     def __init__(
@@ -3189,9 +3551,17 @@ class FamaMacBeth(_PanelModelBase):
         valid_blocks = wx_df.groupby(level=1).apply(validate_block)
         if not valid_blocks.any():
             err = (
-                "Model cannot be estimated. All blocks of time-series observations "
-                "are rank deficient, and so it is not possible to estimate any"
-                "cross-sectional regressions."
+                "Model cannot be estimated. Fama-MacBeth estimates one "
+                "cross-sectional regression for each time period, using the "
+                "entities that are observed in the period, and none of these "
+                "regressions can be estimated. A cross-section needs at least "
+                "as many entities as regressors, and its regressors must not be "
+                "collinear, so the regressors must vary across entities within "
+                "a period. A regressor that depends only on time is collinear "
+                "with the constant, and a panel with a single entity has one "
+                "observation in each cross-section. Use more entities, remove "
+                "the regressors that do not vary across entities, or, for a "
+                "single entity, estimate a time-series regression."
             )
             raise ValueError(err)
         if valid_blocks.sum() < exog.shape[1]:
@@ -3229,7 +3599,10 @@ class FamaMacBeth(_PanelModelBase):
             Name of covariance estimator (see notes). Default is "unadjusted".
         debiased : bool
             Flag indicating whether to debiased the covariance estimator using
-            a degree of freedom adjustment.
+            a degree of freedom adjustment, which uses T - 1 instead of T when
+            the covariance of the T estimates is computed, and to use a t
+            distribution with T - 1 degrees of freedom for inference. If
+            False, inference uses the normal distribution.
         bandwidth : float
             The bandwidth to use when cov_type is "kernel". If None, it is
             automatically computed.
@@ -3253,7 +3626,26 @@ class FamaMacBeth(_PanelModelBase):
 
         * "unadjusted", "homoskedastic", "robust", "heteroskedastic" use the
           standard covariance estimator of the T parameter estimates.
-        * "kernel" is a HAC estimator. Configurations options are:
+        * "kernel" is a HAC estimator of the covariance of the T parameter
+          estimates. The configuration options are ``kernel`` and ``bandwidth``.
+
+        The parameters are the averages of the T cross-sectional estimates, and
+        T is the number of periods whose cross-sectional regression is
+        estimated: periods that cannot be estimated are not counted. If
+        ``debiased`` is True, which is the default, the p-values and
+        confidence intervals use a t distribution with T - 1 degrees of
+        freedom, which is the convention of Fama and MacBeth (1973) and is the
+        ``df_resid`` of the results. The standard and the kernel covariance
+        estimators use the same distribution. If ``debiased`` is False, they
+        use the normal distribution. The estimates and the standard errors
+        do not depend on the distribution.
+
+        .. versionchanged:: 7.1
+
+           The p-values and confidence intervals use T - 1 degrees of freedom.
+           Earlier versions used nobs - nvar degrees of freedom, those of a
+           pooled regression, which is close to the normal distribution when
+           there are many observations.
         """
         y = cast("linearmodels.typing.data.Float64Array", self._y)
         x = cast("linearmodels.typing.data.Float64Array", self._x)
@@ -3359,9 +3751,15 @@ class FamaMacBeth(_PanelModelBase):
             bandwidth=bandwidth,
         )
 
-        df_resid = wy.shape[0] - params.shape[0]
+        # T is the number of cross-sectional estimates that are averaged, the
+        # periods that could be estimated, which are also the periods that the
+        # covariance uses. Inference uses t(T - 1)
+        nperiod = int(np.isfinite(np.asarray(all_params)).all(axis=1).sum())
+        df_resid = nperiod - 1
+        # The classical F-statistic is that of the pooled regression
+        pooled_df_resid = wy.shape[0] - params.shape[0]
         res = self._postestimation(
-            params, cov, debiased, df_resid, weps, wy, wx, root_w
+            params, cov, debiased, pooled_df_resid, weps, wy, wx, root_w
         )
         index = self.dependent.index
         res.update(
@@ -3402,11 +3800,12 @@ class FamaMacBeth(_PanelModelBase):
         formula : str
             Formula to transform into model. Conforms to formulaic formula
             rules.
-        data : array_like
+        data : PanelData or DataFrame
             Data structure that can be coerced into a PanelData.  In most
             cases, this should be a multi-index DataFrame where the level 0
-            index contains the entities and the level 1 contains the time.
-        weights: array_like
+            index contains the entities and the level 1 contains the time. A
+            list or a tuple raises a ``TypeError`` that names ``data``.
+        weights : array_like, optional
             Weights to use in estimation.  Assumes residual variance is
             proportional to inverse of weight to that the residual times
             the weight should be homoskedastic.

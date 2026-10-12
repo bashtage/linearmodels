@@ -5,7 +5,9 @@ Estimation pairs rows by position, so a labelled input whose rows are in a
 different order from dependent would silently be attached to the wrong
 observations. These tests check that this is rejected, that correctly
 labelled inputs are accepted for every supported shape of weights, and that
-raw arrays continue to be paired by position.
+raw arrays continue to be paired by position. If dependent carries no labels,
+the first of exog, weights and other_effects that does sets the labels, and the
+inputs after it, including the clusters, have to use them.
 """
 
 from linearmodels.compat.pandas import ANNUAL_FREQ
@@ -209,13 +211,104 @@ def test_exog_raw_array_is_positional(simple):
     assert_allclose(res.params, positional)
 
 
-def test_unlabelled_dependent_is_not_checked(simple):
-    # There are no labels to compare against, so exog is paired by position
-    y = simple.y.to_numpy().reshape(NENTITY, NTIME).T
+def test_unlabelled_dependent_is_paired_by_position(simple):
+    # There are no labels in dependent, so exog is paired by position
+    y = unlabelled_dependent(simple)
     x = simple.x.iloc[::-1]
     res = PooledOLS(y, x).fit()
     positional, *_ = np.linalg.lstsq(x.to_numpy(), simple.y.to_numpy(), rcond=None)
     assert_allclose(res.params, positional)
+
+
+def unlabelled_dependent(panel):
+    """A time by entity array with the rows of an entity-major dependent"""
+    return panel.y.to_numpy().reshape(NENTITY, NTIME).T
+
+
+@pytest.mark.parametrize("model", MODELS, ids=MODEL_IDS)
+@pytest.mark.parametrize("shape", WEIGHT_SHAPES)
+def test_weights_must_use_the_labels_of_exog_without_labels_in_dependent(
+    simple, model, shape
+):
+    y = unlabelled_dependent(simple)
+    weights = simple.labelled_weights(shape)
+    mod = model(y, simple.x, weights=weights)
+    raw = model(y, simple.x, weights=simple.raw_weights(shape))
+    assert_allclose(mod.weights.values2d, raw.weights.values2d)
+    for corruption in CORRUPTIONS[shape]:
+        bad = CORRUPTIONS[shape][corruption](weights)
+        with pytest.raises(ValueError, match=r"index of weights does not match exog"):
+            model(y, simple.x, weights=bad)
+
+
+@pytest.mark.parametrize("model", MODELS, ids=MODEL_IDS)
+def test_exog_with_labels_must_agree_with_dependent_labels(simple, model):
+    # If dependent has labels they are still the ones that are used
+    with pytest.raises(ValueError, match="row index of exog does not match dependent"):
+        model(simple.y, simple.x.iloc[::-1])
+    with pytest.raises(
+        ValueError, match="row index of weights does not match dependent"
+    ):
+        model(simple.y, simple.x, weights=simple.w_flat.iloc[::-1])
+
+
+def test_message_names_the_input_that_sets_the_labels(simple):
+    y = unlabelled_dependent(simple)
+    with pytest.raises(ValueError, match="does not match") as exc:
+        PooledOLS(y, simple.x, weights=simple.w_flat.iloc[::-1])
+    message = str(exc.value)
+    assert message.startswith("The row index of weights does not match exog.")
+    assert "in the same order as exog" in message
+    assert "reindex weights to the index of exog" in message
+    assert ".to_numpy()" in message
+
+
+@pytest.mark.parametrize("shape", ["grid", "flat"])
+def test_weights_set_the_labels_without_labels_in_dependent_and_exog(simple, shape):
+    y, x = unlabelled_dependent(simple), to_3d(simple.x)
+    weights = simple.labelled_weights(shape)
+    mod = PanelOLS(y, x, weights=weights, other_effects=simple.other)
+    raw = PanelOLS(
+        y, x, weights=simple.raw_weights(shape), other_effects=to_3d(simple.other)
+    )
+    assert_allclose(mod.weights.values2d, raw.weights.values2d)
+    match = "row index of other_effects does not match weights"
+    with pytest.raises(ValueError, match=match):
+        PanelOLS(y, x, weights=weights, other_effects=simple.other.iloc[::-1])
+    with pytest.raises(ValueError, match=match):
+        PanelOLS(y, x, weights=weights, other_effects=shift_labels(simple.other))
+    # Weights for each time period or entity do not have the labels of the rows
+    for shape_ in ("time", "entity"):
+        weights = simple.labelled_weights(shape_)
+        PanelOLS(y, x, weights=weights, other_effects=simple.other.iloc[::-1])
+
+
+def test_other_effects_set_the_labels_without_other_labels(simple):
+    y, x = unlabelled_dependent(simple), to_3d(simple.x)
+    mod = PanelOLS(y, x, other_effects=simple.other)
+    raw = PanelOLS(y, x, other_effects=to_3d(simple.other))
+    assert_allclose(mod.fit().params, raw.fit().params)
+    mod.fit(cov_type="clustered", clusters=simple.clusters)
+    match = "row index of clusters does not match other_effects"
+    with pytest.raises(ValueError, match=match):
+        mod.fit(cov_type="clustered", clusters=simple.clusters.iloc[::-1])
+
+
+def test_other_effects_use_the_labels_of_exog(simple):
+    y = unlabelled_dependent(simple)
+    PanelOLS(y, simple.x, other_effects=simple.other)
+    for corrupt in (reverse, shift_labels):
+        with pytest.raises(
+            ValueError, match="row index of other_effects does not match exog"
+        ):
+            PanelOLS(y, simple.x, other_effects=corrupt(simple.other))
+    wide = simple.other["c"].unstack(0)
+    with pytest.raises(
+        ValueError, match="row index of other_effects does not match exog"
+    ):
+        PanelOLS(y, simple.x, other_effects=wide.iloc[::-1])
+    # An array has no labels
+    PanelOLS(y, simple.x, other_effects=to_3d(simple.other)[:, ::-1])
 
 
 @pytest.mark.parametrize("shape", WEIGHT_SHAPES)
@@ -432,6 +525,81 @@ def test_clusters_unlabelled_dependent(simple):
     mod = PooledOLS(y, to_3d(simple.x))
     clusters = simple.clusters.iloc[::-1]
     assert mod.reformat_clusters(clusters).dataframe.shape == (NENTITY * NTIME, 1)
+
+
+@pytest.mark.parametrize("model", [PooledOLS, PanelOLS, RandomEffects])
+def test_clusters_use_the_labels_of_the_first_input_with_labels(simple, model):
+    y = unlabelled_dependent(simple)
+    mod = model(y, simple.x)
+    clusters = simple.clusters
+    res = mod.fit(cov_type="clustered", clusters=clusters)
+    raw = model(y, to_3d(simple.x)).fit(cov_type="clustered", clusters=to_3d(clusters))
+    assert_allclose(res.std_errors, raw.std_errors)
+    match = "row index of clusters does not match exog"
+    for corrupt in (reverse, shift_labels):
+        with pytest.raises(ValueError, match=match):
+            mod.fit(cov_type="clustered", clusters=corrupt(clusters))
+        with pytest.raises(ValueError, match=match):
+            mod.reformat_clusters(corrupt(clusters))
+    with pytest.raises(ValueError, match=match):
+        mod.reformat_clusters(clusters["cl"].unstack(0).iloc[::-1])
+    # Without any labels there is nothing to compare
+    mod = model(y, to_3d(simple.x))
+    mod.fit(cov_type="clustered", clusters=reverse(clusters))
+    # weights can be the first input with labels
+    mod = model(y, to_3d(simple.x), weights=simple.w_flat)
+    mod.fit(cov_type="clustered", clusters=clusters)
+    match = "row index of clusters does not match weights"
+    with pytest.raises(ValueError, match=match):
+        mod.fit(cov_type="clustered", clusters=reverse(clusters))
+
+
+def test_labelled_clusters_use_the_labels_of_the_rows_of_dependent(simple):
+    # The labels of the rows are those of dependent, which are not the labels of
+    # the clusters when dependent is an array
+    y = unlabelled_dependent(simple)
+    mod = PanelOLS(y, simple.x)
+    clusters = mod.reformat_clusters(simple.clusters)
+    assert clusters.dataframe.index.equals(mod.dependent.index)
+    assert not clusters.dataframe.index.equals(simple.clusters.index)
+    assert_allclose(clusters.values2d, simple.clusters.to_numpy())
+    # Clustering by entity as well as by the clusters used to fail
+    res = mod.fit(cov_type="clustered", clusters=simple.clusters, cluster_entity=True)
+    raw = PanelOLS(y, to_3d(simple.x)).fit(
+        cov_type="clustered", clusters=to_3d(simple.clusters), cluster_entity=True
+    )
+    assert np.all(np.isfinite(res.std_errors))
+    assert_allclose(res.std_errors, raw.std_errors)
+
+
+def test_labelled_clusters_first_difference_without_labels_in_dependent(simple):
+    y = unlabelled_dependent(simple)
+    entity_clusters = pd.DataFrame(
+        {"cl": np.repeat(np.arange(NENTITY) % 3, NTIME)}, index=simple.index
+    )
+    mod = FirstDifferenceOLS(y, simple.x)
+    res = mod.fit(cov_type="clustered", clusters=entity_clusters)
+    raw = FirstDifferenceOLS(y, to_3d(simple.x)).fit(
+        cov_type="clustered", clusters=to_3d(entity_clusters)
+    )
+    assert_allclose(res.std_errors, raw.std_errors)
+    with pytest.raises(ValueError, match="row index of clusters does not match exog"):
+        mod.fit(cov_type="clustered", clusters=reverse(entity_clusters))
+
+
+def test_clusters_and_missing_values_without_labels_in_dependent(simple):
+    y = unlabelled_dependent(simple)
+    x = simple.x.copy()
+    x.iloc[5, 0] = np.nan
+    mod = PooledOLS(y, x)
+    assert mod.not_null.sum() == len(simple.y) - 1
+    res = mod.fit(cov_type="clustered", clusters=simple.clusters)
+    raw = PooledOLS(y, to_3d(x)).fit(
+        cov_type="clustered", clusters=to_3d(simple.clusters)
+    )
+    assert_allclose(res.std_errors, raw.std_errors)
+    with pytest.raises(ValueError, match="row index of clusters does not match exog"):
+        mod.fit(cov_type="clustered", clusters=reverse(simple.clusters))
 
 
 def test_xarray_alignment():

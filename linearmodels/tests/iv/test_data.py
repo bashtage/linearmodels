@@ -125,7 +125,7 @@ def test_invalid_types() -> None:
         def ndim(self) -> int:
             return self._ndim
 
-    with pytest.raises(TypeError, match=r"Only ndarrays, DataArrays and Series"):
+    with pytest.raises(TypeError, match=r"x must be array_like.*Got AnotherClass"):
         # Intentional typing failure
         IVData(AnotherClass())
 

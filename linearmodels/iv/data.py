@@ -11,10 +11,10 @@ import numpy as np
 import pandas as pd
 from pandas.api.types import is_numeric_dtype, is_string_dtype
 
+from linearmodels.shared.inputs import as_array_like, as_float64
 import linearmodels.typing.data
 
 dim_err = "{0} has too many dims.  Maximum is 2, actual is {1}"
-type_err = "Only ndarrays, DataArrays and Series and DataFrames are supported"
 
 
 def convert_columns(s: pd.Series, drop_first: bool) -> linearmodels.typing.AnyPandas:
@@ -40,9 +40,12 @@ class IVData:
 
     Parameters
     ----------
-    x : {ndarray, Series, DataFrame, DataArray}
-        Data to wrap and standardize.  If None, then nobs must be provided to
-        produce an IVData instance with shape (nobs, 0).
+    x : array_like or None
+        Data to wrap and standardize. Anything that is not a pandas Series or
+        DataFrame, an xarray DataArray or an IVData, such as a list or a tuple,
+        is converted using ``np.asarray``. A ``TypeError`` is raised if the data
+        are complex or cannot be converted to float64. If None, then nobs must
+        be provided to produce an IVData instance with shape (nobs, 0).
     var_name : str
         Variable name to use when naming variables in NumPy arrays or
         xarray DataArrays
@@ -66,20 +69,24 @@ class IVData:
     ):
         if isinstance(x, IVData):
             self.__dict__.update(copy.deepcopy(x.__dict__))
+            self._check_nobs(nobs, var_name)
             return
         if x is None and nobs is not None:
             x = np.empty((nobs, 0))
         elif x is None:
             raise ValueError("nobs required when x is None")
 
+        # The input as it was passed, which is what labels are taken from
         self.original = x
         assert x is not None
+        # Lists and tuples are converted to arrays, and complex values are rejected
+        x = as_array_like(x, var_name)
         xndim = x.ndim
         if xndim > 2:
             raise ValueError(dim_err.format(var_name, xndim))
 
         if isinstance(x, np.ndarray):
-            x = x.astype(dtype=np.float64)
+            x = as_float64(x, var_name)
             if xndim == 1:
                 x = x.reshape((x.shape[0], -1))
 
@@ -120,6 +127,7 @@ class IVData:
                 all_numeric = all_numeric and is_numeric_dtype(dt)
                 if not (is_numeric_dtype(dt) or isinstance(dt, pd.CategoricalDtype)):
                     raise ValueError(
+                        f"{var_name} has a column ({col!r}) of type {dt}. "
                         "Only numeric, string  or categorical data permitted"
                     )
 
@@ -134,34 +142,33 @@ class IVData:
             self._col_labels = list(x.axes[1])
 
         else:
-            try:
-                import xarray as xr  # noqa: PLC0415
-            except ImportError as exc:
-                raise TypeError(type_err) from exc
-            if isinstance(x, xr.DataArray):
-                if x.ndim == 1:
-                    x = xr.concat([x], dim=var_name)
-                    assert isinstance(x, xr.DataArray)
-                    x = x.transpose()
-                assert isinstance(x, xr.DataArray)
-                index = list(x.coords[x.dims[0]].values)
-                xr_col_values = x.coords[x.dims[1]].values
-                xr_cols = list(xr_col_values)
-                if is_numeric_dtype(xr_col_values.dtype):
-                    xr_cols = [var_name + f".{i}" for i in range(x.shape[1])]
-                self._ndarray = x.values.astype(np.float64)
-                self._pandas = pd.DataFrame(self._ndarray, columns=xr_cols, index=index)
-                self._row_labels = index
-                self._col_labels = xr_cols
-            else:
-                raise TypeError(type_err)
+            # as_array_like only returns an xarray DataArray if xarray is installed
+            import xarray as xr  # noqa: PLC0415
 
-        if nobs is not None:
-            if self._ndarray.shape[0] != nobs:
-                msg = "Array required to have {nobs} obs, has {act}".format(
-                    nobs=nobs, act=self._ndarray.shape[0]
-                )
-                raise ValueError(msg)
+            assert isinstance(x, xr.DataArray)
+            if x.ndim == 1:
+                x = xr.concat([x], dim=var_name)
+                assert isinstance(x, xr.DataArray)
+                x = x.transpose()
+            assert isinstance(x, xr.DataArray)
+            index = list(x.coords[x.dims[0]].values)
+            xr_col_values = x.coords[x.dims[1]].values
+            xr_cols = list(xr_col_values)
+            if is_numeric_dtype(xr_col_values.dtype):
+                xr_cols = [var_name + f".{i}" for i in range(x.shape[1])]
+            self._ndarray = as_float64(x.values, var_name)
+            self._pandas = pd.DataFrame(self._ndarray, columns=xr_cols, index=index)
+            self._row_labels = index
+            self._col_labels = xr_cols
+
+        self._check_nobs(nobs, var_name)
+
+    def _check_nobs(self, nobs: int | None, var_name: str) -> None:
+        if nobs is not None and self._ndarray.shape[0] != nobs:
+            raise ValueError(
+                f"{var_name} has the wrong number of observations. Array required "
+                f"to have {nobs} obs, has {self._ndarray.shape[0]}"
+            )
 
     @property
     def pandas(self) -> pd.DataFrame:

@@ -515,8 +515,10 @@ class PanelResults(_SummaryStr):
 
         Parameters
         ----------
-        exog : array_like
-            Exogenous values to use in out-of-sample prediction (nobs by nexog)
+        exog : PanelData, DataFrame, Series, ndarray or DataArray, optional
+            Exogenous values to use in out-of-sample prediction (nobs by nexog).
+            The containers are those of ``exog`` in the model. A list or a tuple
+            raises a ``TypeError`` that names ``exog``.
         data : DataFrame
             DataFrame to use for out-of-sample predictions when model was
             constructed using a formula.
@@ -578,7 +580,29 @@ class PanelResults(_SummaryStr):
 
         Notes
         -----
-        NaN filled when models do not include effects.
+        The combined effect of all of the effects in the model, in one column.
+        It is the sum of the entity, time and other effects of each
+        observation. The effects are not available separately.
+        See :ref:`panel-estimated-effects` for how to recover the entity and
+        time effects of a model that has both.
+
+        The estimated effects have no standard errors or any other inference.
+        They are not estimated consistently when the number of time periods is
+        fixed. The effect of an entity is estimated from its observations, so
+        the error does not shrink when the number of entities grows. To make
+        inference about the effects of a small number of entities, include
+        them as dummy variables in the regression.
+
+        The values are NaN for models that do not have effects, which are
+        PooledOLS, FirstDifferenceOLS and FamaMacBeth. They are 0 for a
+        PanelOLS model without effects.
+
+        The effects of RandomEffects are theta times the entity mean of the
+        difference between the dependent variable and the fitted values, where
+        theta is in the results. They are all 0 if the estimated variance of
+        the random effect is negative and so it is set to 0, since theta is
+        then 0 and the model is pooled OLS. ``variance_decomposition`` shows
+        whether this is the case.
         """
         return self._effects
 
@@ -647,11 +671,19 @@ class PanelResults(_SummaryStr):
         Under the null, the statistic is asymptotically standard normal.
 
         The shocks are the model's ``idiosyncratic`` values, so the weights of
-        a weighted model are not applied to them, and the shocks of
-        ``FirstDifferenceOLS`` are in levels rather than the residuals of the
-        differenced equation. Since the correlations are computed over time,
-        the test assumes that the shocks are not serially correlated, and it
-        over-rejects if they are persistent.
+        a weighted model are not applied to them. The exception is
+        ``FirstDifferenceOLS``, which uses ``resids``, the residuals of the
+        differenced equation, as ``plm::pcdtest`` does for a pooled regression
+        of the differenced data. Its ``idiosyncratic`` values are in levels,
+        and are persistent when the errors are, for example a random walk,
+        which is when first differences are used. Since the correlations are
+        computed over time, the test assumes that the shocks are not serially
+        correlated, and it over-rejects if they are persistent. Conversely, if
+        the errors in levels are serially uncorrelated, the residuals of
+        ``FirstDifferenceOLS`` are negatively autocorrelated (an MA(1) with
+        autocorrelation -0.5) and the test over-rejects, with a size of about
+        11% at the nominal 5% level in large panels. The test is then better
+        applied to a ``PanelOLS`` model with entity effects.
 
         The test is not valid for every model and an InapplicableTestStatistic
         is returned for the following.
@@ -692,10 +724,15 @@ class PanelResults(_SummaryStr):
            problem in testing for remaining cross-section correlation.
            Journal of Business & Economic Statistics, 40(3), 1191-1203.
         """
+        from linearmodels.panel.model import FirstDifferenceOLS  # noqa: PLC0415
+
         reason = self._pesaran_cd_inapplicable()
         if reason is not None:
             return InapplicableTestStatistic(reason=reason, name="Pesaran CD test")
-        eps = self.idiosyncratic.iloc[:, 0]
+        if isinstance(self.model, FirstDifferenceOLS):
+            eps = self.resids
+        else:
+            eps = self.idiosyncratic.iloc[:, 0]
         wide = eps.unstack(level=0)
         wide = wide.loc[:, wide.notnull().any(axis=0)]
         nentity = wide.shape[1]
@@ -829,6 +866,11 @@ class PanelResults(_SummaryStr):
               {"x1": 0, "x2+x3": 1}.
 
             It is not possible to use both ``restriction`` and ``formula``.
+            The names in the restrictions are the entries of the index of
+            ``params``. A name that is not valid Python, for example one that
+            contains ``:`` or ``[`` such as ``C(year)[T.1987]:educ``, must be
+            enclosed in back-ticks, e.g.,
+            ``"`C(year)[T.1987]:educ` = 0"``.
 
         Returns
         -------
@@ -870,6 +912,15 @@ class PanelResults(_SummaryStr):
 
         >>> formula = "union = married = 0"
         >>> wald_res = fe_res.wald_test(formula=formula)
+
+        A name that is not valid Python, such as the interaction of a
+        categorical variable with a regressor, is enclosed in back-ticks
+
+        >>> from linearmodels import PooledOLS
+        >>> mod = PooledOLS.from_formula("lwage ~ 1 + union + C(year) * educ", data)
+        >>> res = mod.fit(cov_type="clustered", cluster_entity=True)
+        >>> null = "`C(year)[T.1987]:educ` = 0, `C(year)[T.1986]:educ` = 0"
+        >>> wald_res = res.wald_test(formula=null)
         """
         return quadratic_form_test(
             self.params, self.cov, restriction=restriction, value=value, formula=formula
@@ -1379,6 +1430,32 @@ class FamaMacBethResults(PanelResults):
         self._all_params = res.all_params
         self._avg_r2 = res.avg_r2
         self._avg_adj_r2 = res.avg_adj_r2
+
+    @property
+    def df_resid(self) -> int:
+        """
+        Degrees of freedom of the t distribution used for inference.
+
+        Returns
+        -------
+        int
+            T - 1, where T is the number of cross-sectional regressions that
+            are averaged.
+
+        Notes
+        -----
+        The parameters are the average of T cross-sectional estimates, and
+        their covariance is estimated from the same T estimates. If
+        ``debiased`` is True, p-values and confidence intervals use a t
+        distribution with T - 1 degrees of freedom, as in Fama and MacBeth
+        (1973), and ``f_statistic_robust`` uses an F distribution with this
+        denominator degree of freedom. The periods whose cross-section cannot
+        be estimated are not counted. This is not nobs minus nvar, which is the
+        residual degree of freedom of the pooled regression and the one that
+        ``f_statistic``, the classical F-statistic of the pooled regression,
+        uses.
+        """
+        return self._df_resid
 
     def _pesaran_cd_inapplicable(self) -> str | None:
         return (

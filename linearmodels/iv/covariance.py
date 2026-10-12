@@ -27,6 +27,7 @@ from numpy.linalg import inv, pinv
 
 from linearmodels.shared.covariance import cov_cluster, cov_kernel
 from linearmodels.shared.exceptions import unknown_option_error
+from linearmodels.shared.inputs import as_ndarray
 from linearmodels.shared.linalg import has_constant
 import linearmodels.typing
 import linearmodels.typing.data
@@ -38,11 +39,78 @@ KernelWeight = Union[
 ]
 
 CLUSTER_ERR = """\
-clusters has the wrong nobs. Expected {0}, got {1}.  Any missing observation
-in the regression variables have have been dropped.  When using a clustered
-covariance estimator, drop missing data before estimating the model. The model
-property `notnull` contains the locations of the observations that have no
-missing values."""
+clusters has the wrong nobs. Expected {0}, got {1}. Observations with a missing
+value in the regression variables are dropped when the model is created, so
+clusters must have one row for each of the remaining observations. When using a
+clustered covariance estimator, drop the observations with missing values from
+the data and from clusters before estimating the model."""
+
+CLUSTER_COLUMNS_ERR = """\
+clusters must be a 1-d array or a 2-d array with {0}, but its shape is {1}."""
+
+
+def check_cluster_columns(
+    clusters: linearmodels.typing.data.AnyArray, max_columns: int
+) -> None:
+    """
+    Check that clusters has the number of variables that an estimator supports.
+
+    Parameters
+    ----------
+    clusters : ndarray
+        Cluster membership, either a 1-d array or an array with a column for
+        each of the variables to cluster on.
+    max_columns : int
+        The number of clustering variables that the estimator supports, 1 or 2.
+
+    Raises
+    ------
+    ValueError
+        If clusters has more than 2 dimensions or does not have 1 to
+        max_columns columns.
+    """
+    if clusters.ndim == 1 or (
+        clusters.ndim == 2 and 1 <= clusters.shape[1] <= max_columns
+    ):
+        return
+    supported = (
+        "a single column (one-way clustering)"
+        if max_columns == 1
+        else "1 or 2 columns (one-way or two-way clustering)"
+    )
+    raise ValueError(CLUSTER_COLUMNS_ERR.format(supported, clusters.shape))
+
+
+def as_cluster_array(
+    clusters: linearmodels.typing.data.ArrayLike, max_columns: int
+) -> linearmodels.typing.data.AnyArray:
+    """
+    Convert clusters to an array and check the number of variables.
+
+    Parameters
+    ----------
+    clusters : array_like
+        Cluster membership, either a 1-d array or an array with a column for
+        each of the variables to cluster on.
+    max_columns : int
+        The number of clustering variables that the estimator supports, 1 or 2.
+
+    Returns
+    -------
+    ndarray
+        The cluster membership as an array.
+
+    Raises
+    ------
+    TypeError
+        If clusters is not array_like, or has a complex dtype.
+    ValueError
+        If clusters has more than 2 dimensions or does not have 1 to
+        max_columns columns.
+    """
+    clusters = as_ndarray(clusters, "clusters")
+    check_cluster_columns(clusters, max_columns)
+    return clusters
 
 
 def kernel_weight_bartlett(
@@ -233,6 +301,11 @@ class HomoskedasticCovariance:
         Flag indicating whether to use a small-sample adjustment
     kappa : float
         Value of kappa in k-class estimator
+    extra_df : int, optional
+        Degrees of freedom that the model uses in addition to the nvar columns
+        of x, for example the absorbed effects of AbsorbingLS. The default is 0.
+        It is only used if ``debiased`` is True, when n / (n-k) becomes
+        n / (n-k-extra_df).
 
     Notes
     -----
@@ -248,7 +321,8 @@ class HomoskedasticCovariance:
 
       s^2 = n^{-1} \sum_{i=1}^n \hat{\epsilon}_i^2
 
-    If ``debiased`` is true, then :math:`s^2` is scaled by n / (n-k).
+    If ``debiased`` is true, then :math:`s^2` is scaled by n / (n-k-df), where k is
+    the number of columns of x and df is ``extra_df``.
 
     .. math::
 
@@ -266,6 +340,7 @@ class HomoskedasticCovariance:
         params: linearmodels.typing.data.Float64Array,
         debiased: bool = False,
         kappa: linearmodels.typing.Numeric = 1,
+        extra_df: int = 0,
     ):
         if not (x.shape[0] == y.shape[0] == z.shape[0]):
             raise ValueError("x, y and z must have the same number of rows")
@@ -281,7 +356,13 @@ class HomoskedasticCovariance:
         self._kappa = kappa
         self._pinvz = pinv(z)
         nobs, nvar = x.shape
-        self._scale: float = nobs / (nobs - nvar) if self._debiased else 1.0
+        if self._debiased and extra_df > 0 and nobs - nvar - extra_df <= 0:
+            raise ValueError(
+                "The small-sample adjustment of a debiased covariance needs more "
+                f"observations ({nobs}) than the {nvar} columns of x and the "
+                f"{extra_df} degrees of freedom that are used in addition."
+            )
+        self._scale: float = nobs / (nobs - nvar - extra_df) if self._debiased else 1.0
         self._name = "Unadjusted Covariance (Homoskedastic)"
 
     def __str__(self) -> str:
@@ -367,6 +448,11 @@ class HeteroskedasticCovariance(HomoskedasticCovariance):
         Flag indicating whether to use a small-sample adjustment
     kappa : float
         Value of kappa in k-class estimator
+    extra_df : int, optional
+        Degrees of freedom that the model uses in addition to the nvar columns
+        of x, for example the absorbed effects of AbsorbingLS. The default is 0.
+        It is only used if ``debiased`` is True, when n / (n-k) becomes
+        n / (n-k-extra_df).
 
     Notes
     -----
@@ -384,7 +470,8 @@ class HeteroskedasticCovariance(HomoskedasticCovariance):
 
     where :math:`\hat{\gamma}=(Z'Z)^{-1}(Z'X)` and
     :math:`\hat{x}_i = z_i\hat{\gamma}`. If ``debiased`` is true, then
-    :math:`S` is scaled by n / (n-k).
+    :math:`S` is scaled by n / (n-k-df), where k is the number of columns of x and
+    df is ``extra_df``.
 
     .. math::
 
@@ -402,8 +489,9 @@ class HeteroskedasticCovariance(HomoskedasticCovariance):
         params: linearmodels.typing.data.Float64Array,
         debiased: bool = False,
         kappa: linearmodels.typing.Numeric = 1,
+        extra_df: int = 0,
     ):
-        super().__init__(x, y, z, params, debiased, kappa)
+        super().__init__(x, y, z, params, debiased, kappa, extra_df)
         self._name = "Robust Covariance (Heteroskedastic)"
 
     @property
@@ -446,6 +534,11 @@ class KernelCovariance(HomoskedasticCovariance):
         Flag indicating whether to use a small-sample adjustment
     kappa : float
         Value of kappa in k-class estimator
+    extra_df : int, optional
+        Degrees of freedom that the model uses in addition to the nvar columns
+        of x, for example the absorbed effects of AbsorbingLS. The default is 0.
+        It is only used if ``debiased`` is True, when n / (n-k) becomes
+        n / (n-k-extra_df).
 
     Notes
     -----
@@ -469,7 +562,7 @@ class KernelCovariance(HomoskedasticCovariance):
     where :math:`\hat{\gamma}=(Z'Z)^{-1}(Z'X)`,
     :math:`\hat{x}_i = z_i\hat{\gamma}` and :math:`K(i,bw)` is a weight that
     depends on the kernel. If ``debiased`` is true, then :math:`S` is scaled
-    by n / (n-k).
+    by n / (n-k-df), where k is the number of columns of x and df is ``extra_df``.
 
     .. math::
 
@@ -495,8 +588,9 @@ class KernelCovariance(HomoskedasticCovariance):
         bandwidth: linearmodels.typing.OptionalNumeric = None,
         debiased: bool = False,
         kappa: linearmodels.typing.Numeric = 1,
+        extra_df: int = 0,
     ):
-        super().__init__(x, y, z, params, debiased, kappa)
+        super().__init__(x, y, z, params, debiased, kappa, extra_df)
         self._kernels = KERNEL_LOOKUP
         self._kernel = kernel
         self._bandwidth = bandwidth
@@ -568,11 +662,17 @@ class ClusteredCovariance(HomoskedasticCovariance):
         Estimated model parameters (nvar by 1)
     debiased : bool
         Flag indicating whether to use a small-sample adjustment
-    clusters : ndarray
+    clusters : array_like
         Cluster group assignment.  If not provided, uses clusters of 1.
-        Either nobs by ncluster where ncluster is 1 or 2.
+        Either nobs by ncluster where ncluster is 1 or 2. A ``ValueError`` is
+        raised for more columns.
     kappa : float
         Value of kappa in k-class estimator
+    extra_df : int, optional
+        Degrees of freedom that the model uses in addition to the nvar columns
+        of x, for example the absorbed effects of AbsorbingLS. The default is 0.
+        It is only used if ``debiased`` is True, when n / (n-k) becomes
+        n / (n-k-extra_df).
 
 
     Notes
@@ -593,8 +693,8 @@ class ClusteredCovariance(HomoskedasticCovariance):
     where :math:`\hat{\gamma}=(Z'Z)^{-1}(Z'X)` and
     :math:`\hat{x}_i = z_i\hat{\gamma}`.  :math:`\mathcal{G}_g` contains the
     indices of elements in cluster g. If ``debiased`` is true, then
-    :math:`S` is scaled by g(n - 1) / ((g-1)(n-k)) where g is the number
-    of groups..
+    :math:`S` is scaled by g(n - 1) / ((g-1)(n-k-df)) where g is the number
+    of groups, k is the number of columns of x and df is ``extra_df``.
 
     .. math::
 
@@ -613,16 +713,19 @@ class ClusteredCovariance(HomoskedasticCovariance):
         clusters: linearmodels.typing.data.AnyArray | None = None,
         debiased: bool = False,
         kappa: linearmodels.typing.Numeric = 1,
+        extra_df: int = 0,
     ):
-        super().__init__(x, y, z, params, debiased, kappa)
+        super().__init__(x, y, z, params, debiased, kappa, extra_df)
 
         nobs = x.shape[0]
         clusters = arange(nobs) if clusters is None else clusters
         clusters = cast(
-            "linearmodels.typing.data.AnyArray", asarray(clusters).squeeze()
+            "linearmodels.typing.data.AnyArray",
+            as_ndarray(clusters, "clusters").squeeze(),
         )
         if clusters.shape[0] != nobs:
             raise ValueError(CLUSTER_ERR.format(nobs, clusters.shape[0]))
+        check_cluster_columns(clusters, 2)
         self._clusters = clusters
         if clusters.ndim == 1:
             self._num_clusters = [len(unique(clusters))]
