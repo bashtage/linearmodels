@@ -521,6 +521,11 @@ class _SystemModelBase:
                 "linearmodels.typing.data.Float64Array",
                 w.ndarray,
             )
+            if np.any(w_arr <= 0) or not np.all(np.isfinite(w_arr)):
+                raise ValueError(
+                    f"weights in equation {label!r} must be strictly positive and "
+                    "finite."
+                )
             w_arr = w_arr / np.nanmean(w_arr)
             w_sqrt = np.sqrt(w_arr)
             self._w.append(w_arr)

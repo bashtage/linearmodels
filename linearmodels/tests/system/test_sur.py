@@ -13,6 +13,7 @@ from scipy.sparse.linalg import inv as spinv
 import scipy.stats
 
 from linearmodels.iv.model import _OLS as OLS
+from linearmodels.shared.exceptions import MissingValueWarning
 from linearmodels.shared.hypotheses import InvalidTestStatistic, WaldTestStatistic
 from linearmodels.shared.utility import AttrDict
 from linearmodels.system._utility import (
@@ -192,6 +193,26 @@ def test_errors():
     moddata = {"a": {"dependent": np.random.standard_normal((100, 1)), "exog": x}}
     with pytest.raises(ValueError, match=r"Equation `a` regressor array"):
         SUR(moddata)
+
+
+@pytest.mark.parametrize("bad", [0.0, -1.0, np.inf, -np.inf])
+def test_weights_not_strictly_positive(bad):
+    eqns = generate_data(k=2, p=2, included_weights=True)
+    eqns["equ.1"]["weights"] = eqns["equ.1"]["weights"].copy()
+    eqns["equ.1"]["weights"][3] = bad
+    with pytest.raises(
+        ValueError, match=r"weights in equation 'equ.1' must be strictly"
+    ):
+        SUR(eqns)
+
+
+def test_weights_missing_dropped():
+    eqns = generate_data(k=2, p=2, included_weights=True)
+    eqns["equ.1"]["weights"] = eqns["equ.1"]["weights"].copy()
+    eqns["equ.1"]["weights"][3] = np.nan
+    with pytest.warns(MissingValueWarning):
+        mod = SUR(eqns)
+    assert mod._y[0].shape[0] == eqns["equ.0"]["dependent"].shape[0] - 1
 
 
 @pytest.mark.smoke
