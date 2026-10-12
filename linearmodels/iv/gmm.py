@@ -12,11 +12,10 @@ from numpy.linalg import inv
 from linearmodels.iv.covariance import (
     KERNEL_LOOKUP,
     HomoskedasticCovariance,
-    check_cluster_columns,
+    as_cluster_array,
     kernel_optimal_bandwidth,
 )
 from linearmodels.shared.covariance import cov_cluster, cov_kernel
-from linearmodels.shared.inputs import as_ndarray
 import linearmodels.typing.data
 
 
@@ -297,9 +296,7 @@ class OneWayClusteredWeightMatrix(HomoskedasticWeightMatrix):
         debiased: bool = False,
     ) -> None:
         super().__init__(center, debiased)
-        clusters = as_ndarray(clusters, "clusters")
-        check_cluster_columns(clusters, 1)
-        self._clusters = clusters
+        self._clusters = as_cluster_array(clusters, 1)
 
     def weight_matrix(
         self,

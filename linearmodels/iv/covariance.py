@@ -80,6 +80,38 @@ def check_cluster_columns(
     raise ValueError(CLUSTER_COLUMNS_ERR.format(supported, clusters.shape))
 
 
+def as_cluster_array(
+    clusters: linearmodels.typing.data.ArrayLike, max_columns: int
+) -> linearmodels.typing.data.AnyArray:
+    """
+    Convert clusters to an array and check the number of variables.
+
+    Parameters
+    ----------
+    clusters : array_like
+        Cluster membership, either a 1-d array or an array with a column for
+        each of the variables to cluster on.
+    max_columns : int
+        The number of clustering variables that the estimator supports, 1 or 2.
+
+    Returns
+    -------
+    ndarray
+        The cluster membership as an array.
+
+    Raises
+    ------
+    TypeError
+        If clusters is not array_like, or has a complex dtype.
+    ValueError
+        If clusters has more than 2 dimensions or does not have 1 to
+        max_columns columns.
+    """
+    clusters = as_ndarray(clusters, "clusters")
+    check_cluster_columns(clusters, max_columns)
+    return clusters
+
+
 def kernel_weight_bartlett(
     bw: float, *args: int
 ) -> linearmodels.typing.data.Float64Array:
