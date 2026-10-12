@@ -1,6 +1,8 @@
 """
-Linear (regression) models for Python. Extends statsmodels with Panel regression,
-instrumental variable estimators and system estimators:
+Linear (regression) models for Python.
+
+Extends statsmodels with Panel regression, instrumental variable estimators and
+system estimators:
 
 -  Panel models:
 
@@ -10,12 +12,17 @@ instrumental variable estimators and system estimators:
    -  Pooled regression for panel data
    -  Fama-MacBeth estimation of panel models
 
+-  High-dimensional Regression:
+
+   -  Absorbing Least Squares
+
 -  Instrumental Variable estimators
 
    -  Two-stage Least Squares
    -  Limited Information Maximum Likelihood
    -  k-class Estimators
    -  Generalized Method of Moments, also with continuously updating
+   -  Jackknife IV (JIVE)
 
 -  Factor Asset Pricing Models:
 
@@ -44,7 +51,7 @@ from .asset_pricing.model import (
     TradedFactorModel,
 )
 from .iv.absorbing import AbsorbingLS
-from .iv.model import _OLS, IV2SLS, IVGMM, IVGMMCUE, IVLIML
+from .iv.model import _OLS, IV2SLS, IVGMM, IVGMMCUE, IVJIVE, IVLIML
 from .panel.model import (
     BetweenOLS,
     FamaMacBeth,
@@ -67,6 +74,7 @@ __all__ = [
     "IV3SLS",
     "IVGMM",
     "IVGMMCUE",
+    "IVJIVE",
     "IVLIML",
     "OLS",
     "SUR",
