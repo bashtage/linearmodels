@@ -159,7 +159,10 @@ class LinearFactorModelResults(_SummaryStr):
         param_names: list[str] | tuple[str, ...],
         first: bool = False,
     ) -> SimpleTable:
-        tstats = params / se
+        # The standard error is 0 when the parameter is known, as for the alphas of a
+        # model that is just identified
+        with np.errstate(divide="ignore", invalid="ignore"):
+            tstats = params / se
         pvalues = 2 * stats.norm.sf(np.abs(tstats))
         ci = params + se * stats.norm.ppf([[0.025, 0.975]])
         param_data = np.c_[params, se, tstats, pvalues, ci]
@@ -352,7 +355,18 @@ class GMMFactorModelResults(LinearFactorModelResults):
 
     @property
     def std_errors(self) -> pd.DataFrame:
-        """Estimated parameter standard errors"""
+        r"""
+        Estimated parameter standard errors.
+
+        Notes
+        -----
+        The standard errors of the loadings are the square roots of the diagonal
+        of ``cov``. The alphas are averages of moment conditions. Their standard
+        errors are the square roots of the diagonal of the covariance of the
+        average moment conditions at the estimates,
+        :math:`(S - G (G^\prime S^{-1} G)^{-1} G^\prime) / (T - df)`, which accounts
+        for the estimation of the parameters. See ``LinearFactorModelGMM``.
+        """
         se = cast("linearmodels.typing.data.Float64Array", np.sqrt(np.diag(self._cov)))
         ase = np.sqrt(np.diag(self._alpha_vcv))
         nportfolio, nfactor = self._params.shape

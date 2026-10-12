@@ -10,6 +10,8 @@ def _str(v: float) -> str:
     """Preferred basic formatter"""
     if np.isnan(v):
         return "        "
+    if np.isinf(v):
+        return f"{v:8.4g}"
     av = abs(v)
     digits = 0
     if av != 0:

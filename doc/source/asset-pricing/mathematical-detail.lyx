@@ -945,6 +945,71 @@ f_{c,t}\left[1\!\hat{\beta}_{N}\right]
 \end_layout
 
 \begin_layout Standard
+The pricing errors, 
+\begin_inset Formula $\hat{\alpha}$
+\end_inset
+
+, are the averages of the first moment condition of each portfolio, 
+\begin_inset Formula $\epsilon_{t}$
+\end_inset
+
+. The moment conditions are not zero at the estimates of an over-identified
+ model, and the covariance of their average accounts for the estimation of
+ the parameters.  For efficient GMM it is
+\end_layout
+
+\begin_layout Standard
+\begin_inset Formula 
+\[
+\hat{\Sigma}_{g}=S-G\left(G^{\prime}S^{-1}G\right)^{-1}G^{\prime}
+\]
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+\noindent
+where 
+\begin_inset Formula $S$
+\end_inset
+
+ and 
+\begin_inset Formula $G$
+\end_inset
+
+ are those of the covariance of the parameters.  Both are divided by 
+\begin_inset Formula $T-df$
+\end_inset
+
+, where 
+\begin_inset Formula $df$
+\end_inset
+
+ is the number of factors if the covariance is debiased and 0 if it is not.
+  The standard errors of the pricing errors are the square roots of the
+ diagonal elements of 
+\begin_inset Formula $\hat{\Sigma}_{g}/\left(T-df\right)$
+\end_inset
+
+ that correspond to 
+\begin_inset Formula $\hat{\alpha}$
+\end_inset
+
+.  This covariance has rank 
+\begin_inset Formula $N-K-n_{rf}$
+\end_inset
+
+, the degrees of freedom of the J statistic, where 
+\begin_inset Formula $n_{rf}$
+\end_inset
+
+ is 1 if the risk free rate is estimated and 0 if it is not.
+\end_layout
+
+
+\begin_layout Standard
 \begin_inset Note Note
 status collapsed
 

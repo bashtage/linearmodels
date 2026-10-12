@@ -256,3 +256,20 @@ previous section. The parameter covariance estimator uses the form
 appropriate for efficient GMM,
 
 .. math:: \hat{\Sigma}=\left(\hat{G}\hat{^{\prime}S}^{-1}\hat{G}\right)^{-1}.
+
+The pricing errors, :math:`\hat{\alpha}`, are the averages of the first moment
+condition of each portfolio, :math:`\epsilon_{t}`. The moment conditions are
+not zero at the estimates of an over-identified model, and the covariance of
+their average accounts for the estimation of the parameters. For efficient GMM
+it is
+
+.. math:: \hat{\Sigma}_{g}=S-G\left(G^{\prime}S^{-1}G\right)^{-1}G^{\prime}
+
+where :math:`S` and :math:`G` are those of the covariance of the parameters.
+Both are divided by :math:`T-df`, where :math:`df` is the number of factors
+if the covariance is debiased and 0 if it is not. The standard errors of the
+pricing errors are the square roots of the diagonal elements of
+:math:`\hat{\Sigma}_{g}/\left(T-df\right)` that correspond to
+:math:`\hat{\alpha}`. This covariance has rank :math:`N-K-n_{rf}`, the degrees
+of freedom of the J statistic, where :math:`n_{rf}` is 1 if the risk free rate
+is estimated and 0 if it is not.
