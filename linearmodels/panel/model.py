@@ -121,32 +121,6 @@ class FInfo(NamedTuple):
     is_invalid: bool
 
 
-def _deferred_f(
-    params: Series,
-    cov: DataFrame,
-    debiased: bool,
-    df_resid: int,
-    f_info: FInfo,
-) -> InvalidTestStatistic | WaldTestStatistic:
-    if f_info.is_invalid:
-        assert f_info.invalid_test_stat is not None
-        return f_info.invalid_test_stat
-    sel = f_info.sel
-    name = f_info.name
-    test_params = np.asarray(params)[sel]
-    test_cov = np.asarray(cov)[sel][:, sel]
-    test_stat = test_params.T @ np.linalg.inv(test_cov) @ test_params
-    test_stat = float(test_stat)
-    df = int(sel.sum())
-    null = "All parameters ex. constant are zero"
-
-    if debiased:
-        wald = WaldTestStatistic(test_stat / df, null, df, df_resid, name=name)
-    else:
-        wald = WaldTestStatistic(test_stat, null, df, name=name)
-    return wald
-
-
 def _hotelling_f(
     params: Series,
     cov: DataFrame,
@@ -187,6 +161,32 @@ def _hotelling_f(
         return WaldTestStatistic(wald_stat, null, df, name=name)
     scale = (nperiod - df) / (df * (nperiod - 1))
     return WaldTestStatistic(scale * wald_stat, null, df, nperiod - df, name=name)
+
+
+def _deferred_f(
+    params: Series,
+    cov: DataFrame,
+    debiased: bool,
+    df_resid: int,
+    f_info: FInfo,
+) -> InvalidTestStatistic | WaldTestStatistic:
+    if f_info.is_invalid:
+        assert f_info.invalid_test_stat is not None
+        return f_info.invalid_test_stat
+    sel = f_info.sel
+    name = f_info.name
+    test_params = np.asarray(params)[sel]
+    test_cov = np.asarray(cov)[sel][:, sel]
+    test_stat = test_params.T @ np.linalg.inv(test_cov) @ test_params
+    test_stat = float(test_stat)
+    df = int(sel.sum())
+    null = "All parameters ex. constant are zero"
+
+    if debiased:
+        wald = WaldTestStatistic(test_stat / df, null, df, df_resid, name=name)
+    else:
+        wald = WaldTestStatistic(test_stat, null, df, name=name)
+    return wald
 
 
 class PanelFormulaParser:
