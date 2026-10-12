@@ -11,6 +11,7 @@ from numpy import array, empty, ndarray, repeat, sqrt, zeros_like
 
 from linearmodels.asset_pricing.covariance import _HACMixin
 from linearmodels.iv.covariance import kernel_optimal_bandwidth
+from linearmodels.iv.gmm import _warn_default_bandwidth
 from linearmodels.shared.utility import AttrDict
 from linearmodels.system._utility import blocked_inner_prod
 import linearmodels.typing.data
@@ -253,13 +254,16 @@ class KernelWeightMatrix(HeteroskedasticWeightMatrix, _HACMixin):
         * "parzen", "gallant" : Parzen's kernel
         * "qs", "quadratic-spectral", "andrews" : Quadratic spectral kernel
 
-    bandwidth : float
-        Bandwidth to use for the kernel.  If not provided the optimal
-        bandwidth will be estimated.
-    optimal_bw : bool
-        Flag indicating whether to estimate the optimal bandwidth, when
-        bandwidth is None.  If False, nobs - 2 is used
-
+    bandwidth : float, optional
+        Bandwidth to use for the kernel. If not provided, the bandwidth is
+        selected by ``optimal_bw``.
+    optimal_bw : bool, optional
+        Flag indicating whether to estimate the bandwidth from the data when
+        ``bandwidth`` is not provided. If False, nobs - 2 is used. If True, the
+        bandwidth is estimated using
+        :func:`~linearmodels.iv.covariance.kernel_optimal_bandwidth`. The
+        default also estimates the bandwidth, but it issues a
+        ``DefaultBandwidthWarning`` since it changed in 7.1.
 
     Notes
     -----
@@ -277,6 +281,15 @@ class KernelWeightMatrix(HeteroskedasticWeightMatrix, _HACMixin):
     for equation j and :math:`\epsilon_{ji}` is the error for equation j for
     observation i.  This form allows for heteroskedasticity and autocorrelation
     between the moment conditions.
+
+    If neither ``bandwidth`` nor ``optimal_bw`` is given, the bandwidth is
+    estimated from the data every time that the weight matrix is computed.
+    In 7.0 and earlier the default was ``nobs - 2``, which is not a consistent
+    estimator of the covariance of the moment conditions. Using the default
+    issues a ``DefaultBandwidthWarning`` (a ``UserWarning``), once for each
+    instance. The previous behavior is restored by ``optimal_bw=False`` or by
+    ``bandwidth=nobs - 2``. Passing ``bandwidth`` or ``optimal_bw`` silences the
+    warning, and ``optimal_bw=True`` selects the new default without it.
     """
 
     def __init__(
@@ -285,7 +298,7 @@ class KernelWeightMatrix(HeteroskedasticWeightMatrix, _HACMixin):
         debiased: bool = False,
         kernel: str = "bartlett",
         bandwidth: float | None = None,
-        optimal_bw: bool = False,
+        optimal_bw: bool | None = None,
     ) -> None:
         _HACMixin.__init__(self, kernel, bandwidth)
         super().__init__(center, debiased)
@@ -293,7 +306,11 @@ class KernelWeightMatrix(HeteroskedasticWeightMatrix, _HACMixin):
         self._check_kernel(kernel)
         self._check_bandwidth(bandwidth)
         self._predefined_bw = self._bandwidth
-        self._optimal_bw = optimal_bw
+        # Selecting the bandwidth from the data is the default since 7.1, and it
+        # warns since the default was nobs - 2
+        self._default_bandwidth = bandwidth is None and optimal_bw is None
+        self._optimal_bw = True if optimal_bw is None else optimal_bw
+        self._warned = False
 
     def weight_matrix(
         self,
@@ -350,6 +367,12 @@ class KernelWeightMatrix(HeteroskedasticWeightMatrix, _HACMixin):
         elif not self._optimal_bw:
             self._bandwidth = moments.shape[0] - 2
         else:
+            if self._default_bandwidth and not self._warned:
+                # Once for each instance, and not for each call
+                self._warned = True
+                _warn_default_bandwidth(
+                    weights=True, covariance=False, stacklevel=4, model="IVSystemGMM"
+                )
             m = moments / moments.std(0)[None, :]
             m = m.sum(1)
             self._bandwidth = kernel_optimal_bandwidth(m, kernel=self.kernel)

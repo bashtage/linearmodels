@@ -27,6 +27,7 @@ from pandas import DataFrame, Index, Series, concat
 
 from linearmodels.iv._utility import IVFormulaParser
 from linearmodels.iv.data import IVData
+from linearmodels.iv.gmm import _uses_default_bandwidth, _warn_default_bandwidth
 from linearmodels.shared.alignment import (
     check_alignment,
     check_row_alignment,
@@ -1978,6 +1979,34 @@ class IVSystemGMM(_SystemModelBase):
 
     where :math:`W` is a positive definite weighting matrix.
 
+    The weight matrix is the inverse of an estimate of the covariance of the
+    moment conditions. ``weight_type`` selects the estimator: "unadjusted"
+    ("homoskedastic"), "robust" ("heteroskedastic") or "kernel" ("hac"), and
+    ``weight_config`` contains its options. These are ``center`` and
+    ``debiased`` for all of them, and ``kernel``, ``bandwidth`` and
+    ``optimal_bw`` for "kernel".
+
+    The bandwidth of a kernel weight matrix (``weight_type="kernel"``) is
+    ``bandwidth`` if it is given in ``weight_config``, and ``nobs - 2`` if
+    ``optimal_bw`` is ``False``. Otherwise, which is the default and what
+    ``optimal_bw=True`` does, it is estimated from the data, from the
+    residuals that the weight matrix is computed from. These are the residuals
+    of the first step estimates in two-step GMM, which is the default. In 7.0
+    and earlier the default was ``nobs - 2``, which is not a consistent
+    estimator of the covariance of the moment conditions, so the estimates,
+    standard errors and J statistic can be different. ``fit`` issues a
+    ``DefaultBandwidthWarning`` (a ``UserWarning``) when it uses the default.
+    To restore the previous behavior, pass ``optimal_bw=False`` or
+    ``bandwidth=nobs - 2``, where ``nobs`` is the number of observations of
+    each equation, in ``weight_config``, for example
+    ``IVSystemGMM(equations, weight_type="kernel", optimal_bw=False)``. Passing
+    ``bandwidth`` or ``optimal_bw`` silences the warning, and
+    ``optimal_bw=True`` selects the bandwidth from the data without it. The
+    kernel covariance of the parameters (``cov_type="kernel"`` in ``fit``) is
+    not affected, since it has always estimated its bandwidth from the data
+    unless ``bandwidth`` is given. See
+    :class:`~linearmodels.system.gmm.KernelWeightMatrix`.
+
     Rows are paired by position, both within an equation and across the
     equations. An input that carries labels (a pandas Series or DataFrame
     with an index other than the default 0, 1, ..., n-1, or an xarray
@@ -2019,6 +2048,14 @@ class IVSystemGMM(_SystemModelBase):
                 stacklevel=1,
             )
         weight_type = COV_TYPES[weight_type]
+        # Kernel weights without a bandwidth select it from the data. fit warns
+        # about the change of this default, and makes the choice explicit so that
+        # the weight estimator does not warn as well
+        self._default_weight_bandwidth = (
+            weight_type == "kernel" and _uses_default_bandwidth(weight_config)
+        )
+        if self._default_weight_bandwidth:
+            weight_config = {**weight_config, "optimal_bw": True}
         self._weight_est = GMM_W_EST[weight_type](**weight_config)
 
     def fit(
@@ -2049,15 +2086,30 @@ class IVSystemGMM(_SystemModelBase):
             * "unadjusted", "homoskedastic" - Classic covariance estimator
             * "robust", "heteroskedastic" - Heteroskedasticity robust
               covariance estimator
+            * "kernel", "hac" - Heteroskedasticity and autocorrelation robust
+              covariance estimator
 
         cov_config
             Additional parameters to pass to covariance estimator. All
-            estimators support debiased which employs a small-sample adjustment
+            estimators support debiased which employs a small-sample adjustment.
+            "kernel" also supports kernel, the name of the kernel, and
+            bandwidth, which is estimated from the data if it is not given.
 
         Returns
         -------
         GMMSystemResults
             Estimation results
+
+        Notes
+        -----
+        If the model has a kernel weight matrix (``weight_type="kernel"``) and
+        neither ``bandwidth`` nor ``optimal_bw`` was given when it was created,
+        the bandwidth of the weight matrix is estimated from the data. In 7.0
+        and earlier it was ``nobs - 2``. ``fit`` issues a
+        ``DefaultBandwidthWarning`` (a ``UserWarning``) once for each call when
+        the model uses the default bandwidth. See the notes of
+        :class:`~linearmodels.system.model.IVSystemGMM` for how to restore the
+        previous bandwidth.
         """
         if cov_type not in COV_TYPES:
             raise ValueError(f"Unknown cov_type: {cov_type}")
@@ -2066,6 +2118,12 @@ class IVSystemGMM(_SystemModelBase):
         k = len(wx)
         nobs = wx[0].shape[0]
         k_total = sum(a.shape[1] for a in wz)
+        if self._default_weight_bandwidth:
+            # Once for each call to fit, however many iterations it needs. The
+            # warning refers to the call to fit
+            _warn_default_bandwidth(
+                weights=True, covariance=False, stacklevel=3, model="IVSystemGMM"
+            )
         if initial_weight is None:
             w = blocked_inner_prod(wz, np.eye(k_total)) / nobs
         else:

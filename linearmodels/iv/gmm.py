@@ -26,15 +26,23 @@ def _uses_default_bandwidth(config: Mapping[str, Any]) -> bool:
     return config.get("bandwidth") is None and config.get("optimal_bw") is None
 
 
-def _default_bandwidth_message(*, weights: bool, covariance: bool) -> str:
+_WEIGHT_EXAMPLES = {
+    "IVGMM": 'IVGMM(dependent, exog, endog, instruments, weight_type="kernel", '
+    "optimal_bw=False)",
+    "IVSystemGMM": 'IVSystemGMM(equations, weight_type="kernel", optimal_bw=False)',
+}
+
+
+def _default_bandwidth_message(
+    *, weights: bool, covariance: bool, model: str = "IVGMM"
+) -> str:
     """Message of the warning that the default bandwidth changed in 7.1"""
     used, restore = [], []
     if weights:
         used.append('the weight matrix (weight_type="kernel")')
         restore.append(
             "in the weight configuration for the weight matrix, for example "
-            'IVGMM(dependent, exog, endog, instruments, weight_type="kernel", '
-            "optimal_bw=False)"
+            + _WEIGHT_EXAMPLES[model]
         )
     if covariance:
         used.append('the parameter covariance (cov_type="kernel")')
@@ -60,7 +68,7 @@ def _default_bandwidth_message(*, weights: bool, covariance: bool) -> str:
 
 
 def _warn_default_bandwidth(
-    *, weights: bool, covariance: bool, stacklevel: int
+    *, weights: bool, covariance: bool, stacklevel: int, model: str = "IVGMM"
 ) -> None:
     """
     Warn that a kernel estimator uses the bandwidth selected by default
@@ -68,7 +76,7 @@ def _warn_default_bandwidth(
     The default bandwidth was nobs - 2 before linearmodels 7.1.
     """
     warnings.warn(
-        _default_bandwidth_message(weights=weights, covariance=covariance),
+        _default_bandwidth_message(weights=weights, covariance=covariance, model=model),
         DefaultBandwidthWarning,
         stacklevel=stacklevel,
     )

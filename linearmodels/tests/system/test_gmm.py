@@ -7,6 +7,7 @@ from pandas.testing import assert_frame_equal, assert_series_equal
 import pytest
 
 from linearmodels.iv.covariance import kernel_weight_parzen
+from linearmodels.shared.exceptions import DefaultBandwidthWarning
 from linearmodels.shared.utility import AttrDict
 from linearmodels.system import IV3SLS, IVSystemGMM
 from linearmodels.system.gmm import (
@@ -303,15 +304,27 @@ def test_kernel_equiv(data):
 
 
 def test_kernel_optimal_bandwidth(data):
-    mod = IVSystemGMM(data.eqns, weight_type="kernel")
+    # nobs - 2 was the default until 7.1, and is restored by optimal_bw=False
+    mod = IVSystemGMM(data.eqns, weight_type="kernel", optimal_bw=False)
     res = mod.fit(cov_type="kernel", debiased=True)
     nobs = data.eqns[next(iter(data.eqns.keys()))].dependent.shape[0]
     assert res.weight_config["bandwidth"] == (nobs - 2)
 
     mod = IVSystemGMM(data.eqns, weight_type="kernel", optimal_bw=True)
-    mod.fit(cov_type="kernel", debiased=True)
+    optimal = mod.fit(cov_type="kernel", debiased=True)
+    assert 0 <= optimal.weight_config["bandwidth"] < nobs - 2
+
+    # The default estimates the bandwidth from the data, and warns
+    mod = IVSystemGMM(data.eqns, weight_type="kernel")
+    with pytest.warns(DefaultBandwidthWarning, match="7.1"):
+        default = mod.fit(cov_type="kernel", debiased=True)
+    assert default.weight_config["bandwidth"] == optimal.weight_config["bandwidth"]
+    assert_allclose(default.params, optimal.params)
 
 
+@pytest.mark.filterwarnings(
+    "ignore::linearmodels.shared.exceptions.DefaultBandwidthWarning"
+)
 @pytest.mark.parametrize(
     "options",
     [{}, {"bandwidth": 5}, {"optimal_bw": False}, {"optimal_bw": True}],
