@@ -260,7 +260,7 @@ class _IVModelBase:
         exog: IVDataLike | None = None,
         endog: IVDataLike | None = None,
         data: DataFrame | None = None,
-        eval_env: int = 4,
+        eval_env: int = 2,
     ) -> DataFrame:
         """
         Predict values for additional data
@@ -276,8 +276,10 @@ class _IVModelBase:
         data : DataFrame
             Values to use when making predictions from a model constructed
             from a formula
-        eval_env : int
-            Depth of use when evaluating formulas.
+        eval_env : int, optional
+            Depth of the stack frame whose variables are used when evaluating the
+            formula, counted from the formula parser. The default is 2, which is
+            the frame that calls predict.
 
         Returns
         -------

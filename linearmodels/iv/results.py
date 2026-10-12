@@ -525,7 +525,10 @@ class OLSResults(_LSModelResultsBase):
                 "Predictions can only be constructed using one "
                 "of exog/endog or data, but not both."
             )
-        pred = self.model.predict(self.params, exog=exog, endog=endog, data=data)
+        # Variables of the formula are those of the frame that called OLSResults.predict
+        pred = self.model.predict(
+            self.params, exog=exog, endog=endog, data=data, eval_env=4
+        )
         if not missing:
             pred = pred.loc[pred.notnull().all(axis=1)]
         return pred
