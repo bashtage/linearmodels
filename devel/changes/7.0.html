@@ -19,7 +19,7 @@
     
   
       
-        <title>Version 7.0 - linearmodels v7.1 (+158)</title>
+        <title>Version 7.1 - linearmodels v7.1 (+175)</title>
       
     
 
@@ -91,7 +91,7 @@
 
 <header class="md-header md-header--shadow" data-md-component="header">
   <nav class="md-header__inner md-grid" aria-label="Header">
-    <a href="../index.html" title="linearmodels v7.1 (+158)" class="md-header__button md-logo" aria-label="linearmodels v7.1 (+158)" data-md-component="logo">
+    <a href="../index.html" title="linearmodels v7.1 (+175)" class="md-header__button md-logo" aria-label="linearmodels v7.1 (+175)" data-md-component="logo">
       <img src="../_static/bw-logo.svg" alt="logo">
     </a>
     <label class="md-header__button md-icon" for="__drawer">
@@ -102,13 +102,13 @@
       <div class="md-header__ellipsis">
         <div class="md-header__topic">
           <span class="md-ellipsis">
-            linearmodels v7.1 (+158)
+            linearmodels v7.1 (+175)
           </span>
         </div>
         <div class="md-header__topic" data-md-component="header-topic">
           <span class="md-ellipsis">
             
-              Version 7.0
+              Version 7.1
             
           </span>
         </div>
@@ -197,10 +197,10 @@
 
 <nav class="md-nav md-nav--primary" aria-label="Navigation" data-md-level="0">
   <label class="md-nav__title" for="__drawer">
-    <a href="../index.html" title="linearmodels v7.1 (+158)" class="md-nav__button md-logo" aria-label="linearmodels v7.1 (+158)" data-md-component="logo">
+    <a href="../index.html" title="linearmodels v7.1 (+175)" class="md-nav__button md-logo" aria-label="linearmodels v7.1 (+175)" data-md-component="logo">
       <img src="../_static/bw-logo.svg" alt="logo">
     </a>
-    linearmodels v7.1 (+158)
+    linearmodels v7.1 (+175)
   </label>
   
     <div class="md-nav__source">
@@ -503,6 +503,151 @@
                   
 
 
+<h1 id="version-7-1">Version 7.1<a class="headerlink" href="#version-7-1" title="Link to this heading">¶</a></h1>
+<p class="rubric">Highlights</p>
+<ul class="simple">
+<li><p>New estimators and tests: <a class="reference internal" href="../iv/iv/linearmodels.iv.model.IVJIVE.html#linearmodels.iv.model.IVJIVE" title="linearmodels.iv.model.IVJIVE (Python class) — Jackknife instrumental variables estimator (JIVE)"><code class="xref py py-class docutils literal notranslate"><span class="pre">IVJIVE</span></code></a>, first-stage rank
+tests, a centered J test, and the Hausman and Pesaran CD tests for panel models.</p></li>
+<li><p>Several corrections change the numbers that unchanged code produced in 7.0. See
+<em>Changes that alter results</em>.</p></li>
+<li><p>Inputs with labels must have the same index as <code class="docutils literal notranslate"><span class="pre">dependent</span></code> in every estimator. See
+<em>Backward-incompatible changes</em>.</p></li>
+<li><p>Python 3.15 is supported. <strong>7.1 is the last release to support Python 3.10 and
+NumPy 1.x.</strong></p></li>
+</ul>
+<p class="rubric">New features</p>
+<ul class="simple">
+<li><p>Added <a class="reference internal" href="../iv/iv/linearmodels.iv.model.IVJIVE.html#linearmodels.iv.model.IVJIVE" title="linearmodels.iv.model.IVJIVE (Python class) — Jackknife instrumental variables estimator (JIVE)"><code class="xref py py-class docutils literal notranslate"><span class="pre">IVJIVE</span></code></a>, the jackknife IV estimator (JIVE1), with
+unadjusted, robust, kernel and one-way clustered covariances. It can be imported from
+<code class="docutils literal notranslate"><span class="pre">linearmodels</span></code> (<a class="extlink-issue reference external" href="https://github.com/bashtage/linearmodels/issues/750">GH750</a>).</p></li>
+<li><p>Added the Cragg-Donald and Kleibergen-Paap tests of the rank of the first-stage
+coefficient matrix. They are available as properties of
+<a class="reference internal" href="../iv/iv/linearmodels.iv.results.FirstStageResults.html#linearmodels.iv.results.FirstStageResults" title="linearmodels.iv.results.FirstStageResults (Python class) — First stage estimation results and diagnostics"><code class="xref py py-class docutils literal notranslate"><span class="pre">FirstStageResults</span></code></a> and as the functions
+<code class="docutils literal notranslate"><span class="pre">cragg_donald</span></code>, <code class="docutils literal notranslate"><span class="pre">cragg_donald_f</span></code>, <code class="docutils literal notranslate"><span class="pre">kleibergen_paap</span></code> and <code class="docutils literal notranslate"><span class="pre">kleibergen_paap_f</span></code> of
+<code class="docutils literal notranslate"><span class="pre">linearmodels.iv</span></code> (<a class="extlink-issue reference external" href="https://github.com/bashtage/linearmodels/issues/741">GH741</a>, <a class="extlink-issue reference external" href="https://github.com/bashtage/linearmodels/issues/622">GH622</a>).</p></li>
+<li><p>Added <a class="reference internal" href="../iv/iv/linearmodels.iv.results.IVGMMResults.centered_j_stat.html#linearmodels.iv.results.IVGMMResults.centered_j_stat" title="linearmodels.iv.results.IVGMMResults.centered_j_stat (Python property) — J-test of overidentifying restrictions using a centered moment covariance"><code class="xref py py-attr docutils literal notranslate"><span class="pre">centered_j_stat</span></code></a>, a J test of the
+overidentifying restrictions that uses a centered moment covariance (<a class="extlink-issue reference external" href="https://github.com/bashtage/linearmodels/issues/749">GH749</a>).</p></li>
+<li><p>Added <a class="reference internal" href="../panel/panel/linearmodels.panel.results.RandomEffectsResults.hausman.html#linearmodels.panel.results.RandomEffectsResults.hausman" title="linearmodels.panel.results.RandomEffectsResults.hausman (Python method) — Hausman specification test against results from a consistent model."><code class="xref py py-meth docutils literal notranslate"><span class="pre">hausman()</span></code></a>, the Hausman
+test of random effects against fixed effects. It matches Stata and returns a
+<a class="reference internal" href="../panel/panel/linearmodels.panel.results.HausmanTestResults.html#linearmodels.panel.results.HausmanTestResults" title="linearmodels.panel.results.HausmanTestResults (Python class) — Results of a Hausman specification test."><code class="xref py py-class docutils literal notranslate"><span class="pre">HausmanTestResults</span></code></a> named tuple (<a class="extlink-issue reference external" href="https://github.com/bashtage/linearmodels/issues/740">GH740</a>).</p></li>
+<li><p>Added <a class="reference internal" href="../panel/panel/linearmodels.panel.results.PanelResults.pesaran_cd.html#linearmodels.panel.results.PanelResults.pesaran_cd" title="linearmodels.panel.results.PanelResults.pesaran_cd (Python property) — Pesaran CD test of residual cross-sectional dependence."><code class="xref py py-attr docutils literal notranslate"><span class="pre">pesaran_cd</span></code></a>, the Pesaran CD test
+of cross-sectional dependence, which returns a new
+<a class="reference internal" href="../utility/linearmodels.shared.hypotheses.NormalTestStatistic.html#linearmodels.shared.hypotheses.NormalTestStatistic" title="linearmodels.shared.hypotheses.NormalTestStatistic (Python class) — Test statistic holder for tests with an asymptotic standard normal law."><code class="xref py py-class docutils literal notranslate"><span class="pre">NormalTestStatistic</span></code></a>. It returns an
+<code class="docutils literal notranslate"><span class="pre">InapplicableTestStatistic</span></code> for <code class="docutils literal notranslate"><span class="pre">BetweenOLS</span></code>, <code class="docutils literal notranslate"><span class="pre">FamaMacBeth</span></code> and models with time
+effects or effects concentrated in some periods (<a class="extlink-issue reference external" href="https://github.com/bashtage/linearmodels/issues/739">GH739</a>).</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">linearmodels.iv.common</span></code> and <code class="docutils literal notranslate"><span class="pre">linearmodels.iv.results</span></code> define <code class="docutils literal notranslate"><span class="pre">__all__</span></code>, so that
+<code class="docutils literal notranslate"><span class="pre">import</span> <span class="pre">*</span></code> no longer imports the modules and functions that they import.</p></li>
+</ul>
+<p class="rubric">Changes that alter results</p>
+<ul class="simple">
+<li><p><a class="reference internal" href="../iv/iv/linearmodels.iv.results.IVResults.durbin.html#linearmodels.iv.results.IVResults.durbin" title="linearmodels.iv.results.IVResults.durbin (Python method) — Durbin's test of exogeneity"><code class="xref py py-meth docutils literal notranslate"><span class="pre">durbin()</span></code></a> and
+<a class="reference internal" href="../iv/iv/linearmodels.iv.results.IVResults.wu_hausman.html#linearmodels.iv.results.IVResults.wu_hausman" title="linearmodels.iv.results.IVResults.wu_hausman (Python method) — Wu-Hausman test of exogeneity"><code class="xref py py-meth docutils literal notranslate"><span class="pre">wu_hausman()</span></code></a> of <code class="docutils literal notranslate"><span class="pre">IV2SLS</span></code> and <code class="docutils literal notranslate"><span class="pre">IVLIML</span></code>
+project the residuals on all of the instruments, as documented (<a class="extlink-issue reference external" href="https://github.com/bashtage/linearmodels/issues/725">GH725</a>).</p></li>
+<li><p>The specification tests of weighted IV models (<code class="docutils literal notranslate"><span class="pre">sargan</span></code>, <code class="docutils literal notranslate"><span class="pre">basmann</span></code>, <code class="docutils literal notranslate"><span class="pre">durbin</span></code>,
+<code class="docutils literal notranslate"><span class="pre">wu_hausman</span></code>, <code class="docutils literal notranslate"><span class="pre">wooldridge_*</span></code> and <code class="docutils literal notranslate"><span class="pre">c_stat</span></code>) use the weights, which 7.0 ignored
+(<a class="extlink-issue reference external" href="https://github.com/bashtage/linearmodels/issues/737">GH737</a>).</p></li>
+<li><p><a class="reference internal" href="../iv/iv/linearmodels.iv.results.IVGMMResults.c_stat.html#linearmodels.iv.results.IVGMMResults.c_stat" title="linearmodels.iv.results.IVGMMResults.c_stat (Python method) — C-test of endogeneity"><code class="xref py py-meth docutils literal notranslate"><span class="pre">c_stat()</span></code></a> of overidentified <code class="docutils literal notranslate"><span class="pre">IVGMM</span></code> and
+<code class="docutils literal notranslate"><span class="pre">IVGMMCUE</span></code> models uses the correct moment conditions and the <code class="docutils literal notranslate"><span class="pre">weight_type</span></code> of the
+model. 7.0 ignored the weight type (<a class="extlink-issue reference external" href="https://github.com/bashtage/linearmodels/issues/744">GH744</a>).</p></li>
+<li><p><a class="reference internal" href="../iv/iv/linearmodels.iv.model.IVGMMCUE.html#linearmodels.iv.model.IVGMMCUE" title="linearmodels.iv.model.IVGMMCUE (Python class) — Estimation of IV models using continuously updating GMM"><code class="xref py py-class docutils literal notranslate"><span class="pre">IVGMMCUE</span></code></a> centers the moment conditions by default, as
+documented. This changes its estimates and J statistic (J goes from 0.775 to 2.096 in
+the <code class="docutils literal notranslate"><span class="pre">mroz</span></code> example with kernel weights). Pass <code class="docutils literal notranslate"><span class="pre">center=False</span></code> to get the 7.0
+results. With clustered weights it needs more clusters than moment conditions
+(<a class="extlink-issue reference external" href="https://github.com/bashtage/linearmodels/issues/746">GH746</a>).</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">IVGMMResults.weight_config</span></code> is the <code class="docutils literal notranslate"><span class="pre">dict</span></code> of the weight configuration. 7.0
+returned the name of the weight type, which is <code class="docutils literal notranslate"><span class="pre">weight_type</span></code> (<a class="extlink-issue reference external" href="https://github.com/bashtage/linearmodels/issues/747">GH747</a>).</p></li>
+<li><p>Weighted <code class="docutils literal notranslate"><span class="pre">RandomEffects</span></code> scales the entity means by the root weights, which changes
+its estimates, R-squared and F statistic (<a class="extlink-issue reference external" href="https://github.com/bashtage/linearmodels/issues/738">GH738</a>).</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">FirstDifferenceOLS</span></code> differences in time order. 7.0 differenced against non-adjacent
+periods if the first entity enters late or has a gap (<a class="extlink-issue reference external" href="https://github.com/bashtage/linearmodels/issues/726">GH726</a>).</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">PanelOLS(drop_absorbed=True)</span></code> with entity effects and a constant now drops the
+regressors if none of them varies within entities. 7.0 kept them (<a class="extlink-issue reference external" href="https://github.com/bashtage/linearmodels/issues/730">GH730</a>).</p></li>
+<li><p>Panel weights given by period, by entity or as a table are placed by label. 7.0 used
+the wrong rows unless the data was sorted by entity and then by period (<a class="extlink-issue reference external" href="https://github.com/bashtage/linearmodels/issues/748">GH748</a>).</p></li>
+<li><p>Weighted <code class="docutils literal notranslate"><span class="pre">IV3SLS</span></code> uses a weighted first stage, which changes its estimates.
+<code class="docutils literal notranslate"><span class="pre">IVSystemGMM</span></code> is unchanged (<a class="extlink-issue reference external" href="https://github.com/bashtage/linearmodels/issues/734">GH734</a>).</p></li>
+<li><p>The default <code class="docutils literal notranslate"><span class="pre">unadjusted</span></code> covariance of <code class="docutils literal notranslate"><span class="pre">SUR</span></code> and <code class="docutils literal notranslate"><span class="pre">IV3SLS</span></code> with <code class="docutils literal notranslate"><span class="pre">iterate=True</span></code>
+uses the final residual covariance, which changes standard errors (<a class="extlink-issue reference external" href="https://github.com/bashtage/linearmodels/issues/736">GH736</a>).</p></li>
+<li><p>Repeated calls to <code class="docutils literal notranslate"><span class="pre">AbsorbingLS.fit</span></code> no longer change <code class="docutils literal notranslate"><span class="pre">df_model</span></code>, <code class="docutils literal notranslate"><span class="pre">df_resid</span></code> and
+the adjusted R-squared of later fits (<a class="extlink-issue reference external" href="https://github.com/bashtage/linearmodels/issues/735">GH735</a>). They also use the <code class="docutils literal notranslate"><span class="pre">method</span></code> and
+<code class="docutils literal notranslate"><span class="pre">absorb_options</span></code> of each call, not those of the first call.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">IVGMMCUE</span></code> results report <code class="docutils literal notranslate"><span class="pre">IV-GMM-CUE</span></code> as the estimator (<code class="docutils literal notranslate"><span class="pre">method</span></code>, the summary
+and <code class="docutils literal notranslate"><span class="pre">compare</span></code>) instead of <code class="docutils literal notranslate"><span class="pre">IV-GMM</span></code>.</p></li>
+<li><p>p-values use the survival function, so p-values below about 1e-16 are no longer 0.
+Tiny p-values print in scientific notation in first-stage summaries and <code class="docutils literal notranslate"><span class="pre">compare()</span></code>
+(<a class="extlink-issue reference external" href="https://github.com/bashtage/linearmodels/issues/742">GH742</a>).</p></li>
+</ul>
+<p class="rubric">Backward-incompatible changes</p>
+<ul class="simple">
+<li><p>Inputs with labels, such as a pandas <code class="docutils literal notranslate"><span class="pre">Series</span></code> or <code class="docutils literal notranslate"><span class="pre">DataFrame</span></code> with an index, must
+have the same index as <code class="docutils literal notranslate"><span class="pre">dependent</span></code> in every IV, absorbing, system, asset pricing and
+panel model. 7.0 paired inputs with different labels by position without an error.
+They now raise a <code class="docutils literal notranslate"><span class="pre">ValueError</span></code>: reindex the input, or use <code class="docutils literal notranslate"><span class="pre">.to_numpy()</span></code> to pair by
+position. Nothing is compared if <code class="docutils literal notranslate"><span class="pre">dependent</span></code> has no labels (<a class="extlink-issue reference external" href="https://github.com/bashtage/linearmodels/issues/748">GH748</a>).</p></li>
+<li><p>A system of equations whose equations have different numbers of observations raises a
+<code class="docutils literal notranslate"><span class="pre">ValueError</span></code> when the model is created.</p></li>
+<li><p>With SciPy 2, the sparse helpers (<code class="docutils literal notranslate"><span class="pre">Interaction.sparse</span></code>, <code class="docutils literal notranslate"><span class="pre">dummy_matrix</span></code> and others)
+return sparse arrays, where <code class="docutils literal notranslate"><span class="pre">*</span></code> is elementwise. Use <code class="docutils literal notranslate"><span class="pre">&#64;</span></code> for matrix products
+(<a class="extlink-issue reference external" href="https://github.com/bashtage/linearmodels/issues/733">GH733</a>).</p></li>
+</ul>
+<p class="rubric">Bug fixes</p>
+<ul class="simple">
+<li><p>Fixed <a class="reference internal" href="../iv/iv/linearmodels.iv.results.OLSResults.predict.html#linearmodels.iv.results.OLSResults.predict" title="linearmodels.iv.results.OLSResults.predict (Python method) — In- and out-of-sample predictions"><code class="xref py py-meth docutils literal notranslate"><span class="pre">predict()</span></code></a> for models without exogenous
+or without endogenous regressors (<a class="extlink-issue reference external" href="https://github.com/bashtage/linearmodels/issues/677">GH677</a>).</p></li>
+<li><p>A missing value in the entity or time index of a panel raises a clear <code class="docutils literal notranslate"><span class="pre">ValueError</span></code>
+(<a class="extlink-issue reference external" href="https://github.com/bashtage/linearmodels/issues/614">GH614</a>, <a class="extlink-issue reference external" href="https://github.com/bashtage/linearmodels/issues/716">GH716</a>).</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">quadratic_form_test</span></code> raises a <code class="docutils literal notranslate"><span class="pre">TypeError</span></code> instead of an <code class="docutils literal notranslate"><span class="pre">AssertionError</span></code> if
+<code class="docutils literal notranslate"><span class="pre">formula</span></code> is used with <code class="docutils literal notranslate"><span class="pre">params</span></code> that is not a <code class="docutils literal notranslate"><span class="pre">Series</span></code> (<a class="extlink-issue reference external" href="https://github.com/bashtage/linearmodels/issues/690">GH690</a>).</p></li>
+<li><p>Fixed <code class="docutils literal notranslate"><span class="pre">AbsorbingLS</span></code> with missing values, which raised a <code class="docutils literal notranslate"><span class="pre">ValueError</span></code> in every
+release since 4.13. The incomplete observations are now dropped with a
+<code class="docutils literal notranslate"><span class="pre">MissingValueWarning</span></code>. With clustered covariances, <code class="docutils literal notranslate"><span class="pre">clusters</span></code> must have one row
+for each remaining observation.</p></li>
+<li><p>Fixed <code class="docutils literal notranslate"><span class="pre">AbsorbingLS</span></code> with an <code class="docutils literal notranslate"><span class="pre">Interaction</span></code> in which only <code class="docutils literal notranslate"><span class="pre">cat</span></code> or <code class="docutils literal notranslate"><span class="pre">cont</span></code> has
+labels, and <code class="docutils literal notranslate"><span class="pre">AbsorbingLS.fit</span></code> adding <code class="docutils literal notranslate"><span class="pre">drop_singletons</span></code> to its <code class="docutils literal notranslate"><span class="pre">absorb_options</span></code>.</p></li>
+<li><p>Fixed the <code class="docutils literal notranslate"><span class="pre">dev</span></code> extra, which listed <code class="docutils literal notranslate"><span class="pre">pandas-stubsl</span></code>, and added xarray to the
+<code class="docutils literal notranslate"><span class="pre">test</span></code> extra.</p></li>
+</ul>
+<p class="rubric">Documentation and maintenance</p>
+<ul class="simple">
+<li><p>Corrected the Driscoll-Kraay index in the math documentation, fixed typos and improved
+the type annotations (<a class="extlink-issue reference external" href="https://github.com/bashtage/linearmodels/issues/704">GH704</a>, <a class="extlink-issue reference external" href="https://github.com/bashtage/linearmodels/issues/697">GH697</a>, <a class="extlink-issue reference external" href="https://github.com/bashtage/linearmodels/issues/721">GH721</a>).</p></li>
+<li><p>Added a security policy (<code class="docutils literal notranslate"><span class="pre">SECURITY.md</span></code>).</p></li>
+</ul>
+<p class="rubric">Compatibility</p>
+<ul class="simple">
+<li><p>Python 3.10 to 3.15, NumPy 1.22.3 and later including NumPy 2, and pandas 1.4.0 and
+later including pandas 3 are supported. Wheels are built for Python 3.15.</p></li>
+<li><p>Ready for SciPy 2 and pandas 4: the deprecation warnings that 7.0 gave with their
+development versions are gone (<a class="extlink-issue reference external" href="https://github.com/bashtage/linearmodels/issues/733">GH733</a>).</p></li>
+<li><p>The tests of the oldest supported versions now install them (<a class="extlink-issue reference external" href="https://github.com/bashtage/linearmodels/issues/751">GH751</a>).</p></li>
+</ul>
+<p class="rubric">Deprecations and future changes</p>
+<ul class="simple">
+<li><p><strong>7.1 is the last release to support Python 3.10 and NumPy 1.x.</strong> Later releases will
+raise the minimum versions of Python, NumPy and the other dependencies.</p></li>
+<li><p>The <code class="docutils literal notranslate"><span class="pre">lsmr_options</span></code> argument of
+<a class="reference internal" href="../iv/absorbing/linearmodels.iv.absorbing.AbsorbingLS.fit.html#linearmodels.iv.absorbing.AbsorbingLS.fit" title="linearmodels.iv.absorbing.AbsorbingLS.fit (Python method) — Estimate model parameters"><code class="xref py py-meth docutils literal notranslate"><span class="pre">fit()</span></code></a> and the
+<code class="docutils literal notranslate"><span class="pre">linearmodels.__future__.ordering</span></code> module will be removed in 8.0. Importing the
+module now emits a <code class="docutils literal notranslate"><span class="pre">FutureWarning</span></code>.</p></li>
+</ul>
+<p class="rubric">Minimum versions</p>
+<ul class="simple">
+<li><p>Unchanged (Python 3.10, NumPy 1.22.3, SciPy 1.8.0, pandas 1.4.0, formulaic 1.2.1)
+except statsmodels, which is 0.13.1, the first release with a Python 3.10 wheel. The
+7.0 notes listed formulaic 1.0.0, but 7.0 already required 1.2.1.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">packaging</span></code> is now a declared dependency. Building from source requires
+Cython 3.1.0, and running the tests requires pytest 9.</p></li>
+</ul>
+<p class="rubric">Contributors</p>
+<ul class="simple">
+<li><p>Thanks to shaneraphel (<a class="extlink-issue reference external" href="https://github.com/bashtage/linearmodels/issues/725">GH725</a>, <a class="extlink-issue reference external" href="https://github.com/bashtage/linearmodels/issues/726">GH726</a>, <a class="extlink-issue reference external" href="https://github.com/bashtage/linearmodels/issues/730">GH730</a>), raashish1601
+(<a class="extlink-issue reference external" href="https://github.com/bashtage/linearmodels/issues/734">GH734</a>, <a class="extlink-issue reference external" href="https://github.com/bashtage/linearmodels/issues/735">GH735</a>, <a class="extlink-issue reference external" href="https://github.com/bashtage/linearmodels/issues/736">GH736</a>, <a class="extlink-issue reference external" href="https://github.com/bashtage/linearmodels/issues/737">GH737</a>, <a class="extlink-issue reference external" href="https://github.com/bashtage/linearmodels/issues/738">GH738</a>), nyxst4ck
+(<a class="extlink-issue reference external" href="https://github.com/bashtage/linearmodels/issues/704">GH704</a>), shuxue6662-a11y (<a class="extlink-issue reference external" href="https://github.com/bashtage/linearmodels/issues/716">GH716</a>), aeshef (<a class="extlink-issue reference external" href="https://github.com/bashtage/linearmodels/issues/690">GH690</a>) and maxime2476
+(<a class="extlink-issue reference external" href="https://github.com/bashtage/linearmodels/issues/697">GH697</a>).</p></li>
+<li><p>The new features complete earlier pull requests by hass-nation (<a class="extlink-issue reference external" href="https://github.com/bashtage/linearmodels/issues/701">GH701</a>,
+<a class="extlink-issue reference external" href="https://github.com/bashtage/linearmodels/issues/702">GH702</a>, <a class="extlink-issue reference external" href="https://github.com/bashtage/linearmodels/issues/703">GH703</a>), AyuG619 (<a class="extlink-issue reference external" href="https://github.com/bashtage/linearmodels/issues/713">GH713</a>), eirki (<a class="extlink-issue reference external" href="https://github.com/bashtage/linearmodels/issues/249">GH249</a>) and
+shaneraphel (<a class="extlink-issue reference external" href="https://github.com/bashtage/linearmodels/issues/731">GH731</a>).</p></li>
+</ul>
 <h1 id="version-7-0">Version 7.0<a class="headerlink" href="#version-7-0" title="Link to this heading">¶</a></h1>
 <ul class="simple">
 <li><p>Increased minimums:</p>

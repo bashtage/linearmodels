@@ -23,7 +23,7 @@
     
   
       
-        <title>linearmodels.iv.model.IVJIVE.fit - linearmodels v7.1 (+158)</title>
+        <title>linearmodels.iv.model.IVJIVE.fit - linearmodels v7.1 (+175)</title>
       
     
 
@@ -100,7 +100,7 @@
 
 <header class="md-header md-header--shadow" data-md-component="header">
   <nav class="md-header__inner md-grid" aria-label="Header">
-    <a href="../../index.html" title="linearmodels v7.1 (+158)" class="md-header__button md-logo" aria-label="linearmodels v7.1 (+158)" data-md-component="logo">
+    <a href="../../index.html" title="linearmodels v7.1 (+175)" class="md-header__button md-logo" aria-label="linearmodels v7.1 (+175)" data-md-component="logo">
       <img src="../../_static/bw-logo.svg" alt="logo">
     </a>
     <label class="md-header__button md-icon" for="__drawer">
@@ -111,7 +111,7 @@
       <div class="md-header__ellipsis">
         <div class="md-header__topic">
           <span class="md-ellipsis">
-            linearmodels v7.1 (+158)
+            linearmodels v7.1 (+175)
           </span>
         </div>
         <div class="md-header__topic" data-md-component="header-topic">
@@ -206,10 +206,10 @@
 
 <nav class="md-nav md-nav--primary" aria-label="Navigation" data-md-level="0">
   <label class="md-nav__title" for="__drawer">
-    <a href="../../index.html" title="linearmodels v7.1 (+158)" class="md-nav__button md-logo" aria-label="linearmodels v7.1 (+158)" data-md-component="logo">
+    <a href="../../index.html" title="linearmodels v7.1 (+175)" class="md-nav__button md-logo" aria-label="linearmodels v7.1 (+175)" data-md-component="logo">
       <img src="../../_static/bw-logo.svg" alt="logo">
     </a>
-    linearmodels v7.1 (+158)
+    linearmodels v7.1 (+175)
   </label>
   
     <div class="md-nav__source">
@@ -1653,9 +1653,13 @@ the complete list of available commands.</p>
 <p class="rubric">Notes</p>
 <p>The covariance estimators are the same as in the other IV models with
 the leave-one-out first-stage predictions as the instruments. The
-additional parameters depend on the estimator: <code class="docutils literal notranslate"><span class="pre">kernel</span></code> and
-<code class="docutils literal notranslate"><span class="pre">bandwidth</span></code> for “kernel” and <code class="docutils literal notranslate"><span class="pre">clusters</span></code> for “clustered”.  The
-defaults are used if none are provided.</p>
+additional parameters depend on the estimator: <code class="docutils literal notranslate"><span class="pre">kernel</span></code> (the default
+is “bartlett”) and <code class="docutils literal notranslate"><span class="pre">bandwidth</span></code> for “kernel” and <code class="docutils literal notranslate"><span class="pre">clusters</span></code> for
+“clustered”. If <code class="docutils literal notranslate"><span class="pre">bandwidth</span></code> is not provided it is selected using the
+data, as in <a class="reference internal" href="linearmodels.iv.model.IV2SLS.html#linearmodels.iv.model.IV2SLS" title="linearmodels.iv.model.IV2SLS (Python class) — Estimation of IV models using two-stage least squares"><code class="xref py py-class docutils literal notranslate"><span class="pre">IV2SLS</span></code></a>, and the bandwidth
+that was used is in <code class="docutils literal notranslate"><span class="pre">cov_config</span></code> of the results. “clustered” is
+one-way clustering, and <code class="docutils literal notranslate"><span class="pre">clusters</span></code> has one element for each
+observation.</p>
 <p>Since JIVE is not a k-class estimator, <code class="docutils literal notranslate"><span class="pre">kappa</span></code> is None in the
 results.</p>
 <div class="seealso admonition">

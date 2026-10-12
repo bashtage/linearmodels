@@ -1,0 +1,8 @@
+:orphan:
+
+linearmodels.panel.results.HausmanTestResults.estimates
+=======================================================
+
+.. currentmodule:: linearmodels.panel.results
+
+.. autoattribute:: HausmanTestResults.estimates

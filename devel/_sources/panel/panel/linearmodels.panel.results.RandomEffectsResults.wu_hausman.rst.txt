@@ -1,8 +1,0 @@
-:orphan:
-
-linearmodels.panel.results.RandomEffectsResults.wu\_hausman
-===========================================================
-
-.. currentmodule:: linearmodels.panel.results
-
-.. automethod:: RandomEffectsResults.wu_hausman

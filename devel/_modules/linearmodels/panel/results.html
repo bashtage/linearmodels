@@ -19,7 +19,7 @@
     
   
       
-        <title>linearmodels.panel.results - linearmodels v7.1 (+158)</title>
+        <title>linearmodels.panel.results - linearmodels v7.1 (+175)</title>
       
     
 
@@ -91,7 +91,7 @@
 
 <header class="md-header md-header--shadow" data-md-component="header">
   <nav class="md-header__inner md-grid" aria-label="Header">
-    <a href="../../../index.html" title="linearmodels v7.1 (+158)" class="md-header__button md-logo" aria-label="linearmodels v7.1 (+158)" data-md-component="logo">
+    <a href="../../../index.html" title="linearmodels v7.1 (+175)" class="md-header__button md-logo" aria-label="linearmodels v7.1 (+175)" data-md-component="logo">
       <img src="../../../_static/bw-logo.svg" alt="logo">
     </a>
     <label class="md-header__button md-icon" for="__drawer">
@@ -102,7 +102,7 @@
       <div class="md-header__ellipsis">
         <div class="md-header__topic">
           <span class="md-ellipsis">
-            linearmodels v7.1 (+158)
+            linearmodels v7.1 (+175)
           </span>
         </div>
         <div class="md-header__topic" data-md-component="header-topic">
@@ -197,10 +197,10 @@
 
 <nav class="md-nav md-nav--primary" aria-label="Navigation" data-md-level="0">
   <label class="md-nav__title" for="__drawer">
-    <a href="../../../index.html" title="linearmodels v7.1 (+158)" class="md-nav__button md-logo" aria-label="linearmodels v7.1 (+158)" data-md-component="logo">
+    <a href="../../../index.html" title="linearmodels v7.1 (+175)" class="md-nav__button md-logo" aria-label="linearmodels v7.1 (+175)" data-md-component="logo">
       <img src="../../../_static/bw-logo.svg" alt="logo">
     </a>
-    linearmodels v7.1 (+158)
+    linearmodels v7.1 (+175)
   </label>
   
     <div class="md-nav__source">
@@ -511,7 +511,7 @@
 <span class="kn">from</span><span class="w"> </span><span class="nn">collections.abc</span><span class="w"> </span><span class="kn">import</span> <span class="n">Mapping</span>
 <span class="kn">import</span><span class="w"> </span><span class="nn">datetime</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">dt</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">functools</span><span class="w"> </span><span class="kn">import</span> <span class="n">cached_property</span>
-<span class="kn">from</span><span class="w"> </span><span class="nn">typing</span><span class="w"> </span><span class="kn">import</span> <span class="n">Any</span><span class="p">,</span> <span class="n">Union</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">typing</span><span class="w"> </span><span class="kn">import</span> <span class="n">Any</span><span class="p">,</span> <span class="n">NamedTuple</span><span class="p">,</span> <span class="n">Union</span>
 <span class="kn">import</span><span class="w"> </span><span class="nn">warnings</span>
 
 <span class="kn">from</span><span class="w"> </span><span class="nn">formulaic.utils.context</span><span class="w"> </span><span class="kn">import</span> <span class="n">capture_context</span>
@@ -536,6 +536,7 @@
 
 <span class="n">__all__</span> <span class="o">=</span> <span class="p">[</span>
     <span class="s2">"FamaMacBethResults"</span><span class="p">,</span>
+    <span class="s2">"HausmanTestResults"</span><span class="p">,</span>
     <span class="s2">"PanelEffectsResults"</span><span class="p">,</span>
     <span class="s2">"PanelResults"</span><span class="p">,</span>
     <span class="s2">"RandomEffectsResults"</span><span class="p">,</span>
@@ -1123,6 +1124,19 @@
             <span class="bp">self</span><span class="o">.</span><span class="n">_wresids</span><span class="o">.</span><span class="n">squeeze</span><span class="p">(),</span> <span class="n">index</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">_index</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="s2">"weighted residual"</span>
         <span class="p">)</span>
 
+    <span class="k">def</span><span class="w"> </span><span class="nf">_pesaran_cd_inapplicable</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span> <span class="o">|</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">"""Reason why the Pesaran CD test is not valid for the model, if any"""</span>
+        <span class="kn">from</span><span class="w"> </span><span class="nn">linearmodels.panel.model</span><span class="w"> </span><span class="kn">import</span> <span class="n">BetweenOLS</span>  <span class="c1"># noqa: PLC0415</span>
+
+        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">model</span><span class="p">,</span> <span class="n">BetweenOLS</span><span class="p">):</span>
+            <span class="k">return</span> <span class="p">(</span>
+                <span class="s2">"The Pesaran CD test is not applicable to BetweenOLS. The model "</span>
+                <span class="s2">"is fitted to the entity means, so it has no time-varying "</span>
+                <span class="s2">"residuals, and the series implied by its coefficients is not "</span>
+                <span class="s2">"the model's error."</span>
+            <span class="p">)</span>
+        <span class="k">return</span> <span class="kc">None</span>
+
 <div class="viewcode-block" id="PanelResults.pesaran_cd">
 <a class="viewcode-back" href="../../../panel/panel/linearmodels.panel.results.PanelResults.pesaran_cd.html#linearmodels.panel.results.PanelResults.pesaran_cd">[docs]</a>
     <span class="nd">@cached_property</span>
@@ -1132,17 +1146,19 @@
 
 <span class="sd">        Returns</span>
 <span class="sd">        -------</span>
-<span class="sd">        NormalTestStatistic</span>
-<span class="sd">            Statistic value, distribution and p-value.</span>
+<span class="sd">        NormalTestStatistic or InapplicableTestStatistic</span>
+<span class="sd">            Statistic value, distribution and p-value. If the test is not</span>
+<span class="sd">            valid for the model, an InapplicableTestStatistic that explains</span>
+<span class="sd">            why in its reason.</span>
 
 <span class="sd">        Notes</span>
 <span class="sd">        -----</span>
 <span class="sd">        Tests the null hypothesis that the model's idiosyncratic shocks are</span>
-<span class="sd">        cross-sectionally independent. Let :math:`\hat{\rho}_{ij}` denote the</span>
-<span class="sd">        sample correlation of the estimated idiosyncratic shocks for entities</span>
-<span class="sd">        :math:`i` and :math:`j`, computed using their common time observations,</span>
-<span class="sd">        and let :math:`T_{ij}` denote the number of overlapping observations.</span>
-<span class="sd">        The statistic is</span>
+<span class="sd">        cross-sectionally independent [1]_. Let :math:`\hat{\rho}_{ij}` denote</span>
+<span class="sd">        the sample correlation of the estimated idiosyncratic shocks for</span>
+<span class="sd">        entities :math:`i` and :math:`j`, computed using their common time</span>
+<span class="sd">        observations, and let :math:`T_{ij}` denote the number of overlapping</span>
+<span class="sd">        observations. The statistic is</span>
 
 <span class="sd">        .. math::</span>
 
@@ -1152,11 +1168,55 @@
 <span class="sd">        overlapping observations and finite pairwise correlation estimates.</span>
 <span class="sd">        Under the null, the statistic is asymptotically standard normal.</span>
 
+<span class="sd">        The shocks are the model's ``idiosyncratic`` values, so the weights of</span>
+<span class="sd">        a weighted model are not applied to them, and the shocks of</span>
+<span class="sd">        ``FirstDifferenceOLS`` are in levels rather than the residuals of the</span>
+<span class="sd">        differenced equation. Since the correlations are computed over time,</span>
+<span class="sd">        the test assumes that the shocks are not serially correlated, and it</span>
+<span class="sd">        over-rejects if they are persistent.</span>
+
+<span class="sd">        The test is not valid for every model and an InapplicableTestStatistic</span>
+<span class="sd">        is returned for the following.</span>
+
+<span class="sd">        * ``BetweenOLS``. The model is fitted to the entity means, so it has</span>
+<span class="sd">          no time-varying residuals, and the series implied by its</span>
+<span class="sd">          coefficients is not the model's error.</span>
+<span class="sd">        * ``FamaMacBeth``. The model's errors are the residuals of the</span>
+<span class="sd">          period-by-period cross-sectional regressions. The series implied by</span>
+<span class="sd">          the averaged coefficients contains the common, time-varying term</span>
+<span class="sd">          :math:`(\beta_t - \bar{\beta})^{\prime}x_{it}`, so it is</span>
+<span class="sd">          cross-sectionally dependent by construction. Fama-MacBeth inference</span>
+<span class="sd">          is also already robust to cross-sectional dependence.</span>
+<span class="sd">        * Models with time effects, and models with other effects that</span>
+<span class="sd">          change over time for some entity and have a group of several</span>
+<span class="sd">          entities that is missing from some periods, such as period,</span>
+<span class="sd">          industry-by-period or decade effects. These effects demean the</span>
+<span class="sd">          residuals across entities that are observed in the same periods,</span>
+<span class="sd">          which makes the residuals negatively correlated across entities</span>
+<span class="sd">          and biases the statistic downwards. For example, when the model</span>
+<span class="sd">          has time effects and the errors are independent, the statistic is</span>
+<span class="sd">          centered at about :math:`-\sqrt{T/2}` and its standard deviation</span>
+<span class="sd">          is far below 1, so it is not standard normal [2]_. Other effects</span>
+<span class="sd">          that do not change over time for an entity, or that are present</span>
+<span class="sd">          in every period, are not affected.</span>
+
+<span class="sd">        The statistic is computed from dense N by N matrices of pairwise</span>
+<span class="sd">        correlations and numbers of overlapping observations, where N is the</span>
+<span class="sd">        number of entities. Computing them takes about 450 MB of memory when</span>
+<span class="sd">        N is 4,000, and the memory use is proportional to the square of N.</span>
+
 <span class="sd">        References</span>
 <span class="sd">        ----------</span>
-<span class="sd">        Pesaran, M. H. (2021). General diagnostic tests for cross-sectional</span>
-<span class="sd">        dependence in panels. Empirical Economics, 60(1), 13-50.</span>
+<span class="sd">        .. [1] Pesaran, M. H. (2021). General diagnostic tests for</span>
+<span class="sd">           cross-sectional dependence in panels. Empirical Economics, 60(1),</span>
+<span class="sd">           13-50.</span>
+<span class="sd">        .. [2] Juodis, A. and Reese, S. (2022). The incidental parameters</span>
+<span class="sd">           problem in testing for remaining cross-section correlation.</span>
+<span class="sd">           Journal of Business &amp; Economic Statistics, 40(3), 1191-1203.</span>
 <span class="sd">        """</span>
+        <span class="n">reason</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_pesaran_cd_inapplicable</span><span class="p">()</span>
+        <span class="k">if</span> <span class="n">reason</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="k">return</span> <span class="n">InapplicableTestStatistic</span><span class="p">(</span><span class="n">reason</span><span class="o">=</span><span class="n">reason</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="s2">"Pesaran CD test"</span><span class="p">)</span>
         <span class="n">eps</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">idiosyncratic</span><span class="o">.</span><span class="n">iloc</span><span class="p">[:,</span> <span class="mi">0</span><span class="p">]</span>
         <span class="n">wide</span> <span class="o">=</span> <span class="n">eps</span><span class="o">.</span><span class="n">unstack</span><span class="p">(</span><span class="n">level</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
         <span class="n">wide</span> <span class="o">=</span> <span class="n">wide</span><span class="o">.</span><span class="n">loc</span><span class="p">[:,</span> <span class="n">wide</span><span class="o">.</span><span class="n">notnull</span><span class="p">()</span><span class="o">.</span><span class="n">any</span><span class="p">(</span><span class="n">axis</span><span class="o">=</span><span class="mi">0</span><span class="p">)]</span>
@@ -1343,6 +1403,31 @@
 
 
 
+<span class="k">def</span><span class="w"> </span><span class="nf">_is_concentrated_in_time</span><span class="p">(</span><span class="n">groups</span><span class="p">:</span> <span class="n">Any</span><span class="p">,</span> <span class="n">entity_ids</span><span class="p">:</span> <span class="n">Any</span><span class="p">,</span> <span class="n">time_ids</span><span class="p">:</span> <span class="n">Any</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">"""</span>
+<span class="sd">    Test whether groups of entities change over time and are missing in periods</span>
+
+<span class="sd">    Removing the mean of a group that is the same in every period for an</span>
+<span class="sd">    entity does not change the correlations over time. Removing the mean of a</span>
+<span class="sd">    group that changes over time and is not observed in every period removes a</span>
+<span class="sd">    component that varies over time and is shared by the entities in the group.</span>
+<span class="sd">    A group with a single entity is not shared.</span>
+<span class="sd">    """</span>
+    <span class="n">frame</span> <span class="o">=</span> <span class="n">DataFrame</span><span class="p">(</span>
+        <span class="p">{</span>
+            <span class="s2">"group"</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">asarray</span><span class="p">(</span><span class="n">groups</span><span class="p">)</span><span class="o">.</span><span class="n">ravel</span><span class="p">(),</span>
+            <span class="s2">"entity"</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">asarray</span><span class="p">(</span><span class="n">entity_ids</span><span class="p">)</span><span class="o">.</span><span class="n">ravel</span><span class="p">(),</span>
+            <span class="s2">"time"</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">asarray</span><span class="p">(</span><span class="n">time_ids</span><span class="p">)</span><span class="o">.</span><span class="n">ravel</span><span class="p">(),</span>
+        <span class="p">}</span>
+    <span class="p">)</span>
+    <span class="k">if</span> <span class="n">frame</span><span class="o">.</span><span class="n">groupby</span><span class="p">(</span><span class="s2">"entity"</span><span class="p">)[</span><span class="s2">"group"</span><span class="p">]</span><span class="o">.</span><span class="n">nunique</span><span class="p">()</span><span class="o">.</span><span class="n">max</span><span class="p">()</span> <span class="o">&lt;=</span> <span class="mi">1</span><span class="p">:</span>
+        <span class="k">return</span> <span class="kc">False</span>
+    <span class="n">by_group</span> <span class="o">=</span> <span class="n">frame</span><span class="o">.</span><span class="n">groupby</span><span class="p">(</span><span class="s2">"group"</span><span class="p">)</span>
+    <span class="n">shared</span> <span class="o">=</span> <span class="n">by_group</span><span class="p">[</span><span class="s2">"entity"</span><span class="p">]</span><span class="o">.</span><span class="n">nunique</span><span class="p">()</span> <span class="o">&gt;</span> <span class="mi">1</span>
+    <span class="n">nperiod</span> <span class="o">=</span> <span class="n">frame</span><span class="p">[</span><span class="s2">"time"</span><span class="p">]</span><span class="o">.</span><span class="n">nunique</span><span class="p">()</span>
+    <span class="k">return</span> <span class="nb">bool</span><span class="p">((</span><span class="n">by_group</span><span class="p">[</span><span class="s2">"time"</span><span class="p">]</span><span class="o">.</span><span class="n">nunique</span><span class="p">()[</span><span class="n">shared</span><span class="p">]</span> <span class="o">&lt;</span> <span class="n">nperiod</span><span class="p">)</span><span class="o">.</span><span class="n">any</span><span class="p">())</span>
+
+
 <div class="viewcode-block" id="PanelEffectsResults">
 <a class="viewcode-back" href="../../../panel/panel/linearmodels.panel.results.PanelEffectsResults.html#linearmodels.panel.results.PanelEffectsResults">[docs]</a>
 <span class="k">class</span><span class="w"> </span><span class="nc">PanelEffectsResults</span><span class="p">(</span><span class="n">PanelResults</span><span class="p">):</span>
@@ -1362,6 +1447,28 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">_sigma2_effects</span> <span class="o">=</span> <span class="n">res</span><span class="o">.</span><span class="n">sigma2_effects</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_r2_ex_effects</span> <span class="o">=</span> <span class="n">res</span><span class="o">.</span><span class="n">r2_ex_effects</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_effects</span> <span class="o">=</span> <span class="n">res</span><span class="o">.</span><span class="n">effects</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">_pesaran_cd_inapplicable</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span> <span class="o">|</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="n">reason</span> <span class="o">=</span> <span class="p">(</span>
+            <span class="s2">"The Pesaran CD test is not applicable to models with </span><span class="si">{effect}</span><span class="s2">. "</span>
+            <span class="s2">"These effects demean the residuals across entities that are "</span>
+            <span class="s2">"observed in the same periods, which makes the residuals "</span>
+            <span class="s2">"negatively correlated across entities and biases the statistic "</span>
+            <span class="s2">"downwards, away from its null distribution (Juodis and Reese, "</span>
+            <span class="s2">"2022)."</span>
+        <span class="p">)</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_time_effect</span><span class="p">:</span>
+            <span class="k">return</span> <span class="n">reason</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">effect</span><span class="o">=</span><span class="s2">"time effects"</span><span class="p">)</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_other_effect</span><span class="p">:</span>
+            <span class="n">other</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">model</span><span class="o">.</span><span class="n">_other_effect_cats</span><span class="o">.</span><span class="n">dataframe</span>
+            <span class="n">entity_ids</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">model</span><span class="o">.</span><span class="n">dependent</span><span class="o">.</span><span class="n">entity_ids</span>
+            <span class="n">time_ids</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">model</span><span class="o">.</span><span class="n">dependent</span><span class="o">.</span><span class="n">time_ids</span>
+            <span class="k">for</span> <span class="n">col</span> <span class="ow">in</span> <span class="n">other</span><span class="p">:</span>
+                <span class="k">if</span> <span class="n">_is_concentrated_in_time</span><span class="p">(</span><span class="n">other</span><span class="p">[</span><span class="n">col</span><span class="p">],</span> <span class="n">entity_ids</span><span class="p">,</span> <span class="n">time_ids</span><span class="p">):</span>
+                    <span class="k">return</span> <span class="n">reason</span><span class="o">.</span><span class="n">format</span><span class="p">(</span>
+                        <span class="n">effect</span><span class="o">=</span><span class="s2">"other effects that are concentrated in some periods"</span>
+                    <span class="p">)</span>
+        <span class="k">return</span> <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="n">_pesaran_cd_inapplicable</span><span class="p">()</span>
 
     <span class="nd">@property</span>
     <span class="k">def</span><span class="w"> </span><span class="nf">f_pooled</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">WaldTestStatistic</span><span class="p">:</span>
@@ -1495,6 +1602,82 @@
     <span class="k">return</span> <span class="nb">type</span><span class="p">(</span><span class="n">estimator</span><span class="p">)</span> <span class="ow">is</span> <span class="n">HomoskedasticCovariance</span>
 
 
+<span class="k">def</span><span class="w"> </span><span class="nf">_check_same_sample</span><span class="p">(</span><span class="n">res</span><span class="p">:</span> <span class="n">PanelResults</span><span class="p">,</span> <span class="n">other</span><span class="p">:</span> <span class="n">PanelResults</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">"""Check that two sets of results use the same data and weights"""</span>
+    <span class="k">if</span> <span class="n">res</span><span class="o">.</span><span class="n">nobs</span> <span class="o">!=</span> <span class="n">other</span><span class="o">.</span><span class="n">nobs</span><span class="p">:</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
+            <span class="s2">"The models must be estimated using the same observations. "</span>
+            <span class="sa">f</span><span class="s2">"This model uses </span><span class="si">{</span><span class="n">res</span><span class="o">.</span><span class="n">nobs</span><span class="si">}</span><span class="s2"> and other uses </span><span class="si">{</span><span class="n">other</span><span class="o">.</span><span class="n">nobs</span><span class="si">}</span><span class="s2">."</span>
+        <span class="p">)</span>
+    <span class="n">model</span><span class="p">,</span> <span class="n">other_model</span> <span class="o">=</span> <span class="n">res</span><span class="o">.</span><span class="n">model</span><span class="p">,</span> <span class="n">other</span><span class="o">.</span><span class="n">model</span>
+    <span class="k">if</span> <span class="ow">not</span> <span class="n">model</span><span class="o">.</span><span class="n">dependent</span><span class="o">.</span><span class="n">index</span><span class="o">.</span><span class="n">equals</span><span class="p">(</span><span class="n">other_model</span><span class="o">.</span><span class="n">dependent</span><span class="o">.</span><span class="n">index</span><span class="p">):</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
+            <span class="s2">"The models must be estimated using the same observations. The "</span>
+            <span class="s2">"entities and time periods of the observations differ."</span>
+        <span class="p">)</span>
+    <span class="k">if</span> <span class="ow">not</span> <span class="n">np</span><span class="o">.</span><span class="n">allclose</span><span class="p">(</span>
+        <span class="n">model</span><span class="o">.</span><span class="n">dependent</span><span class="o">.</span><span class="n">values2d</span><span class="p">,</span> <span class="n">other_model</span><span class="o">.</span><span class="n">dependent</span><span class="o">.</span><span class="n">values2d</span><span class="p">,</span> <span class="n">rtol</span><span class="o">=</span><span class="mf">1e-10</span><span class="p">,</span> <span class="n">atol</span><span class="o">=</span><span class="mf">0.0</span>
+    <span class="p">):</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
+            <span class="s2">"The models must have the same dependent variable, but the "</span>
+            <span class="s2">"dependent variables of the models differ."</span>
+        <span class="p">)</span>
+    <span class="c1"># Weights are rescaled to have mean 1, so only the relative weights matter</span>
+    <span class="k">if</span> <span class="ow">not</span> <span class="n">np</span><span class="o">.</span><span class="n">allclose</span><span class="p">(</span>
+        <span class="n">model</span><span class="o">.</span><span class="n">weights</span><span class="o">.</span><span class="n">values2d</span><span class="p">,</span> <span class="n">other_model</span><span class="o">.</span><span class="n">weights</span><span class="o">.</span><span class="n">values2d</span><span class="p">,</span> <span class="n">rtol</span><span class="o">=</span><span class="mf">1e-10</span><span class="p">,</span> <span class="n">atol</span><span class="o">=</span><span class="mf">0.0</span>
+    <span class="p">):</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
+            <span class="s2">"The models must be estimated using the same weights, but the "</span>
+            <span class="s2">"weights of the models differ."</span>
+        <span class="p">)</span>
+
+
+<div class="viewcode-block" id="HausmanTestResults">
+<a class="viewcode-back" href="../../../panel/panel/linearmodels.panel.results.HausmanTestResults.html#linearmodels.panel.results.HausmanTestResults">[docs]</a>
+<span class="k">class</span><span class="w"> </span><span class="nc">HausmanTestResults</span><span class="p">(</span><span class="n">NamedTuple</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">"""</span>
+<span class="sd">    Results of a Hausman specification test.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    statistic : WaldTestStatistic or InvalidTestStatistic</span>
+<span class="sd">        The test statistic with its p-value, distribution and null hypothesis.</span>
+<span class="sd">        An InvalidTestStatistic is used if the statistic is negative or not</span>
+<span class="sd">        finite, which means that the models do not meet the assumptions of the</span>
+<span class="sd">        test.</span>
+<span class="sd">    estimates : DataFrame</span>
+<span class="sd">        The coefficients included in the test. The columns are ``b0`` (from</span>
+<span class="sd">        the model that is consistent under both hypotheses, ``other``), ``b1``</span>
+<span class="sd">        (from the model that is efficient under the null), their difference</span>
+<span class="sd">        ``b0-b1`` and ``Std. Err.``, the standard error of the difference.</span>
+<span class="sd">        The standard error is NaN if the variance of the difference is</span>
+<span class="sd">        negative.</span>
+
+<span class="sd">    See Also</span>
+<span class="sd">    --------</span>
+<span class="sd">    RandomEffectsResults.hausman</span>
+<span class="sd">        Compute the Hausman specification test.</span>
+
+<span class="sd">    Notes</span>
+<span class="sd">    -----</span>
+<span class="sd">    The results are a named tuple, so the statistic and the estimates can be</span>
+<span class="sd">    unpacked as in ``statistic, estimates = results`` or read using the</span>
+<span class="sd">    ``statistic`` and ``estimates`` fields. Printing the results shows the</span>
+<span class="sd">    statistic followed by the table of estimates.</span>
+<span class="sd">    """</span>
+
+    <span class="n">statistic</span><span class="p">:</span> <span class="n">WaldTestStatistic</span> <span class="o">|</span> <span class="n">InvalidTestStatistic</span>
+    <span class="n">estimates</span><span class="p">:</span> <span class="n">DataFrame</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="fm">__str__</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+        <span class="n">legend</span> <span class="o">=</span> <span class="s2">"b0: consistent under H0 and H1, b1: efficient under H0"</span>
+        <span class="k">return</span> <span class="sa">f</span><span class="s2">"</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">statistic</span><span class="si">}</span><span class="se">\n\n</span><span class="s2">Coefficients (</span><span class="si">{</span><span class="n">legend</span><span class="si">}</span><span class="s2">)</span><span class="se">\n</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">estimates</span><span class="si">}</span><span class="s2">"</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="fm">__repr__</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="fm">__str__</span><span class="p">()</span></div>
+
+
+
 <div class="viewcode-block" id="RandomEffectsResults">
 <a class="viewcode-back" href="../../../panel/panel/linearmodels.panel.results.RandomEffectsResults.html#linearmodels.panel.results.RandomEffectsResults">[docs]</a>
 <span class="k">class</span><span class="w"> </span><span class="nc">RandomEffectsResults</span><span class="p">(</span><span class="n">PanelResults</span><span class="p">):</span>
@@ -1521,48 +1704,49 @@
 <span class="w">        </span><span class="sd">"""Values used in generalized demeaning"""</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_theta</span>
 
-<div class="viewcode-block" id="RandomEffectsResults.wu_hausman">
-<a class="viewcode-back" href="../../../panel/panel/linearmodels.panel.results.RandomEffectsResults.wu_hausman.html#linearmodels.panel.results.RandomEffectsResults.wu_hausman">[docs]</a>
-    <span class="k">def</span><span class="w"> </span><span class="nf">wu_hausman</span><span class="p">(</span>
+<div class="viewcode-block" id="RandomEffectsResults.hausman">
+<a class="viewcode-back" href="../../../panel/panel/linearmodels.panel.results.RandomEffectsResults.hausman.html#linearmodels.panel.results.RandomEffectsResults.hausman">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">hausman</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span>
         <span class="n">other</span><span class="p">:</span> <span class="n">PanelResults</span><span class="p">,</span>
         <span class="n">include_constant</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
         <span class="n">sigmamore</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
         <span class="n">sigmaless</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
-    <span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">tuple</span><span class="p">[</span><span class="n">InvalidTestStatistic</span> <span class="o">|</span> <span class="n">WaldTestStatistic</span><span class="p">,</span> <span class="n">DataFrame</span><span class="p">]:</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">HausmanTestResults</span><span class="p">:</span>
 <span class="w">        </span><span class="sa">r</span><span class="sd">"""</span>
-<span class="sd">        Hausman specification test against results from a consistent model</span>
+<span class="sd">        Hausman specification test against results from a consistent model.</span>
 
 <span class="sd">        Parameters</span>
 <span class="sd">        ----------</span>
 <span class="sd">        other : PanelResults</span>
 <span class="sd">            Results from a model that is consistent whether or not the null</span>
 <span class="sd">            hypothesis is true, typically a fixed effects (entity effects)</span>
-<span class="sd">            model estimated using the same observations and regressors as</span>
-<span class="sd">            this model.</span>
-<span class="sd">        include_constant : bool</span>
+<span class="sd">            model estimated using the same observations, dependent variable,</span>
+<span class="sd">            regressors and weights as this model.</span>
+<span class="sd">        include_constant : bool, optional</span>
 <span class="sd">            Flag indicating whether to include the constant in the comparison.</span>
 <span class="sd">            The default is False.</span>
-<span class="sd">        sigmamore : bool</span>
+<span class="sd">        sigmamore : bool, optional</span>
 <span class="sd">            Flag indicating whether to base both covariance estimates on the</span>
 <span class="sd">            error variance estimated by this model, which is efficient under</span>
-<span class="sd">            the null. Cannot be used with ``sigmaless``.</span>
-<span class="sd">        sigmaless : bool</span>
+<span class="sd">            the null. Cannot be used with ``sigmaless``. The default is False.</span>
+<span class="sd">        sigmaless : bool, optional</span>
 <span class="sd">            Flag indicating whether to base both covariance estimates on the</span>
 <span class="sd">            error variance estimated by ``other``. Cannot be used with</span>
-<span class="sd">            ``sigmamore``.</span>
+<span class="sd">            ``sigmamore``. The default is False.</span>
 
 <span class="sd">        Returns</span>
 <span class="sd">        -------</span>
-<span class="sd">        WaldTestStatistic or InvalidTestStatistic</span>
-<span class="sd">            Object containing test statistic, p-value, distribution and null.</span>
-<span class="sd">            An InvalidTestStatistic is returned when the statistic is negative.</span>
-<span class="sd">        DataFrame</span>
-<span class="sd">            The coefficients included in the test. The columns are ``b0``</span>
-<span class="sd">            (from ``other``), ``b1`` (from this model), their difference</span>
-<span class="sd">            ``b0-b1`` and ``Std. Err.``, the standard error of the difference.</span>
-<span class="sd">            The standard error is NaN if the variance of the difference is</span>
-<span class="sd">            negative.</span>
+<span class="sd">        HausmanTestResults</span>
+<span class="sd">            A named tuple with the fields ``statistic``, which contains the</span>
+<span class="sd">            test statistic, p-value, distribution and null as a</span>
+<span class="sd">            WaldTestStatistic, and ``estimates``, a DataFrame with the</span>
+<span class="sd">            coefficients included in the test. An InvalidTestStatistic is</span>
+<span class="sd">            returned as the statistic when the statistic is negative or not</span>
+<span class="sd">            finite. The columns of ``estimates`` are ``b0`` (from ``other``),</span>
+<span class="sd">            ``b1`` (from this model), their difference ``b0-b1`` and</span>
+<span class="sd">            ``Std. Err.``, the standard error of the difference. The standard</span>
+<span class="sd">            error is NaN if the variance of the difference is negative.</span>
 
 <span class="sd">        Raises</span>
 <span class="sd">        ------</span>
@@ -1571,8 +1755,9 @@
 <span class="sd">            was not estimated using the unadjusted covariance estimator.</span>
 <span class="sd">        ValueError</span>
 <span class="sd">            If ``sigmamore`` and ``sigmaless`` are both True, if the models</span>
-<span class="sd">            use different numbers of observations, or if the models do not</span>
-<span class="sd">            have any coefficients in common.</span>
+<span class="sd">            were not estimated using the same observations, dependent variable</span>
+<span class="sd">            and weights, or if the models do not have any coefficients in</span>
+<span class="sd">            common.</span>
 
 <span class="sd">        Notes</span>
 <span class="sd">        -----</span>
@@ -1598,12 +1783,26 @@
 <span class="sd">        The result is only meaningful when :math:`V_0 - V_1` is positive</span>
 <span class="sd">        definite, which is guaranteed in large samples if the null is true. If</span>
 <span class="sd">        it is not, a warning is issued and a generalized inverse is used. If</span>
-<span class="sd">        the resulting statistic is negative, the data do not satisfy the</span>
-<span class="sd">        assumptions of the test and an InvalidTestStatistic is returned.</span>
+<span class="sd">        the resulting statistic is negative or not finite, the data do not</span>
+<span class="sd">        satisfy the assumptions of the test and an InvalidTestStatistic is</span>
+<span class="sd">        returned. This can happen, for example, if ``other`` is a pooled</span>
+<span class="sd">        model, since the unadjusted covariance of a pooled model ignores the</span>
+<span class="sd">        entity effects.</span>
 
-<span class="sd">        Both models must use the default unadjusted covariance estimator, and</span>
-<span class="sd">        the statistic requires that ``other`` is estimated using the same</span>
-<span class="sd">        observations as this model.</span>
+<span class="sd">        Both models must use the default unadjusted covariance estimator. The</span>
+<span class="sd">        statistic also requires that the models are estimated using the same</span>
+<span class="sd">        observations, the same dependent variable and the same weights, which</span>
+<span class="sd">        are checked. The regressors are not checked: only coefficients with</span>
+<span class="sd">        the same name in both models are compared.</span>
+
+<span class="sd">        Effects that are included in ``other`` but not in this model are not</span>
+<span class="sd">        tested separately. For example, if ``other`` includes time effects</span>
+<span class="sd">        and this model does not, the null hypothesis is that the regressors</span>
+<span class="sd">        are uncorrelated with the entity effects and with the time effects,</span>
+<span class="sd">        and the test can reject because of the time effects. To test only the</span>
+<span class="sd">        entity effects, include the time dummies as regressors in this model.</span>
+<span class="sd">        Only the coefficients found in both models are compared, so the</span>
+<span class="sd">        coefficients on the time dummies are not part of the test.</span>
 
 <span class="sd">        References</span>
 <span class="sd">        ----------</span>
@@ -1615,8 +1814,12 @@
 <span class="sd">        &gt;&gt;&gt; from linearmodels import PanelOLS, RandomEffects</span>
 <span class="sd">        &gt;&gt;&gt; fe_res = PanelOLS(y, x, entity_effects=True).fit()</span>
 <span class="sd">        &gt;&gt;&gt; re_res = RandomEffects(y, x).fit()</span>
-<span class="sd">        &gt;&gt;&gt; test, estimates = re_res.wu_hausman(fe_res)</span>
-<span class="sd">        &gt;&gt;&gt; print(test)</span>
+<span class="sd">        &gt;&gt;&gt; results = re_res.hausman(fe_res)</span>
+<span class="sd">        &gt;&gt;&gt; print(results)</span>
+
+<span class="sd">        The statistic and the estimates can be unpacked.</span>
+
+<span class="sd">        &gt;&gt;&gt; test, estimates = results</span>
 <span class="sd">        """</span>
         <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">other</span><span class="p">,</span> <span class="n">PanelResults</span><span class="p">):</span>
             <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="s2">"other must be the results of a panel model."</span><span class="p">)</span>
@@ -1627,11 +1830,7 @@
                 <span class="s2">"The Hausman test can only be used with models estimated using "</span>
                 <span class="s2">"the unadjusted covariance estimator."</span>
             <span class="p">)</span>
-        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">nobs</span> <span class="o">!=</span> <span class="n">other</span><span class="o">.</span><span class="n">nobs</span><span class="p">:</span>
-            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
-                <span class="s2">"The models must be estimated using the same observations. "</span>
-                <span class="sa">f</span><span class="s2">"This model uses </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">nobs</span><span class="si">}</span><span class="s2"> and other uses </span><span class="si">{</span><span class="n">other</span><span class="o">.</span><span class="n">nobs</span><span class="si">}</span><span class="s2">."</span>
-            <span class="p">)</span>
+        <span class="n">_check_same_sample</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">other</span><span class="p">)</span>
 
         <span class="n">in_other</span> <span class="o">=</span> <span class="nb">set</span><span class="p">(</span><span class="n">other</span><span class="o">.</span><span class="n">params</span><span class="o">.</span><span class="n">index</span><span class="p">)</span>
         <span class="n">common</span> <span class="o">=</span> <span class="p">[</span><span class="n">name</span> <span class="k">for</span> <span class="n">name</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">params</span><span class="o">.</span><span class="n">index</span> <span class="k">if</span> <span class="n">name</span> <span class="ow">in</span> <span class="n">in_other</span><span class="p">]</span>
@@ -1667,6 +1866,14 @@
 
         <span class="n">diff</span> <span class="o">=</span> <span class="n">var_diff</span><span class="o">.</span><span class="n">to_numpy</span><span class="p">()</span>
         <span class="n">delta</span> <span class="o">=</span> <span class="n">b_diff</span><span class="o">.</span><span class="n">to_numpy</span><span class="p">()</span>
+        <span class="n">name</span> <span class="o">=</span> <span class="s2">"Hausman specification test"</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">all</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">isfinite</span><span class="p">(</span><span class="n">diff</span><span class="p">))</span> <span class="ow">and</span> <span class="n">np</span><span class="o">.</span><span class="n">all</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">isfinite</span><span class="p">(</span><span class="n">delta</span><span class="p">))):</span>
+            <span class="n">invalid</span> <span class="o">=</span> <span class="n">InvalidTestStatistic</span><span class="p">(</span>
+                <span class="s2">"The coefficients or covariances of the models are not finite, "</span>
+                <span class="s2">"so the statistic cannot be computed."</span><span class="p">,</span>
+                <span class="n">name</span><span class="o">=</span><span class="n">name</span><span class="p">,</span>
+            <span class="p">)</span>
+            <span class="k">return</span> <span class="n">HausmanTestResults</span><span class="p">(</span><span class="n">invalid</span><span class="p">,</span> <span class="n">estimates</span><span class="p">)</span>
         <span class="k">try</span><span class="p">:</span>
             <span class="n">np</span><span class="o">.</span><span class="n">linalg</span><span class="o">.</span><span class="n">cholesky</span><span class="p">(</span><span class="n">diff</span><span class="p">)</span>
             <span class="n">positive_definite</span> <span class="o">=</span> <span class="kc">True</span>
@@ -1683,16 +1890,17 @@
             <span class="p">)</span>
             <span class="n">stat</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="n">delta</span> <span class="o">@</span> <span class="n">np</span><span class="o">.</span><span class="n">linalg</span><span class="o">.</span><span class="n">pinv</span><span class="p">(</span><span class="n">diff</span><span class="p">,</span> <span class="n">hermitian</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span> <span class="o">@</span> <span class="n">delta</span><span class="p">)</span>
 
-        <span class="n">name</span> <span class="o">=</span> <span class="s2">"Hausman specification test"</span>
-        <span class="k">if</span> <span class="n">stat</span> <span class="o">&lt;</span> <span class="mi">0</span><span class="p">:</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">np</span><span class="o">.</span><span class="n">isfinite</span><span class="p">(</span><span class="n">stat</span><span class="p">)</span> <span class="ow">or</span> <span class="n">stat</span> <span class="o">&lt;</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="n">problem</span> <span class="o">=</span> <span class="s2">"not finite"</span> <span class="k">if</span> <span class="ow">not</span> <span class="n">np</span><span class="o">.</span><span class="n">isfinite</span><span class="p">(</span><span class="n">stat</span><span class="p">)</span> <span class="k">else</span> <span class="s2">"negative"</span>
             <span class="n">invalid</span> <span class="o">=</span> <span class="n">InvalidTestStatistic</span><span class="p">(</span>
-                <span class="s2">"The statistic is negative, so the models do not meet the "</span>
+                <span class="sa">f</span><span class="s2">"The statistic is </span><span class="si">{</span><span class="n">problem</span><span class="si">}</span><span class="s2">, so the models do not meet the "</span>
                 <span class="s2">"assumptions of the Hausman test."</span><span class="p">,</span>
                 <span class="n">name</span><span class="o">=</span><span class="n">name</span><span class="p">,</span>
             <span class="p">)</span>
-            <span class="k">return</span> <span class="n">invalid</span><span class="p">,</span> <span class="n">estimates</span>
+            <span class="k">return</span> <span class="n">HausmanTestResults</span><span class="p">(</span><span class="n">invalid</span><span class="p">,</span> <span class="n">estimates</span><span class="p">)</span>
         <span class="n">null</span> <span class="o">=</span> <span class="s2">"No systematic difference in coefficients between models"</span>
-        <span class="k">return</span> <span class="n">WaldTestStatistic</span><span class="p">(</span><span class="n">stat</span><span class="p">,</span> <span class="n">null</span><span class="p">,</span> <span class="nb">len</span><span class="p">(</span><span class="n">common</span><span class="p">),</span> <span class="n">name</span><span class="o">=</span><span class="n">name</span><span class="p">),</span> <span class="n">estimates</span></div>
+        <span class="n">wald</span> <span class="o">=</span> <span class="n">WaldTestStatistic</span><span class="p">(</span><span class="n">stat</span><span class="p">,</span> <span class="n">null</span><span class="p">,</span> <span class="nb">len</span><span class="p">(</span><span class="n">common</span><span class="p">),</span> <span class="n">name</span><span class="o">=</span><span class="n">name</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">HausmanTestResults</span><span class="p">(</span><span class="n">wald</span><span class="p">,</span> <span class="n">estimates</span><span class="p">)</span></div>
 </div>
 
 
@@ -1712,6 +1920,17 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">_all_params</span> <span class="o">=</span> <span class="n">res</span><span class="o">.</span><span class="n">all_params</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_avg_r2</span> <span class="o">=</span> <span class="n">res</span><span class="o">.</span><span class="n">avg_r2</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_avg_adj_r2</span> <span class="o">=</span> <span class="n">res</span><span class="o">.</span><span class="n">avg_adj_r2</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">_pesaran_cd_inapplicable</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span> <span class="o">|</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="k">return</span> <span class="p">(</span>
+            <span class="s2">"The Pesaran CD test is not applicable to FamaMacBeth. The errors "</span>
+            <span class="s2">"of the model are the residuals of the period-by-period "</span>
+            <span class="s2">"cross-sectional regressions. The series implied by the averaged "</span>
+            <span class="s2">"coefficients contains the common, time-varying term "</span>
+            <span class="s2">"(beta_t - beta_bar)'x_it, so it is cross-sectionally dependent by "</span>
+            <span class="s2">"construction. Fama-MacBeth inference is already robust to "</span>
+            <span class="s2">"cross-sectional dependence."</span>
+        <span class="p">)</span>
 
     <span class="nd">@property</span>
     <span class="k">def</span><span class="w"> </span><span class="nf">all_params</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">DataFrame</span><span class="p">:</span>

@@ -23,7 +23,7 @@
     
   
       
-        <title>linearmodels.iv.model.IVJIVE.from_formula - linearmodels v7.1 (+158)</title>
+        <title>linearmodels.iv.model.IVJIVE.from_formula - linearmodels v7.1 (+175)</title>
       
     
 
@@ -100,7 +100,7 @@
 
 <header class="md-header md-header--shadow" data-md-component="header">
   <nav class="md-header__inner md-grid" aria-label="Header">
-    <a href="../../index.html" title="linearmodels v7.1 (+158)" class="md-header__button md-logo" aria-label="linearmodels v7.1 (+158)" data-md-component="logo">
+    <a href="../../index.html" title="linearmodels v7.1 (+175)" class="md-header__button md-logo" aria-label="linearmodels v7.1 (+175)" data-md-component="logo">
       <img src="../../_static/bw-logo.svg" alt="logo">
     </a>
     <label class="md-header__button md-icon" for="__drawer">
@@ -111,7 +111,7 @@
       <div class="md-header__ellipsis">
         <div class="md-header__topic">
           <span class="md-ellipsis">
-            linearmodels v7.1 (+158)
+            linearmodels v7.1 (+175)
           </span>
         </div>
         <div class="md-header__topic" data-md-component="header-topic">
@@ -206,10 +206,10 @@
 
 <nav class="md-nav md-nav--primary" aria-label="Navigation" data-md-level="0">
   <label class="md-nav__title" for="__drawer">
-    <a href="../../index.html" title="linearmodels v7.1 (+158)" class="md-nav__button md-logo" aria-label="linearmodels v7.1 (+158)" data-md-component="logo">
+    <a href="../../index.html" title="linearmodels v7.1 (+175)" class="md-nav__button md-logo" aria-label="linearmodels v7.1 (+175)" data-md-component="logo">
       <img src="../../_static/bw-logo.svg" alt="logo">
     </a>
-    linearmodels v7.1 (+158)
+    linearmodels v7.1 (+175)
   </label>
   
     <div class="md-nav__source">
@@ -1639,12 +1639,18 @@
 <p>The IV formula modifies the standard formula syntax to include a
 block of the form [endog ~ instruments] which is used to indicate
 the list of endogenous variables and instruments.  The general
-structure of an IV formula is <cite>dependent ~ exog [endog ~ instruments]</cite></p>
+structure of an IV formula is <cite>dependent ~ exog [endog ~ instruments]</cite>
+and it must be the case that the formula expressions constructed from
+blocks <cite>dependent ~ exog endog</cite> and <cite>dependent ~ exog instruments</cite> are
+both valid formulas.</p>
+<p>A constant must be explicitly included using “1 +” if required. Use
+<cite>I(exper ** 2)</cite> for the square of a variable, since <cite>exper ** 2</cite> is
+the power of a set of terms in a formula, which is <cite>exper</cite>.</p>
 <p class="example rubric">Examples</p>
 <div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><code><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span><span class="w"> </span><span class="nn">linearmodels.datasets</span><span class="w"> </span><span class="kn">import</span> <span class="n">wage</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span><span class="w"> </span><span class="nn">linearmodels.iv</span><span class="w"> </span><span class="kn">import</span> <span class="n">IVJIVE</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">data</span> <span class="o">=</span> <span class="n">wage</span><span class="o">.</span><span class="n">load</span><span class="p">()</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">formula</span> <span class="o">=</span> <span class="s2">"np.log(wage) ~ 1 + exper + exper ** 2 + brthord + [educ ~ sibs]"</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">formula</span> <span class="o">=</span> <span class="s2">"np.log(wage) ~ 1 + exper + I(exper ** 2) + brthord + [educ ~ sibs]"</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">mod</span> <span class="o">=</span> <span class="n">IVJIVE</span><span class="o">.</span><span class="n">from_formula</span><span class="p">(</span><span class="n">formula</span><span class="p">,</span> <span class="n">data</span><span class="p">)</span>
 </code></pre></div>
 </div>

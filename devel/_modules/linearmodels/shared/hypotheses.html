@@ -19,7 +19,7 @@
     
   
       
-        <title>linearmodels.shared.hypotheses - linearmodels v7.1 (+158)</title>
+        <title>linearmodels.shared.hypotheses - linearmodels v7.1 (+175)</title>
       
     
 
@@ -91,7 +91,7 @@
 
 <header class="md-header md-header--shadow" data-md-component="header">
   <nav class="md-header__inner md-grid" aria-label="Header">
-    <a href="../../../index.html" title="linearmodels v7.1 (+158)" class="md-header__button md-logo" aria-label="linearmodels v7.1 (+158)" data-md-component="logo">
+    <a href="../../../index.html" title="linearmodels v7.1 (+175)" class="md-header__button md-logo" aria-label="linearmodels v7.1 (+175)" data-md-component="logo">
       <img src="../../../_static/bw-logo.svg" alt="logo">
     </a>
     <label class="md-header__button md-icon" for="__drawer">
@@ -102,7 +102,7 @@
       <div class="md-header__ellipsis">
         <div class="md-header__topic">
           <span class="md-ellipsis">
-            linearmodels v7.1 (+158)
+            linearmodels v7.1 (+175)
           </span>
         </div>
         <div class="md-header__topic" data-md-component="header-topic">
@@ -197,10 +197,10 @@
 
 <nav class="md-nav md-nav--primary" aria-label="Navigation" data-md-level="0">
   <label class="md-nav__title" for="__drawer">
-    <a href="../../../index.html" title="linearmodels v7.1 (+158)" class="md-nav__button md-logo" aria-label="linearmodels v7.1 (+158)" data-md-component="logo">
+    <a href="../../../index.html" title="linearmodels v7.1 (+175)" class="md-nav__button md-logo" aria-label="linearmodels v7.1 (+175)" data-md-component="logo">
       <img src="../../../_static/bw-logo.svg" alt="logo">
     </a>
-    linearmodels v7.1 (+158)
+    linearmodels v7.1 (+175)
   </label>
   
     <div class="md-nav__source">
@@ -611,7 +611,7 @@
 <div class="viewcode-block" id="NormalTestStatistic">
 <a class="viewcode-back" href="../../../utility/linearmodels.shared.hypotheses.NormalTestStatistic.html#linearmodels.shared.hypotheses.NormalTestStatistic">[docs]</a>
 <span class="k">class</span><span class="w"> </span><span class="nc">NormalTestStatistic</span><span class="p">:</span>
-<span class="w">    </span><span class="sd">"""</span>
+<span class="w">    </span><span class="sa">r</span><span class="sd">"""</span>
 <span class="sd">    Test statistic holder for tests with an asymptotic standard normal law.</span>
 
 <span class="sd">    Parameters</span>
@@ -620,11 +620,23 @@
 <span class="sd">        The test statistic.</span>
 <span class="sd">    null : str</span>
 <span class="sd">        A statement of the test's null hypothesis.</span>
-<span class="sd">    name : str</span>
+<span class="sd">    name : str, optional</span>
 <span class="sd">        Name of test.</span>
-<span class="sd">    two_sided : bool</span>
+<span class="sd">    two_sided : bool, optional</span>
 <span class="sd">        Flag indicating whether p-values and critical values are computed</span>
-<span class="sd">        using a two-sided test.</span>
+<span class="sd">        using a two-sided test. The default is True.</span>
+
+<span class="sd">    Notes</span>
+<span class="sd">    -----</span>
+<span class="sd">    A two-sided test rejects the null if the absolute value of the statistic</span>
+<span class="sd">    :math:`s` is large. The p-value is :math:`2\Pr(Z &gt; |s|)`, where :math:`Z`</span>
+<span class="sd">    has a standard normal distribution, and the critical values for tests of</span>
+<span class="sd">    size 10%, 5% and 1% are the 0.95, 0.975 and 0.995 quantiles of the standard</span>
+<span class="sd">    normal.</span>
+
+<span class="sd">    A one-sided test rejects the null if the statistic is large. The p-value is</span>
+<span class="sd">    :math:`\Pr(Z &gt; s)`, which is close to 1 if the statistic is large and</span>
+<span class="sd">    negative, and the critical values are the 0.9, 0.95 and 0.99 quantiles.</span>
 <span class="sd">    """</span>
 
     <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span>

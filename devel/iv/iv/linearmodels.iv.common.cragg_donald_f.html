@@ -23,7 +23,7 @@
     
   
       
-        <title>linearmodels.iv.common.cragg_donald_f - linearmodels v7.1 (+158)</title>
+        <title>linearmodels.iv.common.cragg_donald_f - linearmodels v7.1 (+175)</title>
       
     
 
@@ -100,7 +100,7 @@
 
 <header class="md-header md-header--shadow" data-md-component="header">
   <nav class="md-header__inner md-grid" aria-label="Header">
-    <a href="../../index.html" title="linearmodels v7.1 (+158)" class="md-header__button md-logo" aria-label="linearmodels v7.1 (+158)" data-md-component="logo">
+    <a href="../../index.html" title="linearmodels v7.1 (+175)" class="md-header__button md-logo" aria-label="linearmodels v7.1 (+175)" data-md-component="logo">
       <img src="../../_static/bw-logo.svg" alt="logo">
     </a>
     <label class="md-header__button md-icon" for="__drawer">
@@ -111,7 +111,7 @@
       <div class="md-header__ellipsis">
         <div class="md-header__topic">
           <span class="md-ellipsis">
-            linearmodels v7.1 (+158)
+            linearmodels v7.1 (+175)
           </span>
         </div>
         <div class="md-header__topic" data-md-component="header-topic">
@@ -206,10 +206,10 @@
 
 <nav class="md-nav md-nav--primary" aria-label="Navigation" data-md-level="0">
   <label class="md-nav__title" for="__drawer">
-    <a href="../../index.html" title="linearmodels v7.1 (+158)" class="md-nav__button md-logo" aria-label="linearmodels v7.1 (+158)" data-md-component="logo">
+    <a href="../../index.html" title="linearmodels v7.1 (+175)" class="md-nav__button md-logo" aria-label="linearmodels v7.1 (+175)" data-md-component="logo">
       <img src="../../_static/bw-logo.svg" alt="logo">
     </a>
-    linearmodels v7.1 (+158)
+    linearmodels v7.1 (+175)
   </label>
   
     <div class="md-nav__source">
@@ -1305,15 +1305,14 @@ the joint significance of the excluded instruments in the first-stage
 regression. It is the statistic that Stock and Yogo (2005) tabulate
 critical values for. It is reported by Stata’s <code class="docutils literal notranslate"><span class="pre">ivreg2</span></code> as the
 “Cragg-Donald Wald F statistic”.</p>
+<p>The weights are used as in <a class="reference internal" href="linearmodels.iv.common.cragg_donald.html#linearmodels.iv.common.cragg_donald" title="linearmodels.iv.common.cragg_donald (Python function) — Cragg-Donald test of reduced rank for the first-stage regression"><code class="xref py py-func docutils literal notranslate"><span class="pre">cragg_donald()</span></code></a>. Each array, including the
+constant of <code class="docutils literal notranslate"><span class="pre">exog</span></code>, is multiplied by the square root of the weights in a
+weighted model, and the statistic does not depend on the scale of the
+weights or on clusters.</p>
 <p class="rubric">References</p>
-<aside class="footnote-list brackets">
-<aside class="footnote brackets" id="id1" role="doc-footnote">
-<span class="label"><span class="fn-bracket">[</span>1<span class="fn-bracket">]</span></span>
-<p>Stock, J. H., &amp; Yogo, M. (2005). Testing for weak instruments in
-linear IV regression. In Identification and Inference for Econometric
-Models. Cambridge University Press.</p>
-</aside>
-</aside>
+<p>Stock, J. H., &amp; Yogo, M. (2005). Testing for weak instruments in linear IV
+regression. In <em>Identification and Inference for Econometric Models</em>.
+Cambridge University Press.</p>
 </dd></dl>
 
 

@@ -23,7 +23,7 @@
     
   
       
-        <title>linearmodels.iv.results.FirstStageResults.kleibergen_paap_f - linearmodels v7.1 (+158)</title>
+        <title>linearmodels.iv.results.FirstStageResults.kleibergen_paap_f - linearmodels v7.1 (+175)</title>
       
     
 
@@ -100,7 +100,7 @@
 
 <header class="md-header md-header--shadow" data-md-component="header">
   <nav class="md-header__inner md-grid" aria-label="Header">
-    <a href="../../index.html" title="linearmodels v7.1 (+158)" class="md-header__button md-logo" aria-label="linearmodels v7.1 (+158)" data-md-component="logo">
+    <a href="../../index.html" title="linearmodels v7.1 (+175)" class="md-header__button md-logo" aria-label="linearmodels v7.1 (+175)" data-md-component="logo">
       <img src="../../_static/bw-logo.svg" alt="logo">
     </a>
     <label class="md-header__button md-icon" for="__drawer">
@@ -111,7 +111,7 @@
       <div class="md-header__ellipsis">
         <div class="md-header__topic">
           <span class="md-ellipsis">
-            linearmodels v7.1 (+158)
+            linearmodels v7.1 (+175)
           </span>
         </div>
         <div class="md-header__topic" data-md-component="header-topic">
@@ -206,10 +206,10 @@
 
 <nav class="md-nav md-nav--primary" aria-label="Navigation" data-md-level="0">
   <label class="md-nav__title" for="__drawer">
-    <a href="../../index.html" title="linearmodels v7.1 (+158)" class="md-nav__button md-logo" aria-label="linearmodels v7.1 (+158)" data-md-component="logo">
+    <a href="../../index.html" title="linearmodels v7.1 (+175)" class="md-nav__button md-logo" aria-label="linearmodels v7.1 (+175)" data-md-component="logo">
       <img src="../../_static/bw-logo.svg" alt="logo">
     </a>
-    linearmodels v7.1 (+158)
+    linearmodels v7.1 (+175)
   </label>
   
     <div class="md-nav__source">
@@ -1491,6 +1491,10 @@ covariance estimator as the model. With the unadjusted covariance it
 is the Cragg-Donald F statistic. Stata’s <code class="docutils literal notranslate"><span class="pre">ivreg2</span></code> reports it as the
 “Kleibergen-Paap rk Wald F statistic”. See
 <a class="reference internal" href="linearmodels.iv.common.kleibergen_paap_f.html#linearmodels.iv.common.kleibergen_paap_f" title="linearmodels.iv.common.kleibergen_paap_f (Python function) — Kleibergen-Paap rk Wald F statistic"><code class="xref py py-func docutils literal notranslate"><span class="pre">linearmodels.iv.common.kleibergen_paap_f()</span></code></a> for the definition.</p>
+<p>The weights, clusters and kernel are used as for
+<a class="reference internal" href="linearmodels.iv.results.FirstStageResults.kleibergen_paap.html#linearmodels.iv.results.FirstStageResults.kleibergen_paap" title="linearmodels.iv.results.FirstStageResults.kleibergen_paap (Python property) — Kleibergen-Paap rk LM test of underidentification"><code class="xref py py-attr docutils literal notranslate"><span class="pre">kleibergen_paap</span></code></a>. With a clustered covariance estimator there
+must be at least <code class="docutils literal notranslate"><span class="pre">ninstr</span> <span class="pre">-</span> <span class="pre">nendog</span> <span class="pre">+</span> <span class="pre">2</span></code> clusters, and a warning is
+issued if there are fewer.</p>
 </dd></dl>
 
 

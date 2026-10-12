@@ -23,7 +23,7 @@
     
   
       
-        <title>linearmodels.shared.hypotheses.NormalTestStatistic - linearmodels v7.1 (+158)</title>
+        <title>linearmodels.shared.hypotheses.NormalTestStatistic - linearmodels v7.1 (+175)</title>
       
     
 
@@ -100,7 +100,7 @@
 
 <header class="md-header md-header--shadow" data-md-component="header">
   <nav class="md-header__inner md-grid" aria-label="Header">
-    <a href="../index.html" title="linearmodels v7.1 (+158)" class="md-header__button md-logo" aria-label="linearmodels v7.1 (+158)" data-md-component="logo">
+    <a href="../index.html" title="linearmodels v7.1 (+175)" class="md-header__button md-logo" aria-label="linearmodels v7.1 (+175)" data-md-component="logo">
       <img src="../_static/bw-logo.svg" alt="logo">
     </a>
     <label class="md-header__button md-icon" for="__drawer">
@@ -111,7 +111,7 @@
       <div class="md-header__ellipsis">
         <div class="md-header__topic">
           <span class="md-ellipsis">
-            linearmodels v7.1 (+158)
+            linearmodels v7.1 (+175)
           </span>
         </div>
         <div class="md-header__topic" data-md-component="header-topic">
@@ -206,10 +206,10 @@
 
 <nav class="md-nav md-nav--primary" aria-label="Navigation" data-md-level="0">
   <label class="md-nav__title" for="__drawer">
-    <a href="../index.html" title="linearmodels v7.1 (+158)" class="md-nav__button md-logo" aria-label="linearmodels v7.1 (+158)" data-md-component="logo">
+    <a href="../index.html" title="linearmodels v7.1 (+175)" class="md-nav__button md-logo" aria-label="linearmodels v7.1 (+175)" data-md-component="logo">
       <img src="../_static/bw-logo.svg" alt="logo">
     </a>
-    linearmodels v7.1 (+158)
+    linearmodels v7.1 (+175)
   </label>
   
     <div class="md-nav__source">
@@ -1201,11 +1201,20 @@
 <dt id="linearmodels.shared.hypotheses.NormalTestStatistic.__init__.name"><span class="n sig-name">name</span><span class="p">:</span><span class="w"> </span><span class="n"><span class="desctype"><a class="reference external" href="https://docs.python.org/3/builtins/stdtypes.html#str" title="(in Python v3.15)">str</a><span class="w"> </span><span class="p">|</span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/builtins/constants.html#None" title="(in Python v3.15)">None</a></span></span><span class="w"> </span><span class="o">=</span><span class="w"> </span><code class="code python default_value docutils literal highlight highlight-python"><span class="kc">None</span></code><a class="headerlink" href="#linearmodels.shared.hypotheses.NormalTestStatistic.__init__.name" title="Permalink to this definition">¶</a></dt><dd><p>Name of test.</p>
 </dd>
 <dt id="linearmodels.shared.hypotheses.NormalTestStatistic.__init__.two_sided"><span class="n sig-name">two_sided</span><span class="p">:</span><span class="w"> </span><span class="n"><span class="desctype"><a class="reference external" href="https://docs.python.org/3/builtins/functions.html#bool" title="(in Python v3.15)">bool</a></span></span><span class="w"> </span><span class="o">=</span><span class="w"> </span><code class="code python default_value docutils literal highlight highlight-python"><span class="kc">True</span></code><a class="headerlink" href="#linearmodels.shared.hypotheses.NormalTestStatistic.__init__.two_sided" title="Permalink to this definition">¶</a></dt><dd><p>Flag indicating whether p-values and critical values are computed
-using a two-sided test.</p>
+using a two-sided test. The default is True.</p>
 </dd>
 </dl>
 </dd>
 </dl>
+<p class="rubric">Notes</p>
+<p>A two-sided test rejects the null if the absolute value of the statistic
+<span class="math notranslate nohighlight">\(s\)</span> is large. The p-value is <span class="math notranslate nohighlight">\(2\Pr(Z &gt; |s|)\)</span>, where <span class="math notranslate nohighlight">\(Z\)</span>
+has a standard normal distribution, and the critical values for tests of
+size 10%, 5% and 1% are the 0.95, 0.975 and 0.995 quantiles of the standard
+normal.</p>
+<p>A one-sided test rejects the null if the statistic is large. The p-value is
+<span class="math notranslate nohighlight">\(\Pr(Z &gt; s)\)</span>, which is close to 1 if the statistic is large and
+negative, and the critical values are the 0.9, 0.95 and 0.99 quantiles.</p>
 <p class="rubric">Methods</p>
 <table class="autosummary longtable docutils data align-default">
 <tbody>
@@ -1325,6 +1334,8 @@ using a two-sided test.</p>
       
         <script src="../_static/sphinx_immaterial_theme.32136f45f91ae6956.min.js?v=a7a9472a"></script>
         <script crossorigin="anonymous" integrity="sha256-Ae2Vz/4ePdIu6ZyI/5ZGsYnb+m0JlOmKPjt6XZ9JJkA=" src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.4/require.min.js"></script>
+        <script>window.MathJax = {"tex": {"inlineMath": [["$", "$"], ["\\(", "\\)"]], "processEscapes": true}, "options": {"ignoreHtmlClass": "tex2jax_ignore|mathjax_ignore|document", "processHtmlClass": "tex2jax_process|mathjax_process|math|output_area"}}</script>
+        <script id="MathJax-script" src="../_static/mathjax/tex-mml-chtml.js"></script>
     
   </body>
 </html>

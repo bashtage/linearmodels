@@ -23,7 +23,7 @@
     
   
       
-        <title>linearmodels.iv.results.IVGMMResults.centered_j_stat - linearmodels v7.1 (+158)</title>
+        <title>linearmodels.iv.results.IVGMMResults.centered_j_stat - linearmodels v7.1 (+175)</title>
       
     
 
@@ -100,7 +100,7 @@
 
 <header class="md-header md-header--shadow" data-md-component="header">
   <nav class="md-header__inner md-grid" aria-label="Header">
-    <a href="../../index.html" title="linearmodels v7.1 (+158)" class="md-header__button md-logo" aria-label="linearmodels v7.1 (+158)" data-md-component="logo">
+    <a href="../../index.html" title="linearmodels v7.1 (+175)" class="md-header__button md-logo" aria-label="linearmodels v7.1 (+175)" data-md-component="logo">
       <img src="../../_static/bw-logo.svg" alt="logo">
     </a>
     <label class="md-header__button md-icon" for="__drawer">
@@ -111,7 +111,7 @@
       <div class="md-header__ellipsis">
         <div class="md-header__topic">
           <span class="md-ellipsis">
-            linearmodels v7.1 (+158)
+            linearmodels v7.1 (+175)
           </span>
         </div>
         <div class="md-header__topic" data-md-component="header-topic">
@@ -206,10 +206,10 @@
 
 <nav class="md-nav md-nav--primary" aria-label="Navigation" data-md-level="0">
   <label class="md-nav__title" for="__drawer">
-    <a href="../../index.html" title="linearmodels v7.1 (+158)" class="md-nav__button md-logo" aria-label="linearmodels v7.1 (+158)" data-md-component="logo">
+    <a href="../../index.html" title="linearmodels v7.1 (+175)" class="md-nav__button md-logo" aria-label="linearmodels v7.1 (+175)" data-md-component="logo">
       <img src="../../_static/bw-logo.svg" alt="logo">
     </a>
-    linearmodels v7.1 (+158)
+    linearmodels v7.1 (+175)
   </label>
   
     <div class="md-nav__source">
@@ -2218,7 +2218,7 @@ An InvalidTestStatistic is returned if that covariance is
 singular, which can happen if there are too few clusters.</p>
 </dd>
 <dt class="field-even" id="linearmodels.iv.results.IVGMMResults.centered_j_stat-return-type">Return type<span class="colon">:</span><a class="headerlink" href="#linearmodels.iv.results.IVGMMResults.centered_j_stat-return-type" title="Permalink to this headline">¶</a></dt>
-<dd class="field-even"><p><a class="reference internal" href="../../utility/linearmodels.shared.hypotheses.WaldTestStatistic.html#linearmodels.shared.hypotheses.WaldTestStatistic" title="linearmodels.shared.hypotheses.WaldTestStatistic (Python class) — Test statistic holder for Wald-type tests"><code class="xref py py-class docutils literal notranslate"><span class="pre">linearmodels.shared.hypotheses.WaldTestStatistic</span></code></a></p>
+<dd class="field-even"><p><a class="reference internal" href="../../utility/linearmodels.shared.hypotheses.WaldTestStatistic.html#linearmodels.shared.hypotheses.WaldTestStatistic" title="linearmodels.shared.hypotheses.WaldTestStatistic (Python class) — Test statistic holder for Wald-type tests"><code class="xref py py-class docutils literal notranslate"><span class="pre">linearmodels.shared.hypotheses.WaldTestStatistic</span></code></a> or <code class="xref py py-class docutils literal notranslate"><span class="pre">linearmodels.shared.InvalidTestStatistic</span></code></p>
 </dd>
 </dl>
 <p class="rubric">Notes</p>
@@ -2257,6 +2257,11 @@ the statistic then coincides with <a class="reference internal" href="linearmode
 the estimation at which the weight matrix is evaluated.
 It also has no effect in <a class="reference internal" href="linearmodels.iv.model.IVGMMCUE.html#linearmodels.iv.model.IVGMMCUE" title="linearmodels.iv.model.IVGMMCUE (Python class) — Estimation of IV models using continuously updating GMM"><code class="xref py py-class docutils literal notranslate"><span class="pre">IVGMMCUE</span></code></a>
 models unless <code class="docutils literal notranslate"><span class="pre">center=False</span></code> was set.</p>
+<p>In a weighted model the moment conditions are
+<span class="math notranslate nohighlight">\(w_i z_i \hat{\epsilon}_i\)</span>, where <span class="math notranslate nohighlight">\(w_i\)</span> are the weights of
+the model, as in <a class="reference internal" href="linearmodels.iv.results.IVGMMResults.j_stat.html#linearmodels.iv.results.IVGMMResults.j_stat" title="linearmodels.iv.results.IVGMMResults.j_stat (Python property) — J-test of overidentifying restrictions"><code class="xref py py-attr docutils literal notranslate"><span class="pre">j_stat</span></code></a>. The statistic and the test of whether
+the covariance is singular do not depend on the units in which the
+variables are measured.</p>
 <p class="rubric">References</p>
 <p>Hall, A. R. (2000). Covariance matrix estimation and the power of the
 overidentifying restrictions test. <em>Econometrica</em>, 68(6), 1517-1528.</p>

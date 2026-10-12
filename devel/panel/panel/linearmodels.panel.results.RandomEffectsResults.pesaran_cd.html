@@ -23,7 +23,7 @@
     
   
       
-        <title>linearmodels.panel.results.RandomEffectsResults.pesaran_cd - linearmodels v7.1 (+158)</title>
+        <title>linearmodels.panel.results.RandomEffectsResults.pesaran_cd - linearmodels v7.1 (+175)</title>
       
     
 
@@ -100,7 +100,7 @@
 
 <header class="md-header md-header--shadow" data-md-component="header">
   <nav class="md-header__inner md-grid" aria-label="Header">
-    <a href="../../index.html" title="linearmodels v7.1 (+158)" class="md-header__button md-logo" aria-label="linearmodels v7.1 (+158)" data-md-component="logo">
+    <a href="../../index.html" title="linearmodels v7.1 (+175)" class="md-header__button md-logo" aria-label="linearmodels v7.1 (+175)" data-md-component="logo">
       <img src="../../_static/bw-logo.svg" alt="logo">
     </a>
     <label class="md-header__button md-icon" for="__drawer">
@@ -111,7 +111,7 @@
       <div class="md-header__ellipsis">
         <div class="md-header__topic">
           <span class="md-ellipsis">
-            linearmodels v7.1 (+158)
+            linearmodels v7.1 (+175)
           </span>
         </div>
         <div class="md-header__topic" data-md-component="header-topic">
@@ -206,10 +206,10 @@
 
 <nav class="md-nav md-nav--primary" aria-label="Navigation" data-md-level="0">
   <label class="md-nav__title" for="__drawer">
-    <a href="../../index.html" title="linearmodels v7.1 (+158)" class="md-nav__button md-logo" aria-label="linearmodels v7.1 (+158)" data-md-component="logo">
+    <a href="../../index.html" title="linearmodels v7.1 (+175)" class="md-nav__button md-logo" aria-label="linearmodels v7.1 (+175)" data-md-component="logo">
       <img src="../../_static/bw-logo.svg" alt="logo">
     </a>
-    linearmodels v7.1 (+158)
+    linearmodels v7.1 (+175)
   </label>
   
     <div class="md-nav__source">
@@ -724,6 +724,30 @@
   
   
     <li class="md-nav__item">
+      <a href="linearmodels.panel.results.RandomEffectsResults.hausman.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    <span title="/panel/panel/linearmodels.panel.results.randomeffectsresults.hausman.rst (reference label)"><span>linearmodels.<wbr>panel.<wbr>results.<wbr>Random<wbr>Effects<wbr>Results.<wbr>hausman</span></span>
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+  
+    <li class="md-nav__item">
       <a href="linearmodels.panel.results.RandomEffectsResults.predict.html" class="md-nav__link">
         
   
@@ -754,30 +778,6 @@
   
   <span class="md-ellipsis">
     <span title="/panel/panel/linearmodels.panel.results.randomeffectsresults.wald_test.rst (reference label)"><span>linearmodels.<wbr>panel.<wbr>results.<wbr>Random<wbr>Effects<wbr>Results.<wbr>wald_<wbr>test</span></span>
-    
-  </span>
-  
-
-      </a>
-    </li>
-  
-
-              
-            
-              
-                
-  
-  
-  
-  
-  
-    <li class="md-nav__item">
-      <a href="linearmodels.panel.results.RandomEffectsResults.wu_hausman.html" class="md-nav__link">
-        
-  
-  
-  <span class="md-ellipsis">
-    <span title="/panel/panel/linearmodels.panel.results.randomeffectsresults.wu_hausman.rst (reference label)"><span>linearmodels.<wbr>panel.<wbr>results.<wbr>Random<wbr>Effects<wbr>Results.<wbr>wu_<wbr>hausman</span></span>
     
   </span>
   
@@ -1709,6 +1709,30 @@
   
   
     <li class="md-nav__item">
+      <a href="linearmodels.panel.results.HausmanTestResults.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    <span title="/panel/panel/linearmodels.panel.results.hausmantestresults.rst (reference label)"><span>linearmodels.<wbr>panel.<wbr>results.<wbr>Hausman<wbr>Test<wbr>Results</span></span>
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+  
+    <li class="md-nav__item">
       <a href="linearmodels.panel.results.PanelModelComparison.html" class="md-nav__link">
         
   
@@ -2188,27 +2212,76 @@
 <dd><p>Pesaran CD test of residual cross-sectional dependence.</p>
 <dl class="field-list simple">
 <dt class="field-odd" id="linearmodels.panel.results.RandomEffectsResults.pesaran_cd-returns">Returns<span class="colon">:</span><a class="headerlink" href="#linearmodels.panel.results.RandomEffectsResults.pesaran_cd-returns" title="Permalink to this headline">¶</a></dt>
-<dd class="field-odd"><p>Statistic value, distribution and p-value.</p>
+<dd class="field-odd"><p>Statistic value, distribution and p-value. If the test is not
+valid for the model, an InapplicableTestStatistic that explains
+why in its reason.</p>
 </dd>
 <dt class="field-even" id="linearmodels.panel.results.RandomEffectsResults.pesaran_cd-return-type">Return type<span class="colon">:</span><a class="headerlink" href="#linearmodels.panel.results.RandomEffectsResults.pesaran_cd-return-type" title="Permalink to this headline">¶</a></dt>
-<dd class="field-even"><p><a class="reference internal" href="../../utility/linearmodels.shared.hypotheses.NormalTestStatistic.html#linearmodels.shared.hypotheses.NormalTestStatistic" title="linearmodels.shared.hypotheses.NormalTestStatistic (Python class) — Test statistic holder for tests with an asymptotic standard normal law."><code class="xref py py-class docutils literal notranslate"><span class="pre">linearmodels.shared.hypotheses.NormalTestStatistic</span></code></a></p>
+<dd class="field-even"><p><a class="reference internal" href="../../utility/linearmodels.shared.hypotheses.NormalTestStatistic.html#linearmodels.shared.hypotheses.NormalTestStatistic" title="linearmodels.shared.hypotheses.NormalTestStatistic (Python class) — Test statistic holder for tests with an asymptotic standard normal law."><code class="xref py py-class docutils literal notranslate"><span class="pre">linearmodels.shared.hypotheses.NormalTestStatistic</span></code></a> or <code class="xref py py-class docutils literal notranslate"><span class="pre">InapplicableTestStatistic</span></code></p>
 </dd>
 </dl>
 <p class="rubric">Notes</p>
 <p>Tests the null hypothesis that the model’s idiosyncratic shocks are
-cross-sectionally independent. Let <span class="math notranslate nohighlight">\(\hat{\rho}_{ij}\)</span> denote the
-sample correlation of the estimated idiosyncratic shocks for entities
-<span class="math notranslate nohighlight">\(i\)</span> and <span class="math notranslate nohighlight">\(j\)</span>, computed using their common time observations,
-and let <span class="math notranslate nohighlight">\(T_{ij}\)</span> denote the number of overlapping observations.
-The statistic is</p>
+cross-sectionally independent <a class="footnote-reference brackets" href="#id3" id="id1" role="doc-noteref"><span class="fn-bracket">[</span>1<span class="fn-bracket">]</span></a>. Let <span class="math notranslate nohighlight">\(\hat{\rho}_{ij}\)</span> denote
+the sample correlation of the estimated idiosyncratic shocks for
+entities <span class="math notranslate nohighlight">\(i\)</span> and <span class="math notranslate nohighlight">\(j\)</span>, computed using their common time
+observations, and let <span class="math notranslate nohighlight">\(T_{ij}\)</span> denote the number of overlapping
+observations. The statistic is</p>
 <div class="math notranslate nohighlight">
 \[CD = \frac{1}{\sqrt{M}}\sum_{i&lt;j}\sqrt{T_{ij}}\hat{\rho}_{ij},\]</div>
 <p>where <span class="math notranslate nohighlight">\(M\)</span> is the number of entity pairs with at least two
 overlapping observations and finite pairwise correlation estimates.
 Under the null, the statistic is asymptotically standard normal.</p>
+<p>The shocks are the model’s <code class="docutils literal notranslate"><span class="pre">idiosyncratic</span></code> values, so the weights of
+a weighted model are not applied to them, and the shocks of
+<code class="docutils literal notranslate"><span class="pre">FirstDifferenceOLS</span></code> are in levels rather than the residuals of the
+differenced equation. Since the correlations are computed over time,
+the test assumes that the shocks are not serially correlated, and it
+over-rejects if they are persistent.</p>
+<p>The test is not valid for every model and an InapplicableTestStatistic
+is returned for the following.</p>
+<ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">BetweenOLS</span></code>. The model is fitted to the entity means, so it has
+no time-varying residuals, and the series implied by its
+coefficients is not the model’s error.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">FamaMacBeth</span></code>. The model’s errors are the residuals of the
+period-by-period cross-sectional regressions. The series implied by
+the averaged coefficients contains the common, time-varying term
+<span class="math notranslate nohighlight">\((\beta_t - \bar{\beta})^{\prime}x_{it}\)</span>, so it is
+cross-sectionally dependent by construction. Fama-MacBeth inference
+is also already robust to cross-sectional dependence.</p></li>
+<li><p>Models with time effects, and models with other effects that
+change over time for some entity and have a group of several
+entities that is missing from some periods, such as period,
+industry-by-period or decade effects. These effects demean the
+residuals across entities that are observed in the same periods,
+which makes the residuals negatively correlated across entities
+and biases the statistic downwards. For example, when the model
+has time effects and the errors are independent, the statistic is
+centered at about <span class="math notranslate nohighlight">\(-\sqrt{T/2}\)</span> and its standard deviation
+is far below 1, so it is not standard normal <a class="footnote-reference brackets" href="#id4" id="id2" role="doc-noteref"><span class="fn-bracket">[</span>2<span class="fn-bracket">]</span></a>. Other effects
+that do not change over time for an entity, or that are present
+in every period, are not affected.</p></li>
+</ul>
+<p>The statistic is computed from dense N by N matrices of pairwise
+correlations and numbers of overlapping observations, where N is the
+number of entities. Computing them takes about 450 MB of memory when
+N is 4,000, and the memory use is proportional to the square of N.</p>
 <p class="rubric">References</p>
-<p>Pesaran, M. H. (2021). General diagnostic tests for cross-sectional
-dependence in panels. Empirical Economics, 60(1), 13-50.</p>
+<aside class="footnote-list brackets">
+<aside class="footnote brackets" id="id3" role="doc-footnote">
+<span class="label"><span class="fn-bracket">[</span><a role="doc-backlink" href="#id1">1</a><span class="fn-bracket">]</span></span>
+<p>Pesaran, M. H. (2021). General diagnostic tests for
+cross-sectional dependence in panels. Empirical Economics, 60(1),
+13-50.</p>
+</aside>
+<aside class="footnote brackets" id="id4" role="doc-footnote">
+<span class="label"><span class="fn-bracket">[</span><a role="doc-backlink" href="#id2">2</a><span class="fn-bracket">]</span></span>
+<p>Juodis, A. and Reese, S. (2022). The incidental parameters
+problem in testing for remaining cross-section correlation.
+Journal of Business &amp; Economic Statistics, 40(3), 1191-1203.</p>
+</aside>
+</aside>
 </dd></dl>
 
 

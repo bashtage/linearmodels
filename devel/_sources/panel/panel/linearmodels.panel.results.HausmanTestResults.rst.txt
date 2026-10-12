@@ -1,0 +1,32 @@
+﻿linearmodels.panel.results.HausmanTestResults
+=============================================
+
+.. currentmodule:: linearmodels.panel.results
+
+.. autoclass:: HausmanTestResults
+   :exclude-members: count,index,
+
+   
+   
+   .. rubric:: Methods
+
+   .. autosummary::
+      :toctree:
+
+      ~HausmanTestResults.count
+      ~HausmanTestResults.index
+   
+   
+   
+   
+   
+   .. rubric:: Properties
+
+   .. autosummary::
+      :toctree:
+
+      ~HausmanTestResults.estimates
+      ~HausmanTestResults.statistic
+   
+   
+   

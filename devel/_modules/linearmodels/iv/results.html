@@ -19,7 +19,7 @@
     
   
       
-        <title>linearmodels.iv.results - linearmodels v7.1 (+158)</title>
+        <title>linearmodels.iv.results - linearmodels v7.1 (+175)</title>
       
     
 
@@ -91,7 +91,7 @@
 
 <header class="md-header md-header--shadow" data-md-component="header">
   <nav class="md-header__inner md-grid" aria-label="Header">
-    <a href="../../../index.html" title="linearmodels v7.1 (+158)" class="md-header__button md-logo" aria-label="linearmodels v7.1 (+158)" data-md-component="logo">
+    <a href="../../../index.html" title="linearmodels v7.1 (+175)" class="md-header__button md-logo" aria-label="linearmodels v7.1 (+175)" data-md-component="logo">
       <img src="../../../_static/bw-logo.svg" alt="logo">
     </a>
     <label class="md-header__button md-icon" for="__drawer">
@@ -102,7 +102,7 @@
       <div class="md-header__ellipsis">
         <div class="md-header__topic">
           <span class="md-ellipsis">
-            linearmodels v7.1 (+158)
+            linearmodels v7.1 (+175)
           </span>
         </div>
         <div class="md-header__topic" data-md-component="header-topic">
@@ -197,10 +197,10 @@
 
 <nav class="md-nav md-nav--primary" aria-label="Navigation" data-md-level="0">
   <label class="md-nav__title" for="__drawer">
-    <a href="../../../index.html" title="linearmodels v7.1 (+158)" class="md-nav__button md-logo" aria-label="linearmodels v7.1 (+158)" data-md-component="logo">
+    <a href="../../../index.html" title="linearmodels v7.1 (+175)" class="md-nav__button md-logo" aria-label="linearmodels v7.1 (+175)" data-md-component="logo">
       <img src="../../../_static/bw-logo.svg" alt="logo">
     </a>
-    linearmodels v7.1 (+158)
+    linearmodels v7.1 (+175)
   </label>
   
     <div class="md-nav__source">
@@ -1260,6 +1260,13 @@
 <span class="sd">        It equals ``ninstr`` times the classical F-statistic when there is</span>
 <span class="sd">        one endogenous regressor. See :func:`linearmodels.iv.common.cragg_donald`</span>
 <span class="sd">        for the definition.</span>
+
+<span class="sd">        In a weighted model the statistic is computed from the data multiplied</span>
+<span class="sd">        by the square root of the weights of the model, which are scaled to</span>
+<span class="sd">        have mean 1. It does not depend on the scale of the weights. It does not</span>
+<span class="sd">        use a covariance estimator, and so it does not depend on the clusters</span>
+<span class="sd">        or the kernel of the model, and is the same for every covariance</span>
+<span class="sd">        estimator.</span>
 <span class="sd">        """</span>
         <span class="k">return</span> <span class="n">cragg_donald</span><span class="p">(</span><span class="o">*</span><span class="bp">self</span><span class="o">.</span><span class="n">_weighted_arrays</span><span class="p">())</span></div>
 
@@ -1290,17 +1297,25 @@
 <span class="sd">        This is the statistic that Stock and Yogo (2005) tabulate critical</span>
 <span class="sd">        values for, and Stata's ``ivreg2`` reports it as the "Cragg-Donald</span>
 <span class="sd">        Wald F statistic". See :func:`linearmodels.iv.common.cragg_donald_f`.</span>
+
+<span class="sd">        The weights are used as for :attr:`cragg_donald`, and the statistic</span>
+<span class="sd">        does not depend on the scale of the weights or on the clusters of the</span>
+<span class="sd">        model.</span>
 <span class="sd">        """</span>
         <span class="k">return</span> <span class="n">cragg_donald_f</span><span class="p">(</span><span class="o">*</span><span class="bp">self</span><span class="o">.</span><span class="n">_weighted_arrays</span><span class="p">())</span></div>
 
 
     <span class="nd">@cached_property</span>
-    <span class="k">def</span><span class="w"> </span><span class="nf">_kleibergen_paap</span><span class="p">(</span>
-        <span class="bp">self</span><span class="p">,</span>
-    <span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">tuple</span><span class="p">[</span><span class="n">WaldTestStatistic</span> <span class="o">|</span> <span class="n">InvalidTestStatistic</span><span class="p">,</span> <span class="nb">float</span><span class="p">]:</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">_rk_lm</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">WaldTestStatistic</span> <span class="o">|</span> <span class="n">InvalidTestStatistic</span><span class="p">:</span>
+        <span class="k">return</span> <span class="n">_kleibergen_paap</span><span class="p">(</span>
+            <span class="o">*</span><span class="bp">self</span><span class="o">.</span><span class="n">_weighted_arrays</span><span class="p">(),</span> <span class="bp">self</span><span class="o">.</span><span class="n">_cov_type</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_cov_config</span><span class="p">,</span> <span class="n">wald</span><span class="o">=</span><span class="kc">False</span>
+        <span class="p">)[</span><span class="mi">0</span><span class="p">]</span>
+
+    <span class="nd">@cached_property</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">_rk_wald_f</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">float</span><span class="p">:</span>
         <span class="k">return</span> <span class="n">_kleibergen_paap</span><span class="p">(</span>
             <span class="o">*</span><span class="bp">self</span><span class="o">.</span><span class="n">_weighted_arrays</span><span class="p">(),</span> <span class="bp">self</span><span class="o">.</span><span class="n">_cov_type</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_cov_config</span>
-        <span class="p">)</span>
+        <span class="p">)[</span><span class="mi">1</span><span class="p">]</span>
 
     <span class="nd">@property</span>
     <span class="k">def</span><span class="w"> </span><span class="nf">kleibergen_paap</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">WaldTestStatistic</span> <span class="o">|</span> <span class="n">InvalidTestStatistic</span><span class="p">:</span>
@@ -1344,8 +1359,17 @@
 <span class="sd">        corresponds to the "Kleibergen-Paap rk LM statistic" reported by</span>
 <span class="sd">        Stata's ``ivreg2``. See :func:`linearmodels.iv.common.kleibergen_paap`</span>
 <span class="sd">        for the definition and for conventions that differ from Stata.</span>
+
+<span class="sd">        In a weighted model the scores are those of the weighted first-stage</span>
+<span class="sd">        regressions, and the statistic does not depend on the scale of the</span>
+<span class="sd">        weights. A clustered covariance estimator uses the ``clusters`` that</span>
+<span class="sd">        were passed to ``fit``. There must be at least ``ninstr - nendog + 1``</span>
+<span class="sd">        clusters, or ``ninstr - nendog + 2`` for :attr:`kleibergen_paap_f`, and</span>
+<span class="sd">        a warning is issued if there are fewer. A kernel covariance estimator</span>
+<span class="sd">        uses the kernel and the bandwidth of the model, including a bandwidth</span>
+<span class="sd">        that the model selected.</span>
 <span class="sd">        """</span>
-        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_kleibergen_paap</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_rk_lm</span>
 
     <span class="nd">@property</span>
     <span class="k">def</span><span class="w"> </span><span class="nf">kleibergen_paap_f</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">float</span><span class="p">:</span>
@@ -1375,8 +1399,13 @@
 <span class="sd">        is the Cragg-Donald F statistic. Stata's ``ivreg2`` reports it as the</span>
 <span class="sd">        "Kleibergen-Paap rk Wald F statistic". See</span>
 <span class="sd">        :func:`linearmodels.iv.common.kleibergen_paap_f` for the definition.</span>
+
+<span class="sd">        The weights, clusters and kernel are used as for</span>
+<span class="sd">        :attr:`kleibergen_paap`. With a clustered covariance estimator there</span>
+<span class="sd">        must be at least ``ninstr - nendog + 2`` clusters, and a warning is</span>
+<span class="sd">        issued if there are fewer.</span>
 <span class="sd">        """</span>
-        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_kleibergen_paap</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_rk_wald_f</span>
 
 <div class="viewcode-block" id="FirstStageResults.diagnostics">
 <a class="viewcode-back" href="../../../iv/iv/linearmodels.iv.results.FirstStageResults.diagnostics.html#linearmodels.iv.absorbing.FirstStageResults.diagnostics">[docs]</a>
@@ -2231,7 +2260,7 @@
 
 <span class="sd">        Returns</span>
 <span class="sd">        -------</span>
-<span class="sd">        WaldTestStatistic</span>
+<span class="sd">        WaldTestStatistic or InvalidTestStatistic</span>
 <span class="sd">            J statistic test of overidentifying restrictions that uses a</span>
 <span class="sd">            covariance of the moment conditions that has been centered.</span>
 <span class="sd">            An InvalidTestStatistic is returned if that covariance is</span>
@@ -2281,6 +2310,12 @@
 <span class="sd">        the estimation at which the weight matrix is evaluated.</span>
 <span class="sd">        It also has no effect in :class:`~linearmodels.iv.model.IVGMMCUE`</span>
 <span class="sd">        models unless ``center=False`` was set.</span>
+
+<span class="sd">        In a weighted model the moment conditions are</span>
+<span class="sd">        :math:`w_i z_i \hat{\epsilon}_i`, where :math:`w_i` are the weights of</span>
+<span class="sd">        the model, as in :attr:`j_stat`. The statistic and the test of whether</span>
+<span class="sd">        the covariance is singular do not depend on the units in which the</span>
+<span class="sd">        variables are measured.</span>
 
 <span class="sd">        References</span>
 <span class="sd">        ----------</span>

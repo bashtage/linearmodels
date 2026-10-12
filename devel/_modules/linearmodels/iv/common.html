@@ -19,7 +19,7 @@
     
   
       
-        <title>linearmodels.iv.common - linearmodels v7.1 (+158)</title>
+        <title>linearmodels.iv.common - linearmodels v7.1 (+175)</title>
       
     
 
@@ -91,7 +91,7 @@
 
 <header class="md-header md-header--shadow" data-md-component="header">
   <nav class="md-header__inner md-grid" aria-label="Header">
-    <a href="../../../index.html" title="linearmodels v7.1 (+158)" class="md-header__button md-logo" aria-label="linearmodels v7.1 (+158)" data-md-component="logo">
+    <a href="../../../index.html" title="linearmodels v7.1 (+175)" class="md-header__button md-logo" aria-label="linearmodels v7.1 (+175)" data-md-component="logo">
       <img src="../../../_static/bw-logo.svg" alt="logo">
     </a>
     <label class="md-header__button md-icon" for="__drawer">
@@ -102,7 +102,7 @@
       <div class="md-header__ellipsis">
         <div class="md-header__topic">
           <span class="md-ellipsis">
-            linearmodels v7.1 (+158)
+            linearmodels v7.1 (+175)
           </span>
         </div>
         <div class="md-header__topic" data-md-component="header-topic">
@@ -197,10 +197,10 @@
 
 <nav class="md-nav md-nav--primary" aria-label="Navigation" data-md-level="0">
   <label class="md-nav__title" for="__drawer">
-    <a href="../../../index.html" title="linearmodels v7.1 (+158)" class="md-nav__button md-logo" aria-label="linearmodels v7.1 (+158)" data-md-component="logo">
+    <a href="../../../index.html" title="linearmodels v7.1 (+175)" class="md-nav__button md-logo" aria-label="linearmodels v7.1 (+175)" data-md-component="logo">
       <img src="../../../_static/bw-logo.svg" alt="logo">
     </a>
-    linearmodels v7.1 (+158)
+    linearmodels v7.1 (+175)
   </label>
   
     <div class="md-nav__source">
@@ -727,7 +727,7 @@
 <span class="sd">    :math:`\chi^2` approximation is poor, and 2SLS can be badly biased and</span>
 <span class="sd">    its tests badly sized even when the null is rejected.</span>
 
-<span class="sd">    The p-value is asymptotic. Stock-Yogo (2005) critical values for weak</span>
+<span class="sd">    The p-value is asymptotic. Stock and Yogo (2005) critical values for weak</span>
 <span class="sd">    instruments apply to the F form under i.i.d. errors and are not</span>
 <span class="sd">    provided here. Choosing whether to use an instrumental variable</span>
 <span class="sd">    estimator based on the outcome of a test like this one distorts the</span>
@@ -745,7 +745,8 @@
 <span class="sd">    Let :math:`X = Z\Pi + V`, where :math:`\Pi` is the :math:`k \times m`</span>
 <span class="sd">    matrix of first-stage coefficients on the excluded instruments, after</span>
 <span class="sd">    the exogenous regressors have been partialled out. The null hypothesis</span>
-<span class="sd">    is :math:`\mathrm{rank}(\Pi) &lt; m`. The statistic is</span>
+<span class="sd">    is :math:`\mathrm{rank}(\Pi) &lt; m`. The statistic is the minimum</span>
+<span class="sd">    eigenvalue statistic of Cragg and Donald (1993),</span>
 
 <span class="sd">    .. math::</span>
 
@@ -756,23 +757,41 @@
 <span class="sd">    instruments, and :math:`c` is the number of exogenous regressors.</span>
 <span class="sd">    :math:`r^2_{\min}/(1 - r^2_{\min})` is the smallest eigenvalue of</span>
 <span class="sd">    :math:`(X'M_ZX)^{-1}X'P_ZX`. The statistic is asymptotically</span>
-<span class="sd">    :math:`\chi^2_{k-m+1}` under the null.</span>
+<span class="sd">    :math:`\chi^2_{k-m+1}` under the null. Anderson (1951) derived a test of</span>
+<span class="sd">    the rank that is a function of the canonical correlations.</span>
 
 <span class="sd">    The statistic is **not** the first-stage F-statistic. It equals :math:`k`</span>
 <span class="sd">    times the classical F-statistic when there is a single endogenous</span>
 <span class="sd">    regressor. The F form, ``CD / k``, is reported by :func:`cragg_donald_f`.</span>
 
+<span class="sd">    **Weights.** In a weighted model, each of the arrays has to be multiplied</span>
+<span class="sd">    by the square root of the observation weights, including the constant</span>
+<span class="sd">    column of ``exog``. The constant is then a column of the square roots of</span>
+<span class="sd">    the weights and not a column of ones, since the first-stage regressions</span>
+<span class="sd">    are weighted. The sample size :math:`n` is the number of rows, and not the</span>
+<span class="sd">    sum of the weights. The statistic does not change if all of the weights are</span>
+<span class="sd">    multiplied by the same constant. The results of the IV models do this</span>
+<span class="sd">    using weights that have been scaled to have mean 1.</span>
+
+<span class="sd">    **Clusters.** The statistic does not use a covariance estimator, and so</span>
+<span class="sd">    does not depend on clusters. It is the same for a model that is estimated</span>
+<span class="sd">    with a clustered, kernel or robust covariance estimator as it is for one</span>
+<span class="sd">    with an unadjusted covariance estimator. See :func:`kleibergen_paap` for a</span>
+<span class="sd">    statistic that does.</span>
+
 <span class="sd">    References</span>
 <span class="sd">    ----------</span>
-<span class="sd">    .. [1] Cragg, J. G., &amp; Donald, S. G. (1993). Testing identifiability</span>
-<span class="sd">       and specification in instrumental variable models. Econometric</span>
-<span class="sd">       Theory, 9(2), 222-240.</span>
-<span class="sd">    .. [2] Anderson, T. W. (1951). Estimating linear restrictions on</span>
-<span class="sd">       regression coefficients for multivariate normal distributions.</span>
-<span class="sd">       Annals of Mathematical Statistics, 22(3), 327-351.</span>
-<span class="sd">    .. [3] Stock, J. H., &amp; Yogo, M. (2005). Testing for weak instruments in</span>
-<span class="sd">       linear IV regression. In Identification and Inference for Econometric</span>
-<span class="sd">       Models. Cambridge University Press.</span>
+<span class="sd">    Cragg, J. G., &amp; Donald, S. G. (1993). Testing identifiability and</span>
+<span class="sd">    specification in instrumental variable models. *Econometric Theory*, 9(2),</span>
+<span class="sd">    222-240.</span>
+
+<span class="sd">    Anderson, T. W. (1951). Estimating linear restrictions on regression</span>
+<span class="sd">    coefficients for multivariate normal distributions. *Annals of</span>
+<span class="sd">    Mathematical Statistics*, 22(3), 327-351.</span>
+
+<span class="sd">    Stock, J. H., &amp; Yogo, M. (2005). Testing for weak instruments in linear IV</span>
+<span class="sd">    regression. In *Identification and Inference for Econometric Models*.</span>
+<span class="sd">    Cambridge University Press.</span>
 <span class="sd">    """</span>
     <span class="n">name</span> <span class="o">=</span> <span class="s2">"Cragg-Donald Test"</span>
     <span class="n">dec</span> <span class="o">=</span> <span class="n">_first_stage_rank</span><span class="p">(</span><span class="n">endog</span><span class="p">,</span> <span class="n">instr</span><span class="p">,</span> <span class="n">exog</span><span class="p">,</span> <span class="n">name</span><span class="p">)</span>
@@ -832,11 +851,16 @@
 <span class="sd">    critical values for. It is reported by Stata's ``ivreg2`` as the</span>
 <span class="sd">    "Cragg-Donald Wald F statistic".</span>
 
+<span class="sd">    The weights are used as in :func:`cragg_donald`. Each array, including the</span>
+<span class="sd">    constant of ``exog``, is multiplied by the square root of the weights in a</span>
+<span class="sd">    weighted model, and the statistic does not depend on the scale of the</span>
+<span class="sd">    weights or on clusters.</span>
+
 <span class="sd">    References</span>
 <span class="sd">    ----------</span>
-<span class="sd">    .. [1] Stock, J. H., &amp; Yogo, M. (2005). Testing for weak instruments in</span>
-<span class="sd">       linear IV regression. In Identification and Inference for Econometric</span>
-<span class="sd">       Models. Cambridge University Press.</span>
+<span class="sd">    Stock, J. H., &amp; Yogo, M. (2005). Testing for weak instruments in linear IV</span>
+<span class="sd">    regression. In *Identification and Inference for Econometric Models*.</span>
+<span class="sd">    Cambridge University Press.</span>
 <span class="sd">    """</span>
     <span class="n">test</span> <span class="o">=</span> <span class="n">cragg_donald</span><span class="p">(</span><span class="n">endog</span><span class="p">,</span> <span class="n">instr</span><span class="p">,</span> <span class="n">exog</span><span class="p">)</span>
     <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">test</span><span class="p">,</span> <span class="n">InvalidTestStatistic</span><span class="p">):</span>
@@ -933,8 +957,17 @@
     <span class="n">exog</span><span class="p">:</span> <span class="n">linearmodels</span><span class="o">.</span><span class="n">typing</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">Float64Array</span><span class="p">,</span>
     <span class="n">cov_type</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
     <span class="n">cov_config</span><span class="p">:</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]</span> <span class="o">|</span> <span class="kc">None</span><span class="p">,</span>
+    <span class="o">*</span><span class="p">,</span>
+    <span class="n">wald</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">tuple</span><span class="p">[</span><span class="n">WaldTestStatistic</span> <span class="o">|</span> <span class="n">InvalidTestStatistic</span><span class="p">,</span> <span class="nb">float</span><span class="p">]:</span>
-<span class="w">    </span><span class="sd">"""Compute the rk LM test and the rk Wald F-statistic"""</span>
+<span class="w">    </span><span class="sd">"""</span>
+<span class="sd">    Compute the rk LM test and the rk Wald F-statistic</span>
+
+<span class="sd">    The F-statistic is NaN if wald is False. The covariance of the scores of</span>
+<span class="sd">    the Wald statistic is not computed in that case. Its rank can be less than</span>
+<span class="sd">    the rank of the covariance of the LM statistic, and so it can warn when</span>
+<span class="sd">    the LM statistic is well-defined.</span>
+<span class="sd">    """</span>
     <span class="n">name</span> <span class="o">=</span> <span class="s2">"Kleibergen-Paap rk LM Test"</span>
     <span class="n">family</span> <span class="o">=</span> <span class="n">_cov_family</span><span class="p">(</span><span class="n">cov_type</span><span class="p">)</span>
     <span class="n">config</span> <span class="o">=</span> <span class="p">{}</span> <span class="k">if</span> <span class="n">cov_config</span> <span class="ow">is</span> <span class="kc">None</span> <span class="k">else</span> <span class="nb">dict</span><span class="p">(</span><span class="n">cov_config</span><span class="p">)</span>
@@ -973,17 +1006,19 @@
         <span class="k">return</span> <span class="n">singular</span><span class="p">,</span> <span class="n">nan</span>
     <span class="n">lm_chi2</span><span class="p">,</span> <span class="n">lm_df</span> <span class="o">=</span> <span class="n">lm_result</span>
     <span class="n">lm_test</span> <span class="o">=</span> <span class="n">WaldTestStatistic</span><span class="p">(</span><span class="n">lm_chi2</span><span class="p">,</span> <span class="n">_RANK_NULL</span><span class="p">,</span> <span class="n">lm_df</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="n">name</span><span class="p">)</span>
-
-    <span class="c1"># The Wald version uses the first-stage residuals to form the scores</span>
-    <span class="n">residuals</span> <span class="o">=</span> <span class="n">dec</span><span class="o">.</span><span class="n">x</span> <span class="o">-</span> <span class="n">dec</span><span class="o">.</span><span class="n">z</span> <span class="o">@</span> <span class="n">dec</span><span class="o">.</span><span class="n">pihat</span>
-    <span class="n">wald_result</span> <span class="o">=</span> <span class="n">_rk_chi2</span><span class="p">(</span><span class="n">dec</span><span class="p">,</span> <span class="n">residuals</span><span class="p">,</span> <span class="n">family</span><span class="p">,</span> <span class="n">config</span><span class="p">)</span>
-    <span class="n">dof</span> <span class="o">=</span> <span class="n">dec</span><span class="o">.</span><span class="n">nobs</span> <span class="o">-</span> <span class="n">dec</span><span class="o">.</span><span class="n">ninstr</span> <span class="o">-</span> <span class="n">dec</span><span class="o">.</span><span class="n">nexog</span>
-    <span class="k">if</span> <span class="n">family</span> <span class="o">==</span> <span class="s2">"clustered"</span><span class="p">:</span>
-        <span class="n">nclusters</span> <span class="o">=</span> <span class="n">unique</span><span class="p">(</span><span class="n">config</span><span class="p">[</span><span class="s2">"clusters"</span><span class="p">])</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
-        <span class="n">scale</span> <span class="o">=</span> <span class="n">dof</span> <span class="o">*</span> <span class="p">(</span><span class="n">nclusters</span> <span class="o">-</span> <span class="mi">1</span><span class="p">)</span> <span class="o">/</span> <span class="n">nclusters</span> <span class="o">/</span> <span class="p">(</span><span class="n">dec</span><span class="o">.</span><span class="n">nobs</span> <span class="o">-</span> <span class="mi">1</span><span class="p">)</span>
-    <span class="k">else</span><span class="p">:</span>
-        <span class="n">scale</span> <span class="o">=</span> <span class="n">dof</span> <span class="o">/</span> <span class="n">dec</span><span class="o">.</span><span class="n">nobs</span>
-    <span class="n">f</span> <span class="o">=</span> <span class="n">nan</span> <span class="k">if</span> <span class="n">wald_result</span> <span class="ow">is</span> <span class="kc">None</span> <span class="k">else</span> <span class="n">wald_result</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">*</span> <span class="n">scale</span> <span class="o">/</span> <span class="n">dec</span><span class="o">.</span><span class="n">ninstr</span>
+    <span class="n">f</span> <span class="o">=</span> <span class="n">nan</span>
+    <span class="k">if</span> <span class="n">wald</span><span class="p">:</span>
+        <span class="c1"># The Wald version uses the first-stage residuals to form the scores</span>
+        <span class="n">residuals</span> <span class="o">=</span> <span class="n">dec</span><span class="o">.</span><span class="n">x</span> <span class="o">-</span> <span class="n">dec</span><span class="o">.</span><span class="n">z</span> <span class="o">@</span> <span class="n">dec</span><span class="o">.</span><span class="n">pihat</span>
+        <span class="n">wald_result</span> <span class="o">=</span> <span class="n">_rk_chi2</span><span class="p">(</span><span class="n">dec</span><span class="p">,</span> <span class="n">residuals</span><span class="p">,</span> <span class="n">family</span><span class="p">,</span> <span class="n">config</span><span class="p">)</span>
+        <span class="n">dof</span> <span class="o">=</span> <span class="n">dec</span><span class="o">.</span><span class="n">nobs</span> <span class="o">-</span> <span class="n">dec</span><span class="o">.</span><span class="n">ninstr</span> <span class="o">-</span> <span class="n">dec</span><span class="o">.</span><span class="n">nexog</span>
+        <span class="k">if</span> <span class="n">family</span> <span class="o">==</span> <span class="s2">"clustered"</span><span class="p">:</span>
+            <span class="n">nclusters</span> <span class="o">=</span> <span class="n">unique</span><span class="p">(</span><span class="n">config</span><span class="p">[</span><span class="s2">"clusters"</span><span class="p">])</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+            <span class="n">scale</span> <span class="o">=</span> <span class="n">dof</span> <span class="o">*</span> <span class="p">(</span><span class="n">nclusters</span> <span class="o">-</span> <span class="mi">1</span><span class="p">)</span> <span class="o">/</span> <span class="n">nclusters</span> <span class="o">/</span> <span class="p">(</span><span class="n">dec</span><span class="o">.</span><span class="n">nobs</span> <span class="o">-</span> <span class="mi">1</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">scale</span> <span class="o">=</span> <span class="n">dof</span> <span class="o">/</span> <span class="n">dec</span><span class="o">.</span><span class="n">nobs</span>
+        <span class="k">if</span> <span class="n">wald_result</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">f</span> <span class="o">=</span> <span class="n">wald_result</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">*</span> <span class="n">scale</span> <span class="o">/</span> <span class="n">dec</span><span class="o">.</span><span class="n">ninstr</span>
     <span class="k">return</span> <span class="n">lm_test</span><span class="p">,</span> <span class="n">f</span>
 
 
@@ -1034,7 +1069,8 @@
 <span class="sd">    ------</span>
 <span class="sd">    ValueError</span>
 <span class="sd">        If ``cov_type`` is not supported, or is "clustered" and</span>
-<span class="sd">        ``cov_config`` does not contain ``clusters``.</span>
+<span class="sd">        ``cov_config`` does not contain ``clusters`` or ``clusters`` does not</span>
+<span class="sd">        have an element for each row of the arrays.</span>
 
 <span class="sd">    Warnings</span>
 <span class="sd">    --------</span>
@@ -1048,14 +1084,15 @@
 <span class="sd">    instruments and first-stage errors are clustered or persistent.</span>
 
 <span class="sd">    The covariance has dimension :math:`km \times km` and is poorly estimated</span>
-<span class="sd">    unless :math:`n` is large relative to :math:`km`. With clustering it needs</span>
-<span class="sd">    many clusters, and with few clusters the test can be very conservative.</span>
-<span class="sd">    A kernel bandwidth that is too short for the dependence does not remove</span>
-<span class="sd">    the over-rejection. If there are too few clusters or observations the</span>
-<span class="sd">    covariance is rank deficient. A warning is issued, a generalized inverse</span>
-<span class="sd">    is used and the degrees of freedom are reduced, but the result should not</span>
-<span class="sd">    be relied on. The chi-square approximation is also less reliable with</span>
-<span class="sd">    many instruments.</span>
+<span class="sd">    unless :math:`n` is large relative to :math:`km`. It is formed as a dense</span>
+<span class="sd">    matrix, and so the memory that is needed grows with :math:`(km)^2`. With</span>
+<span class="sd">    clustering it needs many clusters, and with few clusters the test can be</span>
+<span class="sd">    very conservative. A kernel bandwidth that is too short for the dependence</span>
+<span class="sd">    does not remove the over-rejection. If there are too few clusters or</span>
+<span class="sd">    observations the covariance is rank deficient. A warning is issued, a</span>
+<span class="sd">    generalized inverse is used and the degrees of freedom are reduced, but</span>
+<span class="sd">    the result should not be relied on. The chi-square approximation is also</span>
+<span class="sd">    less reliable with many instruments.</span>
 
 <span class="sd">    The null is that the model is underidentified. Rejecting it does not</span>
 <span class="sd">    show that the instruments are strong, so this is not a test for weak</span>
@@ -1110,16 +1147,33 @@
 <span class="sd">    :math:`1 - j/(b+1)`, so a Stata bandwidth of :math:`b+1` corresponds to a</span>
 <span class="sd">    ``bandwidth`` of :math:`b`.</span>
 
+<span class="sd">    **Weights.** In a weighted model, each of the arrays has to be multiplied</span>
+<span class="sd">    by the square root of the observation weights, including the constant</span>
+<span class="sd">    column of ``exog``, as for :func:`cragg_donald`. The scores are then those</span>
+<span class="sd">    of the weighted first-stage regressions, and the covariance estimator is</span>
+<span class="sd">    applied to them. The statistic does not change if all of the weights are</span>
+<span class="sd">    multiplied by the same constant.</span>
+
+<span class="sd">    **Clusters.** With "clustered", the scores are summed within the clusters</span>
+<span class="sd">    in ``cov_config["clusters"]``. ``clusters`` has one element for each row</span>
+<span class="sd">    of the arrays, in the order of the rows. It is a 1-d array, or a 2-d array</span>
+<span class="sd">    with a single column. Two-way clustering is not supported. The LM</span>
+<span class="sd">    statistic is a quadratic form in a covariance with :math:`k-m+1` rows,</span>
+<span class="sd">    whose rank is at most the number of clusters, and so it needs at least</span>
+<span class="sd">    :math:`k-m+1` clusters. The scores of the Wald F statistic of</span>
+<span class="sd">    :func:`kleibergen_paap_f` sum to zero, and so it needs one more cluster.</span>
+<span class="sd">    A warning is issued if there are fewer clusters.</span>
+
 <span class="sd">    References</span>
 <span class="sd">    ----------</span>
-<span class="sd">    .. [1] Kleibergen, F., &amp; Paap, R. (2006). Generalized reduced rank tests</span>
-<span class="sd">       using the singular value decomposition. Journal of Econometrics,</span>
-<span class="sd">       133(1), 97-126.</span>
-<span class="sd">    .. [2] Kleibergen, F., &amp; Schaffer, M. E. (2007). ranktest: Stata module</span>
-<span class="sd">       to test the rank of a matrix using the Kleibergen-Paap rk statistic.</span>
-<span class="sd">       Statistical Software Components S456865, Boston College.</span>
+<span class="sd">    Kleibergen, F., &amp; Paap, R. (2006). Generalized reduced rank tests using the</span>
+<span class="sd">    singular value decomposition. *Journal of Econometrics*, 133(1), 97-126.</span>
+
+<span class="sd">    Kleibergen, F., &amp; Schaffer, M. E. (2007). ranktest: Stata module to test</span>
+<span class="sd">    the rank of a matrix using the Kleibergen-Paap rk statistic. *Statistical</span>
+<span class="sd">    Software Components* S456865, Boston College.</span>
 <span class="sd">    """</span>
-    <span class="k">return</span> <span class="n">_kleibergen_paap</span><span class="p">(</span><span class="n">endog</span><span class="p">,</span> <span class="n">instr</span><span class="p">,</span> <span class="n">exog</span><span class="p">,</span> <span class="n">cov_type</span><span class="p">,</span> <span class="n">cov_config</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span></div>
+    <span class="k">return</span> <span class="n">_kleibergen_paap</span><span class="p">(</span><span class="n">endog</span><span class="p">,</span> <span class="n">instr</span><span class="p">,</span> <span class="n">exog</span><span class="p">,</span> <span class="n">cov_type</span><span class="p">,</span> <span class="n">cov_config</span><span class="p">,</span> <span class="n">wald</span><span class="o">=</span><span class="kc">False</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span></div>
 
 
 
@@ -1203,19 +1257,29 @@
 <span class="sd">    where :math:`M` is the number of clusters. With ``cov_type`` equal to</span>
 <span class="sd">    "unadjusted" or "homoskedastic" the statistic is the Cragg-Donald F</span>
 <span class="sd">    statistic from :func:`cragg_donald_f`. These are the definitions used by</span>
-<span class="sd">    Stata's ``ivreg2`` for the "Kleibergen-Paap rk Wald F statistic".</span>
+<span class="sd">    Stata's ``ivreg2`` for the "Kleibergen-Paap rk Wald F statistic" (Baum,</span>
+<span class="sd">    Schaffer and Stillman, 2007).</span>
+
+<span class="sd">    The weights and clusters are used as in :func:`kleibergen_paap`. In a</span>
+<span class="sd">    weighted model, each of the arrays, including the constant of ``exog``, has</span>
+<span class="sd">    to be multiplied by the square root of the weights, and the statistic does</span>
+<span class="sd">    not depend on their scale. The clusters have one element for each row of</span>
+<span class="sd">    the arrays. If there are :math:`m` endogenous regressors, the scores of the</span>
+<span class="sd">    Wald statistic sum to zero, so that at least :math:`k-m+2` clusters are</span>
+<span class="sd">    needed, which is one more than for :func:`kleibergen_paap`. A warning is</span>
+<span class="sd">    issued if there are fewer clusters.</span>
 
 <span class="sd">    References</span>
 <span class="sd">    ----------</span>
-<span class="sd">    .. [1] Kleibergen, F., &amp; Paap, R. (2006). Generalized reduced rank tests</span>
-<span class="sd">       using the singular value decomposition. Journal of Econometrics,</span>
-<span class="sd">       133(1), 97-126.</span>
-<span class="sd">    .. [2] Olea, J. L. M., &amp; Pflueger, C. (2013). A robust test for weak</span>
-<span class="sd">       instruments. Journal of Business &amp; Economic Statistics, 31(3),</span>
-<span class="sd">       358-369.</span>
-<span class="sd">    .. [3] Baum, C. F., Schaffer, M. E., &amp; Stillman, S. (2007). Enhanced</span>
-<span class="sd">       routines for instrumental variables/GMM estimation and testing. Stata</span>
-<span class="sd">       Journal, 7(4), 465-506.</span>
+<span class="sd">    Kleibergen, F., &amp; Paap, R. (2006). Generalized reduced rank tests using the</span>
+<span class="sd">    singular value decomposition. *Journal of Econometrics*, 133(1), 97-126.</span>
+
+<span class="sd">    Olea, J. L. M., &amp; Pflueger, C. (2013). A robust test for weak instruments.</span>
+<span class="sd">    *Journal of Business &amp; Economic Statistics*, 31(3), 358-369.</span>
+
+<span class="sd">    Baum, C. F., Schaffer, M. E., &amp; Stillman, S. (2007). Enhanced routines for</span>
+<span class="sd">    instrumental variables/GMM estimation and testing. *Stata Journal*, 7(4),</span>
+<span class="sd">    465-506.</span>
 <span class="sd">    """</span>
     <span class="k">return</span> <span class="n">_kleibergen_paap</span><span class="p">(</span><span class="n">endog</span><span class="p">,</span> <span class="n">instr</span><span class="p">,</span> <span class="n">exog</span><span class="p">,</span> <span class="n">cov_type</span><span class="p">,</span> <span class="n">cov_config</span><span class="p">)[</span><span class="mi">1</span><span class="p">]</span></div>
 

@@ -1,3 +1,171 @@
+Version 7.1
+-----------
+
+.. TODO(R2): Add the release date.
+.. TODO(R2): Add PR numbers to the entries from PKG1, BUG1, BUG3a/b, DOC1, BUG6, FIX1.
+
+.. rubric:: Highlights
+
+- New estimators and tests: :class:`~linearmodels.iv.model.IVJIVE`, first-stage rank
+  tests, a centered J test, and the Hausman and Pesaran CD tests for panel models.
+- Several corrections change the numbers that unchanged code produced in 7.0. See
+  *Changes that alter results*.
+- Inputs with labels must have the same index as ``dependent`` in every estimator. See
+  *Backward-incompatible changes*.
+- Python 3.15 is supported. **7.1 is the last release to support Python 3.10 and
+  NumPy 1.x.**
+
+.. rubric:: New features
+
+- Added :class:`~linearmodels.iv.model.IVJIVE`, the jackknife IV estimator (JIVE1), with
+  unadjusted, robust, kernel and one-way clustered covariances. It can be imported from
+  ``linearmodels`` (:issue:`750`).
+- Added the Cragg-Donald and Kleibergen-Paap tests of the rank of the first-stage
+  coefficient matrix. They are available as properties of
+  :class:`~linearmodels.iv.results.FirstStageResults` and as the functions
+  ``cragg_donald``, ``cragg_donald_f``, ``kleibergen_paap`` and ``kleibergen_paap_f`` of
+  ``linearmodels.iv`` (:issue:`741`, :issue:`622`).
+- Added :attr:`~linearmodels.iv.results.IVGMMResults.centered_j_stat`, a J test of the
+  overidentifying restrictions that uses a centered moment covariance (:issue:`749`).
+- Added :meth:`~linearmodels.panel.results.RandomEffectsResults.hausman`, the Hausman
+  test of random effects against fixed effects. It matches Stata and returns a
+  :class:`~linearmodels.panel.results.HausmanTestResults` named tuple (:issue:`740`).
+- Added :attr:`~linearmodels.panel.results.PanelResults.pesaran_cd`, the Pesaran CD test
+  of cross-sectional dependence, which returns a new
+  :class:`~linearmodels.shared.hypotheses.NormalTestStatistic`. It returns an
+  ``InapplicableTestStatistic`` for ``BetweenOLS``, ``FamaMacBeth`` and models with time
+  effects or effects concentrated in some periods (:issue:`739`).
+- ``linearmodels.iv.common`` and ``linearmodels.iv.results`` define ``__all__``, so that
+  ``import *`` no longer imports the modules and functions that they import.
+
+.. TODO(R2): State the series that FirstDifferenceOLS.pesaran_cd uses (open decision).
+
+.. rubric:: Changes that alter results
+
+- :meth:`~linearmodels.iv.results.IVResults.durbin` and
+  :meth:`~linearmodels.iv.results.IVResults.wu_hausman` of ``IV2SLS`` and ``IVLIML``
+  project the residuals on all of the instruments, as documented (:issue:`725`).
+- The specification tests of weighted IV models (``sargan``, ``basmann``, ``durbin``,
+  ``wu_hausman``, ``wooldridge_*`` and ``c_stat``) use the weights, which 7.0 ignored
+  (:issue:`737`).
+- :meth:`~linearmodels.iv.results.IVGMMResults.c_stat` of overidentified ``IVGMM`` and
+  ``IVGMMCUE`` models uses the correct moment conditions and the ``weight_type`` of the
+  model. 7.0 ignored the weight type (:issue:`744`).
+- :class:`~linearmodels.iv.model.IVGMMCUE` centers the moment conditions by default, as
+  documented. This changes its estimates and J statistic (J goes from 0.775 to 2.096 in
+  the ``mroz`` example with kernel weights). Pass ``center=False`` to get the 7.0
+  results. With clustered weights it needs more clusters than moment conditions
+  (:issue:`746`).
+- ``IVGMMResults.weight_config`` is the ``dict`` of the weight configuration. 7.0
+  returned the name of the weight type, which is ``weight_type`` (:issue:`747`).
+- Weighted ``RandomEffects`` scales the entity means by the root weights, which changes
+  its estimates, R-squared and F statistic (:issue:`738`).
+- ``FirstDifferenceOLS`` differences in time order. 7.0 differenced against non-adjacent
+  periods if the first entity enters late or has a gap (:issue:`726`).
+- ``PanelOLS(drop_absorbed=True)`` with entity effects and a constant now drops the
+  regressors if none of them varies within entities. 7.0 kept them (:issue:`730`).
+- Panel weights given by period, by entity or as a table are placed by label. 7.0 used
+  the wrong rows unless the data was sorted by entity and then by period (:issue:`748`).
+- Weighted ``IV3SLS`` uses a weighted first stage, which changes its estimates.
+  ``IVSystemGMM`` is unchanged (:issue:`734`).
+- The default ``unadjusted`` covariance of ``SUR`` and ``IV3SLS`` with ``iterate=True``
+  uses the final residual covariance, which changes standard errors (:issue:`736`).
+- Repeated calls to ``AbsorbingLS.fit`` no longer change ``df_model``, ``df_resid`` and
+  the adjusted R-squared of later fits (:issue:`735`). They also use the ``method`` and
+  ``absorb_options`` of each call, not those of the first call.
+- ``IVGMMCUE`` results report ``IV-GMM-CUE`` as the estimator (``method``, the summary
+  and ``compare``) instead of ``IV-GMM``.
+- p-values use the survival function, so p-values below about 1e-16 are no longer 0.
+  Tiny p-values print in scientific notation in first-stage summaries and ``compare()``
+  (:issue:`742`).
+
+.. TODO(R2): State the default kernel bandwidth of IVGMM and IVGMMCUE (open decision).
+.. TODO(R2): Add the FIX2 errors for c_stat and clustered IVGMMCUE with few clusters.
+.. TODO(R2): Check the entries above against the REG1 rerun on the release candidate.
+
+.. rubric:: Backward-incompatible changes
+
+- Inputs with labels, such as a pandas ``Series`` or ``DataFrame`` with an index, must
+  have the same index as ``dependent`` in every IV, absorbing, system, asset pricing and
+  panel model. 7.0 paired inputs with different labels by position without an error.
+  They now raise a ``ValueError``: reindex the input, or use ``.to_numpy()`` to pair by
+  position. Nothing is compared if ``dependent`` has no labels (:issue:`748`).
+- A system of equations whose equations have different numbers of observations raises a
+  ``ValueError`` when the model is created.
+- With SciPy 2, the sparse helpers (``Interaction.sparse``, ``dummy_matrix`` and others)
+  return sparse arrays, where ``*`` is elementwise. Use ``@`` for matrix products
+  (:issue:`733`).
+
+.. TODO(R2): Add BUG2: TypeError for unsupported panel containers and the list inputs.
+.. TODO(R2): Update the label rule if the decision on an unlabelled dependent changes.
+
+.. rubric:: Bug fixes
+
+- Fixed :meth:`~linearmodels.iv.results.OLSResults.predict` for models without exogenous
+  or without endogenous regressors (:issue:`677`).
+- A missing value in the entity or time index of a panel raises a clear ``ValueError``
+  (:issue:`614`, :issue:`716`).
+- ``quadratic_form_test`` raises a ``TypeError`` instead of an ``AssertionError`` if
+  ``formula`` is used with ``params`` that is not a ``Series`` (:issue:`690`).
+- Fixed ``AbsorbingLS`` with missing values, which raised a ``ValueError`` in every
+  release since 4.13. The incomplete observations are now dropped with a
+  ``MissingValueWarning``. With clustered covariances, ``clusters`` must have one row
+  for each remaining observation.
+- Fixed ``AbsorbingLS`` with an ``Interaction`` in which only ``cat`` or ``cont`` has
+  labels, and ``AbsorbingLS.fit`` adding ``drop_singletons`` to its ``absorb_options``.
+- Fixed the ``dev`` extra, which listed ``pandas-stubsl``, and added xarray to the
+  ``test`` extra.
+
+.. TODO(R2): Add the BUG4a-c, BUG5 and FIX2 fixes (panel NaN entity, lsmr_options).
+
+.. rubric:: Documentation and maintenance
+
+- Corrected the Driscoll-Kraay index in the math documentation, fixed typos and improved
+  the type annotations (:issue:`704`, :issue:`697`, :issue:`721`).
+- Added a security policy (``SECURITY.md``).
+
+.. TODO(R2): Summarize DS1-DS3, DOC2, DOC3, NB1 and NB2 (docstrings, docs, notebooks).
+.. TODO(R2): Confirm that GitHub private vulnerability reporting is enabled (D8).
+
+.. rubric:: Compatibility
+
+- Python 3.10 to 3.15, NumPy 1.22.3 and later including NumPy 2, and pandas 1.4.0 and
+  later including pandas 3 are supported. Wheels are built for Python 3.15.
+- Ready for SciPy 2 and pandas 4: the deprecation warnings that 7.0 gave with their
+  development versions are gone (:issue:`733`).
+- The tests of the oldest supported versions now install them (:issue:`751`).
+
+.. TODO(R2): State the wheels (WHL1, CI1) and the versions that RC1 tested.
+
+.. rubric:: Deprecations and future changes
+
+- **7.1 is the last release to support Python 3.10 and NumPy 1.x.** Later releases will
+  raise the minimum versions of Python, NumPy and the other dependencies.
+- The ``lsmr_options`` argument of
+  :meth:`~linearmodels.iv.absorbing.AbsorbingLS.fit` and the
+  ``linearmodels.__future__.ordering`` module will be removed in 8.0. Importing the
+  module now emits a ``FutureWarning``.
+
+.. TODO(R2): Add a bullet if the default kernel bandwidth of IVGMM is to change in 8.0.
+
+.. rubric:: Minimum versions
+
+- Unchanged (Python 3.10, NumPy 1.22.3, SciPy 1.8.0, pandas 1.4.0, formulaic 1.2.1)
+  except statsmodels, which is 0.13.1, the first release with a Python 3.10 wheel. The
+  7.0 notes listed formulaic 1.0.0, but 7.0 already required 1.2.1.
+- ``packaging`` is now a declared dependency. Building from source requires
+  Cython 3.1.0, and running the tests requires pytest 9.
+
+.. rubric:: Contributors
+
+- Thanks to shaneraphel (:issue:`725`, :issue:`726`, :issue:`730`), raashish1601
+  (:issue:`734`, :issue:`735`, :issue:`736`, :issue:`737`, :issue:`738`), nyxst4ck
+  (:issue:`704`), shuxue6662-a11y (:issue:`716`), aeshef (:issue:`690`) and maxime2476
+  (:issue:`697`).
+- The new features complete earlier pull requests by hass-nation (:issue:`701`,
+  :issue:`702`, :issue:`703`), AyuG619 (:issue:`713`), eirki (:issue:`249`) and
+  shaneraphel (:issue:`731`).
+
 Version 7.0
 -----------
 
