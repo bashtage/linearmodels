@@ -1415,6 +1415,17 @@ def test_panel_exog_containers_give_the_same_estimates(panel, kind):
 
 
 @pytest.mark.parametrize("cls", PANEL_MODELS, ids=PANEL_IDS)
+def test_panel_numpy_dependent_and_labelled_exog(panel, panel_reference, cls):
+    # An array has no labels, and so the rows are paired by position. The
+    # labels of the other input are used by the estimators
+    expected = estimates(panel_reference[cls].fit())
+    mod = build_panel(cls, panel, dependent=grid(panel["dependent"]))
+    assert_allclose(estimates(mod.fit()), expected, rtol=1e-10)
+    mod = build_panel(cls, panel, exog=cube(panel["exog"]))
+    assert_allclose(estimates(mod.fit()), expected, rtol=1e-10)
+
+
+@pytest.mark.parametrize("cls", PANEL_MODELS, ids=PANEL_IDS)
 @pytest.mark.parametrize("name", ["dependent", "exog"])
 @pytest.mark.parametrize("kind", ["list", "tuple", "nested"])
 def test_panel_data_rejects_lists_and_names_the_input(panel, cls, name, kind):

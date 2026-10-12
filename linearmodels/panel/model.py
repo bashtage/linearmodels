@@ -11,7 +11,15 @@ from formulaic.model_spec import NAAction
 from formulaic.parser.algos.tokenize import tokenize
 from formulaic.utils.context import capture_context
 import numpy as np
-from pandas import Categorical, DataFrame, Index, MultiIndex, Series, get_dummies
+from pandas import (
+    Categorical,
+    DataFrame,
+    Index,
+    MultiIndex,
+    Series,
+    factorize,
+    get_dummies,
+)
 from pandas.api.types import is_numeric_dtype
 from scipy.linalg import lstsq as sp_lstsq
 from scipy.sparse.linalg import lsmr
@@ -3296,12 +3304,13 @@ class RandomEffects(_PanelModelBase):
         wx: linearmodels.typing.data.Float64Array = np.asarray(
             root_w * self.exog.values2d, dtype=float
         )
-        index = self.dependent.index
-        reindex = index.levels[0][index.codes[0]]
-        wybar = (theta * wybar).loc[reindex]
-        wxbar = (theta * wxbar).loc[reindex]
-        wy -= root_w * wybar.values
-        wx -= root_w * wxbar.values
+        # The entity means are in the order in which the entities appear. Rows are
+        # selected by position since dependent and exog need not have the same labels
+        entity_loc = factorize(self.dependent.index.get_level_values(0))[0]
+        wybar_rows = np.asarray(theta * wybar)[entity_loc]
+        wxbar_rows = np.asarray(theta * wxbar)[entity_loc]
+        wy -= root_w * wybar_rows
+        wx -= root_w * wxbar_rows
         params = _lstsq(wx, wy, rcond=None)[0]
 
         df_resid = wy.shape[0] - wx.shape[1]
