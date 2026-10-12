@@ -34,6 +34,15 @@ default columns, if it is a ``DataFrame`` without a MultiIndex) since there are
 no labels to compare. Use ``to_numpy()`` to explicitly pair the values of any
 other pandas object by position.
 
+If ``dependent`` does not carry labels, for example if it is a NumPy array, the
+first of ``exog``, ``weights`` and ``other_effects`` that carries labels is the
+reference instead. Each of the inputs after it that carries labels, and
+``clusters``, must use the same labels, in the same order, or a ``ValueError``
+that names both inputs is raised. If none of the inputs carries labels, all of
+them are paired by position. A list or a tuple is accepted wherever an array is
+accepted for ``weights``, ``clusters`` and ``other_effects``. It does not carry
+labels.
+
 Weights can be provided in any of the following shapes, where ``nobs`` is the
 number of time periods and ``nentity`` is the number of entities.
 
