@@ -1981,7 +1981,7 @@ class IVSystemGMM(_SystemModelBase):
 
     The weight matrix is the inverse of an estimate of the covariance of the
     moment conditions. ``weight_type`` selects the estimator: "unadjusted"
-    ("homoskedastic"), "robust" ("heteroskedastic") or "kernel" ("hac"), and
+    ("homoskedastic"), "robust" ("heteroskedastic") or "kernel" (``"hac"``), and
     ``weight_config`` contains its options. These are ``center`` and
     ``debiased`` for all of them, and ``kernel``, ``bandwidth`` and
     ``optimal_bw`` for "kernel".
@@ -2086,8 +2086,8 @@ class IVSystemGMM(_SystemModelBase):
             * "unadjusted", "homoskedastic" - Classic covariance estimator
             * "robust", "heteroskedastic" - Heteroskedasticity robust
               covariance estimator
-            * "kernel", "hac" - Heteroskedasticity and autocorrelation robust
-              covariance estimator
+            * "kernel", ``"hac"`` - Heteroskedasticity and autocorrelation
+              robust covariance estimator
 
         cov_config
             Additional parameters to pass to covariance estimator. All

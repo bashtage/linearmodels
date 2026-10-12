@@ -355,7 +355,11 @@ SCENARIOS = {
 def test_warning_only_for_the_default(eqns, scenario):
     weights, fit_kwargs, count = SCENARIOS[scenario]
     mod = IVSystemGMM(eqns, weight_type="kernel", **weights)
-    _, caught = default_bandwidth_warnings(lambda: mod.fit(**fit_kwargs))
+
+    def call_fit():
+        return mod.fit(**fit_kwargs)
+
+    _, caught = default_bandwidth_warnings(call_fit)
     assert len(caught) == count
     if count == 0:
         return
@@ -365,8 +369,10 @@ def test_warning_only_for_the_default(eqns, scenario):
     # The covariance does not use the default, so it is not mentioned
     assert 'weight_type="kernel"' in message
     assert 'cov_type="kernel"' not in message
-    # The warning refers to the line that called fit, and not to the package
+    # The warning refers to the line that called fit, and not to the package or
+    # to the helper that called this function
     assert os.path.abspath(warning.filename) == os.path.abspath(__file__)
+    assert warning.lineno == call_fit.__code__.co_firstlineno + 1
 
 
 @pytest.mark.parametrize("weight_type", ["robust", "unadjusted"])
@@ -490,12 +496,17 @@ def weight_arrays(eqns):
 def test_kernel_weight_matrix_default(eqns):
     x, z, eps = weight_arrays(eqns)
     weight = KernelWeightMatrix()
-    w, caught = default_bandwidth_warnings(lambda: weight.weight_matrix(x, z, eps))
+
+    def compute():
+        return weight.weight_matrix(x, z, eps)
+
+    w, caught = default_bandwidth_warnings(compute)
     assert len(caught) == 1
     assert "7.1" in str(caught[0].message)
     assert os.path.abspath(caught[0].filename) == os.path.abspath(__file__)
+    assert caught[0].lineno == compute.__code__.co_firstlineno + 1
     # Once for each instance, and not for each call
-    again, caught = default_bandwidth_warnings(lambda: weight.weight_matrix(x, z, eps))
+    again, caught = default_bandwidth_warnings(compute)
     assert len(caught) == 0
     assert_array_equal(w, again)
 

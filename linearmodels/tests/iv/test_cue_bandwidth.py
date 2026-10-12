@@ -17,7 +17,6 @@ from numpy.testing import assert_allclose, assert_array_equal
 import pandas as pd
 import pytest
 from scipy.optimize import minimize
-from scipy.signal import lfilter
 
 from linearmodels.iv import IVGMM, IVGMMCUE
 from linearmodels.iv.covariance import kernel_optimal_bandwidth
@@ -119,6 +118,24 @@ def test_bandwidth_is_estimated_once_from_the_first_step(
     assert 0 < expected < NOBS // 10
 
 
+@pytest.mark.parametrize("kernel", ["bartlett", "parzen"])
+@pytest.mark.parametrize("center", [True, False])
+def test_bandwidth_follows_the_centering_of_the_moment_conditions(kernel, center):
+    # In simulated-data.dta the bandwidth is the same with and without centering
+    # the first step scores. In this draw it is not: it is 1 and 2 with a Bartlett
+    # kernel, and 5 and 6 with a Parzen kernel
+    y, exog, endog, z = autocorrelated_iv(9, 250, 0.5, 4)
+    x_all, z_all = np.column_stack([exog, endog]), np.column_stack([exog, z])
+    eps = y - x_all @ two_stage_least_squares(x_all, y, z_all)
+    centered = estimated_bandwidth(z_all, eps, kernel, True)
+    uncentered = estimated_bandwidth(z_all, eps, kernel, False)
+    assert centered != uncentered
+    res = IVGMMCUE(
+        y, exog, endog, z, weight_type="kernel", kernel=kernel, center=center
+    ).fit()
+    assert res.weight_config["bandwidth"] == (centered if center else uncentered)
+
+
 def test_bandwidth_of_the_covariance_is_estimated_from_the_final_estimates(
     args, bandwidth_calls
 ):
@@ -198,7 +215,11 @@ def autocorrelated_iv(seed, nobs, rho, nz):
     rng = np.random.default_rng(seed)
     z = rng.standard_normal((nobs, nz))
     v = rng.standard_normal(nobs)
-    errors = lfilter([1.0], [1.0, -rho], rng.standard_normal(nobs))
+    innovations = rng.standard_normal(nobs)
+    errors = np.empty(nobs)
+    errors[0] = innovations[0]
+    for t in range(1, nobs):
+        errors[t] = rho * errors[t - 1] + innovations[t]
     endog = z @ np.linspace(0.5, 0.2, nz) + v
     y = 1 + endog + 0.5 * v + errors
     return y, np.ones((nobs, 1)), endog[:, None], z
@@ -206,7 +227,7 @@ def autocorrelated_iv(seed, nobs, rho, nz):
 
 # Draws in which BFGS stopped before the minimum of the objective function, when
 # the bandwidth was estimated at each evaluation. The objective function could be
-# reduced by 1% to 9% by a Nelder-Mead search that started from the estimates
+# reduced by 2.6% to 8.9% by a Nelder-Mead search that started from the estimates
 EARLY_STOPS = [
     (80, 250, 0.5, 4),
     (73, 250, 0.5, 4),

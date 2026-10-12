@@ -316,7 +316,7 @@ def test_kernel_optimal_bandwidth(data):
 
     # The default estimates the bandwidth from the data, and warns
     mod = IVSystemGMM(data.eqns, weight_type="kernel")
-    with pytest.warns(DefaultBandwidthWarning, match="7.1"):
+    with pytest.warns(DefaultBandwidthWarning, match=r"7\.1"):
         default = mod.fit(cov_type="kernel", debiased=True)
     assert default.weight_config["bandwidth"] == optimal.weight_config["bandwidth"]
     assert_allclose(default.params, optimal.params)

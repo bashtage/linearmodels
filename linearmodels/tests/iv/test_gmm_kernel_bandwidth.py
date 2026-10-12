@@ -345,7 +345,11 @@ def test_warning_only_for_the_default(args, model, scenario):
         mod = model(*args)
     else:
         mod = model(*args, weight_type="kernel", **weights)
-    _, caught = default_bandwidth_warnings(lambda: mod.fit(**fit_kwargs))
+
+    def call_fit():
+        return mod.fit(**fit_kwargs)
+
+    _, caught = default_bandwidth_warnings(call_fit)
     assert len(caught) == (0 if where is None else 1)
     if where is None:
         return
@@ -354,8 +358,14 @@ def test_warning_only_for_the_default(args, model, scenario):
     message = str(warning.message)
     assert ('weight_type="kernel"' in message) == (where in ("weights", "both"))
     assert ('cov_type="kernel"' in message) == (where in ("covariance", "both"))
-    # The warning refers to the line that called fit, and not to the package
+    # The warning refers to the line that called fit, and not to the package or
+    # to the helper that called this function
     assert os.path.abspath(warning.filename) == os.path.abspath(__file__)
+    assert warning.lineno == call_fit.__code__.co_firstlineno + 1
+    # and the example is for the model
+    assert (f"{model.__name__}(dependent, exog" in message) == (
+        where in ("weights", "both")
+    )
 
 
 @pytest.mark.parametrize("model", [IVGMM, IVGMMCUE])
@@ -534,13 +544,18 @@ def arrays():
 def test_kernel_weight_matrix_default(arrays):
     x, z, eps = arrays.x, arrays.z, arrays.eps
     weight = KernelWeightMatrix()
-    with pytest.warns(DefaultBandwidthWarning, match="7.1"):
+    with pytest.warns(DefaultBandwidthWarning, match=r"7\.1"):
         KernelWeightMatrix().weight_matrix(x, z, eps)
-    w, caught = default_bandwidth_warnings(lambda: weight.weight_matrix(x, z, eps))
+
+    def compute():
+        return weight.weight_matrix(x, z, eps)
+
+    w, caught = default_bandwidth_warnings(compute)
     assert len(caught) == 1
     assert os.path.abspath(caught[0].filename) == os.path.abspath(__file__)
+    assert caught[0].lineno == compute.__code__.co_firstlineno + 1
     # Once for each instance, and not for each call
-    again, caught = default_bandwidth_warnings(lambda: weight.weight_matrix(x, z, eps))
+    again, caught = default_bandwidth_warnings(compute)
     assert len(caught) == 0
     assert_array_equal(w, again)
 
@@ -585,10 +600,15 @@ def test_gmm_covariance_default(arrays):
     x, y, z, params = arrays.x, arrays.y, arrays.z, arrays.params
     w = inv(z.T @ z / NOBS)
     cov = IVGMMCovariance(x, y, z, params, w, "kernel")
-    default, caught = default_bandwidth_warnings(lambda: cov.cov)
+
+    def compute():
+        return cov.cov
+
+    default, caught = default_bandwidth_warnings(compute)
     assert len(caught) == 1
     assert 'cov_type="kernel"' in str(caught[0].message)
     assert os.path.abspath(caught[0].filename) == os.path.abspath(__file__)
+    assert caught[0].lineno == compute.__code__.co_firstlineno + 1
     with no_default_bandwidth_warning():
         optimal = IVGMMCovariance(x, y, z, params, w, "kernel", optimal_bw=True)
         assert_array_equal(optimal.cov, default)

@@ -1142,9 +1142,13 @@ class _IVGMMBase(_IVModelBase):
         covariance = cov_type == "kernel" and _uses_default_bandwidth(cov_config)
         weights = self._default_weight_bandwidth
         if weights or covariance:
-            # Warn at the call to fit, which is above this method and fit
+            # Warn at the call to fit, which is above this method and fit. The
+            # example in the message is for the class of the model
             _warn_default_bandwidth(
-                weights=weights, covariance=covariance, stacklevel=4
+                weights=weights,
+                covariance=covariance,
+                stacklevel=4,
+                model=type(self).__name__,
             )
         if covariance:
             cov_config = {**cov_config, "optimal_bw": True}

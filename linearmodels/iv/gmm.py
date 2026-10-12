@@ -29,6 +29,8 @@ def _uses_default_bandwidth(config: Mapping[str, Any]) -> bool:
 _WEIGHT_EXAMPLES = {
     "IVGMM": 'IVGMM(dependent, exog, endog, instruments, weight_type="kernel", '
     "optimal_bw=False)",
+    "IVGMMCUE": 'IVGMMCUE(dependent, exog, endog, instruments, weight_type="kernel", '
+    "optimal_bw=False)",
     "IVSystemGMM": 'IVSystemGMM(equations, weight_type="kernel", optimal_bw=False)',
 }
 
