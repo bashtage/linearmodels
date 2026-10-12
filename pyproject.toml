@@ -2,22 +2,23 @@
 build-backend = 'mesonpy'
 requires = [
   'meson-python',
-  "cython>=3.0.13,<4",  # Sync with CYTHON_MIN_VER in setup
+  "cython>=3.1.0,<4",  # Sync with the Cython check in meson.build
   "numpy>=2.0.0,<3",
   "setuptools_scm>=9.2.0,<10",
 ]
 
 [project]
 name = "linearmodels"
-# Keep syned with requirements.txt
+# Keep in sync with requirements.txt
 dependencies = [
   "numpy>=1.22.3,<3",
   "pandas>=1.4.0",
   "scipy>=1.8.0",
-  "statsmodels>=0.13.0",
+  "statsmodels>=0.13.1",  # The first release with a wheel for Python 3.10
   "mypy_extensions>=0.4",
   "pyhdfe>=0.1",
   "formulaic>=1.2.1",
+  "packaging",
 ]
 authors = [{ name = "Kevin Sheppard", email = "kevin.k.sheppard@gmail.com" }]
 classifiers = [
@@ -29,6 +30,8 @@ classifiers = [
   "Programming Language :: Python :: 3.11",
   "Programming Language :: Python :: 3.12",
   "Programming Language :: Python :: 3.13",
+  "Programming Language :: Python :: 3.14",
+  "Programming Language :: Python :: 3.15",
   "Operating System :: MacOS :: MacOS X",
   "Operating System :: Microsoft :: Windows",
   "Operating System :: POSIX",
@@ -37,6 +40,7 @@ classifiers = [
   "Topic :: Scientific/Engineering",
 ]
 description = "Linear Panel, Instrumental Variable, Asset Pricing, and System Regression models for Python"
+# The version is set in meson.build, which runs linearmodels/_build/git_version.py
 dynamic = [
   'version'
 ]
@@ -66,11 +70,12 @@ requires-python = ">=3.10"
 [project.optional-dependencies]
 test = [
   # test
-  "pytest>=8.4.1,<9",
+  "pytest>=9,<10",
   "pytest-randomly",
   "pytest-xdist",
   "pytest-cov",
   "coverage[toml]",
+  "xarray>=0.16",  # The tests import xarray
   "meson",
   "ninja",
 ]
@@ -78,19 +83,17 @@ doc = [
   # Documentation
   "setuptools>=61",
   "wheel",
-  "setuptools_scm[toml]>=8.0.3,<9",
-  "oldest-supported-numpy",
-  "cython>=3.0.13,<4",  # Sync with CYTHON_MIN_VER in setup
+  "setuptools_scm[toml]>=9.2.0,<10",
+  "cython>=3.1.0,<4",  # Sync with the Cython check in meson.build
   "numpy >=1.22",
   "scipy >=1.5.0",
   "ipython >=8.0.1",
   "matplotlib >=3.0",
-  "patsy >=0.5.3",
   "statsmodels >=0.13.5",
   "jinja2",
   "sphinx>=7",
   "seaborn",
-  "numpydoc>=1.0.0",
+  "numpydoc>=1.10",
   "nbsphinx",
   "sphinx-immaterial",
   "jupyter",
@@ -98,30 +101,25 @@ doc = [
   "sphinx-autodoc-typehints",
   "fonttools>=4.43.0", # not directly required, pinned by Snyk to avoid a vulnerability
   "jupyterlab>=4.4.8", # not directly required, pinned by Snyk to avoid a vulnerability
-  "ipython>=7",
-  "sphinx_immaterial",
   "nbconvert",
   "pickleshare",
-  # Requirements for doc build, in addition to requirements.txt
-  "pandas~=2.3.3",
   "sphinxcontrib-spelling",
-  "sphinx_autodoc_typehints",
 ]
 dev = [
   "xarray>=0.16",
-  "pandas-stubsl",
+  "pandas-stubs",
   "wheel",
   # versioning
   "setuptools_scm[toml]>=9.2.0,<10",
   "packaging",
   # Performance
-  "cython>=3.0.10",
+  "cython>=3.1.0,<4",
   "numba>=0.55",
   # Graphics
   "matplotlib>=3",
   "seaborn",
   # Tests
-  "pytest>=8.4.1,<9",
+  "pytest>=9,<10",
   "pytest-randomly",
   "pytest-xdist",
   "pytest-cov",
@@ -134,6 +132,7 @@ dev = [
   "mypy>=1.3",
   "ruff>=0.16.0",
   "pyupgrade>=3.4.0",
+  "numpydoc>=1.10",  # The exclude_files setting of numpydoc lint needs 1.10
   "jupyterlab-code-formatter",
   "jupyterlab>=4.4.8",  # not directly required, pinned by Snyk to avoid a vulnerability
   "zipp>=3.19.1", # not directly required, pinned by Snyk to avoid a vulnerability
@@ -148,9 +147,6 @@ changelog = "https://bashtage.github.io/linearmodels/changes.html"
 
 [tool.meson-python.args]
 setup = ['--vsenv']
-
-[tool.setuptools_scm]
-version_file = "arch/_version.py"
 
 [tool.black]
 target-version = ['py310', 'py311', 'py312', 'py313', 'py314']
@@ -270,10 +266,10 @@ ignore = [
 "linearmodels/iv/results.py" = ["PERF203", "PLC0415"]
 
 [tool.pytest.ini_options]
-minversion = "8.4.1"
+minversion = "9.0"
 testpaths = "linearmodels"
 xfail_strict = true
-addopts = "--strict"
+strict = true
 empty_parameter_set_mark = "xfail"
 filterwarnings = [
   "ignore:`formatargspec`:DeprecationWarning:statsmodels",
@@ -289,7 +285,6 @@ filterwarnings = [
   "error:Support for multi-dimensional indexing:DeprecationWarning",
   "error:multivariate_ls is deprecated:FutureWarning",
   "error:invalid value encountered in true_divide:RuntimeWarning",
-  "ignore:The --strict option is deprecated, use --strict-markers instead:pytest.PytestDeprecationWarning",
   "ignore:`np.bool` is a deprecated alias:DeprecationWarning:pyhdfe",
   "ignore:defusedxml.cElementTree:DeprecationWarning:nbconvert",
   "ignore:the imp module is deprecated in favour of importlib:DeprecationWarning:pywintypes",
@@ -389,17 +384,19 @@ disallow_untyped_defs=true
 disallow_incomplete_defs=true
 show_error_context=true
 
-[mypy-linearmodels.conftest]
+[[tool.mypy.overrides]]
+module = "linearmodels.conftest"
 check_untyped_defs=false
 disallow_untyped_defs=false
 
-[mypy-linearmodels._version]
+[[tool.mypy.overrides]]
+module = "linearmodels._version"
 check_untyped_defs=false
 disallow_untyped_defs=false
 disallow_incomplete_defs=false
 
 [[tool.mypy.overrides]]
-module = "mypy-linearmodels.tests."
+module = "linearmodels.tests.*"
 check_untyped_defs=false
 disallow_untyped_defs=false
 disallow_incomplete_defs=false
