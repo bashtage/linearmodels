@@ -90,8 +90,8 @@ def unknown_option_error(
         The supported names. The message lists them in sorted order. A name that
         is close to ``value`` is suggested.
     problem : str, optional
-        The first sentence of the message. The default is "Unknown cov_type:
-        'cluster'." for the parameter ``"cov_type"`` and the value ``"cluster"``.
+        The first sentence of the message. The default says that the value of the
+        parameter is unknown.
 
     Returns
     -------
