@@ -483,10 +483,32 @@ class _LinearFactorModelBase(_FactorModelBase):
                 self.portfolios.shape[1]
             )
         else:
-            self._sigma = np.asarray(sigma)
-            vals, vecs = np.linalg.eigh(sigma)
+            self._sigma = self._validate_sigma(sigma)
+            vals, vecs = np.linalg.eigh(self._sigma)
             self._sigma_m12 = vecs @ np.diag(1.0 / np.sqrt(vals)) @ vecs.T
             self._sigma_inv = np.linalg.inv(self._sigma).astype(float, copy=False)
+
+    def _validate_sigma(
+        self, sigma: linearmodels.typing.data.ArrayLike
+    ) -> linearmodels.typing.data.Float64Array:
+        """Check that sigma is a symmetric positive definite matrix of the right size"""
+        nportfolio = self.portfolios.shape[1]
+        sigma_arr = np.asarray(sigma, dtype=float)
+        if sigma_arr.shape != (nportfolio, nportfolio):
+            raise ValueError(
+                f"sigma must be a square array with shape ({nportfolio}, "
+                f"{nportfolio}), where {nportfolio} is the number of test portfolios. "
+                f"The shape of sigma is {sigma_arr.shape}."
+            )
+        if not np.all(np.isfinite(sigma_arr)):
+            raise ValueError("sigma must not contain missing or infinite values.")
+        scale = np.max(np.abs(sigma_arr))
+        if np.max(np.abs(sigma_arr - sigma_arr.T)) > 1e-8 * scale:
+            raise ValueError("sigma must be symmetric.")
+        vals = np.linalg.eigvalsh((sigma_arr + sigma_arr.T) / 2)
+        if not vals[0] > nportfolio * np.finfo(float).eps * vals[-1]:
+            raise ValueError("sigma must be positive definite.")
+        return sigma_arr
 
     def __str__(self) -> str:
         out = super().__str__()
@@ -533,8 +555,12 @@ class LinearFactorModel(_LinearFactorModelBase):
         Flag indicating whether the risk-free rate should be estimated
         from returns along other risk premia.  If False, the returns are
         assumed to be excess returns using the correct risk-free rate.
-    sigma : array_like
-        Positive definite residual covariance (nportfolio by nportfolio)
+    sigma : array_like, optional
+        Positive definite residual covariance (nportfolio by nportfolio) that
+        weights the test portfolios in the second stage. A ``ValueError`` is
+        raised if it does not have this shape, contains missing or infinite
+        values, or is not symmetric and positive definite. If not provided, the
+        identity matrix is used.
 
     Notes
     -----
@@ -615,8 +641,12 @@ class LinearFactorModel(_LinearFactorModelBase):
             Flag indicating whether the risk-free rate should be estimated
             from returns along other risk premia.  If False, the returns are
             assumed to be excess returns using the correct risk-free rate.
-        sigma : array_like
-            Positive definite residual covariance (nportfolio by nportfolio)
+        sigma : array_like, optional
+            Positive definite residual covariance (nportfolio by nportfolio) that
+            weights the test portfolios in the second stage. A ``ValueError`` is
+            raised if it does not have this shape, contains missing or infinite
+            values, or is not symmetric and positive definite. If not provided,
+            the identity matrix is used.
 
         Returns
         -------
