@@ -2982,6 +2982,25 @@ class RandomEffects(_PanelModelBase):
             estimator similar to the Newey-West covariance estimator.
           * ``bandwidth`` - Bandwidth to use when computing the kernel.  If
             not provided, a naive default is used.
+
+        The variance of the idiosyncratic error is the residual variance of the
+        within regression, and the variance of the effects is estimated from the
+        residuals of the between regression. The degrees of freedom of the
+        variances are the numbers of coefficients that the regressions estimate. A
+        regressor that is constant within entities (the constant, or years of
+        education in a wage panel) or that is collinear with the others once the
+        means of the entities are removed (experience, if the model has year
+        dummies) is not in the within regression, and a regressor that is collinear
+        with the others in the means of the entities (the year dummies and the
+        constant in a balanced panel) is not in the between regression.
+
+        .. versionchanged:: 7.1
+
+           The degrees of freedom of the variances count the coefficients that the
+           regressions estimate. Earlier versions counted every column of ``exog``
+           (less one for the constant in the within regression), so that the
+           variances, theta and the estimates were slightly different for models with
+           time-invariant or collinear regressors, and for models without a constant.
         """
         w = self.weights.values2d
         root_w = cast("linearmodels.typing.data.Float64Array", np.sqrt(w))
@@ -2991,6 +3010,10 @@ class RandomEffects(_PanelModelBase):
         assert isinstance(demeaned_exog, PanelData)
         y = demeaned_dep.values2d
         x = demeaned_exog.values2d
+        # The regressors that do not vary within entities (a constant, a time-invariant
+        # regressor) or that are collinear once the means are removed have no
+        # coefficient in the within regression, and do not use a degree of freedom
+        rank_within = _lstsq(x, y, rcond=None)[2]
         if self.has_constant:
             w_sum = w.sum()
             y_gm = (w * self.dependent.values2d).sum(0) / w_sum
@@ -3002,13 +3025,14 @@ class RandomEffects(_PanelModelBase):
 
         wybar = self.dependent.mean("entity", weights=self.weights)
         wxbar = self.exog.mean("entity", weights=self.weights)
-        params = _lstsq(np.asarray(wxbar), np.asarray(wybar), rcond=None)[0]
+        params, _, rank_between, _ = _lstsq(
+            np.asarray(wxbar), np.asarray(wybar), rcond=None
+        )
         wu = np.asarray(wybar) - np.asarray(wxbar) @ params
 
         nobs = weps.shape[0]
         neffects = wu.shape[0]
-        nvar = x.shape[1]
-        sigma2_e = float(np.squeeze(weps.T @ weps)) / (nobs - nvar - neffects + 1)
+        sigma2_e = float(np.squeeze(weps.T @ weps)) / (nobs - neffects - rank_within)
         ssr = float(np.squeeze(wu.T @ wu))
         t = np.asarray(self.dependent.count("entity"))
         unbalanced = np.ptp(t) != 0
@@ -3019,11 +3043,17 @@ class RandomEffects(_PanelModelBase):
             denom = means.T @ means
             sums = wx_df.groupby(level=0).sum().values
             num = sums.T @ sums
-            tr = np.trace(np.linalg.inv(denom) @ num)
-            sigma2_u = max(0, (ssr - (neffects - nvar) * sigma2_e) / (nobs - tr))
+            # The means of the regressors can be collinear, e.g., the dummy variables
+            # of two periods that are observed for every entity have the same mean
+            # in all entities. The pseudo inverse uses the regressors that are not
+            # collinear
+            tr = np.trace(np.linalg.pinv(denom, hermitian=True) @ num)
+            sigma2_u = max(
+                0, (ssr - (neffects - rank_between) * sigma2_e) / (nobs - tr)
+            )
         else:
             t_bar = neffects / ((1.0 / t).sum())
-            sigma2_u = max(0, ssr / (neffects - nvar) - sigma2_e / t_bar)
+            sigma2_u = max(0, ssr / (neffects - rank_between) - sigma2_e / t_bar)
         rho = sigma2_u / (sigma2_u + sigma2_e)
 
         theta = 1.0 - np.sqrt(sigma2_e / (t * sigma2_u + sigma2_e))
