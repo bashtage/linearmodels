@@ -1306,7 +1306,8 @@ class AbsorbingLS:
         freedom are not counted, since the effect is nested in the clusters, as in
         ``PanelOLS`` and Stata. Unlike ``PanelOLS``, nothing is adjusted if
         ``debiased`` is False. The t and F distributions of the results use
-        ``df_resid`` whatever the covariance estimator.
+        ``df_resid`` whatever the covariance estimator. A ``ValueError`` is raised if
+        ``debiased`` is True and the model has no degrees of freedom left.
 
         The variables are absorbed when fit is called for the first time. A
         later call uses the same absorbed variables if ``method``,
