@@ -19,7 +19,7 @@
     
   
       
-        <title>linearmodels.iv.results - linearmodels v7.1 (+266)</title>
+        <title>linearmodels.iv.results - linearmodels v7.1 (+272)</title>
       
     
 
@@ -91,7 +91,7 @@
 
 <header class="md-header md-header--shadow" data-md-component="header">
   <nav class="md-header__inner md-grid" aria-label="Header">
-    <a href="../../../index.html" title="linearmodels v7.1 (+266)" class="md-header__button md-logo" aria-label="linearmodels v7.1 (+266)" data-md-component="logo">
+    <a href="../../../index.html" title="linearmodels v7.1 (+272)" class="md-header__button md-logo" aria-label="linearmodels v7.1 (+272)" data-md-component="logo">
       <img src="../../../_static/bw-logo.svg" alt="logo">
     </a>
     <label class="md-header__button md-icon" for="__drawer">
@@ -102,7 +102,7 @@
       <div class="md-header__ellipsis">
         <div class="md-header__topic">
           <span class="md-ellipsis">
-            linearmodels v7.1 (+266)
+            linearmodels v7.1 (+272)
           </span>
         </div>
         <div class="md-header__topic" data-md-component="header-topic">
@@ -197,10 +197,10 @@
 
 <nav class="md-nav md-nav--primary" aria-label="Navigation" data-md-level="0">
   <label class="md-nav__title" for="__drawer">
-    <a href="../../../index.html" title="linearmodels v7.1 (+266)" class="md-nav__button md-logo" aria-label="linearmodels v7.1 (+266)" data-md-component="logo">
+    <a href="../../../index.html" title="linearmodels v7.1 (+272)" class="md-nav__button md-logo" aria-label="linearmodels v7.1 (+272)" data-md-component="logo">
       <img src="../../../_static/bw-logo.svg" alt="logo">
     </a>
-    linearmodels v7.1 (+266)
+    linearmodels v7.1 (+272)
   </label>
   
     <div class="md-nav__source">
@@ -2340,7 +2340,9 @@
 <span class="sd">            J statistic  test of overidentifying restrictions.</span>
 <span class="sd">            An InvalidTestStatistic is returned if the estimate of the</span>
 <span class="sd">            covariance of the moment conditions that was inverted to compute</span>
-<span class="sd">            the weight matrix is singular, which can happen if there are too</span>
+<span class="sd">            the weight matrix is singular. This can only happen at the final</span>
+<span class="sd">            estimates of IVGMMCUE, since IVGMM and IVGMMCUE raise a</span>
+<span class="sd">            ValueError if it is singular, which is the case if there are too</span>
 <span class="sd">            few clusters.</span>
 
 <span class="sd">        Notes</span>
@@ -2369,6 +2371,13 @@
 <span class="sd">        same way by the number of observations. Whether the estimate is</span>
 <span class="sd">        singular does not depend on the units in which the variables are</span>
 <span class="sd">        measured.</span>
+
+<span class="sd">        ``IVGMM.fit`` raises a ``ValueError`` if the estimate is singular in</span>
+<span class="sd">        any step, and ``IVGMMCUE.fit`` raises one if it is singular at the</span>
+<span class="sd">        first step estimates, since the weight matrix and the objective</span>
+<span class="sd">        function are not defined. The statistic is invalid only if the</span>
+<span class="sd">        estimate of ``IVGMMCUE`` is singular at its final estimates and not at</span>
+<span class="sd">        the first step estimates.</span>
 <span class="sd">        """</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_j_stat</span>
 
@@ -2566,8 +2575,10 @@
         <span class="p">)</span>
         <span class="k">try</span><span class="p">:</span>
             <span class="n">res_e</span> <span class="o">=</span> <span class="n">mod</span><span class="o">.</span><span class="n">fit</span><span class="p">(</span><span class="n">cov_type</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">cov_type</span><span class="p">,</span> <span class="o">**</span><span class="bp">self</span><span class="o">.</span><span class="n">cov_config</span><span class="p">)</span>
-        <span class="k">except</span> <span class="n">LinAlgError</span><span class="p">:</span>
-            <span class="c1"># The covariance of the moment conditions is exactly singular</span>
+        <span class="k">except</span> <span class="p">(</span><span class="n">LinAlgError</span><span class="p">,</span> <span class="ne">ValueError</span><span class="p">):</span>
+            <span class="c1"># The covariance of the moment conditions is singular: fit raises</span>
+            <span class="c1"># a ValueError, and NumPy raises a LinAlgError if it is exactly</span>
+            <span class="c1"># singular. LinAlgError is not a ValueError in NumPy 1.x</span>
             <span class="k">return</span> <span class="n">InvalidTestStatistic</span><span class="p">(</span><span class="n">reason</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="s2">"C-statistic"</span><span class="p">)</span>
         <span class="k">assert</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">res_e</span><span class="p">,</span> <span class="n">IVGMMResults</span><span class="p">)</span>
         <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">res_e</span><span class="o">.</span><span class="n">j_stat</span><span class="p">,</span> <span class="n">InvalidTestStatistic</span><span class="p">):</span>

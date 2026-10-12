@@ -23,7 +23,7 @@
     
   
       
-        <title>linearmodels.iv.model.IVGMM - linearmodels v7.1 (+266)</title>
+        <title>linearmodels.iv.model.IVGMM - linearmodels v7.1 (+272)</title>
       
     
 
@@ -100,7 +100,7 @@
 
 <header class="md-header md-header--shadow" data-md-component="header">
   <nav class="md-header__inner md-grid" aria-label="Header">
-    <a href="../../index.html" title="linearmodels v7.1 (+266)" class="md-header__button md-logo" aria-label="linearmodels v7.1 (+266)" data-md-component="logo">
+    <a href="../../index.html" title="linearmodels v7.1 (+272)" class="md-header__button md-logo" aria-label="linearmodels v7.1 (+272)" data-md-component="logo">
       <img src="../../_static/bw-logo.svg" alt="logo">
     </a>
     <label class="md-header__button md-icon" for="__drawer">
@@ -111,7 +111,7 @@
       <div class="md-header__ellipsis">
         <div class="md-header__topic">
           <span class="md-ellipsis">
-            linearmodels v7.1 (+266)
+            linearmodels v7.1 (+272)
           </span>
         </div>
         <div class="md-header__topic" data-md-component="header-topic">
@@ -206,10 +206,10 @@
 
 <nav class="md-nav md-nav--primary" aria-label="Navigation" data-md-level="0">
   <label class="md-nav__title" for="__drawer">
-    <a href="../../index.html" title="linearmodels v7.1 (+266)" class="md-nav__button md-logo" aria-label="linearmodels v7.1 (+266)" data-md-component="logo">
+    <a href="../../index.html" title="linearmodels v7.1 (+272)" class="md-nav__button md-logo" aria-label="linearmodels v7.1 (+272)" data-md-component="logo">
       <img src="../../_static/bw-logo.svg" alt="logo">
     </a>
-    linearmodels v7.1 (+266)
+    linearmodels v7.1 (+272)
   </label>
   
     <div class="md-nav__source">
@@ -1879,6 +1879,19 @@ call <code class="docutils literal notranslate"><span class="pre">to_numpy()</sp
 pandas objects with a default index do not carry labels and are always
 paired by position. The same rule applies to <code class="docutils literal notranslate"><span class="pre">clusters</span></code> passed to
 <code class="docutils literal notranslate"><span class="pre">fit</span></code> or in <code class="docutils literal notranslate"><span class="pre">weight_config</span></code>.</p>
+<p>The weight matrix is the inverse of an estimate of the covariance of the
+moment conditions, so that the estimate has to be nonsingular. A clustered
+estimate from G clusters has rank at most G, and at most G - 1 if the
+moment conditions are centered (<code class="docutils literal notranslate"><span class="pre">center</span></code> is <code class="docutils literal notranslate"><span class="pre">True</span></code>), since the
+centered cluster sums add to zero. There have to be at least as many
+clusters as moment conditions, and more if they are centered. The first
+step moment conditions of an exactly identified model add to zero as well,
+so that it needs more clusters than moment conditions with every value of
+<code class="docutils literal notranslate"><span class="pre">center</span></code>. The rank of a kernel or robust estimate is bounded in the same
+way by the number of observations. <code class="docutils literal notranslate"><span class="pre">fit</span></code> raises a <code class="docutils literal notranslate"><span class="pre">ValueError</span></code> that
+says so if the estimate is singular, since the estimates would be
+numerical noise. The estimate is not used, and so it is not tested, if
+<code class="docutils literal notranslate"><span class="pre">iter_limit</span></code> is 1.</p>
 <div class="todo info admonition" id="id1">
 <p class="admonition-title">Todo</p>
 <ul class="simple">

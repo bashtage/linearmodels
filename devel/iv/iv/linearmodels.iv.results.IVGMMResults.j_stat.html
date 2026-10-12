@@ -23,7 +23,7 @@
     
   
       
-        <title>linearmodels.iv.results.IVGMMResults.j_stat - linearmodels v7.1 (+266)</title>
+        <title>linearmodels.iv.results.IVGMMResults.j_stat - linearmodels v7.1 (+272)</title>
       
     
 
@@ -100,7 +100,7 @@
 
 <header class="md-header md-header--shadow" data-md-component="header">
   <nav class="md-header__inner md-grid" aria-label="Header">
-    <a href="../../index.html" title="linearmodels v7.1 (+266)" class="md-header__button md-logo" aria-label="linearmodels v7.1 (+266)" data-md-component="logo">
+    <a href="../../index.html" title="linearmodels v7.1 (+272)" class="md-header__button md-logo" aria-label="linearmodels v7.1 (+272)" data-md-component="logo">
       <img src="../../_static/bw-logo.svg" alt="logo">
     </a>
     <label class="md-header__button md-icon" for="__drawer">
@@ -111,7 +111,7 @@
       <div class="md-header__ellipsis">
         <div class="md-header__topic">
           <span class="md-ellipsis">
-            linearmodels v7.1 (+266)
+            linearmodels v7.1 (+272)
           </span>
         </div>
         <div class="md-header__topic" data-md-component="header-topic">
@@ -206,10 +206,10 @@
 
 <nav class="md-nav md-nav--primary" aria-label="Navigation" data-md-level="0">
   <label class="md-nav__title" for="__drawer">
-    <a href="../../index.html" title="linearmodels v7.1 (+266)" class="md-nav__button md-logo" aria-label="linearmodels v7.1 (+266)" data-md-component="logo">
+    <a href="../../index.html" title="linearmodels v7.1 (+272)" class="md-nav__button md-logo" aria-label="linearmodels v7.1 (+272)" data-md-component="logo">
       <img src="../../_static/bw-logo.svg" alt="logo">
     </a>
-    linearmodels v7.1 (+266)
+    linearmodels v7.1 (+272)
   </label>
   
     <div class="md-nav__source">
@@ -2238,7 +2238,9 @@
 <dd class="field-odd"><p>J statistic  test of overidentifying restrictions.
 An InvalidTestStatistic is returned if the estimate of the
 covariance of the moment conditions that was inverted to compute
-the weight matrix is singular, which can happen if there are too
+the weight matrix is singular. This can only happen at the final
+estimates of IVGMMCUE, since IVGMM and IVGMMCUE raise a
+ValueError if it is singular, which is the case if there are too
 few clusters.</p>
 </dd>
 <dt class="field-even" id="linearmodels.iv.results.IVGMMResults.j_stat-return-type">Return type<span class="colon">:</span><a class="headerlink" href="#linearmodels.iv.results.IVGMMResults.j_stat-return-type" title="Permalink to this headline">¶</a></dt>
@@ -2266,6 +2268,12 @@ centered. The rank of a kernel or robust estimate is bounded in the
 same way by the number of observations. Whether the estimate is
 singular does not depend on the units in which the variables are
 measured.</p>
+<p><code class="docutils literal notranslate"><span class="pre">IVGMM.fit</span></code> raises a <code class="docutils literal notranslate"><span class="pre">ValueError</span></code> if the estimate is singular in
+any step, and <code class="docutils literal notranslate"><span class="pre">IVGMMCUE.fit</span></code> raises one if it is singular at the
+first step estimates, since the weight matrix and the objective
+function are not defined. The statistic is invalid only if the
+estimate of <code class="docutils literal notranslate"><span class="pre">IVGMMCUE</span></code> is singular at its final estimates and not at
+the first step estimates.</p>
 </dd></dl>
 
 

@@ -19,7 +19,7 @@
     
   
       
-        <title>linearmodels.iv.model - linearmodels v7.1 (+266)</title>
+        <title>linearmodels.iv.model - linearmodels v7.1 (+272)</title>
       
     
 
@@ -91,7 +91,7 @@
 
 <header class="md-header md-header--shadow" data-md-component="header">
   <nav class="md-header__inner md-grid" aria-label="Header">
-    <a href="../../../index.html" title="linearmodels v7.1 (+266)" class="md-header__button md-logo" aria-label="linearmodels v7.1 (+266)" data-md-component="logo">
+    <a href="../../../index.html" title="linearmodels v7.1 (+272)" class="md-header__button md-logo" aria-label="linearmodels v7.1 (+272)" data-md-component="logo">
       <img src="../../../_static/bw-logo.svg" alt="logo">
     </a>
     <label class="md-header__button md-icon" for="__drawer">
@@ -102,7 +102,7 @@
       <div class="md-header__ellipsis">
         <div class="md-header__topic">
           <span class="md-ellipsis">
-            linearmodels v7.1 (+266)
+            linearmodels v7.1 (+272)
           </span>
         </div>
         <div class="md-header__topic" data-md-component="header-topic">
@@ -197,10 +197,10 @@
 
 <nav class="md-nav md-nav--primary" aria-label="Navigation" data-md-level="0">
   <label class="md-nav__title" for="__drawer">
-    <a href="../../../index.html" title="linearmodels v7.1 (+266)" class="md-nav__button md-logo" aria-label="linearmodels v7.1 (+266)" data-md-component="logo">
+    <a href="../../../index.html" title="linearmodels v7.1 (+272)" class="md-nav__button md-logo" aria-label="linearmodels v7.1 (+272)" data-md-component="logo">
       <img src="../../../_static/bw-logo.svg" alt="logo">
     </a>
-    linearmodels v7.1 (+266)
+    linearmodels v7.1 (+272)
   </label>
   
     <div class="md-nav__source">
@@ -1739,6 +1739,58 @@
         <span class="n">null</span> <span class="o">=</span> <span class="s2">"Expected moment conditions are equal to 0"</span>
         <span class="k">return</span> <span class="n">WaldTestStatistic</span><span class="p">(</span><span class="n">stat</span><span class="p">,</span> <span class="n">null</span><span class="p">,</span> <span class="n">ninstr</span> <span class="o">-</span> <span class="n">nvar</span><span class="p">)</span>
 
+    <span class="k">def</span><span class="w"> </span><span class="nf">_raise_if_singular</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span>
+        <span class="n">moment_cov</span><span class="p">:</span> <span class="n">linearmodels</span><span class="o">.</span><span class="n">typing</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">Float64Array</span><span class="p">,</span>
+        <span class="n">consequence</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">"""</span>
+<span class="sd">        Raise a ValueError if the covariance of the moment conditions is singular</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        moment_cov : ndarray</span>
+<span class="sd">            Estimate of the covariance of the moment conditions (ninstr by</span>
+<span class="sd">            ninstr).</span>
+<span class="sd">        consequence : str</span>
+<span class="sd">            Sentence that says why the estimator needs the inverse of the</span>
+<span class="sd">            covariance. It ends with the period.</span>
+
+<span class="sd">        Raises</span>
+<span class="sd">        ------</span>
+<span class="sd">        ValueError</span>
+<span class="sd">            If the covariance is singular. The message says that there are too</span>
+<span class="sd">            few clusters or observations and how many are needed.</span>
+<span class="sd">        """</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">_is_singular</span><span class="p">(</span><span class="n">moment_cov</span><span class="p">):</span>
+            <span class="k">return</span>
+        <span class="n">nobs</span><span class="p">,</span> <span class="n">nmoment</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_wz</span><span class="o">.</span><span class="n">shape</span>
+        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_weight</span><span class="p">,</span> <span class="n">OneWayClusteredWeightMatrix</span><span class="p">):</span>
+            <span class="n">nclusters</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">unique</span><span class="p">(</span><span class="n">asarray</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_weight_config</span><span class="p">[</span><span class="s2">"clusters"</span><span class="p">])))</span>
+            <span class="n">centered</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_weight_config</span><span class="p">[</span><span class="s2">"center"</span><span class="p">]</span>
+            <span class="n">rank</span> <span class="o">=</span> <span class="n">nclusters</span> <span class="o">-</span> <span class="mi">1</span> <span class="k">if</span> <span class="n">centered</span> <span class="k">else</span> <span class="n">nclusters</span>
+            <span class="n">rank_reason</span> <span class="o">=</span> <span class="p">(</span>
+                <span class="s2">"one less than the number of clusters, since the cluster sums of "</span>
+                <span class="s2">"centered moment conditions add to zero"</span>
+                <span class="k">if</span> <span class="n">centered</span>
+                <span class="k">else</span> <span class="s2">"the number of clusters"</span>
+            <span class="p">)</span>
+            <span class="n">msg</span> <span class="o">=</span> <span class="p">(</span>
+                <span class="sa">f</span><span class="s2">"The clustered covariance of the </span><span class="si">{</span><span class="n">nmoment</span><span class="si">}</span><span class="s2"> moment conditions is "</span>
+                <span class="sa">f</span><span class="s2">"singular because there are too few clusters (</span><span class="si">{</span><span class="n">nclusters</span><span class="si">}</span><span class="s2"> "</span>
+                <span class="sa">f</span><span class="s2">"clusters). Its rank is at most </span><span class="si">{</span><span class="n">rank</span><span class="si">}</span><span class="s2">, </span><span class="si">{</span><span class="n">rank_reason</span><span class="si">}</span><span class="s2">. "</span>
+                <span class="sa">f</span><span class="s2">"</span><span class="si">{</span><span class="n">consequence</span><span class="si">}</span><span class="s2"> Use more clusters than moment conditions, or a "</span>
+                <span class="s2">"weight_type that does not use clusters."</span>
+            <span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">msg</span> <span class="o">=</span> <span class="p">(</span>
+                <span class="sa">f</span><span class="s2">"The covariance of the </span><span class="si">{</span><span class="n">nmoment</span><span class="si">}</span><span class="s2"> moment conditions is singular, "</span>
+                <span class="sa">f</span><span class="s2">"which occurs if there are too few observations (</span><span class="si">{</span><span class="n">nobs</span><span class="si">}</span><span class="s2">) for the "</span>
+                <span class="sa">f</span><span class="s2">"number of moment conditions. </span><span class="si">{</span><span class="n">consequence</span><span class="si">}</span><span class="s2"> Use more "</span>
+                <span class="s2">"observations or fewer moment conditions."</span>
+            <span class="p">)</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="n">msg</span><span class="p">)</span>
+
 
 <div class="viewcode-block" id="IVGMM">
 <a class="viewcode-back" href="../../../iv/iv/linearmodels.iv.model.IVGMM.html#linearmodels.iv.model.IVGMM">[docs]</a>
@@ -1795,6 +1847,20 @@
 <span class="sd">    pandas objects with a default index do not carry labels and are always</span>
 <span class="sd">    paired by position. The same rule applies to ``clusters`` passed to</span>
 <span class="sd">    ``fit`` or in ``weight_config``.</span>
+
+<span class="sd">    The weight matrix is the inverse of an estimate of the covariance of the</span>
+<span class="sd">    moment conditions, so that the estimate has to be nonsingular. A clustered</span>
+<span class="sd">    estimate from G clusters has rank at most G, and at most G - 1 if the</span>
+<span class="sd">    moment conditions are centered (``center`` is ``True``), since the</span>
+<span class="sd">    centered cluster sums add to zero. There have to be at least as many</span>
+<span class="sd">    clusters as moment conditions, and more if they are centered. The first</span>
+<span class="sd">    step moment conditions of an exactly identified model add to zero as well,</span>
+<span class="sd">    so that it needs more clusters than moment conditions with every value of</span>
+<span class="sd">    ``center``. The rank of a kernel or robust estimate is bounded in the same</span>
+<span class="sd">    way by the number of observations. ``fit`` raises a ``ValueError`` that</span>
+<span class="sd">    says so if the estimate is singular, since the estimates would be</span>
+<span class="sd">    numerical noise. The estimate is not used, and so it is not tested, if</span>
+<span class="sd">    ``iter_limit`` is 1.</span>
 
 <span class="sd">    .. todo::</span>
 
@@ -1978,6 +2044,16 @@
 <span class="sd">        IVGMMResults</span>
 <span class="sd">            Results container</span>
 
+<span class="sd">        Raises</span>
+<span class="sd">        ------</span>
+<span class="sd">        ValueError</span>
+<span class="sd">            If the estimate of the covariance of the moment conditions is</span>
+<span class="sd">            singular, which occurs if there are too few clusters or</span>
+<span class="sd">            observations. A clustered estimate needs at least as many clusters</span>
+<span class="sd">            as moment conditions, and more if the moment conditions are</span>
+<span class="sd">            centered or the model is exactly identified. The estimate is not</span>
+<span class="sd">            used if ``iter_limit`` is 1.</span>
+
 <span class="sd">        See also</span>
 <span class="sd">        --------</span>
 <span class="sd">        linearmodels.iv.gmm.IVGMMCovariance</span>
@@ -2001,6 +2077,11 @@
         <span class="k">while</span> <span class="n">iters</span> <span class="o">&lt;</span> <span class="n">iter_limit</span> <span class="ow">and</span> <span class="n">norm</span> <span class="o">&gt;</span> <span class="n">tol</span><span class="p">:</span>
             <span class="n">eps</span> <span class="o">=</span> <span class="n">wy</span> <span class="o">-</span> <span class="n">wx</span> <span class="o">@</span> <span class="n">params</span>
             <span class="n">moment_cov</span> <span class="o">=</span> <span class="n">weight_matrix</span><span class="p">(</span><span class="n">wx</span><span class="p">,</span> <span class="n">wz</span><span class="p">,</span> <span class="n">eps</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_raise_if_singular</span><span class="p">(</span>
+                <span class="n">moment_cov</span><span class="p">,</span>
+                <span class="s2">"The weight matrix of the GMM estimator is the inverse of the "</span>
+                <span class="s2">"covariance, so it is not defined."</span><span class="p">,</span>
+            <span class="p">)</span>
             <span class="n">wmat</span> <span class="o">=</span> <span class="n">inv</span><span class="p">(</span><span class="n">moment_cov</span><span class="p">)</span>
             <span class="n">params</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">estimate_parameters</span><span class="p">(</span><span class="n">wx</span><span class="p">,</span> <span class="n">wy</span><span class="p">,</span> <span class="n">wz</span><span class="p">,</span> <span class="n">wmat</span><span class="p">)</span>
             <span class="n">delta</span> <span class="o">=</span> <span class="n">params</span> <span class="o">-</span> <span class="n">_params</span>
@@ -2089,7 +2170,12 @@
 <span class="sd">    The covariance of the moment conditions has to be nonsingular. A clustered</span>
 <span class="sd">    covariance that is estimated from G clusters has rank at most G, and at</span>
 <span class="sd">    most G - 1 if the moment conditions are centered, so that there have to be</span>
-<span class="sd">    more clusters than moment conditions if ``center`` is ``True``.</span>
+<span class="sd">    more clusters than moment conditions if ``center`` is ``True``. If</span>
+<span class="sd">    ``center`` is ``False`` and there are as many clusters as moment</span>
+<span class="sd">    conditions, the covariance is nonsingular but the objective function is</span>
+<span class="sd">    the same for every value of the parameters, so that there is nothing to</span>
+<span class="sd">    optimize. There have to be more clusters than moment conditions whether or</span>
+<span class="sd">    not the moment conditions are centered.</span>
 
 <span class="sd">    .. math::</span>
 
@@ -2336,47 +2422,47 @@
 
     <span class="k">def</span><span class="w"> </span><span class="nf">_check_moment_covariance</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">"""</span>
-<span class="sd">        Raise a ValueError if the covariance of the moment conditions is singular</span>
+<span class="sd">        Raise a ValueError if the objective function is not defined or constant</span>
 
-<span class="sd">        The objective function uses the inverse of the covariance, so it is not</span>
-<span class="sd">        defined if the covariance is singular. The rank of the covariance does</span>
-<span class="sd">        not depend on the parameters, other than for special values such as</span>
-<span class="sd">        residuals that are all 0, and so it is tested at the first step</span>
-<span class="sd">        estimates of two-step GMM.</span>
+<span class="sd">        The objective function uses the inverse of the covariance of the moment</span>
+<span class="sd">        conditions, so it is not defined if the covariance is singular. The rank</span>
+<span class="sd">        of the covariance does not depend on the parameters, other than for</span>
+<span class="sd">        special values such as residuals that are all 0, and so it is tested at</span>
+<span class="sd">        the first step estimates of two-step GMM.</span>
+
+<span class="sd">        If the covariance is clustered, the moment conditions are not centered</span>
+<span class="sd">        and there are as many clusters as moment conditions, the covariance is</span>
+<span class="sd">        not singular but the objective function is the same for all values of</span>
+<span class="sd">        the parameters. The cluster sums of the moment conditions are the rows</span>
+<span class="sd">        of a square matrix, Xi, the average of the moment conditions is</span>
+<span class="sd">        Xi'1 / n, and the covariance is Xi'Xi / n, so that the objective function</span>
+<span class="sd">        is 1'Xi(Xi'Xi)^{-1}Xi'1, which is the number of clusters whenever Xi is</span>
+<span class="sd">        nonsingular (it is divided by the small sample adjustment if debiased).</span>
 <span class="sd">        """</span>
         <span class="n">wy</span><span class="p">,</span> <span class="n">wx</span><span class="p">,</span> <span class="n">wz</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_wy</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_wx</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_wz</span>
         <span class="n">nobs</span><span class="p">,</span> <span class="n">nmoment</span> <span class="o">=</span> <span class="n">wz</span><span class="o">.</span><span class="n">shape</span>
         <span class="n">params</span> <span class="o">=</span> <span class="n">IVGMM</span><span class="o">.</span><span class="n">estimate_parameters</span><span class="p">(</span><span class="n">wx</span><span class="p">,</span> <span class="n">wy</span><span class="p">,</span> <span class="n">wz</span><span class="p">,</span> <span class="n">inv</span><span class="p">(</span><span class="n">wz</span><span class="o">.</span><span class="n">T</span> <span class="o">@</span> <span class="n">wz</span> <span class="o">/</span> <span class="n">nobs</span><span class="p">))</span>
-        <span class="k">if</span> <span class="ow">not</span> <span class="n">_is_singular</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_weight</span><span class="o">.</span><span class="n">weight_matrix</span><span class="p">(</span><span class="n">wx</span><span class="p">,</span> <span class="n">wz</span><span class="p">,</span> <span class="n">wy</span> <span class="o">-</span> <span class="n">wx</span> <span class="o">@</span> <span class="n">params</span><span class="p">)):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_raise_if_singular</span><span class="p">(</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_weight</span><span class="o">.</span><span class="n">weight_matrix</span><span class="p">(</span><span class="n">wx</span><span class="p">,</span> <span class="n">wz</span><span class="p">,</span> <span class="n">wy</span> <span class="o">-</span> <span class="n">wx</span> <span class="o">@</span> <span class="n">params</span><span class="p">),</span>
+            <span class="s2">"The objective function of the continuously updating GMM estimator "</span>
+            <span class="s2">"uses the inverse of the covariance, so it is not defined."</span><span class="p">,</span>
+        <span class="p">)</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_weight</span><span class="p">,</span> <span class="n">OneWayClusteredWeightMatrix</span><span class="p">):</span>
             <span class="k">return</span>
-        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_weight</span><span class="p">,</span> <span class="n">OneWayClusteredWeightMatrix</span><span class="p">):</span>
-            <span class="n">nclusters</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">unique</span><span class="p">(</span><span class="n">asarray</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_weight_config</span><span class="p">[</span><span class="s2">"clusters"</span><span class="p">])))</span>
-            <span class="n">centered</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_weight_config</span><span class="p">[</span><span class="s2">"center"</span><span class="p">]</span>
-            <span class="n">rank</span> <span class="o">=</span> <span class="n">nclusters</span> <span class="o">-</span> <span class="mi">1</span> <span class="k">if</span> <span class="n">centered</span> <span class="k">else</span> <span class="n">nclusters</span>
-            <span class="n">rank_reason</span> <span class="o">=</span> <span class="p">(</span>
-                <span class="s2">"one less than the number of clusters, since the cluster sums of "</span>
-                <span class="s2">"centered moment conditions add to zero"</span>
-                <span class="k">if</span> <span class="n">centered</span>
-                <span class="k">else</span> <span class="s2">"the number of clusters"</span>
-            <span class="p">)</span>
-            <span class="n">msg</span> <span class="o">=</span> <span class="p">(</span>
-                <span class="sa">f</span><span class="s2">"The clustered covariance of the </span><span class="si">{</span><span class="n">nmoment</span><span class="si">}</span><span class="s2"> moment conditions is "</span>
-                <span class="sa">f</span><span class="s2">"singular because there are too few clusters (</span><span class="si">{</span><span class="n">nclusters</span><span class="si">}</span><span class="s2"> "</span>
-                <span class="sa">f</span><span class="s2">"clusters). Its rank is at most </span><span class="si">{</span><span class="n">rank</span><span class="si">}</span><span class="s2">, </span><span class="si">{</span><span class="n">rank_reason</span><span class="si">}</span><span class="s2">. The "</span>
-                <span class="s2">"objective function of the continuously updating GMM estimator "</span>
-                <span class="s2">"uses the inverse of the covariance, so it is not defined. Use "</span>
-                <span class="s2">"more clusters than moment conditions, or a weight_type that does "</span>
-                <span class="s2">"not use clusters."</span>
-            <span class="p">)</span>
-        <span class="k">else</span><span class="p">:</span>
-            <span class="n">msg</span> <span class="o">=</span> <span class="p">(</span>
-                <span class="sa">f</span><span class="s2">"The covariance of the </span><span class="si">{</span><span class="n">nmoment</span><span class="si">}</span><span class="s2"> moment conditions is singular, "</span>
-                <span class="sa">f</span><span class="s2">"which occurs if there are too few observations (</span><span class="si">{</span><span class="n">nobs</span><span class="si">}</span><span class="s2">) for the "</span>
-                <span class="s2">"number of moment conditions. The objective function of the "</span>
-                <span class="s2">"continuously updating GMM estimator uses the inverse of the "</span>
-                <span class="s2">"covariance, so it is not defined. Use more observations or fewer "</span>
-                <span class="s2">"moment conditions."</span>
-            <span class="p">)</span>
+        <span class="n">nclusters</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">unique</span><span class="p">(</span><span class="n">asarray</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_weight_config</span><span class="p">[</span><span class="s2">"clusters"</span><span class="p">])))</span>
+        <span class="c1"># Fewer clusters, or centered moment conditions, give a singular covariance</span>
+        <span class="k">if</span> <span class="n">nclusters</span> <span class="o">&gt;</span> <span class="n">nmoment</span><span class="p">:</span>
+            <span class="k">return</span>
+        <span class="n">msg</span> <span class="o">=</span> <span class="p">(</span>
+            <span class="sa">f</span><span class="s2">"The clustered covariance of the </span><span class="si">{</span><span class="n">nmoment</span><span class="si">}</span><span class="s2"> moment conditions is "</span>
+            <span class="sa">f</span><span class="s2">"estimated from as many clusters (</span><span class="si">{</span><span class="n">nclusters</span><span class="si">}</span><span class="s2"> clusters) as there "</span>
+            <span class="s2">"are moment conditions, and the moment conditions are not centered. "</span>
+            <span class="s2">"The objective function of the continuously updating GMM estimator "</span>
+            <span class="s2">"is then the same for every value of the parameters, so that there is "</span>
+            <span class="s2">"nothing to optimize and the estimates would be the starting values. "</span>
+            <span class="s2">"Use more clusters than moment conditions, or a weight_type that "</span>
+            <span class="s2">"does not use clusters."</span>
+        <span class="p">)</span>
         <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="n">msg</span><span class="p">)</span>
 
 <div class="viewcode-block" id="IVGMMCUE.fit">
@@ -2427,10 +2513,11 @@
 <span class="sd">        ------</span>
 <span class="sd">        ValueError</span>
 <span class="sd">            If the covariance of the moment conditions is singular, which</span>
-<span class="sd">            occurs if there are too few clusters or observations. The</span>
-<span class="sd">            number of clusters has to be larger than the number of moment</span>
-<span class="sd">            conditions if the moment conditions are centered, which is the</span>
-<span class="sd">            default.</span>
+<span class="sd">            occurs if there are too few clusters or observations, or if the</span>
+<span class="sd">            moment conditions are not centered and there are as many clusters</span>
+<span class="sd">            as moment conditions, so that the objective function is constant.</span>
+<span class="sd">            The number of clusters has to be larger than the number of moment</span>
+<span class="sd">            conditions.</span>
 
 <span class="sd">        Notes</span>
 <span class="sd">        -----</span>

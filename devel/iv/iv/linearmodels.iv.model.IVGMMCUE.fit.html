@@ -23,7 +23,7 @@
     
   
       
-        <title>linearmodels.iv.model.IVGMMCUE.fit - linearmodels v7.1 (+266)</title>
+        <title>linearmodels.iv.model.IVGMMCUE.fit - linearmodels v7.1 (+272)</title>
       
     
 
@@ -100,7 +100,7 @@
 
 <header class="md-header md-header--shadow" data-md-component="header">
   <nav class="md-header__inner md-grid" aria-label="Header">
-    <a href="../../index.html" title="linearmodels v7.1 (+266)" class="md-header__button md-logo" aria-label="linearmodels v7.1 (+266)" data-md-component="logo">
+    <a href="../../index.html" title="linearmodels v7.1 (+272)" class="md-header__button md-logo" aria-label="linearmodels v7.1 (+272)" data-md-component="logo">
       <img src="../../_static/bw-logo.svg" alt="logo">
     </a>
     <label class="md-header__button md-icon" for="__drawer">
@@ -111,7 +111,7 @@
       <div class="md-header__ellipsis">
         <div class="md-header__topic">
           <span class="md-ellipsis">
-            linearmodels v7.1 (+266)
+            linearmodels v7.1 (+272)
           </span>
         </div>
         <div class="md-header__topic" data-md-component="header-topic">
@@ -206,10 +206,10 @@
 
 <nav class="md-nav md-nav--primary" aria-label="Navigation" data-md-level="0">
   <label class="md-nav__title" for="__drawer">
-    <a href="../../index.html" title="linearmodels v7.1 (+266)" class="md-nav__button md-logo" aria-label="linearmodels v7.1 (+266)" data-md-component="logo">
+    <a href="../../index.html" title="linearmodels v7.1 (+272)" class="md-nav__button md-logo" aria-label="linearmodels v7.1 (+272)" data-md-component="logo">
       <img src="../../_static/bw-logo.svg" alt="logo">
     </a>
-    linearmodels v7.1 (+266)
+    linearmodels v7.1 (+272)
   </label>
   
     <div class="md-nav__source">
@@ -1815,10 +1815,11 @@ configuration is provided.</p>
 </dd>
 <dt class="field-even" id="linearmodels.iv.model.IVGMMCUE.fit-raises">Raises<span class="colon">:</span><a class="headerlink" href="#linearmodels.iv.model.IVGMMCUE.fit-raises" title="Permalink to this headline">¶</a></dt>
 <dd class="field-even"><p><a class="reference external" href="https://docs.python.org/3/builtins/exceptions.html#ValueError" title="(in Python v3.15)"><strong>ValueError</strong></a> – If the covariance of the moment conditions is singular, which
-    occurs if there are too few clusters or observations. The
-    number of clusters has to be larger than the number of moment
-    conditions if the moment conditions are centered, which is the
-    default.</p>
+    occurs if there are too few clusters or observations, or if the
+    moment conditions are not centered and there are as many clusters
+    as moment conditions, so that the objective function is constant.
+    The number of clusters has to be larger than the number of moment
+    conditions.</p>
 </dd>
 </dl>
 <p class="rubric">Notes</p>

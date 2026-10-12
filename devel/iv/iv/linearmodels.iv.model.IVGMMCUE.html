@@ -23,7 +23,7 @@
     
   
       
-        <title>linearmodels.iv.model.IVGMMCUE - linearmodels v7.1 (+266)</title>
+        <title>linearmodels.iv.model.IVGMMCUE - linearmodels v7.1 (+272)</title>
       
     
 
@@ -100,7 +100,7 @@
 
 <header class="md-header md-header--shadow" data-md-component="header">
   <nav class="md-header__inner md-grid" aria-label="Header">
-    <a href="../../index.html" title="linearmodels v7.1 (+266)" class="md-header__button md-logo" aria-label="linearmodels v7.1 (+266)" data-md-component="logo">
+    <a href="../../index.html" title="linearmodels v7.1 (+272)" class="md-header__button md-logo" aria-label="linearmodels v7.1 (+272)" data-md-component="logo">
       <img src="../../_static/bw-logo.svg" alt="logo">
     </a>
     <label class="md-header__button md-icon" for="__drawer">
@@ -111,7 +111,7 @@
       <div class="md-header__ellipsis">
         <div class="md-header__topic">
           <span class="md-ellipsis">
-            linearmodels v7.1 (+266)
+            linearmodels v7.1 (+272)
           </span>
         </div>
         <div class="md-header__topic" data-md-component="header-topic">
@@ -206,10 +206,10 @@
 
 <nav class="md-nav md-nav--primary" aria-label="Navigation" data-md-level="0">
   <label class="md-nav__title" for="__drawer">
-    <a href="../../index.html" title="linearmodels v7.1 (+266)" class="md-nav__button md-logo" aria-label="linearmodels v7.1 (+266)" data-md-component="logo">
+    <a href="../../index.html" title="linearmodels v7.1 (+272)" class="md-nav__button md-logo" aria-label="linearmodels v7.1 (+272)" data-md-component="logo">
       <img src="../../_static/bw-logo.svg" alt="logo">
     </a>
-    linearmodels v7.1 (+266)
+    linearmodels v7.1 (+272)
   </label>
   
     <div class="md-nav__source">
@@ -1903,7 +1903,12 @@ passed in <code class="docutils literal notranslate"><span class="pre">weight_co
 <p>The covariance of the moment conditions has to be nonsingular. A clustered
 covariance that is estimated from G clusters has rank at most G, and at
 most G - 1 if the moment conditions are centered, so that there have to be
-more clusters than moment conditions if <code class="docutils literal notranslate"><span class="pre">center</span></code> is <code class="docutils literal notranslate"><span class="pre">True</span></code>.</p>
+more clusters than moment conditions if <code class="docutils literal notranslate"><span class="pre">center</span></code> is <code class="docutils literal notranslate"><span class="pre">True</span></code>. If
+<code class="docutils literal notranslate"><span class="pre">center</span></code> is <code class="docutils literal notranslate"><span class="pre">False</span></code> and there are as many clusters as moment
+conditions, the covariance is nonsingular but the objective function is
+the same for every value of the parameters, so that there is nothing to
+optimize. There have to be more clusters than moment conditions whether or
+not the moment conditions are centered.</p>
 <div class="math notranslate nohighlight">
 \[\begin{split}\hat{\beta}_{cue} &amp; =\min_{\beta}\bar{g}(\beta)'W(\beta)^{-1}g(\beta)\\
 g(\beta) &amp; =n^{-1}\sum_{i=1}^{n}z_{i}(y_{i}-x_{i}\beta)\end{split}\]</div>
