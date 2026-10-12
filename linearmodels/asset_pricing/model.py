@@ -168,11 +168,14 @@ class _FactorModelBase:
         # Missing values are kept so that the model drops the observations with a
         # missing value in the portfolios or the factors, as it does for arrays
         na_action = NAAction("ignore")
+        # capture_context returns None if the frames of the caller are unavailable,
+        # when formulaic looks in the namespace of this function
+        eval_context: int | Mapping[str, Any] = 0 if context is None else context
         if portfolios is not None:
             factors_mm = model_matrix(
                 formula + " + 0",
                 data,
-                context=context,
+                context=eval_context,
                 ensure_full_rank=True,
                 na_action=na_action,
             )
@@ -182,7 +185,7 @@ class _FactorModelBase:
             portfolios_mm = model_matrix(
                 formula_components[0].strip() + " + 0",
                 data,
-                context=context,
+                context=eval_context,
                 ensure_full_rank=False,
                 na_action=na_action,
             )
@@ -190,7 +193,7 @@ class _FactorModelBase:
             factors_mm = model_matrix(
                 formula_components[1].strip() + " + 0",
                 data,
-                context=context,
+                context=eval_context,
                 ensure_full_rank=False,
                 na_action=na_action,
             )
