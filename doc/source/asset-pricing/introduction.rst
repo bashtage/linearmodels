@@ -49,7 +49,7 @@ prior to estimation.
                           LinearFactorModel Estimation Summary
     ================================================================================
     No. Test Portfolios:                  6   R-squared:                      0.8879
-    No. Factors:                          3   J-statistic:                    39.109
+    No. Factors:                          3   J-statistic:                    30.291
     No. Observations:                   819   P-value                         0.0000
     Date:                  Sun, May 21 2017   Distribution:                  chi2(3)
     Time:                          21:18:56
