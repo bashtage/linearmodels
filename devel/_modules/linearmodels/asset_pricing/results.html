@@ -19,7 +19,7 @@
     
   
       
-        <title>linearmodels.asset_pricing.results - linearmodels v7.1 (+245)</title>
+        <title>linearmodels.asset_pricing.results - linearmodels v7.1 (+252)</title>
       
     
 
@@ -91,7 +91,7 @@
 
 <header class="md-header md-header--shadow" data-md-component="header">
   <nav class="md-header__inner md-grid" aria-label="Header">
-    <a href="../../../index.html" title="linearmodels v7.1 (+245)" class="md-header__button md-logo" aria-label="linearmodels v7.1 (+245)" data-md-component="logo">
+    <a href="../../../index.html" title="linearmodels v7.1 (+252)" class="md-header__button md-logo" aria-label="linearmodels v7.1 (+252)" data-md-component="logo">
       <img src="../../../_static/bw-logo.svg" alt="logo">
     </a>
     <label class="md-header__button md-icon" for="__drawer">
@@ -102,7 +102,7 @@
       <div class="md-header__ellipsis">
         <div class="md-header__topic">
           <span class="md-ellipsis">
-            linearmodels v7.1 (+245)
+            linearmodels v7.1 (+252)
           </span>
         </div>
         <div class="md-header__topic" data-md-component="header-topic">
@@ -197,10 +197,10 @@
 
 <nav class="md-nav md-nav--primary" aria-label="Navigation" data-md-level="0">
   <label class="md-nav__title" for="__drawer">
-    <a href="../../../index.html" title="linearmodels v7.1 (+245)" class="md-nav__button md-logo" aria-label="linearmodels v7.1 (+245)" data-md-component="logo">
+    <a href="../../../index.html" title="linearmodels v7.1 (+252)" class="md-nav__button md-logo" aria-label="linearmodels v7.1 (+252)" data-md-component="logo">
       <img src="../../../_static/bw-logo.svg" alt="logo">
     </a>
-    linearmodels v7.1 (+245)
+    linearmodels v7.1 (+252)
   </label>
   
     <div class="md-nav__source">
@@ -882,8 +882,9 @@
         <span class="n">ase</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">diag</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_alpha_vcv</span><span class="p">))</span>
         <span class="n">nportfolio</span><span class="p">,</span> <span class="n">nfactor</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_params</span><span class="o">.</span><span class="n">shape</span>
         <span class="n">nloadings</span> <span class="o">=</span> <span class="n">nportfolio</span> <span class="o">*</span> <span class="p">(</span><span class="n">nfactor</span> <span class="o">-</span> <span class="mi">1</span><span class="p">)</span>
-        <span class="n">se</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">r_</span><span class="p">[</span><span class="n">ase</span><span class="p">,</span> <span class="n">se</span><span class="p">[:</span><span class="n">nloadings</span><span class="p">]]</span>
-        <span class="n">se</span> <span class="o">=</span> <span class="n">se</span><span class="o">.</span><span class="n">reshape</span><span class="p">((</span><span class="n">nportfolio</span><span class="p">,</span> <span class="n">nfactor</span><span class="p">))</span>
+        <span class="c1"># One row for each portfolio: the alpha, followed by the loadings</span>
+        <span class="n">loadings_se</span> <span class="o">=</span> <span class="n">se</span><span class="p">[:</span><span class="n">nloadings</span><span class="p">]</span><span class="o">.</span><span class="n">reshape</span><span class="p">((</span><span class="n">nportfolio</span><span class="p">,</span> <span class="n">nfactor</span> <span class="o">-</span> <span class="mi">1</span><span class="p">))</span>
+        <span class="n">se</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">column_stack</span><span class="p">([</span><span class="n">ase</span><span class="p">,</span> <span class="n">loadings_se</span><span class="p">])</span>
         <span class="k">return</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">(</span><span class="n">se</span><span class="p">,</span> <span class="n">columns</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">_cols</span><span class="p">,</span> <span class="n">index</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">_portfolio_names</span><span class="p">)</span>
 
     <span class="nd">@property</span>

@@ -19,7 +19,7 @@
     
   
       
-        <title>linearmodels.panel.utility - linearmodels v7.1 (+245)</title>
+        <title>linearmodels.panel.utility - linearmodels v7.1 (+252)</title>
       
     
 
@@ -91,7 +91,7 @@
 
 <header class="md-header md-header--shadow" data-md-component="header">
   <nav class="md-header__inner md-grid" aria-label="Header">
-    <a href="../../../index.html" title="linearmodels v7.1 (+245)" class="md-header__button md-logo" aria-label="linearmodels v7.1 (+245)" data-md-component="logo">
+    <a href="../../../index.html" title="linearmodels v7.1 (+252)" class="md-header__button md-logo" aria-label="linearmodels v7.1 (+252)" data-md-component="logo">
       <img src="../../../_static/bw-logo.svg" alt="logo">
     </a>
     <label class="md-header__button md-icon" for="__drawer">
@@ -102,7 +102,7 @@
       <div class="md-header__ellipsis">
         <div class="md-header__topic">
           <span class="md-ellipsis">
-            linearmodels v7.1 (+245)
+            linearmodels v7.1 (+252)
           </span>
         </div>
         <div class="md-header__topic" data-md-component="header-topic">
@@ -197,10 +197,10 @@
 
 <nav class="md-nav md-nav--primary" aria-label="Navigation" data-md-level="0">
   <label class="md-nav__title" for="__drawer">
-    <a href="../../../index.html" title="linearmodels v7.1 (+245)" class="md-nav__button md-logo" aria-label="linearmodels v7.1 (+245)" data-md-component="logo">
+    <a href="../../../index.html" title="linearmodels v7.1 (+252)" class="md-nav__button md-logo" aria-label="linearmodels v7.1 (+252)" data-md-component="logo">
       <img src="../../../_static/bw-logo.svg" alt="logo">
     </a>
-    linearmodels v7.1 (+245)
+    linearmodels v7.1 (+252)
   </label>
   
     <div class="md-nav__source">
@@ -965,6 +965,100 @@
     <span class="k">return</span> <span class="n">retain</span>
 
 
+<span class="c1"># A column is absorbed if less than this share of its norm, measured before the effects</span>
+<span class="c1"># were absorbed, is left. Both iterative algorithms that absorb effects, LSMR and the</span>
+<span class="c1"># method of alternating projections (HDFE), stop with an error of about 1e-8 of the</span>
+<span class="c1"># norm of the data, and the error is up to 100 times larger when the effects are only</span>
+<span class="c1"># weakly connected. The tolerance is well above that, and far above machine precision.</span>
+<span class="n">_ABSORBED_TOL</span> <span class="o">=</span> <span class="mf">1e-5</span>
+
+
+<span class="k">def</span><span class="w"> </span><span class="nf">_absorbed_columns</span><span class="p">(</span>
+    <span class="n">x</span><span class="p">:</span> <span class="n">linearmodels</span><span class="o">.</span><span class="n">typing</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">Float64Array</span><span class="p">,</span>
+    <span class="n">x_orig</span><span class="p">:</span> <span class="n">linearmodels</span><span class="o">.</span><span class="n">typing</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">Float64Array</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+    <span class="n">constant</span><span class="p">:</span> <span class="nb">int</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">list</span><span class="p">[</span><span class="nb">tuple</span><span class="p">[</span><span class="nb">int</span><span class="p">,</span> <span class="nb">list</span><span class="p">[</span><span class="nb">int</span><span class="p">]]]:</span>
+<span class="w">    </span><span class="sd">"""</span>
+<span class="sd">    Find the columns that are absorbed or collinear with the columns before them</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    x : ndarray</span>
+<span class="sd">        Regressors after the effects were absorbed, with shape (nobs, ncol).</span>
+<span class="sd">    x_orig : ndarray, optional</span>
+<span class="sd">        Regressors before the effects were absorbed, with the same shape as x.</span>
+<span class="sd">        Only the norm of each column is used. If not provided, x is assumed to be</span>
+<span class="sd">        exact, and only columns that are collinear with the columns before them</span>
+<span class="sd">        are found.</span>
+<span class="sd">    constant : int, optional</span>
+<span class="sd">        The location of a constant column. It is retained, and the other columns</span>
+<span class="sd">        are compared with it first, so that a column that was restored as its</span>
+<span class="sd">        grand mean is found.</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    list of tuple of (int, list of int)</span>
+<span class="sd">        The columns to drop, in order. Each is paired with the sorted indices</span>
+<span class="sd">        of the columns in the relation that makes it redundant: the column</span>
+<span class="sd">        itself and the retained columns that it depends on.</span>
+
+<span class="sd">    Notes</span>
+<span class="sd">    -----</span>
+<span class="sd">    Every column is divided by the norm that it had before the effects were</span>
+<span class="sd">    absorbed, so that a column of size 1 is not touched by the effects and a</span>
+<span class="sd">    column of size 0 was absorbed entirely. The columns are processed in order,</span>
+<span class="sd">    and a column is dropped if less than ``_ABSORBED_TOL`` of it is left after it</span>
+<span class="sd">    is orthogonalized to the retained columns before it. The tolerance does not</span>
+<span class="sd">    depend on the units of the columns, and is above the error of the algorithms</span>
+<span class="sd">    that absorb the effects. Without x_orig, the columns are divided by their own</span>
+<span class="sd">    norm and the tolerance is the one of ``numpy.linalg.matrix_rank``.</span>
+<span class="sd">    """</span>
+    <span class="n">tol</span> <span class="o">=</span> <span class="n">_ABSORBED_TOL</span> <span class="k">if</span> <span class="n">x_orig</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="k">else</span> <span class="nb">max</span><span class="p">(</span><span class="n">x</span><span class="o">.</span><span class="n">shape</span><span class="p">)</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">finfo</span><span class="p">(</span><span class="nb">float</span><span class="p">)</span><span class="o">.</span><span class="n">eps</span>
+    <span class="n">nobs</span><span class="p">,</span> <span class="n">ncol</span> <span class="o">=</span> <span class="n">x</span><span class="o">.</span><span class="n">shape</span>
+    <span class="n">order</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="nb">range</span><span class="p">(</span><span class="n">ncol</span><span class="p">))</span>
+    <span class="k">if</span> <span class="n">constant</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="n">order</span><span class="o">.</span><span class="n">remove</span><span class="p">(</span><span class="n">constant</span><span class="p">)</span>
+        <span class="n">order</span><span class="o">.</span><span class="n">insert</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="n">constant</span><span class="p">)</span>
+    <span class="n">norms</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">linalg</span><span class="o">.</span><span class="n">norm</span><span class="p">(</span><span class="n">x</span> <span class="k">if</span> <span class="n">x_orig</span> <span class="ow">is</span> <span class="kc">None</span> <span class="k">else</span> <span class="n">x_orig</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
+
+    <span class="n">basis</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">empty</span><span class="p">((</span><span class="n">nobs</span><span class="p">,</span> <span class="n">ncol</span><span class="p">))</span>  <span class="c1"># Orthonormal basis of the retained columns</span>
+    <span class="n">nbasis</span> <span class="o">=</span> <span class="mi">0</span>
+    <span class="n">unit_constant</span> <span class="o">=</span> <span class="kc">None</span>
+    <span class="n">retained</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="nb">int</span><span class="p">]</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="n">scale</span><span class="p">:</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">int</span><span class="p">,</span> <span class="nb">float</span><span class="p">]</span> <span class="o">=</span> <span class="p">{}</span>
+    <span class="n">absorbed</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="nb">tuple</span><span class="p">[</span><span class="nb">int</span><span class="p">,</span> <span class="nb">list</span><span class="p">[</span><span class="nb">int</span><span class="p">]]]</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="k">for</span> <span class="n">j</span> <span class="ow">in</span> <span class="n">order</span><span class="p">:</span>
+        <span class="n">col</span> <span class="o">=</span> <span class="n">x</span><span class="p">[:,</span> <span class="n">j</span><span class="p">]</span>
+        <span class="n">norm</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="n">norms</span><span class="p">[</span><span class="n">j</span><span class="p">])</span>
+        <span class="k">if</span> <span class="n">x_orig</span> <span class="ow">is</span> <span class="kc">None</span> <span class="ow">and</span> <span class="n">unit_constant</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="c1"># Without the original data, measure the part that is not constant</span>
+            <span class="n">norm</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">linalg</span><span class="o">.</span><span class="n">norm</span><span class="p">(</span><span class="n">col</span> <span class="o">-</span> <span class="n">unit_constant</span> <span class="o">*</span> <span class="p">(</span><span class="n">unit_constant</span> <span class="o">@</span> <span class="n">col</span><span class="p">)))</span>
+        <span class="n">scale</span><span class="p">[</span><span class="n">j</span><span class="p">]</span> <span class="o">=</span> <span class="n">norm</span> <span class="k">if</span> <span class="n">norm</span> <span class="o">&gt;</span> <span class="mf">0.0</span> <span class="k">else</span> <span class="mf">1.0</span>
+        <span class="n">scaled</span> <span class="o">=</span> <span class="n">col</span> <span class="o">/</span> <span class="n">scale</span><span class="p">[</span><span class="n">j</span><span class="p">]</span>
+        <span class="n">resid</span> <span class="o">=</span> <span class="n">scaled</span>
+        <span class="k">for</span> <span class="n">_</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">2</span><span class="p">):</span>  <span class="c1"># Orthogonalizing twice removes the rounding error</span>
+            <span class="n">resid</span> <span class="o">=</span> <span class="n">resid</span> <span class="o">-</span> <span class="n">basis</span><span class="p">[:,</span> <span class="p">:</span><span class="n">nbasis</span><span class="p">]</span> <span class="o">@</span> <span class="p">(</span><span class="n">basis</span><span class="p">[:,</span> <span class="p">:</span><span class="n">nbasis</span><span class="p">]</span><span class="o">.</span><span class="n">T</span> <span class="o">@</span> <span class="n">resid</span><span class="p">)</span>
+        <span class="n">size</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">linalg</span><span class="o">.</span><span class="n">norm</span><span class="p">(</span><span class="n">resid</span><span class="p">))</span>
+        <span class="k">if</span> <span class="n">j</span> <span class="o">==</span> <span class="n">constant</span> <span class="ow">or</span> <span class="n">size</span> <span class="o">&gt;=</span> <span class="n">tol</span><span class="p">:</span>
+            <span class="n">retained</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">j</span><span class="p">)</span>
+            <span class="k">if</span> <span class="n">size</span> <span class="o">&gt;</span> <span class="mf">0.0</span><span class="p">:</span>
+                <span class="n">basis</span><span class="p">[:,</span> <span class="n">nbasis</span><span class="p">]</span> <span class="o">=</span> <span class="n">resid</span> <span class="o">/</span> <span class="n">size</span>
+                <span class="k">if</span> <span class="n">j</span> <span class="o">==</span> <span class="n">constant</span><span class="p">:</span>
+                    <span class="n">unit_constant</span> <span class="o">=</span> <span class="n">basis</span><span class="p">[:,</span> <span class="n">nbasis</span><span class="p">]</span>
+                <span class="n">nbasis</span> <span class="o">+=</span> <span class="mi">1</span>
+            <span class="k">continue</span>
+
+        <span class="c1"># The relation is the column and the retained columns that make it redundant</span>
+        <span class="n">relation</span> <span class="o">=</span> <span class="p">[</span><span class="n">j</span><span class="p">]</span>
+        <span class="k">if</span> <span class="n">retained</span><span class="p">:</span>
+            <span class="n">others</span> <span class="o">=</span> <span class="n">x</span><span class="p">[:,</span> <span class="n">retained</span><span class="p">]</span> <span class="o">/</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="n">scale</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="n">retained</span><span class="p">])</span>
+            <span class="n">coefs</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">linalg</span><span class="o">.</span><span class="n">lstsq</span><span class="p">(</span><span class="n">others</span><span class="p">,</span> <span class="n">scaled</span><span class="p">,</span> <span class="n">rcond</span><span class="o">=</span><span class="kc">None</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span>
+            <span class="n">share</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">abs</span><span class="p">(</span><span class="n">coefs</span><span class="p">)</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">linalg</span><span class="o">.</span><span class="n">norm</span><span class="p">(</span><span class="n">others</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
+            <span class="n">relation</span><span class="o">.</span><span class="n">extend</span><span class="p">(</span><span class="n">i</span> <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">s</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">(</span><span class="n">retained</span><span class="p">,</span> <span class="n">share</span><span class="p">,</span> <span class="n">strict</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span> <span class="k">if</span> <span class="n">s</span> <span class="o">&gt;=</span> <span class="n">tol</span><span class="p">)</span>
+        <span class="n">absorbed</span><span class="o">.</span><span class="n">append</span><span class="p">((</span><span class="n">j</span><span class="p">,</span> <span class="nb">sorted</span><span class="p">(</span><span class="n">relation</span><span class="p">)))</span>
+    <span class="k">return</span> <span class="n">absorbed</span>
+
+
 <span class="k">def</span><span class="w"> </span><span class="nf">check_absorbed</span><span class="p">(</span>
     <span class="n">x</span><span class="p">:</span> <span class="n">linearmodels</span><span class="o">.</span><span class="n">typing</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">Float64Array</span><span class="p">,</span>
     <span class="n">variables</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">|</span> <span class="nb">tuple</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="o">...</span><span class="p">],</span>
@@ -976,48 +1070,50 @@
 <span class="sd">    Parameters</span>
 <span class="sd">    ----------</span>
 <span class="sd">    x : ndarray</span>
-<span class="sd">        Regressor matrix to check</span>
-<span class="sd">    variables : list[str]</span>
-<span class="sd">        List of variable names</span>
-<span class="sd">    x_orig : ndarray</span>
-<span class="sd">        Original data. If provided uses a norm check to ascertain if all</span>
-<span class="sd">        variables have been absorbed.</span>
+<span class="sd">        Regressor matrix to check, after the effects were absorbed.</span>
+<span class="sd">    variables : list of str</span>
+<span class="sd">        List of variable names.</span>
+<span class="sd">    x_orig : ndarray, optional</span>
+<span class="sd">        Regressors before the effects were absorbed, with the same shape as x. A</span>
+<span class="sd">        column of x is absorbed if less than 1e-5 of the norm of the same</span>
+<span class="sd">        column of x_orig is left, so that the check does not depend on the units</span>
+<span class="sd">        of the variables and detects the columns that the algorithm that</span>
+<span class="sd">        absorbed the effects left with an error of its tolerance. If not</span>
+<span class="sd">        provided, only columns that are collinear with other columns are</span>
+<span class="sd">        found.</span>
+
+<span class="sd">    Raises</span>
+<span class="sd">    ------</span>
+<span class="sd">    AbsorbingEffectError</span>
+<span class="sd">        If a column is absorbed by the effects or is collinear with other</span>
+<span class="sd">        columns after the effects are removed.</span>
 <span class="sd">    """</span>
     <span class="k">if</span> <span class="n">x</span><span class="o">.</span><span class="n">size</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
         <span class="k">return</span>
 
-    <span class="n">rank</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">linalg</span><span class="o">.</span><span class="n">matrix_rank</span><span class="p">(</span><span class="n">x</span><span class="p">)</span>
-    <span class="k">if</span> <span class="n">rank</span> <span class="o">&lt;</span> <span class="n">x</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">]:</span>
-        <span class="n">xpx</span> <span class="o">=</span> <span class="n">x</span><span class="o">.</span><span class="n">T</span> <span class="o">@</span> <span class="n">x</span>
-        <span class="n">vals</span><span class="p">,</span> <span class="n">vecs</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">linalg</span><span class="o">.</span><span class="n">eigh</span><span class="p">(</span><span class="n">xpx</span><span class="p">)</span>
-        <span class="n">nabsorbed</span> <span class="o">=</span> <span class="n">x</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">-</span> <span class="n">rank</span>
-        <span class="n">tol</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">sort</span><span class="p">(</span><span class="n">vals</span><span class="p">)[</span><span class="n">nabsorbed</span> <span class="o">-</span> <span class="mi">1</span><span class="p">]</span>
-        <span class="n">absorbed</span> <span class="o">=</span> <span class="n">vals</span> <span class="o">&lt;=</span> <span class="n">tol</span>
-        <span class="n">absorbed_vecs</span> <span class="o">=</span> <span class="n">vecs</span><span class="p">[:,</span> <span class="n">absorbed</span><span class="p">]</span>
-        <span class="n">rows</span> <span class="o">=</span> <span class="p">[]</span>
-        <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">nabsorbed</span><span class="p">):</span>
-            <span class="n">abs_vec</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">abs</span><span class="p">(</span><span class="n">absorbed_vecs</span><span class="p">[:,</span> <span class="n">i</span><span class="p">])</span>
-            <span class="n">tol</span> <span class="o">=</span> <span class="n">abs_vec</span><span class="o">.</span><span class="n">max</span><span class="p">()</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">finfo</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">)</span><span class="o">.</span><span class="n">eps</span> <span class="o">*</span> <span class="n">abs_vec</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
-            <span class="n">vars_idx</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">where</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">abs</span><span class="p">(</span><span class="n">absorbed_vecs</span><span class="p">[:,</span> <span class="n">i</span><span class="p">])</span> <span class="o">&gt;</span> <span class="n">tol</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span>
-            <span class="n">rows</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s2">" "</span> <span class="o">*</span> <span class="mi">10</span> <span class="o">+</span> <span class="s2">", "</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="n">variables</span><span class="p">[</span><span class="n">vi</span><span class="p">])</span> <span class="k">for</span> <span class="n">vi</span> <span class="ow">in</span> <span class="n">vars_idx</span><span class="p">))</span>
-        <span class="n">absorbed_variables</span> <span class="o">=</span> <span class="s2">"</span><span class="se">\n</span><span class="s2">"</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">rows</span><span class="p">)</span>
-        <span class="n">msg</span> <span class="o">=</span> <span class="n">absorbing_error_msg</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">absorbed_variables</span><span class="o">=</span><span class="n">absorbed_variables</span><span class="p">)</span>
-        <span class="k">raise</span> <span class="n">AbsorbingEffectError</span><span class="p">(</span><span class="n">msg</span><span class="p">)</span>
-    <span class="k">if</span> <span class="n">x_orig</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+    <span class="n">absorbed</span> <span class="o">=</span> <span class="n">_absorbed_columns</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">x_orig</span><span class="p">)</span>
+    <span class="k">if</span> <span class="ow">not</span> <span class="n">absorbed</span><span class="p">:</span>
         <span class="k">return</span>
-
-    <span class="n">new_norm</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">linalg</span><span class="o">.</span><span class="n">norm</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
-    <span class="n">orig_norm</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">linalg</span><span class="o">.</span><span class="n">norm</span><span class="p">(</span><span class="n">x_orig</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
-    <span class="k">if</span> <span class="n">np</span><span class="o">.</span><span class="n">all</span><span class="p">(((</span><span class="n">new_norm</span> <span class="o">/</span> <span class="n">orig_norm</span><span class="p">)</span> <span class="o">**</span> <span class="mi">2</span><span class="p">)</span> <span class="o">&lt;</span> <span class="n">np</span><span class="o">.</span><span class="n">finfo</span><span class="p">(</span><span class="nb">float</span><span class="p">)</span><span class="o">.</span><span class="n">eps</span><span class="p">):</span>
-        <span class="k">raise</span> <span class="n">AbsorbingEffectError</span><span class="p">(</span>
-            <span class="s2">"All exog variables have been absorbed. The model cannot be estimated."</span>
-        <span class="p">)</span>
+    <span class="k">if</span> <span class="n">x_orig</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="k">with</span> <span class="n">np</span><span class="o">.</span><span class="n">errstate</span><span class="p">(</span><span class="n">divide</span><span class="o">=</span><span class="s2">"ignore"</span><span class="p">,</span> <span class="n">invalid</span><span class="o">=</span><span class="s2">"ignore"</span><span class="p">):</span>
+            <span class="n">size</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">linalg</span><span class="o">.</span><span class="n">norm</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span> <span class="o">/</span> <span class="n">np</span><span class="o">.</span><span class="n">linalg</span><span class="o">.</span><span class="n">norm</span><span class="p">(</span><span class="n">x_orig</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">np</span><span class="o">.</span><span class="n">all</span><span class="p">(</span><span class="o">~</span><span class="p">(</span><span class="n">size</span> <span class="o">&gt;=</span> <span class="n">_ABSORBED_TOL</span><span class="p">)):</span>
+            <span class="k">raise</span> <span class="n">AbsorbingEffectError</span><span class="p">(</span>
+                <span class="s2">"All exog variables have been absorbed. The model cannot be estimated."</span>
+            <span class="p">)</span>
+    <span class="n">rows</span> <span class="o">=</span> <span class="p">[</span>
+        <span class="s2">" "</span> <span class="o">*</span> <span class="mi">10</span> <span class="o">+</span> <span class="s2">", "</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="n">variables</span><span class="p">[</span><span class="n">i</span><span class="p">])</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="n">relation</span><span class="p">)</span>
+        <span class="k">for</span> <span class="n">_</span><span class="p">,</span> <span class="n">relation</span> <span class="ow">in</span> <span class="n">absorbed</span>
+    <span class="p">]</span>
+    <span class="n">msg</span> <span class="o">=</span> <span class="n">absorbing_error_msg</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">absorbed_variables</span><span class="o">=</span><span class="s2">"</span><span class="se">\n</span><span class="s2">"</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">rows</span><span class="p">))</span>
+    <span class="k">raise</span> <span class="n">AbsorbingEffectError</span><span class="p">(</span><span class="n">msg</span><span class="p">)</span>
 
 
 <span class="k">def</span><span class="w"> </span><span class="nf">not_absorbed</span><span class="p">(</span>
     <span class="n">x</span><span class="p">:</span> <span class="n">linearmodels</span><span class="o">.</span><span class="n">typing</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">Float64Array</span><span class="p">,</span>
     <span class="n">has_constant</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
     <span class="n">loc</span><span class="p">:</span> <span class="nb">int</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+    <span class="n">x_orig</span><span class="p">:</span> <span class="n">linearmodels</span><span class="o">.</span><span class="n">typing</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">Float64Array</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">list</span><span class="p">[</span><span class="nb">int</span><span class="p">]:</span>
 <span class="w">    </span><span class="sd">"""</span>
 <span class="sd">    Construct a list of the indices of regressors that are not absorbed</span>
@@ -1025,59 +1121,31 @@
 <span class="sd">    Parameters</span>
 <span class="sd">    ----------</span>
 <span class="sd">    x : ndarray</span>
-<span class="sd">        Regressor matrix to check</span>
-<span class="sd">    has_constant : bool</span>
-<span class="sd">        Flag indicating that x has a constant column</span>
-<span class="sd">    loc : int</span>
-<span class="sd">        The location of the constant column</span>
+<span class="sd">        Regressor matrix to check, after the effects were absorbed.</span>
+<span class="sd">    has_constant : bool, optional</span>
+<span class="sd">        Flag indicating that x has a constant column. The default is False.</span>
+<span class="sd">    loc : int, optional</span>
+<span class="sd">        The location of the constant column. It is always retained, and the</span>
+<span class="sd">        other columns are compared with it first.</span>
+<span class="sd">    x_orig : ndarray, optional</span>
+<span class="sd">        Regressors before the effects were absorbed, with the same shape as x. A</span>
+<span class="sd">        column of x is absorbed if less than 1e-5 of the norm of the same</span>
+<span class="sd">        column of x_orig is left, so that the check does not depend on the units</span>
+<span class="sd">        of the variables. A column is also dropped if it is collinear with the</span>
+<span class="sd">        retained columns before it, using the same tolerance. If not provided,</span>
+<span class="sd">        only columns that are collinear with other columns are dropped.</span>
 
 <span class="sd">    Returns</span>
 <span class="sd">    -------</span>
-<span class="sd">    retain : list[int]</span>
-<span class="sd">        List of columns to retain</span>
+<span class="sd">    list of int</span>
+<span class="sd">        List of columns to retain.</span>
 <span class="sd">    """</span>
-    <span class="k">if</span> <span class="n">np</span><span class="o">.</span><span class="n">linalg</span><span class="o">.</span><span class="n">matrix_rank</span><span class="p">(</span><span class="n">x</span><span class="p">)</span> <span class="o">==</span> <span class="n">x</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">]:</span>
-        <span class="k">return</span> <span class="nb">list</span><span class="p">(</span><span class="nb">range</span><span class="p">(</span><span class="n">x</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">]))</span>
+    <span class="n">constant</span> <span class="o">=</span> <span class="kc">None</span>
     <span class="k">if</span> <span class="n">has_constant</span><span class="p">:</span>
         <span class="k">assert</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">loc</span><span class="p">,</span> <span class="nb">int</span><span class="p">)</span>
-        <span class="n">check</span> <span class="o">=</span> <span class="p">[</span><span class="n">i</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">x</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">])</span> <span class="k">if</span> <span class="n">i</span> <span class="o">!=</span> <span class="n">loc</span><span class="p">]</span>
-        <span class="n">const</span> <span class="o">=</span> <span class="n">x</span><span class="p">[:,</span> <span class="p">[</span><span class="n">loc</span><span class="p">]]</span>
-        <span class="n">sub</span> <span class="o">=</span> <span class="n">x</span><span class="p">[:,</span> <span class="n">check</span><span class="p">]</span>
-        <span class="n">resid</span> <span class="o">=</span> <span class="n">sub</span> <span class="o">-</span> <span class="n">const</span> <span class="o">@</span> <span class="n">np</span><span class="o">.</span><span class="n">linalg</span><span class="o">.</span><span class="n">lstsq</span><span class="p">(</span><span class="n">const</span><span class="p">,</span> <span class="n">sub</span><span class="p">,</span> <span class="n">rcond</span><span class="o">=</span><span class="kc">None</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span>
-        <span class="c1"># A column that is constant on each entity is restored as its grand</span>
-        <span class="c1"># mean. Projecting that column on the intercept leaves only roundoff.</span>
-        <span class="c1"># The eigenvalue tolerance is relative to that roundoff, so it keeps</span>
-        <span class="c1"># the column. Compare with the column's own norm instead, and only</span>
-        <span class="c1"># when every non-constant column vanishes: a mix of absorbed and</span>
-        <span class="c1"># varying columns still uses the rank test below.</span>
-        <span class="n">orig_norm</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">linalg</span><span class="o">.</span><span class="n">norm</span><span class="p">(</span><span class="n">sub</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
-        <span class="n">new_norm</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">linalg</span><span class="o">.</span><span class="n">norm</span><span class="p">(</span><span class="n">resid</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
-        <span class="k">with</span> <span class="n">np</span><span class="o">.</span><span class="n">errstate</span><span class="p">(</span><span class="n">divide</span><span class="o">=</span><span class="s2">"ignore"</span><span class="p">,</span> <span class="n">invalid</span><span class="o">=</span><span class="s2">"ignore"</span><span class="p">):</span>
-            <span class="n">ratio</span> <span class="o">=</span> <span class="p">(</span><span class="n">new_norm</span> <span class="o">/</span> <span class="n">orig_norm</span><span class="p">)</span> <span class="o">**</span> <span class="mi">2</span>
-        <span class="n">vanished</span> <span class="o">=</span> <span class="p">(</span><span class="n">orig_norm</span> <span class="o">==</span> <span class="mf">0.0</span><span class="p">)</span> <span class="o">|</span> <span class="p">(</span><span class="n">ratio</span> <span class="o">&lt;</span> <span class="n">np</span><span class="o">.</span><span class="n">finfo</span><span class="p">(</span><span class="nb">float</span><span class="p">)</span><span class="o">.</span><span class="n">eps</span><span class="p">)</span>
-        <span class="k">if</span> <span class="nb">bool</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">all</span><span class="p">(</span><span class="n">vanished</span><span class="p">)):</span>
-            <span class="k">return</span> <span class="p">[</span><span class="n">loc</span><span class="p">]</span>
-        <span class="n">x</span> <span class="o">=</span> <span class="n">resid</span>
-    <span class="n">xpx</span> <span class="o">=</span> <span class="n">x</span><span class="o">.</span><span class="n">T</span> <span class="o">@</span> <span class="n">x</span>
-    <span class="n">vals</span><span class="p">,</span> <span class="n">_</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">linalg</span><span class="o">.</span><span class="n">eigh</span><span class="p">(</span><span class="n">xpx</span><span class="p">)</span>
-    <span class="k">if</span> <span class="n">vals</span><span class="o">.</span><span class="n">max</span><span class="p">()</span> <span class="o">==</span> <span class="mf">0.0</span><span class="p">:</span>
-        <span class="k">if</span> <span class="n">has_constant</span><span class="p">:</span>
-            <span class="k">assert</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">loc</span><span class="p">,</span> <span class="nb">int</span><span class="p">)</span>
-            <span class="k">return</span> <span class="p">[</span><span class="n">loc</span><span class="p">]</span>
-        <span class="k">return</span> <span class="p">[]</span>
-
-    <span class="n">tol</span> <span class="o">=</span> <span class="n">vals</span><span class="o">.</span><span class="n">max</span><span class="p">()</span> <span class="o">*</span> <span class="n">x</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">finfo</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">)</span><span class="o">.</span><span class="n">eps</span>
-    <span class="n">absorbed</span> <span class="o">=</span> <span class="n">vals</span> <span class="o">&lt;</span> <span class="n">tol</span>
-    <span class="n">nabsorbed</span> <span class="o">=</span> <span class="n">absorbed</span><span class="o">.</span><span class="n">sum</span><span class="p">()</span>
-    <span class="n">_</span><span class="p">,</span> <span class="n">r</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">linalg</span><span class="o">.</span><span class="n">qr</span><span class="p">(</span><span class="n">x</span><span class="p">)</span>
-    <span class="n">threshold</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">sort</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">abs</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">diag</span><span class="p">(</span><span class="n">r</span><span class="p">)))[</span><span class="n">nabsorbed</span><span class="p">]</span>
-    <span class="n">drop</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">where</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">abs</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">diag</span><span class="p">(</span><span class="n">r</span><span class="p">))</span> <span class="o">&lt;</span> <span class="n">threshold</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span>
-    <span class="n">retain</span><span class="p">:</span> <span class="nb">set</span><span class="p">[</span><span class="nb">int</span><span class="p">]</span> <span class="o">=</span> <span class="nb">set</span><span class="p">(</span><span class="nb">range</span><span class="p">(</span><span class="n">x</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">]))</span><span class="o">.</span><span class="n">difference</span><span class="p">(</span><span class="n">drop</span><span class="p">)</span>
-    <span class="k">if</span> <span class="n">has_constant</span><span class="p">:</span>
-        <span class="k">assert</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">loc</span><span class="p">,</span> <span class="nb">int</span><span class="p">)</span>
-        <span class="n">retain</span> <span class="o">=</span> <span class="p">{</span><span class="n">idx</span> <span class="o">+</span> <span class="p">(</span><span class="n">idx</span> <span class="o">&gt;=</span> <span class="n">loc</span><span class="p">)</span> <span class="k">for</span> <span class="n">idx</span> <span class="ow">in</span> <span class="n">retain</span><span class="p">}</span>
-        <span class="n">retain</span><span class="o">.</span><span class="n">update</span><span class="p">({</span><span class="n">loc</span><span class="p">})</span>
-    <span class="k">return</span> <span class="nb">sorted</span><span class="p">(</span><span class="n">retain</span><span class="p">)</span>
+        <span class="n">constant</span> <span class="o">=</span> <span class="n">loc</span>
+    <span class="n">dropped</span> <span class="o">=</span> <span class="p">{</span><span class="n">i</span> <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">_</span> <span class="ow">in</span> <span class="n">_absorbed_columns</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">x_orig</span><span class="p">,</span> <span class="n">constant</span><span class="p">)}</span>
+    <span class="k">return</span> <span class="p">[</span><span class="n">i</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">x</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">])</span> <span class="k">if</span> <span class="n">i</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">dropped</span><span class="p">]</span>
 
 
 <div class="viewcode-block" id="PanelModelData">

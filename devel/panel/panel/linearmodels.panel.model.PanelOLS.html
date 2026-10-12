@@ -23,7 +23,7 @@
     
   
       
-        <title>linearmodels.panel.model.PanelOLS - linearmodels v7.1 (+245)</title>
+        <title>linearmodels.panel.model.PanelOLS - linearmodels v7.1 (+252)</title>
       
     
 
@@ -100,7 +100,7 @@
 
 <header class="md-header md-header--shadow" data-md-component="header">
   <nav class="md-header__inner md-grid" aria-label="Header">
-    <a href="../../index.html" title="linearmodels v7.1 (+245)" class="md-header__button md-logo" aria-label="linearmodels v7.1 (+245)" data-md-component="logo">
+    <a href="../../index.html" title="linearmodels v7.1 (+252)" class="md-header__button md-logo" aria-label="linearmodels v7.1 (+252)" data-md-component="logo">
       <img src="../../_static/bw-logo.svg" alt="logo">
     </a>
     <label class="md-header__button md-icon" for="__drawer">
@@ -111,7 +111,7 @@
       <div class="md-header__ellipsis">
         <div class="md-header__topic">
           <span class="md-ellipsis">
-            linearmodels v7.1 (+245)
+            linearmodels v7.1 (+252)
           </span>
         </div>
         <div class="md-header__topic" data-md-component="header-topic">
@@ -206,10 +206,10 @@
 
 <nav class="md-nav md-nav--primary" aria-label="Navigation" data-md-level="0">
   <label class="md-nav__title" for="__drawer">
-    <a href="../../index.html" title="linearmodels v7.1 (+245)" class="md-nav__button md-logo" aria-label="linearmodels v7.1 (+245)" data-md-component="logo">
+    <a href="../../index.html" title="linearmodels v7.1 (+252)" class="md-nav__button md-logo" aria-label="linearmodels v7.1 (+252)" data-md-component="logo">
       <img src="../../_static/bw-logo.svg" alt="logo">
     </a>
-    linearmodels v7.1 (+245)
+    linearmodels v7.1 (+252)
   </label>
   
     <div class="md-nav__source">
@@ -1909,6 +1909,17 @@ can be described</p>
 effects are included, the model reduces to <a class="reference internal" href="linearmodels.panel.model.PooledOLS.html#linearmodels.panel.model.PooledOLS" title="linearmodels.panel.model.PooledOLS (Python class) — Pooled coefficient estimator for panel data"><code class="xref py py-class docutils literal notranslate"><span class="pre">PooledOLS</span></code></a>.</p>
 <p>Model supports at most 2 effects.  These can be entity-time, entity-other,
 time-other or 2 other.</p>
+<p>A variable in <code class="docutils literal notranslate"><span class="pre">exog</span></code> is absorbed if the effects explain all of it. The
+algorithms that remove the effects are exact only up to rounding error, or up to
+a relative error of about 1e-8 if they are iterative, so a variable is treated
+as absorbed if less than 1e-5 of its norm is left after the effects are
+removed, whatever its units. It is treated in the same way if it is collinear
+with the variables before it once the effects are removed. An
+<code class="docutils literal notranslate"><span class="pre">AbsorbingEffectError</span></code> is raised for such a variable. If <code class="docutils literal notranslate"><span class="pre">drop_absorbed</span></code> is
+True, the variable is dropped and an <code class="docutils literal notranslate"><span class="pre">AbsorbingEffectWarning</span></code> is raised, and the
+constant is never dropped. The norm includes the mean of the variable, so a
+variable with a large mean and little other variation, less than 1e-5 of its norm,
+is also treated as absorbed. Subtract its mean to avoid this.</p>
 <p class="rubric">Methods</p>
 <table class="autosummary longtable docutils data align-default">
 <tbody>

@@ -23,7 +23,7 @@
     
   
       
-        <title>linearmodels.iv.absorbing.AbsorbingLS - linearmodels v7.1 (+245)</title>
+        <title>linearmodels.iv.absorbing.AbsorbingLS - linearmodels v7.1 (+252)</title>
       
     
 
@@ -100,7 +100,7 @@
 
 <header class="md-header md-header--shadow" data-md-component="header">
   <nav class="md-header__inner md-grid" aria-label="Header">
-    <a href="../../index.html" title="linearmodels v7.1 (+245)" class="md-header__button md-logo" aria-label="linearmodels v7.1 (+245)" data-md-component="logo">
+    <a href="../../index.html" title="linearmodels v7.1 (+252)" class="md-header__button md-logo" aria-label="linearmodels v7.1 (+252)" data-md-component="logo">
       <img src="../../_static/bw-logo.svg" alt="logo">
     </a>
     <label class="md-header__button md-icon" for="__drawer">
@@ -111,7 +111,7 @@
       <div class="md-header__ellipsis">
         <div class="md-header__topic">
           <span class="md-ellipsis">
-            linearmodels v7.1 (+245)
+            linearmodels v7.1 (+252)
           </span>
         </div>
         <div class="md-header__topic" data-md-component="header-topic">
@@ -206,10 +206,10 @@
 
 <nav class="md-nav md-nav--primary" aria-label="Navigation" data-md-level="0">
   <label class="md-nav__title" for="__drawer">
-    <a href="../../index.html" title="linearmodels v7.1 (+245)" class="md-nav__button md-logo" aria-label="linearmodels v7.1 (+245)" data-md-component="logo">
+    <a href="../../index.html" title="linearmodels v7.1 (+252)" class="md-nav__button md-logo" aria-label="linearmodels v7.1 (+252)" data-md-component="logo">
       <img src="../../_static/bw-logo.svg" alt="logo">
     </a>
-    linearmodels v7.1 (+245)
+    linearmodels v7.1 (+252)
   </label>
   
     <div class="md-nav__source">
@@ -1805,6 +1805,17 @@ combined with Frish-Waugh-Lovell to orthogonalize x and y from z.</p>
 <p>z can contain factors that are perfectly linearly dependent. LSMR
 estimates a particular restricted set of parameters that captures the
 effect of non-redundant components in z.</p>
+<p>A variable in <code class="docutils literal notranslate"><span class="pre">exog</span></code> is absorbed if the effects explain all of it. The
+algorithms that absorb the effects stop with a relative error of about
+1e-8, so a variable is treated as absorbed if less than 1e-5 of its norm
+is left after the effects are removed, whatever its units. It is treated
+in the same way if it is collinear with the variables before it once the
+effects are removed. An <code class="docutils literal notranslate"><span class="pre">AbsorbingEffectError</span></code> is raised for such a
+variable. If <code class="docutils literal notranslate"><span class="pre">drop_absorbed</span></code> is True, the variable is dropped and an
+<code class="docutils literal notranslate"><span class="pre">AbsorbingEffectWarning</span></code> is raised, and the constant is never dropped.
+The norm includes the mean of the variable, so a variable with a large mean
+and little other variation, less than 1e-5 of its norm, is also treated as
+absorbed. Subtract its mean to avoid this.</p>
 <p>Rows are paired by position. An input that carries labels (a pandas
 Series or DataFrame with an index other than the default 0, 1, …, n-1,
 or an xarray DataArray with coordinates) must use the same index, in the
