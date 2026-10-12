@@ -96,15 +96,17 @@ def test_weight_config_reports_the_bandwidth_that_was_used(args, model):
     assert bandwidth == mod._weight.bandwidth
 
 
-def test_weight_config_bandwidth_reproduces_two_step_estimates(args):
-    # In two-step GMM the bandwidth is selected once, so using the reported
-    # value reproduces the estimates. This is not true of CUE, where the
-    # bandwidth depends on the parameters and is selected at every evaluation
-    mod = IVGMM(*args, weight_type="kernel", optimal_bw=True, center=True)
-    res = mod.fit()
+@pytest.mark.parametrize("model", MODELS)
+def test_weight_config_bandwidth_reproduces_the_estimates(args, model):
+    # The bandwidth is selected once, from the residuals of the first step, in
+    # two-step GMM and in CUE, so using the reported value reproduces the
+    # estimates. CUE selected it at every evaluation of the objective function
+    # until 7.1, when it depended on the parameters
+    mod = model(*args, weight_type="kernel", optimal_bw=True, center=True)
+    res = mod.fit() if model is IVGMM else mod.fit(display=False)
     bandwidth = res.weight_config["bandwidth"]
-    fixed = IVGMM(*args, weight_type="kernel", bandwidth=bandwidth, center=True)
-    res_fixed = fixed.fit()
+    fixed = model(*args, weight_type="kernel", bandwidth=bandwidth, center=True)
+    res_fixed = fixed.fit() if model is IVGMM else fixed.fit(display=False)
     assert_allclose(res_fixed.params, res.params, rtol=1e-10)
     assert_allclose(res_fixed.weight_matrix, res.weight_matrix, rtol=1e-10)
 

@@ -254,6 +254,9 @@ class KernelWeightMatrix(HomoskedasticWeightMatrix):
     instance. The previous behavior is restored by ``optimal_bw=False`` or by
     ``bandwidth=nobs - 2``. Passing ``bandwidth`` or ``optimal_bw`` silences the
     warning, and ``optimal_bw=True`` selects the new default without it.
+    :class:`~linearmodels.iv.model.IVGMMCUE` estimates the bandwidth once, from
+    the residuals of the first step estimates, and uses it in every evaluation
+    of its objective function.
 
     See Also
     --------
@@ -280,6 +283,48 @@ class KernelWeightMatrix(HomoskedasticWeightMatrix):
         self._default_bandwidth = bandwidth is None and optimal_bw is None
         self._optimal_bw = True if optimal_bw is None else optimal_bw
         self._warned = False
+        # A bandwidth that was estimated from the data once, and is used instead
+        # of estimating it again each time that the weight matrix is computed
+        self._fixed_bandwidth: int | None = None
+
+    @property
+    def _estimates_bandwidth(self) -> bool:
+        """Whether the bandwidth is estimated from the data"""
+        return self._orig_bandwidth is None and self._optimal_bw
+
+    def _scores(
+        self,
+        z: linearmodels.typing.data.Float64Array,
+        eps: linearmodels.typing.data.Float64Array,
+    ) -> linearmodels.typing.data.Float64Array:
+        """The moment conditions, centered if the weight matrix is centered"""
+        ze = z * eps
+        mu = ze.mean(axis=0) if self._center else 0
+        ze -= mu
+        return ze
+
+    def _estimate_bandwidth(self, ze: linearmodels.typing.data.Float64Array) -> int:
+        """The bandwidth that is estimated from the moment conditions"""
+        g = ze / ze.std(0)[None, :]
+        g = g.sum(1)
+        return kernel_optimal_bandwidth(g, self._kernel)
+
+    def _fix_bandwidth(
+        self,
+        z: linearmodels.typing.data.Float64Array,
+        eps: linearmodels.typing.data.Float64Array,
+    ) -> int:
+        """
+        Estimate the bandwidth from eps, and use it for every weight matrix
+
+        The bandwidth that is estimated from the data depends on the residuals.
+        Estimating it at each evaluation of an objective function that depends
+        on the parameters makes the objective a step function of them. It is
+        estimated once instead, and then used each time that the weight matrix
+        is computed.
+        """
+        self._fixed_bandwidth = self._estimate_bandwidth(self._scores(z, eps))
+        return self._fixed_bandwidth
 
     def weight_matrix(
         self,
@@ -303,18 +348,17 @@ class KernelWeightMatrix(HomoskedasticWeightMatrix):
             Covariance of GMM moment conditions.
         """
         nobs, nvar = x.shape
-        ze = z * eps
-        mu = ze.mean(axis=0) if self._center else 0
-        ze -= mu
+        ze = self._scores(z, eps)
 
-        if self._orig_bandwidth is None and self._optimal_bw:
+        if self._estimates_bandwidth:
             if self._default_bandwidth and not self._warned:
                 # Once for each instance, and not for each call
                 self._warned = True
                 _warn_default_bandwidth(weights=True, covariance=False, stacklevel=3)
-            g = ze / ze.std(0)[None, :]
-            g = g.sum(1)
-            self._bandwidth = kernel_optimal_bandwidth(g, self._kernel)
+            if self._fixed_bandwidth is None:
+                self._bandwidth = self._estimate_bandwidth(ze)
+            else:
+                self._bandwidth = self._fixed_bandwidth
         elif self._orig_bandwidth is None:
             self._bandwidth = nobs - 2
         bw = self._bandwidth

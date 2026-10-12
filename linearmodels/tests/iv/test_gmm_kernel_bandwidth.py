@@ -458,21 +458,26 @@ def test_c_stat_uses_the_bandwidth_that_the_model_estimates(args):
 
 
 @pytest.mark.parametrize(
-    "options",
-    [{}, {"optimal_bw": False}, {"optimal_bw": True}, {"bandwidth": 5}],
-    ids=["default", "not_optimal_bw", "optimal_bw", "bandwidth"],
+    ("options", "start_options"),
+    [
+        ({}, {"optimal_bw": True}),
+        ({"optimal_bw": True}, {"optimal_bw": True}),
+        ({"optimal_bw": False}, {"optimal_bw": False}),
+        ({"bandwidth": 5}, {"bandwidth": 5}),
+    ],
+    ids=["default", "optimal_bw", "not_optimal_bw", "bandwidth"],
 )
-def test_cue_starting_values_have_the_old_bandwidth(args, options):
-    # The starting values are the estimates of IVGMM with the bandwidth that was
-    # given, and with nobs - 2 if none was, as they have always been. optimal_bw
-    # selects the bandwidth of the objective only
-    old = {"bandwidth": options["bandwidth"]} if "bandwidth" in options else {}
+def test_cue_starting_values_have_the_bandwidth_of_the_objective(
+    args, options, start_options
+):
+    # The starting values are the estimates of IVGMM with the bandwidth of the
+    # objective function: the one that is estimated from the first step residuals
+    # by default and with optimal_bw=True, as IVGMM does, the one that was given,
+    # and nobs - 2 with optimal_bw=False
     with warnings.catch_warnings():
         # The default warns
         warnings.simplefilter("ignore", DefaultBandwidthWarning)
-        start = IVGMM(
-            *args, weight_type="kernel", center=True, optimal_bw=False, **old
-        ).fit()
+        start = IVGMM(*args, weight_type="kernel", center=True, **start_options).fit()
         res = IVGMMCUE(*args, weight_type="kernel", **options).fit()
         res_start = IVGMMCUE(*args, weight_type="kernel", **options).fit(
             starting=start.params
@@ -480,6 +485,9 @@ def test_cue_starting_values_have_the_old_bandwidth(args, options):
     assert_array_equal(res.params, res_start.params)
     assert res.iterations == res_start.iterations
     assert res.j_stat.stat == res_start.j_stat.stat
+    if start_options.get("optimal_bw"):
+        # and the weight matrix of the objective has the same bandwidth too
+        assert res.weight_config["bandwidth"] == start.weight_config["bandwidth"]
 
 
 def test_from_formula(args):

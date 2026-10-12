@@ -1188,7 +1188,15 @@ class _IVGMMBase(_IVModelBase):
         g_bar = (z * eps).mean(0)
 
         weight_matrix_estimator = WEIGHT_MATRICES[self._weight_type]
-        centered = weight_matrix_estimator(**{**self._weight_kwargs, "center": True})
+        kwargs = {**self._weight_kwargs, "center": True}
+        weight = self._weight
+        if (
+            isinstance(weight, KernelWeightMatrix)
+            and weight._fixed_bandwidth is not None
+        ):
+            # A bandwidth that the model estimated once is not estimated again
+            kwargs["bandwidth"] = weight._fixed_bandwidth
+        centered = weight_matrix_estimator(**kwargs)
         s_c = centered.weight_matrix(x, z, eps)
         if _is_singular(s_c):
             # The centered cluster sums add to zero, so a clustered estimator
@@ -1700,20 +1708,35 @@ class IVGMMCUE(_IVGMMBase):
     through :math:`\epsilon_i = y_i - x_i\beta`.
 
     The bandwidth of a kernel weight matrix (``weight_type="kernel"``) is
-    ``bandwidth`` if it is given in ``weight_config``. If neither ``bandwidth``
-    nor ``optimal_bw`` is given, it is estimated from the data at every
-    evaluation of the objective function, as the bandwidth of the kernel
-    covariance of :class:`~linearmodels.iv.model.IV2SLS` and
-    :class:`~linearmodels.iv.model.IVLIML` is. In 7.0 and earlier it was
-    ``nobs - 2``, which is not a consistent estimator, so the estimates,
-    standard errors and J statistic can be different. ``fit`` issues a
-    ``DefaultBandwidthWarning`` (a ``UserWarning``) when it uses the default.
-    To restore the previous behavior, pass ``optimal_bw=False`` or
-    ``bandwidth=nobs - 2`` in ``weight_config``, for example
-    ``IVGMMCUE(dependent, exog, endog, instruments, weight_type="kernel",
-    optimal_bw=False)``. Passing ``bandwidth`` or ``optimal_bw`` silences the
-    warning, and ``optimal_bw=True`` selects the bandwidth from the data
-    without it. The same holds for ``cov_type="kernel"`` in ``fit``. See
+    ``bandwidth`` if it is given in ``weight_config``, and ``nobs - 2`` if
+    ``optimal_bw`` is ``False``. Otherwise, which is the default and what
+    ``optimal_bw=True`` does, it is estimated from the data, as the bandwidth
+    of the kernel covariance of :class:`~linearmodels.iv.model.IV2SLS` and
+    :class:`~linearmodels.iv.model.IVLIML` is. It is estimated once, from the
+    residuals of the first step estimates (the two-stage least squares
+    estimates, which are also the first step of :class:`~linearmodels.iv.model.IVGMM`),
+    and the same bandwidth is used for the starting values, for every
+    evaluation of the objective function, and for the weight matrix, J
+    statistic and centered J statistic of the estimates. The objective function
+    is smooth in the parameters, as the optimizer needs it to be. A bandwidth
+    that is estimated again at every evaluation changes by whole lags with the
+    parameters, which makes the objective a step function, and the optimizer
+    stopped before the minimum in about one fit in ten in a simulation with
+    autocorrelated errors. The bandwidth that was used is in
+    :attr:`~linearmodels.iv.results.IVGMMResults.weight_config`.
+
+    In 7.0 and earlier the default bandwidth was ``nobs - 2``, which is not a
+    consistent estimator, so the estimates, standard errors and J statistic can
+    be different. ``fit`` issues a ``DefaultBandwidthWarning`` (a
+    ``UserWarning``) when it uses the default. To restore the previous
+    behavior, pass ``optimal_bw=False`` or ``bandwidth=nobs - 2`` in
+    ``weight_config``, for example ``IVGMMCUE(dependent, exog, endog,
+    instruments, weight_type="kernel", optimal_bw=False)``. Passing
+    ``bandwidth`` or ``optimal_bw`` silences the warning. The same holds for
+    ``cov_type="kernel"`` in ``fit``, whose bandwidth is estimated from the
+    residuals of the final estimates. Before 7.1, ``optimal_bw=True`` estimated
+    the bandwidth of the objective function at every evaluation and used
+    ``nobs - 2`` for the starting values, so its estimates change slightly. See
     :class:`~linearmodels.iv.gmm.KernelWeightMatrix` and
     :class:`~linearmodels.iv.gmm.IVGMMCovariance`.
 
@@ -1860,7 +1883,14 @@ class IVGMMCUE(_IVGMMBase):
         Unlike tradition GMM, the weighting matrix is simultaneously computed
         with the moment conditions, and so has explicit dependence on
         :math:`\beta`.
+
+        If the bandwidth of a kernel weight matrix is estimated from the data,
+        it is estimated once, from the residuals of the first step estimates
+        of the data of the model, the first time that it is needed, and the
+        same bandwidth is used each time that the function is evaluated. The
+        function is then smooth in the parameters.
         """
+        self._select_bandwidth()
         nobs = y.shape[0]
         weight_matrix = self._weight.weight_matrix
         eps = y - x @ params[:, None]
@@ -1902,7 +1932,11 @@ class IVGMMCUE(_IVGMMBase):
         Notes
         -----
         Exposed to facilitate estimation with other data, e.g., bootstrapped
-        samples.  Performs no error checking.
+        samples.  Performs no error checking. The bandwidth of a kernel weight
+        matrix that is estimated from the data is the one that is estimated
+        from the data of the model, see
+        :meth:`~linearmodels.iv.model.IVGMMCUE.j`, and not from ``x``, ``y``
+        and ``z``.
 
         See Also
         --------
@@ -1943,6 +1977,39 @@ class IVGMMCUE(_IVGMMBase):
 
         return res.x[:, None], res.nit
 
+    def _first_step_residuals(self) -> linearmodels.typing.data.Float64Array:
+        """
+        Residuals of the first step estimates of two-step GMM
+
+        The first step uses the weight matrix (Z'Z / n)^{-1}, which gives the
+        two-stage least squares estimates. They are also the first step of the
+        IVGMM estimates that are the starting values.
+        """
+        wy, wx, wz = self._wy, self._wx, self._wz
+        nobs = wz.shape[0]
+        params = IVGMM.estimate_parameters(wx, wy, wz, inv(wz.T @ wz / nobs))
+        return wy - wx @ params
+
+    def _select_bandwidth(self) -> None:
+        """
+        Estimate the bandwidth of a kernel weight matrix once
+
+        If the bandwidth of the weight matrix is estimated from the data, it is
+        estimated from the first step residuals the first time that this is
+        called, and the weight matrix uses it from then on. The model has the
+        same bandwidth in the starting values, in the objective function, which
+        is then smooth in the parameters, in the weight matrix of the estimates
+        and in the centered J statistic. A bandwidth that is given, or that is
+        nobs - 2 if optimal_bw is False, is not changed.
+        """
+        weight = self._weight
+        if (
+            isinstance(weight, KernelWeightMatrix)
+            and weight._estimates_bandwidth
+            and weight._fixed_bandwidth is None
+        ):
+            weight._fix_bandwidth(self._wz, self._first_step_residuals())
+
     def _check_moment_covariance(self) -> None:
         """
         Raise a ValueError if the objective function is not defined or constant
@@ -1962,11 +2029,10 @@ class IVGMMCUE(_IVGMMBase):
         is 1'Xi(Xi'Xi)^{-1}Xi'1, which is the number of clusters whenever Xi is
         nonsingular (it is divided by the small sample adjustment if debiased).
         """
-        wy, wx, wz = self._wy, self._wx, self._wz
-        nobs, nmoment = wz.shape
-        params = IVGMM.estimate_parameters(wx, wy, wz, inv(wz.T @ wz / nobs))
+        wx, wz = self._wx, self._wz
+        nmoment = wz.shape[1]
         self._raise_if_singular(
-            self._weight.weight_matrix(wx, wz, wy - wx @ params),
+            self._weight.weight_matrix(wx, wz, self._first_step_residuals()),
             "The objective function of the continuously updating GMM estimator "
             "uses the inverse of the covariance, so it is not defined.",
         )
@@ -2047,14 +2113,22 @@ class IVGMMCUE(_IVGMMBase):
         Notes
         -----
         Starting values are computed by IVGMM with the weight type and
-        configuration of the model, except that the bandwidth of a kernel
-        weight matrix is ``bandwidth`` if it was given and ``nobs - 2`` if it
-        was not. ``optimal_bw`` selects the bandwidth of the objective
-        function only.
+        configuration of the model. A kernel weight matrix has the bandwidth
+        of the objective function: ``bandwidth`` if it was given and
+        ``nobs - 2`` if ``optimal_bw`` is False. Otherwise the bandwidth is
+        estimated from the data, once, from the residuals of the first step
+        estimates, which are the first step of IVGMM too. The same bandwidth
+        is used for the starting values, for every evaluation of the objective
+        function and for the weight matrix of the estimates, so that the
+        objective function is smooth in the parameters. In 7.0 and earlier
+        the starting values used ``nobs - 2`` whenever ``bandwidth`` was not
+        given, and the bandwidth that was estimated from the data was estimated
+        again at every evaluation of the objective function.
 
         If ``cov_type`` is "kernel" and neither ``bandwidth`` nor
         ``optimal_bw`` is in ``cov_config``, the bandwidth of the covariance
-        is estimated from the data. In 7.0 and earlier it was ``nobs - 2``.
+        is estimated from the data, from the residuals of the final
+        estimates. In 7.0 and earlier it was ``nobs - 2``.
         ``fit`` issues a ``DefaultBandwidthWarning`` (a ``UserWarning``) once
         for each call when the covariance, or the kernel weight matrix of the
         model, uses the default bandwidth. To restore the previous covariance,
@@ -2065,6 +2139,7 @@ class IVGMMCUE(_IVGMMBase):
         """
         self._check_clusters(cov_config)
         cov_config = self._check_default_bandwidth(cov_type, cov_config)
+        self._select_bandwidth()
         wy, wx, wz = self._wy, self._wx, self._wz
         weight_matrix = self._weight.weight_matrix
         self._check_moment_covariance()
@@ -2074,12 +2149,16 @@ class IVGMMCUE(_IVGMMBase):
             instr = None if self.instruments.shape[1] == 0 else self.instruments
 
             weight_config = dict(self._weight_config)
-            if self._weight_type == "kernel":
-                # The bandwidth of the starting values is the one that was given,
-                # and nobs - 2 if none was, as it has always been. optimal_bw
-                # selects the bandwidth of the objective only. Being explicit
-                # keeps the new default from being used, and from warning
-                weight_config["optimal_bw"] = False
+            weight = self._weight
+            if isinstance(weight, KernelWeightMatrix):
+                # The starting values use the bandwidth of the objective function.
+                # Being explicit keeps IVGMM from selecting a bandwidth by itself,
+                # and from warning about the default
+                if weight._fixed_bandwidth is None:
+                    # The bandwidth that was given, or nobs - 2
+                    weight_config["optimal_bw"] = False
+                else:
+                    weight_config["bandwidth"] = weight._fixed_bandwidth
             res = IVGMM(
                 self.dependent,
                 exog,
