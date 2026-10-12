@@ -153,7 +153,7 @@ class LinearFactorModelResults(_SummaryStr):
 
         rp = np.asarray(self.risk_premia)[:, None]
         se = np.asarray(self.risk_premia_se)[:, None]
-        tstats = np.asarray(self.risk_premia / self.risk_premia_se)
+        tstats = np.asarray(self.risk_premia_tstats)
         pvalues = 2 * stats.norm.sf(np.abs(tstats))
         ci = rp + se * stats.norm.ppf([[0.025, 0.975]])
         param_data = np.c_[rp, se, tstats[:, None], pvalues[:, None], ci]
@@ -192,9 +192,9 @@ class LinearFactorModelResults(_SummaryStr):
         first: bool = False,
     ) -> SimpleTable:
         # The standard error is 0 when the parameter is known, as for the alphas of a
-        # model that is just identified
+        # model that is just identified, and the t-statistic is not defined
         with np.errstate(divide="ignore", invalid="ignore"):
-            tstats = params / se
+            tstats = np.where(se == 0, np.nan, params / se)
         pvalues = 2 * stats.norm.sf(np.abs(tstats))
         ci = params + se * stats.norm.ppf([[0.025, 0.975]])
         param_data = np.c_[params, se, tstats, pvalues, ci]
@@ -307,13 +307,26 @@ class LinearFactorModelResults(_SummaryStr):
 
     @cached_property
     def tstats(self) -> pd.DataFrame:
-        """Parameter t-statistics"""
-        return self.params / self.std_errors
+        """
+        Parameter t-statistics.
+
+        Notes
+        -----
+        The t-statistic of a parameter with a standard error of 0 is NaN, since
+        the test is not defined. This is the case for the alphas of a model that
+        is just identified, which are zero by construction.
+        """
+        se = self.std_errors
+        return (self.params / se).where(se != 0)
 
     @cached_property
     def pvalues(self) -> pd.DataFrame:
         """
         Parameter p-vals. Uses t(df_resid) if ``debiased`` is True, else normal
+
+        Notes
+        -----
+        The p-value is NaN where the t-statistic is NaN.
         """
         pvals = self.tstats.copy()
         pvals.loc[:, :] = 2 * stats.norm.sf(np.abs(pvals))
@@ -389,8 +402,15 @@ class LinearFactorModelResults(_SummaryStr):
 
     @property
     def risk_premia_tstats(self) -> pd.Series:
-        """Risk premia t-statistics"""
-        return self.risk_premia / self.risk_premia_se
+        """
+        Risk premia t-statistics.
+
+        Notes
+        -----
+        The t-statistic of a risk premium with a standard error of 0 is NaN.
+        """
+        se = self.risk_premia_se
+        return (self.risk_premia / se).where(se != 0)
 
     @property
     def rsquared(self) -> float:
