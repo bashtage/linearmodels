@@ -19,7 +19,7 @@
     
   
       
-        <title>linearmodels.system.covariance - linearmodels v7.1 (+294)</title>
+        <title>linearmodels.system.covariance - linearmodels v7.1 (+315)</title>
       
     
 
@@ -91,7 +91,7 @@
 
 <header class="md-header md-header--shadow" data-md-component="header">
   <nav class="md-header__inner md-grid" aria-label="Header">
-    <a href="../../../index.html" title="linearmodels v7.1 (+294)" class="md-header__button md-logo" aria-label="linearmodels v7.1 (+294)" data-md-component="logo">
+    <a href="../../../index.html" title="linearmodels v7.1 (+315)" class="md-header__button md-logo" aria-label="linearmodels v7.1 (+315)" data-md-component="logo">
       <img src="../../../_static/bw-logo.svg" alt="logo">
     </a>
     <label class="md-header__button md-icon" for="__drawer">
@@ -102,7 +102,7 @@
       <div class="md-header__ellipsis">
         <div class="md-header__topic">
           <span class="md-ellipsis">
-            linearmodels v7.1 (+294)
+            linearmodels v7.1 (+315)
           </span>
         </div>
         <div class="md-header__topic" data-md-component="header-topic">
@@ -197,10 +197,10 @@
 
 <nav class="md-nav md-nav--primary" aria-label="Navigation" data-md-level="0">
   <label class="md-nav__title" for="__drawer">
-    <a href="../../../index.html" title="linearmodels v7.1 (+294)" class="md-nav__button md-logo" aria-label="linearmodels v7.1 (+294)" data-md-component="logo">
+    <a href="../../../index.html" title="linearmodels v7.1 (+315)" class="md-nav__button md-logo" aria-label="linearmodels v7.1 (+315)" data-md-component="logo">
       <img src="../../../_static/bw-logo.svg" alt="logo">
     </a>
-    linearmodels v7.1 (+294)
+    linearmodels v7.1 (+315)
   </label>
   
     <div class="md-nav__source">
@@ -531,7 +531,7 @@
 
 <span class="kn">from</span><span class="w"> </span><span class="nn">typing</span><span class="w"> </span><span class="kn">import</span> <span class="n">cast</span>
 
-<span class="kn">from</span><span class="w"> </span><span class="nn">numpy</span><span class="w"> </span><span class="kn">import</span> <span class="n">asarray</span><span class="p">,</span> <span class="n">empty</span><span class="p">,</span> <span class="n">eye</span><span class="p">,</span> <span class="n">ndarray</span><span class="p">,</span> <span class="n">ones</span><span class="p">,</span> <span class="n">sqrt</span><span class="p">,</span> <span class="n">vstack</span><span class="p">,</span> <span class="n">zeros</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">numpy</span><span class="w"> </span><span class="kn">import</span> <span class="n">empty</span><span class="p">,</span> <span class="n">eye</span><span class="p">,</span> <span class="n">ndarray</span><span class="p">,</span> <span class="n">ones</span><span class="p">,</span> <span class="n">sqrt</span><span class="p">,</span> <span class="n">vstack</span><span class="p">,</span> <span class="n">zeros</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">numpy.linalg</span><span class="w"> </span><span class="kn">import</span> <span class="n">inv</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">pandas</span><span class="w"> </span><span class="kn">import</span> <span class="n">DataFrame</span>
 
@@ -539,6 +539,7 @@
 <span class="kn">from</span><span class="w"> </span><span class="nn">linearmodels.iv.covariance</span><span class="w"> </span><span class="kn">import</span> <span class="n">cov_cluster</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">linearmodels.panel.covariance</span><span class="w"> </span><span class="kn">import</span> <span class="n">cluster_union</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">linearmodels.shared.covariance</span><span class="w"> </span><span class="kn">import</span> <span class="n">group_debias_coefficient</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">linearmodels.shared.inputs</span><span class="w"> </span><span class="kn">import</span> <span class="n">as_ndarray</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">linearmodels.shared.utility</span><span class="w"> </span><span class="kn">import</span> <span class="n">AttrDict</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">linearmodels.system._utility</span><span class="w"> </span><span class="kn">import</span> <span class="p">(</span>
     <span class="n">LinearConstraint</span><span class="p">,</span>
@@ -951,7 +952,7 @@
 <span class="sd">        Flag indicating to apply a small sample adjustment</span>
 <span class="sd">    constraints : {None, LinearConstraint}</span>
 <span class="sd">        Constraints used in estimation, if any</span>
-<span class="sd">    clusters : ndarray</span>
+<span class="sd">    clusters : array_like</span>
 <span class="sd">        Optional array of cluster id.  Must be integer valued, and have shape</span>
 <span class="sd">        (nobs, ncluster) where ncluster is 1 or 2.</span>
 <span class="sd">    group_debias : bool</span>
@@ -1022,15 +1023,15 @@
 <span class="w">        </span><span class="sd">"""Check cluster dimension and ensure ndarray"""</span>
         <span class="k">if</span> <span class="n">clusters</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
             <span class="k">return</span> <span class="n">empty</span><span class="p">((</span><span class="bp">self</span><span class="o">.</span><span class="n">_eps</span><span class="o">.</span><span class="n">size</span><span class="p">,</span> <span class="mi">0</span><span class="p">),</span> <span class="n">dtype</span><span class="o">=</span><span class="nb">int</span><span class="p">)</span>
-        <span class="n">_clusters</span> <span class="o">=</span> <span class="n">asarray</span><span class="p">(</span><span class="n">clusters</span><span class="p">)</span>
+        <span class="n">_clusters</span> <span class="o">=</span> <span class="n">as_ndarray</span><span class="p">(</span><span class="n">clusters</span><span class="p">,</span> <span class="s2">"clusters"</span><span class="p">)</span>
 
         <span class="k">if</span> <span class="n">_clusters</span><span class="o">.</span><span class="n">ndim</span> <span class="ow">not</span> <span class="ow">in</span> <span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">):</span>
-            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="n">CLUSTERS_FORMAT</span><span class="p">,</span> <span class="ne">ValueError</span><span class="p">)</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="n">CLUSTERS_FORMAT</span><span class="p">)</span>
         <span class="k">elif</span> <span class="n">_clusters</span><span class="o">.</span><span class="n">ndim</span> <span class="o">==</span> <span class="mi">1</span><span class="p">:</span>
             <span class="n">_clusters</span> <span class="o">=</span> <span class="n">_clusters</span><span class="p">[:,</span> <span class="kc">None</span><span class="p">]</span>
         <span class="n">shape</span> <span class="o">=</span> <span class="n">_clusters</span><span class="o">.</span><span class="n">shape</span>
         <span class="k">if</span> <span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">!=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_eps</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="ow">or</span> <span class="ow">not</span> <span class="mi">1</span> <span class="o">&lt;=</span> <span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">&lt;=</span> <span class="mi">2</span><span class="p">:</span>
-            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="n">CLUSTERS_FORMAT</span><span class="p">,</span> <span class="ne">ValueError</span><span class="p">)</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="n">CLUSTERS_FORMAT</span><span class="p">)</span>
 
         <span class="n">df</span> <span class="o">=</span> <span class="n">DataFrame</span><span class="p">(</span><span class="n">_clusters</span><span class="p">)</span>
         <span class="n">nunique</span> <span class="o">=</span> <span class="n">df</span><span class="o">.</span><span class="n">nunique</span><span class="p">()</span>

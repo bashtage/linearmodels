@@ -19,7 +19,7 @@
     
   
       
-        <title>linearmodels.panel.results - linearmodels v7.1 (+294)</title>
+        <title>linearmodels.panel.results - linearmodels v7.1 (+315)</title>
       
     
 
@@ -91,7 +91,7 @@
 
 <header class="md-header md-header--shadow" data-md-component="header">
   <nav class="md-header__inner md-grid" aria-label="Header">
-    <a href="../../../index.html" title="linearmodels v7.1 (+294)" class="md-header__button md-logo" aria-label="linearmodels v7.1 (+294)" data-md-component="logo">
+    <a href="../../../index.html" title="linearmodels v7.1 (+315)" class="md-header__button md-logo" aria-label="linearmodels v7.1 (+315)" data-md-component="logo">
       <img src="../../../_static/bw-logo.svg" alt="logo">
     </a>
     <label class="md-header__button md-icon" for="__drawer">
@@ -102,7 +102,7 @@
       <div class="md-header__ellipsis">
         <div class="md-header__topic">
           <span class="md-ellipsis">
-            linearmodels v7.1 (+294)
+            linearmodels v7.1 (+315)
           </span>
         </div>
         <div class="md-header__topic" data-md-component="header-topic">
@@ -197,10 +197,10 @@
 
 <nav class="md-nav md-nav--primary" aria-label="Navigation" data-md-level="0">
   <label class="md-nav__title" for="__drawer">
-    <a href="../../../index.html" title="linearmodels v7.1 (+294)" class="md-nav__button md-logo" aria-label="linearmodels v7.1 (+294)" data-md-component="logo">
+    <a href="../../../index.html" title="linearmodels v7.1 (+315)" class="md-nav__button md-logo" aria-label="linearmodels v7.1 (+315)" data-md-component="logo">
       <img src="../../../_static/bw-logo.svg" alt="logo">
     </a>
-    linearmodels v7.1 (+294)
+    linearmodels v7.1 (+315)
   </label>
   
     <div class="md-nav__source">
@@ -1057,8 +1057,10 @@
 
 <span class="sd">        Parameters</span>
 <span class="sd">        ----------</span>
-<span class="sd">        exog : array_like</span>
-<span class="sd">            Exogenous values to use in out-of-sample prediction (nobs by nexog)</span>
+<span class="sd">        exog : PanelData, DataFrame, Series, ndarray or DataArray, optional</span>
+<span class="sd">            Exogenous values to use in out-of-sample prediction (nobs by nexog).</span>
+<span class="sd">            The containers are those of ``exog`` in the model. A list or a tuple</span>
+<span class="sd">            raises a ``TypeError`` that names ``exog``.</span>
 <span class="sd">        data : DataFrame</span>
 <span class="sd">            DataFrame to use for out-of-sample predictions when model was</span>
 <span class="sd">            constructed using a formula.</span>

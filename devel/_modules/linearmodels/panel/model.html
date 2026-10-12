@@ -19,7 +19,7 @@
     
   
       
-        <title>linearmodels.panel.model - linearmodels v7.1 (+294)</title>
+        <title>linearmodels.panel.model - linearmodels v7.1 (+315)</title>
       
     
 
@@ -91,7 +91,7 @@
 
 <header class="md-header md-header--shadow" data-md-component="header">
   <nav class="md-header__inner md-grid" aria-label="Header">
-    <a href="../../../index.html" title="linearmodels v7.1 (+294)" class="md-header__button md-logo" aria-label="linearmodels v7.1 (+294)" data-md-component="logo">
+    <a href="../../../index.html" title="linearmodels v7.1 (+315)" class="md-header__button md-logo" aria-label="linearmodels v7.1 (+315)" data-md-component="logo">
       <img src="../../../_static/bw-logo.svg" alt="logo">
     </a>
     <label class="md-header__button md-icon" for="__drawer">
@@ -102,7 +102,7 @@
       <div class="md-header__ellipsis">
         <div class="md-header__topic">
           <span class="md-ellipsis">
-            linearmodels v7.1 (+294)
+            linearmodels v7.1 (+315)
           </span>
         </div>
         <div class="md-header__topic" data-md-component="header-topic">
@@ -197,10 +197,10 @@
 
 <nav class="md-nav md-nav--primary" aria-label="Navigation" data-md-level="0">
   <label class="md-nav__title" for="__drawer">
-    <a href="../../../index.html" title="linearmodels v7.1 (+294)" class="md-nav__button md-logo" aria-label="linearmodels v7.1 (+294)" data-md-component="logo">
+    <a href="../../../index.html" title="linearmodels v7.1 (+315)" class="md-nav__button md-logo" aria-label="linearmodels v7.1 (+315)" data-md-component="logo">
       <img src="../../../_static/bw-logo.svg" alt="logo">
     </a>
-    linearmodels v7.1 (+294)
+    linearmodels v7.1 (+315)
   </label>
   
     <div class="md-nav__source">
@@ -540,7 +540,16 @@
 <span class="kn">from</span><span class="w"> </span><span class="nn">formulaic.parser.algos.tokenize</span><span class="w"> </span><span class="kn">import</span> <span class="n">tokenize</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">formulaic.utils.context</span><span class="w"> </span><span class="kn">import</span> <span class="n">capture_context</span>
 <span class="kn">import</span><span class="w"> </span><span class="nn">numpy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">np</span>
-<span class="kn">from</span><span class="w"> </span><span class="nn">pandas</span><span class="w"> </span><span class="kn">import</span> <span class="n">Categorical</span><span class="p">,</span> <span class="n">DataFrame</span><span class="p">,</span> <span class="n">Index</span><span class="p">,</span> <span class="n">MultiIndex</span><span class="p">,</span> <span class="n">Series</span><span class="p">,</span> <span class="n">get_dummies</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">pandas</span><span class="w"> </span><span class="kn">import</span> <span class="p">(</span>
+    <span class="n">Categorical</span><span class="p">,</span>
+    <span class="n">DataFrame</span><span class="p">,</span>
+    <span class="n">Index</span><span class="p">,</span>
+    <span class="n">MultiIndex</span><span class="p">,</span>
+    <span class="n">Series</span><span class="p">,</span>
+    <span class="n">factorize</span><span class="p">,</span>
+    <span class="n">get_dummies</span><span class="p">,</span>
+<span class="p">)</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">pandas.api.types</span><span class="w"> </span><span class="kn">import</span> <span class="n">is_numeric_dtype</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">scipy.linalg</span><span class="w"> </span><span class="kn">import</span> <span class="n">lstsq</span> <span class="k">as</span> <span class="n">sp_lstsq</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">scipy.sparse.linalg</span><span class="w"> </span><span class="kn">import</span> <span class="n">lsmr</span>
 
@@ -588,6 +597,7 @@
     <span class="n">InvalidTestStatistic</span><span class="p">,</span>
     <span class="n">WaldTestStatistic</span><span class="p">,</span>
 <span class="p">)</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">linearmodels.shared.inputs</span><span class="w"> </span><span class="kn">import</span> <span class="n">as_array_like</span><span class="p">,</span> <span class="n">as_float64</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">linearmodels.shared.linalg</span><span class="w"> </span><span class="kn">import</span> <span class="n">has_constant</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">linearmodels.shared.typed_getters</span><span class="w"> </span><span class="kn">import</span> <span class="n">get_panel_data_like</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">linearmodels.shared.utility</span><span class="w"> </span><span class="kn">import</span> <span class="n">AttrDict</span><span class="p">,</span> <span class="n">ensure_unique_column</span><span class="p">,</span> <span class="n">panel_to_frame</span>
@@ -676,6 +686,32 @@
     <span class="k">return</span> <span class="n">wald</span>
 
 
+<span class="k">def</span><span class="w"> </span><span class="nf">_panel_data</span><span class="p">(</span><span class="n">value</span><span class="p">:</span> <span class="n">Any</span><span class="p">,</span> <span class="n">name</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">var_name</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">:</span> <span class="n">Any</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">PanelData</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">"""</span>
+<span class="sd">    PanelData of an input of a model.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    value : object</span>
+<span class="sd">        The input.</span>
+<span class="sd">    name : str</span>
+<span class="sd">        The name of the parameter, which is added to the messages of the errors.</span>
+<span class="sd">    var_name : str</span>
+<span class="sd">        The name to use for the variables of NumPy inputs.</span>
+<span class="sd">    **kwargs</span>
+<span class="sd">        Keyword arguments for PanelData.</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    PanelData</span>
+<span class="sd">        The panel data.</span>
+<span class="sd">    """</span>
+    <span class="k">try</span><span class="p">:</span>
+        <span class="k">return</span> <span class="n">PanelData</span><span class="p">(</span><span class="n">value</span><span class="p">,</span> <span class="n">var_name</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+    <span class="k">except</span> <span class="p">(</span><span class="ne">TypeError</span><span class="p">,</span> <span class="ne">ValueError</span><span class="p">)</span> <span class="k">as</span> <span class="n">exc</span><span class="p">:</span>
+        <span class="k">raise</span> <span class="nb">type</span><span class="p">(</span><span class="n">exc</span><span class="p">)(</span><span class="sa">f</span><span class="s2">"</span><span class="si">{</span><span class="n">name</span><span class="si">}</span><span class="s2">: </span><span class="si">{</span><span class="n">exc</span><span class="si">}</span><span class="s2">"</span><span class="p">)</span> <span class="kn">from</span><span class="w"> </span><span class="nn">exc</span>
+
+
 <span class="k">class</span><span class="w"> </span><span class="nc">PanelFormulaParser</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">"""</span>
 <span class="sd">    Parse formulas for OLS and IV models</span>
@@ -702,7 +738,7 @@
         <span class="n">context</span><span class="p">:</span> <span class="n">Mapping</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
     <span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_formula</span> <span class="o">=</span> <span class="n">formula</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">_data</span> <span class="o">=</span> <span class="n">PanelData</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="n">convert_dummies</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">copy</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_data</span> <span class="o">=</span> <span class="n">_panel_data</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="s2">"data"</span><span class="p">,</span> <span class="s2">"x"</span><span class="p">,</span> <span class="n">convert_dummies</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">copy</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_na_action</span> <span class="o">=</span> <span class="n">NAAction</span><span class="p">(</span><span class="s2">"ignore"</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_eval_env</span> <span class="o">=</span> <span class="n">eval_env</span>
         <span class="k">if</span> <span class="ow">not</span> <span class="n">context</span><span class="p">:</span>
@@ -841,18 +877,28 @@
 
 <span class="sd">    Parameters</span>
 <span class="sd">    ----------</span>
-<span class="sd">    dependent : array_like</span>
-<span class="sd">        Dependent (left-hand-side) variable (time by entity)</span>
-<span class="sd">    exog : array_like</span>
-<span class="sd">        Exogenous or right-hand-side variables (variable by time by entity).</span>
-<span class="sd">    weights : array_like</span>
+<span class="sd">    dependent : PanelData, DataFrame, Series, ndarray or DataArray</span>
+<span class="sd">        Dependent (left-hand-side) variable (time by entity). A DataFrame or</span>
+<span class="sd">        Series with a 2-level MultiIndex (entity, then time), a DataFrame with</span>
+<span class="sd">        time as the index and entities as the columns, a 2-d (time by entity)</span>
+<span class="sd">        NumPy array or DataArray, or a PanelData. A list, a tuple or any other</span>
+<span class="sd">        container raises a ``TypeError`` that names ``dependent``, since the</span>
+<span class="sd">        entities and time periods need labels or a layout.</span>
+<span class="sd">    exog : PanelData, DataFrame, Series, ndarray or DataArray</span>
+<span class="sd">        Exogenous or right-hand-side variables (variable by time by entity). The</span>
+<span class="sd">        containers are those of ``dependent``, where a DataFrame has a column for</span>
+<span class="sd">        each variable and an array or DataArray with several variables has 3</span>
+<span class="sd">        dimensions (variable by time by entity). A list, a tuple or any other</span>
+<span class="sd">        container raises a ``TypeError`` that names ``exog``.</span>
+<span class="sd">    weights : array_like, optional</span>
 <span class="sd">        Weights to use in estimation.  Assumes residual variance is</span>
 <span class="sd">        proportional to inverse of weight to that the residual time</span>
 <span class="sd">        the weight should be homoskedastic.</span>
 <span class="sd">        Weights can be given for each observation, for each time period,</span>
 <span class="sd">        for each entity or for each combination of time period and entity.</span>
 <span class="sd">        Weights with labels must use the same labels, in the same order,</span>
-<span class="sd">        as dependent. See :ref:`panel-input-alignment`.</span>
+<span class="sd">        as dependent or, if dependent has no labels, as exog. See</span>
+<span class="sd">        :ref:`panel-input-alignment`.</span>
 <span class="sd">    check_rank : bool</span>
 <span class="sd">        Flag indicating whether to perform a rank check on the exogenous</span>
 <span class="sd">        variables to ensure that the model is identified. Skipping this</span>
@@ -869,11 +915,14 @@
         <span class="n">weights</span><span class="p">:</span> <span class="n">PanelDataLike</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
         <span class="n">check_rank</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span>
     <span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">dependent</span> <span class="o">=</span> <span class="n">PanelData</span><span class="p">(</span><span class="n">dependent</span><span class="p">,</span> <span class="s2">"Dep"</span><span class="p">)</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">exog</span> <span class="o">=</span> <span class="n">PanelData</span><span class="p">(</span><span class="n">exog</span><span class="p">,</span> <span class="s2">"Exog"</span><span class="p">)</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">_dependent_labelled</span> <span class="o">=</span> <span class="n">_is_labelled</span><span class="p">(</span><span class="n">dependent</span><span class="p">)</span>
-        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_dependent_labelled</span> <span class="ow">and</span> <span class="n">_is_labelled</span><span class="p">(</span><span class="n">exog</span><span class="p">):</span>
-            <span class="n">check_row_alignment</span><span class="p">(</span><span class="s2">"exog"</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">exog</span><span class="o">.</span><span class="n">index</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">dependent</span><span class="o">.</span><span class="n">index</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">dependent</span> <span class="o">=</span> <span class="n">_panel_data</span><span class="p">(</span><span class="n">dependent</span><span class="p">,</span> <span class="s2">"dependent"</span><span class="p">,</span> <span class="s2">"Dep"</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">exog</span> <span class="o">=</span> <span class="n">_panel_data</span><span class="p">(</span><span class="n">exog</span><span class="p">,</span> <span class="s2">"exog"</span><span class="p">,</span> <span class="s2">"Exog"</span><span class="p">)</span>
+        <span class="c1"># The inputs with labels use the labels of dependent. If dependent has no</span>
+        <span class="c1"># labels, they use the labels of the first of them that has labels</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_labels</span><span class="p">:</span> <span class="n">Index</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_labels_name</span> <span class="o">=</span> <span class="s2">"dependent"</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_check_labels</span><span class="p">(</span><span class="s2">"dependent"</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">dependent</span><span class="o">.</span><span class="n">index</span><span class="p">,</span> <span class="n">_is_labelled</span><span class="p">(</span><span class="n">dependent</span><span class="p">))</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_check_labels</span><span class="p">(</span><span class="s2">"exog"</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">exog</span><span class="o">.</span><span class="n">index</span><span class="p">,</span> <span class="n">_is_labelled</span><span class="p">(</span><span class="n">exog</span><span class="p">))</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_original_shape</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">dependent</span><span class="o">.</span><span class="n">shape</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_constant</span> <span class="o">=</span> <span class="kc">False</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_formula</span><span class="p">:</span> <span class="nb">str</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span>
@@ -908,6 +957,68 @@
     <span class="k">def</span><span class="w"> </span><span class="fm">__repr__</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="fm">__str__</span><span class="p">()</span> <span class="o">+</span> <span class="s2">"</span><span class="se">\n</span><span class="s2">id: "</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="nb">hex</span><span class="p">(</span><span class="nb">id</span><span class="p">(</span><span class="bp">self</span><span class="p">)))</span>
 
+    <span class="k">def</span><span class="w"> </span><span class="nf">_check_labels</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">name</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">labels</span><span class="p">:</span> <span class="n">Index</span><span class="p">,</span> <span class="n">labelled</span><span class="p">:</span> <span class="nb">bool</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">"""</span>
+<span class="sd">        Check the labels of an input against the labels of the other inputs</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        name : str</span>
+<span class="sd">            The name of the input, which is used in the message.</span>
+<span class="sd">        labels : Index</span>
+<span class="sd">            The labels of the rows of the input.</span>
+<span class="sd">        labelled : bool</span>
+<span class="sd">            Whether the input carries labels. If not, it is paired with the</span>
+<span class="sd">            other inputs by position and there is nothing to check.</span>
+
+<span class="sd">        Notes</span>
+<span class="sd">        -----</span>
+<span class="sd">        The labels of the first input with labels are saved, so that the inputs</span>
+<span class="sd">        that follow it have to use them.</span>
+<span class="sd">        """</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">labelled</span><span class="p">:</span>
+            <span class="k">return</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_labels</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">labels</span><span class="p">,</span> <span class="n">MultiIndex</span><span class="p">):</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">_labels</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_labels_name</span> <span class="o">=</span> <span class="n">labels</span><span class="p">,</span> <span class="n">name</span>
+            <span class="k">return</span>
+        <span class="n">check_row_alignment</span><span class="p">(</span><span class="n">name</span><span class="p">,</span> <span class="n">labels</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_labels</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_labels_name</span><span class="p">)</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">_panel_rows</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">value</span><span class="p">:</span> <span class="n">Any</span><span class="p">,</span> <span class="n">name</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">var_name</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">PanelData</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">"""</span>
+<span class="sd">        PanelData of an input that has the shape of the data, e.g., clusters</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        value : array_like</span>
+<span class="sd">            The input. A 1-d array has a value for each row of dependent, in the</span>
+<span class="sd">            order of the rows of dependent, since it only has one variable.</span>
+<span class="sd">            Anything else follows the rules of PanelData, after lists and tuples</span>
+<span class="sd">            are converted to arrays.</span>
+<span class="sd">        name : str</span>
+<span class="sd">            The name of the parameter, which is added to the messages of the</span>
+<span class="sd">            errors.</span>
+<span class="sd">        var_name : str</span>
+<span class="sd">            The name to use for the variable when it is a NumPy array.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        PanelData</span>
+<span class="sd">            The input as panel data, without the conversion of categories to</span>
+<span class="sd">            dummy variables.</span>
+<span class="sd">        """</span>
+        <span class="n">value</span> <span class="o">=</span> <span class="n">as_array_like</span><span class="p">(</span><span class="n">value</span><span class="p">,</span> <span class="n">name</span><span class="p">)</span>
+        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">value</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">)</span> <span class="ow">and</span> <span class="n">value</span><span class="o">.</span><span class="n">ndim</span> <span class="o">==</span> <span class="mi">1</span><span class="p">:</span>
+            <span class="n">nrows</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_original_index</span><span class="p">)</span>
+            <span class="k">if</span> <span class="n">value</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">!=</span> <span class="n">nrows</span><span class="p">:</span>
+                <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
+                    <span class="sa">f</span><span class="s2">"</span><span class="si">{</span><span class="n">name</span><span class="si">}</span><span class="s2"> is 1-d and has </span><span class="si">{</span><span class="n">value</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="si">}</span><span class="s2"> values, but dependent "</span>
+                    <span class="sa">f</span><span class="s2">"has </span><span class="si">{</span><span class="n">nrows</span><span class="si">}</span><span class="s2"> rows. A 1-d array must have a value for each row "</span>
+                    <span class="s2">"of dependent, in the order of the rows of dependent."</span>
+                <span class="p">)</span>
+            <span class="n">value</span> <span class="o">=</span> <span class="n">DataFrame</span><span class="p">({</span><span class="n">var_name</span><span class="p">:</span> <span class="n">value</span><span class="p">},</span> <span class="n">index</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">_original_index</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">_panel_data</span><span class="p">(</span><span class="n">value</span><span class="p">,</span> <span class="n">name</span><span class="p">,</span> <span class="n">var_name</span><span class="p">,</span> <span class="n">convert_dummies</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+
     <span class="k">def</span><span class="w"> </span><span class="nf">reformat_clusters</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span> <span class="n">clusters</span><span class="p">:</span> <span class="n">linearmodels</span><span class="o">.</span><span class="n">typing</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">IntArray</span> <span class="o">|</span> <span class="n">PanelDataLike</span>
     <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">PanelData</span><span class="p">:</span>
@@ -917,7 +1028,8 @@
 <span class="sd">        Parameters</span>
 <span class="sd">        ----------</span>
 <span class="sd">        clusters : array_like</span>
-<span class="sd">            Values to use for variance clustering</span>
+<span class="sd">            Values to use for variance clustering. A 1-d array has one value</span>
+<span class="sd">            for each row of dependent, in the order of the rows of dependent.</span>
 
 <span class="sd">        Returns</span>
 <span class="sd">        -------</span>
@@ -929,14 +1041,36 @@
 <span class="sd">        -----</span>
 <span class="sd">        This is exposed for testing and is not normally needed for estimation</span>
 <span class="sd">        """</span>
-        <span class="n">clusters_pd</span> <span class="o">=</span> <span class="n">PanelData</span><span class="p">(</span><span class="n">clusters</span><span class="p">,</span> <span class="n">var_name</span><span class="o">=</span><span class="s2">"cov.cluster"</span><span class="p">,</span> <span class="n">convert_dummies</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+        <span class="n">clusters</span> <span class="o">=</span> <span class="n">as_array_like</span><span class="p">(</span><span class="n">clusters</span><span class="p">,</span> <span class="s2">"clusters"</span><span class="p">)</span>
+        <span class="n">labelled</span> <span class="o">=</span> <span class="n">_is_labelled</span><span class="p">(</span><span class="n">clusters</span><span class="p">)</span>
+        <span class="n">clusters_pd</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_panel_rows</span><span class="p">(</span><span class="n">clusters</span><span class="p">,</span> <span class="s2">"clusters"</span><span class="p">,</span> <span class="s2">"cov.cluster"</span><span class="p">)</span>
         <span class="k">if</span> <span class="n">clusters_pd</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">:]</span> <span class="o">!=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_original_shape</span><span class="p">[</span><span class="mi">1</span><span class="p">:]:</span>
             <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
                 <span class="s2">"clusters must have the same number of entities "</span>
                 <span class="s2">"and time periods as the model data."</span>
             <span class="p">)</span>
-        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_dependent_labelled</span> <span class="ow">and</span> <span class="n">_is_labelled</span><span class="p">(</span><span class="n">clusters</span><span class="p">):</span>
-            <span class="n">check_row_alignment</span><span class="p">(</span><span class="s2">"clusters"</span><span class="p">,</span> <span class="n">clusters_pd</span><span class="o">.</span><span class="n">index</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_original_index</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">labelled</span> <span class="ow">and</span> <span class="bp">self</span><span class="o">.</span><span class="n">_labels</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">check_row_alignment</span><span class="p">(</span>
+                <span class="s2">"clusters"</span><span class="p">,</span> <span class="n">clusters_pd</span><span class="o">.</span><span class="n">index</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_labels</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_labels_name</span>
+            <span class="p">)</span>
+        <span class="n">frame</span> <span class="o">=</span> <span class="n">clusters_pd</span><span class="o">.</span><span class="n">dataframe</span>
+        <span class="n">changed</span> <span class="o">=</span> <span class="kc">False</span>
+        <span class="k">if</span> <span class="n">frame</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">==</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_original_index</span><span class="p">)</span> <span class="ow">and</span> <span class="ow">not</span> <span class="n">frame</span><span class="o">.</span><span class="n">index</span><span class="o">.</span><span class="n">equals</span><span class="p">(</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_original_index</span>
+        <span class="p">):</span>
+            <span class="c1"># The values are paired with the rows of dependent by position, and so</span>
+            <span class="c1"># they have the labels of these rows</span>
+            <span class="n">frame</span> <span class="o">=</span> <span class="n">frame</span><span class="o">.</span><span class="n">set_axis</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_original_index</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
+            <span class="n">changed</span> <span class="o">=</span> <span class="kc">True</span>
+        <span class="n">categories</span> <span class="o">=</span> <span class="p">[</span><span class="n">col</span> <span class="k">for</span> <span class="n">col</span> <span class="ow">in</span> <span class="n">frame</span> <span class="k">if</span> <span class="ow">not</span> <span class="n">is_numeric_dtype</span><span class="p">(</span><span class="n">frame</span><span class="p">[</span><span class="n">col</span><span class="p">]</span><span class="o">.</span><span class="n">dtype</span><span class="p">)]</span>
+        <span class="k">if</span> <span class="n">categories</span><span class="p">:</span>
+            <span class="c1"># Text and categories identify the clusters, but they are not numbers</span>
+            <span class="n">frame</span> <span class="o">=</span> <span class="n">frame</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
+            <span class="k">for</span> <span class="n">col</span> <span class="ow">in</span> <span class="n">categories</span><span class="p">:</span>
+                <span class="n">frame</span><span class="p">[</span><span class="n">col</span><span class="p">]</span> <span class="o">=</span> <span class="n">Categorical</span><span class="p">(</span><span class="n">frame</span><span class="p">[</span><span class="n">col</span><span class="p">])</span><span class="o">.</span><span class="n">codes</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">int64</span><span class="p">)</span>
+            <span class="n">changed</span> <span class="o">=</span> <span class="kc">True</span>
+        <span class="k">if</span> <span class="n">changed</span><span class="p">:</span>
+            <span class="n">clusters_pd</span> <span class="o">=</span> <span class="n">PanelData</span><span class="p">(</span><span class="n">frame</span><span class="p">,</span> <span class="n">convert_dummies</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
         <span class="n">clusters_pd</span><span class="o">.</span><span class="n">drop</span><span class="p">(</span><span class="o">~</span><span class="bp">self</span><span class="o">.</span><span class="n">not_null</span><span class="p">)</span>
         <span class="k">return</span> <span class="n">clusters_pd</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
 
@@ -963,17 +1097,26 @@
             <span class="n">frame</span><span class="o">.</span><span class="n">columns</span> <span class="o">=</span> <span class="n">Index</span><span class="p">([</span><span class="s2">"weight"</span><span class="p">])</span>
             <span class="k">return</span> <span class="n">PanelData</span><span class="p">(</span><span class="n">frame</span><span class="p">)</span>
 
+        <span class="c1"># Lists and tuples are converted to arrays, so that ndim and shape exist</span>
+        <span class="n">weights</span> <span class="o">=</span> <span class="n">as_array_like</span><span class="p">(</span><span class="n">weights</span><span class="p">,</span> <span class="s2">"weights"</span><span class="p">)</span>
+        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">weights</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">):</span>
+            <span class="n">weights</span> <span class="o">=</span> <span class="n">as_float64</span><span class="p">(</span><span class="n">weights</span><span class="p">,</span> <span class="s2">"weights"</span><span class="p">)</span>
         <span class="n">nobs</span><span class="p">,</span> <span class="n">nentity</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">exog</span><span class="o">.</span><span class="n">nobs</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">exog</span><span class="o">.</span><span class="n">nentity</span>
         <span class="n">index</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">dependent</span><span class="o">.</span><span class="n">index</span>
         <span class="n">entities</span> <span class="o">=</span> <span class="n">index</span><span class="o">.</span><span class="n">get_level_values</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span><span class="o">.</span><span class="n">unique</span><span class="p">()</span>
         <span class="n">times</span> <span class="o">=</span> <span class="n">index</span><span class="o">.</span><span class="n">get_level_values</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span><span class="o">.</span><span class="n">unique</span><span class="p">()</span>
-        <span class="n">labelled</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_dependent_labelled</span> <span class="ow">and</span> <span class="n">_is_labelled</span><span class="p">(</span><span class="n">weights</span><span class="p">)</span>
+        <span class="n">labelled</span> <span class="o">=</span> <span class="n">_is_labelled</span><span class="p">(</span><span class="n">weights</span><span class="p">)</span>
+        <span class="c1"># Weights for each time period or entity have to use the time periods or</span>
+        <span class="c1"># entities of the inputs with labels, if there are any</span>
+        <span class="n">reference</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_labels</span>
+        <span class="k">if</span> <span class="n">reference</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">ref_entities</span> <span class="o">=</span> <span class="n">reference</span><span class="o">.</span><span class="n">get_level_values</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span><span class="o">.</span><span class="n">unique</span><span class="p">()</span>
+            <span class="n">ref_times</span> <span class="o">=</span> <span class="n">reference</span><span class="o">.</span><span class="n">get_level_values</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span><span class="o">.</span><span class="n">unique</span><span class="p">()</span>
 
         <span class="k">if</span> <span class="n">weights</span><span class="o">.</span><span class="n">ndim</span> <span class="o">==</span> <span class="mi">3</span> <span class="ow">or</span> <span class="n">weights</span><span class="o">.</span><span class="n">shape</span> <span class="o">==</span> <span class="p">(</span><span class="n">nobs</span><span class="p">,</span> <span class="n">nentity</span><span class="p">):</span>
-            <span class="n">panel</span> <span class="o">=</span> <span class="n">PanelData</span><span class="p">(</span><span class="n">weights</span><span class="p">)</span>
+            <span class="n">panel</span> <span class="o">=</span> <span class="n">_panel_data</span><span class="p">(</span><span class="n">weights</span><span class="p">,</span> <span class="s2">"weights"</span><span class="p">,</span> <span class="s2">"x"</span><span class="p">)</span>
             <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">weights</span><span class="p">,</span> <span class="n">PanelData</span><span class="p">):</span>
-                <span class="k">if</span> <span class="n">labelled</span><span class="p">:</span>
-                    <span class="n">check_row_alignment</span><span class="p">(</span><span class="s2">"weights"</span><span class="p">,</span> <span class="n">panel</span><span class="o">.</span><span class="n">index</span><span class="p">,</span> <span class="n">index</span><span class="p">)</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">_check_labels</span><span class="p">(</span><span class="s2">"weights"</span><span class="p">,</span> <span class="n">panel</span><span class="o">.</span><span class="n">index</span><span class="p">,</span> <span class="n">labelled</span><span class="p">)</span>
                 <span class="k">return</span> <span class="n">panel</span>
             <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_grid_to_rows</span><span class="p">(</span><span class="n">panel</span><span class="p">,</span> <span class="n">labelled</span><span class="p">)</span>
 
@@ -990,24 +1133,31 @@
             <span class="ow">and</span> <span class="n">weights</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">==</span> <span class="bp">self</span><span class="o">.</span><span class="n">dependent</span><span class="o">.</span><span class="n">dataframe</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
         <span class="p">):</span>
             <span class="n">panel</span> <span class="o">=</span> <span class="n">PanelData</span><span class="p">(</span><span class="n">DataFrame</span><span class="p">(</span><span class="n">weights</span><span class="p">))</span>
-            <span class="k">if</span> <span class="n">labelled</span><span class="p">:</span>
-                <span class="n">check_row_alignment</span><span class="p">(</span><span class="s2">"weights"</span><span class="p">,</span> <span class="n">panel</span><span class="o">.</span><span class="n">index</span><span class="p">,</span> <span class="n">index</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_check_labels</span><span class="p">(</span><span class="s2">"weights"</span><span class="p">,</span> <span class="n">panel</span><span class="o">.</span><span class="n">index</span><span class="p">,</span> <span class="n">labelled</span><span class="p">)</span>
             <span class="k">return</span> <span class="n">panel</span>
         <span class="k">elif</span> <span class="n">weights</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">==</span> <span class="n">nobs</span> <span class="ow">and</span> <span class="n">weights</span><span class="o">.</span><span class="n">ndim</span> <span class="o">==</span> <span class="mi">1</span><span class="p">:</span>
-            <span class="k">if</span> <span class="n">labelled</span> <span class="ow">and</span> <span class="n">differs</span><span class="p">(</span><span class="n">labels_1d</span><span class="p">(</span><span class="n">weights</span><span class="p">),</span> <span class="n">times</span><span class="p">):</span>
-                <span class="k">raise</span> <span class="n">misaligned</span><span class="p">(</span><span class="s2">"weights"</span><span class="p">,</span> <span class="s2">"The time index"</span><span class="p">)</span>
+            <span class="k">if</span> <span class="p">(</span>
+                <span class="n">labelled</span>
+                <span class="ow">and</span> <span class="n">reference</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span>
+                <span class="ow">and</span> <span class="n">differs</span><span class="p">(</span><span class="n">labels_1d</span><span class="p">(</span><span class="n">weights</span><span class="p">),</span> <span class="n">ref_times</span><span class="p">)</span>
+            <span class="p">):</span>
+                <span class="k">raise</span> <span class="n">misaligned</span><span class="p">(</span><span class="s2">"weights"</span><span class="p">,</span> <span class="s2">"The time index"</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_labels_name</span><span class="p">)</span>
             <span class="n">weights_arr</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">asarray</span><span class="p">(</span><span class="n">weights</span><span class="p">)[:,</span> <span class="kc">None</span><span class="p">]</span>
             <span class="n">weights_arr</span> <span class="o">=</span> <span class="n">weights_arr</span> <span class="o">@</span> <span class="n">np</span><span class="o">.</span><span class="n">ones</span><span class="p">((</span><span class="mi">1</span><span class="p">,</span> <span class="n">nentity</span><span class="p">))</span>
             <span class="n">grid</span> <span class="o">=</span> <span class="n">DataFrame</span><span class="p">(</span><span class="n">weights_arr</span><span class="p">,</span> <span class="n">index</span><span class="o">=</span><span class="n">times</span><span class="p">,</span> <span class="n">columns</span><span class="o">=</span><span class="n">entities</span><span class="p">)</span>
         <span class="k">elif</span> <span class="n">weights</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">==</span> <span class="n">nentity</span> <span class="ow">and</span> <span class="n">weights</span><span class="o">.</span><span class="n">ndim</span> <span class="o">==</span> <span class="mi">1</span><span class="p">:</span>
-            <span class="k">if</span> <span class="n">labelled</span> <span class="ow">and</span> <span class="n">differs</span><span class="p">(</span><span class="n">labels_1d</span><span class="p">(</span><span class="n">weights</span><span class="p">),</span> <span class="n">entities</span><span class="p">):</span>
-                <span class="k">raise</span> <span class="n">misaligned</span><span class="p">(</span><span class="s2">"weights"</span><span class="p">,</span> <span class="s2">"The entity index"</span><span class="p">)</span>
+            <span class="k">if</span> <span class="p">(</span>
+                <span class="n">labelled</span>
+                <span class="ow">and</span> <span class="n">reference</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span>
+                <span class="ow">and</span> <span class="n">differs</span><span class="p">(</span><span class="n">labels_1d</span><span class="p">(</span><span class="n">weights</span><span class="p">),</span> <span class="n">ref_entities</span><span class="p">)</span>
+            <span class="p">):</span>
+                <span class="k">raise</span> <span class="n">misaligned</span><span class="p">(</span><span class="s2">"weights"</span><span class="p">,</span> <span class="s2">"The entity index"</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_labels_name</span><span class="p">)</span>
             <span class="n">weights_arr</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">asarray</span><span class="p">(</span><span class="n">weights</span><span class="p">)[</span><span class="kc">None</span><span class="p">,</span> <span class="p">:]</span>
             <span class="n">weights_arr</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">ones</span><span class="p">((</span><span class="n">nobs</span><span class="p">,</span> <span class="mi">1</span><span class="p">))</span> <span class="o">@</span> <span class="n">weights_arr</span>
             <span class="n">grid</span> <span class="o">=</span> <span class="n">DataFrame</span><span class="p">(</span><span class="n">weights_arr</span><span class="p">,</span> <span class="n">index</span><span class="o">=</span><span class="n">times</span><span class="p">,</span> <span class="n">columns</span><span class="o">=</span><span class="n">entities</span><span class="p">)</span>
         <span class="k">elif</span> <span class="n">weights</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">==</span> <span class="n">nentity</span> <span class="o">*</span> <span class="n">nobs</span> <span class="ow">and</span> <span class="n">weights</span><span class="o">.</span><span class="n">size</span><span class="p">:</span>
             <span class="k">if</span> <span class="n">labelled</span><span class="p">:</span>
-                <span class="n">check_row_alignment</span><span class="p">(</span><span class="s2">"weights"</span><span class="p">,</span> <span class="n">labels_1d</span><span class="p">(</span><span class="n">weights</span><span class="p">),</span> <span class="n">index</span><span class="p">)</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">_check_labels</span><span class="p">(</span><span class="s2">"weights"</span><span class="p">,</span> <span class="n">labels_1d</span><span class="p">(</span><span class="n">weights</span><span class="p">),</span> <span class="n">labelled</span><span class="p">)</span>
             <span class="n">frame</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">dependent</span><span class="o">.</span><span class="n">dataframe</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
             <span class="c1"># TODO: Fix this for pandas 3</span>
             <span class="n">frame</span><span class="o">.</span><span class="n">iloc</span><span class="p">[:,</span> <span class="p">:]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">asarray</span><span class="p">(</span><span class="n">weights</span><span class="p">)[:,</span> <span class="kc">None</span><span class="p">]</span>
@@ -1025,10 +1175,10 @@
 <span class="sd">        grid : PanelData</span>
 <span class="sd">            Values for every entity and time period, stacked by entity.</span>
 <span class="sd">        labelled : bool</span>
-<span class="sd">            Whether the labels in grid have to match the entities and time</span>
-<span class="sd">            periods of dependent. If False, the position along each axis of the</span>
-<span class="sd">            grid is paired with the entities and time periods of dependent in</span>
-<span class="sd">            order of appearance.</span>
+<span class="sd">            Whether the grid carries labels, which have to match the entities and</span>
+<span class="sd">            time periods of the inputs with labels. If False, the position along</span>
+<span class="sd">            each axis of the grid is paired with the entities and time periods</span>
+<span class="sd">            of dependent in order of appearance.</span>
 
 <span class="sd">        Returns</span>
 <span class="sd">        -------</span>
@@ -1044,8 +1194,20 @@
         <span class="n">rows</span> <span class="o">=</span> <span class="n">grid</span><span class="o">.</span><span class="n">dataframe</span>
         <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">rows</span><span class="p">)</span> <span class="o">!=</span> <span class="nb">len</span><span class="p">(</span><span class="n">grid_index</span><span class="p">)</span> <span class="ow">or</span> <span class="nb">len</span><span class="p">(</span><span class="n">index</span><span class="p">)</span> <span class="o">!=</span> <span class="nb">len</span><span class="p">(</span><span class="n">grid_index</span><span class="p">):</span>
             <span class="k">return</span> <span class="n">grid</span>
-        <span class="k">if</span> <span class="n">labelled</span> <span class="ow">and</span> <span class="ow">not</span> <span class="n">rows</span><span class="o">.</span><span class="n">index</span><span class="o">.</span><span class="n">equals</span><span class="p">(</span><span class="n">grid_index</span><span class="p">):</span>
-            <span class="k">raise</span> <span class="n">misaligned</span><span class="p">(</span><span class="s2">"weights"</span><span class="p">,</span> <span class="s2">"The time and entity index"</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">labelled</span> <span class="ow">and</span> <span class="bp">self</span><span class="o">.</span><span class="n">_labels</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_check_labels</span><span class="p">(</span><span class="s2">"weights"</span><span class="p">,</span> <span class="n">rows</span><span class="o">.</span><span class="n">index</span><span class="p">,</span> <span class="n">labelled</span><span class="p">)</span>
+        <span class="k">elif</span> <span class="n">labelled</span><span class="p">:</span>
+            <span class="k">assert</span> <span class="bp">self</span><span class="o">.</span><span class="n">_labels</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span>
+            <span class="n">expected</span> <span class="o">=</span> <span class="n">MultiIndex</span><span class="o">.</span><span class="n">from_product</span><span class="p">(</span>
+                <span class="p">[</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">_labels</span><span class="o">.</span><span class="n">get_level_values</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span><span class="o">.</span><span class="n">unique</span><span class="p">(),</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">_labels</span><span class="o">.</span><span class="n">get_level_values</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span><span class="o">.</span><span class="n">unique</span><span class="p">(),</span>
+                <span class="p">]</span>
+            <span class="p">)</span>
+            <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">expected</span><span class="p">)</span> <span class="o">==</span> <span class="nb">len</span><span class="p">(</span><span class="n">rows</span><span class="p">)</span> <span class="ow">and</span> <span class="ow">not</span> <span class="n">rows</span><span class="o">.</span><span class="n">index</span><span class="o">.</span><span class="n">equals</span><span class="p">(</span><span class="n">expected</span><span class="p">):</span>
+                <span class="k">raise</span> <span class="n">misaligned</span><span class="p">(</span>
+                    <span class="s2">"weights"</span><span class="p">,</span> <span class="s2">"The time and entity index"</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_labels_name</span>
+                <span class="p">)</span>
         <span class="n">rows</span> <span class="o">=</span> <span class="n">rows</span><span class="o">.</span><span class="n">set_axis</span><span class="p">(</span><span class="n">grid_index</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
         <span class="k">if</span> <span class="ow">not</span> <span class="n">grid_index</span><span class="o">.</span><span class="n">equals</span><span class="p">(</span><span class="n">index</span><span class="p">):</span>
             <span class="n">rows</span> <span class="o">=</span> <span class="n">rows</span><span class="o">.</span><span class="n">reindex</span><span class="p">(</span><span class="n">index</span><span class="p">)</span>
@@ -1379,7 +1541,11 @@
 
         <span class="n">cov_config_upd</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">(</span><span class="n">cov_config</span><span class="o">.</span><span class="n">items</span><span class="p">())</span>
 
-        <span class="n">clusters</span> <span class="o">=</span> <span class="n">get_panel_data_like</span><span class="p">(</span><span class="n">cov_config</span><span class="p">,</span> <span class="s2">"clusters"</span><span class="p">)</span>
+        <span class="n">given</span> <span class="o">=</span> <span class="n">cov_config</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"clusters"</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">given</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="c1"># Lists and tuples are converted to arrays</span>
+            <span class="n">given</span> <span class="o">=</span> <span class="n">as_array_like</span><span class="p">(</span><span class="n">given</span><span class="p">,</span> <span class="s2">"clusters"</span><span class="p">)</span>
+        <span class="n">clusters</span> <span class="o">=</span> <span class="n">get_panel_data_like</span><span class="p">({</span><span class="s2">"clusters"</span><span class="p">:</span> <span class="n">given</span><span class="p">},</span> <span class="s2">"clusters"</span><span class="p">)</span>
         <span class="n">clusters_frame</span><span class="p">:</span> <span class="n">DataFrame</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span>
         <span class="k">if</span> <span class="n">clusters</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
             <span class="n">formatted_clusters</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">reformat_clusters</span><span class="p">(</span><span class="n">clusters</span><span class="p">)</span>
@@ -1435,8 +1601,10 @@
 <span class="sd">        ----------</span>
 <span class="sd">        params : array_like</span>
 <span class="sd">            Model parameters (nvar by 1)</span>
-<span class="sd">        exog : array_like</span>
-<span class="sd">            Exogenous regressors (nobs by nvar)</span>
+<span class="sd">        exog : PanelData, DataFrame, Series, ndarray or DataArray, optional</span>
+<span class="sd">            Exogenous regressors (nobs by nvar). The containers are those of</span>
+<span class="sd">            ``exog`` in the model. A list or a tuple raises a ``TypeError`` that</span>
+<span class="sd">            names ``exog``.</span>
 <span class="sd">        data : DataFrame</span>
 <span class="sd">            Values to use when making predictions from a model constructed</span>
 <span class="sd">            from a formula</span>
@@ -1467,7 +1635,7 @@
                 <span class="s2">"of exog or data, but not both."</span>
             <span class="p">)</span>
         <span class="k">if</span> <span class="n">exog</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
-            <span class="n">exog</span> <span class="o">=</span> <span class="n">PanelData</span><span class="p">(</span><span class="n">exog</span><span class="p">)</span><span class="o">.</span><span class="n">dataframe</span>
+            <span class="n">exog</span> <span class="o">=</span> <span class="n">_panel_data</span><span class="p">(</span><span class="n">exog</span><span class="p">,</span> <span class="s2">"exog"</span><span class="p">,</span> <span class="s2">"x"</span><span class="p">)</span><span class="o">.</span><span class="n">dataframe</span>
         <span class="k">else</span><span class="p">:</span>
             <span class="k">assert</span> <span class="bp">self</span><span class="o">.</span><span class="n">_formula</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span>
             <span class="k">assert</span> <span class="n">data</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span>
@@ -1499,18 +1667,28 @@
 
 <span class="sd">    Parameters</span>
 <span class="sd">    ----------</span>
-<span class="sd">    dependent : array_like</span>
-<span class="sd">        Dependent (left-hand-side) variable (time by entity)</span>
-<span class="sd">    exog : array_like</span>
-<span class="sd">        Exogenous or right-hand-side variables (variable by time by entity).</span>
-<span class="sd">    weights : array_like</span>
+<span class="sd">    dependent : PanelData, DataFrame, Series, ndarray or DataArray</span>
+<span class="sd">        Dependent (left-hand-side) variable (time by entity). A DataFrame or</span>
+<span class="sd">        Series with a 2-level MultiIndex (entity, then time), a DataFrame with</span>
+<span class="sd">        time as the index and entities as the columns, a 2-d (time by entity)</span>
+<span class="sd">        NumPy array or DataArray, or a PanelData. A list, a tuple or any other</span>
+<span class="sd">        container raises a ``TypeError`` that names ``dependent``, since the</span>
+<span class="sd">        entities and time periods need labels or a layout.</span>
+<span class="sd">    exog : PanelData, DataFrame, Series, ndarray or DataArray</span>
+<span class="sd">        Exogenous or right-hand-side variables (variable by time by entity). The</span>
+<span class="sd">        containers are those of ``dependent``, where a DataFrame has a column for</span>
+<span class="sd">        each variable and an array or DataArray with several variables has 3</span>
+<span class="sd">        dimensions (variable by time by entity). A list, a tuple or any other</span>
+<span class="sd">        container raises a ``TypeError`` that names ``exog``.</span>
+<span class="sd">    weights : array_like, optional</span>
 <span class="sd">        Weights to use in estimation.  Assumes residual variance is</span>
 <span class="sd">        proportional to inverse of weight to that the residual time</span>
 <span class="sd">        the weight should be homoskedastic.</span>
 <span class="sd">        Weights can be given for each observation, for each time period,</span>
 <span class="sd">        for each entity or for each combination of time period and entity.</span>
 <span class="sd">        Weights with labels must use the same labels, in the same order,</span>
-<span class="sd">        as dependent. See :ref:`panel-input-alignment`.</span>
+<span class="sd">        as dependent or, if dependent has no labels, as exog. See</span>
+<span class="sd">        :ref:`panel-input-alignment`.</span>
 <span class="sd">    check_rank : bool</span>
 <span class="sd">        Flag indicating whether to perform a rank check on the exogenous</span>
 <span class="sd">        variables to ensure that the model is identified. Skipping this</span>
@@ -1556,11 +1734,12 @@
 <span class="sd">        formula : str</span>
 <span class="sd">            Formula to transform into model. Conforms to formulaic formula</span>
 <span class="sd">            rules.</span>
-<span class="sd">        data : array_like</span>
+<span class="sd">        data : PanelData or DataFrame</span>
 <span class="sd">            Data structure that can be coerced into a PanelData.  In most</span>
 <span class="sd">            cases, this should be a multi-index DataFrame where the level 0</span>
-<span class="sd">            index contains the entities and the level 1 contains the time.</span>
-<span class="sd">        weights: array_like</span>
+<span class="sd">            index contains the entities and the level 1 contains the time. A</span>
+<span class="sd">            list or a tuple raises a ``TypeError`` that names ``data``.</span>
+<span class="sd">        weights : array_like, optional</span>
 <span class="sd">            Weights to use in estimation.  Assumes residual variance is</span>
 <span class="sd">            proportional to inverse of weight to that the residual times</span>
 <span class="sd">            the weight should be homoskedastic.</span>
@@ -1645,7 +1824,11 @@
 <span class="sd">          White's estimator</span>
 <span class="sd">        * "clustered` - One- or two-way clustering.  Configuration options are:</span>
 
-<span class="sd">          * ``clusters`` - Input containing 1 or 2 variables.</span>
+<span class="sd">          * ``clusters`` - Input containing 1 or 2 variables. This can be</span>
+<span class="sd">            a pandas object or PanelData with the index of ``dependent``, a 1-d</span>
+<span class="sd">            array or list with a value for each row of ``dependent`` in the</span>
+<span class="sd">            order of its rows, or an array or list with the layout of</span>
+<span class="sd">            ``dependent`` (time by entity, or variable by time by entity).</span>
 <span class="sd">            Clusters should be integer values, although other types will</span>
 <span class="sd">            be coerced to integer values by treating as categorical variables</span>
 <span class="sd">          * ``cluster_entity`` - Boolean flag indicating to use entity</span>
@@ -1762,8 +1945,10 @@
 <span class="sd">        ----------</span>
 <span class="sd">        params : array_like</span>
 <span class="sd">            Model parameters (nvar by 1)</span>
-<span class="sd">        exog : array_like</span>
-<span class="sd">            Exogenous regressors (nobs by nvar)</span>
+<span class="sd">        exog : PanelData, DataFrame, Series, ndarray or DataArray, optional</span>
+<span class="sd">            Exogenous regressors (nobs by nvar). The containers are those of</span>
+<span class="sd">            ``exog`` in the model. A list or a tuple raises a ``TypeError`` that</span>
+<span class="sd">            names ``exog``.</span>
 <span class="sd">        data : DataFrame</span>
 <span class="sd">            Values to use when making predictions from a model constructed</span>
 <span class="sd">            from a formula</span>
@@ -1794,7 +1979,7 @@
                 <span class="s2">"of exog or data, but not both."</span>
             <span class="p">)</span>
         <span class="k">if</span> <span class="n">exog</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
-            <span class="n">exog</span> <span class="o">=</span> <span class="n">PanelData</span><span class="p">(</span><span class="n">exog</span><span class="p">)</span><span class="o">.</span><span class="n">dataframe</span>
+            <span class="n">exog</span> <span class="o">=</span> <span class="n">_panel_data</span><span class="p">(</span><span class="n">exog</span><span class="p">,</span> <span class="s2">"exog"</span><span class="p">,</span> <span class="s2">"x"</span><span class="p">)</span><span class="o">.</span><span class="n">dataframe</span>
         <span class="k">else</span><span class="p">:</span>
             <span class="k">assert</span> <span class="bp">self</span><span class="o">.</span><span class="n">_formula</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span>
             <span class="k">assert</span> <span class="n">data</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span>
@@ -1827,25 +2012,36 @@
 
 <span class="sd">    Parameters</span>
 <span class="sd">    ----------</span>
-<span class="sd">    dependent : array_like</span>
-<span class="sd">        Dependent (left-hand-side) variable (time by entity).</span>
-<span class="sd">    exog : array_like</span>
-<span class="sd">        Exogenous or right-hand-side variables (variable by time by entity).</span>
-<span class="sd">    weights : array_like</span>
+<span class="sd">    dependent : PanelData, DataFrame, Series, ndarray or DataArray</span>
+<span class="sd">        Dependent (left-hand-side) variable (time by entity). A DataFrame or</span>
+<span class="sd">        Series with a 2-level MultiIndex (entity, then time), a DataFrame with</span>
+<span class="sd">        time as the index and entities as the columns, a 2-d (time by entity)</span>
+<span class="sd">        NumPy array or DataArray, or a PanelData. A list, a tuple or any other</span>
+<span class="sd">        container raises a ``TypeError`` that names ``dependent``, since the</span>
+<span class="sd">        entities and time periods need labels or a layout.</span>
+<span class="sd">    exog : PanelData, DataFrame, Series, ndarray or DataArray</span>
+<span class="sd">        Exogenous or right-hand-side variables (variable by time by entity). The</span>
+<span class="sd">        containers are those of ``dependent``, where a DataFrame has a column for</span>
+<span class="sd">        each variable and an array or DataArray with several variables has 3</span>
+<span class="sd">        dimensions (variable by time by entity). A list, a tuple or any other</span>
+<span class="sd">        container raises a ``TypeError`` that names ``exog``.</span>
+<span class="sd">    weights : array_like, optional</span>
 <span class="sd">        Weights to use in estimation.  Assumes residual variance is</span>
 <span class="sd">        proportional to inverse of weight to that the residual time</span>
 <span class="sd">        the weight should be homoskedastic.</span>
 <span class="sd">        Weights can be given for each observation, for each time period,</span>
 <span class="sd">        for each entity or for each combination of time period and entity.</span>
 <span class="sd">        Weights with labels must use the same labels, in the same order,</span>
-<span class="sd">        as dependent. See :ref:`panel-input-alignment`.</span>
+<span class="sd">        as dependent or, if dependent has no labels, as exog. See</span>
+<span class="sd">        :ref:`panel-input-alignment`.</span>
 <span class="sd">    entity_effects : bool</span>
 <span class="sd">        Flag whether to include entity (fixed) effects in the model</span>
 <span class="sd">    time_effects : bool</span>
 <span class="sd">        Flag whether to include time effects in the model</span>
-<span class="sd">    other_effects : array_like</span>
+<span class="sd">    other_effects : array_like, optional</span>
 <span class="sd">        Category codes to use for any effects that are not entity or time</span>
-<span class="sd">        effects. Each variable is treated as an effect.</span>
+<span class="sd">        effects. Each variable is treated as an effect. A 1-d array or list has</span>
+<span class="sd">        a value for each row of dependent, in the order of the rows of dependent.</span>
 <span class="sd">    singletons : bool</span>
 <span class="sd">        Flag indicating whether to drop singleton observation</span>
 <span class="sd">    drop_absorbed : bool</span>
@@ -1923,8 +2119,7 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">_other_effect_cats</span><span class="p">:</span> <span class="n">PanelData</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_singletons</span> <span class="o">=</span> <span class="n">singletons</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_other_effects</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_validate_effects</span><span class="p">(</span>
-            <span class="n">other_effects</span><span class="p">,</span>
-            <span class="n">labelled</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">_dependent_labelled</span> <span class="ow">and</span> <span class="n">_is_labelled</span><span class="p">(</span><span class="n">other_effects</span><span class="p">),</span>
+            <span class="n">other_effects</span><span class="p">,</span> <span class="n">labelled</span><span class="o">=</span><span class="n">_is_labelled</span><span class="p">(</span><span class="n">other_effects</span><span class="p">)</span>
         <span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_has_effect</span> <span class="o">=</span> <span class="n">entity_effects</span> <span class="ow">or</span> <span class="n">time_effects</span> <span class="ow">or</span> <span class="bp">self</span><span class="o">.</span><span class="n">other_effects</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_drop_absorbed</span> <span class="o">=</span> <span class="n">drop_absorbed</span>
@@ -1993,15 +2188,14 @@
 <span class="w">        </span><span class="sd">"""Check model effects"""</span>
         <span class="k">if</span> <span class="n">effects</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
             <span class="k">return</span> <span class="kc">False</span>
-        <span class="n">effects</span> <span class="o">=</span> <span class="n">PanelData</span><span class="p">(</span><span class="n">effects</span><span class="p">,</span> <span class="n">var_name</span><span class="o">=</span><span class="s2">"OtherEffect"</span><span class="p">,</span> <span class="n">convert_dummies</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+        <span class="n">effects</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_panel_rows</span><span class="p">(</span><span class="n">effects</span><span class="p">,</span> <span class="s2">"other_effects"</span><span class="p">,</span> <span class="s2">"OtherEffect"</span><span class="p">)</span>
 
         <span class="k">if</span> <span class="n">effects</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">:]</span> <span class="o">!=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_original_shape</span><span class="p">[</span><span class="mi">1</span><span class="p">:]:</span>
             <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
                 <span class="s2">"other_effects must have the same number of "</span>
                 <span class="s2">"entities and time periods as dependent."</span>
             <span class="p">)</span>
-        <span class="k">if</span> <span class="n">labelled</span><span class="p">:</span>
-            <span class="n">check_row_alignment</span><span class="p">(</span><span class="s2">"other_effects"</span><span class="p">,</span> <span class="n">effects</span><span class="o">.</span><span class="n">index</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_original_index</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_check_labels</span><span class="p">(</span><span class="s2">"other_effects"</span><span class="p">,</span> <span class="n">effects</span><span class="o">.</span><span class="n">index</span><span class="p">,</span> <span class="n">labelled</span><span class="p">)</span>
 
         <span class="n">num_effects</span> <span class="o">=</span> <span class="n">effects</span><span class="o">.</span><span class="n">nvar</span>
         <span class="k">if</span> <span class="n">num_effects</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">entity_effects</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">time_effects</span> <span class="o">&gt;</span> <span class="mi">2</span><span class="p">:</span>
@@ -2087,11 +2281,12 @@
 <span class="sd">            TimeEffects which can be used to specify that the model should</span>
 <span class="sd">            contain an entity effect or a time effect, respectively. See</span>
 <span class="sd">            Examples.</span>
-<span class="sd">        data : array_like</span>
+<span class="sd">        data : PanelData or DataFrame</span>
 <span class="sd">            Data structure that can be coerced into a PanelData.  In most</span>
 <span class="sd">            cases, this should be a multi-index DataFrame where the level 0</span>
-<span class="sd">            index contains the entities and the level 1 contains the time.</span>
-<span class="sd">        weights: array_like</span>
+<span class="sd">            index contains the entities and the level 1 contains the time. A</span>
+<span class="sd">            list or a tuple raises a ``TypeError`` that names ``data``.</span>
+<span class="sd">        weights : array_like, optional</span>
 <span class="sd">            Weights to use in estimation.  Assumes residual variance is</span>
 <span class="sd">            proportional to inverse of weight to that the residual time</span>
 <span class="sd">            the weight should be homoskedastic.</span>
@@ -2561,7 +2756,11 @@
 <span class="sd">          White's estimator</span>
 <span class="sd">        * "clustered` - One- or two-way clustering.  Configuration options are:</span>
 
-<span class="sd">          * ``clusters`` - Input containing 1 or 2 variables.</span>
+<span class="sd">          * ``clusters`` - Input containing 1 or 2 variables. This can be</span>
+<span class="sd">            a pandas object or PanelData with the index of ``dependent``, a 1-d</span>
+<span class="sd">            array or list with a value for each row of ``dependent`` in the</span>
+<span class="sd">            order of its rows, or an array or list with the layout of</span>
+<span class="sd">            ``dependent`` (time by entity, or variable by time by entity).</span>
 <span class="sd">            Clusters should be integer valued, although other types will</span>
 <span class="sd">            be coerced to integer values by treating as categorical variables</span>
 <span class="sd">          * ``cluster_entity`` - Boolean flag indicating to use entity</span>
@@ -2813,18 +3012,28 @@
 
 <span class="sd">    Parameters</span>
 <span class="sd">    ----------</span>
-<span class="sd">    dependent : array_like</span>
-<span class="sd">        Dependent (left-hand-side) variable (time by entity)</span>
-<span class="sd">    exog : array_like</span>
-<span class="sd">        Exogenous or right-hand-side variables (variable by time by entity).</span>
-<span class="sd">    weights : array_like</span>
+<span class="sd">    dependent : PanelData, DataFrame, Series, ndarray or DataArray</span>
+<span class="sd">        Dependent (left-hand-side) variable (time by entity). A DataFrame or</span>
+<span class="sd">        Series with a 2-level MultiIndex (entity, then time), a DataFrame with</span>
+<span class="sd">        time as the index and entities as the columns, a 2-d (time by entity)</span>
+<span class="sd">        NumPy array or DataArray, or a PanelData. A list, a tuple or any other</span>
+<span class="sd">        container raises a ``TypeError`` that names ``dependent``, since the</span>
+<span class="sd">        entities and time periods need labels or a layout.</span>
+<span class="sd">    exog : PanelData, DataFrame, Series, ndarray or DataArray</span>
+<span class="sd">        Exogenous or right-hand-side variables (variable by time by entity). The</span>
+<span class="sd">        containers are those of ``dependent``, where a DataFrame has a column for</span>
+<span class="sd">        each variable and an array or DataArray with several variables has 3</span>
+<span class="sd">        dimensions (variable by time by entity). A list, a tuple or any other</span>
+<span class="sd">        container raises a ``TypeError`` that names ``exog``.</span>
+<span class="sd">    weights : array_like, optional</span>
 <span class="sd">        Weights to use in estimation.  Assumes residual variance is</span>
 <span class="sd">        proportional to inverse of weight to that the residual time</span>
 <span class="sd">        the weight should be homoskedastic.</span>
 <span class="sd">        Weights can be given for each observation, for each time period,</span>
 <span class="sd">        for each entity or for each combination of time period and entity.</span>
 <span class="sd">        Weights with labels must use the same labels, in the same order,</span>
-<span class="sd">        as dependent. See :ref:`panel-input-alignment`.</span>
+<span class="sd">        as dependent or, if dependent has no labels, as exog. See</span>
+<span class="sd">        :ref:`panel-input-alignment`.</span>
 
 <span class="sd">    Notes</span>
 <span class="sd">    -----</span>
@@ -2950,7 +3159,11 @@
 <span class="sd">          White's estimator</span>
 <span class="sd">        * "clustered` - One- or two-way clustering.  Configuration options are:</span>
 
-<span class="sd">          * ``clusters`` - Input containing 1 or 2 variables.</span>
+<span class="sd">          * ``clusters`` - Input containing 1 or 2 variables. This can be</span>
+<span class="sd">            a pandas object or PanelData with the index of ``dependent``, a 1-d</span>
+<span class="sd">            array or list with a value for each row of ``dependent`` in the</span>
+<span class="sd">            order of its rows, or an array or list with the layout of</span>
+<span class="sd">            ``dependent`` (time by entity, or variable by time by entity).</span>
 <span class="sd">            Clusters should be integer values, although other types will</span>
 <span class="sd">            be coerced to integer values by treating as categorical variables</span>
 <span class="sd">          * ``group_debias`` - Boolean flag indicating whether to apply an</span>
@@ -3067,11 +3280,12 @@
 <span class="sd">        formula : str</span>
 <span class="sd">            Formula to transform into model. Conforms to formulaic formula</span>
 <span class="sd">            rules.</span>
-<span class="sd">        data : array_like</span>
+<span class="sd">        data : PanelData or DataFrame</span>
 <span class="sd">            Data structure that can be coerced into a PanelData.  In most</span>
 <span class="sd">            cases, this should be a multi-index DataFrame where the level 0</span>
-<span class="sd">            index contains the entities and the level 1 contains the time.</span>
-<span class="sd">        weights: array_like</span>
+<span class="sd">            index contains the entities and the level 1 contains the time. A</span>
+<span class="sd">            list or a tuple raises a ``TypeError`` that names ``data``.</span>
+<span class="sd">        weights : array_like, optional</span>
 <span class="sd">            Weights to use in estimation.  Assumes residual variance is</span>
 <span class="sd">            proportional to inverse of weight to that the residual times</span>
 <span class="sd">            the weight should be homoskedastic.</span>
@@ -3117,18 +3331,28 @@
 
 <span class="sd">    Parameters</span>
 <span class="sd">    ----------</span>
-<span class="sd">    dependent : array_like</span>
-<span class="sd">        Dependent (left-hand-side) variable (time by entity)</span>
-<span class="sd">    exog : array_like</span>
-<span class="sd">        Exogenous or right-hand-side variables (variable by time by entity).</span>
-<span class="sd">    weights : array_like</span>
+<span class="sd">    dependent : PanelData, DataFrame, Series, ndarray or DataArray</span>
+<span class="sd">        Dependent (left-hand-side) variable (time by entity). A DataFrame or</span>
+<span class="sd">        Series with a 2-level MultiIndex (entity, then time), a DataFrame with</span>
+<span class="sd">        time as the index and entities as the columns, a 2-d (time by entity)</span>
+<span class="sd">        NumPy array or DataArray, or a PanelData. A list, a tuple or any other</span>
+<span class="sd">        container raises a ``TypeError`` that names ``dependent``, since the</span>
+<span class="sd">        entities and time periods need labels or a layout.</span>
+<span class="sd">    exog : PanelData, DataFrame, Series, ndarray or DataArray</span>
+<span class="sd">        Exogenous or right-hand-side variables (variable by time by entity). The</span>
+<span class="sd">        containers are those of ``dependent``, where a DataFrame has a column for</span>
+<span class="sd">        each variable and an array or DataArray with several variables has 3</span>
+<span class="sd">        dimensions (variable by time by entity). A list, a tuple or any other</span>
+<span class="sd">        container raises a ``TypeError`` that names ``exog``.</span>
+<span class="sd">    weights : array_like, optional</span>
 <span class="sd">        Weights to use in estimation.  Assumes residual variance is</span>
 <span class="sd">        proportional to inverse of weight to that the residual time</span>
 <span class="sd">        the weight should be homoskedastic.</span>
 <span class="sd">        Weights can be given for each observation, for each time period,</span>
 <span class="sd">        for each entity or for each combination of time period and entity.</span>
 <span class="sd">        Weights with labels must use the same labels, in the same order,</span>
-<span class="sd">        as dependent. See :ref:`panel-input-alignment`.</span>
+<span class="sd">        as dependent or, if dependent has no labels, as exog. See</span>
+<span class="sd">        :ref:`panel-input-alignment`.</span>
 
 <span class="sd">    Notes</span>
 <span class="sd">    -----</span>
@@ -3274,7 +3498,11 @@
 <span class="sd">          White's estimator</span>
 <span class="sd">        * "clustered` - White's.  Configuration options are:</span>
 
-<span class="sd">          * ``clusters`` - Input containing 1 or 2 variables.</span>
+<span class="sd">          * ``clusters`` - Input containing 1 or 2 variables. This can be</span>
+<span class="sd">            a pandas object or PanelData with the index of ``dependent``, a 1-d</span>
+<span class="sd">            array or list with a value for each row of ``dependent`` in the</span>
+<span class="sd">            order of its rows, or an array or list with the layout of</span>
+<span class="sd">            ``dependent`` (time by entity, or variable by time by entity).</span>
 <span class="sd">            Clusters should be integer values, although other types will</span>
 <span class="sd">            be coerced to integer values by treating as categorical variables</span>
 <span class="sd">          * ``cluster_entity`` - Boolean flag indicating to use entity</span>
@@ -3420,11 +3648,12 @@
 <span class="sd">        formula : str</span>
 <span class="sd">            Formula to transform into model. Conforms to formulaic formula</span>
 <span class="sd">            rules.</span>
-<span class="sd">        data : array_like</span>
+<span class="sd">        data : PanelData or DataFrame</span>
 <span class="sd">            Data structure that can be coerced into a PanelData.  In most</span>
 <span class="sd">            cases, this should be a multi-index DataFrame where the level 0</span>
-<span class="sd">            index contains the entities and the level 1 contains the time.</span>
-<span class="sd">        weights: array_like</span>
+<span class="sd">            index contains the entities and the level 1 contains the time. A</span>
+<span class="sd">            list or a tuple raises a ``TypeError`` that names ``data``.</span>
+<span class="sd">        weights : array_like, optional</span>
 <span class="sd">            Weights to use in estimation.  Assumes residual variance is</span>
 <span class="sd">            proportional to inverse of weight to that the residual times</span>
 <span class="sd">            the weight should be homoskedastic.</span>
@@ -3470,18 +3699,28 @@
 
 <span class="sd">    Parameters</span>
 <span class="sd">    ----------</span>
-<span class="sd">    dependent : array_like</span>
-<span class="sd">        Dependent (left-hand-side) variable (time by entity)</span>
-<span class="sd">    exog : array_like</span>
-<span class="sd">        Exogenous or right-hand-side variables (variable by time by entity).</span>
-<span class="sd">    weights : array_like</span>
+<span class="sd">    dependent : PanelData, DataFrame, Series, ndarray or DataArray</span>
+<span class="sd">        Dependent (left-hand-side) variable (time by entity). A DataFrame or</span>
+<span class="sd">        Series with a 2-level MultiIndex (entity, then time), a DataFrame with</span>
+<span class="sd">        time as the index and entities as the columns, a 2-d (time by entity)</span>
+<span class="sd">        NumPy array or DataArray, or a PanelData. A list, a tuple or any other</span>
+<span class="sd">        container raises a ``TypeError`` that names ``dependent``, since the</span>
+<span class="sd">        entities and time periods need labels or a layout.</span>
+<span class="sd">    exog : PanelData, DataFrame, Series, ndarray or DataArray</span>
+<span class="sd">        Exogenous or right-hand-side variables (variable by time by entity). The</span>
+<span class="sd">        containers are those of ``dependent``, where a DataFrame has a column for</span>
+<span class="sd">        each variable and an array or DataArray with several variables has 3</span>
+<span class="sd">        dimensions (variable by time by entity). A list, a tuple or any other</span>
+<span class="sd">        container raises a ``TypeError`` that names ``exog``.</span>
+<span class="sd">    weights : array_like, optional</span>
 <span class="sd">        Weights to use in estimation.  Assumes residual variance is</span>
 <span class="sd">        proportional to inverse of weight to that the residual time</span>
 <span class="sd">        the weight should be homoskedastic.</span>
 <span class="sd">        Weights can be given for each observation, for each time period,</span>
 <span class="sd">        for each entity or for each combination of time period and entity.</span>
 <span class="sd">        Weights with labels must use the same labels, in the same order,</span>
-<span class="sd">        as dependent. See :ref:`panel-input-alignment`.</span>
+<span class="sd">        as dependent or, if dependent has no labels, as exog. See</span>
+<span class="sd">        :ref:`panel-input-alignment`.</span>
 
 <span class="sd">    Notes</span>
 <span class="sd">    -----</span>
@@ -3524,11 +3763,12 @@
 <span class="sd">        formula : str</span>
 <span class="sd">            Formula to transform into model. Conforms to formulaic formula</span>
 <span class="sd">            rules.</span>
-<span class="sd">        data : array_like</span>
+<span class="sd">        data : PanelData or DataFrame</span>
 <span class="sd">            Data structure that can be coerced into a PanelData.  In most</span>
 <span class="sd">            cases, this should be a multi-index DataFrame where the level 0</span>
-<span class="sd">            index contains the entities and the level 1 contains the time.</span>
-<span class="sd">        weights: array_like</span>
+<span class="sd">            index contains the entities and the level 1 contains the time. A</span>
+<span class="sd">            list or a tuple raises a ``TypeError`` that names ``data``.</span>
+<span class="sd">        weights : array_like, optional</span>
 <span class="sd">            Weights to use in estimation.  Assumes residual variance is</span>
 <span class="sd">            proportional to inverse of weight to that the residual times</span>
 <span class="sd">            the weight should be homoskedastic.</span>
@@ -3617,7 +3857,11 @@
 <span class="sd">          White's estimator</span>
 <span class="sd">        * "clustered` - One- or two-way clustering.  Configuration options are:</span>
 
-<span class="sd">          * ``clusters`` - Input containing 1 or 2 variables.</span>
+<span class="sd">          * ``clusters`` - Input containing 1 or 2 variables. This can be</span>
+<span class="sd">            a pandas object or PanelData with the index of ``dependent``, a 1-d</span>
+<span class="sd">            array or list with a value for each row of ``dependent`` in the</span>
+<span class="sd">            order of its rows, or an array or list with the layout of</span>
+<span class="sd">            ``dependent`` (time by entity, or variable by time by entity).</span>
 <span class="sd">            Clusters should be integer values, although other types will</span>
 <span class="sd">            be coerced to integer values by treating as categorical variables</span>
 <span class="sd">          * ``cluster_entity`` - Boolean flag indicating to use entity</span>
@@ -3697,12 +3941,13 @@
         <span class="n">wx</span><span class="p">:</span> <span class="n">linearmodels</span><span class="o">.</span><span class="n">typing</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">Float64Array</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">asarray</span><span class="p">(</span>
             <span class="n">root_w</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">exog</span><span class="o">.</span><span class="n">values2d</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="nb">float</span>
         <span class="p">)</span>
-        <span class="n">index</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">dependent</span><span class="o">.</span><span class="n">index</span>
-        <span class="n">reindex</span> <span class="o">=</span> <span class="n">index</span><span class="o">.</span><span class="n">levels</span><span class="p">[</span><span class="mi">0</span><span class="p">][</span><span class="n">index</span><span class="o">.</span><span class="n">codes</span><span class="p">[</span><span class="mi">0</span><span class="p">]]</span>
-        <span class="n">wybar</span> <span class="o">=</span> <span class="p">(</span><span class="n">theta</span> <span class="o">*</span> <span class="n">wybar</span><span class="p">)</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span><span class="n">reindex</span><span class="p">]</span>
-        <span class="n">wxbar</span> <span class="o">=</span> <span class="p">(</span><span class="n">theta</span> <span class="o">*</span> <span class="n">wxbar</span><span class="p">)</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span><span class="n">reindex</span><span class="p">]</span>
-        <span class="n">wy</span> <span class="o">-=</span> <span class="n">root_w</span> <span class="o">*</span> <span class="n">wybar</span><span class="o">.</span><span class="n">values</span>
-        <span class="n">wx</span> <span class="o">-=</span> <span class="n">root_w</span> <span class="o">*</span> <span class="n">wxbar</span><span class="o">.</span><span class="n">values</span>
+        <span class="c1"># The entity means are in the order in which the entities appear. Rows are</span>
+        <span class="c1"># selected by position since dependent and exog need not have the same labels</span>
+        <span class="n">entity_loc</span> <span class="o">=</span> <span class="n">factorize</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">dependent</span><span class="o">.</span><span class="n">index</span><span class="o">.</span><span class="n">get_level_values</span><span class="p">(</span><span class="mi">0</span><span class="p">))[</span><span class="mi">0</span><span class="p">]</span>
+        <span class="n">wybar_rows</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">asarray</span><span class="p">(</span><span class="n">theta</span> <span class="o">*</span> <span class="n">wybar</span><span class="p">)[</span><span class="n">entity_loc</span><span class="p">]</span>
+        <span class="n">wxbar_rows</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">asarray</span><span class="p">(</span><span class="n">theta</span> <span class="o">*</span> <span class="n">wxbar</span><span class="p">)[</span><span class="n">entity_loc</span><span class="p">]</span>
+        <span class="n">wy</span> <span class="o">-=</span> <span class="n">root_w</span> <span class="o">*</span> <span class="n">wybar_rows</span>
+        <span class="n">wx</span> <span class="o">-=</span> <span class="n">root_w</span> <span class="o">*</span> <span class="n">wxbar_rows</span>
         <span class="n">params</span> <span class="o">=</span> <span class="n">_lstsq</span><span class="p">(</span><span class="n">wx</span><span class="p">,</span> <span class="n">wy</span><span class="p">,</span> <span class="n">rcond</span><span class="o">=</span><span class="kc">None</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span>
 
         <span class="n">df_resid</span> <span class="o">=</span> <span class="n">wy</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">-</span> <span class="n">wx</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span>
@@ -3781,18 +4026,28 @@
 
 <span class="sd">    Parameters</span>
 <span class="sd">    ----------</span>
-<span class="sd">    dependent : array_like</span>
-<span class="sd">        Dependent (left-hand-side) variable (time by entity)</span>
-<span class="sd">    exog : array_like</span>
-<span class="sd">        Exogenous or right-hand-side variables (variable by time by entity).</span>
-<span class="sd">    weights : array_like</span>
+<span class="sd">    dependent : PanelData, DataFrame, Series, ndarray or DataArray</span>
+<span class="sd">        Dependent (left-hand-side) variable (time by entity). A DataFrame or</span>
+<span class="sd">        Series with a 2-level MultiIndex (entity, then time), a DataFrame with</span>
+<span class="sd">        time as the index and entities as the columns, a 2-d (time by entity)</span>
+<span class="sd">        NumPy array or DataArray, or a PanelData. A list, a tuple or any other</span>
+<span class="sd">        container raises a ``TypeError`` that names ``dependent``, since the</span>
+<span class="sd">        entities and time periods need labels or a layout.</span>
+<span class="sd">    exog : PanelData, DataFrame, Series, ndarray or DataArray</span>
+<span class="sd">        Exogenous or right-hand-side variables (variable by time by entity). The</span>
+<span class="sd">        containers are those of ``dependent``, where a DataFrame has a column for</span>
+<span class="sd">        each variable and an array or DataArray with several variables has 3</span>
+<span class="sd">        dimensions (variable by time by entity). A list, a tuple or any other</span>
+<span class="sd">        container raises a ``TypeError`` that names ``exog``.</span>
+<span class="sd">    weights : array_like, optional</span>
 <span class="sd">        Weights to use in estimation.  Assumes residual variance is</span>
 <span class="sd">        proportional to inverse of weight to that the residual time</span>
 <span class="sd">        the weight should be homoskedastic.</span>
 <span class="sd">        Weights can be given for each observation, for each time period,</span>
 <span class="sd">        for each entity or for each combination of time period and entity.</span>
 <span class="sd">        Weights with labels must use the same labels, in the same order,</span>
-<span class="sd">        as dependent. See :ref:`panel-input-alignment`.</span>
+<span class="sd">        as dependent or, if dependent has no labels, as exog. See</span>
+<span class="sd">        :ref:`panel-input-alignment`.</span>
 
 <span class="sd">    Notes</span>
 <span class="sd">    -----</span>
@@ -4121,11 +4376,12 @@
 <span class="sd">        formula : str</span>
 <span class="sd">            Formula to transform into model. Conforms to formulaic formula</span>
 <span class="sd">            rules.</span>
-<span class="sd">        data : array_like</span>
+<span class="sd">        data : PanelData or DataFrame</span>
 <span class="sd">            Data structure that can be coerced into a PanelData.  In most</span>
 <span class="sd">            cases, this should be a multi-index DataFrame where the level 0</span>
-<span class="sd">            index contains the entities and the level 1 contains the time.</span>
-<span class="sd">        weights: array_like</span>
+<span class="sd">            index contains the entities and the level 1 contains the time. A</span>
+<span class="sd">            list or a tuple raises a ``TypeError`` that names ``data``.</span>
+<span class="sd">        weights : array_like, optional</span>
 <span class="sd">            Weights to use in estimation.  Assumes residual variance is</span>
 <span class="sd">            proportional to inverse of weight to that the residual times</span>
 <span class="sd">            the weight should be homoskedastic.</span>

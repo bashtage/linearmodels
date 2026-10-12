@@ -19,7 +19,7 @@
     
   
       
-        <title>linearmodels.system.model - linearmodels v7.1 (+294)</title>
+        <title>linearmodels.system.model - linearmodels v7.1 (+315)</title>
       
     
 
@@ -91,7 +91,7 @@
 
 <header class="md-header md-header--shadow" data-md-component="header">
   <nav class="md-header__inner md-grid" aria-label="Header">
-    <a href="../../../index.html" title="linearmodels v7.1 (+294)" class="md-header__button md-logo" aria-label="linearmodels v7.1 (+294)" data-md-component="logo">
+    <a href="../../../index.html" title="linearmodels v7.1 (+315)" class="md-header__button md-logo" aria-label="linearmodels v7.1 (+315)" data-md-component="logo">
       <img src="../../../_static/bw-logo.svg" alt="logo">
     </a>
     <label class="md-header__button md-icon" for="__drawer">
@@ -102,7 +102,7 @@
       <div class="md-header__ellipsis">
         <div class="md-header__topic">
           <span class="md-ellipsis">
-            linearmodels v7.1 (+294)
+            linearmodels v7.1 (+315)
           </span>
         </div>
         <div class="md-header__topic" data-md-component="header-topic">
@@ -197,10 +197,10 @@
 
 <nav class="md-nav md-nav--primary" aria-label="Navigation" data-md-level="0">
   <label class="md-nav__title" for="__drawer">
-    <a href="../../../index.html" title="linearmodels v7.1 (+294)" class="md-nav__button md-logo" aria-label="linearmodels v7.1 (+294)" data-md-component="logo">
+    <a href="../../../index.html" title="linearmodels v7.1 (+315)" class="md-nav__button md-logo" aria-label="linearmodels v7.1 (+315)" data-md-component="logo">
       <img src="../../../_static/bw-logo.svg" alt="logo">
     </a>
-    linearmodels v7.1 (+294)
+    linearmodels v7.1 (+315)
   </label>
   
     <div class="md-nav__source">
@@ -559,10 +559,12 @@
 <span class="kn">from</span><span class="w"> </span><span class="nn">linearmodels.shared.alignment</span><span class="w"> </span><span class="kn">import</span> <span class="p">(</span>
     <span class="n">check_alignment</span><span class="p">,</span>
     <span class="n">check_row_alignment</span><span class="p">,</span>
+    <span class="n">reference_labels</span><span class="p">,</span>
     <span class="n">row_labels</span><span class="p">,</span>
 <span class="p">)</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">linearmodels.shared.exceptions</span><span class="w"> </span><span class="kn">import</span> <span class="n">missing_warning</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">linearmodels.shared.hypotheses</span><span class="w"> </span><span class="kn">import</span> <span class="n">InvalidTestStatistic</span><span class="p">,</span> <span class="n">WaldTestStatistic</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">linearmodels.shared.inputs</span><span class="w"> </span><span class="kn">import</span> <span class="n">as_array_like</span><span class="p">,</span> <span class="n">as_float64</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">linearmodels.shared.linalg</span><span class="w"> </span><span class="kn">import</span> <span class="n">has_constant</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">linearmodels.shared.utility</span><span class="w"> </span><span class="kn">import</span> <span class="n">AttrDict</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">linearmodels.system._utility</span><span class="w"> </span><span class="kn">import</span> <span class="p">(</span>
@@ -694,6 +696,12 @@
     <span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
         <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">formula</span><span class="p">,</span> <span class="p">(</span><span class="n">Mapping</span><span class="p">,</span> <span class="nb">str</span><span class="p">)):</span>
             <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="s2">"formula must be a string or dictionary-like"</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">weights</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="ow">and</span> <span class="ow">not</span> <span class="nb">hasattr</span><span class="p">(</span><span class="n">weights</span><span class="p">,</span> <span class="s2">"keys"</span><span class="p">):</span>
+            <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span>
+                <span class="s2">"weights must be dictionary-like, such as a dict or a DataFrame, "</span>
+                <span class="s2">"where the key of each value is an equation label. "</span>
+                <span class="sa">f</span><span class="s2">"Got </span><span class="si">{</span><span class="nb">type</span><span class="p">(</span><span class="n">weights</span><span class="p">)</span><span class="o">.</span><span class="vm">__name__</span><span class="si">}</span><span class="s2">."</span>
+            <span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_formula</span><span class="p">:</span> <span class="n">Mapping</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">str</span><span class="p">]</span> <span class="o">|</span> <span class="nb">str</span> <span class="o">=</span> <span class="n">formula</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_data</span> <span class="o">=</span> <span class="n">data</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_weights</span> <span class="o">=</span> <span class="n">weights</span>
@@ -717,6 +725,9 @@
     <span class="k">def</span><span class="w"> </span><span class="nf">_convert_to_series</span><span class="p">(</span>
         <span class="n">value</span><span class="p">:</span> <span class="n">linearmodels</span><span class="o">.</span><span class="n">typing</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">ArrayLike</span><span class="p">,</span> <span class="n">name</span><span class="p">:</span> <span class="nb">str</span>
     <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Series</span><span class="p">:</span>
+        <span class="n">value</span> <span class="o">=</span> <span class="n">as_array_like</span><span class="p">(</span><span class="n">value</span><span class="p">,</span> <span class="n">name</span><span class="p">)</span>
+        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">value</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">):</span>
+            <span class="n">value</span> <span class="o">=</span> <span class="n">as_float64</span><span class="p">(</span><span class="n">value</span><span class="p">,</span> <span class="n">name</span><span class="p">)</span>
         <span class="n">shape</span> <span class="o">=</span> <span class="n">value</span><span class="o">.</span><span class="n">shape</span>
         <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">shape</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">2</span> <span class="ow">or</span> <span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">shape</span><span class="p">)</span> <span class="o">==</span> <span class="mi">2</span> <span class="ow">and</span> <span class="nb">min</span><span class="p">(</span><span class="n">shape</span><span class="p">)</span> <span class="o">!=</span> <span class="mi">1</span><span class="p">):</span>
             <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s2">"</span><span class="si">{</span><span class="n">name</span><span class="si">}</span><span class="s2"> must be squeezable to 1D."</span><span class="p">)</span>
@@ -872,7 +883,10 @@
 <span class="sd">        can contain either an empty array or `None` to indicate that an</span>
 <span class="sd">        equation contains no exogenous regressors. Similarly "endog" and</span>
 <span class="sd">        "instruments" can either be omitted or may contain an empty array (or</span>
-<span class="sd">        `None`) if all variables in an equation are exogenous.</span>
+<span class="sd">        `None`) if all variables in an equation are exogenous. The variables are</span>
+<span class="sd">        array_like, such as lists, NumPy arrays, pandas objects and xarray</span>
+<span class="sd">        DataArrays, and a ``TypeError`` that names the variable is raised for</span>
+<span class="sd">        complex values or text.</span>
 <span class="sd">    sigma : array_like</span>
 <span class="sd">        Prespecified residual covariance to use in GLS estimation. If not</span>
 <span class="sd">        provided, FGLS is implemented based on an estimate of sigma.</span>
@@ -958,14 +972,16 @@
                 <span class="n">endog</span> <span class="o">=</span> <span class="n">IVData</span><span class="p">(</span><span class="n">eq_data</span><span class="p">[</span><span class="mi">2</span><span class="p">],</span> <span class="n">var_name</span><span class="o">=</span><span class="n">endog_name</span><span class="p">,</span> <span class="n">nobs</span><span class="o">=</span><span class="n">dep</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
                 <span class="k">if</span> <span class="n">endog</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
                     <span class="n">current_id</span> <span class="o">+=</span> <span class="p">(</span><span class="nb">id</span><span class="p">(</span><span class="n">eq_data</span><span class="p">[</span><span class="mi">2</span><span class="p">]),)</span>
-                <span class="n">ids</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">current_id</span><span class="p">)</span>
                 <span class="bp">self</span><span class="o">.</span><span class="n">_endog</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">endog</span><span class="p">)</span>
 
-                <span class="bp">self</span><span class="o">.</span><span class="n">_instr</span><span class="o">.</span><span class="n">append</span><span class="p">(</span>
-                    <span class="n">IVData</span><span class="p">(</span><span class="n">eq_data</span><span class="p">[</span><span class="mi">3</span><span class="p">],</span> <span class="n">var_name</span><span class="o">=</span><span class="n">instr_name</span><span class="p">,</span> <span class="n">nobs</span><span class="o">=</span><span class="n">dep</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
-                <span class="p">)</span>
+                <span class="n">instr</span> <span class="o">=</span> <span class="n">IVData</span><span class="p">(</span><span class="n">eq_data</span><span class="p">[</span><span class="mi">3</span><span class="p">],</span> <span class="n">var_name</span><span class="o">=</span><span class="n">instr_name</span><span class="p">,</span> <span class="n">nobs</span><span class="o">=</span><span class="n">dep</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
+                <span class="k">if</span> <span class="n">instr</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
+                    <span class="n">current_id</span> <span class="o">+=</span> <span class="p">(</span><span class="nb">id</span><span class="p">(</span><span class="n">eq_data</span><span class="p">[</span><span class="mi">3</span><span class="p">]),)</span>
+                <span class="n">ids</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">current_id</span><span class="p">)</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">_instr</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">instr</span><span class="p">)</span>
                 <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">eq_data</span><span class="p">)</span> <span class="o">==</span> <span class="mi">5</span><span class="p">:</span>
-                    <span class="bp">self</span><span class="o">.</span><span class="n">_weights</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">IVData</span><span class="p">(</span><span class="n">eq_data</span><span class="p">[</span><span class="mi">4</span><span class="p">]))</span>
+                    <span class="n">weights_name</span> <span class="o">=</span> <span class="s2">"weights_"</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="n">i</span><span class="p">)</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">_weights</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">IVData</span><span class="p">(</span><span class="n">eq_data</span><span class="p">[</span><span class="mi">4</span><span class="p">],</span> <span class="n">var_name</span><span class="o">=</span><span class="n">weights_name</span><span class="p">))</span>
                 <span class="k">else</span><span class="p">:</span>
                     <span class="n">dep_shape</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_dependent</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">shape</span>
                     <span class="bp">self</span><span class="o">.</span><span class="n">_weights</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">IVData</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">ones</span><span class="p">(</span><span class="n">dep_shape</span><span class="p">)))</span>
@@ -983,14 +999,19 @@
                 <span class="bp">self</span><span class="o">.</span><span class="n">_endog</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">endog</span><span class="p">)</span>
                 <span class="k">if</span> <span class="s2">"endog"</span> <span class="ow">in</span> <span class="n">eq_data</span><span class="p">:</span>
                     <span class="n">current_id</span> <span class="o">+=</span> <span class="p">(</span><span class="nb">id</span><span class="p">(</span><span class="n">eq_data</span><span class="p">[</span><span class="s2">"endog"</span><span class="p">]),)</span>
-                <span class="n">ids</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">current_id</span><span class="p">)</span>
 
                 <span class="n">instr_values</span> <span class="o">=</span> <span class="n">eq_data</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"instruments"</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
                 <span class="n">instr</span> <span class="o">=</span> <span class="n">IVData</span><span class="p">(</span><span class="n">instr_values</span><span class="p">,</span> <span class="n">var_name</span><span class="o">=</span><span class="n">instr_name</span><span class="p">,</span> <span class="n">nobs</span><span class="o">=</span><span class="n">dep</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
+                <span class="k">if</span> <span class="s2">"instruments"</span> <span class="ow">in</span> <span class="n">eq_data</span><span class="p">:</span>
+                    <span class="n">current_id</span> <span class="o">+=</span> <span class="p">(</span><span class="nb">id</span><span class="p">(</span><span class="n">instr_values</span><span class="p">),)</span>
+                <span class="n">ids</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">current_id</span><span class="p">)</span>
                 <span class="bp">self</span><span class="o">.</span><span class="n">_instr</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">instr</span><span class="p">)</span>
 
                 <span class="k">if</span> <span class="s2">"weights"</span> <span class="ow">in</span> <span class="n">eq_data</span><span class="p">:</span>
-                    <span class="bp">self</span><span class="o">.</span><span class="n">_weights</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">IVData</span><span class="p">(</span><span class="n">eq_data</span><span class="p">[</span><span class="s2">"weights"</span><span class="p">]))</span>
+                    <span class="n">weights_name</span> <span class="o">=</span> <span class="s2">"weights_"</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="n">i</span><span class="p">)</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">_weights</span><span class="o">.</span><span class="n">append</span><span class="p">(</span>
+                        <span class="n">IVData</span><span class="p">(</span><span class="n">eq_data</span><span class="p">[</span><span class="s2">"weights"</span><span class="p">],</span> <span class="n">var_name</span><span class="o">=</span><span class="n">weights_name</span><span class="p">)</span>
+                    <span class="p">)</span>
                 <span class="k">else</span><span class="p">:</span>
                     <span class="bp">self</span><span class="o">.</span><span class="n">_weights</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">IVData</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">ones</span><span class="p">(</span><span class="n">dep</span><span class="o">.</span><span class="n">shape</span><span class="p">)))</span>
             <span class="k">else</span><span class="p">:</span>
@@ -1100,7 +1121,7 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">_constant_loc</span> <span class="o">=</span> <span class="n">constant_loc</span>
 
     <span class="k">def</span><span class="w"> </span><span class="nf">_check_alignment</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
-<span class="w">        </span><span class="sd">"""Check that inputs with labels use the labels of dependent"""</span>
+<span class="w">        </span><span class="sd">"""Check that inputs with labels use the labels of dependent, or the first"""</span>
         <span class="n">nobs</span> <span class="o">=</span> <span class="p">[</span><span class="n">dep</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="k">for</span> <span class="n">dep</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_dependent</span><span class="p">]</span>
         <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">label</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_eq_labels</span><span class="p">):</span>
             <span class="k">if</span> <span class="n">nobs</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">!=</span> <span class="n">nobs</span><span class="p">[</span><span class="mi">0</span><span class="p">]:</span>
@@ -1110,37 +1131,54 @@
                     <span class="sa">f</span><span class="s2">"observations, but in equation </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">_eq_labels</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="si">!r}</span><span class="s2"> it has "</span>
                     <span class="sa">f</span><span class="s2">"</span><span class="si">{</span><span class="n">nobs</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="si">}</span><span class="s2">."</span>
                 <span class="p">)</span>
+        <span class="c1"># The dependent variables of all equations use the same labels</span>
         <span class="n">reference</span><span class="p">:</span> <span class="n">Index</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span>
         <span class="n">reference_name</span> <span class="o">=</span> <span class="s2">""</span>
         <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">label</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_eq_labels</span><span class="p">):</span>
             <span class="n">dependent_name</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">"dependent in equation </span><span class="si">{</span><span class="n">label</span><span class="si">!r}</span><span class="s2">"</span>
             <span class="n">expected</span> <span class="o">=</span> <span class="n">row_labels</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_dependent</span><span class="p">[</span><span class="n">i</span><span class="p">])</span>
-            <span class="k">if</span> <span class="n">expected</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
-                <span class="k">if</span> <span class="n">reference</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
-                    <span class="n">reference</span><span class="p">,</span> <span class="n">reference_name</span> <span class="o">=</span> <span class="n">expected</span><span class="p">,</span> <span class="n">dependent_name</span>
-                <span class="k">else</span><span class="p">:</span>
-                    <span class="n">check_row_alignment</span><span class="p">(</span>
-                        <span class="n">dependent_name</span><span class="p">,</span> <span class="n">expected</span><span class="p">,</span> <span class="n">reference</span><span class="p">,</span> <span class="n">reference_name</span>
-                    <span class="p">)</span>
-            <span class="n">inputs</span> <span class="o">=</span> <span class="p">{</span>
-                <span class="sa">f</span><span class="s2">"exog in equation </span><span class="si">{</span><span class="n">label</span><span class="si">!r}</span><span class="s2">"</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">_exog</span><span class="p">[</span><span class="n">i</span><span class="p">],</span>
-                <span class="sa">f</span><span class="s2">"endog in equation </span><span class="si">{</span><span class="n">label</span><span class="si">!r}</span><span class="s2">"</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">_endog</span><span class="p">[</span><span class="n">i</span><span class="p">],</span>
-                <span class="sa">f</span><span class="s2">"instruments in equation </span><span class="si">{</span><span class="n">label</span><span class="si">!r}</span><span class="s2">"</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">_instr</span><span class="p">[</span><span class="n">i</span><span class="p">],</span>
-                <span class="sa">f</span><span class="s2">"weights in equation </span><span class="si">{</span><span class="n">label</span><span class="si">!r}</span><span class="s2">"</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">_weights</span><span class="p">[</span><span class="n">i</span><span class="p">],</span>
-            <span class="p">}</span>
-            <span class="n">check_alignment</span><span class="p">(</span><span class="n">expected</span><span class="p">,</span> <span class="n">inputs</span><span class="p">,</span> <span class="n">reference</span><span class="o">=</span><span class="n">dependent_name</span><span class="p">)</span>
-
-    <span class="k">def</span><span class="w"> </span><span class="nf">_check_clusters</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">config</span><span class="p">:</span> <span class="n">Mapping</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
-<span class="w">        </span><span class="sd">"""Check that clusters with labels use the labels of dependent"""</span>
+            <span class="k">if</span> <span class="n">expected</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+                <span class="k">continue</span>
+            <span class="k">if</span> <span class="n">reference</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+                <span class="n">reference</span><span class="p">,</span> <span class="n">reference_name</span> <span class="o">=</span> <span class="n">expected</span><span class="p">,</span> <span class="n">dependent_name</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">check_row_alignment</span><span class="p">(</span><span class="n">dependent_name</span><span class="p">,</span> <span class="n">expected</span><span class="p">,</span> <span class="n">reference</span><span class="p">,</span> <span class="n">reference_name</span><span class="p">)</span>
+        <span class="n">equation_inputs</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="nb">list</span><span class="p">[</span><span class="nb">tuple</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">object</span><span class="p">]]]</span> <span class="o">=</span> <span class="p">[</span>
+            <span class="p">[</span>
+                <span class="p">(</span><span class="sa">f</span><span class="s2">"exog in equation </span><span class="si">{</span><span class="n">label</span><span class="si">!r}</span><span class="s2">"</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_exog</span><span class="p">[</span><span class="n">i</span><span class="p">]),</span>
+                <span class="p">(</span><span class="sa">f</span><span class="s2">"endog in equation </span><span class="si">{</span><span class="n">label</span><span class="si">!r}</span><span class="s2">"</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_endog</span><span class="p">[</span><span class="n">i</span><span class="p">]),</span>
+                <span class="p">(</span><span class="sa">f</span><span class="s2">"instruments in equation </span><span class="si">{</span><span class="n">label</span><span class="si">!r}</span><span class="s2">"</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_instr</span><span class="p">[</span><span class="n">i</span><span class="p">]),</span>
+                <span class="p">(</span><span class="sa">f</span><span class="s2">"weights in equation </span><span class="si">{</span><span class="n">label</span><span class="si">!r}</span><span class="s2">"</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_weights</span><span class="p">[</span><span class="n">i</span><span class="p">]),</span>
+            <span class="p">]</span>
+            <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">label</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_eq_labels</span><span class="p">)</span>
+        <span class="p">]</span>
+        <span class="c1"># If no dependent variable has labels, the first input with labels sets them</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_labels</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_labels_name</span> <span class="o">=</span> <span class="n">reference_labels</span><span class="p">(</span>
+            <span class="n">reference</span><span class="p">,</span>
+            <span class="p">[</span><span class="n">item</span> <span class="k">for</span> <span class="n">items</span> <span class="ow">in</span> <span class="n">equation_inputs</span> <span class="k">for</span> <span class="n">item</span> <span class="ow">in</span> <span class="n">items</span><span class="p">],</span>
+            <span class="n">reference</span><span class="o">=</span><span class="n">reference_name</span><span class="p">,</span>
+        <span class="p">)</span>
         <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">label</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_eq_labels</span><span class="p">):</span>
+            <span class="c1"># The inputs of an equation use the labels of its own dependent variable</span>
+            <span class="c1"># if it has labels, and the labels of the system otherwise</span>
             <span class="n">expected</span> <span class="o">=</span> <span class="n">row_labels</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_dependent</span><span class="p">[</span><span class="n">i</span><span class="p">])</span>
-            <span class="k">if</span> <span class="n">expected</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">expected</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+                <span class="n">check_alignment</span><span class="p">(</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">_labels</span><span class="p">,</span> <span class="n">equation_inputs</span><span class="p">[</span><span class="n">i</span><span class="p">],</span> <span class="n">reference</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">_labels_name</span>
+                <span class="p">)</span>
+            <span class="k">else</span><span class="p">:</span>
                 <span class="n">check_alignment</span><span class="p">(</span>
                     <span class="n">expected</span><span class="p">,</span>
-                    <span class="p">{</span><span class="s2">"clusters"</span><span class="p">:</span> <span class="n">config</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"clusters"</span><span class="p">)},</span>
+                    <span class="n">equation_inputs</span><span class="p">[</span><span class="n">i</span><span class="p">],</span>
                     <span class="n">reference</span><span class="o">=</span><span class="sa">f</span><span class="s2">"dependent in equation </span><span class="si">{</span><span class="n">label</span><span class="si">!r}</span><span class="s2">"</span><span class="p">,</span>
                 <span class="p">)</span>
-                <span class="k">return</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">_check_clusters</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">config</span><span class="p">:</span> <span class="n">Mapping</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">"""Check that clusters with labels use the labels of the system"""</span>
+        <span class="n">labels</span> <span class="o">=</span> <span class="kc">None</span> <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_labels</span> <span class="ow">is</span> <span class="kc">None</span> <span class="k">else</span> <span class="bp">self</span><span class="o">.</span><span class="n">_labels</span><span class="p">[</span><span class="o">~</span><span class="bp">self</span><span class="o">.</span><span class="n">_drop_locs</span><span class="p">]</span>
+        <span class="n">check_alignment</span><span class="p">(</span>
+            <span class="n">labels</span><span class="p">,</span> <span class="p">{</span><span class="s2">"clusters"</span><span class="p">:</span> <span class="n">config</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"clusters"</span><span class="p">)},</span> <span class="n">reference</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">_labels_name</span>
+        <span class="p">)</span>
 
     <span class="k">def</span><span class="w"> </span><span class="nf">_drop_missing</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
         <span class="n">k</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_dependent</span><span class="p">)</span>
@@ -1156,6 +1194,7 @@
                     <span class="n">missing</span> <span class="o">|=</span> <span class="n">np</span><span class="o">.</span><span class="n">asarray</span><span class="p">(</span><span class="n">nulls</span><span class="p">)</span>
 
         <span class="n">missing_warning</span><span class="p">(</span><span class="n">missing</span><span class="p">,</span> <span class="n">stacklevel</span><span class="o">=</span><span class="mi">4</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_drop_locs</span> <span class="o">=</span> <span class="n">missing</span>
         <span class="k">if</span> <span class="n">np</span><span class="o">.</span><span class="n">any</span><span class="p">(</span><span class="n">missing</span><span class="p">):</span>
             <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">k</span><span class="p">):</span>
                 <span class="bp">self</span><span class="o">.</span><span class="n">_dependent</span><span class="p">[</span><span class="n">i</span><span class="p">]</span><span class="o">.</span><span class="n">drop</span><span class="p">(</span><span class="n">missing</span><span class="p">)</span>
@@ -1260,12 +1299,12 @@
                     <span class="k">continue</span>
 
                 <span class="k">if</span> <span class="n">exog</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
-                    <span class="n">exog_endog</span> <span class="o">=</span> <span class="n">IVData</span><span class="p">(</span><span class="n">exog</span><span class="p">)</span><span class="o">.</span><span class="n">pandas</span>
+                    <span class="n">exog_endog</span> <span class="o">=</span> <span class="n">IVData</span><span class="p">(</span><span class="n">exog</span><span class="p">,</span> <span class="n">var_name</span><span class="o">=</span><span class="s2">"exog"</span><span class="p">)</span><span class="o">.</span><span class="n">pandas</span>
                     <span class="k">if</span> <span class="n">endog</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
-                        <span class="n">endog_ivd</span> <span class="o">=</span> <span class="n">IVData</span><span class="p">(</span><span class="n">endog</span><span class="p">)</span>
+                        <span class="n">endog_ivd</span> <span class="o">=</span> <span class="n">IVData</span><span class="p">(</span><span class="n">endog</span><span class="p">,</span> <span class="n">var_name</span><span class="o">=</span><span class="s2">"endog"</span><span class="p">)</span>
                         <span class="n">exog_endog</span> <span class="o">=</span> <span class="n">concat</span><span class="p">([</span><span class="n">exog_endog</span><span class="p">,</span> <span class="n">endog_ivd</span><span class="o">.</span><span class="n">pandas</span><span class="p">],</span> <span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
                 <span class="k">else</span><span class="p">:</span>
-                    <span class="n">exog_endog</span> <span class="o">=</span> <span class="n">IVData</span><span class="p">(</span><span class="n">endog</span><span class="p">)</span><span class="o">.</span><span class="n">pandas</span>
+                    <span class="n">exog_endog</span> <span class="o">=</span> <span class="n">IVData</span><span class="p">(</span><span class="n">endog</span><span class="p">,</span> <span class="n">var_name</span><span class="o">=</span><span class="s2">"endog"</span><span class="p">)</span><span class="o">.</span><span class="n">pandas</span>
 
                 <span class="n">fitted</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">asarray</span><span class="p">(</span><span class="n">exog_endog</span><span class="p">)</span> <span class="o">@</span> <span class="n">b</span>
                 <span class="n">fitted_df</span> <span class="o">=</span> <span class="n">DataFrame</span><span class="p">(</span><span class="n">fitted</span><span class="p">,</span> <span class="n">index</span><span class="o">=</span><span class="n">exog_endog</span><span class="o">.</span><span class="n">index</span><span class="p">,</span> <span class="n">columns</span><span class="o">=</span><span class="p">[</span><span class="n">label</span><span class="p">])</span>
@@ -2010,7 +2049,10 @@
 <span class="sd">        can contain either an empty array or `None` to indicate that an</span>
 <span class="sd">        equation contains no exogenous regressors. Similarly "endog" and</span>
 <span class="sd">        "instruments" can either be omitted or may contain an empty array (or</span>
-<span class="sd">        `None`) if all variables in an equation are exogenous.</span>
+<span class="sd">        `None`) if all variables in an equation are exogenous. The variables are</span>
+<span class="sd">        array_like, such as lists, NumPy arrays, pandas objects and xarray</span>
+<span class="sd">        DataArrays, and a ``TypeError`` that names the variable is raised for</span>
+<span class="sd">        complex values or text.</span>
 <span class="sd">    sigma : array_like</span>
 <span class="sd">        Prespecified residual covariance to use in GLS estimation. If not</span>
 <span class="sd">        provided, FGLS is implemented based on an estimate of sigma.</span>
@@ -2083,7 +2125,10 @@
 <span class="sd">    is raised if an index differs. Either reindex the input to the index of</span>
 <span class="sd">    the dependent variable, or call ``to_numpy()`` to pair its values by</span>
 <span class="sd">    position. NumPy arrays and pandas objects with a default index do not</span>
-<span class="sd">    carry labels and are always paired by position.</span>
+<span class="sd">    carry labels and are always paired by position. If none of the dependent</span>
+<span class="sd">    variables carries labels, the inputs that do must use the same index as the</span>
+<span class="sd">    first of them that does, in the order ``exog``, ``endog``, ``instruments``</span>
+<span class="sd">    and ``weights`` of each equation.</span>
 <span class="sd">    The same rule applies to ``clusters`` passed to ``fit``.</span>
 <span class="sd">    """</span>
 
@@ -2142,8 +2187,9 @@
         <span class="k">if</span> <span class="n">exog</span> <span class="ow">is</span> <span class="kc">None</span> <span class="ow">and</span> <span class="n">endog</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
             <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">"At least one of exog or endog must be provided"</span><span class="p">)</span>
         <span class="n">exog_ivd</span> <span class="o">=</span> <span class="n">IVData</span><span class="p">(</span><span class="n">exog</span><span class="p">,</span> <span class="n">var_name</span><span class="o">=</span><span class="s2">"exog"</span><span class="p">)</span>
-        <span class="n">endog_ivd</span> <span class="o">=</span> <span class="n">IVData</span><span class="p">(</span><span class="n">endog</span><span class="p">,</span> <span class="n">var_name</span><span class="o">=</span><span class="s2">"endog"</span><span class="p">,</span> <span class="n">nobs</span><span class="o">=</span><span class="n">dependent</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
-        <span class="n">instr_ivd</span> <span class="o">=</span> <span class="n">IVData</span><span class="p">(</span><span class="n">instruments</span><span class="p">,</span> <span class="n">var_name</span><span class="o">=</span><span class="s2">"instruments"</span><span class="p">,</span> <span class="n">nobs</span><span class="o">=</span><span class="n">dependent</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
+        <span class="n">nobs</span> <span class="o">=</span> <span class="n">dependent_ivd</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+        <span class="n">endog_ivd</span> <span class="o">=</span> <span class="n">IVData</span><span class="p">(</span><span class="n">endog</span><span class="p">,</span> <span class="n">var_name</span><span class="o">=</span><span class="s2">"endog"</span><span class="p">,</span> <span class="n">nobs</span><span class="o">=</span><span class="n">nobs</span><span class="p">)</span>
+        <span class="n">instr_ivd</span> <span class="o">=</span> <span class="n">IVData</span><span class="p">(</span><span class="n">instruments</span><span class="p">,</span> <span class="n">var_name</span><span class="o">=</span><span class="s2">"instruments"</span><span class="p">,</span> <span class="n">nobs</span><span class="o">=</span><span class="n">nobs</span><span class="p">)</span>
         <span class="k">for</span> <span class="n">col</span> <span class="ow">in</span> <span class="n">dependent_ivd</span><span class="o">.</span><span class="n">pandas</span><span class="p">:</span>
             <span class="n">equations</span><span class="p">[</span><span class="nb">str</span><span class="p">(</span><span class="n">col</span><span class="p">)]</span> <span class="o">=</span> <span class="p">{</span>
                 <span class="c1"># TODO: Bug in pandas-stubs</span>
@@ -2246,7 +2292,9 @@
 <span class="sd">        values.  Each key is an equations label and must be a string. Each</span>
 <span class="sd">        value must be either a tuple of the form (dependent,</span>
 <span class="sd">        exog, [weights]) or a dictionary with keys "dependent" and "exog" and</span>
-<span class="sd">        the optional key "weights".</span>
+<span class="sd">        the optional key "weights". The variables are array_like, such as lists,</span>
+<span class="sd">        NumPy arrays, pandas objects and xarray DataArrays, and a ``TypeError``</span>
+<span class="sd">        that names the variable is raised for complex values or text.</span>
 <span class="sd">    sigma : array_like</span>
 <span class="sd">        Prespecified residual covariance to use in GLS estimation. If not</span>
 <span class="sd">        provided, FGLS is implemented based on an estimate of sigma.</span>
@@ -2320,7 +2368,10 @@
 <span class="sd">    is raised if an index differs. Either reindex the input to the index of</span>
 <span class="sd">    the dependent variable, or call ``to_numpy()`` to pair its values by</span>
 <span class="sd">    position. NumPy arrays and pandas objects with a default index do not</span>
-<span class="sd">    carry labels and are always paired by position.</span>
+<span class="sd">    carry labels and are always paired by position. If none of the dependent</span>
+<span class="sd">    variables carries labels, the inputs that do must use the same index as the</span>
+<span class="sd">    first of them that does, in the order ``exog``, ``endog``, ``instruments``</span>
+<span class="sd">    and ``weights`` of each equation.</span>
 <span class="sd">    The same rule applies to ``clusters`` passed to ``fit``.</span>
 <span class="sd">    """</span>
 
@@ -2495,7 +2546,10 @@
 <span class="sd">        exog, endog, instrument[, weights]) or a dictionary with keys "dependent",</span>
 <span class="sd">        "exog".  The dictionary may contain optional keys for "endog",</span>
 <span class="sd">        "instruments", and "weights". Endogenous and/or Instrument can be empty</span>
-<span class="sd">        if all variables in an equation are exogenous.</span>
+<span class="sd">        if all variables in an equation are exogenous. The variables are</span>
+<span class="sd">        array_like, such as lists, NumPy arrays, pandas objects and xarray</span>
+<span class="sd">        DataArrays, and a ``TypeError`` that names the variable is raised for</span>
+<span class="sd">        complex values or text.</span>
 <span class="sd">    sigma : array_like</span>
 <span class="sd">        Prespecified residual covariance to use in GLS estimation. If not</span>
 <span class="sd">        provided, FGLS is implemented based on an estimate of sigma. Only used</span>
@@ -2565,7 +2619,10 @@
 <span class="sd">    is raised if an index differs. Either reindex the input to the index of</span>
 <span class="sd">    the dependent variable, or call ``to_numpy()`` to pair its values by</span>
 <span class="sd">    position. NumPy arrays and pandas objects with a default index do not</span>
-<span class="sd">    carry labels and are always paired by position.</span>
+<span class="sd">    carry labels and are always paired by position. If none of the dependent</span>
+<span class="sd">    variables carries labels, the inputs that do must use the same index as the</span>
+<span class="sd">    first of them that does, in the order ``exog``, ``endog``, ``instruments``</span>
+<span class="sd">    and ``weights`` of each equation.</span>
 <span class="sd">    """</span>
 
     <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span>

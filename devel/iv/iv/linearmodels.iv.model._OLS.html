@@ -23,7 +23,7 @@
     
   
       
-        <title>linearmodels.iv.model._OLS - linearmodels v7.1 (+294)</title>
+        <title>linearmodels.iv.model._OLS - linearmodels v7.1 (+315)</title>
       
     
 
@@ -100,7 +100,7 @@
 
 <header class="md-header md-header--shadow" data-md-component="header">
   <nav class="md-header__inner md-grid" aria-label="Header">
-    <a href="../../index.html" title="linearmodels v7.1 (+294)" class="md-header__button md-logo" aria-label="linearmodels v7.1 (+294)" data-md-component="logo">
+    <a href="../../index.html" title="linearmodels v7.1 (+315)" class="md-header__button md-logo" aria-label="linearmodels v7.1 (+315)" data-md-component="logo">
       <img src="../../_static/bw-logo.svg" alt="logo">
     </a>
     <label class="md-header__button md-icon" for="__drawer">
@@ -111,7 +111,7 @@
       <div class="md-header__ellipsis">
         <div class="md-header__topic">
           <span class="md-ellipsis">
-            linearmodels v7.1 (+294)
+            linearmodels v7.1 (+315)
           </span>
         </div>
         <div class="md-header__topic" data-md-component="header-topic">
@@ -206,10 +206,10 @@
 
 <nav class="md-nav md-nav--primary" aria-label="Navigation" data-md-level="0">
   <label class="md-nav__title" for="__drawer">
-    <a href="../../index.html" title="linearmodels v7.1 (+294)" class="md-nav__button md-logo" aria-label="linearmodels v7.1 (+294)" data-md-component="logo">
+    <a href="../../index.html" title="linearmodels v7.1 (+315)" class="md-nav__button md-logo" aria-label="linearmodels v7.1 (+315)" data-md-component="logo">
       <img src="../../_static/bw-logo.svg" alt="logo">
     </a>
-    linearmodels v7.1 (+294)
+    linearmodels v7.1 (+315)
   </label>
   
     <div class="md-nav__source">
@@ -1761,8 +1761,10 @@ wrong observation. A <code class="docutils literal notranslate"><span class="pre
 <code class="docutils literal notranslate"><span class="pre">weights</span></code> differs from the index of <code class="docutils literal notranslate"><span class="pre">dependent</span></code>. Either reindex the
 input to the index of <code class="docutils literal notranslate"><span class="pre">dependent</span></code>, or call <code class="docutils literal notranslate"><span class="pre">to_numpy()</span></code> to pair its
 values by position. NumPy arrays and pandas objects with a default index
-do not carry labels and are always paired by position. The same rule
-applies to <code class="docutils literal notranslate"><span class="pre">clusters</span></code> passed to <code class="docutils literal notranslate"><span class="pre">fit</span></code>.</p>
+do not carry labels and are always paired by position. If <code class="docutils literal notranslate"><span class="pre">dependent</span></code>
+does not carry labels, the inputs that do must use the same index as the
+first of <code class="docutils literal notranslate"><span class="pre">exog</span></code> and <code class="docutils literal notranslate"><span class="pre">weights</span></code> that does. The same rule applies to
+<code class="docutils literal notranslate"><span class="pre">clusters</span></code> passed to <code class="docutils literal notranslate"><span class="pre">fit</span></code>.</p>
 <div class="seealso admonition">
 <p class="admonition-title">See also</p>
 <p><a class="reference external" href="https://www.statsmodels.org/dev/generated/statsmodels.regression.linear_model.OLS.html#statsmodels.regression.linear_model.OLS" title="(in statsmodels 0.15.1 (+554) v0.15.1 (+554))"><code class="xref py py-obj docutils literal notranslate"><span class="pre">statsmodels.regression.linear_model.OLS</span></code></a>, <a class="reference external" href="https://www.statsmodels.org/dev/generated/statsmodels.regression.linear_model.GLS.html#statsmodels.regression.linear_model.GLS" title="(in statsmodels 0.15.1 (+554) v0.15.1 (+554))"><code class="xref py py-obj docutils literal notranslate"><span class="pre">statsmodels.regression.linear_model.GLS</span></code></a></p>

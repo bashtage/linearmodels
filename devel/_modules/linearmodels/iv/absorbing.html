@@ -19,7 +19,7 @@
     
   
       
-        <title>linearmodels.iv.absorbing - linearmodels v7.1 (+294)</title>
+        <title>linearmodels.iv.absorbing - linearmodels v7.1 (+315)</title>
       
     
 
@@ -91,7 +91,7 @@
 
 <header class="md-header md-header--shadow" data-md-component="header">
   <nav class="md-header__inner md-grid" aria-label="Header">
-    <a href="../../../index.html" title="linearmodels v7.1 (+294)" class="md-header__button md-logo" aria-label="linearmodels v7.1 (+294)" data-md-component="logo">
+    <a href="../../../index.html" title="linearmodels v7.1 (+315)" class="md-header__button md-logo" aria-label="linearmodels v7.1 (+315)" data-md-component="logo">
       <img src="../../../_static/bw-logo.svg" alt="logo">
     </a>
     <label class="md-header__button md-icon" for="__drawer">
@@ -102,7 +102,7 @@
       <div class="md-header__ellipsis">
         <div class="md-header__topic">
           <span class="md-ellipsis">
-            linearmodels v7.1 (+294)
+            linearmodels v7.1 (+315)
           </span>
         </div>
         <div class="md-header__topic" data-md-component="header-topic">
@@ -197,10 +197,10 @@
 
 <nav class="md-nav md-nav--primary" aria-label="Navigation" data-md-level="0">
   <label class="md-nav__title" for="__drawer">
-    <a href="../../../index.html" title="linearmodels v7.1 (+294)" class="md-nav__button md-logo" aria-label="linearmodels v7.1 (+294)" data-md-component="logo">
+    <a href="../../../index.html" title="linearmodels v7.1 (+315)" class="md-nav__button md-logo" aria-label="linearmodels v7.1 (+315)" data-md-component="logo">
       <img src="../../../_static/bw-logo.svg" alt="logo">
     </a>
-    linearmodels v7.1 (+294)
+    linearmodels v7.1 (+315)
   </label>
   
     <div class="md-nav__source">
@@ -566,6 +566,7 @@
 <span class="p">)</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">numpy.linalg</span><span class="w"> </span><span class="kn">import</span> <span class="n">lstsq</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">pandas</span><span class="w"> </span><span class="kn">import</span> <span class="n">Categorical</span><span class="p">,</span> <span class="n">CategoricalDtype</span><span class="p">,</span> <span class="n">DataFrame</span><span class="p">,</span> <span class="n">Series</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">pandas.api.types</span><span class="w"> </span><span class="kn">import</span> <span class="n">is_numeric_dtype</span>
 <span class="kn">import</span><span class="w"> </span><span class="nn">scipy.sparse</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">sp</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">scipy.sparse.linalg</span><span class="w"> </span><span class="kn">import</span> <span class="n">lsmr</span>
 
@@ -587,9 +588,15 @@
     <span class="n">not_absorbed</span><span class="p">,</span>
     <span class="n">preconditioner</span><span class="p">,</span>
 <span class="p">)</span>
-<span class="kn">from</span><span class="w"> </span><span class="nn">linearmodels.shared.alignment</span><span class="w"> </span><span class="kn">import</span> <span class="n">check_alignment</span><span class="p">,</span> <span class="n">is_default_index</span><span class="p">,</span> <span class="n">row_labels</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">linearmodels.shared.alignment</span><span class="w"> </span><span class="kn">import</span> <span class="p">(</span>
+    <span class="n">check_alignment</span><span class="p">,</span>
+    <span class="n">is_default_index</span><span class="p">,</span>
+    <span class="n">reference_labels</span><span class="p">,</span>
+    <span class="n">row_labels</span><span class="p">,</span>
+<span class="p">)</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">linearmodels.shared.exceptions</span><span class="w"> </span><span class="kn">import</span> <span class="n">missing_warning</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">linearmodels.shared.hypotheses</span><span class="w"> </span><span class="kn">import</span> <span class="n">InvalidTestStatistic</span><span class="p">,</span> <span class="n">WaldTestStatistic</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">linearmodels.shared.inputs</span><span class="w"> </span><span class="kn">import</span> <span class="n">as_array_like</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">linearmodels.shared.utility</span><span class="w"> </span><span class="kn">import</span> <span class="n">DataFrameWrapper</span><span class="p">,</span> <span class="n">SeriesWrapper</span>
 <span class="kn">import</span><span class="w"> </span><span class="nn">linearmodels.typing.data</span>
 
@@ -969,13 +976,14 @@
 
 <span class="sd">    Parameters</span>
 <span class="sd">    ----------</span>
-<span class="sd">    cat : {ndarray, Series, DataFrame, DataArray}</span>
+<span class="sd">    cat : array_like</span>
 <span class="sd">        Variables to treat as categoricals. Best format is a Categorical</span>
 <span class="sd">        Series or DataFrame containing Categorical Series. Other formats</span>
 <span class="sd">        are converted to Categorical Series, column-by-column. cats has</span>
 <span class="sd">        shape (nobs, ncat).</span>
-<span class="sd">    cont : {ndarray, Series, DataFrame, DataArray}</span>
-<span class="sd">        Variables to treat as continuous, (nobs, ncont).</span>
+<span class="sd">    cont : array_like</span>
+<span class="sd">        Variables to treat as continuous, (nobs, ncont). A ``TypeError`` is</span>
+<span class="sd">        raised if the values are complex or cannot be converted to float64.</span>
 
 <span class="sd">    Notes</span>
 <span class="sd">    -----</span>
@@ -1023,8 +1031,9 @@
         <span class="n">cont</span><span class="p">:</span> <span class="n">linearmodels</span><span class="o">.</span><span class="n">typing</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">ArrayLike</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
         <span class="n">nobs</span><span class="p">:</span> <span class="nb">int</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
     <span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">_cat</span> <span class="o">=</span> <span class="n">cat</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">_cont</span> <span class="o">=</span> <span class="n">cont</span>
+        <span class="c1"># Lists and tuples are arrays, which have the shape that is used below</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_cat</span> <span class="o">=</span> <span class="kc">None</span> <span class="k">if</span> <span class="n">cat</span> <span class="ow">is</span> <span class="kc">None</span> <span class="k">else</span> <span class="n">as_array_like</span><span class="p">(</span><span class="n">cat</span><span class="p">,</span> <span class="s2">"cat"</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_cont</span> <span class="o">=</span> <span class="kc">None</span> <span class="k">if</span> <span class="n">cont</span> <span class="ow">is</span> <span class="kc">None</span> <span class="k">else</span> <span class="n">as_array_like</span><span class="p">(</span><span class="n">cont</span><span class="p">,</span> <span class="s2">"cont"</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_cat_data</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_iv_data</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_cont_data</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_iv_data</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_nobs</span> <span class="o">=</span> <span class="n">nobs</span>
@@ -1207,16 +1216,33 @@
 <span class="sd">        &gt;&gt;&gt; interact.sparse.shape # Cart product of all cats, 5!, times ncont, 6</span>
 <span class="sd">        (100000, 720)</span>
 <span class="sd">        """</span>
+        <span class="k">return</span> <span class="n">Interaction</span><span class="o">.</span><span class="n">_from_frame</span><span class="p">(</span><span class="n">frame</span><span class="p">,</span> <span class="s2">"frame"</span><span class="p">)</span></div>
+
+
+    <span class="nd">@staticmethod</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">_from_frame</span><span class="p">(</span><span class="n">frame</span><span class="p">:</span> <span class="n">DataFrame</span><span class="p">,</span> <span class="n">name</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Interaction</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">"""from_frame, where name is used to refer to frame in error messages"""</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">frame</span><span class="p">,</span> <span class="n">DataFrame</span><span class="p">):</span>
+            <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="sa">f</span><span class="s2">"</span><span class="si">{</span><span class="n">name</span><span class="si">}</span><span class="s2"> must be a DataFrame. Got </span><span class="si">{</span><span class="nb">type</span><span class="p">(</span><span class="n">frame</span><span class="p">)</span><span class="o">.</span><span class="vm">__name__</span><span class="si">}</span><span class="s2">."</span><span class="p">)</span>
         <span class="n">cat_cols</span> <span class="o">=</span> <span class="p">[</span>
             <span class="n">col</span> <span class="k">for</span> <span class="n">col</span> <span class="ow">in</span> <span class="n">frame</span> <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">frame</span><span class="p">[</span><span class="n">col</span><span class="p">]</span><span class="o">.</span><span class="n">dtype</span><span class="p">,</span> <span class="n">CategoricalDtype</span><span class="p">)</span>
         <span class="p">]</span>
         <span class="n">cont_cols</span> <span class="o">=</span> <span class="p">[</span><span class="n">col</span> <span class="k">for</span> <span class="n">col</span> <span class="ow">in</span> <span class="n">frame</span> <span class="k">if</span> <span class="n">col</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">cat_cols</span><span class="p">]</span>
+        <span class="k">for</span> <span class="n">col</span> <span class="ow">in</span> <span class="n">cont_cols</span><span class="p">:</span>
+            <span class="n">dtype</span> <span class="o">=</span> <span class="n">frame</span><span class="p">[</span><span class="n">col</span><span class="p">]</span><span class="o">.</span><span class="n">dtype</span>
+            <span class="k">if</span> <span class="ow">not</span> <span class="n">is_numeric_dtype</span><span class="p">(</span><span class="n">dtype</span><span class="p">):</span>
+                <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span>
+                    <span class="sa">f</span><span class="s2">"The column </span><span class="si">{</span><span class="n">col</span><span class="si">!r}</span><span class="s2"> of </span><span class="si">{</span><span class="n">name</span><span class="si">}</span><span class="s2"> has dtype </span><span class="si">{</span><span class="n">dtype</span><span class="si">}</span><span class="s2">. The columns "</span>
+                    <span class="s2">"that do not have a categorical dtype are treated as continuous "</span>
+                    <span class="s2">"variables and must be numeric. Convert the columns that "</span>
+                    <span class="sa">f</span><span class="s2">"contain categories to categorical, for example using "</span>
+                    <span class="sa">f</span><span class="s2">"</span><span class="si">{</span><span class="n">name</span><span class="si">}</span><span class="s2">[</span><span class="si">{</span><span class="n">col</span><span class="si">!r}</span><span class="s2">].astype('category')."</span>
+                <span class="p">)</span>
         <span class="c1"># TODO: Bug in pandas-stubs</span>
         <span class="c1">#   https://github.com/pandas-dev/pandas-stubs/issues/97</span>
         <span class="n">frame_cats</span> <span class="o">=</span> <span class="n">frame</span><span class="p">[</span><span class="n">cat_cols</span><span class="p">]</span>
         <span class="n">frame_conts</span> <span class="o">=</span> <span class="n">frame</span><span class="p">[</span><span class="n">cont_cols</span><span class="p">]</span>
         <span class="k">return</span> <span class="n">Interaction</span><span class="p">(</span><span class="n">frame_cats</span><span class="p">,</span> <span class="n">frame_conts</span><span class="p">,</span> <span class="n">nobs</span><span class="o">=</span><span class="n">frame</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span></div>
-</div>
 
 
 
@@ -1336,21 +1362,25 @@
 <span class="sd">    ----------</span>
 <span class="sd">    dependent : array_like</span>
 <span class="sd">        Endogenous variables (nobs by 1)</span>
-<span class="sd">    exog : array_like</span>
+<span class="sd">    exog : array_like, optional</span>
 <span class="sd">        Exogenous regressors  (nobs by nexog)</span>
-<span class="sd">    absorb: {DataFrame, Interaction}</span>
+<span class="sd">    absorb : DataFrame or Interaction, optional</span>
 <span class="sd">        The effects or continuous variables to absorb. When using a DataFrame,</span>
 <span class="sd">        effects must be categorical variables. Other variable types are treated</span>
-<span class="sd">        as continuous variables that should be absorbed. When using an</span>
-<span class="sd">        Interaction, variables in the `cat` argument are treated as effects</span>
-<span class="sd">        and variables in the `cont` argument are treated as continuous.</span>
-<span class="sd">    interactions : {DataFrame, Interaction, list[DataFrame, Interaction]}</span>
+<span class="sd">        as continuous variables that should be absorbed, so they must be</span>
+<span class="sd">        numeric, and a ``TypeError`` is raised for columns of strings, which</span>
+<span class="sd">        have to be converted to categorical. When using an Interaction,</span>
+<span class="sd">        variables in the `cat` argument are treated as effects and variables in</span>
+<span class="sd">        the `cont` argument are treated as continuous.</span>
+<span class="sd">    interactions : DataFrame, Interaction or list of DataFrame or Interaction, optional</span>
 <span class="sd">        Interactions containing both categorical and continuous variables.  Each</span>
 <span class="sd">        interaction is constructed using the Cartesian product of the categorical</span>
 <span class="sd">        variables to produce the dummy, which are then separately interacted with</span>
-<span class="sd">        each continuous variable.</span>
-<span class="sd">    weights : array_like</span>
-<span class="sd">        Observation weights used in estimation</span>
+<span class="sd">        each continuous variable. The columns of a DataFrame follow the rules of</span>
+<span class="sd">        ``absorb``.</span>
+<span class="sd">    weights : array_like, optional</span>
+<span class="sd">        Observation weights used in estimation. All weights must be strictly</span>
+<span class="sd">        positive or missing.</span>
 <span class="sd">    drop_absorbed : bool</span>
 <span class="sd">        Flag indicating whether to drop absorbed variables</span>
 
@@ -1404,8 +1434,10 @@
 <span class="sd">    ``dependent``. Either reindex the input to the index of ``dependent``, or</span>
 <span class="sd">    call ``to_numpy()`` to pair its values by position. NumPy arrays and</span>
 <span class="sd">    pandas objects with a default index do not carry labels and are always</span>
-<span class="sd">    paired by position. The same rule applies to ``clusters`` passed to</span>
-<span class="sd">    ``fit``.</span>
+<span class="sd">    paired by position. If ``dependent`` does not carry labels, the inputs</span>
+<span class="sd">    that do must use the same index as the first of ``exog``, ``absorb``,</span>
+<span class="sd">    ``interactions`` and ``weights`` that does. The same rule applies to</span>
+<span class="sd">    ``clusters`` passed to ``fit``.</span>
 
 <span class="sd">    See also</span>
 <span class="sd">    --------</span>
@@ -1453,7 +1485,7 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">_exog</span> <span class="o">=</span> <span class="n">IVData</span><span class="p">(</span><span class="n">exog</span><span class="p">,</span> <span class="s2">"exog"</span><span class="p">,</span> <span class="n">nobs</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">_nobs</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_absorb</span> <span class="o">=</span> <span class="n">absorb</span>
         <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">absorb</span><span class="p">,</span> <span class="n">DataFrame</span><span class="p">):</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">_absorb_inter</span> <span class="o">=</span> <span class="n">Interaction</span><span class="o">.</span><span class="n">from_frame</span><span class="p">(</span><span class="n">absorb</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_absorb_inter</span> <span class="o">=</span> <span class="n">Interaction</span><span class="o">.</span><span class="n">_from_frame</span><span class="p">(</span><span class="n">absorb</span><span class="p">,</span> <span class="s2">"absorb"</span><span class="p">)</span>
         <span class="k">elif</span> <span class="n">absorb</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">_absorb_inter</span> <span class="o">=</span> <span class="n">Interaction</span><span class="p">(</span><span class="kc">None</span><span class="p">,</span> <span class="kc">None</span><span class="p">,</span> <span class="n">nobs</span><span class="p">)</span>
         <span class="k">elif</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">absorb</span><span class="p">,</span> <span class="n">Interaction</span><span class="p">):</span>
@@ -1533,7 +1565,9 @@
             <span class="bp">self</span><span class="o">.</span><span class="n">_weight_data</span> <span class="o">=</span> <span class="n">IVData</span><span class="p">(</span><span class="n">ones</span><span class="p">(</span><span class="n">nobs</span><span class="p">),</span> <span class="s2">"weights"</span><span class="p">)</span>
         <span class="k">else</span><span class="p">:</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">_is_weighted</span> <span class="o">=</span> <span class="kc">True</span>
-            <span class="n">weights</span> <span class="o">=</span> <span class="n">IVData</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_weights</span><span class="p">)</span><span class="o">.</span><span class="n">ndarray</span>
+            <span class="n">weights</span> <span class="o">=</span> <span class="n">IVData</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_weights</span><span class="p">,</span> <span class="n">var_name</span><span class="o">=</span><span class="s2">"weights"</span><span class="p">)</span><span class="o">.</span><span class="n">ndarray</span>
+            <span class="k">if</span> <span class="n">npany</span><span class="p">(</span><span class="n">weights</span> <span class="o">&lt;=</span> <span class="mi">0</span><span class="p">):</span>
+                <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">"weights must be strictly positive."</span><span class="p">)</span>
             <span class="n">weights</span> <span class="o">=</span> <span class="n">weights</span> <span class="o">/</span> <span class="n">nanmean</span><span class="p">(</span><span class="n">weights</span><span class="p">)</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">_weight_data</span> <span class="o">=</span> <span class="n">IVData</span><span class="p">(</span><span class="n">weights</span><span class="p">,</span> <span class="n">var_name</span><span class="o">=</span><span class="s2">"weights"</span><span class="p">,</span> <span class="n">nobs</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">_nobs</span><span class="p">)</span>
 
@@ -1552,17 +1586,21 @@
                 <span class="p">)</span>
 
     <span class="k">def</span><span class="w"> </span><span class="nf">_check_alignment</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
-<span class="w">        </span><span class="sd">"""Check that inputs with labels use the labels of dependent"""</span>
-        <span class="n">expected</span> <span class="o">=</span> <span class="n">row_labels</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_dependent</span><span class="p">)</span>
-        <span class="n">check_alignment</span><span class="p">(</span><span class="n">expected</span><span class="p">,</span> <span class="p">{</span><span class="s2">"exog"</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">_exog</span><span class="p">,</span> <span class="s2">"weights"</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">_weights</span><span class="p">})</span>
+<span class="w">        </span><span class="sd">"""Check that inputs with labels use the labels of dependent, or the first"""</span>
+        <span class="n">inputs</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="nb">tuple</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">object</span><span class="p">]]</span> <span class="o">=</span> <span class="p">[(</span><span class="s2">"exog"</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_exog</span><span class="p">)]</span>
         <span class="n">interactions</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="nb">tuple</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Interaction</span><span class="p">]]</span> <span class="o">=</span> <span class="p">[(</span><span class="s2">"absorb"</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_absorb_inter</span><span class="p">)]</span>
         <span class="n">single</span> <span class="o">=</span> <span class="nb">isinstance</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_interactions</span><span class="p">,</span> <span class="p">(</span><span class="n">DataFrame</span><span class="p">,</span> <span class="n">Interaction</span><span class="p">))</span>
         <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">interact</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_interaction_list</span><span class="p">):</span>
             <span class="n">name</span> <span class="o">=</span> <span class="s2">"interactions"</span> <span class="k">if</span> <span class="n">single</span> <span class="k">else</span> <span class="sa">f</span><span class="s2">"interactions[</span><span class="si">{</span><span class="n">i</span><span class="si">}</span><span class="s2">]"</span>
             <span class="n">interactions</span><span class="o">.</span><span class="n">append</span><span class="p">((</span><span class="n">name</span><span class="p">,</span> <span class="n">interact</span><span class="p">))</span>
         <span class="k">for</span> <span class="n">name</span><span class="p">,</span> <span class="n">interact</span> <span class="ow">in</span> <span class="n">interactions</span><span class="p">:</span>
-            <span class="n">check_alignment</span><span class="p">(</span><span class="n">expected</span><span class="p">,</span> <span class="p">{</span><span class="n">name</span><span class="p">:</span> <span class="n">interact</span><span class="o">.</span><span class="n">cat</span><span class="p">})</span>
-            <span class="n">check_alignment</span><span class="p">(</span><span class="n">expected</span><span class="p">,</span> <span class="p">{</span><span class="n">name</span><span class="p">:</span> <span class="n">interact</span><span class="o">.</span><span class="n">cont</span><span class="p">})</span>
+            <span class="n">inputs</span><span class="o">.</span><span class="n">extend</span><span class="p">([(</span><span class="n">name</span><span class="p">,</span> <span class="n">interact</span><span class="o">.</span><span class="n">cat</span><span class="p">),</span> <span class="p">(</span><span class="n">name</span><span class="p">,</span> <span class="n">interact</span><span class="o">.</span><span class="n">cont</span><span class="p">)])</span>
+        <span class="n">inputs</span><span class="o">.</span><span class="n">append</span><span class="p">((</span><span class="s2">"weights"</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_weights</span><span class="p">))</span>
+        <span class="c1"># If dependent has no labels, the first input with labels sets the labels</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_labels</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_labels_name</span> <span class="o">=</span> <span class="n">reference_labels</span><span class="p">(</span>
+            <span class="n">row_labels</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_dependent</span><span class="p">),</span> <span class="n">inputs</span>
+        <span class="p">)</span>
+        <span class="n">check_alignment</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_labels</span><span class="p">,</span> <span class="n">inputs</span><span class="p">,</span> <span class="n">reference</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">_labels_name</span><span class="p">)</span>
 
     <span class="nd">@property</span>
     <span class="k">def</span><span class="w"> </span><span class="nf">absorbed_dependent</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">DataFrame</span><span class="p">:</span>
@@ -1628,13 +1666,17 @@
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_interactions</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
             <span class="k">return</span>
         <span class="k">elif</span> <span class="nb">isinstance</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_interactions</span><span class="p">,</span> <span class="n">DataFrame</span><span class="p">):</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">_interaction_list</span> <span class="o">=</span> <span class="p">[</span><span class="n">Interaction</span><span class="o">.</span><span class="n">from_frame</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_interactions</span><span class="p">)]</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_interaction_list</span> <span class="o">=</span> <span class="p">[</span>
+                <span class="n">Interaction</span><span class="o">.</span><span class="n">_from_frame</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_interactions</span><span class="p">,</span> <span class="s2">"interactions"</span><span class="p">)</span>
+            <span class="p">]</span>
         <span class="k">elif</span> <span class="nb">isinstance</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_interactions</span><span class="p">,</span> <span class="n">Interaction</span><span class="p">):</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">_interaction_list</span> <span class="o">=</span> <span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">_interactions</span><span class="p">]</span>
         <span class="k">else</span><span class="p">:</span>
             <span class="k">for</span> <span class="n">interact</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_interactions</span><span class="p">:</span>
                 <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">interact</span><span class="p">,</span> <span class="n">DataFrame</span><span class="p">):</span>
-                    <span class="bp">self</span><span class="o">.</span><span class="n">_interaction_list</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">Interaction</span><span class="o">.</span><span class="n">from_frame</span><span class="p">(</span><span class="n">interact</span><span class="p">))</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">_interaction_list</span><span class="o">.</span><span class="n">append</span><span class="p">(</span>
+                        <span class="n">Interaction</span><span class="o">.</span><span class="n">_from_frame</span><span class="p">(</span><span class="n">interact</span><span class="p">,</span> <span class="s2">"interactions"</span><span class="p">)</span>
+                    <span class="p">)</span>
                 <span class="k">elif</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">interact</span><span class="p">,</span> <span class="n">Interaction</span><span class="p">):</span>
                     <span class="bp">self</span><span class="o">.</span><span class="n">_interaction_list</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">interact</span><span class="p">)</span>
                 <span class="k">else</span><span class="p">:</span>
@@ -1957,8 +1999,12 @@
                 <span class="n">stacklevel</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span>
             <span class="p">)</span>
             <span class="n">absorb_options</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">(</span><span class="n">lsmr_options</span><span class="o">.</span><span class="n">items</span><span class="p">())</span>
+        <span class="c1"># Clusters are for the observations that are used to estimate the model</span>
+        <span class="n">labels</span> <span class="o">=</span> <span class="kc">None</span> <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_labels</span> <span class="ow">is</span> <span class="kc">None</span> <span class="k">else</span> <span class="bp">self</span><span class="o">.</span><span class="n">_labels</span><span class="p">[</span><span class="o">~</span><span class="bp">self</span><span class="o">.</span><span class="n">_drop_locs</span><span class="p">]</span>
         <span class="n">check_alignment</span><span class="p">(</span>
-            <span class="n">row_labels</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_dependent</span><span class="p">),</span> <span class="p">{</span><span class="s2">"clusters"</span><span class="p">:</span> <span class="n">cov_config</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"clusters"</span><span class="p">)}</span>
+            <span class="n">labels</span><span class="p">,</span>
+            <span class="p">{</span><span class="s2">"clusters"</span><span class="p">:</span> <span class="n">cov_config</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"clusters"</span><span class="p">)},</span>
+            <span class="n">reference</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">_labels_name</span><span class="p">,</span>
         <span class="p">)</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_absorbed_dependent</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">_first_time_fit</span><span class="p">(</span><span class="n">use_cache</span><span class="p">,</span> <span class="n">absorb_options</span><span class="p">,</span> <span class="n">method</span><span class="p">)</span>

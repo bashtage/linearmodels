@@ -19,7 +19,7 @@
     
   
       
-        <title>statsmodels.iolib.summary - linearmodels v7.1 (+294)</title>
+        <title>statsmodels.iolib.summary - linearmodels v7.1 (+315)</title>
       
     
 
@@ -91,7 +91,7 @@
 
 <header class="md-header md-header--shadow" data-md-component="header">
   <nav class="md-header__inner md-grid" aria-label="Header">
-    <a href="../../../index.html" title="linearmodels v7.1 (+294)" class="md-header__button md-logo" aria-label="linearmodels v7.1 (+294)" data-md-component="logo">
+    <a href="../../../index.html" title="linearmodels v7.1 (+315)" class="md-header__button md-logo" aria-label="linearmodels v7.1 (+315)" data-md-component="logo">
       <img src="../../../_static/bw-logo.svg" alt="logo">
     </a>
     <label class="md-header__button md-icon" for="__drawer">
@@ -102,7 +102,7 @@
       <div class="md-header__ellipsis">
         <div class="md-header__topic">
           <span class="md-ellipsis">
-            linearmodels v7.1 (+294)
+            linearmodels v7.1 (+315)
           </span>
         </div>
         <div class="md-header__topic" data-md-component="header-topic">
@@ -197,10 +197,10 @@
 
 <nav class="md-nav md-nav--primary" aria-label="Navigation" data-md-level="0">
   <label class="md-nav__title" for="__drawer">
-    <a href="../../../index.html" title="linearmodels v7.1 (+294)" class="md-nav__button md-logo" aria-label="linearmodels v7.1 (+294)" data-md-component="logo">
+    <a href="../../../index.html" title="linearmodels v7.1 (+315)" class="md-nav__button md-logo" aria-label="linearmodels v7.1 (+315)" data-md-component="logo">
       <img src="../../../_static/bw-logo.svg" alt="logo">
     </a>
-    linearmodels v7.1 (+294)
+    linearmodels v7.1 (+315)
   </label>
   
     <div class="md-nav__source">
@@ -1483,8 +1483,6 @@
         <span class="k">return</span> <span class="n">txt</span></div>
 
 
-<div class="viewcode-block" id="Summary.as_latex">
-<a class="viewcode-back" href="../../../compatibility/linearmodels.compat.statsmodels.Summary.as_latex.html#linearmodels.compat.statsmodels.Summary.as_latex">[docs]</a>
     <span class="k">def</span><span class="w"> </span><span class="nf">as_latex</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">"""</span>
 <span class="sd">        Return tables as string</span>
@@ -1503,8 +1501,7 @@
         <span class="n">latex</span> <span class="o">=</span> <span class="n">summary_return</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">tables</span><span class="p">,</span> <span class="n">return_fmt</span><span class="o">=</span><span class="s2">"latex"</span><span class="p">)</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">extra_txt</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
             <span class="n">latex</span> <span class="o">=</span> <span class="n">latex</span> <span class="o">+</span> <span class="s2">"</span><span class="se">\n\n</span><span class="s2">"</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">extra_txt</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s2">"</span><span class="se">\n</span><span class="s2">"</span><span class="p">,</span> <span class="s2">" </span><span class="se">\\</span><span class="s2">newline</span><span class="se">\n</span><span class="s2"> "</span><span class="p">)</span>
-        <span class="k">return</span> <span class="n">latex</span></div>
-
+        <span class="k">return</span> <span class="n">latex</span>
 
 <div class="viewcode-block" id="Summary.as_csv">
 <a class="viewcode-back" href="../../../compatibility/linearmodels.compat.statsmodels.Summary.as_csv.html#linearmodels.compat.statsmodels.Summary.as_csv">[docs]</a>

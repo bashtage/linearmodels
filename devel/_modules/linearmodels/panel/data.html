@@ -19,7 +19,7 @@
     
   
       
-        <title>linearmodels.panel.data - linearmodels v7.1 (+294)</title>
+        <title>linearmodels.panel.data - linearmodels v7.1 (+315)</title>
       
     
 
@@ -91,7 +91,7 @@
 
 <header class="md-header md-header--shadow" data-md-component="header">
   <nav class="md-header__inner md-grid" aria-label="Header">
-    <a href="../../../index.html" title="linearmodels v7.1 (+294)" class="md-header__button md-logo" aria-label="linearmodels v7.1 (+294)" data-md-component="logo">
+    <a href="../../../index.html" title="linearmodels v7.1 (+315)" class="md-header__button md-logo" aria-label="linearmodels v7.1 (+315)" data-md-component="logo">
       <img src="../../../_static/bw-logo.svg" alt="logo">
     </a>
     <label class="md-header__button md-icon" for="__drawer">
@@ -102,7 +102,7 @@
       <div class="md-header__ellipsis">
         <div class="md-header__topic">
           <span class="md-ellipsis">
-            linearmodels v7.1 (+294)
+            linearmodels v7.1 (+315)
           </span>
         </div>
         <div class="md-header__topic" data-md-component="header-topic">
@@ -197,10 +197,10 @@
 
 <nav class="md-nav md-nav--primary" aria-label="Navigation" data-md-level="0">
   <label class="md-nav__title" for="__drawer">
-    <a href="../../../index.html" title="linearmodels v7.1 (+294)" class="md-nav__button md-logo" aria-label="linearmodels v7.1 (+294)" data-md-component="logo">
+    <a href="../../../index.html" title="linearmodels v7.1 (+315)" class="md-nav__button md-logo" aria-label="linearmodels v7.1 (+315)" data-md-component="logo">
       <img src="../../../_static/bw-logo.svg" alt="logo">
     </a>
-    linearmodels v7.1 (+294)
+    linearmodels v7.1 (+315)
   </label>
   
     <div class="md-nav__source">
@@ -549,6 +549,7 @@
 <span class="p">)</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">pandas.api.types</span><span class="w"> </span><span class="kn">import</span> <span class="n">is_datetime64_any_dtype</span><span class="p">,</span> <span class="n">is_numeric_dtype</span><span class="p">,</span> <span class="n">is_string_dtype</span>
 
+<span class="kn">from</span><span class="w"> </span><span class="nn">linearmodels.shared.inputs</span><span class="w"> </span><span class="kn">import</span> <span class="n">as_float64</span><span class="p">,</span> <span class="n">reject_complex</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">linearmodels.shared.utility</span><span class="w"> </span><span class="kn">import</span> <span class="n">ensure_unique_column</span><span class="p">,</span> <span class="n">panel_to_frame</span>
 <span class="kn">import</span><span class="w"> </span><span class="nn">linearmodels.typing.data</span>
 
@@ -667,8 +668,10 @@
 
 <span class="sd">    Parameters</span>
 <span class="sd">    ----------</span>
-<span class="sd">    x : {ndarray, Series, DataFrame, DataArray}</span>
-<span class="sd">       Input data</span>
+<span class="sd">    x : DataFrame, Series, ndarray, DataArray or PanelData</span>
+<span class="sd">        Input data. A list or a tuple raises a ``TypeError``, since the layout</span>
+<span class="sd">        of the data would not be known. A ``TypeError`` is also raised if the</span>
+<span class="sd">        data are complex or cannot be converted to float64.</span>
 <span class="sd">    var_name : str</span>
 <span class="sd">        Variable name to use when naming variables in NumPy arrays or</span>
 <span class="sd">        xarray DataArrays</span>
@@ -728,6 +731,8 @@
         <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">PanelData</span><span class="p">):</span>
             <span class="n">x</span> <span class="o">=</span> <span class="n">x</span><span class="o">.</span><span class="n">dataframe</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_original</span> <span class="o">=</span> <span class="n">x</span>
+        <span class="c1"># Complex values would be converted to float64 without their imaginary part</span>
+        <span class="n">reject_complex</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">var_name</span><span class="p">)</span>
 
         <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="p">(</span><span class="n">Series</span><span class="p">,</span> <span class="n">DataFrame</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">)):</span>
             <span class="k">try</span><span class="p">:</span>
@@ -775,7 +780,10 @@
                 <span class="bp">self</span><span class="o">.</span><span class="n">_frame</span> <span class="o">=</span> <span class="n">DataFrame</span><span class="p">({</span><span class="n">var_name</span><span class="p">:</span> <span class="n">x</span><span class="o">.</span><span class="n">T</span><span class="o">.</span><span class="n">stack</span><span class="p">(</span><span class="o">**</span><span class="n">options</span><span class="p">)})</span>
         <span class="k">elif</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">):</span>
             <span class="k">if</span> <span class="n">x</span><span class="o">.</span><span class="n">ndim</span> <span class="ow">not</span> <span class="ow">in</span> <span class="p">(</span><span class="mi">2</span><span class="p">,</span> <span class="mi">3</span><span class="p">):</span>
-                <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">"2 or 3-d array required for numpy input"</span><span class="p">)</span>
+                <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
+                    <span class="s2">"2 or 3-d array required for numpy input. The array has "</span>
+                    <span class="sa">f</span><span class="s2">"</span><span class="si">{</span><span class="n">x</span><span class="o">.</span><span class="n">ndim</span><span class="si">}</span><span class="s2"> dimension(s)."</span>
+                <span class="p">)</span>
             <span class="k">if</span> <span class="n">x</span><span class="o">.</span><span class="n">ndim</span> <span class="o">==</span> <span class="mi">2</span><span class="p">:</span>
                 <span class="n">x</span> <span class="o">=</span> <span class="n">x</span><span class="p">[</span><span class="kc">None</span><span class="p">,</span> <span class="p">:,</span> <span class="p">:]</span>
 
@@ -786,17 +794,29 @@
             <span class="n">entities</span> <span class="o">=</span> <span class="p">[</span><span class="n">entity_str</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">i</span><span class="p">)</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">n</span><span class="p">)]</span>
             <span class="n">time</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="nb">range</span><span class="p">(</span><span class="n">t</span><span class="p">))</span>
             <span class="k">assert</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">)</span>
-            <span class="n">x</span> <span class="o">=</span> <span class="n">x</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">,</span> <span class="n">copy</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+            <span class="k">if</span> <span class="n">x</span><span class="o">.</span><span class="n">dtype</span> <span class="o">!=</span> <span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">:</span>
+                <span class="n">x</span> <span class="o">=</span> <span class="n">as_float64</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">var_name</span><span class="p">)</span>
             <span class="n">panel</span> <span class="o">=</span> <span class="n">_Panel</span><span class="o">.</span><span class="n">from_array</span><span class="p">(</span>
                 <span class="n">x</span><span class="p">,</span> <span class="n">items</span><span class="o">=</span><span class="n">variables</span><span class="p">,</span> <span class="n">major_axis</span><span class="o">=</span><span class="n">time</span><span class="p">,</span> <span class="n">minor_axis</span><span class="o">=</span><span class="n">entities</span>
             <span class="p">)</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">_fake_panel</span> <span class="o">=</span> <span class="n">panel</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">_frame</span> <span class="o">=</span> <span class="n">panel</span><span class="o">.</span><span class="n">to_frame</span><span class="p">()</span>
         <span class="k">else</span><span class="p">:</span>
-            <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="s2">"Only ndarrays, DataFrames or DataArrays are supported"</span><span class="p">)</span>
+            <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span>
+                <span class="s2">"Only ndarrays, DataFrames or DataArrays are supported. A DataFrame "</span>
+                <span class="s2">"or Series needs a MultiIndex with 2 levels (entity and time), or "</span>
+                <span class="s2">"time as the index and entities as the columns if it is a DataFrame. "</span>
+                <span class="sa">f</span><span class="s2">"Got </span><span class="si">{</span><span class="nb">type</span><span class="p">(</span><span class="n">x</span><span class="p">)</span><span class="o">.</span><span class="vm">__name__</span><span class="si">}</span><span class="s2">."</span>
+            <span class="p">)</span>
         <span class="k">if</span> <span class="n">convert_dummies</span><span class="p">:</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">_frame</span> <span class="o">=</span> <span class="n">expand_categoricals</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_frame</span><span class="p">,</span> <span class="n">drop_first</span><span class="p">)</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">_frame</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_frame</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">)</span>
+            <span class="k">try</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">_frame</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_frame</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">)</span>
+            <span class="k">except</span> <span class="p">(</span><span class="ne">TypeError</span><span class="p">,</span> <span class="ne">ValueError</span><span class="p">)</span> <span class="k">as</span> <span class="n">exc</span><span class="p">:</span>
+                <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span>
+                    <span class="sa">f</span><span class="s2">"</span><span class="si">{</span><span class="n">var_name</span><span class="si">}</span><span class="s2"> must contain numbers, strings or categories, but "</span>
+                    <span class="sa">f</span><span class="s2">"it cannot be converted to float64: </span><span class="si">{</span><span class="n">exc</span><span class="si">}</span><span class="s2">"</span>
+                <span class="p">)</span> <span class="kn">from</span><span class="w"> </span><span class="nn">exc</span>
 
         <span class="n">time_index</span> <span class="o">=</span> <span class="n">Series</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">index</span><span class="o">.</span><span class="n">levels</span><span class="p">[</span><span class="mi">1</span><span class="p">])</span>
         <span class="k">if</span> <span class="ow">not</span> <span class="p">(</span>

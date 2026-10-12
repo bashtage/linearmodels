@@ -19,7 +19,7 @@
     
   
       
-        <title>linearmodels.iv.covariance - linearmodels v7.1 (+294)</title>
+        <title>linearmodels.iv.covariance - linearmodels v7.1 (+315)</title>
       
     
 
@@ -91,7 +91,7 @@
 
 <header class="md-header md-header--shadow" data-md-component="header">
   <nav class="md-header__inner md-grid" aria-label="Header">
-    <a href="../../../index.html" title="linearmodels v7.1 (+294)" class="md-header__button md-logo" aria-label="linearmodels v7.1 (+294)" data-md-component="logo">
+    <a href="../../../index.html" title="linearmodels v7.1 (+315)" class="md-header__button md-logo" aria-label="linearmodels v7.1 (+315)" data-md-component="logo">
       <img src="../../../_static/bw-logo.svg" alt="logo">
     </a>
     <label class="md-header__button md-icon" for="__drawer">
@@ -102,7 +102,7 @@
       <div class="md-header__ellipsis">
         <div class="md-header__topic">
           <span class="md-ellipsis">
-            linearmodels v7.1 (+294)
+            linearmodels v7.1 (+315)
           </span>
         </div>
         <div class="md-header__topic" data-md-component="header-topic">
@@ -197,10 +197,10 @@
 
 <nav class="md-nav md-nav--primary" aria-label="Navigation" data-md-level="0">
   <label class="md-nav__title" for="__drawer">
-    <a href="../../../index.html" title="linearmodels v7.1 (+294)" class="md-nav__button md-logo" aria-label="linearmodels v7.1 (+294)" data-md-component="logo">
+    <a href="../../../index.html" title="linearmodels v7.1 (+315)" class="md-nav__button md-logo" aria-label="linearmodels v7.1 (+315)" data-md-component="logo">
       <img src="../../../_static/bw-logo.svg" alt="logo">
     </a>
-    linearmodels v7.1 (+294)
+    linearmodels v7.1 (+315)
   </label>
   
     <div class="md-nav__source">
@@ -555,6 +555,7 @@
 <span class="kn">from</span><span class="w"> </span><span class="nn">numpy.linalg</span><span class="w"> </span><span class="kn">import</span> <span class="n">inv</span><span class="p">,</span> <span class="n">pinv</span>
 
 <span class="kn">from</span><span class="w"> </span><span class="nn">linearmodels.shared.covariance</span><span class="w"> </span><span class="kn">import</span> <span class="n">cov_cluster</span><span class="p">,</span> <span class="n">cov_kernel</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">linearmodels.shared.inputs</span><span class="w"> </span><span class="kn">import</span> <span class="n">as_ndarray</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">linearmodels.shared.linalg</span><span class="w"> </span><span class="kn">import</span> <span class="n">has_constant</span>
 <span class="kn">import</span><span class="w"> </span><span class="nn">linearmodels.typing</span>
 <span class="kn">import</span><span class="w"> </span><span class="nn">linearmodels.typing.data</span>
@@ -571,6 +572,73 @@
 <span class="s2">clusters must have one row for each of the remaining observations. When using a</span>
 <span class="s2">clustered covariance estimator, drop the observations with missing values from</span>
 <span class="s2">the data and from clusters before estimating the model."""</span>
+
+<span class="n">CLUSTER_COLUMNS_ERR</span> <span class="o">=</span> <span class="s2">"""</span><span class="se">\</span>
+<span class="s2">clusters must be a 1-d array or a 2-d array with </span><span class="si">{0}</span><span class="s2">, but its shape is </span><span class="si">{1}</span><span class="s2">."""</span>
+
+
+<span class="k">def</span><span class="w"> </span><span class="nf">check_cluster_columns</span><span class="p">(</span>
+    <span class="n">clusters</span><span class="p">:</span> <span class="n">linearmodels</span><span class="o">.</span><span class="n">typing</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">AnyArray</span><span class="p">,</span> <span class="n">max_columns</span><span class="p">:</span> <span class="nb">int</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">"""</span>
+<span class="sd">    Check that clusters has the number of variables that an estimator supports.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    clusters : ndarray</span>
+<span class="sd">        Cluster membership, either a 1-d array or an array with a column for</span>
+<span class="sd">        each of the variables to cluster on.</span>
+<span class="sd">    max_columns : int</span>
+<span class="sd">        The number of clustering variables that the estimator supports, 1 or 2.</span>
+
+<span class="sd">    Raises</span>
+<span class="sd">    ------</span>
+<span class="sd">    ValueError</span>
+<span class="sd">        If clusters has more than 2 dimensions or does not have 1 to</span>
+<span class="sd">        max_columns columns.</span>
+<span class="sd">    """</span>
+    <span class="k">if</span> <span class="n">clusters</span><span class="o">.</span><span class="n">ndim</span> <span class="o">==</span> <span class="mi">1</span> <span class="ow">or</span> <span class="p">(</span>
+        <span class="n">clusters</span><span class="o">.</span><span class="n">ndim</span> <span class="o">==</span> <span class="mi">2</span> <span class="ow">and</span> <span class="mi">1</span> <span class="o">&lt;=</span> <span class="n">clusters</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">&lt;=</span> <span class="n">max_columns</span>
+    <span class="p">):</span>
+        <span class="k">return</span>
+    <span class="n">supported</span> <span class="o">=</span> <span class="p">(</span>
+        <span class="s2">"a single column (one-way clustering)"</span>
+        <span class="k">if</span> <span class="n">max_columns</span> <span class="o">==</span> <span class="mi">1</span>
+        <span class="k">else</span> <span class="s2">"1 or 2 columns (one-way or two-way clustering)"</span>
+    <span class="p">)</span>
+    <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="n">CLUSTER_COLUMNS_ERR</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">supported</span><span class="p">,</span> <span class="n">clusters</span><span class="o">.</span><span class="n">shape</span><span class="p">))</span>
+
+
+<span class="k">def</span><span class="w"> </span><span class="nf">as_cluster_array</span><span class="p">(</span>
+    <span class="n">clusters</span><span class="p">:</span> <span class="n">linearmodels</span><span class="o">.</span><span class="n">typing</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">ArrayLike</span><span class="p">,</span> <span class="n">max_columns</span><span class="p">:</span> <span class="nb">int</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="n">linearmodels</span><span class="o">.</span><span class="n">typing</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">AnyArray</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">"""</span>
+<span class="sd">    Convert clusters to an array and check the number of variables.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    clusters : array_like</span>
+<span class="sd">        Cluster membership, either a 1-d array or an array with a column for</span>
+<span class="sd">        each of the variables to cluster on.</span>
+<span class="sd">    max_columns : int</span>
+<span class="sd">        The number of clustering variables that the estimator supports, 1 or 2.</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    ndarray</span>
+<span class="sd">        The cluster membership as an array.</span>
+
+<span class="sd">    Raises</span>
+<span class="sd">    ------</span>
+<span class="sd">    TypeError</span>
+<span class="sd">        If clusters is not array_like, or has a complex dtype.</span>
+<span class="sd">    ValueError</span>
+<span class="sd">        If clusters has more than 2 dimensions or does not have 1 to</span>
+<span class="sd">        max_columns columns.</span>
+<span class="sd">    """</span>
+    <span class="n">clusters</span> <span class="o">=</span> <span class="n">as_ndarray</span><span class="p">(</span><span class="n">clusters</span><span class="p">,</span> <span class="s2">"clusters"</span><span class="p">)</span>
+    <span class="n">check_cluster_columns</span><span class="p">(</span><span class="n">clusters</span><span class="p">,</span> <span class="n">max_columns</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">clusters</span>
 
 
 <div class="viewcode-block" id="kernel_weight_bartlett">
@@ -1145,9 +1213,10 @@
 <span class="sd">        Estimated model parameters (nvar by 1)</span>
 <span class="sd">    debiased : bool</span>
 <span class="sd">        Flag indicating whether to use a small-sample adjustment</span>
-<span class="sd">    clusters : ndarray</span>
+<span class="sd">    clusters : array_like</span>
 <span class="sd">        Cluster group assignment.  If not provided, uses clusters of 1.</span>
-<span class="sd">        Either nobs by ncluster where ncluster is 1 or 2.</span>
+<span class="sd">        Either nobs by ncluster where ncluster is 1 or 2. A ``ValueError`` is</span>
+<span class="sd">        raised for more columns.</span>
 <span class="sd">    kappa : float</span>
 <span class="sd">        Value of kappa in k-class estimator</span>
 <span class="sd">    extra_df : int, optional</span>
@@ -1202,10 +1271,12 @@
         <span class="n">nobs</span> <span class="o">=</span> <span class="n">x</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
         <span class="n">clusters</span> <span class="o">=</span> <span class="n">arange</span><span class="p">(</span><span class="n">nobs</span><span class="p">)</span> <span class="k">if</span> <span class="n">clusters</span> <span class="ow">is</span> <span class="kc">None</span> <span class="k">else</span> <span class="n">clusters</span>
         <span class="n">clusters</span> <span class="o">=</span> <span class="n">cast</span><span class="p">(</span>
-            <span class="s2">"linearmodels.typing.data.AnyArray"</span><span class="p">,</span> <span class="n">asarray</span><span class="p">(</span><span class="n">clusters</span><span class="p">)</span><span class="o">.</span><span class="n">squeeze</span><span class="p">()</span>
+            <span class="s2">"linearmodels.typing.data.AnyArray"</span><span class="p">,</span>
+            <span class="n">as_ndarray</span><span class="p">(</span><span class="n">clusters</span><span class="p">,</span> <span class="s2">"clusters"</span><span class="p">)</span><span class="o">.</span><span class="n">squeeze</span><span class="p">(),</span>
         <span class="p">)</span>
         <span class="k">if</span> <span class="n">clusters</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">!=</span> <span class="n">nobs</span><span class="p">:</span>
             <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="n">CLUSTER_ERR</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">nobs</span><span class="p">,</span> <span class="n">clusters</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]))</span>
+        <span class="n">check_cluster_columns</span><span class="p">(</span><span class="n">clusters</span><span class="p">,</span> <span class="mi">2</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_clusters</span> <span class="o">=</span> <span class="n">clusters</span>
         <span class="k">if</span> <span class="n">clusters</span><span class="o">.</span><span class="n">ndim</span> <span class="o">==</span> <span class="mi">1</span><span class="p">:</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">_num_clusters</span> <span class="o">=</span> <span class="p">[</span><span class="nb">len</span><span class="p">(</span><span class="n">unique</span><span class="p">(</span><span class="n">clusters</span><span class="p">))]</span>

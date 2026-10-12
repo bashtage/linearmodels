@@ -19,7 +19,7 @@
     
   
       
-        <title>linearmodels.iv.model - linearmodels v7.1 (+294)</title>
+        <title>linearmodels.iv.model - linearmodels v7.1 (+315)</title>
       
     
 
@@ -91,7 +91,7 @@
 
 <header class="md-header md-header--shadow" data-md-component="header">
   <nav class="md-header__inner md-grid" aria-label="Header">
-    <a href="../../../index.html" title="linearmodels v7.1 (+294)" class="md-header__button md-logo" aria-label="linearmodels v7.1 (+294)" data-md-component="logo">
+    <a href="../../../index.html" title="linearmodels v7.1 (+315)" class="md-header__button md-logo" aria-label="linearmodels v7.1 (+315)" data-md-component="logo">
       <img src="../../../_static/bw-logo.svg" alt="logo">
     </a>
     <label class="md-header__button md-icon" for="__drawer">
@@ -102,7 +102,7 @@
       <div class="md-header__ellipsis">
         <div class="md-header__topic">
           <span class="md-ellipsis">
-            linearmodels v7.1 (+294)
+            linearmodels v7.1 (+315)
           </span>
         </div>
         <div class="md-header__topic" data-md-component="header-topic">
@@ -197,10 +197,10 @@
 
 <nav class="md-nav md-nav--primary" aria-label="Navigation" data-md-level="0">
   <label class="md-nav__title" for="__drawer">
-    <a href="../../../index.html" title="linearmodels v7.1 (+294)" class="md-nav__button md-logo" aria-label="linearmodels v7.1 (+294)" data-md-component="logo">
+    <a href="../../../index.html" title="linearmodels v7.1 (+315)" class="md-nav__button md-logo" aria-label="linearmodels v7.1 (+315)" data-md-component="logo">
       <img src="../../../_static/bw-logo.svg" alt="logo">
     </a>
-    linearmodels v7.1 (+294)
+    linearmodels v7.1 (+315)
   </label>
   
     <div class="md-nav__source">
@@ -584,7 +584,11 @@
     <span class="n">OneWayClusteredWeightMatrix</span><span class="p">,</span>
 <span class="p">)</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">linearmodels.iv.results</span><span class="w"> </span><span class="kn">import</span> <span class="n">IVGMMResults</span><span class="p">,</span> <span class="n">IVResults</span><span class="p">,</span> <span class="n">OLSResults</span>
-<span class="kn">from</span><span class="w"> </span><span class="nn">linearmodels.shared.alignment</span><span class="w"> </span><span class="kn">import</span> <span class="n">check_alignment</span><span class="p">,</span> <span class="n">row_labels</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">linearmodels.shared.alignment</span><span class="w"> </span><span class="kn">import</span> <span class="p">(</span>
+    <span class="n">check_alignment</span><span class="p">,</span>
+    <span class="n">reference_labels</span><span class="p">,</span>
+    <span class="n">row_labels</span><span class="p">,</span>
+<span class="p">)</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">linearmodels.shared.exceptions</span><span class="w"> </span><span class="kn">import</span> <span class="n">IndexWarning</span><span class="p">,</span> <span class="n">missing_warning</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">linearmodels.shared.hypotheses</span><span class="w"> </span><span class="kn">import</span> <span class="n">InvalidTestStatistic</span><span class="p">,</span> <span class="n">WaldTestStatistic</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">linearmodels.shared.linalg</span><span class="w"> </span><span class="kn">import</span> <span class="n">has_constant</span><span class="p">,</span> <span class="n">inv_sqrth</span>
@@ -717,23 +721,29 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">_original_index</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">dependent</span><span class="o">.</span><span class="n">pandas</span><span class="o">.</span><span class="n">index</span>
         <span class="k">if</span> <span class="n">weights</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
             <span class="n">weights</span> <span class="o">=</span> <span class="n">ones</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">dependent</span><span class="o">.</span><span class="n">shape</span><span class="p">)</span>
-        <span class="n">weights_data</span> <span class="o">=</span> <span class="n">IVData</span><span class="p">(</span><span class="n">weights</span><span class="p">)</span>
-        <span class="n">check_alignment</span><span class="p">(</span>
-            <span class="n">row_labels</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">dependent</span><span class="p">),</span>
-            <span class="p">{</span>
-                <span class="s2">"exog"</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">exog</span><span class="p">,</span>
-                <span class="s2">"endog"</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">endog</span><span class="p">,</span>
-                <span class="s2">"instruments"</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">instruments</span><span class="p">,</span>
-                <span class="s2">"weights"</span><span class="p">:</span> <span class="n">weights_data</span><span class="p">,</span>
-            <span class="p">},</span>
+        <span class="n">weights_data</span> <span class="o">=</span> <span class="n">IVData</span><span class="p">(</span><span class="n">weights</span><span class="p">,</span> <span class="n">var_name</span><span class="o">=</span><span class="s2">"weights"</span><span class="p">)</span>
+        <span class="n">inputs</span> <span class="o">=</span> <span class="p">{</span>
+            <span class="s2">"exog"</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">exog</span><span class="p">,</span>
+            <span class="s2">"endog"</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">endog</span><span class="p">,</span>
+            <span class="s2">"instruments"</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">instruments</span><span class="p">,</span>
+            <span class="s2">"weights"</span><span class="p">:</span> <span class="n">weights_data</span><span class="p">,</span>
+        <span class="p">}</span>
+        <span class="c1"># The inputs with labels use the labels of dependent. If dependent has no</span>
+        <span class="c1"># labels, they use the labels of the first of them that has labels</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_labels</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_labels_name</span> <span class="o">=</span> <span class="n">reference_labels</span><span class="p">(</span>
+            <span class="n">row_labels</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">dependent</span><span class="p">),</span> <span class="n">inputs</span>
         <span class="p">)</span>
+        <span class="n">check_alignment</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_labels</span><span class="p">,</span> <span class="n">inputs</span><span class="p">,</span> <span class="n">reference</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">_labels_name</span><span class="p">)</span>
         <span class="n">weights</span> <span class="o">=</span> <span class="n">weights_data</span><span class="o">.</span><span class="n">ndarray</span>
         <span class="k">if</span> <span class="n">npany</span><span class="p">(</span><span class="n">weights</span> <span class="o">&lt;=</span> <span class="mi">0</span><span class="p">):</span>
             <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">"weights must be strictly positive."</span><span class="p">)</span>
-        <span class="n">weights</span> <span class="o">=</span> <span class="n">weights</span> <span class="o">/</span> <span class="n">nanmean</span><span class="p">(</span><span class="n">weights</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">weights</span> <span class="o">=</span> <span class="n">IVData</span><span class="p">(</span><span class="n">weights</span><span class="p">,</span> <span class="n">var_name</span><span class="o">=</span><span class="s2">"weights"</span><span class="p">,</span> <span class="n">nobs</span><span class="o">=</span><span class="n">nobs</span><span class="p">)</span>
 
         <span class="bp">self</span><span class="o">.</span><span class="n">_drop_locs</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_drop_missing</span><span class="p">()</span>
+        <span class="c1"># The weights have mean 1 in the sample that is used to estimate the model,</span>
+        <span class="c1"># which does not include the observations that were dropped</span>
+        <span class="n">kept</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">weights</span><span class="o">.</span><span class="n">ndarray</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">weights</span> <span class="o">=</span> <span class="n">IVData</span><span class="p">(</span><span class="n">kept</span> <span class="o">/</span> <span class="n">nanmean</span><span class="p">(</span><span class="n">kept</span><span class="p">),</span> <span class="n">var_name</span><span class="o">=</span><span class="s2">"weights"</span><span class="p">)</span>
         <span class="c1"># Weighted data is data scaled by the square root of the weights</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_sqrt_weights</span> <span class="o">=</span> <span class="n">w</span> <span class="o">=</span> <span class="n">sqrt</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">weights</span><span class="o">.</span><span class="n">ndarray</span><span class="p">)</span>
         <span class="c1"># dependent variable</span>
@@ -841,9 +851,9 @@
                 <span class="s2">"of exog/endog or data, but not both."</span>
             <span class="p">)</span>
         <span class="k">if</span> <span class="n">exog</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
-            <span class="n">exog</span> <span class="o">=</span> <span class="n">IVData</span><span class="p">(</span><span class="n">exog</span><span class="p">)</span><span class="o">.</span><span class="n">pandas</span>
+            <span class="n">exog</span> <span class="o">=</span> <span class="n">IVData</span><span class="p">(</span><span class="n">exog</span><span class="p">,</span> <span class="n">var_name</span><span class="o">=</span><span class="s2">"exog"</span><span class="p">)</span><span class="o">.</span><span class="n">pandas</span>
         <span class="k">if</span> <span class="n">endog</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
-            <span class="n">endog</span> <span class="o">=</span> <span class="n">IVData</span><span class="p">(</span><span class="n">endog</span><span class="p">)</span><span class="o">.</span><span class="n">pandas</span>
+            <span class="n">endog</span> <span class="o">=</span> <span class="n">IVData</span><span class="p">(</span><span class="n">endog</span><span class="p">,</span> <span class="n">var_name</span><span class="o">=</span><span class="s2">"endog"</span><span class="p">)</span><span class="o">.</span><span class="n">pandas</span>
         <span class="k">if</span> <span class="n">data</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
             <span class="n">parser</span> <span class="o">=</span> <span class="n">IVFormulaParser</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">formula</span><span class="p">,</span> <span class="n">data</span><span class="p">,</span> <span class="n">eval_env</span><span class="o">=</span><span class="n">eval_env</span><span class="p">)</span>
             <span class="n">exog</span> <span class="o">=</span> <span class="n">parser</span><span class="o">.</span><span class="n">exog</span>
@@ -928,9 +938,11 @@
         <span class="k">return</span> <span class="n">missing</span>
 
     <span class="k">def</span><span class="w"> </span><span class="nf">_check_clusters</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">config</span><span class="p">:</span> <span class="n">Mapping</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
-<span class="w">        </span><span class="sd">"""Check that clusters with labels use the labels of dependent"""</span>
+<span class="w">        </span><span class="sd">"""Check that clusters with labels use the labels of the other inputs"""</span>
+        <span class="c1"># Clusters are for the observations that are used to estimate the model</span>
+        <span class="n">labels</span> <span class="o">=</span> <span class="kc">None</span> <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_labels</span> <span class="ow">is</span> <span class="kc">None</span> <span class="k">else</span> <span class="bp">self</span><span class="o">.</span><span class="n">_labels</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">notnull</span><span class="p">]</span>
         <span class="n">check_alignment</span><span class="p">(</span>
-            <span class="n">row_labels</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">dependent</span><span class="p">),</span> <span class="p">{</span><span class="s2">"clusters"</span><span class="p">:</span> <span class="n">config</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"clusters"</span><span class="p">)}</span>
+            <span class="n">labels</span><span class="p">,</span> <span class="p">{</span><span class="s2">"clusters"</span><span class="p">:</span> <span class="n">config</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"clusters"</span><span class="p">)},</span> <span class="n">reference</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">_labels_name</span>
         <span class="p">)</span>
 
     <span class="k">def</span><span class="w"> </span><span class="nf">wresids</span><span class="p">(</span>
@@ -1332,8 +1344,10 @@
 <span class="sd">    ``dependent``. Either reindex the input to the index of ``dependent``, or</span>
 <span class="sd">    call ``to_numpy()`` to pair its values by position. NumPy arrays and</span>
 <span class="sd">    pandas objects with a default index do not carry labels and are always</span>
-<span class="sd">    paired by position. The same rule applies to ``clusters`` passed to</span>
-<span class="sd">    ``fit``.</span>
+<span class="sd">    paired by position. If ``dependent`` does not carry labels, the inputs</span>
+<span class="sd">    that do must use the same index as the first of ``exog``, ``endog``,</span>
+<span class="sd">    ``instruments`` and ``weights`` that does. The same rule applies to</span>
+<span class="sd">    ``clusters`` passed to ``fit``.</span>
 
 <span class="sd">    .. todo::</span>
 
@@ -1471,8 +1485,10 @@
 <span class="sd">    ``dependent``. Either reindex the input to the index of ``dependent``, or</span>
 <span class="sd">    call ``to_numpy()`` to pair its values by position. NumPy arrays and</span>
 <span class="sd">    pandas objects with a default index do not carry labels and are always</span>
-<span class="sd">    paired by position. The same rule applies to ``clusters`` passed to</span>
-<span class="sd">    ``fit``.</span>
+<span class="sd">    paired by position. If ``dependent`` does not carry labels, the inputs</span>
+<span class="sd">    that do must use the same index as the first of ``exog``, ``endog``,</span>
+<span class="sd">    ``instruments`` and ``weights`` that does. The same rule applies to</span>
+<span class="sd">    ``clusters`` passed to ``fit``.</span>
 
 <span class="sd">    .. todo::</span>
 
@@ -1845,8 +1861,10 @@
 <span class="sd">    ``dependent``. Either reindex the input to the index of ``dependent``, or</span>
 <span class="sd">    call ``to_numpy()`` to pair its values by position. NumPy arrays and</span>
 <span class="sd">    pandas objects with a default index do not carry labels and are always</span>
-<span class="sd">    paired by position. The same rule applies to ``clusters`` passed to</span>
-<span class="sd">    ``fit`` or in ``weight_config``.</span>
+<span class="sd">    paired by position. If ``dependent`` does not carry labels, the inputs</span>
+<span class="sd">    that do must use the same index as the first of ``exog``, ``endog``,</span>
+<span class="sd">    ``instruments`` and ``weights`` that does. The same rule applies to</span>
+<span class="sd">    ``clusters`` passed to ``fit`` or in ``weight_config``.</span>
 
 <span class="sd">    The weight matrix is the inverse of an estimate of the covariance of the</span>
 <span class="sd">    moment conditions, so that the estimate has to be nonsingular. A clustered</span>
@@ -2194,8 +2212,10 @@
 <span class="sd">    ``dependent``. Either reindex the input to the index of ``dependent``, or</span>
 <span class="sd">    call ``to_numpy()`` to pair its values by position. NumPy arrays and</span>
 <span class="sd">    pandas objects with a default index do not carry labels and are always</span>
-<span class="sd">    paired by position. The same rule applies to ``clusters`` passed to</span>
-<span class="sd">    ``fit`` or in ``weight_config``.</span>
+<span class="sd">    paired by position. If ``dependent`` does not carry labels, the inputs</span>
+<span class="sd">    that do must use the same index as the first of ``exog``, ``endog``,</span>
+<span class="sd">    ``instruments`` and ``weights`` that does. The same rule applies to</span>
+<span class="sd">    ``clusters`` passed to ``fit`` or in ``weight_config``.</span>
 
 <span class="sd">    See Also</span>
 <span class="sd">    --------</span>
@@ -2601,8 +2621,10 @@
 <span class="sd">    ``weights`` differs from the index of ``dependent``. Either reindex the</span>
 <span class="sd">    input to the index of ``dependent``, or call ``to_numpy()`` to pair its</span>
 <span class="sd">    values by position. NumPy arrays and pandas objects with a default index</span>
-<span class="sd">    do not carry labels and are always paired by position. The same rule</span>
-<span class="sd">    applies to ``clusters`` passed to ``fit``.</span>
+<span class="sd">    do not carry labels and are always paired by position. If ``dependent``</span>
+<span class="sd">    does not carry labels, the inputs that do must use the same index as the</span>
+<span class="sd">    first of ``exog`` and ``weights`` that does. The same rule applies to</span>
+<span class="sd">    ``clusters`` passed to ``fit``.</span>
 
 <span class="sd">    See Also</span>
 <span class="sd">    --------</span>
@@ -2845,8 +2867,10 @@
 <span class="sd">    ``dependent``. Either reindex the input to the index of ``dependent``, or</span>
 <span class="sd">    call ``to_numpy()`` to pair its values by position. NumPy arrays and</span>
 <span class="sd">    pandas objects with a default index do not carry labels and are always</span>
-<span class="sd">    paired by position. The same rule applies to ``clusters`` passed to</span>
-<span class="sd">    ``fit``.</span>
+<span class="sd">    paired by position. If ``dependent`` does not carry labels, the inputs</span>
+<span class="sd">    that do must use the same index as the first of ``exog``, ``endog``,</span>
+<span class="sd">    ``instruments`` and ``weights`` that does. The same rule applies to</span>
+<span class="sd">    ``clusters`` passed to ``fit``.</span>
 
 <span class="sd">    See Also</span>
 <span class="sd">    --------</span>
