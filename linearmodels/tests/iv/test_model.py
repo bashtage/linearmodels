@@ -399,6 +399,11 @@ def test_first_stage_summary(data):
     assert isinstance(res1.first_stage.summary, Summary)
 
 
+# The default bandwidth of the kernel covariance warns, which is tested in
+# test_gmm_kernel_bandwidth.py
+@pytest.mark.filterwarnings(
+    "ignore::linearmodels.shared.exceptions.DefaultBandwidthWarning"
+)
 def test_gmm_str(data):
     mod = IVGMM(data.dep, data.exog, data.endog, data.instr)
     assert isinstance(str(mod.fit(cov_type="unadjusted")), str)

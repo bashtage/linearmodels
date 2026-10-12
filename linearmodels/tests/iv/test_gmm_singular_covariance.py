@@ -394,6 +394,11 @@ def test_summary_and_attributes_with_an_invalid_statistic():
 # ----------------------------------------------------------------------------
 
 
+# The kernel weight matrix estimates the bandwidth. It warns, which is tested in
+# test_gmm_kernel_bandwidth.py
+@pytest.mark.filterwarnings(
+    "ignore::linearmodels.shared.exceptions.DefaultBandwidthWarning"
+)
 @pytest.mark.parametrize("weight_type", ["kernel", "robust"])
 @pytest.mark.parametrize("nobs", [4, 5, 6, 8, 20])
 def test_small_samples_j_stat(weight_type, nobs):
@@ -409,7 +414,7 @@ def test_small_samples_j_stat(weight_type, nobs):
         return
     j_stat = mod.fit().j_stat
     x, y, z, _, _ = arrays(data)
-    bandwidth = nobs - 2 if weight_type == "kernel" else 0
+    bandwidth = mod._weight.bandwidth if weight_type == "kernel" else 0
     expected = reference_j(x, y, z, bartlett_cov(bandwidth, center=True))
     check_valid(j_stat, expected, df=2)
 
@@ -421,7 +426,9 @@ def test_small_samples_c_stat(weight_type, nobs, center):
     # The C statistic needs 5 moments, so that nobs = 5 gives a singular
     # covariance if the moments are centered
     data = small_sample(nobs)
-    c_stat = IVGMM(*data, weight_type=weight_type, center=center).fit().c_stat()
+    options = {"bandwidth": nobs - 2} if weight_type == "kernel" else {}
+    mod = IVGMM(*data, weight_type=weight_type, center=center, **options)
+    c_stat = mod.fit().c_stat()
     if nobs == 5 and center:
         check_invalid(c_stat, "C-statistic")
         return
@@ -637,6 +644,9 @@ def test_cue_with_enough_clusters_is_not_changed(nclusters, center):
         assert_allclose(res_default.params, res.params)
 
 
+@pytest.mark.filterwarnings(
+    "ignore::linearmodels.shared.exceptions.DefaultBandwidthWarning"
+)
 @pytest.mark.parametrize("weight_type", ["kernel", "robust"])
 @pytest.mark.parametrize("nobs", [4, 5, 8])
 def test_cue_too_few_observations(weight_type, nobs):

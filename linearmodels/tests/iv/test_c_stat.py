@@ -208,18 +208,18 @@ def test_c_stat_uses_the_weight_matrix_of_the_model():
 
 def test_c_stat_kernel_optimal_bandwidth():
     # optimal_bw must be used when the first model is estimated. Otherwise it
-    # silently uses the default of nobs - 2 lags
+    # silently uses nobs - 2 lags, which was the default before 7.1
     ref = REFERENCE.set_index("id").loc["sim_e2_i4_x1"]
     data = SIMULATED
     exog, endog = ref.exog.split(), ref.endog.split()
     instr = ref.instruments.split()
     args = (data.y_robust, data[exog], data[endog], data[instr])
     optimal = IVGMM(*args, weight_type="kernel", optimal_bw=True)
-    default = IVGMM(*args, weight_type="kernel")
+    old = IVGMM(*args, weight_type="kernel", optimal_bw=False)
     c_optimal = optimal.fit().c_stat("x1").stat
-    c_default = default.fit().c_stat("x1").stat
+    c_old = old.fit().c_stat("x1").stat
     assert c_optimal >= 0
-    assert abs(c_optimal - c_default) > 1e-3
+    assert abs(c_optimal - c_old) > 1e-3
 
     # The bandwidth that the first model selects, which treats x1 as exogenous
     first = IVGMM(

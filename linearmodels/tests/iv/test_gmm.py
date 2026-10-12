@@ -128,6 +128,11 @@ def test_kernel_weight_center(data, kernel, bandwidth):
         assert_allclose(weight, weight2, rtol=1e-12)
 
 
+# The default bandwidth, None, warns. This is tested in
+# test_gmm_kernel_bandwidth.py
+@pytest.mark.filterwarnings(
+    "ignore::linearmodels.shared.exceptions.DefaultBandwidthWarning"
+)
 def test_kernel_weight_debiased(kernel, data, bandwidth):
     wm = KernelWeightMatrix(debiased=True, kernel=kernel.kernel, bandwidth=bandwidth)
     weight = wm.weight_matrix(data.x, data.z, data.e)
@@ -144,6 +149,9 @@ def test_kernel_weight_debiased(kernel, data, bandwidth):
     assert wm.config["kernel"] == kernel.kernel
 
 
+@pytest.mark.filterwarnings(
+    "ignore::linearmodels.shared.exceptions.DefaultBandwidthWarning"
+)
 def test_kernel_weight_config(data, kernel, bandwidth):
     wm = KernelWeightMatrix(kernel=kernel.kernel, bandwidth=bandwidth)
     weight = wm.weight_matrix(data.x, data.z, data.e)
@@ -256,6 +264,9 @@ def test_gmm_covariance_clustered(data):
     assert "Clustered" in str(c)
 
 
+@pytest.mark.filterwarnings(
+    "ignore::linearmodels.shared.exceptions.DefaultBandwidthWarning"
+)
 def test_gmm_covariance_kernel(data, kernel, bandwidth):
     c = IVGMMCovariance(
         data.x,
