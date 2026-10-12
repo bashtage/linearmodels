@@ -431,9 +431,10 @@ be imported from ``linearmodels.iv`` and from the top-level package.
 
 ``AbsorbingLS`` is in the IV package for historical reasons. It is built on the
 IV machinery, so that it shares the covariance estimators and the results
-classes with the IV estimators, and it reports OLS-style statistics, including
-an :math:`R^2` that does not include the absorbed effects. It is not a panel
-estimator, and it does not have the statistics of
+classes with the IV estimators, and it reports OLS-style statistics. The
+``rsquared`` of the results includes the explanatory power of the absorbed
+effects, and ``absorbed_rsquared`` does not. It is not a panel estimator, and it
+does not have the statistics of
 :class:`~linearmodels.panel.model.PanelOLS`. Its default for ``debiased`` is
 ``False``, where the panel estimators use ``True``. See
 :ref:`panel-small-sample` for the small-sample adjustments of the panel
