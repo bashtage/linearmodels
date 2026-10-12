@@ -1595,11 +1595,22 @@ LABELLED_CLUSTER_KINDS = [
     "wide",
     *(["dataarray_grid"] if HAS_XARRAY else []),
 ]
+ARRAY_CLUSTER_KINDS = ["grid", "grid3d", "grid_list"]
 
 
 @pytest.mark.parametrize("cls", PATH_MODELS, ids=PATH_IDS)
 @pytest.mark.parametrize("kind", [*ONE_D_KINDS, *LABELLED_CLUSTER_KINDS])
 def test_panel_clusters_containers(panel, panel_reference, cls, kind):
+    mod = panel_reference[cls]
+    expected = setup_clusters(mod, panel["clusters"])
+    clusters = make_panel_clusters(panel["clusters"], kind)
+    assert_array_equal(setup_clusters(mod, clusters), expected)
+
+
+@pytest.mark.parametrize("cls", PATH_MODELS, ids=PATH_IDS)
+@pytest.mark.parametrize("kind", ARRAY_CLUSTER_KINDS)
+def test_panel_array_clusters_containers(panel, panel_reference, cls, kind):
+    # Arrays have the layout of the data, and no labels
     mod = panel_reference[cls]
     expected = setup_clusters(mod, panel["clusters"])
     clusters = make_panel_clusters(panel["clusters"], kind)
@@ -1656,6 +1667,25 @@ def test_panel_clusters_with_missing_values_in_the_model(panel):
     for clusters in (panel["clusters"].to_numpy(), panel["clusters"].tolist()):
         res = mod.fit(cov_type="clustered", clusters=clusters)
         assert_allclose(res.cov, expected.cov, rtol=1e-10)
+
+
+@pytest.mark.parametrize("option", ["cluster_entity", "cluster_time"])
+@pytest.mark.parametrize("cls", [PooledOLS, PanelOLS, RandomEffects], ids=PANEL_IDS[:3])
+@pytest.mark.parametrize("kind", ["grid", "ndarray", "list"])
+def test_panel_unlabelled_clusters_with_entity_or_time_clusters(
+    panel, panel_reference, cls, kind, option
+):
+    # The clusters from an array have the labels of the rows of dependent, and so
+    # they can be combined with the clusters from the entities or periods
+    mod = panel_reference[cls]
+    expected = setup_clusters(mod, panel["clusters"], **{option: True})
+    assert expected.shape == (PN * PT, 2)
+    clusters = (
+        grid(panel["clusters"])
+        if kind == "grid"
+        else make_panel_clusters(panel["clusters"], kind)
+    )
+    assert_array_equal(setup_clusters(mod, clusters, **{option: True}), expected)
 
 
 @pytest.mark.parametrize("cls", CLUSTER_MODELS, ids=CLUSTER_IDS)

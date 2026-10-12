@@ -482,6 +482,15 @@ class _PanelModelBase:
             )
         if self._dependent_labelled and labelled:
             check_row_alignment("clusters", clusters_pd.index, self._original_index)
+        frame = clusters_pd.dataframe
+        changed = False
+        if not labelled and frame.shape[0] == len(self._original_index):
+            # The values are paired with the rows of dependent by position, and so
+            # they have the labels of these rows
+            frame = frame.set_axis(self._original_index, axis=0)
+            changed = True
+        if changed:
+            clusters_pd = PanelData(frame, convert_dummies=False)
         clusters_pd.drop(~self.not_null)
         return clusters_pd.copy()
 
