@@ -1298,8 +1298,9 @@ class AbsorbingLS:
         unadjusted, robust and kernel covariances are multiplied by n / (n - k - d),
         and the clustered covariance by g (n - 1) / ((g - 1) (n - k - d)) where g
         is the number of clusters. The result is that of the regression of the
-        dependent variable on ``exog`` and the dummy variables of the effects, and
-        of ``PanelOLS(debiased=True)`` with the same effects. The exception is a
+        dependent variable on ``exog`` and the dummy variables of the effects. It
+        is also that of ``PanelOLS(debiased=True)`` with the same effects, using
+        ``group_debias=True`` for the clustered covariance. The exception is a
         clustered covariance when there is a single categorical effect and each of
         its categories is in one cluster of every cluster variable: its degrees of
         freedom are not counted, since the effect is nested in the clusters, as in
