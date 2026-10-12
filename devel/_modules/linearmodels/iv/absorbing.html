@@ -19,7 +19,7 @@
     
   
       
-        <title>linearmodels.iv.absorbing - linearmodels v7.1 (+254)</title>
+        <title>linearmodels.iv.absorbing - linearmodels v7.1 (+266)</title>
       
     
 
@@ -91,7 +91,7 @@
 
 <header class="md-header md-header--shadow" data-md-component="header">
   <nav class="md-header__inner md-grid" aria-label="Header">
-    <a href="../../../index.html" title="linearmodels v7.1 (+254)" class="md-header__button md-logo" aria-label="linearmodels v7.1 (+254)" data-md-component="logo">
+    <a href="../../../index.html" title="linearmodels v7.1 (+266)" class="md-header__button md-logo" aria-label="linearmodels v7.1 (+266)" data-md-component="logo">
       <img src="../../../_static/bw-logo.svg" alt="logo">
     </a>
     <label class="md-header__button md-icon" for="__drawer">
@@ -102,7 +102,7 @@
       <div class="md-header__ellipsis">
         <div class="md-header__topic">
           <span class="md-ellipsis">
-            linearmodels v7.1 (+254)
+            linearmodels v7.1 (+266)
           </span>
         </div>
         <div class="md-header__topic" data-md-component="header-topic">
@@ -197,10 +197,10 @@
 
 <nav class="md-nav md-nav--primary" aria-label="Navigation" data-md-level="0">
   <label class="md-nav__title" for="__drawer">
-    <a href="../../../index.html" title="linearmodels v7.1 (+254)" class="md-nav__button md-logo" aria-label="linearmodels v7.1 (+254)" data-md-component="logo">
+    <a href="../../../index.html" title="linearmodels v7.1 (+266)" class="md-nav__button md-logo" aria-label="linearmodels v7.1 (+266)" data-md-component="logo">
       <img src="../../../_static/bw-logo.svg" alt="logo">
     </a>
-    linearmodels v7.1 (+254)
+    linearmodels v7.1 (+266)
   </label>
   
     <div class="md-nav__source">
@@ -666,6 +666,33 @@
     <span class="k">return</span> <span class="nb">tuple</span><span class="p">(</span><span class="n">key</span><span class="p">)</span>
 
 
+<span class="k">def</span><span class="w"> </span><span class="nf">_check_method</span><span class="p">(</span><span class="n">method</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">"""</span>
+<span class="sd">    Check the method used to absorb the variables</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    method : str</span>
+<span class="sd">        The method that was passed to fit</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    str</span>
+<span class="sd">        The method in lower case</span>
+
+<span class="sd">    Raises</span>
+<span class="sd">    ------</span>
+<span class="sd">    ValueError</span>
+<span class="sd">        If method is not "auto", "hdfe" or "lsmr", whatever its case</span>
+<span class="sd">    """</span>
+    <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">method</span><span class="p">,</span> <span class="nb">str</span><span class="p">)</span> <span class="ow">and</span> <span class="n">method</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span> <span class="ow">in</span> <span class="p">(</span><span class="s2">"auto"</span><span class="p">,</span> <span class="s2">"hdfe"</span><span class="p">,</span> <span class="s2">"lsmr"</span><span class="p">):</span>
+        <span class="k">return</span> <span class="n">method</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span>
+    <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
+        <span class="s1">'method must be one of "auto", "hdfe" or "lsmr", whatever its case. '</span>
+        <span class="sa">f</span><span class="s2">"Got </span><span class="si">{</span><span class="n">method</span><span class="si">!r}</span><span class="s2">."</span>
+    <span class="p">)</span>
+
+
 <span class="k">def</span><span class="w"> </span><span class="nf">_absorb_args</span><span class="p">(</span>
     <span class="n">method</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">use_cache</span><span class="p">:</span> <span class="nb">bool</span><span class="p">,</span> <span class="n">absorb_options</span><span class="p">:</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]</span> <span class="o">|</span> <span class="kc">None</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">tuple</span><span class="p">[</span><span class="n">Any</span><span class="p">,</span> <span class="o">...</span><span class="p">]:</span>
@@ -1005,6 +1032,7 @@
 
     <span class="nd">@property</span>
     <span class="k">def</span><span class="w"> </span><span class="nf">nobs</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">int</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">"""Number of observations, which drop reduces."""</span>
         <span class="k">assert</span> <span class="bp">self</span><span class="o">.</span><span class="n">_nobs</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_nobs</span>
 
@@ -1061,8 +1089,24 @@
 <div class="viewcode-block" id="Interaction.drop">
 <a class="viewcode-back" href="../../../iv/absorbing/linearmodels.iv.absorbing.Interaction.drop.html#linearmodels.iv.absorbing.Interaction.drop">[docs]</a>
     <span class="k">def</span><span class="w"> </span><span class="nf">drop</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">locs</span><span class="p">:</span> <span class="n">linearmodels</span><span class="o">.</span><span class="n">typing</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">BoolArray</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">"""</span>
+<span class="sd">        Drop observations.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        locs : ndarray</span>
+<span class="sd">            Boolean array with one element for each observation, which is True</span>
+<span class="sd">            for the observations to drop.</span>
+
+<span class="sd">        Notes</span>
+<span class="sd">        -----</span>
+<span class="sd">        The instance is modified in place and nothing is returned. Afterwards</span>
+<span class="sd">        ``nobs``, ``cat``, ``cont``, ``sparse`` and ``hash`` use only the</span>
+<span class="sd">        remaining observations.</span>
+<span class="sd">        """</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_cat_data</span><span class="o">.</span><span class="n">drop</span><span class="p">(</span><span class="n">locs</span><span class="p">)</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">_cont_data</span><span class="o">.</span><span class="n">drop</span><span class="p">(</span><span class="n">locs</span><span class="p">)</span></div>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_cont_data</span><span class="o">.</span><span class="n">drop</span><span class="p">(</span><span class="n">locs</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_nobs</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_cat_data</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span></div>
 
 
     <span class="nd">@property</span>
@@ -1792,8 +1836,9 @@
 <span class="sd">        debiased : bool</span>
 <span class="sd">            Flag indicating whether to debiased the covariance estimator using</span>
 <span class="sd">            a degree of freedom adjustment.</span>
-<span class="sd">        method : str</span>
-<span class="sd">            One of:</span>
+<span class="sd">        method : {"auto", "hdfe", "lsmr"}, optional</span>
+<span class="sd">            The algorithm that absorbs the variables. The name is not case</span>
+<span class="sd">            sensitive, and a ValueError is raised for any other value. One of:</span>
 
 <span class="sd">            * "auto" - (Default). Use HDFE when applicable and fallback to LSMR.</span>
 <span class="sd">            * "lsmr" - Force LSMR.</span>
@@ -1822,8 +1867,8 @@
 
 <span class="sd">            .. deprecated:: 4.17</span>
 
-<span class="sd">               Use absorb_options to pass options. ``lsmr_options`` will be</span>
-<span class="sd">               removed in linearmodels 8.0.</span>
+<span class="sd">               Use absorb_options with method="lsmr" to pass options.</span>
+<span class="sd">               ``lsmr_options`` will be removed in linearmodels 8.0.</span>
 
 <span class="sd">        cov_config</span>
 <span class="sd">            Additional parameters to pass to covariance estimator. The list</span>
@@ -1890,6 +1935,7 @@
 <span class="sd">        linearmodels.iv.covariance.KernelCovariance</span>
 <span class="sd">        linearmodels.iv.covariance.ClusteredCovariance</span>
 <span class="sd">        """</span>
+        <span class="n">method</span> <span class="o">=</span> <span class="n">_check_method</span><span class="p">(</span><span class="n">method</span><span class="p">)</span>
         <span class="k">if</span> <span class="n">lsmr_options</span> <span class="ow">and</span> <span class="n">absorb_options</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
             <span class="c1"># The options are options of LSMR, so they can not be passed to HDFE</span>
             <span class="k">if</span> <span class="n">method</span> <span class="o">==</span> <span class="s2">"hdfe"</span><span class="p">:</span>
@@ -1905,7 +1951,8 @@
                 <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">"absorb_options cannot be used with lsmr_options"</span><span class="p">)</span>
             <span class="n">warnings</span><span class="o">.</span><span class="n">warn</span><span class="p">(</span>
                 <span class="s2">"lsmr_options is deprecated and will be removed in linearmodels "</span>
-                <span class="s2">"8.0. Use absorb_options."</span><span class="p">,</span>
+                <span class="s1">'8.0. Use absorb_options with method="lsmr", which passes the options '</span>
+                <span class="s2">"to scipy.sparse.linalg.lsmr."</span><span class="p">,</span>
                 <span class="ne">FutureWarning</span><span class="p">,</span>
                 <span class="n">stacklevel</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span>
             <span class="p">)</span>

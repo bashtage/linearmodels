@@ -23,7 +23,7 @@
     
   
       
-        <title>Utilities - linearmodels v7.1 (+254)</title>
+        <title>Utilities - linearmodels v7.1 (+266)</title>
       
     
 
@@ -100,7 +100,7 @@
 
 <header class="md-header md-header--shadow" data-md-component="header">
   <nav class="md-header__inner md-grid" aria-label="Header">
-    <a href="index.html" title="linearmodels v7.1 (+254)" class="md-header__button md-logo" aria-label="linearmodels v7.1 (+254)" data-md-component="logo">
+    <a href="index.html" title="linearmodels v7.1 (+266)" class="md-header__button md-logo" aria-label="linearmodels v7.1 (+266)" data-md-component="logo">
       <img src="_static/bw-logo.svg" alt="logo">
     </a>
     <label class="md-header__button md-icon" for="__drawer">
@@ -111,7 +111,7 @@
       <div class="md-header__ellipsis">
         <div class="md-header__topic">
           <span class="md-ellipsis">
-            linearmodels v7.1 (+254)
+            linearmodels v7.1 (+266)
           </span>
         </div>
         <div class="md-header__topic" data-md-component="header-topic">
@@ -206,10 +206,10 @@
 
 <nav class="md-nav md-nav--primary" aria-label="Navigation" data-md-level="0">
   <label class="md-nav__title" for="__drawer">
-    <a href="index.html" title="linearmodels v7.1 (+254)" class="md-nav__button md-logo" aria-label="linearmodels v7.1 (+254)" data-md-component="logo">
+    <a href="index.html" title="linearmodels v7.1 (+266)" class="md-nav__button md-logo" aria-label="linearmodels v7.1 (+266)" data-md-component="logo">
       <img src="_static/bw-logo.svg" alt="logo">
     </a>
-    linearmodels v7.1 (+254)
+    linearmodels v7.1 (+266)
   </label>
   
     <div class="md-nav__source">
@@ -916,6 +916,34 @@
   
 </li>
       
+        <li class="md-nav__item">
+  <a href="#missing-values" class="md-nav__link">
+    
+    <span class="md-ellipsis">
+      <span title="/utility.rst#missing-values (reference label)"><span>Missing Values</span></span>
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Missing Values">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#linearmodels.shared.exceptions.MissingValueWarning" class="md-nav__link">
+    
+      <span aria-label="Python class" class="objinfo-icon objinfo-icon__data" title="Python class">C</span>
+    
+    <span class="md-ellipsis">
+      <span title="linearmodels.shared.exceptions.MissingValueWarning (Python class) — Warning that observations with missing values were dropped."><span>linearmodels.<wbr>shared.<wbr>exceptions.<wbr>Missing<wbr>Value<wbr>Warning</span></span>
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
     </ul>
   
 </nav>
@@ -1117,6 +1145,34 @@
   
 </li>
       
+        <li class="md-nav__item">
+  <a href="#missing-values" class="md-nav__link">
+    
+    <span class="md-ellipsis">
+      <span title="/utility.rst#missing-values (reference label)"><span>Missing Values</span></span>
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Missing Values">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#linearmodels.shared.exceptions.MissingValueWarning" class="md-nav__link">
+    
+      <span aria-label="Python class" class="objinfo-icon objinfo-icon__data" title="Python class">C</span>
+    
+    <span class="md-ellipsis">
+      <span title="linearmodels.shared.exceptions.MissingValueWarning (Python class) — Warning that observations with missing values were dropped."><span>linearmodels.<wbr>shared.<wbr>exceptions.<wbr>Missing<wbr>Value<wbr>Warning</span></span>
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
     </ul>
   
 </nav>
@@ -1173,6 +1229,68 @@
 </tr>
 </tbody>
 </table>
+<h2 id="missing-values">Missing Values<a class="headerlink" href="#missing-values" title="Link to this heading">¶</a></h2>
+<p>A model drops the observations that have a missing value, such as <code class="docutils literal notranslate"><span class="pre">NaN</span></code>, in any of
+its inputs when it is created. It issues a <a class="reference internal" href="#linearmodels.shared.exceptions.MissingValueWarning" title="linearmodels.shared.exceptions.MissingValueWarning (Python class) — Warning that observations with missing values were dropped."><code class="xref py py-class docutils literal notranslate"><span class="pre">MissingValueWarning</span></code></a> if it drops any
+observation, and the results use the remaining observations. This is the same in every
+model.</p>
+<p>The warning is on by default. It can be turned off in three ways.</p>
+<ul>
+<li><p>Set <code class="docutils literal notranslate"><span class="pre">linearmodels.WARN_ON_MISSING</span></code> to <code class="docutils literal notranslate"><span class="pre">False</span></code>. It applies to every model that is
+created afterwards.</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><code><span class="kn">import</span><span class="w"> </span><span class="nn">linearmodels</span>
+
+<span class="n">linearmodels</span><span class="o">.</span><span class="n">WARN_ON_MISSING</span> <span class="o">=</span> <span class="kc">False</span>
+</code></pre></div>
+</div>
+</li>
+<li><p>Set the environment variable <code class="docutils literal notranslate"><span class="pre">LINEARMODELS_WARN_ON_MISSING</span></code> before importing
+linearmodels, for example in the shell that starts Python. The values <code class="docutils literal notranslate"><span class="pre">&quot;&quot;</span></code> (the
+empty string), <code class="docutils literal notranslate"><span class="pre">&quot;0&quot;</span></code>, <code class="docutils literal notranslate"><span class="pre">&quot;false&quot;</span></code> and <code class="docutils literal notranslate"><span class="pre">&quot;False&quot;</span></code> turn the warning off. Any other
+value, or no variable, leaves it on. The variable is read when linearmodels is
+imported, so setting it later has no effect.</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><code><span class="nb">export</span><span class="w"> </span><span class="nv">LINEARMODELS_WARN_ON_MISSING</span><span class="o">=</span><span class="m">0</span>
+</code></pre></div>
+</div>
+</li>
+<li><p>Use a warnings filter. A filter applies only where it is set, so it can turn off the
+warning for part of a program. The warning is issued when the model is created, not
+when it is fit.</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><code><span class="kn">import</span><span class="w"> </span><span class="nn">warnings</span>
+
+<span class="kn">from</span><span class="w"> </span><span class="nn">linearmodels.iv</span><span class="w"> </span><span class="kn">import</span> <span class="n">IV2SLS</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">linearmodels.shared.exceptions</span><span class="w"> </span><span class="kn">import</span> <span class="n">MissingValueWarning</span>
+
+<span class="k">with</span> <span class="n">warnings</span><span class="o">.</span><span class="n">catch_warnings</span><span class="p">():</span>
+    <span class="n">warnings</span><span class="o">.</span><span class="n">simplefilter</span><span class="p">(</span><span class="s2">"ignore"</span><span class="p">,</span> <span class="n">MissingValueWarning</span><span class="p">)</span>
+    <span class="n">mod</span> <span class="o">=</span> <span class="n">IV2SLS</span><span class="p">(</span><span class="n">dependent</span><span class="p">,</span> <span class="n">exog</span><span class="p">,</span> <span class="n">endog</span><span class="p">,</span> <span class="n">instruments</span><span class="p">)</span>
+<span class="n">res</span> <span class="o">=</span> <span class="n">mod</span><span class="o">.</span><span class="n">fit</span><span class="p">()</span>
+</code></pre></div>
+</div>
+<p>The action <code class="docutils literal notranslate"><span class="pre">&quot;error&quot;</span></code> instead of <code class="docutils literal notranslate"><span class="pre">&quot;ignore&quot;</span></code> raises an exception if a model drops
+any observation.</p>
+</li>
+</ul>
+<div class="admonition deprecated">
+<p class="admonition-title"><span class="versionmodified deprecated">Deprecated since version 7.1: </span>The module attribute <code class="docutils literal notranslate"><span class="pre">linearmodels.DROP_MISSING</span></code> and the environment variable
+<code class="docutils literal notranslate"><span class="pre">LINEARMODELS_DROP_MISSING</span></code> have never had an effect, because observations with
+missing values are always dropped. Reading <code class="docutils literal notranslate"><span class="pre">linearmodels.DROP_MISSING</span></code>, and
+importing linearmodels when the environment variable is set, issue a
+<code class="docutils literal notranslate"><span class="pre">FutureWarning</span></code>. Both will be removed in linearmodels 8.0. Use
+<code class="docutils literal notranslate"><span class="pre">WARN_ON_MISSING</span></code> to turn off the warning.</p>
+</div>
+<dl class="py class objdesc">
+<dt class="sig sig-object highlight py" id="linearmodels.shared.exceptions.MissingValueWarning">
+<span class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></span><span class="sig-prename descclassname"><span class="pre">linearmodels.shared.exceptions.</span></span><span class="sig-name descname"><span class="pre">MissingValueWarning</span></span><a class="reference internal" href="_modules/linearmodels/shared/exceptions.html#MissingValueWarning"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#linearmodels.shared.exceptions.MissingValueWarning" title="Link to this definition">¶</a></dt>
+<dd><p>Warning that observations with missing values were dropped.</p>
+<p class="rubric">Notes</p>
+<p>A model drops the observations that have a missing value in any of its inputs
+when it is created, and issues this warning if it drops any. The warning is on
+by default. Set <code class="docutils literal notranslate"><span class="pre">linearmodels.WARN_ON_MISSING</span> <span class="pre">=</span> <span class="pre">False</span></code> or the environment
+variable <code class="docutils literal notranslate"><span class="pre">LINEARMODELS_WARN_ON_MISSING=0</span></code> to turn it off for every model. To
+change it for part of a program, use a warnings filter for this class, with the
+action <code class="docutils literal notranslate"><span class="pre">&quot;ignore&quot;</span></code> or <code class="docutils literal notranslate"><span class="pre">&quot;error&quot;</span></code>.</p>
+</dd></dl>
 
 
 

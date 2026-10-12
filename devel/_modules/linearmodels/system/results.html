@@ -19,7 +19,7 @@
     
   
       
-        <title>linearmodels.system.results - linearmodels v7.1 (+254)</title>
+        <title>linearmodels.system.results - linearmodels v7.1 (+266)</title>
       
     
 
@@ -91,7 +91,7 @@
 
 <header class="md-header md-header--shadow" data-md-component="header">
   <nav class="md-header__inner md-grid" aria-label="Header">
-    <a href="../../../index.html" title="linearmodels v7.1 (+254)" class="md-header__button md-logo" aria-label="linearmodels v7.1 (+254)" data-md-component="logo">
+    <a href="../../../index.html" title="linearmodels v7.1 (+266)" class="md-header__button md-logo" aria-label="linearmodels v7.1 (+266)" data-md-component="logo">
       <img src="../../../_static/bw-logo.svg" alt="logo">
     </a>
     <label class="md-header__button md-icon" for="__drawer">
@@ -102,7 +102,7 @@
       <div class="md-header__ellipsis">
         <div class="md-header__topic">
           <span class="md-ellipsis">
-            linearmodels v7.1 (+254)
+            linearmodels v7.1 (+266)
           </span>
         </div>
         <div class="md-header__topic" data-md-component="header-topic">
@@ -197,10 +197,10 @@
 
 <nav class="md-nav md-nav--primary" aria-label="Navigation" data-md-level="0">
   <label class="md-nav__title" for="__drawer">
-    <a href="../../../index.html" title="linearmodels v7.1 (+254)" class="md-nav__button md-logo" aria-label="linearmodels v7.1 (+254)" data-md-component="logo">
+    <a href="../../../index.html" title="linearmodels v7.1 (+266)" class="md-nav__button md-logo" aria-label="linearmodels v7.1 (+266)" data-md-component="logo">
       <img src="../../../_static/bw-logo.svg" alt="logo">
     </a>
-    linearmodels v7.1 (+254)
+    linearmodels v7.1 (+266)
   </label>
   
     <div class="md-nav__source">
@@ -749,6 +749,7 @@
         <span class="k">if</span> <span class="n">results</span><span class="o">.</span><span class="n">constraints</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">_num_constraints</span> <span class="o">=</span> <span class="nb">str</span><span class="p">(</span><span class="n">results</span><span class="o">.</span><span class="n">constraints</span><span class="o">.</span><span class="n">r</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_weight_estimtor</span> <span class="o">=</span> <span class="n">results</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"weight_estimator"</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_weighted_resid</span> <span class="o">=</span> <span class="n">results</span><span class="o">.</span><span class="n">weighted_resid</span>
 
     <span class="nd">@property</span>
     <span class="k">def</span><span class="w"> </span><span class="nf">model</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">linearmodels</span><span class="o">.</span><span class="n">system</span><span class="o">.</span><span class="n">model</span><span class="o">.</span><span class="n">IV3SLS</span><span class="p">:</span>
@@ -1093,7 +1094,8 @@
 <span class="sd">        .. [1] Greene, William H. Econometric analysis. Pearson Education, 2003.</span>
 <span class="sd">        """</span>
         <span class="n">name</span> <span class="o">=</span> <span class="s2">"Breusch-Pagan LM Test"</span>
-        <span class="n">resids</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">resids</span>
+        <span class="c1"># The residuals scaled by the weights, which estimate the residual covariance</span>
+        <span class="n">resids</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">asarray</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_weighted_resid</span><span class="p">)</span>
         <span class="k">if</span> <span class="n">resids</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">==</span> <span class="mi">1</span><span class="p">:</span>
             <span class="k">return</span> <span class="n">InvalidTestStatistic</span><span class="p">(</span>
                 <span class="s2">"Cannot test correlation when the system contains a single "</span>
@@ -1103,7 +1105,7 @@
         <span class="n">r</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">corrcoef</span><span class="p">(</span><span class="n">resids</span><span class="o">.</span><span class="n">T</span><span class="p">)</span>
         <span class="n">k</span> <span class="o">=</span> <span class="n">r</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
         <span class="n">distinct_corr</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">tril</span><span class="p">(</span><span class="n">r</span><span class="p">,</span> <span class="o">-</span><span class="mi">1</span><span class="p">)</span>
-        <span class="n">stat</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">resids</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">*</span> <span class="p">(</span><span class="n">distinct_corr</span><span class="o">**</span><span class="mi">2</span><span class="p">)</span><span class="o">.</span><span class="n">sum</span><span class="p">()</span>
+        <span class="n">stat</span> <span class="o">=</span> <span class="n">resids</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">*</span> <span class="p">(</span><span class="n">distinct_corr</span><span class="o">**</span><span class="mi">2</span><span class="p">)</span><span class="o">.</span><span class="n">sum</span><span class="p">()</span>
         <span class="k">return</span> <span class="n">WaldTestStatistic</span><span class="p">(</span>
             <span class="n">stat</span><span class="p">,</span>
             <span class="s2">"Residuals are uncorrelated"</span><span class="p">,</span>
@@ -1150,7 +1152,8 @@
 <span class="sd">        .. [1] Greene, William H. Econometric analysis. Pearson Education, 2003.</span>
 <span class="sd">        """</span>
         <span class="n">name</span> <span class="o">=</span> <span class="s2">"Likelihood Ratio Test for Diagonal Covariance"</span>
-        <span class="n">resids</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">asarray</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">resids</span><span class="p">)</span>
+        <span class="c1"># The residuals scaled by the weights, which estimate the residual covariance</span>
+        <span class="n">resids</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">asarray</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_weighted_resid</span><span class="p">)</span>
         <span class="k">if</span> <span class="n">resids</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">==</span> <span class="mi">1</span><span class="p">:</span>
             <span class="k">return</span> <span class="n">InvalidTestStatistic</span><span class="p">(</span>
                 <span class="s2">"Cannot test covariance structure when the system contains a single "</span>

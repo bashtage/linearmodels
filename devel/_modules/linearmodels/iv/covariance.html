@@ -19,7 +19,7 @@
     
   
       
-        <title>linearmodels.iv.covariance - linearmodels v7.1 (+254)</title>
+        <title>linearmodels.iv.covariance - linearmodels v7.1 (+266)</title>
       
     
 
@@ -91,7 +91,7 @@
 
 <header class="md-header md-header--shadow" data-md-component="header">
   <nav class="md-header__inner md-grid" aria-label="Header">
-    <a href="../../../index.html" title="linearmodels v7.1 (+254)" class="md-header__button md-logo" aria-label="linearmodels v7.1 (+254)" data-md-component="logo">
+    <a href="../../../index.html" title="linearmodels v7.1 (+266)" class="md-header__button md-logo" aria-label="linearmodels v7.1 (+266)" data-md-component="logo">
       <img src="../../../_static/bw-logo.svg" alt="logo">
     </a>
     <label class="md-header__button md-icon" for="__drawer">
@@ -102,7 +102,7 @@
       <div class="md-header__ellipsis">
         <div class="md-header__topic">
           <span class="md-ellipsis">
-            linearmodels v7.1 (+254)
+            linearmodels v7.1 (+266)
           </span>
         </div>
         <div class="md-header__topic" data-md-component="header-topic">
@@ -197,10 +197,10 @@
 
 <nav class="md-nav md-nav--primary" aria-label="Navigation" data-md-level="0">
   <label class="md-nav__title" for="__drawer">
-    <a href="../../../index.html" title="linearmodels v7.1 (+254)" class="md-nav__button md-logo" aria-label="linearmodels v7.1 (+254)" data-md-component="logo">
+    <a href="../../../index.html" title="linearmodels v7.1 (+266)" class="md-nav__button md-logo" aria-label="linearmodels v7.1 (+266)" data-md-component="logo">
       <img src="../../../_static/bw-logo.svg" alt="logo">
     </a>
-    linearmodels v7.1 (+254)
+    linearmodels v7.1 (+266)
   </label>
   
     <div class="md-nav__source">
@@ -566,11 +566,11 @@
 <span class="p">]</span>
 
 <span class="n">CLUSTER_ERR</span> <span class="o">=</span> <span class="s2">"""</span><span class="se">\</span>
-<span class="s2">clusters has the wrong nobs. Expected </span><span class="si">{0}</span><span class="s2">, got </span><span class="si">{1}</span><span class="s2">.  Any missing observation</span>
-<span class="s2">in the regression variables have have been dropped.  When using a clustered</span>
-<span class="s2">covariance estimator, drop missing data before estimating the model. The model</span>
-<span class="s2">property `notnull` contains the locations of the observations that have no</span>
-<span class="s2">missing values."""</span>
+<span class="s2">clusters has the wrong nobs. Expected </span><span class="si">{0}</span><span class="s2">, got </span><span class="si">{1}</span><span class="s2">. Observations with a missing</span>
+<span class="s2">value in the regression variables are dropped when the model is created, so</span>
+<span class="s2">clusters must have one row for each of the remaining observations. When using a</span>
+<span class="s2">clustered covariance estimator, drop the observations with missing values from</span>
+<span class="s2">the data and from clusters before estimating the model."""</span>
 
 
 <div class="viewcode-block" id="kernel_weight_bartlett">
