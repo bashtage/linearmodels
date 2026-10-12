@@ -31,6 +31,7 @@ from numpy import (
     outer,
     sqrt,
     squeeze,
+    unique,
 )
 from numpy.linalg import LinAlgError, eigvalsh, inv, matrix_rank, pinv, qr, solve
 from pandas import DataFrame, Series, concat
@@ -1005,6 +1006,36 @@ class IV2SLS(_IVLSModelBase):
         return mod
 
 
+def _is_singular(cov: linearmodels.typing.data.Float64Array) -> bool:
+    """
+    Test whether the covariance of the moment conditions is singular
+
+    Parameters
+    ----------
+    cov : ndarray
+        Estimate of the covariance of the moment conditions (ninstr by ninstr)
+
+    Returns
+    -------
+    bool
+        True if the covariance is not finite, has a variance that is not
+        positive or its correlation matrix does not have full rank.
+
+    Notes
+    -----
+    The rank is that of the correlation matrix of the moment conditions, so
+    that it does not depend on the units in which the instruments are
+    measured. The tolerance of the rank test is relative to the largest
+    eigenvalue, and so it treats the covariance as singular if the variances
+    of the moment conditions differ by a factor of about 1e16.
+    """
+    variances = diag(cov)
+    if not (npall(isfinite(cov)) and npall(variances > 0)):
+        return True
+    std = sqrt(variances)
+    return bool(matrix_rank(cov / outer(std, std), hermitian=True) < cov.shape[0])
+
+
 class _IVGMMBase(_IVModelBase):
     r"""
     Estimation of IV models using the generalized method of moments (GMM)
@@ -1084,6 +1115,7 @@ class _IVGMMBase(_IVModelBase):
         params: linearmodels.typing.data.Float64Array,
         weight_mat: linearmodels.typing.data.Float64Array,
         iters: int,
+        moment_cov: linearmodels.typing.data.Float64Array | None = None,
     ) -> dict[str, Any]:
         """GMM-specific post-estimation results"""
         instr = self._instr_columns
@@ -1092,7 +1124,7 @@ class _IVGMMBase(_IVModelBase):
             "weight_type": self._weight_type,
             "weight_config": self._weight.config,
             "iterations": iters,
-            "j_stat": self._j_statistic(params, weight_mat),
+            "j_stat": self._j_statistic(params, weight_mat, moment_cov),
             "centered_j_stat": self._centered_j_statistic(params),
         }
 
@@ -1118,17 +1150,7 @@ class _IVGMMBase(_IVModelBase):
         weight_matrix_estimator = WEIGHT_MATRICES[self._weight_type]
         centered = weight_matrix_estimator(**{**self._weight_kwargs, "center": True})
         s_c = centered.weight_matrix(x, z, eps)
-        # The rank is that of the correlation matrix of the moment conditions,
-        # so that it does not depend on the units in which the instruments are
-        # measured. The tolerance of the rank test is relative to the largest
-        # eigenvalue, and so it treats the covariance as singular if the
-        # variances of the moment conditions differ by a factor of about 1e16
-        variances = diag(s_c)
-        singular = not (npall(isfinite(s_c)) and npall(variances > 0))
-        if not singular:
-            std = sqrt(variances)
-            singular = matrix_rank(s_c / outer(std, std), hermitian=True) < ninstr
-        if singular:
+        if _is_singular(s_c):
             # The centered cluster sums add to zero, so a clustered estimator
             # has rank at most one less than the number of clusters
             reason = (
@@ -1145,10 +1167,29 @@ class _IVGMMBase(_IVModelBase):
         self,
         params: linearmodels.typing.data.Float64Array,
         weight_mat: linearmodels.typing.data.Float64Array,
-    ) -> WaldTestStatistic:
-        """J stat and test"""
+        moment_cov: linearmodels.typing.data.Float64Array | None = None,
+    ) -> WaldTestStatistic | InvalidTestStatistic:
+        """
+        J stat and test
+
+        moment_cov is the estimate of the covariance of the moment conditions
+        that was inverted to compute weight_mat, if there is one. The statistic
+        is not defined if it is singular, since weight_mat is then numerical
+        noise. The test is applied to the covariance and not to weight_mat,
+        because the inverse of a singular covariance is not always found to be
+        singular.
+        """
         y, x, z = self._wy, self._wx, self._wz
         nobs, nvar, ninstr = y.shape[0], x.shape[1], z.shape[1]
+        if moment_cov is not None and _is_singular(moment_cov):
+            reason = (
+                "The covariance of the moment conditions that is inverted to "
+                "compute the weight matrix is singular, so the statistic is "
+                "not defined. This occurs, for example, when there are too "
+                "few clusters."
+            )
+            name = "J-test of overidentifying restrictions"
+            return InvalidTestStatistic(reason, name=name)
         eps = y - x @ params
         g_bar = (z * eps).mean(0)
         stat = float(nobs * g_bar.T @ weight_mat @ g_bar.T)
@@ -1403,9 +1444,11 @@ class IVGMM(_IVGMMBase):
 
         iters, norm = 1, 10 * tol + 1
         vinv = eye(params.shape[0])
+        moment_cov: linearmodels.typing.data.Float64Array | None = None
         while iters < iter_limit and norm > tol:
             eps = wy - wx @ params
-            wmat = inv(weight_matrix(wx, wz, eps))
+            moment_cov = weight_matrix(wx, wz, eps)
+            wmat = inv(moment_cov)
             params = self.estimate_parameters(wx, wy, wz, wmat)
             delta = params - _params
             if iters == 1:
@@ -1422,7 +1465,7 @@ class IVGMM(_IVGMMBase):
         )
 
         results = self._post_estimation(params, cov_estimator, cov_type)
-        gmm_pe = self._gmm_post_estimation(params, wmat, iters)
+        gmm_pe = self._gmm_post_estimation(params, wmat, iters, moment_cov)
 
         results.update(gmm_pe)
 
@@ -1433,6 +1476,7 @@ class IVGMM(_IVGMMBase):
         params: linearmodels.typing.data.Float64Array,
         weight_mat: linearmodels.typing.data.Float64Array,
         iters: int,
+        moment_cov: linearmodels.typing.data.Float64Array | None = None,
     ) -> dict[str, Any]:
         """GMM-specific post-estimation results"""
         instr = self._instr_columns
@@ -1441,7 +1485,7 @@ class IVGMM(_IVGMMBase):
             "weight_type": self._weight_type,
             "weight_config": self._weight.config,
             "iterations": iters,
-            "j_stat": self._j_statistic(params, weight_mat),
+            "j_stat": self._j_statistic(params, weight_mat, moment_cov),
             "centered_j_stat": self._centered_j_statistic(params),
         }
 
@@ -1484,6 +1528,11 @@ class IVGMMCUE(_IVGMMBase):
     In most circumstances, the ``center`` weight option should be ``True`` to
     avoid starting value dependence. It is ``True`` unless ``center`` is
     passed in ``weight_config``.
+
+    The covariance of the moment conditions has to be nonsingular. A clustered
+    covariance that is estimated from G clusters has rank at most G, and at
+    most G - 1 if the moment conditions are centered, so that there have to be
+    more clusters than moment conditions if ``center`` is ``True``.
 
     .. math::
 
@@ -1719,6 +1768,51 @@ class IVGMMCUE(_IVGMMBase):
 
         return res.x[:, None], res.nit
 
+    def _check_moment_covariance(self) -> None:
+        """
+        Raise a ValueError if the covariance of the moment conditions is singular
+
+        The objective function uses the inverse of the covariance, so it is not
+        defined if the covariance is singular. The rank of the covariance does
+        not depend on the parameters, other than for special values such as
+        residuals that are all 0, and so it is tested at the first step
+        estimates of two-step GMM.
+        """
+        wy, wx, wz = self._wy, self._wx, self._wz
+        nobs, nmoment = wz.shape
+        params = IVGMM.estimate_parameters(wx, wy, wz, inv(wz.T @ wz / nobs))
+        if not _is_singular(self._weight.weight_matrix(wx, wz, wy - wx @ params)):
+            return
+        if isinstance(self._weight, OneWayClusteredWeightMatrix):
+            nclusters = len(unique(asarray(self._weight_config["clusters"])))
+            centered = self._weight_config["center"]
+            rank = nclusters - 1 if centered else nclusters
+            rank_reason = (
+                "one less than the number of clusters, since the cluster sums of "
+                "centered moment conditions add to zero"
+                if centered
+                else "the number of clusters"
+            )
+            msg = (
+                f"The clustered covariance of the {nmoment} moment conditions is "
+                f"singular because there are too few clusters ({nclusters} "
+                f"clusters). Its rank is at most {rank}, {rank_reason}. The "
+                "objective function of the continuously updating GMM estimator "
+                "uses the inverse of the covariance, so it is not defined. Use "
+                "more clusters than moment conditions, or a weight_type that does "
+                "not use clusters."
+            )
+        else:
+            msg = (
+                f"The covariance of the {nmoment} moment conditions is singular, "
+                f"which occurs if there are too few observations ({nobs}) for the "
+                "number of moment conditions. The objective function of the "
+                "continuously updating GMM estimator uses the inverse of the "
+                "covariance, so it is not defined. Use more observations or fewer "
+                "moment conditions."
+            )
+        raise ValueError(msg)
+
     def fit(
         self,
         *,
@@ -1761,6 +1855,15 @@ class IVGMMCUE(_IVGMMBase):
         IVGMMResults
             Results container
 
+        Raises
+        ------
+        ValueError
+            If the covariance of the moment conditions is singular, which
+            occurs if there are too few clusters or observations. The
+            number of clusters has to be larger than the number of moment
+            conditions if the moment conditions are centered, which is the
+            default.
+
         Notes
         -----
         Starting values are computed by IVGMM.
@@ -1772,6 +1875,7 @@ class IVGMMCUE(_IVGMMBase):
         self._check_clusters(cov_config)
         wy, wx, wz = self._wy, self._wx, self._wz
         weight_matrix = self._weight.weight_matrix
+        self._check_moment_covariance()
         if starting is None:
             exog = None if self.exog.shape[1] == 0 else self.exog
             endog = None if self.endog.shape[1] == 0 else self.endog
@@ -1795,14 +1899,15 @@ class IVGMMCUE(_IVGMMBase):
             starting, wx, wy, wz, display, opt_options=opt_options
         )
         eps = wy - wx @ params
-        wmat = inv(weight_matrix(wx, wz, eps))
+        moment_cov = weight_matrix(wx, wz, eps)
+        wmat = inv(moment_cov)
 
         cov_config["debiased"] = debiased
         cov_estimator = IVGMMCovariance(
             wx, wy, wz, params, wmat, cov_type, **cov_config
         )
         results = self._post_estimation(params, cov_estimator, cov_type)
-        gmm_pe = self._gmm_post_estimation(params, wmat, iters)
+        gmm_pe = self._gmm_post_estimation(params, wmat, iters, moment_cov)
         results.update(gmm_pe)
 
         return IVGMMResults(results, self)
