@@ -61,6 +61,7 @@ from linearmodels.panel.utility import (
 from linearmodels.shared.alignment import check_alignment, is_default_index, row_labels
 from linearmodels.shared.exceptions import missing_warning
 from linearmodels.shared.hypotheses import InvalidTestStatistic, WaldTestStatistic
+from linearmodels.shared.inputs import as_array_like
 from linearmodels.shared.utility import DataFrameWrapper, SeriesWrapper
 import linearmodels.typing.data
 
@@ -438,13 +439,14 @@ class Interaction:
 
     Parameters
     ----------
-    cat : {ndarray, Series, DataFrame, DataArray}
+    cat : array_like
         Variables to treat as categoricals. Best format is a Categorical
         Series or DataFrame containing Categorical Series. Other formats
         are converted to Categorical Series, column-by-column. cats has
         shape (nobs, ncat).
-    cont : {ndarray, Series, DataFrame, DataArray}
-        Variables to treat as continuous, (nobs, ncont).
+    cont : array_like
+        Variables to treat as continuous, (nobs, ncont). A ``TypeError`` is
+        raised if the values are complex or cannot be converted to float64.
 
     Notes
     -----
@@ -492,8 +494,9 @@ class Interaction:
         cont: linearmodels.typing.data.ArrayLike | None = None,
         nobs: int | None = None,
     ) -> None:
-        self._cat = cat
-        self._cont = cont
+        # Lists and tuples are arrays, which have the shape that is used below
+        self._cat = None if cat is None else as_array_like(cat, "cat")
+        self._cont = None if cont is None else as_array_like(cont, "cont")
         self._cat_data = self._iv_data
         self._cont_data = self._iv_data
         self._nobs = nobs
@@ -990,7 +993,7 @@ class AbsorbingLS:
             self._weight_data = IVData(ones(nobs), "weights")
         else:
             self._is_weighted = True
-            weights = IVData(self._weights).ndarray
+            weights = IVData(self._weights, var_name="weights").ndarray
             weights = weights / nanmean(weights)
             self._weight_data = IVData(weights, var_name="weights", nobs=self._nobs)
 

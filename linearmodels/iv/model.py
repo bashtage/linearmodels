@@ -188,7 +188,7 @@ class _IVModelBase:
         self._original_index = self.dependent.pandas.index
         if weights is None:
             weights = ones(self.dependent.shape)
-        weights_data = IVData(weights)
+        weights_data = IVData(weights, var_name="weights")
         check_alignment(
             row_labels(self.dependent),
             {
@@ -312,9 +312,9 @@ class _IVModelBase:
                 "of exog/endog or data, but not both."
             )
         if exog is not None:
-            exog = IVData(exog).pandas
+            exog = IVData(exog, var_name="exog").pandas
         if endog is not None:
-            endog = IVData(endog).pandas
+            endog = IVData(endog, var_name="endog").pandas
         if data is not None:
             parser = IVFormulaParser(self.formula, data, eval_env=eval_env)
             exog = parser.exog

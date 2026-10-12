@@ -34,6 +34,7 @@ from linearmodels.shared.alignment import (
 )
 from linearmodels.shared.exceptions import missing_warning
 from linearmodels.shared.hypotheses import InvalidTestStatistic, WaldTestStatistic
+from linearmodels.shared.inputs import as_array_like, as_float64
 from linearmodels.shared.linalg import has_constant
 from linearmodels.shared.utility import AttrDict
 from linearmodels.system._utility import (
@@ -165,6 +166,12 @@ class SystemFormulaParser:
     ) -> None:
         if not isinstance(formula, (Mapping, str)):
             raise TypeError("formula must be a string or dictionary-like")
+        if weights is not None and not hasattr(weights, "keys"):
+            raise TypeError(
+                "weights must be dictionary-like, such as a dict or a DataFrame, "
+                "where the key of each value is an equation label. "
+                f"Got {type(weights).__name__}."
+            )
         self._formula: Mapping[str, str] | str = formula
         self._data = data
         self._weights = weights
@@ -188,6 +195,9 @@ class SystemFormulaParser:
     def _convert_to_series(
         value: linearmodels.typing.data.ArrayLike, name: str
     ) -> Series:
+        value = as_array_like(value, name)
+        if isinstance(value, np.ndarray):
+            value = as_float64(value, name)
         shape = value.shape
         if len(shape) > 2 or (len(shape) == 2 and min(shape) != 1):
             raise ValueError(f"{name} must be squeezable to 1D.")
@@ -343,7 +353,10 @@ class _SystemModelBase:
         can contain either an empty array or `None` to indicate that an
         equation contains no exogenous regressors. Similarly "endog" and
         "instruments" can either be omitted or may contain an empty array (or
-        `None`) if all variables in an equation are exogenous.
+        `None`) if all variables in an equation are exogenous. The variables are
+        array_like, such as lists, NumPy arrays, pandas objects and xarray
+        DataArrays, and a ``TypeError`` that names the variable is raised for
+        complex values or text.
     sigma : array_like
         Prespecified residual covariance to use in GLS estimation. If not
         provided, FGLS is implemented based on an estimate of sigma.
@@ -436,7 +449,8 @@ class _SystemModelBase:
                     IVData(eq_data[3], var_name=instr_name, nobs=dep.shape[0])
                 )
                 if len(eq_data) == 5:
-                    self._weights.append(IVData(eq_data[4]))
+                    weights_name = "weights_" + str(i)
+                    self._weights.append(IVData(eq_data[4], var_name=weights_name))
                 else:
                     dep_shape = self._dependent[-1].shape
                     self._weights.append(IVData(np.ones(dep_shape)))
@@ -461,7 +475,10 @@ class _SystemModelBase:
                 self._instr.append(instr)
 
                 if "weights" in eq_data:
-                    self._weights.append(IVData(eq_data["weights"]))
+                    weights_name = "weights_" + str(i)
+                    self._weights.append(
+                        IVData(eq_data["weights"], var_name=weights_name)
+                    )
                 else:
                     self._weights.append(IVData(np.ones(dep.shape)))
             else:
@@ -726,12 +743,12 @@ class _SystemModelBase:
                     continue
 
                 if exog is not None:
-                    exog_endog = IVData(exog).pandas
+                    exog_endog = IVData(exog, var_name="exog").pandas
                     if endog is not None:
-                        endog_ivd = IVData(endog)
+                        endog_ivd = IVData(endog, var_name="endog")
                         exog_endog = concat([exog_endog, endog_ivd.pandas], axis=1)
                 else:
-                    exog_endog = IVData(endog).pandas
+                    exog_endog = IVData(endog, var_name="endog").pandas
 
                 fitted = np.asarray(exog_endog) @ b
                 fitted_df = DataFrame(fitted, index=exog_endog.index, columns=[label])
@@ -1474,7 +1491,10 @@ class IV3SLS(_LSSystemModelBase):
         can contain either an empty array or `None` to indicate that an
         equation contains no exogenous regressors. Similarly "endog" and
         "instruments" can either be omitted or may contain an empty array (or
-        `None`) if all variables in an equation are exogenous.
+        `None`) if all variables in an equation are exogenous. The variables are
+        array_like, such as lists, NumPy arrays, pandas objects and xarray
+        DataArrays, and a ``TypeError`` that names the variable is raised for
+        complex values or text.
     sigma : array_like
         Prespecified residual covariance to use in GLS estimation. If not
         provided, FGLS is implemented based on an estimate of sigma.
@@ -1604,8 +1624,9 @@ class IV3SLS(_LSSystemModelBase):
         if exog is None and endog is None:
             raise ValueError("At least one of exog or endog must be provided")
         exog_ivd = IVData(exog, var_name="exog")
-        endog_ivd = IVData(endog, var_name="endog", nobs=dependent.shape[0])
-        instr_ivd = IVData(instruments, var_name="instruments", nobs=dependent.shape[0])
+        nobs = dependent_ivd.shape[0]
+        endog_ivd = IVData(endog, var_name="endog", nobs=nobs)
+        instr_ivd = IVData(instruments, var_name="instruments", nobs=nobs)
         for col in dependent_ivd.pandas:
             equations[str(col)] = {
                 # TODO: Bug in pandas-stubs
@@ -1701,7 +1722,9 @@ class SUR(_LSSystemModelBase):
         values.  Each key is an equations label and must be a string. Each
         value must be either a tuple of the form (dependent,
         exog, [weights]) or a dictionary with keys "dependent" and "exog" and
-        the optional key "weights".
+        the optional key "weights". The variables are array_like, such as lists,
+        NumPy arrays, pandas objects and xarray DataArrays, and a ``TypeError``
+        that names the variable is raised for complex values or text.
     sigma : array_like
         Prespecified residual covariance to use in GLS estimation. If not
         provided, FGLS is implemented based on an estimate of sigma.
@@ -1941,7 +1964,10 @@ class IVSystemGMM(_SystemModelBase):
         exog, endog, instrument[, weights]) or a dictionary with keys "dependent",
         "exog".  The dictionary may contain optional keys for "endog",
         "instruments", and "weights". Endogenous and/or Instrument can be empty
-        if all variables in an equation are exogenous.
+        if all variables in an equation are exogenous. The variables are
+        array_like, such as lists, NumPy arrays, pandas objects and xarray
+        DataArrays, and a ``TypeError`` that names the variable is raised for
+        complex values or text.
     sigma : array_like
         Prespecified residual covariance to use in GLS estimation. If not
         provided, FGLS is implemented based on an estimate of sigma. Only used
