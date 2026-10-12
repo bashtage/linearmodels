@@ -1144,6 +1144,18 @@ def test_system_clusters_containers(system, cls, kind):
     assert_allclose(res.cov, expected.cov, rtol=1e-10)
 
 
+@pytest.mark.parametrize("cls", [SUR, IV3SLS], ids=["SUR", "IV3SLS"])
+@pytest.mark.parametrize("shape", [(NOBS, 3), (NOBS, 2, 2), (NOBS - 1,)])
+def test_system_clusters_with_the_wrong_shape_raise_a_plain_message(system, cls, shape):
+    mod = cls(equations(system, cls))
+    clusters = np.arange(np.prod(shape)).reshape(shape) % 5
+    with pytest.raises(ValueError, match="clusters must be an ndarray") as exc:
+        mod.fit(cov_type="clustered", clusters=clusters)
+    # The message is the only argument, and so it is not printed as a tuple
+    assert len(exc.value.args) == 1
+    assert str(exc.value).startswith("clusters must be an ndarray")
+
+
 # --------------------------------------------------------------------------- #
 # Asset pricing
 # --------------------------------------------------------------------------- #
