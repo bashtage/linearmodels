@@ -342,8 +342,9 @@ class GMMFactorModelResults(LinearFactorModelResults):
         ase = np.sqrt(np.diag(self._alpha_vcv))
         nportfolio, nfactor = self._params.shape
         nloadings = nportfolio * (nfactor - 1)
-        se = np.r_[ase, se[:nloadings]]
-        se = se.reshape((nportfolio, nfactor))
+        # One row for each portfolio: the alpha, followed by the loadings
+        loadings_se = se[:nloadings].reshape((nportfolio, nfactor - 1))
+        se = np.column_stack([ase, loadings_se])
         return pd.DataFrame(se, columns=self._cols, index=self._portfolio_names)
 
     @property
