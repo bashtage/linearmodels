@@ -278,17 +278,59 @@ accepted for ``weights``, ``clusters`` and ``other_effects``. It does not carry
 labels.
 
 Weights can be provided in any of the following shapes, where ``nobs`` is the
-number of time periods and ``nentity`` is the number of entities.
+number of time periods, ``nentity`` is the number of entities and ``nrows`` is the
+number of rows of ``dependent``. ``nrows`` is ``nobs * nentity`` if ``dependent`` is
+balanced and less if it is not.
 
-* A single weight for each observation, either as a 1-d array with
-  ``nobs * nentity`` values or as a Series or DataFrame with the same MultiIndex
-  as ``dependent``.
+* A single weight for each observation, either as a 1-d array with ``nrows``
+  values or as a Series or DataFrame with the same MultiIndex as ``dependent``.
 * A single weight for each time period, as a 1-d array or Series with ``nobs``
   values. The weight is used for every entity.
 * A single weight for each entity, as a 1-d array or Series with ``nentity``
   values. The weight is used for every time period.
 * A weight for each time period and entity, as a 2-d array or a DataFrame with
   ``nobs`` rows and ``nentity`` columns.
+
+The number of values of a 1-d array decides how it is read, whether or not
+``dependent`` is balanced.
+
+* An array with ``nrows`` values is a weight for each observation. Its values are
+  paired with the rows of ``dependent`` by position, in the order of the rows,
+  whatever that order is, as a 1-d array of ``clusters`` or ``other_effects`` is. They
+  are paired before the observations with missing values are dropped, so the array has
+  a value for every row of ``dependent``, including the rows with a missing value of
+  ``dependent`` or ``exog``.
+* An array with ``nobs`` values is a weight for each time period, and an array with
+  ``nentity`` values is a weight for each entity.
+* If ``nobs`` and ``nentity`` are equal, an array with that many values could be
+  either, and an ``AmbiguityError`` is raised. Give the weights as a 2-d array or for
+  each row instead.
+* If ``dependent`` is not balanced and has as many rows as time periods or entities,
+  which happens if every time period or entity has a single observation, an array with
+  that many values is a weight for each observation.
+* Any other number of values raises a ``ValueError`` that gives the numbers that are
+  accepted. An array with ``nobs * nentity`` values is a weight for each observation
+  only if ``dependent`` is balanced. If it is not, use a 2-d array to give a weight to
+  each combination of a time period and an entity.
+
+For example, the weights of a panel that is not balanced, whose rows are in any order,
+can be given as a column of the data that has a value for each row
+
+.. code-block:: python
+
+    weights = data["weight"].to_numpy()  # a value for each row, in the order of the rows
+    mod = PanelOLS(data["y"], data[["x"]], weights=weights, entity_effects=True)
+
+.. versionchanged:: 7.1
+
+   A 1-d array with a weight for each observation can be used if ``dependent`` is not
+   balanced. Earlier versions raised "Weights do not have a supported shape" for it,
+   although the same weights as a Series with the index of ``dependent`` worked, and
+   an array with ``nobs * nentity`` values raised an error from pandas or NumPy. If
+   ``dependent`` is not balanced and has as many rows as time periods or entities,
+   an array with that many values is a weight for each observation. Earlier versions
+   read it as a weight for each time period or entity, or raised an
+   ``AmbiguityError`` if the numbers of time periods and entities were equal.
 
 Weights that are defined for each time period, for each entity or for each
 combination of the two are matched to the time periods and entities in the
