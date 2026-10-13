@@ -404,6 +404,93 @@ def _is_labelled(value: object) -> bool:
     return is_labelled(value, columns=True)
 
 
+def _is_grid(value: object) -> bool:
+    """Whether a panel input has a value for each time period and entity.
+
+    Such an input is a grid, with the time periods as its rows and the entities as
+    its columns: a NumPy array with 2 dimensions (time by entity) or 3 dimensions
+    (variable by time by entity), a DataFrame that does not have a MultiIndex, or
+    a DataArray. A 1-d array, a Series or a DataFrame with a MultiIndex, and a
+    PanelData, have a value for each row of dependent instead.
+    """
+    if isinstance(value, np.ndarray):
+        return value.ndim != 1
+    if isinstance(value, DataFrame):
+        return not isinstance(value.index, MultiIndex)
+    return not isinstance(value, (Series, PanelData))
+
+
+def _grid_axis(labels: Index, groups: Index) -> Index:
+    """The distinct labels of one axis of a grid, in the order of the grid.
+
+    Parameters
+    ----------
+    labels : Index
+        The label of this axis for each row of a panel, e.g., the time periods.
+    groups : Index
+        The label of the other axis for each row, e.g., the entities.
+
+    Returns
+    -------
+    Index
+        The distinct labels in the order of the grid. If the rows of every group
+        have the labels in ascending order, it is the ascending order of the
+        labels, and if they are in descending order it is the descending order.
+        Otherwise it is the order in which the labels first appear in the rows.
+
+    Notes
+    -----
+    The order of first appearance is the order of the labels if the rows are sorted
+    and the panel is balanced, whether the rows are sorted by group and then label
+    or by label and then group. It is not if the panel is not balanced and the first
+    groups do not have the first labels, e.g., the first entity enters late and the
+    rows are sorted by entity. The sorted order is used then. If the panel is
+    balanced and the rows of every group are in order of the labels, they first
+    appear in the same order, so that the rows are not examined.
+    """
+    appearance = labels.unique()
+    if len(labels) == len(appearance) * len(groups.unique()):
+        return appearance
+    try:
+        codes, ordered = factorize(labels, sort=True)
+    except TypeError:
+        # The labels cannot be ordered
+        return appearance
+    if len(ordered) != len(appearance):
+        return appearance
+    group_codes = np.asarray(factorize(groups)[0])
+    rows = np.argsort(group_codes, kind="stable")
+    group_codes, codes = group_codes[rows], np.asarray(codes)[rows]
+    # The steps between the rows of a group, which are in the order of the rows
+    steps = np.diff(codes)[group_codes[1:] == group_codes[:-1]]
+    if np.all(steps > 0):
+        return ordered
+    if np.all(steps < 0):
+        return ordered[::-1]
+    return appearance
+
+
+def _grid_axes(index: Index) -> tuple[Index, Index]:
+    """The entities and time periods in the order of a grid placed on the rows.
+
+    Parameters
+    ----------
+    index : Index
+        The rows of a panel, a MultiIndex with the entities in the first level and
+        the time periods in the second.
+
+    Returns
+    -------
+    entities : Index
+        The distinct entities, which are the columns of the grid.
+    times : Index
+        The distinct time periods, which are the rows of the grid.
+    """
+    entities = index.get_level_values(0)
+    times = index.get_level_values(1)
+    return _grid_axis(entities, times), _grid_axis(times, entities)
+
+
 class _PanelModelBase:
     r"""
     Base class for all panel models
@@ -434,6 +521,9 @@ class _PanelModelBase:
         Weights with labels must use the same labels, in the same order,
         as dependent or, if dependent has no labels, as exog. See
         :ref:`panel-input-alignment`.
+        Dependent need not be balanced when the weights are given for each time
+        period, entity or combination: the weights of the combinations that
+        dependent does not have are not used.
     check_rank : bool
         Flag indicating whether to perform a rank check on the exogenous
         variables to ensure that the model is identified. Skipping this
@@ -459,6 +549,10 @@ class _PanelModelBase:
         self._check_labels("dependent", self.dependent.index, _is_labelled(dependent))
         self._check_labels("exog", self.exog.index, _is_labelled(exog))
         self._original_shape = self.dependent.shape
+        # The rows of dependent, before the observations with missing values are
+        # dropped. The inputs that are given for each time period and entity are
+        # placed on these rows
+        self._original_index = self.dependent.index.copy()
         self._constant = False
         self._formula: str | None = None
         self._is_weighted = True
@@ -475,7 +569,6 @@ class _PanelModelBase:
             DriscollKraay,
             ACCovariance,
         )
-        self._original_index = self.dependent.index.copy()
         self._constant_index: int | None = None
         self._check_rank = bool(check_rank)
         self._validate_data()
@@ -583,6 +676,12 @@ class _PanelModelBase:
         clusters : array_like
             Values to use for variance clustering. A 1-d array has one value
             for each row of dependent, in the order of the rows of dependent.
+            A 2-d array (time by entity), a 3-d array (variable by time by
+            entity), a DataFrame with the time periods as its index and the
+            entities as its columns and a DataArray have a value for each
+            time period and entity. They are placed on the rows of dependent,
+            which need not be balanced: the values of the time periods and
+            entities that dependent does not have are not used.
 
         Returns
         -------
@@ -590,9 +689,39 @@ class _PanelModelBase:
             Original data with matching axis and observation dropped where
             missing in the model data.
 
+        Raises
+        ------
+        ValueError
+            If clusters does not have the numbers of entities and time periods of
+            dependent, or has labels that are not those of dependent in the same
+            order. A value for each time period and entity must have the time
+            periods and entities in the order that the Notes describe.
+
         Notes
         -----
         This is exposed for testing and is not normally needed for estimation
+
+        The time periods and entities of a value for each time period and entity
+        are matched to those of dependent in the order in which they first appear
+        in the rows of dependent. If dependent is not balanced and the first entity
+        does not have the first periods, the periods of a panel that is sorted by
+        entity first appear in an order that is not their order in time. The time
+        periods are in order of time then, if the rows of every entity are in order
+        of time (in either direction), and the entities are in the order of their
+        labels if the rows of every time period are in order of the entities. A
+        pandas object or DataArray with labels must have the time periods and
+        entities in this order.
+
+        .. versionchanged:: 7.1
+
+           A value for each time period and entity can be used if dependent is
+           not balanced. It raised ``IndexError: Boolean index has wrong length``.
+           It is placed on the rows of dependent by time period and entity.
+           Earlier versions paired it by position with the rows of dependent, which
+           is right only if the rows are sorted by entity and then time. If they
+           were sorted by time and then entity, an array was attached to the wrong
+           observations without an error, and a pandas object with labels was
+           rejected.
         """
         clusters = as_array_like(clusters, "clusters")
         labelled = _is_labelled(clusters)
@@ -602,7 +731,13 @@ class _PanelModelBase:
                 "clusters must have the same number of entities "
                 "and time periods as the model data."
             )
-        if labelled and self._labels is not None:
+        if _is_grid(clusters):
+            # Compared with the labels of the model if it has any. Unlike the other
+            # inputs, the clusters never set the labels, as they are given to fit
+            clusters_pd = self._grid_to_rows(
+                clusters_pd, labelled and self._labels is not None, "clusters"
+            )
+        elif labelled and self._labels is not None:
             check_row_alignment(
                 "clusters", clusters_pd.index, self._labels, self._labels_name
             )
@@ -655,16 +790,13 @@ class _PanelModelBase:
         if isinstance(weights, np.ndarray):
             weights = as_float64(weights, "weights")
         nobs, nentity = self.exog.nobs, self.exog.nentity
-        index = self.dependent.index
-        entities = index.get_level_values(0).unique()
-        times = index.get_level_values(1).unique()
+        entities, times = _grid_axes(self.dependent.index)
         labelled = _is_labelled(weights)
         # Weights for each time period or entity have to use the time periods or
         # entities of the inputs with labels, if there are any
         reference = self._labels
         if reference is not None:
-            ref_entities = reference.get_level_values(0).unique()
-            ref_times = reference.get_level_values(1).unique()
+            ref_entities, ref_times = _grid_axes(reference)
 
         if weights.ndim == 3 or weights.shape == (nobs, nentity):
             panel = _panel_data(weights, "weights", "x")
@@ -719,7 +851,9 @@ class _PanelModelBase:
             raise ValueError("Weights do not have a supported shape.")
         return self._grid_to_rows(PanelData(grid), False)
 
-    def _grid_to_rows(self, grid: PanelData, labelled: bool) -> PanelData:
+    def _grid_to_rows(
+        self, grid: PanelData, labelled: bool, name: str = "weights"
+    ) -> PanelData:
         """
         Place values defined on a time by entity grid on the rows of dependent
 
@@ -731,40 +865,43 @@ class _PanelModelBase:
             Whether the grid carries labels, which have to match the entities and
             time periods of the inputs with labels. If False, the position along
             each axis of the grid is paired with the entities and time periods
-            of dependent in order of appearance.
+            of dependent in order of appearance, see ``_grid_axes``.
+        name : str, optional
+            The name of the input, which is used in the messages. The default is
+            "weights".
 
         Returns
         -------
         PanelData
-            Values with the same rows as dependent. If dependent is not
-            balanced or the grid has the wrong shape then grid is returned
-            and the mismatch is reported when the data are validated.
+            Values with the rows of dependent, before the observations with
+            missing values were dropped. If dependent is not balanced, the values
+            of the combinations of a time period and an entity that it does not
+            have are not used. If the grid has the wrong shape then grid is
+            returned, and the caller reports the mismatch.
         """
-        index = self.dependent.index
-        grid_index = MultiIndex.from_product(
-            [index.get_level_values(0).unique(), index.get_level_values(1).unique()]
-        )
+        index = self._original_index
+        grid_index = MultiIndex.from_product(_grid_axes(index))
         rows = grid.dataframe
-        if len(rows) != len(grid_index) or len(index) != len(grid_index):
+        if len(rows) != len(grid_index):
             return grid
         if labelled and self._labels is None:
-            self._check_labels("weights", rows.index, labelled)
+            self._check_labels(name, rows.index, labelled)
         elif labelled:
             assert self._labels is not None
             expected = MultiIndex.from_product(
-                [
-                    self._labels.get_level_values(0).unique(),
-                    self._labels.get_level_values(1).unique(),
-                ]
+                _grid_axes(self._labels),
             )
             if len(expected) == len(rows) and not same_labels(rows.index, expected):
                 raise misaligned(
-                    "weights", "The time and entity index", self._labels_name
+                    name,
+                    "The time and entity index",
+                    self._labels_name,
                 )
         rows = rows.set_axis(grid_index, axis=0)
         if not grid_index.equals(index):
             rows = rows.reindex(index)
-        return PanelData(rows)
+        # Text and categories, e.g., the clusters, are not converted to dummy variables
+        return PanelData(rows, convert_dummies=False)
 
     def _check_exog_rank(self) -> int:
         x = cast("linearmodels.typing.data.Float64Array", self.exog.values2d)
@@ -1187,8 +1324,10 @@ class _PanelModelBase:
             if self._singleton_index is not None:
                 # The clusters have a value for each observation that is not missing.
                 # The singletons are dropped from the data of the model, and so are
-                # the clusters that are made from it below, which do not need this
-                clusters_frame = clusters_frame.loc[~self._singleton_index]
+                # the clusters that are made from it below, which do not need this.
+                # The copy is not a slice of the frame, which the columns that are
+                # added below would be set on
+                clusters_frame = clusters_frame.loc[~self._singleton_index].copy()
 
         cluster_entity = bool(cov_config_upd.pop("cluster_entity", False))
         if cluster_entity:
@@ -1321,6 +1460,9 @@ class PooledOLS(_PanelModelBase):
         Weights with labels must use the same labels, in the same order,
         as dependent or, if dependent has no labels, as exog. See
         :ref:`panel-input-alignment`.
+        Dependent need not be balanced when the weights are given for each time
+        period, entity or combination: the weights of the combinations that
+        dependent does not have are not used.
     check_rank : bool
         Flag indicating whether to perform a rank check on the exogenous
         variables to ensure that the model is identified. Skipping this
@@ -1335,6 +1477,12 @@ class PooledOLS(_PanelModelBase):
     .. math::
 
         y_{it}=\beta^{\prime}x_{it}+\epsilon_{it}
+
+    .. versionchanged:: 7.1
+
+       ``weights`` for each time period, each entity or each time period and
+       entity can be used if ``dependent`` is not balanced. Earlier versions
+       raised "weights must have the same number of observations as dependent".
     """
 
     def __init__(
@@ -1438,6 +1586,13 @@ class PooledOLS(_PanelModelBase):
         PanelResults
             Estimation results
 
+        Raises
+        ------
+        UnknownOptionError
+            If ``cov_type`` is not one of the supported names, or if it is
+            "kernel" or "ac" and ``kernel`` is not one of the supported kernels.
+            It is both a ``ValueError`` and a ``KeyError``.
+
         Examples
         --------
         >>> from linearmodels import PooledOLS
@@ -1458,6 +1613,12 @@ class PooledOLS(_PanelModelBase):
             array or list with a value for each row of ``dependent`` in the
             order of its rows, or an array or list with the layout of
             ``dependent`` (time by entity, or variable by time by entity).
+            An array or list with the layout, or a DataFrame with the time
+            periods as its index and the entities as its columns, has a value
+            for each time period and entity. It is placed on the rows of
+            ``dependent``, which need not be balanced: the values of the
+            combinations that ``dependent`` does not have are not used. See
+            :ref:`panel-input-alignment`.
             Clusters should be integer values, although other types will
             be coerced to integer values by treating as categorical variables
           * ``cluster_entity`` - Boolean flag indicating to use entity
@@ -1494,6 +1655,26 @@ class PooledOLS(_PanelModelBase):
         ``debiased=True`` and ``group_debias=True`` give the clustered
         covariance of Stata's ``regress ..., vce(cluster ...)``.
         See :ref:`panel-small-sample`.
+
+        .. versionchanged:: 7.1
+
+           A ``kernel`` that is not one of the supported names raises an
+           ``UnknownOptionError`` when the model is fit, for "kernel" and "ac".
+           Earlier versions raised it when the covariance was first used, for
+           example when ``std_errors`` of the results was read, so that ``fit``
+           returned results that raised when the covariance was used.
+
+        .. versionchanged:: 7.1
+
+           ``clusters`` with the layout of ``dependent`` (time by entity, or
+           variable by time by entity) can be used if ``dependent`` is not
+           balanced. It raised ``IndexError: Boolean index has wrong length``.
+           It is placed on the rows of ``dependent`` by time period and entity.
+           Earlier versions paired it by position with the rows, which is right
+           only if the rows are sorted by entity and then time: if they were sorted
+           by time and then entity, an array was attached to the wrong
+           observations without an error, and a pandas object with labels was
+           rejected.
         """
         y = self.dependent.values2d
         x = self.exog.values2d
@@ -1670,13 +1851,22 @@ class PanelOLS(_PanelModelBase):
         Weights with labels must use the same labels, in the same order,
         as dependent or, if dependent has no labels, as exog. See
         :ref:`panel-input-alignment`.
+        Dependent need not be balanced when the weights are given for each time
+        period, entity or combination: the weights of the combinations that
+        dependent does not have are not used.
     entity_effects : bool
         Flag whether to include entity (fixed) effects in the model
     time_effects : bool
         Flag whether to include time effects in the model
     other_effects : array_like, optional
         Category codes to use for any effects that are not entity or time
-        effects. Each variable is treated as an effect. A 1-d array or list has
+        effects. Each variable is treated as an effect. An array or list with the
+        layout of dependent (time by entity, or variable by time by entity), or a
+        DataFrame with the time periods as its index and the entities as its
+        columns, has a value for each time period and entity. It is placed on the
+        rows of dependent, which need not be balanced: the values of the
+        combinations that dependent does not have are not used (see
+        :ref:`panel-input-alignment`). A 1-d array or list has
         a value for each row of dependent, in the order of the rows of dependent.
         An observation where any of the other effects is missing (NaN or None) is
         dropped, with the observations that have a missing value in dependent, exog
@@ -1718,6 +1908,19 @@ class PanelOLS(_PanelModelBase):
         y_{it}=\alpha_i + \gamma_t + \beta^{\prime}x_{it} + \epsilon_{it}
 
     Additionally , arbitrary effects can be specified using categorical variables.
+
+    .. versionchanged:: 7.1
+
+       ``weights`` for each time period, each entity or each time period and
+       entity, and ``other_effects`` for each time period and entity, can be used
+       if ``dependent`` is not balanced. Earlier versions raised "weights must
+       have the same number of observations as dependent" for the weights, and an
+       error for ``other_effects``. A value for each time period and entity is
+       placed on the rows of ``dependent`` by time period and entity. Earlier
+       versions paired ``other_effects`` by position with the rows, which is right
+       only if the rows are sorted by entity and then time: if they were sorted by
+       time and then entity, an array was attached to the wrong observations
+       without an error, and a pandas object with labels was rejected.
 
     If both ``entity_effect`` and ``time_effects`` are ``False``, and no other
     effects are included, the model reduces to :class:`PooledOLS`.
@@ -1909,17 +2112,19 @@ class PanelOLS(_PanelModelBase):
         """
         if self._other_effects_input is None:
             return None
-        effects = self._panel_rows(
-            self._other_effects_input, "other_effects", "OtherEffect"
-        )
+        given = as_array_like(self._other_effects_input, "other_effects")
+        effects = self._panel_rows(given, "other_effects", "OtherEffect")
         if effects.shape[1:] != self._original_shape[1:]:
             raise ValueError(
                 "other_effects must have the same number of "
                 "entities and time periods as dependent."
             )
-        self._check_labels(
-            "other_effects", effects.index, _is_labelled(self._other_effects_input)
-        )
+        labelled = _is_labelled(self._other_effects_input)
+        if _is_grid(given):
+            # Placed on the rows of dependent by time period and entity
+            effects = self._grid_to_rows(effects, labelled, "other_effects")
+        else:
+            self._check_labels("other_effects", effects.index, labelled)
         nrows = len(self._original_index)
         if effects.dataframe.shape[0] != nrows:
             raise ValueError(
@@ -2495,6 +2700,13 @@ class PanelOLS(_PanelModelBase):
         PanelEffectsResults
             Estimation results
 
+        Raises
+        ------
+        UnknownOptionError
+            If ``cov_type`` is not one of the supported names, or if it is
+            "kernel" or "ac" and ``kernel`` is not one of the supported kernels.
+            It is both a ``ValueError`` and a ``KeyError``.
+
         Examples
         --------
         >>> from linearmodels import PanelOLS
@@ -2515,6 +2727,12 @@ class PanelOLS(_PanelModelBase):
             array or list with a value for each row of ``dependent`` in the
             order of its rows, or an array or list with the layout of
             ``dependent`` (time by entity, or variable by time by entity).
+            An array or list with the layout, or a DataFrame with the time
+            periods as its index and the entities as its columns, has a value
+            for each time period and entity. It is placed on the rows of
+            ``dependent``, which need not be balanced: the values of the
+            combinations that ``dependent`` does not have are not used. See
+            :ref:`panel-input-alignment`.
             Clusters should be integer valued, although other types will
             be coerced to integer values by treating as categorical variables
           * ``cluster_entity`` - Boolean flag indicating to use entity
@@ -2580,6 +2798,26 @@ class PanelOLS(_PanelModelBase):
            that the standard errors depended on the order of the variables, and the
            effects were not counted if they were nested in the last variable and
            not in the first.
+
+        .. versionchanged:: 7.1
+
+           A ``kernel`` that is not one of the supported names raises an
+           ``UnknownOptionError`` when the model is fit, for "kernel" and "ac".
+           Earlier versions raised it when the covariance was first used, for
+           example when ``std_errors`` of the results was read, so that ``fit``
+           returned results that raised when the covariance was used.
+
+        .. versionchanged:: 7.1
+
+           ``clusters`` with the layout of ``dependent`` (time by entity, or
+           variable by time by entity) can be used if ``dependent`` is not
+           balanced. It raised ``IndexError: Boolean index has wrong length``.
+           It is placed on the rows of ``dependent`` by time period and entity.
+           Earlier versions paired it by position with the rows, which is right
+           only if the rows are sorted by entity and then time: if they were sorted
+           by time and then entity, an array was attached to the wrong
+           observations without an error, and a pandas object with labels was
+           rejected.
         """
 
         weighted = np.any(self.weights.values2d != 1.0)
@@ -2834,6 +3072,9 @@ class BetweenOLS(_PanelModelBase):
         Weights with labels must use the same labels, in the same order,
         as dependent or, if dependent has no labels, as exog. See
         :ref:`panel-input-alignment`.
+        Dependent need not be balanced when the weights are given for each time
+        period, entity or combination: the weights of the combinations that
+        dependent does not have are not used.
 
     Notes
     -----
@@ -2844,6 +3085,12 @@ class BetweenOLS(_PanelModelBase):
         \bar{y}_{i}=  \beta^{\prime}\bar{x}_{i}+\bar{\epsilon}_{i}
 
     where :math:`\bar{z}` is the time-average.
+
+    .. versionchanged:: 7.1
+
+       ``weights`` for each time period, each entity or each time period and
+       entity can be used if ``dependent`` is not balanced. Earlier versions
+       raised "weights must have the same number of observations as dependent".
     """
 
     def __init__(
@@ -2962,6 +3209,12 @@ class BetweenOLS(_PanelModelBase):
             array or list with a value for each row of ``dependent`` in the
             order of its rows, or an array or list with the layout of
             ``dependent`` (time by entity, or variable by time by entity).
+            An array or list with the layout, or a DataFrame with the time
+            periods as its index and the entities as its columns, has a value
+            for each time period and entity. It is placed on the rows of
+            ``dependent``, which need not be balanced: the values of the
+            combinations that ``dependent`` does not have are not used. See
+            :ref:`panel-input-alignment`.
             Clusters should be integer values, although other types will
             be coerced to integer values by treating as categorical variables
           * ``group_debias`` - Boolean flag indicating whether to apply an
@@ -2977,6 +3230,18 @@ class BetweenOLS(_PanelModelBase):
         ``debiased=True``, which is the default, scales the covariance by
         n / (n - k), where k is the number of regressors, and uses the t and
         F distributions for inference. See :ref:`panel-small-sample`.
+
+        .. versionchanged:: 7.1
+
+           ``clusters`` with the layout of ``dependent`` (time by entity, or
+           variable by time by entity) can be used if ``dependent`` is not
+           balanced. It raised ``IndexError: Boolean index has wrong length``.
+           It is placed on the rows of ``dependent`` by time period and entity.
+           Earlier versions paired it by position with the rows, which is right
+           only if the rows are sorted by entity and then time: if they were sorted
+           by time and then entity, an array was attached to the wrong
+           observations without an error, and a pandas object with labels was
+           rejected.
         """
         y, x, w = self._prepare_between()
         if np.all(self.weights.values2d == 1.0) and not reweight:
@@ -3159,6 +3424,9 @@ class FirstDifferenceOLS(_PanelModelBase):
         Weights with labels must use the same labels, in the same order,
         as dependent or, if dependent has no labels, as exog. See
         :ref:`panel-input-alignment`.
+        Dependent need not be balanced when the weights are given for each time
+        period, entity or combination: the weights of the combinations that
+        dependent does not have are not used.
 
     Notes
     -----
@@ -3190,6 +3458,12 @@ class FirstDifferenceOLS(_PanelModelBase):
        The observations are differenced in the order of time. Earlier versions
        differenced against non-adjacent periods if the first entity enters late or
        has a gap.
+
+    .. versionchanged:: 7.1
+
+       ``weights`` for each time period, each entity or each time period and
+       entity can be used if ``dependent`` is not balanced. Earlier versions
+       raised "weights must have the same number of observations as dependent".
     """
 
     def __init__(
@@ -3309,6 +3583,13 @@ class FirstDifferenceOLS(_PanelModelBase):
         PanelResults
             Estimation results
 
+        Raises
+        ------
+        UnknownOptionError
+            If ``cov_type`` is not one of the supported names, or if it is
+            "kernel" or "ac" and ``kernel`` is not one of the supported kernels.
+            It is both a ``ValueError`` and a ``KeyError``.
+
         Examples
         --------
         >>> from linearmodels import FirstDifferenceOLS
@@ -3330,6 +3611,12 @@ class FirstDifferenceOLS(_PanelModelBase):
             array or list with a value for each row of ``dependent`` in the
             order of its rows, or an array or list with the layout of
             ``dependent`` (time by entity, or variable by time by entity).
+            An array or list with the layout, or a DataFrame with the time
+            periods as its index and the entities as its columns, has a value
+            for each time period and entity. It is placed on the rows of
+            ``dependent``, which need not be balanced: the values of the
+            combinations that ``dependent`` does not have are not used. See
+            :ref:`panel-input-alignment`.
             Clusters should be integer values, although other types will
             be coerced to integer values by treating as categorical variables
           * ``cluster_entity`` - Boolean flag indicating to use entity
@@ -3366,6 +3653,26 @@ class FirstDifferenceOLS(_PanelModelBase):
         ``debiased=True``, which is the default, scales the covariance by
         n / (n - k), where k is the number of regressors, and uses the t and
         F distributions for inference. See :ref:`panel-small-sample`.
+
+        .. versionchanged:: 7.1
+
+           A ``kernel`` that is not one of the supported names raises an
+           ``UnknownOptionError`` when the model is fit, for "kernel" and "ac".
+           Earlier versions raised it when the covariance was first used, for
+           example when ``std_errors`` of the results was read, so that ``fit``
+           returned results that raised when the covariance was used.
+
+        .. versionchanged:: 7.1
+
+           ``clusters`` with the layout of ``dependent`` (time by entity, or
+           variable by time by entity) can be used if ``dependent`` is not
+           balanced. It raised ``IndexError: Boolean index has wrong length``.
+           It is placed on the rows of ``dependent`` by time period and entity.
+           Earlier versions paired it by position with the rows, which is right
+           only if the rows are sorted by entity and then time: if they were sorted
+           by time and then entity, an array was attached to the wrong
+           observations without an error, and a pandas object with labels was
+           rejected.
         """
         y_fd = self.dependent.first_difference()
         time_ids = y_fd.time_ids
@@ -3558,6 +3865,9 @@ class RandomEffects(_PanelModelBase):
         Weights with labels must use the same labels, in the same order,
         as dependent or, if dependent has no labels, as exog. See
         :ref:`panel-input-alignment`.
+        Dependent need not be balanced when the weights are given for each time
+        period, entity or combination: the weights of the combinations that
+        dependent does not have are not used.
 
     Notes
     -----
@@ -3569,6 +3879,12 @@ class RandomEffects(_PanelModelBase):
 
     where :math:`u_i` is a shock that is independent of :math:`x_{it}` but
     common to all entities i.
+
+    .. versionchanged:: 7.1
+
+       ``weights`` for each time period, each entity or each time period and
+       entity can be used if ``dependent`` is not balanced. Earlier versions
+       raised "weights must have the same number of observations as dependent".
     """
 
     def __init__(
@@ -3676,6 +3992,13 @@ class RandomEffects(_PanelModelBase):
         RandomEffectsResults
             Estimation results
 
+        Raises
+        ------
+        UnknownOptionError
+            If ``cov_type`` is not one of the supported names, or if it is
+            "kernel" or "ac" and ``kernel`` is not one of the supported kernels.
+            It is both a ``ValueError`` and a ``KeyError``.
+
         Examples
         --------
         >>> from linearmodels import RandomEffects
@@ -3696,6 +4019,12 @@ class RandomEffects(_PanelModelBase):
             array or list with a value for each row of ``dependent`` in the
             order of its rows, or an array or list with the layout of
             ``dependent`` (time by entity, or variable by time by entity).
+            An array or list with the layout, or a DataFrame with the time
+            periods as its index and the entities as its columns, has a value
+            for each time period and entity. It is placed on the rows of
+            ``dependent``, which need not be balanced: the values of the
+            combinations that ``dependent`` does not have are not used. See
+            :ref:`panel-input-alignment`.
             Clusters should be integer values, although other types will
             be coerced to integer values by treating as categorical variables
           * ``cluster_entity`` - Boolean flag indicating to use entity
@@ -3761,6 +4090,26 @@ class RandomEffects(_PanelModelBase):
            have residual degrees of freedom in the regressions raise a
            ``ValueError``. Earlier versions raised an error from NumPy or SciPy,
            or returned variances that were not defined.
+
+        .. versionchanged:: 7.1
+
+           A ``kernel`` that is not one of the supported names raises an
+           ``UnknownOptionError`` when the model is fit, for "kernel" and "ac".
+           Earlier versions raised it when the covariance was first used, for
+           example when ``std_errors`` of the results was read, so that ``fit``
+           returned results that raised when the covariance was used.
+
+        .. versionchanged:: 7.1
+
+           ``clusters`` with the layout of ``dependent`` (time by entity, or
+           variable by time by entity) can be used if ``dependent`` is not
+           balanced. It raised ``IndexError: Boolean index has wrong length``.
+           It is placed on the rows of ``dependent`` by time period and entity.
+           Earlier versions paired it by position with the rows, which is right
+           only if the rows are sorted by entity and then time: if they were sorted
+           by time and then entity, an array was attached to the wrong
+           observations without an error, and a pandas object with labels was
+           rejected.
         """
         w = self.weights.values2d
         root_w = cast("linearmodels.typing.data.Float64Array", np.sqrt(w))
@@ -3960,6 +4309,9 @@ class FamaMacBeth(_PanelModelBase):
         Weights with labels must use the same labels, in the same order,
         as dependent or, if dependent has no labels, as exog. See
         :ref:`panel-input-alignment`.
+        Dependent need not be balanced when the weights are given for each time
+        period, entity or combination: the weights of the combinations that
+        dependent does not have are not used.
 
     Notes
     -----
@@ -4014,6 +4366,12 @@ class FamaMacBeth(_PanelModelBase):
     the degrees of freedom of the pooled regression, rejects a true null
     hypothesis too often when k is larger than 1, see
     :attr:`~linearmodels.panel.results.FamaMacBethResults.f_statistic_robust`.
+
+    .. versionchanged:: 7.1
+
+       ``weights`` for each time period, each entity or each time period and
+       entity can be used if ``dependent`` is not balanced. Earlier versions
+       raised "weights must have the same number of observations as dependent".
 
     References
     ----------
@@ -4114,7 +4472,8 @@ class FamaMacBeth(_PanelModelBase):
             at least 4 with the Bartlett kernel, 5 with the Parzen kernel and 6
             with the quadratic spectral kernel.
         kernel : str
-            The kernel to use.  None chooses the default kernel.
+            The kernel to use.  None chooses the default kernel. See Notes for
+            the names. It is checked for every ``cov_type``.
 
         Returns
         -------
@@ -4129,6 +4488,10 @@ class FamaMacBeth(_PanelModelBase):
             are used. It is also raised if it is "kernel", ``bandwidth`` is None
             and T is below the number that the automatic bandwidth needs, or the
             automatic bandwidth is not finite.
+        UnknownOptionError
+            If ``kernel`` is not one of the supported names, whether or not
+            ``bandwidth`` is given. It is both a ``ValueError`` and a
+            ``KeyError``.
 
         Examples
         --------
@@ -4206,6 +4569,15 @@ class FamaMacBeth(_PanelModelBase):
            ``OverflowError``) or "cannot convert float NaN to integer" when the
            covariance was first used, or used a bandwidth of T - 1 because of the
            rounding error of the sum.
+
+        .. versionchanged:: 7.1
+
+           A ``kernel`` that is not one of the supported names raises an
+           ``UnknownOptionError`` when the model is fit, whether or not
+           ``bandwidth`` is given. Earlier versions raised it when the covariance
+           was first used, for example when ``std_errors`` of the results was
+           read, so that ``fit`` returned results that raised when the covariance
+           was used.
         """
         # The retained observations and their weights, which are scaled to have a
         # mean of one once the observations with missing values are dropped
