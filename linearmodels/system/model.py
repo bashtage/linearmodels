@@ -2134,7 +2134,13 @@ class IVSystemGMM(_SystemModelBase):
     ``optimal_bw`` is ``False``. Otherwise, which is the default and what
     ``optimal_bw=True`` does, it is estimated from the data, from the
     residuals that the weight matrix is computed from. These are the residuals
-    of the first step estimates in two-step GMM, which is the default. In 7.0
+    of the first step estimates in two-step GMM, which is the default. A
+    bandwidth that is estimated from the data, for the weight matrix or the
+    covariance, needs at least 4 observations with the Bartlett kernel, 5 with
+    the Parzen kernel and 6 with the quadratic spectral kernel. ``fit`` raises a
+    ``ValueError`` for fewer observations, and if the estimated bandwidth is
+    not finite. Pass ``bandwidth`` to use the kernel with fewer observations.
+    See :func:`~linearmodels.iv.covariance.kernel_optimal_bandwidth`. In 7.0
     and earlier the default was ``nobs - 2``, which is not a consistent
     estimator of the covariance of the moment conditions, so the estimates,
     standard errors and J statistic can be different. ``fit`` issues a
@@ -2252,6 +2258,16 @@ class IVSystemGMM(_SystemModelBase):
         -------
         GMMSystemResults
             Estimation results
+
+        Raises
+        ------
+        ValueError
+            If a bandwidth is estimated from the data, for the kernel weight
+            matrix or for the kernel covariance, and there are fewer
+            observations than the kernel needs: 4 for the Bartlett kernel, 5
+            for the Parzen kernel and 6 for the quadratic spectral kernel. It
+            is also raised if the estimated bandwidth is not finite. Pass
+            ``bandwidth`` to use the kernel with fewer observations.
 
         Notes
         -----

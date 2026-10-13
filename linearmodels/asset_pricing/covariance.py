@@ -259,13 +259,27 @@ class KernelCovariance(HeteroskedasticCovariance, _HACMixin):
         Kernel name. See notes for available kernels. The default is "bartlett".
     bandwidth : int
         Non-negative integer bandwidth. If None, the optimal bandwidth is
-        estimated.
+        estimated. It needs at least 4 observations with the Bartlett kernel, 5
+        with the Parzen kernel and 6 with the quadratic spectral kernel, and a
+        ``ValueError`` is raised for fewer when the bandwidth is first used. See
+        :func:`~linearmodels.iv.covariance.kernel_optimal_bandwidth`.
     center : bool
         Flag indicating to center the scores when computing the covariance.
     debiased : bool
         Flag indicating to use a debiased estimator.
     df : int
         Degree of freedom value to use if debiasing.
+
+    Notes
+    -----
+    .. versionchanged:: 7.1
+
+       The optimal bandwidth raises a ``ValueError`` if there are fewer
+       observations than the kernel needs, and if it is not finite. Earlier
+       versions raised "cannot convert float infinity to integer" (an
+       ``OverflowError``) or "cannot convert float NaN to integer" for some
+       data, and used a bandwidth of nobs - 1, or another bandwidth, for other
+       data.
 
     See Also
     --------
@@ -381,7 +395,21 @@ class KernelWeight(HeteroskedasticWeight, _HACMixin):
         is set to "bartlett".
     bandwidth : int.
         Non-negative integer bandwidth. If None, the optimal bandwidth is
-        estimated.
+        estimated. It needs at least 4 observations with the Bartlett kernel, 5
+        with the Parzen kernel and 6 with the quadratic spectral kernel, and a
+        ``ValueError`` is raised for fewer when the bandwidth is first used. See
+        :func:`~linearmodels.iv.covariance.kernel_optimal_bandwidth`.
+
+    Notes
+    -----
+    .. versionchanged:: 7.1
+
+       The optimal bandwidth raises a ``ValueError`` if there are fewer
+       observations than the kernel needs, and if it is not finite. Earlier
+       versions raised "cannot convert float infinity to integer" (an
+       ``OverflowError``) or "cannot convert float NaN to integer" for some
+       data, and used a bandwidth of nobs - 1, or another bandwidth, for other
+       data.
     """
 
     def __init__(

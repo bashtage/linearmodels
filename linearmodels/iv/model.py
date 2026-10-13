@@ -1408,6 +1408,13 @@ class IVGMM(_IVGMMBase):
     :class:`~linearmodels.iv.gmm.KernelWeightMatrix` and
     :class:`~linearmodels.iv.gmm.IVGMMCovariance`.
 
+    The bandwidth that is estimated from the data needs at least 4 observations
+    with the Bartlett kernel, 5 with the Parzen kernel and 6 with the quadratic
+    spectral kernel. ``fit`` raises a ``ValueError`` for fewer observations, and
+    if the estimated bandwidth is not finite. Pass ``bandwidth`` or
+    ``optimal_bw=False`` to use the kernel with fewer observations. See
+    :func:`~linearmodels.iv.covariance.kernel_optimal_bandwidth`.
+
     Rows are paired by position. An input that carries labels (a pandas
     Series or DataFrame with an index other than the default 0, 1, ..., n-1,
     or an xarray DataArray with coordinates) must use the same index, in the
@@ -1623,7 +1630,10 @@ class IVGMM(_IVGMMBase):
             observations. A clustered estimate needs at least as many clusters
             as moment conditions, and more if the moment conditions are
             centered or the model is exactly identified. The estimate is not
-            used if ``iter_limit`` is 1.
+            used if ``iter_limit`` is 1. The error is also raised if the
+            bandwidth of a kernel weight matrix or of the kernel covariance is
+            estimated from the data and there are fewer observations than the
+            kernel needs, or the estimated bandwidth is not finite.
 
         See Also
         --------
@@ -1641,6 +1651,12 @@ class IVGMM(_IVGMMBase):
         for example ``fit(cov_type="kernel", optimal_bw=False)``. Passing
         ``bandwidth`` or ``optimal_bw`` silences the warning, and
         ``optimal_bw=True`` selects the bandwidth from the data without it.
+
+        The bandwidth that is estimated from the data needs at least 4
+        observations with the Bartlett kernel, 5 with the Parzen kernel and 6
+        with the quadratic spectral kernel. Pass ``bandwidth`` or
+        ``optimal_bw=False`` to use the kernel with fewer observations. See
+        :func:`~linearmodels.iv.covariance.kernel_optimal_bandwidth`.
         """
         self._check_clusters(cov_config)
         cov_config = self._check_default_bandwidth(cov_type, cov_config)
@@ -1800,6 +1816,13 @@ class IVGMMCUE(_IVGMMBase):
     ``nobs - 2`` for the starting values, so its estimates change slightly. See
     :class:`~linearmodels.iv.gmm.KernelWeightMatrix` and
     :class:`~linearmodels.iv.gmm.IVGMMCovariance`.
+
+    The bandwidth that is estimated from the data needs at least 4 observations
+    with the Bartlett kernel, 5 with the Parzen kernel and 6 with the quadratic
+    spectral kernel. ``fit`` raises a ``ValueError`` for fewer observations, and
+    if the estimated bandwidth is not finite. Pass ``bandwidth`` or
+    ``optimal_bw=False`` to use the kernel with fewer observations. See
+    :func:`~linearmodels.iv.covariance.kernel_optimal_bandwidth`.
 
     Rows are paired by position. An input that carries labels (a pandas
     Series or DataFrame with an index other than the default 0, 1, ..., n-1,
@@ -2172,7 +2195,10 @@ class IVGMMCUE(_IVGMMBase):
             moment conditions are not centered and there are as many clusters
             as moment conditions, so that the objective function is constant.
             The number of clusters has to be larger than the number of moment
-            conditions.
+            conditions. The error is also raised if the bandwidth of a kernel
+            weight matrix or of the kernel covariance is estimated from the data
+            and there are fewer observations than the kernel needs, or the
+            estimated bandwidth is not finite.
 
         See Also
         --------
@@ -2204,6 +2230,12 @@ class IVGMMCUE(_IVGMMBase):
         for example ``fit(cov_type="kernel", optimal_bw=False)``. Passing
         ``bandwidth`` or ``optimal_bw`` silences the warning, and
         ``optimal_bw=True`` selects the bandwidth from the data without it.
+
+        The bandwidth that is estimated from the data needs at least 4
+        observations with the Bartlett kernel, 5 with the Parzen kernel and 6
+        with the quadratic spectral kernel. Pass ``bandwidth`` or
+        ``optimal_bw=False`` to use the kernel with fewer observations. See
+        :func:`~linearmodels.iv.covariance.kernel_optimal_bandwidth`.
         """
         self._check_clusters(cov_config)
         cov_config = self._check_default_bandwidth(cov_type, cov_config)
@@ -2683,9 +2715,11 @@ class IVJIVE(_IVModelBase):
         is "bartlett") and ``bandwidth`` for "kernel" and ``clusters`` for
         "clustered". If ``bandwidth`` is not provided it is selected using the
         data, as in :class:`~linearmodels.iv.model.IV2SLS`, and the bandwidth
-        that was used is in ``cov_config`` of the results. "clustered" is
-        one-way clustering, and ``clusters`` has one element for each
-        observation.
+        that was used is in ``cov_config`` of the results. The selection needs
+        at least 4 observations with the Bartlett kernel, 5 with the Parzen
+        kernel and 6 with the quadratic spectral kernel, and a ``ValueError`` is
+        raised for fewer. "clustered" is one-way clustering, and ``clusters``
+        has one element for each observation.
 
         Since JIVE is not a k-class estimator, ``kappa`` is None in the
         results.

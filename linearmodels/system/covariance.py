@@ -323,7 +323,11 @@ class KernelCovariance(HeteroskedasticCovariance, _HACMixin):
 
     bandwidth : float
         Bandwidth to use for the kernel.  If not provided the optimal
-        bandwidth will be estimated.
+        bandwidth will be estimated. It needs at least 4 observations with the
+        Bartlett kernel, 5 with the Parzen kernel and 6 with the quadratic
+        spectral kernel, and a ``ValueError`` is raised for fewer when the
+        covariance is first used. See
+        :func:`~linearmodels.iv.covariance.kernel_optimal_bandwidth`.
 
     Notes
     -----
@@ -344,6 +348,15 @@ class KernelCovariance(HeteroskedasticCovariance, _HACMixin):
         (X'X)^{-1}\hat{S}(X'X)^{-1}
 
     where :math:`\hat{S}` is a estimator of the covariance of the model scores.
+
+    .. versionchanged:: 7.1
+
+       The optimal bandwidth raises a ``ValueError`` if there are fewer
+       observations than the kernel needs, and if it is not finite. Earlier
+       versions raised "cannot convert float infinity to integer" (an
+       ``OverflowError``) or "cannot convert float NaN to integer" for some
+       data, and used a bandwidth of nobs - 1, or another bandwidth, for other
+       data.
 
     See Also
     --------
@@ -754,7 +767,11 @@ class GMMKernelCovariance(GMMHeteroskedasticCovariance, _HACMixin):
 
     bandwidth : float
         Bandwidth to use for the kernel.  If not provided the optimal
-        bandwidth will be estimated.
+        bandwidth will be estimated. It needs at least 4 observations with the
+        Bartlett kernel, 5 with the Parzen kernel and 6 with the quadratic
+        spectral kernel, and a ``ValueError`` is raised for fewer when the
+        covariance is first used. See
+        :func:`~linearmodels.iv.covariance.kernel_optimal_bandwidth`.
 
     Notes
     -----
@@ -765,6 +782,15 @@ class GMMKernelCovariance(GMMHeteroskedasticCovariance, _HACMixin):
       (X'ZW^{-1}Z'X)^{-1}(X'ZW^{-1}\Omega W^{-1}Z'X)(X'ZW^{-1}Z'X)^{-1}
 
     where :math:`\Omega` is the covariance of the moment conditions.
+
+    .. versionchanged:: 7.1
+
+       The optimal bandwidth raises a ``ValueError`` if there are fewer
+       observations than the kernel needs, and if it is not finite. Earlier
+       versions raised "cannot convert float infinity to integer" (an
+       ``OverflowError``) or "cannot convert float NaN to integer" for some
+       data, and used a bandwidth of nobs - 1, or another bandwidth, for other
+       data.
     """
 
     def __init__(

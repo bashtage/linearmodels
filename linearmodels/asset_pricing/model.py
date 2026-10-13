@@ -422,7 +422,13 @@ class TradedFactorModel(_FactorModelBase):
 
         The kernel covariance estimator takes the optional arguments
         ``kernel``, one of "bartlett", "parzen" or "qs" (quadratic spectral)
-        and ``bandwidth`` (a positive integer).
+        and ``bandwidth`` (a positive integer). If ``bandwidth`` is not given it
+        is selected from the data, which needs at least 4 observations with the
+        Bartlett kernel, 5 with the Parzen kernel and 6 with the quadratic
+        spectral kernel. ``fit`` raises a ``ValueError`` for fewer observations,
+        and if the selected bandwidth is not finite. Pass ``bandwidth`` to use
+        the kernel with fewer observations. See
+        :func:`~linearmodels.iv.covariance.kernel_optimal_bandwidth`.
 
         If ``debiased`` is True, the covariance of the parameters of the
         time-series regressions (the alphas and the loadings) is divided by
@@ -901,7 +907,13 @@ class LinearFactorModel(_LinearFactorModelBase):
         -----
         The kernel covariance estimator takes the optional arguments
         ``kernel``, one of "bartlett", "parzen" or "qs" (quadratic spectral)
-        and ``bandwidth`` (a positive integer).
+        and ``bandwidth`` (a positive integer). If ``bandwidth`` is not given it
+        is selected from the data, which needs at least 4 observations with the
+        Bartlett kernel, 5 with the Parzen kernel and 6 with the quadratic
+        spectral kernel. ``fit`` raises a ``ValueError`` for fewer observations,
+        and if the selected bandwidth is not finite. Pass ``bandwidth`` to use
+        the kernel with fewer observations. See
+        :func:`~linearmodels.iv.covariance.kernel_optimal_bandwidth`.
         """
         nobs, nf, nport, _, s1, s2, s3 = self._boundaries()
         excess_returns = not self._risk_free
@@ -1320,7 +1332,14 @@ class LinearFactorModelGMM(_LinearFactorModelBase):
         -----
         The kernel covariance estimator takes the optional arguments
         ``kernel``, one of "bartlett", "parzen" or "qs" (quadratic spectral)
-        and ``bandwidth`` (a positive integer).
+        and ``bandwidth`` (a positive integer). If ``bandwidth`` is not given it
+        is selected from the data, for the weight matrix and for the covariance,
+        which needs at least 4 observations with the Bartlett kernel, 5 with the
+        Parzen kernel and 6 with the quadratic spectral kernel. ``fit`` raises a
+        ``ValueError`` for fewer observations, and if the selected bandwidth is
+        not finite. Pass ``bandwidth`` to use the kernel with fewer
+        observations. See
+        :func:`~linearmodels.iv.covariance.kernel_optimal_bandwidth`.
         """
 
         nobs, n = self.portfolios.shape

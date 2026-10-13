@@ -14,7 +14,9 @@ from numpy import (
     ceil,
     cos,
     empty,
+    errstate,
     int64,
+    isfinite,
     ndarray,
     ones,
     pi,
@@ -213,14 +215,84 @@ def kernel_weight_parzen(
     return w
 
 
+def _bandwidth_rule(kernel: str) -> tuple[int, float, float]:
+    """
+    The constants of the automatic bandwidth rule of a kernel
+
+    Parameters
+    ----------
+    kernel : str
+        Name of the kernel.
+
+    Returns
+    -------
+    q : int
+        The characteristic exponent of the kernel.
+    c : float
+        The constant of the rule.
+    exponent : float
+        The exponent of t / 100 in the number of lags of the pilot estimates.
+
+    Raises
+    ------
+    UnknownOptionError
+        If kernel is not one of the supported names.
+    """
+    if kernel in ("bartlett", "newey-west"):
+        return 1, 1.1447, 2 / 9
+    if kernel in ("qs", "andrews", "quadratic-spectral"):
+        return 2, 1.3221, 2 / 25
+    if kernel in ("gallant", "parzen"):
+        return 2, 2.6614, 4 / 25
+    raise unknown_option_error("kernel", kernel, KERNEL_LOOKUP)
+
+
+def _pilot_lags(nobs: int, exponent: float) -> int:
+    """The number of lags in the pilot estimates of the automatic bandwidth"""
+    return int(ceil(4 * (nobs / 100) ** exponent))
+
+
+def _min_nobs_automatic_bandwidth(kernel: str) -> int:
+    """
+    The fewest observations for which the automatic bandwidth of a kernel exists
+
+    The pilot estimates use the autocovariances up to the pilot lag, and the pilot
+    lag has to be below nobs - 1. It grows by at most 1 for each additional
+    observation, so that every larger number of observations works too.
+
+    Parameters
+    ----------
+    kernel : str
+        Name of the kernel.
+
+    Returns
+    -------
+    int
+        The smallest number of observations with a pilot lag below nobs - 1.
+
+    Raises
+    ------
+    UnknownOptionError
+        If kernel is not one of the supported names.
+    """
+    exponent = _bandwidth_rule(kernel)[2]
+    nobs = 1
+    while _pilot_lags(nobs, exponent) >= nobs - 1:
+        nobs += 1
+    return nobs
+
+
 def kernel_optimal_bandwidth(
     x: linearmodels.typing.data.Float64Array, kernel: str = "bartlett"
 ) -> int:
-    """
+    r"""
+    Select the bandwidth of a kernel covariance estimator from the data
+
     Parameters
     ----------
     x : ndarray
-        Array of data to use when computing optimal bandwidth
+        The series to use when computing the bandwidth. It has t observations,
+        and is a 1-d array of length t or an array with t rows and 1 column.
     kernel : str
         Name of kernel to use.  Supported kernels include:
 
@@ -233,13 +305,81 @@ def kernel_optimal_bandwidth(
     int
         Optimal bandwidth. Set to nobs - 1 if computed bandwidth is larger.
 
+    Raises
+    ------
+    ValueError
+        If x has fewer observations than the kernel needs: 4 for the Bartlett
+        kernel, 5 for the Parzen kernel and 6 for the quadratic spectral kernel.
+        It is also raised if the bandwidth is not finite, which happens if x has
+        values that are not finite or if the estimate of the long-run variance
+        that the bandwidth divides by is exactly 0, as it is for a series of zeros.
+    UnknownOptionError
+        If kernel is not one of the supported names. It is both a ``KeyError``
+        and a ``ValueError``.
+
     Notes
     -----
+    The bandwidth is that of the nonparametric rule of Newey and West [1]_. With
+    the autocovariances of the series :math:`x_i`,
 
-    .. todo::
+    .. math::
 
-      * Explain mathematics involved
-      * References
+       \hat{\sigma}_j = t^{-1} \sum_{i=j+1}^{t} x_i x_{i-j},
+
+    the rule computes two weighted sums of the first :math:`n` of them,
+
+    .. math::
+
+       \hat{s}_0 & = \hat{\sigma}_0 + 2 \sum_{j=1}^{n} \hat{\sigma}_j \\
+       \hat{s}_q & = 2 \sum_{j=1}^{n} j^q \hat{\sigma}_j
+
+    and the bandwidth is the smaller of :math:`\lceil \hat{m} \rceil` and
+    :math:`t - 1`, where
+
+    .. math::
+
+       \hat{m} = c \left\{ \left(\hat{s}_q / \hat{s}_0 \right)^2 \right\}^{1 / (2q + 1)}
+                 t^{1 / (2q + 1)}.
+
+    The exponent :math:`q` and the constant :math:`c` depend on the kernel. The
+    number of lags in the pilot estimates, :math:`\hat{s}_0` and :math:`\hat{s}_q`,
+    is :math:`n = \lceil 4 (t / 100)^a \rceil`, and the exponent :math:`a`
+    depends on the kernel too:
+
+    ===================================== = ====== ===== ============
+    Kernel                                q c      a     Fewest obs.
+    ===================================== = ====== ===== ============
+    "bartlett", "newey-west"              1 1.1447 2/9   4
+    "parzen", "gallant"                   2 2.6614 4/25  5
+    "qs", "quadratic-spectral", "andrews" 2 1.3221 2/25  6
+    ===================================== = ====== ===== ============
+
+    The autocovariances of a series with :math:`t` observations are defined up
+    to lag :math:`t - 1`. If :math:`n \geq t - 1`, :math:`\hat{s}_0` is the sum
+    of all of them, which is :math:`(\sum_i x_i)^2 / t`. It is 0, up to rounding
+    error, for a series with a mean of 0, such as the scores of a least squares
+    regression or the deviations of estimates from their average, so that the
+    bandwidth divides by 0 or by rounding error. For any other series it depends
+    on the mean alone, and not on the autocorrelation. The rule needs
+    :math:`n < t - 1`. That is the case with at least 4 observations for the
+    Bartlett kernel (:math:`n = 2`), 5 for the Parzen kernel (:math:`n = 3`) and
+    6 for the quadratic spectral kernel (:math:`n = 4`), and a ``ValueError`` is
+    raised for fewer. Pass the bandwidth to the estimator that uses the kernel to
+    use it with fewer observations.
+
+    .. versionchanged:: 7.1
+
+       A ``ValueError`` is raised if the series has fewer observations than the
+       kernel needs, and if the bandwidth is not finite. Earlier versions raised
+       "cannot convert float infinity to integer" (an ``OverflowError``) or
+       "cannot convert float NaN to integer" for some series, and returned
+       :math:`t - 1`, or another number, for the others.
+
+    References
+    ----------
+    .. [1] Newey, W. K. and West, K. D. (1994). Automatic lag selection in
+       covariance matrix estimation. The Review of Economic Studies, 61(4),
+       631-653.
 
     See Also
     --------
@@ -249,26 +389,34 @@ def kernel_optimal_bandwidth(
     """
     t = x.shape[0]
     x = x.squeeze()
-    if kernel in ("bartlett", "newey-west"):
-        q, c = 1, 1.1447
-        m_star = int(ceil(4 * (t / 100) ** (2 / 9)))
-    elif kernel in ("qs", "andrews", "quadratic-spectral"):
-        q, c = 2, 1.3221
-        m_star = int(ceil(4 * (t / 100) ** (2 / 25)))
-    elif kernel in ("gallant", "parzen"):
-        q, c = 2, 2.6614
-        m_star = int(ceil(4 * (t / 100) ** (4 / 25)))
-    else:
-        raise unknown_option_error("kernel", kernel, KERNEL_LOOKUP)
-    sigma = empty(m_star + 1)
-    sigma[0] = x.T @ x / t
-    for i in range(1, m_star + 1):
-        sigma[i] = x[i:].T @ x[:-i] / t
-    s0 = sigma[0] + 2 * sigma[1:].sum()
-    sq = 2 * npsum(sigma[1:] * arange(1, m_star + 1) ** q)
+    q, c, exponent = _bandwidth_rule(kernel)
+    m_star = _pilot_lags(t, exponent)
+    if m_star >= t - 1:
+        raise ValueError(
+            f"The automatic bandwidth of the {kernel!r} kernel needs at least "
+            f"{_min_nobs_automatic_bandwidth(kernel)} observations, but there are "
+            f"{t}. Pass the bandwidth explicitly."
+        )
     rate = 1 / (2 * q + 1)
-    gamma = c * ((sq / s0) ** 2) ** rate
-    m = gamma * t**rate
+    # Values that are not finite, or a long-run variance of 0, are reported by the
+    # error below and not by warnings
+    with errstate(divide="ignore", invalid="ignore", over="ignore"):
+        sigma = empty(m_star + 1)
+        sigma[0] = x.T @ x / t
+        for i in range(1, m_star + 1):
+            sigma[i] = x[i:].T @ x[:-i] / t
+        s0 = sigma[0] + 2 * sigma[1:].sum()
+        sq = 2 * npsum(sigma[1:] * arange(1, m_star + 1) ** q)
+        gamma = c * ((sq / s0) ** 2) ** rate
+        m = gamma * t**rate
+    if not isfinite(m):
+        raise ValueError(
+            f"The automatic bandwidth of the {kernel!r} kernel is not finite. It is "
+            "not defined if the data have values that are not finite, or if the "
+            "estimate of their long-run variance, which the bandwidth divides by, "
+            "is 0, for example because the data are all 0. Pass the bandwidth "
+            "explicitly."
+        )
     return min(int(ceil(m)), t - 1)
 
 
@@ -529,7 +677,11 @@ class KernelCovariance(HomoskedasticCovariance):
 
     bandwidth : {int, None}
         Non-negative bandwidth to use with kernel. If None, automatic
-        bandwidth selection is used.
+        bandwidth selection is used. It needs at least 4 observations with the
+        Bartlett kernel, 5 with the Parzen kernel and 6 with the quadratic
+        spectral kernel, and a ``ValueError`` is raised for fewer when the
+        covariance is first used. See
+        :func:`~linearmodels.iv.covariance.kernel_optimal_bandwidth`.
     debiased : bool
         Flag indicating whether to use a small-sample adjustment
     kappa : float
@@ -570,6 +722,20 @@ class KernelCovariance(HomoskedasticCovariance):
 
     where :math:`X` is the matrix of variables included in the model and
     :math:`Z` is the matrix of instruments, including exogenous regressors.
+
+    The automatic bandwidth is that of
+    :func:`~linearmodels.iv.covariance.kernel_optimal_bandwidth` for the sum of
+    the columns of :math:`\hat{\epsilon}_i \hat{x}_i`, without the column of the
+    constant if :math:`\hat{x}` has one and other columns.
+
+    .. versionchanged:: 7.1
+
+       The automatic bandwidth raises a ``ValueError`` if there are fewer
+       observations than the kernel needs, and if it is not finite. Earlier
+       versions raised "cannot convert float infinity to integer" (an
+       ``OverflowError``) or "cannot convert float NaN to integer" for some
+       series, and used a bandwidth of :math:`n - 1`, or another bandwidth, for
+       the others.
 
     See Also
     --------
