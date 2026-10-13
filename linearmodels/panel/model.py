@@ -1680,12 +1680,17 @@ class PanelOLS(_PanelModelBase):
       for time effects and ``N + T - 1`` for both, and ``df_resid`` is ``nobs``
       less ``df_model``.
     * ``rsquared``, ``rsquared_within``, ``rsquared_between`` and ``rsquared_overall``
-      are 0 since the effects are removed from the dependent variable and there is
-      nothing else to explain it. The squared correlations (``corr_squared_within``,
-      ``corr_squared_between`` and ``corr_squared_overall``) are 0: the fitted values
-      of the regressors are all 0, and these measures are set to 0 if the fitted
-      values do not vary. ``rsquared_inclusive`` is the R-squared of the effects,
-      the share of the variation around the mean that they explain.
+      are 0 when they are defined, since the effects are removed from the dependent
+      variable and there is nothing else to explain it. The squared correlations
+      (``corr_squared_within``, ``corr_squared_between`` and ``corr_squared_overall``)
+      are 0 as well: the fitted values of the regressors are all 0, and these
+      measures are set to 0 if the fitted values do not vary. ``rsquared_inclusive``
+      is the R-squared of the effects, the share of the variation around the mean that
+      they explain. An R-squared is not defined if the sum of squares that it divides
+      is zero, for example ``rsquared_within`` if the dependent variable does not vary
+      within entities. If the dependent variable is constant, there is no variation to
+      explain and ``rsquared``, ``rsquared_within``, ``rsquared_inclusive`` and the
+      squared correlations are NaN.
     * ``f_pooled`` is the test that the effects are zero. For entity effects it is
       the F-test of the one-way analysis of variance. ``f_statistic`` and
       ``f_statistic_robust``, which test the coefficients of the regressors, are

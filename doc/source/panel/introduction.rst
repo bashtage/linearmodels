@@ -145,8 +145,9 @@ variable of the entities (of the periods, with ``TimeEffects``), and ``resids`` 
 the deviations from them. ``f_pooled`` is the test that the effects are zero, which
 for entity effects is the F-test of a one-way analysis of variance. The tests of
 the coefficients, ``f_statistic`` and ``f_statistic_robust``, are not defined. The
-R-squared of the model is 0, and ``rsquared_inclusive`` is the share of the
-variation of the dependent variable that the effects explain. See
+R-squared of the model is 0 (NaN if the dependent variable does not vary once the
+effects are removed), and ``rsquared_inclusive`` is the share of the variation of the
+dependent variable that the effects explain. See
 :class:`~linearmodels.panel.model.PanelOLS` for all of the results.
 
 .. _panel-specification-tests:
