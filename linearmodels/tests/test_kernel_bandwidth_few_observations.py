@@ -584,8 +584,9 @@ def iv_data(nobs, seed=11):
     )
 
 
-def iv_args(data, instruments=("z1",)):
-    return data.y, data[["const"]], data[["xn"]], data[list(instruments)]
+def iv_args(data, instruments=("z1",), constant=True):
+    exog = data[["const"]] if constant else None
+    return data.y, exog, data[["xn"]], data[list(instruments)]
 
 
 def moment_series(z, eps, center=False):
@@ -639,7 +640,8 @@ IV_MODELS = [IV2SLS, IVLIML, IVJIVE]
 @pytest.mark.parametrize("model", IV_MODELS)
 def test_iv_models_raise_when_fit_with_too_few_observations(model, kernel):
     nobs = fewest_observations(kernel) - 1
-    mod = model(*iv_args(iv_data(nobs)))
+    # Without the constant, see the explicit bandwidth test below
+    mod = model(*iv_args(iv_data(nobs), constant=False))
     with pytest.raises(ValueError, match=re.escape(too_few_message(kernel, nobs))):
         mod.fit(cov_type="kernel", kernel=kernel)
 
@@ -660,7 +662,12 @@ def test_iv_models_explicit_bandwidth_works_with_the_observations_that_raise(
     model, kernel
 ):
     nobs = fewest_observations(kernel) - 1
-    mod = model(*iv_args(iv_data(nobs)))
+    # The kappa of LIML, which the IV models compute, needs at least 1 + the number
+    # of endogenous variables observations more than instruments. With the constant,
+    # the 3 observations of the Bartlett kernel leave 1 for 2, and a matrix with an
+    # eigenvalue that is rounding error is inverted: kappa was NaN on macOS arm64 and
+    # rounding error elsewhere. Without the constant, the model is well posed.
+    mod = model(*iv_args(iv_data(nobs), constant=False))
     res = mod.fit(cov_type="kernel", kernel=kernel, bandwidth=1)
     assert res.cov_config["bandwidth"] == 1
     check_covariance_is_finite(res)
