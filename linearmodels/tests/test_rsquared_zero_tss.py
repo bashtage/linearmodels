@@ -337,7 +337,6 @@ def test_constant_dependent_variable_iv(name, value, weighted):
     assert_summary_has(res, "R-squared")
 
 
-@pytest.mark.filterwarnings("ignore:.*encountered in:RuntimeWarning")
 @pytest.mark.parametrize("name", ["OLS", "IV2SLS", "IVJIVE", "AbsorbingLS"])
 def test_all_zero_dependent_variable_iv(name):
     # The residuals are 0, and so is the covariance of the parameters, which has no
