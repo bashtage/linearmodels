@@ -53,6 +53,10 @@ MISSING = ["none", "y", "x"]
 MISSING_Y = [(1, 3), (2, 1), (4, 5), (9, 2), (10, 6)]
 MISSING_X = [(1, 1), (4, 2), (7, 3), (9, 6)]
 SHAPE_MESSAGE = "Weights do not have a supported shape"
+AMBIGUITY_MESSAGE = (
+    "Unable to distinguish nobs from nentity since they are equal. You must use a 2-d "
+    "array to avoid ambiguity."
+)
 
 
 def cell_weight(entity, period):
@@ -588,7 +592,7 @@ def test_equal_numbers_of_periods_and_entities_are_ambiguous(layout):
     # The number of values does not decide between the periods and the entities. It
     # does if it is the number of rows
     panel = Panel(square_cells(layout))
-    with pytest.raises(AmbiguityError, match="Unable to distinguish"):
+    with pytest.raises(AmbiguityError, match=AMBIGUITY_MESSAGE):
         PooledOLS(panel.y, panel.x_const, weights=np.ones(6))
     mod = PooledOLS(panel.y, panel.x_const, weights=panel.row_weights())
     assert_weights_of_cells(panel, mod)
@@ -675,7 +679,7 @@ def test_labels_do_not_resolve_equal_numbers_of_periods_and_entities():
     values = corner_values(ROWS_ARE_BOTH)
     for labels in (panel.periods, panel.entities):
         series = pd.Series(values, index=labels)
-        with pytest.raises(AmbiguityError, match="Unable to distinguish"):
+        with pytest.raises(AmbiguityError, match=AMBIGUITY_MESSAGE):
             PooledOLS(panel.y, panel.x_const, weights=series)
 
 

@@ -915,8 +915,8 @@ class _PanelModelBase:
             and not (row_labels and unbalanced)
         ):
             raise AmbiguityError(
-                "Unable to distinguish nobs form nentity since they are "
-                "equal. You must use an 2-d array to avoid ambiguity."
+                "Unable to distinguish nobs from nentity since they are "
+                "equal. You must use a 2-d array to avoid ambiguity."
             )
         if row_labels:
             panel = PanelData(DataFrame(weights))
