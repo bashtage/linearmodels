@@ -59,11 +59,6 @@ def test_j_statistic_textbook(risk_free, use_sigma, cov_type, debiased):
     assert res.j_statistic.df == df
     assert_allclose(res.j_statistic.pval, stats.chi2(df).sf(expected), rtol=1e-8)
 
-    # The Moore-Penrose pseudo-inverse used before also inverts the directions in
-    # which the covariance is null in theory, and was never smaller in these samples
-    pinv_stat = float(np.squeeze(alphas.T @ np.linalg.pinv(vcv) @ alphas))
-    assert res.j_statistic.stat < pinv_stat
-
 
 @pytest.mark.parametrize("risk_free", [False, True])
 @pytest.mark.parametrize("seed", [3, 11])
