@@ -125,7 +125,11 @@ dependent variable and the endogenous regressors on the exogenous regressors and
 instruments are collinear. :class:`~linearmodels.iv.model.IVLIML` raises a
 ``ValueError`` when the model is fit if ``kappa`` is not provided and the
 estimate is not defined. Earlier versions used the rounding error of a singular
-matrix, which was arbitrary and NaN on some platforms.
+matrix, which was arbitrary and NaN on some platforms. Two cases are not covered
+(:issue:`823`). The estimate is rounding error if an endogenous regressor is
+exactly a linear combination of the exogenous regressors and instruments, and it
+loses accuracy if there are 2 or more endogenous regressors on very different
+scales.
 
 JIVE Estimation
 ^^^^^^^^^^^^^^^
