@@ -3858,8 +3858,9 @@ class FamaMacBeth(_PanelModelBase):
             distribution with T - 1 degrees of freedom for inference. If
             False, inference uses the normal distribution.
         bandwidth : float
-            The bandwidth to use when cov_type is "kernel". If None, it is
-            automatically computed.
+            The bandwidth to use when cov_type is "kernel". It must be below T,
+            the number of periods that are used. If None, it is automatically
+            computed, and is at most T - 1.
         kernel : str
             The kernel to use.  None chooses the default kernel.
 
@@ -3867,6 +3868,13 @@ class FamaMacBeth(_PanelModelBase):
         -------
         PanelResults
             Estimation results
+
+        Raises
+        ------
+        ValueError
+            If ``cov_type`` is not one of the supported names, or if it is
+            "kernel" and ``bandwidth`` is not below T, the number of periods that
+            are used.
 
         Examples
         --------
@@ -3882,6 +3890,10 @@ class FamaMacBeth(_PanelModelBase):
           standard covariance estimator of the T parameter estimates.
         * "kernel" is a HAC estimator of the covariance of the T parameter
           estimates. The configuration options are ``kernel`` and ``bandwidth``.
+          The T estimates have autocovariances up to lag T - 1, so the bandwidth
+          must be below T. This holds for every kernel, including the quadratic
+          spectral kernel, which is not truncated. The bandwidth is checked when
+          the model is fit.
 
         The parameters are the averages of the T cross-sectional estimates, and
         T is the number of periods whose cross-sectional regression is
@@ -3912,6 +3924,15 @@ class FamaMacBeth(_PanelModelBase):
            reference. Earlier versions divided the Wald statistic by k and used
            an F distribution with k and nobs - nvar degrees of freedom, which
            rejects a true null hypothesis too often when k is larger than 1.
+
+        .. versionchanged:: 7.1
+
+           A bandwidth that is not below T raises a ``ValueError`` when the model
+           is fit. Earlier versions raised "Length of w is larger than the number
+           of elements in z" with the Bartlett and Parzen kernels, when the
+           covariance was first used. The quadratic spectral kernel, which has no
+           truncation, returned a covariance without an error, which was close to
+           zero for a large bandwidth.
         """
         # The retained observations and their weights, which are scaled to have a
         # mean of one once the observations with missing values are dropped

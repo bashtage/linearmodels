@@ -770,18 +770,39 @@ class FamaMacBethCovariance(HomoskedasticCovariance):
         (nobs by variables) array of all estimated model parameters
     debiased : bool
         Flag indicating whether to debias the estimator.
-    bandwidth : int
-        Non-negative integer to use as bandwidth.  Set to 0 to disable
-        autocorrelation robustness. If not provided a rule-of- thumb
-        value is used.
+    bandwidth : float, optional
+        Non-negative bandwidth to use. It must be below T, the number of time
+        periods that are used. The Bartlett and Parzen kernels use its integer
+        part. Set to 0 to disable autocorrelation robustness. If not provided, it
+        is computed from the T estimates and is at most T - 1.
     kernel : str
         Name of one of the supported kernels. If None, uses the Newey-West
         kernel.
 
+    Raises
+    ------
+    ValueError
+        If the bandwidth is not below the number of time periods that are used.
 
     Notes
     -----
     Covariance is a Kernel covariance of all estimated parameters.
+
+    The :math:`T` cross-sectional estimates, one for each time period that is
+    used, have autocovariances up to lag :math:`T-1`, so the bandwidth must be
+    below :math:`T`. The bandwidth is checked when the estimator is created, so
+    that the ``fit`` method of the model raises the error.
+
+    .. versionchanged:: 7.1
+
+       A bandwidth that is not below the number of time periods raises a
+       ``ValueError``. Earlier versions raised "Length of w is larger than the
+       number of elements in z" with the Bartlett and Parzen kernels, when the
+       covariance was first used. The quadratic spectral kernel, which has no
+       truncation, returned a covariance without an error. With a large bandwidth
+       the weights of all of the lags are close to one, and the deviations of the
+       estimates from their average sum to zero, so that the covariance was close
+       to zero.
     """
 
     def __init__(
@@ -801,6 +822,18 @@ class FamaMacBethCovariance(HomoskedasticCovariance):
         self._name = f"Fama-MacBeth {cov_type}Cov"
         self._bandwidth = bandwidth
         self._kernel = kernel if kernel is not None else self.DEFAULT_KERNEL
+        if bandwidth is not None:
+            # Checked here so that fit raises, and not the first use of the covariance
+            deviations = np.asarray(all_params) - params.T
+            nperiods = int(np.all(np.isfinite(deviations), 1).sum())
+            if bandwidth >= nperiods:
+                raise ValueError(
+                    "The bandwidth of the Fama-MacBeth kernel covariance, "
+                    f"{bandwidth:g}, must be below the number of time periods that "
+                    f"are used, {nperiods}. The {nperiods} cross-sectional estimates "
+                    f"have autocovariances up to lag {nperiods - 1}. Use a smaller "
+                    "bandwidth."
+                )
 
     @cached_property
     def bandwidth(self) -> float:
