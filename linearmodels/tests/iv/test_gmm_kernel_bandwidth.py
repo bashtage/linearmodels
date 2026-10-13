@@ -28,6 +28,7 @@ from linearmodels.iv.covariance import kernel_optimal_bandwidth
 from linearmodels.iv.gmm import IVGMMCovariance, KernelWeightMatrix
 from linearmodels.shared.exceptions import DefaultBandwidthWarning
 from linearmodels.shared.utility import AttrDict
+from linearmodels.tests._utility import warns_if_default_bandwidth
 
 CWD = os.path.split(os.path.abspath(__file__))[0]
 SIMULATED = pd.read_stata(os.path.join(CWD, "results", "simulated-data.dta"))
@@ -491,11 +492,11 @@ def test_cue_starting_values_have_the_bandwidth_of_the_objective(
     # objective function: the one that is estimated from the first step residuals
     # by default and with optimal_bw=True, as IVGMM does, the one that was given,
     # and nobs - 2 with optimal_bw=False
-    with warnings.catch_warnings():
-        # The default warns
-        warnings.simplefilter("ignore", DefaultBandwidthWarning)
-        start = IVGMM(*args, weight_type="kernel", center=True, **start_options).fit()
+    start = IVGMM(*args, weight_type="kernel", center=True, **start_options).fit()
+    # The default warns
+    with warns_if_default_bandwidth(**options):
         res = IVGMMCUE(*args, weight_type="kernel", **options).fit()
+    with warns_if_default_bandwidth(**options):
         res_start = IVGMMCUE(*args, weight_type="kernel", **options).fit(
             starting=start.params
         )

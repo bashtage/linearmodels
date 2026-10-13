@@ -539,8 +539,11 @@ def test_hausman_constants(hausman_data, re_constant, fe_constant, include_const
     re_res = RandomEffects(dependent, re_exog).fit()
     fe_res = PanelOLS(dependent, fe_exog, entity_effects=True).fit()
     with warnings.catch_warnings():
-        # Warnings are only possible when the constant is part of the test
-        warnings.simplefilter("ignore", UserWarning)
+        # Var(b0) - Var(b1) is not always positive definite, and the statistic is then
+        # computed with a generalized inverse (test_hausman_negative_statistic)
+        warnings.filterwarnings(
+            "ignore", "Var.b0. - Var.b1. is not positive definite", UserWarning
+        )
         wald, estimates = re_res.hausman(fe_res, include_constant=include_constant)
     # The constant can only be compared when both models have one
     names = (

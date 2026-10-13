@@ -1,3 +1,4 @@
+from contextlib import nullcontext
 from itertools import product
 import re
 import warnings
@@ -190,7 +191,9 @@ def test_avg_r2(use_const, just_id):
     r2_adj = []
     for _, g in z.groupby(level=1):
         with warnings.catch_warnings():
-            warnings.simplefilter("ignore")
+            # statsmodels divides by the 0 degrees of freedom of the just identified
+            # regressions
+            warnings.simplefilter("ignore", RuntimeWarning)
             ols_res = OLS(g["y"], g[x.columns]).fit()
             r2.append(ols_res.rsquared)
             r2_adj.append(ols_res.rsquared_adj)
@@ -604,9 +607,14 @@ def test_robust_f_statistic_needs_more_periods_than_parameters(
     y, x = fama_macbeth_panel(nentity=20, nperiod=nperiod, nreg=nreg, seed=3)
     if not use_constant:
         x = x.drop(columns="const")
-    with warnings.catch_warnings():
-        # There are fewer periods than parameters in some of the models
-        warnings.simplefilter("ignore", InferenceUnavailableWarning)
+    # There are fewer periods than parameters in some of the models
+    if nperiod < nreg + use_constant:
+        warns = pytest.warns(
+            InferenceUnavailableWarning, match="cross-sectional regressions"
+        )
+    else:
+        warns = nullcontext()
+    with warns:
         res = FamaMacBeth(y, x).fit(debiased=debiased)
     robust = res.f_statistic_robust
     assert isinstance(robust, InvalidTestStatistic)
