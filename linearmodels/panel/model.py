@@ -820,18 +820,26 @@ class _PanelModelBase:
           3-d array, a PanelData or have the shape (nobs, nentity);
         * a value for each row if they are 1-d with nrows values. A pandas object
           with a MultiIndex is paired by label, and anything else by position
-          with the rows of dependent. If dependent is not balanced, this is the
-          reading even if nrows is also nobs or nentity, which happens if every time
-          period or entity has a single row. If dependent is balanced and nrows is
-          also nobs or nentity, which happens if there is a single entity or time
-          period, they are read as a value for each time period or entity;
+          with the rows of dependent;
         * a value for each time period if they are 1-d with nobs values;
         * a value for each entity if they are 1-d with nentity values.
 
+        If nrows is also nobs or nentity, labels decide. Weights with labels, a
+        pandas object with an index that is not the default index, are read by their
+        labels: a Series indexed by the time periods is a value for each time period
+        and one indexed by the entities is a value for each entity. Weights without
+        labels, which are an array, a list, a tuple and a pandas object with the
+        default index, are read by their number of values. If dependent is not
+        balanced, this happens if every time period or entity has a single row, and
+        they are a value for each row. If it is balanced, this happens if there is a
+        single entity or time period, and they are a value for each time period or
+        entity.
+
         An ``AmbiguityError`` is raised if nobs and nentity are equal and 1-d weights
-        have that many values, since they could be either, unless they are a value
-        for each row of a dependent that is not balanced. Any other number of values
-        raises a ``ValueError`` that gives the accepted numbers.
+        have that many values, since they could be either, and labels do not decide
+        it. The exception is weights without labels that are a value for each row of
+        a dependent that is not balanced. Any other number of values raises a
+        ``ValueError`` that gives the accepted numbers.
         """
         if weights is None:
             self._is_weighted = False
@@ -864,29 +872,41 @@ class _PanelModelBase:
 
         if isinstance(weights, np.ndarray):
             weights = cast("linearmodels.typing.data.Float64Array", np.squeeze(weights))
+        unbalanced = nrows != nobs * nentity
+        # The labels of a pandas object with a MultiIndex identify the rows
+        row_labels = (
+            isinstance(weights, (Series, DataFrame))
+            and isinstance(weights.index, MultiIndex)
+            and weights.shape[0] == nrows
+        )
         # 1-d weights with a value for each row of dependent. If dependent is not
         # balanced it has fewer rows than combinations of a time period and an entity
         # (nobs * nentity), so that the weights cannot be a value for each combination.
-        # They are a value for each row also if the number of rows is nobs or nentity,
-        # which happens if every time period or entity has a single row. If dependent is
-        # balanced, a single entity or time period makes the number of rows nobs or
-        # nentity, and the weights are read as before, as a value for each time period
-        # or entity
+        # Weights without labels are a value for each row also if the number of rows is
+        # nobs or nentity, which happens if every time period or entity has a single
+        # row. Weights with labels are read by their labels in that case, so that a
+        # Series indexed by the time periods is a value for each time period, and one
+        # indexed by the entities a value for each entity. If dependent is balanced, a
+        # single entity or time period makes the number of rows nobs or nentity, and the
+        # weights are read as before, as a value for each time period or entity
         by_row = (
             weights.ndim == 1
             and weights.shape[0] == nrows
-            and (nrows != nobs * nentity or weights.shape[0] not in (nobs, nentity))
+            and (
+                weights.shape[0] not in (nobs, nentity) or (unbalanced and not labelled)
+            )
         )
-        if weights.shape[0] == nobs and nobs == nentity and not by_row:
+        if (
+            weights.shape[0] == nobs
+            and nobs == nentity
+            and not by_row
+            and not (row_labels and unbalanced)
+        ):
             raise AmbiguityError(
                 "Unable to distinguish nobs form nentity since they are "
                 "equal. You must use an 2-d array to avoid ambiguity."
             )
-        if (
-            isinstance(weights, (Series, DataFrame))
-            and isinstance(weights.index, MultiIndex)
-            and weights.shape[0] == nrows
-        ):
+        if row_labels:
             panel = PanelData(DataFrame(weights))
             self._check_labels("weights", panel.index, labelled)
             return panel

@@ -584,3 +584,100 @@ def test_values_for_each_row_are_read_first_if_dependent_is_not_balanced(cells):
     panel = Panel(cells)
     mod = PooledOLS(panel.y, panel.x_const, weights=panel.row_weights())
     assert_weights_of_cells(panel, mod)
+
+
+def corner_values(cells):
+    """The values 1, 2, ..., one for each row, in the order of the rows"""
+    return 1.0 + np.arange(len(cells))
+
+
+def assert_weights_equal(mod, expected):
+    """The weights of the model are the expected weights, scaled to have a mean of 1"""
+    expected = np.asarray(expected, dtype=float)
+    assert_allclose(mod.weights.values2d[:, 0], expected / expected.mean(), rtol=1e-12)
+
+
+# An input with labels is read by its labels, and an input without labels, which an
+# array, a list, a tuple and a pandas object with a default index are, by the number of
+# its values. So a Series indexed by the time periods is a value for each time period,
+# and a Series indexed by the entities is a value for each entity, also if dependent is
+# not balanced and has as many rows as time periods or entities. The same values without
+# labels are a value for each row.
+@pytest.mark.parametrize(
+    ("cells", "kind"),
+    [(ROWS_ARE_PERIODS, "period"), (ROWS_ARE_ENTITIES, "entity")],
+    ids=["T", "N"],
+)
+def test_labels_decide_if_dependent_has_as_many_rows_as_periods_or_entities(
+    cells, kind
+):
+    panel = Panel(cells)
+    values = corner_values(cells)
+    if kind == "period":
+        labels, positions = panel.periods, [t for _, t in cells]
+    else:
+        labels, positions = panel.entities, [e for e, _ in cells]
+    nlabels, nrows = len(labels), len(cells)
+    assert nlabels == nrows
+    mod = PooledOLS(panel.y, panel.x_const, weights=pd.Series(values, index=labels))
+    assert_weights_equal(mod, values[positions])
+
+
+@pytest.mark.parametrize(
+    "cells", [ROWS_ARE_PERIODS, ROWS_ARE_ENTITIES, ROWS_ARE_BOTH], ids=["T", "N", "T=N"]
+)
+def test_values_without_labels_are_a_value_for_each_row_in_these_panels(cells):
+    panel = Panel(cells)
+    values = corner_values(cells)
+    for unlabelled in (values, values.tolist(), tuple(values), pd.Series(values)):
+        mod = PooledOLS(panel.y, panel.x_const, weights=unlabelled)
+        assert_weights_equal(mod, values)
+    # The index of dependent has labels that identify the rows
+    series = pd.Series(values, index=panel.index)
+    assert_weights_equal(PooledOLS(panel.y, panel.x_const, weights=series), values)
+
+
+def test_labels_do_not_resolve_equal_numbers_of_periods_and_entities():
+    panel = Panel(ROWS_ARE_BOTH)
+    values = corner_values(ROWS_ARE_BOTH)
+    for labels in (panel.periods, panel.entities):
+        series = pd.Series(values, index=labels)
+        with pytest.raises(AmbiguityError, match="Unable to distinguish"):
+            PooledOLS(panel.y, panel.x_const, weights=series)
+
+
+@pytest.mark.parametrize(
+    ("cells", "message"),
+    [
+        (ROWS_ARE_PERIODS, "time index of weights"),
+        (ROWS_ARE_ENTITIES, "entity index of weights"),
+    ],
+    ids=["T", "N"],
+)
+def test_labels_that_are_not_those_of_the_periods_or_entities_raise(cells, message):
+    panel = Panel(cells)
+    values = corner_values(cells)
+    wrong = pd.Series(values, index=[f"label{i}" for i in range(len(cells))])
+    with pytest.raises(ValueError, match=message):
+        PooledOLS(panel.y, panel.x_const, weights=wrong)
+
+
+@pytest.mark.parametrize("layout", LAYOUTS)
+def test_labels_that_are_not_those_of_the_rows_raise(layout):
+    panel = main_panel(layout, "entity-major")
+    labels = [f"row{i}" for i in range(len(panel.cells))]
+    wrong = pd.Series(panel.row_weights(), index=labels)
+    with pytest.raises(ValueError, match="row index of weights"):
+        PooledOLS(panel.y, panel.x_const, weights=wrong)
+
+
+def test_labels_of_the_periods_of_a_single_entity_are_read_as_before():
+    # Balanced, and the number of rows is the number of periods
+    cells = [(0, t) for t in range(5)]
+    panel = Panel(cells)
+    values = corner_values(cells)
+    series = pd.Series(values, index=panel.periods)
+    assert_weights_equal(PooledOLS(panel.y, panel.x_const, weights=series), values)
+    wrong = pd.Series(values, index=[f"label{i}" for i in range(5)])
+    with pytest.raises(ValueError, match="time index of weights"):
+        PooledOLS(panel.y, panel.x_const, weights=wrong)
