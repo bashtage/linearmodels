@@ -1691,7 +1691,9 @@ class PanelOLS(_PanelModelBase):
       ``f_statistic_robust``, which test the coefficients of the regressors, are
       ``InvalidTestStatistic`` since there are none.
     * ``loglik`` and ``s2`` are those of the regression on the dummy variables of the
-      effects.
+      effects. ``variance_decomposition`` splits the second moment of the dependent
+      variable, about 0 since there is no constant, into the variance of the
+      residuals and the rest, which is attributed to the effects.
 
     .. versionchanged:: 7.1
 
