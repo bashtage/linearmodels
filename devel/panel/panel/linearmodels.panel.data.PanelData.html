@@ -23,7 +23,7 @@
     
   
       
-        <title>linearmodels.panel.data.PanelData - linearmodels v7.1 (+399)</title>
+        <title>linearmodels.panel.data.PanelData - linearmodels v7.1 (+404)</title>
       
     
 
@@ -100,7 +100,7 @@
 
 <header class="md-header md-header--shadow" data-md-component="header">
   <nav class="md-header__inner md-grid" aria-label="Header">
-    <a href="../../index.html" title="linearmodels v7.1 (+399)" class="md-header__button md-logo" aria-label="linearmodels v7.1 (+399)" data-md-component="logo">
+    <a href="../../index.html" title="linearmodels v7.1 (+404)" class="md-header__button md-logo" aria-label="linearmodels v7.1 (+404)" data-md-component="logo">
       <img src="../../_static/bw-logo.svg" alt="logo">
     </a>
     <label class="md-header__button md-icon" for="__drawer">
@@ -111,7 +111,7 @@
       <div class="md-header__ellipsis">
         <div class="md-header__topic">
           <span class="md-ellipsis">
-            linearmodels v7.1 (+399)
+            linearmodels v7.1 (+404)
           </span>
         </div>
         <div class="md-header__topic" data-md-component="header-topic">
@@ -206,10 +206,10 @@
 
 <nav class="md-nav md-nav--primary" aria-label="Navigation" data-md-level="0">
   <label class="md-nav__title" for="__drawer">
-    <a href="../../index.html" title="linearmodels v7.1 (+399)" class="md-nav__button md-logo" aria-label="linearmodels v7.1 (+399)" data-md-component="logo">
+    <a href="../../index.html" title="linearmodels v7.1 (+404)" class="md-nav__button md-logo" aria-label="linearmodels v7.1 (+404)" data-md-component="logo">
       <img src="../../_static/bw-logo.svg" alt="logo">
     </a>
-    linearmodels v7.1 (+399)
+    linearmodels v7.1 (+404)
   </label>
   
     <div class="md-nav__source">
@@ -2198,12 +2198,28 @@ are also accepted and treated as single column MultiIndex DataFrames.</p>
 <p>Missing values (NaN) in the entity or time index are not supported. The
 methods that group by the index raise a ValueError if the level that they
 use has a missing label.</p>
+<p>The time labels must be numbers or dates. A pandas <code class="docutils literal notranslate"><span class="pre">PeriodIndex</span></code> is
+accepted: it is converted with <code class="docutils literal notranslate"><span class="pre">to_timestamp()</span></code>, so that the time labels
+are the timestamps at the start of the periods, and the data are the same
+as those of a panel that is indexed by timestamps.</p>
+<p>Each combination of an entity and a time period can appear only once, since
+an observation is identified by them.</p>
+<div class="admonition versionchanged">
+<p class="admonition-title"><span class="versionmodified changed">Changed in version 7.1: </span>Duplicated (entity, time) rows raise a <code class="docutils literal notranslate"><span class="pre">ValueError</span></code>. Earlier versions
+accepted them, except for the first difference estimator, which raised an
+error from pandas, and the other estimators treated them as separate
+observations. A <code class="docutils literal notranslate"><span class="pre">PeriodIndex</span></code> of time labels is accepted. Earlier
+versions raised a <code class="docutils literal notranslate"><span class="pre">ValueError</span></code> that the time labels must be numeric or
+date-like.</p>
+</div>
 <dl class="field-list simple">
 <dt class="field-odd" id="linearmodels.panel.data.PanelData-raises">Raises<span class="colon">:</span><a class="headerlink" href="#linearmodels.panel.data.PanelData-raises" title="Permalink to this headline">¶</a></dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><a class="reference external" href="https://docs.python.org/3/builtins/exceptions.html#TypeError" title="(in Python v3.15)"><strong>TypeError</strong></a> – If the input type is not supported</p></li>
 <li><p><a class="reference external" href="https://docs.python.org/3/builtins/exceptions.html#ValueError" title="(in Python v3.15)"><strong>ValueError</strong></a> – If the input has the wrong number of dimensions or a MultiIndex
-    DataFrame does not have 2 levels</p></li>
+    DataFrame does not have 2 levels, if the time labels are neither
+    numbers nor dates, or if a combination of an entity and a time
+    period appears more than once</p></li>
 </ul>
 </dd>
 </dl>

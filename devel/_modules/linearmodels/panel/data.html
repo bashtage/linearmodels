@@ -19,7 +19,7 @@
     
   
       
-        <title>linearmodels.panel.data - linearmodels v7.1 (+399)</title>
+        <title>linearmodels.panel.data - linearmodels v7.1 (+404)</title>
       
     
 
@@ -91,7 +91,7 @@
 
 <header class="md-header md-header--shadow" data-md-component="header">
   <nav class="md-header__inner md-grid" aria-label="Header">
-    <a href="../../../index.html" title="linearmodels v7.1 (+399)" class="md-header__button md-logo" aria-label="linearmodels v7.1 (+399)" data-md-component="logo">
+    <a href="../../../index.html" title="linearmodels v7.1 (+404)" class="md-header__button md-logo" aria-label="linearmodels v7.1 (+404)" data-md-component="logo">
       <img src="../../../_static/bw-logo.svg" alt="logo">
     </a>
     <label class="md-header__button md-icon" for="__drawer">
@@ -102,7 +102,7 @@
       <div class="md-header__ellipsis">
         <div class="md-header__topic">
           <span class="md-ellipsis">
-            linearmodels v7.1 (+399)
+            linearmodels v7.1 (+404)
           </span>
         </div>
         <div class="md-header__topic" data-md-component="header-topic">
@@ -197,10 +197,10 @@
 
 <nav class="md-nav md-nav--primary" aria-label="Navigation" data-md-level="0">
   <label class="md-nav__title" for="__drawer">
-    <a href="../../../index.html" title="linearmodels v7.1 (+399)" class="md-nav__button md-logo" aria-label="linearmodels v7.1 (+399)" data-md-component="logo">
+    <a href="../../../index.html" title="linearmodels v7.1 (+404)" class="md-nav__button md-logo" aria-label="linearmodels v7.1 (+404)" data-md-component="logo">
       <img src="../../../_static/bw-logo.svg" alt="logo">
     </a>
-    linearmodels v7.1 (+399)
+    linearmodels v7.1 (+404)
   </label>
   
     <div class="md-nav__source">
@@ -705,13 +705,32 @@
 <span class="sd">    methods that group by the index raise a ValueError if the level that they</span>
 <span class="sd">    use has a missing label.</span>
 
+<span class="sd">    The time labels must be numbers or dates. A pandas ``PeriodIndex`` is</span>
+<span class="sd">    accepted: it is converted with ``to_timestamp()``, so that the time labels</span>
+<span class="sd">    are the timestamps at the start of the periods, and the data are the same</span>
+<span class="sd">    as those of a panel that is indexed by timestamps.</span>
+
+<span class="sd">    Each combination of an entity and a time period can appear only once, since</span>
+<span class="sd">    an observation is identified by them.</span>
+
+<span class="sd">    .. versionchanged:: 7.1</span>
+
+<span class="sd">       Duplicated (entity, time) rows raise a ``ValueError``. Earlier versions</span>
+<span class="sd">       accepted them, except for the first difference estimator, which raised an</span>
+<span class="sd">       error from pandas, and the other estimators treated them as separate</span>
+<span class="sd">       observations. A ``PeriodIndex`` of time labels is accepted. Earlier</span>
+<span class="sd">       versions raised a ``ValueError`` that the time labels must be numeric or</span>
+<span class="sd">       date-like.</span>
+
 <span class="sd">    Raises</span>
 <span class="sd">    ------</span>
 <span class="sd">    TypeError</span>
 <span class="sd">        If the input type is not supported</span>
 <span class="sd">    ValueError</span>
 <span class="sd">        If the input has the wrong number of dimensions or a MultiIndex</span>
-<span class="sd">        DataFrame does not have 2 levels</span>
+<span class="sd">        DataFrame does not have 2 levels, if the time labels are neither</span>
+<span class="sd">        numbers nor dates, or if a combination of an entity and a time</span>
+<span class="sd">        period appears more than once</span>
 <span class="sd">    """</span>
 
     <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span>
@@ -776,6 +795,15 @@
                 <span class="k">if</span> <span class="n">copy</span><span class="p">:</span>
                     <span class="bp">self</span><span class="o">.</span><span class="n">_frame</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_frame</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
             <span class="k">else</span><span class="p">:</span>
+                <span class="k">if</span> <span class="ow">not</span> <span class="n">x</span><span class="o">.</span><span class="n">index</span><span class="o">.</span><span class="n">is_unique</span><span class="p">:</span>
+                    <span class="n">label</span> <span class="o">=</span> <span class="n">x</span><span class="o">.</span><span class="n">index</span><span class="p">[</span><span class="nb">int</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">argmax</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">asarray</span><span class="p">(</span><span class="n">x</span><span class="o">.</span><span class="n">index</span><span class="o">.</span><span class="n">duplicated</span><span class="p">())))]</span>
+                    <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
+                        <span class="s2">"Each combination of an entity and a time period can appear "</span>
+                        <span class="sa">f</span><span class="s2">"only once, but the time label </span><span class="si">{</span><span class="n">label</span><span class="si">}</span><span class="s2"> appears more than "</span>
+                        <span class="s2">"once in the index of a DataFrame with time as the index and "</span>
+                        <span class="s2">"entities as the columns, so that each entity has more than "</span>
+                        <span class="s2">"one observation at that time."</span>
+                    <span class="p">)</span>
                 <span class="n">options</span> <span class="o">=</span> <span class="p">{</span><span class="s2">"future_stack"</span><span class="p">:</span> <span class="kc">True</span><span class="p">}</span> <span class="k">if</span> <span class="n">PD_GTE_21</span> <span class="k">else</span> <span class="p">{</span><span class="s2">"dropna"</span><span class="p">:</span> <span class="kc">False</span><span class="p">}</span>
                 <span class="bp">self</span><span class="o">.</span><span class="n">_frame</span> <span class="o">=</span> <span class="n">DataFrame</span><span class="p">({</span><span class="n">var_name</span><span class="p">:</span> <span class="n">x</span><span class="o">.</span><span class="n">T</span><span class="o">.</span><span class="n">stack</span><span class="p">(</span><span class="o">**</span><span class="n">options</span><span class="p">)})</span>
         <span class="k">elif</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">):</span>
@@ -818,6 +846,12 @@
                     <span class="sa">f</span><span class="s2">"it cannot be converted to float64: </span><span class="si">{</span><span class="n">exc</span><span class="si">}</span><span class="s2">"</span>
                 <span class="p">)</span> <span class="kn">from</span><span class="w"> </span><span class="nn">exc</span>
 
+        <span class="n">time_level</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">index</span><span class="o">.</span><span class="n">levels</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span>
+        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">time_level</span><span class="p">,</span> <span class="n">pd</span><span class="o">.</span><span class="n">PeriodIndex</span><span class="p">):</span>
+            <span class="c1"># A period is identified by its start, as a date is in a DatetimeIndex. The</span>
+            <span class="c1"># frame is not changed in place since it can be the frame of the caller.</span>
+            <span class="n">timestamps</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">index</span><span class="o">.</span><span class="n">set_levels</span><span class="p">(</span><span class="n">time_level</span><span class="o">.</span><span class="n">to_timestamp</span><span class="p">(),</span> <span class="n">level</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_frame</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_frame</span><span class="o">.</span><span class="n">set_axis</span><span class="p">(</span><span class="n">timestamps</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
         <span class="n">time_index</span> <span class="o">=</span> <span class="n">Series</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">index</span><span class="o">.</span><span class="n">levels</span><span class="p">[</span><span class="mi">1</span><span class="p">])</span>
         <span class="k">if</span> <span class="ow">not</span> <span class="p">(</span>
             <span class="n">is_numeric_dtype</span><span class="p">(</span><span class="n">time_index</span><span class="o">.</span><span class="n">dtype</span><span class="p">)</span>
@@ -826,9 +860,37 @@
             <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
                 <span class="s2">"The index on the time dimension must be either numeric or date-like"</span>
             <span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_check_unique</span><span class="p">(</span><span class="n">index_names</span><span class="p">)</span>
         <span class="c1"># self._k, self._t, self._n = self.panel.shape</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_k</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_t</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_n</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">shape</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_frame</span><span class="o">.</span><span class="n">index</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_frame</span><span class="o">.</span><span class="n">index</span><span class="o">.</span><span class="n">set_names</span><span class="p">(</span><span class="n">index_names</span><span class="p">)</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">_check_unique</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">index_names</span><span class="p">:</span> <span class="n">Sequence</span><span class="p">[</span><span class="nb">str</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">"""</span>
+<span class="sd">        Raise a ValueError if an (entity, time) combination appears more than once</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        index_names : sequence of str</span>
+<span class="sd">            The names of the entity and time levels, which are used in the message.</span>
+
+<span class="sd">        Raises</span>
+<span class="sd">        ------</span>
+<span class="sd">        ValueError</span>
+<span class="sd">            If the index has duplicated entries. The message names the first of</span>
+<span class="sd">            them, the first row that repeats an earlier row.</span>
+<span class="sd">        """</span>
+        <span class="n">index</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">index</span>
+        <span class="k">if</span> <span class="n">index</span><span class="o">.</span><span class="n">is_unique</span><span class="p">:</span>
+            <span class="k">return</span>
+        <span class="n">duplicated</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">asarray</span><span class="p">(</span><span class="n">index</span><span class="o">.</span><span class="n">duplicated</span><span class="p">())</span>
+        <span class="n">first</span> <span class="o">=</span> <span class="n">index</span><span class="p">[</span><span class="nb">int</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">argmax</span><span class="p">(</span><span class="n">duplicated</span><span class="p">))]</span>
+        <span class="n">entity</span><span class="p">,</span> <span class="n">time</span> <span class="o">=</span> <span class="n">index_names</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
+            <span class="s2">"Each combination of an entity and a time period can appear only once, "</span>
+            <span class="sa">f</span><span class="s2">"but </span><span class="si">{</span><span class="nb">int</span><span class="p">(</span><span class="n">duplicated</span><span class="o">.</span><span class="n">sum</span><span class="p">())</span><span class="si">}</span><span class="s2"> row(s) repeat an earlier row. The first "</span>
+            <span class="sa">f</span><span class="s2">"duplicated entry is </span><span class="si">{</span><span class="n">entity</span><span class="si">}</span><span class="s2">=</span><span class="si">{</span><span class="n">first</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="si">}</span><span class="s2">, </span><span class="si">{</span><span class="n">time</span><span class="si">}</span><span class="s2">=</span><span class="si">{</span><span class="n">first</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="si">}</span><span class="s2">."</span>
+        <span class="p">)</span>
 
     <span class="nd">@property</span>
     <span class="k">def</span><span class="w"> </span><span class="nf">panel</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">_Panel</span><span class="p">:</span>

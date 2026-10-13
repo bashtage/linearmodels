@@ -23,7 +23,7 @@
     
   
       
-        <title>linearmodels.panel.model.PanelOLS - linearmodels v7.1 (+399)</title>
+        <title>linearmodels.panel.model.PanelOLS - linearmodels v7.1 (+404)</title>
       
     
 
@@ -100,7 +100,7 @@
 
 <header class="md-header md-header--shadow" data-md-component="header">
   <nav class="md-header__inner md-grid" aria-label="Header">
-    <a href="../../index.html" title="linearmodels v7.1 (+399)" class="md-header__button md-logo" aria-label="linearmodels v7.1 (+399)" data-md-component="logo">
+    <a href="../../index.html" title="linearmodels v7.1 (+404)" class="md-header__button md-logo" aria-label="linearmodels v7.1 (+404)" data-md-component="logo">
       <img src="../../_static/bw-logo.svg" alt="logo">
     </a>
     <label class="md-header__button md-icon" for="__drawer">
@@ -111,7 +111,7 @@
       <div class="md-header__ellipsis">
         <div class="md-header__topic">
           <span class="md-ellipsis">
-            linearmodels v7.1 (+399)
+            linearmodels v7.1 (+404)
           </span>
         </div>
         <div class="md-header__topic" data-md-component="header-topic">
@@ -206,10 +206,10 @@
 
 <nav class="md-nav md-nav--primary" aria-label="Navigation" data-md-level="0">
   <label class="md-nav__title" for="__drawer">
-    <a href="../../index.html" title="linearmodels v7.1 (+399)" class="md-nav__button md-logo" aria-label="linearmodels v7.1 (+399)" data-md-component="logo">
+    <a href="../../index.html" title="linearmodels v7.1 (+404)" class="md-nav__button md-logo" aria-label="linearmodels v7.1 (+404)" data-md-component="logo">
       <img src="../../_static/bw-logo.svg" alt="logo">
     </a>
-    linearmodels v7.1 (+399)
+    linearmodels v7.1 (+404)
   </label>
   
     <div class="md-nav__source">
@@ -1887,7 +1887,10 @@ as dependent or, if dependent has no labels, as exog. See
 </dd>
 <dt id="linearmodels.panel.model.PanelOLS.__init__.other_effects"><span class="n sig-name">other_effects</span><span class="p">:</span><span class="w"> </span><span class="n"><span class="desctype"><a class="reference internal" href="linearmodels.panel.data.PanelData.html#linearmodels.panel.data.PanelData" title="linearmodels.panel.data.PanelData (Python class) — Abstraction to handle alternative formats for panel data">PanelData</a><span class="w"> </span><span class="p">|</span><span class="w"> </span><a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v2.5)">ndarray</a><span class="w"> </span><span class="p">|</span><span class="w"> </span><a class="reference external" href="https://docs.xarray.dev/en/stable/generated/xarray.DataArray.html#xarray.DataArray" title="(in xarray v2026.9.0)">DataArray</a><span class="w"> </span><span class="p">|</span><span class="w"> </span><a class="reference external" href="https://pandas.pydata.org/pandas-docs/stable/reference/api/pandas.DataFrame.html#pandas.DataFrame" title="(in pandas v3.0.6)">DataFrame</a><span class="w"> </span><span class="p">|</span><span class="w"> </span><a class="reference external" href="https://pandas.pydata.org/pandas-docs/stable/reference/api/pandas.Series.html#pandas.Series" title="(in pandas v3.0.6)">Series</a><span class="w"> </span><span class="p">|</span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/builtins/constants.html#None" title="(in Python v3.15)">None</a></span></span><span class="w"> </span><span class="o">=</span><span class="w"> </span><code class="code python default_value docutils literal highlight highlight-python"><span class="kc">None</span></code><a class="headerlink" href="#linearmodels.panel.model.PanelOLS.__init__.other_effects" title="Permalink to this definition">¶</a></dt><dd><p>Category codes to use for any effects that are not entity or time
 effects. Each variable is treated as an effect. A 1-d array or list has
-a value for each row of dependent, in the order of the rows of dependent.</p>
+a value for each row of dependent, in the order of the rows of dependent.
+An observation where any of the other effects is missing (NaN or None) is
+dropped, with the observations that have a missing value in dependent, exog
+or weights, and a <code class="docutils literal notranslate"><span class="pre">MissingValueWarning</span></code> is issued.</p>
 </dd>
 <dt id="linearmodels.panel.model.PanelOLS.__init__.singletons"><span class="n sig-name">singletons</span><span class="p">:</span><span class="w"> </span><span class="n"><span class="desctype"><a class="reference external" href="https://docs.python.org/3/builtins/functions.html#bool" title="(in Python v3.15)">bool</a></span></span><span class="w"> </span><span class="o">=</span><span class="w"> </span><code class="code python default_value docutils literal highlight highlight-python"><span class="kc">True</span></code><a class="headerlink" href="#linearmodels.panel.model.PanelOLS.__init__.singletons" title="Permalink to this definition">¶</a></dt><dd><p>Flag indicating whether to drop singleton observation</p>
 </dd>
@@ -1931,6 +1934,13 @@ True, the variable is dropped and an <code class="docutils literal notranslate">
 constant is never dropped. The norm includes the mean of the variable, so a
 variable with a large mean and little other variation, less than 1e-5 of its norm,
 is also treated as absorbed. Subtract its mean to avoid this.</p>
+<div class="admonition versionchanged">
+<p class="admonition-title"><span class="versionmodified changed">Changed in version 7.1: </span>An observation with a missing value in <code class="docutils literal notranslate"><span class="pre">other_effects</span></code> is dropped with a
+<code class="docutils literal notranslate"><span class="pre">MissingValueWarning</span></code>, as it is for a missing value in <code class="docutils literal notranslate"><span class="pre">dependent</span></code>,
+<code class="docutils literal notranslate"><span class="pre">exog</span></code> or <code class="docutils literal notranslate"><span class="pre">weights</span></code>. Earlier versions treated a missing value as a
+category of its own, and <code class="docutils literal notranslate"><span class="pre">fit</span></code> failed after it estimated the model with the
+error that the observations per group cannot be computed.</p>
+</div>
 <p class="rubric">Methods</p>
 <table class="autosummary longtable docutils data align-default">
 <tbody>

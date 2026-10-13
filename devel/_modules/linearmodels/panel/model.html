@@ -19,7 +19,7 @@
     
   
       
-        <title>linearmodels.panel.model - linearmodels v7.1 (+399)</title>
+        <title>linearmodels.panel.model - linearmodels v7.1 (+404)</title>
       
     
 
@@ -91,7 +91,7 @@
 
 <header class="md-header md-header--shadow" data-md-component="header">
   <nav class="md-header__inner md-grid" aria-label="Header">
-    <a href="../../../index.html" title="linearmodels v7.1 (+399)" class="md-header__button md-logo" aria-label="linearmodels v7.1 (+399)" data-md-component="logo">
+    <a href="../../../index.html" title="linearmodels v7.1 (+404)" class="md-header__button md-logo" aria-label="linearmodels v7.1 (+404)" data-md-component="logo">
       <img src="../../../_static/bw-logo.svg" alt="logo">
     </a>
     <label class="md-header__button md-icon" for="__drawer">
@@ -102,7 +102,7 @@
       <div class="md-header__ellipsis">
         <div class="md-header__topic">
           <span class="md-ellipsis">
-            linearmodels v7.1 (+399)
+            linearmodels v7.1 (+404)
           </span>
         </div>
         <div class="md-header__topic" data-md-component="header-topic">
@@ -197,10 +197,10 @@
 
 <nav class="md-nav md-nav--primary" aria-label="Navigation" data-md-level="0">
   <label class="md-nav__title" for="__drawer">
-    <a href="../../../index.html" title="linearmodels v7.1 (+399)" class="md-nav__button md-logo" aria-label="linearmodels v7.1 (+399)" data-md-component="logo">
+    <a href="../../../index.html" title="linearmodels v7.1 (+404)" class="md-nav__button md-logo" aria-label="linearmodels v7.1 (+404)" data-md-component="logo">
       <img src="../../../_static/bw-logo.svg" alt="logo">
     </a>
-    linearmodels v7.1 (+399)
+    linearmodels v7.1 (+404)
   </label>
   
     <div class="md-nav__source">
@@ -1270,6 +1270,26 @@
             <span class="p">)</span>
         <span class="k">return</span> <span class="n">rank_of_x</span>
 
+    <span class="k">def</span><span class="w"> </span><span class="nf">_missing_in_other_inputs</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">BoolArray</span> <span class="o">|</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">"""</span>
+<span class="sd">        Observations that are missing in inputs other than the data of the model</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        ndarray or None</span>
+<span class="sd">            A boolean array with a value for each row of dependent, which is True</span>
+<span class="sd">            for the observations to drop since an input that the model validates,</span>
+<span class="sd">            e.g., the other effects of PanelOLS, is missing. None if there are</span>
+<span class="sd">            no such inputs.</span>
+
+<span class="sd">        Notes</span>
+<span class="sd">        -----</span>
+<span class="sd">        The observations are dropped together with those that are missing in</span>
+<span class="sd">        dependent, exog and weights, so that there is a single warning and the</span>
+<span class="sd">        weights and the constant are determined from the observations that remain.</span>
+<span class="sd">        """</span>
+        <span class="k">return</span> <span class="kc">None</span>
+
     <span class="k">def</span><span class="w"> </span><span class="nf">_validate_data</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">"""Check input shape and remove missing"""</span>
         <span class="n">y</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_y</span> <span class="o">=</span> <span class="n">cast</span><span class="p">(</span>
@@ -1298,6 +1318,9 @@
             <span class="o">|</span> <span class="n">np</span><span class="o">.</span><span class="n">any</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">isnan</span><span class="p">(</span><span class="n">w</span><span class="p">),</span> <span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">),</span>
             <span class="n">dtype</span><span class="o">=</span><span class="nb">bool</span><span class="p">,</span>
         <span class="p">)</span>
+        <span class="n">missing_in_other_inputs</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_missing_in_other_inputs</span><span class="p">()</span>
+        <span class="k">if</span> <span class="n">missing_in_other_inputs</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">missing</span> <span class="o">=</span> <span class="n">missing</span> <span class="o">|</span> <span class="n">missing_in_other_inputs</span>
 
         <span class="n">missing_warning</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">asarray</span><span class="p">(</span><span class="n">all_missing</span> <span class="o">^</span> <span class="n">missing</span><span class="p">),</span> <span class="n">stacklevel</span><span class="o">=</span><span class="mi">4</span><span class="p">)</span>
         <span class="k">if</span> <span class="n">np</span><span class="o">.</span><span class="n">any</span><span class="p">(</span><span class="n">missing</span><span class="p">):</span>
@@ -2111,6 +2134,9 @@
 <span class="sd">        Category codes to use for any effects that are not entity or time</span>
 <span class="sd">        effects. Each variable is treated as an effect. A 1-d array or list has</span>
 <span class="sd">        a value for each row of dependent, in the order of the rows of dependent.</span>
+<span class="sd">        An observation where any of the other effects is missing (NaN or None) is</span>
+<span class="sd">        dropped, with the observations that have a missing value in dependent, exog</span>
+<span class="sd">        or weights, and a ``MissingValueWarning`` is issued.</span>
 <span class="sd">    singletons : bool</span>
 <span class="sd">        Flag indicating whether to drop singleton observation</span>
 <span class="sd">    drop_absorbed : bool</span>
@@ -2166,6 +2192,14 @@
 <span class="sd">    constant is never dropped. The norm includes the mean of the variable, so a</span>
 <span class="sd">    variable with a large mean and little other variation, less than 1e-5 of its norm,</span>
 <span class="sd">    is also treated as absorbed. Subtract its mean to avoid this.</span>
+
+<span class="sd">    .. versionchanged:: 7.1</span>
+
+<span class="sd">       An observation with a missing value in ``other_effects`` is dropped with a</span>
+<span class="sd">       ``MissingValueWarning``, as it is for a missing value in ``dependent``,</span>
+<span class="sd">       ``exog`` or ``weights``. Earlier versions treated a missing value as a</span>
+<span class="sd">       category of its own, and ``fit`` failed after it estimated the model with the</span>
+<span class="sd">       error that the observations per group cannot be computed.</span>
 <span class="sd">    """</span>
 
     <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span>
@@ -2181,15 +2215,17 @@
         <span class="n">drop_absorbed</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
         <span class="n">check_rank</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span>
     <span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
-        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">dependent</span><span class="p">,</span> <span class="n">exog</span><span class="p">,</span> <span class="n">weights</span><span class="o">=</span><span class="n">weights</span><span class="p">,</span> <span class="n">check_rank</span><span class="o">=</span><span class="n">check_rank</span><span class="p">)</span>
-
+        <span class="c1"># The effects are needed while the data are validated, which drops the</span>
+        <span class="c1"># observations that have a missing value in other_effects</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_entity_effects</span> <span class="o">=</span> <span class="n">entity_effects</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_time_effects</span> <span class="o">=</span> <span class="n">time_effects</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_other_effects_input</span> <span class="o">=</span> <span class="n">other_effects</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_other_effects_rows</span><span class="p">:</span> <span class="n">PanelData</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">dependent</span><span class="p">,</span> <span class="n">exog</span><span class="p">,</span> <span class="n">weights</span><span class="o">=</span><span class="n">weights</span><span class="p">,</span> <span class="n">check_rank</span><span class="o">=</span><span class="n">check_rank</span><span class="p">)</span>
+
         <span class="bp">self</span><span class="o">.</span><span class="n">_other_effect_cats</span><span class="p">:</span> <span class="n">PanelData</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_singletons</span> <span class="o">=</span> <span class="n">singletons</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">_other_effects</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_validate_effects</span><span class="p">(</span>
-            <span class="n">other_effects</span><span class="p">,</span> <span class="n">labelled</span><span class="o">=</span><span class="n">_is_labelled</span><span class="p">(</span><span class="n">other_effects</span><span class="p">)</span>
-        <span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_other_effects</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_validate_effects</span><span class="p">()</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_has_effect</span> <span class="o">=</span> <span class="n">entity_effects</span> <span class="ow">or</span> <span class="n">time_effects</span> <span class="ow">or</span> <span class="bp">self</span><span class="o">.</span><span class="n">other_effects</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_drop_absorbed</span> <span class="o">=</span> <span class="n">drop_absorbed</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_singleton_index</span> <span class="o">=</span> <span class="kc">None</span>
@@ -2251,20 +2287,46 @@
         <span class="n">out</span> <span class="o">+=</span> <span class="n">additional</span>
         <span class="k">return</span> <span class="n">out</span>
 
-    <span class="k">def</span><span class="w"> </span><span class="nf">_validate_effects</span><span class="p">(</span>
-        <span class="bp">self</span><span class="p">,</span> <span class="n">effects</span><span class="p">:</span> <span class="n">PanelDataLike</span> <span class="o">|</span> <span class="kc">None</span><span class="p">,</span> <span class="n">labelled</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span>
-    <span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
-<span class="w">        </span><span class="sd">"""Check model effects"""</span>
-        <span class="k">if</span> <span class="n">effects</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
-            <span class="k">return</span> <span class="kc">False</span>
-        <span class="n">effects</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_panel_rows</span><span class="p">(</span><span class="n">effects</span><span class="p">,</span> <span class="s2">"other_effects"</span><span class="p">,</span> <span class="s2">"OtherEffect"</span><span class="p">)</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">_missing_in_other_inputs</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">BoolArray</span> <span class="o">|</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">"""</span>
+<span class="sd">        Observations with a missing value in other_effects</span>
 
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        ndarray or None</span>
+<span class="sd">            A boolean array that is True for the observations of dependent where</span>
+<span class="sd">            any of the other effects is missing. None if the model does not have</span>
+<span class="sd">            other effects.</span>
+<span class="sd">        """</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_other_effects_input</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="k">return</span> <span class="kc">None</span>
+        <span class="n">effects</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_panel_rows</span><span class="p">(</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_other_effects_input</span><span class="p">,</span> <span class="s2">"other_effects"</span><span class="p">,</span> <span class="s2">"OtherEffect"</span>
+        <span class="p">)</span>
         <span class="k">if</span> <span class="n">effects</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">:]</span> <span class="o">!=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_original_shape</span><span class="p">[</span><span class="mi">1</span><span class="p">:]:</span>
             <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
                 <span class="s2">"other_effects must have the same number of "</span>
                 <span class="s2">"entities and time periods as dependent."</span>
             <span class="p">)</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">_check_labels</span><span class="p">(</span><span class="s2">"other_effects"</span><span class="p">,</span> <span class="n">effects</span><span class="o">.</span><span class="n">index</span><span class="p">,</span> <span class="n">labelled</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_check_labels</span><span class="p">(</span>
+            <span class="s2">"other_effects"</span><span class="p">,</span> <span class="n">effects</span><span class="o">.</span><span class="n">index</span><span class="p">,</span> <span class="n">_is_labelled</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_other_effects_input</span><span class="p">)</span>
+        <span class="p">)</span>
+        <span class="n">nrows</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_original_index</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">effects</span><span class="o">.</span><span class="n">dataframe</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">!=</span> <span class="n">nrows</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
+                <span class="sa">f</span><span class="s2">"other_effects has </span><span class="si">{</span><span class="n">effects</span><span class="o">.</span><span class="n">dataframe</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="si">}</span><span class="s2"> rows, but dependent "</span>
+                <span class="sa">f</span><span class="s2">"has </span><span class="si">{</span><span class="n">nrows</span><span class="si">}</span><span class="s2">. It must have a value for each row of dependent."</span>
+            <span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_other_effects_rows</span> <span class="o">=</span> <span class="n">effects</span>
+        <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">asarray</span><span class="p">(</span><span class="n">effects</span><span class="o">.</span><span class="n">isnull</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="nb">bool</span><span class="p">)</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">_validate_effects</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">"""Check model effects"""</span>
+        <span class="n">effects</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_other_effects_rows</span>
+        <span class="k">if</span> <span class="n">effects</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="k">return</span> <span class="kc">False</span>
+        <span class="c1"># The rows of the input are not needed once the categories are made</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_other_effects_rows</span> <span class="o">=</span> <span class="kc">None</span>
 
         <span class="n">num_effects</span> <span class="o">=</span> <span class="n">effects</span><span class="o">.</span><span class="n">nvar</span>
         <span class="k">if</span> <span class="n">num_effects</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">entity_effects</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">time_effects</span> <span class="o">&gt;</span> <span class="mi">2</span><span class="p">:</span>
@@ -2361,7 +2423,9 @@
 <span class="sd">            the weight should be homoskedastic.</span>
 <span class="sd">        other_effects : array_like</span>
 <span class="sd">            Category codes to use for any effects that are not entity or time</span>
-<span class="sd">            effects. Each variable is treated as an effect.</span>
+<span class="sd">            effects. Each variable is treated as an effect. An observation where</span>
+<span class="sd">            any of the other effects is missing is dropped, with a</span>
+<span class="sd">            ``MissingValueWarning``.</span>
 <span class="sd">        singletons : bool</span>
 <span class="sd">            Flag indicating whether to drop singleton observation</span>
 <span class="sd">        drop_absorbed : bool</span>
