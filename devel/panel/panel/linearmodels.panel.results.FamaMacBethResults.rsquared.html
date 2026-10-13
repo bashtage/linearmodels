@@ -23,7 +23,7 @@
     
   
       
-        <title>linearmodels.panel.results.FamaMacBethResults.rsquared - linearmodels v7.1 (+420)</title>
+        <title>linearmodels.panel.results.FamaMacBethResults.rsquared - linearmodels v7.1 (+425)</title>
       
     
 
@@ -100,7 +100,7 @@
 
 <header class="md-header md-header--shadow" data-md-component="header">
   <nav class="md-header__inner md-grid" aria-label="Header">
-    <a href="../../index.html" title="linearmodels v7.1 (+420)" class="md-header__button md-logo" aria-label="linearmodels v7.1 (+420)" data-md-component="logo">
+    <a href="../../index.html" title="linearmodels v7.1 (+425)" class="md-header__button md-logo" aria-label="linearmodels v7.1 (+425)" data-md-component="logo">
       <img src="../../_static/bw-logo.svg" alt="logo">
     </a>
     <label class="md-header__button md-icon" for="__drawer">
@@ -111,7 +111,7 @@
       <div class="md-header__ellipsis">
         <div class="md-header__topic">
           <span class="md-ellipsis">
-            linearmodels v7.1 (+420)
+            linearmodels v7.1 (+425)
           </span>
         </div>
         <div class="md-header__topic" data-md-component="header-topic">
@@ -206,10 +206,10 @@
 
 <nav class="md-nav md-nav--primary" aria-label="Navigation" data-md-level="0">
   <label class="md-nav__title" for="__drawer">
-    <a href="../../index.html" title="linearmodels v7.1 (+420)" class="md-nav__button md-logo" aria-label="linearmodels v7.1 (+420)" data-md-component="logo">
+    <a href="../../index.html" title="linearmodels v7.1 (+425)" class="md-nav__button md-logo" aria-label="linearmodels v7.1 (+425)" data-md-component="logo">
       <img src="../../_static/bw-logo.svg" alt="logo">
     </a>
-    linearmodels v7.1 (+420)
+    linearmodels v7.1 (+425)
   </label>
   
     <div class="md-nav__source">
@@ -1334,6 +1334,32 @@
     </span>
   </a>
   
+    <nav class="md-nav" aria-label="FamaMacBethResults.rsquared">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#linearmodels.panel.results.FamaMacBethResults.rsquared-returns" class="md-nav__link">
+    
+    <span class="md-ellipsis">
+      <span>Returns</span>
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#linearmodels.panel.results.FamaMacBethResults.rsquared-return-type" class="md-nav__link">
+    
+    <span class="md-ellipsis">
+      <span>Return type</span>
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
 </li>
       
     </ul>
@@ -2158,6 +2184,32 @@
     </span>
   </a>
   
+    <nav class="md-nav" aria-label="FamaMacBethResults.rsquared">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#linearmodels.panel.results.FamaMacBethResults.rsquared-returns" class="md-nav__link">
+    
+    <span class="md-ellipsis">
+      <span>Returns</span>
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#linearmodels.panel.results.FamaMacBethResults.rsquared-return-type" class="md-nav__link">
+    
+    <span class="md-ellipsis">
+      <span>Return type</span>
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
 </li>
       
     </ul>
@@ -2181,6 +2233,24 @@
 <dt class="sig sig-object highlight py" id="linearmodels.panel.results.FamaMacBethResults.rsquared">
 <span class="property"><span class="k"><span class="pre">property</span></span><span class="w"> </span></span><span class="sig-prename descclassname"><span class="pre">FamaMacBethResults.</span></span><span class="sig-name descname"><span class="pre">rsquared</span></span><span class="p"> <span class="pre">:</span> </span><span class="desctype"><a class="reference external" href="https://docs.python.org/3/builtins/functions.html#float" title="(in Python v3.15)"><span class="pre">float</span></a></span><a class="headerlink" href="#linearmodels.panel.results.FamaMacBethResults.rsquared" title="Link to this definition">¶</a></dt>
 <dd><p>Model Coefficient of determination</p>
+<dl class="field-list simple">
+<dt class="field-odd" id="linearmodels.panel.results.FamaMacBethResults.rsquared-returns">Returns<span class="colon">:</span><a class="headerlink" href="#linearmodels.panel.results.FamaMacBethResults.rsquared-returns" title="Permalink to this headline">¶</a></dt>
+<dd class="field-odd"><p>The coefficient of determination of the model.</p>
+</dd>
+<dt class="field-even" id="linearmodels.panel.results.FamaMacBethResults.rsquared-return-type">Return type<span class="colon">:</span><a class="headerlink" href="#linearmodels.panel.results.FamaMacBethResults.rsquared-return-type" title="Permalink to this headline">¶</a></dt>
+<dd class="field-even"><p><a class="reference external" href="https://docs.python.org/3/builtins/functions.html#float" title="(in Python v3.15)"><code class="xref py py-class docutils literal notranslate"><span class="pre">float</span></code></a></p>
+</dd>
+</dl>
+<p class="rubric">Notes</p>
+<p>The coefficient of determination is NaN if its total sum of squares is zero,
+up to rounding error, since it is not defined then. This happens if the
+dependent variable does not vary, or if nothing varies once the means or the
+effects of the model are removed. No error or warning is raised.</p>
+<p>The limit is the rounding error of the computation. If the effects are removed
+by an iterative algorithm (<code class="docutils literal notranslate"><span class="pre">use_lsmr=True</span></code> in <code class="docutils literal notranslate"><span class="pre">fit</span></code>), its error is larger,
+by default about 1e-8 relative to the size of the dependent variable, so that a
+dependent variable that the effects explain exactly can have a total sum of
+squares that is not recognized as zero.</p>
 </dd></dl>
 
 

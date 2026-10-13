@@ -19,7 +19,7 @@
     
   
       
-        <title>linearmodels.system.results - linearmodels v7.1 (+420)</title>
+        <title>linearmodels.system.results - linearmodels v7.1 (+425)</title>
       
     
 
@@ -91,7 +91,7 @@
 
 <header class="md-header md-header--shadow" data-md-component="header">
   <nav class="md-header__inner md-grid" aria-label="Header">
-    <a href="../../../index.html" title="linearmodels v7.1 (+420)" class="md-header__button md-logo" aria-label="linearmodels v7.1 (+420)" data-md-component="logo">
+    <a href="../../../index.html" title="linearmodels v7.1 (+425)" class="md-header__button md-logo" aria-label="linearmodels v7.1 (+425)" data-md-component="logo">
       <img src="../../../_static/bw-logo.svg" alt="logo">
     </a>
     <label class="md-header__button md-icon" for="__drawer">
@@ -102,7 +102,7 @@
       <div class="md-header__ellipsis">
         <div class="md-header__topic">
           <span class="md-ellipsis">
-            linearmodels v7.1 (+420)
+            linearmodels v7.1 (+425)
           </span>
         </div>
         <div class="md-header__topic" data-md-component="header-topic">
@@ -197,10 +197,10 @@
 
 <nav class="md-nav md-nav--primary" aria-label="Navigation" data-md-level="0">
   <label class="md-nav__title" for="__drawer">
-    <a href="../../../index.html" title="linearmodels v7.1 (+420)" class="md-nav__button md-logo" aria-label="linearmodels v7.1 (+420)" data-md-component="logo">
+    <a href="../../../index.html" title="linearmodels v7.1 (+425)" class="md-nav__button md-logo" aria-label="linearmodels v7.1 (+425)" data-md-component="logo">
       <img src="../../../_static/bw-logo.svg" alt="logo">
     </a>
-    linearmodels v7.1 (+420)
+    linearmodels v7.1 (+425)
   </label>
   
     <div class="md-nav__source">
@@ -662,6 +662,12 @@
 <span class="sd">        constant. Note that if a constant is not present in an equation</span>
 <span class="sd">        then the term in the denominator is **not** demeaned so that</span>
 <span class="sd">        :math:`\hat{\eta}_{ij}=y_{ij}`.</span>
+
+<span class="sd">        The coefficient of determination is NaN if the total sum of squares in the</span>
+<span class="sd">        denominator is zero, up to rounding error, since it is not defined then. For</span>
+<span class="sd">        the system this happens if none of the dependent variables vary, since the sums</span>
+<span class="sd">        of the equations are added, and for an equation if its dependent variable does</span>
+<span class="sd">        not vary. No error or warning is raised.</span>
 <span class="sd">        """</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_r2</span>
 
@@ -1024,6 +1030,14 @@
 
 <span class="sd">        the ratio of the variance the dependent in an equation to the total</span>
 <span class="sd">        variance of all dependent variables.</span>
+
+<span class="sd">        A measure is NaN if its total sum of squares is zero, up to rounding error, since</span>
+<span class="sd">        it is not defined then, and all of them are NaN if none of the dependent</span>
+<span class="sd">        variables vary. If the dependent variable of one equation does not vary, the</span>
+<span class="sd">        equation has no weight in Dhrymes's measure, and Berndt's measure is NaN since</span>
+<span class="sd">        the determinant of the covariance of the dependent variables is 0. McElroy's</span>
+<span class="sd">        measure is NaN if the covariance of the residuals is singular, as it is for an</span>
+<span class="sd">        equation that fits exactly. No error or warning is raised.</span>
 <span class="sd">        """</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_system_r2</span>
 
@@ -1379,7 +1393,19 @@
 
     <span class="nd">@property</span>
     <span class="k">def</span><span class="w"> </span><span class="nf">rsquared_adj</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">float</span><span class="p">:</span>
-<span class="w">        </span><span class="sd">"""Sample-size adjusted coefficient of determination (R**2)"""</span>
+<span class="w">        </span><span class="sd">"""</span>
+<span class="sd">        Sample-size adjusted coefficient of determination (R**2)</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        float</span>
+<span class="sd">            The adjusted coefficient of determination.</span>
+
+<span class="sd">        Notes</span>
+<span class="sd">        -----</span>
+<span class="sd">        It is NaN if ``rsquared`` is NaN, i.e., if the dependent variable of the</span>
+<span class="sd">        equation does not vary, up to rounding error.</span>
+<span class="sd">        """</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_r2a</span>
 
 

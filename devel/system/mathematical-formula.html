@@ -23,7 +23,7 @@
     
   
       
-        <title>Seemingly Unrelated Regression (SUR/SURE) - linearmodels v7.1 (+420)</title>
+        <title>Seemingly Unrelated Regression (SUR/SURE) - linearmodels v7.1 (+425)</title>
       
     
 
@@ -100,7 +100,7 @@
 
 <header class="md-header md-header--shadow" data-md-component="header">
   <nav class="md-header__inner md-grid" aria-label="Header">
-    <a href="../index.html" title="linearmodels v7.1 (+420)" class="md-header__button md-logo" aria-label="linearmodels v7.1 (+420)" data-md-component="logo">
+    <a href="../index.html" title="linearmodels v7.1 (+425)" class="md-header__button md-logo" aria-label="linearmodels v7.1 (+425)" data-md-component="logo">
       <img src="../_static/bw-logo.svg" alt="logo">
     </a>
     <label class="md-header__button md-icon" for="__drawer">
@@ -111,7 +111,7 @@
       <div class="md-header__ellipsis">
         <div class="md-header__topic">
           <span class="md-ellipsis">
-            linearmodels v7.1 (+420)
+            linearmodels v7.1 (+425)
           </span>
         </div>
         <div class="md-header__topic" data-md-component="header-topic">
@@ -206,10 +206,10 @@
 
 <nav class="md-nav md-nav--primary" aria-label="Navigation" data-md-level="0">
   <label class="md-nav__title" for="__drawer">
-    <a href="../index.html" title="linearmodels v7.1 (+420)" class="md-nav__button md-logo" aria-label="linearmodels v7.1 (+420)" data-md-component="logo">
+    <a href="../index.html" title="linearmodels v7.1 (+425)" class="md-nav__button md-logo" aria-label="linearmodels v7.1 (+425)" data-md-component="logo">
       <img src="../_static/bw-logo.svg" alt="logo">
     </a>
-    linearmodels v7.1 (+420)
+    linearmodels v7.1 (+425)
   </label>
   
     <div class="md-nav__source">
@@ -1720,6 +1720,11 @@ that element <span class="math notranslate nohighlight">\(ij\)</span> of <span c
 <p>The reported <span class="math notranslate nohighlight">\(R^{2}\)</span> is always for the data, or weighted data is
 weights are used, for either OLS or GLS. The means that the reported
 <span class="math notranslate nohighlight">\(R^{2}\)</span> for the GLS estimator may be negative</p>
+<p>Each <span class="math notranslate nohighlight">\(R^{2}\)</span> is NaN, with no error or warning, if the total sum of
+squares that it divides by is zero, up to rounding error, since it is not
+defined then. If the dependent variable of an equation does not vary, the
+equation has no weight in Dhrymes’ measure and Berndt’s measure is NaN, and
+if none of the dependent variables vary, every measure is NaN.</p>
 <p><strong>F statistics</strong></p>
 <p>When the debiased covariance estimator is used (small sample adjustment)
 the reported <span class="math notranslate nohighlight">\(F\)</span> statistics use <span class="math notranslate nohighlight">\(K\left(T-\bar{P}\right)\)</span>

@@ -19,7 +19,7 @@
     
   
       
-        <title>linearmodels.panel.results - linearmodels v7.1 (+420)</title>
+        <title>linearmodels.panel.results - linearmodels v7.1 (+425)</title>
       
     
 
@@ -91,7 +91,7 @@
 
 <header class="md-header md-header--shadow" data-md-component="header">
   <nav class="md-header__inner md-grid" aria-label="Header">
-    <a href="../../../index.html" title="linearmodels v7.1 (+420)" class="md-header__button md-logo" aria-label="linearmodels v7.1 (+420)" data-md-component="logo">
+    <a href="../../../index.html" title="linearmodels v7.1 (+425)" class="md-header__button md-logo" aria-label="linearmodels v7.1 (+425)" data-md-component="logo">
       <img src="../../../_static/bw-logo.svg" alt="logo">
     </a>
     <label class="md-header__button md-icon" for="__drawer">
@@ -102,7 +102,7 @@
       <div class="md-header__ellipsis">
         <div class="md-header__topic">
           <span class="md-ellipsis">
-            linearmodels v7.1 (+420)
+            linearmodels v7.1 (+425)
           </span>
         </div>
         <div class="md-header__topic" data-md-component="header-topic">
@@ -197,10 +197,10 @@
 
 <nav class="md-nav md-nav--primary" aria-label="Navigation" data-md-level="0">
   <label class="md-nav__title" for="__drawer">
-    <a href="../../../index.html" title="linearmodels v7.1 (+420)" class="md-nav__button md-logo" aria-label="linearmodels v7.1 (+420)" data-md-component="logo">
+    <a href="../../../index.html" title="linearmodels v7.1 (+425)" class="md-nav__button md-logo" aria-label="linearmodels v7.1 (+425)" data-md-component="logo">
       <img src="../../../_static/bw-logo.svg" alt="logo">
     </a>
-    linearmodels v7.1 (+420)
+    linearmodels v7.1 (+425)
   </label>
   
     <div class="md-nav__source">
@@ -699,7 +699,27 @@
 
     <span class="nd">@property</span>
     <span class="k">def</span><span class="w"> </span><span class="nf">rsquared</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">float</span><span class="p">:</span>
-<span class="w">        </span><span class="sd">"""Model Coefficient of determination"""</span>
+<span class="w">        </span><span class="sd">"""</span>
+<span class="sd">        Model Coefficient of determination</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        float</span>
+<span class="sd">            The coefficient of determination of the model.</span>
+
+<span class="sd">        Notes</span>
+<span class="sd">        -----</span>
+<span class="sd">        The coefficient of determination is NaN if its total sum of squares is zero,</span>
+<span class="sd">        up to rounding error, since it is not defined then. This happens if the</span>
+<span class="sd">        dependent variable does not vary, or if nothing varies once the means or the</span>
+<span class="sd">        effects of the model are removed. No error or warning is raised.</span>
+
+<span class="sd">        The limit is the rounding error of the computation. If the effects are removed</span>
+<span class="sd">        by an iterative algorithm (``use_lsmr=True`` in ``fit``), its error is larger,</span>
+<span class="sd">        by default about 1e-8 relative to the size of the dependent variable, so that a</span>
+<span class="sd">        dependent variable that the effects explain exactly can have a total sum of</span>
+<span class="sd">        squares that is not recognized as zero.</span>
+<span class="sd">        """</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_r2</span>
 
     <span class="nd">@property</span>
@@ -720,6 +740,11 @@
 
 <span class="sd">        See the mathematical reference in the documentation for the formal</span>
 <span class="sd">        definition of this measure.</span>
+
+<span class="sd">        It is NaN if its total sum of squares is zero, up to rounding error, i.e., if</span>
+<span class="sd">        the time-averaged dependent variable is the same for every entity in a model</span>
+<span class="sd">        with a constant, or is 0 for every entity in a model without one. No error or</span>
+<span class="sd">        warning is raised.</span>
 <span class="sd">        """</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_r2b</span>
 
@@ -741,6 +766,10 @@
 
 <span class="sd">        See the mathematical reference in the documentation for the formal</span>
 <span class="sd">        definition of this measure.</span>
+
+<span class="sd">        It is NaN if its total sum of squares is zero, up to rounding error, i.e., if</span>
+<span class="sd">        the dependent variable does not vary within entities, which includes a panel</span>
+<span class="sd">        with a single time period. No error or warning is raised.</span>
 <span class="sd">        """</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_r2w</span>
 
@@ -762,6 +791,10 @@
 
 <span class="sd">        See the mathematical reference in the documentation for the formal</span>
 <span class="sd">        definition of this measure.</span>
+
+<span class="sd">        It is NaN if its total sum of squares is zero, up to rounding error, i.e., if</span>
+<span class="sd">        the dependent variable does not vary in a model with a constant, or is 0 in a</span>
+<span class="sd">        model without one. No error or warning is raised.</span>
 <span class="sd">        """</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_r2o</span>
 
@@ -789,6 +822,11 @@
 <span class="sd">           Corr[\bar{y}_i, \bar{x}_i\hat{\beta}]</span>
 
 <span class="sd">        This measure **does not** account for weights.</span>
+
+<span class="sd">        It is NaN if the entity-wise averaged dependent variable is the same for every</span>
+<span class="sd">        entity, up to rounding error, since the correlation is not defined, and it is 0</span>
+<span class="sd">        if the predictions are the same for every entity. No error or warning is</span>
+<span class="sd">        raised.</span>
 <span class="sd">        """</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_c2b</span>
 
@@ -816,6 +854,10 @@
 <span class="sd">           Corr[y_{it}-\bar{y}_i, (x_{it}-\bar{x}_i)\hat{\beta}]</span>
 
 <span class="sd">        This measure **does not** account for weights.</span>
+
+<span class="sd">        It is NaN if the dependent variable does not vary within entities, up to</span>
+<span class="sd">        rounding error, since the correlation is not defined, and it is 0 if the</span>
+<span class="sd">        demeaned predictions do not vary. No error or warning is raised.</span>
 <span class="sd">        """</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_c2w</span>
 
@@ -842,6 +884,10 @@
 <span class="sd">           Corr[y_{it}, x_{it}\hat{\beta}]</span>
 
 <span class="sd">        This measure **does not** account for weights.</span>
+
+<span class="sd">        It is NaN if the dependent variable does not vary, up to rounding error, since</span>
+<span class="sd">        the correlation is not defined, and it is 0 if the predictions do not vary. No</span>
+<span class="sd">        error or warning is raised.</span>
 <span class="sd">        """</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_c2o</span>
 
@@ -1344,6 +1390,10 @@
 <span class="sd">        If ``debiased`` is True, then the Wald statistic is divided by the</span>
 <span class="sd">        number of restrictions and inference is made using an :math:`F_{k,df}`</span>
 <span class="sd">        distribution where df is the residual degree of freedom from the model.</span>
+
+<span class="sd">        An ``InvalidTestStatistic`` is returned if the model only has a constant,</span>
+<span class="sd">        or if the covariance of the parameters is singular, e.g., the dependent</span>
+<span class="sd">        variable is all zero, so that the model fits exactly.</span>
 <span class="sd">        """</span>
         <span class="kn">from</span><span class="w"> </span><span class="nn">linearmodels.panel.model</span><span class="w"> </span><span class="kn">import</span> <span class="n">_deferred_f</span>  <span class="c1"># noqa: PLC0415</span>
 
@@ -1614,7 +1664,19 @@
 
     <span class="nd">@property</span>
     <span class="k">def</span><span class="w"> </span><span class="nf">rsquared_inclusive</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">float</span><span class="p">:</span>
-<span class="w">        </span><span class="sd">"""Model Coefficient of determination including fit of included effects"""</span>
+<span class="w">        </span><span class="sd">"""</span>
+<span class="sd">        Model Coefficient of determination including fit of included effects</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        float</span>
+<span class="sd">            The coefficient of determination of the model and the effects.</span>
+
+<span class="sd">        Notes</span>
+<span class="sd">        -----</span>
+<span class="sd">        It is NaN if its total sum of squares is zero, up to rounding error, i.e., if</span>
+<span class="sd">        the dependent variable does not vary. No error or warning is raised.</span>
+<span class="sd">        """</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_r2_ex_effects</span>
 
     <span class="nd">@property</span>
@@ -2045,9 +2107,9 @@
 <span class="sd">        WaldTestStatistic</span>
 <span class="sd">            Statistic value, distribution and p-value. It is an</span>
 <span class="sd">            ``InvalidTestStatistic`` if the model contains only a constant, or</span>
-<span class="sd">            if the number of periods that are averaged is not larger than the</span>
-<span class="sd">            number of tested parameters, so that the covariance of the</span>
-<span class="sd">            parameters is singular.</span>
+<span class="sd">            if the covariance of the parameters is singular, which it is if the</span>
+<span class="sd">            number of periods that are averaged is not larger than the number</span>
+<span class="sd">            of tested parameters, or if the dependent variable is all zero.</span>
 
 <span class="sd">        Notes</span>
 <span class="sd">        -----</span>
@@ -2157,7 +2219,10 @@
 
 <span class="sd">        This value contains the average of the individual adjusted rsquared</span>
 <span class="sd">        values across the nobs cross-sectional regressions. An rsquare value</span>
-<span class="sd">        is only included in the average if a cross-section has full rank.</span>
+<span class="sd">        is only included in the average if a cross-section has full rank and if</span>
+<span class="sd">        the dependent variable of the cross-section varies, since the coefficient</span>
+<span class="sd">        of determination is NaN, up to rounding error, if its total sum of squares</span>
+<span class="sd">        is zero.</span>
 <span class="sd">        """</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_avg_r2</span>
 
@@ -2168,9 +2233,11 @@
 
 <span class="sd">        This value contains the average of the individual adjusted rsquared</span>
 <span class="sd">        values across the nobs cross-sectional regressions. An rsquare value</span>
-<span class="sd">        is only included in the average if a cross-section has full rank and</span>
+<span class="sd">        is only included in the average if a cross-section has full rank,</span>
 <span class="sd">        if the number of dependent variables in a cross-section is larger than</span>
-<span class="sd">        the number of regressors.</span>
+<span class="sd">        the number of regressors, and if the dependent variable of the</span>
+<span class="sd">        cross-section varies, since the coefficient of determination is NaN, up to</span>
+<span class="sd">        rounding error, if its total sum of squares is zero.</span>
 <span class="sd">        """</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_avg_adj_r2</span></div>
 
@@ -2213,17 +2280,56 @@
 
     <span class="nd">@property</span>
     <span class="k">def</span><span class="w"> </span><span class="nf">rsquared_between</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Series</span><span class="p">:</span>
-<span class="w">        </span><span class="sd">"""Coefficients of determination (R**2)"""</span>
+<span class="w">        </span><span class="sd">"""</span>
+<span class="sd">        Between coefficients of determination (R**2)</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        Series</span>
+<span class="sd">            The between coefficient of determination of each model.</span>
+
+<span class="sd">        Notes</span>
+<span class="sd">        -----</span>
+<span class="sd">        The value of a model is NaN if its between coefficient of determination is not</span>
+<span class="sd">        defined, i.e., if the total sum of squares is zero, up to rounding error. See</span>
+<span class="sd">        ``rsquared_between`` of the results of the models.</span>
+<span class="sd">        """</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_get_property</span><span class="p">(</span><span class="s2">"rsquared_between"</span><span class="p">)</span>
 
     <span class="nd">@property</span>
     <span class="k">def</span><span class="w"> </span><span class="nf">rsquared_within</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Series</span><span class="p">:</span>
-<span class="w">        </span><span class="sd">"""Coefficients of determination (R**2)"""</span>
+<span class="w">        </span><span class="sd">"""</span>
+<span class="sd">        Within coefficients of determination (R**2)</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        Series</span>
+<span class="sd">            The within coefficient of determination of each model.</span>
+
+<span class="sd">        Notes</span>
+<span class="sd">        -----</span>
+<span class="sd">        The value of a model is NaN if its within coefficient of determination is not</span>
+<span class="sd">        defined, i.e., if the total sum of squares is zero, up to rounding error. See</span>
+<span class="sd">        ``rsquared_within`` of the results of the models.</span>
+<span class="sd">        """</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_get_property</span><span class="p">(</span><span class="s2">"rsquared_within"</span><span class="p">)</span>
 
     <span class="nd">@property</span>
     <span class="k">def</span><span class="w"> </span><span class="nf">rsquared_overall</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Series</span><span class="p">:</span>
-<span class="w">        </span><span class="sd">"""Coefficients of determination (R**2)"""</span>
+<span class="w">        </span><span class="sd">"""</span>
+<span class="sd">        Overall coefficients of determination (R**2)</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        Series</span>
+<span class="sd">            The overall coefficient of determination of each model.</span>
+
+<span class="sd">        Notes</span>
+<span class="sd">        -----</span>
+<span class="sd">        The value of a model is NaN if its overall coefficient of determination is not</span>
+<span class="sd">        defined, i.e., if the total sum of squares is zero, up to rounding error. See</span>
+<span class="sd">        ``rsquared_overall`` of the results of the models.</span>
+<span class="sd">        """</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_get_property</span><span class="p">(</span><span class="s2">"rsquared_overall"</span><span class="p">)</span>
 
     <span class="nd">@property</span>

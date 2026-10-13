@@ -19,7 +19,7 @@
     
   
       
-        <title>linearmodels.system.model - linearmodels v7.1 (+420)</title>
+        <title>linearmodels.system.model - linearmodels v7.1 (+425)</title>
       
     
 
@@ -91,7 +91,7 @@
 
 <header class="md-header md-header--shadow" data-md-component="header">
   <nav class="md-header__inner md-grid" aria-label="Header">
-    <a href="../../../index.html" title="linearmodels v7.1 (+420)" class="md-header__button md-logo" aria-label="linearmodels v7.1 (+420)" data-md-component="logo">
+    <a href="../../../index.html" title="linearmodels v7.1 (+425)" class="md-header__button md-logo" aria-label="linearmodels v7.1 (+425)" data-md-component="logo">
       <img src="../../../_static/bw-logo.svg" alt="logo">
     </a>
     <label class="md-header__button md-icon" for="__drawer">
@@ -102,7 +102,7 @@
       <div class="md-header__ellipsis">
         <div class="md-header__topic">
           <span class="md-ellipsis">
-            linearmodels v7.1 (+420)
+            linearmodels v7.1 (+425)
           </span>
         </div>
         <div class="md-header__topic" data-md-component="header-topic">
@@ -197,10 +197,10 @@
 
 <nav class="md-nav md-nav--primary" aria-label="Navigation" data-md-level="0">
   <label class="md-nav__title" for="__drawer">
-    <a href="../../../index.html" title="linearmodels v7.1 (+420)" class="md-nav__button md-logo" aria-label="linearmodels v7.1 (+420)" data-md-component="logo">
+    <a href="../../../index.html" title="linearmodels v7.1 (+425)" class="md-nav__button md-logo" aria-label="linearmodels v7.1 (+425)" data-md-component="logo">
       <img src="../../../_static/bw-logo.svg" alt="logo">
     </a>
-    linearmodels v7.1 (+420)
+    linearmodels v7.1 (+425)
   </label>
   
     <div class="md-nav__source">
@@ -567,6 +567,7 @@
 <span class="kn">from</span><span class="w"> </span><span class="nn">linearmodels.shared.hypotheses</span><span class="w"> </span><span class="kn">import</span> <span class="n">InvalidTestStatistic</span><span class="p">,</span> <span class="n">WaldTestStatistic</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">linearmodels.shared.inputs</span><span class="w"> </span><span class="kn">import</span> <span class="n">as_array_like</span><span class="p">,</span> <span class="n">as_float64</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">linearmodels.shared.linalg</span><span class="w"> </span><span class="kn">import</span> <span class="n">has_constant</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">linearmodels.shared.rsquared</span><span class="w"> </span><span class="kn">import</span> <span class="n">r_squared</span><span class="p">,</span> <span class="n">total_ss_is_zero</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">linearmodels.shared.utility</span><span class="w"> </span><span class="kn">import</span> <span class="n">AttrDict</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">linearmodels.shared.weights</span><span class="w"> </span><span class="kn">import</span> <span class="n">check_weights</span><span class="p">,</span> <span class="n">normalize_weights</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">linearmodels.system._utility</span><span class="w"> </span><span class="kn">import</span> <span class="p">(</span>
@@ -1598,8 +1599,15 @@
         <span class="n">stats</span><span class="p">[</span><span class="s2">"fitted"</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_x</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">@</span> <span class="n">b</span>
         <span class="n">stats</span><span class="p">[</span><span class="s2">"resid_ss"</span><span class="p">]</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">squeeze</span><span class="p">(</span><span class="n">weighted_resid</span><span class="o">.</span><span class="n">T</span> <span class="o">@</span> <span class="n">weighted_resid</span><span class="p">))</span>
         <span class="n">stats</span><span class="p">[</span><span class="s2">"total_ss"</span><span class="p">]</span> <span class="o">=</span> <span class="n">total_ss</span>
-        <span class="n">stats</span><span class="p">[</span><span class="s2">"r2"</span><span class="p">]</span> <span class="o">=</span> <span class="mf">1.0</span> <span class="o">-</span> <span class="n">stats</span><span class="o">.</span><span class="n">resid_ss</span> <span class="o">/</span> <span class="n">stats</span><span class="o">.</span><span class="n">total_ss</span>
-        <span class="n">stats</span><span class="p">[</span><span class="s2">"r2a"</span><span class="p">]</span> <span class="o">=</span> <span class="mf">1.0</span> <span class="o">-</span> <span class="p">(</span><span class="n">stats</span><span class="o">.</span><span class="n">resid_ss</span> <span class="o">/</span> <span class="n">df_r</span><span class="p">)</span> <span class="o">/</span> <span class="p">(</span><span class="n">stats</span><span class="o">.</span><span class="n">total_ss</span> <span class="o">/</span> <span class="n">df_c</span><span class="p">)</span>
+        <span class="c1"># The size of the dependent variable, before the mean is removed, which sets</span>
+        <span class="c1"># the rounding error in the total sum of squares</span>
+        <span class="n">wy</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_wy</span><span class="p">[</span><span class="n">i</span><span class="p">]</span>
+        <span class="n">y_ss</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">squeeze</span><span class="p">(</span><span class="n">wy</span><span class="o">.</span><span class="n">T</span> <span class="o">@</span> <span class="n">wy</span><span class="p">))</span>
+        <span class="n">stats</span><span class="p">[</span><span class="s2">"r2"</span><span class="p">]</span> <span class="o">=</span> <span class="n">r_squared</span><span class="p">(</span><span class="n">stats</span><span class="o">.</span><span class="n">resid_ss</span><span class="p">,</span> <span class="n">stats</span><span class="o">.</span><span class="n">total_ss</span><span class="p">,</span> <span class="n">y_ss</span><span class="p">,</span> <span class="n">nobs</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">np</span><span class="o">.</span><span class="n">isnan</span><span class="p">(</span><span class="n">stats</span><span class="o">.</span><span class="n">r2</span><span class="p">):</span>
+            <span class="n">stats</span><span class="p">[</span><span class="s2">"r2a"</span><span class="p">]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">nan</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">stats</span><span class="p">[</span><span class="s2">"r2a"</span><span class="p">]</span> <span class="o">=</span> <span class="mf">1.0</span> <span class="o">-</span> <span class="p">(</span><span class="n">stats</span><span class="o">.</span><span class="n">resid_ss</span> <span class="o">/</span> <span class="n">df_r</span><span class="p">)</span> <span class="o">/</span> <span class="p">(</span><span class="n">stats</span><span class="o">.</span><span class="n">total_ss</span> <span class="o">/</span> <span class="n">df_c</span><span class="p">)</span>
 
         <span class="n">names</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_param_names</span><span class="p">[</span><span class="n">loc</span> <span class="p">:</span> <span class="n">loc</span> <span class="o">+</span> <span class="n">df</span><span class="p">]</span>
         <span class="n">offset</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">stats</span><span class="o">.</span><span class="n">eq_label</span><span class="p">)</span> <span class="o">+</span> <span class="mi">1</span>
@@ -1650,7 +1658,8 @@
 
         <span class="n">results</span><span class="p">[</span><span class="s2">"resid_ss"</span><span class="p">]</span> <span class="o">=</span> <span class="n">resid_ss</span>
         <span class="n">results</span><span class="p">[</span><span class="s2">"total_ss"</span><span class="p">]</span> <span class="o">=</span> <span class="n">total_ss</span>
-        <span class="n">results</span><span class="p">[</span><span class="s2">"r2"</span><span class="p">]</span> <span class="o">=</span> <span class="mf">1.0</span> <span class="o">-</span> <span class="n">results</span><span class="o">.</span><span class="n">resid_ss</span> <span class="o">/</span> <span class="n">results</span><span class="o">.</span><span class="n">total_ss</span>
+        <span class="n">y_ss</span> <span class="o">=</span> <span class="nb">sum</span><span class="p">(</span><span class="nb">float</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">squeeze</span><span class="p">(</span><span class="n">wy</span><span class="o">.</span><span class="n">T</span> <span class="o">@</span> <span class="n">wy</span><span class="p">))</span> <span class="k">for</span> <span class="n">wy</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_wy</span><span class="p">)</span>
+        <span class="n">results</span><span class="p">[</span><span class="s2">"r2"</span><span class="p">]</span> <span class="o">=</span> <span class="n">r_squared</span><span class="p">(</span><span class="n">results</span><span class="o">.</span><span class="n">resid_ss</span><span class="p">,</span> <span class="n">results</span><span class="o">.</span><span class="n">total_ss</span><span class="p">,</span> <span class="n">y_ss</span><span class="p">,</span> <span class="n">nobs</span><span class="p">)</span>
         <span class="n">results</span><span class="p">[</span><span class="s2">"resid"</span><span class="p">]</span> <span class="o">=</span> <span class="n">resid</span>
         <span class="n">results</span><span class="p">[</span><span class="s2">"weighted_resid"</span><span class="p">]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">hstack</span><span class="p">(</span><span class="n">weighted_residuals</span><span class="p">)</span>
         <span class="n">results</span><span class="p">[</span><span class="s2">"constraints"</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_constraints</span>
@@ -1710,18 +1719,48 @@
         <span class="c1"># residuals of the model and of the regression on a constant</span>
         <span class="n">eps</span> <span class="o">=</span> <span class="n">eps</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">hstack</span><span class="p">(</span><span class="n">wi</span><span class="p">)</span>
         <span class="n">eps_const</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">hstack</span><span class="p">([</span><span class="n">wi</span><span class="p">[</span><span class="n">j</span><span class="p">]</span> <span class="o">*</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_y</span><span class="p">[</span><span class="n">j</span><span class="p">]</span> <span class="o">-</span> <span class="n">mu</span><span class="p">[</span><span class="n">j</span><span class="p">])</span> <span class="k">for</span> <span class="n">j</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">k</span><span class="p">)])</span>
+        <span class="c1"># The size of the dependent variables, which sets the rounding error of the</span>
+        <span class="c1"># total sums of squares, before the means are removed</span>
+        <span class="n">wy_all</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">hstack</span><span class="p">([</span><span class="n">wi</span><span class="p">[</span><span class="n">j</span><span class="p">]</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">_y</span><span class="p">[</span><span class="n">j</span><span class="p">]</span> <span class="k">for</span> <span class="n">j</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">k</span><span class="p">)])</span>
+        <span class="n">y_ss</span> <span class="o">=</span> <span class="p">(</span><span class="n">wy_all</span><span class="o">**</span><span class="mi">2</span><span class="p">)</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>
+        <span class="c1"># A dependent variable that does not vary has no total sum of squares. This is</span>
+        <span class="c1"># found from its weighted mean, since the regression on a constant is GLS, and</span>
+        <span class="c1"># its errors are large if the residuals of the equations are collinear, as they</span>
+        <span class="c1"># are when a dependent variable does not vary</span>
+        <span class="n">own_ss</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span>
+            <span class="p">[</span>
+                <span class="p">((</span><span class="n">wy</span><span class="p">[</span><span class="n">j</span><span class="p">]</span> <span class="o">-</span> <span class="n">wi</span><span class="p">[</span><span class="n">j</span><span class="p">]</span> <span class="o">*</span> <span class="p">((</span><span class="n">w</span><span class="p">[</span><span class="n">j</span><span class="p">]</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">_y</span><span class="p">[</span><span class="n">j</span><span class="p">])</span><span class="o">.</span><span class="n">sum</span><span class="p">()</span> <span class="o">/</span> <span class="n">w</span><span class="p">[</span><span class="n">j</span><span class="p">]</span><span class="o">.</span><span class="n">sum</span><span class="p">()))</span> <span class="o">**</span> <span class="mi">2</span><span class="p">)</span><span class="o">.</span><span class="n">sum</span><span class="p">()</span>
+                <span class="k">for</span> <span class="n">j</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">k</span><span class="p">)</span>
+            <span class="p">]</span>
+        <span class="p">)</span>
+        <span class="n">varies</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span>
+            <span class="p">[</span>
+                <span class="ow">not</span> <span class="n">total_ss_is_zero</span><span class="p">(</span><span class="n">t</span><span class="p">,</span> <span class="n">s</span><span class="p">,</span> <span class="n">nobs</span><span class="p">)</span>
+                <span class="k">for</span> <span class="n">t</span><span class="p">,</span> <span class="n">s</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">(</span><span class="n">own_ss</span><span class="p">,</span> <span class="n">y_ss</span><span class="p">,</span> <span class="n">strict</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+            <span class="p">]</span>
+        <span class="p">)</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">varies</span><span class="o">.</span><span class="n">any</span><span class="p">():</span>
+            <span class="k">return</span> <span class="n">Series</span><span class="p">(</span>
+                <span class="p">{</span>
+                    <span class="s2">"mcelroy"</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">nan</span><span class="p">,</span>
+                    <span class="s2">"berndt"</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">nan</span><span class="p">,</span>
+                    <span class="s2">"judge"</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">nan</span><span class="p">,</span>
+                    <span class="s2">"dhrymes"</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">nan</span><span class="p">,</span>
+                <span class="p">}</span>
+            <span class="p">)</span>
         <span class="c1"># Judge</span>
-        <span class="n">judge</span> <span class="o">=</span> <span class="mi">1</span> <span class="o">-</span> <span class="p">(</span><span class="n">eps</span><span class="o">**</span><span class="mi">2</span><span class="p">)</span><span class="o">.</span><span class="n">sum</span><span class="p">()</span> <span class="o">/</span> <span class="p">(</span><span class="n">eps_const</span><span class="o">**</span><span class="mi">2</span><span class="p">)</span><span class="o">.</span><span class="n">sum</span><span class="p">()</span>
-        <span class="c1"># Dhrymes</span>
+        <span class="n">judge</span> <span class="o">=</span> <span class="n">r_squared</span><span class="p">((</span><span class="n">eps</span><span class="o">**</span><span class="mi">2</span><span class="p">)</span><span class="o">.</span><span class="n">sum</span><span class="p">(),</span> <span class="p">(</span><span class="n">eps_const</span><span class="o">**</span><span class="mi">2</span><span class="p">)</span><span class="o">.</span><span class="n">sum</span><span class="p">(),</span> <span class="n">y_ss</span><span class="o">.</span><span class="n">sum</span><span class="p">(),</span> <span class="n">nobs</span><span class="p">)</span>
+        <span class="c1"># Dhrymes. The equations without a total sum of squares have no weight</span>
         <span class="n">tot_eps_const_sq</span> <span class="o">=</span> <span class="p">(</span><span class="n">eps_const</span><span class="o">**</span><span class="mi">2</span><span class="p">)</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>
         <span class="n">r2s_arr</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">asarray</span><span class="p">(</span><span class="n">r2s</span><span class="p">)</span>
-        <span class="n">dhrymes</span> <span class="o">=</span> <span class="p">(</span><span class="n">r2s_arr</span> <span class="o">*</span> <span class="n">tot_eps_const_sq</span><span class="p">)</span><span class="o">.</span><span class="n">sum</span><span class="p">()</span> <span class="o">/</span> <span class="n">tot_eps_const_sq</span><span class="o">.</span><span class="n">sum</span><span class="p">()</span>
+        <span class="n">dhrymes</span> <span class="o">=</span> <span class="p">(</span><span class="n">r2s_arr</span><span class="p">[</span><span class="n">varies</span><span class="p">]</span> <span class="o">*</span> <span class="n">tot_eps_const_sq</span><span class="p">[</span><span class="n">varies</span><span class="p">])</span><span class="o">.</span><span class="n">sum</span><span class="p">()</span>
+        <span class="n">dhrymes</span> <span class="o">/=</span> <span class="n">tot_eps_const_sq</span><span class="p">[</span><span class="n">varies</span><span class="p">]</span><span class="o">.</span><span class="n">sum</span><span class="p">()</span>
 
         <span class="c1"># Berndt</span>
         <span class="n">sigma_y</span> <span class="o">=</span> <span class="p">(</span><span class="n">eps_const</span><span class="o">.</span><span class="n">T</span> <span class="o">@</span> <span class="n">eps_const</span> <span class="o">/</span> <span class="n">nobs</span><span class="p">)</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">_sigma_scale</span><span class="p">(</span><span class="n">debiased</span><span class="p">)</span>
         <span class="n">berndt</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">nan</span>
-        <span class="c1"># Avoid division by 0</span>
-        <span class="k">if</span> <span class="n">np</span><span class="o">.</span><span class="n">linalg</span><span class="o">.</span><span class="n">det</span><span class="p">(</span><span class="n">sigma_y</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
+        <span class="c1"># Avoid division by 0. The matrix is singular if an equation has no variance</span>
+        <span class="k">if</span> <span class="n">varies</span><span class="o">.</span><span class="n">all</span><span class="p">()</span> <span class="ow">and</span> <span class="n">np</span><span class="o">.</span><span class="n">linalg</span><span class="o">.</span><span class="n">det</span><span class="p">(</span><span class="n">sigma_y</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
             <span class="n">berndt</span> <span class="o">=</span> <span class="mi">1</span> <span class="o">-</span> <span class="n">np</span><span class="o">.</span><span class="n">linalg</span><span class="o">.</span><span class="n">det</span><span class="p">(</span><span class="n">sigma_resid</span><span class="p">)</span> <span class="o">/</span> <span class="n">np</span><span class="o">.</span><span class="n">linalg</span><span class="o">.</span><span class="n">det</span><span class="p">(</span><span class="n">sigma_y</span><span class="p">)</span>
 
         <span class="n">mcelroy</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">nan</span>
@@ -1733,7 +1772,8 @@
             <span class="n">numerator</span> <span class="o">=</span> <span class="p">(</span><span class="n">std_eps</span><span class="o">**</span><span class="mi">2</span><span class="p">)</span><span class="o">.</span><span class="n">sum</span><span class="p">()</span>
             <span class="n">std_eps_const</span> <span class="o">=</span> <span class="n">eps_const</span> <span class="o">@</span> <span class="n">sigma_m12</span>
             <span class="n">denom</span> <span class="o">=</span> <span class="p">(</span><span class="n">std_eps_const</span><span class="o">**</span><span class="mi">2</span><span class="p">)</span><span class="o">.</span><span class="n">sum</span><span class="p">()</span>
-            <span class="n">mcelroy</span> <span class="o">=</span> <span class="mf">1.0</span> <span class="o">-</span> <span class="n">numerator</span> <span class="o">/</span> <span class="n">denom</span>
+            <span class="n">std_y_ss</span> <span class="o">=</span> <span class="p">((</span><span class="n">wy_all</span> <span class="o">@</span> <span class="n">sigma_m12</span><span class="p">)</span> <span class="o">**</span> <span class="mi">2</span><span class="p">)</span><span class="o">.</span><span class="n">sum</span><span class="p">()</span>
+            <span class="n">mcelroy</span> <span class="o">=</span> <span class="n">r_squared</span><span class="p">(</span><span class="n">numerator</span><span class="p">,</span> <span class="n">denom</span><span class="p">,</span> <span class="n">std_y_ss</span><span class="p">,</span> <span class="n">nobs</span><span class="p">)</span>
         <span class="n">r2</span> <span class="o">=</span> <span class="p">{</span><span class="s2">"mcelroy"</span><span class="p">:</span> <span class="n">mcelroy</span><span class="p">,</span> <span class="s2">"berndt"</span><span class="p">:</span> <span class="n">berndt</span><span class="p">,</span> <span class="s2">"judge"</span><span class="p">:</span> <span class="n">judge</span><span class="p">,</span> <span class="s2">"dhrymes"</span><span class="p">:</span> <span class="n">dhrymes</span><span class="p">}</span>
         <span class="k">return</span> <span class="n">Series</span><span class="p">(</span><span class="n">r2</span><span class="p">)</span>
 

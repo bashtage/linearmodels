@@ -19,7 +19,7 @@
     
   
       
-        <title>linearmodels.iv.results - linearmodels v7.1 (+420)</title>
+        <title>linearmodels.iv.results - linearmodels v7.1 (+425)</title>
       
     
 
@@ -91,7 +91,7 @@
 
 <header class="md-header md-header--shadow" data-md-component="header">
   <nav class="md-header__inner md-grid" aria-label="Header">
-    <a href="../../../index.html" title="linearmodels v7.1 (+420)" class="md-header__button md-logo" aria-label="linearmodels v7.1 (+420)" data-md-component="logo">
+    <a href="../../../index.html" title="linearmodels v7.1 (+425)" class="md-header__button md-logo" aria-label="linearmodels v7.1 (+425)" data-md-component="logo">
       <img src="../../../_static/bw-logo.svg" alt="logo">
     </a>
     <label class="md-header__button md-icon" for="__drawer">
@@ -102,7 +102,7 @@
       <div class="md-header__ellipsis">
         <div class="md-header__topic">
           <span class="md-ellipsis">
-            linearmodels v7.1 (+420)
+            linearmodels v7.1 (+425)
           </span>
         </div>
         <div class="md-header__topic" data-md-component="header-topic">
@@ -197,10 +197,10 @@
 
 <nav class="md-nav md-nav--primary" aria-label="Navigation" data-md-level="0">
   <label class="md-nav__title" for="__drawer">
-    <a href="../../../index.html" title="linearmodels v7.1 (+420)" class="md-nav__button md-logo" aria-label="linearmodels v7.1 (+420)" data-md-component="logo">
+    <a href="../../../index.html" title="linearmodels v7.1 (+425)" class="md-nav__button md-logo" aria-label="linearmodels v7.1 (+425)" data-md-component="logo">
       <img src="../../../_static/bw-logo.svg" alt="logo">
     </a>
-    linearmodels v7.1 (+420)
+    linearmodels v7.1 (+425)
   </label>
   
     <div class="md-nav__source">
@@ -716,13 +716,42 @@
 
     <span class="nd">@property</span>
     <span class="k">def</span><span class="w"> </span><span class="nf">rsquared</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">float</span><span class="p">:</span>
-<span class="w">        </span><span class="sd">"""Coefficient of determination (R**2)"""</span>
+<span class="w">        </span><span class="sd">"""</span>
+<span class="sd">        Coefficient of determination (R**2)</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        float</span>
+<span class="sd">            The coefficient of determination.</span>
+
+<span class="sd">        Notes</span>
+<span class="sd">        -----</span>
+<span class="sd">        The total sum of squares is centered if the model has a constant. The</span>
+<span class="sd">        coefficient of determination is NaN if the total sum of squares is zero, up to</span>
+<span class="sd">        rounding error, since it is not defined then, e.g., if the dependent variable</span>
+<span class="sd">        does not vary in a model with a constant, or is all zero. No error or warning</span>
+<span class="sd">        is raised.</span>
+<span class="sd">        """</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_r2</span>
 
     <span class="nd">@property</span>
     <span class="k">def</span><span class="w"> </span><span class="nf">rsquared_adj</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">float</span><span class="p">:</span>
-<span class="w">        </span><span class="sd">"""Sample-size adjusted coefficient of determination (R**2)"""</span>
+<span class="w">        </span><span class="sd">"""</span>
+<span class="sd">        Sample-size adjusted coefficient of determination (R**2)</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        float</span>
+<span class="sd">            The adjusted coefficient of determination.</span>
+
+<span class="sd">        Notes</span>
+<span class="sd">        -----</span>
+<span class="sd">        It is NaN if ``rsquared`` is NaN, and if the model has as many parameters as</span>
+<span class="sd">        observations, so that it has no residual degrees of freedom.</span>
+<span class="sd">        """</span>
         <span class="n">n</span><span class="p">,</span> <span class="n">k</span><span class="p">,</span> <span class="n">c</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">nobs</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">df_model</span><span class="p">,</span> <span class="nb">int</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">has_constant</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">n</span> <span class="o">&lt;=</span> <span class="n">k</span><span class="p">:</span>
+            <span class="k">return</span> <span class="nb">float</span><span class="p">(</span><span class="s2">"nan"</span><span class="p">)</span>
         <span class="k">return</span> <span class="mi">1</span> <span class="o">-</span> <span class="p">((</span><span class="n">n</span> <span class="o">-</span> <span class="n">c</span><span class="p">)</span> <span class="o">/</span> <span class="p">(</span><span class="n">n</span> <span class="o">-</span> <span class="n">k</span><span class="p">))</span> <span class="o">*</span> <span class="p">(</span><span class="mi">1</span> <span class="o">-</span> <span class="bp">self</span><span class="o">.</span><span class="n">_r2</span><span class="p">)</span>
 
     <span class="nd">@property</span>
@@ -798,6 +827,10 @@
 
 <span class="sd">        This version of the F-statistic directly uses the model covariance</span>
 <span class="sd">        estimator and so is robust against the same specification issues.</span>
+
+<span class="sd">        An ``InvalidTestStatistic`` is returned if the model has no non-constant</span>
+<span class="sd">        exogenous terms, or if the covariance of the parameters is singular, e.g.,</span>
+<span class="sd">        the dependent variable is all zero, so that the model fits exactly.</span>
 <span class="sd">        """</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_f_statistic</span>
 
@@ -1199,7 +1232,29 @@
 
     <span class="nd">@property</span>
     <span class="k">def</span><span class="w"> </span><span class="nf">absorbed_rsquared</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">float</span><span class="p">:</span>
-<span class="w">        </span><span class="sd">"""Coefficient of determination (R**2), ignoring absorbed variables"""</span>
+<span class="w">        </span><span class="sd">"""</span>
+<span class="sd">        Coefficient of determination (R**2), ignoring absorbed variables</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        float</span>
+<span class="sd">            The coefficient of determination of the regressors that were not absorbed.</span>
+
+<span class="sd">        Notes</span>
+<span class="sd">        -----</span>
+<span class="sd">        The total sum of squares is that of the dependent variable once the absorbed</span>
+<span class="sd">        variables have been removed. The coefficient of determination is NaN if it is</span>
+<span class="sd">        zero, up to rounding error, e.g., if the absorbed variables explain the</span>
+<span class="sd">        dependent variable, or if it does not vary. No error or warning is raised.</span>
+
+<span class="sd">        The limit is the rounding error of the computation. The variables are absorbed</span>
+<span class="sd">        exactly only if they are a single categorical variable and the model is not</span>
+<span class="sd">        weighted. Otherwise an iterative algorithm is used, and its error is larger,</span>
+<span class="sd">        by default about 1e-8 relative to the size of the dependent variable for LSMR</span>
+<span class="sd">        (see ``lsmr_options`` of ``fit``), so that a dependent variable that the</span>
+<span class="sd">        absorbed variables explain exactly can have a total sum of squares that is not</span>
+<span class="sd">        recognized as zero.</span>
+<span class="sd">        """</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_absorbed_rsquared</span>
 
 <div class="viewcode-block" id="AbsorbingLSResults.absorbed_effects">
@@ -2658,7 +2713,21 @@
 
     <span class="nd">@property</span>
     <span class="k">def</span><span class="w"> </span><span class="nf">rsquared_adj</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Series</span><span class="p">:</span>
-<span class="w">        </span><span class="sd">"""Sample-size adjusted coefficients of determination (R**2)"""</span>
+<span class="w">        </span><span class="sd">"""</span>
+<span class="sd">        Sample-size adjusted coefficients of determination (R**2)</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        Series</span>
+<span class="sd">            The adjusted coefficient of determination of each model.</span>
+
+<span class="sd">        Notes</span>
+<span class="sd">        -----</span>
+<span class="sd">        The value of a model is NaN if its coefficient of determination is not</span>
+<span class="sd">        defined, i.e., if the total sum of squares is zero, up to rounding error, or</span>
+<span class="sd">        if the model has as many parameters as observations. See ``rsquared_adj`` of</span>
+<span class="sd">        the results of the models.</span>
+<span class="sd">        """</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_get_property</span><span class="p">(</span><span class="s2">"rsquared_adj"</span><span class="p">)</span>
 
     <span class="nd">@property</span>

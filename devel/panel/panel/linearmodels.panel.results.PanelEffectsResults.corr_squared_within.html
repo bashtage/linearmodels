@@ -23,7 +23,7 @@
     
   
       
-        <title>linearmodels.panel.results.PanelEffectsResults.corr_squared_within - linearmodels v7.1 (+420)</title>
+        <title>linearmodels.panel.results.PanelEffectsResults.corr_squared_within - linearmodels v7.1 (+425)</title>
       
     
 
@@ -100,7 +100,7 @@
 
 <header class="md-header md-header--shadow" data-md-component="header">
   <nav class="md-header__inner md-grid" aria-label="Header">
-    <a href="../../index.html" title="linearmodels v7.1 (+420)" class="md-header__button md-logo" aria-label="linearmodels v7.1 (+420)" data-md-component="logo">
+    <a href="../../index.html" title="linearmodels v7.1 (+425)" class="md-header__button md-logo" aria-label="linearmodels v7.1 (+425)" data-md-component="logo">
       <img src="../../_static/bw-logo.svg" alt="logo">
     </a>
     <label class="md-header__button md-icon" for="__drawer">
@@ -111,7 +111,7 @@
       <div class="md-header__ellipsis">
         <div class="md-header__topic">
           <span class="md-ellipsis">
-            linearmodels v7.1 (+420)
+            linearmodels v7.1 (+425)
           </span>
         </div>
         <div class="md-header__topic" data-md-component="header-topic">
@@ -206,10 +206,10 @@
 
 <nav class="md-nav md-nav--primary" aria-label="Navigation" data-md-level="0">
   <label class="md-nav__title" for="__drawer">
-    <a href="../../index.html" title="linearmodels v7.1 (+420)" class="md-nav__button md-logo" aria-label="linearmodels v7.1 (+420)" data-md-component="logo">
+    <a href="../../index.html" title="linearmodels v7.1 (+425)" class="md-nav__button md-logo" aria-label="linearmodels v7.1 (+425)" data-md-component="logo">
       <img src="../../_static/bw-logo.svg" alt="logo">
     </a>
-    linearmodels v7.1 (+420)
+    linearmodels v7.1 (+425)
   </label>
   
     <div class="md-nav__source">
@@ -2298,6 +2298,9 @@ predictions.</p>
 <div class="math notranslate nohighlight">
 \[Corr[y_{it}-\bar{y}_i, (x_{it}-\bar{x}_i)\hat{\beta}]\]</div>
 <p>This measure <strong>does not</strong> account for weights.</p>
+<p>It is NaN if the dependent variable does not vary within entities, up to
+rounding error, since the correlation is not defined, and it is 0 if the
+demeaned predictions do not vary. No error or warning is raised.</p>
 </dd></dl>
 
 

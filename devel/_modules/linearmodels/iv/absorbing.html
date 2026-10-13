@@ -19,7 +19,7 @@
     
   
       
-        <title>linearmodels.iv.absorbing - linearmodels v7.1 (+420)</title>
+        <title>linearmodels.iv.absorbing - linearmodels v7.1 (+425)</title>
       
     
 
@@ -91,7 +91,7 @@
 
 <header class="md-header md-header--shadow" data-md-component="header">
   <nav class="md-header__inner md-grid" aria-label="Header">
-    <a href="../../../index.html" title="linearmodels v7.1 (+420)" class="md-header__button md-logo" aria-label="linearmodels v7.1 (+420)" data-md-component="logo">
+    <a href="../../../index.html" title="linearmodels v7.1 (+425)" class="md-header__button md-logo" aria-label="linearmodels v7.1 (+425)" data-md-component="logo">
       <img src="../../../_static/bw-logo.svg" alt="logo">
     </a>
     <label class="md-header__button md-icon" for="__drawer">
@@ -102,7 +102,7 @@
       <div class="md-header__ellipsis">
         <div class="md-header__topic">
           <span class="md-ellipsis">
-            linearmodels v7.1 (+420)
+            linearmodels v7.1 (+425)
           </span>
         </div>
         <div class="md-header__topic" data-md-component="header-topic">
@@ -197,10 +197,10 @@
 
 <nav class="md-nav md-nav--primary" aria-label="Navigation" data-md-level="0">
   <label class="md-nav__title" for="__drawer">
-    <a href="../../../index.html" title="linearmodels v7.1 (+420)" class="md-nav__button md-logo" aria-label="linearmodels v7.1 (+420)" data-md-component="logo">
+    <a href="../../../index.html" title="linearmodels v7.1 (+425)" class="md-nav__button md-logo" aria-label="linearmodels v7.1 (+425)" data-md-component="logo">
       <img src="../../../_static/bw-logo.svg" alt="logo">
     </a>
-    linearmodels v7.1 (+420)
+    linearmodels v7.1 (+425)
   </label>
   
     <div class="md-nav__source">
@@ -536,6 +536,7 @@
 <span class="kn">from</span><span class="w"> </span><span class="nn">copy</span><span class="w"> </span><span class="kn">import</span> <span class="n">deepcopy</span>
 <span class="kn">import</span><span class="w"> </span><span class="nn">hashlib</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">inspect</span><span class="w"> </span><span class="kn">import</span> <span class="n">signature</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">math</span><span class="w"> </span><span class="kn">import</span> <span class="n">isnan</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">typing</span><span class="w"> </span><span class="kn">import</span> <span class="n">Any</span><span class="p">,</span> <span class="n">DefaultDict</span><span class="p">,</span> <span class="n">Union</span><span class="p">,</span> <span class="n">cast</span>
 <span class="kn">import</span><span class="w"> </span><span class="nn">warnings</span>
 
@@ -596,6 +597,7 @@
 <span class="kn">from</span><span class="w"> </span><span class="nn">linearmodels.shared.exceptions</span><span class="w"> </span><span class="kn">import</span> <span class="n">lookup_option</span><span class="p">,</span> <span class="n">missing_warning</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">linearmodels.shared.hypotheses</span><span class="w"> </span><span class="kn">import</span> <span class="n">InvalidTestStatistic</span><span class="p">,</span> <span class="n">WaldTestStatistic</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">linearmodels.shared.inputs</span><span class="w"> </span><span class="kn">import</span> <span class="n">as_array_like</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">linearmodels.shared.rsquared</span><span class="w"> </span><span class="kn">import</span> <span class="n">r_squared</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">linearmodels.shared.utility</span><span class="w"> </span><span class="kn">import</span> <span class="n">DataFrameWrapper</span><span class="p">,</span> <span class="n">SeriesWrapper</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">linearmodels.shared.weights</span><span class="w"> </span><span class="kn">import</span> <span class="n">check_weights</span><span class="p">,</span> <span class="n">normalize_weights</span>
 <span class="kn">import</span><span class="w"> </span><span class="nn">linearmodels.typing.data</span>
@@ -607,6 +609,11 @@
     <span class="n">HAVE_XXHASH</span> <span class="o">=</span> <span class="kc">True</span>
 <span class="k">except</span> <span class="ne">ImportError</span><span class="p">:</span>
     <span class="k">pass</span>
+
+
+<span class="k">def</span><span class="w"> </span><span class="nf">_non_negative</span><span class="p">(</span><span class="n">r2</span><span class="p">:</span> <span class="nb">float</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">float</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">"""Clip an R2 at 0, which is not clipped if it is NaN since it is not defined"""</span>
+    <span class="k">return</span> <span class="n">r2</span> <span class="k">if</span> <span class="n">isnan</span><span class="p">(</span><span class="n">r2</span><span class="p">)</span> <span class="k">else</span> <span class="nb">max</span><span class="p">(</span><span class="n">r2</span><span class="p">,</span> <span class="mf">0.0</span><span class="p">)</span>
 
 
 <span class="k">class</span><span class="w"> </span><span class="nc">Hasher</span><span class="p">:</span>
@@ -2194,11 +2201,14 @@
         <span class="n">w</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">weights</span><span class="o">.</span><span class="n">ndarray</span>
         <span class="n">root_w</span> <span class="o">=</span> <span class="n">sqrt</span><span class="p">(</span><span class="n">w</span><span class="p">)</span>
         <span class="n">e</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_dependent</span><span class="o">.</span><span class="n">ndarray</span> <span class="o">*</span> <span class="n">root_w</span>
+        <span class="c1"># The size of the dependent variable, before the means and the effects are removed</span>
+        <span class="n">y_ss</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="n">squeeze</span><span class="p">(</span><span class="n">e</span><span class="o">.</span><span class="n">T</span> <span class="o">@</span> <span class="n">e</span><span class="p">))</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">has_constant</span><span class="p">:</span>
             <span class="n">e</span> <span class="o">=</span> <span class="n">e</span> <span class="o">-</span> <span class="n">root_w</span> <span class="o">*</span> <span class="n">average</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_dependent</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span> <span class="n">weights</span><span class="o">=</span><span class="n">w</span><span class="p">)</span>
 
         <span class="n">total_ss</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="n">squeeze</span><span class="p">(</span><span class="n">e</span><span class="o">.</span><span class="n">T</span> <span class="o">@</span> <span class="n">e</span><span class="p">))</span>
-        <span class="n">r2</span> <span class="o">=</span> <span class="nb">max</span><span class="p">(</span><span class="mi">1</span> <span class="o">-</span> <span class="n">residual_ss</span> <span class="o">/</span> <span class="n">total_ss</span><span class="p">,</span> <span class="mf">0.0</span><span class="p">)</span>
+        <span class="n">nobs</span> <span class="o">=</span> <span class="n">e</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+        <span class="n">r2</span> <span class="o">=</span> <span class="n">_non_negative</span><span class="p">(</span><span class="n">r_squared</span><span class="p">(</span><span class="nb">float</span><span class="p">(</span><span class="n">residual_ss</span><span class="p">),</span> <span class="n">total_ss</span><span class="p">,</span> <span class="n">y_ss</span><span class="p">,</span> <span class="n">nobs</span><span class="p">))</span>
 
         <span class="n">e</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_absorbed_dependent</span><span class="o">.</span><span class="n">to_numpy</span><span class="p">()</span>  <span class="c1"># already scaled by root_w</span>
         <span class="c1"># If absorbing contains a constant, but exog does not, no need to demean</span>
@@ -2210,7 +2220,9 @@
             <span class="n">e</span> <span class="o">=</span> <span class="n">e</span> <span class="o">-</span> <span class="n">x</span> <span class="o">*</span> <span class="n">mu</span>
 
         <span class="n">aborbed_total_ss</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="n">squeeze</span><span class="p">(</span><span class="n">e</span><span class="o">.</span><span class="n">T</span> <span class="o">@</span> <span class="n">e</span><span class="p">))</span>
-        <span class="n">r2_absorbed</span> <span class="o">=</span> <span class="nb">max</span><span class="p">(</span><span class="mi">1</span> <span class="o">-</span> <span class="n">residual_ss</span> <span class="o">/</span> <span class="n">aborbed_total_ss</span><span class="p">,</span> <span class="mf">0.0</span><span class="p">)</span>
+        <span class="n">r2_absorbed</span> <span class="o">=</span> <span class="n">_non_negative</span><span class="p">(</span>
+            <span class="n">r_squared</span><span class="p">(</span><span class="nb">float</span><span class="p">(</span><span class="n">residual_ss</span><span class="p">),</span> <span class="n">aborbed_total_ss</span><span class="p">,</span> <span class="n">y_ss</span><span class="p">,</span> <span class="n">nobs</span><span class="p">)</span>
+        <span class="p">)</span>
 
         <span class="n">fstat</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_f_statistic</span><span class="p">(</span><span class="n">params</span><span class="p">,</span> <span class="n">cov</span><span class="p">,</span> <span class="n">debiased</span><span class="p">)</span>
         <span class="n">out</span> <span class="o">=</span> <span class="p">{</span>

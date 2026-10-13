@@ -19,7 +19,7 @@
     
   
       
-        <title>linearmodels.iv.model - linearmodels v7.1 (+420)</title>
+        <title>linearmodels.iv.model - linearmodels v7.1 (+425)</title>
       
     
 
@@ -91,7 +91,7 @@
 
 <header class="md-header md-header--shadow" data-md-component="header">
   <nav class="md-header__inner md-grid" aria-label="Header">
-    <a href="../../../index.html" title="linearmodels v7.1 (+420)" class="md-header__button md-logo" aria-label="linearmodels v7.1 (+420)" data-md-component="logo">
+    <a href="../../../index.html" title="linearmodels v7.1 (+425)" class="md-header__button md-logo" aria-label="linearmodels v7.1 (+425)" data-md-component="logo">
       <img src="../../../_static/bw-logo.svg" alt="logo">
     </a>
     <label class="md-header__button md-icon" for="__drawer">
@@ -102,7 +102,7 @@
       <div class="md-header__ellipsis">
         <div class="md-header__topic">
           <span class="md-ellipsis">
-            linearmodels v7.1 (+420)
+            linearmodels v7.1 (+425)
           </span>
         </div>
         <div class="md-header__topic" data-md-component="header-topic">
@@ -197,10 +197,10 @@
 
 <nav class="md-nav md-nav--primary" aria-label="Navigation" data-md-level="0">
   <label class="md-nav__title" for="__drawer">
-    <a href="../../../index.html" title="linearmodels v7.1 (+420)" class="md-nav__button md-logo" aria-label="linearmodels v7.1 (+420)" data-md-component="logo">
+    <a href="../../../index.html" title="linearmodels v7.1 (+425)" class="md-nav__button md-logo" aria-label="linearmodels v7.1 (+425)" data-md-component="logo">
       <img src="../../../_static/bw-logo.svg" alt="logo">
     </a>
-    linearmodels v7.1 (+420)
+    linearmodels v7.1 (+425)
   </label>
   
     <div class="md-nav__source">
@@ -598,6 +598,7 @@
 <span class="p">)</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">linearmodels.shared.hypotheses</span><span class="w"> </span><span class="kn">import</span> <span class="n">InvalidTestStatistic</span><span class="p">,</span> <span class="n">WaldTestStatistic</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">linearmodels.shared.linalg</span><span class="w"> </span><span class="kn">import</span> <span class="n">has_constant</span><span class="p">,</span> <span class="n">inv_sqrth</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">linearmodels.shared.rsquared</span><span class="w"> </span><span class="kn">import</span> <span class="n">r_squared</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">linearmodels.shared.utility</span><span class="w"> </span><span class="kn">import</span> <span class="n">DataFrameWrapper</span><span class="p">,</span> <span class="n">SeriesWrapper</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">linearmodels.shared.weights</span><span class="w"> </span><span class="kn">import</span> <span class="n">check_weights</span><span class="p">,</span> <span class="n">normalize_weights</span>
 <span class="kn">import</span><span class="w"> </span><span class="nn">linearmodels.typing</span>
@@ -1061,7 +1062,8 @@
             <span class="n">e</span> <span class="o">=</span> <span class="n">e</span> <span class="o">-</span> <span class="bp">self</span><span class="o">.</span><span class="n">_sqrt_weights</span> <span class="o">*</span> <span class="n">average</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_y</span><span class="p">,</span> <span class="n">weights</span><span class="o">=</span><span class="n">w</span><span class="p">)</span>
 
         <span class="n">total_ss</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="n">squeeze</span><span class="p">(</span><span class="n">e</span><span class="o">.</span><span class="n">T</span> <span class="o">@</span> <span class="n">e</span><span class="p">))</span>
-        <span class="n">r2</span> <span class="o">=</span> <span class="mi">1</span> <span class="o">-</span> <span class="n">residual_ss</span> <span class="o">/</span> <span class="n">total_ss</span>
+        <span class="n">y_ss</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="n">squeeze</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_wy</span><span class="o">.</span><span class="n">T</span> <span class="o">@</span> <span class="bp">self</span><span class="o">.</span><span class="n">_wy</span><span class="p">))</span>
+        <span class="n">r2</span> <span class="o">=</span> <span class="n">r_squared</span><span class="p">(</span><span class="nb">float</span><span class="p">(</span><span class="n">residual_ss</span><span class="p">),</span> <span class="n">total_ss</span><span class="p">,</span> <span class="n">y_ss</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_y</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
 
         <span class="n">fstat</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_f_statistic</span><span class="p">(</span><span class="n">params</span><span class="p">,</span> <span class="n">cov</span><span class="p">,</span> <span class="n">debiased</span><span class="p">)</span>
         <span class="n">out</span> <span class="o">=</span> <span class="p">{</span>
@@ -1075,7 +1077,7 @@
             <span class="s2">"debiased"</span><span class="p">:</span> <span class="n">debiased</span><span class="p">,</span>
             <span class="s2">"residual_ss"</span><span class="p">:</span> <span class="nb">float</span><span class="p">(</span><span class="n">residual_ss</span><span class="p">),</span>
             <span class="s2">"total_ss"</span><span class="p">:</span> <span class="nb">float</span><span class="p">(</span><span class="n">total_ss</span><span class="p">),</span>
-            <span class="s2">"r2"</span><span class="p">:</span> <span class="nb">float</span><span class="p">(</span><span class="n">squeeze</span><span class="p">(</span><span class="n">r2</span><span class="p">)),</span>
+            <span class="s2">"r2"</span><span class="p">:</span> <span class="n">r2</span><span class="p">,</span>
             <span class="s2">"fstat"</span><span class="p">:</span> <span class="n">fstat</span><span class="p">,</span>
             <span class="s2">"vars"</span><span class="p">:</span> <span class="n">columns</span><span class="p">,</span>
             <span class="s2">"instruments"</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">_instr_columns</span><span class="p">,</span>
