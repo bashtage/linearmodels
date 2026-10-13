@@ -62,7 +62,8 @@ def test_limit_of_the_total_ss(nobs):
     assert at_limit
     assert not above
     result = r_squared(1.0, 0.5 * limit, y_ss, nobs)
-    assert np.isnan(result)
+    is_nan = np.isnan(result)
+    assert is_nan
     result = r_squared(1.0, 2 * limit, y_ss, nobs)
     assert_allclose(result, 1 - 1.0 / (2 * limit))
 
@@ -136,6 +137,8 @@ def test_variation_far_above_rounding_error_is_not_zero(relative_sd):
 
 def test_nan_total_ss_is_nan():
     result = r_squared(1.0, float("nan"), 1.0, 10)
-    assert np.isnan(result)
+    is_nan = np.isnan(result)
+    assert is_nan
     result = r_squared(float("nan"), 1.0, 1.0, 10)
-    assert np.isnan(result)
+    is_nan = np.isnan(result)
+    assert is_nan

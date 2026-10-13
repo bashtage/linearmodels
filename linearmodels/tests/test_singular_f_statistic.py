@@ -63,7 +63,8 @@ def test_iv_f_statistic_with_a_singular_covariance(debiased, cov):
     params = np.array([[1.0], [2.0], [3.0]])
     stat = f_statistic(params, cov, debiased, 100, const_loc=0)
     assert_invalid(stat)
-    assert np.isnan(stat.stat)
+    is_nan = np.isnan(stat.stat)
+    assert is_nan
 
 
 def test_iv_f_statistic_with_a_covariance():
