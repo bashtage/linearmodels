@@ -116,6 +116,21 @@ Two optional arguments can be used to alter the estimation method when using IVL
 * ``kappa`` allows a user-specified value of :math:`\kappa` to be provided in
   which case the LIML estimated value of :math:`\kappa` is ignored.
 
+The LIML estimate of :math:`\kappa` is not defined if there are fewer than
+:math:`1 + k_2` observations more than the number of exogenous regressors and
+instruments, where :math:`k_2` is the number of endogenous regressors. A
+constant, one endogenous regressor and one instrument need at least 4
+observations, for example. It is not defined either if the residuals of the
+dependent variable and the endogenous regressors on the exogenous regressors and
+instruments are collinear. :class:`~linearmodels.iv.model.IVLIML` raises a
+``ValueError`` when the model is fit if ``kappa`` is not provided and the
+estimate is not defined. Earlier versions used the rounding error of a singular
+matrix, which was arbitrary and NaN on some platforms. Two cases are not covered
+(:issue:`823`). The estimate is rounding error if an endogenous regressor is
+exactly a linear combination of the exogenous regressors and instruments, and it
+loses accuracy if there are 2 or more endogenous regressors on very different
+scales.
+
 JIVE Estimation
 ^^^^^^^^^^^^^^^
 The JIVE estimator has no options that change how the parameters are
@@ -404,6 +419,15 @@ endogenous regressors:
   moment conditions that is selected by ``weight_type``. In iterated GMM the
   J-statistic cannot exceed the number of observations, however large the
   violation of the moment conditions is, and the centered J-statistic can.
+
+:attr:`~linearmodels.iv.results.IVResults.anderson_rubin` and
+:attr:`~linearmodels.iv.results.IVResults.basmann_f` are computed from the LIML
+estimate of :math:`\kappa`, which :class:`~linearmodels.iv.model.IV2SLS`,
+:class:`~linearmodels.iv.model.IVLIML` and :class:`~linearmodels.iv.model.IVJIVE`
+compute. They are reported as an
+:class:`~linearmodels.shared.hypotheses.InvalidTestStatistic` if the estimate is
+not defined, as described for LIML above. IV2SLS and IVJIVE still estimate the
+model.
 
 The difference matters if the errors are heteroskedastic. In a simulation of
 1,500 samples with 400 observations, a regressor that is exogenous, three valid

@@ -97,12 +97,24 @@ def inv_sqrth(x: Float64Array) -> Float64Array:
     Parameters
     ----------
     x : ndarray
-        Real, symmetric matrix
+        Real, symmetric, positive definite matrix
 
     Returns
     -------
     ndarray
         Input to the power -1/2
+
+    Raises
+    ------
+    numpy.linalg.LinAlgError
+        If an eigenvalue of x is not positive, which means that x is singular, to
+        rounding error, or not positive semi-definite. The inverse square root is not
+        defined then, and the eigenvalue decomposition does not raise.
     """
     vals, vecs = np.linalg.eigh(x)
+    if not np.all(vals > 0):
+        raise np.linalg.LinAlgError(
+            "The matrix is not positive definite, so that its inverse square root "
+            "is not defined."
+        )
     return vecs @ np.diag(1 / np.sqrt(vals)) @ vecs.T
