@@ -1650,18 +1650,6 @@ class PanelOLS(_PanelModelBase):
     Model supports at most 2 effects.  These can be entity-time, entity-other,
     time-other or 2 other.
 
-    A variable in ``exog`` is absorbed if the effects explain all of it. The
-    algorithms that remove the effects are exact only up to rounding error, or up to
-    a relative error of about 1e-8 if they are iterative, so a variable is treated
-    as absorbed if less than 1e-5 of its norm is left after the effects are
-    removed, whatever its units. It is treated in the same way if it is collinear
-    with the variables before it once the effects are removed. An
-    ``AbsorbingEffectError`` is raised for such a variable. If ``drop_absorbed`` is
-    True, the variable is dropped and an ``AbsorbingEffectWarning`` is raised, and the
-    constant is never dropped. The norm includes the mean of the variable, so a
-    variable with a large mean and little other variation, less than 1e-5 of its norm,
-    is also treated as absorbed. Subtract its mean to avoid this.
-
     **Models without regressors**
 
     A model that only has effects can be estimated,
@@ -1710,6 +1698,18 @@ class PanelOLS(_PanelModelBase):
        A model without regressors can be estimated. Earlier versions raised a
        ``ValueError`` from pandas, "No objects to concatenate", when ``exog`` had no
        columns or the formula had no regressors.
+
+    A variable in ``exog`` is absorbed if the effects explain all of it. The
+    algorithms that remove the effects are exact only up to rounding error, or up to
+    a relative error of about 1e-8 if they are iterative, so a variable is treated
+    as absorbed if less than 1e-5 of its norm is left after the effects are
+    removed, whatever its units. It is treated in the same way if it is collinear
+    with the variables before it once the effects are removed. An
+    ``AbsorbingEffectError`` is raised for such a variable. If ``drop_absorbed`` is
+    True, the variable is dropped and an ``AbsorbingEffectWarning`` is raised, and the
+    constant is never dropped. The norm includes the mean of the variable, so a
+    variable with a large mean and little other variation, less than 1e-5 of its norm,
+    is also treated as absorbed. Subtract its mean to avoid this.
     """
 
     def __init__(

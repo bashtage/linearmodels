@@ -164,14 +164,14 @@ class PanelData:
     Index level 1 is time.  The columns are the variables.  MultiIndex Series
     are also accepted and treated as single column MultiIndex DataFrames.
 
-    Missing values (NaN) in the entity or time index are not supported. The
-    methods that group by the index raise a ValueError if the level that they
-    use has a missing label.
-
     The data can have no variables, a DataFrame with a MultiIndex and no columns
     or an array with 0 variables. It is the ``exog`` of a
     :class:`~linearmodels.panel.model.PanelOLS` model that only has effects. The
     means, counts and demeaned data have no variables either.
+
+    Missing values (NaN) in the entity or time index are not supported. The
+    methods that group by the index raise a ValueError if the level that they
+    use has a missing label.
 
     Raises
     ------
