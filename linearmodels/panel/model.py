@@ -741,6 +741,26 @@ class _PanelModelBase:
             )
         return rank_of_x
 
+    def _missing_in_other_inputs(self) -> BoolArray | None:
+        """
+        Observations that are missing in inputs other than the data of the model
+
+        Returns
+        -------
+        ndarray or None
+            A boolean array with a value for each row of dependent, which is True
+            for the observations to drop since an input that the model validates,
+            e.g., the other effects of PanelOLS, is missing. None if there are
+            no such inputs.
+
+        Notes
+        -----
+        The observations are dropped together with those that are missing in
+        dependent, exog and weights, so that there is a single warning and the
+        weights and the constant are determined from the observations that remain.
+        """
+        return None
+
     def _validate_data(self) -> None:
         """Check input shape and remove missing"""
         y = self._y = cast(
@@ -769,6 +789,9 @@ class _PanelModelBase:
             | np.any(np.isnan(w), axis=1),
             dtype=bool,
         )
+        missing_in_other_inputs = self._missing_in_other_inputs()
+        if missing_in_other_inputs is not None:
+            missing = missing | missing_in_other_inputs
 
         missing_warning(np.asarray(all_missing ^ missing), stacklevel=4)
         if np.any(missing):
@@ -1568,6 +1591,9 @@ class PanelOLS(_PanelModelBase):
         Category codes to use for any effects that are not entity or time
         effects. Each variable is treated as an effect. A 1-d array or list has
         a value for each row of dependent, in the order of the rows of dependent.
+        An observation where any of the other effects is missing (NaN or None) is
+        dropped, with the observations that have a missing value in dependent, exog
+        or weights, and a ``MissingValueWarning`` is issued.
     singletons : bool
         Flag indicating whether to drop singleton observation
     drop_absorbed : bool
@@ -1623,6 +1649,14 @@ class PanelOLS(_PanelModelBase):
     constant is never dropped. The norm includes the mean of the variable, so a
     variable with a large mean and little other variation, less than 1e-5 of its norm,
     is also treated as absorbed. Subtract its mean to avoid this.
+
+    .. versionchanged:: 7.1
+
+       An observation with a missing value in ``other_effects`` is dropped with a
+       ``MissingValueWarning``, as it is for a missing value in ``dependent``,
+       ``exog`` or ``weights``. Earlier versions treated a missing value as a
+       category of its own, and ``fit`` failed after it estimated the model with the
+       error that the observations per group cannot be computed.
     """
 
     def __init__(
@@ -1638,15 +1672,17 @@ class PanelOLS(_PanelModelBase):
         drop_absorbed: bool = False,
         check_rank: bool = True,
     ) -> None:
-        super().__init__(dependent, exog, weights=weights, check_rank=check_rank)
-
+        # The effects are needed while the data are validated, which drops the
+        # observations that have a missing value in other_effects
         self._entity_effects = entity_effects
         self._time_effects = time_effects
+        self._other_effects_input = other_effects
+        self._other_effects_rows: PanelData | None = None
+        super().__init__(dependent, exog, weights=weights, check_rank=check_rank)
+
         self._other_effect_cats: PanelData | None = None
         self._singletons = singletons
-        self._other_effects = self._validate_effects(
-            other_effects, labelled=_is_labelled(other_effects)
-        )
+        self._other_effects = self._validate_effects()
         self._has_effect = entity_effects or time_effects or self.other_effects
         self._drop_absorbed = drop_absorbed
         self._singleton_index = None
@@ -1708,20 +1744,46 @@ class PanelOLS(_PanelModelBase):
         out += additional
         return out
 
-    def _validate_effects(
-        self, effects: PanelDataLike | None, labelled: bool = False
-    ) -> bool:
-        """Check model effects"""
-        if effects is None:
-            return False
-        effects = self._panel_rows(effects, "other_effects", "OtherEffect")
+    def _missing_in_other_inputs(self) -> BoolArray | None:
+        """
+        Observations with a missing value in other_effects
 
+        Returns
+        -------
+        ndarray or None
+            A boolean array that is True for the observations of dependent where
+            any of the other effects is missing. None if the model does not have
+            other effects.
+        """
+        if self._other_effects_input is None:
+            return None
+        effects = self._panel_rows(
+            self._other_effects_input, "other_effects", "OtherEffect"
+        )
         if effects.shape[1:] != self._original_shape[1:]:
             raise ValueError(
                 "other_effects must have the same number of "
                 "entities and time periods as dependent."
             )
-        self._check_labels("other_effects", effects.index, labelled)
+        self._check_labels(
+            "other_effects", effects.index, _is_labelled(self._other_effects_input)
+        )
+        nrows = len(self._original_index)
+        if effects.dataframe.shape[0] != nrows:
+            raise ValueError(
+                f"other_effects has {effects.dataframe.shape[0]} rows, but dependent "
+                f"has {nrows}. It must have a value for each row of dependent."
+            )
+        self._other_effects_rows = effects
+        return np.asarray(effects.isnull, dtype=bool)
+
+    def _validate_effects(self) -> bool:
+        """Check model effects"""
+        effects = self._other_effects_rows
+        if effects is None:
+            return False
+        # The rows of the input are not needed once the categories are made
+        self._other_effects_rows = None
 
         num_effects = effects.nvar
         if num_effects + self.entity_effects + self.time_effects > 2:
@@ -1816,7 +1878,9 @@ class PanelOLS(_PanelModelBase):
             the weight should be homoskedastic.
         other_effects : array_like
             Category codes to use for any effects that are not entity or time
-            effects. Each variable is treated as an effect.
+            effects. Each variable is treated as an effect. An observation where
+            any of the other effects is missing is dropped, with a
+            ``MissingValueWarning``.
         singletons : bool
             Flag indicating whether to drop singleton observation
         drop_absorbed : bool
