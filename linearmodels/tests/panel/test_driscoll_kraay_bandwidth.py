@@ -84,7 +84,7 @@ def test_bandwidth_not_below_the_number_of_periods_raises(
     frame, model, kernel, bandwidth
 ):
     mod = MODELS[model](frame)
-    match = rf"The bandwidth of the Driscoll-Kraay covariance, .*must be below the "
+    match = r"The bandwidth of the Driscoll-Kraay covariance, .*must be below the "
     match += rf"number of time periods, {NPERIOD}\."
     with pytest.raises(ValueError, match=match):
         mod.fit(cov_type="kernel", kernel=kernel, bandwidth=bandwidth)
@@ -97,7 +97,7 @@ def test_cov_type_aliases_raise(frame, cov_type):
 
 
 def test_error_message_names_the_number_of_periods_and_the_largest_lag(frame):
-    with pytest.raises(ValueError) as exc:
+    with pytest.raises(ValueError, match="must be below") as exc:
         pooled(frame, cov_type="kernel", kernel="qs", bandwidth=50)
     message = str(exc.value)
     assert "50" in message
