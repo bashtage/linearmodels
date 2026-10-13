@@ -54,6 +54,14 @@ __all__ = [
 ]
 
 
+_KAPPA_UNAVAILABLE = (
+    "The kappa of LIML, which the statistic is computed from, could not be "
+    "estimated, so the statistic is not defined. This occurs, for example, when "
+    "there are fewer than 1 + the number of endogenous regressors observations "
+    "more than the number of exogenous regressors and instruments."
+)
+
+
 def stub_concat(
     lists: Sequence[list[str] | tuple[str, ...]], sep: str = "="
 ) -> list[str]:
@@ -1689,7 +1697,7 @@ class IVResults(_CommonIVResults):
 
         Returns
         -------
-        WaldTestStatistic
+        WaldTestStatistic or InvalidTestStatistic
             Object containing test statistic, p-value, distribution and null
 
         Notes
@@ -1703,6 +1711,19 @@ class IVResults(_CommonIVResults):
           n \ln(\hat{\kappa}) \sim \chi^2_{q}
 
         where :math:`q = n_{instr} - n_{endog}`.
+
+        The test requires more instruments than endogenous variables, and a
+        value of :math:`\kappa`. An ``InvalidTestStatistic`` is returned
+        if there are not more instruments, or if :math:`\kappa` could not be
+        estimated, which occurs if there are fewer than 1 + the number of
+        endogenous regressors observations more than the number of exogenous
+        regressors and instruments. See :class:`~linearmodels.iv.model.IVLIML`.
+
+        .. versionchanged:: 7.1
+
+           An ``InvalidTestStatistic`` is returned if :math:`\kappa` could
+           not be estimated. The statistic was NaN, or computed from a value of
+           :math:`\kappa` that was rounding error.
         """
         nobs, ninstr = self.model.instruments.shape
         nendog = self.model.endog.shape[1]
@@ -1713,6 +1734,8 @@ class IVResults(_CommonIVResults):
                 name=name,
             )
         assert self._liml_kappa is not None
+        if isnan(self._liml_kappa):
+            return InvalidTestStatistic(_KAPPA_UNAVAILABLE, name=name)
         stat = nobs * log(self._liml_kappa)
         df = ninstr - nendog
         null = "The model is not overidentified."
@@ -1725,7 +1748,7 @@ class IVResults(_CommonIVResults):
 
         Returns
         -------
-        WaldTestStatistic
+        WaldTestStatistic or InvalidTestStatistic
             Object containing test statistic, p-value, distribution and null
 
         Notes
@@ -1739,6 +1762,19 @@ class IVResults(_CommonIVResults):
           \hat{\kappa} (n -n_{instr})/q \sim F_{q, n - n_{instr}}
 
         where :math:`q = n_{instr} - n_{endog}`.
+
+        The test requires more instruments than endogenous variables, and a
+        value of :math:`\kappa`. An ``InvalidTestStatistic`` is returned
+        if there are not more instruments, or if :math:`\kappa` could not be
+        estimated, which occurs if there are fewer than 1 + the number of
+        endogenous regressors observations more than the number of exogenous
+        regressors and instruments. See :class:`~linearmodels.iv.model.IVLIML`.
+
+        .. versionchanged:: 7.1
+
+           An ``InvalidTestStatistic`` is returned if :math:`\kappa` could
+           not be estimated. The statistic was NaN, or computed from a value of
+           :math:`\kappa` that was rounding error.
         """
         nobs, ninstr = self.model.instruments.shape
         nendog, nexog = self.model.endog.shape[1], self.model.exog.shape[1]
@@ -1751,6 +1787,8 @@ class IVResults(_CommonIVResults):
         df = ninstr - nendog
         df_denom = nobs - (nexog + ninstr)
         assert self._liml_kappa is not None
+        if isnan(self._liml_kappa):
+            return InvalidTestStatistic(_KAPPA_UNAVAILABLE, name=name)
         stat = (self._liml_kappa - 1) * df_denom / df
         null = "The model is not overidentified."
         return WaldTestStatistic(stat, null, df, df_denom=df_denom, name=name)

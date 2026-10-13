@@ -20,6 +20,7 @@ from numpy import (
     diag,
     dtype,
     eye,
+    finfo,
     float64,
     isfinite,
     isscalar,
@@ -32,7 +33,7 @@ from numpy import (
     squeeze,
     unique,
 )
-from numpy.linalg import LinAlgError, eigvalsh, inv, matrix_rank, pinv, qr, solve
+from numpy.linalg import LinAlgError, eigvalsh, inv, matrix_rank, norm, pinv, qr, solve
 from pandas import DataFrame, Series, concat
 from scipy.optimize import minimize
 
@@ -122,6 +123,15 @@ WEIGHT_MATRICES = {
     "clustered": OneWayClusteredWeightMatrix,
     "one-way": OneWayClusteredWeightMatrix,
 }
+
+# The residuals of the dependent variable and the endogenous regressors on the exogenous
+# regressors and instruments are linearly dependent if the smallest singular value of
+# the residuals, scaled to have columns of unit length, is no larger than this. It is the
+# square root of the machine precision, about 1.5e-8. The cross product of the residuals
+# that is inverted to estimate kappa has the squares of the singular values as its
+# eigenvalues, so that at this value an eigenvalue of the scaled cross product is at its
+# rounding error, about 2.2e-16 times the largest eigenvalue, and has no digits left.
+_KAPPA_TOLERANCE = float(sqrt(finfo(float64).eps))
 
 
 class _IVModelBase:
@@ -492,17 +502,77 @@ class _IVModelBase:
         return f_statistic(params, cov, debiased, nobs - nvar, const_loc)
 
     def _estimate_kappa(self) -> float:
-        """The value of kappa in LIML, which is the same for any estimator"""
+        """
+        The value of kappa in LIML, which is the same for any estimator
+
+        Returns
+        -------
+        float
+            The smallest eigenvalue of the cross product of the residuals on the
+            exogenous regressors, relative to the cross product of the residuals on
+            the exogenous regressors and instruments. The residuals are those of the
+            dependent variable and the endogenous regressors.
+
+        Raises
+        ------
+        numpy.linalg.LinAlgError
+            If the residuals on the exogenous regressors and instruments are linearly
+            dependent, so that their cross product, which is inverted, is singular.
+            This occurs if there are fewer than 1 + the number of endogenous
+            regressors observations more than the number of exogenous regressors and
+            instruments, and if the columns of the residuals are collinear, to
+            rounding error, or a column is 0, for another reason.
+
+        Notes
+        -----
+        Kappa does not change if a column of the dependent variable and endogenous
+        regressors is rescaled. The residuals are scaled to have columns of unit
+        length before the rank is tested and the cross product is inverted, so that
+        neither depends on the units of the variables.
+        """
         y, x, z = self._wy, self._wx, self._wz
         is_exog = self._regressor_is_exog
         e = c_[y, x[:, ~is_exog]]
         x1 = x[:, is_exog]
+
+        nobs, nz = z.shape
+        ncol = e.shape[1]
+        # z has full column rank, so the residuals on z have a rank of at most nobs - nz.
+        # The count does not depend on the rounding error of the projections, which is
+        # large if z is nearly collinear, and which can hide the rank of the residuals
+        if nobs - nz < ncol:
+            raise LinAlgError(
+                f"Kappa cannot be estimated using {nobs} observations. It needs at "
+                f"least {nz + ncol} observations: the {nz} exogenous regressors and "
+                f"instruments plus {ncol}, which is 1 plus the number of endogenous "
+                f"regressors ({ncol - 1}), so that the residuals of the dependent "
+                "variable and the endogenous regressors on the exogenous regressors "
+                "and instruments are linearly independent."
+            )
 
         ez = e - z @ (pinv(z) @ e)
         if x1.shape[1] == 0:  # No exogenous regressors
             ex1 = e
         else:
             ex1 = e - x1 @ (pinv(x1) @ e)
+
+        # Kappa is the smallest generalized eigenvalue of (ex1'ex1, ez'ez), which does not
+        # change if column j of both is divided by the same number. Dividing by the norm
+        # of column j of ez makes the rank test, and the cross product that is inverted,
+        # independent of the units of the variables. A column that is exactly 0 cannot be
+        # scaled, and is linearly dependent
+        scale = norm(ez, axis=0)
+        full_rank = False
+        if npall(scale > 0):
+            ez, ex1 = ez / scale, ex1 / scale
+            full_rank = bool(matrix_rank(ez, tol=_KAPPA_TOLERANCE) == ncol)
+        if not full_rank:
+            raise LinAlgError(
+                "The residuals of the dependent variable and the endogenous "
+                "regressors on the exogenous regressors and instruments are linearly "
+                "dependent, so that the cross product of the residuals, which is "
+                "inverted to estimate kappa, is singular."
+            )
 
         vpmzv_sqinv = inv_sqrth(ez.T @ ez)
         q = vpmzv_sqinv @ (ex1.T @ ex1) @ vpmzv_sqinv
@@ -682,7 +752,7 @@ class _IVLSModelBase(_IVModelBase):
     def fit(
         self, *, cov_type: str = "robust", debiased: bool = False, **cov_config: Any
     ) -> OLSResults | IVResults:
-        """
+        r"""
         Estimate model parameters
 
         Parameters
@@ -711,6 +781,18 @@ class _IVLSModelBase(_IVModelBase):
         -------
         IVResults
             Results container
+
+        Raises
+        ------
+        ValueError
+            If ``kappa`` is None, so that it is estimated, as in
+            :class:`~linearmodels.iv.model.IVLIML` by default, and the estimate of
+            :math:`\kappa` is not defined. That occurs if there are fewer than 1 +
+            the number of endogenous regressors observations more than the number
+            of exogenous regressors and instruments, or the residuals of the
+            dependent variable and the endogenous regressors on the exogenous
+            regressors and instruments are collinear. See the notes of
+            :class:`~linearmodels.iv.model.IVLIML`.
 
         Notes
         -----
@@ -817,6 +899,30 @@ class IVLIML(_IVLSModelBase):
     .. math::
 
       \kappa-\alpha/(n-n_{instr})
+
+    :math:`\kappa` is the smallest eigenvalue of the cross product of the
+    residuals of the dependent variable and the endogenous regressors on the
+    exogenous regressors, relative to the cross product of their residuals on the
+    exogenous regressors and the instruments, which is inverted. It is not defined
+    if the residuals on the exogenous regressors and the instruments are linearly
+    dependent. That occurs if there are fewer than :math:`1 + n_{endog}`
+    observations more than the number of exogenous regressors and instruments (for
+    example, fewer than 4 observations for a constant, one endogenous regressor and
+    one instrument), and if the residuals are collinear for another reason. Whether
+    the residuals are collinear does not depend on the units of the variables.
+    ``fit`` raises a ``ValueError`` if ``kappa`` is not provided and
+    :math:`\kappa` is not defined. The model is estimated if ``kappa`` is provided,
+    and then the Anderson-Rubin and Basmann F tests of overidentification of the
+    results are an ``InvalidTestStatistic``, since they use the estimate of
+    :math:`\kappa`.
+
+    .. versionchanged:: 7.1
+
+       A ``ValueError`` is raised if :math:`\kappa` is not defined. Earlier versions
+       used the rounding error of the singular cross product, for example 0.8125
+       instead of 1 in a just-identified model with 3 observations, a constant, one
+       endogenous regressor and one instrument. It was NaN on some platforms, with
+       the estimates and their covariance, and a ``RuntimeWarning`` was emitted.
 
     Rows are paired by position. An input that carries labels (a pandas
     Series or DataFrame with an index other than the default 0, 1, ..., n-1,
@@ -959,6 +1065,21 @@ class IV2SLS(_IVLSModelBase):
 
     The 2SLS estimator is a special case of a k-class estimator with
     :math:`\kappa=1`,
+
+    The estimates do not use the estimate of :math:`\kappa` of LIML, but the
+    Anderson-Rubin and Basmann F tests of overidentification of the results do.
+    The estimate of :math:`\kappa` is not defined if there are fewer than
+    :math:`1 + n_{endog}` observations more than the number of exogenous
+    regressors and instruments, or if the residuals of the dependent variable and
+    the endogenous regressors on the exogenous regressors and instruments are
+    collinear (see :class:`~linearmodels.iv.model.IVLIML`). The model is
+    estimated then, and the tests are an ``InvalidTestStatistic``.
+
+    .. versionchanged:: 7.1
+
+       The Anderson-Rubin and Basmann F tests are an ``InvalidTestStatistic`` if
+       :math:`\kappa` is not defined. Earlier versions computed them from the
+       rounding error of a singular matrix, or the statistics were NaN.
 
     Rows are paired by position. An input that carries labels (a pandas
     Series or DataFrame with an index other than the default 0, 1, ..., n-1,
@@ -2565,6 +2686,21 @@ class IVJIVE(_IVModelBase):
     variance, particularly when the instruments are weak (see Davidson and
     MacKinnon, 2006).
 
+    The estimates do not use the estimate of :math:`\kappa` of LIML, but the
+    Anderson-Rubin and Basmann F tests of overidentification of the results do.
+    The estimate of :math:`\kappa` is not defined if there are fewer than
+    :math:`1 + n_{endog}` observations more than the number of exogenous
+    regressors and instruments, or if the residuals of the dependent variable and
+    the endogenous regressors on the exogenous regressors and instruments are
+    collinear (see :class:`~linearmodels.iv.model.IVLIML`). The model is
+    estimated then, and the tests are an ``InvalidTestStatistic``.
+
+    .. versionchanged:: 7.1
+
+       The Anderson-Rubin and Basmann F tests are an ``InvalidTestStatistic`` if
+       :math:`\kappa` is not defined. Earlier versions computed them from the
+       rounding error of a singular matrix, or the statistics were NaN.
+
     Rows are paired by position. An input that carries labels (a pandas
     Series or DataFrame with an index other than the default 0, 1, ..., n-1,
     or an xarray DataArray with coordinates) must use the same index, in the
@@ -2677,7 +2813,7 @@ class IVJIVE(_IVModelBase):
     def fit(
         self, *, cov_type: str = "robust", debiased: bool = False, **cov_config: Any
     ) -> IVResults:
-        """
+        r"""
         Estimate model parameters
 
         Parameters
@@ -2722,7 +2858,10 @@ class IVJIVE(_IVModelBase):
         has one element for each observation.
 
         Since JIVE is not a k-class estimator, ``kappa`` is None in the
-        results.
+        results. The estimate of :math:`\kappa` of LIML is only used by the
+        Anderson-Rubin and Basmann F tests of overidentification, which are an
+        ``InvalidTestStatistic`` if it is not defined. The model is estimated
+        then. See the notes of the class.
 
         See Also
         --------

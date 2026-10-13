@@ -27,6 +27,7 @@ from linearmodels.datasets import card
 from linearmodels.iv import IV2SLS, IVJIVE, compare
 from linearmodels.iv.results import IVResults
 from linearmodels.shared.exceptions import MissingValueWarning
+from linearmodels.shared.hypotheses import InvalidTestStatistic
 
 CWD = os.path.split(os.path.abspath(__file__))[0]
 RESULTS = os.path.join(CWD, "results")
@@ -720,6 +721,9 @@ def test_failure_to_compute_kappa_only_affects_the_tests_that_use_it(monkeypatch
     res = IVJIVE(y, exog, endog, z).fit()
     assert_allclose(res.params, expected.params, rtol=0, atol=0)
     assert_allclose(res.cov, expected.cov, rtol=0, atol=0)
+    # They are not statistics that are NaN, but statistics that are not defined
+    assert isinstance(res.anderson_rubin, InvalidTestStatistic)
+    assert isinstance(res.basmann_f, InvalidTestStatistic)
     assert np.isnan(res.anderson_rubin.stat)
     assert np.isnan(res.basmann_f.stat)
 

@@ -207,6 +207,36 @@ def test_inv_sqrth():
     assert_allclose(1 + prod, np.ones((10, 10)))
 
 
+def test_inv_sqrth_of_diagonal_matrix():
+    # Closed form: the entries are the inverse square roots of the diagonal
+    x = np.diag([4.0, 0.25, 9.0])
+    assert_allclose(inv_sqrth(x), np.diag([0.5, 2.0, 1.0 / 3.0]), rtol=1e-14)
+
+
+@pytest.mark.parametrize(
+    "matrix",
+    [
+        np.zeros((2, 2)),
+        np.diag([2.0, 1.0, 0.0]),
+        np.diag([2.0, 1.0, -1.0]),
+        np.full((2, 2), np.nan),
+    ],
+    ids=["zeros", "zero eigenvalue", "negative eigenvalue", "nan"],
+)
+def test_inv_sqrth_raises_if_not_positive_definite(matrix):
+    # The eigenvalue decomposition does not raise for them, and the result was inf or
+    # NaN, with a RuntimeWarning
+    with warnings.catch_warnings():
+        warnings.simplefilter("error")
+        with pytest.raises(np.linalg.LinAlgError):
+            inv_sqrth(matrix)
+
+
+def test_inv_sqrth_error_message():
+    with pytest.raises(np.linalg.LinAlgError, match="not positive definite"):
+        inv_sqrth(np.diag([1.0, -1.0]))
+
+
 def test_ensure_unique_column():
     df = pd.DataFrame({"a": [0, 1, 0], "b": [1.0, 0.0, 1.0]})
     out = ensure_unique_column("a", df)
