@@ -23,7 +23,7 @@
     
   
       
-        <title>linearmodels.iv.results.IVResults.anderson_rubin - linearmodels v7.1 (+460)</title>
+        <title>linearmodels.iv.results.IVResults.anderson_rubin - linearmodels v7.1 (+468)</title>
       
     
 
@@ -100,7 +100,7 @@
 
 <header class="md-header md-header--shadow" data-md-component="header">
   <nav class="md-header__inner md-grid" aria-label="Header">
-    <a href="../../index.html" title="linearmodels v7.1 (+460)" class="md-header__button md-logo" aria-label="linearmodels v7.1 (+460)" data-md-component="logo">
+    <a href="../../index.html" title="linearmodels v7.1 (+468)" class="md-header__button md-logo" aria-label="linearmodels v7.1 (+468)" data-md-component="logo">
       <img src="../../_static/bw-logo.svg" alt="logo">
     </a>
     <label class="md-header__button md-icon" for="__drawer">
@@ -111,7 +111,7 @@
       <div class="md-header__ellipsis">
         <div class="md-header__topic">
           <span class="md-ellipsis">
-            linearmodels v7.1 (+460)
+            linearmodels v7.1 (+468)
           </span>
         </div>
         <div class="md-header__topic" data-md-component="header-topic">
@@ -206,10 +206,10 @@
 
 <nav class="md-nav md-nav--primary" aria-label="Navigation" data-md-level="0">
   <label class="md-nav__title" for="__drawer">
-    <a href="../../index.html" title="linearmodels v7.1 (+460)" class="md-nav__button md-logo" aria-label="linearmodels v7.1 (+460)" data-md-component="logo">
+    <a href="../../index.html" title="linearmodels v7.1 (+468)" class="md-nav__button md-logo" aria-label="linearmodels v7.1 (+468)" data-md-component="logo">
       <img src="../../_static/bw-logo.svg" alt="logo">
     </a>
-    linearmodels v7.1 (+460)
+    linearmodels v7.1 (+468)
   </label>
   
     <div class="md-nav__source">
@@ -2286,7 +2286,7 @@
 <dd class="field-odd"><p>Object containing test statistic, p-value, distribution and null</p>
 </dd>
 <dt class="field-even" id="linearmodels.iv.results.IVResults.anderson_rubin-return-type">Return type<span class="colon">:</span><a class="headerlink" href="#linearmodels.iv.results.IVResults.anderson_rubin-return-type" title="Permalink to this headline">¶</a></dt>
-<dd class="field-even"><p><a class="reference internal" href="../../utility/linearmodels.shared.hypotheses.WaldTestStatistic.html#linearmodels.shared.hypotheses.WaldTestStatistic" title="linearmodels.shared.hypotheses.WaldTestStatistic (Python class) — Test statistic holder for Wald-type tests"><code class="xref py py-class docutils literal notranslate"><span class="pre">linearmodels.shared.hypotheses.WaldTestStatistic</span></code></a></p>
+<dd class="field-even"><p><a class="reference internal" href="../../utility/linearmodels.shared.hypotheses.WaldTestStatistic.html#linearmodels.shared.hypotheses.WaldTestStatistic" title="linearmodels.shared.hypotheses.WaldTestStatistic (Python class) — Test statistic holder for Wald-type tests"><code class="xref py py-class docutils literal notranslate"><span class="pre">linearmodels.shared.hypotheses.WaldTestStatistic</span></code></a> or <a class="reference internal" href="../../utility/linearmodels.shared.hypotheses.InvalidTestStatistic.html#linearmodels.shared.hypotheses.InvalidTestStatistic" title="linearmodels.shared.hypotheses.InvalidTestStatistic (Python class) — Class returned if a requested test is not valid for a model"><code class="xref py py-class docutils literal notranslate"><span class="pre">linearmodels.shared.hypotheses.InvalidTestStatistic</span></code></a></p>
 </dd>
 </dl>
 <p class="rubric">Notes</p>
@@ -2296,6 +2296,17 @@ indicate the model is not overidentified. The test statistic is</p>
 <div class="math notranslate nohighlight">
 \[n \ln(\hat{\kappa}) \sim \chi^2_{q}\]</div>
 <p>where <span class="math notranslate nohighlight">\(q = n_{instr} - n_{endog}\)</span>.</p>
+<p>The test requires more instruments than endogenous variables, and a
+value of <span class="math notranslate nohighlight">\(\kappa\)</span>. An <code class="docutils literal notranslate"><span class="pre">InvalidTestStatistic</span></code> is returned
+if there are not more instruments, or if <span class="math notranslate nohighlight">\(\kappa\)</span> could not be
+estimated, which occurs if there are fewer than 1 + the number of
+endogenous regressors observations more than the number of exogenous
+regressors and instruments. See <a class="reference internal" href="linearmodels.iv.model.IVLIML.html#linearmodels.iv.model.IVLIML" title="linearmodels.iv.model.IVLIML (Python class) — Limited information ML and k-class estimation of IV models"><code class="xref py py-class docutils literal notranslate"><span class="pre">IVLIML</span></code></a>.</p>
+<div class="admonition versionchanged">
+<p class="admonition-title"><span class="versionmodified changed">Changed in version 7.1: </span>An <code class="docutils literal notranslate"><span class="pre">InvalidTestStatistic</span></code> is returned if <span class="math notranslate nohighlight">\(\kappa\)</span> could
+not be estimated. The statistic was NaN, or computed from a value of
+<span class="math notranslate nohighlight">\(\kappa\)</span> that was rounding error.</p>
+</div>
 </dd></dl>
 
 

@@ -19,7 +19,7 @@
     
   
       
-        <title>linearmodels.iv.results - linearmodels v7.1 (+460)</title>
+        <title>linearmodels.iv.results - linearmodels v7.1 (+468)</title>
       
     
 
@@ -91,7 +91,7 @@
 
 <header class="md-header md-header--shadow" data-md-component="header">
   <nav class="md-header__inner md-grid" aria-label="Header">
-    <a href="../../../index.html" title="linearmodels v7.1 (+460)" class="md-header__button md-logo" aria-label="linearmodels v7.1 (+460)" data-md-component="logo">
+    <a href="../../../index.html" title="linearmodels v7.1 (+468)" class="md-header__button md-logo" aria-label="linearmodels v7.1 (+468)" data-md-component="logo">
       <img src="../../../_static/bw-logo.svg" alt="logo">
     </a>
     <label class="md-header__button md-icon" for="__drawer">
@@ -102,7 +102,7 @@
       <div class="md-header__ellipsis">
         <div class="md-header__topic">
           <span class="md-ellipsis">
-            linearmodels v7.1 (+460)
+            linearmodels v7.1 (+468)
           </span>
         </div>
         <div class="md-header__topic" data-md-component="header-topic">
@@ -197,10 +197,10 @@
 
 <nav class="md-nav md-nav--primary" aria-label="Navigation" data-md-level="0">
   <label class="md-nav__title" for="__drawer">
-    <a href="../../../index.html" title="linearmodels v7.1 (+460)" class="md-nav__button md-logo" aria-label="linearmodels v7.1 (+460)" data-md-component="logo">
+    <a href="../../../index.html" title="linearmodels v7.1 (+468)" class="md-nav__button md-logo" aria-label="linearmodels v7.1 (+468)" data-md-component="logo">
       <img src="../../../_static/bw-logo.svg" alt="logo">
     </a>
-    linearmodels v7.1 (+460)
+    linearmodels v7.1 (+468)
   </label>
   
     <div class="md-nav__source">
@@ -581,6 +581,14 @@
     <span class="s2">"OLSResults"</span><span class="p">,</span>
     <span class="s2">"compare"</span><span class="p">,</span>
 <span class="p">]</span>
+
+
+<span class="n">_KAPPA_UNAVAILABLE</span> <span class="o">=</span> <span class="p">(</span>
+    <span class="s2">"The kappa of LIML, which the statistic is computed from, could not be "</span>
+    <span class="s2">"estimated, so the statistic is not defined. This occurs, for example, when "</span>
+    <span class="s2">"there are fewer than 1 + the number of endogenous regressors observations "</span>
+    <span class="s2">"more than the number of exogenous regressors and instruments."</span>
+<span class="p">)</span>
 
 
 <span class="k">def</span><span class="w"> </span><span class="nf">stub_concat</span><span class="p">(</span>
@@ -2270,7 +2278,7 @@
 
 <span class="sd">        Returns</span>
 <span class="sd">        -------</span>
-<span class="sd">        WaldTestStatistic</span>
+<span class="sd">        WaldTestStatistic or InvalidTestStatistic</span>
 <span class="sd">            Object containing test statistic, p-value, distribution and null</span>
 
 <span class="sd">        Notes</span>
@@ -2284,6 +2292,19 @@
 <span class="sd">          n \ln(\hat{\kappa}) \sim \chi^2_{q}</span>
 
 <span class="sd">        where :math:`q = n_{instr} - n_{endog}`.</span>
+
+<span class="sd">        The test requires more instruments than endogenous variables, and a</span>
+<span class="sd">        value of :math:`\kappa`. An ``InvalidTestStatistic`` is returned</span>
+<span class="sd">        if there are not more instruments, or if :math:`\kappa` could not be</span>
+<span class="sd">        estimated, which occurs if there are fewer than 1 + the number of</span>
+<span class="sd">        endogenous regressors observations more than the number of exogenous</span>
+<span class="sd">        regressors and instruments. See :class:`~linearmodels.iv.model.IVLIML`.</span>
+
+<span class="sd">        .. versionchanged:: 7.1</span>
+
+<span class="sd">           An ``InvalidTestStatistic`` is returned if :math:`\kappa` could</span>
+<span class="sd">           not be estimated. The statistic was NaN, or computed from a value of</span>
+<span class="sd">           :math:`\kappa` that was rounding error.</span>
 <span class="sd">        """</span>
         <span class="n">nobs</span><span class="p">,</span> <span class="n">ninstr</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">model</span><span class="o">.</span><span class="n">instruments</span><span class="o">.</span><span class="n">shape</span>
         <span class="n">nendog</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">model</span><span class="o">.</span><span class="n">endog</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span>
@@ -2294,6 +2315,8 @@
                 <span class="n">name</span><span class="o">=</span><span class="n">name</span><span class="p">,</span>
             <span class="p">)</span>
         <span class="k">assert</span> <span class="bp">self</span><span class="o">.</span><span class="n">_liml_kappa</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span>
+        <span class="k">if</span> <span class="n">isnan</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_liml_kappa</span><span class="p">):</span>
+            <span class="k">return</span> <span class="n">InvalidTestStatistic</span><span class="p">(</span><span class="n">_KAPPA_UNAVAILABLE</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="n">name</span><span class="p">)</span>
         <span class="n">stat</span> <span class="o">=</span> <span class="n">nobs</span> <span class="o">*</span> <span class="n">log</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_liml_kappa</span><span class="p">)</span>
         <span class="n">df</span> <span class="o">=</span> <span class="n">ninstr</span> <span class="o">-</span> <span class="n">nendog</span>
         <span class="n">null</span> <span class="o">=</span> <span class="s2">"The model is not overidentified."</span>
@@ -2309,7 +2332,7 @@
 
 <span class="sd">        Returns</span>
 <span class="sd">        -------</span>
-<span class="sd">        WaldTestStatistic</span>
+<span class="sd">        WaldTestStatistic or InvalidTestStatistic</span>
 <span class="sd">            Object containing test statistic, p-value, distribution and null</span>
 
 <span class="sd">        Notes</span>
@@ -2323,6 +2346,19 @@
 <span class="sd">          \hat{\kappa} (n -n_{instr})/q \sim F_{q, n - n_{instr}}</span>
 
 <span class="sd">        where :math:`q = n_{instr} - n_{endog}`.</span>
+
+<span class="sd">        The test requires more instruments than endogenous variables, and a</span>
+<span class="sd">        value of :math:`\kappa`. An ``InvalidTestStatistic`` is returned</span>
+<span class="sd">        if there are not more instruments, or if :math:`\kappa` could not be</span>
+<span class="sd">        estimated, which occurs if there are fewer than 1 + the number of</span>
+<span class="sd">        endogenous regressors observations more than the number of exogenous</span>
+<span class="sd">        regressors and instruments. See :class:`~linearmodels.iv.model.IVLIML`.</span>
+
+<span class="sd">        .. versionchanged:: 7.1</span>
+
+<span class="sd">           An ``InvalidTestStatistic`` is returned if :math:`\kappa` could</span>
+<span class="sd">           not be estimated. The statistic was NaN, or computed from a value of</span>
+<span class="sd">           :math:`\kappa` that was rounding error.</span>
 <span class="sd">        """</span>
         <span class="n">nobs</span><span class="p">,</span> <span class="n">ninstr</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">model</span><span class="o">.</span><span class="n">instruments</span><span class="o">.</span><span class="n">shape</span>
         <span class="n">nendog</span><span class="p">,</span> <span class="n">nexog</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">model</span><span class="o">.</span><span class="n">endog</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="bp">self</span><span class="o">.</span><span class="n">model</span><span class="o">.</span><span class="n">exog</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span>
@@ -2335,6 +2371,8 @@
         <span class="n">df</span> <span class="o">=</span> <span class="n">ninstr</span> <span class="o">-</span> <span class="n">nendog</span>
         <span class="n">df_denom</span> <span class="o">=</span> <span class="n">nobs</span> <span class="o">-</span> <span class="p">(</span><span class="n">nexog</span> <span class="o">+</span> <span class="n">ninstr</span><span class="p">)</span>
         <span class="k">assert</span> <span class="bp">self</span><span class="o">.</span><span class="n">_liml_kappa</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span>
+        <span class="k">if</span> <span class="n">isnan</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_liml_kappa</span><span class="p">):</span>
+            <span class="k">return</span> <span class="n">InvalidTestStatistic</span><span class="p">(</span><span class="n">_KAPPA_UNAVAILABLE</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="n">name</span><span class="p">)</span>
         <span class="n">stat</span> <span class="o">=</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_liml_kappa</span> <span class="o">-</span> <span class="mi">1</span><span class="p">)</span> <span class="o">*</span> <span class="n">df_denom</span> <span class="o">/</span> <span class="n">df</span>
         <span class="n">null</span> <span class="o">=</span> <span class="s2">"The model is not overidentified."</span>
         <span class="k">return</span> <span class="n">WaldTestStatistic</span><span class="p">(</span><span class="n">stat</span><span class="p">,</span> <span class="n">null</span><span class="p">,</span> <span class="n">df</span><span class="p">,</span> <span class="n">df_denom</span><span class="o">=</span><span class="n">df_denom</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="n">name</span><span class="p">)</span></div>

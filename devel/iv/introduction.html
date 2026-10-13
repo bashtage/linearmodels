@@ -23,7 +23,7 @@
     
   
       
-        <title>Introduction - linearmodels v7.1 (+460)</title>
+        <title>Introduction - linearmodels v7.1 (+468)</title>
       
     
 
@@ -100,7 +100,7 @@
 
 <header class="md-header md-header--shadow" data-md-component="header">
   <nav class="md-header__inner md-grid" aria-label="Header">
-    <a href="../index.html" title="linearmodels v7.1 (+460)" class="md-header__button md-logo" aria-label="linearmodels v7.1 (+460)" data-md-component="logo">
+    <a href="../index.html" title="linearmodels v7.1 (+468)" class="md-header__button md-logo" aria-label="linearmodels v7.1 (+468)" data-md-component="logo">
       <img src="../_static/bw-logo.svg" alt="logo">
     </a>
     <label class="md-header__button md-icon" for="__drawer">
@@ -111,7 +111,7 @@
       <div class="md-header__ellipsis">
         <div class="md-header__topic">
           <span class="md-ellipsis">
-            linearmodels v7.1 (+460)
+            linearmodels v7.1 (+468)
           </span>
         </div>
         <div class="md-header__topic" data-md-component="header-topic">
@@ -206,10 +206,10 @@
 
 <nav class="md-nav md-nav--primary" aria-label="Navigation" data-md-level="0">
   <label class="md-nav__title" for="__drawer">
-    <a href="../index.html" title="linearmodels v7.1 (+460)" class="md-nav__button md-logo" aria-label="linearmodels v7.1 (+460)" data-md-component="logo">
+    <a href="../index.html" title="linearmodels v7.1 (+468)" class="md-nav__button md-logo" aria-label="linearmodels v7.1 (+468)" data-md-component="logo">
       <img src="../_static/bw-logo.svg" alt="logo">
     </a>
-    linearmodels v7.1 (+460)
+    linearmodels v7.1 (+468)
   </label>
   
     <div class="md-nav__source">
@@ -1197,6 +1197,20 @@ finite sample correction to the usual LIML estimator.</p></li>
 <li><p><code class="docutils literal notranslate"><span class="pre">kappa</span></code> allows a user-specified value of <span class="math notranslate nohighlight">\(\kappa\)</span> to be provided in
 which case the LIML estimated value of <span class="math notranslate nohighlight">\(\kappa\)</span> is ignored.</p></li>
 </ul>
+<p>The LIML estimate of <span class="math notranslate nohighlight">\(\kappa\)</span> is not defined if there are fewer than
+<span class="math notranslate nohighlight">\(1 + k_2\)</span> observations more than the number of exogenous regressors and
+instruments, where <span class="math notranslate nohighlight">\(k_2\)</span> is the number of endogenous regressors. A
+constant, one endogenous regressor and one instrument need at least 4
+observations, for example. It is not defined either if the residuals of the
+dependent variable and the endogenous regressors on the exogenous regressors and
+instruments are collinear. <a class="reference internal" href="iv/linearmodels.iv.model.IVLIML.html#linearmodels.iv.model.IVLIML" title="linearmodels.iv.model.IVLIML (Python class) — Limited information ML and k-class estimation of IV models"><code class="xref py py-class docutils literal notranslate"><span class="pre">IVLIML</span></code></a> raises a
+<code class="docutils literal notranslate"><span class="pre">ValueError</span></code> when the model is fit if <code class="docutils literal notranslate"><span class="pre">kappa</span></code> is not provided and the
+estimate is not defined. Earlier versions used the rounding error of a singular
+matrix, which was arbitrary and NaN on some platforms. Two cases are not covered
+(<a class="extlink-issue reference external" href="https://github.com/bashtage/linearmodels/issues/823">GH823</a>). The estimate is rounding error if an endogenous regressor is
+exactly a linear combination of the exogenous regressors and instruments, and it
+loses accuracy if there are 2 or more endogenous regressors on very different
+scales.</p>
 <h4 id="jive-estimation">JIVE Estimation<a class="headerlink" href="#jive-estimation" title="Link to this heading">¶</a></h4>
 <p>The JIVE estimator has no options that change how the parameters are
 estimated. It uses first-stage predictions that leave out each observation as
@@ -1458,6 +1472,14 @@ moment conditions that is selected by <code class="docutils literal notranslate"
 J-statistic cannot exceed the number of observations, however large the
 violation of the moment conditions is, and the centered J-statistic can.</p></li>
 </ul>
+<p><a class="reference internal" href="iv/linearmodels.iv.results.IVResults.anderson_rubin.html#linearmodels.iv.results.IVResults.anderson_rubin" title="linearmodels.iv.results.IVResults.anderson_rubin (Python property) — Anderson-Rubin test of overidentifying restrictions"><code class="xref py py-attr docutils literal notranslate"><span class="pre">anderson_rubin</span></code></a> and
+<a class="reference internal" href="iv/linearmodels.iv.results.IVResults.basmann_f.html#linearmodels.iv.results.IVResults.basmann_f" title="linearmodels.iv.results.IVResults.basmann_f (Python property) — Basmann's F test of overidentifying restrictions"><code class="xref py py-attr docutils literal notranslate"><span class="pre">basmann_f</span></code></a> are computed from the LIML
+estimate of <span class="math notranslate nohighlight">\(\kappa\)</span>, which <a class="reference internal" href="iv/linearmodels.iv.model.IV2SLS.html#linearmodels.iv.model.IV2SLS" title="linearmodels.iv.model.IV2SLS (Python class) — Estimation of IV models using two-stage least squares"><code class="xref py py-class docutils literal notranslate"><span class="pre">IV2SLS</span></code></a>,
+<a class="reference internal" href="iv/linearmodels.iv.model.IVLIML.html#linearmodels.iv.model.IVLIML" title="linearmodels.iv.model.IVLIML (Python class) — Limited information ML and k-class estimation of IV models"><code class="xref py py-class docutils literal notranslate"><span class="pre">IVLIML</span></code></a> and <a class="reference internal" href="iv/linearmodels.iv.model.IVJIVE.html#linearmodels.iv.model.IVJIVE" title="linearmodels.iv.model.IVJIVE (Python class) — Jackknife instrumental variables estimator (JIVE)"><code class="xref py py-class docutils literal notranslate"><span class="pre">IVJIVE</span></code></a>
+compute. They are reported as an
+<a class="reference internal" href="../utility/linearmodels.shared.hypotheses.InvalidTestStatistic.html#linearmodels.shared.hypotheses.InvalidTestStatistic" title="linearmodels.shared.hypotheses.InvalidTestStatistic (Python class) — Class returned if a requested test is not valid for a model"><code class="xref py py-class docutils literal notranslate"><span class="pre">InvalidTestStatistic</span></code></a> if the estimate is
+not defined, as described for LIML above. IV2SLS and IVJIVE still estimate the
+model.</p>
 <p>The difference matters if the errors are heteroskedastic. In a simulation of
 1,500 samples with 400 observations, a regressor that is exogenous, three valid
 instruments and errors with the standard deviation <span class="math notranslate nohighlight">\(\exp(0.9 z_1)\)</span>, where

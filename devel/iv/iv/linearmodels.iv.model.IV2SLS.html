@@ -23,7 +23,7 @@
     
   
       
-        <title>linearmodels.iv.model.IV2SLS - linearmodels v7.1 (+460)</title>
+        <title>linearmodels.iv.model.IV2SLS - linearmodels v7.1 (+468)</title>
       
     
 
@@ -100,7 +100,7 @@
 
 <header class="md-header md-header--shadow" data-md-component="header">
   <nav class="md-header__inner md-grid" aria-label="Header">
-    <a href="../../index.html" title="linearmodels v7.1 (+460)" class="md-header__button md-logo" aria-label="linearmodels v7.1 (+460)" data-md-component="logo">
+    <a href="../../index.html" title="linearmodels v7.1 (+468)" class="md-header__button md-logo" aria-label="linearmodels v7.1 (+468)" data-md-component="logo">
       <img src="../../_static/bw-logo.svg" alt="logo">
     </a>
     <label class="md-header__button md-icon" for="__drawer">
@@ -111,7 +111,7 @@
       <div class="md-header__ellipsis">
         <div class="md-header__topic">
           <span class="md-ellipsis">
-            linearmodels v7.1 (+460)
+            linearmodels v7.1 (+468)
           </span>
         </div>
         <div class="md-header__topic" data-md-component="header-topic">
@@ -206,10 +206,10 @@
 
 <nav class="md-nav md-nav--primary" aria-label="Navigation" data-md-level="0">
   <label class="md-nav__title" for="__drawer">
-    <a href="../../index.html" title="linearmodels v7.1 (+460)" class="md-nav__button md-logo" aria-label="linearmodels v7.1 (+460)" data-md-component="logo">
+    <a href="../../index.html" title="linearmodels v7.1 (+468)" class="md-nav__button md-logo" aria-label="linearmodels v7.1 (+468)" data-md-component="logo">
       <img src="../../_static/bw-logo.svg" alt="logo">
     </a>
-    linearmodels v7.1 (+460)
+    linearmodels v7.1 (+468)
   </label>
   
     <div class="md-nav__source">
@@ -1810,6 +1810,19 @@ its observation is dropped.</p>
            \hat{X} &amp; =Z(Z'Z)^{-1}Z'X\end{split}\]</div>
 <p>The 2SLS estimator is a special case of a k-class estimator with
 <span class="math notranslate nohighlight">\(\kappa=1\)</span>,</p>
+<p>The estimates do not use the estimate of <span class="math notranslate nohighlight">\(\kappa\)</span> of LIML, but the
+Anderson-Rubin and Basmann F tests of overidentification of the results do.
+The estimate of <span class="math notranslate nohighlight">\(\kappa\)</span> is not defined if there are fewer than
+<span class="math notranslate nohighlight">\(1 + n_{endog}\)</span> observations more than the number of exogenous
+regressors and instruments, or if the residuals of the dependent variable and
+the endogenous regressors on the exogenous regressors and instruments are
+collinear (see <a class="reference internal" href="linearmodels.iv.model.IVLIML.html#linearmodels.iv.model.IVLIML" title="linearmodels.iv.model.IVLIML (Python class) — Limited information ML and k-class estimation of IV models"><code class="xref py py-class docutils literal notranslate"><span class="pre">IVLIML</span></code></a>). The model is
+estimated then, and the tests are an <code class="docutils literal notranslate"><span class="pre">InvalidTestStatistic</span></code>.</p>
+<div class="admonition versionchanged">
+<p class="admonition-title"><span class="versionmodified changed">Changed in version 7.1: </span>The Anderson-Rubin and Basmann F tests are an <code class="docutils literal notranslate"><span class="pre">InvalidTestStatistic</span></code> if
+<span class="math notranslate nohighlight">\(\kappa\)</span> is not defined. Earlier versions computed them from the
+rounding error of a singular matrix, or the statistics were NaN.</p>
+</div>
 <p>Rows are paired by position. An input that carries labels (a pandas
 Series or DataFrame with an index other than the default 0, 1, …, n-1,
 or an xarray DataArray with coordinates) must use the same index, in the

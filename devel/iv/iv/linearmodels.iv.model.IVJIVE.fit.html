@@ -23,7 +23,7 @@
     
   
       
-        <title>linearmodels.iv.model.IVJIVE.fit - linearmodels v7.1 (+460)</title>
+        <title>linearmodels.iv.model.IVJIVE.fit - linearmodels v7.1 (+468)</title>
       
     
 
@@ -100,7 +100,7 @@
 
 <header class="md-header md-header--shadow" data-md-component="header">
   <nav class="md-header__inner md-grid" aria-label="Header">
-    <a href="../../index.html" title="linearmodels v7.1 (+460)" class="md-header__button md-logo" aria-label="linearmodels v7.1 (+460)" data-md-component="logo">
+    <a href="../../index.html" title="linearmodels v7.1 (+468)" class="md-header__button md-logo" aria-label="linearmodels v7.1 (+468)" data-md-component="logo">
       <img src="../../_static/bw-logo.svg" alt="logo">
     </a>
     <label class="md-header__button md-icon" for="__drawer">
@@ -111,7 +111,7 @@
       <div class="md-header__ellipsis">
         <div class="md-header__topic">
           <span class="md-ellipsis">
-            linearmodels v7.1 (+460)
+            linearmodels v7.1 (+468)
           </span>
         </div>
         <div class="md-header__topic" data-md-component="header-topic">
@@ -206,10 +206,10 @@
 
 <nav class="md-nav md-nav--primary" aria-label="Navigation" data-md-level="0">
   <label class="md-nav__title" for="__drawer">
-    <a href="../../index.html" title="linearmodels v7.1 (+460)" class="md-nav__button md-logo" aria-label="linearmodels v7.1 (+460)" data-md-component="logo">
+    <a href="../../index.html" title="linearmodels v7.1 (+468)" class="md-nav__button md-logo" aria-label="linearmodels v7.1 (+468)" data-md-component="logo">
       <img src="../../_static/bw-logo.svg" alt="logo">
     </a>
-    linearmodels v7.1 (+460)
+    linearmodels v7.1 (+468)
   </label>
   
     <div class="md-nav__source">
@@ -1686,7 +1686,10 @@ kernel and 6 with the quadratic spectral kernel, and a <code class="docutils lit
 raised for fewer. “clustered” is one-way clustering, and <code class="docutils literal notranslate"><span class="pre">clusters</span></code>
 has one element for each observation.</p>
 <p>Since JIVE is not a k-class estimator, <code class="docutils literal notranslate"><span class="pre">kappa</span></code> is None in the
-results.</p>
+results. The estimate of <span class="math notranslate nohighlight">\(\kappa\)</span> of LIML is only used by the
+Anderson-Rubin and Basmann F tests of overidentification, which are an
+<code class="docutils literal notranslate"><span class="pre">InvalidTestStatistic</span></code> if it is not defined. The model is estimated
+then. See the notes of the class.</p>
 <div class="seealso admonition">
 <p class="admonition-title">See also</p>
 <p><a class="reference internal" href="linearmodels.iv.gmm.IVGMMCovariance.html#linearmodels.iv.gmm.IVGMMCovariance" title="linearmodels.iv.gmm.IVGMMCovariance (Python class) — Covariance estimation for GMM models"><code class="xref py py-obj docutils literal notranslate"><span class="pre">linearmodels.iv.gmm.IVGMMCovariance</span></code></a></p>
@@ -1788,6 +1791,8 @@ results.</p>
       
         <script src="../../_static/sphinx_immaterial_theme.32136f45f91ae6956.min.js?v=a7a9472a"></script>
         <script crossorigin="anonymous" integrity="sha256-Ae2Vz/4ePdIu6ZyI/5ZGsYnb+m0JlOmKPjt6XZ9JJkA=" src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.4/require.min.js"></script>
+        <script>window.MathJax = {"tex": {"inlineMath": [["$", "$"], ["\\(", "\\)"]], "processEscapes": true}, "options": {"ignoreHtmlClass": "tex2jax_ignore|mathjax_ignore|document", "processHtmlClass": "tex2jax_process|mathjax_process|math|output_area"}}</script>
+        <script id="MathJax-script" src="../../_static/mathjax/tex-mml-chtml.js"></script>
     
   </body>
 </html>

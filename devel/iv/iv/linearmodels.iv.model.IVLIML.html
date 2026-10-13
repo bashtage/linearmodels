@@ -23,7 +23,7 @@
     
   
       
-        <title>linearmodels.iv.model.IVLIML - linearmodels v7.1 (+460)</title>
+        <title>linearmodels.iv.model.IVLIML - linearmodels v7.1 (+468)</title>
       
     
 
@@ -100,7 +100,7 @@
 
 <header class="md-header md-header--shadow" data-md-component="header">
   <nav class="md-header__inner md-grid" aria-label="Header">
-    <a href="../../index.html" title="linearmodels v7.1 (+460)" class="md-header__button md-logo" aria-label="linearmodels v7.1 (+460)" data-md-component="logo">
+    <a href="../../index.html" title="linearmodels v7.1 (+468)" class="md-header__button md-logo" aria-label="linearmodels v7.1 (+468)" data-md-component="logo">
       <img src="../../_static/bw-logo.svg" alt="logo">
     </a>
     <label class="md-header__button md-icon" for="__drawer">
@@ -111,7 +111,7 @@
       <div class="md-header__ellipsis">
         <div class="md-header__topic">
           <span class="md-ellipsis">
-            linearmodels v7.1 (+460)
+            linearmodels v7.1 (+468)
           </span>
         </div>
         <div class="md-header__topic" data-md-component="header-topic">
@@ -206,10 +206,10 @@
 
 <nav class="md-nav md-nav--primary" aria-label="Navigation" data-md-level="0">
   <label class="md-nav__title" for="__drawer">
-    <a href="../../index.html" title="linearmodels v7.1 (+460)" class="md-nav__button md-logo" aria-label="linearmodels v7.1 (+460)" data-md-component="logo">
+    <a href="../../index.html" title="linearmodels v7.1 (+468)" class="md-nav__button md-logo" aria-label="linearmodels v7.1 (+468)" data-md-component="logo">
       <img src="../../_static/bw-logo.svg" alt="logo">
     </a>
-    linearmodels v7.1 (+460)
+    linearmodels v7.1 (+468)
   </label>
   
     <div class="md-nav__source">
@@ -1872,6 +1872,33 @@ P_{z} &amp; =Z(Z'Z)^{-1}Z'\end{split}\]</div>
 <p>When using Fuller’s <span class="math notranslate nohighlight">\(\alpha\)</span>, the value used is modified to</p>
 <div class="math notranslate nohighlight">
 \[\kappa-\alpha/(n-n_{instr})\]</div>
+<p><span class="math notranslate nohighlight">\(\kappa\)</span> is the smallest eigenvalue of the cross product of the
+residuals of the dependent variable and the endogenous regressors on the
+exogenous regressors, relative to the cross product of their residuals on the
+exogenous regressors and the instruments, which is inverted. It is not defined
+if the residuals on the exogenous regressors and the instruments are linearly
+dependent. That occurs if there are fewer than <span class="math notranslate nohighlight">\(1 + n_{endog}\)</span>
+observations more than the number of exogenous regressors and instruments (for
+example, fewer than 4 observations for a constant, one endogenous regressor and
+one instrument), and if the residuals are collinear for another reason. Whether
+the residuals are collinear does not depend on the units of the variables.
+<code class="docutils literal notranslate"><span class="pre">fit</span></code> raises a <code class="docutils literal notranslate"><span class="pre">ValueError</span></code> if <code class="docutils literal notranslate"><span class="pre">kappa</span></code> is not provided and
+<span class="math notranslate nohighlight">\(\kappa\)</span> is not defined. The model is estimated if <code class="docutils literal notranslate"><span class="pre">kappa</span></code> is provided,
+and then the Anderson-Rubin and Basmann F tests of overidentification of the
+results are an <code class="docutils literal notranslate"><span class="pre">InvalidTestStatistic</span></code>, since they use the estimate of
+<span class="math notranslate nohighlight">\(\kappa\)</span>.</p>
+<p>Two cases are not covered, see <a class="extlink-issue reference external" href="https://github.com/bashtage/linearmodels/issues/823">GH823</a>. An endogenous regressor that is
+exactly a linear combination of the exogenous regressors and instruments has
+residuals that are only rounding error, and so does <span class="math notranslate nohighlight">\(\kappa\)</span>. With 2 or
+more endogenous regressors, <span class="math notranslate nohighlight">\(\kappa\)</span> loses accuracy, and the estimate can
+fail, if the variables are on very different scales.</p>
+<div class="admonition versionchanged">
+<p class="admonition-title"><span class="versionmodified changed">Changed in version 7.1: </span>A <code class="docutils literal notranslate"><span class="pre">ValueError</span></code> is raised if <span class="math notranslate nohighlight">\(\kappa\)</span> is not defined. Earlier versions
+used the rounding error of the singular cross product, for example 0.8125
+instead of 1 in a just-identified model with 3 observations, a constant, one
+endogenous regressor and one instrument. It was NaN on some platforms, with
+the estimates and their covariance, and a <code class="docutils literal notranslate"><span class="pre">RuntimeWarning</span></code> was emitted.</p>
+</div>
 <p>Rows are paired by position. An input that carries labels (a pandas
 Series or DataFrame with an index other than the default 0, 1, …, n-1,
 or an xarray DataArray with coordinates) must use the same index, in the
