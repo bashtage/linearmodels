@@ -2119,7 +2119,21 @@ class IVModelComparison(_ModelComparison):
 
     @property
     def rsquared_adj(self) -> Series:
-        """Sample-size adjusted coefficients of determination (R**2)"""
+        """
+        Sample-size adjusted coefficients of determination (R**2)
+
+        Returns
+        -------
+        Series
+            The adjusted coefficient of determination of each model.
+
+        Notes
+        -----
+        The value of a model is NaN if its coefficient of determination is not
+        defined, i.e., if the total sum of squares is zero, up to rounding error, or
+        if the model has as many parameters as observations. See ``rsquared_adj`` of
+        the results of the models.
+        """
         return self._get_property("rsquared_adj")
 
     @property

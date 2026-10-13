@@ -1699,17 +1699,56 @@ class PanelModelComparison(_ModelComparison):
 
     @property
     def rsquared_between(self) -> Series:
-        """Coefficients of determination (R**2)"""
+        """
+        Between coefficients of determination (R**2)
+
+        Returns
+        -------
+        Series
+            The between coefficient of determination of each model.
+
+        Notes
+        -----
+        The value of a model is NaN if its between coefficient of determination is not
+        defined, i.e., if the total sum of squares is zero, up to rounding error. See
+        ``rsquared_between`` of the results of the models.
+        """
         return self._get_property("rsquared_between")
 
     @property
     def rsquared_within(self) -> Series:
-        """Coefficients of determination (R**2)"""
+        """
+        Within coefficients of determination (R**2)
+
+        Returns
+        -------
+        Series
+            The within coefficient of determination of each model.
+
+        Notes
+        -----
+        The value of a model is NaN if its within coefficient of determination is not
+        defined, i.e., if the total sum of squares is zero, up to rounding error. See
+        ``rsquared_within`` of the results of the models.
+        """
         return self._get_property("rsquared_within")
 
     @property
     def rsquared_overall(self) -> Series:
-        """Coefficients of determination (R**2)"""
+        """
+        Overall coefficients of determination (R**2)
+
+        Returns
+        -------
+        Series
+            The overall coefficient of determination of each model.
+
+        Notes
+        -----
+        The value of a model is NaN if its overall coefficient of determination is not
+        defined, i.e., if the total sum of squares is zero, up to rounding error. See
+        ``rsquared_overall`` of the results of the models.
+        """
         return self._get_property("rsquared_overall")
 
     @property
