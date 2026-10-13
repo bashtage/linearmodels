@@ -99,9 +99,13 @@ def test_unknown_kernel_raises_when_the_model_is_fit(
         mod.fit(cov_type=cov_type, kernel=name, **options(bandwidth))
     error = info.value
     # Code that caught the KeyError or the ValueError of earlier versions still works
-    assert isinstance(error, ValueError)
-    assert isinstance(error, KeyError)
-    assert str(error) == message(name, suggestion)
+    is_value_error = isinstance(error, ValueError)
+    is_key_error = isinstance(error, KeyError)
+    assert is_value_error
+    assert is_key_error
+    text = str(error)
+    expected = message(name, suggestion)
+    assert text == expected
 
 
 @pytest.mark.parametrize("bandwidth", BANDWIDTHS)
@@ -118,7 +122,9 @@ def test_fama_macbeth_unknown_kernel_raises_when_the_model_is_fit(
     mod = FamaMacBeth(frame["y"], frame[["const", "x"]])
     with pytest.raises(UnknownOptionError) as info:
         mod.fit(cov_type=cov_type, kernel=name, **options(bandwidth))
-    assert str(info.value) == message(name, suggestion)
+    text = str(info.value)
+    expected = message(name, suggestion)
+    assert text == expected
 
 
 def test_the_name_is_checked_before_the_bandwidth(frame):
@@ -167,7 +173,8 @@ def test_estimators_check_the_kernel_when_they_are_created(frame, cov, bandwidth
     with pytest.raises(UnknownOptionError, match="Unknown kernel: 'foo'"):
         cov(*args, kernel="foo", **options(bandwidth))
     estimator = cov(*args, kernel="parzen", **options(bandwidth))
-    assert np.all(np.isfinite(estimator.cov))
+    finite = np.all(np.isfinite(estimator.cov))
+    assert finite
 
 
 @pytest.mark.parametrize("bandwidth", [*BANDWIDTHS, pytest.param(0, id="zero")])
@@ -183,7 +190,8 @@ def test_fama_macbeth_estimator_checks_the_kernel_when_it_is_created(frame, band
     with pytest.raises(UnknownOptionError, match="Unknown kernel: 'foo'"):
         FamaMacBethCovariance(*args, kernel="foo", **options(bandwidth))
     estimator = FamaMacBethCovariance(*args, kernel="parzen", **options(bandwidth))
-    assert np.all(np.isfinite(estimator.cov))
+    finite = np.all(np.isfinite(estimator.cov))
+    assert finite
 
 
 @pytest.mark.parametrize("bandwidth", BANDWIDTHS)

@@ -271,6 +271,11 @@ ONE_WAY_FORMS = ["frame", "array", "list", "xarray2d", "xarray3d"]
 TWO_WAY_FORMS = ["array3d", "list3d", "xarray3d"]
 
 
+def assert_same_index(index, expected):
+    same = index.equals(expected)
+    assert same
+
+
 def compare_results(res, expected):
     # The covariance of two-way clusters is not positive in some of the small samples,
     # so the standard errors, which would warn, are not used
@@ -296,7 +301,7 @@ def check_clusters(panel, mod, expected, names, form):
     grid = panel.grid(names, form)
     # Each row has the cluster of its entity and period
     clusters = mod.reformat_clusters(grid)
-    assert clusters.dataframe.index.equals(mod.dependent.index)
+    assert_same_index(clusters.dataframe.index, mod.dependent.index)
     for k, name in enumerate(names):
         values = panel.row_values(name, mod.dependent.index)
         assert_allclose(clusters.values2d[:, k], values)
@@ -434,7 +439,7 @@ def least_squares_with_dummies(panel, mod, names, **options):
 def check_categories(panel, mod, names):
     """Each row has the category of its entity and period"""
     cats = mod._other_effect_cats.dataframe
-    assert cats.index.equals(mod.dependent.index)
+    assert_same_index(cats.index, mod.dependent.index)
     for k, name in enumerate(names):
         values = panel.row_values(name, mod.dependent.index)
         codes = np.unique(values, return_inverse=True)[1]
@@ -488,7 +493,7 @@ def test_other_effects_in_every_form_and_order_of_the_rows(
     check_categories(panel, mod, names)
     expected_cats = expected._other_effect_cats.dataframe
     assert_allclose(mod._other_effect_cats.dataframe, expected_cats)
-    assert mod._other_effect_cats.dataframe.index.equals(expected_cats.index)
+    assert_same_index(mod._other_effect_cats.dataframe.index, expected_cats.index)
 
 
 WEIGHT_FORMS = [
@@ -539,7 +544,7 @@ def test_weights_in_every_form_and_order_of_the_rows(
 ):
     panel, expected = reference_weights(layout, order, missing, name, "PooledOLS")
     mod = panel.build(WEIGHT_MODELS["PooledOLS"], w=weights_in_form(panel, name, form))
-    assert mod.weights.dataframe.index.equals(expected.weights.dataframe.index)
+    assert_same_index(mod.weights.dataframe.index, expected.weights.dataframe.index)
     assert_allclose(mod.weights.values2d, expected.weights.values2d, rtol=1e-12)
     # Weighted least squares, which does not use the model
     index = mod.dependent.index
@@ -559,7 +564,7 @@ def test_weights_in_a_grid_are_those_of_the_rows_in_every_model(
 ):
     panel, expected = reference_weights(layout, order, missing, "w", model)
     mod = panel.build(WEIGHT_MODELS[model], w=weights_in_form(panel, "w", "frame"))
-    assert mod.weights.dataframe.index.equals(expected.weights.dataframe.index)
+    assert_same_index(mod.weights.dataframe.index, expected.weights.dataframe.index)
     assert_allclose(mod.weights.values2d, expected.weights.values2d, rtol=1e-12)
     compare_results(mod.fit(), expected.fit())
 
@@ -649,7 +654,8 @@ def test_grids_without_labels_are_paired_by_position_in_the_grid(layout, order):
     # Reversed values in the same positions are not the values of the rows
     reversed_grid = pd.DataFrame(frame.to_numpy()[::-1])
     other = mod.fit(cov_type="clustered", clusters=reversed_grid)
-    assert not np.allclose(other.cov, expected.cov)
+    unchanged = np.allclose(other.cov, expected.cov)
+    assert not unchanged
 
 
 @pytest.mark.parametrize("layout", LAYOUTS)
@@ -688,12 +694,13 @@ def test_unbalanced_grid_is_in_the_order_of_the_rows_not_of_their_appearance(
     entities = [panel.entities[e] for e, _ in panel.cells]
     grid = make_labelled(panel, "c1")
     first = appearance(periods), appearance(entities)
+    found = list(grid.index), list(grid.columns)
     if order == "newest-first":
         # Newest first is the order of appearance, since the first entity has the
         # last period
-        assert list(grid.index) == first[0]
+        assert found[0] == first[0]
     else:
-        assert list(grid.index) != first[0] or list(grid.columns) != first[1]
+        assert found != first
         by_appearance = grid.reindex(index=first[0], columns=first[1])
         with pytest.raises(ValueError, match="time and entity index of clusters"):
             mod.fit(cov_type="clustered", clusters=by_appearance)
@@ -717,9 +724,11 @@ def test_balanced_panels_use_the_order_in_which_the_rows_appear(seed):
     elif kind == 3:
         cells = [cells[i] for i in rng.permutation(len(cells))]
     index = pd.MultiIndex.from_tuples(cells)
-    found_entities, found_periods = _grid_axes(index)
-    assert list(found_entities) == appearance(e for e, _ in cells)
-    assert list(found_periods) == appearance(t for _, t in cells)
+    found_entities, found_periods = (list(axis) for axis in _grid_axes(index))
+    expected_entities = appearance(e for e, _ in cells)
+    expected_periods = appearance(t for _, t in cells)
+    assert found_entities == expected_entities
+    assert found_periods == expected_periods
 
 
 @pytest.mark.parametrize("seed", range(40))
@@ -738,20 +747,22 @@ def test_sorted_unbalanced_panels_use_sorted_axes(seed):
     elif kind == 2:
         cells.sort(key=lambda cell: (cell[0], -cell[1]))
     index = pd.MultiIndex.from_tuples(cells)
-    entities, periods = _grid_axes(index)
+    entities, periods = (list(axis) for axis in _grid_axes(index))
     present_e = sorted({e for e, _ in cells})
     present_t = sorted({t for _, t in cells})
-    assert list(entities) == present_e
-    assert list(periods) == (present_t[::-1] if kind == 2 else present_t)
+    expected_periods = present_t[::-1] if kind == 2 else present_t
+    assert entities == present_e
+    assert periods == expected_periods
 
 
 def test_axes_of_labels_that_cannot_be_ordered_are_in_order_of_appearance():
     # Entities that are strings and integers have no order. The periods of every
     # entity are in order, so that they are in order of time and not of appearance
     cells = [("a", 3), ("a", 4), (2, 1), (2, 3), ("b", 1)]
-    entities, periods = _grid_axes(pd.MultiIndex.from_tuples(cells))
-    assert list(entities) == ["a", 2, "b"]
-    assert list(periods) == [1, 3, 4]
+    index = pd.MultiIndex.from_tuples(cells)
+    entities, periods = (list(axis) for axis in _grid_axes(index))
+    assert entities == ["a", 2, "b"]
+    assert periods == [1, 3, 4]
 
 
 @pytest.mark.parametrize("order", ["entity-major", "time-major"])
