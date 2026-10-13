@@ -19,7 +19,7 @@
     
   
       
-        <title>linearmodels.panel.model - linearmodels v7.1 (+439)</title>
+        <title>linearmodels.panel.model - linearmodels v7.1 (+446)</title>
       
     
 
@@ -91,7 +91,7 @@
 
 <header class="md-header md-header--shadow" data-md-component="header">
   <nav class="md-header__inner md-grid" aria-label="Header">
-    <a href="../../../index.html" title="linearmodels v7.1 (+439)" class="md-header__button md-logo" aria-label="linearmodels v7.1 (+439)" data-md-component="logo">
+    <a href="../../../index.html" title="linearmodels v7.1 (+446)" class="md-header__button md-logo" aria-label="linearmodels v7.1 (+446)" data-md-component="logo">
       <img src="../../../_static/bw-logo.svg" alt="logo">
     </a>
     <label class="md-header__button md-icon" for="__drawer">
@@ -102,7 +102,7 @@
       <div class="md-header__ellipsis">
         <div class="md-header__topic">
           <span class="md-ellipsis">
-            linearmodels v7.1 (+439)
+            linearmodels v7.1 (+446)
           </span>
         </div>
         <div class="md-header__topic" data-md-component="header-topic">
@@ -197,10 +197,10 @@
 
 <nav class="md-nav md-nav--primary" aria-label="Navigation" data-md-level="0">
   <label class="md-nav__title" for="__drawer">
-    <a href="../../../index.html" title="linearmodels v7.1 (+439)" class="md-nav__button md-logo" aria-label="linearmodels v7.1 (+439)" data-md-component="logo">
+    <a href="../../../index.html" title="linearmodels v7.1 (+446)" class="md-nav__button md-logo" aria-label="linearmodels v7.1 (+446)" data-md-component="logo">
       <img src="../../../_static/bw-logo.svg" alt="logo">
     </a>
-    linearmodels v7.1 (+439)
+    linearmodels v7.1 (+446)
   </label>
   
     <div class="md-nav__source">
@@ -4691,7 +4691,9 @@
 <span class="sd">        bandwidth : float</span>
 <span class="sd">            The bandwidth to use when cov_type is "kernel". It must be below T,</span>
 <span class="sd">            the number of periods that are used. If None, it is automatically</span>
-<span class="sd">            computed, and is at most T - 1.</span>
+<span class="sd">            computed, and is at most T - 1. The automatic bandwidth needs T to be</span>
+<span class="sd">            at least 4 with the Bartlett kernel, 5 with the Parzen kernel and 6</span>
+<span class="sd">            with the quadratic spectral kernel.</span>
 <span class="sd">        kernel : str</span>
 <span class="sd">            The kernel to use.  None chooses the default kernel.</span>
 
@@ -4705,13 +4707,15 @@
 <span class="sd">        ValueError</span>
 <span class="sd">            If ``cov_type`` is not one of the supported names, or if it is</span>
 <span class="sd">            "kernel" and ``bandwidth`` is not below T, the number of periods that</span>
-<span class="sd">            are used.</span>
+<span class="sd">            are used. It is also raised if it is "kernel", ``bandwidth`` is None</span>
+<span class="sd">            and T is below the number that the automatic bandwidth needs, or the</span>
+<span class="sd">            automatic bandwidth is not finite.</span>
 
 <span class="sd">        Examples</span>
 <span class="sd">        --------</span>
 <span class="sd">        &gt;&gt;&gt; from linearmodels import FamaMacBeth</span>
 <span class="sd">        &gt;&gt;&gt; mod = FamaMacBeth(y, x)</span>
-<span class="sd">        &gt;&gt;&gt; res = mod.fit(cov_type="kernel", kernel="Parzen")</span>
+<span class="sd">        &gt;&gt;&gt; res = mod.fit(cov_type="kernel", kernel="parzen")</span>
 
 <span class="sd">        Notes</span>
 <span class="sd">        -----</span>
@@ -4724,7 +4728,14 @@
 <span class="sd">          The T estimates have autocovariances up to lag T - 1, so the bandwidth</span>
 <span class="sd">          must be below T. This holds for every kernel, including the quadratic</span>
 <span class="sd">          spectral kernel, which is not truncated. The bandwidth is checked when</span>
-<span class="sd">          the model is fit.</span>
+<span class="sd">          the model is fit. If ``bandwidth`` is None it is computed from the T</span>
+<span class="sd">          estimates by</span>
+<span class="sd">          :func:`~linearmodels.iv.covariance.kernel_optimal_bandwidth`, when the</span>
+<span class="sd">          model is fit as well. The rule needs T to be at least 4 with the</span>
+<span class="sd">          Bartlett kernel ("bartlett", "newey-west", the default), 5 with the</span>
+<span class="sd">          Parzen kernel ("parzen", "gallant") and 6 with the quadratic spectral</span>
+<span class="sd">          kernel ("qs", "quadratic-spectral", "andrews"). Pass ``bandwidth`` to</span>
+<span class="sd">          use the estimator with fewer periods.</span>
 
 <span class="sd">        The parameters are the averages of the T cross-sectional estimates, and</span>
 <span class="sd">        T is the number of periods whose cross-sectional regression is</span>
@@ -4764,6 +4775,18 @@
 <span class="sd">           covariance was first used. The quadratic spectral kernel, which has no</span>
 <span class="sd">           truncation, returned a covariance without an error, which was close to</span>
 <span class="sd">           zero for a large bandwidth.</span>
+
+<span class="sd">        .. versionchanged:: 7.1</span>
+
+<span class="sd">           The automatic bandwidth raises a ``ValueError`` when the model is fit</span>
+<span class="sd">           if T is below 4 with the Bartlett kernel, 5 with the Parzen kernel or</span>
+<span class="sd">           6 with the quadratic spectral kernel. The deviations of the T</span>
+<span class="sd">           estimates from their average sum to zero, and with so few periods the</span>
+<span class="sd">           rule divides by the sum of all of their autocovariances. Earlier</span>
+<span class="sd">           versions raised "cannot convert float infinity to integer" (an</span>
+<span class="sd">           ``OverflowError``) or "cannot convert float NaN to integer" when the</span>
+<span class="sd">           covariance was first used, or used a bandwidth of T - 1 because of the</span>
+<span class="sd">           rounding error of the sum.</span>
 <span class="sd">        """</span>
         <span class="c1"># The retained observations and their weights, which are scaled to have a</span>
         <span class="c1"># mean of one once the observations with missing values are dropped</span>

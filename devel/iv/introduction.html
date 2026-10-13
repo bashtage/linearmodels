@@ -23,7 +23,7 @@
     
   
       
-        <title>Introduction - linearmodels v7.1 (+439)</title>
+        <title>Introduction - linearmodels v7.1 (+446)</title>
       
     
 
@@ -100,7 +100,7 @@
 
 <header class="md-header md-header--shadow" data-md-component="header">
   <nav class="md-header__inner md-grid" aria-label="Header">
-    <a href="../index.html" title="linearmodels v7.1 (+439)" class="md-header__button md-logo" aria-label="linearmodels v7.1 (+439)" data-md-component="logo">
+    <a href="../index.html" title="linearmodels v7.1 (+446)" class="md-header__button md-logo" aria-label="linearmodels v7.1 (+446)" data-md-component="logo">
       <img src="../_static/bw-logo.svg" alt="logo">
     </a>
     <label class="md-header__button md-icon" for="__drawer">
@@ -111,7 +111,7 @@
       <div class="md-header__ellipsis">
         <div class="md-header__topic">
           <span class="md-ellipsis">
-            linearmodels v7.1 (+439)
+            linearmodels v7.1 (+446)
           </span>
         </div>
         <div class="md-header__topic" data-md-component="header-topic">
@@ -206,10 +206,10 @@
 
 <nav class="md-nav md-nav--primary" aria-label="Navigation" data-md-level="0">
   <label class="md-nav__title" for="__drawer">
-    <a href="../index.html" title="linearmodels v7.1 (+439)" class="md-nav__button md-logo" aria-label="linearmodels v7.1 (+439)" data-md-component="logo">
+    <a href="../index.html" title="linearmodels v7.1 (+446)" class="md-nav__button md-logo" aria-label="linearmodels v7.1 (+446)" data-md-component="logo">
       <img src="../_static/bw-logo.svg" alt="logo">
     </a>
-    linearmodels v7.1 (+439)
+    linearmodels v7.1 (+446)
   </label>
   
     <div class="md-nav__source">
@@ -1240,7 +1240,11 @@ unless <code class="docutils literal notranslate"><span class="pre">optimal_bw=F
 <a class="reference internal" href="iv/linearmodels.iv.model.IVLIML.html#linearmodels.iv.model.IVLIML" title="linearmodels.iv.model.IVLIML (Python class) — Limited information ML and k-class estimation of IV models"><code class="xref py py-class docutils literal notranslate"><span class="pre">IVLIML</span></code></a> is. The same is true of the kernel
 covariance that <code class="docutils literal notranslate"><span class="pre">fit</span></code> uses if <code class="docutils literal notranslate"><span class="pre">cov_type</span></code> is ‘kernel’. See
 <a class="reference internal" href="mathematical-formula.html#iv-mathematical-notation"><span class="std std-ref">Formulas and Mathematical Detail</span></a> for the method. The bandwidth that was used is
-in <code class="docutils literal notranslate"><span class="pre">weight_config</span></code> and <code class="docutils literal notranslate"><span class="pre">cov_config</span></code> of the results.</p>
+in <code class="docutils literal notranslate"><span class="pre">weight_config</span></code> and <code class="docutils literal notranslate"><span class="pre">cov_config</span></code> of the results. The estimate needs at
+least 4 observations with the Bartlett kernel, 5 with the Parzen kernel and 6
+with the quadratic spectral kernel, and <code class="docutils literal notranslate"><span class="pre">fit</span></code> raises a <code class="docutils literal notranslate"><span class="pre">ValueError</span></code> for
+fewer. Pass <code class="docutils literal notranslate"><span class="pre">bandwidth</span></code>, or <code class="docutils literal notranslate"><span class="pre">optimal_bw=False</span></code>, to use the kernel with fewer
+observations.</p>
 <div class="admonition versionchanged">
 <p class="admonition-title"><span class="versionmodified changed">Changed in version 7.1: </span>The default bandwidth of the kernel estimators of
 <a class="reference internal" href="iv/linearmodels.iv.model.IVGMM.html#linearmodels.iv.model.IVGMM" title="linearmodels.iv.model.IVGMM (Python class) — Estimation of IV models using the generalized method of moments (GMM)"><code class="xref py py-class docutils literal notranslate"><span class="pre">IVGMM</span></code></a> and
@@ -1285,7 +1289,11 @@ Andrews.</p></li>
 the optimal value is used. This is the case for all of the estimators. It
 has been the case for <a class="reference internal" href="iv/linearmodels.iv.model.IVGMM.html#linearmodels.iv.model.IVGMM" title="linearmodels.iv.model.IVGMM (Python class) — Estimation of IV models using the generalized method of moments (GMM)"><code class="xref py py-class docutils literal notranslate"><span class="pre">IVGMM</span></code></a> and
 <a class="reference internal" href="iv/linearmodels.iv.model.IVGMMCUE.html#linearmodels.iv.model.IVGMMCUE" title="linearmodels.iv.model.IVGMMCUE (Python class) — Estimation of IV models using continuously updating GMM"><code class="xref py py-class docutils literal notranslate"><span class="pre">IVGMMCUE</span></code></a> since 7.1, see the kernel
-bandwidth in <a class="reference internal" href="#gmm-and-gmm-cue-estimation">GMM and GMM-CUE Estimation</a>.</p>
+bandwidth in <a class="reference internal" href="#gmm-and-gmm-cue-estimation">GMM and GMM-CUE Estimation</a>. The estimate of the optimal
+value needs at least 4 observations with the Bartlett kernel, 5 with the
+Parzen kernel and 6 with the quadratic spectral kernel, and a <code class="docutils literal notranslate"><span class="pre">ValueError</span></code>
+is raised for fewer. Pass <code class="docutils literal notranslate"><span class="pre">bandwidth</span></code> to use the kernel with fewer
+observations.</p>
 <p>See <a class="reference internal" href="iv/linearmodels.iv.covariance.KernelCovariance.html#linearmodels.iv.covariance.KernelCovariance" title="linearmodels.iv.covariance.KernelCovariance (Python class) — Kernel weighted (HAC) covariance estimation"><code class="xref py py-class docutils literal notranslate"><span class="pre">KernelCovariance</span></code></a>.</p>
 </li>
 <li><p>‘clustered’, ‘one-way’ - Allows for a one-way cluster structure where model

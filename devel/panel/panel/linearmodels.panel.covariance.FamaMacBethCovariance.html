@@ -23,7 +23,7 @@
     
   
       
-        <title>linearmodels.panel.covariance.FamaMacBethCovariance - linearmodels v7.1 (+439)</title>
+        <title>linearmodels.panel.covariance.FamaMacBethCovariance - linearmodels v7.1 (+446)</title>
       
     
 
@@ -100,7 +100,7 @@
 
 <header class="md-header md-header--shadow" data-md-component="header">
   <nav class="md-header__inner md-grid" aria-label="Header">
-    <a href="../../index.html" title="linearmodels v7.1 (+439)" class="md-header__button md-logo" aria-label="linearmodels v7.1 (+439)" data-md-component="logo">
+    <a href="../../index.html" title="linearmodels v7.1 (+446)" class="md-header__button md-logo" aria-label="linearmodels v7.1 (+446)" data-md-component="logo">
       <img src="../../_static/bw-logo.svg" alt="logo">
     </a>
     <label class="md-header__button md-icon" for="__drawer">
@@ -111,7 +111,7 @@
       <div class="md-header__ellipsis">
         <div class="md-header__topic">
           <span class="md-ellipsis">
-            linearmodels v7.1 (+439)
+            linearmodels v7.1 (+446)
           </span>
         </div>
         <div class="md-header__topic" data-md-component="header-topic">
@@ -206,10 +206,10 @@
 
 <nav class="md-nav md-nav--primary" aria-label="Navigation" data-md-level="0">
   <label class="md-nav__title" for="__drawer">
-    <a href="../../index.html" title="linearmodels v7.1 (+439)" class="md-nav__button md-logo" aria-label="linearmodels v7.1 (+439)" data-md-component="logo">
+    <a href="../../index.html" title="linearmodels v7.1 (+446)" class="md-nav__button md-logo" aria-label="linearmodels v7.1 (+446)" data-md-component="logo">
       <img src="../../_static/bw-logo.svg" alt="logo">
     </a>
-    linearmodels v7.1 (+439)
+    linearmodels v7.1 (+446)
   </label>
   
     <div class="md-nav__source">
@@ -1810,7 +1810,10 @@
 <dt id="linearmodels.panel.covariance.FamaMacBethCovariance.__init__.bandwidth"><span class="n sig-name">bandwidth</span><span class="p">:</span><span class="w"> </span><span class="n"><span class="desctype"><a class="reference external" href="https://docs.python.org/3/builtins/functions.html#float" title="(in Python v3.15)">float</a><span class="w"> </span><span class="p">|</span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/builtins/constants.html#None" title="(in Python v3.15)">None</a></span></span><span class="w"> </span><span class="o">=</span><span class="w"> </span><code class="code python default_value docutils literal highlight highlight-python"><span class="kc">None</span></code><a class="headerlink" href="#linearmodels.panel.covariance.FamaMacBethCovariance.__init__.bandwidth" title="Permalink to this definition">¶</a></dt><dd><p>Non-negative bandwidth to use. It must be below T, the number of time
 periods that are used. The Bartlett and Parzen kernels use its integer
 part. Set to 0 to disable autocorrelation robustness. If not provided, it
-is computed from the T estimates and is at most T - 1.</p>
+is computed from the T estimates and is at most T - 1. The computation
+needs at least 4 time periods with the Bartlett kernel, 5 with the Parzen
+kernel and 6 with the quadratic spectral kernel. See
+<a class="reference internal" href="../../iv/iv/linearmodels.iv.covariance.kernel_optimal_bandwidth.html#linearmodels.iv.covariance.kernel_optimal_bandwidth" title="linearmodels.iv.covariance.kernel_optimal_bandwidth (Python function) — Select the bandwidth of a kernel covariance estimator from the data"><code class="xref py py-func docutils literal notranslate"><span class="pre">kernel_optimal_bandwidth()</span></code></a>.</p>
 </dd>
 <dt id="linearmodels.panel.covariance.FamaMacBethCovariance.__init__.kernel"><span class="n sig-name">kernel</span><span class="p">:</span><span class="w"> </span><span class="n"><span class="desctype"><a class="reference external" href="https://docs.python.org/3/builtins/stdtypes.html#str" title="(in Python v3.15)">str</a><span class="w"> </span><span class="p">|</span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/builtins/constants.html#None" title="(in Python v3.15)">None</a></span></span><span class="w"> </span><span class="o">=</span><span class="w"> </span><code class="code python default_value docutils literal highlight highlight-python"><span class="kc">None</span></code><a class="headerlink" href="#linearmodels.panel.covariance.FamaMacBethCovariance.__init__.kernel" title="Permalink to this definition">¶</a></dt><dd><p>Name of one of the supported kernels. If None, uses the Newey-West
 kernel.</p>
@@ -1818,15 +1821,19 @@ kernel.</p>
 </dl>
 </dd>
 <dt class="field-even" id="linearmodels.panel.covariance.FamaMacBethCovariance-raises">Raises<span class="colon">:</span><a class="headerlink" href="#linearmodels.panel.covariance.FamaMacBethCovariance-raises" title="Permalink to this headline">¶</a></dt>
-<dd class="field-even"><p><a class="reference external" href="https://docs.python.org/3/builtins/exceptions.html#ValueError" title="(in Python v3.15)"><strong>ValueError</strong></a> – If the bandwidth is not below the number of time periods that are used.</p>
+<dd class="field-even"><p><a class="reference external" href="https://docs.python.org/3/builtins/exceptions.html#ValueError" title="(in Python v3.15)"><strong>ValueError</strong></a> – If the bandwidth is not below the number of time periods that are used.
+    It is also raised if the bandwidth is not provided and there are fewer
+    time periods than the kernel needs to compute it, or if the bandwidth
+    that is computed is not finite.</p>
 </dd>
 </dl>
 <p class="rubric">Notes</p>
 <p>Covariance is a Kernel covariance of all estimated parameters.</p>
 <p>The <span class="math notranslate nohighlight">\(T\)</span> cross-sectional estimates, one for each time period that is
 used, have autocovariances up to lag <span class="math notranslate nohighlight">\(T-1\)</span>, so the bandwidth must be
-below <span class="math notranslate nohighlight">\(T\)</span>. The bandwidth is checked when the estimator is created, so
-that the <code class="docutils literal notranslate"><span class="pre">fit</span></code> method of the model raises the error.</p>
+below <span class="math notranslate nohighlight">\(T\)</span>. The bandwidth is checked, or computed if it is not
+provided, when the estimator is created, so that the <code class="docutils literal notranslate"><span class="pre">fit</span></code> method of the
+model raises the error.</p>
 <div class="admonition versionchanged">
 <p class="admonition-title"><span class="versionmodified changed">Changed in version 7.1: </span>A bandwidth that is not below the number of time periods raises a
 <code class="docutils literal notranslate"><span class="pre">ValueError</span></code>. Earlier versions raised “Length of w is larger than the
@@ -1836,6 +1843,18 @@ truncation, returned a covariance without an error. With a large bandwidth
 the weights of all of the lags are close to one, and the deviations of the
 estimates from their average sum to zero, so that the covariance was close
 to zero.</p>
+</div>
+<div class="admonition versionchanged">
+<p class="admonition-title"><span class="versionmodified changed">Changed in version 7.1: </span>The bandwidth that is computed from the estimates needs at least 4 time
+periods with the Bartlett kernel, 5 with the Parzen kernel and 6 with the
+quadratic spectral kernel, and a <code class="docutils literal notranslate"><span class="pre">ValueError</span></code> is raised for fewer, when
+the estimator is created. The deviations of the estimates from their
+average sum to zero. With fewer periods the rule divides by the sum of
+all of their autocovariances, which is zero, so that earlier versions
+raised “cannot convert float infinity to integer” (an <code class="docutils literal notranslate"><span class="pre">OverflowError</span></code>) or
+“cannot convert float NaN to integer” when the covariance was first used,
+or used a bandwidth of <span class="math notranslate nohighlight">\(T-1\)</span> because of the rounding error of the
+sum.</p>
 </div>
 <p class="rubric">Methods</p>
 <table class="autosummary longtable docutils data align-default">

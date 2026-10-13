@@ -19,7 +19,7 @@
     
   
       
-        <title>linearmodels.asset_pricing.model - linearmodels v7.1 (+439)</title>
+        <title>linearmodels.asset_pricing.model - linearmodels v7.1 (+446)</title>
       
     
 
@@ -91,7 +91,7 @@
 
 <header class="md-header md-header--shadow" data-md-component="header">
   <nav class="md-header__inner md-grid" aria-label="Header">
-    <a href="../../../index.html" title="linearmodels v7.1 (+439)" class="md-header__button md-logo" aria-label="linearmodels v7.1 (+439)" data-md-component="logo">
+    <a href="../../../index.html" title="linearmodels v7.1 (+446)" class="md-header__button md-logo" aria-label="linearmodels v7.1 (+446)" data-md-component="logo">
       <img src="../../../_static/bw-logo.svg" alt="logo">
     </a>
     <label class="md-header__button md-icon" for="__drawer">
@@ -102,7 +102,7 @@
       <div class="md-header__ellipsis">
         <div class="md-header__topic">
           <span class="md-ellipsis">
-            linearmodels v7.1 (+439)
+            linearmodels v7.1 (+446)
           </span>
         </div>
         <div class="md-header__topic" data-md-component="header-topic">
@@ -197,10 +197,10 @@
 
 <nav class="md-nav md-nav--primary" aria-label="Navigation" data-md-level="0">
   <label class="md-nav__title" for="__drawer">
-    <a href="../../../index.html" title="linearmodels v7.1 (+439)" class="md-nav__button md-logo" aria-label="linearmodels v7.1 (+439)" data-md-component="logo">
+    <a href="../../../index.html" title="linearmodels v7.1 (+446)" class="md-nav__button md-logo" aria-label="linearmodels v7.1 (+446)" data-md-component="logo">
       <img src="../../../_static/bw-logo.svg" alt="logo">
     </a>
-    linearmodels v7.1 (+439)
+    linearmodels v7.1 (+446)
   </label>
   
     <div class="md-nav__source">
@@ -958,7 +958,13 @@
 
 <span class="sd">        The kernel covariance estimator takes the optional arguments</span>
 <span class="sd">        ``kernel``, one of "bartlett", "parzen" or "qs" (quadratic spectral)</span>
-<span class="sd">        and ``bandwidth`` (a positive integer).</span>
+<span class="sd">        and ``bandwidth`` (a positive integer). If ``bandwidth`` is not given it</span>
+<span class="sd">        is selected from the data, which needs at least 4 observations with the</span>
+<span class="sd">        Bartlett kernel, 5 with the Parzen kernel and 6 with the quadratic</span>
+<span class="sd">        spectral kernel. ``fit`` raises a ``ValueError`` for fewer observations,</span>
+<span class="sd">        and if the selected bandwidth is not finite. Pass ``bandwidth`` to use</span>
+<span class="sd">        the kernel with fewer observations. See</span>
+<span class="sd">        :func:`~linearmodels.iv.covariance.kernel_optimal_bandwidth`.</span>
 
 <span class="sd">        If ``debiased`` is True, the covariance of the parameters of the</span>
 <span class="sd">        time-series regressions (the alphas and the loadings) is divided by</span>
@@ -1446,7 +1452,13 @@
 <span class="sd">        -----</span>
 <span class="sd">        The kernel covariance estimator takes the optional arguments</span>
 <span class="sd">        ``kernel``, one of "bartlett", "parzen" or "qs" (quadratic spectral)</span>
-<span class="sd">        and ``bandwidth`` (a positive integer).</span>
+<span class="sd">        and ``bandwidth`` (a positive integer). If ``bandwidth`` is not given it</span>
+<span class="sd">        is selected from the data, which needs at least 4 observations with the</span>
+<span class="sd">        Bartlett kernel, 5 with the Parzen kernel and 6 with the quadratic</span>
+<span class="sd">        spectral kernel. ``fit`` raises a ``ValueError`` for fewer observations,</span>
+<span class="sd">        and if the selected bandwidth is not finite. Pass ``bandwidth`` to use</span>
+<span class="sd">        the kernel with fewer observations. See</span>
+<span class="sd">        :func:`~linearmodels.iv.covariance.kernel_optimal_bandwidth`.</span>
 <span class="sd">        """</span>
         <span class="n">nobs</span><span class="p">,</span> <span class="n">nf</span><span class="p">,</span> <span class="n">nport</span><span class="p">,</span> <span class="n">_</span><span class="p">,</span> <span class="n">s1</span><span class="p">,</span> <span class="n">s2</span><span class="p">,</span> <span class="n">s3</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_boundaries</span><span class="p">()</span>
         <span class="n">excess_returns</span> <span class="o">=</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">_risk_free</span>
@@ -1874,7 +1886,14 @@
 <span class="sd">        -----</span>
 <span class="sd">        The kernel covariance estimator takes the optional arguments</span>
 <span class="sd">        ``kernel``, one of "bartlett", "parzen" or "qs" (quadratic spectral)</span>
-<span class="sd">        and ``bandwidth`` (a positive integer).</span>
+<span class="sd">        and ``bandwidth`` (a positive integer). If ``bandwidth`` is not given it</span>
+<span class="sd">        is selected from the data, for the weight matrix and for the covariance,</span>
+<span class="sd">        which needs at least 4 observations with the Bartlett kernel, 5 with the</span>
+<span class="sd">        Parzen kernel and 6 with the quadratic spectral kernel. ``fit`` raises a</span>
+<span class="sd">        ``ValueError`` for fewer observations, and if the selected bandwidth is</span>
+<span class="sd">        not finite. Pass ``bandwidth`` to use the kernel with fewer</span>
+<span class="sd">        observations. See</span>
+<span class="sd">        :func:`~linearmodels.iv.covariance.kernel_optimal_bandwidth`.</span>
 <span class="sd">        """</span>
 
         <span class="n">nobs</span><span class="p">,</span> <span class="n">n</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">portfolios</span><span class="o">.</span><span class="n">shape</span>

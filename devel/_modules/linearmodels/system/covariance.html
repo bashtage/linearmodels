@@ -19,7 +19,7 @@
     
   
       
-        <title>linearmodels.system.covariance - linearmodels v7.1 (+439)</title>
+        <title>linearmodels.system.covariance - linearmodels v7.1 (+446)</title>
       
     
 
@@ -91,7 +91,7 @@
 
 <header class="md-header md-header--shadow" data-md-component="header">
   <nav class="md-header__inner md-grid" aria-label="Header">
-    <a href="../../../index.html" title="linearmodels v7.1 (+439)" class="md-header__button md-logo" aria-label="linearmodels v7.1 (+439)" data-md-component="logo">
+    <a href="../../../index.html" title="linearmodels v7.1 (+446)" class="md-header__button md-logo" aria-label="linearmodels v7.1 (+446)" data-md-component="logo">
       <img src="../../../_static/bw-logo.svg" alt="logo">
     </a>
     <label class="md-header__button md-icon" for="__drawer">
@@ -102,7 +102,7 @@
       <div class="md-header__ellipsis">
         <div class="md-header__topic">
           <span class="md-ellipsis">
-            linearmodels v7.1 (+439)
+            linearmodels v7.1 (+446)
           </span>
         </div>
         <div class="md-header__topic" data-md-component="header-topic">
@@ -197,10 +197,10 @@
 
 <nav class="md-nav md-nav--primary" aria-label="Navigation" data-md-level="0">
   <label class="md-nav__title" for="__drawer">
-    <a href="../../../index.html" title="linearmodels v7.1 (+439)" class="md-nav__button md-logo" aria-label="linearmodels v7.1 (+439)" data-md-component="logo">
+    <a href="../../../index.html" title="linearmodels v7.1 (+446)" class="md-nav__button md-logo" aria-label="linearmodels v7.1 (+446)" data-md-component="logo">
       <img src="../../../_static/bw-logo.svg" alt="logo">
     </a>
-    linearmodels v7.1 (+439)
+    linearmodels v7.1 (+446)
   </label>
   
     <div class="md-nav__source">
@@ -860,7 +860,11 @@
 
 <span class="sd">    bandwidth : float</span>
 <span class="sd">        Bandwidth to use for the kernel.  If not provided the optimal</span>
-<span class="sd">        bandwidth will be estimated.</span>
+<span class="sd">        bandwidth will be estimated. It needs at least 4 observations with the</span>
+<span class="sd">        Bartlett kernel, 5 with the Parzen kernel and 6 with the quadratic</span>
+<span class="sd">        spectral kernel, and a ``ValueError`` is raised for fewer when the</span>
+<span class="sd">        covariance is first used. See</span>
+<span class="sd">        :func:`~linearmodels.iv.covariance.kernel_optimal_bandwidth`.</span>
 
 <span class="sd">    Notes</span>
 <span class="sd">    -----</span>
@@ -881,6 +885,15 @@
 <span class="sd">        (X'X)^{-1}\hat{S}(X'X)^{-1}</span>
 
 <span class="sd">    where :math:`\hat{S}` is a estimator of the covariance of the model scores.</span>
+
+<span class="sd">    .. versionchanged:: 7.1</span>
+
+<span class="sd">       The optimal bandwidth raises a ``ValueError`` if there are fewer</span>
+<span class="sd">       observations than the kernel needs, and if it is not finite. Earlier</span>
+<span class="sd">       versions raised "cannot convert float infinity to integer" (an</span>
+<span class="sd">       ``OverflowError``) or "cannot convert float NaN to integer" for some</span>
+<span class="sd">       data, and used a bandwidth of nobs - 1, or another bandwidth, for other</span>
+<span class="sd">       data.</span>
 
 <span class="sd">    See Also</span>
 <span class="sd">    --------</span>
@@ -1303,7 +1316,11 @@
 
 <span class="sd">    bandwidth : float</span>
 <span class="sd">        Bandwidth to use for the kernel.  If not provided the optimal</span>
-<span class="sd">        bandwidth will be estimated.</span>
+<span class="sd">        bandwidth will be estimated. It needs at least 4 observations with the</span>
+<span class="sd">        Bartlett kernel, 5 with the Parzen kernel and 6 with the quadratic</span>
+<span class="sd">        spectral kernel, and a ``ValueError`` is raised for fewer when the</span>
+<span class="sd">        covariance is first used. See</span>
+<span class="sd">        :func:`~linearmodels.iv.covariance.kernel_optimal_bandwidth`.</span>
 
 <span class="sd">    Notes</span>
 <span class="sd">    -----</span>
@@ -1314,6 +1331,15 @@
 <span class="sd">      (X'ZW^{-1}Z'X)^{-1}(X'ZW^{-1}\Omega W^{-1}Z'X)(X'ZW^{-1}Z'X)^{-1}</span>
 
 <span class="sd">    where :math:`\Omega` is the covariance of the moment conditions.</span>
+
+<span class="sd">    .. versionchanged:: 7.1</span>
+
+<span class="sd">       The optimal bandwidth raises a ``ValueError`` if there are fewer</span>
+<span class="sd">       observations than the kernel needs, and if it is not finite. Earlier</span>
+<span class="sd">       versions raised "cannot convert float infinity to integer" (an</span>
+<span class="sd">       ``OverflowError``) or "cannot convert float NaN to integer" for some</span>
+<span class="sd">       data, and used a bandwidth of nobs - 1, or another bandwidth, for other</span>
+<span class="sd">       data.</span>
 <span class="sd">    """</span>
 
     <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span>

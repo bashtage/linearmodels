@@ -19,7 +19,7 @@
     
   
       
-        <title>linearmodels.asset_pricing.covariance - linearmodels v7.1 (+439)</title>
+        <title>linearmodels.asset_pricing.covariance - linearmodels v7.1 (+446)</title>
       
     
 
@@ -91,7 +91,7 @@
 
 <header class="md-header md-header--shadow" data-md-component="header">
   <nav class="md-header__inner md-grid" aria-label="Header">
-    <a href="../../../index.html" title="linearmodels v7.1 (+439)" class="md-header__button md-logo" aria-label="linearmodels v7.1 (+439)" data-md-component="logo">
+    <a href="../../../index.html" title="linearmodels v7.1 (+446)" class="md-header__button md-logo" aria-label="linearmodels v7.1 (+446)" data-md-component="logo">
       <img src="../../../_static/bw-logo.svg" alt="logo">
     </a>
     <label class="md-header__button md-icon" for="__drawer">
@@ -102,7 +102,7 @@
       <div class="md-header__ellipsis">
         <div class="md-header__topic">
           <span class="md-ellipsis">
-            linearmodels v7.1 (+439)
+            linearmodels v7.1 (+446)
           </span>
         </div>
         <div class="md-header__topic" data-md-component="header-topic">
@@ -197,10 +197,10 @@
 
 <nav class="md-nav md-nav--primary" aria-label="Navigation" data-md-level="0">
   <label class="md-nav__title" for="__drawer">
-    <a href="../../../index.html" title="linearmodels v7.1 (+439)" class="md-nav__button md-logo" aria-label="linearmodels v7.1 (+439)" data-md-component="logo">
+    <a href="../../../index.html" title="linearmodels v7.1 (+446)" class="md-nav__button md-logo" aria-label="linearmodels v7.1 (+446)" data-md-component="logo">
       <img src="../../../_static/bw-logo.svg" alt="logo">
     </a>
-    linearmodels v7.1 (+439)
+    linearmodels v7.1 (+446)
   </label>
   
     <div class="md-nav__source">
@@ -793,13 +793,27 @@
 <span class="sd">        Kernel name. See notes for available kernels. The default is "bartlett".</span>
 <span class="sd">    bandwidth : int</span>
 <span class="sd">        Non-negative integer bandwidth. If None, the optimal bandwidth is</span>
-<span class="sd">        estimated.</span>
+<span class="sd">        estimated. It needs at least 4 observations with the Bartlett kernel, 5</span>
+<span class="sd">        with the Parzen kernel and 6 with the quadratic spectral kernel, and a</span>
+<span class="sd">        ``ValueError`` is raised for fewer when the bandwidth is first used. See</span>
+<span class="sd">        :func:`~linearmodels.iv.covariance.kernel_optimal_bandwidth`.</span>
 <span class="sd">    center : bool</span>
 <span class="sd">        Flag indicating to center the scores when computing the covariance.</span>
 <span class="sd">    debiased : bool</span>
 <span class="sd">        Flag indicating to use a debiased estimator.</span>
 <span class="sd">    df : int</span>
 <span class="sd">        Degree of freedom value to use if debiasing.</span>
+
+<span class="sd">    Notes</span>
+<span class="sd">    -----</span>
+<span class="sd">    .. versionchanged:: 7.1</span>
+
+<span class="sd">       The optimal bandwidth raises a ``ValueError`` if there are fewer</span>
+<span class="sd">       observations than the kernel needs, and if it is not finite. Earlier</span>
+<span class="sd">       versions raised "cannot convert float infinity to integer" (an</span>
+<span class="sd">       ``OverflowError``) or "cannot convert float NaN to integer" for some</span>
+<span class="sd">       data, and used a bandwidth of nobs - 1, or another bandwidth, for other</span>
+<span class="sd">       data.</span>
 
 <span class="sd">    See Also</span>
 <span class="sd">    --------</span>
@@ -916,7 +930,21 @@
 <span class="sd">        is set to "bartlett".</span>
 <span class="sd">    bandwidth : int.</span>
 <span class="sd">        Non-negative integer bandwidth. If None, the optimal bandwidth is</span>
-<span class="sd">        estimated.</span>
+<span class="sd">        estimated. It needs at least 4 observations with the Bartlett kernel, 5</span>
+<span class="sd">        with the Parzen kernel and 6 with the quadratic spectral kernel, and a</span>
+<span class="sd">        ``ValueError`` is raised for fewer when the bandwidth is first used. See</span>
+<span class="sd">        :func:`~linearmodels.iv.covariance.kernel_optimal_bandwidth`.</span>
+
+<span class="sd">    Notes</span>
+<span class="sd">    -----</span>
+<span class="sd">    .. versionchanged:: 7.1</span>
+
+<span class="sd">       The optimal bandwidth raises a ``ValueError`` if there are fewer</span>
+<span class="sd">       observations than the kernel needs, and if it is not finite. Earlier</span>
+<span class="sd">       versions raised "cannot convert float infinity to integer" (an</span>
+<span class="sd">       ``OverflowError``) or "cannot convert float NaN to integer" for some</span>
+<span class="sd">       data, and used a bandwidth of nobs - 1, or another bandwidth, for other</span>
+<span class="sd">       data.</span>
 <span class="sd">    """</span>
 
     <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span>

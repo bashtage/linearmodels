@@ -19,7 +19,7 @@
     
   
       
-        <title>linearmodels.system.model - linearmodels v7.1 (+439)</title>
+        <title>linearmodels.system.model - linearmodels v7.1 (+446)</title>
       
     
 
@@ -91,7 +91,7 @@
 
 <header class="md-header md-header--shadow" data-md-component="header">
   <nav class="md-header__inner md-grid" aria-label="Header">
-    <a href="../../../index.html" title="linearmodels v7.1 (+439)" class="md-header__button md-logo" aria-label="linearmodels v7.1 (+439)" data-md-component="logo">
+    <a href="../../../index.html" title="linearmodels v7.1 (+446)" class="md-header__button md-logo" aria-label="linearmodels v7.1 (+446)" data-md-component="logo">
       <img src="../../../_static/bw-logo.svg" alt="logo">
     </a>
     <label class="md-header__button md-icon" for="__drawer">
@@ -102,7 +102,7 @@
       <div class="md-header__ellipsis">
         <div class="md-header__topic">
           <span class="md-ellipsis">
-            linearmodels v7.1 (+439)
+            linearmodels v7.1 (+446)
           </span>
         </div>
         <div class="md-header__topic" data-md-component="header-topic">
@@ -197,10 +197,10 @@
 
 <nav class="md-nav md-nav--primary" aria-label="Navigation" data-md-level="0">
   <label class="md-nav__title" for="__drawer">
-    <a href="../../../index.html" title="linearmodels v7.1 (+439)" class="md-nav__button md-logo" aria-label="linearmodels v7.1 (+439)" data-md-component="logo">
+    <a href="../../../index.html" title="linearmodels v7.1 (+446)" class="md-nav__button md-logo" aria-label="linearmodels v7.1 (+446)" data-md-component="logo">
       <img src="../../../_static/bw-logo.svg" alt="logo">
     </a>
-    linearmodels v7.1 (+439)
+    linearmodels v7.1 (+446)
   </label>
   
     <div class="md-nav__source">
@@ -2683,7 +2683,13 @@
 <span class="sd">    ``optimal_bw`` is ``False``. Otherwise, which is the default and what</span>
 <span class="sd">    ``optimal_bw=True`` does, it is estimated from the data, from the</span>
 <span class="sd">    residuals that the weight matrix is computed from. These are the residuals</span>
-<span class="sd">    of the first step estimates in two-step GMM, which is the default. In 7.0</span>
+<span class="sd">    of the first step estimates in two-step GMM, which is the default. A</span>
+<span class="sd">    bandwidth that is estimated from the data, for the weight matrix or the</span>
+<span class="sd">    covariance, needs at least 4 observations with the Bartlett kernel, 5 with</span>
+<span class="sd">    the Parzen kernel and 6 with the quadratic spectral kernel. ``fit`` raises a</span>
+<span class="sd">    ``ValueError`` for fewer observations, and if the estimated bandwidth is</span>
+<span class="sd">    not finite. Pass ``bandwidth`` to use the kernel with fewer observations.</span>
+<span class="sd">    See :func:`~linearmodels.iv.covariance.kernel_optimal_bandwidth`. In 7.0</span>
 <span class="sd">    and earlier the default was ``nobs - 2``, which is not a consistent</span>
 <span class="sd">    estimator of the covariance of the moment conditions, so the estimates,</span>
 <span class="sd">    standard errors and J statistic can be different. ``fit`` issues a</span>
@@ -2803,6 +2809,16 @@
 <span class="sd">        -------</span>
 <span class="sd">        GMMSystemResults</span>
 <span class="sd">            Estimation results</span>
+
+<span class="sd">        Raises</span>
+<span class="sd">        ------</span>
+<span class="sd">        ValueError</span>
+<span class="sd">            If a bandwidth is estimated from the data, for the kernel weight</span>
+<span class="sd">            matrix or for the kernel covariance, and there are fewer</span>
+<span class="sd">            observations than the kernel needs: 4 for the Bartlett kernel, 5</span>
+<span class="sd">            for the Parzen kernel and 6 for the quadratic spectral kernel. It</span>
+<span class="sd">            is also raised if the estimated bandwidth is not finite. Pass</span>
+<span class="sd">            ``bandwidth`` to use the kernel with fewer observations.</span>
 
 <span class="sd">        Notes</span>
 <span class="sd">        -----</span>

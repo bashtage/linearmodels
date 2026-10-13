@@ -162,7 +162,11 @@ unless ``optimal_bw=False``, as the bandwidth of the kernel covariance of
 :class:`~linearmodels.iv.model.IVLIML` is. The same is true of the kernel
 covariance that ``fit`` uses if ``cov_type`` is 'kernel'. See
 :ref:`iv-mathematical-notation` for the method. The bandwidth that was used is
-in ``weight_config`` and ``cov_config`` of the results.
+in ``weight_config`` and ``cov_config`` of the results. The estimate needs at
+least 4 observations with the Bartlett kernel, 5 with the Parzen kernel and 6
+with the quadratic spectral kernel, and ``fit`` raises a ``ValueError`` for
+fewer. Pass ``bandwidth``, or ``optimal_bw=False``, to use the kernel with fewer
+observations.
 
 .. versionchanged:: 7.1
 
@@ -213,7 +217,11 @@ perform inference. Four classes of covariance estimators are available:
   the optimal value is used. This is the case for all of the estimators. It
   has been the case for :class:`~linearmodels.iv.model.IVGMM` and
   :class:`~linearmodels.iv.model.IVGMMCUE` since 7.1, see the kernel
-  bandwidth in `GMM and GMM-CUE Estimation`_.
+  bandwidth in `GMM and GMM-CUE Estimation`_. The estimate of the optimal
+  value needs at least 4 observations with the Bartlett kernel, 5 with the
+  Parzen kernel and 6 with the quadratic spectral kernel, and a ``ValueError``
+  is raised for fewer. Pass ``bandwidth`` to use the kernel with fewer
+  observations.
 
   See :class:`~linearmodels.iv.covariance.KernelCovariance`.
 

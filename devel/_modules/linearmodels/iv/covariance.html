@@ -19,7 +19,7 @@
     
   
       
-        <title>linearmodels.iv.covariance - linearmodels v7.1 (+439)</title>
+        <title>linearmodels.iv.covariance - linearmodels v7.1 (+446)</title>
       
     
 
@@ -91,7 +91,7 @@
 
 <header class="md-header md-header--shadow" data-md-component="header">
   <nav class="md-header__inner md-grid" aria-label="Header">
-    <a href="../../../index.html" title="linearmodels v7.1 (+439)" class="md-header__button md-logo" aria-label="linearmodels v7.1 (+439)" data-md-component="logo">
+    <a href="../../../index.html" title="linearmodels v7.1 (+446)" class="md-header__button md-logo" aria-label="linearmodels v7.1 (+446)" data-md-component="logo">
       <img src="../../../_static/bw-logo.svg" alt="logo">
     </a>
     <label class="md-header__button md-icon" for="__drawer">
@@ -102,7 +102,7 @@
       <div class="md-header__ellipsis">
         <div class="md-header__topic">
           <span class="md-ellipsis">
-            linearmodels v7.1 (+439)
+            linearmodels v7.1 (+446)
           </span>
         </div>
         <div class="md-header__topic" data-md-component="header-topic">
@@ -197,10 +197,10 @@
 
 <nav class="md-nav md-nav--primary" aria-label="Navigation" data-md-level="0">
   <label class="md-nav__title" for="__drawer">
-    <a href="../../../index.html" title="linearmodels v7.1 (+439)" class="md-nav__button md-logo" aria-label="linearmodels v7.1 (+439)" data-md-component="logo">
+    <a href="../../../index.html" title="linearmodels v7.1 (+446)" class="md-nav__button md-logo" aria-label="linearmodels v7.1 (+446)" data-md-component="logo">
       <img src="../../../_static/bw-logo.svg" alt="logo">
     </a>
-    linearmodels v7.1 (+439)
+    linearmodels v7.1 (+446)
   </label>
   
     <div class="md-nav__source">
@@ -543,7 +543,9 @@
     <span class="n">ceil</span><span class="p">,</span>
     <span class="n">cos</span><span class="p">,</span>
     <span class="n">empty</span><span class="p">,</span>
+    <span class="n">errstate</span><span class="p">,</span>
     <span class="n">int64</span><span class="p">,</span>
+    <span class="n">isfinite</span><span class="p">,</span>
     <span class="n">ndarray</span><span class="p">,</span>
     <span class="n">ones</span><span class="p">,</span>
     <span class="n">pi</span><span class="p">,</span>
@@ -751,16 +753,86 @@
 
 
 
+<span class="k">def</span><span class="w"> </span><span class="nf">_bandwidth_rule</span><span class="p">(</span><span class="n">kernel</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">tuple</span><span class="p">[</span><span class="nb">int</span><span class="p">,</span> <span class="nb">float</span><span class="p">,</span> <span class="nb">float</span><span class="p">]:</span>
+<span class="w">    </span><span class="sd">"""</span>
+<span class="sd">    The constants of the automatic bandwidth rule of a kernel</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    kernel : str</span>
+<span class="sd">        Name of the kernel.</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    q : int</span>
+<span class="sd">        The characteristic exponent of the kernel.</span>
+<span class="sd">    c : float</span>
+<span class="sd">        The constant of the rule.</span>
+<span class="sd">    exponent : float</span>
+<span class="sd">        The exponent of t / 100 in the number of lags of the pilot estimates.</span>
+
+<span class="sd">    Raises</span>
+<span class="sd">    ------</span>
+<span class="sd">    UnknownOptionError</span>
+<span class="sd">        If kernel is not one of the supported names.</span>
+<span class="sd">    """</span>
+    <span class="k">if</span> <span class="n">kernel</span> <span class="ow">in</span> <span class="p">(</span><span class="s2">"bartlett"</span><span class="p">,</span> <span class="s2">"newey-west"</span><span class="p">):</span>
+        <span class="k">return</span> <span class="mi">1</span><span class="p">,</span> <span class="mf">1.1447</span><span class="p">,</span> <span class="mi">2</span> <span class="o">/</span> <span class="mi">9</span>
+    <span class="k">if</span> <span class="n">kernel</span> <span class="ow">in</span> <span class="p">(</span><span class="s2">"qs"</span><span class="p">,</span> <span class="s2">"andrews"</span><span class="p">,</span> <span class="s2">"quadratic-spectral"</span><span class="p">):</span>
+        <span class="k">return</span> <span class="mi">2</span><span class="p">,</span> <span class="mf">1.3221</span><span class="p">,</span> <span class="mi">2</span> <span class="o">/</span> <span class="mi">25</span>
+    <span class="k">if</span> <span class="n">kernel</span> <span class="ow">in</span> <span class="p">(</span><span class="s2">"gallant"</span><span class="p">,</span> <span class="s2">"parzen"</span><span class="p">):</span>
+        <span class="k">return</span> <span class="mi">2</span><span class="p">,</span> <span class="mf">2.6614</span><span class="p">,</span> <span class="mi">4</span> <span class="o">/</span> <span class="mi">25</span>
+    <span class="k">raise</span> <span class="n">unknown_option_error</span><span class="p">(</span><span class="s2">"kernel"</span><span class="p">,</span> <span class="n">kernel</span><span class="p">,</span> <span class="n">KERNEL_LOOKUP</span><span class="p">)</span>
+
+
+<span class="k">def</span><span class="w"> </span><span class="nf">_pilot_lags</span><span class="p">(</span><span class="n">nobs</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span> <span class="n">exponent</span><span class="p">:</span> <span class="nb">float</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">int</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">"""The number of lags in the pilot estimates of the automatic bandwidth"""</span>
+    <span class="k">return</span> <span class="nb">int</span><span class="p">(</span><span class="n">ceil</span><span class="p">(</span><span class="mi">4</span> <span class="o">*</span> <span class="p">(</span><span class="n">nobs</span> <span class="o">/</span> <span class="mi">100</span><span class="p">)</span> <span class="o">**</span> <span class="n">exponent</span><span class="p">))</span>
+
+
+<span class="k">def</span><span class="w"> </span><span class="nf">_min_nobs_automatic_bandwidth</span><span class="p">(</span><span class="n">kernel</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">int</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">"""</span>
+<span class="sd">    The fewest observations for which the automatic bandwidth of a kernel exists</span>
+
+<span class="sd">    The pilot estimates use the autocovariances up to the pilot lag, and the pilot</span>
+<span class="sd">    lag has to be below nobs - 1. It grows by at most 1 for each additional</span>
+<span class="sd">    observation, so that every larger number of observations works too.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    kernel : str</span>
+<span class="sd">        Name of the kernel.</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    int</span>
+<span class="sd">        The smallest number of observations with a pilot lag below nobs - 1.</span>
+
+<span class="sd">    Raises</span>
+<span class="sd">    ------</span>
+<span class="sd">    UnknownOptionError</span>
+<span class="sd">        If kernel is not one of the supported names.</span>
+<span class="sd">    """</span>
+    <span class="n">exponent</span> <span class="o">=</span> <span class="n">_bandwidth_rule</span><span class="p">(</span><span class="n">kernel</span><span class="p">)[</span><span class="mi">2</span><span class="p">]</span>
+    <span class="n">nobs</span> <span class="o">=</span> <span class="mi">1</span>
+    <span class="k">while</span> <span class="n">_pilot_lags</span><span class="p">(</span><span class="n">nobs</span><span class="p">,</span> <span class="n">exponent</span><span class="p">)</span> <span class="o">&gt;=</span> <span class="n">nobs</span> <span class="o">-</span> <span class="mi">1</span><span class="p">:</span>
+        <span class="n">nobs</span> <span class="o">+=</span> <span class="mi">1</span>
+    <span class="k">return</span> <span class="n">nobs</span>
+
+
 <div class="viewcode-block" id="kernel_optimal_bandwidth">
 <a class="viewcode-back" href="../../../iv/iv/linearmodels.iv.covariance.kernel_optimal_bandwidth.html#linearmodels.iv.covariance.kernel_optimal_bandwidth">[docs]</a>
 <span class="k">def</span><span class="w"> </span><span class="nf">kernel_optimal_bandwidth</span><span class="p">(</span>
     <span class="n">x</span><span class="p">:</span> <span class="n">linearmodels</span><span class="o">.</span><span class="n">typing</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">Float64Array</span><span class="p">,</span> <span class="n">kernel</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">"bartlett"</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">int</span><span class="p">:</span>
-<span class="w">    </span><span class="sd">"""</span>
+<span class="w">    </span><span class="sa">r</span><span class="sd">"""</span>
+<span class="sd">    Select the bandwidth of a kernel covariance estimator from the data</span>
+
 <span class="sd">    Parameters</span>
 <span class="sd">    ----------</span>
 <span class="sd">    x : ndarray</span>
-<span class="sd">        Array of data to use when computing optimal bandwidth</span>
+<span class="sd">        The series to use when computing the bandwidth. It has t observations,</span>
+<span class="sd">        and is a 1-d array of length t or an array with t rows and 1 column.</span>
 <span class="sd">    kernel : str</span>
 <span class="sd">        Name of kernel to use.  Supported kernels include:</span>
 
@@ -773,13 +845,81 @@
 <span class="sd">    int</span>
 <span class="sd">        Optimal bandwidth. Set to nobs - 1 if computed bandwidth is larger.</span>
 
+<span class="sd">    Raises</span>
+<span class="sd">    ------</span>
+<span class="sd">    ValueError</span>
+<span class="sd">        If x has fewer observations than the kernel needs: 4 for the Bartlett</span>
+<span class="sd">        kernel, 5 for the Parzen kernel and 6 for the quadratic spectral kernel.</span>
+<span class="sd">        It is also raised if the bandwidth is not finite, which happens if x has</span>
+<span class="sd">        values that are not finite or if the estimate of the long-run variance</span>
+<span class="sd">        that the bandwidth divides by is exactly 0, as it is for a series of zeros.</span>
+<span class="sd">    UnknownOptionError</span>
+<span class="sd">        If kernel is not one of the supported names. It is both a ``KeyError``</span>
+<span class="sd">        and a ``ValueError``.</span>
+
 <span class="sd">    Notes</span>
 <span class="sd">    -----</span>
+<span class="sd">    The bandwidth is that of the nonparametric rule of Newey and West [1]_. With</span>
+<span class="sd">    the autocovariances of the series :math:`x_i`,</span>
 
-<span class="sd">    .. todo::</span>
+<span class="sd">    .. math::</span>
 
-<span class="sd">      * Explain mathematics involved</span>
-<span class="sd">      * References</span>
+<span class="sd">       \hat{\sigma}_j = t^{-1} \sum_{i=j+1}^{t} x_i x_{i-j},</span>
+
+<span class="sd">    the rule computes two weighted sums of the first :math:`n` of them,</span>
+
+<span class="sd">    .. math::</span>
+
+<span class="sd">       \hat{s}_0 &amp; = \hat{\sigma}_0 + 2 \sum_{j=1}^{n} \hat{\sigma}_j \\</span>
+<span class="sd">       \hat{s}_q &amp; = 2 \sum_{j=1}^{n} j^q \hat{\sigma}_j</span>
+
+<span class="sd">    and the bandwidth is the smaller of :math:`\lceil \hat{m} \rceil` and</span>
+<span class="sd">    :math:`t - 1`, where</span>
+
+<span class="sd">    .. math::</span>
+
+<span class="sd">       \hat{m} = c \left\{ \left(\hat{s}_q / \hat{s}_0 \right)^2 \right\}^{1 / (2q + 1)}</span>
+<span class="sd">                 t^{1 / (2q + 1)}.</span>
+
+<span class="sd">    The exponent :math:`q` and the constant :math:`c` depend on the kernel. The</span>
+<span class="sd">    number of lags in the pilot estimates, :math:`\hat{s}_0` and :math:`\hat{s}_q`,</span>
+<span class="sd">    is :math:`n = \lceil 4 (t / 100)^a \rceil`, and the exponent :math:`a`</span>
+<span class="sd">    depends on the kernel too:</span>
+
+<span class="sd">    ===================================== = ====== ===== ============</span>
+<span class="sd">    Kernel                                q c      a     Fewest obs.</span>
+<span class="sd">    ===================================== = ====== ===== ============</span>
+<span class="sd">    "bartlett", "newey-west"              1 1.1447 2/9   4</span>
+<span class="sd">    "parzen", "gallant"                   2 2.6614 4/25  5</span>
+<span class="sd">    "qs", "quadratic-spectral", "andrews" 2 1.3221 2/25  6</span>
+<span class="sd">    ===================================== = ====== ===== ============</span>
+
+<span class="sd">    The autocovariances of a series with :math:`t` observations are defined up</span>
+<span class="sd">    to lag :math:`t - 1`. If :math:`n \geq t - 1`, :math:`\hat{s}_0` is the sum</span>
+<span class="sd">    of all of them, which is :math:`(\sum_i x_i)^2 / t`. It is 0, up to rounding</span>
+<span class="sd">    error, for a series with a mean of 0, such as the scores of a least squares</span>
+<span class="sd">    regression or the deviations of estimates from their average, so that the</span>
+<span class="sd">    bandwidth divides by 0 or by rounding error. For any other series it depends</span>
+<span class="sd">    on the mean alone, and not on the autocorrelation. The rule needs</span>
+<span class="sd">    :math:`n &lt; t - 1`. That is the case with at least 4 observations for the</span>
+<span class="sd">    Bartlett kernel (:math:`n = 2`), 5 for the Parzen kernel (:math:`n = 3`) and</span>
+<span class="sd">    6 for the quadratic spectral kernel (:math:`n = 4`), and a ``ValueError`` is</span>
+<span class="sd">    raised for fewer. Pass the bandwidth to the estimator that uses the kernel to</span>
+<span class="sd">    use it with fewer observations.</span>
+
+<span class="sd">    .. versionchanged:: 7.1</span>
+
+<span class="sd">       A ``ValueError`` is raised if the series has fewer observations than the</span>
+<span class="sd">       kernel needs, and if the bandwidth is not finite. Earlier versions raised</span>
+<span class="sd">       "cannot convert float infinity to integer" (an ``OverflowError``) or</span>
+<span class="sd">       "cannot convert float NaN to integer" for some series, and returned</span>
+<span class="sd">       :math:`t - 1`, or another number, for the others.</span>
+
+<span class="sd">    References</span>
+<span class="sd">    ----------</span>
+<span class="sd">    .. [1] Newey, W. K. and West, K. D. (1994). Automatic lag selection in</span>
+<span class="sd">       covariance matrix estimation. The Review of Economic Studies, 61(4),</span>
+<span class="sd">       631-653.</span>
 
 <span class="sd">    See Also</span>
 <span class="sd">    --------</span>
@@ -789,26 +929,34 @@
 <span class="sd">    """</span>
     <span class="n">t</span> <span class="o">=</span> <span class="n">x</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
     <span class="n">x</span> <span class="o">=</span> <span class="n">x</span><span class="o">.</span><span class="n">squeeze</span><span class="p">()</span>
-    <span class="k">if</span> <span class="n">kernel</span> <span class="ow">in</span> <span class="p">(</span><span class="s2">"bartlett"</span><span class="p">,</span> <span class="s2">"newey-west"</span><span class="p">):</span>
-        <span class="n">q</span><span class="p">,</span> <span class="n">c</span> <span class="o">=</span> <span class="mi">1</span><span class="p">,</span> <span class="mf">1.1447</span>
-        <span class="n">m_star</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">ceil</span><span class="p">(</span><span class="mi">4</span> <span class="o">*</span> <span class="p">(</span><span class="n">t</span> <span class="o">/</span> <span class="mi">100</span><span class="p">)</span> <span class="o">**</span> <span class="p">(</span><span class="mi">2</span> <span class="o">/</span> <span class="mi">9</span><span class="p">)))</span>
-    <span class="k">elif</span> <span class="n">kernel</span> <span class="ow">in</span> <span class="p">(</span><span class="s2">"qs"</span><span class="p">,</span> <span class="s2">"andrews"</span><span class="p">,</span> <span class="s2">"quadratic-spectral"</span><span class="p">):</span>
-        <span class="n">q</span><span class="p">,</span> <span class="n">c</span> <span class="o">=</span> <span class="mi">2</span><span class="p">,</span> <span class="mf">1.3221</span>
-        <span class="n">m_star</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">ceil</span><span class="p">(</span><span class="mi">4</span> <span class="o">*</span> <span class="p">(</span><span class="n">t</span> <span class="o">/</span> <span class="mi">100</span><span class="p">)</span> <span class="o">**</span> <span class="p">(</span><span class="mi">2</span> <span class="o">/</span> <span class="mi">25</span><span class="p">)))</span>
-    <span class="k">elif</span> <span class="n">kernel</span> <span class="ow">in</span> <span class="p">(</span><span class="s2">"gallant"</span><span class="p">,</span> <span class="s2">"parzen"</span><span class="p">):</span>
-        <span class="n">q</span><span class="p">,</span> <span class="n">c</span> <span class="o">=</span> <span class="mi">2</span><span class="p">,</span> <span class="mf">2.6614</span>
-        <span class="n">m_star</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">ceil</span><span class="p">(</span><span class="mi">4</span> <span class="o">*</span> <span class="p">(</span><span class="n">t</span> <span class="o">/</span> <span class="mi">100</span><span class="p">)</span> <span class="o">**</span> <span class="p">(</span><span class="mi">4</span> <span class="o">/</span> <span class="mi">25</span><span class="p">)))</span>
-    <span class="k">else</span><span class="p">:</span>
-        <span class="k">raise</span> <span class="n">unknown_option_error</span><span class="p">(</span><span class="s2">"kernel"</span><span class="p">,</span> <span class="n">kernel</span><span class="p">,</span> <span class="n">KERNEL_LOOKUP</span><span class="p">)</span>
-    <span class="n">sigma</span> <span class="o">=</span> <span class="n">empty</span><span class="p">(</span><span class="n">m_star</span> <span class="o">+</span> <span class="mi">1</span><span class="p">)</span>
-    <span class="n">sigma</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="n">x</span><span class="o">.</span><span class="n">T</span> <span class="o">@</span> <span class="n">x</span> <span class="o">/</span> <span class="n">t</span>
-    <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="n">m_star</span> <span class="o">+</span> <span class="mi">1</span><span class="p">):</span>
-        <span class="n">sigma</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">=</span> <span class="n">x</span><span class="p">[</span><span class="n">i</span><span class="p">:]</span><span class="o">.</span><span class="n">T</span> <span class="o">@</span> <span class="n">x</span><span class="p">[:</span><span class="o">-</span><span class="n">i</span><span class="p">]</span> <span class="o">/</span> <span class="n">t</span>
-    <span class="n">s0</span> <span class="o">=</span> <span class="n">sigma</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">+</span> <span class="mi">2</span> <span class="o">*</span> <span class="n">sigma</span><span class="p">[</span><span class="mi">1</span><span class="p">:]</span><span class="o">.</span><span class="n">sum</span><span class="p">()</span>
-    <span class="n">sq</span> <span class="o">=</span> <span class="mi">2</span> <span class="o">*</span> <span class="n">npsum</span><span class="p">(</span><span class="n">sigma</span><span class="p">[</span><span class="mi">1</span><span class="p">:]</span> <span class="o">*</span> <span class="n">arange</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="n">m_star</span> <span class="o">+</span> <span class="mi">1</span><span class="p">)</span> <span class="o">**</span> <span class="n">q</span><span class="p">)</span>
+    <span class="n">q</span><span class="p">,</span> <span class="n">c</span><span class="p">,</span> <span class="n">exponent</span> <span class="o">=</span> <span class="n">_bandwidth_rule</span><span class="p">(</span><span class="n">kernel</span><span class="p">)</span>
+    <span class="n">m_star</span> <span class="o">=</span> <span class="n">_pilot_lags</span><span class="p">(</span><span class="n">t</span><span class="p">,</span> <span class="n">exponent</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">m_star</span> <span class="o">&gt;=</span> <span class="n">t</span> <span class="o">-</span> <span class="mi">1</span><span class="p">:</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
+            <span class="sa">f</span><span class="s2">"The automatic bandwidth of the </span><span class="si">{</span><span class="n">kernel</span><span class="si">!r}</span><span class="s2"> kernel needs at least "</span>
+            <span class="sa">f</span><span class="s2">"</span><span class="si">{</span><span class="n">_min_nobs_automatic_bandwidth</span><span class="p">(</span><span class="n">kernel</span><span class="p">)</span><span class="si">}</span><span class="s2"> observations, but there are "</span>
+            <span class="sa">f</span><span class="s2">"</span><span class="si">{</span><span class="n">t</span><span class="si">}</span><span class="s2">. Pass the bandwidth explicitly."</span>
+        <span class="p">)</span>
     <span class="n">rate</span> <span class="o">=</span> <span class="mi">1</span> <span class="o">/</span> <span class="p">(</span><span class="mi">2</span> <span class="o">*</span> <span class="n">q</span> <span class="o">+</span> <span class="mi">1</span><span class="p">)</span>
-    <span class="n">gamma</span> <span class="o">=</span> <span class="n">c</span> <span class="o">*</span> <span class="p">((</span><span class="n">sq</span> <span class="o">/</span> <span class="n">s0</span><span class="p">)</span> <span class="o">**</span> <span class="mi">2</span><span class="p">)</span> <span class="o">**</span> <span class="n">rate</span>
-    <span class="n">m</span> <span class="o">=</span> <span class="n">gamma</span> <span class="o">*</span> <span class="n">t</span><span class="o">**</span><span class="n">rate</span>
+    <span class="c1"># Values that are not finite, or a long-run variance of 0, are reported by the</span>
+    <span class="c1"># error below and not by warnings</span>
+    <span class="k">with</span> <span class="n">errstate</span><span class="p">(</span><span class="n">divide</span><span class="o">=</span><span class="s2">"ignore"</span><span class="p">,</span> <span class="n">invalid</span><span class="o">=</span><span class="s2">"ignore"</span><span class="p">,</span> <span class="n">over</span><span class="o">=</span><span class="s2">"ignore"</span><span class="p">):</span>
+        <span class="n">sigma</span> <span class="o">=</span> <span class="n">empty</span><span class="p">(</span><span class="n">m_star</span> <span class="o">+</span> <span class="mi">1</span><span class="p">)</span>
+        <span class="n">sigma</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="n">x</span><span class="o">.</span><span class="n">T</span> <span class="o">@</span> <span class="n">x</span> <span class="o">/</span> <span class="n">t</span>
+        <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="n">m_star</span> <span class="o">+</span> <span class="mi">1</span><span class="p">):</span>
+            <span class="n">sigma</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">=</span> <span class="n">x</span><span class="p">[</span><span class="n">i</span><span class="p">:]</span><span class="o">.</span><span class="n">T</span> <span class="o">@</span> <span class="n">x</span><span class="p">[:</span><span class="o">-</span><span class="n">i</span><span class="p">]</span> <span class="o">/</span> <span class="n">t</span>
+        <span class="n">s0</span> <span class="o">=</span> <span class="n">sigma</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">+</span> <span class="mi">2</span> <span class="o">*</span> <span class="n">sigma</span><span class="p">[</span><span class="mi">1</span><span class="p">:]</span><span class="o">.</span><span class="n">sum</span><span class="p">()</span>
+        <span class="n">sq</span> <span class="o">=</span> <span class="mi">2</span> <span class="o">*</span> <span class="n">npsum</span><span class="p">(</span><span class="n">sigma</span><span class="p">[</span><span class="mi">1</span><span class="p">:]</span> <span class="o">*</span> <span class="n">arange</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="n">m_star</span> <span class="o">+</span> <span class="mi">1</span><span class="p">)</span> <span class="o">**</span> <span class="n">q</span><span class="p">)</span>
+        <span class="n">gamma</span> <span class="o">=</span> <span class="n">c</span> <span class="o">*</span> <span class="p">((</span><span class="n">sq</span> <span class="o">/</span> <span class="n">s0</span><span class="p">)</span> <span class="o">**</span> <span class="mi">2</span><span class="p">)</span> <span class="o">**</span> <span class="n">rate</span>
+        <span class="n">m</span> <span class="o">=</span> <span class="n">gamma</span> <span class="o">*</span> <span class="n">t</span><span class="o">**</span><span class="n">rate</span>
+    <span class="k">if</span> <span class="ow">not</span> <span class="n">isfinite</span><span class="p">(</span><span class="n">m</span><span class="p">):</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
+            <span class="sa">f</span><span class="s2">"The automatic bandwidth of the </span><span class="si">{</span><span class="n">kernel</span><span class="si">!r}</span><span class="s2"> kernel is not finite. It is "</span>
+            <span class="s2">"not defined if the data have values that are not finite, or if the "</span>
+            <span class="s2">"estimate of their long-run variance, which the bandwidth divides by, "</span>
+            <span class="s2">"is 0, for example because the data are all 0. Pass the bandwidth "</span>
+            <span class="s2">"explicitly."</span>
+        <span class="p">)</span>
     <span class="k">return</span> <span class="nb">min</span><span class="p">(</span><span class="nb">int</span><span class="p">(</span><span class="n">ceil</span><span class="p">(</span><span class="n">m</span><span class="p">)),</span> <span class="n">t</span> <span class="o">-</span> <span class="mi">1</span><span class="p">)</span></div>
 
 
@@ -1078,7 +1226,11 @@
 
 <span class="sd">    bandwidth : {int, None}</span>
 <span class="sd">        Non-negative bandwidth to use with kernel. If None, automatic</span>
-<span class="sd">        bandwidth selection is used.</span>
+<span class="sd">        bandwidth selection is used. It needs at least 4 observations with the</span>
+<span class="sd">        Bartlett kernel, 5 with the Parzen kernel and 6 with the quadratic</span>
+<span class="sd">        spectral kernel, and a ``ValueError`` is raised for fewer when the</span>
+<span class="sd">        covariance is first used. See</span>
+<span class="sd">        :func:`~linearmodels.iv.covariance.kernel_optimal_bandwidth`.</span>
 <span class="sd">    debiased : bool</span>
 <span class="sd">        Flag indicating whether to use a small-sample adjustment</span>
 <span class="sd">    kappa : float</span>
@@ -1119,6 +1271,20 @@
 
 <span class="sd">    where :math:`X` is the matrix of variables included in the model and</span>
 <span class="sd">    :math:`Z` is the matrix of instruments, including exogenous regressors.</span>
+
+<span class="sd">    The automatic bandwidth is that of</span>
+<span class="sd">    :func:`~linearmodels.iv.covariance.kernel_optimal_bandwidth` for the sum of</span>
+<span class="sd">    the columns of :math:`\hat{\epsilon}_i \hat{x}_i`, without the column of the</span>
+<span class="sd">    constant if :math:`\hat{x}` has one and other columns.</span>
+
+<span class="sd">    .. versionchanged:: 7.1</span>
+
+<span class="sd">       The automatic bandwidth raises a ``ValueError`` if there are fewer</span>
+<span class="sd">       observations than the kernel needs, and if it is not finite. Earlier</span>
+<span class="sd">       versions raised "cannot convert float infinity to integer" (an</span>
+<span class="sd">       ``OverflowError``) or "cannot convert float NaN to integer" for some</span>
+<span class="sd">       series, and used a bandwidth of :math:`n - 1`, or another bandwidth, for</span>
+<span class="sd">       the others.</span>
 
 <span class="sd">    See Also</span>
 <span class="sd">    --------</span>

@@ -23,7 +23,7 @@
     
   
       
-        <title>linearmodels.asset_pricing.model.TradedFactorModel.fit - linearmodels v7.1 (+439)</title>
+        <title>linearmodels.asset_pricing.model.TradedFactorModel.fit - linearmodels v7.1 (+446)</title>
       
     
 
@@ -100,7 +100,7 @@
 
 <header class="md-header md-header--shadow" data-md-component="header">
   <nav class="md-header__inner md-grid" aria-label="Header">
-    <a href="../../index.html" title="linearmodels v7.1 (+439)" class="md-header__button md-logo" aria-label="linearmodels v7.1 (+439)" data-md-component="logo">
+    <a href="../../index.html" title="linearmodels v7.1 (+446)" class="md-header__button md-logo" aria-label="linearmodels v7.1 (+446)" data-md-component="logo">
       <img src="../../_static/bw-logo.svg" alt="logo">
     </a>
     <label class="md-header__button md-icon" for="__drawer">
@@ -111,7 +111,7 @@
       <div class="md-header__ellipsis">
         <div class="md-header__topic">
           <span class="md-ellipsis">
-            linearmodels v7.1 (+439)
+            linearmodels v7.1 (+446)
           </span>
         </div>
         <div class="md-header__topic" data-md-component="header-topic">
@@ -206,10 +206,10 @@
 
 <nav class="md-nav md-nav--primary" aria-label="Navigation" data-md-level="0">
   <label class="md-nav__title" for="__drawer">
-    <a href="../../index.html" title="linearmodels v7.1 (+439)" class="md-nav__button md-logo" aria-label="linearmodels v7.1 (+439)" data-md-component="logo">
+    <a href="../../index.html" title="linearmodels v7.1 (+446)" class="md-nav__button md-logo" aria-label="linearmodels v7.1 (+446)" data-md-component="logo">
       <img src="../../_static/bw-logo.svg" alt="logo">
     </a>
-    linearmodels v7.1 (+439)
+    linearmodels v7.1 (+446)
   </label>
   
     <div class="md-nav__source">
@@ -1310,7 +1310,13 @@ covariance estimator</p></li>
 </ul>
 <p>The kernel covariance estimator takes the optional arguments
 <code class="docutils literal notranslate"><span class="pre">kernel</span></code>, one of “bartlett”, “parzen” or “qs” (quadratic spectral)
-and <code class="docutils literal notranslate"><span class="pre">bandwidth</span></code> (a positive integer).</p>
+and <code class="docutils literal notranslate"><span class="pre">bandwidth</span></code> (a positive integer). If <code class="docutils literal notranslate"><span class="pre">bandwidth</span></code> is not given it
+is selected from the data, which needs at least 4 observations with the
+Bartlett kernel, 5 with the Parzen kernel and 6 with the quadratic
+spectral kernel. <code class="docutils literal notranslate"><span class="pre">fit</span></code> raises a <code class="docutils literal notranslate"><span class="pre">ValueError</span></code> for fewer observations,
+and if the selected bandwidth is not finite. Pass <code class="docutils literal notranslate"><span class="pre">bandwidth</span></code> to use
+the kernel with fewer observations. See
+<a class="reference internal" href="../../iv/iv/linearmodels.iv.covariance.kernel_optimal_bandwidth.html#linearmodels.iv.covariance.kernel_optimal_bandwidth" title="linearmodels.iv.covariance.kernel_optimal_bandwidth (Python function) — Select the bandwidth of a kernel covariance estimator from the data"><code class="xref py py-func docutils literal notranslate"><span class="pre">kernel_optimal_bandwidth()</span></code></a>.</p>
 <p>If <code class="docutils literal notranslate"><span class="pre">debiased</span></code> is True, the covariance of the parameters of the
 time-series regressions (the alphas and the loadings) is divided by
 nobs - nfactor - 1, the number of observations less the number of

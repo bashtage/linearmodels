@@ -19,7 +19,7 @@
     
   
       
-        <title>linearmodels.iv.gmm - linearmodels v7.1 (+439)</title>
+        <title>linearmodels.iv.gmm - linearmodels v7.1 (+446)</title>
       
     
 
@@ -91,7 +91,7 @@
 
 <header class="md-header md-header--shadow" data-md-component="header">
   <nav class="md-header__inner md-grid" aria-label="Header">
-    <a href="../../../index.html" title="linearmodels v7.1 (+439)" class="md-header__button md-logo" aria-label="linearmodels v7.1 (+439)" data-md-component="logo">
+    <a href="../../../index.html" title="linearmodels v7.1 (+446)" class="md-header__button md-logo" aria-label="linearmodels v7.1 (+446)" data-md-component="logo">
       <img src="../../../_static/bw-logo.svg" alt="logo">
     </a>
     <label class="md-header__button md-icon" for="__drawer">
@@ -102,7 +102,7 @@
       <div class="md-header__ellipsis">
         <div class="md-header__topic">
           <span class="md-ellipsis">
-            linearmodels v7.1 (+439)
+            linearmodels v7.1 (+446)
           </span>
         </div>
         <div class="md-header__topic" data-md-component="header-topic">
@@ -197,10 +197,10 @@
 
 <nav class="md-nav md-nav--primary" aria-label="Navigation" data-md-level="0">
   <label class="md-nav__title" for="__drawer">
-    <a href="../../../index.html" title="linearmodels v7.1 (+439)" class="md-nav__button md-logo" aria-label="linearmodels v7.1 (+439)" data-md-component="logo">
+    <a href="../../../index.html" title="linearmodels v7.1 (+446)" class="md-nav__button md-logo" aria-label="linearmodels v7.1 (+446)" data-md-component="logo">
       <img src="../../../_static/bw-logo.svg" alt="logo">
     </a>
-    linearmodels v7.1 (+439)
+    linearmodels v7.1 (+446)
   </label>
   
     <div class="md-nav__source">
@@ -784,8 +784,10 @@
 <span class="sd">        Flag indicating whether to estimate the bandwidth from the data when</span>
 <span class="sd">        ``bandwidth`` is not provided. If False, nobs - 2 is used. If True,</span>
 <span class="sd">        the bandwidth is estimated using</span>
-<span class="sd">        :func:`~linearmodels.iv.covariance.kernel_optimal_bandwidth`. The</span>
-<span class="sd">        default also estimates the bandwidth, but it issues a</span>
+<span class="sd">        :func:`~linearmodels.iv.covariance.kernel_optimal_bandwidth`, which</span>
+<span class="sd">        needs at least 4 observations with the Bartlett kernel, 5 with the</span>
+<span class="sd">        Parzen kernel and 6 with the quadratic spectral kernel. The default</span>
+<span class="sd">        also estimates the bandwidth, but it issues a</span>
 <span class="sd">        ``DefaultBandwidthWarning`` since it changed in 7.1.</span>
 
 <span class="sd">    Notes</span>
@@ -816,6 +818,17 @@
 <span class="sd">    :class:`~linearmodels.iv.model.IVGMMCUE` estimates the bandwidth once, from</span>
 <span class="sd">    the residuals of the first step estimates, and uses it in every evaluation</span>
 <span class="sd">    of its objective function.</span>
+
+<span class="sd">    .. versionchanged:: 7.1</span>
+
+<span class="sd">       ``weight_matrix`` raises a ``ValueError`` if the bandwidth is estimated</span>
+<span class="sd">       from the data and there are fewer observations than the kernel needs</span>
+<span class="sd">       (see ``optimal_bw``), or if the estimated bandwidth is not finite. Pass</span>
+<span class="sd">       ``bandwidth`` or ``optimal_bw=False`` to use the weight matrix with</span>
+<span class="sd">       fewer observations. Earlier versions raised "cannot convert float</span>
+<span class="sd">       infinity to integer" (an ``OverflowError``) or "cannot convert float NaN</span>
+<span class="sd">       to integer" for some data when ``optimal_bw`` was True, and used a</span>
+<span class="sd">       bandwidth of nobs - 1, or another bandwidth, for other data.</span>
 
 <span class="sd">    See Also</span>
 <span class="sd">    --------</span>
@@ -1097,7 +1110,10 @@
 <span class="sd">    * ``optimal_bw``: Flag indicating whether to estimate the bandwidth from</span>
 <span class="sd">      the data when ``bandwidth`` is not provided. If False, nobs - 2 is used.</span>
 <span class="sd">      If True, the bandwidth is estimated using</span>
-<span class="sd">      :func:`~linearmodels.iv.covariance.kernel_optimal_bandwidth`.</span>
+<span class="sd">      :func:`~linearmodels.iv.covariance.kernel_optimal_bandwidth`, which</span>
+<span class="sd">      needs at least 4 observations with the Bartlett kernel, 5 with the Parzen</span>
+<span class="sd">      kernel and 6 with the quadratic spectral kernel, and raises a</span>
+<span class="sd">      ``ValueError`` for fewer.</span>
 
 <span class="sd">    If neither ``bandwidth`` nor ``optimal_bw`` is given, the bandwidth is</span>
 <span class="sd">    estimated from the data. In 7.0 and earlier the default was ``nobs - 2``,</span>

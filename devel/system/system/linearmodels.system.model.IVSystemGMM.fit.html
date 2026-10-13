@@ -23,7 +23,7 @@
     
   
       
-        <title>linearmodels.system.model.IVSystemGMM.fit - linearmodels v7.1 (+439)</title>
+        <title>linearmodels.system.model.IVSystemGMM.fit - linearmodels v7.1 (+446)</title>
       
     
 
@@ -100,7 +100,7 @@
 
 <header class="md-header md-header--shadow" data-md-component="header">
   <nav class="md-header__inner md-grid" aria-label="Header">
-    <a href="../../index.html" title="linearmodels v7.1 (+439)" class="md-header__button md-logo" aria-label="linearmodels v7.1 (+439)" data-md-component="logo">
+    <a href="../../index.html" title="linearmodels v7.1 (+446)" class="md-header__button md-logo" aria-label="linearmodels v7.1 (+446)" data-md-component="logo">
       <img src="../../_static/bw-logo.svg" alt="logo">
     </a>
     <label class="md-header__button md-icon" for="__drawer">
@@ -111,7 +111,7 @@
       <div class="md-header__ellipsis">
         <div class="md-header__topic">
           <span class="md-ellipsis">
-            linearmodels v7.1 (+439)
+            linearmodels v7.1 (+446)
           </span>
         </div>
         <div class="md-header__topic" data-md-component="header-topic">
@@ -206,10 +206,10 @@
 
 <nav class="md-nav md-nav--primary" aria-label="Navigation" data-md-level="0">
   <label class="md-nav__title" for="__drawer">
-    <a href="../../index.html" title="linearmodels v7.1 (+439)" class="md-nav__button md-logo" aria-label="linearmodels v7.1 (+439)" data-md-component="logo">
+    <a href="../../index.html" title="linearmodels v7.1 (+446)" class="md-nav__button md-logo" aria-label="linearmodels v7.1 (+446)" data-md-component="logo">
       <img src="../../_static/bw-logo.svg" alt="logo">
     </a>
-    linearmodels v7.1 (+439)
+    linearmodels v7.1 (+446)
   </label>
   
     <div class="md-nav__source">
@@ -826,6 +826,16 @@
     
     <span class="md-ellipsis">
       <span>Return type</span>
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#linearmodels.system.model.IVSystemGMM.fit-raises" class="md-nav__link">
+    
+    <span class="md-ellipsis">
+      <span>Raises</span>
     </span>
   </a>
   
@@ -1639,6 +1649,16 @@
   
 </li>
         
+          <li class="md-nav__item">
+  <a href="#linearmodels.system.model.IVSystemGMM.fit-raises" class="md-nav__link">
+    
+    <span class="md-ellipsis">
+      <span>Raises</span>
+    </span>
+  </a>
+  
+</li>
+        
       </ul>
     </nav>
   
@@ -1698,6 +1718,14 @@ bandwidth, which is estimated from the data if it is not given.</p>
 </dd>
 <dt class="field-odd" id="linearmodels.system.model.IVSystemGMM.fit-return-type">Return type<span class="colon">:</span><a class="headerlink" href="#linearmodels.system.model.IVSystemGMM.fit-return-type" title="Permalink to this headline">¶</a></dt>
 <dd class="field-odd"><p><a class="reference internal" href="linearmodels.system.results.GMMSystemResults.html#linearmodels.system.results.GMMSystemResults" title="linearmodels.system.results.GMMSystemResults (Python class) — Results from GMM System Estimators"><code class="xref py py-class docutils literal notranslate"><span class="pre">linearmodels.system.results.GMMSystemResults</span></code></a></p>
+</dd>
+<dt class="field-even" id="linearmodels.system.model.IVSystemGMM.fit-raises">Raises<span class="colon">:</span><a class="headerlink" href="#linearmodels.system.model.IVSystemGMM.fit-raises" title="Permalink to this headline">¶</a></dt>
+<dd class="field-even"><p><a class="reference external" href="https://docs.python.org/3/builtins/exceptions.html#ValueError" title="(in Python v3.15)"><strong>ValueError</strong></a> – If a bandwidth is estimated from the data, for the kernel weight
+    matrix or for the kernel covariance, and there are fewer
+    observations than the kernel needs: 4 for the Bartlett kernel, 5
+    for the Parzen kernel and 6 for the quadratic spectral kernel. It
+    is also raised if the estimated bandwidth is not finite. Pass
+    <code class="docutils literal notranslate"><span class="pre">bandwidth</span></code> to use the kernel with fewer observations.</p>
 </dd>
 </dl>
 <p class="rubric">Notes</p>

@@ -23,7 +23,7 @@
     
   
       
-        <title>linearmodels.system.covariance.GMMKernelCovariance - linearmodels v7.1 (+439)</title>
+        <title>linearmodels.system.covariance.GMMKernelCovariance - linearmodels v7.1 (+446)</title>
       
     
 
@@ -100,7 +100,7 @@
 
 <header class="md-header md-header--shadow" data-md-component="header">
   <nav class="md-header__inner md-grid" aria-label="Header">
-    <a href="../../index.html" title="linearmodels v7.1 (+439)" class="md-header__button md-logo" aria-label="linearmodels v7.1 (+439)" data-md-component="logo">
+    <a href="../../index.html" title="linearmodels v7.1 (+446)" class="md-header__button md-logo" aria-label="linearmodels v7.1 (+446)" data-md-component="logo">
       <img src="../../_static/bw-logo.svg" alt="logo">
     </a>
     <label class="md-header__button md-icon" for="__drawer">
@@ -111,7 +111,7 @@
       <div class="md-header__ellipsis">
         <div class="md-header__topic">
           <span class="md-ellipsis">
-            linearmodels v7.1 (+439)
+            linearmodels v7.1 (+446)
           </span>
         </div>
         <div class="md-header__topic" data-md-component="header-topic">
@@ -206,10 +206,10 @@
 
 <nav class="md-nav md-nav--primary" aria-label="Navigation" data-md-level="0">
   <label class="md-nav__title" for="__drawer">
-    <a href="../../index.html" title="linearmodels v7.1 (+439)" class="md-nav__button md-logo" aria-label="linearmodels v7.1 (+439)" data-md-component="logo">
+    <a href="../../index.html" title="linearmodels v7.1 (+446)" class="md-nav__button md-logo" aria-label="linearmodels v7.1 (+446)" data-md-component="logo">
       <img src="../../_static/bw-logo.svg" alt="logo">
     </a>
-    linearmodels v7.1 (+439)
+    linearmodels v7.1 (+446)
   </label>
   
     <div class="md-nav__source">
@@ -1707,7 +1707,11 @@ equation in the system</p>
 </p>
 </dd>
 <dt id="linearmodels.system.covariance.GMMKernelCovariance.__init__.bandwidth"><span class="n sig-name">bandwidth</span><span class="p">:</span><span class="w"> </span><span class="n"><span class="desctype"><a class="reference external" href="https://docs.python.org/3/builtins/functions.html#float" title="(in Python v3.15)">float</a><span class="w"> </span><span class="p">|</span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/builtins/constants.html#None" title="(in Python v3.15)">None</a></span></span><span class="w"> </span><span class="o">=</span><span class="w"> </span><code class="code python default_value docutils literal highlight highlight-python"><span class="kc">None</span></code><a class="headerlink" href="#linearmodels.system.covariance.GMMKernelCovariance.__init__.bandwidth" title="Permalink to this definition">¶</a></dt><dd><p>Bandwidth to use for the kernel.  If not provided the optimal
-bandwidth will be estimated.</p>
+bandwidth will be estimated. It needs at least 4 observations with the
+Bartlett kernel, 5 with the Parzen kernel and 6 with the quadratic
+spectral kernel, and a <code class="docutils literal notranslate"><span class="pre">ValueError</span></code> is raised for fewer when the
+covariance is first used. See
+<a class="reference internal" href="../../iv/iv/linearmodels.iv.covariance.kernel_optimal_bandwidth.html#linearmodels.iv.covariance.kernel_optimal_bandwidth" title="linearmodels.iv.covariance.kernel_optimal_bandwidth (Python function) — Select the bandwidth of a kernel covariance estimator from the data"><code class="xref py py-func docutils literal notranslate"><span class="pre">kernel_optimal_bandwidth()</span></code></a>.</p>
 </dd>
 </dl>
 </dd>
@@ -1717,6 +1721,14 @@ bandwidth will be estimated.</p>
 <div class="math notranslate nohighlight">
 \[(X'ZW^{-1}Z'X)^{-1}(X'ZW^{-1}\Omega W^{-1}Z'X)(X'ZW^{-1}Z'X)^{-1}\]</div>
 <p>where <span class="math notranslate nohighlight">\(\Omega\)</span> is the covariance of the moment conditions.</p>
+<div class="admonition versionchanged">
+<p class="admonition-title"><span class="versionmodified changed">Changed in version 7.1: </span>The optimal bandwidth raises a <code class="docutils literal notranslate"><span class="pre">ValueError</span></code> if there are fewer
+observations than the kernel needs, and if it is not finite. Earlier
+versions raised “cannot convert float infinity to integer” (an
+<code class="docutils literal notranslate"><span class="pre">OverflowError</span></code>) or “cannot convert float NaN to integer” for some
+data, and used a bandwidth of nobs - 1, or another bandwidth, for other
+data.</p>
+</div>
 <p class="rubric">Methods</p>
 <table class="autosummary longtable docutils data align-default">
 <tbody>

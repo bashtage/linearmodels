@@ -23,7 +23,7 @@
     
   
       
-        <title>linearmodels.iv.covariance.KernelCovariance - linearmodels v7.1 (+439)</title>
+        <title>linearmodels.iv.covariance.KernelCovariance - linearmodels v7.1 (+446)</title>
       
     
 
@@ -100,7 +100,7 @@
 
 <header class="md-header md-header--shadow" data-md-component="header">
   <nav class="md-header__inner md-grid" aria-label="Header">
-    <a href="../../index.html" title="linearmodels v7.1 (+439)" class="md-header__button md-logo" aria-label="linearmodels v7.1 (+439)" data-md-component="logo">
+    <a href="../../index.html" title="linearmodels v7.1 (+446)" class="md-header__button md-logo" aria-label="linearmodels v7.1 (+446)" data-md-component="logo">
       <img src="../../_static/bw-logo.svg" alt="logo">
     </a>
     <label class="md-header__button md-icon" for="__drawer">
@@ -111,7 +111,7 @@
       <div class="md-header__ellipsis">
         <div class="md-header__topic">
           <span class="md-ellipsis">
-            linearmodels v7.1 (+439)
+            linearmodels v7.1 (+446)
           </span>
         </div>
         <div class="md-header__topic" data-md-component="header-topic">
@@ -206,10 +206,10 @@
 
 <nav class="md-nav md-nav--primary" aria-label="Navigation" data-md-level="0">
   <label class="md-nav__title" for="__drawer">
-    <a href="../../index.html" title="linearmodels v7.1 (+439)" class="md-nav__button md-logo" aria-label="linearmodels v7.1 (+439)" data-md-component="logo">
+    <a href="../../index.html" title="linearmodels v7.1 (+446)" class="md-nav__button md-logo" aria-label="linearmodels v7.1 (+446)" data-md-component="logo">
       <img src="../../_static/bw-logo.svg" alt="logo">
     </a>
-    linearmodels v7.1 (+439)
+    linearmodels v7.1 (+446)
   </label>
   
     <div class="md-nav__source">
@@ -1706,7 +1706,11 @@
 </p>
 </dd>
 <dt id="linearmodels.iv.covariance.KernelCovariance.__init__.bandwidth"><span class="n sig-name">bandwidth</span><span class="p">:</span><span class="w"> </span><span class="n"><span class="desctype"><a class="reference external" href="https://docs.python.org/3/builtins/functions.html#int" title="(in Python v3.15)">int</a><span class="w"> </span><span class="p">|</span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/builtins/functions.html#float" title="(in Python v3.15)">float</a><span class="w"> </span><span class="p">|</span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/builtins/constants.html#None" title="(in Python v3.15)">None</a></span></span><span class="w"> </span><span class="o">=</span><span class="w"> </span><code class="code python default_value docutils literal highlight highlight-python"><span class="kc">None</span></code><a class="headerlink" href="#linearmodels.iv.covariance.KernelCovariance.__init__.bandwidth" title="Permalink to this definition">¶</a></dt><dd><p>Non-negative bandwidth to use with kernel. If None, automatic
-bandwidth selection is used.</p>
+bandwidth selection is used. It needs at least 4 observations with the
+Bartlett kernel, 5 with the Parzen kernel and 6 with the quadratic
+spectral kernel, and a <code class="docutils literal notranslate"><span class="pre">ValueError</span></code> is raised for fewer when the
+covariance is first used. See
+<a class="reference internal" href="linearmodels.iv.covariance.kernel_optimal_bandwidth.html#linearmodels.iv.covariance.kernel_optimal_bandwidth" title="linearmodels.iv.covariance.kernel_optimal_bandwidth (Python function) — Select the bandwidth of a kernel covariance estimator from the data"><code class="xref py py-func docutils literal notranslate"><span class="pre">kernel_optimal_bandwidth()</span></code></a>.</p>
 </dd>
 <dt id="linearmodels.iv.covariance.KernelCovariance.__init__.debiased"><span class="n sig-name">debiased</span><span class="p">:</span><span class="w"> </span><span class="n"><span class="desctype"><a class="reference external" href="https://docs.python.org/3/builtins/functions.html#bool" title="(in Python v3.15)">bool</a></span></span><span class="w"> </span><span class="o">=</span><span class="w"> </span><code class="code python default_value docutils literal highlight highlight-python"><span class="kc">False</span></code><a class="headerlink" href="#linearmodels.iv.covariance.KernelCovariance.__init__.debiased" title="Permalink to this definition">¶</a></dt><dd><p>Flag indicating whether to use a small-sample adjustment</p>
 </dd>
@@ -1740,6 +1744,18 @@ by n / (n-k-df), where k is the number of columns of x and df is <code class="do
 \[V = n^{-1} X'Z(Z'Z)^{-1}Z'X\]</div>
 <p>where <span class="math notranslate nohighlight">\(X\)</span> is the matrix of variables included in the model and
 <span class="math notranslate nohighlight">\(Z\)</span> is the matrix of instruments, including exogenous regressors.</p>
+<p>The automatic bandwidth is that of
+<a class="reference internal" href="linearmodels.iv.covariance.kernel_optimal_bandwidth.html#linearmodels.iv.covariance.kernel_optimal_bandwidth" title="linearmodels.iv.covariance.kernel_optimal_bandwidth (Python function) — Select the bandwidth of a kernel covariance estimator from the data"><code class="xref py py-func docutils literal notranslate"><span class="pre">kernel_optimal_bandwidth()</span></code></a> for the sum of
+the columns of <span class="math notranslate nohighlight">\(\hat{\epsilon}_i \hat{x}_i\)</span>, without the column of the
+constant if <span class="math notranslate nohighlight">\(\hat{x}\)</span> has one and other columns.</p>
+<div class="admonition versionchanged">
+<p class="admonition-title"><span class="versionmodified changed">Changed in version 7.1: </span>The automatic bandwidth raises a <code class="docutils literal notranslate"><span class="pre">ValueError</span></code> if there are fewer
+observations than the kernel needs, and if it is not finite. Earlier
+versions raised “cannot convert float infinity to integer” (an
+<code class="docutils literal notranslate"><span class="pre">OverflowError</span></code>) or “cannot convert float NaN to integer” for some
+series, and used a bandwidth of <span class="math notranslate nohighlight">\(n - 1\)</span>, or another bandwidth, for
+the others.</p>
+</div>
 <div class="seealso admonition">
 <p class="admonition-title">See also</p>
 <p><a class="reference internal" href="linearmodels.iv.covariance.kernel_weight_bartlett.html#linearmodels.iv.covariance.kernel_weight_bartlett" title="linearmodels.iv.covariance.kernel_weight_bartlett (Python function) — Kernel weights from a Bartlett kernel"><code class="xref py py-obj docutils literal notranslate"><span class="pre">linearmodels.iv.covariance.kernel_weight_bartlett</span></code></a>, <a class="reference internal" href="linearmodels.iv.covariance.kernel_weight_parzen.html#linearmodels.iv.covariance.kernel_weight_parzen" title="linearmodels.iv.covariance.kernel_weight_parzen (Python function) — Kernel weights from a Parzen kernel"><code class="xref py py-obj docutils literal notranslate"><span class="pre">linearmodels.iv.covariance.kernel_weight_parzen</span></code></a>, <a class="reference internal" href="linearmodels.iv.covariance.kernel_weight_quadratic_spectral.html#linearmodels.iv.covariance.kernel_weight_quadratic_spectral" title="linearmodels.iv.covariance.kernel_weight_quadratic_spectral (Python function) — Kernel weights from a quadratic-spectral kernel"><code class="xref py py-obj docutils literal notranslate"><span class="pre">linearmodels.iv.covariance.kernel_weight_quadratic_spectral</span></code></a></p>

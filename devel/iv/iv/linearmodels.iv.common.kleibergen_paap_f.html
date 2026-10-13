@@ -23,7 +23,7 @@
     
   
       
-        <title>linearmodels.iv.common.kleibergen_paap_f - linearmodels v7.1 (+439)</title>
+        <title>linearmodels.iv.common.kleibergen_paap_f - linearmodels v7.1 (+446)</title>
       
     
 
@@ -100,7 +100,7 @@
 
 <header class="md-header md-header--shadow" data-md-component="header">
   <nav class="md-header__inner md-grid" aria-label="Header">
-    <a href="../../index.html" title="linearmodels v7.1 (+439)" class="md-header__button md-logo" aria-label="linearmodels v7.1 (+439)" data-md-component="logo">
+    <a href="../../index.html" title="linearmodels v7.1 (+446)" class="md-header__button md-logo" aria-label="linearmodels v7.1 (+446)" data-md-component="logo">
       <img src="../../_static/bw-logo.svg" alt="logo">
     </a>
     <label class="md-header__button md-icon" for="__drawer">
@@ -111,7 +111,7 @@
       <div class="md-header__ellipsis">
         <div class="md-header__topic">
           <span class="md-ellipsis">
-            linearmodels v7.1 (+439)
+            linearmodels v7.1 (+446)
           </span>
         </div>
         <div class="md-header__topic" data-md-component="header-topic">
@@ -206,10 +206,10 @@
 
 <nav class="md-nav md-nav--primary" aria-label="Navigation" data-md-level="0">
   <label class="md-nav__title" for="__drawer">
-    <a href="../../index.html" title="linearmodels v7.1 (+439)" class="md-nav__button md-logo" aria-label="linearmodels v7.1 (+439)" data-md-component="logo">
+    <a href="../../index.html" title="linearmodels v7.1 (+446)" class="md-nav__button md-logo" aria-label="linearmodels v7.1 (+446)" data-md-component="logo">
       <img src="../../_static/bw-logo.svg" alt="logo">
     </a>
-    linearmodels v7.1 (+439)
+    linearmodels v7.1 (+446)
   </label>
   
     <div class="md-nav__source">
@@ -1386,7 +1386,10 @@ the IV models accept for the same estimator, such as “homoskedastic” or
 </dd>
 <dt class="field-even" id="linearmodels.iv.common.kleibergen_paap_f-raises">Raises<span class="colon">:</span><a class="headerlink" href="#linearmodels.iv.common.kleibergen_paap_f-raises" title="Permalink to this headline">¶</a></dt>
 <dd class="field-even"><p><a class="reference external" href="https://docs.python.org/3/builtins/exceptions.html#ValueError" title="(in Python v3.15)"><strong>ValueError</strong></a> – If <code class="docutils literal notranslate"><span class="pre">cov_type</span></code> is not supported, or is “clustered” and
-    <code class="docutils literal notranslate"><span class="pre">cov_config</span></code> does not contain <code class="docutils literal notranslate"><span class="pre">clusters</span></code>.</p>
+    <code class="docutils literal notranslate"><span class="pre">cov_config</span></code> does not contain <code class="docutils literal notranslate"><span class="pre">clusters</span></code>. It is also raised if
+    <code class="docutils literal notranslate"><span class="pre">cov_type</span></code> is “kernel”, the bandwidth is not provided and there are
+    fewer observations than the kernel needs to select it, or the
+    bandwidth that is selected is not finite. See <a class="reference internal" href="linearmodels.iv.common.kleibergen_paap.html#linearmodels.iv.common.kleibergen_paap" title="linearmodels.iv.common.kleibergen_paap (Python function) — Kleibergen-Paap rk LM test of underidentification"><code class="xref py py-func docutils literal notranslate"><span class="pre">kleibergen_paap()</span></code></a>.</p>
 </dd>
 </dl>
 <div class="warning admonition">

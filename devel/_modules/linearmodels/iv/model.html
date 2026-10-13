@@ -19,7 +19,7 @@
     
   
       
-        <title>linearmodels.iv.model - linearmodels v7.1 (+439)</title>
+        <title>linearmodels.iv.model - linearmodels v7.1 (+446)</title>
       
     
 
@@ -91,7 +91,7 @@
 
 <header class="md-header md-header--shadow" data-md-component="header">
   <nav class="md-header__inner md-grid" aria-label="Header">
-    <a href="../../../index.html" title="linearmodels v7.1 (+439)" class="md-header__button md-logo" aria-label="linearmodels v7.1 (+439)" data-md-component="logo">
+    <a href="../../../index.html" title="linearmodels v7.1 (+446)" class="md-header__button md-logo" aria-label="linearmodels v7.1 (+446)" data-md-component="logo">
       <img src="../../../_static/bw-logo.svg" alt="logo">
     </a>
     <label class="md-header__button md-icon" for="__drawer">
@@ -102,7 +102,7 @@
       <div class="md-header__ellipsis">
         <div class="md-header__topic">
           <span class="md-ellipsis">
-            linearmodels v7.1 (+439)
+            linearmodels v7.1 (+446)
           </span>
         </div>
         <div class="md-header__topic" data-md-component="header-topic">
@@ -197,10 +197,10 @@
 
 <nav class="md-nav md-nav--primary" aria-label="Navigation" data-md-level="0">
   <label class="md-nav__title" for="__drawer">
-    <a href="../../../index.html" title="linearmodels v7.1 (+439)" class="md-nav__button md-logo" aria-label="linearmodels v7.1 (+439)" data-md-component="logo">
+    <a href="../../../index.html" title="linearmodels v7.1 (+446)" class="md-nav__button md-logo" aria-label="linearmodels v7.1 (+446)" data-md-component="logo">
       <img src="../../../_static/bw-logo.svg" alt="logo">
     </a>
-    linearmodels v7.1 (+439)
+    linearmodels v7.1 (+446)
   </label>
   
     <div class="md-nav__source">
@@ -1951,6 +1951,13 @@
 <span class="sd">    :class:`~linearmodels.iv.gmm.KernelWeightMatrix` and</span>
 <span class="sd">    :class:`~linearmodels.iv.gmm.IVGMMCovariance`.</span>
 
+<span class="sd">    The bandwidth that is estimated from the data needs at least 4 observations</span>
+<span class="sd">    with the Bartlett kernel, 5 with the Parzen kernel and 6 with the quadratic</span>
+<span class="sd">    spectral kernel. ``fit`` raises a ``ValueError`` for fewer observations, and</span>
+<span class="sd">    if the estimated bandwidth is not finite. Pass ``bandwidth`` or</span>
+<span class="sd">    ``optimal_bw=False`` to use the kernel with fewer observations. See</span>
+<span class="sd">    :func:`~linearmodels.iv.covariance.kernel_optimal_bandwidth`.</span>
+
 <span class="sd">    Rows are paired by position. An input that carries labels (a pandas</span>
 <span class="sd">    Series or DataFrame with an index other than the default 0, 1, ..., n-1,</span>
 <span class="sd">    or an xarray DataArray with coordinates) must use the same index, in the</span>
@@ -2174,7 +2181,10 @@
 <span class="sd">            observations. A clustered estimate needs at least as many clusters</span>
 <span class="sd">            as moment conditions, and more if the moment conditions are</span>
 <span class="sd">            centered or the model is exactly identified. The estimate is not</span>
-<span class="sd">            used if ``iter_limit`` is 1.</span>
+<span class="sd">            used if ``iter_limit`` is 1. The error is also raised if the</span>
+<span class="sd">            bandwidth of a kernel weight matrix or of the kernel covariance is</span>
+<span class="sd">            estimated from the data and there are fewer observations than the</span>
+<span class="sd">            kernel needs, or the estimated bandwidth is not finite.</span>
 
 <span class="sd">        See Also</span>
 <span class="sd">        --------</span>
@@ -2192,6 +2202,12 @@
 <span class="sd">        for example ``fit(cov_type="kernel", optimal_bw=False)``. Passing</span>
 <span class="sd">        ``bandwidth`` or ``optimal_bw`` silences the warning, and</span>
 <span class="sd">        ``optimal_bw=True`` selects the bandwidth from the data without it.</span>
+
+<span class="sd">        The bandwidth that is estimated from the data needs at least 4</span>
+<span class="sd">        observations with the Bartlett kernel, 5 with the Parzen kernel and 6</span>
+<span class="sd">        with the quadratic spectral kernel. Pass ``bandwidth`` or</span>
+<span class="sd">        ``optimal_bw=False`` to use the kernel with fewer observations. See</span>
+<span class="sd">        :func:`~linearmodels.iv.covariance.kernel_optimal_bandwidth`.</span>
 <span class="sd">        """</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_check_clusters</span><span class="p">(</span><span class="n">cov_config</span><span class="p">)</span>
         <span class="n">cov_config</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_check_default_bandwidth</span><span class="p">(</span><span class="n">cov_type</span><span class="p">,</span> <span class="n">cov_config</span><span class="p">)</span>
@@ -2355,6 +2371,13 @@
 <span class="sd">    ``nobs - 2`` for the starting values, so its estimates change slightly. See</span>
 <span class="sd">    :class:`~linearmodels.iv.gmm.KernelWeightMatrix` and</span>
 <span class="sd">    :class:`~linearmodels.iv.gmm.IVGMMCovariance`.</span>
+
+<span class="sd">    The bandwidth that is estimated from the data needs at least 4 observations</span>
+<span class="sd">    with the Bartlett kernel, 5 with the Parzen kernel and 6 with the quadratic</span>
+<span class="sd">    spectral kernel. ``fit`` raises a ``ValueError`` for fewer observations, and</span>
+<span class="sd">    if the estimated bandwidth is not finite. Pass ``bandwidth`` or</span>
+<span class="sd">    ``optimal_bw=False`` to use the kernel with fewer observations. See</span>
+<span class="sd">    :func:`~linearmodels.iv.covariance.kernel_optimal_bandwidth`.</span>
 
 <span class="sd">    Rows are paired by position. An input that carries labels (a pandas</span>
 <span class="sd">    Series or DataFrame with an index other than the default 0, 1, ..., n-1,</span>
@@ -2738,7 +2761,10 @@
 <span class="sd">            moment conditions are not centered and there are as many clusters</span>
 <span class="sd">            as moment conditions, so that the objective function is constant.</span>
 <span class="sd">            The number of clusters has to be larger than the number of moment</span>
-<span class="sd">            conditions.</span>
+<span class="sd">            conditions. The error is also raised if the bandwidth of a kernel</span>
+<span class="sd">            weight matrix or of the kernel covariance is estimated from the data</span>
+<span class="sd">            and there are fewer observations than the kernel needs, or the</span>
+<span class="sd">            estimated bandwidth is not finite.</span>
 
 <span class="sd">        See Also</span>
 <span class="sd">        --------</span>
@@ -2770,6 +2796,12 @@
 <span class="sd">        for example ``fit(cov_type="kernel", optimal_bw=False)``. Passing</span>
 <span class="sd">        ``bandwidth`` or ``optimal_bw`` silences the warning, and</span>
 <span class="sd">        ``optimal_bw=True`` selects the bandwidth from the data without it.</span>
+
+<span class="sd">        The bandwidth that is estimated from the data needs at least 4</span>
+<span class="sd">        observations with the Bartlett kernel, 5 with the Parzen kernel and 6</span>
+<span class="sd">        with the quadratic spectral kernel. Pass ``bandwidth`` or</span>
+<span class="sd">        ``optimal_bw=False`` to use the kernel with fewer observations. See</span>
+<span class="sd">        :func:`~linearmodels.iv.covariance.kernel_optimal_bandwidth`.</span>
 <span class="sd">        """</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_check_clusters</span><span class="p">(</span><span class="n">cov_config</span><span class="p">)</span>
         <span class="n">cov_config</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_check_default_bandwidth</span><span class="p">(</span><span class="n">cov_type</span><span class="p">,</span> <span class="n">cov_config</span><span class="p">)</span>
@@ -3261,9 +3293,11 @@
 <span class="sd">        is "bartlett") and ``bandwidth`` for "kernel" and ``clusters`` for</span>
 <span class="sd">        "clustered". If ``bandwidth`` is not provided it is selected using the</span>
 <span class="sd">        data, as in :class:`~linearmodels.iv.model.IV2SLS`, and the bandwidth</span>
-<span class="sd">        that was used is in ``cov_config`` of the results. "clustered" is</span>
-<span class="sd">        one-way clustering, and ``clusters`` has one element for each</span>
-<span class="sd">        observation.</span>
+<span class="sd">        that was used is in ``cov_config`` of the results. The selection needs</span>
+<span class="sd">        at least 4 observations with the Bartlett kernel, 5 with the Parzen</span>
+<span class="sd">        kernel and 6 with the quadratic spectral kernel, and a ``ValueError`` is</span>
+<span class="sd">        raised for fewer. "clustered" is one-way clustering, and ``clusters``</span>
+<span class="sd">        has one element for each observation.</span>
 
 <span class="sd">        Since JIVE is not a k-class estimator, ``kappa`` is None in the</span>
 <span class="sd">        results.</span>

@@ -23,7 +23,7 @@
     
   
       
-        <title>linearmodels.iv.common.kleibergen_paap - linearmodels v7.1 (+439)</title>
+        <title>linearmodels.iv.common.kleibergen_paap - linearmodels v7.1 (+446)</title>
       
     
 
@@ -100,7 +100,7 @@
 
 <header class="md-header md-header--shadow" data-md-component="header">
   <nav class="md-header__inner md-grid" aria-label="Header">
-    <a href="../../index.html" title="linearmodels v7.1 (+439)" class="md-header__button md-logo" aria-label="linearmodels v7.1 (+439)" data-md-component="logo">
+    <a href="../../index.html" title="linearmodels v7.1 (+446)" class="md-header__button md-logo" aria-label="linearmodels v7.1 (+446)" data-md-component="logo">
       <img src="../../_static/bw-logo.svg" alt="logo">
     </a>
     <label class="md-header__button md-icon" for="__drawer">
@@ -111,7 +111,7 @@
       <div class="md-header__ellipsis">
         <div class="md-header__topic">
           <span class="md-ellipsis">
-            linearmodels v7.1 (+439)
+            linearmodels v7.1 (+446)
           </span>
         </div>
         <div class="md-header__topic" data-md-component="header-topic">
@@ -206,10 +206,10 @@
 
 <nav class="md-nav md-nav--primary" aria-label="Navigation" data-md-level="0">
   <label class="md-nav__title" for="__drawer">
-    <a href="../../index.html" title="linearmodels v7.1 (+439)" class="md-nav__button md-logo" aria-label="linearmodels v7.1 (+439)" data-md-component="logo">
+    <a href="../../index.html" title="linearmodels v7.1 (+446)" class="md-nav__button md-logo" aria-label="linearmodels v7.1 (+446)" data-md-component="logo">
       <img src="../../_static/bw-logo.svg" alt="logo">
     </a>
-    linearmodels v7.1 (+439)
+    linearmodels v7.1 (+446)
   </label>
   
     <div class="md-nav__source">
@@ -1377,7 +1377,10 @@ the IV models accept for the same estimator, such as “homoskedastic” or
 <dt id="linearmodels.iv.common.kleibergen_paap.cov_config"><span class="n sig-name">cov_config</span><span class="p">:</span><span class="w"> </span><span class="n"><span class="desctype"><a class="reference external" href="https://docs.python.org/3/builtins/stdtypes.html#dict" title="(in Python v3.15)">dict</a><span class="p">[</span><a class="reference external" href="https://docs.python.org/3/builtins/stdtypes.html#str" title="(in Python v3.15)">str</a><span class="p">,</span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Any" title="(in Python v3.15)">Any</a><span class="p">]</span><span class="w"> </span><span class="p">|</span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/builtins/constants.html#None" title="(in Python v3.15)">None</a></span></span><span class="w"> </span><span class="o">=</span><span class="w"> </span><code class="code python default_value docutils literal highlight highlight-python"><span class="kc">None</span></code><a class="headerlink" href="#linearmodels.iv.common.kleibergen_paap.cov_config" title="Permalink to this definition">¶</a></dt><dd><p>Options for the covariance estimator. “clustered” requires
 <code class="docutils literal notranslate"><span class="pre">clusters</span></code>, a 1-d array with one element for each observation.
 “kernel” uses <code class="docutils literal notranslate"><span class="pre">kernel</span></code> (default “bartlett”) and <code class="docutils literal notranslate"><span class="pre">bandwidth</span></code>. If
-the bandwidth is not provided it is selected automatically.</p>
+the bandwidth is not provided it is selected automatically, which
+needs at least 4 observations with the Bartlett kernel, 5 with the
+Parzen kernel and 6 with the quadratic spectral kernel. See
+<a class="reference internal" href="linearmodels.iv.covariance.kernel_optimal_bandwidth.html#linearmodels.iv.covariance.kernel_optimal_bandwidth" title="linearmodels.iv.covariance.kernel_optimal_bandwidth (Python function) — Select the bandwidth of a kernel covariance estimator from the data"><code class="xref py py-func docutils literal notranslate"><span class="pre">kernel_optimal_bandwidth()</span></code></a>.</p>
 </dd>
 </dl>
 </dd>
@@ -1396,7 +1399,10 @@ covariance of the statistic is singular.</p>
 <dt class="field-even" id="linearmodels.iv.common.kleibergen_paap-raises">Raises<span class="colon">:</span><a class="headerlink" href="#linearmodels.iv.common.kleibergen_paap-raises" title="Permalink to this headline">¶</a></dt>
 <dd class="field-even"><p><a class="reference external" href="https://docs.python.org/3/builtins/exceptions.html#ValueError" title="(in Python v3.15)"><strong>ValueError</strong></a> – If <code class="docutils literal notranslate"><span class="pre">cov_type</span></code> is not supported, or is “clustered” and
     <code class="docutils literal notranslate"><span class="pre">cov_config</span></code> does not contain <code class="docutils literal notranslate"><span class="pre">clusters</span></code> or <code class="docutils literal notranslate"><span class="pre">clusters</span></code> does not
-    have an element for each row of the arrays.</p>
+    have an element for each row of the arrays. It is also raised if
+    <code class="docutils literal notranslate"><span class="pre">cov_type</span></code> is “kernel”, the bandwidth is not provided and there are
+    fewer observations than the kernel needs to select it, or the
+    bandwidth that is selected is not finite.</p>
 </dd>
 </dl>
 <div class="warning admonition">
