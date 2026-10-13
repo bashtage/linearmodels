@@ -150,6 +150,29 @@ def test_clusters_of_the_model_are_not_set_on_a_slice_of_the_clusters(clustering
     compare(res, expected)
 
 
+@pytest.mark.parametrize("clustering", ["entity", "time"])
+def test_singleton_observations_with_a_grid_of_clusters(clustering):
+    # The panel is not balanced since the singletons only have one observation. The
+    # clusters for each time period and entity are those of the clusters for each row
+    data = make_data()
+    grid = data["group"].unstack(0)
+    assert grid.shape == (NPERIOD, NENTITY)
+    with pytest.warns(SingletonWarning):
+        mod = PanelOLS(
+            data["y"], data[["x1", "x2"]], singletons=False, entity_effects=True
+        )
+    res = mod.fit(cov_type="clustered", clusters=grid, **COVARIANCES[clustering])
+    expected = mod.fit(
+        cov_type="clustered", clusters=data[["group"]], **COVARIANCES[clustering]
+    )
+    compare(res, expected)
+    kept = drop_singletons(data, ["entity"])
+    manual = PanelOLS(kept["y"], kept[["x1", "x2"]], entity_effects=True).fit(
+        cov_type="clustered", clusters=kept[["group"]], **COVARIANCES[clustering]
+    )
+    compare(res, manual)
+
+
 def test_singleton_observations_with_missing_values_and_clusters():
     # The missing observations are dropped before the singletons, and the singletons
     # are the observations that remain alone
