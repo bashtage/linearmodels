@@ -319,7 +319,7 @@ def differs(labels: Index, expected: Index) -> bool:
     -------
     bool
         True if labels is not a default index and is not the same as expected.
-        Dates are compared by value, see :func:`same_labels`.
+        Dates are compared by value, see ``same_labels``.
     """
     return not is_default_index(labels) and not same_labels(labels, expected)
 
@@ -368,7 +368,7 @@ def check_row_alignment(
 
     Dates and time deltas are compared by value, so that the same dates at
     different resolutions, e.g., ``datetime64[us]`` and ``datetime64[ns]``,
-    are the same labels. See :func:`same_labels`.
+    are the same labels. See ``same_labels``.
 
     Parameters
     ----------
@@ -451,7 +451,7 @@ def check_alignment(
     Reject labelled inputs whose row index is not the expected index.
 
     Dates and time deltas are compared by value, so that the same dates at
-    different resolutions are the same labels. See :func:`same_labels`.
+    different resolutions are the same labels. See ``same_labels``.
 
     Parameters
     ----------
