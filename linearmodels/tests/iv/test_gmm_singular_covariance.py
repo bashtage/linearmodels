@@ -394,18 +394,23 @@ def test_summary_and_attributes_with_an_invalid_statistic():
 # ----------------------------------------------------------------------------
 
 
-# The kernel weight matrix estimates the bandwidth. It warns, which is tested in
-# test_gmm_kernel_bandwidth.py
-@pytest.mark.filterwarnings(
-    "ignore::linearmodels.shared.exceptions.DefaultBandwidthWarning"
-)
+def bandwidth_options(weight_type):
+    """
+    The kernel weight matrix estimates the bandwidth, which is the default and warns.
+    That is tested in test_gmm_kernel_bandwidth.py. optimal_bw=True estimates it
+    without the warning.
+    """
+    return {"optimal_bw": True} if weight_type == "kernel" else {}
+
+
 @pytest.mark.parametrize("weight_type", ["kernel", "robust"])
 @pytest.mark.parametrize("nobs", [4, 5, 6, 8, 20])
 def test_small_samples_j_stat(weight_type, nobs):
     # The centered moment conditions of nobs observations have rank at most
     # nobs - 1, and so the covariance of the 4 moments is singular if nobs = 4
     data = small_sample(nobs)
-    mod = IVGMM(*data, weight_type=weight_type, center=True)
+    options = bandwidth_options(weight_type)
+    mod = IVGMM(*data, weight_type=weight_type, center=True, **options)
     if nobs == 4:
         with pytest.raises(ValueError, match="too few observations") as exc_info:
             mod.fit()
@@ -644,15 +649,12 @@ def test_cue_with_enough_clusters_is_not_changed(nclusters, center):
         assert_allclose(res_default.params, res.params)
 
 
-@pytest.mark.filterwarnings(
-    "ignore::linearmodels.shared.exceptions.DefaultBandwidthWarning"
-)
 @pytest.mark.parametrize("weight_type", ["kernel", "robust"])
 @pytest.mark.parametrize("nobs", [4, 5, 8])
 def test_cue_too_few_observations(weight_type, nobs):
     # The rank of a covariance of centered moment conditions is at most nobs - 1
     data = small_sample(nobs)
-    mod = IVGMMCUE(*data, weight_type=weight_type)
+    mod = IVGMMCUE(*data, weight_type=weight_type, **bandwidth_options(weight_type))
     if nobs > 4:
         res = mod.fit()
         assert np.isfinite(res.j_stat.stat)

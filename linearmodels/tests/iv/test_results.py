@@ -38,10 +38,8 @@ def result_checker(res):
 
 
 # IVGMM and IVGMMCUE warn about the default bandwidth of the kernel
-# covariance, which is tested in test_gmm_kernel_bandwidth.py
-@pytest.mark.filterwarnings(
-    "ignore::linearmodels.shared.exceptions.DefaultBandwidthWarning"
-)
+# covariance, which is tested in test_gmm_kernel_bandwidth.py, so the bandwidth
+# is given
 def test_results(data, model):
     mod = model(data.dep, data.exog, data.endog, data.instr)
     # OLS-like results
@@ -49,29 +47,23 @@ def test_results(data, model):
 
     result_checker(mod.fit(cov_type="unadjusted"))
     result_checker(mod.fit(cov_type="robust"))
-    result_checker(mod.fit(cov_type="kernel"))
+    result_checker(mod.fit(cov_type="kernel", bandwidth=5))
     result_checker(mod.fit(cov_type="clustered", clusters=data.clusters))
 
 
-@pytest.mark.filterwarnings(
-    "ignore::linearmodels.shared.exceptions.DefaultBandwidthWarning"
-)
 def test_results_single(data, model):
     mod = model(data.dep, data.exog[:, 0], data.endog[:, 0], data.instr[:, 0])
     result_checker(mod.fit(cov_type="unadjusted"))
     result_checker(mod.fit(cov_type="robust"))
-    result_checker(mod.fit(cov_type="kernel"))
+    result_checker(mod.fit(cov_type="kernel", bandwidth=5))
     result_checker(mod.fit(cov_type="clustered", clusters=data.clusters))
 
 
-@pytest.mark.filterwarnings(
-    "ignore::linearmodels.shared.exceptions.DefaultBandwidthWarning"
-)
 def test_results_no_exog(data, model):
     mod = model(data.dep, None, data.endog[:, 0], data.instr[:, 0])
     result_checker(mod.fit(cov_type="unadjusted"))
     result_checker(mod.fit(cov_type="robust"))
-    result_checker(mod.fit(cov_type="kernel"))
+    result_checker(mod.fit(cov_type="kernel", bandwidth=5))
     result_checker(mod.fit(cov_type="clustered", clusters=data.clusters))
 
 

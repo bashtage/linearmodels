@@ -21,10 +21,8 @@ from scipy.optimize import minimize
 from linearmodels.iv import IVGMM, IVGMMCUE
 from linearmodels.iv.covariance import kernel_optimal_bandwidth
 import linearmodels.iv.gmm as gmm_module
-
-pytestmark = pytest.mark.filterwarnings(
-    "ignore::linearmodels.shared.exceptions.DefaultBandwidthWarning"
-)
+from linearmodels.shared.exceptions import DefaultBandwidthWarning
+from linearmodels.tests._utility import warns_if_default_bandwidth
 
 CWD = os.path.split(os.path.abspath(__file__))[0]
 SIMULATED = pd.read_stata(os.path.join(CWD, "results", "simulated-data.dta"))
@@ -108,7 +106,8 @@ def test_bandwidth_is_estimated_once_from_the_first_step(
 ):
     mod = IVGMMCUE(*args, weight_type="kernel", kernel=kernel, center=center, **options)
     evaluations = count_objective(mod)
-    res = mod.fit()
+    with warns_if_default_bandwidth(**options):
+        res = mod.fit()
     # The objective function was evaluated many times with different parameters,
     # but the bandwidth was estimated once, from the first step residuals
     assert len(evaluations) > 10
@@ -130,9 +129,10 @@ def test_bandwidth_follows_the_centering_of_the_moment_conditions(kernel, center
     centered = estimated_bandwidth(z_all, eps, kernel, True)
     uncentered = estimated_bandwidth(z_all, eps, kernel, False)
     assert centered != uncentered
-    res = IVGMMCUE(
-        y, exog, endog, z, weight_type="kernel", kernel=kernel, center=center
-    ).fit()
+    with pytest.warns(DefaultBandwidthWarning, match=r"7\.1"):
+        res = IVGMMCUE(
+            y, exog, endog, z, weight_type="kernel", kernel=kernel, center=center
+        ).fit()
     assert res.weight_config["bandwidth"] == (centered if center else uncentered)
 
 
@@ -142,7 +142,8 @@ def test_bandwidth_of_the_covariance_is_estimated_from_the_final_estimates(
     # The kernel covariance of the parameters is a second estimator. It is
     # estimated from the residuals of the final estimates, and not the bandwidth
     # of the weight matrix
-    res = IVGMMCUE(*args, weight_type="kernel").fit(cov_type="kernel")
+    with pytest.warns(DefaultBandwidthWarning, match=r"7\.1"):
+        res = IVGMMCUE(*args, weight_type="kernel").fit(cov_type="kernel")
     assert len(bandwidth_calls) == 2
     x, y, z = simulated_arrays()
     eps = y - x @ res.params.to_numpy()
@@ -176,11 +177,14 @@ def test_cue_has_the_bandwidth_of_two_step_gmm(args, kernel):
     # weight matrix use the same bandwidth, and the starting values are those of
     # two-step GMM
     two_step = IVGMM(*args, weight_type="kernel", kernel=kernel, center=True)
-    two_step_res = two_step.fit()
-    res = IVGMMCUE(*args, weight_type="kernel", kernel=kernel).fit(
-        starting=two_step_res.params
-    )
-    default = IVGMMCUE(*args, weight_type="kernel", kernel=kernel).fit()
+    with pytest.warns(DefaultBandwidthWarning, match=r"7\.1"):
+        two_step_res = two_step.fit()
+    with pytest.warns(DefaultBandwidthWarning, match=r"7\.1"):
+        res = IVGMMCUE(*args, weight_type="kernel", kernel=kernel).fit(
+            starting=two_step_res.params
+        )
+    with pytest.warns(DefaultBandwidthWarning, match=r"7\.1"):
+        default = IVGMMCUE(*args, weight_type="kernel", kernel=kernel).fit()
     assert res.weight_config["bandwidth"] == two_step_res.weight_config["bandwidth"]
     assert_array_equal(res.params, default.params)
     assert res.iterations == default.iterations
@@ -204,7 +208,8 @@ def test_the_objective_function_uses_one_bandwidth(args):
     # which are not residuals that give the same bandwidth
     assert len(set(others) - {bandwidth}) > 3
     # and neither after the model is fit, which changes the parameters
-    res = mod.fit()
+    with pytest.warns(DefaultBandwidthWarning, match=r"7\.1"):
+        res = mod.fit()
     assert res.weight_config["bandwidth"] == bandwidth
     for param in params:
         assert mod.j(param, x, y[:, None], z) == given.j(param, x, y[:, None], z)
@@ -244,7 +249,8 @@ EARLY_STOPS = [
 def test_the_optimizer_reaches_the_minimum(seed, nobs, rho, nz):
     y, exog, endog, z = autocorrelated_iv(seed, nobs, rho, nz)
     mod = IVGMMCUE(y, exog, endog, z, weight_type="kernel")
-    res = mod.fit()
+    with pytest.warns(DefaultBandwidthWarning, match=r"7\.1"):
+        res = mod.fit()
     x, wy, wz = mod._wx, mod._wy, mod._wz
     start = res.params.to_numpy()
     value = mod.j(start, x, wy, wz)
@@ -261,7 +267,8 @@ def test_the_optimizer_reaches_the_minimum(seed, nobs, rho, nz):
     assert np.all(np.abs(search.x - start) / std_errors < 1e-4)
     # and so the estimates do not depend on the starting values
     other = np.asarray(IVGMM(y, exog, endog, z).fit().params) + 0.05
-    again = mod.fit(starting=other)
+    with pytest.warns(DefaultBandwidthWarning, match=r"7\.1"):
+        again = mod.fit(starting=other)
     assert np.all(np.abs(again.params.to_numpy() - start) / std_errors < 1e-3)
 
 
@@ -270,7 +277,8 @@ def test_estimates_are_those_of_the_bandwidth_that_was_estimated(seed, nobs, rho
     # The estimates move by less than 1e-10 (relative) from the estimates of
     # a model that is given the bandwidth, which is the same computation
     y, exog, endog, z = autocorrelated_iv(seed, nobs, rho, nz)
-    res = IVGMMCUE(y, exog, endog, z, weight_type="kernel").fit()
+    with pytest.warns(DefaultBandwidthWarning, match=r"7\.1"):
+        res = IVGMMCUE(y, exog, endog, z, weight_type="kernel").fit()
     bandwidth = res.weight_config["bandwidth"]
     assert bandwidth > 0
     given = IVGMMCUE(y, exog, endog, z, weight_type="kernel", bandwidth=bandwidth)
@@ -284,7 +292,8 @@ def test_estimates_are_those_of_the_bandwidth_that_was_estimated(seed, nobs, rho
 
 @pytest.mark.parametrize("kernel", KERNELS)
 def test_weight_config_reproduces_the_fit(args, kernel):
-    res = IVGMMCUE(*args, weight_type="kernel", kernel=kernel).fit()
+    with pytest.warns(DefaultBandwidthWarning, match=r"7\.1"):
+        res = IVGMMCUE(*args, weight_type="kernel", kernel=kernel).fit()
     again = IVGMMCUE(*args, weight_type=res.weight_type, **res.weight_config).fit()
     assert_array_equal(again.params, res.params)
     assert again.j_stat.stat == res.j_stat.stat
@@ -293,8 +302,10 @@ def test_weight_config_reproduces_the_fit(args, kernel):
 
 def test_fitting_again_gives_the_same_results(args, bandwidth_calls):
     mod = IVGMMCUE(*args, weight_type="kernel")
-    first = mod.fit()
-    second = mod.fit()
+    with pytest.warns(DefaultBandwidthWarning, match=r"7\.1"):
+        first = mod.fit()
+    with pytest.warns(DefaultBandwidthWarning, match=r"7\.1"):
+        second = mod.fit()
     assert_array_equal(second.params, first.params)
     assert second.weight_config == first.weight_config
     # It is a property of the data of the model, so it is not estimated again
@@ -308,7 +319,8 @@ def test_centered_j_statistic_has_the_bandwidth_of_the_estimates():
     # centered statistic must use too
     y, exog, endog, z = autocorrelated_iv(10, 250, 0.5, 4)
     mod = IVGMMCUE(y, exog, endog, z, weight_type="kernel")
-    res = mod.fit()
+    with pytest.warns(DefaultBandwidthWarning, match=r"7\.1"):
+        res = mod.fit()
     eps = (mod._wy - mod._wx @ res.params.to_numpy()[:, None])[:, 0]
     final_bandwidth = estimated_bandwidth(mod._wz, eps, "bartlett", center=True)
     assert final_bandwidth == 9
@@ -323,14 +335,15 @@ def test_weighted_model_uses_the_weighted_data():
     data = SIMULATED
     rng = np.random.default_rng(12)
     weights = np.exp(0.5 * rng.standard_normal(NOBS))
-    res = IVGMMCUE(
-        data.y_kernel,
-        data[["const", "x3"]],
-        data[["x1"]],
-        data[["z1", "z2", "x4"]],
-        weight_type="kernel",
-        weights=weights,
-    ).fit()
+    with pytest.warns(DefaultBandwidthWarning, match=r"7\.1"):
+        res = IVGMMCUE(
+            data.y_kernel,
+            data[["const", "x3"]],
+            data[["x1"]],
+            data[["z1", "z2", "x4"]],
+            weight_type="kernel",
+            weights=weights,
+        ).fit()
     x, y, z = simulated_arrays()
     root_w = np.sqrt(weights / weights.mean())
     x, y, z = x * root_w[:, None], y * root_w, z * root_w[:, None]

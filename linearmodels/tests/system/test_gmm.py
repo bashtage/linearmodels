@@ -15,6 +15,7 @@ from linearmodels.system.gmm import (
     HomoskedasticWeightMatrix,
     KernelWeightMatrix,
 )
+from linearmodels.tests._utility import warns_if_default_bandwidth
 from linearmodels.tests.system._utility import (
     generate_3sls_data,
     generate_3sls_data_v2,
@@ -327,9 +328,6 @@ def test_kernel_optimal_bandwidth(data):
     assert_allclose(default.params, optimal.params)
 
 
-@pytest.mark.filterwarnings(
-    "ignore::linearmodels.shared.exceptions.DefaultBandwidthWarning"
-)
 @pytest.mark.parametrize(
     "options",
     [{}, {"bandwidth": 5}, {"optimal_bw": False}, {"optimal_bw": True}],
@@ -339,7 +337,8 @@ def test_kernel_weights_with_one_step(options):
     # The first step does not use the weight matrix, so its bandwidth is not
     # known. It was an AssertionError if the bandwidth was not given
     eqns = generate_3sls_data_v2(k=2, n=200)
-    res = IVSystemGMM(eqns, weight_type="kernel", **options).fit(iter_limit=1)
+    with warns_if_default_bandwidth(**options):
+        res = IVSystemGMM(eqns, weight_type="kernel", **options).fit(iter_limit=1)
     assert res.weight_config["bandwidth"] == options.get("bandwidth")
     assert res.weight_config["center"] is False
     robust = IVSystemGMM(eqns, weight_type="robust").fit(iter_limit=1)

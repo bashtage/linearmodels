@@ -111,15 +111,12 @@ def test_formula_weights(data, model_and_func, formula):
 
 
 # IVGMM and IVGMMCUE warn about the default bandwidth, which is tested in
-# test_gmm_kernel_bandwidth.py
-@pytest.mark.filterwarnings(
-    "ignore::linearmodels.shared.exceptions.DefaultBandwidthWarning"
-)
+# test_gmm_kernel_bandwidth.py, so the bandwidth is given
 def test_formula_kernel(data, model_and_func, formula):
     model, func = model_and_func
     mod = model.from_formula(formula, data)
-    mod.fit(cov_type="kernel")
-    func(formula, data).fit(cov_type="kernel")
+    mod.fit(cov_type="kernel", bandwidth=5)
+    func(formula, data).fit(cov_type="kernel", bandwidth=5)
 
 
 def test_formula_ols(data, model_and_func):

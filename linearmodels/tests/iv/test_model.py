@@ -400,16 +400,13 @@ def test_first_stage_summary(data):
 
 
 # The default bandwidth of the kernel covariance warns, which is tested in
-# test_gmm_kernel_bandwidth.py
-@pytest.mark.filterwarnings(
-    "ignore::linearmodels.shared.exceptions.DefaultBandwidthWarning"
-)
+# test_gmm_kernel_bandwidth.py, so the bandwidth is given
 def test_gmm_str(data):
     mod = IVGMM(data.dep, data.exog, data.endog, data.instr)
     assert isinstance(str(mod.fit(cov_type="unadjusted")), str)
     assert isinstance(str(mod.fit(cov_type="robust")), str)
     assert isinstance(str(mod.fit(cov_type="clustered", clusters=data.clusters)), str)
-    assert isinstance(str(mod.fit(cov_type="kernel")), str)
+    assert isinstance(str(mod.fit(cov_type="kernel", bandwidth=5)), str)
 
 
 def test_gmm_cue_optimization_options(small_data):
