@@ -86,7 +86,8 @@ def test_std_errors_not_changed():
     cov[2, 2] = np.nan
     se = _std_errors(cov)
     assert np.isnan(se[2])
-    assert np.all(np.isfinite(np.delete(se, 2)))
+    others = np.delete(se, 2)
+    assert np.all(np.isfinite(others))
 
 
 @pytest.mark.parametrize("risk_free", [False, True])
