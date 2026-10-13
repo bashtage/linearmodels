@@ -129,13 +129,15 @@ FULL_RANK = [
 def test_rank_deficient_design_is_not_full_rank(kind):
     # The cases are rank deficient, so that they test what they say they test
     x, _ = design(kind)
-    assert np.linalg.matrix_rank(x) < x.shape[1]
+    rank = np.linalg.matrix_rank(x)
+    assert rank < x.shape[1]
 
 
 @pytest.mark.parametrize("kind", FULL_RANK)
 def test_full_rank_design_is_full_rank(kind):
     x, _ = design(kind)
-    assert np.linalg.matrix_rank(x) == x.shape[1]
+    rank = np.linalg.matrix_rank(x)
+    assert rank == x.shape[1]
 
 
 @pytest.mark.parametrize(
@@ -148,7 +150,8 @@ def test_constant_of_any_rank(kind):
     if expected:
         assert 0 <= loc < x.shape[1]
         # The location is that of a column that varies, not of a column of zeros
-        assert np.any(x[:, loc] != 0)
+        not_zeros = np.any(x[:, loc] != 0)
+        assert not_zeros
     else:
         assert loc == -1
 
@@ -158,9 +161,12 @@ def test_rank_argument_is_not_used(kind):
     # check_rank=False passes the number of columns, which is not the rank
     x, expected = design(kind)
     k = x.shape[1]
+    expected_result = has_constant(x)
     for x_rank in (k, np.linalg.matrix_rank(x), 1, 0):
-        assert has_constant(x, x_rank) == has_constant(x)
-    assert has_constant(x, k)[0] is expected
+        result = has_constant(x, x_rank)
+        assert result == expected_result
+    const, _ = has_constant(x, k)
+    assert const is expected
 
 
 @pytest.mark.parametrize("kind", RANK_DEFICIENT_CONSTANT + RANK_DEFICIENT_NO_CONSTANT)
@@ -169,9 +175,11 @@ def test_constant_does_not_depend_on_the_size_of_the_columns(kind, scale):
     x, expected = design(kind)
     rg = np.random.default_rng(1)
     sizes = np.exp(rg.uniform(-1, 1, x.shape[1])) * scale
-    assert has_constant(x * sizes)[0] is expected
+    const, _ = has_constant(x * sizes)
+    assert const is expected
     sizes[::2] = 1.0
-    assert has_constant(x * sizes)[0] is expected
+    const, _ = has_constant(x * sizes)
+    assert const is expected
 
 
 @pytest.mark.parametrize("kind", RANK_DEFICIENT_CONSTANT)
@@ -183,15 +191,17 @@ def test_constant_location_of_rank_deficient_dummies(kind):
     nonzero = np.any(x != 0, axis=0)
     normed_var = np.full(x.shape[1], np.inf)
     normed_var[nonzero] = x[:, nonzero].var(0) / np.abs(x[:, nonzero]).max(0)
-    assert normed_var[loc] <= normed_var.min() * (1 + 1e-12)
+    smallest = normed_var.min()
+    assert normed_var[loc] <= smallest * (1 + 1e-12)
 
 
 def test_zero_column_is_not_the_location():
     d = dummies(np.random.default_rng(0), NOBS, 3)
     x = np.c_[np.zeros(NOBS), d]
-    assert has_constant(x)[0]
+    const, loc = has_constant(x)
+    assert const
     # The normalized variance of the column of zeros is not defined
-    assert has_constant(x)[1] in (1, 2, 3)
+    assert loc in (1, 2, 3)
 
 
 def test_explicit_constant_is_found_first():
@@ -199,18 +209,27 @@ def test_explicit_constant_is_found_first():
     d = dummies(rg, NOBS, 3)
     z = normal(rg, NOBS, 2)
     ones = np.ones((NOBS, 1))
+    zeros = np.zeros((NOBS, 1))
     # A constant column is found before one that is in the column space
-    assert has_constant(np.c_[d, z, ones]) == (True, 5)
-    assert has_constant(np.c_[d, ones]) == (True, 3)
-    assert has_constant(np.c_[z, ones, d]) == (True, 2)
-    assert has_constant(np.c_[z, 3.0 * ones, d]) == (True, 2)
+    result = has_constant(np.c_[d, z, ones])
+    assert result == (True, 5)
+    result = has_constant(np.c_[d, ones])
+    assert result == (True, 3)
+    result = has_constant(np.c_[z, ones, d])
+    assert result == (True, 2)
+    result = has_constant(np.c_[z, 3.0 * ones, d])
+    assert result == (True, 2)
     # Columns of ones come before other constants
-    assert has_constant(np.c_[z, 3.0 * ones, ones]) == (True, 3)
+    result = has_constant(np.c_[z, 3.0 * ones, ones])
+    assert result == (True, 3)
     # Duplicated constants, with rank deficiency
-    assert has_constant(np.c_[z, ones, ones, 2 * ones]) == (True, 2)
-    assert has_constant(np.c_[np.zeros((NOBS, 1)), z, 7 * ones]) == (True, 3)
+    result = has_constant(np.c_[z, ones, ones, 2 * ones])
+    assert result == (True, 2)
+    result = has_constant(np.c_[zeros, z, 7 * ones])
+    assert result == (True, 3)
     # The rank does not change it
-    assert has_constant(np.c_[z, z, ones], x_rank=5) == (True, 4)
+    result = has_constant(np.c_[z, z, ones], x_rank=5)
+    assert result == (True, 4)
 
 
 @pytest.mark.parametrize("nobs", [30, 100])
@@ -236,30 +255,42 @@ def test_full_rank_results_are_unchanged(nobs, seed):
             for x in candidates:
                 if x.shape[1] == 0:
                     continue
-                assert np.linalg.matrix_rank(x) == x.shape[1]
-                assert has_constant(x) == reference_rank_comparison(x)
+                rank = np.linalg.matrix_rank(x)
+                assert rank == x.shape[1]
+                result = has_constant(x)
+                reference = reference_rank_comparison(x)
+                assert result == reference
     # Square, tall, and wide
     for shape in ((nobs, 1), (nobs, nobs - 1), (nobs, nobs), (nobs // 3, nobs)):
         x = normal(rg, *shape)
-        assert has_constant(x) == reference_rank_comparison(x)
+        result = has_constant(x)
+        reference = reference_rank_comparison(x)
+        assert result == reference
         # A saturated matrix spans the column of ones, which is not a constant
         if x.shape[1] >= x.shape[0]:
-            assert has_constant(x) == (False, -1)
+            assert result == (False, -1)
 
 
 def test_matrix_that_spans_everything_has_no_constant():
     rg = np.random.default_rng(3)
     # The rank is the number of rows, so that the column of ones is in the column space
-    assert has_constant(np.eye(5)) == (False, -1)
-    assert has_constant(normal(rg, 6, 6)) == (False, -1)
-    assert has_constant(normal(rg, 6, 9)) == (False, -1)
+    result = has_constant(np.eye(5))
+    assert result == (False, -1)
+    result = has_constant(normal(rg, 6, 6))
+    assert result == (False, -1)
+    result = has_constant(normal(rg, 6, 9))
+    assert result == (False, -1)
     # A wide matrix of lower rank has a constant if the column of ones is in its space
     wide = np.c_[dummies(rg, 12, 3), normal(rg, 12, 2) @ normal(rg, 2, 9)]
-    assert np.linalg.matrix_rank(wide) < 12
-    assert has_constant(wide)[0]
+    rank = np.linalg.matrix_rank(wide)
+    assert rank < 12
+    const, _ = has_constant(wide)
+    assert const
     wide_no_constant = normal(rg, 12, 3) @ normal(rg, 3, 14)
-    assert np.linalg.matrix_rank(wide_no_constant) < 12
-    assert has_constant(wide_no_constant) == (False, -1)
+    rank = np.linalg.matrix_rank(wide_no_constant)
+    assert rank < 12
+    result = has_constant(wide_no_constant)
+    assert result == (False, -1)
 
 
 @pytest.mark.parametrize(
@@ -273,7 +304,8 @@ def test_column_that_varies_by_less_than_the_tolerance_is_a_constant(
     # only if the noise is small relative to the tolerance, about 1.5e-8
     z = np.random.default_rng(4).standard_normal(200)
     x = (1 + variation * z)[:, None]
-    assert has_constant(x)[0] is expected
+    const, _ = has_constant(x)
+    assert const is expected
 
 
 def test_columns_are_not_modified():
@@ -287,11 +319,17 @@ def test_columns_are_not_modified():
 def test_integer_and_bool_columns():
     rg = np.random.default_rng(6)
     d = dummies(rg, NOBS, 3)
-    assert has_constant(d.astype(int)) == has_constant(d)
-    assert has_constant(d.astype(bool)) == has_constant(d)
-    assert has_constant(d.astype(np.float32))[0]
-    assert has_constant(d[:, :2].astype(int)) == (False, -1)
+    expected = has_constant(d)
+    result = has_constant(d.astype(int))
+    assert result == expected
+    result = has_constant(d.astype(bool))
+    assert result == expected
+    const, _ = has_constant(d.astype(np.float32))
+    assert const
+    result = has_constant(d[:, :2].astype(int))
+    assert result == (False, -1)
 
 
 def test_no_columns():
-    assert has_constant(np.empty((NOBS, 0))) == (False, -1)
+    result = has_constant(np.empty((NOBS, 0)))
+    assert result == (False, -1)
