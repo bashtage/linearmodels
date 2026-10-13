@@ -265,8 +265,10 @@ given for each time period, and to every other input. See
 NumPy arrays do not have labels and are always paired by position. The same
 is true of a pandas object that only has a default index, 0, 1, ..., n-1, (and
 default columns, if it is a ``DataFrame`` without a MultiIndex) since there are
-no labels to compare. Use ``to_numpy()`` to explicitly pair the values of any
-other pandas object by position.
+no labels to compare. A ``DataFrame`` with one column and a default index is a
+column of values, and has no labels whatever the name of its column is. Use
+``to_numpy()`` to explicitly pair the values of any other pandas object by
+position.
 
 If ``dependent`` does not carry labels, for example if it is a NumPy array, the
 first of ``exog``, ``weights`` and ``other_effects`` that carries labels is the
