@@ -165,13 +165,24 @@ class PanelData:
     methods that group by the index raise a ValueError if the level that they
     use has a missing label.
 
+    Each combination of an entity and a time period can appear only once, since
+    an observation is identified by them.
+
+    .. versionchanged:: 7.1
+
+       Duplicated (entity, time) rows raise a ``ValueError``. Earlier versions
+       accepted them, except for the first difference estimator, which raised an
+       error from pandas, and the other estimators treated them as separate
+       observations.
+
     Raises
     ------
     TypeError
         If the input type is not supported
     ValueError
         If the input has the wrong number of dimensions or a MultiIndex
-        DataFrame does not have 2 levels
+        DataFrame does not have 2 levels, or if a combination of an entity
+        and a time period appears more than once
     """
 
     def __init__(
@@ -236,6 +247,15 @@ class PanelData:
                 if copy:
                     self._frame = self._frame.copy()
             else:
+                if not x.index.is_unique:
+                    label = x.index[int(np.argmax(np.asarray(x.index.duplicated())))]
+                    raise ValueError(
+                        "Each combination of an entity and a time period can appear "
+                        f"only once, but the time label {label} appears more than "
+                        "once in the index of a DataFrame with time as the index and "
+                        "entities as the columns, so that each entity has more than "
+                        "one observation at that time."
+                    )
                 options = {"future_stack": True} if PD_GTE_21 else {"dropna": False}
                 self._frame = DataFrame({var_name: x.T.stack(**options)})
         elif isinstance(x, np.ndarray):
@@ -286,9 +306,37 @@ class PanelData:
             raise ValueError(
                 "The index on the time dimension must be either numeric or date-like"
             )
+        self._check_unique(index_names)
         # self._k, self._t, self._n = self.panel.shape
         self._k, self._t, self._n = self.shape
         self._frame.index = self._frame.index.set_names(index_names)
+
+    def _check_unique(self, index_names: Sequence[str]) -> None:
+        """
+        Raise a ValueError if an (entity, time) combination appears more than once
+
+        Parameters
+        ----------
+        index_names : sequence of str
+            The names of the entity and time levels, which are used in the message.
+
+        Raises
+        ------
+        ValueError
+            If the index has duplicated entries. The message names the first of
+            them, the first row that repeats an earlier row.
+        """
+        index = self.index
+        if index.is_unique:
+            return
+        duplicated = np.asarray(index.duplicated())
+        first = index[int(np.argmax(duplicated))]
+        entity, time = index_names
+        raise ValueError(
+            "Each combination of an entity and a time period can appear only once, "
+            f"but {int(duplicated.sum())} row(s) repeat an earlier row. The first "
+            f"duplicated entry is {entity}={first[0]}, {time}={first[1]}."
+        )
 
     @property
     def panel(self) -> _Panel:

@@ -1313,11 +1313,14 @@ def test_low_memory_auto():
 
 @pytest.mark.filterwarnings("ignore::linearmodels.shared.exceptions.SingletonWarning")
 def test_singleton_removal():
+    # Entity j is observed in the periods 0 to 5 - j, so the last entity and the
+    # last period have a single observation
     entities = []
+    times = []
     for i in range(6):
         entities.extend([f"entity.{j}" for j in range(6 - i)])
+        times.extend([i] * (6 - i))
     nobs = len(entities)
-    times = np.arange(nobs) % 6
     index = pd.MultiIndex.from_arrays((entities, times))
     cols = [f"x{i}" for i in range(3)]
     x = pd.DataFrame(np.random.randn(nobs, 3), index=index, columns=cols)
@@ -1380,11 +1383,12 @@ def test_singleton_removal_mixed(singleton_data, other_effects):
 
 
 def test_repeated_measures_weight():
-    # Issue reported by email
+    # Issue reported by email. The observations of an entity have to be at different
+    # times, since a combination of an entity and a time period can appear only once
     rs = np.random.RandomState(0)
     w = rs.chisquare(5, 300) / 5
     idx1 = ["a"] * 100 + ["b"] * 100 + ["c"] * 100
-    idx2 = np.arange(300) % 25
+    idx2 = np.tile(np.arange(100), 3)
     mi = pd.MultiIndex.from_arrays([idx1, idx2])
     df = pd.DataFrame(rs.standard_normal((300, 2)), index=mi, columns=["y", "x"])
     w = pd.Series(w, index=mi, name="weight")
