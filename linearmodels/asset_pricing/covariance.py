@@ -4,7 +4,7 @@ Covariance estimators for linear factor models
 
 from __future__ import annotations
 
-from numpy import empty, ndarray
+from numpy import empty, ndarray, zeros_like
 from numpy.linalg import inv
 
 from linearmodels.iv.covariance import (
@@ -174,6 +174,12 @@ class HeteroskedasticCovariance:
         return self._square
 
     @property
+    def _scale(self) -> float:
+        """The inverse of the number of observations, less df if debiased"""
+        nobs = self._xe.shape[0]
+        return 1 / (nobs - int(self._debiased) * self._df)
+
+    @property
     def cov(self) -> linearmodels.typing.data.Float64Array:
         """
         Compute parameter covariance
@@ -184,8 +190,7 @@ class HeteroskedasticCovariance:
             Parameter covariance
         """
         s = self.s
-        nobs = self._xe.shape[0]
-        scale = 1 / (nobs - int(self._debiased) * self._df)
+        scale = self._scale
         if self.square:
             ji = self.inv_jacobian
             out = ji @ s @ ji.T
@@ -194,6 +199,45 @@ class HeteroskedasticCovariance:
             out = inv(j.T @ inv(s) @ j).astype(float, copy=False)
         out = (scale / 2) * (out + out.T)
         return out
+
+    @property
+    def _moment_cov(self) -> linearmodels.typing.data.Float64Array:
+        r"""
+        Covariance of the average moment conditions at the estimates.
+
+        Returns
+        -------
+        ndarray
+            Covariance of the average of the moment conditions, evaluated at
+            the estimated parameters.
+
+        Notes
+        -----
+        The moment conditions are not zero at the estimates of an over-identified
+        model. If :math:`S` is the covariance of the moment conditions and
+        :math:`G` is the Jacobian, the efficient GMM estimates have
+
+        .. math::
+
+           (S - G (G^{\prime} S^{-1} G)^{-1} G^{\prime}) / (T - df)
+
+        as the covariance of the average moment conditions, where :math:`df` is
+        zero unless the covariance is debiased. This uses the same :math:`S`
+        and the same scale as :attr:`cov`, which is
+        :math:`(G^{\prime} S^{-1} G)^{-1} / (T - df)`. The covariance is
+        singular, with rank equal to the number of moment conditions less the
+        number of parameters. It is zero if the Jacobian is square, since the
+        moment conditions are then zero at the estimates.
+
+        This is used for the standard errors of the alphas of
+        ``LinearFactorModelGMM``. It is private, and not part of the API.
+        """
+        s = self.s
+        if self.square:
+            return zeros_like(s)
+        j = self.jacobian
+        out = self._scale * s - j @ self.cov @ j.T
+        return (out + out.T) / 2
 
 
 class KernelCovariance(HeteroskedasticCovariance, _HACMixin):

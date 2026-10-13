@@ -48,6 +48,13 @@ and :math:`bw` is the bandwidth. The reported risk premia are just the
 average returns on the factors, and the covariance of the risk premia
 estimates is based on the factor residuals after demeaning using either
 the simple estimator or the kernel estimator.
+If the covariance is debiased, :math:`df=K+1` is the number of regressors of
+each regression. The risk premia are sample means, so that their covariance
+uses :math:`T-1` in place of :math:`T-df`, and the covariance between the
+risk premia and the other parameters uses the geometric mean of the two
+divisors, :math:`\sqrt{\left(T-df\right)\left(T-1\right)}`. The block of the
+covariance of the parameters for the risk premia is then the square of their
+reported standard errors.
 
 The J statistic
 ~~~~~~~~~~~~~~~
@@ -179,16 +186,34 @@ previous section.
 The J statistic
 ~~~~~~~~~~~~~~~
 
-The J statistic is virtually identical to the :math:`J` statistic from
-traded factor model except that it has a difference distribution.
+The J statistic is similar to the :math:`J` statistic from traded factor
+model except that the pricing errors satisfy linear restrictions and that the
+statistic has a different distribution.
 
-.. math:: J=\hat{\alpha}^{\prime}\hat{\Sigma}_{\alpha}^{-1}\hat{\alpha}^{\prime}\sim\chi_{N-K}^{2}
+.. math:: J=\hat{\alpha}^{\prime}\hat{\Sigma}_{\alpha}^{+}\hat{\alpha}=\left(Q^{\prime}\hat{\alpha}\right)^{\prime}\left(Q^{\prime}\hat{\Sigma}_{\alpha}Q\right)^{-1}\left(Q^{\prime}\hat{\alpha}\right)\sim\chi_{N-K-n_{rf}}^{2}
 
-The loss of degrees of freedom occurs since
+where :math:`n_{rf}` is 1 if the risk free rate is estimated and 0 if it is
+not. The loss of degrees of freedom occurs since
 :math:`\hat{\alpha}=\hat{\eta}` which are regression residuals from a
-regression of :math:`N` average returns on :math:`K` factor loadings.
-:math:`\hat{\Sigma}_{\alpha}` is the bottom right :math:`K\times K`
-block of :math:`\hat{\Sigma}`.
+regression of :math:`N` average returns on the :math:`K+n_{rf}` columns of
+the factor loadings. The second stage estimates make :math:`\hat{\alpha}`
+orthogonal to the :math:`K+n_{rf}` columns of
+:math:`\Sigma^{-1}\hat{\beta}_{c}`, where :math:`\Sigma` is the covariance
+used in the GLS version or the identity matrix, so that
+:math:`\hat{\alpha}` lies in a space with :math:`N-K-n_{rf}` dimensions and
+its covariance has rank :math:`N-K-n_{rf}` in theory.
+:math:`\hat{\Sigma}_{\alpha}` is the block of :math:`\hat{\Sigma}` that
+contains the covariance of :math:`\hat{\alpha}`. The columns of :math:`Q`
+are an orthonormal basis of the space that is orthogonal to the columns of
+:math:`\Sigma^{-1}\hat{\beta}_{c}`, and
+:math:`\hat{\Sigma}_{\alpha}^{+}=Q\left(Q^{\prime}\hat{\Sigma}_{\alpha}Q\right)^{-1}Q^{\prime}`
+is the generalized inverse of :math:`\hat{\Sigma}_{\alpha}` with rank
+:math:`N-K-n_{rf}`. The statistic is the Wald statistic of the
+:math:`N-K-n_{rf}` linear combinations of the pricing errors that are not
+restricted to be zero. If :math:`\hat{\Sigma}_{\alpha}` were exactly singular
+in the directions of the columns of :math:`\Sigma^{-1}\hat{\beta}_{c}`, as the
+covariance of the pricing errors is in theory,
+:math:`\hat{\Sigma}_{\alpha}^{+}` would be its Moore-Penrose pseudo-inverse.
 
 GMM Estimation of Linear Factor Models
 --------------------------------------
@@ -238,3 +263,20 @@ previous section. The parameter covariance estimator uses the form
 appropriate for efficient GMM,
 
 .. math:: \hat{\Sigma}=\left(\hat{G}\hat{^{\prime}S}^{-1}\hat{G}\right)^{-1}.
+
+The pricing errors, :math:`\hat{\alpha}`, are the averages of the first moment
+condition of each portfolio, :math:`\epsilon_{t}`. The moment conditions are
+not zero at the estimates of an over-identified model, and the covariance of
+their average accounts for the estimation of the parameters. For efficient GMM
+it is
+
+.. math:: \hat{\Sigma}_{g}=S-G\left(G^{\prime}S^{-1}G\right)^{-1}G^{\prime}
+
+where :math:`S` and :math:`G` are those of the covariance of the parameters.
+Both are divided by :math:`T-df`, where :math:`df` is the number of factors
+if the covariance is debiased and 0 if it is not. The standard errors of the
+pricing errors are the square roots of the diagonal elements of
+:math:`\hat{\Sigma}_{g}/\left(T-df\right)` that correspond to
+:math:`\hat{\alpha}`. This covariance has rank :math:`N-K-n_{rf}`, the degrees
+of freedom of the J statistic, where :math:`n_{rf}` is 1 if the risk free rate
+is estimated and 0 if it is not.

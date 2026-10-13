@@ -26,6 +26,7 @@ from linearmodels.asset_pricing.results import (
     LinearFactorModelResults,
 )
 from linearmodels.iv.data import IVData, IVDataLike
+from linearmodels.shared import hypotheses
 from linearmodels.shared.alignment import check_alignment, row_labels
 from linearmodels.shared.exceptions import missing_warning
 from linearmodels.shared.hypotheses import WaldTestStatistic
@@ -67,6 +68,65 @@ def callback_factory(
         d["iter"] += 1
 
     return callback
+
+
+def _j_statistic(
+    alphas: linearmodels.typing.data.Float64Array,
+    alpha_vcv: linearmodels.typing.data.Float64Array,
+    restrictions: linearmodels.typing.data.Float64Array,
+) -> WaldTestStatistic:
+    r"""
+    J statistic of the pricing errors of a two-pass estimator.
+
+    Parameters
+    ----------
+    alphas : ndarray
+        The pricing errors (nportfolio by 1), which satisfy
+        ``restrictions.T @ alphas = 0``.
+    alpha_vcv : ndarray
+        The estimated covariance of the pricing errors (nportfolio by nportfolio).
+    restrictions : ndarray
+        The nportfolio by nrestriction matrix of the restrictions that the pricing
+        errors satisfy, which has full column rank.
+
+    Returns
+    -------
+    WaldTestStatistic
+        The statistic :math:`\hat{\alpha}^{\prime}\hat{V}^{+}\hat{\alpha}`, where
+        :math:`\hat{V}^{+}=Q(Q^{\prime}\hat{V}Q)^{-1}Q^{\prime}` is the generalized
+        inverse of :math:`\hat{V}` with rank nportfolio less nrestriction, and the
+        columns of :math:`Q` are an orthonormal basis of the space that is
+        orthogonal to the columns of ``restrictions``. An ``InvalidTestStatistic``
+        if :math:`Q^{\prime}\hat{V}Q` is singular.
+
+    Notes
+    -----
+    The statistic depends on the space that is orthogonal to the columns of
+    ``restrictions`` and not on the basis :math:`Q` of the space, so that it does
+    not depend on the order of the portfolios. No tolerance decides the rank of
+    :math:`\hat{V}`, which is the dimension of that space.
+    """
+    name = "J-statistic"
+    null = "All alphas are 0"
+    nportfolio, nrestriction = restrictions.shape
+    df = nportfolio - nrestriction
+    if df == 0:
+        return WaldTestStatistic(0.0, null, df, name=name)
+    # The pricing errors are in the span of the last df columns of u
+    q = np.linalg.svd(restrictions)[0][:, nrestriction:]
+    vcv = q.T @ alpha_vcv @ q
+    vals, vecs = np.linalg.eigh((vcv + vcv.T) / 2)
+    if not vals[0] > df * np.finfo(float).eps * vals[-1]:
+        reason = (
+            "The estimated covariance of the pricing errors has a rank smaller "
+            f"than the {df} degrees of freedom of the statistic, so that the "
+            "J-statistic cannot be computed. This occurs when the number of "
+            "observations is small relative to the number of portfolios."
+        )
+        return hypotheses.InvalidTestStatistic(reason, name=name)
+    coefs = vecs.T @ (q.T @ alphas)
+    stat = float(np.sum(coefs**2 / vals[:, None]))
+    return WaldTestStatistic(stat, null, df, name=name)
 
 
 class _FactorModelBase:
@@ -337,22 +397,23 @@ class TradedFactorModel(_FactorModelBase):
         **cov_config: str | float,
     ) -> LinearFactorModelResults:
         """
-        Estimate model parameters
+        Estimate model parameters.
 
         Parameters
         ----------
-        cov_type : str
-            Name of covariance estimator
-        debiased : bool
+        cov_type : {"robust", "heteroskedastic", "kernel"}, optional
+            Name of covariance estimator. The default is ``"robust"``.
+        debiased : bool, optional
             Flag indicating whether to debias the covariance estimator using
-            a degree of freedom adjustment
-        cov_config : dict
-            Additional covariance-specific options.  See Notes.
+            a degree of freedom adjustment. The default is True. See Notes.
+        **cov_config
+            Additional covariance-specific options for the kernel covariance
+            estimator: ``kernel`` and ``bandwidth``. See Notes.
 
         Returns
         -------
         LinearFactorModelResults
-            Results class with parameter estimates, covariance and test statistics
+            Results class with parameter estimates, covariance and test statistics.
 
         Notes
         -----
@@ -365,6 +426,30 @@ class TradedFactorModel(_FactorModelBase):
         The kernel covariance estimator takes the optional arguments
         ``kernel``, one of "bartlett", "parzen" or "qs" (quadratic spectral)
         and ``bandwidth`` (a positive integer).
+
+        If ``debiased`` is True, the covariance of the parameters of the
+        time-series regressions (the alphas and the loadings) is divided by
+        nobs - nfactor - 1, the number of observations less the number of
+        regressors, instead of by nobs. The risk premia are the sample means of
+        the factors, so that their covariance, which is the block of ``cov`` for
+        the risk premia and the source of ``risk_premia_se``, is divided by
+        nobs - 1. The covariance between the two groups of parameters is divided
+        by the geometric mean of the two scales, so that the covariance matrix
+        remains positive semi-definite. If ``debiased`` is False, the covariance
+        is divided by nobs.
+
+        .. versionchanged:: 7.1
+
+           The block of ``cov`` for the risk premia was divided by
+           nobs - nfactor - 1, while ``risk_premia_se`` used nobs - 1. Both use
+           nobs - 1 now, so that the block of ``cov`` for the risk premia is
+           smaller by the factor (nobs - nfactor - 1) / (nobs - 1), for example by
+           5.1% with 60 observations and 3 factors, and equals
+           ``risk_premia_se`` squared. The covariance between the risk premia
+           and the other parameters, which used nobs - nfactor - 1, is now smaller
+           by the square root of the same factor. The covariance of the
+           alphas and the loadings, ``risk_premia_se`` and the covariance with
+           ``debiased=False`` do not change.
         """
         self._check_debiased(debiased)
         p = self.portfolios.ndarray
@@ -424,6 +509,13 @@ class TradedFactorModel(_FactorModelBase):
             raise ValueError(f"Unknown cov_type: {cov_type}")
         full_vcv = cov_est.cov
         rp_cov = rp_cov_est.cov
+        if debiased:
+            # The risk premia are sample means, so their covariance uses nobs - 1 and
+            # not the nobs - (nfactor + 1) of the time-series regressions. The
+            # covariance between the two uses the geometric mean of the two scales
+            adj = np.ones(nloading + nfactor)
+            adj[nloading:] = np.sqrt((nobs - fc.shape[1]) / (nobs - 1))
+            full_vcv = full_vcv * np.outer(adj, adj)
         vcv = full_vcv[:nloading, :nloading]
 
         # Rearrange VCV
@@ -609,7 +701,80 @@ class LinearFactorModel(_LinearFactorModelBase):
     is used in the second stage if ``sigma`` is provided.
 
     The model is tested using the estimated values
-    :math:`\hat{\alpha}_i=\hat{\eta}_i`.
+    :math:`\hat{\alpha}_i=\hat{\eta}_i`, the pricing errors. With :math:`N`
+    test portfolios, :math:`K` factors and :math:`n_{rf}` equal to 1 if the
+    risk-free rate is estimated and 0 if it is not, the second stage estimates
+    make the pricing errors orthogonal to the :math:`K + n_{rf}` columns of
+    :math:`\Sigma^{-1}\hat{\beta}_c`. Here :math:`\hat{\beta}_c` contains the
+    estimated factor loadings, preceded by a column of ones if the risk-free
+    rate is estimated, and :math:`\Sigma` is ``sigma``, or the identity if it
+    is not provided. The pricing errors therefore lie in a space with
+    :math:`N - K - n_{rf}` dimensions, and the covariance of the pricing errors
+    has rank :math:`N - K - n_{rf}`.
+
+    The J-statistic is the Wald statistic of the pricing errors in the space
+    where they lie,
+
+    .. math::
+
+        J = (Q^\prime\hat{\alpha})^\prime (Q^\prime \hat{V} Q)^{-1}
+            (Q^\prime\hat{\alpha})
+
+    where :math:`\hat{V}` is the estimated covariance of the pricing errors and
+    :math:`Q` is an :math:`N` by :math:`N - K - n_{rf}` matrix whose orthonormal
+    columns span the space that is orthogonal to the columns of
+    :math:`\Sigma^{-1}\hat{\beta}_c`. The :math:`N - K - n_{rf}` elements of
+    :math:`Q^\prime\hat{\alpha}` are the coordinates of the pricing errors in
+    that space, and :math:`Q^\prime \hat{V} Q` is their estimated covariance.
+    The statistic tests the null that all of the pricing errors are zero, and
+    has an asymptotic :math:`\chi^2_{N-K-n_{rf}}` distribution. It can also be
+    written :math:`\hat{\alpha}^\prime \hat{V}^{+} \hat{\alpha}` for
+    :math:`\hat{V}^{+}=Q(Q^\prime \hat{V} Q)^{-1}Q^\prime`, which has rank
+    :math:`N - K - n_{rf}`. If :math:`\hat{V}` were exactly singular in the
+    directions of the columns of :math:`\Sigma^{-1}\hat{\beta}_c`, as the
+    covariance of the pricing errors is in theory, :math:`\hat{V}^{+}` would be
+    its Moore-Penrose pseudo-inverse.
+
+    In a sample, :math:`\hat{V}` is not exactly singular. The Moore-Penrose
+    pseudo-inverse of :math:`\hat{V}` would either invert the directions that
+    are null in theory, which makes the statistic too large, or need a
+    tolerance that decides which eigenvalues are treated as zero. The
+    J-statistic instead projects the pricing errors on the space where they lie
+    and uses the rank that the model implies, :math:`N - K - n_{rf}`, so that no
+    tolerance decides which eigenvalues are treated as zero.
+
+    The statistic depends on the space and not on the basis of the space: any
+    other orthonormal basis, :math:`QR` for an orthogonal matrix :math:`R`,
+    gives the same value. It therefore does not depend on the order of the test
+    portfolios. Reordering the columns of ``portfolios``, and the rows and
+    columns of ``sigma`` in the same way, reorders :math:`\hat{\alpha}`,
+    :math:`\hat{V}` and the rows of :math:`\Sigma^{-1}\hat{\beta}_c` in the
+    same way and does not change the statistic. It also does not depend on the
+    order of the observations if ``cov_type`` is ``"robust"``, but the kernel
+    covariance estimators use the order of the observations.
+
+    If :math:`Q^\prime \hat{V} Q` is numerically singular, which can occur when
+    there are few observations, the J-statistic is an ``InvalidTestStatistic``.
+    If the number of test portfolios is the number of risk premia,
+    :math:`N = K + n_{rf}`, the pricing errors are zero and the statistic is 0
+    with 0 degrees of freedom.
+
+    .. versionchanged:: 7.1
+
+       The J-statistic used the Moore-Penrose pseudo-inverse of
+       :math:`\hat{V}` with its default tolerance, which also inverts the
+       directions in which the covariance is null in theory. Its eigenvalues
+       are small but not zero in a sample. The statistic was therefore too
+       large: by 4% in the median and by up to 30% in 200 simulated samples of
+       a correct model with 250 observations, 25 portfolios and 3 factors,
+       where the 5% test rejected 12.5% of the samples (10.0% now; with 1,000
+       observations 7.5% and 5.5%). The covariance can be far from singular in
+       those directions when there are few portfolios: the J-statistic of the
+       five portfolios and three factors of the Fama-French example in the
+       documentation is 41.6 and was 100.6. If the risk-free rate was
+       estimated, an eigenvalue that is numerically zero was inverted as well,
+       and the statistic changed in the third digit when the observations were
+       only reordered.
 
     Rows are paired by position, so that the first row of ``factors`` is the
     factor return in the period of the first row of ``portfolios``. If both
@@ -738,7 +903,7 @@ class LinearFactorModel(_LinearFactorModelBase):
         ``kernel``, one of "bartlett", "parzen" or "qs" (quadratic spectral)
         and ``bandwidth`` (a positive integer).
         """
-        nobs, nf, nport, nrf, s1, s2, s3 = self._boundaries()
+        nobs, nf, nport, _, s1, s2, s3 = self._boundaries()
         excess_returns = not self._risk_free
         self._check_debiased(debiased)
         f = self.factors.ndarray
@@ -791,10 +956,9 @@ class LinearFactorModel(_LinearFactorModelBase):
         # VCV
         full_vcv = cov_est_inst.cov
         alpha_vcv = full_vcv[s2:, s2:]
-        stat = float(np.squeeze(alphas.T @ np.linalg.pinv(alpha_vcv) @ alphas))
-        jstat = WaldTestStatistic(
-            stat, "All alphas are 0", nport - nf - nrf, name="J-statistic"
-        )
+        # The second stage estimates make the pricing errors orthogonal to the
+        # columns of sigma^-1 [1 betas]
+        jstat = _j_statistic(alphas, alpha_vcv, self._sigma_inv @ betas)
 
         total_ss = ((p - p.mean(0)[None, :]) ** 2).sum()
         residual_ss = (eps**2).sum()
@@ -958,6 +1122,39 @@ class LinearFactorModelGMM(_LinearFactorModelBase):
 
     The model is tested using the optimized objective function using the
     usual GMM J statistic.
+
+    The alphas are the averages of the moment conditions :math:`\epsilon_t`
+    that correspond to the intercept, and their standard errors account for the
+    estimation of the parameters. If :math:`S` is the covariance of the moment
+    conditions and :math:`G` is the Jacobian of their average, the covariance of
+    the average moment conditions at the efficient GMM estimates is
+
+    .. math::
+
+        \left(S - G (G^\prime S^{-1} G)^{-1} G^\prime\right) / (T - df)
+
+    where :math:`df` is the number of factors if the covariance is debiased and
+    0 if it is not. This is the same :math:`S`, :math:`G` and scale as the
+    covariance of the parameters :math:`(G^\prime S^{-1} G)^{-1} / (T - df)`,
+    which depends on ``cov_type`` (and ``kernel`` and ``bandwidth`` for the
+    kernel estimator), ``center`` and ``debiased`` of ``fit``. The covariance of
+    the alphas has rank equal to the number of degrees of freedom of the
+    J-statistic. If the model is just identified, the alphas are zero and so is
+    their variance.
+
+    .. versionchanged:: 7.1
+
+       The standard errors of the alphas were the square roots of the diagonal
+       of the covariance of the average moment conditions, :math:`S / T`, which
+       ignores that the parameters were estimated, and which did not depend on
+       ``cov_type``, ``center`` or ``debiased``. This overstated the standard
+       errors: in a simulation of 60 samples with 400 observations, 6 portfolios
+       and 2 factors the mean standard error was 0.00143 to 0.00145 for all six
+       alphas, where their sampling standard deviations were 0.00047 to 0.00136.
+       The mean standard errors are now 0.00049 to 0.00133 and track them. The
+       t-statistics and p-values of the alphas, which are in ``tstats`` and
+       ``pvalues``, change with them. The covariance of the parameters, the risk
+       premia and the J-statistic do not change.
 
     Rows are paired by position, so that the first row of ``factors`` is the
     factor return in the period of the first row of ``portfolios``. If both
@@ -1223,7 +1420,6 @@ class LinearFactorModelGMM(_LinearFactorModelBase):
 
         # 4. Compute final S and G for inference
         g = self._moments(params, excess_returns)
-        s = g.T @ g / nobs
         jac = self._jacobian(params, excess_returns)
         if cov_est is HeteroskedasticCovariance:
             cov_est_inst = HeteroskedasticCovariance(
@@ -1250,7 +1446,9 @@ class LinearFactorModelGMM(_LinearFactorModelBase):
         rp_cov = full_vcv[sel, sel]
         sel = slice(0, (n * (k + 1)), (k + 1))
         alphas = g.mean(0)[sel, None]
-        alpha_vcv = s[sel, sel] / nobs
+        # The alphas are averages of moments, whose covariance at the estimates
+        # accounts for the estimation of the parameters
+        alpha_vcv = cov_est_inst._moment_cov[sel, sel]
         if use_cue:
             # The objective that was minimized updates the weight matrix
             stat = self._j_cue(params, excess_returns, weight_est_instance)

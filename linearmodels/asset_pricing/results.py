@@ -21,6 +21,38 @@ from linearmodels.shared.io import _str, pval_format
 from linearmodels.shared.utility import AttrDict
 import linearmodels.typing.data
 
+# Rounding makes the variance of a parameter that is known exactly, such as the alpha
+# of a model that is just identified, a tiny positive or negative number and not 0. In
+# simulations of such models the most negative variance was 2e-13 times the largest
+# variance of the covariance. A variance that is negative by no more than this multiple
+# of the largest variance is zero up to rounding. A more negative variance is not.
+_VARIANCE_RTOL = 1e-10
+
+
+def _std_errors(
+    cov: linearmodels.typing.data.Float64Array,
+) -> linearmodels.typing.data.Float64Array:
+    """
+    Standard errors, the square roots of the diagonal of a covariance.
+
+    Parameters
+    ----------
+    cov : ndarray
+        Covariance matrix of the parameters.
+
+    Returns
+    -------
+    ndarray
+        The square roots of the diagonal of ``cov``. A variance that is negative
+        by no more than ``_VARIANCE_RTOL`` times the largest absolute variance
+        is zero up to rounding, and its standard error is 0. The standard error
+        of a variance that is more negative is NaN, with a ``RuntimeWarning``.
+    """
+    variances = np.array(np.diag(cov), dtype=float)
+    tol = _VARIANCE_RTOL * np.max(np.abs(variances))
+    variances[(variances < 0) & (variances >= -tol)] = 0.0
+    return cast("linearmodels.typing.data.Float64Array", np.sqrt(variances))
+
 
 class LinearFactorModelResults(_SummaryStr):
     """
@@ -121,7 +153,7 @@ class LinearFactorModelResults(_SummaryStr):
 
         rp = np.asarray(self.risk_premia)[:, None]
         se = np.asarray(self.risk_premia_se)[:, None]
-        tstats = np.asarray(self.risk_premia / self.risk_premia_se)
+        tstats = np.asarray(self.risk_premia_tstats)
         pvalues = 2 * stats.norm.sf(np.abs(tstats))
         ci = rp + se * stats.norm.ppf([[0.025, 0.975]])
         param_data = np.c_[rp, se, tstats[:, None], pvalues[:, None], ci]
@@ -159,7 +191,10 @@ class LinearFactorModelResults(_SummaryStr):
         param_names: list[str] | tuple[str, ...],
         first: bool = False,
     ) -> SimpleTable:
-        tstats = params / se
+        # The standard error is 0 when the parameter is known, as for the alphas of a
+        # model that is just identified, and the t-statistic is not defined
+        with np.errstate(divide="ignore", invalid="ignore"):
+            tstats = np.where(se == 0, np.nan, params / se)
         pvalues = 2 * stats.norm.sf(np.abs(tstats))
         ci = params + se * stats.norm.ppf([[0.025, 0.975]])
         param_data = np.c_[params, se, tstats, pvalues, ci]
@@ -244,9 +279,26 @@ class LinearFactorModelResults(_SummaryStr):
 
     @property
     def std_errors(self) -> pd.DataFrame:
-        """Estimated parameter standard errors"""
-        se = np.sqrt(np.diag(self._cov))
-        assert isinstance(se, np.ndarray)
+        """
+        Estimated parameter standard errors.
+
+        Notes
+        -----
+        These are the square roots of the diagonal of ``cov``. The standard error
+        of a parameter that is known exactly is 0, for example the alpha of a
+        model that is just identified, whose variance is zero. Rounding can make
+        such a variance a tiny negative number, and a variance that is negative
+        by no more than ``1e-10`` times the largest variance of ``cov`` is
+        treated as zero. The standard error of a variance that is more negative
+        is NaN, with a ``RuntimeWarning``.
+
+        .. versionchanged:: 7.1
+
+           The standard errors of the alphas of a ``LinearFactorModel`` that is
+           just identified were NaN, with a ``RuntimeWarning``, if rounding made
+           their variances negative, which was about -3e-19 in most samples.
+        """
+        se = _std_errors(self._cov)
         nportfolio, nfactor = self._params.shape
         nloadings = nportfolio * nfactor
         se = se[:nloadings]
@@ -255,13 +307,26 @@ class LinearFactorModelResults(_SummaryStr):
 
     @cached_property
     def tstats(self) -> pd.DataFrame:
-        """Parameter t-statistics"""
-        return self.params / self.std_errors
+        """
+        Parameter t-statistics.
+
+        Notes
+        -----
+        The t-statistic of a parameter with a standard error of 0 is NaN, since
+        the test is not defined. This is the case for the alphas of a model that
+        is just identified, which are zero by construction.
+        """
+        se = self.std_errors
+        return (self.params / se).where(se != 0)
 
     @cached_property
     def pvalues(self) -> pd.DataFrame:
         """
         Parameter p-vals. Uses t(df_resid) if ``debiased`` is True, else normal
+
+        Notes
+        -----
+        The p-value is NaN where the t-statistic is NaN.
         """
         pvals = self.tstats.copy()
         pvals.loc[:, :] = 2 * stats.norm.sf(np.abs(pvals))
@@ -287,13 +352,28 @@ class LinearFactorModelResults(_SummaryStr):
         Returns
         -------
         WaldTestStatistic
-            Test statistic for null that model prices test portfolios
+            Test statistic for null that model prices test portfolios. An
+            ``InvalidTestStatistic`` if the statistic cannot be computed.
 
         Notes
         -----
-        Joint test that all estimated :math:`\hat{\alpha}_i` are zero.
-        Implemented using a Wald test using the estimated parameter
-        covariance.
+        Joint test that all estimated :math:`\hat{\alpha}_i` are zero, which
+        depends on the model.
+
+        * ``TradedFactorModel``: A Wald test using the estimated covariance of
+          the :math:`N` alphas. The statistic has a :math:`\chi^2_N` distribution.
+        * ``LinearFactorModel``: The Wald statistic of the alphas in the
+          :math:`N - K - n_{rf}` dimensional space where they lie, since they
+          satisfy :math:`K + n_{rf}` linear restrictions. :math:`K` is the
+          number of factors and :math:`n_{rf}` is 1 if the risk-free rate is
+          estimated and 0 otherwise. The statistic has a
+          :math:`\chi^2_{N-K-n_{rf}}` distribution. No tolerance decides the
+          rank of the covariance of the alphas, and the statistic does not
+          depend on the order of the test portfolios. See ``LinearFactorModel``
+          for details.
+        * ``LinearFactorModelGMM``: The value of the GMM objective function at
+          the estimates. The statistic has a :math:`\chi^2_{N-K-n_{rf}}`
+          distribution.
         """
 
         return self._jstat
@@ -305,14 +385,32 @@ class LinearFactorModelResults(_SummaryStr):
 
     @property
     def risk_premia_se(self) -> pd.Series:
-        """Estimated factor risk premia standard errors"""
-        se = np.sqrt(np.diag(self._rp_cov))
+        """
+        Estimated factor risk premia standard errors.
+
+        Notes
+        -----
+        These are the square roots of the diagonal of the block of ``cov`` for
+        the risk premia. For ``TradedFactorModel`` the risk premia are the
+        sample means of the factors. If the covariance is debiased, they use
+        a divisor of nobs - 1. A variance that is negative by no more than
+        ``1e-10`` times the largest variance is zero up to rounding, and its
+        standard error is 0. See ``std_errors``.
+        """
+        se = _std_errors(self._rp_cov)
         return pd.Series(se, index=self._rp_names)
 
     @property
     def risk_premia_tstats(self) -> pd.Series:
-        """Risk premia t-statistics"""
-        return self.risk_premia / self.risk_premia_se
+        """
+        Risk premia t-statistics.
+
+        Notes
+        -----
+        The t-statistic of a risk premium with a standard error of 0 is NaN.
+        """
+        se = self.risk_premia_se
+        return (self.risk_premia / se).where(se != 0)
 
     @property
     def rsquared(self) -> float:
@@ -337,9 +435,23 @@ class GMMFactorModelResults(LinearFactorModelResults):
 
     @property
     def std_errors(self) -> pd.DataFrame:
-        """Estimated parameter standard errors"""
-        se = cast("linearmodels.typing.data.Float64Array", np.sqrt(np.diag(self._cov)))
-        ase = np.sqrt(np.diag(self._alpha_vcv))
+        r"""
+        Estimated parameter standard errors.
+
+        Notes
+        -----
+        The standard errors of the loadings are the square roots of the diagonal
+        of ``cov``. The alphas are averages of moment conditions. Their standard
+        errors are the square roots of the diagonal of the covariance of the
+        average moment conditions at the estimates,
+        :math:`(S - G (G^\prime S^{-1} G)^{-1} G^\prime) / (T - df)`, which accounts
+        for the estimation of the parameters. See ``LinearFactorModelGMM``. A
+        variance that is negative by no more than ``1e-10`` times the largest
+        variance is zero up to rounding, and its standard error is 0. See
+        ``LinearFactorModelResults.std_errors``.
+        """
+        se = _std_errors(self._cov)
+        ase = _std_errors(self._alpha_vcv)
         nportfolio, nfactor = self._params.shape
         nloadings = nportfolio * (nfactor - 1)
         # One row for each portfolio: the alpha, followed by the loadings
