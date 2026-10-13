@@ -662,7 +662,6 @@ def test_iv_models_explicit_bandwidth_works_with_the_observations_that_raise(
     model, kernel
 ):
     nobs = fewest_observations(kernel) - 1
-    mod = model(*iv_args(iv_data(nobs)))
     # The kappa of LIML, which the IV models compute, needs at least 1 + the number
     # of endogenous variables observations more than instruments. With the constant,
     # the 3 observations of the Bartlett kernel leave 1 for 2, and a matrix with an
