@@ -470,6 +470,19 @@ The reported
 
 \begin_layout Standard
 \noindent
+Each
+\begin_inset Formula $R^{2}$
+\end_inset
+
+ is NaN, with no error or warning, if the total sum of squares that it divides
+ by is zero, up to rounding error, since it is not defined then.
+ If the dependent variable of an equation does not vary, the equation has
+ no weight in Dhrymes’ measure and Berndt’s measure is NaN, and if none
+ of the dependent variables vary, every measure is NaN.
+\end_layout
+
+\begin_layout Standard
+\noindent
 
 \series bold
 F statistics

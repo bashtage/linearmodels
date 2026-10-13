@@ -162,7 +162,27 @@ class PanelResults(_SummaryStr):
 
     @property
     def rsquared(self) -> float:
-        """Model Coefficient of determination"""
+        """
+        Model Coefficient of determination
+
+        Returns
+        -------
+        float
+            The coefficient of determination of the model.
+
+        Notes
+        -----
+        The coefficient of determination is NaN if its total sum of squares is zero,
+        up to rounding error, since it is not defined then. This happens if the
+        dependent variable does not vary, or if nothing varies once the means or the
+        effects of the model are removed. No error or warning is raised.
+
+        The limit is the rounding error of the computation. If the effects are removed
+        by an iterative algorithm (``use_lsmr=True`` in ``fit``), its error is larger,
+        by default about 1e-8 relative to the size of the dependent variable, so that a
+        dependent variable that the effects explain exactly can have a total sum of
+        squares that is not recognized as zero.
+        """
         return self._r2
 
     @property
@@ -183,6 +203,11 @@ class PanelResults(_SummaryStr):
 
         See the mathematical reference in the documentation for the formal
         definition of this measure.
+
+        It is NaN if its total sum of squares is zero, up to rounding error, i.e., if
+        the time-averaged dependent variable is the same for every entity in a model
+        with a constant, or is 0 for every entity in a model without one. No error or
+        warning is raised.
         """
         return self._r2b
 
@@ -204,6 +229,10 @@ class PanelResults(_SummaryStr):
 
         See the mathematical reference in the documentation for the formal
         definition of this measure.
+
+        It is NaN if its total sum of squares is zero, up to rounding error, i.e., if
+        the dependent variable does not vary within entities, which includes a panel
+        with a single time period. No error or warning is raised.
         """
         return self._r2w
 
@@ -225,6 +254,10 @@ class PanelResults(_SummaryStr):
 
         See the mathematical reference in the documentation for the formal
         definition of this measure.
+
+        It is NaN if its total sum of squares is zero, up to rounding error, i.e., if
+        the dependent variable does not vary in a model with a constant, or is 0 in a
+        model without one. No error or warning is raised.
         """
         return self._r2o
 
@@ -252,6 +285,11 @@ class PanelResults(_SummaryStr):
            Corr[\bar{y}_i, \bar{x}_i\hat{\beta}]
 
         This measure **does not** account for weights.
+
+        It is NaN if the entity-wise averaged dependent variable is the same for every
+        entity, up to rounding error, since the correlation is not defined, and it is 0
+        if the predictions are the same for every entity. No error or warning is
+        raised.
         """
         return self._c2b
 
@@ -279,6 +317,10 @@ class PanelResults(_SummaryStr):
            Corr[y_{it}-\bar{y}_i, (x_{it}-\bar{x}_i)\hat{\beta}]
 
         This measure **does not** account for weights.
+
+        It is NaN if the dependent variable does not vary within entities, up to
+        rounding error, since the correlation is not defined, and it is 0 if the
+        demeaned predictions do not vary. No error or warning is raised.
         """
         return self._c2w
 
@@ -305,6 +347,10 @@ class PanelResults(_SummaryStr):
            Corr[y_{it}, x_{it}\hat{\beta}]
 
         This measure **does not** account for weights.
+
+        It is NaN if the dependent variable does not vary, up to rounding error, since
+        the correlation is not defined, and it is 0 if the predictions do not vary. No
+        error or warning is raised.
         """
         return self._c2o
 
@@ -1052,7 +1098,19 @@ class PanelEffectsResults(PanelResults):
 
     @property
     def rsquared_inclusive(self) -> float:
-        """Model Coefficient of determination including fit of included effects"""
+        """
+        Model Coefficient of determination including fit of included effects
+
+        Returns
+        -------
+        float
+            The coefficient of determination of the model and the effects.
+
+        Notes
+        -----
+        It is NaN if its total sum of squares is zero, up to rounding error, i.e., if
+        the dependent variable does not vary. No error or warning is raised.
+        """
         return self._r2_ex_effects
 
     @property
@@ -1583,7 +1641,10 @@ class FamaMacBethResults(PanelResults):
 
         This value contains the average of the individual adjusted rsquared
         values across the nobs cross-sectional regressions. An rsquare value
-        is only included in the average if a cross-section has full rank.
+        is only included in the average if a cross-section has full rank and if
+        the dependent variable of the cross-section varies, since the coefficient
+        of determination is NaN, up to rounding error, if its total sum of squares
+        is zero.
         """
         return self._avg_r2
 
@@ -1594,9 +1655,11 @@ class FamaMacBethResults(PanelResults):
 
         This value contains the average of the individual adjusted rsquared
         values across the nobs cross-sectional regressions. An rsquare value
-        is only included in the average if a cross-section has full rank and
+        is only included in the average if a cross-section has full rank,
         if the number of dependent variables in a cross-section is larger than
-        the number of regressors.
+        the number of regressors, and if the dependent variable of the
+        cross-section varies, since the coefficient of determination is NaN, up to
+        rounding error, if its total sum of squares is zero.
         """
         return self._avg_adj_r2
 

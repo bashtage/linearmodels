@@ -7,6 +7,7 @@ from collections.abc import Hashable, Iterable
 from copy import deepcopy
 import hashlib
 from inspect import signature
+from math import isnan
 from typing import Any, DefaultDict, Union, cast
 import warnings
 
@@ -68,6 +69,7 @@ from linearmodels.shared.alignment import (
 from linearmodels.shared.exceptions import lookup_option, missing_warning
 from linearmodels.shared.hypotheses import InvalidTestStatistic, WaldTestStatistic
 from linearmodels.shared.inputs import as_array_like
+from linearmodels.shared.rsquared import r_squared
 from linearmodels.shared.utility import DataFrameWrapper, SeriesWrapper
 import linearmodels.typing.data
 
@@ -78,6 +80,11 @@ try:
     HAVE_XXHASH = True
 except ImportError:
     pass
+
+
+def _non_negative(r2: float) -> float:
+    """Clip an R2 at 0, which is not clipped if it is NaN since it is not defined"""
+    return r2 if isnan(r2) else max(r2, 0.0)
 
 
 class Hasher:
@@ -1642,11 +1649,14 @@ class AbsorbingLS:
         w = self.weights.ndarray
         root_w = sqrt(w)
         e = self._dependent.ndarray * root_w
+        # The size of the dependent variable, before the means and the effects are removed
+        y_ss = float(squeeze(e.T @ e))
         if self.has_constant:
             e = e - root_w * average(self._dependent.ndarray, weights=w)
 
         total_ss = float(squeeze(e.T @ e))
-        r2 = max(1 - residual_ss / total_ss, 0.0)
+        nobs = e.shape[0]
+        r2 = _non_negative(r_squared(float(residual_ss), total_ss, y_ss, nobs))
 
         e = self._absorbed_dependent.to_numpy()  # already scaled by root_w
         # If absorbing contains a constant, but exog does not, no need to demean
@@ -1658,7 +1668,9 @@ class AbsorbingLS:
             e = e - x * mu
 
         aborbed_total_ss = float(squeeze(e.T @ e))
-        r2_absorbed = max(1 - residual_ss / aborbed_total_ss, 0.0)
+        r2_absorbed = _non_negative(
+            r_squared(float(residual_ss), aborbed_total_ss, y_ss, nobs)
+        )
 
         fstat = self._f_statistic(params, cov, debiased)
         out = {

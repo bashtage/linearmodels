@@ -31,6 +31,7 @@ from linearmodels.shared.alignment import check_alignment, row_labels
 from linearmodels.shared.exceptions import missing_warning, unknown_option_error
 from linearmodels.shared.hypotheses import WaldTestStatistic
 from linearmodels.shared.linalg import has_constant
+from linearmodels.shared.rsquared import r_squared
 from linearmodels.shared.typed_getters import get_float, get_string
 from linearmodels.shared.utility import AttrDict
 import linearmodels.typing.data
@@ -539,7 +540,7 @@ class TradedFactorModel(_FactorModelBase):
         residual_ss = (eps**2).sum()
         e = p - p.mean(0)[None, :]
         total_ss = (e**2).sum()
-        r2 = 1 - residual_ss / total_ss
+        r2 = r_squared(residual_ss, total_ss, (p**2).sum(), p.shape[0])
         param_names = []
         for portfolio in self.portfolios.cols:
             param_names.append(f"alpha-{portfolio}")
@@ -965,7 +966,7 @@ class LinearFactorModel(_LinearFactorModelBase):
 
         total_ss = ((p - p.mean(0)[None, :]) ** 2).sum()
         residual_ss = (eps**2).sum()
-        r2 = 1 - residual_ss / total_ss
+        r2 = r_squared(residual_ss, total_ss, (p**2).sum(), p.shape[0])
         rp = lam
         rp_cov = full_vcv[s1:s2, s1:s2]
         betas = betas if excess_returns else betas[:, 1:]
@@ -1467,9 +1468,10 @@ class LinearFactorModelGMM(_LinearFactorModelBase):
         resids -= resids.mean(0)[None, :]
         residual_ss = (resids**2).sum()
         total = self.portfolios.ndarray
+        y_ss = (self.portfolios.ndarray**2).sum()
         total = total - total.mean(0)[None, :]
         total_ss = (total**2).sum()
-        r2 = 1.0 - residual_ss / total_ss
+        r2 = r_squared(residual_ss, total_ss, y_ss, self.portfolios.shape[0])
         param_names = []
         for portfolio in self.portfolios.cols:
             param_names.extend(

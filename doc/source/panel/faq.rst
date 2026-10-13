@@ -254,3 +254,11 @@ the actual model fit, after adjusting the data for:
 * re-centering (:class:`~linearmodels.panel.model.RandomEffects`)
 * within entity aggregation (:class:`~linearmodels.panel.model.BetweenOLS`)
 * differencing (:class:`~linearmodels.panel.model.FirstDifferenceOLS`)
+
+An :math:`R^2` is NaN, with no error or warning, if the total sum of squares that it
+divides by is zero, up to rounding error, since it is not defined then. This
+happens if the dependent variable does not vary, or if it has no variation left
+once the means or the effects of the measure are removed, e.g., the within
+:math:`R^2` of a dependent variable that is constant within each entity, or of a
+panel with a single time period. See
+:attr:`~linearmodels.panel.results.PanelResults.rsquared_within`.

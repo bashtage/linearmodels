@@ -116,7 +116,20 @@ class _ModelComparison(_SummaryStr):
 
     @property
     def rsquared(self) -> Series:
-        """Coefficients of determination (R**2)"""
+        """
+        Coefficients of determination (R**2)
+
+        Returns
+        -------
+        Series
+            The coefficient of determination of each model.
+
+        Notes
+        -----
+        The value of a model is NaN if its coefficient of determination is not
+        defined, e.g., if the total sum of squares is zero. See the ``rsquared`` of
+        the results of the models.
+        """
         return self._get_property("rsquared")
 
     @property

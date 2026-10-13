@@ -70,6 +70,7 @@ from linearmodels.shared.exceptions import (
 )
 from linearmodels.shared.hypotheses import InvalidTestStatistic, WaldTestStatistic
 from linearmodels.shared.linalg import has_constant, inv_sqrth
+from linearmodels.shared.rsquared import r_squared
 from linearmodels.shared.utility import DataFrameWrapper, SeriesWrapper
 import linearmodels.typing
 import linearmodels.typing.data
@@ -531,7 +532,8 @@ class _IVModelBase:
             e = e - self._sqrt_weights * average(self._y, weights=w)
 
         total_ss = float(squeeze(e.T @ e))
-        r2 = 1 - residual_ss / total_ss
+        y_ss = float(squeeze(self._wy.T @ self._wy))
+        r2 = r_squared(float(residual_ss), total_ss, y_ss, self._y.shape[0])
 
         fstat = self._f_statistic(params, cov, debiased)
         out = {
@@ -545,7 +547,7 @@ class _IVModelBase:
             "debiased": debiased,
             "residual_ss": float(residual_ss),
             "total_ss": float(total_ss),
-            "r2": float(squeeze(r2)),
+            "r2": r2,
             "fstat": fstat,
             "vars": columns,
             "instruments": self._instr_columns,
