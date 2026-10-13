@@ -17,7 +17,7 @@ from numpy import (
     unique,
     where,
 )
-from numpy.linalg import eigh, inv, matrix_rank, svd
+from numpy.linalg import LinAlgError, eigh, inv, matrix_rank, svd
 from scipy.linalg import cholesky, solve_triangular
 
 from linearmodels.iv._utility import annihilate
@@ -809,7 +809,15 @@ def f_statistic(
         )
     test_params = params[non_const]
     test_cov = cov[ix_(non_const, non_const)]
-    test_stat = float(squeeze(test_params.T @ inv(test_cov) @ test_params))
+    try:
+        inv_test_cov = inv(test_cov)
+    except LinAlgError:
+        # The model fits exactly, e.g., the dependent variable is all zero, so that
+        # the covariance of the parameters is 0
+        return InvalidTestStatistic(
+            "The covariance of the parameters is singular", name=name
+        )
+    test_stat = float(squeeze(test_params.T @ inv_test_cov @ test_params))
     df = test_params.shape[0]
     if debiased:
         wald = WaldTestStatistic(test_stat / df, null, df, resid_df, name=name)

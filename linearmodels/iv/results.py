@@ -269,6 +269,10 @@ class _LSModelResultsBase(_SummaryStr):
 
         This version of the F-statistic directly uses the model covariance
         estimator and so is robust against the same specification issues.
+
+        An ``InvalidTestStatistic`` is returned if the model has no non-constant
+        exogenous terms, or if the covariance of the parameters is singular, e.g.,
+        the dependent variable is all zero, so that the model fits exactly.
         """
         return self._f_statistic
 

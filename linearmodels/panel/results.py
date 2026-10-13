@@ -795,6 +795,10 @@ class PanelResults(_SummaryStr):
         If ``debiased`` is True, then the Wald statistic is divided by the
         number of restrictions and inference is made using an :math:`F_{k,df}`
         distribution where df is the residual degree of freedom from the model.
+
+        An ``InvalidTestStatistic`` is returned if the model only has a constant,
+        or if the covariance of the parameters is singular, e.g., the dependent
+        variable is all zero, so that the model fits exactly.
         """
         from linearmodels.panel.model import _deferred_f  # noqa: PLC0415
 
@@ -1467,9 +1471,9 @@ class FamaMacBethResults(PanelResults):
         WaldTestStatistic
             Statistic value, distribution and p-value. It is an
             ``InvalidTestStatistic`` if the model contains only a constant, or
-            if the number of periods that are averaged is not larger than the
-            number of tested parameters, so that the covariance of the
-            parameters is singular.
+            if the covariance of the parameters is singular, which it is if the
+            number of periods that are averaged is not larger than the number
+            of tested parameters, or if the dependent variable is all zero.
 
         Notes
         -----

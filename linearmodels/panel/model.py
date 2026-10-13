@@ -132,6 +132,10 @@ class FInfo(NamedTuple):
     is_invalid: bool
 
 
+# The model fits exactly, e.g., the dependent variable is all zero
+_SINGULAR_COVARIANCE = "The covariance of the parameters is singular"
+
+
 def _hotelling_f(
     params: Series,
     cov: DataFrame,
@@ -167,7 +171,11 @@ def _hotelling_f(
         return InvalidTestStatistic(reason, name=name)
     test_params = np.asarray(params)[sel]
     test_cov = np.asarray(cov)[sel][:, sel]
-    wald_stat = float(test_params.T @ np.linalg.inv(test_cov) @ test_params)
+    try:
+        inv_test_cov = np.linalg.inv(test_cov)
+    except np.linalg.LinAlgError:
+        return InvalidTestStatistic(_SINGULAR_COVARIANCE, name=name)
+    wald_stat = float(test_params.T @ inv_test_cov @ test_params)
     if not debiased:
         return WaldTestStatistic(wald_stat, null, df, name=name)
     scale = (nperiod - df) / (df * (nperiod - 1))
@@ -188,7 +196,11 @@ def _deferred_f(
     name = f_info.name
     test_params = np.asarray(params)[sel]
     test_cov = np.asarray(cov)[sel][:, sel]
-    test_stat = test_params.T @ np.linalg.inv(test_cov) @ test_params
+    try:
+        inv_test_cov = np.linalg.inv(test_cov)
+    except np.linalg.LinAlgError:
+        return InvalidTestStatistic(_SINGULAR_COVARIANCE, name=name)
+    test_stat = test_params.T @ inv_test_cov @ test_params
     test_stat = float(test_stat)
     df = int(sel.sum())
     null = "All parameters ex. constant are zero"
