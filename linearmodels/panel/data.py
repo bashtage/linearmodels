@@ -2,7 +2,7 @@ from __future__ import annotations
 
 from linearmodels.compat.pandas import PD_GTE_21
 
-from collections.abc import Hashable, Sequence
+from collections.abc import Sequence
 from itertools import product
 from typing import Literal, Union, cast, overload
 
@@ -117,6 +117,9 @@ def convert_columns(s: Series, drop_first: bool) -> linearmodels.typing.AnyPanda
 
 
 def expand_categoricals(x: DataFrame, drop_first: bool) -> DataFrame:
+    if x.shape[1] == 0:
+        # Nothing to convert, and concat needs an object
+        return x
     return concat(
         [convert_columns(x[c], drop_first) for c in x.columns], axis=1, sort=False
     )
@@ -161,9 +164,31 @@ class PanelData:
     Index level 1 is time.  The columns are the variables.  MultiIndex Series
     are also accepted and treated as single column MultiIndex DataFrames.
 
+    The data can have no variables, a DataFrame with a MultiIndex and no columns
+    or an array with 0 variables. It is the ``exog`` of a
+    :class:`~linearmodels.panel.model.PanelOLS` model that only has effects. The
+    means, counts and demeaned data have no variables either.
+
     Missing values (NaN) in the entity or time index are not supported. The
     methods that group by the index raise a ValueError if the level that they
     use has a missing label.
+
+    The time labels must be numbers or dates. A pandas ``PeriodIndex`` is
+    accepted: it is converted with ``to_timestamp()``, so that the time labels
+    are the timestamps at the start of the periods, and the data are the same
+    as those of a panel that is indexed by timestamps.
+
+    Each combination of an entity and a time period can appear only once, since
+    an observation is identified by them.
+
+    .. versionchanged:: 7.1
+
+       Duplicated (entity, time) rows raise a ``ValueError``. Earlier versions
+       accepted them, except for the first difference estimator, which raised an
+       error from pandas, and the other estimators treated them as separate
+       observations. A ``PeriodIndex`` of time labels is accepted. Earlier
+       versions raised a ``ValueError`` that the time labels must be numeric or
+       date-like.
 
     Raises
     ------
@@ -171,7 +196,9 @@ class PanelData:
         If the input type is not supported
     ValueError
         If the input has the wrong number of dimensions or a MultiIndex
-        DataFrame does not have 2 levels
+        DataFrame does not have 2 levels, if the time labels are neither
+        numbers nor dates, or if a combination of an entity and a time
+        period appears more than once
     """
 
     def __init__(
@@ -204,15 +231,12 @@ class PanelData:
                     if x.ndim == 2:
                         x = x.to_pandas()
                     else:
-                        items: list[Hashable] = cast(
-                            "list[Hashable]", np.asarray(x.coords[x.dims[0]]).tolist()
-                        )
-                        major: list[Hashable] = cast(
-                            "list[Hashable]", np.asarray(x.coords[x.dims[1]]).tolist()
-                        )
-                        minor: list[Hashable] = cast(
-                            "list[Hashable]", np.asarray(x.coords[x.dims[2]]).tolist()
-                        )
+                        # The indexes keep the type of the coordinates. tolist() turns
+                        # datetime64[ns] values into integers since a datetime cannot
+                        # hold nanoseconds.
+                        items = x.get_index(x.dims[0]).rename(None)
+                        major = x.get_index(x.dims[1]).rename(None)
+                        minor = x.get_index(x.dims[2]).rename(None)
                         values = x.values
                         x = panel_to_frame(values, items, major, minor, True)
             except ImportError:
@@ -236,6 +260,15 @@ class PanelData:
                 if copy:
                     self._frame = self._frame.copy()
             else:
+                if not x.index.is_unique:
+                    label = x.index[int(np.argmax(np.asarray(x.index.duplicated())))]
+                    raise ValueError(
+                        "Each combination of an entity and a time period can appear "
+                        f"only once, but the time label {label} appears more than "
+                        "once in the index of a DataFrame with time as the index and "
+                        "entities as the columns, so that each entity has more than "
+                        "one observation at that time."
+                    )
                 options = {"future_stack": True} if PD_GTE_21 else {"dropna": False}
                 self._frame = DataFrame({var_name: x.T.stack(**options)})
         elif isinstance(x, np.ndarray):
@@ -248,7 +281,9 @@ class PanelData:
                 x = x[None, :, :]
 
             k, t, n = x.shape
-            var_str = var_name + ".{0:0>" + str(int(np.log10(k) + 0.01)) + "}"
+            # An array without variables has no names, and no digits to pad
+            ndigits = int(np.log10(k) + 0.01) if k > 0 else 0
+            var_str = var_name + ".{0:0>" + str(ndigits) + "}"
             variables = [var_name] if k == 1 else [var_str.format(i) for i in range(k)]
             entity_str = "entity.{0:0>" + str(int(np.log10(n) + 0.01)) + "}"
             entities = [entity_str.format(i) for i in range(n)]
@@ -278,6 +313,12 @@ class PanelData:
                     f"it cannot be converted to float64: {exc}"
                 ) from exc
 
+        time_level = self.index.levels[1]
+        if isinstance(time_level, pd.PeriodIndex):
+            # A period is identified by its start, as a date is in a DatetimeIndex. The
+            # frame is not changed in place since it can be the frame of the caller.
+            timestamps = self.index.set_levels(time_level.to_timestamp(), level=1)
+            self._frame = self._frame.set_axis(timestamps, axis=0)
         time_index = Series(self.index.levels[1])
         if not (
             is_numeric_dtype(time_index.dtype)
@@ -286,9 +327,37 @@ class PanelData:
             raise ValueError(
                 "The index on the time dimension must be either numeric or date-like"
             )
+        self._check_unique(index_names)
         # self._k, self._t, self._n = self.panel.shape
         self._k, self._t, self._n = self.shape
         self._frame.index = self._frame.index.set_names(index_names)
+
+    def _check_unique(self, index_names: Sequence[str]) -> None:
+        """
+        Raise a ValueError if an (entity, time) combination appears more than once
+
+        Parameters
+        ----------
+        index_names : sequence of str
+            The names of the entity and time levels, which are used in the message.
+
+        Raises
+        ------
+        ValueError
+            If the index has duplicated entries. The message names the first of
+            them, the first row that repeats an earlier row.
+        """
+        index = self.index
+        if index.is_unique:
+            return
+        duplicated = np.asarray(index.duplicated())
+        first = index[int(np.argmax(duplicated))]
+        entity, time = index_names
+        raise ValueError(
+            "Each combination of an entity and a time period can appear only once, "
+            f"but {int(duplicated.sum())} row(s) repeat an earlier row. The first "
+            f"duplicated entry is {entity}={first[0]}, {time}={first[1]}."
+        )
 
     @property
     def panel(self) -> _Panel:
@@ -500,6 +569,9 @@ class PanelData:
         """
         if not isinstance(groups, PanelData):
             groups = PanelData(groups)
+        if self._frame.shape[1] == 0:
+            # There are no variables to demean
+            return PanelData(self._frame.copy())
         if weights is None:
             weights = PanelData(
                 DataFrame(
@@ -647,7 +719,8 @@ class PanelData:
                 return self._demean_both_low_mem(weights)
 
         level = 0 if group == "entity" else 1
-        if weights is None:
+        if weights is None or self._frame.shape[1] == 0:
+            # The weights have no variables to weight if the frame has no columns
             group_mu = self._frame.groupby(level=level).transform("mean")
             out = self._frame - group_mu
             if not return_panel:
@@ -739,7 +812,8 @@ class PanelData:
         """
         level = 0 if group == "entity" else 1
         self._check_index(level)
-        if weights is None:
+        if weights is None or self._frame.shape[1] == 0:
+            # There are no variables to weight if the frame has no columns
             mu = self._frame.groupby(level=level).mean()
         else:
             w = weights.values2d

@@ -55,6 +55,7 @@ from linearmodels.shared.alignment import (
     is_labelled,
     labels_1d,
     misaligned,
+    same_labels,
 )
 from linearmodels.shared.exceptions import (
     InferenceUnavailableWarning,
@@ -71,8 +72,10 @@ from linearmodels.shared.hypotheses import (
 )
 from linearmodels.shared.inputs import as_array_like, as_float64
 from linearmodels.shared.linalg import has_constant
+from linearmodels.shared.rsquared import r_squared, total_ss_is_zero
 from linearmodels.shared.typed_getters import get_panel_data_like
 from linearmodels.shared.utility import AttrDict, ensure_unique_column, panel_to_frame
+from linearmodels.shared.weights import check_weights, normalize_weights
 from linearmodels.typing import BoolArray
 import linearmodels.typing.data
 
@@ -103,6 +106,10 @@ def _lstsq(
     int,
     linearmodels.typing.data.Float64Array,
 ]:
+    if x.shape[1] == 0 or (y.ndim == 2 and y.shape[1] == 0):
+        # There are no regressors, or no variables to regress
+        empty = np.empty(0)
+        return np.zeros((x.shape[1], *y.shape[1:])), empty, 0, empty
     if rcond is None:
         eps = np.finfo(np.float64).eps
         cond = float(max(x.shape) * eps)
@@ -130,6 +137,10 @@ class FInfo(NamedTuple):
     name: str
     invalid_test_stat: InvalidTestStatistic | None
     is_invalid: bool
+
+
+# The model fits exactly, e.g., the dependent variable is all zero
+_SINGULAR_COVARIANCE = "The covariance of the parameters is singular"
 
 
 def _hotelling_f(
@@ -167,7 +178,11 @@ def _hotelling_f(
         return InvalidTestStatistic(reason, name=name)
     test_params = np.asarray(params)[sel]
     test_cov = np.asarray(cov)[sel][:, sel]
-    wald_stat = float(test_params.T @ np.linalg.inv(test_cov) @ test_params)
+    try:
+        inv_test_cov = np.linalg.inv(test_cov)
+    except np.linalg.LinAlgError:
+        return InvalidTestStatistic(_SINGULAR_COVARIANCE, name=name)
+    wald_stat = float(test_params.T @ inv_test_cov @ test_params)
     if not debiased:
         return WaldTestStatistic(wald_stat, null, df, name=name)
     scale = (nperiod - df) / (df * (nperiod - 1))
@@ -188,7 +203,11 @@ def _deferred_f(
     name = f_info.name
     test_params = np.asarray(params)[sel]
     test_cov = np.asarray(cov)[sel][:, sel]
-    test_stat = test_params.T @ np.linalg.inv(test_cov) @ test_params
+    try:
+        inv_test_cov = np.linalg.inv(test_cov)
+    except np.linalg.LinAlgError:
+        return InvalidTestStatistic(_SINGULAR_COVARIANCE, name=name)
+    test_stat = test_params.T @ inv_test_cov @ test_params
     test_stat = float(test_stat)
     df = int(sel.sum())
     null = "All parameters ex. constant are zero"
@@ -497,6 +516,8 @@ class _PanelModelBase:
         the weight should be homoskedastic.
         Weights can be given for each observation, for each time period,
         for each entity or for each combination of time period and entity.
+        The weights must be strictly positive and finite. They are rescaled to have a
+        mean of 1. A NaN weight is missing, and its observation is dropped.
         Weights with labels must use the same labels, in the same order,
         as dependent or, if dependent has no labels, as exog. See
         :ref:`panel-input-alignment`.
@@ -552,6 +573,24 @@ class _PanelModelBase:
         self._check_rank = bool(check_rank)
         self._validate_data()
         self._singleton_index: linearmodels.typing.data.BoolArray | None = None
+        self._check_regressors()
+
+    def _check_regressors(self) -> None:
+        """
+        Raise a ValueError if exog has no columns
+
+        Raises
+        ------
+        ValueError
+            If exog has no columns. Only PanelOLS with effects can estimate a model
+            without regressors.
+        """
+        if self.exog.nvar == 0:
+            raise ValueError(
+                f"{self.__class__.__name__} needs at least one regressor, but exog "
+                "has no columns. Only PanelOLS can estimate a model without "
+                "regressors, and it needs entity, time or other effects."
+            )
 
     def __str__(self) -> str:
         out = "{name} \nNum exog: {num_exog}, Constant: {has_constant}"
@@ -852,7 +891,7 @@ class _PanelModelBase:
             expected = MultiIndex.from_product(
                 _grid_axes(self._labels),
             )
-            if len(expected) == len(rows) and not rows.index.equals(expected):
+            if len(expected) == len(rows) and not same_labels(rows.index, expected):
                 raise misaligned(
                     name,
                     "The time and entity index",
@@ -878,6 +917,26 @@ class _PanelModelBase:
             )
         return rank_of_x
 
+    def _missing_in_other_inputs(self) -> BoolArray | None:
+        """
+        Observations that are missing in inputs other than the data of the model
+
+        Returns
+        -------
+        ndarray or None
+            A boolean array with a value for each row of dependent, which is True
+            for the observations to drop since an input that the model validates,
+            e.g., the other effects of PanelOLS, is missing. None if there are
+            no such inputs.
+
+        Notes
+        -----
+        The observations are dropped together with those that are missing in
+        dependent, exog and weights, so that there is a single warning and the
+        weights and the constant are determined from the observations that remain.
+        """
+        return None
+
     def _validate_data(self) -> None:
         """Check input shape and remove missing"""
         y = self._y = cast(
@@ -899,13 +958,21 @@ class _PanelModelBase:
                 "weights must have the same number of observations as dependent."
             )
 
-        all_missing = np.any(np.isnan(y), axis=1) & np.all(np.isnan(x), axis=1)
+        # The rows that are missing in dependent and in all of the regressors are
+        # dropped without a warning. If there are no regressors, the rows that are
+        # missing in dependent only get the warning
+        all_missing = np.any(np.isnan(y), axis=1) & (
+            np.all(np.isnan(x), axis=1) & (x.shape[1] > 0)
+        )
         missing = np.asarray(
             np.any(np.isnan(y), axis=1)
             | np.any(np.isnan(x), axis=1)
             | np.any(np.isnan(w), axis=1),
             dtype=bool,
         )
+        missing_in_other_inputs = self._missing_in_other_inputs()
+        if missing_in_other_inputs is not None:
+            missing = missing | missing_in_other_inputs
 
         missing_warning(np.asarray(all_missing ^ missing), stacklevel=4)
         if np.any(missing):
@@ -918,9 +985,10 @@ class _PanelModelBase:
 
         w_df = self.weights.dataframe
         w_values = np.asarray(w_df)
-        if np.any(w_values <= 0) or np.any(np.isinf(w_values)):
-            raise ValueError("weights must be strictly positive and finite.")
-        w_df = w_df / w_df.mean()
+        check_weights(w_values)
+        w_df = DataFrame(
+            normalize_weights(w_values), index=w_df.index, columns=w_df.columns
+        )
         self.weights = PanelData(w_df)
         rank_of_x = self._check_exog_rank()
         self._constant, self._constant_index = has_constant(x, rank_of_x)
@@ -971,6 +1039,8 @@ class _PanelModelBase:
         weps_const = y
         num_df = x.shape[1]
         name = "Model F-statistic (homoskedastic)"
+        if num_df == 0:
+            return InvalidTestStatistic("Model contains no regressors", name=name)
         if df_resid <= 0:
             return InvalidTestStatistic(
                 "The model has no residual degrees of freedom", name=name
@@ -1006,6 +1076,13 @@ class _PanelModelBase:
         sel = np.ones(params.shape[0], dtype=bool)
         name = "Model F-statistic (robust)"
 
+        if len(sel) == 0:
+            return FInfo(
+                sel,
+                name,
+                InvalidTestStatistic("Model contains no regressors", name=name),
+                True,
+            )
         if self.has_constant:
             if len(sel) == 1:
                 return FInfo(
@@ -1042,39 +1119,38 @@ class _PanelModelBase:
         self, params: linearmodels.typing.data.Float64Array
     ) -> tuple[float, float, float]:
         """Correlation-based measures of R2"""
+
+        def corr_squared(
+            y: linearmodels.typing.data.Float64Array,
+            xb: linearmodels.typing.data.Float64Array,
+            y_ss: float,
+        ) -> float:
+            # Undefined if y does not vary. 0 if the prediction does not vary
+            if total_ss_is_zero(float(((y - y.mean()) ** 2).sum()), y_ss, y.shape[0]):
+                return np.nan
+            return np.corrcoef(y.T, xb.T)[0, 1] ** 2 if xb.std() > 0 else 0.0
+
         # Overall
         y = self.dependent.values2d
         x = self.exog.values2d
-        xb = x @ params
-        r2o = 0.0
-        if y.std() > 0 and xb.std() > 0:
-            r2o = np.corrcoef(y.T, (x @ params).T)[0, 1]
+        y_ss = float((y**2).sum())
+        r2o = corr_squared(y, x @ params, y_ss)
         # Between
         y = np.asarray(self.dependent.mean("entity"))
         x = np.asarray(self.exog.mean("entity"))
-        xb = x @ params
-        r2b = 0.0
-        if y.std() > 0 and xb.std() > 0:
-            r2b = np.corrcoef(y.T, (x @ params).T)[0, 1]
+        r2b = corr_squared(y, x @ params, float((y**2).sum()))
 
         # Within
         y = self.dependent.demean("entity", return_panel=False)
         x = self.exog.demean("entity", return_panel=False)
-        xb = x @ params
-        r2w = 0.0
-        if y.std() > 0 and xb.std() > 0:
-            r2w = np.corrcoef(y.T, xb.T)[0, 1]
+        r2w = corr_squared(y, x @ params, y_ss)
 
-        return r2o**2, r2w**2, r2b**2
+        return r2o, r2w, r2b
 
     def _rsquared(
         self, params: linearmodels.typing.data.Float64Array, reweight: bool = False
     ) -> tuple[float, float, float]:
         """Compute alternative measures of R2"""
-        if self.has_constant and self.exog.nvar == 1:
-            # Constant only fast track
-            return 0.0, 0.0, 0.0
-
         #############################################
         # R2 - Between
         #############################################
@@ -1092,7 +1168,8 @@ class _PanelModelBase:
             e = y - (w * y).sum() / w.sum()
 
         total_ss = float(np.squeeze(w.T @ (e**2)))
-        r2b = 1 - residual_ss / total_ss if total_ss > 0.0 else 0.0
+        y_ss = float(np.squeeze(w.T @ (y**2)))
+        r2b = r_squared(residual_ss, total_ss, y_ss, y.shape[0])
 
         #############################################
         # R2 - Overall
@@ -1108,7 +1185,8 @@ class _PanelModelBase:
         mu = (w * y).sum() / w.sum() if self.has_constant else 0
         we = wy - root_w * mu
         total_ss = float(np.squeeze(we.T @ we))
-        r2o = 1 - residual_ss / total_ss if total_ss > 0.0 else 0.0
+        y_ss = float(np.squeeze(wy.T @ wy))
+        r2o = r_squared(residual_ss, total_ss, y_ss, y.shape[0])
 
         #############################################
         # R2 - Within
@@ -1127,10 +1205,11 @@ class _PanelModelBase:
         weps = wy - wx @ params
         residual_ss = float(np.squeeze(weps.T @ weps))
         total_ss = float(np.squeeze(wy.T @ wy))
-        if self.dependent.nobs == 1 or (self.exog.nvar == 1 and self.has_constant):
-            r2w = 0.0
-        else:
-            r2w = 1.0 - residual_ss / total_ss if total_ss > 0.0 else 0.0
+        r2w = r_squared(residual_ss, total_ss, y_ss, wy.shape[0])
+
+        if self.has_constant and self.exog.nvar == 1:
+            # A model with only a constant explains nothing, whatever the data
+            r2b, r2o, r2w = (np.nan if np.isnan(r2) else 0.0 for r2 in (r2b, r2o, r2w))
 
         return r2o, r2w, r2b
 
@@ -1143,8 +1222,17 @@ class _PanelModelBase:
         weps: linearmodels.typing.data.Float64Array,
         y: linearmodels.typing.data.Float64Array,
         x: linearmodels.typing.data.Float64Array,
+        weights: linearmodels.typing.data.Float64Array | None = None,
     ) -> AttrDict:
-        """Common post-estimation values"""
+        """
+        Common post-estimation values
+
+        The log-likelihood is that of the Gaussian regression whose weighted
+        residuals are ``weps`` = sqrt(w) * e, where the variance of the error of an
+        observation is sigma2 / w. Its Jacobian term is 0.5 * sum(log(w)), where w
+        is ``weights``, the weight of each of the observations of the regression.
+        There are no weights, or unit weights, if ``weights`` is None.
+        """
         f_info = self._f_statistic_robust(params)
         f_stat = self._f_statistic(weps, y, x, df_resid)
         r2o, r2w, r2b = self._rsquared(params)
@@ -1157,6 +1245,8 @@ class _PanelModelBase:
         sigma2 = float(np.squeeze(weps.T @ weps) / nobs)
         if sigma2 > 0.0:
             loglik = -0.5 * nobs * (np.log(2 * np.pi) + np.log(sigma2) + 1)
+            if weights is not None:
+                loglik += 0.5 * float(np.sum(np.log(weights)))
         else:
             loglik = np.nan
 
@@ -1365,6 +1455,8 @@ class PooledOLS(_PanelModelBase):
         the weight should be homoskedastic.
         Weights can be given for each observation, for each time period,
         for each entity or for each combination of time period and entity.
+        The weights must be strictly positive and finite. They are rescaled to have a
+        mean of 1. A NaN weight is missing, and its observation is dropped.
         Weights with labels must use the same labels, in the same order,
         as dependent or, if dependent has no labels, as exog. See
         :ref:`panel-input-alignment`.
@@ -1429,6 +1521,8 @@ class PooledOLS(_PanelModelBase):
             Weights to use in estimation.  Assumes residual variance is
             proportional to inverse of weight to that the residual times
             the weight should be homoskedastic.
+            The weights must be strictly positive and finite. They are rescaled to have
+            a mean of 1. A NaN weight is missing, and its observation is dropped.
         check_rank : bool
             Flag indicating whether to perform a rank check on the exogenous
             variables to ensure that the model is identified. Skipping this
@@ -1627,9 +1721,12 @@ class PooledOLS(_PanelModelBase):
             e = e - (w * y).sum() / w.sum()
 
         total_ss = float(np.squeeze(w.T @ (e**2)))
-        r2 = 1 - residual_ss / total_ss
+        y_ss = float(np.squeeze(w.T @ (y**2)))
+        r2 = r_squared(residual_ss, total_ss, y_ss, nobs)
 
-        res = self._postestimation(params, cov, debiased, df_resid, weps, wy, wx)
+        res = self._postestimation(
+            params, cov, debiased, df_resid, weps, wy, wx, weights=w
+        )
         res.update(
             {
                 "df_resid": df_resid,
@@ -1740,13 +1837,17 @@ class PanelOLS(_PanelModelBase):
         containers are those of ``dependent``, where a DataFrame has a column for
         each variable and an array or DataArray with several variables has 3
         dimensions (variable by time by entity). A list, a tuple or any other
-        container raises a ``TypeError`` that names ``exog``.
+        container raises a ``TypeError`` that names ``exog``. It can have no
+        variables, a DataFrame with the index of ``dependent`` and no columns or an
+        array with 0 variables, if the model has effects. See the notes.
     weights : array_like, optional
         Weights to use in estimation.  Assumes residual variance is
         proportional to inverse of weight to that the residual time
         the weight should be homoskedastic.
         Weights can be given for each observation, for each time period,
         for each entity or for each combination of time period and entity.
+        The weights must be strictly positive and finite. They are rescaled to have a
+        mean of 1. A NaN weight is missing, and its observation is dropped.
         Weights with labels must use the same labels, in the same order,
         as dependent or, if dependent has no labels, as exog. See
         :ref:`panel-input-alignment`.
@@ -1767,6 +1868,9 @@ class PanelOLS(_PanelModelBase):
         combinations that dependent does not have are not used (see
         :ref:`panel-input-alignment`). A 1-d array or list has
         a value for each row of dependent, in the order of the rows of dependent.
+        An observation where any of the other effects is missing (NaN or None) is
+        dropped, with the observations that have a missing value in dependent, exog
+        or weights, and a ``MissingValueWarning`` is issued.
     singletons : bool
         Flag indicating whether to drop singleton observation
     drop_absorbed : bool
@@ -1824,6 +1928,62 @@ class PanelOLS(_PanelModelBase):
     Model supports at most 2 effects.  These can be entity-time, entity-other,
     time-other or 2 other.
 
+    **Models without regressors**
+
+    A model that only has effects can be estimated,
+
+    .. math::
+
+        y_{it} = \alpha_i + \gamma_t + \epsilon_{it}
+
+    where either effect can be left out. The model is created with an ``exog`` that
+    has no columns, for example ``pd.DataFrame(index=y.index)`` or an array with 0
+    variables, or with a formula that has effects and no regressors, such as
+    ``"y ~ EntityEffects"`` or ``"y ~ EntityEffects + TimeEffects"``. The formula
+    gives the same results as ``exog`` without columns. The model has no constant, as
+    a constant is a regressor (``"y ~ 1 + EntityEffects"`` has one). The other models,
+    and ``PanelOLS`` without effects, raise a ``ValueError`` if ``exog`` has no
+    columns. The results of a model without regressors are:
+
+    * ``params``, ``std_errors``, ``tstats``, ``pvalues`` and ``cov`` are empty, and
+      ``conf_int`` has no rows. The summary does not have a table of parameters, and
+      ``wald_test`` raises a ``ValueError``.
+    * ``estimated_effects`` are the means of the dependent variable of the entity
+      (entity effects), of the time period (time effects), or the fitted values of
+      the regression on the dummy variables of both effects. These are weighted means
+      in a weighted model. There is no constant, so that the effects include the
+      overall mean. ``fitted_values`` are 0, and ``resids`` and ``idiosyncratic`` are
+      the dependent variable less its effects.
+    * ``df_model`` is the number of effects, which is ``N`` for entity effects, ``T``
+      for time effects and ``N + T - 1`` for both, and ``df_resid`` is ``nobs``
+      less ``df_model``.
+    * ``rsquared``, ``rsquared_within``, ``rsquared_between`` and ``rsquared_overall``
+      are 0 when they are defined, since the effects are removed from the dependent
+      variable and there is nothing else to explain it. The squared correlations
+      (``corr_squared_within``, ``corr_squared_between`` and ``corr_squared_overall``)
+      are 0 as well: the fitted values of the regressors are all 0, and these
+      measures are set to 0 if the fitted values do not vary. ``rsquared_inclusive``
+      is the R-squared of the effects, the share of the variation around the mean that
+      they explain. An R-squared is not defined if the sum of squares that it divides
+      is zero, for example ``rsquared_within`` if the dependent variable does not vary
+      within entities. If the dependent variable is constant, there is no variation to
+      explain and ``rsquared``, ``rsquared_within``, ``rsquared_inclusive`` and the
+      squared correlations are NaN.
+    * ``f_pooled`` is the test that the effects are zero. For entity effects it is
+      the F-test of the one-way analysis of variance. ``f_statistic`` and
+      ``f_statistic_robust``, which test the coefficients of the regressors, are
+      ``InvalidTestStatistic`` since there are none.
+    * ``loglik`` and ``s2`` are those of the regression on the dummy variables of the
+      effects. ``variance_decomposition`` splits the second moment of the dependent
+      variable, about 0 since there is no constant, into the variance of the
+      residuals and the rest, which is attributed to the effects.
+
+    .. versionchanged:: 7.1
+
+       A model without regressors can be estimated. Earlier versions raised a
+       ``ValueError`` from pandas, "No objects to concatenate", when ``exog`` had no
+       columns or the formula had no regressors.
+
     A variable in ``exog`` is absorbed if the effects explain all of it. The
     algorithms that remove the effects are exact only up to rounding error, or up to
     a relative error of about 1e-8 if they are iterative, so a variable is treated
@@ -1835,6 +1995,14 @@ class PanelOLS(_PanelModelBase):
     constant is never dropped. The norm includes the mean of the variable, so a
     variable with a large mean and little other variation, less than 1e-5 of its norm,
     is also treated as absorbed. Subtract its mean to avoid this.
+
+    .. versionchanged:: 7.1
+
+       An observation with a missing value in ``other_effects`` is dropped with a
+       ``MissingValueWarning``, as it is for a missing value in ``dependent``,
+       ``exog`` or ``weights``. Earlier versions treated a missing value as a
+       category of its own, and ``fit`` failed after it estimated the model with the
+       error that the observations per group cannot be computed.
     """
 
     def __init__(
@@ -1850,19 +2018,30 @@ class PanelOLS(_PanelModelBase):
         drop_absorbed: bool = False,
         check_rank: bool = True,
     ) -> None:
-        super().__init__(dependent, exog, weights=weights, check_rank=check_rank)
-
+        # The effects are needed while the data are validated, which drops the
+        # observations that have a missing value in other_effects
         self._entity_effects = entity_effects
         self._time_effects = time_effects
+        self._other_effects_input = other_effects
+        self._other_effects_rows: PanelData | None = None
+        super().__init__(dependent, exog, weights=weights, check_rank=check_rank)
+
         self._other_effect_cats: PanelData | None = None
         self._singletons = singletons
-        self._other_effects = self._validate_effects(
-            other_effects, labelled=_is_labelled(other_effects)
-        )
+        self._other_effects = self._validate_effects()
         self._has_effect = entity_effects or time_effects or self.other_effects
+        if self.exog.nvar == 0 and not self._has_effect:
+            raise ValueError(
+                "exog has no columns and the model has no effects, so there is "
+                "nothing to estimate. A model without regressors needs entity, time "
+                "or other effects."
+            )
         self._drop_absorbed = drop_absorbed
         self._singleton_index = None
         self._drop_singletons()
+
+    def _check_regressors(self) -> None:
+        """Nothing is checked here: __init__ checks that a model has effects"""
 
     def _collect_effects(self) -> linearmodels.typing.NumericArray:
         if not self._has_effect:
@@ -1920,26 +2099,48 @@ class PanelOLS(_PanelModelBase):
         out += additional
         return out
 
-    def _validate_effects(
-        self, effects: PanelDataLike | None, labelled: bool = False
-    ) -> bool:
-        """Check model effects"""
-        if effects is None:
-            return False
-        effects = as_array_like(effects, "other_effects")
-        grid = _is_grid(effects)
-        effects = self._panel_rows(effects, "other_effects", "OtherEffect")
+    def _missing_in_other_inputs(self) -> BoolArray | None:
+        """
+        Observations with a missing value in other_effects
 
+        Returns
+        -------
+        ndarray or None
+            A boolean array that is True for the observations of dependent where
+            any of the other effects is missing. None if the model does not have
+            other effects.
+        """
+        if self._other_effects_input is None:
+            return None
+        given = as_array_like(self._other_effects_input, "other_effects")
+        effects = self._panel_rows(given, "other_effects", "OtherEffect")
         if effects.shape[1:] != self._original_shape[1:]:
             raise ValueError(
                 "other_effects must have the same number of "
                 "entities and time periods as dependent."
             )
-        if grid:
+        labelled = _is_labelled(self._other_effects_input)
+        if _is_grid(given):
             # Placed on the rows of dependent by time period and entity
             effects = self._grid_to_rows(effects, labelled, "other_effects")
         else:
             self._check_labels("other_effects", effects.index, labelled)
+        nrows = len(self._original_index)
+        if effects.dataframe.shape[0] != nrows:
+            raise ValueError(
+                f"other_effects has {effects.dataframe.shape[0]} rows, but dependent "
+                f"has {nrows}. It must have a value for each row of dependent."
+            )
+        self._other_effects_rows = effects
+        return np.asarray(effects.isnull, dtype=bool)
+
+    def _validate_effects(self) -> bool:
+        """Check model effects"""
+        effects = self._other_effects_rows
+        if effects is None:
+            return False
+        # The rows of the input are not needed once the categories are made
+        self._other_effects_rows = None
 
         num_effects = effects.nvar
         if num_effects + self.entity_effects + self.time_effects > 2:
@@ -2021,7 +2222,10 @@ class PanelOLS(_PanelModelBase):
             Formula to transform into model. Conforms to formulaic formula
             rules with two special variable names, EntityEffects and
             TimeEffects which can be used to specify that the model should
-            contain an entity effect or a time effect, respectively. See
+            contain an entity effect or a time effect, respectively. The
+            formula can have effects and no regressors, for example
+            ``"y ~ EntityEffects"``, which is a model with only entity effects
+            that gives the same results as ``exog`` without columns. See
             Examples.
         data : PanelData or DataFrame
             Data structure that can be coerced into a PanelData.  In most
@@ -2032,9 +2236,13 @@ class PanelOLS(_PanelModelBase):
             Weights to use in estimation.  Assumes residual variance is
             proportional to inverse of weight to that the residual time
             the weight should be homoskedastic.
+            The weights must be strictly positive and finite. They are rescaled to have
+            a mean of 1. A NaN weight is missing, and its observation is dropped.
         other_effects : array_like
             Category codes to use for any effects that are not entity or time
-            effects. Each variable is treated as an effect.
+            effects. Each variable is treated as an effect. An observation where
+            any of the other effects is missing is dropped, with a
+            ``MissingValueWarning``.
         singletons : bool
             Flag indicating whether to drop singleton observation
         drop_absorbed : bool
@@ -2058,6 +2266,11 @@ class PanelOLS(_PanelModelBase):
         >>> panel_data = generate_panel_data()
         >>> mod = PanelOLS.from_formula("y ~ 1 + x1 + EntityEffects", panel_data.data)
         >>> res = mod.fit(cov_type="clustered", cluster_entity=True)
+
+        A model with effects and no regressors
+
+        >>> mod = PanelOLS.from_formula("y ~ EntityEffects", panel_data.data)
+        >>> res = mod.fit()
         """
         parser = PanelFormulaParser(formula, data, context=capture_context(1))
         entity_effect = parser.entity_effect
@@ -2124,19 +2337,19 @@ class PanelOLS(_PanelModelBase):
             cond_mean = lsmr(wd, wx[:, i], atol=1e-8, btol=1e-8)[0]
             cond_mean /= cond
             wx_mean_l.append(cond_mean)
-        wx_mean: linearmodels.typing.data.Float64Array | csc_array
         wy_mean: linearmodels.typing.data.Float64Array | csc_array
-        wx_mean = np.column_stack(wx_mean_l)
         wy_mean = lsmr(wd, wy, atol=1e-8, btol=1e-8)[0]
         wy_mean /= cond
         wy_mean = wy_mean[:, None]
 
-        wx_mean = csc_array(wx_mean)
         wy_mean = csc_array(wy_mean)
 
         # Purge fitted, weighted values
         sp_cond = diags_array(cond, format="csc")
-        wx = wx - (wd @ sp_cond @ wx_mean).toarray()
+        if wx_mean_l:
+            # There is nothing to purge if there are no regressors
+            wx_mean = csc_array(np.column_stack(wx_mean_l))
+            wx = wx - (wd @ sp_cond @ wx_mean).toarray()
         wy = wy - (wd @ sp_cond @ wy_mean).toarray()
 
         if self.has_constant:
@@ -2641,7 +2854,8 @@ class PanelOLS(_PanelModelBase):
                 neffects += oe[c].nunique() - drop_first
                 drop_first = True
 
-        if self.entity_effects or self.time_effects or self.other_effects:
+        has_effects = self.entity_effects or self.time_effects or self.other_effects
+        if has_effects and x.shape[1] > 0:
             # The regressors before the effects were removed set the scale of each
             # column, so the check does not depend on the units of the variables
             x_orig = np.sqrt(self.weights.values2d) * self.exog.values2d
@@ -2727,12 +2941,14 @@ class PanelOLS(_PanelModelBase):
         else:
             mu = np.array([0.0])
         total_ss = float(np.squeeze((y - mu).T @ (y - mu)))
-        r2 = 1 - resid_ss / total_ss if total_ss > 0.0 else 0.0
 
         root_w = cast(
             "linearmodels.typing.data.Float64Array", np.sqrt(self.weights.values2d)
         )
         y_ex = root_w * self.dependent.values2d
+        # The size of the dependent variable, before the effects are removed
+        y_ss = float(np.squeeze(y_ex.T @ y_ex))
+        r2 = r_squared(resid_ss, total_ss, y_ss, nobs)
         mu_ex = np.array(0.0, dtype=float)
         if (
             self.has_constant
@@ -2742,11 +2958,11 @@ class PanelOLS(_PanelModelBase):
         ):
             mu_ex = root_w * ((root_w.T @ y_ex) / (root_w.T @ root_w))
         total_ss_ex_effect = float(np.squeeze((y_ex - mu_ex).T @ (y_ex - mu_ex)))
-        r2_ex_effects = (
-            1 - resid_ss / total_ss_ex_effect if total_ss_ex_effect > 0.0 else 0.0
-        )
+        r2_ex_effects = r_squared(resid_ss, total_ss_ex_effect, y_ss, nobs)
 
-        res = self._postestimation(params, cov, debiased, df_resid, weps, y, x)
+        res = self._postestimation(
+            params, cov, debiased, df_resid, weps, y, x, weights=self.weights.values2d
+        )
         ######################################
         # Pooled f-stat
         ######################################
@@ -2772,6 +2988,10 @@ class PanelOLS(_PanelModelBase):
             elif df_denom <= 0:
                 f_pooled = InvalidTestStatistic(
                     "The model has no residual degrees of freedom", name=name
+                )
+            elif resid_ss <= 0.0:
+                f_pooled = InvalidTestStatistic(
+                    "The residual sum of squares is 0", name=name
                 )
             else:
                 num = (resid_ss_pooled - resid_ss) / df_num
@@ -2847,6 +3067,8 @@ class BetweenOLS(_PanelModelBase):
         the weight should be homoskedastic.
         Weights can be given for each observation, for each time period,
         for each entity or for each combination of time period and entity.
+        The weights must be strictly positive and finite. They are rescaled to have a
+        mean of 1. A NaN weight is missing, and its observation is dropped.
         Weights with labels must use the same labels, in the same order,
         as dependent or, if dependent has no labels, as exog. See
         :ref:`panel-input-alignment`.
@@ -3087,9 +3309,12 @@ class BetweenOLS(_PanelModelBase):
             e = y - (w * y).sum() / w.sum()
 
         total_ss = float(np.squeeze(w.T @ (e**2)))
-        r2 = 1 - residual_ss / total_ss
+        y_ss = float(np.squeeze(w.T @ (y**2)))
+        r2 = r_squared(residual_ss, total_ss, y_ss, nobs)
 
-        res = self._postestimation(params, cov, debiased, df_resid, weps, wy, wx)
+        res = self._postestimation(
+            params, cov, debiased, df_resid, weps, wy, wx, weights=w
+        )
         res.update(
             {
                 "df_resid": df_resid,
@@ -3135,6 +3360,8 @@ class BetweenOLS(_PanelModelBase):
             Weights to use in estimation.  Assumes residual variance is
             proportional to inverse of weight to that the residual times
             the weight should be homoskedastic.
+            The weights must be strictly positive and finite. They are rescaled to have
+            a mean of 1. A NaN weight is missing, and its observation is dropped.
         check_rank : bool
             Flag indicating whether to perform a rank check on the exogenous
             variables to ensure that the model is identified. Skipping this
@@ -3192,6 +3419,8 @@ class FirstDifferenceOLS(_PanelModelBase):
         the weight should be homoskedastic.
         Weights can be given for each observation, for each time period,
         for each entity or for each combination of time period and entity.
+        The weights must be strictly positive and finite. They are rescaled to have a
+        mean of 1. A NaN weight is missing, and its observation is dropped.
         Weights with labels must use the same labels, in the same order,
         as dependent or, if dependent has no labels, as exog. See
         :ref:`panel-input-alignment`.
@@ -3519,9 +3748,14 @@ class FirstDifferenceOLS(_PanelModelBase):
 
         residual_ss = float(np.squeeze(weps.T @ weps))
         total_ss = float(np.squeeze(w.T @ (y**2)))
-        r2 = 1 - residual_ss / total_ss
+        # The size of the dependent variable, before it is differenced
+        levels = self.dependent.values2d
+        y_ss = float(np.squeeze(self.weights.values2d.T @ (levels**2)))
+        r2 = r_squared(residual_ss, total_ss, y_ss, y.shape[0])
 
-        res = self._postestimation(params, cov, debiased, df_resid, weps, wy, wx)
+        res = self._postestimation(
+            params, cov, debiased, df_resid, weps, wy, wx, weights=w
+        )
         res.update(
             {
                 "df_resid": df_resid,
@@ -3567,6 +3801,8 @@ class FirstDifferenceOLS(_PanelModelBase):
             Weights to use in estimation.  Assumes residual variance is
             proportional to inverse of weight to that the residual times
             the weight should be homoskedastic.
+            The weights must be strictly positive and finite. They are rescaled to have
+            a mean of 1. A NaN weight is missing, and its observation is dropped.
         check_rank : bool
             Flag indicating whether to perform a rank check on the exogenous
             variables to ensure that the model is identified. Skipping this
@@ -3624,6 +3860,8 @@ class RandomEffects(_PanelModelBase):
         the weight should be homoskedastic.
         Weights can be given for each observation, for each time period,
         for each entity or for each combination of time period and entity.
+        The weights must be strictly positive and finite. They are rescaled to have a
+        mean of 1. A NaN weight is missing, and its observation is dropped.
         Weights with labels must use the same labels, in the same order,
         as dependent or, if dependent has no labels, as exog. See
         :ref:`panel-input-alignment`.
@@ -3685,6 +3923,8 @@ class RandomEffects(_PanelModelBase):
             Weights to use in estimation.  Assumes residual variance is
             proportional to inverse of weight to that the residual times
             the weight should be homoskedastic.
+            The weights must be strictly positive and finite. They are rescaled to have
+            a mean of 1. A NaN weight is missing, and its observation is dropped.
         check_rank : bool
             Flag indicating whether to perform a rank check on the exogenous
             variables to ensure that the model is identified. Skipping this
@@ -4008,9 +4248,13 @@ class RandomEffects(_PanelModelBase):
             wmu = root_w * _lstsq(root_w, wy, rcond=None)[0]
         wy_demeaned = wy - wmu
         total_ss = float(np.squeeze(wy_demeaned.T @ wy_demeaned))
-        r2 = 1 - residual_ss / total_ss
+        # The size of the dependent variable, before the means of the entities are removed
+        y_ss = float(np.squeeze(w.T @ (self.dependent.values2d**2)))
+        r2 = r_squared(residual_ss, total_ss, y_ss, wy.shape[0])
 
-        res = self._postestimation(params, cov, debiased, df_resid, weps, wy, wx)
+        res = self._postestimation(
+            params, cov, debiased, df_resid, weps, wy, wx, weights=w
+        )
         res.update(
             {
                 "df_resid": df_resid,
@@ -4060,6 +4304,8 @@ class FamaMacBeth(_PanelModelBase):
         the weight should be homoskedastic.
         Weights can be given for each observation, for each time period,
         for each entity or for each combination of time period and entity.
+        The weights must be strictly positive and finite. They are rescaled to have a
+        mean of 1. A NaN weight is missing, and its observation is dropped.
         Weights with labels must use the same labels, in the same order,
         as dependent or, if dependent has no labels, as exog. See
         :ref:`panel-input-alignment`.
@@ -4377,16 +4623,20 @@ class FamaMacBeth(_PanelModelBase):
                 tss = float(np.squeeze(dep_demean.T @ dep_demean))
             else:
                 tss = float(np.squeeze(dep.T @ dep))
-            r2 = 1 - sse / tss
             nobs = exog.shape[0]
-            if nobs - nexog > 0:
+            r2 = r_squared(sse, tss, float(np.squeeze(dep.T @ dep)), nobs)
+            if nobs - nexog > 0 and not np.isnan(r2):
                 adj_r2 = 1 - (sse / (nobs - nexog)) / (tss / (nobs - int(has_constant)))
             else:
                 adj_r2 = np.nan
             return Series(np.r_[np.nan, params.ravel(), r2, adj_r2], index=cols)
 
         all_params = yx.groupby(level=1).apply(single)
-        avg_r2 = np.nanmean(all_params.iloc[:, -2])
+        avg_r2_values = all_params.iloc[:, -2]
+        if np.any(np.isfinite(avg_r2_values)):
+            avg_r2 = np.nanmean(avg_r2_values)
+        else:
+            avg_r2 = np.nan
         avg_adj_r2_values = all_params.iloc[:, -1]
         if np.any(np.isfinite(avg_adj_r2_values)):
             avg_adj_r2 = np.nanmean(avg_adj_r2_values)
@@ -4412,7 +4662,8 @@ class FamaMacBeth(_PanelModelBase):
         if self.has_constant:
             e = y - (w * y).sum() / w.sum()
         total_ss = float(np.squeeze(w.T @ (e**2)))
-        r2 = 1 - residual_ss / total_ss
+        y_ss = float(np.squeeze(w.T @ (y**2)))
+        r2 = r_squared(residual_ss, total_ss, y_ss, y.shape[0])
 
         if cov_type not in (
             "robust",
@@ -4448,7 +4699,9 @@ class FamaMacBeth(_PanelModelBase):
         df_resid = nperiod - 1
         # The classical F-statistic is that of the pooled regression
         pooled_df_resid = wy.shape[0] - params.shape[0]
-        res = self._postestimation(params, cov, debiased, pooled_df_resid, weps, wy, wx)
+        res = self._postestimation(
+            params, cov, debiased, pooled_df_resid, weps, wy, wx, weights=w
+        )
         index = self.dependent.index
         res.update(
             {
@@ -4497,6 +4750,8 @@ class FamaMacBeth(_PanelModelBase):
             Weights to use in estimation.  Assumes residual variance is
             proportional to inverse of weight to that the residual times
             the weight should be homoskedastic.
+            The weights must be strictly positive and finite. They are rescaled to have
+            a mean of 1. A NaN weight is missing, and its observation is dropped.
         check_rank : bool
             Flag indicating whether to perform a rank check on the exogenous
             variables to ensure that the model is identified. Skipping this

@@ -917,6 +917,18 @@ do not
  in estimation results.
 \end_layout
 
+\begin_layout Standard
+\noindent
+Every
+\begin_inset Formula $R^{2}$
+\end_inset
+
+ is NaN, with no error or warning, if the sum of squares that it divides
+ by is zero, up to rounding error, since it is not defined then.
+ This happens if the dependent variable does not vary, and, for the within
+ measures, if it does not vary within entities.
+\end_layout
+
 \begin_layout Subsubsection
 Between 
 \begin_inset Formula $R^{2}$

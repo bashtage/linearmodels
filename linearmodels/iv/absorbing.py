@@ -7,6 +7,7 @@ from collections.abc import Hashable, Iterable
 from copy import deepcopy
 import hashlib
 from inspect import signature
+from math import isnan
 from typing import Any, DefaultDict, Union, cast
 import warnings
 
@@ -24,7 +25,6 @@ from numpy import (
     int16,
     int32,
     int64,
-    nanmean,
     ndarray,
     ones,
     ptp,
@@ -68,7 +68,9 @@ from linearmodels.shared.alignment import (
 from linearmodels.shared.exceptions import lookup_option, missing_warning
 from linearmodels.shared.hypotheses import InvalidTestStatistic, WaldTestStatistic
 from linearmodels.shared.inputs import as_array_like
+from linearmodels.shared.rsquared import r_squared
 from linearmodels.shared.utility import DataFrameWrapper, SeriesWrapper
+from linearmodels.shared.weights import check_weights, normalize_weights
 import linearmodels.typing.data
 
 HAVE_XXHASH = False
@@ -78,6 +80,11 @@ try:
     HAVE_XXHASH = True
 except ImportError:
     pass
+
+
+def _non_negative(r2: float) -> float:
+    """Clip an R2 at 0, which is not clipped if it is NaN since it is not defined"""
+    return r2 if isnan(r2) else max(r2, 0.0)
 
 
 class Hasher:
@@ -836,8 +843,9 @@ class AbsorbingLS:
         each continuous variable. The columns of a DataFrame follow the rules of
         ``absorb``.
     weights : array_like, optional
-        Observation weights used in estimation. All weights must be strictly
-        positive or missing.
+        Observation weights used in estimation. The weights must be strictly positive
+        and finite. They are rescaled to have a mean of 1. A NaN weight is missing, and
+        its observation is dropped.
     drop_absorbed : bool
         Flag indicating whether to drop absorbed variables
 
@@ -895,6 +903,9 @@ class AbsorbingLS:
     that do must use the same index as the first of ``exog``, ``absorb``,
     ``interactions`` and ``weights`` that does. The same rule applies to
     ``clusters`` passed to ``fit``.
+    Dates and time deltas are compared by value, so that the same dates at
+    different resolutions, e.g., ``datetime64[us]`` and ``datetime64[ns]``, are
+    the same labels.
 
     See also
     --------
@@ -1004,7 +1015,7 @@ class AbsorbingLS:
                 interact.drop(missing)
             # Weights have mean 1 in the sample used to estimate the model
             weights = self._weight_data.ndarray[~missing]
-            self._weight_data = IVData(weights / weights.mean(), "weights")
+            self._weight_data = IVData(normalize_weights(weights), "weights")
             self._nobs = self.dependent.shape[0]
         missing_warning(missing, stacklevel=4)
         return missing
@@ -1023,9 +1034,8 @@ class AbsorbingLS:
         else:
             self._is_weighted = True
             weights = IVData(self._weights, var_name="weights").ndarray
-            if npany(weights <= 0):
-                raise ValueError("weights must be strictly positive.")
-            weights = weights / nanmean(weights)
+            check_weights(weights)
+            weights = normalize_weights(weights)
             self._weight_data = IVData(weights, var_name="weights", nobs=self._nobs)
 
     def _check_shape(self) -> None:
@@ -1642,11 +1652,14 @@ class AbsorbingLS:
         w = self.weights.ndarray
         root_w = sqrt(w)
         e = self._dependent.ndarray * root_w
+        # The size of the dependent variable, before the means and the effects are removed
+        y_ss = float(squeeze(e.T @ e))
         if self.has_constant:
             e = e - root_w * average(self._dependent.ndarray, weights=w)
 
         total_ss = float(squeeze(e.T @ e))
-        r2 = max(1 - residual_ss / total_ss, 0.0)
+        nobs = e.shape[0]
+        r2 = _non_negative(r_squared(float(residual_ss), total_ss, y_ss, nobs))
 
         e = self._absorbed_dependent.to_numpy()  # already scaled by root_w
         # If absorbing contains a constant, but exog does not, no need to demean
@@ -1658,7 +1671,9 @@ class AbsorbingLS:
             e = e - x * mu
 
         aborbed_total_ss = float(squeeze(e.T @ e))
-        r2_absorbed = max(1 - residual_ss / aborbed_total_ss, 0.0)
+        r2_absorbed = _non_negative(
+            r_squared(float(residual_ss), aborbed_total_ss, y_ss, nobs)
+        )
 
         fstat = self._f_statistic(params, cov, debiased)
         out = {

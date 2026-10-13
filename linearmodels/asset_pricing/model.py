@@ -31,6 +31,7 @@ from linearmodels.shared.alignment import check_alignment, row_labels
 from linearmodels.shared.exceptions import missing_warning, unknown_option_error
 from linearmodels.shared.hypotheses import WaldTestStatistic
 from linearmodels.shared.linalg import has_constant
+from linearmodels.shared.rsquared import r_squared
 from linearmodels.shared.typed_getters import get_float, get_string
 from linearmodels.shared.utility import AttrDict
 import linearmodels.typing.data
@@ -194,24 +195,14 @@ class _FactorModelBase:
 
         p = cast("linearmodels.typing.data.Float64Array", self.portfolios.ndarray)
         f = cast("linearmodels.typing.data.Float64Array", self.factors.ndarray)
-        if has_constant(p)[0]:
+        if has_constant(p)[0] or np.linalg.matrix_rank(p) < min(p.shape):
             raise ValueError(
                 "portfolios must not contain a constant or "
                 "equivalent and must not have rank\n"
                 "less than the dimension of the smaller shape."
             )
         rank = np.linalg.matrix_rank(f)
-        constant = has_constant(f, rank)[0]
-        if constant and rank < f.shape[1]:
-            # has_constant is also True if the columns are collinear. Collinear
-            # factors have a constant if a column is constant, or, for a matrix
-            # with more rows than columns, if a constant is in the span of the
-            # columns
-            nobs = f.shape[0]
-            aug_rank = np.linalg.matrix_rank(np.c_[np.ones((nobs, 1)), f])
-            constant_column = np.any((np.ptp(f, axis=0) == 0) & ~np.all(f == 0, axis=0))
-            constant = bool(constant_column or (nobs > f.shape[1] and aug_rank == rank))
-        if constant:
+        if has_constant(f)[0]:
             raise ValueError("factors must not contain a constant or equivalent.")
         if rank < f.shape[1]:
             raise ValueError(
@@ -327,6 +318,9 @@ class TradedFactorModel(_FactorModelBase):
     ``to_numpy()`` to pair its values by position. NumPy arrays and pandas
     objects with a default index do not carry labels and are always paired by
     position.
+    Dates and time deltas are compared by value, so that the same dates at
+    different resolutions, e.g., ``datetime64[us]`` and ``datetime64[ns]``, are
+    the same labels.
     """
 
     def __init__(self, portfolios: IVDataLike, factors: IVDataLike):
@@ -545,7 +539,7 @@ class TradedFactorModel(_FactorModelBase):
         residual_ss = (eps**2).sum()
         e = p - p.mean(0)[None, :]
         total_ss = (e**2).sum()
-        r2 = 1 - residual_ss / total_ss
+        r2 = r_squared(residual_ss, total_ss, (p**2).sum(), p.shape[0])
         param_names = []
         for portfolio in self.portfolios.cols:
             param_names.append(f"alpha-{portfolio}")
@@ -796,6 +790,9 @@ class LinearFactorModel(_LinearFactorModelBase):
     ``to_numpy()`` to pair its values by position. NumPy arrays and pandas
     objects with a default index do not carry labels and are always paired by
     position.
+    Dates and time deltas are compared by value, so that the same dates at
+    different resolutions, e.g., ``datetime64[us]`` and ``datetime64[ns]``, are
+    the same labels.
     """
 
     def __init__(
@@ -977,7 +974,7 @@ class LinearFactorModel(_LinearFactorModelBase):
 
         total_ss = ((p - p.mean(0)[None, :]) ** 2).sum()
         residual_ss = (eps**2).sum()
-        r2 = 1 - residual_ss / total_ss
+        r2 = r_squared(residual_ss, total_ss, (p**2).sum(), p.shape[0])
         rp = lam
         rp_cov = full_vcv[s1:s2, s1:s2]
         betas = betas if excess_returns else betas[:, 1:]
@@ -1182,6 +1179,9 @@ class LinearFactorModelGMM(_LinearFactorModelBase):
     ``to_numpy()`` to pair its values by position. NumPy arrays and pandas
     objects with a default index do not carry labels and are always paired by
     position.
+    Dates and time deltas are compared by value, so that the same dates at
+    different resolutions, e.g., ``datetime64[us]`` and ``datetime64[ns]``, are
+    the same labels.
     """
 
     def __init__(
@@ -1486,9 +1486,10 @@ class LinearFactorModelGMM(_LinearFactorModelBase):
         resids -= resids.mean(0)[None, :]
         residual_ss = (resids**2).sum()
         total = self.portfolios.ndarray
+        y_ss = (self.portfolios.ndarray**2).sum()
         total = total - total.mean(0)[None, :]
         total_ss = (total**2).sum()
-        r2 = 1.0 - residual_ss / total_ss
+        r2 = r_squared(residual_ss, total_ss, y_ss, self.portfolios.shape[0])
         param_names = []
         for portfolio in self.portfolios.cols:
             param_names.extend(

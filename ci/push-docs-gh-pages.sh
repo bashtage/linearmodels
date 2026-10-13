@@ -30,6 +30,7 @@ echo "rm -rf ${PWD}/doc/build/"
 rm -rf ${PWD}/doc/build/
 echo "Add devel"
 git add devel/.
+git add devel/_static/.
 echo "Add new HTML/JS/CSS"
 git add ./\*.html
 git add ./\*.js

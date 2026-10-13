@@ -149,6 +149,36 @@ def test_xarray_3d():
     assert_equal(np.reshape(x.values.T, (n * t, k)), dh.values2d)
 
 
+@pytest.mark.skipif(MISSING_XARRAY, reason="xarray is not installed")
+def test_xarray_3d_datetime_labels():
+    # The time labels of a DataArray with datetime64[ns] coordinates were the
+    # integer nanoseconds, so the DataArray did not match a pandas input with the
+    # same dates
+    nperiod, nentity = 6, 8
+    rg = np.random.default_rng(0)
+    months = np.arange("2000-01", "2000-07", dtype="datetime64[M]")
+    time = months.astype("datetime64[ns]")
+    entities = [f"firm{i}" for i in range(nentity)]
+    x = xr.DataArray(
+        rg.standard_normal((2, nperiod, nentity)),
+        coords={"vars": ["x0", "x1"], "time": time, "entities": entities},
+        dims=["vars", "time", "entities"],
+    )
+    x_frame = DataFrame(
+        x.values.transpose(2, 1, 0).reshape(nentity * nperiod, 2),
+        index=MultiIndex.from_product([entities, time]),
+        columns=["x0", "x1"],
+    )
+    times = PanelData(x).index.get_level_values(1)
+    assert times.dtype == np.dtype("datetime64[ns]")
+    assert_frame_equal(PanelData(x).dataframe, PanelData(x_frame).dataframe)
+
+    y = DataFrame(rg.standard_normal((nperiod, nentity)), index=time, columns=entities)
+    res = PanelOLS(y, x, entity_effects=True).fit()
+    expected = PanelOLS(y, x_frame, entity_effects=True).fit()
+    assert_allclose(res.params, expected.params)
+
+
 def test_dimensions(mi_df):
     dh = PanelData(mi_df)
     assert dh.nentity == len(mi_df.index.levels[0])

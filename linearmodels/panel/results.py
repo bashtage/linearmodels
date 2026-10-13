@@ -16,6 +16,7 @@ from statsmodels.iolib.summary import SimpleTable, fmt_2cols, fmt_params
 
 from linearmodels.iv.results import default_txt_fmt, stub_concat, table_concat
 from linearmodels.panel.covariance import HomoskedasticCovariance
+from linearmodels.shared.alignment import same_labels
 from linearmodels.shared.base import _ModelComparison, _SummaryStr
 from linearmodels.shared.hypotheses import (
     InapplicableTestStatistic,
@@ -162,7 +163,27 @@ class PanelResults(_SummaryStr):
 
     @property
     def rsquared(self) -> float:
-        """Model Coefficient of determination"""
+        """
+        Model Coefficient of determination
+
+        Returns
+        -------
+        float
+            The coefficient of determination of the model.
+
+        Notes
+        -----
+        The coefficient of determination is NaN if its total sum of squares is zero,
+        up to rounding error, since it is not defined then. This happens if the
+        dependent variable does not vary, or if nothing varies once the means or the
+        effects of the model are removed. No error or warning is raised.
+
+        The limit is the rounding error of the computation. If the effects are removed
+        by an iterative algorithm (``use_lsmr=True`` in ``fit``), its error is larger,
+        by default about 1e-8 relative to the size of the dependent variable, so that a
+        dependent variable that the effects explain exactly can have a total sum of
+        squares that is not recognized as zero.
+        """
         return self._r2
 
     @property
@@ -183,6 +204,11 @@ class PanelResults(_SummaryStr):
 
         See the mathematical reference in the documentation for the formal
         definition of this measure.
+
+        It is NaN if its total sum of squares is zero, up to rounding error, i.e., if
+        the time-averaged dependent variable is the same for every entity in a model
+        with a constant, or is 0 for every entity in a model without one. No error or
+        warning is raised.
         """
         return self._r2b
 
@@ -204,6 +230,10 @@ class PanelResults(_SummaryStr):
 
         See the mathematical reference in the documentation for the formal
         definition of this measure.
+
+        It is NaN if its total sum of squares is zero, up to rounding error, i.e., if
+        the dependent variable does not vary within entities, which includes a panel
+        with a single time period. No error or warning is raised.
         """
         return self._r2w
 
@@ -225,6 +255,10 @@ class PanelResults(_SummaryStr):
 
         See the mathematical reference in the documentation for the formal
         definition of this measure.
+
+        It is NaN if its total sum of squares is zero, up to rounding error, i.e., if
+        the dependent variable does not vary in a model with a constant, or is 0 in a
+        model without one. No error or warning is raised.
         """
         return self._r2o
 
@@ -252,6 +286,11 @@ class PanelResults(_SummaryStr):
            Corr[\bar{y}_i, \bar{x}_i\hat{\beta}]
 
         This measure **does not** account for weights.
+
+        It is NaN if the entity-wise averaged dependent variable is the same for every
+        entity, up to rounding error, since the correlation is not defined, and it is 0
+        if the predictions are the same for every entity. No error or warning is
+        raised.
         """
         return self._c2b
 
@@ -279,6 +318,10 @@ class PanelResults(_SummaryStr):
            Corr[y_{it}-\bar{y}_i, (x_{it}-\bar{x}_i)\hat{\beta}]
 
         This measure **does not** account for weights.
+
+        It is NaN if the dependent variable does not vary within entities, up to
+        rounding error, since the correlation is not defined, and it is 0 if the
+        demeaned predictions do not vary. No error or warning is raised.
         """
         return self._c2w
 
@@ -305,6 +348,10 @@ class PanelResults(_SummaryStr):
            Corr[y_{it}, x_{it}\hat{\beta}]
 
         This measure **does not** account for weights.
+
+        It is NaN if the dependent variable does not vary, up to rounding error, since
+        the correlation is not defined, and it is 0 if the predictions do not vary. No
+        error or warning is raised.
         """
         return self._c2o
 
@@ -443,6 +490,9 @@ class PanelResults(_SummaryStr):
             vals.append([val])
         table.extend_right(SimpleTable(vals, stubs=stubs))
         smry.tables.append(table)
+        if self.params.shape[0] == 0:
+            # A model that only has effects has no table of parameters
+            return smry
 
         param_data = np.c_[
             self.params.to_numpy()[:, None],
@@ -795,6 +845,10 @@ class PanelResults(_SummaryStr):
         If ``debiased`` is True, then the Wald statistic is divided by the
         number of restrictions and inference is made using an :math:`F_{k,df}`
         distribution where df is the residual degree of freedom from the model.
+
+        An ``InvalidTestStatistic`` is returned if the model only has a constant,
+        or if the covariance of the parameters is singular, e.g., the dependent
+        variable is all zero, so that the model fits exactly.
         """
         from linearmodels.panel.model import _deferred_f  # noqa: PLC0415
 
@@ -832,7 +886,63 @@ class PanelResults(_SummaryStr):
 
     @property
     def loglik(self) -> float:
-        """Log-likelihood of model"""
+        r"""
+        Log-likelihood of model
+
+        Notes
+        -----
+        The Gaussian log-likelihood of the regression that the model estimates, at
+        the estimates and the maximum likelihood estimate of the error variance,
+
+        .. math::
+
+           -\frac{n}{2}\left(\ln 2\pi + \ln\hat{\sigma}^2 + 1\right)
+           + \frac{1}{2}\sum_{i=1}^{n}\ln w_i
+
+        where :math:`\hat{\sigma}^2 = \hat{\epsilon}'\hat{\epsilon}/n` is the
+        residual sum of squares of the regression divided by its number of
+        observations :math:`n`, and :math:`\hat{\epsilon}_i` are the weighted
+        residuals, :math:`\sqrt{w_i}` times the residuals. The last term is the
+        Jacobian of the weights, which is 0 if the model is not weighted. The
+        variance of the error of observation :math:`i` is
+        :math:`\sigma^2/w_i`, and so the log-likelihood is that of the weighted least
+        squares regression of the original data, for example of ``WLS(...).llf`` in
+        statsmodels for ``PooledOLS``. It does not depend on the scale of the weights,
+        and the log-likelihoods of the models with different weights are comparable
+        if they have the same observations, for example in an information
+        criterion.
+
+        The regression and its observations depend on the model.
+
+        * ``PooledOLS`` - The regression of the observations. The weights are the
+          weights of the model.
+        * ``PanelOLS`` - The regression on the dummy variables of the effects, with
+          the effects as parameters that are estimated. It is computed from the
+          regression of the observations with the effects removed. The weights are
+          the weights of the model.
+        * ``BetweenOLS`` - The regression of the means of the entities. The
+          observations are the entities, and the weights are the sums of the
+          weights of the entities, scaled to a mean of one, if the model is weighted
+          or ``reweight`` is True. Otherwise all of the weights are 1.
+        * ``FirstDifferenceOLS`` - The regression of the first differences. The
+          weights are those of the differences, :math:`1/(1/w_{it}+1/w_{it-1})`.
+        * ``RandomEffects`` - The regression of the data that are weighted and
+          quasi-demeaned. It is not the likelihood of the random effects model, which
+          also depends on the variances of the effects.
+        * ``FamaMacBeth`` - The pooled regression at the average of the estimates
+          of the periods.
+
+        .. versionchanged:: 7.1
+
+           The log-likelihood of a weighted model includes the Jacobian of the
+           weights. Earlier versions omitted it, so that the log-likelihood was that
+           of the regression of the weighted data, which is not the likelihood of the
+           original data, and the log-likelihoods of models with different weights
+           were not comparable. For the pooled regression of the log wages in the wage
+           panel on a constant, ``educ``, ``married`` and ``union`` with the hours as
+           weights it was -3065.75, where ``WLS`` of statsmodels has -3153.16. The
+           log-likelihoods of models without weights do not change.
+        """
         return self._loglik
 
     def wald_test(
@@ -876,6 +986,12 @@ class PanelResults(_SummaryStr):
         -------
         WaldTestStatistic
             Test statistic for null that restrictions are valid.
+
+        Raises
+        ------
+        ValueError
+            If the model has no parameters, e.g., a PanelOLS model that only has
+            effects.
 
         Notes
         -----
@@ -922,6 +1038,11 @@ class PanelResults(_SummaryStr):
         >>> null = "`C(year)[T.1987]:educ` = 0, `C(year)[T.1986]:educ` = 0"
         >>> wald_res = res.wald_test(formula=null)
         """
+        if self.params.shape[0] == 0:
+            raise ValueError(
+                "The model has no parameters, so that there is nothing to test. It "
+                "only has effects, which have no inference."
+            )
         return quadratic_form_test(
             self.params, self.cov, restriction=restriction, value=value, formula=formula
         )
@@ -1048,7 +1169,19 @@ class PanelEffectsResults(PanelResults):
 
     @property
     def rsquared_inclusive(self) -> float:
-        """Model Coefficient of determination including fit of included effects"""
+        """
+        Model Coefficient of determination including fit of included effects
+
+        Returns
+        -------
+        float
+            The coefficient of determination of the model and the effects.
+
+        Notes
+        -----
+        It is NaN if its total sum of squares is zero, up to rounding error, i.e., if
+        the dependent variable does not vary. No error or warning is raised.
+        """
         return self._r2_ex_effects
 
     @property
@@ -1131,7 +1264,7 @@ def _check_same_sample(res: PanelResults, other: PanelResults) -> None:
             f"This model uses {res.nobs} and other uses {other.nobs}."
         )
     model, other_model = res.model, other.model
-    if not model.dependent.index.equals(other_model.dependent.index):
+    if not same_labels(model.dependent.index, other_model.dependent.index):
         raise ValueError(
             "The models must be estimated using the same observations. The "
             "entities and time periods of the observations differ."
@@ -1467,9 +1600,9 @@ class FamaMacBethResults(PanelResults):
         WaldTestStatistic
             Statistic value, distribution and p-value. It is an
             ``InvalidTestStatistic`` if the model contains only a constant, or
-            if the number of periods that are averaged is not larger than the
-            number of tested parameters, so that the covariance of the
-            parameters is singular.
+            if the covariance of the parameters is singular, which it is if the
+            number of periods that are averaged is not larger than the number
+            of tested parameters, or if the dependent variable is all zero.
 
         Notes
         -----
@@ -1579,7 +1712,10 @@ class FamaMacBethResults(PanelResults):
 
         This value contains the average of the individual adjusted rsquared
         values across the nobs cross-sectional regressions. An rsquare value
-        is only included in the average if a cross-section has full rank.
+        is only included in the average if a cross-section has full rank and if
+        the dependent variable of the cross-section varies, since the coefficient
+        of determination is NaN, up to rounding error, if its total sum of squares
+        is zero.
         """
         return self._avg_r2
 
@@ -1590,9 +1726,11 @@ class FamaMacBethResults(PanelResults):
 
         This value contains the average of the individual adjusted rsquared
         values across the nobs cross-sectional regressions. An rsquare value
-        is only included in the average if a cross-section has full rank and
+        is only included in the average if a cross-section has full rank,
         if the number of dependent variables in a cross-section is larger than
-        the number of regressors.
+        the number of regressors, and if the dependent variable of the
+        cross-section varies, since the coefficient of determination is NaN, up to
+        rounding error, if its total sum of squares is zero.
         """
         return self._avg_adj_r2
 
@@ -1632,17 +1770,56 @@ class PanelModelComparison(_ModelComparison):
 
     @property
     def rsquared_between(self) -> Series:
-        """Coefficients of determination (R**2)"""
+        """
+        Between coefficients of determination (R**2)
+
+        Returns
+        -------
+        Series
+            The between coefficient of determination of each model.
+
+        Notes
+        -----
+        The value of a model is NaN if its between coefficient of determination is not
+        defined, i.e., if the total sum of squares is zero, up to rounding error. See
+        ``rsquared_between`` of the results of the models.
+        """
         return self._get_property("rsquared_between")
 
     @property
     def rsquared_within(self) -> Series:
-        """Coefficients of determination (R**2)"""
+        """
+        Within coefficients of determination (R**2)
+
+        Returns
+        -------
+        Series
+            The within coefficient of determination of each model.
+
+        Notes
+        -----
+        The value of a model is NaN if its within coefficient of determination is not
+        defined, i.e., if the total sum of squares is zero, up to rounding error. See
+        ``rsquared_within`` of the results of the models.
+        """
         return self._get_property("rsquared_within")
 
     @property
     def rsquared_overall(self) -> Series:
-        """Coefficients of determination (R**2)"""
+        """
+        Overall coefficients of determination (R**2)
+
+        Returns
+        -------
+        Series
+            The overall coefficient of determination of each model.
+
+        Notes
+        -----
+        The value of a model is NaN if its overall coefficient of determination is not
+        defined, i.e., if the total sum of squares is zero, up to rounding error. See
+        ``rsquared_overall`` of the results of the models.
+        """
         return self._get_property("rsquared_overall")
 
     @property
@@ -1732,8 +1909,10 @@ class PanelModelComparison(_ModelComparison):
             params_stub.append(str(params.index[i]))
             params_stub.append(" ")
 
-        vals_lst = table_concat((vals_lst, params_fmt))
-        stubs = stub_concat((stubs, params_stub))
+        if params_fmt:
+            # None of the models has parameters if they only have effects
+            vals_lst = table_concat((vals_lst, params_fmt))
+            stubs = stub_concat((stubs, params_stub))
 
         all_effects = []
         for key in self._results:

@@ -122,6 +122,34 @@ to include the fixed effects.
 
     mod = PanelOLS.from_formula('lwage ~ 1 + expersq + union + married + EntityEffects',data)
 
+.. _panel-effects-only:
+
+Models with Only Effects
+========================
+A :class:`~linearmodels.panel.model.PanelOLS` model can have effects and no
+regressors, :math:`y_{it} = \alpha_i + \epsilon_{it}`. The formula has no
+regressors, or ``exog`` has the index of ``dependent`` and no columns.
+
+.. code-block:: python
+
+    import pandas as pd
+
+    mod = PanelOLS.from_formula('lwage ~ EntityEffects', data)
+    # The same model, without a formula
+    mod = PanelOLS(dependent, pd.DataFrame(index=data.index), entity_effects=True)
+    res = mod.fit()
+
+The model has no parameters, so that ``params``, ``cov`` and the other tables
+of the parameters are empty. ``estimated_effects`` are the means of the dependent
+variable of the entities (of the periods, with ``TimeEffects``), and ``resids`` are
+the deviations from them. ``f_pooled`` is the test that the effects are zero, which
+for entity effects is the F-test of a one-way analysis of variance. The tests of
+the coefficients, ``f_statistic`` and ``f_statistic_robust``, are not defined. The
+R-squared of the model is 0 (NaN if the dependent variable does not vary once the
+effects are removed), and ``rsquared_inclusive`` is the share of the variation of the
+dependent variable that the effects explain. See
+:class:`~linearmodels.panel.model.PanelOLS` for all of the results.
+
 .. _panel-specification-tests:
 
 Specification Tests

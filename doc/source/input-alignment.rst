@@ -22,6 +22,15 @@ To correct the error, reindex the input to the index of ``dependent``, e.g.,
 ``exog = exog.reindex(dependent.index)``, or call ``to_numpy()`` to explicitly
 pair the values by position.
 
+Dates and time deltas are compared by value, so the same dates are the same
+labels when they are stored at different resolutions, for example
+``datetime64[us]`` and ``datetime64[ns]``. This matters in pandas 2, which keeps
+dates at the resolution of the data, e.g., when they come from a NumPy array of
+``datetime64[us]`` or from a Parquet file. pandas 3 compares them in the same
+way. The comparison applies to each level of a ``MultiIndex``. Different dates,
+the same dates in a different order, dates in different time zones, dates with
+and without a time zone, and dates and time deltas are different labels.
+
 NumPy arrays, lists, tuples and pandas objects that only have the default index
 do not carry labels. They are always paired by position, and only need to have
 the right number of rows. This is also the case for a ``DataFrame`` with a
