@@ -1006,8 +1006,17 @@ class _PanelModelBase:
         weps: linearmodels.typing.data.Float64Array,
         y: linearmodels.typing.data.Float64Array,
         x: linearmodels.typing.data.Float64Array,
+        weights: linearmodels.typing.data.Float64Array | None = None,
     ) -> AttrDict:
-        """Common post-estimation values"""
+        """
+        Common post-estimation values
+
+        The log-likelihood is that of the Gaussian regression whose weighted
+        residuals are ``weps`` = sqrt(w) * e, where the variance of the error of an
+        observation is sigma2 / w. Its Jacobian term is 0.5 * sum(log(w)), where w
+        is ``weights``, the weight of each of the observations of the regression.
+        There are no weights, or unit weights, if ``weights`` is None.
+        """
         f_info = self._f_statistic_robust(params)
         f_stat = self._f_statistic(weps, y, x, df_resid)
         r2o, r2w, r2b = self._rsquared(params)
@@ -1020,6 +1029,8 @@ class _PanelModelBase:
         sigma2 = float(np.squeeze(weps.T @ weps) / nobs)
         if sigma2 > 0.0:
             loglik = -0.5 * nobs * (np.log(2 * np.pi) + np.log(sigma2) + 1)
+            if weights is not None:
+                loglik += 0.5 * float(np.sum(np.log(weights)))
         else:
             loglik = np.nan
 
@@ -1439,7 +1450,9 @@ class PooledOLS(_PanelModelBase):
         total_ss = float(np.squeeze(w.T @ (e**2)))
         r2 = 1 - residual_ss / total_ss
 
-        res = self._postestimation(params, cov, debiased, df_resid, weps, wy, wx)
+        res = self._postestimation(
+            params, cov, debiased, df_resid, weps, wy, wx, weights=w
+        )
         res.update(
             {
                 "df_resid": df_resid,
@@ -2466,7 +2479,9 @@ class PanelOLS(_PanelModelBase):
             1 - resid_ss / total_ss_ex_effect if total_ss_ex_effect > 0.0 else 0.0
         )
 
-        res = self._postestimation(params, cov, debiased, df_resid, weps, y, x)
+        res = self._postestimation(
+            params, cov, debiased, df_resid, weps, y, x, weights=self.weights.values2d
+        )
         ######################################
         # Pooled f-stat
         ######################################
@@ -2782,7 +2797,9 @@ class BetweenOLS(_PanelModelBase):
         total_ss = float(np.squeeze(w.T @ (e**2)))
         r2 = 1 - residual_ss / total_ss
 
-        res = self._postestimation(params, cov, debiased, df_resid, weps, wy, wx)
+        res = self._postestimation(
+            params, cov, debiased, df_resid, weps, wy, wx, weights=w
+        )
         res.update(
             {
                 "df_resid": df_resid,
@@ -3139,7 +3156,9 @@ class FirstDifferenceOLS(_PanelModelBase):
         total_ss = float(np.squeeze(w.T @ (y**2)))
         r2 = 1 - residual_ss / total_ss
 
-        res = self._postestimation(params, cov, debiased, df_resid, weps, wy, wx)
+        res = self._postestimation(
+            params, cov, debiased, df_resid, weps, wy, wx, weights=w
+        )
         res.update(
             {
                 "df_resid": df_resid,
@@ -3577,7 +3596,9 @@ class RandomEffects(_PanelModelBase):
         total_ss = float(np.squeeze(wy_demeaned.T @ wy_demeaned))
         r2 = 1 - residual_ss / total_ss
 
-        res = self._postestimation(params, cov, debiased, df_resid, weps, wy, wx)
+        res = self._postestimation(
+            params, cov, debiased, df_resid, weps, wy, wx, weights=w
+        )
         res.update(
             {
                 "df_resid": df_resid,
@@ -3948,7 +3969,9 @@ class FamaMacBeth(_PanelModelBase):
         df_resid = nperiod - 1
         # The classical F-statistic is that of the pooled regression
         pooled_df_resid = wy.shape[0] - params.shape[0]
-        res = self._postestimation(params, cov, debiased, pooled_df_resid, weps, wy, wx)
+        res = self._postestimation(
+            params, cov, debiased, pooled_df_resid, weps, wy, wx, weights=w
+        )
         index = self.dependent.index
         res.update(
             {
