@@ -1645,6 +1645,9 @@ class IV3SLS(_LSSystemModelBase):
     first of them that does, in the order ``exog``, ``endog``, ``instruments``
     and ``weights`` of each equation.
     The same rule applies to ``clusters`` passed to ``fit``.
+    Dates and time deltas are compared by value, so that the same dates at
+    different resolutions, e.g., ``datetime64[us]`` and ``datetime64[ns]``, are
+    the same labels.
     """
 
     def __init__(
@@ -1886,6 +1889,9 @@ class SUR(_LSSystemModelBase):
     first of them that does, in the order ``exog``, ``endog``, ``instruments``
     and ``weights`` of each equation.
     The same rule applies to ``clusters`` passed to ``fit``.
+    Dates and time deltas are compared by value, so that the same dates at
+    different resolutions, e.g., ``datetime64[us]`` and ``datetime64[ns]``, are
+    the same labels.
     """
 
     def __init__(
@@ -2162,6 +2168,9 @@ class IVSystemGMM(_SystemModelBase):
     variables carries labels, the inputs that do must use the same index as the
     first of them that does, in the order ``exog``, ``endog``, ``instruments``
     and ``weights`` of each equation.
+    Dates and time deltas are compared by value, so that the same dates at
+    different resolutions, e.g., ``datetime64[us]`` and ``datetime64[ns]``, are
+    the same labels.
     """
 
     def __init__(

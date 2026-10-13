@@ -318,6 +318,9 @@ class TradedFactorModel(_FactorModelBase):
     ``to_numpy()`` to pair its values by position. NumPy arrays and pandas
     objects with a default index do not carry labels and are always paired by
     position.
+    Dates and time deltas are compared by value, so that the same dates at
+    different resolutions, e.g., ``datetime64[us]`` and ``datetime64[ns]``, are
+    the same labels.
     """
 
     def __init__(self, portfolios: IVDataLike, factors: IVDataLike):
@@ -781,6 +784,9 @@ class LinearFactorModel(_LinearFactorModelBase):
     ``to_numpy()`` to pair its values by position. NumPy arrays and pandas
     objects with a default index do not carry labels and are always paired by
     position.
+    Dates and time deltas are compared by value, so that the same dates at
+    different resolutions, e.g., ``datetime64[us]`` and ``datetime64[ns]``, are
+    the same labels.
     """
 
     def __init__(
@@ -1161,6 +1167,9 @@ class LinearFactorModelGMM(_LinearFactorModelBase):
     ``to_numpy()`` to pair its values by position. NumPy arrays and pandas
     objects with a default index do not carry labels and are always paired by
     position.
+    Dates and time deltas are compared by value, so that the same dates at
+    different resolutions, e.g., ``datetime64[us]`` and ``datetime64[ns]``, are
+    the same labels.
     """
 
     def __init__(

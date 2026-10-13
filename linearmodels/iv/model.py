@@ -831,6 +831,9 @@ class IVLIML(_IVLSModelBase):
     that do must use the same index as the first of ``exog``, ``endog``,
     ``instruments`` and ``weights`` that does. The same rule applies to
     ``clusters`` passed to ``fit``.
+    Dates and time deltas are compared by value, so that the same dates at
+    different resolutions, e.g., ``datetime64[us]`` and ``datetime64[ns]``, are
+    the same labels.
 
     .. todo::
 
@@ -970,6 +973,9 @@ class IV2SLS(_IVLSModelBase):
     that do must use the same index as the first of ``exog``, ``endog``,
     ``instruments`` and ``weights`` that does. The same rule applies to
     ``clusters`` passed to ``fit``.
+    Dates and time deltas are compared by value, so that the same dates at
+    different resolutions, e.g., ``datetime64[us]`` and ``datetime64[ns]``, are
+    the same labels.
 
     .. todo::
 
@@ -1415,6 +1421,9 @@ class IVGMM(_IVGMMBase):
     that do must use the same index as the first of ``exog``, ``endog``,
     ``instruments`` and ``weights`` that does. The same rule applies to
     ``clusters`` passed to ``fit`` or in ``weight_config``.
+    Dates and time deltas are compared by value, so that the same dates at
+    different resolutions, e.g., ``datetime64[us]`` and ``datetime64[ns]``, are
+    the same labels.
 
     The weight matrix is the inverse of an estimate of the covariance of the
     moment conditions, so that the estimate has to be nonsingular. A clustered
@@ -1805,6 +1814,9 @@ class IVGMMCUE(_IVGMMBase):
     that do must use the same index as the first of ``exog``, ``endog``,
     ``instruments`` and ``weights`` that does. The same rule applies to
     ``clusters`` passed to ``fit`` or in ``weight_config``.
+    Dates and time deltas are compared by value, so that the same dates at
+    different resolutions, e.g., ``datetime64[us]`` and ``datetime64[ns]``, are
+    the same labels.
 
     See Also
     --------
@@ -2282,6 +2294,9 @@ class _OLS(IVLIML):
     does not carry labels, the inputs that do must use the same index as the
     first of ``exog`` and ``weights`` that does. The same rule applies to
     ``clusters`` passed to ``fit``.
+    Dates and time deltas are compared by value, so that the same dates at
+    different resolutions, e.g., ``datetime64[us]`` and ``datetime64[ns]``, are
+    the same labels.
 
     See Also
     --------
@@ -2531,6 +2546,9 @@ class IVJIVE(_IVModelBase):
     that do must use the same index as the first of ``exog``, ``endog``,
     ``instruments`` and ``weights`` that does. The same rule applies to
     ``clusters`` passed to ``fit``.
+    Dates and time deltas are compared by value, so that the same dates at
+    different resolutions, e.g., ``datetime64[us]`` and ``datetime64[ns]``, are
+    the same labels.
 
     See Also
     --------

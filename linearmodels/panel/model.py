@@ -55,6 +55,7 @@ from linearmodels.shared.alignment import (
     is_labelled,
     labels_1d,
     misaligned,
+    same_labels,
 )
 from linearmodels.shared.exceptions import (
     InferenceUnavailableWarning,
@@ -756,7 +757,7 @@ class _PanelModelBase:
                     self._labels.get_level_values(1).unique(),
                 ]
             )
-            if len(expected) == len(rows) and not rows.index.equals(expected):
+            if len(expected) == len(rows) and not same_labels(rows.index, expected):
                 raise misaligned(
                     "weights", "The time and entity index", self._labels_name
                 )

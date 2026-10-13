@@ -16,6 +16,11 @@ If the dependent variable does not carry labels, the first of the other inputs
 that carries labels sets the labels instead, and the inputs that carry labels
 after it must use them. Two inputs with labels in a different order would
 otherwise be silently attached to the wrong observations in the same way.
+
+Dates and time deltas are compared by value. The same dates are the same
+labels when they are stored at different resolutions, e.g., ``datetime64[us]``
+and ``datetime64[ns]``, which is what pandas 3 does. In pandas 2 these indexes
+are not equal.
 """
 
 from __future__ import annotations
@@ -23,7 +28,20 @@ from __future__ import annotations
 from collections.abc import Iterable, Mapping
 from typing import Any
 
-from pandas import DataFrame, Index, MultiIndex, RangeIndex, Series
+from pandas import (
+    DataFrame,
+    DatetimeIndex,
+    Index,
+    MultiIndex,
+    RangeIndex,
+    Series,
+    TimedeltaIndex,
+)
+
+# The resolutions of dates and time deltas in pandas 2, from the coarsest to the
+# finest. Before pandas 2.0 the resolution is always nanoseconds, and indexes
+# do not have a unit.
+_UNITS = ("s", "ms", "us", "ns")
 
 
 def is_default_index(index: Index) -> bool:
@@ -140,6 +158,152 @@ def row_labels(value: object) -> Index | None:
     return None if is_default_index(labels) else labels
 
 
+def _unit(index: Index) -> str | None:
+    """Resolution of the dates or time deltas of an index, None if it has none."""
+    if isinstance(index, (DatetimeIndex, TimedeltaIndex)):
+        # Before pandas 2.0 an index does not have a unit
+        unit = getattr(index, "unit", None)
+        return unit if unit in _UNITS else None
+    return None
+
+
+def _finer_unit(left: Index, right: Index) -> str | None:
+    """
+    The finer resolution of two indexes that have different resolutions.
+
+    Parameters
+    ----------
+    left : Index
+        The first index.
+    right : Index
+        The second index.
+
+    Returns
+    -------
+    str or None
+        The finer of the resolutions if both are indexes of dates, or both are
+        indexes of time deltas, that have different resolutions. None otherwise.
+    """
+    unit, other = _unit(left), _unit(right)
+    if type(left) is not type(right) or unit is None or other is None or unit == other:
+        return None
+    return max(unit, other, key=_UNITS.index)
+
+
+def _as_unit(left: Index, right: Index, unit: str) -> tuple[Index, Index] | None:
+    """
+    The dates or time deltas of two indexes at the same resolution.
+
+    Parameters
+    ----------
+    left : DatetimeIndex or TimedeltaIndex
+        The first index.
+    right : DatetimeIndex or TimedeltaIndex
+        The second index, which has the same type as the first.
+    unit : str
+        The resolution, which is the finer of the resolutions of the indexes.
+
+    Returns
+    -------
+    tuple of Index or None
+        The indexes at the resolution. None if a value cannot be represented at
+        the resolution, e.g., a date in the year 3000 in nanoseconds. The index
+        with the finer resolution cannot hold that value, and so the values
+        are different.
+    """
+    try:
+        return (
+            left.as_unit(unit),  # type: ignore[attr-defined]
+            right.as_unit(unit),  # type: ignore[attr-defined]
+        )
+    except ValueError:
+        # OutOfBoundsDatetime and OutOfBoundsTimedelta, which are ValueErrors
+        return None
+
+
+def _same_multi_index(labels: MultiIndex, expected: MultiIndex) -> bool:
+    """
+    Whether two MultiIndexes are the same, comparing the dates in the levels by value.
+
+    This is used for MultiIndexes that ``MultiIndex.equals`` reports as
+    different, to find out if only the resolutions of their dates differ.
+    """
+    if labels.nlevels != expected.nlevels:
+        return False
+    pairs = zip(labels.levels, expected.levels, strict=True)
+    if all(_finer_unit(left, right) is None for left, right in pairs):
+        return False
+    converted_labels: list[Index] = []
+    converted_expected: list[Index] = []
+    for i in range(labels.nlevels):
+        # The values in the rows, since a level can have values that are not used
+        left, right = labels.get_level_values(i), expected.get_level_values(i)
+        unit = _finer_unit(left, right)
+        if unit is not None:
+            converted = _as_unit(left, right, unit)
+            if converted is None:
+                return False
+            left, right = converted
+        converted_labels.append(left)
+        converted_expected.append(right)
+    # The levels have the same type and resolution now, and so MultiIndex.equals
+    # compares everything else as before
+    return MultiIndex.from_arrays(converted_labels).equals(
+        MultiIndex.from_arrays(converted_expected)
+    )
+
+
+def same_labels(labels: Index, expected: Index) -> bool:
+    """
+    Whether two sets of labels are the same, where dates are compared by value.
+
+    The labels are the same if they have the same values in the same order.
+    Dates and time deltas are compared by value, and so the same dates at
+    different resolutions, e.g., ``datetime64[us]`` and ``datetime64[ns]``, are
+    the same labels. ``Index.equals`` treats them in this way in pandas 3, but
+    not in pandas 2.
+
+    Parameters
+    ----------
+    labels : Index
+        The labels to check.
+    expected : Index
+        The expected labels.
+
+    Returns
+    -------
+    bool
+        True if labels has the same values in the same order as expected.
+
+    Notes
+    -----
+    Dates and time deltas are compared at the finer of their resolutions. A
+    value that cannot be represented at that resolution, e.g., a date in the
+    year 3000 in nanoseconds, cannot be in the index that has the finer
+    resolution, and so the labels are different. The levels of a ``MultiIndex``
+    are compared in the same way. Everything else is compared as by
+    ``Index.equals``, so that dates in different time zones, and dates with and
+    without a time zone, are different labels as they are in pandas 3.
+    """
+    try:
+        if labels.equals(expected):
+            return True
+    except ValueError:
+        # pandas 3 raises an OutOfBoundsDatetime error when it compares a
+        # MultiIndex that has dates which the resolution of the other cannot
+        # hold. These are different labels, and the levels are compared below.
+        pass
+    if len(labels) != len(expected):
+        return False
+    if isinstance(labels, MultiIndex) and isinstance(expected, MultiIndex):
+        return _same_multi_index(labels, expected)
+    unit = _finer_unit(labels, expected)
+    if unit is None:
+        return False
+    converted = _as_unit(labels, expected, unit)
+    return converted is not None and converted[0].equals(converted[1])
+
+
 def differs(labels: Index, expected: Index) -> bool:
     """
     Whether labels, other than a default index, are not the expected labels.
@@ -154,9 +318,10 @@ def differs(labels: Index, expected: Index) -> bool:
     Returns
     -------
     bool
-        True if labels is not a default index and is not equal to expected.
+        True if labels is not a default index and is not the same as expected.
+        Dates are compared by value, see ``same_labels``.
     """
-    return not is_default_index(labels) and not labels.equals(expected)
+    return not is_default_index(labels) and not same_labels(labels, expected)
 
 
 def misaligned(name: str, what: str, reference: str = "dependent") -> ValueError:
@@ -201,6 +366,10 @@ def check_row_alignment(
     are reported using a length-specific error message. A default index has
     no labels and is paired by position.
 
+    Dates and time deltas are compared by value, so that the same dates at
+    different resolutions, e.g., ``datetime64[us]`` and ``datetime64[ns]``,
+    are the same labels. See ``same_labels``.
+
     Parameters
     ----------
     name : str
@@ -221,7 +390,7 @@ def check_row_alignment(
     if (
         len(labels) != len(expected)
         or is_default_index(labels)
-        or labels.equals(expected)
+        or same_labels(labels, expected)
     ):
         return
     raise misaligned(name, "The row index", reference)
@@ -280,6 +449,9 @@ def check_alignment(
 ) -> None:
     """
     Reject labelled inputs whose row index is not the expected index.
+
+    Dates and time deltas are compared by value, so that the same dates at
+    different resolutions are the same labels. See ``same_labels``.
 
     Parameters
     ----------

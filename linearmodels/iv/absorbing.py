@@ -903,6 +903,9 @@ class AbsorbingLS:
     that do must use the same index as the first of ``exog``, ``absorb``,
     ``interactions`` and ``weights`` that does. The same rule applies to
     ``clusters`` passed to ``fit``.
+    Dates and time deltas are compared by value, so that the same dates at
+    different resolutions, e.g., ``datetime64[us]`` and ``datetime64[ns]``, are
+    the same labels.
 
     See also
     --------

@@ -16,6 +16,7 @@ from statsmodels.iolib.summary import SimpleTable, fmt_2cols, fmt_params
 
 from linearmodels.iv.results import default_txt_fmt, stub_concat, table_concat
 from linearmodels.panel.covariance import HomoskedasticCovariance
+from linearmodels.shared.alignment import same_labels
 from linearmodels.shared.base import _ModelComparison, _SummaryStr
 from linearmodels.shared.hypotheses import (
     InapplicableTestStatistic,
@@ -1263,7 +1264,7 @@ def _check_same_sample(res: PanelResults, other: PanelResults) -> None:
             f"This model uses {res.nobs} and other uses {other.nobs}."
         )
     model, other_model = res.model, other.model
-    if not model.dependent.index.equals(other_model.dependent.index):
+    if not same_labels(model.dependent.index, other_model.dependent.index):
         raise ValueError(
             "The models must be estimated using the same observations. The "
             "entities and time periods of the observations differ."
