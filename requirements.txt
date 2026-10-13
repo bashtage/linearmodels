@@ -1,8 +1,8 @@
 numpy>=1.23.5,<3
 pandas>=1.4.0
 scipy>=1.8.0
-statsmodels>=0.13.1
+statsmodels>=0.14.6
 mypy_extensions>=0.4
-pyhdfe>=0.1
+pyhdfe>=0.2.0
 formulaic>=1.2.1
 packaging

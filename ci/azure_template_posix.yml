@@ -44,26 +44,26 @@ jobs:
       # pandas 2.3, the last 2.x, with copy-on-write, which pandas 3 always uses
       python313_recent_wheel:
         python.version: '3.13'
-        PACKAGES: 'xxhash numpy==2.2.6 scipy==1.15.3 pandas==2.3.3 statsmodels==0.14.5'
+        PACKAGES: 'xxhash numpy==2.2.6 scipy==1.15.3 pandas==2.3.3 statsmodels==0.14.6'
         LM_TEST_COPY_ON_WRITE: 1
         test.wheel: true
       # numpy 2.0, the first 2.x, and pandas 2.2, which renamed annual dates to YE-DEC
       python312_cython_coverage:
         python.version: '3.12'
-        PACKAGES: 'xxhash numpy==2.0.2 scipy==1.13.1 pandas==2.2.3 statsmodels==0.14.4'
+        PACKAGES: 'xxhash numpy==2.0.2 scipy==1.13.1 pandas==2.2.3 statsmodels==0.14.6'
         BUILD_FLAGS: '-Csetup-args=-Dcython-coverage=true'
         cython.coverage: true
         COVERAGE_CORE: ctrace
       # pandas 2.0, the newest without DataFrame.stack(future_stack)
       python311_mid_sdist:
         python.version: '3.11'
-        PACKAGES: 'xxhash numpy==1.24.4 scipy==1.10.1 pandas==2.0.3 statsmodels==0.14.0'
+        PACKAGES: 'xxhash numpy==1.24.4 scipy==1.10.1 pandas==2.0.3 statsmodels==0.14.6'
         test.sdist: true
-      # The oldest versions that linearmodels supports. statsmodels 0.13.1 is the
-      # oldest with a wheel for Python 3.10.
+      # The oldest versions that linearmodels supports. statsmodels 0.14.6 is the
+      # first release that imports with pandas 3.
       python310_minimums:
         python.version: '3.10'
-        PACKAGES: 'numpy==1.23.5 scipy==1.8.0 pandas==1.4.0 statsmodels==0.13.1 xarray==0.21.0 formulaic==1.2.1 pyhdfe==0.1.0'
+        PACKAGES: 'numpy==1.23.5 scipy==1.8.0 pandas==1.4.0 statsmodels==0.14.6 xarray==0.21.0 formulaic==1.2.1 pyhdfe==0.2.0'
         PYTEST_PATTERN: "(slow or not slow)"
         style: true
       python314_pre:

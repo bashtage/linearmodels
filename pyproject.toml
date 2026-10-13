@@ -14,9 +14,9 @@ dependencies = [
   "numpy>=1.23.5,<3",
   "pandas>=1.4.0",
   "scipy>=1.8.0",
-  "statsmodels>=0.13.1",  # The first release with a wheel for Python 3.10
+  "statsmodels>=0.14.6",  # The first release that imports with pandas 3
   "mypy_extensions>=0.4",
-  "pyhdfe>=0.1",
+  "pyhdfe>=0.2.0",
   "formulaic>=1.2.1",
   "packaging",
 ]
@@ -89,7 +89,7 @@ doc = [
   "scipy >=1.5.0",
   "ipython >=8.0.1",
   "matplotlib >=3.0",
-  "statsmodels >=0.13.5",
+  "statsmodels >=0.14.6",
   "jinja2",
   "sphinx>=7",
   "seaborn",
