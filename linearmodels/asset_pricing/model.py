@@ -136,9 +136,20 @@ class _FactorModelBase:
                 "equivalent and must not have rank\n"
                 "less than the dimension of the smaller shape."
             )
-        if has_constant(f)[0]:
+        rank = np.linalg.matrix_rank(f)
+        constant = has_constant(f, rank)[0]
+        if constant and rank < f.shape[1]:
+            # has_constant is also True if the columns are collinear. Collinear
+            # factors have a constant if a column is constant, or, for a matrix
+            # with more rows than columns, if a constant is in the span of the
+            # columns
+            nobs = f.shape[0]
+            aug_rank = np.linalg.matrix_rank(np.c_[np.ones((nobs, 1)), f])
+            constant_column = np.any((np.ptp(f, axis=0) == 0) & ~np.all(f == 0, axis=0))
+            constant = bool(constant_column or (nobs > f.shape[1] and aug_rank == rank))
+        if constant:
             raise ValueError("factors must not contain a constant or equivalent.")
-        if np.linalg.matrix_rank(f) < f.shape[1]:
+        if rank < f.shape[1]:
             raise ValueError(
                 "Model cannot be estimated. factors do not have full column rank."
             )
@@ -146,6 +157,18 @@ class _FactorModelBase:
             raise ValueError(
                 "Model cannot be estimated. portfolios must have factors + 1 or "
                 "more returns to\nestimate the model parameters."
+            )
+
+    def _check_debiased(self, debiased: bool) -> None:
+        """Debiasing needs more observations than regressors in the regressions"""
+        nobs, nfactor = self.factors.shape
+        if debiased and nobs <= nfactor + 1:
+            raise ValueError(
+                "The covariance cannot be debiased when the number of observations "
+                f"({nobs}) is not larger than the number of factors plus one "
+                f"({nfactor + 1}), the number of regressors of each time-series "
+                "regression, since there are no residual degrees of freedom. Use "
+                "debiased=False or more observations."
             )
 
     @property
@@ -326,6 +349,7 @@ class TradedFactorModel(_FactorModelBase):
         ``kernel``, one of "bartlett", "parzen" or "qs" (quadratic spectral)
         and ``bandwidth`` (a positive integer).
         """
+        self._check_debiased(debiased)
         p = self.portfolios.ndarray
         f = self.factors.ndarray
         nportfolio = p.shape[1]
@@ -459,10 +483,32 @@ class _LinearFactorModelBase(_FactorModelBase):
                 self.portfolios.shape[1]
             )
         else:
-            self._sigma = np.asarray(sigma)
-            vals, vecs = np.linalg.eigh(sigma)
+            self._sigma = self._validate_sigma(sigma)
+            vals, vecs = np.linalg.eigh(self._sigma)
             self._sigma_m12 = vecs @ np.diag(1.0 / np.sqrt(vals)) @ vecs.T
             self._sigma_inv = np.linalg.inv(self._sigma).astype(float, copy=False)
+
+    def _validate_sigma(
+        self, sigma: linearmodels.typing.data.ArrayLike
+    ) -> linearmodels.typing.data.Float64Array:
+        """Check that sigma is a symmetric positive definite matrix of the right size"""
+        nportfolio = self.portfolios.shape[1]
+        sigma_arr = np.asarray(sigma, dtype=float)
+        if sigma_arr.shape != (nportfolio, nportfolio):
+            raise ValueError(
+                f"sigma must be a square array with shape ({nportfolio}, "
+                f"{nportfolio}), where {nportfolio} is the number of test portfolios. "
+                f"The shape of sigma is {sigma_arr.shape}."
+            )
+        if not np.all(np.isfinite(sigma_arr)):
+            raise ValueError("sigma must not contain missing or infinite values.")
+        scale = np.max(np.abs(sigma_arr))
+        if np.max(np.abs(sigma_arr - sigma_arr.T)) > 1e-8 * scale:
+            raise ValueError("sigma must be symmetric.")
+        vals = np.linalg.eigvalsh((sigma_arr + sigma_arr.T) / 2)
+        if not vals[0] > nportfolio * np.finfo(float).eps * vals[-1]:
+            raise ValueError("sigma must be positive definite.")
+        return sigma_arr
 
     def __str__(self) -> str:
         out = super().__str__()
@@ -509,8 +555,12 @@ class LinearFactorModel(_LinearFactorModelBase):
         Flag indicating whether the risk-free rate should be estimated
         from returns along other risk premia.  If False, the returns are
         assumed to be excess returns using the correct risk-free rate.
-    sigma : array_like
-        Positive definite residual covariance (nportfolio by nportfolio)
+    sigma : array_like, optional
+        Positive definite residual covariance (nportfolio by nportfolio) that
+        weights the test portfolios in the second stage. A ``ValueError`` is
+        raised if it does not have this shape, contains missing or infinite
+        values, or is not symmetric and positive definite. If not provided, the
+        identity matrix is used.
 
     Notes
     -----
@@ -591,8 +641,12 @@ class LinearFactorModel(_LinearFactorModelBase):
             Flag indicating whether the risk-free rate should be estimated
             from returns along other risk premia.  If False, the returns are
             assumed to be excess returns using the correct risk-free rate.
-        sigma : array_like
-            Positive definite residual covariance (nportfolio by nportfolio)
+        sigma : array_like, optional
+            Positive definite residual covariance (nportfolio by nportfolio) that
+            weights the test portfolios in the second stage. A ``ValueError`` is
+            raised if it does not have this shape, contains missing or infinite
+            values, or is not symmetric and positive definite. If not provided,
+            the identity matrix is used.
 
         Returns
         -------
@@ -659,6 +713,7 @@ class LinearFactorModel(_LinearFactorModelBase):
         """
         nobs, nf, nport, nrf, s1, s2, s3 = self._boundaries()
         excess_returns = not self._risk_free
+        self._check_debiased(debiased)
         f = self.factors.ndarray
         p = self.portfolios.ndarray
         nport = p.shape[1]
@@ -1009,7 +1064,9 @@ class LinearFactorModelGMM(_LinearFactorModelBase):
         mod = LinearFactorModel(
             self.portfolios, self.factors, risk_free=self._risk_free
         )
-        res = mod.fit()
+        # The starting values do not use the covariance, which cannot be debiased
+        # if there are no residual degrees of freedom in the first stage
+        res = mod.fit(debiased=False)
         betas_1d = np.asarray(res.betas).ravel()
         lam = np.asarray(res.risk_premia)
         mu = self.factors.ndarray.mean(0)

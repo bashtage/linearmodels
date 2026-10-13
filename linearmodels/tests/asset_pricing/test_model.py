@@ -169,7 +169,7 @@ def test_errors(data):
         TradedFactorModel(p3, data.factors)
     with pytest.raises(ValueError, match=r"factors must not contain"):
         TradedFactorModel(data.portfolios, f)
-    with pytest.raises(ValueError, match=r"factors must not contain"):
+    with pytest.raises(ValueError, match=r"factors do not have full column rank"):
         TradedFactorModel(data.portfolios, f2)
     with pytest.raises(ValueError, match=r"Model cannot be estimated"):
         TradedFactorModel(p5, f5)
