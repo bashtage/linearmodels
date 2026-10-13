@@ -124,7 +124,8 @@ def newey_west(series, kernel):
     """The bandwidth of Newey and West (1994): the ceiling of the rule, at most t - 1"""
     m = newey_west_rule(series, kernel)
     # Away from an integer, so that rounding cannot change the ceiling
-    assert m == 0 or abs(m - round(m)) > 1e-6
+    distance = abs(m - round(m))
+    assert m == 0 or distance > 1e-6
     return min(math.ceil(m), np.asarray(series).size - 1)
 
 
@@ -198,7 +199,8 @@ def test_message_names_the_kernel_the_observations_and_the_bandwidth(kernel):
     with pytest.raises(ValueError, match="bandwidth") as exc:
         kernel_optimal_bandwidth(zero_sum_series(first - 1), kernel)
     message = str(exc.value)
-    assert repr(kernel) in message
+    quoted = repr(kernel)
+    assert quoted in message
     assert f"needs at least {first} observations" in message
     assert f"there are {first - 1}" in message
     assert "Pass the bandwidth explicitly" in message
@@ -211,8 +213,10 @@ def test_bandwidth_above_the_boundary_is_the_newey_west_rule(kernel, series, ext
     nobs = fewest_observations(kernel) + extra
     x = SERIES[series](nobs)
     result = kernel_optimal_bandwidth(x, kernel)
-    assert isinstance(result, int)
-    assert result == newey_west(x, kernel)
+    is_integer = isinstance(result, int)
+    expected = newey_west(x, kernel)
+    assert is_integer
+    assert result == expected
 
 
 # Series with the fewest observations whose rule is much larger than nobs - 1
@@ -226,9 +230,13 @@ CAPPED = {
 @pytest.mark.parametrize("kernel", CANONICAL)
 def test_bandwidth_is_capped_at_the_number_of_observations_less_one(kernel):
     x = np.array(CAPPED[kernel])
-    assert x.shape[0] == fewest_observations(kernel)
-    assert newey_west_rule(x, kernel) > 1.4 * (x.shape[0] - 1)
-    assert kernel_optimal_bandwidth(x, kernel) == x.shape[0] - 1
+    nobs = x.shape[0]
+    first = fewest_observations(kernel)
+    rule = newey_west_rule(x, kernel)
+    result = kernel_optimal_bandwidth(x, kernel)
+    assert nobs == first
+    assert rule > 1.4 * (nobs - 1)
+    assert result == nobs - 1
 
 
 # The digits of pi with signs, which have a long-run variance that is not 0
@@ -240,8 +248,46 @@ def test_column_vector_and_integers_give_the_same_bandwidth(kernel):
     nobs = fewest_observations(kernel) + 3
     x = INTEGERS[:nobs]
     expected = newey_west(x, kernel)
-    assert kernel_optimal_bandwidth(x, kernel) == expected
-    assert kernel_optimal_bandwidth(x[:, None].astype(float), kernel) == expected
+    result = kernel_optimal_bandwidth(x, kernel)
+    column = kernel_optimal_bandwidth(x[:, None].astype(float), kernel)
+    assert result == expected
+    assert column == expected
+
+
+# The rule of sandwich::bwNeweyWest (sandwich 3.1.3 in R 4.6.1) for the series of
+# sandwich_series, which has 100 observations. It is the same rule and the same
+# constants. The pilot lag of sandwich is floor(4 (T / 100) ** a), the one here is the
+# ceiling, and they are the same if that number is an integer, as it is for every kernel
+# with 100 observations (it is 4):
+#
+#   e <- sin((1:100)^2)
+#   x <- as.numeric(stats::filter(e, 0.6, method = "recursive"))
+#   bwNeweyWest(matrix(x), kernel = "Bartlett", prewhite = 0, weights = 1)
+SANDWICH_RULE = {
+    **dict.fromkeys(BARTLETT, 6.1644899939539499),
+    **dict.fromkeys(PARZEN, 10.174290345382101),
+    **dict.fromkeys(QS, 5.0542681542157037),
+}
+
+
+def sandwich_series():
+    e = np.sin(np.arange(1, 101, dtype=float) ** 2)
+    x = np.empty(100)
+    x[0] = e[0]
+    for i in range(1, 100):
+        x[i] = 0.6 * x[i - 1] + e[i]
+    return x
+
+
+@pytest.mark.parametrize("kernel", KERNELS)
+def test_rule_is_that_of_r_sandwich(kernel):
+    x = sandwich_series()
+    expected = SANDWICH_RULE[kernel]
+    rule = newey_west_rule(x, kernel)
+    result = kernel_optimal_bandwidth(x, kernel)
+    ceiling = math.ceil(expected)
+    assert_allclose(rule, expected, rtol=1e-12)
+    assert result == ceiling
 
 
 @pytest.mark.parametrize("nobs", [1, 3, 20])
@@ -273,7 +319,8 @@ NOT_FINITE = {
 @pytest.mark.parametrize("kernel", KERNELS)
 def test_bandwidth_that_is_not_finite_raises(kernel, case):
     x = NOT_FINITE[case]
-    assert x.shape[0] >= fewest_observations(kernel)
+    first = fewest_observations(kernel)
+    assert x.shape[0] >= first
     if case == EXACTLY_ZERO:
         # The rule divides a number that is not zero by zero, which is exact here
         s0, sq = pilot_sums(x, kernel)
@@ -388,7 +435,8 @@ EXPLICIT_BANDWIDTHS = [
 def test_fama_macbeth_with_too_few_periods_raises_when_the_model_is_fit(
     kernel, nperiod
 ):
-    assert FEWEST[kernel] == fewest_observations(kernel)
+    first = fewest_observations(kernel)
+    assert FEWEST[kernel] == first
     y, x = fama_macbeth_panel(nperiod)
     mod = FamaMacBeth(y, x)
     match = re.escape(fama_macbeth_message(kernel, nperiod))
@@ -578,9 +626,10 @@ def gmm_step_two(data):
     return x, z, y, np.linalg.solve(xpz @ weight @ xpz.T, xpz @ weight @ (z.T @ y))
 
 
-def covariance_is_finite(res):
+def check_covariance_is_finite(res):
     values = np.asarray(res.cov)
-    return bool(np.isfinite(values).all())
+    finite = bool(np.isfinite(values).all())
+    assert finite
 
 
 IV_MODELS = [IV2SLS, IVLIML, IVJIVE]
@@ -602,7 +651,7 @@ def test_iv_models_with_the_fewest_observations(model, kernel):
     res = model(*iv_args(iv_data(nobs))).fit(cov_type="kernel", kernel=kernel)
     bandwidth = res.cov_config["bandwidth"]
     assert 0 <= bandwidth <= nobs - 1
-    assert covariance_is_finite(res)
+    check_covariance_is_finite(res)
 
 
 @pytest.mark.parametrize("kernel", CANONICAL)
@@ -614,7 +663,7 @@ def test_iv_models_explicit_bandwidth_works_with_the_observations_that_raise(
     mod = model(*iv_args(iv_data(nobs)))
     res = mod.fit(cov_type="kernel", kernel=kernel, bandwidth=1)
     assert res.cov_config["bandwidth"] == 1
-    assert covariance_is_finite(res)
+    check_covariance_is_finite(res)
 
 
 @pytest.mark.parametrize("extra", [0, 1, 2, 10])
@@ -627,7 +676,8 @@ def test_iv2sls_automatic_bandwidth_is_the_rule_for_the_scores(kernel, extra):
     assert_allclose(res.params, params, rtol=1e-8)
     # The scores of the regressors that are not the constant: xhat * eps
     scores = xhat[:, 1] * (y - x @ params)
-    assert res.cov_config["bandwidth"] == newey_west(scores, kernel)
+    expected = newey_west(scores, kernel)
+    assert res.cov_config["bandwidth"] == expected
 
 
 @pytest.mark.parametrize("kernel", CANONICAL)
@@ -713,7 +763,8 @@ def test_gmm_weight_bandwidth_is_the_rule_for_the_first_step_residuals(
     x, z, y, params = gmm_step_one(data)
     # IVGMMCUE centers the moment conditions by default
     series = moment_series(z, y - x @ params, center=model is IVGMMCUE)
-    assert res.weight_config["bandwidth"] == newey_west(series, kernel)
+    expected = newey_west(series, kernel)
+    assert res.weight_config["bandwidth"] == expected
 
 
 @pytest.mark.parametrize("extra", [0, 2, 8])
@@ -742,10 +793,11 @@ def test_kernel_weight_matrix_raises_with_too_few_observations(kernel):
     with pytest.raises(ValueError, match=re.escape(too_few_message(kernel, nobs))):
         weight.weight_matrix(x, z, eps)
     # The bandwidth of 7.0 and an explicit bandwidth do not need the observations
-    for options in ({"optimal_bw": False}, {"bandwidth": 1}):
+    for options, expected in (({"optimal_bw": False}, nobs - 2), ({"bandwidth": 1}, 1)):
         restored = IVKernelWeightMatrix(kernel=kernel, **options)
         restored.weight_matrix(x, z, eps)
-        assert restored.bandwidth == options.get("bandwidth", nobs - 2)
+        bandwidth = restored.bandwidth
+        assert bandwidth == expected
 
 
 # The first stage rank tests --------------------------------------------------------
@@ -782,14 +834,16 @@ def test_rank_tests_with_an_explicit_bandwidth_work_with_too_few_observations(
     result = statistic(endog, instr, exog, "kernel", config)
     # kleibergen_paap returns a test statistic and kleibergen_paap_f a float
     value = float(getattr(result, "stat", result))
-    assert np.isfinite(value)
+    finite = np.isfinite(value)
+    assert finite
 
 
 @pytest.mark.parametrize(("kernel", "nobs"), RANK_TEST_ENOUGH)
 def test_rank_tests_with_enough_observations(kernel, nobs):
     endog, instr, exog = rank_test_arrays(nobs)
     stat = kleibergen_paap_f(endog, instr, exog, "kernel", {"kernel": kernel})
-    assert np.isfinite(stat)
+    finite = np.isfinite(stat)
+    assert finite
 
 
 # ---------------------------------------------------------------------------------
@@ -831,7 +885,7 @@ def test_system_models_with_the_fewest_observations(model, endogenous, kernel):
     mod = model(system_equations(nobs, endogenous))
     res = mod.fit(cov_type="kernel", kernel=kernel)
     assert 0 <= res.cov_config["bandwidth"] <= nobs - 1
-    assert covariance_is_finite(res)
+    check_covariance_is_finite(res)
     explicit = mod.fit(cov_type="kernel", kernel=kernel, bandwidth=1)
     assert explicit.cov_config["bandwidth"] == 1
 
@@ -846,7 +900,7 @@ def test_system_models_explicit_bandwidth_works_with_the_observations_that_raise
         cov_type="kernel", kernel=kernel, bandwidth=1
     )
     assert res.cov_config["bandwidth"] == 1
-    assert covariance_is_finite(res)
+    check_covariance_is_finite(res)
 
 
 @pytest.mark.parametrize("kernel", CANONICAL)
@@ -904,7 +958,7 @@ def test_system_gmm_with_the_fewest_observations(kernel):
     ).fit(cov_type="kernel", kernel=kernel)
     assert 0 <= res.weight_config["bandwidth"] <= nobs - 1
     assert 0 <= res.cov_config["bandwidth"] <= nobs - 1
-    assert covariance_is_finite(res)
+    check_covariance_is_finite(res)
 
 
 @pytest.mark.parametrize("extra", [0, 3])
@@ -919,7 +973,9 @@ def test_system_kernel_weight_matrix_bandwidth_is_the_rule(kernel, extra):
     weight.weight_matrix(x, z, eps)
     ze = np.hstack([z[i] * eps[:, [i]] for i in range(2)])
     series = (ze / ze.std(axis=0)).sum(axis=1)
-    assert weight.bandwidth == newey_west(series, kernel)
+    expected = newey_west(series, kernel)
+    bandwidth = weight.bandwidth
+    assert bandwidth == expected
 
 
 @pytest.mark.parametrize("kernel", CANONICAL)
@@ -934,7 +990,8 @@ def test_system_kernel_weight_matrix_raises_with_too_few_observations(kernel):
         weight.weight_matrix(x, z, eps)
     explicit = SystemKernelWeightMatrix(kernel=kernel, bandwidth=1)
     explicit.weight_matrix(x, z, eps)
-    assert explicit.bandwidth == 1
+    bandwidth = explicit.bandwidth
+    assert bandwidth == 1
 
 
 # ---------------------------------------------------------------------------------
@@ -986,8 +1043,9 @@ def test_factor_models_explicit_bandwidth_works_with_the_observations_that_raise
 ):
     nobs = fewest_observations(kernel) - 1
     res = model(*factor_data(nobs)).fit(cov_type="kernel", kernel=kernel, bandwidth=1)
-    assert bandwidth_of(res) == 1
-    assert covariance_is_finite(res)
+    bandwidth = bandwidth_of(res)
+    assert bandwidth == 1
+    check_covariance_is_finite(res)
 
 
 @pytest.mark.parametrize("kernel", CANONICAL)
@@ -995,8 +1053,9 @@ def test_factor_models_explicit_bandwidth_works_with_the_observations_that_raise
 def test_factor_models_with_the_fewest_observations(model, kernel):
     nobs = fewest_observations(kernel)
     res = model(*factor_data(nobs)).fit(cov_type="kernel", kernel=kernel)
-    assert 0 <= bandwidth_of(res) <= nobs - 1
-    assert covariance_is_finite(res)
+    bandwidth = bandwidth_of(res)
+    assert 0 <= bandwidth <= nobs - 1
+    check_covariance_is_finite(res)
 
 
 @pytest.mark.parametrize("extra", [0, 1, 2, 10])
@@ -1007,7 +1066,9 @@ def test_traded_factor_model_bandwidth_is_the_rule_for_the_moments(kernel, extra
     res = TradedFactorModel(portfolios, factors).fit(cov_type="kernel", kernel=kernel)
     moments = traded_factor_moments(portfolios, factors)
     series = (moments / moments.std(axis=0)).sum(axis=1)
-    assert bandwidth_of(res) == newey_west(series, kernel)
+    expected = newey_west(series, kernel)
+    bandwidth = bandwidth_of(res)
+    assert bandwidth == expected
 
 
 # One portfolio and one factor have 3 moment conditions, and GMM needs more
@@ -1028,7 +1089,8 @@ def test_gmm_factor_model_explicit_bandwidth_works_with_the_observations_that_ra
 ):
     mod = LinearFactorModelGMM(*factor_data(nobs, nportfolio=1))
     res = mod.fit(cov_type="kernel", kernel=kernel, bandwidth=1, disp=0)
-    assert bandwidth_of(res) == 1
+    bandwidth = bandwidth_of(res)
+    assert bandwidth == 1
 
 
 @pytest.mark.parametrize("extra", [0, 3])
@@ -1039,9 +1101,11 @@ def test_factor_kernel_covariance_and_weight_bandwidth_is_the_rule(kernel, extra
     series = (moments / moments.std(axis=0)).sum(axis=1)
     expected = newey_west(series, kernel)
     covariance = FactorKernelCovariance(moments, jacobian=np.eye(3), kernel=kernel)
-    assert covariance.bandwidth == expected
+    covariance_bandwidth = covariance.bandwidth
     weight = FactorKernelWeight(moments, kernel=kernel)
-    assert weight.bandwidth == expected
+    weight_bandwidth = weight.bandwidth
+    assert covariance_bandwidth == expected
+    assert weight_bandwidth == expected
 
 
 @pytest.mark.parametrize("kernel", CANONICAL)
@@ -1057,4 +1121,5 @@ def test_factor_kernel_covariance_and_weight_raise_with_too_few_observations(ker
         weight.w(moments)
     # An explicit bandwidth does not need the observations
     explicit = FactorKernelWeight(moments, kernel=kernel, bandwidth=1)
-    assert explicit.bandwidth == 1
+    bandwidth = explicit.bandwidth
+    assert bandwidth == 1
