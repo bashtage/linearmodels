@@ -540,7 +540,10 @@ def kleibergen_paap(
         Options for the covariance estimator. "clustered" requires
         ``clusters``, a 1-d array with one element for each observation.
         "kernel" uses ``kernel`` (default "bartlett") and ``bandwidth``. If
-        the bandwidth is not provided it is selected automatically.
+        the bandwidth is not provided it is selected automatically, which
+        needs at least 4 observations with the Bartlett kernel, 5 with the
+        Parzen kernel and 6 with the quadratic spectral kernel. See
+        :func:`~linearmodels.iv.covariance.kernel_optimal_bandwidth`.
 
     Returns
     -------
@@ -558,7 +561,10 @@ def kleibergen_paap(
     ValueError
         If ``cov_type`` is not supported, or is "clustered" and
         ``cov_config`` does not contain ``clusters`` or ``clusters`` does not
-        have an element for each row of the arrays.
+        have an element for each row of the arrays. It is also raised if
+        ``cov_type`` is "kernel", the bandwidth is not provided and there are
+        fewer observations than the kernel needs to select it, or the
+        bandwidth that is selected is not finite.
 
     Warnings
     --------
@@ -700,7 +706,10 @@ def kleibergen_paap_f(
     ------
     ValueError
         If ``cov_type`` is not supported, or is "clustered" and
-        ``cov_config`` does not contain ``clusters``.
+        ``cov_config`` does not contain ``clusters``. It is also raised if
+        ``cov_type`` is "kernel", the bandwidth is not provided and there are
+        fewer observations than the kernel needs to select it, or the
+        bandwidth that is selected is not finite. See :func:`kleibergen_paap`.
 
     Warnings
     --------

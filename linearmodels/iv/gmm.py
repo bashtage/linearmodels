@@ -241,8 +241,10 @@ class KernelWeightMatrix(HomoskedasticWeightMatrix):
         Flag indicating whether to estimate the bandwidth from the data when
         ``bandwidth`` is not provided. If False, nobs - 2 is used. If True,
         the bandwidth is estimated using
-        :func:`~linearmodels.iv.covariance.kernel_optimal_bandwidth`. The
-        default also estimates the bandwidth, but it issues a
+        :func:`~linearmodels.iv.covariance.kernel_optimal_bandwidth`, which
+        needs at least 4 observations with the Bartlett kernel, 5 with the
+        Parzen kernel and 6 with the quadratic spectral kernel. The default
+        also estimates the bandwidth, but it issues a
         ``DefaultBandwidthWarning`` since it changed in 7.1.
 
     Notes
@@ -273,6 +275,17 @@ class KernelWeightMatrix(HomoskedasticWeightMatrix):
     :class:`~linearmodels.iv.model.IVGMMCUE` estimates the bandwidth once, from
     the residuals of the first step estimates, and uses it in every evaluation
     of its objective function.
+
+    .. versionchanged:: 7.1
+
+       ``weight_matrix`` raises a ``ValueError`` if the bandwidth is estimated
+       from the data and there are fewer observations than the kernel needs
+       (see ``optimal_bw``), or if the estimated bandwidth is not finite. Pass
+       ``bandwidth`` or ``optimal_bw=False`` to use the weight matrix with
+       fewer observations. Earlier versions raised "cannot convert float
+       infinity to integer" (an ``OverflowError``) or "cannot convert float NaN
+       to integer" for some data when ``optimal_bw`` was True, and used a
+       bandwidth of nobs - 1, or another bandwidth, for other data.
 
     See Also
     --------
@@ -542,7 +555,10 @@ class IVGMMCovariance(HomoskedasticCovariance):
     * ``optimal_bw``: Flag indicating whether to estimate the bandwidth from
       the data when ``bandwidth`` is not provided. If False, nobs - 2 is used.
       If True, the bandwidth is estimated using
-      :func:`~linearmodels.iv.covariance.kernel_optimal_bandwidth`.
+      :func:`~linearmodels.iv.covariance.kernel_optimal_bandwidth`, which
+      needs at least 4 observations with the Bartlett kernel, 5 with the Parzen
+      kernel and 6 with the quadratic spectral kernel, and raises a
+      ``ValueError`` for fewer.
 
     If neither ``bandwidth`` nor ``optimal_bw`` is given, the bandwidth is
     estimated from the data. In 7.0 and earlier the default was ``nobs - 2``,

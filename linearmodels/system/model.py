@@ -2093,6 +2093,13 @@ class IVSystemGMM(_SystemModelBase):
     unless ``bandwidth`` is given. See
     :class:`~linearmodels.system.gmm.KernelWeightMatrix`.
 
+    A bandwidth that is estimated from the data, for the weight matrix or the
+    covariance, needs at least 4 observations with the Bartlett kernel, 5 with
+    the Parzen kernel and 6 with the quadratic spectral kernel. ``fit`` raises a
+    ``ValueError`` for fewer observations, and if the estimated bandwidth is
+    not finite. Pass ``bandwidth`` to use the kernel with fewer observations.
+    See :func:`~linearmodels.iv.covariance.kernel_optimal_bandwidth`.
+
     Rows are paired by position, both within an equation and across the
     equations. An input that carries labels (a pandas Series or DataFrame
     with an index other than the default 0, 1, ..., n-1, or an xarray
@@ -2188,6 +2195,16 @@ class IVSystemGMM(_SystemModelBase):
         -------
         GMMSystemResults
             Estimation results
+
+        Raises
+        ------
+        ValueError
+            If a bandwidth is estimated from the data, for the kernel weight
+            matrix or for the kernel covariance, and there are fewer
+            observations than the kernel needs: 4 for the Bartlett kernel, 5
+            for the Parzen kernel and 6 for the quadratic spectral kernel. It
+            is also raised if the estimated bandwidth is not finite. Pass
+            ``bandwidth`` to use the kernel with fewer observations.
 
         Notes
         -----

@@ -766,6 +766,18 @@ kernel, :math:`q=2`, :math:`c_{q}=2.6614` and
 
 or :math:`T-1`, if that is smaller.
 
+The method needs :math:`m^{*}<T-1`. Otherwise :math:`\hat{s}^{(0)}` is
+the sum of all of the autocovariances,
+:math:`T^{-1}\left(\sum_{i}g_{i}\right)^{2}`, which is zero, up to
+rounding error, for a series with a mean of zero, such as the scores of a
+least squares regression, and the method divides by it. The condition
+holds with at least 4 observations for the Bartlett kernel
+(:math:`m^{*}=2`), 5 for the Parzen kernel (:math:`m^{*}=3`) and 6 for the
+quadratic spectral kernel (:math:`m^{*}=4`). An error is raised for fewer
+observations, and if the bandwidth is not finite, which happens if
+:math:`\hat{s}^{(0)}` is zero or the series has values that are not
+finite.
+
 Constant Detection
 ------------------
 
