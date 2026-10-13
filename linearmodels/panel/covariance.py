@@ -10,6 +10,7 @@ from pandas import DataFrame, MultiIndex
 from linearmodels.iv.covariance import (
     CLUSTER_ERR,
     KERNEL_LOOKUP,
+    _min_nobs_automatic_bandwidth,
     cov_cluster,
     cov_kernel,
     kernel_optimal_bandwidth,
@@ -774,7 +775,10 @@ class FamaMacBethCovariance(HomoskedasticCovariance):
         Non-negative bandwidth to use. It must be below T, the number of time
         periods that are used. The Bartlett and Parzen kernels use its integer
         part. Set to 0 to disable autocorrelation robustness. If not provided, it
-        is computed from the T estimates and is at most T - 1.
+        is computed from the T estimates and is at most T - 1. The computation
+        needs at least 4 time periods with the Bartlett kernel, 5 with the Parzen
+        kernel and 6 with the quadratic spectral kernel. See
+        :func:`~linearmodels.iv.covariance.kernel_optimal_bandwidth`.
     kernel : str
         Name of one of the supported kernels. If None, uses the Newey-West
         kernel.
@@ -783,6 +787,9 @@ class FamaMacBethCovariance(HomoskedasticCovariance):
     ------
     ValueError
         If the bandwidth is not below the number of time periods that are used.
+        It is also raised if the bandwidth is not provided and there are fewer
+        time periods than the kernel needs to compute it, or if the bandwidth
+        that is computed is not finite.
 
     Notes
     -----
@@ -790,8 +797,9 @@ class FamaMacBethCovariance(HomoskedasticCovariance):
 
     The :math:`T` cross-sectional estimates, one for each time period that is
     used, have autocovariances up to lag :math:`T-1`, so the bandwidth must be
-    below :math:`T`. The bandwidth is checked when the estimator is created, so
-    that the ``fit`` method of the model raises the error.
+    below :math:`T`. The bandwidth is checked, or computed if it is not
+    provided, when the estimator is created, so that the ``fit`` method of the
+    model raises the error.
 
     .. versionchanged:: 7.1
 
@@ -803,6 +811,19 @@ class FamaMacBethCovariance(HomoskedasticCovariance):
        the weights of all of the lags are close to one, and the deviations of the
        estimates from their average sum to zero, so that the covariance was close
        to zero.
+
+    .. versionchanged:: 7.1
+
+       The bandwidth that is computed from the estimates needs at least 4 time
+       periods with the Bartlett kernel, 5 with the Parzen kernel and 6 with the
+       quadratic spectral kernel, and a ``ValueError`` is raised for fewer, when
+       the estimator is created. The deviations of the estimates from their
+       average sum to zero. With fewer periods the rule divides by the sum of
+       all of their autocovariances, which is zero, so that earlier versions
+       raised "cannot convert float infinity to integer" (an ``OverflowError``) or
+       "cannot convert float NaN to integer" when the covariance was first used,
+       or used a bandwidth of :math:`T-1` because of the rounding error of the
+       sum.
     """
 
     def __init__(
@@ -834,6 +855,10 @@ class FamaMacBethCovariance(HomoskedasticCovariance):
                     f"have autocovariances up to lag {nperiods - 1}. Use a smaller "
                     "bandwidth."
                 )
+        else:
+            # Selected here as well, so that fit raises if it cannot be selected, and
+            # not the first use of the covariance
+            _ = self.bandwidth
 
     @cached_property
     def bandwidth(self) -> float:
@@ -842,6 +867,16 @@ class FamaMacBethCovariance(HomoskedasticCovariance):
             all_params = np.asarray(self._all_params)
             e = all_params - self._params.T
             e = e[np.all(np.isfinite(e), 1)]
+            nperiods = e.shape[0]
+            minimum = _min_nobs_automatic_bandwidth(self._kernel)
+            if nperiods < minimum:
+                raise ValueError(
+                    "The automatic bandwidth of the Fama-MacBeth kernel covariance "
+                    f"with the {self._kernel!r} kernel needs at least {minimum} time "
+                    "periods, but the number of time periods that are used is "
+                    f"{nperiods}. Pass the bandwidth to fit, which must be below "
+                    f"{nperiods}."
+                )
             stde = np.sum(e / e.std(0)[None, :], 1)
             self._bandwidth = kernel_optimal_bandwidth(stde, self._kernel)
         assert self._bandwidth is not None

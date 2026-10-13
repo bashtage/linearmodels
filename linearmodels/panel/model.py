@@ -3860,7 +3860,9 @@ class FamaMacBeth(_PanelModelBase):
         bandwidth : float
             The bandwidth to use when cov_type is "kernel". It must be below T,
             the number of periods that are used. If None, it is automatically
-            computed, and is at most T - 1.
+            computed, and is at most T - 1. The automatic bandwidth needs T to be
+            at least 4 with the Bartlett kernel, 5 with the Parzen kernel and 6
+            with the quadratic spectral kernel.
         kernel : str
             The kernel to use.  None chooses the default kernel.
 
@@ -3874,13 +3876,15 @@ class FamaMacBeth(_PanelModelBase):
         ValueError
             If ``cov_type`` is not one of the supported names, or if it is
             "kernel" and ``bandwidth`` is not below T, the number of periods that
-            are used.
+            are used. It is also raised if it is "kernel", ``bandwidth`` is None
+            and T is below the number that the automatic bandwidth needs, or the
+            automatic bandwidth is not finite.
 
         Examples
         --------
         >>> from linearmodels import FamaMacBeth
         >>> mod = FamaMacBeth(y, x)
-        >>> res = mod.fit(cov_type="kernel", kernel="Parzen")
+        >>> res = mod.fit(cov_type="kernel", kernel="parzen")
 
         Notes
         -----
@@ -3893,7 +3897,14 @@ class FamaMacBeth(_PanelModelBase):
           The T estimates have autocovariances up to lag T - 1, so the bandwidth
           must be below T. This holds for every kernel, including the quadratic
           spectral kernel, which is not truncated. The bandwidth is checked when
-          the model is fit.
+          the model is fit. If ``bandwidth`` is None it is computed from the T
+          estimates by
+          :func:`~linearmodels.iv.covariance.kernel_optimal_bandwidth`, when the
+          model is fit as well. The rule needs T to be at least 4 with the
+          Bartlett kernel ("bartlett", "newey-west", the default), 5 with the
+          Parzen kernel ("parzen", "gallant") and 6 with the quadratic spectral
+          kernel ("qs", "quadratic-spectral", "andrews"). Pass ``bandwidth`` to
+          use the estimator with fewer periods.
 
         The parameters are the averages of the T cross-sectional estimates, and
         T is the number of periods whose cross-sectional regression is
@@ -3933,6 +3944,18 @@ class FamaMacBeth(_PanelModelBase):
            covariance was first used. The quadratic spectral kernel, which has no
            truncation, returned a covariance without an error, which was close to
            zero for a large bandwidth.
+
+        .. versionchanged:: 7.1
+
+           The automatic bandwidth raises a ``ValueError`` when the model is fit
+           if T is below 4 with the Bartlett kernel, 5 with the Parzen kernel or
+           6 with the quadratic spectral kernel. The deviations of the T
+           estimates from their average sum to zero, and with so few periods the
+           rule divides by the sum of all of their autocovariances. Earlier
+           versions raised "cannot convert float infinity to integer" (an
+           ``OverflowError``) or "cannot convert float NaN to integer" when the
+           covariance was first used, or used a bandwidth of T - 1 because of the
+           rounding error of the sum.
         """
         # The retained observations and their weights, which are scaled to have a
         # mean of one once the observations with missing values are dropped
