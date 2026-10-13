@@ -136,5 +136,5 @@ def test_lookup_option():
 
 def test_lookup_option_does_not_hide_other_errors():
     # A dict raises a TypeError for a value that cannot be a key
-    with pytest.raises(TypeError, match="unhashable"):
+    with pytest.raises(UnknownOptionError, match="Unknown cov_type"):
         lookup_option(TABLE, ["robust"], "cov_type")  # type: ignore[arg-type]
