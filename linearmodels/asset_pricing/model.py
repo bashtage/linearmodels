@@ -4,11 +4,12 @@ Linear factor models for applications in asset pricing
 
 from __future__ import annotations
 
-from collections.abc import Callable
+from collections.abc import Callable, Mapping
 from typing import Any, cast
 
 from formulaic import model_matrix
 from formulaic.materializers.types import NAAction
+from formulaic.utils.context import capture_context
 import numpy as np
 from numpy.linalg import lstsq
 from pandas import DataFrame
@@ -181,17 +182,23 @@ class _FactorModelBase:
 
     @staticmethod
     def _prepare_data_from_formula(
-        formula: str, data: DataFrame, portfolios: DataFrame | None
+        formula: str,
+        data: DataFrame,
+        portfolios: DataFrame | None,
+        context: Mapping[str, Any] | None,
     ) -> tuple[DataFrame, DataFrame, str]:
         orig_formula = formula
         # Missing values are kept so that the model drops the observations with a
         # missing value in the portfolios or the factors, as it does for arrays
         na_action = NAAction("ignore")
+        # capture_context returns None if the frames of the caller are unavailable,
+        # when formulaic looks in the namespace of this function
+        eval_context: int | Mapping[str, Any] = 0 if context is None else context
         if portfolios is not None:
             factors_mm = model_matrix(
                 formula + " + 0",
                 data,
-                context=0,  # TODO: self._eval_env,
+                context=eval_context,
                 ensure_full_rank=True,
                 na_action=na_action,
             )
@@ -201,7 +208,7 @@ class _FactorModelBase:
             portfolios_mm = model_matrix(
                 formula_components[0].strip() + " + 0",
                 data,
-                context=0,  # TODO: self._eval_env,
+                context=eval_context,
                 ensure_full_rank=False,
                 na_action=na_action,
             )
@@ -209,7 +216,7 @@ class _FactorModelBase:
             factors_mm = model_matrix(
                 formula_components[1].strip() + " + 0",
                 data,
-                context=0,  # TODO: self._eval_env,
+                context=eval_context,
                 ensure_full_rank=False,
                 na_action=na_action,
             )
@@ -292,6 +299,15 @@ class TradedFactorModel(_FactorModelBase):
         The second specified the portfolio using ``+`` to separate the test portfolios
         and ``~`` to separate the test portfolios from the factors.
 
+        The formula can use the variables and functions that are available
+        where ``from_formula`` is called, in addition to the columns of ``data``
+        and the transforms of formulaic.
+
+        .. versionchanged:: 7.1
+
+           Variables and functions of the caller could not be used in the
+           formula, and raised a ``FactorEvaluationError``.
+
         Examples
         --------
         >>> from linearmodels.datasets import french
@@ -306,8 +322,9 @@ class TradedFactorModel(_FactorModelBase):
         >>> formula = "MktRF + SMB + HML"
         >>> mod = TradedFactorModel.from_formula(formula, data, portfolios=portfolios)
         """
+        context = capture_context(1)
         factors, portfolios, formula = cls._prepare_data_from_formula(
-            formula, data, portfolios
+            formula, data, portfolios, context
         )
         mod = cls(portfolios, factors)
         mod.formula = formula
@@ -660,6 +677,15 @@ class LinearFactorModel(_LinearFactorModelBase):
         The second specified the portfolio using ``+`` to separate the test portfolios
         and ``~`` to separate the test portfolios from the factors.
 
+        The formula can use the variables and functions that are available
+        where ``from_formula`` is called, in addition to the columns of ``data``
+        and the transforms of formulaic.
+
+        .. versionchanged:: 7.1
+
+           Variables and functions of the caller could not be used in the
+           formula, and raised a ``FactorEvaluationError``.
+
         Examples
         --------
         >>> from linearmodels.datasets import french
@@ -674,8 +700,9 @@ class LinearFactorModel(_LinearFactorModelBase):
         >>> formula = "MktRF + SMB + HML"
         >>> mod = LinearFactorModel.from_formula(formula, data, portfolios=portfolios)
         """
+        context = capture_context(1)
         factors, portfolios, formula = cls._prepare_data_from_formula(
-            formula, data, portfolios
+            formula, data, portfolios, context
         )
         mod = cls(portfolios, factors, risk_free=risk_free, sigma=sigma)
         mod.formula = formula
@@ -974,6 +1001,15 @@ class LinearFactorModelGMM(_LinearFactorModelBase):
         The second specified the portfolio using ``+`` to separate the test portfolios
         and ``~`` to separate the test portfolios from the factors.
 
+        The formula can use the variables and functions that are available
+        where ``from_formula`` is called, in addition to the columns of ``data``
+        and the transforms of formulaic.
+
+        .. versionchanged:: 7.1
+
+           Variables and functions of the caller could not be used in the
+           formula, and raised a ``FactorEvaluationError``.
+
         Examples
         --------
         >>> from linearmodels.datasets import french
@@ -988,8 +1024,9 @@ class LinearFactorModelGMM(_LinearFactorModelBase):
         >>> formula = "MktRF + SMB + HML"
         >>> mod = LinearFactorModel.from_formula(formula, data, portfolios=portfolios)
         """
+        context = capture_context(1)
         factors, portfolios, formula = cls._prepare_data_from_formula(
-            formula, data, portfolios
+            formula, data, portfolios, context
         )
         mod = cls(portfolios, factors, risk_free=risk_free)
         mod.formula = formula
