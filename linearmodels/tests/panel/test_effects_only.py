@@ -87,8 +87,11 @@ EFFECTS = {
     "entity+other": {"entity_effects": True, "other_effects": ["g"]},
 }
 ALGORITHMS = {"means": {}, "lsdv": {"use_lsdv": True}, "lsmr": {"use_lsmr": True}}
-# LSMR stops when its relative error is below 1e-8
-TOLERANCE = {"means": 1e-10, "lsdv": 1e-10, "lsmr": 1e-6}
+# The effects and the residuals are exact for the dummy variables. The algorithms that
+# iterate (LSMR, and the means with other effects) stop at a relative error of 1e-8, and
+# their sums of squares are accurate to the square of that
+EFFECT_ATOL = {"means": 1e-6, "lsdv": 1e-10, "lsmr": 1e-5}
+SUM_OF_SQUARES_RTOL = 1e-8
 # The number of effects that are estimated, with no constant to absorb one of them
 NEFFECTS = {
     "entity": NENTITY,
@@ -159,7 +162,7 @@ def test_effects_and_residuals_are_the_means(frame, effect, weighted, algorithm)
     res = fit_effects_only(frame, effect, weighted, algorithm)
     fitted, _ = projection(frame, effect, weighted)
     y = frame["y"].to_numpy()
-    atol = TOLERANCE[algorithm]
+    atol = EFFECT_ATOL[algorithm]
     assert res.params.shape == (0,)
     assert_allclose(res.estimated_effects.to_numpy().ravel(), fitted, atol=atol)
     assert_allclose(res.fitted_values.to_numpy().ravel(), 0.0, atol=0.0)
@@ -212,7 +215,7 @@ def test_statistics_against_hand_computation(frame, effect, weighted, algorithm)
     resid_ss = float(np.sum(w * (y - fitted) ** 2))
     centered = float(np.sum(w * (y - np.sum(w * y) / np.sum(w)) ** 2))
 
-    rtol = TOLERANCE[algorithm]
+    rtol = SUM_OF_SQUARES_RTOL
     assert res.nobs == nobs
     assert res.df_model == neffects
     assert res.df_resid == nobs - neffects
