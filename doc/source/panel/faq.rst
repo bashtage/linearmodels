@@ -293,7 +293,7 @@ periods and entities in this order.
 
 ``clusters`` and ``other_effects`` can be given for each combination of time
 period and entity in the same way as weights: a 2-d array or a DataFrame with
-``nobs`` rows and ``nentity`` columns, or a 3-d array or a DataArray with the
+``nobs`` rows and ``nentity`` columns, or a 3-d array or a ``DataArray`` with the
 variables first, which two-way clusters and two effects need. They are placed on
 the rows of ``dependent`` by time period and entity, whatever the order of the
 rows is. ``dependent`` does not need to be balanced for any of these inputs. The

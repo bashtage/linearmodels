@@ -864,8 +864,7 @@ class FamaMacBethCovariance(HomoskedasticCovariance):
        method of the model raises, also if the bandwidth is given. Earlier versions
        raised it when the covariance was first used, for example when ``std_errors``
        of the results was read, so that ``fit`` returned results that raised when
-       the covariance was used. The bandwidth that is selected from the data
-       already raised when the estimator was created.
+       the covariance was used.
     """
 
     def __init__(
