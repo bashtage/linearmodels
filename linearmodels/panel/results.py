@@ -885,7 +885,63 @@ class PanelResults(_SummaryStr):
 
     @property
     def loglik(self) -> float:
-        """Log-likelihood of model"""
+        r"""
+        Log-likelihood of model
+
+        Notes
+        -----
+        The Gaussian log-likelihood of the regression that the model estimates, at
+        the estimates and the maximum likelihood estimate of the error variance,
+
+        .. math::
+
+           -\frac{n}{2}\left(\ln 2\pi + \ln\hat{\sigma}^2 + 1\right)
+           + \frac{1}{2}\sum_{i=1}^{n}\ln w_i
+
+        where :math:`\hat{\sigma}^2 = \hat{\epsilon}'\hat{\epsilon}/n` is the
+        residual sum of squares of the regression divided by its number of
+        observations :math:`n`, and :math:`\hat{\epsilon}_i` are the weighted
+        residuals, :math:`\sqrt{w_i}` times the residuals. The last term is the
+        Jacobian of the weights, which is 0 if the model is not weighted. The
+        variance of the error of observation :math:`i` is
+        :math:`\sigma^2/w_i`, and so the log-likelihood is that of the weighted least
+        squares regression of the original data, for example of ``WLS(...).llf`` in
+        statsmodels for ``PooledOLS``. It does not depend on the scale of the weights,
+        and the log-likelihoods of the models with different weights are comparable
+        if they have the same observations, for example in an information
+        criterion.
+
+        The regression and its observations depend on the model.
+
+        * ``PooledOLS`` - The regression of the observations. The weights are the
+          weights of the model.
+        * ``PanelOLS`` - The regression on the dummy variables of the effects, with
+          the effects as parameters that are estimated. It is computed from the
+          regression of the observations with the effects removed. The weights are
+          the weights of the model.
+        * ``BetweenOLS`` - The regression of the means of the entities. The
+          observations are the entities, and the weights are the sums of the
+          weights of the entities, scaled to a mean of one, if the model is weighted
+          or ``reweight`` is True. Otherwise all of the weights are 1.
+        * ``FirstDifferenceOLS`` - The regression of the first differences. The
+          weights are those of the differences, :math:`1/(1/w_{it}+1/w_{it-1})`.
+        * ``RandomEffects`` - The regression of the data that are weighted and
+          quasi-demeaned. It is not the likelihood of the random effects model, which
+          also depends on the variances of the effects.
+        * ``FamaMacBeth`` - The pooled regression at the average of the estimates
+          of the periods.
+
+        .. versionchanged:: 7.1
+
+           The log-likelihood of a weighted model includes the Jacobian of the
+           weights. Earlier versions omitted it, so that the log-likelihood was that
+           of the regression of the weighted data, which is not the likelihood of the
+           original data, and the log-likelihoods of models with different weights
+           were not comparable. For the pooled regression of the log wages in the wage
+           panel on a constant, ``educ``, ``married`` and ``union`` with the hours as
+           weights it was -3065.75, where ``WLS`` of statsmodels has -3153.16. The
+           log-likelihoods of models without weights do not change.
+        """
         return self._loglik
 
     def wald_test(
