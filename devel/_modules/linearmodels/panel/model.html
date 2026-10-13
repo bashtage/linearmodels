@@ -19,7 +19,7 @@
     
   
       
-        <title>linearmodels.panel.model - linearmodels v7.1 (+327)</title>
+        <title>linearmodels.panel.model - linearmodels v7.1 (+330)</title>
       
     
 
@@ -91,7 +91,7 @@
 
 <header class="md-header md-header--shadow" data-md-component="header">
   <nav class="md-header__inner md-grid" aria-label="Header">
-    <a href="../../../index.html" title="linearmodels v7.1 (+327)" class="md-header__button md-logo" aria-label="linearmodels v7.1 (+327)" data-md-component="logo">
+    <a href="../../../index.html" title="linearmodels v7.1 (+330)" class="md-header__button md-logo" aria-label="linearmodels v7.1 (+330)" data-md-component="logo">
       <img src="../../../_static/bw-logo.svg" alt="logo">
     </a>
     <label class="md-header__button md-icon" for="__drawer">
@@ -102,7 +102,7 @@
       <div class="md-header__ellipsis">
         <div class="md-header__topic">
           <span class="md-ellipsis">
-            linearmodels v7.1 (+327)
+            linearmodels v7.1 (+330)
           </span>
         </div>
         <div class="md-header__topic" data-md-component="header-topic">
@@ -197,10 +197,10 @@
 
 <nav class="md-nav md-nav--primary" aria-label="Navigation" data-md-level="0">
   <label class="md-nav__title" for="__drawer">
-    <a href="../../../index.html" title="linearmodels v7.1 (+327)" class="md-nav__button md-logo" aria-label="linearmodels v7.1 (+327)" data-md-component="logo">
+    <a href="../../../index.html" title="linearmodels v7.1 (+330)" class="md-nav__button md-logo" aria-label="linearmodels v7.1 (+330)" data-md-component="logo">
       <img src="../../../_static/bw-logo.svg" alt="logo">
     </a>
-    linearmodels v7.1 (+327)
+    linearmodels v7.1 (+330)
   </label>
   
     <div class="md-nav__source">
@@ -1555,6 +1555,11 @@
                 <span class="c1">#  https://github.com/pandas-dev/pandas-stubs/issues/111</span>
                 <span class="n">formatted_clusters</span><span class="o">.</span><span class="n">dataframe</span><span class="p">[</span><span class="n">col</span><span class="p">]</span> <span class="o">=</span> <span class="n">cat</span><span class="o">.</span><span class="n">codes</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">int64</span><span class="p">)</span>
             <span class="n">clusters_frame</span> <span class="o">=</span> <span class="n">formatted_clusters</span><span class="o">.</span><span class="n">dataframe</span>
+            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_singleton_index</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+                <span class="c1"># The clusters have a value for each observation that is not missing.</span>
+                <span class="c1"># The singletons are dropped from the data of the model, and so are</span>
+                <span class="c1"># the clusters that are made from it below, which do not need this</span>
+                <span class="n">clusters_frame</span> <span class="o">=</span> <span class="n">clusters_frame</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span><span class="o">~</span><span class="bp">self</span><span class="o">.</span><span class="n">_singleton_index</span><span class="p">]</span>
 
         <span class="n">cluster_entity</span> <span class="o">=</span> <span class="nb">bool</span><span class="p">(</span><span class="n">cov_config_upd</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="s2">"cluster_entity"</span><span class="p">,</span> <span class="kc">False</span><span class="p">))</span>
         <span class="k">if</span> <span class="n">cluster_entity</span><span class="p">:</span>
@@ -1577,8 +1582,6 @@
                 <span class="n">clusters_frame</span><span class="p">[</span><span class="n">name</span><span class="p">]</span> <span class="o">=</span> <span class="n">group_ids</span>
             <span class="k">else</span><span class="p">:</span>
                 <span class="n">clusters_frame</span> <span class="o">=</span> <span class="n">DataFrame</span><span class="p">(</span><span class="n">group_ids</span><span class="p">)</span>
-        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_singleton_index</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="ow">and</span> <span class="n">clusters_frame</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
-            <span class="n">clusters_frame</span> <span class="o">=</span> <span class="n">clusters_frame</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span><span class="o">~</span><span class="bp">self</span><span class="o">.</span><span class="n">_singleton_index</span><span class="p">]</span>
 
         <span class="k">if</span> <span class="n">clusters_frame</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
             <span class="n">cov_config_upd</span><span class="p">[</span><span class="s2">"clusters"</span><span class="p">]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">asarray</span><span class="p">(</span><span class="n">clusters_frame</span><span class="p">)</span>
@@ -2635,17 +2638,22 @@
         <span class="n">effects</span><span class="p">:</span> <span class="n">linearmodels</span><span class="o">.</span><span class="n">typing</span><span class="o">.</span><span class="n">NumericArray</span><span class="p">,</span>
         <span class="n">clusters</span><span class="p">:</span> <span class="n">linearmodels</span><span class="o">.</span><span class="n">typing</span><span class="o">.</span><span class="n">NumericArray</span><span class="p">,</span>
     <span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
-<span class="w">        </span><span class="sd">"""Determine whether an effect is nested by the covariance clusters"""</span>
-        <span class="n">is_nested</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span><span class="n">effects</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="n">dtype</span><span class="o">=</span><span class="nb">bool</span><span class="p">)</span>
-        <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">e</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">effects</span><span class="o">.</span><span class="n">T</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">"""</span>
+<span class="sd">        Determine whether the effects are nested by the covariance clusters</span>
+
+<span class="sd">        An effect is nested if each of its groups is in one group of every one of</span>
+<span class="sd">        the cluster variables, so that the result does not depend on their order.</span>
+<span class="sd">        """</span>
+        <span class="k">for</span> <span class="n">e</span> <span class="ow">in</span> <span class="n">effects</span><span class="o">.</span><span class="n">T</span><span class="p">:</span>
             <span class="n">_e</span> <span class="o">=</span> <span class="p">(</span><span class="n">e</span> <span class="o">-</span> <span class="n">e</span><span class="o">.</span><span class="n">min</span><span class="p">())</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">int64</span><span class="p">)</span>
             <span class="n">e_count</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">unique</span><span class="p">(</span><span class="n">_e</span><span class="p">))</span>
             <span class="k">for</span> <span class="n">c</span> <span class="ow">in</span> <span class="n">clusters</span><span class="o">.</span><span class="n">T</span><span class="p">:</span>
                 <span class="n">_c</span> <span class="o">=</span> <span class="p">(</span><span class="n">c</span> <span class="o">-</span> <span class="n">c</span><span class="o">.</span><span class="n">min</span><span class="p">())</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">int64</span><span class="p">)</span>
                 <span class="n">cmax</span> <span class="o">=</span> <span class="n">_c</span><span class="o">.</span><span class="n">max</span><span class="p">()</span>
                 <span class="n">ec</span> <span class="o">=</span> <span class="n">_e</span> <span class="o">*</span> <span class="p">(</span><span class="n">cmax</span> <span class="o">+</span> <span class="mi">1</span><span class="p">)</span> <span class="o">+</span> <span class="n">_c</span>
-                <span class="n">is_nested</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">unique</span><span class="p">(</span><span class="n">ec</span><span class="p">))</span> <span class="o">==</span> <span class="n">e_count</span>
-        <span class="k">return</span> <span class="nb">bool</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">all</span><span class="p">(</span><span class="n">is_nested</span><span class="p">))</span>
+                <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">unique</span><span class="p">(</span><span class="n">ec</span><span class="p">))</span> <span class="o">!=</span> <span class="n">e_count</span><span class="p">:</span>
+                    <span class="k">return</span> <span class="kc">False</span>
+        <span class="k">return</span> <span class="kc">True</span>
 
     <span class="k">def</span><span class="w"> </span><span class="nf">_determine_df_adjustment</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span>
@@ -2728,7 +2736,9 @@
 <span class="sd">            of freedom adjustment is automatically handled. This is useful</span>
 <span class="sd">            since clustered standard errors that are clustered using the same</span>
 <span class="sd">            variable as an effect do not require degree of freedom correction</span>
-<span class="sd">            while other estimators such as the unadjusted covariance do.</span>
+<span class="sd">            while other estimators such as the unadjusted covariance do. With</span>
+<span class="sd">            two cluster variables, the effect has to be nested in both of them,</span>
+<span class="sd">            which means that each of its groups is in one group of each variable.</span>
 <span class="sd">        count_effects : bool</span>
 <span class="sd">            Flag indicating that the covariance estimator should be adjusted</span>
 <span class="sd">            to account for the estimation of effects in the model. Only used</span>

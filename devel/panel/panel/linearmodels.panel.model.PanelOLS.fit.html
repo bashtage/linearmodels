@@ -23,7 +23,7 @@
     
   
       
-        <title>linearmodels.panel.model.PanelOLS.fit - linearmodels v7.1 (+327)</title>
+        <title>linearmodels.panel.model.PanelOLS.fit - linearmodels v7.1 (+330)</title>
       
     
 
@@ -100,7 +100,7 @@
 
 <header class="md-header md-header--shadow" data-md-component="header">
   <nav class="md-header__inner md-grid" aria-label="Header">
-    <a href="../../index.html" title="linearmodels v7.1 (+327)" class="md-header__button md-logo" aria-label="linearmodels v7.1 (+327)" data-md-component="logo">
+    <a href="../../index.html" title="linearmodels v7.1 (+330)" class="md-header__button md-logo" aria-label="linearmodels v7.1 (+330)" data-md-component="logo">
       <img src="../../_static/bw-logo.svg" alt="logo">
     </a>
     <label class="md-header__button md-icon" for="__drawer">
@@ -111,7 +111,7 @@
       <div class="md-header__ellipsis">
         <div class="md-header__topic">
           <span class="md-ellipsis">
-            linearmodels v7.1 (+327)
+            linearmodels v7.1 (+330)
           </span>
         </div>
         <div class="md-header__topic" data-md-component="header-topic">
@@ -206,10 +206,10 @@
 
 <nav class="md-nav md-nav--primary" aria-label="Navigation" data-md-level="0">
   <label class="md-nav__title" for="__drawer">
-    <a href="../../index.html" title="linearmodels v7.1 (+327)" class="md-nav__button md-logo" aria-label="linearmodels v7.1 (+327)" data-md-component="logo">
+    <a href="../../index.html" title="linearmodels v7.1 (+330)" class="md-nav__button md-logo" aria-label="linearmodels v7.1 (+330)" data-md-component="logo">
       <img src="../../_static/bw-logo.svg" alt="logo">
     </a>
-    linearmodels v7.1 (+327)
+    linearmodels v7.1 (+330)
   </label>
   
     <div class="md-nav__source">
@@ -1788,7 +1788,9 @@ or not <code class="docutils literal notranslate"><span class="pre">debiased</sp
 of freedom adjustment is automatically handled. This is useful
 since clustered standard errors that are clustered using the same
 variable as an effect do not require degree of freedom correction
-while other estimators such as the unadjusted covariance do.</p>
+while other estimators such as the unadjusted covariance do. With
+two cluster variables, the effect has to be nested in both of them,
+which means that each of its groups is in one group of each variable.</p>
 </dd>
 <dt id="linearmodels.panel.model.PanelOLS.fit.count_effects"><span class="n sig-name">count_effects</span><span class="p">:</span><span class="w"> </span><span class="n"><span class="desctype"><a class="reference external" href="https://docs.python.org/3/builtins/functions.html#bool" title="(in Python v3.15)">bool</a></span></span><span class="w"> </span><span class="o">=</span><span class="w"> </span><code class="code python default_value docutils literal highlight highlight-python"><span class="kc">True</span></code><a class="headerlink" href="#linearmodels.panel.model.PanelOLS.fit.count_effects" title="Permalink to this definition">¶</a></dt><dd><p>Flag indicating that the covariance estimator should be adjusted
 to account for the estimation of effects in the model. Only used
