@@ -39,6 +39,7 @@ from linearmodels.shared.hypotheses import InvalidTestStatistic, WaldTestStatist
 from linearmodels.shared.inputs import as_array_like, as_float64
 from linearmodels.shared.linalg import has_constant
 from linearmodels.shared.utility import AttrDict
+from linearmodels.shared.weights import check_weights, normalize_weights
 from linearmodels.system._utility import (
     LinearConstraint,
     blocked_column_product,
@@ -546,12 +547,8 @@ class _SystemModelBase:
                 "linearmodels.typing.data.Float64Array",
                 w.ndarray,
             )
-            if np.any(w_arr <= 0) or not np.all(np.isfinite(w_arr)):
-                raise ValueError(
-                    f"weights in equation {label!r} must be strictly positive and "
-                    "finite."
-                )
-            w_arr = w_arr / np.nanmean(w_arr)
+            check_weights(w_arr, f"weights in equation {label!r}")
+            w_arr = normalize_weights(w_arr)
             w_sqrt = np.sqrt(w_arr)
             self._w.append(w_arr)
             self._y.append(y)
@@ -1589,6 +1586,10 @@ class IV3SLS(_LSSystemModelBase):
 
     where :math:`\Sigma` is the covariance matrix of the residuals.
 
+    The weights of an equation, if they are given, must be strictly positive and
+    finite. They are rescaled to have a mean of 1 in the equation. A NaN weight is
+    missing, and its observation is dropped from all of the equations.
+
     Rows are paired by position, both within an equation and across the
     equations. An input that carries labels (a pandas Series or DataFrame
     with an index other than the default 0, 1, ..., n-1, or an xarray
@@ -1701,7 +1702,10 @@ class IV3SLS(_LSSystemModelBase):
             Dictionary like object (e.g. a DataFrame) containing variable
             weights.  Each entry must have the same number of observations as
             data.  If an equation label is not a key weights, the weights will
-            be set to unity
+            be set to unity.
+            The weights of an equation must be strictly positive and finite. They are
+            rescaled to have a mean of 1 in the equation. A NaN weight is missing, and
+            its observation is dropped from all of the equations.
 
         Returns
         -------
@@ -1822,6 +1826,10 @@ class SUR(_LSSystemModelBase):
 
     SUR is a special case of 3SLS where there are no endogenous regressors and
     no instruments.
+
+    The weights of an equation, if they are given, must be strictly positive and
+    finite. They are rescaled to have a mean of 1 in the equation. A NaN weight is
+    missing, and its observation is dropped from all of the equations.
 
     Rows are paired by position, both within an equation and across the
     equations. An input that carries labels (a pandas Series or DataFrame
@@ -1945,7 +1953,10 @@ class SUR(_LSSystemModelBase):
             Dictionary like object (e.g. a DataFrame) containing variable
             weights.  Each entry must have the same number of observations as
             data.  If an equation label is not a key weights, the weights will
-            be set to unity
+            be set to unity.
+            The weights of an equation must be strictly positive and finite. They are
+            rescaled to have a mean of 1 in the equation. A NaN weight is missing, and
+            its observation is dropped from all of the equations.
 
         Returns
         -------
@@ -2092,6 +2103,10 @@ class IVSystemGMM(_SystemModelBase):
     not affected, since it has always estimated its bandwidth from the data
     unless ``bandwidth`` is given. See
     :class:`~linearmodels.system.gmm.KernelWeightMatrix`.
+
+    The weights of an equation, if they are given, must be strictly positive and
+    finite. They are rescaled to have a mean of 1 in the equation. A NaN weight is
+    missing, and its observation is dropped from all of the equations.
 
     Rows are paired by position, both within an equation and across the
     equations. An input that carries labels (a pandas Series or DataFrame
@@ -2418,7 +2433,10 @@ class IVSystemGMM(_SystemModelBase):
             Dictionary like object (e.g. a DataFrame) containing variable
             weights.  Each entry must have the same number of observations as
             data.  If an equation label is not a key weights, the weights will
-            be set to unity
+            be set to unity.
+            The weights of an equation must be strictly positive and finite. They are
+            rescaled to have a mean of 1 in the equation. A NaN weight is missing, and
+            its observation is dropped from all of the equations.
         weight_type : str
             Name of moment condition weight function to use in the GMM
             estimation. Valid options are:

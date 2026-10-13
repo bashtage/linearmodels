@@ -73,6 +73,7 @@ from linearmodels.shared.inputs import as_array_like, as_float64
 from linearmodels.shared.linalg import has_constant
 from linearmodels.shared.typed_getters import get_panel_data_like
 from linearmodels.shared.utility import AttrDict, ensure_unique_column, panel_to_frame
+from linearmodels.shared.weights import check_weights, normalize_weights
 from linearmodels.typing import BoolArray
 import linearmodels.typing.data
 
@@ -410,6 +411,8 @@ class _PanelModelBase:
         the weight should be homoskedastic.
         Weights can be given for each observation, for each time period,
         for each entity or for each combination of time period and entity.
+        The weights must be strictly positive and finite. They are rescaled to have a
+        mean of 1. A NaN weight is missing, and its observation is dropped.
         Weights with labels must use the same labels, in the same order,
         as dependent or, if dependent has no labels, as exog. See
         :ref:`panel-input-alignment`.
@@ -804,9 +807,10 @@ class _PanelModelBase:
 
         w_df = self.weights.dataframe
         w_values = np.asarray(w_df)
-        if np.any(w_values <= 0) or np.any(np.isinf(w_values)):
-            raise ValueError("weights must be strictly positive and finite.")
-        w_df = w_df / w_df.mean()
+        check_weights(w_values)
+        w_df = DataFrame(
+            normalize_weights(w_values), index=w_df.index, columns=w_df.columns
+        )
         self.weights = PanelData(w_df)
         rank_of_x = self._check_exog_rank()
         self._constant, self._constant_index = has_constant(x, rank_of_x)
@@ -1249,6 +1253,8 @@ class PooledOLS(_PanelModelBase):
         the weight should be homoskedastic.
         Weights can be given for each observation, for each time period,
         for each entity or for each combination of time period and entity.
+        The weights must be strictly positive and finite. They are rescaled to have a
+        mean of 1. A NaN weight is missing, and its observation is dropped.
         Weights with labels must use the same labels, in the same order,
         as dependent or, if dependent has no labels, as exog. See
         :ref:`panel-input-alignment`.
@@ -1304,6 +1310,8 @@ class PooledOLS(_PanelModelBase):
             Weights to use in estimation.  Assumes residual variance is
             proportional to inverse of weight to that the residual times
             the weight should be homoskedastic.
+            The weights must be strictly positive and finite. They are rescaled to have
+            a mean of 1. A NaN weight is missing, and its observation is dropped.
         check_rank : bool
             Flag indicating whether to perform a rank check on the exogenous
             variables to ensure that the model is identified. Skipping this
@@ -1580,6 +1588,8 @@ class PanelOLS(_PanelModelBase):
         the weight should be homoskedastic.
         Weights can be given for each observation, for each time period,
         for each entity or for each combination of time period and entity.
+        The weights must be strictly positive and finite. They are rescaled to have a
+        mean of 1. A NaN weight is missing, and its observation is dropped.
         Weights with labels must use the same labels, in the same order,
         as dependent or, if dependent has no labels, as exog. See
         :ref:`panel-input-alignment`.
@@ -1876,6 +1886,8 @@ class PanelOLS(_PanelModelBase):
             Weights to use in estimation.  Assumes residual variance is
             proportional to inverse of weight to that the residual time
             the weight should be homoskedastic.
+            The weights must be strictly positive and finite. They are rescaled to have
+            a mean of 1. A NaN weight is missing, and its observation is dropped.
         other_effects : array_like
             Category codes to use for any effects that are not entity or time
             effects. Each variable is treated as an effect. An observation where
@@ -2631,6 +2643,8 @@ class BetweenOLS(_PanelModelBase):
         the weight should be homoskedastic.
         Weights can be given for each observation, for each time period,
         for each entity or for each combination of time period and entity.
+        The weights must be strictly positive and finite. They are rescaled to have a
+        mean of 1. A NaN weight is missing, and its observation is dropped.
         Weights with labels must use the same labels, in the same order,
         as dependent or, if dependent has no labels, as exog. See
         :ref:`panel-input-alignment`.
@@ -2892,6 +2906,8 @@ class BetweenOLS(_PanelModelBase):
             Weights to use in estimation.  Assumes residual variance is
             proportional to inverse of weight to that the residual times
             the weight should be homoskedastic.
+            The weights must be strictly positive and finite. They are rescaled to have
+            a mean of 1. A NaN weight is missing, and its observation is dropped.
         check_rank : bool
             Flag indicating whether to perform a rank check on the exogenous
             variables to ensure that the model is identified. Skipping this
@@ -2949,6 +2965,8 @@ class FirstDifferenceOLS(_PanelModelBase):
         the weight should be homoskedastic.
         Weights can be given for each observation, for each time period,
         for each entity or for each combination of time period and entity.
+        The weights must be strictly positive and finite. They are rescaled to have a
+        mean of 1. A NaN weight is missing, and its observation is dropped.
         Weights with labels must use the same labels, in the same order,
         as dependent or, if dependent has no labels, as exog. See
         :ref:`panel-input-alignment`.
@@ -3249,6 +3267,8 @@ class FirstDifferenceOLS(_PanelModelBase):
             Weights to use in estimation.  Assumes residual variance is
             proportional to inverse of weight to that the residual times
             the weight should be homoskedastic.
+            The weights must be strictly positive and finite. They are rescaled to have
+            a mean of 1. A NaN weight is missing, and its observation is dropped.
         check_rank : bool
             Flag indicating whether to perform a rank check on the exogenous
             variables to ensure that the model is identified. Skipping this
@@ -3306,6 +3326,8 @@ class RandomEffects(_PanelModelBase):
         the weight should be homoskedastic.
         Weights can be given for each observation, for each time period,
         for each entity or for each combination of time period and entity.
+        The weights must be strictly positive and finite. They are rescaled to have a
+        mean of 1. A NaN weight is missing, and its observation is dropped.
         Weights with labels must use the same labels, in the same order,
         as dependent or, if dependent has no labels, as exog. See
         :ref:`panel-input-alignment`.
@@ -3358,6 +3380,8 @@ class RandomEffects(_PanelModelBase):
             Weights to use in estimation.  Assumes residual variance is
             proportional to inverse of weight to that the residual times
             the weight should be homoskedastic.
+            The weights must be strictly positive and finite. They are rescaled to have
+            a mean of 1. A NaN weight is missing, and its observation is dropped.
         check_rank : bool
             Flag indicating whether to perform a rank check on the exogenous
             variables to ensure that the model is identified. Skipping this
@@ -3691,6 +3715,8 @@ class FamaMacBeth(_PanelModelBase):
         the weight should be homoskedastic.
         Weights can be given for each observation, for each time period,
         for each entity or for each combination of time period and entity.
+        The weights must be strictly positive and finite. They are rescaled to have a
+        mean of 1. A NaN weight is missing, and its observation is dropped.
         Weights with labels must use the same labels, in the same order,
         as dependent or, if dependent has no labels, as exog. See
         :ref:`panel-input-alignment`.
@@ -4061,6 +4087,8 @@ class FamaMacBeth(_PanelModelBase):
             Weights to use in estimation.  Assumes residual variance is
             proportional to inverse of weight to that the residual times
             the weight should be homoskedastic.
+            The weights must be strictly positive and finite. They are rescaled to have
+            a mean of 1. A NaN weight is missing, and its observation is dropped.
         check_rank : bool
             Flag indicating whether to perform a rank check on the exogenous
             variables to ensure that the model is identified. Skipping this
