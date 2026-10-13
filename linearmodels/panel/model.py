@@ -1352,7 +1352,7 @@ class PooledOLS(_PanelModelBase):
 
         Notes
         -----
-        Four covariance estimators are supported:
+        Five covariance estimators are supported:
 
         * "unadjusted", "homoskedastic" - Assume residual are homoskedastic
         * "robust", "heteroskedastic" - Control for heteroskedasticity using
@@ -1382,7 +1382,16 @@ class PooledOLS(_PanelModelBase):
             Default is Bartlett's kernel, which is produces a covariance
             estimator similar to the Newey-West covariance estimator.
           * ``bandwidth`` - Bandwidth to use when computing the kernel.  If
-            not provided, a naive default is used.
+            not provided, a naive default is used. It must be below the number
+            of time periods, and a ``ValueError`` is raised otherwise.
+
+        * "ac", "autocorrelated" - Autocorrelation robust estimator, which allows
+          for autocorrelation of the errors of an entity and not for correlation
+          between entities. The configuration options are ``kernel`` and
+          ``bandwidth``, as for "kernel". The lags of an entity are the positions of
+          its observations, not calendar periods, and the bandwidth can be larger
+          than the number of observations of an entity. See
+          :class:`~linearmodels.panel.covariance.ACCovariance`.
 
         ``debiased=True``, which is the default, scales the covariance by
         n / (n - k), where k is the number of regressors, and uses the t and
@@ -2277,7 +2286,7 @@ class PanelOLS(_PanelModelBase):
 
         Notes
         -----
-        Three covariance estimators are supported:
+        Five covariance estimators are supported:
 
         * "unadjusted", "homoskedastic" - Assume residual are homoskedastic
         * "robust", "heteroskedastic" - Control for heteroskedasticity using
@@ -2307,7 +2316,16 @@ class PanelOLS(_PanelModelBase):
             Default is Bartlett's kernel, which is produces a covariance
             estimator similar to the Newey-West covariance estimator.
           * ``bandwidth`` - Bandwidth to use when computing the kernel.  If
-            not provided, a naive default is used.
+            not provided, a naive default is used. It must be below the number
+            of time periods, and a ``ValueError`` is raised otherwise.
+
+        * "ac", "autocorrelated" - Autocorrelation robust estimator, which allows
+          for autocorrelation of the errors of an entity and not for correlation
+          between entities. The configuration options are ``kernel`` and
+          ``bandwidth``, as for "kernel". The lags of an entity are the positions of
+          its observations, not calendar periods, and the bandwidth can be larger
+          than the number of observations of an entity. See
+          :class:`~linearmodels.panel.covariance.ACCovariance`.
 
         ``debiased=True``, which is the default, scales the covariance by
         n / (n - k), where k is the number of regressors, and uses the t and
@@ -2322,9 +2340,29 @@ class PanelOLS(_PanelModelBase):
         the number of effects, the covariance is scaled by n / (n - d - k)
         if ``debiased`` is True and by n / (n - d) if it is False. If
         ``auto_df`` is True, the effects are not counted when the model has
-        a single effect and each of its groups is in one cluster, for
-        example entity effects with ``cluster_entity=True``. Use
-        ``auto_df=False`` and ``count_effects`` to choose.
+        a single effect that is nested in the clusters. Use ``auto_df=False``
+        and ``count_effects`` to choose.
+
+        An effect is nested in a cluster variable if each of its groups is in one
+        group of the variable, for example entity effects with
+        ``cluster_entity=True``, or entity effects with clusters that are the
+        industries of the entities. It is nested in the clusters if it is nested
+        in every one of the cluster variables, so that the covariance does not
+        depend on the order of the variables. Entity effects are nested in the
+        two-way clusters (entity, industry) if every entity is in one industry,
+        and they are not nested in the clusters (entity, time), as an entity has
+        observations in several periods. They are counted in the degrees of
+        freedom then. The effects are always counted if the model has more than
+        one effect or the covariance is not clustered. See
+        :ref:`panel-small-sample`.
+
+        .. versionchanged:: 7.1
+
+           With two cluster variables the effect has to be nested in every one
+           of them. Earlier versions kept the result for the last variable only, so
+           that the standard errors depended on the order of the variables, and the
+           effects were not counted if they were nested in the last variable and
+           not in the first.
         """
 
         weighted = np.any(self.weights.values2d != 1.0)
@@ -2896,6 +2934,29 @@ class FirstDifferenceOLS(_PanelModelBase):
     .. math::
 
         \Delta y_{it}=\beta^{\prime}\Delta x_{it}+\Delta\epsilon_{it}
+
+    The differences are between adjacent periods. An observation is differenced with
+    the observation of the same entity in the preceding time label of the panel. The
+    labels of the panel are the distinct time labels that occur for any entity, in
+    order. If the entity has no observation in the preceding label, the observation
+    has no difference and is not used. This is the case for the first observation of
+    an entity and for an observation that follows a gap, one or more periods in which
+    the entity is not observed although another entity is. The model is fit to the
+    differences that remain, and ``nobs`` is their number.
+
+    Other packages can difference differently. plm differences consecutive
+    observations of an entity, also across a gap, so that a difference can span
+    several periods and the number of differences and the estimates are different if
+    there are gaps. In a panel where about a quarter of the periods are missing, plm
+    had 210 differences where this model has 167 and a coefficient of 0.474 where this
+    model has 0.562. The estimates are the same if no entity has a gap. See
+    :ref:`panel-ac-lags`.
+
+    .. versionchanged:: 7.1
+
+       The observations are differenced in the order of time. Earlier versions
+       differenced against non-adjacent periods if the first entity enters late or
+       has a gap.
     """
 
     def __init__(
@@ -3024,7 +3085,7 @@ class FirstDifferenceOLS(_PanelModelBase):
 
         Notes
         -----
-        Three covariance estimators are supported:
+        Five covariance estimators are supported:
 
         * "unadjusted", "homoskedastic" - Assume residual are homoskedastic
         * "robust", "heteroskedastic" - Control for heteroskedasticity using
@@ -3053,7 +3114,17 @@ class FirstDifferenceOLS(_PanelModelBase):
             Default is Bartlett's kernel, which is produces a covariance
             estimator similar to the Newey-West covariance estimator.
           * ``bandwidth`` - Bandwidth to use when computing the kernel.  If
-            not provided, a naive default is used.
+            not provided, a naive default is used. It must be below the number
+            of time periods of the differences, which is one less than the
+            number of time periods, and a ``ValueError`` is raised otherwise.
+
+        * "ac", "autocorrelated" - Autocorrelation robust estimator, which allows
+          for autocorrelation of the errors of an entity and not for correlation
+          between entities. The configuration options are ``kernel`` and
+          ``bandwidth``, as for "kernel". The lags of an entity are the positions of
+          its differences, not calendar periods, and the bandwidth can be larger
+          than the number of differences of an entity. See
+          :class:`~linearmodels.panel.covariance.ACCovariance`.
 
         When using a clustered covariance estimator, all cluster ids must be
         identical within a first difference.  In most scenarios, this requires
@@ -3369,7 +3440,7 @@ class RandomEffects(_PanelModelBase):
 
         Notes
         -----
-        Four covariance estimators are supported:
+        Five covariance estimators are supported:
 
         * "unadjusted", "homoskedastic" - Assume residual are homoskedastic
         * "robust", "heteroskedastic" - Control for heteroskedasticity using
@@ -3399,7 +3470,16 @@ class RandomEffects(_PanelModelBase):
             Default is Bartlett's kernel, which is produces a covariance
             estimator similar to the Newey-West covariance estimator.
           * ``bandwidth`` - Bandwidth to use when computing the kernel.  If
-            not provided, a naive default is used.
+            not provided, a naive default is used. It must be below the number
+            of time periods, and a ``ValueError`` is raised otherwise.
+
+        * "ac", "autocorrelated" - Autocorrelation robust estimator, which allows
+          for autocorrelation of the errors of an entity and not for correlation
+          between entities. The configuration options are ``kernel`` and
+          ``bandwidth``, as for "kernel". The lags of an entity are the positions of
+          its observations, not calendar periods, and the bandwidth can be larger
+          than the number of observations of an entity. See
+          :class:`~linearmodels.panel.covariance.ACCovariance`.
 
         ``debiased=True``, which is the default, scales the covariance by
         n / (n - k), where k is the number of regressors, and uses the t and

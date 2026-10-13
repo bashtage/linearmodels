@@ -217,9 +217,18 @@ the group debias term is not used, the expression
 
 **Clustering by Variables used as Effects**
 
-When clustering by the same variable used in the effect estimation,
-e.g., entity effects with clustering by entity, there the degrees of
-freedom used in estimating the effects are *not* counted.
+When the model has a single effect, e.g., entity effects, and the
+effect is nested in the clusters, the degrees of freedom used in
+estimating the effect are *not* counted. An effect is nested in a cluster
+variable if each of its groups is in one group of the variable, e.g.,
+entity effects with clustering by entity. With two cluster variables, the
+effect is nested in the clusters if it is nested in *every* one of them,
+so that the covariance does not depend on the order of the variables. For
+example, entity effects are nested in the clusters (industry, entity) if
+every entity is in one industry, and they are not nested in the clusters
+(entity, time), since an entity has observations in several periods. The
+degrees of freedom of the effects are counted if the effect is not
+nested, and if the model has more than one effect.
 
 Driscoll-Kraay Covariance Estimator
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -240,7 +249,9 @@ where
    \xi_{t} & =\sum_{i=1}^{n_{t}}\hat{\epsilon}_{it}x_{it}\end{aligned}
 
 and :math:`K\left(i,bw\right)` is a kernel weighting function. Kernel
-supported include the Bartlett, Parzen and Quadratic Spectral.
+supported include the Bartlett, Parzen and Quadratic Spectral. The
+bandwidth :math:`bw` must be below the number of time periods :math:`T`,
+since the sums :math:`\xi_{t}` have autocovariances up to lag :math:`T-1`.
 
 :math:`R^{2}` Calculation
 -------------------------

@@ -798,13 +798,27 @@ Clustering by Variables used as Effects
 
 \begin_layout Standard
 \noindent
-When clustering by the same variable used in the effect estimation, e.g.,
- entity effects with clustering by entity, there the degrees of freedom
- used in estimating the effects are 
+When the model has a single effect, e.g., entity effects, and the effect
+ is nested in the clusters, the degrees of freedom used in estimating the
+ effect are 
 \emph on
 not
 \emph default
  counted.
+ An effect is nested in a cluster variable if each of its groups is in one
+ group of the variable, e.g., entity effects with clustering by entity.
+ With two cluster variables, the effect is nested in the clusters if it
+ is nested in 
+\emph on
+every
+\emph default
+ one of them, so that the covariance does not depend on the order of the
+ variables.
+ For example, entity effects are nested in the clusters (industry, entity)
+ if every entity is in one industry, and they are not nested in the clusters
+ (entity, time), since an entity has observations in several periods.
+ The degrees of freedom of the effects are counted if the effect is not
+ nested, and if the model has more than one effect.
 \end_layout
 
 \begin_layout Subsubsection
@@ -852,6 +866,23 @@ and
 
  is a kernel weighting function.
  Kernel supported include the Bartlett, Parzen and Quadratic Spectral.
+ The bandwidth
+\begin_inset Formula $bw$
+\end_inset
+
+ must be below the number of time periods
+\begin_inset Formula $T$
+\end_inset
+
+, since the sums
+\begin_inset Formula $\xi_{t}$
+\end_inset
+
+ have autocovariances up to lag
+\begin_inset Formula $T-1$
+\end_inset
+
+.
  
 \end_layout
 

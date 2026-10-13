@@ -87,10 +87,62 @@ Clustered Covariance with Fixed Effects
 When using clustered standard errors and entity effects, it is not necessary
 to adjust for estimated effects. ``PanelOLS`` attempts to detect when this is
 the case and automatically adjust the degree of freedom. This is done when
-the model has a single effect and every group of the effect is in one cluster,
-for example entity effects clustered by entity. The effects are counted in all
-other cases. This can be overridden by setting the fit option ``auto_df=False``
-and then changing the value of ``count_effects``.
+the model has a single effect and the effect is nested in the clusters. The
+effects are counted in all other cases. This can be overridden by setting the
+fit option ``auto_df=False`` and then changing the value of ``count_effects``.
+
+An effect is nested in a cluster variable if each of its groups is in one group
+of the variable. Entity effects are nested in the clusters of ``cluster_entity=True``,
+and in clusters that are the industries of the entities if every entity is in one
+industry. The effect is nested in the clusters if it is nested in **every**
+cluster variable. This is the rule of :class:`~linearmodels.iv.absorbing.AbsorbingLS`.
+It does not depend on the order of the cluster variables, which is why it is not
+enough that the effect is nested in one of them. For example:
+
+* Entity effects with ``cluster_entity=True``, or with the clusters (industry,
+  entity) when each entity is in one industry, are nested. The effects are not
+  counted.
+* Entity effects with the clusters (entity, time), the two-way clustering by
+  ``cluster_entity=True, cluster_time=True``, are not nested, since an entity
+  has observations in several periods. The effects are counted. Time effects with
+  these clusters are not nested for the same reason.
+* A model with more than one effect, for example entity and time effects, counts
+  its effects with every clustered covariance.
+
+.. versionchanged:: 7.1
+
+   The effect has to be nested in every cluster variable. Earlier versions kept
+   the result for the last cluster variable only, so that the standard errors of the
+   same model depended on the order of the variables, for example entity effects with
+   the clusters (time, entity) were treated as nested and with (entity, time)
+   as not nested.
+
+.. _panel-ac-lags:
+
+Gaps in the Periods of an Entity
+================================
+Some estimators use the order of the observations of an entity. They treat an
+entity that is not observed in some period between two of its observations (a gap)
+in different ways from other packages.
+
+The autocorrelation robust covariance, ``cov_type="ac"``, counts lags as positions
+in the observations of the entity, in the order of time. Two observations on both sides of
+a gap are one lag apart. The cluster-HAC covariance of statsmodels
+(``cov_type="hac-panel"``) does the same. plm (``vcovNW``) and sandwich (``vcovPL``)
+count calendar periods, so that the observations are two lags apart if one period is
+missing between them. The covariances are the same for an entity without gaps. In a
+panel where about a quarter of the periods are missing, the standard errors of plm
+were about 3% different from the standard errors of this package and of statsmodels.
+See :class:`~linearmodels.panel.covariance.ACCovariance`, which also describes the weights
+of the lags of entities that are shorter than the bandwidth.
+
+:class:`~linearmodels.panel.model.FirstDifferenceOLS` differences adjacent periods only.
+An observation that follows a gap does not have a difference, and the estimator uses the
+differences between adjacent periods of the panel, which are the distinct time labels of
+the data. plm differences consecutive observations of an entity, also across a gap, so
+that its differences can span several periods. In the panel with the missing periods
+above plm had 210 differences and this package 167, and the coefficient of the first
+regressor was 0.474 and 0.562. The estimates are the same without gaps.
 
 .. _panel-estimated-effects:
 
