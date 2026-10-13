@@ -19,7 +19,7 @@
     
   
       
-        <title>linearmodels.asset_pricing.model - linearmodels v7.1 (+373)</title>
+        <title>linearmodels.asset_pricing.model - linearmodels v7.1 (+375)</title>
       
     
 
@@ -91,7 +91,7 @@
 
 <header class="md-header md-header--shadow" data-md-component="header">
   <nav class="md-header__inner md-grid" aria-label="Header">
-    <a href="../../../index.html" title="linearmodels v7.1 (+373)" class="md-header__button md-logo" aria-label="linearmodels v7.1 (+373)" data-md-component="logo">
+    <a href="../../../index.html" title="linearmodels v7.1 (+375)" class="md-header__button md-logo" aria-label="linearmodels v7.1 (+375)" data-md-component="logo">
       <img src="../../../_static/bw-logo.svg" alt="logo">
     </a>
     <label class="md-header__button md-icon" for="__drawer">
@@ -102,7 +102,7 @@
       <div class="md-header__ellipsis">
         <div class="md-header__topic">
           <span class="md-ellipsis">
-            linearmodels v7.1 (+373)
+            linearmodels v7.1 (+375)
           </span>
         </div>
         <div class="md-header__topic" data-md-component="header-topic">
@@ -197,10 +197,10 @@
 
 <nav class="md-nav md-nav--primary" aria-label="Navigation" data-md-level="0">
   <label class="md-nav__title" for="__drawer">
-    <a href="../../../index.html" title="linearmodels v7.1 (+373)" class="md-nav__button md-logo" aria-label="linearmodels v7.1 (+373)" data-md-component="logo">
+    <a href="../../../index.html" title="linearmodels v7.1 (+375)" class="md-nav__button md-logo" aria-label="linearmodels v7.1 (+375)" data-md-component="logo">
       <img src="../../../_static/bw-logo.svg" alt="logo">
     </a>
-    linearmodels v7.1 (+373)
+    linearmodels v7.1 (+375)
   </label>
   
     <div class="md-nav__source">
@@ -1592,16 +1592,18 @@
 <span class="sd">        Examples</span>
 <span class="sd">        --------</span>
 <span class="sd">        &gt;&gt;&gt; from linearmodels.datasets import french</span>
-<span class="sd">        &gt;&gt;&gt; from linearmodels.asset_pricing import LinearFactorModel</span>
+<span class="sd">        &gt;&gt;&gt; from linearmodels.asset_pricing import LinearFactorModelGMM</span>
 <span class="sd">        &gt;&gt;&gt; data = french.load()</span>
 <span class="sd">        &gt;&gt;&gt; formula = "S1M1 + S1M5 + S3M3 + S5M1 + S5M5 ~ MktRF + SMB + HML"</span>
-<span class="sd">        &gt;&gt;&gt; mod = LinearFactorModel.from_formula(formula, data)</span>
+<span class="sd">        &gt;&gt;&gt; mod = LinearFactorModelGMM.from_formula(formula, data)</span>
 
 <span class="sd">        Using only factors</span>
 
 <span class="sd">        &gt;&gt;&gt; portfolios = data[["S1M1", "S1M5", "S3M1", "S3M5", "S5M1", "S5M5"]]</span>
 <span class="sd">        &gt;&gt;&gt; formula = "MktRF + SMB + HML"</span>
-<span class="sd">        &gt;&gt;&gt; mod = LinearFactorModel.from_formula(formula, data, portfolios=portfolios)</span>
+<span class="sd">        &gt;&gt;&gt; mod = LinearFactorModelGMM.from_formula(</span>
+<span class="sd">        ...     formula, data, portfolios=portfolios</span>
+<span class="sd">        ... )</span>
 <span class="sd">        """</span>
         <span class="n">context</span> <span class="o">=</span> <span class="n">capture_context</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span>
         <span class="n">factors</span><span class="p">,</span> <span class="n">portfolios</span><span class="p">,</span> <span class="n">formula</span> <span class="o">=</span> <span class="bp">cls</span><span class="o">.</span><span class="n">_prepare_data_from_formula</span><span class="p">(</span>
