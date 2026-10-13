@@ -479,23 +479,36 @@ def test_model_without_regressors_with_weights_for_each_row(order, effects):
     compare_results(mod.fit(), expected.fit())
 
 
-@pytest.mark.parametrize("reading", ["rows", "periods", "entities"])
-@pytest.mark.parametrize("order", ["entity-major", "time-major"])
-@pytest.mark.parametrize("layout", LAYOUTS)
-def test_the_number_of_values_selects_the_reading(layout, order, reading):
-    panel = main_panel(layout, order)
+def values_of_reading(panel, reading):
+    """The values that are given, and the weight of each row that they are read as"""
     period_values = 1 + np.arange(NPERIOD) / 2
     entity_values = 1 + np.arange(NENTITY) / 3
     if reading == "rows":
-        given = expected = panel.row_weights()
-    elif reading == "periods":
-        given = period_values
-        expected = np.array([period_values[t] for _, t in panel.cells])
-    else:
-        given = entity_values
-        expected = np.array([entity_values[e] for e, _ in panel.cells])
-    mod = PooledOLS(panel.y, panel.x_const, weights=given)
-    assert_allclose(mod.weights.values2d[:, 0], expected / expected.mean(), rtol=1e-12)
+        return panel.row_weights(), panel.row_weights()
+    if reading == "periods":
+        return period_values, np.array([period_values[t] for _, t in panel.cells])
+    return entity_values, np.array([entity_values[e] for e, _ in panel.cells])
+
+
+# A DataFrame with one column and a default index has no labels, and is read as the
+# array with a column is. The name of its column is the name of a variable
+COLUMNS = {
+    "array": lambda values: values,
+    "column": lambda values: values[:, None],
+    "frame": lambda values: pd.DataFrame({"weight": values}),
+    "frame-default-column": lambda values: pd.DataFrame(values[:, None]),
+}
+
+
+@pytest.mark.parametrize("form", COLUMNS)
+@pytest.mark.parametrize("reading", ["rows", "periods", "entities"])
+@pytest.mark.parametrize("order", ["entity-major", "time-major"])
+@pytest.mark.parametrize("layout", LAYOUTS)
+def test_the_number_of_values_selects_the_reading(layout, order, reading, form):
+    panel = main_panel(layout, order)
+    given, expected = values_of_reading(panel, reading)
+    mod = PooledOLS(panel.y, panel.x_const, weights=COLUMNS[form](given))
+    assert_weights_equal(mod, expected)
 
 
 @pytest.mark.parametrize("extra", [-2, -1, 1, 2])
@@ -540,13 +553,26 @@ def test_another_shape_of_2d_weights_raises(layout, shape):
 
 
 @pytest.mark.parametrize("layout", LAYOUTS)
-def test_data_frame_with_one_column_and_a_default_index_raises(layout):
-    # Only a DataFrame with the index of dependent is a value for each row. This one
-    # raised an error from pandas or NumPy if dependent was balanced
+def test_data_frame_with_one_column_of_the_wrong_length_raises(layout):
+    # A column of values is read as the array with a column is, so that its number of
+    # values has to be one of the accepted numbers
     panel = main_panel(layout, "entity-major")
-    weights = pd.DataFrame({"weight": panel.row_weights()})
+    weights = pd.DataFrame({"weight": np.ones(len(panel.cells) + 1)})
     with pytest.raises(ValueError, match=SHAPE_MESSAGE):
         PooledOLS(panel.y, panel.x_const, weights=weights)
+
+
+@pytest.mark.parametrize("layout", LAYOUTS)
+def test_data_frame_with_columns_is_not_a_column_of_values(layout):
+    # Two columns are not weights, and the error is the one of the array with two columns
+    panel = main_panel(layout, "entity-major")
+    values = np.ones((len(panel.cells), 2))
+    with pytest.raises(ValueError, match=SHAPE_MESSAGE) as caught:
+        PooledOLS(panel.y, panel.x_const, weights=pd.DataFrame(values))
+    with pytest.raises(ValueError, match=SHAPE_MESSAGE) as expected:
+        PooledOLS(panel.y, panel.x_const, weights=values)
+    found, message = str(caught.value), str(expected.value)
+    assert found == message
 
 
 def square_cells(layout):
@@ -629,7 +655,14 @@ def test_labels_decide_if_dependent_has_as_many_rows_as_periods_or_entities(
 def test_values_without_labels_are_a_value_for_each_row_in_these_panels(cells):
     panel = Panel(cells)
     values = corner_values(cells)
-    for unlabelled in (values, values.tolist(), tuple(values), pd.Series(values)):
+    frames = (pd.DataFrame({"weight": values}), pd.DataFrame(values[:, None]))
+    for unlabelled in (
+        values,
+        values.tolist(),
+        tuple(values),
+        pd.Series(values),
+        *frames,
+    ):
         mod = PooledOLS(panel.y, panel.x_const, weights=unlabelled)
         assert_weights_equal(mod, values)
     # The index of dependent has labels that identify the rows

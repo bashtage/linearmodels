@@ -52,6 +52,7 @@ from linearmodels.panel.utility import (
 from linearmodels.shared.alignment import (
     check_row_alignment,
     differs,
+    is_default_index,
     is_labelled,
     labels_1d,
     misaligned,
@@ -828,12 +829,13 @@ class _PanelModelBase:
         pandas object with an index that is not the default index, are read by their
         labels: a Series indexed by the time periods is a value for each time period
         and one indexed by the entities is a value for each entity. Weights without
-        labels, which are an array, a list, a tuple and a pandas object with the
-        default index, are read by their number of values. If dependent is not
-        balanced, this happens if every time period or entity has a single row, and
-        they are a value for each row. If it is balanced, this happens if there is a
-        single entity or time period, and they are a value for each time period or
-        entity.
+        labels, which are an array, a list, a tuple, and a Series or a DataFrame with
+        one column that has the default index, are read by their number of values. A
+        DataFrame with one column is read as an array with a column is. If dependent
+        is not balanced, this happens if every time period or entity has a single
+        row, and they are a value for each row. If it is balanced, this happens if
+        there is a single entity or time period, and they are a value for each time
+        period or entity.
 
         An ``AmbiguityError`` is raised if nobs and nentity are equal and 1-d weights
         have that many values, since they could be either, and labels do not decide
@@ -872,6 +874,16 @@ class _PanelModelBase:
 
         if isinstance(weights, np.ndarray):
             weights = cast("linearmodels.typing.data.Float64Array", np.squeeze(weights))
+        elif (
+            isinstance(weights, DataFrame)
+            and weights.shape[1] == 1
+            and is_default_index(weights.index)
+        ):
+            # A column of values with a default index has no labels. It is read as the
+            # array with a column is, whatever the name of the column is
+            column = as_float64(np.asarray(weights), "weights")
+            weights = cast("linearmodels.typing.data.Float64Array", column[:, 0])
+            labelled = False
         unbalanced = nrows != nobs * nentity
         # The labels of a pandas object with a MultiIndex identify the rows
         row_labels = (
