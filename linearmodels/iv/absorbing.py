@@ -24,7 +24,6 @@ from numpy import (
     int16,
     int32,
     int64,
-    nanmean,
     ndarray,
     ones,
     ptp,
@@ -69,6 +68,7 @@ from linearmodels.shared.exceptions import lookup_option, missing_warning
 from linearmodels.shared.hypotheses import InvalidTestStatistic, WaldTestStatistic
 from linearmodels.shared.inputs import as_array_like
 from linearmodels.shared.utility import DataFrameWrapper, SeriesWrapper
+from linearmodels.shared.weights import check_weights, normalize_weights
 import linearmodels.typing.data
 
 HAVE_XXHASH = False
@@ -836,8 +836,9 @@ class AbsorbingLS:
         each continuous variable. The columns of a DataFrame follow the rules of
         ``absorb``.
     weights : array_like, optional
-        Observation weights used in estimation. All weights must be strictly
-        positive or missing.
+        Observation weights used in estimation. The weights must be strictly positive
+        and finite. They are rescaled to have a mean of 1. A NaN weight is missing, and
+        its observation is dropped.
     drop_absorbed : bool
         Flag indicating whether to drop absorbed variables
 
@@ -1004,7 +1005,7 @@ class AbsorbingLS:
                 interact.drop(missing)
             # Weights have mean 1 in the sample used to estimate the model
             weights = self._weight_data.ndarray[~missing]
-            self._weight_data = IVData(weights / weights.mean(), "weights")
+            self._weight_data = IVData(normalize_weights(weights), "weights")
             self._nobs = self.dependent.shape[0]
         missing_warning(missing, stacklevel=4)
         return missing
@@ -1023,9 +1024,8 @@ class AbsorbingLS:
         else:
             self._is_weighted = True
             weights = IVData(self._weights, var_name="weights").ndarray
-            if npany(weights <= 0):
-                raise ValueError("weights must be strictly positive.")
-            weights = weights / nanmean(weights)
+            check_weights(weights)
+            weights = normalize_weights(weights)
             self._weight_data = IVData(weights, var_name="weights", nobs=self._nobs)
 
     def _check_shape(self) -> None:

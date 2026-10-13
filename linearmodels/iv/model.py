@@ -25,7 +25,6 @@ from numpy import (
     isscalar,
     logical_not,
     nan,
-    nanmean,
     ndarray,
     ones,
     outer,
@@ -71,6 +70,7 @@ from linearmodels.shared.exceptions import (
 from linearmodels.shared.hypotheses import InvalidTestStatistic, WaldTestStatistic
 from linearmodels.shared.linalg import has_constant, inv_sqrth
 from linearmodels.shared.utility import DataFrameWrapper, SeriesWrapper
+from linearmodels.shared.weights import check_weights, normalize_weights
 import linearmodels.typing
 import linearmodels.typing.data
 
@@ -138,7 +138,9 @@ class _IVModelBase:
     instruments : array_like
         Instrumental variables (nobs by ninstr)
     weights : array_like
-        Observation weights used in estimation
+        Observation weights used in estimation. The weights must be strictly positive
+        and finite. They are rescaled to have a mean of 1. A NaN weight is missing, and
+        its observation is dropped.
     fuller : float
         Fuller's alpha to modify LIML estimator. Default returns unmodified
         LIML estimator.
@@ -213,15 +215,14 @@ class _IVModelBase:
         )
         check_alignment(self._labels, inputs, reference=self._labels_name)
         weights = weights_data.ndarray
-        if npany(weights <= 0):
-            raise ValueError("weights must be strictly positive.")
+        check_weights(weights)
         self.weights = IVData(weights, var_name="weights", nobs=nobs)
 
         self._drop_locs = self._drop_missing()
         # The weights have mean 1 in the sample that is used to estimate the model,
         # which does not include the observations that were dropped
         kept = self.weights.ndarray
-        self.weights = IVData(kept / nanmean(kept), var_name="weights")
+        self.weights = IVData(normalize_weights(kept), var_name="weights")
         # Weighted data is data scaled by the square root of the weights
         self._sqrt_weights = w = sqrt(self.weights.ndarray)
         # dependent variable
@@ -575,7 +576,9 @@ class _IVLSModelBase(_IVModelBase):
     instruments : array_like
         Instrumental variables (nobs by ninstr)
     weights : array_like
-        Observation weights used in estimation
+        Observation weights used in estimation. The weights must be strictly positive
+        and finite. They are rescaled to have a mean of 1. A NaN weight is missing, and
+        its observation is dropped.
     fuller : float
         Fuller's alpha to modify LIML estimator. Default returns unmodified
         LIML estimator.
@@ -778,7 +781,9 @@ class IVLIML(_IVLSModelBase):
     instruments : array_like
         Instrumental variables (nobs by ninstr)
     weights : array_like
-        Observation weights used in estimation
+        Observation weights used in estimation. The weights must be strictly positive
+        and finite. They are rescaled to have a mean of 1. A NaN weight is missing, and
+        its observation is dropped.
     fuller : float
         Fuller's alpha to modify LIML estimator. Default returns unmodified
         LIML estimator.
@@ -873,7 +878,9 @@ class IVLIML(_IVLSModelBase):
         data : DataFrame
             DataFrame containing the variables used in the formula
         weights : array_like
-            Observation weights used in estimation
+            Observation weights used in estimation. The weights must be strictly
+            positive and finite. They are rescaled to have a mean of 1. A NaN weight is
+            missing, and its observation is dropped.
         fuller : float
             Fuller's alpha to modify LIML estimator. Default returns unmodified
             LIML estimator.
@@ -931,7 +938,9 @@ class IV2SLS(_IVLSModelBase):
     instruments : array_like
         Instrumental variables (nobs by ninstr)
     weights : array_like
-        Observation weights used in estimation
+        Observation weights used in estimation. The weights must be strictly positive
+        and finite. They are rescaled to have a mean of 1. A NaN weight is missing, and
+        its observation is dropped.
 
     Notes
     -----
@@ -996,7 +1005,9 @@ class IV2SLS(_IVLSModelBase):
         data : DataFrame
             DataFrame containing the variables used in the formula
         weights : array_like
-            Observation weights used in estimation
+            Observation weights used in estimation. The weights must be strictly
+            positive and finite. They are rescaled to have a mean of 1. A NaN weight is
+            missing, and its observation is dropped.
 
         Returns
         -------
@@ -1076,7 +1087,9 @@ class _IVGMMBase(_IVModelBase):
     instruments : array_like
         Instrumental variables (nobs by ninstr)
     weights : array_like
-        Observation weights used in estimation
+        Observation weights used in estimation. The weights must be strictly positive
+        and finite. They are rescaled to have a mean of 1. A NaN weight is missing, and
+        its observation is dropped.
     weight_type : str
         Name of moment condition weight function to use in the GMM estimation
     weight_config
@@ -1341,7 +1354,9 @@ class IVGMM(_IVGMMBase):
     instruments : array_like
         Instrumental variables (nobs by ninstr)
     weights : array_like
-        Observation weights used in estimation
+        Observation weights used in estimation. The weights must be strictly positive
+        and finite. They are rescaled to have a mean of 1. A NaN weight is missing, and
+        its observation is dropped.
     weight_type : str
         Name of moment condition weight function to use in the GMM estimation
     weight_config
@@ -1461,7 +1476,9 @@ class IVGMM(_IVGMMBase):
         data : DataFrame
             DataFrame containing the variables used in the formula
         weights : array_like
-            Observation weights used in estimation
+            Observation weights used in estimation. The weights must be strictly
+            positive and finite. They are rescaled to have a mean of 1. A NaN weight is
+            missing, and its observation is dropped.
         weight_type : str
             Name of moment condition weight function to use in the GMM estimation
         weight_config
@@ -1698,7 +1715,9 @@ class IVGMMCUE(_IVGMMBase):
     instruments : array_like
         Instrumental variables (nobs by ninstr)
     weights : array_like
-        Observation weights used in estimation
+        Observation weights used in estimation. The weights must be strictly positive
+        and finite. They are rescaled to have a mean of 1. A NaN weight is missing, and
+        its observation is dropped.
     weight_type : str
         Name of moment condition weight function to use in the GMM estimation
     weight_config
@@ -1834,7 +1853,9 @@ class IVGMMCUE(_IVGMMBase):
         data : DataFrame
             DataFrame containing the variables used in the formula
         weights : array_like
-            Observation weights used in estimation
+            Observation weights used in estimation. The weights must be strictly
+            positive and finite. They are rescaled to have a mean of 1. A NaN weight is
+            missing, and its observation is dropped.
         weight_type : str
             Name of moment condition weight function to use in the GMM estimation
         weight_config
@@ -2238,7 +2259,9 @@ class _OLS(IVLIML):
     exog : array_like
         Exogenous regressors  (nobs by nexog)
     weights : array_like
-        Observation weights used in estimation
+        Observation weights used in estimation. The weights must be strictly positive
+        and finite. They are rescaled to have a mean of 1. A NaN weight is missing, and
+        its observation is dropped.
 
     Notes
     -----
@@ -2292,7 +2315,9 @@ def _gmm_model_from_formula(
     data : DataFrame
         DataFrame containing the variables used in the formula
     weights : array_like
-        Observation weights used in estimation
+        Observation weights used in estimation. The weights must be strictly positive
+        and finite. They are rescaled to have a mean of 1. A NaN weight is missing, and
+        its observation is dropped.
     weight_type : str
         Name of moment condition weight function to use in the GMM estimation
     weight_config
@@ -2446,7 +2471,9 @@ class IVJIVE(_IVModelBase):
     instruments : array_like
         Instrumental variables (nobs by ninstr)
     weights : array_like
-        Observation weights used in estimation
+        Observation weights used in estimation. The weights must be strictly positive
+        and finite. They are rescaled to have a mean of 1. A NaN weight is missing, and
+        its observation is dropped.
 
     Notes
     -----
@@ -2558,7 +2585,9 @@ class IVJIVE(_IVModelBase):
         data : DataFrame
             DataFrame containing the variables used in the formula
         weights : array_like
-            Observation weights used in estimation
+            Observation weights used in estimation. The weights must be strictly
+            positive and finite. They are rescaled to have a mean of 1. A NaN weight is
+            missing, and its observation is dropped.
 
         Returns
         -------
