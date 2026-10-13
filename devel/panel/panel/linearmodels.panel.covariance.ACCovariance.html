@@ -23,7 +23,7 @@
     
   
       
-        <title>linearmodels.panel.covariance.ACCovariance - linearmodels v7.1 (+330)</title>
+        <title>linearmodels.panel.covariance.ACCovariance - linearmodels v7.1 (+363)</title>
       
     
 
@@ -100,7 +100,7 @@
 
 <header class="md-header md-header--shadow" data-md-component="header">
   <nav class="md-header__inner md-grid" aria-label="Header">
-    <a href="../../index.html" title="linearmodels v7.1 (+330)" class="md-header__button md-logo" aria-label="linearmodels v7.1 (+330)" data-md-component="logo">
+    <a href="../../index.html" title="linearmodels v7.1 (+363)" class="md-header__button md-logo" aria-label="linearmodels v7.1 (+363)" data-md-component="logo">
       <img src="../../_static/bw-logo.svg" alt="logo">
     </a>
     <label class="md-header__button md-icon" for="__drawer">
@@ -111,7 +111,7 @@
       <div class="md-header__ellipsis">
         <div class="md-header__topic">
           <span class="md-ellipsis">
-            linearmodels v7.1 (+330)
+            linearmodels v7.1 (+363)
           </span>
         </div>
         <div class="md-header__topic" data-md-component="header-topic">
@@ -206,10 +206,10 @@
 
 <nav class="md-nav md-nav--primary" aria-label="Navigation" data-md-level="0">
   <label class="md-nav__title" for="__drawer">
-    <a href="../../index.html" title="linearmodels v7.1 (+330)" class="md-nav__button md-logo" aria-label="linearmodels v7.1 (+330)" data-md-component="logo">
+    <a href="../../index.html" title="linearmodels v7.1 (+363)" class="md-nav__button md-logo" aria-label="linearmodels v7.1 (+363)" data-md-component="logo">
       <img src="../../_static/bw-logo.svg" alt="logo">
     </a>
-    linearmodels v7.1 (+330)
+    linearmodels v7.1 (+363)
   </label>
   
     <div class="md-nav__source">
@@ -1800,13 +1800,23 @@ provided.</p>
 \[\hat{\Sigma}_{xx} = n^{-1}X'X\]</div>
 <p>and</p>
 <div class="math notranslate nohighlight">
-\[\begin{split}\xi_t &amp; = \epsilon_{it} x_{it} \\
-\hat{S} &amp; = n / (N(n-df))  \sum_{i=1}^N S_i \\
+\[\begin{split}\xi_{it} &amp; = \epsilon_{it} x_{it} \\
+\hat{S} &amp; = (n-df)^{-1} \sum_{i=1}^N S_i \\
 \hat{S}_i &amp; = \sum_{j=0}^{bw} K(j, bw) \hat{S}_{ij} \\
 \hat{S}_{i0} &amp; = \sum_{t=1}^{T} \xi'_{it} \xi_{it} \\
 \hat{S}_{ij} &amp; = \sum_{t=1}^{T-j} \xi'_{it} \xi_{it+j} + \xi'_{it+j} \xi_{it}\end{split}\]</div>
 <p>where df is <code class="docutils literal notranslate"><span class="pre">extra_df</span></code> and n-df is replace by n-df-k if <code class="docutils literal notranslate"><span class="pre">debiased</span></code> is
-<code class="docutils literal notranslate"><span class="pre">True</span></code>. <span class="math notranslate nohighlight">\(K(i, bw)\)</span> is the kernel weighting function.</p>
+<code class="docutils literal notranslate"><span class="pre">True</span></code>. <span class="math notranslate nohighlight">\(K(i, bw)\)</span> is the kernel weighting function. The sums of an
+entity are over the lags of its observations, so that observations that follow
+each other are one lag apart even if a period is missing between them.</p>
+<div class="admonition versionchanged">
+<p class="admonition-title"><span class="versionmodified changed">Changed in version 7.1: </span>The entities are not weighted by their numbers of observations: each
+entity contributes the sum of the products of its scores. Earlier versions
+divided the sum of each entity by its number of observations and averaged
+over the entities, which is the same for a balanced panel. For an unbalanced
+panel the covariance, e.g., with a bandwidth of 0, was not the heteroskedasticity
+robust covariance, and differed from the covariance of other packages.</p>
+</div>
 <p class="rubric">Methods</p>
 <table class="autosummary longtable docutils data align-default">
 <tbody>

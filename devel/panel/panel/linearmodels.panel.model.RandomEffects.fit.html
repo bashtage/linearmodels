@@ -23,7 +23,7 @@
     
   
       
-        <title>linearmodels.panel.model.RandomEffects.fit - linearmodels v7.1 (+330)</title>
+        <title>linearmodels.panel.model.RandomEffects.fit - linearmodels v7.1 (+363)</title>
       
     
 
@@ -100,7 +100,7 @@
 
 <header class="md-header md-header--shadow" data-md-component="header">
   <nav class="md-header__inner md-grid" aria-label="Header">
-    <a href="../../index.html" title="linearmodels v7.1 (+330)" class="md-header__button md-logo" aria-label="linearmodels v7.1 (+330)" data-md-component="logo">
+    <a href="../../index.html" title="linearmodels v7.1 (+363)" class="md-header__button md-logo" aria-label="linearmodels v7.1 (+363)" data-md-component="logo">
       <img src="../../_static/bw-logo.svg" alt="logo">
     </a>
     <label class="md-header__button md-icon" for="__drawer">
@@ -111,7 +111,7 @@
       <div class="md-header__ellipsis">
         <div class="md-header__topic">
           <span class="md-ellipsis">
-            linearmodels v7.1 (+330)
+            linearmodels v7.1 (+363)
           </span>
         </div>
         <div class="md-header__topic" data-md-component="header-topic">
@@ -206,10 +206,10 @@
 
 <nav class="md-nav md-nav--primary" aria-label="Navigation" data-md-level="0">
   <label class="md-nav__title" for="__drawer">
-    <a href="../../index.html" title="linearmodels v7.1 (+330)" class="md-nav__button md-logo" aria-label="linearmodels v7.1 (+330)" data-md-component="logo">
+    <a href="../../index.html" title="linearmodels v7.1 (+363)" class="md-nav__button md-logo" aria-label="linearmodels v7.1 (+363)" data-md-component="logo">
       <img src="../../_static/bw-logo.svg" alt="logo">
     </a>
-    linearmodels v7.1 (+330)
+    linearmodels v7.1 (+363)
   </label>
   
     <div class="md-nav__source">
@@ -1663,6 +1663,33 @@ F distributions for inference.</p>
 <p><code class="docutils literal notranslate"><span class="pre">debiased=True</span></code> and <code class="docutils literal notranslate"><span class="pre">group_debias=True</span></code> give the clustered
 covariance of Stata’s <code class="docutils literal notranslate"><span class="pre">xtreg,</span> <span class="pre">re</span> <span class="pre">vce(cluster</span> <span class="pre">...)</span></code>.
 See <a class="reference internal" href="../faq.html#panel-small-sample"><span class="std std-ref">Small-sample Adjustments</span></a>.</p>
+<p>The variance of the idiosyncratic error is the residual variance of the
+within regression, and the variance of the effects is estimated from the
+residuals of the between regression. The degrees of freedom of the
+variances are the numbers of coefficients that the regressions estimate. A
+regressor that is constant within entities (the constant, or years of
+education in a wage panel) or that is collinear with the others once the
+means of the entities are removed (experience, if the model has year
+dummies) is not in the within regression, and a regressor that is collinear
+with the others in the means of the entities (the year dummies and the
+constant in a balanced panel) is not in the between regression. A
+<code class="docutils literal notranslate"><span class="pre">ValueError</span></code> is raised if either regression has no residual degrees of
+freedom, since the variances cannot be estimated.</p>
+<div class="admonition versionchanged">
+<p class="admonition-title"><span class="versionmodified changed">Changed in version 7.1: </span>The degrees of freedom of the variances count the coefficients that the
+regressions estimate. Earlier versions counted every column of <code class="docutils literal notranslate"><span class="pre">exog</span></code>
+(less one for the constant in the within regression), so that the
+variances, theta and the estimates were slightly different for models with
+time-invariant or collinear regressors, and for models without a constant.
+With <code class="docutils literal notranslate"><span class="pre">small_sample</span></code> and an unbalanced panel, the residuals of the between
+regression that the estimator of Baltagi and Chang (1994) uses are those of
+the regression that weights the entities by their numbers of observations.
+Earlier versions used the residuals of the unweighted regression of the
+means, which gave a different variance of the effects. Models that do not
+have residual degrees of freedom in the regressions raise a
+<code class="docutils literal notranslate"><span class="pre">ValueError</span></code>. Earlier versions raised an error from NumPy or SciPy,
+or returned variances that were not defined.</p>
+</div>
 </dd></dl>
 
 

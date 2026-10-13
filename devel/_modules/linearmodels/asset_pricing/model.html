@@ -19,7 +19,7 @@
     
   
       
-        <title>linearmodels.asset_pricing.model - linearmodels v7.1 (+330)</title>
+        <title>linearmodels.asset_pricing.model - linearmodels v7.1 (+363)</title>
       
     
 
@@ -91,7 +91,7 @@
 
 <header class="md-header md-header--shadow" data-md-component="header">
   <nav class="md-header__inner md-grid" aria-label="Header">
-    <a href="../../../index.html" title="linearmodels v7.1 (+330)" class="md-header__button md-logo" aria-label="linearmodels v7.1 (+330)" data-md-component="logo">
+    <a href="../../../index.html" title="linearmodels v7.1 (+363)" class="md-header__button md-logo" aria-label="linearmodels v7.1 (+363)" data-md-component="logo">
       <img src="../../../_static/bw-logo.svg" alt="logo">
     </a>
     <label class="md-header__button md-icon" for="__drawer">
@@ -102,7 +102,7 @@
       <div class="md-header__ellipsis">
         <div class="md-header__topic">
           <span class="md-ellipsis">
-            linearmodels v7.1 (+330)
+            linearmodels v7.1 (+363)
           </span>
         </div>
         <div class="md-header__topic" data-md-component="header-topic">
@@ -197,10 +197,10 @@
 
 <nav class="md-nav md-nav--primary" aria-label="Navigation" data-md-level="0">
   <label class="md-nav__title" for="__drawer">
-    <a href="../../../index.html" title="linearmodels v7.1 (+330)" class="md-nav__button md-logo" aria-label="linearmodels v7.1 (+330)" data-md-component="logo">
+    <a href="../../../index.html" title="linearmodels v7.1 (+363)" class="md-nav__button md-logo" aria-label="linearmodels v7.1 (+363)" data-md-component="logo">
       <img src="../../../_static/bw-logo.svg" alt="logo">
     </a>
-    linearmodels v7.1 (+330)
+    linearmodels v7.1 (+363)
   </label>
   
     <div class="md-nav__source">
@@ -665,9 +665,20 @@
                 <span class="s2">"equivalent and must not have rank</span><span class="se">\n</span><span class="s2">"</span>
                 <span class="s2">"less than the dimension of the smaller shape."</span>
             <span class="p">)</span>
-        <span class="k">if</span> <span class="n">has_constant</span><span class="p">(</span><span class="n">f</span><span class="p">)[</span><span class="mi">0</span><span class="p">]:</span>
+        <span class="n">rank</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">linalg</span><span class="o">.</span><span class="n">matrix_rank</span><span class="p">(</span><span class="n">f</span><span class="p">)</span>
+        <span class="n">constant</span> <span class="o">=</span> <span class="n">has_constant</span><span class="p">(</span><span class="n">f</span><span class="p">,</span> <span class="n">rank</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span>
+        <span class="k">if</span> <span class="n">constant</span> <span class="ow">and</span> <span class="n">rank</span> <span class="o">&lt;</span> <span class="n">f</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">]:</span>
+            <span class="c1"># has_constant is also True if the columns are collinear. Collinear</span>
+            <span class="c1"># factors have a constant if a column is constant, or, for a matrix</span>
+            <span class="c1"># with more rows than columns, if a constant is in the span of the</span>
+            <span class="c1"># columns</span>
+            <span class="n">nobs</span> <span class="o">=</span> <span class="n">f</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+            <span class="n">aug_rank</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">linalg</span><span class="o">.</span><span class="n">matrix_rank</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">c_</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">ones</span><span class="p">((</span><span class="n">nobs</span><span class="p">,</span> <span class="mi">1</span><span class="p">)),</span> <span class="n">f</span><span class="p">])</span>
+            <span class="n">constant_column</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">any</span><span class="p">((</span><span class="n">np</span><span class="o">.</span><span class="n">ptp</span><span class="p">(</span><span class="n">f</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span> <span class="o">==</span> <span class="mi">0</span><span class="p">)</span> <span class="o">&amp;</span> <span class="o">~</span><span class="n">np</span><span class="o">.</span><span class="n">all</span><span class="p">(</span><span class="n">f</span> <span class="o">==</span> <span class="mi">0</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="mi">0</span><span class="p">))</span>
+            <span class="n">constant</span> <span class="o">=</span> <span class="nb">bool</span><span class="p">(</span><span class="n">constant_column</span> <span class="ow">or</span> <span class="p">(</span><span class="n">nobs</span> <span class="o">&gt;</span> <span class="n">f</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="ow">and</span> <span class="n">aug_rank</span> <span class="o">==</span> <span class="n">rank</span><span class="p">))</span>
+        <span class="k">if</span> <span class="n">constant</span><span class="p">:</span>
             <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">"factors must not contain a constant or equivalent."</span><span class="p">)</span>
-        <span class="k">if</span> <span class="n">np</span><span class="o">.</span><span class="n">linalg</span><span class="o">.</span><span class="n">matrix_rank</span><span class="p">(</span><span class="n">f</span><span class="p">)</span> <span class="o">&lt;</span> <span class="n">f</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">]:</span>
+        <span class="k">if</span> <span class="n">rank</span> <span class="o">&lt;</span> <span class="n">f</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">]:</span>
             <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
                 <span class="s2">"Model cannot be estimated. factors do not have full column rank."</span>
             <span class="p">)</span>
@@ -675,6 +686,18 @@
             <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
                 <span class="s2">"Model cannot be estimated. portfolios must have factors + 1 or "</span>
                 <span class="s2">"more returns to</span><span class="se">\n</span><span class="s2">estimate the model parameters."</span>
+            <span class="p">)</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">_check_debiased</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">debiased</span><span class="p">:</span> <span class="nb">bool</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">"""Debiasing needs more observations than regressors in the regressions"""</span>
+        <span class="n">nobs</span><span class="p">,</span> <span class="n">nfactor</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">factors</span><span class="o">.</span><span class="n">shape</span>
+        <span class="k">if</span> <span class="n">debiased</span> <span class="ow">and</span> <span class="n">nobs</span> <span class="o">&lt;=</span> <span class="n">nfactor</span> <span class="o">+</span> <span class="mi">1</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
+                <span class="s2">"The covariance cannot be debiased when the number of observations "</span>
+                <span class="sa">f</span><span class="s2">"(</span><span class="si">{</span><span class="n">nobs</span><span class="si">}</span><span class="s2">) is not larger than the number of factors plus one "</span>
+                <span class="sa">f</span><span class="s2">"(</span><span class="si">{</span><span class="n">nfactor</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="mi">1</span><span class="si">}</span><span class="s2">), the number of regressors of each time-series "</span>
+                <span class="s2">"regression, since there are no residual degrees of freedom. Use "</span>
+                <span class="s2">"debiased=False or more observations."</span>
             <span class="p">)</span>
 
     <span class="nd">@property</span>
@@ -862,6 +885,7 @@
 <span class="sd">        ``kernel``, one of "bartlett", "parzen" or "qs" (quadratic spectral)</span>
 <span class="sd">        and ``bandwidth`` (a positive integer).</span>
 <span class="sd">        """</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_check_debiased</span><span class="p">(</span><span class="n">debiased</span><span class="p">)</span>
         <span class="n">p</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">portfolios</span><span class="o">.</span><span class="n">ndarray</span>
         <span class="n">f</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">factors</span><span class="o">.</span><span class="n">ndarray</span>
         <span class="n">nportfolio</span> <span class="o">=</span> <span class="n">p</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span>
@@ -997,10 +1021,32 @@
                 <span class="bp">self</span><span class="o">.</span><span class="n">portfolios</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span>
             <span class="p">)</span>
         <span class="k">else</span><span class="p">:</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">_sigma</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">asarray</span><span class="p">(</span><span class="n">sigma</span><span class="p">)</span>
-            <span class="n">vals</span><span class="p">,</span> <span class="n">vecs</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">linalg</span><span class="o">.</span><span class="n">eigh</span><span class="p">(</span><span class="n">sigma</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_sigma</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_validate_sigma</span><span class="p">(</span><span class="n">sigma</span><span class="p">)</span>
+            <span class="n">vals</span><span class="p">,</span> <span class="n">vecs</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">linalg</span><span class="o">.</span><span class="n">eigh</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_sigma</span><span class="p">)</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">_sigma_m12</span> <span class="o">=</span> <span class="n">vecs</span> <span class="o">@</span> <span class="n">np</span><span class="o">.</span><span class="n">diag</span><span class="p">(</span><span class="mf">1.0</span> <span class="o">/</span> <span class="n">np</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="n">vals</span><span class="p">))</span> <span class="o">@</span> <span class="n">vecs</span><span class="o">.</span><span class="n">T</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">_sigma_inv</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">linalg</span><span class="o">.</span><span class="n">inv</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_sigma</span><span class="p">)</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="nb">float</span><span class="p">,</span> <span class="n">copy</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">_validate_sigma</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span> <span class="n">sigma</span><span class="p">:</span> <span class="n">linearmodels</span><span class="o">.</span><span class="n">typing</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">ArrayLike</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">linearmodels</span><span class="o">.</span><span class="n">typing</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">Float64Array</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">"""Check that sigma is a symmetric positive definite matrix of the right size"""</span>
+        <span class="n">nportfolio</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">portfolios</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span>
+        <span class="n">sigma_arr</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">asarray</span><span class="p">(</span><span class="n">sigma</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="nb">float</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">sigma_arr</span><span class="o">.</span><span class="n">shape</span> <span class="o">!=</span> <span class="p">(</span><span class="n">nportfolio</span><span class="p">,</span> <span class="n">nportfolio</span><span class="p">):</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
+                <span class="sa">f</span><span class="s2">"sigma must be a square array with shape (</span><span class="si">{</span><span class="n">nportfolio</span><span class="si">}</span><span class="s2">, "</span>
+                <span class="sa">f</span><span class="s2">"</span><span class="si">{</span><span class="n">nportfolio</span><span class="si">}</span><span class="s2">), where </span><span class="si">{</span><span class="n">nportfolio</span><span class="si">}</span><span class="s2"> is the number of test portfolios. "</span>
+                <span class="sa">f</span><span class="s2">"The shape of sigma is </span><span class="si">{</span><span class="n">sigma_arr</span><span class="o">.</span><span class="n">shape</span><span class="si">}</span><span class="s2">."</span>
+            <span class="p">)</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">np</span><span class="o">.</span><span class="n">all</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">isfinite</span><span class="p">(</span><span class="n">sigma_arr</span><span class="p">)):</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">"sigma must not contain missing or infinite values."</span><span class="p">)</span>
+        <span class="n">scale</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">max</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">abs</span><span class="p">(</span><span class="n">sigma_arr</span><span class="p">))</span>
+        <span class="k">if</span> <span class="n">np</span><span class="o">.</span><span class="n">max</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">abs</span><span class="p">(</span><span class="n">sigma_arr</span> <span class="o">-</span> <span class="n">sigma_arr</span><span class="o">.</span><span class="n">T</span><span class="p">))</span> <span class="o">&gt;</span> <span class="mf">1e-8</span> <span class="o">*</span> <span class="n">scale</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">"sigma must be symmetric."</span><span class="p">)</span>
+        <span class="n">vals</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">linalg</span><span class="o">.</span><span class="n">eigvalsh</span><span class="p">((</span><span class="n">sigma_arr</span> <span class="o">+</span> <span class="n">sigma_arr</span><span class="o">.</span><span class="n">T</span><span class="p">)</span> <span class="o">/</span> <span class="mi">2</span><span class="p">)</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">vals</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">&gt;</span> <span class="n">nportfolio</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">finfo</span><span class="p">(</span><span class="nb">float</span><span class="p">)</span><span class="o">.</span><span class="n">eps</span> <span class="o">*</span> <span class="n">vals</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">"sigma must be positive definite."</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">sigma_arr</span>
 
     <span class="k">def</span><span class="w"> </span><span class="fm">__str__</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
         <span class="n">out</span> <span class="o">=</span> <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__str__</span><span class="p">()</span>
@@ -1049,8 +1095,12 @@
 <span class="sd">        Flag indicating whether the risk-free rate should be estimated</span>
 <span class="sd">        from returns along other risk premia.  If False, the returns are</span>
 <span class="sd">        assumed to be excess returns using the correct risk-free rate.</span>
-<span class="sd">    sigma : array_like</span>
-<span class="sd">        Positive definite residual covariance (nportfolio by nportfolio)</span>
+<span class="sd">    sigma : array_like, optional</span>
+<span class="sd">        Positive definite residual covariance (nportfolio by nportfolio) that</span>
+<span class="sd">        weights the test portfolios in the second stage. A ``ValueError`` is</span>
+<span class="sd">        raised if it does not have this shape, contains missing or infinite</span>
+<span class="sd">        values, or is not symmetric and positive definite. If not provided, the</span>
+<span class="sd">        identity matrix is used.</span>
 
 <span class="sd">    Notes</span>
 <span class="sd">    -----</span>
@@ -1133,8 +1183,12 @@
 <span class="sd">            Flag indicating whether the risk-free rate should be estimated</span>
 <span class="sd">            from returns along other risk premia.  If False, the returns are</span>
 <span class="sd">            assumed to be excess returns using the correct risk-free rate.</span>
-<span class="sd">        sigma : array_like</span>
-<span class="sd">            Positive definite residual covariance (nportfolio by nportfolio)</span>
+<span class="sd">        sigma : array_like, optional</span>
+<span class="sd">            Positive definite residual covariance (nportfolio by nportfolio) that</span>
+<span class="sd">            weights the test portfolios in the second stage. A ``ValueError`` is</span>
+<span class="sd">            raised if it does not have this shape, contains missing or infinite</span>
+<span class="sd">            values, or is not symmetric and positive definite. If not provided,</span>
+<span class="sd">            the identity matrix is used.</span>
 
 <span class="sd">        Returns</span>
 <span class="sd">        -------</span>
@@ -1204,6 +1258,7 @@
 <span class="sd">        """</span>
         <span class="n">nobs</span><span class="p">,</span> <span class="n">nf</span><span class="p">,</span> <span class="n">nport</span><span class="p">,</span> <span class="n">nrf</span><span class="p">,</span> <span class="n">s1</span><span class="p">,</span> <span class="n">s2</span><span class="p">,</span> <span class="n">s3</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_boundaries</span><span class="p">()</span>
         <span class="n">excess_returns</span> <span class="o">=</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">_risk_free</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_check_debiased</span><span class="p">(</span><span class="n">debiased</span><span class="p">)</span>
         <span class="n">f</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">factors</span><span class="o">.</span><span class="n">ndarray</span>
         <span class="n">p</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">portfolios</span><span class="o">.</span><span class="n">ndarray</span>
         <span class="n">nport</span> <span class="o">=</span> <span class="n">p</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span>
@@ -1563,7 +1618,9 @@
         <span class="n">mod</span> <span class="o">=</span> <span class="n">LinearFactorModel</span><span class="p">(</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">portfolios</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">factors</span><span class="p">,</span> <span class="n">risk_free</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">_risk_free</span>
         <span class="p">)</span>
-        <span class="n">res</span> <span class="o">=</span> <span class="n">mod</span><span class="o">.</span><span class="n">fit</span><span class="p">()</span>
+        <span class="c1"># The starting values do not use the covariance, which cannot be debiased</span>
+        <span class="c1"># if there are no residual degrees of freedom in the first stage</span>
+        <span class="n">res</span> <span class="o">=</span> <span class="n">mod</span><span class="o">.</span><span class="n">fit</span><span class="p">(</span><span class="n">debiased</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
         <span class="n">betas_1d</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">asarray</span><span class="p">(</span><span class="n">res</span><span class="o">.</span><span class="n">betas</span><span class="p">)</span><span class="o">.</span><span class="n">ravel</span><span class="p">()</span>
         <span class="n">lam</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">asarray</span><span class="p">(</span><span class="n">res</span><span class="o">.</span><span class="n">risk_premia</span><span class="p">)</span>
         <span class="n">mu</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">factors</span><span class="o">.</span><span class="n">ndarray</span><span class="o">.</span><span class="n">mean</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>

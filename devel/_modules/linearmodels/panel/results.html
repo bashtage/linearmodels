@@ -19,7 +19,7 @@
     
   
       
-        <title>linearmodels.panel.results - linearmodels v7.1 (+330)</title>
+        <title>linearmodels.panel.results - linearmodels v7.1 (+363)</title>
       
     
 
@@ -91,7 +91,7 @@
 
 <header class="md-header md-header--shadow" data-md-component="header">
   <nav class="md-header__inner md-grid" aria-label="Header">
-    <a href="../../../index.html" title="linearmodels v7.1 (+330)" class="md-header__button md-logo" aria-label="linearmodels v7.1 (+330)" data-md-component="logo">
+    <a href="../../../index.html" title="linearmodels v7.1 (+363)" class="md-header__button md-logo" aria-label="linearmodels v7.1 (+363)" data-md-component="logo">
       <img src="../../../_static/bw-logo.svg" alt="logo">
     </a>
     <label class="md-header__button md-icon" for="__drawer">
@@ -102,7 +102,7 @@
       <div class="md-header__ellipsis">
         <div class="md-header__topic">
           <span class="md-ellipsis">
-            linearmodels v7.1 (+330)
+            linearmodels v7.1 (+363)
           </span>
         </div>
         <div class="md-header__topic" data-md-component="header-topic">
@@ -197,10 +197,10 @@
 
 <nav class="md-nav md-nav--primary" aria-label="Navigation" data-md-level="0">
   <label class="md-nav__title" for="__drawer">
-    <a href="../../../index.html" title="linearmodels v7.1 (+330)" class="md-nav__button md-logo" aria-label="linearmodels v7.1 (+330)" data-md-component="logo">
+    <a href="../../../index.html" title="linearmodels v7.1 (+363)" class="md-nav__button md-logo" aria-label="linearmodels v7.1 (+363)" data-md-component="logo">
       <img src="../../../_static/bw-logo.svg" alt="logo">
     </a>
-    linearmodels v7.1 (+330)
+    linearmodels v7.1 (+363)
   </label>
   
     <div class="md-nav__source">
@@ -2012,14 +2012,106 @@
 <span class="sd">        their covariance is estimated from the same T estimates. If</span>
 <span class="sd">        ``debiased`` is True, p-values and confidence intervals use a t</span>
 <span class="sd">        distribution with T - 1 degrees of freedom, as in Fama and MacBeth</span>
-<span class="sd">        (1973), and ``f_statistic_robust`` uses an F distribution with this</span>
-<span class="sd">        denominator degree of freedom. The periods whose cross-section cannot</span>
-<span class="sd">        be estimated are not counted. This is not nobs minus nvar, which is the</span>
-<span class="sd">        residual degree of freedom of the pooled regression and the one that</span>
-<span class="sd">        ``f_statistic``, the classical F-statistic of the pooled regression,</span>
-<span class="sd">        uses.</span>
+<span class="sd">        (1973). The periods whose cross-section cannot be estimated are not</span>
+<span class="sd">        counted. This is not nobs minus nvar, which is the residual degree of</span>
+<span class="sd">        freedom of the pooled regression and the one that ``f_statistic``, the</span>
+<span class="sd">        classical F-statistic of the pooled regression, uses. The joint test</span>
+<span class="sd">        ``f_statistic_robust`` uses T - k denominator degrees of freedom, where</span>
+<span class="sd">        k is the number of parameters that it tests.</span>
 <span class="sd">        """</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_df_resid</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">f_statistic_robust</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">WaldTestStatistic</span><span class="p">:</span>
+<span class="w">        </span><span class="sa">r</span><span class="sd">"""</span>
+<span class="sd">        Joint test of significance for non-constant regressors.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        WaldTestStatistic</span>
+<span class="sd">            Statistic value, distribution and p-value. It is an</span>
+<span class="sd">            ``InvalidTestStatistic`` if the model contains only a constant, or</span>
+<span class="sd">            if the number of periods that are averaged is not larger than the</span>
+<span class="sd">            number of tested parameters, so that the covariance of the</span>
+<span class="sd">            parameters is singular.</span>
+
+<span class="sd">        Notes</span>
+<span class="sd">        -----</span>
+<span class="sd">        Implemented as a Wald test using the estimated parameter covariance,</span>
+<span class="sd">        which is the covariance of the average of the T cross-sectional</span>
+<span class="sd">        estimates that is selected by ``cov_type``.</span>
+
+<span class="sd">        .. math::</span>
+
+<span class="sd">           W = \hat{\beta}_{-}' \hat{\Sigma}_{-}^{-1} \hat{\beta}_{-}</span>
+
+<span class="sd">        where :math:`\hat{\beta}_{-}` does not include the model constant and</span>
+<span class="sd">        :math:`\hat{\Sigma}_{-}` is the estimated covariance of the</span>
+<span class="sd">        parameters, also excluding the constant. Let :math:`k` be the number of</span>
+<span class="sd">        non-constant parameters and :math:`T` the number of periods whose</span>
+<span class="sd">        cross-sectional regression is estimated, which is ``df_resid`` plus 1.</span>
+
+<span class="sd">        If ``debiased`` is True, which is the default, the statistic is</span>
+
+<span class="sd">        .. math::</span>
+
+<span class="sd">           F = \frac{T-k}{k(T-1)} W</span>
+
+<span class="sd">        and it is compared with an :math:`F_{k,T-k}` distribution. This is</span>
+<span class="sd">        the Hotelling T-squared test [1]_ of the hypothesis that the mean of</span>
+<span class="sd">        the :math:`T` estimates is zero. It is exact when the :math:`T`</span>
+<span class="sd">        estimates are independent draws from the same normal distribution and</span>
+<span class="sd">        the covariance is the standard covariance of their average</span>
+<span class="sd">        (``cov_type`` equal to "unadjusted", "homoskedastic", "robust" or</span>
+<span class="sd">        "heteroskedastic"), and the test then has the size that it claims.</span>
+<span class="sd">        With one tested parameter, :math:`F` is the square of the t-statistic</span>
+<span class="sd">        and the distribution is the square of the :math:`t_{T-1}`</span>
+<span class="sd">        distribution, so that the p-value is that of the parameter.</span>
+
+<span class="sd">        With the kernel covariance ("kernel") the test is only an</span>
+<span class="sd">        approximation. A kernel estimate of the long-run covariance from only</span>
+<span class="sd">        :math:`T` estimates is much less precise than the sample covariance, so</span>
+<span class="sd">        that the test can reject a true null hypothesis far too often even if</span>
+<span class="sd">        the estimates are independent, as can the t-test of a single</span>
+<span class="sd">        parameter, which is the case :math:`k=1`. In simulations of</span>
+<span class="sd">        independent normal estimates with the default bandwidth, the 5% test</span>
+<span class="sd">        rejected the null hypothesis in 21% of the samples with :math:`k=1` and</span>
+<span class="sd">        :math:`T=10`, in 37% with :math:`k=3` and :math:`T=10`, and in 23% with</span>
+<span class="sd">        :math:`k=3` and :math:`T=40`, where the test with the standard</span>
+<span class="sd">        covariance rejected in 5%.</span>
+
+<span class="sd">        The covariance is estimated from only :math:`T` estimates, which makes</span>
+<span class="sd">        :math:`W/k` stochastically larger than an :math:`F_{k,df}` variable</span>
+<span class="sd">        with :math:`df=T-1`, or with :math:`df=nobs-nvar` as in 7.0 and</span>
+<span class="sd">        earlier, when there are several tested parameters. A test that uses</span>
+<span class="sd">        those distributions rejects a true null hypothesis too often, and more</span>
+<span class="sd">        with more tested parameters and fewer periods. The factor and the</span>
+<span class="sd">        :math:`F_{k,T-k}` distribution correct this. In simulations of 20,000</span>
+<span class="sd">        samples of 40 entities in which the null hypothesis is true, the</span>
+<span class="sd">        tests of nominal size 5% with :math:`k=3` and :math:`T=10`, with</span>
+<span class="sd">        :math:`k=5` and :math:`T=10`, and with :math:`k=5` and :math:`T=20`</span>
+<span class="sd">        rejected the null hypothesis in 10%, 24% and 11% of the samples with the</span>
+<span class="sd">        :math:`F_{k,T-1}` distribution, in 20%, 41% and 18% with the</span>
+<span class="sd">        :math:`F_{k,nobs-nvar}` distribution of 7.0, and in 5% with the test</span>
+<span class="sd">        described here.</span>
+
+<span class="sd">        If ``debiased`` is False, the statistic is :math:`W` and the</span>
+<span class="sd">        distribution is :math:`\chi^2_k`. The general</span>
+<span class="sd">        :meth:`~linearmodels.panel.results.PanelResults.wald_test` of the</span>
+<span class="sd">        results also compares its statistic with a chi-squared distribution,</span>
+<span class="sd">        and does not apply this correction.</span>
+
+<span class="sd">        References</span>
+<span class="sd">        ----------</span>
+<span class="sd">        .. [1] Hotelling, H. (1931). The generalization of Student's ratio.</span>
+<span class="sd">           The Annals of Mathematical Statistics, 2(3), 360-378.</span>
+<span class="sd">        """</span>
+        <span class="kn">from</span><span class="w"> </span><span class="nn">linearmodels.panel.model</span><span class="w"> </span><span class="kn">import</span> <span class="n">_hotelling_f</span>  <span class="c1"># noqa: PLC0415</span>
+
+        <span class="c1"># The periods whose cross-section is estimated are df_resid + 1</span>
+        <span class="k">return</span> <span class="n">_hotelling_f</span><span class="p">(</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">params</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">cov</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_debiased</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_df_resid</span> <span class="o">+</span> <span class="mi">1</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_f_info</span>
+        <span class="p">)</span>
 
     <span class="k">def</span><span class="w"> </span><span class="nf">_pesaran_cd_inapplicable</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span> <span class="o">|</span> <span class="kc">None</span><span class="p">:</span>
         <span class="k">return</span> <span class="p">(</span>

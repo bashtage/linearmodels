@@ -23,7 +23,7 @@
     
   
       
-        <title>linearmodels.panel.model.FamaMacBeth.fit - linearmodels v7.1 (+330)</title>
+        <title>linearmodels.panel.model.FamaMacBeth.fit - linearmodels v7.1 (+363)</title>
       
     
 
@@ -100,7 +100,7 @@
 
 <header class="md-header md-header--shadow" data-md-component="header">
   <nav class="md-header__inner md-grid" aria-label="Header">
-    <a href="../../index.html" title="linearmodels v7.1 (+330)" class="md-header__button md-logo" aria-label="linearmodels v7.1 (+330)" data-md-component="logo">
+    <a href="../../index.html" title="linearmodels v7.1 (+363)" class="md-header__button md-logo" aria-label="linearmodels v7.1 (+363)" data-md-component="logo">
       <img src="../../_static/bw-logo.svg" alt="logo">
     </a>
     <label class="md-header__button md-icon" for="__drawer">
@@ -111,7 +111,7 @@
       <div class="md-header__ellipsis">
         <div class="md-header__topic">
           <span class="md-ellipsis">
-            linearmodels v7.1 (+330)
+            linearmodels v7.1 (+363)
           </span>
         </div>
         <div class="md-header__topic" data-md-component="header-topic">
@@ -206,10 +206,10 @@
 
 <nav class="md-nav md-nav--primary" aria-label="Navigation" data-md-level="0">
   <label class="md-nav__title" for="__drawer">
-    <a href="../../index.html" title="linearmodels v7.1 (+330)" class="md-nav__button md-logo" aria-label="linearmodels v7.1 (+330)" data-md-component="logo">
+    <a href="../../index.html" title="linearmodels v7.1 (+363)" class="md-nav__button md-logo" aria-label="linearmodels v7.1 (+363)" data-md-component="logo">
       <img src="../../_static/bw-logo.svg" alt="logo">
     </a>
-    linearmodels v7.1 (+330)
+    linearmodels v7.1 (+363)
   </label>
   
     <div class="md-nav__source">
@@ -1642,11 +1642,22 @@ freedom, which is the convention of Fama and MacBeth (1973) and is the
 estimators use the same distribution. If <code class="docutils literal notranslate"><span class="pre">debiased</span></code> is False, they
 use the normal distribution. The estimates and the standard errors
 do not depend on the distribution.</p>
+<p>The joint test of the parameters other than the constant,
+<code class="docutils literal notranslate"><span class="pre">f_statistic_robust</span></code> of the results, is the Hotelling T-squared test.
+If <code class="docutils literal notranslate"><span class="pre">debiased</span></code> is True, the Wald statistic of the k tested parameters
+is multiplied by (T - k) / (k (T - 1)), and the p-value is computed from
+an F distribution with k and T - k degrees of freedom. If <code class="docutils literal notranslate"><span class="pre">debiased</span></code>
+is False, the statistic is compared with a chi-squared distribution with
+k degrees of freedom. See
+<a class="reference internal" href="linearmodels.panel.results.FamaMacBethResults.f_statistic_robust.html#linearmodels.panel.results.FamaMacBethResults.f_statistic_robust" title="linearmodels.panel.results.FamaMacBethResults.f_statistic_robust (Python property) — Joint test of significance for non-constant regressors."><code class="xref py py-attr docutils literal notranslate"><span class="pre">f_statistic_robust</span></code></a>.</p>
 <div class="admonition versionchanged">
 <p class="admonition-title"><span class="versionmodified changed">Changed in version 7.1: </span>The p-values and confidence intervals use T - 1 degrees of freedom.
 Earlier versions used nobs - nvar degrees of freedom, those of a
 pooled regression, which is close to the normal distribution when
-there are many observations.</p>
+there are many observations. <code class="docutils literal notranslate"><span class="pre">f_statistic_robust</span></code> uses Hotelling’s
+reference. Earlier versions divided the Wald statistic by k and used
+an F distribution with k and nobs - nvar degrees of freedom, which
+rejects a true null hypothesis too often when k is larger than 1.</p>
 </div>
 </dd></dl>
 

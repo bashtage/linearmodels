@@ -19,7 +19,7 @@
     
   
       
-        <title>linearmodels.panel.covariance - linearmodels v7.1 (+330)</title>
+        <title>linearmodels.panel.covariance - linearmodels v7.1 (+363)</title>
       
     
 
@@ -91,7 +91,7 @@
 
 <header class="md-header md-header--shadow" data-md-component="header">
   <nav class="md-header__inner md-grid" aria-label="Header">
-    <a href="../../../index.html" title="linearmodels v7.1 (+330)" class="md-header__button md-logo" aria-label="linearmodels v7.1 (+330)" data-md-component="logo">
+    <a href="../../../index.html" title="linearmodels v7.1 (+363)" class="md-header__button md-logo" aria-label="linearmodels v7.1 (+363)" data-md-component="logo">
       <img src="../../../_static/bw-logo.svg" alt="logo">
     </a>
     <label class="md-header__button md-icon" for="__drawer">
@@ -102,7 +102,7 @@
       <div class="md-header__ellipsis">
         <div class="md-header__topic">
           <span class="md-ellipsis">
-            linearmodels v7.1 (+330)
+            linearmodels v7.1 (+363)
           </span>
         </div>
         <div class="md-header__topic" data-md-component="header-topic">
@@ -197,10 +197,10 @@
 
 <nav class="md-nav md-nav--primary" aria-label="Navigation" data-md-level="0">
   <label class="md-nav__title" for="__drawer">
-    <a href="../../../index.html" title="linearmodels v7.1 (+330)" class="md-nav__button md-logo" aria-label="linearmodels v7.1 (+330)" data-md-component="logo">
+    <a href="../../../index.html" title="linearmodels v7.1 (+363)" class="md-nav__button md-logo" aria-label="linearmodels v7.1 (+363)" data-md-component="logo">
       <img src="../../../_static/bw-logo.svg" alt="logo">
     </a>
-    linearmodels v7.1 (+330)
+    linearmodels v7.1 (+363)
   </label>
   
     <div class="md-nav__source">
@@ -636,6 +636,13 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">_nobs_eff</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_nobs</span> <span class="o">-</span> <span class="n">extra_df</span>
         <span class="k">if</span> <span class="n">debiased</span><span class="p">:</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">_nobs_eff</span> <span class="o">-=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_nvar</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_nobs_eff</span> <span class="o">&lt;=</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="n">regressors</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">"</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">_nvar</span><span class="si">}</span><span class="s2"> regressors and "</span> <span class="k">if</span> <span class="n">debiased</span> <span class="k">else</span> <span class="s2">""</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
+                <span class="s2">"The covariance of the model cannot be estimated since the model has "</span>
+                <span class="sa">f</span><span class="s2">"no residual degrees of freedom. It has </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">_nobs</span><span class="si">}</span><span class="s2"> observations "</span>
+                <span class="sa">f</span><span class="s2">"and uses </span><span class="si">{</span><span class="n">regressors</span><span class="si">}{</span><span class="n">extra_df</span><span class="si">}</span><span class="s2"> degrees of freedom for the effects."</span>
+            <span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_scale</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_nobs</span> <span class="o">/</span> <span class="bp">self</span><span class="o">.</span><span class="n">_nobs_eff</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_name</span> <span class="o">=</span> <span class="s2">"Unadjusted"</span>
 
@@ -1068,15 +1075,26 @@
 
 <span class="sd">    .. math::</span>
 
-<span class="sd">      \xi_t &amp; = \epsilon_{it} x_{it} \\</span>
-<span class="sd">      \hat{S} &amp; = n / (N(n-df))  \sum_{i=1}^N S_i \\</span>
+<span class="sd">      \xi_{it} &amp; = \epsilon_{it} x_{it} \\</span>
+<span class="sd">      \hat{S} &amp; = (n-df)^{-1} \sum_{i=1}^N S_i \\</span>
 <span class="sd">      \hat{S}_i &amp; = \sum_{j=0}^{bw} K(j, bw) \hat{S}_{ij} \\</span>
 <span class="sd">      \hat{S}_{i0} &amp; = \sum_{t=1}^{T} \xi'_{it} \xi_{it} \\</span>
 <span class="sd">      \hat{S}_{ij} &amp; = \sum_{t=1}^{T-j} \xi'_{it} \xi_{it+j} + \xi'_{it+j} \xi_{it}</span>
 
 
 <span class="sd">    where df is ``extra_df`` and n-df is replace by n-df-k if ``debiased`` is</span>
-<span class="sd">    ``True``. :math:`K(i, bw)` is the kernel weighting function.</span>
+<span class="sd">    ``True``. :math:`K(i, bw)` is the kernel weighting function. The sums of an</span>
+<span class="sd">    entity are over the lags of its observations, so that observations that follow</span>
+<span class="sd">    each other are one lag apart even if a period is missing between them.</span>
+
+<span class="sd">    .. versionchanged:: 7.1</span>
+
+<span class="sd">       The entities are not weighted by their numbers of observations: each</span>
+<span class="sd">       entity contributes the sum of the products of its scores. Earlier versions</span>
+<span class="sd">       divided the sum of each entity by its number of observations and averaged</span>
+<span class="sd">       over the entities, which is the same for a balanced panel. For an unbalanced</span>
+<span class="sd">       panel the covariance, e.g., with a bandwidth of 0, was not the heteroskedasticity</span>
+<span class="sd">       robust covariance, and differed from the covariance of other packages.</span>
 <span class="sd">    """</span>
 
     <span class="n">ALLOWED_KWARGS</span> <span class="o">=</span> <span class="p">(</span><span class="s2">"kernel"</span><span class="p">,</span> <span class="s2">"bandwidth"</span><span class="p">)</span>
@@ -1134,13 +1152,14 @@
         <span class="n">xe_index</span> <span class="o">=</span> <span class="n">xe_df</span><span class="o">.</span><span class="n">index</span>
         <span class="k">assert</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">xe_index</span><span class="p">,</span> <span class="n">MultiIndex</span><span class="p">)</span>
         <span class="n">entities</span> <span class="o">=</span> <span class="n">xe_index</span><span class="o">.</span><span class="n">levels</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
-        <span class="n">nentity</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">entities</span><span class="p">)</span>
         <span class="n">xeex</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">((</span><span class="n">xe_df</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="n">xe_df</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">]))</span>
         <span class="k">for</span> <span class="n">entity</span> <span class="ow">in</span> <span class="n">entities</span><span class="p">:</span>
             <span class="n">_xe</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">asarray</span><span class="p">(</span><span class="n">xe_df</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span><span class="n">entity</span><span class="p">])</span>
             <span class="n">_bw</span> <span class="o">=</span> <span class="nb">min</span><span class="p">(</span><span class="n">_xe</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">-</span> <span class="mf">1.0</span><span class="p">,</span> <span class="n">bw</span><span class="p">)</span>
-            <span class="n">xeex</span> <span class="o">+=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_single_cov</span><span class="p">(</span><span class="n">_xe</span><span class="p">,</span> <span class="n">_bw</span><span class="p">)</span>
-        <span class="n">xeex</span> <span class="o">/=</span> <span class="n">nentity</span>
+            <span class="c1"># The sum of the products of the scores of the entity, which the kernel</span>
+            <span class="c1"># covariance divides by the number of observations of the entity</span>
+            <span class="n">xeex</span> <span class="o">+=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_single_cov</span><span class="p">(</span><span class="n">_xe</span><span class="p">,</span> <span class="n">_bw</span><span class="p">)</span> <span class="o">*</span> <span class="n">_xe</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+        <span class="n">xeex</span> <span class="o">/=</span> <span class="n">nobs</span>
         <span class="n">xeex</span> <span class="o">*=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_scale</span>
 
         <span class="n">out</span> <span class="o">=</span> <span class="p">(</span><span class="n">xpxi</span> <span class="o">@</span> <span class="n">xeex</span> <span class="o">@</span> <span class="n">xpxi</span><span class="p">)</span> <span class="o">/</span> <span class="n">nobs</span>
