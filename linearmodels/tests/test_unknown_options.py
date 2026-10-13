@@ -362,7 +362,8 @@ SITES = {
         FAMA_MACBETH_COV_TYPES,
     ),
     # panel/covariance.py, the kernel weights are looked up when the covariance is
-    # computed, which is when the standard errors are needed
+    # created, which is in fit. The standard errors are read as well, so that the
+    # names that are accepted are used to compute them
     "PanelOLS.fit(cov_type='kernel', kernel)": Site(
         lambda d, v: panel(PanelOLS, d, entity_effects=True)
         .fit(cov_type="kernel", kernel=v)

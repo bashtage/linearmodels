@@ -1344,6 +1344,13 @@ class PooledOLS(_PanelModelBase):
         PanelResults
             Estimation results
 
+        Raises
+        ------
+        UnknownOptionError
+            If ``cov_type`` is not one of the supported names, or if it is
+            "kernel" or "ac" and ``kernel`` is not one of the supported kernels.
+            It is both a ``ValueError`` and a ``KeyError``.
+
         Examples
         --------
         >>> from linearmodels import PooledOLS
@@ -1400,6 +1407,14 @@ class PooledOLS(_PanelModelBase):
         ``debiased=True`` and ``group_debias=True`` give the clustered
         covariance of Stata's ``regress ..., vce(cluster ...)``.
         See :ref:`panel-small-sample`.
+
+        .. versionchanged:: 7.1
+
+           A ``kernel`` that is not one of the supported names raises an
+           ``UnknownOptionError`` when the model is fit, for "kernel" and "ac".
+           Earlier versions raised it when the covariance was first used, for
+           example when ``std_errors`` of the results was read, so that ``fit``
+           returned results that raised when the covariance was used.
         """
         y = self.dependent.values2d
         x = self.exog.values2d
@@ -2278,6 +2293,13 @@ class PanelOLS(_PanelModelBase):
         PanelEffectsResults
             Estimation results
 
+        Raises
+        ------
+        UnknownOptionError
+            If ``cov_type`` is not one of the supported names, or if it is
+            "kernel" or "ac" and ``kernel`` is not one of the supported kernels.
+            It is both a ``ValueError`` and a ``KeyError``.
+
         Examples
         --------
         >>> from linearmodels import PanelOLS
@@ -2363,6 +2385,14 @@ class PanelOLS(_PanelModelBase):
            that the standard errors depended on the order of the variables, and the
            effects were not counted if they were nested in the last variable and
            not in the first.
+
+        .. versionchanged:: 7.1
+
+           A ``kernel`` that is not one of the supported names raises an
+           ``UnknownOptionError`` when the model is fit, for "kernel" and "ac".
+           Earlier versions raised it when the covariance was first used, for
+           example when ``std_errors`` of the results was read, so that ``fit``
+           returned results that raised when the covariance was used.
         """
 
         weighted = np.any(self.weights.values2d != 1.0)
@@ -3076,6 +3106,13 @@ class FirstDifferenceOLS(_PanelModelBase):
         PanelResults
             Estimation results
 
+        Raises
+        ------
+        UnknownOptionError
+            If ``cov_type`` is not one of the supported names, or if it is
+            "kernel" or "ac" and ``kernel`` is not one of the supported kernels.
+            It is both a ``ValueError`` and a ``KeyError``.
+
         Examples
         --------
         >>> from linearmodels import FirstDifferenceOLS
@@ -3133,6 +3170,14 @@ class FirstDifferenceOLS(_PanelModelBase):
         ``debiased=True``, which is the default, scales the covariance by
         n / (n - k), where k is the number of regressors, and uses the t and
         F distributions for inference. See :ref:`panel-small-sample`.
+
+        .. versionchanged:: 7.1
+
+           A ``kernel`` that is not one of the supported names raises an
+           ``UnknownOptionError`` when the model is fit, for "kernel" and "ac".
+           Earlier versions raised it when the covariance was first used, for
+           example when ``std_errors`` of the results was read, so that ``fit``
+           returned results that raised when the covariance was used.
         """
         y_fd = self.dependent.first_difference()
         time_ids = y_fd.time_ids
@@ -3432,6 +3477,13 @@ class RandomEffects(_PanelModelBase):
         RandomEffectsResults
             Estimation results
 
+        Raises
+        ------
+        UnknownOptionError
+            If ``cov_type`` is not one of the supported names, or if it is
+            "kernel" or "ac" and ``kernel`` is not one of the supported kernels.
+            It is both a ``ValueError`` and a ``KeyError``.
+
         Examples
         --------
         >>> from linearmodels import RandomEffects
@@ -3517,6 +3569,14 @@ class RandomEffects(_PanelModelBase):
            have residual degrees of freedom in the regressions raise a
            ``ValueError``. Earlier versions raised an error from NumPy or SciPy,
            or returned variances that were not defined.
+
+        .. versionchanged:: 7.1
+
+           A ``kernel`` that is not one of the supported names raises an
+           ``UnknownOptionError`` when the model is fit, for "kernel" and "ac".
+           Earlier versions raised it when the covariance was first used, for
+           example when ``std_errors`` of the results was read, so that ``fit``
+           returned results that raised when the covariance was used.
         """
         w = self.weights.values2d
         root_w = cast("linearmodels.typing.data.Float64Array", np.sqrt(w))
@@ -3864,7 +3924,8 @@ class FamaMacBeth(_PanelModelBase):
             at least 4 with the Bartlett kernel, 5 with the Parzen kernel and 6
             with the quadratic spectral kernel.
         kernel : str
-            The kernel to use.  None chooses the default kernel.
+            The kernel to use.  None chooses the default kernel. See Notes for
+            the names. It is checked for every ``cov_type``.
 
         Returns
         -------
@@ -3879,6 +3940,10 @@ class FamaMacBeth(_PanelModelBase):
             are used. It is also raised if it is "kernel", ``bandwidth`` is None
             and T is below the number that the automatic bandwidth needs, or the
             automatic bandwidth is not finite.
+        UnknownOptionError
+            If ``kernel`` is not one of the supported names, whether or not
+            ``bandwidth`` is given. It is both a ``ValueError`` and a
+            ``KeyError``.
 
         Examples
         --------
@@ -3956,6 +4021,15 @@ class FamaMacBeth(_PanelModelBase):
            ``OverflowError``) or "cannot convert float NaN to integer" when the
            covariance was first used, or used a bandwidth of T - 1 because of the
            rounding error of the sum.
+
+        .. versionchanged:: 7.1
+
+           A ``kernel`` that is not one of the supported names raises an
+           ``UnknownOptionError`` when the model is fit, whether or not
+           ``bandwidth`` is given. Earlier versions raised it when the covariance
+           was first used, for example when ``std_errors`` of the results was
+           read, so that ``fit`` returned results that raised when the covariance
+           was used.
         """
         # The retained observations and their weights, which are scaled to have a
         # mean of one once the observations with missing values are dropped

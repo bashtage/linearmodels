@@ -383,6 +383,9 @@ class DriscollKraay(HomoskedasticCovariance):
     ValueError
         If the bandwidth, or the default bandwidth if none is given, is not
         below the number of time periods.
+    UnknownOptionError
+        If ``kernel`` is not one of the supported names. It is both a
+        ``ValueError`` and a ``KeyError``.
 
     Notes
     -----
@@ -434,6 +437,14 @@ class DriscollKraay(HomoskedasticCovariance):
        the weights of all of the lags are close to one, and the sum of the scores
        over all of the periods is zero in a regression, so that the covariance
        was close to zero.
+
+    .. versionchanged:: 7.1
+
+       A ``kernel`` that is not one of the supported names raises an
+       ``UnknownOptionError`` when the estimator is created, so that the ``fit``
+       method of a model raises. Earlier versions raised it when the covariance
+       was first used, for example when ``std_errors`` of the results was read,
+       so that ``fit`` returned results that raised when the covariance was used.
     """
 
     ALLOWED_KWARGS = ("kernel", "bandwidth")
@@ -459,6 +470,7 @@ class DriscollKraay(HomoskedasticCovariance):
         self._kernel = kernel if kernel is not None else self.DEFAULT_KERNEL
         self._bandwidth = bandwidth
         # Checked here so that fit raises, instead of the first use of the covariance
+        self._kernel_weights = lookup_option(KERNEL_LOOKUP, self._kernel, "kernel")
         self._bw = self._select_bandwidth(np.unique(time_ids).shape[0])
 
     def _select_bandwidth(self, nperiods: int) -> float:
@@ -507,7 +519,7 @@ class DriscollKraay(HomoskedasticCovariance):
         xe_df = xe_df.groupby(level=0).sum()
         xe_df = xe_df.sort_index()
         xe_nobs = xe_df.shape[0]
-        w = lookup_option(KERNEL_LOOKUP, self._kernel, "kernel")(self._bw, xe_nobs - 1)
+        w = self._kernel_weights(self._bw, xe_nobs - 1)
         xeex = cov_kernel(np.asarray(xe_df), w) * (xe_nobs / nobs)
         xeex *= self._scale
 
@@ -544,6 +556,12 @@ class ACCovariance(HomoskedasticCovariance):
         Non-negative bandwidth to use. The Bartlett and Parzen kernels use its
         integer part. If not provided a rule-of-thumb value is used. It can be
         larger than the number of observations of an entity.
+
+    Raises
+    ------
+    UnknownOptionError
+        If ``kernel`` is not one of the supported names. It is both a
+        ``ValueError`` and a ``KeyError``.
 
     Notes
     -----
@@ -628,6 +646,14 @@ class ACCovariance(HomoskedasticCovariance):
        and the bandwidth of the quadratic spectral kernel. The covariance changes if
        any entity has fewer observations than the bandwidth, which is more likely
        in a panel where the entities are short or the bandwidth is large.
+
+    .. versionchanged:: 7.1
+
+       A ``kernel`` that is not one of the supported names raises an
+       ``UnknownOptionError`` when the estimator is created, so that the ``fit``
+       method of a model raises. Earlier versions raised it when the covariance
+       was first used, for example when ``std_errors`` of the results was read,
+       so that ``fit`` returned results that raised when the covariance was used.
     """
 
     ALLOWED_KWARGS = ("kernel", "bandwidth")
@@ -652,12 +678,14 @@ class ACCovariance(HomoskedasticCovariance):
         self._name = "Autocorrelation Rob. Cov."
         self._kernel = kernel if kernel is not None else self.DEFAULT_KERNEL
         self._bandwidth = bandwidth
+        # Checked here so that fit raises, instead of the first use of the covariance
+        self._kernel_weights = lookup_option(KERNEL_LOOKUP, self._kernel, "kernel")
 
     def _single_cov(
         self, xe: linearmodels.typing.data.Float64Array, bw: float
     ) -> linearmodels.typing.data.Float64Array:
         nobs = xe.shape[0]
-        w = lookup_option(KERNEL_LOOKUP, self._kernel, "kernel")(bw, nobs - 1)
+        w = self._kernel_weights(bw, nobs - 1)
         # The entity has the lags 0, ..., nobs - 1 only. They have the weights of
         # the bandwidth that was chosen, also if the entity is shorter than the
         # bandwidth, and so the weights of the other lags are not used
@@ -790,6 +818,10 @@ class FamaMacBethCovariance(HomoskedasticCovariance):
         It is also raised if the bandwidth is not provided and there are fewer
         time periods than the kernel needs to compute it, or if the bandwidth
         that is computed is not finite.
+    UnknownOptionError
+        If ``kernel`` is not one of the supported names, whether or not the
+        covariance is a kernel covariance. It is both a ``ValueError`` and a
+        ``KeyError``.
 
     Notes
     -----
@@ -824,6 +856,16 @@ class FamaMacBethCovariance(HomoskedasticCovariance):
        "cannot convert float NaN to integer" when the covariance was first used,
        or used a bandwidth of :math:`T-1` because of the rounding error of the
        sum.
+
+    .. versionchanged:: 7.1
+
+       A ``kernel`` that is not one of the supported names raises an
+       ``UnknownOptionError`` when the estimator is created, so that the ``fit``
+       method of the model raises, also if the bandwidth is given. Earlier versions
+       raised it when the covariance was first used, for example when ``std_errors``
+       of the results was read, so that ``fit`` returned results that raised when
+       the covariance was used. The bandwidth that is selected from the data
+       already raised when the estimator was created.
     """
 
     def __init__(
@@ -843,6 +885,9 @@ class FamaMacBethCovariance(HomoskedasticCovariance):
         self._name = f"Fama-MacBeth {cov_type}Cov"
         self._bandwidth = bandwidth
         self._kernel = kernel if kernel is not None else self.DEFAULT_KERNEL
+        # Checked here, also if the bandwidth is selected from the data, so that fit
+        # raises and not the first use of the covariance
+        self._kernel_weights = lookup_option(KERNEL_LOOKUP, self._kernel, "kernel")
         if bandwidth is not None:
             # Checked here so that fit raises, and not the first use of the covariance
             deviations = np.asarray(all_params) - params.T
@@ -890,8 +935,7 @@ class FamaMacBethCovariance(HomoskedasticCovariance):
         nobs = e.shape[0]
 
         bw = self.bandwidth
-        assert self._kernel is not None
-        w = lookup_option(KERNEL_LOOKUP, self._kernel, "kernel")(bw, nobs - 1)
+        w = self._kernel_weights(bw, nobs - 1)
         cov = cov_kernel(e, w)
         return cov / (nobs - int(bool(self._debiased)))
 
