@@ -12,7 +12,6 @@ import warnings
 import numpy as np
 import pandas as pd
 import pytest
-import xarray as xr
 
 from linearmodels.shared.exceptions import DefaultBandwidthWarning, MissingValueWarning
 from linearmodels.tests._utility import (
@@ -28,30 +27,43 @@ ARRAY = np.arange(8.0).reshape((2, 2, 2))
 ARRAY_MISSING = ARRAY.copy()
 ARRAY_MISSING[1, 0, 1] = np.nan
 
-INPUTS = {
-    "ndarray": (ARRAY, ARRAY_MISSING),
-    "int ndarray": (np.arange(4), None),
-    "DataFrame": (FRAME, FRAME_MISSING),
-    "Series": (FRAME["a"], FRAME_MISSING["a"]),
-    "DataArray": (xr.DataArray(ARRAY), xr.DataArray(ARRAY_MISSING)),
-    "object ndarray": (np.array(["a", 1], dtype=object), np.array(["a", None, 1.0])),
-}
+KINDS = ["ndarray", "int ndarray", "DataFrame", "Series", "DataArray", "object ndarray"]
 
 
-@pytest.mark.parametrize("kind", list(INPUTS))
+def inputs_of_kind(kind):
+    """An input without a missing value and one with a missing value, or None"""
+    if kind == "DataArray":
+        xr = pytest.importorskip("xarray")
+        return xr.DataArray(ARRAY), xr.DataArray(ARRAY_MISSING)
+    return {
+        "ndarray": (ARRAY, ARRAY_MISSING),
+        "int ndarray": (np.arange(4), None),
+        "DataFrame": (FRAME, FRAME_MISSING),
+        "Series": (FRAME["a"], FRAME_MISSING["a"]),
+        "object ndarray": (
+            np.array(["a", 1], dtype=object),
+            np.array(["a", None, 1.0]),
+        ),
+    }[kind]
+
+
+@pytest.mark.parametrize("kind", KINDS)
 def test_has_missing(kind):
-    clean, missing = INPUTS[kind]
-    assert not has_missing(clean)
+    clean, missing = inputs_of_kind(kind)
+    clean_has_missing = has_missing(clean)
+    assert not clean_has_missing
     if missing is not None:
-        assert has_missing(missing)
-        assert has_missing(clean, missing)
-        assert has_missing(missing, clean)
+        with_missing = has_missing(missing)
+        both = has_missing(clean, missing)
+        reversed_both = has_missing(missing, clean)
+        assert with_missing
+        assert both
+        assert reversed_both
 
 
 def test_none_is_not_missing():
-    assert not has_missing(None)
-    assert not has_missing(FRAME, None)
-    assert not has_missing()
+    results = [has_missing(None), has_missing(FRAME, None), has_missing()]
+    assert not any(results)
 
 
 def test_warns_if_missing_expects_the_warning_of_inputs_with_missing_values():
