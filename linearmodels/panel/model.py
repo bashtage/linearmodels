@@ -727,9 +727,10 @@ class _PanelModelBase:
         return PanelData(rows)
 
     def _check_exog_rank(self) -> int:
-        if not self._check_rank:
-            return self.exog.shape[1]
         x = cast("linearmodels.typing.data.Float64Array", self.exog.values2d)
+        if not self._check_rank:
+            # The shape of the PanelData is (variables, periods, entities)
+            return x.shape[1]
         _, _, rank_of_x, _ = _lstsq(x, np.ones(x.shape[0]))
         if rank_of_x < x.shape[1]:
             raise ValueError(
@@ -778,8 +779,9 @@ class _PanelModelBase:
             self._not_null = cast("BoolArray", np.asarray(~missing))
 
         w_df = self.weights.dataframe
-        if np.any(np.asarray(w_df) <= 0):
-            raise ValueError("weights must be strictly positive.")
+        w_values = np.asarray(w_df)
+        if np.any(w_values <= 0) or np.any(np.isinf(w_values)):
+            raise ValueError("weights must be strictly positive and finite.")
         w_df = w_df / w_df.mean()
         self.weights = PanelData(w_df)
         rank_of_x = self._check_exog_rank()
@@ -831,6 +833,10 @@ class _PanelModelBase:
         weps_const = y
         num_df = x.shape[1]
         name = "Model F-statistic (homoskedastic)"
+        if df_resid <= 0:
+            return InvalidTestStatistic(
+                "The model has no residual degrees of freedom", name=name
+            )
         if self.has_constant:
             if num_df == 1:
                 return InvalidTestStatistic("Model contains only a constant", name=name)
@@ -2473,17 +2479,29 @@ class PanelOLS(_PanelModelBase):
                 df_num -= 1
             weps_pooled = wy - wx @ _lstsq(wx, wy, rcond=None)[0]
             resid_ss_pooled = float(np.squeeze(weps_pooled.T @ weps_pooled))
-            num = (resid_ss_pooled - resid_ss) / df_num
-
-            denom = resid_ss / df_denom
-            stat = num / denom
-            f_pooled = WaldTestStatistic(
-                stat,
-                "Effects are zero",
-                df_num,
-                df_denom=df_denom,
-                name="Pooled F-statistic",
+            name = "Pooled F-statistic"
+            f_pooled: (
+                WaldTestStatistic | InapplicableTestStatistic | InvalidTestStatistic
             )
+            if df_num <= 0:
+                # A single entity (or period) with a constant: the effect is the constant
+                f_pooled = InapplicableTestStatistic(
+                    reason="The effects do not use any degrees of freedom", name=name
+                )
+            elif df_denom <= 0:
+                f_pooled = InvalidTestStatistic(
+                    "The model has no residual degrees of freedom", name=name
+                )
+            else:
+                num = (resid_ss_pooled - resid_ss) / df_num
+                denom = resid_ss / df_denom
+                f_pooled = WaldTestStatistic(
+                    num / denom,
+                    "Effects are zero",
+                    df_num,
+                    df_denom=df_denom,
+                    name=name,
+                )
             res.update(f_pooled=f_pooled)
             effects = DataFrame(
                 eps_effects - eps,
@@ -2703,10 +2721,20 @@ class BetweenOLS(_PanelModelBase):
 
         wx = root_w * x
         wy = root_w * y
-        params = _lstsq(wx, wy, rcond=None)[0]
+        params, _, rank, _ = _lstsq(wx, wy, rcond=None)
+        if self._check_rank and rank < x.shape[1]:
+            raise ValueError(
+                "The regressors are collinear in the means of the entities, which "
+                f"are the {y.shape[0]} observations of the regression, so that the "
+                "parameters are not identified. This happens if there are fewer "
+                "entities than regressors, or if a regressor is a combination of "
+                "the others only in the means, e.g., the dummy variables of the "
+                "periods and the constant in a balanced panel. If you wish to "
+                "proceed, you can set check_rank=False."
+            )
 
         df_resid = y.shape[0] - x.shape[1]
-        df_model = (x.shape[1],)
+        df_model = x.shape[1]
         nobs = y.shape[0]
         cov_config = self._setup_clusters(cov_config)
         extra_df = 0
@@ -3713,17 +3741,16 @@ class FamaMacBeth(_PanelModelBase):
         if valid_blocks.sum() < exog.shape[1]:
 
             warnings.warn(
-                "The number of time-series observation available to estimate "
-                "cross-sectional\nregressions, {}, is less than the number of "
-                "parameters in the model. Parameter\ninference is not "
-                "available.".format(valid_blocks.sum()),
+                "The number of cross-sectional regressions that can be estimated, "
+                "{}, is less than the number of parameters in the model. Parameter "
+                "inference is not available.".format(valid_blocks.sum()),
                 InferenceUnavailableWarning,
                 stacklevel=3,
             )
         elif valid_blocks.sum() < valid_blocks.shape[0]:
 
             warnings.warn(
-                "{} of the time-series regressions cannot be estimated due to "
+                "{} of the cross-sectional regressions cannot be estimated due to "
                 "deficient rank.".format(valid_blocks.shape[0] - valid_blocks.sum()),
                 MissingValueWarning,
                 stacklevel=3,

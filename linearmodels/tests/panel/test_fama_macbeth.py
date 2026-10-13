@@ -135,9 +135,14 @@ def test_block_size_warnings():
     )
     y = pd.DataFrame(y, index=idx, columns=["y"])
     x = pd.DataFrame(x, index=idx, columns=["x1", "x2", "x3"])
-    with pytest.warns(MissingValueWarning):
+    # The periods are cross-sectional regressions, and not time-series regressions
+    with pytest.warns(
+        MissingValueWarning, match=r"1 of the cross-sectional regressions"
+    ):
         FamaMacBeth(y.iloc[:11], x.iloc[:11])
-    with pytest.warns(InferenceUnavailableWarning):
+    with pytest.warns(
+        InferenceUnavailableWarning, match=r"cross-sectional regressions that can be"
+    ):
         FamaMacBeth(y.iloc[::4], x.iloc[::4])
 
 
@@ -344,7 +349,9 @@ def test_inference_n40_t10():
 def test_inference_dropped_periods(bandwidth, debiased):
     # T is the number of periods that are estimated, 21 of the 25 periods
     y, x = dropped_periods_panel()
-    with pytest.warns(MissingValueWarning, match=r"4 of the time-series regressions"):
+    with pytest.warns(
+        MissingValueWarning, match=r"4 of the cross-sectional regressions"
+    ):
         mod = FamaMacBeth(y, x)
     cov_type = "kernel" if bandwidth else "unadjusted"
     res = mod.fit(

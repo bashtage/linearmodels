@@ -105,6 +105,13 @@ class HomoskedasticCovariance:
         self._nobs_eff = self._nobs - extra_df
         if debiased:
             self._nobs_eff -= self._nvar
+        if self._nobs_eff <= 0:
+            regressors = f"{self._nvar} regressors and " if debiased else ""
+            raise ValueError(
+                "The covariance of the model cannot be estimated since the model has "
+                f"no residual degrees of freedom. It has {self._nobs} observations "
+                f"and uses {regressors}{extra_df} degrees of freedom for the effects."
+            )
         self._scale = self._nobs / self._nobs_eff
         self._name = "Unadjusted"
 

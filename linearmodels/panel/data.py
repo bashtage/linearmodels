@@ -462,6 +462,9 @@ class PanelData:
         e = self.demean(group, weights=weights)
         assert isinstance(e, PanelData)
         d = self.dummies(dummy, drop_first=True)
+        if d.shape[1] == 0:
+            # A single entity or period: there are no dummy variables to remove
+            return e
         d.index = e.index
         d_pd = PanelData(d).demean(group, weights=weights)
         d_arr = d_pd.values2d
