@@ -23,7 +23,7 @@
     
   
       
-        <title>linearmodels.iv.model.IVGMM - linearmodels v7.1 (+435)</title>
+        <title>linearmodels.iv.model.IVGMM - linearmodels v7.1 (+439)</title>
       
     
 
@@ -100,7 +100,7 @@
 
 <header class="md-header md-header--shadow" data-md-component="header">
   <nav class="md-header__inner md-grid" aria-label="Header">
-    <a href="../../index.html" title="linearmodels v7.1 (+435)" class="md-header__button md-logo" aria-label="linearmodels v7.1 (+435)" data-md-component="logo">
+    <a href="../../index.html" title="linearmodels v7.1 (+439)" class="md-header__button md-logo" aria-label="linearmodels v7.1 (+439)" data-md-component="logo">
       <img src="../../_static/bw-logo.svg" alt="logo">
     </a>
     <label class="md-header__button md-icon" for="__drawer">
@@ -111,7 +111,7 @@
       <div class="md-header__ellipsis">
         <div class="md-header__topic">
           <span class="md-ellipsis">
-            linearmodels v7.1 (+435)
+            linearmodels v7.1 (+439)
           </span>
         </div>
         <div class="md-header__topic" data-md-component="header-topic">
@@ -206,10 +206,10 @@
 
 <nav class="md-nav md-nav--primary" aria-label="Navigation" data-md-level="0">
   <label class="md-nav__title" for="__drawer">
-    <a href="../../index.html" title="linearmodels v7.1 (+435)" class="md-nav__button md-logo" aria-label="linearmodels v7.1 (+435)" data-md-component="logo">
+    <a href="../../index.html" title="linearmodels v7.1 (+439)" class="md-nav__button md-logo" aria-label="linearmodels v7.1 (+439)" data-md-component="logo">
       <img src="../../_static/bw-logo.svg" alt="logo">
     </a>
-    linearmodels v7.1 (+435)
+    linearmodels v7.1 (+439)
   </label>
   
     <div class="md-nav__source">
@@ -1898,7 +1898,10 @@ pandas objects with a default index do not carry labels and are always
 paired by position. If <code class="docutils literal notranslate"><span class="pre">dependent</span></code> does not carry labels, the inputs
 that do must use the same index as the first of <code class="docutils literal notranslate"><span class="pre">exog</span></code>, <code class="docutils literal notranslate"><span class="pre">endog</span></code>,
 <code class="docutils literal notranslate"><span class="pre">instruments</span></code> and <code class="docutils literal notranslate"><span class="pre">weights</span></code> that does. The same rule applies to
-<code class="docutils literal notranslate"><span class="pre">clusters</span></code> passed to <code class="docutils literal notranslate"><span class="pre">fit</span></code> or in <code class="docutils literal notranslate"><span class="pre">weight_config</span></code>.</p>
+<code class="docutils literal notranslate"><span class="pre">clusters</span></code> passed to <code class="docutils literal notranslate"><span class="pre">fit</span></code> or in <code class="docutils literal notranslate"><span class="pre">weight_config</span></code>.
+Dates and time deltas are compared by value, so that the same dates at
+different resolutions, e.g., <code class="docutils literal notranslate"><span class="pre">datetime64[us]</span></code> and <code class="docutils literal notranslate"><span class="pre">datetime64[ns]</span></code>, are
+the same labels.</p>
 <p>The weight matrix is the inverse of an estimate of the covariance of the
 moment conditions, so that the estimate has to be nonsingular. A clustered
 estimate from G clusters has rank at most G, and at most G - 1 if the

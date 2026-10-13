@@ -23,7 +23,7 @@
     
   
       
-        <title>Aligning Inputs - linearmodels v7.1 (+435)</title>
+        <title>Aligning Inputs - linearmodels v7.1 (+439)</title>
       
     
 
@@ -95,7 +95,7 @@
 
 <header class="md-header md-header--shadow" data-md-component="header">
   <nav class="md-header__inner md-grid" aria-label="Header">
-    <a href="index.html" title="linearmodels v7.1 (+435)" class="md-header__button md-logo" aria-label="linearmodels v7.1 (+435)" data-md-component="logo">
+    <a href="index.html" title="linearmodels v7.1 (+439)" class="md-header__button md-logo" aria-label="linearmodels v7.1 (+439)" data-md-component="logo">
       <img src="_static/bw-logo.svg" alt="logo">
     </a>
     <label class="md-header__button md-icon" for="__drawer">
@@ -106,7 +106,7 @@
       <div class="md-header__ellipsis">
         <div class="md-header__topic">
           <span class="md-ellipsis">
-            linearmodels v7.1 (+435)
+            linearmodels v7.1 (+439)
           </span>
         </div>
         <div class="md-header__topic" data-md-component="header-topic">
@@ -201,10 +201,10 @@
 
 <nav class="md-nav md-nav--primary" aria-label="Navigation" data-md-level="0">
   <label class="md-nav__title" for="__drawer">
-    <a href="index.html" title="linearmodels v7.1 (+435)" class="md-nav__button md-logo" aria-label="linearmodels v7.1 (+435)" data-md-component="logo">
+    <a href="index.html" title="linearmodels v7.1 (+439)" class="md-nav__button md-logo" aria-label="linearmodels v7.1 (+439)" data-md-component="logo">
       <img src="_static/bw-logo.svg" alt="logo">
     </a>
-    linearmodels v7.1 (+435)
+    linearmodels v7.1 (+439)
   </label>
   
     <div class="md-nav__source">
@@ -555,6 +555,14 @@ index, 0, 1, …, n-1;</p></li>
 <p>To correct the error, reindex the input to the index of <code class="docutils literal notranslate"><span class="pre">dependent</span></code>, e.g.,
 <code class="docutils literal notranslate"><span class="pre">exog</span> <span class="pre">=</span> <span class="pre">exog.reindex(dependent.index)</span></code>, or call <code class="docutils literal notranslate"><span class="pre">to_numpy()</span></code> to explicitly
 pair the values by position.</p>
+<p>Dates and time deltas are compared by value, so the same dates are the same
+labels when they are stored at different resolutions, for example
+<code class="docutils literal notranslate"><span class="pre">datetime64[us]</span></code> and <code class="docutils literal notranslate"><span class="pre">datetime64[ns]</span></code>. This matters in pandas 2, which keeps
+dates at the resolution of the data, e.g., when they come from a NumPy array of
+<code class="docutils literal notranslate"><span class="pre">datetime64[us]</span></code> or from a Parquet file. pandas 3 compares them in the same
+way. The comparison applies to each level of a <code class="docutils literal notranslate"><span class="pre">MultiIndex</span></code>. Different dates,
+the same dates in a different order, dates in different time zones, dates with
+and without a time zone, and dates and time deltas are different labels.</p>
 <p>NumPy arrays, lists, tuples and pandas objects that only have the default index
 do not carry labels. They are always paired by position, and only need to have
 the right number of rows. This is also the case for a <code class="docutils literal notranslate"><span class="pre">DataFrame</span></code> with a

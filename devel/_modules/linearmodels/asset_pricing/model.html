@@ -19,7 +19,7 @@
     
   
       
-        <title>linearmodels.asset_pricing.model - linearmodels v7.1 (+435)</title>
+        <title>linearmodels.asset_pricing.model - linearmodels v7.1 (+439)</title>
       
     
 
@@ -91,7 +91,7 @@
 
 <header class="md-header md-header--shadow" data-md-component="header">
   <nav class="md-header__inner md-grid" aria-label="Header">
-    <a href="../../../index.html" title="linearmodels v7.1 (+435)" class="md-header__button md-logo" aria-label="linearmodels v7.1 (+435)" data-md-component="logo">
+    <a href="../../../index.html" title="linearmodels v7.1 (+439)" class="md-header__button md-logo" aria-label="linearmodels v7.1 (+439)" data-md-component="logo">
       <img src="../../../_static/bw-logo.svg" alt="logo">
     </a>
     <label class="md-header__button md-icon" for="__drawer">
@@ -102,7 +102,7 @@
       <div class="md-header__ellipsis">
         <div class="md-header__topic">
           <span class="md-ellipsis">
-            linearmodels v7.1 (+435)
+            linearmodels v7.1 (+439)
           </span>
         </div>
         <div class="md-header__topic" data-md-component="header-topic">
@@ -197,10 +197,10 @@
 
 <nav class="md-nav md-nav--primary" aria-label="Navigation" data-md-level="0">
   <label class="md-nav__title" for="__drawer">
-    <a href="../../../index.html" title="linearmodels v7.1 (+435)" class="md-nav__button md-logo" aria-label="linearmodels v7.1 (+435)" data-md-component="logo">
+    <a href="../../../index.html" title="linearmodels v7.1 (+439)" class="md-nav__button md-logo" aria-label="linearmodels v7.1 (+439)" data-md-component="logo">
       <img src="../../../_static/bw-logo.svg" alt="logo">
     </a>
-    linearmodels v7.1 (+435)
+    linearmodels v7.1 (+439)
   </label>
   
     <div class="md-nav__source">
@@ -849,6 +849,9 @@
 <span class="sd">    ``to_numpy()`` to pair its values by position. NumPy arrays and pandas</span>
 <span class="sd">    objects with a default index do not carry labels and are always paired by</span>
 <span class="sd">    position.</span>
+<span class="sd">    Dates and time deltas are compared by value, so that the same dates at</span>
+<span class="sd">    different resolutions, e.g., ``datetime64[us]`` and ``datetime64[ns]``, are</span>
+<span class="sd">    the same labels.</span>
 <span class="sd">    """</span>
 
     <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">portfolios</span><span class="p">:</span> <span class="n">IVDataLike</span><span class="p">,</span> <span class="n">factors</span><span class="p">:</span> <span class="n">IVDataLike</span><span class="p">):</span>
@@ -1321,6 +1324,9 @@
 <span class="sd">    ``to_numpy()`` to pair its values by position. NumPy arrays and pandas</span>
 <span class="sd">    objects with a default index do not carry labels and are always paired by</span>
 <span class="sd">    position.</span>
+<span class="sd">    Dates and time deltas are compared by value, so that the same dates at</span>
+<span class="sd">    different resolutions, e.g., ``datetime64[us]`` and ``datetime64[ns]``, are</span>
+<span class="sd">    the same labels.</span>
 <span class="sd">    """</span>
 
     <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span>
@@ -1710,6 +1716,9 @@
 <span class="sd">    ``to_numpy()`` to pair its values by position. NumPy arrays and pandas</span>
 <span class="sd">    objects with a default index do not carry labels and are always paired by</span>
 <span class="sd">    position.</span>
+<span class="sd">    Dates and time deltas are compared by value, so that the same dates at</span>
+<span class="sd">    different resolutions, e.g., ``datetime64[us]`` and ``datetime64[ns]``, are</span>
+<span class="sd">    the same labels.</span>
 <span class="sd">    """</span>
 
     <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span>

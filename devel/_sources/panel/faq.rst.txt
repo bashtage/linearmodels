@@ -256,6 +256,12 @@ differ, for example when the values of a regressor have been reversed or sorted
 differently from the outcome. Reindex the input to the index of ``dependent``
 to correct this.
 
+Dates are compared by value, so the same dates are the same labels when they
+are stored at different resolutions, for example ``datetime64[us]`` and
+``datetime64[ns]``. This applies to the time periods of the weights that are
+given for each time period, and to every other input. See
+:ref:`input-alignment`.
+
 NumPy arrays do not have labels and are always paired by position. The same
 is true of a pandas object that only has a default index, 0, 1, ..., n-1, (and
 default columns, if it is a ``DataFrame`` without a MultiIndex) since there are
