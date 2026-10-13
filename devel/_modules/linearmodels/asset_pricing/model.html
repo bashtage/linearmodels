@@ -19,7 +19,7 @@
     
   
       
-        <title>linearmodels.asset_pricing.model - linearmodels v7.1 (+363)</title>
+        <title>linearmodels.asset_pricing.model - linearmodels v7.1 (+371)</title>
       
     
 
@@ -91,7 +91,7 @@
 
 <header class="md-header md-header--shadow" data-md-component="header">
   <nav class="md-header__inner md-grid" aria-label="Header">
-    <a href="../../../index.html" title="linearmodels v7.1 (+363)" class="md-header__button md-logo" aria-label="linearmodels v7.1 (+363)" data-md-component="logo">
+    <a href="../../../index.html" title="linearmodels v7.1 (+371)" class="md-header__button md-logo" aria-label="linearmodels v7.1 (+371)" data-md-component="logo">
       <img src="../../../_static/bw-logo.svg" alt="logo">
     </a>
     <label class="md-header__button md-icon" for="__drawer">
@@ -102,7 +102,7 @@
       <div class="md-header__ellipsis">
         <div class="md-header__topic">
           <span class="md-ellipsis">
-            linearmodels v7.1 (+363)
+            linearmodels v7.1 (+371)
           </span>
         </div>
         <div class="md-header__topic" data-md-component="header-topic">
@@ -197,10 +197,10 @@
 
 <nav class="md-nav md-nav--primary" aria-label="Navigation" data-md-level="0">
   <label class="md-nav__title" for="__drawer">
-    <a href="../../../index.html" title="linearmodels v7.1 (+363)" class="md-nav__button md-logo" aria-label="linearmodels v7.1 (+363)" data-md-component="logo">
+    <a href="../../../index.html" title="linearmodels v7.1 (+371)" class="md-nav__button md-logo" aria-label="linearmodels v7.1 (+371)" data-md-component="logo">
       <img src="../../../_static/bw-logo.svg" alt="logo">
     </a>
-    linearmodels v7.1 (+363)
+    linearmodels v7.1 (+371)
   </label>
   
     <div class="md-nav__source">
@@ -533,11 +533,12 @@
 
 <span class="kn">from</span><span class="w"> </span><span class="nn">__future__</span><span class="w"> </span><span class="kn">import</span> <span class="n">annotations</span>
 
-<span class="kn">from</span><span class="w"> </span><span class="nn">collections.abc</span><span class="w"> </span><span class="kn">import</span> <span class="n">Callable</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">collections.abc</span><span class="w"> </span><span class="kn">import</span> <span class="n">Callable</span><span class="p">,</span> <span class="n">Mapping</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">typing</span><span class="w"> </span><span class="kn">import</span> <span class="n">Any</span><span class="p">,</span> <span class="n">cast</span>
 
 <span class="kn">from</span><span class="w"> </span><span class="nn">formulaic</span><span class="w"> </span><span class="kn">import</span> <span class="n">model_matrix</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">formulaic.materializers.types</span><span class="w"> </span><span class="kn">import</span> <span class="n">NAAction</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">formulaic.utils.context</span><span class="w"> </span><span class="kn">import</span> <span class="n">capture_context</span>
 <span class="kn">import</span><span class="w"> </span><span class="nn">numpy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">np</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">numpy.linalg</span><span class="w"> </span><span class="kn">import</span> <span class="n">lstsq</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">pandas</span><span class="w"> </span><span class="kn">import</span> <span class="n">DataFrame</span>
@@ -710,17 +711,23 @@
 
     <span class="nd">@staticmethod</span>
     <span class="k">def</span><span class="w"> </span><span class="nf">_prepare_data_from_formula</span><span class="p">(</span>
-        <span class="n">formula</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">data</span><span class="p">:</span> <span class="n">DataFrame</span><span class="p">,</span> <span class="n">portfolios</span><span class="p">:</span> <span class="n">DataFrame</span> <span class="o">|</span> <span class="kc">None</span>
+        <span class="n">formula</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
+        <span class="n">data</span><span class="p">:</span> <span class="n">DataFrame</span><span class="p">,</span>
+        <span class="n">portfolios</span><span class="p">:</span> <span class="n">DataFrame</span> <span class="o">|</span> <span class="kc">None</span><span class="p">,</span>
+        <span class="n">context</span><span class="p">:</span> <span class="n">Mapping</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]</span> <span class="o">|</span> <span class="kc">None</span><span class="p">,</span>
     <span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">tuple</span><span class="p">[</span><span class="n">DataFrame</span><span class="p">,</span> <span class="n">DataFrame</span><span class="p">,</span> <span class="nb">str</span><span class="p">]:</span>
         <span class="n">orig_formula</span> <span class="o">=</span> <span class="n">formula</span>
         <span class="c1"># Missing values are kept so that the model drops the observations with a</span>
         <span class="c1"># missing value in the portfolios or the factors, as it does for arrays</span>
         <span class="n">na_action</span> <span class="o">=</span> <span class="n">NAAction</span><span class="p">(</span><span class="s2">"ignore"</span><span class="p">)</span>
+        <span class="c1"># capture_context returns None if the frames of the caller are unavailable,</span>
+        <span class="c1"># when formulaic looks in the namespace of this function</span>
+        <span class="n">eval_context</span><span class="p">:</span> <span class="nb">int</span> <span class="o">|</span> <span class="n">Mapping</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]</span> <span class="o">=</span> <span class="mi">0</span> <span class="k">if</span> <span class="n">context</span> <span class="ow">is</span> <span class="kc">None</span> <span class="k">else</span> <span class="n">context</span>
         <span class="k">if</span> <span class="n">portfolios</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
             <span class="n">factors_mm</span> <span class="o">=</span> <span class="n">model_matrix</span><span class="p">(</span>
                 <span class="n">formula</span> <span class="o">+</span> <span class="s2">" + 0"</span><span class="p">,</span>
                 <span class="n">data</span><span class="p">,</span>
-                <span class="n">context</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span>  <span class="c1"># TODO: self._eval_env,</span>
+                <span class="n">context</span><span class="o">=</span><span class="n">eval_context</span><span class="p">,</span>
                 <span class="n">ensure_full_rank</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
                 <span class="n">na_action</span><span class="o">=</span><span class="n">na_action</span><span class="p">,</span>
             <span class="p">)</span>
@@ -730,7 +737,7 @@
             <span class="n">portfolios_mm</span> <span class="o">=</span> <span class="n">model_matrix</span><span class="p">(</span>
                 <span class="n">formula_components</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span> <span class="o">+</span> <span class="s2">" + 0"</span><span class="p">,</span>
                 <span class="n">data</span><span class="p">,</span>
-                <span class="n">context</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span>  <span class="c1"># TODO: self._eval_env,</span>
+                <span class="n">context</span><span class="o">=</span><span class="n">eval_context</span><span class="p">,</span>
                 <span class="n">ensure_full_rank</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
                 <span class="n">na_action</span><span class="o">=</span><span class="n">na_action</span><span class="p">,</span>
             <span class="p">)</span>
@@ -738,7 +745,7 @@
             <span class="n">factors_mm</span> <span class="o">=</span> <span class="n">model_matrix</span><span class="p">(</span>
                 <span class="n">formula_components</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span> <span class="o">+</span> <span class="s2">" + 0"</span><span class="p">,</span>
                 <span class="n">data</span><span class="p">,</span>
-                <span class="n">context</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span>  <span class="c1"># TODO: self._eval_env,</span>
+                <span class="n">context</span><span class="o">=</span><span class="n">eval_context</span><span class="p">,</span>
                 <span class="n">ensure_full_rank</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
                 <span class="n">na_action</span><span class="o">=</span><span class="n">na_action</span><span class="p">,</span>
             <span class="p">)</span>
@@ -825,6 +832,15 @@
 <span class="sd">        The second specified the portfolio using ``+`` to separate the test portfolios</span>
 <span class="sd">        and ``~`` to separate the test portfolios from the factors.</span>
 
+<span class="sd">        The formula can use the variables and functions that are available</span>
+<span class="sd">        where ``from_formula`` is called, in addition to the columns of ``data``</span>
+<span class="sd">        and the transforms of formulaic.</span>
+
+<span class="sd">        .. versionchanged:: 7.1</span>
+
+<span class="sd">           Variables and functions of the caller could not be used in the</span>
+<span class="sd">           formula, and raised a ``FactorEvaluationError``.</span>
+
 <span class="sd">        Examples</span>
 <span class="sd">        --------</span>
 <span class="sd">        &gt;&gt;&gt; from linearmodels.datasets import french</span>
@@ -839,8 +855,9 @@
 <span class="sd">        &gt;&gt;&gt; formula = "MktRF + SMB + HML"</span>
 <span class="sd">        &gt;&gt;&gt; mod = TradedFactorModel.from_formula(formula, data, portfolios=portfolios)</span>
 <span class="sd">        """</span>
+        <span class="n">context</span> <span class="o">=</span> <span class="n">capture_context</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span>
         <span class="n">factors</span><span class="p">,</span> <span class="n">portfolios</span><span class="p">,</span> <span class="n">formula</span> <span class="o">=</span> <span class="bp">cls</span><span class="o">.</span><span class="n">_prepare_data_from_formula</span><span class="p">(</span>
-            <span class="n">formula</span><span class="p">,</span> <span class="n">data</span><span class="p">,</span> <span class="n">portfolios</span>
+            <span class="n">formula</span><span class="p">,</span> <span class="n">data</span><span class="p">,</span> <span class="n">portfolios</span><span class="p">,</span> <span class="n">context</span>
         <span class="p">)</span>
         <span class="n">mod</span> <span class="o">=</span> <span class="bp">cls</span><span class="p">(</span><span class="n">portfolios</span><span class="p">,</span> <span class="n">factors</span><span class="p">)</span>
         <span class="n">mod</span><span class="o">.</span><span class="n">formula</span> <span class="o">=</span> <span class="n">formula</span>
@@ -1202,6 +1219,15 @@
 <span class="sd">        The second specified the portfolio using ``+`` to separate the test portfolios</span>
 <span class="sd">        and ``~`` to separate the test portfolios from the factors.</span>
 
+<span class="sd">        The formula can use the variables and functions that are available</span>
+<span class="sd">        where ``from_formula`` is called, in addition to the columns of ``data``</span>
+<span class="sd">        and the transforms of formulaic.</span>
+
+<span class="sd">        .. versionchanged:: 7.1</span>
+
+<span class="sd">           Variables and functions of the caller could not be used in the</span>
+<span class="sd">           formula, and raised a ``FactorEvaluationError``.</span>
+
 <span class="sd">        Examples</span>
 <span class="sd">        --------</span>
 <span class="sd">        &gt;&gt;&gt; from linearmodels.datasets import french</span>
@@ -1216,8 +1242,9 @@
 <span class="sd">        &gt;&gt;&gt; formula = "MktRF + SMB + HML"</span>
 <span class="sd">        &gt;&gt;&gt; mod = LinearFactorModel.from_formula(formula, data, portfolios=portfolios)</span>
 <span class="sd">        """</span>
+        <span class="n">context</span> <span class="o">=</span> <span class="n">capture_context</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span>
         <span class="n">factors</span><span class="p">,</span> <span class="n">portfolios</span><span class="p">,</span> <span class="n">formula</span> <span class="o">=</span> <span class="bp">cls</span><span class="o">.</span><span class="n">_prepare_data_from_formula</span><span class="p">(</span>
-            <span class="n">formula</span><span class="p">,</span> <span class="n">data</span><span class="p">,</span> <span class="n">portfolios</span>
+            <span class="n">formula</span><span class="p">,</span> <span class="n">data</span><span class="p">,</span> <span class="n">portfolios</span><span class="p">,</span> <span class="n">context</span>
         <span class="p">)</span>
         <span class="n">mod</span> <span class="o">=</span> <span class="bp">cls</span><span class="p">(</span><span class="n">portfolios</span><span class="p">,</span> <span class="n">factors</span><span class="p">,</span> <span class="n">risk_free</span><span class="o">=</span><span class="n">risk_free</span><span class="p">,</span> <span class="n">sigma</span><span class="o">=</span><span class="n">sigma</span><span class="p">)</span>
         <span class="n">mod</span><span class="o">.</span><span class="n">formula</span> <span class="o">=</span> <span class="n">formula</span>
@@ -1525,6 +1552,15 @@
 <span class="sd">        The second specified the portfolio using ``+`` to separate the test portfolios</span>
 <span class="sd">        and ``~`` to separate the test portfolios from the factors.</span>
 
+<span class="sd">        The formula can use the variables and functions that are available</span>
+<span class="sd">        where ``from_formula`` is called, in addition to the columns of ``data``</span>
+<span class="sd">        and the transforms of formulaic.</span>
+
+<span class="sd">        .. versionchanged:: 7.1</span>
+
+<span class="sd">           Variables and functions of the caller could not be used in the</span>
+<span class="sd">           formula, and raised a ``FactorEvaluationError``.</span>
+
 <span class="sd">        Examples</span>
 <span class="sd">        --------</span>
 <span class="sd">        &gt;&gt;&gt; from linearmodels.datasets import french</span>
@@ -1539,8 +1575,9 @@
 <span class="sd">        &gt;&gt;&gt; formula = "MktRF + SMB + HML"</span>
 <span class="sd">        &gt;&gt;&gt; mod = LinearFactorModel.from_formula(formula, data, portfolios=portfolios)</span>
 <span class="sd">        """</span>
+        <span class="n">context</span> <span class="o">=</span> <span class="n">capture_context</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span>
         <span class="n">factors</span><span class="p">,</span> <span class="n">portfolios</span><span class="p">,</span> <span class="n">formula</span> <span class="o">=</span> <span class="bp">cls</span><span class="o">.</span><span class="n">_prepare_data_from_formula</span><span class="p">(</span>
-            <span class="n">formula</span><span class="p">,</span> <span class="n">data</span><span class="p">,</span> <span class="n">portfolios</span>
+            <span class="n">formula</span><span class="p">,</span> <span class="n">data</span><span class="p">,</span> <span class="n">portfolios</span><span class="p">,</span> <span class="n">context</span>
         <span class="p">)</span>
         <span class="n">mod</span> <span class="o">=</span> <span class="bp">cls</span><span class="p">(</span><span class="n">portfolios</span><span class="p">,</span> <span class="n">factors</span><span class="p">,</span> <span class="n">risk_free</span><span class="o">=</span><span class="n">risk_free</span><span class="p">)</span>
         <span class="n">mod</span><span class="o">.</span><span class="n">formula</span> <span class="o">=</span> <span class="n">formula</span>

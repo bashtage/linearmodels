@@ -19,7 +19,7 @@
     
   
       
-        <title>linearmodels.system.model - linearmodels v7.1 (+363)</title>
+        <title>linearmodels.system.model - linearmodels v7.1 (+371)</title>
       
     
 
@@ -91,7 +91,7 @@
 
 <header class="md-header md-header--shadow" data-md-component="header">
   <nav class="md-header__inner md-grid" aria-label="Header">
-    <a href="../../../index.html" title="linearmodels v7.1 (+363)" class="md-header__button md-logo" aria-label="linearmodels v7.1 (+363)" data-md-component="logo">
+    <a href="../../../index.html" title="linearmodels v7.1 (+371)" class="md-header__button md-logo" aria-label="linearmodels v7.1 (+371)" data-md-component="logo">
       <img src="../../../_static/bw-logo.svg" alt="logo">
     </a>
     <label class="md-header__button md-icon" for="__drawer">
@@ -102,7 +102,7 @@
       <div class="md-header__ellipsis">
         <div class="md-header__topic">
           <span class="md-ellipsis">
-            linearmodels v7.1 (+363)
+            linearmodels v7.1 (+371)
           </span>
         </div>
         <div class="md-header__topic" data-md-component="header-topic">
@@ -197,10 +197,10 @@
 
 <nav class="md-nav md-nav--primary" aria-label="Navigation" data-md-level="0">
   <label class="md-nav__title" for="__drawer">
-    <a href="../../../index.html" title="linearmodels v7.1 (+363)" class="md-nav__button md-logo" aria-label="linearmodels v7.1 (+363)" data-md-component="logo">
+    <a href="../../../index.html" title="linearmodels v7.1 (+371)" class="md-nav__button md-logo" aria-label="linearmodels v7.1 (+371)" data-md-component="logo">
       <img src="../../../_static/bw-logo.svg" alt="logo">
     </a>
-    linearmodels v7.1 (+363)
+    linearmodels v7.1 (+371)
   </label>
   
     <div class="md-nav__source">
@@ -1471,7 +1471,8 @@
             <span class="n">key</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_eq_labels</span><span class="p">[</span><span class="n">i</span><span class="p">]</span>
             <span class="n">individual</span><span class="p">[</span><span class="n">key</span><span class="p">]</span> <span class="o">=</span> <span class="n">stats</span>
 
-        <span class="n">nobs</span> <span class="o">=</span> <span class="n">eps</span><span class="o">.</span><span class="n">size</span>
+        <span class="c1"># All equations use the same observations</span>
+        <span class="n">nobs</span> <span class="o">=</span> <span class="n">eps</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
         <span class="n">results</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_common_results</span><span class="p">(</span>
             <span class="n">beta</span><span class="p">,</span> <span class="n">cov</span><span class="p">,</span> <span class="s2">"OLS"</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="n">nobs</span><span class="p">,</span> <span class="n">cov_type</span><span class="p">,</span> <span class="n">sigma</span><span class="p">,</span> <span class="n">individual</span><span class="p">,</span> <span class="n">debiased</span>
         <span class="p">)</span>
@@ -1800,8 +1801,8 @@
             <span class="n">key</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_eq_labels</span><span class="p">[</span><span class="n">i</span><span class="p">]</span>
             <span class="n">individual</span><span class="p">[</span><span class="n">key</span><span class="p">]</span> <span class="o">=</span> <span class="n">stats</span>
 
-        <span class="c1"># Populate results dictionary</span>
-        <span class="n">nobs</span> <span class="o">=</span> <span class="n">eps</span><span class="o">.</span><span class="n">size</span>
+        <span class="c1"># Populate results dictionary. All equations use the same observations</span>
+        <span class="n">nobs</span> <span class="o">=</span> <span class="n">eps</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
         <span class="n">results</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_common_results</span><span class="p">(</span>
             <span class="n">beta</span><span class="p">,</span>
             <span class="n">cov</span><span class="p">,</span>
@@ -2187,8 +2188,8 @@
         <span class="n">dependent_ivd</span> <span class="o">=</span> <span class="n">IVData</span><span class="p">(</span><span class="n">dependent</span><span class="p">,</span> <span class="n">var_name</span><span class="o">=</span><span class="s2">"dependent"</span><span class="p">)</span>
         <span class="k">if</span> <span class="n">exog</span> <span class="ow">is</span> <span class="kc">None</span> <span class="ow">and</span> <span class="n">endog</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
             <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">"At least one of exog or endog must be provided"</span><span class="p">)</span>
-        <span class="n">exog_ivd</span> <span class="o">=</span> <span class="n">IVData</span><span class="p">(</span><span class="n">exog</span><span class="p">,</span> <span class="n">var_name</span><span class="o">=</span><span class="s2">"exog"</span><span class="p">)</span>
         <span class="n">nobs</span> <span class="o">=</span> <span class="n">dependent_ivd</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+        <span class="n">exog_ivd</span> <span class="o">=</span> <span class="n">IVData</span><span class="p">(</span><span class="n">exog</span><span class="p">,</span> <span class="n">var_name</span><span class="o">=</span><span class="s2">"exog"</span><span class="p">,</span> <span class="n">nobs</span><span class="o">=</span><span class="n">nobs</span><span class="p">)</span>
         <span class="n">endog_ivd</span> <span class="o">=</span> <span class="n">IVData</span><span class="p">(</span><span class="n">endog</span><span class="p">,</span> <span class="n">var_name</span><span class="o">=</span><span class="s2">"endog"</span><span class="p">,</span> <span class="n">nobs</span><span class="o">=</span><span class="n">nobs</span><span class="p">)</span>
         <span class="n">instr_ivd</span> <span class="o">=</span> <span class="n">IVData</span><span class="p">(</span><span class="n">instruments</span><span class="p">,</span> <span class="n">var_name</span><span class="o">=</span><span class="s2">"instruments"</span><span class="p">,</span> <span class="n">nobs</span><span class="o">=</span><span class="n">nobs</span><span class="p">)</span>
         <span class="k">for</span> <span class="n">col</span> <span class="ow">in</span> <span class="n">dependent_ivd</span><span class="o">.</span><span class="n">pandas</span><span class="p">:</span>
@@ -2917,8 +2918,8 @@
             <span class="n">key</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_eq_labels</span><span class="p">[</span><span class="n">i</span><span class="p">]</span>
             <span class="n">individual</span><span class="p">[</span><span class="n">key</span><span class="p">]</span> <span class="o">=</span> <span class="n">stats</span>
 
-        <span class="c1"># Populate results dictionary</span>
-        <span class="n">nobs</span> <span class="o">=</span> <span class="n">eps</span><span class="o">.</span><span class="n">size</span>
+        <span class="c1"># Populate results dictionary. All equations use the same observations</span>
+        <span class="n">nobs</span> <span class="o">=</span> <span class="n">eps</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
         <span class="n">results</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_common_results</span><span class="p">(</span>
             <span class="n">beta</span><span class="p">,</span> <span class="n">cov</span><span class="p">,</span> <span class="n">method</span><span class="p">,</span> <span class="n">iter_count</span><span class="p">,</span> <span class="n">nobs</span><span class="p">,</span> <span class="n">cov_type</span><span class="p">,</span> <span class="n">sigma</span><span class="p">,</span> <span class="n">individual</span><span class="p">,</span> <span class="n">debiased</span>
         <span class="p">)</span>

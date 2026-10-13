@@ -19,7 +19,7 @@
     
   
       
-        <title>linearmodels.system.results - linearmodels v7.1 (+363)</title>
+        <title>linearmodels.system.results - linearmodels v7.1 (+371)</title>
       
     
 
@@ -91,7 +91,7 @@
 
 <header class="md-header md-header--shadow" data-md-component="header">
   <nav class="md-header__inner md-grid" aria-label="Header">
-    <a href="../../../index.html" title="linearmodels v7.1 (+363)" class="md-header__button md-logo" aria-label="linearmodels v7.1 (+363)" data-md-component="logo">
+    <a href="../../../index.html" title="linearmodels v7.1 (+371)" class="md-header__button md-logo" aria-label="linearmodels v7.1 (+371)" data-md-component="logo">
       <img src="../../../_static/bw-logo.svg" alt="logo">
     </a>
     <label class="md-header__button md-icon" for="__drawer">
@@ -102,7 +102,7 @@
       <div class="md-header__ellipsis">
         <div class="md-header__topic">
           <span class="md-ellipsis">
-            linearmodels v7.1 (+363)
+            linearmodels v7.1 (+371)
           </span>
         </div>
         <div class="md-header__topic" data-md-component="header-topic">
@@ -197,10 +197,10 @@
 
 <nav class="md-nav md-nav--primary" aria-label="Navigation" data-md-level="0">
   <label class="md-nav__title" for="__drawer">
-    <a href="../../../index.html" title="linearmodels v7.1 (+363)" class="md-nav__button md-logo" aria-label="linearmodels v7.1 (+363)" data-md-component="logo">
+    <a href="../../../index.html" title="linearmodels v7.1 (+371)" class="md-nav__button md-logo" aria-label="linearmodels v7.1 (+371)" data-md-component="logo">
       <img src="../../../_static/bw-logo.svg" alt="logo">
     </a>
-    linearmodels v7.1 (+363)
+    linearmodels v7.1 (+371)
   </label>
   
     <div class="md-nav__source">
@@ -734,6 +734,28 @@
 <span class="sd">    ----------</span>
 <span class="sd">    results : AttrDict</span>
 <span class="sd">        Dictionary of model estimation results</span>
+
+<span class="sd">    Notes</span>
+<span class="sd">    -----</span>
+<span class="sd">    All equations of a system use the same observations. Observations with a</span>
+<span class="sd">    missing value in any variable of any equation are dropped from all of the</span>
+<span class="sd">    equations, and the models raise an error if the equations have different</span>
+<span class="sd">    numbers of observations. ``nobs`` is the number of observations of each</span>
+<span class="sd">    equation, as it is for the results of each equation. The number of</span>
+<span class="sd">    observations of all the equations is ``nobs`` times the number of equations,</span>
+<span class="sd">    and the residual degrees of freedom, ``df_resid``, which are used by the</span>
+<span class="sd">    p-values and the confidence intervals of a debiased covariance, are that</span>
+<span class="sd">    number less the number of parameters.</span>
+
+<span class="sd">    .. versionchanged:: 7.1</span>
+
+<span class="sd">       ``nobs`` was the number of observations of all the equations, which is</span>
+<span class="sd">       the number of observations of each equation times the number of</span>
+<span class="sd">       equations. The summary of the results reported the number of</span>
+<span class="sd">       observations of each equation. ``nobs`` is now the number of</span>
+<span class="sd">       observations of each equation. ``df_resid``, the p-values and the</span>
+<span class="sd">       confidence intervals use the observations of all the equations, as they</span>
+<span class="sd">       did, and do not change.</span>
 <span class="sd">    """</span>
 
     <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">results</span><span class="p">:</span> <span class="n">AttrDict</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
@@ -741,6 +763,8 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">_individual</span> <span class="o">=</span> <span class="n">AttrDict</span><span class="p">()</span>
         <span class="k">for</span> <span class="n">key</span> <span class="ow">in</span> <span class="n">results</span><span class="o">.</span><span class="n">individual</span><span class="p">:</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">_individual</span><span class="p">[</span><span class="n">key</span><span class="p">]</span> <span class="o">=</span> <span class="n">SystemEquationResult</span><span class="p">(</span><span class="n">results</span><span class="o">.</span><span class="n">individual</span><span class="p">[</span><span class="n">key</span><span class="p">])</span>
+        <span class="c1"># The residual degrees of freedom count the observations of all equations</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_df_resid</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_individual</span><span class="p">)</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">_nobs</span> <span class="o">-</span> <span class="bp">self</span><span class="o">.</span><span class="n">_df_model</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_system_r2</span> <span class="o">=</span> <span class="n">results</span><span class="o">.</span><span class="n">system_r2</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_sigma</span> <span class="o">=</span> <span class="n">results</span><span class="o">.</span><span class="n">sigma</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_model</span> <span class="o">=</span> <span class="n">results</span><span class="o">.</span><span class="n">model</span>
@@ -755,6 +779,30 @@
     <span class="k">def</span><span class="w"> </span><span class="nf">model</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">linearmodels</span><span class="o">.</span><span class="n">system</span><span class="o">.</span><span class="n">model</span><span class="o">.</span><span class="n">IV3SLS</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">"""Model used in estimation"""</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_model</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">nobs</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">int</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">"""</span>
+<span class="sd">        Number of observations in each equation.</span>
+
+<span class="sd">        Notes</span>
+<span class="sd">        -----</span>
+<span class="sd">        All equations use the same observations. The number of observations of</span>
+<span class="sd">        all the equations is ``nobs`` times the number of equations.</span>
+<span class="sd">        """</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_nobs</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">df_resid</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">int</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">"""</span>
+<span class="sd">        Residual degree of freedom.</span>
+
+<span class="sd">        Notes</span>
+<span class="sd">        -----</span>
+<span class="sd">        The number of observations of all the equations, which is ``nobs`` times</span>
+<span class="sd">        the number of equations, less the number of parameters.</span>
+<span class="sd">        """</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_df_resid</span>
 
     <span class="nd">@property</span>
     <span class="k">def</span><span class="w"> </span><span class="nf">equations</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">AttrDict</span><span class="p">:</span>
@@ -1000,7 +1048,7 @@
         <span class="n">top_left</span> <span class="o">=</span> <span class="p">[</span>
             <span class="p">(</span><span class="s2">"Estimator:"</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_method</span><span class="p">),</span>
             <span class="p">(</span><span class="s2">"No. Equations.:"</span><span class="p">,</span> <span class="nb">str</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">equation_labels</span><span class="p">))),</span>
-            <span class="p">(</span><span class="s2">"No. Observations:"</span><span class="p">,</span> <span class="nb">str</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">resids</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">])),</span>
+            <span class="p">(</span><span class="s2">"No. Observations:"</span><span class="p">,</span> <span class="nb">str</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">nobs</span><span class="p">)),</span>
             <span class="p">(</span><span class="s2">"Date:"</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_datetime</span><span class="o">.</span><span class="n">strftime</span><span class="p">(</span><span class="s2">"</span><span class="si">%a</span><span class="s2">, %b </span><span class="si">%d</span><span class="s2"> %Y"</span><span class="p">)),</span>
             <span class="p">(</span><span class="s2">"Time:"</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_datetime</span><span class="o">.</span><span class="n">strftime</span><span class="p">(</span><span class="s2">"%H:%M:%S"</span><span class="p">)),</span>
             <span class="p">(</span><span class="s2">""</span><span class="p">,</span> <span class="s2">""</span><span class="p">),</span>
