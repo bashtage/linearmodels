@@ -2,7 +2,7 @@ from __future__ import annotations
 
 from linearmodels.compat.pandas import PD_GTE_21
 
-from collections.abc import Hashable, Sequence
+from collections.abc import Sequence
 from itertools import product
 from typing import Literal, Union, cast, overload
 
@@ -212,15 +212,12 @@ class PanelData:
                     if x.ndim == 2:
                         x = x.to_pandas()
                     else:
-                        items: list[Hashable] = cast(
-                            "list[Hashable]", np.asarray(x.coords[x.dims[0]]).tolist()
-                        )
-                        major: list[Hashable] = cast(
-                            "list[Hashable]", np.asarray(x.coords[x.dims[1]]).tolist()
-                        )
-                        minor: list[Hashable] = cast(
-                            "list[Hashable]", np.asarray(x.coords[x.dims[2]]).tolist()
-                        )
+                        # The indexes keep the type of the coordinates. tolist() turns
+                        # datetime64[ns] values into integers since a datetime cannot
+                        # hold nanoseconds.
+                        items = x.get_index(x.dims[0]).rename(None)
+                        major = x.get_index(x.dims[1]).rename(None)
+                        minor = x.get_index(x.dims[2]).rename(None)
                         values = x.values
                         x = panel_to_frame(values, items, major, minor, True)
             except ImportError:
