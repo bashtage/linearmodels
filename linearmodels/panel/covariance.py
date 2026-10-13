@@ -921,7 +921,10 @@ class FamaMacBethCovariance(HomoskedasticCovariance):
                     f"{nperiods}. Pass the bandwidth to fit, which must be below "
                     f"{nperiods}."
                 )
-            stde = np.sum(e / e.std(0)[None, :], 1)
+            # Estimates that do not vary have a standard deviation of 0, and the series
+            # is NaN. kernel_optimal_bandwidth raises, so there is no need to warn
+            with np.errstate(divide="ignore", invalid="ignore"):
+                stde = np.sum(e / e.std(0)[None, :], 1)
             self._bandwidth = kernel_optimal_bandwidth(stde, self._kernel)
         assert self._bandwidth is not None
         return self._bandwidth
