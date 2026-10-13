@@ -19,7 +19,7 @@
     
   
       
-        <title>linearmodels.asset_pricing.model - linearmodels v7.1 (+371)</title>
+        <title>linearmodels.asset_pricing.model - linearmodels v7.1 (+373)</title>
       
     
 
@@ -91,7 +91,7 @@
 
 <header class="md-header md-header--shadow" data-md-component="header">
   <nav class="md-header__inner md-grid" aria-label="Header">
-    <a href="../../../index.html" title="linearmodels v7.1 (+371)" class="md-header__button md-logo" aria-label="linearmodels v7.1 (+371)" data-md-component="logo">
+    <a href="../../../index.html" title="linearmodels v7.1 (+373)" class="md-header__button md-logo" aria-label="linearmodels v7.1 (+373)" data-md-component="logo">
       <img src="../../../_static/bw-logo.svg" alt="logo">
     </a>
     <label class="md-header__button md-icon" for="__drawer">
@@ -102,7 +102,7 @@
       <div class="md-header__ellipsis">
         <div class="md-header__topic">
           <span class="md-ellipsis">
-            linearmodels v7.1 (+371)
+            linearmodels v7.1 (+373)
           </span>
         </div>
         <div class="md-header__topic" data-md-component="header-topic">
@@ -197,10 +197,10 @@
 
 <nav class="md-nav md-nav--primary" aria-label="Navigation" data-md-level="0">
   <label class="md-nav__title" for="__drawer">
-    <a href="../../../index.html" title="linearmodels v7.1 (+371)" class="md-nav__button md-logo" aria-label="linearmodels v7.1 (+371)" data-md-component="logo">
+    <a href="../../../index.html" title="linearmodels v7.1 (+373)" class="md-nav__button md-logo" aria-label="linearmodels v7.1 (+373)" data-md-component="logo">
       <img src="../../../_static/bw-logo.svg" alt="logo">
     </a>
-    linearmodels v7.1 (+371)
+    linearmodels v7.1 (+373)
   </label>
   
     <div class="md-nav__source">
@@ -1493,6 +1493,18 @@
 <span class="sd">    where :math:`r_{it}` is the return on test portfolio i and</span>
 <span class="sd">    :math:`f_t` are the factor returns.</span>
 
+<span class="sd">    There are :math:`N (K + 1) + K` moment conditions, where :math:`N` is the</span>
+<span class="sd">    number of test portfolios and :math:`K` is the number of factors. The number</span>
+<span class="sd">    of observations must exceed the number of moment conditions, since the</span>
+<span class="sd">    covariance of the moment conditions, which weights them, is singular</span>
+<span class="sd">    otherwise. A ``ValueError`` is raised if it does not.</span>
+
+<span class="sd">    .. versionchanged:: 7.1</span>
+
+<span class="sd">       A ``ValueError`` is raised if the number of observations does not exceed</span>
+<span class="sd">       the number of moment conditions. The estimator raised a ``LinAlgError``</span>
+<span class="sd">       or returned a J-statistic that was NaN or arbitrary, such as -4.6e35.</span>
+
 <span class="sd">    The model is tested using the optimized objective function using the</span>
 <span class="sd">    usual GMM J statistic.</span>
 
@@ -1513,6 +1525,22 @@
         <span class="bp">self</span><span class="p">,</span> <span class="n">portfolios</span><span class="p">:</span> <span class="n">IVDataLike</span><span class="p">,</span> <span class="n">factors</span><span class="p">:</span> <span class="n">IVDataLike</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">risk_free</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span>
     <span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
         <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">portfolios</span><span class="p">,</span> <span class="n">factors</span><span class="p">,</span> <span class="n">risk_free</span><span class="o">=</span><span class="n">risk_free</span><span class="p">)</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">_validate_additional_data</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="n">_validate_additional_data</span><span class="p">()</span>
+        <span class="n">nobs</span><span class="p">,</span> <span class="n">nfactor</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">factors</span><span class="o">.</span><span class="n">shape</span>
+        <span class="n">nportfolio</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">portfolios</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span>
+        <span class="n">nmoment</span> <span class="o">=</span> <span class="n">nportfolio</span> <span class="o">*</span> <span class="p">(</span><span class="n">nfactor</span> <span class="o">+</span> <span class="mi">1</span><span class="p">)</span> <span class="o">+</span> <span class="n">nfactor</span>
+        <span class="k">if</span> <span class="n">nobs</span> <span class="o">&lt;=</span> <span class="n">nmoment</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
+                <span class="sa">f</span><span class="s2">"The number of observations (</span><span class="si">{</span><span class="n">nobs</span><span class="si">}</span><span class="s2">) must exceed the number of "</span>
+                <span class="sa">f</span><span class="s2">"moment conditions (</span><span class="si">{</span><span class="n">nmoment</span><span class="si">}</span><span class="s2">) of the GMM estimator, since the "</span>
+                <span class="s2">"covariance of the moment conditions is singular otherwise. The "</span>
+                <span class="s2">"number of moment conditions is nportfolio * (nfactor + 1) + "</span>
+                <span class="sa">f</span><span class="s2">"nfactor, where nportfolio is </span><span class="si">{</span><span class="n">nportfolio</span><span class="si">}</span><span class="s2"> and nfactor is "</span>
+                <span class="sa">f</span><span class="s2">"</span><span class="si">{</span><span class="n">nfactor</span><span class="si">}</span><span class="s2">. Use more observations, fewer portfolios or fewer "</span>
+                <span class="s2">"factors."</span>
+            <span class="p">)</span>
 
 <div class="viewcode-block" id="LinearFactorModelGMM.from_formula">
 <a class="viewcode-back" href="../../../asset-pricing/asset-pricing/linearmodels.asset_pricing.model.LinearFactorModelGMM.from_formula.html#linearmodels.asset_pricing.model.LinearFactorModelGMM.from_formula">[docs]</a>

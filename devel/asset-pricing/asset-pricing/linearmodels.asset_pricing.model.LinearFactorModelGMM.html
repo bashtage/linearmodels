@@ -23,7 +23,7 @@
     
   
       
-        <title>linearmodels.asset_pricing.model.LinearFactorModelGMM - linearmodels v7.1 (+371)</title>
+        <title>linearmodels.asset_pricing.model.LinearFactorModelGMM - linearmodels v7.1 (+373)</title>
       
     
 
@@ -100,7 +100,7 @@
 
 <header class="md-header md-header--shadow" data-md-component="header">
   <nav class="md-header__inner md-grid" aria-label="Header">
-    <a href="../../index.html" title="linearmodels v7.1 (+371)" class="md-header__button md-logo" aria-label="linearmodels v7.1 (+371)" data-md-component="logo">
+    <a href="../../index.html" title="linearmodels v7.1 (+373)" class="md-header__button md-logo" aria-label="linearmodels v7.1 (+373)" data-md-component="logo">
       <img src="../../_static/bw-logo.svg" alt="logo">
     </a>
     <label class="md-header__button md-icon" for="__drawer">
@@ -111,7 +111,7 @@
       <div class="md-header__ellipsis">
         <div class="md-header__topic">
           <span class="md-ellipsis">
-            linearmodels v7.1 (+371)
+            linearmodels v7.1 (+373)
           </span>
         </div>
         <div class="md-header__topic" data-md-component="header-topic">
@@ -206,10 +206,10 @@
 
 <nav class="md-nav md-nav--primary" aria-label="Navigation" data-md-level="0">
   <label class="md-nav__title" for="__drawer">
-    <a href="../../index.html" title="linearmodels v7.1 (+371)" class="md-nav__button md-logo" aria-label="linearmodels v7.1 (+371)" data-md-component="logo">
+    <a href="../../index.html" title="linearmodels v7.1 (+373)" class="md-nav__button md-logo" aria-label="linearmodels v7.1 (+373)" data-md-component="logo">
       <img src="../../_static/bw-logo.svg" alt="logo">
     </a>
-    linearmodels v7.1 (+371)
+    linearmodels v7.1 (+373)
   </label>
   
     <div class="md-nav__source">
@@ -1311,6 +1311,16 @@ tests.</p>
 \[\epsilon_{t}=r_{t}-\left[1_{N}\;\beta\right]\lambda-\beta\left(f_{t}-\mu\right)\]</div>
 <p>where <span class="math notranslate nohighlight">\(r_{it}\)</span> is the return on test portfolio i and
 <span class="math notranslate nohighlight">\(f_t\)</span> are the factor returns.</p>
+<p>There are <span class="math notranslate nohighlight">\(N (K + 1) + K\)</span> moment conditions, where <span class="math notranslate nohighlight">\(N\)</span> is the
+number of test portfolios and <span class="math notranslate nohighlight">\(K\)</span> is the number of factors. The number
+of observations must exceed the number of moment conditions, since the
+covariance of the moment conditions, which weights them, is singular
+otherwise. A <code class="docutils literal notranslate"><span class="pre">ValueError</span></code> is raised if it does not.</p>
+<div class="admonition versionchanged">
+<p class="admonition-title"><span class="versionmodified changed">Changed in version 7.1: </span>A <code class="docutils literal notranslate"><span class="pre">ValueError</span></code> is raised if the number of observations does not exceed
+the number of moment conditions. The estimator raised a <code class="docutils literal notranslate"><span class="pre">LinAlgError</span></code>
+or returned a J-statistic that was NaN or arbitrary, such as -4.6e35.</p>
+</div>
 <p>The model is tested using the optimized objective function using the
 usual GMM J statistic.</p>
 <p>Rows are paired by position, so that the first row of <code class="docutils literal notranslate"><span class="pre">factors</span></code> is the
