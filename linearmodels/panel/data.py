@@ -165,6 +165,11 @@ class PanelData:
     methods that group by the index raise a ValueError if the level that they
     use has a missing label.
 
+    The time labels must be numbers or dates. A pandas ``PeriodIndex`` is
+    accepted: it is converted with ``to_timestamp()``, so that the time labels
+    are the timestamps at the start of the periods, and the data are the same
+    as those of a panel that is indexed by timestamps.
+
     Each combination of an entity and a time period can appear only once, since
     an observation is identified by them.
 
@@ -173,7 +178,9 @@ class PanelData:
        Duplicated (entity, time) rows raise a ``ValueError``. Earlier versions
        accepted them, except for the first difference estimator, which raised an
        error from pandas, and the other estimators treated them as separate
-       observations.
+       observations. A ``PeriodIndex`` of time labels is accepted. Earlier
+       versions raised a ``ValueError`` that the time labels must be numeric or
+       date-like.
 
     Raises
     ------
@@ -181,8 +188,9 @@ class PanelData:
         If the input type is not supported
     ValueError
         If the input has the wrong number of dimensions or a MultiIndex
-        DataFrame does not have 2 levels, or if a combination of an entity
-        and a time period appears more than once
+        DataFrame does not have 2 levels, if the time labels are neither
+        numbers nor dates, or if a combination of an entity and a time
+        period appears more than once
     """
 
     def __init__(
@@ -298,6 +306,12 @@ class PanelData:
                     f"it cannot be converted to float64: {exc}"
                 ) from exc
 
+        time_level = self.index.levels[1]
+        if isinstance(time_level, pd.PeriodIndex):
+            # A period is identified by its start, as a date is in a DatetimeIndex. The
+            # frame is not changed in place since it can be the frame of the caller.
+            timestamps = self.index.set_levels(time_level.to_timestamp(), level=1)
+            self._frame = self._frame.set_axis(timestamps, axis=0)
         time_index = Series(self.index.levels[1])
         if not (
             is_numeric_dtype(time_index.dtype)
