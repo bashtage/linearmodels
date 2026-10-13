@@ -19,7 +19,7 @@
     
   
       
-        <title>linearmodels.iv.model - linearmodels v7.1 (+391)</title>
+        <title>linearmodels.iv.model - linearmodels v7.1 (+399)</title>
       
     
 
@@ -91,7 +91,7 @@
 
 <header class="md-header md-header--shadow" data-md-component="header">
   <nav class="md-header__inner md-grid" aria-label="Header">
-    <a href="../../../index.html" title="linearmodels v7.1 (+391)" class="md-header__button md-logo" aria-label="linearmodels v7.1 (+391)" data-md-component="logo">
+    <a href="../../../index.html" title="linearmodels v7.1 (+399)" class="md-header__button md-logo" aria-label="linearmodels v7.1 (+399)" data-md-component="logo">
       <img src="../../../_static/bw-logo.svg" alt="logo">
     </a>
     <label class="md-header__button md-icon" for="__drawer">
@@ -102,7 +102,7 @@
       <div class="md-header__ellipsis">
         <div class="md-header__topic">
           <span class="md-ellipsis">
-            linearmodels v7.1 (+391)
+            linearmodels v7.1 (+399)
           </span>
         </div>
         <div class="md-header__topic" data-md-component="header-topic">
@@ -197,10 +197,10 @@
 
 <nav class="md-nav md-nav--primary" aria-label="Navigation" data-md-level="0">
   <label class="md-nav__title" for="__drawer">
-    <a href="../../../index.html" title="linearmodels v7.1 (+391)" class="md-nav__button md-logo" aria-label="linearmodels v7.1 (+391)" data-md-component="logo">
+    <a href="../../../index.html" title="linearmodels v7.1 (+399)" class="md-nav__button md-logo" aria-label="linearmodels v7.1 (+399)" data-md-component="logo">
       <img src="../../../_static/bw-logo.svg" alt="logo">
     </a>
-    linearmodels v7.1 (+391)
+    linearmodels v7.1 (+399)
   </label>
   
     <div class="md-nav__source">
@@ -591,7 +591,12 @@
     <span class="n">reference_labels</span><span class="p">,</span>
     <span class="n">row_labels</span><span class="p">,</span>
 <span class="p">)</span>
-<span class="kn">from</span><span class="w"> </span><span class="nn">linearmodels.shared.exceptions</span><span class="w"> </span><span class="kn">import</span> <span class="n">IndexWarning</span><span class="p">,</span> <span class="n">missing_warning</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">linearmodels.shared.exceptions</span><span class="w"> </span><span class="kn">import</span> <span class="p">(</span>
+    <span class="n">IndexWarning</span><span class="p">,</span>
+    <span class="n">lookup_option</span><span class="p">,</span>
+    <span class="n">missing_warning</span><span class="p">,</span>
+    <span class="n">unknown_option_error</span><span class="p">,</span>
+<span class="p">)</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">linearmodels.shared.hypotheses</span><span class="w"> </span><span class="kn">import</span> <span class="n">InvalidTestStatistic</span><span class="p">,</span> <span class="n">WaldTestStatistic</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">linearmodels.shared.linalg</span><span class="w"> </span><span class="kn">import</span> <span class="n">has_constant</span><span class="p">,</span> <span class="n">inv_sqrth</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">linearmodels.shared.utility</span><span class="w"> </span><span class="kn">import</span> <span class="n">DataFrameWrapper</span><span class="p">,</span> <span class="n">SeriesWrapper</span>
@@ -1270,7 +1275,7 @@
 
         <span class="n">params</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">estimate_parameters</span><span class="p">(</span><span class="n">wx</span><span class="p">,</span> <span class="n">wy</span><span class="p">,</span> <span class="n">wz</span><span class="p">,</span> <span class="n">est_kappa</span><span class="p">)</span>
 
-        <span class="n">cov_estimator</span> <span class="o">=</span> <span class="n">COVARIANCE_ESTIMATORS</span><span class="p">[</span><span class="n">cov_type</span><span class="p">]</span>
+        <span class="n">cov_estimator</span> <span class="o">=</span> <span class="n">lookup_option</span><span class="p">(</span><span class="n">COVARIANCE_ESTIMATORS</span><span class="p">,</span> <span class="n">cov_type</span><span class="p">,</span> <span class="s2">"cov_type"</span><span class="p">)</span>
         <span class="n">cov_config</span><span class="p">[</span><span class="s2">"debiased"</span><span class="p">]</span> <span class="o">=</span> <span class="n">debiased</span>
         <span class="n">cov_config</span><span class="p">[</span><span class="s2">"kappa"</span><span class="p">]</span> <span class="o">=</span> <span class="n">est_kappa</span>
         <span class="n">cov_config_copy</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">(</span><span class="n">cov_config</span><span class="o">.</span><span class="n">items</span><span class="p">())</span>
@@ -1663,7 +1668,9 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">_method</span> <span class="o">=</span> <span class="s2">"IV-GMM"</span>
 
         <span class="bp">self</span><span class="o">.</span><span class="n">_check_clusters</span><span class="p">(</span><span class="n">weight_config</span><span class="p">)</span>
-        <span class="n">weight_matrix_estimator</span> <span class="o">=</span> <span class="n">WEIGHT_MATRICES</span><span class="p">[</span><span class="n">weight_type</span><span class="p">]</span>
+        <span class="n">weight_matrix_estimator</span> <span class="o">=</span> <span class="n">lookup_option</span><span class="p">(</span>
+            <span class="n">WEIGHT_MATRICES</span><span class="p">,</span> <span class="n">weight_type</span><span class="p">,</span> <span class="s2">"weight_type"</span>
+        <span class="p">)</span>
         <span class="c1"># Kernel weights without a bandwidth select it from the data. fit warns</span>
         <span class="c1"># about the change of this default, and makes the choice explicit so that</span>
         <span class="c1"># the weight estimators and models that are created from the arguments</span>
@@ -2959,7 +2966,7 @@
         <span class="k">if</span> <span class="n">cov_type</span> <span class="o">==</span> <span class="s2">"kernel"</span><span class="p">:</span>
             <span class="n">kernel</span> <span class="o">=</span> <span class="n">cov_config</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"kernel"</span><span class="p">,</span> <span class="s2">"bartlett"</span><span class="p">)</span>
             <span class="k">if</span> <span class="n">kernel</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">KERNEL_LOOKUP</span><span class="p">:</span>
-                <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s2">"Unknown kernel: </span><span class="si">{</span><span class="n">kernel</span><span class="si">}</span><span class="s2">"</span><span class="p">)</span>
+                <span class="k">raise</span> <span class="n">unknown_option_error</span><span class="p">(</span><span class="s2">"kernel"</span><span class="p">,</span> <span class="n">kernel</span><span class="p">,</span> <span class="n">KERNEL_LOOKUP</span><span class="p">)</span>
             <span class="c1"># Select the bandwidth using the data unless it is given, as in</span>
             <span class="c1"># IV2SLS and IVLIML. This is the default of the weight matrix</span>
             <span class="c1"># estimator since 7.1, and it is explicit here so that it does not</span>

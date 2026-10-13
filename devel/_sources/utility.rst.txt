@@ -31,6 +31,20 @@ Hypothesis Testing
    InapplicableTestStatistic
 
 
+Errors
+------
+
+.. currentmodule:: linearmodels.shared.exceptions
+
+The name of a covariance estimator (``cov_type``), of a weight matrix estimator
+(``weight_type``) or of a kernel (``kernel``) that is not supported raises an
+:class:`UnknownOptionError`, which lists the supported names. It is a ``ValueError``
+and a ``KeyError``.
+
+.. autoclass:: linearmodels.shared.exceptions.UnknownOptionError
+   :show-inheritance:
+
+
 Covariance Estimation
 ---------------------
 

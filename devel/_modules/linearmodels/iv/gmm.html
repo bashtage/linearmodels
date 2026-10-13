@@ -19,7 +19,7 @@
     
   
       
-        <title>linearmodels.iv.gmm - linearmodels v7.1 (+391)</title>
+        <title>linearmodels.iv.gmm - linearmodels v7.1 (+399)</title>
       
     
 
@@ -91,7 +91,7 @@
 
 <header class="md-header md-header--shadow" data-md-component="header">
   <nav class="md-header__inner md-grid" aria-label="Header">
-    <a href="../../../index.html" title="linearmodels v7.1 (+391)" class="md-header__button md-logo" aria-label="linearmodels v7.1 (+391)" data-md-component="logo">
+    <a href="../../../index.html" title="linearmodels v7.1 (+399)" class="md-header__button md-logo" aria-label="linearmodels v7.1 (+399)" data-md-component="logo">
       <img src="../../../_static/bw-logo.svg" alt="logo">
     </a>
     <label class="md-header__button md-icon" for="__drawer">
@@ -102,7 +102,7 @@
       <div class="md-header__ellipsis">
         <div class="md-header__topic">
           <span class="md-ellipsis">
-            linearmodels v7.1 (+391)
+            linearmodels v7.1 (+399)
           </span>
         </div>
         <div class="md-header__topic" data-md-component="header-topic">
@@ -197,10 +197,10 @@
 
 <nav class="md-nav md-nav--primary" aria-label="Navigation" data-md-level="0">
   <label class="md-nav__title" for="__drawer">
-    <a href="../../../index.html" title="linearmodels v7.1 (+391)" class="md-nav__button md-logo" aria-label="linearmodels v7.1 (+391)" data-md-component="logo">
+    <a href="../../../index.html" title="linearmodels v7.1 (+399)" class="md-nav__button md-logo" aria-label="linearmodels v7.1 (+399)" data-md-component="logo">
       <img src="../../../_static/bw-logo.svg" alt="logo">
     </a>
-    linearmodels v7.1 (+391)
+    linearmodels v7.1 (+399)
   </label>
   
     <div class="md-nav__source">
@@ -547,7 +547,11 @@
     <span class="n">kernel_optimal_bandwidth</span><span class="p">,</span>
 <span class="p">)</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">linearmodels.shared.covariance</span><span class="w"> </span><span class="kn">import</span> <span class="n">cov_cluster</span><span class="p">,</span> <span class="n">cov_kernel</span>
-<span class="kn">from</span><span class="w"> </span><span class="nn">linearmodels.shared.exceptions</span><span class="w"> </span><span class="kn">import</span> <span class="n">DefaultBandwidthWarning</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">linearmodels.shared.exceptions</span><span class="w"> </span><span class="kn">import</span> <span class="p">(</span>
+    <span class="n">DefaultBandwidthWarning</span><span class="p">,</span>
+    <span class="n">lookup_option</span><span class="p">,</span>
+    <span class="n">unknown_option_error</span><span class="p">,</span>
+<span class="p">)</span>
 <span class="kn">import</span><span class="w"> </span><span class="nn">linearmodels.typing.data</span>
 
 
@@ -920,7 +924,7 @@
             <span class="bp">self</span><span class="o">.</span><span class="n">_bandwidth</span> <span class="o">=</span> <span class="n">nobs</span> <span class="o">-</span> <span class="mi">2</span>
         <span class="n">bw</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_bandwidth</span>
         <span class="k">assert</span> <span class="n">bw</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span>
-        <span class="n">w</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_kernels</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">_kernel</span><span class="p">](</span><span class="n">bw</span><span class="p">,</span> <span class="n">nobs</span> <span class="o">-</span> <span class="mi">1</span><span class="p">)</span>
+        <span class="n">w</span> <span class="o">=</span> <span class="n">lookup_option</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_kernels</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_kernel</span><span class="p">,</span> <span class="s2">"kernel"</span><span class="p">)(</span><span class="n">bw</span><span class="p">,</span> <span class="n">nobs</span> <span class="o">-</span> <span class="mi">1</span><span class="p">)</span>
 
         <span class="n">s</span> <span class="o">=</span> <span class="n">cov_kernel</span><span class="p">(</span><span class="n">ze</span><span class="p">,</span> <span class="n">w</span><span class="p">)</span>
         <span class="n">s</span> <span class="o">*=</span> <span class="mi">1</span> <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">_debiased</span> <span class="k">else</span> <span class="n">nobs</span> <span class="o">/</span> <span class="p">(</span><span class="n">nobs</span> <span class="o">-</span> <span class="n">nvar</span><span class="p">)</span>
@@ -1145,7 +1149,15 @@
         <span class="k">elif</span> <span class="n">cov_type</span> <span class="o">==</span> <span class="s2">"kernel"</span><span class="p">:</span>
             <span class="n">score_cov_estimator</span> <span class="o">=</span> <span class="n">KernelWeightMatrix</span>
         <span class="k">else</span><span class="p">:</span>
-            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">"Unknown cov_type"</span><span class="p">)</span>
+            <span class="n">supported</span> <span class="o">=</span> <span class="p">(</span>
+                <span class="s2">"clustered"</span><span class="p">,</span>
+                <span class="s2">"heteroskedastic"</span><span class="p">,</span>
+                <span class="s2">"homoskedastic"</span><span class="p">,</span>
+                <span class="s2">"kernel"</span><span class="p">,</span>
+                <span class="s2">"robust"</span><span class="p">,</span>
+                <span class="s2">"unadjusted"</span><span class="p">,</span>
+            <span class="p">)</span>
+            <span class="k">raise</span> <span class="n">unknown_option_error</span><span class="p">(</span><span class="s2">"cov_type"</span><span class="p">,</span> <span class="n">cov_type</span><span class="p">,</span> <span class="n">supported</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_score_cov_estimator</span> <span class="o">=</span> <span class="n">score_cov_estimator</span>
 
     <span class="k">def</span><span class="w"> </span><span class="fm">__str__</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>

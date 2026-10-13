@@ -19,7 +19,7 @@
     
   
       
-        <title>linearmodels.panel.model - linearmodels v7.1 (+391)</title>
+        <title>linearmodels.panel.model - linearmodels v7.1 (+399)</title>
       
     
 
@@ -91,7 +91,7 @@
 
 <header class="md-header md-header--shadow" data-md-component="header">
   <nav class="md-header__inner md-grid" aria-label="Header">
-    <a href="../../../index.html" title="linearmodels v7.1 (+391)" class="md-header__button md-logo" aria-label="linearmodels v7.1 (+391)" data-md-component="logo">
+    <a href="../../../index.html" title="linearmodels v7.1 (+399)" class="md-header__button md-logo" aria-label="linearmodels v7.1 (+399)" data-md-component="logo">
       <img src="../../../_static/bw-logo.svg" alt="logo">
     </a>
     <label class="md-header__button md-icon" for="__drawer">
@@ -102,7 +102,7 @@
       <div class="md-header__ellipsis">
         <div class="md-header__topic">
           <span class="md-ellipsis">
-            linearmodels v7.1 (+391)
+            linearmodels v7.1 (+399)
           </span>
         </div>
         <div class="md-header__topic" data-md-component="header-topic">
@@ -197,10 +197,10 @@
 
 <nav class="md-nav md-nav--primary" aria-label="Navigation" data-md-level="0">
   <label class="md-nav__title" for="__drawer">
-    <a href="../../../index.html" title="linearmodels v7.1 (+391)" class="md-nav__button md-logo" aria-label="linearmodels v7.1 (+391)" data-md-component="logo">
+    <a href="../../../index.html" title="linearmodels v7.1 (+399)" class="md-nav__button md-logo" aria-label="linearmodels v7.1 (+399)" data-md-component="logo">
       <img src="../../../_static/bw-logo.svg" alt="logo">
     </a>
-    linearmodels v7.1 (+391)
+    linearmodels v7.1 (+399)
   </label>
   
     <div class="md-nav__source">
@@ -591,6 +591,7 @@
     <span class="n">MissingValueWarning</span><span class="p">,</span>
     <span class="n">SingletonWarning</span><span class="p">,</span>
     <span class="n">missing_warning</span><span class="p">,</span>
+    <span class="n">unknown_option_error</span><span class="p">,</span>
 <span class="p">)</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">linearmodels.shared.hypotheses</span><span class="w"> </span><span class="kn">import</span> <span class="p">(</span>
     <span class="n">InapplicableTestStatistic</span><span class="p">,</span>
@@ -4501,7 +4502,14 @@
             <span class="s2">"heteroskedastic"</span><span class="p">,</span>
             <span class="s2">"kernel"</span><span class="p">,</span>
         <span class="p">):</span>
-            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">"Unknown cov_type"</span><span class="p">)</span>
+            <span class="n">supported</span> <span class="o">=</span> <span class="p">(</span>
+                <span class="s2">"heteroskedastic"</span><span class="p">,</span>
+                <span class="s2">"homoskedastic"</span><span class="p">,</span>
+                <span class="s2">"kernel"</span><span class="p">,</span>
+                <span class="s2">"robust"</span><span class="p">,</span>
+                <span class="s2">"unadjusted"</span><span class="p">,</span>
+            <span class="p">)</span>
+            <span class="k">raise</span> <span class="n">unknown_option_error</span><span class="p">(</span><span class="s2">"cov_type"</span><span class="p">,</span> <span class="n">cov_type</span><span class="p">,</span> <span class="n">supported</span><span class="p">)</span>
 
         <span class="n">bandwidth</span> <span class="o">=</span> <span class="mf">0.0</span> <span class="k">if</span> <span class="n">cov_type</span> <span class="o">!=</span> <span class="s2">"kernel"</span> <span class="k">else</span> <span class="n">bandwidth</span>
         <span class="n">cov</span> <span class="o">=</span> <span class="n">FamaMacBethCovariance</span><span class="p">(</span>

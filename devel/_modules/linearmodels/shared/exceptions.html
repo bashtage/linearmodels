@@ -19,7 +19,7 @@
     
   
       
-        <title>linearmodels.shared.exceptions - linearmodels v7.1 (+391)</title>
+        <title>linearmodels.shared.exceptions - linearmodels v7.1 (+399)</title>
       
     
 
@@ -91,7 +91,7 @@
 
 <header class="md-header md-header--shadow" data-md-component="header">
   <nav class="md-header__inner md-grid" aria-label="Header">
-    <a href="../../../index.html" title="linearmodels v7.1 (+391)" class="md-header__button md-logo" aria-label="linearmodels v7.1 (+391)" data-md-component="logo">
+    <a href="../../../index.html" title="linearmodels v7.1 (+399)" class="md-header__button md-logo" aria-label="linearmodels v7.1 (+399)" data-md-component="logo">
       <img src="../../../_static/bw-logo.svg" alt="logo">
     </a>
     <label class="md-header__button md-icon" for="__drawer">
@@ -102,7 +102,7 @@
       <div class="md-header__ellipsis">
         <div class="md-header__topic">
           <span class="md-ellipsis">
-            linearmodels v7.1 (+391)
+            linearmodels v7.1 (+399)
           </span>
         </div>
         <div class="md-header__topic" data-md-component="header-topic">
@@ -197,10 +197,10 @@
 
 <nav class="md-nav md-nav--primary" aria-label="Navigation" data-md-level="0">
   <label class="md-nav__title" for="__drawer">
-    <a href="../../../index.html" title="linearmodels v7.1 (+391)" class="md-nav__button md-logo" aria-label="linearmodels v7.1 (+391)" data-md-component="logo">
+    <a href="../../../index.html" title="linearmodels v7.1 (+399)" class="md-nav__button md-logo" aria-label="linearmodels v7.1 (+399)" data-md-component="logo">
       <img src="../../../_static/bw-logo.svg" alt="logo">
     </a>
-    linearmodels v7.1 (+391)
+    linearmodels v7.1 (+399)
   </label>
   
     <div class="md-nav__source">
@@ -527,11 +527,16 @@
 
 
 <h1>Source code for linearmodels.shared.exceptions</h1><div class="highlight"><pre>
-<span></span><code><span class="kn">import</span><span class="w"> </span><span class="nn">warnings</span>
+<span></span><code><span class="kn">from</span><span class="w"> </span><span class="nn">collections.abc</span><span class="w"> </span><span class="kn">import</span> <span class="n">Iterable</span><span class="p">,</span> <span class="n">Mapping</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">difflib</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">typing</span><span class="w"> </span><span class="kn">import</span> <span class="n">TypeVar</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">warnings</span>
 
 <span class="kn">import</span><span class="w"> </span><span class="nn">numpy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">np</span>
 
 <span class="kn">from</span><span class="w"> </span><span class="nn">linearmodels.typing</span><span class="w"> </span><span class="kn">import</span> <span class="n">BoolArray</span>
+
+<span class="n">_T</span> <span class="o">=</span> <span class="n">TypeVar</span><span class="p">(</span><span class="s2">"_T"</span><span class="p">)</span>
 
 
 <div class="viewcode-block" id="MissingValueWarning">
@@ -619,6 +624,112 @@
         <span class="p">)</span>
 
 
+<div class="viewcode-block" id="UnknownOptionError">
+<a class="viewcode-back" href="../../../utility.html#linearmodels.shared.exceptions.UnknownOptionError">[docs]</a>
+<span class="k">class</span><span class="w"> </span><span class="nc">UnknownOptionError</span><span class="p">(</span><span class="ne">ValueError</span><span class="p">,</span> <span class="ne">KeyError</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">"""</span>
+<span class="sd">    Error that a name is not one of the supported names.</span>
+
+<span class="sd">    It is raised if the name of a covariance estimator (``cov_type``), of a</span>
+<span class="sd">    weight matrix estimator (``weight_type``) or of a kernel (``kernel``) is not</span>
+<span class="sd">    supported. The message gives the parameter, the value that was passed and</span>
+<span class="sd">    the supported names.</span>
+
+<span class="sd">    Notes</span>
+<span class="sd">    -----</span>
+<span class="sd">    Releases before 7.1 raised a ``KeyError`` for most of these names and a</span>
+<span class="sd">    ``ValueError`` for the others. The error is both, so that code that catches</span>
+<span class="sd">    either of them keeps working. ``str(error)`` is the message. It is not quoted,</span>
+<span class="sd">    as it is for a ``KeyError``.</span>
+<span class="sd">    """</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="fm">__str__</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+        <span class="c1"># KeyError is next in the method resolution order, and its __str__ is the</span>
+        <span class="c1"># repr of the message</span>
+        <span class="k">return</span> <span class="ne">Exception</span><span class="o">.</span><span class="fm">__str__</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span></div>
+
+
+
+<span class="k">def</span><span class="w"> </span><span class="nf">unknown_option_error</span><span class="p">(</span>
+    <span class="n">parameter</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
+    <span class="n">value</span><span class="p">:</span> <span class="nb">object</span><span class="p">,</span>
+    <span class="n">supported</span><span class="p">:</span> <span class="n">Iterable</span><span class="p">[</span><span class="nb">str</span><span class="p">],</span>
+    <span class="o">*</span><span class="p">,</span>
+    <span class="n">problem</span><span class="p">:</span> <span class="nb">str</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="n">UnknownOptionError</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">"""</span>
+<span class="sd">    Create the error for a name that is not one of the supported names.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    parameter : str</span>
+<span class="sd">        Name of the parameter, for example ``"cov_type"``.</span>
+<span class="sd">    value : object</span>
+<span class="sd">        The value of the parameter, which is not supported.</span>
+<span class="sd">    supported : iterable of str</span>
+<span class="sd">        The supported names. The message lists them in sorted order. A name that</span>
+<span class="sd">        is close to ``value`` is suggested.</span>
+<span class="sd">    problem : str, optional</span>
+<span class="sd">        The first sentence of the message. The default says that the value of the</span>
+<span class="sd">        parameter is unknown.</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    UnknownOptionError</span>
+<span class="sd">        The error, which the caller raises.</span>
+
+<span class="sd">    Notes</span>
+<span class="sd">    -----</span>
+<span class="sd">    The message is the first sentence, then a suggestion if one of the supported</span>
+<span class="sd">    names is close to ``value``, and then the list. For example, ``cov_type``</span>
+<span class="sd">    ``"cluster"`` with the names ``"clustered"`` and ``"robust"`` gives</span>
+
+<span class="sd">    .. code-block:: text</span>
+
+<span class="sd">        Unknown cov_type: 'cluster'. Did you mean 'clustered'? The supported values</span>
+<span class="sd">        of cov_type are: 'clustered', 'robust'.</span>
+<span class="sd">    """</span>
+    <span class="n">names</span> <span class="o">=</span> <span class="nb">sorted</span><span class="p">(</span><span class="n">supported</span><span class="p">)</span>
+    <span class="n">sentences</span> <span class="o">=</span> <span class="p">[</span><span class="n">problem</span> <span class="ow">or</span> <span class="sa">f</span><span class="s2">"Unknown </span><span class="si">{</span><span class="n">parameter</span><span class="si">}</span><span class="s2">: </span><span class="si">{</span><span class="n">value</span><span class="si">!r}</span><span class="s2">."</span><span class="p">]</span>
+    <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">value</span><span class="p">,</span> <span class="nb">str</span><span class="p">):</span>
+        <span class="n">close</span> <span class="o">=</span> <span class="n">difflib</span><span class="o">.</span><span class="n">get_close_matches</span><span class="p">(</span><span class="n">value</span><span class="p">,</span> <span class="n">names</span><span class="p">,</span> <span class="n">n</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">close</span><span class="p">:</span>
+            <span class="n">sentences</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="sa">f</span><span class="s2">"Did you mean </span><span class="si">{</span><span class="n">close</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="si">!r}</span><span class="s2">?"</span><span class="p">)</span>
+    <span class="n">listed</span> <span class="o">=</span> <span class="s2">", "</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="nb">repr</span><span class="p">(</span><span class="n">name</span><span class="p">)</span> <span class="k">for</span> <span class="n">name</span> <span class="ow">in</span> <span class="n">names</span><span class="p">)</span>
+    <span class="n">sentences</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="sa">f</span><span class="s2">"The supported values of </span><span class="si">{</span><span class="n">parameter</span><span class="si">}</span><span class="s2"> are: </span><span class="si">{</span><span class="n">listed</span><span class="si">}</span><span class="s2">."</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">UnknownOptionError</span><span class="p">(</span><span class="s2">" "</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">sentences</span><span class="p">))</span>
+
+
+<span class="k">def</span><span class="w"> </span><span class="nf">lookup_option</span><span class="p">(</span><span class="n">table</span><span class="p">:</span> <span class="n">Mapping</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">_T</span><span class="p">],</span> <span class="n">value</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">parameter</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">_T</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">"""</span>
+<span class="sd">    Return an entry of a table of supported names.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    table : dict of str to object</span>
+<span class="sd">        The supported names and what they select.</span>
+<span class="sd">    value : str</span>
+<span class="sd">        The name to look up.</span>
+<span class="sd">    parameter : str</span>
+<span class="sd">        Name of the parameter that has the name, for example ``"cov_type"``.</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    object</span>
+<span class="sd">        The entry of ``table`` for ``value``.</span>
+
+<span class="sd">    Raises</span>
+<span class="sd">    ------</span>
+<span class="sd">    UnknownOptionError</span>
+<span class="sd">        If ``value`` is not in ``table``. It is a ``KeyError``, as it is for a</span>
+<span class="sd">        dict, and a ``ValueError``.</span>
+<span class="sd">    """</span>
+    <span class="k">try</span><span class="p">:</span>
+        <span class="k">return</span> <span class="n">table</span><span class="p">[</span><span class="n">value</span><span class="p">]</span>
+    <span class="k">except</span> <span class="p">(</span><span class="ne">KeyError</span><span class="p">,</span> <span class="ne">TypeError</span><span class="p">):</span>
+        <span class="k">raise</span> <span class="n">unknown_option_error</span><span class="p">(</span><span class="n">parameter</span><span class="p">,</span> <span class="n">value</span><span class="p">,</span> <span class="n">table</span><span class="p">)</span> <span class="kn">from</span><span class="w"> </span><span class="kc">None</span>
+
+
 <span class="n">__all__</span> <span class="o">=</span> <span class="p">[</span>
     <span class="s2">"DefaultBandwidthWarning"</span><span class="p">,</span>
     <span class="s2">"IndexWarning"</span><span class="p">,</span>
@@ -626,8 +737,11 @@
     <span class="s2">"MemoryWarning"</span><span class="p">,</span>
     <span class="s2">"MissingValueWarning"</span><span class="p">,</span>
     <span class="s2">"SingletonWarning"</span><span class="p">,</span>
+    <span class="s2">"UnknownOptionError"</span><span class="p">,</span>
+    <span class="s2">"lookup_option"</span><span class="p">,</span>
     <span class="s2">"missing_value_warning_msg"</span><span class="p">,</span>
     <span class="s2">"missing_warning"</span><span class="p">,</span>
+    <span class="s2">"unknown_option_error"</span><span class="p">,</span>
 <span class="p">]</span>
 </code></pre></div>
 

@@ -19,7 +19,7 @@
     
   
       
-        <title>linearmodels.iv.common - linearmodels v7.1 (+391)</title>
+        <title>linearmodels.iv.common - linearmodels v7.1 (+399)</title>
       
     
 
@@ -91,7 +91,7 @@
 
 <header class="md-header md-header--shadow" data-md-component="header">
   <nav class="md-header__inner md-grid" aria-label="Header">
-    <a href="../../../index.html" title="linearmodels v7.1 (+391)" class="md-header__button md-logo" aria-label="linearmodels v7.1 (+391)" data-md-component="logo">
+    <a href="../../../index.html" title="linearmodels v7.1 (+399)" class="md-header__button md-logo" aria-label="linearmodels v7.1 (+399)" data-md-component="logo">
       <img src="../../../_static/bw-logo.svg" alt="logo">
     </a>
     <label class="md-header__button md-icon" for="__drawer">
@@ -102,7 +102,7 @@
       <div class="md-header__ellipsis">
         <div class="md-header__topic">
           <span class="md-ellipsis">
-            linearmodels v7.1 (+391)
+            linearmodels v7.1 (+399)
           </span>
         </div>
         <div class="md-header__topic" data-md-component="header-topic">
@@ -197,10 +197,10 @@
 
 <nav class="md-nav md-nav--primary" aria-label="Navigation" data-md-level="0">
   <label class="md-nav__title" for="__drawer">
-    <a href="../../../index.html" title="linearmodels v7.1 (+391)" class="md-nav__button md-logo" aria-label="linearmodels v7.1 (+391)" data-md-component="logo">
+    <a href="../../../index.html" title="linearmodels v7.1 (+399)" class="md-nav__button md-logo" aria-label="linearmodels v7.1 (+399)" data-md-component="logo">
       <img src="../../../_static/bw-logo.svg" alt="logo">
     </a>
-    linearmodels v7.1 (+391)
+    linearmodels v7.1 (+399)
   </label>
   
     <div class="md-nav__source">
@@ -555,6 +555,7 @@
     <span class="n">KernelWeightMatrix</span><span class="p">,</span>
     <span class="n">OneWayClusteredWeightMatrix</span><span class="p">,</span>
 <span class="p">)</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">linearmodels.shared.exceptions</span><span class="w"> </span><span class="kn">import</span> <span class="n">unknown_option_error</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">linearmodels.shared.hypotheses</span><span class="w"> </span><span class="kn">import</span> <span class="n">InvalidTestStatistic</span><span class="p">,</span> <span class="n">WaldTestStatistic</span>
 <span class="kn">import</span><span class="w"> </span><span class="nn">linearmodels.typing.data</span>
 
@@ -583,7 +584,8 @@
     <span class="k">for</span> <span class="n">family</span><span class="p">,</span> <span class="n">aliases</span> <span class="ow">in</span> <span class="n">_COV_FAMILIES</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
         <span class="k">if</span> <span class="n">name</span> <span class="ow">in</span> <span class="n">aliases</span><span class="p">:</span>
             <span class="k">return</span> <span class="n">family</span>
-    <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s2">"Unsupported cov_type: </span><span class="si">{</span><span class="n">cov_type</span><span class="si">}</span><span class="s2">"</span><span class="p">)</span>
+    <span class="n">supported</span> <span class="o">=</span> <span class="p">[</span><span class="n">alias</span> <span class="k">for</span> <span class="n">aliases</span> <span class="ow">in</span> <span class="n">_COV_FAMILIES</span><span class="o">.</span><span class="n">values</span><span class="p">()</span> <span class="k">for</span> <span class="n">alias</span> <span class="ow">in</span> <span class="n">aliases</span><span class="p">]</span>
+    <span class="k">raise</span> <span class="n">unknown_option_error</span><span class="p">(</span><span class="s2">"cov_type"</span><span class="p">,</span> <span class="n">cov_type</span><span class="p">,</span> <span class="n">supported</span><span class="p">)</span>
 
 
 <span class="k">def</span><span class="w"> </span><span class="nf">find_constant</span><span class="p">(</span><span class="n">x</span><span class="p">:</span> <span class="n">linearmodels</span><span class="o">.</span><span class="n">typing</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">Float64Array</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">int</span> <span class="o">|</span> <span class="kc">None</span><span class="p">:</span>
