@@ -1655,8 +1655,8 @@ class IV3SLS(_LSSystemModelBase):
         dependent_ivd = IVData(dependent, var_name="dependent")
         if exog is None and endog is None:
             raise ValueError("At least one of exog or endog must be provided")
-        exog_ivd = IVData(exog, var_name="exog")
         nobs = dependent_ivd.shape[0]
+        exog_ivd = IVData(exog, var_name="exog", nobs=nobs)
         endog_ivd = IVData(endog, var_name="endog", nobs=nobs)
         instr_ivd = IVData(instruments, var_name="instruments", nobs=nobs)
         for col in dependent_ivd.pandas:
