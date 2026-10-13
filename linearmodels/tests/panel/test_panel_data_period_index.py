@@ -6,8 +6,6 @@ so that the results are those of a panel with a DatetimeIndex. A PeriodIndex was
 rejected, with the error that the time labels must be numeric or date-like.
 """
 
-import warnings
-
 import numpy as np
 from numpy.testing import assert_allclose
 import pandas as pd
@@ -132,10 +130,8 @@ def fit_model(model, frame, cov):
 @pytest.mark.parametrize("unbalanced", [False, True], ids=["balanced", "unbalanced"])
 def test_period_index_equals_datetime_index(model, cov, unbalanced):
     periods, stamps = period_and_timestamp_frames(unbalanced)
-    with warnings.catch_warnings():
-        warnings.simplefilter("ignore")
-        res = fit_model(model, periods, cov)
-        expected = fit_model(model, stamps, cov)
+    res = fit_model(model, periods, cov)
+    expected = fit_model(model, stamps, cov)
     assert_equal_results(res, expected)
     access_attributes(res)
 
