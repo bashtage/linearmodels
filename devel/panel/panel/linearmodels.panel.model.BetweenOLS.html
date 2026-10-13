@@ -23,7 +23,7 @@
     
   
       
-        <title>linearmodels.panel.model.BetweenOLS - linearmodels v7.1 (+446)</title>
+        <title>linearmodels.panel.model.BetweenOLS - linearmodels v7.1 (+460)</title>
       
     
 
@@ -100,7 +100,7 @@
 
 <header class="md-header md-header--shadow" data-md-component="header">
   <nav class="md-header__inner md-grid" aria-label="Header">
-    <a href="../../index.html" title="linearmodels v7.1 (+446)" class="md-header__button md-logo" aria-label="linearmodels v7.1 (+446)" data-md-component="logo">
+    <a href="../../index.html" title="linearmodels v7.1 (+460)" class="md-header__button md-logo" aria-label="linearmodels v7.1 (+460)" data-md-component="logo">
       <img src="../../_static/bw-logo.svg" alt="logo">
     </a>
     <label class="md-header__button md-icon" for="__drawer">
@@ -111,7 +111,7 @@
       <div class="md-header__ellipsis">
         <div class="md-header__topic">
           <span class="md-ellipsis">
-            linearmodels v7.1 (+446)
+            linearmodels v7.1 (+460)
           </span>
         </div>
         <div class="md-header__topic" data-md-component="header-topic">
@@ -206,10 +206,10 @@
 
 <nav class="md-nav md-nav--primary" aria-label="Navigation" data-md-level="0">
   <label class="md-nav__title" for="__drawer">
-    <a href="../../index.html" title="linearmodels v7.1 (+446)" class="md-nav__button md-logo" aria-label="linearmodels v7.1 (+446)" data-md-component="logo">
+    <a href="../../index.html" title="linearmodels v7.1 (+460)" class="md-nav__button md-logo" aria-label="linearmodels v7.1 (+460)" data-md-component="logo">
       <img src="../../_static/bw-logo.svg" alt="logo">
     </a>
-    linearmodels v7.1 (+446)
+    linearmodels v7.1 (+460)
   </label>
   
     <div class="md-nav__source">
@@ -1635,7 +1635,10 @@ The weights must be strictly positive and finite. They are rescaled to have a
 mean of 1. A NaN weight is missing, and its observation is dropped.
 Weights with labels must use the same labels, in the same order,
 as dependent or, if dependent has no labels, as exog. See
-<a class="reference internal" href="../faq.html#panel-input-alignment"><span class="std std-ref">Aligning Inputs</span></a>.</p>
+<a class="reference internal" href="../faq.html#panel-input-alignment"><span class="std std-ref">Aligning Inputs</span></a>.
+Dependent need not be balanced when the weights are given for each time
+period, entity or combination: the weights of the combinations that
+dependent does not have are not used.</p>
 </dd>
 </dl>
 </dd>
@@ -1645,6 +1648,11 @@ as dependent or, if dependent has no labels, as exog. See
 <div class="math notranslate nohighlight">
 \[\bar{y}_{i}=  \beta^{\prime}\bar{x}_{i}+\bar{\epsilon}_{i}\]</div>
 <p>where <span class="math notranslate nohighlight">\(\bar{z}\)</span> is the time-average.</p>
+<div class="admonition versionchanged">
+<p class="admonition-title"><span class="versionmodified changed">Changed in version 7.1: </span><code class="docutils literal notranslate"><span class="pre">weights</span></code> for each time period, each entity or each time period and
+entity can be used if <code class="docutils literal notranslate"><span class="pre">dependent</span></code> is not balanced. Earlier versions
+raised “weights must have the same number of observations as dependent”.</p>
+</div>
 <p class="rubric">Methods</p>
 <table class="autosummary longtable docutils data align-default">
 <tbody>

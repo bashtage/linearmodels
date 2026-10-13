@@ -23,7 +23,7 @@
     
   
       
-        <title>linearmodels.panel.model.BetweenOLS.fit - linearmodels v7.1 (+446)</title>
+        <title>linearmodels.panel.model.BetweenOLS.fit - linearmodels v7.1 (+460)</title>
       
     
 
@@ -100,7 +100,7 @@
 
 <header class="md-header md-header--shadow" data-md-component="header">
   <nav class="md-header__inner md-grid" aria-label="Header">
-    <a href="../../index.html" title="linearmodels v7.1 (+446)" class="md-header__button md-logo" aria-label="linearmodels v7.1 (+446)" data-md-component="logo">
+    <a href="../../index.html" title="linearmodels v7.1 (+460)" class="md-header__button md-logo" aria-label="linearmodels v7.1 (+460)" data-md-component="logo">
       <img src="../../_static/bw-logo.svg" alt="logo">
     </a>
     <label class="md-header__button md-icon" for="__drawer">
@@ -111,7 +111,7 @@
       <div class="md-header__ellipsis">
         <div class="md-header__topic">
           <span class="md-ellipsis">
-            linearmodels v7.1 (+446)
+            linearmodels v7.1 (+460)
           </span>
         </div>
         <div class="md-header__topic" data-md-component="header-topic">
@@ -206,10 +206,10 @@
 
 <nav class="md-nav md-nav--primary" aria-label="Navigation" data-md-level="0">
   <label class="md-nav__title" for="__drawer">
-    <a href="../../index.html" title="linearmodels v7.1 (+446)" class="md-nav__button md-logo" aria-label="linearmodels v7.1 (+446)" data-md-component="logo">
+    <a href="../../index.html" title="linearmodels v7.1 (+460)" class="md-nav__button md-logo" aria-label="linearmodels v7.1 (+460)" data-md-component="logo">
       <img src="../../_static/bw-logo.svg" alt="logo">
     </a>
-    linearmodels v7.1 (+446)
+    linearmodels v7.1 (+460)
   </label>
   
     <div class="md-nav__source">
@@ -1635,6 +1635,12 @@ a pandas object or PanelData with the index of <code class="docutils literal not
 array or list with a value for each row of <code class="docutils literal notranslate"><span class="pre">dependent</span></code> in the
 order of its rows, or an array or list with the layout of
 <code class="docutils literal notranslate"><span class="pre">dependent</span></code> (time by entity, or variable by time by entity).
+An array or list with the layout, or a DataFrame with the time
+periods as its index and the entities as its columns, has a value
+for each time period and entity. It is placed on the rows of
+<code class="docutils literal notranslate"><span class="pre">dependent</span></code>, which need not be balanced: the values of the
+combinations that <code class="docutils literal notranslate"><span class="pre">dependent</span></code> does not have are not used. See
+<a class="reference internal" href="../faq.html#panel-input-alignment"><span class="std std-ref">Aligning Inputs</span></a>.
 Clusters should be integer values, although other types will
 be coerced to integer values by treating as categorical variables</p></li>
 <li><p><code class="docutils literal notranslate"><span class="pre">group_debias</span></code> - Boolean flag indicating whether to apply an
@@ -1651,6 +1657,17 @@ identical within an entity.</p>
 <p><code class="docutils literal notranslate"><span class="pre">debiased=True</span></code>, which is the default, scales the covariance by
 n / (n - k), where k is the number of regressors, and uses the t and
 F distributions for inference. See <a class="reference internal" href="../faq.html#panel-small-sample"><span class="std std-ref">Small-sample Adjustments</span></a>.</p>
+<div class="admonition versionchanged">
+<p class="admonition-title"><span class="versionmodified changed">Changed in version 7.1: </span><code class="docutils literal notranslate"><span class="pre">clusters</span></code> with the layout of <code class="docutils literal notranslate"><span class="pre">dependent</span></code> (time by entity, or
+variable by time by entity) can be used if <code class="docutils literal notranslate"><span class="pre">dependent</span></code> is not
+balanced. It raised <code class="docutils literal notranslate"><span class="pre">IndexError:</span> <span class="pre">Boolean</span> <span class="pre">index</span> <span class="pre">has</span> <span class="pre">wrong</span> <span class="pre">length</span></code>.
+It is placed on the rows of <code class="docutils literal notranslate"><span class="pre">dependent</span></code> by time period and entity.
+Earlier versions paired it by position with the rows, which is right
+only if the rows are sorted by entity and then time: if they were sorted
+by time and then entity, an array was attached to the wrong
+observations without an error, and a pandas object with labels was
+rejected.</p>
+</div>
 </dd></dl>
 
 

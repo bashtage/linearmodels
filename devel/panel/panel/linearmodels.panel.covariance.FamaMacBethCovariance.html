@@ -23,7 +23,7 @@
     
   
       
-        <title>linearmodels.panel.covariance.FamaMacBethCovariance - linearmodels v7.1 (+446)</title>
+        <title>linearmodels.panel.covariance.FamaMacBethCovariance - linearmodels v7.1 (+460)</title>
       
     
 
@@ -100,7 +100,7 @@
 
 <header class="md-header md-header--shadow" data-md-component="header">
   <nav class="md-header__inner md-grid" aria-label="Header">
-    <a href="../../index.html" title="linearmodels v7.1 (+446)" class="md-header__button md-logo" aria-label="linearmodels v7.1 (+446)" data-md-component="logo">
+    <a href="../../index.html" title="linearmodels v7.1 (+460)" class="md-header__button md-logo" aria-label="linearmodels v7.1 (+460)" data-md-component="logo">
       <img src="../../_static/bw-logo.svg" alt="logo">
     </a>
     <label class="md-header__button md-icon" for="__drawer">
@@ -111,7 +111,7 @@
       <div class="md-header__ellipsis">
         <div class="md-header__topic">
           <span class="md-ellipsis">
-            linearmodels v7.1 (+446)
+            linearmodels v7.1 (+460)
           </span>
         </div>
         <div class="md-header__topic" data-md-component="header-topic">
@@ -206,10 +206,10 @@
 
 <nav class="md-nav md-nav--primary" aria-label="Navigation" data-md-level="0">
   <label class="md-nav__title" for="__drawer">
-    <a href="../../index.html" title="linearmodels v7.1 (+446)" class="md-nav__button md-logo" aria-label="linearmodels v7.1 (+446)" data-md-component="logo">
+    <a href="../../index.html" title="linearmodels v7.1 (+460)" class="md-nav__button md-logo" aria-label="linearmodels v7.1 (+460)" data-md-component="logo">
       <img src="../../_static/bw-logo.svg" alt="logo">
     </a>
-    linearmodels v7.1 (+446)
+    linearmodels v7.1 (+460)
   </label>
   
     <div class="md-nav__source">
@@ -1821,10 +1821,15 @@ kernel.</p>
 </dl>
 </dd>
 <dt class="field-even" id="linearmodels.panel.covariance.FamaMacBethCovariance-raises">Raises<span class="colon">:</span><a class="headerlink" href="#linearmodels.panel.covariance.FamaMacBethCovariance-raises" title="Permalink to this headline">¶</a></dt>
-<dd class="field-even"><p><a class="reference external" href="https://docs.python.org/3/builtins/exceptions.html#ValueError" title="(in Python v3.15)"><strong>ValueError</strong></a> – If the bandwidth is not below the number of time periods that are used.
+<dd class="field-even"><ul class="simple">
+<li><p><a class="reference external" href="https://docs.python.org/3/builtins/exceptions.html#ValueError" title="(in Python v3.15)"><strong>ValueError</strong></a> – If the bandwidth is not below the number of time periods that are used.
     It is also raised if the bandwidth is not provided and there are fewer
     time periods than the kernel needs to compute it, or if the bandwidth
-    that is computed is not finite.</p>
+    that is computed is not finite.</p></li>
+<li><p><a class="reference internal" href="../../utility.html#linearmodels.shared.exceptions.UnknownOptionError" title="linearmodels.shared.exceptions.UnknownOptionError (Python class) — Bases: ValueError, KeyError"><strong>UnknownOptionError</strong></a> – If <code class="docutils literal notranslate"><span class="pre">kernel</span></code> is not one of the supported names, whether or not the
+    covariance is a kernel covariance. It is both a <code class="docutils literal notranslate"><span class="pre">ValueError</span></code> and a
+    <code class="docutils literal notranslate"><span class="pre">KeyError</span></code>.</p></li>
+</ul>
 </dd>
 </dl>
 <p class="rubric">Notes</p>
@@ -1855,6 +1860,14 @@ raised “cannot convert float infinity to integer” (an <code class="docutils 
 “cannot convert float NaN to integer” when the covariance was first used,
 or used a bandwidth of <span class="math notranslate nohighlight">\(T-1\)</span> because of the rounding error of the
 sum.</p>
+</div>
+<div class="admonition versionchanged">
+<p class="admonition-title"><span class="versionmodified changed">Changed in version 7.1: </span>A <code class="docutils literal notranslate"><span class="pre">kernel</span></code> that is not one of the supported names raises an
+<code class="docutils literal notranslate"><span class="pre">UnknownOptionError</span></code> when the estimator is created, so that the <code class="docutils literal notranslate"><span class="pre">fit</span></code>
+method of the model raises, also if the bandwidth is given. Earlier versions
+raised it when the covariance was first used, for example when <code class="docutils literal notranslate"><span class="pre">std_errors</span></code>
+of the results was read, so that <code class="docutils literal notranslate"><span class="pre">fit</span></code> returned results that raised when
+the covariance was used.</p>
 </div>
 <p class="rubric">Methods</p>
 <table class="autosummary longtable docutils data align-default">

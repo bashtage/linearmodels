@@ -19,7 +19,7 @@
     
   
       
-        <title>linearmodels.panel.model - linearmodels v7.1 (+446)</title>
+        <title>linearmodels.panel.model - linearmodels v7.1 (+460)</title>
       
     
 
@@ -91,7 +91,7 @@
 
 <header class="md-header md-header--shadow" data-md-component="header">
   <nav class="md-header__inner md-grid" aria-label="Header">
-    <a href="../../../index.html" title="linearmodels v7.1 (+446)" class="md-header__button md-logo" aria-label="linearmodels v7.1 (+446)" data-md-component="logo">
+    <a href="../../../index.html" title="linearmodels v7.1 (+460)" class="md-header__button md-logo" aria-label="linearmodels v7.1 (+460)" data-md-component="logo">
       <img src="../../../_static/bw-logo.svg" alt="logo">
     </a>
     <label class="md-header__button md-icon" for="__drawer">
@@ -102,7 +102,7 @@
       <div class="md-header__ellipsis">
         <div class="md-header__topic">
           <span class="md-ellipsis">
-            linearmodels v7.1 (+446)
+            linearmodels v7.1 (+460)
           </span>
         </div>
         <div class="md-header__topic" data-md-component="header-topic">
@@ -197,10 +197,10 @@
 
 <nav class="md-nav md-nav--primary" aria-label="Navigation" data-md-level="0">
   <label class="md-nav__title" for="__drawer">
-    <a href="../../../index.html" title="linearmodels v7.1 (+446)" class="md-nav__button md-logo" aria-label="linearmodels v7.1 (+446)" data-md-component="logo">
+    <a href="../../../index.html" title="linearmodels v7.1 (+460)" class="md-nav__button md-logo" aria-label="linearmodels v7.1 (+460)" data-md-component="logo">
       <img src="../../../_static/bw-logo.svg" alt="logo">
     </a>
-    linearmodels v7.1 (+446)
+    linearmodels v7.1 (+460)
   </label>
   
     <div class="md-nav__source">
@@ -933,6 +933,93 @@
     <span class="k">return</span> <span class="n">is_labelled</span><span class="p">(</span><span class="n">value</span><span class="p">,</span> <span class="n">columns</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
 
 
+<span class="k">def</span><span class="w"> </span><span class="nf">_is_grid</span><span class="p">(</span><span class="n">value</span><span class="p">:</span> <span class="nb">object</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">"""Whether a panel input has a value for each time period and entity.</span>
+
+<span class="sd">    Such an input is a grid, with the time periods as its rows and the entities as</span>
+<span class="sd">    its columns: a NumPy array with 2 dimensions (time by entity) or 3 dimensions</span>
+<span class="sd">    (variable by time by entity), a DataFrame that does not have a MultiIndex, or</span>
+<span class="sd">    a DataArray. A 1-d array, a Series or a DataFrame with a MultiIndex, and a</span>
+<span class="sd">    PanelData, have a value for each row of dependent instead.</span>
+<span class="sd">    """</span>
+    <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">value</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">):</span>
+        <span class="k">return</span> <span class="n">value</span><span class="o">.</span><span class="n">ndim</span> <span class="o">!=</span> <span class="mi">1</span>
+    <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">value</span><span class="p">,</span> <span class="n">DataFrame</span><span class="p">):</span>
+        <span class="k">return</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">value</span><span class="o">.</span><span class="n">index</span><span class="p">,</span> <span class="n">MultiIndex</span><span class="p">)</span>
+    <span class="k">return</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">value</span><span class="p">,</span> <span class="p">(</span><span class="n">Series</span><span class="p">,</span> <span class="n">PanelData</span><span class="p">))</span>
+
+
+<span class="k">def</span><span class="w"> </span><span class="nf">_grid_axis</span><span class="p">(</span><span class="n">labels</span><span class="p">:</span> <span class="n">Index</span><span class="p">,</span> <span class="n">groups</span><span class="p">:</span> <span class="n">Index</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Index</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">"""The distinct labels of one axis of a grid, in the order of the grid.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    labels : Index</span>
+<span class="sd">        The label of this axis for each row of a panel, e.g., the time periods.</span>
+<span class="sd">    groups : Index</span>
+<span class="sd">        The label of the other axis for each row, e.g., the entities.</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    Index</span>
+<span class="sd">        The distinct labels in the order of the grid. If the rows of every group</span>
+<span class="sd">        have the labels in ascending order, it is the ascending order of the</span>
+<span class="sd">        labels, and if they are in descending order it is the descending order.</span>
+<span class="sd">        Otherwise it is the order in which the labels first appear in the rows.</span>
+
+<span class="sd">    Notes</span>
+<span class="sd">    -----</span>
+<span class="sd">    The order of first appearance is the order of the labels if the rows are sorted</span>
+<span class="sd">    and the panel is balanced, whether the rows are sorted by group and then label</span>
+<span class="sd">    or by label and then group. It is not if the panel is not balanced and the first</span>
+<span class="sd">    groups do not have the first labels, e.g., the first entity enters late and the</span>
+<span class="sd">    rows are sorted by entity. The sorted order is used then. If the panel is</span>
+<span class="sd">    balanced and the rows of every group are in order of the labels, they first</span>
+<span class="sd">    appear in the same order, so that the rows are not examined.</span>
+<span class="sd">    """</span>
+    <span class="n">appearance</span> <span class="o">=</span> <span class="n">labels</span><span class="o">.</span><span class="n">unique</span><span class="p">()</span>
+    <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">labels</span><span class="p">)</span> <span class="o">==</span> <span class="nb">len</span><span class="p">(</span><span class="n">appearance</span><span class="p">)</span> <span class="o">*</span> <span class="nb">len</span><span class="p">(</span><span class="n">groups</span><span class="o">.</span><span class="n">unique</span><span class="p">()):</span>
+        <span class="k">return</span> <span class="n">appearance</span>
+    <span class="k">try</span><span class="p">:</span>
+        <span class="n">codes</span><span class="p">,</span> <span class="n">ordered</span> <span class="o">=</span> <span class="n">factorize</span><span class="p">(</span><span class="n">labels</span><span class="p">,</span> <span class="n">sort</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+    <span class="k">except</span> <span class="ne">TypeError</span><span class="p">:</span>
+        <span class="c1"># The labels cannot be ordered</span>
+        <span class="k">return</span> <span class="n">appearance</span>
+    <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">ordered</span><span class="p">)</span> <span class="o">!=</span> <span class="nb">len</span><span class="p">(</span><span class="n">appearance</span><span class="p">):</span>
+        <span class="k">return</span> <span class="n">appearance</span>
+    <span class="n">group_codes</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">asarray</span><span class="p">(</span><span class="n">factorize</span><span class="p">(</span><span class="n">groups</span><span class="p">)[</span><span class="mi">0</span><span class="p">])</span>
+    <span class="n">rows</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">argsort</span><span class="p">(</span><span class="n">group_codes</span><span class="p">,</span> <span class="n">kind</span><span class="o">=</span><span class="s2">"stable"</span><span class="p">)</span>
+    <span class="n">group_codes</span><span class="p">,</span> <span class="n">codes</span> <span class="o">=</span> <span class="n">group_codes</span><span class="p">[</span><span class="n">rows</span><span class="p">],</span> <span class="n">np</span><span class="o">.</span><span class="n">asarray</span><span class="p">(</span><span class="n">codes</span><span class="p">)[</span><span class="n">rows</span><span class="p">]</span>
+    <span class="c1"># The steps between the rows of a group, which are in the order of the rows</span>
+    <span class="n">steps</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">diff</span><span class="p">(</span><span class="n">codes</span><span class="p">)[</span><span class="n">group_codes</span><span class="p">[</span><span class="mi">1</span><span class="p">:]</span> <span class="o">==</span> <span class="n">group_codes</span><span class="p">[:</span><span class="o">-</span><span class="mi">1</span><span class="p">]]</span>
+    <span class="k">if</span> <span class="n">np</span><span class="o">.</span><span class="n">all</span><span class="p">(</span><span class="n">steps</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">):</span>
+        <span class="k">return</span> <span class="n">ordered</span>
+    <span class="k">if</span> <span class="n">np</span><span class="o">.</span><span class="n">all</span><span class="p">(</span><span class="n">steps</span> <span class="o">&lt;</span> <span class="mi">0</span><span class="p">):</span>
+        <span class="k">return</span> <span class="n">ordered</span><span class="p">[::</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span>
+    <span class="k">return</span> <span class="n">appearance</span>
+
+
+<span class="k">def</span><span class="w"> </span><span class="nf">_grid_axes</span><span class="p">(</span><span class="n">index</span><span class="p">:</span> <span class="n">Index</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">tuple</span><span class="p">[</span><span class="n">Index</span><span class="p">,</span> <span class="n">Index</span><span class="p">]:</span>
+<span class="w">    </span><span class="sd">"""The entities and time periods in the order of a grid placed on the rows.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    index : Index</span>
+<span class="sd">        The rows of a panel, a MultiIndex with the entities in the first level and</span>
+<span class="sd">        the time periods in the second.</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    entities : Index</span>
+<span class="sd">        The distinct entities, which are the columns of the grid.</span>
+<span class="sd">    times : Index</span>
+<span class="sd">        The distinct time periods, which are the rows of the grid.</span>
+<span class="sd">    """</span>
+    <span class="n">entities</span> <span class="o">=</span> <span class="n">index</span><span class="o">.</span><span class="n">get_level_values</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>
+    <span class="n">times</span> <span class="o">=</span> <span class="n">index</span><span class="o">.</span><span class="n">get_level_values</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">_grid_axis</span><span class="p">(</span><span class="n">entities</span><span class="p">,</span> <span class="n">times</span><span class="p">),</span> <span class="n">_grid_axis</span><span class="p">(</span><span class="n">times</span><span class="p">,</span> <span class="n">entities</span><span class="p">)</span>
+
+
 <span class="k">class</span><span class="w"> </span><span class="nc">_PanelModelBase</span><span class="p">:</span>
 <span class="w">    </span><span class="sa">r</span><span class="sd">"""</span>
 <span class="sd">    Base class for all panel models</span>
@@ -963,6 +1050,9 @@
 <span class="sd">        Weights with labels must use the same labels, in the same order,</span>
 <span class="sd">        as dependent or, if dependent has no labels, as exog. See</span>
 <span class="sd">        :ref:`panel-input-alignment`.</span>
+<span class="sd">        Dependent need not be balanced when the weights are given for each time</span>
+<span class="sd">        period, entity or combination: the weights of the combinations that</span>
+<span class="sd">        dependent does not have are not used.</span>
 <span class="sd">    check_rank : bool</span>
 <span class="sd">        Flag indicating whether to perform a rank check on the exogenous</span>
 <span class="sd">        variables to ensure that the model is identified. Skipping this</span>
@@ -988,6 +1078,10 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">_check_labels</span><span class="p">(</span><span class="s2">"dependent"</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">dependent</span><span class="o">.</span><span class="n">index</span><span class="p">,</span> <span class="n">_is_labelled</span><span class="p">(</span><span class="n">dependent</span><span class="p">))</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_check_labels</span><span class="p">(</span><span class="s2">"exog"</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">exog</span><span class="o">.</span><span class="n">index</span><span class="p">,</span> <span class="n">_is_labelled</span><span class="p">(</span><span class="n">exog</span><span class="p">))</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_original_shape</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">dependent</span><span class="o">.</span><span class="n">shape</span>
+        <span class="c1"># The rows of dependent, before the observations with missing values are</span>
+        <span class="c1"># dropped. The inputs that are given for each time period and entity are</span>
+        <span class="c1"># placed on these rows</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_original_index</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">dependent</span><span class="o">.</span><span class="n">index</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_constant</span> <span class="o">=</span> <span class="kc">False</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_formula</span><span class="p">:</span> <span class="nb">str</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_is_weighted</span> <span class="o">=</span> <span class="kc">True</span>
@@ -1004,7 +1098,6 @@
             <span class="n">DriscollKraay</span><span class="p">,</span>
             <span class="n">ACCovariance</span><span class="p">,</span>
         <span class="p">)</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">_original_index</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">dependent</span><span class="o">.</span><span class="n">index</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_constant_index</span><span class="p">:</span> <span class="nb">int</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_check_rank</span> <span class="o">=</span> <span class="nb">bool</span><span class="p">(</span><span class="n">check_rank</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_validate_data</span><span class="p">()</span>
@@ -1112,6 +1205,12 @@
 <span class="sd">        clusters : array_like</span>
 <span class="sd">            Values to use for variance clustering. A 1-d array has one value</span>
 <span class="sd">            for each row of dependent, in the order of the rows of dependent.</span>
+<span class="sd">            A 2-d array (time by entity), a 3-d array (variable by time by</span>
+<span class="sd">            entity), a DataFrame with the time periods as its index and the</span>
+<span class="sd">            entities as its columns and a DataArray have a value for each</span>
+<span class="sd">            time period and entity. They are placed on the rows of dependent,</span>
+<span class="sd">            which need not be balanced: the values of the time periods and</span>
+<span class="sd">            entities that dependent does not have are not used.</span>
 
 <span class="sd">        Returns</span>
 <span class="sd">        -------</span>
@@ -1119,9 +1218,39 @@
 <span class="sd">            Original data with matching axis and observation dropped where</span>
 <span class="sd">            missing in the model data.</span>
 
+<span class="sd">        Raises</span>
+<span class="sd">        ------</span>
+<span class="sd">        ValueError</span>
+<span class="sd">            If clusters does not have the numbers of entities and time periods of</span>
+<span class="sd">            dependent, or has labels that are not those of dependent in the same</span>
+<span class="sd">            order. A value for each time period and entity must have the time</span>
+<span class="sd">            periods and entities in the order that the Notes describe.</span>
+
 <span class="sd">        Notes</span>
 <span class="sd">        -----</span>
 <span class="sd">        This is exposed for testing and is not normally needed for estimation</span>
+
+<span class="sd">        The time periods and entities of a value for each time period and entity</span>
+<span class="sd">        are matched to those of dependent in the order in which they first appear</span>
+<span class="sd">        in the rows of dependent. If dependent is not balanced and the first entity</span>
+<span class="sd">        does not have the first periods, the periods of a panel that is sorted by</span>
+<span class="sd">        entity first appear in an order that is not their order in time. The time</span>
+<span class="sd">        periods are in order of time then, if the rows of every entity are in order</span>
+<span class="sd">        of time (in either direction), and the entities are in the order of their</span>
+<span class="sd">        labels if the rows of every time period are in order of the entities. A</span>
+<span class="sd">        pandas object or DataArray with labels must have the time periods and</span>
+<span class="sd">        entities in this order.</span>
+
+<span class="sd">        .. versionchanged:: 7.1</span>
+
+<span class="sd">           A value for each time period and entity can be used if dependent is</span>
+<span class="sd">           not balanced. It raised ``IndexError: Boolean index has wrong length``.</span>
+<span class="sd">           It is placed on the rows of dependent by time period and entity.</span>
+<span class="sd">           Earlier versions paired it by position with the rows of dependent, which</span>
+<span class="sd">           is right only if the rows are sorted by entity and then time. If they</span>
+<span class="sd">           were sorted by time and then entity, an array was attached to the wrong</span>
+<span class="sd">           observations without an error, and a pandas object with labels was</span>
+<span class="sd">           rejected.</span>
 <span class="sd">        """</span>
         <span class="n">clusters</span> <span class="o">=</span> <span class="n">as_array_like</span><span class="p">(</span><span class="n">clusters</span><span class="p">,</span> <span class="s2">"clusters"</span><span class="p">)</span>
         <span class="n">labelled</span> <span class="o">=</span> <span class="n">_is_labelled</span><span class="p">(</span><span class="n">clusters</span><span class="p">)</span>
@@ -1131,7 +1260,13 @@
                 <span class="s2">"clusters must have the same number of entities "</span>
                 <span class="s2">"and time periods as the model data."</span>
             <span class="p">)</span>
-        <span class="k">if</span> <span class="n">labelled</span> <span class="ow">and</span> <span class="bp">self</span><span class="o">.</span><span class="n">_labels</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="k">if</span> <span class="n">_is_grid</span><span class="p">(</span><span class="n">clusters</span><span class="p">):</span>
+            <span class="c1"># Compared with the labels of the model if it has any. Unlike the other</span>
+            <span class="c1"># inputs, the clusters never set the labels, as they are given to fit</span>
+            <span class="n">clusters_pd</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_grid_to_rows</span><span class="p">(</span>
+                <span class="n">clusters_pd</span><span class="p">,</span> <span class="n">labelled</span> <span class="ow">and</span> <span class="bp">self</span><span class="o">.</span><span class="n">_labels</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">,</span> <span class="s2">"clusters"</span>
+            <span class="p">)</span>
+        <span class="k">elif</span> <span class="n">labelled</span> <span class="ow">and</span> <span class="bp">self</span><span class="o">.</span><span class="n">_labels</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
             <span class="n">check_row_alignment</span><span class="p">(</span>
                 <span class="s2">"clusters"</span><span class="p">,</span> <span class="n">clusters_pd</span><span class="o">.</span><span class="n">index</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_labels</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_labels_name</span>
             <span class="p">)</span>
@@ -1184,16 +1319,13 @@
         <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">weights</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">):</span>
             <span class="n">weights</span> <span class="o">=</span> <span class="n">as_float64</span><span class="p">(</span><span class="n">weights</span><span class="p">,</span> <span class="s2">"weights"</span><span class="p">)</span>
         <span class="n">nobs</span><span class="p">,</span> <span class="n">nentity</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">exog</span><span class="o">.</span><span class="n">nobs</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">exog</span><span class="o">.</span><span class="n">nentity</span>
-        <span class="n">index</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">dependent</span><span class="o">.</span><span class="n">index</span>
-        <span class="n">entities</span> <span class="o">=</span> <span class="n">index</span><span class="o">.</span><span class="n">get_level_values</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span><span class="o">.</span><span class="n">unique</span><span class="p">()</span>
-        <span class="n">times</span> <span class="o">=</span> <span class="n">index</span><span class="o">.</span><span class="n">get_level_values</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span><span class="o">.</span><span class="n">unique</span><span class="p">()</span>
+        <span class="n">entities</span><span class="p">,</span> <span class="n">times</span> <span class="o">=</span> <span class="n">_grid_axes</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">dependent</span><span class="o">.</span><span class="n">index</span><span class="p">)</span>
         <span class="n">labelled</span> <span class="o">=</span> <span class="n">_is_labelled</span><span class="p">(</span><span class="n">weights</span><span class="p">)</span>
         <span class="c1"># Weights for each time period or entity have to use the time periods or</span>
         <span class="c1"># entities of the inputs with labels, if there are any</span>
         <span class="n">reference</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_labels</span>
         <span class="k">if</span> <span class="n">reference</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
-            <span class="n">ref_entities</span> <span class="o">=</span> <span class="n">reference</span><span class="o">.</span><span class="n">get_level_values</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span><span class="o">.</span><span class="n">unique</span><span class="p">()</span>
-            <span class="n">ref_times</span> <span class="o">=</span> <span class="n">reference</span><span class="o">.</span><span class="n">get_level_values</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span><span class="o">.</span><span class="n">unique</span><span class="p">()</span>
+            <span class="n">ref_entities</span><span class="p">,</span> <span class="n">ref_times</span> <span class="o">=</span> <span class="n">_grid_axes</span><span class="p">(</span><span class="n">reference</span><span class="p">)</span>
 
         <span class="k">if</span> <span class="n">weights</span><span class="o">.</span><span class="n">ndim</span> <span class="o">==</span> <span class="mi">3</span> <span class="ow">or</span> <span class="n">weights</span><span class="o">.</span><span class="n">shape</span> <span class="o">==</span> <span class="p">(</span><span class="n">nobs</span><span class="p">,</span> <span class="n">nentity</span><span class="p">):</span>
             <span class="n">panel</span> <span class="o">=</span> <span class="n">_panel_data</span><span class="p">(</span><span class="n">weights</span><span class="p">,</span> <span class="s2">"weights"</span><span class="p">,</span> <span class="s2">"x"</span><span class="p">)</span>
@@ -1248,7 +1380,9 @@
             <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">"Weights do not have a supported shape."</span><span class="p">)</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_grid_to_rows</span><span class="p">(</span><span class="n">PanelData</span><span class="p">(</span><span class="n">grid</span><span class="p">),</span> <span class="kc">False</span><span class="p">)</span>
 
-    <span class="k">def</span><span class="w"> </span><span class="nf">_grid_to_rows</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">grid</span><span class="p">:</span> <span class="n">PanelData</span><span class="p">,</span> <span class="n">labelled</span><span class="p">:</span> <span class="nb">bool</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">PanelData</span><span class="p">:</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">_grid_to_rows</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span> <span class="n">grid</span><span class="p">:</span> <span class="n">PanelData</span><span class="p">,</span> <span class="n">labelled</span><span class="p">:</span> <span class="nb">bool</span><span class="p">,</span> <span class="n">name</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">"weights"</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">PanelData</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">"""</span>
 <span class="sd">        Place values defined on a time by entity grid on the rows of dependent</span>
 
@@ -1260,40 +1394,43 @@
 <span class="sd">            Whether the grid carries labels, which have to match the entities and</span>
 <span class="sd">            time periods of the inputs with labels. If False, the position along</span>
 <span class="sd">            each axis of the grid is paired with the entities and time periods</span>
-<span class="sd">            of dependent in order of appearance.</span>
+<span class="sd">            of dependent in order of appearance, see ``_grid_axes``.</span>
+<span class="sd">        name : str, optional</span>
+<span class="sd">            The name of the input, which is used in the messages. The default is</span>
+<span class="sd">            "weights".</span>
 
 <span class="sd">        Returns</span>
 <span class="sd">        -------</span>
 <span class="sd">        PanelData</span>
-<span class="sd">            Values with the same rows as dependent. If dependent is not</span>
-<span class="sd">            balanced or the grid has the wrong shape then grid is returned</span>
-<span class="sd">            and the mismatch is reported when the data are validated.</span>
+<span class="sd">            Values with the rows of dependent, before the observations with</span>
+<span class="sd">            missing values were dropped. If dependent is not balanced, the values</span>
+<span class="sd">            of the combinations of a time period and an entity that it does not</span>
+<span class="sd">            have are not used. If the grid has the wrong shape then grid is</span>
+<span class="sd">            returned, and the caller reports the mismatch.</span>
 <span class="sd">        """</span>
-        <span class="n">index</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">dependent</span><span class="o">.</span><span class="n">index</span>
-        <span class="n">grid_index</span> <span class="o">=</span> <span class="n">MultiIndex</span><span class="o">.</span><span class="n">from_product</span><span class="p">(</span>
-            <span class="p">[</span><span class="n">index</span><span class="o">.</span><span class="n">get_level_values</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span><span class="o">.</span><span class="n">unique</span><span class="p">(),</span> <span class="n">index</span><span class="o">.</span><span class="n">get_level_values</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span><span class="o">.</span><span class="n">unique</span><span class="p">()]</span>
-        <span class="p">)</span>
+        <span class="n">index</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_original_index</span>
+        <span class="n">grid_index</span> <span class="o">=</span> <span class="n">MultiIndex</span><span class="o">.</span><span class="n">from_product</span><span class="p">(</span><span class="n">_grid_axes</span><span class="p">(</span><span class="n">index</span><span class="p">))</span>
         <span class="n">rows</span> <span class="o">=</span> <span class="n">grid</span><span class="o">.</span><span class="n">dataframe</span>
-        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">rows</span><span class="p">)</span> <span class="o">!=</span> <span class="nb">len</span><span class="p">(</span><span class="n">grid_index</span><span class="p">)</span> <span class="ow">or</span> <span class="nb">len</span><span class="p">(</span><span class="n">index</span><span class="p">)</span> <span class="o">!=</span> <span class="nb">len</span><span class="p">(</span><span class="n">grid_index</span><span class="p">):</span>
+        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">rows</span><span class="p">)</span> <span class="o">!=</span> <span class="nb">len</span><span class="p">(</span><span class="n">grid_index</span><span class="p">):</span>
             <span class="k">return</span> <span class="n">grid</span>
         <span class="k">if</span> <span class="n">labelled</span> <span class="ow">and</span> <span class="bp">self</span><span class="o">.</span><span class="n">_labels</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">_check_labels</span><span class="p">(</span><span class="s2">"weights"</span><span class="p">,</span> <span class="n">rows</span><span class="o">.</span><span class="n">index</span><span class="p">,</span> <span class="n">labelled</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_check_labels</span><span class="p">(</span><span class="n">name</span><span class="p">,</span> <span class="n">rows</span><span class="o">.</span><span class="n">index</span><span class="p">,</span> <span class="n">labelled</span><span class="p">)</span>
         <span class="k">elif</span> <span class="n">labelled</span><span class="p">:</span>
             <span class="k">assert</span> <span class="bp">self</span><span class="o">.</span><span class="n">_labels</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span>
             <span class="n">expected</span> <span class="o">=</span> <span class="n">MultiIndex</span><span class="o">.</span><span class="n">from_product</span><span class="p">(</span>
-                <span class="p">[</span>
-                    <span class="bp">self</span><span class="o">.</span><span class="n">_labels</span><span class="o">.</span><span class="n">get_level_values</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span><span class="o">.</span><span class="n">unique</span><span class="p">(),</span>
-                    <span class="bp">self</span><span class="o">.</span><span class="n">_labels</span><span class="o">.</span><span class="n">get_level_values</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span><span class="o">.</span><span class="n">unique</span><span class="p">(),</span>
-                <span class="p">]</span>
+                <span class="n">_grid_axes</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_labels</span><span class="p">),</span>
             <span class="p">)</span>
             <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">expected</span><span class="p">)</span> <span class="o">==</span> <span class="nb">len</span><span class="p">(</span><span class="n">rows</span><span class="p">)</span> <span class="ow">and</span> <span class="ow">not</span> <span class="n">same_labels</span><span class="p">(</span><span class="n">rows</span><span class="o">.</span><span class="n">index</span><span class="p">,</span> <span class="n">expected</span><span class="p">):</span>
                 <span class="k">raise</span> <span class="n">misaligned</span><span class="p">(</span>
-                    <span class="s2">"weights"</span><span class="p">,</span> <span class="s2">"The time and entity index"</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_labels_name</span>
+                    <span class="n">name</span><span class="p">,</span>
+                    <span class="s2">"The time and entity index"</span><span class="p">,</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">_labels_name</span><span class="p">,</span>
                 <span class="p">)</span>
         <span class="n">rows</span> <span class="o">=</span> <span class="n">rows</span><span class="o">.</span><span class="n">set_axis</span><span class="p">(</span><span class="n">grid_index</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
         <span class="k">if</span> <span class="ow">not</span> <span class="n">grid_index</span><span class="o">.</span><span class="n">equals</span><span class="p">(</span><span class="n">index</span><span class="p">):</span>
             <span class="n">rows</span> <span class="o">=</span> <span class="n">rows</span><span class="o">.</span><span class="n">reindex</span><span class="p">(</span><span class="n">index</span><span class="p">)</span>
-        <span class="k">return</span> <span class="n">PanelData</span><span class="p">(</span><span class="n">rows</span><span class="p">)</span>
+        <span class="c1"># Text and categories, e.g., the clusters, are not converted to dummy variables</span>
+        <span class="k">return</span> <span class="n">PanelData</span><span class="p">(</span><span class="n">rows</span><span class="p">,</span> <span class="n">convert_dummies</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
 
     <span class="k">def</span><span class="w"> </span><span class="nf">_check_exog_rank</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">int</span><span class="p">:</span>
         <span class="n">x</span> <span class="o">=</span> <span class="n">cast</span><span class="p">(</span><span class="s2">"linearmodels.typing.data.Float64Array"</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">exog</span><span class="o">.</span><span class="n">values2d</span><span class="p">)</span>
@@ -1716,8 +1853,10 @@
             <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_singleton_index</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
                 <span class="c1"># The clusters have a value for each observation that is not missing.</span>
                 <span class="c1"># The singletons are dropped from the data of the model, and so are</span>
-                <span class="c1"># the clusters that are made from it below, which do not need this</span>
-                <span class="n">clusters_frame</span> <span class="o">=</span> <span class="n">clusters_frame</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span><span class="o">~</span><span class="bp">self</span><span class="o">.</span><span class="n">_singleton_index</span><span class="p">]</span>
+                <span class="c1"># the clusters that are made from it below, which do not need this.</span>
+                <span class="c1"># The copy is not a slice of the frame, which the columns that are</span>
+                <span class="c1"># added below would be set on</span>
+                <span class="n">clusters_frame</span> <span class="o">=</span> <span class="n">clusters_frame</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span><span class="o">~</span><span class="bp">self</span><span class="o">.</span><span class="n">_singleton_index</span><span class="p">]</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
 
         <span class="n">cluster_entity</span> <span class="o">=</span> <span class="nb">bool</span><span class="p">(</span><span class="n">cov_config_upd</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="s2">"cluster_entity"</span><span class="p">,</span> <span class="kc">False</span><span class="p">))</span>
         <span class="k">if</span> <span class="n">cluster_entity</span><span class="p">:</span>
@@ -1852,6 +1991,9 @@
 <span class="sd">        Weights with labels must use the same labels, in the same order,</span>
 <span class="sd">        as dependent or, if dependent has no labels, as exog. See</span>
 <span class="sd">        :ref:`panel-input-alignment`.</span>
+<span class="sd">        Dependent need not be balanced when the weights are given for each time</span>
+<span class="sd">        period, entity or combination: the weights of the combinations that</span>
+<span class="sd">        dependent does not have are not used.</span>
 <span class="sd">    check_rank : bool</span>
 <span class="sd">        Flag indicating whether to perform a rank check on the exogenous</span>
 <span class="sd">        variables to ensure that the model is identified. Skipping this</span>
@@ -1866,6 +2008,12 @@
 <span class="sd">    .. math::</span>
 
 <span class="sd">        y_{it}=\beta^{\prime}x_{it}+\epsilon_{it}</span>
+
+<span class="sd">    .. versionchanged:: 7.1</span>
+
+<span class="sd">       ``weights`` for each time period, each entity or each time period and</span>
+<span class="sd">       entity can be used if ``dependent`` is not balanced. Earlier versions</span>
+<span class="sd">       raised "weights must have the same number of observations as dependent".</span>
 <span class="sd">    """</span>
 
     <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span>
@@ -1974,6 +2122,13 @@
 <span class="sd">        PanelResults</span>
 <span class="sd">            Estimation results</span>
 
+<span class="sd">        Raises</span>
+<span class="sd">        ------</span>
+<span class="sd">        UnknownOptionError</span>
+<span class="sd">            If ``cov_type`` is not one of the supported names, or if it is</span>
+<span class="sd">            "kernel" or "ac" and ``kernel`` is not one of the supported kernels.</span>
+<span class="sd">            It is both a ``ValueError`` and a ``KeyError``.</span>
+
 <span class="sd">        Examples</span>
 <span class="sd">        --------</span>
 <span class="sd">        &gt;&gt;&gt; from linearmodels import PooledOLS</span>
@@ -1994,6 +2149,12 @@
 <span class="sd">            array or list with a value for each row of ``dependent`` in the</span>
 <span class="sd">            order of its rows, or an array or list with the layout of</span>
 <span class="sd">            ``dependent`` (time by entity, or variable by time by entity).</span>
+<span class="sd">            An array or list with the layout, or a DataFrame with the time</span>
+<span class="sd">            periods as its index and the entities as its columns, has a value</span>
+<span class="sd">            for each time period and entity. It is placed on the rows of</span>
+<span class="sd">            ``dependent``, which need not be balanced: the values of the</span>
+<span class="sd">            combinations that ``dependent`` does not have are not used. See</span>
+<span class="sd">            :ref:`panel-input-alignment`.</span>
 <span class="sd">            Clusters should be integer values, although other types will</span>
 <span class="sd">            be coerced to integer values by treating as categorical variables</span>
 <span class="sd">          * ``cluster_entity`` - Boolean flag indicating to use entity</span>
@@ -2030,6 +2191,26 @@
 <span class="sd">        ``debiased=True`` and ``group_debias=True`` give the clustered</span>
 <span class="sd">        covariance of Stata's ``regress ..., vce(cluster ...)``.</span>
 <span class="sd">        See :ref:`panel-small-sample`.</span>
+
+<span class="sd">        .. versionchanged:: 7.1</span>
+
+<span class="sd">           A ``kernel`` that is not one of the supported names raises an</span>
+<span class="sd">           ``UnknownOptionError`` when the model is fit, for "kernel" and "ac".</span>
+<span class="sd">           Earlier versions raised it when the covariance was first used, for</span>
+<span class="sd">           example when ``std_errors`` of the results was read, so that ``fit``</span>
+<span class="sd">           returned results that raised when the covariance was used.</span>
+
+<span class="sd">        .. versionchanged:: 7.1</span>
+
+<span class="sd">           ``clusters`` with the layout of ``dependent`` (time by entity, or</span>
+<span class="sd">           variable by time by entity) can be used if ``dependent`` is not</span>
+<span class="sd">           balanced. It raised ``IndexError: Boolean index has wrong length``.</span>
+<span class="sd">           It is placed on the rows of ``dependent`` by time period and entity.</span>
+<span class="sd">           Earlier versions paired it by position with the rows, which is right</span>
+<span class="sd">           only if the rows are sorted by entity and then time: if they were sorted</span>
+<span class="sd">           by time and then entity, an array was attached to the wrong</span>
+<span class="sd">           observations without an error, and a pandas object with labels was</span>
+<span class="sd">           rejected.</span>
 <span class="sd">        """</span>
         <span class="n">y</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">dependent</span><span class="o">.</span><span class="n">values2d</span>
         <span class="n">x</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">exog</span><span class="o">.</span><span class="n">values2d</span>
@@ -2213,13 +2394,22 @@
 <span class="sd">        Weights with labels must use the same labels, in the same order,</span>
 <span class="sd">        as dependent or, if dependent has no labels, as exog. See</span>
 <span class="sd">        :ref:`panel-input-alignment`.</span>
+<span class="sd">        Dependent need not be balanced when the weights are given for each time</span>
+<span class="sd">        period, entity or combination: the weights of the combinations that</span>
+<span class="sd">        dependent does not have are not used.</span>
 <span class="sd">    entity_effects : bool</span>
 <span class="sd">        Flag whether to include entity (fixed) effects in the model</span>
 <span class="sd">    time_effects : bool</span>
 <span class="sd">        Flag whether to include time effects in the model</span>
 <span class="sd">    other_effects : array_like, optional</span>
 <span class="sd">        Category codes to use for any effects that are not entity or time</span>
-<span class="sd">        effects. Each variable is treated as an effect. A 1-d array or list has</span>
+<span class="sd">        effects. Each variable is treated as an effect. An array or list with the</span>
+<span class="sd">        layout of dependent (time by entity, or variable by time by entity), or a</span>
+<span class="sd">        DataFrame with the time periods as its index and the entities as its</span>
+<span class="sd">        columns, has a value for each time period and entity. It is placed on the</span>
+<span class="sd">        rows of dependent, which need not be balanced: the values of the</span>
+<span class="sd">        combinations that dependent does not have are not used (see</span>
+<span class="sd">        :ref:`panel-input-alignment`). A 1-d array or list has</span>
 <span class="sd">        a value for each row of dependent, in the order of the rows of dependent.</span>
 <span class="sd">        An observation where any of the other effects is missing (NaN or None) is</span>
 <span class="sd">        dropped, with the observations that have a missing value in dependent, exog</span>
@@ -2261,6 +2451,19 @@
 <span class="sd">        y_{it}=\alpha_i + \gamma_t + \beta^{\prime}x_{it} + \epsilon_{it}</span>
 
 <span class="sd">    Additionally , arbitrary effects can be specified using categorical variables.</span>
+
+<span class="sd">    .. versionchanged:: 7.1</span>
+
+<span class="sd">       ``weights`` for each time period, each entity or each time period and</span>
+<span class="sd">       entity, and ``other_effects`` for each time period and entity, can be used</span>
+<span class="sd">       if ``dependent`` is not balanced. Earlier versions raised "weights must</span>
+<span class="sd">       have the same number of observations as dependent" for the weights, and an</span>
+<span class="sd">       error for ``other_effects``. A value for each time period and entity is</span>
+<span class="sd">       placed on the rows of ``dependent`` by time period and entity. Earlier</span>
+<span class="sd">       versions paired ``other_effects`` by position with the rows, which is right</span>
+<span class="sd">       only if the rows are sorted by entity and then time: if they were sorted by</span>
+<span class="sd">       time and then entity, an array was attached to the wrong observations</span>
+<span class="sd">       without an error, and a pandas object with labels was rejected.</span>
 
 <span class="sd">    If both ``entity_effect`` and ``time_effects`` are ``False``, and no other</span>
 <span class="sd">    effects are included, the model reduces to :class:`PooledOLS`.</span>
@@ -2452,17 +2655,19 @@
 <span class="sd">        """</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_other_effects_input</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
             <span class="k">return</span> <span class="kc">None</span>
-        <span class="n">effects</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_panel_rows</span><span class="p">(</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">_other_effects_input</span><span class="p">,</span> <span class="s2">"other_effects"</span><span class="p">,</span> <span class="s2">"OtherEffect"</span>
-        <span class="p">)</span>
+        <span class="n">given</span> <span class="o">=</span> <span class="n">as_array_like</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_other_effects_input</span><span class="p">,</span> <span class="s2">"other_effects"</span><span class="p">)</span>
+        <span class="n">effects</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_panel_rows</span><span class="p">(</span><span class="n">given</span><span class="p">,</span> <span class="s2">"other_effects"</span><span class="p">,</span> <span class="s2">"OtherEffect"</span><span class="p">)</span>
         <span class="k">if</span> <span class="n">effects</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">:]</span> <span class="o">!=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_original_shape</span><span class="p">[</span><span class="mi">1</span><span class="p">:]:</span>
             <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
                 <span class="s2">"other_effects must have the same number of "</span>
                 <span class="s2">"entities and time periods as dependent."</span>
             <span class="p">)</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">_check_labels</span><span class="p">(</span>
-            <span class="s2">"other_effects"</span><span class="p">,</span> <span class="n">effects</span><span class="o">.</span><span class="n">index</span><span class="p">,</span> <span class="n">_is_labelled</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_other_effects_input</span><span class="p">)</span>
-        <span class="p">)</span>
+        <span class="n">labelled</span> <span class="o">=</span> <span class="n">_is_labelled</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_other_effects_input</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">_is_grid</span><span class="p">(</span><span class="n">given</span><span class="p">):</span>
+            <span class="c1"># Placed on the rows of dependent by time period and entity</span>
+            <span class="n">effects</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_grid_to_rows</span><span class="p">(</span><span class="n">effects</span><span class="p">,</span> <span class="n">labelled</span><span class="p">,</span> <span class="s2">"other_effects"</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_check_labels</span><span class="p">(</span><span class="s2">"other_effects"</span><span class="p">,</span> <span class="n">effects</span><span class="o">.</span><span class="n">index</span><span class="p">,</span> <span class="n">labelled</span><span class="p">)</span>
         <span class="n">nrows</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_original_index</span><span class="p">)</span>
         <span class="k">if</span> <span class="n">effects</span><span class="o">.</span><span class="n">dataframe</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">!=</span> <span class="n">nrows</span><span class="p">:</span>
             <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
@@ -3043,6 +3248,13 @@
 <span class="sd">        PanelEffectsResults</span>
 <span class="sd">            Estimation results</span>
 
+<span class="sd">        Raises</span>
+<span class="sd">        ------</span>
+<span class="sd">        UnknownOptionError</span>
+<span class="sd">            If ``cov_type`` is not one of the supported names, or if it is</span>
+<span class="sd">            "kernel" or "ac" and ``kernel`` is not one of the supported kernels.</span>
+<span class="sd">            It is both a ``ValueError`` and a ``KeyError``.</span>
+
 <span class="sd">        Examples</span>
 <span class="sd">        --------</span>
 <span class="sd">        &gt;&gt;&gt; from linearmodels import PanelOLS</span>
@@ -3063,6 +3275,12 @@
 <span class="sd">            array or list with a value for each row of ``dependent`` in the</span>
 <span class="sd">            order of its rows, or an array or list with the layout of</span>
 <span class="sd">            ``dependent`` (time by entity, or variable by time by entity).</span>
+<span class="sd">            An array or list with the layout, or a DataFrame with the time</span>
+<span class="sd">            periods as its index and the entities as its columns, has a value</span>
+<span class="sd">            for each time period and entity. It is placed on the rows of</span>
+<span class="sd">            ``dependent``, which need not be balanced: the values of the</span>
+<span class="sd">            combinations that ``dependent`` does not have are not used. See</span>
+<span class="sd">            :ref:`panel-input-alignment`.</span>
 <span class="sd">            Clusters should be integer valued, although other types will</span>
 <span class="sd">            be coerced to integer values by treating as categorical variables</span>
 <span class="sd">          * ``cluster_entity`` - Boolean flag indicating to use entity</span>
@@ -3128,6 +3346,26 @@
 <span class="sd">           that the standard errors depended on the order of the variables, and the</span>
 <span class="sd">           effects were not counted if they were nested in the last variable and</span>
 <span class="sd">           not in the first.</span>
+
+<span class="sd">        .. versionchanged:: 7.1</span>
+
+<span class="sd">           A ``kernel`` that is not one of the supported names raises an</span>
+<span class="sd">           ``UnknownOptionError`` when the model is fit, for "kernel" and "ac".</span>
+<span class="sd">           Earlier versions raised it when the covariance was first used, for</span>
+<span class="sd">           example when ``std_errors`` of the results was read, so that ``fit``</span>
+<span class="sd">           returned results that raised when the covariance was used.</span>
+
+<span class="sd">        .. versionchanged:: 7.1</span>
+
+<span class="sd">           ``clusters`` with the layout of ``dependent`` (time by entity, or</span>
+<span class="sd">           variable by time by entity) can be used if ``dependent`` is not</span>
+<span class="sd">           balanced. It raised ``IndexError: Boolean index has wrong length``.</span>
+<span class="sd">           It is placed on the rows of ``dependent`` by time period and entity.</span>
+<span class="sd">           Earlier versions paired it by position with the rows, which is right</span>
+<span class="sd">           only if the rows are sorted by entity and then time: if they were sorted</span>
+<span class="sd">           by time and then entity, an array was attached to the wrong</span>
+<span class="sd">           observations without an error, and a pandas object with labels was</span>
+<span class="sd">           rejected.</span>
 <span class="sd">        """</span>
 
         <span class="n">weighted</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">any</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">weights</span><span class="o">.</span><span class="n">values2d</span> <span class="o">!=</span> <span class="mf">1.0</span><span class="p">)</span>
@@ -3386,6 +3624,9 @@
 <span class="sd">        Weights with labels must use the same labels, in the same order,</span>
 <span class="sd">        as dependent or, if dependent has no labels, as exog. See</span>
 <span class="sd">        :ref:`panel-input-alignment`.</span>
+<span class="sd">        Dependent need not be balanced when the weights are given for each time</span>
+<span class="sd">        period, entity or combination: the weights of the combinations that</span>
+<span class="sd">        dependent does not have are not used.</span>
 
 <span class="sd">    Notes</span>
 <span class="sd">    -----</span>
@@ -3396,6 +3637,12 @@
 <span class="sd">        \bar{y}_{i}=  \beta^{\prime}\bar{x}_{i}+\bar{\epsilon}_{i}</span>
 
 <span class="sd">    where :math:`\bar{z}` is the time-average.</span>
+
+<span class="sd">    .. versionchanged:: 7.1</span>
+
+<span class="sd">       ``weights`` for each time period, each entity or each time period and</span>
+<span class="sd">       entity can be used if ``dependent`` is not balanced. Earlier versions</span>
+<span class="sd">       raised "weights must have the same number of observations as dependent".</span>
 <span class="sd">    """</span>
 
     <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span>
@@ -3516,6 +3763,12 @@
 <span class="sd">            array or list with a value for each row of ``dependent`` in the</span>
 <span class="sd">            order of its rows, or an array or list with the layout of</span>
 <span class="sd">            ``dependent`` (time by entity, or variable by time by entity).</span>
+<span class="sd">            An array or list with the layout, or a DataFrame with the time</span>
+<span class="sd">            periods as its index and the entities as its columns, has a value</span>
+<span class="sd">            for each time period and entity. It is placed on the rows of</span>
+<span class="sd">            ``dependent``, which need not be balanced: the values of the</span>
+<span class="sd">            combinations that ``dependent`` does not have are not used. See</span>
+<span class="sd">            :ref:`panel-input-alignment`.</span>
 <span class="sd">            Clusters should be integer values, although other types will</span>
 <span class="sd">            be coerced to integer values by treating as categorical variables</span>
 <span class="sd">          * ``group_debias`` - Boolean flag indicating whether to apply an</span>
@@ -3531,6 +3784,18 @@
 <span class="sd">        ``debiased=True``, which is the default, scales the covariance by</span>
 <span class="sd">        n / (n - k), where k is the number of regressors, and uses the t and</span>
 <span class="sd">        F distributions for inference. See :ref:`panel-small-sample`.</span>
+
+<span class="sd">        .. versionchanged:: 7.1</span>
+
+<span class="sd">           ``clusters`` with the layout of ``dependent`` (time by entity, or</span>
+<span class="sd">           variable by time by entity) can be used if ``dependent`` is not</span>
+<span class="sd">           balanced. It raised ``IndexError: Boolean index has wrong length``.</span>
+<span class="sd">           It is placed on the rows of ``dependent`` by time period and entity.</span>
+<span class="sd">           Earlier versions paired it by position with the rows, which is right</span>
+<span class="sd">           only if the rows are sorted by entity and then time: if they were sorted</span>
+<span class="sd">           by time and then entity, an array was attached to the wrong</span>
+<span class="sd">           observations without an error, and a pandas object with labels was</span>
+<span class="sd">           rejected.</span>
 <span class="sd">        """</span>
         <span class="n">y</span><span class="p">,</span> <span class="n">x</span><span class="p">,</span> <span class="n">w</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_prepare_between</span><span class="p">()</span>
         <span class="k">if</span> <span class="n">np</span><span class="o">.</span><span class="n">all</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">weights</span><span class="o">.</span><span class="n">values2d</span> <span class="o">==</span> <span class="mf">1.0</span><span class="p">)</span> <span class="ow">and</span> <span class="ow">not</span> <span class="n">reweight</span><span class="p">:</span>
@@ -3720,6 +3985,9 @@
 <span class="sd">        Weights with labels must use the same labels, in the same order,</span>
 <span class="sd">        as dependent or, if dependent has no labels, as exog. See</span>
 <span class="sd">        :ref:`panel-input-alignment`.</span>
+<span class="sd">        Dependent need not be balanced when the weights are given for each time</span>
+<span class="sd">        period, entity or combination: the weights of the combinations that</span>
+<span class="sd">        dependent does not have are not used.</span>
 
 <span class="sd">    Notes</span>
 <span class="sd">    -----</span>
@@ -3751,6 +4019,12 @@
 <span class="sd">       The observations are differenced in the order of time. Earlier versions</span>
 <span class="sd">       differenced against non-adjacent periods if the first entity enters late or</span>
 <span class="sd">       has a gap.</span>
+
+<span class="sd">    .. versionchanged:: 7.1</span>
+
+<span class="sd">       ``weights`` for each time period, each entity or each time period and</span>
+<span class="sd">       entity can be used if ``dependent`` is not balanced. Earlier versions</span>
+<span class="sd">       raised "weights must have the same number of observations as dependent".</span>
 <span class="sd">    """</span>
 
     <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span>
@@ -3872,6 +4146,13 @@
 <span class="sd">        PanelResults</span>
 <span class="sd">            Estimation results</span>
 
+<span class="sd">        Raises</span>
+<span class="sd">        ------</span>
+<span class="sd">        UnknownOptionError</span>
+<span class="sd">            If ``cov_type`` is not one of the supported names, or if it is</span>
+<span class="sd">            "kernel" or "ac" and ``kernel`` is not one of the supported kernels.</span>
+<span class="sd">            It is both a ``ValueError`` and a ``KeyError``.</span>
+
 <span class="sd">        Examples</span>
 <span class="sd">        --------</span>
 <span class="sd">        &gt;&gt;&gt; from linearmodels import FirstDifferenceOLS</span>
@@ -3893,6 +4174,12 @@
 <span class="sd">            array or list with a value for each row of ``dependent`` in the</span>
 <span class="sd">            order of its rows, or an array or list with the layout of</span>
 <span class="sd">            ``dependent`` (time by entity, or variable by time by entity).</span>
+<span class="sd">            An array or list with the layout, or a DataFrame with the time</span>
+<span class="sd">            periods as its index and the entities as its columns, has a value</span>
+<span class="sd">            for each time period and entity. It is placed on the rows of</span>
+<span class="sd">            ``dependent``, which need not be balanced: the values of the</span>
+<span class="sd">            combinations that ``dependent`` does not have are not used. See</span>
+<span class="sd">            :ref:`panel-input-alignment`.</span>
 <span class="sd">            Clusters should be integer values, although other types will</span>
 <span class="sd">            be coerced to integer values by treating as categorical variables</span>
 <span class="sd">          * ``cluster_entity`` - Boolean flag indicating to use entity</span>
@@ -3929,6 +4216,26 @@
 <span class="sd">        ``debiased=True``, which is the default, scales the covariance by</span>
 <span class="sd">        n / (n - k), where k is the number of regressors, and uses the t and</span>
 <span class="sd">        F distributions for inference. See :ref:`panel-small-sample`.</span>
+
+<span class="sd">        .. versionchanged:: 7.1</span>
+
+<span class="sd">           A ``kernel`` that is not one of the supported names raises an</span>
+<span class="sd">           ``UnknownOptionError`` when the model is fit, for "kernel" and "ac".</span>
+<span class="sd">           Earlier versions raised it when the covariance was first used, for</span>
+<span class="sd">           example when ``std_errors`` of the results was read, so that ``fit``</span>
+<span class="sd">           returned results that raised when the covariance was used.</span>
+
+<span class="sd">        .. versionchanged:: 7.1</span>
+
+<span class="sd">           ``clusters`` with the layout of ``dependent`` (time by entity, or</span>
+<span class="sd">           variable by time by entity) can be used if ``dependent`` is not</span>
+<span class="sd">           balanced. It raised ``IndexError: Boolean index has wrong length``.</span>
+<span class="sd">           It is placed on the rows of ``dependent`` by time period and entity.</span>
+<span class="sd">           Earlier versions paired it by position with the rows, which is right</span>
+<span class="sd">           only if the rows are sorted by entity and then time: if they were sorted</span>
+<span class="sd">           by time and then entity, an array was attached to the wrong</span>
+<span class="sd">           observations without an error, and a pandas object with labels was</span>
+<span class="sd">           rejected.</span>
 <span class="sd">        """</span>
         <span class="n">y_fd</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">dependent</span><span class="o">.</span><span class="n">first_difference</span><span class="p">()</span>
         <span class="n">time_ids</span> <span class="o">=</span> <span class="n">y_fd</span><span class="o">.</span><span class="n">time_ids</span>
@@ -4128,6 +4435,9 @@
 <span class="sd">        Weights with labels must use the same labels, in the same order,</span>
 <span class="sd">        as dependent or, if dependent has no labels, as exog. See</span>
 <span class="sd">        :ref:`panel-input-alignment`.</span>
+<span class="sd">        Dependent need not be balanced when the weights are given for each time</span>
+<span class="sd">        period, entity or combination: the weights of the combinations that</span>
+<span class="sd">        dependent does not have are not used.</span>
 
 <span class="sd">    Notes</span>
 <span class="sd">    -----</span>
@@ -4139,6 +4449,12 @@
 
 <span class="sd">    where :math:`u_i` is a shock that is independent of :math:`x_{it}` but</span>
 <span class="sd">    common to all entities i.</span>
+
+<span class="sd">    .. versionchanged:: 7.1</span>
+
+<span class="sd">       ``weights`` for each time period, each entity or each time period and</span>
+<span class="sd">       entity can be used if ``dependent`` is not balanced. Earlier versions</span>
+<span class="sd">       raised "weights must have the same number of observations as dependent".</span>
 <span class="sd">    """</span>
 
     <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span>
@@ -4251,6 +4567,13 @@
 <span class="sd">        RandomEffectsResults</span>
 <span class="sd">            Estimation results</span>
 
+<span class="sd">        Raises</span>
+<span class="sd">        ------</span>
+<span class="sd">        UnknownOptionError</span>
+<span class="sd">            If ``cov_type`` is not one of the supported names, or if it is</span>
+<span class="sd">            "kernel" or "ac" and ``kernel`` is not one of the supported kernels.</span>
+<span class="sd">            It is both a ``ValueError`` and a ``KeyError``.</span>
+
 <span class="sd">        Examples</span>
 <span class="sd">        --------</span>
 <span class="sd">        &gt;&gt;&gt; from linearmodels import RandomEffects</span>
@@ -4271,6 +4594,12 @@
 <span class="sd">            array or list with a value for each row of ``dependent`` in the</span>
 <span class="sd">            order of its rows, or an array or list with the layout of</span>
 <span class="sd">            ``dependent`` (time by entity, or variable by time by entity).</span>
+<span class="sd">            An array or list with the layout, or a DataFrame with the time</span>
+<span class="sd">            periods as its index and the entities as its columns, has a value</span>
+<span class="sd">            for each time period and entity. It is placed on the rows of</span>
+<span class="sd">            ``dependent``, which need not be balanced: the values of the</span>
+<span class="sd">            combinations that ``dependent`` does not have are not used. See</span>
+<span class="sd">            :ref:`panel-input-alignment`.</span>
 <span class="sd">            Clusters should be integer values, although other types will</span>
 <span class="sd">            be coerced to integer values by treating as categorical variables</span>
 <span class="sd">          * ``cluster_entity`` - Boolean flag indicating to use entity</span>
@@ -4336,6 +4665,26 @@
 <span class="sd">           have residual degrees of freedom in the regressions raise a</span>
 <span class="sd">           ``ValueError``. Earlier versions raised an error from NumPy or SciPy,</span>
 <span class="sd">           or returned variances that were not defined.</span>
+
+<span class="sd">        .. versionchanged:: 7.1</span>
+
+<span class="sd">           A ``kernel`` that is not one of the supported names raises an</span>
+<span class="sd">           ``UnknownOptionError`` when the model is fit, for "kernel" and "ac".</span>
+<span class="sd">           Earlier versions raised it when the covariance was first used, for</span>
+<span class="sd">           example when ``std_errors`` of the results was read, so that ``fit``</span>
+<span class="sd">           returned results that raised when the covariance was used.</span>
+
+<span class="sd">        .. versionchanged:: 7.1</span>
+
+<span class="sd">           ``clusters`` with the layout of ``dependent`` (time by entity, or</span>
+<span class="sd">           variable by time by entity) can be used if ``dependent`` is not</span>
+<span class="sd">           balanced. It raised ``IndexError: Boolean index has wrong length``.</span>
+<span class="sd">           It is placed on the rows of ``dependent`` by time period and entity.</span>
+<span class="sd">           Earlier versions paired it by position with the rows, which is right</span>
+<span class="sd">           only if the rows are sorted by entity and then time: if they were sorted</span>
+<span class="sd">           by time and then entity, an array was attached to the wrong</span>
+<span class="sd">           observations without an error, and a pandas object with labels was</span>
+<span class="sd">           rejected.</span>
 <span class="sd">        """</span>
         <span class="n">w</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">weights</span><span class="o">.</span><span class="n">values2d</span>
         <span class="n">root_w</span> <span class="o">=</span> <span class="n">cast</span><span class="p">(</span><span class="s2">"linearmodels.typing.data.Float64Array"</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="n">w</span><span class="p">))</span>
@@ -4539,6 +4888,9 @@
 <span class="sd">        Weights with labels must use the same labels, in the same order,</span>
 <span class="sd">        as dependent or, if dependent has no labels, as exog. See</span>
 <span class="sd">        :ref:`panel-input-alignment`.</span>
+<span class="sd">        Dependent need not be balanced when the weights are given for each time</span>
+<span class="sd">        period, entity or combination: the weights of the combinations that</span>
+<span class="sd">        dependent does not have are not used.</span>
 
 <span class="sd">    Notes</span>
 <span class="sd">    -----</span>
@@ -4593,6 +4945,12 @@
 <span class="sd">    the degrees of freedom of the pooled regression, rejects a true null</span>
 <span class="sd">    hypothesis too often when k is larger than 1, see</span>
 <span class="sd">    :attr:`~linearmodels.panel.results.FamaMacBethResults.f_statistic_robust`.</span>
+
+<span class="sd">    .. versionchanged:: 7.1</span>
+
+<span class="sd">       ``weights`` for each time period, each entity or each time period and</span>
+<span class="sd">       entity can be used if ``dependent`` is not balanced. Earlier versions</span>
+<span class="sd">       raised "weights must have the same number of observations as dependent".</span>
 
 <span class="sd">    References</span>
 <span class="sd">    ----------</span>
@@ -4695,7 +5053,8 @@
 <span class="sd">            at least 4 with the Bartlett kernel, 5 with the Parzen kernel and 6</span>
 <span class="sd">            with the quadratic spectral kernel.</span>
 <span class="sd">        kernel : str</span>
-<span class="sd">            The kernel to use.  None chooses the default kernel.</span>
+<span class="sd">            The kernel to use.  None chooses the default kernel. See Notes for</span>
+<span class="sd">            the names. It is checked for every ``cov_type``.</span>
 
 <span class="sd">        Returns</span>
 <span class="sd">        -------</span>
@@ -4710,6 +5069,10 @@
 <span class="sd">            are used. It is also raised if it is "kernel", ``bandwidth`` is None</span>
 <span class="sd">            and T is below the number that the automatic bandwidth needs, or the</span>
 <span class="sd">            automatic bandwidth is not finite.</span>
+<span class="sd">        UnknownOptionError</span>
+<span class="sd">            If ``kernel`` is not one of the supported names, whether or not</span>
+<span class="sd">            ``bandwidth`` is given. It is both a ``ValueError`` and a</span>
+<span class="sd">            ``KeyError``.</span>
 
 <span class="sd">        Examples</span>
 <span class="sd">        --------</span>
@@ -4787,6 +5150,15 @@
 <span class="sd">           ``OverflowError``) or "cannot convert float NaN to integer" when the</span>
 <span class="sd">           covariance was first used, or used a bandwidth of T - 1 because of the</span>
 <span class="sd">           rounding error of the sum.</span>
+
+<span class="sd">        .. versionchanged:: 7.1</span>
+
+<span class="sd">           A ``kernel`` that is not one of the supported names raises an</span>
+<span class="sd">           ``UnknownOptionError`` when the model is fit, whether or not</span>
+<span class="sd">           ``bandwidth`` is given. Earlier versions raised it when the covariance</span>
+<span class="sd">           was first used, for example when ``std_errors`` of the results was</span>
+<span class="sd">           read, so that ``fit`` returned results that raised when the covariance</span>
+<span class="sd">           was used.</span>
 <span class="sd">        """</span>
         <span class="c1"># The retained observations and their weights, which are scaled to have a</span>
         <span class="c1"># mean of one once the observations with missing values are dropped</span>

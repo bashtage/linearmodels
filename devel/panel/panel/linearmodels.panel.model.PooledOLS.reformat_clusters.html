@@ -23,7 +23,7 @@
     
   
       
-        <title>linearmodels.panel.model.PooledOLS.reformat_clusters - linearmodels v7.1 (+446)</title>
+        <title>linearmodels.panel.model.PooledOLS.reformat_clusters - linearmodels v7.1 (+460)</title>
       
     
 
@@ -100,7 +100,7 @@
 
 <header class="md-header md-header--shadow" data-md-component="header">
   <nav class="md-header__inner md-grid" aria-label="Header">
-    <a href="../../index.html" title="linearmodels v7.1 (+446)" class="md-header__button md-logo" aria-label="linearmodels v7.1 (+446)" data-md-component="logo">
+    <a href="../../index.html" title="linearmodels v7.1 (+460)" class="md-header__button md-logo" aria-label="linearmodels v7.1 (+460)" data-md-component="logo">
       <img src="../../_static/bw-logo.svg" alt="logo">
     </a>
     <label class="md-header__button md-icon" for="__drawer">
@@ -111,7 +111,7 @@
       <div class="md-header__ellipsis">
         <div class="md-header__topic">
           <span class="md-ellipsis">
-            linearmodels v7.1 (+446)
+            linearmodels v7.1 (+460)
           </span>
         </div>
         <div class="md-header__topic" data-md-component="header-topic">
@@ -206,10 +206,10 @@
 
 <nav class="md-nav md-nav--primary" aria-label="Navigation" data-md-level="0">
   <label class="md-nav__title" for="__drawer">
-    <a href="../../index.html" title="linearmodels v7.1 (+446)" class="md-nav__button md-logo" aria-label="linearmodels v7.1 (+446)" data-md-component="logo">
+    <a href="../../index.html" title="linearmodels v7.1 (+460)" class="md-nav__button md-logo" aria-label="linearmodels v7.1 (+460)" data-md-component="logo">
       <img src="../../_static/bw-logo.svg" alt="logo">
     </a>
-    linearmodels v7.1 (+446)
+    linearmodels v7.1 (+460)
   </label>
   
     <div class="md-nav__source">
@@ -881,6 +881,16 @@
   
 </li>
         
+          <li class="md-nav__item">
+  <a href="#linearmodels.panel.model.PooledOLS.reformat_clusters-raises" class="md-nav__link">
+    
+    <span class="md-ellipsis">
+      <span>Raises</span>
+    </span>
+  </a>
+  
+</li>
+        
       </ul>
     </nav>
   
@@ -1495,6 +1505,16 @@
   
 </li>
         
+          <li class="md-nav__item">
+  <a href="#linearmodels.panel.model.PooledOLS.reformat_clusters-raises" class="md-nav__link">
+    
+    <span class="md-ellipsis">
+      <span>Raises</span>
+    </span>
+  </a>
+  
+</li>
+        
       </ul>
     </nav>
   
@@ -1525,7 +1545,13 @@
 <dt class="field-odd" id="linearmodels.panel.model.PooledOLS.reformat_clusters-parameters">Parameters<span class="colon">:</span><a class="headerlink" href="#linearmodels.panel.model.PooledOLS.reformat_clusters-parameters" title="Permalink to this headline">¶</a></dt>
 <dd class="field-odd"><dl class="simple api-field highlight">
 <dt id="linearmodels.panel.model.PooledOLS.reformat_clusters.clusters"><span class="n sig-name">clusters</span><span class="p">:</span><span class="w"> </span><span class="n"><span class="desctype"><a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v2.5)">ndarray</a><span class="p">[</span><a class="reference external" href="https://docs.python.org/3/builtins/stdtypes.html#tuple" title="(in Python v3.15)">tuple</a><span class="p">[</span><a class="reference external" href="https://docs.python.org/3/builtins/functions.html#int" title="(in Python v3.15)">int</a><span class="p">,</span><span class="w"> </span><span class="p">...</span><span class="p">]</span><span class="p">,</span><span class="w"> </span><a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.dtype.html#numpy.dtype" title="(in NumPy v2.5)">dtype</a><span class="p">[</span>int64<span class="p">]</span><span class="p">]</span><span class="w"> </span><span class="p">|</span><span class="w"> </span><a class="reference internal" href="linearmodels.panel.data.PanelData.html#linearmodels.panel.data.PanelData" title="linearmodels.panel.data.PanelData (Python class) — Abstraction to handle alternative formats for panel data">PanelData</a><span class="w"> </span><span class="p">|</span><span class="w"> </span><a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v2.5)">ndarray</a><span class="w"> </span><span class="p">|</span><span class="w"> </span><a class="reference external" href="https://docs.xarray.dev/en/stable/generated/xarray.DataArray.html#xarray.DataArray" title="(in xarray v2026.9.0)">DataArray</a><span class="w"> </span><span class="p">|</span><span class="w"> </span><a class="reference external" href="https://pandas.pydata.org/pandas-docs/stable/reference/api/pandas.DataFrame.html#pandas.DataFrame" title="(in pandas v3.0.6)">DataFrame</a><span class="w"> </span><span class="p">|</span><span class="w"> </span><a class="reference external" href="https://pandas.pydata.org/pandas-docs/stable/reference/api/pandas.Series.html#pandas.Series" title="(in pandas v3.0.6)">Series</a></span></span><a class="headerlink" href="#linearmodels.panel.model.PooledOLS.reformat_clusters.clusters" title="Permalink to this definition">¶</a></dt><dd><p>Values to use for variance clustering. A 1-d array has one value
-for each row of dependent, in the order of the rows of dependent.</p>
+for each row of dependent, in the order of the rows of dependent.
+A 2-d array (time by entity), a 3-d array (variable by time by
+entity), a DataFrame with the time periods as its index and the
+entities as its columns and a DataArray have a value for each
+time period and entity. They are placed on the rows of dependent,
+which need not be balanced: the values of the time periods and
+entities that dependent does not have are not used.</p>
 </dd>
 </dl>
 </dd>
@@ -1536,9 +1562,35 @@ missing in the model data.</p>
 <dt class="field-odd" id="linearmodels.panel.model.PooledOLS.reformat_clusters-return-type">Return type<span class="colon">:</span><a class="headerlink" href="#linearmodels.panel.model.PooledOLS.reformat_clusters-return-type" title="Permalink to this headline">¶</a></dt>
 <dd class="field-odd"><p><a class="reference internal" href="linearmodels.panel.data.PanelData.html#linearmodels.panel.data.PanelData" title="linearmodels.panel.data.PanelData (Python class) — Abstraction to handle alternative formats for panel data"><code class="xref py py-class docutils literal notranslate"><span class="pre">linearmodels.panel.data.PanelData</span></code></a></p>
 </dd>
+<dt class="field-even" id="linearmodels.panel.model.PooledOLS.reformat_clusters-raises">Raises<span class="colon">:</span><a class="headerlink" href="#linearmodels.panel.model.PooledOLS.reformat_clusters-raises" title="Permalink to this headline">¶</a></dt>
+<dd class="field-even"><p><a class="reference external" href="https://docs.python.org/3/builtins/exceptions.html#ValueError" title="(in Python v3.15)"><strong>ValueError</strong></a> – If clusters does not have the numbers of entities and time periods of
+    dependent, or has labels that are not those of dependent in the same
+    order. A value for each time period and entity must have the time
+    periods and entities in the order that the Notes describe.</p>
+</dd>
 </dl>
 <p class="rubric">Notes</p>
 <p>This is exposed for testing and is not normally needed for estimation</p>
+<p>The time periods and entities of a value for each time period and entity
+are matched to those of dependent in the order in which they first appear
+in the rows of dependent. If dependent is not balanced and the first entity
+does not have the first periods, the periods of a panel that is sorted by
+entity first appear in an order that is not their order in time. The time
+periods are in order of time then, if the rows of every entity are in order
+of time (in either direction), and the entities are in the order of their
+labels if the rows of every time period are in order of the entities. A
+pandas object or DataArray with labels must have the time periods and
+entities in this order.</p>
+<div class="admonition versionchanged">
+<p class="admonition-title"><span class="versionmodified changed">Changed in version 7.1: </span>A value for each time period and entity can be used if dependent is
+not balanced. It raised <code class="docutils literal notranslate"><span class="pre">IndexError:</span> <span class="pre">Boolean</span> <span class="pre">index</span> <span class="pre">has</span> <span class="pre">wrong</span> <span class="pre">length</span></code>.
+It is placed on the rows of dependent by time period and entity.
+Earlier versions paired it by position with the rows of dependent, which
+is right only if the rows are sorted by entity and then time. If they
+were sorted by time and then entity, an array was attached to the wrong
+observations without an error, and a pandas object with labels was
+rejected.</p>
+</div>
 </dd></dl>
 
 

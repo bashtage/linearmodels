@@ -23,7 +23,7 @@
     
   
       
-        <title>linearmodels.panel.model.PanelOLS - linearmodels v7.1 (+446)</title>
+        <title>linearmodels.panel.model.PanelOLS - linearmodels v7.1 (+460)</title>
       
     
 
@@ -100,7 +100,7 @@
 
 <header class="md-header md-header--shadow" data-md-component="header">
   <nav class="md-header__inner md-grid" aria-label="Header">
-    <a href="../../index.html" title="linearmodels v7.1 (+446)" class="md-header__button md-logo" aria-label="linearmodels v7.1 (+446)" data-md-component="logo">
+    <a href="../../index.html" title="linearmodels v7.1 (+460)" class="md-header__button md-logo" aria-label="linearmodels v7.1 (+460)" data-md-component="logo">
       <img src="../../_static/bw-logo.svg" alt="logo">
     </a>
     <label class="md-header__button md-icon" for="__drawer">
@@ -111,7 +111,7 @@
       <div class="md-header__ellipsis">
         <div class="md-header__topic">
           <span class="md-ellipsis">
-            linearmodels v7.1 (+446)
+            linearmodels v7.1 (+460)
           </span>
         </div>
         <div class="md-header__topic" data-md-component="header-topic">
@@ -206,10 +206,10 @@
 
 <nav class="md-nav md-nav--primary" aria-label="Navigation" data-md-level="0">
   <label class="md-nav__title" for="__drawer">
-    <a href="../../index.html" title="linearmodels v7.1 (+446)" class="md-nav__button md-logo" aria-label="linearmodels v7.1 (+446)" data-md-component="logo">
+    <a href="../../index.html" title="linearmodels v7.1 (+460)" class="md-nav__button md-logo" aria-label="linearmodels v7.1 (+460)" data-md-component="logo">
       <img src="../../_static/bw-logo.svg" alt="logo">
     </a>
-    linearmodels v7.1 (+446)
+    linearmodels v7.1 (+460)
   </label>
   
     <div class="md-nav__source">
@@ -1883,14 +1883,23 @@ The weights must be strictly positive and finite. They are rescaled to have a
 mean of 1. A NaN weight is missing, and its observation is dropped.
 Weights with labels must use the same labels, in the same order,
 as dependent or, if dependent has no labels, as exog. See
-<a class="reference internal" href="../faq.html#panel-input-alignment"><span class="std std-ref">Aligning Inputs</span></a>.</p>
+<a class="reference internal" href="../faq.html#panel-input-alignment"><span class="std std-ref">Aligning Inputs</span></a>.
+Dependent need not be balanced when the weights are given for each time
+period, entity or combination: the weights of the combinations that
+dependent does not have are not used.</p>
 </dd>
 <dt id="linearmodels.panel.model.PanelOLS.__init__.entity_effects"><span class="n sig-name">entity_effects</span><span class="p">:</span><span class="w"> </span><span class="n"><span class="desctype"><a class="reference external" href="https://docs.python.org/3/builtins/functions.html#bool" title="(in Python v3.15)">bool</a></span></span><span class="w"> </span><span class="o">=</span><span class="w"> </span><code class="code python default_value docutils literal highlight highlight-python"><span class="kc">False</span></code><a class="headerlink" href="#linearmodels.panel.model.PanelOLS.__init__.entity_effects" title="Permalink to this definition">¶</a></dt><dd><p>Flag whether to include entity (fixed) effects in the model</p>
 </dd>
 <dt id="linearmodels.panel.model.PanelOLS.__init__.time_effects"><span class="n sig-name">time_effects</span><span class="p">:</span><span class="w"> </span><span class="n"><span class="desctype"><a class="reference external" href="https://docs.python.org/3/builtins/functions.html#bool" title="(in Python v3.15)">bool</a></span></span><span class="w"> </span><span class="o">=</span><span class="w"> </span><code class="code python default_value docutils literal highlight highlight-python"><span class="kc">False</span></code><a class="headerlink" href="#linearmodels.panel.model.PanelOLS.__init__.time_effects" title="Permalink to this definition">¶</a></dt><dd><p>Flag whether to include time effects in the model</p>
 </dd>
 <dt id="linearmodels.panel.model.PanelOLS.__init__.other_effects"><span class="n sig-name">other_effects</span><span class="p">:</span><span class="w"> </span><span class="n"><span class="desctype"><a class="reference internal" href="linearmodels.panel.data.PanelData.html#linearmodels.panel.data.PanelData" title="linearmodels.panel.data.PanelData (Python class) — Abstraction to handle alternative formats for panel data">PanelData</a><span class="w"> </span><span class="p">|</span><span class="w"> </span><a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v2.5)">ndarray</a><span class="w"> </span><span class="p">|</span><span class="w"> </span><a class="reference external" href="https://docs.xarray.dev/en/stable/generated/xarray.DataArray.html#xarray.DataArray" title="(in xarray v2026.9.0)">DataArray</a><span class="w"> </span><span class="p">|</span><span class="w"> </span><a class="reference external" href="https://pandas.pydata.org/pandas-docs/stable/reference/api/pandas.DataFrame.html#pandas.DataFrame" title="(in pandas v3.0.6)">DataFrame</a><span class="w"> </span><span class="p">|</span><span class="w"> </span><a class="reference external" href="https://pandas.pydata.org/pandas-docs/stable/reference/api/pandas.Series.html#pandas.Series" title="(in pandas v3.0.6)">Series</a><span class="w"> </span><span class="p">|</span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/builtins/constants.html#None" title="(in Python v3.15)">None</a></span></span><span class="w"> </span><span class="o">=</span><span class="w"> </span><code class="code python default_value docutils literal highlight highlight-python"><span class="kc">None</span></code><a class="headerlink" href="#linearmodels.panel.model.PanelOLS.__init__.other_effects" title="Permalink to this definition">¶</a></dt><dd><p>Category codes to use for any effects that are not entity or time
-effects. Each variable is treated as an effect. A 1-d array or list has
+effects. Each variable is treated as an effect. An array or list with the
+layout of dependent (time by entity, or variable by time by entity), or a
+DataFrame with the time periods as its index and the entities as its
+columns, has a value for each time period and entity. It is placed on the
+rows of dependent, which need not be balanced: the values of the
+combinations that dependent does not have are not used (see
+<a class="reference internal" href="../faq.html#panel-input-alignment"><span class="std std-ref">Aligning Inputs</span></a>). A 1-d array or list has
 a value for each row of dependent, in the order of the rows of dependent.
 An observation where any of the other effects is missing (NaN or None) is
 dropped, with the observations that have a missing value in dependent, exog
@@ -1923,6 +1932,18 @@ can be described</p>
 <div class="math notranslate nohighlight">
 \[y_{it}=\alpha_i + \gamma_t + \beta^{\prime}x_{it} + \epsilon_{it}\]</div>
 <p>Additionally , arbitrary effects can be specified using categorical variables.</p>
+<div class="admonition versionchanged">
+<p class="admonition-title"><span class="versionmodified changed">Changed in version 7.1: </span><code class="docutils literal notranslate"><span class="pre">weights</span></code> for each time period, each entity or each time period and
+entity, and <code class="docutils literal notranslate"><span class="pre">other_effects</span></code> for each time period and entity, can be used
+if <code class="docutils literal notranslate"><span class="pre">dependent</span></code> is not balanced. Earlier versions raised “weights must
+have the same number of observations as dependent” for the weights, and an
+error for <code class="docutils literal notranslate"><span class="pre">other_effects</span></code>. A value for each time period and entity is
+placed on the rows of <code class="docutils literal notranslate"><span class="pre">dependent</span></code> by time period and entity. Earlier
+versions paired <code class="docutils literal notranslate"><span class="pre">other_effects</span></code> by position with the rows, which is right
+only if the rows are sorted by entity and then time: if they were sorted by
+time and then entity, an array was attached to the wrong observations
+without an error, and a pandas object with labels was rejected.</p>
+</div>
 <p>If both <code class="docutils literal notranslate"><span class="pre">entity_effect</span></code> and <code class="docutils literal notranslate"><span class="pre">time_effects</span></code> are <code class="docutils literal notranslate"><span class="pre">False</span></code>, and no other
 effects are included, the model reduces to <a class="reference internal" href="linearmodels.panel.model.PooledOLS.html#linearmodels.panel.model.PooledOLS" title="linearmodels.panel.model.PooledOLS (Python class) — Pooled coefficient estimator for panel data"><code class="xref py py-class docutils literal notranslate"><span class="pre">PooledOLS</span></code></a>.</p>
 <p>Model supports at most 2 effects.  These can be entity-time, entity-other,
