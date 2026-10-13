@@ -19,7 +19,7 @@
     
   
       
-        <title>linearmodels.panel.model - linearmodels v7.1 (+411)</title>
+        <title>linearmodels.panel.model - linearmodels v7.1 (+420)</title>
       
     
 
@@ -91,7 +91,7 @@
 
 <header class="md-header md-header--shadow" data-md-component="header">
   <nav class="md-header__inner md-grid" aria-label="Header">
-    <a href="../../../index.html" title="linearmodels v7.1 (+411)" class="md-header__button md-logo" aria-label="linearmodels v7.1 (+411)" data-md-component="logo">
+    <a href="../../../index.html" title="linearmodels v7.1 (+420)" class="md-header__button md-logo" aria-label="linearmodels v7.1 (+420)" data-md-component="logo">
       <img src="../../../_static/bw-logo.svg" alt="logo">
     </a>
     <label class="md-header__button md-icon" for="__drawer">
@@ -102,7 +102,7 @@
       <div class="md-header__ellipsis">
         <div class="md-header__topic">
           <span class="md-ellipsis">
-            linearmodels v7.1 (+411)
+            linearmodels v7.1 (+420)
           </span>
         </div>
         <div class="md-header__topic" data-md-component="header-topic">
@@ -197,10 +197,10 @@
 
 <nav class="md-nav md-nav--primary" aria-label="Navigation" data-md-level="0">
   <label class="md-nav__title" for="__drawer">
-    <a href="../../../index.html" title="linearmodels v7.1 (+411)" class="md-nav__button md-logo" aria-label="linearmodels v7.1 (+411)" data-md-component="logo">
+    <a href="../../../index.html" title="linearmodels v7.1 (+420)" class="md-nav__button md-logo" aria-label="linearmodels v7.1 (+420)" data-md-component="logo">
       <img src="../../../_static/bw-logo.svg" alt="logo">
     </a>
-    linearmodels v7.1 (+411)
+    linearmodels v7.1 (+420)
   </label>
   
     <div class="md-nav__source">
@@ -633,6 +633,10 @@
     <span class="nb">int</span><span class="p">,</span>
     <span class="n">linearmodels</span><span class="o">.</span><span class="n">typing</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">Float64Array</span><span class="p">,</span>
 <span class="p">]:</span>
+    <span class="k">if</span> <span class="n">x</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">==</span> <span class="mi">0</span> <span class="ow">or</span> <span class="p">(</span><span class="n">y</span><span class="o">.</span><span class="n">ndim</span> <span class="o">==</span> <span class="mi">2</span> <span class="ow">and</span> <span class="n">y</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">==</span> <span class="mi">0</span><span class="p">):</span>
+        <span class="c1"># There are no regressors, or no variables to regress</span>
+        <span class="n">empty</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">empty</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">((</span><span class="n">x</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="o">*</span><span class="n">y</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">:])),</span> <span class="n">empty</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="n">empty</span>
     <span class="k">if</span> <span class="n">rcond</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
         <span class="n">eps</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">finfo</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">)</span><span class="o">.</span><span class="n">eps</span>
         <span class="n">cond</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="nb">max</span><span class="p">(</span><span class="n">x</span><span class="o">.</span><span class="n">shape</span><span class="p">)</span> <span class="o">*</span> <span class="n">eps</span><span class="p">)</span>
@@ -991,6 +995,24 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">_check_rank</span> <span class="o">=</span> <span class="nb">bool</span><span class="p">(</span><span class="n">check_rank</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_validate_data</span><span class="p">()</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_singleton_index</span><span class="p">:</span> <span class="n">linearmodels</span><span class="o">.</span><span class="n">typing</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">BoolArray</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_check_regressors</span><span class="p">()</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">_check_regressors</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">"""</span>
+<span class="sd">        Raise a ValueError if exog has no columns</span>
+
+<span class="sd">        Raises</span>
+<span class="sd">        ------</span>
+<span class="sd">        ValueError</span>
+<span class="sd">            If exog has no columns. Only PanelOLS with effects can estimate a model</span>
+<span class="sd">            without regressors.</span>
+<span class="sd">        """</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">exog</span><span class="o">.</span><span class="n">nvar</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
+                <span class="sa">f</span><span class="s2">"</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="vm">__class__</span><span class="o">.</span><span class="vm">__name__</span><span class="si">}</span><span class="s2"> needs at least one regressor, but exog "</span>
+                <span class="s2">"has no columns. Only PanelOLS can estimate a model without "</span>
+                <span class="s2">"regressors, and it needs entity, time or other effects."</span>
+            <span class="p">)</span>
 
     <span class="k">def</span><span class="w"> </span><span class="fm">__str__</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
         <span class="n">out</span> <span class="o">=</span> <span class="s2">"</span><span class="si">{name}</span><span class="s2"> </span><span class="se">\n</span><span class="s2">Num exog: </span><span class="si">{num_exog}</span><span class="s2">, Constant: </span><span class="si">{has_constant}</span><span class="s2">"</span>
@@ -1314,7 +1336,12 @@
                 <span class="s2">"weights must have the same number of observations as dependent."</span>
             <span class="p">)</span>
 
-        <span class="n">all_missing</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">any</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">isnan</span><span class="p">(</span><span class="n">y</span><span class="p">),</span> <span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span> <span class="o">&amp;</span> <span class="n">np</span><span class="o">.</span><span class="n">all</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">isnan</span><span class="p">(</span><span class="n">x</span><span class="p">),</span> <span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+        <span class="c1"># The rows that are missing in dependent and in all of the regressors are</span>
+        <span class="c1"># dropped without a warning. If there are no regressors, the rows that are</span>
+        <span class="c1"># missing in dependent only get the warning</span>
+        <span class="n">all_missing</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">any</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">isnan</span><span class="p">(</span><span class="n">y</span><span class="p">),</span> <span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span> <span class="o">&amp;</span> <span class="p">(</span>
+            <span class="n">np</span><span class="o">.</span><span class="n">all</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">isnan</span><span class="p">(</span><span class="n">x</span><span class="p">),</span> <span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span> <span class="o">&amp;</span> <span class="p">(</span><span class="n">x</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">)</span>
+        <span class="p">)</span>
         <span class="n">missing</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">asarray</span><span class="p">(</span>
             <span class="n">np</span><span class="o">.</span><span class="n">any</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">isnan</span><span class="p">(</span><span class="n">y</span><span class="p">),</span> <span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
             <span class="o">|</span> <span class="n">np</span><span class="o">.</span><span class="n">any</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">isnan</span><span class="p">(</span><span class="n">x</span><span class="p">),</span> <span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
@@ -1390,6 +1417,8 @@
         <span class="n">weps_const</span> <span class="o">=</span> <span class="n">y</span>
         <span class="n">num_df</span> <span class="o">=</span> <span class="n">x</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span>
         <span class="n">name</span> <span class="o">=</span> <span class="s2">"Model F-statistic (homoskedastic)"</span>
+        <span class="k">if</span> <span class="n">num_df</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="k">return</span> <span class="n">InvalidTestStatistic</span><span class="p">(</span><span class="s2">"Model contains no regressors"</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="n">name</span><span class="p">)</span>
         <span class="k">if</span> <span class="n">df_resid</span> <span class="o">&lt;=</span> <span class="mi">0</span><span class="p">:</span>
             <span class="k">return</span> <span class="n">InvalidTestStatistic</span><span class="p">(</span>
                 <span class="s2">"The model has no residual degrees of freedom"</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="n">name</span>
@@ -1425,6 +1454,13 @@
         <span class="n">sel</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">ones</span><span class="p">(</span><span class="n">params</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">dtype</span><span class="o">=</span><span class="nb">bool</span><span class="p">)</span>
         <span class="n">name</span> <span class="o">=</span> <span class="s2">"Model F-statistic (robust)"</span>
 
+        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">sel</span><span class="p">)</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="k">return</span> <span class="n">FInfo</span><span class="p">(</span>
+                <span class="n">sel</span><span class="p">,</span>
+                <span class="n">name</span><span class="p">,</span>
+                <span class="n">InvalidTestStatistic</span><span class="p">(</span><span class="s2">"Model contains no regressors"</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="n">name</span><span class="p">),</span>
+                <span class="kc">True</span><span class="p">,</span>
+            <span class="p">)</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">has_constant</span><span class="p">:</span>
             <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">sel</span><span class="p">)</span> <span class="o">==</span> <span class="mi">1</span><span class="p">:</span>
                 <span class="k">return</span> <span class="n">FInfo</span><span class="p">(</span>
@@ -2124,7 +2160,9 @@
 <span class="sd">        containers are those of ``dependent``, where a DataFrame has a column for</span>
 <span class="sd">        each variable and an array or DataArray with several variables has 3</span>
 <span class="sd">        dimensions (variable by time by entity). A list, a tuple or any other</span>
-<span class="sd">        container raises a ``TypeError`` that names ``exog``.</span>
+<span class="sd">        container raises a ``TypeError`` that names ``exog``. It can have no</span>
+<span class="sd">        variables, a DataFrame with the index of ``dependent`` and no columns or an</span>
+<span class="sd">        array with 0 variables, if the model has effects. See the notes.</span>
 <span class="sd">    weights : array_like, optional</span>
 <span class="sd">        Weights to use in estimation.  Assumes residual variance is</span>
 <span class="sd">        proportional to inverse of weight to that the residual time</span>
@@ -2191,6 +2229,62 @@
 <span class="sd">    Model supports at most 2 effects.  These can be entity-time, entity-other,</span>
 <span class="sd">    time-other or 2 other.</span>
 
+<span class="sd">    **Models without regressors**</span>
+
+<span class="sd">    A model that only has effects can be estimated,</span>
+
+<span class="sd">    .. math::</span>
+
+<span class="sd">        y_{it} = \alpha_i + \gamma_t + \epsilon_{it}</span>
+
+<span class="sd">    where either effect can be left out. The model is created with an ``exog`` that</span>
+<span class="sd">    has no columns, for example ``pd.DataFrame(index=y.index)`` or an array with 0</span>
+<span class="sd">    variables, or with a formula that has effects and no regressors, such as</span>
+<span class="sd">    ``"y ~ EntityEffects"`` or ``"y ~ EntityEffects + TimeEffects"``. The formula</span>
+<span class="sd">    gives the same results as ``exog`` without columns. The model has no constant, as</span>
+<span class="sd">    a constant is a regressor (``"y ~ 1 + EntityEffects"`` has one). The other models,</span>
+<span class="sd">    and ``PanelOLS`` without effects, raise a ``ValueError`` if ``exog`` has no</span>
+<span class="sd">    columns. The results of a model without regressors are:</span>
+
+<span class="sd">    * ``params``, ``std_errors``, ``tstats``, ``pvalues`` and ``cov`` are empty, and</span>
+<span class="sd">      ``conf_int`` has no rows. The summary does not have a table of parameters, and</span>
+<span class="sd">      ``wald_test`` raises a ``ValueError``.</span>
+<span class="sd">    * ``estimated_effects`` are the means of the dependent variable of the entity</span>
+<span class="sd">      (entity effects), of the time period (time effects), or the fitted values of</span>
+<span class="sd">      the regression on the dummy variables of both effects. These are weighted means</span>
+<span class="sd">      in a weighted model. There is no constant, so that the effects include the</span>
+<span class="sd">      overall mean. ``fitted_values`` are 0, and ``resids`` and ``idiosyncratic`` are</span>
+<span class="sd">      the dependent variable less its effects.</span>
+<span class="sd">    * ``df_model`` is the number of effects, which is ``N`` for entity effects, ``T``</span>
+<span class="sd">      for time effects and ``N + T - 1`` for both, and ``df_resid`` is ``nobs``</span>
+<span class="sd">      less ``df_model``.</span>
+<span class="sd">    * ``rsquared``, ``rsquared_within``, ``rsquared_between`` and ``rsquared_overall``</span>
+<span class="sd">      are 0 when they are defined, since the effects are removed from the dependent</span>
+<span class="sd">      variable and there is nothing else to explain it. The squared correlations</span>
+<span class="sd">      (``corr_squared_within``, ``corr_squared_between`` and ``corr_squared_overall``)</span>
+<span class="sd">      are 0 as well: the fitted values of the regressors are all 0, and these</span>
+<span class="sd">      measures are set to 0 if the fitted values do not vary. ``rsquared_inclusive``</span>
+<span class="sd">      is the R-squared of the effects, the share of the variation around the mean that</span>
+<span class="sd">      they explain. An R-squared is not defined if the sum of squares that it divides</span>
+<span class="sd">      is zero, for example ``rsquared_within`` if the dependent variable does not vary</span>
+<span class="sd">      within entities. If the dependent variable is constant, there is no variation to</span>
+<span class="sd">      explain and ``rsquared``, ``rsquared_within``, ``rsquared_inclusive`` and the</span>
+<span class="sd">      squared correlations are NaN.</span>
+<span class="sd">    * ``f_pooled`` is the test that the effects are zero. For entity effects it is</span>
+<span class="sd">      the F-test of the one-way analysis of variance. ``f_statistic`` and</span>
+<span class="sd">      ``f_statistic_robust``, which test the coefficients of the regressors, are</span>
+<span class="sd">      ``InvalidTestStatistic`` since there are none.</span>
+<span class="sd">    * ``loglik`` and ``s2`` are those of the regression on the dummy variables of the</span>
+<span class="sd">      effects. ``variance_decomposition`` splits the second moment of the dependent</span>
+<span class="sd">      variable, about 0 since there is no constant, into the variance of the</span>
+<span class="sd">      residuals and the rest, which is attributed to the effects.</span>
+
+<span class="sd">    .. versionchanged:: 7.1</span>
+
+<span class="sd">       A model without regressors can be estimated. Earlier versions raised a</span>
+<span class="sd">       ``ValueError`` from pandas, "No objects to concatenate", when ``exog`` had no</span>
+<span class="sd">       columns or the formula had no regressors.</span>
+
 <span class="sd">    A variable in ``exog`` is absorbed if the effects explain all of it. The</span>
 <span class="sd">    algorithms that remove the effects are exact only up to rounding error, or up to</span>
 <span class="sd">    a relative error of about 1e-8 if they are iterative, so a variable is treated</span>
@@ -2237,9 +2331,18 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">_singletons</span> <span class="o">=</span> <span class="n">singletons</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_other_effects</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_validate_effects</span><span class="p">()</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_has_effect</span> <span class="o">=</span> <span class="n">entity_effects</span> <span class="ow">or</span> <span class="n">time_effects</span> <span class="ow">or</span> <span class="bp">self</span><span class="o">.</span><span class="n">other_effects</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">exog</span><span class="o">.</span><span class="n">nvar</span> <span class="o">==</span> <span class="mi">0</span> <span class="ow">and</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">_has_effect</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
+                <span class="s2">"exog has no columns and the model has no effects, so there is "</span>
+                <span class="s2">"nothing to estimate. A model without regressors needs entity, time "</span>
+                <span class="s2">"or other effects."</span>
+            <span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_drop_absorbed</span> <span class="o">=</span> <span class="n">drop_absorbed</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_singleton_index</span> <span class="o">=</span> <span class="kc">None</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_drop_singletons</span><span class="p">()</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">_check_regressors</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">"""Nothing is checked here: __init__ checks that a model has effects"""</span>
 
     <span class="k">def</span><span class="w"> </span><span class="nf">_collect_effects</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">linearmodels</span><span class="o">.</span><span class="n">typing</span><span class="o">.</span><span class="n">NumericArray</span><span class="p">:</span>
         <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">_has_effect</span><span class="p">:</span>
@@ -2420,7 +2523,10 @@
 <span class="sd">            Formula to transform into model. Conforms to formulaic formula</span>
 <span class="sd">            rules with two special variable names, EntityEffects and</span>
 <span class="sd">            TimeEffects which can be used to specify that the model should</span>
-<span class="sd">            contain an entity effect or a time effect, respectively. See</span>
+<span class="sd">            contain an entity effect or a time effect, respectively. The</span>
+<span class="sd">            formula can have effects and no regressors, for example</span>
+<span class="sd">            ``"y ~ EntityEffects"``, which is a model with only entity effects</span>
+<span class="sd">            that gives the same results as ``exog`` without columns. See</span>
 <span class="sd">            Examples.</span>
 <span class="sd">        data : PanelData or DataFrame</span>
 <span class="sd">            Data structure that can be coerced into a PanelData.  In most</span>
@@ -2461,6 +2567,11 @@
 <span class="sd">        &gt;&gt;&gt; panel_data = generate_panel_data()</span>
 <span class="sd">        &gt;&gt;&gt; mod = PanelOLS.from_formula("y ~ 1 + x1 + EntityEffects", panel_data.data)</span>
 <span class="sd">        &gt;&gt;&gt; res = mod.fit(cov_type="clustered", cluster_entity=True)</span>
+
+<span class="sd">        A model with effects and no regressors</span>
+
+<span class="sd">        &gt;&gt;&gt; mod = PanelOLS.from_formula("y ~ EntityEffects", panel_data.data)</span>
+<span class="sd">        &gt;&gt;&gt; res = mod.fit()</span>
 <span class="sd">        """</span>
         <span class="n">parser</span> <span class="o">=</span> <span class="n">PanelFormulaParser</span><span class="p">(</span><span class="n">formula</span><span class="p">,</span> <span class="n">data</span><span class="p">,</span> <span class="n">context</span><span class="o">=</span><span class="n">capture_context</span><span class="p">(</span><span class="mi">1</span><span class="p">))</span>
         <span class="n">entity_effect</span> <span class="o">=</span> <span class="n">parser</span><span class="o">.</span><span class="n">entity_effect</span>
@@ -2528,19 +2639,19 @@
             <span class="n">cond_mean</span> <span class="o">=</span> <span class="n">lsmr</span><span class="p">(</span><span class="n">wd</span><span class="p">,</span> <span class="n">wx</span><span class="p">[:,</span> <span class="n">i</span><span class="p">],</span> <span class="n">atol</span><span class="o">=</span><span class="mf">1e-8</span><span class="p">,</span> <span class="n">btol</span><span class="o">=</span><span class="mf">1e-8</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span>
             <span class="n">cond_mean</span> <span class="o">/=</span> <span class="n">cond</span>
             <span class="n">wx_mean_l</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">cond_mean</span><span class="p">)</span>
-        <span class="n">wx_mean</span><span class="p">:</span> <span class="n">linearmodels</span><span class="o">.</span><span class="n">typing</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">Float64Array</span> <span class="o">|</span> <span class="n">csc_array</span>
         <span class="n">wy_mean</span><span class="p">:</span> <span class="n">linearmodels</span><span class="o">.</span><span class="n">typing</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">Float64Array</span> <span class="o">|</span> <span class="n">csc_array</span>
-        <span class="n">wx_mean</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">column_stack</span><span class="p">(</span><span class="n">wx_mean_l</span><span class="p">)</span>
         <span class="n">wy_mean</span> <span class="o">=</span> <span class="n">lsmr</span><span class="p">(</span><span class="n">wd</span><span class="p">,</span> <span class="n">wy</span><span class="p">,</span> <span class="n">atol</span><span class="o">=</span><span class="mf">1e-8</span><span class="p">,</span> <span class="n">btol</span><span class="o">=</span><span class="mf">1e-8</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span>
         <span class="n">wy_mean</span> <span class="o">/=</span> <span class="n">cond</span>
         <span class="n">wy_mean</span> <span class="o">=</span> <span class="n">wy_mean</span><span class="p">[:,</span> <span class="kc">None</span><span class="p">]</span>
 
-        <span class="n">wx_mean</span> <span class="o">=</span> <span class="n">csc_array</span><span class="p">(</span><span class="n">wx_mean</span><span class="p">)</span>
         <span class="n">wy_mean</span> <span class="o">=</span> <span class="n">csc_array</span><span class="p">(</span><span class="n">wy_mean</span><span class="p">)</span>
 
         <span class="c1"># Purge fitted, weighted values</span>
         <span class="n">sp_cond</span> <span class="o">=</span> <span class="n">diags_array</span><span class="p">(</span><span class="n">cond</span><span class="p">,</span> <span class="nb">format</span><span class="o">=</span><span class="s2">"csc"</span><span class="p">)</span>
-        <span class="n">wx</span> <span class="o">=</span> <span class="n">wx</span> <span class="o">-</span> <span class="p">(</span><span class="n">wd</span> <span class="o">@</span> <span class="n">sp_cond</span> <span class="o">@</span> <span class="n">wx_mean</span><span class="p">)</span><span class="o">.</span><span class="n">toarray</span><span class="p">()</span>
+        <span class="k">if</span> <span class="n">wx_mean_l</span><span class="p">:</span>
+            <span class="c1"># There is nothing to purge if there are no regressors</span>
+            <span class="n">wx_mean</span> <span class="o">=</span> <span class="n">csc_array</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">column_stack</span><span class="p">(</span><span class="n">wx_mean_l</span><span class="p">))</span>
+            <span class="n">wx</span> <span class="o">=</span> <span class="n">wx</span> <span class="o">-</span> <span class="p">(</span><span class="n">wd</span> <span class="o">@</span> <span class="n">sp_cond</span> <span class="o">@</span> <span class="n">wx_mean</span><span class="p">)</span><span class="o">.</span><span class="n">toarray</span><span class="p">()</span>
         <span class="n">wy</span> <span class="o">=</span> <span class="n">wy</span> <span class="o">-</span> <span class="p">(</span><span class="n">wd</span> <span class="o">@</span> <span class="n">sp_cond</span> <span class="o">@</span> <span class="n">wy_mean</span><span class="p">)</span><span class="o">.</span><span class="n">toarray</span><span class="p">()</span>
 
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">has_constant</span><span class="p">:</span>
@@ -2985,7 +3096,8 @@
                 <span class="n">neffects</span> <span class="o">+=</span> <span class="n">oe</span><span class="p">[</span><span class="n">c</span><span class="p">]</span><span class="o">.</span><span class="n">nunique</span><span class="p">()</span> <span class="o">-</span> <span class="n">drop_first</span>
                 <span class="n">drop_first</span> <span class="o">=</span> <span class="kc">True</span>
 
-        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">entity_effects</span> <span class="ow">or</span> <span class="bp">self</span><span class="o">.</span><span class="n">time_effects</span> <span class="ow">or</span> <span class="bp">self</span><span class="o">.</span><span class="n">other_effects</span><span class="p">:</span>
+        <span class="n">has_effects</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">entity_effects</span> <span class="ow">or</span> <span class="bp">self</span><span class="o">.</span><span class="n">time_effects</span> <span class="ow">or</span> <span class="bp">self</span><span class="o">.</span><span class="n">other_effects</span>
+        <span class="k">if</span> <span class="n">has_effects</span> <span class="ow">and</span> <span class="n">x</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
             <span class="c1"># The regressors before the effects were removed set the scale of each</span>
             <span class="c1"># column, so the check does not depend on the units of the variables</span>
             <span class="n">x_orig</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">weights</span><span class="o">.</span><span class="n">values2d</span><span class="p">)</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">exog</span><span class="o">.</span><span class="n">values2d</span>

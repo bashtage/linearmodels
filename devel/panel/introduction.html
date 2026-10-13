@@ -23,7 +23,7 @@
     
   
       
-        <title>Introduction - linearmodels v7.1 (+411)</title>
+        <title>Introduction - linearmodels v7.1 (+420)</title>
       
     
 
@@ -80,7 +80,7 @@
     <div data-md-component="skip">
       
         
-        <a href="#specification-tests" class="md-skip">
+        <a href="#models-with-only-effects" class="md-skip">
           Skip to content
         </a>
       
@@ -100,7 +100,7 @@
 
 <header class="md-header md-header--shadow" data-md-component="header">
   <nav class="md-header__inner md-grid" aria-label="Header">
-    <a href="../index.html" title="linearmodels v7.1 (+411)" class="md-header__button md-logo" aria-label="linearmodels v7.1 (+411)" data-md-component="logo">
+    <a href="../index.html" title="linearmodels v7.1 (+420)" class="md-header__button md-logo" aria-label="linearmodels v7.1 (+420)" data-md-component="logo">
       <img src="../_static/bw-logo.svg" alt="logo">
     </a>
     <label class="md-header__button md-icon" for="__drawer">
@@ -111,7 +111,7 @@
       <div class="md-header__ellipsis">
         <div class="md-header__topic">
           <span class="md-ellipsis">
-            linearmodels v7.1 (+411)
+            linearmodels v7.1 (+420)
           </span>
         </div>
         <div class="md-header__topic" data-md-component="header-topic">
@@ -206,10 +206,10 @@
 
 <nav class="md-nav md-nav--primary" aria-label="Navigation" data-md-level="0">
   <label class="md-nav__title" for="__drawer">
-    <a href="../index.html" title="linearmodels v7.1 (+411)" class="md-nav__button md-logo" aria-label="linearmodels v7.1 (+411)" data-md-component="logo">
+    <a href="../index.html" title="linearmodels v7.1 (+420)" class="md-nav__button md-logo" aria-label="linearmodels v7.1 (+420)" data-md-component="logo">
       <img src="../_static/bw-logo.svg" alt="logo">
     </a>
-    linearmodels v7.1 (+411)
+    linearmodels v7.1 (+420)
   </label>
   
     <div class="md-nav__source">
@@ -349,6 +349,16 @@
       Contents
     </label>
     <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#models-with-only-effects" class="md-nav__link">
+    
+    <span class="md-ellipsis">
+      <span title="/panel/introduction.rst#models-with-only-effects (reference label)"><span>Models with Only Effects</span></span>
+    </span>
+  </a>
+  
+</li>
       
         <li class="md-nav__item">
   <a href="#specification-tests" class="md-nav__link">
@@ -827,6 +837,16 @@
     <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
       
         <li class="md-nav__item">
+  <a href="#models-with-only-effects" class="md-nav__link">
+    
+    <span class="md-ellipsis">
+      <span title="/panel/introduction.rst#models-with-only-effects (reference label)"><span>Models with Only Effects</span></span>
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
   <a href="#specification-tests" class="md-nav__link">
     
     <span class="md-ellipsis">
@@ -983,6 +1003,28 @@ to include the fixed effects.</p>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><code><span class="n">mod</span> <span class="o">=</span> <span class="n">PanelOLS</span><span class="o">.</span><span class="n">from_formula</span><span class="p">(</span><span class="s1">'lwage ~ 1 + expersq + union + married + EntityEffects'</span><span class="p">,</span><span class="n">data</span><span class="p">)</span>
 </code></pre></div>
 </div>
+<h2 id="models-with-only-effects"><span id="panel-effects-only"></span>Models with Only Effects<a class="headerlink" href="#models-with-only-effects" title="Link to this heading">¶</a></h2>
+<p>A <a class="reference internal" href="panel/linearmodels.panel.model.PanelOLS.html#linearmodels.panel.model.PanelOLS" title="linearmodels.panel.model.PanelOLS (Python class) — One- and two-way fixed effects estimator for panel data"><code class="xref py py-class docutils literal notranslate"><span class="pre">PanelOLS</span></code></a> model can have effects and no
+regressors, <span class="math notranslate nohighlight">\(y_{it} = \alpha_i + \epsilon_{it}\)</span>. The formula has no
+regressors, or <code class="docutils literal notranslate"><span class="pre">exog</span></code> has the index of <code class="docutils literal notranslate"><span class="pre">dependent</span></code> and no columns.</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><code><span class="kn">import</span><span class="w"> </span><span class="nn">pandas</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">pd</span>
+
+<span class="n">mod</span> <span class="o">=</span> <span class="n">PanelOLS</span><span class="o">.</span><span class="n">from_formula</span><span class="p">(</span><span class="s1">'lwage ~ EntityEffects'</span><span class="p">,</span> <span class="n">data</span><span class="p">)</span>
+<span class="c1"># The same model, without a formula</span>
+<span class="n">mod</span> <span class="o">=</span> <span class="n">PanelOLS</span><span class="p">(</span><span class="n">dependent</span><span class="p">,</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">(</span><span class="n">index</span><span class="o">=</span><span class="n">data</span><span class="o">.</span><span class="n">index</span><span class="p">),</span> <span class="n">entity_effects</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+<span class="n">res</span> <span class="o">=</span> <span class="n">mod</span><span class="o">.</span><span class="n">fit</span><span class="p">()</span>
+</code></pre></div>
+</div>
+<p>The model has no parameters, so that <code class="docutils literal notranslate"><span class="pre">params</span></code>, <code class="docutils literal notranslate"><span class="pre">cov</span></code> and the other tables
+of the parameters are empty. <code class="docutils literal notranslate"><span class="pre">estimated_effects</span></code> are the means of the dependent
+variable of the entities (of the periods, with <code class="docutils literal notranslate"><span class="pre">TimeEffects</span></code>), and <code class="docutils literal notranslate"><span class="pre">resids</span></code> are
+the deviations from them. <code class="docutils literal notranslate"><span class="pre">f_pooled</span></code> is the test that the effects are zero, which
+for entity effects is the F-test of a one-way analysis of variance. The tests of
+the coefficients, <code class="docutils literal notranslate"><span class="pre">f_statistic</span></code> and <code class="docutils literal notranslate"><span class="pre">f_statistic_robust</span></code>, are not defined. The
+R-squared of the model is 0 (NaN if the dependent variable does not vary once the
+effects are removed), and <code class="docutils literal notranslate"><span class="pre">rsquared_inclusive</span></code> is the share of the variation of the
+dependent variable that the effects explain. See
+<a class="reference internal" href="panel/linearmodels.panel.model.PanelOLS.html#linearmodels.panel.model.PanelOLS" title="linearmodels.panel.model.PanelOLS (Python class) — One- and two-way fixed effects estimator for panel data"><code class="xref py py-class docutils literal notranslate"><span class="pre">PanelOLS</span></code></a> for all of the results.</p>
 <h2 id="specification-tests"><span id="panel-specification-tests"></span>Specification Tests<a class="headerlink" href="#specification-tests" title="Link to this heading">¶</a></h2>
 <p>The results of the panel models contain two specification tests. The Hausman
 test compares the random effects estimates with those of a model that is

@@ -19,7 +19,7 @@
     
   
       
-        <title>linearmodels.panel.results - linearmodels v7.1 (+411)</title>
+        <title>linearmodels.panel.results - linearmodels v7.1 (+420)</title>
       
     
 
@@ -91,7 +91,7 @@
 
 <header class="md-header md-header--shadow" data-md-component="header">
   <nav class="md-header__inner md-grid" aria-label="Header">
-    <a href="../../../index.html" title="linearmodels v7.1 (+411)" class="md-header__button md-logo" aria-label="linearmodels v7.1 (+411)" data-md-component="logo">
+    <a href="../../../index.html" title="linearmodels v7.1 (+420)" class="md-header__button md-logo" aria-label="linearmodels v7.1 (+420)" data-md-component="logo">
       <img src="../../../_static/bw-logo.svg" alt="logo">
     </a>
     <label class="md-header__button md-icon" for="__drawer">
@@ -102,7 +102,7 @@
       <div class="md-header__ellipsis">
         <div class="md-header__topic">
           <span class="md-ellipsis">
-            linearmodels v7.1 (+411)
+            linearmodels v7.1 (+420)
           </span>
         </div>
         <div class="md-header__topic" data-md-component="header-topic">
@@ -197,10 +197,10 @@
 
 <nav class="md-nav md-nav--primary" aria-label="Navigation" data-md-level="0">
   <label class="md-nav__title" for="__drawer">
-    <a href="../../../index.html" title="linearmodels v7.1 (+411)" class="md-nav__button md-logo" aria-label="linearmodels v7.1 (+411)" data-md-component="logo">
+    <a href="../../../index.html" title="linearmodels v7.1 (+420)" class="md-nav__button md-logo" aria-label="linearmodels v7.1 (+420)" data-md-component="logo">
       <img src="../../../_static/bw-logo.svg" alt="logo">
     </a>
-    linearmodels v7.1 (+411)
+    linearmodels v7.1 (+420)
   </label>
   
     <div class="md-nav__source">
@@ -983,6 +983,9 @@
             <span class="n">vals</span><span class="o">.</span><span class="n">append</span><span class="p">([</span><span class="n">val</span><span class="p">])</span>
         <span class="n">table</span><span class="o">.</span><span class="n">extend_right</span><span class="p">(</span><span class="n">SimpleTable</span><span class="p">(</span><span class="n">vals</span><span class="p">,</span> <span class="n">stubs</span><span class="o">=</span><span class="n">stubs</span><span class="p">))</span>
         <span class="n">smry</span><span class="o">.</span><span class="n">tables</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">table</span><span class="p">)</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">params</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="c1"># A model that only has effects has no table of parameters</span>
+            <span class="k">return</span> <span class="n">smry</span>
 
         <span class="n">param_data</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">c_</span><span class="p">[</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">params</span><span class="o">.</span><span class="n">to_numpy</span><span class="p">()[:,</span> <span class="kc">None</span><span class="p">],</span>
@@ -1425,6 +1428,12 @@
 <span class="sd">        WaldTestStatistic</span>
 <span class="sd">            Test statistic for null that restrictions are valid.</span>
 
+<span class="sd">        Raises</span>
+<span class="sd">        ------</span>
+<span class="sd">        ValueError</span>
+<span class="sd">            If the model has no parameters, e.g., a PanelOLS model that only has</span>
+<span class="sd">            effects.</span>
+
 <span class="sd">        Notes</span>
 <span class="sd">        -----</span>
 <span class="sd">        Hypothesis test examines whether :math:`H_0:C\theta=v` where the</span>
@@ -1470,6 +1479,11 @@
 <span class="sd">        &gt;&gt;&gt; null = "`C(year)[T.1987]:educ` = 0, `C(year)[T.1986]:educ` = 0"</span>
 <span class="sd">        &gt;&gt;&gt; wald_res = res.wald_test(formula=null)</span>
 <span class="sd">        """</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">params</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
+                <span class="s2">"The model has no parameters, so that there is nothing to test. It "</span>
+                <span class="s2">"only has effects, which have no inference."</span>
+            <span class="p">)</span>
         <span class="k">return</span> <span class="n">quadratic_form_test</span><span class="p">(</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">params</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">cov</span><span class="p">,</span> <span class="n">restriction</span><span class="o">=</span><span class="n">restriction</span><span class="p">,</span> <span class="n">value</span><span class="o">=</span><span class="n">value</span><span class="p">,</span> <span class="n">formula</span><span class="o">=</span><span class="n">formula</span>
         <span class="p">)</span></div>
@@ -2299,8 +2313,10 @@
             <span class="n">params_stub</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="n">params</span><span class="o">.</span><span class="n">index</span><span class="p">[</span><span class="n">i</span><span class="p">]))</span>
             <span class="n">params_stub</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s2">" "</span><span class="p">)</span>
 
-        <span class="n">vals_lst</span> <span class="o">=</span> <span class="n">table_concat</span><span class="p">((</span><span class="n">vals_lst</span><span class="p">,</span> <span class="n">params_fmt</span><span class="p">))</span>
-        <span class="n">stubs</span> <span class="o">=</span> <span class="n">stub_concat</span><span class="p">((</span><span class="n">stubs</span><span class="p">,</span> <span class="n">params_stub</span><span class="p">))</span>
+        <span class="k">if</span> <span class="n">params_fmt</span><span class="p">:</span>
+            <span class="c1"># None of the models has parameters if they only have effects</span>
+            <span class="n">vals_lst</span> <span class="o">=</span> <span class="n">table_concat</span><span class="p">((</span><span class="n">vals_lst</span><span class="p">,</span> <span class="n">params_fmt</span><span class="p">))</span>
+            <span class="n">stubs</span> <span class="o">=</span> <span class="n">stub_concat</span><span class="p">((</span><span class="n">stubs</span><span class="p">,</span> <span class="n">params_stub</span><span class="p">))</span>
 
         <span class="n">all_effects</span> <span class="o">=</span> <span class="p">[]</span>
         <span class="k">for</span> <span class="n">key</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_results</span><span class="p">:</span>

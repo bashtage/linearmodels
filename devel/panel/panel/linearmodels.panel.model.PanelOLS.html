@@ -23,7 +23,7 @@
     
   
       
-        <title>linearmodels.panel.model.PanelOLS - linearmodels v7.1 (+411)</title>
+        <title>linearmodels.panel.model.PanelOLS - linearmodels v7.1 (+420)</title>
       
     
 
@@ -100,7 +100,7 @@
 
 <header class="md-header md-header--shadow" data-md-component="header">
   <nav class="md-header__inner md-grid" aria-label="Header">
-    <a href="../../index.html" title="linearmodels v7.1 (+411)" class="md-header__button md-logo" aria-label="linearmodels v7.1 (+411)" data-md-component="logo">
+    <a href="../../index.html" title="linearmodels v7.1 (+420)" class="md-header__button md-logo" aria-label="linearmodels v7.1 (+420)" data-md-component="logo">
       <img src="../../_static/bw-logo.svg" alt="logo">
     </a>
     <label class="md-header__button md-icon" for="__drawer">
@@ -111,7 +111,7 @@
       <div class="md-header__ellipsis">
         <div class="md-header__topic">
           <span class="md-ellipsis">
-            linearmodels v7.1 (+411)
+            linearmodels v7.1 (+420)
           </span>
         </div>
         <div class="md-header__topic" data-md-component="header-topic">
@@ -206,10 +206,10 @@
 
 <nav class="md-nav md-nav--primary" aria-label="Navigation" data-md-level="0">
   <label class="md-nav__title" for="__drawer">
-    <a href="../../index.html" title="linearmodels v7.1 (+411)" class="md-nav__button md-logo" aria-label="linearmodels v7.1 (+411)" data-md-component="logo">
+    <a href="../../index.html" title="linearmodels v7.1 (+420)" class="md-nav__button md-logo" aria-label="linearmodels v7.1 (+420)" data-md-component="logo">
       <img src="../../_static/bw-logo.svg" alt="logo">
     </a>
-    linearmodels v7.1 (+411)
+    linearmodels v7.1 (+420)
   </label>
   
     <div class="md-nav__source">
@@ -1870,7 +1870,9 @@ entities and time periods need labels or a layout.</p>
 containers are those of <code class="docutils literal notranslate"><span class="pre">dependent</span></code>, where a DataFrame has a column for
 each variable and an array or DataArray with several variables has 3
 dimensions (variable by time by entity). A list, a tuple or any other
-container raises a <code class="docutils literal notranslate"><span class="pre">TypeError</span></code> that names <code class="docutils literal notranslate"><span class="pre">exog</span></code>.</p>
+container raises a <code class="docutils literal notranslate"><span class="pre">TypeError</span></code> that names <code class="docutils literal notranslate"><span class="pre">exog</span></code>. It can have no
+variables, a DataFrame with the index of <code class="docutils literal notranslate"><span class="pre">dependent</span></code> and no columns or an
+array with 0 variables, if the model has effects. See the notes.</p>
 </dd>
 <dt id="linearmodels.panel.model.PanelOLS.__init__.weights"><span class="n sig-name">weights</span><span class="p">:</span><span class="w"> </span><span class="n"><span class="desctype"><a class="reference internal" href="linearmodels.panel.data.PanelData.html#linearmodels.panel.data.PanelData" title="linearmodels.panel.data.PanelData (Python class) — Abstraction to handle alternative formats for panel data">PanelData</a><span class="w"> </span><span class="p">|</span><span class="w"> </span><a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v2.5)">ndarray</a><span class="w"> </span><span class="p">|</span><span class="w"> </span><a class="reference external" href="https://docs.xarray.dev/en/stable/generated/xarray.DataArray.html#xarray.DataArray" title="(in xarray v2026.9.0)">DataArray</a><span class="w"> </span><span class="p">|</span><span class="w"> </span><a class="reference external" href="https://pandas.pydata.org/pandas-docs/stable/reference/api/pandas.DataFrame.html#pandas.DataFrame" title="(in pandas v3.0.6)">DataFrame</a><span class="w"> </span><span class="p">|</span><span class="w"> </span><a class="reference external" href="https://pandas.pydata.org/pandas-docs/stable/reference/api/pandas.Series.html#pandas.Series" title="(in pandas v3.0.6)">Series</a><span class="w"> </span><span class="p">|</span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/builtins/constants.html#None" title="(in Python v3.15)">None</a></span></span><span class="w"> </span><span class="o">=</span><span class="w"> </span><code class="code python default_value docutils literal highlight highlight-python"><span class="kc">None</span></code><a class="headerlink" href="#linearmodels.panel.model.PanelOLS.__init__.weights" title="Permalink to this definition">¶</a></dt><dd><p>Weights to use in estimation.  Assumes residual variance is
 proportional to inverse of weight to that the residual time
@@ -1925,6 +1927,57 @@ can be described</p>
 effects are included, the model reduces to <a class="reference internal" href="linearmodels.panel.model.PooledOLS.html#linearmodels.panel.model.PooledOLS" title="linearmodels.panel.model.PooledOLS (Python class) — Pooled coefficient estimator for panel data"><code class="xref py py-class docutils literal notranslate"><span class="pre">PooledOLS</span></code></a>.</p>
 <p>Model supports at most 2 effects.  These can be entity-time, entity-other,
 time-other or 2 other.</p>
+<p><strong>Models without regressors</strong></p>
+<p>A model that only has effects can be estimated,</p>
+<div class="math notranslate nohighlight">
+\[y_{it} = \alpha_i + \gamma_t + \epsilon_{it}\]</div>
+<p>where either effect can be left out. The model is created with an <code class="docutils literal notranslate"><span class="pre">exog</span></code> that
+has no columns, for example <code class="docutils literal notranslate"><span class="pre">pd.DataFrame(index=y.index)</span></code> or an array with 0
+variables, or with a formula that has effects and no regressors, such as
+<code class="docutils literal notranslate"><span class="pre">&quot;y</span> <span class="pre">~</span> <span class="pre">EntityEffects&quot;</span></code> or <code class="docutils literal notranslate"><span class="pre">&quot;y</span> <span class="pre">~</span> <span class="pre">EntityEffects</span> <span class="pre">+</span> <span class="pre">TimeEffects&quot;</span></code>. The formula
+gives the same results as <code class="docutils literal notranslate"><span class="pre">exog</span></code> without columns. The model has no constant, as
+a constant is a regressor (<code class="docutils literal notranslate"><span class="pre">&quot;y</span> <span class="pre">~</span> <span class="pre">1</span> <span class="pre">+</span> <span class="pre">EntityEffects&quot;</span></code> has one). The other models,
+and <code class="docutils literal notranslate"><span class="pre">PanelOLS</span></code> without effects, raise a <code class="docutils literal notranslate"><span class="pre">ValueError</span></code> if <code class="docutils literal notranslate"><span class="pre">exog</span></code> has no
+columns. The results of a model without regressors are:</p>
+<ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">params</span></code>, <code class="docutils literal notranslate"><span class="pre">std_errors</span></code>, <code class="docutils literal notranslate"><span class="pre">tstats</span></code>, <code class="docutils literal notranslate"><span class="pre">pvalues</span></code> and <code class="docutils literal notranslate"><span class="pre">cov</span></code> are empty, and
+<code class="docutils literal notranslate"><span class="pre">conf_int</span></code> has no rows. The summary does not have a table of parameters, and
+<code class="docutils literal notranslate"><span class="pre">wald_test</span></code> raises a <code class="docutils literal notranslate"><span class="pre">ValueError</span></code>.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">estimated_effects</span></code> are the means of the dependent variable of the entity
+(entity effects), of the time period (time effects), or the fitted values of
+the regression on the dummy variables of both effects. These are weighted means
+in a weighted model. There is no constant, so that the effects include the
+overall mean. <code class="docutils literal notranslate"><span class="pre">fitted_values</span></code> are 0, and <code class="docutils literal notranslate"><span class="pre">resids</span></code> and <code class="docutils literal notranslate"><span class="pre">idiosyncratic</span></code> are
+the dependent variable less its effects.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">df_model</span></code> is the number of effects, which is <code class="docutils literal notranslate"><span class="pre">N</span></code> for entity effects, <code class="docutils literal notranslate"><span class="pre">T</span></code>
+for time effects and <code class="docutils literal notranslate"><span class="pre">N</span> <span class="pre">+</span> <span class="pre">T</span> <span class="pre">-</span> <span class="pre">1</span></code> for both, and <code class="docutils literal notranslate"><span class="pre">df_resid</span></code> is <code class="docutils literal notranslate"><span class="pre">nobs</span></code>
+less <code class="docutils literal notranslate"><span class="pre">df_model</span></code>.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">rsquared</span></code>, <code class="docutils literal notranslate"><span class="pre">rsquared_within</span></code>, <code class="docutils literal notranslate"><span class="pre">rsquared_between</span></code> and <code class="docutils literal notranslate"><span class="pre">rsquared_overall</span></code>
+are 0 when they are defined, since the effects are removed from the dependent
+variable and there is nothing else to explain it. The squared correlations
+(<code class="docutils literal notranslate"><span class="pre">corr_squared_within</span></code>, <code class="docutils literal notranslate"><span class="pre">corr_squared_between</span></code> and <code class="docutils literal notranslate"><span class="pre">corr_squared_overall</span></code>)
+are 0 as well: the fitted values of the regressors are all 0, and these
+measures are set to 0 if the fitted values do not vary. <code class="docutils literal notranslate"><span class="pre">rsquared_inclusive</span></code>
+is the R-squared of the effects, the share of the variation around the mean that
+they explain. An R-squared is not defined if the sum of squares that it divides
+is zero, for example <code class="docutils literal notranslate"><span class="pre">rsquared_within</span></code> if the dependent variable does not vary
+within entities. If the dependent variable is constant, there is no variation to
+explain and <code class="docutils literal notranslate"><span class="pre">rsquared</span></code>, <code class="docutils literal notranslate"><span class="pre">rsquared_within</span></code>, <code class="docutils literal notranslate"><span class="pre">rsquared_inclusive</span></code> and the
+squared correlations are NaN.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">f_pooled</span></code> is the test that the effects are zero. For entity effects it is
+the F-test of the one-way analysis of variance. <code class="docutils literal notranslate"><span class="pre">f_statistic</span></code> and
+<code class="docutils literal notranslate"><span class="pre">f_statistic_robust</span></code>, which test the coefficients of the regressors, are
+<code class="docutils literal notranslate"><span class="pre">InvalidTestStatistic</span></code> since there are none.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">loglik</span></code> and <code class="docutils literal notranslate"><span class="pre">s2</span></code> are those of the regression on the dummy variables of the
+effects. <code class="docutils literal notranslate"><span class="pre">variance_decomposition</span></code> splits the second moment of the dependent
+variable, about 0 since there is no constant, into the variance of the
+residuals and the rest, which is attributed to the effects.</p></li>
+</ul>
+<div class="admonition versionchanged">
+<p class="admonition-title"><span class="versionmodified changed">Changed in version 7.1: </span>A model without regressors can be estimated. Earlier versions raised a
+<code class="docutils literal notranslate"><span class="pre">ValueError</span></code> from pandas, “No objects to concatenate”, when <code class="docutils literal notranslate"><span class="pre">exog</span></code> had no
+columns or the formula had no regressors.</p>
+</div>
 <p>A variable in <code class="docutils literal notranslate"><span class="pre">exog</span></code> is absorbed if the effects explain all of it. The
 algorithms that remove the effects are exact only up to rounding error, or up to
 a relative error of about 1e-8 if they are iterative, so a variable is treated

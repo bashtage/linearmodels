@@ -23,7 +23,7 @@
     
   
       
-        <title>linearmodels.panel.model.PanelOLS.from_formula - linearmodels v7.1 (+411)</title>
+        <title>linearmodels.panel.model.PanelOLS.from_formula - linearmodels v7.1 (+420)</title>
       
     
 
@@ -100,7 +100,7 @@
 
 <header class="md-header md-header--shadow" data-md-component="header">
   <nav class="md-header__inner md-grid" aria-label="Header">
-    <a href="../../index.html" title="linearmodels v7.1 (+411)" class="md-header__button md-logo" aria-label="linearmodels v7.1 (+411)" data-md-component="logo">
+    <a href="../../index.html" title="linearmodels v7.1 (+420)" class="md-header__button md-logo" aria-label="linearmodels v7.1 (+420)" data-md-component="logo">
       <img src="../../_static/bw-logo.svg" alt="logo">
     </a>
     <label class="md-header__button md-icon" for="__drawer">
@@ -111,7 +111,7 @@
       <div class="md-header__ellipsis">
         <div class="md-header__topic">
           <span class="md-ellipsis">
-            linearmodels v7.1 (+411)
+            linearmodels v7.1 (+420)
           </span>
         </div>
         <div class="md-header__topic" data-md-component="header-topic">
@@ -206,10 +206,10 @@
 
 <nav class="md-nav md-nav--primary" aria-label="Navigation" data-md-level="0">
   <label class="md-nav__title" for="__drawer">
-    <a href="../../index.html" title="linearmodels v7.1 (+411)" class="md-nav__button md-logo" aria-label="linearmodels v7.1 (+411)" data-md-component="logo">
+    <a href="../../index.html" title="linearmodels v7.1 (+420)" class="md-nav__button md-logo" aria-label="linearmodels v7.1 (+420)" data-md-component="logo">
       <img src="../../_static/bw-logo.svg" alt="logo">
     </a>
-    linearmodels v7.1 (+411)
+    linearmodels v7.1 (+420)
   </label>
   
     <div class="md-nav__source">
@@ -1743,7 +1743,10 @@
 <dt id="linearmodels.panel.model.PanelOLS.from_formula.formula"><span class="n sig-name">formula</span><span class="p">:</span><span class="w"> </span><span class="n"><span class="desctype"><a class="reference external" href="https://docs.python.org/3/builtins/stdtypes.html#str" title="(in Python v3.15)">str</a></span></span><a class="headerlink" href="#linearmodels.panel.model.PanelOLS.from_formula.formula" title="Permalink to this definition">¶</a></dt><dd><p>Formula to transform into model. Conforms to formulaic formula
 rules with two special variable names, EntityEffects and
 TimeEffects which can be used to specify that the model should
-contain an entity effect or a time effect, respectively. See
+contain an entity effect or a time effect, respectively. The
+formula can have effects and no regressors, for example
+<code class="docutils literal notranslate"><span class="pre">&quot;y</span> <span class="pre">~</span> <span class="pre">EntityEffects&quot;</span></code>, which is a model with only entity effects
+that gives the same results as <code class="docutils literal notranslate"><span class="pre">exog</span></code> without columns. See
 Examples.</p>
 </dd>
 <dt id="linearmodels.panel.model.PanelOLS.from_formula.data"><span class="n sig-name">data</span><span class="p">:</span><span class="w"> </span><span class="n"><span class="desctype"><a class="reference internal" href="linearmodels.panel.data.PanelData.html#linearmodels.panel.data.PanelData" title="linearmodels.panel.data.PanelData (Python class) — Abstraction to handle alternative formats for panel data">PanelData</a><span class="w"> </span><span class="p">|</span><span class="w"> </span><a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v2.5)">ndarray</a><span class="w"> </span><span class="p">|</span><span class="w"> </span><a class="reference external" href="https://docs.xarray.dev/en/stable/generated/xarray.DataArray.html#xarray.DataArray" title="(in xarray v2026.9.0)">DataArray</a><span class="w"> </span><span class="p">|</span><span class="w"> </span><a class="reference external" href="https://pandas.pydata.org/pandas-docs/stable/reference/api/pandas.DataFrame.html#pandas.DataFrame" title="(in pandas v3.0.6)">DataFrame</a><span class="w"> </span><span class="p">|</span><span class="w"> </span><a class="reference external" href="https://pandas.pydata.org/pandas-docs/stable/reference/api/pandas.Series.html#pandas.Series" title="(in pandas v3.0.6)">Series</a></span></span><a class="headerlink" href="#linearmodels.panel.model.PanelOLS.from_formula.data" title="Permalink to this definition">¶</a></dt><dd><p>Data structure that can be coerced into a PanelData.  In most
@@ -1787,6 +1790,11 @@ is skipped and the matrix is not full rank.</p>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">panel_data</span> <span class="o">=</span> <span class="n">generate_panel_data</span><span class="p">()</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">mod</span> <span class="o">=</span> <span class="n">PanelOLS</span><span class="o">.</span><span class="n">from_formula</span><span class="p">(</span><span class="s2">"y ~ 1 + x1 + EntityEffects"</span><span class="p">,</span> <span class="n">panel_data</span><span class="o">.</span><span class="n">data</span><span class="p">)</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">res</span> <span class="o">=</span> <span class="n">mod</span><span class="o">.</span><span class="n">fit</span><span class="p">(</span><span class="n">cov_type</span><span class="o">=</span><span class="s2">"clustered"</span><span class="p">,</span> <span class="n">cluster_entity</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+</code></pre></div>
+</div>
+<p>A model with effects and no regressors</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><code><span class="gp">&gt;&gt;&gt; </span><span class="n">mod</span> <span class="o">=</span> <span class="n">PanelOLS</span><span class="o">.</span><span class="n">from_formula</span><span class="p">(</span><span class="s2">"y ~ EntityEffects"</span><span class="p">,</span> <span class="n">panel_data</span><span class="o">.</span><span class="n">data</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">res</span> <span class="o">=</span> <span class="n">mod</span><span class="o">.</span><span class="n">fit</span><span class="p">()</span>
 </code></pre></div>
 </div>
 </dd></dl>

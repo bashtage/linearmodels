@@ -23,7 +23,7 @@
     
   
       
-        <title>linearmodels.panel.data.PanelData - linearmodels v7.1 (+411)</title>
+        <title>linearmodels.panel.data.PanelData - linearmodels v7.1 (+420)</title>
       
     
 
@@ -100,7 +100,7 @@
 
 <header class="md-header md-header--shadow" data-md-component="header">
   <nav class="md-header__inner md-grid" aria-label="Header">
-    <a href="../../index.html" title="linearmodels v7.1 (+411)" class="md-header__button md-logo" aria-label="linearmodels v7.1 (+411)" data-md-component="logo">
+    <a href="../../index.html" title="linearmodels v7.1 (+420)" class="md-header__button md-logo" aria-label="linearmodels v7.1 (+420)" data-md-component="logo">
       <img src="../../_static/bw-logo.svg" alt="logo">
     </a>
     <label class="md-header__button md-icon" for="__drawer">
@@ -111,7 +111,7 @@
       <div class="md-header__ellipsis">
         <div class="md-header__topic">
           <span class="md-ellipsis">
-            linearmodels v7.1 (+411)
+            linearmodels v7.1 (+420)
           </span>
         </div>
         <div class="md-header__topic" data-md-component="header-topic">
@@ -206,10 +206,10 @@
 
 <nav class="md-nav md-nav--primary" aria-label="Navigation" data-md-level="0">
   <label class="md-nav__title" for="__drawer">
-    <a href="../../index.html" title="linearmodels v7.1 (+411)" class="md-nav__button md-logo" aria-label="linearmodels v7.1 (+411)" data-md-component="logo">
+    <a href="../../index.html" title="linearmodels v7.1 (+420)" class="md-nav__button md-logo" aria-label="linearmodels v7.1 (+420)" data-md-component="logo">
       <img src="../../_static/bw-logo.svg" alt="logo">
     </a>
-    linearmodels v7.1 (+411)
+    linearmodels v7.1 (+420)
   </label>
   
     <div class="md-nav__source">
@@ -2195,6 +2195,10 @@ can be treated as-if being (1, nobs, nentity).</p>
 input is treated differently.  Index level 0 is assumed to be entity.
 Index level 1 is time.  The columns are the variables.  MultiIndex Series
 are also accepted and treated as single column MultiIndex DataFrames.</p>
+<p>The data can have no variables, a DataFrame with a MultiIndex and no columns
+or an array with 0 variables. It is the <code class="docutils literal notranslate"><span class="pre">exog</span></code> of a
+<a class="reference internal" href="linearmodels.panel.model.PanelOLS.html#linearmodels.panel.model.PanelOLS" title="linearmodels.panel.model.PanelOLS (Python class) — One- and two-way fixed effects estimator for panel data"><code class="xref py py-class docutils literal notranslate"><span class="pre">PanelOLS</span></code></a> model that only has effects. The
+means, counts and demeaned data have no variables either.</p>
 <p>Missing values (NaN) in the entity or time index are not supported. The
 methods that group by the index raise a ValueError if the level that they
 use has a missing label.</p>
