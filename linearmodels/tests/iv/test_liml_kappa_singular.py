@@ -25,7 +25,13 @@ fit has to raise the ValueError that it has for a kappa that cannot be estimated
 if kappa is not given, set kappa of IV2SLS and IVJIVE to NaN so that the tests
 that use it are invalid, and not emit a warning, on every platform. Whether B is
 singular cannot depend on the units of the variables, and so a column of W that
-is rescaled by 1e6 or 1e-6 does not change the answer, or kappa.
+is rescaled by 1e6 or 1e-6 does not change whether kappa is defined.
+
+Where kappa is defined it is computed as it was. The accuracy of kappa depends on
+the units of the variables if there are 2 or more endogenous regressors, and a
+regressor that is exactly a linear combination of the exogenous regressors and
+instruments is not detected (issue 823). The tests pin the values, which are
+noise in the second case, to those of the previous computation.
 
 The expected values are computed from the definition. The projections come from
 QR decompositions and kappa from scipy.linalg.eigh(A, B), so that none of the
@@ -46,6 +52,7 @@ from scipy.linalg import eigh
 from linearmodels.iv import IV2SLS, IVJIVE, IVLIML
 import linearmodels.iv.model
 from linearmodels.shared.hypotheses import InvalidTestStatistic, WaldTestStatistic
+from linearmodels.shared.linalg import inv_sqrth
 
 # ----------------------------------------------------------------------------
 # Data and the definitions of the expected values
@@ -231,11 +238,13 @@ def test_weighted_kappa_is_the_generalized_eigenvalue():
 
 
 # ----------------------------------------------------------------------------
-# Kappa, and whether it is defined, do not depend on the units of the variables
+# Whether kappa is defined does not depend on the units of the variables
 # ----------------------------------------------------------------------------
 
 # Scales of (y, endogenous regressors). The scales are interleaved, which matters for
-# the cross product that is inverted
+# the cross product that is inverted. The accuracy of kappa depends on the units if
+# there are 2 or more endogenous regressors (issue 823). Those scales test that a
+# singular model is singular in any units, and that kappa is computed as it was
 SCALES_ONE_ENDOG = [(1e6, 1), (1, 1e6), (1e-6, 1), (1, 1e-6), (1e6, 1e-6), (1e-6, 1e6)]
 SCALES_TWO_ENDOG = [
     (1e6, 1, 1),
@@ -257,24 +266,18 @@ def scaled(design, scales, seed=3):
     return y * scales[0], exog, endog * np.array(scales[1:]), instr
 
 
-@pytest.mark.parametrize("scales", SCALES, ids=[str(s) for s in SCALES])
+@pytest.mark.parametrize(
+    "scales", SCALES_ONE_ENDOG, ids=[str(s) for s in SCALES_ONE_ENDOG]
+)
 @pytest.mark.parametrize("model", MODELS)
-def test_kappa_does_not_depend_on_the_units(model, scales):
-    nendog = len(scales) - 1
-    design = (1, nendog, nendog + 2, 120)
+def test_kappa_with_one_endogenous_regressor_does_not_depend_on_the_units(
+    model, scales
+):
+    # This is not true of 2 or more endogenous regressors, see issue 823
+    design = (1, 1, 3, 120)
     expected = reference_kappa(*data_for(design, seed=3))
     res = model(*args(*scaled(design, scales))).fit()
     assert_allclose(res._liml_kappa, expected, rtol=1e-9)
-
-
-@pytest.mark.parametrize(
-    "scales", SCALES_TWO_ENDOG, ids=[str(s) for s in SCALES_TWO_ENDOG]
-)
-def test_kappa_with_the_fewest_observations_does_not_depend_on_the_units(scales):
-    design = (1, 2, 3, fewest_observations(1, 2, 3))
-    expected = reference_kappa(*data_for(design, seed=3))
-    kappa = IVLIML(*args(*scaled(design, scales))).fit().kappa
-    assert_allclose(kappa, expected, rtol=1e-7)
 
 
 @pytest.mark.parametrize("scales", SCALES, ids=[str(s) for s in SCALES])
@@ -285,6 +288,82 @@ def test_too_few_observations_are_singular_in_any_units(scales):
     y, exog, endog, instr = scaled(design, scales)
     with pytest.raises(ValueError, match="Unable to estimate kappa"):
         IVLIML(*args(y, exog, endog, instr)).fit()
+
+
+# ----------------------------------------------------------------------------
+# Kappa is computed as it was where the model is not singular
+# ----------------------------------------------------------------------------
+
+
+def previous_kappa(model):
+    """The previous computation: the same operations on the residuals as they are"""
+    y, x, z = model._wy, model._wx, model._wz
+    is_exog = model._regressor_is_exog
+    e = np.c_[y, x[:, ~is_exog]]
+    x1 = x[:, is_exog]
+    ez = e - z @ (np.linalg.pinv(z) @ e)
+    ex1 = e if x1.shape[1] == 0 else e - x1 @ (np.linalg.pinv(x1) @ e)
+    vpmzv_sqinv = inv_sqrth(ez.T @ ez)
+    q = vpmzv_sqinv @ (ex1.T @ ex1) @ vpmzv_sqinv
+    return min(np.linalg.eigvalsh(q))
+
+
+def current_kappa(model):
+    return model._estimate_kappa()
+
+
+def kappa_or_none(function, model):
+    try:
+        return function(model)
+    except LinAlgError:
+        return None
+
+
+def check_computed_as_before(model):
+    # Either both raise, or the values are the same. The accuracy of both is poor
+    # in the cases of issue 823, where the values are not the kappa of the data
+    kappa = kappa_or_none(current_kappa, model)
+    previous = kappa_or_none(previous_kappa, model)
+    kappa_raised = kappa is None
+    previous_raised = previous is None
+    assert kappa_raised == previous_raised
+    if not previous_raised:
+        assert_allclose(kappa, previous, rtol=1e-12)
+
+
+@pytest.mark.parametrize("design", DEFINED, ids=ids(DEFINED))
+def test_kappa_is_computed_as_before(design):
+    y, exog, endog, instr = data_for(design)
+    check_computed_as_before(IVLIML(*args(y, exog, endog, instr), kappa=1.0))
+
+
+def span_data(seed):
+    """A regressor that is exactly a linear combination of the instruments"""
+    rng = np.random.default_rng(seed)
+    nobs = 500
+    instr = rng.standard_normal((nobs, 2))
+    endog = instr[:, 0] + 2 * instr[:, 1]
+    y = 1 + 0.5 * endog + rng.standard_normal(nobs)
+    return y, np.ones((nobs, 1)), endog[:, None], instr
+
+
+@pytest.mark.parametrize("seed", range(8))
+def test_kappa_of_a_regressor_in_the_span_of_the_instruments_is_computed_as_before(
+    seed,
+):
+    # The residuals of the regressor are rounding error, and so is kappa (issue 823),
+    # which is near 1. Dividing the residuals by their norms magnified the rounding
+    # error by 1e14, and kappa was -5.5e10 where it is 1.002657 (seed 0, Windows)
+    check_computed_as_before(IVLIML(*span_data(seed), kappa=1.0))
+
+
+@pytest.mark.parametrize(
+    "scales", SCALES_TWO_ENDOG, ids=[str(s) for s in SCALES_TWO_ENDOG]
+)
+def test_kappa_of_regressors_on_different_scales_is_computed_as_before(scales):
+    # The values are not the kappa of the data if the scales differ much (issue 823)
+    design = (1, 2, 4, 120)
+    check_computed_as_before(IVLIML(*args(*scaled(design, scales)), kappa=1.0))
 
 
 # ----------------------------------------------------------------------------

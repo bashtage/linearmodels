@@ -127,10 +127,10 @@ WEIGHT_MATRICES = {
 # The residuals of the dependent variable and the endogenous regressors on the exogenous
 # regressors and instruments are linearly dependent if the smallest singular value of
 # the residuals, scaled to have columns of unit length, is no larger than this. It is the
-# square root of the machine precision, about 1.5e-8. The cross product of the residuals
-# that is inverted to estimate kappa has the squares of the singular values as its
-# eigenvalues, so that at this value an eigenvalue of the scaled cross product is at its
-# rounding error, about 2.2e-16 times the largest eigenvalue, and has no digits left.
+# square root of the machine precision, about 1.5e-8. The cross product of the scaled
+# residuals has the squares of the singular values as its eigenvalues, so that at this
+# value its smallest eigenvalue is at its rounding error, about 2.2e-16 times the largest
+# eigenvalue, and has no digits left.
 _KAPPA_TOLERANCE = float(sqrt(finfo(float64).eps))
 
 
@@ -525,10 +525,14 @@ class _IVModelBase:
 
         Notes
         -----
-        Kappa does not change if a column of the dependent variable and endogenous
-        regressors is rescaled. The residuals are scaled to have columns of unit
-        length before the rank is tested and the cross product is inverted, so that
-        neither depends on the units of the variables.
+        Whether the residuals are linearly dependent does not depend on the units of
+        the variables: the count of observations does not, and the rank is tested on
+        residuals that are scaled to have columns of unit length. Kappa is computed
+        from the residuals as they are. Two cases are not covered, see issue 823. The
+        accuracy of kappa depends on the units of the variables if there are 2 or more
+        endogenous regressors, and a regressor that is exactly a linear combination of
+        the exogenous regressors and instruments, which has residuals that are only
+        rounding error, is not detected.
         """
         y, x, z = self._wy, self._wx, self._wz
         is_exog = self._regressor_is_exog
@@ -556,16 +560,14 @@ class _IVModelBase:
         else:
             ex1 = e - x1 @ (pinv(x1) @ e)
 
-        # Kappa is the smallest generalized eigenvalue of (ex1'ex1, ez'ez), which does not
-        # change if column j of both is divided by the same number. Dividing by the norm
-        # of column j of ez makes the rank test, and the cross product that is inverted,
-        # independent of the units of the variables. A column that is exactly 0 cannot be
-        # scaled, and is linearly dependent
+        # The rank is tested on a copy of the residuals with columns of unit length, so
+        # that it does not depend on the units of the variables. A column that is exactly
+        # 0 cannot be scaled, and is linearly dependent. Kappa is computed from the
+        # residuals as they are, see issue 823
         scale = norm(ez, axis=0)
         full_rank = False
         if npall(scale > 0):
-            ez, ex1 = ez / scale, ex1 / scale
-            full_rank = bool(matrix_rank(ez, tol=_KAPPA_TOLERANCE) == ncol)
+            full_rank = bool(matrix_rank(ez / scale, tol=_KAPPA_TOLERANCE) == ncol)
         if not full_rank:
             raise LinAlgError(
                 "The residuals of the dependent variable and the endogenous "
@@ -915,6 +917,12 @@ class IVLIML(_IVLSModelBase):
     and then the Anderson-Rubin and Basmann F tests of overidentification of the
     results are an ``InvalidTestStatistic``, since they use the estimate of
     :math:`\kappa`.
+
+    Two cases are not covered, see :issue:`823`. An endogenous regressor that is
+    exactly a linear combination of the exogenous regressors and instruments has
+    residuals that are only rounding error, and so does :math:`\kappa`. With 2 or
+    more endogenous regressors, :math:`\kappa` loses accuracy, and the estimate can
+    fail, if the variables are on very different scales.
 
     .. versionchanged:: 7.1
 
