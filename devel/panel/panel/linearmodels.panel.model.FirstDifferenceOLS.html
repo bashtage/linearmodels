@@ -23,7 +23,7 @@
     
   
       
-        <title>linearmodels.panel.model.FirstDifferenceOLS - linearmodels v7.1 (+425)</title>
+        <title>linearmodels.panel.model.FirstDifferenceOLS - linearmodels v7.1 (+433)</title>
       
     
 
@@ -100,7 +100,7 @@
 
 <header class="md-header md-header--shadow" data-md-component="header">
   <nav class="md-header__inner md-grid" aria-label="Header">
-    <a href="../../index.html" title="linearmodels v7.1 (+425)" class="md-header__button md-logo" aria-label="linearmodels v7.1 (+425)" data-md-component="logo">
+    <a href="../../index.html" title="linearmodels v7.1 (+433)" class="md-header__button md-logo" aria-label="linearmodels v7.1 (+433)" data-md-component="logo">
       <img src="../../_static/bw-logo.svg" alt="logo">
     </a>
     <label class="md-header__button md-icon" for="__drawer">
@@ -111,7 +111,7 @@
       <div class="md-header__ellipsis">
         <div class="md-header__topic">
           <span class="md-ellipsis">
-            linearmodels v7.1 (+425)
+            linearmodels v7.1 (+433)
           </span>
         </div>
         <div class="md-header__topic" data-md-component="header-topic">
@@ -206,10 +206,10 @@
 
 <nav class="md-nav md-nav--primary" aria-label="Navigation" data-md-level="0">
   <label class="md-nav__title" for="__drawer">
-    <a href="../../index.html" title="linearmodels v7.1 (+425)" class="md-nav__button md-logo" aria-label="linearmodels v7.1 (+425)" data-md-component="logo">
+    <a href="../../index.html" title="linearmodels v7.1 (+433)" class="md-nav__button md-logo" aria-label="linearmodels v7.1 (+433)" data-md-component="logo">
       <img src="../../_static/bw-logo.svg" alt="logo">
     </a>
-    linearmodels v7.1 (+425)
+    linearmodels v7.1 (+433)
   </label>
   
     <div class="md-nav__source">
@@ -1644,6 +1644,26 @@ as dependent or, if dependent has no labels, as exog. See
 <p>The model is given by</p>
 <div class="math notranslate nohighlight">
 \[\Delta y_{it}=\beta^{\prime}\Delta x_{it}+\Delta\epsilon_{it}\]</div>
+<p>The differences are between adjacent periods. An observation is differenced with
+the observation of the same entity in the preceding time label of the panel. The
+labels of the panel are the distinct time labels that occur for any entity, in
+order. If the entity has no observation in the preceding label, the observation
+has no difference and is not used. This is the case for the first observation of
+an entity and for an observation that follows a gap, one or more periods in which
+the entity is not observed although another entity is. The model is fit to the
+differences that remain, and <code class="docutils literal notranslate"><span class="pre">nobs</span></code> is their number.</p>
+<p>Other packages can difference differently. plm differences consecutive
+observations of an entity, also across a gap, so that a difference can span
+several periods and the number of differences and the estimates are different if
+there are gaps. In a panel where about a quarter of the periods are missing, plm
+had 210 differences where this model has 167 and a coefficient of 0.474 where this
+model has 0.562. The estimates are the same if no entity has a gap. See
+<a class="reference internal" href="../faq.html#panel-ac-lags"><span class="std std-ref">Gaps in the Periods of an Entity</span></a>.</p>
+<div class="admonition versionchanged">
+<p class="admonition-title"><span class="versionmodified changed">Changed in version 7.1: </span>The observations are differenced in the order of time. Earlier versions
+differenced against non-adjacent periods if the first entity enters late or
+has a gap.</p>
+</div>
 <p class="rubric">Methods</p>
 <table class="autosummary longtable docutils data align-default">
 <tbody>

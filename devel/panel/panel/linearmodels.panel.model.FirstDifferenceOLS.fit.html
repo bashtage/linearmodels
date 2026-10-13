@@ -23,7 +23,7 @@
     
   
       
-        <title>linearmodels.panel.model.FirstDifferenceOLS.fit - linearmodels v7.1 (+425)</title>
+        <title>linearmodels.panel.model.FirstDifferenceOLS.fit - linearmodels v7.1 (+433)</title>
       
     
 
@@ -100,7 +100,7 @@
 
 <header class="md-header md-header--shadow" data-md-component="header">
   <nav class="md-header__inner md-grid" aria-label="Header">
-    <a href="../../index.html" title="linearmodels v7.1 (+425)" class="md-header__button md-logo" aria-label="linearmodels v7.1 (+425)" data-md-component="logo">
+    <a href="../../index.html" title="linearmodels v7.1 (+433)" class="md-header__button md-logo" aria-label="linearmodels v7.1 (+433)" data-md-component="logo">
       <img src="../../_static/bw-logo.svg" alt="logo">
     </a>
     <label class="md-header__button md-icon" for="__drawer">
@@ -111,7 +111,7 @@
       <div class="md-header__ellipsis">
         <div class="md-header__topic">
           <span class="md-ellipsis">
-            linearmodels v7.1 (+425)
+            linearmodels v7.1 (+433)
           </span>
         </div>
         <div class="md-header__topic" data-md-component="header-topic">
@@ -206,10 +206,10 @@
 
 <nav class="md-nav md-nav--primary" aria-label="Navigation" data-md-level="0">
   <label class="md-nav__title" for="__drawer">
-    <a href="../../index.html" title="linearmodels v7.1 (+425)" class="md-nav__button md-logo" aria-label="linearmodels v7.1 (+425)" data-md-component="logo">
+    <a href="../../index.html" title="linearmodels v7.1 (+433)" class="md-nav__button md-logo" aria-label="linearmodels v7.1 (+433)" data-md-component="logo">
       <img src="../../_static/bw-logo.svg" alt="logo">
     </a>
-    linearmodels v7.1 (+425)
+    linearmodels v7.1 (+433)
   </label>
   
     <div class="md-nav__source">
@@ -1596,7 +1596,7 @@ a degree of freedom adjustment. The default is True. See Notes.</p>
 </code></pre></div>
 </div>
 <p class="rubric">Notes</p>
-<p>Three covariance estimators are supported:</p>
+<p>Five covariance estimators are supported:</p>
 <ul class="simple">
 <li><p>“unadjusted”, “homoskedastic” - Assume residual are homoskedastic</p></li>
 <li><p>“robust”, “heteroskedastic” - Control for heteroskedasticity using
@@ -1626,9 +1626,18 @@ covariances that are combined. The default is False.</p></li>
 Default is Bartlett’s kernel, which is produces a covariance
 estimator similar to the Newey-West covariance estimator.</p></li>
 <li><p><code class="docutils literal notranslate"><span class="pre">bandwidth</span></code> - Bandwidth to use when computing the kernel.  If
-not provided, a naive default is used.</p></li>
+not provided, a naive default is used. It must be below the number
+of time periods of the differences, which is one less than the
+number of time periods, and a <code class="docutils literal notranslate"><span class="pre">ValueError</span></code> is raised otherwise.</p></li>
 </ul>
 </li>
+<li><p>“ac”, “autocorrelated” - Autocorrelation robust estimator, which allows
+for autocorrelation of the errors of an entity and not for correlation
+between entities. The configuration options are <code class="docutils literal notranslate"><span class="pre">kernel</span></code> and
+<code class="docutils literal notranslate"><span class="pre">bandwidth</span></code>, as for “kernel”. The lags of an entity are the positions of
+its differences, not calendar periods, and the bandwidth can be larger
+than the number of differences of an entity. See
+<a class="reference internal" href="linearmodels.panel.covariance.ACCovariance.html#linearmodels.panel.covariance.ACCovariance" title="linearmodels.panel.covariance.ACCovariance (Python class) — Autocorrelation robust covariance estimation"><code class="xref py py-class docutils literal notranslate"><span class="pre">ACCovariance</span></code></a>.</p></li>
 </ul>
 <p>When using a clustered covariance estimator, all cluster ids must be
 identical within a first difference.  In most scenarios, this requires

@@ -23,7 +23,7 @@
     
   
       
-        <title>linearmodels.panel.data.PanelData.first_difference - linearmodels v7.1 (+425)</title>
+        <title>linearmodels.panel.data.PanelData.first_difference - linearmodels v7.1 (+433)</title>
       
     
 
@@ -100,7 +100,7 @@
 
 <header class="md-header md-header--shadow" data-md-component="header">
   <nav class="md-header__inner md-grid" aria-label="Header">
-    <a href="../../index.html" title="linearmodels v7.1 (+425)" class="md-header__button md-logo" aria-label="linearmodels v7.1 (+425)" data-md-component="logo">
+    <a href="../../index.html" title="linearmodels v7.1 (+433)" class="md-header__button md-logo" aria-label="linearmodels v7.1 (+433)" data-md-component="logo">
       <img src="../../_static/bw-logo.svg" alt="logo">
     </a>
     <label class="md-header__button md-icon" for="__drawer">
@@ -111,7 +111,7 @@
       <div class="md-header__ellipsis">
         <div class="md-header__topic">
           <span class="md-ellipsis">
-            linearmodels v7.1 (+425)
+            linearmodels v7.1 (+433)
           </span>
         </div>
         <div class="md-header__topic" data-md-component="header-topic">
@@ -206,10 +206,10 @@
 
 <nav class="md-nav md-nav--primary" aria-label="Navigation" data-md-level="0">
   <label class="md-nav__title" for="__drawer">
-    <a href="../../index.html" title="linearmodels v7.1 (+425)" class="md-nav__button md-logo" aria-label="linearmodels v7.1 (+425)" data-md-component="logo">
+    <a href="../../index.html" title="linearmodels v7.1 (+433)" class="md-nav__button md-logo" aria-label="linearmodels v7.1 (+433)" data-md-component="logo">
       <img src="../../_static/bw-logo.svg" alt="logo">
     </a>
-    linearmodels v7.1 (+425)
+    linearmodels v7.1 (+433)
   </label>
   
     <div class="md-nav__source">
@@ -1785,6 +1785,14 @@
 <dd class="field-even"><p><a class="reference internal" href="linearmodels.panel.data.PanelData.html#linearmodels.panel.data.PanelData" title="linearmodels.panel.data.PanelData (Python class) — Abstraction to handle alternative formats for panel data"><code class="xref py py-class docutils literal notranslate"><span class="pre">linearmodels.panel.data.PanelData</span></code></a></p>
 </dd>
 </dl>
+<p class="rubric">Notes</p>
+<p>An observation is differenced with the observation of the same entity in
+the preceding time label of the panel, which is the preceding one of the
+distinct time labels that occur for any entity. If the entity has no
+observation in the preceding label, there is no difference for the
+observation. This is the case for the first observation of an entity and
+for an observation that follows a gap. The differences are never taken
+across a gap, and so they are all differences between adjacent periods.</p>
 </dd></dl>
 
 

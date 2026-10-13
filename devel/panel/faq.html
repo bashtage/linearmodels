@@ -23,7 +23,7 @@
     
   
       
-        <title>Implementation Choices - linearmodels v7.1 (+425)</title>
+        <title>Implementation Choices - linearmodels v7.1 (+433)</title>
       
     
 
@@ -100,7 +100,7 @@
 
 <header class="md-header md-header--shadow" data-md-component="header">
   <nav class="md-header__inner md-grid" aria-label="Header">
-    <a href="../index.html" title="linearmodels v7.1 (+425)" class="md-header__button md-logo" aria-label="linearmodels v7.1 (+425)" data-md-component="logo">
+    <a href="../index.html" title="linearmodels v7.1 (+433)" class="md-header__button md-logo" aria-label="linearmodels v7.1 (+433)" data-md-component="logo">
       <img src="../_static/bw-logo.svg" alt="logo">
     </a>
     <label class="md-header__button md-icon" for="__drawer">
@@ -111,7 +111,7 @@
       <div class="md-header__ellipsis">
         <div class="md-header__topic">
           <span class="md-ellipsis">
-            linearmodels v7.1 (+425)
+            linearmodels v7.1 (+433)
           </span>
         </div>
         <div class="md-header__topic" data-md-component="header-topic">
@@ -206,10 +206,10 @@
 
 <nav class="md-nav md-nav--primary" aria-label="Navigation" data-md-level="0">
   <label class="md-nav__title" for="__drawer">
-    <a href="../index.html" title="linearmodels v7.1 (+425)" class="md-nav__button md-logo" aria-label="linearmodels v7.1 (+425)" data-md-component="logo">
+    <a href="../index.html" title="linearmodels v7.1 (+433)" class="md-nav__button md-logo" aria-label="linearmodels v7.1 (+433)" data-md-component="logo">
       <img src="../_static/bw-logo.svg" alt="logo">
     </a>
-    linearmodels v7.1 (+425)
+    linearmodels v7.1 (+433)
   </label>
   
     <div class="md-nav__source">
@@ -559,6 +559,16 @@
     
     <span class="md-ellipsis">
       <span title="/panel/faq.rst#clustered-covariance-with-fixed-effects (reference label)"><span>Clustered Covariance with Fixed Effects</span></span>
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#gaps-in-the-periods-of-an-entity" class="md-nav__link">
+    
+    <span class="md-ellipsis">
+      <span title="/panel/faq.rst#gaps-in-the-periods-of-an-entity (reference label)"><span>Gaps in the Periods of an Entity</span></span>
     </span>
   </a>
   
@@ -939,6 +949,16 @@
 </li>
       
         <li class="md-nav__item">
+  <a href="#gaps-in-the-periods-of-an-entity" class="md-nav__link">
+    
+    <span class="md-ellipsis">
+      <span title="/panel/faq.rst#gaps-in-the-periods-of-an-entity (reference label)"><span>Gaps in the Periods of an Entity</span></span>
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
   <a href="#estimated-effects" class="md-nav__link">
     
     <span class="md-ellipsis">
@@ -1080,10 +1100,55 @@ they are nested in the clusters, which is described next.</p>
 <p>When using clustered standard errors and entity effects, it is not necessary
 to adjust for estimated effects. <code class="docutils literal notranslate"><span class="pre">PanelOLS</span></code> attempts to detect when this is
 the case and automatically adjust the degree of freedom. This is done when
-the model has a single effect and every group of the effect is in one cluster,
-for example entity effects clustered by entity. The effects are counted in all
-other cases. This can be overridden by setting the fit option <code class="docutils literal notranslate"><span class="pre">auto_df=False</span></code>
-and then changing the value of <code class="docutils literal notranslate"><span class="pre">count_effects</span></code>.</p>
+the model has a single effect and the effect is nested in the clusters. The
+effects are counted in all other cases. This can be overridden by setting the
+fit option <code class="docutils literal notranslate"><span class="pre">auto_df=False</span></code> and then changing the value of <code class="docutils literal notranslate"><span class="pre">count_effects</span></code>.</p>
+<p>An effect is nested in a cluster variable if each of its groups is in one group
+of the variable. Entity effects are nested in the clusters of <code class="docutils literal notranslate"><span class="pre">cluster_entity=True</span></code>,
+and in clusters that are the industries of the entities if every entity is in one
+industry. The effect is nested in the clusters if it is nested in <strong>every</strong>
+cluster variable. This is the rule of <a class="reference internal" href="../iv/absorbing/linearmodels.iv.absorbing.AbsorbingLS.html#linearmodels.iv.absorbing.AbsorbingLS" title="linearmodels.iv.absorbing.AbsorbingLS (Python class) — Linear regression with high-dimensional effects"><code class="xref py py-class docutils literal notranslate"><span class="pre">AbsorbingLS</span></code></a>.
+It does not depend on the order of the cluster variables, which is why it is not
+enough that the effect is nested in one of them. For example:</p>
+<ul class="simple">
+<li><p>Entity effects with <code class="docutils literal notranslate"><span class="pre">cluster_entity=True</span></code>, or with the clusters (industry,
+entity) when each entity is in one industry, are nested. The effects are not
+counted.</p></li>
+<li><p>Entity effects with the clusters (entity, time), the two-way clustering by
+<code class="docutils literal notranslate"><span class="pre">cluster_entity=True,</span> <span class="pre">cluster_time=True</span></code>, are not nested, since an entity
+has observations in several periods. The effects are counted. Time effects with
+these clusters are not nested for the same reason.</p></li>
+<li><p>A model with more than one effect, for example entity and time effects, counts
+its effects with every clustered covariance.</p></li>
+</ul>
+<div class="admonition versionchanged">
+<p class="admonition-title"><span class="versionmodified changed">Changed in version 7.1: </span>The effect has to be nested in every cluster variable. Earlier versions kept
+the result for the last cluster variable only, so that the standard errors of the
+same model depended on the order of the variables, for example entity effects with
+the clusters (time, entity) were treated as nested and with (entity, time)
+as not nested.</p>
+</div>
+<h2 id="gaps-in-the-periods-of-an-entity"><span id="panel-ac-lags"></span>Gaps in the Periods of an Entity<a class="headerlink" href="#gaps-in-the-periods-of-an-entity" title="Link to this heading">¶</a></h2>
+<p>Some estimators use the order of the observations of an entity. They treat an
+entity that is not observed in some period between two of its observations (a gap)
+in different ways from other packages.</p>
+<p>The autocorrelation robust covariance, <code class="docutils literal notranslate"><span class="pre">cov_type=&quot;ac&quot;</span></code>, counts lags as positions
+in the observations of the entity, in the order of time. Two observations on both sides of
+a gap are one lag apart. The cluster-HAC covariance of statsmodels
+(<code class="docutils literal notranslate"><span class="pre">cov_type=&quot;hac-panel&quot;</span></code>) does the same. plm (<code class="docutils literal notranslate"><span class="pre">vcovNW</span></code>) and sandwich (<code class="docutils literal notranslate"><span class="pre">vcovPL</span></code>)
+count calendar periods, so that the observations are two lags apart if one period is
+missing between them. The covariances are the same for an entity without gaps. In a
+panel where about a quarter of the periods are missing, the standard errors of plm
+were about 3% different from the standard errors of this package and of statsmodels.
+See <a class="reference internal" href="panel/linearmodels.panel.covariance.ACCovariance.html#linearmodels.panel.covariance.ACCovariance" title="linearmodels.panel.covariance.ACCovariance (Python class) — Autocorrelation robust covariance estimation"><code class="xref py py-class docutils literal notranslate"><span class="pre">ACCovariance</span></code></a>, which also describes the weights
+of the lags of entities that are shorter than the bandwidth.</p>
+<p><a class="reference internal" href="panel/linearmodels.panel.model.FirstDifferenceOLS.html#linearmodels.panel.model.FirstDifferenceOLS" title="linearmodels.panel.model.FirstDifferenceOLS (Python class) — First difference model for panel data"><code class="xref py py-class docutils literal notranslate"><span class="pre">FirstDifferenceOLS</span></code></a> differences adjacent periods only.
+An observation that follows a gap does not have a difference, and the estimator uses the
+differences between adjacent periods of the panel, which are the distinct time labels of
+the data. plm differences consecutive observations of an entity, also across a gap, so
+that its differences can span several periods. In the panel with the missing periods
+above plm had 210 differences and this package 167, and the coefficient of the first
+regressor was 0.474 and 0.562. The estimates are the same without gaps.</p>
 <h2 id="estimated-effects"><span id="panel-estimated-effects"></span>Estimated Effects<a class="headerlink" href="#estimated-effects" title="Link to this heading">¶</a></h2>
 <p><code class="docutils literal notranslate"><span class="pre">estimated_effects</span></code> in the results is the combined effect of all of the
 effects in the model. It is a <code class="docutils literal notranslate"><span class="pre">DataFrame</span></code> with one column, the sum of the

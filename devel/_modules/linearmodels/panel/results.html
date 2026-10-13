@@ -19,7 +19,7 @@
     
   
       
-        <title>linearmodels.panel.results - linearmodels v7.1 (+425)</title>
+        <title>linearmodels.panel.results - linearmodels v7.1 (+433)</title>
       
     
 
@@ -91,7 +91,7 @@
 
 <header class="md-header md-header--shadow" data-md-component="header">
   <nav class="md-header__inner md-grid" aria-label="Header">
-    <a href="../../../index.html" title="linearmodels v7.1 (+425)" class="md-header__button md-logo" aria-label="linearmodels v7.1 (+425)" data-md-component="logo">
+    <a href="../../../index.html" title="linearmodels v7.1 (+433)" class="md-header__button md-logo" aria-label="linearmodels v7.1 (+433)" data-md-component="logo">
       <img src="../../../_static/bw-logo.svg" alt="logo">
     </a>
     <label class="md-header__button md-icon" for="__drawer">
@@ -102,7 +102,7 @@
       <div class="md-header__ellipsis">
         <div class="md-header__topic">
           <span class="md-ellipsis">
-            linearmodels v7.1 (+425)
+            linearmodels v7.1 (+433)
           </span>
         </div>
         <div class="md-header__topic" data-md-component="header-topic">
@@ -197,10 +197,10 @@
 
 <nav class="md-nav md-nav--primary" aria-label="Navigation" data-md-level="0">
   <label class="md-nav__title" for="__drawer">
-    <a href="../../../index.html" title="linearmodels v7.1 (+425)" class="md-nav__button md-logo" aria-label="linearmodels v7.1 (+425)" data-md-component="logo">
+    <a href="../../../index.html" title="linearmodels v7.1 (+433)" class="md-nav__button md-logo" aria-label="linearmodels v7.1 (+433)" data-md-component="logo">
       <img src="../../../_static/bw-logo.svg" alt="logo">
     </a>
-    linearmodels v7.1 (+425)
+    linearmodels v7.1 (+433)
   </label>
   
     <div class="md-nav__source">
@@ -1431,7 +1431,63 @@
 
     <span class="nd">@property</span>
     <span class="k">def</span><span class="w"> </span><span class="nf">loglik</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">float</span><span class="p">:</span>
-<span class="w">        </span><span class="sd">"""Log-likelihood of model"""</span>
+<span class="w">        </span><span class="sa">r</span><span class="sd">"""</span>
+<span class="sd">        Log-likelihood of model</span>
+
+<span class="sd">        Notes</span>
+<span class="sd">        -----</span>
+<span class="sd">        The Gaussian log-likelihood of the regression that the model estimates, at</span>
+<span class="sd">        the estimates and the maximum likelihood estimate of the error variance,</span>
+
+<span class="sd">        .. math::</span>
+
+<span class="sd">           -\frac{n}{2}\left(\ln 2\pi + \ln\hat{\sigma}^2 + 1\right)</span>
+<span class="sd">           + \frac{1}{2}\sum_{i=1}^{n}\ln w_i</span>
+
+<span class="sd">        where :math:`\hat{\sigma}^2 = \hat{\epsilon}'\hat{\epsilon}/n` is the</span>
+<span class="sd">        residual sum of squares of the regression divided by its number of</span>
+<span class="sd">        observations :math:`n`, and :math:`\hat{\epsilon}_i` are the weighted</span>
+<span class="sd">        residuals, :math:`\sqrt{w_i}` times the residuals. The last term is the</span>
+<span class="sd">        Jacobian of the weights, which is 0 if the model is not weighted. The</span>
+<span class="sd">        variance of the error of observation :math:`i` is</span>
+<span class="sd">        :math:`\sigma^2/w_i`, and so the log-likelihood is that of the weighted least</span>
+<span class="sd">        squares regression of the original data, for example of ``WLS(...).llf`` in</span>
+<span class="sd">        statsmodels for ``PooledOLS``. It does not depend on the scale of the weights,</span>
+<span class="sd">        and the log-likelihoods of the models with different weights are comparable</span>
+<span class="sd">        if they have the same observations, for example in an information</span>
+<span class="sd">        criterion.</span>
+
+<span class="sd">        The regression and its observations depend on the model.</span>
+
+<span class="sd">        * ``PooledOLS`` - The regression of the observations. The weights are the</span>
+<span class="sd">          weights of the model.</span>
+<span class="sd">        * ``PanelOLS`` - The regression on the dummy variables of the effects, with</span>
+<span class="sd">          the effects as parameters that are estimated. It is computed from the</span>
+<span class="sd">          regression of the observations with the effects removed. The weights are</span>
+<span class="sd">          the weights of the model.</span>
+<span class="sd">        * ``BetweenOLS`` - The regression of the means of the entities. The</span>
+<span class="sd">          observations are the entities, and the weights are the sums of the</span>
+<span class="sd">          weights of the entities, scaled to a mean of one, if the model is weighted</span>
+<span class="sd">          or ``reweight`` is True. Otherwise all of the weights are 1.</span>
+<span class="sd">        * ``FirstDifferenceOLS`` - The regression of the first differences. The</span>
+<span class="sd">          weights are those of the differences, :math:`1/(1/w_{it}+1/w_{it-1})`.</span>
+<span class="sd">        * ``RandomEffects`` - The regression of the data that are weighted and</span>
+<span class="sd">          quasi-demeaned. It is not the likelihood of the random effects model, which</span>
+<span class="sd">          also depends on the variances of the effects.</span>
+<span class="sd">        * ``FamaMacBeth`` - The pooled regression at the average of the estimates</span>
+<span class="sd">          of the periods.</span>
+
+<span class="sd">        .. versionchanged:: 7.1</span>
+
+<span class="sd">           The log-likelihood of a weighted model includes the Jacobian of the</span>
+<span class="sd">           weights. Earlier versions omitted it, so that the log-likelihood was that</span>
+<span class="sd">           of the regression of the weighted data, which is not the likelihood of the</span>
+<span class="sd">           original data, and the log-likelihoods of models with different weights</span>
+<span class="sd">           were not comparable. For the pooled regression of the log wages in the wage</span>
+<span class="sd">           panel on a constant, ``educ``, ``married`` and ``union`` with the hours as</span>
+<span class="sd">           weights it was -3065.75, where ``WLS`` of statsmodels has -3153.16. The</span>
+<span class="sd">           log-likelihoods of models without weights do not change.</span>
+<span class="sd">        """</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_loglik</span>
 
 <div class="viewcode-block" id="PanelResults.wald_test">

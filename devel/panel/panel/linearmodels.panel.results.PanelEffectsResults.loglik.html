@@ -23,7 +23,7 @@
     
   
       
-        <title>linearmodels.panel.results.PanelEffectsResults.loglik - linearmodels v7.1 (+425)</title>
+        <title>linearmodels.panel.results.PanelEffectsResults.loglik - linearmodels v7.1 (+433)</title>
       
     
 
@@ -100,7 +100,7 @@
 
 <header class="md-header md-header--shadow" data-md-component="header">
   <nav class="md-header__inner md-grid" aria-label="Header">
-    <a href="../../index.html" title="linearmodels v7.1 (+425)" class="md-header__button md-logo" aria-label="linearmodels v7.1 (+425)" data-md-component="logo">
+    <a href="../../index.html" title="linearmodels v7.1 (+433)" class="md-header__button md-logo" aria-label="linearmodels v7.1 (+433)" data-md-component="logo">
       <img src="../../_static/bw-logo.svg" alt="logo">
     </a>
     <label class="md-header__button md-icon" for="__drawer">
@@ -111,7 +111,7 @@
       <div class="md-header__ellipsis">
         <div class="md-header__topic">
           <span class="md-ellipsis">
-            linearmodels v7.1 (+425)
+            linearmodels v7.1 (+433)
           </span>
         </div>
         <div class="md-header__topic" data-md-component="header-topic">
@@ -206,10 +206,10 @@
 
 <nav class="md-nav md-nav--primary" aria-label="Navigation" data-md-level="0">
   <label class="md-nav__title" for="__drawer">
-    <a href="../../index.html" title="linearmodels v7.1 (+425)" class="md-nav__button md-logo" aria-label="linearmodels v7.1 (+425)" data-md-component="logo">
+    <a href="../../index.html" title="linearmodels v7.1 (+433)" class="md-nav__button md-logo" aria-label="linearmodels v7.1 (+433)" data-md-component="logo">
       <img src="../../_static/bw-logo.svg" alt="logo">
     </a>
-    linearmodels v7.1 (+425)
+    linearmodels v7.1 (+433)
   </label>
   
     <div class="md-nav__source">
@@ -2229,6 +2229,54 @@
 <dt class="sig sig-object highlight py" id="linearmodels.panel.results.PanelEffectsResults.loglik">
 <span class="property"><span class="k"><span class="pre">property</span></span><span class="w"> </span></span><span class="sig-prename descclassname"><span class="pre">PanelEffectsResults.</span></span><span class="sig-name descname"><span class="pre">loglik</span></span><span class="p"> <span class="pre">:</span> </span><span class="desctype"><a class="reference external" href="https://docs.python.org/3/builtins/functions.html#float" title="(in Python v3.15)"><span class="pre">float</span></a></span><a class="headerlink" href="#linearmodels.panel.results.PanelEffectsResults.loglik" title="Link to this definition">¶</a></dt>
 <dd><p>Log-likelihood of model</p>
+<p class="rubric">Notes</p>
+<p>The Gaussian log-likelihood of the regression that the model estimates, at
+the estimates and the maximum likelihood estimate of the error variance,</p>
+<div class="math notranslate nohighlight">
+\[-\frac{n}{2}\left(\ln 2\pi + \ln\hat{\sigma}^2 + 1\right)
++ \frac{1}{2}\sum_{i=1}^{n}\ln w_i\]</div>
+<p>where <span class="math notranslate nohighlight">\(\hat{\sigma}^2 = \hat{\epsilon}'\hat{\epsilon}/n\)</span> is the
+residual sum of squares of the regression divided by its number of
+observations <span class="math notranslate nohighlight">\(n\)</span>, and <span class="math notranslate nohighlight">\(\hat{\epsilon}_i\)</span> are the weighted
+residuals, <span class="math notranslate nohighlight">\(\sqrt{w_i}\)</span> times the residuals. The last term is the
+Jacobian of the weights, which is 0 if the model is not weighted. The
+variance of the error of observation <span class="math notranslate nohighlight">\(i\)</span> is
+<span class="math notranslate nohighlight">\(\sigma^2/w_i\)</span>, and so the log-likelihood is that of the weighted least
+squares regression of the original data, for example of <code class="docutils literal notranslate"><span class="pre">WLS(...).llf</span></code> in
+statsmodels for <code class="docutils literal notranslate"><span class="pre">PooledOLS</span></code>. It does not depend on the scale of the weights,
+and the log-likelihoods of the models with different weights are comparable
+if they have the same observations, for example in an information
+criterion.</p>
+<p>The regression and its observations depend on the model.</p>
+<ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">PooledOLS</span></code> - The regression of the observations. The weights are the
+weights of the model.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">PanelOLS</span></code> - The regression on the dummy variables of the effects, with
+the effects as parameters that are estimated. It is computed from the
+regression of the observations with the effects removed. The weights are
+the weights of the model.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">BetweenOLS</span></code> - The regression of the means of the entities. The
+observations are the entities, and the weights are the sums of the
+weights of the entities, scaled to a mean of one, if the model is weighted
+or <code class="docutils literal notranslate"><span class="pre">reweight</span></code> is True. Otherwise all of the weights are 1.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">FirstDifferenceOLS</span></code> - The regression of the first differences. The
+weights are those of the differences, <span class="math notranslate nohighlight">\(1/(1/w_{it}+1/w_{it-1})\)</span>.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">RandomEffects</span></code> - The regression of the data that are weighted and
+quasi-demeaned. It is not the likelihood of the random effects model, which
+also depends on the variances of the effects.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">FamaMacBeth</span></code> - The pooled regression at the average of the estimates
+of the periods.</p></li>
+</ul>
+<div class="admonition versionchanged">
+<p class="admonition-title"><span class="versionmodified changed">Changed in version 7.1: </span>The log-likelihood of a weighted model includes the Jacobian of the
+weights. Earlier versions omitted it, so that the log-likelihood was that
+of the regression of the weighted data, which is not the likelihood of the
+original data, and the log-likelihoods of models with different weights
+were not comparable. For the pooled regression of the log wages in the wage
+panel on a constant, <code class="docutils literal notranslate"><span class="pre">educ</span></code>, <code class="docutils literal notranslate"><span class="pre">married</span></code> and <code class="docutils literal notranslate"><span class="pre">union</span></code> with the hours as
+weights it was -3065.75, where <code class="docutils literal notranslate"><span class="pre">WLS</span></code> of statsmodels has -3153.16. The
+log-likelihoods of models without weights do not change.</p>
+</div>
 </dd></dl>
 
 
@@ -2326,6 +2374,8 @@
       
         <script src="../../_static/sphinx_immaterial_theme.32136f45f91ae6956.min.js?v=a7a9472a"></script>
         <script crossorigin="anonymous" integrity="sha256-Ae2Vz/4ePdIu6ZyI/5ZGsYnb+m0JlOmKPjt6XZ9JJkA=" src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.4/require.min.js"></script>
+        <script>window.MathJax = {"tex": {"inlineMath": [["$", "$"], ["\\(", "\\)"]], "processEscapes": true}, "options": {"ignoreHtmlClass": "tex2jax_ignore|mathjax_ignore|document", "processHtmlClass": "tex2jax_process|mathjax_process|math|output_area"}}</script>
+        <script id="MathJax-script" src="../../_static/mathjax/tex-mml-chtml.js"></script>
     
   </body>
 </html>

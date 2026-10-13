@@ -23,7 +23,7 @@
     
   
       
-        <title>linearmodels.panel.model.FamaMacBeth.fit - linearmodels v7.1 (+425)</title>
+        <title>linearmodels.panel.model.FamaMacBeth.fit - linearmodels v7.1 (+433)</title>
       
     
 
@@ -100,7 +100,7 @@
 
 <header class="md-header md-header--shadow" data-md-component="header">
   <nav class="md-header__inner md-grid" aria-label="Header">
-    <a href="../../index.html" title="linearmodels v7.1 (+425)" class="md-header__button md-logo" aria-label="linearmodels v7.1 (+425)" data-md-component="logo">
+    <a href="../../index.html" title="linearmodels v7.1 (+433)" class="md-header__button md-logo" aria-label="linearmodels v7.1 (+433)" data-md-component="logo">
       <img src="../../_static/bw-logo.svg" alt="logo">
     </a>
     <label class="md-header__button md-icon" for="__drawer">
@@ -111,7 +111,7 @@
       <div class="md-header__ellipsis">
         <div class="md-header__topic">
           <span class="md-ellipsis">
-            linearmodels v7.1 (+425)
+            linearmodels v7.1 (+433)
           </span>
         </div>
         <div class="md-header__topic" data-md-component="header-topic">
@@ -206,10 +206,10 @@
 
 <nav class="md-nav md-nav--primary" aria-label="Navigation" data-md-level="0">
   <label class="md-nav__title" for="__drawer">
-    <a href="../../index.html" title="linearmodels v7.1 (+425)" class="md-nav__button md-logo" aria-label="linearmodels v7.1 (+425)" data-md-component="logo">
+    <a href="../../index.html" title="linearmodels v7.1 (+433)" class="md-nav__button md-logo" aria-label="linearmodels v7.1 (+433)" data-md-component="logo">
       <img src="../../_static/bw-logo.svg" alt="logo">
     </a>
-    linearmodels v7.1 (+425)
+    linearmodels v7.1 (+433)
   </label>
   
     <div class="md-nav__source">
@@ -864,6 +864,16 @@
     
     <span class="md-ellipsis">
       <span>Return type</span>
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#linearmodels.panel.model.FamaMacBeth.fit-raises" class="md-nav__link">
+    
+    <span class="md-ellipsis">
+      <span>Raises</span>
     </span>
   </a>
   
@@ -1567,6 +1577,16 @@
   
 </li>
         
+          <li class="md-nav__item">
+  <a href="#linearmodels.panel.model.FamaMacBeth.fit-raises" class="md-nav__link">
+    
+    <span class="md-ellipsis">
+      <span>Raises</span>
+    </span>
+  </a>
+  
+</li>
+        
       </ul>
     </nav>
   
@@ -1604,8 +1624,9 @@ the covariance of the T estimates is computed, and to use a t
 distribution with T - 1 degrees of freedom for inference. If
 False, inference uses the normal distribution.</p>
 </dd>
-<dt id="linearmodels.panel.model.FamaMacBeth.fit.bandwidth"><span class="n sig-name">bandwidth</span><span class="p">:</span><span class="w"> </span><span class="n"><span class="desctype"><a class="reference external" href="https://docs.python.org/3/builtins/functions.html#float" title="(in Python v3.15)">float</a><span class="w"> </span><span class="p">|</span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/builtins/constants.html#None" title="(in Python v3.15)">None</a></span></span><span class="w"> </span><span class="o">=</span><span class="w"> </span><code class="code python default_value docutils literal highlight highlight-python"><span class="kc">None</span></code><a class="headerlink" href="#linearmodels.panel.model.FamaMacBeth.fit.bandwidth" title="Permalink to this definition">¶</a></dt><dd><p>The bandwidth to use when cov_type is “kernel”. If None, it is
-automatically computed.</p>
+<dt id="linearmodels.panel.model.FamaMacBeth.fit.bandwidth"><span class="n sig-name">bandwidth</span><span class="p">:</span><span class="w"> </span><span class="n"><span class="desctype"><a class="reference external" href="https://docs.python.org/3/builtins/functions.html#float" title="(in Python v3.15)">float</a><span class="w"> </span><span class="p">|</span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/builtins/constants.html#None" title="(in Python v3.15)">None</a></span></span><span class="w"> </span><span class="o">=</span><span class="w"> </span><code class="code python default_value docutils literal highlight highlight-python"><span class="kc">None</span></code><a class="headerlink" href="#linearmodels.panel.model.FamaMacBeth.fit.bandwidth" title="Permalink to this definition">¶</a></dt><dd><p>The bandwidth to use when cov_type is “kernel”. It must be below T,
+the number of periods that are used. If None, it is automatically
+computed, and is at most T - 1.</p>
 </dd>
 <dt id="linearmodels.panel.model.FamaMacBeth.fit.kernel"><span class="n sig-name">kernel</span><span class="p">:</span><span class="w"> </span><span class="n"><span class="desctype"><a class="reference external" href="https://docs.python.org/3/builtins/stdtypes.html#str" title="(in Python v3.15)">str</a><span class="w"> </span><span class="p">|</span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/builtins/constants.html#None" title="(in Python v3.15)">None</a></span></span><span class="w"> </span><span class="o">=</span><span class="w"> </span><code class="code python default_value docutils literal highlight highlight-python"><span class="kc">None</span></code><a class="headerlink" href="#linearmodels.panel.model.FamaMacBeth.fit.kernel" title="Permalink to this definition">¶</a></dt><dd><p>The kernel to use.  None chooses the default kernel.</p>
 </dd>
@@ -1616,6 +1637,11 @@ automatically computed.</p>
 </dd>
 <dt class="field-odd" id="linearmodels.panel.model.FamaMacBeth.fit-return-type">Return type<span class="colon">:</span><a class="headerlink" href="#linearmodels.panel.model.FamaMacBeth.fit-return-type" title="Permalink to this headline">¶</a></dt>
 <dd class="field-odd"><p><a class="reference internal" href="linearmodels.panel.results.PanelResults.html#linearmodels.panel.results.PanelResults" title="linearmodels.panel.results.PanelResults (Python class) — Results container for panel data models that do not include effects"><code class="xref py py-class docutils literal notranslate"><span class="pre">linearmodels.panel.results.PanelResults</span></code></a></p>
+</dd>
+<dt class="field-even" id="linearmodels.panel.model.FamaMacBeth.fit-raises">Raises<span class="colon">:</span><a class="headerlink" href="#linearmodels.panel.model.FamaMacBeth.fit-raises" title="Permalink to this headline">¶</a></dt>
+<dd class="field-even"><p><a class="reference external" href="https://docs.python.org/3/builtins/exceptions.html#ValueError" title="(in Python v3.15)"><strong>ValueError</strong></a> – If <code class="docutils literal notranslate"><span class="pre">cov_type</span></code> is not one of the supported names, or if it is
+    “kernel” and <code class="docutils literal notranslate"><span class="pre">bandwidth</span></code> is not below T, the number of periods that
+    are used.</p>
 </dd>
 </dl>
 <p class="example rubric">Examples</p>
@@ -1630,7 +1656,11 @@ automatically computed.</p>
 <li><p>“unadjusted”, “homoskedastic”, “robust”, “heteroskedastic” use the
 standard covariance estimator of the T parameter estimates.</p></li>
 <li><p>“kernel” is a HAC estimator of the covariance of the T parameter
-estimates. The configuration options are <code class="docutils literal notranslate"><span class="pre">kernel</span></code> and <code class="docutils literal notranslate"><span class="pre">bandwidth</span></code>.</p></li>
+estimates. The configuration options are <code class="docutils literal notranslate"><span class="pre">kernel</span></code> and <code class="docutils literal notranslate"><span class="pre">bandwidth</span></code>.
+The T estimates have autocovariances up to lag T - 1, so the bandwidth
+must be below T. This holds for every kernel, including the quadratic
+spectral kernel, which is not truncated. The bandwidth is checked when
+the model is fit.</p></li>
 </ul>
 <p>The parameters are the averages of the T cross-sectional estimates, and
 T is the number of periods whose cross-sectional regression is
@@ -1658,6 +1688,14 @@ there are many observations. <code class="docutils literal notranslate"><span cl
 reference. Earlier versions divided the Wald statistic by k and used
 an F distribution with k and nobs - nvar degrees of freedom, which
 rejects a true null hypothesis too often when k is larger than 1.</p>
+</div>
+<div class="admonition versionchanged">
+<p class="admonition-title"><span class="versionmodified changed">Changed in version 7.1: </span>A bandwidth that is not below T raises a <code class="docutils literal notranslate"><span class="pre">ValueError</span></code> when the model
+is fit. Earlier versions raised “Length of w is larger than the number
+of elements in z” with the Bartlett and Parzen kernels, when the
+covariance was first used. The quadratic spectral kernel, which has no
+truncation, returned a covariance without an error, which was close to
+zero for a large bandwidth.</p>
 </div>
 </dd></dl>
 

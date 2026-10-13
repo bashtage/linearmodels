@@ -19,7 +19,7 @@
     
   
       
-        <title>linearmodels.panel.covariance - linearmodels v7.1 (+425)</title>
+        <title>linearmodels.panel.covariance - linearmodels v7.1 (+433)</title>
       
     
 
@@ -91,7 +91,7 @@
 
 <header class="md-header md-header--shadow" data-md-component="header">
   <nav class="md-header__inner md-grid" aria-label="Header">
-    <a href="../../../index.html" title="linearmodels v7.1 (+425)" class="md-header__button md-logo" aria-label="linearmodels v7.1 (+425)" data-md-component="logo">
+    <a href="../../../index.html" title="linearmodels v7.1 (+433)" class="md-header__button md-logo" aria-label="linearmodels v7.1 (+433)" data-md-component="logo">
       <img src="../../../_static/bw-logo.svg" alt="logo">
     </a>
     <label class="md-header__button md-icon" for="__drawer">
@@ -102,7 +102,7 @@
       <div class="md-header__ellipsis">
         <div class="md-header__topic">
           <span class="md-ellipsis">
-            linearmodels v7.1 (+425)
+            linearmodels v7.1 (+433)
           </span>
         </div>
         <div class="md-header__topic" data-md-component="header-topic">
@@ -197,10 +197,10 @@
 
 <nav class="md-nav md-nav--primary" aria-label="Navigation" data-md-level="0">
   <label class="md-nav__title" for="__drawer">
-    <a href="../../../index.html" title="linearmodels v7.1 (+425)" class="md-nav__button md-logo" aria-label="linearmodels v7.1 (+425)" data-md-component="logo">
+    <a href="../../../index.html" title="linearmodels v7.1 (+433)" class="md-nav__button md-logo" aria-label="linearmodels v7.1 (+433)" data-md-component="logo">
       <img src="../../../_static/bw-logo.svg" alt="logo">
     </a>
-    linearmodels v7.1 (+425)
+    linearmodels v7.1 (+433)
   </label>
   
     <div class="md-nav__source">
@@ -924,9 +924,16 @@
 <span class="sd">    kernel : str</span>
 <span class="sd">        Name of one of the supported kernels. If None, uses the Newey-West</span>
 <span class="sd">        kernel.</span>
-<span class="sd">    bandwidth : int</span>
-<span class="sd">        Non-negative integer to use as bandwidth.  If not provided a rule-of-</span>
-<span class="sd">        thumb value is used.</span>
+<span class="sd">    bandwidth : float, optional</span>
+<span class="sd">        Non-negative bandwidth to use. It must be below the number of time</span>
+<span class="sd">        periods. The Bartlett and Parzen kernels use its integer part. If not</span>
+<span class="sd">        provided a rule-of-thumb value is used.</span>
+
+<span class="sd">    Raises</span>
+<span class="sd">    ------</span>
+<span class="sd">    ValueError</span>
+<span class="sd">        If the bandwidth, or the default bandwidth if none is given, is not</span>
+<span class="sd">        below the number of time periods.</span>
 
 <span class="sd">    Notes</span>
 <span class="sd">    -----</span>
@@ -937,7 +944,8 @@
 <span class="sd">    * "parzen", "gallant" - Parzen kernel</span>
 
 <span class="sd">    Bandwidth is set to the common value for the Bartlett kernel if not</span>
-<span class="sd">    provided.</span>
+<span class="sd">    provided, :math:`\lfloor 4 (T / 100)^{2/9} \rfloor` where :math:`T` is the</span>
+<span class="sd">    number of time periods.</span>
 
 <span class="sd">    The estimator of the covariance is</span>
 
@@ -961,6 +969,22 @@
 
 <span class="sd">    where df is ``extra_df`` and n-df is replace by n-df-k if ``debiased`` is</span>
 <span class="sd">    ``True``. :math:`K(i, bw)` is the kernel weighting function.</span>
+
+<span class="sd">    The sums :math:`\xi_t` of the scores of the :math:`T` time periods have</span>
+<span class="sd">    autocovariances up to lag :math:`T-1`, so the bandwidth must be below</span>
+<span class="sd">    :math:`T`. The bandwidth is checked when the estimator is created, so that</span>
+<span class="sd">    the ``fit`` method of a model raises the error.</span>
+
+<span class="sd">    .. versionchanged:: 7.1</span>
+
+<span class="sd">       A bandwidth that is not below the number of time periods raises a</span>
+<span class="sd">       ``ValueError``. Earlier versions raised "Length of w is larger than the</span>
+<span class="sd">       number of elements in z" with the Bartlett and Parzen kernels, when the</span>
+<span class="sd">       covariance was first used. The quadratic spectral kernel, which has no</span>
+<span class="sd">       truncation, returned a covariance without an error. With a large bandwidth</span>
+<span class="sd">       the weights of all of the lags are close to one, and the sum of the scores</span>
+<span class="sd">       over all of the periods is zero in a regression, so that the covariance</span>
+<span class="sd">       was close to zero.</span>
 <span class="sd">    """</span>
 
     <span class="n">ALLOWED_KWARGS</span> <span class="o">=</span> <span class="p">(</span><span class="s2">"kernel"</span><span class="p">,</span> <span class="s2">"bandwidth"</span><span class="p">)</span>
@@ -985,6 +1009,40 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">_name</span> <span class="o">=</span> <span class="s2">"Driscoll-Kraay"</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_kernel</span> <span class="o">=</span> <span class="n">kernel</span> <span class="k">if</span> <span class="n">kernel</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="k">else</span> <span class="bp">self</span><span class="o">.</span><span class="n">DEFAULT_KERNEL</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_bandwidth</span> <span class="o">=</span> <span class="n">bandwidth</span>
+        <span class="c1"># Checked here so that fit raises, instead of the first use of the covariance</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_bw</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_select_bandwidth</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">unique</span><span class="p">(</span><span class="n">time_ids</span><span class="p">)</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">_select_bandwidth</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">nperiods</span><span class="p">:</span> <span class="nb">int</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">float</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">"""</span>
+<span class="sd">        The bandwidth of the kernel, which has to be below the number of periods</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        nperiods : int</span>
+<span class="sd">            The number of time periods.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        float</span>
+<span class="sd">            The bandwidth that was given or, if there is none, the rule-of-thumb value.</span>
+
+<span class="sd">        Raises</span>
+<span class="sd">        ------</span>
+<span class="sd">        ValueError</span>
+<span class="sd">            If the bandwidth is not below the number of time periods.</span>
+<span class="sd">        """</span>
+        <span class="n">bw</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_bandwidth</span>
+        <span class="k">if</span> <span class="n">bw</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">bw</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">floor</span><span class="p">(</span><span class="mi">4</span> <span class="o">*</span> <span class="p">(</span><span class="n">nperiods</span> <span class="o">/</span> <span class="mi">100</span><span class="p">)</span> <span class="o">**</span> <span class="p">(</span><span class="mi">2</span> <span class="o">/</span> <span class="mi">9</span><span class="p">)))</span>
+        <span class="k">if</span> <span class="n">bw</span> <span class="o">&gt;=</span> <span class="n">nperiods</span><span class="p">:</span>
+            <span class="n">which</span> <span class="o">=</span> <span class="s2">"bandwidth"</span> <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_bandwidth</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="k">else</span> <span class="s2">"default bandwidth"</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
+                <span class="sa">f</span><span class="s2">"The </span><span class="si">{</span><span class="n">which</span><span class="si">}</span><span class="s2"> of the Driscoll-Kraay covariance, </span><span class="si">{</span><span class="n">bw</span><span class="si">:</span><span class="s2">g</span><span class="si">}</span><span class="s2">, must be below "</span>
+                <span class="sa">f</span><span class="s2">"the number of time periods, </span><span class="si">{</span><span class="n">nperiods</span><span class="si">}</span><span class="s2">. The sums of the scores of "</span>
+                <span class="sa">f</span><span class="s2">"</span><span class="si">{</span><span class="n">nperiods</span><span class="si">}</span><span class="s2"> periods have autocovariances up to lag </span><span class="si">{</span><span class="n">nperiods</span><span class="w"> </span><span class="o">-</span><span class="w"> </span><span class="mi">1</span><span class="si">}</span><span class="s2">. "</span>
+                <span class="s2">"Use a smaller bandwidth."</span>
+            <span class="p">)</span>
+        <span class="k">return</span> <span class="n">bw</span>
 
 <div class="viewcode-block" id="DriscollKraay.cov">
 <a class="viewcode-back" href="../../../panel/panel/linearmodels.panel.covariance.DriscollKraay.cov.html#linearmodels.panel.covariance.DriscollKraay.cov">[docs]</a>
@@ -1002,11 +1060,7 @@
         <span class="n">xe_df</span> <span class="o">=</span> <span class="n">xe_df</span><span class="o">.</span><span class="n">groupby</span><span class="p">(</span><span class="n">level</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span><span class="o">.</span><span class="n">sum</span><span class="p">()</span>
         <span class="n">xe_df</span> <span class="o">=</span> <span class="n">xe_df</span><span class="o">.</span><span class="n">sort_index</span><span class="p">()</span>
         <span class="n">xe_nobs</span> <span class="o">=</span> <span class="n">xe_df</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
-        <span class="n">bw</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_bandwidth</span>
-        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_bandwidth</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
-            <span class="n">bw</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">floor</span><span class="p">(</span><span class="mi">4</span> <span class="o">*</span> <span class="p">(</span><span class="n">xe_nobs</span> <span class="o">/</span> <span class="mi">100</span><span class="p">)</span> <span class="o">**</span> <span class="p">(</span><span class="mi">2</span> <span class="o">/</span> <span class="mi">9</span><span class="p">)))</span>
-        <span class="k">assert</span> <span class="n">bw</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span>
-        <span class="n">w</span> <span class="o">=</span> <span class="n">lookup_option</span><span class="p">(</span><span class="n">KERNEL_LOOKUP</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_kernel</span><span class="p">,</span> <span class="s2">"kernel"</span><span class="p">)(</span><span class="n">bw</span><span class="p">,</span> <span class="n">xe_nobs</span> <span class="o">-</span> <span class="mi">1</span><span class="p">)</span>
+        <span class="n">w</span> <span class="o">=</span> <span class="n">lookup_option</span><span class="p">(</span><span class="n">KERNEL_LOOKUP</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_kernel</span><span class="p">,</span> <span class="s2">"kernel"</span><span class="p">)(</span><span class="bp">self</span><span class="o">.</span><span class="n">_bw</span><span class="p">,</span> <span class="n">xe_nobs</span> <span class="o">-</span> <span class="mi">1</span><span class="p">)</span>
         <span class="n">xeex</span> <span class="o">=</span> <span class="n">cov_kernel</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">asarray</span><span class="p">(</span><span class="n">xe_df</span><span class="p">),</span> <span class="n">w</span><span class="p">)</span> <span class="o">*</span> <span class="p">(</span><span class="n">xe_nobs</span> <span class="o">/</span> <span class="n">nobs</span><span class="p">)</span>
         <span class="n">xeex</span> <span class="o">*=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_scale</span>
 
@@ -1043,9 +1097,10 @@
 <span class="sd">    kernel : str</span>
 <span class="sd">        Name of one of the supported kernels. If None, uses the Newey-West</span>
 <span class="sd">        kernel.</span>
-<span class="sd">    bandwidth : int</span>
-<span class="sd">        Non-negative integer to use as bandwidth.  If not provided a rule-of-</span>
-<span class="sd">        thumb value is used.</span>
+<span class="sd">    bandwidth : float, optional</span>
+<span class="sd">        Non-negative bandwidth to use. The Bartlett and Parzen kernels use its</span>
+<span class="sd">        integer part. If not provided a rule-of-thumb value is used. It can be</span>
+<span class="sd">        larger than the number of observations of an entity.</span>
 
 <span class="sd">    Notes</span>
 <span class="sd">    -----</span>
@@ -1058,7 +1113,8 @@
 <span class="sd">    * "parzen", "gallant" - Parzen kernel</span>
 
 <span class="sd">    Bandwidth is set to the common value for the Bartlett kernel if not</span>
-<span class="sd">    provided.</span>
+<span class="sd">    provided, :math:`\lfloor 4 (T / 100)^{2/9} \rfloor` where :math:`T` is the</span>
+<span class="sd">    number of time periods.</span>
 
 <span class="sd">    The estimator of the covariance is</span>
 
@@ -1078,15 +1134,38 @@
 
 <span class="sd">      \xi_{it} &amp; = \epsilon_{it} x_{it} \\</span>
 <span class="sd">      \hat{S} &amp; = (n-df)^{-1} \sum_{i=1}^N S_i \\</span>
-<span class="sd">      \hat{S}_i &amp; = \sum_{j=0}^{bw} K(j, bw) \hat{S}_{ij} \\</span>
-<span class="sd">      \hat{S}_{i0} &amp; = \sum_{t=1}^{T} \xi'_{it} \xi_{it} \\</span>
-<span class="sd">      \hat{S}_{ij} &amp; = \sum_{t=1}^{T-j} \xi'_{it} \xi_{it+j} + \xi'_{it+j} \xi_{it}</span>
+<span class="sd">      \hat{S}_i &amp; = \sum_{j=0}^{T_i-1} K(j, bw) \hat{S}_{ij} \\</span>
+<span class="sd">      \hat{S}_{i0} &amp; = \sum_{t=1}^{T_i} \xi'_{it} \xi_{it} \\</span>
+<span class="sd">      \hat{S}_{ij} &amp; = \sum_{t=1}^{T_i-j} \xi'_{it} \xi_{it+j} + \xi'_{it+j} \xi_{it}</span>
 
 
-<span class="sd">    where df is ``extra_df`` and n-df is replace by n-df-k if ``debiased`` is</span>
-<span class="sd">    ``True``. :math:`K(i, bw)` is the kernel weighting function. The sums of an</span>
-<span class="sd">    entity are over the lags of its observations, so that observations that follow</span>
-<span class="sd">    each other are one lag apart even if a period is missing between them.</span>
+<span class="sd">    where :math:`T_i` is the number of observations of entity :math:`i`, df is</span>
+<span class="sd">    ``extra_df`` and n-df is replace by n-df-k if ``debiased`` is ``True``.</span>
+<span class="sd">    :math:`K(j, bw)` is the kernel weighting function, which is 1 for the lag 0.</span>
+<span class="sd">    The Bartlett and Parzen kernels are 0 for the lags above ``bandwidth``.</span>
+
+<span class="sd">    **Lags**</span>
+
+<span class="sd">    The lag between two observations of an entity is the difference between their</span>
+<span class="sd">    positions in the observations of the entity, which are in the order of time. It is</span>
+<span class="sd">    not the difference between their time periods. If a period is missing between two</span>
+<span class="sd">    observations of an entity, they are one lag apart. With the Bartlett kernel the</span>
+<span class="sd">    covariance is that of the cluster-HAC option of statsmodels</span>
+<span class="sd">    (``cov_type="hac-panel"``), which also counts positions. plm (``vcovNW``) and</span>
+<span class="sd">    sandwich (``vcovPL``) pair the observations that are :math:`j` periods apart, so</span>
+<span class="sd">    that their covariances are different if an entity has missing periods between its</span>
+<span class="sd">    observations: in a panel where about a quarter of the periods are missing the</span>
+<span class="sd">    standard errors differed by about 3%. They are the same if no entity has a gap.</span>
+<span class="sd">    See :ref:`panel-ac-lags`.</span>
+
+<span class="sd">    **Entities with few observations**</span>
+
+<span class="sd">    An entity has the lags :math:`0,\ldots,T_i-1`, and its sum is over these lags.</span>
+<span class="sd">    The weights are those of the bandwidth that was chosen, :math:`K(j, bw)`, also</span>
+<span class="sd">    for an entity with fewer observations than the bandwidth. The bandwidth is not</span>
+<span class="sd">    reduced to :math:`T_i-1` for such an entity, and the weights of the lags that the</span>
+<span class="sd">    entity does not have are not used. This is how plm, sandwich and statsmodels</span>
+<span class="sd">    compute the covariance.</span>
 
 <span class="sd">    .. versionchanged:: 7.1</span>
 
@@ -1096,6 +1175,16 @@
 <span class="sd">       over the entities, which is the same for a balanced panel. For an unbalanced</span>
 <span class="sd">       panel the covariance, e.g., with a bandwidth of 0, was not the heteroskedasticity</span>
 <span class="sd">       robust covariance, and differed from the covariance of other packages.</span>
+
+<span class="sd">    .. versionchanged:: 7.1</span>
+
+<span class="sd">       An entity with :math:`T_i` observations, where :math:`T_i \leq bw`, keeps the</span>
+<span class="sd">       weights of the bandwidth. Earlier versions replaced the bandwidth of the</span>
+<span class="sd">       entity by :math:`T_i-1`. This changed the Bartlett weights of the entity from</span>
+<span class="sd">       :math:`1-j/(bw+1)` to :math:`1-j/T_i`, the Parzen weights in the same way,</span>
+<span class="sd">       and the bandwidth of the quadratic spectral kernel. The covariance changes if</span>
+<span class="sd">       any entity has fewer observations than the bandwidth, which is more likely</span>
+<span class="sd">       in a panel where the entities are short or the bandwidth is large.</span>
 <span class="sd">    """</span>
 
     <span class="n">ALLOWED_KWARGS</span> <span class="o">=</span> <span class="p">(</span><span class="s2">"kernel"</span><span class="p">,</span> <span class="s2">"bandwidth"</span><span class="p">)</span>
@@ -1126,7 +1215,10 @@
     <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">linearmodels</span><span class="o">.</span><span class="n">typing</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">Float64Array</span><span class="p">:</span>
         <span class="n">nobs</span> <span class="o">=</span> <span class="n">xe</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
         <span class="n">w</span> <span class="o">=</span> <span class="n">lookup_option</span><span class="p">(</span><span class="n">KERNEL_LOOKUP</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_kernel</span><span class="p">,</span> <span class="s2">"kernel"</span><span class="p">)(</span><span class="n">bw</span><span class="p">,</span> <span class="n">nobs</span> <span class="o">-</span> <span class="mi">1</span><span class="p">)</span>
-        <span class="k">return</span> <span class="n">cov_kernel</span><span class="p">(</span><span class="n">xe</span><span class="p">,</span> <span class="n">w</span><span class="p">)</span>
+        <span class="c1"># The entity has the lags 0, ..., nobs - 1 only. They have the weights of</span>
+        <span class="c1"># the bandwidth that was chosen, also if the entity is shorter than the</span>
+        <span class="c1"># bandwidth, and so the weights of the other lags are not used</span>
+        <span class="k">return</span> <span class="n">cov_kernel</span><span class="p">(</span><span class="n">xe</span><span class="p">,</span> <span class="n">w</span><span class="p">[:</span><span class="n">nobs</span><span class="p">])</span>
 
 <div class="viewcode-block" id="ACCovariance.cov">
 <a class="viewcode-back" href="../../../panel/panel/linearmodels.panel.covariance.ACCovariance.cov.html#linearmodels.panel.covariance.ACCovariance.cov">[docs]</a>
@@ -1156,10 +1248,9 @@
         <span class="n">xeex</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">((</span><span class="n">xe_df</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="n">xe_df</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">]))</span>
         <span class="k">for</span> <span class="n">entity</span> <span class="ow">in</span> <span class="n">entities</span><span class="p">:</span>
             <span class="n">_xe</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">asarray</span><span class="p">(</span><span class="n">xe_df</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span><span class="n">entity</span><span class="p">])</span>
-            <span class="n">_bw</span> <span class="o">=</span> <span class="nb">min</span><span class="p">(</span><span class="n">_xe</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">-</span> <span class="mf">1.0</span><span class="p">,</span> <span class="n">bw</span><span class="p">)</span>
             <span class="c1"># The sum of the products of the scores of the entity, which the kernel</span>
             <span class="c1"># covariance divides by the number of observations of the entity</span>
-            <span class="n">xeex</span> <span class="o">+=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_single_cov</span><span class="p">(</span><span class="n">_xe</span><span class="p">,</span> <span class="n">_bw</span><span class="p">)</span> <span class="o">*</span> <span class="n">_xe</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+            <span class="n">xeex</span> <span class="o">+=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_single_cov</span><span class="p">(</span><span class="n">_xe</span><span class="p">,</span> <span class="n">bw</span><span class="p">)</span> <span class="o">*</span> <span class="n">_xe</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
         <span class="n">xeex</span> <span class="o">/=</span> <span class="n">nobs</span>
         <span class="n">xeex</span> <span class="o">*=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_scale</span>
 
@@ -1243,18 +1334,39 @@
 <span class="sd">        (nobs by variables) array of all estimated model parameters</span>
 <span class="sd">    debiased : bool</span>
 <span class="sd">        Flag indicating whether to debias the estimator.</span>
-<span class="sd">    bandwidth : int</span>
-<span class="sd">        Non-negative integer to use as bandwidth.  Set to 0 to disable</span>
-<span class="sd">        autocorrelation robustness. If not provided a rule-of- thumb</span>
-<span class="sd">        value is used.</span>
+<span class="sd">    bandwidth : float, optional</span>
+<span class="sd">        Non-negative bandwidth to use. It must be below T, the number of time</span>
+<span class="sd">        periods that are used. The Bartlett and Parzen kernels use its integer</span>
+<span class="sd">        part. Set to 0 to disable autocorrelation robustness. If not provided, it</span>
+<span class="sd">        is computed from the T estimates and is at most T - 1.</span>
 <span class="sd">    kernel : str</span>
 <span class="sd">        Name of one of the supported kernels. If None, uses the Newey-West</span>
 <span class="sd">        kernel.</span>
 
+<span class="sd">    Raises</span>
+<span class="sd">    ------</span>
+<span class="sd">    ValueError</span>
+<span class="sd">        If the bandwidth is not below the number of time periods that are used.</span>
 
 <span class="sd">    Notes</span>
 <span class="sd">    -----</span>
 <span class="sd">    Covariance is a Kernel covariance of all estimated parameters.</span>
+
+<span class="sd">    The :math:`T` cross-sectional estimates, one for each time period that is</span>
+<span class="sd">    used, have autocovariances up to lag :math:`T-1`, so the bandwidth must be</span>
+<span class="sd">    below :math:`T`. The bandwidth is checked when the estimator is created, so</span>
+<span class="sd">    that the ``fit`` method of the model raises the error.</span>
+
+<span class="sd">    .. versionchanged:: 7.1</span>
+
+<span class="sd">       A bandwidth that is not below the number of time periods raises a</span>
+<span class="sd">       ``ValueError``. Earlier versions raised "Length of w is larger than the</span>
+<span class="sd">       number of elements in z" with the Bartlett and Parzen kernels, when the</span>
+<span class="sd">       covariance was first used. The quadratic spectral kernel, which has no</span>
+<span class="sd">       truncation, returned a covariance without an error. With a large bandwidth</span>
+<span class="sd">       the weights of all of the lags are close to one, and the deviations of the</span>
+<span class="sd">       estimates from their average sum to zero, so that the covariance was close</span>
+<span class="sd">       to zero.</span>
 <span class="sd">    """</span>
 
     <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span>
@@ -1274,6 +1386,18 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">_name</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">"Fama-MacBeth </span><span class="si">{</span><span class="n">cov_type</span><span class="si">}</span><span class="s2">Cov"</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_bandwidth</span> <span class="o">=</span> <span class="n">bandwidth</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_kernel</span> <span class="o">=</span> <span class="n">kernel</span> <span class="k">if</span> <span class="n">kernel</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="k">else</span> <span class="bp">self</span><span class="o">.</span><span class="n">DEFAULT_KERNEL</span>
+        <span class="k">if</span> <span class="n">bandwidth</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="c1"># Checked here so that fit raises, and not the first use of the covariance</span>
+            <span class="n">deviations</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">asarray</span><span class="p">(</span><span class="n">all_params</span><span class="p">)</span> <span class="o">-</span> <span class="n">params</span><span class="o">.</span><span class="n">T</span>
+            <span class="n">nperiods</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">all</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">isfinite</span><span class="p">(</span><span class="n">deviations</span><span class="p">),</span> <span class="mi">1</span><span class="p">)</span><span class="o">.</span><span class="n">sum</span><span class="p">())</span>
+            <span class="k">if</span> <span class="n">bandwidth</span> <span class="o">&gt;=</span> <span class="n">nperiods</span><span class="p">:</span>
+                <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
+                    <span class="s2">"The bandwidth of the Fama-MacBeth kernel covariance, "</span>
+                    <span class="sa">f</span><span class="s2">"</span><span class="si">{</span><span class="n">bandwidth</span><span class="si">:</span><span class="s2">g</span><span class="si">}</span><span class="s2">, must be below the number of time periods that "</span>
+                    <span class="sa">f</span><span class="s2">"are used, </span><span class="si">{</span><span class="n">nperiods</span><span class="si">}</span><span class="s2">. The </span><span class="si">{</span><span class="n">nperiods</span><span class="si">}</span><span class="s2"> cross-sectional estimates "</span>
+                    <span class="sa">f</span><span class="s2">"have autocovariances up to lag </span><span class="si">{</span><span class="n">nperiods</span><span class="w"> </span><span class="o">-</span><span class="w"> </span><span class="mi">1</span><span class="si">}</span><span class="s2">. Use a smaller "</span>
+                    <span class="s2">"bandwidth."</span>
+                <span class="p">)</span>
 
 <div class="viewcode-block" id="FamaMacBethCovariance.bandwidth">
 <a class="viewcode-back" href="../../../panel/panel/linearmodels.panel.covariance.FamaMacBethCovariance.bandwidth.html#linearmodels.panel.covariance.FamaMacBethCovariance.bandwidth">[docs]</a>
