@@ -3379,6 +3379,35 @@ class RandomEffects(_PanelModelBase):
         ``debiased=True`` and ``group_debias=True`` give the clustered
         covariance of Stata's ``xtreg, re vce(cluster ...)``.
         See :ref:`panel-small-sample`.
+
+        The variance of the idiosyncratic error is the residual variance of the
+        within regression, and the variance of the effects is estimated from the
+        residuals of the between regression. The degrees of freedom of the
+        variances are the numbers of coefficients that the regressions estimate. A
+        regressor that is constant within entities (the constant, or years of
+        education in a wage panel) or that is collinear with the others once the
+        means of the entities are removed (experience, if the model has year
+        dummies) is not in the within regression, and a regressor that is collinear
+        with the others in the means of the entities (the year dummies and the
+        constant in a balanced panel) is not in the between regression. A
+        ``ValueError`` is raised if either regression has no residual degrees of
+        freedom, since the variances cannot be estimated.
+
+        .. versionchanged:: 7.1
+
+           The degrees of freedom of the variances count the coefficients that the
+           regressions estimate. Earlier versions counted every column of ``exog``
+           (less one for the constant in the within regression), so that the
+           variances, theta and the estimates were slightly different for models with
+           time-invariant or collinear regressors, and for models without a constant.
+           With ``small_sample`` and an unbalanced panel, the residuals of the between
+           regression that the estimator of Baltagi and Chang (1994) uses are those of
+           the regression that weights the entities by their numbers of observations.
+           Earlier versions used the residuals of the unweighted regression of the
+           means, which gave a different variance of the effects. Models that do not
+           have residual degrees of freedom in the regressions raise a
+           ``ValueError``. Earlier versions raised an error from NumPy or SciPy,
+           or returned variances that were not defined.
         """
         w = self.weights.values2d
         root_w = cast("linearmodels.typing.data.Float64Array", np.sqrt(w))
@@ -3388,6 +3417,15 @@ class RandomEffects(_PanelModelBase):
         assert isinstance(demeaned_exog, PanelData)
         y = demeaned_dep.values2d
         x = demeaned_exog.values2d
+        # The regressors that do not vary within entities (a constant, a time-invariant
+        # regressor) or that are collinear once the means are removed have no
+        # coefficient in the within regression, and do not use a degree of freedom.
+        # Removing the means leaves rounding error in a regressor that does not vary,
+        # which is large if its units are large, so the rank is that of the regressors
+        # in the units that they had before the means were removed
+        x_norm = np.sqrt(((root_w * self.exog.values2d) ** 2).sum(0))
+        x_norm[x_norm == 0.0] = 1.0
+        rank_within = _lstsq(x / x_norm, y, rcond=None)[2]
         if self.has_constant:
             w_sum = w.sum()
             y_gm = (w * self.dependent.values2d).sum(0) / w_sum
@@ -3399,28 +3437,59 @@ class RandomEffects(_PanelModelBase):
 
         wybar = self.dependent.mean("entity", weights=self.weights)
         wxbar = self.exog.mean("entity", weights=self.weights)
-        params = _lstsq(np.asarray(wxbar), np.asarray(wybar), rcond=None)[0]
+        params, _, rank_between, _ = _lstsq(
+            np.asarray(wxbar), np.asarray(wybar), rcond=None
+        )
         wu = np.asarray(wybar) - np.asarray(wxbar) @ params
 
         nobs = weps.shape[0]
         neffects = wu.shape[0]
-        nvar = x.shape[1]
-        sigma2_e = float(np.squeeze(weps.T @ weps)) / (nobs - nvar - neffects + 1)
+        df_within = nobs - neffects - rank_within
+        df_between = neffects - rank_between
+        if df_within <= 0:
+            raise ValueError(
+                "The variance of the idiosyncratic error cannot be estimated since "
+                "the within regression has no residual degrees of freedom. The model "
+                f"has {nobs} observations of {neffects} entities, and the regressors "
+                f"that vary within entities have a rank of {rank_within}, so that "
+                f"at least {neffects + rank_within + 1} observations are needed."
+            )
+        if df_between <= 0:
+            raise ValueError(
+                "The variance of the effects cannot be estimated since the between "
+                "regression has no residual degrees of freedom. The model has "
+                f"{neffects} entities, and the means of the regressors have a rank "
+                f"of {rank_between}, so that at least {rank_between + 1} entities "
+                "are needed."
+            )
+        sigma2_e = float(np.squeeze(weps.T @ weps)) / df_within
         ssr = float(np.squeeze(wu.T @ wu))
         t = np.asarray(self.dependent.count("entity"))
         unbalanced = np.ptp(t) != 0
         if small_sample and unbalanced:
-            ssr = float(np.squeeze((t * wu).T @ wu))
+            # The between regression of the estimator of Baltagi and Chang (1994) is
+            # the regression of the data replaced by the means of the entities. It
+            # weights the means by the numbers of observations, as the trace below
+            # does, and the residuals of the regression of the means do not
+            root_t = np.sqrt(t)
+            xbar, ybar = np.asarray(wxbar), np.asarray(wybar)
+            params_t = _lstsq(root_t * xbar, root_t * ybar, rcond=None)[0]
+            wu_t = ybar - xbar @ params_t
+            ssr = float(np.squeeze((t * wu_t).T @ wu_t))
             wx_df = cast("DataFrame", root_w * self.exog.dataframe)
             means = wx_df.groupby(level=0).transform("mean").values
             denom = means.T @ means
             sums = wx_df.groupby(level=0).sum().values
             num = sums.T @ sums
-            tr = np.trace(np.linalg.inv(denom) @ num)
-            sigma2_u = max(0, (ssr - (neffects - nvar) * sigma2_e) / (nobs - tr))
+            # The means of the regressors can be collinear, e.g., the dummy variables
+            # of two periods that are observed for every entity have the same mean
+            # in all entities. The pseudo inverse uses the regressors that are not
+            # collinear
+            tr = np.trace(np.linalg.pinv(denom, hermitian=True) @ num)
+            sigma2_u = max(0, (ssr - df_between * sigma2_e) / (nobs - tr))
         else:
             t_bar = neffects / ((1.0 / t).sum())
-            sigma2_u = max(0, ssr / (neffects - nvar) - sigma2_e / t_bar)
+            sigma2_u = max(0, ssr / df_between - sigma2_e / t_bar)
         rho = sigma2_u / (sigma2_u + sigma2_e)
 
         theta = 1.0 - np.sqrt(sigma2_e / (t * sigma2_u + sigma2_e))
