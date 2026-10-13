@@ -44,6 +44,7 @@ from scipy import stats
 from scipy.linalg import eigh
 
 from linearmodels.iv import IV2SLS, IVJIVE, IVLIML
+import linearmodels.iv.model
 from linearmodels.shared.hypotheses import InvalidTestStatistic, WaldTestStatistic
 
 # ----------------------------------------------------------------------------
@@ -494,6 +495,35 @@ def test_no_warnings_if_kappa_is_not_defined(design):
             IVLIML(*args(y, exog, endog, instr)).fit()
         IVLIML(*args(y, exog, endog, instr), kappa=1.0).fit()
         IV2SLS(*args(y, exog, endog, instr)).fit()
+
+
+def fail_if_decomposed(matrix):
+    raise AssertionError("The singular cross product was decomposed")
+
+
+@pytest.mark.parametrize(
+    "design", TOO_FEW + SATURATED, ids=ids(TOO_FEW) + ids(SATURATED)
+)
+def test_too_few_observations_are_detected_before_the_decomposition(
+    design, monkeypatch
+):
+    # The sign of an eigenvalue that is rounding error depends on the platform, and
+    # was negative on macOS arm64. A matrix that is singular because of the number of
+    # observations is not decomposed, so that nothing depends on it
+    monkeypatch.setattr(linearmodels.iv.model, "inv_sqrth", fail_if_decomposed)
+    y, exog, endog, instr = data_for(design)
+    mod = IVLIML(*args(y, exog, endog, instr), kappa=1.0)
+    with pytest.raises(LinAlgError, match="Kappa cannot be estimated"):
+        mod._estimate_kappa()
+
+
+@pytest.mark.parametrize("scale", [1e-6, 1.0, 1e6])
+def test_collinear_residuals_are_detected_before_the_decomposition(scale, monkeypatch):
+    monkeypatch.setattr(linearmodels.iv.model, "inv_sqrth", fail_if_decomposed)
+    y, exog, endog, instr = collinear_data(scale)
+    mod = IVLIML(*args(y, exog, endog, instr), kappa=1.0)
+    with pytest.raises(LinAlgError, match="linearly dependent"):
+        mod._estimate_kappa()
 
 
 @pytest.mark.parametrize("design", TOO_FEW, ids=ids(TOO_FEW))
