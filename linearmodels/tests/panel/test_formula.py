@@ -334,16 +334,8 @@ def test_formulas_rank_check(data, models, formula):
         # FMB has tighter checks that cannot be disabled
         return
 
-    if model == FirstDifferenceOLS:
-        # The check for a constant reads regressors that are not full rank as having an
-        # implicit constant, which first differences do not allow. The rank that it
-        # used when the rank was not checked was the number of periods, not the rank
-        with pytest.raises(ValueError, match=r"Constants are not allowed"):
-            model.from_formula(formula, joined, check_rank=False)
-        with pytest.raises(ValueError, match=r"Constants are not allowed"):
-            model(y, x, check_rank=False)
-        return
-
+    # The regressors do not contain a constant, whether or not they have full rank,
+    # and so first differences do not reject them either
     mod = model.from_formula(formula, joined, check_rank=False)
     res = mod.fit()
     assert isinstance(res.summary.as_text(), str)

@@ -2553,17 +2553,47 @@ A column with a maximum minus minimum equal to 0 and that is not all 0s.
 \end_layout
 
 \begin_layout Enumerate
-Whether the rank of 
+Whether the column of 1s,
+\begin_inset Formula $1_{N}$
+\end_inset
+
+, is in the column space of
 \begin_inset Formula $X$
 \end_inset
 
- is the same as 
-\begin_inset Formula $\left[1_{N}\:X\right]$
+.
+ If it is, then the model contains a constant equivalent (e.g., dummies
+ for all categories).
+
+\begin_inset Formula $X$
 \end_inset
 
-.
- If these are the same, then the model contains a constant equivalent (e.g.,
- dummies for all categories).
+ can have any rank.
+ The column of 1s is regressed on the columns of
+\begin_inset Formula $X$
+\end_inset
+
+, which are scaled to have a largest absolute value of 1, using a singular
+ value decomposition.
+ It is in the column space if the norm of the residual, relative to the
+ norm of
+\begin_inset Formula $1_{N}$
+\end_inset
+
+, is at most the square root of the machine precision (about
+\begin_inset Formula $1.5\times10^{-8}$
+\end_inset
+
+).
+ The test is not used if the rank of
+\begin_inset Formula $X$
+\end_inset
+
+ is
+\begin_inset Formula $N$
+\end_inset
+
+, since the column space is then everything.
 \end_layout
 
 \end_body

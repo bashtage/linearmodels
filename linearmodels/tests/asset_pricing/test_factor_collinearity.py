@@ -1,9 +1,10 @@
 """
 Tests of the messages for factors that are collinear or contain a constant
 
-has_constant is also True for a matrix that does not have full column rank, so that
+has_constant was also True for a matrix that does not have full column rank, so that
 collinear factors were reported as containing a constant and the message for factors
-without full column rank could not be reached.
+without full column rank could not be reached. It is exact now, and portfolios that do
+not have full rank have to be checked as well as portfolios that contain a constant.
 """
 
 import numpy as np
@@ -78,6 +79,21 @@ def test_constant_is_reported_as_a_constant(data, model, kind):
     portfolios, factors = data
     with pytest.raises(ValueError, match=CONSTANT):
         model(portfolios, collinear_factors(kind, factors))
+
+
+@pytest.mark.parametrize("model", MODELS)
+@pytest.mark.parametrize("kind", ["duplicate", "combination", "zeros", "constant"])
+def test_portfolios_must_have_full_rank_and_no_constant(data, model, kind):
+    portfolios, factors = data
+    p1, p2 = portfolios.T[:2]
+    bad = {
+        "duplicate": np.c_[portfolios, p1],
+        "combination": np.c_[portfolios, p1 - 2 * p2],
+        "zeros": np.c_[portfolios, np.zeros_like(p1)],
+        "constant": np.c_[portfolios, np.ones_like(p1)],
+    }[kind]
+    with pytest.raises(ValueError, match=r"portfolios must not contain a constant"):
+        model(bad, factors)
 
 
 @pytest.mark.parametrize("model", MODELS)
