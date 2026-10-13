@@ -199,6 +199,15 @@ def far(unit, values):
     return pd.DatetimeIndex(np.array(values, dtype=f"datetime64[{unit}]"))
 
 
+def far_index(unit, year, n, entities=None):
+    """Consecutive days from January 1 of the year, which nanoseconds cannot hold"""
+    days = np.datetime64(f"{year}-01-01") + np.arange(n).astype("timedelta64[D]")
+    times = pd.DatetimeIndex(days.astype(f"datetime64[{unit}]"))
+    if entities is None:
+        return times
+    return pd.MultiIndex.from_product([entities, times], names=["entity", "time"])
+
+
 @needs_units
 @pytest.mark.parametrize("values", [FAR_FUTURE, FAR_PAST], ids=["after", "before"])
 def test_dates_outside_the_nanosecond_range(values):
@@ -595,6 +604,33 @@ def test_panel_other_dates_in_other_effects_are_rejected(panel, shift):
         PanelOLS(panel.dependent(), panel.exog(), other_effects=effects)
 
 
+@needs_units
+@pytest.mark.parametrize("year", [3000, 1000])
+@pytest.mark.parametrize(("model", "options"), PANEL_MODELS)
+@pytest.mark.parametrize(("y_unit", "x_unit"), [("s", "us"), ("us", "s"), ("ms", "s")])
+def test_panel_dates_outside_the_nanosecond_range(
+    panel, year, model, options, y_unit, x_unit
+):
+    def build(unit_y, unit_x):
+        y = pd.Series(panel.y, index=far_index(unit_y, year, NTIME, ENTITIES))
+        index = far_index(unit_x, year, NTIME, ENTITIES)
+        return y, pd.DataFrame(panel.x, index=index, columns=["a", "b"])
+
+    expected = fit_panel(model, options, *build("us", "us"))
+    y, x = build(y_unit, x_unit)
+    assert_same_results(fit_panel(model, options, y, x), expected)
+
+
+@needs_units
+@pytest.mark.parametrize("year", [3000, 1000])
+def test_panel_dates_outside_the_nanosecond_range_are_not_nanoseconds(panel, year):
+    # Nanoseconds cannot hold these dates, and so it has other dates. pandas 3
+    # raises its own OutOfBoundsDatetime error from MultiIndex.equals otherwise
+    y = pd.Series(panel.y, index=far_index("s", year, NTIME, ENTITIES))
+    with pytest.raises(ValueError, match="row index of exog does not match dependent"):
+        PooledOLS(y, panel.exog("ns"))
+
+
 @pytest.mark.parametrize("data_array", ["dependent", "exog"])
 @pytest.mark.parametrize(("y_unit", "x_unit"), UNIT_PAIRS)
 def test_panel_two_dimensional_data_arrays(panel, data_array, y_unit, x_unit):
@@ -832,6 +868,29 @@ def test_iv_formula_with_weights(iv, cls, unit):
         cls.from_formula(formula, frame, weights=shifted)
 
 
+@needs_units
+@pytest.mark.parametrize("year", [3000, 1000])
+def test_iv_dates_outside_the_nanosecond_range(iv, year):
+    def fit(units):
+        n = iv.nobs
+        y, exog, endog, instruments = (far_index(unit, year, n) for unit in units)
+        mod = IV2SLS(
+            pd.Series(iv.dependent, index=y),
+            pd.DataFrame(iv.exog, index=exog, columns=["const", "w"]),
+            pd.DataFrame(iv.endog, index=endog, columns=["x"]),
+            pd.DataFrame(iv.instruments, index=instruments, columns=["z0", "z1"]),
+        )
+        return mod.fit()
+
+    expected = fit(["us", "us", "us", "us"])
+    assert_same_results(fit(["s", "us", "s", "ms"]), expected)
+    inputs = iv.inputs()
+    far_y = pd.Series(iv.dependent, index=far_index("s", year, iv.nobs))
+    inputs["dependent"] = far_y
+    with pytest.raises(ValueError, match="row index of exog does not match dependent"):
+        fit_iv(IV2SLS, inputs)
+
+
 def data_array(frame, unit):
     """DataArray with the rows of the frame, where the coordinates have the unit"""
     xr = pytest.importorskip("xarray")
@@ -1065,6 +1124,8 @@ ASSET_IDS = [cls.__name__ for cls in ASSET_MODELS]
 
 
 class ReturnsInputs:
+    """The values of the returns, where the rows of each input have a resolution"""
+
     nobs = 100
 
     def __init__(self):
