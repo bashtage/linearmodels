@@ -152,7 +152,8 @@ def test_period_index_with_clusters_weights_and_other_effects():
             other_effects=frame[["g"]],
         )
         out.append(mod.fit(cov_type="clustered", clusters=frame[["g"]], use_lsdv=True))
-    assert_equal_results(*out)
+    res, expected = out
+    assert_equal_results(res, expected)
 
 
 def test_period_index_and_timestamps_can_be_mixed():
