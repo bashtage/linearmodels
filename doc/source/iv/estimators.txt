@@ -779,9 +779,16 @@ constant is correctly detected is to include a columns of 1s.
 #. A column with a maximum minus minimum equal to 0 and that is not all
    0s.
 
-#. Whether the rank of :math:`X` is the same as
-   :math:`\left[1_{N}\:X\right]`. If these are the same, then the model
-   contains a constant equivalent (e.g., dummies for all categories).
+#. Whether the column of 1s, :math:`1_{N}`, is in the column space of
+   :math:`X`. If it is, then the model contains a constant equivalent
+   (e.g., dummies for all categories). :math:`X` can have any rank. The
+   column of 1s is regressed on the columns of :math:`X`, which are
+   scaled to have a largest absolute value of 1, using a singular value
+   decomposition. It is in the column space if the norm of the residual,
+   relative to the norm of :math:`1_{N}`, is at most the square root of
+   the machine precision (about :math:`1.5\times10^{-8}`). The test is
+   not used if the rank of :math:`X` is :math:`N`, since the column
+   space is then everything.
 
 .. [1]
    If the model contains an implicit constant, e.g., all categories of a
