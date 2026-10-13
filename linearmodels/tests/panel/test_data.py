@@ -12,6 +12,7 @@ import pytest
 from linearmodels.panel.data import PanelData, _Panel
 from linearmodels.panel.model import PanelOLS, panel_structure_stats
 from linearmodels.shared.utility import panel_to_frame
+from linearmodels.tests._utility import warns_if_missing
 from linearmodels.tests.panel._utility import MISSING_XARRAY, datatypes, generate_data
 
 try:
@@ -19,10 +20,6 @@ try:
 except ImportError:
     pass
 
-
-pytestmark = pytest.mark.filterwarnings(
-    "ignore::linearmodels.shared.exceptions.MissingValueWarning"
-)
 
 PERC_MISSING = [0, 0.02, 0.10, 0.33]
 TYPES = datatypes
@@ -852,7 +849,8 @@ def test_original_unmodified(data):
     pre_y = data.y.copy()
     pre_x = data.x.copy()
     pre_w = data.w.copy()
-    mod = PanelOLS(data.y, data.x, weights=data.w)
+    with warns_if_missing(data.y, data.x):
+        mod = PanelOLS(data.y, data.x, weights=data.w)
     mod.fit(debiased=True)
     if isinstance(data.y, DataFrame):
         for after, before in ((data.y, pre_y), (data.x, pre_x), (data.w, pre_w)):
@@ -866,7 +864,8 @@ def test_original_unmodified(data):
         pre_y = mi_df_y.copy()
         pre_x = mi_df_x.copy()
         pre_w = mi_df_w.copy()
-        mod = PanelOLS(mi_df_y, mi_df_x, weights=mi_df_w)
+        with warns_if_missing(mi_df_y, mi_df_x):
+            mod = PanelOLS(mi_df_y, mi_df_x, weights=mi_df_w)
         mod.fit(debiased=True)
         assert_frame_equal(mi_df_w, pre_w)
         assert_frame_equal(mi_df_y, pre_y)

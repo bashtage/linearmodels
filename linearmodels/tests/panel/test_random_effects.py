@@ -7,15 +7,12 @@ import pytest
 
 from linearmodels.panel.data import PanelData
 from linearmodels.panel.model import RandomEffects
+from linearmodels.tests._utility import warns_if_missing
 from linearmodels.tests.panel._utility import (
     access_attributes,
     assert_frame_similar,
     datatypes,
     generate_data,
-)
-
-pytestmark = pytest.mark.filterwarnings(
-    "ignore::linearmodels.shared.exceptions.MissingValueWarning"
 )
 
 missing = [0.0, 0.20]
@@ -32,7 +29,8 @@ def data(request):
 
 def test_random_effects_small_sample(data):
     y = PanelData(data.y)
-    mod = RandomEffects(data.y, data.x)
+    with warns_if_missing(data.y, data.x):
+        mod = RandomEffects(data.y, data.x)
     no_ss = mod.fit()
     ss = mod.fit(small_sample=True)
     if y.dataframe.shape[0] == mod.dependent.dataframe.shape[0]:
@@ -40,7 +38,8 @@ def test_random_effects_small_sample(data):
     else:
         assert ss.variance_decomposition.Effects != no_ss.variance_decomposition.Effects
 
-    mod = RandomEffects(data.y, data.x, weights=data.w)
+    with warns_if_missing(data.y, data.x):
+        mod = RandomEffects(data.y, data.x, weights=data.w)
     no_ss = mod.fit()
     ss = mod.fit(small_sample=True)
     if y.dataframe.shape[0] == mod.dependent.dataframe.shape[0]:
@@ -50,13 +49,15 @@ def test_random_effects_small_sample(data):
 
 
 def test_results_access(data):
-    mod = RandomEffects(data.y, data.x)
+    with warns_if_missing(data.y, data.x):
+        mod = RandomEffects(data.y, data.x)
     res = mod.fit(debiased=False)
     access_attributes(res)
 
 
 def test_fitted_effects_residuals(data):
-    mod = RandomEffects(data.y, data.x)
+    with warns_if_missing(data.y, data.x):
+        mod = RandomEffects(data.y, data.x)
     res = mod.fit()
 
     expected = mod.exog.values2d @ res.params.values
@@ -78,7 +79,8 @@ def test_fitted_effects_residuals(data):
 
 
 def test_extra_df(data):
-    mod = RandomEffects(data.y, data.x)
+    with warns_if_missing(data.y, data.x):
+        mod = RandomEffects(data.y, data.x)
     res = mod.fit()
     res_extra = mod.fit(extra_df=10)
     assert np.all(np.diag(res_extra.cov) > np.diag(res.cov))

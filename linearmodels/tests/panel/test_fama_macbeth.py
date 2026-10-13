@@ -22,15 +22,12 @@ from linearmodels.shared.exceptions import (
 )
 from linearmodels.shared.hypotheses import InvalidTestStatistic
 from linearmodels.shared.io import pval_format
+from linearmodels.tests._utility import warns_if_missing
 from linearmodels.tests.panel._utility import (
     access_attributes,
     assert_frame_similar,
     datatypes,
     generate_data,
-)
-
-pytestmark = pytest.mark.filterwarnings(
-    "ignore::linearmodels.shared.exceptions.MissingValueWarning"
 )
 
 missing = [0.0, 0.20]
@@ -48,7 +45,8 @@ def data(request):
 
 
 def test_fama_macbeth(data):
-    res = FamaMacBeth(data.y, data.x).fit(debiased=True)
+    with warns_if_missing(data.y, data.x, match=None):
+        res = FamaMacBeth(data.y, data.x).fit(debiased=True)
     y = PanelData(data.y)
     x = PanelData(data.x)
     missing = y.isnull | x.isnull
@@ -84,23 +82,26 @@ def test_fama_macbeth(data):
 
 def test_unknown_cov_type(data):
     with pytest.raises(ValueError, match=r"Unknown cov_type"):
-        FamaMacBeth(data.y, data.x).fit(cov_type="unknown")
+        with warns_if_missing(data.y, data.x, match=None):
+            FamaMacBeth(data.y, data.x).fit(cov_type="unknown")
 
 
 @pytest.mark.smoke
 def test_fama_macbeth_kernel_smoke(data):
-    FamaMacBeth(data.y, data.x).fit(cov_type="kernel")
-    FamaMacBeth(data.y, data.x).fit(cov_type="kernel", kernel="bartlett")
-    FamaMacBeth(data.y, data.x).fit(cov_type="kernel", kernel="newey-west")
-    FamaMacBeth(data.y, data.x).fit(cov_type="kernel", kernel="parzen")
-    FamaMacBeth(data.y, data.x).fit(cov_type="kernel", kernel="qs")
-    FamaMacBeth(data.y, data.x).fit(cov_type="kernel", bandwidth=3)
-    res = FamaMacBeth(data.y, data.x).fit(cov_type="kernel", kernel="andrews")
+    with warns_if_missing(data.y, data.x, match=None):
+        FamaMacBeth(data.y, data.x).fit(cov_type="kernel")
+        FamaMacBeth(data.y, data.x).fit(cov_type="kernel", kernel="bartlett")
+        FamaMacBeth(data.y, data.x).fit(cov_type="kernel", kernel="newey-west")
+        FamaMacBeth(data.y, data.x).fit(cov_type="kernel", kernel="parzen")
+        FamaMacBeth(data.y, data.x).fit(cov_type="kernel", kernel="qs")
+        FamaMacBeth(data.y, data.x).fit(cov_type="kernel", bandwidth=3)
+        res = FamaMacBeth(data.y, data.x).fit(cov_type="kernel", kernel="andrews")
     access_attributes(res)
 
 
 def test_fitted_effects_residuals(data):
-    mod = FamaMacBeth(data.y, data.x)
+    with warns_if_missing(data.y, data.x, match=None):
+        mod = FamaMacBeth(data.y, data.x)
     res = mod.fit()
 
     expected = mod.exog.values2d @ res.params.values
@@ -122,9 +123,6 @@ def test_fitted_effects_residuals(data):
     assert_frame_similar(res.estimated_effects, expected)
 
 
-@pytest.mark.filterwarnings(
-    "always::linearmodels.shared.exceptions.MissingValueWarning"
-)
 def test_block_size_warnings():
     y = np.arange(12.0)[:, None]
     x = np.ones((12, 3))
@@ -166,7 +164,8 @@ def test_limited_redundancy():
     )
     for i in range(0, data.x.shape[1], 7):
         data.x[1, i, :] = data.x[0, i, :]
-    mod = FamaMacBeth(data.y, data.x)
+    with pytest.warns(MissingValueWarning, match="cross-sectional regressions"):
+        mod = FamaMacBeth(data.y, data.x)
     res = mod.fit()
     assert np.any(np.isnan(res.all_params))
 
@@ -384,7 +383,12 @@ def test_kernel_covariances_use_t_distribution(kernel, bandwidth):
     # The kernel covariances also use the T - 1 degrees of freedom, with the
     # automatic bandwidth and a bandwidth that is given
     y, x = dropped_periods_panel()
-    res = FamaMacBeth(y, x).fit(cov_type="kernel", kernel=kernel, bandwidth=bandwidth)
+    with pytest.warns(
+        MissingValueWarning, match=r"4 of the cross-sectional regressions"
+    ):
+        res = FamaMacBeth(y, x).fit(
+            cov_type="kernel", kernel=kernel, bandwidth=bandwidth
+        )
     nperiod = int(res.all_params.notnull().all(axis=1).sum())
     assert nperiod == 21
     assert res.df_resid == 20

@@ -7,11 +7,8 @@ import pytest
 
 from linearmodels.panel.data import PanelData
 from linearmodels.panel.model import PanelOLS
+from linearmodels.tests._utility import warns_if_missing
 from linearmodels.tests.panel._utility import datatypes, generate_data
-
-pytestmark = pytest.mark.filterwarnings(
-    "ignore::linearmodels.shared.exceptions.MissingValueWarning"
-)
 
 missing = [0.0, 0.20]
 perms = list(product(missing, datatypes))
@@ -33,7 +30,8 @@ def test_categorical_input(data):
         name = "effect." + str(i)
         temp[name] = pd.Categorical(pd.Series(e, index=y.index, name=name))
     effects = pd.DataFrame(temp, index=y.index)
-    mod = PanelOLS(data.y, data.x, other_effects=effects)
+    with warns_if_missing(data.y, data.x):
+        mod = PanelOLS(data.y, data.x, other_effects=effects)
     mod.fit()
 
     clusters = np.random.randint(0, y.shape[2] // 2, size=(nt, 2))
@@ -56,7 +54,8 @@ def test_string_input(data):
             np.random.choice(prim, size=nt), index=y.index, name=name
         )
     effects = pd.DataFrame(temp, index=y.index)
-    mod = PanelOLS(data.y, data.x, other_effects=effects)
+    with warns_if_missing(data.y, data.x):
+        mod = PanelOLS(data.y, data.x, other_effects=effects)
     mod.fit()
 
     clusters = np.random.randint(0, y.shape[2] // 2, size=(nt, 2))
@@ -81,7 +80,8 @@ def test_integer_input(data):
         name = "effect." + str(i)
         temp[name] = pd.Series(e, index=y.index, name=name)
     effects = pd.DataFrame(temp, index=y.index)
-    mod = PanelOLS(data.y, data.x, other_effects=effects)
+    with warns_if_missing(data.y, data.x):
+        mod = PanelOLS(data.y, data.x, other_effects=effects)
     mod.fit()
 
     clusters = np.random.randint(0, y.shape[2] // 2, size=(nt, 2))
@@ -103,7 +103,8 @@ def test_mixed_input(data):
         "effect.1": pd.Series(np.random.choice(prim, size=nt), index=y.index),
     }
     effects = pd.DataFrame(temp, index=y.index)
-    mod = PanelOLS(data.y, data.x, other_effects=effects)
+    with warns_if_missing(data.y, data.x):
+        mod = PanelOLS(data.y, data.x, other_effects=effects)
     mod.fit()
 
     clusters = np.random.randint(0, y.shape[2] // 2, size=(nt, 2))
@@ -119,19 +120,22 @@ def test_nested_effects(data):
     y = PanelData(data.y)
     effects = pd.DataFrame(y.entity_ids // 2, index=y.index)
     with pytest.raises(ValueError, match=r"Included other effects nest") as exception:
-        PanelOLS(data.y, data.x, entity_effects=True, other_effects=effects)
+        with warns_if_missing(data.y, data.x):
+            PanelOLS(data.y, data.x, entity_effects=True, other_effects=effects)
     assert "entity effects" in str(exception.value)
 
     effects = pd.DataFrame(y.time_ids // 2, index=y.index)
     with pytest.raises(ValueError, match=r"Included other effects nest") as exception:
-        PanelOLS(data.y, data.x, time_effects=True, other_effects=effects)
+        with warns_if_missing(data.y, data.x):
+            PanelOLS(data.y, data.x, time_effects=True, other_effects=effects)
     assert "time effects" in str(exception.value)
 
     effects1 = pd.Series(y.entity_ids.squeeze() // 2, index=y.index)
     effects2 = pd.Series(y.entity_ids.squeeze() // 4, index=y.index)
     effects = pd.DataFrame({"eff1": effects1, "eff2": effects2})
     with pytest.raises(ValueError, match=r"Included other effects nest") as exception:
-        PanelOLS(data.y, data.x, other_effects=effects)
+        with warns_if_missing(data.y, data.x):
+            PanelOLS(data.y, data.x, other_effects=effects)
     assert "by other effects" in str(exception.value)
     assert "time effects" not in str(exception.value)
     assert "entity effects" not in str(exception.value)

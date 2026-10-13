@@ -11,6 +11,8 @@ was a constant in a panel with 2 periods and 3 regressors. The R-squared and the
 F-statistic then treated the models as if they had, or did not have, a constant.
 """
 
+from contextlib import nullcontext
+
 import numpy as np
 from numpy.testing import assert_allclose
 import pandas as pd
@@ -24,14 +26,18 @@ from linearmodels.panel import (
     PooledOLS,
     RandomEffects,
 )
+from linearmodels.shared.exceptions import InferenceUnavailableWarning
 
 MODELS = ["pooled", "between", "random-effects", "fama-macbeth", "panel-ols"]
 
-# Two cross-sections cannot give the standard errors of 3 parameters
-pytestmark = pytest.mark.filterwarnings(
-    "ignore:The number of cross-sectional regressions:"
-    "linearmodels.shared.exceptions.InferenceUnavailableWarning"
-)
+
+def warns_for_too_few_periods(model):
+    """Two cross-sections cannot give the standard errors of 3 parameters"""
+    if model == "fama-macbeth":
+        return pytest.warns(
+            InferenceUnavailableWarning, match="cross-sectional regressions"
+        )
+    return nullcontext()
 
 
 def build(model, y, x, check_rank):
@@ -100,8 +106,10 @@ def test_implicit_constant(model):
 @pytest.mark.parametrize("model", MODELS + ["first-difference"])
 def test_no_constant_with_more_regressors_than_periods(model):
     y, x = no_constant_panel()
-    checked = build(model, y, x, True)
-    skipped = build(model, y, x, False)
+    with warns_for_too_few_periods(model):
+        checked = build(model, y, x, True)
+    with warns_for_too_few_periods(model):
+        skipped = build(model, y, x, False)
     assert not checked.has_constant
     assert not skipped.has_constant
     res_checked, res_skipped = checked.fit(), skipped.fit()

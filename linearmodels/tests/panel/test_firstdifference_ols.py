@@ -1,3 +1,4 @@
+from contextlib import nullcontext
 from itertools import product
 
 import numpy as np
@@ -7,16 +8,13 @@ import pytest
 
 from linearmodels.iv import IV2SLS
 from linearmodels.panel.model import FirstDifferenceOLS
+from linearmodels.tests._utility import warns_if_missing
 from linearmodels.tests.panel._utility import (
     access_attributes,
     assert_frame_similar,
     assert_results_equal,
     datatypes,
     generate_data,
-)
-
-pytestmark = pytest.mark.filterwarnings(
-    "ignore::linearmodels.shared.exceptions.MissingValueWarning"
 )
 
 missing = [0.0, 0.20]
@@ -31,7 +29,8 @@ def data(request):
 
 
 def test_firstdifference_ols(data):
-    mod = FirstDifferenceOLS(data.y, data.x)
+    with warns_if_missing(data.y, data.x):
+        mod = FirstDifferenceOLS(data.y, data.x)
     res = mod.fit(debiased=False)
 
     y = mod.dependent.values3d
@@ -95,7 +94,8 @@ def test_firstdifference_ols(data):
 
 
 def test_firstdifference_ols_weighted(data):
-    mod = FirstDifferenceOLS(data.y, data.x, weights=data.w)
+    with warns_if_missing(data.y, data.x):
+        mod = FirstDifferenceOLS(data.y, data.x, weights=data.w)
     res = mod.fit(debiased=False)
 
     y = mod.dependent.values3d
@@ -171,28 +171,35 @@ def test_first_difference_errors(data):
         y = data.y[[0], :]
 
     match = r"Panel must have at least 2"
+    missing_warning = warns_if_missing(y, x)
     if data.y.ndim == 3:
         match = r"dependent and exog must have the"
+        # The shapes are checked before the missing values are dropped
+        missing_warning = nullcontext()
 
     with pytest.raises(ValueError, match=match):
-        FirstDifferenceOLS(y, x)
+        with missing_warning:
+            FirstDifferenceOLS(y, x)
 
     if not isinstance(data.x, pd.DataFrame):
         return
     x = data.x.copy()
     x["Intercept"] = 1.0
     with pytest.raises(ValueError, match=r"Constants are not allowed"):
-        FirstDifferenceOLS(data.y, x)
+        with warns_if_missing(data.y, x):
+            FirstDifferenceOLS(data.y, x)
 
 
 def test_results_access(data):
-    mod = FirstDifferenceOLS(data.y, data.x)
+    with warns_if_missing(data.y, data.x):
+        mod = FirstDifferenceOLS(data.y, data.x)
     res = mod.fit(debiased=False)
     access_attributes(res)
 
 
 def test_firstdifference_error(data):
-    mod = FirstDifferenceOLS(data.y, data.x)
+    with warns_if_missing(data.y, data.x):
+        mod = FirstDifferenceOLS(data.y, data.x)
 
     clusters = mod.dependent.dataframe.copy()
     for entity in mod.dependent.entities:
@@ -207,7 +214,8 @@ def test_firstdifference_error(data):
 
 
 def test_fitted_effects_residuals(data):
-    mod = FirstDifferenceOLS(data.y, data.x)
+    with warns_if_missing(data.y, data.x):
+        mod = FirstDifferenceOLS(data.y, data.x)
     res = mod.fit()
 
     expected = mod.exog.values2d @ res.params.values
@@ -230,7 +238,8 @@ def test_fitted_effects_residuals(data):
 
 
 def test_extra_df(data):
-    mod = FirstDifferenceOLS(data.y, data.x)
+    with warns_if_missing(data.y, data.x):
+        mod = FirstDifferenceOLS(data.y, data.x)
     res = mod.fit()
     res_extra = mod.fit(extra_df=10)
     assert np.all(np.diag(res_extra.cov) > np.diag(res.cov))

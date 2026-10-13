@@ -8,16 +8,14 @@ import pytest
 from linearmodels.iv import IV2SLS
 from linearmodels.panel.data import PanelData
 from linearmodels.panel.model import BetweenOLS
+from linearmodels.shared.exceptions import MissingValueWarning
+from linearmodels.tests._utility import warns_if_missing
 from linearmodels.tests.panel._utility import (
     access_attributes,
     assert_frame_similar,
     assert_results_equal,
     datatypes,
     generate_data,
-)
-
-pytestmark = pytest.mark.filterwarnings(
-    "ignore::linearmodels.shared.exceptions.MissingValueWarning"
 )
 
 
@@ -174,7 +172,8 @@ def test_multiple_obs_per_entity_weighted(data):
 
 
 def test_missing(missing_data):
-    mod = BetweenOLS(missing_data.y, missing_data.x)
+    with pytest.warns(MissingValueWarning, match="missing values"):
+        mod = BetweenOLS(missing_data.y, missing_data.x)
     res = mod.fit(reweight=True, debiased=False)
 
     dep = mod.dependent.dataframe.groupby(level=0).mean()
@@ -205,7 +204,8 @@ def test_missing(missing_data):
 
 
 def test_missing_weighted(missing_data):
-    mod = BetweenOLS(missing_data.y, missing_data.x, weights=missing_data.w)
+    with pytest.warns(MissingValueWarning, match="missing values"):
+        mod = BetweenOLS(missing_data.y, missing_data.x, weights=missing_data.w)
     res = mod.fit(reweight=True, debiased=False)
 
     weights = mod.weights.dataframe.groupby(level=0).sum()
@@ -245,7 +245,8 @@ def test_alt_rsquared(data):
 
 
 def test_alt_rsquared_missing(missing_data):
-    mod = BetweenOLS(missing_data.y, missing_data.x)
+    with pytest.warns(MissingValueWarning, match="missing values"):
+        mod = BetweenOLS(missing_data.y, missing_data.x)
     res = mod.fit(debiased=False)
     assert_allclose(res.rsquared, res.rsquared_between)
 
@@ -257,7 +258,8 @@ def test_alt_rsquared_weighted(data):
 
 
 def test_alt_rsquared_weighted_missing(missing_data):
-    mod = BetweenOLS(missing_data.y, missing_data.x, weights=missing_data.w)
+    with pytest.warns(MissingValueWarning, match="missing values"):
+        mod = BetweenOLS(missing_data.y, missing_data.x, weights=missing_data.w)
     res = mod.fit(debiased=False)
     assert_allclose(res.rsquared, res.rsquared_between)
 
@@ -328,7 +330,8 @@ def test_default_clusters(data):
 
 
 def test_fitted_effects_residuals(both_data_types):
-    mod = BetweenOLS(both_data_types.y, both_data_types.x)
+    with warns_if_missing(both_data_types.y, both_data_types.x):
+        mod = BetweenOLS(both_data_types.y, both_data_types.x)
     res = mod.fit(reweight=True, debiased=False)
     expected = pd.DataFrame(
         mod.exog.values2d @ res.params.values,
