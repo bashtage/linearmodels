@@ -1,4 +1,5 @@
 Hausman
+Hotelling
 Newey
 Driscoll
 Kraay
