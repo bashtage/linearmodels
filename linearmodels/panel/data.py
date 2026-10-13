@@ -117,6 +117,9 @@ def convert_columns(s: Series, drop_first: bool) -> linearmodels.typing.AnyPanda
 
 
 def expand_categoricals(x: DataFrame, drop_first: bool) -> DataFrame:
+    if x.shape[1] == 0:
+        # Nothing to convert, and concat needs an object
+        return x
     return concat(
         [convert_columns(x[c], drop_first) for c in x.columns], axis=1, sort=False
     )
@@ -164,6 +167,11 @@ class PanelData:
     Missing values (NaN) in the entity or time index are not supported. The
     methods that group by the index raise a ValueError if the level that they
     use has a missing label.
+
+    The data can have no variables, a DataFrame with a MultiIndex and no columns
+    or an array with 0 variables. It is the ``exog`` of a
+    :class:`~linearmodels.panel.model.PanelOLS` model that only has effects. The
+    means, counts and demeaned data have no variables either.
 
     Raises
     ------
@@ -248,7 +256,9 @@ class PanelData:
                 x = x[None, :, :]
 
             k, t, n = x.shape
-            var_str = var_name + ".{0:0>" + str(int(np.log10(k) + 0.01)) + "}"
+            # An array without variables has no names, and no digits to pad
+            ndigits = int(np.log10(k) + 0.01) if k > 0 else 0
+            var_str = var_name + ".{0:0>" + str(ndigits) + "}"
             variables = [var_name] if k == 1 else [var_str.format(i) for i in range(k)]
             entity_str = "entity.{0:0>" + str(int(np.log10(n) + 0.01)) + "}"
             entities = [entity_str.format(i) for i in range(n)]
@@ -500,6 +510,9 @@ class PanelData:
         """
         if not isinstance(groups, PanelData):
             groups = PanelData(groups)
+        if self._frame.shape[1] == 0:
+            # There are no variables to demean
+            return PanelData(self._frame.copy())
         if weights is None:
             weights = PanelData(
                 DataFrame(
@@ -647,7 +660,8 @@ class PanelData:
                 return self._demean_both_low_mem(weights)
 
         level = 0 if group == "entity" else 1
-        if weights is None:
+        if weights is None or self._frame.shape[1] == 0:
+            # The weights have no variables to weight if the frame has no columns
             group_mu = self._frame.groupby(level=level).transform("mean")
             out = self._frame - group_mu
             if not return_panel:
@@ -739,7 +753,8 @@ class PanelData:
         """
         level = 0 if group == "entity" else 1
         self._check_index(level)
-        if weights is None:
+        if weights is None or self._frame.shape[1] == 0:
+            # There are no variables to weight if the frame has no columns
             mu = self._frame.groupby(level=level).mean()
         else:
             w = weights.values2d
