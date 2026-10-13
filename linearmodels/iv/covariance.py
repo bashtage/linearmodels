@@ -26,6 +26,7 @@ from numpy import (
 from numpy.linalg import inv, pinv
 
 from linearmodels.shared.covariance import cov_cluster, cov_kernel
+from linearmodels.shared.exceptions import unknown_option_error
 from linearmodels.shared.inputs import as_ndarray
 from linearmodels.shared.linalg import has_constant
 import linearmodels.typing
@@ -258,7 +259,7 @@ def kernel_optimal_bandwidth(
         q, c = 2, 2.6614
         m_star = int(ceil(4 * (t / 100) ** (4 / 25)))
     else:
-        raise ValueError(f"Unknown kernel: {kernel}")
+        raise unknown_option_error("kernel", kernel, KERNEL_LOOKUP)
     sigma = empty(m_star + 1)
     sigma[0] = x.T @ x / t
     for i in range(1, m_star + 1):
@@ -597,7 +598,7 @@ class KernelCovariance(HomoskedasticCovariance):
         self._name = "Kernel Covariance (HAC)"
 
         if kernel not in KERNEL_LOOKUP:
-            raise ValueError(f"Unknown kernel: {kernel}")
+            raise unknown_option_error("kernel", kernel, KERNEL_LOOKUP)
 
     def __str__(self) -> str:
         out = super().__str__()

@@ -65,7 +65,7 @@ from linearmodels.shared.alignment import (
     reference_labels,
     row_labels,
 )
-from linearmodels.shared.exceptions import missing_warning
+from linearmodels.shared.exceptions import lookup_option, missing_warning
 from linearmodels.shared.hypotheses import InvalidTestStatistic, WaldTestStatistic
 from linearmodels.shared.inputs import as_array_like
 from linearmodels.shared.utility import DataFrameWrapper, SeriesWrapper
@@ -1471,7 +1471,7 @@ class AbsorbingLS:
         else:
             params = lstsq(exog_resid, dep_resid, rcond=None)[0]
 
-        cov_estimator = COVARIANCE_ESTIMATORS[cov_type]
+        cov_estimator = lookup_option(COVARIANCE_ESTIMATORS, cov_type, "cov_type")
         cov_config["debiased"] = debiased
         cov_config["kappa"] = 0.0
         cov_config_copy = dict(cov_config.items())

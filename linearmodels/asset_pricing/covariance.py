@@ -12,6 +12,7 @@ from linearmodels.iv.covariance import (
     cov_kernel,
     kernel_optimal_bandwidth,
 )
+from linearmodels.shared.exceptions import unknown_option_error
 import linearmodels.typing.data
 
 
@@ -47,7 +48,7 @@ class _HACMixin:
             raise TypeError("kernel must be the name of a kernel")
         self._kernel = kernel.lower()
         if self._kernel not in KERNEL_LOOKUP:
-            raise ValueError("Unknown kernel")
+            raise unknown_option_error("kernel", kernel, KERNEL_LOOKUP)
 
     def _check_bandwidth(self, bandwidth: float | None) -> None:
         self._bandwidth = bandwidth

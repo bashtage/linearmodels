@@ -18,7 +18,11 @@ from linearmodels.iv.covariance import (
     kernel_optimal_bandwidth,
 )
 from linearmodels.shared.covariance import cov_cluster, cov_kernel
-from linearmodels.shared.exceptions import DefaultBandwidthWarning
+from linearmodels.shared.exceptions import (
+    DefaultBandwidthWarning,
+    lookup_option,
+    unknown_option_error,
+)
 import linearmodels.typing.data
 
 
@@ -375,7 +379,7 @@ class KernelWeightMatrix(HomoskedasticWeightMatrix):
             self._bandwidth = nobs - 2
         bw = self._bandwidth
         assert bw is not None
-        w = self._kernels[self._kernel](bw, nobs - 1)
+        w = lookup_option(self._kernels, self._kernel, "kernel")(bw, nobs - 1)
 
         s = cov_kernel(ze, w)
         s *= 1 if not self._debiased else nobs / (nobs - nvar)
@@ -590,7 +594,15 @@ class IVGMMCovariance(HomoskedasticCovariance):
         elif cov_type == "kernel":
             score_cov_estimator = KernelWeightMatrix
         else:
-            raise ValueError("Unknown cov_type")
+            supported = (
+                "clustered",
+                "heteroskedastic",
+                "homoskedastic",
+                "kernel",
+                "robust",
+                "unadjusted",
+            )
+            raise unknown_option_error("cov_type", cov_type, supported)
         self._score_cov_estimator = score_cov_estimator
 
     def __str__(self) -> str:

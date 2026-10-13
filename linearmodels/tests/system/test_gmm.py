@@ -206,7 +206,7 @@ def test_no_constant_smoke():
 
 
 def test_unknown_weight_type(data):
-    with pytest.raises(ValueError, match=r"Unknown estimator for weight_type"):
+    with pytest.raises(ValueError, match=r"Unknown weight_type"):
         IVSystemGMM(data.eqns, weight_type="unknown")
 
 

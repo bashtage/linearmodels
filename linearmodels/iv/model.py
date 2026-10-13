@@ -62,7 +62,12 @@ from linearmodels.shared.alignment import (
     reference_labels,
     row_labels,
 )
-from linearmodels.shared.exceptions import IndexWarning, missing_warning
+from linearmodels.shared.exceptions import (
+    IndexWarning,
+    lookup_option,
+    missing_warning,
+    unknown_option_error,
+)
 from linearmodels.shared.hypotheses import InvalidTestStatistic, WaldTestStatistic
 from linearmodels.shared.linalg import has_constant, inv_sqrth
 from linearmodels.shared.utility import DataFrameWrapper, SeriesWrapper
@@ -741,7 +746,7 @@ class _IVLSModelBase(_IVModelBase):
 
         params = self.estimate_parameters(wx, wy, wz, est_kappa)
 
-        cov_estimator = COVARIANCE_ESTIMATORS[cov_type]
+        cov_estimator = lookup_option(COVARIANCE_ESTIMATORS, cov_type, "cov_type")
         cov_config["debiased"] = debiased
         cov_config["kappa"] = est_kappa
         cov_config_copy = dict(cov_config.items())
@@ -1122,7 +1127,9 @@ class _IVGMMBase(_IVModelBase):
         self._method = "IV-GMM"
 
         self._check_clusters(weight_config)
-        weight_matrix_estimator = WEIGHT_MATRICES[weight_type]
+        weight_matrix_estimator = lookup_option(
+            WEIGHT_MATRICES, weight_type, "weight_type"
+        )
         # Kernel weights without a bandwidth select it from the data. fit warns
         # about the change of this default, and makes the choice explicit so that
         # the weight estimators and models that are created from the arguments
@@ -2388,7 +2395,7 @@ class _JIVECovariance(IVGMMCovariance):
         if cov_type == "kernel":
             kernel = cov_config.get("kernel", "bartlett")
             if kernel not in KERNEL_LOOKUP:
-                raise ValueError(f"Unknown kernel: {kernel}")
+                raise unknown_option_error("kernel", kernel, KERNEL_LOOKUP)
             # Select the bandwidth using the data unless it is given, as in
             # IV2SLS and IVLIML. This is the default of the weight matrix
             # estimator since 7.1, and it is explicit here so that it does not

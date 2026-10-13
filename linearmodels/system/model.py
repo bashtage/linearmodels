@@ -34,7 +34,7 @@ from linearmodels.shared.alignment import (
     reference_labels,
     row_labels,
 )
-from linearmodels.shared.exceptions import missing_warning
+from linearmodels.shared.exceptions import missing_warning, unknown_option_error
 from linearmodels.shared.hypotheses import InvalidTestStatistic, WaldTestStatistic
 from linearmodels.shared.inputs import as_array_like, as_float64
 from linearmodels.shared.linalg import has_constant
@@ -100,6 +100,9 @@ GMM_COV_EST = {
     "robust": GMMHeteroskedasticCovariance,
     "kernel": GMMKernelCovariance,
 }
+
+# The names in COV_TYPES that IVSystemGMM supports, which excludes "clustered"
+GMM_TYPES = {name: cov for name, cov in COV_TYPES.items() if cov in GMM_W_EST}
 
 
 def _missing_weights(
@@ -1440,7 +1443,7 @@ class _LSSystemModelBase(_SystemModelBase):
 
         cov_type = cov_type.lower()
         if cov_type not in COV_TYPES:
-            raise ValueError(f"Unknown cov_type: {cov_type}")
+            raise unknown_option_error("cov_type", cov_type, COV_TYPES)
         cov_type = COV_TYPES[cov_type]
         k = len(self._dependent)
         col_sizes = [0] + [v.shape[1] for v in self._x]
@@ -2122,8 +2125,8 @@ class IVSystemGMM(_SystemModelBase):
         self._weight_type = weight_type
         self._weight_config = weight_config
 
-        if weight_type not in COV_TYPES:
-            raise ValueError("Unknown estimator for weight_type")
+        if weight_type not in GMM_TYPES:
+            raise unknown_option_error("weight_type", weight_type, GMM_TYPES)
 
         if weight_type not in ("unadjusted", "homoskedastic") and sigma is not None:
             warnings.warn(
@@ -2197,8 +2200,8 @@ class IVSystemGMM(_SystemModelBase):
         :class:`~linearmodels.system.model.IVSystemGMM` for how to restore the
         previous bandwidth.
         """
-        if cov_type not in COV_TYPES:
-            raise ValueError(f"Unknown cov_type: {cov_type}")
+        if cov_type not in GMM_TYPES:
+            raise unknown_option_error("cov_type", cov_type, GMM_TYPES)
         # Parameter estimation
         wx, wy, wz = self._wx, self._wy, self._wz
         k = len(wx)

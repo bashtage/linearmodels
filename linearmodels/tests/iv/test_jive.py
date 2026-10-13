@@ -640,11 +640,11 @@ def test_unknown_kernel():
     # The error is the one of the other IV models, whether or not the bandwidth
     # is selected using the data
     y, exog, endog, z = simulate(8)
-    with pytest.raises(ValueError, match="Unknown kernel: unknown"):
+    with pytest.raises(ValueError, match="Unknown kernel: 'unknown'"):
         IVJIVE(y, exog, endog, z).fit(cov_type="kernel", kernel="unknown")
-    with pytest.raises(ValueError, match="Unknown kernel: unknown"):
+    with pytest.raises(ValueError, match="Unknown kernel: 'unknown'"):
         IVJIVE(y, exog, endog, z).fit(cov_type="kernel", kernel="unknown", bandwidth=3)
-    with pytest.raises(ValueError, match="Unknown kernel: unknown"):
+    with pytest.raises(ValueError, match="Unknown kernel: 'unknown'"):
         IV2SLS(y, exog, endog, z).fit(cov_type="kernel", kernel="unknown")
 
 
