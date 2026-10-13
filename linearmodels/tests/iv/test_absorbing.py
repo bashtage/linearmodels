@@ -34,9 +34,6 @@ from linearmodels.shared.exceptions import MissingValueWarning
 from linearmodels.shared.utility import AttrDict
 
 NOBS = 100
-pytestmark = pytest.mark.filterwarnings(
-    "ignore:the matrix subclass:PendingDeprecationWarning"
-)
 
 
 class Hasher:

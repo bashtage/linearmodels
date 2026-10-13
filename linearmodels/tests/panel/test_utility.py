@@ -24,10 +24,6 @@ formats = {
     "coo": coo_array,
 }
 
-pytestmark = pytest.mark.filterwarnings(
-    "ignore:the matrix subclass:PendingDeprecationWarning"
-)
-
 
 @pytest.fixture(scope="module", params=formats)
 def dummy_format(request):
