@@ -2521,7 +2521,7 @@ where
 
 \begin_layout Standard
 \noindent
-or
+or 
 \begin_inset Formula $T-1$
 \end_inset
 
@@ -2530,16 +2530,16 @@ or
 
 \begin_layout Standard
 \noindent
-The method needs
+The method needs 
 \begin_inset Formula $m^{*}<T-1$
 \end_inset
 
 .
- Otherwise
+ Otherwise 
 \begin_inset Formula $\hat{s}^{(0)}$
 \end_inset
 
- is the sum of all of the autocovariances,
+ is the sum of all of the autocovariances, 
 \begin_inset Formula $T^{-1}\left(\sum_{i}g_{i}\right)^{2}$
 \end_inset
 
@@ -2557,7 +2557,7 @@ The method needs
 \end_inset
 
 ).
- An error is raised for fewer observations, and if the bandwidth is not finite, which happens if
+ An error is raised for fewer observations, and if the bandwidth is not finite, which happens if 
 \begin_inset Formula $\hat{s}^{(0)}$
 \end_inset
 
