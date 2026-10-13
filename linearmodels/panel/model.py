@@ -1097,8 +1097,10 @@ class _PanelModelBase:
             if self._singleton_index is not None:
                 # The clusters have a value for each observation that is not missing.
                 # The singletons are dropped from the data of the model, and so are
-                # the clusters that are made from it below, which do not need this
-                clusters_frame = clusters_frame.loc[~self._singleton_index]
+                # the clusters that are made from it below, which do not need this.
+                # The copy is not a slice of the frame, which the columns that are
+                # added below would be set on
+                clusters_frame = clusters_frame.loc[~self._singleton_index].copy()
 
         cluster_entity = bool(cov_config_upd.pop("cluster_entity", False))
         if cluster_entity:

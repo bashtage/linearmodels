@@ -9,6 +9,8 @@ applied to the clusters that were made after. The results have to be those of th
 estimated from the data without the singleton observations.
 """
 
+import warnings
+
 import numpy as np
 from numpy.testing import assert_allclose
 import pandas as pd
@@ -115,6 +117,32 @@ def test_singleton_observations_with_clusters_and_the_clusters_of_the_model(clus
     res = mod.fit(
         cov_type="clustered", clusters=data[["group"]], **COVARIANCES[clustering]
     )
+    kept = drop_singletons(data, ["entity"])
+    expected = PanelOLS(kept["y"], kept[["x1", "x2"]], entity_effects=True).fit(
+        cov_type="clustered", clusters=kept[["group"]], **COVARIANCES[clustering]
+    )
+    compare(res, expected)
+
+
+@pytest.mark.parametrize("clustering", ["entity", "time"])
+def test_clusters_of_the_model_are_not_set_on_a_slice_of_the_clusters(clustering):
+    # The clusters without the singletons were a slice of the clusters that are given,
+    # and the clusters of the entities or periods were set on it. pandas 2 warns "A
+    # value is trying to be set on a copy of a slice from a DataFrame" (the warning
+    # does not exist in pandas 3, where the test passes whatever the code does)
+    data = make_data()
+    with pytest.warns(SingletonWarning):
+        mod = PanelOLS(
+            data["y"], data[["x1", "x2"]], singletons=False, entity_effects=True
+        )
+    with warnings.catch_warnings(record=True) as caught:
+        warnings.simplefilter("always")
+        res = mod.fit(
+            cov_type="clustered", clusters=data[["group"]], **COVARIANCES[clustering]
+        )
+    categories = [w.category.__name__ for w in caught]
+    assert "SettingWithCopyWarning" not in categories
+    # Nothing else changes: the clusters are those of the model without singletons
     kept = drop_singletons(data, ["entity"])
     expected = PanelOLS(kept["y"], kept[["x1", "x2"]], entity_effects=True).fit(
         cov_type="clustered", clusters=kept[["group"]], **COVARIANCES[clustering]
