@@ -6,8 +6,8 @@ Weights that are a 1-d array with a value for each row of dependent
   object with the index of dependent, and 1-d arrays of clusters and other effects,
   worked. The array worked if dependent was balanced, since it then had as many values
   as the number of time periods times the number of entities, which is the number of
-  rows. An array with that many values raised an error from pandas if dependent was
-  not balanced.
+  rows. An array with that many values raised an error from pandas or NumPy if
+  dependent was not balanced.
 * A 1-d array is read by its number of values. It has a value for each row of dependent
   if it has as many values as dependent has rows, a value for each time period if it
   has as many as there are time periods, and a value for each entity if it has as many
@@ -386,7 +386,8 @@ def test_singletons_are_dropped_with_their_weights(order):
         mod = PanelOLS(panel.y, panel.x, weights=weights, **options)
     with pytest.warns(SingletonWarning):
         expected = PanelOLS(panel.y, panel.x, weights=series, **options)
-    assert len(mod.dependent.index) == len(cells) - 1
+    nkept, expected_nkept = len(mod.dependent.index), len(cells) - 1
+    assert nkept == expected_nkept
     assert_same_index(mod.weights.dataframe.index, mod.dependent.index)
     assert_same_weights(mod, expected)
     # The weights are scaled to have a mean of 1 before the singletons are dropped, so
@@ -453,6 +454,31 @@ def test_from_formula_with_weights_for_each_row(model, order, missing):
     compare_results(mod.fit(), expected.fit())
 
 
+EFFECTS = {
+    "entity": {"entity_effects": True},
+    "time": {"time_effects": True},
+    "both": {"entity_effects": True, "time_effects": True},
+}
+
+
+@pytest.mark.parametrize("effects", EFFECTS)
+@pytest.mark.parametrize("order", ORDERS)
+def test_model_without_regressors_with_weights_for_each_row(order, effects):
+    # The number of time periods and entities is that of an exog without columns
+    panel = main_panel("unbalanced", order, "y")
+    weights = panel.row_weights()
+
+    def factory(p, w):
+        exog = pd.DataFrame(index=p.index)
+        return PanelOLS(p.y, exog, weights=w, **EFFECTS[effects])
+
+    mod = panel.build(factory, weights)
+    expected = panel.build(factory, pd.Series(weights, index=panel.index))
+    assert_same_weights(mod, expected)
+    assert_weights_of_cells(panel, mod)
+    compare_results(mod.fit(), expected.fit())
+
+
 @pytest.mark.parametrize("reading", ["rows", "periods", "entities"])
 @pytest.mark.parametrize("order", ["entity-major", "time-major"])
 @pytest.mark.parametrize("layout", LAYOUTS)
@@ -509,7 +535,18 @@ def test_another_shape_of_2d_weights_raises(layout, shape):
     panel = main_panel(layout, "entity-major")
     with pytest.raises(ValueError, match=SHAPE_MESSAGE) as caught:
         PooledOLS(panel.y, panel.x_const, weights=np.ones(shape))
-    assert f"{NPERIOD} rows (time periods)" in str(caught.value)
+    message = str(caught.value)
+    assert f"{NPERIOD} rows (time periods)" in message
+
+
+@pytest.mark.parametrize("layout", LAYOUTS)
+def test_data_frame_with_one_column_and_a_default_index_raises(layout):
+    # Only a DataFrame with the index of dependent is a value for each row. This one
+    # raised an error from pandas or NumPy if dependent was balanced
+    panel = main_panel(layout, "entity-major")
+    weights = pd.DataFrame({"weight": panel.row_weights()})
+    with pytest.raises(ValueError, match=SHAPE_MESSAGE):
+        PooledOLS(panel.y, panel.x_const, weights=weights)
 
 
 def square_cells(layout):
