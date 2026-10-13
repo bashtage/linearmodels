@@ -215,26 +215,37 @@ def test_inv_sqrth_of_diagonal_matrix():
 
 @pytest.mark.parametrize(
     "matrix",
-    [
-        np.zeros((2, 2)),
-        np.diag([2.0, 1.0, 0.0]),
-        np.diag([2.0, 1.0, -1.0]),
-        np.full((2, 2), np.nan),
-    ],
-    ids=["zeros", "zero eigenvalue", "negative eigenvalue", "nan"],
+    [np.zeros((2, 2)), np.diag([2.0, 1.0, 0.0]), np.diag([2.0, 1.0, -1.0])],
+    ids=["zeros", "zero eigenvalue", "negative eigenvalue"],
 )
 def test_inv_sqrth_raises_if_not_positive_definite(matrix):
     # The eigenvalue decomposition does not raise for them, and the result was inf or
     # NaN, with a RuntimeWarning
     with warnings.catch_warnings():
         warnings.simplefilter("error")
-        with pytest.raises(np.linalg.LinAlgError):
+        with pytest.raises(np.linalg.LinAlgError, match="not positive definite"):
             inv_sqrth(matrix)
 
 
-def test_inv_sqrth_error_message():
-    with pytest.raises(np.linalg.LinAlgError, match="not positive definite"):
-        inv_sqrth(np.diag([1.0, -1.0]))
+@pytest.mark.parametrize(
+    "eigenvalues",
+    [[-1e-17, 1.0], [0.0, 1.0], [np.nan, 1.0]],
+    ids=["rounding error", "zero", "nan"],
+)
+def test_inv_sqrth_raises_for_the_eigenvalues_that_platforms_return(
+    eigenvalues, monkeypatch
+):
+    # What the decomposition of a singular matrix returns depends on the platform: a
+    # negative eigenvalue that is rounding error on macOS arm64, 0, or NaN where it
+    # does not raise
+    def eigh(x):
+        return np.array(eigenvalues), np.eye(2)
+
+    monkeypatch.setattr(np.linalg, "eigh", eigh)
+    with warnings.catch_warnings():
+        warnings.simplefilter("error")
+        with pytest.raises(np.linalg.LinAlgError, match="not positive definite"):
+            inv_sqrth(np.eye(2))
 
 
 def test_ensure_unique_column():

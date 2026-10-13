@@ -387,8 +387,10 @@ def test_liml_fits_with_the_fewest_observations(design):
     # One more observation than TOO_FEW
     y, exog, endog, instr = data_for(design)
     res = IVLIML(*args(y, exog, endog, instr)).fit()
-    assert np.all(np.isfinite(res.params))
-    assert np.isfinite(res.kappa)
+    params_are_finite = np.all(np.isfinite(res.params))
+    kappa_is_finite = np.isfinite(res.kappa)
+    assert params_are_finite
+    assert kappa_is_finite
 
 
 # ----------------------------------------------------------------------------
@@ -403,8 +405,9 @@ def test_liml_with_kappa_fits_if_kappa_is_not_defined(design, kappa):
     res = IVLIML(*args(y, exog, endog, instr), kappa=kappa).fit()
     expected = k_class(y, exog, endog, instr, kappa)
     assert_allclose(res.params.to_numpy(), expected, rtol=1e-6, atol=1e-8)
+    liml_kappa_is_nan = np.isnan(res._liml_kappa)
     assert res.kappa == kappa
-    assert np.isnan(res._liml_kappa)
+    assert liml_kappa_is_nan
 
 
 @pytest.mark.parametrize(
@@ -426,7 +429,8 @@ def test_liml_with_kappa_has_invalid_overidentification_tests(design):
 def test_2sls_sets_kappa_of_liml_to_nan(design):
     y, exog, endog, instr = data_for(design)
     res = IV2SLS(*args(y, exog, endog, instr)).fit()
-    assert np.isnan(res._liml_kappa)
+    liml_kappa_is_nan = np.isnan(res._liml_kappa)
+    assert liml_kappa_is_nan
     assert res.kappa == 1
     expected = k_class(y, exog, endog, instr, 1.0)
     assert_allclose(res.params.to_numpy(), expected, rtol=1e-6, atol=1e-8)
@@ -436,7 +440,8 @@ def test_2sls_sets_kappa_of_liml_to_nan(design):
 def test_jive_sets_kappa_of_liml_to_nan(design):
     y, exog, endog, instr = data_for(design)
     res = IVJIVE(*args(y, exog, endog, instr)).fit()
-    assert np.isnan(res._liml_kappa)
+    liml_kappa_is_nan = np.isnan(res._liml_kappa)
+    assert liml_kappa_is_nan
     assert res.kappa is None
     expected = reference_jive(y, exog, endog, instr)
     assert_allclose(res.params.to_numpy(), expected, rtol=1e-6, atol=1e-8)
@@ -450,13 +455,16 @@ def test_overidentification_tests_are_invalid_if_kappa_is_not_defined(model, des
     y, exog, endog, instr = data_for(design)
     res = model(*args(y, exog, endog, instr)).fit()
     for test in (res.anderson_rubin, res.basmann_f):
+        stat_is_nan = np.isnan(test.stat)
+        pval_is_nan = np.isnan(test.pval)
+        reason = str(test)
         assert isinstance(test, InvalidTestStatistic)
-        assert np.isnan(test.stat)
-        assert np.isnan(test.pval)
+        assert stat_is_nan
+        assert pval_is_nan
         assert test.critical_values is None
         # The reason is the missing kappa, not the number of instruments
-        assert "kappa of LIML" in str(test)
-        assert "more instruments" not in str(test)
+        assert "kappa of LIML" in reason
+        assert "more instruments" not in reason
 
 
 @pytest.mark.parametrize("model", [IV2SLS, IVJIVE])
@@ -464,8 +472,9 @@ def test_just_identified_tests_keep_their_reason(model):
     y, exog, endog, instr = bug_design(3)
     res = model(y, exog, endog, instr).fit()
     for test in (res.anderson_rubin, res.basmann_f):
+        reason = str(test)
         assert isinstance(test, InvalidTestStatistic)
-        assert "more instruments than endogenous variables" in str(test)
+        assert "more instruments than endogenous variables" in reason
 
 
 @pytest.mark.parametrize("model", [IV2SLS, IVJIVE])
@@ -542,8 +551,10 @@ def test_no_warnings_from_the_tests_if_kappa_is_not_defined(design):
     with warnings.catch_warnings():
         warnings.simplefilter("error")
         res = IV2SLS(*args(y, exog, endog, instr)).fit()
-        assert isinstance(str(res.anderson_rubin), str)
-        assert isinstance(str(res.basmann_f), str)
+        # str of the tests does not warn
+        anderson_rubin, basmann_f = str(res.anderson_rubin), str(res.basmann_f)
+    assert "kappa of LIML" in anderson_rubin
+    assert "kappa of LIML" in basmann_f
 
 
 @pytest.mark.parametrize("design", DEFINED, ids=ids(DEFINED))
@@ -579,7 +590,8 @@ def test_collinear_residuals_are_singular(scale):
         with pytest.raises(LinAlgError, match="linearly dependent"):
             mod._estimate_kappa()
         res = IV2SLS(*args(y, exog, endog, instr)).fit()
-    assert np.isnan(res._liml_kappa)
+    liml_kappa_is_nan = np.isnan(res._liml_kappa)
+    assert liml_kappa_is_nan
     assert isinstance(res.anderson_rubin, InvalidTestStatistic)
 
 
@@ -610,7 +622,8 @@ def test_zero_dependent_variable_is_singular():
         with pytest.raises(ValueError, match="Unable to estimate kappa"):
             IVLIML(*args(y, exog, endog, instr)).fit()
         res = IV2SLS(*args(y, exog, endog, instr)).fit()
-    assert np.isnan(res._liml_kappa)
+    liml_kappa_is_nan = np.isnan(res._liml_kappa)
+    assert liml_kappa_is_nan
     assert isinstance(res.anderson_rubin, InvalidTestStatistic)
 
 
