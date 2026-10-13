@@ -14,6 +14,10 @@ The dates are built from NumPy arrays. pandas before 2.0 only has nanoseconds
 and converts these arrays to nanoseconds, so the tests also hold there.
 """
 
+from contextlib import nullcontext
+from functools import cache
+import warnings
+
 import numpy as np
 from numpy.testing import assert_allclose
 import pandas as pd
@@ -52,6 +56,29 @@ UNIT_PAIRS = [("us", "ns"), ("ns", "us"), ("s", "ms")]
 # Resolutions other than nanoseconds only exist in pandas 2.0 and later
 HAS_UNITS = hasattr(pd.DatetimeIndex, "as_unit")
 needs_units = pytest.mark.skipif(not HAS_UNITS, reason="pandas before 2.0 is ns only")
+
+
+@cache
+def xarray_converts_to_nanoseconds():
+    """Whether xarray warns when it converts the dates of a DataArray to nanoseconds
+
+    xarray 2022.11.0 to 2025.1.1 convert coordinates that are datetime64[s], [ms] or
+    [us] to datetime64[ns] and warn. The other versions keep the unit. The behavior is
+    probed so that the tests expect the warning exactly where xarray issues it.
+    """
+    xr = pytest.importorskip("xarray")
+    coords = {"time": np.array(["2000-01-01"], dtype="datetime64[s]")}
+    with warnings.catch_warnings(record=True) as record:
+        warnings.simplefilter("always")
+        xr.DataArray([1.0], dims=["time"], coords=coords)
+    return any("non-nanosecond" in str(w.message) for w in record)
+
+
+def data_array_warns(unit):
+    """Context for the construction of a DataArray with dates that have the unit"""
+    if unit != "ns" and xarray_converts_to_nanoseconds():
+        return pytest.warns(UserWarning, match="Converting non-nanosecond precision")
+    return nullcontext()
 
 
 def dates(unit, n, shift=0, tz=None):
@@ -641,10 +668,12 @@ def test_panel_two_dimensional_data_arrays(panel, data_array, y_unit, x_unit):
     y, x = y.set_axis(dates(y_unit, NTIME)), x.set_axis(dates(x_unit, NTIME))
     if data_array == "dependent":
         coords = {"time": y.index.to_numpy(), "entity": ENTITIES}
-        y = xr.DataArray(y.to_numpy(), dims=["time", "entity"], coords=coords)
+        with data_array_warns(y_unit):
+            y = xr.DataArray(y.to_numpy(), dims=["time", "entity"], coords=coords)
     else:
         coords = {"time": x.index.to_numpy(), "entity": ENTITIES}
-        x = xr.DataArray(x.to_numpy(), dims=["time", "entity"], coords=coords)
+        with data_array_warns(x_unit):
+            x = xr.DataArray(x.to_numpy(), dims=["time", "entity"], coords=coords)
     assert_allclose(PooledOLS(y, x).fit().params, expected.params)
 
 
@@ -896,7 +925,8 @@ def data_array(frame, unit):
     xr = pytest.importorskip("xarray")
     obs = frame.index.to_numpy().astype(f"datetime64[{unit}]")
     coords = {"obs": obs, "var": list(frame.columns)}
-    return xr.DataArray(frame.to_numpy(), dims=["obs", "var"], coords=coords)
+    with data_array_warns(unit):
+        return xr.DataArray(frame.to_numpy(), dims=["obs", "var"], coords=coords)
 
 
 @pytest.mark.parametrize("unit", ["us", "s", "ns"])
