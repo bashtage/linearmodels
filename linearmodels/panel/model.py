@@ -1805,12 +1805,6 @@ class PanelOLS(_PanelModelBase):
 
     Additionally , arbitrary effects can be specified using categorical variables.
 
-    If both ``entity_effect`` and ``time_effects`` are ``False``, and no other
-    effects are included, the model reduces to :class:`PooledOLS`.
-
-    Model supports at most 2 effects.  These can be entity-time, entity-other,
-    time-other or 2 other.
-
     .. versionchanged:: 7.1
 
        ``weights`` for each time period, each entity or each time period and
@@ -1823,6 +1817,12 @@ class PanelOLS(_PanelModelBase):
        only if the rows are sorted by entity and then time: if they were sorted by
        time and then entity, an array was attached to the wrong observations
        without an error, and a pandas object with labels was rejected.
+
+    If both ``entity_effect`` and ``time_effects`` are ``False``, and no other
+    effects are included, the model reduces to :class:`PooledOLS`.
+
+    Model supports at most 2 effects.  These can be entity-time, entity-other,
+    time-other or 2 other.
 
     A variable in ``exog`` is absorbed if the effects explain all of it. The
     algorithms that remove the effects are exact only up to rounding error, or up to
