@@ -19,7 +19,7 @@
     
   
       
-        <title>linearmodels.iv.model - linearmodels v7.1 (+406)</title>
+        <title>linearmodels.iv.model - linearmodels v7.1 (+408)</title>
       
     
 
@@ -91,7 +91,7 @@
 
 <header class="md-header md-header--shadow" data-md-component="header">
   <nav class="md-header__inner md-grid" aria-label="Header">
-    <a href="../../../index.html" title="linearmodels v7.1 (+406)" class="md-header__button md-logo" aria-label="linearmodels v7.1 (+406)" data-md-component="logo">
+    <a href="../../../index.html" title="linearmodels v7.1 (+408)" class="md-header__button md-logo" aria-label="linearmodels v7.1 (+408)" data-md-component="logo">
       <img src="../../../_static/bw-logo.svg" alt="logo">
     </a>
     <label class="md-header__button md-icon" for="__drawer">
@@ -102,7 +102,7 @@
       <div class="md-header__ellipsis">
         <div class="md-header__topic">
           <span class="md-ellipsis">
-            linearmodels v7.1 (+406)
+            linearmodels v7.1 (+408)
           </span>
         </div>
         <div class="md-header__topic" data-md-component="header-topic">
@@ -197,10 +197,10 @@
 
 <nav class="md-nav md-nav--primary" aria-label="Navigation" data-md-level="0">
   <label class="md-nav__title" for="__drawer">
-    <a href="../../../index.html" title="linearmodels v7.1 (+406)" class="md-nav__button md-logo" aria-label="linearmodels v7.1 (+406)" data-md-component="logo">
+    <a href="../../../index.html" title="linearmodels v7.1 (+408)" class="md-nav__button md-logo" aria-label="linearmodels v7.1 (+408)" data-md-component="logo">
       <img src="../../../_static/bw-logo.svg" alt="logo">
     </a>
-    linearmodels v7.1 (+406)
+    linearmodels v7.1 (+408)
   </label>
   
     <div class="md-nav__source">
@@ -554,7 +554,6 @@
     <span class="n">isscalar</span><span class="p">,</span>
     <span class="n">logical_not</span><span class="p">,</span>
     <span class="n">nan</span><span class="p">,</span>
-    <span class="n">nanmean</span><span class="p">,</span>
     <span class="n">ndarray</span><span class="p">,</span>
     <span class="n">ones</span><span class="p">,</span>
     <span class="n">outer</span><span class="p">,</span>
@@ -600,6 +599,7 @@
 <span class="kn">from</span><span class="w"> </span><span class="nn">linearmodels.shared.hypotheses</span><span class="w"> </span><span class="kn">import</span> <span class="n">InvalidTestStatistic</span><span class="p">,</span> <span class="n">WaldTestStatistic</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">linearmodels.shared.linalg</span><span class="w"> </span><span class="kn">import</span> <span class="n">has_constant</span><span class="p">,</span> <span class="n">inv_sqrth</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">linearmodels.shared.utility</span><span class="w"> </span><span class="kn">import</span> <span class="n">DataFrameWrapper</span><span class="p">,</span> <span class="n">SeriesWrapper</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">linearmodels.shared.weights</span><span class="w"> </span><span class="kn">import</span> <span class="n">check_weights</span><span class="p">,</span> <span class="n">normalize_weights</span>
 <span class="kn">import</span><span class="w"> </span><span class="nn">linearmodels.typing</span>
 <span class="kn">import</span><span class="w"> </span><span class="nn">linearmodels.typing.data</span>
 
@@ -667,7 +667,9 @@
 <span class="sd">    instruments : array_like</span>
 <span class="sd">        Instrumental variables (nobs by ninstr)</span>
 <span class="sd">    weights : array_like</span>
-<span class="sd">        Observation weights used in estimation</span>
+<span class="sd">        Observation weights used in estimation. The weights must be strictly positive</span>
+<span class="sd">        and finite. They are rescaled to have a mean of 1. A NaN weight is missing, and</span>
+<span class="sd">        its observation is dropped.</span>
 <span class="sd">    fuller : float</span>
 <span class="sd">        Fuller's alpha to modify LIML estimator. Default returns unmodified</span>
 <span class="sd">        LIML estimator.</span>
@@ -742,15 +744,14 @@
         <span class="p">)</span>
         <span class="n">check_alignment</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_labels</span><span class="p">,</span> <span class="n">inputs</span><span class="p">,</span> <span class="n">reference</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">_labels_name</span><span class="p">)</span>
         <span class="n">weights</span> <span class="o">=</span> <span class="n">weights_data</span><span class="o">.</span><span class="n">ndarray</span>
-        <span class="k">if</span> <span class="n">npany</span><span class="p">(</span><span class="n">weights</span> <span class="o">&lt;=</span> <span class="mi">0</span><span class="p">):</span>
-            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">"weights must be strictly positive."</span><span class="p">)</span>
+        <span class="n">check_weights</span><span class="p">(</span><span class="n">weights</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">weights</span> <span class="o">=</span> <span class="n">IVData</span><span class="p">(</span><span class="n">weights</span><span class="p">,</span> <span class="n">var_name</span><span class="o">=</span><span class="s2">"weights"</span><span class="p">,</span> <span class="n">nobs</span><span class="o">=</span><span class="n">nobs</span><span class="p">)</span>
 
         <span class="bp">self</span><span class="o">.</span><span class="n">_drop_locs</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_drop_missing</span><span class="p">()</span>
         <span class="c1"># The weights have mean 1 in the sample that is used to estimate the model,</span>
         <span class="c1"># which does not include the observations that were dropped</span>
         <span class="n">kept</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">weights</span><span class="o">.</span><span class="n">ndarray</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">weights</span> <span class="o">=</span> <span class="n">IVData</span><span class="p">(</span><span class="n">kept</span> <span class="o">/</span> <span class="n">nanmean</span><span class="p">(</span><span class="n">kept</span><span class="p">),</span> <span class="n">var_name</span><span class="o">=</span><span class="s2">"weights"</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">weights</span> <span class="o">=</span> <span class="n">IVData</span><span class="p">(</span><span class="n">normalize_weights</span><span class="p">(</span><span class="n">kept</span><span class="p">),</span> <span class="n">var_name</span><span class="o">=</span><span class="s2">"weights"</span><span class="p">)</span>
         <span class="c1"># Weighted data is data scaled by the square root of the weights</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_sqrt_weights</span> <span class="o">=</span> <span class="n">w</span> <span class="o">=</span> <span class="n">sqrt</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">weights</span><span class="o">.</span><span class="n">ndarray</span><span class="p">)</span>
         <span class="c1"># dependent variable</span>
@@ -1104,7 +1105,9 @@
 <span class="sd">    instruments : array_like</span>
 <span class="sd">        Instrumental variables (nobs by ninstr)</span>
 <span class="sd">    weights : array_like</span>
-<span class="sd">        Observation weights used in estimation</span>
+<span class="sd">        Observation weights used in estimation. The weights must be strictly positive</span>
+<span class="sd">        and finite. They are rescaled to have a mean of 1. A NaN weight is missing, and</span>
+<span class="sd">        its observation is dropped.</span>
 <span class="sd">    fuller : float</span>
 <span class="sd">        Fuller's alpha to modify LIML estimator. Default returns unmodified</span>
 <span class="sd">        LIML estimator.</span>
@@ -1309,7 +1312,9 @@
 <span class="sd">    instruments : array_like</span>
 <span class="sd">        Instrumental variables (nobs by ninstr)</span>
 <span class="sd">    weights : array_like</span>
-<span class="sd">        Observation weights used in estimation</span>
+<span class="sd">        Observation weights used in estimation. The weights must be strictly positive</span>
+<span class="sd">        and finite. They are rescaled to have a mean of 1. A NaN weight is missing, and</span>
+<span class="sd">        its observation is dropped.</span>
 <span class="sd">    fuller : float</span>
 <span class="sd">        Fuller's alpha to modify LIML estimator. Default returns unmodified</span>
 <span class="sd">        LIML estimator.</span>
@@ -1406,7 +1411,9 @@
 <span class="sd">        data : DataFrame</span>
 <span class="sd">            DataFrame containing the variables used in the formula</span>
 <span class="sd">        weights : array_like</span>
-<span class="sd">            Observation weights used in estimation</span>
+<span class="sd">            Observation weights used in estimation. The weights must be strictly</span>
+<span class="sd">            positive and finite. They are rescaled to have a mean of 1. A NaN weight is</span>
+<span class="sd">            missing, and its observation is dropped.</span>
 <span class="sd">        fuller : float</span>
 <span class="sd">            Fuller's alpha to modify LIML estimator. Default returns unmodified</span>
 <span class="sd">            LIML estimator.</span>
@@ -1468,7 +1475,9 @@
 <span class="sd">    instruments : array_like</span>
 <span class="sd">        Instrumental variables (nobs by ninstr)</span>
 <span class="sd">    weights : array_like</span>
-<span class="sd">        Observation weights used in estimation</span>
+<span class="sd">        Observation weights used in estimation. The weights must be strictly positive</span>
+<span class="sd">        and finite. They are rescaled to have a mean of 1. A NaN weight is missing, and</span>
+<span class="sd">        its observation is dropped.</span>
 
 <span class="sd">    Notes</span>
 <span class="sd">    -----</span>
@@ -1535,7 +1544,9 @@
 <span class="sd">        data : DataFrame</span>
 <span class="sd">            DataFrame containing the variables used in the formula</span>
 <span class="sd">        weights : array_like</span>
-<span class="sd">            Observation weights used in estimation</span>
+<span class="sd">            Observation weights used in estimation. The weights must be strictly</span>
+<span class="sd">            positive and finite. They are rescaled to have a mean of 1. A NaN weight is</span>
+<span class="sd">            missing, and its observation is dropped.</span>
 
 <span class="sd">        Returns</span>
 <span class="sd">        -------</span>
@@ -1617,7 +1628,9 @@
 <span class="sd">    instruments : array_like</span>
 <span class="sd">        Instrumental variables (nobs by ninstr)</span>
 <span class="sd">    weights : array_like</span>
-<span class="sd">        Observation weights used in estimation</span>
+<span class="sd">        Observation weights used in estimation. The weights must be strictly positive</span>
+<span class="sd">        and finite. They are rescaled to have a mean of 1. A NaN weight is missing, and</span>
+<span class="sd">        its observation is dropped.</span>
 <span class="sd">    weight_type : str</span>
 <span class="sd">        Name of moment condition weight function to use in the GMM estimation</span>
 <span class="sd">    weight_config</span>
@@ -1884,7 +1897,9 @@
 <span class="sd">    instruments : array_like</span>
 <span class="sd">        Instrumental variables (nobs by ninstr)</span>
 <span class="sd">    weights : array_like</span>
-<span class="sd">        Observation weights used in estimation</span>
+<span class="sd">        Observation weights used in estimation. The weights must be strictly positive</span>
+<span class="sd">        and finite. They are rescaled to have a mean of 1. A NaN weight is missing, and</span>
+<span class="sd">        its observation is dropped.</span>
 <span class="sd">    weight_type : str</span>
 <span class="sd">        Name of moment condition weight function to use in the GMM estimation</span>
 <span class="sd">    weight_config</span>
@@ -2006,7 +2021,9 @@
 <span class="sd">        data : DataFrame</span>
 <span class="sd">            DataFrame containing the variables used in the formula</span>
 <span class="sd">        weights : array_like</span>
-<span class="sd">            Observation weights used in estimation</span>
+<span class="sd">            Observation weights used in estimation. The weights must be strictly</span>
+<span class="sd">            positive and finite. They are rescaled to have a mean of 1. A NaN weight is</span>
+<span class="sd">            missing, and its observation is dropped.</span>
 <span class="sd">        weight_type : str</span>
 <span class="sd">            Name of moment condition weight function to use in the GMM estimation</span>
 <span class="sd">        weight_config</span>
@@ -2253,7 +2270,9 @@
 <span class="sd">    instruments : array_like</span>
 <span class="sd">        Instrumental variables (nobs by ninstr)</span>
 <span class="sd">    weights : array_like</span>
-<span class="sd">        Observation weights used in estimation</span>
+<span class="sd">        Observation weights used in estimation. The weights must be strictly positive</span>
+<span class="sd">        and finite. They are rescaled to have a mean of 1. A NaN weight is missing, and</span>
+<span class="sd">        its observation is dropped.</span>
 <span class="sd">    weight_type : str</span>
 <span class="sd">        Name of moment condition weight function to use in the GMM estimation</span>
 <span class="sd">    weight_config</span>
@@ -2391,7 +2410,9 @@
 <span class="sd">        data : DataFrame</span>
 <span class="sd">            DataFrame containing the variables used in the formula</span>
 <span class="sd">        weights : array_like</span>
-<span class="sd">            Observation weights used in estimation</span>
+<span class="sd">            Observation weights used in estimation. The weights must be strictly</span>
+<span class="sd">            positive and finite. They are rescaled to have a mean of 1. A NaN weight is</span>
+<span class="sd">            missing, and its observation is dropped.</span>
 <span class="sd">        weight_type : str</span>
 <span class="sd">            Name of moment condition weight function to use in the GMM estimation</span>
 <span class="sd">        weight_config</span>
@@ -2808,7 +2829,9 @@
 <span class="sd">    exog : array_like</span>
 <span class="sd">        Exogenous regressors  (nobs by nexog)</span>
 <span class="sd">    weights : array_like</span>
-<span class="sd">        Observation weights used in estimation</span>
+<span class="sd">        Observation weights used in estimation. The weights must be strictly positive</span>
+<span class="sd">        and finite. They are rescaled to have a mean of 1. A NaN weight is missing, and</span>
+<span class="sd">        its observation is dropped.</span>
 
 <span class="sd">    Notes</span>
 <span class="sd">    -----</span>
@@ -2863,7 +2886,9 @@
 <span class="sd">    data : DataFrame</span>
 <span class="sd">        DataFrame containing the variables used in the formula</span>
 <span class="sd">    weights : array_like</span>
-<span class="sd">        Observation weights used in estimation</span>
+<span class="sd">        Observation weights used in estimation. The weights must be strictly positive</span>
+<span class="sd">        and finite. They are rescaled to have a mean of 1. A NaN weight is missing, and</span>
+<span class="sd">        its observation is dropped.</span>
 <span class="sd">    weight_type : str</span>
 <span class="sd">        Name of moment condition weight function to use in the GMM estimation</span>
 <span class="sd">    weight_config</span>
@@ -3019,7 +3044,9 @@
 <span class="sd">    instruments : array_like</span>
 <span class="sd">        Instrumental variables (nobs by ninstr)</span>
 <span class="sd">    weights : array_like</span>
-<span class="sd">        Observation weights used in estimation</span>
+<span class="sd">        Observation weights used in estimation. The weights must be strictly positive</span>
+<span class="sd">        and finite. They are rescaled to have a mean of 1. A NaN weight is missing, and</span>
+<span class="sd">        its observation is dropped.</span>
 
 <span class="sd">    Notes</span>
 <span class="sd">    -----</span>
@@ -3133,7 +3160,9 @@
 <span class="sd">        data : DataFrame</span>
 <span class="sd">            DataFrame containing the variables used in the formula</span>
 <span class="sd">        weights : array_like</span>
-<span class="sd">            Observation weights used in estimation</span>
+<span class="sd">            Observation weights used in estimation. The weights must be strictly</span>
+<span class="sd">            positive and finite. They are rescaled to have a mean of 1. A NaN weight is</span>
+<span class="sd">            missing, and its observation is dropped.</span>
 
 <span class="sd">        Returns</span>
 <span class="sd">        -------</span>

@@ -23,7 +23,7 @@
     
   
       
-        <title>linearmodels.system.model.SUR - linearmodels v7.1 (+406)</title>
+        <title>linearmodels.system.model.SUR - linearmodels v7.1 (+408)</title>
       
     
 
@@ -100,7 +100,7 @@
 
 <header class="md-header md-header--shadow" data-md-component="header">
   <nav class="md-header__inner md-grid" aria-label="Header">
-    <a href="../../index.html" title="linearmodels v7.1 (+406)" class="md-header__button md-logo" aria-label="linearmodels v7.1 (+406)" data-md-component="logo">
+    <a href="../../index.html" title="linearmodels v7.1 (+408)" class="md-header__button md-logo" aria-label="linearmodels v7.1 (+408)" data-md-component="logo">
       <img src="../../_static/bw-logo.svg" alt="logo">
     </a>
     <label class="md-header__button md-icon" for="__drawer">
@@ -111,7 +111,7 @@
       <div class="md-header__ellipsis">
         <div class="md-header__topic">
           <span class="md-ellipsis">
-            linearmodels v7.1 (+406)
+            linearmodels v7.1 (+408)
           </span>
         </div>
         <div class="md-header__topic" data-md-component="header-topic">
@@ -206,10 +206,10 @@
 
 <nav class="md-nav md-nav--primary" aria-label="Navigation" data-md-level="0">
   <label class="md-nav__title" for="__drawer">
-    <a href="../../index.html" title="linearmodels v7.1 (+406)" class="md-nav__button md-logo" aria-label="linearmodels v7.1 (+406)" data-md-component="logo">
+    <a href="../../index.html" title="linearmodels v7.1 (+408)" class="md-nav__button md-logo" aria-label="linearmodels v7.1 (+408)" data-md-component="logo">
       <img src="../../_static/bw-logo.svg" alt="logo">
     </a>
-    linearmodels v7.1 (+406)
+    linearmodels v7.1 (+408)
   </label>
   
     <div class="md-nav__source">
@@ -1740,6 +1740,9 @@ expressed as</p>
 <p>where <span class="math notranslate nohighlight">\(\Sigma\)</span> is the covariance matrix of the residuals.</p>
 <p>SUR is a special case of 3SLS where there are no endogenous regressors and
 no instruments.</p>
+<p>The weights of an equation, if they are given, must be strictly positive and
+finite. They are rescaled to have a mean of 1 in the equation. A NaN weight is
+missing, and its observation is dropped from all of the equations.</p>
 <p>Rows are paired by position, both within an equation and across the
 equations. An input that carries labels (a pandas Series or DataFrame
 with an index other than the default 0, 1, …, n-1, or an xarray

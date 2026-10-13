@@ -19,7 +19,7 @@
     
   
       
-        <title>linearmodels.panel.model - linearmodels v7.1 (+406)</title>
+        <title>linearmodels.panel.model - linearmodels v7.1 (+408)</title>
       
     
 
@@ -91,7 +91,7 @@
 
 <header class="md-header md-header--shadow" data-md-component="header">
   <nav class="md-header__inner md-grid" aria-label="Header">
-    <a href="../../../index.html" title="linearmodels v7.1 (+406)" class="md-header__button md-logo" aria-label="linearmodels v7.1 (+406)" data-md-component="logo">
+    <a href="../../../index.html" title="linearmodels v7.1 (+408)" class="md-header__button md-logo" aria-label="linearmodels v7.1 (+408)" data-md-component="logo">
       <img src="../../../_static/bw-logo.svg" alt="logo">
     </a>
     <label class="md-header__button md-icon" for="__drawer">
@@ -102,7 +102,7 @@
       <div class="md-header__ellipsis">
         <div class="md-header__topic">
           <span class="md-ellipsis">
-            linearmodels v7.1 (+406)
+            linearmodels v7.1 (+408)
           </span>
         </div>
         <div class="md-header__topic" data-md-component="header-topic">
@@ -197,10 +197,10 @@
 
 <nav class="md-nav md-nav--primary" aria-label="Navigation" data-md-level="0">
   <label class="md-nav__title" for="__drawer">
-    <a href="../../../index.html" title="linearmodels v7.1 (+406)" class="md-nav__button md-logo" aria-label="linearmodels v7.1 (+406)" data-md-component="logo">
+    <a href="../../../index.html" title="linearmodels v7.1 (+408)" class="md-nav__button md-logo" aria-label="linearmodels v7.1 (+408)" data-md-component="logo">
       <img src="../../../_static/bw-logo.svg" alt="logo">
     </a>
-    linearmodels v7.1 (+406)
+    linearmodels v7.1 (+408)
   </label>
   
     <div class="md-nav__source">
@@ -602,6 +602,7 @@
 <span class="kn">from</span><span class="w"> </span><span class="nn">linearmodels.shared.linalg</span><span class="w"> </span><span class="kn">import</span> <span class="n">has_constant</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">linearmodels.shared.typed_getters</span><span class="w"> </span><span class="kn">import</span> <span class="n">get_panel_data_like</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">linearmodels.shared.utility</span><span class="w"> </span><span class="kn">import</span> <span class="n">AttrDict</span><span class="p">,</span> <span class="n">ensure_unique_column</span><span class="p">,</span> <span class="n">panel_to_frame</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">linearmodels.shared.weights</span><span class="w"> </span><span class="kn">import</span> <span class="n">check_weights</span><span class="p">,</span> <span class="n">normalize_weights</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">linearmodels.typing</span><span class="w"> </span><span class="kn">import</span> <span class="n">BoolArray</span>
 <span class="kn">import</span><span class="w"> </span><span class="nn">linearmodels.typing.data</span>
 
@@ -939,6 +940,8 @@
 <span class="sd">        the weight should be homoskedastic.</span>
 <span class="sd">        Weights can be given for each observation, for each time period,</span>
 <span class="sd">        for each entity or for each combination of time period and entity.</span>
+<span class="sd">        The weights must be strictly positive and finite. They are rescaled to have a</span>
+<span class="sd">        mean of 1. A NaN weight is missing, and its observation is dropped.</span>
 <span class="sd">        Weights with labels must use the same labels, in the same order,</span>
 <span class="sd">        as dependent or, if dependent has no labels, as exog. See</span>
 <span class="sd">        :ref:`panel-input-alignment`.</span>
@@ -1333,9 +1336,10 @@
 
         <span class="n">w_df</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">weights</span><span class="o">.</span><span class="n">dataframe</span>
         <span class="n">w_values</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">asarray</span><span class="p">(</span><span class="n">w_df</span><span class="p">)</span>
-        <span class="k">if</span> <span class="n">np</span><span class="o">.</span><span class="n">any</span><span class="p">(</span><span class="n">w_values</span> <span class="o">&lt;=</span> <span class="mi">0</span><span class="p">)</span> <span class="ow">or</span> <span class="n">np</span><span class="o">.</span><span class="n">any</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">isinf</span><span class="p">(</span><span class="n">w_values</span><span class="p">)):</span>
-            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">"weights must be strictly positive and finite."</span><span class="p">)</span>
-        <span class="n">w_df</span> <span class="o">=</span> <span class="n">w_df</span> <span class="o">/</span> <span class="n">w_df</span><span class="o">.</span><span class="n">mean</span><span class="p">()</span>
+        <span class="n">check_weights</span><span class="p">(</span><span class="n">w_values</span><span class="p">)</span>
+        <span class="n">w_df</span> <span class="o">=</span> <span class="n">DataFrame</span><span class="p">(</span>
+            <span class="n">normalize_weights</span><span class="p">(</span><span class="n">w_values</span><span class="p">),</span> <span class="n">index</span><span class="o">=</span><span class="n">w_df</span><span class="o">.</span><span class="n">index</span><span class="p">,</span> <span class="n">columns</span><span class="o">=</span><span class="n">w_df</span><span class="o">.</span><span class="n">columns</span>
+        <span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">weights</span> <span class="o">=</span> <span class="n">PanelData</span><span class="p">(</span><span class="n">w_df</span><span class="p">)</span>
         <span class="n">rank_of_x</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_check_exog_rank</span><span class="p">()</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_constant</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_constant_index</span> <span class="o">=</span> <span class="n">has_constant</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">rank_of_x</span><span class="p">)</span>
@@ -1780,6 +1784,8 @@
 <span class="sd">        the weight should be homoskedastic.</span>
 <span class="sd">        Weights can be given for each observation, for each time period,</span>
 <span class="sd">        for each entity or for each combination of time period and entity.</span>
+<span class="sd">        The weights must be strictly positive and finite. They are rescaled to have a</span>
+<span class="sd">        mean of 1. A NaN weight is missing, and its observation is dropped.</span>
 <span class="sd">        Weights with labels must use the same labels, in the same order,</span>
 <span class="sd">        as dependent or, if dependent has no labels, as exog. See</span>
 <span class="sd">        :ref:`panel-input-alignment`.</span>
@@ -1837,6 +1843,8 @@
 <span class="sd">            Weights to use in estimation.  Assumes residual variance is</span>
 <span class="sd">            proportional to inverse of weight to that the residual times</span>
 <span class="sd">            the weight should be homoskedastic.</span>
+<span class="sd">            The weights must be strictly positive and finite. They are rescaled to have</span>
+<span class="sd">            a mean of 1. A NaN weight is missing, and its observation is dropped.</span>
 <span class="sd">        check_rank : bool</span>
 <span class="sd">            Flag indicating whether to perform a rank check on the exogenous</span>
 <span class="sd">            variables to ensure that the model is identified. Skipping this</span>
@@ -2123,6 +2131,8 @@
 <span class="sd">        the weight should be homoskedastic.</span>
 <span class="sd">        Weights can be given for each observation, for each time period,</span>
 <span class="sd">        for each entity or for each combination of time period and entity.</span>
+<span class="sd">        The weights must be strictly positive and finite. They are rescaled to have a</span>
+<span class="sd">        mean of 1. A NaN weight is missing, and its observation is dropped.</span>
 <span class="sd">        Weights with labels must use the same labels, in the same order,</span>
 <span class="sd">        as dependent or, if dependent has no labels, as exog. See</span>
 <span class="sd">        :ref:`panel-input-alignment`.</span>
@@ -2421,6 +2431,8 @@
 <span class="sd">            Weights to use in estimation.  Assumes residual variance is</span>
 <span class="sd">            proportional to inverse of weight to that the residual time</span>
 <span class="sd">            the weight should be homoskedastic.</span>
+<span class="sd">            The weights must be strictly positive and finite. They are rescaled to have</span>
+<span class="sd">            a mean of 1. A NaN weight is missing, and its observation is dropped.</span>
 <span class="sd">        other_effects : array_like</span>
 <span class="sd">            Category codes to use for any effects that are not entity or time</span>
 <span class="sd">            effects. Each variable is treated as an effect. An observation where</span>
@@ -3183,6 +3195,8 @@
 <span class="sd">        the weight should be homoskedastic.</span>
 <span class="sd">        Weights can be given for each observation, for each time period,</span>
 <span class="sd">        for each entity or for each combination of time period and entity.</span>
+<span class="sd">        The weights must be strictly positive and finite. They are rescaled to have a</span>
+<span class="sd">        mean of 1. A NaN weight is missing, and its observation is dropped.</span>
 <span class="sd">        Weights with labels must use the same labels, in the same order,</span>
 <span class="sd">        as dependent or, if dependent has no labels, as exog. See</span>
 <span class="sd">        :ref:`panel-input-alignment`.</span>
@@ -3449,6 +3463,8 @@
 <span class="sd">            Weights to use in estimation.  Assumes residual variance is</span>
 <span class="sd">            proportional to inverse of weight to that the residual times</span>
 <span class="sd">            the weight should be homoskedastic.</span>
+<span class="sd">            The weights must be strictly positive and finite. They are rescaled to have</span>
+<span class="sd">            a mean of 1. A NaN weight is missing, and its observation is dropped.</span>
 <span class="sd">        check_rank : bool</span>
 <span class="sd">            Flag indicating whether to perform a rank check on the exogenous</span>
 <span class="sd">            variables to ensure that the model is identified. Skipping this</span>
@@ -3510,6 +3526,8 @@
 <span class="sd">        the weight should be homoskedastic.</span>
 <span class="sd">        Weights can be given for each observation, for each time period,</span>
 <span class="sd">        for each entity or for each combination of time period and entity.</span>
+<span class="sd">        The weights must be strictly positive and finite. They are rescaled to have a</span>
+<span class="sd">        mean of 1. A NaN weight is missing, and its observation is dropped.</span>
 <span class="sd">        Weights with labels must use the same labels, in the same order,</span>
 <span class="sd">        as dependent or, if dependent has no labels, as exog. See</span>
 <span class="sd">        :ref:`panel-input-alignment`.</span>
@@ -3815,6 +3833,8 @@
 <span class="sd">            Weights to use in estimation.  Assumes residual variance is</span>
 <span class="sd">            proportional to inverse of weight to that the residual times</span>
 <span class="sd">            the weight should be homoskedastic.</span>
+<span class="sd">            The weights must be strictly positive and finite. They are rescaled to have</span>
+<span class="sd">            a mean of 1. A NaN weight is missing, and its observation is dropped.</span>
 <span class="sd">        check_rank : bool</span>
 <span class="sd">            Flag indicating whether to perform a rank check on the exogenous</span>
 <span class="sd">            variables to ensure that the model is identified. Skipping this</span>
@@ -3876,6 +3896,8 @@
 <span class="sd">        the weight should be homoskedastic.</span>
 <span class="sd">        Weights can be given for each observation, for each time period,</span>
 <span class="sd">        for each entity or for each combination of time period and entity.</span>
+<span class="sd">        The weights must be strictly positive and finite. They are rescaled to have a</span>
+<span class="sd">        mean of 1. A NaN weight is missing, and its observation is dropped.</span>
 <span class="sd">        Weights with labels must use the same labels, in the same order,</span>
 <span class="sd">        as dependent or, if dependent has no labels, as exog. See</span>
 <span class="sd">        :ref:`panel-input-alignment`.</span>
@@ -3930,6 +3952,8 @@
 <span class="sd">            Weights to use in estimation.  Assumes residual variance is</span>
 <span class="sd">            proportional to inverse of weight to that the residual times</span>
 <span class="sd">            the weight should be homoskedastic.</span>
+<span class="sd">            The weights must be strictly positive and finite. They are rescaled to have</span>
+<span class="sd">            a mean of 1. A NaN weight is missing, and its observation is dropped.</span>
 <span class="sd">        check_rank : bool</span>
 <span class="sd">            Flag indicating whether to perform a rank check on the exogenous</span>
 <span class="sd">            variables to ensure that the model is identified. Skipping this</span>
@@ -4270,6 +4294,8 @@
 <span class="sd">        the weight should be homoskedastic.</span>
 <span class="sd">        Weights can be given for each observation, for each time period,</span>
 <span class="sd">        for each entity or for each combination of time period and entity.</span>
+<span class="sd">        The weights must be strictly positive and finite. They are rescaled to have a</span>
+<span class="sd">        mean of 1. A NaN weight is missing, and its observation is dropped.</span>
 <span class="sd">        Weights with labels must use the same labels, in the same order,</span>
 <span class="sd">        as dependent or, if dependent has no labels, as exog. See</span>
 <span class="sd">        :ref:`panel-input-alignment`.</span>
@@ -4645,6 +4671,8 @@
 <span class="sd">            Weights to use in estimation.  Assumes residual variance is</span>
 <span class="sd">            proportional to inverse of weight to that the residual times</span>
 <span class="sd">            the weight should be homoskedastic.</span>
+<span class="sd">            The weights must be strictly positive and finite. They are rescaled to have</span>
+<span class="sd">            a mean of 1. A NaN weight is missing, and its observation is dropped.</span>
 <span class="sd">        check_rank : bool</span>
 <span class="sd">            Flag indicating whether to perform a rank check on the exogenous</span>
 <span class="sd">            variables to ensure that the model is identified. Skipping this</span>
