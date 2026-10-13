@@ -191,7 +191,7 @@ def lookup_option(table: Mapping[str, _T], value: str, parameter: str) -> _T:
     """
     try:
         return table[value]
-    except KeyError:
+    except (KeyError, TypeError):
         raise unknown_option_error(parameter, value, table) from None
 
 
