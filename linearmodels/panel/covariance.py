@@ -539,9 +539,10 @@ class ACCovariance(HomoskedasticCovariance):
     kernel : str
         Name of one of the supported kernels. If None, uses the Newey-West
         kernel.
-    bandwidth : int
-        Non-negative integer to use as bandwidth.  If not provided a rule-of-
-        thumb value is used.
+    bandwidth : float, optional
+        Non-negative bandwidth to use. The Bartlett and Parzen kernels use its
+        integer part. If not provided a rule-of-thumb value is used. It can be
+        larger than the number of observations of an entity.
 
     Notes
     -----
@@ -554,7 +555,8 @@ class ACCovariance(HomoskedasticCovariance):
     * "parzen", "gallant" - Parzen kernel
 
     Bandwidth is set to the common value for the Bartlett kernel if not
-    provided.
+    provided, :math:`\lfloor 4 (T / 100)^{2/9} \rfloor` where :math:`T` is the
+    number of time periods.
 
     The estimator of the covariance is
 
@@ -574,15 +576,38 @@ class ACCovariance(HomoskedasticCovariance):
 
       \xi_{it} & = \epsilon_{it} x_{it} \\
       \hat{S} & = (n-df)^{-1} \sum_{i=1}^N S_i \\
-      \hat{S}_i & = \sum_{j=0}^{bw} K(j, bw) \hat{S}_{ij} \\
-      \hat{S}_{i0} & = \sum_{t=1}^{T} \xi'_{it} \xi_{it} \\
-      \hat{S}_{ij} & = \sum_{t=1}^{T-j} \xi'_{it} \xi_{it+j} + \xi'_{it+j} \xi_{it}
+      \hat{S}_i & = \sum_{j=0}^{T_i-1} K(j, bw) \hat{S}_{ij} \\
+      \hat{S}_{i0} & = \sum_{t=1}^{T_i} \xi'_{it} \xi_{it} \\
+      \hat{S}_{ij} & = \sum_{t=1}^{T_i-j} \xi'_{it} \xi_{it+j} + \xi'_{it+j} \xi_{it}
 
 
-    where df is ``extra_df`` and n-df is replace by n-df-k if ``debiased`` is
-    ``True``. :math:`K(i, bw)` is the kernel weighting function. The sums of an
-    entity are over the lags of its observations, so that observations that follow
-    each other are one lag apart even if a period is missing between them.
+    where :math:`T_i` is the number of observations of entity :math:`i`, df is
+    ``extra_df`` and n-df is replace by n-df-k if ``debiased`` is ``True``.
+    :math:`K(j, bw)` is the kernel weighting function, which is 1 for the lag 0.
+    The Bartlett and Parzen kernels are 0 for the lags above ``bandwidth``.
+
+    **Lags**
+
+    The lag between two observations of an entity is the difference between their
+    positions in the observations of the entity, which are in the order of time. It is
+    not the difference between their time periods. If a period is missing between two
+    observations of an entity, they are one lag apart. With the Bartlett kernel the
+    covariance is that of the cluster-HAC option of statsmodels
+    (``cov_type="hac-panel"``), which also counts positions. plm (``vcovNW``) and
+    sandwich (``vcovPL``) pair the observations that are :math:`j` periods apart, so
+    that their covariances are different if an entity has missing periods between its
+    observations: in a panel where about a quarter of the periods are missing the
+    standard errors differed by about 3%. They are the same if no entity has a gap.
+    See :ref:`panel-ac-lags`.
+
+    **Entities with few observations**
+
+    An entity has the lags :math:`0,\ldots,T_i-1`, and its sum is over these lags.
+    The weights are those of the bandwidth that was chosen, :math:`K(j, bw)`, also
+    for an entity with fewer observations than the bandwidth. The bandwidth is not
+    reduced to :math:`T_i-1` for such an entity, and the weights of the lags that the
+    entity does not have are not used. This is how plm, sandwich and statsmodels
+    compute the covariance.
 
     .. versionchanged:: 7.1
 
@@ -592,6 +617,16 @@ class ACCovariance(HomoskedasticCovariance):
        over the entities, which is the same for a balanced panel. For an unbalanced
        panel the covariance, e.g., with a bandwidth of 0, was not the heteroskedasticity
        robust covariance, and differed from the covariance of other packages.
+
+    .. versionchanged:: 7.1
+
+       An entity with :math:`T_i` observations, where :math:`T_i \leq bw`, keeps the
+       weights of the bandwidth. Earlier versions replaced the bandwidth of the
+       entity by :math:`T_i-1`. This changed the Bartlett weights of the entity from
+       :math:`1-j/(bw+1)` to :math:`1-j/T_i`, the Parzen weights in the same way,
+       and the bandwidth of the quadratic spectral kernel. The covariance changes if
+       any entity has fewer observations than the bandwidth, which is more likely
+       in a panel where the entities are short or the bandwidth is large.
     """
 
     ALLOWED_KWARGS = ("kernel", "bandwidth")
@@ -622,7 +657,10 @@ class ACCovariance(HomoskedasticCovariance):
     ) -> linearmodels.typing.data.Float64Array:
         nobs = xe.shape[0]
         w = lookup_option(KERNEL_LOOKUP, self._kernel, "kernel")(bw, nobs - 1)
-        return cov_kernel(xe, w)
+        # The entity has the lags 0, ..., nobs - 1 only. They have the weights of
+        # the bandwidth that was chosen, also if the entity is shorter than the
+        # bandwidth, and so the weights of the other lags are not used
+        return cov_kernel(xe, w[:nobs])
 
     @cached_property
     def cov(self) -> linearmodels.typing.data.Float64Array:
@@ -650,10 +688,9 @@ class ACCovariance(HomoskedasticCovariance):
         xeex = np.zeros((xe_df.shape[1], xe_df.shape[1]))
         for entity in entities:
             _xe = np.asarray(xe_df.loc[entity])
-            _bw = min(_xe.shape[0] - 1.0, bw)
             # The sum of the products of the scores of the entity, which the kernel
             # covariance divides by the number of observations of the entity
-            xeex += self._single_cov(_xe, _bw) * _xe.shape[0]
+            xeex += self._single_cov(_xe, bw) * _xe.shape[0]
         xeex /= nobs
         xeex *= self._scale
 
