@@ -27,6 +27,7 @@ from linearmodels.panel.model import (
     PooledOLS,
     RandomEffects,
 )
+from linearmodels.shared.exceptions import MissingValueWarning
 
 NENTITY = 8
 NTIME = 5
@@ -591,12 +592,13 @@ def test_clusters_and_missing_values_without_labels_in_dependent(simple):
     y = unlabelled_dependent(simple)
     x = simple.x.copy()
     x.iloc[5, 0] = np.nan
-    mod = PooledOLS(y, x)
+    with pytest.warns(MissingValueWarning):
+        mod = PooledOLS(y, x)
     assert mod.not_null.sum() == len(simple.y) - 1
     res = mod.fit(cov_type="clustered", clusters=simple.clusters)
-    raw = PooledOLS(y, to_3d(x)).fit(
-        cov_type="clustered", clusters=to_3d(simple.clusters)
-    )
+    with pytest.warns(MissingValueWarning):
+        raw_mod = PooledOLS(y, to_3d(x))
+    raw = raw_mod.fit(cov_type="clustered", clusters=to_3d(simple.clusters))
     assert_allclose(res.std_errors, raw.std_errors)
     with pytest.raises(ValueError, match="row index of clusters does not match exog"):
         mod.fit(cov_type="clustered", clusters=reverse(simple.clusters))
