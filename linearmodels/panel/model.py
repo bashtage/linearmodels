@@ -497,12 +497,12 @@ class _PanelModelBase:
         the weight should be homoskedastic.
         Weights can be given for each observation, for each time period,
         for each entity or for each combination of time period and entity.
-        Dependent need not be balanced when they are given for each time
-        period, entity or combination: the weights of the combinations that
-        dependent does not have are not used.
         Weights with labels must use the same labels, in the same order,
         as dependent or, if dependent has no labels, as exog. See
         :ref:`panel-input-alignment`.
+        Dependent need not be balanced when the weights are given for each time
+        period, entity or combination: the weights of the combinations that
+        dependent does not have are not used.
     check_rank : bool
         Flag indicating whether to perform a rank check on the exogenous
         variables to ensure that the model is identified. Skipping this
@@ -1365,12 +1365,12 @@ class PooledOLS(_PanelModelBase):
         the weight should be homoskedastic.
         Weights can be given for each observation, for each time period,
         for each entity or for each combination of time period and entity.
-        Dependent need not be balanced when they are given for each time
-        period, entity or combination: the weights of the combinations that
-        dependent does not have are not used.
         Weights with labels must use the same labels, in the same order,
         as dependent or, if dependent has no labels, as exog. See
         :ref:`panel-input-alignment`.
+        Dependent need not be balanced when the weights are given for each time
+        period, entity or combination: the weights of the combinations that
+        dependent does not have are not used.
     check_rank : bool
         Flag indicating whether to perform a rank check on the exogenous
         variables to ensure that the model is identified. Skipping this
@@ -1747,26 +1747,26 @@ class PanelOLS(_PanelModelBase):
         the weight should be homoskedastic.
         Weights can be given for each observation, for each time period,
         for each entity or for each combination of time period and entity.
-        Dependent need not be balanced when they are given for each time
-        period, entity or combination: the weights of the combinations that
-        dependent does not have are not used.
         Weights with labels must use the same labels, in the same order,
         as dependent or, if dependent has no labels, as exog. See
         :ref:`panel-input-alignment`.
+        Dependent need not be balanced when the weights are given for each time
+        period, entity or combination: the weights of the combinations that
+        dependent does not have are not used.
     entity_effects : bool
         Flag whether to include entity (fixed) effects in the model
     time_effects : bool
         Flag whether to include time effects in the model
     other_effects : array_like, optional
         Category codes to use for any effects that are not entity or time
-        effects. Each variable is treated as an effect. A 1-d array or list has
+        effects. Each variable is treated as an effect. An array or list with the
+        layout of dependent (time by entity, or variable by time by entity), or a
+        DataFrame with the time periods as its index and the entities as its
+        columns, has a value for each time period and entity. It is placed on the
+        rows of dependent, which need not be balanced: the values of the
+        combinations that dependent does not have are not used (see
+        :ref:`panel-input-alignment`). A 1-d array or list has
         a value for each row of dependent, in the order of the rows of dependent.
-        An array or list with the layout of dependent (time by entity, or variable
-        by time by entity), or a DataFrame with the time periods as its index and
-        the entities as its columns, has a value for each time period and entity.
-        It is placed on the rows of dependent, which need not be balanced: the
-        values of the combinations that dependent does not have are not used. See
-        :ref:`panel-input-alignment`.
     singletons : bool
         Flag indicating whether to drop singleton observation
     drop_absorbed : bool
@@ -1811,18 +1811,6 @@ class PanelOLS(_PanelModelBase):
     Model supports at most 2 effects.  These can be entity-time, entity-other,
     time-other or 2 other.
 
-    A variable in ``exog`` is absorbed if the effects explain all of it. The
-    algorithms that remove the effects are exact only up to rounding error, or up to
-    a relative error of about 1e-8 if they are iterative, so a variable is treated
-    as absorbed if less than 1e-5 of its norm is left after the effects are
-    removed, whatever its units. It is treated in the same way if it is collinear
-    with the variables before it once the effects are removed. An
-    ``AbsorbingEffectError`` is raised for such a variable. If ``drop_absorbed`` is
-    True, the variable is dropped and an ``AbsorbingEffectWarning`` is raised, and the
-    constant is never dropped. The norm includes the mean of the variable, so a
-    variable with a large mean and little other variation, less than 1e-5 of its norm,
-    is also treated as absorbed. Subtract its mean to avoid this.
-
     .. versionchanged:: 7.1
 
        ``weights`` for each time period, each entity or each time period and
@@ -1835,6 +1823,18 @@ class PanelOLS(_PanelModelBase):
        only if the rows are sorted by entity and then time: if they were sorted by
        time and then entity, an array was attached to the wrong observations
        without an error, and a pandas object with labels was rejected.
+
+    A variable in ``exog`` is absorbed if the effects explain all of it. The
+    algorithms that remove the effects are exact only up to rounding error, or up to
+    a relative error of about 1e-8 if they are iterative, so a variable is treated
+    as absorbed if less than 1e-5 of its norm is left after the effects are
+    removed, whatever its units. It is treated in the same way if it is collinear
+    with the variables before it once the effects are removed. An
+    ``AbsorbingEffectError`` is raised for such a variable. If ``drop_absorbed`` is
+    True, the variable is dropped and an ``AbsorbingEffectWarning`` is raised, and the
+    constant is never dropped. The norm includes the mean of the variable, so a
+    variable with a large mean and little other variation, less than 1e-5 of its norm,
+    is also treated as absorbed. Subtract its mean to avoid this.
     """
 
     def __init__(
@@ -2847,12 +2847,12 @@ class BetweenOLS(_PanelModelBase):
         the weight should be homoskedastic.
         Weights can be given for each observation, for each time period,
         for each entity or for each combination of time period and entity.
-        Dependent need not be balanced when they are given for each time
-        period, entity or combination: the weights of the combinations that
-        dependent does not have are not used.
         Weights with labels must use the same labels, in the same order,
         as dependent or, if dependent has no labels, as exog. See
         :ref:`panel-input-alignment`.
+        Dependent need not be balanced when the weights are given for each time
+        period, entity or combination: the weights of the combinations that
+        dependent does not have are not used.
 
     Notes
     -----
@@ -3192,12 +3192,12 @@ class FirstDifferenceOLS(_PanelModelBase):
         the weight should be homoskedastic.
         Weights can be given for each observation, for each time period,
         for each entity or for each combination of time period and entity.
-        Dependent need not be balanced when they are given for each time
-        period, entity or combination: the weights of the combinations that
-        dependent does not have are not used.
         Weights with labels must use the same labels, in the same order,
         as dependent or, if dependent has no labels, as exog. See
         :ref:`panel-input-alignment`.
+        Dependent need not be balanced when the weights are given for each time
+        period, entity or combination: the weights of the combinations that
+        dependent does not have are not used.
 
     Notes
     -----
@@ -3624,12 +3624,12 @@ class RandomEffects(_PanelModelBase):
         the weight should be homoskedastic.
         Weights can be given for each observation, for each time period,
         for each entity or for each combination of time period and entity.
-        Dependent need not be balanced when they are given for each time
-        period, entity or combination: the weights of the combinations that
-        dependent does not have are not used.
         Weights with labels must use the same labels, in the same order,
         as dependent or, if dependent has no labels, as exog. See
         :ref:`panel-input-alignment`.
+        Dependent need not be balanced when the weights are given for each time
+        period, entity or combination: the weights of the combinations that
+        dependent does not have are not used.
 
     Notes
     -----
@@ -4060,12 +4060,12 @@ class FamaMacBeth(_PanelModelBase):
         the weight should be homoskedastic.
         Weights can be given for each observation, for each time period,
         for each entity or for each combination of time period and entity.
-        Dependent need not be balanced when they are given for each time
-        period, entity or combination: the weights of the combinations that
-        dependent does not have are not used.
         Weights with labels must use the same labels, in the same order,
         as dependent or, if dependent has no labels, as exog. See
         :ref:`panel-input-alignment`.
+        Dependent need not be balanced when the weights are given for each time
+        period, entity or combination: the weights of the combinations that
+        dependent does not have are not used.
 
     Notes
     -----
