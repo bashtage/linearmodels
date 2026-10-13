@@ -1610,9 +1610,9 @@ class PooledOLS(_PanelModelBase):
        raises "Weights do not have a supported shape" now, which names the numbers
        of values that are accepted. If ``dependent`` is not balanced and has as many
        rows as time periods or entities, an array with that many values is a value
-       for each row. Earlier versions read it as a value for each time period or
-       entity, or raised an ``AmbiguityError`` if the numbers of time periods and
-       entities were equal.
+       for each row. Earlier versions raised "weights must have the same number of
+       observations as dependent", or an ``AmbiguityError`` if the numbers of time
+       periods and entities were equal.
     """
 
     def __init__(
@@ -2072,9 +2072,9 @@ class PanelOLS(_PanelModelBase):
        raises "Weights do not have a supported shape" now, which names the numbers
        of values that are accepted. If ``dependent`` is not balanced and has as many
        rows as time periods or entities, an array with that many values is a value
-       for each row. Earlier versions read it as a value for each time period or
-       entity, or raised an ``AmbiguityError`` if the numbers of time periods and
-       entities were equal.
+       for each row. Earlier versions raised "weights must have the same number of
+       observations as dependent", or an ``AmbiguityError`` if the numbers of time
+       periods and entities were equal.
 
     If both ``entity_effect`` and ``time_effects`` are ``False``, and no other
     effects are included, the model reduces to :class:`PooledOLS`.
@@ -3266,9 +3266,9 @@ class BetweenOLS(_PanelModelBase):
        raises "Weights do not have a supported shape" now, which names the numbers
        of values that are accepted. If ``dependent`` is not balanced and has as many
        rows as time periods or entities, an array with that many values is a value
-       for each row. Earlier versions read it as a value for each time period or
-       entity, or raised an ``AmbiguityError`` if the numbers of time periods and
-       entities were equal.
+       for each row. Earlier versions raised "weights must have the same number of
+       observations as dependent", or an ``AmbiguityError`` if the numbers of time
+       periods and entities were equal.
     """
 
     def __init__(
@@ -3663,9 +3663,9 @@ class FirstDifferenceOLS(_PanelModelBase):
        raises "Weights do not have a supported shape" now, which names the numbers
        of values that are accepted. If ``dependent`` is not balanced and has as many
        rows as time periods or entities, an array with that many values is a value
-       for each row. Earlier versions read it as a value for each time period or
-       entity, or raised an ``AmbiguityError`` if the numbers of time periods and
-       entities were equal.
+       for each row. Earlier versions raised "weights must have the same number of
+       observations as dependent", or an ``AmbiguityError`` if the numbers of time
+       periods and entities were equal.
     """
 
     def __init__(
@@ -4108,9 +4108,9 @@ class RandomEffects(_PanelModelBase):
        raises "Weights do not have a supported shape" now, which names the numbers
        of values that are accepted. If ``dependent`` is not balanced and has as many
        rows as time periods or entities, an array with that many values is a value
-       for each row. Earlier versions read it as a value for each time period or
-       entity, or raised an ``AmbiguityError`` if the numbers of time periods and
-       entities were equal.
+       for each row. Earlier versions raised "weights must have the same number of
+       observations as dependent", or an ``AmbiguityError`` if the numbers of time
+       periods and entities were equal.
     """
 
     def __init__(
@@ -4619,9 +4619,9 @@ class FamaMacBeth(_PanelModelBase):
        raises "Weights do not have a supported shape" now, which names the numbers
        of values that are accepted. If ``dependent`` is not balanced and has as many
        rows as time periods or entities, an array with that many values is a value
-       for each row. Earlier versions read it as a value for each time period or
-       entity, or raised an ``AmbiguityError`` if the numbers of time periods and
-       entities were equal.
+       for each row. Earlier versions raised "weights must have the same number of
+       observations as dependent", or an ``AmbiguityError`` if the numbers of time
+       periods and entities were equal.
 
     References
     ----------

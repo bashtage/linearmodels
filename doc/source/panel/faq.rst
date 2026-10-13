@@ -329,8 +329,8 @@ can be given as a column of the data that has a value for each row
    an array with ``nobs * nentity`` values raised an error from pandas or NumPy. If
    ``dependent`` is not balanced and has as many rows as time periods or entities,
    an array with that many values is a weight for each observation. Earlier versions
-   read it as a weight for each time period or entity, or raised an
-   ``AmbiguityError`` if the numbers of time periods and entities were equal.
+   raised "weights must have the same number of observations as dependent" for it, or
+   an ``AmbiguityError`` if the numbers of time periods and entities were equal.
 
 Weights that are defined for each time period, for each entity or for each
 combination of the two are matched to the time periods and entities in the
