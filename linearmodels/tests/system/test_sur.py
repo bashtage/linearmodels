@@ -718,11 +718,9 @@ def test_fitted(data):
     assert_frame_equal(expected, res.fitted_values)
 
 
-@pytest.mark.filterwarnings(
-    "ignore::linearmodels.shared.exceptions.MissingValueWarning"
-)
 def test_predict(missing_data):
-    mod = SUR(missing_data)
+    with pytest.warns(MissingValueWarning, match="missing values"):
+        mod = SUR(missing_data)
     res = mod.fit()
     pred_no_missing = res.predict(equations=missing_data, missing=False, dataframe=True)
     pred_missing = res.predict(equations=missing_data, missing=True, dataframe=True)
@@ -764,11 +762,9 @@ def test_predict(missing_data):
         assert pred[key].shape[0] == nobs
 
 
-@pytest.mark.filterwarnings(
-    "ignore::linearmodels.shared.exceptions.MissingValueWarning"
-)
 def test_predict_error(missing_data):
-    mod = SUR(missing_data)
+    with pytest.warns(MissingValueWarning, match="missing values"):
+        mod = SUR(missing_data)
     res = mod.fit()
     with pytest.raises(ValueError, match=r"At least one output must be selected"):
         res.predict(fitted=False, idiosyncratic=False)

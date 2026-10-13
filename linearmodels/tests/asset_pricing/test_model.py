@@ -12,11 +12,8 @@ from linearmodels.asset_pricing.model import (
 )
 from linearmodels.iv.data import IVData
 from linearmodels.iv.model import _OLS
+from linearmodels.shared.exceptions import MissingValueWarning
 from linearmodels.tests.asset_pricing._utility import generate_data, get_all
-
-pytestmark = pytest.mark.filterwarnings(
-    "ignore::linearmodels.shared.exceptions.MissingValueWarning"
-)
 
 
 @pytest.fixture(params=["numpy", "pandas"])
@@ -202,7 +199,8 @@ def test_drop_missing(data):
     else:
         p[::33] = np.nan
 
-    res = TradedFactorModel(p, data.factors).fit()
+    with pytest.warns(MissingValueWarning, match="missing values"):
+        res = TradedFactorModel(p, data.factors).fit()
 
     p = IVData(p)
     f = IVData(data.factors)

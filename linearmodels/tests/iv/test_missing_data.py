@@ -3,11 +3,8 @@ from pandas.testing import assert_series_equal
 import pytest
 
 from linearmodels.iv import IV2SLS, IVGMM, IVGMMCUE, IVLIML
+from linearmodels.shared.exceptions import MissingValueWarning
 from linearmodels.shared.utility import AttrDict
-
-pytestmark = pytest.mark.filterwarnings(
-    "ignore::linearmodels.shared.exceptions.MissingValueWarning"
-)
 
 
 @pytest.fixture(scope="module", params=[IV2SLS, IVLIML, IVGMM, IVGMMCUE])
@@ -73,7 +70,8 @@ def get_all(v):
 
 
 def test_missing(data, model):
-    mod = model(data.dep, data.exog, data.endog, data.instr)
+    with pytest.warns(MissingValueWarning, match="missing values"):
+        mod = model(data.dep, data.exog, data.endog, data.instr)
     res = mod.fit()
     mod = model(data.dep_clean, data.exog_clean, data.endog_clean, data.instr_clean)
     res2 = mod.fit()
@@ -83,7 +81,8 @@ def test_missing(data, model):
 
 
 def test_missing_clustered(data):
-    mod = IV2SLS(data.dep, data.exog, data.endog, data.instr)
+    with pytest.warns(MissingValueWarning, match="missing values"):
+        mod = IV2SLS(data.dep, data.exog, data.endog, data.instr)
     with pytest.raises(ValueError, match=r"clusters has the wrong nobs"):
         mod.fit(cov_type="clustered", clusters=data.clusters)
     res = mod.fit(cov_type="clustered", clusters=data.clusters_clean)

@@ -10,6 +10,8 @@ are scaled to have a mean of 1, and the mean of very large weights overflows: we
 1e308 became 0, and the scaled weights have to be finite for any finite weights.
 """
 
+from contextlib import nullcontext
+
 import numpy as np
 from numpy.testing import assert_allclose
 import pandas as pd
@@ -250,13 +252,17 @@ def test_missing_weights_are_dropped_with_their_observations(name):
     assert res.nobs == expected.nobs
 
 
-@pytest.mark.filterwarnings(
-    "ignore:.*cross-sectional regressions:linearmodels.shared.exceptions.MissingValueWarning"
-)
 @pytest.mark.parametrize("kind", EXTREME)
 @pytest.mark.parametrize("name", MODELS)
 def test_extreme_weights_are_finite_when_they_are_scaled(name, kind):
-    mod = build(name, extreme(kind))
+    # Half of the weights of the mixed 1e308 and 1e-308 are 0 once they are scaled,
+    # which leaves cross-sections of Fama-MacBeth with too few observations
+    if name == "FamaMacBeth" and kind == "mixed 1e308 and 1e-308":
+        warns = pytest.warns(MissingValueWarning, match="cross-sectional regressions")
+    else:
+        warns = nullcontext()
+    with warns:
+        mod = build(name, extreme(kind))
     weights = get_weights(mod)
     all_finite = np.isfinite(weights).all()
     assert all_finite
