@@ -1,5 +1,6 @@
 """Helpers for the tests of all packages"""
 
+from collections.abc import Mapping
 from contextlib import nullcontext
 
 import numpy as np
@@ -16,7 +17,8 @@ def has_missing(*inputs):
     Parameters
     ----------
     *inputs
-        NumPy arrays, pandas Series and DataFrames, xarray DataArrays or None.
+        NumPy arrays, pandas Series and DataFrames, xarray DataArrays, None, or
+        dicts of these, for example the equations of a system model.
 
     Returns
     -------
@@ -26,7 +28,9 @@ def has_missing(*inputs):
     for value in inputs:
         if value is None:
             continue
-        if isinstance(value, (pd.DataFrame, pd.Series)):
+        if isinstance(value, Mapping):
+            missing = has_missing(*value.values())
+        elif isinstance(value, (pd.DataFrame, pd.Series)):
             missing = value.isna().to_numpy().any()
         else:
             # NumPy arrays, and the values of an xarray DataArray

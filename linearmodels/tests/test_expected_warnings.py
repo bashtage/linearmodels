@@ -61,6 +61,21 @@ def test_has_missing(kind):
         assert reversed_both
 
 
+def test_has_missing_looks_into_dicts():
+    equations = {
+        "a": {"dependent": FRAME["a"], "exog": ARRAY},
+        "b": {"dependent": FRAME["b"], "exog": None},
+    }
+    equations_missing = {
+        "a": {"dependent": FRAME["a"], "exog": ARRAY},
+        "b": {"dependent": FRAME_MISSING["a"], "exog": None},
+    }
+    clean = has_missing(equations)
+    with_missing = has_missing(equations_missing)
+    assert not clean
+    assert with_missing
+
+
 def test_none_is_not_missing():
     results = [has_missing(None), has_missing(FRAME, None), has_missing()]
     assert not any(results)

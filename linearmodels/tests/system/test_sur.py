@@ -23,6 +23,7 @@ from linearmodels.system._utility import (
     inv_matrix_sqrt,
 )
 from linearmodels.system.model import SUR
+from linearmodels.tests._utility import warns_if_missing
 from linearmodels.tests.system._utility import (
     generate_data,
     simple_sur,
@@ -719,7 +720,7 @@ def test_fitted(data):
 
 
 def test_predict(missing_data):
-    with pytest.warns(MissingValueWarning, match="missing values"):
+    with warns_if_missing(missing_data):
         mod = SUR(missing_data)
     res = mod.fit()
     pred_no_missing = res.predict(equations=missing_data, missing=False, dataframe=True)
@@ -763,7 +764,7 @@ def test_predict(missing_data):
 
 
 def test_predict_error(missing_data):
-    with pytest.warns(MissingValueWarning, match="missing values"):
+    with warns_if_missing(missing_data):
         mod = SUR(missing_data)
     res = mod.fit()
     with pytest.raises(ValueError, match=r"At least one output must be selected"):
