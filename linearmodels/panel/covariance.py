@@ -372,9 +372,16 @@ class DriscollKraay(HomoskedasticCovariance):
     kernel : str
         Name of one of the supported kernels. If None, uses the Newey-West
         kernel.
-    bandwidth : int
-        Non-negative integer to use as bandwidth.  If not provided a rule-of-
-        thumb value is used.
+    bandwidth : float, optional
+        Non-negative bandwidth to use. It must be below the number of time
+        periods. The Bartlett and Parzen kernels use its integer part. If not
+        provided a rule-of-thumb value is used.
+
+    Raises
+    ------
+    ValueError
+        If the bandwidth, or the default bandwidth if none is given, is not
+        below the number of time periods.
 
     Notes
     -----
@@ -385,7 +392,8 @@ class DriscollKraay(HomoskedasticCovariance):
     * "parzen", "gallant" - Parzen kernel
 
     Bandwidth is set to the common value for the Bartlett kernel if not
-    provided.
+    provided, :math:`\lfloor 4 (T / 100)^{2/9} \rfloor` where :math:`T` is the
+    number of time periods.
 
     The estimator of the covariance is
 
@@ -409,6 +417,22 @@ class DriscollKraay(HomoskedasticCovariance):
 
     where df is ``extra_df`` and n-df is replace by n-df-k if ``debiased`` is
     ``True``. :math:`K(i, bw)` is the kernel weighting function.
+
+    The sums :math:`\xi_t` of the scores of the :math:`T` time periods have
+    autocovariances up to lag :math:`T-1`, so the bandwidth must be below
+    :math:`T`. The bandwidth is checked when the estimator is created, so that
+    the ``fit`` method of a model raises the error.
+
+    .. versionchanged:: 7.1
+
+       A bandwidth that is not below the number of time periods raises a
+       ``ValueError``. Earlier versions raised "Length of w is larger than the
+       number of elements in z" with the Bartlett and Parzen kernels, when the
+       covariance was first used. The quadratic spectral kernel, which has no
+       truncation, returned a covariance without an error. With a large bandwidth
+       the weights of all of the lags are close to one, and the sum of the scores
+       over all of the periods is zero in a regression, so that the covariance
+       was close to zero.
     """
 
     ALLOWED_KWARGS = ("kernel", "bandwidth")
@@ -433,6 +457,40 @@ class DriscollKraay(HomoskedasticCovariance):
         self._name = "Driscoll-Kraay"
         self._kernel = kernel if kernel is not None else self.DEFAULT_KERNEL
         self._bandwidth = bandwidth
+        # Checked here so that fit raises, instead of the first use of the covariance
+        self._bw = self._select_bandwidth(np.unique(time_ids).shape[0])
+
+    def _select_bandwidth(self, nperiods: int) -> float:
+        """
+        The bandwidth of the kernel, which has to be below the number of periods
+
+        Parameters
+        ----------
+        nperiods : int
+            The number of time periods.
+
+        Returns
+        -------
+        float
+            The bandwidth that was given or, if there is none, the rule-of-thumb value.
+
+        Raises
+        ------
+        ValueError
+            If the bandwidth is not below the number of time periods.
+        """
+        bw = self._bandwidth
+        if bw is None:
+            bw = float(np.floor(4 * (nperiods / 100) ** (2 / 9)))
+        if bw >= nperiods:
+            which = "bandwidth" if self._bandwidth is not None else "default bandwidth"
+            raise ValueError(
+                f"The {which} of the Driscoll-Kraay covariance, {bw:g}, must be below "
+                f"the number of time periods, {nperiods}. The sums of the scores of "
+                f"{nperiods} periods have autocovariances up to lag {nperiods - 1}. "
+                "Use a smaller bandwidth."
+            )
+        return bw
 
     @cached_property
     def cov(self) -> linearmodels.typing.data.Float64Array:
@@ -448,11 +506,7 @@ class DriscollKraay(HomoskedasticCovariance):
         xe_df = xe_df.groupby(level=0).sum()
         xe_df = xe_df.sort_index()
         xe_nobs = xe_df.shape[0]
-        bw = self._bandwidth
-        if self._bandwidth is None:
-            bw = float(np.floor(4 * (xe_nobs / 100) ** (2 / 9)))
-        assert bw is not None
-        w = lookup_option(KERNEL_LOOKUP, self._kernel, "kernel")(bw, xe_nobs - 1)
+        w = lookup_option(KERNEL_LOOKUP, self._kernel, "kernel")(self._bw, xe_nobs - 1)
         xeex = cov_kernel(np.asarray(xe_df), w) * (xe_nobs / nobs)
         xeex *= self._scale
 
