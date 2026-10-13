@@ -297,6 +297,37 @@ rows of ``dependent`` are not sorted by entity and then time. When these
 weights are a pandas object, the index (and columns) must contain the time
 periods and entities in this order.
 
+``clusters`` and ``other_effects`` can be given for each combination of time
+period and entity in the same way as weights: a 2-d array or a DataFrame with
+``nobs`` rows and ``nentity`` columns, or a 3-d array or a ``DataArray`` with the
+variables first, which two-way clusters and two effects need. They are placed on
+the rows of ``dependent`` by time period and entity, whatever the order of the
+rows is. ``dependent`` does not need to be balanced for any of these inputs. The
+values of the combinations of a time period and an entity that ``dependent``
+does not have are not used, and can be missing. For example, the industry of each
+observation of a panel that is sorted by entity and time can be used for the
+clusters of the standard errors in either of the two ways
+
+.. code-block:: python
+
+    clusters = data["industry"].unstack(0)  # time periods by entities
+    res = mod.fit(cov_type="clustered", clusters=clusters)
+    res = mod.fit(cov_type="clustered", clusters=data[["industry"]])
+
+In an unbalanced panel the order in which the time periods and entities first
+appear can differ from the order of the time periods and entities. If the first
+entity enters late and the rows are sorted by entity, for example, the first
+periods appear last. The time periods are in order of time if the rows of every
+entity are in order of time, in either direction, and the entities are in the
+order of their labels if the rows of every time period are in order of the
+entities. This is how a panel that is sorted by entity and time, or by time and
+entity, is matched whether or not it is balanced, and a DataFrame that
+``unstack`` makes from such a panel has its time periods and entities in order.
+If the rows are in another order, then the time periods and entities are in the
+order that they first appear, as in a balanced panel. A pandas object that does not
+use this order raises a ``ValueError``. Values for each row, a pandas object with
+the index of ``dependent`` or a 1-d array, do not depend on this order.
+
 :math:`R^2` definitions
 =======================
 The :math:`R^2` definitions are all designed so that the reported value will

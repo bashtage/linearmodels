@@ -27,6 +27,7 @@ from linearmodels.panel.model import (
     PooledOLS,
     RandomEffects,
 )
+from linearmodels.shared.exceptions import MissingValueWarning
 
 NENTITY = 8
 NTIME = 5
@@ -304,7 +305,7 @@ def test_other_effects_use_the_labels_of_exog(simple):
             PanelOLS(y, simple.x, other_effects=corrupt(simple.other))
     wide = simple.other["c"].unstack(0)
     with pytest.raises(
-        ValueError, match="row index of other_effects does not match exog"
+        ValueError, match="time and entity index of other_effects does not match exog"
     ):
         PanelOLS(y, simple.x, other_effects=wide.iloc[::-1])
     # An array has no labels
@@ -453,13 +454,19 @@ def test_weights_ambiguity_not_resolved_by_labels():
         PooledOLS(y, x, weights=weights)
 
 
-def test_weights_unbalanced_dependent_keeps_length_error(simple):
+def test_weights_unbalanced_dependent(simple):
+    # An observation is missing, so that the first entity does not have the fourth
+    # period. The weights of that period and entity are not used. They raised "weights
+    # must have the same number of observations as dependent" before
     keep = np.ones(len(simple.y), dtype=bool)
     keep[3] = False
     y, x = simple.y[keep], simple.x[keep]
     for shape in ("time", "entity", "grid"):
-        with pytest.raises(ValueError, match="weights must have the same number"):
-            PooledOLS(y, x, weights=simple.raw_weights(shape))
+        expected = simple.expected_weights(shape)[keep]
+        expected = expected / expected.mean()
+        for weights in (simple.raw_weights(shape), simple.labelled_weights(shape)):
+            mod = PooledOLS(y, x, weights=weights)
+            assert_allclose(mod.weights.values2d[:, 0], expected)
     flat = simple.w_flat[keep]
     mod = PooledOLS(y, x, weights=flat)
     assert_allclose(mod.weights.values2d[:, 0], flat / flat.mean())
@@ -489,7 +496,7 @@ def test_other_effects_alignment(panel):
     with pytest.raises(ValueError, match="row index of other_effects"):
         PanelOLS(panel.y, panel.x, other_effects=shift_labels(other))
     wide = other["c"].unstack(0)
-    with pytest.raises(ValueError, match="row index of other_effects"):
+    with pytest.raises(ValueError, match="time and entity index of other_effects"):
         PanelOLS(panel.y, panel.x, other_effects=wide.iloc[::-1])
 
 
@@ -509,7 +516,7 @@ def test_clusters_alignment(panel):
     with pytest.raises(ValueError, match="row index of clusters"):
         mod.reformat_clusters(shift_labels(clusters))
     wide = clusters["cl"].unstack(0)
-    with pytest.raises(ValueError, match="row index of clusters"):
+    with pytest.raises(ValueError, match="time and entity index of clusters"):
         mod.reformat_clusters(wide.iloc[::-1])
 
 
@@ -541,7 +548,8 @@ def test_clusters_use_the_labels_of_the_first_input_with_labels(simple, model):
             mod.fit(cov_type="clustered", clusters=corrupt(clusters))
         with pytest.raises(ValueError, match=match):
             mod.reformat_clusters(corrupt(clusters))
-    with pytest.raises(ValueError, match=match):
+    wide_match = "time and entity index of clusters does not match exog"
+    with pytest.raises(ValueError, match=wide_match):
         mod.reformat_clusters(clusters["cl"].unstack(0).iloc[::-1])
     # Without any labels there is nothing to compare
     mod = model(y, to_3d(simple.x))
@@ -591,12 +599,13 @@ def test_clusters_and_missing_values_without_labels_in_dependent(simple):
     y = unlabelled_dependent(simple)
     x = simple.x.copy()
     x.iloc[5, 0] = np.nan
-    mod = PooledOLS(y, x)
+    with pytest.warns(MissingValueWarning):
+        mod = PooledOLS(y, x)
     assert mod.not_null.sum() == len(simple.y) - 1
     res = mod.fit(cov_type="clustered", clusters=simple.clusters)
-    raw = PooledOLS(y, to_3d(x)).fit(
-        cov_type="clustered", clusters=to_3d(simple.clusters)
-    )
+    with pytest.warns(MissingValueWarning):
+        raw_mod = PooledOLS(y, to_3d(x))
+    raw = raw_mod.fit(cov_type="clustered", clusters=to_3d(simple.clusters))
     assert_allclose(res.std_errors, raw.std_errors)
     with pytest.raises(ValueError, match="row index of clusters does not match exog"):
         mod.fit(cov_type="clustered", clusters=reverse(simple.clusters))
