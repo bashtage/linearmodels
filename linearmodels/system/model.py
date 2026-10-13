@@ -38,6 +38,7 @@ from linearmodels.shared.exceptions import missing_warning, unknown_option_error
 from linearmodels.shared.hypotheses import InvalidTestStatistic, WaldTestStatistic
 from linearmodels.shared.inputs import as_array_like, as_float64
 from linearmodels.shared.linalg import has_constant
+from linearmodels.shared.rsquared import r_squared, total_ss_is_zero
 from linearmodels.shared.utility import AttrDict
 from linearmodels.shared.weights import check_weights, normalize_weights
 from linearmodels.system._utility import (
@@ -1069,8 +1070,15 @@ class _SystemModelBase:
         stats["fitted"] = self._x[i] @ b
         stats["resid_ss"] = float(np.squeeze(weighted_resid.T @ weighted_resid))
         stats["total_ss"] = total_ss
-        stats["r2"] = 1.0 - stats.resid_ss / stats.total_ss
-        stats["r2a"] = 1.0 - (stats.resid_ss / df_r) / (stats.total_ss / df_c)
+        # The size of the dependent variable, before the mean is removed, which sets
+        # the rounding error in the total sum of squares
+        wy = self._wy[i]
+        y_ss = float(np.squeeze(wy.T @ wy))
+        stats["r2"] = r_squared(stats.resid_ss, stats.total_ss, y_ss, nobs)
+        if np.isnan(stats.r2):
+            stats["r2a"] = np.nan
+        else:
+            stats["r2a"] = 1.0 - (stats.resid_ss / df_r) / (stats.total_ss / df_c)
 
         names = self._param_names[loc : loc + df]
         offset = len(stats.eq_label) + 1
@@ -1121,7 +1129,8 @@ class _SystemModelBase:
 
         results["resid_ss"] = resid_ss
         results["total_ss"] = total_ss
-        results["r2"] = 1.0 - results.resid_ss / results.total_ss
+        y_ss = sum(float(np.squeeze(wy.T @ wy)) for wy in self._wy)
+        results["r2"] = r_squared(results.resid_ss, results.total_ss, y_ss, nobs)
         results["resid"] = resid
         results["weighted_resid"] = np.hstack(weighted_residuals)
         results["constraints"] = self._constraints
@@ -1181,18 +1190,48 @@ class _SystemModelBase:
         # residuals of the model and of the regression on a constant
         eps = eps * np.hstack(wi)
         eps_const = np.hstack([wi[j] * (self._y[j] - mu[j]) for j in range(k)])
+        # The size of the dependent variables, which sets the rounding error of the
+        # total sums of squares, before the means are removed
+        wy_all = np.hstack([wi[j] * self._y[j] for j in range(k)])
+        y_ss = (wy_all**2).sum(0)
+        # A dependent variable that does not vary has no total sum of squares. This is
+        # found from its weighted mean, since the regression on a constant is GLS, and
+        # its errors are large if the residuals of the equations are collinear, as they
+        # are when a dependent variable does not vary
+        own_ss = np.array(
+            [
+                ((wy[j] - wi[j] * ((w[j] * self._y[j]).sum() / w[j].sum())) ** 2).sum()
+                for j in range(k)
+            ]
+        )
+        varies = np.array(
+            [
+                not total_ss_is_zero(t, s, nobs)
+                for t, s in zip(own_ss, y_ss, strict=True)
+            ]
+        )
+        if not varies.any():
+            return Series(
+                {
+                    "mcelroy": np.nan,
+                    "berndt": np.nan,
+                    "judge": np.nan,
+                    "dhrymes": np.nan,
+                }
+            )
         # Judge
-        judge = 1 - (eps**2).sum() / (eps_const**2).sum()
-        # Dhrymes
+        judge = r_squared((eps**2).sum(), (eps_const**2).sum(), y_ss.sum(), nobs)
+        # Dhrymes. The equations without a total sum of squares have no weight
         tot_eps_const_sq = (eps_const**2).sum(0)
         r2s_arr = np.asarray(r2s)
-        dhrymes = (r2s_arr * tot_eps_const_sq).sum() / tot_eps_const_sq.sum()
+        dhrymes = (r2s_arr[varies] * tot_eps_const_sq[varies]).sum()
+        dhrymes /= tot_eps_const_sq[varies].sum()
 
         # Berndt
         sigma_y = (eps_const.T @ eps_const / nobs) * self._sigma_scale(debiased)
         berndt = np.nan
-        # Avoid division by 0
-        if np.linalg.det(sigma_y) > 0:
+        # Avoid division by 0. The matrix is singular if an equation has no variance
+        if varies.all() and np.linalg.det(sigma_y) > 0:
             berndt = 1 - np.linalg.det(sigma_resid) / np.linalg.det(sigma_y)
 
         mcelroy = np.nan
@@ -1204,7 +1243,8 @@ class _SystemModelBase:
             numerator = (std_eps**2).sum()
             std_eps_const = eps_const @ sigma_m12
             denom = (std_eps_const**2).sum()
-            mcelroy = 1.0 - numerator / denom
+            std_y_ss = ((wy_all @ sigma_m12) ** 2).sum()
+            mcelroy = r_squared(numerator, denom, std_y_ss, nobs)
         r2 = {"mcelroy": mcelroy, "berndt": berndt, "judge": judge, "dhrymes": dhrymes}
         return Series(r2)
 

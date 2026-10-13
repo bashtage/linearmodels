@@ -187,13 +187,42 @@ class _LSModelResultsBase(_SummaryStr):
 
     @property
     def rsquared(self) -> float:
-        """Coefficient of determination (R**2)"""
+        """
+        Coefficient of determination (R**2)
+
+        Returns
+        -------
+        float
+            The coefficient of determination.
+
+        Notes
+        -----
+        The total sum of squares is centered if the model has a constant. The
+        coefficient of determination is NaN if the total sum of squares is zero, up to
+        rounding error, since it is not defined then, e.g., if the dependent variable
+        does not vary in a model with a constant, or is all zero. No error or warning
+        is raised.
+        """
         return self._r2
 
     @property
     def rsquared_adj(self) -> float:
-        """Sample-size adjusted coefficient of determination (R**2)"""
+        """
+        Sample-size adjusted coefficient of determination (R**2)
+
+        Returns
+        -------
+        float
+            The adjusted coefficient of determination.
+
+        Notes
+        -----
+        It is NaN if ``rsquared`` is NaN, and if the model has as many parameters as
+        observations, so that it has no residual degrees of freedom.
+        """
         n, k, c = self.nobs, self.df_model, int(self.has_constant)
+        if n <= k:
+            return float("nan")
         return 1 - ((n - c) / (n - k)) * (1 - self._r2)
 
     @property
@@ -269,6 +298,10 @@ class _LSModelResultsBase(_SummaryStr):
 
         This version of the F-statistic directly uses the model covariance
         estimator and so is robust against the same specification issues.
+
+        An ``InvalidTestStatistic`` is returned if the model has no non-constant
+        exogenous terms, or if the covariance of the parameters is singular, e.g.,
+        the dependent variable is all zero, so that the model fits exactly.
         """
         return self._f_statistic
 
@@ -662,7 +695,29 @@ class AbsorbingLSResults(_LSModelResultsBase):
 
     @property
     def absorbed_rsquared(self) -> float:
-        """Coefficient of determination (R**2), ignoring absorbed variables"""
+        """
+        Coefficient of determination (R**2), ignoring absorbed variables
+
+        Returns
+        -------
+        float
+            The coefficient of determination of the regressors that were not absorbed.
+
+        Notes
+        -----
+        The total sum of squares is that of the dependent variable once the absorbed
+        variables have been removed. The coefficient of determination is NaN if it is
+        zero, up to rounding error, e.g., if the absorbed variables explain the
+        dependent variable, or if it does not vary. No error or warning is raised.
+
+        The limit is the rounding error of the computation. The variables are absorbed
+        exactly only if they are a single categorical variable and the model is not
+        weighted. Otherwise an iterative algorithm is used, and its error is larger,
+        by default about 1e-8 relative to the size of the dependent variable for LSMR
+        (see ``lsmr_options`` of ``fit``), so that a dependent variable that the
+        absorbed variables explain exactly can have a total sum of squares that is not
+        recognized as zero.
+        """
         return self._absorbed_rsquared
 
     @cached_property
@@ -2064,7 +2119,21 @@ class IVModelComparison(_ModelComparison):
 
     @property
     def rsquared_adj(self) -> Series:
-        """Sample-size adjusted coefficients of determination (R**2)"""
+        """
+        Sample-size adjusted coefficients of determination (R**2)
+
+        Returns
+        -------
+        Series
+            The adjusted coefficient of determination of each model.
+
+        Notes
+        -----
+        The value of a model is NaN if its coefficient of determination is not
+        defined, i.e., if the total sum of squares is zero, up to rounding error, or
+        if the model has as many parameters as observations. See ``rsquared_adj`` of
+        the results of the models.
+        """
         return self._get_property("rsquared_adj")
 
     @property

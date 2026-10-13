@@ -252,6 +252,11 @@ and are not weighted, the two methods agree.
 The correlation-based measures **do not** make use of weights. They are
 prefixed as :math:`\texttt{corr\_squared}` in estimation results.
 
+Every :math:`R^{2}` is NaN, with no error or warning, if the sum of squares
+that it divides by is zero, up to rounding error, since it is not defined
+then. This happens if the dependent variable does not vary, and, for the
+within measures, if it does not vary within entities.
+
 Between :math:`R^{2}`
 ~~~~~~~~~~~~~~~~~~~~~
 

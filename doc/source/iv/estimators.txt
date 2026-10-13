@@ -177,6 +177,11 @@ and the adjusted :math:`R^{2}` is defined
    \begin{aligned}
    \bar{R}^{2} & =1-\left(1-R^{2}\right)\frac{N-k_{c}}{N-k}.\end{aligned}
 
+The :math:`R^{2}` is NaN, with no error or warning, if the total sum of
+squares is zero, up to rounding error, since it is not defined then, e.g.,
+if the dependent variable does not vary in a model with a constant. The
+adjusted :math:`R^{2}` is NaN as well, and it is NaN if :math:`N=k`.
+
 The residual variance is
 :math:`s^{2}=n^{-1}\hat{\epsilon}^{\prime}\hat{\epsilon}` unless the
 debiased flag is used, in which case a small sample adjusted version is

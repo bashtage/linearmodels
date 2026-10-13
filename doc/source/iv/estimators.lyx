@@ -715,6 +715,26 @@ and the adjusted
 
 \begin_layout Standard
 \noindent
+The
+\begin_inset Formula $R^{2}$
+\end_inset
+
+ is NaN, with no error or warning, if the total sum of squares is zero, up
+ to rounding error, since it is not defined then, e.g., if the dependent
+ variable does not vary in a model with a constant.
+ The adjusted
+\begin_inset Formula $R^{2}$
+\end_inset
+
+ is NaN as well, and it is NaN if
+\begin_inset Formula $N=k$
+\end_inset
+
+.
+\end_layout
+
+\begin_layout Standard
+\noindent
 The residual variance is 
 \begin_inset Formula $s^{2}=n^{-1}\hat{\epsilon}^{\prime}\hat{\epsilon}$
 \end_inset

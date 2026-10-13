@@ -414,7 +414,21 @@ class LinearFactorModelResults(_SummaryStr):
 
     @property
     def rsquared(self) -> float:
-        """Coefficient of determination (R**2)"""
+        """
+        Coefficient of determination (R**2)
+
+        Returns
+        -------
+        float
+            The coefficient of determination of the returns of all portfolios.
+
+        Notes
+        -----
+        The coefficient of determination is NaN if the total sum of squares of the
+        returns, about their means, is zero, up to rounding error. The models reject
+        portfolios that contain a constant, so that the returns vary and the
+        coefficient of determination is defined.
+        """
         return self._rsquared
 
     @property

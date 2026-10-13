@@ -136,6 +136,12 @@ The reported :math:`R^{2}` is always for the data, or weighted data is
 weights are used, for either OLS or GLS. The means that the reported
 :math:`R^{2}` for the GLS estimator may be negative
 
+Each :math:`R^{2}` is NaN, with no error or warning, if the total sum of
+squares that it divides by is zero, up to rounding error, since it is not
+defined then. If the dependent variable of an equation does not vary, the
+equation has no weight in Dhrymes’ measure and Berndt’s measure is NaN, and
+if none of the dependent variables vary, every measure is NaN.
+
 **F statistics**
 
 When the debiased covariance estimator is used (small sample adjustment)

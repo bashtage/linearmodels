@@ -71,6 +71,7 @@ from linearmodels.shared.hypotheses import (
 )
 from linearmodels.shared.inputs import as_array_like, as_float64
 from linearmodels.shared.linalg import has_constant
+from linearmodels.shared.rsquared import r_squared, total_ss_is_zero
 from linearmodels.shared.typed_getters import get_panel_data_like
 from linearmodels.shared.utility import AttrDict, ensure_unique_column, panel_to_frame
 from linearmodels.shared.weights import check_weights, normalize_weights
@@ -137,6 +138,10 @@ class FInfo(NamedTuple):
     is_invalid: bool
 
 
+# The model fits exactly, e.g., the dependent variable is all zero
+_SINGULAR_COVARIANCE = "The covariance of the parameters is singular"
+
+
 def _hotelling_f(
     params: Series,
     cov: DataFrame,
@@ -172,7 +177,11 @@ def _hotelling_f(
         return InvalidTestStatistic(reason, name=name)
     test_params = np.asarray(params)[sel]
     test_cov = np.asarray(cov)[sel][:, sel]
-    wald_stat = float(test_params.T @ np.linalg.inv(test_cov) @ test_params)
+    try:
+        inv_test_cov = np.linalg.inv(test_cov)
+    except np.linalg.LinAlgError:
+        return InvalidTestStatistic(_SINGULAR_COVARIANCE, name=name)
+    wald_stat = float(test_params.T @ inv_test_cov @ test_params)
     if not debiased:
         return WaldTestStatistic(wald_stat, null, df, name=name)
     scale = (nperiod - df) / (df * (nperiod - 1))
@@ -193,7 +202,11 @@ def _deferred_f(
     name = f_info.name
     test_params = np.asarray(params)[sel]
     test_cov = np.asarray(cov)[sel][:, sel]
-    test_stat = test_params.T @ np.linalg.inv(test_cov) @ test_params
+    try:
+        inv_test_cov = np.linalg.inv(test_cov)
+    except np.linalg.LinAlgError:
+        return InvalidTestStatistic(_SINGULAR_COVARIANCE, name=name)
+    test_stat = test_params.T @ inv_test_cov @ test_params
     test_stat = float(test_stat)
     df = int(sel.sum())
     null = "All parameters ex. constant are zero"
@@ -968,39 +981,38 @@ class _PanelModelBase:
         self, params: linearmodels.typing.data.Float64Array
     ) -> tuple[float, float, float]:
         """Correlation-based measures of R2"""
+
+        def corr_squared(
+            y: linearmodels.typing.data.Float64Array,
+            xb: linearmodels.typing.data.Float64Array,
+            y_ss: float,
+        ) -> float:
+            # Undefined if y does not vary. 0 if the prediction does not vary
+            if total_ss_is_zero(float(((y - y.mean()) ** 2).sum()), y_ss, y.shape[0]):
+                return np.nan
+            return np.corrcoef(y.T, xb.T)[0, 1] ** 2 if xb.std() > 0 else 0.0
+
         # Overall
         y = self.dependent.values2d
         x = self.exog.values2d
-        xb = x @ params
-        r2o = 0.0
-        if y.std() > 0 and xb.std() > 0:
-            r2o = np.corrcoef(y.T, (x @ params).T)[0, 1]
+        y_ss = float((y**2).sum())
+        r2o = corr_squared(y, x @ params, y_ss)
         # Between
         y = np.asarray(self.dependent.mean("entity"))
         x = np.asarray(self.exog.mean("entity"))
-        xb = x @ params
-        r2b = 0.0
-        if y.std() > 0 and xb.std() > 0:
-            r2b = np.corrcoef(y.T, (x @ params).T)[0, 1]
+        r2b = corr_squared(y, x @ params, float((y**2).sum()))
 
         # Within
         y = self.dependent.demean("entity", return_panel=False)
         x = self.exog.demean("entity", return_panel=False)
-        xb = x @ params
-        r2w = 0.0
-        if y.std() > 0 and xb.std() > 0:
-            r2w = np.corrcoef(y.T, xb.T)[0, 1]
+        r2w = corr_squared(y, x @ params, y_ss)
 
-        return r2o**2, r2w**2, r2b**2
+        return r2o, r2w, r2b
 
     def _rsquared(
         self, params: linearmodels.typing.data.Float64Array, reweight: bool = False
     ) -> tuple[float, float, float]:
         """Compute alternative measures of R2"""
-        if self.has_constant and self.exog.nvar == 1:
-            # Constant only fast track
-            return 0.0, 0.0, 0.0
-
         #############################################
         # R2 - Between
         #############################################
@@ -1018,7 +1030,8 @@ class _PanelModelBase:
             e = y - (w * y).sum() / w.sum()
 
         total_ss = float(np.squeeze(w.T @ (e**2)))
-        r2b = 1 - residual_ss / total_ss if total_ss > 0.0 else 0.0
+        y_ss = float(np.squeeze(w.T @ (y**2)))
+        r2b = r_squared(residual_ss, total_ss, y_ss, y.shape[0])
 
         #############################################
         # R2 - Overall
@@ -1034,7 +1047,8 @@ class _PanelModelBase:
         mu = (w * y).sum() / w.sum() if self.has_constant else 0
         we = wy - root_w * mu
         total_ss = float(np.squeeze(we.T @ we))
-        r2o = 1 - residual_ss / total_ss if total_ss > 0.0 else 0.0
+        y_ss = float(np.squeeze(wy.T @ wy))
+        r2o = r_squared(residual_ss, total_ss, y_ss, y.shape[0])
 
         #############################################
         # R2 - Within
@@ -1053,10 +1067,11 @@ class _PanelModelBase:
         weps = wy - wx @ params
         residual_ss = float(np.squeeze(weps.T @ weps))
         total_ss = float(np.squeeze(wy.T @ wy))
-        if self.dependent.nobs == 1 or (self.exog.nvar == 1 and self.has_constant):
-            r2w = 0.0
-        else:
-            r2w = 1.0 - residual_ss / total_ss if total_ss > 0.0 else 0.0
+        r2w = r_squared(residual_ss, total_ss, y_ss, wy.shape[0])
+
+        if self.has_constant and self.exog.nvar == 1:
+            # A model with only a constant explains nothing, whatever the data
+            r2b, r2o, r2w = (np.nan if np.isnan(r2) else 0.0 for r2 in (r2b, r2o, r2w))
 
         return r2o, r2w, r2b
 
@@ -1504,7 +1519,8 @@ class PooledOLS(_PanelModelBase):
             e = e - (w * y).sum() / w.sum()
 
         total_ss = float(np.squeeze(w.T @ (e**2)))
-        r2 = 1 - residual_ss / total_ss
+        y_ss = float(np.squeeze(w.T @ (y**2)))
+        r2 = r_squared(residual_ss, total_ss, y_ss, nobs)
 
         res = self._postestimation(params, cov, debiased, df_resid, weps, wy, wx)
         res.update(
@@ -2635,12 +2651,14 @@ class PanelOLS(_PanelModelBase):
         else:
             mu = np.array([0.0])
         total_ss = float(np.squeeze((y - mu).T @ (y - mu)))
-        r2 = 1 - resid_ss / total_ss if total_ss > 0.0 else 0.0
 
         root_w = cast(
             "linearmodels.typing.data.Float64Array", np.sqrt(self.weights.values2d)
         )
         y_ex = root_w * self.dependent.values2d
+        # The size of the dependent variable, before the effects are removed
+        y_ss = float(np.squeeze(y_ex.T @ y_ex))
+        r2 = r_squared(resid_ss, total_ss, y_ss, nobs)
         mu_ex = np.array(0.0, dtype=float)
         if (
             self.has_constant
@@ -2650,9 +2668,7 @@ class PanelOLS(_PanelModelBase):
         ):
             mu_ex = root_w * ((root_w.T @ y_ex) / (root_w.T @ root_w))
         total_ss_ex_effect = float(np.squeeze((y_ex - mu_ex).T @ (y_ex - mu_ex)))
-        r2_ex_effects = (
-            1 - resid_ss / total_ss_ex_effect if total_ss_ex_effect > 0.0 else 0.0
-        )
+        r2_ex_effects = r_squared(resid_ss, total_ss_ex_effect, y_ss, nobs)
 
         res = self._postestimation(params, cov, debiased, df_resid, weps, y, x)
         ######################################
@@ -2680,6 +2696,10 @@ class PanelOLS(_PanelModelBase):
             elif df_denom <= 0:
                 f_pooled = InvalidTestStatistic(
                     "The model has no residual degrees of freedom", name=name
+                )
+            elif resid_ss <= 0.0:
+                f_pooled = InvalidTestStatistic(
+                    "The residual sum of squares is 0", name=name
                 )
             else:
                 num = (resid_ss_pooled - resid_ss) / df_num
@@ -2970,7 +2990,8 @@ class BetweenOLS(_PanelModelBase):
             e = y - (w * y).sum() / w.sum()
 
         total_ss = float(np.squeeze(w.T @ (e**2)))
-        r2 = 1 - residual_ss / total_ss
+        y_ss = float(np.squeeze(w.T @ (y**2)))
+        r2 = r_squared(residual_ss, total_ss, y_ss, nobs)
 
         res = self._postestimation(params, cov, debiased, df_resid, weps, wy, wx)
         res.update(
@@ -3331,7 +3352,10 @@ class FirstDifferenceOLS(_PanelModelBase):
 
         residual_ss = float(np.squeeze(weps.T @ weps))
         total_ss = float(np.squeeze(w.T @ (y**2)))
-        r2 = 1 - residual_ss / total_ss
+        # The size of the dependent variable, before it is differenced
+        levels = self.dependent.values2d
+        y_ss = float(np.squeeze(self.weights.values2d.T @ (levels**2)))
+        r2 = r_squared(residual_ss, total_ss, y_ss, y.shape[0])
 
         res = self._postestimation(params, cov, debiased, df_resid, weps, wy, wx)
         res.update(
@@ -3775,7 +3799,9 @@ class RandomEffects(_PanelModelBase):
             wmu = root_w * _lstsq(root_w, wy, rcond=None)[0]
         wy_demeaned = wy - wmu
         total_ss = float(np.squeeze(wy_demeaned.T @ wy_demeaned))
-        r2 = 1 - residual_ss / total_ss
+        # The size of the dependent variable, before the means of the entities are removed
+        y_ss = float(np.squeeze(w.T @ (self.dependent.values2d**2)))
+        r2 = r_squared(residual_ss, total_ss, y_ss, wy.shape[0])
 
         res = self._postestimation(params, cov, debiased, df_resid, weps, wy, wx)
         res.update(
@@ -4079,16 +4105,20 @@ class FamaMacBeth(_PanelModelBase):
                 tss = float(np.squeeze(dep_demean.T @ dep_demean))
             else:
                 tss = float(np.squeeze(dep.T @ dep))
-            r2 = 1 - sse / tss
             nobs = exog.shape[0]
-            if nobs - nexog > 0:
+            r2 = r_squared(sse, tss, float(np.squeeze(dep.T @ dep)), nobs)
+            if nobs - nexog > 0 and not np.isnan(r2):
                 adj_r2 = 1 - (sse / (nobs - nexog)) / (tss / (nobs - int(has_constant)))
             else:
                 adj_r2 = np.nan
             return Series(np.r_[np.nan, params.ravel(), r2, adj_r2], index=cols)
 
         all_params = yx.groupby(level=1).apply(single)
-        avg_r2 = np.nanmean(all_params.iloc[:, -2])
+        avg_r2_values = all_params.iloc[:, -2]
+        if np.any(np.isfinite(avg_r2_values)):
+            avg_r2 = np.nanmean(avg_r2_values)
+        else:
+            avg_r2 = np.nan
         avg_adj_r2_values = all_params.iloc[:, -1]
         if np.any(np.isfinite(avg_adj_r2_values)):
             avg_adj_r2 = np.nanmean(avg_adj_r2_values)
@@ -4114,7 +4144,8 @@ class FamaMacBeth(_PanelModelBase):
         if self.has_constant:
             e = y - (w * y).sum() / w.sum()
         total_ss = float(np.squeeze(w.T @ (e**2)))
-        r2 = 1 - residual_ss / total_ss
+        y_ss = float(np.squeeze(w.T @ (y**2)))
+        r2 = r_squared(residual_ss, total_ss, y_ss, y.shape[0])
 
         if cov_type not in (
             "robust",

@@ -133,6 +133,12 @@ class _CommonResults(_SummaryStr):
         constant. Note that if a constant is not present in an equation
         then the term in the denominator is **not** demeaned so that
         :math:`\hat{\eta}_{ij}=y_{ij}`.
+
+        The coefficient of determination is NaN if the total sum of squares in the
+        denominator is zero, up to rounding error, since it is not defined then. For
+        the system this happens if none of the dependent variables vary, since the sums
+        of the equations are added, and for an equation if its dependent variable does
+        not vary. No error or warning is raised.
         """
         return self._r2
 
@@ -490,6 +496,14 @@ class SystemResults(_CommonResults):
 
         the ratio of the variance the dependent in an equation to the total
         variance of all dependent variables.
+
+        A measure is NaN if its total sum of squares is zero, up to rounding error, since
+        it is not defined then, and all of them are NaN if none of the dependent
+        variables vary. If the dependent variable of one equation does not vary, the
+        equation has no weight in Dhrymes's measure, and Berndt's measure is NaN since
+        the determinant of the covariance of the dependent variables is 0. McElroy's
+        measure is NaN if the covariance of the residuals is singular, as it is for an
+        equation that fits exactly. No error or warning is raised.
         """
         return self._system_r2
 
@@ -838,7 +852,19 @@ class SystemEquationResult(_CommonResults):
 
     @property
     def rsquared_adj(self) -> float:
-        """Sample-size adjusted coefficient of determination (R**2)"""
+        """
+        Sample-size adjusted coefficient of determination (R**2)
+
+        Returns
+        -------
+        float
+            The adjusted coefficient of determination.
+
+        Notes
+        -----
+        It is NaN if ``rsquared`` is NaN, i.e., if the dependent variable of the
+        equation does not vary, up to rounding error.
+        """
         return self._r2a
 
 
