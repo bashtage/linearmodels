@@ -443,6 +443,9 @@ class PanelResults(_SummaryStr):
             vals.append([val])
         table.extend_right(SimpleTable(vals, stubs=stubs))
         smry.tables.append(table)
+        if self.params.shape[0] == 0:
+            # A model that only has effects has no table of parameters
+            return smry
 
         param_data = np.c_[
             self.params.to_numpy()[:, None],
@@ -877,6 +880,12 @@ class PanelResults(_SummaryStr):
         WaldTestStatistic
             Test statistic for null that restrictions are valid.
 
+        Raises
+        ------
+        ValueError
+            If the model has no parameters, e.g., a PanelOLS model that only has
+            effects.
+
         Notes
         -----
         Hypothesis test examines whether :math:`H_0:C\theta=v` where the
@@ -922,6 +931,11 @@ class PanelResults(_SummaryStr):
         >>> null = "`C(year)[T.1987]:educ` = 0, `C(year)[T.1986]:educ` = 0"
         >>> wald_res = res.wald_test(formula=null)
         """
+        if self.params.shape[0] == 0:
+            raise ValueError(
+                "The model has no parameters, so that there is nothing to test. It "
+                "only has effects, which have no inference."
+            )
         return quadratic_form_test(
             self.params, self.cov, restriction=restriction, value=value, formula=formula
         )
@@ -1732,8 +1746,10 @@ class PanelModelComparison(_ModelComparison):
             params_stub.append(str(params.index[i]))
             params_stub.append(" ")
 
-        vals_lst = table_concat((vals_lst, params_fmt))
-        stubs = stub_concat((stubs, params_stub))
+        if params_fmt:
+            # None of the models has parameters if they only have effects
+            vals_lst = table_concat((vals_lst, params_fmt))
+            stubs = stub_concat((stubs, params_stub))
 
         all_effects = []
         for key in self._results:

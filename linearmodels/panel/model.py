@@ -103,6 +103,10 @@ def _lstsq(
     int,
     linearmodels.typing.data.Float64Array,
 ]:
+    if x.shape[1] == 0 or (y.ndim == 2 and y.shape[1] == 0):
+        # There are no regressors, or no variables to regress
+        empty = np.empty(0)
+        return np.zeros((x.shape[1], *y.shape[1:])), empty, 0, empty
     if rcond is None:
         eps = np.finfo(np.float64).eps
         cond = float(max(x.shape) * eps)
@@ -459,6 +463,24 @@ class _PanelModelBase:
         self._check_rank = bool(check_rank)
         self._validate_data()
         self._singleton_index: linearmodels.typing.data.BoolArray | None = None
+        self._check_regressors()
+
+    def _check_regressors(self) -> None:
+        """
+        Raise a ValueError if exog has no columns
+
+        Raises
+        ------
+        ValueError
+            If exog has no columns. Only PanelOLS with effects can estimate a model
+            without regressors.
+        """
+        if self.exog.nvar == 0:
+            raise ValueError(
+                f"{self.__class__.__name__} needs at least one regressor, but exog "
+                "has no columns. Only PanelOLS can estimate a model without "
+                "regressors, and it needs entity, time or other effects."
+            )
 
     def __str__(self) -> str:
         out = "{name} \nNum exog: {num_exog}, Constant: {has_constant}"
@@ -762,7 +784,12 @@ class _PanelModelBase:
                 "weights must have the same number of observations as dependent."
             )
 
-        all_missing = np.any(np.isnan(y), axis=1) & np.all(np.isnan(x), axis=1)
+        # The rows that are missing in dependent and in all of the regressors are
+        # dropped without a warning. If there are no regressors, the rows that are
+        # missing in dependent only get the warning
+        all_missing = np.any(np.isnan(y), axis=1) & (
+            np.all(np.isnan(x), axis=1) & (x.shape[1] > 0)
+        )
         missing = np.asarray(
             np.any(np.isnan(y), axis=1)
             | np.any(np.isnan(x), axis=1)
@@ -834,6 +861,8 @@ class _PanelModelBase:
         weps_const = y
         num_df = x.shape[1]
         name = "Model F-statistic (homoskedastic)"
+        if num_df == 0:
+            return InvalidTestStatistic("Model contains no regressors", name=name)
         if df_resid <= 0:
             return InvalidTestStatistic(
                 "The model has no residual degrees of freedom", name=name
@@ -869,6 +898,13 @@ class _PanelModelBase:
         sel = np.ones(params.shape[0], dtype=bool)
         name = "Model F-statistic (robust)"
 
+        if len(sel) == 0:
+            return FInfo(
+                sel,
+                name,
+                InvalidTestStatistic("Model contains no regressors", name=name),
+                True,
+            )
         if self.has_constant:
             if len(sel) == 1:
                 return FInfo(
@@ -1550,7 +1586,9 @@ class PanelOLS(_PanelModelBase):
         containers are those of ``dependent``, where a DataFrame has a column for
         each variable and an array or DataArray with several variables has 3
         dimensions (variable by time by entity). A list, a tuple or any other
-        container raises a ``TypeError`` that names ``exog``.
+        container raises a ``TypeError`` that names ``exog``. It can have no
+        variables, a DataFrame with the index of ``dependent`` and no columns or an
+        array with 0 variables, if the model has effects. See the notes.
     weights : array_like, optional
         Weights to use in estimation.  Assumes residual variance is
         proportional to inverse of weight to that the residual time
@@ -1623,6 +1661,55 @@ class PanelOLS(_PanelModelBase):
     constant is never dropped. The norm includes the mean of the variable, so a
     variable with a large mean and little other variation, less than 1e-5 of its norm,
     is also treated as absorbed. Subtract its mean to avoid this.
+
+    **Models without regressors**
+
+    A model that only has effects can be estimated,
+
+    .. math::
+
+        y_{it} = \alpha_i + \gamma_t + \epsilon_{it}
+
+    where either effect can be left out. The model is created with an ``exog`` that
+    has no columns, for example ``pd.DataFrame(index=y.index)`` or an array with 0
+    variables, or with a formula that has effects and no regressors, such as
+    ``"y ~ EntityEffects"`` or ``"y ~ EntityEffects + TimeEffects"``. The formula
+    gives the same results as ``exog`` without columns. The model has no constant, as
+    a constant is a regressor (``"y ~ 1 + EntityEffects"`` has one). The other models,
+    and ``PanelOLS`` without effects, raise a ``ValueError`` if ``exog`` has no
+    columns. The results of a model without regressors are:
+
+    * ``params``, ``std_errors``, ``tstats``, ``pvalues`` and ``cov`` are empty, and
+      ``conf_int`` has no rows. The summary does not have a table of parameters, and
+      ``wald_test`` raises a ``ValueError``.
+    * ``estimated_effects`` are the means of the dependent variable of the entity
+      (entity effects), of the time period (time effects), or the fitted values of
+      the regression on the dummy variables of both effects. These are weighted means
+      in a weighted model. There is no constant, so that the effects include the
+      overall mean. ``fitted_values`` are 0, and ``resids`` and ``idiosyncratic`` are
+      the dependent variable less its effects.
+    * ``df_model`` is the number of effects, which is ``N`` for entity effects, ``T``
+      for time effects and ``N + T - 1`` for both, and ``df_resid`` is ``nobs``
+      less ``df_model``.
+    * ``rsquared``, ``rsquared_within``, ``rsquared_between`` and ``rsquared_overall``
+      are 0 since the effects are removed from the dependent variable and there is
+      nothing else to explain it. The squared correlations (``corr_squared_within``,
+      ``corr_squared_between`` and ``corr_squared_overall``) are 0: the fitted values
+      of the regressors are all 0, and these measures are set to 0 if the fitted
+      values do not vary. ``rsquared_inclusive`` is the R-squared of the effects,
+      the share of the variation around the mean that they explain.
+    * ``f_pooled`` is the test that the effects are zero. For entity effects it is
+      the F-test of the one-way analysis of variance. ``f_statistic`` and
+      ``f_statistic_robust``, which test the coefficients of the regressors, are
+      ``InvalidTestStatistic`` since there are none.
+    * ``loglik`` and ``s2`` are those of the regression on the dummy variables of the
+      effects.
+
+    .. versionchanged:: 7.1
+
+       A model without regressors can be estimated. Earlier versions raised a
+       ``ValueError`` from pandas, "No objects to concatenate", when ``exog`` had no
+       columns or the formula had no regressors.
     """
 
     def __init__(
@@ -1648,9 +1735,18 @@ class PanelOLS(_PanelModelBase):
             other_effects, labelled=_is_labelled(other_effects)
         )
         self._has_effect = entity_effects or time_effects or self.other_effects
+        if self.exog.nvar == 0 and not self._has_effect:
+            raise ValueError(
+                "exog has no columns and the model has no effects, so there is "
+                "nothing to estimate. A model without regressors needs entity, time "
+                "or other effects."
+            )
         self._drop_absorbed = drop_absorbed
         self._singleton_index = None
         self._drop_singletons()
+
+    def _check_regressors(self) -> None:
+        """Nothing is checked here: __init__ checks that a model has effects"""
 
     def _collect_effects(self) -> linearmodels.typing.NumericArray:
         if not self._has_effect:
@@ -1803,7 +1899,10 @@ class PanelOLS(_PanelModelBase):
             Formula to transform into model. Conforms to formulaic formula
             rules with two special variable names, EntityEffects and
             TimeEffects which can be used to specify that the model should
-            contain an entity effect or a time effect, respectively. See
+            contain an entity effect or a time effect, respectively. The
+            formula can have effects and no regressors, for example
+            ``"y ~ EntityEffects"``, which is a model with only entity effects
+            that gives the same results as ``exog`` without columns. See
             Examples.
         data : PanelData or DataFrame
             Data structure that can be coerced into a PanelData.  In most
@@ -1840,6 +1939,11 @@ class PanelOLS(_PanelModelBase):
         >>> panel_data = generate_panel_data()
         >>> mod = PanelOLS.from_formula("y ~ 1 + x1 + EntityEffects", panel_data.data)
         >>> res = mod.fit(cov_type="clustered", cluster_entity=True)
+
+        A model with effects and no regressors
+
+        >>> mod = PanelOLS.from_formula("y ~ EntityEffects", panel_data.data)
+        >>> res = mod.fit()
         """
         parser = PanelFormulaParser(formula, data, context=capture_context(1))
         entity_effect = parser.entity_effect
@@ -1906,19 +2010,19 @@ class PanelOLS(_PanelModelBase):
             cond_mean = lsmr(wd, wx[:, i], atol=1e-8, btol=1e-8)[0]
             cond_mean /= cond
             wx_mean_l.append(cond_mean)
-        wx_mean: linearmodels.typing.data.Float64Array | csc_array
         wy_mean: linearmodels.typing.data.Float64Array | csc_array
-        wx_mean = np.column_stack(wx_mean_l)
         wy_mean = lsmr(wd, wy, atol=1e-8, btol=1e-8)[0]
         wy_mean /= cond
         wy_mean = wy_mean[:, None]
 
-        wx_mean = csc_array(wx_mean)
         wy_mean = csc_array(wy_mean)
 
         # Purge fitted, weighted values
         sp_cond = diags_array(cond, format="csc")
-        wx = wx - (wd @ sp_cond @ wx_mean).toarray()
+        if wx_mean_l:
+            # There is nothing to purge if there are no regressors
+            wx_mean = csc_array(np.column_stack(wx_mean_l))
+            wx = wx - (wd @ sp_cond @ wx_mean).toarray()
         wy = wy - (wd @ sp_cond @ wy_mean).toarray()
 
         if self.has_constant:
@@ -2361,7 +2465,8 @@ class PanelOLS(_PanelModelBase):
                 neffects += oe[c].nunique() - drop_first
                 drop_first = True
 
-        if self.entity_effects or self.time_effects or self.other_effects:
+        has_effects = self.entity_effects or self.time_effects or self.other_effects
+        if has_effects and x.shape[1] > 0:
             # The regressors before the effects were removed set the scale of each
             # column, so the check does not depend on the units of the variables
             x_orig = np.sqrt(self.weights.values2d) * self.exog.values2d
