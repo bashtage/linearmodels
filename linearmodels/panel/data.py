@@ -837,6 +837,16 @@ class PanelData:
         -------
         PanelData
             Differenced values
+
+        Notes
+        -----
+        An observation is differenced with the observation of the same entity in
+        the preceding time label of the panel, which is the preceding one of the
+        distinct time labels that occur for any entity. If the entity has no
+        observation in the preceding label, there is no difference for the
+        observation. This is the case for the first observation of an entity and
+        for an observation that follows a gap. The differences are never taken
+        across a gap, and so they are all differences between adjacent periods.
         """
         diffs = self.panel.values
         diffs = diffs[:, 1:] - diffs[:, :-1]
