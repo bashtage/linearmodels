@@ -528,12 +528,18 @@ class _PanelModelBase:
         A 1-d array has a value for each row of dependent, in the order of the
         rows, if it has as many values as dependent has rows. It has a value for
         each time period if it has as many values as there are time periods, and
-        a value for each entity if it has as many as there are entities. If
-        dependent is not balanced and has as many rows as time periods or
-        entities, the array has a value for each row. An ``AmbiguityError`` is
-        raised if the numbers of time periods and entities are equal and the
-        array has that many values, unless it has a value for each row. Any
-        other number of values raises a ``ValueError``.
+        a value for each entity if it has as many as there are entities. Weights
+        with labels (a pandas object with an index that is not the default index)
+        are read by their labels, so that a Series indexed by the time periods has
+        a value for each time period, and one indexed by the entities has a value
+        for each entity. Weights without labels (an array, a list, a tuple, or a
+        Series or a DataFrame with one column that has the default index) are read
+        by their number of values. If dependent is not balanced and has as many
+        rows as time periods or entities, they have a value for each row. An
+        ``AmbiguityError`` is raised if the numbers of time periods and entities
+        are equal and the weights have that many values, unless they have no
+        labels and a value for each row. Any other number of values raises a
+        ``ValueError``.
     check_rank : bool
         Flag indicating whether to perform a rank check on the exogenous
         variables to ensure that the model is identified. Skipping this
@@ -1604,12 +1610,18 @@ class PooledOLS(_PanelModelBase):
         A 1-d array has a value for each row of dependent, in the order of the
         rows, if it has as many values as dependent has rows. It has a value for
         each time period if it has as many values as there are time periods, and
-        a value for each entity if it has as many as there are entities. If
-        dependent is not balanced and has as many rows as time periods or
-        entities, the array has a value for each row. An ``AmbiguityError`` is
-        raised if the numbers of time periods and entities are equal and the
-        array has that many values, unless it has a value for each row. Any
-        other number of values raises a ``ValueError``.
+        a value for each entity if it has as many as there are entities. Weights
+        with labels (a pandas object with an index that is not the default index)
+        are read by their labels, so that a Series indexed by the time periods has
+        a value for each time period, and one indexed by the entities has a value
+        for each entity. Weights without labels (an array, a list, a tuple, or a
+        Series or a DataFrame with one column that has the default index) are read
+        by their number of values. If dependent is not balanced and has as many
+        rows as time periods or entities, they have a value for each row. An
+        ``AmbiguityError`` is raised if the numbers of time periods and entities
+        are equal and the weights have that many values, unless they have no
+        labels and a value for each row. Any other number of values raises a
+        ``ValueError``.
     check_rank : bool
         Flag indicating whether to perform a rank check on the exogenous
         variables to ensure that the model is identified. Skipping this
@@ -1641,10 +1653,15 @@ class PooledOLS(_PanelModelBase):
        "could not broadcast input array from shape (30,1) into shape (27,1)", and
        raises "Weights do not have a supported shape" now, which names the numbers
        of values that are accepted. If ``dependent`` is not balanced and has as many
-       rows as time periods or entities, an array with that many values is a value
-       for each row. Earlier versions raised "weights must have the same number of
-       observations as dependent", or an ``AmbiguityError`` if the numbers of time
-       periods and entities were equal.
+       rows as time periods or entities, weights without labels (an array, or a
+       Series with the default index) with that many values are a value for each
+       row, and a Series indexed by the time periods or by the entities is a value
+       for each time period or entity. Earlier versions raised "weights must have
+       the same number of observations as dependent", or an ``AmbiguityError`` if
+       the numbers of time periods and entities were equal. A DataFrame with one
+       column and the default index is read as an array with a column is. It raised
+       an error from pandas or NumPy if ``dependent`` was balanced, and "Weights do
+       not have a supported shape" if it was not.
     """
 
     def __init__(
@@ -2019,12 +2036,18 @@ class PanelOLS(_PanelModelBase):
         A 1-d array has a value for each row of dependent, in the order of the
         rows, if it has as many values as dependent has rows. It has a value for
         each time period if it has as many values as there are time periods, and
-        a value for each entity if it has as many as there are entities. If
-        dependent is not balanced and has as many rows as time periods or
-        entities, the array has a value for each row. An ``AmbiguityError`` is
-        raised if the numbers of time periods and entities are equal and the
-        array has that many values, unless it has a value for each row. Any
-        other number of values raises a ``ValueError``.
+        a value for each entity if it has as many as there are entities. Weights
+        with labels (a pandas object with an index that is not the default index)
+        are read by their labels, so that a Series indexed by the time periods has
+        a value for each time period, and one indexed by the entities has a value
+        for each entity. Weights without labels (an array, a list, a tuple, or a
+        Series or a DataFrame with one column that has the default index) are read
+        by their number of values. If dependent is not balanced and has as many
+        rows as time periods or entities, they have a value for each row. An
+        ``AmbiguityError`` is raised if the numbers of time periods and entities
+        are equal and the weights have that many values, unless they have no
+        labels and a value for each row. Any other number of values raises a
+        ``ValueError``.
     entity_effects : bool
         Flag whether to include entity (fixed) effects in the model
     time_effects : bool
@@ -2103,10 +2126,15 @@ class PanelOLS(_PanelModelBase):
        "could not broadcast input array from shape (30,1) into shape (27,1)", and
        raises "Weights do not have a supported shape" now, which names the numbers
        of values that are accepted. If ``dependent`` is not balanced and has as many
-       rows as time periods or entities, an array with that many values is a value
-       for each row. Earlier versions raised "weights must have the same number of
-       observations as dependent", or an ``AmbiguityError`` if the numbers of time
-       periods and entities were equal.
+       rows as time periods or entities, weights without labels (an array, or a
+       Series with the default index) with that many values are a value for each
+       row, and a Series indexed by the time periods or by the entities is a value
+       for each time period or entity. Earlier versions raised "weights must have
+       the same number of observations as dependent", or an ``AmbiguityError`` if
+       the numbers of time periods and entities were equal. A DataFrame with one
+       column and the default index is read as an array with a column is. It raised
+       an error from pandas or NumPy if ``dependent`` was balanced, and "Weights do
+       not have a supported shape" if it was not.
 
     If both ``entity_effect`` and ``time_effects`` are ``False``, and no other
     effects are included, the model reduces to :class:`PooledOLS`.
@@ -3264,12 +3292,18 @@ class BetweenOLS(_PanelModelBase):
         A 1-d array has a value for each row of dependent, in the order of the
         rows, if it has as many values as dependent has rows. It has a value for
         each time period if it has as many values as there are time periods, and
-        a value for each entity if it has as many as there are entities. If
-        dependent is not balanced and has as many rows as time periods or
-        entities, the array has a value for each row. An ``AmbiguityError`` is
-        raised if the numbers of time periods and entities are equal and the
-        array has that many values, unless it has a value for each row. Any
-        other number of values raises a ``ValueError``.
+        a value for each entity if it has as many as there are entities. Weights
+        with labels (a pandas object with an index that is not the default index)
+        are read by their labels, so that a Series indexed by the time periods has
+        a value for each time period, and one indexed by the entities has a value
+        for each entity. Weights without labels (an array, a list, a tuple, or a
+        Series or a DataFrame with one column that has the default index) are read
+        by their number of values. If dependent is not balanced and has as many
+        rows as time periods or entities, they have a value for each row. An
+        ``AmbiguityError`` is raised if the numbers of time periods and entities
+        are equal and the weights have that many values, unless they have no
+        labels and a value for each row. Any other number of values raises a
+        ``ValueError``.
 
     Notes
     -----
@@ -3297,10 +3331,15 @@ class BetweenOLS(_PanelModelBase):
        "could not broadcast input array from shape (30,1) into shape (27,1)", and
        raises "Weights do not have a supported shape" now, which names the numbers
        of values that are accepted. If ``dependent`` is not balanced and has as many
-       rows as time periods or entities, an array with that many values is a value
-       for each row. Earlier versions raised "weights must have the same number of
-       observations as dependent", or an ``AmbiguityError`` if the numbers of time
-       periods and entities were equal.
+       rows as time periods or entities, weights without labels (an array, or a
+       Series with the default index) with that many values are a value for each
+       row, and a Series indexed by the time periods or by the entities is a value
+       for each time period or entity. Earlier versions raised "weights must have
+       the same number of observations as dependent", or an ``AmbiguityError`` if
+       the numbers of time periods and entities were equal. A DataFrame with one
+       column and the default index is read as an array with a column is. It raised
+       an error from pandas or NumPy if ``dependent`` was balanced, and "Weights do
+       not have a supported shape" if it was not.
     """
 
     def __init__(
@@ -3640,12 +3679,18 @@ class FirstDifferenceOLS(_PanelModelBase):
         A 1-d array has a value for each row of dependent, in the order of the
         rows, if it has as many values as dependent has rows. It has a value for
         each time period if it has as many values as there are time periods, and
-        a value for each entity if it has as many as there are entities. If
-        dependent is not balanced and has as many rows as time periods or
-        entities, the array has a value for each row. An ``AmbiguityError`` is
-        raised if the numbers of time periods and entities are equal and the
-        array has that many values, unless it has a value for each row. Any
-        other number of values raises a ``ValueError``.
+        a value for each entity if it has as many as there are entities. Weights
+        with labels (a pandas object with an index that is not the default index)
+        are read by their labels, so that a Series indexed by the time periods has
+        a value for each time period, and one indexed by the entities has a value
+        for each entity. Weights without labels (an array, a list, a tuple, or a
+        Series or a DataFrame with one column that has the default index) are read
+        by their number of values. If dependent is not balanced and has as many
+        rows as time periods or entities, they have a value for each row. An
+        ``AmbiguityError`` is raised if the numbers of time periods and entities
+        are equal and the weights have that many values, unless they have no
+        labels and a value for each row. Any other number of values raises a
+        ``ValueError``.
 
     Notes
     -----
@@ -3694,10 +3739,15 @@ class FirstDifferenceOLS(_PanelModelBase):
        "could not broadcast input array from shape (30,1) into shape (27,1)", and
        raises "Weights do not have a supported shape" now, which names the numbers
        of values that are accepted. If ``dependent`` is not balanced and has as many
-       rows as time periods or entities, an array with that many values is a value
-       for each row. Earlier versions raised "weights must have the same number of
-       observations as dependent", or an ``AmbiguityError`` if the numbers of time
-       periods and entities were equal.
+       rows as time periods or entities, weights without labels (an array, or a
+       Series with the default index) with that many values are a value for each
+       row, and a Series indexed by the time periods or by the entities is a value
+       for each time period or entity. Earlier versions raised "weights must have
+       the same number of observations as dependent", or an ``AmbiguityError`` if
+       the numbers of time periods and entities were equal. A DataFrame with one
+       column and the default index is read as an array with a column is. It raised
+       an error from pandas or NumPy if ``dependent`` was balanced, and "Weights do
+       not have a supported shape" if it was not.
     """
 
     def __init__(
@@ -4105,12 +4155,18 @@ class RandomEffects(_PanelModelBase):
         A 1-d array has a value for each row of dependent, in the order of the
         rows, if it has as many values as dependent has rows. It has a value for
         each time period if it has as many values as there are time periods, and
-        a value for each entity if it has as many as there are entities. If
-        dependent is not balanced and has as many rows as time periods or
-        entities, the array has a value for each row. An ``AmbiguityError`` is
-        raised if the numbers of time periods and entities are equal and the
-        array has that many values, unless it has a value for each row. Any
-        other number of values raises a ``ValueError``.
+        a value for each entity if it has as many as there are entities. Weights
+        with labels (a pandas object with an index that is not the default index)
+        are read by their labels, so that a Series indexed by the time periods has
+        a value for each time period, and one indexed by the entities has a value
+        for each entity. Weights without labels (an array, a list, a tuple, or a
+        Series or a DataFrame with one column that has the default index) are read
+        by their number of values. If dependent is not balanced and has as many
+        rows as time periods or entities, they have a value for each row. An
+        ``AmbiguityError`` is raised if the numbers of time periods and entities
+        are equal and the weights have that many values, unless they have no
+        labels and a value for each row. Any other number of values raises a
+        ``ValueError``.
 
     Notes
     -----
@@ -4139,10 +4195,15 @@ class RandomEffects(_PanelModelBase):
        "could not broadcast input array from shape (30,1) into shape (27,1)", and
        raises "Weights do not have a supported shape" now, which names the numbers
        of values that are accepted. If ``dependent`` is not balanced and has as many
-       rows as time periods or entities, an array with that many values is a value
-       for each row. Earlier versions raised "weights must have the same number of
-       observations as dependent", or an ``AmbiguityError`` if the numbers of time
-       periods and entities were equal.
+       rows as time periods or entities, weights without labels (an array, or a
+       Series with the default index) with that many values are a value for each
+       row, and a Series indexed by the time periods or by the entities is a value
+       for each time period or entity. Earlier versions raised "weights must have
+       the same number of observations as dependent", or an ``AmbiguityError`` if
+       the numbers of time periods and entities were equal. A DataFrame with one
+       column and the default index is read as an array with a column is. It raised
+       an error from pandas or NumPy if ``dependent`` was balanced, and "Weights do
+       not have a supported shape" if it was not.
     """
 
     def __init__(
@@ -4573,12 +4634,18 @@ class FamaMacBeth(_PanelModelBase):
         A 1-d array has a value for each row of dependent, in the order of the
         rows, if it has as many values as dependent has rows. It has a value for
         each time period if it has as many values as there are time periods, and
-        a value for each entity if it has as many as there are entities. If
-        dependent is not balanced and has as many rows as time periods or
-        entities, the array has a value for each row. An ``AmbiguityError`` is
-        raised if the numbers of time periods and entities are equal and the
-        array has that many values, unless it has a value for each row. Any
-        other number of values raises a ``ValueError``.
+        a value for each entity if it has as many as there are entities. Weights
+        with labels (a pandas object with an index that is not the default index)
+        are read by their labels, so that a Series indexed by the time periods has
+        a value for each time period, and one indexed by the entities has a value
+        for each entity. Weights without labels (an array, a list, a tuple, or a
+        Series or a DataFrame with one column that has the default index) are read
+        by their number of values. If dependent is not balanced and has as many
+        rows as time periods or entities, they have a value for each row. An
+        ``AmbiguityError`` is raised if the numbers of time periods and entities
+        are equal and the weights have that many values, unless they have no
+        labels and a value for each row. Any other number of values raises a
+        ``ValueError``.
 
     Notes
     -----
@@ -4650,10 +4717,15 @@ class FamaMacBeth(_PanelModelBase):
        "could not broadcast input array from shape (30,1) into shape (27,1)", and
        raises "Weights do not have a supported shape" now, which names the numbers
        of values that are accepted. If ``dependent`` is not balanced and has as many
-       rows as time periods or entities, an array with that many values is a value
-       for each row. Earlier versions raised "weights must have the same number of
-       observations as dependent", or an ``AmbiguityError`` if the numbers of time
-       periods and entities were equal.
+       rows as time periods or entities, weights without labels (an array, or a
+       Series with the default index) with that many values are a value for each
+       row, and a Series indexed by the time periods or by the entities is a value
+       for each time period or entity. Earlier versions raised "weights must have
+       the same number of observations as dependent", or an ``AmbiguityError`` if
+       the numbers of time periods and entities were equal. A DataFrame with one
+       column and the default index is read as an array with a column is. It raised
+       an error from pandas or NumPy if ``dependent`` was balanced, and "Weights do
+       not have a supported shape" if it was not.
 
     References
     ----------

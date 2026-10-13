@@ -292,7 +292,9 @@ balanced and less if it is not.
   ``nobs`` rows and ``nentity`` columns.
 
 The number of values of a 1-d array decides how it is read, whether or not
-``dependent`` is balanced.
+``dependent`` is balanced. A list, a tuple, a Series that has the default index and a
+DataFrame with one column and the default index have no labels, and are read in the
+same way as an array.
 
 * An array with ``nrows`` values is a weight for each observation. Its values are
   paired with the rows of ``dependent`` by position, in the order of the rows,
@@ -313,6 +315,16 @@ The number of values of a 1-d array decides how it is read, whether or not
   only if ``dependent`` is balanced. If it is not, use a 2-d array to give a weight to
   each combination of a time period and an entity.
 
+Weights with labels, a pandas object with an index that is not the default index, are
+read by their labels instead. A Series with the MultiIndex of ``dependent`` is a weight
+for each observation. A Series that is indexed by the time periods is a weight for each
+time period, and a Series that is indexed by the entities is a weight for each entity,
+also if ``dependent`` is not balanced and has as many rows as time periods or entities,
+where the same values in an array are a weight for each observation. The time periods
+and entities must be in the order that is described below. The labels do not resolve the
+ambiguity of equal numbers of time periods and entities, and the ``AmbiguityError`` is
+raised for them.
+
 For example, the weights of a panel that is not balanced, whose rows are in any order,
 can be given as a column of the data that has a value for each row
 
@@ -328,9 +340,14 @@ can be given as a column of the data that has a value for each row
    although the same weights as a Series with the index of ``dependent`` worked, and
    an array with ``nobs * nentity`` values raised an error from pandas or NumPy. If
    ``dependent`` is not balanced and has as many rows as time periods or entities,
-   an array with that many values is a weight for each observation. Earlier versions
-   raised "weights must have the same number of observations as dependent" for it, or
-   an ``AmbiguityError`` if the numbers of time periods and entities were equal.
+   weights without labels with that many values are a weight for each observation, and
+   a Series indexed by the time periods or by the entities is a weight for each time
+   period or entity. Earlier versions raised "weights must have the same number of
+   observations as dependent" for them, or an ``AmbiguityError`` if the numbers of time
+   periods and entities were equal. A DataFrame with one column and the default index is
+   read as an array with a column is. It raised an error from pandas or NumPy if
+   ``dependent`` was balanced, and "Weights do not have a supported shape" if it was
+   not.
 
 Weights that are defined for each time period, for each entity or for each
 combination of the two are matched to the time periods and entities in the
