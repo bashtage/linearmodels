@@ -23,7 +23,7 @@
     
   
       
-        <title>linearmodels.asset_pricing.model.LinearFactorModel - linearmodels v7.1 (+375)</title>
+        <title>linearmodels.asset_pricing.model.LinearFactorModel - linearmodels v7.1 (+391)</title>
       
     
 
@@ -100,7 +100,7 @@
 
 <header class="md-header md-header--shadow" data-md-component="header">
   <nav class="md-header__inner md-grid" aria-label="Header">
-    <a href="../../index.html" title="linearmodels v7.1 (+375)" class="md-header__button md-logo" aria-label="linearmodels v7.1 (+375)" data-md-component="logo">
+    <a href="../../index.html" title="linearmodels v7.1 (+391)" class="md-header__button md-logo" aria-label="linearmodels v7.1 (+391)" data-md-component="logo">
       <img src="../../_static/bw-logo.svg" alt="logo">
     </a>
     <label class="md-header__button md-icon" for="__drawer">
@@ -111,7 +111,7 @@
       <div class="md-header__ellipsis">
         <div class="md-header__topic">
           <span class="md-ellipsis">
-            linearmodels v7.1 (+375)
+            linearmodels v7.1 (+391)
           </span>
         </div>
         <div class="md-header__topic" data-md-component="header-topic">
@@ -206,10 +206,10 @@
 
 <nav class="md-nav md-nav--primary" aria-label="Navigation" data-md-level="0">
   <label class="md-nav__title" for="__drawer">
-    <a href="../../index.html" title="linearmodels v7.1 (+375)" class="md-nav__button md-logo" aria-label="linearmodels v7.1 (+375)" data-md-component="logo">
+    <a href="../../index.html" title="linearmodels v7.1 (+391)" class="md-nav__button md-logo" aria-label="linearmodels v7.1 (+391)" data-md-component="logo">
       <img src="../../_static/bw-logo.svg" alt="logo">
     </a>
-    linearmodels v7.1 (+375)
+    linearmodels v7.1 (+391)
   </label>
   
     <div class="md-nav__source">
@@ -1345,7 +1345,72 @@ and is</p>
 <span class="math notranslate nohighlight">\(\lambda_0\)</span> is only included if estimating the risk-free rate. GLS
 is used in the second stage if <code class="docutils literal notranslate"><span class="pre">sigma</span></code> is provided.</p>
 <p>The model is tested using the estimated values
-<span class="math notranslate nohighlight">\(\hat{\alpha}_i=\hat{\eta}_i\)</span>.</p>
+<span class="math notranslate nohighlight">\(\hat{\alpha}_i=\hat{\eta}_i\)</span>, the pricing errors. With <span class="math notranslate nohighlight">\(N\)</span>
+test portfolios, <span class="math notranslate nohighlight">\(K\)</span> factors and <span class="math notranslate nohighlight">\(n_{rf}\)</span> equal to 1 if the
+risk-free rate is estimated and 0 if it is not, the second stage estimates
+make the pricing errors orthogonal to the <span class="math notranslate nohighlight">\(K + n_{rf}\)</span> columns of
+<span class="math notranslate nohighlight">\(\Sigma^{-1}\hat{\beta}_c\)</span>. Here <span class="math notranslate nohighlight">\(\hat{\beta}_c\)</span> contains the
+estimated factor loadings, preceded by a column of ones if the risk-free
+rate is estimated, and <span class="math notranslate nohighlight">\(\Sigma\)</span> is <code class="docutils literal notranslate"><span class="pre">sigma</span></code>, or the identity if it
+is not provided. The pricing errors therefore lie in a space with
+<span class="math notranslate nohighlight">\(N - K - n_{rf}\)</span> dimensions, and the covariance of the pricing errors
+has rank <span class="math notranslate nohighlight">\(N - K - n_{rf}\)</span>.</p>
+<p>The J-statistic is the Wald statistic of the pricing errors in the space
+where they lie,</p>
+<div class="math notranslate nohighlight">
+\[J = (Q^\prime\hat{\alpha})^\prime (Q^\prime \hat{V} Q)^{-1}
+    (Q^\prime\hat{\alpha})\]</div>
+<p>where <span class="math notranslate nohighlight">\(\hat{V}\)</span> is the estimated covariance of the pricing errors and
+<span class="math notranslate nohighlight">\(Q\)</span> is an <span class="math notranslate nohighlight">\(N\)</span> by <span class="math notranslate nohighlight">\(N - K - n_{rf}\)</span> matrix whose orthonormal
+columns span the space that is orthogonal to the columns of
+<span class="math notranslate nohighlight">\(\Sigma^{-1}\hat{\beta}_c\)</span>. The <span class="math notranslate nohighlight">\(N - K - n_{rf}\)</span> elements of
+<span class="math notranslate nohighlight">\(Q^\prime\hat{\alpha}\)</span> are the coordinates of the pricing errors in
+that space, and <span class="math notranslate nohighlight">\(Q^\prime \hat{V} Q\)</span> is their estimated covariance.
+The statistic tests the null that all of the pricing errors are zero, and
+has an asymptotic <span class="math notranslate nohighlight">\(\chi^2_{N-K-n_{rf}}\)</span> distribution. It can also be
+written <span class="math notranslate nohighlight">\(\hat{\alpha}^\prime \hat{V}^{+} \hat{\alpha}\)</span> for
+<span class="math notranslate nohighlight">\(\hat{V}^{+}=Q(Q^\prime \hat{V} Q)^{-1}Q^\prime\)</span>, which has rank
+<span class="math notranslate nohighlight">\(N - K - n_{rf}\)</span>. If <span class="math notranslate nohighlight">\(\hat{V}\)</span> were exactly singular in the
+directions of the columns of <span class="math notranslate nohighlight">\(\Sigma^{-1}\hat{\beta}_c\)</span>, as the
+covariance of the pricing errors is in theory, <span class="math notranslate nohighlight">\(\hat{V}^{+}\)</span> would be
+its Moore-Penrose pseudo-inverse.</p>
+<p>In a sample, <span class="math notranslate nohighlight">\(\hat{V}\)</span> is not exactly singular. The Moore-Penrose
+pseudo-inverse of <span class="math notranslate nohighlight">\(\hat{V}\)</span> would either invert the directions that
+are null in theory, which makes the statistic too large, or need a
+tolerance that decides which eigenvalues are treated as zero. The
+J-statistic instead projects the pricing errors on the space where they lie
+and uses the rank that the model implies, <span class="math notranslate nohighlight">\(N - K - n_{rf}\)</span>, so that no
+tolerance decides which eigenvalues are treated as zero.</p>
+<p>The statistic depends on the space and not on the basis of the space: any
+other orthonormal basis, <span class="math notranslate nohighlight">\(QR\)</span> for an orthogonal matrix <span class="math notranslate nohighlight">\(R\)</span>,
+gives the same value. It therefore does not depend on the order of the test
+portfolios. Reordering the columns of <code class="docutils literal notranslate"><span class="pre">portfolios</span></code>, and the rows and
+columns of <code class="docutils literal notranslate"><span class="pre">sigma</span></code> in the same way, reorders <span class="math notranslate nohighlight">\(\hat{\alpha}\)</span>,
+<span class="math notranslate nohighlight">\(\hat{V}\)</span> and the rows of <span class="math notranslate nohighlight">\(\Sigma^{-1}\hat{\beta}_c\)</span> in the
+same way and does not change the statistic. It also does not depend on the
+order of the observations if <code class="docutils literal notranslate"><span class="pre">cov_type</span></code> is <code class="docutils literal notranslate"><span class="pre">&quot;robust&quot;</span></code>, but the kernel
+covariance estimators use the order of the observations.</p>
+<p>If <span class="math notranslate nohighlight">\(Q^\prime \hat{V} Q\)</span> is numerically singular, which can occur when
+there are few observations, the J-statistic is an <code class="docutils literal notranslate"><span class="pre">InvalidTestStatistic</span></code>.
+If the number of test portfolios is the number of risk premia,
+<span class="math notranslate nohighlight">\(N = K + n_{rf}\)</span>, the pricing errors are zero and the statistic is 0
+with 0 degrees of freedom.</p>
+<div class="admonition versionchanged">
+<p class="admonition-title"><span class="versionmodified changed">Changed in version 7.1: </span>The J-statistic used the Moore-Penrose pseudo-inverse of
+<span class="math notranslate nohighlight">\(\hat{V}\)</span> with its default tolerance, which also inverts the
+directions in which the covariance is null in theory. Its eigenvalues
+are small but not zero in a sample. The statistic was therefore too
+large: by 4% in the median and by up to 30% in 200 simulated samples of
+a correct model with 250 observations, 25 portfolios and 3 factors,
+where the 5% test rejected 12.5% of the samples (10.0% now; with 1,000
+observations 7.5% and 5.5%). The covariance can be far from singular in
+those directions when there are few portfolios: the J-statistic of the
+five portfolios and three factors of the Fama-French example in the
+documentation is 41.6 and was 100.6. If the risk-free rate was
+estimated, an eigenvalue that is numerically zero was inverted as well,
+and the statistic changed in the third digit when the observations were
+only reordered.</p>
+</div>
 <p>Rows are paired by position, so that the first row of <code class="docutils literal notranslate"><span class="pre">factors</span></code> is the
 factor return in the period of the first row of <code class="docutils literal notranslate"><span class="pre">portfolios</span></code>. If both
 <code class="docutils literal notranslate"><span class="pre">portfolios</span></code> and <code class="docutils literal notranslate"><span class="pre">factors</span></code> carry labels (a pandas Series or DataFrame

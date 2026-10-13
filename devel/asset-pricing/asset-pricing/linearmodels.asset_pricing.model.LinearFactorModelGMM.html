@@ -23,7 +23,7 @@
     
   
       
-        <title>linearmodels.asset_pricing.model.LinearFactorModelGMM - linearmodels v7.1 (+375)</title>
+        <title>linearmodels.asset_pricing.model.LinearFactorModelGMM - linearmodels v7.1 (+391)</title>
       
     
 
@@ -100,7 +100,7 @@
 
 <header class="md-header md-header--shadow" data-md-component="header">
   <nav class="md-header__inner md-grid" aria-label="Header">
-    <a href="../../index.html" title="linearmodels v7.1 (+375)" class="md-header__button md-logo" aria-label="linearmodels v7.1 (+375)" data-md-component="logo">
+    <a href="../../index.html" title="linearmodels v7.1 (+391)" class="md-header__button md-logo" aria-label="linearmodels v7.1 (+391)" data-md-component="logo">
       <img src="../../_static/bw-logo.svg" alt="logo">
     </a>
     <label class="md-header__button md-icon" for="__drawer">
@@ -111,7 +111,7 @@
       <div class="md-header__ellipsis">
         <div class="md-header__topic">
           <span class="md-ellipsis">
-            linearmodels v7.1 (+375)
+            linearmodels v7.1 (+391)
           </span>
         </div>
         <div class="md-header__topic" data-md-component="header-topic">
@@ -206,10 +206,10 @@
 
 <nav class="md-nav md-nav--primary" aria-label="Navigation" data-md-level="0">
   <label class="md-nav__title" for="__drawer">
-    <a href="../../index.html" title="linearmodels v7.1 (+375)" class="md-nav__button md-logo" aria-label="linearmodels v7.1 (+375)" data-md-component="logo">
+    <a href="../../index.html" title="linearmodels v7.1 (+391)" class="md-nav__button md-logo" aria-label="linearmodels v7.1 (+391)" data-md-component="logo">
       <img src="../../_static/bw-logo.svg" alt="logo">
     </a>
-    linearmodels v7.1 (+375)
+    linearmodels v7.1 (+391)
   </label>
   
     <div class="md-nav__source">
@@ -1323,6 +1323,34 @@ or returned a J-statistic that was NaN or arbitrary, such as -4.6e35.</p>
 </div>
 <p>The model is tested using the optimized objective function using the
 usual GMM J statistic.</p>
+<p>The alphas are the averages of the moment conditions <span class="math notranslate nohighlight">\(\epsilon_t\)</span>
+that correspond to the intercept, and their standard errors account for the
+estimation of the parameters. If <span class="math notranslate nohighlight">\(S\)</span> is the covariance of the moment
+conditions and <span class="math notranslate nohighlight">\(G\)</span> is the Jacobian of their average, the covariance of
+the average moment conditions at the efficient GMM estimates is</p>
+<div class="math notranslate nohighlight">
+\[\left(S - G (G^\prime S^{-1} G)^{-1} G^\prime\right) / (T - df)\]</div>
+<p>where <span class="math notranslate nohighlight">\(df\)</span> is the number of factors if the covariance is debiased and
+0 if it is not. This is the same <span class="math notranslate nohighlight">\(S\)</span>, <span class="math notranslate nohighlight">\(G\)</span> and scale as the
+covariance of the parameters <span class="math notranslate nohighlight">\((G^\prime S^{-1} G)^{-1} / (T - df)\)</span>,
+which depends on <code class="docutils literal notranslate"><span class="pre">cov_type</span></code> (and <code class="docutils literal notranslate"><span class="pre">kernel</span></code> and <code class="docutils literal notranslate"><span class="pre">bandwidth</span></code> for the
+kernel estimator), <code class="docutils literal notranslate"><span class="pre">center</span></code> and <code class="docutils literal notranslate"><span class="pre">debiased</span></code> of <code class="docutils literal notranslate"><span class="pre">fit</span></code>. The covariance of
+the alphas has rank equal to the number of degrees of freedom of the
+J-statistic. If the model is just identified, the alphas are zero and so is
+their variance.</p>
+<div class="admonition versionchanged">
+<p class="admonition-title"><span class="versionmodified changed">Changed in version 7.1: </span>The standard errors of the alphas were the square roots of the diagonal
+of the covariance of the average moment conditions, <span class="math notranslate nohighlight">\(S / T\)</span>, which
+ignores that the parameters were estimated, and which did not depend on
+<code class="docutils literal notranslate"><span class="pre">cov_type</span></code>, <code class="docutils literal notranslate"><span class="pre">center</span></code> or <code class="docutils literal notranslate"><span class="pre">debiased</span></code>. This overstated the standard
+errors: in a simulation of 60 samples with 400 observations, 6 portfolios
+and 2 factors the mean standard error was 0.00143 to 0.00145 for all six
+alphas, where their sampling standard deviations were 0.00047 to 0.00136.
+The mean standard errors are now 0.00049 to 0.00133 and track them. The
+t-statistics and p-values of the alphas, which are in <code class="docutils literal notranslate"><span class="pre">tstats</span></code> and
+<code class="docutils literal notranslate"><span class="pre">pvalues</span></code>, change with them. The covariance of the parameters, the risk
+premia and the J-statistic do not change.</p>
+</div>
 <p>Rows are paired by position, so that the first row of <code class="docutils literal notranslate"><span class="pre">factors</span></code> is the
 factor return in the period of the first row of <code class="docutils literal notranslate"><span class="pre">portfolios</span></code>. If both
 <code class="docutils literal notranslate"><span class="pre">portfolios</span></code> and <code class="docutils literal notranslate"><span class="pre">factors</span></code> carry labels (a pandas Series or DataFrame

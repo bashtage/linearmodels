@@ -23,7 +23,7 @@
     
   
       
-        <title>Linear Factor Models for Asset Pricing - linearmodels v7.1 (+375)</title>
+        <title>Linear Factor Models for Asset Pricing - linearmodels v7.1 (+391)</title>
       
     
 
@@ -95,7 +95,7 @@
 
 <header class="md-header md-header--shadow" data-md-component="header">
   <nav class="md-header__inner md-grid" aria-label="Header">
-    <a href="../index.html" title="linearmodels v7.1 (+375)" class="md-header__button md-logo" aria-label="linearmodels v7.1 (+375)" data-md-component="logo">
+    <a href="../index.html" title="linearmodels v7.1 (+391)" class="md-header__button md-logo" aria-label="linearmodels v7.1 (+391)" data-md-component="logo">
       <img src="../_static/bw-logo.svg" alt="logo">
     </a>
     <label class="md-header__button md-icon" for="__drawer">
@@ -106,7 +106,7 @@
       <div class="md-header__ellipsis">
         <div class="md-header__topic">
           <span class="md-ellipsis">
-            linearmodels v7.1 (+375)
+            linearmodels v7.1 (+391)
           </span>
         </div>
         <div class="md-header__topic" data-md-component="header-topic">
@@ -201,10 +201,10 @@
 
 <nav class="md-nav md-nav--primary" aria-label="Navigation" data-md-level="0">
   <label class="md-nav__title" for="__drawer">
-    <a href="../index.html" title="linearmodels v7.1 (+375)" class="md-nav__button md-logo" aria-label="linearmodels v7.1 (+375)" data-md-component="logo">
+    <a href="../index.html" title="linearmodels v7.1 (+391)" class="md-nav__button md-logo" aria-label="linearmodels v7.1 (+391)" data-md-component="logo">
       <img src="../_static/bw-logo.svg" alt="logo">
     </a>
-    linearmodels v7.1 (+375)
+    linearmodels v7.1 (+391)
   </label>
   
     <div class="md-nav__source">
@@ -800,8 +800,9 @@ must equal the factor’s risk premium.
 <a class="reference internal" href="asset-pricing/linearmodels.asset_pricing.model.TradedFactorModel.html#linearmodels.asset_pricing.model.TradedFactorModel" title="linearmodels.asset_pricing.model.TradedFactorModel (Python class) — Linear factor models estimator applicable to traded factors"><code class="xref py py-class docutils literal notranslate"><span class="pre">TradedFactorModel</span></code></a> implements this
 model and allows the specification to be testes with a J-statistic of the form</p>
 <div class="math notranslate nohighlight">
-\[J = \hat{\alpha}^{\prime} \hat{\Sigma}_{\alpha} \hat{\alpha} \sim \chi^2_P\]</div>
-<p>where there are P portfolios.</p>
+\[J = \hat{\alpha}^{\prime} \hat{\Sigma}_{\alpha}^{-1} \hat{\alpha} \sim \chi^2_P\]</div>
+<p>where there are P portfolios and <span class="math notranslate nohighlight">\(\hat{\Sigma}_{\alpha}\)</span> is the covariance
+of the estimated pricing errors.</p>
 <p>When some factors are not-traded, for example macroeconomic shocks, then a 2-step
 procedure is required since the average value of the factors does not
 necessarily equal the risk premium associated with the factor. The first step
@@ -811,8 +812,12 @@ that the estimated risk premia attempt to price the cross-section of assets as
 well as possible.  A similar J-statistic can be used to test the model, although it
 has a different distribution,</p>
 <div class="math notranslate nohighlight">
-\[J = \hat{\alpha}^{\prime} \hat{\Sigma}_{\alpha} \hat{\alpha} \sim \chi^2_{P-K}\]</div>
-<p>where K is the number of factors.
+\[J = \hat{\alpha}^{\prime} \hat{\Sigma}_{\alpha}^{+} \hat{\alpha} \sim \chi^2_{P-K-n_{rf}}\]</div>
+<p>where K is the number of factors, <span class="math notranslate nohighlight">\(n_{rf}\)</span> is 1 if the risk-free rate is
+estimated and 0 if it is not, and <span class="math notranslate nohighlight">\(\hat{\Sigma}_{\alpha}^{+}\)</span> is the
+generalized inverse of the covariance of the pricing errors, which has rank
+<span class="math notranslate nohighlight">\(P-K-n_{rf}\)</span> since the pricing errors satisfy <span class="math notranslate nohighlight">\(K+n_{rf}\)</span> linear
+restrictions.
 <a class="reference internal" href="asset-pricing/linearmodels.asset_pricing.model.LinearFactorModel.html#linearmodels.asset_pricing.model.LinearFactorModel" title="linearmodels.asset_pricing.model.LinearFactorModel (Python class) — Linear factor model estimator"><code class="xref py py-class docutils literal notranslate"><span class="pre">LinearFactorModel</span></code></a> implements this
 two-step estimator.
 <a class="reference internal" href="asset-pricing/linearmodels.asset_pricing.model.LinearFactorModelGMM.html#linearmodels.asset_pricing.model.LinearFactorModelGMM" title="linearmodels.asset_pricing.model.LinearFactorModelGMM (Python class) — GMM estimator of Linear factor models"><code class="xref py py-class docutils literal notranslate"><span class="pre">LinearFactorModelGMM</span></code></a> contains a more

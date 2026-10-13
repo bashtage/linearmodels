@@ -19,7 +19,7 @@
     
   
       
-        <title>linearmodels.asset_pricing.results - linearmodels v7.1 (+375)</title>
+        <title>linearmodels.asset_pricing.results - linearmodels v7.1 (+391)</title>
       
     
 
@@ -91,7 +91,7 @@
 
 <header class="md-header md-header--shadow" data-md-component="header">
   <nav class="md-header__inner md-grid" aria-label="Header">
-    <a href="../../../index.html" title="linearmodels v7.1 (+375)" class="md-header__button md-logo" aria-label="linearmodels v7.1 (+375)" data-md-component="logo">
+    <a href="../../../index.html" title="linearmodels v7.1 (+391)" class="md-header__button md-logo" aria-label="linearmodels v7.1 (+391)" data-md-component="logo">
       <img src="../../../_static/bw-logo.svg" alt="logo">
     </a>
     <label class="md-header__button md-icon" for="__drawer">
@@ -102,7 +102,7 @@
       <div class="md-header__ellipsis">
         <div class="md-header__topic">
           <span class="md-ellipsis">
-            linearmodels v7.1 (+375)
+            linearmodels v7.1 (+391)
           </span>
         </div>
         <div class="md-header__topic" data-md-component="header-topic">
@@ -197,10 +197,10 @@
 
 <nav class="md-nav md-nav--primary" aria-label="Navigation" data-md-level="0">
   <label class="md-nav__title" for="__drawer">
-    <a href="../../../index.html" title="linearmodels v7.1 (+375)" class="md-nav__button md-logo" aria-label="linearmodels v7.1 (+375)" data-md-component="logo">
+    <a href="../../../index.html" title="linearmodels v7.1 (+391)" class="md-nav__button md-logo" aria-label="linearmodels v7.1 (+391)" data-md-component="logo">
       <img src="../../../_static/bw-logo.svg" alt="logo">
     </a>
-    linearmodels v7.1 (+375)
+    linearmodels v7.1 (+391)
   </label>
   
     <div class="md-nav__source">
@@ -550,6 +550,38 @@
 <span class="kn">from</span><span class="w"> </span><span class="nn">linearmodels.shared.utility</span><span class="w"> </span><span class="kn">import</span> <span class="n">AttrDict</span>
 <span class="kn">import</span><span class="w"> </span><span class="nn">linearmodels.typing.data</span>
 
+<span class="c1"># Rounding makes the variance of a parameter that is known exactly, such as the alpha</span>
+<span class="c1"># of a model that is just identified, a tiny positive or negative number and not 0. In</span>
+<span class="c1"># simulations of such models the most negative variance was 2e-13 times the largest</span>
+<span class="c1"># variance of the covariance. A variance that is negative by no more than this multiple</span>
+<span class="c1"># of the largest variance is zero up to rounding. A more negative variance is not.</span>
+<span class="n">_VARIANCE_RTOL</span> <span class="o">=</span> <span class="mf">1e-10</span>
+
+
+<span class="k">def</span><span class="w"> </span><span class="nf">_std_errors</span><span class="p">(</span>
+    <span class="n">cov</span><span class="p">:</span> <span class="n">linearmodels</span><span class="o">.</span><span class="n">typing</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">Float64Array</span><span class="p">,</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="n">linearmodels</span><span class="o">.</span><span class="n">typing</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">Float64Array</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">"""</span>
+<span class="sd">    Standard errors, the square roots of the diagonal of a covariance.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    cov : ndarray</span>
+<span class="sd">        Covariance matrix of the parameters.</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    ndarray</span>
+<span class="sd">        The square roots of the diagonal of ``cov``. A variance that is negative</span>
+<span class="sd">        by no more than ``_VARIANCE_RTOL`` times the largest absolute variance</span>
+<span class="sd">        is zero up to rounding, and its standard error is 0. The standard error</span>
+<span class="sd">        of a variance that is more negative is NaN, with a ``RuntimeWarning``.</span>
+<span class="sd">    """</span>
+    <span class="n">variances</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">diag</span><span class="p">(</span><span class="n">cov</span><span class="p">),</span> <span class="n">dtype</span><span class="o">=</span><span class="nb">float</span><span class="p">)</span>
+    <span class="n">tol</span> <span class="o">=</span> <span class="n">_VARIANCE_RTOL</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">max</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">abs</span><span class="p">(</span><span class="n">variances</span><span class="p">))</span>
+    <span class="n">variances</span><span class="p">[(</span><span class="n">variances</span> <span class="o">&lt;</span> <span class="mi">0</span><span class="p">)</span> <span class="o">&amp;</span> <span class="p">(</span><span class="n">variances</span> <span class="o">&gt;=</span> <span class="o">-</span><span class="n">tol</span><span class="p">)]</span> <span class="o">=</span> <span class="mf">0.0</span>
+    <span class="k">return</span> <span class="n">cast</span><span class="p">(</span><span class="s2">"linearmodels.typing.data.Float64Array"</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="n">variances</span><span class="p">))</span>
+
 
 <div class="viewcode-block" id="LinearFactorModelResults">
 <a class="viewcode-back" href="../../../asset-pricing/asset-pricing/linearmodels.asset_pricing.results.LinearFactorModelResults.html#linearmodels.asset_pricing.results.LinearFactorModelResults">[docs]</a>
@@ -652,7 +684,7 @@
 
         <span class="n">rp</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">asarray</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">risk_premia</span><span class="p">)[:,</span> <span class="kc">None</span><span class="p">]</span>
         <span class="n">se</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">asarray</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">risk_premia_se</span><span class="p">)[:,</span> <span class="kc">None</span><span class="p">]</span>
-        <span class="n">tstats</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">asarray</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">risk_premia</span> <span class="o">/</span> <span class="bp">self</span><span class="o">.</span><span class="n">risk_premia_se</span><span class="p">)</span>
+        <span class="n">tstats</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">asarray</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">risk_premia_tstats</span><span class="p">)</span>
         <span class="n">pvalues</span> <span class="o">=</span> <span class="mi">2</span> <span class="o">*</span> <span class="n">stats</span><span class="o">.</span><span class="n">norm</span><span class="o">.</span><span class="n">sf</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">abs</span><span class="p">(</span><span class="n">tstats</span><span class="p">))</span>
         <span class="n">ci</span> <span class="o">=</span> <span class="n">rp</span> <span class="o">+</span> <span class="n">se</span> <span class="o">*</span> <span class="n">stats</span><span class="o">.</span><span class="n">norm</span><span class="o">.</span><span class="n">ppf</span><span class="p">([[</span><span class="mf">0.025</span><span class="p">,</span> <span class="mf">0.975</span><span class="p">]])</span>
         <span class="n">param_data</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">c_</span><span class="p">[</span><span class="n">rp</span><span class="p">,</span> <span class="n">se</span><span class="p">,</span> <span class="n">tstats</span><span class="p">[:,</span> <span class="kc">None</span><span class="p">],</span> <span class="n">pvalues</span><span class="p">[:,</span> <span class="kc">None</span><span class="p">],</span> <span class="n">ci</span><span class="p">]</span>
@@ -690,7 +722,10 @@
         <span class="n">param_names</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">|</span> <span class="nb">tuple</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="o">...</span><span class="p">],</span>
         <span class="n">first</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
     <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">SimpleTable</span><span class="p">:</span>
-        <span class="n">tstats</span> <span class="o">=</span> <span class="n">params</span> <span class="o">/</span> <span class="n">se</span>
+        <span class="c1"># The standard error is 0 when the parameter is known, as for the alphas of a</span>
+        <span class="c1"># model that is just identified, and the t-statistic is not defined</span>
+        <span class="k">with</span> <span class="n">np</span><span class="o">.</span><span class="n">errstate</span><span class="p">(</span><span class="n">divide</span><span class="o">=</span><span class="s2">"ignore"</span><span class="p">,</span> <span class="n">invalid</span><span class="o">=</span><span class="s2">"ignore"</span><span class="p">):</span>
+            <span class="n">tstats</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">where</span><span class="p">(</span><span class="n">se</span> <span class="o">==</span> <span class="mi">0</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">nan</span><span class="p">,</span> <span class="n">params</span> <span class="o">/</span> <span class="n">se</span><span class="p">)</span>
         <span class="n">pvalues</span> <span class="o">=</span> <span class="mi">2</span> <span class="o">*</span> <span class="n">stats</span><span class="o">.</span><span class="n">norm</span><span class="o">.</span><span class="n">sf</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">abs</span><span class="p">(</span><span class="n">tstats</span><span class="p">))</span>
         <span class="n">ci</span> <span class="o">=</span> <span class="n">params</span> <span class="o">+</span> <span class="n">se</span> <span class="o">*</span> <span class="n">stats</span><span class="o">.</span><span class="n">norm</span><span class="o">.</span><span class="n">ppf</span><span class="p">([[</span><span class="mf">0.025</span><span class="p">,</span> <span class="mf">0.975</span><span class="p">]])</span>
         <span class="n">param_data</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">c_</span><span class="p">[</span><span class="n">params</span><span class="p">,</span> <span class="n">se</span><span class="p">,</span> <span class="n">tstats</span><span class="p">,</span> <span class="n">pvalues</span><span class="p">,</span> <span class="n">ci</span><span class="p">]</span>
@@ -775,9 +810,26 @@
 
     <span class="nd">@property</span>
     <span class="k">def</span><span class="w"> </span><span class="nf">std_errors</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">:</span>
-<span class="w">        </span><span class="sd">"""Estimated parameter standard errors"""</span>
-        <span class="n">se</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">diag</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_cov</span><span class="p">))</span>
-        <span class="k">assert</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">se</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">)</span>
+<span class="w">        </span><span class="sd">"""</span>
+<span class="sd">        Estimated parameter standard errors.</span>
+
+<span class="sd">        Notes</span>
+<span class="sd">        -----</span>
+<span class="sd">        These are the square roots of the diagonal of ``cov``. The standard error</span>
+<span class="sd">        of a parameter that is known exactly is 0, for example the alpha of a</span>
+<span class="sd">        model that is just identified, whose variance is zero. Rounding can make</span>
+<span class="sd">        such a variance a tiny negative number, and a variance that is negative</span>
+<span class="sd">        by no more than ``1e-10`` times the largest variance of ``cov`` is</span>
+<span class="sd">        treated as zero. The standard error of a variance that is more negative</span>
+<span class="sd">        is NaN, with a ``RuntimeWarning``.</span>
+
+<span class="sd">        .. versionchanged:: 7.1</span>
+
+<span class="sd">           The standard errors of the alphas of a ``LinearFactorModel`` that is</span>
+<span class="sd">           just identified were NaN, with a ``RuntimeWarning``, if rounding made</span>
+<span class="sd">           their variances negative, which was about -3e-19 in most samples.</span>
+<span class="sd">        """</span>
+        <span class="n">se</span> <span class="o">=</span> <span class="n">_std_errors</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_cov</span><span class="p">)</span>
         <span class="n">nportfolio</span><span class="p">,</span> <span class="n">nfactor</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_params</span><span class="o">.</span><span class="n">shape</span>
         <span class="n">nloadings</span> <span class="o">=</span> <span class="n">nportfolio</span> <span class="o">*</span> <span class="n">nfactor</span>
         <span class="n">se</span> <span class="o">=</span> <span class="n">se</span><span class="p">[:</span><span class="n">nloadings</span><span class="p">]</span>
@@ -788,8 +840,17 @@
 <a class="viewcode-back" href="../../../asset-pricing/asset-pricing/linearmodels.asset_pricing.results.LinearFactorModelResults.tstats.html#linearmodels.asset_pricing.results.LinearFactorModelResults.tstats">[docs]</a>
     <span class="nd">@cached_property</span>
     <span class="k">def</span><span class="w"> </span><span class="nf">tstats</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">:</span>
-<span class="w">        </span><span class="sd">"""Parameter t-statistics"""</span>
-        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">params</span> <span class="o">/</span> <span class="bp">self</span><span class="o">.</span><span class="n">std_errors</span></div>
+<span class="w">        </span><span class="sd">"""</span>
+<span class="sd">        Parameter t-statistics.</span>
+
+<span class="sd">        Notes</span>
+<span class="sd">        -----</span>
+<span class="sd">        The t-statistic of a parameter with a standard error of 0 is NaN, since</span>
+<span class="sd">        the test is not defined. This is the case for the alphas of a model that</span>
+<span class="sd">        is just identified, which are zero by construction.</span>
+<span class="sd">        """</span>
+        <span class="n">se</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">std_errors</span>
+        <span class="k">return</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">params</span> <span class="o">/</span> <span class="n">se</span><span class="p">)</span><span class="o">.</span><span class="n">where</span><span class="p">(</span><span class="n">se</span> <span class="o">!=</span> <span class="mi">0</span><span class="p">)</span></div>
 
 
 <div class="viewcode-block" id="LinearFactorModelResults.pvalues">
@@ -798,6 +859,10 @@
     <span class="k">def</span><span class="w"> </span><span class="nf">pvalues</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">"""</span>
 <span class="sd">        Parameter p-vals. Uses t(df_resid) if ``debiased`` is True, else normal</span>
+
+<span class="sd">        Notes</span>
+<span class="sd">        -----</span>
+<span class="sd">        The p-value is NaN where the t-statistic is NaN.</span>
 <span class="sd">        """</span>
         <span class="n">pvals</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">tstats</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
         <span class="n">pvals</span><span class="o">.</span><span class="n">loc</span><span class="p">[:,</span> <span class="p">:]</span> <span class="o">=</span> <span class="mi">2</span> <span class="o">*</span> <span class="n">stats</span><span class="o">.</span><span class="n">norm</span><span class="o">.</span><span class="n">sf</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">abs</span><span class="p">(</span><span class="n">pvals</span><span class="p">))</span>
@@ -824,13 +889,28 @@
 <span class="sd">        Returns</span>
 <span class="sd">        -------</span>
 <span class="sd">        WaldTestStatistic</span>
-<span class="sd">            Test statistic for null that model prices test portfolios</span>
+<span class="sd">            Test statistic for null that model prices test portfolios. An</span>
+<span class="sd">            ``InvalidTestStatistic`` if the statistic cannot be computed.</span>
 
 <span class="sd">        Notes</span>
 <span class="sd">        -----</span>
-<span class="sd">        Joint test that all estimated :math:`\hat{\alpha}_i` are zero.</span>
-<span class="sd">        Implemented using a Wald test using the estimated parameter</span>
-<span class="sd">        covariance.</span>
+<span class="sd">        Joint test that all estimated :math:`\hat{\alpha}_i` are zero, which</span>
+<span class="sd">        depends on the model.</span>
+
+<span class="sd">        * ``TradedFactorModel``: A Wald test using the estimated covariance of</span>
+<span class="sd">          the :math:`N` alphas. The statistic has a :math:`\chi^2_N` distribution.</span>
+<span class="sd">        * ``LinearFactorModel``: The Wald statistic of the alphas in the</span>
+<span class="sd">          :math:`N - K - n_{rf}` dimensional space where they lie, since they</span>
+<span class="sd">          satisfy :math:`K + n_{rf}` linear restrictions. :math:`K` is the</span>
+<span class="sd">          number of factors and :math:`n_{rf}` is 1 if the risk-free rate is</span>
+<span class="sd">          estimated and 0 otherwise. The statistic has a</span>
+<span class="sd">          :math:`\chi^2_{N-K-n_{rf}}` distribution. No tolerance decides the</span>
+<span class="sd">          rank of the covariance of the alphas, and the statistic does not</span>
+<span class="sd">          depend on the order of the test portfolios. See ``LinearFactorModel``</span>
+<span class="sd">          for details.</span>
+<span class="sd">        * ``LinearFactorModelGMM``: The value of the GMM objective function at</span>
+<span class="sd">          the estimates. The statistic has a :math:`\chi^2_{N-K-n_{rf}}`</span>
+<span class="sd">          distribution.</span>
 <span class="sd">        """</span>
 
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_jstat</span>
@@ -842,14 +922,32 @@
 
     <span class="nd">@property</span>
     <span class="k">def</span><span class="w"> </span><span class="nf">risk_premia_se</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">pd</span><span class="o">.</span><span class="n">Series</span><span class="p">:</span>
-<span class="w">        </span><span class="sd">"""Estimated factor risk premia standard errors"""</span>
-        <span class="n">se</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">diag</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_rp_cov</span><span class="p">))</span>
+<span class="w">        </span><span class="sd">"""</span>
+<span class="sd">        Estimated factor risk premia standard errors.</span>
+
+<span class="sd">        Notes</span>
+<span class="sd">        -----</span>
+<span class="sd">        These are the square roots of the diagonal of the block of ``cov`` for</span>
+<span class="sd">        the risk premia. For ``TradedFactorModel`` the risk premia are the</span>
+<span class="sd">        sample means of the factors. If the covariance is debiased, they use</span>
+<span class="sd">        a divisor of nobs - 1. A variance that is negative by no more than</span>
+<span class="sd">        ``1e-10`` times the largest variance is zero up to rounding, and its</span>
+<span class="sd">        standard error is 0. See ``std_errors``.</span>
+<span class="sd">        """</span>
+        <span class="n">se</span> <span class="o">=</span> <span class="n">_std_errors</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_rp_cov</span><span class="p">)</span>
         <span class="k">return</span> <span class="n">pd</span><span class="o">.</span><span class="n">Series</span><span class="p">(</span><span class="n">se</span><span class="p">,</span> <span class="n">index</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">_rp_names</span><span class="p">)</span>
 
     <span class="nd">@property</span>
     <span class="k">def</span><span class="w"> </span><span class="nf">risk_premia_tstats</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">pd</span><span class="o">.</span><span class="n">Series</span><span class="p">:</span>
-<span class="w">        </span><span class="sd">"""Risk premia t-statistics"""</span>
-        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">risk_premia</span> <span class="o">/</span> <span class="bp">self</span><span class="o">.</span><span class="n">risk_premia_se</span>
+<span class="w">        </span><span class="sd">"""</span>
+<span class="sd">        Risk premia t-statistics.</span>
+
+<span class="sd">        Notes</span>
+<span class="sd">        -----</span>
+<span class="sd">        The t-statistic of a risk premium with a standard error of 0 is NaN.</span>
+<span class="sd">        """</span>
+        <span class="n">se</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">risk_premia_se</span>
+        <span class="k">return</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">risk_premia</span> <span class="o">/</span> <span class="n">se</span><span class="p">)</span><span class="o">.</span><span class="n">where</span><span class="p">(</span><span class="n">se</span> <span class="o">!=</span> <span class="mi">0</span><span class="p">)</span>
 
     <span class="nd">@property</span>
     <span class="k">def</span><span class="w"> </span><span class="nf">rsquared</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">float</span><span class="p">:</span>
@@ -877,9 +975,23 @@
 
     <span class="nd">@property</span>
     <span class="k">def</span><span class="w"> </span><span class="nf">std_errors</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">:</span>
-<span class="w">        </span><span class="sd">"""Estimated parameter standard errors"""</span>
-        <span class="n">se</span> <span class="o">=</span> <span class="n">cast</span><span class="p">(</span><span class="s2">"linearmodels.typing.data.Float64Array"</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">diag</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_cov</span><span class="p">)))</span>
-        <span class="n">ase</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">diag</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_alpha_vcv</span><span class="p">))</span>
+<span class="w">        </span><span class="sa">r</span><span class="sd">"""</span>
+<span class="sd">        Estimated parameter standard errors.</span>
+
+<span class="sd">        Notes</span>
+<span class="sd">        -----</span>
+<span class="sd">        The standard errors of the loadings are the square roots of the diagonal</span>
+<span class="sd">        of ``cov``. The alphas are averages of moment conditions. Their standard</span>
+<span class="sd">        errors are the square roots of the diagonal of the covariance of the</span>
+<span class="sd">        average moment conditions at the estimates,</span>
+<span class="sd">        :math:`(S - G (G^\prime S^{-1} G)^{-1} G^\prime) / (T - df)`, which accounts</span>
+<span class="sd">        for the estimation of the parameters. See ``LinearFactorModelGMM``. A</span>
+<span class="sd">        variance that is negative by no more than ``1e-10`` times the largest</span>
+<span class="sd">        variance is zero up to rounding, and its standard error is 0. See</span>
+<span class="sd">        ``LinearFactorModelResults.std_errors``.</span>
+<span class="sd">        """</span>
+        <span class="n">se</span> <span class="o">=</span> <span class="n">_std_errors</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_cov</span><span class="p">)</span>
+        <span class="n">ase</span> <span class="o">=</span> <span class="n">_std_errors</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_alpha_vcv</span><span class="p">)</span>
         <span class="n">nportfolio</span><span class="p">,</span> <span class="n">nfactor</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_params</span><span class="o">.</span><span class="n">shape</span>
         <span class="n">nloadings</span> <span class="o">=</span> <span class="n">nportfolio</span> <span class="o">*</span> <span class="p">(</span><span class="n">nfactor</span> <span class="o">-</span> <span class="mi">1</span><span class="p">)</span>
         <span class="c1"># One row for each portfolio: the alpha, followed by the loadings</span>

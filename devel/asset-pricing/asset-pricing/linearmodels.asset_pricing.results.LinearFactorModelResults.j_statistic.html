@@ -23,7 +23,7 @@
     
   
       
-        <title>linearmodels.asset_pricing.results.LinearFactorModelResults.j_statistic - linearmodels v7.1 (+375)</title>
+        <title>linearmodels.asset_pricing.results.LinearFactorModelResults.j_statistic - linearmodels v7.1 (+391)</title>
       
     
 
@@ -100,7 +100,7 @@
 
 <header class="md-header md-header--shadow" data-md-component="header">
   <nav class="md-header__inner md-grid" aria-label="Header">
-    <a href="../../index.html" title="linearmodels v7.1 (+375)" class="md-header__button md-logo" aria-label="linearmodels v7.1 (+375)" data-md-component="logo">
+    <a href="../../index.html" title="linearmodels v7.1 (+391)" class="md-header__button md-logo" aria-label="linearmodels v7.1 (+391)" data-md-component="logo">
       <img src="../../_static/bw-logo.svg" alt="logo">
     </a>
     <label class="md-header__button md-icon" for="__drawer">
@@ -111,7 +111,7 @@
       <div class="md-header__ellipsis">
         <div class="md-header__topic">
           <span class="md-ellipsis">
-            linearmodels v7.1 (+375)
+            linearmodels v7.1 (+391)
           </span>
         </div>
         <div class="md-header__topic" data-md-component="header-topic">
@@ -206,10 +206,10 @@
 
 <nav class="md-nav md-nav--primary" aria-label="Navigation" data-md-level="0">
   <label class="md-nav__title" for="__drawer">
-    <a href="../../index.html" title="linearmodels v7.1 (+375)" class="md-nav__button md-logo" aria-label="linearmodels v7.1 (+375)" data-md-component="logo">
+    <a href="../../index.html" title="linearmodels v7.1 (+391)" class="md-nav__button md-logo" aria-label="linearmodels v7.1 (+391)" data-md-component="logo">
       <img src="../../_static/bw-logo.svg" alt="logo">
     </a>
-    linearmodels v7.1 (+375)
+    linearmodels v7.1 (+391)
   </label>
   
     <div class="md-nav__source">
@@ -1539,16 +1539,32 @@
 <dd><p>Model J statistic</p>
 <dl class="field-list simple">
 <dt class="field-odd" id="linearmodels.asset_pricing.results.LinearFactorModelResults.j_statistic-returns">Returns<span class="colon">:</span><a class="headerlink" href="#linearmodels.asset_pricing.results.LinearFactorModelResults.j_statistic-returns" title="Permalink to this headline">¶</a></dt>
-<dd class="field-odd"><p>Test statistic for null that model prices test portfolios</p>
+<dd class="field-odd"><p>Test statistic for null that model prices test portfolios. An
+<code class="docutils literal notranslate"><span class="pre">InvalidTestStatistic</span></code> if the statistic cannot be computed.</p>
 </dd>
 <dt class="field-even" id="linearmodels.asset_pricing.results.LinearFactorModelResults.j_statistic-return-type">Return type<span class="colon">:</span><a class="headerlink" href="#linearmodels.asset_pricing.results.LinearFactorModelResults.j_statistic-return-type" title="Permalink to this headline">¶</a></dt>
 <dd class="field-even"><p><a class="reference internal" href="../../utility/linearmodels.shared.hypotheses.WaldTestStatistic.html#linearmodels.shared.hypotheses.WaldTestStatistic" title="linearmodels.shared.hypotheses.WaldTestStatistic (Python class) — Test statistic holder for Wald-type tests"><code class="xref py py-class docutils literal notranslate"><span class="pre">linearmodels.shared.hypotheses.WaldTestStatistic</span></code></a></p>
 </dd>
 </dl>
 <p class="rubric">Notes</p>
-<p>Joint test that all estimated <span class="math notranslate nohighlight">\(\hat{\alpha}_i\)</span> are zero.
-Implemented using a Wald test using the estimated parameter
-covariance.</p>
+<p>Joint test that all estimated <span class="math notranslate nohighlight">\(\hat{\alpha}_i\)</span> are zero, which
+depends on the model.</p>
+<ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">TradedFactorModel</span></code>: A Wald test using the estimated covariance of
+the <span class="math notranslate nohighlight">\(N\)</span> alphas. The statistic has a <span class="math notranslate nohighlight">\(\chi^2_N\)</span> distribution.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">LinearFactorModel</span></code>: The Wald statistic of the alphas in the
+<span class="math notranslate nohighlight">\(N - K - n_{rf}\)</span> dimensional space where they lie, since they
+satisfy <span class="math notranslate nohighlight">\(K + n_{rf}\)</span> linear restrictions. <span class="math notranslate nohighlight">\(K\)</span> is the
+number of factors and <span class="math notranslate nohighlight">\(n_{rf}\)</span> is 1 if the risk-free rate is
+estimated and 0 otherwise. The statistic has a
+<span class="math notranslate nohighlight">\(\chi^2_{N-K-n_{rf}}\)</span> distribution. No tolerance decides the
+rank of the covariance of the alphas, and the statistic does not
+depend on the order of the test portfolios. See <code class="docutils literal notranslate"><span class="pre">LinearFactorModel</span></code>
+for details.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">LinearFactorModelGMM</span></code>: The value of the GMM objective function at
+the estimates. The statistic has a <span class="math notranslate nohighlight">\(\chi^2_{N-K-n_{rf}}\)</span>
+distribution.</p></li>
+</ul>
 </dd></dl>
 
 

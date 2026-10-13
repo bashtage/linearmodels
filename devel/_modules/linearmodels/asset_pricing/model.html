@@ -19,7 +19,7 @@
     
   
       
-        <title>linearmodels.asset_pricing.model - linearmodels v7.1 (+375)</title>
+        <title>linearmodels.asset_pricing.model - linearmodels v7.1 (+391)</title>
       
     
 
@@ -91,7 +91,7 @@
 
 <header class="md-header md-header--shadow" data-md-component="header">
   <nav class="md-header__inner md-grid" aria-label="Header">
-    <a href="../../../index.html" title="linearmodels v7.1 (+375)" class="md-header__button md-logo" aria-label="linearmodels v7.1 (+375)" data-md-component="logo">
+    <a href="../../../index.html" title="linearmodels v7.1 (+391)" class="md-header__button md-logo" aria-label="linearmodels v7.1 (+391)" data-md-component="logo">
       <img src="../../../_static/bw-logo.svg" alt="logo">
     </a>
     <label class="md-header__button md-icon" for="__drawer">
@@ -102,7 +102,7 @@
       <div class="md-header__ellipsis">
         <div class="md-header__topic">
           <span class="md-ellipsis">
-            linearmodels v7.1 (+375)
+            linearmodels v7.1 (+391)
           </span>
         </div>
         <div class="md-header__topic" data-md-component="header-topic">
@@ -197,10 +197,10 @@
 
 <nav class="md-nav md-nav--primary" aria-label="Navigation" data-md-level="0">
   <label class="md-nav__title" for="__drawer">
-    <a href="../../../index.html" title="linearmodels v7.1 (+375)" class="md-nav__button md-logo" aria-label="linearmodels v7.1 (+375)" data-md-component="logo">
+    <a href="../../../index.html" title="linearmodels v7.1 (+391)" class="md-nav__button md-logo" aria-label="linearmodels v7.1 (+391)" data-md-component="logo">
       <img src="../../../_static/bw-logo.svg" alt="logo">
     </a>
-    linearmodels v7.1 (+375)
+    linearmodels v7.1 (+391)
   </label>
   
     <div class="md-nav__source">
@@ -555,6 +555,7 @@
     <span class="n">LinearFactorModelResults</span><span class="p">,</span>
 <span class="p">)</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">linearmodels.iv.data</span><span class="w"> </span><span class="kn">import</span> <span class="n">IVData</span><span class="p">,</span> <span class="n">IVDataLike</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">linearmodels.shared</span><span class="w"> </span><span class="kn">import</span> <span class="n">hypotheses</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">linearmodels.shared.alignment</span><span class="w"> </span><span class="kn">import</span> <span class="n">check_alignment</span><span class="p">,</span> <span class="n">row_labels</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">linearmodels.shared.exceptions</span><span class="w"> </span><span class="kn">import</span> <span class="n">missing_warning</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">linearmodels.shared.hypotheses</span><span class="w"> </span><span class="kn">import</span> <span class="n">WaldTestStatistic</span>
@@ -596,6 +597,65 @@
         <span class="n">d</span><span class="p">[</span><span class="s2">"iter"</span><span class="p">]</span> <span class="o">+=</span> <span class="mi">1</span>
 
     <span class="k">return</span> <span class="n">callback</span>
+
+
+<span class="k">def</span><span class="w"> </span><span class="nf">_j_statistic</span><span class="p">(</span>
+    <span class="n">alphas</span><span class="p">:</span> <span class="n">linearmodels</span><span class="o">.</span><span class="n">typing</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">Float64Array</span><span class="p">,</span>
+    <span class="n">alpha_vcv</span><span class="p">:</span> <span class="n">linearmodels</span><span class="o">.</span><span class="n">typing</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">Float64Array</span><span class="p">,</span>
+    <span class="n">restrictions</span><span class="p">:</span> <span class="n">linearmodels</span><span class="o">.</span><span class="n">typing</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">Float64Array</span><span class="p">,</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="n">WaldTestStatistic</span><span class="p">:</span>
+<span class="w">    </span><span class="sa">r</span><span class="sd">"""</span>
+<span class="sd">    J statistic of the pricing errors of a two-pass estimator.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    alphas : ndarray</span>
+<span class="sd">        The pricing errors (nportfolio by 1), which satisfy</span>
+<span class="sd">        ``restrictions.T @ alphas = 0``.</span>
+<span class="sd">    alpha_vcv : ndarray</span>
+<span class="sd">        The estimated covariance of the pricing errors (nportfolio by nportfolio).</span>
+<span class="sd">    restrictions : ndarray</span>
+<span class="sd">        The nportfolio by nrestriction matrix of the restrictions that the pricing</span>
+<span class="sd">        errors satisfy, which has full column rank.</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    WaldTestStatistic</span>
+<span class="sd">        The statistic :math:`\hat{\alpha}^{\prime}\hat{V}^{+}\hat{\alpha}`, where</span>
+<span class="sd">        :math:`\hat{V}^{+}=Q(Q^{\prime}\hat{V}Q)^{-1}Q^{\prime}` is the generalized</span>
+<span class="sd">        inverse of :math:`\hat{V}` with rank nportfolio less nrestriction, and the</span>
+<span class="sd">        columns of :math:`Q` are an orthonormal basis of the space that is</span>
+<span class="sd">        orthogonal to the columns of ``restrictions``. An ``InvalidTestStatistic``</span>
+<span class="sd">        if :math:`Q^{\prime}\hat{V}Q` is singular.</span>
+
+<span class="sd">    Notes</span>
+<span class="sd">    -----</span>
+<span class="sd">    The statistic depends on the space that is orthogonal to the columns of</span>
+<span class="sd">    ``restrictions`` and not on the basis :math:`Q` of the space, so that it does</span>
+<span class="sd">    not depend on the order of the portfolios. No tolerance decides the rank of</span>
+<span class="sd">    :math:`\hat{V}`, which is the dimension of that space.</span>
+<span class="sd">    """</span>
+    <span class="n">name</span> <span class="o">=</span> <span class="s2">"J-statistic"</span>
+    <span class="n">null</span> <span class="o">=</span> <span class="s2">"All alphas are 0"</span>
+    <span class="n">nportfolio</span><span class="p">,</span> <span class="n">nrestriction</span> <span class="o">=</span> <span class="n">restrictions</span><span class="o">.</span><span class="n">shape</span>
+    <span class="n">df</span> <span class="o">=</span> <span class="n">nportfolio</span> <span class="o">-</span> <span class="n">nrestriction</span>
+    <span class="k">if</span> <span class="n">df</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+        <span class="k">return</span> <span class="n">WaldTestStatistic</span><span class="p">(</span><span class="mf">0.0</span><span class="p">,</span> <span class="n">null</span><span class="p">,</span> <span class="n">df</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="n">name</span><span class="p">)</span>
+    <span class="c1"># The pricing errors are in the span of the last df columns of u</span>
+    <span class="n">q</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">linalg</span><span class="o">.</span><span class="n">svd</span><span class="p">(</span><span class="n">restrictions</span><span class="p">)[</span><span class="mi">0</span><span class="p">][:,</span> <span class="n">nrestriction</span><span class="p">:]</span>
+    <span class="n">vcv</span> <span class="o">=</span> <span class="n">q</span><span class="o">.</span><span class="n">T</span> <span class="o">@</span> <span class="n">alpha_vcv</span> <span class="o">@</span> <span class="n">q</span>
+    <span class="n">vals</span><span class="p">,</span> <span class="n">vecs</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">linalg</span><span class="o">.</span><span class="n">eigh</span><span class="p">((</span><span class="n">vcv</span> <span class="o">+</span> <span class="n">vcv</span><span class="o">.</span><span class="n">T</span><span class="p">)</span> <span class="o">/</span> <span class="mi">2</span><span class="p">)</span>
+    <span class="k">if</span> <span class="ow">not</span> <span class="n">vals</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">&gt;</span> <span class="n">df</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">finfo</span><span class="p">(</span><span class="nb">float</span><span class="p">)</span><span class="o">.</span><span class="n">eps</span> <span class="o">*</span> <span class="n">vals</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]:</span>
+        <span class="n">reason</span> <span class="o">=</span> <span class="p">(</span>
+            <span class="s2">"The estimated covariance of the pricing errors has a rank smaller "</span>
+            <span class="sa">f</span><span class="s2">"than the </span><span class="si">{</span><span class="n">df</span><span class="si">}</span><span class="s2"> degrees of freedom of the statistic, so that the "</span>
+            <span class="s2">"J-statistic cannot be computed. This occurs when the number of "</span>
+            <span class="s2">"observations is small relative to the number of portfolios."</span>
+        <span class="p">)</span>
+        <span class="k">return</span> <span class="n">hypotheses</span><span class="o">.</span><span class="n">InvalidTestStatistic</span><span class="p">(</span><span class="n">reason</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="n">name</span><span class="p">)</span>
+    <span class="n">coefs</span> <span class="o">=</span> <span class="n">vecs</span><span class="o">.</span><span class="n">T</span> <span class="o">@</span> <span class="p">(</span><span class="n">q</span><span class="o">.</span><span class="n">T</span> <span class="o">@</span> <span class="n">alphas</span><span class="p">)</span>
+    <span class="n">stat</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="n">coefs</span><span class="o">**</span><span class="mi">2</span> <span class="o">/</span> <span class="n">vals</span><span class="p">[:,</span> <span class="kc">None</span><span class="p">]))</span>
+    <span class="k">return</span> <span class="n">WaldTestStatistic</span><span class="p">(</span><span class="n">stat</span><span class="p">,</span> <span class="n">null</span><span class="p">,</span> <span class="n">df</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="n">name</span><span class="p">)</span>
 
 
 <span class="k">class</span><span class="w"> </span><span class="nc">_FactorModelBase</span><span class="p">:</span>
@@ -873,22 +933,23 @@
         <span class="o">**</span><span class="n">cov_config</span><span class="p">:</span> <span class="nb">str</span> <span class="o">|</span> <span class="nb">float</span><span class="p">,</span>
     <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">LinearFactorModelResults</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">"""</span>
-<span class="sd">        Estimate model parameters</span>
+<span class="sd">        Estimate model parameters.</span>
 
 <span class="sd">        Parameters</span>
 <span class="sd">        ----------</span>
-<span class="sd">        cov_type : str</span>
-<span class="sd">            Name of covariance estimator</span>
-<span class="sd">        debiased : bool</span>
+<span class="sd">        cov_type : {"robust", "heteroskedastic", "kernel"}, optional</span>
+<span class="sd">            Name of covariance estimator. The default is ``"robust"``.</span>
+<span class="sd">        debiased : bool, optional</span>
 <span class="sd">            Flag indicating whether to debias the covariance estimator using</span>
-<span class="sd">            a degree of freedom adjustment</span>
-<span class="sd">        cov_config : dict</span>
-<span class="sd">            Additional covariance-specific options.  See Notes.</span>
+<span class="sd">            a degree of freedom adjustment. The default is True. See Notes.</span>
+<span class="sd">        **cov_config</span>
+<span class="sd">            Additional covariance-specific options for the kernel covariance</span>
+<span class="sd">            estimator: ``kernel`` and ``bandwidth``. See Notes.</span>
 
 <span class="sd">        Returns</span>
 <span class="sd">        -------</span>
 <span class="sd">        LinearFactorModelResults</span>
-<span class="sd">            Results class with parameter estimates, covariance and test statistics</span>
+<span class="sd">            Results class with parameter estimates, covariance and test statistics.</span>
 
 <span class="sd">        Notes</span>
 <span class="sd">        -----</span>
@@ -901,6 +962,30 @@
 <span class="sd">        The kernel covariance estimator takes the optional arguments</span>
 <span class="sd">        ``kernel``, one of "bartlett", "parzen" or "qs" (quadratic spectral)</span>
 <span class="sd">        and ``bandwidth`` (a positive integer).</span>
+
+<span class="sd">        If ``debiased`` is True, the covariance of the parameters of the</span>
+<span class="sd">        time-series regressions (the alphas and the loadings) is divided by</span>
+<span class="sd">        nobs - nfactor - 1, the number of observations less the number of</span>
+<span class="sd">        regressors, instead of by nobs. The risk premia are the sample means of</span>
+<span class="sd">        the factors, so that their covariance, which is the block of ``cov`` for</span>
+<span class="sd">        the risk premia and the source of ``risk_premia_se``, is divided by</span>
+<span class="sd">        nobs - 1. The covariance between the two groups of parameters is divided</span>
+<span class="sd">        by the geometric mean of the two scales, so that the covariance matrix</span>
+<span class="sd">        remains positive semi-definite. If ``debiased`` is False, the covariance</span>
+<span class="sd">        is divided by nobs.</span>
+
+<span class="sd">        .. versionchanged:: 7.1</span>
+
+<span class="sd">           The block of ``cov`` for the risk premia was divided by</span>
+<span class="sd">           nobs - nfactor - 1, while ``risk_premia_se`` used nobs - 1. Both use</span>
+<span class="sd">           nobs - 1 now, so that the block of ``cov`` for the risk premia is</span>
+<span class="sd">           smaller by the factor (nobs - nfactor - 1) / (nobs - 1), for example by</span>
+<span class="sd">           5.1% with 60 observations and 3 factors, and equals</span>
+<span class="sd">           ``risk_premia_se`` squared. The covariance between the risk premia</span>
+<span class="sd">           and the other parameters, which used nobs - nfactor - 1, is now smaller</span>
+<span class="sd">           by the square root of the same factor. The covariance of the</span>
+<span class="sd">           alphas and the loadings, ``risk_premia_se`` and the covariance with</span>
+<span class="sd">           ``debiased=False`` do not change.</span>
 <span class="sd">        """</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_check_debiased</span><span class="p">(</span><span class="n">debiased</span><span class="p">)</span>
         <span class="n">p</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">portfolios</span><span class="o">.</span><span class="n">ndarray</span>
@@ -960,6 +1045,13 @@
             <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s2">"Unknown cov_type: </span><span class="si">{</span><span class="n">cov_type</span><span class="si">}</span><span class="s2">"</span><span class="p">)</span>
         <span class="n">full_vcv</span> <span class="o">=</span> <span class="n">cov_est</span><span class="o">.</span><span class="n">cov</span>
         <span class="n">rp_cov</span> <span class="o">=</span> <span class="n">rp_cov_est</span><span class="o">.</span><span class="n">cov</span>
+        <span class="k">if</span> <span class="n">debiased</span><span class="p">:</span>
+            <span class="c1"># The risk premia are sample means, so their covariance uses nobs - 1 and</span>
+            <span class="c1"># not the nobs - (nfactor + 1) of the time-series regressions. The</span>
+            <span class="c1"># covariance between the two uses the geometric mean of the two scales</span>
+            <span class="n">adj</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">ones</span><span class="p">(</span><span class="n">nloading</span> <span class="o">+</span> <span class="n">nfactor</span><span class="p">)</span>
+            <span class="n">adj</span><span class="p">[</span><span class="n">nloading</span><span class="p">:]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">sqrt</span><span class="p">((</span><span class="n">nobs</span> <span class="o">-</span> <span class="n">fc</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">])</span> <span class="o">/</span> <span class="p">(</span><span class="n">nobs</span> <span class="o">-</span> <span class="mi">1</span><span class="p">))</span>
+            <span class="n">full_vcv</span> <span class="o">=</span> <span class="n">full_vcv</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">outer</span><span class="p">(</span><span class="n">adj</span><span class="p">,</span> <span class="n">adj</span><span class="p">)</span>
         <span class="n">vcv</span> <span class="o">=</span> <span class="n">full_vcv</span><span class="p">[:</span><span class="n">nloading</span><span class="p">,</span> <span class="p">:</span><span class="n">nloading</span><span class="p">]</span>
 
         <span class="c1"># Rearrange VCV</span>
@@ -1149,7 +1241,80 @@
 <span class="sd">    is used in the second stage if ``sigma`` is provided.</span>
 
 <span class="sd">    The model is tested using the estimated values</span>
-<span class="sd">    :math:`\hat{\alpha}_i=\hat{\eta}_i`.</span>
+<span class="sd">    :math:`\hat{\alpha}_i=\hat{\eta}_i`, the pricing errors. With :math:`N`</span>
+<span class="sd">    test portfolios, :math:`K` factors and :math:`n_{rf}` equal to 1 if the</span>
+<span class="sd">    risk-free rate is estimated and 0 if it is not, the second stage estimates</span>
+<span class="sd">    make the pricing errors orthogonal to the :math:`K + n_{rf}` columns of</span>
+<span class="sd">    :math:`\Sigma^{-1}\hat{\beta}_c`. Here :math:`\hat{\beta}_c` contains the</span>
+<span class="sd">    estimated factor loadings, preceded by a column of ones if the risk-free</span>
+<span class="sd">    rate is estimated, and :math:`\Sigma` is ``sigma``, or the identity if it</span>
+<span class="sd">    is not provided. The pricing errors therefore lie in a space with</span>
+<span class="sd">    :math:`N - K - n_{rf}` dimensions, and the covariance of the pricing errors</span>
+<span class="sd">    has rank :math:`N - K - n_{rf}`.</span>
+
+<span class="sd">    The J-statistic is the Wald statistic of the pricing errors in the space</span>
+<span class="sd">    where they lie,</span>
+
+<span class="sd">    .. math::</span>
+
+<span class="sd">        J = (Q^\prime\hat{\alpha})^\prime (Q^\prime \hat{V} Q)^{-1}</span>
+<span class="sd">            (Q^\prime\hat{\alpha})</span>
+
+<span class="sd">    where :math:`\hat{V}` is the estimated covariance of the pricing errors and</span>
+<span class="sd">    :math:`Q` is an :math:`N` by :math:`N - K - n_{rf}` matrix whose orthonormal</span>
+<span class="sd">    columns span the space that is orthogonal to the columns of</span>
+<span class="sd">    :math:`\Sigma^{-1}\hat{\beta}_c`. The :math:`N - K - n_{rf}` elements of</span>
+<span class="sd">    :math:`Q^\prime\hat{\alpha}` are the coordinates of the pricing errors in</span>
+<span class="sd">    that space, and :math:`Q^\prime \hat{V} Q` is their estimated covariance.</span>
+<span class="sd">    The statistic tests the null that all of the pricing errors are zero, and</span>
+<span class="sd">    has an asymptotic :math:`\chi^2_{N-K-n_{rf}}` distribution. It can also be</span>
+<span class="sd">    written :math:`\hat{\alpha}^\prime \hat{V}^{+} \hat{\alpha}` for</span>
+<span class="sd">    :math:`\hat{V}^{+}=Q(Q^\prime \hat{V} Q)^{-1}Q^\prime`, which has rank</span>
+<span class="sd">    :math:`N - K - n_{rf}`. If :math:`\hat{V}` were exactly singular in the</span>
+<span class="sd">    directions of the columns of :math:`\Sigma^{-1}\hat{\beta}_c`, as the</span>
+<span class="sd">    covariance of the pricing errors is in theory, :math:`\hat{V}^{+}` would be</span>
+<span class="sd">    its Moore-Penrose pseudo-inverse.</span>
+
+<span class="sd">    In a sample, :math:`\hat{V}` is not exactly singular. The Moore-Penrose</span>
+<span class="sd">    pseudo-inverse of :math:`\hat{V}` would either invert the directions that</span>
+<span class="sd">    are null in theory, which makes the statistic too large, or need a</span>
+<span class="sd">    tolerance that decides which eigenvalues are treated as zero. The</span>
+<span class="sd">    J-statistic instead projects the pricing errors on the space where they lie</span>
+<span class="sd">    and uses the rank that the model implies, :math:`N - K - n_{rf}`, so that no</span>
+<span class="sd">    tolerance decides which eigenvalues are treated as zero.</span>
+
+<span class="sd">    The statistic depends on the space and not on the basis of the space: any</span>
+<span class="sd">    other orthonormal basis, :math:`QR` for an orthogonal matrix :math:`R`,</span>
+<span class="sd">    gives the same value. It therefore does not depend on the order of the test</span>
+<span class="sd">    portfolios. Reordering the columns of ``portfolios``, and the rows and</span>
+<span class="sd">    columns of ``sigma`` in the same way, reorders :math:`\hat{\alpha}`,</span>
+<span class="sd">    :math:`\hat{V}` and the rows of :math:`\Sigma^{-1}\hat{\beta}_c` in the</span>
+<span class="sd">    same way and does not change the statistic. It also does not depend on the</span>
+<span class="sd">    order of the observations if ``cov_type`` is ``"robust"``, but the kernel</span>
+<span class="sd">    covariance estimators use the order of the observations.</span>
+
+<span class="sd">    If :math:`Q^\prime \hat{V} Q` is numerically singular, which can occur when</span>
+<span class="sd">    there are few observations, the J-statistic is an ``InvalidTestStatistic``.</span>
+<span class="sd">    If the number of test portfolios is the number of risk premia,</span>
+<span class="sd">    :math:`N = K + n_{rf}`, the pricing errors are zero and the statistic is 0</span>
+<span class="sd">    with 0 degrees of freedom.</span>
+
+<span class="sd">    .. versionchanged:: 7.1</span>
+
+<span class="sd">       The J-statistic used the Moore-Penrose pseudo-inverse of</span>
+<span class="sd">       :math:`\hat{V}` with its default tolerance, which also inverts the</span>
+<span class="sd">       directions in which the covariance is null in theory. Its eigenvalues</span>
+<span class="sd">       are small but not zero in a sample. The statistic was therefore too</span>
+<span class="sd">       large: by 4% in the median and by up to 30% in 200 simulated samples of</span>
+<span class="sd">       a correct model with 250 observations, 25 portfolios and 3 factors,</span>
+<span class="sd">       where the 5% test rejected 12.5% of the samples (10.0% now; with 1,000</span>
+<span class="sd">       observations 7.5% and 5.5%). The covariance can be far from singular in</span>
+<span class="sd">       those directions when there are few portfolios: the J-statistic of the</span>
+<span class="sd">       five portfolios and three factors of the Fama-French example in the</span>
+<span class="sd">       documentation is 41.6 and was 100.6. If the risk-free rate was</span>
+<span class="sd">       estimated, an eigenvalue that is numerically zero was inverted as well,</span>
+<span class="sd">       and the statistic changed in the third digit when the observations were</span>
+<span class="sd">       only reordered.</span>
 
 <span class="sd">    Rows are paired by position, so that the first row of ``factors`` is the</span>
 <span class="sd">    factor return in the period of the first row of ``portfolios``. If both</span>
@@ -1283,7 +1448,7 @@
 <span class="sd">        ``kernel``, one of "bartlett", "parzen" or "qs" (quadratic spectral)</span>
 <span class="sd">        and ``bandwidth`` (a positive integer).</span>
 <span class="sd">        """</span>
-        <span class="n">nobs</span><span class="p">,</span> <span class="n">nf</span><span class="p">,</span> <span class="n">nport</span><span class="p">,</span> <span class="n">nrf</span><span class="p">,</span> <span class="n">s1</span><span class="p">,</span> <span class="n">s2</span><span class="p">,</span> <span class="n">s3</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_boundaries</span><span class="p">()</span>
+        <span class="n">nobs</span><span class="p">,</span> <span class="n">nf</span><span class="p">,</span> <span class="n">nport</span><span class="p">,</span> <span class="n">_</span><span class="p">,</span> <span class="n">s1</span><span class="p">,</span> <span class="n">s2</span><span class="p">,</span> <span class="n">s3</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_boundaries</span><span class="p">()</span>
         <span class="n">excess_returns</span> <span class="o">=</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">_risk_free</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_check_debiased</span><span class="p">(</span><span class="n">debiased</span><span class="p">)</span>
         <span class="n">f</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">factors</span><span class="o">.</span><span class="n">ndarray</span>
@@ -1336,10 +1501,9 @@
         <span class="c1"># VCV</span>
         <span class="n">full_vcv</span> <span class="o">=</span> <span class="n">cov_est_inst</span><span class="o">.</span><span class="n">cov</span>
         <span class="n">alpha_vcv</span> <span class="o">=</span> <span class="n">full_vcv</span><span class="p">[</span><span class="n">s2</span><span class="p">:,</span> <span class="n">s2</span><span class="p">:]</span>
-        <span class="n">stat</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">squeeze</span><span class="p">(</span><span class="n">alphas</span><span class="o">.</span><span class="n">T</span> <span class="o">@</span> <span class="n">np</span><span class="o">.</span><span class="n">linalg</span><span class="o">.</span><span class="n">pinv</span><span class="p">(</span><span class="n">alpha_vcv</span><span class="p">)</span> <span class="o">@</span> <span class="n">alphas</span><span class="p">))</span>
-        <span class="n">jstat</span> <span class="o">=</span> <span class="n">WaldTestStatistic</span><span class="p">(</span>
-            <span class="n">stat</span><span class="p">,</span> <span class="s2">"All alphas are 0"</span><span class="p">,</span> <span class="n">nport</span> <span class="o">-</span> <span class="n">nf</span> <span class="o">-</span> <span class="n">nrf</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="s2">"J-statistic"</span>
-        <span class="p">)</span>
+        <span class="c1"># The second stage estimates make the pricing errors orthogonal to the</span>
+        <span class="c1"># columns of sigma^-1 [1 betas]</span>
+        <span class="n">jstat</span> <span class="o">=</span> <span class="n">_j_statistic</span><span class="p">(</span><span class="n">alphas</span><span class="p">,</span> <span class="n">alpha_vcv</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_sigma_inv</span> <span class="o">@</span> <span class="n">betas</span><span class="p">)</span>
 
         <span class="n">total_ss</span> <span class="o">=</span> <span class="p">((</span><span class="n">p</span> <span class="o">-</span> <span class="n">p</span><span class="o">.</span><span class="n">mean</span><span class="p">(</span><span class="mi">0</span><span class="p">)[</span><span class="kc">None</span><span class="p">,</span> <span class="p">:])</span> <span class="o">**</span> <span class="mi">2</span><span class="p">)</span><span class="o">.</span><span class="n">sum</span><span class="p">()</span>
         <span class="n">residual_ss</span> <span class="o">=</span> <span class="p">(</span><span class="n">eps</span><span class="o">**</span><span class="mi">2</span><span class="p">)</span><span class="o">.</span><span class="n">sum</span><span class="p">()</span>
@@ -1507,6 +1671,39 @@
 
 <span class="sd">    The model is tested using the optimized objective function using the</span>
 <span class="sd">    usual GMM J statistic.</span>
+
+<span class="sd">    The alphas are the averages of the moment conditions :math:`\epsilon_t`</span>
+<span class="sd">    that correspond to the intercept, and their standard errors account for the</span>
+<span class="sd">    estimation of the parameters. If :math:`S` is the covariance of the moment</span>
+<span class="sd">    conditions and :math:`G` is the Jacobian of their average, the covariance of</span>
+<span class="sd">    the average moment conditions at the efficient GMM estimates is</span>
+
+<span class="sd">    .. math::</span>
+
+<span class="sd">        \left(S - G (G^\prime S^{-1} G)^{-1} G^\prime\right) / (T - df)</span>
+
+<span class="sd">    where :math:`df` is the number of factors if the covariance is debiased and</span>
+<span class="sd">    0 if it is not. This is the same :math:`S`, :math:`G` and scale as the</span>
+<span class="sd">    covariance of the parameters :math:`(G^\prime S^{-1} G)^{-1} / (T - df)`,</span>
+<span class="sd">    which depends on ``cov_type`` (and ``kernel`` and ``bandwidth`` for the</span>
+<span class="sd">    kernel estimator), ``center`` and ``debiased`` of ``fit``. The covariance of</span>
+<span class="sd">    the alphas has rank equal to the number of degrees of freedom of the</span>
+<span class="sd">    J-statistic. If the model is just identified, the alphas are zero and so is</span>
+<span class="sd">    their variance.</span>
+
+<span class="sd">    .. versionchanged:: 7.1</span>
+
+<span class="sd">       The standard errors of the alphas were the square roots of the diagonal</span>
+<span class="sd">       of the covariance of the average moment conditions, :math:`S / T`, which</span>
+<span class="sd">       ignores that the parameters were estimated, and which did not depend on</span>
+<span class="sd">       ``cov_type``, ``center`` or ``debiased``. This overstated the standard</span>
+<span class="sd">       errors: in a simulation of 60 samples with 400 observations, 6 portfolios</span>
+<span class="sd">       and 2 factors the mean standard error was 0.00143 to 0.00145 for all six</span>
+<span class="sd">       alphas, where their sampling standard deviations were 0.00047 to 0.00136.</span>
+<span class="sd">       The mean standard errors are now 0.00049 to 0.00133 and track them. The</span>
+<span class="sd">       t-statistics and p-values of the alphas, which are in ``tstats`` and</span>
+<span class="sd">       ``pvalues``, change with them. The covariance of the parameters, the risk</span>
+<span class="sd">       premia and the J-statistic do not change.</span>
 
 <span class="sd">    Rows are paired by position, so that the first row of ``factors`` is the</span>
 <span class="sd">    factor return in the period of the first row of ``portfolios``. If both</span>
@@ -1777,7 +1974,6 @@
 
         <span class="c1"># 4. Compute final S and G for inference</span>
         <span class="n">g</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_moments</span><span class="p">(</span><span class="n">params</span><span class="p">,</span> <span class="n">excess_returns</span><span class="p">)</span>
-        <span class="n">s</span> <span class="o">=</span> <span class="n">g</span><span class="o">.</span><span class="n">T</span> <span class="o">@</span> <span class="n">g</span> <span class="o">/</span> <span class="n">nobs</span>
         <span class="n">jac</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_jacobian</span><span class="p">(</span><span class="n">params</span><span class="p">,</span> <span class="n">excess_returns</span><span class="p">)</span>
         <span class="k">if</span> <span class="n">cov_est</span> <span class="ow">is</span> <span class="n">HeteroskedasticCovariance</span><span class="p">:</span>
             <span class="n">cov_est_inst</span> <span class="o">=</span> <span class="n">HeteroskedasticCovariance</span><span class="p">(</span>
@@ -1804,7 +2000,9 @@
         <span class="n">rp_cov</span> <span class="o">=</span> <span class="n">full_vcv</span><span class="p">[</span><span class="n">sel</span><span class="p">,</span> <span class="n">sel</span><span class="p">]</span>
         <span class="n">sel</span> <span class="o">=</span> <span class="nb">slice</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="p">(</span><span class="n">n</span> <span class="o">*</span> <span class="p">(</span><span class="n">k</span> <span class="o">+</span> <span class="mi">1</span><span class="p">)),</span> <span class="p">(</span><span class="n">k</span> <span class="o">+</span> <span class="mi">1</span><span class="p">))</span>
         <span class="n">alphas</span> <span class="o">=</span> <span class="n">g</span><span class="o">.</span><span class="n">mean</span><span class="p">(</span><span class="mi">0</span><span class="p">)[</span><span class="n">sel</span><span class="p">,</span> <span class="kc">None</span><span class="p">]</span>
-        <span class="n">alpha_vcv</span> <span class="o">=</span> <span class="n">s</span><span class="p">[</span><span class="n">sel</span><span class="p">,</span> <span class="n">sel</span><span class="p">]</span> <span class="o">/</span> <span class="n">nobs</span>
+        <span class="c1"># The alphas are averages of moments, whose covariance at the estimates</span>
+        <span class="c1"># accounts for the estimation of the parameters</span>
+        <span class="n">alpha_vcv</span> <span class="o">=</span> <span class="n">cov_est_inst</span><span class="o">.</span><span class="n">_moment_cov</span><span class="p">[</span><span class="n">sel</span><span class="p">,</span> <span class="n">sel</span><span class="p">]</span>
         <span class="k">if</span> <span class="n">use_cue</span><span class="p">:</span>
             <span class="c1"># The objective that was minimized updates the weight matrix</span>
             <span class="n">stat</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_j_cue</span><span class="p">(</span><span class="n">params</span><span class="p">,</span> <span class="n">excess_returns</span><span class="p">,</span> <span class="n">weight_est_instance</span><span class="p">)</span>

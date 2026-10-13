@@ -23,7 +23,7 @@
     
   
       
-        <title>Formulas and Mathematical Detail - linearmodels v7.1 (+375)</title>
+        <title>Formulas and Mathematical Detail - linearmodels v7.1 (+391)</title>
       
     
 
@@ -100,7 +100,7 @@
 
 <header class="md-header md-header--shadow" data-md-component="header">
   <nav class="md-header__inner md-grid" aria-label="Header">
-    <a href="../index.html" title="linearmodels v7.1 (+375)" class="md-header__button md-logo" aria-label="linearmodels v7.1 (+375)" data-md-component="logo">
+    <a href="../index.html" title="linearmodels v7.1 (+391)" class="md-header__button md-logo" aria-label="linearmodels v7.1 (+391)" data-md-component="logo">
       <img src="../_static/bw-logo.svg" alt="logo">
     </a>
     <label class="md-header__button md-icon" for="__drawer">
@@ -111,7 +111,7 @@
       <div class="md-header__ellipsis">
         <div class="md-header__topic">
           <span class="md-ellipsis">
-            linearmodels v7.1 (+375)
+            linearmodels v7.1 (+391)
           </span>
         </div>
         <div class="md-header__topic" data-md-component="header-topic">
@@ -206,10 +206,10 @@
 
 <nav class="md-nav md-nav--primary" aria-label="Navigation" data-md-level="0">
   <label class="md-nav__title" for="__drawer">
-    <a href="../index.html" title="linearmodels v7.1 (+375)" class="md-nav__button md-logo" aria-label="linearmodels v7.1 (+375)" data-md-component="logo">
+    <a href="../index.html" title="linearmodels v7.1 (+391)" class="md-nav__button md-logo" aria-label="linearmodels v7.1 (+391)" data-md-component="logo">
       <img src="../_static/bw-logo.svg" alt="logo">
     </a>
-    linearmodels v7.1 (+375)
+    linearmodels v7.1 (+391)
   </label>
   
     <div class="md-nav__source">
@@ -912,7 +912,14 @@ the same regressors so that the model for test portfolio <span class="math notra
 and <span class="math notranslate nohighlight">\(bw\)</span> is the bandwidth. The reported risk premia are just the
 average returns on the factors, and the covariance of the risk premia
 estimates is based on the factor residuals after demeaning using either
-the simple estimator or the kernel estimator.</p>
+the simple estimator or the kernel estimator.
+If the covariance is debiased, <span class="math notranslate nohighlight">\(df=K+1\)</span> is the number of regressors of
+each regression. The risk premia are sample means, so that their covariance
+uses <span class="math notranslate nohighlight">\(T-1\)</span> in place of <span class="math notranslate nohighlight">\(T-df\)</span>, and the covariance between the
+risk premia and the other parameters uses the geometric mean of the two
+divisors, <span class="math notranslate nohighlight">\(\sqrt{\left(T-df\right)\left(T-1\right)}\)</span>. The block of the
+covariance of the parameters for the risk premia is then the square of their
+reported standard errors.</p>
 <h3 id="the-j-statistic">The J statistic<a class="headerlink" href="#the-j-statistic" title="Link to this heading">¶</a></h3>
 <p>The J statistic is implemented as</p>
 <div class="math notranslate nohighlight">
@@ -1011,15 +1018,33 @@ Each block has a 0 columns corresponding to <span class="math notranslate nohigh
 heteroskedasticity consistent estimator or the HAC estimator in the
 previous section.</p>
 <h3 id="id1">The J statistic<a class="headerlink" href="#id1" title="Link to this heading">¶</a></h3>
-<p>The J statistic is virtually identical to the <span class="math notranslate nohighlight">\(J\)</span> statistic from
-traded factor model except that it has a difference distribution.</p>
+<p>The J statistic is similar to the <span class="math notranslate nohighlight">\(J\)</span> statistic from traded factor
+model except that the pricing errors satisfy linear restrictions and that the
+statistic has a different distribution.</p>
 <div class="math notranslate nohighlight">
-\[J=\hat{\alpha}^{\prime}\hat{\Sigma}_{\alpha}^{-1}\hat{\alpha}^{\prime}\sim\chi_{N-K}^{2}\]</div>
-<p>The loss of degrees of freedom occurs since
+\[J=\hat{\alpha}^{\prime}\hat{\Sigma}_{\alpha}^{+}\hat{\alpha}=\left(Q^{\prime}\hat{\alpha}\right)^{\prime}\left(Q^{\prime}\hat{\Sigma}_{\alpha}Q\right)^{-1}\left(Q^{\prime}\hat{\alpha}\right)\sim\chi_{N-K-n_{rf}}^{2}\]</div>
+<p>where <span class="math notranslate nohighlight">\(n_{rf}\)</span> is 1 if the risk free rate is estimated and 0 if it is
+not. The loss of degrees of freedom occurs since
 <span class="math notranslate nohighlight">\(\hat{\alpha}=\hat{\eta}\)</span> which are regression residuals from a
-regression of <span class="math notranslate nohighlight">\(N\)</span> average returns on <span class="math notranslate nohighlight">\(K\)</span> factor loadings.
-<span class="math notranslate nohighlight">\(\hat{\Sigma}_{\alpha}\)</span> is the bottom right <span class="math notranslate nohighlight">\(K\times K\)</span>
-block of <span class="math notranslate nohighlight">\(\hat{\Sigma}\)</span>.</p>
+regression of <span class="math notranslate nohighlight">\(N\)</span> average returns on the <span class="math notranslate nohighlight">\(K+n_{rf}\)</span> columns of
+the factor loadings. The second stage estimates make <span class="math notranslate nohighlight">\(\hat{\alpha}\)</span>
+orthogonal to the <span class="math notranslate nohighlight">\(K+n_{rf}\)</span> columns of
+<span class="math notranslate nohighlight">\(\Sigma^{-1}\hat{\beta}_{c}\)</span>, where <span class="math notranslate nohighlight">\(\Sigma\)</span> is the covariance
+used in the GLS version or the identity matrix, so that
+<span class="math notranslate nohighlight">\(\hat{\alpha}\)</span> lies in a space with <span class="math notranslate nohighlight">\(N-K-n_{rf}\)</span> dimensions and
+its covariance has rank <span class="math notranslate nohighlight">\(N-K-n_{rf}\)</span> in theory.
+<span class="math notranslate nohighlight">\(\hat{\Sigma}_{\alpha}\)</span> is the block of <span class="math notranslate nohighlight">\(\hat{\Sigma}\)</span> that
+contains the covariance of <span class="math notranslate nohighlight">\(\hat{\alpha}\)</span>. The columns of <span class="math notranslate nohighlight">\(Q\)</span>
+are an orthonormal basis of the space that is orthogonal to the columns of
+<span class="math notranslate nohighlight">\(\Sigma^{-1}\hat{\beta}_{c}\)</span>, and
+<span class="math notranslate nohighlight">\(\hat{\Sigma}_{\alpha}^{+}=Q\left(Q^{\prime}\hat{\Sigma}_{\alpha}Q\right)^{-1}Q^{\prime}\)</span>
+is the generalized inverse of <span class="math notranslate nohighlight">\(\hat{\Sigma}_{\alpha}\)</span> with rank
+<span class="math notranslate nohighlight">\(N-K-n_{rf}\)</span>. The statistic is the Wald statistic of the
+<span class="math notranslate nohighlight">\(N-K-n_{rf}\)</span> linear combinations of the pricing errors that are not
+restricted to be zero. If <span class="math notranslate nohighlight">\(\hat{\Sigma}_{\alpha}\)</span> were exactly singular
+in the directions of the columns of <span class="math notranslate nohighlight">\(\Sigma^{-1}\hat{\beta}_{c}\)</span>, as the
+covariance of the pricing errors is in theory,
+<span class="math notranslate nohighlight">\(\hat{\Sigma}_{\alpha}^{+}\)</span> would be its Moore-Penrose pseudo-inverse.</p>
 <h2 id="gmm-estimation-of-linear-factor-models">GMM Estimation of Linear Factor Models<a class="headerlink" href="#gmm-estimation-of-linear-factor-models" title="Link to this heading">¶</a></h2>
 <p>The GMM estimator solves a set of non-linear moment conditions of the
 form</p>
@@ -1058,6 +1083,21 @@ previous section. The parameter covariance estimator uses the form
 appropriate for efficient GMM,</p>
 <div class="math notranslate nohighlight">
 \[\hat{\Sigma}=\left(\hat{G}\hat{^{\prime}S}^{-1}\hat{G}\right)^{-1}.\]</div>
+<p>The pricing errors, <span class="math notranslate nohighlight">\(\hat{\alpha}\)</span>, are the averages of the first moment
+condition of each portfolio, <span class="math notranslate nohighlight">\(\epsilon_{t}\)</span>. The moment conditions are
+not zero at the estimates of an over-identified model, and the covariance of
+their average accounts for the estimation of the parameters. For efficient GMM
+it is</p>
+<div class="math notranslate nohighlight">
+\[\hat{\Sigma}_{g}=S-G\left(G^{\prime}S^{-1}G\right)^{-1}G^{\prime}\]</div>
+<p>where <span class="math notranslate nohighlight">\(S\)</span> and <span class="math notranslate nohighlight">\(G\)</span> are those of the covariance of the parameters.
+Both are divided by <span class="math notranslate nohighlight">\(T-df\)</span>, where <span class="math notranslate nohighlight">\(df\)</span> is the number of factors
+if the covariance is debiased and 0 if it is not. The standard errors of the
+pricing errors are the square roots of the diagonal elements of
+<span class="math notranslate nohighlight">\(\hat{\Sigma}_{g}/\left(T-df\right)\)</span> that correspond to
+<span class="math notranslate nohighlight">\(\hat{\alpha}\)</span>. This covariance has rank <span class="math notranslate nohighlight">\(N-K-n_{rf}\)</span>, the degrees
+of freedom of the J statistic, where <span class="math notranslate nohighlight">\(n_{rf}\)</span> is 1 if the risk free rate
+is estimated and 0 if it is not.</p>
 <p>Sources used in writing the code include <a class="reference internal" href="../references.html#bryzgalova" id="id2"><span>[Bryzgalova]</span></a>, <a class="reference internal" href="../references.html#cochrane" id="id3"><span>[Cochrane]</span></a> and <a class="reference internal" href="../references.html#jagannathanetal" id="id4"><span>[JagannathanEtAl]</span></a>.</p>
 
 
