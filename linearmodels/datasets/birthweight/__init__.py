@@ -1,3 +1,7 @@
+"""
+Birth weight and maternal smoking data of Mullahy (1997).
+"""
+
 from pandas import DataFrame
 
 from linearmodels import datasets
@@ -25,5 +29,12 @@ faminc                   log(faminc)
 
 
 def load() -> DataFrame:
+    """
+    Load the birth weight and smoking data.
 
+    Returns
+    -------
+    DataFrame
+        The data. ``DESCR`` describes the variables.
+    """
     return datasets.load(__file__, "birthweight.csv.bz2")

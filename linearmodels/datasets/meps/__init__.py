@@ -1,3 +1,7 @@
+"""
+Medical Expenditure Panel Survey data on prescription drug expenditure.
+"""
+
 from pandas import DataFrame
 
 from linearmodels import datasets
@@ -36,5 +40,12 @@ vgh               vg or good health
 
 
 def load() -> DataFrame:
+    """
+    Load the prescription drug expenditure data.
 
+    Returns
+    -------
+    DataFrame
+        The data. ``DESCR`` describes the variables.
+    """
     return datasets.load(__file__, "meps.csv.bz2")

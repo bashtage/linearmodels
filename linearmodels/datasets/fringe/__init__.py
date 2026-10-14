@@ -1,3 +1,7 @@
+"""
+Fringe benefits and earnings data of Vella (1993).
+"""
+
 from pandas import DataFrame
 
 from linearmodels import datasets
@@ -50,5 +54,12 @@ vserat                   (vacdays+sicklve)/annearn
 
 
 def load() -> DataFrame:
+    """
+    Load the fringe benefits and earnings data.
 
+    Returns
+    -------
+    DataFrame
+        The data. ``DESCR`` describes the variables.
+    """
     return datasets.load(__file__, "fringe.csv.bz2")

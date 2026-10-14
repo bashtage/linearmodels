@@ -1,3 +1,7 @@
+"""
+Sparse array classes that work in all supported versions of SciPy.
+"""
+
 import packaging.version
 import scipy
 

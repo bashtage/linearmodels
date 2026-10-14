@@ -1,3 +1,7 @@
+"""
+State-level productivity and public capital data of Munnell (1990).
+"""
+
 from pandas import DataFrame
 
 from linearmodels import datasets
@@ -21,5 +25,12 @@ UNEMP   Unemployment rate
 
 
 def load() -> DataFrame:
+    """
+    Load the state productivity and public capital data.
 
+    Returns
+    -------
+    DataFrame
+        The data. ``DESCR`` describes the variables.
+    """
     return datasets.load(__file__, "munnell.csv.bz2")

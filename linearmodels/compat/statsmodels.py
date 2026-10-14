@@ -1,3 +1,7 @@
+"""
+Summary class built on the summary of statsmodels.
+"""
+
 from statsmodels.iolib import summary
 
 _LATEX_ESCAPES = str.maketrans(
@@ -52,12 +56,12 @@ class Summary(summary.Summary):
 
     def as_latex(self) -> str:
         """
-        Return tables as string
+        Return the tables as a string in LaTeX format.
 
         Returns
         -------
         str
-            concatenated summary tables in LaTeX format. Special LaTeX
+            The concatenated summary tables in LaTeX format. Special LaTeX
             characters in the extra text, such as the underscores in
             variable names, are escaped.
         """
@@ -69,12 +73,12 @@ class Summary(summary.Summary):
 
     def as_html(self) -> str:
         """
-        Return tables as string
+        Return the tables as a string in HTML format.
 
         Returns
         -------
         str
-            concatenated summary tables in HTML format
+            The concatenated summary tables in HTML format.
         """
         html = summary.summary_return(self.tables, return_fmt="html")
         if self.extra_txt is not None:

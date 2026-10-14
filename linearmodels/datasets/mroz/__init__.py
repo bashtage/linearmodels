@@ -1,3 +1,7 @@
+"""
+Married women's labor supply data of Mroz (1987).
+"""
+
 from pandas import DataFrame
 
 from linearmodels import datasets
@@ -33,5 +37,12 @@ expersq    exper^2
 
 
 def load() -> DataFrame:
+    """
+    Load the married women's labor supply data.
 
+    Returns
+    -------
+    DataFrame
+        The data. ``DESCR`` describes the variables.
+    """
     return datasets.load(__file__, "mroz.csv.bz2")

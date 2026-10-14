@@ -1,3 +1,7 @@
+"""
+Monthly Fama-French factor returns from Ken French's data library.
+"""
+
 from pandas import DataFrame, to_datetime
 
 from linearmodels import datasets
@@ -46,7 +50,14 @@ S5M5     Large firms, winners
 
 
 def load() -> DataFrame:
+    """
+    Load the Fama-French factor returns data.
 
+    Returns
+    -------
+    DataFrame
+        The data. ``DESCR`` describes the variables.
+    """
     data = datasets.load(__file__, "french.csv.bz2")
     data["dates"] = to_datetime(data.dates)
     return data

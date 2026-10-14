@@ -1,3 +1,7 @@
+"""
+Women's schooling and fertility data of Sander.
+"""
+
 from pandas import DataFrame
 
 from linearmodels import datasets
@@ -37,5 +41,12 @@ y84educ
 
 
 def load() -> DataFrame:
+    """
+    Load the women's schooling and fertility data.
 
+    Returns
+    -------
+    DataFrame
+        The data. ``DESCR`` describes the variables.
+    """
     return datasets.load(__file__, "fertility.csv.bz2")

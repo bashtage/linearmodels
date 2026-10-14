@@ -1,3 +1,7 @@
+"""
+Type aliases for arrays and array-like inputs.
+"""
+
 from typing import Any, Union
 
 import numpy as np

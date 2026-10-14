@@ -1,3 +1,7 @@
+"""
+Wage and ability data of Blackburn and Neumark (1992).
+"""
+
 from pandas import DataFrame
 
 from linearmodels import datasets
@@ -27,5 +31,12 @@ lwage                    natural log of wage
 
 
 def load() -> DataFrame:
+    """
+    Load the wages and ability data.
 
+    Returns
+    -------
+    DataFrame
+        The data. ``DESCR`` describes the variables.
+    """
     return datasets.load(__file__, "wage.csv.bz2")

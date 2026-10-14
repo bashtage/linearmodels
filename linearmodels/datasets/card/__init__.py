@@ -1,3 +1,7 @@
+"""
+Returns to schooling data of Card (1995).
+"""
+
 from pandas import DataFrame
 
 from linearmodels import datasets
@@ -46,5 +50,12 @@ xpersq                   exper**2
 
 
 def load() -> DataFrame:
+    """
+    Load the returns to schooling data.
 
+    Returns
+    -------
+    DataFrame
+        The data. ``DESCR`` describes the variables.
+    """
     return datasets.load(__file__, "card.csv.bz2")
