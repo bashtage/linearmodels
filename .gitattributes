@@ -1,1 +1,13 @@
 linearmodels/_version.py export-subst
+
+# Set the default behavior to handle all files as text and enforce LF on checkout
+* text=auto eol=lf
+
+# Explicitly ensure binary files are not touched
+*.png binary
+*.jpg binary
+*.gif binary
+*.ico binary
+*.dta binary
+*.bz2 binary
+*.pyd binary
