@@ -1,3 +1,7 @@
+"""
+Linear algebra functions that the models share.
+"""
+
 from __future__ import annotations
 
 import numpy as np
@@ -16,8 +20,8 @@ def has_constant(x: Float64Array, x_rank: int | None = None) -> tuple[bool, int]
 
     Parameters
     ----------
-    x : ndarray
-        Array to be checked for a constant (nobs, nvar).
+    x : array_like
+        Array to be checked for a constant, with shape (nobs, nvar).
     x_rank : int, optional
         Not used. The rank of x is found when the constant is searched for, and a
         value that is not the rank would change the answer. It is accepted so that
@@ -92,17 +96,17 @@ def has_constant(x: Float64Array, x_rank: int | None = None) -> tuple[bool, int]
 
 def inv_sqrth(x: Float64Array) -> Float64Array:
     """
-    Matrix inverse square root
+    Matrix inverse square root.
 
     Parameters
     ----------
-    x : ndarray
-        Real, symmetric, positive definite matrix
+    x : array_like
+        Real, symmetric, positive definite matrix.
 
     Returns
     -------
     ndarray
-        Input to the power -1/2
+        The input to the power -1/2.
 
     Raises
     ------

@@ -1,3 +1,7 @@
+"""
+Utility classes and functions that the models share.
+"""
+
 from __future__ import annotations
 
 from collections.abc import (
@@ -23,7 +27,11 @@ _VT_co = TypeVar("_VT_co", covariant=True)
 
 
 class SupportsKeysAndGetItem(Protocol[_KT, _VT_co]):
-    def keys(self) -> Iterable[_KT]: ...
+    """Protocol for objects that have ``keys`` and can be indexed by their keys."""
+
+    def keys(self) -> Iterable[_KT]:
+        """Return the keys."""
+        ...
 
     def __getitem__(self, __k: _KT, /) -> _VT_co: ...
 
@@ -37,7 +45,15 @@ def _new_attr_dict_(*args: Iterable[tuple[Any, Any]]) -> AttrDict:
 
 class AttrDict(MutableMapping):
     """
-    Ordered dictionary-like object that exposes keys as attributes
+    Ordered dictionary-like object that exposes keys as attributes.
+
+    Parameters
+    ----------
+    *args : mapping or sequence of tuple
+        A mapping, or a sequence of (key, value) pairs, with the initial items.
+        The arguments are those of ``dict``.
+    **kwargs
+        Items to add, with the names of the keyword arguments as keys.
     """
 
     def update(
@@ -47,9 +63,17 @@ class AttrDict(MutableMapping):
     ) -> None:
         """
         Update AD from dictionary or iterable E and F.
+
         If E is present and has a .keys() method, then does:  for k in E: AD[k] = E[k]
         If E is present and lacks a .keys() method, then does:  for k, v in E: AD[k] = v
         In either case, this is followed by: for k in F:  AD[k] = F[k]
+
+        Parameters
+        ----------
+        *args : mapping or iterable of tuple
+            At most one mapping, or iterable of (key, value) pairs, which is E.
+        **kwargs
+            The items of F, with the names of the keyword arguments as keys.
         """
         self.__private_dict__.update(*args, **kwargs)
 
@@ -58,28 +82,67 @@ class AttrDict(MutableMapping):
         self.__private_dict__.clear()
 
     def copy(self) -> AttrDict:
-        """Create a shallow copy of AD"""
+        """
+        Create a shallow copy of AD.
+
+        Returns
+        -------
+        AttrDict
+            A copy that has the same keys and values.
+        """
         ad = AttrDict()
         for key in self.__private_dict__.keys():
             ad[key] = self.__private_dict__[key]
         return ad
 
     def keys(self) -> KeysView[Any]:
-        """Return an ordered list-like object providing a view on AD's keys"""
+        """
+        Return an ordered list-like object providing a view on AD's keys.
+
+        Returns
+        -------
+        KeysView
+            View of the keys.
+        """
         return self.__private_dict__.keys()
 
     def items(self) -> ItemsView[Any, Any]:
-        """Return an ordered list-like object providing a view on AD's items"""
+        """
+        Return an ordered list-like object providing a view on AD's items.
+
+        Returns
+        -------
+        ItemsView
+            View of the (key, value) pairs.
+        """
         return self.__private_dict__.items()
 
     def values(self) -> ValuesView[Any]:
-        """Return an ordered list-like object object providing a view on AD's values"""
+        """
+        Return an ordered list-like object providing a view on AD's values.
+
+        Returns
+        -------
+        ValuesView
+            View of the values.
+        """
         return self.__private_dict__.values()
 
     def pop(self, key: Label, default: Any = None) -> Any:
         """
         Remove specified key and return the corresponding value.
-        If key is not found, default is returned if given, otherwise KeyError is raised
+
+        Parameters
+        ----------
+        key : hashable
+            The key to remove.
+        default : object, optional
+            The value to return if the key is not found. The default is None.
+
+        Returns
+        -------
+        object
+            The value of the key, or ``default`` if the key is not found.
         """
 
         return self.__private_dict__.pop(key, default)
@@ -144,6 +207,25 @@ class AttrDict(MutableMapping):
 
 
 def ensure_unique_column(col_name: str, df: DataFrame, addition: str = "_") -> str:
+    """
+    Create a column name that is not a column of a DataFrame.
+
+    Parameters
+    ----------
+    col_name : str
+        The preferred name.
+    df : DataFrame
+        The frame that must not have a column with the name.
+    addition : str, optional
+        The string that is added before and after the name until it is not the
+        name of a column of ``df``. The default is ``"_"``.
+
+    Returns
+    -------
+    str
+        ``col_name`` if it is not a column of ``df``, and otherwise the name with
+        ``addition`` added at both ends as often as needed.
+    """
     while col_name in df:
         col_name = addition + col_name + addition
     return col_name
@@ -157,20 +239,26 @@ def panel_to_frame(
     swap: bool = False,
 ) -> DataFrame:
     """
-    Construct a multiindex DataFrame using Panel-like arguments
+    Construct a multiindex DataFrame using Panel-like arguments.
 
     Parameters
     ----------
-    x : ndarray
-        3-d array with size nite, nmajor, nminor
-    items : list-like
-        List like object with item labels
-    major_axis : list-like
-        List like object with major_axis labels
-    minor_axis : list-like
-        List like object with minor_axis labels
-    swap : bool
-        Swap is major and minor axes
+    x : ndarray or None
+        3-d array with shape (nitem, nmajor, nminor). If None, the frame has no
+        values.
+    items : sequence or Index
+        Labels of the items, which become the columns.
+    major_axis : sequence or Index
+        Labels of the major axis.
+    minor_axis : sequence or Index
+        Labels of the minor axis.
+    swap : bool, optional
+        Whether to swap the major and minor axes. The default is False.
+
+    Returns
+    -------
+    DataFrame
+        The frame, with a two-level index named ``"major"`` and ``"minor"``.
 
     Notes
     -----
@@ -178,7 +266,7 @@ def panel_to_frame(
 
     Panel(x, items, major_axis, minor_axis).to_frame()
 
-    if `swap` is True, it is equivalent to
+    if ``swap`` is True, it is equivalent to
 
     Panel(x, items, major_axis, minor_axis).swapaxes(1,2).to_frame()
     """
@@ -207,11 +295,11 @@ class DataFrameWrapper:
     Parameters
     ----------
     values : ndarray
-        The data to use in the DataFrame's constructor
-    columns : list[str]
-        The column names of the frame
-    index : {Index, list[str]}
-        The index to use.
+        The data to use in the DataFrame's constructor.
+    columns : list of str, optional
+        The column names of the frame. The default is the integers from 0.
+    index : Index or list of str, optional
+        The index to use. The default is the integers from 0.
     """
 
     def __init__(
@@ -238,11 +326,11 @@ class SeriesWrapper:
     Parameters
     ----------
     values : ndarray
-        The data to use in the Series' constructor
-    name : str
-        The name of the series
-    index : {Index, list[str]}
-        The index to use.
+        The data to use in the Series' constructor.
+    name : str, optional
+        The name of the series. The default is no name.
+    index : Index or list of str, optional
+        The index to use. The default is the integers from 0.
     """
 
     def __init__(

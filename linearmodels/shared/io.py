@@ -1,3 +1,7 @@
+"""
+Formatting of the tables in the summaries of results.
+"""
+
 from __future__ import annotations
 
 from typing import Any
@@ -7,7 +11,7 @@ from statsmodels.iolib.summary import SimpleTable, fmt_params
 
 
 def _str(v: float) -> str:
-    """Preferred basic formatter"""
+    """Preferred basic formatter."""
     if np.isnan(v):
         return "        "
     if np.isinf(v):
@@ -29,7 +33,20 @@ def _str(v: float) -> str:
 
 
 def pval_format(v: float) -> str:
-    """Preferred formatting for x in [0,1]"""
+    """
+    Format a probability.
+
+    Parameters
+    ----------
+    v : float
+        The value to format, which is in [0, 1] or NaN.
+
+    Returns
+    -------
+    str
+        The value with 4 digits after the decimal point, or blanks if the value
+        is NaN.
+    """
     if np.isnan(v):
         return "        "
     return f"{v:4.4f}"
@@ -37,7 +54,26 @@ def pval_format(v: float) -> str:
 
 # TODO: typing for Any
 def param_table(results: Any, title: str, pad_bottom: bool = False) -> SimpleTable:
-    """Formatted standard parameter table"""
+    """
+    Create the table of parameter estimates of a model.
+
+    Parameters
+    ----------
+    results : object
+        Results of a model, with ``params``, ``std_errors``, ``tstats`` and
+        ``pvalues`` that are Series and a ``conf_int`` method.
+    title : str
+        Title of the table.
+    pad_bottom : bool, optional
+        Whether to add a blank row below the parameters. The default is False.
+
+    Returns
+    -------
+    SimpleTable
+        The table, with a row for each parameter and columns for the estimate,
+        the standard error, the t-statistic, the p-value and the confidence
+        interval.
+    """
     param_data = np.c_[
         np.asarray(results.params)[:, None],
         np.asarray(results.std_errors)[:, None],
@@ -72,15 +108,16 @@ def format_wide(s: list[str] | tuple[str, ...], cols: int) -> list[list[str]]:
 
     Parameters
     ----------
-    s : list[str]
-        List of strings to format
+    s : list of str or tuple of str
+        List of strings to format.
     cols : int
-        Number of columns in output
+        Maximum number of characters in a line of the output.
 
     Returns
     -------
-    list[list[str]]
-        The joined list.
+    list of list of str
+        The lines. Each line is a list with a single string, which joins the
+        strings that fit in the line with commas.
     """
     lines = []
     line = ""
@@ -106,19 +143,24 @@ def format_wide(s: list[str] | tuple[str, ...], cols: int) -> list[list[str]]:
 
 def add_star(value: str, pvalue: float, star: bool) -> str:
     """
-    Add 1, 2 or 3 stars to a string base on the p-value
+    Add 1, 2 or 3 stars to a string based on the p-value.
 
-    Adds 1 star if the pvalue is less than 10%, 2 if less than 5% and 3 is
-    less than 1%.
+    Adds 1 star if the p-value is at most 10%, 2 if at most 5% and 3 if at most
+    1%.
 
     Parameters
     ----------
     value : str
         The formatted parameter value as a string.
     pvalue : float
-        The p-value of the parameter
+        The p-value of the parameter.
     star : bool
-        Flag indicating whether the star should be added
+        Flag indicating whether the star should be added.
+
+    Returns
+    -------
+    str
+        The value, followed by the stars if ``star`` is True.
     """
     if not star:
         return value

@@ -1,3 +1,7 @@
+"""
+Core covariance estimators that the models share.
+"""
+
 from numpy import (
     any as npany,
     arange,
@@ -34,7 +38,7 @@ def group_debias_coefficient(clusters: linearmodels.typing.data.IntArray) -> flo
 
     .. math::
 
-       `\frac{g}{g-1}\frac{n-1}{n}`
+       \frac{g}{g-1}\frac{n-1}{n}
 
     where g is the number of groups and n is the sample size.
     """
@@ -47,17 +51,20 @@ def cluster_union(
     clusters: linearmodels.typing.data.IntArray,
 ) -> linearmodels.typing.data.IntArray:
     """
-    Compute a set of clusters that is nested within 2 clusters
+    Compute a set of clusters that is nested within 2 clusters.
 
     Parameters
     ----------
     clusters : ndarray
-        A nobs by 2 array of integer values of cluster group membership.
+        An array with shape (nobs, 2) of integer values of cluster group
+        membership.
 
     Returns
     -------
     ndarray
-        A nobs array of integer cluster group memberships
+        An array with shape (nobs,) of integer cluster group memberships. Two
+        observations are in the same group if they are in the same group of both
+        columns of ``clusters``.
     """
     sort_keys = lexsort(clusters.T)
     locs = arange(clusters.shape[0])
@@ -74,19 +81,20 @@ def cov_cluster(
     clusters: linearmodels.typing.data.AnyArray,
 ) -> linearmodels.typing.data.Float64Array:
     """
-    Core cluster covariance estimator
+    Core cluster covariance estimator.
 
     Parameters
     ----------
     z : ndarray
-        n by k mean zero data array
+        Mean zero data with shape (n, k).
     clusters : ndarray
-        n by 1 array
+        Array with shape (n,) that contains the cluster that each observation
+        belongs to.
 
     Returns
     -------
     ndarray
-       k by k cluster asymptotic covariance
+        Cluster asymptotic covariance with shape (k, k).
 
     Raises
     ------
@@ -123,19 +131,26 @@ def cov_kernel(
     z: linearmodels.typing.data.Float64Array, w: linearmodels.typing.data.Float64Array
 ) -> linearmodels.typing.data.Float64Array:
     """
-    Core kernel covariance estimator
+    Core kernel covariance estimator.
 
     Parameters
     ----------
     z : ndarray
-        n by k mean zero data array
+        Mean zero data with shape (n, k).
     w : ndarray
-        m by 1
+        Kernel weights with shape (m,) for lags 0, 1, ..., m - 1. The weight of
+        lag 0 is not used, since the variance is always included with a weight
+        of 1.
 
     Returns
     -------
     ndarray
-       k by k kernel asymptotic covariance
+        Kernel asymptotic covariance with shape (k, k).
+
+    Raises
+    ------
+    ValueError
+        If the number of weights is larger than the number of observations.
     """
     k = len(w)
     n = z.shape[0]
