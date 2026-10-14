@@ -26,6 +26,7 @@ from numpy.linalg import inv, lstsq, matrix_rank, solve
 from pandas import DataFrame, Index, Series, concat
 
 from linearmodels.iv._utility import IVFormulaParser
+from linearmodels.iv.covariance import KERNEL_LOOKUP
 from linearmodels.iv.data import IVData
 from linearmodels.iv.gmm import _uses_default_bandwidth, _warn_default_bandwidth
 from linearmodels.shared.alignment import (
@@ -1548,7 +1549,7 @@ class _LSSystemModelBase(_SystemModelBase):
         linearmodels.system.covariance.ClusteredCovariance
             Clustered covariance.
         """
-        check_cov_config(cov_config, cov_type, _LS_COV_KEYS)
+        check_cov_config(cov_config, cov_type, _LS_COV_KEYS, KERNEL_LOOKUP)
         self._check_clusters(cov_config)
         if method is None:
             method = (
@@ -2410,7 +2411,7 @@ class IVSystemGMM(_SystemModelBase):
         :class:`~linearmodels.system.model.IVSystemGMM` for how to restore the
         previous bandwidth.
         """
-        check_cov_config(cov_config, cov_type, _GMM_COV_KEYS)
+        check_cov_config(cov_config, cov_type, _GMM_COV_KEYS, KERNEL_LOOKUP)
         if cov_type not in GMM_TYPES:
             raise unknown_option_error("cov_type", cov_type, GMM_TYPES)
         # Parameter estimation

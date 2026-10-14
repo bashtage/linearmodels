@@ -15,10 +15,13 @@ from linearmodels.asset_pricing import (
 from linearmodels.iv import IV2SLS, IVGMM, IVGMMCUE, IVJIVE, IVLIML, AbsorbingLS
 from linearmodels.panel import (
     BetweenOLS,
+    FamaMacBeth,
     PanelOLS,
     PooledOLS,
     RandomEffects,
 )
+import linearmodels.panel.model as panel_module
+from linearmodels.shared.exceptions import UnknownOptionError
 from linearmodels.system import IV3SLS, SUR, IVSystemGMM
 
 NOBS = 60
@@ -93,3 +96,31 @@ def test_panel_cluster_options_need_clustered(data):
     model = PooledOLS(*data["panel"])
     with pytest.raises(ValueError, match=r"are: cluster_entity"):
         model.fit(cov_type="robust", cluster_entity=True)
+
+
+def test_unknown_kernel_of_fit_is_reported_before_estimation(data, monkeypatch):
+    def estimated(*args, **kwargs):
+        raise AssertionError("The model was estimated")
+
+    iv_model = IV2SLS(*data["iv"])
+    pooled = PooledOLS(*data["panel"])
+    fama_macbeth = FamaMacBeth(*data["panel"])
+    monkeypatch.setattr(iv_model, "estimate_parameters", estimated)
+    monkeypatch.setattr(panel_module, "_lstsq", estimated)
+    with pytest.raises(UnknownOptionError, match=r"Unknown kernel: 'bogus'"):
+        iv_model.fit(cov_type="kernel", kernel="bogus")
+    with pytest.raises(UnknownOptionError, match=r"Unknown kernel: 'bogus'"):
+        pooled.fit(cov_type="kernel", kernel="bogus")
+    with pytest.raises(UnknownOptionError, match=r"Unknown kernel: 'bogus'"):
+        fama_macbeth.fit(cov_type="kernel", kernel="bogus")
+
+
+@pytest.mark.parametrize("cls", [IVGMM, IVGMMCUE])
+def test_unknown_weight_kernel_of_iv_gmm(data, cls):
+    with pytest.raises(UnknownOptionError, match=r"Unknown kernel: 'bogus'"):
+        cls(*data["iv"], weight_type="kernel", kernel="bogus")
+
+
+def test_unknown_weight_kernel_of_system_gmm(data):
+    with pytest.raises(UnknownOptionError, match=r"Unknown kernel: 'bogus'"):
+        IVSystemGMM(data["iv_equations"], weight_type="kernel", kernel="bogus")

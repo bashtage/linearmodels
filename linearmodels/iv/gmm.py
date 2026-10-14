@@ -317,6 +317,8 @@ class KernelWeightMatrix(HomoskedasticWeightMatrix):
         self._orig_bandwidth = bandwidth
         self._kernel = kernel
         self._kernels = KERNEL_LOOKUP
+        if isinstance(kernel, str) and kernel.lower() not in KERNEL_LOOKUP:
+            raise unknown_option_error("kernel", kernel, KERNEL_LOOKUP)
         # Selecting the bandwidth from the data is the default since 7.1, and it
         # warns since the default was nobs - 2
         self._default_bandwidth = bandwidth is None and optimal_bw is None

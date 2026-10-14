@@ -911,7 +911,7 @@ class _IVLSModelBase(_IVModelBase):
         supported options. Defaults are used if no covariance configuration
         is provided.
         """
-        check_cov_config(cov_config, cov_type, _LS_COV_KEYS)
+        check_cov_config(cov_config, cov_type, _LS_COV_KEYS, KERNEL_LOOKUP)
         self._check_clusters(cov_config)
         wy, wx, wz = self._wy, self._wx, self._wz
         kappa = self._kappa
@@ -1416,8 +1416,10 @@ class _IVGMMBase(_IVModelBase):
         not match (see Notes), or if ``weights`` are not strictly positive and
         finite.
     UnknownOptionError
-        If ``weight_type`` is not supported. It is both a ``KeyError`` and a
-        ``ValueError``.
+        If ``weight_type`` is not supported, or if it is "kernel" and ``kernel``
+        is not a supported kernel. It is both a ``KeyError`` and a
+        ``ValueError``. Before 7.1, an unsupported ``kernel`` was reported by
+        ``fit``.
     TypeError
         If an input is complex or cannot be converted to float64.
 
@@ -1717,8 +1719,10 @@ class IVGMM(_IVGMMBase):
         not match (see Notes), or if ``weights`` are not strictly positive and
         finite.
     UnknownOptionError
-        If ``weight_type`` is not supported. It is both a ``KeyError`` and a
-        ``ValueError``.
+        If ``weight_type`` is not supported, or if it is "kernel" and ``kernel``
+        is not a supported kernel. It is both a ``KeyError`` and a
+        ``ValueError``. Before 7.1, an unsupported ``kernel`` was reported by
+        ``fit``.
     TypeError
         If an input is complex or cannot be converted to float64.
 
@@ -2040,7 +2044,7 @@ class IVGMM(_IVGMMBase):
         ``optimal_bw=False`` to use the kernel with fewer observations. See
         :func:`~linearmodels.iv.covariance.kernel_optimal_bandwidth`.
         """
-        check_cov_config(cov_config, cov_type, _GMM_COV_KEYS)
+        check_cov_config(cov_config, cov_type, _GMM_COV_KEYS, KERNEL_LOOKUP)
         self._check_clusters(cov_config)
         cov_config = self._check_default_bandwidth(cov_type, cov_config)
         wy, wx, wz = self._wy, self._wx, self._wz
@@ -2161,8 +2165,10 @@ class IVGMMCUE(_IVGMMBase):
         not match (see Notes), or if ``weights`` are not strictly positive and
         finite.
     UnknownOptionError
-        If ``weight_type`` is not supported. It is both a ``KeyError`` and a
-        ``ValueError``.
+        If ``weight_type`` is not supported, or if it is "kernel" and ``kernel``
+        is not a supported kernel. It is both a ``KeyError`` and a
+        ``ValueError``. Before 7.1, an unsupported ``kernel`` was reported by
+        ``fit``.
     TypeError
         If an input is complex or cannot be converted to float64.
 
@@ -2694,7 +2700,7 @@ class IVGMMCUE(_IVGMMBase):
         ``optimal_bw=False`` to use the kernel with fewer observations. See
         :func:`~linearmodels.iv.covariance.kernel_optimal_bandwidth`.
         """
-        check_cov_config(cov_config, cov_type, _GMM_COV_KEYS)
+        check_cov_config(cov_config, cov_type, _GMM_COV_KEYS, KERNEL_LOOKUP)
         self._check_clusters(cov_config)
         cov_config = self._check_default_bandwidth(cov_type, cov_config)
         self._select_bandwidth()
@@ -3270,7 +3276,7 @@ class IVJIVE(_IVModelBase):
         ``InvalidTestStatistic`` if it is not defined. The model is estimated
         then. See the notes of the class.
         """
-        check_cov_config(cov_config, cov_type, _GMM_COV_KEYS)
+        check_cov_config(cov_config, cov_type, _GMM_COV_KEYS, KERNEL_LOOKUP)
         self._check_clusters(cov_config)
         wy, wx, wz = self._wy, self._wx, self._wz
 

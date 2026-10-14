@@ -1070,6 +1070,9 @@ def check_covariance_kwargs(
             f"are: {', '.join(unknown_kwargs)} "
         )
         raise ValueError(msg)
+    kernel = cov_config.get("kernel")
+    if isinstance(kernel, str) and "kernel" in estimator.ALLOWED_KWARGS:
+        lookup_option(KERNEL_LOOKUP, kernel.lower(), "kernel")
     return estimator
 
 

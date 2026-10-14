@@ -46,6 +46,7 @@ import scipy.sparse as sp
 from scipy.sparse.linalg import lsmr
 
 from linearmodels.iv.common import f_statistic
+from linearmodels.iv.covariance import KERNEL_LOOKUP
 from linearmodels.iv.data import IVData
 from linearmodels.iv.model import (
     _LS_COV_KEYS,
@@ -1588,7 +1589,7 @@ class AbsorbingLS:
         changing only the covariance estimator is fast. If any of them differs,
         the variables are absorbed again using the new values.
         """
-        check_cov_config(cov_config, cov_type, _LS_COV_KEYS)
+        check_cov_config(cov_config, cov_type, _LS_COV_KEYS, KERNEL_LOOKUP)
         method = _check_method(method)
         if lsmr_options and absorb_options is None:
             # The options are options of LSMR, so they can not be passed to HDFE

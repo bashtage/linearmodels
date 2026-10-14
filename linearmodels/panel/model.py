@@ -26,6 +26,7 @@ from pandas.api.types import is_numeric_dtype
 from scipy.linalg import lstsq as sp_lstsq
 from scipy.sparse.linalg import lsmr
 
+from linearmodels.iv.covariance import KERNEL_LOOKUP
 from linearmodels.panel.covariance import (
     ACCovariance,
     ClusteredCovariance,
@@ -66,6 +67,7 @@ from linearmodels.shared.exceptions import (
     MemoryWarning,
     MissingValueWarning,
     SingletonWarning,
+    lookup_option,
     missing_warning,
     unknown_option_error,
 )
@@ -5367,6 +5369,8 @@ class FamaMacBeth(_PanelModelBase):
         >>> mod = FamaMacBeth(y, x)
         >>> res = mod.fit(cov_type="kernel", kernel="parzen")
         """
+        if isinstance(kernel, str):
+            lookup_option(KERNEL_LOOKUP, kernel.lower(), "kernel")
         # The retained observations and their weights, which are scaled to have a
         # mean of one once the observations with missing values are dropped
         y = cast("linearmodels.typing.data.Float64Array", self.dependent.values2d)

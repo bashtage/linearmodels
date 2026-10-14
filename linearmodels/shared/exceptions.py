@@ -233,6 +233,7 @@ def check_cov_config(
     cov_config: Mapping[str, object],
     cov_type: str,
     allowed: Mapping[str, Sequence[str]],
+    kernels: Mapping[str, object] | None = None,
 ) -> None:
     """
     Check that the keyword arguments of a covariance estimator are supported.
@@ -245,6 +246,9 @@ def check_cov_config(
         Name of the covariance estimator.
     allowed : dict of str to sequence of str
         The keys that each covariance estimator accepts, by lower-case name.
+    kernels : dict, optional
+        The supported kernels, which are checked if ``cov_config`` has a
+        ``kernel``.
 
     Raises
     ------
@@ -252,6 +256,8 @@ def check_cov_config(
         If a key of ``cov_config`` is not accepted by the estimator. The message
         is that of Python for an unexpected keyword argument, and also names the
         keys that are accepted. An unknown ``cov_type`` is not checked here.
+    UnknownOptionError
+        If the ``kernel`` is not one of ``kernels``.
     """
     keys = allowed.get(str(cov_type).lower())
     if keys is None:
@@ -267,6 +273,11 @@ def check_cov_config(
             f"The keyword arguments that are accepted with cov_type={cov_type!r} "
             f"are: {accepted}."
         )
+    if kernels is not None and "kernel" in cov_config:
+        kernel = cov_config["kernel"]
+        # The estimator reports a kernel that is not a str
+        if isinstance(kernel, str) and kernel.lower() not in kernels:
+            raise unknown_option_error("kernel", kernel, kernels)
 
 
 __all__ = [

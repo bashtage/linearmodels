@@ -25,6 +25,7 @@ from linearmodels.asset_pricing.results import (
     GMMFactorModelResults,
     LinearFactorModelResults,
 )
+from linearmodels.iv.covariance import KERNEL_LOOKUP
 from linearmodels.iv.data import IVData, IVDataLike
 from linearmodels.shared import hypotheses
 from linearmodels.shared.alignment import check_alignment, row_labels
@@ -503,7 +504,7 @@ class TradedFactorModel(_FactorModelBase):
            alphas and the loadings, ``risk_premia_se`` and the covariance with
            ``debiased=False`` do not change.
         """
-        check_cov_config(cov_config, cov_type, _COV_KEYS)
+        check_cov_config(cov_config, cov_type, _COV_KEYS, KERNEL_LOOKUP)
         self._check_debiased(debiased)
         p = self.portfolios.ndarray
         f = self.factors.ndarray
@@ -990,7 +991,7 @@ class LinearFactorModel(_LinearFactorModelBase):
         the kernel with fewer observations. See
         :func:`~linearmodels.iv.covariance.kernel_optimal_bandwidth`.
         """
-        check_cov_config(cov_config, cov_type, _COV_KEYS)
+        check_cov_config(cov_config, cov_type, _COV_KEYS, KERNEL_LOOKUP)
         nobs, nf, nport, _, s1, s2, s3 = self._boundaries()
         excess_returns = not self._risk_free
         self._check_debiased(debiased)
@@ -1445,7 +1446,7 @@ class LinearFactorModelGMM(_LinearFactorModelBase):
         observations. See
         :func:`~linearmodels.iv.covariance.kernel_optimal_bandwidth`.
         """
-        check_cov_config(cov_config, cov_type, _COV_KEYS)
+        check_cov_config(cov_config, cov_type, _COV_KEYS, KERNEL_LOOKUP)
 
         nobs, n = self.portfolios.shape
         k = self.factors.shape[1]
