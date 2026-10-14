@@ -19,7 +19,7 @@
     
   
       
-        <title>linearmodels.asset_pricing.model - linearmodels v7.1 (+525)</title>
+        <title>linearmodels.asset_pricing.model - linearmodels v7.1 (+544)</title>
       
     
 
@@ -91,7 +91,7 @@
 
 <header class="md-header md-header--shadow" data-md-component="header">
   <nav class="md-header__inner md-grid" aria-label="Header">
-    <a href="../../../index.html" title="linearmodels v7.1 (+525)" class="md-header__button md-logo" aria-label="linearmodels v7.1 (+525)" data-md-component="logo">
+    <a href="../../../index.html" title="linearmodels v7.1 (+544)" class="md-header__button md-logo" aria-label="linearmodels v7.1 (+544)" data-md-component="logo">
       <img src="../../../_static/bw-logo.svg" alt="logo">
     </a>
     <label class="md-header__button md-icon" for="__drawer">
@@ -102,7 +102,7 @@
       <div class="md-header__ellipsis">
         <div class="md-header__topic">
           <span class="md-ellipsis">
-            linearmodels v7.1 (+525)
+            linearmodels v7.1 (+544)
           </span>
         </div>
         <div class="md-header__topic" data-md-component="header-topic">
@@ -197,10 +197,10 @@
 
 <nav class="md-nav md-nav--primary" aria-label="Navigation" data-md-level="0">
   <label class="md-nav__title" for="__drawer">
-    <a href="../../../index.html" title="linearmodels v7.1 (+525)" class="md-nav__button md-logo" aria-label="linearmodels v7.1 (+525)" data-md-component="logo">
+    <a href="../../../index.html" title="linearmodels v7.1 (+544)" class="md-nav__button md-logo" aria-label="linearmodels v7.1 (+544)" data-md-component="logo">
       <img src="../../../_static/bw-logo.svg" alt="logo">
     </a>
-    linearmodels v7.1 (+525)
+    linearmodels v7.1 (+544)
   </label>
   
     <div class="md-nav__source">
@@ -554,10 +554,16 @@
     <span class="n">GMMFactorModelResults</span><span class="p">,</span>
     <span class="n">LinearFactorModelResults</span><span class="p">,</span>
 <span class="p">)</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">linearmodels.iv.covariance</span><span class="w"> </span><span class="kn">import</span> <span class="n">KERNEL_LOOKUP</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">linearmodels.iv.data</span><span class="w"> </span><span class="kn">import</span> <span class="n">IVData</span><span class="p">,</span> <span class="n">IVDataLike</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">linearmodels.shared</span><span class="w"> </span><span class="kn">import</span> <span class="n">hypotheses</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">linearmodels.shared.alignment</span><span class="w"> </span><span class="kn">import</span> <span class="n">check_alignment</span><span class="p">,</span> <span class="n">row_labels</span>
-<span class="kn">from</span><span class="w"> </span><span class="nn">linearmodels.shared.exceptions</span><span class="w"> </span><span class="kn">import</span> <span class="n">missing_warning</span><span class="p">,</span> <span class="n">unknown_option_error</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">linearmodels.shared.exceptions</span><span class="w"> </span><span class="kn">import</span> <span class="p">(</span>
+    <span class="n">check_cov_config</span><span class="p">,</span>
+    <span class="n">lower_option</span><span class="p">,</span>
+    <span class="n">missing_warning</span><span class="p">,</span>
+    <span class="n">unknown_option_error</span><span class="p">,</span>
+<span class="p">)</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">linearmodels.shared.hypotheses</span><span class="w"> </span><span class="kn">import</span> <span class="n">WaldTestStatistic</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">linearmodels.shared.linalg</span><span class="w"> </span><span class="kn">import</span> <span class="n">has_constant</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">linearmodels.shared.rsquared</span><span class="w"> </span><span class="kn">import</span> <span class="n">r_squared</span>
@@ -567,6 +573,7 @@
 
 <span class="c1"># The names of the covariance estimators of the models</span>
 <span class="n">COV_TYPES</span> <span class="o">=</span> <span class="p">(</span><span class="s2">"heteroskedastic"</span><span class="p">,</span> <span class="s2">"kernel"</span><span class="p">,</span> <span class="s2">"robust"</span><span class="p">)</span>
+<span class="n">_COV_KEYS</span> <span class="o">=</span> <span class="p">{</span><span class="s2">"heteroskedastic"</span><span class="p">:</span> <span class="p">(),</span> <span class="s2">"robust"</span><span class="p">:</span> <span class="p">(),</span> <span class="s2">"kernel"</span><span class="p">:</span> <span class="p">(</span><span class="s2">"kernel"</span><span class="p">,</span> <span class="s2">"bandwidth"</span><span class="p">)}</span>
 
 
 <span class="k">def</span><span class="w"> </span><span class="nf">callback_factory</span><span class="p">(</span>
@@ -958,7 +965,7 @@
 <span class="sd">        Parameters</span>
 <span class="sd">        ----------</span>
 <span class="sd">        cov_type : {"robust", "heteroskedastic", "kernel"}, optional</span>
-<span class="sd">            Name of covariance estimator. The names are case sensitive. The</span>
+<span class="sd">            Name of covariance estimator. The names are not case sensitive. The</span>
 <span class="sd">            default is "robust". "heteroskedastic" is the same as "robust".</span>
 <span class="sd">        debiased : bool, optional</span>
 <span class="sd">            Flag indicating whether to debias the covariance estimator using</span>
@@ -982,6 +989,11 @@
 <span class="sd">            If ``debiased`` is True and the number of observations is not larger</span>
 <span class="sd">            than the number of factors plus one, or if the bandwidth is selected</span>
 <span class="sd">            from the data and there are too few observations. See Notes.</span>
+<span class="sd">        ValueError</span>
+<span class="sd">            If a key of ``cov_config`` is not accepted by the covariance estimator</span>
+<span class="sd">            that ``cov_type`` selects. The message names the key and lists the</span>
+<span class="sd">            accepted keys. It is raised before the model is estimated. Releases</span>
+<span class="sd">            before 7.1 ignored the key.</span>
 
 <span class="sd">        Notes</span>
 <span class="sd">        -----</span>
@@ -1028,6 +1040,8 @@
 <span class="sd">           alphas and the loadings, ``risk_premia_se`` and the covariance with</span>
 <span class="sd">           ``debiased=False`` do not change.</span>
 <span class="sd">        """</span>
+        <span class="n">cov_type</span> <span class="o">=</span> <span class="n">lower_option</span><span class="p">(</span><span class="n">cov_type</span><span class="p">)</span>
+        <span class="n">check_cov_config</span><span class="p">(</span><span class="n">cov_config</span><span class="p">,</span> <span class="n">cov_type</span><span class="p">,</span> <span class="n">_COV_KEYS</span><span class="p">,</span> <span class="n">KERNEL_LOOKUP</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_check_debiased</span><span class="p">(</span><span class="n">debiased</span><span class="p">)</span>
         <span class="n">p</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">portfolios</span><span class="o">.</span><span class="n">ndarray</span>
         <span class="n">f</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">factors</span><span class="o">.</span><span class="n">ndarray</span>
@@ -1478,7 +1492,7 @@
 <span class="sd">        Parameters</span>
 <span class="sd">        ----------</span>
 <span class="sd">        cov_type : {"robust", "heteroskedastic", "kernel"}, optional</span>
-<span class="sd">            Name of covariance estimator. The names are case sensitive. The</span>
+<span class="sd">            Name of covariance estimator. The names are not case sensitive. The</span>
 <span class="sd">            default is "robust". "heteroskedastic" is the same as "robust".</span>
 <span class="sd">        debiased : bool, optional</span>
 <span class="sd">            Flag indicating whether to debias the covariance estimator using</span>
@@ -1502,6 +1516,11 @@
 <span class="sd">            If ``debiased`` is True and the number of observations is not larger</span>
 <span class="sd">            than the number of factors plus one, or if the bandwidth is selected</span>
 <span class="sd">            from the data and there are too few observations. See Notes.</span>
+<span class="sd">        ValueError</span>
+<span class="sd">            If a key of ``cov_config`` is not accepted by the covariance estimator</span>
+<span class="sd">            that ``cov_type`` selects. The message names the key and lists the</span>
+<span class="sd">            accepted keys. It is raised before the model is estimated. Releases</span>
+<span class="sd">            before 7.1 ignored the key.</span>
 
 <span class="sd">        Notes</span>
 <span class="sd">        -----</span>
@@ -1517,6 +1536,8 @@
 <span class="sd">        the kernel with fewer observations. See</span>
 <span class="sd">        :func:`~linearmodels.iv.covariance.kernel_optimal_bandwidth`.</span>
 <span class="sd">        """</span>
+        <span class="n">cov_type</span> <span class="o">=</span> <span class="n">lower_option</span><span class="p">(</span><span class="n">cov_type</span><span class="p">)</span>
+        <span class="n">check_cov_config</span><span class="p">(</span><span class="n">cov_config</span><span class="p">,</span> <span class="n">cov_type</span><span class="p">,</span> <span class="n">_COV_KEYS</span><span class="p">,</span> <span class="n">KERNEL_LOOKUP</span><span class="p">)</span>
         <span class="n">nobs</span><span class="p">,</span> <span class="n">nf</span><span class="p">,</span> <span class="n">nport</span><span class="p">,</span> <span class="n">_</span><span class="p">,</span> <span class="n">s1</span><span class="p">,</span> <span class="n">s2</span><span class="p">,</span> <span class="n">s3</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_boundaries</span><span class="p">()</span>
         <span class="n">excess_returns</span> <span class="o">=</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">_risk_free</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_check_debiased</span><span class="p">(</span><span class="n">debiased</span><span class="p">)</span>
@@ -1926,7 +1947,7 @@
 <span class="sd">            Maximum number of iterations when minimizing objective. Must be</span>
 <span class="sd">            positive. The default is 1000.</span>
 <span class="sd">        cov_type : {"robust", "heteroskedastic", "kernel"}, optional</span>
-<span class="sd">            Name of covariance estimator. The names are case sensitive. The</span>
+<span class="sd">            Name of covariance estimator. The names are not case sensitive. The</span>
 <span class="sd">            default is "robust". "heteroskedastic" is the same as "robust".</span>
 <span class="sd">        debiased : bool, optional</span>
 <span class="sd">            Flag indicating whether to debias the covariance estimator using</span>
@@ -1958,6 +1979,11 @@
 <span class="sd">            If ``starting`` does not have one element for each parameter, or if</span>
 <span class="sd">            the bandwidth is selected from the data and there are too few</span>
 <span class="sd">            observations. See Notes.</span>
+<span class="sd">        ValueError</span>
+<span class="sd">            If a key of ``cov_config`` is not accepted by the covariance estimator</span>
+<span class="sd">            that ``cov_type`` selects. The message names the key and lists the</span>
+<span class="sd">            accepted keys. It is raised before the model is estimated. Releases</span>
+<span class="sd">            before 7.1 ignored the key.</span>
 
 <span class="sd">        Notes</span>
 <span class="sd">        -----</span>
@@ -1974,6 +2000,8 @@
 <span class="sd">        observations. See</span>
 <span class="sd">        :func:`~linearmodels.iv.covariance.kernel_optimal_bandwidth`.</span>
 <span class="sd">        """</span>
+        <span class="n">cov_type</span> <span class="o">=</span> <span class="n">lower_option</span><span class="p">(</span><span class="n">cov_type</span><span class="p">)</span>
+        <span class="n">check_cov_config</span><span class="p">(</span><span class="n">cov_config</span><span class="p">,</span> <span class="n">cov_type</span><span class="p">,</span> <span class="n">_COV_KEYS</span><span class="p">,</span> <span class="n">KERNEL_LOOKUP</span><span class="p">)</span>
 
         <span class="n">nobs</span><span class="p">,</span> <span class="n">n</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">portfolios</span><span class="o">.</span><span class="n">shape</span>
         <span class="n">k</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">factors</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span>

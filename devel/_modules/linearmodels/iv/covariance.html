@@ -19,7 +19,7 @@
     
   
       
-        <title>linearmodels.iv.covariance - linearmodels v7.1 (+525)</title>
+        <title>linearmodels.iv.covariance - linearmodels v7.1 (+544)</title>
       
     
 
@@ -91,7 +91,7 @@
 
 <header class="md-header md-header--shadow" data-md-component="header">
   <nav class="md-header__inner md-grid" aria-label="Header">
-    <a href="../../../index.html" title="linearmodels v7.1 (+525)" class="md-header__button md-logo" aria-label="linearmodels v7.1 (+525)" data-md-component="logo">
+    <a href="../../../index.html" title="linearmodels v7.1 (+544)" class="md-header__button md-logo" aria-label="linearmodels v7.1 (+544)" data-md-component="logo">
       <img src="../../../_static/bw-logo.svg" alt="logo">
     </a>
     <label class="md-header__button md-icon" for="__drawer">
@@ -102,7 +102,7 @@
       <div class="md-header__ellipsis">
         <div class="md-header__topic">
           <span class="md-ellipsis">
-            linearmodels v7.1 (+525)
+            linearmodels v7.1 (+544)
           </span>
         </div>
         <div class="md-header__topic" data-md-component="header-topic">
@@ -197,10 +197,10 @@
 
 <nav class="md-nav md-nav--primary" aria-label="Navigation" data-md-level="0">
   <label class="md-nav__title" for="__drawer">
-    <a href="../../../index.html" title="linearmodels v7.1 (+525)" class="md-nav__button md-logo" aria-label="linearmodels v7.1 (+525)" data-md-component="logo">
+    <a href="../../../index.html" title="linearmodels v7.1 (+544)" class="md-nav__button md-logo" aria-label="linearmodels v7.1 (+544)" data-md-component="logo">
       <img src="../../../_static/bw-logo.svg" alt="logo">
     </a>
-    linearmodels v7.1 (+525)
+    linearmodels v7.1 (+544)
   </label>
   
     <div class="md-nav__source">
@@ -557,7 +557,7 @@
 <span class="kn">from</span><span class="w"> </span><span class="nn">numpy.linalg</span><span class="w"> </span><span class="kn">import</span> <span class="n">inv</span><span class="p">,</span> <span class="n">pinv</span>
 
 <span class="kn">from</span><span class="w"> </span><span class="nn">linearmodels.shared.covariance</span><span class="w"> </span><span class="kn">import</span> <span class="n">cov_cluster</span><span class="p">,</span> <span class="n">cov_kernel</span>
-<span class="kn">from</span><span class="w"> </span><span class="nn">linearmodels.shared.exceptions</span><span class="w"> </span><span class="kn">import</span> <span class="n">unknown_option_error</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">linearmodels.shared.exceptions</span><span class="w"> </span><span class="kn">import</span> <span class="n">lower_option</span><span class="p">,</span> <span class="n">unknown_option_error</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">linearmodels.shared.inputs</span><span class="w"> </span><span class="kn">import</span> <span class="n">as_ndarray</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">linearmodels.shared.linalg</span><span class="w"> </span><span class="kn">import</span> <span class="n">has_constant</span>
 <span class="kn">import</span><span class="w"> </span><span class="nn">linearmodels.typing</span>
@@ -782,6 +782,7 @@
 <span class="sd">    UnknownOptionError</span>
 <span class="sd">        If kernel is not one of the supported names.</span>
 <span class="sd">    """</span>
+    <span class="n">kernel</span> <span class="o">=</span> <span class="n">lower_option</span><span class="p">(</span><span class="n">kernel</span><span class="p">)</span>
     <span class="k">if</span> <span class="n">kernel</span> <span class="ow">in</span> <span class="p">(</span><span class="s2">"bartlett"</span><span class="p">,</span> <span class="s2">"newey-west"</span><span class="p">):</span>
         <span class="k">return</span> <span class="mi">1</span><span class="p">,</span> <span class="mf">1.1447</span><span class="p">,</span> <span class="mi">2</span> <span class="o">/</span> <span class="mi">9</span>
     <span class="k">if</span> <span class="n">kernel</span> <span class="ow">in</span> <span class="p">(</span><span class="s2">"qs"</span><span class="p">,</span> <span class="s2">"andrews"</span><span class="p">,</span> <span class="s2">"quadratic-spectral"</span><span class="p">):</span>
@@ -1341,6 +1342,7 @@
     <span class="p">):</span>
         <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">z</span><span class="p">,</span> <span class="n">params</span><span class="p">,</span> <span class="n">debiased</span><span class="p">,</span> <span class="n">kappa</span><span class="p">,</span> <span class="n">extra_df</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_kernels</span> <span class="o">=</span> <span class="n">KERNEL_LOOKUP</span>
+        <span class="n">kernel</span> <span class="o">=</span> <span class="n">lower_option</span><span class="p">(</span><span class="n">kernel</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_kernel</span> <span class="o">=</span> <span class="n">kernel</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_bandwidth</span> <span class="o">=</span> <span class="n">bandwidth</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_auto_bandwidth</span> <span class="o">=</span> <span class="kc">False</span>

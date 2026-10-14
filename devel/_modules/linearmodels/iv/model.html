@@ -19,7 +19,7 @@
     
   
       
-        <title>linearmodels.iv.model - linearmodels v7.1 (+525)</title>
+        <title>linearmodels.iv.model - linearmodels v7.1 (+544)</title>
       
     
 
@@ -91,7 +91,7 @@
 
 <header class="md-header md-header--shadow" data-md-component="header">
   <nav class="md-header__inner md-grid" aria-label="Header">
-    <a href="../../../index.html" title="linearmodels v7.1 (+525)" class="md-header__button md-logo" aria-label="linearmodels v7.1 (+525)" data-md-component="logo">
+    <a href="../../../index.html" title="linearmodels v7.1 (+544)" class="md-header__button md-logo" aria-label="linearmodels v7.1 (+544)" data-md-component="logo">
       <img src="../../../_static/bw-logo.svg" alt="logo">
     </a>
     <label class="md-header__button md-icon" for="__drawer">
@@ -102,7 +102,7 @@
       <div class="md-header__ellipsis">
         <div class="md-header__topic">
           <span class="md-ellipsis">
-            linearmodels v7.1 (+525)
+            linearmodels v7.1 (+544)
           </span>
         </div>
         <div class="md-header__topic" data-md-component="header-topic">
@@ -197,10 +197,10 @@
 
 <nav class="md-nav md-nav--primary" aria-label="Navigation" data-md-level="0">
   <label class="md-nav__title" for="__drawer">
-    <a href="../../../index.html" title="linearmodels v7.1 (+525)" class="md-nav__button md-logo" aria-label="linearmodels v7.1 (+525)" data-md-component="logo">
+    <a href="../../../index.html" title="linearmodels v7.1 (+544)" class="md-nav__button md-logo" aria-label="linearmodels v7.1 (+544)" data-md-component="logo">
       <img src="../../../_static/bw-logo.svg" alt="logo">
     </a>
-    linearmodels v7.1 (+525)
+    linearmodels v7.1 (+544)
   </label>
   
     <div class="md-nav__source">
@@ -593,7 +593,9 @@
 <span class="p">)</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">linearmodels.shared.exceptions</span><span class="w"> </span><span class="kn">import</span> <span class="p">(</span>
     <span class="n">IndexWarning</span><span class="p">,</span>
+    <span class="n">check_cov_config</span><span class="p">,</span>
     <span class="n">lookup_option</span><span class="p">,</span>
+    <span class="n">lower_option</span><span class="p">,</span>
     <span class="n">missing_warning</span><span class="p">,</span>
     <span class="n">unknown_option_error</span><span class="p">,</span>
 <span class="p">)</span>
@@ -619,6 +621,28 @@
     <span class="s2">"IVResultType"</span><span class="p">,</span>
 <span class="p">]</span>
 
+<span class="n">_CENTER</span> <span class="o">=</span> <span class="p">(</span><span class="s2">"center"</span><span class="p">,)</span>
+<span class="c1"># kappa is overwritten by fit. It is accepted so that the cov_config of results</span>
+<span class="c1"># can be passed to fit. extra_df is the number of degrees of freedom that the model</span>
+<span class="c1"># uses beyond the regressors, which the covariance estimators document</span>
+<span class="n">_LS_KEYS</span> <span class="o">=</span> <span class="p">(</span><span class="o">*</span><span class="n">_CENTER</span><span class="p">,</span> <span class="s2">"kappa"</span><span class="p">,</span> <span class="s2">"extra_df"</span><span class="p">)</span>
+<span class="n">_COV_KEYS</span> <span class="o">=</span> <span class="p">{</span>
+    <span class="n">HomoskedasticCovariance</span><span class="p">:</span> <span class="n">_LS_KEYS</span><span class="p">,</span>
+    <span class="n">HeteroskedasticCovariance</span><span class="p">:</span> <span class="n">_LS_KEYS</span><span class="p">,</span>
+    <span class="n">KernelCovariance</span><span class="p">:</span> <span class="p">(</span><span class="o">*</span><span class="n">_LS_KEYS</span><span class="p">,</span> <span class="s2">"kernel"</span><span class="p">,</span> <span class="s2">"bandwidth"</span><span class="p">),</span>
+    <span class="n">ClusteredCovariance</span><span class="p">:</span> <span class="p">(</span><span class="o">*</span><span class="n">_LS_KEYS</span><span class="p">,</span> <span class="s2">"clusters"</span><span class="p">),</span>
+<span class="p">}</span>
+<span class="c1"># The keys of the covariance estimators of GMM models, which also select the</span>
+<span class="c1"># bandwidth from the data</span>
+<span class="n">_GMM_COV_KEYS</span> <span class="o">=</span> <span class="p">{</span>
+    <span class="s2">"unadjusted"</span><span class="p">:</span> <span class="n">_CENTER</span><span class="p">,</span>
+    <span class="s2">"homoskedastic"</span><span class="p">:</span> <span class="n">_CENTER</span><span class="p">,</span>
+    <span class="s2">"robust"</span><span class="p">:</span> <span class="n">_CENTER</span><span class="p">,</span>
+    <span class="s2">"heteroskedastic"</span><span class="p">:</span> <span class="n">_CENTER</span><span class="p">,</span>
+    <span class="s2">"clustered"</span><span class="p">:</span> <span class="p">(</span><span class="o">*</span><span class="n">_CENTER</span><span class="p">,</span> <span class="s2">"clusters"</span><span class="p">),</span>
+    <span class="s2">"kernel"</span><span class="p">:</span> <span class="p">(</span><span class="o">*</span><span class="n">_CENTER</span><span class="p">,</span> <span class="s2">"kernel"</span><span class="p">,</span> <span class="s2">"bandwidth"</span><span class="p">,</span> <span class="s2">"optimal_bw"</span><span class="p">),</span>
+<span class="p">}</span>
+
 <span class="n">COVARIANCE_ESTIMATORS</span> <span class="o">=</span> <span class="p">{</span>
     <span class="s2">"homoskedastic"</span><span class="p">:</span> <span class="n">HomoskedasticCovariance</span><span class="p">,</span>
     <span class="s2">"unadjusted"</span><span class="p">:</span> <span class="n">HomoskedasticCovariance</span><span class="p">,</span>
@@ -633,6 +657,10 @@
     <span class="s2">"one-way"</span><span class="p">:</span> <span class="n">ClusteredCovariance</span><span class="p">,</span>
     <span class="s2">"clustered"</span><span class="p">:</span> <span class="n">ClusteredCovariance</span><span class="p">,</span>
     <span class="s2">"OneWayClusteredCovariance"</span><span class="p">:</span> <span class="n">ClusteredCovariance</span><span class="p">,</span>
+<span class="p">}</span>
+<span class="n">_LS_COV_KEYS</span> <span class="o">=</span> <span class="p">{</span>
+    <span class="n">name</span><span class="o">.</span><span class="n">lower</span><span class="p">():</span> <span class="n">_COV_KEYS</span><span class="p">[</span><span class="n">estimator</span><span class="p">]</span>
+    <span class="k">for</span> <span class="n">name</span><span class="p">,</span> <span class="n">estimator</span> <span class="ow">in</span> <span class="n">COVARIANCE_ESTIMATORS</span><span class="o">.</span><span class="n">items</span><span class="p">()</span>
 <span class="p">}</span>
 
 <span class="n">CovarianceEstimator</span> <span class="o">=</span> <span class="n">TypeVar</span><span class="p">(</span>
@@ -1392,6 +1420,12 @@
 <span class="sd">        UnknownOptionError</span>
 <span class="sd">            If ``cov_type`` or ``kernel`` is not supported. It is both a</span>
 <span class="sd">            ``KeyError`` and a ``ValueError``.</span>
+<span class="sd">        ValueError</span>
+<span class="sd">            If a key of ``cov_config`` is not accepted by the covariance estimator</span>
+<span class="sd">            that ``cov_type`` selects. The message names the key and lists the</span>
+<span class="sd">            accepted keys. It is raised before the model is estimated. Releases</span>
+<span class="sd">            before 7.1 raised the ``TypeError`` of the constructor of the covariance</span>
+<span class="sd">            estimator.</span>
 
 <span class="sd">        See Also</span>
 <span class="sd">        --------</span>
@@ -1408,6 +1442,8 @@
 <span class="sd">        supported options. Defaults are used if no covariance configuration</span>
 <span class="sd">        is provided.</span>
 <span class="sd">        """</span>
+        <span class="n">cov_type</span> <span class="o">=</span> <span class="n">lower_option</span><span class="p">(</span><span class="n">cov_type</span><span class="p">)</span>
+        <span class="n">check_cov_config</span><span class="p">(</span><span class="n">cov_config</span><span class="p">,</span> <span class="n">cov_type</span><span class="p">,</span> <span class="n">_LS_COV_KEYS</span><span class="p">,</span> <span class="n">KERNEL_LOOKUP</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_check_clusters</span><span class="p">(</span><span class="n">cov_config</span><span class="p">)</span>
         <span class="n">wy</span><span class="p">,</span> <span class="n">wx</span><span class="p">,</span> <span class="n">wz</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_wy</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_wx</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_wz</span>
         <span class="n">kappa</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_kappa</span>
@@ -1924,8 +1960,10 @@
 <span class="sd">        not match (see Notes), or if ``weights`` are not strictly positive and</span>
 <span class="sd">        finite.</span>
 <span class="sd">    UnknownOptionError</span>
-<span class="sd">        If ``weight_type`` is not supported. It is both a ``KeyError`` and a</span>
-<span class="sd">        ``ValueError``.</span>
+<span class="sd">        If ``weight_type`` is not supported, or if it is "kernel" and ``kernel``</span>
+<span class="sd">        is not a supported kernel. It is both a ``KeyError`` and a</span>
+<span class="sd">        ``ValueError``. Before 7.1, an unsupported ``kernel`` was reported by</span>
+<span class="sd">        ``fit``.</span>
 <span class="sd">    TypeError</span>
 <span class="sd">        If an input is complex or cannot be converted to float64.</span>
 
@@ -1974,6 +2012,7 @@
         <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">dependent</span><span class="p">,</span> <span class="n">exog</span><span class="p">,</span> <span class="n">endog</span><span class="p">,</span> <span class="n">instruments</span><span class="p">,</span> <span class="n">weights</span><span class="o">=</span><span class="n">weights</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_method</span> <span class="o">=</span> <span class="s2">"IV-GMM"</span>
 
+        <span class="n">weight_type</span> <span class="o">=</span> <span class="n">lower_option</span><span class="p">(</span><span class="n">weight_type</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_check_clusters</span><span class="p">(</span><span class="n">weight_config</span><span class="p">)</span>
         <span class="n">weight_matrix_estimator</span> <span class="o">=</span> <span class="n">lookup_option</span><span class="p">(</span>
             <span class="n">WEIGHT_MATRICES</span><span class="p">,</span> <span class="n">weight_type</span><span class="p">,</span> <span class="s2">"weight_type"</span>
@@ -2227,8 +2266,10 @@
 <span class="sd">        not match (see Notes), or if ``weights`` are not strictly positive and</span>
 <span class="sd">        finite.</span>
 <span class="sd">    UnknownOptionError</span>
-<span class="sd">        If ``weight_type`` is not supported. It is both a ``KeyError`` and a</span>
-<span class="sd">        ``ValueError``.</span>
+<span class="sd">        If ``weight_type`` is not supported, or if it is "kernel" and ``kernel``</span>
+<span class="sd">        is not a supported kernel. It is both a ``KeyError`` and a</span>
+<span class="sd">        ``ValueError``. Before 7.1, an unsupported ``kernel`` was reported by</span>
+<span class="sd">        ``fit``.</span>
 <span class="sd">    TypeError</span>
 <span class="sd">        If an input is complex or cannot be converted to float64.</span>
 
@@ -2528,6 +2569,12 @@
 <span class="sd">        UnknownOptionError</span>
 <span class="sd">            If ``cov_type`` is not supported. It is both a ``KeyError`` and a</span>
 <span class="sd">            ``ValueError``.</span>
+<span class="sd">        ValueError</span>
+<span class="sd">            If a key of ``cov_config`` is not accepted by the covariance estimator</span>
+<span class="sd">            that ``cov_type`` selects. The message names the key and lists the</span>
+<span class="sd">            accepted keys. It is raised before the model is estimated. Releases</span>
+<span class="sd">            before 7.1 raised the ``TypeError`` of the constructor of the covariance</span>
+<span class="sd">            estimator.</span>
 
 <span class="sd">        See Also</span>
 <span class="sd">        --------</span>
@@ -2552,6 +2599,8 @@
 <span class="sd">        ``optimal_bw=False`` to use the kernel with fewer observations. See</span>
 <span class="sd">        :func:`~linearmodels.iv.covariance.kernel_optimal_bandwidth`.</span>
 <span class="sd">        """</span>
+        <span class="n">cov_type</span> <span class="o">=</span> <span class="n">lower_option</span><span class="p">(</span><span class="n">cov_type</span><span class="p">)</span>
+        <span class="n">check_cov_config</span><span class="p">(</span><span class="n">cov_config</span><span class="p">,</span> <span class="n">cov_type</span><span class="p">,</span> <span class="n">_GMM_COV_KEYS</span><span class="p">,</span> <span class="n">KERNEL_LOOKUP</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_check_clusters</span><span class="p">(</span><span class="n">cov_config</span><span class="p">)</span>
         <span class="n">cov_config</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_check_default_bandwidth</span><span class="p">(</span><span class="n">cov_type</span><span class="p">,</span> <span class="n">cov_config</span><span class="p">)</span>
         <span class="n">wy</span><span class="p">,</span> <span class="n">wx</span><span class="p">,</span> <span class="n">wz</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_wy</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_wx</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_wz</span>
@@ -2676,8 +2725,10 @@
 <span class="sd">        not match (see Notes), or if ``weights`` are not strictly positive and</span>
 <span class="sd">        finite.</span>
 <span class="sd">    UnknownOptionError</span>
-<span class="sd">        If ``weight_type`` is not supported. It is both a ``KeyError`` and a</span>
-<span class="sd">        ``ValueError``.</span>
+<span class="sd">        If ``weight_type`` is not supported, or if it is "kernel" and ``kernel``</span>
+<span class="sd">        is not a supported kernel. It is both a ``KeyError`` and a</span>
+<span class="sd">        ``ValueError``. Before 7.1, an unsupported ``kernel`` was reported by</span>
+<span class="sd">        ``fit``.</span>
 <span class="sd">    TypeError</span>
 <span class="sd">        If an input is complex or cannot be converted to float64.</span>
 
@@ -3176,6 +3227,12 @@
 <span class="sd">        UnknownOptionError</span>
 <span class="sd">            If ``cov_type`` is not supported. It is both a ``KeyError`` and a</span>
 <span class="sd">            ``ValueError``.</span>
+<span class="sd">        ValueError</span>
+<span class="sd">            If a key of ``cov_config`` is not accepted by the covariance estimator</span>
+<span class="sd">            that ``cov_type`` selects. The message names the key and lists the</span>
+<span class="sd">            accepted keys. It is raised before the model is estimated. Releases</span>
+<span class="sd">            before 7.1 raised the ``TypeError`` of the constructor of the covariance</span>
+<span class="sd">            estimator.</span>
 
 <span class="sd">        See Also</span>
 <span class="sd">        --------</span>
@@ -3214,6 +3271,8 @@
 <span class="sd">        ``optimal_bw=False`` to use the kernel with fewer observations. See</span>
 <span class="sd">        :func:`~linearmodels.iv.covariance.kernel_optimal_bandwidth`.</span>
 <span class="sd">        """</span>
+        <span class="n">cov_type</span> <span class="o">=</span> <span class="n">lower_option</span><span class="p">(</span><span class="n">cov_type</span><span class="p">)</span>
+        <span class="n">check_cov_config</span><span class="p">(</span><span class="n">cov_config</span><span class="p">,</span> <span class="n">cov_type</span><span class="p">,</span> <span class="n">_GMM_COV_KEYS</span><span class="p">,</span> <span class="n">KERNEL_LOOKUP</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_check_clusters</span><span class="p">(</span><span class="n">cov_config</span><span class="p">)</span>
         <span class="n">cov_config</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_check_default_bandwidth</span><span class="p">(</span><span class="n">cov_type</span><span class="p">,</span> <span class="n">cov_config</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_select_bandwidth</span><span class="p">()</span>
@@ -3470,7 +3529,7 @@
         <span class="c1"># The weight matrix has no effect in a just identified model</span>
         <span class="n">w</span> <span class="o">=</span> <span class="n">eye</span><span class="p">(</span><span class="n">x</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">])</span>
         <span class="k">if</span> <span class="n">cov_type</span> <span class="o">==</span> <span class="s2">"kernel"</span><span class="p">:</span>
-            <span class="n">kernel</span> <span class="o">=</span> <span class="n">cov_config</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"kernel"</span><span class="p">,</span> <span class="s2">"bartlett"</span><span class="p">)</span>
+            <span class="n">kernel</span> <span class="o">=</span> <span class="n">lower_option</span><span class="p">(</span><span class="n">cov_config</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"kernel"</span><span class="p">,</span> <span class="s2">"bartlett"</span><span class="p">))</span>
             <span class="k">if</span> <span class="n">kernel</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">KERNEL_LOOKUP</span><span class="p">:</span>
                 <span class="k">raise</span> <span class="n">unknown_option_error</span><span class="p">(</span><span class="s2">"kernel"</span><span class="p">,</span> <span class="n">kernel</span><span class="p">,</span> <span class="n">KERNEL_LOOKUP</span><span class="p">)</span>
             <span class="c1"># Select the bandwidth using the data unless it is given, as in</span>
@@ -3770,6 +3829,12 @@
 <span class="sd">        UnknownOptionError</span>
 <span class="sd">            If ``cov_type`` or ``kernel`` is not supported. It is both a</span>
 <span class="sd">            ``KeyError`` and a ``ValueError``.</span>
+<span class="sd">        ValueError</span>
+<span class="sd">            If a key of ``cov_config`` is not accepted by the covariance estimator</span>
+<span class="sd">            that ``cov_type`` selects. The message names the key and lists the</span>
+<span class="sd">            accepted keys. It is raised before the model is estimated. Releases</span>
+<span class="sd">            before 7.1 raised the ``TypeError`` of the constructor of the covariance</span>
+<span class="sd">            estimator.</span>
 
 <span class="sd">        See Also</span>
 <span class="sd">        --------</span>
@@ -3795,6 +3860,8 @@
 <span class="sd">        ``InvalidTestStatistic`` if it is not defined. The model is estimated</span>
 <span class="sd">        then. See the notes of the class.</span>
 <span class="sd">        """</span>
+        <span class="n">cov_type</span> <span class="o">=</span> <span class="n">lower_option</span><span class="p">(</span><span class="n">cov_type</span><span class="p">)</span>
+        <span class="n">check_cov_config</span><span class="p">(</span><span class="n">cov_config</span><span class="p">,</span> <span class="n">cov_type</span><span class="p">,</span> <span class="n">_GMM_COV_KEYS</span><span class="p">,</span> <span class="n">KERNEL_LOOKUP</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_check_clusters</span><span class="p">(</span><span class="n">cov_config</span><span class="p">)</span>
         <span class="n">wy</span><span class="p">,</span> <span class="n">wx</span><span class="p">,</span> <span class="n">wz</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_wy</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_wx</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_wz</span>
 

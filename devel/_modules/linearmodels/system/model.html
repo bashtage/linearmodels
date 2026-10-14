@@ -19,7 +19,7 @@
     
   
       
-        <title>linearmodels.system.model - linearmodels v7.1 (+525)</title>
+        <title>linearmodels.system.model - linearmodels v7.1 (+544)</title>
       
     
 
@@ -91,7 +91,7 @@
 
 <header class="md-header md-header--shadow" data-md-component="header">
   <nav class="md-header__inner md-grid" aria-label="Header">
-    <a href="../../../index.html" title="linearmodels v7.1 (+525)" class="md-header__button md-logo" aria-label="linearmodels v7.1 (+525)" data-md-component="logo">
+    <a href="../../../index.html" title="linearmodels v7.1 (+544)" class="md-header__button md-logo" aria-label="linearmodels v7.1 (+544)" data-md-component="logo">
       <img src="../../../_static/bw-logo.svg" alt="logo">
     </a>
     <label class="md-header__button md-icon" for="__drawer">
@@ -102,7 +102,7 @@
       <div class="md-header__ellipsis">
         <div class="md-header__topic">
           <span class="md-ellipsis">
-            linearmodels v7.1 (+525)
+            linearmodels v7.1 (+544)
           </span>
         </div>
         <div class="md-header__topic" data-md-component="header-topic">
@@ -197,10 +197,10 @@
 
 <nav class="md-nav md-nav--primary" aria-label="Navigation" data-md-level="0">
   <label class="md-nav__title" for="__drawer">
-    <a href="../../../index.html" title="linearmodels v7.1 (+525)" class="md-nav__button md-logo" aria-label="linearmodels v7.1 (+525)" data-md-component="logo">
+    <a href="../../../index.html" title="linearmodels v7.1 (+544)" class="md-nav__button md-logo" aria-label="linearmodels v7.1 (+544)" data-md-component="logo">
       <img src="../../../_static/bw-logo.svg" alt="logo">
     </a>
-    linearmodels v7.1 (+525)
+    linearmodels v7.1 (+544)
   </label>
   
     <div class="md-nav__source">
@@ -555,6 +555,7 @@
 <span class="kn">from</span><span class="w"> </span><span class="nn">pandas</span><span class="w"> </span><span class="kn">import</span> <span class="n">DataFrame</span><span class="p">,</span> <span class="n">Index</span><span class="p">,</span> <span class="n">Series</span><span class="p">,</span> <span class="n">concat</span>
 
 <span class="kn">from</span><span class="w"> </span><span class="nn">linearmodels.iv._utility</span><span class="w"> </span><span class="kn">import</span> <span class="n">IVFormulaParser</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">linearmodels.iv.covariance</span><span class="w"> </span><span class="kn">import</span> <span class="n">KERNEL_LOOKUP</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">linearmodels.iv.data</span><span class="w"> </span><span class="kn">import</span> <span class="n">IVData</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">linearmodels.iv.gmm</span><span class="w"> </span><span class="kn">import</span> <span class="n">_uses_default_bandwidth</span><span class="p">,</span> <span class="n">_warn_default_bandwidth</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">linearmodels.shared.alignment</span><span class="w"> </span><span class="kn">import</span> <span class="p">(</span>
@@ -563,7 +564,12 @@
     <span class="n">reference_labels</span><span class="p">,</span>
     <span class="n">row_labels</span><span class="p">,</span>
 <span class="p">)</span>
-<span class="kn">from</span><span class="w"> </span><span class="nn">linearmodels.shared.exceptions</span><span class="w"> </span><span class="kn">import</span> <span class="n">missing_warning</span><span class="p">,</span> <span class="n">unknown_option_error</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">linearmodels.shared.exceptions</span><span class="w"> </span><span class="kn">import</span> <span class="p">(</span>
+    <span class="n">check_cov_config</span><span class="p">,</span>
+    <span class="n">lower_option</span><span class="p">,</span>
+    <span class="n">missing_warning</span><span class="p">,</span>
+    <span class="n">unknown_option_error</span><span class="p">,</span>
+<span class="p">)</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">linearmodels.shared.hypotheses</span><span class="w"> </span><span class="kn">import</span> <span class="n">InvalidTestStatistic</span><span class="p">,</span> <span class="n">WaldTestStatistic</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">linearmodels.shared.inputs</span><span class="w"> </span><span class="kn">import</span> <span class="n">as_array_like</span><span class="p">,</span> <span class="n">as_float64</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">linearmodels.shared.linalg</span><span class="w"> </span><span class="kn">import</span> <span class="n">has_constant</span>
@@ -630,6 +636,17 @@
     <span class="s2">"unadjusted"</span><span class="p">:</span> <span class="n">GMMHomoskedasticCovariance</span><span class="p">,</span>
     <span class="s2">"robust"</span><span class="p">:</span> <span class="n">GMMHeteroskedasticCovariance</span><span class="p">,</span>
     <span class="s2">"kernel"</span><span class="p">:</span> <span class="n">GMMKernelCovariance</span><span class="p">,</span>
+<span class="p">}</span>
+
+<span class="n">_LS_KEYS</span> <span class="o">=</span> <span class="p">{</span>
+    <span class="s2">"unadjusted"</span><span class="p">:</span> <span class="p">(</span><span class="s2">"debiased"</span><span class="p">,),</span>
+    <span class="s2">"robust"</span><span class="p">:</span> <span class="p">(</span><span class="s2">"debiased"</span><span class="p">,),</span>
+    <span class="s2">"kernel"</span><span class="p">:</span> <span class="p">(</span><span class="s2">"debiased"</span><span class="p">,</span> <span class="s2">"kernel"</span><span class="p">,</span> <span class="s2">"bandwidth"</span><span class="p">),</span>
+    <span class="s2">"clustered"</span><span class="p">:</span> <span class="p">(</span><span class="s2">"debiased"</span><span class="p">,</span> <span class="s2">"clusters"</span><span class="p">,</span> <span class="s2">"group_debias"</span><span class="p">),</span>
+<span class="p">}</span>
+<span class="n">_LS_COV_KEYS</span> <span class="o">=</span> <span class="p">{</span><span class="n">name</span><span class="p">:</span> <span class="n">_LS_KEYS</span><span class="p">[</span><span class="n">cov</span><span class="p">]</span> <span class="k">for</span> <span class="n">name</span><span class="p">,</span> <span class="n">cov</span> <span class="ow">in</span> <span class="n">COV_TYPES</span><span class="o">.</span><span class="n">items</span><span class="p">()}</span>
+<span class="n">_GMM_COV_KEYS</span> <span class="o">=</span> <span class="p">{</span>
+    <span class="n">name</span><span class="p">:</span> <span class="n">keys</span> <span class="k">for</span> <span class="n">name</span><span class="p">,</span> <span class="n">keys</span> <span class="ow">in</span> <span class="n">_LS_COV_KEYS</span><span class="o">.</span><span class="n">items</span><span class="p">()</span> <span class="k">if</span> <span class="n">COV_TYPES</span><span class="p">[</span><span class="n">name</span><span class="p">]</span> <span class="ow">in</span> <span class="n">GMM_W_EST</span>
 <span class="p">}</span>
 
 <span class="c1"># The names in COV_TYPES that IVSystemGMM supports, which excludes "clustered"</span>
@@ -2044,6 +2061,12 @@
 <span class="sd">        UnknownOptionError</span>
 <span class="sd">            If ``cov_type`` or ``kernel`` is not supported. It is both a</span>
 <span class="sd">            ``KeyError`` and a ``ValueError``.</span>
+<span class="sd">        ValueError</span>
+<span class="sd">            If a key of ``cov_config`` is not accepted by the covariance estimator</span>
+<span class="sd">            that ``cov_type`` selects. The message names the key and lists the</span>
+<span class="sd">            accepted keys. It is raised before the model is estimated. Releases</span>
+<span class="sd">            before 7.1 raised the ``TypeError`` of the constructor of the covariance</span>
+<span class="sd">            estimator.</span>
 
 <span class="sd">        See Also</span>
 <span class="sd">        --------</span>
@@ -2056,6 +2079,8 @@
 <span class="sd">        linearmodels.system.covariance.ClusteredCovariance</span>
 <span class="sd">            Clustered covariance.</span>
 <span class="sd">        """</span>
+        <span class="n">cov_type</span> <span class="o">=</span> <span class="n">lower_option</span><span class="p">(</span><span class="n">cov_type</span><span class="p">)</span>
+        <span class="n">check_cov_config</span><span class="p">(</span><span class="n">cov_config</span><span class="p">,</span> <span class="n">cov_type</span><span class="p">,</span> <span class="n">_LS_COV_KEYS</span><span class="p">,</span> <span class="n">KERNEL_LOOKUP</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_check_clusters</span><span class="p">(</span><span class="n">cov_config</span><span class="p">)</span>
         <span class="k">if</span> <span class="n">method</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
             <span class="n">method</span> <span class="o">=</span> <span class="p">(</span>
@@ -2693,7 +2718,7 @@
 <span class="sd">        provided with another weight type.</span>
 <span class="sd">    weight_type : str, optional</span>
 <span class="sd">        Name of moment condition weight function to use in the GMM estimation. The</span>
-<span class="sd">        default is "robust". The names are case sensitive. Supported weight</span>
+<span class="sd">        default is "robust". The names are not case sensitive. Supported weight</span>
 <span class="sd">        types are:</span>
 
 <span class="sd">        * "unadjusted", "homoskedastic" - Assume moments are homoskedastic</span>
@@ -2836,6 +2861,7 @@
         <span class="o">**</span><span class="n">weight_config</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">|</span> <span class="nb">str</span> <span class="o">|</span> <span class="nb">float</span><span class="p">,</span>
     <span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
         <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">equations</span><span class="p">,</span> <span class="n">sigma</span><span class="o">=</span><span class="n">sigma</span><span class="p">)</span>
+        <span class="n">weight_type</span> <span class="o">=</span> <span class="n">lower_option</span><span class="p">(</span><span class="n">weight_type</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_weight_type</span> <span class="o">=</span> <span class="n">weight_type</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_weight_config</span> <span class="o">=</span> <span class="n">weight_config</span>
 
@@ -2887,7 +2913,7 @@
 <span class="sd">            specified, uses the average outer-product of the set containing</span>
 <span class="sd">            the exogenous variables and instruments.</span>
 <span class="sd">        cov_type : str, optional</span>
-<span class="sd">            Name of covariance estimator. The names are case sensitive. The default</span>
+<span class="sd">            Name of covariance estimator. The names are not case sensitive. The default</span>
 <span class="sd">            is "robust". Valid options are</span>
 
 <span class="sd">            * "unadjusted", "homoskedastic" - Classic covariance estimator</span>
@@ -2921,6 +2947,12 @@
 <span class="sd">            for the Parzen kernel and 6 for the quadratic spectral kernel. It</span>
 <span class="sd">            is also raised if the estimated bandwidth is not finite. Pass</span>
 <span class="sd">            ``bandwidth`` to use the kernel with fewer observations.</span>
+<span class="sd">        ValueError</span>
+<span class="sd">            If a key of ``cov_config`` is not accepted by the covariance estimator</span>
+<span class="sd">            that ``cov_type`` selects. The message names the key and lists the</span>
+<span class="sd">            accepted keys. It is raised before the model is estimated. Releases</span>
+<span class="sd">            before 7.1 raised the ``TypeError`` of the constructor of the covariance</span>
+<span class="sd">            estimator.</span>
 
 <span class="sd">        Notes</span>
 <span class="sd">        -----</span>
@@ -2933,6 +2965,8 @@
 <span class="sd">        :class:`~linearmodels.system.model.IVSystemGMM` for how to restore the</span>
 <span class="sd">        previous bandwidth.</span>
 <span class="sd">        """</span>
+        <span class="n">cov_type</span> <span class="o">=</span> <span class="n">lower_option</span><span class="p">(</span><span class="n">cov_type</span><span class="p">)</span>
+        <span class="n">check_cov_config</span><span class="p">(</span><span class="n">cov_config</span><span class="p">,</span> <span class="n">cov_type</span><span class="p">,</span> <span class="n">_GMM_COV_KEYS</span><span class="p">,</span> <span class="n">KERNEL_LOOKUP</span><span class="p">)</span>
         <span class="k">if</span> <span class="n">cov_type</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">GMM_TYPES</span><span class="p">:</span>
             <span class="k">raise</span> <span class="n">unknown_option_error</span><span class="p">(</span><span class="s2">"cov_type"</span><span class="p">,</span> <span class="n">cov_type</span><span class="p">,</span> <span class="n">GMM_TYPES</span><span class="p">)</span>
         <span class="c1"># Parameter estimation</span>
@@ -3160,7 +3194,7 @@
 <span class="sd">            its observation is dropped from all of the equations.</span>
 <span class="sd">        weight_type : str, optional</span>
 <span class="sd">            Name of moment condition weight function to use in the GMM</span>
-<span class="sd">            estimation. The default is "robust". The names are case sensitive.</span>
+<span class="sd">            estimation. The default is "robust". The names are not case sensitive.</span>
 <span class="sd">            Valid options are:</span>
 
 <span class="sd">            * "unadjusted", "homoskedastic" - Assume moments are homoskedastic</span>

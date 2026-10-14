@@ -19,7 +19,7 @@
     
   
       
-        <title>linearmodels.panel.model - linearmodels v7.1 (+525)</title>
+        <title>linearmodels.panel.model - linearmodels v7.1 (+544)</title>
       
     
 
@@ -91,7 +91,7 @@
 
 <header class="md-header md-header--shadow" data-md-component="header">
   <nav class="md-header__inner md-grid" aria-label="Header">
-    <a href="../../../index.html" title="linearmodels v7.1 (+525)" class="md-header__button md-logo" aria-label="linearmodels v7.1 (+525)" data-md-component="logo">
+    <a href="../../../index.html" title="linearmodels v7.1 (+544)" class="md-header__button md-logo" aria-label="linearmodels v7.1 (+544)" data-md-component="logo">
       <img src="../../../_static/bw-logo.svg" alt="logo">
     </a>
     <label class="md-header__button md-icon" for="__drawer">
@@ -102,7 +102,7 @@
       <div class="md-header__ellipsis">
         <div class="md-header__topic">
           <span class="md-ellipsis">
-            linearmodels v7.1 (+525)
+            linearmodels v7.1 (+544)
           </span>
         </div>
         <div class="md-header__topic" data-md-component="header-topic">
@@ -197,10 +197,10 @@
 
 <nav class="md-nav md-nav--primary" aria-label="Navigation" data-md-level="0">
   <label class="md-nav__title" for="__drawer">
-    <a href="../../../index.html" title="linearmodels v7.1 (+525)" class="md-nav__button md-logo" aria-label="linearmodels v7.1 (+525)" data-md-component="logo">
+    <a href="../../../index.html" title="linearmodels v7.1 (+544)" class="md-nav__button md-logo" aria-label="linearmodels v7.1 (+544)" data-md-component="logo">
       <img src="../../../_static/bw-logo.svg" alt="logo">
     </a>
-    linearmodels v7.1 (+525)
+    linearmodels v7.1 (+544)
   </label>
   
     <div class="md-nav__source">
@@ -555,6 +555,7 @@
 <span class="kn">from</span><span class="w"> </span><span class="nn">scipy.linalg</span><span class="w"> </span><span class="kn">import</span> <span class="n">lstsq</span> <span class="k">as</span> <span class="n">sp_lstsq</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">scipy.sparse.linalg</span><span class="w"> </span><span class="kn">import</span> <span class="n">lsmr</span>
 
+<span class="kn">from</span><span class="w"> </span><span class="nn">linearmodels.iv.covariance</span><span class="w"> </span><span class="kn">import</span> <span class="n">KERNEL_LOOKUP</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">linearmodels.panel.covariance</span><span class="w"> </span><span class="kn">import</span> <span class="p">(</span>
     <span class="n">ACCovariance</span><span class="p">,</span>
     <span class="n">ClusteredCovariance</span><span class="p">,</span>
@@ -563,6 +564,7 @@
     <span class="n">FamaMacBethCovariance</span><span class="p">,</span>
     <span class="n">HeteroskedasticCovariance</span><span class="p">,</span>
     <span class="n">HomoskedasticCovariance</span><span class="p">,</span>
+    <span class="n">check_covariance_kwargs</span><span class="p">,</span>
     <span class="n">setup_covariance_estimator</span><span class="p">,</span>
 <span class="p">)</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">linearmodels.panel.data</span><span class="w"> </span><span class="kn">import</span> <span class="n">PanelData</span><span class="p">,</span> <span class="n">PanelDataLike</span>
@@ -594,6 +596,8 @@
     <span class="n">MemoryWarning</span><span class="p">,</span>
     <span class="n">MissingValueWarning</span><span class="p">,</span>
     <span class="n">SingletonWarning</span><span class="p">,</span>
+    <span class="n">lookup_option</span><span class="p">,</span>
+    <span class="n">lower_option</span><span class="p">,</span>
     <span class="n">missing_warning</span><span class="p">,</span>
     <span class="n">unknown_option_error</span><span class="p">,</span>
 <span class="p">)</span>
@@ -1426,7 +1430,8 @@
 <span class="sd">        and one indexed by the entities is a value for each entity. Weights without</span>
 <span class="sd">        labels, which are an array, a list, a tuple, and a Series or a DataFrame with</span>
 <span class="sd">        one column that has the default index, are read by their number of values. A</span>
-<span class="sd">        DataFrame with one column is read as an array with a column is. If dependent</span>
+<span class="sd">        DataFrame with one column is read as an array with a column is if it has the</span>
+<span class="sd">        default index, and as a Series with the same index if it has any other. If dependent</span>
 <span class="sd">        is not balanced, this happens if every time period or entity has a single</span>
 <span class="sd">        row, and they are a value for each row. If it is balanced, this happens if</span>
 <span class="sd">        there is a single entity or time period, and they are a value for each time</span>
@@ -1479,6 +1484,13 @@
             <span class="n">column</span> <span class="o">=</span> <span class="n">as_float64</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">asarray</span><span class="p">(</span><span class="n">weights</span><span class="p">),</span> <span class="s2">"weights"</span><span class="p">)</span>
             <span class="n">weights</span> <span class="o">=</span> <span class="n">cast</span><span class="p">(</span><span class="s2">"linearmodels.typing.data.Float64Array"</span><span class="p">,</span> <span class="n">column</span><span class="p">[:,</span> <span class="mi">0</span><span class="p">])</span>
             <span class="n">labelled</span> <span class="o">=</span> <span class="kc">False</span>
+        <span class="k">elif</span> <span class="p">(</span>
+            <span class="nb">isinstance</span><span class="p">(</span><span class="n">weights</span><span class="p">,</span> <span class="n">DataFrame</span><span class="p">)</span>
+            <span class="ow">and</span> <span class="n">weights</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">==</span> <span class="mi">1</span>
+            <span class="ow">and</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">weights</span><span class="o">.</span><span class="n">index</span><span class="p">,</span> <span class="n">MultiIndex</span><span class="p">)</span>
+        <span class="p">):</span>
+            <span class="c1"># The labels decide, as they do for a Series with the same index</span>
+            <span class="n">weights</span> <span class="o">=</span> <span class="n">weights</span><span class="o">.</span><span class="n">iloc</span><span class="p">[:,</span> <span class="mi">0</span><span class="p">]</span>
         <span class="n">unbalanced</span> <span class="o">=</span> <span class="n">nrows</span> <span class="o">!=</span> <span class="n">nobs</span> <span class="o">*</span> <span class="n">nentity</span>
         <span class="c1"># The labels of a pandas object with a MultiIndex identify the rows</span>
         <span class="n">row_labels</span> <span class="o">=</span> <span class="p">(</span>
@@ -2128,13 +2140,18 @@
 <span class="sd">        ------</span>
 <span class="sd">        ValueError</span>
 <span class="sd">            If `data` is provided and the model was not created using a formula,</span>
-<span class="sd">            if both `exog` and `data` are provided, or if `exog` does not have as</span>
-<span class="sd">            many columns as there are parameters.</span>
+<span class="sd">            if both `exog` and `data` are provided, if neither is provided, or</span>
+<span class="sd">            if `exog` does not have as many columns as there are parameters.</span>
 <span class="sd">        TypeError</span>
 <span class="sd">            If `exog` is a container that is not supported, e.g., a list or a tuple.</span>
 
 <span class="sd">        Notes</span>
 <span class="sd">        -----</span>
+<span class="sd">        .. versionchanged:: 7.1</span>
+
+<span class="sd">           Calling without `exog` and `data` raises a ``ValueError``. It raised</span>
+<span class="sd">           an ``AssertionError``.</span>
+
 <span class="sd">        If `data` is not None, then `exog` must be None.</span>
 <span class="sd">        Predictions from models constructed using formulas can</span>
 <span class="sd">        be computed using either `exog`, which will treat these are</span>
@@ -2151,6 +2168,8 @@
                 <span class="s2">"Predictions can only be constructed using one "</span>
                 <span class="s2">"of exog or data, but not both."</span>
             <span class="p">)</span>
+        <span class="k">if</span> <span class="n">data</span> <span class="ow">is</span> <span class="kc">None</span> <span class="ow">and</span> <span class="n">exog</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">"One of exog or data must be provided."</span><span class="p">)</span>
         <span class="k">if</span> <span class="n">exog</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
             <span class="n">exog</span> <span class="o">=</span> <span class="n">_panel_data</span><span class="p">(</span><span class="n">exog</span><span class="p">,</span> <span class="s2">"exog"</span><span class="p">,</span> <span class="s2">"x"</span><span class="p">)</span><span class="o">.</span><span class="n">dataframe</span>
         <span class="k">else</span><span class="p">:</span>
@@ -2282,7 +2301,10 @@
 <span class="sd">       the numbers of time periods and entities were equal. A DataFrame with one</span>
 <span class="sd">       column and the default index is read as an array with a column is. It raised</span>
 <span class="sd">       an error from pandas or NumPy if ``dependent`` was balanced, and "Weights do</span>
-<span class="sd">       not have a supported shape" if it was not.</span>
+<span class="sd">       not have a supported shape" if it was not. A DataFrame with one column and</span>
+<span class="sd">       an index that is not the default index is read as a Series with that index</span>
+<span class="sd">       is, so that its labels decide. It raised "Weights do not have a supported</span>
+<span class="sd">       shape".</span>
 <span class="sd">    """</span>
 
     <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span>
@@ -2407,7 +2429,8 @@
 <span class="sd">            It is both a ``ValueError`` and a ``KeyError``.</span>
 <span class="sd">        ValueError</span>
 <span class="sd">            If a key of ``cov_config`` is not supported by the covariance</span>
-<span class="sd">            estimator, if ``clusters`` does not have the shape of the data, if</span>
+<span class="sd">            estimator (this is checked before the model is estimated), if</span>
+<span class="sd">            ``clusters`` does not have the shape of the data, if</span>
 <span class="sd">            ``bandwidth`` is not below the number of time periods, or if the model</span>
 <span class="sd">            has no residual degrees of freedom.</span>
 <span class="sd">        TypeError</span>
@@ -2503,9 +2526,15 @@
 <span class="sd">        Examples</span>
 <span class="sd">        --------</span>
 <span class="sd">        &gt;&gt;&gt; from linearmodels import PooledOLS</span>
+<span class="sd">        &gt;&gt;&gt; from linearmodels.datasets import wage_panel</span>
+<span class="sd">        &gt;&gt;&gt; data = wage_panel.load().set_index(["nr", "year"])</span>
+<span class="sd">        &gt;&gt;&gt; y = data["lwage"]</span>
+<span class="sd">        &gt;&gt;&gt; x = data[["married", "union"]]</span>
 <span class="sd">        &gt;&gt;&gt; mod = PooledOLS(y, x)</span>
 <span class="sd">        &gt;&gt;&gt; res = mod.fit(cov_type="clustered", cluster_entity=True)</span>
 <span class="sd">        """</span>
+        <span class="n">cov_type</span> <span class="o">=</span> <span class="n">lower_option</span><span class="p">(</span><span class="n">cov_type</span><span class="p">)</span>
+        <span class="n">check_covariance_kwargs</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_cov_estimators</span><span class="p">,</span> <span class="n">cov_type</span><span class="p">,</span> <span class="n">cov_config</span><span class="p">)</span>
         <span class="n">y</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">dependent</span><span class="o">.</span><span class="n">values2d</span>
         <span class="n">x</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">exog</span><span class="o">.</span><span class="n">values2d</span>
         <span class="n">w</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">weights</span><span class="o">.</span><span class="n">values2d</span>
@@ -2618,13 +2647,18 @@
 <span class="sd">        ------</span>
 <span class="sd">        ValueError</span>
 <span class="sd">            If `data` is provided and the model was not created using a formula,</span>
-<span class="sd">            if both `exog` and `data` are provided, or if `exog` does not have as</span>
-<span class="sd">            many columns as there are parameters.</span>
+<span class="sd">            if both `exog` and `data` are provided, if neither is provided, or</span>
+<span class="sd">            if `exog` does not have as many columns as there are parameters.</span>
 <span class="sd">        TypeError</span>
 <span class="sd">            If `exog` is a container that is not supported, e.g., a list or a tuple.</span>
 
 <span class="sd">        Notes</span>
 <span class="sd">        -----</span>
+<span class="sd">        .. versionchanged:: 7.1</span>
+
+<span class="sd">           Calling without `exog` and `data` raises a ``ValueError``. It raised</span>
+<span class="sd">           an ``AssertionError``.</span>
+
 <span class="sd">        If `data` is not None, then `exog` must be None.</span>
 <span class="sd">        Predictions from models constructed using formulas can</span>
 <span class="sd">        be computed using either `exog`, which will treat these are</span>
@@ -2641,6 +2675,8 @@
                 <span class="s2">"Predictions can only be constructed using one "</span>
                 <span class="s2">"of exog or data, but not both."</span>
             <span class="p">)</span>
+        <span class="k">if</span> <span class="n">data</span> <span class="ow">is</span> <span class="kc">None</span> <span class="ow">and</span> <span class="n">exog</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">"One of exog or data must be provided."</span><span class="p">)</span>
         <span class="k">if</span> <span class="n">exog</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
             <span class="n">exog</span> <span class="o">=</span> <span class="n">_panel_data</span><span class="p">(</span><span class="n">exog</span><span class="p">,</span> <span class="s2">"exog"</span><span class="p">,</span> <span class="s2">"x"</span><span class="p">)</span><span class="o">.</span><span class="n">dataframe</span>
         <span class="k">else</span><span class="p">:</span>
@@ -2741,7 +2777,14 @@
 <span class="sd">        Flag indicating whether to keep singleton observations. If False, the</span>
 <span class="sd">        observations that are alone in their group of an effect are dropped,</span>
 <span class="sd">        repeatedly until there are none, and a ``SingletonWarning`` is issued.</span>
-<span class="sd">        The default is True.</span>
+<span class="sd">        The weights are then scaled to have a mean of 1 in the observations that</span>
+<span class="sd">        are retained. The default is True.</span>
+
+<span class="sd">        .. versionchanged:: 7.1</span>
+
+<span class="sd">           The weights were scaled before the singletons were dropped, so that</span>
+<span class="sd">           their mean was not 1 in the retained observations and ``s2`` differed</span>
+<span class="sd">           from that of the same model on data without the singletons.</span>
 <span class="sd">    drop_absorbed : bool, optional</span>
 <span class="sd">        Flag indicating whether to drop absorbed variables. If False, an</span>
 <span class="sd">        ``AbsorbingEffectError`` is raised by ``fit`` for a model with an</span>
@@ -2832,7 +2875,10 @@
 <span class="sd">       the numbers of time periods and entities were equal. A DataFrame with one</span>
 <span class="sd">       column and the default index is read as an array with a column is. It raised</span>
 <span class="sd">       an error from pandas or NumPy if ``dependent`` was balanced, and "Weights do</span>
-<span class="sd">       not have a supported shape" if it was not.</span>
+<span class="sd">       not have a supported shape" if it was not. A DataFrame with one column and</span>
+<span class="sd">       an index that is not the default index is read as a Series with that index</span>
+<span class="sd">       is, so that its labels decide. It raised "Weights do not have a supported</span>
+<span class="sd">       shape".</span>
 
 <span class="sd">    If both ``entity_effect`` and ``time_effects`` are ``False``, and no other</span>
 <span class="sd">    effects are included, the model reduces to :class:`PooledOLS`.</span>
@@ -2990,6 +3036,15 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">dependent</span><span class="o">.</span><span class="n">drop</span><span class="p">(</span><span class="n">drop</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">exog</span><span class="o">.</span><span class="n">drop</span><span class="p">(</span><span class="n">drop</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">weights</span><span class="o">.</span><span class="n">drop</span><span class="p">(</span><span class="n">drop</span><span class="p">)</span>
+        <span class="c1"># The weights have a mean of 1 in the rows that are retained</span>
+        <span class="n">w_df</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">weights</span><span class="o">.</span><span class="n">dataframe</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">weights</span> <span class="o">=</span> <span class="n">PanelData</span><span class="p">(</span>
+            <span class="n">DataFrame</span><span class="p">(</span>
+                <span class="n">normalize_weights</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">asarray</span><span class="p">(</span><span class="n">w_df</span><span class="p">)),</span>
+                <span class="n">index</span><span class="o">=</span><span class="n">w_df</span><span class="o">.</span><span class="n">index</span><span class="p">,</span>
+                <span class="n">columns</span><span class="o">=</span><span class="n">w_df</span><span class="o">.</span><span class="n">columns</span><span class="p">,</span>
+            <span class="p">)</span>
+        <span class="p">)</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">other_effects</span><span class="p">:</span>
             <span class="k">assert</span> <span class="bp">self</span><span class="o">.</span><span class="n">_other_effect_cats</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">_other_effect_cats</span><span class="o">.</span><span class="n">drop</span><span class="p">(</span><span class="n">drop</span><span class="p">)</span>
@@ -3644,7 +3699,8 @@
 <span class="sd">            collinear, and ``drop_absorbed`` is False in the model.</span>
 <span class="sd">        ValueError</span>
 <span class="sd">            If a key of ``cov_config`` is not supported by the covariance</span>
-<span class="sd">            estimator, if ``clusters`` does not have the shape of the data, if</span>
+<span class="sd">            estimator (this is checked before the model is estimated), if</span>
+<span class="sd">            ``clusters`` does not have the shape of the data, if</span>
 <span class="sd">            ``bandwidth`` is not below the number of time periods, if the model</span>
 <span class="sd">            has no residual degrees of freedom, or if all of the variables of</span>
 <span class="sd">            ``exog`` are absorbed.</span>
@@ -3728,7 +3784,13 @@
 <span class="sd">        if ``debiased`` is True and by n / (n - d) if it is False. If</span>
 <span class="sd">        ``auto_df`` is True, the effects are not counted when the model has</span>
 <span class="sd">        a single effect that is nested in the clusters. Use ``auto_df=False``</span>
-<span class="sd">        and ``count_effects`` to choose.</span>
+<span class="sd">        and ``count_effects`` to choose. Since ``extra_df`` is set from the</span>
+<span class="sd">        effects, it is not a keyword argument of ``fit``.</span>
+
+<span class="sd">        .. versionchanged:: 7.1</span>
+
+<span class="sd">           ``extra_df`` raises a ``ValueError`` at the start of ``fit``. It</span>
+<span class="sd">           raised a ``TypeError`` after the parameters were estimated.</span>
 
 <span class="sd">        An effect is nested in a cluster variable if each of its groups is in one</span>
 <span class="sd">        group of the variable, for example entity effects with</span>
@@ -3774,9 +3836,18 @@
 <span class="sd">        Examples</span>
 <span class="sd">        --------</span>
 <span class="sd">        &gt;&gt;&gt; from linearmodels import PanelOLS</span>
+<span class="sd">        &gt;&gt;&gt; from linearmodels.datasets import wage_panel</span>
+<span class="sd">        &gt;&gt;&gt; data = wage_panel.load().set_index(["nr", "year"])</span>
+<span class="sd">        &gt;&gt;&gt; y = data["lwage"]</span>
+<span class="sd">        &gt;&gt;&gt; x = data[["married", "union"]]</span>
 <span class="sd">        &gt;&gt;&gt; mod = PanelOLS(y, x, entity_effects=True)</span>
 <span class="sd">        &gt;&gt;&gt; res = mod.fit(cov_type="clustered", cluster_entity=True)</span>
 <span class="sd">        """</span>
+        <span class="n">cov_type</span> <span class="o">=</span> <span class="n">lower_option</span><span class="p">(</span><span class="n">cov_type</span><span class="p">)</span>
+        <span class="c1"># extra_df is set from the effects that are estimated</span>
+        <span class="n">check_covariance_kwargs</span><span class="p">(</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_cov_estimators</span><span class="p">,</span> <span class="n">cov_type</span><span class="p">,</span> <span class="n">cov_config</span><span class="p">,</span> <span class="n">fit_options</span><span class="o">=</span><span class="p">()</span>
+        <span class="p">)</span>
 
         <span class="n">weighted</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">any</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">weights</span><span class="o">.</span><span class="n">values2d</span> <span class="o">!=</span> <span class="mf">1.0</span><span class="p">)</span>
 
@@ -4110,7 +4181,10 @@
 <span class="sd">       the numbers of time periods and entities were equal. A DataFrame with one</span>
 <span class="sd">       column and the default index is read as an array with a column is. It raised</span>
 <span class="sd">       an error from pandas or NumPy if ``dependent`` was balanced, and "Weights do</span>
-<span class="sd">       not have a supported shape" if it was not.</span>
+<span class="sd">       not have a supported shape" if it was not. A DataFrame with one column and</span>
+<span class="sd">       an index that is not the default index is read as a Series with that index</span>
+<span class="sd">       is, so that its labels decide. It raised "Weights do not have a supported</span>
+<span class="sd">       shape".</span>
 <span class="sd">    """</span>
 
     <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span>
@@ -4294,9 +4368,17 @@
 <span class="sd">        Examples</span>
 <span class="sd">        --------</span>
 <span class="sd">        &gt;&gt;&gt; from linearmodels import BetweenOLS</span>
+<span class="sd">        &gt;&gt;&gt; from linearmodels.datasets import wage_panel</span>
+<span class="sd">        &gt;&gt;&gt; data = wage_panel.load().set_index(["nr", "year"])</span>
+<span class="sd">        &gt;&gt;&gt; y = data["lwage"]</span>
+<span class="sd">        &gt;&gt;&gt; x = data[["married", "union"]]</span>
 <span class="sd">        &gt;&gt;&gt; mod = BetweenOLS(y, x)</span>
 <span class="sd">        &gt;&gt;&gt; res = mod.fit(cov_type='robust')</span>
 <span class="sd">        """</span>
+        <span class="n">cov_type</span> <span class="o">=</span> <span class="n">lower_option</span><span class="p">(</span><span class="n">cov_type</span><span class="p">)</span>
+        <span class="n">check_covariance_kwargs</span><span class="p">(</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_cov_estimators</span><span class="p">,</span> <span class="n">cov_type</span><span class="p">,</span> <span class="n">cov_config</span><span class="p">,</span> <span class="n">cluster_options</span><span class="o">=</span><span class="p">()</span>
+        <span class="p">)</span>
         <span class="n">y</span><span class="p">,</span> <span class="n">x</span><span class="p">,</span> <span class="n">w</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_prepare_between</span><span class="p">()</span>
         <span class="k">if</span> <span class="n">np</span><span class="o">.</span><span class="n">all</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">weights</span><span class="o">.</span><span class="n">values2d</span> <span class="o">==</span> <span class="mf">1.0</span><span class="p">)</span> <span class="ow">and</span> <span class="ow">not</span> <span class="n">reweight</span><span class="p">:</span>
             <span class="n">w</span> <span class="o">=</span> <span class="n">root_w</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">ones_like</span><span class="p">(</span><span class="n">y</span><span class="p">)</span>
@@ -4583,7 +4665,10 @@
 <span class="sd">       the numbers of time periods and entities were equal. A DataFrame with one</span>
 <span class="sd">       column and the default index is read as an array with a column is. It raised</span>
 <span class="sd">       an error from pandas or NumPy if ``dependent`` was balanced, and "Weights do</span>
-<span class="sd">       not have a supported shape" if it was not.</span>
+<span class="sd">       not have a supported shape" if it was not. A DataFrame with one column and</span>
+<span class="sd">       an index that is not the default index is read as a Series with that index</span>
+<span class="sd">       is, so that its labels decide. It raised "Weights do not have a supported</span>
+<span class="sd">       shape".</span>
 <span class="sd">    """</span>
 
     <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span>
@@ -4721,7 +4806,8 @@
 <span class="sd">            It is both a ``ValueError`` and a ``KeyError``.</span>
 <span class="sd">        ValueError</span>
 <span class="sd">            If a key of ``cov_config`` is not supported by the covariance</span>
-<span class="sd">            estimator, if ``clusters`` does not have the shape of the data, if</span>
+<span class="sd">            estimator (this is checked before the model is estimated), if</span>
+<span class="sd">            ``clusters`` does not have the shape of the data, if</span>
 <span class="sd">            ``bandwidth`` is not below the number of time periods, or if the model</span>
 <span class="sd">            has no residual degrees of freedom.</span>
 <span class="sd">        TypeError</span>
@@ -4816,10 +4902,21 @@
 <span class="sd">        Examples</span>
 <span class="sd">        --------</span>
 <span class="sd">        &gt;&gt;&gt; from linearmodels import FirstDifferenceOLS</span>
+<span class="sd">        &gt;&gt;&gt; from linearmodels.datasets import wage_panel</span>
+<span class="sd">        &gt;&gt;&gt; data = wage_panel.load().set_index(["nr", "year"])</span>
+<span class="sd">        &gt;&gt;&gt; y = data["lwage"]</span>
+<span class="sd">        &gt;&gt;&gt; x = data[["married", "union"]]</span>
 <span class="sd">        &gt;&gt;&gt; mod = FirstDifferenceOLS(y, x)</span>
 <span class="sd">        &gt;&gt;&gt; robust = mod.fit(cov_type="robust")</span>
 <span class="sd">        &gt;&gt;&gt; clustered = mod.fit(cov_type="clustered", cluster_entity=True)</span>
 <span class="sd">        """</span>
+        <span class="n">cov_type</span> <span class="o">=</span> <span class="n">lower_option</span><span class="p">(</span><span class="n">cov_type</span><span class="p">)</span>
+        <span class="n">check_covariance_kwargs</span><span class="p">(</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_cov_estimators</span><span class="p">,</span>
+            <span class="n">cov_type</span><span class="p">,</span>
+            <span class="n">cov_config</span><span class="p">,</span>
+            <span class="n">cluster_options</span><span class="o">=</span><span class="p">(</span><span class="s2">"cluster_entity"</span><span class="p">,),</span>
+        <span class="p">)</span>
         <span class="n">y_fd</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">dependent</span><span class="o">.</span><span class="n">first_difference</span><span class="p">()</span>
         <span class="n">time_ids</span> <span class="o">=</span> <span class="n">y_fd</span><span class="o">.</span><span class="n">time_ids</span>
         <span class="n">entity_ids</span> <span class="o">=</span> <span class="n">y_fd</span><span class="o">.</span><span class="n">entity_ids</span>
@@ -5095,7 +5192,10 @@
 <span class="sd">       the numbers of time periods and entities were equal. A DataFrame with one</span>
 <span class="sd">       column and the default index is read as an array with a column is. It raised</span>
 <span class="sd">       an error from pandas or NumPy if ``dependent`` was balanced, and "Weights do</span>
-<span class="sd">       not have a supported shape" if it was not.</span>
+<span class="sd">       not have a supported shape" if it was not. A DataFrame with one column and</span>
+<span class="sd">       an index that is not the default index is read as a Series with that index</span>
+<span class="sd">       is, so that its labels decide. It raised "Weights do not have a supported</span>
+<span class="sd">       shape".</span>
 <span class="sd">    """</span>
 
     <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span>
@@ -5224,7 +5324,8 @@
 <span class="sd">            It is both a ``ValueError`` and a ``KeyError``.</span>
 <span class="sd">        ValueError</span>
 <span class="sd">            If a key of ``cov_config`` is not supported by the covariance</span>
-<span class="sd">            estimator, if ``clusters`` does not have the shape of the data, if</span>
+<span class="sd">            estimator (this is checked before the model is estimated), if</span>
+<span class="sd">            ``clusters`` does not have the shape of the data, if</span>
 <span class="sd">            ``bandwidth`` is not below the number of time periods, if the model</span>
 <span class="sd">            has no residual degrees of freedom, or if the within or the between</span>
 <span class="sd">            regression has no residual degrees of freedom, so that the variance of</span>
@@ -5351,9 +5452,15 @@
 <span class="sd">        Examples</span>
 <span class="sd">        --------</span>
 <span class="sd">        &gt;&gt;&gt; from linearmodels import RandomEffects</span>
+<span class="sd">        &gt;&gt;&gt; from linearmodels.datasets import wage_panel</span>
+<span class="sd">        &gt;&gt;&gt; data = wage_panel.load().set_index(["nr", "year"])</span>
+<span class="sd">        &gt;&gt;&gt; y = data["lwage"]</span>
+<span class="sd">        &gt;&gt;&gt; x = data[["married", "union"]]</span>
 <span class="sd">        &gt;&gt;&gt; mod = RandomEffects(y, x)</span>
 <span class="sd">        &gt;&gt;&gt; res = mod.fit(cov_type="clustered", cluster_entity=True)</span>
 <span class="sd">        """</span>
+        <span class="n">cov_type</span> <span class="o">=</span> <span class="n">lower_option</span><span class="p">(</span><span class="n">cov_type</span><span class="p">)</span>
+        <span class="n">check_covariance_kwargs</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_cov_estimators</span><span class="p">,</span> <span class="n">cov_type</span><span class="p">,</span> <span class="n">cov_config</span><span class="p">)</span>
         <span class="n">w</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">weights</span><span class="o">.</span><span class="n">values2d</span>
         <span class="n">root_w</span> <span class="o">=</span> <span class="n">cast</span><span class="p">(</span><span class="s2">"linearmodels.typing.data.Float64Array"</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="n">w</span><span class="p">))</span>
         <span class="n">demeaned_dep</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">dependent</span><span class="o">.</span><span class="n">demean</span><span class="p">(</span><span class="s2">"entity"</span><span class="p">,</span> <span class="n">weights</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">weights</span><span class="p">)</span>
@@ -5677,7 +5784,10 @@
 <span class="sd">       the numbers of time periods and entities were equal. A DataFrame with one</span>
 <span class="sd">       column and the default index is read as an array with a column is. It raised</span>
 <span class="sd">       an error from pandas or NumPy if ``dependent`` was balanced, and "Weights do</span>
-<span class="sd">       not have a supported shape" if it was not.</span>
+<span class="sd">       not have a supported shape" if it was not. A DataFrame with one column and</span>
+<span class="sd">       an index that is not the default index is read as a Series with that index</span>
+<span class="sd">       is, so that its labels decide. It raised "Weights do not have a supported</span>
+<span class="sd">       shape".</span>
 
 <span class="sd">    References</span>
 <span class="sd">    ----------</span>
@@ -5888,9 +5998,16 @@
 <span class="sd">        Examples</span>
 <span class="sd">        --------</span>
 <span class="sd">        &gt;&gt;&gt; from linearmodels import FamaMacBeth</span>
+<span class="sd">        &gt;&gt;&gt; from linearmodels.datasets import wage_panel</span>
+<span class="sd">        &gt;&gt;&gt; data = wage_panel.load().set_index(["nr", "year"])</span>
+<span class="sd">        &gt;&gt;&gt; y = data["lwage"]</span>
+<span class="sd">        &gt;&gt;&gt; x = data[["married", "union"]]</span>
 <span class="sd">        &gt;&gt;&gt; mod = FamaMacBeth(y, x)</span>
 <span class="sd">        &gt;&gt;&gt; res = mod.fit(cov_type="kernel", kernel="parzen")</span>
 <span class="sd">        """</span>
+        <span class="n">cov_type</span> <span class="o">=</span> <span class="n">lower_option</span><span class="p">(</span><span class="n">cov_type</span><span class="p">)</span>
+        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">kernel</span><span class="p">,</span> <span class="nb">str</span><span class="p">):</span>
+            <span class="n">lookup_option</span><span class="p">(</span><span class="n">KERNEL_LOOKUP</span><span class="p">,</span> <span class="n">kernel</span><span class="o">.</span><span class="n">lower</span><span class="p">(),</span> <span class="s2">"kernel"</span><span class="p">)</span>
         <span class="c1"># The retained observations and their weights, which are scaled to have a</span>
         <span class="c1"># mean of one once the observations with missing values are dropped</span>
         <span class="n">y</span> <span class="o">=</span> <span class="n">cast</span><span class="p">(</span><span class="s2">"linearmodels.typing.data.Float64Array"</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">dependent</span><span class="o">.</span><span class="n">values2d</span><span class="p">)</span>

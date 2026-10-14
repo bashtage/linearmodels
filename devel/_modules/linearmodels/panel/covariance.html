@@ -19,7 +19,7 @@
     
   
       
-        <title>linearmodels.panel.covariance - linearmodels v7.1 (+525)</title>
+        <title>linearmodels.panel.covariance - linearmodels v7.1 (+544)</title>
       
     
 
@@ -91,7 +91,7 @@
 
 <header class="md-header md-header--shadow" data-md-component="header">
   <nav class="md-header__inner md-grid" aria-label="Header">
-    <a href="../../../index.html" title="linearmodels v7.1 (+525)" class="md-header__button md-logo" aria-label="linearmodels v7.1 (+525)" data-md-component="logo">
+    <a href="../../../index.html" title="linearmodels v7.1 (+544)" class="md-header__button md-logo" aria-label="linearmodels v7.1 (+544)" data-md-component="logo">
       <img src="../../../_static/bw-logo.svg" alt="logo">
     </a>
     <label class="md-header__button md-icon" for="__drawer">
@@ -102,7 +102,7 @@
       <div class="md-header__ellipsis">
         <div class="md-header__topic">
           <span class="md-ellipsis">
-            linearmodels v7.1 (+525)
+            linearmodels v7.1 (+544)
           </span>
         </div>
         <div class="md-header__topic" data-md-component="header-topic">
@@ -197,10 +197,10 @@
 
 <nav class="md-nav md-nav--primary" aria-label="Navigation" data-md-level="0">
   <label class="md-nav__title" for="__drawer">
-    <a href="../../../index.html" title="linearmodels v7.1 (+525)" class="md-nav__button md-logo" aria-label="linearmodels v7.1 (+525)" data-md-component="logo">
+    <a href="../../../index.html" title="linearmodels v7.1 (+544)" class="md-nav__button md-logo" aria-label="linearmodels v7.1 (+544)" data-md-component="logo">
       <img src="../../../_static/bw-logo.svg" alt="logo">
     </a>
-    linearmodels v7.1 (+525)
+    linearmodels v7.1 (+544)
   </label>
   
     <div class="md-nav__source">
@@ -531,6 +531,7 @@
 
 <span class="kn">from</span><span class="w"> </span><span class="nn">__future__</span><span class="w"> </span><span class="kn">import</span> <span class="n">annotations</span>
 
+<span class="kn">from</span><span class="w"> </span><span class="nn">collections.abc</span><span class="w"> </span><span class="kn">import</span> <span class="n">Mapping</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">functools</span><span class="w"> </span><span class="kn">import</span> <span class="n">cached_property</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">typing</span><span class="w"> </span><span class="kn">import</span> <span class="n">Any</span><span class="p">,</span> <span class="n">ClassVar</span><span class="p">,</span> <span class="n">Union</span>
 
@@ -547,7 +548,12 @@
     <span class="n">kernel_optimal_bandwidth</span><span class="p">,</span>
 <span class="p">)</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">linearmodels.shared.covariance</span><span class="w"> </span><span class="kn">import</span> <span class="n">cluster_union</span><span class="p">,</span> <span class="n">group_debias_coefficient</span>
-<span class="kn">from</span><span class="w"> </span><span class="nn">linearmodels.shared.exceptions</span><span class="w"> </span><span class="kn">import</span> <span class="n">lookup_option</span><span class="p">,</span> <span class="n">unknown_option_error</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">linearmodels.shared.exceptions</span><span class="w"> </span><span class="kn">import</span> <span class="p">(</span>
+    <span class="n">check_cov_config</span><span class="p">,</span>
+    <span class="n">lookup_option</span><span class="p">,</span>
+    <span class="n">lower_option</span><span class="p">,</span>
+    <span class="n">unknown_option_error</span><span class="p">,</span>
+<span class="p">)</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">linearmodels.shared.typed_getters</span><span class="w"> </span><span class="kn">import</span> <span class="p">(</span>
     <span class="n">get_array_like</span><span class="p">,</span>
     <span class="n">get_bool</span><span class="p">,</span>
@@ -1400,9 +1406,10 @@
             <span class="k">for</span> <span class="n">name</span><span class="p">,</span> <span class="n">estimator</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">COVARIANCE_ESTIMATORS</span><span class="o">.</span><span class="n">items</span><span class="p">()</span>
             <span class="k">if</span> <span class="n">estimator</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_supported</span>
         <span class="p">]</span>
-        <span class="k">if</span> <span class="n">item</span> <span class="ow">not</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">COVARIANCE_ESTIMATORS</span><span class="p">:</span>
+        <span class="n">name</span> <span class="o">=</span> <span class="n">lower_option</span><span class="p">(</span><span class="n">item</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">name</span> <span class="ow">not</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">COVARIANCE_ESTIMATORS</span><span class="p">:</span>
             <span class="k">raise</span> <span class="n">unknown_option_error</span><span class="p">(</span><span class="s2">"cov_type"</span><span class="p">,</span> <span class="n">item</span><span class="p">,</span> <span class="n">supported</span><span class="p">)</span>
-        <span class="n">cov_est</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">COVARIANCE_ESTIMATORS</span><span class="p">[</span><span class="n">item</span><span class="p">]</span>
+        <span class="n">cov_est</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">COVARIANCE_ESTIMATORS</span><span class="p">[</span><span class="n">name</span><span class="p">]</span>
         <span class="k">if</span> <span class="n">cov_est</span> <span class="ow">not</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_supported</span><span class="p">:</span>
             <span class="n">problem</span> <span class="o">=</span> <span class="p">(</span>
                 <span class="s2">"Requested covariance estimator is not supported "</span>
@@ -1593,6 +1600,53 @@
 
 
 
+<span class="k">def</span><span class="w"> </span><span class="nf">check_covariance_kwargs</span><span class="p">(</span>
+    <span class="n">cov_estimators</span><span class="p">:</span> <span class="n">CovarianceManager</span><span class="p">,</span>
+    <span class="n">cov_type</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
+    <span class="n">cov_config</span><span class="p">:</span> <span class="n">Mapping</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">],</span>
+    <span class="n">cluster_options</span><span class="p">:</span> <span class="nb">tuple</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="o">...</span><span class="p">]</span> <span class="o">=</span> <span class="p">(</span><span class="s2">"cluster_entity"</span><span class="p">,</span> <span class="s2">"cluster_time"</span><span class="p">),</span>
+    <span class="n">fit_options</span><span class="p">:</span> <span class="nb">tuple</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="o">...</span><span class="p">]</span> <span class="o">=</span> <span class="p">(</span><span class="s2">"extra_df"</span><span class="p">,),</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="n">CovarianceEstimatorType</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">"""</span>
+<span class="sd">    Check that the keyword arguments are supported by a covariance estimator.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    cov_estimators : CovarianceManager</span>
+<span class="sd">        The manager of the covariance estimators that the model supports.</span>
+<span class="sd">    cov_type : str</span>
+<span class="sd">        Name of the covariance estimator.</span>
+<span class="sd">    cov_config : dict</span>
+<span class="sd">        The keyword arguments of ``fit`` for the covariance estimator.</span>
+<span class="sd">    cluster_options : tuple of str, optional</span>
+<span class="sd">        The options that make clusters, which the model supports if the estimator</span>
+<span class="sd">        takes clusters.</span>
+<span class="sd">    fit_options : tuple of str, optional</span>
+<span class="sd">        The keyword arguments that ``fit`` accepts with every estimator. The</span>
+<span class="sd">        default is ``("extra_df",)``.</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    type</span>
+<span class="sd">        The covariance estimator class that `cov_type` selects.</span>
+
+<span class="sd">    Raises</span>
+<span class="sd">    ------</span>
+<span class="sd">    UnknownOptionError</span>
+<span class="sd">        If `cov_type` is unknown or is not supported.</span>
+<span class="sd">    ValueError</span>
+<span class="sd">        If `cov_config` contains a key that the estimator does not support.</span>
+<span class="sd">    """</span>
+    <span class="n">estimator</span> <span class="o">=</span> <span class="n">cov_estimators</span><span class="p">[</span><span class="n">cov_type</span><span class="p">]</span>
+    <span class="c1"># fit also accepts its own options, and the options that make clusters</span>
+    <span class="n">accepted</span> <span class="o">=</span> <span class="p">(</span><span class="o">*</span><span class="n">estimator</span><span class="o">.</span><span class="n">ALLOWED_KWARGS</span><span class="p">,</span> <span class="o">*</span><span class="n">fit_options</span><span class="p">)</span>
+    <span class="k">if</span> <span class="s2">"clusters"</span> <span class="ow">in</span> <span class="n">estimator</span><span class="o">.</span><span class="n">ALLOWED_KWARGS</span><span class="p">:</span>
+        <span class="n">accepted</span> <span class="o">=</span> <span class="p">(</span><span class="o">*</span><span class="n">accepted</span><span class="p">,</span> <span class="o">*</span><span class="n">cluster_options</span><span class="p">)</span>
+    <span class="n">name</span> <span class="o">=</span> <span class="nb">str</span><span class="p">(</span><span class="n">cov_type</span><span class="p">)</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span>
+    <span class="n">check_cov_config</span><span class="p">(</span><span class="n">cov_config</span><span class="p">,</span> <span class="n">name</span><span class="p">,</span> <span class="p">{</span><span class="n">name</span><span class="p">:</span> <span class="n">accepted</span><span class="p">},</span> <span class="n">KERNEL_LOOKUP</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">estimator</span>
+
+
 <span class="k">def</span><span class="w"> </span><span class="nf">setup_covariance_estimator</span><span class="p">(</span>
     <span class="n">cov_estimators</span><span class="p">:</span> <span class="n">CovarianceManager</span><span class="p">,</span>
     <span class="n">cov_type</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
@@ -1655,22 +1709,7 @@
 <span class="sd">    TypeError</span>
 <span class="sd">        If a value of `cov_config` does not have the type that its key requires.</span>
 <span class="sd">    """</span>
-    <span class="n">estimator</span> <span class="o">=</span> <span class="n">cov_estimators</span><span class="p">[</span><span class="n">cov_type</span><span class="p">]</span>
-    <span class="n">unknown_kwargs</span> <span class="o">=</span> <span class="p">[</span>
-        <span class="nb">str</span><span class="p">(</span><span class="n">key</span><span class="p">)</span> <span class="k">for</span> <span class="n">key</span> <span class="ow">in</span> <span class="n">cov_config</span> <span class="k">if</span> <span class="nb">str</span><span class="p">(</span><span class="n">key</span><span class="p">)</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">estimator</span><span class="o">.</span><span class="n">ALLOWED_KWARGS</span>
-    <span class="p">]</span>
-    <span class="k">if</span> <span class="n">unknown_kwargs</span><span class="p">:</span>
-        <span class="k">if</span> <span class="n">estimator</span><span class="o">.</span><span class="n">ALLOWED_KWARGS</span><span class="p">:</span>
-            <span class="n">allowed</span> <span class="o">=</span> <span class="s2">", "</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">estimator</span><span class="o">.</span><span class="n">ALLOWED_KWARGS</span><span class="p">)</span>
-            <span class="n">kwarg_err</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">"only supports the keyword arguments: </span><span class="si">{</span><span class="n">allowed</span><span class="si">}</span><span class="s2">"</span>
-        <span class="k">else</span><span class="p">:</span>
-            <span class="n">kwarg_err</span> <span class="o">=</span> <span class="s2">"does not support any keyword arguments"</span>
-        <span class="n">msg</span> <span class="o">=</span> <span class="p">(</span>
-            <span class="sa">f</span><span class="s2">"Covariance estimator </span><span class="si">{</span><span class="n">estimator</span><span class="o">.</span><span class="vm">__name__</span><span class="si">}</span><span class="s2"> </span><span class="si">{</span><span class="n">kwarg_err</span><span class="si">}</span><span class="s2">. Unknown keyword "</span>
-            <span class="sa">f</span><span class="s2">"arguments were passed to the estimator. The unknown keyword argument(s) "</span>
-            <span class="sa">f</span><span class="s2">"are: </span><span class="si">{</span><span class="s1">', '</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">unknown_kwargs</span><span class="p">)</span><span class="si">}</span><span class="s2"> "</span>
-        <span class="p">)</span>
-        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="n">msg</span><span class="p">)</span>
+    <span class="n">estimator</span> <span class="o">=</span> <span class="n">check_covariance_kwargs</span><span class="p">(</span><span class="n">cov_estimators</span><span class="p">,</span> <span class="n">cov_type</span><span class="p">,</span> <span class="n">cov_config</span><span class="p">)</span>
     <span class="n">kernel</span> <span class="o">=</span> <span class="n">get_string</span><span class="p">(</span><span class="n">cov_config</span><span class="p">,</span> <span class="s2">"kernel"</span><span class="p">)</span>
     <span class="n">bandwidth</span> <span class="o">=</span> <span class="n">get_float</span><span class="p">(</span><span class="n">cov_config</span><span class="p">,</span> <span class="s2">"bandwidth"</span><span class="p">)</span>
     <span class="n">group_debias</span> <span class="o">=</span> <span class="n">get_bool</span><span class="p">(</span><span class="n">cov_config</span><span class="p">,</span> <span class="s2">"group_debias"</span><span class="p">)</span>

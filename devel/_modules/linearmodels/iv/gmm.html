@@ -19,7 +19,7 @@
     
   
       
-        <title>linearmodels.iv.gmm - linearmodels v7.1 (+525)</title>
+        <title>linearmodels.iv.gmm - linearmodels v7.1 (+544)</title>
       
     
 
@@ -91,7 +91,7 @@
 
 <header class="md-header md-header--shadow" data-md-component="header">
   <nav class="md-header__inner md-grid" aria-label="Header">
-    <a href="../../../index.html" title="linearmodels v7.1 (+525)" class="md-header__button md-logo" aria-label="linearmodels v7.1 (+525)" data-md-component="logo">
+    <a href="../../../index.html" title="linearmodels v7.1 (+544)" class="md-header__button md-logo" aria-label="linearmodels v7.1 (+544)" data-md-component="logo">
       <img src="../../../_static/bw-logo.svg" alt="logo">
     </a>
     <label class="md-header__button md-icon" for="__drawer">
@@ -102,7 +102,7 @@
       <div class="md-header__ellipsis">
         <div class="md-header__topic">
           <span class="md-ellipsis">
-            linearmodels v7.1 (+525)
+            linearmodels v7.1 (+544)
           </span>
         </div>
         <div class="md-header__topic" data-md-component="header-topic">
@@ -197,10 +197,10 @@
 
 <nav class="md-nav md-nav--primary" aria-label="Navigation" data-md-level="0">
   <label class="md-nav__title" for="__drawer">
-    <a href="../../../index.html" title="linearmodels v7.1 (+525)" class="md-nav__button md-logo" aria-label="linearmodels v7.1 (+525)" data-md-component="logo">
+    <a href="../../../index.html" title="linearmodels v7.1 (+544)" class="md-nav__button md-logo" aria-label="linearmodels v7.1 (+544)" data-md-component="logo">
       <img src="../../../_static/bw-logo.svg" alt="logo">
     </a>
-    linearmodels v7.1 (+525)
+    linearmodels v7.1 (+544)
   </label>
   
     <div class="md-nav__source">
@@ -537,7 +537,7 @@
 <span class="kn">from</span><span class="w"> </span><span class="nn">typing</span><span class="w"> </span><span class="kn">import</span> <span class="n">Any</span>
 <span class="kn">import</span><span class="w"> </span><span class="nn">warnings</span>
 
-<span class="kn">from</span><span class="w"> </span><span class="nn">numpy</span><span class="w"> </span><span class="kn">import</span> <span class="n">asarray</span><span class="p">,</span> <span class="n">ndarray</span><span class="p">,</span> <span class="n">unique</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">numpy</span><span class="w"> </span><span class="kn">import</span> <span class="n">asarray</span><span class="p">,</span> <span class="n">errstate</span><span class="p">,</span> <span class="n">ndarray</span><span class="p">,</span> <span class="n">unique</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">numpy.linalg</span><span class="w"> </span><span class="kn">import</span> <span class="n">inv</span>
 
 <span class="kn">from</span><span class="w"> </span><span class="nn">linearmodels.iv.covariance</span><span class="w"> </span><span class="kn">import</span> <span class="p">(</span>
@@ -550,6 +550,7 @@
 <span class="kn">from</span><span class="w"> </span><span class="nn">linearmodels.shared.exceptions</span><span class="w"> </span><span class="kn">import</span> <span class="p">(</span>
     <span class="n">DefaultBandwidthWarning</span><span class="p">,</span>
     <span class="n">lookup_option</span><span class="p">,</span>
+    <span class="n">lower_option</span><span class="p">,</span>
     <span class="n">unknown_option_error</span><span class="p">,</span>
 <span class="p">)</span>
 <span class="kn">import</span><span class="w"> </span><span class="nn">linearmodels.typing.data</span>
@@ -858,8 +859,11 @@
         <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">center</span><span class="p">,</span> <span class="n">debiased</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_bandwidth</span> <span class="o">=</span> <span class="n">bandwidth</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_orig_bandwidth</span> <span class="o">=</span> <span class="n">bandwidth</span>
+        <span class="n">kernel</span> <span class="o">=</span> <span class="n">lower_option</span><span class="p">(</span><span class="n">kernel</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_kernel</span> <span class="o">=</span> <span class="n">kernel</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_kernels</span> <span class="o">=</span> <span class="n">KERNEL_LOOKUP</span>
+        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">kernel</span><span class="p">,</span> <span class="nb">str</span><span class="p">)</span> <span class="ow">and</span> <span class="n">kernel</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">KERNEL_LOOKUP</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="n">unknown_option_error</span><span class="p">(</span><span class="s2">"kernel"</span><span class="p">,</span> <span class="n">kernel</span><span class="p">,</span> <span class="n">KERNEL_LOOKUP</span><span class="p">)</span>
         <span class="c1"># Selecting the bandwidth from the data is the default since 7.1, and it</span>
         <span class="c1"># warns since the default was nobs - 2</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_default_bandwidth</span> <span class="o">=</span> <span class="n">bandwidth</span> <span class="ow">is</span> <span class="kc">None</span> <span class="ow">and</span> <span class="n">optimal_bw</span> <span class="ow">is</span> <span class="kc">None</span>
@@ -887,7 +891,10 @@
 
     <span class="k">def</span><span class="w"> </span><span class="nf">_estimate_bandwidth</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">ze</span><span class="p">:</span> <span class="n">linearmodels</span><span class="o">.</span><span class="n">typing</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">Float64Array</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">int</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">"""The bandwidth that is estimated from the moment conditions."""</span>
-        <span class="n">g</span> <span class="o">=</span> <span class="n">ze</span> <span class="o">/</span> <span class="n">ze</span><span class="o">.</span><span class="n">std</span><span class="p">(</span><span class="mi">0</span><span class="p">)[</span><span class="kc">None</span><span class="p">,</span> <span class="p">:]</span>
+        <span class="c1"># A moment that does not vary has a standard deviation of 0, and the series is</span>
+        <span class="c1"># NaN. kernel_optimal_bandwidth raises, so there is no need to warn</span>
+        <span class="k">with</span> <span class="n">errstate</span><span class="p">(</span><span class="n">divide</span><span class="o">=</span><span class="s2">"ignore"</span><span class="p">,</span> <span class="n">invalid</span><span class="o">=</span><span class="s2">"ignore"</span><span class="p">):</span>
+            <span class="n">g</span> <span class="o">=</span> <span class="n">ze</span> <span class="o">/</span> <span class="n">ze</span><span class="o">.</span><span class="n">std</span><span class="p">(</span><span class="mi">0</span><span class="p">)[</span><span class="kc">None</span><span class="p">,</span> <span class="p">:]</span>
         <span class="n">g</span> <span class="o">=</span> <span class="n">g</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span>
         <span class="k">return</span> <span class="n">kernel_optimal_bandwidth</span><span class="p">(</span><span class="n">g</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_kernel</span><span class="p">)</span>
 
@@ -1186,6 +1193,7 @@
         <span class="o">**</span><span class="n">cov_config</span><span class="p">:</span> <span class="nb">str</span> <span class="o">|</span> <span class="nb">bool</span><span class="p">,</span>
     <span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
         <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">z</span><span class="p">,</span> <span class="n">params</span><span class="p">,</span> <span class="n">debiased</span><span class="p">)</span>
+        <span class="n">cov_type</span> <span class="o">=</span> <span class="n">lower_option</span><span class="p">(</span><span class="n">cov_type</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_cov_type</span> <span class="o">=</span> <span class="n">cov_type</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_cov_config</span> <span class="o">=</span> <span class="n">cov_config</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">w</span> <span class="o">=</span> <span class="n">w</span>

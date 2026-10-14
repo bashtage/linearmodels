@@ -23,7 +23,7 @@
     
   
       
-        <title>linearmodels.panel.model.PooledOLS.fit - linearmodels v7.1 (+525)</title>
+        <title>linearmodels.panel.model.PooledOLS.fit - linearmodels v7.1 (+544)</title>
       
     
 
@@ -100,7 +100,7 @@
 
 <header class="md-header md-header--shadow" data-md-component="header">
   <nav class="md-header__inner md-grid" aria-label="Header">
-    <a href="../../index.html" title="linearmodels v7.1 (+525)" class="md-header__button md-logo" aria-label="linearmodels v7.1 (+525)" data-md-component="logo">
+    <a href="../../index.html" title="linearmodels v7.1 (+544)" class="md-header__button md-logo" aria-label="linearmodels v7.1 (+544)" data-md-component="logo">
       <img src="../../_static/bw-logo.svg" alt="logo">
     </a>
     <label class="md-header__button md-icon" for="__drawer">
@@ -111,7 +111,7 @@
       <div class="md-header__ellipsis">
         <div class="md-header__topic">
           <span class="md-ellipsis">
-            linearmodels v7.1 (+525)
+            linearmodels v7.1 (+544)
           </span>
         </div>
         <div class="md-header__topic" data-md-component="header-topic">
@@ -206,10 +206,10 @@
 
 <nav class="md-nav md-nav--primary" aria-label="Navigation" data-md-level="0">
   <label class="md-nav__title" for="__drawer">
-    <a href="../../index.html" title="linearmodels v7.1 (+525)" class="md-nav__button md-logo" aria-label="linearmodels v7.1 (+525)" data-md-component="logo">
+    <a href="../../index.html" title="linearmodels v7.1 (+544)" class="md-nav__button md-logo" aria-label="linearmodels v7.1 (+544)" data-md-component="logo">
       <img src="../../_static/bw-logo.svg" alt="logo">
     </a>
-    linearmodels v7.1 (+525)
+    linearmodels v7.1 (+544)
   </label>
   
     <div class="md-nav__source">
@@ -1621,7 +1621,8 @@ estimator does not support raises a <code class="docutils literal notranslate"><
     “kernel” or “ac” and <code class="docutils literal notranslate"><span class="pre">kernel</span></code> is not one of the supported kernels.
     It is both a <code class="docutils literal notranslate"><span class="pre">ValueError</span></code> and a <code class="docutils literal notranslate"><span class="pre">KeyError</span></code>.</p></li>
 <li><p><a class="reference external" href="https://docs.python.org/3/builtins/exceptions.html#ValueError" title="(in Python v3.15)"><strong>ValueError</strong></a> – If a key of <code class="docutils literal notranslate"><span class="pre">cov_config</span></code> is not supported by the covariance
-    estimator, if <code class="docutils literal notranslate"><span class="pre">clusters</span></code> does not have the shape of the data, if
+    estimator (this is checked before the model is estimated), if
+    <code class="docutils literal notranslate"><span class="pre">clusters</span></code> does not have the shape of the data, if
     <code class="docutils literal notranslate"><span class="pre">bandwidth</span></code> is not below the number of time periods, or if the model
     has no residual degrees of freedom.</p></li>
 <li><p><a class="reference external" href="https://docs.python.org/3/builtins/exceptions.html#TypeError" title="(in Python v3.15)"><strong>TypeError</strong></a> – If the value of a key of <code class="docutils literal notranslate"><span class="pre">cov_config</span></code> does not have the type that the
@@ -1713,6 +1714,10 @@ rejected.</p>
 </div>
 <p class="example rubric">Examples</p>
 <div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><code><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span><span class="w"> </span><span class="nn">linearmodels</span><span class="w"> </span><span class="kn">import</span> <span class="n">PooledOLS</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span><span class="w"> </span><span class="nn">linearmodels.datasets</span><span class="w"> </span><span class="kn">import</span> <span class="n">wage_panel</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">data</span> <span class="o">=</span> <span class="n">wage_panel</span><span class="o">.</span><span class="n">load</span><span class="p">()</span><span class="o">.</span><span class="n">set_index</span><span class="p">([</span><span class="s2">"nr"</span><span class="p">,</span> <span class="s2">"year"</span><span class="p">])</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">y</span> <span class="o">=</span> <span class="n">data</span><span class="p">[</span><span class="s2">"lwage"</span><span class="p">]</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">x</span> <span class="o">=</span> <span class="n">data</span><span class="p">[[</span><span class="s2">"married"</span><span class="p">,</span> <span class="s2">"union"</span><span class="p">]]</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">mod</span> <span class="o">=</span> <span class="n">PooledOLS</span><span class="p">(</span><span class="n">y</span><span class="p">,</span> <span class="n">x</span><span class="p">)</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">res</span> <span class="o">=</span> <span class="n">mod</span><span class="o">.</span><span class="n">fit</span><span class="p">(</span><span class="n">cov_type</span><span class="o">=</span><span class="s2">"clustered"</span><span class="p">,</span> <span class="n">cluster_entity</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
 </code></pre></div>

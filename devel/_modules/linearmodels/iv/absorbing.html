@@ -19,7 +19,7 @@
     
   
       
-        <title>linearmodels.iv.absorbing - linearmodels v7.1 (+525)</title>
+        <title>linearmodels.iv.absorbing - linearmodels v7.1 (+544)</title>
       
     
 
@@ -91,7 +91,7 @@
 
 <header class="md-header md-header--shadow" data-md-component="header">
   <nav class="md-header__inner md-grid" aria-label="Header">
-    <a href="../../../index.html" title="linearmodels v7.1 (+525)" class="md-header__button md-logo" aria-label="linearmodels v7.1 (+525)" data-md-component="logo">
+    <a href="../../../index.html" title="linearmodels v7.1 (+544)" class="md-header__button md-logo" aria-label="linearmodels v7.1 (+544)" data-md-component="logo">
       <img src="../../../_static/bw-logo.svg" alt="logo">
     </a>
     <label class="md-header__button md-icon" for="__drawer">
@@ -102,7 +102,7 @@
       <div class="md-header__ellipsis">
         <div class="md-header__topic">
           <span class="md-ellipsis">
-            linearmodels v7.1 (+525)
+            linearmodels v7.1 (+544)
           </span>
         </div>
         <div class="md-header__topic" data-md-component="header-topic">
@@ -197,10 +197,10 @@
 
 <nav class="md-nav md-nav--primary" aria-label="Navigation" data-md-level="0">
   <label class="md-nav__title" for="__drawer">
-    <a href="../../../index.html" title="linearmodels v7.1 (+525)" class="md-nav__button md-logo" aria-label="linearmodels v7.1 (+525)" data-md-component="logo">
+    <a href="../../../index.html" title="linearmodels v7.1 (+544)" class="md-nav__button md-logo" aria-label="linearmodels v7.1 (+544)" data-md-component="logo">
       <img src="../../../_static/bw-logo.svg" alt="logo">
     </a>
-    linearmodels v7.1 (+525)
+    linearmodels v7.1 (+544)
   </label>
   
     <div class="md-nav__source">
@@ -575,8 +575,10 @@
 <span class="kn">from</span><span class="w"> </span><span class="nn">scipy.sparse.linalg</span><span class="w"> </span><span class="kn">import</span> <span class="n">lsmr</span>
 
 <span class="kn">from</span><span class="w"> </span><span class="nn">linearmodels.iv.common</span><span class="w"> </span><span class="kn">import</span> <span class="n">f_statistic</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">linearmodels.iv.covariance</span><span class="w"> </span><span class="kn">import</span> <span class="n">KERNEL_LOOKUP</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">linearmodels.iv.data</span><span class="w"> </span><span class="kn">import</span> <span class="n">IVData</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">linearmodels.iv.model</span><span class="w"> </span><span class="kn">import</span> <span class="p">(</span>
+    <span class="n">_LS_COV_KEYS</span><span class="p">,</span>
     <span class="n">COVARIANCE_ESTIMATORS</span><span class="p">,</span>
     <span class="n">ClusteredCovariance</span><span class="p">,</span>
     <span class="n">HeteroskedasticCovariance</span><span class="p">,</span>
@@ -598,7 +600,11 @@
     <span class="n">reference_labels</span><span class="p">,</span>
     <span class="n">row_labels</span><span class="p">,</span>
 <span class="p">)</span>
-<span class="kn">from</span><span class="w"> </span><span class="nn">linearmodels.shared.exceptions</span><span class="w"> </span><span class="kn">import</span> <span class="n">lookup_option</span><span class="p">,</span> <span class="n">missing_warning</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">linearmodels.shared.exceptions</span><span class="w"> </span><span class="kn">import</span> <span class="p">(</span>
+    <span class="n">check_cov_config</span><span class="p">,</span>
+    <span class="n">lookup_option</span><span class="p">,</span>
+    <span class="n">missing_warning</span><span class="p">,</span>
+<span class="p">)</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">linearmodels.shared.hypotheses</span><span class="w"> </span><span class="kn">import</span> <span class="n">InvalidTestStatistic</span><span class="p">,</span> <span class="n">WaldTestStatistic</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">linearmodels.shared.inputs</span><span class="w"> </span><span class="kn">import</span> <span class="n">as_array_like</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">linearmodels.shared.rsquared</span><span class="w"> </span><span class="kn">import</span> <span class="n">r_squared</span>
@@ -2059,6 +2065,12 @@
 <span class="sd">        UnknownOptionError</span>
 <span class="sd">            If ``cov_type`` or ``kernel`` is not supported. It is both a</span>
 <span class="sd">            ``KeyError`` and a ``ValueError``.</span>
+<span class="sd">        ValueError</span>
+<span class="sd">            If a key of ``cov_config`` is not accepted by the covariance estimator</span>
+<span class="sd">            that ``cov_type`` selects. The message names the key and lists the</span>
+<span class="sd">            accepted keys. It is raised before the model is estimated. Releases</span>
+<span class="sd">            before 7.1 raised the ``TypeError`` of the constructor of the covariance</span>
+<span class="sd">            estimator.</span>
 
 <span class="sd">        Warns</span>
 <span class="sd">        -----</span>
@@ -2122,6 +2134,7 @@
 <span class="sd">        changing only the covariance estimator is fast. If any of them differs,</span>
 <span class="sd">        the variables are absorbed again using the new values.</span>
 <span class="sd">        """</span>
+        <span class="n">check_cov_config</span><span class="p">(</span><span class="n">cov_config</span><span class="p">,</span> <span class="n">cov_type</span><span class="p">,</span> <span class="n">_LS_COV_KEYS</span><span class="p">,</span> <span class="n">KERNEL_LOOKUP</span><span class="p">)</span>
         <span class="n">method</span> <span class="o">=</span> <span class="n">_check_method</span><span class="p">(</span><span class="n">method</span><span class="p">)</span>
         <span class="k">if</span> <span class="n">lsmr_options</span> <span class="ow">and</span> <span class="n">absorb_options</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
             <span class="c1"># The options are options of LSMR, so they can not be passed to HDFE</span>

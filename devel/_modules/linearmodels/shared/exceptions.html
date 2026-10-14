@@ -19,7 +19,7 @@
     
   
       
-        <title>linearmodels.shared.exceptions - linearmodels v7.1 (+525)</title>
+        <title>linearmodels.shared.exceptions - linearmodels v7.1 (+544)</title>
       
     
 
@@ -91,7 +91,7 @@
 
 <header class="md-header md-header--shadow" data-md-component="header">
   <nav class="md-header__inner md-grid" aria-label="Header">
-    <a href="../../../index.html" title="linearmodels v7.1 (+525)" class="md-header__button md-logo" aria-label="linearmodels v7.1 (+525)" data-md-component="logo">
+    <a href="../../../index.html" title="linearmodels v7.1 (+544)" class="md-header__button md-logo" aria-label="linearmodels v7.1 (+544)" data-md-component="logo">
       <img src="../../../_static/bw-logo.svg" alt="logo">
     </a>
     <label class="md-header__button md-icon" for="__drawer">
@@ -102,7 +102,7 @@
       <div class="md-header__ellipsis">
         <div class="md-header__topic">
           <span class="md-ellipsis">
-            linearmodels v7.1 (+525)
+            linearmodels v7.1 (+544)
           </span>
         </div>
         <div class="md-header__topic" data-md-component="header-topic">
@@ -197,10 +197,10 @@
 
 <nav class="md-nav md-nav--primary" aria-label="Navigation" data-md-level="0">
   <label class="md-nav__title" for="__drawer">
-    <a href="../../../index.html" title="linearmodels v7.1 (+525)" class="md-nav__button md-logo" aria-label="linearmodels v7.1 (+525)" data-md-component="logo">
+    <a href="../../../index.html" title="linearmodels v7.1 (+544)" class="md-nav__button md-logo" aria-label="linearmodels v7.1 (+544)" data-md-component="logo">
       <img src="../../../_static/bw-logo.svg" alt="logo">
     </a>
-    linearmodels v7.1 (+525)
+    linearmodels v7.1 (+544)
   </label>
   
     <div class="md-nav__source">
@@ -531,9 +531,9 @@
 <span class="sd">Warnings and errors that linearmodels raises.</span>
 <span class="sd">"""</span>
 
-<span class="kn">from</span><span class="w"> </span><span class="nn">collections.abc</span><span class="w"> </span><span class="kn">import</span> <span class="n">Iterable</span><span class="p">,</span> <span class="n">Mapping</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">collections.abc</span><span class="w"> </span><span class="kn">import</span> <span class="n">Iterable</span><span class="p">,</span> <span class="n">Mapping</span><span class="p">,</span> <span class="n">Sequence</span>
 <span class="kn">import</span><span class="w"> </span><span class="nn">difflib</span>
-<span class="kn">from</span><span class="w"> </span><span class="nn">typing</span><span class="w"> </span><span class="kn">import</span> <span class="n">TypeVar</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">typing</span><span class="w"> </span><span class="kn">import</span> <span class="n">Any</span><span class="p">,</span> <span class="n">TypeVar</span>
 <span class="kn">import</span><span class="w"> </span><span class="nn">warnings</span>
 
 <span class="kn">import</span><span class="w"> </span><span class="nn">numpy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">np</span>
@@ -757,11 +757,90 @@
 <span class="sd">    UnknownOptionError</span>
 <span class="sd">        If ``value`` is not in ``table``. It is a ``KeyError``, as it is for a</span>
 <span class="sd">        dict, and a ``ValueError``.</span>
+
+<span class="sd">    Notes</span>
+<span class="sd">    -----</span>
+<span class="sd">    A str is also matched to the names of ``table`` without regard to case.</span>
 <span class="sd">    """</span>
     <span class="k">try</span><span class="p">:</span>
         <span class="k">return</span> <span class="n">table</span><span class="p">[</span><span class="n">value</span><span class="p">]</span>
     <span class="k">except</span> <span class="p">(</span><span class="ne">KeyError</span><span class="p">,</span> <span class="ne">TypeError</span><span class="p">):</span>
-        <span class="k">raise</span> <span class="n">unknown_option_error</span><span class="p">(</span><span class="n">parameter</span><span class="p">,</span> <span class="n">value</span><span class="p">,</span> <span class="n">table</span><span class="p">)</span> <span class="kn">from</span><span class="w"> </span><span class="kc">None</span>
+        <span class="k">pass</span>
+    <span class="c1"># The names are not case sensitive</span>
+    <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">value</span><span class="p">,</span> <span class="nb">str</span><span class="p">):</span>
+        <span class="k">for</span> <span class="n">name</span><span class="p">,</span> <span class="n">entry</span> <span class="ow">in</span> <span class="n">table</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+            <span class="k">if</span> <span class="n">name</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span> <span class="o">==</span> <span class="n">value</span><span class="o">.</span><span class="n">lower</span><span class="p">():</span>
+                <span class="k">return</span> <span class="n">entry</span>
+    <span class="k">raise</span> <span class="n">unknown_option_error</span><span class="p">(</span><span class="n">parameter</span><span class="p">,</span> <span class="n">value</span><span class="p">,</span> <span class="n">table</span><span class="p">)</span> <span class="kn">from</span><span class="w"> </span><span class="kc">None</span>
+
+
+<span class="k">def</span><span class="w"> </span><span class="nf">lower_option</span><span class="p">(</span><span class="n">value</span><span class="p">:</span> <span class="n">Any</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Any</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">"""</span>
+<span class="sd">    Return the name of an option in lower case.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    value : object</span>
+<span class="sd">        The value of an option that is a name, e.g., ``cov_type`` or ``kernel``.</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    object</span>
+<span class="sd">        The lower case of ``value`` if it is a str, and ``value`` otherwise, which</span>
+<span class="sd">        the caller reports as an unsupported name or type.</span>
+<span class="sd">    """</span>
+    <span class="k">return</span> <span class="n">value</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span> <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">value</span><span class="p">,</span> <span class="nb">str</span><span class="p">)</span> <span class="k">else</span> <span class="n">value</span>
+
+
+<span class="k">def</span><span class="w"> </span><span class="nf">check_cov_config</span><span class="p">(</span>
+    <span class="n">cov_config</span><span class="p">:</span> <span class="n">Mapping</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">object</span><span class="p">],</span>
+    <span class="n">cov_type</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
+    <span class="n">allowed</span><span class="p">:</span> <span class="n">Mapping</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Sequence</span><span class="p">[</span><span class="nb">str</span><span class="p">]],</span>
+    <span class="n">kernels</span><span class="p">:</span> <span class="n">Mapping</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">object</span><span class="p">]</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">"""</span>
+<span class="sd">    Check that the keyword arguments of a covariance estimator are supported.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    cov_config : dict</span>
+<span class="sd">        The keyword arguments of ``fit`` that configure the covariance estimator.</span>
+<span class="sd">    cov_type : str</span>
+<span class="sd">        Name of the covariance estimator.</span>
+<span class="sd">    allowed : dict of str to sequence of str</span>
+<span class="sd">        The keys that each covariance estimator accepts, by lower-case name.</span>
+<span class="sd">    kernels : dict, optional</span>
+<span class="sd">        The supported kernels, which are checked if ``cov_config`` has a</span>
+<span class="sd">        ``kernel``.</span>
+
+<span class="sd">    Raises</span>
+<span class="sd">    ------</span>
+<span class="sd">    ValueError</span>
+<span class="sd">        If a key of ``cov_config`` is not accepted by the estimator. The message</span>
+<span class="sd">        names the keys that are not accepted and the keys that are. An unknown</span>
+<span class="sd">        ``cov_type`` is not checked here.</span>
+<span class="sd">    UnknownOptionError</span>
+<span class="sd">        If the ``kernel`` is not one of ``kernels``.</span>
+<span class="sd">    """</span>
+    <span class="n">keys</span> <span class="o">=</span> <span class="n">allowed</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="n">cov_type</span><span class="p">)</span><span class="o">.</span><span class="n">lower</span><span class="p">())</span>
+    <span class="k">if</span> <span class="n">keys</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="k">return</span>
+    <span class="n">unknown</span> <span class="o">=</span> <span class="p">[</span><span class="nb">repr</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="n">key</span><span class="p">))</span> <span class="k">for</span> <span class="n">key</span> <span class="ow">in</span> <span class="n">cov_config</span> <span class="k">if</span> <span class="n">key</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">keys</span><span class="p">]</span>
+    <span class="k">if</span> <span class="n">unknown</span><span class="p">:</span>
+        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">unknown</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">1</span><span class="p">:</span>
+            <span class="n">problem</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">"The keyword arguments </span><span class="si">{</span><span class="s1">', '</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">unknown</span><span class="p">)</span><span class="si">}</span><span class="s2"> are"</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">problem</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">"The keyword argument </span><span class="si">{</span><span class="n">unknown</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="si">}</span><span class="s2"> is"</span>
+        <span class="n">accepted</span> <span class="o">=</span> <span class="s2">", "</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="nb">sorted</span><span class="p">(</span><span class="n">keys</span><span class="p">))</span> <span class="k">if</span> <span class="n">keys</span> <span class="k">else</span> <span class="s2">"none"</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
+            <span class="sa">f</span><span class="s2">"</span><span class="si">{</span><span class="n">problem</span><span class="si">}</span><span class="s2"> not accepted with cov_type=</span><span class="si">{</span><span class="n">cov_type</span><span class="si">!r}</span><span class="s2">. "</span>
+            <span class="sa">f</span><span class="s2">"The accepted keyword arguments are: </span><span class="si">{</span><span class="n">accepted</span><span class="si">}</span><span class="s2">."</span>
+        <span class="p">)</span>
+    <span class="k">if</span> <span class="n">kernels</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="ow">and</span> <span class="s2">"kernel"</span> <span class="ow">in</span> <span class="n">cov_config</span><span class="p">:</span>
+        <span class="n">kernel</span> <span class="o">=</span> <span class="n">cov_config</span><span class="p">[</span><span class="s2">"kernel"</span><span class="p">]</span>
+        <span class="c1"># The estimator reports a kernel that is not a str</span>
+        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">kernel</span><span class="p">,</span> <span class="nb">str</span><span class="p">)</span> <span class="ow">and</span> <span class="n">kernel</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">kernels</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="n">unknown_option_error</span><span class="p">(</span><span class="s2">"kernel"</span><span class="p">,</span> <span class="n">kernel</span><span class="o">.</span><span class="n">lower</span><span class="p">(),</span> <span class="n">kernels</span><span class="p">)</span>
 
 
 <span class="n">__all__</span> <span class="o">=</span> <span class="p">[</span>
@@ -772,7 +851,9 @@
     <span class="s2">"MissingValueWarning"</span><span class="p">,</span>
     <span class="s2">"SingletonWarning"</span><span class="p">,</span>
     <span class="s2">"UnknownOptionError"</span><span class="p">,</span>
+    <span class="s2">"check_cov_config"</span><span class="p">,</span>
     <span class="s2">"lookup_option"</span><span class="p">,</span>
+    <span class="s2">"lower_option"</span><span class="p">,</span>
     <span class="s2">"missing_value_warning_msg"</span><span class="p">,</span>
     <span class="s2">"missing_warning"</span><span class="p">,</span>
     <span class="s2">"unknown_option_error"</span><span class="p">,</span>

@@ -19,7 +19,7 @@
     
   
       
-        <title>linearmodels.panel.data - linearmodels v7.1 (+525)</title>
+        <title>linearmodels.panel.data - linearmodels v7.1 (+544)</title>
       
     
 
@@ -91,7 +91,7 @@
 
 <header class="md-header md-header--shadow" data-md-component="header">
   <nav class="md-header__inner md-grid" aria-label="Header">
-    <a href="../../../index.html" title="linearmodels v7.1 (+525)" class="md-header__button md-logo" aria-label="linearmodels v7.1 (+525)" data-md-component="logo">
+    <a href="../../../index.html" title="linearmodels v7.1 (+544)" class="md-header__button md-logo" aria-label="linearmodels v7.1 (+544)" data-md-component="logo">
       <img src="../../../_static/bw-logo.svg" alt="logo">
     </a>
     <label class="md-header__button md-icon" for="__drawer">
@@ -102,7 +102,7 @@
       <div class="md-header__ellipsis">
         <div class="md-header__topic">
           <span class="md-ellipsis">
-            linearmodels v7.1 (+525)
+            linearmodels v7.1 (+544)
           </span>
         </div>
         <div class="md-header__topic" data-md-component="header-topic">
@@ -197,10 +197,10 @@
 
 <nav class="md-nav md-nav--primary" aria-label="Navigation" data-md-level="0">
   <label class="md-nav__title" for="__drawer">
-    <a href="../../../index.html" title="linearmodels v7.1 (+525)" class="md-nav__button md-logo" aria-label="linearmodels v7.1 (+525)" data-md-component="logo">
+    <a href="../../../index.html" title="linearmodels v7.1 (+544)" class="md-nav__button md-logo" aria-label="linearmodels v7.1 (+544)" data-md-component="logo">
       <img src="../../../_static/bw-logo.svg" alt="logo">
     </a>
-    linearmodels v7.1 (+525)
+    linearmodels v7.1 (+544)
   </label>
   
     <div class="md-nav__source">
@@ -551,6 +551,7 @@
 <span class="p">)</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">pandas.api.types</span><span class="w"> </span><span class="kn">import</span> <span class="n">is_datetime64_any_dtype</span><span class="p">,</span> <span class="n">is_numeric_dtype</span><span class="p">,</span> <span class="n">is_string_dtype</span>
 
+<span class="kn">from</span><span class="w"> </span><span class="nn">linearmodels.shared.exceptions</span><span class="w"> </span><span class="kn">import</span> <span class="n">lower_option</span><span class="p">,</span> <span class="n">unknown_option_error</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">linearmodels.shared.inputs</span><span class="w"> </span><span class="kn">import</span> <span class="n">as_float64</span><span class="p">,</span> <span class="n">reject_complex</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">linearmodels.shared.utility</span><span class="w"> </span><span class="kn">import</span> <span class="n">ensure_unique_column</span><span class="p">,</span> <span class="n">panel_to_frame</span>
 <span class="kn">import</span><span class="w"> </span><span class="nn">linearmodels.typing.data</span>
@@ -1343,8 +1344,9 @@
 <span class="sd">        the square root of the weights so that they can be used in WLS</span>
 <span class="sd">        estimation.</span>
 <span class="sd">        """</span>
+        <span class="n">group</span> <span class="o">=</span> <span class="n">lower_option</span><span class="p">(</span><span class="n">group</span><span class="p">)</span>
         <span class="k">if</span> <span class="n">group</span> <span class="ow">not</span> <span class="ow">in</span> <span class="p">(</span><span class="s2">"entity"</span><span class="p">,</span> <span class="s2">"time"</span><span class="p">,</span> <span class="s2">"both"</span><span class="p">):</span>
-            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">"Group must be one of 'entity', 'time' or 'both'"</span><span class="p">)</span>
+            <span class="k">raise</span> <span class="n">unknown_option_error</span><span class="p">(</span><span class="s2">"group"</span><span class="p">,</span> <span class="n">group</span><span class="p">,</span> <span class="p">(</span><span class="s2">"entity"</span><span class="p">,</span> <span class="s2">"time"</span><span class="p">,</span> <span class="s2">"both"</span><span class="p">))</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_check_index</span><span class="p">(</span><span class="o">*</span><span class="p">{</span><span class="s2">"entity"</span><span class="p">:</span> <span class="p">(</span><span class="mi">0</span><span class="p">,),</span> <span class="s2">"time"</span><span class="p">:</span> <span class="p">(</span><span class="mi">1</span><span class="p">,),</span> <span class="s2">"both"</span><span class="p">:</span> <span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">)}[</span><span class="n">group</span><span class="p">])</span>
         <span class="k">if</span> <span class="n">group</span> <span class="o">==</span> <span class="s2">"both"</span><span class="p">:</span>
             <span class="k">if</span> <span class="ow">not</span> <span class="n">low_memory</span><span class="p">:</span>
@@ -1408,9 +1410,21 @@
 
 <span class="sd">        Raises</span>
 <span class="sd">        ------</span>
+<span class="sd">        UnknownOptionError</span>
+<span class="sd">            If `group` is not one of the supported values. It is also a</span>
+<span class="sd">            ``ValueError``.</span>
 <span class="sd">        ValueError</span>
 <span class="sd">            If the level of the index that is used has a missing label.</span>
+
+<span class="sd">        Notes</span>
+<span class="sd">        -----</span>
+<span class="sd">        .. versionchanged:: 7.1</span>
+
+<span class="sd">           An unknown `group` raises an error. It was treated as ``"time"``.</span>
 <span class="sd">        """</span>
+        <span class="n">group</span> <span class="o">=</span> <span class="n">lower_option</span><span class="p">(</span><span class="n">group</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">group</span> <span class="ow">not</span> <span class="ow">in</span> <span class="p">(</span><span class="s2">"entity"</span><span class="p">,</span> <span class="s2">"time"</span><span class="p">):</span>
+            <span class="k">raise</span> <span class="n">unknown_option_error</span><span class="p">(</span><span class="s2">"group"</span><span class="p">,</span> <span class="n">group</span><span class="p">,</span> <span class="p">(</span><span class="s2">"entity"</span><span class="p">,</span> <span class="s2">"time"</span><span class="p">))</span>
         <span class="n">level</span> <span class="o">=</span> <span class="mi">0</span> <span class="k">if</span> <span class="n">group</span> <span class="o">==</span> <span class="s2">"entity"</span> <span class="k">else</span> <span class="mi">1</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_check_index</span><span class="p">(</span><span class="n">level</span><span class="p">)</span>
         <span class="n">reindex</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">entities</span> <span class="k">if</span> <span class="n">group</span> <span class="o">==</span> <span class="s2">"entity"</span> <span class="k">else</span> <span class="bp">self</span><span class="o">.</span><span class="n">time</span>
@@ -1468,9 +1482,21 @@
 
 <span class="sd">        Raises</span>
 <span class="sd">        ------</span>
+<span class="sd">        UnknownOptionError</span>
+<span class="sd">            If `group` is not one of the supported values. It is also a</span>
+<span class="sd">            ``ValueError``.</span>
 <span class="sd">        ValueError</span>
 <span class="sd">            If the level of the index that is used has a missing label.</span>
+
+<span class="sd">        Notes</span>
+<span class="sd">        -----</span>
+<span class="sd">        .. versionchanged:: 7.1</span>
+
+<span class="sd">           An unknown `group` raises an error. It was treated as ``"time"``.</span>
 <span class="sd">        """</span>
+        <span class="n">group</span> <span class="o">=</span> <span class="n">lower_option</span><span class="p">(</span><span class="n">group</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">group</span> <span class="ow">not</span> <span class="ow">in</span> <span class="p">(</span><span class="s2">"entity"</span><span class="p">,</span> <span class="s2">"time"</span><span class="p">):</span>
+            <span class="k">raise</span> <span class="n">unknown_option_error</span><span class="p">(</span><span class="s2">"group"</span><span class="p">,</span> <span class="n">group</span><span class="p">,</span> <span class="p">(</span><span class="s2">"entity"</span><span class="p">,</span> <span class="s2">"time"</span><span class="p">))</span>
         <span class="n">level</span> <span class="o">=</span> <span class="mi">0</span> <span class="k">if</span> <span class="n">group</span> <span class="o">==</span> <span class="s2">"entity"</span> <span class="k">else</span> <span class="mi">1</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_check_index</span><span class="p">(</span><span class="n">level</span><span class="p">)</span>
         <span class="k">if</span> <span class="n">weights</span> <span class="ow">is</span> <span class="kc">None</span> <span class="ow">or</span> <span class="bp">self</span><span class="o">.</span><span class="n">_frame</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
@@ -1563,8 +1589,9 @@
 <span class="sd">            If `group` is not one of the supported values, or if the level of</span>
 <span class="sd">            the index that is used has a missing label.</span>
 <span class="sd">        """</span>
+        <span class="n">group</span> <span class="o">=</span> <span class="n">lower_option</span><span class="p">(</span><span class="n">group</span><span class="p">)</span>
         <span class="k">if</span> <span class="n">group</span> <span class="ow">not</span> <span class="ow">in</span> <span class="p">(</span><span class="s2">"entity"</span><span class="p">,</span> <span class="s2">"time"</span><span class="p">):</span>
-            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">"Group must be one of 'entity' or 'time'"</span><span class="p">)</span>
+            <span class="k">raise</span> <span class="n">unknown_option_error</span><span class="p">(</span><span class="s2">"group"</span><span class="p">,</span> <span class="n">group</span><span class="p">,</span> <span class="p">(</span><span class="s2">"entity"</span><span class="p">,</span> <span class="s2">"time"</span><span class="p">))</span>
         <span class="n">axis</span> <span class="o">=</span> <span class="mi">0</span> <span class="k">if</span> <span class="n">group</span> <span class="o">==</span> <span class="s2">"entity"</span> <span class="k">else</span> <span class="mi">1</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_check_index</span><span class="p">(</span><span class="n">axis</span><span class="p">)</span>
         <span class="n">labels</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">index</span><span class="o">.</span><span class="n">codes</span>
