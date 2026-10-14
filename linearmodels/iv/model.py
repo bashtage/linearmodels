@@ -94,8 +94,9 @@ __all__ = [
 
 _CENTER = ("center",)
 # kappa is overwritten by fit. It is accepted so that the cov_config of results
-# can be passed to fit
-_LS_KEYS = (*_CENTER, "kappa")
+# can be passed to fit. extra_df is the number of degrees of freedom that the model
+# uses beyond the regressors, which the covariance estimators document
+_LS_KEYS = (*_CENTER, "kappa", "extra_df")
 _COV_KEYS = {
     HomoskedasticCovariance: _LS_KEYS,
     HeteroskedasticCovariance: _LS_KEYS,
