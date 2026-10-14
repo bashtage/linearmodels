@@ -1491,8 +1491,9 @@ class AbsorbingLS:
             if it is not provided, and ``bandwidth`` (int), which is selected from the
             data if it is not provided. The names of the kernels are not case
             sensitive. "clustered" uses ``clusters`` (array_like), the cluster
-            assignment of each observation, with one or two columns. A ``center`` key
-            is accepted and ignored. See
+            assignment of each observation, with one or two columns. The keys
+            ``center``, ``kappa`` and ``extra_df`` are accepted and ignored: the
+            absorbed effects set the degrees of freedom. See
             :class:`~linearmodels.iv.covariance.HomoskedasticCovariance`,
             :class:`~linearmodels.iv.covariance.HeteroskedasticCovariance`,
             :class:`~linearmodels.iv.covariance.KernelCovariance` and

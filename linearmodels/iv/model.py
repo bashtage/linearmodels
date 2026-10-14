@@ -869,7 +869,8 @@ class _IVLSModelBase(_IVModelBase):
             freedom that the model uses in addition to its regressors. It is 0 if it is
             not provided, and it is only used if ``debiased`` is True, when the
             covariance is scaled by n / (n - k - ``extra_df``), where k is the number
-            of regressors. A ``center`` key is accepted and ignored. See
+            of regressors. The keys ``center`` and ``kappa`` are accepted and ignored:
+            ``kappa`` is set by the model. See
             :class:`~linearmodels.iv.covariance.HomoskedasticCovariance`,
             :class:`~linearmodels.iv.covariance.HeteroskedasticCovariance`,
             :class:`~linearmodels.iv.covariance.KernelCovariance` and
