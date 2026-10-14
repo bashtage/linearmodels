@@ -23,7 +23,7 @@
     
   
       
-        <title>Introduction - linearmodels v7.1 (+518)</title>
+        <title>Introduction - linearmodels v7.1 (+525)</title>
       
     
 
@@ -100,7 +100,7 @@
 
 <header class="md-header md-header--shadow" data-md-component="header">
   <nav class="md-header__inner md-grid" aria-label="Header">
-    <a href="../index.html" title="linearmodels v7.1 (+518)" class="md-header__button md-logo" aria-label="linearmodels v7.1 (+518)" data-md-component="logo">
+    <a href="../index.html" title="linearmodels v7.1 (+525)" class="md-header__button md-logo" aria-label="linearmodels v7.1 (+525)" data-md-component="logo">
       <img src="../_static/bw-logo.svg" alt="logo">
     </a>
     <label class="md-header__button md-icon" for="__drawer">
@@ -111,7 +111,7 @@
       <div class="md-header__ellipsis">
         <div class="md-header__topic">
           <span class="md-ellipsis">
-            linearmodels v7.1 (+518)
+            linearmodels v7.1 (+525)
           </span>
         </div>
         <div class="md-header__topic" data-md-component="header-topic">
@@ -206,10 +206,10 @@
 
 <nav class="md-nav md-nav--primary" aria-label="Navigation" data-md-level="0">
   <label class="md-nav__title" for="__drawer">
-    <a href="../index.html" title="linearmodels v7.1 (+518)" class="md-nav__button md-logo" aria-label="linearmodels v7.1 (+518)" data-md-component="logo">
+    <a href="../index.html" title="linearmodels v7.1 (+525)" class="md-nav__button md-logo" aria-label="linearmodels v7.1 (+525)" data-md-component="logo">
       <img src="../_static/bw-logo.svg" alt="logo">
     </a>
-    linearmodels v7.1 (+518)
+    linearmodels v7.1 (+525)
   </label>
   
     <div class="md-nav__source">
@@ -1074,7 +1074,7 @@ The test returns a
 <a class="reference internal" href="panel/linearmodels.panel.results.HausmanTestResults.html#linearmodels.panel.results.HausmanTestResults" title="linearmodels.panel.results.HausmanTestResults (Python class) — Results of a Hausman specification test."><code class="xref py py-class docutils literal notranslate"><span class="pre">HausmanTestResults</span></code></a>, which is a named tuple
 with the fields <code class="docutils literal notranslate"><span class="pre">statistic</span></code> and <code class="docutils literal notranslate"><span class="pre">estimates</span></code>. They can be unpacked,
 <code class="docutils literal notranslate"><span class="pre">statistic,</span> <span class="pre">estimates</span> <span class="pre">=</span> <span class="pre">re_res.hausman(fe_res)</span></code>, or read as attributes. The
-statistic is a <a class="reference internal" href="../utility/linearmodels.shared.hypotheses.WaldTestStatistic.html#linearmodels.shared.hypotheses.WaldTestStatistic" title="linearmodels.shared.hypotheses.WaldTestStatistic (Python class) — Test statistic holder for Wald-type tests"><code class="xref py py-class docutils literal notranslate"><span class="pre">WaldTestStatistic</span></code></a>, and
+statistic is a <a class="reference internal" href="../utility/linearmodels.shared.hypotheses.WaldTestStatistic.html#linearmodels.shared.hypotheses.WaldTestStatistic" title="linearmodels.shared.hypotheses.WaldTestStatistic (Python class) — Test statistic holder for Wald-type tests."><code class="xref py py-class docutils literal notranslate"><span class="pre">WaldTestStatistic</span></code></a>, and
 <code class="docutils literal notranslate"><span class="pre">estimates</span></code> is a <code class="docutils literal notranslate"><span class="pre">DataFrame</span></code>. Its columns <code class="docutils literal notranslate"><span class="pre">b0</span></code> and <code class="docutils literal notranslate"><span class="pre">b1</span></code> contain the
 coefficients of the other model and of the random effects model, and
 <code class="docutils literal notranslate"><span class="pre">Std.</span> <span class="pre">Err.</span></code> is the standard error of their difference.</p>
@@ -1093,7 +1093,7 @@ unless <code class="docutils literal notranslate"><span class="pre">include_cons
 <li><p>The covariance of the difference has to be positive definite. A warning is
 issued, and a generalized inverse is used, if it is not. If the statistic is
 negative or is not finite, an
-<a class="reference internal" href="../utility/linearmodels.shared.hypotheses.InvalidTestStatistic.html#linearmodels.shared.hypotheses.InvalidTestStatistic" title="linearmodels.shared.hypotheses.InvalidTestStatistic (Python class) — Class returned if a requested test is not valid for a model"><code class="xref py py-class docutils literal notranslate"><span class="pre">InvalidTestStatistic</span></code></a> is returned
+<a class="reference internal" href="../utility/linearmodels.shared.hypotheses.InvalidTestStatistic.html#linearmodels.shared.hypotheses.InvalidTestStatistic" title="linearmodels.shared.hypotheses.InvalidTestStatistic (Python class) — Class returned if a requested test is not valid for a model."><code class="xref py py-class docutils literal notranslate"><span class="pre">InvalidTestStatistic</span></code></a> is returned
 as the statistic. This can happen if the other model is a pooled model, whose
 unadjusted covariance ignores the effects.</p></li>
 </ul>
@@ -1138,7 +1138,7 @@ computed over time, and so the test assumes that the shocks are not serially
 correlated. It over-rejects if they are persistent.</p>
 <p>The test is not valid for every model. For the following models
 <code class="docutils literal notranslate"><span class="pre">pesaran_cd</span></code> returns an
-<a class="reference internal" href="../utility/linearmodels.shared.hypotheses.InapplicableTestStatistic.html#linearmodels.shared.hypotheses.InapplicableTestStatistic" title="linearmodels.shared.hypotheses.InapplicableTestStatistic (Python class) — Class returned if a requested test is not applicable for a specification"><code class="xref py py-class docutils literal notranslate"><span class="pre">InapplicableTestStatistic</span></code></a>, and its
+<a class="reference internal" href="../utility/linearmodels.shared.hypotheses.InapplicableTestStatistic.html#linearmodels.shared.hypotheses.InapplicableTestStatistic" title="linearmodels.shared.hypotheses.InapplicableTestStatistic (Python class) — Class returned if a requested test is not applicable for a specification."><code class="xref py py-class docutils literal notranslate"><span class="pre">InapplicableTestStatistic</span></code></a>, and its
 string says why.</p>
 <ul class="simple">
 <li><p><a class="reference internal" href="panel/linearmodels.panel.model.BetweenOLS.html#linearmodels.panel.model.BetweenOLS" title="linearmodels.panel.model.BetweenOLS (Python class) — Between estimator for panel data."><code class="xref py py-class docutils literal notranslate"><span class="pre">BetweenOLS</span></code></a>. The model is fitted to the

@@ -19,7 +19,7 @@
     
   
       
-        <title>linearmodels.system.model - linearmodels v7.1 (+518)</title>
+        <title>linearmodels.system.model - linearmodels v7.1 (+525)</title>
       
     
 
@@ -91,7 +91,7 @@
 
 <header class="md-header md-header--shadow" data-md-component="header">
   <nav class="md-header__inner md-grid" aria-label="Header">
-    <a href="../../../index.html" title="linearmodels v7.1 (+518)" class="md-header__button md-logo" aria-label="linearmodels v7.1 (+518)" data-md-component="logo">
+    <a href="../../../index.html" title="linearmodels v7.1 (+525)" class="md-header__button md-logo" aria-label="linearmodels v7.1 (+525)" data-md-component="logo">
       <img src="../../../_static/bw-logo.svg" alt="logo">
     </a>
     <label class="md-header__button md-icon" for="__drawer">
@@ -102,7 +102,7 @@
       <div class="md-header__ellipsis">
         <div class="md-header__topic">
           <span class="md-ellipsis">
-            linearmodels v7.1 (+518)
+            linearmodels v7.1 (+525)
           </span>
         </div>
         <div class="md-header__topic" data-md-component="header-topic">
@@ -197,10 +197,10 @@
 
 <nav class="md-nav md-nav--primary" aria-label="Navigation" data-md-level="0">
   <label class="md-nav__title" for="__drawer">
-    <a href="../../../index.html" title="linearmodels v7.1 (+518)" class="md-nav__button md-logo" aria-label="linearmodels v7.1 (+518)" data-md-component="logo">
+    <a href="../../../index.html" title="linearmodels v7.1 (+525)" class="md-nav__button md-logo" aria-label="linearmodels v7.1 (+525)" data-md-component="logo">
       <img src="../../../_static/bw-logo.svg" alt="logo">
     </a>
-    linearmodels v7.1 (+518)
+    linearmodels v7.1 (+525)
   </label>
   
     <div class="md-nav__source">
@@ -528,7 +528,7 @@
 
 <h1>Source code for linearmodels.system.model</h1><div class="highlight"><pre>
 <span></span><code><span class="sd">"""</span>
-<span class="sd">Estimators for systems of equations</span>
+<span class="sd">Estimators for systems of equations.</span>
 
 <span class="sd">References</span>
 <span class="sd">----------</span>
@@ -639,7 +639,7 @@
 <span class="k">def</span><span class="w"> </span><span class="nf">_missing_weights</span><span class="p">(</span>
     <span class="n">weights</span><span class="p">:</span> <span class="n">Mapping</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">linearmodels</span><span class="o">.</span><span class="n">typing</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">ArrayLike</span> <span class="o">|</span> <span class="kc">None</span><span class="p">],</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
-<span class="w">    </span><span class="sd">"""Raise warning if missing weighs found"""</span>
+<span class="w">    </span><span class="sd">"""Raise warning if missing weights found."""</span>
     <span class="n">missing</span> <span class="o">=</span> <span class="p">[</span><span class="n">key</span> <span class="k">for</span> <span class="n">key</span> <span class="ow">in</span> <span class="n">weights</span> <span class="k">if</span> <span class="n">weights</span><span class="p">[</span><span class="n">key</span><span class="p">]</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">]</span>
     <span class="k">if</span> <span class="n">missing</span><span class="p">:</span>
         <span class="n">msg</span> <span class="o">=</span> <span class="s2">"Weights not found for equation labels:</span><span class="se">\n</span><span class="si">{}</span><span class="s2">"</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="s2">", "</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">missing</span><span class="p">))</span>
@@ -652,21 +652,21 @@
     <span class="n">constraints</span><span class="p">:</span> <span class="n">LinearConstraint</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">linearmodels</span><span class="o">.</span><span class="n">typing</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">Float64Array</span><span class="p">:</span>
 <span class="w">    </span><span class="sa">r</span><span class="sd">"""</span>
-<span class="sd">    Estimate regression parameters from cross produces</span>
+<span class="sd">    Estimate regression parameters from cross products.</span>
 
 <span class="sd">    Parameters</span>
 <span class="sd">    ----------</span>
 <span class="sd">    xpx : ndarray</span>
-<span class="sd">        Cross product measuring variation in x (nvar by nvar)</span>
+<span class="sd">        Cross product measuring variation in x (nvar by nvar).</span>
 <span class="sd">    xpy : ndarray</span>
-<span class="sd">        Cross produce measuring covariation between x and y (nvar by 1)</span>
-<span class="sd">    constraints : LinearConstraint</span>
-<span class="sd">        Constraints to use in estimation</span>
+<span class="sd">        Cross product measuring covariation between x and y (nvar by 1).</span>
+<span class="sd">    constraints : LinearConstraint, optional</span>
+<span class="sd">        Constraints to use in estimation. The default is no constraints.</span>
 
 <span class="sd">    Returns</span>
 <span class="sd">    -------</span>
-<span class="sd">    params : ndarray</span>
-<span class="sd">        Estimated parameters (nvar by 1)</span>
+<span class="sd">    ndarray</span>
+<span class="sd">        Estimated parameters (nvar by 1).</span>
 
 <span class="sd">    Notes</span>
 <span class="sd">    -----</span>
@@ -692,6 +692,27 @@
 
 
 <span class="k">class</span><span class="w"> </span><span class="nc">SystemFormulaParser</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">"""</span>
+<span class="sd">    Parser for the formulas of a system of equations.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    formula : str or dict of str to str</span>
+<span class="sd">        Either a string with the equations in curly braces, or a dictionary of</span>
+<span class="sd">        formulas where each key is an equation label.</span>
+<span class="sd">    data : DataFrame</span>
+<span class="sd">        Frame containing named variables.</span>
+<span class="sd">    weights : dict of str to array_like, optional</span>
+<span class="sd">        Weights of the equations, where each key is an equation label. The</span>
+<span class="sd">        default is no weights.</span>
+<span class="sd">    eval_env : int, optional</span>
+<span class="sd">        Depth of the frame, relative to the caller of the parser, used to</span>
+<span class="sd">        evaluate the formulas when ``context`` is not given. The default is 2.</span>
+<span class="sd">    context : dict of str to object, optional</span>
+<span class="sd">        Namespace used to evaluate the formulas. The default is the namespace</span>
+<span class="sd">        of the frame at depth ``eval_env``.</span>
+<span class="sd">    """</span>
+
     <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span>
         <span class="n">formula</span><span class="p">:</span> <span class="n">Mapping</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">str</span><span class="p">]</span> <span class="o">|</span> <span class="nb">str</span><span class="p">,</span>
@@ -806,16 +827,16 @@
 
     <span class="nd">@property</span>
     <span class="k">def</span><span class="w"> </span><span class="nf">formula</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">str</span><span class="p">]:</span>
-<span class="w">        </span><span class="sd">"""Cleaned version of formula"""</span>
+<span class="w">        </span><span class="sd">"""Cleaned version of formula."""</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_clean_formula</span>
 
     <span class="nd">@property</span>
     <span class="k">def</span><span class="w"> </span><span class="nf">eval_env</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">int</span><span class="p">:</span>
-<span class="w">        </span><span class="sd">"""Set or get the eval env depth"""</span>
+<span class="w">        </span><span class="sd">"""Set or get the eval env depth."""</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_eval_env</span>
 
     <span class="nd">@eval_env</span><span class="o">.</span><span class="n">setter</span>
-    <span class="k">def</span><span class="w"> </span><span class="nf">eval_env</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">value</span><span class="p">:</span> <span class="nb">int</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">eval_env</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">value</span><span class="p">:</span> <span class="nb">int</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>  <span class="c1"># numpydoc ignore=GL08</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_eval_env</span> <span class="o">=</span> <span class="n">value</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_context</span> <span class="o">=</span> <span class="n">capture_context</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_eval_env</span><span class="p">)</span>
         <span class="c1"># Update parsers for new level</span>
@@ -830,10 +851,12 @@
 
     <span class="nd">@property</span>
     <span class="k">def</span><span class="w"> </span><span class="nf">equation_labels</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">list</span><span class="p">[</span><span class="nb">str</span><span class="p">]:</span>
+<span class="w">        </span><span class="sd">"""Labels of the equations."""</span>
         <span class="k">return</span> <span class="nb">list</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_parsers</span><span class="o">.</span><span class="n">keys</span><span class="p">())</span>
 
     <span class="nd">@property</span>
     <span class="k">def</span><span class="w"> </span><span class="nf">data</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">linearmodels</span><span class="o">.</span><span class="n">typing</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">ArrayLike</span> <span class="o">|</span> <span class="kc">None</span><span class="p">]]:</span>
+<span class="w">        </span><span class="sd">"""Dependent, exogenous, endogenous, instruments and weights by equation."""</span>
         <span class="n">out</span><span class="p">:</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">linearmodels</span><span class="o">.</span><span class="n">typing</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">ArrayLike</span> <span class="o">|</span> <span class="kc">None</span><span class="p">]]</span> <span class="o">=</span> <span class="p">{}</span>
         <span class="n">dep</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">dependent</span>
         <span class="k">for</span> <span class="n">key</span> <span class="ow">in</span> <span class="n">dep</span><span class="p">:</span>
@@ -854,18 +877,22 @@
 
     <span class="nd">@property</span>
     <span class="k">def</span><span class="w"> </span><span class="nf">dependent</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">DataFrame</span> <span class="o">|</span> <span class="kc">None</span><span class="p">]:</span>
+<span class="w">        </span><span class="sd">"""Dependent variable of each equation."""</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_get_variable</span><span class="p">(</span><span class="s2">"dependent"</span><span class="p">)</span>
 
     <span class="nd">@property</span>
     <span class="k">def</span><span class="w"> </span><span class="nf">exog</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">DataFrame</span> <span class="o">|</span> <span class="kc">None</span><span class="p">]:</span>
+<span class="w">        </span><span class="sd">"""Exogenous regressors of each equation."""</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_get_variable</span><span class="p">(</span><span class="s2">"exog"</span><span class="p">)</span>
 
     <span class="nd">@property</span>
     <span class="k">def</span><span class="w"> </span><span class="nf">endog</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">DataFrame</span> <span class="o">|</span> <span class="kc">None</span><span class="p">]:</span>
+<span class="w">        </span><span class="sd">"""Endogenous regressors of each equation."""</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_get_variable</span><span class="p">(</span><span class="s2">"endog"</span><span class="p">)</span>
 
     <span class="nd">@property</span>
     <span class="k">def</span><span class="w"> </span><span class="nf">instruments</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">DataFrame</span> <span class="o">|</span> <span class="kc">None</span><span class="p">]:</span>
+<span class="w">        </span><span class="sd">"""Instruments of each equation."""</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_get_variable</span><span class="p">(</span><span class="s2">"instruments"</span><span class="p">)</span>
 
 
@@ -875,7 +902,7 @@
 
 <span class="sd">    Parameters</span>
 <span class="sd">    ----------</span>
-<span class="sd">    equations : dict</span>
+<span class="sd">    equations : dict of str to tuple or dict</span>
 <span class="sd">        Dictionary-like structure containing dependent, exogenous, endogenous</span>
 <span class="sd">        and instrumental variables.  Each key is an equations label and must</span>
 <span class="sd">        be a string. Each value must be either a tuple of the form (dependent,</span>
@@ -893,9 +920,10 @@
 <span class="sd">        array_like, such as lists, NumPy arrays, pandas objects and xarray</span>
 <span class="sd">        DataArrays, and a ``TypeError`` that names the variable is raised for</span>
 <span class="sd">        complex values or text.</span>
-<span class="sd">    sigma : array_like</span>
-<span class="sd">        Prespecified residual covariance to use in GLS estimation. If not</span>
-<span class="sd">        provided, FGLS is implemented based on an estimate of sigma.</span>
+<span class="sd">    sigma : array_like, optional</span>
+<span class="sd">        Prespecified residual covariance to use in GLS estimation, with shape</span>
+<span class="sd">        (nequations, nequations). If not provided, FGLS is implemented based on an</span>
+<span class="sd">        estimate of sigma.</span>
 <span class="sd">    """</span>
 
     <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span>
@@ -952,11 +980,13 @@
 
     <span class="nd">@property</span>
     <span class="k">def</span><span class="w"> </span><span class="nf">formula</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span> <span class="o">|</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">str</span><span class="p">]</span> <span class="o">|</span> <span class="kc">None</span><span class="p">:</span>
-<span class="w">        </span><span class="sd">"""Set or get the formula used to construct the model"""</span>
+<span class="w">        </span><span class="sd">"""Set or get the formula used to construct the model."""</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_formula</span>
 
     <span class="nd">@formula</span><span class="o">.</span><span class="n">setter</span>
-    <span class="k">def</span><span class="w"> </span><span class="nf">formula</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">value</span><span class="p">:</span> <span class="nb">str</span> <span class="o">|</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">str</span><span class="p">]</span> <span class="o">|</span> <span class="kc">None</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">formula</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span> <span class="n">value</span><span class="p">:</span> <span class="nb">str</span> <span class="o">|</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">str</span><span class="p">]</span> <span class="o">|</span> <span class="kc">None</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>  <span class="c1"># numpydoc ignore=GL08</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_formula</span> <span class="o">=</span> <span class="n">value</span>
 
     <span class="k">def</span><span class="w"> </span><span class="nf">_validate_data</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
@@ -1228,29 +1258,36 @@
         <span class="n">eval_env</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">1</span><span class="p">,</span>
     <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">DataFrame</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">"""</span>
-<span class="sd">        Predict values for additional data</span>
+<span class="sd">        Predict values for additional data.</span>
 
 <span class="sd">        Parameters</span>
 <span class="sd">        ----------</span>
 <span class="sd">        params : array_like</span>
-<span class="sd">            Model parameters (nvar by 1)</span>
-<span class="sd">        equations : dict</span>
+<span class="sd">            Model parameters (nvar by 1).</span>
+<span class="sd">        equations : dict of str to dict, optional</span>
 <span class="sd">            Dictionary-like structure containing exogenous and endogenous</span>
 <span class="sd">            variables.  Each key is an equations label and must</span>
-<span class="sd">            match the labels used to fir the model. Each value must be a</span>
+<span class="sd">            match the labels used to fit the model. Each value must be a</span>
 <span class="sd">            dictionary with keys "exog" and "endog". If predictions are not</span>
 <span class="sd">            required for one of more of the model equations, these keys can</span>
 <span class="sd">            be omitted.</span>
-<span class="sd">        data : DataFrame</span>
+<span class="sd">        data : DataFrame, optional</span>
 <span class="sd">            Values to use when making predictions from a model constructed</span>
-<span class="sd">            from a formula</span>
-<span class="sd">        eval_env : int</span>
-<span class="sd">            Depth to  use when evaluating formulas.</span>
+<span class="sd">            from a formula.</span>
+<span class="sd">        eval_env : int, optional</span>
+<span class="sd">            Depth to use when evaluating formulas. The default is 1.</span>
 
 <span class="sd">        Returns</span>
 <span class="sd">        -------</span>
-<span class="sd">        predictions : DataFrame</span>
-<span class="sd">            Fitted values from supplied data and parameters</span>
+<span class="sd">        DataFrame</span>
+<span class="sd">            Fitted values from supplied data and parameters, with a column for</span>
+<span class="sd">            each equation that has predictions.</span>
+
+<span class="sd">        Raises</span>
+<span class="sd">        ------</span>
+<span class="sd">        ValueError</span>
+<span class="sd">            If neither ``equations`` nor ``data`` is provided, or if ``params`` does</span>
+<span class="sd">            not have one element for each parameter of the model.</span>
 
 <span class="sd">        Notes</span>
 <span class="sd">        -----</span>
@@ -1490,7 +1527,7 @@
 
     <span class="nd">@property</span>
     <span class="k">def</span><span class="w"> </span><span class="nf">has_constant</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Series</span><span class="p">:</span>
-<span class="w">        </span><span class="sd">"""Vector indicating which equations contain constants"""</span>
+<span class="w">        </span><span class="sd">"""Vector indicating which equations contain constants."""</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_has_constant</span>
 
     <span class="k">def</span><span class="w"> </span><span class="nf">_f_stat</span><span class="p">(</span>
@@ -1884,12 +1921,12 @@
     <span class="nd">@property</span>
     <span class="k">def</span><span class="w"> </span><span class="nf">constraints</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">LinearConstraint</span> <span class="o">|</span> <span class="kc">None</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">"""</span>
-<span class="sd">        Model constraints</span>
+<span class="sd">        Model constraints.</span>
 
 <span class="sd">        Returns</span>
 <span class="sd">        -------</span>
-<span class="sd">        cons : {LinearConstraint, None}</span>
-<span class="sd">            Constraint object</span>
+<span class="sd">        LinearConstraint or None</span>
+<span class="sd">            Constraint object, which is None if the model has no constraints.</span>
 <span class="sd">        """</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_constraints</span>
 
@@ -1900,9 +1937,9 @@
 <span class="sd">        Parameters</span>
 <span class="sd">        ----------</span>
 <span class="sd">        r : DataFrame</span>
-<span class="sd">            Constraint matrix. nconstraints by nparameters</span>
-<span class="sd">        q : Series</span>
-<span class="sd">            Constraint values (nconstraints).  If not set, set to 0</span>
+<span class="sd">            Constraint matrix. nconstraints by nparameters.</span>
+<span class="sd">        q : Series, optional</span>
+<span class="sd">            Constraint values (nconstraints).  If not set, set to 0.</span>
 
 <span class="sd">        Notes</span>
 <span class="sd">        -----</span>
@@ -1920,24 +1957,24 @@
         <span class="p">)</span>
 
     <span class="k">def</span><span class="w"> </span><span class="nf">reset_constraints</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
-<span class="w">        </span><span class="sd">"""Remove all model constraints"""</span>
+<span class="w">        </span><span class="sd">"""Remove all model constraints."""</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_constraints</span> <span class="o">=</span> <span class="kc">None</span>
 
     <span class="nd">@property</span>
     <span class="k">def</span><span class="w"> </span><span class="nf">param_names</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">list</span><span class="p">[</span><span class="nb">str</span><span class="p">]:</span>
 <span class="w">        </span><span class="sd">"""</span>
-<span class="sd">        Model parameter names</span>
+<span class="sd">        Model parameter names.</span>
 
 <span class="sd">        Returns</span>
 <span class="sd">        -------</span>
-<span class="sd">        names : list[str]</span>
-<span class="sd">            Normalized, unique model parameter names</span>
+<span class="sd">        list of str</span>
+<span class="sd">            Normalized, unique model parameter names.</span>
 <span class="sd">        """</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_param_names</span>
 
 
 <span class="k">class</span><span class="w"> </span><span class="nc">_LSSystemModelBase</span><span class="p">(</span><span class="n">_SystemModelBase</span><span class="p">):</span>
-<span class="w">    </span><span class="sd">"""Base class for least-squares-based system estimators"""</span>
+<span class="w">    </span><span class="sd">"""Base class for least-squares-based system estimators."""</span>
 
     <span class="k">def</span><span class="w"> </span><span class="nf">fit</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span>
@@ -1951,49 +1988,73 @@
         <span class="o">**</span><span class="n">cov_config</span><span class="p">:</span> <span class="nb">bool</span><span class="p">,</span>
     <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">SystemResults</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">"""</span>
-<span class="sd">        Estimate model parameters</span>
+<span class="sd">        Estimate model parameters.</span>
 
 <span class="sd">        Parameters</span>
 <span class="sd">        ----------</span>
-<span class="sd">        method : {None, "gls", "ols"}</span>
-<span class="sd">            Estimation method.  Default auto selects based on regressors,</span>
-<span class="sd">            using OLS only if all regressors are identical. The other two</span>
-<span class="sd">            arguments force the use of GLS or OLS.</span>
-<span class="sd">        full_cov : bool</span>
+<span class="sd">        method : {"ols", "gls"}, optional</span>
+<span class="sd">            Estimation method. The name is not case sensitive. If not provided, the</span>
+<span class="sd">            method is selected based on the regressors, using OLS only if all</span>
+<span class="sd">            regressors are identical and the model has no constraints, and GLS</span>
+<span class="sd">            otherwise. The two names force the use of OLS or GLS.</span>
+<span class="sd">        full_cov : bool, optional</span>
 <span class="sd">            Flag indicating whether to utilize information in correlations</span>
-<span class="sd">            when estimating the model with GLS</span>
-<span class="sd">        iterate : bool</span>
-<span class="sd">            Flag indicating to iterate GLS until convergence of iter limit</span>
-<span class="sd">            iterations have been completed</span>
-<span class="sd">        iter_limit : int</span>
-<span class="sd">            Maximum number of iterations for iterative GLS</span>
-<span class="sd">        tol : float</span>
-<span class="sd">            Tolerance to use when checking for convergence in iterative GLS</span>
-<span class="sd">        cov_type : str</span>
-<span class="sd">            Name of covariance estimator. Valid options are</span>
+<span class="sd">            when estimating the model with GLS. The default is True.</span>
+<span class="sd">        iterate : bool, optional</span>
+<span class="sd">            Flag indicating to iterate GLS until convergence or until iter_limit</span>
+<span class="sd">            iterations have been completed. The default is False.</span>
+<span class="sd">        iter_limit : int, optional</span>
+<span class="sd">            Maximum number of iterations for iterative GLS. The default is 100.</span>
+<span class="sd">        tol : float, optional</span>
+<span class="sd">            Tolerance to use when checking for convergence in iterative GLS. The</span>
+<span class="sd">            default is 1e-6.</span>
+<span class="sd">        cov_type : str, optional</span>
+<span class="sd">            Name of covariance estimator. The name is not case sensitive. The</span>
+<span class="sd">            default is "robust". Valid options are</span>
 
 <span class="sd">            * "unadjusted", "homoskedastic" - Classic covariance estimator</span>
 <span class="sd">            * "robust", "heteroskedastic" - Heteroskedasticity robust</span>
 <span class="sd">              covariance estimator</span>
-<span class="sd">            * "kernel" - Allows for heteroskedasticity and autocorrelation</span>
+<span class="sd">            * "kernel", "hac" - Allows for heteroskedasticity and autocorrelation</span>
 <span class="sd">            * "clustered" - Allows for 1 and 2-way clustering of errors</span>
 <span class="sd">              (Rogers).</span>
 
-<span class="sd">        cov_config</span>
-<span class="sd">            Additional parameters to pass to covariance estimator. All</span>
-<span class="sd">            estimators support debiased which employs a small-sample adjustment</span>
+<span class="sd">        **cov_config : dict</span>
+<span class="sd">            Additional parameters to pass to the covariance estimator. The keys</span>
+<span class="sd">            that are used depend on ``cov_type``. All estimators accept ``debiased``</span>
+<span class="sd">            (bool), which employs a small-sample adjustment and is False by</span>
+<span class="sd">            default. "kernel" also accepts ``kernel`` (str), the name of the kernel,</span>
+<span class="sd">            which is "bartlett" if it is not provided, and ``bandwidth`` (float),</span>
+<span class="sd">            which is estimated from the data if it is not provided. "clustered" also</span>
+<span class="sd">            accepts ``clusters`` (array_like), the cluster assignment of each</span>
+<span class="sd">            observation with one or two columns, and ``group_debias`` (bool), which</span>
+<span class="sd">            debiases by the number of groups and is False by default. "unadjusted"</span>
+<span class="sd">            and "robust" accept only ``debiased``.</span>
 
 <span class="sd">        Returns</span>
 <span class="sd">        -------</span>
-<span class="sd">        results : SystemResults</span>
-<span class="sd">            Estimation results</span>
+<span class="sd">        SystemResults</span>
+<span class="sd">            Estimation results.</span>
+
+<span class="sd">        Raises</span>
+<span class="sd">        ------</span>
+<span class="sd">        ValueError</span>
+<span class="sd">            If ``method`` is not "ols" or "gls", or if the labels of ``clusters``</span>
+<span class="sd">            do not match the labels of the inputs.</span>
+<span class="sd">        UnknownOptionError</span>
+<span class="sd">            If ``cov_type`` or ``kernel`` is not supported. It is both a</span>
+<span class="sd">            ``KeyError`` and a ``ValueError``.</span>
 
 <span class="sd">        See Also</span>
 <span class="sd">        --------</span>
 <span class="sd">        linearmodels.system.covariance.HomoskedasticCovariance</span>
+<span class="sd">            Homoskedastic covariance.</span>
 <span class="sd">        linearmodels.system.covariance.HeteroskedasticCovariance</span>
+<span class="sd">            Heteroskedasticity robust covariance.</span>
 <span class="sd">        linearmodels.system.covariance.KernelCovariance</span>
+<span class="sd">            Kernel (HAC) covariance.</span>
 <span class="sd">        linearmodels.system.covariance.ClusteredCovariance</span>
+<span class="sd">            Clustered covariance.</span>
 <span class="sd">        """</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_check_clusters</span><span class="p">(</span><span class="n">cov_config</span><span class="p">)</span>
         <span class="k">if</span> <span class="n">method</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
@@ -2073,11 +2134,11 @@
 <a class="viewcode-back" href="../../../system/system/linearmodels.system.model.IV3SLS.html#linearmodels.system.model.IV3SLS">[docs]</a>
 <span class="k">class</span><span class="w"> </span><span class="nc">IV3SLS</span><span class="p">(</span><span class="n">_LSSystemModelBase</span><span class="p">):</span>
 <span class="w">    </span><span class="sa">r</span><span class="sd">"""</span>
-<span class="sd">    Three-stage Least Squares (3SLS) Estimator</span>
+<span class="sd">    Three-stage Least Squares (3SLS) Estimator.</span>
 
 <span class="sd">    Parameters</span>
 <span class="sd">    ----------</span>
-<span class="sd">    equations : dict</span>
+<span class="sd">    equations : dict of str to tuple or dict</span>
 <span class="sd">        Dictionary-like structure containing dependent, exogenous, endogenous</span>
 <span class="sd">        and instrumental variables.  Each key is an equations label and must</span>
 <span class="sd">        be a string. Each value must be either a tuple of the form (dependent,</span>
@@ -2095,9 +2156,10 @@
 <span class="sd">        array_like, such as lists, NumPy arrays, pandas objects and xarray</span>
 <span class="sd">        DataArrays, and a ``TypeError`` that names the variable is raised for</span>
 <span class="sd">        complex values or text.</span>
-<span class="sd">    sigma : array_like</span>
-<span class="sd">        Prespecified residual covariance to use in GLS estimation. If not</span>
-<span class="sd">        provided, FGLS is implemented based on an estimate of sigma.</span>
+<span class="sd">    sigma : array_like, optional</span>
+<span class="sd">        Prespecified residual covariance to use in GLS estimation, with shape</span>
+<span class="sd">        (nequations, nequations). If not provided, FGLS is implemented based on an</span>
+<span class="sd">        estimate of sigma.</span>
 
 <span class="sd">    Notes</span>
 <span class="sd">    -----</span>
@@ -2122,7 +2184,7 @@
 
 <span class="sd">    .. math::</span>
 
-<span class="sd">        Y = \left[\begin{array}{x}Y_1 \\ Y_2 \\ \vdots \\ Y_K\end{array}\right]</span>
+<span class="sd">        Y = \left[\begin{array}{c}Y_1 \\ Y_2 \\ \vdots \\ Y_K\end{array}\right]</span>
 
 <span class="sd">    and</span>
 
@@ -2142,7 +2204,7 @@
 <span class="sd">        \hat{\beta}_{IV} &amp; = (X'Z(Z'Z)^{-1}Z'X)^{-1}X'Z(Z'Z)^{-1}Z'Y \\</span>
 <span class="sd">                         &amp; = (\hat{X}'\hat{X})^{-1}\hat{X}'Y</span>
 
-<span class="sd">    where :math:`\hat{X} = Z(Z'Z)^{-1}Z'X` and.  When certain conditions are</span>
+<span class="sd">    where :math:`\hat{X} = Z(Z'Z)^{-1}Z'X`.  When certain conditions are</span>
 <span class="sd">    satisfied, a GLS estimator of the form</span>
 
 <span class="sd">    .. math::</span>
@@ -2204,23 +2266,30 @@
         <span class="n">instruments</span><span class="p">:</span> <span class="n">linearmodels</span><span class="o">.</span><span class="n">typing</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">ArrayLike</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
     <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">IV3SLS</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">"""</span>
-<span class="sd">        Interface for specification of multivariate IV models</span>
+<span class="sd">        Interface for specification of multivariate IV models.</span>
 
 <span class="sd">        Parameters</span>
 <span class="sd">        ----------</span>
 <span class="sd">        dependent : array_like</span>
-<span class="sd">            nobs by ndep array of dependent variables</span>
-<span class="sd">        exog : array_like</span>
-<span class="sd">            nobs by nexog array of exogenous regressors common to all models</span>
-<span class="sd">        endog : array_like</span>
-<span class="sd">            nobs by nendog array of endogenous regressors common to all models</span>
-<span class="sd">        instruments : array_like</span>
-<span class="sd">            nobs by ninstr array of instruments to use in all equations</span>
+<span class="sd">            Array of dependent variables with shape (nobs, ndep).</span>
+<span class="sd">        exog : array_like, optional</span>
+<span class="sd">            Array of exogenous regressors common to all models with shape</span>
+<span class="sd">            (nobs, nexog).</span>
+<span class="sd">        endog : array_like, optional</span>
+<span class="sd">            Array of endogenous regressors common to all models with shape</span>
+<span class="sd">            (nobs, nendog).</span>
+<span class="sd">        instruments : array_like, optional</span>
+<span class="sd">            Array of instruments to use in all equations with shape (nobs, ninstr).</span>
 
 <span class="sd">        Returns</span>
 <span class="sd">        -------</span>
-<span class="sd">        model : IV3SLS</span>
-<span class="sd">            Model instance</span>
+<span class="sd">        IV3SLS</span>
+<span class="sd">            Model instance.</span>
+
+<span class="sd">        Raises</span>
+<span class="sd">        ------</span>
+<span class="sd">        ValueError</span>
+<span class="sd">            If neither ``exog`` nor ``endog`` is provided.</span>
 
 <span class="sd">        Notes</span>
 <span class="sd">        -----</span>
@@ -2264,20 +2333,21 @@
         <span class="n">weights</span><span class="p">:</span> <span class="n">Mapping</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">linearmodels</span><span class="o">.</span><span class="n">typing</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">ArrayLike</span><span class="p">]</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
     <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">IV3SLS</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">"""</span>
-<span class="sd">        Specify a 3SLS using the formula interface</span>
+<span class="sd">        Specify a 3SLS using the formula interface.</span>
 
 <span class="sd">        Parameters</span>
 <span class="sd">        ----------</span>
-<span class="sd">        formula : {str, dict-like}</span>
+<span class="sd">        formula : str or dict of str to str</span>
 <span class="sd">            Either a string or a dictionary of strings where each value in</span>
 <span class="sd">            the dictionary represents a single equation. See Notes for a</span>
-<span class="sd">            description of the accepted syntax</span>
+<span class="sd">            description of the accepted syntax.</span>
 <span class="sd">        data : DataFrame</span>
-<span class="sd">            Frame containing named variables</span>
-<span class="sd">        sigma : array_like</span>
-<span class="sd">            Prespecified residual covariance to use in GLS estimation. If</span>
-<span class="sd">            not provided, FGLS is implemented based on an estimate of sigma.</span>
-<span class="sd">        weights : dict-like</span>
+<span class="sd">            Frame containing named variables.</span>
+<span class="sd">        sigma : array_like, optional</span>
+<span class="sd">            Prespecified residual covariance to use in GLS estimation, with shape</span>
+<span class="sd">            (nequations, nequations). If not provided, FGLS is implemented based on</span>
+<span class="sd">            an estimate of sigma.</span>
+<span class="sd">        weights : dict of str to array_like, optional</span>
 <span class="sd">            Dictionary like object (e.g. a DataFrame) containing variable</span>
 <span class="sd">            weights.  Each entry must have the same number of observations as</span>
 <span class="sd">            data.  If an equation label is not a key weights, the weights will</span>
@@ -2288,8 +2358,8 @@
 
 <span class="sd">        Returns</span>
 <span class="sd">        -------</span>
-<span class="sd">        model : IV3SLS</span>
-<span class="sd">            Model instance</span>
+<span class="sd">        IV3SLS</span>
+<span class="sd">            Model instance.</span>
 
 <span class="sd">        Notes</span>
 <span class="sd">        -----</span>
@@ -2335,11 +2405,11 @@
 <a class="viewcode-back" href="../../../system/system/linearmodels.system.model.SUR.html#linearmodels.system.model.SUR">[docs]</a>
 <span class="k">class</span><span class="w"> </span><span class="nc">SUR</span><span class="p">(</span><span class="n">_LSSystemModelBase</span><span class="p">):</span>
 <span class="w">    </span><span class="sa">r</span><span class="sd">"""</span>
-<span class="sd">    Seemingly unrelated regression estimation (SUR/SURE)</span>
+<span class="sd">    Seemingly unrelated regression estimation (SUR/SURE).</span>
 
 <span class="sd">    Parameters</span>
 <span class="sd">    ----------</span>
-<span class="sd">    equations : dict</span>
+<span class="sd">    equations : dict of str to tuple or dict</span>
 <span class="sd">        Dictionary-like structure containing dependent and exogenous variable</span>
 <span class="sd">        values.  Each key is an equations label and must be a string. Each</span>
 <span class="sd">        value must be either a tuple of the form (dependent,</span>
@@ -2347,9 +2417,10 @@
 <span class="sd">        the optional key "weights". The variables are array_like, such as lists,</span>
 <span class="sd">        NumPy arrays, pandas objects and xarray DataArrays, and a ``TypeError``</span>
 <span class="sd">        that names the variable is raised for complex values or text.</span>
-<span class="sd">    sigma : array_like</span>
-<span class="sd">        Prespecified residual covariance to use in GLS estimation. If not</span>
-<span class="sd">        provided, FGLS is implemented based on an estimate of sigma.</span>
+<span class="sd">    sigma : array_like, optional</span>
+<span class="sd">        Prespecified residual covariance to use in GLS estimation, with shape</span>
+<span class="sd">        (nequations, nequations). If not provided, FGLS is implemented based on an</span>
+<span class="sd">        estimate of sigma.</span>
 
 <span class="sd">    Notes</span>
 <span class="sd">    -----</span>
@@ -2374,7 +2445,7 @@
 
 <span class="sd">    .. math::</span>
 
-<span class="sd">        Y = \left[\begin{array}{x}Y_1 \\ Y_2 \\ \vdots \\ Y_K\end{array}\right]</span>
+<span class="sd">        Y = \left[\begin{array}{c}Y_1 \\ Y_2 \\ \vdots \\ Y_K\end{array}\right]</span>
 
 <span class="sd">    and</span>
 
@@ -2472,19 +2543,20 @@
         <span class="n">exog</span><span class="p">:</span> <span class="n">linearmodels</span><span class="o">.</span><span class="n">typing</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">ArrayLike</span><span class="p">,</span>
     <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">SUR</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">"""</span>
-<span class="sd">        Interface for specification of multivariate regression models</span>
+<span class="sd">        Interface for specification of multivariate regression models.</span>
 
 <span class="sd">        Parameters</span>
 <span class="sd">        ----------</span>
 <span class="sd">        dependent : array_like</span>
-<span class="sd">            nobs by ndep array of dependent variables</span>
+<span class="sd">            Array of dependent variables with shape (nobs, ndep).</span>
 <span class="sd">        exog : array_like</span>
-<span class="sd">            nobs by nvar array of exogenous regressors common to all models</span>
+<span class="sd">            Array of exogenous regressors common to all models with shape</span>
+<span class="sd">            (nobs, nvar).</span>
 
 <span class="sd">        Returns</span>
 <span class="sd">        -------</span>
-<span class="sd">        model : SUR</span>
-<span class="sd">            Model instance</span>
+<span class="sd">        SUR</span>
+<span class="sd">            Model instance.</span>
 
 <span class="sd">        Notes</span>
 <span class="sd">        -----</span>
@@ -2527,20 +2599,21 @@
         <span class="n">weights</span><span class="p">:</span> <span class="n">Mapping</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">linearmodels</span><span class="o">.</span><span class="n">typing</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">ArrayLike</span><span class="p">]</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
     <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">SUR</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">"""</span>
-<span class="sd">        Specify a SUR using the formula interface</span>
+<span class="sd">        Specify a SUR using the formula interface.</span>
 
 <span class="sd">        Parameters</span>
 <span class="sd">        ----------</span>
-<span class="sd">        formula : {str, dict[str, str]}</span>
+<span class="sd">        formula : str or dict of str to str</span>
 <span class="sd">            Either a string or a dictionary of strings where each value in</span>
 <span class="sd">            the dictionary represents a single equation. See Notes for a</span>
-<span class="sd">            description of the accepted syntax</span>
+<span class="sd">            description of the accepted syntax.</span>
 <span class="sd">        data : DataFrame</span>
-<span class="sd">            Frame containing named variables</span>
-<span class="sd">        sigma : array_like</span>
-<span class="sd">            Prespecified residual covariance to use in GLS estimation. If</span>
-<span class="sd">            not provided, FGLS is implemented based on an estimate of sigma.</span>
-<span class="sd">        weights : dict[str, array_like]</span>
+<span class="sd">            Frame containing named variables.</span>
+<span class="sd">        sigma : array_like, optional</span>
+<span class="sd">            Prespecified residual covariance to use in GLS estimation, with shape</span>
+<span class="sd">            (nequations, nequations). If not provided, FGLS is implemented based on</span>
+<span class="sd">            an estimate of sigma.</span>
+<span class="sd">        weights : dict of str to array_like, optional</span>
 <span class="sd">            Dictionary like object (e.g. a DataFrame) containing variable</span>
 <span class="sd">            weights.  Each entry must have the same number of observations as</span>
 <span class="sd">            data.  If an equation label is not a key weights, the weights will</span>
@@ -2551,8 +2624,8 @@
 
 <span class="sd">        Returns</span>
 <span class="sd">        -------</span>
-<span class="sd">        model : SUR</span>
-<span class="sd">            Model instance</span>
+<span class="sd">        SUR</span>
+<span class="sd">            Model instance.</span>
 
 <span class="sd">        Notes</span>
 <span class="sd">        -----</span>
@@ -2597,11 +2670,11 @@
 <a class="viewcode-back" href="../../../system/system/linearmodels.system.model.IVSystemGMM.html#linearmodels.system.model.IVSystemGMM">[docs]</a>
 <span class="k">class</span><span class="w"> </span><span class="nc">IVSystemGMM</span><span class="p">(</span><span class="n">_SystemModelBase</span><span class="p">):</span>
 <span class="w">    </span><span class="sa">r</span><span class="sd">"""</span>
-<span class="sd">    System Generalized Method of Moments (GMM) estimation of linear IV models</span>
+<span class="sd">    System Generalized Method of Moments (GMM) estimation of linear IV models.</span>
 
 <span class="sd">    Parameters</span>
 <span class="sd">    ----------</span>
-<span class="sd">    equations : dict</span>
+<span class="sd">    equations : dict of str to tuple or dict</span>
 <span class="sd">        Dictionary-like structure containing dependent, exogenous, endogenous</span>
 <span class="sd">        and instrumental variables.  Each key is an equations label and must</span>
 <span class="sd">        be a string. Each value must be either a tuple of the form (dependent,</span>
@@ -2612,15 +2685,37 @@
 <span class="sd">        array_like, such as lists, NumPy arrays, pandas objects and xarray</span>
 <span class="sd">        DataArrays, and a ``TypeError`` that names the variable is raised for</span>
 <span class="sd">        complex values or text.</span>
-<span class="sd">    sigma : array_like</span>
-<span class="sd">        Prespecified residual covariance to use in GLS estimation. If not</span>
-<span class="sd">        provided, FGLS is implemented based on an estimate of sigma. Only used</span>
-<span class="sd">        if weight_type is "unadjusted"</span>
-<span class="sd">    weight_type : str</span>
-<span class="sd">        Name of moment condition weight function to use in the GMM estimation</span>
-<span class="sd">    weight_config</span>
+<span class="sd">    sigma : array_like, optional</span>
+<span class="sd">        Prespecified residual covariance to use in GLS estimation, with shape</span>
+<span class="sd">        (nequations, nequations). If not provided, FGLS is implemented based on an</span>
+<span class="sd">        estimate of sigma. Only used if weight_type is "unadjusted" or</span>
+<span class="sd">        "homoskedastic". A ``UserWarning`` is issued, and sigma is ignored, if it is</span>
+<span class="sd">        provided with another weight type.</span>
+<span class="sd">    weight_type : str, optional</span>
+<span class="sd">        Name of moment condition weight function to use in the GMM estimation. The</span>
+<span class="sd">        default is "robust". The names are case sensitive. Supported weight</span>
+<span class="sd">        types are:</span>
+
+<span class="sd">        * "unadjusted", "homoskedastic" - Assume moments are homoskedastic</span>
+<span class="sd">        * "robust", "heteroskedastic" - Allow for heteroskedasticity</span>
+<span class="sd">        * "kernel", "hac" - Allow for heteroskedasticity and autocorrelation</span>
+
+<span class="sd">    **weight_config : dict</span>
 <span class="sd">        Additional keyword arguments to pass to the moment condition weight</span>
-<span class="sd">        function</span>
+<span class="sd">        function. All weight types accept ``center`` (bool), whether to center the</span>
+<span class="sd">        moment conditions, and ``debiased`` (bool), whether to use small-sample</span>
+<span class="sd">        adjustments. Both are False by default. "kernel" also accepts ``kernel``</span>
+<span class="sd">        (str), the name of the kernel, which is "bartlett" if it is not provided,</span>
+<span class="sd">        ``bandwidth`` (float), and ``optimal_bw`` (bool). See</span>
+<span class="sd">        :class:`~linearmodels.system.gmm.HomoskedasticWeightMatrix`,</span>
+<span class="sd">        :class:`~linearmodels.system.gmm.HeteroskedasticWeightMatrix` and</span>
+<span class="sd">        :class:`~linearmodels.system.gmm.KernelWeightMatrix` for the details.</span>
+
+<span class="sd">    Raises</span>
+<span class="sd">    ------</span>
+<span class="sd">    UnknownOptionError</span>
+<span class="sd">        If ``weight_type`` is not supported or ``kernel`` is not a supported</span>
+<span class="sd">        kernel. It is both a ``KeyError`` and a ``ValueError``.</span>
 
 <span class="sd">    Notes</span>
 <span class="sd">    -----</span>
@@ -2643,7 +2738,7 @@
 
 <span class="sd">    .. math::</span>
 
-<span class="sd">        Y = \left[\begin{array}{x}Y_1 \\ Y_2 \\ \vdots \\ Y_K\end{array}\right]</span>
+<span class="sd">        Y = \left[\begin{array}{c}Y_1 \\ Y_2 \\ \vdots \\ Y_K\end{array}\right]</span>
 
 <span class="sd">    and</span>
 
@@ -2778,40 +2873,47 @@
         <span class="o">**</span><span class="n">cov_config</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">|</span> <span class="nb">float</span><span class="p">,</span>
     <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">GMMSystemResults</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">"""</span>
-<span class="sd">        Estimate model parameters</span>
+<span class="sd">        Estimate model parameters.</span>
 
 <span class="sd">        Parameters</span>
 <span class="sd">        ----------</span>
-<span class="sd">        iter_limit : int</span>
-<span class="sd">            Maximum number of iterations for iterative GLS</span>
-<span class="sd">        tol : float</span>
-<span class="sd">            Tolerance to use when checking for convergence in iterative GLS</span>
-<span class="sd">        initial_weight : ndarray</span>
+<span class="sd">        iter_limit : int, optional</span>
+<span class="sd">            Maximum number of iterations for iterative GLS. The default is 2.</span>
+<span class="sd">        tol : float, optional</span>
+<span class="sd">            Tolerance to use when checking for convergence in iterative GLS. The</span>
+<span class="sd">            default is 1e-6.</span>
+<span class="sd">        initial_weight : ndarray, optional</span>
 <span class="sd">            Initial weighting matrix to use in the first step. If not</span>
 <span class="sd">            specified, uses the average outer-product of the set containing</span>
 <span class="sd">            the exogenous variables and instruments.</span>
-<span class="sd">        cov_type : str</span>
-<span class="sd">            Name of covariance estimator. Valid options are</span>
+<span class="sd">        cov_type : str, optional</span>
+<span class="sd">            Name of covariance estimator. The names are case sensitive. The default</span>
+<span class="sd">            is "robust". Valid options are</span>
 
 <span class="sd">            * "unadjusted", "homoskedastic" - Classic covariance estimator</span>
 <span class="sd">            * "robust", "heteroskedastic" - Heteroskedasticity robust</span>
 <span class="sd">              covariance estimator</span>
-<span class="sd">            * "kernel", ``"hac"`` - Heteroskedasticity and autocorrelation</span>
+<span class="sd">            * "kernel", "hac" - Heteroskedasticity and autocorrelation</span>
 <span class="sd">              robust covariance estimator</span>
 
-<span class="sd">        cov_config</span>
-<span class="sd">            Additional parameters to pass to covariance estimator. All</span>
-<span class="sd">            estimators support debiased which employs a small-sample adjustment.</span>
-<span class="sd">            "kernel" also supports kernel, the name of the kernel, and</span>
-<span class="sd">            bandwidth, which is estimated from the data if it is not given.</span>
+<span class="sd">        **cov_config : dict</span>
+<span class="sd">            Additional parameters to pass to the covariance estimator. All</span>
+<span class="sd">            estimators accept ``debiased`` (bool), which employs a small-sample</span>
+<span class="sd">            adjustment and is False by default. "kernel" also accepts ``kernel``</span>
+<span class="sd">            (str), the name of the kernel, which is "bartlett" if it is not</span>
+<span class="sd">            provided, and ``bandwidth`` (float), which is estimated from the data</span>
+<span class="sd">            if it is not given.</span>
 
 <span class="sd">        Returns</span>
 <span class="sd">        -------</span>
 <span class="sd">        GMMSystemResults</span>
-<span class="sd">            Estimation results</span>
+<span class="sd">            Estimation results.</span>
 
 <span class="sd">        Raises</span>
 <span class="sd">        ------</span>
+<span class="sd">        UnknownOptionError</span>
+<span class="sd">            If ``cov_type`` or ``kernel`` is not supported. It is both a</span>
+<span class="sd">            ``KeyError`` and a ``ValueError``.</span>
 <span class="sd">        ValueError</span>
 <span class="sd">            If a bandwidth is estimated from the data, for the kernel weight</span>
 <span class="sd">            matrix or for the kernel covariance, and there are fewer</span>
@@ -3038,17 +3140,17 @@
         <span class="o">**</span><span class="n">weight_config</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">|</span> <span class="nb">str</span> <span class="o">|</span> <span class="nb">float</span><span class="p">,</span>
     <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">IVSystemGMM</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">"""</span>
-<span class="sd">        Specify a 3SLS using the formula interface</span>
+<span class="sd">        Specify a system GMM model using the formula interface.</span>
 
 <span class="sd">        Parameters</span>
 <span class="sd">        ----------</span>
-<span class="sd">        formula : {str, dict-like}</span>
+<span class="sd">        formula : str or dict of str to str</span>
 <span class="sd">            Either a string or a dictionary of strings where each value in</span>
 <span class="sd">            the dictionary represents a single equation. See Notes for a</span>
-<span class="sd">            description of the accepted syntax</span>
+<span class="sd">            description of the accepted syntax.</span>
 <span class="sd">        data : DataFrame</span>
-<span class="sd">            Frame containing named variables</span>
-<span class="sd">        weights : dict-like</span>
+<span class="sd">            Frame containing named variables.</span>
+<span class="sd">        weights : dict of str to array_like, optional</span>
 <span class="sd">            Dictionary like object (e.g. a DataFrame) containing variable</span>
 <span class="sd">            weights.  Each entry must have the same number of observations as</span>
 <span class="sd">            data.  If an equation label is not a key weights, the weights will</span>
@@ -3056,21 +3158,33 @@
 <span class="sd">            The weights of an equation must be strictly positive and finite. They are</span>
 <span class="sd">            rescaled to have a mean of 1 in the equation. A NaN weight is missing, and</span>
 <span class="sd">            its observation is dropped from all of the equations.</span>
-<span class="sd">        weight_type : str</span>
+<span class="sd">        weight_type : str, optional</span>
 <span class="sd">            Name of moment condition weight function to use in the GMM</span>
-<span class="sd">            estimation. Valid options are:</span>
+<span class="sd">            estimation. The default is "robust". The names are case sensitive.</span>
+<span class="sd">            Valid options are:</span>
 
 <span class="sd">            * "unadjusted", "homoskedastic" - Assume moments are homoskedastic</span>
 <span class="sd">            * "robust", "heteroskedastic" - Allow for heteroskedasticity</span>
+<span class="sd">            * "kernel", "hac" - Allow for heteroskedasticity and autocorrelation</span>
 
-<span class="sd">        weight_config</span>
+<span class="sd">        **weight_config : dict</span>
 <span class="sd">            Additional keyword arguments to pass to the moment condition weight</span>
-<span class="sd">            function</span>
+<span class="sd">            function. All weight types accept ``center`` (bool) and ``debiased``</span>
+<span class="sd">            (bool), which are False by default. "kernel" also accepts ``kernel``</span>
+<span class="sd">            (str), the name of the kernel, which is "bartlett" if it is not</span>
+<span class="sd">            provided, ``bandwidth`` (float), and ``optimal_bw`` (bool). See the</span>
+<span class="sd">            parameters of :class:`~linearmodels.system.model.IVSystemGMM`.</span>
 
 <span class="sd">        Returns</span>
 <span class="sd">        -------</span>
-<span class="sd">        model : IVSystemGMM</span>
-<span class="sd">            Model instance</span>
+<span class="sd">        IVSystemGMM</span>
+<span class="sd">            Model instance.</span>
+
+<span class="sd">        Raises</span>
+<span class="sd">        ------</span>
+<span class="sd">        UnknownOptionError</span>
+<span class="sd">            If ``weight_type`` is not supported or ``kernel`` is not a supported</span>
+<span class="sd">            kernel. It is both a ``KeyError`` and a ``ValueError``.</span>
 
 <span class="sd">        Notes</span>
 <span class="sd">        -----</span>
@@ -3116,19 +3230,19 @@
         <span class="n">weight_mat</span><span class="p">:</span> <span class="n">linearmodels</span><span class="o">.</span><span class="n">typing</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">Float64Array</span><span class="p">,</span>
     <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">WaldTestStatistic</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">"""</span>
-<span class="sd">        J stat and test</span>
+<span class="sd">        J stat and test.</span>
 
 <span class="sd">        Parameters</span>
 <span class="sd">        ----------</span>
 <span class="sd">        params : ndarray</span>
-<span class="sd">            Estimated model parameters</span>
+<span class="sd">            Estimated model parameters.</span>
 <span class="sd">        weight_mat : ndarray</span>
-<span class="sd">            Weighting matrix used in estimation of the parameters</span>
+<span class="sd">            Weighting matrix used in estimation of the parameters.</span>
 
 <span class="sd">        Returns</span>
 <span class="sd">        -------</span>
-<span class="sd">        stat : WaldTestStatistic</span>
-<span class="sd">            Test statistic</span>
+<span class="sd">        WaldTestStatistic</span>
+<span class="sd">            Test statistic.</span>
 
 <span class="sd">        Notes</span>
 <span class="sd">        -----</span>

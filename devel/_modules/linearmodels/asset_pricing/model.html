@@ -19,7 +19,7 @@
     
   
       
-        <title>linearmodels.asset_pricing.model - linearmodels v7.1 (+518)</title>
+        <title>linearmodels.asset_pricing.model - linearmodels v7.1 (+525)</title>
       
     
 
@@ -91,7 +91,7 @@
 
 <header class="md-header md-header--shadow" data-md-component="header">
   <nav class="md-header__inner md-grid" aria-label="Header">
-    <a href="../../../index.html" title="linearmodels v7.1 (+518)" class="md-header__button md-logo" aria-label="linearmodels v7.1 (+518)" data-md-component="logo">
+    <a href="../../../index.html" title="linearmodels v7.1 (+525)" class="md-header__button md-logo" aria-label="linearmodels v7.1 (+525)" data-md-component="logo">
       <img src="../../../_static/bw-logo.svg" alt="logo">
     </a>
     <label class="md-header__button md-icon" for="__drawer">
@@ -102,7 +102,7 @@
       <div class="md-header__ellipsis">
         <div class="md-header__topic">
           <span class="md-ellipsis">
-            linearmodels v7.1 (+518)
+            linearmodels v7.1 (+525)
           </span>
         </div>
         <div class="md-header__topic" data-md-component="header-topic">
@@ -197,10 +197,10 @@
 
 <nav class="md-nav md-nav--primary" aria-label="Navigation" data-md-level="0">
   <label class="md-nav__title" for="__drawer">
-    <a href="../../../index.html" title="linearmodels v7.1 (+518)" class="md-nav__button md-logo" aria-label="linearmodels v7.1 (+518)" data-md-component="logo">
+    <a href="../../../index.html" title="linearmodels v7.1 (+525)" class="md-nav__button md-logo" aria-label="linearmodels v7.1 (+525)" data-md-component="logo">
       <img src="../../../_static/bw-logo.svg" alt="logo">
     </a>
-    linearmodels v7.1 (+518)
+    linearmodels v7.1 (+525)
   </label>
   
     <div class="md-nav__source">
@@ -528,7 +528,7 @@
 
 <h1>Source code for linearmodels.asset_pricing.model</h1><div class="highlight"><pre>
 <span></span><code><span class="sd">"""</span>
-<span class="sd">Linear factor models for applications in asset pricing</span>
+<span class="sd">Linear factor models for applications in asset pricing.</span>
 <span class="sd">"""</span>
 
 <span class="kn">from</span><span class="w"> </span><span class="nn">__future__</span><span class="w"> </span><span class="kn">import</span> <span class="n">annotations</span>
@@ -591,6 +591,25 @@
     <span class="n">args</span><span class="p">:</span> <span class="nb">tuple</span><span class="p">[</span><span class="nb">bool</span><span class="p">,</span> <span class="n">Any</span><span class="p">],</span>
     <span class="n">disp</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">|</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">1</span><span class="p">,</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Callable</span><span class="p">[[</span><span class="n">linearmodels</span><span class="o">.</span><span class="n">typing</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">Float64Array</span><span class="p">],</span> <span class="kc">None</span><span class="p">]:</span>
+<span class="w">    </span><span class="sd">"""</span>
+<span class="sd">    Create a callback that prints the value of the objective during optimization.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    obj : callable</span>
+<span class="sd">        The objective function, which is called as ``obj(params, *args)``.</span>
+<span class="sd">    args : tuple</span>
+<span class="sd">        The arguments of ``obj`` after the parameters.</span>
+<span class="sd">    disp : bool or int, optional</span>
+<span class="sd">        Number of iterations between printed updates. The default is 1. A value</span>
+<span class="sd">        that is 0 or negative suppresses the output.</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    callable</span>
+<span class="sd">        Function of the parameters that prints the iteration and the value of the</span>
+<span class="sd">        objective every ``disp`` iterations.</span>
+<span class="sd">    """</span>
     <span class="n">d</span> <span class="o">=</span> <span class="p">{</span><span class="s2">"iter"</span><span class="p">:</span> <span class="mi">0</span><span class="p">}</span>
     <span class="n">disp</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">disp</span><span class="p">)</span>
 
@@ -757,10 +776,11 @@
 
     <span class="nd">@property</span>
     <span class="k">def</span><span class="w"> </span><span class="nf">formula</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span> <span class="o">|</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">"""Formula used to construct the model, if it was constructed using one."""</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_formula</span>
 
     <span class="nd">@formula</span><span class="o">.</span><span class="n">setter</span>
-    <span class="k">def</span><span class="w"> </span><span class="nf">formula</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">value</span><span class="p">:</span> <span class="nb">str</span> <span class="o">|</span> <span class="kc">None</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">formula</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">value</span><span class="p">:</span> <span class="nb">str</span> <span class="o">|</span> <span class="kc">None</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>  <span class="c1"># numpydoc ignore=GL08</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_formula</span> <span class="o">=</span> <span class="n">value</span>
 
     <span class="nd">@staticmethod</span>
@@ -812,14 +832,14 @@
 <a class="viewcode-back" href="../../../asset-pricing/asset-pricing/linearmodels.asset_pricing.model.TradedFactorModel.html#linearmodels.asset_pricing.model.TradedFactorModel">[docs]</a>
 <span class="k">class</span><span class="w"> </span><span class="nc">TradedFactorModel</span><span class="p">(</span><span class="n">_FactorModelBase</span><span class="p">):</span>
 <span class="w">    </span><span class="sa">r</span><span class="sd">"""</span>
-<span class="sd">    Linear factor models estimator applicable to traded factors</span>
+<span class="sd">    Linear factor models estimator applicable to traded factors.</span>
 
 <span class="sd">    Parameters</span>
 <span class="sd">    ----------</span>
 <span class="sd">    portfolios : array_like</span>
-<span class="sd">        Test portfolio returns (nobs by nportfolio)</span>
+<span class="sd">        Test portfolio returns (nobs by nportfolio).</span>
 <span class="sd">    factors : array_like</span>
-<span class="sd">        Priced factor returns (nobs by nfactor)</span>
+<span class="sd">        Priced factor returns (nobs by nfactor).</span>
 
 <span class="sd">    Notes</span>
 <span class="sd">    -----</span>
@@ -868,25 +888,28 @@
         <span class="n">portfolios</span><span class="p">:</span> <span class="n">DataFrame</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
     <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">TradedFactorModel</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">"""</span>
+<span class="sd">        Specify a model using the formula interface.</span>
+
 <span class="sd">        Parameters</span>
 <span class="sd">        ----------</span>
 <span class="sd">        formula : str</span>
-<span class="sd">            Formula modified for the syntax described in the notes</span>
+<span class="sd">            Formula modified for the syntax described in the notes.</span>
 <span class="sd">        data : DataFrame</span>
-<span class="sd">            DataFrame containing the variables used in the formula</span>
-<span class="sd">        portfolios : array_like</span>
-<span class="sd">            Portfolios to be used in the model</span>
+<span class="sd">            DataFrame containing the variables used in the formula.</span>
+<span class="sd">        portfolios : array_like, optional</span>
+<span class="sd">            Portfolios to be used in the model. If provided, must use formula</span>
+<span class="sd">            syntax containing only factors.</span>
 
 <span class="sd">        Returns</span>
 <span class="sd">        -------</span>
 <span class="sd">        TradedFactorModel</span>
-<span class="sd">            Model instance</span>
+<span class="sd">            Model instance.</span>
 
 <span class="sd">        Notes</span>
 <span class="sd">        -----</span>
-<span class="sd">        The formula can be used in one of two ways.  The first specified only the</span>
+<span class="sd">        The formula can be used in one of two ways.  The first specifies only the</span>
 <span class="sd">        factors and uses the data provided in ``portfolios`` as the test portfolios.</span>
-<span class="sd">        The second specified the portfolio using ``+`` to separate the test portfolios</span>
+<span class="sd">        The second specifies the portfolio using ``+`` to separate the test portfolios</span>
 <span class="sd">        and ``~`` to separate the test portfolios from the factors.</span>
 
 <span class="sd">        The formula can use the variables and functions that are available</span>
@@ -935,30 +958,45 @@
 <span class="sd">        Parameters</span>
 <span class="sd">        ----------</span>
 <span class="sd">        cov_type : {"robust", "heteroskedastic", "kernel"}, optional</span>
-<span class="sd">            Name of covariance estimator. The default is ``"robust"``.</span>
+<span class="sd">            Name of covariance estimator. The names are case sensitive. The</span>
+<span class="sd">            default is "robust". "heteroskedastic" is the same as "robust".</span>
 <span class="sd">        debiased : bool, optional</span>
 <span class="sd">            Flag indicating whether to debias the covariance estimator using</span>
 <span class="sd">            a degree of freedom adjustment. The default is True. See Notes.</span>
-<span class="sd">        **cov_config</span>
+<span class="sd">        **cov_config : dict</span>
 <span class="sd">            Additional covariance-specific options for the kernel covariance</span>
-<span class="sd">            estimator: ``kernel`` and ``bandwidth``. See Notes.</span>
+<span class="sd">            estimator: ``kernel`` (str) and ``bandwidth`` (float). The other</span>
+<span class="sd">            covariance estimators do not use any. See Notes.</span>
 
 <span class="sd">        Returns</span>
 <span class="sd">        -------</span>
 <span class="sd">        LinearFactorModelResults</span>
 <span class="sd">            Results class with parameter estimates, covariance and test statistics.</span>
 
+<span class="sd">        Raises</span>
+<span class="sd">        ------</span>
+<span class="sd">        UnknownOptionError</span>
+<span class="sd">            If ``cov_type`` or ``kernel`` is not supported. It is both a</span>
+<span class="sd">            ``KeyError`` and a ``ValueError``.</span>
+<span class="sd">        ValueError</span>
+<span class="sd">            If ``debiased`` is True and the number of observations is not larger</span>
+<span class="sd">            than the number of factors plus one, or if the bandwidth is selected</span>
+<span class="sd">            from the data and there are too few observations. See Notes.</span>
+
 <span class="sd">        Notes</span>
 <span class="sd">        -----</span>
 <span class="sd">        Supported covariance estimators are:</span>
 
-<span class="sd">        * "robust" - Heteroskedasticity-robust covariance estimator</span>
+<span class="sd">        * "robust", "heteroskedastic" - Heteroskedasticity-robust covariance</span>
+<span class="sd">          estimator</span>
 <span class="sd">        * "kernel" - Heteroskedasticity and Autocorrelation consistent (HAC)</span>
 <span class="sd">          covariance estimator</span>
 
 <span class="sd">        The kernel covariance estimator takes the optional arguments</span>
-<span class="sd">        ``kernel``, one of "bartlett", "parzen" or "qs" (quadratic spectral)</span>
-<span class="sd">        and ``bandwidth`` (a positive integer). If ``bandwidth`` is not given it</span>
+<span class="sd">        ``kernel``, which is not case sensitive and is one of "bartlett",</span>
+<span class="sd">        "newey-west", "parzen", "gallant", "qs", "quadratic-spectral" or</span>
+<span class="sd">        "andrews", and ``bandwidth`` (a non-negative number). The default kernel is</span>
+<span class="sd">        "bartlett". If ``bandwidth`` is not given it</span>
 <span class="sd">        is selected from the data, which needs at least 4 observations with the</span>
 <span class="sd">        Bartlett kernel, 5 with the Parzen kernel and 6 with the quadratic</span>
 <span class="sd">        spectral kernel. ``fit`` raises a ``ValueError`` for fewer observations,</span>
@@ -1195,18 +1233,19 @@
 <a class="viewcode-back" href="../../../asset-pricing/asset-pricing/linearmodels.asset_pricing.model.LinearFactorModel.html#linearmodels.asset_pricing.model.LinearFactorModel">[docs]</a>
 <span class="k">class</span><span class="w"> </span><span class="nc">LinearFactorModel</span><span class="p">(</span><span class="n">_LinearFactorModelBase</span><span class="p">):</span>
 <span class="w">    </span><span class="sa">r</span><span class="sd">"""</span>
-<span class="sd">    Linear factor model estimator</span>
+<span class="sd">    Linear factor model estimator.</span>
 
 <span class="sd">    Parameters</span>
 <span class="sd">    ----------</span>
 <span class="sd">    portfolios : array_like</span>
-<span class="sd">        Test portfolio returns (nobs by nportfolio)</span>
+<span class="sd">        Test portfolio returns (nobs by nportfolio).</span>
 <span class="sd">    factors : array_like</span>
-<span class="sd">        Priced factor returns (nobs by nfactor)</span>
-<span class="sd">    risk_free : bool</span>
+<span class="sd">        Priced factor returns (nobs by nfactor).</span>
+<span class="sd">    risk_free : bool, optional</span>
 <span class="sd">        Flag indicating whether the risk-free rate should be estimated</span>
 <span class="sd">        from returns along other risk premia.  If False, the returns are</span>
-<span class="sd">        assumed to be excess returns using the correct risk-free rate.</span>
+<span class="sd">        assumed to be excess returns using the correct risk-free rate. The default</span>
+<span class="sd">        is False.</span>
 <span class="sd">    sigma : array_like, optional</span>
 <span class="sd">        Positive definite residual covariance (nportfolio by nportfolio) that</span>
 <span class="sd">        weights the test portfolios in the second stage. A ``ValueError`` is</span>
@@ -1358,19 +1397,22 @@
         <span class="n">sigma</span><span class="p">:</span> <span class="n">linearmodels</span><span class="o">.</span><span class="n">typing</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">ArrayLike</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
     <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">LinearFactorModel</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">"""</span>
+<span class="sd">        Specify a model using the formula interface.</span>
+
 <span class="sd">        Parameters</span>
 <span class="sd">        ----------</span>
 <span class="sd">        formula : str</span>
-<span class="sd">            Formula modified for the syntax described in the notes</span>
+<span class="sd">            Formula modified for the syntax described in the notes.</span>
 <span class="sd">        data : DataFrame</span>
-<span class="sd">            DataFrame containing the variables used in the formula</span>
-<span class="sd">        portfolios : array_like</span>
+<span class="sd">            DataFrame containing the variables used in the formula.</span>
+<span class="sd">        portfolios : array_like, optional</span>
 <span class="sd">            Portfolios to be used in the model. If provided, must use formula</span>
 <span class="sd">            syntax containing only factors.</span>
-<span class="sd">        risk_free : bool</span>
+<span class="sd">        risk_free : bool, optional</span>
 <span class="sd">            Flag indicating whether the risk-free rate should be estimated</span>
 <span class="sd">            from returns along other risk premia.  If False, the returns are</span>
-<span class="sd">            assumed to be excess returns using the correct risk-free rate.</span>
+<span class="sd">            assumed to be excess returns using the correct risk-free rate. The</span>
+<span class="sd">            default is False.</span>
 <span class="sd">        sigma : array_like, optional</span>
 <span class="sd">            Positive definite residual covariance (nportfolio by nportfolio) that</span>
 <span class="sd">            weights the test portfolios in the second stage. A ``ValueError`` is</span>
@@ -1381,13 +1423,13 @@
 <span class="sd">        Returns</span>
 <span class="sd">        -------</span>
 <span class="sd">        LinearFactorModel</span>
-<span class="sd">            Model instance</span>
+<span class="sd">            Model instance.</span>
 
 <span class="sd">        Notes</span>
 <span class="sd">        -----</span>
-<span class="sd">        The formula can be used in one of two ways.  The first specified only the</span>
+<span class="sd">        The formula can be used in one of two ways.  The first specifies only the</span>
 <span class="sd">        factors and uses the data provided in ``portfolios`` as the test portfolios.</span>
-<span class="sd">        The second specified the portfolio using ``+`` to separate the test portfolios</span>
+<span class="sd">        The second specifies the portfolio using ``+`` to separate the test portfolios</span>
 <span class="sd">        and ``~`` to separate the test portfolios from the factors.</span>
 
 <span class="sd">        The formula can use the variables and functions that are available</span>
@@ -1431,28 +1473,43 @@
         <span class="o">**</span><span class="n">cov_config</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">|</span> <span class="nb">int</span> <span class="o">|</span> <span class="nb">str</span><span class="p">,</span>
     <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">LinearFactorModelResults</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">"""</span>
-<span class="sd">        Estimate model parameters</span>
+<span class="sd">        Estimate model parameters.</span>
 
 <span class="sd">        Parameters</span>
 <span class="sd">        ----------</span>
-<span class="sd">        cov_type : str</span>
-<span class="sd">            Name of covariance estimator</span>
-<span class="sd">        debiased : bool</span>
+<span class="sd">        cov_type : {"robust", "heteroskedastic", "kernel"}, optional</span>
+<span class="sd">            Name of covariance estimator. The names are case sensitive. The</span>
+<span class="sd">            default is "robust". "heteroskedastic" is the same as "robust".</span>
+<span class="sd">        debiased : bool, optional</span>
 <span class="sd">            Flag indicating whether to debias the covariance estimator using</span>
-<span class="sd">            a degree of freedom adjustment</span>
-<span class="sd">        cov_config</span>
-<span class="sd">            Additional covariance-specific options.  See Notes.</span>
+<span class="sd">            a degree of freedom adjustment. The default is True.</span>
+<span class="sd">        **cov_config : dict</span>
+<span class="sd">            Additional covariance-specific options for the kernel covariance</span>
+<span class="sd">            estimator: ``kernel`` (str) and ``bandwidth`` (float). The other</span>
+<span class="sd">            covariance estimators do not use any. See Notes.</span>
 
 <span class="sd">        Returns</span>
 <span class="sd">        -------</span>
 <span class="sd">        LinearFactorModelResults</span>
-<span class="sd">            Results class with parameter estimates, covariance and test statistics</span>
+<span class="sd">            Results class with parameter estimates, covariance and test statistics.</span>
+
+<span class="sd">        Raises</span>
+<span class="sd">        ------</span>
+<span class="sd">        UnknownOptionError</span>
+<span class="sd">            If ``cov_type`` or ``kernel`` is not supported. It is both a</span>
+<span class="sd">            ``KeyError`` and a ``ValueError``.</span>
+<span class="sd">        ValueError</span>
+<span class="sd">            If ``debiased`` is True and the number of observations is not larger</span>
+<span class="sd">            than the number of factors plus one, or if the bandwidth is selected</span>
+<span class="sd">            from the data and there are too few observations. See Notes.</span>
 
 <span class="sd">        Notes</span>
 <span class="sd">        -----</span>
 <span class="sd">        The kernel covariance estimator takes the optional arguments</span>
-<span class="sd">        ``kernel``, one of "bartlett", "parzen" or "qs" (quadratic spectral)</span>
-<span class="sd">        and ``bandwidth`` (a positive integer). If ``bandwidth`` is not given it</span>
+<span class="sd">        ``kernel``, which is not case sensitive and is one of "bartlett",</span>
+<span class="sd">        "newey-west", "parzen", "gallant", "qs", "quadratic-spectral" or</span>
+<span class="sd">        "andrews", and ``bandwidth`` (a non-negative number). The default kernel is</span>
+<span class="sd">        "bartlett". If ``bandwidth`` is not given it</span>
 <span class="sd">        is selected from the data, which needs at least 4 observations with the</span>
 <span class="sd">        Bartlett kernel, 5 with the Parzen kernel and 6 with the quadratic</span>
 <span class="sd">        spectral kernel. ``fit`` raises a ``ValueError`` for fewer observations,</span>
@@ -1631,18 +1688,19 @@
 <a class="viewcode-back" href="../../../asset-pricing/asset-pricing/linearmodels.asset_pricing.model.LinearFactorModelGMM.html#linearmodels.asset_pricing.model.LinearFactorModelGMM">[docs]</a>
 <span class="k">class</span><span class="w"> </span><span class="nc">LinearFactorModelGMM</span><span class="p">(</span><span class="n">_LinearFactorModelBase</span><span class="p">):</span>
 <span class="w">    </span><span class="sa">r</span><span class="sd">"""</span>
-<span class="sd">    GMM estimator of Linear factor models</span>
+<span class="sd">    GMM estimator of Linear factor models.</span>
 
 <span class="sd">    Parameters</span>
 <span class="sd">    ----------</span>
 <span class="sd">    portfolios : array_like</span>
-<span class="sd">        Test portfolio returns (nobs by nportfolio)</span>
+<span class="sd">        Test portfolio returns (nobs by nportfolio).</span>
 <span class="sd">    factors : array_like</span>
-<span class="sd">        Priced factors values (nobs by nfactor)</span>
-<span class="sd">    risk_free : bool</span>
+<span class="sd">        Priced factors values (nobs by nfactor).</span>
+<span class="sd">    risk_free : bool, optional</span>
 <span class="sd">        Flag indicating whether the risk-free rate should be estimated</span>
 <span class="sd">        from returns along other risk premia.  If False, the returns are</span>
-<span class="sd">        assumed to be excess returns using the correct risk-free rate.</span>
+<span class="sd">        assumed to be excess returns using the correct risk-free rate. The default</span>
+<span class="sd">        is False.</span>
 
 <span class="sd">    Notes</span>
 <span class="sd">    -----</span>
@@ -1766,30 +1824,33 @@
         <span class="n">risk_free</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
     <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">LinearFactorModelGMM</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">"""</span>
+<span class="sd">        Specify a model using the formula interface.</span>
+
 <span class="sd">        Parameters</span>
 <span class="sd">        ----------</span>
 <span class="sd">        formula : str</span>
-<span class="sd">            Formula modified for the syntax described in the notes</span>
+<span class="sd">            Formula modified for the syntax described in the notes.</span>
 <span class="sd">        data : DataFrame</span>
-<span class="sd">            DataFrame containing the variables used in the formula</span>
-<span class="sd">        portfolios : array_like</span>
+<span class="sd">            DataFrame containing the variables used in the formula.</span>
+<span class="sd">        portfolios : array_like, optional</span>
 <span class="sd">            Portfolios to be used in the model. If provided, must use formula</span>
 <span class="sd">            syntax containing only factors.</span>
-<span class="sd">        risk_free : bool</span>
+<span class="sd">        risk_free : bool, optional</span>
 <span class="sd">            Flag indicating whether the risk-free rate should be estimated</span>
 <span class="sd">            from returns along other risk premia.  If False, the returns are</span>
-<span class="sd">            assumed to be excess returns using the correct risk-free rate.</span>
+<span class="sd">            assumed to be excess returns using the correct risk-free rate. The</span>
+<span class="sd">            default is False.</span>
 
 <span class="sd">        Returns</span>
 <span class="sd">        -------</span>
 <span class="sd">        LinearFactorModelGMM</span>
-<span class="sd">            Model instance</span>
+<span class="sd">            Model instance.</span>
 
 <span class="sd">        Notes</span>
 <span class="sd">        -----</span>
-<span class="sd">        The formula can be used in one of two ways.  The first specified only the</span>
+<span class="sd">        The formula can be used in one of two ways.  The first specifies only the</span>
 <span class="sd">        factors and uses the data provided in ``portfolios`` as the test portfolios.</span>
-<span class="sd">        The second specified the portfolio using ``+`` to separate the test portfolios</span>
+<span class="sd">        The second specifies the portfolio using ``+`` to separate the test portfolios</span>
 <span class="sd">        and ``~`` to separate the test portfolios from the factors.</span>
 
 <span class="sd">        The formula can use the variables and functions that are available</span>
@@ -1843,50 +1904,68 @@
         <span class="o">**</span><span class="n">cov_config</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">|</span> <span class="nb">int</span> <span class="o">|</span> <span class="nb">str</span><span class="p">,</span>
     <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">GMMFactorModelResults</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">"""</span>
-<span class="sd">        Estimate model parameters</span>
+<span class="sd">        Estimate model parameters.</span>
 
 <span class="sd">        Parameters</span>
 <span class="sd">        ----------</span>
-<span class="sd">        center : bool</span>
+<span class="sd">        center : bool, optional</span>
 <span class="sd">            Flag indicating to center the moment conditions before computing</span>
-<span class="sd">            the weighting matrix.</span>
-<span class="sd">        use_cue : bool</span>
-<span class="sd">            Flag indicating to use continuously updating estimator</span>
-<span class="sd">        steps : int</span>
+<span class="sd">            the weighting matrix. The default is True.</span>
+<span class="sd">        use_cue : bool, optional</span>
+<span class="sd">            Flag indicating to use continuously updating estimator. The default is</span>
+<span class="sd">            False.</span>
+<span class="sd">        steps : int, optional</span>
 <span class="sd">            Number of steps to use when estimating parameters.  2 corresponds</span>
 <span class="sd">            to the standard efficient GMM estimator. Higher values will</span>
-<span class="sd">            iterate until convergence or up to the number of steps given</span>
-<span class="sd">        disp : int</span>
+<span class="sd">            iterate until convergence or up to the number of steps given. The</span>
+<span class="sd">            default is 2.</span>
+<span class="sd">        disp : int, optional</span>
 <span class="sd">            Number of iterations between printed update. 0 or negative values</span>
-<span class="sd">            suppresses output</span>
-<span class="sd">        max_iter : int</span>
-<span class="sd">            Maximum number of iterations when minimizing objective. Must be positive.</span>
-<span class="sd">        cov_type : str</span>
-<span class="sd">            Name of covariance estimator</span>
-<span class="sd">        debiased : bool</span>
+<span class="sd">            suppresses output. The default is 10.</span>
+<span class="sd">        max_iter : int, optional</span>
+<span class="sd">            Maximum number of iterations when minimizing objective. Must be</span>
+<span class="sd">            positive. The default is 1000.</span>
+<span class="sd">        cov_type : {"robust", "heteroskedastic", "kernel"}, optional</span>
+<span class="sd">            Name of covariance estimator. The names are case sensitive. The</span>
+<span class="sd">            default is "robust". "heteroskedastic" is the same as "robust".</span>
+<span class="sd">        debiased : bool, optional</span>
 <span class="sd">            Flag indicating whether to debias the covariance estimator using</span>
-<span class="sd">            a degree of freedom adjustment</span>
-<span class="sd">        starting : array_like</span>
+<span class="sd">            a degree of freedom adjustment. The default is True.</span>
+<span class="sd">        starting : array_like, optional</span>
 <span class="sd">            Starting values to use in optimization.  If not provided, 2SLS</span>
 <span class="sd">            estimates are used.</span>
-<span class="sd">        opt_options : dict</span>
+<span class="sd">        opt_options : dict, optional</span>
 <span class="sd">            Additional options to pass to scipy.optimize.minimize when</span>
 <span class="sd">            optimizing the objective function. If not provided, defers to</span>
 <span class="sd">            scipy to choose an appropriate optimizer. All minimize inputs</span>
 <span class="sd">            except ``fun``, ``x0``, and ``args`` can be overridden.</span>
-<span class="sd">        cov_config</span>
-<span class="sd">            Additional covariance-specific options.  See Notes.</span>
+<span class="sd">        **cov_config : dict</span>
+<span class="sd">            Additional covariance-specific options for the kernel covariance</span>
+<span class="sd">            estimator: ``kernel`` (str) and ``bandwidth`` (float). The other</span>
+<span class="sd">            covariance estimators do not use any. See Notes.</span>
 
 <span class="sd">        Returns</span>
 <span class="sd">        -------</span>
 <span class="sd">        GMMFactorModelResults</span>
-<span class="sd">            Results class with parameter estimates, covariance and test statistics</span>
+<span class="sd">            Results class with parameter estimates, covariance and test statistics.</span>
+
+<span class="sd">        Raises</span>
+<span class="sd">        ------</span>
+<span class="sd">        UnknownOptionError</span>
+<span class="sd">            If ``cov_type`` or ``kernel`` is not supported. It is both a</span>
+<span class="sd">            ``KeyError`` and a ``ValueError``.</span>
+<span class="sd">        ValueError</span>
+<span class="sd">            If ``starting`` does not have one element for each parameter, or if</span>
+<span class="sd">            the bandwidth is selected from the data and there are too few</span>
+<span class="sd">            observations. See Notes.</span>
 
 <span class="sd">        Notes</span>
 <span class="sd">        -----</span>
 <span class="sd">        The kernel covariance estimator takes the optional arguments</span>
-<span class="sd">        ``kernel``, one of "bartlett", "parzen" or "qs" (quadratic spectral)</span>
-<span class="sd">        and ``bandwidth`` (a positive integer). If ``bandwidth`` is not given it</span>
+<span class="sd">        ``kernel``, which is not case sensitive and is one of "bartlett",</span>
+<span class="sd">        "newey-west", "parzen", "gallant", "qs", "quadratic-spectral" or</span>
+<span class="sd">        "andrews", and ``bandwidth`` (a non-negative number). The default kernel is</span>
+<span class="sd">        "bartlett". If ``bandwidth`` is not given it</span>
 <span class="sd">        is selected from the data, for the weight matrix and for the covariance,</span>
 <span class="sd">        which needs at least 4 observations with the Bartlett kernel, 5 with the</span>
 <span class="sd">        Parzen kernel and 6 with the quadratic spectral kernel. ``fit`` raises a</span>

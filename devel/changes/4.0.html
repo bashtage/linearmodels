@@ -23,7 +23,7 @@
     
   
       
-        <title>Version 4 - linearmodels v7.1 (+518)</title>
+        <title>Version 4 - linearmodels v7.1 (+525)</title>
       
     
 
@@ -100,7 +100,7 @@
 
 <header class="md-header md-header--shadow" data-md-component="header">
   <nav class="md-header__inner md-grid" aria-label="Header">
-    <a href="../index.html" title="linearmodels v7.1 (+518)" class="md-header__button md-logo" aria-label="linearmodels v7.1 (+518)" data-md-component="logo">
+    <a href="../index.html" title="linearmodels v7.1 (+525)" class="md-header__button md-logo" aria-label="linearmodels v7.1 (+525)" data-md-component="logo">
       <img src="../_static/bw-logo.svg" alt="logo">
     </a>
     <label class="md-header__button md-icon" for="__drawer">
@@ -111,7 +111,7 @@
       <div class="md-header__ellipsis">
         <div class="md-header__topic">
           <span class="md-ellipsis">
-            linearmodels v7.1 (+518)
+            linearmodels v7.1 (+525)
           </span>
         </div>
         <div class="md-header__topic" data-md-component="header-topic">
@@ -206,10 +206,10 @@
 
 <nav class="md-nav md-nav--primary" aria-label="Navigation" data-md-level="0">
   <label class="md-nav__title" for="__drawer">
-    <a href="../index.html" title="linearmodels v7.1 (+518)" class="md-nav__button md-logo" aria-label="linearmodels v7.1 (+518)" data-md-component="logo">
+    <a href="../index.html" title="linearmodels v7.1 (+525)" class="md-nav__button md-logo" aria-label="linearmodels v7.1 (+525)" data-md-component="logo">
       <img src="../_static/bw-logo.svg" alt="logo">
     </a>
-    linearmodels v7.1 (+518)
+    linearmodels v7.1 (+525)
   </label>
   
     <div class="md-nav__source">
@@ -1546,13 +1546,13 @@ was not squared.</p></li>
 </ul>
 <h2 id="version-4-24">Version 4.24<a class="headerlink" href="#version-4-24" title="Link to this heading">¶</a></h2>
 <ul class="simple">
-<li><p>Added <a class="reference internal" href="../system/system/linearmodels.system.results.SystemResults.breusch_pagan.html#linearmodels.system.results.SystemResults.breusch_pagan" title="linearmodels.system.results.SystemResults.breusch_pagan (Python method) — Breusch-Pagan LM test for no cross-correlation"><code class="xref py py-func docutils literal notranslate"><span class="pre">breusch_pagan()</span></code></a> and
-<a class="reference internal" href="../system/system/linearmodels.system.results.SystemResults.likelihood_ratio.html#linearmodels.system.results.SystemResults.likelihood_ratio" title="linearmodels.system.results.SystemResults.likelihood_ratio (Python method) — Likelihood ratio test of no cross-correlation"><code class="xref py py-func docutils literal notranslate"><span class="pre">likelihood_ratio()</span></code></a> to test
+<li><p>Added <a class="reference internal" href="../system/system/linearmodels.system.results.SystemResults.breusch_pagan.html#linearmodels.system.results.SystemResults.breusch_pagan" title="linearmodels.system.results.SystemResults.breusch_pagan (Python method) — Breusch-Pagan LM test for no cross-correlation."><code class="xref py py-func docutils literal notranslate"><span class="pre">breusch_pagan()</span></code></a> and
+<a class="reference internal" href="../system/system/linearmodels.system.results.SystemResults.likelihood_ratio.html#linearmodels.system.results.SystemResults.likelihood_ratio" title="linearmodels.system.results.SystemResults.likelihood_ratio (Python method) — Likelihood ratio test of no cross-correlation."><code class="xref py py-func docutils literal notranslate"><span class="pre">likelihood_ratio()</span></code></a> to test
 whether the shock covariance is diagonal.</p></li>
 </ul>
 <h2 id="version-4-21">Version 4.21<a class="headerlink" href="#version-4-21" title="Link to this heading">¶</a></h2>
 <ul class="simple">
-<li><p>Fixed a bug that affected <a class="reference internal" href="../system/system/linearmodels.system.model.SUR.html#linearmodels.system.model.SUR" title="linearmodels.system.model.SUR (Python class) — Seemingly unrelated regression estimation (SUR/SURE)"><code class="xref py py-class docutils literal notranslate"><span class="pre">SUR</span></code></a> when estimating
+<li><p>Fixed a bug that affected <a class="reference internal" href="../system/system/linearmodels.system.model.SUR.html#linearmodels.system.model.SUR" title="linearmodels.system.model.SUR (Python class) — Seemingly unrelated regression estimation (SUR/SURE)."><code class="xref py py-class docutils literal notranslate"><span class="pre">SUR</span></code></a> when estimating
 models using <code class="docutils literal notranslate"><span class="pre">method=&quot;gls&quot;</span></code> and heteroskedasticity-, hac, or cluster-robust
 inference.</p></li>
 <li><p>Added <code class="docutils literal notranslate"><span class="pre">rank_check</span></code> argument to panel-data models that allows the rank
@@ -1585,7 +1585,7 @@ when the model is unweighted.</p></li>
 <a class="reference internal" href="../panel/panel/linearmodels.panel.results.PanelResults.corr_squared_within.html#linearmodels.panel.results.PanelResults.corr_squared_within" title="linearmodels.panel.results.PanelResults.corr_squared_within (Python property) — Within coefficient of determination using squared correlation."><code class="xref py py-meth docutils literal notranslate"><span class="pre">corr_squared_within()</span></code></a>, and
 <a class="reference internal" href="../panel/panel/linearmodels.panel.results.PanelResults.corr_squared_between.html#linearmodels.panel.results.PanelResults.corr_squared_between" title="linearmodels.panel.results.PanelResults.corr_squared_between (Python property) — Between coefficient of determination using squared correlation."><code class="xref py py-meth docutils literal notranslate"><span class="pre">corr_squared_between()</span></code></a> (<a class="extlink-issue reference external" href="https://github.com/bashtage/linearmodels/issues/157">GH157</a>).</p></li>
 <li><p>Added a clustered covariance estimator
-(<a class="reference internal" href="../system/system/linearmodels.system.covariance.ClusteredCovariance.html#linearmodels.system.covariance.ClusteredCovariance" title="linearmodels.system.covariance.ClusteredCovariance (Python class) — Heteroskedastic covariance estimation for system regression"><code class="xref py py-class docutils literal notranslate"><span class="pre">linearmodels.system.covariance.ClusteredCovariance</span></code></a>) for system regressions
+(<a class="reference internal" href="../system/system/linearmodels.system.covariance.ClusteredCovariance.html#linearmodels.system.covariance.ClusteredCovariance" title="linearmodels.system.covariance.ClusteredCovariance (Python class) — Clustered covariance estimation for system regression."><code class="xref py py-class docutils literal notranslate"><span class="pre">linearmodels.system.covariance.ClusteredCovariance</span></code></a>) for system regressions
 (<a class="extlink-issue reference external" href="https://github.com/bashtage/linearmodels/issues/241">GH241</a>).</p></li>
 <li><p>Fixed a bug in <a class="reference internal" href="../iv/iv/linearmodels.iv.covariance.kernel_optimal_bandwidth.html#linearmodels.iv.covariance.kernel_optimal_bandwidth" title="linearmodels.iv.covariance.kernel_optimal_bandwidth (Python function) — Select the bandwidth of a kernel covariance estimator from the data."><code class="xref py py-class docutils literal notranslate"><span class="pre">kernel_optimal_bandwidth</span></code></a>
 which used incorrect values for a tuning parameter in the bandwidth estimation

@@ -23,7 +23,7 @@
     
   
       
-        <title>linearmodels.system.covariance.HeteroskedasticCovariance - linearmodels v7.1 (+518)</title>
+        <title>linearmodels.system.covariance.HeteroskedasticCovariance - linearmodels v7.1 (+525)</title>
       
     
 
@@ -100,7 +100,7 @@
 
 <header class="md-header md-header--shadow" data-md-component="header">
   <nav class="md-header__inner md-grid" aria-label="Header">
-    <a href="../../index.html" title="linearmodels v7.1 (+518)" class="md-header__button md-logo" aria-label="linearmodels v7.1 (+518)" data-md-component="logo">
+    <a href="../../index.html" title="linearmodels v7.1 (+525)" class="md-header__button md-logo" aria-label="linearmodels v7.1 (+525)" data-md-component="logo">
       <img src="../../_static/bw-logo.svg" alt="logo">
     </a>
     <label class="md-header__button md-icon" for="__drawer">
@@ -111,7 +111,7 @@
       <div class="md-header__ellipsis">
         <div class="md-header__topic">
           <span class="md-ellipsis">
-            linearmodels v7.1 (+518)
+            linearmodels v7.1 (+525)
           </span>
         </div>
         <div class="md-header__topic" data-md-component="header-topic">
@@ -206,10 +206,10 @@
 
 <nav class="md-nav md-nav--primary" aria-label="Navigation" data-md-level="0">
   <label class="md-nav__title" for="__drawer">
-    <a href="../../index.html" title="linearmodels v7.1 (+518)" class="md-nav__button md-logo" aria-label="linearmodels v7.1 (+518)" data-md-component="logo">
+    <a href="../../index.html" title="linearmodels v7.1 (+525)" class="md-nav__button md-logo" aria-label="linearmodels v7.1 (+525)" data-md-component="logo">
       <img src="../../_static/bw-logo.svg" alt="logo">
     </a>
-    linearmodels v7.1 (+518)
+    linearmodels v7.1 (+525)
   </label>
   
     <div class="md-nav__source">
@@ -689,7 +689,7 @@
     <span aria-label="Python class" class="objinfo-icon objinfo-icon__data" title="Python class">C</span>
   
   <span class="md-ellipsis">
-    <span title="linearmodels.system.covariance.HeteroskedasticCovariance (Python class) — Heteroskedastic covariance estimation for system regression"><span>linearmodels.<wbr>system.<wbr>covariance.<wbr>Heteroskedastic<wbr>Covariance</span></span>
+    <span title="linearmodels.system.covariance.HeteroskedasticCovariance (Python class) — Heteroskedastic covariance estimation for system regression."><span>linearmodels.<wbr>system.<wbr>covariance.<wbr>Heteroskedastic<wbr>Covariance</span></span>
     
   </span>
   
@@ -706,7 +706,7 @@
         <nav class="md-nav" data-md-level="6" aria-labelledby="__nav_4_4_3_1_2_1_label" aria-expanded="false">
           <label class="md-nav__title" for="__nav_4_4_3_1_2_1">
             <span class="md-nav__icon md-icon"></span>
-            <span title="linearmodels.system.covariance.HeteroskedasticCovariance (Python class) — Heteroskedastic covariance estimation for system regression"><span>linearmodels.<wbr>system.<wbr>covariance.<wbr>Heteroskedastic<wbr>Covariance</span></span>
+            <span title="linearmodels.system.covariance.HeteroskedasticCovariance (Python class) — Heteroskedastic covariance estimation for system regression."><span>linearmodels.<wbr>system.<wbr>covariance.<wbr>Heteroskedastic<wbr>Covariance</span></span>
           </label>
           <ul class="md-nav__list" data-md-scrollfix>
             
@@ -850,7 +850,7 @@
       <span aria-label="Python class" class="objinfo-icon objinfo-icon__data" title="Python class">C</span>
     
     <span class="md-ellipsis">
-      <span title="linearmodels.system.covariance.HeteroskedasticCovariance (Python class) — Heteroskedastic covariance estimation for system regression"><span>linearmodels.<wbr>system.<wbr>covariance.<wbr>Heteroskedastic<wbr>Covariance</span></span>
+      <span title="linearmodels.system.covariance.HeteroskedasticCovariance (Python class) — Heteroskedastic covariance estimation for system regression."><span>linearmodels.<wbr>system.<wbr>covariance.<wbr>Heteroskedastic<wbr>Covariance</span></span>
     </span>
   </a>
   
@@ -874,7 +874,7 @@
       <span aria-label="Python parameter" class="objinfo-icon objinfo-icon__sub-data" title="Python parameter">p</span>
     
     <span class="md-ellipsis">
-      <span title="linearmodels.system.covariance.HeteroskedasticCovariance.__init__.x (Python parameter) — ndependent element list of regressor"><span>x</span></span>
+      <span title="linearmodels.system.covariance.HeteroskedasticCovariance.__init__.x (Python parameter) — Regressors of each equation, with shape (nobs, k_i) for equation i."><span>x</span></span>
     </span>
   </a>
   
@@ -886,7 +886,7 @@
       <span aria-label="Python parameter" class="objinfo-icon objinfo-icon__sub-data" title="Python parameter">p</span>
     
     <span class="md-ellipsis">
-      <span title="linearmodels.system.covariance.HeteroskedasticCovariance.__init__.eps (Python parameter) — Model residuals, ndependent by nobs"><span>eps</span></span>
+      <span title="linearmodels.system.covariance.HeteroskedasticCovariance.__init__.eps (Python parameter) — Model residuals, with shape (nobs, neq)."><span>eps</span></span>
     </span>
   </a>
   
@@ -898,7 +898,19 @@
       <span aria-label="Python parameter" class="objinfo-icon objinfo-icon__sub-data" title="Python parameter">p</span>
     
     <span class="md-ellipsis">
-      <span title="linearmodels.system.covariance.HeteroskedasticCovariance.__init__.sigma (Python parameter) — Covariance matrix estimator of eps"><span>sigma</span></span>
+      <span title="linearmodels.system.covariance.HeteroskedasticCovariance.__init__.sigma (Python parameter) — Covariance of the residuals of the equations that is used to weight the equations if gls is True, with shape (neq, neq)."><span>sigma</span></span>
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#linearmodels.system.covariance.HeteroskedasticCovariance.__init__.full_sigma" class="md-nav__link">
+    
+      <span aria-label="Python parameter" class="objinfo-icon objinfo-icon__sub-data" title="Python parameter">p</span>
+    
+    <span class="md-ellipsis">
+      <span title="linearmodels.system.covariance.HeteroskedasticCovariance.__init__.full_sigma (Python parameter) — Covariance of the residuals of the equations at the final estimates, with shape (neq, neq)."><span>full_<wbr>sigma</span></span>
     </span>
   </a>
   
@@ -922,7 +934,7 @@
       <span aria-label="Python parameter" class="objinfo-icon objinfo-icon__sub-data" title="Python parameter">p</span>
     
     <span class="md-ellipsis">
-      <span title="linearmodels.system.covariance.HeteroskedasticCovariance.__init__.debiased (Python parameter) — Flag indicating to apply a small sample adjustment"><span>debiased</span></span>
+      <span title="linearmodels.system.covariance.HeteroskedasticCovariance.__init__.debiased (Python parameter) — Flag indicating to apply a small sample adjustment."><span>debiased</span></span>
     </span>
   </a>
   
@@ -934,7 +946,7 @@
       <span aria-label="Python parameter" class="objinfo-icon objinfo-icon__sub-data" title="Python parameter">p</span>
     
     <span class="md-ellipsis">
-      <span title="linearmodels.system.covariance.HeteroskedasticCovariance.__init__.constraints (Python parameter) — Constraints used in estimation, if any"><span>constraints</span></span>
+      <span title="linearmodels.system.covariance.HeteroskedasticCovariance.__init__.constraints (Python parameter) — Constraints used in estimation."><span>constraints</span></span>
     </span>
   </a>
   
@@ -1503,7 +1515,7 @@
       <span aria-label="Python class" class="objinfo-icon objinfo-icon__data" title="Python class">C</span>
     
     <span class="md-ellipsis">
-      <span title="linearmodels.system.covariance.HeteroskedasticCovariance (Python class) — Heteroskedastic covariance estimation for system regression"><span>linearmodels.<wbr>system.<wbr>covariance.<wbr>Heteroskedastic<wbr>Covariance</span></span>
+      <span title="linearmodels.system.covariance.HeteroskedasticCovariance (Python class) — Heteroskedastic covariance estimation for system regression."><span>linearmodels.<wbr>system.<wbr>covariance.<wbr>Heteroskedastic<wbr>Covariance</span></span>
     </span>
   </a>
   
@@ -1527,7 +1539,7 @@
       <span aria-label="Python parameter" class="objinfo-icon objinfo-icon__sub-data" title="Python parameter">p</span>
     
     <span class="md-ellipsis">
-      <span title="linearmodels.system.covariance.HeteroskedasticCovariance.__init__.x (Python parameter) — ndependent element list of regressor"><span>x</span></span>
+      <span title="linearmodels.system.covariance.HeteroskedasticCovariance.__init__.x (Python parameter) — Regressors of each equation, with shape (nobs, k_i) for equation i."><span>x</span></span>
     </span>
   </a>
   
@@ -1539,7 +1551,7 @@
       <span aria-label="Python parameter" class="objinfo-icon objinfo-icon__sub-data" title="Python parameter">p</span>
     
     <span class="md-ellipsis">
-      <span title="linearmodels.system.covariance.HeteroskedasticCovariance.__init__.eps (Python parameter) — Model residuals, ndependent by nobs"><span>eps</span></span>
+      <span title="linearmodels.system.covariance.HeteroskedasticCovariance.__init__.eps (Python parameter) — Model residuals, with shape (nobs, neq)."><span>eps</span></span>
     </span>
   </a>
   
@@ -1551,7 +1563,19 @@
       <span aria-label="Python parameter" class="objinfo-icon objinfo-icon__sub-data" title="Python parameter">p</span>
     
     <span class="md-ellipsis">
-      <span title="linearmodels.system.covariance.HeteroskedasticCovariance.__init__.sigma (Python parameter) — Covariance matrix estimator of eps"><span>sigma</span></span>
+      <span title="linearmodels.system.covariance.HeteroskedasticCovariance.__init__.sigma (Python parameter) — Covariance of the residuals of the equations that is used to weight the equations if gls is True, with shape (neq, neq)."><span>sigma</span></span>
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#linearmodels.system.covariance.HeteroskedasticCovariance.__init__.full_sigma" class="md-nav__link">
+    
+      <span aria-label="Python parameter" class="objinfo-icon objinfo-icon__sub-data" title="Python parameter">p</span>
+    
+    <span class="md-ellipsis">
+      <span title="linearmodels.system.covariance.HeteroskedasticCovariance.__init__.full_sigma (Python parameter) — Covariance of the residuals of the equations at the final estimates, with shape (neq, neq)."><span>full_<wbr>sigma</span></span>
     </span>
   </a>
   
@@ -1575,7 +1599,7 @@
       <span aria-label="Python parameter" class="objinfo-icon objinfo-icon__sub-data" title="Python parameter">p</span>
     
     <span class="md-ellipsis">
-      <span title="linearmodels.system.covariance.HeteroskedasticCovariance.__init__.debiased (Python parameter) — Flag indicating to apply a small sample adjustment"><span>debiased</span></span>
+      <span title="linearmodels.system.covariance.HeteroskedasticCovariance.__init__.debiased (Python parameter) — Flag indicating to apply a small sample adjustment."><span>debiased</span></span>
     </span>
   </a>
   
@@ -1587,7 +1611,7 @@
       <span aria-label="Python parameter" class="objinfo-icon objinfo-icon__sub-data" title="Python parameter">p</span>
     
     <span class="md-ellipsis">
-      <span title="linearmodels.system.covariance.HeteroskedasticCovariance.__init__.constraints (Python parameter) — Constraints used in estimation, if any"><span>constraints</span></span>
+      <span title="linearmodels.system.covariance.HeteroskedasticCovariance.__init__.constraints (Python parameter) — Constraints used in estimation."><span>constraints</span></span>
     </span>
   </a>
   
@@ -1622,23 +1646,30 @@
 <h1 id="linearmodels-system-covariance-heteroskedasticcovariance">linearmodels.system.covariance.HeteroskedasticCovariance<a class="headerlink" href="#linearmodels-system-covariance-heteroskedasticcovariance" title="Link to this heading">¶</a></h1>
 <dl class="py class objdesc">
 <dt class="sig sig-object highlight sig-wrap py" id="linearmodels.system.covariance.HeteroskedasticCovariance">
-<span class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></span><span class="sig-prename descclassname"><span class="pre">linearmodels.system.covariance.</span></span><span class="sig-name descname"><span class="pre">HeteroskedasticCovariance</span></span><span class="sig-paren">(</span><span class="sig-param-decl"><em class="sig-param"><a class="n reference internal" href="#linearmodels.system.covariance.HeteroskedasticCovariance.__init__.x" title="linearmodels.system.covariance.HeteroskedasticCovariance.__init__.x (Python parameter) — ndependent element list of regressor"><span class="n"><span class="pre">x</span></span></a><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="desctype"><a class="reference external" href="https://docs.python.org/3/builtins/stdtypes.html#list" title="(in Python v3.15)"><span class="pre">list</span></a><span class="p"><span class="pre">[</span></span><a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v2.5)"><span class="pre">ndarray</span></a><span class="p"><span class="pre">]</span></span></span></span></em>, </span><span class="sig-param-decl"><em class="sig-param"><a class="n reference internal" href="#linearmodels.system.covariance.HeteroskedasticCovariance.__init__.eps" title="linearmodels.system.covariance.HeteroskedasticCovariance.__init__.eps (Python parameter) — Model residuals, ndependent by nobs"><span class="n"><span class="pre">eps</span></span></a><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="desctype"><a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v2.5)"><span class="pre">ndarray</span></a><span class="p"><span class="pre">[</span></span><a class="reference external" href="https://docs.python.org/3/builtins/stdtypes.html#tuple" title="(in Python v3.15)"><span class="pre">tuple</span></a><span class="p"><span class="pre">[</span></span><a class="reference external" href="https://docs.python.org/3/builtins/functions.html#int" title="(in Python v3.15)"><span class="pre">int</span></a><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="p"><span class="pre">...</span></span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">,</span></span><span class="w"> </span><a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.dtype.html#numpy.dtype" title="(in NumPy v2.5)"><span class="pre">dtype</span></a><span class="p"><span class="pre">[</span></span><span class="pre">float64</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></span></span></em>, </span><span class="sig-param-decl"><em class="sig-param"><a class="n reference internal" href="#linearmodels.system.covariance.HeteroskedasticCovariance.__init__.sigma" title="linearmodels.system.covariance.HeteroskedasticCovariance.__init__.sigma (Python parameter) — Covariance matrix estimator of eps"><span class="n"><span class="pre">sigma</span></span></a><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="desctype"><a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v2.5)"><span class="pre">ndarray</span></a><span class="p"><span class="pre">[</span></span><a class="reference external" href="https://docs.python.org/3/builtins/stdtypes.html#tuple" title="(in Python v3.15)"><span class="pre">tuple</span></a><span class="p"><span class="pre">[</span></span><a class="reference external" href="https://docs.python.org/3/builtins/functions.html#int" title="(in Python v3.15)"><span class="pre">int</span></a><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="p"><span class="pre">...</span></span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">,</span></span><span class="w"> </span><a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.dtype.html#numpy.dtype" title="(in NumPy v2.5)"><span class="pre">dtype</span></a><span class="p"><span class="pre">[</span></span><span class="pre">float64</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></span></span></em>, </span><span class="sig-param-decl"><em class="sig-param"><a class="n reference internal" href="#linearmodels.system.covariance.HeteroskedasticCovariance" title="linearmodels.system.covariance.HeteroskedasticCovariance.__init__.full_sigma (Python parameter)"><span class="n"><span class="pre">full_sigma</span></span></a><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="desctype"><a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v2.5)"><span class="pre">ndarray</span></a><span class="p"><span class="pre">[</span></span><a class="reference external" href="https://docs.python.org/3/builtins/stdtypes.html#tuple" title="(in Python v3.15)"><span class="pre">tuple</span></a><span class="p"><span class="pre">[</span></span><a class="reference external" href="https://docs.python.org/3/builtins/functions.html#int" title="(in Python v3.15)"><span class="pre">int</span></a><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="p"><span class="pre">...</span></span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">,</span></span><span class="w"> </span><a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.dtype.html#numpy.dtype" title="(in NumPy v2.5)"><span class="pre">dtype</span></a><span class="p"><span class="pre">[</span></span><span class="pre">float64</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></span></span></em>, </span><span class="sig-param-decl"><em class="sig-param"><span class="keyword-only-separator o"><abbr title="Keyword-only parameters separator (PEP 3102)"><span class="pre">*</span></abbr></span></em>, </span><span class="sig-param-decl"><em class="sig-param"><a class="n reference internal" href="#linearmodels.system.covariance.HeteroskedasticCovariance.__init__.gls" title="linearmodels.system.covariance.HeteroskedasticCovariance.__init__.gls (Python parameter) — Flag indicating to compute the GLS covariance estimator."><span class="n"><span class="pre">gls</span></span></a><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="desctype"><a class="reference external" href="https://docs.python.org/3/builtins/functions.html#bool" title="(in Python v3.15)"><span class="pre">bool</span></a></span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><code class="code python default_value docutils literal highlight highlight-python"><span class="kc">False</span></code></em>, </span><span class="sig-param-decl"><em class="sig-param"><a class="n reference internal" href="#linearmodels.system.covariance.HeteroskedasticCovariance.__init__.debiased" title="linearmodels.system.covariance.HeteroskedasticCovariance.__init__.debiased (Python parameter) — Flag indicating to apply a small sample adjustment"><span class="n"><span class="pre">debiased</span></span></a><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="desctype"><a class="reference external" href="https://docs.python.org/3/builtins/functions.html#bool" title="(in Python v3.15)"><span class="pre">bool</span></a></span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><code class="code python default_value docutils literal highlight highlight-python"><span class="kc">False</span></code></em>, </span><span class="sig-param-decl"><em class="sig-param"><a class="n reference internal" href="#linearmodels.system.covariance.HeteroskedasticCovariance.__init__.constraints" title="linearmodels.system.covariance.HeteroskedasticCovariance.__init__.constraints (Python parameter) — Constraints used in estimation, if any"><span class="n"><span class="pre">constraints</span></span></a><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="desctype"><a class="reference internal" href="linearmodels.system.model.LinearConstraint.html#linearmodels.system.model.LinearConstraint" title="linearmodels.system._utility.LinearConstraint (Python class)"><span class="pre">LinearConstraint</span></a><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/builtins/constants.html#None" title="(in Python v3.15)"><span class="pre">None</span></a></span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><code class="code python default_value docutils literal highlight highlight-python"><span class="kc">None</span></code></em></span><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/linearmodels/system/covariance.html#HeteroskedasticCovariance"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#linearmodels.system.covariance.HeteroskedasticCovariance" title="Link to this definition">¶</a></dt>
-<dd><p>Heteroskedastic covariance estimation for system regression</p>
+<span class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></span><span class="sig-prename descclassname"><span class="pre">linearmodels.system.covariance.</span></span><span class="sig-name descname"><span class="pre">HeteroskedasticCovariance</span></span><span class="sig-paren">(</span><span class="sig-param-decl"><em class="sig-param"><a class="n reference internal" href="#linearmodels.system.covariance.HeteroskedasticCovariance.__init__.x" title="linearmodels.system.covariance.HeteroskedasticCovariance.__init__.x (Python parameter) — Regressors of each equation, with shape (nobs, k_i) for equation i."><span class="n"><span class="pre">x</span></span></a><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="desctype"><a class="reference external" href="https://docs.python.org/3/builtins/stdtypes.html#list" title="(in Python v3.15)"><span class="pre">list</span></a><span class="p"><span class="pre">[</span></span><a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v2.5)"><span class="pre">ndarray</span></a><span class="p"><span class="pre">]</span></span></span></span></em>, </span><span class="sig-param-decl"><em class="sig-param"><a class="n reference internal" href="#linearmodels.system.covariance.HeteroskedasticCovariance.__init__.eps" title="linearmodels.system.covariance.HeteroskedasticCovariance.__init__.eps (Python parameter) — Model residuals, with shape (nobs, neq)."><span class="n"><span class="pre">eps</span></span></a><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="desctype"><a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v2.5)"><span class="pre">ndarray</span></a><span class="p"><span class="pre">[</span></span><a class="reference external" href="https://docs.python.org/3/builtins/stdtypes.html#tuple" title="(in Python v3.15)"><span class="pre">tuple</span></a><span class="p"><span class="pre">[</span></span><a class="reference external" href="https://docs.python.org/3/builtins/functions.html#int" title="(in Python v3.15)"><span class="pre">int</span></a><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="p"><span class="pre">...</span></span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">,</span></span><span class="w"> </span><a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.dtype.html#numpy.dtype" title="(in NumPy v2.5)"><span class="pre">dtype</span></a><span class="p"><span class="pre">[</span></span><span class="pre">float64</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></span></span></em>, </span><span class="sig-param-decl"><em class="sig-param"><a class="n reference internal" href="#linearmodels.system.covariance.HeteroskedasticCovariance.__init__.sigma" title="linearmodels.system.covariance.HeteroskedasticCovariance.__init__.sigma (Python parameter) — Covariance of the residuals of the equations that is used to weight the equations if gls is True, with shape (neq, neq)."><span class="n"><span class="pre">sigma</span></span></a><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="desctype"><a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v2.5)"><span class="pre">ndarray</span></a><span class="p"><span class="pre">[</span></span><a class="reference external" href="https://docs.python.org/3/builtins/stdtypes.html#tuple" title="(in Python v3.15)"><span class="pre">tuple</span></a><span class="p"><span class="pre">[</span></span><a class="reference external" href="https://docs.python.org/3/builtins/functions.html#int" title="(in Python v3.15)"><span class="pre">int</span></a><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="p"><span class="pre">...</span></span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">,</span></span><span class="w"> </span><a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.dtype.html#numpy.dtype" title="(in NumPy v2.5)"><span class="pre">dtype</span></a><span class="p"><span class="pre">[</span></span><span class="pre">float64</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></span></span></em>, </span><span class="sig-param-decl"><em class="sig-param"><a class="n reference internal" href="#linearmodels.system.covariance.HeteroskedasticCovariance.__init__.full_sigma" title="linearmodels.system.covariance.HeteroskedasticCovariance.__init__.full_sigma (Python parameter) — Covariance of the residuals of the equations at the final estimates, with shape (neq, neq)."><span class="n"><span class="pre">full_sigma</span></span></a><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="desctype"><a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v2.5)"><span class="pre">ndarray</span></a><span class="p"><span class="pre">[</span></span><a class="reference external" href="https://docs.python.org/3/builtins/stdtypes.html#tuple" title="(in Python v3.15)"><span class="pre">tuple</span></a><span class="p"><span class="pre">[</span></span><a class="reference external" href="https://docs.python.org/3/builtins/functions.html#int" title="(in Python v3.15)"><span class="pre">int</span></a><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="p"><span class="pre">...</span></span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">,</span></span><span class="w"> </span><a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.dtype.html#numpy.dtype" title="(in NumPy v2.5)"><span class="pre">dtype</span></a><span class="p"><span class="pre">[</span></span><span class="pre">float64</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></span></span></em>, </span><span class="sig-param-decl"><em class="sig-param"><span class="keyword-only-separator o"><abbr title="Keyword-only parameters separator (PEP 3102)"><span class="pre">*</span></abbr></span></em>, </span><span class="sig-param-decl"><em class="sig-param"><a class="n reference internal" href="#linearmodels.system.covariance.HeteroskedasticCovariance.__init__.gls" title="linearmodels.system.covariance.HeteroskedasticCovariance.__init__.gls (Python parameter) — Flag indicating to compute the GLS covariance estimator."><span class="n"><span class="pre">gls</span></span></a><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="desctype"><a class="reference external" href="https://docs.python.org/3/builtins/functions.html#bool" title="(in Python v3.15)"><span class="pre">bool</span></a></span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><code class="code python default_value docutils literal highlight highlight-python"><span class="kc">False</span></code></em>, </span><span class="sig-param-decl"><em class="sig-param"><a class="n reference internal" href="#linearmodels.system.covariance.HeteroskedasticCovariance.__init__.debiased" title="linearmodels.system.covariance.HeteroskedasticCovariance.__init__.debiased (Python parameter) — Flag indicating to apply a small sample adjustment."><span class="n"><span class="pre">debiased</span></span></a><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="desctype"><a class="reference external" href="https://docs.python.org/3/builtins/functions.html#bool" title="(in Python v3.15)"><span class="pre">bool</span></a></span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><code class="code python default_value docutils literal highlight highlight-python"><span class="kc">False</span></code></em>, </span><span class="sig-param-decl"><em class="sig-param"><a class="n reference internal" href="#linearmodels.system.covariance.HeteroskedasticCovariance.__init__.constraints" title="linearmodels.system.covariance.HeteroskedasticCovariance.__init__.constraints (Python parameter) — Constraints used in estimation."><span class="n"><span class="pre">constraints</span></span></a><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="desctype"><a class="reference internal" href="linearmodels.system.model.LinearConstraint.html#linearmodels.system.model.LinearConstraint" title="linearmodels.system._utility.LinearConstraint (Python class)"><span class="pre">LinearConstraint</span></a><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/builtins/constants.html#None" title="(in Python v3.15)"><span class="pre">None</span></a></span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><code class="code python default_value docutils literal highlight highlight-python"><span class="kc">None</span></code></em></span><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/linearmodels/system/covariance.html#HeteroskedasticCovariance"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#linearmodels.system.covariance.HeteroskedasticCovariance" title="Link to this definition">¶</a></dt>
+<dd><p>Heteroskedastic covariance estimation for system regression.</p>
 <dl class="field-list simple">
 <dt class="field-odd" id="linearmodels.system.covariance.HeteroskedasticCovariance-parameters">Parameters<span class="colon">:</span><a class="headerlink" href="#linearmodels.system.covariance.HeteroskedasticCovariance-parameters" title="Permalink to this headline">¶</a></dt>
 <dd class="field-odd"><dl class="simple api-field highlight">
-<dt id="linearmodels.system.covariance.HeteroskedasticCovariance.__init__.x"><span class="n sig-name">x</span><span class="p">:</span><span class="w"> </span><span class="n"><span class="desctype"><a class="reference external" href="https://docs.python.org/3/builtins/stdtypes.html#list" title="(in Python v3.15)">list</a><span class="p">[</span><a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v2.5)">ndarray</a><span class="p">]</span></span></span><a class="headerlink" href="#linearmodels.system.covariance.HeteroskedasticCovariance.__init__.x" title="Permalink to this definition">¶</a></dt><dd><p>ndependent element list of regressor</p>
+<dt id="linearmodels.system.covariance.HeteroskedasticCovariance.__init__.x"><span class="n sig-name">x</span><span class="p">:</span><span class="w"> </span><span class="n"><span class="desctype"><a class="reference external" href="https://docs.python.org/3/builtins/stdtypes.html#list" title="(in Python v3.15)">list</a><span class="p">[</span><a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v2.5)">ndarray</a><span class="p">]</span></span></span><a class="headerlink" href="#linearmodels.system.covariance.HeteroskedasticCovariance.__init__.x" title="Permalink to this definition">¶</a></dt><dd><p>Regressors of each equation, with shape (nobs, k_i) for equation i.</p>
 </dd>
-<dt id="linearmodels.system.covariance.HeteroskedasticCovariance.__init__.eps"><span class="n sig-name">eps</span><span class="p">:</span><span class="w"> </span><span class="n"><span class="desctype"><a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v2.5)">ndarray</a><span class="p">[</span><a class="reference external" href="https://docs.python.org/3/builtins/stdtypes.html#tuple" title="(in Python v3.15)">tuple</a><span class="p">[</span><a class="reference external" href="https://docs.python.org/3/builtins/functions.html#int" title="(in Python v3.15)">int</a><span class="p">,</span><span class="w"> </span><span class="p">...</span><span class="p">]</span><span class="p">,</span><span class="w"> </span><a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.dtype.html#numpy.dtype" title="(in NumPy v2.5)">dtype</a><span class="p">[</span>float64<span class="p">]</span><span class="p">]</span></span></span><a class="headerlink" href="#linearmodels.system.covariance.HeteroskedasticCovariance.__init__.eps" title="Permalink to this definition">¶</a></dt><dd><p>Model residuals, ndependent by nobs</p>
+<dt id="linearmodels.system.covariance.HeteroskedasticCovariance.__init__.eps"><span class="n sig-name">eps</span><span class="p">:</span><span class="w"> </span><span class="n"><span class="desctype"><a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v2.5)">ndarray</a><span class="p">[</span><a class="reference external" href="https://docs.python.org/3/builtins/stdtypes.html#tuple" title="(in Python v3.15)">tuple</a><span class="p">[</span><a class="reference external" href="https://docs.python.org/3/builtins/functions.html#int" title="(in Python v3.15)">int</a><span class="p">,</span><span class="w"> </span><span class="p">...</span><span class="p">]</span><span class="p">,</span><span class="w"> </span><a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.dtype.html#numpy.dtype" title="(in NumPy v2.5)">dtype</a><span class="p">[</span>float64<span class="p">]</span><span class="p">]</span></span></span><a class="headerlink" href="#linearmodels.system.covariance.HeteroskedasticCovariance.__init__.eps" title="Permalink to this definition">¶</a></dt><dd><p>Model residuals, with shape (nobs, neq).</p>
 </dd>
-<dt id="linearmodels.system.covariance.HeteroskedasticCovariance.__init__.sigma"><span class="n sig-name">sigma</span><span class="p">:</span><span class="w"> </span><span class="n"><span class="desctype"><a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v2.5)">ndarray</a><span class="p">[</span><a class="reference external" href="https://docs.python.org/3/builtins/stdtypes.html#tuple" title="(in Python v3.15)">tuple</a><span class="p">[</span><a class="reference external" href="https://docs.python.org/3/builtins/functions.html#int" title="(in Python v3.15)">int</a><span class="p">,</span><span class="w"> </span><span class="p">...</span><span class="p">]</span><span class="p">,</span><span class="w"> </span><a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.dtype.html#numpy.dtype" title="(in NumPy v2.5)">dtype</a><span class="p">[</span>float64<span class="p">]</span><span class="p">]</span></span></span><a class="headerlink" href="#linearmodels.system.covariance.HeteroskedasticCovariance.__init__.sigma" title="Permalink to this definition">¶</a></dt><dd><p>Covariance matrix estimator of eps</p>
+<dt id="linearmodels.system.covariance.HeteroskedasticCovariance.__init__.sigma"><span class="n sig-name">sigma</span><span class="p">:</span><span class="w"> </span><span class="n"><span class="desctype"><a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v2.5)">ndarray</a><span class="p">[</span><a class="reference external" href="https://docs.python.org/3/builtins/stdtypes.html#tuple" title="(in Python v3.15)">tuple</a><span class="p">[</span><a class="reference external" href="https://docs.python.org/3/builtins/functions.html#int" title="(in Python v3.15)">int</a><span class="p">,</span><span class="w"> </span><span class="p">...</span><span class="p">]</span><span class="p">,</span><span class="w"> </span><a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.dtype.html#numpy.dtype" title="(in NumPy v2.5)">dtype</a><span class="p">[</span>float64<span class="p">]</span><span class="p">]</span></span></span><a class="headerlink" href="#linearmodels.system.covariance.HeteroskedasticCovariance.__init__.sigma" title="Permalink to this definition">¶</a></dt><dd><p>Covariance of the residuals of the equations that is used to weight the
+equations if <code class="docutils literal notranslate"><span class="pre">gls</span></code> is True, with shape (neq, neq).</p>
 </dd>
-<dt id="linearmodels.system.covariance.HeteroskedasticCovariance.__init__.gls"><span class="n sig-name">gls</span><span class="p">:</span><span class="w"> </span><span class="n"><span class="desctype"><a class="reference external" href="https://docs.python.org/3/builtins/functions.html#bool" title="(in Python v3.15)">bool</a></span></span><span class="w"> </span><span class="o">=</span><span class="w"> </span><code class="code python default_value docutils literal highlight highlight-python"><span class="kc">False</span></code><a class="headerlink" href="#linearmodels.system.covariance.HeteroskedasticCovariance.__init__.gls" title="Permalink to this definition">¶</a></dt><dd><p>Flag indicating to compute the GLS covariance estimator.  If False,
-assume OLS was used</p>
+<dt id="linearmodels.system.covariance.HeteroskedasticCovariance.__init__.full_sigma"><span class="n sig-name">full_sigma</span><span class="p">:</span><span class="w"> </span><span class="n"><span class="desctype"><a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v2.5)">ndarray</a><span class="p">[</span><a class="reference external" href="https://docs.python.org/3/builtins/stdtypes.html#tuple" title="(in Python v3.15)">tuple</a><span class="p">[</span><a class="reference external" href="https://docs.python.org/3/builtins/functions.html#int" title="(in Python v3.15)">int</a><span class="p">,</span><span class="w"> </span><span class="p">...</span><span class="p">]</span><span class="p">,</span><span class="w"> </span><a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.dtype.html#numpy.dtype" title="(in NumPy v2.5)">dtype</a><span class="p">[</span>float64<span class="p">]</span><span class="p">]</span></span></span><a class="headerlink" href="#linearmodels.system.covariance.HeteroskedasticCovariance.__init__.full_sigma" title="Permalink to this definition">¶</a></dt><dd><p>Covariance of the residuals of the equations at the final estimates, with
+shape (neq, neq). It differs from <code class="docutils literal notranslate"><span class="pre">sigma</span></code> if the weights are not the
+covariance of the final residuals, e.g., if the model was given <code class="docutils literal notranslate"><span class="pre">sigma</span></code>
+or did not iterate. It is used to estimate the covariance of the scores
+if <code class="docutils literal notranslate"><span class="pre">gls</span></code> is True.</p>
 </dd>
-<dt id="linearmodels.system.covariance.HeteroskedasticCovariance.__init__.debiased"><span class="n sig-name">debiased</span><span class="p">:</span><span class="w"> </span><span class="n"><span class="desctype"><a class="reference external" href="https://docs.python.org/3/builtins/functions.html#bool" title="(in Python v3.15)">bool</a></span></span><span class="w"> </span><span class="o">=</span><span class="w"> </span><code class="code python default_value docutils literal highlight highlight-python"><span class="kc">False</span></code><a class="headerlink" href="#linearmodels.system.covariance.HeteroskedasticCovariance.__init__.debiased" title="Permalink to this definition">¶</a></dt><dd><p>Flag indicating to apply a small sample adjustment</p>
+<dt id="linearmodels.system.covariance.HeteroskedasticCovariance.__init__.gls"><span class="n sig-name">gls</span><span class="p">:</span><span class="w"> </span><span class="n"><span class="desctype"><a class="reference external" href="https://docs.python.org/3/builtins/functions.html#bool" title="(in Python v3.15)">bool</a></span></span><span class="w"> </span><span class="o">=</span><span class="w"> </span><code class="code python default_value docutils literal highlight highlight-python"><span class="kc">False</span></code><a class="headerlink" href="#linearmodels.system.covariance.HeteroskedasticCovariance.__init__.gls" title="Permalink to this definition">¶</a></dt><dd><p>Flag indicating to compute the GLS covariance estimator. If False, assume
+OLS was used. The default is False.</p>
 </dd>
-<dt id="linearmodels.system.covariance.HeteroskedasticCovariance.__init__.constraints"><span class="n sig-name">constraints</span><span class="p">:</span><span class="w"> </span><span class="n"><span class="desctype"><a class="reference internal" href="linearmodels.system.model.LinearConstraint.html#linearmodels.system.model.LinearConstraint" title="linearmodels.system._utility.LinearConstraint (Python class)">LinearConstraint</a><span class="w"> </span><span class="p">|</span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/builtins/constants.html#None" title="(in Python v3.15)">None</a></span></span><span class="w"> </span><span class="o">=</span><span class="w"> </span><code class="code python default_value docutils literal highlight highlight-python"><span class="kc">None</span></code><a class="headerlink" href="#linearmodels.system.covariance.HeteroskedasticCovariance.__init__.constraints" title="Permalink to this definition">¶</a></dt><dd><p>Constraints used in estimation, if any</p>
+<dt id="linearmodels.system.covariance.HeteroskedasticCovariance.__init__.debiased"><span class="n sig-name">debiased</span><span class="p">:</span><span class="w"> </span><span class="n"><span class="desctype"><a class="reference external" href="https://docs.python.org/3/builtins/functions.html#bool" title="(in Python v3.15)">bool</a></span></span><span class="w"> </span><span class="o">=</span><span class="w"> </span><code class="code python default_value docutils literal highlight highlight-python"><span class="kc">False</span></code><a class="headerlink" href="#linearmodels.system.covariance.HeteroskedasticCovariance.__init__.debiased" title="Permalink to this definition">¶</a></dt><dd><p>Flag indicating to apply a small sample adjustment. The default is False.</p>
+</dd>
+<dt id="linearmodels.system.covariance.HeteroskedasticCovariance.__init__.constraints"><span class="n sig-name">constraints</span><span class="p">:</span><span class="w"> </span><span class="n"><span class="desctype"><a class="reference internal" href="linearmodels.system.model.LinearConstraint.html#linearmodels.system.model.LinearConstraint" title="linearmodels.system._utility.LinearConstraint (Python class)">LinearConstraint</a><span class="w"> </span><span class="p">|</span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/builtins/constants.html#None" title="(in Python v3.15)">None</a></span></span><span class="w"> </span><span class="o">=</span><span class="w"> </span><code class="code python default_value docutils literal highlight highlight-python"><span class="kc">None</span></code><a class="headerlink" href="#linearmodels.system.covariance.HeteroskedasticCovariance.__init__.constraints" title="Permalink to this definition">¶</a></dt><dd><p>Constraints used in estimation. The default is no constraints.</p>
 </dd>
 </dl>
 </dd>
@@ -1662,14 +1693,14 @@ residuals and the weighted X matrix <span class="math notranslate nohighlight">\
 <p class="rubric">Properties</p>
 <table class="autosummary longtable docutils data align-default">
 <tbody>
-<tr class="row-odd"><td><p><a class="reference internal" href="linearmodels.system.covariance.HeteroskedasticCovariance.cov.html#linearmodels.system.covariance.HeteroskedasticCovariance.cov" title="linearmodels.system.covariance.HeteroskedasticCovariance.cov (Python property) — Parameter covariance"><code class="xref py py-obj docutils literal notranslate"><span class="pre">cov</span></code></a></p></td>
-<td><p>Parameter covariance</p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="linearmodels.system.covariance.HeteroskedasticCovariance.cov.html#linearmodels.system.covariance.HeteroskedasticCovariance.cov" title="linearmodels.system.covariance.HeteroskedasticCovariance.cov (Python property) — Covariance of the parameter estimates."><code class="xref py py-obj docutils literal notranslate"><span class="pre">cov</span></code></a></p></td>
+<td><p>Covariance of the parameter estimates.</p></td>
 </tr>
-<tr class="row-even"><td><p><a class="reference internal" href="linearmodels.system.covariance.HeteroskedasticCovariance.cov_config.html#linearmodels.system.covariance.HeteroskedasticCovariance.cov_config" title="linearmodels.system.covariance.HeteroskedasticCovariance.cov_config (Python property) — Optional configuration information used in covariance"><code class="xref py py-obj docutils literal notranslate"><span class="pre">cov_config</span></code></a></p></td>
-<td><p>Optional configuration information used in covariance</p></td>
+<tr class="row-even"><td><p><a class="reference internal" href="linearmodels.system.covariance.HeteroskedasticCovariance.cov_config.html#linearmodels.system.covariance.HeteroskedasticCovariance.cov_config" title="linearmodels.system.covariance.HeteroskedasticCovariance.cov_config (Python property) — Configuration of the covariance estimator."><code class="xref py py-obj docutils literal notranslate"><span class="pre">cov_config</span></code></a></p></td>
+<td><p>Configuration of the covariance estimator.</p></td>
 </tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="linearmodels.system.covariance.HeteroskedasticCovariance.sigma.html#linearmodels.system.covariance.HeteroskedasticCovariance.sigma" title="linearmodels.system.covariance.HeteroskedasticCovariance.sigma (Python property) — Error covariance"><code class="xref py py-obj docutils literal notranslate"><span class="pre">sigma</span></code></a></p></td>
-<td><p>Error covariance</p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="linearmodels.system.covariance.HeteroskedasticCovariance.sigma.html#linearmodels.system.covariance.HeteroskedasticCovariance.sigma" title="linearmodels.system.covariance.HeteroskedasticCovariance.sigma (Python property) — Covariance of the residuals of the equations."><code class="xref py py-obj docutils literal notranslate"><span class="pre">sigma</span></code></a></p></td>
+<td><p>Covariance of the residuals of the equations.</p></td>
 </tr>
 </tbody>
 </table>

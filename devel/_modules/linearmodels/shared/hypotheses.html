@@ -19,7 +19,7 @@
     
   
       
-        <title>linearmodels.shared.hypotheses - linearmodels v7.1 (+518)</title>
+        <title>linearmodels.shared.hypotheses - linearmodels v7.1 (+525)</title>
       
     
 
@@ -91,7 +91,7 @@
 
 <header class="md-header md-header--shadow" data-md-component="header">
   <nav class="md-header__inner md-grid" aria-label="Header">
-    <a href="../../../index.html" title="linearmodels v7.1 (+518)" class="md-header__button md-logo" aria-label="linearmodels v7.1 (+518)" data-md-component="logo">
+    <a href="../../../index.html" title="linearmodels v7.1 (+525)" class="md-header__button md-logo" aria-label="linearmodels v7.1 (+525)" data-md-component="logo">
       <img src="../../../_static/bw-logo.svg" alt="logo">
     </a>
     <label class="md-header__button md-icon" for="__drawer">
@@ -102,7 +102,7 @@
       <div class="md-header__ellipsis">
         <div class="md-header__topic">
           <span class="md-ellipsis">
-            linearmodels v7.1 (+518)
+            linearmodels v7.1 (+525)
           </span>
         </div>
         <div class="md-header__topic" data-md-component="header-topic">
@@ -197,10 +197,10 @@
 
 <nav class="md-nav md-nav--primary" aria-label="Navigation" data-md-level="0">
   <label class="md-nav__title" for="__drawer">
-    <a href="../../../index.html" title="linearmodels v7.1 (+518)" class="md-nav__button md-logo" aria-label="linearmodels v7.1 (+518)" data-md-component="logo">
+    <a href="../../../index.html" title="linearmodels v7.1 (+525)" class="md-nav__button md-logo" aria-label="linearmodels v7.1 (+525)" data-md-component="logo">
       <img src="../../../_static/bw-logo.svg" alt="logo">
     </a>
-    linearmodels v7.1 (+518)
+    linearmodels v7.1 (+525)
   </label>
   
     <div class="md-nav__source">
@@ -527,7 +527,11 @@
 
 
 <h1>Source code for linearmodels.shared.hypotheses</h1><div class="highlight"><pre>
-<span></span><code><span class="kn">from</span><span class="w"> </span><span class="nn">__future__</span><span class="w"> </span><span class="kn">import</span> <span class="n">annotations</span>
+<span></span><code><span class="sd">"""</span>
+<span class="sd">Test statistics and hypothesis tests that the models share.</span>
+<span class="sd">"""</span>
+
+<span class="kn">from</span><span class="w"> </span><span class="nn">__future__</span><span class="w"> </span><span class="kn">import</span> <span class="n">annotations</span>
 
 <span class="kn">from</span><span class="w"> </span><span class="nn">collections.abc</span><span class="w"> </span><span class="kn">import</span> <span class="n">Mapping</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">typing</span><span class="w"> </span><span class="kn">import</span> <span class="n">Any</span>
@@ -544,25 +548,30 @@
 <a class="viewcode-back" href="../../../utility/linearmodels.shared.hypotheses.WaldTestStatistic.html#linearmodels.shared.hypotheses.WaldTestStatistic">[docs]</a>
 <span class="k">class</span><span class="w"> </span><span class="nc">WaldTestStatistic</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">"""</span>
-<span class="sd">    Test statistic holder for Wald-type tests</span>
+<span class="sd">    Test statistic holder for Wald-type tests.</span>
 
 <span class="sd">    Parameters</span>
 <span class="sd">    ----------</span>
 <span class="sd">    stat : float</span>
-<span class="sd">        The test statistic</span>
+<span class="sd">        The test statistic.</span>
 <span class="sd">    null : str</span>
-<span class="sd">        A statement of the test's null hypothesis</span>
+<span class="sd">        A statement of the test's null hypothesis.</span>
 <span class="sd">    df : int</span>
-<span class="sd">        Degree of freedom.</span>
-<span class="sd">    df_denom : int</span>
-<span class="sd">        Numerator degree of freedom.  If provided, uses an</span>
-<span class="sd">        F(df, df_denom) distribution.</span>
-<span class="sd">    name : str</span>
-<span class="sd">        Name of test</span>
+<span class="sd">        Degree of freedom, which is the numerator degree of freedom if</span>
+<span class="sd">        ``df_denom`` is given.</span>
+<span class="sd">    df_denom : int, optional</span>
+<span class="sd">        Denominator degree of freedom. If provided, the p-value and the critical</span>
+<span class="sd">        values use an F(df, df_denom) distribution. Otherwise they use a</span>
+<span class="sd">        chi-squared distribution with ``df`` degrees of freedom.</span>
+<span class="sd">    name : str, optional</span>
+<span class="sd">        Name of test.</span>
 
 <span class="sd">    See Also</span>
 <span class="sd">    --------</span>
 <span class="sd">    InvalidTestStatistic</span>
+<span class="sd">        Returned if a requested test is not valid for a model.</span>
+<span class="sd">    InapplicableTestStatistic</span>
+<span class="sd">        Returned if a requested test is not applicable for a specification.</span>
 <span class="sd">    """</span>
 
     <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span>
@@ -588,24 +597,24 @@
 
     <span class="nd">@property</span>
     <span class="k">def</span><span class="w"> </span><span class="nf">stat</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">float</span><span class="p">:</span>
-<span class="w">        </span><span class="sd">"""Test statistic"""</span>
+<span class="w">        </span><span class="sd">"""Test statistic."""</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_stat</span>
 
     <span class="nd">@property</span>
     <span class="k">def</span><span class="w"> </span><span class="nf">pval</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">float</span><span class="p">:</span>
-<span class="w">        </span><span class="sd">"""P-value of test statistic"""</span>
+<span class="w">        </span><span class="sd">"""P-value of the test statistic."""</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">dist</span><span class="o">.</span><span class="n">sf</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">stat</span><span class="p">)</span>
 
     <span class="nd">@property</span>
     <span class="k">def</span><span class="w"> </span><span class="nf">critical_values</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">float</span><span class="p">]</span> <span class="o">|</span> <span class="kc">None</span><span class="p">:</span>
-<span class="w">        </span><span class="sd">"""Critical values test for common test sizes"""</span>
+<span class="w">        </span><span class="sd">"""Critical values for common test sizes."""</span>
         <span class="k">return</span> <span class="nb">dict</span><span class="p">(</span>
             <span class="nb">zip</span><span class="p">([</span><span class="s2">"10%"</span><span class="p">,</span> <span class="s2">"5%"</span><span class="p">,</span> <span class="s2">"1%"</span><span class="p">],</span> <span class="bp">self</span><span class="o">.</span><span class="n">dist</span><span class="o">.</span><span class="n">ppf</span><span class="p">([</span><span class="mf">0.9</span><span class="p">,</span> <span class="mf">0.95</span><span class="p">,</span> <span class="mf">0.99</span><span class="p">]),</span> <span class="n">strict</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
         <span class="p">)</span>
 
     <span class="nd">@property</span>
     <span class="k">def</span><span class="w"> </span><span class="nf">null</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
-<span class="w">        </span><span class="sd">"""Null hypothesis"""</span>
+<span class="w">        </span><span class="sd">"""Null hypothesis of the test."""</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_null</span>
 
     <span class="k">def</span><span class="w"> </span><span class="fm">__str__</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
@@ -679,19 +688,19 @@
 
     <span class="nd">@property</span>
     <span class="k">def</span><span class="w"> </span><span class="nf">stat</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">float</span><span class="p">:</span>
-<span class="w">        </span><span class="sd">"""Test statistic"""</span>
+<span class="w">        </span><span class="sd">"""Test statistic."""</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_stat</span>
 
     <span class="nd">@property</span>
     <span class="k">def</span><span class="w"> </span><span class="nf">pval</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">float</span><span class="p">:</span>
-<span class="w">        </span><span class="sd">"""P-value of test statistic"""</span>
+<span class="w">        </span><span class="sd">"""P-value of the test statistic."""</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_two_sided</span><span class="p">:</span>
             <span class="k">return</span> <span class="mi">2</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">dist</span><span class="o">.</span><span class="n">sf</span><span class="p">(</span><span class="nb">abs</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">stat</span><span class="p">))</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">dist</span><span class="o">.</span><span class="n">sf</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">stat</span><span class="p">)</span>
 
     <span class="nd">@property</span>
     <span class="k">def</span><span class="w"> </span><span class="nf">critical_values</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">float</span><span class="p">]:</span>
-<span class="w">        </span><span class="sd">"""Critical values for common test sizes"""</span>
+<span class="w">        </span><span class="sd">"""Critical values for common test sizes."""</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_two_sided</span><span class="p">:</span>
             <span class="n">quantiles</span> <span class="o">=</span> <span class="p">[</span><span class="mf">0.95</span><span class="p">,</span> <span class="mf">0.975</span><span class="p">,</span> <span class="mf">0.995</span><span class="p">]</span>
         <span class="k">else</span><span class="p">:</span>
@@ -700,7 +709,7 @@
 
     <span class="nd">@property</span>
     <span class="k">def</span><span class="w"> </span><span class="nf">null</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
-<span class="w">        </span><span class="sd">"""Null hypothesis"""</span>
+<span class="w">        </span><span class="sd">"""Null hypothesis of the test."""</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_null</span>
 
     <span class="k">def</span><span class="w"> </span><span class="fm">__str__</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
@@ -727,25 +736,26 @@
 
 
 <span class="k">class</span><span class="w"> </span><span class="nc">InvalidTestWarning</span><span class="p">(</span><span class="ne">UserWarning</span><span class="p">):</span>
-    <span class="k">pass</span>
+<span class="w">    </span><span class="sd">"""Warning that a test is not valid."""</span>
 
 
 <div class="viewcode-block" id="InvalidTestStatistic">
 <a class="viewcode-back" href="../../../utility/linearmodels.shared.hypotheses.InvalidTestStatistic.html#linearmodels.shared.hypotheses.InvalidTestStatistic">[docs]</a>
 <span class="k">class</span><span class="w"> </span><span class="nc">InvalidTestStatistic</span><span class="p">(</span><span class="n">WaldTestStatistic</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">"""</span>
-<span class="sd">    Class returned if a requested test is not valid for a model</span>
+<span class="sd">    Class returned if a requested test is not valid for a model.</span>
 
 <span class="sd">    Parameters</span>
 <span class="sd">    ----------</span>
 <span class="sd">    reason : str</span>
-<span class="sd">        Explanation why test is invalid</span>
-<span class="sd">    name : str</span>
-<span class="sd">        Name of test</span>
+<span class="sd">        Explanation why test is invalid.</span>
+<span class="sd">    name : str, optional</span>
+<span class="sd">        Name of test.</span>
 
 <span class="sd">    See Also</span>
 <span class="sd">    --------</span>
 <span class="sd">    WaldTestStatistic</span>
+<span class="sd">        Test statistic holder for Wald-type tests.</span>
 <span class="sd">    """</span>
 
     <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">reason</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">name</span><span class="p">:</span> <span class="nb">str</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
@@ -755,12 +765,12 @@
 
     <span class="nd">@property</span>
     <span class="k">def</span><span class="w"> </span><span class="nf">pval</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">float</span><span class="p">:</span>
-<span class="w">        </span><span class="sd">"""Always returns np.nan"""</span>
+<span class="w">        </span><span class="sd">"""P-value, which is always NaN."""</span>
         <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">nan</span>
 
     <span class="nd">@property</span>
     <span class="k">def</span><span class="w"> </span><span class="nf">critical_values</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
-<span class="w">        </span><span class="sd">"""Always returns None"""</span>
+<span class="w">        </span><span class="sd">"""Critical values, which are always None."""</span>
         <span class="k">return</span> <span class="kc">None</span>
 
     <span class="k">def</span><span class="w"> </span><span class="fm">__str__</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
@@ -775,18 +785,20 @@
 <a class="viewcode-back" href="../../../utility/linearmodels.shared.hypotheses.InapplicableTestStatistic.html#linearmodels.shared.hypotheses.InapplicableTestStatistic">[docs]</a>
 <span class="k">class</span><span class="w"> </span><span class="nc">InapplicableTestStatistic</span><span class="p">(</span><span class="n">WaldTestStatistic</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">"""</span>
-<span class="sd">    Class returned if a requested test is not applicable for a specification</span>
+<span class="sd">    Class returned if a requested test is not applicable for a specification.</span>
 
 <span class="sd">    Parameters</span>
 <span class="sd">    ----------</span>
-<span class="sd">    reason : str</span>
-<span class="sd">        Explanation why test is invalid</span>
-<span class="sd">    name : str</span>
-<span class="sd">        Name of test</span>
+<span class="sd">    reason : str, optional</span>
+<span class="sd">        Explanation why the test is not applicable. The default says that the</span>
+<span class="sd">        test is not applicable to the model specification.</span>
+<span class="sd">    name : str, optional</span>
+<span class="sd">        Name of test.</span>
 
 <span class="sd">    See Also</span>
 <span class="sd">    --------</span>
 <span class="sd">    WaldTestStatistic</span>
+<span class="sd">        Test statistic holder for Wald-type tests.</span>
 <span class="sd">    """</span>
 
     <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">reason</span><span class="p">:</span> <span class="nb">str</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="n">name</span><span class="p">:</span> <span class="nb">str</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">):</span>
@@ -799,12 +811,12 @@
 
     <span class="nd">@property</span>
     <span class="k">def</span><span class="w"> </span><span class="nf">pval</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">float</span><span class="p">:</span>
-<span class="w">        </span><span class="sd">"""Always returns np.nan"""</span>
+<span class="w">        </span><span class="sd">"""P-value, which is always NaN."""</span>
         <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">nan</span>
 
     <span class="nd">@property</span>
     <span class="k">def</span><span class="w"> </span><span class="nf">critical_values</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
-<span class="w">        </span><span class="sd">"""Always returns None"""</span>
+<span class="w">        </span><span class="sd">"""Critical values, which are always None."""</span>
         <span class="k">return</span> <span class="kc">None</span>
 
     <span class="k">def</span><span class="w"> </span><span class="fm">__str__</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
@@ -858,6 +870,58 @@
     <span class="n">value</span><span class="p">:</span> <span class="n">linearmodels</span><span class="o">.</span><span class="n">typing</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">ArrayLike</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
     <span class="n">formula</span><span class="p">:</span> <span class="nb">str</span> <span class="o">|</span> <span class="nb">list</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">|</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">float</span><span class="p">]</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">WaldTestStatistic</span><span class="p">:</span>
+<span class="w">    </span><span class="sa">r</span><span class="sd">"""</span>
+<span class="sd">    Test linear equality constraints using a Wald test.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    params : array_like</span>
+<span class="sd">        Parameter estimates with p elements. It must be a Series, indexed by the</span>
+<span class="sd">        names of the parameters, if ``formula`` is used.</span>
+<span class="sd">    cov : array_like</span>
+<span class="sd">        Covariance of the parameter estimates, with shape (p, p).</span>
+<span class="sd">    restriction : array_like, optional</span>
+<span class="sd">        Array with q rows and p columns containing linear weights to apply to</span>
+<span class="sd">        parameters when forming the restrictions. It is not possible to use both</span>
+<span class="sd">        ``restriction`` and ``formula``.</span>
+<span class="sd">    value : array_like, optional</span>
+<span class="sd">        Array with q elements containing the restricted values. The default is</span>
+<span class="sd">        zeros.</span>
+<span class="sd">    formula : str, list of str or dict of str to float, optional</span>
+<span class="sd">        Linear constraints in the formulaic syntax. The names in the constraints</span>
+<span class="sd">        are the entries of the index of ``params``. It is one of:</span>
+
+<span class="sd">        * A single comma-separated string such as "x1=0, x2+x3=1"</span>
+<span class="sd">        * A list of strings where each element is a single constraint</span>
+<span class="sd">          such as ["x1=0", "x2+x3=1"]</span>
+<span class="sd">        * A single string without commas to test simple constraints such</span>
+<span class="sd">          as "x1=x2=x3=0"</span>
+<span class="sd">        * A dictionary where each key is a parameter restriction and</span>
+<span class="sd">          the corresponding value is the restriction value, e.g.,</span>
+<span class="sd">          {"x1": 0, "x2+x3": 1}.</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    WaldTestStatistic</span>
+<span class="sd">        Test statistic for the null that the restrictions are valid. It has a</span>
+<span class="sd">        chi-squared distribution with q degrees of freedom.</span>
+
+<span class="sd">    Raises</span>
+<span class="sd">    ------</span>
+<span class="sd">    ValueError</span>
+<span class="sd">        If both ``restriction`` and ``formula`` are provided, or if a string</span>
+<span class="sd">        constraint does not contain an equal sign.</span>
+<span class="sd">    TypeError</span>
+<span class="sd">        If ``formula`` is used and ``params`` is not a Series, or if the value of</span>
+<span class="sd">        a constraint cannot be converted to a float.</span>
+
+<span class="sd">    Notes</span>
+<span class="sd">    -----</span>
+<span class="sd">    The null hypothesis is :math:`H_0:C\theta=v`, where the matrix C is</span>
+<span class="sd">    ``restriction`` and v is ``value``. The statistic is</span>
+<span class="sd">    :math:`(C\hat\theta-v)'(C\hat\Sigma C')^{-1}(C\hat\theta-v)`, where</span>
+<span class="sd">    :math:`\hat\Sigma` is ``cov``.</span>
+<span class="sd">    """</span>
     <span class="k">if</span> <span class="n">formula</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="ow">and</span> <span class="n">restriction</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
         <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">"restriction and formula cannot be used simultaneously."</span><span class="p">)</span>
     <span class="k">if</span> <span class="n">formula</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>

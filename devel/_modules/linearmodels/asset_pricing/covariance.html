@@ -19,7 +19,7 @@
     
   
       
-        <title>linearmodels.asset_pricing.covariance - linearmodels v7.1 (+518)</title>
+        <title>linearmodels.asset_pricing.covariance - linearmodels v7.1 (+525)</title>
       
     
 
@@ -91,7 +91,7 @@
 
 <header class="md-header md-header--shadow" data-md-component="header">
   <nav class="md-header__inner md-grid" aria-label="Header">
-    <a href="../../../index.html" title="linearmodels v7.1 (+518)" class="md-header__button md-logo" aria-label="linearmodels v7.1 (+518)" data-md-component="logo">
+    <a href="../../../index.html" title="linearmodels v7.1 (+525)" class="md-header__button md-logo" aria-label="linearmodels v7.1 (+525)" data-md-component="logo">
       <img src="../../../_static/bw-logo.svg" alt="logo">
     </a>
     <label class="md-header__button md-icon" for="__drawer">
@@ -102,7 +102,7 @@
       <div class="md-header__ellipsis">
         <div class="md-header__topic">
           <span class="md-ellipsis">
-            linearmodels v7.1 (+518)
+            linearmodels v7.1 (+525)
           </span>
         </div>
         <div class="md-header__topic" data-md-component="header-topic">
@@ -197,10 +197,10 @@
 
 <nav class="md-nav md-nav--primary" aria-label="Navigation" data-md-level="0">
   <label class="md-nav__title" for="__drawer">
-    <a href="../../../index.html" title="linearmodels v7.1 (+518)" class="md-nav__button md-logo" aria-label="linearmodels v7.1 (+518)" data-md-component="logo">
+    <a href="../../../index.html" title="linearmodels v7.1 (+525)" class="md-nav__button md-logo" aria-label="linearmodels v7.1 (+525)" data-md-component="logo">
       <img src="../../../_static/bw-logo.svg" alt="logo">
     </a>
-    linearmodels v7.1 (+518)
+    linearmodels v7.1 (+525)
   </label>
   
     <div class="md-nav__source">
@@ -528,7 +528,7 @@
 
 <h1>Source code for linearmodels.asset_pricing.covariance</h1><div class="highlight"><pre>
 <span></span><code><span class="sd">"""</span>
-<span class="sd">Covariance estimators for linear factor models</span>
+<span class="sd">Covariance estimators for linear factor models.</span>
 <span class="sd">"""</span>
 
 <span class="kn">from</span><span class="w"> </span><span class="nn">__future__</span><span class="w"> </span><span class="kn">import</span> <span class="n">annotations</span>
@@ -555,13 +555,13 @@
 
     <span class="nd">@property</span>
     <span class="k">def</span><span class="w"> </span><span class="nf">kernel</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
-<span class="w">        </span><span class="sd">"""Kernel used in estimation"""</span>
+<span class="w">        </span><span class="sd">"""Kernel used in estimation."""</span>
         <span class="k">assert</span> <span class="bp">self</span><span class="o">.</span><span class="n">_kernel</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_kernel</span>
 
     <span class="nd">@property</span>
     <span class="k">def</span><span class="w"> </span><span class="nf">bandwidth</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">float</span><span class="p">:</span>
-<span class="w">        </span><span class="sd">"""Bandwidth used in estimation"""</span>
+<span class="w">        </span><span class="sd">"""Bandwidth used in estimation."""</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_bandwidth</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
             <span class="k">assert</span> <span class="bp">self</span><span class="o">.</span><span class="n">_moments</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span>
             <span class="n">moments</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_moments</span>
@@ -607,25 +607,30 @@
 <a class="viewcode-back" href="../../../asset-pricing/asset-pricing/linearmodels.asset_pricing.covariance.HeteroskedasticCovariance.html#linearmodels.asset_pricing.covariance.HeteroskedasticCovariance">[docs]</a>
 <span class="k">class</span><span class="w"> </span><span class="nc">HeteroskedasticCovariance</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">"""</span>
-<span class="sd">    Heteroskedasticity robust covariance estimator</span>
+<span class="sd">    Heteroskedasticity robust covariance estimator.</span>
 
 <span class="sd">    Parameters</span>
 <span class="sd">    ----------</span>
 <span class="sd">    xe : ndarray</span>
-<span class="sd">        Scores/moment conditions</span>
-<span class="sd">    jacobian : ndarray</span>
-<span class="sd">        Jacobian.  One and only one of jacobian and inv_jacobian must</span>
-<span class="sd">        be provided</span>
-<span class="sd">    inv_jacobian : {ndarray, None}</span>
-<span class="sd">        Inverse jacobian.  One and only one of jacobian and inv_jacobian must</span>
-<span class="sd">        be provided. Default is None.</span>
-<span class="sd">    center : bool</span>
-<span class="sd">        Flag indicating to center the scores when computing the covariance. Default</span>
-<span class="sd">        is true.</span>
-<span class="sd">    debiased : bool</span>
-<span class="sd">        Flag indicating to use a debiased estimator. Default is False.</span>
-<span class="sd">    df : int</span>
-<span class="sd">        Degree of freedom value to use if debiasing. Default is 0.</span>
+<span class="sd">        Scores/moment conditions, with shape (nobs, nmoments).</span>
+<span class="sd">    jacobian : ndarray, optional</span>
+<span class="sd">        Jacobian, with shape (nmoments, nparams). One and only one of jacobian and</span>
+<span class="sd">        inv_jacobian must be provided.</span>
+<span class="sd">    inv_jacobian : ndarray, optional</span>
+<span class="sd">        Inverse jacobian. One and only one of jacobian and inv_jacobian must</span>
+<span class="sd">        be provided.</span>
+<span class="sd">    center : bool, optional</span>
+<span class="sd">        Flag indicating to center the scores when computing the covariance. The</span>
+<span class="sd">        default is True.</span>
+<span class="sd">    debiased : bool, optional</span>
+<span class="sd">        Flag indicating to use a debiased estimator. The default is False.</span>
+<span class="sd">    df : int, optional</span>
+<span class="sd">        Degree of freedom value to use if debiasing. The default is 0.</span>
+
+<span class="sd">    Raises</span>
+<span class="sd">    ------</span>
+<span class="sd">    ValueError</span>
+<span class="sd">        If both or neither of ``jacobian`` and ``inv_jacobian`` are provided.</span>
 <span class="sd">    """</span>
 
     <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span>
@@ -662,17 +667,18 @@
 
     <span class="nd">@property</span>
     <span class="k">def</span><span class="w"> </span><span class="nf">config</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">str</span> <span class="o">|</span> <span class="nb">float</span><span class="p">]:</span>
+<span class="w">        </span><span class="sd">"""Configuration of the covariance estimator."""</span>
         <span class="k">return</span> <span class="p">{</span><span class="s2">"type"</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="vm">__class__</span><span class="o">.</span><span class="vm">__name__</span><span class="p">}</span>
 
     <span class="nd">@property</span>
     <span class="k">def</span><span class="w"> </span><span class="nf">s</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">linearmodels</span><span class="o">.</span><span class="n">typing</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">Float64Array</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">"""</span>
-<span class="sd">        Score/moment condition covariance</span>
+<span class="sd">        Score/moment condition covariance.</span>
 
 <span class="sd">        Returns</span>
 <span class="sd">        -------</span>
 <span class="sd">        ndarray</span>
-<span class="sd">            Covariance of the scores or moment conditions</span>
+<span class="sd">            Covariance of the scores or moment conditions.</span>
 <span class="sd">        """</span>
         <span class="n">xe</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_xe</span>
         <span class="n">nobs</span> <span class="o">=</span> <span class="n">xe</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
@@ -684,7 +690,7 @@
 
     <span class="nd">@property</span>
     <span class="k">def</span><span class="w"> </span><span class="nf">jacobian</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">linearmodels</span><span class="o">.</span><span class="n">typing</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">Float64Array</span><span class="p">:</span>
-<span class="w">        </span><span class="sd">"""The Jacobian"""</span>
+<span class="w">        </span><span class="sd">"""The Jacobian."""</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_jac</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
             <span class="k">assert</span> <span class="bp">self</span><span class="o">.</span><span class="n">_inv_jac</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">_jac</span> <span class="o">=</span> <span class="n">inv</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_inv_jac</span><span class="p">)</span>
@@ -693,7 +699,7 @@
 
     <span class="nd">@property</span>
     <span class="k">def</span><span class="w"> </span><span class="nf">inv_jacobian</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">linearmodels</span><span class="o">.</span><span class="n">typing</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">Float64Array</span><span class="p">:</span>
-<span class="w">        </span><span class="sd">"""Inverse Jacobian"""</span>
+<span class="w">        </span><span class="sd">"""Inverse Jacobian."""</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_inv_jac</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
             <span class="k">assert</span> <span class="bp">self</span><span class="o">.</span><span class="n">_jac</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">_inv_jac</span> <span class="o">=</span> <span class="n">inv</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_jac</span><span class="p">)</span>
@@ -702,7 +708,7 @@
 
     <span class="nd">@property</span>
     <span class="k">def</span><span class="w"> </span><span class="nf">square</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
-<span class="w">        </span><span class="sd">"""Flag indicating if jacobian is square"""</span>
+<span class="w">        </span><span class="sd">"""Flag indicating if jacobian is square."""</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_square</span>
 
     <span class="nd">@property</span>
@@ -714,12 +720,12 @@
     <span class="nd">@property</span>
     <span class="k">def</span><span class="w"> </span><span class="nf">cov</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">linearmodels</span><span class="o">.</span><span class="n">typing</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">Float64Array</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">"""</span>
-<span class="sd">        Compute parameter covariance</span>
+<span class="sd">        Compute parameter covariance.</span>
 
 <span class="sd">        Returns</span>
 <span class="sd">        -------</span>
 <span class="sd">        ndarray</span>
-<span class="sd">            Parameter covariance</span>
+<span class="sd">            Parameter covariance.</span>
 <span class="sd">        """</span>
         <span class="n">s</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">s</span>
         <span class="n">scale</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_scale</span>
@@ -777,32 +783,59 @@
 <a class="viewcode-back" href="../../../asset-pricing/asset-pricing/linearmodels.asset_pricing.covariance.KernelCovariance.html#linearmodels.asset_pricing.covariance.KernelCovariance">[docs]</a>
 <span class="k">class</span><span class="w"> </span><span class="nc">KernelCovariance</span><span class="p">(</span><span class="n">HeteroskedasticCovariance</span><span class="p">,</span> <span class="n">_HACMixin</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">"""</span>
-<span class="sd">    Heteroskedasticity-autocorrelation (HAC) robust covariance estimator</span>
+<span class="sd">    Heteroskedasticity-autocorrelation (HAC) robust covariance estimator.</span>
 
 <span class="sd">    Parameters</span>
 <span class="sd">    ----------</span>
 <span class="sd">    xe : ndarray</span>
-<span class="sd">        The scores (moment) conditions.</span>
-<span class="sd">    jacobian : ndarray</span>
-<span class="sd">        Jacobian.  One and only one of jacobian and inv_jacobian must</span>
+<span class="sd">        The scores (moment) conditions, with shape (nobs, nmoments).</span>
+<span class="sd">    jacobian : ndarray, optional</span>
+<span class="sd">        Jacobian, with shape (nmoments, nparams). One and only one of jacobian and</span>
+<span class="sd">        inv_jacobian must be provided.</span>
+<span class="sd">    inv_jacobian : ndarray, optional</span>
+<span class="sd">        Inverse jacobian. One and only one of jacobian and inv_jacobian must</span>
 <span class="sd">        be provided.</span>
-<span class="sd">    inv_jacobian : ndarray</span>
-<span class="sd">        Inverse jacobian.  One and only one of jacobian and inv_jacobian must</span>
-<span class="sd">        be provided.</span>
-<span class="sd">    kernel : str</span>
-<span class="sd">        Kernel name. See notes for available kernels. The default is "bartlett".</span>
-<span class="sd">    bandwidth : int</span>
-<span class="sd">        Non-negative integer bandwidth. If None, the optimal bandwidth is</span>
+<span class="sd">    kernel : str, optional</span>
+<span class="sd">        Name of the kernel. The name is not case sensitive. The default is</span>
+<span class="sd">        "bartlett". Supported kernels are:</span>
+
+<span class="sd">        * "bartlett", "newey-west" - Bartlett's kernel</span>
+<span class="sd">        * "parzen", "gallant" - Parzen's kernel</span>
+<span class="sd">        * "qs", "quadratic-spectral", "andrews" - Quadratic spectral kernel</span>
+
+<span class="sd">    bandwidth : float, optional</span>
+<span class="sd">        Non-negative bandwidth. If None, the optimal bandwidth is</span>
 <span class="sd">        estimated. It needs at least 4 observations with the Bartlett kernel, 5</span>
 <span class="sd">        with the Parzen kernel and 6 with the quadratic spectral kernel, and a</span>
 <span class="sd">        ``ValueError`` is raised for fewer when the bandwidth is first used. See</span>
 <span class="sd">        :func:`~linearmodels.iv.covariance.kernel_optimal_bandwidth`.</span>
-<span class="sd">    center : bool</span>
-<span class="sd">        Flag indicating to center the scores when computing the covariance.</span>
-<span class="sd">    debiased : bool</span>
-<span class="sd">        Flag indicating to use a debiased estimator.</span>
-<span class="sd">    df : int</span>
-<span class="sd">        Degree of freedom value to use if debiasing.</span>
+<span class="sd">    center : bool, optional</span>
+<span class="sd">        Flag indicating to center the scores when computing the covariance. The</span>
+<span class="sd">        default is True.</span>
+<span class="sd">    debiased : bool, optional</span>
+<span class="sd">        Flag indicating to use a debiased estimator. The default is False.</span>
+<span class="sd">    df : int, optional</span>
+<span class="sd">        Degree of freedom value to use if debiasing. The default is 0.</span>
+
+<span class="sd">    Raises</span>
+<span class="sd">    ------</span>
+<span class="sd">    ValueError</span>
+<span class="sd">        If both or neither of ``jacobian`` and ``inv_jacobian`` are provided, or</span>
+<span class="sd">        if ``bandwidth`` is negative.</span>
+<span class="sd">    TypeError</span>
+<span class="sd">        If ``kernel`` is not a str, or ``bandwidth`` is not a number.</span>
+<span class="sd">    UnknownOptionError</span>
+<span class="sd">        If ``kernel`` is not supported. It is both a ``KeyError`` and a</span>
+<span class="sd">        ``ValueError``.</span>
+
+<span class="sd">    See Also</span>
+<span class="sd">    --------</span>
+<span class="sd">    linearmodels.iv.covariance.kernel_weight_bartlett</span>
+<span class="sd">        Weights of the Bartlett kernel.</span>
+<span class="sd">    linearmodels.iv.covariance.kernel_weight_parzen</span>
+<span class="sd">        Weights of the Parzen kernel.</span>
+<span class="sd">    linearmodels.iv.covariance.kernel_weight_quadratic_spectral</span>
+<span class="sd">        Weights of the quadratic spectral kernel.</span>
 
 <span class="sd">    Notes</span>
 <span class="sd">    -----</span>
@@ -814,12 +847,6 @@
 <span class="sd">       ``OverflowError``) or "cannot convert float NaN to integer" for some</span>
 <span class="sd">       data, and used a bandwidth of nobs - 1, or another bandwidth, for other</span>
 <span class="sd">       data.</span>
-
-<span class="sd">    See Also</span>
-<span class="sd">    --------</span>
-<span class="sd">    linearmodels.iv.covariance.kernel_weight_bartlett,</span>
-<span class="sd">    linearmodels.iv.covariance.kernel_weight_parzen,</span>
-<span class="sd">    linearmodels.iv.covariance.kernel_weight_quadratic_spectral</span>
 <span class="sd">    """</span>
 
     <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span>
@@ -851,6 +878,7 @@
 
     <span class="nd">@property</span>
     <span class="k">def</span><span class="w"> </span><span class="nf">config</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">str</span> <span class="o">|</span> <span class="nb">float</span><span class="p">]:</span>
+<span class="w">        </span><span class="sd">"""Configuration of the covariance estimator."""</span>
         <span class="n">out</span> <span class="o">=</span> <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="n">config</span>
         <span class="n">out</span><span class="p">[</span><span class="s2">"kernel"</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">kernel</span>
         <span class="n">out</span><span class="p">[</span><span class="s2">"bandwidth"</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">bandwidth</span>
@@ -859,12 +887,12 @@
     <span class="nd">@property</span>
     <span class="k">def</span><span class="w"> </span><span class="nf">s</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">linearmodels</span><span class="o">.</span><span class="n">typing</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">Float64Array</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">"""</span>
-<span class="sd">        Score/moment condition covariance</span>
+<span class="sd">        Score/moment condition covariance.</span>
 
 <span class="sd">        Returns</span>
 <span class="sd">        -------</span>
 <span class="sd">        ndarray</span>
-<span class="sd">            Covariance of the scores or moment conditions</span>
+<span class="sd">            Covariance of the scores or moment conditions.</span>
 <span class="sd">        """</span>
         <span class="n">xe</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_xe</span>
         <span class="n">out</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_kernel_cov</span><span class="p">(</span><span class="n">xe</span><span class="p">)</span>
@@ -875,14 +903,15 @@
 
 <span class="k">class</span><span class="w"> </span><span class="nc">HeteroskedasticWeight</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">"""</span>
-<span class="sd">    GMM weighing matrix estimation</span>
+<span class="sd">    GMM weighing matrix estimation.</span>
 
 <span class="sd">    Parameters</span>
 <span class="sd">    ----------</span>
 <span class="sd">    moments : ndarray</span>
-<span class="sd">        Moment conditions (nobs by nmoments)</span>
-<span class="sd">    center : bool</span>
-<span class="sd">        Flag indicating to center the moments when computing the weights</span>
+<span class="sd">        Moment conditions (nobs by nmoments).</span>
+<span class="sd">    center : bool, optional</span>
+<span class="sd">        Flag indicating to center the moments when computing the weights. The</span>
+<span class="sd">        default is True.</span>
 <span class="sd">    """</span>
 
     <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span>
@@ -895,17 +924,17 @@
         <span class="bp">self</span><span class="p">,</span> <span class="n">moments</span><span class="p">:</span> <span class="n">linearmodels</span><span class="o">.</span><span class="n">typing</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">Float64Array</span>
     <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">linearmodels</span><span class="o">.</span><span class="n">typing</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">Float64Array</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">"""</span>
-<span class="sd">        Score/moment condition weighting matrix</span>
+<span class="sd">        Score/moment condition weighting matrix.</span>
 
 <span class="sd">        Parameters</span>
 <span class="sd">        ----------</span>
 <span class="sd">        moments : ndarray</span>
-<span class="sd">            Moment conditions (nobs by nmoments)</span>
+<span class="sd">            Moment conditions (nobs by nmoments).</span>
 
 <span class="sd">        Returns</span>
 <span class="sd">        -------</span>
 <span class="sd">        ndarray</span>
-<span class="sd">            Weighting matrix computed from moment conditions</span>
+<span class="sd">            Weighting matrix computed from moment conditions.</span>
 <span class="sd">        """</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_center</span><span class="p">:</span>
             <span class="n">moments</span> <span class="o">=</span> <span class="n">moments</span> <span class="o">-</span> <span class="n">moments</span><span class="o">.</span><span class="n">mean</span><span class="p">(</span><span class="mi">0</span><span class="p">)[</span><span class="kc">None</span><span class="p">,</span> <span class="p">:]</span>
@@ -917,19 +946,25 @@
 
 <span class="k">class</span><span class="w"> </span><span class="nc">KernelWeight</span><span class="p">(</span><span class="n">HeteroskedasticWeight</span><span class="p">,</span> <span class="n">_HACMixin</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">"""</span>
-<span class="sd">    HAC GMM weighing matrix estimation</span>
+<span class="sd">    HAC GMM weighing matrix estimation.</span>
 
 <span class="sd">    Parameters</span>
 <span class="sd">    ----------</span>
 <span class="sd">    moments : ndarray</span>
-<span class="sd">        Moment conditions (nobs by nmoments)</span>
-<span class="sd">    center : bool</span>
-<span class="sd">        Flag indicating to center the moments when computing the weights</span>
-<span class="sd">    kernel : str</span>
-<span class="sd">        Kernel name. See notes for available kernels. If None, the kernel</span>
-<span class="sd">        is set to "bartlett".</span>
-<span class="sd">    bandwidth : int.</span>
-<span class="sd">        Non-negative integer bandwidth. If None, the optimal bandwidth is</span>
+<span class="sd">        Moment conditions (nobs by nmoments).</span>
+<span class="sd">    center : bool, optional</span>
+<span class="sd">        Flag indicating to center the moments when computing the weights. The</span>
+<span class="sd">        default is True.</span>
+<span class="sd">    kernel : str, optional</span>
+<span class="sd">        Name of the kernel. The name is not case sensitive. The default is</span>
+<span class="sd">        "bartlett". Supported kernels are:</span>
+
+<span class="sd">        * "bartlett", "newey-west" - Bartlett's kernel</span>
+<span class="sd">        * "parzen", "gallant" - Parzen's kernel</span>
+<span class="sd">        * "qs", "quadratic-spectral", "andrews" - Quadratic spectral kernel</span>
+
+<span class="sd">    bandwidth : float, optional</span>
+<span class="sd">        Non-negative bandwidth. If None, the optimal bandwidth is</span>
 <span class="sd">        estimated. It needs at least 4 observations with the Bartlett kernel, 5</span>
 <span class="sd">        with the Parzen kernel and 6 with the quadratic spectral kernel, and a</span>
 <span class="sd">        ``ValueError`` is raised for fewer when the bandwidth is first used. See</span>
@@ -962,17 +997,17 @@
         <span class="bp">self</span><span class="p">,</span> <span class="n">moments</span><span class="p">:</span> <span class="n">linearmodels</span><span class="o">.</span><span class="n">typing</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">Float64Array</span>
     <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">linearmodels</span><span class="o">.</span><span class="n">typing</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">Float64Array</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">"""</span>
-<span class="sd">        Score/moment condition weighting matrix</span>
+<span class="sd">        Score/moment condition weighting matrix.</span>
 
 <span class="sd">        Parameters</span>
 <span class="sd">        ----------</span>
 <span class="sd">        moments : ndarray</span>
-<span class="sd">            Moment conditions (nobs by nmoments)</span>
+<span class="sd">            Moment conditions (nobs by nmoments).</span>
 
 <span class="sd">        Returns</span>
 <span class="sd">        -------</span>
 <span class="sd">        ndarray</span>
-<span class="sd">            Weighting matrix computed from moment conditions</span>
+<span class="sd">            Weighting matrix computed from moment conditions.</span>
 <span class="sd">        """</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_center</span><span class="p">:</span>
             <span class="n">moments</span> <span class="o">=</span> <span class="n">moments</span> <span class="o">-</span> <span class="n">moments</span><span class="o">.</span><span class="n">mean</span><span class="p">(</span><span class="mi">0</span><span class="p">)[</span><span class="kc">None</span><span class="p">,</span> <span class="p">:]</span>

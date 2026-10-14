@@ -19,7 +19,7 @@
     
   
       
-        <title>linearmodels.shared.covariance - linearmodels v7.1 (+518)</title>
+        <title>linearmodels.shared.covariance - linearmodels v7.1 (+525)</title>
       
     
 
@@ -91,7 +91,7 @@
 
 <header class="md-header md-header--shadow" data-md-component="header">
   <nav class="md-header__inner md-grid" aria-label="Header">
-    <a href="../../../index.html" title="linearmodels v7.1 (+518)" class="md-header__button md-logo" aria-label="linearmodels v7.1 (+518)" data-md-component="logo">
+    <a href="../../../index.html" title="linearmodels v7.1 (+525)" class="md-header__button md-logo" aria-label="linearmodels v7.1 (+525)" data-md-component="logo">
       <img src="../../../_static/bw-logo.svg" alt="logo">
     </a>
     <label class="md-header__button md-icon" for="__drawer">
@@ -102,7 +102,7 @@
       <div class="md-header__ellipsis">
         <div class="md-header__topic">
           <span class="md-ellipsis">
-            linearmodels v7.1 (+518)
+            linearmodels v7.1 (+525)
           </span>
         </div>
         <div class="md-header__topic" data-md-component="header-topic">
@@ -197,10 +197,10 @@
 
 <nav class="md-nav md-nav--primary" aria-label="Navigation" data-md-level="0">
   <label class="md-nav__title" for="__drawer">
-    <a href="../../../index.html" title="linearmodels v7.1 (+518)" class="md-nav__button md-logo" aria-label="linearmodels v7.1 (+518)" data-md-component="logo">
+    <a href="../../../index.html" title="linearmodels v7.1 (+525)" class="md-nav__button md-logo" aria-label="linearmodels v7.1 (+525)" data-md-component="logo">
       <img src="../../../_static/bw-logo.svg" alt="logo">
     </a>
-    linearmodels v7.1 (+518)
+    linearmodels v7.1 (+525)
   </label>
   
     <div class="md-nav__source">
@@ -527,7 +527,11 @@
 
 
 <h1>Source code for linearmodels.shared.covariance</h1><div class="highlight"><pre>
-<span></span><code><span class="kn">from</span><span class="w"> </span><span class="nn">numpy</span><span class="w"> </span><span class="kn">import</span> <span class="p">(</span>
+<span></span><code><span class="sd">"""</span>
+<span class="sd">Core covariance estimators that the models share.</span>
+<span class="sd">"""</span>
+
+<span class="kn">from</span><span class="w"> </span><span class="nn">numpy</span><span class="w"> </span><span class="kn">import</span> <span class="p">(</span>
     <span class="nb">any</span> <span class="k">as</span> <span class="n">npany</span><span class="p">,</span>
     <span class="n">arange</span><span class="p">,</span>
     <span class="n">argsort</span><span class="p">,</span>
@@ -565,7 +569,7 @@
 
 <span class="sd">    .. math::</span>
 
-<span class="sd">       `\frac{g}{g-1}\frac{n-1}{n}`</span>
+<span class="sd">       \frac{g}{g-1}\frac{n-1}{n}</span>
 
 <span class="sd">    where g is the number of groups and n is the sample size.</span>
 <span class="sd">    """</span>
@@ -579,17 +583,20 @@
     <span class="n">clusters</span><span class="p">:</span> <span class="n">linearmodels</span><span class="o">.</span><span class="n">typing</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">IntArray</span><span class="p">,</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">linearmodels</span><span class="o">.</span><span class="n">typing</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">IntArray</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">"""</span>
-<span class="sd">    Compute a set of clusters that is nested within 2 clusters</span>
+<span class="sd">    Compute a set of clusters that is nested within 2 clusters.</span>
 
 <span class="sd">    Parameters</span>
 <span class="sd">    ----------</span>
 <span class="sd">    clusters : ndarray</span>
-<span class="sd">        A nobs by 2 array of integer values of cluster group membership.</span>
+<span class="sd">        An array with shape (nobs, 2) of integer values of cluster group</span>
+<span class="sd">        membership.</span>
 
 <span class="sd">    Returns</span>
 <span class="sd">    -------</span>
 <span class="sd">    ndarray</span>
-<span class="sd">        A nobs array of integer cluster group memberships</span>
+<span class="sd">        An array with shape (nobs,) of integer cluster group memberships. Two</span>
+<span class="sd">        observations are in the same group if they are in the same group of both</span>
+<span class="sd">        columns of ``clusters``.</span>
 <span class="sd">    """</span>
     <span class="n">sort_keys</span> <span class="o">=</span> <span class="n">lexsort</span><span class="p">(</span><span class="n">clusters</span><span class="o">.</span><span class="n">T</span><span class="p">)</span>
     <span class="n">locs</span> <span class="o">=</span> <span class="n">arange</span><span class="p">(</span><span class="n">clusters</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
@@ -608,19 +615,20 @@
     <span class="n">clusters</span><span class="p">:</span> <span class="n">linearmodels</span><span class="o">.</span><span class="n">typing</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">AnyArray</span><span class="p">,</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">linearmodels</span><span class="o">.</span><span class="n">typing</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">Float64Array</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">"""</span>
-<span class="sd">    Core cluster covariance estimator</span>
+<span class="sd">    Core cluster covariance estimator.</span>
 
 <span class="sd">    Parameters</span>
 <span class="sd">    ----------</span>
 <span class="sd">    z : ndarray</span>
-<span class="sd">        n by k mean zero data array</span>
+<span class="sd">        Mean zero data with shape (n, k).</span>
 <span class="sd">    clusters : ndarray</span>
-<span class="sd">        n by 1 array</span>
+<span class="sd">        Array with shape (n,) that contains the cluster that each observation</span>
+<span class="sd">        belongs to.</span>
 
 <span class="sd">    Returns</span>
 <span class="sd">    -------</span>
 <span class="sd">    ndarray</span>
-<span class="sd">       k by k cluster asymptotic covariance</span>
+<span class="sd">        Cluster asymptotic covariance with shape (k, k).</span>
 
 <span class="sd">    Raises</span>
 <span class="sd">    ------</span>
@@ -660,19 +668,26 @@
     <span class="n">z</span><span class="p">:</span> <span class="n">linearmodels</span><span class="o">.</span><span class="n">typing</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">Float64Array</span><span class="p">,</span> <span class="n">w</span><span class="p">:</span> <span class="n">linearmodels</span><span class="o">.</span><span class="n">typing</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">Float64Array</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">linearmodels</span><span class="o">.</span><span class="n">typing</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">Float64Array</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">"""</span>
-<span class="sd">    Core kernel covariance estimator</span>
+<span class="sd">    Core kernel covariance estimator.</span>
 
 <span class="sd">    Parameters</span>
 <span class="sd">    ----------</span>
 <span class="sd">    z : ndarray</span>
-<span class="sd">        n by k mean zero data array</span>
+<span class="sd">        Mean zero data with shape (n, k).</span>
 <span class="sd">    w : ndarray</span>
-<span class="sd">        m by 1</span>
+<span class="sd">        Kernel weights with shape (m,) for lags 0, 1, ..., m - 1. The weight of</span>
+<span class="sd">        lag 0 is not used, since the variance is always included with a weight</span>
+<span class="sd">        of 1.</span>
 
 <span class="sd">    Returns</span>
 <span class="sd">    -------</span>
 <span class="sd">    ndarray</span>
-<span class="sd">       k by k kernel asymptotic covariance</span>
+<span class="sd">        Kernel asymptotic covariance with shape (k, k).</span>
+
+<span class="sd">    Raises</span>
+<span class="sd">    ------</span>
+<span class="sd">    ValueError</span>
+<span class="sd">        If the number of weights is larger than the number of observations.</span>
 <span class="sd">    """</span>
     <span class="n">k</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">w</span><span class="p">)</span>
     <span class="n">n</span> <span class="o">=</span> <span class="n">z</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>

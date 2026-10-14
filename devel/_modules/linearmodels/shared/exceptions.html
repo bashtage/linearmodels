@@ -19,7 +19,7 @@
     
   
       
-        <title>linearmodels.shared.exceptions - linearmodels v7.1 (+518)</title>
+        <title>linearmodels.shared.exceptions - linearmodels v7.1 (+525)</title>
       
     
 
@@ -91,7 +91,7 @@
 
 <header class="md-header md-header--shadow" data-md-component="header">
   <nav class="md-header__inner md-grid" aria-label="Header">
-    <a href="../../../index.html" title="linearmodels v7.1 (+518)" class="md-header__button md-logo" aria-label="linearmodels v7.1 (+518)" data-md-component="logo">
+    <a href="../../../index.html" title="linearmodels v7.1 (+525)" class="md-header__button md-logo" aria-label="linearmodels v7.1 (+525)" data-md-component="logo">
       <img src="../../../_static/bw-logo.svg" alt="logo">
     </a>
     <label class="md-header__button md-icon" for="__drawer">
@@ -102,7 +102,7 @@
       <div class="md-header__ellipsis">
         <div class="md-header__topic">
           <span class="md-ellipsis">
-            linearmodels v7.1 (+518)
+            linearmodels v7.1 (+525)
           </span>
         </div>
         <div class="md-header__topic" data-md-component="header-topic">
@@ -197,10 +197,10 @@
 
 <nav class="md-nav md-nav--primary" aria-label="Navigation" data-md-level="0">
   <label class="md-nav__title" for="__drawer">
-    <a href="../../../index.html" title="linearmodels v7.1 (+518)" class="md-nav__button md-logo" aria-label="linearmodels v7.1 (+518)" data-md-component="logo">
+    <a href="../../../index.html" title="linearmodels v7.1 (+525)" class="md-nav__button md-logo" aria-label="linearmodels v7.1 (+525)" data-md-component="logo">
       <img src="../../../_static/bw-logo.svg" alt="logo">
     </a>
-    linearmodels v7.1 (+518)
+    linearmodels v7.1 (+525)
   </label>
   
     <div class="md-nav__source">
@@ -527,7 +527,11 @@
 
 
 <h1>Source code for linearmodels.shared.exceptions</h1><div class="highlight"><pre>
-<span></span><code><span class="kn">from</span><span class="w"> </span><span class="nn">collections.abc</span><span class="w"> </span><span class="kn">import</span> <span class="n">Iterable</span><span class="p">,</span> <span class="n">Mapping</span>
+<span></span><code><span class="sd">"""</span>
+<span class="sd">Warnings and errors that linearmodels raises.</span>
+<span class="sd">"""</span>
+
+<span class="kn">from</span><span class="w"> </span><span class="nn">collections.abc</span><span class="w"> </span><span class="kn">import</span> <span class="n">Iterable</span><span class="p">,</span> <span class="n">Mapping</span>
 <span class="kn">import</span><span class="w"> </span><span class="nn">difflib</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">typing</span><span class="w"> </span><span class="kn">import</span> <span class="n">TypeVar</span>
 <span class="kn">import</span><span class="w"> </span><span class="nn">warnings</span>
@@ -562,19 +566,40 @@
 
 
 <span class="k">class</span><span class="w"> </span><span class="nc">MemoryWarning</span><span class="p">(</span><span class="ne">Warning</span><span class="p">):</span>
-    <span class="k">pass</span>
+<span class="w">    </span><span class="sd">"""</span>
+<span class="sd">    Warning that an estimator uses the algorithm that saves memory.</span>
+
+<span class="sd">    ``PanelOLS`` issues it when a model has entity and time effects, ``low_memory``</span>
+<span class="sd">    is not given and the dummy variables of the smaller of the two effects would</span>
+<span class="sd">    need more than 1 GiB.</span>
+<span class="sd">    """</span>
 
 
 <span class="k">class</span><span class="w"> </span><span class="nc">InferenceUnavailableWarning</span><span class="p">(</span><span class="ne">Warning</span><span class="p">):</span>
-    <span class="k">pass</span>
+<span class="w">    </span><span class="sd">"""</span>
+<span class="sd">    Warning that inference on the parameters is not available.</span>
+
+<span class="sd">    ``FamaMacBeth`` issues it if the number of cross-sectional regressions that</span>
+<span class="sd">    can be estimated is smaller than the number of parameters.</span>
+<span class="sd">    """</span>
 
 
 <span class="k">class</span><span class="w"> </span><span class="nc">SingletonWarning</span><span class="p">(</span><span class="ne">Warning</span><span class="p">):</span>
-    <span class="k">pass</span>
+<span class="w">    </span><span class="sd">"""</span>
+<span class="sd">    Warning that observations of singleton groups were dropped.</span>
+
+<span class="sd">    ``PanelOLS`` issues it when ``singletons=False`` and the model drops</span>
+<span class="sd">    observations that are the only observation of a group of an effect.</span>
+<span class="sd">    """</span>
 
 
 <span class="k">class</span><span class="w"> </span><span class="nc">IndexWarning</span><span class="p">(</span><span class="ne">Warning</span><span class="p">):</span>
-    <span class="k">pass</span>
+<span class="w">    </span><span class="sd">"""</span>
+<span class="sd">    Warning that the indices of two inputs do not match.</span>
+
+<span class="sd">    ``predict`` issues it if the index of ``exog`` is not the index of ``endog``.</span>
+<span class="sd">    The predictions use the index of ``exog``.</span>
+<span class="sd">    """</span>
 
 
 <span class="k">class</span><span class="w"> </span><span class="nc">DefaultBandwidthWarning</span><span class="p">(</span><span class="ne">UserWarning</span><span class="p">):</span>
@@ -612,7 +637,16 @@
 
 
 <span class="k">def</span><span class="w"> </span><span class="nf">missing_warning</span><span class="p">(</span><span class="n">missing</span><span class="p">:</span> <span class="n">BoolArray</span><span class="p">,</span> <span class="n">stacklevel</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">4</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
-<span class="w">    </span><span class="sd">"""Utility function to perform missing value check and warning"""</span>
+<span class="w">    </span><span class="sd">"""</span>
+<span class="sd">    Warn if any observation has a missing value.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    missing : ndarray</span>
+<span class="sd">        Boolean array that is True for the observations that have a missing value.</span>
+<span class="sd">    stacklevel : int, optional</span>
+<span class="sd">        Stack level of the warning. The default is 4.</span>
+<span class="sd">    """</span>
     <span class="k">if</span> <span class="ow">not</span> <span class="n">np</span><span class="o">.</span><span class="n">any</span><span class="p">(</span><span class="n">missing</span><span class="p">):</span>
         <span class="k">return</span>
     <span class="kn">import</span><span class="w"> </span><span class="nn">linearmodels</span>  <span class="c1"># noqa: PLC0415</span>

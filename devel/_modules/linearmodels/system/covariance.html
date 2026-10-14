@@ -19,7 +19,7 @@
     
   
       
-        <title>linearmodels.system.covariance - linearmodels v7.1 (+518)</title>
+        <title>linearmodels.system.covariance - linearmodels v7.1 (+525)</title>
       
     
 
@@ -91,7 +91,7 @@
 
 <header class="md-header md-header--shadow" data-md-component="header">
   <nav class="md-header__inner md-grid" aria-label="Header">
-    <a href="../../../index.html" title="linearmodels v7.1 (+518)" class="md-header__button md-logo" aria-label="linearmodels v7.1 (+518)" data-md-component="logo">
+    <a href="../../../index.html" title="linearmodels v7.1 (+525)" class="md-header__button md-logo" aria-label="linearmodels v7.1 (+525)" data-md-component="logo">
       <img src="../../../_static/bw-logo.svg" alt="logo">
     </a>
     <label class="md-header__button md-icon" for="__drawer">
@@ -102,7 +102,7 @@
       <div class="md-header__ellipsis">
         <div class="md-header__topic">
           <span class="md-ellipsis">
-            linearmodels v7.1 (+518)
+            linearmodels v7.1 (+525)
           </span>
         </div>
         <div class="md-header__topic" data-md-component="header-topic">
@@ -197,10 +197,10 @@
 
 <nav class="md-nav md-nav--primary" aria-label="Navigation" data-md-level="0">
   <label class="md-nav__title" for="__drawer">
-    <a href="../../../index.html" title="linearmodels v7.1 (+518)" class="md-nav__button md-logo" aria-label="linearmodels v7.1 (+518)" data-md-component="logo">
+    <a href="../../../index.html" title="linearmodels v7.1 (+525)" class="md-nav__button md-logo" aria-label="linearmodels v7.1 (+525)" data-md-component="logo">
       <img src="../../../_static/bw-logo.svg" alt="logo">
     </a>
-    linearmodels v7.1 (+518)
+    linearmodels v7.1 (+525)
   </label>
   
     <div class="md-nav__source">
@@ -527,7 +527,11 @@
 
 
 <h1>Source code for linearmodels.system.covariance</h1><div class="highlight"><pre>
-<span></span><code><span class="kn">from</span><span class="w"> </span><span class="nn">__future__</span><span class="w"> </span><span class="kn">import</span> <span class="n">annotations</span>
+<span></span><code><span class="sd">"""</span>
+<span class="sd">Covariance estimators for system regression models.</span>
+<span class="sd">"""</span>
+
+<span class="kn">from</span><span class="w"> </span><span class="nn">__future__</span><span class="w"> </span><span class="kn">import</span> <span class="n">annotations</span>
 
 <span class="kn">from</span><span class="w"> </span><span class="nn">typing</span><span class="w"> </span><span class="kn">import</span> <span class="n">cast</span>
 
@@ -559,23 +563,30 @@
 <a class="viewcode-back" href="../../../system/system/linearmodels.system.covariance.HomoskedasticCovariance.html#linearmodels.system.covariance.HomoskedasticCovariance">[docs]</a>
 <span class="k">class</span><span class="w"> </span><span class="nc">HomoskedasticCovariance</span><span class="p">:</span>
 <span class="w">    </span><span class="sa">r</span><span class="sd">"""</span>
-<span class="sd">    Homoskedastic covariance estimation for system regression</span>
+<span class="sd">    Homoskedastic covariance estimation for system regression.</span>
 
 <span class="sd">    Parameters</span>
 <span class="sd">    ----------</span>
-<span class="sd">    x : list[ndarray]</span>
-<span class="sd">        List of regressor arrays (ndependent)</span>
+<span class="sd">    x : list of ndarray</span>
+<span class="sd">        Regressors of each equation, with shape (nobs, k_i) for equation i.</span>
 <span class="sd">    eps : ndarray</span>
-<span class="sd">        Model residuals, ndependent by nobs</span>
+<span class="sd">        Model residuals, with shape (nobs, neq).</span>
 <span class="sd">    sigma : ndarray</span>
-<span class="sd">        Covariance matrix estimator of eps</span>
-<span class="sd">    gls : bool</span>
-<span class="sd">        Flag indicating to compute the GLS covariance estimator.  If False,</span>
-<span class="sd">        assume OLS was used</span>
-<span class="sd">    debiased : bool</span>
-<span class="sd">        Flag indicating to apply a small sample adjustment</span>
-<span class="sd">    constraints : {None, LinearConstraint}</span>
-<span class="sd">        Constraints used in estimation, if any</span>
+<span class="sd">        Covariance of the residuals of the equations that is used to weight the</span>
+<span class="sd">        equations if ``gls`` is True, with shape (neq, neq).</span>
+<span class="sd">    full_sigma : ndarray</span>
+<span class="sd">        Covariance of the residuals of the equations at the final estimates, with</span>
+<span class="sd">        shape (neq, neq). It differs from ``sigma`` if the weights are not the</span>
+<span class="sd">        covariance of the final residuals, e.g., if the model was given ``sigma``</span>
+<span class="sd">        or did not iterate. It is used to estimate the covariance of the scores</span>
+<span class="sd">        if ``gls`` is True.</span>
+<span class="sd">    gls : bool, optional</span>
+<span class="sd">        Flag indicating to compute the GLS covariance estimator. If False, assume</span>
+<span class="sd">        OLS was used. The default is False.</span>
+<span class="sd">    debiased : bool, optional</span>
+<span class="sd">        Flag indicating to apply a small sample adjustment. The default is False.</span>
+<span class="sd">    constraints : LinearConstraint, optional</span>
+<span class="sd">        Constraints used in estimation. The default is no constraints.</span>
 
 <span class="sd">    Notes</span>
 <span class="sd">    -----</span>
@@ -632,7 +643,7 @@
 
     <span class="nd">@property</span>
     <span class="k">def</span><span class="w"> </span><span class="nf">sigma</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">linearmodels</span><span class="o">.</span><span class="n">typing</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">Float64Array</span><span class="p">:</span>
-<span class="w">        </span><span class="sd">"""Error covariance"""</span>
+<span class="w">        </span><span class="sd">"""Covariance of the residuals of the equations."""</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_sigma</span>
 
     <span class="k">def</span><span class="w"> </span><span class="nf">_adjustment</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">float</span> <span class="o">|</span> <span class="n">ndarray</span><span class="p">:</span>
@@ -681,7 +692,7 @@
 
     <span class="nd">@property</span>
     <span class="k">def</span><span class="w"> </span><span class="nf">cov</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">linearmodels</span><span class="o">.</span><span class="n">typing</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">Float64Array</span><span class="p">:</span>
-<span class="w">        </span><span class="sd">"""Parameter covariance"""</span>
+<span class="w">        </span><span class="sd">"""Covariance of the parameter estimates."""</span>
         <span class="n">adj</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_adjustment</span><span class="p">()</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_gls</span><span class="p">:</span>
             <span class="k">return</span> <span class="n">cast</span><span class="p">(</span><span class="s2">"ndarray"</span><span class="p">,</span> <span class="n">adj</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">_gls_cov</span><span class="p">())</span>
@@ -690,7 +701,7 @@
 
     <span class="nd">@property</span>
     <span class="k">def</span><span class="w"> </span><span class="nf">cov_config</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">AttrDict</span><span class="p">:</span>
-<span class="w">        </span><span class="sd">"""Optional configuration information used in covariance"""</span>
+<span class="w">        </span><span class="sd">"""Configuration of the covariance estimator."""</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_cov_config</span></div>
 
 
@@ -699,23 +710,30 @@
 <a class="viewcode-back" href="../../../system/system/linearmodels.system.covariance.HeteroskedasticCovariance.html#linearmodels.system.covariance.HeteroskedasticCovariance">[docs]</a>
 <span class="k">class</span><span class="w"> </span><span class="nc">HeteroskedasticCovariance</span><span class="p">(</span><span class="n">HomoskedasticCovariance</span><span class="p">):</span>
 <span class="w">    </span><span class="sa">r</span><span class="sd">"""</span>
-<span class="sd">    Heteroskedastic covariance estimation for system regression</span>
+<span class="sd">    Heteroskedastic covariance estimation for system regression.</span>
 
 <span class="sd">    Parameters</span>
 <span class="sd">    ----------</span>
-<span class="sd">    x : list[ndarray]</span>
-<span class="sd">        ndependent element list of regressor</span>
+<span class="sd">    x : list of ndarray</span>
+<span class="sd">        Regressors of each equation, with shape (nobs, k_i) for equation i.</span>
 <span class="sd">    eps : ndarray</span>
-<span class="sd">        Model residuals, ndependent by nobs</span>
+<span class="sd">        Model residuals, with shape (nobs, neq).</span>
 <span class="sd">    sigma : ndarray</span>
-<span class="sd">        Covariance matrix estimator of eps</span>
-<span class="sd">    gls : bool</span>
-<span class="sd">        Flag indicating to compute the GLS covariance estimator.  If False,</span>
-<span class="sd">        assume OLS was used</span>
-<span class="sd">    debiased : bool</span>
-<span class="sd">        Flag indicating to apply a small sample adjustment</span>
-<span class="sd">    constraints : {None, LinearConstraint}</span>
-<span class="sd">        Constraints used in estimation, if any</span>
+<span class="sd">        Covariance of the residuals of the equations that is used to weight the</span>
+<span class="sd">        equations if ``gls`` is True, with shape (neq, neq).</span>
+<span class="sd">    full_sigma : ndarray</span>
+<span class="sd">        Covariance of the residuals of the equations at the final estimates, with</span>
+<span class="sd">        shape (neq, neq). It differs from ``sigma`` if the weights are not the</span>
+<span class="sd">        covariance of the final residuals, e.g., if the model was given ``sigma``</span>
+<span class="sd">        or did not iterate. It is used to estimate the covariance of the scores</span>
+<span class="sd">        if ``gls`` is True.</span>
+<span class="sd">    gls : bool, optional</span>
+<span class="sd">        Flag indicating to compute the GLS covariance estimator. If False, assume</span>
+<span class="sd">        OLS was used. The default is False.</span>
+<span class="sd">    debiased : bool, optional</span>
+<span class="sd">        Flag indicating to apply a small sample adjustment. The default is False.</span>
+<span class="sd">    constraints : LinearConstraint, optional</span>
+<span class="sd">        Constraints used in estimation. The default is no constraints.</span>
 
 <span class="sd">    Notes</span>
 <span class="sd">    -----</span>
@@ -836,35 +854,54 @@
 <a class="viewcode-back" href="../../../system/system/linearmodels.system.covariance.KernelCovariance.html#linearmodels.system.covariance.KernelCovariance">[docs]</a>
 <span class="k">class</span><span class="w"> </span><span class="nc">KernelCovariance</span><span class="p">(</span><span class="n">HeteroskedasticCovariance</span><span class="p">,</span> <span class="n">_HACMixin</span><span class="p">):</span>
 <span class="w">    </span><span class="sa">r</span><span class="sd">"""</span>
-<span class="sd">    Kernel (HAC) covariance estimation for system regression</span>
+<span class="sd">    Kernel (HAC) covariance estimation for system regression.</span>
 
 <span class="sd">    Parameters</span>
 <span class="sd">    ----------</span>
-<span class="sd">    x : list[ndarray]</span>
-<span class="sd">        ndependent element list of regressor</span>
+<span class="sd">    x : list of ndarray</span>
+<span class="sd">        Regressors of each equation, with shape (nobs, k_i) for equation i.</span>
 <span class="sd">    eps : ndarray</span>
-<span class="sd">        Model residuals, ndependent by nobs</span>
+<span class="sd">        Model residuals, with shape (nobs, neq).</span>
 <span class="sd">    sigma : ndarray</span>
-<span class="sd">        Covariance matrix estimator of eps</span>
-<span class="sd">    gls : bool</span>
-<span class="sd">        Flag indicating to compute the GLS covariance estimator.  If False,</span>
-<span class="sd">        assume OLS was used</span>
-<span class="sd">    debiased : bool</span>
-<span class="sd">        Flag indicating to apply a small sample adjustment</span>
-<span class="sd">    kernel : str</span>
-<span class="sd">        Name of kernel to use.  Supported kernels include:</span>
+<span class="sd">        Covariance of the residuals of the equations that is used to weight the</span>
+<span class="sd">        equations if ``gls`` is True, with shape (neq, neq).</span>
+<span class="sd">    full_sigma : ndarray</span>
+<span class="sd">        Covariance of the residuals of the equations at the final estimates, with</span>
+<span class="sd">        shape (neq, neq). It differs from ``sigma`` if the weights are not the</span>
+<span class="sd">        covariance of the final residuals, e.g., if the model was given ``sigma``</span>
+<span class="sd">        or did not iterate. It is used to estimate the covariance of the scores</span>
+<span class="sd">        if ``gls`` is True.</span>
+<span class="sd">    gls : bool, optional</span>
+<span class="sd">        Flag indicating to compute the GLS covariance estimator. If False, assume</span>
+<span class="sd">        OLS was used. The default is False.</span>
+<span class="sd">    debiased : bool, optional</span>
+<span class="sd">        Flag indicating to apply a small sample adjustment. The default is False.</span>
+<span class="sd">    constraints : LinearConstraint, optional</span>
+<span class="sd">        Constraints used in estimation. The default is no constraints.</span>
+<span class="sd">    kernel : str, optional</span>
+<span class="sd">        Name of kernel to use. The name is not case sensitive. The default is</span>
+<span class="sd">        "bartlett". Supported kernels are:</span>
 
 <span class="sd">        * "bartlett", "newey-west" : Bartlett's kernel</span>
 <span class="sd">        * "parzen", "gallant" : Parzen's kernel</span>
 <span class="sd">        * "qs", "quadratic-spectral", "andrews" : Quadratic spectral kernel</span>
 
-<span class="sd">    bandwidth : float</span>
-<span class="sd">        Bandwidth to use for the kernel.  If not provided the optimal</span>
+<span class="sd">    bandwidth : float, optional</span>
+<span class="sd">        Non-negative bandwidth to use for the kernel. If not provided, the optimal</span>
 <span class="sd">        bandwidth will be estimated. It needs at least 4 observations with the</span>
 <span class="sd">        Bartlett kernel, 5 with the Parzen kernel and 6 with the quadratic</span>
 <span class="sd">        spectral kernel, and a ``ValueError`` is raised for fewer when the</span>
 <span class="sd">        covariance is first used. See</span>
 <span class="sd">        :func:`~linearmodels.iv.covariance.kernel_optimal_bandwidth`.</span>
+
+<span class="sd">    See Also</span>
+<span class="sd">    --------</span>
+<span class="sd">    linearmodels.iv.covariance.kernel_weight_bartlett</span>
+<span class="sd">        Weights of the Bartlett kernel.</span>
+<span class="sd">    linearmodels.iv.covariance.kernel_weight_parzen</span>
+<span class="sd">        Weights of the Parzen kernel.</span>
+<span class="sd">    linearmodels.iv.covariance.kernel_weight_quadratic_spectral</span>
+<span class="sd">        Weights of the quadratic spectral kernel.</span>
 
 <span class="sd">    Notes</span>
 <span class="sd">    -----</span>
@@ -894,12 +931,6 @@
 <span class="sd">       ``OverflowError``) or "cannot convert float NaN to integer" for some</span>
 <span class="sd">       data, and used a bandwidth of nobs - 1, or another bandwidth, for other</span>
 <span class="sd">       data.</span>
-
-<span class="sd">    See Also</span>
-<span class="sd">    --------</span>
-<span class="sd">    linearmodels.iv.covariance.kernel_weight_bartlett,</span>
-<span class="sd">    linearmodels.iv.covariance.kernel_weight_parzen,</span>
-<span class="sd">    linearmodels.iv.covariance.kernel_weight_quadratic_spectral</span>
 <span class="sd">    """</span>
 
     <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span>
@@ -937,7 +968,7 @@
 
     <span class="nd">@property</span>
     <span class="k">def</span><span class="w"> </span><span class="nf">cov_config</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">AttrDict</span><span class="p">:</span>
-<span class="w">        </span><span class="sd">"""Optional configuration information used in covariance"""</span>
+<span class="w">        </span><span class="sd">"""Configuration of the covariance estimator."""</span>
         <span class="n">out</span> <span class="o">=</span> <span class="n">AttrDict</span><span class="p">([(</span><span class="n">k</span><span class="p">,</span> <span class="n">v</span><span class="p">)</span> <span class="k">for</span> <span class="n">k</span><span class="p">,</span> <span class="n">v</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_cov_config</span><span class="o">.</span><span class="n">items</span><span class="p">()])</span>
         <span class="n">out</span><span class="p">[</span><span class="s2">"bandwidth"</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">bandwidth</span>
         <span class="k">return</span> <span class="n">out</span></div>
@@ -948,28 +979,44 @@
 <a class="viewcode-back" href="../../../system/system/linearmodels.system.covariance.ClusteredCovariance.html#linearmodels.system.covariance.ClusteredCovariance">[docs]</a>
 <span class="k">class</span><span class="w"> </span><span class="nc">ClusteredCovariance</span><span class="p">(</span><span class="n">HeteroskedasticCovariance</span><span class="p">):</span>
 <span class="w">    </span><span class="sa">r</span><span class="sd">"""</span>
-<span class="sd">    Heteroskedastic covariance estimation for system regression</span>
+<span class="sd">    Clustered covariance estimation for system regression.</span>
 
 <span class="sd">    Parameters</span>
 <span class="sd">    ----------</span>
-<span class="sd">    x : list[ndarray]</span>
-<span class="sd">        ndependent element list of regressor</span>
+<span class="sd">    x : list of ndarray</span>
+<span class="sd">        Regressors of each equation, with shape (nobs, k_i) for equation i.</span>
 <span class="sd">    eps : ndarray</span>
-<span class="sd">        Model residuals, ndependent by nobs</span>
+<span class="sd">        Model residuals, with shape (nobs, neq).</span>
 <span class="sd">    sigma : ndarray</span>
-<span class="sd">        Covariance matrix estimator of eps</span>
-<span class="sd">    gls : bool</span>
-<span class="sd">        Flag indicating to compute the GLS covariance estimator.  If False,</span>
-<span class="sd">        assume OLS was used</span>
-<span class="sd">    debiased : bool</span>
-<span class="sd">        Flag indicating to apply a small sample adjustment</span>
-<span class="sd">    constraints : {None, LinearConstraint}</span>
-<span class="sd">        Constraints used in estimation, if any</span>
-<span class="sd">    clusters : array_like</span>
-<span class="sd">        Optional array of cluster id.  Must be integer valued, and have shape</span>
-<span class="sd">        (nobs, ncluster) where ncluster is 1 or 2.</span>
-<span class="sd">    group_debias : bool</span>
-<span class="sd">        Flag indicating whether to debias by the number of groups.</span>
+<span class="sd">        Covariance of the residuals of the equations that is used to weight the</span>
+<span class="sd">        equations if ``gls`` is True, with shape (neq, neq).</span>
+<span class="sd">    full_sigma : ndarray</span>
+<span class="sd">        Covariance of the residuals of the equations at the final estimates, with</span>
+<span class="sd">        shape (neq, neq). It differs from ``sigma`` if the weights are not the</span>
+<span class="sd">        covariance of the final residuals, e.g., if the model was given ``sigma``</span>
+<span class="sd">        or did not iterate. It is used to estimate the covariance of the scores</span>
+<span class="sd">        if ``gls`` is True.</span>
+<span class="sd">    gls : bool, optional</span>
+<span class="sd">        Flag indicating to compute the GLS covariance estimator. If False, assume</span>
+<span class="sd">        OLS was used. The default is False.</span>
+<span class="sd">    debiased : bool, optional</span>
+<span class="sd">        Flag indicating to apply a small sample adjustment. The default is False.</span>
+<span class="sd">    constraints : LinearConstraint, optional</span>
+<span class="sd">        Constraints used in estimation. The default is no constraints.</span>
+<span class="sd">    clusters : array_like, optional</span>
+<span class="sd">        Array of cluster ids. It must be integer valued, and have shape (nobs,) or</span>
+<span class="sd">        (nobs, ncluster) where ncluster is 1 or 2. The default is no clusters,</span>
+<span class="sd">        which gives the heteroskedasticity robust covariance.</span>
+<span class="sd">    group_debias : bool, optional</span>
+<span class="sd">        Flag indicating whether to debias by the number of groups. The default is</span>
+<span class="sd">        False.</span>
+
+<span class="sd">    See Also</span>
+<span class="sd">    --------</span>
+<span class="sd">    linearmodels.shared.covariance.cov_cluster</span>
+<span class="sd">        Core cluster covariance estimator.</span>
+<span class="sd">    linearmodels.shared.covariance.group_debias_coefficient</span>
+<span class="sd">        Scale that debiases a covariance by the number of groups.</span>
 
 <span class="sd">    Notes</span>
 <span class="sd">    -----</span>
@@ -992,11 +1039,6 @@
 
 <span class="sd">    where :math:`\hat{S}` is a clustered estimator of the covariance of the</span>
 <span class="sd">    model scores.</span>
-
-<span class="sd">    See Also</span>
-<span class="sd">    --------</span>
-<span class="sd">    linearmodels.shared.covariance.cov_cluster</span>
-<span class="sd">    linearmodels.shared.covariance.group_debias_coefficient</span>
 <span class="sd">    """</span>
 
     <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span>
@@ -1033,7 +1075,7 @@
     <span class="k">def</span><span class="w"> </span><span class="nf">_check_clusters</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span> <span class="n">clusters</span><span class="p">:</span> <span class="n">linearmodels</span><span class="o">.</span><span class="n">typing</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">IntArray</span> <span class="o">|</span> <span class="kc">None</span>
     <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">linearmodels</span><span class="o">.</span><span class="n">typing</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">IntArray</span><span class="p">:</span>
-<span class="w">        </span><span class="sd">"""Check cluster dimension and ensure ndarray"""</span>
+<span class="w">        </span><span class="sd">"""Check cluster dimension and ensure ndarray."""</span>
         <span class="k">if</span> <span class="n">clusters</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
             <span class="k">return</span> <span class="n">empty</span><span class="p">((</span><span class="bp">self</span><span class="o">.</span><span class="n">_eps</span><span class="o">.</span><span class="n">size</span><span class="p">,</span> <span class="mi">0</span><span class="p">),</span> <span class="n">dtype</span><span class="o">=</span><span class="nb">int</span><span class="p">)</span>
         <span class="n">_clusters</span> <span class="o">=</span> <span class="n">as_ndarray</span><span class="p">(</span><span class="n">clusters</span><span class="p">,</span> <span class="s2">"clusters"</span><span class="p">)</span>
@@ -1085,7 +1127,7 @@
 
     <span class="nd">@property</span>
     <span class="k">def</span><span class="w"> </span><span class="nf">cov_config</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">AttrDict</span><span class="p">:</span>
-<span class="w">        </span><span class="sd">"""Optional configuration information used in covariance"""</span>
+<span class="w">        </span><span class="sd">"""Configuration of the covariance estimator."""</span>
         <span class="n">out</span> <span class="o">=</span> <span class="n">AttrDict</span><span class="p">([(</span><span class="n">k</span><span class="p">,</span> <span class="n">v</span><span class="p">)</span> <span class="k">for</span> <span class="n">k</span><span class="p">,</span> <span class="n">v</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_cov_config</span><span class="o">.</span><span class="n">items</span><span class="p">()])</span>
         <span class="n">out</span><span class="p">[</span><span class="s2">"clusters"</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_clusters</span>
         <span class="n">out</span><span class="p">[</span><span class="s2">"group_debias"</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_group_debias</span>
@@ -1097,23 +1139,27 @@
 <a class="viewcode-back" href="../../../system/system/linearmodels.system.covariance.GMMHomoskedasticCovariance.html#linearmodels.system.covariance.GMMHomoskedasticCovariance">[docs]</a>
 <span class="k">class</span><span class="w"> </span><span class="nc">GMMHomoskedasticCovariance</span><span class="p">:</span>
 <span class="w">    </span><span class="sa">r</span><span class="sd">"""</span>
-<span class="sd">    Covariance estimator for IV system estimation with homoskedastic data</span>
+<span class="sd">    Covariance estimator for IV system estimation with homoskedastic data.</span>
 
 <span class="sd">    Parameters</span>
 <span class="sd">    ----------</span>
-<span class="sd">    x : list[ndarray]</span>
-<span class="sd">        List containing the model regressors for each equation in the system</span>
-<span class="sd">    z : list[ndarray]</span>
-<span class="sd">        List containing the model instruments for each equation in the system</span>
+<span class="sd">    x : list of ndarray</span>
+<span class="sd">        Regressors of each equation, with shape (nobs, k_i) for equation i.</span>
+<span class="sd">    z : list of ndarray</span>
+<span class="sd">        Instruments of each equation, with shape (nobs, nz_i) for equation i.</span>
 <span class="sd">    eps : ndarray</span>
-<span class="sd">        nobs by neq array of residuals where each column corresponds an</span>
-<span class="sd">        equation in the system</span>
+<span class="sd">        Residuals with shape (nobs, neq), where each column corresponds to an</span>
+<span class="sd">        equation in the system.</span>
 <span class="sd">    w : ndarray</span>
-<span class="sd">        Weighting matrix used in estimation</span>
-<span class="sd">    sigma : ndarray</span>
-<span class="sd">        Residual covariance used in estimation</span>
-<span class="sd">    constraints : {None, LinearConstraint}</span>
-<span class="sd">        Constraints used in estimation, if any</span>
+<span class="sd">        Weighting matrix used in estimation, with shape (nmoments, nmoments).</span>
+<span class="sd">    sigma : ndarray, optional</span>
+<span class="sd">        Residual covariance used in estimation, with shape (neq, neq). It is</span>
+<span class="sd">        required by ``GMMHomoskedasticCovariance``, which uses it to estimate the</span>
+<span class="sd">        covariance of the moment conditions. The other estimators ignore it.</span>
+<span class="sd">    debiased : bool, optional</span>
+<span class="sd">        Flag indicating to apply a small sample adjustment. The default is False.</span>
+<span class="sd">    constraints : LinearConstraint, optional</span>
+<span class="sd">        Constraints used in estimation. The default is no constraints.</span>
 
 <span class="sd">    Notes</span>
 <span class="sd">    -----</span>
@@ -1158,7 +1204,7 @@
 
     <span class="nd">@property</span>
     <span class="k">def</span><span class="w"> </span><span class="nf">cov</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">linearmodels</span><span class="o">.</span><span class="n">typing</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">Float64Array</span><span class="p">:</span>
-<span class="w">        </span><span class="sd">"""Parameter covariance"""</span>
+<span class="w">        </span><span class="sd">"""Covariance of the parameter estimates."""</span>
         <span class="n">x</span><span class="p">,</span> <span class="n">z</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_x</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_z</span>
         <span class="n">k</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">x</span><span class="p">)</span>
         <span class="n">nobs</span> <span class="o">=</span> <span class="n">x</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
@@ -1212,7 +1258,7 @@
 
     <span class="nd">@property</span>
     <span class="k">def</span><span class="w"> </span><span class="nf">cov_config</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">AttrDict</span><span class="p">:</span>
-<span class="w">        </span><span class="sd">"""Optional configuration information used in covariance"""</span>
+<span class="w">        </span><span class="sd">"""Configuration of the covariance estimator."""</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_cov_config</span></div>
 
 
@@ -1221,23 +1267,27 @@
 <a class="viewcode-back" href="../../../system/system/linearmodels.system.covariance.GMMHeteroskedasticCovariance.html#linearmodels.system.covariance.GMMHeteroskedasticCovariance">[docs]</a>
 <span class="k">class</span><span class="w"> </span><span class="nc">GMMHeteroskedasticCovariance</span><span class="p">(</span><span class="n">GMMHomoskedasticCovariance</span><span class="p">):</span>
 <span class="w">    </span><span class="sa">r</span><span class="sd">"""</span>
-<span class="sd">    Covariance estimator for IV system estimation with homoskedastic data</span>
+<span class="sd">    Covariance estimator for IV system estimation with heteroskedastic data.</span>
 
 <span class="sd">    Parameters</span>
 <span class="sd">    ----------</span>
-<span class="sd">    x : list[ndarray]</span>
-<span class="sd">        List containing the model regressors for each equation in the system</span>
-<span class="sd">    z : list[ndarray]</span>
-<span class="sd">        List containing the model instruments for each equation in the system</span>
+<span class="sd">    x : list of ndarray</span>
+<span class="sd">        Regressors of each equation, with shape (nobs, k_i) for equation i.</span>
+<span class="sd">    z : list of ndarray</span>
+<span class="sd">        Instruments of each equation, with shape (nobs, nz_i) for equation i.</span>
 <span class="sd">    eps : ndarray</span>
-<span class="sd">        nobs by neq array of residuals where each column corresponds an</span>
-<span class="sd">        equation in the system</span>
+<span class="sd">        Residuals with shape (nobs, neq), where each column corresponds to an</span>
+<span class="sd">        equation in the system.</span>
 <span class="sd">    w : ndarray</span>
-<span class="sd">        Weighting matrix used in estimation</span>
-<span class="sd">    sigma : ndarray</span>
-<span class="sd">        Residual covariance used in estimation</span>
-<span class="sd">    constraints : {None, LinearConstraint}</span>
-<span class="sd">        Constraints used in estimation, if any</span>
+<span class="sd">        Weighting matrix used in estimation, with shape (nmoments, nmoments).</span>
+<span class="sd">    sigma : ndarray, optional</span>
+<span class="sd">        Residual covariance used in estimation, with shape (neq, neq). It is</span>
+<span class="sd">        required by ``GMMHomoskedasticCovariance``, which uses it to estimate the</span>
+<span class="sd">        covariance of the moment conditions. The other estimators ignore it.</span>
+<span class="sd">    debiased : bool, optional</span>
+<span class="sd">        Flag indicating to apply a small sample adjustment. The default is False.</span>
+<span class="sd">    constraints : LinearConstraint, optional</span>
+<span class="sd">        Constraints used in estimation. The default is no constraints.</span>
 
 <span class="sd">    Notes</span>
 <span class="sd">    -----</span>
@@ -1290,32 +1340,37 @@
 <a class="viewcode-back" href="../../../system/system/linearmodels.system.covariance.GMMKernelCovariance.html#linearmodels.system.covariance.GMMKernelCovariance">[docs]</a>
 <span class="k">class</span><span class="w"> </span><span class="nc">GMMKernelCovariance</span><span class="p">(</span><span class="n">GMMHeteroskedasticCovariance</span><span class="p">,</span> <span class="n">_HACMixin</span><span class="p">):</span>
 <span class="w">    </span><span class="sa">r</span><span class="sd">"""</span>
-<span class="sd">    Covariance estimator for IV system estimation with homoskedastic data</span>
+<span class="sd">    Kernel (HAC) covariance estimator for IV system estimation.</span>
 
 <span class="sd">    Parameters</span>
 <span class="sd">    ----------</span>
-<span class="sd">    x : list[ndarray]</span>
-<span class="sd">        List containing the model regressors for each equation in the system</span>
-<span class="sd">    z : list[ndarray]</span>
-<span class="sd">        List containing the model instruments for each equation in the system</span>
+<span class="sd">    x : list of ndarray</span>
+<span class="sd">        Regressors of each equation, with shape (nobs, k_i) for equation i.</span>
+<span class="sd">    z : list of ndarray</span>
+<span class="sd">        Instruments of each equation, with shape (nobs, nz_i) for equation i.</span>
 <span class="sd">    eps : ndarray</span>
-<span class="sd">        nobs by neq array of residuals where each column corresponds an</span>
-<span class="sd">        equation in the system</span>
+<span class="sd">        Residuals with shape (nobs, neq), where each column corresponds to an</span>
+<span class="sd">        equation in the system.</span>
 <span class="sd">    w : ndarray</span>
-<span class="sd">        Weighting matrix used in estimation</span>
-<span class="sd">    sigma : ndarray</span>
-<span class="sd">        Residual covariance used in estimation</span>
-<span class="sd">    constraints : {None, LinearConstraint}</span>
-<span class="sd">        Constraints used in estimation, if any</span>
-<span class="sd">    kernel : str</span>
-<span class="sd">        Name of kernel to use.  Supported kernels include:</span>
+<span class="sd">        Weighting matrix used in estimation, with shape (nmoments, nmoments).</span>
+<span class="sd">    sigma : ndarray, optional</span>
+<span class="sd">        Residual covariance used in estimation, with shape (neq, neq). It is</span>
+<span class="sd">        required by ``GMMHomoskedasticCovariance``, which uses it to estimate the</span>
+<span class="sd">        covariance of the moment conditions. The other estimators ignore it.</span>
+<span class="sd">    debiased : bool, optional</span>
+<span class="sd">        Flag indicating to apply a small sample adjustment. The default is False.</span>
+<span class="sd">    constraints : LinearConstraint, optional</span>
+<span class="sd">        Constraints used in estimation. The default is no constraints.</span>
+<span class="sd">    kernel : str, optional</span>
+<span class="sd">        Name of kernel to use. The name is not case sensitive. The default is</span>
+<span class="sd">        "bartlett". Supported kernels are:</span>
 
 <span class="sd">        * "bartlett", "newey-west" : Bartlett's kernel</span>
 <span class="sd">        * "parzen", "gallant" : Parzen's kernel</span>
 <span class="sd">        * "qs", "quadratic-spectral", "andrews" : Quadratic spectral kernel</span>
 
-<span class="sd">    bandwidth : float</span>
-<span class="sd">        Bandwidth to use for the kernel.  If not provided the optimal</span>
+<span class="sd">    bandwidth : float, optional</span>
+<span class="sd">        Non-negative bandwidth to use for the kernel. If not provided, the optimal</span>
 <span class="sd">        bandwidth will be estimated. It needs at least 4 observations with the</span>
 <span class="sd">        Bartlett kernel, 5 with the Parzen kernel and 6 with the quadratic</span>
 <span class="sd">        spectral kernel, and a ``ValueError`` is raised for fewer when the</span>
@@ -1369,7 +1424,7 @@
 
     <span class="nd">@property</span>
     <span class="k">def</span><span class="w"> </span><span class="nf">cov_config</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">AttrDict</span><span class="p">:</span>
-<span class="w">        </span><span class="sd">"""Optional configuration information used in covariance"""</span>
+<span class="w">        </span><span class="sd">"""Configuration of the covariance estimator."""</span>
         <span class="n">out</span> <span class="o">=</span> <span class="n">AttrDict</span><span class="p">([(</span><span class="n">k</span><span class="p">,</span> <span class="n">v</span><span class="p">)</span> <span class="k">for</span> <span class="n">k</span><span class="p">,</span> <span class="n">v</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_cov_config</span><span class="o">.</span><span class="n">items</span><span class="p">()])</span>
         <span class="n">out</span><span class="p">[</span><span class="s2">"bandwidth"</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">bandwidth</span>
         <span class="k">return</span> <span class="n">out</span></div>

@@ -23,7 +23,7 @@
     
   
       
-        <title>Introduction - linearmodels v7.1 (+518)</title>
+        <title>Introduction - linearmodels v7.1 (+525)</title>
       
     
 
@@ -100,7 +100,7 @@
 
 <header class="md-header md-header--shadow" data-md-component="header">
   <nav class="md-header__inner md-grid" aria-label="Header">
-    <a href="../index.html" title="linearmodels v7.1 (+518)" class="md-header__button md-logo" aria-label="linearmodels v7.1 (+518)" data-md-component="logo">
+    <a href="../index.html" title="linearmodels v7.1 (+525)" class="md-header__button md-logo" aria-label="linearmodels v7.1 (+525)" data-md-component="logo">
       <img src="../_static/bw-logo.svg" alt="logo">
     </a>
     <label class="md-header__button md-icon" for="__drawer">
@@ -111,7 +111,7 @@
       <div class="md-header__ellipsis">
         <div class="md-header__topic">
           <span class="md-ellipsis">
-            linearmodels v7.1 (+518)
+            linearmodels v7.1 (+525)
           </span>
         </div>
         <div class="md-header__topic" data-md-component="header-topic">
@@ -206,10 +206,10 @@
 
 <nav class="md-nav md-nav--primary" aria-label="Navigation" data-md-level="0">
   <label class="md-nav__title" for="__drawer">
-    <a href="../index.html" title="linearmodels v7.1 (+518)" class="md-nav__button md-logo" aria-label="linearmodels v7.1 (+518)" data-md-component="logo">
+    <a href="../index.html" title="linearmodels v7.1 (+525)" class="md-nav__button md-logo" aria-label="linearmodels v7.1 (+525)" data-md-component="logo">
       <img src="../_static/bw-logo.svg" alt="logo">
     </a>
-    linearmodels v7.1 (+518)
+    linearmodels v7.1 (+525)
   </label>
   
     <div class="md-nav__source">
@@ -757,15 +757,15 @@
 <h1 id="introduction">Introduction<a class="headerlink" href="#introduction" title="Link to this heading">¶</a></h1>
 <p>There are three estimators for linear factor asset pricing models:</p>
 <ul class="simple">
-<li><p><a class="reference internal" href="asset-pricing/linearmodels.asset_pricing.model.TradedFactorModel.html#linearmodels.asset_pricing.model.TradedFactorModel" title="linearmodels.asset_pricing.model.TradedFactorModel (Python class) — Linear factor models estimator applicable to traded factors"><code class="xref py py-class docutils literal notranslate"><span class="pre">TradedFactorModel</span></code></a> implements
+<li><p><a class="reference internal" href="asset-pricing/linearmodels.asset_pricing.model.TradedFactorModel.html#linearmodels.asset_pricing.model.TradedFactorModel" title="linearmodels.asset_pricing.model.TradedFactorModel (Python class) — Linear factor models estimator applicable to traded factors."><code class="xref py py-class docutils literal notranslate"><span class="pre">TradedFactorModel</span></code></a> implements
 an estimator which is appropriate when all factors are traded assets. When
 this is the case, the model can be estimated using regressions as a SUR.</p></li>
-<li><p><a class="reference internal" href="asset-pricing/linearmodels.asset_pricing.model.LinearFactorModel.html#linearmodels.asset_pricing.model.LinearFactorModel" title="linearmodels.asset_pricing.model.LinearFactorModel (Python class) — Linear factor model estimator"><code class="xref py py-class docutils literal notranslate"><span class="pre">LinearFactorModel</span></code></a> implements
+<li><p><a class="reference internal" href="asset-pricing/linearmodels.asset_pricing.model.LinearFactorModel.html#linearmodels.asset_pricing.model.LinearFactorModel" title="linearmodels.asset_pricing.model.LinearFactorModel (Python class) — Linear factor model estimator."><code class="xref py py-class docutils literal notranslate"><span class="pre">LinearFactorModel</span></code></a> implements
 a general purpose estimator based on the 2-step strategy where the first
 step estimated the factor loadings and the second step estimates the risk
 premia using the estimates from the first step.  This model is appropriate
 for both traded and non-traded factors.</p></li>
-<li><p><a class="reference internal" href="asset-pricing/linearmodels.asset_pricing.model.LinearFactorModelGMM.html#linearmodels.asset_pricing.model.LinearFactorModelGMM" title="linearmodels.asset_pricing.model.LinearFactorModelGMM (Python class) — GMM estimator of Linear factor models"><code class="xref py py-class docutils literal notranslate"><span class="pre">LinearFactorModelGMM</span></code></a> implements
+<li><p><a class="reference internal" href="asset-pricing/linearmodels.asset_pricing.model.LinearFactorModelGMM.html#linearmodels.asset_pricing.model.LinearFactorModelGMM" title="linearmodels.asset_pricing.model.LinearFactorModelGMM (Python class) — GMM estimator of Linear factor models."><code class="xref py py-class docutils literal notranslate"><span class="pre">LinearFactorModelGMM</span></code></a> implements
 a version of the 2-step model using GMM.  The GMM estimator is relatively
 efficient and so should be preferred. The continuously updating version can
 is available using an options when fitting the model (<code class="docutils literal notranslate"><span class="pre">use_cue=True</span></code>).</p></li>

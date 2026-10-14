@@ -19,7 +19,7 @@
     
   
       
-        <title>linearmodels.system.gmm - linearmodels v7.1 (+518)</title>
+        <title>linearmodels.system.gmm - linearmodels v7.1 (+525)</title>
       
     
 
@@ -91,7 +91,7 @@
 
 <header class="md-header md-header--shadow" data-md-component="header">
   <nav class="md-header__inner md-grid" aria-label="Header">
-    <a href="../../../index.html" title="linearmodels v7.1 (+518)" class="md-header__button md-logo" aria-label="linearmodels v7.1 (+518)" data-md-component="logo">
+    <a href="../../../index.html" title="linearmodels v7.1 (+525)" class="md-header__button md-logo" aria-label="linearmodels v7.1 (+525)" data-md-component="logo">
       <img src="../../../_static/bw-logo.svg" alt="logo">
     </a>
     <label class="md-header__button md-icon" for="__drawer">
@@ -102,7 +102,7 @@
       <div class="md-header__ellipsis">
         <div class="md-header__topic">
           <span class="md-ellipsis">
-            linearmodels v7.1 (+518)
+            linearmodels v7.1 (+525)
           </span>
         </div>
         <div class="md-header__topic" data-md-component="header-topic">
@@ -197,10 +197,10 @@
 
 <nav class="md-nav md-nav--primary" aria-label="Navigation" data-md-level="0">
   <label class="md-nav__title" for="__drawer">
-    <a href="../../../index.html" title="linearmodels v7.1 (+518)" class="md-nav__button md-logo" aria-label="linearmodels v7.1 (+518)" data-md-component="logo">
+    <a href="../../../index.html" title="linearmodels v7.1 (+525)" class="md-nav__button md-logo" aria-label="linearmodels v7.1 (+525)" data-md-component="logo">
       <img src="../../../_static/bw-logo.svg" alt="logo">
     </a>
-    linearmodels v7.1 (+518)
+    linearmodels v7.1 (+525)
   </label>
   
     <div class="md-nav__source">
@@ -528,7 +528,7 @@
 
 <h1>Source code for linearmodels.system.gmm</h1><div class="highlight"><pre>
 <span></span><code><span class="sd">"""</span>
-<span class="sd">Covariance and weight estimation for GMM IV estimators</span>
+<span class="sd">Covariance and weight estimation for GMM IV estimators.</span>
 <span class="sd">"""</span>
 
 <span class="kn">from</span><span class="w"> </span><span class="nn">__future__</span><span class="w"> </span><span class="kn">import</span> <span class="n">annotations</span>
@@ -550,15 +550,16 @@
 <a class="viewcode-back" href="../../../system/system/linearmodels.system.gmm.HomoskedasticWeightMatrix.html#linearmodels.system.gmm.HomoskedasticWeightMatrix">[docs]</a>
 <span class="k">class</span><span class="w"> </span><span class="nc">HomoskedasticWeightMatrix</span><span class="p">:</span>
 <span class="w">    </span><span class="sa">r</span><span class="sd">"""</span>
-<span class="sd">    Homoskedastic (unadjusted) weight estimation</span>
+<span class="sd">    Homoskedastic (unadjusted) weight estimation.</span>
 
 <span class="sd">    Parameters</span>
 <span class="sd">    ----------</span>
-<span class="sd">    center : bool</span>
+<span class="sd">    center : bool, optional</span>
 <span class="sd">        Flag indicating whether to center the moment conditions by subtracting</span>
-<span class="sd">        the mean before computing the weight matrix.</span>
-<span class="sd">    debiased : bool</span>
-<span class="sd">        Flag indicating whether to use small-sample adjustments</span>
+<span class="sd">        the mean before computing the weight matrix. The default is False.</span>
+<span class="sd">    debiased : bool, optional</span>
+<span class="sd">        Flag indicating whether to use small-sample adjustments. The default is</span>
+<span class="sd">        False.</span>
 
 <span class="sd">    Notes</span>
 <span class="sd">    -----</span>
@@ -611,9 +612,10 @@
 <span class="sd">        Parameters</span>
 <span class="sd">        ----------</span>
 <span class="sd">        eps : ndarray</span>
-<span class="sd">            The residuals from the system of equations.</span>
-<span class="sd">        x : list[ndarray]</span>
-<span class="sd">            A list of the regressor matrices for each equation in the system.</span>
+<span class="sd">            The residuals from the system of equations, with shape (nobs, neq).</span>
+<span class="sd">        x : sequence of ndarray</span>
+<span class="sd">            The regressors of each equation in the system, with shape</span>
+<span class="sd">            (nobs, k_i) for equation i.</span>
 
 <span class="sd">        Returns</span>
 <span class="sd">        -------</span>
@@ -648,19 +650,23 @@
 
 <span class="sd">        Parameters</span>
 <span class="sd">        ----------</span>
-<span class="sd">        x : list[ndarray]</span>
-<span class="sd">            List of containing model regressors for each equation in the system</span>
-<span class="sd">        z : list[ndarray]</span>
-<span class="sd">            List of containing instruments for each equation in the system</span>
+<span class="sd">        x : sequence of ndarray</span>
+<span class="sd">            The regressors of each equation in the system, with shape</span>
+<span class="sd">            (nobs, k_i) for equation i.</span>
+<span class="sd">        z : sequence of ndarray</span>
+<span class="sd">            The instruments of each equation in the system, with shape</span>
+<span class="sd">            (nobs, nz_i) for equation i.</span>
 <span class="sd">        eps : ndarray</span>
-<span class="sd">            Model errors (nobs by neqn)</span>
+<span class="sd">            Model errors, with shape (nobs, neqn). They are not used by this</span>
+<span class="sd">            estimator, which uses ``sigma``.</span>
 <span class="sd">        sigma : ndarray</span>
-<span class="sd">            Fixed covariance of model errors. If None, estimated from eps.</span>
+<span class="sd">            Covariance of the model errors, with shape (neqn, neqn).</span>
 
 <span class="sd">        Returns</span>
 <span class="sd">        -------</span>
 <span class="sd">        ndarray</span>
-<span class="sd">            Covariance of GMM moment conditions.</span>
+<span class="sd">            Weight matrix, which is the covariance of the GMM moment conditions</span>
+<span class="sd">            with shape (nmoments, nmoments).</span>
 <span class="sd">        """</span>
         <span class="n">nobs</span> <span class="o">=</span> <span class="n">z</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
         <span class="n">w</span> <span class="o">=</span> <span class="n">cast</span><span class="p">(</span><span class="s2">"ndarray"</span><span class="p">,</span> <span class="n">blocked_inner_prod</span><span class="p">(</span><span class="n">z</span><span class="p">,</span> <span class="n">sigma</span><span class="p">)</span> <span class="o">/</span> <span class="n">nobs</span><span class="p">)</span>
@@ -670,12 +676,12 @@
     <span class="nd">@property</span>
     <span class="k">def</span><span class="w"> </span><span class="nf">config</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">AttrDict</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">"""</span>
-<span class="sd">        Weight estimator configuration</span>
+<span class="sd">        Weight estimator configuration.</span>
 
 <span class="sd">        Returns</span>
 <span class="sd">        -------</span>
 <span class="sd">        AttrDict</span>
-<span class="sd">            Dictionary containing weight estimator configuration information</span>
+<span class="sd">            Dictionary containing weight estimator configuration information.</span>
 <span class="sd">        """</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_config</span></div>
 
@@ -685,15 +691,16 @@
 <a class="viewcode-back" href="../../../system/system/linearmodels.system.gmm.HeteroskedasticWeightMatrix.html#linearmodels.system.gmm.HeteroskedasticWeightMatrix">[docs]</a>
 <span class="k">class</span><span class="w"> </span><span class="nc">HeteroskedasticWeightMatrix</span><span class="p">(</span><span class="n">HomoskedasticWeightMatrix</span><span class="p">):</span>
 <span class="w">    </span><span class="sa">r</span><span class="sd">"""</span>
-<span class="sd">    Heteroskedasticity robust weight estimation</span>
+<span class="sd">    Heteroskedasticity robust weight estimation.</span>
 
 <span class="sd">    Parameters</span>
 <span class="sd">    ----------</span>
-<span class="sd">    center : bool</span>
+<span class="sd">    center : bool, optional</span>
 <span class="sd">        Flag indicating whether to center the moment conditions by subtracting</span>
-<span class="sd">        the mean before computing the weight matrix.</span>
-<span class="sd">    debiased : bool</span>
-<span class="sd">        Flag indicating whether to use small-sample adjustments</span>
+<span class="sd">        the mean before computing the weight matrix. The default is False.</span>
+<span class="sd">    debiased : bool, optional</span>
+<span class="sd">        Flag indicating whether to use small-sample adjustments. The default is</span>
+<span class="sd">        False.</span>
 
 <span class="sd">    Notes</span>
 <span class="sd">    -----</span>
@@ -730,19 +737,23 @@
 
 <span class="sd">        Parameters</span>
 <span class="sd">        ----------</span>
-<span class="sd">        x : list[ndarray]</span>
-<span class="sd">            Model regressors (exog and endog), (nobs by nvar)</span>
-<span class="sd">        z : list[ndarray]</span>
-<span class="sd">            Model instruments (exog and instruments), (nobs by ninstr)</span>
+<span class="sd">        x : sequence of ndarray</span>
+<span class="sd">            The regressors (exog and endog) of each equation in the system, with</span>
+<span class="sd">            shape (nobs, k_i) for equation i.</span>
+<span class="sd">        z : sequence of ndarray</span>
+<span class="sd">            The instruments (exog and instruments) of each equation in the</span>
+<span class="sd">            system, with shape (nobs, nz_i) for equation i.</span>
 <span class="sd">        eps : ndarray</span>
-<span class="sd">            Model errors (nobs by 1)</span>
-<span class="sd">        sigma : ndarray</span>
-<span class="sd">            Fixed covariance of model errors. If None, estimated from eps.</span>
+<span class="sd">            Model errors, with shape (nobs, neqn).</span>
+<span class="sd">        sigma : ndarray, optional</span>
+<span class="sd">            Not used by this estimator. It is accepted so that all the weight</span>
+<span class="sd">            matrix estimators have the same signature.</span>
 
 <span class="sd">        Returns</span>
 <span class="sd">        -------</span>
 <span class="sd">        ndarray</span>
-<span class="sd">            Covariance of GMM moment conditions.</span>
+<span class="sd">            Weight matrix, which is the covariance of the GMM moment conditions</span>
+<span class="sd">            with shape (nmoments, nmoments).</span>
 <span class="sd">        """</span>
         <span class="n">nobs</span> <span class="o">=</span> <span class="n">x</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
         <span class="n">k</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">x</span><span class="p">)</span>
@@ -784,25 +795,27 @@
 <a class="viewcode-back" href="../../../system/system/linearmodels.system.gmm.KernelWeightMatrix.html#linearmodels.system.gmm.KernelWeightMatrix">[docs]</a>
 <span class="k">class</span><span class="w"> </span><span class="nc">KernelWeightMatrix</span><span class="p">(</span><span class="n">HeteroskedasticWeightMatrix</span><span class="p">,</span> <span class="n">_HACMixin</span><span class="p">):</span>
 <span class="w">    </span><span class="sa">r</span><span class="sd">"""</span>
-<span class="sd">    Heteroskedasticity robust weight estimation</span>
+<span class="sd">    Heteroskedasticity and autocorrelation robust (HAC) weight estimation.</span>
 
 <span class="sd">    Parameters</span>
 <span class="sd">    ----------</span>
-<span class="sd">    center : bool</span>
+<span class="sd">    center : bool, optional</span>
 <span class="sd">        Flag indicating whether to center the moment conditions by subtracting</span>
-<span class="sd">        the mean before computing the weight matrix.</span>
-<span class="sd">    debiased : bool</span>
-<span class="sd">        Flag indicating whether to use small-sample adjustments</span>
-<span class="sd">    kernel : str</span>
-<span class="sd">        Name of kernel to use.  Supported kernels include:</span>
+<span class="sd">        the mean before computing the weight matrix. The default is False.</span>
+<span class="sd">    debiased : bool, optional</span>
+<span class="sd">        Flag indicating whether to use small-sample adjustments. The default is</span>
+<span class="sd">        False.</span>
+<span class="sd">    kernel : str, optional</span>
+<span class="sd">        Name of kernel to use. The name is not case sensitive. The default is</span>
+<span class="sd">        "bartlett". Supported kernels are:</span>
 
 <span class="sd">        * "bartlett", "newey-west" : Bartlett's kernel</span>
 <span class="sd">        * "parzen", "gallant" : Parzen's kernel</span>
 <span class="sd">        * "qs", "quadratic-spectral", "andrews" : Quadratic spectral kernel</span>
 
 <span class="sd">    bandwidth : float, optional</span>
-<span class="sd">        Bandwidth to use for the kernel. If not provided, the bandwidth is</span>
-<span class="sd">        selected by ``optimal_bw``.</span>
+<span class="sd">        Non-negative bandwidth to use for the kernel. If not provided, the</span>
+<span class="sd">        bandwidth is selected by ``optimal_bw``.</span>
 <span class="sd">    optimal_bw : bool, optional</span>
 <span class="sd">        Flag indicating whether to estimate the bandwidth from the data when</span>
 <span class="sd">        ``bandwidth`` is not provided. If False, nobs - 2 is used. If True, the</span>
@@ -819,7 +832,7 @@
 
 <span class="sd">    .. math::</span>
 
-<span class="sd">      W &amp; = \hat{\Gamma}_0+\sum_{i=1}^{n-1} w_i (\hat{\Gamma}_i+\hat{\Gamma}_i^\prime)</span>
+<span class="sd">      W &amp; = \hat{\Gamma}_0+\sum_{i=1}^{n-1} w_i (\hat{\Gamma}_i+\hat{\Gamma}_i^\prime) \\</span>
 <span class="sd">      \hat{\Gamma}_j &amp; = n^{-1}\sum_{i=1}^{n-j} g'_ig_{i+j} \\</span>
 <span class="sd">      g_i &amp; = (z_{1i}\epsilon_{1i},z_{2i}\epsilon_{2i},\ldots,z_{ki}\epsilon_{ki})</span>
 
@@ -886,19 +899,23 @@
 
 <span class="sd">        Parameters</span>
 <span class="sd">        ----------</span>
-<span class="sd">        x : list[ndarray]</span>
-<span class="sd">            Model regressors (exog and endog)</span>
-<span class="sd">        z : list[ndarray]</span>
-<span class="sd">            Model instruments (exog and instruments)</span>
+<span class="sd">        x : sequence of ndarray</span>
+<span class="sd">            The regressors (exog and endog) of each equation in the system, with</span>
+<span class="sd">            shape (nobs, k_i) for equation i.</span>
+<span class="sd">        z : sequence of ndarray</span>
+<span class="sd">            The instruments (exog and instruments) of each equation in the</span>
+<span class="sd">            system, with shape (nobs, nz_i) for equation i.</span>
 <span class="sd">        eps : ndarray</span>
-<span class="sd">            Model errors (nobs by nequation)</span>
-<span class="sd">        sigma : ndarray</span>
-<span class="sd">            Fixed covariance of model errors. If None, estimated from eps.</span>
+<span class="sd">            Model errors, with shape (nobs, neqn).</span>
+<span class="sd">        sigma : ndarray, optional</span>
+<span class="sd">            Not used by this estimator. It is accepted so that all the weight</span>
+<span class="sd">            matrix estimators have the same signature.</span>
 
 <span class="sd">        Returns</span>
 <span class="sd">        -------</span>
 <span class="sd">        ndarray</span>
-<span class="sd">            Covariance of GMM moment conditions.</span>
+<span class="sd">            Weight matrix, which is the covariance of the GMM moment conditions</span>
+<span class="sd">            with shape (nmoments, nmoments).</span>
 <span class="sd">        """</span>
         <span class="n">nobs</span> <span class="o">=</span> <span class="n">x</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
         <span class="n">k</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">x</span><span class="p">)</span>
@@ -923,7 +940,7 @@
     <span class="k">def</span><span class="w"> </span><span class="nf">_optimal_bandwidth</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span> <span class="n">moments</span><span class="p">:</span> <span class="n">linearmodels</span><span class="o">.</span><span class="n">typing</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">Float64Array</span>
     <span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">float</span><span class="p">:</span>
-<span class="w">        </span><span class="sd">"""Compute optimal bandwidth used in estimation if needed"""</span>
+<span class="w">        </span><span class="sd">"""Compute optimal bandwidth used in estimation if needed."""</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_predefined_bw</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
             <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_predefined_bw</span>
         <span class="k">elif</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">_optimal_bw</span><span class="p">:</span>
@@ -943,14 +960,14 @@
 
     <span class="nd">@property</span>
     <span class="k">def</span><span class="w"> </span><span class="nf">bandwidth</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">float</span><span class="p">:</span>
-<span class="w">        </span><span class="sd">"""Bandwidth used to estimate covariance of moment conditions"""</span>
+<span class="w">        </span><span class="sd">"""Bandwidth used to estimate covariance of moment conditions."""</span>
         <span class="k">assert</span> <span class="bp">self</span><span class="o">.</span><span class="n">_bandwidth</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_bandwidth</span>
 
     <span class="nd">@property</span>
     <span class="k">def</span><span class="w"> </span><span class="nf">config</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">AttrDict</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">"""</span>
-<span class="sd">        Weight estimator configuration</span>
+<span class="sd">        Weight estimator configuration.</span>
 
 <span class="sd">        Returns</span>
 <span class="sd">        -------</span>
