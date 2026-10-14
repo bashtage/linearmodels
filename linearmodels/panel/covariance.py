@@ -416,9 +416,13 @@ class DriscollKraay(HomoskedasticCovariance):
         adjusted for extra_df irrespective of the setting of debiased. The
         default is 0.
     kernel : str, optional
-        Name of the kernel, one of "bartlett",
-        "newey-west", "quadratic-spectral", "qs", "andrews", "parzen" or "gallant". If
-        not provided, uses the Newey-West kernel.
+        Name of the kernel. If not provided, "newey-west", which is the Bartlett
+        kernel, is used. The names are not case sensitive. Supported kernels are:
+
+        * "bartlett", "newey-west" - Bartlett's kernel
+        * "parzen", "gallant" - Parzen's kernel
+        * "qs", "quadratic-spectral", "andrews" - Quadratic spectral kernel
+
     bandwidth : float, optional
         Non-negative bandwidth to use. It must be below the number of time
         periods. The Bartlett and Parzen kernels use its integer part. If not
@@ -438,12 +442,6 @@ class DriscollKraay(HomoskedasticCovariance):
 
     Notes
     -----
-    Supported kernels:
-
-    * "bartlett", "newey-west" - Bartlett's kernel
-    * "quadratic-spectral", "qs", "andrews" - Quadratic-Spectral Kernel
-    * "parzen", "gallant" - Parzen kernel
-
     Bandwidth is set to the common value for the Bartlett kernel if not
     provided, :math:`\lfloor 4 (T / 100)^{2/9} \rfloor` where :math:`T` is the
     number of time periods.
@@ -600,9 +598,13 @@ class ACCovariance(HomoskedasticCovariance):
         adjusted for extra_df irrespective of the setting of debiased. The
         default is 0.
     kernel : str, optional
-        Name of the kernel, one of "bartlett",
-        "newey-west", "quadratic-spectral", "qs", "andrews", "parzen" or "gallant". If
-        not provided, uses the Newey-West kernel.
+        Name of the kernel. If not provided, "newey-west", which is the Bartlett
+        kernel, is used. The names are not case sensitive. Supported kernels are:
+
+        * "bartlett", "newey-west" - Bartlett's kernel
+        * "parzen", "gallant" - Parzen's kernel
+        * "qs", "quadratic-spectral", "andrews" - Quadratic spectral kernel
+
     bandwidth : float, optional
         Non-negative bandwidth to use. The Bartlett and Parzen kernels use its
         integer part. If not provided a rule-of-thumb value is used. It can be
@@ -621,12 +623,6 @@ class ACCovariance(HomoskedasticCovariance):
     Notes
     -----
     Estimator is robust to autocorrelation but not cross-sectional correlation.
-
-    Supported kernels:
-
-    * "bartlett", "newey-west" - Bartlett's kernel
-    * "quadratic-spectral", "qs", "andrews" - Quadratic-Spectral Kernel
-    * "parzen", "gallant" - Parzen kernel
 
     Bandwidth is set to the common value for the Bartlett kernel if not
     provided, :math:`\lfloor 4 (T / 100)^{2/9} \rfloor` where :math:`T` is the
@@ -882,9 +878,12 @@ class FamaMacBethCovariance(HomoskedasticCovariance):
         kernel and 6 with the quadratic spectral kernel. See
         :func:`~linearmodels.iv.covariance.kernel_optimal_bandwidth`.
     kernel : str, optional
-        Name of one of the supported kernels, {"bartlett", "newey-west",
-        "quadratic-spectral", "qs", "andrews", "parzen", "gallant"}. If not
-        provided, uses the Newey-West kernel.
+        Name of the kernel. If not provided, "newey-west", which is the Bartlett
+        kernel, is used. The names are not case sensitive. Supported kernels are:
+
+        * "bartlett", "newey-west" - Bartlett's kernel
+        * "parzen", "gallant" - Parzen's kernel
+        * "qs", "quadratic-spectral", "andrews" - Quadratic spectral kernel
 
     Raises
     ------

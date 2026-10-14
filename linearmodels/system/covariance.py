@@ -342,12 +342,12 @@ class KernelCovariance(HeteroskedasticCovariance, _HACMixin):
     constraints : LinearConstraint, optional
         Constraints used in estimation. The default is no constraints.
     kernel : str, optional
-        Name of kernel to use. The name is not case sensitive. The default is
-        "bartlett". Supported kernels are:
+        Name of the kernel. The default is "bartlett". The names are not case
+        sensitive. Supported kernels are:
 
-        * "bartlett", "newey-west" : Bartlett's kernel
-        * "parzen", "gallant" : Parzen's kernel
-        * "qs", "quadratic-spectral", "andrews" : Quadratic spectral kernel
+        * "bartlett", "newey-west" - Bartlett's kernel
+        * "parzen", "gallant" - Parzen's kernel
+        * "qs", "quadratic-spectral", "andrews" - Quadratic spectral kernel
 
     bandwidth : float, optional
         Non-negative bandwidth to use for the kernel. If not provided, the optimal
@@ -813,12 +813,12 @@ class GMMKernelCovariance(GMMHeteroskedasticCovariance, _HACMixin):
     constraints : LinearConstraint, optional
         Constraints used in estimation. The default is no constraints.
     kernel : str, optional
-        Name of kernel to use. The name is not case sensitive. The default is
-        "bartlett". Supported kernels are:
+        Name of the kernel. The default is "bartlett". The names are not case
+        sensitive. Supported kernels are:
 
-        * "bartlett", "newey-west" : Bartlett's kernel
-        * "parzen", "gallant" : Parzen's kernel
-        * "qs", "quadratic-spectral", "andrews" : Quadratic spectral kernel
+        * "bartlett", "newey-west" - Bartlett's kernel
+        * "parzen", "gallant" - Parzen's kernel
+        * "qs", "quadratic-spectral", "andrews" - Quadratic spectral kernel
 
     bandwidth : float, optional
         Non-negative bandwidth to use for the kernel. If not provided, the optimal

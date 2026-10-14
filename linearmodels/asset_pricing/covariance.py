@@ -265,8 +265,8 @@ class KernelCovariance(HeteroskedasticCovariance, _HACMixin):
         Inverse jacobian. One and only one of jacobian and inv_jacobian must
         be provided.
     kernel : str, optional
-        Name of the kernel. The name is not case sensitive. The default is
-        "bartlett". Supported kernels are:
+        Name of the kernel. The default is "bartlett". The names are not case
+        sensitive. Supported kernels are:
 
         * "bartlett", "newey-west" - Bartlett's kernel
         * "parzen", "gallant" - Parzen's kernel
@@ -424,8 +424,8 @@ class KernelWeight(HeteroskedasticWeight, _HACMixin):
         Flag indicating to center the moments when computing the weights. The
         default is True.
     kernel : str, optional
-        Name of the kernel. The name is not case sensitive. The default is
-        "bartlett". Supported kernels are:
+        Name of the kernel. The default is "bartlett". The names are not case
+        sensitive. Supported kernels are:
 
         * "bartlett", "newey-west" - Bartlett's kernel
         * "parzen", "gallant" - Parzen's kernel

@@ -234,8 +234,13 @@ class KernelWeightMatrix(HomoskedasticWeightMatrix):
     Parameters
     ----------
     kernel : str, optional
-        Name of kernel weighting function to use. The default is "bartlett". See
-        Notes for the supported kernels.
+        Name of kernel weighting function to use. The default is "bartlett". The
+        names are not case sensitive. Supported kernels are:
+
+        * "bartlett", "newey-west" - Bartlett's kernel
+        * "parzen", "gallant" - Parzen's kernel
+        * "qs", "quadratic-spectral", "andrews" - Quadratic spectral kernel
+
     bandwidth : int, optional
         Bandwidth to use when computing kernel weights. If not provided, the
         bandwidth is selected by ``optimal_bw``.
@@ -266,11 +271,7 @@ class KernelWeightMatrix(HomoskedasticWeightMatrix):
 
     Notes
     -----
-    Supported kernels:
-
-    * "bartlett", "newey-west" - Bartlett's kernel
-    * "parzen", "gallant" - Parzen's kernel
-    * "qs", "quadratic-spectral", "andrews" - The quadratic spectral kernel
+    The weight matrix is
 
     .. math::
 
@@ -556,7 +557,8 @@ class IVGMMCovariance(HomoskedasticCovariance):
     w : ndarray
         Weighting matrix used in GMM estimation (ninstr by ninstr).
     cov_type : str, optional
-        Covariance estimator to use. The default is "robust". Valid choices are
+        Covariance estimator to use. The default is "robust". The names are not
+        case sensitive. Supported covariance estimators are:
 
         * "unadjusted", "homoskedastic" - Assumes moment conditions are
           homoskedastic
@@ -572,7 +574,8 @@ class IVGMMCovariance(HomoskedasticCovariance):
         Optional keyword arguments that are specific to a particular cov_type.
         The keys are ``center`` (bool) for every covariance estimator,
         ``kernel`` (str), ``bandwidth`` (int) and ``optimal_bw`` (bool) for
-        "kernel", and ``clusters`` (array_like) for "clustered". See Notes.
+        "kernel", and ``clusters`` (array_like) for "clustered". The names of the
+        kernels are not case sensitive. See Notes.
 
     Raises
     ------
@@ -597,7 +600,7 @@ class IVGMMCovariance(HomoskedasticCovariance):
 
     **kernel**
 
-    * ``kernel``: Name of kernel to use.  See
+    * ``kernel``: Name of kernel to use. The names are not case sensitive. See
       :class:`~linearmodels.iv.covariance.KernelCovariance` for details on
       available kernels
     * ``bandwidth``: Bandwidth to use when computing the weight.  If not

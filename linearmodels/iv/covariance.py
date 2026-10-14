@@ -301,8 +301,8 @@ def kernel_optimal_bandwidth(
         The series to use when computing the bandwidth. It has t observations,
         and is a 1-d array of length t or an array with t rows and 1 column.
     kernel : str, optional
-        Name of the kernel to use. The default is "bartlett". Supported kernels
-        are:
+        Name of the kernel to use. The default is "bartlett". The names are not
+        case sensitive. Supported kernels are:
 
         * "bartlett", "newey-west" - Bartlett's kernel
         * "parzen", "gallant" - Parzen's kernel
@@ -692,11 +692,12 @@ class KernelCovariance(HomoskedasticCovariance):
     params : ndarray
         Estimated model parameters (nvar by 1).
     kernel : str, optional
-        Kernel name. The default is "bartlett". Supported kernels are:
+        Kernel name. The default is "bartlett". The names are not case
+        sensitive. Supported kernels are:
 
-        * "bartlett", "newey-west" - Triangular kernel
+        * "bartlett", "newey-west" - Bartlett's kernel
+        * "parzen", "gallant" - Parzen's kernel
         * "qs", "quadratic-spectral", "andrews" - Quadratic spectral kernel
-        * "parzen", "gallant" - Parzen's kernel.
 
     bandwidth : int, optional
         Non-negative bandwidth to use with kernel. If not provided, automatic

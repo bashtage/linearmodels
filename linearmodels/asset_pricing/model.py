@@ -429,8 +429,8 @@ class TradedFactorModel(_FactorModelBase):
         Parameters
         ----------
         cov_type : {"robust", "heteroskedastic", "kernel"}, optional
-            Name of covariance estimator. The names are not case sensitive. The
-            default is "robust". "heteroskedastic" is the same as "robust".
+            Name of covariance estimator. The default is "robust". The names are
+            not case sensitive. "heteroskedastic" is an alias of "robust". See Notes.
         debiased : bool, optional
             Flag indicating whether to debias the covariance estimator using
             a degree of freedom adjustment. The default is True. See Notes.
@@ -453,10 +453,9 @@ class TradedFactorModel(_FactorModelBase):
             If ``debiased`` is True and the number of observations is not larger
             than the number of factors plus one, or if the bandwidth is selected
             from the data and there are too few observations. See Notes.
-        ValueError
-            If a key of ``cov_config`` is not accepted by the covariance estimator
-            that ``cov_type`` selects. The message names the key and lists the
-            accepted keys. It is raised before the model is estimated. Releases
+            A key of ``cov_config`` that the covariance estimator that ``cov_type``
+            selects does not accept also raises it. The message names the key and lists
+            the accepted keys. This is checked before the model is estimated. Releases
             before 7.1 ignored the key.
 
         Notes
@@ -469,10 +468,10 @@ class TradedFactorModel(_FactorModelBase):
           covariance estimator
 
         The kernel covariance estimator takes the optional arguments
-        ``kernel``, which is not case sensitive and is one of "bartlett",
-        "newey-west", "parzen", "gallant", "qs", "quadratic-spectral" or
-        "andrews", and ``bandwidth`` (a non-negative number). The default kernel is
-        "bartlett". If ``bandwidth`` is not given it
+        ``kernel``, which is one of "bartlett", "newey-west", "parzen", "gallant",
+        "qs", "quadratic-spectral" or "andrews", and ``bandwidth`` (a non-negative
+        number). The names of the kernels are not case sensitive. The default
+        kernel is "bartlett". If ``bandwidth`` is not given it
         is selected from the data, which needs at least 4 observations with the
         Bartlett kernel, 5 with the Parzen kernel and 6 with the quadratic
         spectral kernel. ``fit`` raises a ``ValueError`` for fewer observations,
@@ -947,8 +946,8 @@ class LinearFactorModel(_LinearFactorModelBase):
         Parameters
         ----------
         cov_type : {"robust", "heteroskedastic", "kernel"}, optional
-            Name of covariance estimator. The names are not case sensitive. The
-            default is "robust". "heteroskedastic" is the same as "robust".
+            Name of covariance estimator. The default is "robust". The names are
+            not case sensitive. "heteroskedastic" is an alias of "robust".
         debiased : bool, optional
             Flag indicating whether to debias the covariance estimator using
             a degree of freedom adjustment. The default is True.
@@ -971,19 +970,18 @@ class LinearFactorModel(_LinearFactorModelBase):
             If ``debiased`` is True and the number of observations is not larger
             than the number of factors plus one, or if the bandwidth is selected
             from the data and there are too few observations. See Notes.
-        ValueError
-            If a key of ``cov_config`` is not accepted by the covariance estimator
-            that ``cov_type`` selects. The message names the key and lists the
-            accepted keys. It is raised before the model is estimated. Releases
+            A key of ``cov_config`` that the covariance estimator that ``cov_type``
+            selects does not accept also raises it. The message names the key and lists
+            the accepted keys. This is checked before the model is estimated. Releases
             before 7.1 ignored the key.
 
         Notes
         -----
         The kernel covariance estimator takes the optional arguments
-        ``kernel``, which is not case sensitive and is one of "bartlett",
-        "newey-west", "parzen", "gallant", "qs", "quadratic-spectral" or
-        "andrews", and ``bandwidth`` (a non-negative number). The default kernel is
-        "bartlett". If ``bandwidth`` is not given it
+        ``kernel``, which is one of "bartlett", "newey-west", "parzen", "gallant",
+        "qs", "quadratic-spectral" or "andrews", and ``bandwidth`` (a non-negative
+        number). The names of the kernels are not case sensitive. The default
+        kernel is "bartlett". If ``bandwidth`` is not given it
         is selected from the data, which needs at least 4 observations with the
         Bartlett kernel, 5 with the Parzen kernel and 6 with the quadratic
         spectral kernel. ``fit`` raises a ``ValueError`` for fewer observations,
@@ -1393,8 +1391,8 @@ class LinearFactorModelGMM(_LinearFactorModelBase):
             Maximum number of iterations when minimizing objective. Must be
             positive. The default is 1000.
         cov_type : {"robust", "heteroskedastic", "kernel"}, optional
-            Name of covariance estimator. The names are not case sensitive. The
-            default is "robust". "heteroskedastic" is the same as "robust".
+            Name of covariance estimator. The default is "robust". The names are
+            not case sensitive. "heteroskedastic" is an alias of "robust".
         debiased : bool, optional
             Flag indicating whether to debias the covariance estimator using
             a degree of freedom adjustment. The default is True.
@@ -1425,19 +1423,18 @@ class LinearFactorModelGMM(_LinearFactorModelBase):
             If ``starting`` does not have one element for each parameter, or if
             the bandwidth is selected from the data and there are too few
             observations. See Notes.
-        ValueError
-            If a key of ``cov_config`` is not accepted by the covariance estimator
-            that ``cov_type`` selects. The message names the key and lists the
-            accepted keys. It is raised before the model is estimated. Releases
+            A key of ``cov_config`` that the covariance estimator that ``cov_type``
+            selects does not accept also raises it. The message names the key and lists
+            the accepted keys. This is checked before the model is estimated. Releases
             before 7.1 ignored the key.
 
         Notes
         -----
         The kernel covariance estimator takes the optional arguments
-        ``kernel``, which is not case sensitive and is one of "bartlett",
-        "newey-west", "parzen", "gallant", "qs", "quadratic-spectral" or
-        "andrews", and ``bandwidth`` (a non-negative number). The default kernel is
-        "bartlett". If ``bandwidth`` is not given it
+        ``kernel``, which is one of "bartlett", "newey-west", "parzen", "gallant",
+        "qs", "quadratic-spectral" or "andrews", and ``bandwidth`` (a non-negative
+        number). The names of the kernels are not case sensitive. The default
+        kernel is "bartlett". If ``bandwidth`` is not given it
         is selected from the data, for the weight matrix and for the covariance,
         which needs at least 4 observations with the Bartlett kernel, 5 with the
         Parzen kernel and 6 with the quadratic spectral kernel. ``fit`` raises a

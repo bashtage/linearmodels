@@ -1862,13 +1862,17 @@ class PooledOLS(_PanelModelBase):
         Parameters
         ----------
         cov_type : str, optional
-            Name of covariance estimator. The default is ``"unadjusted"``. The
-            names are "unadjusted", "conventional" and "homoskedastic" for the
-            homoskedastic estimator, "robust" and "heteroskedastic" for the
-            heteroskedastic estimator, "clustered" for the clustered estimator,
-            "kernel", "driscoll-kraay" and "dk" for the Driscoll-Kraay estimator,
-            and "ac" and "autocorrelated" for the autocorrelation robust
-            estimator. See Notes.
+            Name of covariance estimator. The default is "unadjusted". The names
+            are not case sensitive. Supported covariance estimators are (see
+            Notes):
+
+            * "unadjusted", "conventional", "homoskedastic" - Homoskedastic
+              estimator
+            * "robust", "heteroskedastic" - Heteroskedastic estimator
+            * "clustered" - Clustered estimator
+            * "kernel", "driscoll-kraay", "dk" - Driscoll-Kraay estimator
+            * "ac", "autocorrelated" - Autocorrelation robust estimator
+
         debiased : bool, optional
             Flag indicating whether to debias the covariance estimator using
             a degree of freedom adjustment. The default is True. See Notes.
@@ -1936,9 +1940,9 @@ class PooledOLS(_PanelModelBase):
           configuration options are:
 
           * ``kernel`` - One of the supported kernels: "bartlett", "newey-west",
-            "quadratic-spectral", "qs", "andrews", "parzen" or "gallant". The
-            default is Bartlett's kernel, which produces a covariance estimator
-            similar to the Newey-West covariance estimator.
+            "parzen", "gallant", "qs", "quadratic-spectral" or "andrews". The names
+            are not case sensitive. The default is "newey-west", which is
+            Bartlett's kernel.
           * ``bandwidth`` - Bandwidth to use when computing the kernel. If
             not provided, a naive default is used. It must be below the number
             of time periods, and a ``ValueError`` is raised otherwise.
@@ -3102,13 +3106,17 @@ class PanelOLS(_PanelModelBase):
             required dummy variable array is both larger than the array of
             regressors in the model and requires more than 1 GiB.
         cov_type : str, optional
-            Name of covariance estimator. The default is ``"unadjusted"``. The
-            names are "unadjusted", "conventional" and "homoskedastic" for the
-            homoskedastic estimator, "robust" and "heteroskedastic" for the
-            heteroskedastic estimator, "clustered" for the clustered estimator,
-            "kernel", "driscoll-kraay" and "dk" for the Driscoll-Kraay estimator,
-            and "ac" and "autocorrelated" for the autocorrelation robust
-            estimator. See Notes.
+            Name of covariance estimator. The default is "unadjusted". The names
+            are not case sensitive. Supported covariance estimators are (see
+            Notes):
+
+            * "unadjusted", "conventional", "homoskedastic" - Homoskedastic
+              estimator
+            * "robust", "heteroskedastic" - Heteroskedastic estimator
+            * "clustered" - Clustered estimator
+            * "kernel", "driscoll-kraay", "dk" - Driscoll-Kraay estimator
+            * "ac", "autocorrelated" - Autocorrelation robust estimator
+
         debiased : bool, optional
             Flag indicating whether to debias the covariance estimator using
             a degree of freedom adjustment. The default is True. The
@@ -3204,9 +3212,9 @@ class PanelOLS(_PanelModelBase):
           configuration options are:
 
           * ``kernel`` - One of the supported kernels: "bartlett", "newey-west",
-            "quadratic-spectral", "qs", "andrews", "parzen" or "gallant". The
-            default is Bartlett's kernel, which produces a covariance estimator
-            similar to the Newey-West covariance estimator.
+            "parzen", "gallant", "qs", "quadratic-spectral" or "andrews". The names
+            are not case sensitive. The default is "newey-west", which is
+            Bartlett's kernel.
           * ``bandwidth`` - Bandwidth to use when computing the kernel. If
             not provided, a naive default is used. It must be below the number
             of time periods, and a ``ValueError`` is raised otherwise.
@@ -3717,11 +3725,15 @@ class BetweenOLS(_PanelModelBase):
             are accounted for when reweighting. Has no effect on balanced data.
             The default is False.
         cov_type : str, optional
-            Name of covariance estimator. The default is ``"unadjusted"``. The
-            names are "unadjusted", "conventional" and "homoskedastic" for the
-            homoskedastic estimator, "robust" and "heteroskedastic" for the
-            heteroskedastic estimator, and "clustered" for the clustered
-            estimator. See Notes.
+            Name of covariance estimator. The default is "unadjusted". The names
+            are not case sensitive. Supported covariance estimators are (see
+            Notes):
+
+            * "unadjusted", "conventional", "homoskedastic" - Homoskedastic
+              estimator
+            * "robust", "heteroskedastic" - Heteroskedastic estimator
+            * "clustered" - Clustered estimator
+
         debiased : bool, optional
             Flag indicating whether to debias the covariance estimator using
             a degree of freedom adjustment. The default is True. See Notes.
@@ -4212,13 +4224,17 @@ class FirstDifferenceOLS(_PanelModelBase):
         Parameters
         ----------
         cov_type : str, optional
-            Name of covariance estimator. The default is ``"unadjusted"``. The
-            names are "unadjusted", "conventional" and "homoskedastic" for the
-            homoskedastic estimator, "robust" and "heteroskedastic" for the
-            heteroskedastic estimator, "clustered" for the clustered estimator,
-            "kernel", "driscoll-kraay" and "dk" for the Driscoll-Kraay estimator,
-            and "ac" and "autocorrelated" for the autocorrelation robust
-            estimator. See Notes.
+            Name of covariance estimator. The default is "unadjusted". The names
+            are not case sensitive. Supported covariance estimators are (see
+            Notes):
+
+            * "unadjusted", "conventional", "homoskedastic" - Homoskedastic
+              estimator
+            * "robust", "heteroskedastic" - Heteroskedastic estimator
+            * "clustered" - Clustered estimator
+            * "kernel", "driscoll-kraay", "dk" - Driscoll-Kraay estimator
+            * "ac", "autocorrelated" - Autocorrelation robust estimator
+
         debiased : bool, optional
             Flag indicating whether to debias the covariance estimator using
             a degree of freedom adjustment. The default is True. See Notes.
@@ -4284,9 +4300,9 @@ class FirstDifferenceOLS(_PanelModelBase):
           configuration options are:
 
           * ``kernel`` - One of the supported kernels: "bartlett", "newey-west",
-            "quadratic-spectral", "qs", "andrews", "parzen" or "gallant". The
-            default is Bartlett's kernel, which produces a covariance estimator
-            similar to the Newey-West covariance estimator.
+            "parzen", "gallant", "qs", "quadratic-spectral" or "andrews". The names
+            are not case sensitive. The default is "newey-west", which is
+            Bartlett's kernel.
           * ``bandwidth`` - Bandwidth to use when computing the kernel. If
             not provided, a naive default is used. It must be below the number
             of time periods of the differences, which is one less than the
@@ -4718,13 +4734,17 @@ class RandomEffects(_PanelModelBase):
             Apply a small-sample correction to the estimate of the variance of
             the random effect. The default is False.
         cov_type : str, optional
-            Name of covariance estimator. The default is ``"unadjusted"``. The
-            names are "unadjusted", "conventional" and "homoskedastic" for the
-            homoskedastic estimator, "robust" and "heteroskedastic" for the
-            heteroskedastic estimator, "clustered" for the clustered estimator,
-            "kernel", "driscoll-kraay" and "dk" for the Driscoll-Kraay estimator,
-            and "ac" and "autocorrelated" for the autocorrelation robust
-            estimator. See Notes.
+            Name of covariance estimator. The default is "unadjusted". The names
+            are not case sensitive. Supported covariance estimators are (see
+            Notes):
+
+            * "unadjusted", "conventional", "homoskedastic" - Homoskedastic
+              estimator
+            * "robust", "heteroskedastic" - Heteroskedastic estimator
+            * "clustered" - Clustered estimator
+            * "kernel", "driscoll-kraay", "dk" - Driscoll-Kraay estimator
+            * "ac", "autocorrelated" - Autocorrelation robust estimator
+
         debiased : bool, optional
             Flag indicating whether to debias the covariance estimator using
             a degree of freedom adjustment. The default is True. See Notes.
@@ -4794,9 +4814,9 @@ class RandomEffects(_PanelModelBase):
           configuration options are:
 
           * ``kernel`` - One of the supported kernels: "bartlett", "newey-west",
-            "quadratic-spectral", "qs", "andrews", "parzen" or "gallant". The
-            default is Bartlett's kernel, which produces a covariance estimator
-            similar to the Newey-West covariance estimator.
+            "parzen", "gallant", "qs", "quadratic-spectral" or "andrews". The names
+            are not case sensitive. The default is "newey-west", which is
+            Bartlett's kernel.
           * ``bandwidth`` - Bandwidth to use when computing the kernel. If
             not provided, a naive default is used. It must be below the number
             of time periods, and a ``ValueError`` is raised otherwise.
@@ -5291,11 +5311,10 @@ class FamaMacBeth(_PanelModelBase):
 
         Parameters
         ----------
-        cov_type : str, optional
-            Name of covariance estimator (see notes). The default is
-            ``"unadjusted"``. The names are "unadjusted", "homoskedastic",
-            "robust" and "heteroskedastic" for the standard estimator, and
-            "kernel" for the kernel estimator.
+        cov_type : {"unadjusted", "homoskedastic", "robust", "heteroskedastic", "kernel"}, optional
+            Name of covariance estimator. The default is "unadjusted". The names
+            are not case sensitive. "homoskedastic" is an alias of "unadjusted",
+            and "heteroskedastic" is an alias of "robust". See Notes.
         debiased : bool, optional
             Flag indicating whether to debiased the covariance estimator using
             a degree of freedom adjustment, which uses T - 1 instead of T when
@@ -5309,10 +5328,13 @@ class FamaMacBeth(_PanelModelBase):
             needs T to be at least 4 with the Bartlett kernel, 5 with the Parzen
             kernel and 6 with the quadratic spectral kernel.
         kernel : str, optional
-            The kernel to use, one of "bartlett", "newey-west",
-            "quadratic-spectral", "qs", "andrews", "parzen" and "gallant". If
-            not provided, the default Bartlett kernel is used. It is checked for
-            every ``cov_type``.
+            Name of the kernel. If not provided, "newey-west", which is the
+            Bartlett kernel, is used. The names are not case sensitive. It is
+            checked for every ``cov_type``. Supported kernels are:
+
+            * "bartlett", "newey-west" - Bartlett's kernel
+            * "parzen", "gallant" - Parzen's kernel
+            * "qs", "quadratic-spectral", "andrews" - Quadratic spectral kernel
 
         Returns
         -------
