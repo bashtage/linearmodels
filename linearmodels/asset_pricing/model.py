@@ -1,5 +1,5 @@
 """
-Linear factor models for applications in asset pricing
+Linear factor models for applications in asset pricing.
 """
 
 from __future__ import annotations
@@ -62,6 +62,25 @@ def callback_factory(
     args: tuple[bool, Any],
     disp: bool | int = 1,
 ) -> Callable[[linearmodels.typing.data.Float64Array], None]:
+    """
+    Create a callback that prints the value of the objective during optimization.
+
+    Parameters
+    ----------
+    obj : callable
+        The objective function, which is called as ``obj(params, *args)``.
+    args : tuple
+        The arguments of ``obj`` after the parameters.
+    disp : bool or int, optional
+        Number of iterations between printed updates. The default is 1. A value
+        that is 0 or negative suppresses the output.
+
+    Returns
+    -------
+    callable
+        Function of the parameters that prints the iteration and the value of the
+        objective every ``disp`` iterations.
+    """
     d = {"iter": 0}
     disp = int(disp)
 
@@ -228,10 +247,11 @@ class _FactorModelBase:
 
     @property
     def formula(self) -> str | None:
+        """Formula used to construct the model, if it was constructed using one."""
         return self._formula
 
     @formula.setter
-    def formula(self, value: str | None) -> None:
+    def formula(self, value: str | None) -> None:  # numpydoc ignore=GL08
         self._formula = value
 
     @staticmethod
@@ -281,14 +301,14 @@ class _FactorModelBase:
 
 class TradedFactorModel(_FactorModelBase):
     r"""
-    Linear factor models estimator applicable to traded factors
+    Linear factor models estimator applicable to traded factors.
 
     Parameters
     ----------
     portfolios : array_like
-        Test portfolio returns (nobs by nportfolio)
+        Test portfolio returns (nobs by nportfolio).
     factors : array_like
-        Priced factor returns (nobs by nfactor)
+        Priced factor returns (nobs by nfactor).
 
     Notes
     -----
@@ -335,25 +355,28 @@ class TradedFactorModel(_FactorModelBase):
         portfolios: DataFrame | None = None,
     ) -> TradedFactorModel:
         """
+        Specify a model using the formula interface.
+
         Parameters
         ----------
         formula : str
-            Formula modified for the syntax described in the notes
+            Formula modified for the syntax described in the notes.
         data : DataFrame
-            DataFrame containing the variables used in the formula
-        portfolios : array_like
-            Portfolios to be used in the model
+            DataFrame containing the variables used in the formula.
+        portfolios : array_like, optional
+            Portfolios to be used in the model. If provided, must use formula
+            syntax containing only factors.
 
         Returns
         -------
         TradedFactorModel
-            Model instance
+            Model instance.
 
         Notes
         -----
-        The formula can be used in one of two ways.  The first specified only the
+        The formula can be used in one of two ways.  The first specifies only the
         factors and uses the data provided in ``portfolios`` as the test portfolios.
-        The second specified the portfolio using ``+`` to separate the test portfolios
+        The second specifies the portfolio using ``+`` to separate the test portfolios
         and ``~`` to separate the test portfolios from the factors.
 
         The formula can use the variables and functions that are available
@@ -399,30 +422,45 @@ class TradedFactorModel(_FactorModelBase):
         Parameters
         ----------
         cov_type : {"robust", "heteroskedastic", "kernel"}, optional
-            Name of covariance estimator. The default is ``"robust"``.
+            Name of covariance estimator. The names are case sensitive. The
+            default is "robust". "heteroskedastic" is the same as "robust".
         debiased : bool, optional
             Flag indicating whether to debias the covariance estimator using
             a degree of freedom adjustment. The default is True. See Notes.
-        **cov_config
+        **cov_config : dict
             Additional covariance-specific options for the kernel covariance
-            estimator: ``kernel`` and ``bandwidth``. See Notes.
+            estimator: ``kernel`` (str) and ``bandwidth`` (float). The other
+            covariance estimators do not use any. See Notes.
 
         Returns
         -------
         LinearFactorModelResults
             Results class with parameter estimates, covariance and test statistics.
 
+        Raises
+        ------
+        UnknownOptionError
+            If ``cov_type`` or ``kernel`` is not supported. It is both a
+            ``KeyError`` and a ``ValueError``.
+        ValueError
+            If ``debiased`` is True and the number of observations is not larger
+            than the number of factors plus one, or if the bandwidth is selected
+            from the data and there are too few observations. See Notes.
+
         Notes
         -----
         Supported covariance estimators are:
 
-        * "robust" - Heteroskedasticity-robust covariance estimator
+        * "robust", "heteroskedastic" - Heteroskedasticity-robust covariance
+          estimator
         * "kernel" - Heteroskedasticity and Autocorrelation consistent (HAC)
           covariance estimator
 
         The kernel covariance estimator takes the optional arguments
-        ``kernel``, one of "bartlett", "parzen" or "qs" (quadratic spectral)
-        and ``bandwidth`` (a positive integer). If ``bandwidth`` is not given it
+        ``kernel``, which is not case sensitive and is one of "bartlett",
+        "newey-west", "parzen", "gallant", "qs", "quadratic-spectral" or
+        "andrews", and ``bandwidth`` (a non-negative number). The default kernel is
+        "bartlett". If ``bandwidth`` is not given it
         is selected from the data, which needs at least 4 observations with the
         Bartlett kernel, 5 with the Parzen kernel and 6 with the quadratic
         spectral kernel. ``fit`` raises a ``ValueError`` for fewer observations,
@@ -655,18 +693,19 @@ class _LinearFactorModelBase(_FactorModelBase):
 
 class LinearFactorModel(_LinearFactorModelBase):
     r"""
-    Linear factor model estimator
+    Linear factor model estimator.
 
     Parameters
     ----------
     portfolios : array_like
-        Test portfolio returns (nobs by nportfolio)
+        Test portfolio returns (nobs by nportfolio).
     factors : array_like
-        Priced factor returns (nobs by nfactor)
-    risk_free : bool
+        Priced factor returns (nobs by nfactor).
+    risk_free : bool, optional
         Flag indicating whether the risk-free rate should be estimated
         from returns along other risk premia.  If False, the returns are
-        assumed to be excess returns using the correct risk-free rate.
+        assumed to be excess returns using the correct risk-free rate. The default
+        is False.
     sigma : array_like, optional
         Positive definite residual covariance (nportfolio by nportfolio) that
         weights the test portfolios in the second stage. A ``ValueError`` is
@@ -816,19 +855,22 @@ class LinearFactorModel(_LinearFactorModelBase):
         sigma: linearmodels.typing.data.ArrayLike | None = None,
     ) -> LinearFactorModel:
         """
+        Specify a model using the formula interface.
+
         Parameters
         ----------
         formula : str
-            Formula modified for the syntax described in the notes
+            Formula modified for the syntax described in the notes.
         data : DataFrame
-            DataFrame containing the variables used in the formula
-        portfolios : array_like
+            DataFrame containing the variables used in the formula.
+        portfolios : array_like, optional
             Portfolios to be used in the model. If provided, must use formula
             syntax containing only factors.
-        risk_free : bool
+        risk_free : bool, optional
             Flag indicating whether the risk-free rate should be estimated
             from returns along other risk premia.  If False, the returns are
-            assumed to be excess returns using the correct risk-free rate.
+            assumed to be excess returns using the correct risk-free rate. The
+            default is False.
         sigma : array_like, optional
             Positive definite residual covariance (nportfolio by nportfolio) that
             weights the test portfolios in the second stage. A ``ValueError`` is
@@ -839,13 +881,13 @@ class LinearFactorModel(_LinearFactorModelBase):
         Returns
         -------
         LinearFactorModel
-            Model instance
+            Model instance.
 
         Notes
         -----
-        The formula can be used in one of two ways.  The first specified only the
+        The formula can be used in one of two ways.  The first specifies only the
         factors and uses the data provided in ``portfolios`` as the test portfolios.
-        The second specified the portfolio using ``+`` to separate the test portfolios
+        The second specifies the portfolio using ``+`` to separate the test portfolios
         and ``~`` to separate the test portfolios from the factors.
 
         The formula can use the variables and functions that are available
@@ -886,28 +928,43 @@ class LinearFactorModel(_LinearFactorModelBase):
         **cov_config: bool | int | str,
     ) -> LinearFactorModelResults:
         """
-        Estimate model parameters
+        Estimate model parameters.
 
         Parameters
         ----------
-        cov_type : str
-            Name of covariance estimator
-        debiased : bool
+        cov_type : {"robust", "heteroskedastic", "kernel"}, optional
+            Name of covariance estimator. The names are case sensitive. The
+            default is "robust". "heteroskedastic" is the same as "robust".
+        debiased : bool, optional
             Flag indicating whether to debias the covariance estimator using
-            a degree of freedom adjustment
-        cov_config
-            Additional covariance-specific options.  See Notes.
+            a degree of freedom adjustment. The default is True.
+        **cov_config : dict
+            Additional covariance-specific options for the kernel covariance
+            estimator: ``kernel`` (str) and ``bandwidth`` (float). The other
+            covariance estimators do not use any. See Notes.
 
         Returns
         -------
         LinearFactorModelResults
-            Results class with parameter estimates, covariance and test statistics
+            Results class with parameter estimates, covariance and test statistics.
+
+        Raises
+        ------
+        UnknownOptionError
+            If ``cov_type`` or ``kernel`` is not supported. It is both a
+            ``KeyError`` and a ``ValueError``.
+        ValueError
+            If ``debiased`` is True and the number of observations is not larger
+            than the number of factors plus one, or if the bandwidth is selected
+            from the data and there are too few observations. See Notes.
 
         Notes
         -----
         The kernel covariance estimator takes the optional arguments
-        ``kernel``, one of "bartlett", "parzen" or "qs" (quadratic spectral)
-        and ``bandwidth`` (a positive integer). If ``bandwidth`` is not given it
+        ``kernel``, which is not case sensitive and is one of "bartlett",
+        "newey-west", "parzen", "gallant", "qs", "quadratic-spectral" or
+        "andrews", and ``bandwidth`` (a non-negative number). The default kernel is
+        "bartlett". If ``bandwidth`` is not given it
         is selected from the data, which needs at least 4 observations with the
         Bartlett kernel, 5 with the Parzen kernel and 6 with the quadratic
         spectral kernel. ``fit`` raises a ``ValueError`` for fewer observations,
@@ -1082,18 +1139,19 @@ class LinearFactorModel(_LinearFactorModelBase):
 
 class LinearFactorModelGMM(_LinearFactorModelBase):
     r"""
-    GMM estimator of Linear factor models
+    GMM estimator of Linear factor models.
 
     Parameters
     ----------
     portfolios : array_like
-        Test portfolio returns (nobs by nportfolio)
+        Test portfolio returns (nobs by nportfolio).
     factors : array_like
-        Priced factors values (nobs by nfactor)
-    risk_free : bool
+        Priced factors values (nobs by nfactor).
+    risk_free : bool, optional
         Flag indicating whether the risk-free rate should be estimated
         from returns along other risk premia.  If False, the returns are
-        assumed to be excess returns using the correct risk-free rate.
+        assumed to be excess returns using the correct risk-free rate. The default
+        is False.
 
     Notes
     -----
@@ -1215,30 +1273,33 @@ class LinearFactorModelGMM(_LinearFactorModelBase):
         risk_free: bool = False,
     ) -> LinearFactorModelGMM:
         """
+        Specify a model using the formula interface.
+
         Parameters
         ----------
         formula : str
-            Formula modified for the syntax described in the notes
+            Formula modified for the syntax described in the notes.
         data : DataFrame
-            DataFrame containing the variables used in the formula
-        portfolios : array_like
+            DataFrame containing the variables used in the formula.
+        portfolios : array_like, optional
             Portfolios to be used in the model. If provided, must use formula
             syntax containing only factors.
-        risk_free : bool
+        risk_free : bool, optional
             Flag indicating whether the risk-free rate should be estimated
             from returns along other risk premia.  If False, the returns are
-            assumed to be excess returns using the correct risk-free rate.
+            assumed to be excess returns using the correct risk-free rate. The
+            default is False.
 
         Returns
         -------
         LinearFactorModelGMM
-            Model instance
+            Model instance.
 
         Notes
         -----
-        The formula can be used in one of two ways.  The first specified only the
+        The formula can be used in one of two ways.  The first specifies only the
         factors and uses the data provided in ``portfolios`` as the test portfolios.
-        The second specified the portfolio using ``+`` to separate the test portfolios
+        The second specifies the portfolio using ``+`` to separate the test portfolios
         and ``~`` to separate the test portfolios from the factors.
 
         The formula can use the variables and functions that are available
@@ -1289,50 +1350,68 @@ class LinearFactorModelGMM(_LinearFactorModelBase):
         **cov_config: bool | int | str,
     ) -> GMMFactorModelResults:
         """
-        Estimate model parameters
+        Estimate model parameters.
 
         Parameters
         ----------
-        center : bool
+        center : bool, optional
             Flag indicating to center the moment conditions before computing
-            the weighting matrix.
-        use_cue : bool
-            Flag indicating to use continuously updating estimator
-        steps : int
+            the weighting matrix. The default is True.
+        use_cue : bool, optional
+            Flag indicating to use continuously updating estimator. The default is
+            False.
+        steps : int, optional
             Number of steps to use when estimating parameters.  2 corresponds
             to the standard efficient GMM estimator. Higher values will
-            iterate until convergence or up to the number of steps given
-        disp : int
+            iterate until convergence or up to the number of steps given. The
+            default is 2.
+        disp : int, optional
             Number of iterations between printed update. 0 or negative values
-            suppresses output
-        max_iter : int
-            Maximum number of iterations when minimizing objective. Must be positive.
-        cov_type : str
-            Name of covariance estimator
-        debiased : bool
+            suppresses output. The default is 10.
+        max_iter : int, optional
+            Maximum number of iterations when minimizing objective. Must be
+            positive. The default is 1000.
+        cov_type : {"robust", "heteroskedastic", "kernel"}, optional
+            Name of covariance estimator. The names are case sensitive. The
+            default is "robust". "heteroskedastic" is the same as "robust".
+        debiased : bool, optional
             Flag indicating whether to debias the covariance estimator using
-            a degree of freedom adjustment
-        starting : array_like
+            a degree of freedom adjustment. The default is True.
+        starting : array_like, optional
             Starting values to use in optimization.  If not provided, 2SLS
             estimates are used.
-        opt_options : dict
+        opt_options : dict, optional
             Additional options to pass to scipy.optimize.minimize when
             optimizing the objective function. If not provided, defers to
             scipy to choose an appropriate optimizer. All minimize inputs
             except ``fun``, ``x0``, and ``args`` can be overridden.
-        cov_config
-            Additional covariance-specific options.  See Notes.
+        **cov_config : dict
+            Additional covariance-specific options for the kernel covariance
+            estimator: ``kernel`` (str) and ``bandwidth`` (float). The other
+            covariance estimators do not use any. See Notes.
 
         Returns
         -------
         GMMFactorModelResults
-            Results class with parameter estimates, covariance and test statistics
+            Results class with parameter estimates, covariance and test statistics.
+
+        Raises
+        ------
+        UnknownOptionError
+            If ``cov_type`` or ``kernel`` is not supported. It is both a
+            ``KeyError`` and a ``ValueError``.
+        ValueError
+            If ``starting`` does not have one element for each parameter, or if
+            the bandwidth is selected from the data and there are too few
+            observations. See Notes.
 
         Notes
         -----
         The kernel covariance estimator takes the optional arguments
-        ``kernel``, one of "bartlett", "parzen" or "qs" (quadratic spectral)
-        and ``bandwidth`` (a positive integer). If ``bandwidth`` is not given it
+        ``kernel``, which is not case sensitive and is one of "bartlett",
+        "newey-west", "parzen", "gallant", "qs", "quadratic-spectral" or
+        "andrews", and ``bandwidth`` (a non-negative number). The default kernel is
+        "bartlett". If ``bandwidth`` is not given it
         is selected from the data, for the weight matrix and for the covariance,
         which needs at least 4 observations with the Bartlett kernel, 5 with the
         Parzen kernel and 6 with the quadratic spectral kernel. ``fit`` raises a
