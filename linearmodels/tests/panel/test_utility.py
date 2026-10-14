@@ -346,3 +346,9 @@ def test_all_absorbed_exception():
     x = x_orig * 1e-32
     with pytest.raises(AbsorbingEffectError, match=r"All exog variables have been"):
         check_absorbed(x, ["a", "b", "c"], x_orig)
+
+
+def test_dummy_matrix_bad_order():
+    cats = np.array([[0, 1], [1, 0]])
+    with pytest.raises(ValueError, match="Unknown drop option: bad"):
+        dummy_matrix(cats, drop="bad")
