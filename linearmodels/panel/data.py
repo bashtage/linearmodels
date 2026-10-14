@@ -1,3 +1,5 @@
+"""Data container that handles the formats of panel data."""
+
 from __future__ import annotations
 
 from linearmodels.compat.pandas import PD_GTE_21
@@ -37,7 +39,7 @@ class _Panel:
     Parameters
     ----------
     df : DataFrame
-        MultiIndex DataFrame containing floats
+        MultiIndex DataFrame containing floats.
 
     Notes
     -----
@@ -71,6 +73,25 @@ class _Panel:
         major_axis: Sequence[linearmodels.typing.Label],
         minor_axis: Sequence[linearmodels.typing.Label],
     ) -> _Panel:
+        """
+        Construct a panel from a 3-d array.
+
+        Parameters
+        ----------
+        values : ndarray
+            Array with shape (nitems, nmajor, nminor).
+        items : sequence of Label
+            The names of the items, which are the variables.
+        major_axis : sequence of Label
+            The labels of the major axis, which is time.
+        minor_axis : sequence of Label
+            The labels of the minor axis, which is the entity.
+
+        Returns
+        -------
+        _Panel
+            The panel with the data of the array.
+        """
         index = list(product(minor_axis, major_axis))
         multi_index = MultiIndex.from_tuples(index)
         i, j, k = len(items), len(major_axis), len(minor_axis)
@@ -82,29 +103,59 @@ class _Panel:
 
     @property
     def shape(self) -> tuple[int, int, int]:
+        """Shape of the panel, (nitems, nmajor, nminor)."""
         return self._shape
 
     @property
     def items(self) -> Index:
+        """Names of the items, which are the variables."""
         return self._items
 
     @property
     def major_axis(self) -> Index:
+        """Labels of the major axis, which is time."""
         return self._major_axis
 
     @property
     def minor_axis(self) -> Index:
+        """Labels of the minor axis, which is the entity."""
         return self._minor_axis
 
     @property
     def values(self) -> linearmodels.typing.data.Float64Array:
+        """Values of the panel with shape (nitems, nmajor, nminor)."""
         return self._values
 
     def to_frame(self) -> DataFrame:
+        """
+        Return the data as a DataFrame with a 2-level MultiIndex.
+
+        Returns
+        -------
+        DataFrame
+            The data with the entity and the time as the index levels, which
+            has a row for each combination of an entity and a time period.
+        """
         return self._frame
 
 
 def convert_columns(s: Series, drop_first: bool) -> linearmodels.typing.AnyPandas:
+    """
+    Convert a string or categorical Series to dummy variables.
+
+    Parameters
+    ----------
+    s : Series
+        The data of one variable.
+    drop_first : bool
+        Flag indicating whether to drop the dummy of the first category.
+
+    Returns
+    -------
+    Series or DataFrame
+        A DataFrame of dummy variables, named ``name.category``, if s contains
+        strings or is categorical. Otherwise, s.
+    """
     if is_string_dtype(s.dtype) and s.map(lambda v: isinstance(v, str)).all():
         s = s.astype("category")
 
@@ -117,6 +168,23 @@ def convert_columns(s: Series, drop_first: bool) -> linearmodels.typing.AnyPanda
 
 
 def expand_categoricals(x: DataFrame, drop_first: bool) -> DataFrame:
+    """
+    Convert the string and categorical columns of a DataFrame to dummy variables.
+
+    Parameters
+    ----------
+    x : DataFrame
+        The data.
+    drop_first : bool
+        Flag indicating whether to drop the dummy of the first category of each
+        variable.
+
+    Returns
+    -------
+    DataFrame
+        The data with dummy variables in place of the string and categorical
+        columns.
+    """
     if x.shape[1] == 0:
         # Nothing to convert, and concat needs an object
         return x
@@ -127,7 +195,7 @@ def expand_categoricals(x: DataFrame, drop_first: bool) -> DataFrame:
 
 class PanelData:
     """
-    Abstraction to handle alternative formats for panel data
+    Abstraction to handle alternative formats for panel data.
 
     Parameters
     ----------
@@ -135,17 +203,29 @@ class PanelData:
         Input data. A list or a tuple raises a ``TypeError``, since the layout
         of the data would not be known. A ``TypeError`` is also raised if the
         data are complex or cannot be converted to float64.
-    var_name : str
+    var_name : str, optional
         Variable name to use when naming variables in NumPy arrays or
-        xarray DataArrays
-    convert_dummies : bool
-        Flat indicating whether pandas categoricals or string input data
-        should be converted to dummy variables
-    drop_first : bool
-        Flag indicating to drop first dummy category when converting
-    copy : bool
+        xarray DataArrays. The default is ``"x"``.
+    convert_dummies : bool, optional
+        Flag indicating whether pandas categoricals or string input data
+        should be converted to dummy variables. The default is True.
+    drop_first : bool, optional
+        Flag indicating to drop first dummy category when converting. The
+        default is True.
+    copy : bool, optional
         Flag indicating whether to copy the input. Only has an effect when
-        x is a DataFrame
+        x is a DataFrame with a MultiIndex. The default is True.
+
+    Raises
+    ------
+    TypeError
+        If the input type is not supported, or if it is complex or cannot be
+        converted to float64.
+    ValueError
+        If the input has the wrong number of dimensions or a MultiIndex
+        DataFrame does not have 2 levels, if the time labels are neither
+        numbers nor dates, or if a combination of an entity and a time
+        period appears more than once.
 
     Notes
     -----
@@ -189,16 +269,6 @@ class PanelData:
        observations. A ``PeriodIndex`` of time labels is accepted. Earlier
        versions raised a ``ValueError`` that the time labels must be numeric or
        date-like.
-
-    Raises
-    ------
-    TypeError
-        If the input type is not supported
-    ValueError
-        If the input has the wrong number of dimensions or a MultiIndex
-        DataFrame does not have 2 levels, if the time labels are neither
-        numbers nor dates, or if a combination of an entity and a time
-        period appears more than once
     """
 
     def __init__(
@@ -361,7 +431,7 @@ class PanelData:
 
     @property
     def panel(self) -> _Panel:
-        """pandas Panel view of data"""
+        """Panel view of the data, a legacy shim of the pandas Panel."""
         if self._panel is None:
             self._check_index(0, 1)
             self._panel = _Panel(self._frame)
@@ -370,17 +440,17 @@ class PanelData:
 
     @property
     def dataframe(self) -> DataFrame:
-        """pandas DataFrame view of data"""
+        """DataFrame view of the data."""
         return self._frame
 
     @property
     def values2d(self) -> linearmodels.typing.data.AnyArray:
-        """NumPy ndarray view of dataframe"""
+        """NumPy ndarray view of the DataFrame."""
         return np.require(self._frame, requirements="W")
 
     @property
     def values3d(self) -> linearmodels.typing.data.AnyArray:
-        """NumPy ndarray view of panel"""
+        """NumPy ndarray view of the panel with shape (nvar, nobs, nentity)."""
         return self.panel.values
 
     def drop(self, locs: pd.Series | linearmodels.typing.data.BoolArray) -> None:
@@ -389,9 +459,9 @@ class PanelData:
 
         Parameters
         ----------
-        locs : ndarray
+        locs : Series or ndarray
             Boolean array indicating observations to drop with reference to
-            the dataframe view of the data
+            the dataframe view of the data.
         """
         if isinstance(locs, Series):
             locs = np.asarray(locs)
@@ -403,7 +473,7 @@ class PanelData:
 
     @property
     def shape(self) -> tuple[int, int, int]:
-        """Shape of panel view of data"""
+        """Shape of the panel view of the data, (nvar, nobs, nentity)."""
         if self._shape is None:
             k = self._frame.shape[1]
             index: Index = self._frame.index
@@ -414,43 +484,43 @@ class PanelData:
 
     @property
     def ndim(self) -> int:
-        """Number of dimensions of panel view of data"""
+        """Number of dimensions of the panel view of the data."""
         return 3
 
     @property
     def isnull(self) -> Series:
-        """Locations with missing observations"""
+        """Locations with missing observations."""
         return self._frame.isnull().any(axis=1)
 
     @property
     def nobs(self) -> int:
-        """Number of time observations"""
+        """Number of time observations."""
         return self._t
 
     @property
     def nvar(self) -> int:
-        """Number of variables"""
+        """Number of variables."""
         return self._k
 
     @property
     def nentity(self) -> int:
-        """Number of entities"""
+        """Number of entities."""
         return self._n
 
     @property
     def vars(self) -> list[linearmodels.typing.Label]:
-        """List of variable names"""
+        """List of variable names."""
         return list(self._frame.columns)
 
     @property
     def time(self) -> list[linearmodels.typing.Label]:
-        """List of time index names"""
+        """List of time index labels."""
         index = self.index
         return list(index.levels[1][index.codes[1]].unique())
 
     @property
     def entities(self) -> list[linearmodels.typing.Label]:
-        """List of entity index names"""
+        """List of entity index labels."""
         index = self.index
         return list(index.levels[0][index.codes[0]].unique())
 
@@ -481,12 +551,12 @@ class PanelData:
     @property
     def entity_ids(self) -> linearmodels.typing.data.AnyIntArray:
         """
-        Get array containing entity group membership information
+        Get array containing entity group membership information.
 
         Returns
         -------
         ndarray
-            2d array containing entity ids corresponding dataframe view
+            2d array containing entity ids corresponding to the dataframe view.
         """
         self._check_index(0)
         return np.asarray(self.index.codes[0])[:, None]
@@ -494,12 +564,12 @@ class PanelData:
     @property
     def time_ids(self) -> linearmodels.typing.data.AnyIntArray:
         """
-        Get array containing time membership information
+        Get array containing time membership information.
 
         Returns
         -------
         ndarray
-            2d array containing time ids corresponding dataframe view
+            2d array containing time ids corresponding to the dataframe view.
         """
         self._check_index(1)
         return np.asarray(self.index.codes[1])[:, None]
@@ -514,12 +584,17 @@ class PanelData:
 
     def _demean_both(self, weights: PanelData | None) -> PanelData:
         """
-        Entity and time demean
+        Entity and time demean.
 
         Parameters
         ----------
-        weights : PanelData
-             Weights to use in demeaning
+        weights : PanelData or None
+            Weights to use in demeaning.
+
+        Returns
+        -------
+        PanelData
+            The data demeaned by entity and by time.
         """
         group: Literal["entity", "time"]
         if self.nentity > self.nobs:
@@ -549,23 +624,25 @@ class PanelData:
         self, groups: PanelDataLike, weights: PanelData | None = None
     ) -> PanelData:
         """
-        Multi-way demeaning using only groupby
+        Multi-way demeaning using only groupby.
 
         Parameters
         ----------
-        groups : PanelData
-            Arrays with the same size containing group identifiers
-        weights : PanelData
-            Weights to use in the weighted demeaning
+        groups : PanelData or array_like
+            Arrays with the same size containing group identifiers. Input that
+            is not a PanelData is converted with ``PanelData``.
+        weights : PanelData, optional
+            Weights to use in the weighted demeaning. If not provided, the
+            observations have equal weights.
 
         Returns
         -------
         PanelData
-            Weighted, demeaned data according to groups
+            Weighted, demeaned data according to groups.
 
         Notes
         -----
-        Iterates until convergence
+        Iterates until convergence.
         """
         if not isinstance(groups, PanelData):
             groups = PanelData(groups)
@@ -650,7 +727,7 @@ class PanelData:
         return PanelData(current)
 
     @overload
-    def demean(
+    def demean(  # numpydoc ignore=GL08
         self,
         group: Literal["entity", "time", "both"],
         *,
@@ -658,7 +735,7 @@ class PanelData:
     ) -> linearmodels.typing.data.Float64Array: ...
 
     @overload
-    def demean(
+    def demean(  # numpydoc ignore=GL08
         self,
         group: Literal["entity", "time", "both"] = ...,
         weights: PanelData | None = ...,
@@ -667,7 +744,7 @@ class PanelData:
     ) -> PanelData: ...
 
     @overload
-    def demean(
+    def demean(  # numpydoc ignore=GL08
         self,
         group: Literal["entity", "time", "both"],
         weights: PanelData | None,
@@ -682,26 +759,35 @@ class PanelData:
         low_memory: bool = False,
     ) -> PanelData | linearmodels.typing.data.Float64Array:
         """
-        Demeans data by either entity or time group
+        Demean data by either entity or time group.
 
         Parameters
         ----------
-        group : {"entity", "time", "both"}
-            Group to use in demeaning
-        weights : PanelData
-            Weights to implement weighted averaging
-        return_panel : bool
+        group : {"entity", "time", "both"}, optional
+            Group to use in demeaning. The default is ``"entity"``.
+        weights : PanelData, optional
+            Weights to implement weighted averaging. If not provided, the
+            observations have equal weights.
+        return_panel : bool, optional
             Flag indicating to return a PanelData object. If False, a 2-d
-            NumPy representation of the panel is returned
-        low_memory : bool
+            NumPy representation of the panel is returned. The default is
+            True.
+        low_memory : bool, optional
             Flag indicating whether to use a low memory implementation
             that avoids constructing dummy variables. Only relevant when
-            group is "both"
+            group is "both". The default is False.
 
         Returns
         -------
-        PanelData
-            Demeaned data according to type
+        PanelData or ndarray
+            Demeaned data according to type. An ndarray if `return_panel` is
+            False.
+
+        Raises
+        ------
+        ValueError
+            If `group` is not one of the supported values, or if the level of
+            the index that is used has a missing label.
 
         Notes
         -----
@@ -757,17 +843,22 @@ class PanelData:
 
     def count(self, group: str = "entity") -> DataFrame:
         """
-        Count number of observations by entity or time
+        Count number of observations by entity or time.
 
         Parameters
         ----------
-        group : {"entity", "time"}
-            Group to count
+        group : {"entity", "time"}, optional
+            Group to count. The default is ``"entity"``.
 
         Returns
         -------
         DataFrame
-            Counts according to type. Either (entity by var) or (time by var)
+            Counts according to type. Either (entity by var) or (time by var).
+
+        Raises
+        ------
+        ValueError
+            If the level of the index that is used has a missing label.
         """
         level = 0 if group == "entity" else 1
         self._check_index(level)
@@ -778,13 +869,20 @@ class PanelData:
 
     @property
     def index(self) -> MultiIndex:
-        """Return the index of the multi-index dataframe view"""
+        """Return the index of the multi-index dataframe view."""
         index = self._frame.index
         assert isinstance(index, MultiIndex)
         return index
 
     def copy(self) -> PanelData:
-        """Return a deep copy"""
+        """
+        Return a deep copy.
+
+        Returns
+        -------
+        PanelData
+            A copy of the data with the same settings.
+        """
         return PanelData(
             self._frame.copy(),
             var_name=self._var_name,
@@ -796,19 +894,25 @@ class PanelData:
         self, group: str = "entity", weights: PanelData | None = None
     ) -> pd.DataFrame:
         """
-        Compute data mean by either entity or time group
+        Compute data mean by either entity or time group.
 
         Parameters
         ----------
-        group : {"entity", "time"}
-            Group to use in demeaning
-        weights : PanelData
-            Weights to implement weighted averaging
+        group : {"entity", "time"}, optional
+            Group to use in computing the means. The default is ``"entity"``.
+        weights : PanelData, optional
+            Weights to implement weighted averaging. If not provided, the
+            observations have equal weights.
 
         Returns
         -------
         DataFrame
-            Data mean according to type. Either (entity by var) or (time by var)
+            Data mean according to type. Either (entity by var) or (time by var).
+
+        Raises
+        ------
+        ValueError
+            If the level of the index that is used has a missing label.
         """
         level = 0 if group == "entity" else 1
         self._check_index(level)
@@ -831,12 +935,12 @@ class PanelData:
 
     def first_difference(self) -> PanelData:
         """
-        Compute first differences of variables
+        Compute first differences of variables.
 
         Returns
         -------
         PanelData
-            Differenced values
+            Differenced values.
 
         Notes
         -----
@@ -875,20 +979,26 @@ class PanelData:
 
     def dummies(self, group: str = "entity", drop_first: bool = False) -> DataFrame:
         """
-        Generate entity or time dummies
+        Generate entity or time dummies.
 
         Parameters
         ----------
-        group : {"entity", "time"}
-            Type of dummies to generate
-        drop_first : bool
+        group : {"entity", "time"}, optional
+            Type of dummies to generate. The default is ``"entity"``.
+        drop_first : bool, optional
             Flag indicating that the dummy column corresponding to the first
-            entity or time period should be dropped
+            entity or time period should be dropped. The default is False.
 
         Returns
         -------
         DataFrame
-            Dummy variables
+            Dummy variables.
+
+        Raises
+        ------
+        ValueError
+            If `group` is not one of the supported values, or if the level of
+            the index that is used has a missing label.
         """
         if group not in ("entity", "time"):
             raise ValueError("Group must be one of 'entity' or 'time'")

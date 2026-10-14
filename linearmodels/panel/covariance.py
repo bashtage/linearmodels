@@ -1,3 +1,5 @@
+"""Covariance estimators for panel models."""
+
 from __future__ import annotations
 
 from functools import cached_property
@@ -39,26 +41,36 @@ __all__ = [
 
 class HomoskedasticCovariance:
     r"""
-    Homoskedastic covariance estimation
+    Homoskedastic covariance estimation.
 
     Parameters
     ----------
     y : ndarray
-        (entity x time) by 1 stacked array of dependent
+        (entity x time) by 1 stacked array of the dependent variable.
     x : ndarray
-        (entity x time) by variables stacked array of exogenous
+        (entity x time) by variables stacked array of the exogenous variables.
     params : ndarray
-        variables by 1 array of estimated model parameters
-    entity_ids : ndarray
-        (entity x time) by 1 stacked array of entity ids
-    time_ids : ndarray
-        (entity x time) by 1 stacked array of time ids
-    debiased : bool
-        Flag indicating whether to debias the estimator
-    extra_df : int
+        Variables by 1 array of estimated model parameters.
+    entity_ids : ndarray or None
+        (entity x time) by 1 stacked array of entity ids. Not used by this
+        estimator, so it can be None.
+    time_ids : ndarray or None
+        (entity x time) by 1 stacked array of time ids. Not used by this
+        estimator, so it can be None.
+    debiased : bool, optional
+        Flag indicating whether to debias the estimator. The default is False.
+    extra_df : int, optional
         Additional degrees of freedom consumed by models beyond the number of
-        columns in x, e.g., fixed effects.  Covariance estimators are always
-        adjusted for extra_df irrespective of the setting of debiased
+        columns in x, e.g., fixed effects. Covariance estimators are always
+        adjusted for extra_df irrespective of the setting of debiased. The
+        default is 0.
+
+    Raises
+    ------
+    ValueError
+        If the model has no residual degrees of freedom: the number of
+        observations less ``extra_df``, and less the number of regressors if
+        ``debiased`` is True, is not positive.
 
     Notes
     -----
@@ -78,7 +90,7 @@ class HomoskedasticCovariance:
 
         s^2 = (n-df)^{-1} \hat{\epsilon}'\hat{\epsilon}
 
-    where df is ``extra_df`` and n-df is replace by n-df-k if ``debiased`` is
+    where df is ``extra_df`` and n-df is replaced by n-df-k if ``debiased`` is
     ``True``.
     """
 
@@ -119,54 +131,69 @@ class HomoskedasticCovariance:
 
     @property
     def name(self) -> str:
-        """Covariance estimator name"""
+        """Covariance estimator name."""
         return self._name
 
     @property
     def eps(self) -> linearmodels.typing.data.Float64Array:
-        """Model residuals"""
+        """Model residuals."""
         return self._y - self._x @ self._params
 
     @property
     def s2(self) -> float:
-        """Error variance"""
+        """Error variance."""
         eps = self.eps
         return self._scale * float(np.squeeze(eps.T @ eps)) / self._nobs
 
     @cached_property
     def cov(self) -> linearmodels.typing.data.Float64Array:
-        """Estimated covariance"""
+        """Estimated covariance."""
         x = self._x
         out = self.s2 * inv(x.T @ x)
         return (out + out.T) / 2
 
     def deferred_cov(self) -> linearmodels.typing.data.Float64Array:
-        """Covariance calculation deferred until executed"""
+        """
+        Covariance calculation deferred until executed.
+
+        Returns
+        -------
+        ndarray
+            The estimated covariance of the parameters.
+        """
         return self.cov
 
 
 class HeteroskedasticCovariance(HomoskedasticCovariance):
     r"""
-    Covariance estimation using White estimator
+    Covariance estimation using White estimator.
 
     Parameters
     ----------
     y : ndarray
-        (entity x time) by 1 stacked array of dependent
+        (entity x time) by 1 stacked array of the dependent variable.
     x : ndarray
-        (entity x time) by variables stacked array of exogenous
+        (entity x time) by variables stacked array of the exogenous variables.
     params : ndarray
-        variables by 1 array of estimated model parameters
+        Variables by 1 array of estimated model parameters.
     entity_ids : ndarray
-        (entity x time) by 1 stacked array of entity ids
+        (entity x time) by 1 stacked array of entity ids.
     time_ids : ndarray
-        (entity x time) by 1 stacked array of time ids
-    debiased : bool
-        Flag indicating whether to debias the estimator
-    extra_df : int
+        (entity x time) by 1 stacked array of time ids.
+    debiased : bool, optional
+        Flag indicating whether to debias the estimator. The default is False.
+    extra_df : int, optional
         Additional degrees of freedom consumed by models beyond the number of
-        columns in x, e.g., fixed effects.  Covariance estimators are always
-        adjusted for extra_df irrespective of the setting of debiased
+        columns in x, e.g., fixed effects. Covariance estimators are always
+        adjusted for extra_df irrespective of the setting of debiased. The
+        default is 0.
+
+    Raises
+    ------
+    ValueError
+        If the model has no residual degrees of freedom: the number of
+        observations less ``extra_df``, and less the number of regressors if
+        ``debiased`` is True, is not positive.
 
     Notes
     -----
@@ -188,7 +215,7 @@ class HeteroskedasticCovariance(HomoskedasticCovariance):
 
         \hat{S} = (n-df)^{-1} \sum_{i=1}^n \hat{\epsilon}_i^2 x_i'x_i
 
-    where df is ``extra_df`` and n-df is replace by n-df-k if ``debiased`` is
+    where df is ``extra_df`` and n-df is replaced by n-df-k if ``debiased`` is
     ``True``.
     """
 
@@ -210,7 +237,7 @@ class HeteroskedasticCovariance(HomoskedasticCovariance):
 
     @cached_property
     def cov(self) -> linearmodels.typing.data.Float64Array:
-        """Estimated covariance"""
+        """Estimated covariance."""
         x = self._x
         nobs = x.shape[0]
         xpxi = inv(x.T @ x / nobs)
@@ -224,30 +251,41 @@ class HeteroskedasticCovariance(HomoskedasticCovariance):
 
 class ClusteredCovariance(HomoskedasticCovariance):
     r"""
-    One-way (Rogers) or two-way clustered covariance estimation
+    One-way (Rogers) or two-way clustered covariance estimation.
 
     Parameters
     ----------
     y : ndarray
-        nobs by 1 stacked array of dependent
+        (entity x time) by 1 stacked array of the dependent variable.
     x : ndarray
-        nobs by variables stacked array of exogenous
+        (entity x time) by variables stacked array of the exogenous variables.
     params : ndarray
-        variables by 1 array of estimated model parameters
+        Variables by 1 array of estimated model parameters.
     entity_ids : ndarray
-        (entity x time) by 1 stacked array of entity ids
+        (entity x time) by 1 stacked array of entity ids.
     time_ids : ndarray
-        (entity x time) by 1 stacked array of time ids
-    debiased : bool
-        Flag indicating whether to debias the estimator
-    extra_df : int
+        (entity x time) by 1 stacked array of time ids.
+    debiased : bool, optional
+        Flag indicating whether to debias the estimator. The default is False.
+    extra_df : int, optional
         Additional degrees of freedom consumed by models beyond the number of
-        columns in x, e.g., fixed effects.  Covariance estimators are always
-        adjusted for extra_df irrespective of the setting of debiased
-    clusters : ndarray
-        nobs by 1 or nobs by 2 array of cluster group ids
-    group_debias : bool
+        columns in x, e.g., fixed effects. Covariance estimators are always
+        adjusted for extra_df irrespective of the setting of debiased. The
+        default is 0.
+    clusters : array_like, optional
+        Array of cluster group ids with nobs rows and 1 or 2 columns. If not
+        provided, every observation is its own cluster.
+    group_debias : bool, optional
         Flag indicating whether to apply small-number of groups adjustment.
+        The default is False.
+
+    Raises
+    ------
+    ValueError
+        If the model has no residual degrees of freedom: the number of
+        observations less ``extra_df``, and less the number of regressors if
+        ``debiased`` is True, is not positive. It is also raised if
+        `clusters` has more than 2 columns or does not have nobs rows.
 
     Notes
     -----
@@ -315,7 +353,7 @@ class ClusteredCovariance(HomoskedasticCovariance):
 
     @cached_property
     def cov(self) -> linearmodels.typing.data.Float64Array:
-        """Estimated covariance"""
+        """Estimated covariance."""
         x = self._x
         nobs = x.shape[0]
         xpxi = inv(x.T @ x / nobs)
@@ -350,29 +388,31 @@ class ClusteredCovariance(HomoskedasticCovariance):
 
 class DriscollKraay(HomoskedasticCovariance):
     r"""
-    Driscoll-Kraay heteroskedasticity-autocorrelation robust covariance estimation
+    Driscoll-Kraay heteroskedasticity-autocorrelation robust covariance estimation.
 
     Parameters
     ----------
     y : ndarray
-        (entity x time) by 1 stacked array of dependent
+        (entity x time) by 1 stacked array of the dependent variable.
     x : ndarray
-        (entity x time) by variables stacked array of exogenous
+        (entity x time) by variables stacked array of the exogenous variables.
     params : ndarray
-        variables by 1 array of estimated model parameters
+        Variables by 1 array of estimated model parameters.
     entity_ids : ndarray
-        (entity x time) by 1 stacked array of entity ids
+        (entity x time) by 1 stacked array of entity ids.
     time_ids : ndarray
-        (entity x time) by 1 stacked array of time ids
-    debiased : bool
-        Flag indicating whether to debias the estimator
-    extra_df : int
+        (entity x time) by 1 stacked array of time ids.
+    debiased : bool, optional
+        Flag indicating whether to debias the estimator. The default is False.
+    extra_df : int, optional
         Additional degrees of freedom consumed by models beyond the number of
-        columns in x, e.g., fixed effects.  Covariance estimators are always
-        adjusted for extra_df irrespective of the setting of debiased.
-    kernel : str
-        Name of one of the supported kernels. If None, uses the Newey-West
-        kernel.
+        columns in x, e.g., fixed effects. Covariance estimators are always
+        adjusted for extra_df irrespective of the setting of debiased. The
+        default is 0.
+    kernel : str, optional
+        Name of the kernel, one of "bartlett",
+        "newey-west", "quadratic-spectral", "qs", "andrews", "parzen" or "gallant". If
+        not provided, uses the Newey-West kernel.
     bandwidth : float, optional
         Non-negative bandwidth to use. It must be below the number of time
         periods. The Bartlett and Parzen kernels use its integer part. If not
@@ -382,7 +422,10 @@ class DriscollKraay(HomoskedasticCovariance):
     ------
     ValueError
         If the bandwidth, or the default bandwidth if none is given, is not
-        below the number of time periods.
+        below the number of time periods. It is also raised if the model has
+        no residual degrees of freedom: the number of observations less
+        ``extra_df``, and less the number of regressors if ``debiased`` is
+        True, is not positive.
     UnknownOptionError
         If ``kernel`` is not one of the supported names. It is both a
         ``ValueError`` and a ``KeyError``.
@@ -419,7 +462,7 @@ class DriscollKraay(HomoskedasticCovariance):
       \hat{S}_j & = \sum_{i=1}^{t-j} \xi'_t \xi_{t+j} + \xi'_{t+j} \xi_t  \\
       \hat{S}   & = (n-df)^{-1} \sum_{j=0}^{bw} K(j, bw) \hat{S}_j
 
-    where df is ``extra_df`` and n-df is replace by n-df-k if ``debiased`` is
+    where df is ``extra_df`` and n-df is replaced by n-df-k if ``debiased`` is
     ``True``. :math:`K(i, bw)` is the kernel weighting function.
 
     The sums :math:`\xi_t` of the scores of the :math:`T` time periods have
@@ -475,7 +518,7 @@ class DriscollKraay(HomoskedasticCovariance):
 
     def _select_bandwidth(self, nperiods: int) -> float:
         """
-        The bandwidth of the kernel, which has to be below the number of periods
+        Select the bandwidth of the kernel, which has to be below the number of periods.
 
         Parameters
         ----------
@@ -507,7 +550,7 @@ class DriscollKraay(HomoskedasticCovariance):
 
     @cached_property
     def cov(self) -> linearmodels.typing.data.Float64Array:
-        """Estimated covariance"""
+        """Estimated covariance."""
         x = self._x
         nobs = x.shape[0]
         xpxi = inv(x.T @ x / nobs)
@@ -529,29 +572,31 @@ class DriscollKraay(HomoskedasticCovariance):
 
 class ACCovariance(HomoskedasticCovariance):
     r"""
-    Autocorrelation robust covariance estimation
+    Autocorrelation robust covariance estimation.
 
     Parameters
     ----------
     y : ndarray
-        (entity x time) by 1 stacked array of dependent
+        (entity x time) by 1 stacked array of the dependent variable.
     x : ndarray
-        (entity x time) by variables stacked array of exogenous
+        (entity x time) by variables stacked array of the exogenous variables.
     params : ndarray
-        variables by 1 array of estimated model parameters
+        Variables by 1 array of estimated model parameters.
     entity_ids : ndarray
-        (entity x time) by 1 stacked array of entity ids
+        (entity x time) by 1 stacked array of entity ids.
     time_ids : ndarray
-        (entity x time) by 1 stacked array of time ids
-    debiased : bool
-        Flag indicating whether to debias the estimator
-    extra_df : int
+        (entity x time) by 1 stacked array of time ids.
+    debiased : bool, optional
+        Flag indicating whether to debias the estimator. The default is False.
+    extra_df : int, optional
         Additional degrees of freedom consumed by models beyond the number of
-        columns in x, e.g., fixed effects.  Covariance estimators are always
-        adjusted for extra_df irrespective of the setting of debiased
-    kernel : str
-        Name of one of the supported kernels. If None, uses the Newey-West
-        kernel.
+        columns in x, e.g., fixed effects. Covariance estimators are always
+        adjusted for extra_df irrespective of the setting of debiased. The
+        default is 0.
+    kernel : str, optional
+        Name of the kernel, one of "bartlett",
+        "newey-west", "quadratic-spectral", "qs", "andrews", "parzen" or "gallant". If
+        not provided, uses the Newey-West kernel.
     bandwidth : float, optional
         Non-negative bandwidth to use. The Bartlett and Parzen kernels use its
         integer part. If not provided a rule-of-thumb value is used. It can be
@@ -559,6 +604,10 @@ class ACCovariance(HomoskedasticCovariance):
 
     Raises
     ------
+    ValueError
+        If the model has no residual degrees of freedom: the number of
+        observations less ``extra_df``, and less the number of regressors if
+        ``debiased`` is True, is not positive.
     UnknownOptionError
         If ``kernel`` is not one of the supported names. It is both a
         ``ValueError`` and a ``KeyError``.
@@ -599,9 +648,8 @@ class ACCovariance(HomoskedasticCovariance):
       \hat{S}_{i0} & = \sum_{t=1}^{T_i} \xi'_{it} \xi_{it} \\
       \hat{S}_{ij} & = \sum_{t=1}^{T_i-j} \xi'_{it} \xi_{it+j} + \xi'_{it+j} \xi_{it}
 
-
     where :math:`T_i` is the number of observations of entity :math:`i`, df is
-    ``extra_df`` and n-df is replace by n-df-k if ``debiased`` is ``True``.
+    ``extra_df`` and n-df is replaced by n-df-k if ``debiased`` is ``True``.
     :math:`K(j, bw)` is the kernel weighting function, which is 1 for the lag 0.
     The Bartlett and Parzen kernels are 0 for the lags above ``bandwidth``.
 
@@ -693,7 +741,7 @@ class ACCovariance(HomoskedasticCovariance):
 
     @cached_property
     def cov(self) -> linearmodels.typing.data.Float64Array:
-        """Estimated covariance"""
+        """Estimated covariance."""
         x = self._x
         nobs = x.shape[0]
         xpxi = inv(x.T @ x / nobs)
@@ -744,6 +792,25 @@ CovarianceEstimatorType = Union[
 
 
 class CovarianceManager:
+    """
+    Look up the covariance estimators that a model supports.
+
+    Parameters
+    ----------
+    estimator : str
+        Name of the model, used in the error message when a covariance
+        estimator is not supported by the model.
+    *cov_estimators : type
+        The covariance estimator classes that the model supports.
+
+    Notes
+    -----
+    Indexing the manager with a ``cov_type`` name, e.g.,
+    ``manager["robust"]``, returns the covariance estimator class. It raises an
+    ``UnknownOptionError``, which is both a ``ValueError`` and a ``KeyError``,
+    if the name is unknown or the estimator is not supported by the model.
+    """
+
     COVARIANCE_ESTIMATORS: ClassVar[dict[str, CovarianceEstimatorType]] = {
         "unadjusted": HomoskedasticCovariance,
         "conventional": HomoskedasticCovariance,
@@ -785,20 +852,20 @@ class CovarianceManager:
 
 class FamaMacBethCovariance(HomoskedasticCovariance):
     """
-    HAC estimator for Fama-MacBeth estimator
+    HAC estimator for Fama-MacBeth estimator.
 
     Parameters
     ----------
     y : ndarray
-        (entity x time) by 1 stacked array of dependent
+        (entity x time) by 1 stacked array of the dependent variable.
     x : ndarray
-        (entity x time) by variables stacked array of exogenous
+        (entity x time) by variables stacked array of the exogenous variables.
     params : ndarray
-        (variables by 1) array of estimated model parameters
-    all_params : ndarray
-        (nobs by variables) array of all estimated model parameters
-    debiased : bool
-        Flag indicating whether to debias the estimator.
+        (variables by 1) array of estimated model parameters.
+    all_params : DataFrame
+        (nobs by variables) array of all estimated model parameters.
+    debiased : bool, optional
+        Flag indicating whether to debias the estimator. The default is False.
     bandwidth : float, optional
         Non-negative bandwidth to use. It must be below T, the number of time
         periods that are used. The Bartlett and Parzen kernels use its integer
@@ -807,9 +874,10 @@ class FamaMacBethCovariance(HomoskedasticCovariance):
         needs at least 4 time periods with the Bartlett kernel, 5 with the Parzen
         kernel and 6 with the quadratic spectral kernel. See
         :func:`~linearmodels.iv.covariance.kernel_optimal_bandwidth`.
-    kernel : str
-        Name of one of the supported kernels. If None, uses the Newey-West
-        kernel.
+    kernel : str, optional
+        Name of one of the supported kernels, {"bartlett", "newey-west",
+        "quadratic-spectral", "qs", "andrews", "parzen", "gallant"}. If not
+        provided, uses the Newey-West kernel.
 
     Raises
     ------
@@ -906,7 +974,7 @@ class FamaMacBethCovariance(HomoskedasticCovariance):
 
     @cached_property
     def bandwidth(self) -> float:
-        """Estimator bandwidth"""
+        """Bandwidth of the kernel."""
         if self._bandwidth is None:
             all_params = np.asarray(self._all_params)
             e = all_params - self._params.T
@@ -931,7 +999,7 @@ class FamaMacBethCovariance(HomoskedasticCovariance):
 
     @cached_property
     def cov(self) -> linearmodels.typing.data.Float64Array:
-        """Estimated covariance"""
+        """Estimated covariance."""
         e = np.asarray(self._all_params) - self._params.T
         e = e[np.all(np.isfinite(e), 1)]
         nobs = e.shape[0]
@@ -944,12 +1012,12 @@ class FamaMacBethCovariance(HomoskedasticCovariance):
     @property
     def all_params(self) -> DataFrame:
         """
-        The set of parameters estimated for each of the time periods
+        The set of parameters estimated for each of the time periods.
 
         Returns
         -------
         DataFrame
-            The parameters (nobs, nparam).
+            The parameters with shape (nobs, nparam).
         """
         return self._all_params
 
@@ -967,6 +1035,55 @@ def setup_covariance_estimator(
     extra_df: int = 0,
     **cov_config: Any,
 ) -> HomoskedasticCovariance:
+    """
+    Construct the covariance estimator for a ``cov_type``.
+
+    Parameters
+    ----------
+    cov_estimators : CovarianceManager
+        The manager of the covariance estimators that the model supports.
+    cov_type : str
+        Name of the covariance estimator, one of the names supported by
+        `cov_estimators`.
+    y : ndarray
+        (entity x time) by 1 stacked array of the dependent variable.
+    x : ndarray
+        (entity x time) by variables stacked array of the exogenous variables.
+    params : ndarray
+        Variables by 1 array of estimated model parameters.
+    entity_ids : ndarray
+        (entity x time) by 1 stacked array of entity ids.
+    time_ids : ndarray
+        (entity x time) by 1 stacked array of time ids.
+    debiased : bool, optional
+        Flag indicating whether to debias the estimator. The default is False.
+    extra_df : int, optional
+        Additional degrees of freedom consumed by models beyond the number of
+        columns in x. The default is 0.
+    **cov_config
+        Keyword arguments of the covariance estimator. The keys that are
+        allowed depend on the estimator: ``clusters`` and ``group_debias`` for
+        the clustered estimator, ``kernel`` and ``bandwidth`` for the
+        Driscoll-Kraay and autocorrelation robust estimators, and none for the
+        homoskedastic and heteroskedastic estimators.
+
+    Returns
+    -------
+    HomoskedasticCovariance
+        The covariance estimator, an instance of the class that
+        `cov_type` selects, which is a subclass of
+        ``HomoskedasticCovariance``.
+
+    Raises
+    ------
+    UnknownOptionError
+        If `cov_type` is unknown or is not supported. It is both a
+        ``ValueError`` and a ``KeyError``.
+    ValueError
+        If `cov_config` contains a key that the estimator does not support.
+    TypeError
+        If a value of `cov_config` does not have the type that its key requires.
+    """
     estimator = cov_estimators[cov_type]
     unknown_kwargs = [
         str(key) for key in cov_config if str(key) not in estimator.ALLOWED_KWARGS

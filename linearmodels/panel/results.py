@@ -1,3 +1,5 @@
+"""Results containers for panel models, and tools to compare them."""
+
 from __future__ import annotations
 
 from linearmodels.compat.statsmodels import Summary
@@ -41,7 +43,13 @@ __all__ = [
 
 class PanelResults(_SummaryStr):
     """
-    Results container for panel data models that do not include effects
+    Results container for panel data models that do not include effects.
+
+    Parameters
+    ----------
+    res : AttrDict
+        The results of the estimation, which the ``fit`` method of the model
+        constructs.
     """
 
     def __init__(self, res: AttrDict):
@@ -82,30 +90,30 @@ class PanelResults(_SummaryStr):
 
     @property
     def params(self) -> Series:
-        """Estimated parameters"""
+        """Estimated parameters."""
         return Series(self._params, index=self._var_names, name="parameter")
 
     @cached_property
     def cov(self) -> DataFrame:
-        """Estimated covariance of parameters"""
+        """Estimated covariance of parameters."""
         return DataFrame(
             self._deferred_cov(), columns=self._var_names, index=self._var_names
         )
 
     @property
     def std_errors(self) -> Series:
-        """Estimated parameter standard errors"""
+        """Estimated parameter standard errors."""
         return Series(np.sqrt(np.diag(self.cov)), self._var_names, name="std_error")
 
     @property
     def tstats(self) -> Series:
-        """Parameter t-statistics"""
+        """Parameter t-statistics."""
         return Series(self._params / self.std_errors, name="tstat")
 
     @cached_property
     def pvalues(self) -> Series:
         """
-        Parameter p-vals. Uses t(df_resid) if ``debiased`` is True, else normal
+        Parameter p-vals. Uses t(df_resid) if ``debiased`` is True, else normal.
         """
         abs_tstats = np.abs(self.tstats)
         if self._debiased:
@@ -117,7 +125,7 @@ class PanelResults(_SummaryStr):
     @property
     def df_resid(self) -> int:
         """
-        Residual degree of freedom
+        Residual degree of freedom.
 
         Notes
         -----
@@ -128,7 +136,7 @@ class PanelResults(_SummaryStr):
     @property
     def df_model(self) -> int:
         """
-        Model degree of freedom
+        Model degree of freedom.
 
         Notes
         -----
@@ -138,33 +146,33 @@ class PanelResults(_SummaryStr):
 
     @property
     def nobs(self) -> int:
-        """Number of observations used to estimate the model"""
+        """Number of observations used to estimate the model."""
         return self._nobs
 
     @property
     def name(self) -> str:
-        """Model name"""
+        """Model name."""
         return self._name
 
     @property
     def total_ss(self) -> float:
-        """Total sum of squares"""
+        """Total sum of squares."""
         return self._total_ss
 
     @property
     def model_ss(self) -> float:
-        """Residual sum of squares"""
+        """Model sum of squares."""
         return self._total_ss - self._residual_ss
 
     @property
     def resid_ss(self) -> float:
-        """Residual sum of squares"""
+        """Residual sum of squares."""
         return self._residual_ss
 
     @property
     def rsquared(self) -> float:
         """
-        Model Coefficient of determination
+        Model coefficient of determination.
 
         Returns
         -------
@@ -189,12 +197,12 @@ class PanelResults(_SummaryStr):
     @property
     def rsquared_between(self) -> float:
         """
-        Between Coefficient of determination
+        Between coefficient of determination.
 
         Returns
         -------
         float
-            Between coefficient of determination
+            Between coefficient of determination.
 
         Notes
         -----
@@ -215,12 +223,12 @@ class PanelResults(_SummaryStr):
     @property
     def rsquared_within(self) -> float:
         """
-        Within coefficient of determination
+        Within coefficient of determination.
 
         Returns
         -------
         float
-            Within coefficient of determination
+            Within coefficient of determination.
 
         Notes
         -----
@@ -240,12 +248,12 @@ class PanelResults(_SummaryStr):
     @property
     def rsquared_overall(self) -> float:
         """
-        Overall coefficient of determination
+        Overall coefficient of determination.
 
         Returns
         -------
         float
-            Between coefficient of determination
+            Overall coefficient of determination.
 
         Notes
         -----
@@ -265,12 +273,12 @@ class PanelResults(_SummaryStr):
     @property
     def corr_squared_between(self) -> float:
         r"""
-        Between Coefficient of determination using squared correlation
+        Between coefficient of determination using squared correlation.
 
         Returns
         -------
         float
-            Between coefficient of determination
+            Between coefficient of determination.
 
         Notes
         -----
@@ -297,12 +305,12 @@ class PanelResults(_SummaryStr):
     @property
     def corr_squared_within(self) -> float:
         r"""
-        Within coefficient of determination using squared correlation
+        Within coefficient of determination using squared correlation.
 
         Returns
         -------
         float
-            Within coefficient of determination
+            Within coefficient of determination.
 
         Notes
         -----
@@ -328,12 +336,12 @@ class PanelResults(_SummaryStr):
     @property
     def corr_squared_overall(self) -> float:
         r"""
-        Overall coefficient of determination using squared correlation
+        Overall coefficient of determination using squared correlation.
 
         Returns
         -------
         float
-            Between coefficient of determination
+            Overall coefficient of determination.
 
         Notes
         -----
@@ -357,32 +365,32 @@ class PanelResults(_SummaryStr):
 
     @property
     def s2(self) -> float:
-        """Residual variance estimator"""
+        """Residual variance estimator."""
         return self._s2
 
     @property
     def entity_info(self) -> Series:
-        """Statistics on observations per entity"""
+        """Statistics on observations per entity."""
         return self._entity_info
 
     @property
     def time_info(self) -> Series:
-        """Statistics on observations per time interval"""
+        """Statistics on observations per time interval."""
         return self._time_info
 
     def conf_int(self, level: float = 0.95) -> DataFrame:
         """
-        Confidence interval construction
+        Confidence interval construction.
 
         Parameters
         ----------
-        level : float
-            Confidence level for interval
+        level : float, optional
+            Confidence level for interval. The default is 0.95.
 
         Returns
         -------
         DataFrame
-            Confidence interval of the form [lower, upper] for each parameters
+            Confidence interval of the form [lower, upper] for each parameter.
 
         Notes
         -----
@@ -406,7 +414,7 @@ class PanelResults(_SummaryStr):
         Returns
         -------
         Summary
-            Summary table of model estimation results
+            Summary table of model estimation results.
 
         Notes
         -----
@@ -523,13 +531,14 @@ class PanelResults(_SummaryStr):
     @property
     def resids(self) -> Series:
         """
-        Model residuals
+        Model residuals.
 
         Notes
         -----
         These residuals are from the estimated model. They will not have the
         same shape as the original data whenever the model is estimated on
-        transformed data which has a different shape."""
+        transformed data which has a different shape.
+        """
         return Series(self._resids.squeeze(), index=self._index, name="residual")
 
     def _out_of_sample(
@@ -561,32 +570,42 @@ class PanelResults(_SummaryStr):
         missing: bool = False,
     ) -> DataFrame:
         """
-        In- and out-of-sample predictions
+        In- and out-of-sample predictions.
 
         Parameters
         ----------
         exog : PanelData, DataFrame, Series, ndarray or DataArray, optional
             Exogenous values to use in out-of-sample prediction (nobs by nexog).
             The containers are those of ``exog`` in the model. A list or a tuple
-            raises a ``TypeError`` that names ``exog``.
-        data : DataFrame
+            raises a ``TypeError`` that names ``exog``. If neither `exog` nor
+            `data` is provided, the in-sample values are returned.
+        data : DataFrame, optional
             DataFrame to use for out-of-sample predictions when model was
             constructed using a formula.
-        fitted : bool
-            Flag indicating whether to include the fitted values
-        effects : bool
-            Flag indicating whether to include estimated effects
-        idiosyncratic : bool
-            Flag indicating whether to include the estimated idiosyncratic shock
-        missing : bool
-            Flag indicating to adjust for dropped observations.  if True, the
-            values returns will have the same size as the original input data
-            before filtering missing values
+        fitted : bool, optional
+            Flag indicating whether to include the fitted values. The default
+            is True. Only used for in-sample values.
+        effects : bool, optional
+            Flag indicating whether to include estimated effects. The default
+            is False. Only used for in-sample values.
+        idiosyncratic : bool, optional
+            Flag indicating whether to include the estimated idiosyncratic
+            shock. The default is False. Only used for in-sample values.
+        missing : bool, optional
+            Flag indicating to adjust for dropped observations. If True, the
+            values returned will have the same size as the original input data
+            before filtering missing values. The default is False.
 
         Returns
         -------
         DataFrame
-            DataFrame containing columns for all selected output
+            DataFrame containing columns for all selected output.
+
+        Raises
+        ------
+        ValueError
+            If both `exog` and `data` are provided, or if no in-sample output
+            is selected.
 
         Notes
         -----
@@ -620,13 +639,13 @@ class PanelResults(_SummaryStr):
 
     @property
     def fitted_values(self) -> Series:
-        """Fitted values"""
+        """Fitted values."""
         return self._fitted
 
     @property
     def estimated_effects(self) -> Series:
         """
-        Estimated effects
+        Estimated effects.
 
         Notes
         -----
@@ -658,8 +677,8 @@ class PanelResults(_SummaryStr):
 
     @property
     def idiosyncratic(self) -> Series:
-        """
-        Idiosyncratic error
+        r"""
+        Idiosyncratic error.
 
         Notes
         -----
@@ -668,12 +687,16 @@ class PanelResults(_SummaryStr):
         The shape and nature of resids depends on the model estimated. These
         estimates only depend on the model estimated through the estimation
         of parameters and inclusion of effects, if any.
+
+        For ``FirstDifferenceOLS`` the values are the dependent variable less
+        the fitted values, :math:`y_{it} - x_{it}\hat{\beta}`, in levels. They
+        are not the shocks of the differenced equation, which are in ``resids``.
         """
         return self._idiosyncratic
 
     @property
     def wresids(self) -> Series:
-        """Weighted model residuals"""
+        """Weighted model residuals."""
         return Series(
             self._wresids.squeeze(), index=self._index, name="weighted residual"
         )
@@ -760,6 +783,12 @@ class PanelResults(_SummaryStr):
           that do not change over time for an entity, or that are present
           in every period, are not affected.
 
+        Time dummy variables (for example ``C(year)``) among the regressors have
+        the same effect on the residuals as time effects, and make the test
+        invalid in the same way. The code cannot reliably detect
+        such regressors, so that the test is returned without a warning and
+        should not be used for a model that has them.
+
         The statistic is computed from dense N by N matrices of pairwise
         correlations and numbers of overlapping observations, where N is the
         number of entities. Computing them takes about 450 MB of memory when
@@ -819,12 +848,12 @@ class PanelResults(_SummaryStr):
     @property
     def f_statistic_robust(self) -> WaldTestStatistic:
         r"""
-        Joint test of significance for non-constant regressors
+        Joint test of significance for non-constant regressors.
 
         Returns
         -------
         WaldTestStatistic
-            Statistic value, distribution and p-value
+            Statistic value, distribution and p-value.
 
         Notes
         -----
@@ -859,12 +888,12 @@ class PanelResults(_SummaryStr):
     @property
     def f_statistic(self) -> WaldTestStatistic:
         r"""
-        Joint test of significance for non-constant regressors
+        Joint test of significance for non-constant regressors.
 
         Returns
         -------
         WaldTestStatistic
-            Statistic value, distribution and p-value
+            Statistic value, distribution and p-value.
 
         Notes
         -----
@@ -887,7 +916,7 @@ class PanelResults(_SummaryStr):
     @property
     def loglik(self) -> float:
         r"""
-        Log-likelihood of model
+        Log-likelihood of model.
 
         Notes
         -----
@@ -953,18 +982,19 @@ class PanelResults(_SummaryStr):
         formula: str | list[str] | None = None,
     ) -> WaldTestStatistic:
         r"""
-        Test linear equality constraints using a Wald test
+        Test linear equality constraints using a Wald test.
 
         Parameters
         ----------
-        restriction : {ndarray, DataFrame}
-            q by nvar array containing linear weights to apply to parameters
-            when forming the restrictions. It is not possible to use both
-            restriction and formula.
-        value : {ndarray, Series}
-            q element array containing the restricted values.
-        formula : Union[str, list[str]]
-            formulaic linear constraints. The simplest formats are one of:
+        restriction : array_like, optional
+            Array with q rows and nvar columns containing linear weights to
+            apply to parameters when forming the restrictions. It is not
+            possible to use both restriction and formula.
+        value : array_like, optional
+            Array with q elements containing the restricted values. If not
+            provided, the restricted values are all 0.
+        formula : str, list of str or dict of str to float, optional
+            Formulaic linear constraints. The simplest formats are one of:
 
             * A single comma-separated string such as "x1=0, x2+x3=1"
             * A list of strings where each element is a single constraint
@@ -991,7 +1021,7 @@ class PanelResults(_SummaryStr):
         ------
         ValueError
             If the model has no parameters, e.g., a PanelOLS model that only has
-            effects.
+            effects, or if both `restriction` and `formula` are provided.
 
         Notes
         -----
@@ -1075,7 +1105,13 @@ def _is_concentrated_in_time(groups: Any, entity_ids: Any, time_ids: Any) -> boo
 
 class PanelEffectsResults(PanelResults):
     """
-    Results container for panel data models that include effects
+    Results container for panel data models that include effects.
+
+    Parameters
+    ----------
+    res : AttrDict
+        The results of the estimation, which the ``fit`` method of the model
+        constructs.
     """
 
     def __init__(self, res: AttrDict) -> None:
@@ -1121,7 +1157,7 @@ class PanelEffectsResults(PanelResults):
         Returns
         -------
         WaldTestStatistic
-            Statistic value, distribution and p-value
+            Statistic value, distribution and p-value.
 
         Notes
         -----
@@ -1147,7 +1183,7 @@ class PanelEffectsResults(PanelResults):
 
     @property
     def included_effects(self) -> list[str]:
-        """List of effects included in the model"""
+        """List of effects included in the model."""
         entity_effect = self._entity_effect
         time_effect = self._time_effect
         other_effect = self._other_effect
@@ -1164,13 +1200,13 @@ class PanelEffectsResults(PanelResults):
 
     @property
     def other_info(self) -> DataFrame | None:
-        """Statistics on observations per group for other effects"""
+        """Statistics on observations per group for other effects."""
         return self._other_info
 
     @property
     def rsquared_inclusive(self) -> float:
         """
-        Model Coefficient of determination including fit of included effects
+        Model Coefficient of determination including fit of included effects.
 
         Returns
         -------
@@ -1192,7 +1228,7 @@ class PanelEffectsResults(PanelResults):
         Returns
         -------
         Summary
-            Summary table of model estimation results
+            Summary table of model estimation results.
 
         Notes
         -----
@@ -1240,7 +1276,7 @@ class PanelEffectsResults(PanelResults):
 
     @property
     def variance_decomposition(self) -> Series:
-        """Decomposition of total variance into effects and residuals"""
+        """Decomposition of total variance into effects and residuals."""
         vals = [self._sigma2_effects, self._sigma2_eps, self._rho]
         index = ["Effects", "Residual", "Percent due to Effects"]
         return Series(vals, index=index, name="Variance Decomposition")
@@ -1286,7 +1322,7 @@ def _check_same_sample(res: PanelResults, other: PanelResults) -> None:
         )
 
 
-class HausmanTestResults(NamedTuple):
+class HausmanTestResults(NamedTuple):  # numpydoc ignore=PR02
     """
     Results of a Hausman specification test.
 
@@ -1331,7 +1367,13 @@ class HausmanTestResults(NamedTuple):
 
 class RandomEffectsResults(PanelResults):
     """
-    Results container for random effect panel data models
+    Results container for random effect panel data models.
+
+    Parameters
+    ----------
+    res : AttrDict
+        The results of the estimation, which the ``fit`` method of the model
+        constructs.
     """
 
     def __init__(self, res: AttrDict) -> None:
@@ -1343,14 +1385,14 @@ class RandomEffectsResults(PanelResults):
 
     @property
     def variance_decomposition(self) -> Series:
-        """Decomposition of total variance into effects and residuals"""
+        """Decomposition of total variance into effects and residuals."""
         vals = [self._sigma2_effects, self._sigma2_eps, self._rho]
         index = ["Effects", "Residual", "Percent due to Effects"]
         return Series(vals, index=index, name="Variance Decomposition")
 
     @property
     def theta(self) -> DataFrame:
-        """Values used in generalized demeaning"""
+        """Values used in generalized demeaning."""
         return self._theta
 
     def hausman(
@@ -1555,7 +1597,13 @@ PanelModelResults = Union[PanelEffectsResults, PanelResults, RandomEffectsResult
 
 class FamaMacBethResults(PanelResults):
     """
-    Results container for Fama MacBeth panel data models
+    Results container for Fama MacBeth panel data models.
+
+    Parameters
+    ----------
+    res : AttrDict
+        The results of the estimation, which the ``fit`` method of the model
+        constructs.
     """
 
     def __init__(self, res: AttrDict):
@@ -1696,26 +1744,27 @@ class FamaMacBethResults(PanelResults):
     @property
     def all_params(self) -> DataFrame:
         """
-        The set of parameters estimated for each of the time periods
+        The set of parameters estimated for each of the time periods.
 
         Returns
         -------
         DataFrame
-            The parameters (nobs, nparam).
+            The parameters of each of the time periods, with shape (nobs,
+            nparam).
         """
         return self._all_params
 
     @property
     def avg_rsquared(self) -> float:
         """
-        The average coefficient of determination
+        The average coefficient of determination.
 
-        This value contains the average of the individual adjusted rsquared
-        values across the nobs cross-sectional regressions. An rsquare value
-        is only included in the average if a cross-section has full rank and if
-        the dependent variable of the cross-section varies, since the coefficient
-        of determination is NaN, up to rounding error, if its total sum of squares
-        is zero.
+        This value contains the average of the individual rsquared values
+        across the cross-sectional regressions, one for each time period. An
+        R-squared value is only included in the average if a cross-section has
+        full rank and if the dependent variable of the cross-section varies,
+        since the coefficient of determination is NaN, up to rounding error, if
+        its total sum of squares is zero.
         """
         return self._avg_r2
 
@@ -1725,31 +1774,40 @@ class FamaMacBethResults(PanelResults):
         The average coefficient of determination, adjusted for sample size.
 
         This value contains the average of the individual adjusted rsquared
-        values across the nobs cross-sectional regressions. An rsquare value
-        is only included in the average if a cross-section has full rank,
-        if the number of dependent variables in a cross-section is larger than
-        the number of regressors, and if the dependent variable of the
-        cross-section varies, since the coefficient of determination is NaN, up to
-        rounding error, if its total sum of squares is zero.
+        values across the cross-sectional regressions, one for each time
+        period. An R-squared value is only included in the average if a
+        cross-section has full rank, if the number of observations in a
+        cross-section is larger than the number of regressors, and if the
+        dependent variable of the cross-section varies, since the coefficient
+        of determination is NaN, up to rounding error, if its total sum of
+        squares is zero.
         """
         return self._avg_adj_r2
 
 
 class PanelModelComparison(_ModelComparison):
     """
-    Comparison of multiple models
+    Comparison of multiple models.
 
     Parameters
     ----------
-    results : {list, dict}
-        Set of results to compare.  If a dict, the keys will be used as model
-        names.
-    precision : {"tstats","std_errors", "std-errors", "pvalues"}
-        Estimator precision estimator to include in the comparison output.
-        Default is "tstats".
-    stars : bool
+    results : list of results or dict of str to results
+        Set of results to compare. The results are those of the panel models
+        in the package. If a dict, the keys will be used as model names.
+    precision : {"tstats", "std_errors", "std-errors", "pvalues"}, optional
+        Estimator precision estimator to include in the comparison output. The
+        default is ``"tstats"``. The value is not case sensitive.
+    stars : bool, optional
         Add stars based on the p-value of the coefficient where 1, 2 and
-        3-stars correspond to p-values of 10%, 5% and 1%, respectively.
+        3-stars correspond to p-values of 10%, 5% and 1%, respectively. The
+        default is False.
+
+    Raises
+    ------
+    TypeError
+        If a result is not the result of a panel model.
+    ValueError
+        If `precision` is not one of the supported values.
     """
 
     _supported = (
@@ -1771,7 +1829,7 @@ class PanelModelComparison(_ModelComparison):
     @property
     def rsquared_between(self) -> Series:
         """
-        Between coefficients of determination (R**2)
+        Between coefficients of determination (R**2).
 
         Returns
         -------
@@ -1789,7 +1847,7 @@ class PanelModelComparison(_ModelComparison):
     @property
     def rsquared_within(self) -> Series:
         """
-        Within coefficients of determination (R**2)
+        Within coefficients of determination (R**2).
 
         Returns
         -------
@@ -1807,7 +1865,7 @@ class PanelModelComparison(_ModelComparison):
     @property
     def rsquared_overall(self) -> Series:
         """
-        Overall coefficients of determination (R**2)
+        Overall coefficients of determination (R**2).
 
         Returns
         -------
@@ -1824,12 +1882,12 @@ class PanelModelComparison(_ModelComparison):
 
     @property
     def estimator_method(self) -> Series:
-        """Estimation methods"""
+        """Estimation methods."""
         return self._get_property("name")
 
     @property
     def cov_estimator(self) -> Series:
-        """Covariance estimator descriptions"""
+        """Covariance estimator descriptions."""
         return self._get_property("_cov_type")
 
     @property
@@ -1840,7 +1898,7 @@ class PanelModelComparison(_ModelComparison):
         Returns
         -------
         Summary
-            Summary table of model estimation results
+            Summary table of model estimation results.
 
         Notes
         -----
@@ -1957,23 +2015,31 @@ def compare(
     stars: bool = False,
 ) -> PanelModelComparison:
     """
-    Compare the results of multiple models
+    Compare the results of multiple models.
 
     Parameters
     ----------
-    results : {list, dict}
-        Set of results to compare.  If a dict, the keys will be used as model
-        names.
-    precision : {"tstats","std_errors", "std-errors", "pvalues"}
-        Estimator precision estimator to include in the comparison output.
-        Default is "tstats".
-    stars : bool
+    results : list of results or dict of str to results
+        Set of results to compare. The results are those of the panel models
+        in the package. If a dict, the keys will be used as model names.
+    precision : {"tstats", "std_errors", "std-errors", "pvalues"}, optional
+        Estimator precision estimator to include in the comparison output. The
+        default is ``"tstats"``. The value is not case sensitive.
+    stars : bool, optional
         Add stars based on the p-value of the coefficient where 1, 2 and
-        3-stars correspond to p-values of 10%, 5% and 1%, respectively.
+        3-stars correspond to p-values of 10%, 5% and 1%, respectively. The
+        default is False.
 
     Returns
     -------
     PanelModelComparison
         The model comparison object.
+
+    Raises
+    ------
+    TypeError
+        If a result is not the result of a panel model.
+    ValueError
+        If `precision` is not one of the supported values.
     """
     return PanelModelComparison(results, precision=precision, stars=stars)

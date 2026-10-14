@@ -1,3 +1,5 @@
+"""Panel data models and estimators."""
+
 from __future__ import annotations
 
 from linearmodels.compat.scipy import csc_array, diags_array
@@ -120,6 +122,28 @@ def _lstsq(
 
 
 def panel_structure_stats(ids: linearmodels.typing.data.IntArray, name: str) -> Series:
+    """
+    Compute statistics of the number of observations in each group.
+
+    Parameters
+    ----------
+    ids : ndarray
+        The non-negative integer id of the group of each observation.
+    name : str
+        The name of the output, which is also used in the error message.
+
+    Returns
+    -------
+    Series
+        The mean, median, maximum, minimum and number of groups, named
+        ``"mean"``, ``"median"``, ``"max"``, ``"min"`` and ``"total"``.
+
+    Raises
+    ------
+    ValueError
+        If an id is negative, which marks a missing value in the index of the
+        panel.
+    """
     ids = np.asarray(ids)
     if np.any(ids < 0):
         raise ValueError(
@@ -133,7 +157,23 @@ def panel_structure_stats(ids: linearmodels.typing.data.IntArray, name: str) -> 
     return Series(out, index=index, name=name)
 
 
-class FInfo(NamedTuple):
+class FInfo(NamedTuple):  # numpydoc ignore=PR02
+    """
+    Information that the robust F-statistic of a model needs.
+
+    Parameters
+    ----------
+    sel : ndarray
+        Boolean array that selects the parameters that are tested, which are all
+        of the parameters except for the constant.
+    name : str
+        The name of the test.
+    invalid_test_stat : InvalidTestStatistic or None
+        The test statistic to return if the test cannot be computed, or None.
+    is_invalid : bool
+        Flag indicating that the test cannot be computed.
+    """
+
     sel: linearmodels.typing.data.BoolArray
     name: str
     invalid_test_stat: InvalidTestStatistic | None
@@ -248,20 +288,24 @@ def _panel_data(value: Any, name: str, var_name: str, **kwargs: Any) -> PanelDat
 
 class PanelFormulaParser:
     """
-    Parse formulas for OLS and IV models
+    Parse formulas for OLS and IV models.
 
     Parameters
     ----------
     formula : str
         String formula object.
     data : DataFrame
-        Frame containing values for variables used in formula
-    context : int
-        Stack depth to use when evaluating formulas
+        Frame containing values for variables used in formula.
+    eval_env : int, optional
+        Stack depth to use when evaluating formulas. The default is 2. It is
+        not used if `context` is provided.
+    context : Mapping of str to object, optional
+        The variables that the formula can use, by name. If not provided, it is
+        captured at the stack depth `eval_env`.
 
     Notes
     -----
-    The general structure of a formula is `dep ~ exog`
+    The general structure of a formula is `dep ~ exog`.
     """
 
     def __init__(
@@ -308,43 +352,50 @@ class PanelFormulaParser:
 
     @property
     def entity_effect(self) -> bool:
-        """Formula contains entity effect"""
+        """Formula contains entity effect."""
         return self._entity_effect
 
     @property
     def time_effect(self) -> bool:
-        """Formula contains time effect"""
+        """Formula contains time effect."""
         return self._time_effect
 
     @property
     def eval_env(self) -> int:
-        """Set or get the eval env depth"""
+        """Set or get the eval env depth."""
         return self._eval_env
 
     @eval_env.setter
-    def eval_env(self, value: int) -> None:
+    def eval_env(self, value: int) -> None:  # numpydoc ignore=GL08
         self._context = capture_context(value)
         self._eval_env = value
 
     @property
     def context(self) -> Mapping[str, Any]:
-        """Get the context used in the parser"""
+        """Get the context used in the parser."""
         return self._context
 
     @context.setter
     def context(self, value: Mapping[str, Any]) -> None:
-        """Get the context used in the parser"""
+        """
+        Set the context used in the parser.
+
+        Parameters
+        ----------
+        value : Mapping of str to object
+            The variables that the formula can use, by name.
+        """
         self._context = value
 
     @property
     def data(self) -> tuple[DataFrame, DataFrame]:
-        """Returns a tuple containing the dependent, exog, endog"""
+        """Return a tuple containing the dependent and exog."""
         out = self.dependent, self.exog
         return out
 
     @property
     def dependent(self) -> DataFrame:
-        """DataFrame containing the dependent variable"""
+        """DataFrame containing the dependent variable."""
         return DataFrame(
             Formula(self._lhs).get_model_matrix(
                 self._data.dataframe,
@@ -355,7 +406,7 @@ class PanelFormulaParser:
 
     @property
     def exog(self) -> DataFrame:
-        """DataFrame containing the exogenous variables"""
+        """DataFrame containing the exogenous variables."""
         return DataFrame(
             Formula(self._rhs).get_model_matrix(
                 self._data.dataframe,
@@ -366,7 +417,13 @@ class PanelFormulaParser:
 
 
 class AmbiguityError(Exception):
-    pass
+    """
+    Error raised when the shape of the weights could mean different things.
+
+    It is raised when the numbers of time periods and of entities are equal and
+    1-d weights have that many values, so that the weights could have a value
+    for each time period or for each entity.
+    """
 
 
 __all__ = [
@@ -512,9 +569,9 @@ class _PanelModelBase:
         dimensions (variable by time by entity). A list, a tuple or any other
         container raises a ``TypeError`` that names ``exog``.
     weights : array_like, optional
-        Weights to use in estimation.  Assumes residual variance is
-        proportional to inverse of weight to that the residual time
-        the weight should be homoskedastic.
+        Weights to use in estimation. Assumes the variance of the residual is
+        proportional to the inverse of the weight, so that the residual times
+        the square root of the weight is homoskedastic.
         Weights can be given for each observation, for each time period,
         for each entity or for each combination of time period and entity.
         The weights must be strictly positive and finite. They are rescaled to have a
@@ -540,12 +597,12 @@ class _PanelModelBase:
         are equal and the weights have that many values, unless they have no
         labels and a value for each row. Any other number of values raises a
         ``ValueError``.
-    check_rank : bool
+    check_rank : bool, optional
         Flag indicating whether to perform a rank check on the exogenous
         variables to ensure that the model is identified. Skipping this
         check can reduce the time required to validate a model specification.
         Results may be numerically unstable if this check is skipped and
-        the matrix is not full rank.
+        the matrix is not full rank. The default is True.
     """
 
     def __init__(
@@ -685,7 +742,7 @@ class _PanelModelBase:
         self, clusters: linearmodels.typing.data.IntArray | PanelDataLike
     ) -> PanelData:
         """
-        Reformat cluster variables
+        Reformat cluster variables.
 
         Parameters
         ----------
@@ -1139,16 +1196,16 @@ class _PanelModelBase:
 
     @property
     def formula(self) -> str | None:
-        """Formula used to construct the model"""
+        """Formula used to construct the model."""
         return self._formula
 
     @formula.setter
-    def formula(self, value: str | None) -> None:
+    def formula(self, value: str | None) -> None:  # numpydoc ignore=GL08
         self._formula = value
 
     @property
     def has_constant(self) -> bool:
-        """Flag indicating the model a constant or implicit constant"""
+        """Flag indicating the model has a constant or implicit constant."""
         return self._constant
 
     def _constant_loadings(self) -> linearmodels.typing.data.Float64Array:
@@ -1425,7 +1482,7 @@ class _PanelModelBase:
 
     @property
     def not_null(self) -> linearmodels.typing.data.BoolArray:
-        """Locations of non-missing observations"""
+        """Locations of non-missing observations."""
         return self._not_null
 
     def _setup_clusters(
@@ -1510,26 +1567,39 @@ class _PanelModelBase:
         context: Mapping[str, Any] | None = None,
     ) -> DataFrame:
         """
-        Predict values for additional data
+        Predict values for additional data.
 
         Parameters
         ----------
         params : array_like
-            Model parameters (nvar by 1)
+            Model parameters (nvar by 1).
         exog : PanelData, DataFrame, Series, ndarray or DataArray, optional
             Exogenous regressors (nobs by nvar). The containers are those of
             ``exog`` in the model. A list or a tuple raises a ``TypeError`` that
             names ``exog``.
-        data : DataFrame
+        data : DataFrame, optional
             Values to use when making predictions from a model constructed
-            from a formula
-        context : int
-            Depth of use when evaluating formulas.
+            from a formula.
+        eval_env : int, optional
+            Depth of the stack to use when evaluating formulas. The default is 1.
+            It is not used if `context` is provided.
+        context : Mapping of str to object, optional
+            The variables that the formula can use, by name. If not provided, it
+            is captured at the depth `eval_env`.
 
         Returns
         -------
         DataFrame
-            Fitted values from supplied data and parameters
+            Fitted values from supplied data and parameters.
+
+        Raises
+        ------
+        ValueError
+            If `data` is provided and the model was not created using a formula,
+            if both `exog` and `data` are provided, or if `exog` does not have as
+            many columns as there are parameters.
+        TypeError
+            If `exog` is a container that is not supported, e.g., a list or a tuple.
 
         Notes
         -----
@@ -1576,7 +1646,7 @@ class _PanelModelBase:
 
 class PooledOLS(_PanelModelBase):
     r"""
-    Pooled coefficient estimator for panel data
+    Pooled coefficient estimator for panel data.
 
     Parameters
     ----------
@@ -1594,9 +1664,9 @@ class PooledOLS(_PanelModelBase):
         dimensions (variable by time by entity). A list, a tuple or any other
         container raises a ``TypeError`` that names ``exog``.
     weights : array_like, optional
-        Weights to use in estimation.  Assumes residual variance is
-        proportional to inverse of weight to that the residual time
-        the weight should be homoskedastic.
+        Weights to use in estimation. Assumes the variance of the residual is
+        proportional to the inverse of the weight, so that the residual times
+        the square root of the weight is homoskedastic.
         Weights can be given for each observation, for each time period,
         for each entity or for each combination of time period and entity.
         The weights must be strictly positive and finite. They are rescaled to have a
@@ -1622,12 +1692,29 @@ class PooledOLS(_PanelModelBase):
         are equal and the weights have that many values, unless they have no
         labels and a value for each row. Any other number of values raises a
         ``ValueError``.
-    check_rank : bool
+    check_rank : bool, optional
         Flag indicating whether to perform a rank check on the exogenous
         variables to ensure that the model is identified. Skipping this
         check can reduce the time required to validate a model specification.
         Results may be numerically unstable if this check is skipped and
-        the matrix is not full rank.
+        the matrix is not full rank. The default is True.
+
+    Raises
+    ------
+    TypeError
+        If `dependent` or `exog` is a container that is not supported, e.g., a list
+        or a tuple, or if they have complex values or values that cannot be
+        converted to float64.
+    ValueError
+        If `dependent`, `exog` or `weights` have different shapes or labels, if a
+        combination of an entity and a time period appears more than once, if the
+        weights are not strictly positive and finite or do not have a supported
+        shape, or if `exog` does not have full column rank and `check_rank` is
+        True.
+    AmbiguityError
+        If the numbers of time periods and entities are equal and 1-d weights have
+        that many values, so that they could be a value for each time period or
+        for each entity.
 
     Notes
     -----
@@ -1684,7 +1771,7 @@ class PooledOLS(_PanelModelBase):
         check_rank: bool = True,
     ) -> PooledOLS:
         """
-        Create a model from a formula
+        Create a model from a formula.
 
         Parameters
         ----------
@@ -1697,22 +1784,22 @@ class PooledOLS(_PanelModelBase):
             index contains the entities and the level 1 contains the time. A
             list or a tuple raises a ``TypeError`` that names ``data``.
         weights : array_like, optional
-            Weights to use in estimation.  Assumes residual variance is
-            proportional to inverse of weight to that the residual times
-            the weight should be homoskedastic.
+            Weights to use in estimation. Assumes the variance of the residual is
+            proportional to the inverse of the weight, so that the residual times
+            the square root of the weight is homoskedastic.
             The weights must be strictly positive and finite. They are rescaled to have
             a mean of 1. A NaN weight is missing, and its observation is dropped.
-        check_rank : bool
+        check_rank : bool, optional
             Flag indicating whether to perform a rank check on the exogenous
             variables to ensure that the model is identified. Skipping this
             check can reduce the time required to validate a model
             specification. Results may be numerically unstable if this check
-            is skipped and the matrix is not full rank.
+            is skipped and the matrix is not full rank. The default is True.
 
         Returns
         -------
         PooledOLS
-            Model specified using the formula
+            Model specified using the formula.
 
         Notes
         -----
@@ -1748,22 +1835,30 @@ class PooledOLS(_PanelModelBase):
         ),
     ) -> PanelResults:
         """
-        Estimate model parameters
+        Estimate model parameters.
 
         Parameters
         ----------
-        cov_type : str
-            Name of covariance estimator. See Notes.
+        cov_type : str, optional
+            Name of covariance estimator. The default is ``"unadjusted"``. The
+            names are "unadjusted", "conventional" and "homoskedastic" for the
+            homoskedastic estimator, "robust" and "heteroskedastic" for the
+            heteroskedastic estimator, "clustered" for the clustered estimator,
+            "kernel", "driscoll-kraay" and "dk" for the Driscoll-Kraay estimator,
+            and "ac" and "autocorrelated" for the autocorrelation robust
+            estimator. See Notes.
         debiased : bool, optional
             Flag indicating whether to debias the covariance estimator using
             a degree of freedom adjustment. The default is True. See Notes.
-        cov_config
-            Additional covariance-specific options.  See Notes.
+        **cov_config : bool, float, str, array_like, DataFrame or PanelData
+            Additional covariance-specific options. The options that each
+            covariance estimator supports are listed in Notes. A key that the
+            estimator does not support raises a ``ValueError``.
 
         Returns
         -------
         PanelResults
-            Estimation results
+            Estimation results.
 
         Raises
         ------
@@ -1771,21 +1866,24 @@ class PooledOLS(_PanelModelBase):
             If ``cov_type`` is not one of the supported names, or if it is
             "kernel" or "ac" and ``kernel`` is not one of the supported kernels.
             It is both a ``ValueError`` and a ``KeyError``.
-
-        Examples
-        --------
-        >>> from linearmodels import PooledOLS
-        >>> mod = PooledOLS(y, x)
-        >>> res = mod.fit(cov_type="clustered", cluster_entity=True)
+        ValueError
+            If a key of ``cov_config`` is not supported by the covariance
+            estimator, if ``clusters`` does not have the shape of the data, if
+            ``bandwidth`` is not below the number of time periods, or if the model
+            has no residual degrees of freedom.
+        TypeError
+            If the value of a key of ``cov_config`` does not have the type that the
+            key needs, e.g., if ``kernel`` is not a str.
 
         Notes
         -----
         Five covariance estimators are supported:
 
-        * "unadjusted", "homoskedastic" - Assume residual are homoskedastic
+        * "unadjusted", "conventional", "homoskedastic" - Assume the residuals are
+          homoskedastic
         * "robust", "heteroskedastic" - Control for heteroskedasticity using
           White's estimator
-        * "clustered` - One- or two-way clustering.  Configuration options are:
+        * "clustered" - One- or two-way clustering. The configuration options are:
 
           * ``clusters`` - Input containing 1 or 2 variables. This can be
             a pandas object or PanelData with the index of ``dependent``, a 1-d
@@ -1799,10 +1897,11 @@ class PooledOLS(_PanelModelBase):
             combinations that ``dependent`` does not have are not used. See
             :ref:`panel-input-alignment`.
             Clusters should be integer values, although other types will
-            be coerced to integer values by treating as categorical variables
+            be coerced to integer values by treating as categorical variables.
           * ``cluster_entity`` - Boolean flag indicating to use entity
-            clusters
-          * ``cluster_time`` - Boolean indicating to use time clusters
+            clusters. The default is False.
+          * ``cluster_time`` - Boolean flag indicating to use time clusters. The
+            default is False.
           * ``group_debias`` - Boolean flag indicating whether to apply an
             adjustment for the number of clusters. It multiplies the
             covariance by g / (g - 1) * (n - 1) / n, where g is the number
@@ -1810,12 +1909,14 @@ class PooledOLS(_PanelModelBase):
             two-way clustering, it is applied to each of the three one-way
             covariances that are combined. The default is False.
 
-        * "kernel" - Driscoll-Kraay HAC estimator. Configurations options are:
+        * "kernel", "driscoll-kraay", "dk" - Driscoll-Kraay HAC estimator. The
+          configuration options are:
 
-          * ``kernel`` - One of the supported kernels (bartlett, parzen, qs).
-            Default is Bartlett's kernel, which is produces a covariance
-            estimator similar to the Newey-West covariance estimator.
-          * ``bandwidth`` - Bandwidth to use when computing the kernel.  If
+          * ``kernel`` - One of the supported kernels: "bartlett", "newey-west",
+            "quadratic-spectral", "qs", "andrews", "parzen" or "gallant". The
+            default is Bartlett's kernel, which produces a covariance estimator
+            similar to the Newey-West covariance estimator.
+          * ``bandwidth`` - Bandwidth to use when computing the kernel. If
             not provided, a naive default is used. It must be below the number
             of time periods, and a ``ValueError`` is raised otherwise.
 
@@ -1830,6 +1931,11 @@ class PooledOLS(_PanelModelBase):
         ``debiased=True``, which is the default, scales the covariance by
         n / (n - k), where k is the number of regressors, and uses the t and
         F distributions for inference.
+
+        ``extra_df`` can be used with any of the covariance estimators. It is the
+        number of degrees of freedom that the model uses beyond the regressors,
+        which the covariance estimator always accounts for, whether or not
+        ``debiased`` is True. The default is 0.
 
         ``debiased=True`` and ``group_debias=True`` give the clustered
         covariance of Stata's ``regress ..., vce(cluster ...)``.
@@ -1854,6 +1960,12 @@ class PooledOLS(_PanelModelBase):
            by time and then entity, an array was attached to the wrong
            observations without an error, and a pandas object with labels was
            rejected.
+
+        Examples
+        --------
+        >>> from linearmodels import PooledOLS
+        >>> mod = PooledOLS(y, x)
+        >>> res = mod.fit(cov_type="clustered", cluster_entity=True)
         """
         y = self.dependent.values2d
         x = self.exog.values2d
@@ -1935,26 +2047,39 @@ class PooledOLS(_PanelModelBase):
         context: Mapping[str, Any] | None = None,
     ) -> DataFrame:
         """
-        Predict values for additional data
+        Predict values for additional data.
 
         Parameters
         ----------
         params : array_like
-            Model parameters (nvar by 1)
+            Model parameters (nvar by 1).
         exog : PanelData, DataFrame, Series, ndarray or DataArray, optional
             Exogenous regressors (nobs by nvar). The containers are those of
             ``exog`` in the model. A list or a tuple raises a ``TypeError`` that
             names ``exog``.
-        data : DataFrame
+        data : DataFrame, optional
             Values to use when making predictions from a model constructed
-            from a formula
-        context : int
-            Depth to use when evaluating formulas.
+            from a formula.
+        eval_env : int, optional
+            Depth of the stack to use when evaluating formulas. The default is 1.
+            It is not used if `context` is provided.
+        context : Mapping of str to object, optional
+            The variables that the formula can use, by name. If not provided, it
+            is captured at the depth `eval_env`.
 
         Returns
         -------
         DataFrame
-            Fitted values from supplied data and parameters
+            Fitted values from supplied data and parameters.
+
+        Raises
+        ------
+        ValueError
+            If `data` is provided and the model was not created using a formula,
+            if both `exog` and `data` are provided, or if `exog` does not have as
+            many columns as there are parameters.
+        TypeError
+            If `exog` is a container that is not supported, e.g., a list or a tuple.
 
         Notes
         -----
@@ -2000,7 +2125,7 @@ class PooledOLS(_PanelModelBase):
 
 class PanelOLS(_PanelModelBase):
     r"""
-    One- and two-way fixed effects estimator for panel data
+    One- and two-way fixed effects estimator for panel data.
 
     Parameters
     ----------
@@ -2020,9 +2145,9 @@ class PanelOLS(_PanelModelBase):
         variables, a DataFrame with the index of ``dependent`` and no columns or an
         array with 0 variables, if the model has effects. See the notes.
     weights : array_like, optional
-        Weights to use in estimation.  Assumes residual variance is
-        proportional to inverse of weight to that the residual time
-        the weight should be homoskedastic.
+        Weights to use in estimation. Assumes the variance of the residual is
+        proportional to the inverse of the weight, so that the residual times
+        the square root of the weight is homoskedastic.
         Weights can be given for each observation, for each time period,
         for each entity or for each combination of time period and entity.
         The weights must be strictly positive and finite. They are rescaled to have a
@@ -2048,10 +2173,11 @@ class PanelOLS(_PanelModelBase):
         are equal and the weights have that many values, unless they have no
         labels and a value for each row. Any other number of values raises a
         ``ValueError``.
-    entity_effects : bool
-        Flag whether to include entity (fixed) effects in the model
-    time_effects : bool
-        Flag whether to include time effects in the model
+    entity_effects : bool, optional
+        Flag whether to include entity (fixed) effects in the model. The default
+        is False.
+    time_effects : bool, optional
+        Flag whether to include time effects in the model. The default is False.
     other_effects : array_like, optional
         Category codes to use for any effects that are not entity or time
         effects. Each variable is treated as an effect. An array or list with the
@@ -2065,16 +2191,42 @@ class PanelOLS(_PanelModelBase):
         An observation where any of the other effects is missing (NaN or None) is
         dropped, with the observations that have a missing value in dependent, exog
         or weights, and a ``MissingValueWarning`` is issued.
-    singletons : bool
-        Flag indicating whether to drop singleton observation
-    drop_absorbed : bool
-        Flag indicating whether to drop absorbed variables
-    check_rank : bool
+    singletons : bool, optional
+        Flag indicating whether to keep singleton observations. If False, the
+        observations that are alone in their group of an effect are dropped,
+        repeatedly until there are none, and a ``SingletonWarning`` is issued.
+        The default is True.
+    drop_absorbed : bool, optional
+        Flag indicating whether to drop absorbed variables. If False, an
+        ``AbsorbingEffectError`` is raised by ``fit`` for a model with an
+        absorbed variable, and if True a variable is dropped with an
+        ``AbsorbingEffectWarning``. The default is False.
+    check_rank : bool, optional
         Flag indicating whether to perform a rank check on the exogenous
         variables to ensure that the model is identified. Skipping this
         check can reduce the time required to validate a model specification.
         Results may be numerically unstable if this check is skipped and
-        the matrix is not full rank.
+        the matrix is not full rank. The default is True.
+
+    Raises
+    ------
+    TypeError
+        If `dependent` or `exog` is a container that is not supported, e.g., a list
+        or a tuple, or if they have complex values or values that cannot be
+        converted to float64.
+    ValueError
+        If `dependent`, `exog` or `weights` have different shapes or labels, if a
+        combination of an entity and a time period appears more than once, if the
+        weights are not strictly positive and finite or do not have a supported
+        shape, or if `exog` does not have full column rank and `check_rank` is
+        True. It is also raised if more than 2 effects are included, if
+        two of the effects nest each other, if `other_effects` does not have as many
+        entities and time periods as `dependent`, or if the model has no effects
+        and `exog` has no columns.
+    AmbiguityError
+        If the numbers of time periods and entities are equal and 1-d weights have
+        that many values, so that they could be a value for each time period or
+        for each entity.
 
     Notes
     -----
@@ -2402,17 +2554,17 @@ class PanelOLS(_PanelModelBase):
 
     @property
     def entity_effects(self) -> bool:
-        """Flag indicating whether entity effects are included"""
+        """Flag indicating whether entity effects are included."""
         return self._entity_effects
 
     @property
     def time_effects(self) -> bool:
-        """Flag indicating whether time effects are included"""
+        """Flag indicating whether time effects are included."""
         return self._time_effects
 
     @property
     def other_effects(self) -> bool:
-        """Flag indicating whether other (generic) effects are included"""
+        """Flag indicating whether other (generic) effects are included."""
         return self._other_effects
 
     @classmethod
@@ -2428,7 +2580,7 @@ class PanelOLS(_PanelModelBase):
         check_rank: bool = True,
     ) -> PanelOLS:
         """
-        Create a model from a formula
+        Create a model from a formula.
 
         Parameters
         ----------
@@ -2447,31 +2599,37 @@ class PanelOLS(_PanelModelBase):
             index contains the entities and the level 1 contains the time. A
             list or a tuple raises a ``TypeError`` that names ``data``.
         weights : array_like, optional
-            Weights to use in estimation.  Assumes residual variance is
-            proportional to inverse of weight to that the residual time
-            the weight should be homoskedastic.
+            Weights to use in estimation. Assumes the variance of the residual is
+            proportional to the inverse of the weight, so that the residual times
+            the square root of the weight is homoskedastic.
             The weights must be strictly positive and finite. They are rescaled to have
             a mean of 1. A NaN weight is missing, and its observation is dropped.
-        other_effects : array_like
+        other_effects : array_like, optional
             Category codes to use for any effects that are not entity or time
             effects. Each variable is treated as an effect. An observation where
             any of the other effects is missing is dropped, with a
             ``MissingValueWarning``.
-        singletons : bool
-            Flag indicating whether to drop singleton observation
-        drop_absorbed : bool
-            Flag indicating whether to drop absorbed variables
-        check_rank : bool
+        singletons : bool, optional
+            Flag indicating whether to keep singleton observations. If False, the
+            observations that are alone in their group of an effect are dropped,
+            repeatedly until there are none, and a ``SingletonWarning`` is issued.
+            The default is True.
+        drop_absorbed : bool, optional
+            Flag indicating whether to drop absorbed variables. If False, an
+            ``AbsorbingEffectError`` is raised by ``fit`` for a model with an
+            absorbed variable, and if True a variable is dropped with an
+            ``AbsorbingEffectWarning``. The default is False.
+        check_rank : bool, optional
             Flag indicating whether to perform a rank check on the exogenous
             variables to ensure that the model is identified. Skipping this
             check can reduce the time required to validate a model
             specification. Results may be numerically unstable if this check
-            is skipped and the matrix is not full rank.
+            is skipped and the matrix is not full rank. The default is True.
 
         Returns
         -------
         PanelOLS
-            Model specified using the formula
+            Model specified using the formula.
 
         Examples
         --------
@@ -2870,31 +3028,38 @@ class PanelOLS(_PanelModelBase):
         ),
     ) -> PanelEffectsResults:
         """
-        Estimate model parameters
+        Estimate model parameters.
 
         Parameters
         ----------
-        use_lsdv : bool
+        use_lsdv : bool, optional
             Flag indicating to use the Least Squares Dummy Variable estimator
-            to eliminate effects.  The default value uses only means and does
-            note require constructing dummy variables for each effect.
-        use_lsmr : bool
+            to eliminate effects. The default is False, which uses only means
+            and does not require constructing dummy variables for each effect.
+        use_lsmr : bool, optional
             Flag indicating to use LSDV with the Sparse Equations and Least
-            Squares estimator to eliminate the fixed effects.
-        low_memory : {bool, None}
+            Squares estimator to eliminate the fixed effects. It takes
+            precedence over ``use_lsdv``. The default is False.
+        low_memory : bool, optional
             Flag indicating whether to use a low-memory algorithm when a model
-            contains two-way fixed effects. If `None`, the choice is taken
+            contains two-way fixed effects. If not provided, the choice is taken
             automatically, and the low memory algorithm is used if the
-            required dummy variable array is both larger than then array of
-            regressors in the model and requires more than 1 GiB .
-        cov_type : str
-            Name of covariance estimator. See Notes.
+            required dummy variable array is both larger than the array of
+            regressors in the model and requires more than 1 GiB.
+        cov_type : str, optional
+            Name of covariance estimator. The default is ``"unadjusted"``. The
+            names are "unadjusted", "conventional" and "homoskedastic" for the
+            homoskedastic estimator, "robust" and "heteroskedastic" for the
+            heteroskedastic estimator, "clustered" for the clustered estimator,
+            "kernel", "driscoll-kraay" and "dk" for the Driscoll-Kraay estimator,
+            and "ac" and "autocorrelated" for the autocorrelation robust
+            estimator. See Notes.
         debiased : bool, optional
             Flag indicating whether to debias the covariance estimator using
             a degree of freedom adjustment. The default is True. The
             estimated effects are counted in the degrees of freedom whether
             or not ``debiased`` is True. See Notes.
-        auto_df : bool
+        auto_df : bool, optional
             Flag indicating that the treatment of estimated effects in degree
             of freedom adjustment is automatically handled. This is useful
             since clustered standard errors that are clustered using the same
@@ -2902,17 +3067,20 @@ class PanelOLS(_PanelModelBase):
             while other estimators such as the unadjusted covariance do. With
             two cluster variables, the effect has to be nested in both of them,
             which means that each of its groups is in one group of each variable.
-        count_effects : bool
+            The default is True.
+        count_effects : bool, optional
             Flag indicating that the covariance estimator should be adjusted
             to account for the estimation of effects in the model. Only used
-            if ``auto_df=False``.
-        cov_config
-            Additional covariance-specific options.  See Notes.
+            if ``auto_df=False``. The default is True.
+        **cov_config : bool, float, str, array_like, DataFrame or PanelData
+            Additional covariance-specific options. The options that each
+            covariance estimator supports are listed in Notes. A key that the
+            estimator does not support raises a ``ValueError``.
 
         Returns
         -------
         PanelEffectsResults
-            Estimation results
+            Estimation results.
 
         Raises
         ------
@@ -2920,21 +3088,37 @@ class PanelOLS(_PanelModelBase):
             If ``cov_type`` is not one of the supported names, or if it is
             "kernel" or "ac" and ``kernel`` is not one of the supported kernels.
             It is both a ``ValueError`` and a ``KeyError``.
+        AbsorbingEffectError
+            If the effects absorb one or more variables of ``exog``, or make them
+            collinear, and ``drop_absorbed`` is False in the model.
+        ValueError
+            If a key of ``cov_config`` is not supported by the covariance
+            estimator, if ``clusters`` does not have the shape of the data, if
+            ``bandwidth`` is not below the number of time periods, if the model
+            has no residual degrees of freedom, or if all of the variables of
+            ``exog`` are absorbed.
+        TypeError
+            If the value of a key of ``cov_config`` does not have the type that the
+            key needs, e.g., if ``kernel`` is not a str.
 
-        Examples
-        --------
-        >>> from linearmodels import PanelOLS
-        >>> mod = PanelOLS(y, x, entity_effects=True)
-        >>> res = mod.fit(cov_type="clustered", cluster_entity=True)
+        Warns
+        -----
+        AbsorbingEffectWarning
+            If variables are dropped since they are absorbed by the effects, which
+            happens if ``drop_absorbed`` is True in the model.
+        MemoryWarning
+            If ``low_memory`` is not provided and the low-memory algorithm is used
+            for a model with entity and time effects.
 
         Notes
         -----
         Five covariance estimators are supported:
 
-        * "unadjusted", "homoskedastic" - Assume residual are homoskedastic
+        * "unadjusted", "conventional", "homoskedastic" - Assume the residuals are
+          homoskedastic
         * "robust", "heteroskedastic" - Control for heteroskedasticity using
           White's estimator
-        * "clustered` - One- or two-way clustering.  Configuration options are:
+        * "clustered" - One- or two-way clustering. The configuration options are:
 
           * ``clusters`` - Input containing 1 or 2 variables. This can be
             a pandas object or PanelData with the index of ``dependent``, a 1-d
@@ -2948,10 +3132,11 @@ class PanelOLS(_PanelModelBase):
             combinations that ``dependent`` does not have are not used. See
             :ref:`panel-input-alignment`.
             Clusters should be integer valued, although other types will
-            be coerced to integer values by treating as categorical variables
+            be coerced to integer values by treating as categorical variables.
           * ``cluster_entity`` - Boolean flag indicating to use entity
-            clusters
-          * ``cluster_time`` - Boolean indicating to use time clusters
+            clusters. The default is False.
+          * ``cluster_time`` - Boolean flag indicating to use time clusters. The
+            default is False.
           * ``group_debias`` - Boolean flag indicating whether to apply an
             adjustment for the number of clusters. It multiplies the
             covariance by g / (g - 1) * (n - 1) / n, where g is the number
@@ -2959,12 +3144,14 @@ class PanelOLS(_PanelModelBase):
             two-way clustering, it is applied to each of the three one-way
             covariances that are combined. The default is False.
 
-        * "kernel" - Driscoll-Kraay HAC estimator. Configurations options are:
+        * "kernel", "driscoll-kraay", "dk" - Driscoll-Kraay HAC estimator. The
+          configuration options are:
 
-          * ``kernel`` - One of the supported kernels (bartlett, parzen, qs).
-            Default is Bartlett's kernel, which is produces a covariance
-            estimator similar to the Newey-West covariance estimator.
-          * ``bandwidth`` - Bandwidth to use when computing the kernel.  If
+          * ``kernel`` - One of the supported kernels: "bartlett", "newey-west",
+            "quadratic-spectral", "qs", "andrews", "parzen" or "gallant". The
+            default is Bartlett's kernel, which produces a covariance estimator
+            similar to the Newey-West covariance estimator.
+          * ``bandwidth`` - Bandwidth to use when computing the kernel. If
             not provided, a naive default is used. It must be below the number
             of time periods, and a ``ValueError`` is raised otherwise.
 
@@ -3032,6 +3219,12 @@ class PanelOLS(_PanelModelBase):
            by time and then entity, an array was attached to the wrong
            observations without an error, and a pandas object with labels was
            rejected.
+
+        Examples
+        --------
+        >>> from linearmodels import PanelOLS
+        >>> mod = PanelOLS(y, x, entity_effects=True)
+        >>> res = mod.fit(cov_type="clustered", cluster_entity=True)
         """
 
         weighted = np.any(self.weights.values2d != 1.0)
@@ -3258,7 +3451,7 @@ class PanelOLS(_PanelModelBase):
 
 class BetweenOLS(_PanelModelBase):
     r"""
-    Between estimator for panel data
+    Between estimator for panel data.
 
     Parameters
     ----------
@@ -3276,9 +3469,9 @@ class BetweenOLS(_PanelModelBase):
         dimensions (variable by time by entity). A list, a tuple or any other
         container raises a ``TypeError`` that names ``exog``.
     weights : array_like, optional
-        Weights to use in estimation.  Assumes residual variance is
-        proportional to inverse of weight to that the residual time
-        the weight should be homoskedastic.
+        Weights to use in estimation. Assumes the variance of the residual is
+        proportional to the inverse of the weight, so that the residual times
+        the square root of the weight is homoskedastic.
         Weights can be given for each observation, for each time period,
         for each entity or for each combination of time period and entity.
         The weights must be strictly positive and finite. They are rescaled to have a
@@ -3304,6 +3497,29 @@ class BetweenOLS(_PanelModelBase):
         are equal and the weights have that many values, unless they have no
         labels and a value for each row. Any other number of values raises a
         ``ValueError``.
+    check_rank : bool, optional
+        Flag indicating whether to perform a rank check on the exogenous
+        variables to ensure that the model is identified. Skipping this
+        check can reduce the time required to validate a model specification.
+        Results may be numerically unstable if this check is skipped and
+        the matrix is not full rank. The default is True.
+
+    Raises
+    ------
+    TypeError
+        If `dependent` or `exog` is a container that is not supported, e.g., a list
+        or a tuple, or if they have complex values or values that cannot be
+        converted to float64.
+    ValueError
+        If `dependent`, `exog` or `weights` have different shapes or labels, if a
+        combination of an entity and a time period appears more than once, if the
+        weights are not strictly positive and finite or do not have a supported
+        shape, or if `exog` does not have full column rank and `check_rank` is
+        True.
+    AmbiguityError
+        If the numbers of time periods and entities are equal and 1-d weights have
+        that many values, so that they could be a value for each time period or
+        for each entity.
 
     Notes
     -----
@@ -3417,41 +3633,61 @@ class BetweenOLS(_PanelModelBase):
         ),
     ) -> PanelResults:
         """
-        Estimate model parameters
+        Estimate model parameters.
 
         Parameters
         ----------
-        reweight : bool
+        reweight : bool, optional
             Flag indicating to reweight observations if the input data is
-            unbalanced using a WLS estimator.  If weights are provided, these
+            unbalanced using a WLS estimator. If weights are provided, these
             are accounted for when reweighting. Has no effect on balanced data.
-        cov_type : str
-            Name of covariance estimator. See Notes.
+            The default is False.
+        cov_type : str, optional
+            Name of covariance estimator. The default is ``"unadjusted"``. The
+            names are "unadjusted", "conventional" and "homoskedastic" for the
+            homoskedastic estimator, "robust" and "heteroskedastic" for the
+            heteroskedastic estimator, and "clustered" for the clustered
+            estimator. See Notes.
         debiased : bool, optional
             Flag indicating whether to debias the covariance estimator using
             a degree of freedom adjustment. The default is True. See Notes.
-        cov_config
-            Additional covariance-specific options.  See Notes.
+        **cov_config : bool, float, str, array_like, DataFrame or PanelData
+            Additional covariance-specific options. The options that each
+            covariance estimator supports are listed in Notes. A key that the
+            estimator does not support raises a ``ValueError``.
 
         Returns
         -------
         PanelResults
-            Estimation results
+            Estimation results.
 
-        Examples
-        --------
-        >>> from linearmodels import BetweenOLS
-        >>> mod = BetweenOLS(y, x)
-        >>> res = mod.fit(cov_type='robust')
+        Raises
+        ------
+        UnknownOptionError
+            If ``cov_type`` is not one of the supported names. It is both a
+            ``ValueError`` and a ``KeyError``.
+        ValueError
+            If the regressors are collinear in the means of the entities, which are
+            the observations of the regression, unless ``check_rank`` is False in
+            the model. This happens if there are fewer entities than regressors, or
+            if a regressor is a combination of the others only in the means, e.g.,
+            the dummy variables of the periods and the constant in a balanced
+            panel. It is also raised if a key of ``cov_config`` is not supported by
+            the covariance estimator, if the clusters vary within an entity, or if
+            the model has no residual degrees of freedom.
+        TypeError
+            If the value of a key of ``cov_config`` does not have the type that the
+            key needs.
 
         Notes
         -----
         Three covariance estimators are supported:
 
-        * "unadjusted", "homoskedastic" - Assume residual are homoskedastic
+        * "unadjusted", "conventional", "homoskedastic" - Assume the residuals are
+          homoskedastic
         * "robust", "heteroskedastic" - Control for heteroskedasticity using
           White's estimator
-        * "clustered` - One- or two-way clustering.  Configuration options are:
+        * "clustered" - One- or two-way clustering. The configuration options are:
 
           * ``clusters`` - Input containing 1 or 2 variables. This can be
             a pandas object or PanelData with the index of ``dependent``, a 1-d
@@ -3465,7 +3701,7 @@ class BetweenOLS(_PanelModelBase):
             combinations that ``dependent`` does not have are not used. See
             :ref:`panel-input-alignment`.
             Clusters should be integer values, although other types will
-            be coerced to integer values by treating as categorical variables
+            be coerced to integer values by treating as categorical variables.
           * ``group_debias`` - Boolean flag indicating whether to apply an
             adjustment for the number of clusters. It multiplies the
             covariance by g / (g - 1) * (n - 1) / n, where g is the number
@@ -3474,11 +3710,17 @@ class BetweenOLS(_PanelModelBase):
             covariances that are combined. The default is False.
 
         When using a clustered covariance estimator, all cluster ids must be
-        identical within an entity.
+        identical within an entity. The options ``cluster_entity`` and
+        ``cluster_time`` are not supported, since the observations are the entities.
 
         ``debiased=True``, which is the default, scales the covariance by
         n / (n - k), where k is the number of regressors, and uses the t and
         F distributions for inference. See :ref:`panel-small-sample`.
+
+        ``extra_df`` can be used with any of the covariance estimators. It is the
+        number of degrees of freedom that the model uses beyond the regressors,
+        which the covariance estimator always accounts for, whether or not
+        ``debiased`` is True. The default is 0.
 
         .. versionchanged:: 7.1
 
@@ -3491,6 +3733,12 @@ class BetweenOLS(_PanelModelBase):
            by time and then entity, an array was attached to the wrong
            observations without an error, and a pandas object with labels was
            rejected.
+
+        Examples
+        --------
+        >>> from linearmodels import BetweenOLS
+        >>> mod = BetweenOLS(y, x)
+        >>> res = mod.fit(cov_type='robust')
         """
         y, x, w = self._prepare_between()
         if np.all(self.weights.values2d == 1.0) and not reweight:
@@ -3593,7 +3841,7 @@ class BetweenOLS(_PanelModelBase):
         check_rank: bool = True,
     ) -> BetweenOLS:
         """
-        Create a model from a formula
+        Create a model from a formula.
 
         Parameters
         ----------
@@ -3606,22 +3854,22 @@ class BetweenOLS(_PanelModelBase):
             index contains the entities and the level 1 contains the time. A
             list or a tuple raises a ``TypeError`` that names ``data``.
         weights : array_like, optional
-            Weights to use in estimation.  Assumes residual variance is
-            proportional to inverse of weight to that the residual times
-            the weight should be homoskedastic.
+            Weights to use in estimation. Assumes the variance of the residual is
+            proportional to the inverse of the weight, so that the residual times
+            the square root of the weight is homoskedastic.
             The weights must be strictly positive and finite. They are rescaled to have
             a mean of 1. A NaN weight is missing, and its observation is dropped.
-        check_rank : bool
+        check_rank : bool, optional
             Flag indicating whether to perform a rank check on the exogenous
             variables to ensure that the model is identified. Skipping this
             check can reduce the time required to validate a model
             specification. Results may be numerically unstable if this check
-            is skipped and the matrix is not full rank.
+            is skipped and the matrix is not full rank. The default is True.
 
         Returns
         -------
         BetweenOLS
-            Model specified using the formula
+            Model specified using the formula.
 
         Notes
         -----
@@ -3645,7 +3893,7 @@ class BetweenOLS(_PanelModelBase):
 
 class FirstDifferenceOLS(_PanelModelBase):
     r"""
-    First difference model for panel data
+    First difference model for panel data.
 
     Parameters
     ----------
@@ -3663,9 +3911,9 @@ class FirstDifferenceOLS(_PanelModelBase):
         dimensions (variable by time by entity). A list, a tuple or any other
         container raises a ``TypeError`` that names ``exog``.
     weights : array_like, optional
-        Weights to use in estimation.  Assumes residual variance is
-        proportional to inverse of weight to that the residual time
-        the weight should be homoskedastic.
+        Weights to use in estimation. Assumes the variance of the residual is
+        proportional to the inverse of the weight, so that the residual times
+        the square root of the weight is homoskedastic.
         Weights can be given for each observation, for each time period,
         for each entity or for each combination of time period and entity.
         The weights must be strictly positive and finite. They are rescaled to have a
@@ -3691,6 +3939,30 @@ class FirstDifferenceOLS(_PanelModelBase):
         are equal and the weights have that many values, unless they have no
         labels and a value for each row. Any other number of values raises a
         ``ValueError``.
+    check_rank : bool, optional
+        Flag indicating whether to perform a rank check on the exogenous
+        variables to ensure that the model is identified. Skipping this
+        check can reduce the time required to validate a model specification.
+        Results may be numerically unstable if this check is skipped and
+        the matrix is not full rank. The default is True.
+
+    Raises
+    ------
+    TypeError
+        If `dependent` or `exog` is a container that is not supported, e.g., a list
+        or a tuple, or if they have complex values or values that cannot be
+        converted to float64.
+    ValueError
+        If `dependent`, `exog` or `weights` have different shapes or labels, if a
+        combination of an entity and a time period appears more than once, if the
+        weights are not strictly positive and finite or do not have a supported
+        shape, or if `exog` does not have full column rank and `check_rank` is
+        True. It is also raised if `exog` has a constant, since it is differenced
+        away, or if the panel has fewer than 2 time periods.
+    AmbiguityError
+        If the numbers of time periods and entities are equal and 1-d weights have
+        that many values, so that they could be a value for each time period or
+        for each entity.
 
     Notes
     -----
@@ -3850,22 +4122,30 @@ class FirstDifferenceOLS(_PanelModelBase):
         ),
     ) -> PanelResults:
         """
-        Estimate model parameters
+        Estimate model parameters.
 
         Parameters
         ----------
-        cov_type : str
-            Name of covariance estimator. See Notes.
+        cov_type : str, optional
+            Name of covariance estimator. The default is ``"unadjusted"``. The
+            names are "unadjusted", "conventional" and "homoskedastic" for the
+            homoskedastic estimator, "robust" and "heteroskedastic" for the
+            heteroskedastic estimator, "clustered" for the clustered estimator,
+            "kernel", "driscoll-kraay" and "dk" for the Driscoll-Kraay estimator,
+            and "ac" and "autocorrelated" for the autocorrelation robust
+            estimator. See Notes.
         debiased : bool, optional
             Flag indicating whether to debias the covariance estimator using
             a degree of freedom adjustment. The default is True. See Notes.
-        cov_config
-            Additional covariance-specific options.  See Notes.
+        **cov_config : bool, float, str, array_like, DataFrame or PanelData
+            Additional covariance-specific options. The options that each
+            covariance estimator supports are listed in Notes. A key that the
+            estimator does not support raises a ``ValueError``.
 
         Returns
         -------
         PanelResults
-            Estimation results
+            Estimation results.
 
         Raises
         ------
@@ -3873,22 +4153,24 @@ class FirstDifferenceOLS(_PanelModelBase):
             If ``cov_type`` is not one of the supported names, or if it is
             "kernel" or "ac" and ``kernel`` is not one of the supported kernels.
             It is both a ``ValueError`` and a ``KeyError``.
-
-        Examples
-        --------
-        >>> from linearmodels import FirstDifferenceOLS
-        >>> mod = FirstDifferenceOLS(y, x)
-        >>> robust = mod.fit(cov_type="robust")
-        >>> clustered = mod.fit(cov_type="clustered", cluster_entity=True)
+        ValueError
+            If a key of ``cov_config`` is not supported by the covariance
+            estimator, if ``clusters`` does not have the shape of the data, if
+            ``bandwidth`` is not below the number of time periods, or if the model
+            has no residual degrees of freedom.
+        TypeError
+            If the value of a key of ``cov_config`` does not have the type that the
+            key needs, e.g., if ``kernel`` is not a str.
 
         Notes
         -----
         Five covariance estimators are supported:
 
-        * "unadjusted", "homoskedastic" - Assume residual are homoskedastic
+        * "unadjusted", "conventional", "homoskedastic" - Assume the residuals are
+          homoskedastic
         * "robust", "heteroskedastic" - Control for heteroskedasticity using
           White's estimator
-        * "clustered` - White's.  Configuration options are:
+        * "clustered" - One- or two-way clustering. The configuration options are:
 
           * ``clusters`` - Input containing 1 or 2 variables. This can be
             a pandas object or PanelData with the index of ``dependent``, a 1-d
@@ -3902,9 +4184,9 @@ class FirstDifferenceOLS(_PanelModelBase):
             combinations that ``dependent`` does not have are not used. See
             :ref:`panel-input-alignment`.
             Clusters should be integer values, although other types will
-            be coerced to integer values by treating as categorical variables
+            be coerced to integer values by treating as categorical variables.
           * ``cluster_entity`` - Boolean flag indicating to use entity
-            clusters
+            clusters. The default is False.
           * ``group_debias`` - Boolean flag indicating whether to apply an
             adjustment for the number of clusters. It multiplies the
             covariance by g / (g - 1) * (n - 1) / n, where g is the number
@@ -3912,12 +4194,14 @@ class FirstDifferenceOLS(_PanelModelBase):
             two-way clustering, it is applied to each of the three one-way
             covariances that are combined. The default is False.
 
-        * "kernel" - Driscoll-Kraay HAC estimator. Configurations options are:
+        * "kernel", "driscoll-kraay", "dk" - Driscoll-Kraay HAC estimator. The
+          configuration options are:
 
-          * ``kernel`` - One of the supported kernels (bartlett, parzen, qs).
-            Default is Bartlett's kernel, which is produces a covariance
-            estimator similar to the Newey-West covariance estimator.
-          * ``bandwidth`` - Bandwidth to use when computing the kernel.  If
+          * ``kernel`` - One of the supported kernels: "bartlett", "newey-west",
+            "quadratic-spectral", "qs", "andrews", "parzen" or "gallant". The
+            default is Bartlett's kernel, which produces a covariance estimator
+            similar to the Newey-West covariance estimator.
+          * ``bandwidth`` - Bandwidth to use when computing the kernel. If
             not provided, a naive default is used. It must be below the number
             of time periods of the differences, which is one less than the
             number of time periods, and a ``ValueError`` is raised otherwise.
@@ -3938,6 +4222,11 @@ class FirstDifferenceOLS(_PanelModelBase):
         n / (n - k), where k is the number of regressors, and uses the t and
         F distributions for inference. See :ref:`panel-small-sample`.
 
+        ``extra_df`` can be used with any of the covariance estimators. It is the
+        number of degrees of freedom that the model uses beyond the regressors,
+        which the covariance estimator always accounts for, whether or not
+        ``debiased`` is True. The default is 0.
+
         .. versionchanged:: 7.1
 
            A ``kernel`` that is not one of the supported names raises an
@@ -3957,6 +4246,13 @@ class FirstDifferenceOLS(_PanelModelBase):
            by time and then entity, an array was attached to the wrong
            observations without an error, and a pandas object with labels was
            rejected.
+
+        Examples
+        --------
+        >>> from linearmodels import FirstDifferenceOLS
+        >>> mod = FirstDifferenceOLS(y, x)
+        >>> robust = mod.fit(cov_type="robust")
+        >>> clustered = mod.fit(cov_type="clustered", cluster_entity=True)
         """
         y_fd = self.dependent.first_difference()
         time_ids = y_fd.time_ids
@@ -4069,7 +4365,7 @@ class FirstDifferenceOLS(_PanelModelBase):
         check_rank: bool = True,
     ) -> FirstDifferenceOLS:
         """
-        Create a model from a formula
+        Create a model from a formula.
 
         Parameters
         ----------
@@ -4082,22 +4378,22 @@ class FirstDifferenceOLS(_PanelModelBase):
             index contains the entities and the level 1 contains the time. A
             list or a tuple raises a ``TypeError`` that names ``data``.
         weights : array_like, optional
-            Weights to use in estimation.  Assumes residual variance is
-            proportional to inverse of weight to that the residual times
-            the weight should be homoskedastic.
+            Weights to use in estimation. Assumes the variance of the residual is
+            proportional to the inverse of the weight, so that the residual times
+            the square root of the weight is homoskedastic.
             The weights must be strictly positive and finite. They are rescaled to have
             a mean of 1. A NaN weight is missing, and its observation is dropped.
-        check_rank : bool
+        check_rank : bool, optional
             Flag indicating whether to perform a rank check on the exogenous
             variables to ensure that the model is identified. Skipping this
             check can reduce the time required to validate a model
             specification. Results may be numerically unstable if this check
-            is skipped and the matrix is not full rank.
+            is skipped and the matrix is not full rank. The default is True.
 
         Returns
         -------
         FirstDifferenceOLS
-            Model specified using the formula
+            Model specified using the formula.
 
         Notes
         -----
@@ -4121,7 +4417,7 @@ class FirstDifferenceOLS(_PanelModelBase):
 
 class RandomEffects(_PanelModelBase):
     r"""
-    One-way Random Effects model for panel data
+    One-way Random Effects model for panel data.
 
     Parameters
     ----------
@@ -4139,9 +4435,9 @@ class RandomEffects(_PanelModelBase):
         dimensions (variable by time by entity). A list, a tuple or any other
         container raises a ``TypeError`` that names ``exog``.
     weights : array_like, optional
-        Weights to use in estimation.  Assumes residual variance is
-        proportional to inverse of weight to that the residual time
-        the weight should be homoskedastic.
+        Weights to use in estimation. Assumes the variance of the residual is
+        proportional to the inverse of the weight, so that the residual times
+        the square root of the weight is homoskedastic.
         Weights can be given for each observation, for each time period,
         for each entity or for each combination of time period and entity.
         The weights must be strictly positive and finite. They are rescaled to have a
@@ -4167,6 +4463,29 @@ class RandomEffects(_PanelModelBase):
         are equal and the weights have that many values, unless they have no
         labels and a value for each row. Any other number of values raises a
         ``ValueError``.
+    check_rank : bool, optional
+        Flag indicating whether to perform a rank check on the exogenous
+        variables to ensure that the model is identified. Skipping this
+        check can reduce the time required to validate a model specification.
+        Results may be numerically unstable if this check is skipped and
+        the matrix is not full rank. The default is True.
+
+    Raises
+    ------
+    TypeError
+        If `dependent` or `exog` is a container that is not supported, e.g., a list
+        or a tuple, or if they have complex values or values that cannot be
+        converted to float64.
+    ValueError
+        If `dependent`, `exog` or `weights` have different shapes or labels, if a
+        combination of an entity and a time period appears more than once, if the
+        weights are not strictly positive and finite or do not have a supported
+        shape, or if `exog` does not have full column rank and `check_rank` is
+        True.
+    AmbiguityError
+        If the numbers of time periods and entities are equal and 1-d weights have
+        that many values, so that they could be a value for each time period or
+        for each entity.
 
     Notes
     -----
@@ -4226,7 +4545,7 @@ class RandomEffects(_PanelModelBase):
         check_rank: bool = True,
     ) -> RandomEffects:
         """
-        Create a model from a formula
+        Create a model from a formula.
 
         Parameters
         ----------
@@ -4239,22 +4558,22 @@ class RandomEffects(_PanelModelBase):
             index contains the entities and the level 1 contains the time. A
             list or a tuple raises a ``TypeError`` that names ``data``.
         weights : array_like, optional
-            Weights to use in estimation.  Assumes residual variance is
-            proportional to inverse of weight to that the residual times
-            the weight should be homoskedastic.
+            Weights to use in estimation. Assumes the variance of the residual is
+            proportional to the inverse of the weight, so that the residual times
+            the square root of the weight is homoskedastic.
             The weights must be strictly positive and finite. They are rescaled to have
             a mean of 1. A NaN weight is missing, and its observation is dropped.
-        check_rank : bool
+        check_rank : bool, optional
             Flag indicating whether to perform a rank check on the exogenous
             variables to ensure that the model is identified. Skipping this
             check can reduce the time required to validate a model
             specification. Results may be numerically unstable if this check
-            is skipped and the matrix is not full rank.
+            is skipped and the matrix is not full rank. The default is True.
 
         Returns
         -------
         RandomEffects
-            Model specified using the formula
+            Model specified using the formula.
 
         Notes
         -----
@@ -4291,25 +4610,33 @@ class RandomEffects(_PanelModelBase):
         ),
     ) -> RandomEffectsResults:
         """
-        Estimate model parameters
+        Estimate model parameters.
 
         Parameters
         ----------
-        small_sample : bool
+        small_sample : bool, optional
             Apply a small-sample correction to the estimate of the variance of
-            the random effect.
-        cov_type : str
-            Name of covariance estimator (see notes). Default is "unadjusted".
+            the random effect. The default is False.
+        cov_type : str, optional
+            Name of covariance estimator. The default is ``"unadjusted"``. The
+            names are "unadjusted", "conventional" and "homoskedastic" for the
+            homoskedastic estimator, "robust" and "heteroskedastic" for the
+            heteroskedastic estimator, "clustered" for the clustered estimator,
+            "kernel", "driscoll-kraay" and "dk" for the Driscoll-Kraay estimator,
+            and "ac" and "autocorrelated" for the autocorrelation robust
+            estimator. See Notes.
         debiased : bool, optional
             Flag indicating whether to debias the covariance estimator using
             a degree of freedom adjustment. The default is True. See Notes.
-        cov_config
-            Additional covariance-specific options.  See Notes.
+        **cov_config : bool, float, str, array_like, DataFrame or PanelData
+            Additional covariance-specific options. The options that each
+            covariance estimator supports are listed in Notes. A key that the
+            estimator does not support raises a ``ValueError``.
 
         Returns
         -------
         RandomEffectsResults
-            Estimation results
+            Estimation results.
 
         Raises
         ------
@@ -4317,21 +4644,26 @@ class RandomEffects(_PanelModelBase):
             If ``cov_type`` is not one of the supported names, or if it is
             "kernel" or "ac" and ``kernel`` is not one of the supported kernels.
             It is both a ``ValueError`` and a ``KeyError``.
-
-        Examples
-        --------
-        >>> from linearmodels import RandomEffects
-        >>> mod = RandomEffects(y, x)
-        >>> res = mod.fit(cov_type="clustered", cluster_entity=True)
+        ValueError
+            If a key of ``cov_config`` is not supported by the covariance
+            estimator, if ``clusters`` does not have the shape of the data, if
+            ``bandwidth`` is not below the number of time periods, if the model
+            has no residual degrees of freedom, or if the within or the between
+            regression has no residual degrees of freedom, so that the variance of
+            the idiosyncratic error or of the effects cannot be estimated.
+        TypeError
+            If the value of a key of ``cov_config`` does not have the type that the
+            key needs, e.g., if ``kernel`` is not a str.
 
         Notes
         -----
         Five covariance estimators are supported:
 
-        * "unadjusted", "homoskedastic" - Assume residual are homoskedastic
+        * "unadjusted", "conventional", "homoskedastic" - Assume the residuals are
+          homoskedastic
         * "robust", "heteroskedastic" - Control for heteroskedasticity using
           White's estimator
-        * "clustered` - One- or two-way clustering.  Configuration options are:
+        * "clustered" - One- or two-way clustering. The configuration options are:
 
           * ``clusters`` - Input containing 1 or 2 variables. This can be
             a pandas object or PanelData with the index of ``dependent``, a 1-d
@@ -4345,10 +4677,11 @@ class RandomEffects(_PanelModelBase):
             combinations that ``dependent`` does not have are not used. See
             :ref:`panel-input-alignment`.
             Clusters should be integer values, although other types will
-            be coerced to integer values by treating as categorical variables
+            be coerced to integer values by treating as categorical variables.
           * ``cluster_entity`` - Boolean flag indicating to use entity
-            clusters
-          * ``cluster_time`` - Boolean indicating to use time clusters
+            clusters. The default is False.
+          * ``cluster_time`` - Boolean flag indicating to use time clusters. The
+            default is False.
           * ``group_debias`` - Boolean flag indicating whether to apply an
             adjustment for the number of clusters. It multiplies the
             covariance by g / (g - 1) * (n - 1) / n, where g is the number
@@ -4356,12 +4689,14 @@ class RandomEffects(_PanelModelBase):
             two-way clustering, it is applied to each of the three one-way
             covariances that are combined. The default is False.
 
-        * "kernel" - Driscoll-Kraay HAC estimator. Configurations options are:
+        * "kernel", "driscoll-kraay", "dk" - Driscoll-Kraay HAC estimator. The
+          configuration options are:
 
-          * ``kernel`` - One of the supported kernels (bartlett, parzen, qs).
-            Default is Bartlett's kernel, which is produces a covariance
-            estimator similar to the Newey-West covariance estimator.
-          * ``bandwidth`` - Bandwidth to use when computing the kernel.  If
+          * ``kernel`` - One of the supported kernels: "bartlett", "newey-west",
+            "quadratic-spectral", "qs", "andrews", "parzen" or "gallant". The
+            default is Bartlett's kernel, which produces a covariance estimator
+            similar to the Newey-West covariance estimator.
+          * ``bandwidth`` - Bandwidth to use when computing the kernel. If
             not provided, a naive default is used. It must be below the number
             of time periods, and a ``ValueError`` is raised otherwise.
 
@@ -4376,6 +4711,11 @@ class RandomEffects(_PanelModelBase):
         ``debiased=True``, which is the default, scales the covariance by
         n / (n - k), where k is the number of regressors, and uses the t and
         F distributions for inference.
+
+        ``extra_df`` can be used with any of the covariance estimators. It is the
+        number of degrees of freedom that the model uses beyond the regressors,
+        which the covariance estimator always accounts for, whether or not
+        ``debiased`` is True. The default is 0.
 
         ``debiased=True`` and ``group_debias=True`` give the clustered
         covariance of Stata's ``xtreg, re vce(cluster ...)``.
@@ -4429,6 +4769,12 @@ class RandomEffects(_PanelModelBase):
            by time and then entity, an array was attached to the wrong
            observations without an error, and a pandas object with labels was
            rejected.
+
+        Examples
+        --------
+        >>> from linearmodels import RandomEffects
+        >>> mod = RandomEffects(y, x)
+        >>> res = mod.fit(cov_type="clustered", cluster_entity=True)
         """
         w = self.weights.values2d
         root_w = cast("linearmodels.typing.data.Float64Array", np.sqrt(w))
@@ -4600,7 +4946,7 @@ class RandomEffects(_PanelModelBase):
 
 class FamaMacBeth(_PanelModelBase):
     r"""
-    Pooled coefficient estimator for panel data
+    Fama-MacBeth estimator for panel data.
 
     Parameters
     ----------
@@ -4618,9 +4964,9 @@ class FamaMacBeth(_PanelModelBase):
         dimensions (variable by time by entity). A list, a tuple or any other
         container raises a ``TypeError`` that names ``exog``.
     weights : array_like, optional
-        Weights to use in estimation.  Assumes residual variance is
-        proportional to inverse of weight to that the residual time
-        the weight should be homoskedastic.
+        Weights to use in estimation. Assumes the variance of the residual is
+        proportional to the inverse of the weight, so that the residual times
+        the square root of the weight is homoskedastic.
         Weights can be given for each observation, for each time period,
         for each entity or for each combination of time period and entity.
         The weights must be strictly positive and finite. They are rescaled to have a
@@ -4646,6 +4992,30 @@ class FamaMacBeth(_PanelModelBase):
         are equal and the weights have that many values, unless they have no
         labels and a value for each row. Any other number of values raises a
         ``ValueError``.
+    check_rank : bool, optional
+        Flag indicating whether to perform a rank check on the exogenous
+        variables to ensure that the model is identified. Skipping this
+        check can reduce the time required to validate a model specification.
+        Results may be numerically unstable if this check is skipped and
+        the matrix is not full rank. The default is True.
+
+    Raises
+    ------
+    TypeError
+        If `dependent` or `exog` is a container that is not supported, e.g., a list
+        or a tuple, or if they have complex values or values that cannot be
+        converted to float64.
+    ValueError
+        If `dependent`, `exog` or `weights` have different shapes or labels, if a
+        combination of an entity and a time period appears more than once, if the
+        weights are not strictly positive and finite or do not have a supported
+        shape, or if `exog` does not have full column rank and `check_rank` is
+        True. It is also raised if none of the cross-sectional regressions can be
+        estimated.
+    AmbiguityError
+        If the numbers of time periods and entities are equal and 1-d weights have
+        that many values, so that they could be a value for each time period or
+        for each entity.
 
     Notes
     -----
@@ -4807,51 +5177,49 @@ class FamaMacBeth(_PanelModelBase):
         kernel: str | None = None,
     ) -> FamaMacBethResults:
         """
-        Estimate model parameters
+        Estimate model parameters.
 
         Parameters
         ----------
-        cov_type : str
-            Name of covariance estimator (see notes). Default is "unadjusted".
-        debiased : bool
+        cov_type : str, optional
+            Name of covariance estimator (see notes). The default is
+            ``"unadjusted"``. The names are "unadjusted", "homoskedastic",
+            "robust" and "heteroskedastic" for the standard estimator, and
+            "kernel" for the kernel estimator.
+        debiased : bool, optional
             Flag indicating whether to debiased the covariance estimator using
             a degree of freedom adjustment, which uses T - 1 instead of T when
             the covariance of the T estimates is computed, and to use a t
             distribution with T - 1 degrees of freedom for inference. If
-            False, inference uses the normal distribution.
-        bandwidth : float
+            False, inference uses the normal distribution. The default is True.
+        bandwidth : float, optional
             The bandwidth to use when cov_type is "kernel". It must be below T,
-            the number of periods that are used. If None, it is automatically
-            computed, and is at most T - 1. The automatic bandwidth needs T to be
-            at least 4 with the Bartlett kernel, 5 with the Parzen kernel and 6
-            with the quadratic spectral kernel.
-        kernel : str
-            The kernel to use.  None chooses the default kernel. See Notes for
-            the names. It is checked for every ``cov_type``.
+            the number of periods that are used. If not provided, it is
+            automatically computed, and is at most T - 1. The automatic bandwidth
+            needs T to be at least 4 with the Bartlett kernel, 5 with the Parzen
+            kernel and 6 with the quadratic spectral kernel.
+        kernel : str, optional
+            The kernel to use, one of "bartlett", "newey-west",
+            "quadratic-spectral", "qs", "andrews", "parzen" and "gallant". If
+            not provided, the default Bartlett kernel is used. It is checked for
+            every ``cov_type``.
 
         Returns
         -------
-        PanelResults
-            Estimation results
+        FamaMacBethResults
+            Estimation results.
 
         Raises
         ------
-        ValueError
-            If ``cov_type`` is not one of the supported names, or if it is
-            "kernel" and ``bandwidth`` is not below T, the number of periods that
-            are used. It is also raised if it is "kernel", ``bandwidth`` is None
-            and T is below the number that the automatic bandwidth needs, or the
-            automatic bandwidth is not finite.
         UnknownOptionError
-            If ``kernel`` is not one of the supported names, whether or not
-            ``bandwidth`` is given. It is both a ``ValueError`` and a
-            ``KeyError``.
-
-        Examples
-        --------
-        >>> from linearmodels import FamaMacBeth
-        >>> mod = FamaMacBeth(y, x)
-        >>> res = mod.fit(cov_type="kernel", kernel="parzen")
+            If ``cov_type`` is not one of the supported names, or if ``kernel`` is
+            not one of the supported names, whether or not ``bandwidth`` is
+            given. It is both a ``ValueError`` and a ``KeyError``.
+        ValueError
+            If ``cov_type`` is "kernel" and ``bandwidth`` is not below T, the
+            number of periods that are used. It is also raised if it is "kernel",
+            ``bandwidth`` is not provided and T is below the number that the
+            automatic bandwidth needs, or the automatic bandwidth is not finite.
 
         Notes
         -----
@@ -4932,6 +5300,12 @@ class FamaMacBeth(_PanelModelBase):
            was first used, for example when ``std_errors`` of the results was
            read, so that ``fit`` returned results that raised when the covariance
            was used.
+
+        Examples
+        --------
+        >>> from linearmodels import FamaMacBeth
+        >>> mod = FamaMacBeth(y, x)
+        >>> res = mod.fit(cov_type="kernel", kernel="parzen")
         """
         # The retained observations and their weights, which are scaled to have a
         # mean of one once the observations with missing values are dropped
@@ -5088,7 +5462,7 @@ class FamaMacBeth(_PanelModelBase):
         check_rank: bool = True,
     ) -> FamaMacBeth:
         """
-        Create a model from a formula
+        Create a model from a formula.
 
         Parameters
         ----------
@@ -5101,22 +5475,22 @@ class FamaMacBeth(_PanelModelBase):
             index contains the entities and the level 1 contains the time. A
             list or a tuple raises a ``TypeError`` that names ``data``.
         weights : array_like, optional
-            Weights to use in estimation.  Assumes residual variance is
-            proportional to inverse of weight to that the residual times
-            the weight should be homoskedastic.
+            Weights to use in estimation. Assumes the variance of the residual is
+            proportional to the inverse of the weight, so that the residual times
+            the square root of the weight is homoskedastic.
             The weights must be strictly positive and finite. They are rescaled to have
             a mean of 1. A NaN weight is missing, and its observation is dropped.
-        check_rank : bool
+        check_rank : bool, optional
             Flag indicating whether to perform a rank check on the exogenous
             variables to ensure that the model is identified. Skipping this
             check can reduce the time required to validate a model
             specification. Results may be numerically unstable if this check
-            is skipped and the matrix is not full rank.
+            is skipped and the matrix is not full rank. The default is True.
 
         Returns
         -------
         FamaMacBeth
-            Model specified using the formula
+            Model specified using the formula.
 
         Notes
         -----
