@@ -8,8 +8,6 @@ Version 7.1
    features, so add any other difference that it finds.
 .. TODO(RC1): State the versions that RC1 tested (Python 3.15.0, NumPy, pandas, SciPy,
    statsmodels and formulaic) in "Compatibility".
-.. TODO(RC1): Confirm that GitHub private vulnerability reporting is enabled for the
-   repository (decision D8), or the link in ``SECURITY.md`` does not work.
 
 .. rubric:: Highlights
 
@@ -63,10 +61,10 @@ Version 7.1
   DataFrame of panel weights is read by its labels. ``BetweenOLS`` and
   ``FirstDifferenceOLS`` accept text and categorical ``clusters`` (:issue:`776`,
   :issue:`825`, :issue:`827`, :issue:`833`).
-- The names of options (``cov_type``, ``weight_type``, ``kernel`` and the ``group`` and
-  ``drop`` options of the panel utilities) are not case sensitive in every model.
-  ``cov_type="Robust"`` and ``kernel="Bartlett"`` give the results of the lower case
-  names (:issue:`833`, :issue:`836`).
+- The names of options are not case sensitive: ``cov_type``, ``weight_type`` and
+  ``kernel`` in every model, the ``group`` of ``PanelData`` and the ``drop`` of
+  ``dummy_matrix``. ``cov_type="Robust"`` and ``kernel="Bartlett"`` give the results of
+  the lower case names (:issue:`833`, :issue:`836`).
 - ``linearmodels.iv.common`` and ``linearmodels.iv.results`` define ``__all__``, so that
   ``import *`` no longer imports the modules and functions that they import
   (:issue:`765`).
@@ -227,11 +225,11 @@ Version 7.1
   system models name the equation). 7.0 accepted zero weights in ``AbsorbingLS`` and the
   system models, and failed with unclear errors for the others. A missing weight still
   drops the observation (:issue:`776`, :issue:`792`, :issue:`799`, :issue:`811`).
-- Options are checked at the start of ``fit``. An unexpected keyword argument raises one
-  ``ValueError`` in every model (7.0 raised a ``TypeError``, or ignored it in the asset
-  pricing models), and an unknown kernel raises when the model is created or fit. An
-  unknown ``group`` of ``PanelData`` and a ``predict`` without ``exog`` raise too
-  (:issue:`822`, :issue:`833`).
+- Options are checked at the start of ``fit``, and kernels when the model is created. A
+  keyword argument that ``cov_type`` does not accept raises one ``ValueError`` in every
+  model with ``**cov_config`` (7.0 raised ``TypeError`` in IV, absorbing and system
+  models; asset pricing ignored it). An unknown ``group`` of ``PanelData`` and a panel
+  ``predict`` without ``exog`` or ``data`` raise too (:issue:`822`, :issue:`833`).
 - ``dummy_matrix`` raises a ``ValueError`` for a ``drop`` other than ``"first"`` or
   ``"last"``. It treated any other value as ``"last"`` (:issue:`835`, :issue:`836`).
 - Panel models raise a ``ValueError`` for duplicated (entity, time) rows, which 7.0
@@ -279,9 +277,9 @@ Version 7.1
 - ``quadratic_form_test`` raises a ``TypeError`` instead of an ``AssertionError`` if
   ``formula`` is used with ``params`` that is not a ``Series`` (:issue:`690`).
 - A ``cov_type``, ``weight_type`` or ``kernel`` that is not supported raises an
-  ``UnknownOptionError``, a ``ValueError`` and a ``KeyError``, that suggests the closest
-  name and lists the supported names, in every model. 7.0 raised a bare ``KeyError`` in
-  many (:issue:`808`).
+  ``UnknownOptionError`` (both a ``ValueError`` and a ``KeyError``) that suggests the
+  closest name and lists the supported names, in every model. 7.0 raised a bare
+  ``KeyError`` in many (:issue:`808`).
 - The ``predict`` method of the IV models with ``data`` evaluates the formula in the
   frame that calls it, and works at the top level of a script. Missing values in the
   dependent variable, the endogenous regressors or the instruments of an IV or system
