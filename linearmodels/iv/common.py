@@ -1,3 +1,7 @@
+"""
+Rank tests of the first stage and the model F-statistic.
+"""
+
 from __future__ import annotations
 
 from typing import Any, NamedTuple
@@ -50,7 +54,7 @@ _COV_FAMILIES = {
 
 
 def _cov_family(cov_type: str) -> str:
-    """Map the name of a covariance estimator to its family"""
+    """Map the name of a covariance estimator to its family."""
     name = str(cov_type).lower()
     for family, aliases in _COV_FAMILIES.items():
         if name in aliases:
@@ -61,15 +65,18 @@ def _cov_family(cov_type: str) -> str:
 
 def find_constant(x: linearmodels.typing.data.Float64Array) -> int | None:
     """
+    Locate the first constant column of an array.
+
     Parameters
     ----------
     x : ndarray
-        2-d array (nobs, nvar)
+        2-d array (nobs, nvar).
 
     Returns
     -------
-    const_loc : {int, None}
-        Integer location or None, if there is no constant
+    int or None
+        Integer location of the first constant column, or None if there is
+        no constant.
     """
     loc = where(ptp(x, 0) == 0)[0]
     if loc.shape != (0,):
@@ -79,7 +86,7 @@ def find_constant(x: linearmodels.typing.data.Float64Array) -> int | None:
 
 
 class _FirstStageRank(NamedTuple):
-    """Canonical correlation decomposition of the partialled first stage"""
+    """Canonical correlation decomposition of the partialled first stage."""
 
     nobs: int
     ninstr: int
@@ -103,7 +110,7 @@ def _first_stage_rank(
     name: str,
 ) -> _FirstStageRank | InvalidTestStatistic:
     r"""
-    Decompose the first stage into canonical correlations
+    Decompose the first stage into canonical correlations.
 
     The endogenous regressors and excluded instruments are first
     orthogonalized with respect to the exogenous regressors. Let
@@ -180,14 +187,14 @@ def cragg_donald(
     exog: linearmodels.typing.data.Float64Array,
 ) -> WaldTestStatistic | InvalidTestStatistic:
     r"""
-    Cragg-Donald test of reduced rank for the first-stage regression
+    Cragg-Donald test of reduced rank for the first-stage regression.
 
     Parameters
     ----------
     endog : ndarray
-        Weighted endogenous regressor array (nobs, nendog)
+        Weighted endogenous regressor array (nobs, nendog).
     instr : ndarray
-        Weighted instrument array (nobs, ninstr)
+        Weighted instrument array (nobs, ninstr).
     exog : ndarray
         Weighted exogenous regressor array (nobs, nexog), partialled out
         before testing. Include a constant column here if the model has one.
@@ -303,14 +310,14 @@ def cragg_donald_f(
     exog: linearmodels.typing.data.Float64Array,
 ) -> float:
     r"""
-    Cragg-Donald Wald F statistic
+    Cragg-Donald Wald F statistic.
 
     Parameters
     ----------
     endog : ndarray
-        Weighted endogenous regressor array (nobs, nendog)
+        Weighted endogenous regressor array (nobs, nendog).
     instr : ndarray
-        Weighted instrument array (nobs, ninstr)
+        Weighted instrument array (nobs, ninstr).
     exog : ndarray
         Weighted exogenous regressor array (nobs, nexog), partialled out
         before testing. Include a constant column here if the model has one.
@@ -520,18 +527,18 @@ def kleibergen_paap(
     cov_config: dict[str, Any] | None = None,
 ) -> WaldTestStatistic | InvalidTestStatistic:
     r"""
-    Kleibergen-Paap rk LM test of underidentification
+    Kleibergen-Paap rk LM test of underidentification.
 
     Parameters
     ----------
     endog : ndarray
-        Weighted endogenous regressor array (nobs, nendog)
+        Weighted endogenous regressor array (nobs, nendog).
     instr : ndarray
-        Weighted instrument array (nobs, ninstr)
+        Weighted instrument array (nobs, ninstr).
     exog : ndarray
         Weighted exogenous regressor array (nobs, nexog), partialled out
         before testing. Include a constant column here if the model has one.
-    cov_type : str
+    cov_type : str, optional
         Covariance estimator used for the first-stage scores. One of
         "unadjusted", "robust", "clustered" or "kernel", or any other name that
         the IV models accept for the same estimator, such as "homoskedastic" or
@@ -678,18 +685,18 @@ def kleibergen_paap_f(
     cov_config: dict[str, Any] | None = None,
 ) -> float:
     r"""
-    Kleibergen-Paap rk Wald F statistic
+    Kleibergen-Paap rk Wald F statistic.
 
     Parameters
     ----------
     endog : ndarray
-        Weighted endogenous regressor array (nobs, nendog)
+        Weighted endogenous regressor array (nobs, nendog).
     instr : ndarray
-        Weighted instrument array (nobs, ninstr)
+        Weighted instrument array (nobs, ninstr).
     exog : ndarray
         Weighted exogenous regressor array (nobs, nexog), partialled out
         before testing. Include a constant column here if the model has one.
-    cov_type : str
+    cov_type : str, optional
         Covariance estimator used for the first-stage scores. One of
         "unadjusted", "robust", "clustered" or "kernel", or any other name that
         the IV models accept for the same estimator, such as "homoskedastic" or
@@ -786,24 +793,29 @@ def f_statistic(
     const_loc: int | None = None,
 ) -> WaldTestStatistic | InvalidTestStatistic:
     """
+    Test that all of the parameters other than the constant are zero.
+
     Parameters
     ----------
     params : ndarray
-        Estimated parameters (nvar, 1)
+        Estimated parameters (nvar, 1).
     cov : ndarray
-        Covariance of estimated parameters (nvar, nvar)
+        Covariance of estimated parameters (nvar, nvar).
     debiased : bool
-        False indicating whether to use a small-sample exact F or the large
-        sample chi2 distribution
+        Whether to use a small-sample F distribution (True) or the large
+        sample chi2 distribution (False).
     resid_df : int
-        NUmber of observations minus number of model parameters
-    const_loc : int
-        Location of constant column, if any
+        Number of observations minus number of model parameters.
+    const_loc : int, optional
+        Location of the constant column, if any. The default is None, which
+        means that the model has no constant.
 
     Returns
     -------
-    WaldTestStatistic
-        WaldTestStatistic instance
+    WaldTestStatistic or InvalidTestStatistic
+        The test statistic, or an InvalidTestStatistic if the model has no
+        regressors other than the constant or the covariance of the
+        parameters is singular.
     """
     null = "All parameters ex. constant are zero"
     name = "Model F-statistic"
