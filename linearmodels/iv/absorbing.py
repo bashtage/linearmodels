@@ -1,3 +1,7 @@
+"""
+Linear regression with high-dimensional effects.
+"""
+
 from __future__ import annotations
 
 from linearmodels.compat.scipy import csc_array, diags_array
@@ -83,11 +87,15 @@ except ImportError:
 
 
 def _non_negative(r2: float) -> float:
-    """Clip an R2 at 0, which is not clipped if it is NaN since it is not defined"""
+    """Clip an R2 at 0, which is not clipped if it is NaN since it is not defined."""
     return r2 if isnan(r2) else max(r2, 0.0)
 
 
 class Hasher:
+    """
+    Hash the values of an array using xxhash if it is installed, and SHA-256 if not.
+    """
+
     def __init__(self) -> None:
         self._hasher: hashlib._Hash | xxh64
         if HAVE_XXHASH:
@@ -98,6 +106,7 @@ class Hasher:
             self._use_xxh64 = False
 
     def reset(self) -> None:
+        """Reset the hasher to its initial state."""
         if self._use_xxh64:
             assert isinstance(self._hasher, xxh64)
             self._hasher.reset()
@@ -105,12 +114,36 @@ class Hasher:
             self._hasher = hashlib.sha256()
 
     def update(self, data: memoryview) -> None:
+        """
+        Add data to the hash.
+
+        Parameters
+        ----------
+        data : memoryview
+            The values to hash.
+        """
         self._hasher.update(data)
 
     def digest(self) -> bytes:
+        """
+        Return the digest of the data added so far.
+
+        Returns
+        -------
+        bytes
+            The digest.
+        """
         return self._hasher.digest()
 
     def hexdigest(self) -> str:
+        """
+        Return the digest of the data added so far as a string of hexadecimal digits.
+
+        Returns
+        -------
+        str
+            The digest.
+        """
         return self._hasher.hexdigest()
 
 
@@ -118,13 +151,13 @@ _VARIABLE_CACHE: DefaultDict[Hashable, dict[str, ndarray]] = defaultdict(dict)
 
 
 def clear_cache() -> None:
-    """Clear the absorbed variable cache"""
+    """Clear the absorbed variable cache."""
     _VARIABLE_CACHE.clear()
 
 
 def _options_key(options: dict[str, Any]) -> tuple[Any, ...]:
     """
-    Hashable key that identifies options of an absorption algorithm
+    Hashable key that identifies options of an absorption algorithm.
 
     Parameters
     ----------
@@ -153,17 +186,17 @@ def _options_key(options: dict[str, Any]) -> tuple[Any, ...]:
 
 def _check_method(method: str) -> str:
     """
-    Check the method used to absorb the variables
+    Check the method used to absorb the variables.
 
     Parameters
     ----------
     method : str
-        The method that was passed to fit
+        The method that was passed to fit.
 
     Returns
     -------
     str
-        The method in lower case
+        The method in lower case.
 
     Raises
     ------
@@ -181,7 +214,7 @@ def _check_method(method: str) -> str:
 def _absorb_args(
     method: str, use_cache: bool, absorb_options: dict[str, Any] | None
 ) -> tuple[Any, ...]:
-    """The arguments of AbsorbingLS.fit that determine the absorbed variables"""
+    """The arguments of AbsorbingLS.fit that determine the absorbed variables."""
     options = {} if absorb_options is None else absorb_options
     return method, use_cache, _options_key(options)
 
@@ -191,19 +224,19 @@ def _is_nested(
     cluster: linearmodels.typing.data.AnyArray,
 ) -> bool:
     """
-    Test whether every category of an effect is in a single cluster
+    Test whether every category of an effect is in a single cluster.
 
     Parameters
     ----------
     effect : ndarray
-        Integer codes of the categories of the effect, with shape (nobs,)
+        Integer codes of the categories of the effect, with shape (nobs,).
     cluster : ndarray
-        Cluster of each observation, with shape (nobs,)
+        Cluster of each observation, with shape (nobs,).
 
     Returns
     -------
     bool
-        True if each category of the effect has observations in one cluster only
+        True if each category of the effect has observations in one cluster only.
     """
     _, effect_codes = unique(effect, return_inverse=True)
     _, cluster_codes = unique(cluster, return_inverse=True)
@@ -213,16 +246,16 @@ def _is_nested(
 
 def _check_absorb_options(options: dict[str, Any], use_hdfe: bool, method: str) -> None:
     """
-    Raise a ValueError if options are those of the algorithm that is not used
+    Raise a ValueError if options are those of the algorithm that is not used.
 
     Parameters
     ----------
     options : dict
-        The options of the algorithm that absorbs the variables
+        The options of the algorithm that absorbs the variables.
     use_hdfe : bool
-        Flag indicating that pyhdfe absorbs the variables and not LSMR
+        Flag indicating that pyhdfe absorbs the variables and not LSMR.
     method : str
-        The method that was passed to fit
+        The method that was passed to fit.
 
     Notes
     -----
@@ -270,26 +303,28 @@ def lsmr_annihilate(
     ),
 ) -> linearmodels.typing.data.Float64Array:
     r"""
-    Removes projection of x on y from y
+    Remove the projection of y on x from y.
 
     Parameters
     ----------
     x : csc_array
-        Sparse array of regressors
+        Sparse array of regressors.
     y : ndarray
-        Array with shape (nobs, nvar)
-    use_cache : bool
+        Array with shape (nobs, nvar).
+    use_cache : bool, optional
         Flag indicating whether results should be stored in the cache,
-        and retrieved if available.
-    x_hash : object
-        Hashable object representing the values in x
-    lsmr_options: dict
-        Dictionary of options to pass to scipy.sparse.linalg.lsmr
+        and retrieved if available. The default is True.
+    x_hash : object, optional
+        Hashable object representing the values in x. The cache is not used if
+        it is not provided.
+    **lsmr_options : dict
+        Options to pass to scipy.sparse.linalg.lsmr. The defaults are
+        ``atol=1e-8``, ``btol=1e-8`` and ``show=False``.
 
     Returns
     -------
     ndarray
-        Returns the residuals from regressing y on x, (nobs, nvar)
+        The residuals from regressing y on x, with shape (nobs, nvar).
 
     Notes
     -----
@@ -338,11 +373,11 @@ def lsmr_annihilate(
 
 def category_product(cats: linearmodels.typing.AnyPandas) -> Series:
     """
-    Construct category from all combination of input categories
+    Construct category from all combination of input categories.
 
     Parameters
     ----------
-    cats : {Series, DataFrame}
+    cats : Series or DataFrame
         DataFrame containing categorical variables.  If cats is a Series, cats
         is returned unmodified.
 
@@ -350,7 +385,14 @@ def category_product(cats: linearmodels.typing.AnyPandas) -> Series:
     -------
     Series
         Categorical series containing the cartesian product of the categories
-        in cats
+        in cats.
+
+    Raises
+    ------
+    TypeError
+        If a column of cats is not categorical.
+    ValueError
+        If the categories have too many states to be combined.
     """
     if isinstance(cats, Series):
         return cats
@@ -398,17 +440,20 @@ def category_product(cats: linearmodels.typing.AnyPandas) -> Series:
 
 def category_interaction(cat: Series, precondition: bool = True) -> csc_array:
     """
+    Convert a categorical series to a sparse matrix of dummy variables.
+
     Parameters
     ----------
     cat : Series
-        Categorical series to convert to dummy variables
-    precondition : bool
-        Flag whether dummies should be preconditioned
+        Categorical series to convert to dummy variables.
+    precondition : bool, optional
+        Flag whether dummies should be preconditioned. The default is True.
 
     Returns
     -------
     csc_array
-        Sparse matrix of dummies with unit column norm
+        Sparse matrix of dummies. The columns have unit norm if the dummies are
+        preconditioned.
     """
     codes = asarray(category_product(cat).cat.codes)[:, None]
     mat = dummy_matrix(codes, precondition=precondition)[0]
@@ -422,19 +467,23 @@ def category_continuous_interaction(
     precondition: bool = True,
 ) -> csc_array:
     """
+    Interact a categorical series with continuous variables.
+
     Parameters
     ----------
-    cat : Series
-        Categorical series to convert to dummy variables
-    cont : {Series, DataFrame}
-        Continuous variable values to use in the dummy interaction
-    precondition : bool
-        Flag whether dummies should be preconditioned
+    cat : Series or DataFrame
+        Categorical series to convert to dummy variables. The cartesian product
+        of the categories of a DataFrame is used.
+    cont : Series or DataFrame
+        Continuous variable values to use in the dummy interaction.
+    precondition : bool, optional
+        Flag whether dummies should be preconditioned. The default is True.
 
     Returns
     -------
     csc_array
-        Sparse matrix of dummy interactions with unit column norm
+        Sparse matrix of dummy interactions. The columns have unit norm if the
+        dummies are preconditioned.
     """
     codes = category_product(cat).cat.codes
     interact = csc_array((cont.to_numpy().flat, (arange(codes.shape[0]), codes)))
@@ -448,18 +497,30 @@ def category_continuous_interaction(
 
 class Interaction:
     """
-    Class that simplifies specifying interactions
+    Class that simplifies specifying interactions.
 
     Parameters
     ----------
-    cat : array_like
+    cat : array_like, optional
         Variables to treat as categoricals. Best format is a Categorical
         Series or DataFrame containing Categorical Series. Other formats
-        are converted to Categorical Series, column-by-column. cats has
+        are converted to Categorical Series, column-by-column. cat has
         shape (nobs, ncat).
-    cont : array_like
+    cont : array_like, optional
         Variables to treat as continuous, (nobs, ncont). A ``TypeError`` is
         raised if the values are complex or cannot be converted to float64.
+    nobs : int, optional
+        Number of observations. It is required if both ``cat`` and ``cont`` are
+        not provided, and it is otherwise the number of rows of the inputs.
+
+    Raises
+    ------
+    TypeError
+        If ``cat`` or ``cont`` is complex or cannot be converted to float64.
+    ValueError
+        If ``nobs`` is not provided when ``cat`` and ``cont`` are not provided,
+        if both are empty, if they have different numbers of rows, or if they
+        carry labels that differ.
 
     Notes
     -----
@@ -555,16 +616,17 @@ class Interaction:
 
     @property
     def cat(self) -> DataFrame:
-        """Categorical Variables"""
+        """Categorical variables."""
         return self._cat_data.pandas
 
     @property
     def cont(self) -> DataFrame:
-        """Continuous Variables"""
+        """Continuous variables."""
         return self._cont_data.pandas
 
     @property
     def isnull(self) -> Series:
+        """Return a Series that is True for the rows that contain a missing value."""
         cat_null = self.cat.isnull().any(axis=1)
         cont_null = self.cont.isnull().any(axis=1)
         # Rows are paired by position since cat and cont need not have labels
@@ -594,7 +656,7 @@ class Interaction:
     @property
     def sparse(self) -> csc_array:
         r"""
-        Construct a sparse interaction matrix
+        Construct a sparse interaction matrix.
 
         Returns
         -------
@@ -604,7 +666,7 @@ class Interaction:
 
         Notes
         -----
-        The number of columns in `dummy_interact` is
+        The number of columns is
 
         .. math::
 
@@ -630,8 +692,15 @@ class Interaction:
     @property
     def hash(self) -> list[tuple[str, ...]]:
         """
-        Construct a hash that will be invariant for any permutation of
-        inputs that produce the same fit when used as regressors"""
+        Construct a hash that is invariant to the order of the inputs.
+
+        Returns
+        -------
+        list of tuple of str
+            The sorted hashes of the interactions of the categorical variables
+            with each continuous variable. Inputs that produce the same fit when
+            they are used as regressors have the same hash.
+        """
         # Sorted hashes of any categoricals
         hasher = Hasher()
         cat_hashes = []
@@ -656,7 +725,7 @@ class Interaction:
     @staticmethod
     def from_frame(frame: DataFrame) -> Interaction:
         """
-        Convenience function the simplifies using a DataFrame
+        Create an Interaction from the columns of a DataFrame.
 
         Parameters
         ----------
@@ -668,7 +737,13 @@ class Interaction:
         Returns
         -------
         Interaction
-            Instance using the columns of frame
+            Instance using the columns of frame.
+
+        Raises
+        ------
+        TypeError
+            If ``frame`` is not a DataFrame, or a column that is not categorical
+            is not numeric.
 
         Examples
         --------
@@ -691,7 +766,7 @@ class Interaction:
 
     @staticmethod
     def _from_frame(frame: DataFrame, name: str) -> Interaction:
-        """from_frame, where name is used to refer to frame in error messages"""
+        """from_frame, where name is used to refer to frame in error messages."""
         if not isinstance(frame, DataFrame):
             raise TypeError(f"{name} must be a DataFrame. Got {type(frame).__name__}.")
         cat_cols = [
@@ -720,18 +795,19 @@ InteractionVar = Union[DataFrame, Interaction]
 
 class AbsorbingRegressor:
     """
-    Constructed weights sparse matrix from components
+    Construct a sparse matrix of regressors from components.
 
     Parameters
     ----------
-    cat : DataFrame
-        List of categorical variables (factors) to absorb
-    cont : DataFrame
-        List of continuous variables to absorb
-    interactions : list[Interaction]
-        List of included interactions
-    weights : ndarray
-        Weights, if any
+    cat : DataFrame, optional
+        Categorical variables (factors) to absorb.
+    cont : DataFrame, optional
+        Continuous variables to absorb.
+    interactions : list of Interaction, optional
+        Included interactions.
+    weights : ndarray, optional
+        Weights, if any. The regressors are multiplied by the square root of the
+        weights.
     """
 
     def __init__(
@@ -750,11 +826,12 @@ class AbsorbingRegressor:
 
     @property
     def has_constant(self) -> bool:
-        """Flag indicating whether the regressors have a constant equivalent"""
+        """Flag indicating whether the regressors have a constant equivalent."""
         return self._cat is not None and self._cat.shape[1] > 0
 
     @property
     def approx_rank(self) -> int:
+        """Return the number of columns of the regressors, an upper bound of their rank."""
         if self._approx_rank is None:
             self._regressors()
         assert self._approx_rank is not None
@@ -762,6 +839,7 @@ class AbsorbingRegressor:
 
     @property
     def hash(self) -> tuple[tuple[str, ...], ...]:
+        """Return a hash of the regressors, which does not depend on their order."""
         hashes: list[tuple[str, ...]] = []
         hasher = Hasher()
         if self._cat is not None:
@@ -792,6 +870,7 @@ class AbsorbingRegressor:
 
     @property
     def regressors(self) -> csc_array:
+        """Return the sparse matrix of regressors."""
         return self._regressors()
 
     def _regressors(self) -> csc_array:
@@ -820,14 +899,14 @@ class AbsorbingRegressor:
 
 class AbsorbingLS:
     r"""
-    Linear regression with high-dimensional effects
+    Linear regression with high-dimensional effects.
 
     Parameters
     ----------
     dependent : array_like
-        Endogenous variables (nobs by 1)
+        Dependent variable (nobs by 1).
     exog : array_like, optional
-        Exogenous regressors  (nobs by nexog)
+        Exogenous regressors (nobs by nexog).
     absorb : DataFrame or Interaction, optional
         The effects or continuous variables to absorb. When using a DataFrame,
         effects must be categorical variables. Other variable types are treated
@@ -845,9 +924,30 @@ class AbsorbingLS:
     weights : array_like, optional
         Observation weights used in estimation. The weights must be strictly positive
         and finite. They are rescaled to have a mean of 1. A NaN weight is missing, and
-        its observation is dropped.
-    drop_absorbed : bool
-        Flag indicating whether to drop absorbed variables
+        its observation is dropped. The default is to weight all observations equally.
+    drop_absorbed : bool, optional
+        Flag indicating whether to drop absorbed variables. The default is False.
+
+    Raises
+    ------
+    TypeError
+        If ``absorb`` or ``interactions`` is not a DataFrame or an Interaction
+        (a list of them for ``interactions``), or if a column that is not
+        categorical is not numeric.
+    ValueError
+        If ``dependent``, ``exog``, ``absorb``, ``interactions`` and ``weights``
+        have different numbers of observations or labels that do not match (see
+        Notes), if all observations have a missing value, or if ``weights`` are
+        not strictly positive and finite.
+
+    See Also
+    --------
+    Interaction : Specify interactions between categorical and continuous variables.
+    linearmodels.iv.model.IVLIML : Limited information ML and k-class estimation of
+        IV models.
+    linearmodels.iv.model.IV2SLS : Estimation of IV models using two-stage least
+        squares.
+    scipy.sparse.linalg.lsmr : Iterative solver for sparse least squares problems.
 
     Notes
     -----
@@ -906,13 +1006,6 @@ class AbsorbingLS:
     Dates and time deltas are compared by value, so that the same dates at
     different resolutions, e.g., ``datetime64[us]`` and ``datetime64[ns]``, are
     the same labels.
-
-    See also
-    --------
-    Interaction
-    linearmodels.iv.model.IVLIML
-    linearmodels.iv.model.IV2SLS
-    scipy.sparse.linalg.lsmr
 
     Examples
     --------
@@ -1053,7 +1146,7 @@ class AbsorbingLS:
                 )
 
     def _check_alignment(self) -> None:
-        """Check that inputs with labels use the labels of dependent, or the first"""
+        """Check that inputs with labels use the labels of dependent, or the first."""
         inputs: list[tuple[str, object]] = [("exog", self._exog)]
         interactions: list[tuple[str, Interaction]] = [("absorb", self._absorb_inter)]
         single = isinstance(self._interactions, (DataFrame, Interaction))
@@ -1072,12 +1165,12 @@ class AbsorbingLS:
     @property
     def absorbed_dependent(self) -> DataFrame:
         """
-        Dependent variable with effects absorbed
+        Dependent variable with effects absorbed.
 
         Returns
         -------
         DataFrame
-            Dependent after effects have been absorbed
+            Dependent after effects have been absorbed.
 
         Raises
         ------
@@ -1093,12 +1186,12 @@ class AbsorbingLS:
     @property
     def absorbed_exog(self) -> DataFrame:
         """
-        Exogenous variables with effects absorbed
+        Exogenous variables with effects absorbed.
 
         Returns
         -------
         DataFrame
-            Exogenous after effects have been absorbed
+            Exogenous after effects have been absorbed.
 
         Raises
         ------
@@ -1111,22 +1204,27 @@ class AbsorbingLS:
 
     @property
     def weights(self) -> IVData:
+        """Return the weights, which have a mean of 1."""
         return self._weight_data
 
     @property
     def dependent(self) -> IVData:
+        """Return the dependent variable."""
         return self._dependent
 
     @property
     def exog(self) -> IVData:
+        """Return the exogenous regressors."""
         return self._exog
 
     @property
     def has_constant(self) -> bool:
+        """Flag indicating whether the model has a constant or equivalent."""
         return self._has_constant
 
     @property
     def instruments(self) -> IVData:
+        """Return the instruments, of which there are none."""
         return IVData(None, "instrument", nobs=self._dependent.shape[0])
 
     def _prepare_interactions(self) -> None:
@@ -1294,7 +1392,7 @@ class AbsorbingLS:
         absorb_options: dict[str, Any] | None,
         lsmr_options: dict[str, float | bool] | None,
     ) -> None:
-        """Discard the absorbed variables if fit uses other options to absorb"""
+        """Discard the absorbed variables if fit uses other options to absorb."""
         if absorb_options is not None and lsmr_options is not None:
             return  # fit raises an error
         options = lsmr_options if absorb_options is None else absorb_options
@@ -1325,24 +1423,27 @@ class AbsorbingLS:
         **cov_config: Any,
     ) -> AbsorbingLSResults:
         """
-        Estimate model parameters
+        Estimate model parameters.
 
         Parameters
         ----------
-        cov_type : str
-            Name of covariance estimator to use. Supported covariance
-            estimators are:
+        cov_type : str, optional
+            Name of covariance estimator to use. The default is "robust". Supported
+            covariance estimators are:
 
-            * "unadjusted", "homoskedastic" - Classic homoskedastic inference
-            * "robust", "heteroskedastic" - Heteroskedasticity robust inference
-            * "kernel" - Heteroskedasticity and autocorrelation robust
-              inference
-            * "clustered" - One-way cluster dependent inference.
-              Heteroskedasticity robust
+            * "unadjusted", "homoskedastic", "homo", "HomoskedasticCovariance" -
+              Classic homoskedastic inference
+            * "robust", "heteroskedastic", "hccm", "HeteroskedasticCovariance" -
+              Heteroskedasticity robust inference
+            * "kernel", "KernelCovariance" - Heteroskedasticity and autocorrelation
+              robust inference
+            * "clustered", "one-way", "OneWayClusteredCovariance" - Cluster
+              dependent inference, which is heteroskedasticity robust. It is
+              one-way unless ``clusters`` has two columns.
 
-        debiased : bool
-            Flag indicating whether to debiased the covariance estimator using
-            a degree of freedom adjustment.
+        debiased : bool, optional
+            Flag indicating whether to debias the covariance estimator using
+            a degree of freedom adjustment. The default is False.
         method : {"auto", "hdfe", "lsmr"}, optional
             The algorithm that absorbs the variables. The name is not case
             sensitive, and a ValueError is raised for any other value. One of:
@@ -1353,7 +1454,7 @@ class AbsorbingLS:
               continuous variables or continuous-binary interactions to absorb or
               if the model is weighted.
 
-        absorb_options : dict
+        absorb_options : dict, optional
             Dictionary of options to pass to the absorber. Passed to either
             scipy.sparse.linalg.lsmr or pyhdfe.create depending on the method used
             to absorb the absorbed regressors. The options have to be those of
@@ -1361,13 +1462,13 @@ class AbsorbingLS:
             model can be absorbed using it. A ValueError is raised for options
             of LSMR if the variables are absorbed using HDFE, and for options
             of pyhdfe.create if they are absorbed using LSMR.
-        use_cache : bool
+        use_cache : bool, optional
             Flag indicating whether the variables, once purged from the
             absorbed variables and interactions, should be stored in the cache,
             and retrieved if available. Cache can dramatically speed up
             re-fitting large models when the set of absorbed variables and
-            interactions are identical.
-        lsmr_options : dict
+            interactions are identical. The default is True.
+        lsmr_options : dict, optional
             Options to pass to scipy.sparse.linalg.lsmr. If they are not empty,
             method "auto" absorbs the variables using LSMR, and method "hdfe"
             raises a ValueError.
@@ -1377,22 +1478,63 @@ class AbsorbingLS:
                Use absorb_options with method="lsmr" to pass options.
                ``lsmr_options`` will be removed in linearmodels 8.0.
 
-        cov_config
-            Additional parameters to pass to covariance estimator. The list
-            of optional parameters differ according to ``cov_type``. See
-            the documentation of the alternative covariance estimators for
-            the complete list of available commands.
-
+        **cov_config : dict
+            Additional parameters to pass to the covariance estimator. The keys that
+            are used depend on ``cov_type``. "unadjusted" and "robust" do not use any.
+            "kernel" uses ``kernel`` (str), the name of the kernel, which is "bartlett"
+            if it is not provided, and ``bandwidth`` (int), which is selected from the
+            data if it is not provided. "clustered" uses ``clusters`` (array_like),
+            the cluster assignment of each observation, with one or two columns.
+            A ``center`` key is accepted and ignored. See
+            :class:`~linearmodels.iv.covariance.HomoskedasticCovariance`,
+            :class:`~linearmodels.iv.covariance.HeteroskedasticCovariance`,
+            :class:`~linearmodels.iv.covariance.KernelCovariance` and
+            :class:`~linearmodels.iv.covariance.ClusteredCovariance` for the details.
 
         Returns
         -------
         AbsorbingLSResults
-            Results container
+            Results container.
+
+        Raises
+        ------
+        ValueError
+            If ``method`` is not supported, if ``absorb_options`` contains options
+            of the algorithm that is not used, if ``lsmr_options`` is used with
+            ``absorb_options`` or with ``method="hdfe"``, if all columns in ``exog``
+            are absorbed and ``drop_absorbed`` is True, if ``debiased`` is True and
+            the model has no degrees of freedom left, or if the labels of
+            ``clusters`` do not match the labels of the other inputs.
+        RuntimeError
+            If ``method`` is "hdfe" and the model cannot be absorbed using HDFE.
+        Exception
+            An ``AbsorbingEffectError``, which is defined in
+            ``linearmodels.panel.utility``, if a variable in ``exog`` is absorbed by
+            the effects and ``drop_absorbed`` is False.
+        UnknownOptionError
+            If ``cov_type`` or ``kernel`` is not supported. It is both a
+            ``KeyError`` and a ``ValueError``.
+
+        Warns
+        -----
+        AbsorbingEffectWarning
+            If a variable in ``exog`` is absorbed by the effects and
+            ``drop_absorbed`` is True. The variable is dropped.
+        FutureWarning
+            If ``lsmr_options`` is used.
+
+        See Also
+        --------
+        linearmodels.iv.covariance.HomoskedasticCovariance : Homoskedastic covariance.
+        linearmodels.iv.covariance.HeteroskedasticCovariance : Heteroskedasticity
+            robust covariance.
+        linearmodels.iv.covariance.KernelCovariance : Kernel (HAC) covariance.
+        linearmodels.iv.covariance.ClusteredCovariance : Clustered covariance.
 
         Notes
         -----
         Additional covariance parameters depend on specific covariance used.
-        The see the docstring of specific covariance estimator for a list of
+        See the docstring of the specific covariance estimator for a list of
         supported options. Defaults are used if no covariance configuration
         is provided.
 
@@ -1434,13 +1576,6 @@ class AbsorbingLS:
         ``absorb_options`` and ``use_cache`` have the same values, so that
         changing only the covariance estimator is fast. If any of them differs,
         the variables are absorbed again using the new values.
-
-        See also
-        --------
-        linearmodels.iv.covariance.HomoskedasticCovariance
-        linearmodels.iv.covariance.HeteroskedasticCovariance
-        linearmodels.iv.covariance.KernelCovariance
-        linearmodels.iv.covariance.ClusteredCovariance
         """
         method = _check_method(method)
         if lsmr_options and absorb_options is None:
@@ -1512,14 +1647,14 @@ class AbsorbingLS:
         clusters: linearmodels.typing.data.ArrayLike | None,
     ) -> int:
         """
-        Degrees of freedom of the absorbed terms that a debiased covariance counts
+        Degrees of freedom of the absorbed terms that a debiased covariance counts.
 
         Parameters
         ----------
         cov_estimator : type
-            The class of the covariance estimator
+            The class of the covariance estimator.
         clusters : array_like
-            The clusters that are passed to fit, if any
+            The clusters that are passed to fit, if any.
 
         Returns
         -------
@@ -1555,17 +1690,17 @@ class AbsorbingLS:
         self, params: linearmodels.typing.data.Float64Array
     ) -> linearmodels.typing.data.Float64Array:
         """
-        Compute model residuals
+        Compute model residuals.
 
         Parameters
         ----------
         params : ndarray
-            Model parameters (nvar by 1)
+            Model parameters (nvar by 1).
 
         Returns
         -------
         ndarray
-            Model residuals
+            Model residuals.
         """
         resids = self.wresids(params)
         return resids / sqrt(self.weights.ndarray)
@@ -1574,17 +1709,17 @@ class AbsorbingLS:
         self, params: linearmodels.typing.data.Float64Array
     ) -> linearmodels.typing.data.Float64Array:
         """
-        Compute weighted model residuals
+        Compute weighted model residuals.
 
         Parameters
         ----------
         params : ndarray
-            Model parameters (nvar by 1)
+            Model parameters (nvar by 1).
 
         Returns
         -------
         ndarray
-            Weighted model residuals
+            Weighted model residuals.
 
         Notes
         -----
@@ -1609,7 +1744,7 @@ class AbsorbingLS:
         return f_statistic(params, cov, debiased, resid_df, self._const_loc)
 
     def _retained_exog(self) -> linearmodels.typing.data.Float64Array:
-        """The regressors that were estimated, in the units of exog"""
+        """The regressors that were estimated, in the units of exog."""
         locs = [self._exog.cols.index(col) for col in self._columns]
         return cast(
             "linearmodels.typing.data.Float64Array", self._exog.ndarray[:, locs]
