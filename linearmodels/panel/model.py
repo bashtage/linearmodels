@@ -3808,7 +3808,9 @@ class BetweenOLS(_PanelModelBase):
         >>> res = mod.fit(cov_type='robust')
         """
         cov_type = lower_option(cov_type)
-        check_covariance_kwargs(self._cov_estimators, cov_type, cov_config)
+        check_covariance_kwargs(
+            self._cov_estimators, cov_type, cov_config, cluster_options=()
+        )
         y, x, w = self._prepare_between()
         if np.all(self.weights.values2d == 1.0) and not reweight:
             w = root_w = np.ones_like(y)
@@ -4331,7 +4333,12 @@ class FirstDifferenceOLS(_PanelModelBase):
         >>> clustered = mod.fit(cov_type="clustered", cluster_entity=True)
         """
         cov_type = lower_option(cov_type)
-        check_covariance_kwargs(self._cov_estimators, cov_type, cov_config)
+        check_covariance_kwargs(
+            self._cov_estimators,
+            cov_type,
+            cov_config,
+            cluster_options=("cluster_entity",),
+        )
         y_fd = self.dependent.first_difference()
         time_ids = y_fd.time_ids
         entity_ids = y_fd.entity_ids
