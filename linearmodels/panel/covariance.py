@@ -307,7 +307,7 @@ class ClusteredCovariance(HomoskedasticCovariance):
     covariance computed using the group formed from the intersection of the
     two groups.
 
-    Two small sample adjustment are available.  ``debias=True`` will account
+    Two small sample adjustments are available. ``debiased=True`` will account
     for regressors in the main model. ``group_debias=True`` will provide a
     small sample adjustment for the number of clusters of the form
 

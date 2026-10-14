@@ -852,8 +852,9 @@ class PanelResults(_SummaryStr):
 
         Returns
         -------
-        WaldTestStatistic
-            Statistic value, distribution and p-value.
+        WaldTestStatistic or InvalidTestStatistic
+            Statistic value, distribution and p-value. An ``InvalidTestStatistic``
+            is returned if the test cannot be computed, as described in Notes.
 
         Notes
         -----
@@ -892,8 +893,10 @@ class PanelResults(_SummaryStr):
 
         Returns
         -------
-        WaldTestStatistic
-            Statistic value, distribution and p-value.
+        WaldTestStatistic or InvalidTestStatistic
+            Statistic value, distribution and p-value. An ``InvalidTestStatistic``
+            is returned if the model has no regressors, only a constant, or no
+            residual degrees of freedom.
 
         Notes
         -----
@@ -1156,8 +1159,12 @@ class PanelEffectsResults(PanelResults):
 
         Returns
         -------
-        WaldTestStatistic
-            Statistic value, distribution and p-value.
+        WaldTestStatistic, InapplicableTestStatistic or InvalidTestStatistic
+            Statistic value, distribution and p-value. It is an
+            ``InapplicableTestStatistic`` if the effects do not use any degrees
+            of freedom, e.g., a single entity with a constant, and an
+            ``InvalidTestStatistic`` if the model has no residual degrees of
+            freedom or its residual sum of squares is 0.
 
         Notes
         -----
@@ -1645,7 +1652,7 @@ class FamaMacBethResults(PanelResults):
 
         Returns
         -------
-        WaldTestStatistic
+        WaldTestStatistic or InvalidTestStatistic
             Statistic value, distribution and p-value. It is an
             ``InvalidTestStatistic`` if the model contains only a constant, or
             if the covariance of the parameters is singular, which it is if the
