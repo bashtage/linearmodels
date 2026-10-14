@@ -1,5 +1,5 @@
 """
-Results containers and post-estimation diagnostics for IV models
+Results containers and post-estimation diagnostics for IV models.
 """
 
 from __future__ import annotations
@@ -65,6 +65,21 @@ _KAPPA_UNAVAILABLE = (
 def stub_concat(
     lists: Sequence[list[str] | tuple[str, ...]], sep: str = "="
 ) -> list[str]:
+    """
+    Concatenate the stubs of tables, separating them by a line.
+
+    Parameters
+    ----------
+    lists : sequence of list of str or sequence of tuple of str
+        The stubs of each table.
+    sep : str, optional
+        The character that makes up the separating line. The default is "=".
+
+    Returns
+    -------
+    list of str
+        The stubs, with a separating line between the tables.
+    """
     col_size = max(max(map(len, stubs)) for stubs in lists)
     out: list[str] = []
     for stubs in lists:
@@ -74,6 +89,21 @@ def stub_concat(
 
 
 def table_concat(lists: Sequence[list[list[str]]], sep: str = "=") -> list[list[str]]:
+    """
+    Concatenate the rows of tables, separating them by a line.
+
+    Parameters
+    ----------
+    lists : sequence of list of list of str
+        The rows of each table.
+    sep : str, optional
+        The character that makes up the separating line. The default is "=".
+
+    Returns
+    -------
+    list of list of str
+        The rows, with a separating line between the tables.
+    """
     col_sizes = []
     for table in lists:
         size = [[len(item) for item in row] for row in table]
@@ -90,11 +120,11 @@ def table_concat(lists: Sequence[list[list[str]]], sep: str = "=") -> list[list[
 
 class _LSModelResultsBase(_SummaryStr):
     """
-    Results from OLS model estimation
+    Results from the estimation of a linear model.
 
     Parameters
     ----------
-    results : dict[str, any]
+    results : dict of str to object
         A dictionary of results from the model estimation.
     model : _OLS
         The model used to estimate parameters.
@@ -125,38 +155,38 @@ class _LSModelResultsBase(_SummaryStr):
 
     @property
     def cov_config(self) -> dict[str, Any]:
-        """Parameter values from covariance estimator"""
+        """Parameter values from covariance estimator."""
         return self._cov_config
 
     @property
     def cov_estimator(self) -> str:
-        """Type of covariance estimator used to compute covariance"""
+        """Type of covariance estimator used to compute covariance."""
         return self._cov_type
 
     @property
     def cov(self) -> DataFrame:
-        """Estimated covariance of parameters"""
+        """Estimated covariance of parameters."""
         return self._cov
 
     @property
     def params(self) -> Series:
-        """Estimated parameters"""
+        """Estimated parameters."""
         return self._params
 
     @cached_property
     def resids(self) -> Series:
-        """Estimated residuals"""
+        """Estimated residuals."""
         return self._resid()
 
     @cached_property
     def fitted_values(self) -> Series:
-        """Fitted values"""
+        """Fitted values."""
         return self._fitted()
 
     @property
     def idiosyncratic(self) -> Series:
         """
-        Idiosyncratic error
+        Idiosyncratic error.
 
         Notes
         -----
@@ -170,33 +200,33 @@ class _LSModelResultsBase(_SummaryStr):
 
     @cached_property
     def wresids(self) -> Series:
-        """Weighted estimated residuals"""
+        """Weighted estimated residuals."""
         return self._wresid()
 
     @property
     def nobs(self) -> int:
-        """Number of observations"""
+        """Number of observations."""
         return self.model.dependent.shape[0]
 
     @property
     def df_resid(self) -> int:
-        """Residual degree of freedom"""
+        """Residual degree of freedom."""
         return self.nobs - self.df_model
 
     @property
     def df_model(self) -> int:
-        """Model degree of freedom"""
+        """Model degree of freedom."""
         return int(self._df_model)
 
     @property
     def has_constant(self) -> bool:
-        """Flag indicating the model includes a constant or equivalent"""
+        """Flag indicating the model includes a constant or equivalent."""
         return self.model.has_constant
 
     @property
     def rsquared(self) -> float:
         """
-        Coefficient of determination (R**2)
+        Coefficient of determination (R**2).
 
         Returns
         -------
@@ -216,7 +246,7 @@ class _LSModelResultsBase(_SummaryStr):
     @property
     def rsquared_adj(self) -> float:
         """
-        Sample-size adjusted coefficient of determination (R**2)
+        Sample-size adjusted coefficient of determination (R**2).
 
         Returns
         -------
@@ -235,24 +265,24 @@ class _LSModelResultsBase(_SummaryStr):
 
     @property
     def cov_type(self) -> str:
-        """Covariance estimator used"""
+        """Covariance estimator used."""
         return self._cov_type
 
     @cached_property
     def std_errors(self) -> Series:
-        """Estimated parameter standard errors"""
+        """Estimated parameter standard errors."""
         std_errors = sqrt(diag(self.cov))
         return Series(std_errors, index=self._vars, name="stderr")
 
     @cached_property
     def tstats(self) -> Series:
-        """Parameter t-statistics"""
+        """Parameter t-statistics."""
         return Series(self._params / self.std_errors, name="tstat")
 
     @cached_property
     def pvalues(self) -> Series:
         """
-        Parameter p-vals. Uses t(df_resid) if ``debiased`` is True, else normal
+        Parameter p-values. Uses t(df_resid) if ``debiased`` is True, else normal.
         """
         if self.debiased:
             pvals = 2 * stats.t.sf(abs(self.tstats), self.df_resid)
@@ -263,33 +293,33 @@ class _LSModelResultsBase(_SummaryStr):
 
     @property
     def total_ss(self) -> float:
-        """Total sum of squares"""
+        """Total sum of squares."""
         return self._tss
 
     @property
     def model_ss(self) -> float:
-        """Residual sum of squares"""
+        """Model sum of squares."""
         return self._tss - self._rss
 
     @property
     def resid_ss(self) -> float:
-        """Residual sum of squares"""
+        """Residual sum of squares."""
         return self._rss
 
     @property
     def s2(self) -> float:
-        """Residual variance estimator"""
+        """Residual variance estimator."""
         return self._s2
 
     @property
     def debiased(self) -> bool:
-        """Flag indicating whether covariance uses a small-sample adjustment"""
+        """Flag indicating whether covariance uses a small-sample adjustment."""
         return self._debiased
 
     @property
     def f_statistic(self) -> WaldTestStatistic:
         """
-        Model F-statistic
+        Model F-statistic.
 
         Returns
         -------
@@ -315,22 +345,22 @@ class _LSModelResultsBase(_SummaryStr):
 
     @property
     def method(self) -> str:
-        """Method used to estimate model parameters"""
+        """Method used to estimate model parameters."""
         return self._method
 
     def conf_int(self, level: float = 0.95) -> DataFrame:
         """
-        Confidence interval construction
+        Confidence interval construction.
 
         Parameters
         ----------
-        level : float
-            Confidence level for interval
+        level : float, optional
+            Confidence level for interval. The default is 0.95.
 
         Returns
         -------
         DataFrame
-            Confidence interval of the form [lower, upper] for each parameters
+            Confidence interval of the form [lower, upper] for each parameters.
 
         Notes
         -----
@@ -368,7 +398,7 @@ class _LSModelResultsBase(_SummaryStr):
         Returns
         -------
         Summary
-            Summary table of model estimation results
+            Summary table of model estimation results.
 
         Notes
         -----
@@ -465,18 +495,20 @@ class _LSModelResultsBase(_SummaryStr):
         formula: str | list[str] | dict[str, float] | None = None,
     ) -> WaldTestStatistic:
         r"""
-        Test linear equality constraints using a Wald test
+        Test linear equality constraints using a Wald test.
 
         Parameters
         ----------
-        restriction : {ndarray, DataFrame}
-            q by nvar array containing linear weights to apply to parameters
-            when forming the restrictions. It is not possible to use both
-            restriction and formula.
-        value : {ndarray, Series}
-            q element array containing the restricted values.
-        formula : {str, list[str]}
-            formulaic linear constraints. The simplest formats are one of:
+        restriction : array_like, optional
+            Array with q rows and nvar columns containing linear weights to apply
+            to parameters when forming the restrictions. It is not possible to use
+            both restriction and formula.
+        value : array_like, optional
+            Array with q elements containing the restricted values. The default is
+            zeros.
+        formula : str, list of str or dict of str to float, optional
+            Linear constraints in the formulaic syntax. The simplest formats are
+            one of:
 
             * A single comma-separated string such as "x1=0, x2+x3=1"
             * A list of strings where each element is a single constraint
@@ -497,6 +529,11 @@ class _LSModelResultsBase(_SummaryStr):
         -------
         WaldTestStatistic
             Test statistic for null that restrictions are valid.
+
+        Raises
+        ------
+        ValueError
+            If both ``restriction`` and ``formula`` are provided.
 
         Notes
         -----
@@ -548,11 +585,11 @@ class _LSModelResultsBase(_SummaryStr):
 
 class OLSResults(_LSModelResultsBase):
     """
-    Results from OLS model estimation
+    Results from OLS model estimation.
 
     Parameters
     ----------
-    results : dict[str, any]
+    results : dict of str to object
         A dictionary of results from the model estimation.
     model : _OLS
         The model used to estimate parameters.
@@ -572,7 +609,7 @@ class OLSResults(_LSModelResultsBase):
         data: linearmodels.typing.data.ArrayLike | None,
         missing: bool | None,
     ) -> DataFrame:
-        """Interface between model predict and predict for OOS fits"""
+        """Interface between model predict and predict for OOS fits."""
         if not (exog is None and endog is None) and data is not None:
             raise ValueError(
                 "Predictions can only be constructed using one "
@@ -597,31 +634,42 @@ class OLSResults(_LSModelResultsBase):
         missing: bool = False,
     ) -> DataFrame:
         """
-        In- and out-of-sample predictions
+        In- and out-of-sample predictions.
 
         Parameters
         ----------
-        exog : array_like
-            Exogenous values to use in out-of-sample prediction (nobs by nexog)
-        endog : array_like
-            Endogenous values to use in out-of-sample prediction (nobs by nendog)
-        data : DataFrame
+        exog : array_like, optional
+            Exogenous values to use in out-of-sample prediction (nobs by nexog).
+        endog : array_like, optional
+            Endogenous values to use in out-of-sample prediction (nobs by nendog).
+        data : DataFrame, optional
             DataFrame to use for out-of-sample predictions when model was
             constructed using a formula.
-        fitted : bool
-            Flag indicating whether to include the fitted values
-        idiosyncratic : bool
-            Flag indicating whether to include the estimated idiosyncratic shock
-        missing : bool
+        fitted : bool, optional
+            Flag indicating whether to include the fitted values. The default is
+            True.
+        idiosyncratic : bool, optional
+            Flag indicating whether to include the estimated idiosyncratic shock.
+            The default is False.
+        missing : bool, optional
             Flag indicating to adjust for dropped observations.  If True, the
             values returned will have the same size as the original input data
             before filtering missing values.  If False, then missing
-            observations will not be returned.
+            observations will not be returned. The default is False.
 
         Returns
         -------
         DataFrame
-            DataFrame containing columns for all selected outputs
+            DataFrame containing columns for all selected outputs.
+
+        Raises
+        ------
+        ValueError
+            If neither ``fitted`` nor ``idiosyncratic`` is selected for an
+            in-sample prediction, or if ``data`` is used with ``exog`` or
+            ``endog``. The errors of
+            :meth:`~linearmodels.iv.model.IV2SLS.predict` are raised for an
+            out-of-sample prediction.
 
         Notes
         -----
@@ -652,7 +700,7 @@ class OLSResults(_LSModelResultsBase):
 
     @property
     def kappa(self) -> float | None:
-        """k-class estimator value"""
+        """Value of kappa in the k-class estimator."""
         return self._kappa
 
     def _update_extra_text(self, extra_text: list[str]) -> list[str]:
@@ -669,11 +717,11 @@ class OLSResults(_LSModelResultsBase):
 
 class AbsorbingLSResults(_LSModelResultsBase):
     """
-    Results from IV estimation
+    Results from the estimation of a model with absorbed effects.
 
     Parameters
     ----------
-    results : dict[str, any]
+    results : dict of str to object
         A dictionary of results from the model estimation.
     model : AbsorbingLS
         The model used to estimate parameters.
@@ -704,7 +752,7 @@ class AbsorbingLSResults(_LSModelResultsBase):
     @property
     def absorbed_rsquared(self) -> float:
         """
-        Coefficient of determination (R**2), ignoring absorbed variables
+        Coefficient of determination (R**2), ignoring absorbed variables.
 
         Returns
         -------
@@ -731,7 +779,7 @@ class AbsorbingLSResults(_LSModelResultsBase):
     @cached_property
     def absorbed_effects(self) -> DataFrame:
         """
-        Fitted values from only absorbed terms
+        Fitted values from only absorbed terms.
 
         The part of ``fitted_values`` that the absorbed terms explain, which is
         ``fitted_values - exog @ params``, in the units of the dependent variable. It
@@ -748,13 +796,31 @@ class AbsorbingLSResults(_LSModelResultsBase):
 
     @property
     def df_absorbed(self) -> int:
-        """Number of variables absorbed"""
+        """Number of variables absorbed."""
         return self.df_model - self.params.shape[0]
 
 
 class FirstStageResults(_SummaryStr):
     """
-    First stage estimation results and diagnostics
+    First stage estimation results and diagnostics.
+
+    Parameters
+    ----------
+    dep : IVData
+        Dependent variable.
+    exog : IVData
+        Exogenous regressors.
+    endog : IVData
+        Endogenous regressors.
+    instr : IVData
+        Instruments.
+    weights : IVData
+        Observation weights, scaled to have a mean of 1.
+    cov_type : str
+        Name of the covariance estimator of the model. It is used for the first
+        stage regressions and for the rank tests.
+    cov_config : dict
+        Options of the covariance estimator of the model.
     """
 
     def __init__(
@@ -784,7 +850,7 @@ class FirstStageResults(_SummaryStr):
         linearmodels.typing.data.Float64Array,
         linearmodels.typing.data.Float64Array,
     ]:
-        """Weighted endogenous, instrument and exogenous arrays"""
+        """Weighted endogenous, instrument and exogenous arrays."""
         w = sqrt(self.weights.ndarray)
         endog = w * self.endog.ndarray.astype(float, copy=False)
         instr = w * self.instr.ndarray.astype(float, copy=False)
@@ -794,7 +860,7 @@ class FirstStageResults(_SummaryStr):
     @cached_property
     def cragg_donald(self) -> WaldTestStatistic | InvalidTestStatistic:
         r"""
-        Cragg-Donald test of underidentification
+        Cragg-Donald test of underidentification.
 
         Returns
         -------
@@ -842,7 +908,7 @@ class FirstStageResults(_SummaryStr):
     @cached_property
     def cragg_donald_f(self) -> float:
         r"""
-        Cragg-Donald Wald F statistic
+        Cragg-Donald Wald F statistic.
 
         Returns
         -------
@@ -885,7 +951,7 @@ class FirstStageResults(_SummaryStr):
     @property
     def kleibergen_paap(self) -> WaldTestStatistic | InvalidTestStatistic:
         r"""
-        Kleibergen-Paap rk LM test of underidentification
+        Kleibergen-Paap rk LM test of underidentification.
 
         Returns
         -------
@@ -939,7 +1005,7 @@ class FirstStageResults(_SummaryStr):
     @property
     def kleibergen_paap_f(self) -> float:
         r"""
-        Kleibergen-Paap rk Wald F statistic
+        Kleibergen-Paap rk Wald F statistic.
 
         Returns
         -------
@@ -975,7 +1041,7 @@ class FirstStageResults(_SummaryStr):
     @cached_property
     def diagnostics(self) -> DataFrame:
         r"""
-        Post estimation diagnostics of first-stage fit
+        Post estimation diagnostics of first-stage fit.
 
         Returns
         -------
@@ -1095,11 +1161,11 @@ class FirstStageResults(_SummaryStr):
     @cached_property
     def individual(self) -> dict[str, OLSResults]:
         """
-        Individual model results from first-stage regressions
+        Individual model results from first-stage regressions.
 
         Returns
         -------
-        dict
+        dict of str to OLSResults
             Dictionary containing first stage estimation results. Keys are
             the variable names of the endogenous regressors.
         """
@@ -1125,7 +1191,7 @@ class FirstStageResults(_SummaryStr):
         Returns
         -------
         Summary
-            Summary table of model estimation results
+            Summary table of model estimation results.
 
         Notes
         -----
@@ -1210,7 +1276,7 @@ class _CommonIVResults(OLSResults):
     @property
     def first_stage(self) -> FirstStageResults:
         """
-        First stage regression results
+        First stage regression results.
 
         Returns
         -------
@@ -1230,13 +1296,13 @@ class _CommonIVResults(OLSResults):
 
 class IVResults(_CommonIVResults):
     """
-    Results from IV estimation
+    Results from IV estimation.
 
     Parameters
     ----------
-    results : dict[str, any]
+    results : dict of str to object
         A dictionary of results from the model estimation.
-    model : {IV2SLS, IVLIML, IVJIVE}
+    model : IV2SLS, IVLIML or IVJIVE
         The model used to estimate parameters.
     """
 
@@ -1249,12 +1315,14 @@ class IVResults(_CommonIVResults):
     @cached_property
     def sargan(self) -> InvalidTestStatistic | WaldTestStatistic:
         r"""
-        Sargan test of overidentifying restrictions
+        Sargan test of overidentifying restrictions.
 
         Returns
         -------
-        WaldTestStatistic
-            Object containing test statistic, p-value, distribution and null
+        WaldTestStatistic or InvalidTestStatistic
+            Object containing test statistic, p-value, distribution and null.
+            An InvalidTestStatistic is returned if the model does not have more
+            instruments than endogenous variables.
 
         See Also
         --------
@@ -1264,7 +1332,7 @@ class IVResults(_CommonIVResults):
 
         Notes
         -----
-        Requires more instruments than endogenous variables
+        Requires more instruments than endogenous variables.
 
         The test assumes that the errors are homoskedastic. It does not use the
         covariance estimator that was used to fit the model, so it is the same
@@ -1285,7 +1353,7 @@ class IVResults(_CommonIVResults):
 
         .. math ::
 
-          v = n_{instr} - n_{exog}
+          v = n_{instr} - n_{endog}
         """
         z = self.model.instruments.ndarray
         nobs, ninstr = z.shape
@@ -1307,12 +1375,14 @@ class IVResults(_CommonIVResults):
     @cached_property
     def basmann(self) -> InvalidTestStatistic | WaldTestStatistic:
         r"""
-        Basmann's test of overidentifying restrictions
+        Basmann's test of overidentifying restrictions.
 
         Returns
         -------
-        WaldTestStatistic
-            Object containing test statistic, p-value, distribution and null
+        WaldTestStatistic or InvalidTestStatistic
+            Object containing test statistic, p-value, distribution and null.
+            An InvalidTestStatistic is returned if the model does not have more
+            instruments than endogenous variables.
 
         See Also
         --------
@@ -1322,18 +1392,18 @@ class IVResults(_CommonIVResults):
 
         Notes
         -----
-        Requires more instruments than endogenous variables
+        Requires more instruments than endogenous variables.
 
         The test assumes that the errors are homoskedastic. It does not use the
         covariance estimator that was used to fit the model, so it is the same
         for every ``cov_type``.
 
-        Tests is a small-sample version of Sargan's test that has the same
-        distribution.
+        The test is a small-sample version of Sargan's test that has the same
+        distribution. With :math:`s` the Sargan statistic,
 
         .. math ::
 
-          s (n - n_{instr}) / (n - s) \sim \chi^2_{v}
+          s (n - n_{exog} - n_{instr}) / (n - s) \sim \chi^2_{v}
 
         where :math:`n_{instr}` is the number of instruments, :math:`n_{exog}`
         is the number of exogenous regressors and :math:`n_{endog}` is the
@@ -1343,7 +1413,7 @@ class IVResults(_CommonIVResults):
 
         .. math ::
 
-          v = n_{instr} - n_{exog}
+          v = n_{instr} - n_{endog}
         """
         mod = self.model
         ninstr = mod.instruments.shape[1]
@@ -1363,7 +1433,7 @@ class IVResults(_CommonIVResults):
     def _endogeneity_setup(
         self, variables: str | list[str] | None = None
     ) -> tuple[ndarray, ndarray, ndarray, int, int, int, int]:
-        """Setup function for some endogeneity iv"""
+        """Setup function for some endogeneity iv."""
         if isinstance(variables, str):
             variables = [variables]
         elif variables is not None and not isinstance(variables, list):
@@ -1405,18 +1475,26 @@ class IVResults(_CommonIVResults):
 
     def durbin(self, variables: str | list[str] | None = None) -> WaldTestStatistic:
         r"""
-        Durbin's test of exogeneity
+        Compute Durbin's test of exogeneity.
 
         Parameters
         ----------
-        variables : {str, list[str]}
-            List of variables to test for exogeneity.  If None, all variables
-            are jointly tested.
+        variables : str or list of str, optional
+            Name or list of names of the endogenous regressors to test for
+            exogeneity.  If not provided, all endogenous regressors are jointly
+            tested.
 
         Returns
         -------
         WaldTestStatistic
-            Object containing test statistic, p-value, distribution and null
+            Object containing test statistic, p-value, distribution and null.
+
+        Raises
+        ------
+        TypeError
+            If ``variables`` is not a str or a list of str.
+        KeyError
+            If a name in ``variables`` is not an endogenous regressor.
 
         See Also
         --------
@@ -1444,11 +1522,11 @@ class IVResults(_CommonIVResults):
                      \hat{\epsilon}'_c P_{z} \hat{\epsilon}_c
 
         where :math:`\hat{\epsilon}_e` are the regression residuals from a
-        model where ``vars`` are treated as exogenous,
+        model where ``variables`` are treated as exogenous,
         :math:`\hat{\epsilon}_c` are the regression residuals from the model
-        leaving ``vars`` as endogenous, :math:`P_{[z,w]}` is a projection
+        leaving ``variables`` as endogenous, :math:`P_{[z,w]}` is a projection
         matrix onto the exogenous variables and instruments (`z`) as well as
-        ``vars``, and :math:`P_{z}` is a projection matrix only onto `z`.
+        ``variables``, and :math:`P_{z}` is a projection matrix only onto `z`.
 
         The test statistic is then
 
@@ -1472,18 +1550,26 @@ class IVResults(_CommonIVResults):
 
     def wu_hausman(self, variables: str | list[str] | None = None) -> WaldTestStatistic:
         r"""
-        Wu-Hausman test of exogeneity
+        Wu-Hausman test of exogeneity.
 
         Parameters
         ----------
-        variables : {str, list[str]}
-            List of variables to test for exogeneity.  If None, all variables
-            are jointly tested.
+        variables : str or list of str, optional
+            Name or list of names of the endogenous regressors to test for
+            exogeneity.  If not provided, all endogenous regressors are jointly
+            tested.
 
         Returns
         -------
         WaldTestStatistic
-            Object containing test statistic, p-value, distribution and null
+            Object containing test statistic, p-value, distribution and null.
+
+        Raises
+        ------
+        TypeError
+            If ``variables`` is not a str or a list of str.
+        KeyError
+            If a name in ``variables`` is not an endogenous regressor.
 
         See Also
         --------
@@ -1511,11 +1597,11 @@ class IVResults(_CommonIVResults):
                      \hat{\epsilon}'_c P_{z} \hat{\epsilon}_c
 
         where :math:`\hat{\epsilon}_e` are the regression residuals from a
-        model where ``vars`` are treated as exogenous,
+        model where ``variables`` are treated as exogenous,
         :math:`\hat{\epsilon}_c` are the regression residuals from the model
-        leaving ``vars`` as endogenous, :math:`P_{[z,w]}` is a projection
+        leaving ``variables`` as endogenous, :math:`P_{[z,w]}` is a projection
         matrix onto the exogenous variables and instruments (`z`) as well as
-        ``vars``, and :math:`P_{z}` is a projection matrix only onto `z`.
+        ``variables``, and :math:`P_{z}` is a projection matrix only onto `z`.
 
         The test statistic is then
 
@@ -1523,7 +1609,7 @@ class IVResults(_CommonIVResults):
 
             \frac{\delta / q}{(\hat{\epsilon}'_e\hat{\epsilon}_e - \delta) / v}
 
-        where :math:`q` is the number of variables iv,
+        where :math:`q` is the number of variables tested,
         :math:`v = n - n_{endog} - n_{exog} - q`. The test statistic has a
         :math:`F_{q, v}` distribution.
         """
@@ -1546,12 +1632,12 @@ class IVResults(_CommonIVResults):
     @cached_property
     def wooldridge_score(self) -> WaldTestStatistic:
         r"""
-        Wooldridge's score test of exogeneity
+        Wooldridge's score test of exogeneity.
 
         Returns
         -------
         WaldTestStatistic
-            Object containing test statistic, p-value, distribution and null
+            Object containing test statistic, p-value, distribution and null.
 
         Notes
         -----
@@ -1591,12 +1677,12 @@ class IVResults(_CommonIVResults):
     @cached_property
     def wooldridge_regression(self) -> WaldTestStatistic:
         r"""
-        Wooldridge's regression test of exogeneity
+        Wooldridge's regression test of exogeneity.
 
         Returns
         -------
         WaldTestStatistic
-            Object containing test statistic, p-value, distribution and null
+            Object containing test statistic, p-value, distribution and null.
 
         Notes
         -----
@@ -1639,12 +1725,14 @@ class IVResults(_CommonIVResults):
     @cached_property
     def wooldridge_overid(self) -> InvalidTestStatistic | WaldTestStatistic:
         r"""
-        Wooldridge's score test of overidentification
+        Wooldridge's score test of overidentification.
 
         Returns
         -------
-        WaldTestStatistic
-            Object containing test statistic, p-value, distribution and null
+        WaldTestStatistic or InvalidTestStatistic
+            Object containing test statistic, p-value, distribution and null.
+            An InvalidTestStatistic is returned if the model does not have more
+            instruments than endogenous variables.
 
         Notes
         -----
@@ -1693,12 +1781,12 @@ class IVResults(_CommonIVResults):
     @cached_property
     def anderson_rubin(self) -> InvalidTestStatistic | WaldTestStatistic:
         r"""
-        Anderson-Rubin test of overidentifying restrictions
+        Anderson-Rubin test of overidentifying restrictions.
 
         Returns
         -------
         WaldTestStatistic or InvalidTestStatistic
-            Object containing test statistic, p-value, distribution and null
+            Object containing test statistic, p-value, distribution and null.
 
         Notes
         -----
@@ -1744,12 +1832,12 @@ class IVResults(_CommonIVResults):
     @cached_property
     def basmann_f(self) -> InvalidTestStatistic | WaldTestStatistic:
         r"""
-        Basmann's F test of overidentifying restrictions
+        Basmann's F test of overidentifying restrictions.
 
         Returns
         -------
         WaldTestStatistic or InvalidTestStatistic
-            Object containing test statistic, p-value, distribution and null
+            Object containing test statistic, p-value, distribution and null.
 
         Notes
         -----
@@ -1759,7 +1847,7 @@ class IVResults(_CommonIVResults):
 
         .. math ::
 
-          \hat{\kappa} (n -n_{instr})/q \sim F_{q, n - n_{instr}}
+          (\hat{\kappa} - 1) (n - n_{exog} - n_{instr})/q \sim F_{q, n - n_{exog} - n_{instr}}
 
         where :math:`q = n_{instr} - n_{endog}`.
 
@@ -1796,13 +1884,13 @@ class IVResults(_CommonIVResults):
 
 class IVGMMResults(_CommonIVResults):
     """
-    Results from GMM estimation of IV models
+    Results from GMM estimation of IV models.
 
     Parameters
     ----------
-    results : dict[str, any]
+    results : dict of str to object
         A dictionary of results from the model estimation.
-    model : {IVGMM, IVGMMCUE}
+    model : IVGMM or IVGMMCUE
         The model used to estimate parameters.
     """
 
@@ -1819,23 +1907,23 @@ class IVGMMResults(_CommonIVResults):
 
     @property
     def weight_matrix(self) -> linearmodels.typing.data.Float64Array:
-        """Weight matrix used in the final-step GMM estimation"""
+        """Weight matrix used in the final-step GMM estimation."""
         return self._weight_mat
 
     @property
     def iterations(self) -> int:
-        """Iterations used in GMM estimation"""
+        """Iterations used in GMM estimation."""
         return self._iterations
 
     @property
     def weight_type(self) -> str:
-        """Weighting matrix method used in estimation"""
+        """Weighting matrix method used in estimation."""
         return self._weight_type
 
     @property
     def weight_config(self) -> dict[str, Any]:
         """
-        Weighting matrix configuration used in estimation
+        Weighting matrix configuration used in estimation.
 
         Notes
         -----
@@ -1850,7 +1938,7 @@ class IVGMMResults(_CommonIVResults):
     @property
     def j_stat(self) -> InvalidTestStatistic | WaldTestStatistic:
         r"""
-        J-test of overidentifying restrictions
+        J-test of overidentifying restrictions.
 
         Returns
         -------
@@ -1902,7 +1990,7 @@ class IVGMMResults(_CommonIVResults):
     @property
     def centered_j_stat(self) -> InvalidTestStatistic | WaldTestStatistic:
         r"""
-        J-test of overidentifying restrictions using a centered moment covariance
+        J-test of overidentifying restrictions using a centered moment covariance.
 
         Returns
         -------
@@ -1978,13 +2066,14 @@ class IVGMMResults(_CommonIVResults):
         self, variables: list[str] | str | None = None
     ) -> InvalidTestStatistic | WaldTestStatistic:
         r"""
-        C-test of endogeneity
+        C-test of endogeneity.
 
         Parameters
         ----------
-        variables : {str, list[str]}
-            List of variables to test for exogeneity.  If None, all variables
-            are jointly tested.
+        variables : str or list of str, optional
+            Name or list of names of the endogenous regressors to test for
+            exogeneity.  If not provided, all endogenous regressors are jointly
+            tested.
 
         Returns
         -------
@@ -1993,6 +2082,13 @@ class IVGMMResults(_CommonIVResults):
             An InvalidTestStatistic is returned if the covariance of the
             moment conditions of the first model is singular, which can happen
             if there are too few clusters.
+
+        Raises
+        ------
+        TypeError
+            If ``variables`` is not a str or a list of str.
+        KeyError
+            If a name in ``variables`` is not an endogenous regressor.
 
         Notes
         -----
@@ -2129,19 +2225,27 @@ AnyResult = Union[IVResults, IVGMMResults, OLSResults]
 
 class IVModelComparison(_ModelComparison):
     """
-    Comparison of multiple models
+    Comparison of multiple models.
 
     Parameters
     ----------
-    results : {list, dict}
-        Set of results to compare.  If a dict, the keys will be used as model
-        names.
-    precision : {"tstats","std_errors", "std-errors", "pvalues"}
-        Estimator precision estimator to include in the comparison output.
-        Default is "tstats".
-    stars : bool
+    results : sequence of results or dict of str to results
+        Set of results to compare, which are IVResults, IVGMMResults or
+        OLSResults.  If a dict, the keys will be used as model names.
+    precision : {"tstats", "std_errors", "std-errors", "pvalues"}, optional
+        Estimator precision estimator to include in the comparison output. The
+        name is not case sensitive. The default is "tstats".
+    stars : bool, optional
         Add stars based on the p-value of the coefficient where 1, 2 and
-        3-stars correspond to p-values of 10%, 5% and 1%, respectively.
+        3-stars correspond to p-values of 10%, 5% and 1%, respectively. The
+        default is False.
+
+    Raises
+    ------
+    TypeError
+        If a result is not an IVResults, IVGMMResults or OLSResults.
+    ValueError
+        If ``precision`` is not supported.
     """
 
     _supported = (IVResults, IVGMMResults, OLSResults)
@@ -2158,7 +2262,7 @@ class IVModelComparison(_ModelComparison):
     @property
     def rsquared_adj(self) -> Series:
         """
-        Sample-size adjusted coefficients of determination (R**2)
+        Sample-size adjusted coefficients of determination (R**2).
 
         Returns
         -------
@@ -2176,12 +2280,12 @@ class IVModelComparison(_ModelComparison):
 
     @property
     def estimator_method(self) -> Series:
-        """Estimation methods"""
+        """Estimation methods."""
         return self._get_property("_method")
 
     @property
     def cov_estimator(self) -> Series:
-        """Covariance estimator descriptions"""
+        """Covariance estimator descriptions."""
         return self._get_property("cov_estimator")
 
     @property
@@ -2192,7 +2296,7 @@ class IVModelComparison(_ModelComparison):
         Returns
         -------
         Summary
-            Summary table of model estimation results
+            Summary table of model estimation results.
 
         Notes
         -----
@@ -2298,23 +2402,31 @@ def compare(
     stars: bool = False,
 ) -> IVModelComparison:
     """
-    Compare the results of multiple models
+    Compare the results of multiple models.
 
     Parameters
     ----------
-    results : {list, dict}
-        Set of results to compare.  If a dict, the keys will be used as model
-        names.
-    precision : {"tstats","std_errors", "std-errors", "pvalues"}
-        Estimator precision estimator to include in the comparison output.
-        Default is "tstats".
-    stars : bool
+    results : sequence of results or dict of str to results
+        Set of results to compare, which are IVResults, IVGMMResults or
+        OLSResults.  If a dict, the keys will be used as model names.
+    precision : {"tstats", "std_errors", "std-errors", "pvalues"}, optional
+        Estimator precision estimator to include in the comparison output. The
+        name is not case sensitive. The default is "tstats".
+    stars : bool, optional
         Add stars based on the p-value of the coefficient where 1, 2 and
-        3-stars correspond to p-values of 10%, 5% and 1%, respectively.
+        3-stars correspond to p-values of 10%, 5% and 1%, respectively. The
+        default is False.
 
     Returns
     -------
     IVModelComparison
         The model comparison object.
+
+    Raises
+    ------
+    TypeError
+        If a result is not an IVResults, IVGMMResults or OLSResults.
+    ValueError
+        If ``precision`` is not supported.
     """
     return IVModelComparison(results, precision=precision, stars=stars)
