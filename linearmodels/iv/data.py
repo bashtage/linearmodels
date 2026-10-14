@@ -1,5 +1,5 @@
 """
-A data abstraction that allow multiple input data formats
+A data abstraction that allows multiple input data formats.
 """
 
 from __future__ import annotations
@@ -18,6 +18,22 @@ dim_err = "{0} has too many dims.  Maximum is 2, actual is {1}"
 
 
 def convert_columns(s: pd.Series, drop_first: bool) -> linearmodels.typing.AnyPandas:
+    """
+    Convert a categorical Series to dummy variables.
+
+    Parameters
+    ----------
+    s : Series
+        The data to convert.
+    drop_first : bool
+        Whether to drop the first category of a categorical Series.
+
+    Returns
+    -------
+    Series or DataFrame
+        A DataFrame of dummy variables, with columns named
+        ``"<name>.<category>"``, if ``s`` is categorical. Otherwise ``s``.
+    """
     if isinstance(s.dtype, pd.CategoricalDtype):
         out = pd.get_dummies(s, drop_first=drop_first)
         # TODO: Remove once pandas typing fixed
@@ -27,6 +43,21 @@ def convert_columns(s: pd.Series, drop_first: bool) -> linearmodels.typing.AnyPa
 
 
 def expand_categoricals(x: pd.DataFrame, drop_first: bool) -> pd.DataFrame:
+    """
+    Convert the categorical columns of a DataFrame to dummy variables.
+
+    Parameters
+    ----------
+    x : DataFrame
+        The data to convert.
+    drop_first : bool
+        Whether to drop the first category of each categorical column.
+
+    Returns
+    -------
+    DataFrame
+        The data with every categorical column replaced by dummy variables.
+    """
     if x.shape[1] == 0:
         return x
     return pd.concat(
@@ -46,17 +77,27 @@ class IVData:
         is converted using ``np.asarray``. A ``TypeError`` is raised if the data
         are complex or cannot be converted to float64. If None, then nobs must
         be provided to produce an IVData instance with shape (nobs, 0).
-    var_name : str
+    var_name : str, optional
         Variable name to use when naming variables in NumPy arrays or
-        xarray DataArrays
-    nobs : int
-        Number of observation, used when `x` is None. If `x` is array_like,
+        xarray DataArrays. The default is ``"x"``.
+    nobs : int, optional
+        Number of observations, used when `x` is None. If `x` is array_like,
         then nobs is used to check the number of observations in `x`.
-    convert_dummies : bool
-        Flat indicating whether pandas categoricals or string input data
-        should be converted to dummy variables
-    drop_first : bool
-        Flag indicating to drop first dummy category
+    convert_dummies : bool, optional
+        Flag indicating whether pandas categoricals or string input data
+        should be converted to dummy variables. The default is True.
+    drop_first : bool, optional
+        Flag indicating to drop the first dummy category. The default is True.
+
+    Raises
+    ------
+    ValueError
+        If `x` is None and `nobs` is not provided, if `x` has more than two
+        dimensions, if the number of observations in `x` is not `nobs`, if a
+        DataFrame has duplicate column names or has a column that is not
+        numeric, string or categorical.
+    TypeError
+        If `x` is complex or cannot be converted to float64.
     """
 
     def __init__(
@@ -172,44 +213,54 @@ class IVData:
 
     @property
     def pandas(self) -> pd.DataFrame:
-        """DataFrame view of data"""
+        """Return a DataFrame view of the data."""
         return self._pandas
 
     @property
     def ndarray(self) -> linearmodels.typing.NumericArray:
-        """ndarray view of data, always 2d"""
+        """Return an ndarray view of the data, which is always 2d."""
         return self._ndarray
 
     @property
     def shape(self) -> tuple[int, int]:
-        """Tuple containing shape"""
+        """Return the shape of the data as a tuple."""
         return self._ndarray.shape[0], self._ndarray.shape[1]
 
     @property
     def ndim(self) -> int:
-        """Number of dimensions"""
+        """Return the number of dimensions."""
         return self._ndarray.ndim
 
     @property
     def cols(self) -> list[Any]:
-        """Column labels"""
+        """Return the column labels."""
         return self._col_labels
 
     @property
     def rows(self) -> list[Any]:
-        """Row labels (index)"""
+        """Return the row labels (index)."""
         return self._row_labels
 
     @property
     def labels(self) -> dict[int, Any]:
-        """Dictionary containing row and column labels keyed by axis"""
+        """Return a dictionary containing row and column labels keyed by axis."""
         return {0: self._row_labels, 1: self._col_labels}
 
     @property
     def isnull(self) -> pd.Series:
+        """Return a Series that is True for the rows that contain a missing value."""
         return self._pandas.isnull().any(axis=1)
 
     def drop(self, locs: linearmodels.typing.data.ArrayLike) -> None:
+        """
+        Drop rows in place.
+
+        Parameters
+        ----------
+        locs : array_like
+            Boolean array that is True for the rows to drop. It must have one
+            element for each row.
+        """
         locs = np.asarray(locs)
         self._pandas = self.pandas.loc[~locs]
         self._ndarray = self._ndarray[~locs]
