@@ -169,6 +169,17 @@ def test_cluster_options_that_the_model_does_not_support_raise(data):
     first_difference.fit(cov_type="clustered", cluster_entity=True)
 
 
+@pytest.mark.parametrize("cov_type", ["unadjusted", "robust", "clustered", "kernel"])
+def test_panel_ols_sets_extra_df_from_its_effects(data, cov_type):
+    # extra_df is the number of effects, so it is not a keyword argument of fit
+    model = PanelOLS(*data["panel"], entity_effects=True)
+    match = (
+        f"The keyword argument 'extra_df' is not accepted with cov_type='{cov_type}'"
+    )
+    with pytest.raises(ValueError, match=match):
+        model.fit(cov_type=cov_type, extra_df=1)
+
+
 def test_unknown_kernel_is_shown_in_lower_case(data):
     with pytest.raises(UnknownOptionError, match=r"Unknown kernel: 'bogus'"):
         IV2SLS(*data["iv"]).fit(cov_type="kernel", kernel="Bogus")

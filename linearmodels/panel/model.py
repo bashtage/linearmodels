@@ -3233,7 +3233,13 @@ class PanelOLS(_PanelModelBase):
         if ``debiased`` is True and by n / (n - d) if it is False. If
         ``auto_df`` is True, the effects are not counted when the model has
         a single effect that is nested in the clusters. Use ``auto_df=False``
-        and ``count_effects`` to choose.
+        and ``count_effects`` to choose. Since ``extra_df`` is set from the
+        effects, it is not a keyword argument of ``fit``.
+
+        .. versionchanged:: 7.1
+
+           ``extra_df`` raises a ``ValueError`` at the start of ``fit``. It
+           raised a ``TypeError`` after the parameters were estimated.
 
         An effect is nested in a cluster variable if each of its groups is in one
         group of the variable, for example entity effects with
@@ -3287,7 +3293,10 @@ class PanelOLS(_PanelModelBase):
         >>> res = mod.fit(cov_type="clustered", cluster_entity=True)
         """
         cov_type = lower_option(cov_type)
-        check_covariance_kwargs(self._cov_estimators, cov_type, cov_config)
+        # extra_df is set from the effects that are estimated
+        check_covariance_kwargs(
+            self._cov_estimators, cov_type, cov_config, fit_options=()
+        )
 
         weighted = np.any(self.weights.values2d != 1.0)
 

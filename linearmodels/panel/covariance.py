@@ -1034,6 +1034,7 @@ def check_covariance_kwargs(
     cov_type: str,
     cov_config: Mapping[str, Any],
     cluster_options: tuple[str, ...] = ("cluster_entity", "cluster_time"),
+    fit_options: tuple[str, ...] = ("extra_df",),
 ) -> CovarianceEstimatorType:
     """
     Check that the keyword arguments are supported by a covariance estimator.
@@ -1049,6 +1050,9 @@ def check_covariance_kwargs(
     cluster_options : tuple of str, optional
         The options that make clusters, which the model supports if the estimator
         takes clusters.
+    fit_options : tuple of str, optional
+        The keyword arguments that ``fit`` accepts with every estimator. The
+        default is ``("extra_df",)``.
 
     Returns
     -------
@@ -1063,8 +1067,8 @@ def check_covariance_kwargs(
         If `cov_config` contains a key that the estimator does not support.
     """
     estimator = cov_estimators[cov_type]
-    # fit also accepts extra_df, and the options that make clusters
-    accepted = (*estimator.ALLOWED_KWARGS, "extra_df")
+    # fit also accepts its own options, and the options that make clusters
+    accepted = (*estimator.ALLOWED_KWARGS, *fit_options)
     if "clusters" in estimator.ALLOWED_KWARGS:
         accepted = (*accepted, *cluster_options)
     name = str(cov_type).lower()
