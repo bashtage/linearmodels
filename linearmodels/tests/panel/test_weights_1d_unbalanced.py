@@ -650,7 +650,7 @@ def test_labels_decide_if_dependent_has_as_many_rows_as_periods_or_entities(
     nlabels, nrows = len(labels), len(cells)
     assert nlabels == nrows
     mod = PooledOLS(panel.y, panel.x_const, weights=pd.Series(values, index=labels))
-    assert_weights_equal(mod, values[positions])
+    assert_weights_equal(mod, values[np.asarray(positions)])
 
 
 @pytest.mark.parametrize(
