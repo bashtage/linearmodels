@@ -305,7 +305,7 @@ def check_cov_config(
         kernel = cov_config["kernel"]
         # The estimator reports a kernel that is not a str
         if isinstance(kernel, str) and kernel.lower() not in kernels:
-            raise unknown_option_error("kernel", kernel, kernels)
+            raise unknown_option_error("kernel", kernel.lower(), kernels)
 
 
 __all__ = [
