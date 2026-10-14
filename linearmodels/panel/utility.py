@@ -228,9 +228,11 @@ def dummy_matrix(
         elif drop == "first":
             # remove first
             retain = cols != 0
-        else:  # drop == "last"
+        elif drop == "last":
             # remove last
             retain = cols != (ncategories - 1)
+        else:
+            raise ValueError(f"Unknown drop option: {drop}")
         rows = rows[retain]
         col_adj = -1 if (drop == "first" and i > 0) else 0
         cols = cols[retain] + total_dummies + col_adj
