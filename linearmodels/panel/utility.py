@@ -225,16 +225,16 @@ def dummy_matrix(
         cols = replacements[inverse]
         if i == 0 and not drop_all:
             retain = np.arange(nobs)
-        elif drop == "first":
+        elif drop.lower() == "first":
             # remove first
             retain = cols != 0
-        elif drop == "last":
+        elif drop.lower() == "last":
             # remove last
             retain = cols != (ncategories - 1)
         else:
             raise ValueError(f"Unknown drop option: {drop}")
         rows = rows[retain]
-        col_adj = -1 if (drop == "first" and i > 0) else 0
+        col_adj = -1 if (drop.lower() == "first" and i > 0) else 0
         cols = cols[retain] + total_dummies + col_adj
         values = np.ones(rows.shape)
         data["values"].append(values)
