@@ -1,5 +1,5 @@
 """
-Covariance estimation for 2SLS and LIML IV estimators
+Covariance estimation for 2SLS and LIML IV estimators.
 """
 
 from __future__ import annotations
@@ -119,17 +119,20 @@ def kernel_weight_bartlett(
     bw: float, *args: int
 ) -> linearmodels.typing.data.Float64Array:
     r"""
-    Kernel weights from a Bartlett kernel
+    Kernel weights from a Bartlett kernel.
 
     Parameters
     ----------
-    bw: int
-       Maximum lag to used in kernel
+    bw : int
+        Maximum lag to use in the kernel.
+    *args : int
+        Ignored. Accepted so that every kernel weight function can be called
+        with the same arguments.
 
     Returns
     -------
     ndarray
-        Weight array  ordered by lag position (maxlag + 1)
+        Weight array ordered by lag position (maxlag + 1).
 
     Notes
     -----
@@ -144,19 +147,19 @@ def kernel_weight_quadratic_spectral(
     bw: float, n: int
 ) -> linearmodels.typing.data.Float64Array:
     r"""
-    Kernel weights from a quadratic-spectral kernel
+    Kernel weights from a quadratic-spectral kernel.
 
     Parameters
     ----------
-    bw: {int, float}
-       Maximum lag to used in kernel
+    bw : int or float
+        Bandwidth of the kernel.
     n : int
-        Positive number of weight to return
+        Positive number of weights to return.
 
     Returns
     -------
     ndarray
-        Weight array  ordered by lag position (maxlag + 1)
+        Weight array ordered by lag position (n + 1).
 
     Notes
     -----
@@ -189,17 +192,20 @@ def kernel_weight_parzen(
     bw: float, *args: int
 ) -> linearmodels.typing.data.Float64Array:
     r"""
-    Kernel weights from a Parzen kernel
+    Kernel weights from a Parzen kernel.
 
     Parameters
     ----------
     bw : int
-       Maximum lag to used in kernel
+        Maximum lag to use in the kernel.
+    *args : int
+        Ignored. Accepted so that every kernel weight function can be called
+        with the same arguments.
 
     Returns
     -------
     ndarray
-        Weight array  ordered by lag position (maxlag + 1)
+        Weight array ordered by lag position (maxlag + 1).
 
     Notes
     -----
@@ -217,7 +223,7 @@ def kernel_weight_parzen(
 
 def _bandwidth_rule(kernel: str) -> tuple[int, float, float]:
     """
-    The constants of the automatic bandwidth rule of a kernel
+    The constants of the automatic bandwidth rule of a kernel.
 
     Parameters
     ----------
@@ -248,13 +254,13 @@ def _bandwidth_rule(kernel: str) -> tuple[int, float, float]:
 
 
 def _pilot_lags(nobs: int, exponent: float) -> int:
-    """The number of lags in the pilot estimates of the automatic bandwidth"""
+    """The number of lags in the pilot estimates of the automatic bandwidth."""
     return int(ceil(4 * (nobs / 100) ** exponent))
 
 
 def _min_nobs_automatic_bandwidth(kernel: str) -> int:
     """
-    The fewest observations for which the automatic bandwidth of a kernel exists
+    The fewest observations for which the automatic bandwidth of a kernel exists.
 
     The pilot estimates use the autocovariances up to the pilot lag, and the pilot
     lag has to be below nobs - 1. It grows by at most 1 for each additional
@@ -286,15 +292,16 @@ def kernel_optimal_bandwidth(
     x: linearmodels.typing.data.Float64Array, kernel: str = "bartlett"
 ) -> int:
     r"""
-    Select the bandwidth of a kernel covariance estimator from the data
+    Select the bandwidth of a kernel covariance estimator from the data.
 
     Parameters
     ----------
     x : ndarray
         The series to use when computing the bandwidth. It has t observations,
         and is a 1-d array of length t or an array with t rows and 1 column.
-    kernel : str
-        Name of kernel to use.  Supported kernels include:
+    kernel : str, optional
+        Name of the kernel to use. The default is "bartlett". Supported kernels
+        are:
 
         * "bartlett", "newey-west" - Bartlett's kernel
         * "parzen", "gallant" - Parzen's kernel
@@ -316,6 +323,13 @@ def kernel_optimal_bandwidth(
     UnknownOptionError
         If kernel is not one of the supported names. It is both a ``KeyError``
         and a ``ValueError``.
+
+    See Also
+    --------
+    kernel_weight_bartlett : Kernel weights from a Bartlett kernel.
+    kernel_weight_parzen : Kernel weights from a Parzen kernel.
+    kernel_weight_quadratic_spectral : Kernel weights from a quadratic-spectral
+        kernel.
 
     Notes
     -----
@@ -380,12 +394,6 @@ def kernel_optimal_bandwidth(
     .. [1] Newey, W. K. and West, K. D. (1994). Automatic lag selection in
        covariance matrix estimation. The Review of Economic Studies, 61(4),
        631-653.
-
-    See Also
-    --------
-    linearmodels.iv.covariance.kernel_weight_bartlett,
-    linearmodels.iv.covariance.kernel_weight_parzen,
-    linearmodels.iv.covariance.kernel_weight_quadratic_spectral
     """
     t = x.shape[0]
     x = x.squeeze()
@@ -433,27 +441,35 @@ KERNEL_LOOKUP: dict[str, KernelWeight] = {
 
 class HomoskedasticCovariance:
     r"""
-    Covariance estimation for homoskedastic data
+    Covariance estimation for homoskedastic data.
 
     Parameters
     ----------
     x : ndarray
-        Model regressors (nobs by nvar)
+        Model regressors (nobs by nvar).
     y : ndarray
-        Series modeled (nobs by 1)
+        Series modeled (nobs by 1).
     z : ndarray
-        Instruments used for endogenous regressors (nobs by ninstr)
+        Instruments used for endogenous regressors (nobs by ninstr).
     params : ndarray
-        Estimated model parameters (nvar by 1)
-    debiased : bool
-        Flag indicating whether to use a small-sample adjustment
-    kappa : float
-        Value of kappa in k-class estimator
+        Estimated model parameters (nvar by 1).
+    debiased : bool, optional
+        Flag indicating whether to use a small-sample adjustment. The default is
+        False.
+    kappa : float, optional
+        Value of kappa in the k-class estimator. The default is 1.
     extra_df : int, optional
         Degrees of freedom that the model uses in addition to the nvar columns
         of x, for example the absorbed effects of AbsorbingLS. The default is 0.
         It is only used if ``debiased`` is True, when n / (n-k) becomes
         n / (n-k-extra_df).
+
+    Raises
+    ------
+    ValueError
+        If the number of rows of x, y and z differ, if x and params have
+        incompatible dimensions or if ``debiased`` is True and there are no more
+        observations than the columns of x plus ``extra_df``.
 
     Notes
     -----
@@ -527,7 +543,7 @@ class HomoskedasticCovariance:
 
     @property
     def s(self) -> linearmodels.typing.data.Float64Array:
-        """Score covariance estimate"""
+        """Return the score covariance estimate."""
         x, z, eps = self.x, self.z, self.eps
         nobs = x.shape[0]
         s2 = eps.T @ eps / nobs
@@ -542,8 +558,7 @@ class HomoskedasticCovariance:
 
     @property
     def cov(self) -> linearmodels.typing.data.Float64Array:
-        """Covariance of estimated parameters"""
-
+        """Return the covariance of the estimated parameters."""
         x, z = self.x, self.z
         nobs = x.shape[0]
 
@@ -560,9 +575,7 @@ class HomoskedasticCovariance:
 
     @property
     def s2(self) -> linearmodels.typing.data.Float64Array:
-        """
-        Estimated variance of residuals. Small-sample adjusted if debiased.
-        """
+        """Return the variance of the residuals, adjusted if debiased."""
         nobs = self.x.shape[0]
         eps = self.eps
 
@@ -570,37 +583,46 @@ class HomoskedasticCovariance:
 
     @property
     def debiased(self) -> bool:
-        """Flag indicating if covariance is debiased"""
+        """Return a flag indicating if the covariance is debiased."""
         return self._debiased
 
     @property
     def config(self) -> dict[str, Any]:
+        """Return the options of the covariance estimator as a dict."""
         return {"debiased": self.debiased, "kappa": self._kappa}
 
 
 class HeteroskedasticCovariance(HomoskedasticCovariance):
     r"""
-    Covariance estimation for heteroskedastic data
+    Covariance estimation for heteroskedastic data.
 
     Parameters
     ----------
     x : ndarray
-        Model regressors (nobs by nvar)
+        Model regressors (nobs by nvar).
     y : ndarray
-        Series ,modeled (nobs by 1)
+        Series modeled (nobs by 1).
     z : ndarray
-        Instruments used for endogenous regressors (nobs by ninstr)
+        Instruments used for endogenous regressors (nobs by ninstr).
     params : ndarray
-        Estimated model parameters (nvar by 1)
-    debiased : bool
-        Flag indicating whether to use a small-sample adjustment
-    kappa : float
-        Value of kappa in k-class estimator
+        Estimated model parameters (nvar by 1).
+    debiased : bool, optional
+        Flag indicating whether to use a small-sample adjustment. The default is
+        False.
+    kappa : float, optional
+        Value of kappa in the k-class estimator. The default is 1.
     extra_df : int, optional
         Degrees of freedom that the model uses in addition to the nvar columns
         of x, for example the absorbed effects of AbsorbingLS. The default is 0.
         It is only used if ``debiased`` is True, when n / (n-k) becomes
         n / (n-k-extra_df).
+
+    Raises
+    ------
+    ValueError
+        If the number of rows of x, y and z differ, if x and params have
+        incompatible dimensions or if ``debiased`` is True and there are no more
+        observations than the columns of x plus ``extra_df``.
 
     Notes
     -----
@@ -644,7 +666,7 @@ class HeteroskedasticCovariance(HomoskedasticCovariance):
 
     @property
     def s(self) -> linearmodels.typing.data.Float64Array:
-        """Heteroskedasticity-robust score covariance estimate"""
+        """Return the heteroskedasticity-robust score covariance estimate."""
         x, z, eps = self.x, self.z, self.eps
         nobs = x.shape[0]
         pinvz = self._pinvz
@@ -656,41 +678,59 @@ class HeteroskedasticCovariance(HomoskedasticCovariance):
 
 class KernelCovariance(HomoskedasticCovariance):
     r"""
-    Kernel weighted (HAC) covariance estimation
+    Kernel weighted (HAC) covariance estimation.
 
     Parameters
     ----------
     x : ndarray
-        Model regressors (nobs by nvar)
+        Model regressors (nobs by nvar).
     y : ndarray
-        Series ,modeled (nobs by 1)
+        Series modeled (nobs by 1).
     z : ndarray
-        Instruments used for endogenous regressors (nobs by ninstr)
+        Instruments used for endogenous regressors (nobs by ninstr).
     params : ndarray
-        Estimated model parameters (nvar by 1)
-    kernel : str
-        Kernel name. Supported kernels are:
+        Estimated model parameters (nvar by 1).
+    kernel : str, optional
+        Kernel name. The default is "bartlett". Supported kernels are:
 
         * "bartlett", "newey-west" - Triangular kernel
         * "qs", "quadratic-spectral", "andrews" - Quadratic spectral kernel
-        * "parzen", "gallant" - Parzen's kernel;
+        * "parzen", "gallant" - Parzen's kernel.
 
-    bandwidth : {int, None}
-        Non-negative bandwidth to use with kernel. If None, automatic
+    bandwidth : int, optional
+        Non-negative bandwidth to use with kernel. If not provided, automatic
         bandwidth selection is used. It needs at least 4 observations with the
         Bartlett kernel, 5 with the Parzen kernel and 6 with the quadratic
         spectral kernel, and a ``ValueError`` is raised for fewer when the
         covariance is first used. See
         :func:`~linearmodels.iv.covariance.kernel_optimal_bandwidth`.
-    debiased : bool
-        Flag indicating whether to use a small-sample adjustment
-    kappa : float
-        Value of kappa in k-class estimator
+    debiased : bool, optional
+        Flag indicating whether to use a small-sample adjustment. The default is
+        False.
+    kappa : float, optional
+        Value of kappa in the k-class estimator. The default is 1.
     extra_df : int, optional
         Degrees of freedom that the model uses in addition to the nvar columns
         of x, for example the absorbed effects of AbsorbingLS. The default is 0.
         It is only used if ``debiased`` is True, when n / (n-k) becomes
         n / (n-k-extra_df).
+
+    Raises
+    ------
+    ValueError
+        If the number of rows of x, y and z differ, if x and params have
+        incompatible dimensions or if ``debiased`` is True and there are no more
+        observations than the columns of x plus ``extra_df``.
+    UnknownOptionError
+        If ``kernel`` is not one of the supported kernels. It is both a
+        ``KeyError`` and a ``ValueError``.
+
+    See Also
+    --------
+    kernel_weight_bartlett : Kernel weights from a Bartlett kernel.
+    kernel_weight_parzen : Kernel weights from a Parzen kernel.
+    kernel_weight_quadratic_spectral : Kernel weights from a quadratic-spectral
+        kernel.
 
     Notes
     -----
@@ -736,12 +776,6 @@ class KernelCovariance(HomoskedasticCovariance):
        ``OverflowError``) or "cannot convert float NaN to integer" for some
        series, and used a bandwidth of :math:`n - 1`, or another bandwidth, for
        the others.
-
-    See Also
-    --------
-    linearmodels.iv.covariance.kernel_weight_bartlett,
-    linearmodels.iv.covariance.kernel_weight_parzen,
-    linearmodels.iv.covariance.kernel_weight_quadratic_spectral
     """
 
     def __init__(
@@ -776,7 +810,7 @@ class KernelCovariance(HomoskedasticCovariance):
 
     @property
     def s(self) -> linearmodels.typing.data.Float64Array:
-        """HAC score covariance estimate"""
+        """Return the HAC score covariance estimate."""
         x, z, eps = self.x, self.z, self.eps
         nobs = x.shape[0]
 
@@ -804,6 +838,7 @@ class KernelCovariance(HomoskedasticCovariance):
 
     @property
     def config(self) -> dict[str, Any]:
+        """Return the options of the covariance estimator as a dict."""
         return {
             "debiased": self.debiased,
             "bandwidth": self._bandwidth,
@@ -814,32 +849,40 @@ class KernelCovariance(HomoskedasticCovariance):
 
 class ClusteredCovariance(HomoskedasticCovariance):
     r"""
-    Covariance estimation for clustered data
+    Covariance estimation for clustered data.
 
     Parameters
     ----------
     x : ndarray
-        Model regressors (nobs by nvar)
+        Model regressors (nobs by nvar).
     y : ndarray
-        Series ,modeled (nobs by 1)
+        Series modeled (nobs by 1).
     z : ndarray
-        Instruments used for endogenous regressors (nobs by ninstr)
+        Instruments used for endogenous regressors (nobs by ninstr).
     params : ndarray
-        Estimated model parameters (nvar by 1)
-    debiased : bool
-        Flag indicating whether to use a small-sample adjustment
-    clusters : array_like
-        Cluster group assignment.  If not provided, uses clusters of 1.
-        Either nobs by ncluster where ncluster is 1 or 2. A ``ValueError`` is
-        raised for more columns.
-    kappa : float
-        Value of kappa in k-class estimator
+        Estimated model parameters (nvar by 1).
+    clusters : array_like, optional
+        Cluster group assignment, with shape nobs by ncluster where ncluster is
+        1 or 2. If not provided, every observation is its own cluster. A
+        ``ValueError`` is raised for more columns.
+    debiased : bool, optional
+        Flag indicating whether to use a small-sample adjustment. The default is
+        False.
+    kappa : float, optional
+        Value of kappa in the k-class estimator. The default is 1.
     extra_df : int, optional
         Degrees of freedom that the model uses in addition to the nvar columns
         of x, for example the absorbed effects of AbsorbingLS. The default is 0.
         It is only used if ``debiased`` is True, when n / (n-k) becomes
         n / (n-k-extra_df).
 
+    Raises
+    ------
+    ValueError
+        If the number of rows of x, y and z differ, if x and params have
+        incompatible dimensions, if clusters does not have one row for each
+        observation or has more than 2 columns, or if ``debiased`` is True and
+        there are no more observations than the columns of x plus ``extra_df``.
 
     Notes
     -----
@@ -913,7 +956,7 @@ class ClusteredCovariance(HomoskedasticCovariance):
 
     @property
     def s(self) -> linearmodels.typing.data.Float64Array:
-        """Clustered estimator of score covariance"""
+        """Return the clustered estimator of the score covariance."""
 
         def rescale(
             s: linearmodels.typing.data.Float64Array, nc: int, nobs: int
@@ -950,6 +993,7 @@ class ClusteredCovariance(HomoskedasticCovariance):
 
     @property
     def config(self) -> dict[str, Any]:
+        """Return the options of the covariance estimator as a dict."""
         return {
             "debiased": self.debiased,
             "clusters": self._clusters,

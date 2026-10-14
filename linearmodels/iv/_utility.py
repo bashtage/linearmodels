@@ -29,19 +29,19 @@ def proj(
     y: linearmodels.typing.data.Float64Array, x: linearmodels.typing.data.Float64Array
 ) -> linearmodels.typing.data.Float64Array:
     """
-    Projection of y on x from y
+    Projection of y on x from y.
 
     Parameters
     ----------
     y : ndarray
-        Array to project (nobs by nseries)
+        Array to project (nobs by nseries).
     x : ndarray
-        Array to project onto (nobs by nvar)
+        Array to project onto (nobs by nvar).
 
     Returns
     -------
     ndarray
-        Projected values of y (nobs by nseries)
+        Projected values of y (nobs by nseries).
     """
     if x.shape[1] == 0:
         return np.zeros_like(y)
@@ -52,39 +52,48 @@ def annihilate(
     y: linearmodels.typing.data.Float64Array, x: linearmodels.typing.data.Float64Array
 ) -> linearmodels.typing.data.Float64Array:
     """
-    Remove projection of y on x from y
+    Remove projection of y on x from y.
 
     Parameters
     ----------
     y : ndarray
-        Array to project (nobs by nseries)
+        Array to project (nobs by nseries).
     x : ndarray
-        Array to project onto (nobs by nvar)
+        Array to project onto (nobs by nvar).
 
     Returns
     -------
     ndarray
-        Residuals values of y minus y projected on x (nobs by nseries)
+        Residuals values of y minus y projected on x (nobs by nseries).
     """
     return y - proj(y, x)
 
 
 class IVFormulaParser:
     """
-    Parse formulas for OLS and IV models
+    Parse formulas for OLS and IV models.
 
     Parameters
     ----------
     formula : str
         String formula object.
     data : DataFrame
-        Frame containing values for variables used in formula
-    eval_env : int
-        Stack depth to use when evaluating formulas
+        Frame containing values for variables used in formula.
+    eval_env : int, optional
+        Stack depth to use when evaluating formulas. The default is 2.
+    context : mapping of str to object, optional
+        Variables to use when evaluating the formula, in addition to ``data``. If
+        not provided, the variables of the stack frame that ``eval_env`` selects
+        are used.
+
+    Raises
+    ------
+    ValueError
+        If the formula does not have the form of an IV formula.
 
     Notes
     -----
-    The general structure of a formula is `dep ~ exog + [endog ~ instr]`
+    The general structure of a formula is `dep ~ exog + [endog ~ instr]`.
     """
 
     def __init__(
@@ -149,7 +158,7 @@ class IVFormulaParser:
 
     @property
     def eval_env(self) -> int:
-        """Set or get the eval env depth"""
+        """Set or get the eval env depth."""
         return self._eval_env
 
     @eval_env.setter
@@ -160,7 +169,7 @@ class IVFormulaParser:
     def data(
         self,
     ) -> tuple[DataFrame, DataFrame | None, DataFrame | None, DataFrame | None]:
-        """Returns a tuple containing the dependent, exog, endog and instruments"""
+        """Return a tuple containing the dependent, exog, endog and instruments."""
         self._eval_env += 1
         out = self.dependent, self.exog, self.endog, self.instruments
         self._eval_env -= 1
@@ -168,7 +177,7 @@ class IVFormulaParser:
 
     @property
     def dependent(self) -> DataFrame:
-        """Dependent variable"""
+        """Dependent variable."""
         dep_fmla = self.components["dependent"]
         dep = model_matrix(
             dep_fmla,
@@ -181,7 +190,7 @@ class IVFormulaParser:
 
     @property
     def exog(self) -> DataFrame | None:
-        """Exogenous variables"""
+        """Exogenous variables."""
         exog_fmla = self.components["exog"]
         exog = Formula(exog_fmla).get_model_matrix(
             self._data,
@@ -193,7 +202,7 @@ class IVFormulaParser:
 
     @property
     def endog(self) -> DataFrame | None:
-        """Endogenous variables"""
+        """Endogenous variables."""
         endog_fmla = "0 +" + self.components["endog"]
         endog = Formula(endog_fmla).get_model_matrix(
             self._data,
@@ -205,7 +214,7 @@ class IVFormulaParser:
 
     @property
     def instruments(self) -> DataFrame | None:
-        """Instruments"""
+        """Instruments."""
         instr_fmla = "0 +" + self.components["instruments"]
         instr = Formula(instr_fmla).get_model_matrix(
             self._data,
@@ -217,7 +226,7 @@ class IVFormulaParser:
 
     @property
     def components(self) -> dict[str, str]:
-        """Dictionary containing the string components of the formula"""
+        """Dictionary containing the string components of the formula."""
         return self._components
 
     @staticmethod
