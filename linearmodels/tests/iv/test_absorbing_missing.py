@@ -20,10 +20,6 @@ NOBS = 240
 # Rows given a missing value, including a row that appears twice
 MISSING_ROWS = [3, 17, 17, 101, 233]
 
-pytestmark = pytest.mark.filterwarnings(
-    "ignore::linearmodels.shared.exceptions.MissingValueWarning"
-)
-
 
 def make_data(weighted, seed=0, labelled=True):
     rng = np.random.default_rng(seed)
@@ -250,7 +246,8 @@ def test_covariance_matches_manual_drop(
         clusters = np.random.default_rng(1).integers(0, 12, NOBS)
         cov_config = {"clusters": clusters[keep]}
 
-    mod = make_model(data, absorb_type, False)
+    with pytest.warns(MissingValueWarning, match="missing values"):
+        mod = make_model(data, absorb_type, False)
     res = mod.fit(cov_type=cov_type, debiased=debiased, **cov_config)
     expected = make_model(cleaned, absorb_type, False).fit(
         cov_type=cov_type, debiased=debiased, **cov_config
@@ -276,7 +273,8 @@ def test_single_missing_value():
     assert isinstance(str(res.summary), str)
 
     weights = pd.Series(np.exp(rng.standard_normal(nobs)))
-    res = AbsorbingLS(y, x, absorb=cat, weights=weights).fit()
+    with pytest.warns(MissingValueWarning, match="missing values"):
+        res = AbsorbingLS(y, x, absorb=cat, weights=weights).fit()
     assert res.nobs == nobs - 1
     assert isinstance(str(res.summary), str)
 
@@ -294,7 +292,8 @@ def test_ndarray_inputs(weighted):
         return inputs["dependent"].to_numpy(), inputs["exog"].to_numpy(), weights
 
     y, x, w = arrays(data)
-    res = AbsorbingLS(y, x, absorb=data["absorb_cat"], weights=w).fit()
+    with pytest.warns(MissingValueWarning, match="missing values"):
+        res = AbsorbingLS(y, x, absorb=data["absorb_cat"], weights=w).fit()
     y, x, w = arrays(cleaned)
     expected = AbsorbingLS(y, x, absorb=cleaned["absorb_cat"], weights=w).fit()
 
@@ -323,7 +322,8 @@ def test_category_removed_by_missing_data(method):
     cleaned, keep = drop_manually(data, "categorical", False)
     assert keep.sum() == NOBS - 1
 
-    res = make_model(data, "categorical", False).fit(method=method)
+    with pytest.warns(MissingValueWarning, match="missing values"):
+        res = make_model(data, "categorical", False).fit(method=method)
     expected = make_model(cleaned, "categorical", False).fit(method=method)
     assert_same_fit(res, expected)
 
@@ -347,7 +347,8 @@ def test_drop_absorbed_with_missing():
     data = add_missing(data, "dependent", rows=[4, 40])
     cleaned, _ = drop_manually(data, "categorical", False)
 
-    mod = make_model(data, "categorical", False, drop_absorbed=True)
+    with pytest.warns(MissingValueWarning, match="missing values"):
+        mod = make_model(data, "categorical", False, drop_absorbed=True)
     expected = make_model(cleaned, "categorical", False, drop_absorbed=True)
     with pytest.warns(AbsorbingEffectWarning):
         res = mod.fit()
@@ -379,7 +380,8 @@ def test_independent_reference():
         cleaned["dependent"], exog, None, None, weights=cleaned["weights"]
     ).fit(cov_type="robust")
 
-    res = make_model(data, "categorical", False).fit(cov_type="robust")
+    with pytest.warns(MissingValueWarning, match="missing values"):
+        res = make_model(data, "categorical", False).fit(cov_type="robust")
     cols = ["x0", "x1"]
     assert res.nobs == benchmark.nobs
     assert_allclose(res.params[cols], benchmark.params[cols], rtol=1e-8)
@@ -407,7 +409,8 @@ def test_missing_value_warning():
 @pytest.mark.parametrize("weighted", [False, True])
 def test_weights_have_unit_mean_after_drop(weighted):
     data = add_missing(make_data(weighted), "dependent", rows=[0, 1, 2, 3])
-    mod = make_model(data, "categorical", False)
+    with pytest.warns(MissingValueWarning, match="missing values"):
+        mod = make_model(data, "categorical", False)
     weights = mod.weights.ndarray
     assert weights.shape == (NOBS - 4, 1)
     assert_allclose(weights.mean(), 1.0)
@@ -421,7 +424,8 @@ def test_clusters_have_estimation_sample_length():
     data = add_missing(make_data(False), "exog", rows=[8, 90])
     cleaned, keep = drop_manually(data, "categorical", False)
     clusters = np.random.default_rng(2).integers(0, 9, NOBS)
-    mod = make_model(data, "categorical", False)
+    with pytest.warns(MissingValueWarning, match="missing values"):
+        mod = make_model(data, "categorical", False)
 
     res = mod.fit(cov_type="clustered", clusters=clusters[keep])
     expected = make_model(cleaned, "categorical", False).fit(
@@ -447,14 +451,16 @@ def test_interaction_instances_are_not_modified(as_absorb, missing_in_instance):
 
     def fit():
         if as_absorb:
-            mod = AbsorbingLS(data["dependent"], data["exog"], absorb=inter)
+            with pytest.warns(MissingValueWarning, match="missing values"):
+                mod = AbsorbingLS(data["dependent"], data["exog"], absorb=inter)
         else:
-            mod = AbsorbingLS(
-                data["dependent"],
-                data["exog"],
-                absorb=data["absorb_cat"],
-                interactions=[inter],
-            )
+            with pytest.warns(MissingValueWarning, match="missing values"):
+                mod = AbsorbingLS(
+                    data["dependent"],
+                    data["exog"],
+                    absorb=data["absorb_cat"],
+                    interactions=[inter],
+                )
         return mod.fit()
 
     res = fit()

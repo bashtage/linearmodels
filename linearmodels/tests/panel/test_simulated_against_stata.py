@@ -9,11 +9,8 @@ import pytest
 from linearmodels.panel.data import PanelData
 from linearmodels.panel.model import BetweenOLS, PanelOLS, PooledOLS, RandomEffects
 from linearmodels.shared.utility import AttrDict
+from linearmodels.tests._utility import warns_if_missing
 from linearmodels.tests.panel.results import parse_stata_results
-
-pytestmark = pytest.mark.filterwarnings(
-    "ignore::linearmodels.shared.exceptions.MissingValueWarning"
-)
 
 STATA_RESULTS = parse_stata_results.data()
 MODELS = {
@@ -67,7 +64,8 @@ def data(request):
         model in ("fixed_effect", "random_effect") and vcv == "robust"
     ):
         fit_options.update({"group_debias": True})
-    spec_mod = mod(y, x, **mod_options)
+    with warns_if_missing(y, x):
+        spec_mod = mod(y, x, **mod_options)
     fit = spec_mod.fit(**fit_options)
     return AttrDict(
         fit=fit,

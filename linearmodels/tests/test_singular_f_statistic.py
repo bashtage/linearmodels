@@ -73,7 +73,6 @@ def test_iv_f_statistic_with_a_covariance():
     assert_wald(stat, 13.0)
 
 
-@pytest.mark.filterwarnings("ignore:.*encountered in:RuntimeWarning")
 @pytest.mark.parametrize("name", IV_MODELS)
 def test_iv_model_of_an_all_zero_dependent_variable(name):
     # The parameters, the residuals and the covariance are exactly 0

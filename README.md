@@ -155,9 +155,9 @@ Python, NumPy and the other dependencies.
 -   NumPy (1.23.5+)
 -   SciPy (1.8+)
 -   pandas (1.4+)
--   statsmodels (0.13.1+)
+-   statsmodels (0.14.6+)
 -   formulaic (1.2.1+)
--   pyhdfe (0.1+)
+-   pyhdfe (0.2.0+)
 -   mypy_extensions (0.4+)
 -   packaging
 -   xarray (0.16+, optional)

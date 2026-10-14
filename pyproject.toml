@@ -14,9 +14,9 @@ dependencies = [
   "numpy>=1.23.5,<3",
   "pandas>=1.4.0",
   "scipy>=1.8.0",
-  "statsmodels>=0.13.1",  # The first release with a wheel for Python 3.10
+  "statsmodels>=0.14.6",  # The first release that imports with pandas 3
   "mypy_extensions>=0.4",
-  "pyhdfe>=0.1",
+  "pyhdfe>=0.2.0",
   "formulaic>=1.2.1",
   "packaging",
 ]
@@ -89,7 +89,7 @@ doc = [
   "scipy >=1.5.0",
   "ipython >=8.0.1",
   "matplotlib >=3.0",
-  "statsmodels >=0.13.5",
+  "statsmodels >=0.14.6",
   "jinja2",
   "sphinx>=7",
   "seaborn",
@@ -272,23 +272,18 @@ xfail_strict = true
 strict = true
 empty_parameter_set_mark = "xfail"
 filterwarnings = [
-  "ignore:`formatargspec`:DeprecationWarning:statsmodels",
-  "ignore:Method .ptp is deprecated:FutureWarning",
-  "ignore:Traits should be given:DeprecationWarning",
-  "ignore:Using or importing the ABCs:DeprecationWarning",
-  "ignore:`nbconvert.exporters.exporter_locator` is deprecated:DeprecationWarning",
-  "ignore:Session._key_changed:DeprecationWarning",
-  "ignore:@asynchronous is deprecated:DeprecationWarning",
-  "error:A value is trying to be set::",
+  # Guards: nothing in linearmodels or its tests triggers these deprecations, and a
+  # test that does fails. The comments give the versions of pandas that warn.
+  # pandas 1.x
   "error:The pandas.datetime class is deprecated:FutureWarning:",
   "error:pandas.util.testing is deprecated:FutureWarning:",
-  "error:Support for multi-dimensional indexing:DeprecationWarning",
-  "error:multivariate_ls is deprecated:FutureWarning",
-  "error:invalid value encountered in true_divide:RuntimeWarning",
-  "ignore:`np.bool` is a deprecated alias:DeprecationWarning:pyhdfe",
-  "ignore:defusedxml.cElementTree:DeprecationWarning:nbconvert",
-  "ignore:the imp module is deprecated in favour of importlib:DeprecationWarning:pywintypes",
-  "error:Setting an item of incompatible dtype:FutureWarning:",
+  "error:Support for multi-dimensional indexing:FutureWarning",
+  # pandas 1.4 to 2.3 start the message of SettingWithCopyWarning with a new line
+  "error:\\s*A value is trying to be set::",
+  # pandas 2.1 to 2.3 (a FutureWarning) and the development versions of 3.1 (a
+  # Pandas4Warning, which is a DeprecationWarning)
+  "error:Setting an item of incompatible dtype::",
+  # Development versions of pandas 3.1
   "error:Constructing a DataFrame from a list of sequences with mismatched::",
   "error:assert_index_equal will check the::",
 ]

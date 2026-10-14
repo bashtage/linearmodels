@@ -383,8 +383,6 @@ def test_scaling_the_data():
     assert_allclose(one.cov, two.cov, rtol=1e-9)
 
 
-# The LIML kappa, which these tests do not use, is not accurate for such data
-@pytest.mark.filterwarnings("ignore:invalid value encountered in sqrt:RuntimeWarning")
 @pytest.mark.parametrize("cov_type", ["unadjusted", "robust", "kernel", "clustered"])
 def test_badly_scaled_regressors(cov_type):
     # The t-statistics do not depend on the units of the variables. Forming the

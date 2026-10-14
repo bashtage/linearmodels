@@ -109,8 +109,7 @@ def test_jive_from_formula_example_has_every_term():
     doc = IVJIVE.from_formula.__doc__
     formula = re.search(r'formula = "(.*)"', doc).group(1)
     assert "exper ** 2" not in formula.replace("I(exper ** 2)", "")
-    with warnings.catch_warnings():
-        warnings.simplefilter("ignore", MissingValueWarning)
+    with pytest.warns(MissingValueWarning, match="missing values"):
         mod = IVJIVE.from_formula(formula, wage.load())
     assert "I(exper ** 2)" in list(mod.fit().params.index)
 

@@ -188,6 +188,15 @@ def inputs():
     )
 
 
+def bandwidth_config(name):
+    """An explicit bandwidth for the kernel covariance of the GMM models
+
+    These tests are about the names, not the bandwidth. Without a bandwidth the kernel
+    covariance of the GMM models uses a default that gives a DefaultBandwidthWarning.
+    """
+    return {"bandwidth": 5} if name == "kernel" else {}
+
+
 def is_clustered(name):
     lowered = name.lower()
     return "cluster" in lowered or lowered == "one-way"
@@ -261,12 +270,16 @@ SITES = {
     ),
     # iv/gmm.py, the covariance of the GMM estimators and of IVJIVE
     "IVGMM.fit(cov_type)": Site(
-        lambda d, v: iv(IVGMM, d).fit(cov_type=v, **cluster_config(d, v)),
+        lambda d, v: iv(IVGMM, d).fit(
+            cov_type=v, **cluster_config(d, v), **bandwidth_config(v)
+        ),
         "cov_type",
         IV_GMM_COV_TYPES,
     ),
     "IVGMMCUE.fit(cov_type)": Site(
-        lambda d, v: iv(IVGMMCUE, d).fit(cov_type=v, **cluster_config(d, v)),
+        lambda d, v: iv(IVGMMCUE, d).fit(
+            cov_type=v, **cluster_config(d, v), **bandwidth_config(v)
+        ),
         "cov_type",
         IV_GMM_COV_TYPES,
     ),
@@ -296,12 +309,12 @@ SITES = {
     ),
     # iv/gmm.py, the kernel weights are looked up when the weight matrix is computed
     "IVGMM(weight_type='kernel', kernel)": Site(
-        lambda d, v: iv(IVGMM, d, weight_type="kernel", kernel=v).fit(),
+        lambda d, v: iv(IVGMM, d, weight_type="kernel", kernel=v, bandwidth=5).fit(),
         "kernel",
         KERNELS,
     ),
     "IVGMM.fit(cov_type='kernel', kernel)": Site(
-        lambda d, v: iv(IVGMM, d).fit(cov_type="kernel", kernel=v),
+        lambda d, v: iv(IVGMM, d).fit(cov_type="kernel", kernel=v, bandwidth=5),
         "kernel",
         KERNELS,
     ),

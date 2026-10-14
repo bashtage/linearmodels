@@ -27,9 +27,6 @@ def pytest_configure(config: pytest.Config) -> None:
     config.addinivalue_line(
         "markers", "smoke: mark a test as a coding error (smoke) test"
     )
-    config.addinivalue_line(
-        "filterwarnings", "ignore:Method .ptp is deprecated:FutureWarning"
-    )
 
 
 def pytest_addoption(parser: pytest.Parser) -> None:

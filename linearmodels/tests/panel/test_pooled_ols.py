@@ -8,16 +8,13 @@ import pytest
 from linearmodels.iv import IV2SLS
 from linearmodels.panel.data import PanelData
 from linearmodels.panel.model import PooledOLS
+from linearmodels.tests._utility import warns_if_missing
 from linearmodels.tests.panel._utility import (
     access_attributes,
     assert_frame_similar,
     assert_results_equal,
     datatypes,
     generate_data,
-)
-
-pytestmark = pytest.mark.filterwarnings(
-    "ignore::linearmodels.shared.exceptions.MissingValueWarning"
 )
 
 missing = [0.0, 0.20]
@@ -33,7 +30,8 @@ def data(request):
 
 
 def test_pooled_ols(data):
-    mod = PooledOLS(data.y, data.x)
+    with warns_if_missing(data.y, data.x):
+        mod = PooledOLS(data.y, data.x)
     res = mod.fit(debiased=False)
 
     y = mod.dependent.dataframe.copy()
@@ -49,7 +47,8 @@ def test_pooled_ols(data):
 
 
 def test_pooled_ols_weighted(data):
-    mod = PooledOLS(data.y, data.x, weights=data.w)
+    with warns_if_missing(data.y, data.x):
+        mod = PooledOLS(data.y, data.x, weights=data.w)
     res = mod.fit(debiased=False)
 
     y = mod.dependent.dataframe
@@ -85,15 +84,18 @@ def test_rank_deficient_array(data):
     else:
         x[1] = x[0]
     with pytest.raises(ValueError, match=r"exog does not have full column rank"):
-        PooledOLS(data.y, x)
+        with warns_if_missing(data.y, x):
+            PooledOLS(data.y, x)
 
 
 def test_results_access(data):
-    mod = PooledOLS(data.y, data.x)
+    with warns_if_missing(data.y, data.x):
+        mod = PooledOLS(data.y, data.x)
     res = mod.fit(debiased=False)
     access_attributes(res)
 
-    mod = PooledOLS(data.y, data.x)
+    with warns_if_missing(data.y, data.x):
+        mod = PooledOLS(data.y, data.x)
     res = mod.fit(debiased=True)
     access_attributes(res)
 
@@ -101,25 +103,29 @@ def test_results_access(data):
         return
     x = data.y.copy()
     x.iloc[:, :] = 1
-    mod = PooledOLS(data.y, x)
+    with warns_if_missing(data.y, x):
+        mod = PooledOLS(data.y, x)
     res = mod.fit(debiased=False)
     access_attributes(res)
 
 
 def test_alt_rsquared(data):
-    mod = PooledOLS(data.y, data.x)
+    with warns_if_missing(data.y, data.x):
+        mod = PooledOLS(data.y, data.x)
     res = mod.fit(debiased=False)
     assert_allclose(res.rsquared, res.rsquared_overall)
 
 
 def test_alt_rsquared_weighted(data):
-    mod = PooledOLS(data.y, data.x, weights=data.w)
+    with warns_if_missing(data.y, data.x):
+        mod = PooledOLS(data.y, data.x, weights=data.w)
     res = mod.fit(debiased=False)
     assert_allclose(res.rsquared, res.rsquared_overall)
 
 
 def test_cov_equiv(data):
-    mod = PooledOLS(data.y, data.x)
+    with warns_if_missing(data.y, data.x):
+        mod = PooledOLS(data.y, data.x)
     res = mod.fit(cov_type="robust", debiased=False)
     y = mod.dependent.dataframe.copy()
     x = mod.exog.dataframe.copy()
@@ -133,7 +139,8 @@ def test_cov_equiv(data):
 
 
 def test_cov_equiv_weighted(data):
-    mod = PooledOLS(data.y, data.x, weights=data.w)
+    with warns_if_missing(data.y, data.x):
+        mod = PooledOLS(data.y, data.x, weights=data.w)
     res = mod.fit(cov_type="robust", debiased=False)
     y = mod.dependent.dataframe.copy()
     x = mod.exog.dataframe.copy()
@@ -149,7 +156,8 @@ def test_cov_equiv_weighted(data):
 
 
 def test_cov_equiv_cluster(data):
-    mod = PooledOLS(data.y, data.x)
+    with warns_if_missing(data.y, data.x):
+        mod = PooledOLS(data.y, data.x)
     res = mod.fit(cov_type="clustered", cluster_entity=True, debiased=False)
     y = PanelData(data.y)
     clusters = pd.DataFrame(y.entity_ids, index=y.index)
@@ -175,7 +183,8 @@ def test_cov_equiv_cluster(data):
 
 
 def test_cov_equiv_cluster_weighted(data):
-    mod = PooledOLS(data.y, data.x, weights=data.w)
+    with warns_if_missing(data.y, data.x):
+        mod = PooledOLS(data.y, data.x, weights=data.w)
     res = mod.fit(cov_type="clustered", clusters=data.vc1, debiased=False)
 
     y = mod.dependent.dataframe.copy()
@@ -190,7 +199,8 @@ def test_cov_equiv_cluster_weighted(data):
 
 
 def test_two_way_clustering(data):
-    mod = PooledOLS(data.y, data.x)
+    with warns_if_missing(data.y, data.x):
+        mod = PooledOLS(data.y, data.x)
 
     y = PanelData(data.y)
     entity_clusters = pd.DataFrame(y.entity_ids, index=y.index)
@@ -212,7 +222,8 @@ def test_two_way_clustering(data):
 
 
 def test_fitted_effects_residuals(data):
-    mod = PooledOLS(data.y, data.x)
+    with warns_if_missing(data.y, data.x):
+        mod = PooledOLS(data.y, data.x)
     res = mod.fit()
     expected = pd.DataFrame(res.resids.copy())
     expected.columns = ["idiosyncratic"]
@@ -231,7 +242,8 @@ def test_fitted_effects_residuals(data):
 
 
 def test_extra_df(data):
-    mod = PooledOLS(data.y, data.x)
+    with warns_if_missing(data.y, data.x):
+        mod = PooledOLS(data.y, data.x)
     res = mod.fit()
     res_extra = mod.fit(extra_df=10)
     assert np.all(np.diag(res_extra.cov) > np.diag(res.cov))
@@ -241,7 +253,8 @@ def test_extra_df(data):
     "cov_type", ["dk", "driscoll-kraay", "kernel", "ac", "autocorrelated"]
 )
 def test_alt_cov(data, cov_type):
-    mod = PooledOLS(data.y, data.x)
+    with warns_if_missing(data.y, data.x):
+        mod = PooledOLS(data.y, data.x)
     res = mod.fit(cov_type=cov_type)
     res_def = mod.fit()
     assert not np.all(np.isclose(res.cov, res_def.cov))

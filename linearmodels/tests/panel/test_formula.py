@@ -28,11 +28,8 @@ from linearmodels.panel.model import (
     PooledOLS,
     RandomEffects,
 )
+from linearmodels.tests._utility import warns_if_missing
 from linearmodels.tests.panel._utility import datatypes, generate_data
-
-pytestmark = pytest.mark.filterwarnings(
-    "ignore::linearmodels.shared.exceptions.MissingValueWarning"
-)
 
 PERC_MISSING = [0, 0.02, 0.10, 0.33]
 TYPES = datatypes
@@ -78,12 +75,15 @@ def test_basic_formulas(data, models, formula):
     joined = data.x
     joined["y"] = data.y
     model, formula_func = models
-    mod = model.from_formula(formula, joined)
+    with warns_if_missing(joined):
+        mod = model.from_formula(formula, joined)
     res = mod.fit()
-    wmod = model.from_formula(formula, joined, weights=data.w)
+    with warns_if_missing(joined):
+        wmod = model.from_formula(formula, joined, weights=data.w)
     wres = wmod.fit()
 
-    mod2 = formula_func(formula, joined)
+    with warns_if_missing(joined):
+        mod2 = formula_func(formula, joined)
     res2 = mod2.fit()
     assert_allclose(res.params, res2.params)
 
@@ -91,8 +91,10 @@ def test_basic_formulas(data, models, formula):
     variables = parts[1].replace(" 1 ", " const ").split("+")
     variables = [s.strip() for s in variables]
     x = data.x
-    res2 = model(data.y, x[variables]).fit()
-    wres2 = model(data.y, x[variables], weights=data.w).fit()
+    with warns_if_missing(data.y, x[variables]):
+        res2 = model(data.y, x[variables]).fit()
+    with warns_if_missing(data.y, x[variables]):
+        wres2 = model(data.y, x[variables], weights=data.w).fit()
     assert_allclose(res.params, res2.params)
     assert_allclose(wres.params, wres2.params)
     assert isinstance(mod, model)
@@ -104,13 +106,15 @@ def test_basic_formulas(data, models, formula):
     formula = formula.split("~")
     formula[1] = " 1 + " + formula[1]
     formula = "~".join(formula)
-    mod = model.from_formula(formula, joined)
+    with warns_if_missing(joined):
+        mod = model.from_formula(formula, joined)
     pmod = pickle.loads(pickle.dumps(mod))
     res = mod.fit()
     pres = pmod.fit()
     ppres = pickle.loads(pickle.dumps(pres))
 
-    mod2 = formula_func(formula, joined)
+    with warns_if_missing(joined):
+        mod2 = formula_func(formula, joined)
     res2 = mod2.fit()
     assert_allclose(res.params, res2.params)
     assert_allclose(res.params, pres.params)
@@ -118,7 +122,8 @@ def test_basic_formulas(data, models, formula):
 
     x["Intercept"] = 1.0
     variables = ["Intercept", *variables]
-    mod2 = model(data.y, x[variables])
+    with warns_if_missing(data.y, x[variables]):
+        mod2 = model(data.y, x[variables])
     res2 = mod2.fit()
     assert_allclose(res.params, res2.params)
     assert mod.formula == formula
@@ -132,7 +137,8 @@ def test_basic_formulas_math_op(data, models, formula):
     formula = formula.replace("x0", "np.exp(x0)")
     formula = formula.replace("x1", "sigmoid(x1)")
     model, _ = models
-    mod = model.from_formula(formula, joined)
+    with warns_if_missing(joined):
+        mod = model.from_formula(formula, joined)
     res = mod.fit()
     mod.predict(res.params, data=joined)
     pred = res.predict(data=joined)
@@ -146,7 +152,8 @@ def test_panel_ols_formulas_math_op(data):
     joined = data.x
     joined["y"] = data.y
     formula = "y ~ x1 + np.exp(x2)"
-    mod = PanelOLS.from_formula(formula, joined)
+    with warns_if_missing(joined):
+        mod = PanelOLS.from_formula(formula, joined)
     mod.fit()
 
 
@@ -156,27 +163,32 @@ def test_panel_ols_formula(data):
     joined = data.x
     joined["y"] = data.y
     formula = "y ~ x1 + x2"
-    mod = PanelOLS.from_formula(formula, joined)
+    with warns_if_missing(joined):
+        mod = PanelOLS.from_formula(formula, joined)
     assert mod.formula == formula
 
     formula = "y ~ x1 + x2 + EntityEffects"
-    mod = PanelOLS.from_formula(formula, joined)
+    with warns_if_missing(joined):
+        mod = PanelOLS.from_formula(formula, joined)
     assert mod.formula == formula
     assert mod.entity_effects is True
     assert mod.time_effects is False
 
     formula = "y ~ x1 + x2 + TimeEffects"
-    mod = PanelOLS.from_formula(formula, joined)
+    with warns_if_missing(joined):
+        mod = PanelOLS.from_formula(formula, joined)
     assert mod.formula == formula
     assert mod.time_effects is True
     assert mod.entity_effects is False
 
     formula = "y ~ x1 + EntityEffects + TimeEffects + x2 "
-    mod = PanelOLS.from_formula(formula, joined)
+    with warns_if_missing(joined):
+        mod = PanelOLS.from_formula(formula, joined)
     assert mod.formula == formula
     assert mod.entity_effects is True
     assert mod.time_effects is True
-    mod2 = panel_ols(formula, joined)
+    with warns_if_missing(joined):
+        mod2 = panel_ols(formula, joined)
     res = mod.fit()
     res2 = mod2.fit()
     assert_allclose(res.params, res2.params)
@@ -192,11 +204,13 @@ def test_basic_formulas_predict(data, models, formula):
     joined = data.x
     joined["y"] = data.y
     model, formula_func = models
-    mod = model.from_formula(formula, joined)
+    with warns_if_missing(joined):
+        mod = model.from_formula(formula, joined)
     res = mod.fit()
     pred = res.predict(data=joined)
 
-    mod2 = formula_func(formula, joined)
+    with warns_if_missing(joined):
+        mod2 = formula_func(formula, joined)
     res2 = mod2.fit()
     pred2 = res2.predict(data=joined)
     assert_allclose(pred.values, pred2.values, atol=1e-8)
@@ -205,7 +219,8 @@ def test_basic_formulas_predict(data, models, formula):
     variables = parts[1].replace(" 1 ", " const ").split("+")
     variables = [s.strip() for s in variables]
     x = data.x
-    res2 = model(data.y, x[variables]).fit()
+    with warns_if_missing(data.y, x[variables]):
+        res2 = model(data.y, x[variables]).fit()
     pred3 = res2.predict(x[variables])
     pred4 = res.predict(x[variables])
     assert_allclose(pred.values, pred3.values, atol=1e-8)
@@ -217,13 +232,15 @@ def test_basic_formulas_predict(data, models, formula):
     formula = formula.split("~")
     formula[1] = " 1 + " + formula[1]
     formula = "~".join(formula)
-    mod = model.from_formula(formula, joined)
+    with warns_if_missing(joined):
+        mod = model.from_formula(formula, joined)
     res = mod.fit()
     pred = res.predict(data=joined)
 
     x["Intercept"] = 1.0
     variables = ["Intercept", *variables]
-    mod2 = model(data.y, x[variables])
+    with warns_if_missing(data.y, x[variables]):
+        mod2 = model(data.y, x[variables])
     res2 = mod2.fit()
     pred2 = res.predict(x[variables])
     pred3 = res2.predict(x[variables])
@@ -237,7 +254,8 @@ def test_formulas_predict_error(data, models, formula):
     joined = data.x
     joined["y"] = data.y
     model, _ = models
-    mod = model.from_formula(formula, joined)
+    with warns_if_missing(joined):
+        mod = model.from_formula(formula, joined)
     res = mod.fit()
     with pytest.raises(ValueError, match=r"Predictions can only be constructed"):
         res.predict(joined, data=joined)
@@ -248,7 +266,8 @@ def test_formulas_predict_error(data, models, formula):
     variables = parts[1].replace(" 1 ", " const ").split("+")
     variables = [s.strip() for s in variables]
     x = data.x
-    res = model(data.y, x[variables]).fit()
+    with warns_if_missing(data.y, x[variables]):
+        res = model(data.y, x[variables]).fit()
     with pytest.raises(ValueError, match=r"Unable to use data when the"):
         res.predict(data=joined)
 
@@ -310,7 +329,8 @@ def test_formulas_rank_check(data, models, formula):
     joined = data.x
     joined["y"] = data.y
     model, _ = models
-    mod = model.from_formula(formula, joined)
+    with warns_if_missing(joined):
+        mod = model.from_formula(formula, joined)
     y = mod.dependent.dataframe.copy()
     x = mod.exog.dataframe.copy()
 
@@ -322,9 +342,11 @@ def test_formulas_rank_check(data, models, formula):
     for col in x:
         joined[col] = x[col]
     with pytest.raises(ValueError, match=r"exog does not have"):
-        model.from_formula(formula, joined)
+        with warns_if_missing(joined):
+            model.from_formula(formula, joined)
     with pytest.raises(ValueError, match=r"exog does not have"):
-        model.from_formula(formula, joined, check_rank=True)
+        with warns_if_missing(joined):
+            model.from_formula(formula, joined, check_rank=True)
     with pytest.raises(ValueError, match=r"exog does not have"):
         model(y, x)
     with pytest.raises(ValueError, match=r"exog does not have"):
@@ -336,7 +358,8 @@ def test_formulas_rank_check(data, models, formula):
 
     # The regressors do not contain a constant, whether or not they have full rank,
     # and so first differences do not reject them either
-    mod = model.from_formula(formula, joined, check_rank=False)
+    with warns_if_missing(joined):
+        mod = model.from_formula(formula, joined, check_rank=False)
     res = mod.fit()
     assert isinstance(res.summary.as_text(), str)
     mod = model(y, x, check_rank=False)

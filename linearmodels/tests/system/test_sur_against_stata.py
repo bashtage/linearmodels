@@ -3,6 +3,7 @@ from numpy.testing import assert_allclose
 import pandas as pd
 import pytest
 
+from linearmodels.shared.exceptions import MissingValueWarning
 from linearmodels.shared.utility import AttrDict
 from linearmodels.system import SUR
 from linearmodels.tests.system.results.generate_data import (
@@ -11,10 +12,6 @@ from linearmodels.tests.system.results.generate_data import (
     missing_data,
 )
 from linearmodels.tests.system.results.parse_stata_results import stata_results
-
-pytestmark = pytest.mark.filterwarnings(
-    "ignore::linearmodels.shared.exceptions.MissingValueWarning"
-)
 
 
 @pytest.fixture(scope="module", params=list(stata_results.keys()))
@@ -56,7 +53,11 @@ def model_data(request) -> AttrDict:
         r.iloc[1, widths[0] + widths[1]] = 1.0
         constraint = r
 
-    mod = SUR(rekeyed_data)
+    if dgp == "missing":
+        with pytest.warns(MissingValueWarning, match="missing values"):
+            mod = SUR(rekeyed_data)
+    else:
+        mod = SUR(rekeyed_data)
     if constraint is not None:
         mod.add_constraints(constraint)
 

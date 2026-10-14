@@ -27,10 +27,6 @@ from linearmodels.shared.exceptions import MissingValueWarning
 
 NOBS = 200
 
-pytestmark = pytest.mark.filterwarnings(
-    "ignore::linearmodels.shared.exceptions.MissingValueWarning"
-)
-
 
 @pytest.fixture(scope="module")
 def data():
@@ -210,11 +206,12 @@ def test_cluster_message_names_only_what_the_models_have(data):
         np.random.default_rng(2).standard_normal((NOBS, 2)), columns=["z0", "z1"]
     )
     endog = (z.sum(axis=1) + x["x0"]).to_frame("e")
-    models = {
-        "IV2SLS": IV2SLS(y, x, endog, z),
-        "IVLIML": IVLIML(y, x, endog, z),
-        "AbsorbingLS": AbsorbingLS(y, x, absorb=cats),
-    }
+    with pytest.warns(MissingValueWarning, match="missing values"):
+        models = {
+            "IV2SLS": IV2SLS(y, x, endog, z),
+            "IVLIML": IVLIML(y, x, endog, z),
+            "AbsorbingLS": AbsorbingLS(y, x, absorb=cats),
+        }
     for name, mod in models.items():
         with pytest.raises(ValueError, match="clusters has the wrong nobs") as info:
             mod.fit(cov_type="clustered", clusters=clusters)
@@ -240,7 +237,8 @@ def test_clusters_that_are_dropped_with_the_data_are_accepted(data):
     res = mod.fit(cov_type="clustered", clusters=clusters[keep])
     assert res.nobs == NOBS - 1
     # The rows are the rows of the model that drops them
-    auto = AbsorbingLS(y, x, absorb=cats)
+    with pytest.warns(MissingValueWarning, match="missing values"):
+        auto = AbsorbingLS(y, x, absorb=cats)
     assert_allclose(
         auto.fit(cov_type="clustered", clusters=clusters[keep]).params, res.params
     )

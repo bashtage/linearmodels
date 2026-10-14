@@ -21,7 +21,11 @@ from linearmodels.iv.absorbing import AbsorbingLS, Interaction
 NOBS = 240
 LEVELS = (14, 6, 4)
 
-pytestmark = pytest.mark.filterwarnings("ignore::DeprecationWarning")
+# pyhdfe 0.2.0 calls the sparse matrix classes of SciPy, which SciPy 2.0 deprecates.
+# pyhdfe 0.2.1 does not
+pytestmark = pytest.mark.filterwarnings(
+    "ignore:(coo|csc|csr)_matrix is being replaced by:DeprecationWarning:pyhdfe"
+)
 
 
 def make_data(neffects, seed=0, weighted=False):

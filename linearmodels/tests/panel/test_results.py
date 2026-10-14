@@ -25,6 +25,7 @@ from linearmodels.shared.hypotheses import (
     NormalTestStatistic,
     WaldTestStatistic,
 )
+from linearmodels.tests._utility import warns_if_missing
 from linearmodels.tests.panel._utility import datatypes, generate_data
 
 
@@ -323,11 +324,9 @@ def test_incorrect_type(data):
         compare({"model1": res, "model2": res2})
 
 
-@pytest.mark.filterwarnings(
-    "ignore::linearmodels.shared.exceptions.MissingValueWarning"
-)
 def test_predict(generated_data):
-    mod = PanelOLS(generated_data.y, generated_data.x, entity_effects=True)
+    with warns_if_missing(generated_data.y, generated_data.x):
+        mod = PanelOLS(generated_data.y, generated_data.x, entity_effects=True)
     res = mod.fit()
     pred = res.predict()
     nobs = mod.dependent.dataframe.shape[0]
@@ -343,7 +342,8 @@ def test_predict(generated_data):
     assert list(pred.columns) == ["fitted_values", "estimated_effects", "idiosyncratic"]
     assert pred.shape == (PanelData(generated_data.y).dataframe.shape[0], 3)
 
-    mod = PanelOLS(generated_data.y, generated_data.x)
+    with warns_if_missing(generated_data.y, generated_data.x):
+        mod = PanelOLS(generated_data.y, generated_data.x)
     res = mod.fit()
     pred = res.predict()
     assert list(pred.columns) == ["fitted_values"]
@@ -377,11 +377,9 @@ def test_predict_exception(generated_data):
         res.predict(x)
 
 
-@pytest.mark.filterwarnings(
-    "ignore::linearmodels.shared.exceptions.MissingValueWarning"
-)
 def test_predict_no_selection(generated_data):
-    mod = PanelOLS(generated_data.y, generated_data.x, entity_effects=True)
+    with warns_if_missing(generated_data.y, generated_data.x):
+        mod = PanelOLS(generated_data.y, generated_data.x, entity_effects=True)
     res = mod.fit()
     with pytest.raises(ValueError, match=r"At least one output must be"):
         res.predict(fitted=False)
@@ -541,8 +539,11 @@ def test_hausman_constants(hausman_data, re_constant, fe_constant, include_const
     re_res = RandomEffects(dependent, re_exog).fit()
     fe_res = PanelOLS(dependent, fe_exog, entity_effects=True).fit()
     with warnings.catch_warnings():
-        # Warnings are only possible when the constant is part of the test
-        warnings.simplefilter("ignore", UserWarning)
+        # Var(b0) - Var(b1) is not always positive definite, and the statistic is then
+        # computed with a generalized inverse (test_hausman_negative_statistic)
+        warnings.filterwarnings(
+            "ignore", "Var.b0. - Var.b1. is not positive definite", UserWarning
+        )
         wald, estimates = re_res.hausman(fe_res, include_constant=include_constant)
     # The constant can only be compared when both models have one
     names = (

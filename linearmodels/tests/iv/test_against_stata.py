@@ -11,10 +11,6 @@ from statsmodels.tools.tools import add_constant
 from linearmodels.iv import IV2SLS, IVGMM, IVLIML
 from linearmodels.tests.iv.results.read_stata_results import process_results
 
-pytestmark = pytest.mark.filterwarnings(
-    "ignore::linearmodels.shared.exceptions.MissingValueWarning"
-)
-
 CWD = os.path.split(os.path.abspath(__file__))[0]
 
 HOUSING_DATA = pd.read_csv(os.path.join(CWD, "results", "housing.csv"), index_col=0)

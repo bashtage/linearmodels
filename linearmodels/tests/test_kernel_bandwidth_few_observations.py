@@ -552,7 +552,7 @@ def test_driscoll_kraay_default_bandwidth_is_another_rule_and_does_not_change(
     assert_allclose(default.cov, explicit.cov, rtol=1e-12)
 
 
-@pytest.mark.filterwarnings("ignore:invalid value encountered:RuntimeWarning")
+@pytest.mark.filterwarnings("error::RuntimeWarning")
 @pytest.mark.parametrize("kernel", KERNELS)
 def test_fama_macbeth_estimates_that_do_not_vary_have_no_finite_bandwidth(kernel):
     # The standard deviation of the estimates is 0, and the deviations are divided by it
