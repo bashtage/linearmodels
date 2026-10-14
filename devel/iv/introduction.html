@@ -23,7 +23,7 @@
     
   
       
-        <title>Introduction - linearmodels v7.1 (+513)</title>
+        <title>Introduction - linearmodels v7.1 (+518)</title>
       
     
 
@@ -100,7 +100,7 @@
 
 <header class="md-header md-header--shadow" data-md-component="header">
   <nav class="md-header__inner md-grid" aria-label="Header">
-    <a href="../index.html" title="linearmodels v7.1 (+513)" class="md-header__button md-logo" aria-label="linearmodels v7.1 (+513)" data-md-component="logo">
+    <a href="../index.html" title="linearmodels v7.1 (+518)" class="md-header__button md-logo" aria-label="linearmodels v7.1 (+518)" data-md-component="logo">
       <img src="../_static/bw-logo.svg" alt="logo">
     </a>
     <label class="md-header__button md-icon" for="__drawer">
@@ -111,7 +111,7 @@
       <div class="md-header__ellipsis">
         <div class="md-header__topic">
           <span class="md-ellipsis">
-            linearmodels v7.1 (+513)
+            linearmodels v7.1 (+518)
           </span>
         </div>
         <div class="md-header__topic" data-md-component="header-topic">
@@ -206,10 +206,10 @@
 
 <nav class="md-nav md-nav--primary" aria-label="Navigation" data-md-level="0">
   <label class="md-nav__title" for="__drawer">
-    <a href="../index.html" title="linearmodels v7.1 (+513)" class="md-nav__button md-logo" aria-label="linearmodels v7.1 (+513)" data-md-component="logo">
+    <a href="../index.html" title="linearmodels v7.1 (+518)" class="md-nav__button md-logo" aria-label="linearmodels v7.1 (+518)" data-md-component="logo">
       <img src="../_static/bw-logo.svg" alt="logo">
     </a>
-    linearmodels v7.1 (+513)
+    linearmodels v7.1 (+518)
   </label>
   
     <div class="md-nav__source">
@@ -1518,11 +1518,11 @@ classes with the IV estimators, and it reports OLS-style statistics. The
 <code class="docutils literal notranslate"><span class="pre">rsquared</span></code> of the results includes the explanatory power of the absorbed
 effects, and <code class="docutils literal notranslate"><span class="pre">absorbed_rsquared</span></code> does not. It is not a panel estimator, and it
 does not have the statistics of
-<a class="reference internal" href="../panel/panel/linearmodels.panel.model.PanelOLS.html#linearmodels.panel.model.PanelOLS" title="linearmodels.panel.model.PanelOLS (Python class) — One- and two-way fixed effects estimator for panel data"><code class="xref py py-class docutils literal notranslate"><span class="pre">PanelOLS</span></code></a>. Its default for <code class="docutils literal notranslate"><span class="pre">debiased</span></code> is
+<a class="reference internal" href="../panel/panel/linearmodels.panel.model.PanelOLS.html#linearmodels.panel.model.PanelOLS" title="linearmodels.panel.model.PanelOLS (Python class) — One- and two-way fixed effects estimator for panel data."><code class="xref py py-class docutils literal notranslate"><span class="pre">PanelOLS</span></code></a>. Its default for <code class="docutils literal notranslate"><span class="pre">debiased</span></code> is
 <code class="docutils literal notranslate"><span class="pre">False</span></code>, where the panel estimators use <code class="docutils literal notranslate"><span class="pre">True</span></code>. See
 <a class="reference internal" href="../panel/faq.html#panel-small-sample"><span class="std std-ref">Small-sample Adjustments</span></a> for the small-sample adjustments of the panel
 estimators.</p>
-<p>A rule of thumb is to use <a class="reference internal" href="../panel/panel/linearmodels.panel.model.PanelOLS.html#linearmodels.panel.model.PanelOLS" title="linearmodels.panel.model.PanelOLS (Python class) — One- and two-way fixed effects estimator for panel data"><code class="xref py py-class docutils literal notranslate"><span class="pre">PanelOLS</span></code></a> for up to
+<p>A rule of thumb is to use <a class="reference internal" href="../panel/panel/linearmodels.panel.model.PanelOLS.html#linearmodels.panel.model.PanelOLS" title="linearmodels.panel.model.PanelOLS (Python class) — One- and two-way fixed effects estimator for panel data."><code class="xref py py-class docutils literal notranslate"><span class="pre">PanelOLS</span></code></a> for up to
 two effects when you want panel-style output and inference that matches Stata’s
 <code class="docutils literal notranslate"><span class="pre">xtreg</span></code>, and to use <code class="docutils literal notranslate"><span class="pre">AbsorbingLS</span></code> for more than two effects, for effects
 interacted with continuous variables, and for models with very many groups.</p>

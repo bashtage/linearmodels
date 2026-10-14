@@ -90,3 +90,12 @@ Test Data Generation
 
    generate_panel_data
    PanelModelData
+
+Errors
+------
+
+.. autoclass:: linearmodels.panel.model.AmbiguityError
+   :show-inheritance:
+
+.. autoclass:: linearmodels.panel.utility.AbsorbingEffectError
+   :show-inheritance:

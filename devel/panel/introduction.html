@@ -23,7 +23,7 @@
     
   
       
-        <title>Introduction - linearmodels v7.1 (+513)</title>
+        <title>Introduction - linearmodels v7.1 (+518)</title>
       
     
 
@@ -100,7 +100,7 @@
 
 <header class="md-header md-header--shadow" data-md-component="header">
   <nav class="md-header__inner md-grid" aria-label="Header">
-    <a href="../index.html" title="linearmodels v7.1 (+513)" class="md-header__button md-logo" aria-label="linearmodels v7.1 (+513)" data-md-component="logo">
+    <a href="../index.html" title="linearmodels v7.1 (+518)" class="md-header__button md-logo" aria-label="linearmodels v7.1 (+518)" data-md-component="logo">
       <img src="../_static/bw-logo.svg" alt="logo">
     </a>
     <label class="md-header__button md-icon" for="__drawer">
@@ -111,7 +111,7 @@
       <div class="md-header__ellipsis">
         <div class="md-header__topic">
           <span class="md-ellipsis">
-            linearmodels v7.1 (+513)
+            linearmodels v7.1 (+518)
           </span>
         </div>
         <div class="md-header__topic" data-md-component="header-topic">
@@ -206,10 +206,10 @@
 
 <nav class="md-nav md-nav--primary" aria-label="Navigation" data-md-level="0">
   <label class="md-nav__title" for="__drawer">
-    <a href="../index.html" title="linearmodels v7.1 (+513)" class="md-nav__button md-logo" aria-label="linearmodels v7.1 (+513)" data-md-component="logo">
+    <a href="../index.html" title="linearmodels v7.1 (+518)" class="md-nav__button md-logo" aria-label="linearmodels v7.1 (+518)" data-md-component="logo">
       <img src="../_static/bw-logo.svg" alt="logo">
     </a>
-    linearmodels v7.1 (+513)
+    linearmodels v7.1 (+518)
   </label>
   
     <div class="md-nav__source">
@@ -922,24 +922,24 @@ uncorrelated with <span class="math notranslate nohighlight">\(\alpha_i\)</span>
 <p>and use different techniques to address the presence of <span class="math notranslate nohighlight">\(\alpha_i\)</span>.</p>
 <p>In particular,</p>
 <ul class="simple">
-<li><p><a class="reference internal" href="panel/linearmodels.panel.model.PanelOLS.html#linearmodels.panel.model.PanelOLS" title="linearmodels.panel.model.PanelOLS (Python class) — One- and two-way fixed effects estimator for panel data"><code class="xref py py-class docutils literal notranslate"><span class="pre">PanelOLS</span></code></a> uses fixed effect
+<li><p><a class="reference internal" href="panel/linearmodels.panel.model.PanelOLS.html#linearmodels.panel.model.PanelOLS" title="linearmodels.panel.model.PanelOLS (Python class) — One- and two-way fixed effects estimator for panel data."><code class="xref py py-class docutils literal notranslate"><span class="pre">PanelOLS</span></code></a> uses fixed effect
 (i.e., entity effects) to eliminate the entity specific components.
 This is mathematically equivalent to including a dummy variable for
 each entity, although the implementation does not do this for
 performance reasons.</p></li>
-<li><p><a class="reference internal" href="panel/linearmodels.panel.model.BetweenOLS.html#linearmodels.panel.model.BetweenOLS" title="linearmodels.panel.model.BetweenOLS (Python class) — Between estimator for panel data"><code class="xref py py-class docutils literal notranslate"><span class="pre">BetweenOLS</span></code></a> averages within an
+<li><p><a class="reference internal" href="panel/linearmodels.panel.model.BetweenOLS.html#linearmodels.panel.model.BetweenOLS" title="linearmodels.panel.model.BetweenOLS (Python class) — Between estimator for panel data."><code class="xref py py-class docutils literal notranslate"><span class="pre">BetweenOLS</span></code></a> averages within an
 entity and then regresses the time-averaged values using OLS.</p></li>
-<li><p><a class="reference internal" href="panel/linearmodels.panel.model.FirstDifferenceOLS.html#linearmodels.panel.model.FirstDifferenceOLS" title="linearmodels.panel.model.FirstDifferenceOLS (Python class) — First difference model for panel data"><code class="xref py py-class docutils literal notranslate"><span class="pre">FirstDifferenceOLS</span></code></a> takes the first
+<li><p><a class="reference internal" href="panel/linearmodels.panel.model.FirstDifferenceOLS.html#linearmodels.panel.model.FirstDifferenceOLS" title="linearmodels.panel.model.FirstDifferenceOLS (Python class) — First difference model for panel data."><code class="xref py py-class docutils literal notranslate"><span class="pre">FirstDifferenceOLS</span></code></a> takes the first
 difference to eliminate the entity specific effect.</p></li>
-<li><p><a class="reference internal" href="panel/linearmodels.panel.model.RandomEffects.html#linearmodels.panel.model.RandomEffects" title="linearmodels.panel.model.RandomEffects (Python class) — One-way Random Effects model for panel data"><code class="xref py py-class docutils literal notranslate"><span class="pre">RandomEffects</span></code></a> uses a quasi-difference
+<li><p><a class="reference internal" href="panel/linearmodels.panel.model.RandomEffects.html#linearmodels.panel.model.RandomEffects" title="linearmodels.panel.model.RandomEffects (Python class) — One-way Random Effects model for panel data."><code class="xref py py-class docutils literal notranslate"><span class="pre">RandomEffects</span></code></a> uses a quasi-difference
 to efficiently estimate <span class="math notranslate nohighlight">\(\beta\)</span> when the entity effect is
 independent from the regressors.  It is, however, not consistent when
 there is dependence between the entity effect and the regressors.</p></li>
-<li><p><a class="reference internal" href="panel/linearmodels.panel.model.PooledOLS.html#linearmodels.panel.model.PooledOLS" title="linearmodels.panel.model.PooledOLS (Python class) — Pooled coefficient estimator for panel data"><code class="xref py py-class docutils literal notranslate"><span class="pre">PooledOLS</span></code></a> ignores the entity effect
+<li><p><a class="reference internal" href="panel/linearmodels.panel.model.PooledOLS.html#linearmodels.panel.model.PooledOLS" title="linearmodels.panel.model.PooledOLS (Python class) — Pooled coefficient estimator for panel data."><code class="xref py py-class docutils literal notranslate"><span class="pre">PooledOLS</span></code></a> ignores the entity effect
 and is consistent but inefficient when the effect is independent of the
 regressors.</p></li>
 </ul>
-<p><a class="reference internal" href="panel/linearmodels.panel.model.PanelOLS.html#linearmodels.panel.model.PanelOLS" title="linearmodels.panel.model.PanelOLS (Python class) — One- and two-way fixed effects estimator for panel data"><code class="xref py py-class docutils literal notranslate"><span class="pre">PanelOLS</span></code></a> is somewhat more general than the
+<p><a class="reference internal" href="panel/linearmodels.panel.model.PanelOLS.html#linearmodels.panel.model.PanelOLS" title="linearmodels.panel.model.PanelOLS (Python class) — One- and two-way fixed effects estimator for panel data."><code class="xref py py-class docutils literal notranslate"><span class="pre">PanelOLS</span></code></a> is somewhat more general than the
 other estimators and can be used to model 2 effects (e.g., entity and time
 effects).</p>
 <p>Model specification is similar to <a class="reference external" href="http://www.statsmodels.org/">statsmodels</a>.
@@ -1004,7 +1004,7 @@ to include the fixed effects.</p>
 </code></pre></div>
 </div>
 <h2 id="models-with-only-effects"><span id="panel-effects-only"></span>Models with Only Effects<a class="headerlink" href="#models-with-only-effects" title="Link to this heading">¶</a></h2>
-<p>A <a class="reference internal" href="panel/linearmodels.panel.model.PanelOLS.html#linearmodels.panel.model.PanelOLS" title="linearmodels.panel.model.PanelOLS (Python class) — One- and two-way fixed effects estimator for panel data"><code class="xref py py-class docutils literal notranslate"><span class="pre">PanelOLS</span></code></a> model can have effects and no
+<p>A <a class="reference internal" href="panel/linearmodels.panel.model.PanelOLS.html#linearmodels.panel.model.PanelOLS" title="linearmodels.panel.model.PanelOLS (Python class) — One- and two-way fixed effects estimator for panel data."><code class="xref py py-class docutils literal notranslate"><span class="pre">PanelOLS</span></code></a> model can have effects and no
 regressors, <span class="math notranslate nohighlight">\(y_{it} = \alpha_i + \epsilon_{it}\)</span>. The formula has no
 regressors, or <code class="docutils literal notranslate"><span class="pre">exog</span></code> has the index of <code class="docutils literal notranslate"><span class="pre">dependent</span></code> and no columns.</p>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><code><span class="kn">import</span><span class="w"> </span><span class="nn">pandas</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">pd</span>
@@ -1024,7 +1024,7 @@ the coefficients, <code class="docutils literal notranslate"><span class="pre">f
 R-squared of the model is 0 (NaN if the dependent variable does not vary once the
 effects are removed), and <code class="docutils literal notranslate"><span class="pre">rsquared_inclusive</span></code> is the share of the variation of the
 dependent variable that the effects explain. See
-<a class="reference internal" href="panel/linearmodels.panel.model.PanelOLS.html#linearmodels.panel.model.PanelOLS" title="linearmodels.panel.model.PanelOLS (Python class) — One- and two-way fixed effects estimator for panel data"><code class="xref py py-class docutils literal notranslate"><span class="pre">PanelOLS</span></code></a> for all of the results.</p>
+<a class="reference internal" href="panel/linearmodels.panel.model.PanelOLS.html#linearmodels.panel.model.PanelOLS" title="linearmodels.panel.model.PanelOLS (Python class) — One- and two-way fixed effects estimator for panel data."><code class="xref py py-class docutils literal notranslate"><span class="pre">PanelOLS</span></code></a> for all of the results.</p>
 <h2 id="specification-tests"><span id="panel-specification-tests"></span>Specification Tests<a class="headerlink" href="#specification-tests" title="Link to this heading">¶</a></h2>
 <p>The results of the panel models contain two specification tests. The Hausman
 test compares the random effects estimates with those of a model that is
@@ -1129,7 +1129,7 @@ the null. The test is the property
 </div>
 <p>The statistic is computed from the idiosyncratic shocks of the model, which are
 <code class="docutils literal notranslate"><span class="pre">idiosyncratic</span></code> in the results. The weights of a weighted model are not applied
-to them. <a class="reference internal" href="panel/linearmodels.panel.model.FirstDifferenceOLS.html#linearmodels.panel.model.FirstDifferenceOLS" title="linearmodels.panel.model.FirstDifferenceOLS (Python class) — First difference model for panel data"><code class="xref py py-class docutils literal notranslate"><span class="pre">FirstDifferenceOLS</span></code></a> is the exception.
+to them. <a class="reference internal" href="panel/linearmodels.panel.model.FirstDifferenceOLS.html#linearmodels.panel.model.FirstDifferenceOLS" title="linearmodels.panel.model.FirstDifferenceOLS (Python class) — First difference model for panel data."><code class="xref py py-class docutils literal notranslate"><span class="pre">FirstDifferenceOLS</span></code></a> is the exception.
 It uses <code class="docutils literal notranslate"><span class="pre">resids</span></code>, the residuals of the differenced equation, as <code class="docutils literal notranslate"><span class="pre">plm::pcdtest</span></code>
 does for a regression of the differenced data. Its <code class="docutils literal notranslate"><span class="pre">idiosyncratic</span></code> shocks are
 in levels, and they are as persistent as the errors in levels, for example a
@@ -1141,9 +1141,9 @@ correlated. It over-rejects if they are persistent.</p>
 <a class="reference internal" href="../utility/linearmodels.shared.hypotheses.InapplicableTestStatistic.html#linearmodels.shared.hypotheses.InapplicableTestStatistic" title="linearmodels.shared.hypotheses.InapplicableTestStatistic (Python class) — Class returned if a requested test is not applicable for a specification"><code class="xref py py-class docutils literal notranslate"><span class="pre">InapplicableTestStatistic</span></code></a>, and its
 string says why.</p>
 <ul class="simple">
-<li><p><a class="reference internal" href="panel/linearmodels.panel.model.BetweenOLS.html#linearmodels.panel.model.BetweenOLS" title="linearmodels.panel.model.BetweenOLS (Python class) — Between estimator for panel data"><code class="xref py py-class docutils literal notranslate"><span class="pre">BetweenOLS</span></code></a>. The model is fitted to the
+<li><p><a class="reference internal" href="panel/linearmodels.panel.model.BetweenOLS.html#linearmodels.panel.model.BetweenOLS" title="linearmodels.panel.model.BetweenOLS (Python class) — Between estimator for panel data."><code class="xref py py-class docutils literal notranslate"><span class="pre">BetweenOLS</span></code></a>. The model is fitted to the
 entity means, so it has no residuals that vary over time.</p></li>
-<li><p><a class="reference internal" href="panel/linearmodels.panel.model.FamaMacBeth.html#linearmodels.panel.model.FamaMacBeth" title="linearmodels.panel.model.FamaMacBeth (Python class) — Pooled coefficient estimator for panel data"><code class="xref py py-class docutils literal notranslate"><span class="pre">FamaMacBeth</span></code></a>. The errors of the model are the
+<li><p><a class="reference internal" href="panel/linearmodels.panel.model.FamaMacBeth.html#linearmodels.panel.model.FamaMacBeth" title="linearmodels.panel.model.FamaMacBeth (Python class) — Fama-MacBeth estimator for panel data."><code class="xref py py-class docutils literal notranslate"><span class="pre">FamaMacBeth</span></code></a>. The errors of the model are the
 residuals of the cross-sectional regressions of each period. The series that
 are implied by the average of the coefficients contain a common,
 time-varying term, so they are cross-sectionally dependent by construction.

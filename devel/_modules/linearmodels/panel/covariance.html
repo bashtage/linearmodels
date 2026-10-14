@@ -19,7 +19,7 @@
     
   
       
-        <title>linearmodels.panel.covariance - linearmodels v7.1 (+513)</title>
+        <title>linearmodels.panel.covariance - linearmodels v7.1 (+518)</title>
       
     
 
@@ -91,7 +91,7 @@
 
 <header class="md-header md-header--shadow" data-md-component="header">
   <nav class="md-header__inner md-grid" aria-label="Header">
-    <a href="../../../index.html" title="linearmodels v7.1 (+513)" class="md-header__button md-logo" aria-label="linearmodels v7.1 (+513)" data-md-component="logo">
+    <a href="../../../index.html" title="linearmodels v7.1 (+518)" class="md-header__button md-logo" aria-label="linearmodels v7.1 (+518)" data-md-component="logo">
       <img src="../../../_static/bw-logo.svg" alt="logo">
     </a>
     <label class="md-header__button md-icon" for="__drawer">
@@ -102,7 +102,7 @@
       <div class="md-header__ellipsis">
         <div class="md-header__topic">
           <span class="md-ellipsis">
-            linearmodels v7.1 (+513)
+            linearmodels v7.1 (+518)
           </span>
         </div>
         <div class="md-header__topic" data-md-component="header-topic">
@@ -197,10 +197,10 @@
 
 <nav class="md-nav md-nav--primary" aria-label="Navigation" data-md-level="0">
   <label class="md-nav__title" for="__drawer">
-    <a href="../../../index.html" title="linearmodels v7.1 (+513)" class="md-nav__button md-logo" aria-label="linearmodels v7.1 (+513)" data-md-component="logo">
+    <a href="../../../index.html" title="linearmodels v7.1 (+518)" class="md-nav__button md-logo" aria-label="linearmodels v7.1 (+518)" data-md-component="logo">
       <img src="../../../_static/bw-logo.svg" alt="logo">
     </a>
-    linearmodels v7.1 (+513)
+    linearmodels v7.1 (+518)
   </label>
   
     <div class="md-nav__source">
@@ -527,7 +527,9 @@
 
 
 <h1>Source code for linearmodels.panel.covariance</h1><div class="highlight"><pre>
-<span></span><code><span class="kn">from</span><span class="w"> </span><span class="nn">__future__</span><span class="w"> </span><span class="kn">import</span> <span class="n">annotations</span>
+<span></span><code><span class="sd">"""Covariance estimators for panel models."""</span>
+
+<span class="kn">from</span><span class="w"> </span><span class="nn">__future__</span><span class="w"> </span><span class="kn">import</span> <span class="n">annotations</span>
 
 <span class="kn">from</span><span class="w"> </span><span class="nn">functools</span><span class="w"> </span><span class="kn">import</span> <span class="n">cached_property</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">typing</span><span class="w"> </span><span class="kn">import</span> <span class="n">Any</span><span class="p">,</span> <span class="n">ClassVar</span><span class="p">,</span> <span class="n">Union</span>
@@ -570,26 +572,36 @@
 <a class="viewcode-back" href="../../../panel/panel/linearmodels.panel.covariance.HomoskedasticCovariance.html#linearmodels.panel.covariance.HomoskedasticCovariance">[docs]</a>
 <span class="k">class</span><span class="w"> </span><span class="nc">HomoskedasticCovariance</span><span class="p">:</span>
 <span class="w">    </span><span class="sa">r</span><span class="sd">"""</span>
-<span class="sd">    Homoskedastic covariance estimation</span>
+<span class="sd">    Homoskedastic covariance estimation.</span>
 
 <span class="sd">    Parameters</span>
 <span class="sd">    ----------</span>
 <span class="sd">    y : ndarray</span>
-<span class="sd">        (entity x time) by 1 stacked array of dependent</span>
+<span class="sd">        (entity x time) by 1 stacked array of the dependent variable.</span>
 <span class="sd">    x : ndarray</span>
-<span class="sd">        (entity x time) by variables stacked array of exogenous</span>
+<span class="sd">        (entity x time) by variables stacked array of the exogenous variables.</span>
 <span class="sd">    params : ndarray</span>
-<span class="sd">        variables by 1 array of estimated model parameters</span>
-<span class="sd">    entity_ids : ndarray</span>
-<span class="sd">        (entity x time) by 1 stacked array of entity ids</span>
-<span class="sd">    time_ids : ndarray</span>
-<span class="sd">        (entity x time) by 1 stacked array of time ids</span>
-<span class="sd">    debiased : bool</span>
-<span class="sd">        Flag indicating whether to debias the estimator</span>
-<span class="sd">    extra_df : int</span>
+<span class="sd">        Variables by 1 array of estimated model parameters.</span>
+<span class="sd">    entity_ids : ndarray or None</span>
+<span class="sd">        (entity x time) by 1 stacked array of entity ids. Not used by this</span>
+<span class="sd">        estimator, so it can be None.</span>
+<span class="sd">    time_ids : ndarray or None</span>
+<span class="sd">        (entity x time) by 1 stacked array of time ids. Not used by this</span>
+<span class="sd">        estimator, so it can be None.</span>
+<span class="sd">    debiased : bool, optional</span>
+<span class="sd">        Flag indicating whether to debias the estimator. The default is False.</span>
+<span class="sd">    extra_df : int, optional</span>
 <span class="sd">        Additional degrees of freedom consumed by models beyond the number of</span>
-<span class="sd">        columns in x, e.g., fixed effects.  Covariance estimators are always</span>
-<span class="sd">        adjusted for extra_df irrespective of the setting of debiased</span>
+<span class="sd">        columns in x, e.g., fixed effects. Covariance estimators are always</span>
+<span class="sd">        adjusted for extra_df irrespective of the setting of debiased. The</span>
+<span class="sd">        default is 0.</span>
+
+<span class="sd">    Raises</span>
+<span class="sd">    ------</span>
+<span class="sd">    ValueError</span>
+<span class="sd">        If the model has no residual degrees of freedom: the number of</span>
+<span class="sd">        observations less ``extra_df``, and less the number of regressors if</span>
+<span class="sd">        ``debiased`` is True, is not positive.</span>
 
 <span class="sd">    Notes</span>
 <span class="sd">    -----</span>
@@ -609,7 +621,7 @@
 
 <span class="sd">        s^2 = (n-df)^{-1} \hat{\epsilon}'\hat{\epsilon}</span>
 
-<span class="sd">    where df is ``extra_df`` and n-df is replace by n-df-k if ``debiased`` is</span>
+<span class="sd">    where df is ``extra_df`` and n-df is replaced by n-df-k if ``debiased`` is</span>
 <span class="sd">    ``True``.</span>
 <span class="sd">    """</span>
 
@@ -650,17 +662,17 @@
 
     <span class="nd">@property</span>
     <span class="k">def</span><span class="w"> </span><span class="nf">name</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
-<span class="w">        </span><span class="sd">"""Covariance estimator name"""</span>
+<span class="w">        </span><span class="sd">"""Covariance estimator name."""</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_name</span>
 
     <span class="nd">@property</span>
     <span class="k">def</span><span class="w"> </span><span class="nf">eps</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">linearmodels</span><span class="o">.</span><span class="n">typing</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">Float64Array</span><span class="p">:</span>
-<span class="w">        </span><span class="sd">"""Model residuals"""</span>
+<span class="w">        </span><span class="sd">"""Model residuals."""</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_y</span> <span class="o">-</span> <span class="bp">self</span><span class="o">.</span><span class="n">_x</span> <span class="o">@</span> <span class="bp">self</span><span class="o">.</span><span class="n">_params</span>
 
     <span class="nd">@property</span>
     <span class="k">def</span><span class="w"> </span><span class="nf">s2</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">float</span><span class="p">:</span>
-<span class="w">        </span><span class="sd">"""Error variance"""</span>
+<span class="w">        </span><span class="sd">"""Error variance."""</span>
         <span class="n">eps</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">eps</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_scale</span> <span class="o">*</span> <span class="nb">float</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">squeeze</span><span class="p">(</span><span class="n">eps</span><span class="o">.</span><span class="n">T</span> <span class="o">@</span> <span class="n">eps</span><span class="p">))</span> <span class="o">/</span> <span class="bp">self</span><span class="o">.</span><span class="n">_nobs</span>
 
@@ -668,7 +680,7 @@
 <a class="viewcode-back" href="../../../panel/panel/linearmodels.panel.covariance.HomoskedasticCovariance.cov.html#linearmodels.panel.covariance.HomoskedasticCovariance.cov">[docs]</a>
     <span class="nd">@cached_property</span>
     <span class="k">def</span><span class="w"> </span><span class="nf">cov</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">linearmodels</span><span class="o">.</span><span class="n">typing</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">Float64Array</span><span class="p">:</span>
-<span class="w">        </span><span class="sd">"""Estimated covariance"""</span>
+<span class="w">        </span><span class="sd">"""Estimated covariance."""</span>
         <span class="n">x</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_x</span>
         <span class="n">out</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">s2</span> <span class="o">*</span> <span class="n">inv</span><span class="p">(</span><span class="n">x</span><span class="o">.</span><span class="n">T</span> <span class="o">@</span> <span class="n">x</span><span class="p">)</span>
         <span class="k">return</span> <span class="p">(</span><span class="n">out</span> <span class="o">+</span> <span class="n">out</span><span class="o">.</span><span class="n">T</span><span class="p">)</span> <span class="o">/</span> <span class="mi">2</span></div>
@@ -677,7 +689,14 @@
 <div class="viewcode-block" id="HomoskedasticCovariance.deferred_cov">
 <a class="viewcode-back" href="../../../panel/panel/linearmodels.panel.covariance.HomoskedasticCovariance.deferred_cov.html#linearmodels.panel.covariance.HomoskedasticCovariance.deferred_cov">[docs]</a>
     <span class="k">def</span><span class="w"> </span><span class="nf">deferred_cov</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">linearmodels</span><span class="o">.</span><span class="n">typing</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">Float64Array</span><span class="p">:</span>
-<span class="w">        </span><span class="sd">"""Covariance calculation deferred until executed"""</span>
+<span class="w">        </span><span class="sd">"""</span>
+<span class="sd">        Covariance calculation deferred until executed.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        ndarray</span>
+<span class="sd">            The estimated covariance of the parameters.</span>
+<span class="sd">        """</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">cov</span></div>
 </div>
 
@@ -687,26 +706,34 @@
 <a class="viewcode-back" href="../../../panel/panel/linearmodels.panel.covariance.HeteroskedasticCovariance.html#linearmodels.panel.covariance.HeteroskedasticCovariance">[docs]</a>
 <span class="k">class</span><span class="w"> </span><span class="nc">HeteroskedasticCovariance</span><span class="p">(</span><span class="n">HomoskedasticCovariance</span><span class="p">):</span>
 <span class="w">    </span><span class="sa">r</span><span class="sd">"""</span>
-<span class="sd">    Covariance estimation using White estimator</span>
+<span class="sd">    Covariance estimation using White estimator.</span>
 
 <span class="sd">    Parameters</span>
 <span class="sd">    ----------</span>
 <span class="sd">    y : ndarray</span>
-<span class="sd">        (entity x time) by 1 stacked array of dependent</span>
+<span class="sd">        (entity x time) by 1 stacked array of the dependent variable.</span>
 <span class="sd">    x : ndarray</span>
-<span class="sd">        (entity x time) by variables stacked array of exogenous</span>
+<span class="sd">        (entity x time) by variables stacked array of the exogenous variables.</span>
 <span class="sd">    params : ndarray</span>
-<span class="sd">        variables by 1 array of estimated model parameters</span>
+<span class="sd">        Variables by 1 array of estimated model parameters.</span>
 <span class="sd">    entity_ids : ndarray</span>
-<span class="sd">        (entity x time) by 1 stacked array of entity ids</span>
+<span class="sd">        (entity x time) by 1 stacked array of entity ids.</span>
 <span class="sd">    time_ids : ndarray</span>
-<span class="sd">        (entity x time) by 1 stacked array of time ids</span>
-<span class="sd">    debiased : bool</span>
-<span class="sd">        Flag indicating whether to debias the estimator</span>
-<span class="sd">    extra_df : int</span>
+<span class="sd">        (entity x time) by 1 stacked array of time ids.</span>
+<span class="sd">    debiased : bool, optional</span>
+<span class="sd">        Flag indicating whether to debias the estimator. The default is False.</span>
+<span class="sd">    extra_df : int, optional</span>
 <span class="sd">        Additional degrees of freedom consumed by models beyond the number of</span>
-<span class="sd">        columns in x, e.g., fixed effects.  Covariance estimators are always</span>
-<span class="sd">        adjusted for extra_df irrespective of the setting of debiased</span>
+<span class="sd">        columns in x, e.g., fixed effects. Covariance estimators are always</span>
+<span class="sd">        adjusted for extra_df irrespective of the setting of debiased. The</span>
+<span class="sd">        default is 0.</span>
+
+<span class="sd">    Raises</span>
+<span class="sd">    ------</span>
+<span class="sd">    ValueError</span>
+<span class="sd">        If the model has no residual degrees of freedom: the number of</span>
+<span class="sd">        observations less ``extra_df``, and less the number of regressors if</span>
+<span class="sd">        ``debiased`` is True, is not positive.</span>
 
 <span class="sd">    Notes</span>
 <span class="sd">    -----</span>
@@ -728,7 +755,7 @@
 
 <span class="sd">        \hat{S} = (n-df)^{-1} \sum_{i=1}^n \hat{\epsilon}_i^2 x_i'x_i</span>
 
-<span class="sd">    where df is ``extra_df`` and n-df is replace by n-df-k if ``debiased`` is</span>
+<span class="sd">    where df is ``extra_df`` and n-df is replaced by n-df-k if ``debiased`` is</span>
 <span class="sd">    ``True``.</span>
 <span class="sd">    """</span>
 
@@ -752,7 +779,7 @@
 <a class="viewcode-back" href="../../../panel/panel/linearmodels.panel.covariance.HeteroskedasticCovariance.cov.html#linearmodels.panel.covariance.HeteroskedasticCovariance.cov">[docs]</a>
     <span class="nd">@cached_property</span>
     <span class="k">def</span><span class="w"> </span><span class="nf">cov</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">linearmodels</span><span class="o">.</span><span class="n">typing</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">Float64Array</span><span class="p">:</span>
-<span class="w">        </span><span class="sd">"""Estimated covariance"""</span>
+<span class="w">        </span><span class="sd">"""Estimated covariance."""</span>
         <span class="n">x</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_x</span>
         <span class="n">nobs</span> <span class="o">=</span> <span class="n">x</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
         <span class="n">xpxi</span> <span class="o">=</span> <span class="n">inv</span><span class="p">(</span><span class="n">x</span><span class="o">.</span><span class="n">T</span> <span class="o">@</span> <span class="n">x</span> <span class="o">/</span> <span class="n">nobs</span><span class="p">)</span>
@@ -770,30 +797,41 @@
 <a class="viewcode-back" href="../../../panel/panel/linearmodels.panel.covariance.ClusteredCovariance.html#linearmodels.panel.covariance.ClusteredCovariance">[docs]</a>
 <span class="k">class</span><span class="w"> </span><span class="nc">ClusteredCovariance</span><span class="p">(</span><span class="n">HomoskedasticCovariance</span><span class="p">):</span>
 <span class="w">    </span><span class="sa">r</span><span class="sd">"""</span>
-<span class="sd">    One-way (Rogers) or two-way clustered covariance estimation</span>
+<span class="sd">    One-way (Rogers) or two-way clustered covariance estimation.</span>
 
 <span class="sd">    Parameters</span>
 <span class="sd">    ----------</span>
 <span class="sd">    y : ndarray</span>
-<span class="sd">        nobs by 1 stacked array of dependent</span>
+<span class="sd">        (entity x time) by 1 stacked array of the dependent variable.</span>
 <span class="sd">    x : ndarray</span>
-<span class="sd">        nobs by variables stacked array of exogenous</span>
+<span class="sd">        (entity x time) by variables stacked array of the exogenous variables.</span>
 <span class="sd">    params : ndarray</span>
-<span class="sd">        variables by 1 array of estimated model parameters</span>
+<span class="sd">        Variables by 1 array of estimated model parameters.</span>
 <span class="sd">    entity_ids : ndarray</span>
-<span class="sd">        (entity x time) by 1 stacked array of entity ids</span>
+<span class="sd">        (entity x time) by 1 stacked array of entity ids.</span>
 <span class="sd">    time_ids : ndarray</span>
-<span class="sd">        (entity x time) by 1 stacked array of time ids</span>
-<span class="sd">    debiased : bool</span>
-<span class="sd">        Flag indicating whether to debias the estimator</span>
-<span class="sd">    extra_df : int</span>
+<span class="sd">        (entity x time) by 1 stacked array of time ids.</span>
+<span class="sd">    debiased : bool, optional</span>
+<span class="sd">        Flag indicating whether to debias the estimator. The default is False.</span>
+<span class="sd">    extra_df : int, optional</span>
 <span class="sd">        Additional degrees of freedom consumed by models beyond the number of</span>
-<span class="sd">        columns in x, e.g., fixed effects.  Covariance estimators are always</span>
-<span class="sd">        adjusted for extra_df irrespective of the setting of debiased</span>
-<span class="sd">    clusters : ndarray</span>
-<span class="sd">        nobs by 1 or nobs by 2 array of cluster group ids</span>
-<span class="sd">    group_debias : bool</span>
+<span class="sd">        columns in x, e.g., fixed effects. Covariance estimators are always</span>
+<span class="sd">        adjusted for extra_df irrespective of the setting of debiased. The</span>
+<span class="sd">        default is 0.</span>
+<span class="sd">    clusters : array_like, optional</span>
+<span class="sd">        Array of cluster group ids with nobs rows and 1 or 2 columns. If not</span>
+<span class="sd">        provided, every observation is its own cluster.</span>
+<span class="sd">    group_debias : bool, optional</span>
 <span class="sd">        Flag indicating whether to apply small-number of groups adjustment.</span>
+<span class="sd">        The default is False.</span>
+
+<span class="sd">    Raises</span>
+<span class="sd">    ------</span>
+<span class="sd">    ValueError</span>
+<span class="sd">        If the model has no residual degrees of freedom: the number of</span>
+<span class="sd">        observations less ``extra_df``, and less the number of regressors if</span>
+<span class="sd">        ``debiased`` is True, is not positive. It is also raised if</span>
+<span class="sd">        `clusters` has more than 2 columns or does not have nobs rows.</span>
 
 <span class="sd">    Notes</span>
 <span class="sd">    -----</span>
@@ -815,7 +853,7 @@
 <span class="sd">    covariance computed using the group formed from the intersection of the</span>
 <span class="sd">    two groups.</span>
 
-<span class="sd">    Two small sample adjustment are available.  ``debias=True`` will account</span>
+<span class="sd">    Two small sample adjustments are available. ``debiased=True`` will account</span>
 <span class="sd">    for regressors in the main model. ``group_debias=True`` will provide a</span>
 <span class="sd">    small sample adjustment for the number of clusters of the form</span>
 
@@ -863,7 +901,7 @@
 <a class="viewcode-back" href="../../../panel/panel/linearmodels.panel.covariance.ClusteredCovariance.cov.html#linearmodels.panel.covariance.ClusteredCovariance.cov">[docs]</a>
     <span class="nd">@cached_property</span>
     <span class="k">def</span><span class="w"> </span><span class="nf">cov</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">linearmodels</span><span class="o">.</span><span class="n">typing</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">Float64Array</span><span class="p">:</span>
-<span class="w">        </span><span class="sd">"""Estimated covariance"""</span>
+<span class="w">        </span><span class="sd">"""Estimated covariance."""</span>
         <span class="n">x</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_x</span>
         <span class="n">nobs</span> <span class="o">=</span> <span class="n">x</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
         <span class="n">xpxi</span> <span class="o">=</span> <span class="n">inv</span><span class="p">(</span><span class="n">x</span><span class="o">.</span><span class="n">T</span> <span class="o">@</span> <span class="n">x</span> <span class="o">/</span> <span class="n">nobs</span><span class="p">)</span>
@@ -902,29 +940,31 @@
 <a class="viewcode-back" href="../../../panel/panel/linearmodels.panel.covariance.DriscollKraay.html#linearmodels.panel.covariance.DriscollKraay">[docs]</a>
 <span class="k">class</span><span class="w"> </span><span class="nc">DriscollKraay</span><span class="p">(</span><span class="n">HomoskedasticCovariance</span><span class="p">):</span>
 <span class="w">    </span><span class="sa">r</span><span class="sd">"""</span>
-<span class="sd">    Driscoll-Kraay heteroskedasticity-autocorrelation robust covariance estimation</span>
+<span class="sd">    Driscoll-Kraay heteroskedasticity-autocorrelation robust covariance estimation.</span>
 
 <span class="sd">    Parameters</span>
 <span class="sd">    ----------</span>
 <span class="sd">    y : ndarray</span>
-<span class="sd">        (entity x time) by 1 stacked array of dependent</span>
+<span class="sd">        (entity x time) by 1 stacked array of the dependent variable.</span>
 <span class="sd">    x : ndarray</span>
-<span class="sd">        (entity x time) by variables stacked array of exogenous</span>
+<span class="sd">        (entity x time) by variables stacked array of the exogenous variables.</span>
 <span class="sd">    params : ndarray</span>
-<span class="sd">        variables by 1 array of estimated model parameters</span>
+<span class="sd">        Variables by 1 array of estimated model parameters.</span>
 <span class="sd">    entity_ids : ndarray</span>
-<span class="sd">        (entity x time) by 1 stacked array of entity ids</span>
+<span class="sd">        (entity x time) by 1 stacked array of entity ids.</span>
 <span class="sd">    time_ids : ndarray</span>
-<span class="sd">        (entity x time) by 1 stacked array of time ids</span>
-<span class="sd">    debiased : bool</span>
-<span class="sd">        Flag indicating whether to debias the estimator</span>
-<span class="sd">    extra_df : int</span>
+<span class="sd">        (entity x time) by 1 stacked array of time ids.</span>
+<span class="sd">    debiased : bool, optional</span>
+<span class="sd">        Flag indicating whether to debias the estimator. The default is False.</span>
+<span class="sd">    extra_df : int, optional</span>
 <span class="sd">        Additional degrees of freedom consumed by models beyond the number of</span>
-<span class="sd">        columns in x, e.g., fixed effects.  Covariance estimators are always</span>
-<span class="sd">        adjusted for extra_df irrespective of the setting of debiased.</span>
-<span class="sd">    kernel : str</span>
-<span class="sd">        Name of one of the supported kernels. If None, uses the Newey-West</span>
-<span class="sd">        kernel.</span>
+<span class="sd">        columns in x, e.g., fixed effects. Covariance estimators are always</span>
+<span class="sd">        adjusted for extra_df irrespective of the setting of debiased. The</span>
+<span class="sd">        default is 0.</span>
+<span class="sd">    kernel : str, optional</span>
+<span class="sd">        Name of the kernel, one of "bartlett",</span>
+<span class="sd">        "newey-west", "quadratic-spectral", "qs", "andrews", "parzen" or "gallant". If</span>
+<span class="sd">        not provided, uses the Newey-West kernel.</span>
 <span class="sd">    bandwidth : float, optional</span>
 <span class="sd">        Non-negative bandwidth to use. It must be below the number of time</span>
 <span class="sd">        periods. The Bartlett and Parzen kernels use its integer part. If not</span>
@@ -934,7 +974,10 @@
 <span class="sd">    ------</span>
 <span class="sd">    ValueError</span>
 <span class="sd">        If the bandwidth, or the default bandwidth if none is given, is not</span>
-<span class="sd">        below the number of time periods.</span>
+<span class="sd">        below the number of time periods. It is also raised if the model has</span>
+<span class="sd">        no residual degrees of freedom: the number of observations less</span>
+<span class="sd">        ``extra_df``, and less the number of regressors if ``debiased`` is</span>
+<span class="sd">        True, is not positive.</span>
 <span class="sd">    UnknownOptionError</span>
 <span class="sd">        If ``kernel`` is not one of the supported names. It is both a</span>
 <span class="sd">        ``ValueError`` and a ``KeyError``.</span>
@@ -971,7 +1014,7 @@
 <span class="sd">      \hat{S}_j &amp; = \sum_{i=1}^{t-j} \xi'_t \xi_{t+j} + \xi'_{t+j} \xi_t  \\</span>
 <span class="sd">      \hat{S}   &amp; = (n-df)^{-1} \sum_{j=0}^{bw} K(j, bw) \hat{S}_j</span>
 
-<span class="sd">    where df is ``extra_df`` and n-df is replace by n-df-k if ``debiased`` is</span>
+<span class="sd">    where df is ``extra_df`` and n-df is replaced by n-df-k if ``debiased`` is</span>
 <span class="sd">    ``True``. :math:`K(i, bw)` is the kernel weighting function.</span>
 
 <span class="sd">    The sums :math:`\xi_t` of the scores of the :math:`T` time periods have</span>
@@ -1027,7 +1070,7 @@
 
     <span class="k">def</span><span class="w"> </span><span class="nf">_select_bandwidth</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">nperiods</span><span class="p">:</span> <span class="nb">int</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">float</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">"""</span>
-<span class="sd">        The bandwidth of the kernel, which has to be below the number of periods</span>
+<span class="sd">        Select the bandwidth of the kernel, which has to be below the number of periods.</span>
 
 <span class="sd">        Parameters</span>
 <span class="sd">        ----------</span>
@@ -1061,7 +1104,7 @@
 <a class="viewcode-back" href="../../../panel/panel/linearmodels.panel.covariance.DriscollKraay.cov.html#linearmodels.panel.covariance.DriscollKraay.cov">[docs]</a>
     <span class="nd">@cached_property</span>
     <span class="k">def</span><span class="w"> </span><span class="nf">cov</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">linearmodels</span><span class="o">.</span><span class="n">typing</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">Float64Array</span><span class="p">:</span>
-<span class="w">        </span><span class="sd">"""Estimated covariance"""</span>
+<span class="w">        </span><span class="sd">"""Estimated covariance."""</span>
         <span class="n">x</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_x</span>
         <span class="n">nobs</span> <span class="o">=</span> <span class="n">x</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
         <span class="n">xpxi</span> <span class="o">=</span> <span class="n">inv</span><span class="p">(</span><span class="n">x</span><span class="o">.</span><span class="n">T</span> <span class="o">@</span> <span class="n">x</span> <span class="o">/</span> <span class="n">nobs</span><span class="p">)</span>
@@ -1087,29 +1130,31 @@
 <a class="viewcode-back" href="../../../panel/panel/linearmodels.panel.covariance.ACCovariance.html#linearmodels.panel.covariance.ACCovariance">[docs]</a>
 <span class="k">class</span><span class="w"> </span><span class="nc">ACCovariance</span><span class="p">(</span><span class="n">HomoskedasticCovariance</span><span class="p">):</span>
 <span class="w">    </span><span class="sa">r</span><span class="sd">"""</span>
-<span class="sd">    Autocorrelation robust covariance estimation</span>
+<span class="sd">    Autocorrelation robust covariance estimation.</span>
 
 <span class="sd">    Parameters</span>
 <span class="sd">    ----------</span>
 <span class="sd">    y : ndarray</span>
-<span class="sd">        (entity x time) by 1 stacked array of dependent</span>
+<span class="sd">        (entity x time) by 1 stacked array of the dependent variable.</span>
 <span class="sd">    x : ndarray</span>
-<span class="sd">        (entity x time) by variables stacked array of exogenous</span>
+<span class="sd">        (entity x time) by variables stacked array of the exogenous variables.</span>
 <span class="sd">    params : ndarray</span>
-<span class="sd">        variables by 1 array of estimated model parameters</span>
+<span class="sd">        Variables by 1 array of estimated model parameters.</span>
 <span class="sd">    entity_ids : ndarray</span>
-<span class="sd">        (entity x time) by 1 stacked array of entity ids</span>
+<span class="sd">        (entity x time) by 1 stacked array of entity ids.</span>
 <span class="sd">    time_ids : ndarray</span>
-<span class="sd">        (entity x time) by 1 stacked array of time ids</span>
-<span class="sd">    debiased : bool</span>
-<span class="sd">        Flag indicating whether to debias the estimator</span>
-<span class="sd">    extra_df : int</span>
+<span class="sd">        (entity x time) by 1 stacked array of time ids.</span>
+<span class="sd">    debiased : bool, optional</span>
+<span class="sd">        Flag indicating whether to debias the estimator. The default is False.</span>
+<span class="sd">    extra_df : int, optional</span>
 <span class="sd">        Additional degrees of freedom consumed by models beyond the number of</span>
-<span class="sd">        columns in x, e.g., fixed effects.  Covariance estimators are always</span>
-<span class="sd">        adjusted for extra_df irrespective of the setting of debiased</span>
-<span class="sd">    kernel : str</span>
-<span class="sd">        Name of one of the supported kernels. If None, uses the Newey-West</span>
-<span class="sd">        kernel.</span>
+<span class="sd">        columns in x, e.g., fixed effects. Covariance estimators are always</span>
+<span class="sd">        adjusted for extra_df irrespective of the setting of debiased. The</span>
+<span class="sd">        default is 0.</span>
+<span class="sd">    kernel : str, optional</span>
+<span class="sd">        Name of the kernel, one of "bartlett",</span>
+<span class="sd">        "newey-west", "quadratic-spectral", "qs", "andrews", "parzen" or "gallant". If</span>
+<span class="sd">        not provided, uses the Newey-West kernel.</span>
 <span class="sd">    bandwidth : float, optional</span>
 <span class="sd">        Non-negative bandwidth to use. The Bartlett and Parzen kernels use its</span>
 <span class="sd">        integer part. If not provided a rule-of-thumb value is used. It can be</span>
@@ -1117,6 +1162,10 @@
 
 <span class="sd">    Raises</span>
 <span class="sd">    ------</span>
+<span class="sd">    ValueError</span>
+<span class="sd">        If the model has no residual degrees of freedom: the number of</span>
+<span class="sd">        observations less ``extra_df``, and less the number of regressors if</span>
+<span class="sd">        ``debiased`` is True, is not positive.</span>
 <span class="sd">    UnknownOptionError</span>
 <span class="sd">        If ``kernel`` is not one of the supported names. It is both a</span>
 <span class="sd">        ``ValueError`` and a ``KeyError``.</span>
@@ -1157,9 +1206,8 @@
 <span class="sd">      \hat{S}_{i0} &amp; = \sum_{t=1}^{T_i} \xi'_{it} \xi_{it} \\</span>
 <span class="sd">      \hat{S}_{ij} &amp; = \sum_{t=1}^{T_i-j} \xi'_{it} \xi_{it+j} + \xi'_{it+j} \xi_{it}</span>
 
-
 <span class="sd">    where :math:`T_i` is the number of observations of entity :math:`i`, df is</span>
-<span class="sd">    ``extra_df`` and n-df is replace by n-df-k if ``debiased`` is ``True``.</span>
+<span class="sd">    ``extra_df`` and n-df is replaced by n-df-k if ``debiased`` is ``True``.</span>
 <span class="sd">    :math:`K(j, bw)` is the kernel weighting function, which is 1 for the lag 0.</span>
 <span class="sd">    The Bartlett and Parzen kernels are 0 for the lags above ``bandwidth``.</span>
 
@@ -1253,7 +1301,7 @@
 <a class="viewcode-back" href="../../../panel/panel/linearmodels.panel.covariance.ACCovariance.cov.html#linearmodels.panel.covariance.ACCovariance.cov">[docs]</a>
     <span class="nd">@cached_property</span>
     <span class="k">def</span><span class="w"> </span><span class="nf">cov</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">linearmodels</span><span class="o">.</span><span class="n">typing</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">Float64Array</span><span class="p">:</span>
-<span class="w">        </span><span class="sd">"""Estimated covariance"""</span>
+<span class="w">        </span><span class="sd">"""Estimated covariance."""</span>
         <span class="n">x</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_x</span>
         <span class="n">nobs</span> <span class="o">=</span> <span class="n">x</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
         <span class="n">xpxi</span> <span class="o">=</span> <span class="n">inv</span><span class="p">(</span><span class="n">x</span><span class="o">.</span><span class="n">T</span> <span class="o">@</span> <span class="n">x</span> <span class="o">/</span> <span class="n">nobs</span><span class="p">)</span>
@@ -1306,6 +1354,25 @@
 
 
 <span class="k">class</span><span class="w"> </span><span class="nc">CovarianceManager</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">"""</span>
+<span class="sd">    Look up the covariance estimators that a model supports.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    estimator : str</span>
+<span class="sd">        Name of the model, used in the error message when a covariance</span>
+<span class="sd">        estimator is not supported by the model.</span>
+<span class="sd">    *cov_estimators : type</span>
+<span class="sd">        The covariance estimator classes that the model supports.</span>
+
+<span class="sd">    Notes</span>
+<span class="sd">    -----</span>
+<span class="sd">    Indexing the manager with a ``cov_type`` name, e.g.,</span>
+<span class="sd">    ``manager["robust"]``, returns the covariance estimator class. It raises an</span>
+<span class="sd">    ``UnknownOptionError``, which is both a ``ValueError`` and a ``KeyError``,</span>
+<span class="sd">    if the name is unknown or the estimator is not supported by the model.</span>
+<span class="sd">    """</span>
+
     <span class="n">COVARIANCE_ESTIMATORS</span><span class="p">:</span> <span class="n">ClassVar</span><span class="p">[</span><span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">CovarianceEstimatorType</span><span class="p">]]</span> <span class="o">=</span> <span class="p">{</span>
         <span class="s2">"unadjusted"</span><span class="p">:</span> <span class="n">HomoskedasticCovariance</span><span class="p">,</span>
         <span class="s2">"conventional"</span><span class="p">:</span> <span class="n">HomoskedasticCovariance</span><span class="p">,</span>
@@ -1349,20 +1416,20 @@
 <a class="viewcode-back" href="../../../panel/panel/linearmodels.panel.covariance.FamaMacBethCovariance.html#linearmodels.panel.covariance.FamaMacBethCovariance">[docs]</a>
 <span class="k">class</span><span class="w"> </span><span class="nc">FamaMacBethCovariance</span><span class="p">(</span><span class="n">HomoskedasticCovariance</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">"""</span>
-<span class="sd">    HAC estimator for Fama-MacBeth estimator</span>
+<span class="sd">    HAC estimator for Fama-MacBeth estimator.</span>
 
 <span class="sd">    Parameters</span>
 <span class="sd">    ----------</span>
 <span class="sd">    y : ndarray</span>
-<span class="sd">        (entity x time) by 1 stacked array of dependent</span>
+<span class="sd">        (entity x time) by 1 stacked array of the dependent variable.</span>
 <span class="sd">    x : ndarray</span>
-<span class="sd">        (entity x time) by variables stacked array of exogenous</span>
+<span class="sd">        (entity x time) by variables stacked array of the exogenous variables.</span>
 <span class="sd">    params : ndarray</span>
-<span class="sd">        (variables by 1) array of estimated model parameters</span>
-<span class="sd">    all_params : ndarray</span>
-<span class="sd">        (nobs by variables) array of all estimated model parameters</span>
-<span class="sd">    debiased : bool</span>
-<span class="sd">        Flag indicating whether to debias the estimator.</span>
+<span class="sd">        (variables by 1) array of estimated model parameters.</span>
+<span class="sd">    all_params : DataFrame</span>
+<span class="sd">        (nobs by variables) array of all estimated model parameters.</span>
+<span class="sd">    debiased : bool, optional</span>
+<span class="sd">        Flag indicating whether to debias the estimator. The default is False.</span>
 <span class="sd">    bandwidth : float, optional</span>
 <span class="sd">        Non-negative bandwidth to use. It must be below T, the number of time</span>
 <span class="sd">        periods that are used. The Bartlett and Parzen kernels use its integer</span>
@@ -1371,9 +1438,10 @@
 <span class="sd">        needs at least 4 time periods with the Bartlett kernel, 5 with the Parzen</span>
 <span class="sd">        kernel and 6 with the quadratic spectral kernel. See</span>
 <span class="sd">        :func:`~linearmodels.iv.covariance.kernel_optimal_bandwidth`.</span>
-<span class="sd">    kernel : str</span>
-<span class="sd">        Name of one of the supported kernels. If None, uses the Newey-West</span>
-<span class="sd">        kernel.</span>
+<span class="sd">    kernel : str, optional</span>
+<span class="sd">        Name of one of the supported kernels, {"bartlett", "newey-west",</span>
+<span class="sd">        "quadratic-spectral", "qs", "andrews", "parzen", "gallant"}. If not</span>
+<span class="sd">        provided, uses the Newey-West kernel.</span>
 
 <span class="sd">    Raises</span>
 <span class="sd">    ------</span>
@@ -1472,7 +1540,7 @@
 <a class="viewcode-back" href="../../../panel/panel/linearmodels.panel.covariance.FamaMacBethCovariance.bandwidth.html#linearmodels.panel.covariance.FamaMacBethCovariance.bandwidth">[docs]</a>
     <span class="nd">@cached_property</span>
     <span class="k">def</span><span class="w"> </span><span class="nf">bandwidth</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">float</span><span class="p">:</span>
-<span class="w">        </span><span class="sd">"""Estimator bandwidth"""</span>
+<span class="w">        </span><span class="sd">"""Bandwidth of the kernel."""</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_bandwidth</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
             <span class="n">all_params</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">asarray</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_all_params</span><span class="p">)</span>
             <span class="n">e</span> <span class="o">=</span> <span class="n">all_params</span> <span class="o">-</span> <span class="bp">self</span><span class="o">.</span><span class="n">_params</span><span class="o">.</span><span class="n">T</span>
@@ -1500,7 +1568,7 @@
 <a class="viewcode-back" href="../../../panel/panel/linearmodels.panel.covariance.FamaMacBethCovariance.cov.html#linearmodels.panel.covariance.FamaMacBethCovariance.cov">[docs]</a>
     <span class="nd">@cached_property</span>
     <span class="k">def</span><span class="w"> </span><span class="nf">cov</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">linearmodels</span><span class="o">.</span><span class="n">typing</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">Float64Array</span><span class="p">:</span>
-<span class="w">        </span><span class="sd">"""Estimated covariance"""</span>
+<span class="w">        </span><span class="sd">"""Estimated covariance."""</span>
         <span class="n">e</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">asarray</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_all_params</span><span class="p">)</span> <span class="o">-</span> <span class="bp">self</span><span class="o">.</span><span class="n">_params</span><span class="o">.</span><span class="n">T</span>
         <span class="n">e</span> <span class="o">=</span> <span class="n">e</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">all</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">isfinite</span><span class="p">(</span><span class="n">e</span><span class="p">),</span> <span class="mi">1</span><span class="p">)]</span>
         <span class="n">nobs</span> <span class="o">=</span> <span class="n">e</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
@@ -1514,12 +1582,12 @@
     <span class="nd">@property</span>
     <span class="k">def</span><span class="w"> </span><span class="nf">all_params</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">DataFrame</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">"""</span>
-<span class="sd">        The set of parameters estimated for each of the time periods</span>
+<span class="sd">        The set of parameters estimated for each of the time periods.</span>
 
 <span class="sd">        Returns</span>
 <span class="sd">        -------</span>
 <span class="sd">        DataFrame</span>
-<span class="sd">            The parameters (nobs, nparam).</span>
+<span class="sd">            The parameters with shape (nobs, nparam).</span>
 <span class="sd">        """</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_all_params</span></div>
 
@@ -1538,6 +1606,55 @@
     <span class="n">extra_df</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">0</span><span class="p">,</span>
     <span class="o">**</span><span class="n">cov_config</span><span class="p">:</span> <span class="n">Any</span><span class="p">,</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">HomoskedasticCovariance</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">"""</span>
+<span class="sd">    Construct the covariance estimator for a ``cov_type``.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    cov_estimators : CovarianceManager</span>
+<span class="sd">        The manager of the covariance estimators that the model supports.</span>
+<span class="sd">    cov_type : str</span>
+<span class="sd">        Name of the covariance estimator, one of the names supported by</span>
+<span class="sd">        `cov_estimators`.</span>
+<span class="sd">    y : ndarray</span>
+<span class="sd">        (entity x time) by 1 stacked array of the dependent variable.</span>
+<span class="sd">    x : ndarray</span>
+<span class="sd">        (entity x time) by variables stacked array of the exogenous variables.</span>
+<span class="sd">    params : ndarray</span>
+<span class="sd">        Variables by 1 array of estimated model parameters.</span>
+<span class="sd">    entity_ids : ndarray</span>
+<span class="sd">        (entity x time) by 1 stacked array of entity ids.</span>
+<span class="sd">    time_ids : ndarray</span>
+<span class="sd">        (entity x time) by 1 stacked array of time ids.</span>
+<span class="sd">    debiased : bool, optional</span>
+<span class="sd">        Flag indicating whether to debias the estimator. The default is False.</span>
+<span class="sd">    extra_df : int, optional</span>
+<span class="sd">        Additional degrees of freedom consumed by models beyond the number of</span>
+<span class="sd">        columns in x. The default is 0.</span>
+<span class="sd">    **cov_config</span>
+<span class="sd">        Keyword arguments of the covariance estimator. The keys that are</span>
+<span class="sd">        allowed depend on the estimator: ``clusters`` and ``group_debias`` for</span>
+<span class="sd">        the clustered estimator, ``kernel`` and ``bandwidth`` for the</span>
+<span class="sd">        Driscoll-Kraay and autocorrelation robust estimators, and none for the</span>
+<span class="sd">        homoskedastic and heteroskedastic estimators.</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    HomoskedasticCovariance</span>
+<span class="sd">        The covariance estimator, an instance of the class that</span>
+<span class="sd">        `cov_type` selects, which is a subclass of</span>
+<span class="sd">        ``HomoskedasticCovariance``.</span>
+
+<span class="sd">    Raises</span>
+<span class="sd">    ------</span>
+<span class="sd">    UnknownOptionError</span>
+<span class="sd">        If `cov_type` is unknown or is not supported. It is both a</span>
+<span class="sd">        ``ValueError`` and a ``KeyError``.</span>
+<span class="sd">    ValueError</span>
+<span class="sd">        If `cov_config` contains a key that the estimator does not support.</span>
+<span class="sd">    TypeError</span>
+<span class="sd">        If a value of `cov_config` does not have the type that its key requires.</span>
+<span class="sd">    """</span>
     <span class="n">estimator</span> <span class="o">=</span> <span class="n">cov_estimators</span><span class="p">[</span><span class="n">cov_type</span><span class="p">]</span>
     <span class="n">unknown_kwargs</span> <span class="o">=</span> <span class="p">[</span>
         <span class="nb">str</span><span class="p">(</span><span class="n">key</span><span class="p">)</span> <span class="k">for</span> <span class="n">key</span> <span class="ow">in</span> <span class="n">cov_config</span> <span class="k">if</span> <span class="nb">str</span><span class="p">(</span><span class="n">key</span><span class="p">)</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">estimator</span><span class="o">.</span><span class="n">ALLOWED_KWARGS</span>

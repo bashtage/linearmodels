@@ -23,7 +23,7 @@
     
   
       
-        <title>Version 4 - linearmodels v7.1 (+513)</title>
+        <title>Version 4 - linearmodels v7.1 (+518)</title>
       
     
 
@@ -100,7 +100,7 @@
 
 <header class="md-header md-header--shadow" data-md-component="header">
   <nav class="md-header__inner md-grid" aria-label="Header">
-    <a href="../index.html" title="linearmodels v7.1 (+513)" class="md-header__button md-logo" aria-label="linearmodels v7.1 (+513)" data-md-component="logo">
+    <a href="../index.html" title="linearmodels v7.1 (+518)" class="md-header__button md-logo" aria-label="linearmodels v7.1 (+518)" data-md-component="logo">
       <img src="../_static/bw-logo.svg" alt="logo">
     </a>
     <label class="md-header__button md-icon" for="__drawer">
@@ -111,7 +111,7 @@
       <div class="md-header__ellipsis">
         <div class="md-header__topic">
           <span class="md-ellipsis">
-            linearmodels v7.1 (+513)
+            linearmodels v7.1 (+518)
           </span>
         </div>
         <div class="md-header__topic" data-md-component="header-topic">
@@ -206,10 +206,10 @@
 
 <nav class="md-nav md-nav--primary" aria-label="Navigation" data-md-level="0">
   <label class="md-nav__title" for="__drawer">
-    <a href="../index.html" title="linearmodels v7.1 (+513)" class="md-nav__button md-logo" aria-label="linearmodels v7.1 (+513)" data-md-component="logo">
+    <a href="../index.html" title="linearmodels v7.1 (+518)" class="md-nav__button md-logo" aria-label="linearmodels v7.1 (+518)" data-md-component="logo">
       <img src="../_static/bw-logo.svg" alt="logo">
     </a>
-    linearmodels v7.1 (+513)
+    linearmodels v7.1 (+518)
   </label>
   
     <div class="md-nav__source">
@@ -1500,8 +1500,8 @@ will return parameter estimates in the order <code class="docutils literal notra
 <h2 id="version-4-29">Version 4.29<a class="headerlink" href="#version-4-29" title="Link to this heading">¶</a></h2>
 <ul class="simple">
 <li><p>Added average <span class="math notranslate nohighlight">\(R^2\)</span> and average adjusted <span class="math notranslate nohighlight">\(R^2\)</span> properties to
-<a class="reference internal" href="../panel/panel/linearmodels.panel.results.FamaMacBethResults.html#linearmodels.panel.results.FamaMacBethResults" title="linearmodels.panel.results.FamaMacBethResults (Python class) — Results container for Fama MacBeth panel data models"><code class="xref py py-class docutils literal notranslate"><span class="pre">FamaMacBethResults</span></code></a> as
-<a class="reference internal" href="../panel/panel/linearmodels.panel.results.FamaMacBethResults.avg_rsquared.html#linearmodels.panel.results.FamaMacBethResults.avg_rsquared" title="linearmodels.panel.results.FamaMacBethResults.avg_rsquared (Python property) — The average coefficient of determination"><code class="xref py py-meth docutils literal notranslate"><span class="pre">avg_rsquared()</span></code></a> and
+<a class="reference internal" href="../panel/panel/linearmodels.panel.results.FamaMacBethResults.html#linearmodels.panel.results.FamaMacBethResults" title="linearmodels.panel.results.FamaMacBethResults (Python class) — Results container for Fama MacBeth panel data models."><code class="xref py py-class docutils literal notranslate"><span class="pre">FamaMacBethResults</span></code></a> as
+<a class="reference internal" href="../panel/panel/linearmodels.panel.results.FamaMacBethResults.avg_rsquared.html#linearmodels.panel.results.FamaMacBethResults.avg_rsquared" title="linearmodels.panel.results.FamaMacBethResults.avg_rsquared (Python property) — The average coefficient of determination."><code class="xref py py-meth docutils literal notranslate"><span class="pre">avg_rsquared()</span></code></a> and
 <a class="reference internal" href="../panel/panel/linearmodels.panel.results.FamaMacBethResults.avg_adj_rsquared.html#linearmodels.panel.results.FamaMacBethResults.avg_adj_rsquared" title="linearmodels.panel.results.FamaMacBethResults.avg_adj_rsquared (Python property) — The average coefficient of determination, adjusted for sample size."><code class="xref py py-meth docutils literal notranslate"><span class="pre">avg_adj_rsquared()</span></code></a>.</p></li>
 <li><p>Initial compatibility with pandas 2.0 Copy-on-Write feature.</p></li>
 </ul>
@@ -1537,11 +1537,11 @@ location.</p></li>
 <li><p>Improved the error message when dependent and exog have different numbers
 of observations</p></li>
 <li><p>Added formulaic as the preferred formula parser</p></li>
-<li><p>Fixed a bug in <a class="reference internal" href="../panel/panel/linearmodels.panel.covariance.ACCovariance.html#linearmodels.panel.covariance.ACCovariance" title="linearmodels.panel.covariance.ACCovariance (Python class) — Autocorrelation robust covariance estimation"><code class="xref py py-class docutils literal notranslate"><span class="pre">ACCovariance</span></code></a> estimator where the number of observations
+<li><p>Fixed a bug in <a class="reference internal" href="../panel/panel/linearmodels.panel.covariance.ACCovariance.html#linearmodels.panel.covariance.ACCovariance" title="linearmodels.panel.covariance.ACCovariance (Python class) — Autocorrelation robust covariance estimation."><code class="xref py py-class docutils literal notranslate"><span class="pre">ACCovariance</span></code></a> estimator where the number of observations
 was incorrectly overwritten</p></li>
-<li><p>Fixed a bug in <a class="reference internal" href="../panel/panel/linearmodels.panel.results.PanelResults.corr_squared_between.html#linearmodels.panel.results.PanelResults.corr_squared_between" title="linearmodels.panel.results.PanelResults.corr_squared_between (Python property) — Between Coefficient of determination using squared correlation"><code class="xref py py-func docutils literal notranslate"><span class="pre">linearmodels.panel.results.PanelResults.corr_squared_between()</span></code></a>,
-<a class="reference internal" href="../panel/panel/linearmodels.panel.results.PanelResults.corr_squared_overall.html#linearmodels.panel.results.PanelResults.corr_squared_overall" title="linearmodels.panel.results.PanelResults.corr_squared_overall (Python property) — Overall coefficient of determination using squared correlation"><code class="xref py py-func docutils literal notranslate"><span class="pre">linearmodels.panel.results.PanelResults.corr_squared_overall()</span></code></a>, and
-<a class="reference internal" href="../panel/panel/linearmodels.panel.results.PanelResults.corr_squared_within.html#linearmodels.panel.results.PanelResults.corr_squared_within" title="linearmodels.panel.results.PanelResults.corr_squared_within (Python property) — Within coefficient of determination using squared correlation"><code class="xref py py-func docutils literal notranslate"><span class="pre">linearmodels.panel.results.PanelResults.corr_squared_within()</span></code></a> where the correlation
+<li><p>Fixed a bug in <a class="reference internal" href="../panel/panel/linearmodels.panel.results.PanelResults.corr_squared_between.html#linearmodels.panel.results.PanelResults.corr_squared_between" title="linearmodels.panel.results.PanelResults.corr_squared_between (Python property) — Between coefficient of determination using squared correlation."><code class="xref py py-func docutils literal notranslate"><span class="pre">linearmodels.panel.results.PanelResults.corr_squared_between()</span></code></a>,
+<a class="reference internal" href="../panel/panel/linearmodels.panel.results.PanelResults.corr_squared_overall.html#linearmodels.panel.results.PanelResults.corr_squared_overall" title="linearmodels.panel.results.PanelResults.corr_squared_overall (Python property) — Overall coefficient of determination using squared correlation."><code class="xref py py-func docutils literal notranslate"><span class="pre">linearmodels.panel.results.PanelResults.corr_squared_overall()</span></code></a>, and
+<a class="reference internal" href="../panel/panel/linearmodels.panel.results.PanelResults.corr_squared_within.html#linearmodels.panel.results.PanelResults.corr_squared_within" title="linearmodels.panel.results.PanelResults.corr_squared_within (Python property) — Within coefficient of determination using squared correlation."><code class="xref py py-func docutils literal notranslate"><span class="pre">linearmodels.panel.results.PanelResults.corr_squared_within()</span></code></a> where the correlation
 was not squared.</p></li>
 </ul>
 <h2 id="version-4-24">Version 4.24<a class="headerlink" href="#version-4-24" title="Link to this heading">¶</a></h2>
@@ -1581,9 +1581,9 @@ deferring some operations.</p></li>
 used when the variables absorbed are categorical (i.e., fixed-effects only) and
 when the model is unweighted.</p></li>
 <li><p>Added alternative measures of <span class="math notranslate nohighlight">\(R^2\)</span> using the squared correlation. See
-<a class="reference internal" href="../panel/panel/linearmodels.panel.results.PanelResults.corr_squared_overall.html#linearmodels.panel.results.PanelResults.corr_squared_overall" title="linearmodels.panel.results.PanelResults.corr_squared_overall (Python property) — Overall coefficient of determination using squared correlation"><code class="xref py py-meth docutils literal notranslate"><span class="pre">corr_squared_overall()</span></code></a>,
-<a class="reference internal" href="../panel/panel/linearmodels.panel.results.PanelResults.corr_squared_within.html#linearmodels.panel.results.PanelResults.corr_squared_within" title="linearmodels.panel.results.PanelResults.corr_squared_within (Python property) — Within coefficient of determination using squared correlation"><code class="xref py py-meth docutils literal notranslate"><span class="pre">corr_squared_within()</span></code></a>, and
-<a class="reference internal" href="../panel/panel/linearmodels.panel.results.PanelResults.corr_squared_between.html#linearmodels.panel.results.PanelResults.corr_squared_between" title="linearmodels.panel.results.PanelResults.corr_squared_between (Python property) — Between Coefficient of determination using squared correlation"><code class="xref py py-meth docutils literal notranslate"><span class="pre">corr_squared_between()</span></code></a> (<a class="extlink-issue reference external" href="https://github.com/bashtage/linearmodels/issues/157">GH157</a>).</p></li>
+<a class="reference internal" href="../panel/panel/linearmodels.panel.results.PanelResults.corr_squared_overall.html#linearmodels.panel.results.PanelResults.corr_squared_overall" title="linearmodels.panel.results.PanelResults.corr_squared_overall (Python property) — Overall coefficient of determination using squared correlation."><code class="xref py py-meth docutils literal notranslate"><span class="pre">corr_squared_overall()</span></code></a>,
+<a class="reference internal" href="../panel/panel/linearmodels.panel.results.PanelResults.corr_squared_within.html#linearmodels.panel.results.PanelResults.corr_squared_within" title="linearmodels.panel.results.PanelResults.corr_squared_within (Python property) — Within coefficient of determination using squared correlation."><code class="xref py py-meth docutils literal notranslate"><span class="pre">corr_squared_within()</span></code></a>, and
+<a class="reference internal" href="../panel/panel/linearmodels.panel.results.PanelResults.corr_squared_between.html#linearmodels.panel.results.PanelResults.corr_squared_between" title="linearmodels.panel.results.PanelResults.corr_squared_between (Python property) — Between coefficient of determination using squared correlation."><code class="xref py py-meth docutils literal notranslate"><span class="pre">corr_squared_between()</span></code></a> (<a class="extlink-issue reference external" href="https://github.com/bashtage/linearmodels/issues/157">GH157</a>).</p></li>
 <li><p>Added a clustered covariance estimator
 (<a class="reference internal" href="../system/system/linearmodels.system.covariance.ClusteredCovariance.html#linearmodels.system.covariance.ClusteredCovariance" title="linearmodels.system.covariance.ClusteredCovariance (Python class) — Heteroskedastic covariance estimation for system regression"><code class="xref py py-class docutils literal notranslate"><span class="pre">linearmodels.system.covariance.ClusteredCovariance</span></code></a>) for system regressions
 (<a class="extlink-issue reference external" href="https://github.com/bashtage/linearmodels/issues/241">GH241</a>).</p></li>
@@ -1599,8 +1599,8 @@ for the Parzen and Quadratic Spectral kernels (<a class="extlink-issue reference
 <ul class="simple">
 <li><p>Verify typing using mypy (<a class="extlink-issue reference external" href="https://github.com/bashtage/linearmodels/issues/232">GH232</a>, <a class="extlink-issue reference external" href="https://github.com/bashtage/linearmodels/issues/234">GH234</a>, <a class="extlink-issue reference external" href="https://github.com/bashtage/linearmodels/issues/235">GH235</a>, <a class="extlink-issue reference external" href="https://github.com/bashtage/linearmodels/issues/238">GH238</a>).</p></li>
 <li><p>Added typing to all public-facing classes and methods (<a class="extlink-issue reference external" href="https://github.com/bashtage/linearmodels/issues/228">GH228</a>, <a class="extlink-issue reference external" href="https://github.com/bashtage/linearmodels/issues/229">GH229</a>).</p></li>
-<li><p>Added <a class="reference internal" href="../panel/panel/linearmodels.panel.results.FamaMacBethResults.html#linearmodels.panel.results.FamaMacBethResults" title="linearmodels.panel.results.FamaMacBethResults (Python class) — Results container for Fama MacBeth panel data models"><code class="xref py py-class docutils literal notranslate"><span class="pre">FamaMacBethResults</span></code></a> which has
-the property <a class="reference internal" href="../panel/panel/linearmodels.panel.results.FamaMacBethResults.all_params.html#linearmodels.panel.results.FamaMacBethResults.all_params" title="linearmodels.panel.results.FamaMacBethResults.all_params (Python property) — The set of parameters estimated for each of the time periods"><code class="xref py py-meth docutils literal notranslate"><span class="pre">all_params()</span></code></a>
+<li><p>Added <a class="reference internal" href="../panel/panel/linearmodels.panel.results.FamaMacBethResults.html#linearmodels.panel.results.FamaMacBethResults" title="linearmodels.panel.results.FamaMacBethResults (Python class) — Results container for Fama MacBeth panel data models."><code class="xref py py-class docutils literal notranslate"><span class="pre">FamaMacBethResults</span></code></a> which has
+the property <a class="reference internal" href="../panel/panel/linearmodels.panel.results.FamaMacBethResults.all_params.html#linearmodels.panel.results.FamaMacBethResults.all_params" title="linearmodels.panel.results.FamaMacBethResults.all_params (Python property) — The set of parameters estimated for each of the time periods."><code class="xref py py-meth docutils literal notranslate"><span class="pre">all_params()</span></code></a>
 that contains a (nobs, nparam) DataFrame of parameters estimated in each time
 period (<a class="extlink-issue reference external" href="https://github.com/bashtage/linearmodels/issues/230">GH230</a>).</p></li>
 </ul>
@@ -1624,18 +1624,18 @@ variables and has been tested using up to 1,000,000 categories in a data set
 with 5,000,000 observations.</p></li>
 <li><p>Fixed a bug when estimating weighted panel models that have repeated observations
 (i.e., more than one observation per entity and time id).</p></li>
-<li><p>Added <code class="docutils literal notranslate"><span class="pre">drop_absorbed</span></code> option to <a class="reference internal" href="../panel/panel/linearmodels.panel.model.PanelOLS.html#linearmodels.panel.model.PanelOLS" title="linearmodels.panel.model.PanelOLS (Python class) — One- and two-way fixed effects estimator for panel data"><code class="xref py py-class docutils literal notranslate"><span class="pre">PanelOLS</span></code></a>
+<li><p>Added <code class="docutils literal notranslate"><span class="pre">drop_absorbed</span></code> option to <a class="reference internal" href="../panel/panel/linearmodels.panel.model.PanelOLS.html#linearmodels.panel.model.PanelOLS" title="linearmodels.panel.model.PanelOLS (Python class) — One- and two-way fixed effects estimator for panel data."><code class="xref py py-class docutils literal notranslate"><span class="pre">PanelOLS</span></code></a>
 which automatically drops variables that are absorbed by fixed effects.
 (<a class="extlink-issue reference external" href="https://github.com/bashtage/linearmodels/issues/206">GH206</a>)</p></li>
 <li><p>Added optional Cythonized node selection for dropping singletons</p></li>
 <li><p>Added preconditioning to the dummy variable matrix when <code class="docutils literal notranslate"><span class="pre">use_lsmr-True</span></code>
-in <a class="reference internal" href="../panel/panel/linearmodels.panel.model.PanelOLS.fit.html#linearmodels.panel.model.PanelOLS.fit" title="linearmodels.panel.model.PanelOLS.fit (Python method) — Estimate model parameters"><code class="xref py py-func docutils literal notranslate"><span class="pre">fit()</span></code></a>. In models with many
+in <a class="reference internal" href="../panel/panel/linearmodels.panel.model.PanelOLS.fit.html#linearmodels.panel.model.PanelOLS.fit" title="linearmodels.panel.model.PanelOLS.fit (Python method) — Estimate model parameters."><code class="xref py py-func docutils literal notranslate"><span class="pre">fit()</span></code></a>. In models with many
 effects, this can reduce run time by a factor of 4 or more.</p></li>
 </ul>
 <h2 id="version-4-12">Version 4.12<a class="headerlink" href="#version-4-12" title="Link to this heading">¶</a></h2>
 <ul class="simple">
 <li><p>Added an option to drop singleton observations in
-<a class="reference internal" href="../panel/panel/linearmodels.panel.model.PanelOLS.html#linearmodels.panel.model.PanelOLS" title="linearmodels.panel.model.PanelOLS (Python class) — One- and two-way fixed effects estimator for panel data"><code class="xref py py-class docutils literal notranslate"><span class="pre">PanelOLS</span></code></a> by setting the keyword argument
+<a class="reference internal" href="../panel/panel/linearmodels.panel.model.PanelOLS.html#linearmodels.panel.model.PanelOLS" title="linearmodels.panel.model.PanelOLS (Python class) — One- and two-way fixed effects estimator for panel data."><code class="xref py py-class docutils literal notranslate"><span class="pre">PanelOLS</span></code></a> by setting the keyword argument
 <code class="docutils literal notranslate"><span class="pre">singletons-False</span></code>. When <code class="docutils literal notranslate"><span class="pre">False</span></code>, singleton observations are dropped
 before the model is fit, so the result is <em>as-if</em> the observations were
 never in <code class="docutils literal notranslate"><span class="pre">exog</span></code> or <code class="docutils literal notranslate"><span class="pre">dependent</span></code>.</p></li>
@@ -1643,26 +1643,26 @@ never in <code class="docutils literal notranslate"><span class="pre">exog</span
 allows singleton observations with no effect on estimated slopes to be
 excluded. (<a class="extlink-issue reference external" href="https://github.com/bashtage/linearmodels/issues/191">GH191</a>)</p></li>
 <li><p>Added support for LSMR estimation of parameters in
-<a class="reference internal" href="../panel/panel/linearmodels.panel.model.PanelOLS.fit.html#linearmodels.panel.model.PanelOLS.fit" title="linearmodels.panel.model.PanelOLS.fit (Python method) — Estimate model parameters"><code class="xref py py-func docutils literal notranslate"><span class="pre">fit()</span></code></a> through the keyword argument
+<a class="reference internal" href="../panel/panel/linearmodels.panel.model.PanelOLS.fit.html#linearmodels.panel.model.PanelOLS.fit" title="linearmodels.panel.model.PanelOLS.fit (Python method) — Estimate model parameters."><code class="xref py py-func docutils literal notranslate"><span class="pre">fit()</span></code></a> through the keyword argument
 <code class="docutils literal notranslate"><span class="pre">use_lsmr</span></code>. LSMR is a sparse estimation method that can be used to extend
-<a class="reference internal" href="../panel/panel/linearmodels.panel.model.PanelOLS.html#linearmodels.panel.model.PanelOLS" title="linearmodels.panel.model.PanelOLS (Python class) — One- and two-way fixed effects estimator for panel data"><code class="xref py py-class docutils literal notranslate"><span class="pre">PanelOLS</span></code></a> to more than two effects.</p></li>
+<a class="reference internal" href="../panel/panel/linearmodels.panel.model.PanelOLS.html#linearmodels.panel.model.PanelOLS" title="linearmodels.panel.model.PanelOLS (Python class) — One- and two-way fixed effects estimator for panel data."><code class="xref py py-class docutils literal notranslate"><span class="pre">PanelOLS</span></code></a> to more than two effects.</p></li>
 <li><p>Fixed a bug where IV models estimated with only exogenous regressors where
 not being correctly labeled as OLS models in output. (<a class="extlink-issue reference external" href="https://github.com/bashtage/linearmodels/issues/185">GH185</a>)</p></li>
 <li><p>Added <code class="docutils literal notranslate"><span class="pre">wald_test</span></code> to panel-model results.</p></li>
 <li><p>Renamed <code class="docutils literal notranslate"><span class="pre">test_linear_constraint</span></code> to <code class="docutils literal notranslate"><span class="pre">wald_test</span></code></p></li>
-<li><p>Added a low-memory option to <a class="reference internal" href="../panel/panel/linearmodels.panel.model.PanelOLS.fit.html#linearmodels.panel.model.PanelOLS.fit" title="linearmodels.panel.model.PanelOLS.fit (Python method) — Estimate model parameters"><code class="xref py py-func docutils literal notranslate"><span class="pre">fit()</span></code></a>
+<li><p>Added a low-memory option to <a class="reference internal" href="../panel/panel/linearmodels.panel.model.PanelOLS.fit.html#linearmodels.panel.model.PanelOLS.fit" title="linearmodels.panel.model.PanelOLS.fit (Python method) — Estimate model parameters."><code class="xref py py-func docutils literal notranslate"><span class="pre">fit()</span></code></a>
 that avoids constructing dummy variables. Only used when both <code class="docutils literal notranslate"><span class="pre">entity_effects</span></code>
 and <code class="docutils literal notranslate"><span class="pre">time_effects</span></code> are <code class="docutils literal notranslate"><span class="pre">True</span></code>. By default, the low memory algorithm will be
 used whenever constructing the dummy variable array would require more than
 1 GiB. (<a class="extlink-issue reference external" href="https://github.com/bashtage/linearmodels/issues/182">GH182</a>)</p></li>
 <li><p>Added an option in model comparison (<a class="reference internal" href="../iv/iv/linearmodels.iv.results.compare.html#linearmodels.iv.results.compare" title="linearmodels.iv.results.compare (Python function) — Compare the results of multiple models."><code class="xref py py-func docutils literal notranslate"><span class="pre">compare()</span></code></a> and
-<a class="reference internal" href="../panel/panel/linearmodels.panel.results.compare.html#linearmodels.panel.results.compare" title="linearmodels.panel.results.compare (Python function) — Compare the results of multiple models"><code class="xref py py-func docutils literal notranslate"><span class="pre">compare()</span></code></a>) to report standard errors or pvalues
+<a class="reference internal" href="../panel/panel/linearmodels.panel.results.compare.html#linearmodels.panel.results.compare" title="linearmodels.panel.results.compare (Python function) — Compare the results of multiple models."><code class="xref py py-func docutils literal notranslate"><span class="pre">compare()</span></code></a>) to report standard errors or pvalues
 instead of t-stats. (<a class="extlink-issue reference external" href="https://github.com/bashtage/linearmodels/issues/178">GH178</a>)</p></li>
 </ul>
 <h2 id="version-4-11">Version 4.11<a class="headerlink" href="#version-4-11" title="Link to this heading">¶</a></h2>
 <ul class="simple">
 <li><p>Fixed a bug which did not correctly check the rank of the
-cross-section regression in <a class="reference internal" href="../panel/panel/linearmodels.panel.model.FamaMacBeth.html#linearmodels.panel.model.FamaMacBeth" title="linearmodels.panel.model.FamaMacBeth (Python class) — Pooled coefficient estimator for panel data"><code class="xref py py-class docutils literal notranslate"><span class="pre">FamaMacBeth</span></code></a> (<a class="extlink-issue reference external" href="https://github.com/bashtage/linearmodels/issues/176">GH176</a>)</p></li>
+cross-section regression in <a class="reference internal" href="../panel/panel/linearmodels.panel.model.FamaMacBeth.html#linearmodels.panel.model.FamaMacBeth" title="linearmodels.panel.model.FamaMacBeth (Python class) — Fama-MacBeth estimator for panel data."><code class="xref py py-class docutils literal notranslate"><span class="pre">FamaMacBeth</span></code></a> (<a class="extlink-issue reference external" href="https://github.com/bashtage/linearmodels/issues/176">GH176</a>)</p></li>
 <li><p>Fixed a bug which failed to correctly check rank conditions when
 specifying asset pricing models (<a class="extlink-issue reference external" href="https://github.com/bashtage/linearmodels/issues/173">GH173</a>)</p></li>
 <li><p>Switched to external package cached-property to manage caching instead of
@@ -1681,7 +1681,7 @@ invalid to <code class="docutils literal notranslate"><span class="pre">InvalidT
 <li><p>Allow optimization parameters to be passed to <a class="reference internal" href="../iv/iv/linearmodels.iv.model.IVGMMCUE.html#linearmodels.iv.model.IVGMMCUE" title="linearmodels.iv.model.IVGMMCUE (Python class) — Estimation of IV models using continuously updating GMM."><code class="xref py py-class docutils literal notranslate"><span class="pre">IVGMMCUE</span></code></a></p></li>
 <li><p>Removed internal use of pandas Panel</p></li>
 <li><p>Improved performance in panel models when using
-<a class="reference internal" href="../panel/panel/linearmodels.panel.model.PanelOLS.from_formula.html#linearmodels.panel.model.PanelOLS.from_formula" title="linearmodels.panel.model.PanelOLS.from_formula (Python method) — Create a model from a formula"><code class="xref py py-func docutils literal notranslate"><span class="pre">from_formula()</span></code></a></p></li>
+<a class="reference internal" href="../panel/panel/linearmodels.panel.model.PanelOLS.from_formula.html#linearmodels.panel.model.PanelOLS.from_formula" title="linearmodels.panel.model.PanelOLS.from_formula (Python method) — Create a model from a formula."><code class="xref py py-func docutils literal notranslate"><span class="pre">from_formula()</span></code></a></p></li>
 <li><p>Switched to retaining index column names when original input index is named</p></li>
 <li><p>Modified tests that were not well conceived</p></li>
 <li><p>Added spell check to documentation build</p></li>

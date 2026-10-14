@@ -19,7 +19,7 @@
     
   
       
-        <title>linearmodels.panel.data - linearmodels v7.1 (+513)</title>
+        <title>linearmodels.panel.data - linearmodels v7.1 (+518)</title>
       
     
 
@@ -91,7 +91,7 @@
 
 <header class="md-header md-header--shadow" data-md-component="header">
   <nav class="md-header__inner md-grid" aria-label="Header">
-    <a href="../../../index.html" title="linearmodels v7.1 (+513)" class="md-header__button md-logo" aria-label="linearmodels v7.1 (+513)" data-md-component="logo">
+    <a href="../../../index.html" title="linearmodels v7.1 (+518)" class="md-header__button md-logo" aria-label="linearmodels v7.1 (+518)" data-md-component="logo">
       <img src="../../../_static/bw-logo.svg" alt="logo">
     </a>
     <label class="md-header__button md-icon" for="__drawer">
@@ -102,7 +102,7 @@
       <div class="md-header__ellipsis">
         <div class="md-header__topic">
           <span class="md-ellipsis">
-            linearmodels v7.1 (+513)
+            linearmodels v7.1 (+518)
           </span>
         </div>
         <div class="md-header__topic" data-md-component="header-topic">
@@ -197,10 +197,10 @@
 
 <nav class="md-nav md-nav--primary" aria-label="Navigation" data-md-level="0">
   <label class="md-nav__title" for="__drawer">
-    <a href="../../../index.html" title="linearmodels v7.1 (+513)" class="md-nav__button md-logo" aria-label="linearmodels v7.1 (+513)" data-md-component="logo">
+    <a href="../../../index.html" title="linearmodels v7.1 (+518)" class="md-nav__button md-logo" aria-label="linearmodels v7.1 (+518)" data-md-component="logo">
       <img src="../../../_static/bw-logo.svg" alt="logo">
     </a>
-    linearmodels v7.1 (+513)
+    linearmodels v7.1 (+518)
   </label>
   
     <div class="md-nav__source">
@@ -527,7 +527,9 @@
 
 
 <h1>Source code for linearmodels.panel.data</h1><div class="highlight"><pre>
-<span></span><code><span class="kn">from</span><span class="w"> </span><span class="nn">__future__</span><span class="w"> </span><span class="kn">import</span> <span class="n">annotations</span>
+<span></span><code><span class="sd">"""Data container that handles the formats of panel data."""</span>
+
+<span class="kn">from</span><span class="w"> </span><span class="nn">__future__</span><span class="w"> </span><span class="kn">import</span> <span class="n">annotations</span>
 
 <span class="kn">from</span><span class="w"> </span><span class="nn">linearmodels.compat.pandas</span><span class="w"> </span><span class="kn">import</span> <span class="n">PD_GTE_21</span>
 
@@ -568,7 +570,7 @@
 <span class="sd">    Parameters</span>
 <span class="sd">    ----------</span>
 <span class="sd">    df : DataFrame</span>
-<span class="sd">        MultiIndex DataFrame containing floats</span>
+<span class="sd">        MultiIndex DataFrame containing floats.</span>
 
 <span class="sd">    Notes</span>
 <span class="sd">    -----</span>
@@ -604,6 +606,25 @@
         <span class="n">major_axis</span><span class="p">:</span> <span class="n">Sequence</span><span class="p">[</span><span class="n">linearmodels</span><span class="o">.</span><span class="n">typing</span><span class="o">.</span><span class="n">Label</span><span class="p">],</span>
         <span class="n">minor_axis</span><span class="p">:</span> <span class="n">Sequence</span><span class="p">[</span><span class="n">linearmodels</span><span class="o">.</span><span class="n">typing</span><span class="o">.</span><span class="n">Label</span><span class="p">],</span>
     <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">_Panel</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">"""</span>
+<span class="sd">        Construct a panel from a 3-d array.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        values : ndarray</span>
+<span class="sd">            Array with shape (nitems, nmajor, nminor).</span>
+<span class="sd">        items : sequence of Label</span>
+<span class="sd">            The names of the items, which are the variables.</span>
+<span class="sd">        major_axis : sequence of Label</span>
+<span class="sd">            The labels of the major axis, which is time.</span>
+<span class="sd">        minor_axis : sequence of Label</span>
+<span class="sd">            The labels of the minor axis, which is the entity.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        _Panel</span>
+<span class="sd">            The panel with the data of the array.</span>
+<span class="sd">        """</span>
         <span class="n">index</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="n">product</span><span class="p">(</span><span class="n">minor_axis</span><span class="p">,</span> <span class="n">major_axis</span><span class="p">))</span>
         <span class="n">multi_index</span> <span class="o">=</span> <span class="n">MultiIndex</span><span class="o">.</span><span class="n">from_tuples</span><span class="p">(</span><span class="n">index</span><span class="p">)</span>
         <span class="n">i</span><span class="p">,</span> <span class="n">j</span><span class="p">,</span> <span class="n">k</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">items</span><span class="p">),</span> <span class="nb">len</span><span class="p">(</span><span class="n">major_axis</span><span class="p">),</span> <span class="nb">len</span><span class="p">(</span><span class="n">minor_axis</span><span class="p">)</span>
@@ -616,33 +637,63 @@
 
     <span class="nd">@property</span>
     <span class="k">def</span><span class="w"> </span><span class="nf">shape</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">tuple</span><span class="p">[</span><span class="nb">int</span><span class="p">,</span> <span class="nb">int</span><span class="p">,</span> <span class="nb">int</span><span class="p">]:</span>
+<span class="w">        </span><span class="sd">"""Shape of the panel, (nitems, nmajor, nminor)."""</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_shape</span>
 
     <span class="nd">@property</span>
     <span class="k">def</span><span class="w"> </span><span class="nf">items</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Index</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">"""Names of the items, which are the variables."""</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_items</span>
 
     <span class="nd">@property</span>
     <span class="k">def</span><span class="w"> </span><span class="nf">major_axis</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Index</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">"""Labels of the major axis, which is time."""</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_major_axis</span>
 
     <span class="nd">@property</span>
     <span class="k">def</span><span class="w"> </span><span class="nf">minor_axis</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Index</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">"""Labels of the minor axis, which is the entity."""</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_minor_axis</span>
 
     <span class="nd">@property</span>
     <span class="k">def</span><span class="w"> </span><span class="nf">values</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">linearmodels</span><span class="o">.</span><span class="n">typing</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">Float64Array</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">"""Values of the panel with shape (nitems, nmajor, nminor)."""</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_values</span>
 
 <div class="viewcode-block" id="_Panel.to_frame">
 <a class="viewcode-back" href="../../../panel/panel/linearmodels.panel.data._Panel.to_frame.html#linearmodels.panel.data._Panel.to_frame">[docs]</a>
     <span class="k">def</span><span class="w"> </span><span class="nf">to_frame</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">DataFrame</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">"""</span>
+<span class="sd">        Return the data as a DataFrame with a 2-level MultiIndex.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        DataFrame</span>
+<span class="sd">            The data with the entity and the time as the index levels, which</span>
+<span class="sd">            has a row for each combination of an entity and a time period.</span>
+<span class="sd">        """</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_frame</span></div>
 </div>
 
 
 
 <span class="k">def</span><span class="w"> </span><span class="nf">convert_columns</span><span class="p">(</span><span class="n">s</span><span class="p">:</span> <span class="n">Series</span><span class="p">,</span> <span class="n">drop_first</span><span class="p">:</span> <span class="nb">bool</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">linearmodels</span><span class="o">.</span><span class="n">typing</span><span class="o">.</span><span class="n">AnyPandas</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">"""</span>
+<span class="sd">    Convert a string or categorical Series to dummy variables.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    s : Series</span>
+<span class="sd">        The data of one variable.</span>
+<span class="sd">    drop_first : bool</span>
+<span class="sd">        Flag indicating whether to drop the dummy of the first category.</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    Series or DataFrame</span>
+<span class="sd">        A DataFrame of dummy variables, named ``name.category``, if s contains</span>
+<span class="sd">        strings or is categorical. Otherwise, s.</span>
+<span class="sd">    """</span>
     <span class="k">if</span> <span class="n">is_string_dtype</span><span class="p">(</span><span class="n">s</span><span class="o">.</span><span class="n">dtype</span><span class="p">)</span> <span class="ow">and</span> <span class="n">s</span><span class="o">.</span><span class="n">map</span><span class="p">(</span><span class="k">lambda</span> <span class="n">v</span><span class="p">:</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">v</span><span class="p">,</span> <span class="nb">str</span><span class="p">))</span><span class="o">.</span><span class="n">all</span><span class="p">():</span>
         <span class="n">s</span> <span class="o">=</span> <span class="n">s</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="s2">"category"</span><span class="p">)</span>
 
@@ -655,6 +706,23 @@
 
 
 <span class="k">def</span><span class="w"> </span><span class="nf">expand_categoricals</span><span class="p">(</span><span class="n">x</span><span class="p">:</span> <span class="n">DataFrame</span><span class="p">,</span> <span class="n">drop_first</span><span class="p">:</span> <span class="nb">bool</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">DataFrame</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">"""</span>
+<span class="sd">    Convert the string and categorical columns of a DataFrame to dummy variables.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    x : DataFrame</span>
+<span class="sd">        The data.</span>
+<span class="sd">    drop_first : bool</span>
+<span class="sd">        Flag indicating whether to drop the dummy of the first category of each</span>
+<span class="sd">        variable.</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    DataFrame</span>
+<span class="sd">        The data with dummy variables in place of the string and categorical</span>
+<span class="sd">        columns.</span>
+<span class="sd">    """</span>
     <span class="k">if</span> <span class="n">x</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
         <span class="c1"># Nothing to convert, and concat needs an object</span>
         <span class="k">return</span> <span class="n">x</span>
@@ -667,7 +735,7 @@
 <a class="viewcode-back" href="../../../panel/panel/linearmodels.panel.data.PanelData.html#linearmodels.panel.data.PanelData">[docs]</a>
 <span class="k">class</span><span class="w"> </span><span class="nc">PanelData</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">"""</span>
-<span class="sd">    Abstraction to handle alternative formats for panel data</span>
+<span class="sd">    Abstraction to handle alternative formats for panel data.</span>
 
 <span class="sd">    Parameters</span>
 <span class="sd">    ----------</span>
@@ -675,17 +743,29 @@
 <span class="sd">        Input data. A list or a tuple raises a ``TypeError``, since the layout</span>
 <span class="sd">        of the data would not be known. A ``TypeError`` is also raised if the</span>
 <span class="sd">        data are complex or cannot be converted to float64.</span>
-<span class="sd">    var_name : str</span>
+<span class="sd">    var_name : str, optional</span>
 <span class="sd">        Variable name to use when naming variables in NumPy arrays or</span>
-<span class="sd">        xarray DataArrays</span>
-<span class="sd">    convert_dummies : bool</span>
-<span class="sd">        Flat indicating whether pandas categoricals or string input data</span>
-<span class="sd">        should be converted to dummy variables</span>
-<span class="sd">    drop_first : bool</span>
-<span class="sd">        Flag indicating to drop first dummy category when converting</span>
-<span class="sd">    copy : bool</span>
+<span class="sd">        xarray DataArrays. The default is ``"x"``.</span>
+<span class="sd">    convert_dummies : bool, optional</span>
+<span class="sd">        Flag indicating whether pandas categoricals or string input data</span>
+<span class="sd">        should be converted to dummy variables. The default is True.</span>
+<span class="sd">    drop_first : bool, optional</span>
+<span class="sd">        Flag indicating to drop first dummy category when converting. The</span>
+<span class="sd">        default is True.</span>
+<span class="sd">    copy : bool, optional</span>
 <span class="sd">        Flag indicating whether to copy the input. Only has an effect when</span>
-<span class="sd">        x is a DataFrame</span>
+<span class="sd">        x is a DataFrame with a MultiIndex. The default is True.</span>
+
+<span class="sd">    Raises</span>
+<span class="sd">    ------</span>
+<span class="sd">    TypeError</span>
+<span class="sd">        If the input type is not supported, or if it is complex or cannot be</span>
+<span class="sd">        converted to float64.</span>
+<span class="sd">    ValueError</span>
+<span class="sd">        If the input has the wrong number of dimensions or a MultiIndex</span>
+<span class="sd">        DataFrame does not have 2 levels, if the time labels are neither</span>
+<span class="sd">        numbers nor dates, or if a combination of an entity and a time</span>
+<span class="sd">        period appears more than once.</span>
 
 <span class="sd">    Notes</span>
 <span class="sd">    -----</span>
@@ -729,16 +809,6 @@
 <span class="sd">       observations. A ``PeriodIndex`` of time labels is accepted. Earlier</span>
 <span class="sd">       versions raised a ``ValueError`` that the time labels must be numeric or</span>
 <span class="sd">       date-like.</span>
-
-<span class="sd">    Raises</span>
-<span class="sd">    ------</span>
-<span class="sd">    TypeError</span>
-<span class="sd">        If the input type is not supported</span>
-<span class="sd">    ValueError</span>
-<span class="sd">        If the input has the wrong number of dimensions or a MultiIndex</span>
-<span class="sd">        DataFrame does not have 2 levels, if the time labels are neither</span>
-<span class="sd">        numbers nor dates, or if a combination of an entity and a time</span>
-<span class="sd">        period appears more than once</span>
 <span class="sd">    """</span>
 
     <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span>
@@ -901,7 +971,7 @@
 
     <span class="nd">@property</span>
     <span class="k">def</span><span class="w"> </span><span class="nf">panel</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">_Panel</span><span class="p">:</span>
-<span class="w">        </span><span class="sd">"""pandas Panel view of data"""</span>
+<span class="w">        </span><span class="sd">"""Panel view of the data, a legacy shim of the pandas Panel."""</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_panel</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">_check_index</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">_panel</span> <span class="o">=</span> <span class="n">_Panel</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_frame</span><span class="p">)</span>
@@ -910,17 +980,17 @@
 
     <span class="nd">@property</span>
     <span class="k">def</span><span class="w"> </span><span class="nf">dataframe</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">DataFrame</span><span class="p">:</span>
-<span class="w">        </span><span class="sd">"""pandas DataFrame view of data"""</span>
+<span class="w">        </span><span class="sd">"""DataFrame view of the data."""</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_frame</span>
 
     <span class="nd">@property</span>
     <span class="k">def</span><span class="w"> </span><span class="nf">values2d</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">linearmodels</span><span class="o">.</span><span class="n">typing</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">AnyArray</span><span class="p">:</span>
-<span class="w">        </span><span class="sd">"""NumPy ndarray view of dataframe"""</span>
+<span class="w">        </span><span class="sd">"""NumPy ndarray view of the DataFrame."""</span>
         <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">require</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_frame</span><span class="p">,</span> <span class="n">requirements</span><span class="o">=</span><span class="s2">"W"</span><span class="p">)</span>
 
     <span class="nd">@property</span>
     <span class="k">def</span><span class="w"> </span><span class="nf">values3d</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">linearmodels</span><span class="o">.</span><span class="n">typing</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">AnyArray</span><span class="p">:</span>
-<span class="w">        </span><span class="sd">"""NumPy ndarray view of panel"""</span>
+<span class="w">        </span><span class="sd">"""NumPy ndarray view of the panel with shape (nvar, nobs, nentity)."""</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">panel</span><span class="o">.</span><span class="n">values</span>
 
 <div class="viewcode-block" id="PanelData.drop">
@@ -931,9 +1001,9 @@
 
 <span class="sd">        Parameters</span>
 <span class="sd">        ----------</span>
-<span class="sd">        locs : ndarray</span>
+<span class="sd">        locs : Series or ndarray</span>
 <span class="sd">            Boolean array indicating observations to drop with reference to</span>
-<span class="sd">            the dataframe view of the data</span>
+<span class="sd">            the dataframe view of the data.</span>
 <span class="sd">        """</span>
         <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">locs</span><span class="p">,</span> <span class="n">Series</span><span class="p">):</span>
             <span class="n">locs</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">asarray</span><span class="p">(</span><span class="n">locs</span><span class="p">)</span>
@@ -946,7 +1016,7 @@
 
     <span class="nd">@property</span>
     <span class="k">def</span><span class="w"> </span><span class="nf">shape</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">tuple</span><span class="p">[</span><span class="nb">int</span><span class="p">,</span> <span class="nb">int</span><span class="p">,</span> <span class="nb">int</span><span class="p">]:</span>
-<span class="w">        </span><span class="sd">"""Shape of panel view of data"""</span>
+<span class="w">        </span><span class="sd">"""Shape of the panel view of the data, (nvar, nobs, nentity)."""</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_shape</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
             <span class="n">k</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_frame</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span>
             <span class="n">index</span><span class="p">:</span> <span class="n">Index</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_frame</span><span class="o">.</span><span class="n">index</span>
@@ -957,43 +1027,43 @@
 
     <span class="nd">@property</span>
     <span class="k">def</span><span class="w"> </span><span class="nf">ndim</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">int</span><span class="p">:</span>
-<span class="w">        </span><span class="sd">"""Number of dimensions of panel view of data"""</span>
+<span class="w">        </span><span class="sd">"""Number of dimensions of the panel view of the data."""</span>
         <span class="k">return</span> <span class="mi">3</span>
 
     <span class="nd">@property</span>
     <span class="k">def</span><span class="w"> </span><span class="nf">isnull</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Series</span><span class="p">:</span>
-<span class="w">        </span><span class="sd">"""Locations with missing observations"""</span>
+<span class="w">        </span><span class="sd">"""Locations with missing observations."""</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_frame</span><span class="o">.</span><span class="n">isnull</span><span class="p">()</span><span class="o">.</span><span class="n">any</span><span class="p">(</span><span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
 
     <span class="nd">@property</span>
     <span class="k">def</span><span class="w"> </span><span class="nf">nobs</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">int</span><span class="p">:</span>
-<span class="w">        </span><span class="sd">"""Number of time observations"""</span>
+<span class="w">        </span><span class="sd">"""Number of time observations."""</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_t</span>
 
     <span class="nd">@property</span>
     <span class="k">def</span><span class="w"> </span><span class="nf">nvar</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">int</span><span class="p">:</span>
-<span class="w">        </span><span class="sd">"""Number of variables"""</span>
+<span class="w">        </span><span class="sd">"""Number of variables."""</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_k</span>
 
     <span class="nd">@property</span>
     <span class="k">def</span><span class="w"> </span><span class="nf">nentity</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">int</span><span class="p">:</span>
-<span class="w">        </span><span class="sd">"""Number of entities"""</span>
+<span class="w">        </span><span class="sd">"""Number of entities."""</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_n</span>
 
     <span class="nd">@property</span>
     <span class="k">def</span><span class="w"> </span><span class="nf">vars</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">list</span><span class="p">[</span><span class="n">linearmodels</span><span class="o">.</span><span class="n">typing</span><span class="o">.</span><span class="n">Label</span><span class="p">]:</span>
-<span class="w">        </span><span class="sd">"""List of variable names"""</span>
+<span class="w">        </span><span class="sd">"""List of variable names."""</span>
         <span class="k">return</span> <span class="nb">list</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_frame</span><span class="o">.</span><span class="n">columns</span><span class="p">)</span>
 
     <span class="nd">@property</span>
     <span class="k">def</span><span class="w"> </span><span class="nf">time</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">list</span><span class="p">[</span><span class="n">linearmodels</span><span class="o">.</span><span class="n">typing</span><span class="o">.</span><span class="n">Label</span><span class="p">]:</span>
-<span class="w">        </span><span class="sd">"""List of time index names"""</span>
+<span class="w">        </span><span class="sd">"""List of time index labels."""</span>
         <span class="n">index</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">index</span>
         <span class="k">return</span> <span class="nb">list</span><span class="p">(</span><span class="n">index</span><span class="o">.</span><span class="n">levels</span><span class="p">[</span><span class="mi">1</span><span class="p">][</span><span class="n">index</span><span class="o">.</span><span class="n">codes</span><span class="p">[</span><span class="mi">1</span><span class="p">]]</span><span class="o">.</span><span class="n">unique</span><span class="p">())</span>
 
     <span class="nd">@property</span>
     <span class="k">def</span><span class="w"> </span><span class="nf">entities</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">list</span><span class="p">[</span><span class="n">linearmodels</span><span class="o">.</span><span class="n">typing</span><span class="o">.</span><span class="n">Label</span><span class="p">]:</span>
-<span class="w">        </span><span class="sd">"""List of entity index names"""</span>
+<span class="w">        </span><span class="sd">"""List of entity index labels."""</span>
         <span class="n">index</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">index</span>
         <span class="k">return</span> <span class="nb">list</span><span class="p">(</span><span class="n">index</span><span class="o">.</span><span class="n">levels</span><span class="p">[</span><span class="mi">0</span><span class="p">][</span><span class="n">index</span><span class="o">.</span><span class="n">codes</span><span class="p">[</span><span class="mi">0</span><span class="p">]]</span><span class="o">.</span><span class="n">unique</span><span class="p">())</span>
 
@@ -1024,12 +1094,12 @@
     <span class="nd">@property</span>
     <span class="k">def</span><span class="w"> </span><span class="nf">entity_ids</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">linearmodels</span><span class="o">.</span><span class="n">typing</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">AnyIntArray</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">"""</span>
-<span class="sd">        Get array containing entity group membership information</span>
+<span class="sd">        Get array containing entity group membership information.</span>
 
 <span class="sd">        Returns</span>
 <span class="sd">        -------</span>
 <span class="sd">        ndarray</span>
-<span class="sd">            2d array containing entity ids corresponding dataframe view</span>
+<span class="sd">            2d array containing entity ids corresponding to the dataframe view.</span>
 <span class="sd">        """</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_check_index</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>
         <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">asarray</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">index</span><span class="o">.</span><span class="n">codes</span><span class="p">[</span><span class="mi">0</span><span class="p">])[:,</span> <span class="kc">None</span><span class="p">]</span>
@@ -1037,12 +1107,12 @@
     <span class="nd">@property</span>
     <span class="k">def</span><span class="w"> </span><span class="nf">time_ids</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">linearmodels</span><span class="o">.</span><span class="n">typing</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">AnyIntArray</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">"""</span>
-<span class="sd">        Get array containing time membership information</span>
+<span class="sd">        Get array containing time membership information.</span>
 
 <span class="sd">        Returns</span>
 <span class="sd">        -------</span>
 <span class="sd">        ndarray</span>
-<span class="sd">            2d array containing time ids corresponding dataframe view</span>
+<span class="sd">            2d array containing time ids corresponding to the dataframe view.</span>
 <span class="sd">        """</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_check_index</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span>
         <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">asarray</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">index</span><span class="o">.</span><span class="n">codes</span><span class="p">[</span><span class="mi">1</span><span class="p">])[:,</span> <span class="kc">None</span><span class="p">]</span>
@@ -1057,12 +1127,17 @@
 
     <span class="k">def</span><span class="w"> </span><span class="nf">_demean_both</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">weights</span><span class="p">:</span> <span class="n">PanelData</span> <span class="o">|</span> <span class="kc">None</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">PanelData</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">"""</span>
-<span class="sd">        Entity and time demean</span>
+<span class="sd">        Entity and time demean.</span>
 
 <span class="sd">        Parameters</span>
 <span class="sd">        ----------</span>
-<span class="sd">        weights : PanelData</span>
-<span class="sd">             Weights to use in demeaning</span>
+<span class="sd">        weights : PanelData or None</span>
+<span class="sd">            Weights to use in demeaning.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        PanelData</span>
+<span class="sd">            The data demeaned by entity and by time.</span>
 <span class="sd">        """</span>
         <span class="n">group</span><span class="p">:</span> <span class="n">Literal</span><span class="p">[</span><span class="s2">"entity"</span><span class="p">,</span> <span class="s2">"time"</span><span class="p">]</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">nentity</span> <span class="o">&gt;</span> <span class="bp">self</span><span class="o">.</span><span class="n">nobs</span><span class="p">:</span>
@@ -1094,23 +1169,25 @@
         <span class="bp">self</span><span class="p">,</span> <span class="n">groups</span><span class="p">:</span> <span class="n">PanelDataLike</span><span class="p">,</span> <span class="n">weights</span><span class="p">:</span> <span class="n">PanelData</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span>
     <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">PanelData</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">"""</span>
-<span class="sd">        Multi-way demeaning using only groupby</span>
+<span class="sd">        Multi-way demeaning using only groupby.</span>
 
 <span class="sd">        Parameters</span>
 <span class="sd">        ----------</span>
-<span class="sd">        groups : PanelData</span>
-<span class="sd">            Arrays with the same size containing group identifiers</span>
-<span class="sd">        weights : PanelData</span>
-<span class="sd">            Weights to use in the weighted demeaning</span>
+<span class="sd">        groups : PanelData or array_like</span>
+<span class="sd">            Arrays with the same size containing group identifiers. Input that</span>
+<span class="sd">            is not a PanelData is converted with ``PanelData``.</span>
+<span class="sd">        weights : PanelData, optional</span>
+<span class="sd">            Weights to use in the weighted demeaning. If not provided, the</span>
+<span class="sd">            observations have equal weights.</span>
 
 <span class="sd">        Returns</span>
 <span class="sd">        -------</span>
 <span class="sd">        PanelData</span>
-<span class="sd">            Weighted, demeaned data according to groups</span>
+<span class="sd">            Weighted, demeaned data according to groups.</span>
 
 <span class="sd">        Notes</span>
 <span class="sd">        -----</span>
-<span class="sd">        Iterates until convergence</span>
+<span class="sd">        Iterates until convergence.</span>
 <span class="sd">        """</span>
         <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">groups</span><span class="p">,</span> <span class="n">PanelData</span><span class="p">):</span>
             <span class="n">groups</span> <span class="o">=</span> <span class="n">PanelData</span><span class="p">(</span><span class="n">groups</span><span class="p">)</span>
@@ -1196,7 +1273,7 @@
 
 
     <span class="nd">@overload</span>
-    <span class="k">def</span><span class="w"> </span><span class="nf">demean</span><span class="p">(</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">demean</span><span class="p">(</span>  <span class="c1"># numpydoc ignore=GL08</span>
         <span class="bp">self</span><span class="p">,</span>
         <span class="n">group</span><span class="p">:</span> <span class="n">Literal</span><span class="p">[</span><span class="s2">"entity"</span><span class="p">,</span> <span class="s2">"time"</span><span class="p">,</span> <span class="s2">"both"</span><span class="p">],</span>
         <span class="o">*</span><span class="p">,</span>
@@ -1204,7 +1281,7 @@
     <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">linearmodels</span><span class="o">.</span><span class="n">typing</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">Float64Array</span><span class="p">:</span> <span class="o">...</span>
 
     <span class="nd">@overload</span>
-    <span class="k">def</span><span class="w"> </span><span class="nf">demean</span><span class="p">(</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">demean</span><span class="p">(</span>  <span class="c1"># numpydoc ignore=GL08</span>
         <span class="bp">self</span><span class="p">,</span>
         <span class="n">group</span><span class="p">:</span> <span class="n">Literal</span><span class="p">[</span><span class="s2">"entity"</span><span class="p">,</span> <span class="s2">"time"</span><span class="p">,</span> <span class="s2">"both"</span><span class="p">]</span> <span class="o">=</span> <span class="o">...</span><span class="p">,</span>
         <span class="n">weights</span><span class="p">:</span> <span class="n">PanelData</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="o">...</span><span class="p">,</span>
@@ -1213,7 +1290,7 @@
     <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">PanelData</span><span class="p">:</span> <span class="o">...</span>
 
     <span class="nd">@overload</span>
-    <span class="k">def</span><span class="w"> </span><span class="nf">demean</span><span class="p">(</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">demean</span><span class="p">(</span>  <span class="c1"># numpydoc ignore=GL08</span>
         <span class="bp">self</span><span class="p">,</span>
         <span class="n">group</span><span class="p">:</span> <span class="n">Literal</span><span class="p">[</span><span class="s2">"entity"</span><span class="p">,</span> <span class="s2">"time"</span><span class="p">,</span> <span class="s2">"both"</span><span class="p">],</span>
         <span class="n">weights</span><span class="p">:</span> <span class="n">PanelData</span> <span class="o">|</span> <span class="kc">None</span><span class="p">,</span>
@@ -1230,26 +1307,35 @@
         <span class="n">low_memory</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
     <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">PanelData</span> <span class="o">|</span> <span class="n">linearmodels</span><span class="o">.</span><span class="n">typing</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">Float64Array</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">"""</span>
-<span class="sd">        Demeans data by either entity or time group</span>
+<span class="sd">        Demean data by either entity or time group.</span>
 
 <span class="sd">        Parameters</span>
 <span class="sd">        ----------</span>
-<span class="sd">        group : {"entity", "time", "both"}</span>
-<span class="sd">            Group to use in demeaning</span>
-<span class="sd">        weights : PanelData</span>
-<span class="sd">            Weights to implement weighted averaging</span>
-<span class="sd">        return_panel : bool</span>
+<span class="sd">        group : {"entity", "time", "both"}, optional</span>
+<span class="sd">            Group to use in demeaning. The default is ``"entity"``.</span>
+<span class="sd">        weights : PanelData, optional</span>
+<span class="sd">            Weights to implement weighted averaging. If not provided, the</span>
+<span class="sd">            observations have equal weights.</span>
+<span class="sd">        return_panel : bool, optional</span>
 <span class="sd">            Flag indicating to return a PanelData object. If False, a 2-d</span>
-<span class="sd">            NumPy representation of the panel is returned</span>
-<span class="sd">        low_memory : bool</span>
+<span class="sd">            NumPy representation of the panel is returned. The default is</span>
+<span class="sd">            True.</span>
+<span class="sd">        low_memory : bool, optional</span>
 <span class="sd">            Flag indicating whether to use a low memory implementation</span>
 <span class="sd">            that avoids constructing dummy variables. Only relevant when</span>
-<span class="sd">            group is "both"</span>
+<span class="sd">            group is "both". The default is False.</span>
 
 <span class="sd">        Returns</span>
 <span class="sd">        -------</span>
-<span class="sd">        PanelData</span>
-<span class="sd">            Demeaned data according to type</span>
+<span class="sd">        PanelData or ndarray</span>
+<span class="sd">            Demeaned data according to type. An ndarray if `return_panel` is</span>
+<span class="sd">            False.</span>
+
+<span class="sd">        Raises</span>
+<span class="sd">        ------</span>
+<span class="sd">        ValueError</span>
+<span class="sd">            If `group` is not one of the supported values, or if the level of</span>
+<span class="sd">            the index that is used has a missing label.</span>
 
 <span class="sd">        Notes</span>
 <span class="sd">        -----</span>
@@ -1308,17 +1394,22 @@
 <a class="viewcode-back" href="../../../panel/panel/linearmodels.panel.data.PanelData.count.html#linearmodels.panel.data.PanelData.count">[docs]</a>
     <span class="k">def</span><span class="w"> </span><span class="nf">count</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">group</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">"entity"</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">DataFrame</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">"""</span>
-<span class="sd">        Count number of observations by entity or time</span>
+<span class="sd">        Count number of observations by entity or time.</span>
 
 <span class="sd">        Parameters</span>
 <span class="sd">        ----------</span>
-<span class="sd">        group : {"entity", "time"}</span>
-<span class="sd">            Group to count</span>
+<span class="sd">        group : {"entity", "time"}, optional</span>
+<span class="sd">            Group to count. The default is ``"entity"``.</span>
 
 <span class="sd">        Returns</span>
 <span class="sd">        -------</span>
 <span class="sd">        DataFrame</span>
-<span class="sd">            Counts according to type. Either (entity by var) or (time by var)</span>
+<span class="sd">            Counts according to type. Either (entity by var) or (time by var).</span>
+
+<span class="sd">        Raises</span>
+<span class="sd">        ------</span>
+<span class="sd">        ValueError</span>
+<span class="sd">            If the level of the index that is used has a missing label.</span>
 <span class="sd">        """</span>
         <span class="n">level</span> <span class="o">=</span> <span class="mi">0</span> <span class="k">if</span> <span class="n">group</span> <span class="o">==</span> <span class="s2">"entity"</span> <span class="k">else</span> <span class="mi">1</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_check_index</span><span class="p">(</span><span class="n">level</span><span class="p">)</span>
@@ -1330,7 +1421,7 @@
 
     <span class="nd">@property</span>
     <span class="k">def</span><span class="w"> </span><span class="nf">index</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">MultiIndex</span><span class="p">:</span>
-<span class="w">        </span><span class="sd">"""Return the index of the multi-index dataframe view"""</span>
+<span class="w">        </span><span class="sd">"""Return the index of the multi-index dataframe view."""</span>
         <span class="n">index</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_frame</span><span class="o">.</span><span class="n">index</span>
         <span class="k">assert</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">index</span><span class="p">,</span> <span class="n">MultiIndex</span><span class="p">)</span>
         <span class="k">return</span> <span class="n">index</span>
@@ -1338,7 +1429,14 @@
 <div class="viewcode-block" id="PanelData.copy">
 <a class="viewcode-back" href="../../../panel/panel/linearmodels.panel.data.PanelData.copy.html#linearmodels.panel.data.PanelData.copy">[docs]</a>
     <span class="k">def</span><span class="w"> </span><span class="nf">copy</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">PanelData</span><span class="p">:</span>
-<span class="w">        </span><span class="sd">"""Return a deep copy"""</span>
+<span class="w">        </span><span class="sd">"""</span>
+<span class="sd">        Return a deep copy.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        PanelData</span>
+<span class="sd">            A copy of the data with the same settings.</span>
+<span class="sd">        """</span>
         <span class="k">return</span> <span class="n">PanelData</span><span class="p">(</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">_frame</span><span class="o">.</span><span class="n">copy</span><span class="p">(),</span>
             <span class="n">var_name</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">_var_name</span><span class="p">,</span>
@@ -1353,19 +1451,25 @@
         <span class="bp">self</span><span class="p">,</span> <span class="n">group</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">"entity"</span><span class="p">,</span> <span class="n">weights</span><span class="p">:</span> <span class="n">PanelData</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span>
     <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">"""</span>
-<span class="sd">        Compute data mean by either entity or time group</span>
+<span class="sd">        Compute data mean by either entity or time group.</span>
 
 <span class="sd">        Parameters</span>
 <span class="sd">        ----------</span>
-<span class="sd">        group : {"entity", "time"}</span>
-<span class="sd">            Group to use in demeaning</span>
-<span class="sd">        weights : PanelData</span>
-<span class="sd">            Weights to implement weighted averaging</span>
+<span class="sd">        group : {"entity", "time"}, optional</span>
+<span class="sd">            Group to use in computing the means. The default is ``"entity"``.</span>
+<span class="sd">        weights : PanelData, optional</span>
+<span class="sd">            Weights to implement weighted averaging. If not provided, the</span>
+<span class="sd">            observations have equal weights.</span>
 
 <span class="sd">        Returns</span>
 <span class="sd">        -------</span>
 <span class="sd">        DataFrame</span>
-<span class="sd">            Data mean according to type. Either (entity by var) or (time by var)</span>
+<span class="sd">            Data mean according to type. Either (entity by var) or (time by var).</span>
+
+<span class="sd">        Raises</span>
+<span class="sd">        ------</span>
+<span class="sd">        ValueError</span>
+<span class="sd">            If the level of the index that is used has a missing label.</span>
 <span class="sd">        """</span>
         <span class="n">level</span> <span class="o">=</span> <span class="mi">0</span> <span class="k">if</span> <span class="n">group</span> <span class="o">==</span> <span class="s2">"entity"</span> <span class="k">else</span> <span class="mi">1</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_check_index</span><span class="p">(</span><span class="n">level</span><span class="p">)</span>
@@ -1391,12 +1495,12 @@
 <a class="viewcode-back" href="../../../panel/panel/linearmodels.panel.data.PanelData.first_difference.html#linearmodels.panel.data.PanelData.first_difference">[docs]</a>
     <span class="k">def</span><span class="w"> </span><span class="nf">first_difference</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">PanelData</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">"""</span>
-<span class="sd">        Compute first differences of variables</span>
+<span class="sd">        Compute first differences of variables.</span>
 
 <span class="sd">        Returns</span>
 <span class="sd">        -------</span>
 <span class="sd">        PanelData</span>
-<span class="sd">            Differenced values</span>
+<span class="sd">            Differenced values.</span>
 
 <span class="sd">        Notes</span>
 <span class="sd">        -----</span>
@@ -1438,20 +1542,26 @@
 <a class="viewcode-back" href="../../../panel/panel/linearmodels.panel.data.PanelData.dummies.html#linearmodels.panel.data.PanelData.dummies">[docs]</a>
     <span class="k">def</span><span class="w"> </span><span class="nf">dummies</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">group</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">"entity"</span><span class="p">,</span> <span class="n">drop_first</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">DataFrame</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">"""</span>
-<span class="sd">        Generate entity or time dummies</span>
+<span class="sd">        Generate entity or time dummies.</span>
 
 <span class="sd">        Parameters</span>
 <span class="sd">        ----------</span>
-<span class="sd">        group : {"entity", "time"}</span>
-<span class="sd">            Type of dummies to generate</span>
-<span class="sd">        drop_first : bool</span>
+<span class="sd">        group : {"entity", "time"}, optional</span>
+<span class="sd">            Type of dummies to generate. The default is ``"entity"``.</span>
+<span class="sd">        drop_first : bool, optional</span>
 <span class="sd">            Flag indicating that the dummy column corresponding to the first</span>
-<span class="sd">            entity or time period should be dropped</span>
+<span class="sd">            entity or time period should be dropped. The default is False.</span>
 
 <span class="sd">        Returns</span>
 <span class="sd">        -------</span>
 <span class="sd">        DataFrame</span>
-<span class="sd">            Dummy variables</span>
+<span class="sd">            Dummy variables.</span>
+
+<span class="sd">        Raises</span>
+<span class="sd">        ------</span>
+<span class="sd">        ValueError</span>
+<span class="sd">            If `group` is not one of the supported values, or if the level of</span>
+<span class="sd">            the index that is used has a missing label.</span>
 <span class="sd">        """</span>
         <span class="k">if</span> <span class="n">group</span> <span class="ow">not</span> <span class="ow">in</span> <span class="p">(</span><span class="s2">"entity"</span><span class="p">,</span> <span class="s2">"time"</span><span class="p">):</span>
             <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">"Group must be one of 'entity' or 'time'"</span><span class="p">)</span>

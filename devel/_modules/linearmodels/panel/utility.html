@@ -19,7 +19,7 @@
     
   
       
-        <title>linearmodels.panel.utility - linearmodels v7.1 (+513)</title>
+        <title>linearmodels.panel.utility - linearmodels v7.1 (+518)</title>
       
     
 
@@ -91,7 +91,7 @@
 
 <header class="md-header md-header--shadow" data-md-component="header">
   <nav class="md-header__inner md-grid" aria-label="Header">
-    <a href="../../../index.html" title="linearmodels v7.1 (+513)" class="md-header__button md-logo" aria-label="linearmodels v7.1 (+513)" data-md-component="logo">
+    <a href="../../../index.html" title="linearmodels v7.1 (+518)" class="md-header__button md-logo" aria-label="linearmodels v7.1 (+518)" data-md-component="logo">
       <img src="../../../_static/bw-logo.svg" alt="logo">
     </a>
     <label class="md-header__button md-icon" for="__drawer">
@@ -102,7 +102,7 @@
       <div class="md-header__ellipsis">
         <div class="md-header__topic">
           <span class="md-ellipsis">
-            linearmodels v7.1 (+513)
+            linearmodels v7.1 (+518)
           </span>
         </div>
         <div class="md-header__topic" data-md-component="header-topic">
@@ -197,10 +197,10 @@
 
 <nav class="md-nav md-nav--primary" aria-label="Navigation" data-md-level="0">
   <label class="md-nav__title" for="__drawer">
-    <a href="../../../index.html" title="linearmodels v7.1 (+513)" class="md-nav__button md-logo" aria-label="linearmodels v7.1 (+513)" data-md-component="logo">
+    <a href="../../../index.html" title="linearmodels v7.1 (+518)" class="md-nav__button md-logo" aria-label="linearmodels v7.1 (+518)" data-md-component="logo">
       <img src="../../../_static/bw-logo.svg" alt="logo">
     </a>
-    linearmodels v7.1 (+513)
+    linearmodels v7.1 (+518)
   </label>
   
     <div class="md-nav__source">
@@ -527,7 +527,9 @@
 
 
 <h1>Source code for linearmodels.panel.utility</h1><div class="highlight"><pre>
-<span></span><code><span class="kn">from</span><span class="w"> </span><span class="nn">__future__</span><span class="w"> </span><span class="kn">import</span> <span class="n">annotations</span>
+<span></span><code><span class="sd">"""Utilities for panel models: dummy variables, singleton removal and test data."""</span>
+
+<span class="kn">from</span><span class="w"> </span><span class="nn">__future__</span><span class="w"> </span><span class="kn">import</span> <span class="n">annotations</span>
 
 <span class="kn">from</span><span class="w"> </span><span class="nn">linearmodels.compat.pandas</span><span class="w"> </span><span class="kn">import</span> <span class="n">ANNUAL_FREQ</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">linearmodels.compat.scipy</span><span class="w"> </span><span class="kn">import</span> <span class="n">coo_array</span><span class="p">,</span> <span class="n">csc_array</span><span class="p">,</span> <span class="n">csr_array</span>
@@ -567,8 +569,11 @@
 <span class="p">]</span>
 
 
+<div class="viewcode-block" id="AbsorbingEffectError">
+<a class="viewcode-back" href="../../../panel/reference.html#linearmodels.panel.utility.AbsorbingEffectError">[docs]</a>
 <span class="k">class</span><span class="w"> </span><span class="nc">AbsorbingEffectError</span><span class="p">(</span><span class="ne">Exception</span><span class="p">):</span>
-    <span class="k">pass</span>
+<span class="w">    </span><span class="sd">"""Error raised when the effects absorb one or more of the variables."""</span></div>
+
 
 
 <span class="n">absorbing_error_msg</span> <span class="o">=</span> <span class="s2">"""</span>
@@ -586,7 +591,7 @@
 
 
 <span class="k">class</span><span class="w"> </span><span class="nc">AbsorbingEffectWarning</span><span class="p">(</span><span class="ne">Warning</span><span class="p">):</span>
-    <span class="k">pass</span>
+<span class="w">    </span><span class="sd">"""Warning issued when absorbed variables are dropped from the regression."""</span>
 
 
 <span class="n">absorbing_warn_msg</span> <span class="o">=</span> <span class="s2">"""</span>
@@ -609,22 +614,24 @@
     <span class="n">d</span><span class="p">:</span> <span class="n">SparseOrDense</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">copy</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">tuple</span><span class="p">[</span><span class="n">SparseOrDense</span><span class="p">,</span> <span class="n">linearmodels</span><span class="o">.</span><span class="n">typing</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">Float64Array</span><span class="p">]:</span>
 <span class="w">    </span><span class="sd">"""</span>
+<span class="sd">    Scale the columns of an array to have unit 2-norm.</span>
+
 <span class="sd">    Parameters</span>
 <span class="sd">    ----------</span>
-<span class="sd">    d : array_like</span>
-<span class="sd">        Array to precondition</span>
-<span class="sd">    copy : bool</span>
+<span class="sd">    d : array_like or csc_array or csr_array or coo_array</span>
+<span class="sd">        Array to precondition. Dense input is converted with ``np.asarray``.</span>
+<span class="sd">    copy : bool, optional</span>
 <span class="sd">        Flag indicating whether the operation should be in-place, if possible.</span>
-<span class="sd">        If True, when a new array will always be returned.</span>
+<span class="sd">        If True, a new array is always returned. The default is False.</span>
 
 <span class="sd">    Returns</span>
 <span class="sd">    -------</span>
-<span class="sd">    d : array_like</span>
-<span class="sd">        Array with same type as input array. If copy is False, and d is</span>
-<span class="sd">        an ndarray or a csc_array, then the operation is inplace</span>
+<span class="sd">    d : ndarray or csc_array or csr_array or coo_array</span>
+<span class="sd">        Array with the same type as the input array. If copy is False, and d is</span>
+<span class="sd">        an ndarray or a csc_array, then the operation is inplace.</span>
 <span class="sd">    cond : ndarray</span>
-<span class="sd">        Array of conditioning numbers defined as the square root of the column</span>
-<span class="sd">        2-norms (nvar,)</span>
+<span class="sd">        Conditioning numbers with shape (nvar,), defined as the square root of</span>
+<span class="sd">        the 2-norm of each column.</span>
 <span class="sd">    """</span>
     <span class="c1"># Dense path</span>
     <span class="k">if</span> <span class="ow">not</span> <span class="n">sp</span><span class="o">.</span><span class="n">issparse</span><span class="p">(</span><span class="n">d</span><span class="p">):</span>
@@ -677,36 +684,47 @@
     <span class="n">linearmodels</span><span class="o">.</span><span class="n">typing</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">Float64Array</span><span class="p">,</span>
 <span class="p">]:</span>
 <span class="w">    </span><span class="sd">"""</span>
+<span class="sd">    Construct a sparse matrix of dummy variables from category codes.</span>
+
 <span class="sd">    Parameters</span>
 <span class="sd">    ----------</span>
 <span class="sd">    cats : DataFrame or array_like</span>
-<span class="sd">        Array containing the category codes of pandas categoricals</span>
-<span class="sd">        (nobs, ncats). A DataFrame must only contain categoricals. A</span>
-<span class="sd">        ``ValueError`` is raised if an array does not have 2 dimensions.</span>
-<span class="sd">    output_format: {"csc", "csr", "coo", "array"}</span>
-<span class="sd">        Output format. Default is csc (csc_array). Supported output</span>
-<span class="sd">        formats are:</span>
+<span class="sd">        Array containing the category codes of pandas categoricals with shape</span>
+<span class="sd">        (nobs, ncats). A DataFrame must only contain categoricals. An array</span>
+<span class="sd">        is converted with ``np.asarray`` and must have 2 dimensions.</span>
+<span class="sd">    output_format : {"csc", "csr", "coo"}, optional</span>
+<span class="sd">        Format of the sparse output. The default is ``"csc"``. The formats are:</span>
 
-<span class="sd">        * "csc" - sparse array in compressed column form</span>
-<span class="sd">        * "csr" - sparse array in compressed row form</span>
-<span class="sd">        * "coo" - sparse array in coordinate form</span>
+<span class="sd">        * "csc" - sparse array in compressed column form (csc_array)</span>
+<span class="sd">        * "csr" - sparse array in compressed row form (csr_array)</span>
+<span class="sd">        * "coo" - sparse array in coordinate form (coo_array)</span>
 
-<span class="sd">    drop: {"first", "last"}</span>
+<span class="sd">    drop : {"first", "last"}, optional</span>
 <span class="sd">        Exclude either the first or last category. This only applies when</span>
-<span class="sd">        cats contains more than one column, unless `drop_all` is True.</span>
-<span class="sd">    drop_all : bool</span>
-<span class="sd">        Flag indicating whether all sets of dummies should exclude one category</span>
-<span class="sd">    precondition : bool</span>
+<span class="sd">        cats contains more than one column, unless `drop_all` is True. The</span>
+<span class="sd">        default is ``"first"``.</span>
+<span class="sd">    drop_all : bool, optional</span>
+<span class="sd">        Flag indicating whether all sets of dummies should exclude one</span>
+<span class="sd">        category. The default is False.</span>
+<span class="sd">    precondition : bool, optional</span>
 <span class="sd">        Flag indicating whether the columns of the dummy matrix should be</span>
-<span class="sd">        preconditioned to have unit 2-norm.</span>
+<span class="sd">        preconditioned to have unit 2-norm. The default is True.</span>
 
 <span class="sd">    Returns</span>
 <span class="sd">    -------</span>
-<span class="sd">    dummies : array_like</span>
-<span class="sd">        Array, either sparse or dense, of size nobs x ncats containing the</span>
-<span class="sd">        dummy variable values</span>
+<span class="sd">    dummies : csc_array or csr_array or coo_array</span>
+<span class="sd">        Sparse array, with the format set by `output_format`, of size</span>
+<span class="sd">        nobs by ndummies containing the dummy variable values.</span>
 <span class="sd">    cond : ndarray</span>
-<span class="sd">        Conditioning number of each column</span>
+<span class="sd">        Conditioning number of each column.</span>
+
+<span class="sd">    Raises</span>
+<span class="sd">    ------</span>
+<span class="sd">    TypeError</span>
+<span class="sd">        If cats is a DataFrame with a column that is not categorical.</span>
+<span class="sd">    ValueError</span>
+<span class="sd">        If cats is an array that does not have 2 dimensions, or if</span>
+<span class="sd">        `output_format` is not one of the supported formats.</span>
 <span class="sd">    """</span>
     <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">cats</span><span class="p">,</span> <span class="n">DataFrame</span><span class="p">):</span>
         <span class="k">for</span> <span class="n">col</span> <span class="ow">in</span> <span class="n">cats</span><span class="p">:</span>
@@ -782,22 +800,24 @@
     <span class="n">orig_dest</span><span class="p">:</span> <span class="n">linearmodels</span><span class="o">.</span><span class="n">typing</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">IntArray</span><span class="p">,</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">tuple</span><span class="p">[</span><span class="nb">int</span><span class="p">,</span> <span class="nb">int</span><span class="p">]:</span>
 <span class="w">    </span><span class="sd">"""</span>
+<span class="sd">    Remove a node that has one link and step to its neighbor.</span>
+
 <span class="sd">    Parameters</span>
 <span class="sd">    ----------</span>
 <span class="sd">    node : int</span>
-<span class="sd">        ID of the node to remove</span>
+<span class="sd">        ID of the node to remove.</span>
 <span class="sd">    meta : ndarray</span>
 <span class="sd">        Array with rows containing node, count, and address where</span>
-<span class="sd">        address is used to find the first occurrence in orig_desk</span>
+<span class="sd">        address is used to find the first occurrence in orig_dest.</span>
 <span class="sd">    orig_dest : ndarray</span>
-<span class="sd">        Array with rows containing origin and destination nodes</span>
+<span class="sd">        Array with rows containing origin and destination nodes.</span>
 
 <span class="sd">    Returns</span>
 <span class="sd">    -------</span>
 <span class="sd">    next_node : int</span>
-<span class="sd">        ID of the next node in the branch</span>
+<span class="sd">        ID of the next node in the branch.</span>
 <span class="sd">    next_count : int</span>
-<span class="sd">        Count of the next node in the branch</span>
+<span class="sd">        Count of the next node in the branch.</span>
 
 <span class="sd">    Notes</span>
 <span class="sd">    -----</span>
@@ -840,15 +860,15 @@
     <span class="n">orig_dest</span><span class="p">:</span> <span class="n">linearmodels</span><span class="o">.</span><span class="n">typing</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">IntArray</span><span class="p">,</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">"""</span>
-<span class="sd">    Loop through the nodes and recursively drop singleton chains</span>
+<span class="sd">    Loop through the nodes and recursively drop singleton chains.</span>
 
 <span class="sd">    Parameters</span>
 <span class="sd">    ----------</span>
 <span class="sd">    meta : ndarray</span>
 <span class="sd">        Array with rows containing node, count, and address where</span>
-<span class="sd">        address is used to find the first occurrence in orig_desk</span>
+<span class="sd">        address is used to find the first occurrence in orig_dest.</span>
 <span class="sd">    orig_dest : ndarray</span>
-<span class="sd">        Array with rows containing origin and destination nodes</span>
+<span class="sd">        Array with rows containing origin and destination nodes.</span>
 <span class="sd">    """</span>
     <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">meta</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]):</span>
         <span class="k">if</span> <span class="n">meta</span><span class="p">[</span><span class="n">i</span><span class="p">,</span> <span class="mi">1</span><span class="p">]</span> <span class="o">==</span> <span class="mi">1</span><span class="p">:</span>
@@ -867,16 +887,18 @@
     <span class="n">cats</span><span class="p">:</span> <span class="n">linearmodels</span><span class="o">.</span><span class="n">typing</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">ArrayLike</span><span class="p">,</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">linearmodels</span><span class="o">.</span><span class="n">typing</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">BoolArray</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">"""</span>
+<span class="sd">    Find the observations that are in the 2-core of the graph.</span>
+
 <span class="sd">    Parameters</span>
 <span class="sd">    ----------</span>
-<span class="sd">    cats: {DataFrame, ndarray}</span>
+<span class="sd">    cats : DataFrame or ndarray</span>
 <span class="sd">        Array containing the category codes of pandas categoricals</span>
-<span class="sd">        (nobs, ncats)</span>
+<span class="sd">        with shape (nobs, ncats). A DataFrame must only contain categoricals.</span>
 
 <span class="sd">    Returns</span>
 <span class="sd">    -------</span>
-<span class="sd">    retain : ndarray</span>
-<span class="sd">        Boolean array that marks non-singleton entries as True</span>
+<span class="sd">    ndarray</span>
+<span class="sd">        Boolean array that marks non-singleton entries as True.</span>
 <span class="sd">    """</span>
     <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">cats</span><span class="p">,</span> <span class="n">DataFrame</span><span class="p">):</span>
         <span class="n">cats</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">column_stack</span><span class="p">([</span><span class="n">np</span><span class="o">.</span><span class="n">asarray</span><span class="p">(</span><span class="n">cats</span><span class="p">[</span><span class="n">c</span><span class="p">]</span><span class="o">.</span><span class="n">cat</span><span class="o">.</span><span class="n">codes</span><span class="p">)</span> <span class="k">for</span> <span class="n">c</span> <span class="ow">in</span> <span class="n">cats</span><span class="p">])</span>
@@ -941,16 +963,18 @@
     <span class="n">cats</span><span class="p">:</span> <span class="n">linearmodels</span><span class="o">.</span><span class="n">typing</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">ArrayLike</span><span class="p">,</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">linearmodels</span><span class="o">.</span><span class="n">typing</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">BoolArray</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">"""</span>
+<span class="sd">    Find the observations in the 2-core using a reference method.</span>
+
 <span class="sd">    Parameters</span>
 <span class="sd">    ----------</span>
-<span class="sd">    cats: {DataFrame, ndarray}</span>
+<span class="sd">    cats : DataFrame or ndarray</span>
 <span class="sd">        Array containing the category codes of pandas categoricals</span>
-<span class="sd">        (nobs, ncats)</span>
+<span class="sd">        with shape (nobs, ncats). A DataFrame must only contain categoricals.</span>
 
 <span class="sd">    Returns</span>
 <span class="sd">    -------</span>
-<span class="sd">    retain : ndarray</span>
-<span class="sd">        Boolean array that marks non-singleton entries as True</span>
+<span class="sd">    ndarray</span>
+<span class="sd">        Boolean array that marks non-singleton entries as True.</span>
 
 <span class="sd">    Notes</span>
 <span class="sd">    -----</span>
@@ -1078,14 +1102,14 @@
     <span class="n">x_orig</span><span class="p">:</span> <span class="n">linearmodels</span><span class="o">.</span><span class="n">typing</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">Float64Array</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">"""</span>
-<span class="sd">    Check a regressor matrix for variables absorbed</span>
+<span class="sd">    Check a regressor matrix for variables absorbed by the effects.</span>
 
 <span class="sd">    Parameters</span>
 <span class="sd">    ----------</span>
 <span class="sd">    x : ndarray</span>
 <span class="sd">        Regressor matrix to check, after the effects were absorbed.</span>
-<span class="sd">    variables : list of str</span>
-<span class="sd">        List of variable names.</span>
+<span class="sd">    variables : list of str or tuple of str</span>
+<span class="sd">        Variable names, in the order of the columns of x.</span>
 <span class="sd">    x_orig : ndarray, optional</span>
 <span class="sd">        Regressors before the effects were absorbed, with the same shape as x. A</span>
 <span class="sd">        column of x is absorbed if less than 1e-5 of the norm of the same</span>
@@ -1129,7 +1153,7 @@
     <span class="n">x_orig</span><span class="p">:</span> <span class="n">linearmodels</span><span class="o">.</span><span class="n">typing</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">Float64Array</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">list</span><span class="p">[</span><span class="nb">int</span><span class="p">]:</span>
 <span class="w">    </span><span class="sd">"""</span>
-<span class="sd">    Construct a list of the indices of regressors that are not absorbed</span>
+<span class="sd">    Construct a list of the indices of regressors that are not absorbed.</span>
 
 <span class="sd">    Parameters</span>
 <span class="sd">    ----------</span>
@@ -1151,7 +1175,7 @@
 <span class="sd">    Returns</span>
 <span class="sd">    -------</span>
 <span class="sd">    list of int</span>
-<span class="sd">        List of columns to retain.</span>
+<span class="sd">        Columns to retain.</span>
 <span class="sd">    """</span>
     <span class="n">constant</span> <span class="o">=</span> <span class="kc">None</span>
     <span class="k">if</span> <span class="n">has_constant</span><span class="p">:</span>
@@ -1163,16 +1187,16 @@
 
 <div class="viewcode-block" id="PanelModelData">
 <a class="viewcode-back" href="../../../panel/panel/linearmodels.panel.utility.PanelModelData.html#linearmodels.panel.utility.PanelModelData">[docs]</a>
-<span class="k">class</span><span class="w"> </span><span class="nc">PanelModelData</span><span class="p">(</span><span class="n">NamedTuple</span><span class="p">):</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">PanelModelData</span><span class="p">(</span><span class="n">NamedTuple</span><span class="p">):</span>  <span class="c1"># numpydoc ignore=PR02</span>
 <span class="w">    </span><span class="sd">"""</span>
-<span class="sd">    Typed namedtuple to hold simulated panel data</span>
+<span class="sd">    Typed namedtuple to hold simulated panel data.</span>
 
 <span class="sd">    Parameters</span>
 <span class="sd">    ----------</span>
 <span class="sd">    data : DataFrame</span>
-<span class="sd">        DataFrame containing the panel model's data</span>
+<span class="sd">        DataFrame containing the panel model's data.</span>
 <span class="sd">    weights : DataFrame</span>
-<span class="sd">        DataFrame containing  the panel model's weights</span>
+<span class="sd">        DataFrame containing the panel model's weights.</span>
 <span class="sd">    other_effects : DataFrame</span>
 <span class="sd">        DataFrame containing the panel model's effects,</span>
 <span class="sd">        excluding time and entity effects.</span>
@@ -1192,7 +1216,7 @@
     <span class="n">high</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>
     <span class="n">size</span><span class="p">:</span> <span class="nb">tuple</span><span class="p">[</span><span class="nb">int</span><span class="p">,</span> <span class="o">...</span><span class="p">],</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">linearmodels</span><span class="o">.</span><span class="n">typing</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">IntArray</span><span class="p">:</span>
-<span class="w">    </span><span class="sd">"""Random integers in [0, high) from a RandomState or a Generator"""</span>
+<span class="w">    </span><span class="sd">"""Random integers in [0, high) from a RandomState or a Generator."""</span>
     <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">rng</span><span class="p">,</span> <span class="n">numpy</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">Generator</span><span class="p">):</span>
         <span class="k">return</span> <span class="n">rng</span><span class="o">.</span><span class="n">integers</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="n">high</span><span class="p">,</span> <span class="n">size</span><span class="p">)</span>
     <span class="k">return</span> <span class="n">rng</span><span class="o">.</span><span class="n">randint</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="n">high</span><span class="p">,</span> <span class="n">size</span><span class="p">)</span>
@@ -1211,27 +1235,30 @@
     <span class="n">rng</span><span class="p">:</span> <span class="n">numpy</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">RandomState</span> <span class="o">|</span> <span class="n">numpy</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">Generator</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">PanelModelData</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">"""</span>
-<span class="sd">    Simulate panel data for testing</span>
+<span class="sd">    Simulate panel data for testing.</span>
 
 <span class="sd">    Parameters</span>
 <span class="sd">    ----------</span>
-<span class="sd">    nentity : int</span>
-<span class="sd">        The number of entities in the panel.</span>
-<span class="sd">    ntime : int</span>
-<span class="sd">        The number of time periods in the panel.</span>
-<span class="sd">    nexog : int</span>
-<span class="sd">        The number of explanatory variables in the dataset.</span>
-<span class="sd">    const : bool</span>
-<span class="sd">        Flag indicating that the model should include a constant.</span>
-<span class="sd">    missing : float</span>
-<span class="sd">        The percentage of values that are missing. Should be between 0 and 100.</span>
-<span class="sd">    other_effects : int</span>
-<span class="sd">        The number of other effects generated.</span>
-<span class="sd">    ncats : Union[int, Sequence[int]]</span>
+<span class="sd">    nentity : int, optional</span>
+<span class="sd">        The number of entities in the panel. The default is 971.</span>
+<span class="sd">    ntime : int, optional</span>
+<span class="sd">        The number of time periods in the panel. The default is 7.</span>
+<span class="sd">    nexog : int, optional</span>
+<span class="sd">        The number of explanatory variables in the dataset. The default</span>
+<span class="sd">        is 5.</span>
+<span class="sd">    const : bool, optional</span>
+<span class="sd">        Flag indicating that the model should include a constant. The</span>
+<span class="sd">        default is False.</span>
+<span class="sd">    missing : float, optional</span>
+<span class="sd">        The fraction of values that are missing, between 0 and 1. The</span>
+<span class="sd">        default is 0, so that no values are missing.</span>
+<span class="sd">    other_effects : int, optional</span>
+<span class="sd">        The number of other effects generated. The default is 2.</span>
+<span class="sd">    ncats : int or list of int, optional</span>
 <span class="sd">        The number of categories to use in other_effects and variance</span>
-<span class="sd">        clusters. If list-like, then it must have as many elements</span>
-<span class="sd">        as other_effects.</span>
-<span class="sd">    rng : RandomState or Generator</span>
+<span class="sd">        clusters. If a list, then it must have as many elements as</span>
+<span class="sd">        other_effects. The default is 4.</span>
+<span class="sd">    rng : numpy.random.RandomState or numpy.random.Generator, optional</span>
 <span class="sd">        A NumPy RandomState or Generator instance. If not provided, a</span>
 <span class="sd">        RandomState is initialized using a fixed seed.</span>
 
