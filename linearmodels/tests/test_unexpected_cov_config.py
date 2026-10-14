@@ -3,6 +3,8 @@ Tests of the error for a keyword argument of fit that the covariance estimator d
 not accept
 """
 
+import re
+
 import numpy as np
 from numpy.testing import assert_allclose
 import pandas as pd
@@ -87,9 +89,8 @@ def test_message_of_unexpected_keywords(data):
         "The keyword argument 'bogus' is not accepted with cov_type='robust'. "
         "The accepted keyword arguments are: center, extra_df, kappa."
     )
-    with pytest.raises(ValueError) as one:
+    with pytest.raises(ValueError, match=f"^{re.escape(expected)}$"):
         model.fit(cov_type="robust", bogus=1)
-    assert str(one.value) == expected
     with pytest.raises(ValueError, match=r"The keyword arguments 'a', 'b' are not"):
         model.fit(cov_type="robust", a=1, b=2)
     with pytest.raises(ValueError, match=r"arguments are: none\.$"):
