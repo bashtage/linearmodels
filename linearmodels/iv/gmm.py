@@ -1,5 +1,5 @@
 """
-Covariance and weight estimation for GMM IV estimators
+Covariance and weight estimation for GMM IV estimators.
 """
 
 from __future__ import annotations
@@ -27,7 +27,7 @@ import linearmodels.typing.data
 
 
 def _uses_default_bandwidth(config: Mapping[str, Any]) -> bool:
-    """Whether neither bandwidth nor optimal_bw selects the kernel bandwidth"""
+    """Whether neither bandwidth nor optimal_bw selects the kernel bandwidth."""
     return config.get("bandwidth") is None and config.get("optimal_bw") is None
 
 
@@ -43,7 +43,7 @@ _WEIGHT_EXAMPLES = {
 def _default_bandwidth_message(
     *, weights: bool, covariance: bool, model: str = "IVGMM"
 ) -> str:
-    """Message of the warning that the default bandwidth changed in 7.1"""
+    """Message of the warning that the default bandwidth changed in 7.1."""
     used, restore = [], []
     if weights:
         used.append('the weight matrix (weight_type="kernel")')
@@ -79,7 +79,7 @@ def _warn_default_bandwidth(
     *, weights: bool, covariance: bool, stacklevel: int, model: str = "IVGMM"
 ) -> None:
     """
-    Warn that a kernel estimator uses the bandwidth selected by default
+    Warn that a kernel estimator uses the bandwidth selected by default.
 
     The default bandwidth was nobs - 2 before linearmodels 7.1.
     """
@@ -92,15 +92,16 @@ def _warn_default_bandwidth(
 
 class HomoskedasticWeightMatrix:
     r"""
-    Homoskedastic (unadjusted) weight estimation
+    Homoskedastic (unadjusted) weight estimation.
 
     Parameters
     ----------
-    center : bool
+    center : bool, optional
         Flag indicating whether to center the moment conditions by subtracting
-        the mean before computing the weight matrix.
-    debiased : bool
-        Flag indicating whether to use small-sample adjustments
+        the mean before computing the weight matrix. The default is False.
+    debiased : bool, optional
+        Flag indicating whether to use small-sample adjustments. The default is
+        False.
 
     Notes
     -----
@@ -128,14 +129,16 @@ class HomoskedasticWeightMatrix:
         eps: linearmodels.typing.data.Float64Array,
     ) -> linearmodels.typing.data.Float64Array:
         """
+        Compute the covariance of the moment conditions.
+
         Parameters
         ----------
         x : ndarray
-            Model regressors (exog and endog), (nobs by nvar)
+            Model regressors (exog and endog), (nobs by nvar).
         z : ndarray
-            Model instruments (exog and instruments), (nobs by ninstr)
+            Model instruments (exog and instruments), (nobs by ninstr).
         eps : ndarray
-            Model errors (nobs by 1)
+            Model errors (nobs by 1).
 
         Returns
         -------
@@ -152,27 +155,28 @@ class HomoskedasticWeightMatrix:
     @property
     def config(self) -> dict[str, str | bool | ndarray | int | None]:
         """
-        Weight estimator configuration
+        Weight estimator configuration.
 
         Returns
         -------
         dict
-            Dictionary containing weight estimator configuration information
+            Dictionary containing weight estimator configuration information.
         """
         return {"center": self._center, "debiased": self._debiased}
 
 
 class HeteroskedasticWeightMatrix(HomoskedasticWeightMatrix):
     r"""
-    Heteroskedasticity robust weight estimation
+    Heteroskedasticity robust weight estimation.
 
     Parameters
     ----------
-    center : bool
+    center : bool, optional
         Flag indicating whether to center the moment conditions by subtracting
-        the mean before computing the weight matrix.
-    debiased : bool
-        Flag indicating whether to use small-sample adjustments
+        the mean before computing the weight matrix. The default is False.
+    debiased : bool, optional
+        Flag indicating whether to use small-sample adjustments. The default is
+        False.
 
     Notes
     -----
@@ -196,14 +200,16 @@ class HeteroskedasticWeightMatrix(HomoskedasticWeightMatrix):
         eps: linearmodels.typing.data.Float64Array,
     ) -> linearmodels.typing.data.Float64Array:
         """
+        Compute the covariance of the moment conditions.
+
         Parameters
         ----------
         x : ndarray
-            Model regressors (exog and endog), (nobs by nvar)
+            Model regressors (exog and endog), (nobs by nvar).
         z : ndarray
-            Model instruments (exog and instruments), (nobs by ninstr)
+            Model instruments (exog and instruments), (nobs by ninstr).
         eps : ndarray
-            Model errors (nobs by 1)
+            Model errors (nobs by 1).
 
         Returns
         -------
@@ -222,12 +228,13 @@ class HeteroskedasticWeightMatrix(HomoskedasticWeightMatrix):
 
 class KernelWeightMatrix(HomoskedasticWeightMatrix):
     r"""
-    Heteroskedasticity, autocorrelation robust weight estimation
+    Heteroskedasticity, autocorrelation robust weight estimation.
 
     Parameters
     ----------
     kernel : str, optional
-        Name of kernel weighting function to use. The default is "bartlett".
+        Name of kernel weighting function to use. The default is "bartlett". See
+        Notes for the supported kernels.
     bandwidth : int, optional
         Bandwidth to use when computing kernel weights. If not provided, the
         bandwidth is selected by ``optimal_bw``.
@@ -247,6 +254,15 @@ class KernelWeightMatrix(HomoskedasticWeightMatrix):
         also estimates the bandwidth, but it issues a
         ``DefaultBandwidthWarning`` since it changed in 7.1.
 
+    See Also
+    --------
+    linearmodels.iv.covariance.kernel_weight_bartlett : Kernel weights from a
+        Bartlett kernel.
+    linearmodels.iv.covariance.kernel_weight_parzen : Kernel weights from a Parzen
+        kernel.
+    linearmodels.iv.covariance.kernel_weight_quadratic_spectral : Kernel weights
+        from a quadratic-spectral kernel.
+
     Notes
     -----
     Supported kernels:
@@ -259,10 +275,10 @@ class KernelWeightMatrix(HomoskedasticWeightMatrix):
 
       g_i & =z_i \epsilon_i \\
       W & =n^{-1}(\Gamma_0+\sum_{j=1}^{n-1}k(j)(\Gamma_j+\Gamma_j')) \\
-      \Gamma_j & =\sum_{i=j+1}^n g'_i g_{j-j}
+      \Gamma_j & =\sum_{i=j+1}^n g'_i g_{i-j}
 
     where :math:`k(j)` is the kernel weight for lag j and :math:`z_i`
-    contains both the exogenous regressors and instruments..
+    contains both the exogenous regressors and instruments.
 
     If neither ``bandwidth`` nor ``optimal_bw`` is given, the bandwidth is
     estimated from the data every time that the weight matrix is computed.
@@ -286,12 +302,6 @@ class KernelWeightMatrix(HomoskedasticWeightMatrix):
        infinity to integer" (an ``OverflowError``) or "cannot convert float NaN
        to integer" for some data when ``optimal_bw`` was True, and used a
        bandwidth of nobs - 1, or another bandwidth, for other data.
-
-    See Also
-    --------
-    linearmodels.iv.covariance.kernel_weight_bartlett,
-    linearmodels.iv.covariance.kernel_weight_parzen,
-    linearmodels.iv.covariance.kernel_weight_quadratic_spectral
     """
 
     def __init__(
@@ -318,7 +328,7 @@ class KernelWeightMatrix(HomoskedasticWeightMatrix):
 
     @property
     def _estimates_bandwidth(self) -> bool:
-        """Whether the bandwidth is estimated from the data"""
+        """Whether the bandwidth is estimated from the data."""
         return self._orig_bandwidth is None and self._optimal_bw
 
     def _scores(
@@ -326,14 +336,14 @@ class KernelWeightMatrix(HomoskedasticWeightMatrix):
         z: linearmodels.typing.data.Float64Array,
         eps: linearmodels.typing.data.Float64Array,
     ) -> linearmodels.typing.data.Float64Array:
-        """The moment conditions, centered if the weight matrix is centered"""
+        """The moment conditions, centered if the weight matrix is centered."""
         ze = z * eps
         mu = ze.mean(axis=0) if self._center else 0
         ze -= mu
         return ze
 
     def _estimate_bandwidth(self, ze: linearmodels.typing.data.Float64Array) -> int:
-        """The bandwidth that is estimated from the moment conditions"""
+        """The bandwidth that is estimated from the moment conditions."""
         g = ze / ze.std(0)[None, :]
         g = g.sum(1)
         return kernel_optimal_bandwidth(g, self._kernel)
@@ -344,7 +354,7 @@ class KernelWeightMatrix(HomoskedasticWeightMatrix):
         eps: linearmodels.typing.data.Float64Array,
     ) -> int:
         """
-        Estimate the bandwidth from eps, and use it for every weight matrix
+        Estimate the bandwidth from eps, and use it for every weight matrix.
 
         The bandwidth that is estimated from the data depends on the residuals.
         Estimating it at each evaluation of an objective function that depends
@@ -362,14 +372,16 @@ class KernelWeightMatrix(HomoskedasticWeightMatrix):
         eps: linearmodels.typing.data.Float64Array,
     ) -> linearmodels.typing.data.Float64Array:
         """
+        Compute the covariance of the moment conditions.
+
         Parameters
         ----------
         x : ndarray
-            Model regressors (exog and endog), (nobs by nvar)
+            Model regressors (exog and endog), (nobs by nvar).
         z : ndarray
-            Model instruments (exog and instruments), (nobs by ninstr)
+            Model instruments (exog and instruments), (nobs by ninstr).
         eps : ndarray
-            Model errors (nobs by 1)
+            Model errors (nobs by 1).
 
         Returns
         -------
@@ -402,12 +414,12 @@ class KernelWeightMatrix(HomoskedasticWeightMatrix):
     @property
     def config(self) -> dict[str, str | bool | ndarray | int | None]:
         """
-        Weight estimator configuration
+        Weight estimator configuration.
 
         Returns
         -------
         dict
-            Dictionary containing weight estimator configuration information
+            Dictionary containing weight estimator configuration information.
         """
         return {
             "center": self._center,
@@ -418,13 +430,13 @@ class KernelWeightMatrix(HomoskedasticWeightMatrix):
 
     @property
     def bandwidth(self) -> int | None:
-        """Actual bandwidth used in estimating the weight matrix"""
+        """Actual bandwidth used in estimating the weight matrix."""
         return self._bandwidth
 
 
 class OneWayClusteredWeightMatrix(HomoskedasticWeightMatrix):
     """
-    Clustered (one-way) weight estimation
+    Clustered (one-way) weight estimation.
 
     Parameters
     ----------
@@ -433,11 +445,19 @@ class OneWayClusteredWeightMatrix(HomoskedasticWeightMatrix):
         observation or a 2-d array with a single column, since only one-way
         clustering is supported. A ``ValueError`` is raised if it has more
         columns.
-    center : bool
+    center : bool, optional
         Flag indicating whether to center the moment conditions by subtracting
-        the mean before computing the weight matrix.
-    debiased : bool
-        Flag indicating whether to use small-sample adjustments
+        the mean before computing the weight matrix. The default is False.
+    debiased : bool, optional
+        Flag indicating whether to use small-sample adjustments. The default is
+        False.
+
+    Raises
+    ------
+    TypeError
+        If ``clusters`` is not array_like, or has a complex dtype.
+    ValueError
+        If ``clusters`` has more than one column.
     """
 
     def __init__(
@@ -456,14 +476,16 @@ class OneWayClusteredWeightMatrix(HomoskedasticWeightMatrix):
         eps: linearmodels.typing.data.Float64Array,
     ) -> linearmodels.typing.data.Float64Array:
         """
+        Compute the covariance of the moment conditions.
+
         Parameters
         ----------
         x : ndarray
-            Model regressors (exog and endog), (nobs by nvar)
+            Model regressors (exog and endog), (nobs by nvar).
         z : ndarray
-            Model instruments (exog and instruments), (nobs by ninstr)
+            Model instruments (exog and instruments), (nobs by ninstr).
         eps : ndarray
-            Model errors (nobs by 1)
+            Model errors (nobs by 1).
 
         Returns
         -------
@@ -496,12 +518,12 @@ class OneWayClusteredWeightMatrix(HomoskedasticWeightMatrix):
     @property
     def config(self) -> dict[str, str | bool | ndarray | int | None]:
         """
-        Weight estimator configuration
+        Weight estimator configuration.
 
         Returns
         -------
         dict
-            Dictionary containing weight estimator configuration information
+            Dictionary containing weight estimator configuration information.
         """
         return {
             "center": self._center,
@@ -512,34 +534,55 @@ class OneWayClusteredWeightMatrix(HomoskedasticWeightMatrix):
 
 class IVGMMCovariance(HomoskedasticCovariance):
     """
-    Covariance estimation for GMM models
+    Covariance estimation for GMM models.
 
     Parameters
     ----------
     x : ndarray
-        Model regressors (nobs by nvar)
+        Model regressors (nobs by nvar).
     y : ndarray
-        Series ,modeled (nobs by 1)
+        Series modeled (nobs by 1).
     z : ndarray
-        Instruments used for endogenous regressors (nobs by ninstr)
+        Instruments used for endogenous regressors (nobs by ninstr).
     params : ndarray
-        Estimated model parameters (nvar by 1)
+        Estimated model parameters (nvar by 1).
     w : ndarray
-        Weighting matrix used in GMM estimation
-    cov_type : str
-        Covariance estimator to use  Valid choices are
+        Weighting matrix used in GMM estimation (ninstr by ninstr).
+    cov_type : str, optional
+        Covariance estimator to use. The default is "robust". Valid choices are
 
         * "unadjusted", "homoskedastic" - Assumes moment conditions are
           homoskedastic
-        * "robust", "heteroskedastic" - Allows for heteroskedasticity by not
+        * "robust", "heteroskedastic" - Allows for heteroskedasticity but not
           autocorrelation
         * "kernel" - Allows for heteroskedasticity and autocorrelation
         * "clustered" - Allows for one-way cluster dependence
 
-    debiased : bool
-        Flag indicating whether to debias the covariance estimator
-    cov_config
-        Optional keyword arguments that are specific to a particular cov_type
+    debiased : bool, optional
+        Flag indicating whether to debias the covariance estimator. The default
+        is False.
+    **cov_config : dict
+        Optional keyword arguments that are specific to a particular cov_type.
+        The keys are ``center`` (bool) for every covariance estimator,
+        ``kernel`` (str), ``bandwidth`` (int) and ``optimal_bw`` (bool) for
+        "kernel", and ``clusters`` (array_like) for "clustered". See Notes.
+
+    Raises
+    ------
+    ValueError
+        If the number of rows of x, y and z differ, or if x and params have
+        incompatible dimensions.
+    UnknownOptionError
+        If ``cov_type`` is not supported. It is both a ``KeyError`` and a
+        ``ValueError``.
+
+    See Also
+    --------
+    linearmodels.iv.covariance.HomoskedasticCovariance : Homoskedastic covariance.
+    linearmodels.iv.covariance.HeteroskedasticCovariance : Heteroskedasticity
+        robust covariance.
+    linearmodels.iv.covariance.KernelCovariance : Kernel (HAC) covariance.
+    linearmodels.iv.covariance.ClusteredCovariance : Clustered covariance.
 
     Notes
     -----
@@ -573,13 +616,6 @@ class IVGMMCovariance(HomoskedasticCovariance):
 
     * ``clusters``: Array containing the cluster indices.  See
       :class:`~linearmodels.iv.covariance.ClusteredCovariance`
-
-    See Also
-    --------
-    linearmodels.iv.covariance.HomoskedasticCovariance,
-    linearmodels.iv.covariance.HeteroskedasticCovariance,
-    linearmodels.iv.covariance.KernelCovariance,
-    linearmodels.iv.covariance.ClusteredCovariance
     """
 
     # TODO: 2-way clustering
@@ -644,6 +680,7 @@ class IVGMMCovariance(HomoskedasticCovariance):
 
     @property
     def cov(self) -> linearmodels.typing.data.Float64Array:
+        """Return the covariance of the estimated parameters."""
         x, z, eps, w = self.x, self.z, self.eps, self.w
         nobs = x.shape[0]
         xpz = x.T @ z / nobs
@@ -664,6 +701,7 @@ class IVGMMCovariance(HomoskedasticCovariance):
 
     @property
     def config(self) -> dict[str, str | bool | ndarray | int | None]:
+        """Return the options of the covariance estimator as a dict."""
         conf: dict[str, str | bool | ndarray | int | None] = {"debiased": self.debiased}
         conf.update(self._cov_config)
         return conf
