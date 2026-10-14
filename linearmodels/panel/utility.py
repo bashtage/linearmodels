@@ -1,3 +1,5 @@
+"""Utilities for panel models: dummy variables, singleton removal and test data."""
+
 from __future__ import annotations
 
 from linearmodels.compat.pandas import ANNUAL_FREQ
@@ -39,7 +41,7 @@ __all__ = [
 
 
 class AbsorbingEffectError(Exception):
-    pass
+    """Error raised when the effects absorb one or more of the variables."""
 
 
 absorbing_error_msg = """
@@ -57,7 +59,7 @@ Set drop_absorbed=True to automatically drop absorbed variables.
 
 
 class AbsorbingEffectWarning(Warning):
-    pass
+    """Warning issued when absorbed variables are dropped from the regression."""
 
 
 absorbing_warn_msg = """
@@ -80,22 +82,24 @@ def preconditioner(
     d: SparseOrDense, *, copy: bool = False
 ) -> tuple[SparseOrDense, linearmodels.typing.data.Float64Array]:
     """
+    Scale the columns of an array to have unit 2-norm.
+
     Parameters
     ----------
-    d : array_like
-        Array to precondition
-    copy : bool
+    d : array_like or csc_array or csr_array or coo_array
+        Array to precondition. Dense input is converted with ``np.asarray``.
+    copy : bool, optional
         Flag indicating whether the operation should be in-place, if possible.
-        If True, when a new array will always be returned.
+        If True, a new array is always returned. The default is False.
 
     Returns
     -------
-    d : array_like
-        Array with same type as input array. If copy is False, and d is
-        an ndarray or a csc_array, then the operation is inplace
+    d : ndarray or csc_array or csr_array or coo_array
+        Array with the same type as the input array. If copy is False, and d is
+        an ndarray or a csc_array, then the operation is inplace.
     cond : ndarray
-        Array of conditioning numbers defined as the square root of the column
-        2-norms (nvar,)
+        Conditioning numbers with shape (nvar,), defined as the square root of
+        the 2-norm of each column.
     """
     # Dense path
     if not sp.issparse(d):
@@ -148,36 +152,47 @@ def dummy_matrix(
     linearmodels.typing.data.Float64Array,
 ]:
     """
+    Construct a sparse matrix of dummy variables from category codes.
+
     Parameters
     ----------
     cats : DataFrame or array_like
-        Array containing the category codes of pandas categoricals
-        (nobs, ncats). A DataFrame must only contain categoricals. A
-        ``ValueError`` is raised if an array does not have 2 dimensions.
-    output_format: {"csc", "csr", "coo", "array"}
-        Output format. Default is csc (csc_array). Supported output
-        formats are:
+        Array containing the category codes of pandas categoricals with shape
+        (nobs, ncats). A DataFrame must only contain categoricals. An array
+        is converted with ``np.asarray`` and must have 2 dimensions.
+    output_format : {"csc", "csr", "coo"}, optional
+        Format of the sparse output. The default is ``"csc"``. The formats are:
 
-        * "csc" - sparse array in compressed column form
-        * "csr" - sparse array in compressed row form
-        * "coo" - sparse array in coordinate form
+        * "csc" - sparse array in compressed column form (csc_array)
+        * "csr" - sparse array in compressed row form (csr_array)
+        * "coo" - sparse array in coordinate form (coo_array)
 
-    drop: {"first", "last"}
+    drop : {"first", "last"}, optional
         Exclude either the first or last category. This only applies when
-        cats contains more than one column, unless `drop_all` is True.
-    drop_all : bool
-        Flag indicating whether all sets of dummies should exclude one category
-    precondition : bool
+        cats contains more than one column, unless `drop_all` is True. The
+        default is ``"first"``.
+    drop_all : bool, optional
+        Flag indicating whether all sets of dummies should exclude one
+        category. The default is False.
+    precondition : bool, optional
         Flag indicating whether the columns of the dummy matrix should be
-        preconditioned to have unit 2-norm.
+        preconditioned to have unit 2-norm. The default is True.
 
     Returns
     -------
-    dummies : array_like
-        Array, either sparse or dense, of size nobs x ncats containing the
-        dummy variable values
+    dummies : csc_array or csr_array or coo_array
+        Sparse array, with the format set by `output_format`, of size
+        nobs by ndummies containing the dummy variable values.
     cond : ndarray
-        Conditioning number of each column
+        Conditioning number of each column.
+
+    Raises
+    ------
+    TypeError
+        If cats is a DataFrame with a column that is not categorical.
+    ValueError
+        If cats is an array that does not have 2 dimensions, or if
+        `output_format` is not one of the supported formats.
     """
     if isinstance(cats, DataFrame):
         for col in cats:
@@ -253,22 +268,24 @@ def _remove_node(
     orig_dest: linearmodels.typing.data.IntArray,
 ) -> tuple[int, int]:
     """
+    Remove a node that has one link and step to its neighbor.
+
     Parameters
     ----------
     node : int
-        ID of the node to remove
+        ID of the node to remove.
     meta : ndarray
         Array with rows containing node, count, and address where
-        address is used to find the first occurrence in orig_desk
+        address is used to find the first occurrence in orig_dest.
     orig_dest : ndarray
-        Array with rows containing origin and destination nodes
+        Array with rows containing origin and destination nodes.
 
     Returns
     -------
     next_node : int
-        ID of the next node in the branch
+        ID of the next node in the branch.
     next_count : int
-        Count of the next node in the branch
+        Count of the next node in the branch.
 
     Notes
     -----
@@ -311,15 +328,15 @@ def _py_drop_singletons(
     orig_dest: linearmodels.typing.data.IntArray,
 ) -> None:
     """
-    Loop through the nodes and recursively drop singleton chains
+    Loop through the nodes and recursively drop singleton chains.
 
     Parameters
     ----------
     meta : ndarray
         Array with rows containing node, count, and address where
-        address is used to find the first occurrence in orig_desk
+        address is used to find the first occurrence in orig_dest.
     orig_dest : ndarray
-        Array with rows containing origin and destination nodes
+        Array with rows containing origin and destination nodes.
     """
     for i in range(meta.shape[0]):
         if meta[i, 1] == 1:
@@ -338,16 +355,18 @@ def in_2core_graph(
     cats: linearmodels.typing.data.ArrayLike,
 ) -> linearmodels.typing.data.BoolArray:
     """
+    Find the observations that are in the 2-core of the graph.
+
     Parameters
     ----------
-    cats: {DataFrame, ndarray}
+    cats : DataFrame or ndarray
         Array containing the category codes of pandas categoricals
-        (nobs, ncats)
+        with shape (nobs, ncats). A DataFrame must only contain categoricals.
 
     Returns
     -------
-    retain : ndarray
-        Boolean array that marks non-singleton entries as True
+    ndarray
+        Boolean array that marks non-singleton entries as True.
     """
     if isinstance(cats, DataFrame):
         cats = np.column_stack([np.asarray(cats[c].cat.codes) for c in cats])
@@ -412,16 +431,18 @@ def in_2core_graph_slow(
     cats: linearmodels.typing.data.ArrayLike,
 ) -> linearmodels.typing.data.BoolArray:
     """
+    Find the observations in the 2-core using a reference method.
+
     Parameters
     ----------
-    cats: {DataFrame, ndarray}
+    cats : DataFrame or ndarray
         Array containing the category codes of pandas categoricals
-        (nobs, ncats)
+        with shape (nobs, ncats). A DataFrame must only contain categoricals.
 
     Returns
     -------
-    retain : ndarray
-        Boolean array that marks non-singleton entries as True
+    ndarray
+        Boolean array that marks non-singleton entries as True.
 
     Notes
     -----
@@ -549,14 +570,14 @@ def check_absorbed(
     x_orig: linearmodels.typing.data.Float64Array | None = None,
 ) -> None:
     """
-    Check a regressor matrix for variables absorbed
+    Check a regressor matrix for variables absorbed by the effects.
 
     Parameters
     ----------
     x : ndarray
         Regressor matrix to check, after the effects were absorbed.
-    variables : list of str
-        List of variable names.
+    variables : list of str or tuple of str
+        Variable names, in the order of the columns of x.
     x_orig : ndarray, optional
         Regressors before the effects were absorbed, with the same shape as x. A
         column of x is absorbed if less than 1e-5 of the norm of the same
@@ -600,7 +621,7 @@ def not_absorbed(
     x_orig: linearmodels.typing.data.Float64Array | None = None,
 ) -> list[int]:
     """
-    Construct a list of the indices of regressors that are not absorbed
+    Construct a list of the indices of regressors that are not absorbed.
 
     Parameters
     ----------
@@ -622,7 +643,7 @@ def not_absorbed(
     Returns
     -------
     list of int
-        List of columns to retain.
+        Columns to retain.
     """
     constant = None
     if has_constant:
@@ -632,16 +653,16 @@ def not_absorbed(
     return [i for i in range(x.shape[1]) if i not in dropped]
 
 
-class PanelModelData(NamedTuple):
+class PanelModelData(NamedTuple):  # numpydoc ignore=PR02
     """
-    Typed namedtuple to hold simulated panel data
+    Typed namedtuple to hold simulated panel data.
 
     Parameters
     ----------
     data : DataFrame
-        DataFrame containing the panel model's data
+        DataFrame containing the panel model's data.
     weights : DataFrame
-        DataFrame containing  the panel model's weights
+        DataFrame containing the panel model's weights.
     other_effects : DataFrame
         DataFrame containing the panel model's effects,
         excluding time and entity effects.
@@ -660,7 +681,7 @@ def _integers(
     high: int,
     size: tuple[int, ...],
 ) -> linearmodels.typing.data.IntArray:
-    """Random integers in [0, high) from a RandomState or a Generator"""
+    """Random integers in [0, high) from a RandomState or a Generator."""
     if isinstance(rng, numpy.random.Generator):
         return rng.integers(0, high, size)
     return rng.randint(0, high, size)
@@ -677,27 +698,30 @@ def generate_panel_data(
     rng: numpy.random.RandomState | numpy.random.Generator | None = None,
 ) -> PanelModelData:
     """
-    Simulate panel data for testing
+    Simulate panel data for testing.
 
     Parameters
     ----------
-    nentity : int
-        The number of entities in the panel.
-    ntime : int
-        The number of time periods in the panel.
-    nexog : int
-        The number of explanatory variables in the dataset.
-    const : bool
-        Flag indicating that the model should include a constant.
-    missing : float
-        The percentage of values that are missing. Should be between 0 and 100.
-    other_effects : int
-        The number of other effects generated.
-    ncats : Union[int, Sequence[int]]
+    nentity : int, optional
+        The number of entities in the panel. The default is 971.
+    ntime : int, optional
+        The number of time periods in the panel. The default is 7.
+    nexog : int, optional
+        The number of explanatory variables in the dataset. The default
+        is 5.
+    const : bool, optional
+        Flag indicating that the model should include a constant. The
+        default is False.
+    missing : float, optional
+        The fraction of values that are missing, between 0 and 1. The
+        default is 0, so that no values are missing.
+    other_effects : int, optional
+        The number of other effects generated. The default is 2.
+    ncats : int or list of int, optional
         The number of categories to use in other_effects and variance
-        clusters. If list-like, then it must have as many elements
-        as other_effects.
-    rng : RandomState or Generator
+        clusters. If a list, then it must have as many elements as
+        other_effects. The default is 4.
+    rng : numpy.random.RandomState or numpy.random.Generator, optional
         A NumPy RandomState or Generator instance. If not provided, a
         RandomState is initialized using a fixed seed.
 

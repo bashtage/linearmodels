@@ -1,3 +1,5 @@
+"""Panel data models and tools for estimation, inference and comparison."""
+
 from linearmodels.panel.model import (
     BetweenOLS,
     FamaMacBeth,
