@@ -1434,16 +1434,16 @@ class AbsorbingLS:
         Parameters
         ----------
         cov_type : str, optional
-            Name of covariance estimator to use. The default is "robust". Supported
-            covariance estimators are:
+            Name of covariance estimator to use. The default is "robust". The names
+            are not case sensitive. Supported covariance estimators are:
 
-            * "unadjusted", "homoskedastic", "homo", "HomoskedasticCovariance" -
+            * "unadjusted", "homoskedastic", "homo", "homoskedasticcovariance" -
               Classic homoskedastic inference
-            * "robust", "heteroskedastic", "hccm", "HeteroskedasticCovariance" -
+            * "robust", "heteroskedastic", "hccm", "heteroskedasticcovariance" -
               Heteroskedasticity robust inference
-            * "kernel", "KernelCovariance" - Heteroskedasticity and autocorrelation
+            * "kernel", "kernelcovariance" - Heteroskedasticity and autocorrelation
               robust inference
-            * "clustered", "one-way", "OneWayClusteredCovariance" - Cluster
+            * "clustered", "one-way", "onewayclusteredcovariance" - Cluster
               dependent inference, which is heteroskedasticity robust. It is
               one-way unless ``clusters`` has two columns.
 
@@ -1451,7 +1451,7 @@ class AbsorbingLS:
             Flag indicating whether to debias the covariance estimator using
             a degree of freedom adjustment. The default is False.
         method : {"auto", "hdfe", "lsmr"}, optional
-            The algorithm that absorbs the variables. The name is not case
+            The algorithm that absorbs the variables. The names are not case
             sensitive, and a ValueError is raised for any other value. One of:
 
             * "auto" - (Default). Use HDFE when applicable and fallback to LSMR.
@@ -1489,9 +1489,11 @@ class AbsorbingLS:
             are used depend on ``cov_type``. "unadjusted" and "robust" do not use any.
             "kernel" uses ``kernel`` (str), the name of the kernel, which is "bartlett"
             if it is not provided, and ``bandwidth`` (int), which is selected from the
-            data if it is not provided. "clustered" uses ``clusters`` (array_like),
-            the cluster assignment of each observation, with one or two columns.
-            A ``center`` key is accepted and ignored. See
+            data if it is not provided. The names of the kernels are not case
+            sensitive. "clustered" uses ``clusters`` (array_like), the cluster
+            assignment of each observation, with one or two columns. The keys
+            ``center``, ``kappa`` and ``extra_df`` are accepted and ignored: the
+            absorbed effects set the degrees of freedom. See
             :class:`~linearmodels.iv.covariance.HomoskedasticCovariance`,
             :class:`~linearmodels.iv.covariance.HeteroskedasticCovariance`,
             :class:`~linearmodels.iv.covariance.KernelCovariance` and
@@ -1511,6 +1513,11 @@ class AbsorbingLS:
             are absorbed and ``drop_absorbed`` is True, if ``debiased`` is True and
             the model has no degrees of freedom left, or if the labels of
             ``clusters`` do not match the labels of the other inputs.
+            A key of ``cov_config`` that the covariance estimator that ``cov_type``
+            selects does not accept also raises it. The message names the key and lists
+            the accepted keys. This is checked before the model is estimated. Releases
+            before 7.1 raised the ``TypeError`` of the constructor of the covariance
+            estimator.
         RuntimeError
             If ``method`` is "hdfe" and the model cannot be absorbed using HDFE.
         Exception
@@ -1520,12 +1527,6 @@ class AbsorbingLS:
         UnknownOptionError
             If ``cov_type`` or ``kernel`` is not supported. It is both a
             ``KeyError`` and a ``ValueError``.
-        ValueError
-            If a key of ``cov_config`` is not accepted by the covariance estimator
-            that ``cov_type`` selects. The message names the key and lists the
-            accepted keys. It is raised before the model is estimated. Releases
-            before 7.1 raised the ``TypeError`` of the constructor of the covariance
-            estimator.
 
         Warns
         -----

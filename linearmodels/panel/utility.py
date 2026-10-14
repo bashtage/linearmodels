@@ -161,7 +161,7 @@ def dummy_matrix(
         (nobs, ncats). A DataFrame must only contain categoricals. An array
         is converted with ``np.asarray`` and must have 2 dimensions.
     output_format : {"csc", "csr", "coo"}, optional
-        Format of the sparse output. The default is ``"csc"``. The formats are:
+        Format of the sparse output. The default is "csc". The formats are:
 
         * "csc" - sparse array in compressed column form (csc_array)
         * "csr" - sparse array in compressed row form (csr_array)
@@ -170,7 +170,7 @@ def dummy_matrix(
     drop : {"first", "last"}, optional
         Exclude either the first or last category. This only applies when
         cats contains more than one column, unless `drop_all` is True. The
-        default is ``"first"``.
+        default is "first".
     drop_all : bool, optional
         Flag indicating whether all sets of dummies should exclude one
         category. The default is False.

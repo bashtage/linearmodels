@@ -841,16 +841,16 @@ class _IVLSModelBase(_IVModelBase):
         Parameters
         ----------
         cov_type : str, optional
-            Name of covariance estimator to use. The default is "robust". Supported
-            covariance estimators are:
+            Name of covariance estimator to use. The default is "robust". The names
+            are not case sensitive. Supported covariance estimators are:
 
-            * "unadjusted", "homoskedastic", "homo", "HomoskedasticCovariance" -
+            * "unadjusted", "homoskedastic", "homo", "homoskedasticcovariance" -
               Classic homoskedastic inference
-            * "robust", "heteroskedastic", "hccm", "HeteroskedasticCovariance" -
+            * "robust", "heteroskedastic", "hccm", "heteroskedasticcovariance" -
               Heteroskedasticity robust inference
-            * "kernel", "KernelCovariance" - Heteroskedasticity and autocorrelation
+            * "kernel", "kernelcovariance" - Heteroskedasticity and autocorrelation
               robust inference
-            * "clustered", "one-way", "OneWayClusteredCovariance" - Cluster
+            * "clustered", "one-way", "onewayclusteredcovariance" - Cluster
               dependent inference, which is heteroskedasticity robust. It is
               one-way unless ``clusters`` has two columns.
 
@@ -862,9 +862,15 @@ class _IVLSModelBase(_IVModelBase):
             are used depend on ``cov_type``. "unadjusted" and "robust" do not use any.
             "kernel" uses ``kernel`` (str), the name of the kernel, which is "bartlett"
             if it is not provided, and ``bandwidth`` (int), which is selected from the
-            data if it is not provided. "clustered" uses ``clusters`` (array_like),
-            the cluster assignment of each observation, with one or two columns.
-            A ``center`` key is accepted and ignored. See
+            data if it is not provided. The names of the kernels are not case
+            sensitive. "clustered" uses ``clusters`` (array_like), the cluster
+            assignment of each observation, with one or two columns. Every
+            covariance estimator accepts ``extra_df`` (int), the number of degrees of
+            freedom that the model uses in addition to its regressors. It is 0 if it is
+            not provided, and it is only used if ``debiased`` is True, when the
+            covariance is scaled by n / (n - k - ``extra_df``), where k is the number
+            of regressors. The keys ``center`` and ``kappa`` are accepted and ignored:
+            ``kappa`` is set by the model. See
             :class:`~linearmodels.iv.covariance.HomoskedasticCovariance`,
             :class:`~linearmodels.iv.covariance.HeteroskedasticCovariance`,
             :class:`~linearmodels.iv.covariance.KernelCovariance` and
@@ -888,15 +894,14 @@ class _IVLSModelBase(_IVModelBase):
             regressors and instruments are collinear. See the notes of
             :class:`~linearmodels.iv.model.IVLIML`. It is also raised if the
             labels of ``clusters`` do not match the labels of the other inputs.
+            A key of ``cov_config`` that the covariance estimator that ``cov_type``
+            selects does not accept also raises it. The message names the key and lists
+            the accepted keys. This is checked before the model is estimated. Releases
+            before 7.1 raised the ``TypeError`` of the constructor of the covariance
+            estimator.
         UnknownOptionError
             If ``cov_type`` or ``kernel`` is not supported. It is both a
             ``KeyError`` and a ``ValueError``.
-        ValueError
-            If a key of ``cov_config`` is not accepted by the covariance estimator
-            that ``cov_type`` selects. The message names the key and lists the
-            accepted keys. It is raised before the model is estimated. Releases
-            before 7.1 raised the ``TypeError`` of the constructor of the covariance
-            estimator.
 
         See Also
         --------
@@ -1390,7 +1395,8 @@ class _IVGMMBase(_IVModelBase):
         its observation is dropped. The default is to weight all observations equally.
     weight_type : str, optional
         Name of moment condition weight function to use in the GMM estimation. The
-        default is "robust". The supported weight functions are:
+        default is "robust". The names are not case sensitive. The supported weight
+        functions are:
 
         * "unadjusted", "homoskedastic"
         * "robust", "heteroskedastic"
@@ -1403,7 +1409,8 @@ class _IVGMMBase(_IVModelBase):
         function. The keys are ``center`` (bool) and ``debiased`` (bool) for every
         weight function, ``kernel`` (str), ``bandwidth`` (int) and ``optimal_bw``
         (bool) for "kernel", and ``clusters`` (array_like) for "clustered".
-        ``clusters`` is required and has one element for each observation.
+        The names of the kernels are not case sensitive. ``clusters`` is required
+        and has one element for each observation.
         See :class:`~linearmodels.iv.gmm.HomoskedasticWeightMatrix`,
         :class:`~linearmodels.iv.gmm.HeteroskedasticWeightMatrix`,
         :class:`~linearmodels.iv.gmm.KernelWeightMatrix` and
@@ -1694,7 +1701,8 @@ class IVGMM(_IVGMMBase):
         its observation is dropped. The default is to weight all observations equally.
     weight_type : str, optional
         Name of moment condition weight function to use in the GMM estimation. The
-        default is "robust". The supported weight functions are:
+        default is "robust". The names are not case sensitive. The supported weight
+        functions are:
 
         * "unadjusted", "homoskedastic"
         * "robust", "heteroskedastic"
@@ -1707,7 +1715,8 @@ class IVGMM(_IVGMMBase):
         function. The keys are ``center`` (bool) and ``debiased`` (bool) for every
         weight function, ``kernel`` (str), ``bandwidth`` (int) and ``optimal_bw``
         (bool) for "kernel", and ``clusters`` (array_like) for "clustered".
-        ``clusters`` is required and has one element for each observation.
+        The names of the kernels are not case sensitive. ``clusters`` is required
+        and has one element for each observation.
         See :class:`~linearmodels.iv.gmm.HomoskedasticWeightMatrix`,
         :class:`~linearmodels.iv.gmm.HeteroskedasticWeightMatrix`,
         :class:`~linearmodels.iv.gmm.KernelWeightMatrix` and
@@ -1863,8 +1872,8 @@ class IVGMM(_IVGMMBase):
             observations equally.
         weight_type : str, optional
             Name of moment condition weight function to use in the GMM estimation.
-            The default is "robust". See :class:`~linearmodels.iv.model.IVGMM` for the
-            supported weight functions.
+            The default is "robust". The names are not case sensitive. See
+            :class:`~linearmodels.iv.model.IVGMM` for the supported weight functions.
         **weight_config : dict
             Additional keyword arguments to pass to the moment condition weight
             function. See :class:`~linearmodels.iv.model.IVGMM` for the keys.
@@ -1974,8 +1983,8 @@ class IVGMM(_IVGMMBase):
             the average outer-product of the set containing the exogenous variables
             and instruments.
         cov_type : str, optional
-            Name of covariance estimator to use. The default is "robust". Supported
-            covariance estimators are:
+            Name of covariance estimator to use. The default is "robust". The names
+            are not case sensitive. Supported covariance estimators are:
 
             * "unadjusted", "homoskedastic" - Assumes moment conditions are
               homoskedastic
@@ -1991,7 +2000,8 @@ class IVGMM(_IVGMMBase):
             Additional parameters to pass to the covariance estimator. The keys are
             ``center`` (bool) for every covariance estimator, ``kernel`` (str),
             ``bandwidth`` (int) and ``optimal_bw`` (bool) for "kernel", and
-            ``clusters`` (array_like) for "clustered". See
+            ``clusters`` (array_like) for "clustered". The names of the kernels are
+            not case sensitive. See
             :class:`~linearmodels.iv.gmm.IVGMMCovariance` for details on the
             available options. Defaults are used if no covariance configuration is
             provided.
@@ -2015,15 +2025,14 @@ class IVGMM(_IVGMMBase):
             kernel needs, or the estimated bandwidth is not finite, if
             ``initial_weight`` does not have the right shape, and if the labels
             of ``clusters`` do not match the labels of the other inputs.
+            A key of ``cov_config`` that the covariance estimator that ``cov_type``
+            selects does not accept also raises it. The message names the key and lists
+            the accepted keys. This is checked before the model is estimated. Releases
+            before 7.1 raised the ``TypeError`` of the constructor of the covariance
+            estimator.
         UnknownOptionError
             If ``cov_type`` is not supported. It is both a ``KeyError`` and a
             ``ValueError``.
-        ValueError
-            If a key of ``cov_config`` is not accepted by the covariance estimator
-            that ``cov_type`` selects. The message names the key and lists the
-            accepted keys. It is raised before the model is estimated. Releases
-            before 7.1 raised the ``TypeError`` of the constructor of the covariance
-            estimator.
 
         See Also
         --------
@@ -2141,7 +2150,8 @@ class IVGMMCUE(_IVGMMBase):
         its observation is dropped. The default is to weight all observations equally.
     weight_type : str, optional
         Name of moment condition weight function to use in the GMM estimation. The
-        default is "robust". The supported weight functions are:
+        default is "robust". The names are not case sensitive. The supported weight
+        functions are:
 
         * "unadjusted", "homoskedastic"
         * "robust", "heteroskedastic"
@@ -2154,7 +2164,8 @@ class IVGMMCUE(_IVGMMBase):
         function. The keys are ``center`` (bool) and ``debiased`` (bool) for every
         weight function, ``kernel`` (str), ``bandwidth`` (int) and ``optimal_bw``
         (bool) for "kernel", and ``clusters`` (array_like) for "clustered".
-        ``clusters`` is required and has one element for each observation.
+        The names of the kernels are not case sensitive. ``clusters`` is required
+        and has one element for each observation.
         See :class:`~linearmodels.iv.gmm.HomoskedasticWeightMatrix`,
         :class:`~linearmodels.iv.gmm.HeteroskedasticWeightMatrix`,
         :class:`~linearmodels.iv.gmm.KernelWeightMatrix` and
@@ -2326,8 +2337,9 @@ class IVGMMCUE(_IVGMMBase):
             observations equally.
         weight_type : str, optional
             Name of moment condition weight function to use in the GMM estimation.
-            The default is "robust". See :class:`~linearmodels.iv.model.IVGMMCUE` for
-            the supported weight functions.
+            The default is "robust". The names are not case sensitive. See
+            :class:`~linearmodels.iv.model.IVGMMCUE` for the supported weight
+            functions.
         **weight_config : dict
             Additional keyword arguments to pass to the moment condition weight
             function. See :class:`~linearmodels.iv.model.IVGMMCUE` for the keys.
@@ -2612,8 +2624,8 @@ class IVGMMCUE(_IVGMMBase):
             Flag indicating whether to display optimization output. The default is
             False.
         cov_type : str, optional
-            Name of covariance estimator to use. The default is "robust". Supported
-            covariance estimators are:
+            Name of covariance estimator to use. The default is "robust". The names
+            are not case sensitive. Supported covariance estimators are:
 
             * "unadjusted", "homoskedastic" - Assumes moment conditions are
               homoskedastic
@@ -2634,7 +2646,8 @@ class IVGMMCUE(_IVGMMBase):
             Additional parameters to pass to the covariance estimator. The keys are
             ``center`` (bool) for every covariance estimator, ``kernel`` (str),
             ``bandwidth`` (int) and ``optimal_bw`` (bool) for "kernel", and
-            ``clusters`` (array_like) for "clustered". See
+            ``clusters`` (array_like) for "clustered". The names of the kernels are
+            not case sensitive. See
             :class:`~linearmodels.iv.gmm.IVGMMCovariance` for details on the
             available options. Defaults are used if no covariance configuration is
             provided.
@@ -2658,15 +2671,14 @@ class IVGMMCUE(_IVGMMBase):
             estimated bandwidth is not finite, if ``starting`` does not have one
             value for each regressor, and if the labels of ``clusters`` do not match
             the labels of the other inputs.
+            A key of ``cov_config`` that the covariance estimator that ``cov_type``
+            selects does not accept also raises it. The message names the key and lists
+            the accepted keys. This is checked before the model is estimated. Releases
+            before 7.1 raised the ``TypeError`` of the constructor of the covariance
+            estimator.
         UnknownOptionError
             If ``cov_type`` is not supported. It is both a ``KeyError`` and a
             ``ValueError``.
-        ValueError
-            If a key of ``cov_config`` is not accepted by the covariance estimator
-            that ``cov_type`` selects. The message names the key and lists the
-            accepted keys. It is raised before the model is estimated. Releases
-            before 7.1 raised the ``TypeError`` of the constructor of the covariance
-            estimator.
 
         See Also
         --------
@@ -3216,8 +3228,8 @@ class IVJIVE(_IVModelBase):
         Parameters
         ----------
         cov_type : str, optional
-            Name of covariance estimator to use. The default is "robust". Supported
-            covariance estimators are:
+            Name of covariance estimator to use. The default is "robust". The names
+            are not case sensitive. Supported covariance estimators are:
 
             * "unadjusted", "homoskedastic" - Classic homoskedastic inference
             * "robust", "heteroskedastic" - Heteroskedasticity robust inference
@@ -3233,7 +3245,8 @@ class IVJIVE(_IVModelBase):
             Additional parameters to pass to the covariance estimator. The keys are
             ``center`` (bool) for every covariance estimator, ``kernel`` (str),
             ``bandwidth`` (int) and ``optimal_bw`` (bool) for "kernel", and
-            ``clusters`` (array_like, one column) for "clustered". See the Notes.
+            ``clusters`` (array_like, one column) for "clustered". The names of the
+            kernels are not case sensitive. See the Notes.
 
         Returns
         -------
@@ -3248,15 +3261,14 @@ class IVJIVE(_IVModelBase):
             fewer observations than the kernel needs, if ``clusters`` has more than
             one column, or if the labels of ``clusters`` do not match the labels of
             the other inputs.
+            A key of ``cov_config`` that the covariance estimator that ``cov_type``
+            selects does not accept also raises it. The message names the key and lists
+            the accepted keys. This is checked before the model is estimated. Releases
+            before 7.1 raised the ``TypeError`` of the constructor of the covariance
+            estimator.
         UnknownOptionError
             If ``cov_type`` or ``kernel`` is not supported. It is both a
             ``KeyError`` and a ``ValueError``.
-        ValueError
-            If a key of ``cov_config`` is not accepted by the covariance estimator
-            that ``cov_type`` selects. The message names the key and lists the
-            accepted keys. It is raised before the model is estimated. Releases
-            before 7.1 raised the ``TypeError`` of the constructor of the covariance
-            estimator.
 
         See Also
         --------

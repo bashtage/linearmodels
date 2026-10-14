@@ -2234,7 +2234,7 @@ class IVModelComparison(_ModelComparison):
         OLSResults.  If a dict, the keys will be used as model names.
     precision : {"tstats", "std_errors", "std-errors", "pvalues"}, optional
         Estimator precision estimator to include in the comparison output. The
-        name is not case sensitive. The default is "tstats".
+        default is "tstats". The names are not case sensitive.
     stars : bool, optional
         Add stars based on the p-value of the coefficient where 1, 2 and
         3-stars correspond to p-values of 10%, 5% and 1%, respectively. The
@@ -2411,7 +2411,7 @@ def compare(
         OLSResults.  If a dict, the keys will be used as model names.
     precision : {"tstats", "std_errors", "std-errors", "pvalues"}, optional
         Estimator precision estimator to include in the comparison output. The
-        name is not case sensitive. The default is "tstats".
+        default is "tstats". The names are not case sensitive.
     stars : bool, optional
         Add stars based on the p-value of the coefficient where 1, 2 and
         3-stars correspond to p-values of 10%, 5% and 1%, respectively. The

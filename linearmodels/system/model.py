@@ -1481,7 +1481,7 @@ class _LSSystemModelBase(_SystemModelBase):
         Parameters
         ----------
         method : {"ols", "gls"}, optional
-            Estimation method. The name is not case sensitive. If not provided, the
+            Estimation method. The names are not case sensitive. If not provided, the
             method is selected based on the regressors, using OLS only if all
             regressors are identical and the model has no constraints, and GLS
             otherwise. The two names force the use of OLS or GLS.
@@ -1497,8 +1497,8 @@ class _LSSystemModelBase(_SystemModelBase):
             Tolerance to use when checking for convergence in iterative GLS. The
             default is 1e-6.
         cov_type : str, optional
-            Name of covariance estimator. The name is not case sensitive. The
-            default is "robust". Valid options are
+            Name of covariance estimator to use. The default is "robust". The names
+            are not case sensitive. Supported covariance estimators are:
 
             * "unadjusted", "homoskedastic" - Classic covariance estimator
             * "robust", "heteroskedastic" - Heteroskedasticity robust
@@ -1513,7 +1513,8 @@ class _LSSystemModelBase(_SystemModelBase):
             (bool), which employs a small-sample adjustment and is False by
             default. "kernel" also accepts ``kernel`` (str), the name of the kernel,
             which is "bartlett" if it is not provided, and ``bandwidth`` (float),
-            which is estimated from the data if it is not provided. "clustered" also
+            which is estimated from the data if it is not provided. The names of the
+            kernels are not case sensitive. "clustered" also
             accepts ``clusters`` (array_like), the cluster assignment of each
             observation with one or two columns, and ``group_debias`` (bool), which
             debiases by the number of groups and is False by default. "unadjusted"
@@ -1529,15 +1530,14 @@ class _LSSystemModelBase(_SystemModelBase):
         ValueError
             If ``method`` is not "ols" or "gls", or if the labels of ``clusters``
             do not match the labels of the inputs.
+            A key of ``cov_config`` that the covariance estimator that ``cov_type``
+            selects does not accept also raises it. The message names the key and lists
+            the accepted keys. This is checked before the model is estimated. Releases
+            before 7.1 raised the ``TypeError`` of the constructor of the covariance
+            estimator.
         UnknownOptionError
             If ``cov_type`` or ``kernel`` is not supported. It is both a
             ``KeyError`` and a ``ValueError``.
-        ValueError
-            If a key of ``cov_config`` is not accepted by the covariance estimator
-            that ``cov_type`` selects. The message names the key and lists the
-            accepted keys. It is raised before the model is estimated. Releases
-            before 7.1 raised the ``TypeError`` of the constructor of the covariance
-            estimator.
 
         See Also
         --------
@@ -2169,8 +2169,8 @@ class IVSystemGMM(_SystemModelBase):
         provided with another weight type.
     weight_type : str, optional
         Name of moment condition weight function to use in the GMM estimation. The
-        default is "robust". The names are not case sensitive. Supported weight
-        types are:
+        default is "robust". The names are not case sensitive. The supported weight
+        functions are:
 
         * "unadjusted", "homoskedastic" - Assume moments are homoskedastic
         * "robust", "heteroskedastic" - Allow for heteroskedasticity
@@ -2182,7 +2182,8 @@ class IVSystemGMM(_SystemModelBase):
         moment conditions, and ``debiased`` (bool), whether to use small-sample
         adjustments. Both are False by default. "kernel" also accepts ``kernel``
         (str), the name of the kernel, which is "bartlett" if it is not provided,
-        ``bandwidth`` (float), and ``optimal_bw`` (bool). See
+        ``bandwidth`` (float), and ``optimal_bw`` (bool). The names of the kernels
+        are not case sensitive. See
         :class:`~linearmodels.system.gmm.HomoskedasticWeightMatrix`,
         :class:`~linearmodels.system.gmm.HeteroskedasticWeightMatrix` and
         :class:`~linearmodels.system.gmm.KernelWeightMatrix` for the details.
@@ -2362,8 +2363,8 @@ class IVSystemGMM(_SystemModelBase):
             specified, uses the average outer-product of the set containing
             the exogenous variables and instruments.
         cov_type : str, optional
-            Name of covariance estimator. The names are not case sensitive. The default
-            is "robust". Valid options are
+            Name of covariance estimator to use. The default is "robust". The names
+            are not case sensitive. Supported covariance estimators are:
 
             * "unadjusted", "homoskedastic" - Classic covariance estimator
             * "robust", "heteroskedastic" - Heteroskedasticity robust
@@ -2377,7 +2378,7 @@ class IVSystemGMM(_SystemModelBase):
             adjustment and is False by default. "kernel" also accepts ``kernel``
             (str), the name of the kernel, which is "bartlett" if it is not
             provided, and ``bandwidth`` (float), which is estimated from the data
-            if it is not given.
+            if it is not given. The names of the kernels are not case sensitive.
 
         Returns
         -------
@@ -2396,10 +2397,9 @@ class IVSystemGMM(_SystemModelBase):
             for the Parzen kernel and 6 for the quadratic spectral kernel. It
             is also raised if the estimated bandwidth is not finite. Pass
             ``bandwidth`` to use the kernel with fewer observations.
-        ValueError
-            If a key of ``cov_config`` is not accepted by the covariance estimator
-            that ``cov_type`` selects. The message names the key and lists the
-            accepted keys. It is raised before the model is estimated. Releases
+            A key of ``cov_config`` that the covariance estimator that ``cov_type``
+            selects does not accept also raises it. The message names the key and lists
+            the accepted keys. This is checked before the model is estimated. Releases
             before 7.1 raised the ``TypeError`` of the constructor of the covariance
             estimator.
 
@@ -2641,7 +2641,7 @@ class IVSystemGMM(_SystemModelBase):
         weight_type : str, optional
             Name of moment condition weight function to use in the GMM
             estimation. The default is "robust". The names are not case sensitive.
-            Valid options are:
+            The supported weight functions are:
 
             * "unadjusted", "homoskedastic" - Assume moments are homoskedastic
             * "robust", "heteroskedastic" - Allow for heteroskedasticity
@@ -2652,8 +2652,9 @@ class IVSystemGMM(_SystemModelBase):
             function. All weight types accept ``center`` (bool) and ``debiased``
             (bool), which are False by default. "kernel" also accepts ``kernel``
             (str), the name of the kernel, which is "bartlett" if it is not
-            provided, ``bandwidth`` (float), and ``optimal_bw`` (bool). See the
-            parameters of :class:`~linearmodels.system.model.IVSystemGMM`.
+            provided, ``bandwidth`` (float), and ``optimal_bw`` (bool). The names of
+            the kernels are not case sensitive. See the parameters of
+            :class:`~linearmodels.system.model.IVSystemGMM`.
 
         Returns
         -------

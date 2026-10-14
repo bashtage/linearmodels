@@ -765,7 +765,8 @@ class PanelData:
         Parameters
         ----------
         group : {"entity", "time", "both"}, optional
-            Group to use in demeaning. The default is ``"entity"``.
+            Group to use in demeaning. The default is "entity". The names are not
+            case sensitive.
         weights : PanelData, optional
             Weights to implement weighted averaging. If not provided, the
             observations have equal weights.
@@ -850,7 +851,8 @@ class PanelData:
         Parameters
         ----------
         group : {"entity", "time"}, optional
-            Group to count. The default is ``"entity"``.
+            Group to count. The default is "entity". The names are not case
+            sensitive.
 
         Returns
         -------
@@ -913,7 +915,8 @@ class PanelData:
         Parameters
         ----------
         group : {"entity", "time"}, optional
-            Group to use in computing the means. The default is ``"entity"``.
+            Group to use in computing the means. The default is "entity". The names
+            are not case sensitive.
         weights : PanelData, optional
             Weights to implement weighted averaging. If not provided, the
             observations have equal weights.
@@ -1010,7 +1013,8 @@ class PanelData:
         Parameters
         ----------
         group : {"entity", "time"}, optional
-            Type of dummies to generate. The default is ``"entity"``.
+            Type of dummies to generate. The default is "entity". The names are not
+            case sensitive.
         drop_first : bool, optional
             Flag indicating that the dummy column corresponding to the first
             entity or time period should be dropped. The default is False.

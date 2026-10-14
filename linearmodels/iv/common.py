@@ -539,18 +539,29 @@ def kleibergen_paap(
         Weighted exogenous regressor array (nobs, nexog), partialled out
         before testing. Include a constant column here if the model has one.
     cov_type : str, optional
-        Covariance estimator used for the first-stage scores. One of
-        "unadjusted", "robust", "clustered" or "kernel", or any other name that
-        the IV models accept for the same estimator, such as "homoskedastic" or
-        "heteroskedastic". The default is "robust".
+        Covariance estimator used for the first-stage scores. The default is
+        "robust". The names are not case sensitive. Supported covariance
+        estimators are:
+
+        * "unadjusted", "homoskedastic", "homo", "homoskedasticcovariance" -
+          Classic homoskedastic inference
+        * "robust", "heteroskedastic", "hccm", "heteroskedasticcovariance" -
+          Heteroskedasticity robust inference
+        * "kernel", "kernelcovariance" - Heteroskedasticity and autocorrelation
+          robust inference
+        * "clustered", "one-way", "onewayclusteredcovariance" - Cluster
+          dependent inference, which is heteroskedasticity robust
+
     cov_config : dict, optional
         Options for the covariance estimator. "clustered" requires
         ``clusters``, a 1-d array with one element for each observation.
-        "kernel" uses ``kernel`` (default "bartlett") and ``bandwidth``. If
-        the bandwidth is not provided it is selected automatically, which
-        needs at least 4 observations with the Bartlett kernel, 5 with the
-        Parzen kernel and 6 with the quadratic spectral kernel. See
-        :func:`~linearmodels.iv.covariance.kernel_optimal_bandwidth`.
+        "kernel" uses ``kernel`` (default "bartlett") and ``bandwidth``. The
+        names of the kernels are not case sensitive. If the bandwidth is not
+        provided it is selected automatically, which needs at least 4
+        observations with the Bartlett kernel, 5 with the Parzen kernel and 6
+        with the quadratic spectral kernel. See
+        :func:`~linearmodels.iv.covariance.kernel_optimal_bandwidth`, which
+        lists the supported kernels.
 
     Returns
     -------
@@ -697,10 +708,19 @@ def kleibergen_paap_f(
         Weighted exogenous regressor array (nobs, nexog), partialled out
         before testing. Include a constant column here if the model has one.
     cov_type : str, optional
-        Covariance estimator used for the first-stage scores. One of
-        "unadjusted", "robust", "clustered" or "kernel", or any other name that
-        the IV models accept for the same estimator, such as "homoskedastic" or
-        "heteroskedastic". The default is "robust".
+        Covariance estimator used for the first-stage scores. The default is
+        "robust". The names are not case sensitive. Supported covariance
+        estimators are:
+
+        * "unadjusted", "homoskedastic", "homo", "homoskedasticcovariance" -
+          Classic homoskedastic inference
+        * "robust", "heteroskedastic", "hccm", "heteroskedasticcovariance" -
+          Heteroskedasticity robust inference
+        * "kernel", "kernelcovariance" - Heteroskedasticity and autocorrelation
+          robust inference
+        * "clustered", "one-way", "onewayclusteredcovariance" - Cluster
+          dependent inference, which is heteroskedasticity robust
+
     cov_config : dict, optional
         Options for the covariance estimator. See :func:`kleibergen_paap`.
 
