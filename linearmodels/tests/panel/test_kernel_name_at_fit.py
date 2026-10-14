@@ -43,9 +43,9 @@ ALIASES = [
     ("parzen", "gallant"),
     ("qs", "quadratic-spectral", "andrews"),
 ]
-# A name that is not close to any kernel and a name with a case that is not supported,
-# for which the message makes a suggestion
-UNKNOWN = [("foo", None), ("Parzen", "parzen"), ("Bartlett", "bartlett")]
+# A name that is not close to any kernel and a name that is close to one, for which
+# the message makes a suggestion. The names are not case sensitive
+UNKNOWN = [("foo", None), ("parzan", "parzen"), ("bartlet", "bartlett")]
 UNKNOWN_IDS = [name for name, _ in UNKNOWN]
 KERNEL_COV_TYPES = ["kernel", "driscoll-kraay", "dk"]
 AC_COV_TYPES = ["ac", "autocorrelated"]
@@ -149,7 +149,7 @@ def test_model_is_not_changed_by_the_failed_fit(frame):
     mod = PooledOLS(frame["y"], frame[["const", "x"]])
     expected = mod.fit(cov_type="kernel", kernel="parzen", bandwidth=2).std_errors
     with pytest.raises(UnknownOptionError):
-        mod.fit(cov_type="kernel", kernel="Parzen", bandwidth=2)
+        mod.fit(cov_type="kernel", kernel="foo", bandwidth=2)
     after = mod.fit(cov_type="kernel", kernel="parzen", bandwidth=2).std_errors
     assert_allclose(after, expected, rtol=1e-12)
 

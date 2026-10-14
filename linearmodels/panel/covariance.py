@@ -19,7 +19,11 @@ from linearmodels.iv.covariance import (
     kernel_optimal_bandwidth,
 )
 from linearmodels.shared.covariance import cluster_union, group_debias_coefficient
-from linearmodels.shared.exceptions import lookup_option, unknown_option_error
+from linearmodels.shared.exceptions import (
+    lookup_option,
+    lower_option,
+    unknown_option_error,
+)
 from linearmodels.shared.typed_getters import (
     get_array_like,
     get_bool,
@@ -839,9 +843,10 @@ class CovarianceManager:
             for name, estimator in self.COVARIANCE_ESTIMATORS.items()
             if estimator in self._supported
         ]
-        if item not in self.COVARIANCE_ESTIMATORS:
+        name = lower_option(item)
+        if name not in self.COVARIANCE_ESTIMATORS:
             raise unknown_option_error("cov_type", item, supported)
-        cov_est = self.COVARIANCE_ESTIMATORS[item]
+        cov_est = self.COVARIANCE_ESTIMATORS[name]
         if cov_est not in self._supported:
             problem = (
                 "Requested covariance estimator is not supported "

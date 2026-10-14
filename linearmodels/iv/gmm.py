@@ -21,6 +21,7 @@ from linearmodels.shared.covariance import cov_cluster, cov_kernel
 from linearmodels.shared.exceptions import (
     DefaultBandwidthWarning,
     lookup_option,
+    lower_option,
     unknown_option_error,
 )
 import linearmodels.typing.data
@@ -315,9 +316,10 @@ class KernelWeightMatrix(HomoskedasticWeightMatrix):
         super().__init__(center, debiased)
         self._bandwidth = bandwidth
         self._orig_bandwidth = bandwidth
+        kernel = lower_option(kernel)
         self._kernel = kernel
         self._kernels = KERNEL_LOOKUP
-        if isinstance(kernel, str) and kernel.lower() not in KERNEL_LOOKUP:
+        if isinstance(kernel, str) and kernel not in KERNEL_LOOKUP:
             raise unknown_option_error("kernel", kernel, KERNEL_LOOKUP)
         # Selecting the bandwidth from the data is the default since 7.1, and it
         # warns since the default was nobs - 2
@@ -636,6 +638,7 @@ class IVGMMCovariance(HomoskedasticCovariance):
         **cov_config: str | bool,
     ) -> None:
         super().__init__(x, y, z, params, debiased)
+        cov_type = lower_option(cov_type)
         self._cov_type = cov_type
         self._cov_config = cov_config
         self.w = w

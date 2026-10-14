@@ -66,6 +66,7 @@ from linearmodels.shared.exceptions import (
     IndexWarning,
     check_cov_config,
     lookup_option,
+    lower_option,
     missing_warning,
     unknown_option_error,
 )
@@ -911,6 +912,7 @@ class _IVLSModelBase(_IVModelBase):
         supported options. Defaults are used if no covariance configuration
         is provided.
         """
+        cov_type = lower_option(cov_type)
         check_cov_config(cov_config, cov_type, _LS_COV_KEYS, KERNEL_LOOKUP)
         self._check_clusters(cov_config)
         wy, wx, wz = self._wy, self._wx, self._wz
@@ -1468,6 +1470,7 @@ class _IVGMMBase(_IVModelBase):
         super().__init__(dependent, exog, endog, instruments, weights=weights)
         self._method = "IV-GMM"
 
+        weight_type = lower_option(weight_type)
         self._check_clusters(weight_config)
         weight_matrix_estimator = lookup_option(
             WEIGHT_MATRICES, weight_type, "weight_type"
@@ -2044,6 +2047,7 @@ class IVGMM(_IVGMMBase):
         ``optimal_bw=False`` to use the kernel with fewer observations. See
         :func:`~linearmodels.iv.covariance.kernel_optimal_bandwidth`.
         """
+        cov_type = lower_option(cov_type)
         check_cov_config(cov_config, cov_type, _GMM_COV_KEYS, KERNEL_LOOKUP)
         self._check_clusters(cov_config)
         cov_config = self._check_default_bandwidth(cov_type, cov_config)
@@ -2700,6 +2704,7 @@ class IVGMMCUE(_IVGMMBase):
         ``optimal_bw=False`` to use the kernel with fewer observations. See
         :func:`~linearmodels.iv.covariance.kernel_optimal_bandwidth`.
         """
+        cov_type = lower_option(cov_type)
         check_cov_config(cov_config, cov_type, _GMM_COV_KEYS, KERNEL_LOOKUP)
         self._check_clusters(cov_config)
         cov_config = self._check_default_bandwidth(cov_type, cov_config)
@@ -2952,7 +2957,7 @@ class _JIVECovariance(IVGMMCovariance):
         # The weight matrix has no effect in a just identified model
         w = eye(x.shape[1])
         if cov_type == "kernel":
-            kernel = cov_config.get("kernel", "bartlett")
+            kernel = lower_option(cov_config.get("kernel", "bartlett"))
             if kernel not in KERNEL_LOOKUP:
                 raise unknown_option_error("kernel", kernel, KERNEL_LOOKUP)
             # Select the bandwidth using the data unless it is given, as in
@@ -3276,6 +3281,7 @@ class IVJIVE(_IVModelBase):
         ``InvalidTestStatistic`` if it is not defined. The model is estimated
         then. See the notes of the class.
         """
+        cov_type = lower_option(cov_type)
         check_cov_config(cov_config, cov_type, _GMM_COV_KEYS, KERNEL_LOOKUP)
         self._check_clusters(cov_config)
         wy, wx, wz = self._wy, self._wx, self._wz

@@ -511,9 +511,9 @@ def test_fama_macbeth_unknown_kernel_raises_when_the_model_is_fit():
     y, x = fama_macbeth_panel(12)
     mod = FamaMacBeth(y, x)
     with pytest.raises(
-        ValueError, match=r"Unknown kernel: 'Parzen'\. Did you mean 'parzen'"
+        ValueError, match=r"Unknown kernel: 'parzan'\. Did you mean 'parzen'"
     ):
-        mod.fit(cov_type="kernel", kernel="Parzen")
+        mod.fit(cov_type="kernel", kernel="parzan")
 
 
 def estimates_and_params(estimates):

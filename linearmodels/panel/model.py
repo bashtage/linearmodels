@@ -68,6 +68,7 @@ from linearmodels.shared.exceptions import (
     MissingValueWarning,
     SingletonWarning,
     lookup_option,
+    lower_option,
     missing_warning,
     unknown_option_error,
 )
@@ -1992,6 +1993,7 @@ class PooledOLS(_PanelModelBase):
         >>> mod = PooledOLS(y, x)
         >>> res = mod.fit(cov_type="clustered", cluster_entity=True)
         """
+        cov_type = lower_option(cov_type)
         check_covariance_kwargs(self._cov_estimators, cov_type, cov_config)
         y = self.dependent.values2d
         x = self.exog.values2d
@@ -3282,6 +3284,7 @@ class PanelOLS(_PanelModelBase):
         >>> mod = PanelOLS(y, x, entity_effects=True)
         >>> res = mod.fit(cov_type="clustered", cluster_entity=True)
         """
+        cov_type = lower_option(cov_type)
         check_covariance_kwargs(self._cov_estimators, cov_type, cov_config)
 
         weighted = np.any(self.weights.values2d != 1.0)
@@ -3804,6 +3807,7 @@ class BetweenOLS(_PanelModelBase):
         >>> mod = BetweenOLS(y, x)
         >>> res = mod.fit(cov_type='robust')
         """
+        cov_type = lower_option(cov_type)
         check_covariance_kwargs(self._cov_estimators, cov_type, cov_config)
         y, x, w = self._prepare_between()
         if np.all(self.weights.values2d == 1.0) and not reweight:
@@ -4326,6 +4330,7 @@ class FirstDifferenceOLS(_PanelModelBase):
         >>> robust = mod.fit(cov_type="robust")
         >>> clustered = mod.fit(cov_type="clustered", cluster_entity=True)
         """
+        cov_type = lower_option(cov_type)
         check_covariance_kwargs(self._cov_estimators, cov_type, cov_config)
         y_fd = self.dependent.first_difference()
         time_ids = y_fd.time_ids
@@ -4856,6 +4861,7 @@ class RandomEffects(_PanelModelBase):
         >>> mod = RandomEffects(y, x)
         >>> res = mod.fit(cov_type="clustered", cluster_entity=True)
         """
+        cov_type = lower_option(cov_type)
         check_covariance_kwargs(self._cov_estimators, cov_type, cov_config)
         w = self.weights.values2d
         root_w = cast("linearmodels.typing.data.Float64Array", np.sqrt(w))
@@ -5395,6 +5401,7 @@ class FamaMacBeth(_PanelModelBase):
         >>> mod = FamaMacBeth(y, x)
         >>> res = mod.fit(cov_type="kernel", kernel="parzen")
         """
+        cov_type = lower_option(cov_type)
         if isinstance(kernel, str):
             lookup_option(KERNEL_LOOKUP, kernel.lower(), "kernel")
         # The retained observations and their weights, which are scaled to have a

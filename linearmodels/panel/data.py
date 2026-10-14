@@ -22,7 +22,7 @@ from pandas import (
 )
 from pandas.api.types import is_datetime64_any_dtype, is_numeric_dtype, is_string_dtype
 
-from linearmodels.shared.exceptions import unknown_option_error
+from linearmodels.shared.exceptions import lower_option, unknown_option_error
 from linearmodels.shared.inputs import as_float64, reject_complex
 from linearmodels.shared.utility import ensure_unique_column, panel_to_frame
 import linearmodels.typing.data
@@ -796,6 +796,7 @@ class PanelData:
         the square root of the weights so that they can be used in WLS
         estimation.
         """
+        group = lower_option(group)
         if group not in ("entity", "time", "both"):
             raise unknown_option_error("group", group, ("entity", "time", "both"))
         self._check_index(*{"entity": (0,), "time": (1,), "both": (0, 1)}[group])
@@ -870,6 +871,7 @@ class PanelData:
 
            An unknown `group` raises an error. It was treated as ``"time"``.
         """
+        group = lower_option(group)
         if group not in ("entity", "time"):
             raise unknown_option_error("group", group, ("entity", "time"))
         level = 0 if group == "entity" else 1
@@ -935,6 +937,7 @@ class PanelData:
 
            An unknown `group` raises an error. It was treated as ``"time"``.
         """
+        group = lower_option(group)
         if group not in ("entity", "time"):
             raise unknown_option_error("group", group, ("entity", "time"))
         level = 0 if group == "entity" else 1
@@ -1023,6 +1026,7 @@ class PanelData:
             If `group` is not one of the supported values, or if the level of
             the index that is used has a missing label.
         """
+        group = lower_option(group)
         if group not in ("entity", "time"):
             raise unknown_option_error("group", group, ("entity", "time"))
         axis = 0 if group == "entity" else 1

@@ -533,17 +533,10 @@ def test_iv_system_gmm_with_clustered_weights(inputs):
 
 
 def test_case_of_the_names_of_the_system_models(inputs):
-    # SUR and IV3SLS lower case cov_type before they look it up, so that "Robust" is
-    # accepted and the message shows the lower case name. IVSystemGMM looks up the name
-    # that it is given
+    # The names are lower cased before they are looked up, and the message shows the
+    # name in lower case if it is a cov_type of SUR and IV3SLS
     SUR(inputs.equations).fit(cov_type="Robust")
-    check_error(
-        lambda: IVSystemGMM(inputs.iv_equations, weight_type="Robust"),
-        "weight_type",
-        "Robust",
-        SYSTEM_GMM_TYPES,
-        suggestion="robust",
-    )
+    IVSystemGMM(inputs.iv_equations, weight_type="Robust")
     check_error(
         lambda: SUR(inputs.equations).fit(cov_type="FOO"),
         "cov_type",
@@ -585,15 +578,15 @@ def test_a_name_that_the_model_does_not_support(inputs):
 
 
 def test_case_of_kernel_names_of_the_panel_models(inputs):
-    # The names are not lower cased before they are looked up. The message suggests
-    # the right case, for example for kernel="Parzen", which the docstring of
-    # FamaMacBeth.fit uses
+    # The names are not case sensitive. The message shows the name in lower case and
+    # suggests a name that is close
+    panel(FamaMacBeth, inputs).fit(cov_type="kernel", kernel="Parzen")
     check_error(
         lambda: panel(FamaMacBeth, inputs)
-        .fit(cov_type="kernel", kernel="Parzen")
+        .fit(cov_type="kernel", kernel="Parzan")
         .std_errors,
         "kernel",
-        "Parzen",
+        "parzan",
         KERNELS,
         suggestion="parzen",
     )

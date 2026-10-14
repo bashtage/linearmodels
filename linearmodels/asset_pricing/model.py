@@ -31,6 +31,7 @@ from linearmodels.shared import hypotheses
 from linearmodels.shared.alignment import check_alignment, row_labels
 from linearmodels.shared.exceptions import (
     check_cov_config,
+    lower_option,
     missing_warning,
     unknown_option_error,
 )
@@ -428,7 +429,7 @@ class TradedFactorModel(_FactorModelBase):
         Parameters
         ----------
         cov_type : {"robust", "heteroskedastic", "kernel"}, optional
-            Name of covariance estimator. The names are case sensitive. The
+            Name of covariance estimator. The names are not case sensitive. The
             default is "robust". "heteroskedastic" is the same as "robust".
         debiased : bool, optional
             Flag indicating whether to debias the covariance estimator using
@@ -504,6 +505,7 @@ class TradedFactorModel(_FactorModelBase):
            alphas and the loadings, ``risk_premia_se`` and the covariance with
            ``debiased=False`` do not change.
         """
+        cov_type = lower_option(cov_type)
         check_cov_config(cov_config, cov_type, _COV_KEYS, KERNEL_LOOKUP)
         self._check_debiased(debiased)
         p = self.portfolios.ndarray
@@ -946,7 +948,7 @@ class LinearFactorModel(_LinearFactorModelBase):
         Parameters
         ----------
         cov_type : {"robust", "heteroskedastic", "kernel"}, optional
-            Name of covariance estimator. The names are case sensitive. The
+            Name of covariance estimator. The names are not case sensitive. The
             default is "robust". "heteroskedastic" is the same as "robust".
         debiased : bool, optional
             Flag indicating whether to debias the covariance estimator using
@@ -991,6 +993,7 @@ class LinearFactorModel(_LinearFactorModelBase):
         the kernel with fewer observations. See
         :func:`~linearmodels.iv.covariance.kernel_optimal_bandwidth`.
         """
+        cov_type = lower_option(cov_type)
         check_cov_config(cov_config, cov_type, _COV_KEYS, KERNEL_LOOKUP)
         nobs, nf, nport, _, s1, s2, s3 = self._boundaries()
         excess_returns = not self._risk_free
@@ -1392,7 +1395,7 @@ class LinearFactorModelGMM(_LinearFactorModelBase):
             Maximum number of iterations when minimizing objective. Must be
             positive. The default is 1000.
         cov_type : {"robust", "heteroskedastic", "kernel"}, optional
-            Name of covariance estimator. The names are case sensitive. The
+            Name of covariance estimator. The names are not case sensitive. The
             default is "robust". "heteroskedastic" is the same as "robust".
         debiased : bool, optional
             Flag indicating whether to debias the covariance estimator using
@@ -1446,6 +1449,7 @@ class LinearFactorModelGMM(_LinearFactorModelBase):
         observations. See
         :func:`~linearmodels.iv.covariance.kernel_optimal_bandwidth`.
         """
+        cov_type = lower_option(cov_type)
         check_cov_config(cov_config, cov_type, _COV_KEYS, KERNEL_LOOKUP)
 
         nobs, n = self.portfolios.shape
