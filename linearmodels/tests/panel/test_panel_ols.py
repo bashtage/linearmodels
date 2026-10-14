@@ -1614,6 +1614,14 @@ def test_predict_incorrect(data):
         mod.predict(res.params, exog=exog)
 
 
+def test_predict_requires_exog_or_data(data):
+    with warns_if_missing(data.y, data.x):
+        mod = PanelOLS(data.y, data.x)
+    res = mod.fit()
+    with pytest.raises(ValueError, match=r"One of exog or data must be provided"):
+        mod.predict(res.params)
+
+
 @pytest.mark.parametrize(
     "cov_config",
     [

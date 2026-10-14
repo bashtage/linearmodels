@@ -1596,13 +1596,18 @@ class _PanelModelBase:
         ------
         ValueError
             If `data` is provided and the model was not created using a formula,
-            if both `exog` and `data` are provided, or if `exog` does not have as
-            many columns as there are parameters.
+            if both `exog` and `data` are provided, if neither is provided, or
+            if `exog` does not have as many columns as there are parameters.
         TypeError
             If `exog` is a container that is not supported, e.g., a list or a tuple.
 
         Notes
         -----
+        .. versionchanged:: 7.1
+
+           Calling without `exog` and `data` raises a ``ValueError``. It raised
+           an ``AssertionError``.
+
         If `data` is not None, then `exog` must be None.
         Predictions from models constructed using formulas can
         be computed using either `exog`, which will treat these are
@@ -1619,6 +1624,8 @@ class _PanelModelBase:
                 "Predictions can only be constructed using one "
                 "of exog or data, but not both."
             )
+        if data is None and exog is None:
+            raise ValueError("One of exog or data must be provided.")
         if exog is not None:
             exog = _panel_data(exog, "exog", "x").dataframe
         else:
@@ -2076,13 +2083,18 @@ class PooledOLS(_PanelModelBase):
         ------
         ValueError
             If `data` is provided and the model was not created using a formula,
-            if both `exog` and `data` are provided, or if `exog` does not have as
-            many columns as there are parameters.
+            if both `exog` and `data` are provided, if neither is provided, or
+            if `exog` does not have as many columns as there are parameters.
         TypeError
             If `exog` is a container that is not supported, e.g., a list or a tuple.
 
         Notes
         -----
+        .. versionchanged:: 7.1
+
+           Calling without `exog` and `data` raises a ``ValueError``. It raised
+           an ``AssertionError``.
+
         If `data` is not None, then `exog` must be None.
         Predictions from models constructed using formulas can
         be computed using either `exog`, which will treat these are
@@ -2099,6 +2111,8 @@ class PooledOLS(_PanelModelBase):
                 "Predictions can only be constructed using one "
                 "of exog or data, but not both."
             )
+        if data is None and exog is None:
+            raise ValueError("One of exog or data must be provided.")
         if exog is not None:
             exog = _panel_data(exog, "exog", "x").dataframe
         else:
