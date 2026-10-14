@@ -19,7 +19,7 @@
     
   
       
-        <title>linearmodels.system.model - linearmodels v7.1 (+544)</title>
+        <title>linearmodels.system.model - linearmodels v7.1 (+547)</title>
       
     
 
@@ -91,7 +91,7 @@
 
 <header class="md-header md-header--shadow" data-md-component="header">
   <nav class="md-header__inner md-grid" aria-label="Header">
-    <a href="../../../index.html" title="linearmodels v7.1 (+544)" class="md-header__button md-logo" aria-label="linearmodels v7.1 (+544)" data-md-component="logo">
+    <a href="../../../index.html" title="linearmodels v7.1 (+547)" class="md-header__button md-logo" aria-label="linearmodels v7.1 (+547)" data-md-component="logo">
       <img src="../../../_static/bw-logo.svg" alt="logo">
     </a>
     <label class="md-header__button md-icon" for="__drawer">
@@ -102,7 +102,7 @@
       <div class="md-header__ellipsis">
         <div class="md-header__topic">
           <span class="md-ellipsis">
-            linearmodels v7.1 (+544)
+            linearmodels v7.1 (+547)
           </span>
         </div>
         <div class="md-header__topic" data-md-component="header-topic">
@@ -197,10 +197,10 @@
 
 <nav class="md-nav md-nav--primary" aria-label="Navigation" data-md-level="0">
   <label class="md-nav__title" for="__drawer">
-    <a href="../../../index.html" title="linearmodels v7.1 (+544)" class="md-nav__button md-logo" aria-label="linearmodels v7.1 (+544)" data-md-component="logo">
+    <a href="../../../index.html" title="linearmodels v7.1 (+547)" class="md-nav__button md-logo" aria-label="linearmodels v7.1 (+547)" data-md-component="logo">
       <img src="../../../_static/bw-logo.svg" alt="logo">
     </a>
-    linearmodels v7.1 (+544)
+    linearmodels v7.1 (+547)
   </label>
   
     <div class="md-nav__source">
@@ -2010,7 +2010,7 @@
 <span class="sd">        Parameters</span>
 <span class="sd">        ----------</span>
 <span class="sd">        method : {"ols", "gls"}, optional</span>
-<span class="sd">            Estimation method. The name is not case sensitive. If not provided, the</span>
+<span class="sd">            Estimation method. The names are not case sensitive. If not provided, the</span>
 <span class="sd">            method is selected based on the regressors, using OLS only if all</span>
 <span class="sd">            regressors are identical and the model has no constraints, and GLS</span>
 <span class="sd">            otherwise. The two names force the use of OLS or GLS.</span>
@@ -2026,8 +2026,8 @@
 <span class="sd">            Tolerance to use when checking for convergence in iterative GLS. The</span>
 <span class="sd">            default is 1e-6.</span>
 <span class="sd">        cov_type : str, optional</span>
-<span class="sd">            Name of covariance estimator. The name is not case sensitive. The</span>
-<span class="sd">            default is "robust". Valid options are</span>
+<span class="sd">            Name of covariance estimator to use. The default is "robust". The names</span>
+<span class="sd">            are not case sensitive. Supported covariance estimators are:</span>
 
 <span class="sd">            * "unadjusted", "homoskedastic" - Classic covariance estimator</span>
 <span class="sd">            * "robust", "heteroskedastic" - Heteroskedasticity robust</span>
@@ -2042,7 +2042,8 @@
 <span class="sd">            (bool), which employs a small-sample adjustment and is False by</span>
 <span class="sd">            default. "kernel" also accepts ``kernel`` (str), the name of the kernel,</span>
 <span class="sd">            which is "bartlett" if it is not provided, and ``bandwidth`` (float),</span>
-<span class="sd">            which is estimated from the data if it is not provided. "clustered" also</span>
+<span class="sd">            which is estimated from the data if it is not provided. The names of the</span>
+<span class="sd">            kernels are not case sensitive. "clustered" also</span>
 <span class="sd">            accepts ``clusters`` (array_like), the cluster assignment of each</span>
 <span class="sd">            observation with one or two columns, and ``group_debias`` (bool), which</span>
 <span class="sd">            debiases by the number of groups and is False by default. "unadjusted"</span>
@@ -2058,15 +2059,14 @@
 <span class="sd">        ValueError</span>
 <span class="sd">            If ``method`` is not "ols" or "gls", or if the labels of ``clusters``</span>
 <span class="sd">            do not match the labels of the inputs.</span>
+<span class="sd">            A key of ``cov_config`` that the covariance estimator that ``cov_type``</span>
+<span class="sd">            selects does not accept also raises it. The message names the key and lists</span>
+<span class="sd">            the accepted keys. This is checked before the model is estimated. Releases</span>
+<span class="sd">            before 7.1 raised the ``TypeError`` of the constructor of the covariance</span>
+<span class="sd">            estimator.</span>
 <span class="sd">        UnknownOptionError</span>
 <span class="sd">            If ``cov_type`` or ``kernel`` is not supported. It is both a</span>
 <span class="sd">            ``KeyError`` and a ``ValueError``.</span>
-<span class="sd">        ValueError</span>
-<span class="sd">            If a key of ``cov_config`` is not accepted by the covariance estimator</span>
-<span class="sd">            that ``cov_type`` selects. The message names the key and lists the</span>
-<span class="sd">            accepted keys. It is raised before the model is estimated. Releases</span>
-<span class="sd">            before 7.1 raised the ``TypeError`` of the constructor of the covariance</span>
-<span class="sd">            estimator.</span>
 
 <span class="sd">        See Also</span>
 <span class="sd">        --------</span>
@@ -2718,8 +2718,8 @@
 <span class="sd">        provided with another weight type.</span>
 <span class="sd">    weight_type : str, optional</span>
 <span class="sd">        Name of moment condition weight function to use in the GMM estimation. The</span>
-<span class="sd">        default is "robust". The names are not case sensitive. Supported weight</span>
-<span class="sd">        types are:</span>
+<span class="sd">        default is "robust". The names are not case sensitive. The supported weight</span>
+<span class="sd">        functions are:</span>
 
 <span class="sd">        * "unadjusted", "homoskedastic" - Assume moments are homoskedastic</span>
 <span class="sd">        * "robust", "heteroskedastic" - Allow for heteroskedasticity</span>
@@ -2731,7 +2731,8 @@
 <span class="sd">        moment conditions, and ``debiased`` (bool), whether to use small-sample</span>
 <span class="sd">        adjustments. Both are False by default. "kernel" also accepts ``kernel``</span>
 <span class="sd">        (str), the name of the kernel, which is "bartlett" if it is not provided,</span>
-<span class="sd">        ``bandwidth`` (float), and ``optimal_bw`` (bool). See</span>
+<span class="sd">        ``bandwidth`` (float), and ``optimal_bw`` (bool). The names of the kernels</span>
+<span class="sd">        are not case sensitive. See</span>
 <span class="sd">        :class:`~linearmodels.system.gmm.HomoskedasticWeightMatrix`,</span>
 <span class="sd">        :class:`~linearmodels.system.gmm.HeteroskedasticWeightMatrix` and</span>
 <span class="sd">        :class:`~linearmodels.system.gmm.KernelWeightMatrix` for the details.</span>
@@ -2913,8 +2914,8 @@
 <span class="sd">            specified, uses the average outer-product of the set containing</span>
 <span class="sd">            the exogenous variables and instruments.</span>
 <span class="sd">        cov_type : str, optional</span>
-<span class="sd">            Name of covariance estimator. The names are not case sensitive. The default</span>
-<span class="sd">            is "robust". Valid options are</span>
+<span class="sd">            Name of covariance estimator to use. The default is "robust". The names</span>
+<span class="sd">            are not case sensitive. Supported covariance estimators are:</span>
 
 <span class="sd">            * "unadjusted", "homoskedastic" - Classic covariance estimator</span>
 <span class="sd">            * "robust", "heteroskedastic" - Heteroskedasticity robust</span>
@@ -2928,7 +2929,7 @@
 <span class="sd">            adjustment and is False by default. "kernel" also accepts ``kernel``</span>
 <span class="sd">            (str), the name of the kernel, which is "bartlett" if it is not</span>
 <span class="sd">            provided, and ``bandwidth`` (float), which is estimated from the data</span>
-<span class="sd">            if it is not given.</span>
+<span class="sd">            if it is not given. The names of the kernels are not case sensitive.</span>
 
 <span class="sd">        Returns</span>
 <span class="sd">        -------</span>
@@ -2947,10 +2948,9 @@
 <span class="sd">            for the Parzen kernel and 6 for the quadratic spectral kernel. It</span>
 <span class="sd">            is also raised if the estimated bandwidth is not finite. Pass</span>
 <span class="sd">            ``bandwidth`` to use the kernel with fewer observations.</span>
-<span class="sd">        ValueError</span>
-<span class="sd">            If a key of ``cov_config`` is not accepted by the covariance estimator</span>
-<span class="sd">            that ``cov_type`` selects. The message names the key and lists the</span>
-<span class="sd">            accepted keys. It is raised before the model is estimated. Releases</span>
+<span class="sd">            A key of ``cov_config`` that the covariance estimator that ``cov_type``</span>
+<span class="sd">            selects does not accept also raises it. The message names the key and lists</span>
+<span class="sd">            the accepted keys. This is checked before the model is estimated. Releases</span>
 <span class="sd">            before 7.1 raised the ``TypeError`` of the constructor of the covariance</span>
 <span class="sd">            estimator.</span>
 
@@ -3195,7 +3195,7 @@
 <span class="sd">        weight_type : str, optional</span>
 <span class="sd">            Name of moment condition weight function to use in the GMM</span>
 <span class="sd">            estimation. The default is "robust". The names are not case sensitive.</span>
-<span class="sd">            Valid options are:</span>
+<span class="sd">            The supported weight functions are:</span>
 
 <span class="sd">            * "unadjusted", "homoskedastic" - Assume moments are homoskedastic</span>
 <span class="sd">            * "robust", "heteroskedastic" - Allow for heteroskedasticity</span>
@@ -3206,8 +3206,9 @@
 <span class="sd">            function. All weight types accept ``center`` (bool) and ``debiased``</span>
 <span class="sd">            (bool), which are False by default. "kernel" also accepts ``kernel``</span>
 <span class="sd">            (str), the name of the kernel, which is "bartlett" if it is not</span>
-<span class="sd">            provided, ``bandwidth`` (float), and ``optimal_bw`` (bool). See the</span>
-<span class="sd">            parameters of :class:`~linearmodels.system.model.IVSystemGMM`.</span>
+<span class="sd">            provided, ``bandwidth`` (float), and ``optimal_bw`` (bool). The names of</span>
+<span class="sd">            the kernels are not case sensitive. See the parameters of</span>
+<span class="sd">            :class:`~linearmodels.system.model.IVSystemGMM`.</span>
 
 <span class="sd">        Returns</span>
 <span class="sd">        -------</span>

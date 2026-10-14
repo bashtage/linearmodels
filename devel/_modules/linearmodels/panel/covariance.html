@@ -19,7 +19,7 @@
     
   
       
-        <title>linearmodels.panel.covariance - linearmodels v7.1 (+544)</title>
+        <title>linearmodels.panel.covariance - linearmodels v7.1 (+547)</title>
       
     
 
@@ -91,7 +91,7 @@
 
 <header class="md-header md-header--shadow" data-md-component="header">
   <nav class="md-header__inner md-grid" aria-label="Header">
-    <a href="../../../index.html" title="linearmodels v7.1 (+544)" class="md-header__button md-logo" aria-label="linearmodels v7.1 (+544)" data-md-component="logo">
+    <a href="../../../index.html" title="linearmodels v7.1 (+547)" class="md-header__button md-logo" aria-label="linearmodels v7.1 (+547)" data-md-component="logo">
       <img src="../../../_static/bw-logo.svg" alt="logo">
     </a>
     <label class="md-header__button md-icon" for="__drawer">
@@ -102,7 +102,7 @@
       <div class="md-header__ellipsis">
         <div class="md-header__topic">
           <span class="md-ellipsis">
-            linearmodels v7.1 (+544)
+            linearmodels v7.1 (+547)
           </span>
         </div>
         <div class="md-header__topic" data-md-component="header-topic">
@@ -197,10 +197,10 @@
 
 <nav class="md-nav md-nav--primary" aria-label="Navigation" data-md-level="0">
   <label class="md-nav__title" for="__drawer">
-    <a href="../../../index.html" title="linearmodels v7.1 (+544)" class="md-nav__button md-logo" aria-label="linearmodels v7.1 (+544)" data-md-component="logo">
+    <a href="../../../index.html" title="linearmodels v7.1 (+547)" class="md-nav__button md-logo" aria-label="linearmodels v7.1 (+547)" data-md-component="logo">
       <img src="../../../_static/bw-logo.svg" alt="logo">
     </a>
-    linearmodels v7.1 (+544)
+    linearmodels v7.1 (+547)
   </label>
   
     <div class="md-nav__source">
@@ -968,9 +968,13 @@
 <span class="sd">        adjusted for extra_df irrespective of the setting of debiased. The</span>
 <span class="sd">        default is 0.</span>
 <span class="sd">    kernel : str, optional</span>
-<span class="sd">        Name of the kernel, one of "bartlett",</span>
-<span class="sd">        "newey-west", "quadratic-spectral", "qs", "andrews", "parzen" or "gallant". If</span>
-<span class="sd">        not provided, uses the Newey-West kernel.</span>
+<span class="sd">        Name of the kernel. If not provided, "newey-west", which is the Bartlett</span>
+<span class="sd">        kernel, is used. The names are not case sensitive. Supported kernels are:</span>
+
+<span class="sd">        * "bartlett", "newey-west" - Bartlett's kernel</span>
+<span class="sd">        * "parzen", "gallant" - Parzen's kernel</span>
+<span class="sd">        * "qs", "quadratic-spectral", "andrews" - Quadratic spectral kernel</span>
+
 <span class="sd">    bandwidth : float, optional</span>
 <span class="sd">        Non-negative bandwidth to use. It must be below the number of time</span>
 <span class="sd">        periods. The Bartlett and Parzen kernels use its integer part. If not</span>
@@ -990,12 +994,6 @@
 
 <span class="sd">    Notes</span>
 <span class="sd">    -----</span>
-<span class="sd">    Supported kernels:</span>
-
-<span class="sd">    * "bartlett", "newey-west" - Bartlett's kernel</span>
-<span class="sd">    * "quadratic-spectral", "qs", "andrews" - Quadratic-Spectral Kernel</span>
-<span class="sd">    * "parzen", "gallant" - Parzen kernel</span>
-
 <span class="sd">    Bandwidth is set to the common value for the Bartlett kernel if not</span>
 <span class="sd">    provided, :math:`\lfloor 4 (T / 100)^{2/9} \rfloor` where :math:`T` is the</span>
 <span class="sd">    number of time periods.</span>
@@ -1158,9 +1156,13 @@
 <span class="sd">        adjusted for extra_df irrespective of the setting of debiased. The</span>
 <span class="sd">        default is 0.</span>
 <span class="sd">    kernel : str, optional</span>
-<span class="sd">        Name of the kernel, one of "bartlett",</span>
-<span class="sd">        "newey-west", "quadratic-spectral", "qs", "andrews", "parzen" or "gallant". If</span>
-<span class="sd">        not provided, uses the Newey-West kernel.</span>
+<span class="sd">        Name of the kernel. If not provided, "newey-west", which is the Bartlett</span>
+<span class="sd">        kernel, is used. The names are not case sensitive. Supported kernels are:</span>
+
+<span class="sd">        * "bartlett", "newey-west" - Bartlett's kernel</span>
+<span class="sd">        * "parzen", "gallant" - Parzen's kernel</span>
+<span class="sd">        * "qs", "quadratic-spectral", "andrews" - Quadratic spectral kernel</span>
+
 <span class="sd">    bandwidth : float, optional</span>
 <span class="sd">        Non-negative bandwidth to use. The Bartlett and Parzen kernels use its</span>
 <span class="sd">        integer part. If not provided a rule-of-thumb value is used. It can be</span>
@@ -1179,12 +1181,6 @@
 <span class="sd">    Notes</span>
 <span class="sd">    -----</span>
 <span class="sd">    Estimator is robust to autocorrelation but not cross-sectional correlation.</span>
-
-<span class="sd">    Supported kernels:</span>
-
-<span class="sd">    * "bartlett", "newey-west" - Bartlett's kernel</span>
-<span class="sd">    * "quadratic-spectral", "qs", "andrews" - Quadratic-Spectral Kernel</span>
-<span class="sd">    * "parzen", "gallant" - Parzen kernel</span>
 
 <span class="sd">    Bandwidth is set to the common value for the Bartlett kernel if not</span>
 <span class="sd">    provided, :math:`\lfloor 4 (T / 100)^{2/9} \rfloor` where :math:`T` is the</span>
@@ -1446,9 +1442,12 @@
 <span class="sd">        kernel and 6 with the quadratic spectral kernel. See</span>
 <span class="sd">        :func:`~linearmodels.iv.covariance.kernel_optimal_bandwidth`.</span>
 <span class="sd">    kernel : str, optional</span>
-<span class="sd">        Name of one of the supported kernels, {"bartlett", "newey-west",</span>
-<span class="sd">        "quadratic-spectral", "qs", "andrews", "parzen", "gallant"}. If not</span>
-<span class="sd">        provided, uses the Newey-West kernel.</span>
+<span class="sd">        Name of the kernel. If not provided, "newey-west", which is the Bartlett</span>
+<span class="sd">        kernel, is used. The names are not case sensitive. Supported kernels are:</span>
+
+<span class="sd">        * "bartlett", "newey-west" - Bartlett's kernel</span>
+<span class="sd">        * "parzen", "gallant" - Parzen's kernel</span>
+<span class="sd">        * "qs", "quadratic-spectral", "andrews" - Quadratic spectral kernel</span>
 
 <span class="sd">    Raises</span>
 <span class="sd">    ------</span>

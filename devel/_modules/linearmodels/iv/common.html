@@ -19,7 +19,7 @@
     
   
       
-        <title>linearmodels.iv.common - linearmodels v7.1 (+544)</title>
+        <title>linearmodels.iv.common - linearmodels v7.1 (+547)</title>
       
     
 
@@ -91,7 +91,7 @@
 
 <header class="md-header md-header--shadow" data-md-component="header">
   <nav class="md-header__inner md-grid" aria-label="Header">
-    <a href="../../../index.html" title="linearmodels v7.1 (+544)" class="md-header__button md-logo" aria-label="linearmodels v7.1 (+544)" data-md-component="logo">
+    <a href="../../../index.html" title="linearmodels v7.1 (+547)" class="md-header__button md-logo" aria-label="linearmodels v7.1 (+547)" data-md-component="logo">
       <img src="../../../_static/bw-logo.svg" alt="logo">
     </a>
     <label class="md-header__button md-icon" for="__drawer">
@@ -102,7 +102,7 @@
       <div class="md-header__ellipsis">
         <div class="md-header__topic">
           <span class="md-ellipsis">
-            linearmodels v7.1 (+544)
+            linearmodels v7.1 (+547)
           </span>
         </div>
         <div class="md-header__topic" data-md-component="header-topic">
@@ -197,10 +197,10 @@
 
 <nav class="md-nav md-nav--primary" aria-label="Navigation" data-md-level="0">
   <label class="md-nav__title" for="__drawer">
-    <a href="../../../index.html" title="linearmodels v7.1 (+544)" class="md-nav__button md-logo" aria-label="linearmodels v7.1 (+544)" data-md-component="logo">
+    <a href="../../../index.html" title="linearmodels v7.1 (+547)" class="md-nav__button md-logo" aria-label="linearmodels v7.1 (+547)" data-md-component="logo">
       <img src="../../../_static/bw-logo.svg" alt="logo">
     </a>
-    linearmodels v7.1 (+544)
+    linearmodels v7.1 (+547)
   </label>
   
     <div class="md-nav__source">
@@ -1076,18 +1076,29 @@
 <span class="sd">        Weighted exogenous regressor array (nobs, nexog), partialled out</span>
 <span class="sd">        before testing. Include a constant column here if the model has one.</span>
 <span class="sd">    cov_type : str, optional</span>
-<span class="sd">        Covariance estimator used for the first-stage scores. One of</span>
-<span class="sd">        "unadjusted", "robust", "clustered" or "kernel", or any other name that</span>
-<span class="sd">        the IV models accept for the same estimator, such as "homoskedastic" or</span>
-<span class="sd">        "heteroskedastic". The default is "robust".</span>
+<span class="sd">        Covariance estimator used for the first-stage scores. The default is</span>
+<span class="sd">        "robust". The names are not case sensitive. Supported covariance</span>
+<span class="sd">        estimators are:</span>
+
+<span class="sd">        * "unadjusted", "homoskedastic", "homo", "homoskedasticcovariance" -</span>
+<span class="sd">          Classic homoskedastic inference</span>
+<span class="sd">        * "robust", "heteroskedastic", "hccm", "heteroskedasticcovariance" -</span>
+<span class="sd">          Heteroskedasticity robust inference</span>
+<span class="sd">        * "kernel", "kernelcovariance" - Heteroskedasticity and autocorrelation</span>
+<span class="sd">          robust inference</span>
+<span class="sd">        * "clustered", "one-way", "onewayclusteredcovariance" - Cluster</span>
+<span class="sd">          dependent inference, which is heteroskedasticity robust</span>
+
 <span class="sd">    cov_config : dict, optional</span>
 <span class="sd">        Options for the covariance estimator. "clustered" requires</span>
 <span class="sd">        ``clusters``, a 1-d array with one element for each observation.</span>
-<span class="sd">        "kernel" uses ``kernel`` (default "bartlett") and ``bandwidth``. If</span>
-<span class="sd">        the bandwidth is not provided it is selected automatically, which</span>
-<span class="sd">        needs at least 4 observations with the Bartlett kernel, 5 with the</span>
-<span class="sd">        Parzen kernel and 6 with the quadratic spectral kernel. See</span>
-<span class="sd">        :func:`~linearmodels.iv.covariance.kernel_optimal_bandwidth`.</span>
+<span class="sd">        "kernel" uses ``kernel`` (default "bartlett") and ``bandwidth``. The</span>
+<span class="sd">        names of the kernels are not case sensitive. If the bandwidth is not</span>
+<span class="sd">        provided it is selected automatically, which needs at least 4</span>
+<span class="sd">        observations with the Bartlett kernel, 5 with the Parzen kernel and 6</span>
+<span class="sd">        with the quadratic spectral kernel. See</span>
+<span class="sd">        :func:`~linearmodels.iv.covariance.kernel_optimal_bandwidth`, which</span>
+<span class="sd">        lists the supported kernels.</span>
 
 <span class="sd">    Returns</span>
 <span class="sd">    -------</span>
@@ -1237,10 +1248,19 @@
 <span class="sd">        Weighted exogenous regressor array (nobs, nexog), partialled out</span>
 <span class="sd">        before testing. Include a constant column here if the model has one.</span>
 <span class="sd">    cov_type : str, optional</span>
-<span class="sd">        Covariance estimator used for the first-stage scores. One of</span>
-<span class="sd">        "unadjusted", "robust", "clustered" or "kernel", or any other name that</span>
-<span class="sd">        the IV models accept for the same estimator, such as "homoskedastic" or</span>
-<span class="sd">        "heteroskedastic". The default is "robust".</span>
+<span class="sd">        Covariance estimator used for the first-stage scores. The default is</span>
+<span class="sd">        "robust". The names are not case sensitive. Supported covariance</span>
+<span class="sd">        estimators are:</span>
+
+<span class="sd">        * "unadjusted", "homoskedastic", "homo", "homoskedasticcovariance" -</span>
+<span class="sd">          Classic homoskedastic inference</span>
+<span class="sd">        * "robust", "heteroskedastic", "hccm", "heteroskedasticcovariance" -</span>
+<span class="sd">          Heteroskedasticity robust inference</span>
+<span class="sd">        * "kernel", "kernelcovariance" - Heteroskedasticity and autocorrelation</span>
+<span class="sd">          robust inference</span>
+<span class="sd">        * "clustered", "one-way", "onewayclusteredcovariance" - Cluster</span>
+<span class="sd">          dependent inference, which is heteroskedasticity robust</span>
+
 <span class="sd">    cov_config : dict, optional</span>
 <span class="sd">        Options for the covariance estimator. See :func:`kleibergen_paap`.</span>
 

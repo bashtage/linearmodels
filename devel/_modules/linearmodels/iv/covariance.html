@@ -19,7 +19,7 @@
     
   
       
-        <title>linearmodels.iv.covariance - linearmodels v7.1 (+544)</title>
+        <title>linearmodels.iv.covariance - linearmodels v7.1 (+547)</title>
       
     
 
@@ -91,7 +91,7 @@
 
 <header class="md-header md-header--shadow" data-md-component="header">
   <nav class="md-header__inner md-grid" aria-label="Header">
-    <a href="../../../index.html" title="linearmodels v7.1 (+544)" class="md-header__button md-logo" aria-label="linearmodels v7.1 (+544)" data-md-component="logo">
+    <a href="../../../index.html" title="linearmodels v7.1 (+547)" class="md-header__button md-logo" aria-label="linearmodels v7.1 (+547)" data-md-component="logo">
       <img src="../../../_static/bw-logo.svg" alt="logo">
     </a>
     <label class="md-header__button md-icon" for="__drawer">
@@ -102,7 +102,7 @@
       <div class="md-header__ellipsis">
         <div class="md-header__topic">
           <span class="md-ellipsis">
-            linearmodels v7.1 (+544)
+            linearmodels v7.1 (+547)
           </span>
         </div>
         <div class="md-header__topic" data-md-component="header-topic">
@@ -197,10 +197,10 @@
 
 <nav class="md-nav md-nav--primary" aria-label="Navigation" data-md-level="0">
   <label class="md-nav__title" for="__drawer">
-    <a href="../../../index.html" title="linearmodels v7.1 (+544)" class="md-nav__button md-logo" aria-label="linearmodels v7.1 (+544)" data-md-component="logo">
+    <a href="../../../index.html" title="linearmodels v7.1 (+547)" class="md-nav__button md-logo" aria-label="linearmodels v7.1 (+547)" data-md-component="logo">
       <img src="../../../_static/bw-logo.svg" alt="logo">
     </a>
-    linearmodels v7.1 (+544)
+    linearmodels v7.1 (+547)
   </label>
   
     <div class="md-nav__source">
@@ -841,8 +841,8 @@
 <span class="sd">        The series to use when computing the bandwidth. It has t observations,</span>
 <span class="sd">        and is a 1-d array of length t or an array with t rows and 1 column.</span>
 <span class="sd">    kernel : str, optional</span>
-<span class="sd">        Name of the kernel to use. The default is "bartlett". Supported kernels</span>
-<span class="sd">        are:</span>
+<span class="sd">        Name of the kernel to use. The default is "bartlett". The names are not</span>
+<span class="sd">        case sensitive. Supported kernels are:</span>
 
 <span class="sd">        * "bartlett", "newey-west" - Bartlett's kernel</span>
 <span class="sd">        * "parzen", "gallant" - Parzen's kernel</span>
@@ -1241,11 +1241,12 @@
 <span class="sd">    params : ndarray</span>
 <span class="sd">        Estimated model parameters (nvar by 1).</span>
 <span class="sd">    kernel : str, optional</span>
-<span class="sd">        Kernel name. The default is "bartlett". Supported kernels are:</span>
+<span class="sd">        Kernel name. The default is "bartlett". The names are not case</span>
+<span class="sd">        sensitive. Supported kernels are:</span>
 
-<span class="sd">        * "bartlett", "newey-west" - Triangular kernel</span>
+<span class="sd">        * "bartlett", "newey-west" - Bartlett's kernel</span>
+<span class="sd">        * "parzen", "gallant" - Parzen's kernel</span>
 <span class="sd">        * "qs", "quadratic-spectral", "andrews" - Quadratic spectral kernel</span>
-<span class="sd">        * "parzen", "gallant" - Parzen's kernel.</span>
 
 <span class="sd">    bandwidth : int, optional</span>
 <span class="sd">        Non-negative bandwidth to use with kernel. If not provided, automatic</span>

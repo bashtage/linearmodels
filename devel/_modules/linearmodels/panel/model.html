@@ -19,7 +19,7 @@
     
   
       
-        <title>linearmodels.panel.model - linearmodels v7.1 (+544)</title>
+        <title>linearmodels.panel.model - linearmodels v7.1 (+547)</title>
       
     
 
@@ -91,7 +91,7 @@
 
 <header class="md-header md-header--shadow" data-md-component="header">
   <nav class="md-header__inner md-grid" aria-label="Header">
-    <a href="../../../index.html" title="linearmodels v7.1 (+544)" class="md-header__button md-logo" aria-label="linearmodels v7.1 (+544)" data-md-component="logo">
+    <a href="../../../index.html" title="linearmodels v7.1 (+547)" class="md-header__button md-logo" aria-label="linearmodels v7.1 (+547)" data-md-component="logo">
       <img src="../../../_static/bw-logo.svg" alt="logo">
     </a>
     <label class="md-header__button md-icon" for="__drawer">
@@ -102,7 +102,7 @@
       <div class="md-header__ellipsis">
         <div class="md-header__topic">
           <span class="md-ellipsis">
-            linearmodels v7.1 (+544)
+            linearmodels v7.1 (+547)
           </span>
         </div>
         <div class="md-header__topic" data-md-component="header-topic">
@@ -197,10 +197,10 @@
 
 <nav class="md-nav md-nav--primary" aria-label="Navigation" data-md-level="0">
   <label class="md-nav__title" for="__drawer">
-    <a href="../../../index.html" title="linearmodels v7.1 (+544)" class="md-nav__button md-logo" aria-label="linearmodels v7.1 (+544)" data-md-component="logo">
+    <a href="../../../index.html" title="linearmodels v7.1 (+547)" class="md-nav__button md-logo" aria-label="linearmodels v7.1 (+547)" data-md-component="logo">
       <img src="../../../_static/bw-logo.svg" alt="logo">
     </a>
-    linearmodels v7.1 (+544)
+    linearmodels v7.1 (+547)
   </label>
   
     <div class="md-nav__source">
@@ -2401,13 +2401,17 @@
 <span class="sd">        Parameters</span>
 <span class="sd">        ----------</span>
 <span class="sd">        cov_type : str, optional</span>
-<span class="sd">            Name of covariance estimator. The default is ``"unadjusted"``. The</span>
-<span class="sd">            names are "unadjusted", "conventional" and "homoskedastic" for the</span>
-<span class="sd">            homoskedastic estimator, "robust" and "heteroskedastic" for the</span>
-<span class="sd">            heteroskedastic estimator, "clustered" for the clustered estimator,</span>
-<span class="sd">            "kernel", "driscoll-kraay" and "dk" for the Driscoll-Kraay estimator,</span>
-<span class="sd">            and "ac" and "autocorrelated" for the autocorrelation robust</span>
-<span class="sd">            estimator. See Notes.</span>
+<span class="sd">            Name of covariance estimator. The default is "unadjusted". The names</span>
+<span class="sd">            are not case sensitive. Supported covariance estimators are (see</span>
+<span class="sd">            Notes):</span>
+
+<span class="sd">            * "unadjusted", "conventional", "homoskedastic" - Homoskedastic</span>
+<span class="sd">              estimator</span>
+<span class="sd">            * "robust", "heteroskedastic" - Heteroskedastic estimator</span>
+<span class="sd">            * "clustered" - Clustered estimator</span>
+<span class="sd">            * "kernel", "driscoll-kraay", "dk" - Driscoll-Kraay estimator</span>
+<span class="sd">            * "ac", "autocorrelated" - Autocorrelation robust estimator</span>
+
 <span class="sd">        debiased : bool, optional</span>
 <span class="sd">            Flag indicating whether to debias the covariance estimator using</span>
 <span class="sd">            a degree of freedom adjustment. The default is True. See Notes.</span>
@@ -2475,9 +2479,9 @@
 <span class="sd">          configuration options are:</span>
 
 <span class="sd">          * ``kernel`` - One of the supported kernels: "bartlett", "newey-west",</span>
-<span class="sd">            "quadratic-spectral", "qs", "andrews", "parzen" or "gallant". The</span>
-<span class="sd">            default is Bartlett's kernel, which produces a covariance estimator</span>
-<span class="sd">            similar to the Newey-West covariance estimator.</span>
+<span class="sd">            "parzen", "gallant", "qs", "quadratic-spectral" or "andrews". The names</span>
+<span class="sd">            are not case sensitive. The default is "newey-west", which is</span>
+<span class="sd">            Bartlett's kernel.</span>
 <span class="sd">          * ``bandwidth`` - Bandwidth to use when computing the kernel. If</span>
 <span class="sd">            not provided, a naive default is used. It must be below the number</span>
 <span class="sd">            of time periods, and a ``ValueError`` is raised otherwise.</span>
@@ -3653,13 +3657,17 @@
 <span class="sd">            required dummy variable array is both larger than the array of</span>
 <span class="sd">            regressors in the model and requires more than 1 GiB.</span>
 <span class="sd">        cov_type : str, optional</span>
-<span class="sd">            Name of covariance estimator. The default is ``"unadjusted"``. The</span>
-<span class="sd">            names are "unadjusted", "conventional" and "homoskedastic" for the</span>
-<span class="sd">            homoskedastic estimator, "robust" and "heteroskedastic" for the</span>
-<span class="sd">            heteroskedastic estimator, "clustered" for the clustered estimator,</span>
-<span class="sd">            "kernel", "driscoll-kraay" and "dk" for the Driscoll-Kraay estimator,</span>
-<span class="sd">            and "ac" and "autocorrelated" for the autocorrelation robust</span>
-<span class="sd">            estimator. See Notes.</span>
+<span class="sd">            Name of covariance estimator. The default is "unadjusted". The names</span>
+<span class="sd">            are not case sensitive. Supported covariance estimators are (see</span>
+<span class="sd">            Notes):</span>
+
+<span class="sd">            * "unadjusted", "conventional", "homoskedastic" - Homoskedastic</span>
+<span class="sd">              estimator</span>
+<span class="sd">            * "robust", "heteroskedastic" - Heteroskedastic estimator</span>
+<span class="sd">            * "clustered" - Clustered estimator</span>
+<span class="sd">            * "kernel", "driscoll-kraay", "dk" - Driscoll-Kraay estimator</span>
+<span class="sd">            * "ac", "autocorrelated" - Autocorrelation robust estimator</span>
+
 <span class="sd">        debiased : bool, optional</span>
 <span class="sd">            Flag indicating whether to debias the covariance estimator using</span>
 <span class="sd">            a degree of freedom adjustment. The default is True. The</span>
@@ -3755,9 +3763,9 @@
 <span class="sd">          configuration options are:</span>
 
 <span class="sd">          * ``kernel`` - One of the supported kernels: "bartlett", "newey-west",</span>
-<span class="sd">            "quadratic-spectral", "qs", "andrews", "parzen" or "gallant". The</span>
-<span class="sd">            default is Bartlett's kernel, which produces a covariance estimator</span>
-<span class="sd">            similar to the Newey-West covariance estimator.</span>
+<span class="sd">            "parzen", "gallant", "qs", "quadratic-spectral" or "andrews". The names</span>
+<span class="sd">            are not case sensitive. The default is "newey-west", which is</span>
+<span class="sd">            Bartlett's kernel.</span>
 <span class="sd">          * ``bandwidth`` - Bandwidth to use when computing the kernel. If</span>
 <span class="sd">            not provided, a naive default is used. It must be below the number</span>
 <span class="sd">            of time periods, and a ``ValueError`` is raised otherwise.</span>
@@ -4274,11 +4282,15 @@
 <span class="sd">            are accounted for when reweighting. Has no effect on balanced data.</span>
 <span class="sd">            The default is False.</span>
 <span class="sd">        cov_type : str, optional</span>
-<span class="sd">            Name of covariance estimator. The default is ``"unadjusted"``. The</span>
-<span class="sd">            names are "unadjusted", "conventional" and "homoskedastic" for the</span>
-<span class="sd">            homoskedastic estimator, "robust" and "heteroskedastic" for the</span>
-<span class="sd">            heteroskedastic estimator, and "clustered" for the clustered</span>
-<span class="sd">            estimator. See Notes.</span>
+<span class="sd">            Name of covariance estimator. The default is "unadjusted". The names</span>
+<span class="sd">            are not case sensitive. Supported covariance estimators are (see</span>
+<span class="sd">            Notes):</span>
+
+<span class="sd">            * "unadjusted", "conventional", "homoskedastic" - Homoskedastic</span>
+<span class="sd">              estimator</span>
+<span class="sd">            * "robust", "heteroskedastic" - Heteroskedastic estimator</span>
+<span class="sd">            * "clustered" - Clustered estimator</span>
+
 <span class="sd">        debiased : bool, optional</span>
 <span class="sd">            Flag indicating whether to debias the covariance estimator using</span>
 <span class="sd">            a degree of freedom adjustment. The default is True. See Notes.</span>
@@ -4778,13 +4790,17 @@
 <span class="sd">        Parameters</span>
 <span class="sd">        ----------</span>
 <span class="sd">        cov_type : str, optional</span>
-<span class="sd">            Name of covariance estimator. The default is ``"unadjusted"``. The</span>
-<span class="sd">            names are "unadjusted", "conventional" and "homoskedastic" for the</span>
-<span class="sd">            homoskedastic estimator, "robust" and "heteroskedastic" for the</span>
-<span class="sd">            heteroskedastic estimator, "clustered" for the clustered estimator,</span>
-<span class="sd">            "kernel", "driscoll-kraay" and "dk" for the Driscoll-Kraay estimator,</span>
-<span class="sd">            and "ac" and "autocorrelated" for the autocorrelation robust</span>
-<span class="sd">            estimator. See Notes.</span>
+<span class="sd">            Name of covariance estimator. The default is "unadjusted". The names</span>
+<span class="sd">            are not case sensitive. Supported covariance estimators are (see</span>
+<span class="sd">            Notes):</span>
+
+<span class="sd">            * "unadjusted", "conventional", "homoskedastic" - Homoskedastic</span>
+<span class="sd">              estimator</span>
+<span class="sd">            * "robust", "heteroskedastic" - Heteroskedastic estimator</span>
+<span class="sd">            * "clustered" - Clustered estimator</span>
+<span class="sd">            * "kernel", "driscoll-kraay", "dk" - Driscoll-Kraay estimator</span>
+<span class="sd">            * "ac", "autocorrelated" - Autocorrelation robust estimator</span>
+
 <span class="sd">        debiased : bool, optional</span>
 <span class="sd">            Flag indicating whether to debias the covariance estimator using</span>
 <span class="sd">            a degree of freedom adjustment. The default is True. See Notes.</span>
@@ -4850,9 +4866,9 @@
 <span class="sd">          configuration options are:</span>
 
 <span class="sd">          * ``kernel`` - One of the supported kernels: "bartlett", "newey-west",</span>
-<span class="sd">            "quadratic-spectral", "qs", "andrews", "parzen" or "gallant". The</span>
-<span class="sd">            default is Bartlett's kernel, which produces a covariance estimator</span>
-<span class="sd">            similar to the Newey-West covariance estimator.</span>
+<span class="sd">            "parzen", "gallant", "qs", "quadratic-spectral" or "andrews". The names</span>
+<span class="sd">            are not case sensitive. The default is "newey-west", which is</span>
+<span class="sd">            Bartlett's kernel.</span>
 <span class="sd">          * ``bandwidth`` - Bandwidth to use when computing the kernel. If</span>
 <span class="sd">            not provided, a naive default is used. It must be below the number</span>
 <span class="sd">            of time periods of the differences, which is one less than the</span>
@@ -5296,13 +5312,17 @@
 <span class="sd">            Apply a small-sample correction to the estimate of the variance of</span>
 <span class="sd">            the random effect. The default is False.</span>
 <span class="sd">        cov_type : str, optional</span>
-<span class="sd">            Name of covariance estimator. The default is ``"unadjusted"``. The</span>
-<span class="sd">            names are "unadjusted", "conventional" and "homoskedastic" for the</span>
-<span class="sd">            homoskedastic estimator, "robust" and "heteroskedastic" for the</span>
-<span class="sd">            heteroskedastic estimator, "clustered" for the clustered estimator,</span>
-<span class="sd">            "kernel", "driscoll-kraay" and "dk" for the Driscoll-Kraay estimator,</span>
-<span class="sd">            and "ac" and "autocorrelated" for the autocorrelation robust</span>
-<span class="sd">            estimator. See Notes.</span>
+<span class="sd">            Name of covariance estimator. The default is "unadjusted". The names</span>
+<span class="sd">            are not case sensitive. Supported covariance estimators are (see</span>
+<span class="sd">            Notes):</span>
+
+<span class="sd">            * "unadjusted", "conventional", "homoskedastic" - Homoskedastic</span>
+<span class="sd">              estimator</span>
+<span class="sd">            * "robust", "heteroskedastic" - Heteroskedastic estimator</span>
+<span class="sd">            * "clustered" - Clustered estimator</span>
+<span class="sd">            * "kernel", "driscoll-kraay", "dk" - Driscoll-Kraay estimator</span>
+<span class="sd">            * "ac", "autocorrelated" - Autocorrelation robust estimator</span>
+
 <span class="sd">        debiased : bool, optional</span>
 <span class="sd">            Flag indicating whether to debias the covariance estimator using</span>
 <span class="sd">            a degree of freedom adjustment. The default is True. See Notes.</span>
@@ -5372,9 +5392,9 @@
 <span class="sd">          configuration options are:</span>
 
 <span class="sd">          * ``kernel`` - One of the supported kernels: "bartlett", "newey-west",</span>
-<span class="sd">            "quadratic-spectral", "qs", "andrews", "parzen" or "gallant". The</span>
-<span class="sd">            default is Bartlett's kernel, which produces a covariance estimator</span>
-<span class="sd">            similar to the Newey-West covariance estimator.</span>
+<span class="sd">            "parzen", "gallant", "qs", "quadratic-spectral" or "andrews". The names</span>
+<span class="sd">            are not case sensitive. The default is "newey-west", which is</span>
+<span class="sd">            Bartlett's kernel.</span>
 <span class="sd">          * ``bandwidth`` - Bandwidth to use when computing the kernel. If</span>
 <span class="sd">            not provided, a naive default is used. It must be below the number</span>
 <span class="sd">            of time periods, and a ``ValueError`` is raised otherwise.</span>
@@ -5875,11 +5895,10 @@
 
 <span class="sd">        Parameters</span>
 <span class="sd">        ----------</span>
-<span class="sd">        cov_type : str, optional</span>
-<span class="sd">            Name of covariance estimator (see notes). The default is</span>
-<span class="sd">            ``"unadjusted"``. The names are "unadjusted", "homoskedastic",</span>
-<span class="sd">            "robust" and "heteroskedastic" for the standard estimator, and</span>
-<span class="sd">            "kernel" for the kernel estimator.</span>
+<span class="sd">        cov_type : {"unadjusted", "homoskedastic", "robust", "heteroskedastic", "kernel"}, optional</span>
+<span class="sd">            Name of covariance estimator. The default is "unadjusted". The names</span>
+<span class="sd">            are not case sensitive. "homoskedastic" is an alias of "unadjusted",</span>
+<span class="sd">            and "heteroskedastic" is an alias of "robust". See Notes.</span>
 <span class="sd">        debiased : bool, optional</span>
 <span class="sd">            Flag indicating whether to debiased the covariance estimator using</span>
 <span class="sd">            a degree of freedom adjustment, which uses T - 1 instead of T when</span>
@@ -5893,10 +5912,13 @@
 <span class="sd">            needs T to be at least 4 with the Bartlett kernel, 5 with the Parzen</span>
 <span class="sd">            kernel and 6 with the quadratic spectral kernel.</span>
 <span class="sd">        kernel : str, optional</span>
-<span class="sd">            The kernel to use, one of "bartlett", "newey-west",</span>
-<span class="sd">            "quadratic-spectral", "qs", "andrews", "parzen" and "gallant". If</span>
-<span class="sd">            not provided, the default Bartlett kernel is used. It is checked for</span>
-<span class="sd">            every ``cov_type``.</span>
+<span class="sd">            Name of the kernel. If not provided, "newey-west", which is the</span>
+<span class="sd">            Bartlett kernel, is used. The names are not case sensitive. It is</span>
+<span class="sd">            checked for every ``cov_type``. Supported kernels are:</span>
+
+<span class="sd">            * "bartlett", "newey-west" - Bartlett's kernel</span>
+<span class="sd">            * "parzen", "gallant" - Parzen's kernel</span>
+<span class="sd">            * "qs", "quadratic-spectral", "andrews" - Quadratic spectral kernel</span>
 
 <span class="sd">        Returns</span>
 <span class="sd">        -------</span>

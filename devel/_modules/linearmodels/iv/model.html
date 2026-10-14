@@ -19,7 +19,7 @@
     
   
       
-        <title>linearmodels.iv.model - linearmodels v7.1 (+544)</title>
+        <title>linearmodels.iv.model - linearmodels v7.1 (+547)</title>
       
     
 
@@ -91,7 +91,7 @@
 
 <header class="md-header md-header--shadow" data-md-component="header">
   <nav class="md-header__inner md-grid" aria-label="Header">
-    <a href="../../../index.html" title="linearmodels v7.1 (+544)" class="md-header__button md-logo" aria-label="linearmodels v7.1 (+544)" data-md-component="logo">
+    <a href="../../../index.html" title="linearmodels v7.1 (+547)" class="md-header__button md-logo" aria-label="linearmodels v7.1 (+547)" data-md-component="logo">
       <img src="../../../_static/bw-logo.svg" alt="logo">
     </a>
     <label class="md-header__button md-icon" for="__drawer">
@@ -102,7 +102,7 @@
       <div class="md-header__ellipsis">
         <div class="md-header__topic">
           <span class="md-ellipsis">
-            linearmodels v7.1 (+544)
+            linearmodels v7.1 (+547)
           </span>
         </div>
         <div class="md-header__topic" data-md-component="header-topic">
@@ -197,10 +197,10 @@
 
 <nav class="md-nav md-nav--primary" aria-label="Navigation" data-md-level="0">
   <label class="md-nav__title" for="__drawer">
-    <a href="../../../index.html" title="linearmodels v7.1 (+544)" class="md-nav__button md-logo" aria-label="linearmodels v7.1 (+544)" data-md-component="logo">
+    <a href="../../../index.html" title="linearmodels v7.1 (+547)" class="md-nav__button md-logo" aria-label="linearmodels v7.1 (+547)" data-md-component="logo">
       <img src="../../../_static/bw-logo.svg" alt="logo">
     </a>
-    linearmodels v7.1 (+544)
+    linearmodels v7.1 (+547)
   </label>
   
     <div class="md-nav__source">
@@ -1370,16 +1370,16 @@
 <span class="sd">        Parameters</span>
 <span class="sd">        ----------</span>
 <span class="sd">        cov_type : str, optional</span>
-<span class="sd">            Name of covariance estimator to use. The default is "robust". Supported</span>
-<span class="sd">            covariance estimators are:</span>
+<span class="sd">            Name of covariance estimator to use. The default is "robust". The names</span>
+<span class="sd">            are not case sensitive. Supported covariance estimators are:</span>
 
-<span class="sd">            * "unadjusted", "homoskedastic", "homo", "HomoskedasticCovariance" -</span>
+<span class="sd">            * "unadjusted", "homoskedastic", "homo", "homoskedasticcovariance" -</span>
 <span class="sd">              Classic homoskedastic inference</span>
-<span class="sd">            * "robust", "heteroskedastic", "hccm", "HeteroskedasticCovariance" -</span>
+<span class="sd">            * "robust", "heteroskedastic", "hccm", "heteroskedasticcovariance" -</span>
 <span class="sd">              Heteroskedasticity robust inference</span>
-<span class="sd">            * "kernel", "KernelCovariance" - Heteroskedasticity and autocorrelation</span>
+<span class="sd">            * "kernel", "kernelcovariance" - Heteroskedasticity and autocorrelation</span>
 <span class="sd">              robust inference</span>
-<span class="sd">            * "clustered", "one-way", "OneWayClusteredCovariance" - Cluster</span>
+<span class="sd">            * "clustered", "one-way", "onewayclusteredcovariance" - Cluster</span>
 <span class="sd">              dependent inference, which is heteroskedasticity robust. It is</span>
 <span class="sd">              one-way unless ``clusters`` has two columns.</span>
 
@@ -1391,9 +1391,15 @@
 <span class="sd">            are used depend on ``cov_type``. "unadjusted" and "robust" do not use any.</span>
 <span class="sd">            "kernel" uses ``kernel`` (str), the name of the kernel, which is "bartlett"</span>
 <span class="sd">            if it is not provided, and ``bandwidth`` (int), which is selected from the</span>
-<span class="sd">            data if it is not provided. "clustered" uses ``clusters`` (array_like),</span>
-<span class="sd">            the cluster assignment of each observation, with one or two columns.</span>
-<span class="sd">            A ``center`` key is accepted and ignored. See</span>
+<span class="sd">            data if it is not provided. The names of the kernels are not case</span>
+<span class="sd">            sensitive. "clustered" uses ``clusters`` (array_like), the cluster</span>
+<span class="sd">            assignment of each observation, with one or two columns. Every</span>
+<span class="sd">            covariance estimator accepts ``extra_df`` (int), the number of degrees of</span>
+<span class="sd">            freedom that the model uses in addition to its regressors. It is 0 if it is</span>
+<span class="sd">            not provided, and it is only used if ``debiased`` is True, when the</span>
+<span class="sd">            covariance is scaled by n / (n - k - ``extra_df``), where k is the number</span>
+<span class="sd">            of regressors. The keys ``center`` and ``kappa`` are accepted and ignored:</span>
+<span class="sd">            ``kappa`` is set by the model. See</span>
 <span class="sd">            :class:`~linearmodels.iv.covariance.HomoskedasticCovariance`,</span>
 <span class="sd">            :class:`~linearmodels.iv.covariance.HeteroskedasticCovariance`,</span>
 <span class="sd">            :class:`~linearmodels.iv.covariance.KernelCovariance` and</span>
@@ -1417,15 +1423,14 @@
 <span class="sd">            regressors and instruments are collinear. See the notes of</span>
 <span class="sd">            :class:`~linearmodels.iv.model.IVLIML`. It is also raised if the</span>
 <span class="sd">            labels of ``clusters`` do not match the labels of the other inputs.</span>
+<span class="sd">            A key of ``cov_config`` that the covariance estimator that ``cov_type``</span>
+<span class="sd">            selects does not accept also raises it. The message names the key and lists</span>
+<span class="sd">            the accepted keys. This is checked before the model is estimated. Releases</span>
+<span class="sd">            before 7.1 raised the ``TypeError`` of the constructor of the covariance</span>
+<span class="sd">            estimator.</span>
 <span class="sd">        UnknownOptionError</span>
 <span class="sd">            If ``cov_type`` or ``kernel`` is not supported. It is both a</span>
 <span class="sd">            ``KeyError`` and a ``ValueError``.</span>
-<span class="sd">        ValueError</span>
-<span class="sd">            If a key of ``cov_config`` is not accepted by the covariance estimator</span>
-<span class="sd">            that ``cov_type`` selects. The message names the key and lists the</span>
-<span class="sd">            accepted keys. It is raised before the model is estimated. Releases</span>
-<span class="sd">            before 7.1 raised the ``TypeError`` of the constructor of the covariance</span>
-<span class="sd">            estimator.</span>
 
 <span class="sd">        See Also</span>
 <span class="sd">        --------</span>
@@ -1931,7 +1936,8 @@
 <span class="sd">        its observation is dropped. The default is to weight all observations equally.</span>
 <span class="sd">    weight_type : str, optional</span>
 <span class="sd">        Name of moment condition weight function to use in the GMM estimation. The</span>
-<span class="sd">        default is "robust". The supported weight functions are:</span>
+<span class="sd">        default is "robust". The names are not case sensitive. The supported weight</span>
+<span class="sd">        functions are:</span>
 
 <span class="sd">        * "unadjusted", "homoskedastic"</span>
 <span class="sd">        * "robust", "heteroskedastic"</span>
@@ -1944,7 +1950,8 @@
 <span class="sd">        function. The keys are ``center`` (bool) and ``debiased`` (bool) for every</span>
 <span class="sd">        weight function, ``kernel`` (str), ``bandwidth`` (int) and ``optimal_bw``</span>
 <span class="sd">        (bool) for "kernel", and ``clusters`` (array_like) for "clustered".</span>
-<span class="sd">        ``clusters`` is required and has one element for each observation.</span>
+<span class="sd">        The names of the kernels are not case sensitive. ``clusters`` is required</span>
+<span class="sd">        and has one element for each observation.</span>
 <span class="sd">        See :class:`~linearmodels.iv.gmm.HomoskedasticWeightMatrix`,</span>
 <span class="sd">        :class:`~linearmodels.iv.gmm.HeteroskedasticWeightMatrix`,</span>
 <span class="sd">        :class:`~linearmodels.iv.gmm.KernelWeightMatrix` and</span>
@@ -2237,7 +2244,8 @@
 <span class="sd">        its observation is dropped. The default is to weight all observations equally.</span>
 <span class="sd">    weight_type : str, optional</span>
 <span class="sd">        Name of moment condition weight function to use in the GMM estimation. The</span>
-<span class="sd">        default is "robust". The supported weight functions are:</span>
+<span class="sd">        default is "robust". The names are not case sensitive. The supported weight</span>
+<span class="sd">        functions are:</span>
 
 <span class="sd">        * "unadjusted", "homoskedastic"</span>
 <span class="sd">        * "robust", "heteroskedastic"</span>
@@ -2250,7 +2258,8 @@
 <span class="sd">        function. The keys are ``center`` (bool) and ``debiased`` (bool) for every</span>
 <span class="sd">        weight function, ``kernel`` (str), ``bandwidth`` (int) and ``optimal_bw``</span>
 <span class="sd">        (bool) for "kernel", and ``clusters`` (array_like) for "clustered".</span>
-<span class="sd">        ``clusters`` is required and has one element for each observation.</span>
+<span class="sd">        The names of the kernels are not case sensitive. ``clusters`` is required</span>
+<span class="sd">        and has one element for each observation.</span>
 <span class="sd">        See :class:`~linearmodels.iv.gmm.HomoskedasticWeightMatrix`,</span>
 <span class="sd">        :class:`~linearmodels.iv.gmm.HeteroskedasticWeightMatrix`,</span>
 <span class="sd">        :class:`~linearmodels.iv.gmm.KernelWeightMatrix` and</span>
@@ -2408,8 +2417,8 @@
 <span class="sd">            observations equally.</span>
 <span class="sd">        weight_type : str, optional</span>
 <span class="sd">            Name of moment condition weight function to use in the GMM estimation.</span>
-<span class="sd">            The default is "robust". See :class:`~linearmodels.iv.model.IVGMM` for the</span>
-<span class="sd">            supported weight functions.</span>
+<span class="sd">            The default is "robust". The names are not case sensitive. See</span>
+<span class="sd">            :class:`~linearmodels.iv.model.IVGMM` for the supported weight functions.</span>
 <span class="sd">        **weight_config : dict</span>
 <span class="sd">            Additional keyword arguments to pass to the moment condition weight</span>
 <span class="sd">            function. See :class:`~linearmodels.iv.model.IVGMM` for the keys.</span>
@@ -2525,8 +2534,8 @@
 <span class="sd">            the average outer-product of the set containing the exogenous variables</span>
 <span class="sd">            and instruments.</span>
 <span class="sd">        cov_type : str, optional</span>
-<span class="sd">            Name of covariance estimator to use. The default is "robust". Supported</span>
-<span class="sd">            covariance estimators are:</span>
+<span class="sd">            Name of covariance estimator to use. The default is "robust". The names</span>
+<span class="sd">            are not case sensitive. Supported covariance estimators are:</span>
 
 <span class="sd">            * "unadjusted", "homoskedastic" - Assumes moment conditions are</span>
 <span class="sd">              homoskedastic</span>
@@ -2542,7 +2551,8 @@
 <span class="sd">            Additional parameters to pass to the covariance estimator. The keys are</span>
 <span class="sd">            ``center`` (bool) for every covariance estimator, ``kernel`` (str),</span>
 <span class="sd">            ``bandwidth`` (int) and ``optimal_bw`` (bool) for "kernel", and</span>
-<span class="sd">            ``clusters`` (array_like) for "clustered". See</span>
+<span class="sd">            ``clusters`` (array_like) for "clustered". The names of the kernels are</span>
+<span class="sd">            not case sensitive. See</span>
 <span class="sd">            :class:`~linearmodels.iv.gmm.IVGMMCovariance` for details on the</span>
 <span class="sd">            available options. Defaults are used if no covariance configuration is</span>
 <span class="sd">            provided.</span>
@@ -2566,15 +2576,14 @@
 <span class="sd">            kernel needs, or the estimated bandwidth is not finite, if</span>
 <span class="sd">            ``initial_weight`` does not have the right shape, and if the labels</span>
 <span class="sd">            of ``clusters`` do not match the labels of the other inputs.</span>
+<span class="sd">            A key of ``cov_config`` that the covariance estimator that ``cov_type``</span>
+<span class="sd">            selects does not accept also raises it. The message names the key and lists</span>
+<span class="sd">            the accepted keys. This is checked before the model is estimated. Releases</span>
+<span class="sd">            before 7.1 raised the ``TypeError`` of the constructor of the covariance</span>
+<span class="sd">            estimator.</span>
 <span class="sd">        UnknownOptionError</span>
 <span class="sd">            If ``cov_type`` is not supported. It is both a ``KeyError`` and a</span>
 <span class="sd">            ``ValueError``.</span>
-<span class="sd">        ValueError</span>
-<span class="sd">            If a key of ``cov_config`` is not accepted by the covariance estimator</span>
-<span class="sd">            that ``cov_type`` selects. The message names the key and lists the</span>
-<span class="sd">            accepted keys. It is raised before the model is estimated. Releases</span>
-<span class="sd">            before 7.1 raised the ``TypeError`` of the constructor of the covariance</span>
-<span class="sd">            estimator.</span>
 
 <span class="sd">        See Also</span>
 <span class="sd">        --------</span>
@@ -2696,7 +2705,8 @@
 <span class="sd">        its observation is dropped. The default is to weight all observations equally.</span>
 <span class="sd">    weight_type : str, optional</span>
 <span class="sd">        Name of moment condition weight function to use in the GMM estimation. The</span>
-<span class="sd">        default is "robust". The supported weight functions are:</span>
+<span class="sd">        default is "robust". The names are not case sensitive. The supported weight</span>
+<span class="sd">        functions are:</span>
 
 <span class="sd">        * "unadjusted", "homoskedastic"</span>
 <span class="sd">        * "robust", "heteroskedastic"</span>
@@ -2709,7 +2719,8 @@
 <span class="sd">        function. The keys are ``center`` (bool) and ``debiased`` (bool) for every</span>
 <span class="sd">        weight function, ``kernel`` (str), ``bandwidth`` (int) and ``optimal_bw``</span>
 <span class="sd">        (bool) for "kernel", and ``clusters`` (array_like) for "clustered".</span>
-<span class="sd">        ``clusters`` is required and has one element for each observation.</span>
+<span class="sd">        The names of the kernels are not case sensitive. ``clusters`` is required</span>
+<span class="sd">        and has one element for each observation.</span>
 <span class="sd">        See :class:`~linearmodels.iv.gmm.HomoskedasticWeightMatrix`,</span>
 <span class="sd">        :class:`~linearmodels.iv.gmm.HeteroskedasticWeightMatrix`,</span>
 <span class="sd">        :class:`~linearmodels.iv.gmm.KernelWeightMatrix` and</span>
@@ -2883,8 +2894,9 @@
 <span class="sd">            observations equally.</span>
 <span class="sd">        weight_type : str, optional</span>
 <span class="sd">            Name of moment condition weight function to use in the GMM estimation.</span>
-<span class="sd">            The default is "robust". See :class:`~linearmodels.iv.model.IVGMMCUE` for</span>
-<span class="sd">            the supported weight functions.</span>
+<span class="sd">            The default is "robust". The names are not case sensitive. See</span>
+<span class="sd">            :class:`~linearmodels.iv.model.IVGMMCUE` for the supported weight</span>
+<span class="sd">            functions.</span>
 <span class="sd">        **weight_config : dict</span>
 <span class="sd">            Additional keyword arguments to pass to the moment condition weight</span>
 <span class="sd">            function. See :class:`~linearmodels.iv.model.IVGMMCUE` for the keys.</span>
@@ -3178,8 +3190,8 @@
 <span class="sd">            Flag indicating whether to display optimization output. The default is</span>
 <span class="sd">            False.</span>
 <span class="sd">        cov_type : str, optional</span>
-<span class="sd">            Name of covariance estimator to use. The default is "robust". Supported</span>
-<span class="sd">            covariance estimators are:</span>
+<span class="sd">            Name of covariance estimator to use. The default is "robust". The names</span>
+<span class="sd">            are not case sensitive. Supported covariance estimators are:</span>
 
 <span class="sd">            * "unadjusted", "homoskedastic" - Assumes moment conditions are</span>
 <span class="sd">              homoskedastic</span>
@@ -3200,7 +3212,8 @@
 <span class="sd">            Additional parameters to pass to the covariance estimator. The keys are</span>
 <span class="sd">            ``center`` (bool) for every covariance estimator, ``kernel`` (str),</span>
 <span class="sd">            ``bandwidth`` (int) and ``optimal_bw`` (bool) for "kernel", and</span>
-<span class="sd">            ``clusters`` (array_like) for "clustered". See</span>
+<span class="sd">            ``clusters`` (array_like) for "clustered". The names of the kernels are</span>
+<span class="sd">            not case sensitive. See</span>
 <span class="sd">            :class:`~linearmodels.iv.gmm.IVGMMCovariance` for details on the</span>
 <span class="sd">            available options. Defaults are used if no covariance configuration is</span>
 <span class="sd">            provided.</span>
@@ -3224,15 +3237,14 @@
 <span class="sd">            estimated bandwidth is not finite, if ``starting`` does not have one</span>
 <span class="sd">            value for each regressor, and if the labels of ``clusters`` do not match</span>
 <span class="sd">            the labels of the other inputs.</span>
+<span class="sd">            A key of ``cov_config`` that the covariance estimator that ``cov_type``</span>
+<span class="sd">            selects does not accept also raises it. The message names the key and lists</span>
+<span class="sd">            the accepted keys. This is checked before the model is estimated. Releases</span>
+<span class="sd">            before 7.1 raised the ``TypeError`` of the constructor of the covariance</span>
+<span class="sd">            estimator.</span>
 <span class="sd">        UnknownOptionError</span>
 <span class="sd">            If ``cov_type`` is not supported. It is both a ``KeyError`` and a</span>
 <span class="sd">            ``ValueError``.</span>
-<span class="sd">        ValueError</span>
-<span class="sd">            If a key of ``cov_config`` is not accepted by the covariance estimator</span>
-<span class="sd">            that ``cov_type`` selects. The message names the key and lists the</span>
-<span class="sd">            accepted keys. It is raised before the model is estimated. Releases</span>
-<span class="sd">            before 7.1 raised the ``TypeError`` of the constructor of the covariance</span>
-<span class="sd">            estimator.</span>
 
 <span class="sd">        See Also</span>
 <span class="sd">        --------</span>
@@ -3794,8 +3806,8 @@
 <span class="sd">        Parameters</span>
 <span class="sd">        ----------</span>
 <span class="sd">        cov_type : str, optional</span>
-<span class="sd">            Name of covariance estimator to use. The default is "robust". Supported</span>
-<span class="sd">            covariance estimators are:</span>
+<span class="sd">            Name of covariance estimator to use. The default is "robust". The names</span>
+<span class="sd">            are not case sensitive. Supported covariance estimators are:</span>
 
 <span class="sd">            * "unadjusted", "homoskedastic" - Classic homoskedastic inference</span>
 <span class="sd">            * "robust", "heteroskedastic" - Heteroskedasticity robust inference</span>
@@ -3811,7 +3823,8 @@
 <span class="sd">            Additional parameters to pass to the covariance estimator. The keys are</span>
 <span class="sd">            ``center`` (bool) for every covariance estimator, ``kernel`` (str),</span>
 <span class="sd">            ``bandwidth`` (int) and ``optimal_bw`` (bool) for "kernel", and</span>
-<span class="sd">            ``clusters`` (array_like, one column) for "clustered". See the Notes.</span>
+<span class="sd">            ``clusters`` (array_like, one column) for "clustered". The names of the</span>
+<span class="sd">            kernels are not case sensitive. See the Notes.</span>
 
 <span class="sd">        Returns</span>
 <span class="sd">        -------</span>
@@ -3826,15 +3839,14 @@
 <span class="sd">            fewer observations than the kernel needs, if ``clusters`` has more than</span>
 <span class="sd">            one column, or if the labels of ``clusters`` do not match the labels of</span>
 <span class="sd">            the other inputs.</span>
+<span class="sd">            A key of ``cov_config`` that the covariance estimator that ``cov_type``</span>
+<span class="sd">            selects does not accept also raises it. The message names the key and lists</span>
+<span class="sd">            the accepted keys. This is checked before the model is estimated. Releases</span>
+<span class="sd">            before 7.1 raised the ``TypeError`` of the constructor of the covariance</span>
+<span class="sd">            estimator.</span>
 <span class="sd">        UnknownOptionError</span>
 <span class="sd">            If ``cov_type`` or ``kernel`` is not supported. It is both a</span>
 <span class="sd">            ``KeyError`` and a ``ValueError``.</span>
-<span class="sd">        ValueError</span>
-<span class="sd">            If a key of ``cov_config`` is not accepted by the covariance estimator</span>
-<span class="sd">            that ``cov_type`` selects. The message names the key and lists the</span>
-<span class="sd">            accepted keys. It is raised before the model is estimated. Releases</span>
-<span class="sd">            before 7.1 raised the ``TypeError`` of the constructor of the covariance</span>
-<span class="sd">            estimator.</span>
 
 <span class="sd">        See Also</span>
 <span class="sd">        --------</span>

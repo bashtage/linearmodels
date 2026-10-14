@@ -19,7 +19,7 @@
     
   
       
-        <title>linearmodels.asset_pricing.model - linearmodels v7.1 (+544)</title>
+        <title>linearmodels.asset_pricing.model - linearmodels v7.1 (+547)</title>
       
     
 
@@ -91,7 +91,7 @@
 
 <header class="md-header md-header--shadow" data-md-component="header">
   <nav class="md-header__inner md-grid" aria-label="Header">
-    <a href="../../../index.html" title="linearmodels v7.1 (+544)" class="md-header__button md-logo" aria-label="linearmodels v7.1 (+544)" data-md-component="logo">
+    <a href="../../../index.html" title="linearmodels v7.1 (+547)" class="md-header__button md-logo" aria-label="linearmodels v7.1 (+547)" data-md-component="logo">
       <img src="../../../_static/bw-logo.svg" alt="logo">
     </a>
     <label class="md-header__button md-icon" for="__drawer">
@@ -102,7 +102,7 @@
       <div class="md-header__ellipsis">
         <div class="md-header__topic">
           <span class="md-ellipsis">
-            linearmodels v7.1 (+544)
+            linearmodels v7.1 (+547)
           </span>
         </div>
         <div class="md-header__topic" data-md-component="header-topic">
@@ -197,10 +197,10 @@
 
 <nav class="md-nav md-nav--primary" aria-label="Navigation" data-md-level="0">
   <label class="md-nav__title" for="__drawer">
-    <a href="../../../index.html" title="linearmodels v7.1 (+544)" class="md-nav__button md-logo" aria-label="linearmodels v7.1 (+544)" data-md-component="logo">
+    <a href="../../../index.html" title="linearmodels v7.1 (+547)" class="md-nav__button md-logo" aria-label="linearmodels v7.1 (+547)" data-md-component="logo">
       <img src="../../../_static/bw-logo.svg" alt="logo">
     </a>
-    linearmodels v7.1 (+544)
+    linearmodels v7.1 (+547)
   </label>
   
     <div class="md-nav__source">
@@ -965,8 +965,8 @@
 <span class="sd">        Parameters</span>
 <span class="sd">        ----------</span>
 <span class="sd">        cov_type : {"robust", "heteroskedastic", "kernel"}, optional</span>
-<span class="sd">            Name of covariance estimator. The names are not case sensitive. The</span>
-<span class="sd">            default is "robust". "heteroskedastic" is the same as "robust".</span>
+<span class="sd">            Name of covariance estimator. The default is "robust". The names are</span>
+<span class="sd">            not case sensitive. "heteroskedastic" is an alias of "robust". See Notes.</span>
 <span class="sd">        debiased : bool, optional</span>
 <span class="sd">            Flag indicating whether to debias the covariance estimator using</span>
 <span class="sd">            a degree of freedom adjustment. The default is True. See Notes.</span>
@@ -989,10 +989,9 @@
 <span class="sd">            If ``debiased`` is True and the number of observations is not larger</span>
 <span class="sd">            than the number of factors plus one, or if the bandwidth is selected</span>
 <span class="sd">            from the data and there are too few observations. See Notes.</span>
-<span class="sd">        ValueError</span>
-<span class="sd">            If a key of ``cov_config`` is not accepted by the covariance estimator</span>
-<span class="sd">            that ``cov_type`` selects. The message names the key and lists the</span>
-<span class="sd">            accepted keys. It is raised before the model is estimated. Releases</span>
+<span class="sd">            A key of ``cov_config`` that the covariance estimator that ``cov_type``</span>
+<span class="sd">            selects does not accept also raises it. The message names the key and lists</span>
+<span class="sd">            the accepted keys. This is checked before the model is estimated. Releases</span>
 <span class="sd">            before 7.1 ignored the key.</span>
 
 <span class="sd">        Notes</span>
@@ -1005,10 +1004,10 @@
 <span class="sd">          covariance estimator</span>
 
 <span class="sd">        The kernel covariance estimator takes the optional arguments</span>
-<span class="sd">        ``kernel``, which is not case sensitive and is one of "bartlett",</span>
-<span class="sd">        "newey-west", "parzen", "gallant", "qs", "quadratic-spectral" or</span>
-<span class="sd">        "andrews", and ``bandwidth`` (a non-negative number). The default kernel is</span>
-<span class="sd">        "bartlett". If ``bandwidth`` is not given it</span>
+<span class="sd">        ``kernel``, which is one of "bartlett", "newey-west", "parzen", "gallant",</span>
+<span class="sd">        "qs", "quadratic-spectral" or "andrews", and ``bandwidth`` (a non-negative</span>
+<span class="sd">        number). The names of the kernels are not case sensitive. The default</span>
+<span class="sd">        kernel is "bartlett". If ``bandwidth`` is not given it</span>
 <span class="sd">        is selected from the data, which needs at least 4 observations with the</span>
 <span class="sd">        Bartlett kernel, 5 with the Parzen kernel and 6 with the quadratic</span>
 <span class="sd">        spectral kernel. ``fit`` raises a ``ValueError`` for fewer observations,</span>
@@ -1492,8 +1491,8 @@
 <span class="sd">        Parameters</span>
 <span class="sd">        ----------</span>
 <span class="sd">        cov_type : {"robust", "heteroskedastic", "kernel"}, optional</span>
-<span class="sd">            Name of covariance estimator. The names are not case sensitive. The</span>
-<span class="sd">            default is "robust". "heteroskedastic" is the same as "robust".</span>
+<span class="sd">            Name of covariance estimator. The default is "robust". The names are</span>
+<span class="sd">            not case sensitive. "heteroskedastic" is an alias of "robust".</span>
 <span class="sd">        debiased : bool, optional</span>
 <span class="sd">            Flag indicating whether to debias the covariance estimator using</span>
 <span class="sd">            a degree of freedom adjustment. The default is True.</span>
@@ -1516,19 +1515,18 @@
 <span class="sd">            If ``debiased`` is True and the number of observations is not larger</span>
 <span class="sd">            than the number of factors plus one, or if the bandwidth is selected</span>
 <span class="sd">            from the data and there are too few observations. See Notes.</span>
-<span class="sd">        ValueError</span>
-<span class="sd">            If a key of ``cov_config`` is not accepted by the covariance estimator</span>
-<span class="sd">            that ``cov_type`` selects. The message names the key and lists the</span>
-<span class="sd">            accepted keys. It is raised before the model is estimated. Releases</span>
+<span class="sd">            A key of ``cov_config`` that the covariance estimator that ``cov_type``</span>
+<span class="sd">            selects does not accept also raises it. The message names the key and lists</span>
+<span class="sd">            the accepted keys. This is checked before the model is estimated. Releases</span>
 <span class="sd">            before 7.1 ignored the key.</span>
 
 <span class="sd">        Notes</span>
 <span class="sd">        -----</span>
 <span class="sd">        The kernel covariance estimator takes the optional arguments</span>
-<span class="sd">        ``kernel``, which is not case sensitive and is one of "bartlett",</span>
-<span class="sd">        "newey-west", "parzen", "gallant", "qs", "quadratic-spectral" or</span>
-<span class="sd">        "andrews", and ``bandwidth`` (a non-negative number). The default kernel is</span>
-<span class="sd">        "bartlett". If ``bandwidth`` is not given it</span>
+<span class="sd">        ``kernel``, which is one of "bartlett", "newey-west", "parzen", "gallant",</span>
+<span class="sd">        "qs", "quadratic-spectral" or "andrews", and ``bandwidth`` (a non-negative</span>
+<span class="sd">        number). The names of the kernels are not case sensitive. The default</span>
+<span class="sd">        kernel is "bartlett". If ``bandwidth`` is not given it</span>
 <span class="sd">        is selected from the data, which needs at least 4 observations with the</span>
 <span class="sd">        Bartlett kernel, 5 with the Parzen kernel and 6 with the quadratic</span>
 <span class="sd">        spectral kernel. ``fit`` raises a ``ValueError`` for fewer observations,</span>
@@ -1947,8 +1945,8 @@
 <span class="sd">            Maximum number of iterations when minimizing objective. Must be</span>
 <span class="sd">            positive. The default is 1000.</span>
 <span class="sd">        cov_type : {"robust", "heteroskedastic", "kernel"}, optional</span>
-<span class="sd">            Name of covariance estimator. The names are not case sensitive. The</span>
-<span class="sd">            default is "robust". "heteroskedastic" is the same as "robust".</span>
+<span class="sd">            Name of covariance estimator. The default is "robust". The names are</span>
+<span class="sd">            not case sensitive. "heteroskedastic" is an alias of "robust".</span>
 <span class="sd">        debiased : bool, optional</span>
 <span class="sd">            Flag indicating whether to debias the covariance estimator using</span>
 <span class="sd">            a degree of freedom adjustment. The default is True.</span>
@@ -1979,19 +1977,18 @@
 <span class="sd">            If ``starting`` does not have one element for each parameter, or if</span>
 <span class="sd">            the bandwidth is selected from the data and there are too few</span>
 <span class="sd">            observations. See Notes.</span>
-<span class="sd">        ValueError</span>
-<span class="sd">            If a key of ``cov_config`` is not accepted by the covariance estimator</span>
-<span class="sd">            that ``cov_type`` selects. The message names the key and lists the</span>
-<span class="sd">            accepted keys. It is raised before the model is estimated. Releases</span>
+<span class="sd">            A key of ``cov_config`` that the covariance estimator that ``cov_type``</span>
+<span class="sd">            selects does not accept also raises it. The message names the key and lists</span>
+<span class="sd">            the accepted keys. This is checked before the model is estimated. Releases</span>
 <span class="sd">            before 7.1 ignored the key.</span>
 
 <span class="sd">        Notes</span>
 <span class="sd">        -----</span>
 <span class="sd">        The kernel covariance estimator takes the optional arguments</span>
-<span class="sd">        ``kernel``, which is not case sensitive and is one of "bartlett",</span>
-<span class="sd">        "newey-west", "parzen", "gallant", "qs", "quadratic-spectral" or</span>
-<span class="sd">        "andrews", and ``bandwidth`` (a non-negative number). The default kernel is</span>
-<span class="sd">        "bartlett". If ``bandwidth`` is not given it</span>
+<span class="sd">        ``kernel``, which is one of "bartlett", "newey-west", "parzen", "gallant",</span>
+<span class="sd">        "qs", "quadratic-spectral" or "andrews", and ``bandwidth`` (a non-negative</span>
+<span class="sd">        number). The names of the kernels are not case sensitive. The default</span>
+<span class="sd">        kernel is "bartlett". If ``bandwidth`` is not given it</span>
 <span class="sd">        is selected from the data, for the weight matrix and for the covariance,</span>
 <span class="sd">        which needs at least 4 observations with the Bartlett kernel, 5 with the</span>
 <span class="sd">        Parzen kernel and 6 with the quadratic spectral kernel. ``fit`` raises a</span>

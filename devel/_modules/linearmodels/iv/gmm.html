@@ -19,7 +19,7 @@
     
   
       
-        <title>linearmodels.iv.gmm - linearmodels v7.1 (+544)</title>
+        <title>linearmodels.iv.gmm - linearmodels v7.1 (+547)</title>
       
     
 
@@ -91,7 +91,7 @@
 
 <header class="md-header md-header--shadow" data-md-component="header">
   <nav class="md-header__inner md-grid" aria-label="Header">
-    <a href="../../../index.html" title="linearmodels v7.1 (+544)" class="md-header__button md-logo" aria-label="linearmodels v7.1 (+544)" data-md-component="logo">
+    <a href="../../../index.html" title="linearmodels v7.1 (+547)" class="md-header__button md-logo" aria-label="linearmodels v7.1 (+547)" data-md-component="logo">
       <img src="../../../_static/bw-logo.svg" alt="logo">
     </a>
     <label class="md-header__button md-icon" for="__drawer">
@@ -102,7 +102,7 @@
       <div class="md-header__ellipsis">
         <div class="md-header__topic">
           <span class="md-ellipsis">
-            linearmodels v7.1 (+544)
+            linearmodels v7.1 (+547)
           </span>
         </div>
         <div class="md-header__topic" data-md-component="header-topic">
@@ -197,10 +197,10 @@
 
 <nav class="md-nav md-nav--primary" aria-label="Navigation" data-md-level="0">
   <label class="md-nav__title" for="__drawer">
-    <a href="../../../index.html" title="linearmodels v7.1 (+544)" class="md-nav__button md-logo" aria-label="linearmodels v7.1 (+544)" data-md-component="logo">
+    <a href="../../../index.html" title="linearmodels v7.1 (+547)" class="md-nav__button md-logo" aria-label="linearmodels v7.1 (+547)" data-md-component="logo">
       <img src="../../../_static/bw-logo.svg" alt="logo">
     </a>
-    linearmodels v7.1 (+544)
+    linearmodels v7.1 (+547)
   </label>
   
     <div class="md-nav__source">
@@ -777,8 +777,13 @@
 <span class="sd">    Parameters</span>
 <span class="sd">    ----------</span>
 <span class="sd">    kernel : str, optional</span>
-<span class="sd">        Name of kernel weighting function to use. The default is "bartlett". See</span>
-<span class="sd">        Notes for the supported kernels.</span>
+<span class="sd">        Name of kernel weighting function to use. The default is "bartlett". The</span>
+<span class="sd">        names are not case sensitive. Supported kernels are:</span>
+
+<span class="sd">        * "bartlett", "newey-west" - Bartlett's kernel</span>
+<span class="sd">        * "parzen", "gallant" - Parzen's kernel</span>
+<span class="sd">        * "qs", "quadratic-spectral", "andrews" - Quadratic spectral kernel</span>
+
 <span class="sd">    bandwidth : int, optional</span>
 <span class="sd">        Bandwidth to use when computing kernel weights. If not provided, the</span>
 <span class="sd">        bandwidth is selected by ``optimal_bw``.</span>
@@ -809,11 +814,7 @@
 
 <span class="sd">    Notes</span>
 <span class="sd">    -----</span>
-<span class="sd">    Supported kernels:</span>
-
-<span class="sd">    * "bartlett", "newey-west" - Bartlett's kernel</span>
-<span class="sd">    * "parzen", "gallant" - Parzen's kernel</span>
-<span class="sd">    * "qs", "quadratic-spectral", "andrews" - The quadratic spectral kernel</span>
+<span class="sd">    The weight matrix is</span>
 
 <span class="sd">    .. math::</span>
 
@@ -1111,7 +1112,8 @@
 <span class="sd">    w : ndarray</span>
 <span class="sd">        Weighting matrix used in GMM estimation (ninstr by ninstr).</span>
 <span class="sd">    cov_type : str, optional</span>
-<span class="sd">        Covariance estimator to use. The default is "robust". Valid choices are</span>
+<span class="sd">        Covariance estimator to use. The default is "robust". The names are not</span>
+<span class="sd">        case sensitive. Supported covariance estimators are:</span>
 
 <span class="sd">        * "unadjusted", "homoskedastic" - Assumes moment conditions are</span>
 <span class="sd">          homoskedastic</span>
@@ -1127,7 +1129,8 @@
 <span class="sd">        Optional keyword arguments that are specific to a particular cov_type.</span>
 <span class="sd">        The keys are ``center`` (bool) for every covariance estimator,</span>
 <span class="sd">        ``kernel`` (str), ``bandwidth`` (int) and ``optimal_bw`` (bool) for</span>
-<span class="sd">        "kernel", and ``clusters`` (array_like) for "clustered". See Notes.</span>
+<span class="sd">        "kernel", and ``clusters`` (array_like) for "clustered". The names of the</span>
+<span class="sd">        kernels are not case sensitive. See Notes.</span>
 
 <span class="sd">    Raises</span>
 <span class="sd">    ------</span>
@@ -1152,7 +1155,7 @@
 
 <span class="sd">    **kernel**</span>
 
-<span class="sd">    * ``kernel``: Name of kernel to use.  See</span>
+<span class="sd">    * ``kernel``: Name of kernel to use. The names are not case sensitive. See</span>
 <span class="sd">      :class:`~linearmodels.iv.covariance.KernelCovariance` for details on</span>
 <span class="sd">      available kernels</span>
 <span class="sd">    * ``bandwidth``: Bandwidth to use when computing the weight.  If not</span>

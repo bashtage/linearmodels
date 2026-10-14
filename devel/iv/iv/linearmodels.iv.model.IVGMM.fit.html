@@ -23,7 +23,7 @@
     
   
       
-        <title>linearmodels.iv.model.IVGMM.fit - linearmodels v7.1 (+544)</title>
+        <title>linearmodels.iv.model.IVGMM.fit - linearmodels v7.1 (+547)</title>
       
     
 
@@ -100,7 +100,7 @@
 
 <header class="md-header md-header--shadow" data-md-component="header">
   <nav class="md-header__inner md-grid" aria-label="Header">
-    <a href="../../index.html" title="linearmodels v7.1 (+544)" class="md-header__button md-logo" aria-label="linearmodels v7.1 (+544)" data-md-component="logo">
+    <a href="../../index.html" title="linearmodels v7.1 (+547)" class="md-header__button md-logo" aria-label="linearmodels v7.1 (+547)" data-md-component="logo">
       <img src="../../_static/bw-logo.svg" alt="logo">
     </a>
     <label class="md-header__button md-icon" for="__drawer">
@@ -111,7 +111,7 @@
       <div class="md-header__ellipsis">
         <div class="md-header__topic">
           <span class="md-ellipsis">
-            linearmodels v7.1 (+544)
+            linearmodels v7.1 (+547)
           </span>
         </div>
         <div class="md-header__topic" data-md-component="header-topic">
@@ -206,10 +206,10 @@
 
 <nav class="md-nav md-nav--primary" aria-label="Navigation" data-md-level="0">
   <label class="md-nav__title" for="__drawer">
-    <a href="../../index.html" title="linearmodels v7.1 (+544)" class="md-nav__button md-logo" aria-label="linearmodels v7.1 (+544)" data-md-component="logo">
+    <a href="../../index.html" title="linearmodels v7.1 (+547)" class="md-nav__button md-logo" aria-label="linearmodels v7.1 (+547)" data-md-component="logo">
       <img src="../../_static/bw-logo.svg" alt="logo">
     </a>
-    linearmodels v7.1 (+544)
+    linearmodels v7.1 (+547)
   </label>
   
     <div class="md-nav__source">
@@ -1774,8 +1774,8 @@ based on the first step parameter estimates. The default is 1e-4.</p>
 the average outer-product of the set containing the exogenous variables
 and instruments.</p>
 </dd>
-<dt id="linearmodels.iv.model.IVGMM.fit.cov_type"><span class="n sig-name">cov_type</span><span class="p">:</span><span class="w"> </span><span class="n"><span class="desctype"><a class="reference external" href="https://docs.python.org/3/builtins/stdtypes.html#str" title="(in Python v3.15)">str</a></span></span><span class="w"> </span><span class="o">=</span><span class="w"> </span><code class="code python default_value docutils literal highlight highlight-python"><span class="s1">'robust'</span></code><a class="headerlink" href="#linearmodels.iv.model.IVGMM.fit.cov_type" title="Permalink to this definition">¶</a></dt><dd><p><p>Name of covariance estimator to use. The default is “robust”. Supported
-covariance estimators are:</p>
+<dt id="linearmodels.iv.model.IVGMM.fit.cov_type"><span class="n sig-name">cov_type</span><span class="p">:</span><span class="w"> </span><span class="n"><span class="desctype"><a class="reference external" href="https://docs.python.org/3/builtins/stdtypes.html#str" title="(in Python v3.15)">str</a></span></span><span class="w"> </span><span class="o">=</span><span class="w"> </span><code class="code python default_value docutils literal highlight highlight-python"><span class="s1">'robust'</span></code><a class="headerlink" href="#linearmodels.iv.model.IVGMM.fit.cov_type" title="Permalink to this definition">¶</a></dt><dd><p><p>Name of covariance estimator to use. The default is “robust”. The names
+are not case sensitive. Supported covariance estimators are:</p>
 <ul class="simple">
 <li><p>”unadjusted”, “homoskedastic” - Assumes moment conditions are
 homoskedastic</p></li>
@@ -1792,7 +1792,8 @@ a degree of freedom adjustment. The default is False.</p>
 <dt id="linearmodels.iv.model.IVGMM.fit.cov_config"><span class="o">**</span><span class="n sig-name">cov_config</span><span class="p">:</span><span class="w"> </span><span class="n"><span class="desctype"><a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Any" title="(in Python v3.15)">Any</a></span></span><a class="headerlink" href="#linearmodels.iv.model.IVGMM.fit.cov_config" title="Permalink to this definition">¶</a></dt><dd><p>Additional parameters to pass to the covariance estimator. The keys are
 <code class="docutils literal notranslate"><span class="pre">center</span></code> (bool) for every covariance estimator, <code class="docutils literal notranslate"><span class="pre">kernel</span></code> (str),
 <code class="docutils literal notranslate"><span class="pre">bandwidth</span></code> (int) and <code class="docutils literal notranslate"><span class="pre">optimal_bw</span></code> (bool) for “kernel”, and
-<code class="docutils literal notranslate"><span class="pre">clusters</span></code> (array_like) for “clustered”. See
+<code class="docutils literal notranslate"><span class="pre">clusters</span></code> (array_like) for “clustered”. The names of the kernels are
+not case sensitive. See
 <a class="reference internal" href="linearmodels.iv.gmm.IVGMMCovariance.html#linearmodels.iv.gmm.IVGMMCovariance" title="linearmodels.iv.gmm.IVGMMCovariance (Python class) — Covariance estimation for GMM models."><code class="xref py py-class docutils literal notranslate"><span class="pre">IVGMMCovariance</span></code></a> for details on the
 available options. Defaults are used if no covariance configuration is
 provided.</p>
@@ -1817,14 +1818,14 @@ provided.</p>
     estimated from the data and there are fewer observations than the
     kernel needs, or the estimated bandwidth is not finite, if
     <code class="docutils literal notranslate"><span class="pre">initial_weight</span></code> does not have the right shape, and if the labels
-    of <code class="docutils literal notranslate"><span class="pre">clusters</span></code> do not match the labels of the other inputs.</p></li>
-<li><p><a class="reference internal" href="../../utility.html#linearmodels.shared.exceptions.UnknownOptionError" title="linearmodels.shared.exceptions.UnknownOptionError (Python class) — Bases: ValueError, KeyError"><strong>UnknownOptionError</strong></a> – If <code class="docutils literal notranslate"><span class="pre">cov_type</span></code> is not supported. It is both a <code class="docutils literal notranslate"><span class="pre">KeyError</span></code> and a
-    <code class="docutils literal notranslate"><span class="pre">ValueError</span></code>.</p></li>
-<li><p><a class="reference external" href="https://docs.python.org/3/builtins/exceptions.html#ValueError" title="(in Python v3.15)"><strong>ValueError</strong></a> – If a key of <code class="docutils literal notranslate"><span class="pre">cov_config</span></code> is not accepted by the covariance estimator
-    that <code class="docutils literal notranslate"><span class="pre">cov_type</span></code> selects. The message names the key and lists the
-    accepted keys. It is raised before the model is estimated. Releases
+    of <code class="docutils literal notranslate"><span class="pre">clusters</span></code> do not match the labels of the other inputs.
+    A key of <code class="docutils literal notranslate"><span class="pre">cov_config</span></code> that the covariance estimator that <code class="docutils literal notranslate"><span class="pre">cov_type</span></code>
+    selects does not accept also raises it. The message names the key and lists
+    the accepted keys. This is checked before the model is estimated. Releases
     before 7.1 raised the <code class="docutils literal notranslate"><span class="pre">TypeError</span></code> of the constructor of the covariance
     estimator.</p></li>
+<li><p><a class="reference internal" href="../../utility.html#linearmodels.shared.exceptions.UnknownOptionError" title="linearmodels.shared.exceptions.UnknownOptionError (Python class) — Bases: ValueError, KeyError"><strong>UnknownOptionError</strong></a> – If <code class="docutils literal notranslate"><span class="pre">cov_type</span></code> is not supported. It is both a <code class="docutils literal notranslate"><span class="pre">KeyError</span></code> and a
+    <code class="docutils literal notranslate"><span class="pre">ValueError</span></code>.</p></li>
 </ul>
 </dd>
 </dl>
