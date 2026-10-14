@@ -1,3 +1,7 @@
+"""
+Results of the estimation of systems of equations.
+"""
+
 from __future__ import annotations
 
 from linearmodels.compat.statsmodels import Summary
@@ -52,54 +56,56 @@ class _CommonResults(_SummaryStr):
 
     @property
     def method(self) -> str:
-        """Estimation method"""
+        """Estimation method."""
         return self._method
 
     @property
     def cov(self) -> DataFrame:
-        """Estimated covariance of parameters"""
+        """Estimated covariance of parameters."""
         return DataFrame(self._cov, index=self._param_names, columns=self._param_names)
 
     @property
     def cov_estimator(self) -> str:
-        """Type of covariance estimator used to compute covariance"""
+        """Type of covariance estimator used to compute covariance."""
         return self._cov_type
 
     @property
     def cov_config(self) -> dict[str, bool]:
-        """Configuration of covariance estimator used to compute covariance"""
+        """Configuration of covariance estimator used to compute covariance."""
         return self._cov_config
 
     @property
     def iterations(self) -> int:
-        """Number of iterations of the GLS executed"""
+        """Number of iterations of the GLS executed."""
         return self._iter
 
     @property
     def debiased(self) -> bool:
-        """Flag indicating whether covariance uses a small-sample adjustment"""
+        """Flag indicating whether covariance uses a small-sample adjustment."""
         return self._debiased
 
     @property
     def params(self) -> Series:
-        """Estimated parameters"""
+        """Estimated parameters."""
         return Series(self._params.squeeze(), index=self._param_names, name="params")
 
     @property
     def std_errors(self) -> Series:
-        """Estimated parameter standard errors"""
+        """Estimated parameter standard errors."""
         std_errors = np.sqrt(np.diag(self.cov))
         return Series(std_errors, index=self._param_names, name="stderr")
 
     @property
     def tstats(self) -> Series:
-        """Parameter t-statistics"""
+        """Parameter t-statistics."""
         return Series(self.params / self.std_errors, name="tstat")
 
     @cached_property
     def pvalues(self) -> Series:
         """
-        Parameter p-vals. Uses t(df_resid) if ``debiased`` is True, else normal
+        Parameter p-values.
+
+        Uses t(df_resid) if ``debiased`` is True, else normal.
         """
         if self.debiased:
             pvals = 2 * stats.t.sf(np.abs(self.tstats), self._df_resid)
@@ -111,12 +117,12 @@ class _CommonResults(_SummaryStr):
     @property
     def rsquared(self) -> float:
         r"""
-        Coefficient of determination (R2)
+        Coefficient of determination (R2).
 
         Returns
         -------
         float
-            The coefficient of determinations.
+            The overall coefficient of determination of the system.
 
         Notes
         -----
@@ -144,47 +150,47 @@ class _CommonResults(_SummaryStr):
 
     @property
     def total_ss(self) -> float:
-        """Total sum of squares"""
+        """Total sum of squares."""
         return self._tss
 
     @property
     def model_ss(self) -> float:
-        """Residual sum of squares"""
+        """Model sum of squares."""
         return self._tss - self._rss
 
     @property
     def resid_ss(self) -> float:
-        """Residual sum of squares"""
+        """Residual sum of squares."""
         return self._rss
 
     @property
     def nobs(self) -> int:
-        """Number of observations"""
+        """Number of observations."""
         return self._nobs
 
     @property
     def df_resid(self) -> int:
-        """Residual degree of freedom"""
+        """Residual degree of freedom."""
         return self._df_resid
 
     @property
     def df_model(self) -> int:
-        """Model degree of freedom"""
+        """Model degree of freedom."""
         return self._df_model
 
     def conf_int(self, level: float = 0.95) -> DataFrame:
         """
-        Confidence interval construction
+        Confidence interval construction.
 
         Parameters
         ----------
-        level : float
-            Confidence level for interval
+        level : float, optional
+            Confidence level for interval. The default is 0.95.
 
         Returns
         -------
         DataFrame
-            Confidence interval of the form [lower, upper] for each parameters
+            Confidence interval of the form [lower, upper] for each parameter.
 
         Notes
         -----
@@ -203,12 +209,12 @@ class _CommonResults(_SummaryStr):
 
 class SystemResults(_CommonResults):
     """
-    Results from Seemingly Unrelated Regression Estimators
+    Results from Seemingly Unrelated Regression Estimators.
 
     Parameters
     ----------
     results : AttrDict
-        Dictionary of model estimation results
+        Dictionary of model estimation results.
 
     Notes
     -----
@@ -252,7 +258,7 @@ class SystemResults(_CommonResults):
 
     @property
     def model(self) -> linearmodels.system.model.IV3SLS:
-        """Model used in estimation"""
+        """Model used in estimation."""
         return self._model
 
     @property
@@ -281,22 +287,22 @@ class SystemResults(_CommonResults):
 
     @property
     def equations(self) -> AttrDict:
-        """Individual equation results"""
+        """Individual equation results."""
         return self._individual
 
     @property
     def equation_labels(self) -> list[str]:
-        """Individual equation labels"""
+        """Individual equation labels."""
         return list(self._individual.keys())
 
     @property
     def resids(self) -> DataFrame:
-        """Estimated residuals"""
+        """Estimated residuals."""
         return DataFrame(self._resid, index=self._index, columns=self.equation_labels)
 
     @property
     def fitted_values(self) -> DataFrame:
-        """Fitted values"""
+        """Fitted values."""
         return DataFrame(self._fitted, index=self._index, columns=self.equation_labels)
 
     def _out_of_sample(
@@ -339,41 +345,59 @@ class SystemResults(_CommonResults):
         dataframe: bool = False,
     ) -> DataFrame | dict:
         """
-        In- and out-of-sample predictions
+        In- and out-of-sample predictions.
 
         Parameters
         ----------
-        equations : dict
+        equations : dict of str to dict, optional
             Dictionary-like structure containing exogenous and endogenous
             variables.  Each key is an equations label and must
-            match the labels used to fit the model. Each value must be either a tuple
-            of the form (exog, endog) or a dictionary with keys "exog" and "endog".
+            match the labels used to fit the model. Each value must be a
+            dictionary with keys "exog" and "endog".
             If predictions are not required for one of more of the model equations,
             these keys can be omitted.
-        data : DataFrame
+        data : DataFrame, optional
             DataFrame to use for out-of-sample predictions when model was
             constructed using a formula.
-        fitted : bool
-            Flag indicating whether to include the fitted values
-        idiosyncratic : bool
-            Flag indicating whether to include the estimated idiosyncratic shock
-        missing : bool
-            Flag indicating to adjust for dropped observations.  if True, the
-            values returns will have the same size as the original input data
-            before filtering missing values
-        dataframe : bool
+        fitted : bool, optional
+            Flag indicating whether to include the fitted values. The default is
+            True.
+        idiosyncratic : bool, optional
+            Flag indicating whether to include the estimated idiosyncratic shock.
+            The default is False.
+        missing : bool, optional
+            Flag indicating to adjust for dropped observations.  If True, the
+            values returned will have the same size as the original input data
+            before filtering missing values. The default is False.
+        dataframe : bool, optional
             Flag indicating to return output as a dataframe. If False, a
-            dictionary is returned using the equation labels as keys.
+            dictionary is returned using the equation labels as keys. The default
+            is False.
 
         Returns
         -------
-        predictions : {DataFrame, dict}
-            DataFrame or dictionary containing selected outputs
+        DataFrame or dict of str to DataFrame or Series
+            The selected outputs. For in-sample predictions, a DataFrame with a
+            column for each equation if ``dataframe`` is True and only one of
+            ``fitted`` and ``idiosyncratic`` is selected, and otherwise a dict. The
+            dict has the equation labels as keys and DataFrames of the selected
+            outputs as values, or, if ``dataframe`` is True, the keys
+            "fitted_values" and "idiosyncratic". For out-of-sample predictions, a
+            DataFrame if ``dataframe`` is True, and otherwise a dict of Series with
+            the equation labels as keys.
+
+        Raises
+        ------
+        ValueError
+            If both ``equations`` and ``data`` are provided, or if neither
+            ``fitted`` nor ``idiosyncratic`` is selected for in-sample predictions.
 
         Notes
         -----
         If `equations` and `data` are both `None`, in-sample predictions
-        (fitted values) will be returned.
+        (fitted values) will be returned. ``fitted`` and ``idiosyncratic`` select
+        the in-sample outputs and are ignored for out-of-sample predictions, which
+        are always fitted values.
 
         If `data` is not none, then `equations` must be none.
         Predictions from models constructed using formulas can
@@ -424,23 +448,24 @@ class SystemResults(_CommonResults):
 
     @property
     def wresids(self) -> DataFrame:
-        """Weighted estimated residuals"""
+        """Weighted estimated residuals."""
         return DataFrame(self._wresid, index=self._index, columns=self.equation_labels)
 
     @property
     def sigma(self) -> DataFrame:
-        """Estimated residual covariance"""
+        """Estimated residual covariance."""
         return self._sigma
 
     @property
     def system_rsquared(self) -> Series:
         r"""
-        Alternative measure of system fit
+        Alternative measure of system fit.
 
         Returns
         -------
         Series
-            The measures of overall system fit.
+            The measures of overall system fit, with the index "mcelroy", "berndt",
+            "judge" and "dhrymes".
 
         Notes
         -----
@@ -486,13 +511,13 @@ class SystemResults(_CommonResults):
 
         .. math::
 
-            \sum__i w_i R^2_i
+            \sum_i w_i R^2_i
 
         where the weight is
 
         .. math::
 
-           w_i = \frac{\hat{\Sigma}_{\eta}^{[ii]}}{\tr{\hat{\Sigma}_{\eta}}}
+           w_i = \frac{\hat{\Sigma}_{\eta}^{[ii]}}{\operatorname{tr}(\hat{\Sigma}_{\eta})}
 
         the ratio of the variance the dependent in an equation to the total
         variance of all dependent variables.
@@ -515,7 +540,7 @@ class SystemResults(_CommonResults):
         Returns
         -------
         Summary
-            Summary table of model estimation results
+            Summary table of model estimation results.
 
         Notes
         -----
@@ -591,12 +616,13 @@ class SystemResults(_CommonResults):
 
     def breusch_pagan(self) -> WaldTestStatistic | InvalidTestStatistic:
         r"""
-        Breusch-Pagan LM test for no cross-correlation
+        Breusch-Pagan LM test for no cross-correlation.
 
         Returns
         -------
-        WaldTestStatistic
-            Test statistic for null all correlations are zero.
+        WaldTestStatistic or InvalidTestStatistic
+            Test statistic for null all correlations are zero. It is an
+            InvalidTestStatistic if the system contains a single equation.
 
         Notes
         -----
@@ -641,12 +667,13 @@ class SystemResults(_CommonResults):
 
     def likelihood_ratio(self) -> WaldTestStatistic | InvalidTestStatistic:
         r"""
-        Likelihood ratio test of no cross-correlation
+        Likelihood ratio test of no cross-correlation.
 
         Returns
         -------
-        WaldTestStatistic
-            Test statistic that the covariance is diagonal.
+        WaldTestStatistic or InvalidTestStatistic
+            Test statistic that the covariance is diagonal. It is an
+            InvalidTestStatistic if the system contains a single equation.
 
         Notes
         -----
@@ -697,12 +724,12 @@ class SystemResults(_CommonResults):
 
 class SystemEquationResult(_CommonResults):
     """
-    Results from a single equation of a Seemingly Unrelated Regression
+    Results from a single equation of a Seemingly Unrelated Regression.
 
     Parameters
     ----------
     results : AttrDict
-        Dictionary of model estimation results
+        Dictionary of model estimation results.
     """
 
     def __init__(self, results: AttrDict) -> None:
@@ -717,12 +744,12 @@ class SystemEquationResult(_CommonResults):
 
     @property
     def equation_label(self) -> str:
-        """Equation label"""
+        """Equation label."""
         return self._eq_label
 
     @property
     def dependent(self) -> dict[str, DataFrame]:
-        """Name of dependent variable"""
+        """Name of dependent variable."""
         return self._dependent
 
     @property
@@ -738,7 +765,7 @@ class SystemEquationResult(_CommonResults):
         Returns
         -------
         Summary
-            Summary table of model estimation results
+            Summary table of model estimation results.
 
         Notes
         -----
@@ -815,7 +842,7 @@ class SystemEquationResult(_CommonResults):
     @property
     def f_statistic(self) -> WaldTestStatistic:
         """
-        Model F-statistic
+        Model F-statistic.
 
         Returns
         -------
@@ -837,23 +864,23 @@ class SystemEquationResult(_CommonResults):
 
     @property
     def resids(self) -> Series:
-        """Estimated residuals"""
+        """Estimated residuals."""
         return Series(self._resid.squeeze(), index=self._index, name="resid")
 
     @property
     def wresids(self) -> Series:
-        """Weighted estimated residuals"""
+        """Weighted estimated residuals."""
         return Series(self._wresid.squeeze(), index=self._index, name="wresid")
 
     @property
     def fitted_values(self) -> Series:
-        """Fitted values"""
+        """Fitted values."""
         return Series(self._fitted.squeeze(), index=self._index, name="fitted_values")
 
     @property
     def rsquared_adj(self) -> float:
         """
-        Sample-size adjusted coefficient of determination (R**2)
+        Sample-size adjusted coefficient of determination (R**2).
 
         Returns
         -------
@@ -870,12 +897,12 @@ class SystemEquationResult(_CommonResults):
 
 class GMMSystemResults(SystemResults):
     """
-    Results from GMM System Estimators
+    Results from GMM System Estimators.
 
     Parameters
     ----------
     results : AttrDict
-        Dictionary of model estimation results
+        Dictionary of model estimation results.
     """
 
     def __init__(self, results: AttrDict) -> None:
@@ -887,28 +914,28 @@ class GMMSystemResults(SystemResults):
 
     @property
     def w(self) -> linearmodels.typing.data.Float64Array:
-        """GMM weight matrix used in estimation"""
+        """GMM weight matrix used in estimation."""
         return self._wmat
 
     @property
     def weight_type(self) -> str:
-        """Type of weighting used in GMM estimation"""
+        """Type of weighting used in GMM estimation."""
         return self._weight_type
 
     @property
     def weight_config(self) -> dict[str, Any]:
-        """Weight configuration options used in GMM estimation"""
+        """Weight configuration options used in GMM estimation."""
         return self._weight_config
 
     @property
     def j_stat(self) -> WaldTestStatistic:
         r"""
-        J-test of overidentifying restrictions
+        J-test of overidentifying restrictions.
 
         Returns
         -------
         WaldTestStatistic
-            J statistic  test of overidentifying restrictions
+            J statistic test of overidentifying restrictions.
 
         Notes
         -----

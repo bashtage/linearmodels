@@ -1,3 +1,7 @@
+"""
+Covariance estimators for system regression models.
+"""
+
 from __future__ import annotations
 
 from typing import cast
@@ -28,23 +32,30 @@ number of clustering variables.  Clustering is only supported in 1 or 2 dimensio
 
 class HomoskedasticCovariance:
     r"""
-    Homoskedastic covariance estimation for system regression
+    Homoskedastic covariance estimation for system regression.
 
     Parameters
     ----------
-    x : list[ndarray]
-        List of regressor arrays (ndependent)
+    x : list of ndarray
+        Regressors of each equation, with shape (nobs, k_i) for equation i.
     eps : ndarray
-        Model residuals, ndependent by nobs
+        Model residuals, with shape (nobs, neq).
     sigma : ndarray
-        Covariance matrix estimator of eps
-    gls : bool
-        Flag indicating to compute the GLS covariance estimator.  If False,
-        assume OLS was used
-    debiased : bool
-        Flag indicating to apply a small sample adjustment
-    constraints : {None, LinearConstraint}
-        Constraints used in estimation, if any
+        Covariance of the residuals of the equations that is used to weight the
+        equations if ``gls`` is True, with shape (neq, neq).
+    full_sigma : ndarray
+        Covariance of the residuals of the equations at the final estimates, with
+        shape (neq, neq). It differs from ``sigma`` if the weights are not the
+        covariance of the final residuals, e.g., if the model was given ``sigma``
+        or did not iterate. It is used to estimate the covariance of the scores
+        if ``gls`` is True.
+    gls : bool, optional
+        Flag indicating to compute the GLS covariance estimator. If False, assume
+        OLS was used. The default is False.
+    debiased : bool, optional
+        Flag indicating to apply a small sample adjustment. The default is False.
+    constraints : LinearConstraint, optional
+        Constraints used in estimation. The default is no constraints.
 
     Notes
     -----
@@ -101,7 +112,7 @@ class HomoskedasticCovariance:
 
     @property
     def sigma(self) -> linearmodels.typing.data.Float64Array:
-        """Error covariance"""
+        """Covariance of the residuals of the equations."""
         return self._sigma
 
     def _adjustment(self) -> float | ndarray:
@@ -150,7 +161,7 @@ class HomoskedasticCovariance:
 
     @property
     def cov(self) -> linearmodels.typing.data.Float64Array:
-        """Parameter covariance"""
+        """Covariance of the parameter estimates."""
         adj = self._adjustment()
         if self._gls:
             return cast("ndarray", adj * self._gls_cov())
@@ -159,29 +170,36 @@ class HomoskedasticCovariance:
 
     @property
     def cov_config(self) -> AttrDict:
-        """Optional configuration information used in covariance"""
+        """Configuration of the covariance estimator."""
         return self._cov_config
 
 
 class HeteroskedasticCovariance(HomoskedasticCovariance):
     r"""
-    Heteroskedastic covariance estimation for system regression
+    Heteroskedastic covariance estimation for system regression.
 
     Parameters
     ----------
-    x : list[ndarray]
-        ndependent element list of regressor
+    x : list of ndarray
+        Regressors of each equation, with shape (nobs, k_i) for equation i.
     eps : ndarray
-        Model residuals, ndependent by nobs
+        Model residuals, with shape (nobs, neq).
     sigma : ndarray
-        Covariance matrix estimator of eps
-    gls : bool
-        Flag indicating to compute the GLS covariance estimator.  If False,
-        assume OLS was used
-    debiased : bool
-        Flag indicating to apply a small sample adjustment
-    constraints : {None, LinearConstraint}
-        Constraints used in estimation, if any
+        Covariance of the residuals of the equations that is used to weight the
+        equations if ``gls`` is True, with shape (neq, neq).
+    full_sigma : ndarray
+        Covariance of the residuals of the equations at the final estimates, with
+        shape (neq, neq). It differs from ``sigma`` if the weights are not the
+        covariance of the final residuals, e.g., if the model was given ``sigma``
+        or did not iterate. It is used to estimate the covariance of the scores
+        if ``gls`` is True.
+    gls : bool, optional
+        Flag indicating to compute the GLS covariance estimator. If False, assume
+        OLS was used. The default is False.
+    debiased : bool, optional
+        Flag indicating to apply a small sample adjustment. The default is False.
+    constraints : LinearConstraint, optional
+        Constraints used in estimation. The default is no constraints.
 
     Notes
     -----
@@ -299,35 +317,54 @@ class HeteroskedasticCovariance(HomoskedasticCovariance):
 
 class KernelCovariance(HeteroskedasticCovariance, _HACMixin):
     r"""
-    Kernel (HAC) covariance estimation for system regression
+    Kernel (HAC) covariance estimation for system regression.
 
     Parameters
     ----------
-    x : list[ndarray]
-        ndependent element list of regressor
+    x : list of ndarray
+        Regressors of each equation, with shape (nobs, k_i) for equation i.
     eps : ndarray
-        Model residuals, ndependent by nobs
+        Model residuals, with shape (nobs, neq).
     sigma : ndarray
-        Covariance matrix estimator of eps
-    gls : bool
-        Flag indicating to compute the GLS covariance estimator.  If False,
-        assume OLS was used
-    debiased : bool
-        Flag indicating to apply a small sample adjustment
-    kernel : str
-        Name of kernel to use.  Supported kernels include:
+        Covariance of the residuals of the equations that is used to weight the
+        equations if ``gls`` is True, with shape (neq, neq).
+    full_sigma : ndarray
+        Covariance of the residuals of the equations at the final estimates, with
+        shape (neq, neq). It differs from ``sigma`` if the weights are not the
+        covariance of the final residuals, e.g., if the model was given ``sigma``
+        or did not iterate. It is used to estimate the covariance of the scores
+        if ``gls`` is True.
+    gls : bool, optional
+        Flag indicating to compute the GLS covariance estimator. If False, assume
+        OLS was used. The default is False.
+    debiased : bool, optional
+        Flag indicating to apply a small sample adjustment. The default is False.
+    constraints : LinearConstraint, optional
+        Constraints used in estimation. The default is no constraints.
+    kernel : str, optional
+        Name of kernel to use. The name is not case sensitive. The default is
+        "bartlett". Supported kernels are:
 
         * "bartlett", "newey-west" : Bartlett's kernel
         * "parzen", "gallant" : Parzen's kernel
         * "qs", "quadratic-spectral", "andrews" : Quadratic spectral kernel
 
-    bandwidth : float
-        Bandwidth to use for the kernel.  If not provided the optimal
+    bandwidth : float, optional
+        Non-negative bandwidth to use for the kernel. If not provided, the optimal
         bandwidth will be estimated. It needs at least 4 observations with the
         Bartlett kernel, 5 with the Parzen kernel and 6 with the quadratic
         spectral kernel, and a ``ValueError`` is raised for fewer when the
         covariance is first used. See
         :func:`~linearmodels.iv.covariance.kernel_optimal_bandwidth`.
+
+    See Also
+    --------
+    linearmodels.iv.covariance.kernel_weight_bartlett
+        Weights of the Bartlett kernel.
+    linearmodels.iv.covariance.kernel_weight_parzen
+        Weights of the Parzen kernel.
+    linearmodels.iv.covariance.kernel_weight_quadratic_spectral
+        Weights of the quadratic spectral kernel.
 
     Notes
     -----
@@ -357,12 +394,6 @@ class KernelCovariance(HeteroskedasticCovariance, _HACMixin):
        ``OverflowError``) or "cannot convert float NaN to integer" for some
        data, and used a bandwidth of nobs - 1, or another bandwidth, for other
        data.
-
-    See Also
-    --------
-    linearmodels.iv.covariance.kernel_weight_bartlett,
-    linearmodels.iv.covariance.kernel_weight_parzen,
-    linearmodels.iv.covariance.kernel_weight_quadratic_spectral
     """
 
     def __init__(
@@ -400,7 +431,7 @@ class KernelCovariance(HeteroskedasticCovariance, _HACMixin):
 
     @property
     def cov_config(self) -> AttrDict:
-        """Optional configuration information used in covariance"""
+        """Configuration of the covariance estimator."""
         out = AttrDict([(k, v) for k, v in self._cov_config.items()])
         out["bandwidth"] = self.bandwidth
         return out
@@ -408,28 +439,44 @@ class KernelCovariance(HeteroskedasticCovariance, _HACMixin):
 
 class ClusteredCovariance(HeteroskedasticCovariance):
     r"""
-    Heteroskedastic covariance estimation for system regression
+    Clustered covariance estimation for system regression.
 
     Parameters
     ----------
-    x : list[ndarray]
-        ndependent element list of regressor
+    x : list of ndarray
+        Regressors of each equation, with shape (nobs, k_i) for equation i.
     eps : ndarray
-        Model residuals, ndependent by nobs
+        Model residuals, with shape (nobs, neq).
     sigma : ndarray
-        Covariance matrix estimator of eps
-    gls : bool
-        Flag indicating to compute the GLS covariance estimator.  If False,
-        assume OLS was used
-    debiased : bool
-        Flag indicating to apply a small sample adjustment
-    constraints : {None, LinearConstraint}
-        Constraints used in estimation, if any
-    clusters : array_like
-        Optional array of cluster id.  Must be integer valued, and have shape
-        (nobs, ncluster) where ncluster is 1 or 2.
-    group_debias : bool
-        Flag indicating whether to debias by the number of groups.
+        Covariance of the residuals of the equations that is used to weight the
+        equations if ``gls`` is True, with shape (neq, neq).
+    full_sigma : ndarray
+        Covariance of the residuals of the equations at the final estimates, with
+        shape (neq, neq). It differs from ``sigma`` if the weights are not the
+        covariance of the final residuals, e.g., if the model was given ``sigma``
+        or did not iterate. It is used to estimate the covariance of the scores
+        if ``gls`` is True.
+    gls : bool, optional
+        Flag indicating to compute the GLS covariance estimator. If False, assume
+        OLS was used. The default is False.
+    debiased : bool, optional
+        Flag indicating to apply a small sample adjustment. The default is False.
+    constraints : LinearConstraint, optional
+        Constraints used in estimation. The default is no constraints.
+    clusters : array_like, optional
+        Array of cluster ids. It must be integer valued, and have shape (nobs,) or
+        (nobs, ncluster) where ncluster is 1 or 2. The default is no clusters,
+        which gives the heteroskedasticity robust covariance.
+    group_debias : bool, optional
+        Flag indicating whether to debias by the number of groups. The default is
+        False.
+
+    See Also
+    --------
+    linearmodels.shared.covariance.cov_cluster
+        Core cluster covariance estimator.
+    linearmodels.shared.covariance.group_debias_coefficient
+        Scale that debiases a covariance by the number of groups.
 
     Notes
     -----
@@ -452,11 +499,6 @@ class ClusteredCovariance(HeteroskedasticCovariance):
 
     where :math:`\hat{S}` is a clustered estimator of the covariance of the
     model scores.
-
-    See Also
-    --------
-    linearmodels.shared.covariance.cov_cluster
-    linearmodels.shared.covariance.group_debias_coefficient
     """
 
     def __init__(
@@ -493,7 +535,7 @@ class ClusteredCovariance(HeteroskedasticCovariance):
     def _check_clusters(
         self, clusters: linearmodels.typing.data.IntArray | None
     ) -> linearmodels.typing.data.IntArray:
-        """Check cluster dimension and ensure ndarray"""
+        """Check cluster dimension and ensure ndarray."""
         if clusters is None:
             return empty((self._eps.size, 0), dtype=int)
         _clusters = as_ndarray(clusters, "clusters")
@@ -545,7 +587,7 @@ class ClusteredCovariance(HeteroskedasticCovariance):
 
     @property
     def cov_config(self) -> AttrDict:
-        """Optional configuration information used in covariance"""
+        """Configuration of the covariance estimator."""
         out = AttrDict([(k, v) for k, v in self._cov_config.items()])
         out["clusters"] = self._clusters
         out["group_debias"] = self._group_debias
@@ -554,23 +596,27 @@ class ClusteredCovariance(HeteroskedasticCovariance):
 
 class GMMHomoskedasticCovariance:
     r"""
-    Covariance estimator for IV system estimation with homoskedastic data
+    Covariance estimator for IV system estimation with homoskedastic data.
 
     Parameters
     ----------
-    x : list[ndarray]
-        List containing the model regressors for each equation in the system
-    z : list[ndarray]
-        List containing the model instruments for each equation in the system
+    x : list of ndarray
+        Regressors of each equation, with shape (nobs, k_i) for equation i.
+    z : list of ndarray
+        Instruments of each equation, with shape (nobs, nz_i) for equation i.
     eps : ndarray
-        nobs by neq array of residuals where each column corresponds an
-        equation in the system
+        Residuals with shape (nobs, neq), where each column corresponds to an
+        equation in the system.
     w : ndarray
-        Weighting matrix used in estimation
-    sigma : ndarray
-        Residual covariance used in estimation
-    constraints : {None, LinearConstraint}
-        Constraints used in estimation, if any
+        Weighting matrix used in estimation, with shape (nmoments, nmoments).
+    sigma : ndarray, optional
+        Residual covariance used in estimation, with shape (neq, neq). It is
+        required by ``GMMHomoskedasticCovariance``, which uses it to estimate the
+        covariance of the moment conditions. The other estimators ignore it.
+    debiased : bool, optional
+        Flag indicating to apply a small sample adjustment. The default is False.
+    constraints : LinearConstraint, optional
+        Constraints used in estimation. The default is no constraints.
 
     Notes
     -----
@@ -615,7 +661,7 @@ class GMMHomoskedasticCovariance:
 
     @property
     def cov(self) -> linearmodels.typing.data.Float64Array:
-        """Parameter covariance"""
+        """Covariance of the parameter estimates."""
         x, z = self._x, self._z
         k = len(x)
         nobs = x[0].shape[0]
@@ -669,29 +715,33 @@ class GMMHomoskedasticCovariance:
 
     @property
     def cov_config(self) -> AttrDict:
-        """Optional configuration information used in covariance"""
+        """Configuration of the covariance estimator."""
         return self._cov_config
 
 
 class GMMHeteroskedasticCovariance(GMMHomoskedasticCovariance):
     r"""
-    Covariance estimator for IV system estimation with homoskedastic data
+    Covariance estimator for IV system estimation with heteroskedastic data.
 
     Parameters
     ----------
-    x : list[ndarray]
-        List containing the model regressors for each equation in the system
-    z : list[ndarray]
-        List containing the model instruments for each equation in the system
+    x : list of ndarray
+        Regressors of each equation, with shape (nobs, k_i) for equation i.
+    z : list of ndarray
+        Instruments of each equation, with shape (nobs, nz_i) for equation i.
     eps : ndarray
-        nobs by neq array of residuals where each column corresponds an
-        equation in the system
+        Residuals with shape (nobs, neq), where each column corresponds to an
+        equation in the system.
     w : ndarray
-        Weighting matrix used in estimation
-    sigma : ndarray
-        Residual covariance used in estimation
-    constraints : {None, LinearConstraint}
-        Constraints used in estimation, if any
+        Weighting matrix used in estimation, with shape (nmoments, nmoments).
+    sigma : ndarray, optional
+        Residual covariance used in estimation, with shape (neq, neq). It is
+        required by ``GMMHomoskedasticCovariance``, which uses it to estimate the
+        covariance of the moment conditions. The other estimators ignore it.
+    debiased : bool, optional
+        Flag indicating to apply a small sample adjustment. The default is False.
+    constraints : LinearConstraint, optional
+        Constraints used in estimation. The default is no constraints.
 
     Notes
     -----
@@ -741,32 +791,37 @@ class GMMHeteroskedasticCovariance(GMMHomoskedasticCovariance):
 
 class GMMKernelCovariance(GMMHeteroskedasticCovariance, _HACMixin):
     r"""
-    Covariance estimator for IV system estimation with homoskedastic data
+    Kernel (HAC) covariance estimator for IV system estimation.
 
     Parameters
     ----------
-    x : list[ndarray]
-        List containing the model regressors for each equation in the system
-    z : list[ndarray]
-        List containing the model instruments for each equation in the system
+    x : list of ndarray
+        Regressors of each equation, with shape (nobs, k_i) for equation i.
+    z : list of ndarray
+        Instruments of each equation, with shape (nobs, nz_i) for equation i.
     eps : ndarray
-        nobs by neq array of residuals where each column corresponds an
-        equation in the system
+        Residuals with shape (nobs, neq), where each column corresponds to an
+        equation in the system.
     w : ndarray
-        Weighting matrix used in estimation
-    sigma : ndarray
-        Residual covariance used in estimation
-    constraints : {None, LinearConstraint}
-        Constraints used in estimation, if any
-    kernel : str
-        Name of kernel to use.  Supported kernels include:
+        Weighting matrix used in estimation, with shape (nmoments, nmoments).
+    sigma : ndarray, optional
+        Residual covariance used in estimation, with shape (neq, neq). It is
+        required by ``GMMHomoskedasticCovariance``, which uses it to estimate the
+        covariance of the moment conditions. The other estimators ignore it.
+    debiased : bool, optional
+        Flag indicating to apply a small sample adjustment. The default is False.
+    constraints : LinearConstraint, optional
+        Constraints used in estimation. The default is no constraints.
+    kernel : str, optional
+        Name of kernel to use. The name is not case sensitive. The default is
+        "bartlett". Supported kernels are:
 
         * "bartlett", "newey-west" : Bartlett's kernel
         * "parzen", "gallant" : Parzen's kernel
         * "qs", "quadratic-spectral", "andrews" : Quadratic spectral kernel
 
-    bandwidth : float
-        Bandwidth to use for the kernel.  If not provided the optimal
+    bandwidth : float, optional
+        Non-negative bandwidth to use for the kernel. If not provided, the optimal
         bandwidth will be estimated. It needs at least 4 observations with the
         Bartlett kernel, 5 with the Parzen kernel and 6 with the quadratic
         spectral kernel, and a ``ValueError`` is raised for fewer when the
@@ -820,7 +875,7 @@ class GMMKernelCovariance(GMMHeteroskedasticCovariance, _HACMixin):
 
     @property
     def cov_config(self) -> AttrDict:
-        """Optional configuration information used in covariance"""
+        """Configuration of the covariance estimator."""
         out = AttrDict([(k, v) for k, v in self._cov_config.items()])
         out["bandwidth"] = self.bandwidth
         return out
