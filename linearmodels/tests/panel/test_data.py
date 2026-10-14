@@ -11,6 +11,7 @@ import pytest
 
 from linearmodels.panel.data import PanelData, _Panel
 from linearmodels.panel.model import PanelOLS, panel_structure_stats
+from linearmodels.shared.exceptions import UnknownOptionError
 from linearmodels.shared.utility import panel_to_frame
 from linearmodels.tests._utility import warns_if_missing
 from linearmodels.tests.panel._utility import MISSING_XARRAY, datatypes, generate_data
@@ -441,8 +442,15 @@ def test_demean_both_large_t():
 
 def test_demean_invalid(mi_df):
     data = PanelData(mi_df)
-    with pytest.raises(ValueError, match=r"Group must be one of"):
+    with pytest.raises(ValueError, match=r"Unknown group"):
         data.demean("unknown")
+
+
+@pytest.mark.parametrize("method", ["count", "mean", "demean", "dummies"])
+def test_unknown_group(mi_df, method):
+    data = PanelData(mi_df)
+    with pytest.raises(UnknownOptionError, match=r"Unknown group: 'times'"):
+        getattr(data, method)("times")
 
 
 def test_dummies(mi_df):
@@ -456,7 +464,7 @@ def test_dummies(mi_df):
     tdummy_drop = data.dummies(group="time", drop_first=True)
     assert tdummy_drop.shape == (77, 6)
     assert np.all(tdummy.sum(axis=0) == 11)
-    with pytest.raises(ValueError, match=r"Group must be one of"):
+    with pytest.raises(ValueError, match=r"Unknown group"):
         data.dummies("unknown")
 
 

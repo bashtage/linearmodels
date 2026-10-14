@@ -22,6 +22,7 @@ from pandas import (
 )
 from pandas.api.types import is_datetime64_any_dtype, is_numeric_dtype, is_string_dtype
 
+from linearmodels.shared.exceptions import unknown_option_error
 from linearmodels.shared.inputs import as_float64, reject_complex
 from linearmodels.shared.utility import ensure_unique_column, panel_to_frame
 import linearmodels.typing.data
@@ -796,7 +797,7 @@ class PanelData:
         estimation.
         """
         if group not in ("entity", "time", "both"):
-            raise ValueError("Group must be one of 'entity', 'time' or 'both'")
+            raise unknown_option_error("group", group, ("entity", "time", "both"))
         self._check_index(*{"entity": (0,), "time": (1,), "both": (0, 1)}[group])
         if group == "both":
             if not low_memory:
@@ -857,9 +858,20 @@ class PanelData:
 
         Raises
         ------
+        UnknownOptionError
+            If `group` is not one of the supported values. It is also a
+            ``ValueError``.
         ValueError
             If the level of the index that is used has a missing label.
+
+        Notes
+        -----
+        .. versionchanged:: 7.1
+
+           An unknown `group` raises an error. It was treated as ``"time"``.
         """
+        if group not in ("entity", "time"):
+            raise unknown_option_error("group", group, ("entity", "time"))
         level = 0 if group == "entity" else 1
         self._check_index(level)
         reindex = self.entities if group == "entity" else self.time
@@ -911,9 +923,20 @@ class PanelData:
 
         Raises
         ------
+        UnknownOptionError
+            If `group` is not one of the supported values. It is also a
+            ``ValueError``.
         ValueError
             If the level of the index that is used has a missing label.
+
+        Notes
+        -----
+        .. versionchanged:: 7.1
+
+           An unknown `group` raises an error. It was treated as ``"time"``.
         """
+        if group not in ("entity", "time"):
+            raise unknown_option_error("group", group, ("entity", "time"))
         level = 0 if group == "entity" else 1
         self._check_index(level)
         if weights is None or self._frame.shape[1] == 0:
@@ -1001,7 +1024,7 @@ class PanelData:
             the index that is used has a missing label.
         """
         if group not in ("entity", "time"):
-            raise ValueError("Group must be one of 'entity' or 'time'")
+            raise unknown_option_error("group", group, ("entity", "time"))
         axis = 0 if group == "entity" else 1
         self._check_index(axis)
         labels = self.index.codes
