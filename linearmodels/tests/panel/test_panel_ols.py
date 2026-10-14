@@ -1420,6 +1420,25 @@ def test_singleton_removal_other_effects(data):
     assert res.nobs <= res_keep.nobs
 
 
+def test_singleton_removal_rescales_weights():
+    # The weights have a mean of 1 in the retained rows, as if the singleton had
+    # not been in the data
+    rng = np.random.default_rng(0)
+    index = pd.MultiIndex.from_product([range(8), range(5)])
+    keep = np.ones(len(index), dtype=bool)
+    keep[np.flatnonzero(index.codes[0] == 7)[1:]] = False
+    index = index[keep]
+    x = pd.DataFrame(rng.standard_normal((len(index), 2)), index=index)
+    y = pd.Series(rng.standard_normal(len(index)), index=index)
+    w = pd.Series(0.5 + 3 * rng.random(len(index)), index=index)
+    single = index.get_level_values(0) == 7
+    with pytest.warns(SingletonWarning, match="1 singleton observations dropped"):
+        dropped = PanelOLS(y, x, weights=w, entity_effects=True, singletons=False)
+    trimmed = PanelOLS(y[~single], x[~single], weights=w[~single], entity_effects=True)
+    assert_allclose(dropped.weights.values2d.mean(), 1.0)
+    assert_allclose(dropped.fit().s2, trimmed.fit().s2)
+
+
 @pytest.mark.slow
 @pytest.mark.parametrize("other_effects", [1, 2])
 def test_singleton_removal_mixed(singleton_data, other_effects):
@@ -1614,6 +1633,14 @@ def test_predict_incorrect(data):
         mod.predict(res.params, exog=exog)
 
 
+def test_predict_requires_exog_or_data(data):
+    with warns_if_missing(data.y, data.x):
+        mod = PanelOLS(data.y, data.x)
+    res = mod.fit()
+    with pytest.raises(ValueError, match=r"One of exog or data must be provided"):
+        mod.predict(res.params)
+
+
 @pytest.mark.parametrize(
     "cov_config",
     [
@@ -1628,15 +1655,8 @@ def test_unknown_covconfig_kwargs(data, cov_config):
     c, fig = cov_config
     with warns_if_missing(data.y, data.x):
         mod = PanelOLS(data.y, data.x)
-    if c == "clustered":
-        cov = "ClusteredCovariance"
-    elif c == "kernel":
-        cov = "DriscollKraay"
-    elif c == "robust":
-        cov = "HeteroskedasticCovariance"
-    else:
-        cov = "HomoskedasticCovariance"
-    with pytest.raises(ValueError, match=f"Covariance estimator {cov}"):
+    match = f"The keyword argument '{fig}' is not accepted with cov_type='{c}'"
+    with pytest.raises(ValueError, match=match):
         mod.fit(cov_type=c, **{fig: data.vc1})
 
 

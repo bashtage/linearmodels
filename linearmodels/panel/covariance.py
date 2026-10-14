@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+from collections.abc import Mapping
 from functools import cached_property
 from typing import Any, ClassVar, Union
 
@@ -18,7 +19,12 @@ from linearmodels.iv.covariance import (
     kernel_optimal_bandwidth,
 )
 from linearmodels.shared.covariance import cluster_union, group_debias_coefficient
-from linearmodels.shared.exceptions import lookup_option, unknown_option_error
+from linearmodels.shared.exceptions import (
+    check_cov_config,
+    lookup_option,
+    lower_option,
+    unknown_option_error,
+)
 from linearmodels.shared.typed_getters import (
     get_array_like,
     get_bool,
@@ -838,9 +844,10 @@ class CovarianceManager:
             for name, estimator in self.COVARIANCE_ESTIMATORS.items()
             if estimator in self._supported
         ]
-        if item not in self.COVARIANCE_ESTIMATORS:
+        name = lower_option(item)
+        if name not in self.COVARIANCE_ESTIMATORS:
             raise unknown_option_error("cov_type", item, supported)
-        cov_est = self.COVARIANCE_ESTIMATORS[item]
+        cov_est = self.COVARIANCE_ESTIMATORS[name]
         if cov_est not in self._supported:
             problem = (
                 "Requested covariance estimator is not supported "
@@ -1022,6 +1029,53 @@ class FamaMacBethCovariance(HomoskedasticCovariance):
         return self._all_params
 
 
+def check_covariance_kwargs(
+    cov_estimators: CovarianceManager,
+    cov_type: str,
+    cov_config: Mapping[str, Any],
+    cluster_options: tuple[str, ...] = ("cluster_entity", "cluster_time"),
+    fit_options: tuple[str, ...] = ("extra_df",),
+) -> CovarianceEstimatorType:
+    """
+    Check that the keyword arguments are supported by a covariance estimator.
+
+    Parameters
+    ----------
+    cov_estimators : CovarianceManager
+        The manager of the covariance estimators that the model supports.
+    cov_type : str
+        Name of the covariance estimator.
+    cov_config : dict
+        The keyword arguments of ``fit`` for the covariance estimator.
+    cluster_options : tuple of str, optional
+        The options that make clusters, which the model supports if the estimator
+        takes clusters.
+    fit_options : tuple of str, optional
+        The keyword arguments that ``fit`` accepts with every estimator. The
+        default is ``("extra_df",)``.
+
+    Returns
+    -------
+    type
+        The covariance estimator class that `cov_type` selects.
+
+    Raises
+    ------
+    UnknownOptionError
+        If `cov_type` is unknown or is not supported.
+    ValueError
+        If `cov_config` contains a key that the estimator does not support.
+    """
+    estimator = cov_estimators[cov_type]
+    # fit also accepts its own options, and the options that make clusters
+    accepted = (*estimator.ALLOWED_KWARGS, *fit_options)
+    if "clusters" in estimator.ALLOWED_KWARGS:
+        accepted = (*accepted, *cluster_options)
+    name = str(cov_type).lower()
+    check_cov_config(cov_config, name, {name: accepted}, KERNEL_LOOKUP)
+    return estimator
+
+
 def setup_covariance_estimator(
     cov_estimators: CovarianceManager,
     cov_type: str,
@@ -1084,22 +1138,7 @@ def setup_covariance_estimator(
     TypeError
         If a value of `cov_config` does not have the type that its key requires.
     """
-    estimator = cov_estimators[cov_type]
-    unknown_kwargs = [
-        str(key) for key in cov_config if str(key) not in estimator.ALLOWED_KWARGS
-    ]
-    if unknown_kwargs:
-        if estimator.ALLOWED_KWARGS:
-            allowed = ", ".join(estimator.ALLOWED_KWARGS)
-            kwarg_err = f"only supports the keyword arguments: {allowed}"
-        else:
-            kwarg_err = "does not support any keyword arguments"
-        msg = (
-            f"Covariance estimator {estimator.__name__} {kwarg_err}. Unknown keyword "
-            f"arguments were passed to the estimator. The unknown keyword argument(s) "
-            f"are: {', '.join(unknown_kwargs)} "
-        )
-        raise ValueError(msg)
+    estimator = check_covariance_kwargs(cov_estimators, cov_type, cov_config)
     kernel = get_string(cov_config, "kernel")
     bandwidth = get_float(cov_config, "bandwidth")
     group_debias = get_bool(cov_config, "group_debias")

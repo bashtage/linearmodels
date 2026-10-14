@@ -25,10 +25,16 @@ from linearmodels.asset_pricing.results import (
     GMMFactorModelResults,
     LinearFactorModelResults,
 )
+from linearmodels.iv.covariance import KERNEL_LOOKUP
 from linearmodels.iv.data import IVData, IVDataLike
 from linearmodels.shared import hypotheses
 from linearmodels.shared.alignment import check_alignment, row_labels
-from linearmodels.shared.exceptions import missing_warning, unknown_option_error
+from linearmodels.shared.exceptions import (
+    check_cov_config,
+    lower_option,
+    missing_warning,
+    unknown_option_error,
+)
 from linearmodels.shared.hypotheses import WaldTestStatistic
 from linearmodels.shared.linalg import has_constant
 from linearmodels.shared.rsquared import r_squared
@@ -38,6 +44,7 @@ import linearmodels.typing.data
 
 # The names of the covariance estimators of the models
 COV_TYPES = ("heteroskedastic", "kernel", "robust")
+_COV_KEYS = {"heteroskedastic": (), "robust": (), "kernel": ("kernel", "bandwidth")}
 
 
 def callback_factory(
@@ -422,7 +429,7 @@ class TradedFactorModel(_FactorModelBase):
         Parameters
         ----------
         cov_type : {"robust", "heteroskedastic", "kernel"}, optional
-            Name of covariance estimator. The names are case sensitive. The
+            Name of covariance estimator. The names are not case sensitive. The
             default is "robust". "heteroskedastic" is the same as "robust".
         debiased : bool, optional
             Flag indicating whether to debias the covariance estimator using
@@ -446,6 +453,11 @@ class TradedFactorModel(_FactorModelBase):
             If ``debiased`` is True and the number of observations is not larger
             than the number of factors plus one, or if the bandwidth is selected
             from the data and there are too few observations. See Notes.
+        ValueError
+            If a key of ``cov_config`` is not accepted by the covariance estimator
+            that ``cov_type`` selects. The message names the key and lists the
+            accepted keys. It is raised before the model is estimated. Releases
+            before 7.1 ignored the key.
 
         Notes
         -----
@@ -492,6 +504,8 @@ class TradedFactorModel(_FactorModelBase):
            alphas and the loadings, ``risk_premia_se`` and the covariance with
            ``debiased=False`` do not change.
         """
+        cov_type = lower_option(cov_type)
+        check_cov_config(cov_config, cov_type, _COV_KEYS, KERNEL_LOOKUP)
         self._check_debiased(debiased)
         p = self.portfolios.ndarray
         f = self.factors.ndarray
@@ -933,7 +947,7 @@ class LinearFactorModel(_LinearFactorModelBase):
         Parameters
         ----------
         cov_type : {"robust", "heteroskedastic", "kernel"}, optional
-            Name of covariance estimator. The names are case sensitive. The
+            Name of covariance estimator. The names are not case sensitive. The
             default is "robust". "heteroskedastic" is the same as "robust".
         debiased : bool, optional
             Flag indicating whether to debias the covariance estimator using
@@ -957,6 +971,11 @@ class LinearFactorModel(_LinearFactorModelBase):
             If ``debiased`` is True and the number of observations is not larger
             than the number of factors plus one, or if the bandwidth is selected
             from the data and there are too few observations. See Notes.
+        ValueError
+            If a key of ``cov_config`` is not accepted by the covariance estimator
+            that ``cov_type`` selects. The message names the key and lists the
+            accepted keys. It is raised before the model is estimated. Releases
+            before 7.1 ignored the key.
 
         Notes
         -----
@@ -972,6 +991,8 @@ class LinearFactorModel(_LinearFactorModelBase):
         the kernel with fewer observations. See
         :func:`~linearmodels.iv.covariance.kernel_optimal_bandwidth`.
         """
+        cov_type = lower_option(cov_type)
+        check_cov_config(cov_config, cov_type, _COV_KEYS, KERNEL_LOOKUP)
         nobs, nf, nport, _, s1, s2, s3 = self._boundaries()
         excess_returns = not self._risk_free
         self._check_debiased(debiased)
@@ -1372,7 +1393,7 @@ class LinearFactorModelGMM(_LinearFactorModelBase):
             Maximum number of iterations when minimizing objective. Must be
             positive. The default is 1000.
         cov_type : {"robust", "heteroskedastic", "kernel"}, optional
-            Name of covariance estimator. The names are case sensitive. The
+            Name of covariance estimator. The names are not case sensitive. The
             default is "robust". "heteroskedastic" is the same as "robust".
         debiased : bool, optional
             Flag indicating whether to debias the covariance estimator using
@@ -1404,6 +1425,11 @@ class LinearFactorModelGMM(_LinearFactorModelBase):
             If ``starting`` does not have one element for each parameter, or if
             the bandwidth is selected from the data and there are too few
             observations. See Notes.
+        ValueError
+            If a key of ``cov_config`` is not accepted by the covariance estimator
+            that ``cov_type`` selects. The message names the key and lists the
+            accepted keys. It is raised before the model is estimated. Releases
+            before 7.1 ignored the key.
 
         Notes
         -----
@@ -1420,6 +1446,8 @@ class LinearFactorModelGMM(_LinearFactorModelBase):
         observations. See
         :func:`~linearmodels.iv.covariance.kernel_optimal_bandwidth`.
         """
+        cov_type = lower_option(cov_type)
+        check_cov_config(cov_config, cov_type, _COV_KEYS, KERNEL_LOOKUP)
 
         nobs, n = self.portfolios.shape
         k = self.factors.shape[1]

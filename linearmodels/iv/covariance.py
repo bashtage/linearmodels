@@ -28,7 +28,7 @@ from numpy import (
 from numpy.linalg import inv, pinv
 
 from linearmodels.shared.covariance import cov_cluster, cov_kernel
-from linearmodels.shared.exceptions import unknown_option_error
+from linearmodels.shared.exceptions import lower_option, unknown_option_error
 from linearmodels.shared.inputs import as_ndarray
 from linearmodels.shared.linalg import has_constant
 import linearmodels.typing
@@ -244,6 +244,7 @@ def _bandwidth_rule(kernel: str) -> tuple[int, float, float]:
     UnknownOptionError
         If kernel is not one of the supported names.
     """
+    kernel = lower_option(kernel)
     if kernel in ("bartlett", "newey-west"):
         return 1, 1.1447, 2 / 9
     if kernel in ("qs", "andrews", "quadratic-spectral"):
@@ -792,6 +793,7 @@ class KernelCovariance(HomoskedasticCovariance):
     ):
         super().__init__(x, y, z, params, debiased, kappa, extra_df)
         self._kernels = KERNEL_LOOKUP
+        kernel = lower_option(kernel)
         self._kernel = kernel
         self._bandwidth = bandwidth
         self._auto_bandwidth = False

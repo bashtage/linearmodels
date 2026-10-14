@@ -26,6 +26,7 @@ from pandas.api.types import is_numeric_dtype
 from scipy.linalg import lstsq as sp_lstsq
 from scipy.sparse.linalg import lsmr
 
+from linearmodels.iv.covariance import KERNEL_LOOKUP
 from linearmodels.panel.covariance import (
     ACCovariance,
     ClusteredCovariance,
@@ -34,6 +35,7 @@ from linearmodels.panel.covariance import (
     FamaMacBethCovariance,
     HeteroskedasticCovariance,
     HomoskedasticCovariance,
+    check_covariance_kwargs,
     setup_covariance_estimator,
 )
 from linearmodels.panel.data import PanelData, PanelDataLike
@@ -65,6 +67,8 @@ from linearmodels.shared.exceptions import (
     MemoryWarning,
     MissingValueWarning,
     SingletonWarning,
+    lookup_option,
+    lower_option,
     missing_warning,
     unknown_option_error,
 )
@@ -894,7 +898,8 @@ class _PanelModelBase:
         and one indexed by the entities is a value for each entity. Weights without
         labels, which are an array, a list, a tuple, and a Series or a DataFrame with
         one column that has the default index, are read by their number of values. A
-        DataFrame with one column is read as an array with a column is. If dependent
+        DataFrame with one column is read as an array with a column is if it has the
+        default index, and as a Series with the same index if it has any other. If dependent
         is not balanced, this happens if every time period or entity has a single
         row, and they are a value for each row. If it is balanced, this happens if
         there is a single entity or time period, and they are a value for each time
@@ -947,6 +952,13 @@ class _PanelModelBase:
             column = as_float64(np.asarray(weights), "weights")
             weights = cast("linearmodels.typing.data.Float64Array", column[:, 0])
             labelled = False
+        elif (
+            isinstance(weights, DataFrame)
+            and weights.shape[1] == 1
+            and not isinstance(weights.index, MultiIndex)
+        ):
+            # The labels decide, as they do for a Series with the same index
+            weights = weights.iloc[:, 0]
         unbalanced = nrows != nobs * nentity
         # The labels of a pandas object with a MultiIndex identify the rows
         row_labels = (
@@ -1596,13 +1608,18 @@ class _PanelModelBase:
         ------
         ValueError
             If `data` is provided and the model was not created using a formula,
-            if both `exog` and `data` are provided, or if `exog` does not have as
-            many columns as there are parameters.
+            if both `exog` and `data` are provided, if neither is provided, or
+            if `exog` does not have as many columns as there are parameters.
         TypeError
             If `exog` is a container that is not supported, e.g., a list or a tuple.
 
         Notes
         -----
+        .. versionchanged:: 7.1
+
+           Calling without `exog` and `data` raises a ``ValueError``. It raised
+           an ``AssertionError``.
+
         If `data` is not None, then `exog` must be None.
         Predictions from models constructed using formulas can
         be computed using either `exog`, which will treat these are
@@ -1619,6 +1636,8 @@ class _PanelModelBase:
                 "Predictions can only be constructed using one "
                 "of exog or data, but not both."
             )
+        if data is None and exog is None:
+            raise ValueError("One of exog or data must be provided.")
         if exog is not None:
             exog = _panel_data(exog, "exog", "x").dataframe
         else:
@@ -1748,7 +1767,10 @@ class PooledOLS(_PanelModelBase):
        the numbers of time periods and entities were equal. A DataFrame with one
        column and the default index is read as an array with a column is. It raised
        an error from pandas or NumPy if ``dependent`` was balanced, and "Weights do
-       not have a supported shape" if it was not.
+       not have a supported shape" if it was not. A DataFrame with one column and
+       an index that is not the default index is read as a Series with that index
+       is, so that its labels decide. It raised "Weights do not have a supported
+       shape".
     """
 
     def __init__(
@@ -1868,7 +1890,8 @@ class PooledOLS(_PanelModelBase):
             It is both a ``ValueError`` and a ``KeyError``.
         ValueError
             If a key of ``cov_config`` is not supported by the covariance
-            estimator, if ``clusters`` does not have the shape of the data, if
+            estimator (this is checked before the model is estimated), if
+            ``clusters`` does not have the shape of the data, if
             ``bandwidth`` is not below the number of time periods, or if the model
             has no residual degrees of freedom.
         TypeError
@@ -1964,9 +1987,15 @@ class PooledOLS(_PanelModelBase):
         Examples
         --------
         >>> from linearmodels import PooledOLS
+        >>> from linearmodels.datasets import wage_panel
+        >>> data = wage_panel.load().set_index(["nr", "year"])
+        >>> y = data["lwage"]
+        >>> x = data[["married", "union"]]
         >>> mod = PooledOLS(y, x)
         >>> res = mod.fit(cov_type="clustered", cluster_entity=True)
         """
+        cov_type = lower_option(cov_type)
+        check_covariance_kwargs(self._cov_estimators, cov_type, cov_config)
         y = self.dependent.values2d
         x = self.exog.values2d
         w = self.weights.values2d
@@ -2076,13 +2105,18 @@ class PooledOLS(_PanelModelBase):
         ------
         ValueError
             If `data` is provided and the model was not created using a formula,
-            if both `exog` and `data` are provided, or if `exog` does not have as
-            many columns as there are parameters.
+            if both `exog` and `data` are provided, if neither is provided, or
+            if `exog` does not have as many columns as there are parameters.
         TypeError
             If `exog` is a container that is not supported, e.g., a list or a tuple.
 
         Notes
         -----
+        .. versionchanged:: 7.1
+
+           Calling without `exog` and `data` raises a ``ValueError``. It raised
+           an ``AssertionError``.
+
         If `data` is not None, then `exog` must be None.
         Predictions from models constructed using formulas can
         be computed using either `exog`, which will treat these are
@@ -2099,6 +2133,8 @@ class PooledOLS(_PanelModelBase):
                 "Predictions can only be constructed using one "
                 "of exog or data, but not both."
             )
+        if data is None and exog is None:
+            raise ValueError("One of exog or data must be provided.")
         if exog is not None:
             exog = _panel_data(exog, "exog", "x").dataframe
         else:
@@ -2195,7 +2231,14 @@ class PanelOLS(_PanelModelBase):
         Flag indicating whether to keep singleton observations. If False, the
         observations that are alone in their group of an effect are dropped,
         repeatedly until there are none, and a ``SingletonWarning`` is issued.
-        The default is True.
+        The weights are then scaled to have a mean of 1 in the observations that
+        are retained. The default is True.
+
+        .. versionchanged:: 7.1
+
+           The weights were scaled before the singletons were dropped, so that
+           their mean was not 1 in the retained observations and ``s2`` differed
+           from that of the same model on data without the singletons.
     drop_absorbed : bool, optional
         Flag indicating whether to drop absorbed variables. If False, an
         ``AbsorbingEffectError`` is raised by ``fit`` for a model with an
@@ -2286,7 +2329,10 @@ class PanelOLS(_PanelModelBase):
        the numbers of time periods and entities were equal. A DataFrame with one
        column and the default index is read as an array with a column is. It raised
        an error from pandas or NumPy if ``dependent`` was balanced, and "Weights do
-       not have a supported shape" if it was not.
+       not have a supported shape" if it was not. A DataFrame with one column and
+       an index that is not the default index is read as a Series with that index
+       is, so that its labels decide. It raised "Weights do not have a supported
+       shape".
 
     If both ``entity_effect`` and ``time_effects`` are ``False``, and no other
     effects are included, the model reduces to :class:`PooledOLS`.
@@ -2444,6 +2490,15 @@ class PanelOLS(_PanelModelBase):
         self.dependent.drop(drop)
         self.exog.drop(drop)
         self.weights.drop(drop)
+        # The weights have a mean of 1 in the rows that are retained
+        w_df = self.weights.dataframe
+        self.weights = PanelData(
+            DataFrame(
+                normalize_weights(np.asarray(w_df)),
+                index=w_df.index,
+                columns=w_df.columns,
+            )
+        )
         if self.other_effects:
             assert self._other_effect_cats is not None
             self._other_effect_cats.drop(drop)
@@ -3093,7 +3148,8 @@ class PanelOLS(_PanelModelBase):
             collinear, and ``drop_absorbed`` is False in the model.
         ValueError
             If a key of ``cov_config`` is not supported by the covariance
-            estimator, if ``clusters`` does not have the shape of the data, if
+            estimator (this is checked before the model is estimated), if
+            ``clusters`` does not have the shape of the data, if
             ``bandwidth`` is not below the number of time periods, if the model
             has no residual degrees of freedom, or if all of the variables of
             ``exog`` are absorbed.
@@ -3177,7 +3233,13 @@ class PanelOLS(_PanelModelBase):
         if ``debiased`` is True and by n / (n - d) if it is False. If
         ``auto_df`` is True, the effects are not counted when the model has
         a single effect that is nested in the clusters. Use ``auto_df=False``
-        and ``count_effects`` to choose.
+        and ``count_effects`` to choose. Since ``extra_df`` is set from the
+        effects, it is not a keyword argument of ``fit``.
+
+        .. versionchanged:: 7.1
+
+           ``extra_df`` raises a ``ValueError`` at the start of ``fit``. It
+           raised a ``TypeError`` after the parameters were estimated.
 
         An effect is nested in a cluster variable if each of its groups is in one
         group of the variable, for example entity effects with
@@ -3223,9 +3285,18 @@ class PanelOLS(_PanelModelBase):
         Examples
         --------
         >>> from linearmodels import PanelOLS
+        >>> from linearmodels.datasets import wage_panel
+        >>> data = wage_panel.load().set_index(["nr", "year"])
+        >>> y = data["lwage"]
+        >>> x = data[["married", "union"]]
         >>> mod = PanelOLS(y, x, entity_effects=True)
         >>> res = mod.fit(cov_type="clustered", cluster_entity=True)
         """
+        cov_type = lower_option(cov_type)
+        # extra_df is set from the effects that are estimated
+        check_covariance_kwargs(
+            self._cov_estimators, cov_type, cov_config, fit_options=()
+        )
 
         weighted = np.any(self.weights.values2d != 1.0)
 
@@ -3555,7 +3626,10 @@ class BetweenOLS(_PanelModelBase):
        the numbers of time periods and entities were equal. A DataFrame with one
        column and the default index is read as an array with a column is. It raised
        an error from pandas or NumPy if ``dependent`` was balanced, and "Weights do
-       not have a supported shape" if it was not.
+       not have a supported shape" if it was not. A DataFrame with one column and
+       an index that is not the default index is read as a Series with that index
+       is, so that its labels decide. It raised "Weights do not have a supported
+       shape".
     """
 
     def __init__(
@@ -3737,9 +3811,17 @@ class BetweenOLS(_PanelModelBase):
         Examples
         --------
         >>> from linearmodels import BetweenOLS
+        >>> from linearmodels.datasets import wage_panel
+        >>> data = wage_panel.load().set_index(["nr", "year"])
+        >>> y = data["lwage"]
+        >>> x = data[["married", "union"]]
         >>> mod = BetweenOLS(y, x)
         >>> res = mod.fit(cov_type='robust')
         """
+        cov_type = lower_option(cov_type)
+        check_covariance_kwargs(
+            self._cov_estimators, cov_type, cov_config, cluster_options=()
+        )
         y, x, w = self._prepare_between()
         if np.all(self.weights.values2d == 1.0) and not reweight:
             w = root_w = np.ones_like(y)
@@ -4019,7 +4101,10 @@ class FirstDifferenceOLS(_PanelModelBase):
        the numbers of time periods and entities were equal. A DataFrame with one
        column and the default index is read as an array with a column is. It raised
        an error from pandas or NumPy if ``dependent`` was balanced, and "Weights do
-       not have a supported shape" if it was not.
+       not have a supported shape" if it was not. A DataFrame with one column and
+       an index that is not the default index is read as a Series with that index
+       is, so that its labels decide. It raised "Weights do not have a supported
+       shape".
     """
 
     def __init__(
@@ -4155,7 +4240,8 @@ class FirstDifferenceOLS(_PanelModelBase):
             It is both a ``ValueError`` and a ``KeyError``.
         ValueError
             If a key of ``cov_config`` is not supported by the covariance
-            estimator, if ``clusters`` does not have the shape of the data, if
+            estimator (this is checked before the model is estimated), if
+            ``clusters`` does not have the shape of the data, if
             ``bandwidth`` is not below the number of time periods, or if the model
             has no residual degrees of freedom.
         TypeError
@@ -4250,10 +4336,21 @@ class FirstDifferenceOLS(_PanelModelBase):
         Examples
         --------
         >>> from linearmodels import FirstDifferenceOLS
+        >>> from linearmodels.datasets import wage_panel
+        >>> data = wage_panel.load().set_index(["nr", "year"])
+        >>> y = data["lwage"]
+        >>> x = data[["married", "union"]]
         >>> mod = FirstDifferenceOLS(y, x)
         >>> robust = mod.fit(cov_type="robust")
         >>> clustered = mod.fit(cov_type="clustered", cluster_entity=True)
         """
+        cov_type = lower_option(cov_type)
+        check_covariance_kwargs(
+            self._cov_estimators,
+            cov_type,
+            cov_config,
+            cluster_options=("cluster_entity",),
+        )
         y_fd = self.dependent.first_difference()
         time_ids = y_fd.time_ids
         entity_ids = y_fd.entity_ids
@@ -4522,7 +4619,10 @@ class RandomEffects(_PanelModelBase):
        the numbers of time periods and entities were equal. A DataFrame with one
        column and the default index is read as an array with a column is. It raised
        an error from pandas or NumPy if ``dependent`` was balanced, and "Weights do
-       not have a supported shape" if it was not.
+       not have a supported shape" if it was not. A DataFrame with one column and
+       an index that is not the default index is read as a Series with that index
+       is, so that its labels decide. It raised "Weights do not have a supported
+       shape".
     """
 
     def __init__(
@@ -4646,7 +4746,8 @@ class RandomEffects(_PanelModelBase):
             It is both a ``ValueError`` and a ``KeyError``.
         ValueError
             If a key of ``cov_config`` is not supported by the covariance
-            estimator, if ``clusters`` does not have the shape of the data, if
+            estimator (this is checked before the model is estimated), if
+            ``clusters`` does not have the shape of the data, if
             ``bandwidth`` is not below the number of time periods, if the model
             has no residual degrees of freedom, or if the within or the between
             regression has no residual degrees of freedom, so that the variance of
@@ -4773,9 +4874,15 @@ class RandomEffects(_PanelModelBase):
         Examples
         --------
         >>> from linearmodels import RandomEffects
+        >>> from linearmodels.datasets import wage_panel
+        >>> data = wage_panel.load().set_index(["nr", "year"])
+        >>> y = data["lwage"]
+        >>> x = data[["married", "union"]]
         >>> mod = RandomEffects(y, x)
         >>> res = mod.fit(cov_type="clustered", cluster_entity=True)
         """
+        cov_type = lower_option(cov_type)
+        check_covariance_kwargs(self._cov_estimators, cov_type, cov_config)
         w = self.weights.values2d
         root_w = cast("linearmodels.typing.data.Float64Array", np.sqrt(w))
         demeaned_dep = self.dependent.demean("entity", weights=self.weights)
@@ -5095,7 +5202,10 @@ class FamaMacBeth(_PanelModelBase):
        the numbers of time periods and entities were equal. A DataFrame with one
        column and the default index is read as an array with a column is. It raised
        an error from pandas or NumPy if ``dependent`` was balanced, and "Weights do
-       not have a supported shape" if it was not.
+       not have a supported shape" if it was not. A DataFrame with one column and
+       an index that is not the default index is read as a Series with that index
+       is, so that its labels decide. It raised "Weights do not have a supported
+       shape".
 
     References
     ----------
@@ -5304,9 +5414,16 @@ class FamaMacBeth(_PanelModelBase):
         Examples
         --------
         >>> from linearmodels import FamaMacBeth
+        >>> from linearmodels.datasets import wage_panel
+        >>> data = wage_panel.load().set_index(["nr", "year"])
+        >>> y = data["lwage"]
+        >>> x = data[["married", "union"]]
         >>> mod = FamaMacBeth(y, x)
         >>> res = mod.fit(cov_type="kernel", kernel="parzen")
         """
+        cov_type = lower_option(cov_type)
+        if isinstance(kernel, str):
+            lookup_option(KERNEL_LOOKUP, kernel.lower(), "kernel")
         # The retained observations and their weights, which are scaled to have a
         # mean of one once the observations with missing values are dropped
         y = cast("linearmodels.typing.data.Float64Array", self.dependent.values2d)

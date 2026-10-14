@@ -4,7 +4,7 @@ Covariance estimators for linear factor models.
 
 from __future__ import annotations
 
-from numpy import empty, ndarray, zeros_like
+from numpy import empty, errstate, ndarray, zeros_like
 from numpy.linalg import inv
 
 from linearmodels.iv.covariance import (
@@ -36,7 +36,10 @@ class _HACMixin:
         if self._bandwidth is None:
             assert self._moments is not None
             moments = self._moments
-            m = moments / moments.std(0)[None, :]
+            # A moment that does not vary has a standard deviation of 0, and the
+            # series is NaN. kernel_optimal_bandwidth raises, so do not warn
+            with errstate(divide="ignore", invalid="ignore"):
+                m = moments / moments.std(0)[None, :]
             m = m.sum(1)
             bw = kernel_optimal_bandwidth(m, kernel=self.kernel)
             self._bandwidth = bw

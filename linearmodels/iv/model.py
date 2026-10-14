@@ -64,7 +64,9 @@ from linearmodels.shared.alignment import (
 )
 from linearmodels.shared.exceptions import (
     IndexWarning,
+    check_cov_config,
     lookup_option,
+    lower_option,
     missing_warning,
     unknown_option_error,
 )
@@ -90,6 +92,28 @@ __all__ = [
     "IVResultType",
 ]
 
+_CENTER = ("center",)
+# kappa is overwritten by fit. It is accepted so that the cov_config of results
+# can be passed to fit. extra_df is the number of degrees of freedom that the model
+# uses beyond the regressors, which the covariance estimators document
+_LS_KEYS = (*_CENTER, "kappa", "extra_df")
+_COV_KEYS = {
+    HomoskedasticCovariance: _LS_KEYS,
+    HeteroskedasticCovariance: _LS_KEYS,
+    KernelCovariance: (*_LS_KEYS, "kernel", "bandwidth"),
+    ClusteredCovariance: (*_LS_KEYS, "clusters"),
+}
+# The keys of the covariance estimators of GMM models, which also select the
+# bandwidth from the data
+_GMM_COV_KEYS = {
+    "unadjusted": _CENTER,
+    "homoskedastic": _CENTER,
+    "robust": _CENTER,
+    "heteroskedastic": _CENTER,
+    "clustered": (*_CENTER, "clusters"),
+    "kernel": (*_CENTER, "kernel", "bandwidth", "optimal_bw"),
+}
+
 COVARIANCE_ESTIMATORS = {
     "homoskedastic": HomoskedasticCovariance,
     "unadjusted": HomoskedasticCovariance,
@@ -104,6 +128,10 @@ COVARIANCE_ESTIMATORS = {
     "one-way": ClusteredCovariance,
     "clustered": ClusteredCovariance,
     "OneWayClusteredCovariance": ClusteredCovariance,
+}
+_LS_COV_KEYS = {
+    name.lower(): _COV_KEYS[estimator]
+    for name, estimator in COVARIANCE_ESTIMATORS.items()
 }
 
 CovarianceEstimator = TypeVar(
@@ -863,6 +891,12 @@ class _IVLSModelBase(_IVModelBase):
         UnknownOptionError
             If ``cov_type`` or ``kernel`` is not supported. It is both a
             ``KeyError`` and a ``ValueError``.
+        ValueError
+            If a key of ``cov_config`` is not accepted by the covariance estimator
+            that ``cov_type`` selects. The message names the key and lists the
+            accepted keys. It is raised before the model is estimated. Releases
+            before 7.1 raised the ``TypeError`` of the constructor of the covariance
+            estimator.
 
         See Also
         --------
@@ -879,6 +913,8 @@ class _IVLSModelBase(_IVModelBase):
         supported options. Defaults are used if no covariance configuration
         is provided.
         """
+        cov_type = lower_option(cov_type)
+        check_cov_config(cov_config, cov_type, _LS_COV_KEYS, KERNEL_LOOKUP)
         self._check_clusters(cov_config)
         wy, wx, wz = self._wy, self._wx, self._wz
         kappa = self._kappa
@@ -1383,8 +1419,10 @@ class _IVGMMBase(_IVModelBase):
         not match (see Notes), or if ``weights`` are not strictly positive and
         finite.
     UnknownOptionError
-        If ``weight_type`` is not supported. It is both a ``KeyError`` and a
-        ``ValueError``.
+        If ``weight_type`` is not supported, or if it is "kernel" and ``kernel``
+        is not a supported kernel. It is both a ``KeyError`` and a
+        ``ValueError``. Before 7.1, an unsupported ``kernel`` was reported by
+        ``fit``.
     TypeError
         If an input is complex or cannot be converted to float64.
 
@@ -1433,6 +1471,7 @@ class _IVGMMBase(_IVModelBase):
         super().__init__(dependent, exog, endog, instruments, weights=weights)
         self._method = "IV-GMM"
 
+        weight_type = lower_option(weight_type)
         self._check_clusters(weight_config)
         weight_matrix_estimator = lookup_option(
             WEIGHT_MATRICES, weight_type, "weight_type"
@@ -1684,8 +1723,10 @@ class IVGMM(_IVGMMBase):
         not match (see Notes), or if ``weights`` are not strictly positive and
         finite.
     UnknownOptionError
-        If ``weight_type`` is not supported. It is both a ``KeyError`` and a
-        ``ValueError``.
+        If ``weight_type`` is not supported, or if it is "kernel" and ``kernel``
+        is not a supported kernel. It is both a ``KeyError`` and a
+        ``ValueError``. Before 7.1, an unsupported ``kernel`` was reported by
+        ``fit``.
     TypeError
         If an input is complex or cannot be converted to float64.
 
@@ -1977,6 +2018,12 @@ class IVGMM(_IVGMMBase):
         UnknownOptionError
             If ``cov_type`` is not supported. It is both a ``KeyError`` and a
             ``ValueError``.
+        ValueError
+            If a key of ``cov_config`` is not accepted by the covariance estimator
+            that ``cov_type`` selects. The message names the key and lists the
+            accepted keys. It is raised before the model is estimated. Releases
+            before 7.1 raised the ``TypeError`` of the constructor of the covariance
+            estimator.
 
         See Also
         --------
@@ -2001,6 +2048,8 @@ class IVGMM(_IVGMMBase):
         ``optimal_bw=False`` to use the kernel with fewer observations. See
         :func:`~linearmodels.iv.covariance.kernel_optimal_bandwidth`.
         """
+        cov_type = lower_option(cov_type)
+        check_cov_config(cov_config, cov_type, _GMM_COV_KEYS, KERNEL_LOOKUP)
         self._check_clusters(cov_config)
         cov_config = self._check_default_bandwidth(cov_type, cov_config)
         wy, wx, wz = self._wy, self._wx, self._wz
@@ -2121,8 +2170,10 @@ class IVGMMCUE(_IVGMMBase):
         not match (see Notes), or if ``weights`` are not strictly positive and
         finite.
     UnknownOptionError
-        If ``weight_type`` is not supported. It is both a ``KeyError`` and a
-        ``ValueError``.
+        If ``weight_type`` is not supported, or if it is "kernel" and ``kernel``
+        is not a supported kernel. It is both a ``KeyError`` and a
+        ``ValueError``. Before 7.1, an unsupported ``kernel`` was reported by
+        ``fit``.
     TypeError
         If an input is complex or cannot be converted to float64.
 
@@ -2610,6 +2661,12 @@ class IVGMMCUE(_IVGMMBase):
         UnknownOptionError
             If ``cov_type`` is not supported. It is both a ``KeyError`` and a
             ``ValueError``.
+        ValueError
+            If a key of ``cov_config`` is not accepted by the covariance estimator
+            that ``cov_type`` selects. The message names the key and lists the
+            accepted keys. It is raised before the model is estimated. Releases
+            before 7.1 raised the ``TypeError`` of the constructor of the covariance
+            estimator.
 
         See Also
         --------
@@ -2648,6 +2705,8 @@ class IVGMMCUE(_IVGMMBase):
         ``optimal_bw=False`` to use the kernel with fewer observations. See
         :func:`~linearmodels.iv.covariance.kernel_optimal_bandwidth`.
         """
+        cov_type = lower_option(cov_type)
+        check_cov_config(cov_config, cov_type, _GMM_COV_KEYS, KERNEL_LOOKUP)
         self._check_clusters(cov_config)
         cov_config = self._check_default_bandwidth(cov_type, cov_config)
         self._select_bandwidth()
@@ -2899,7 +2958,7 @@ class _JIVECovariance(IVGMMCovariance):
         # The weight matrix has no effect in a just identified model
         w = eye(x.shape[1])
         if cov_type == "kernel":
-            kernel = cov_config.get("kernel", "bartlett")
+            kernel = lower_option(cov_config.get("kernel", "bartlett"))
             if kernel not in KERNEL_LOOKUP:
                 raise unknown_option_error("kernel", kernel, KERNEL_LOOKUP)
             # Select the bandwidth using the data unless it is given, as in
@@ -3192,6 +3251,12 @@ class IVJIVE(_IVModelBase):
         UnknownOptionError
             If ``cov_type`` or ``kernel`` is not supported. It is both a
             ``KeyError`` and a ``ValueError``.
+        ValueError
+            If a key of ``cov_config`` is not accepted by the covariance estimator
+            that ``cov_type`` selects. The message names the key and lists the
+            accepted keys. It is raised before the model is estimated. Releases
+            before 7.1 raised the ``TypeError`` of the constructor of the covariance
+            estimator.
 
         See Also
         --------
@@ -3217,6 +3282,8 @@ class IVJIVE(_IVModelBase):
         ``InvalidTestStatistic`` if it is not defined. The model is estimated
         then. See the notes of the class.
         """
+        cov_type = lower_option(cov_type)
+        check_cov_config(cov_config, cov_type, _GMM_COV_KEYS, KERNEL_LOOKUP)
         self._check_clusters(cov_config)
         wy, wx, wz = self._wy, self._wx, self._wz
 

@@ -2,9 +2,9 @@
 Warnings and errors that linearmodels raises.
 """
 
-from collections.abc import Iterable, Mapping
+from collections.abc import Iterable, Mapping, Sequence
 import difflib
-from typing import TypeVar
+from typing import Any, TypeVar
 import warnings
 
 import numpy as np
@@ -222,11 +222,90 @@ def lookup_option(table: Mapping[str, _T], value: str, parameter: str) -> _T:
     UnknownOptionError
         If ``value`` is not in ``table``. It is a ``KeyError``, as it is for a
         dict, and a ``ValueError``.
+
+    Notes
+    -----
+    A str is also matched to the names of ``table`` without regard to case.
     """
     try:
         return table[value]
     except (KeyError, TypeError):
-        raise unknown_option_error(parameter, value, table) from None
+        pass
+    # The names are not case sensitive
+    if isinstance(value, str):
+        for name, entry in table.items():
+            if name.lower() == value.lower():
+                return entry
+    raise unknown_option_error(parameter, value, table) from None
+
+
+def lower_option(value: Any) -> Any:
+    """
+    Return the name of an option in lower case.
+
+    Parameters
+    ----------
+    value : object
+        The value of an option that is a name, e.g., ``cov_type`` or ``kernel``.
+
+    Returns
+    -------
+    object
+        The lower case of ``value`` if it is a str, and ``value`` otherwise, which
+        the caller reports as an unsupported name or type.
+    """
+    return value.lower() if isinstance(value, str) else value
+
+
+def check_cov_config(
+    cov_config: Mapping[str, object],
+    cov_type: str,
+    allowed: Mapping[str, Sequence[str]],
+    kernels: Mapping[str, object] | None = None,
+) -> None:
+    """
+    Check that the keyword arguments of a covariance estimator are supported.
+
+    Parameters
+    ----------
+    cov_config : dict
+        The keyword arguments of ``fit`` that configure the covariance estimator.
+    cov_type : str
+        Name of the covariance estimator.
+    allowed : dict of str to sequence of str
+        The keys that each covariance estimator accepts, by lower-case name.
+    kernels : dict, optional
+        The supported kernels, which are checked if ``cov_config`` has a
+        ``kernel``.
+
+    Raises
+    ------
+    ValueError
+        If a key of ``cov_config`` is not accepted by the estimator. The message
+        names the keys that are not accepted and the keys that are. An unknown
+        ``cov_type`` is not checked here.
+    UnknownOptionError
+        If the ``kernel`` is not one of ``kernels``.
+    """
+    keys = allowed.get(str(cov_type).lower())
+    if keys is None:
+        return
+    unknown = [repr(str(key)) for key in cov_config if key not in keys]
+    if unknown:
+        if len(unknown) > 1:
+            problem = f"The keyword arguments {', '.join(unknown)} are"
+        else:
+            problem = f"The keyword argument {unknown[0]} is"
+        accepted = ", ".join(sorted(keys)) if keys else "none"
+        raise ValueError(
+            f"{problem} not accepted with cov_type={cov_type!r}. "
+            f"The accepted keyword arguments are: {accepted}."
+        )
+    if kernels is not None and "kernel" in cov_config:
+        kernel = cov_config["kernel"]
+        # The estimator reports a kernel that is not a str
+        if isinstance(kernel, str) and kernel.lower() not in kernels:
+            raise unknown_option_error("kernel", kernel.lower(), kernels)
 
 
 __all__ = [
@@ -237,7 +316,9 @@ __all__ = [
     "MissingValueWarning",
     "SingletonWarning",
     "UnknownOptionError",
+    "check_cov_config",
     "lookup_option",
+    "lower_option",
     "missing_value_warning_msg",
     "missing_warning",
     "unknown_option_error",

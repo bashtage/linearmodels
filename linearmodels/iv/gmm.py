@@ -8,7 +8,7 @@ from collections.abc import Mapping
 from typing import Any
 import warnings
 
-from numpy import asarray, ndarray, unique
+from numpy import asarray, errstate, ndarray, unique
 from numpy.linalg import inv
 
 from linearmodels.iv.covariance import (
@@ -21,6 +21,7 @@ from linearmodels.shared.covariance import cov_cluster, cov_kernel
 from linearmodels.shared.exceptions import (
     DefaultBandwidthWarning,
     lookup_option,
+    lower_option,
     unknown_option_error,
 )
 import linearmodels.typing.data
@@ -315,8 +316,11 @@ class KernelWeightMatrix(HomoskedasticWeightMatrix):
         super().__init__(center, debiased)
         self._bandwidth = bandwidth
         self._orig_bandwidth = bandwidth
+        kernel = lower_option(kernel)
         self._kernel = kernel
         self._kernels = KERNEL_LOOKUP
+        if isinstance(kernel, str) and kernel not in KERNEL_LOOKUP:
+            raise unknown_option_error("kernel", kernel, KERNEL_LOOKUP)
         # Selecting the bandwidth from the data is the default since 7.1, and it
         # warns since the default was nobs - 2
         self._default_bandwidth = bandwidth is None and optimal_bw is None
@@ -344,7 +348,10 @@ class KernelWeightMatrix(HomoskedasticWeightMatrix):
 
     def _estimate_bandwidth(self, ze: linearmodels.typing.data.Float64Array) -> int:
         """The bandwidth that is estimated from the moment conditions."""
-        g = ze / ze.std(0)[None, :]
+        # A moment that does not vary has a standard deviation of 0, and the series is
+        # NaN. kernel_optimal_bandwidth raises, so there is no need to warn
+        with errstate(divide="ignore", invalid="ignore"):
+            g = ze / ze.std(0)[None, :]
         g = g.sum(1)
         return kernel_optimal_bandwidth(g, self._kernel)
 
@@ -631,6 +638,7 @@ class IVGMMCovariance(HomoskedasticCovariance):
         **cov_config: str | bool,
     ) -> None:
         super().__init__(x, y, z, params, debiased)
+        cov_type = lower_option(cov_type)
         self._cov_type = cov_type
         self._cov_config = cov_config
         self.w = w

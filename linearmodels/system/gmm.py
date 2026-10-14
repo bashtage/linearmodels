@@ -7,7 +7,7 @@ from __future__ import annotations
 from collections.abc import Sequence
 from typing import cast
 
-from numpy import array, empty, ndarray, repeat, sqrt, zeros_like
+from numpy import array, empty, errstate, ndarray, repeat, sqrt, zeros_like
 
 from linearmodels.asset_pricing.covariance import _HACMixin
 from linearmodels.iv.covariance import kernel_optimal_bandwidth
@@ -403,7 +403,10 @@ class KernelWeightMatrix(HeteroskedasticWeightMatrix, _HACMixin):
                 _warn_default_bandwidth(
                     weights=True, covariance=False, stacklevel=4, model="IVSystemGMM"
                 )
-            m = moments / moments.std(0)[None, :]
+            # A moment that does not vary has a standard deviation of 0, and the
+            # series is NaN. kernel_optimal_bandwidth raises, so do not warn
+            with errstate(divide="ignore", invalid="ignore"):
+                m = moments / moments.std(0)[None, :]
             m = m.sum(1)
             self._bandwidth = kernel_optimal_bandwidth(m, kernel=self.kernel)
         assert self._bandwidth is not None

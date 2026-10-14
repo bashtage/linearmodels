@@ -26,6 +26,7 @@ from numpy.linalg import inv, lstsq, matrix_rank, solve
 from pandas import DataFrame, Index, Series, concat
 
 from linearmodels.iv._utility import IVFormulaParser
+from linearmodels.iv.covariance import KERNEL_LOOKUP
 from linearmodels.iv.data import IVData
 from linearmodels.iv.gmm import _uses_default_bandwidth, _warn_default_bandwidth
 from linearmodels.shared.alignment import (
@@ -34,7 +35,12 @@ from linearmodels.shared.alignment import (
     reference_labels,
     row_labels,
 )
-from linearmodels.shared.exceptions import missing_warning, unknown_option_error
+from linearmodels.shared.exceptions import (
+    check_cov_config,
+    lower_option,
+    missing_warning,
+    unknown_option_error,
+)
 from linearmodels.shared.hypotheses import InvalidTestStatistic, WaldTestStatistic
 from linearmodels.shared.inputs import as_array_like, as_float64
 from linearmodels.shared.linalg import has_constant
@@ -101,6 +107,17 @@ GMM_COV_EST = {
     "unadjusted": GMMHomoskedasticCovariance,
     "robust": GMMHeteroskedasticCovariance,
     "kernel": GMMKernelCovariance,
+}
+
+_LS_KEYS = {
+    "unadjusted": ("debiased",),
+    "robust": ("debiased",),
+    "kernel": ("debiased", "kernel", "bandwidth"),
+    "clustered": ("debiased", "clusters", "group_debias"),
+}
+_LS_COV_KEYS = {name: _LS_KEYS[cov] for name, cov in COV_TYPES.items()}
+_GMM_COV_KEYS = {
+    name: keys for name, keys in _LS_COV_KEYS.items() if COV_TYPES[name] in GMM_W_EST
 }
 
 # The names in COV_TYPES that IVSystemGMM supports, which excludes "clustered"
@@ -1515,6 +1532,12 @@ class _LSSystemModelBase(_SystemModelBase):
         UnknownOptionError
             If ``cov_type`` or ``kernel`` is not supported. It is both a
             ``KeyError`` and a ``ValueError``.
+        ValueError
+            If a key of ``cov_config`` is not accepted by the covariance estimator
+            that ``cov_type`` selects. The message names the key and lists the
+            accepted keys. It is raised before the model is estimated. Releases
+            before 7.1 raised the ``TypeError`` of the constructor of the covariance
+            estimator.
 
         See Also
         --------
@@ -1527,6 +1550,8 @@ class _LSSystemModelBase(_SystemModelBase):
         linearmodels.system.covariance.ClusteredCovariance
             Clustered covariance.
         """
+        cov_type = lower_option(cov_type)
+        check_cov_config(cov_config, cov_type, _LS_COV_KEYS, KERNEL_LOOKUP)
         self._check_clusters(cov_config)
         if method is None:
             method = (
@@ -2144,7 +2169,7 @@ class IVSystemGMM(_SystemModelBase):
         provided with another weight type.
     weight_type : str, optional
         Name of moment condition weight function to use in the GMM estimation. The
-        default is "robust". The names are case sensitive. Supported weight
+        default is "robust". The names are not case sensitive. Supported weight
         types are:
 
         * "unadjusted", "homoskedastic" - Assume moments are homoskedastic
@@ -2287,6 +2312,7 @@ class IVSystemGMM(_SystemModelBase):
         **weight_config: bool | str | float,
     ) -> None:
         super().__init__(equations, sigma=sigma)
+        weight_type = lower_option(weight_type)
         self._weight_type = weight_type
         self._weight_config = weight_config
 
@@ -2336,7 +2362,7 @@ class IVSystemGMM(_SystemModelBase):
             specified, uses the average outer-product of the set containing
             the exogenous variables and instruments.
         cov_type : str, optional
-            Name of covariance estimator. The names are case sensitive. The default
+            Name of covariance estimator. The names are not case sensitive. The default
             is "robust". Valid options are
 
             * "unadjusted", "homoskedastic" - Classic covariance estimator
@@ -2370,6 +2396,12 @@ class IVSystemGMM(_SystemModelBase):
             for the Parzen kernel and 6 for the quadratic spectral kernel. It
             is also raised if the estimated bandwidth is not finite. Pass
             ``bandwidth`` to use the kernel with fewer observations.
+        ValueError
+            If a key of ``cov_config`` is not accepted by the covariance estimator
+            that ``cov_type`` selects. The message names the key and lists the
+            accepted keys. It is raised before the model is estimated. Releases
+            before 7.1 raised the ``TypeError`` of the constructor of the covariance
+            estimator.
 
         Notes
         -----
@@ -2382,6 +2414,8 @@ class IVSystemGMM(_SystemModelBase):
         :class:`~linearmodels.system.model.IVSystemGMM` for how to restore the
         previous bandwidth.
         """
+        cov_type = lower_option(cov_type)
+        check_cov_config(cov_config, cov_type, _GMM_COV_KEYS, KERNEL_LOOKUP)
         if cov_type not in GMM_TYPES:
             raise unknown_option_error("cov_type", cov_type, GMM_TYPES)
         # Parameter estimation
@@ -2606,7 +2640,7 @@ class IVSystemGMM(_SystemModelBase):
             its observation is dropped from all of the equations.
         weight_type : str, optional
             Name of moment condition weight function to use in the GMM
-            estimation. The default is "robust". The names are case sensitive.
+            estimation. The default is "robust". The names are not case sensitive.
             Valid options are:
 
             * "unadjusted", "homoskedastic" - Assume moments are homoskedastic
