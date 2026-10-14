@@ -8,7 +8,7 @@ from collections.abc import Mapping
 from typing import Any
 import warnings
 
-from numpy import asarray, ndarray, unique
+from numpy import asarray, errstate, ndarray, unique
 from numpy.linalg import inv
 
 from linearmodels.iv.covariance import (
@@ -344,7 +344,10 @@ class KernelWeightMatrix(HomoskedasticWeightMatrix):
 
     def _estimate_bandwidth(self, ze: linearmodels.typing.data.Float64Array) -> int:
         """The bandwidth that is estimated from the moment conditions."""
-        g = ze / ze.std(0)[None, :]
+        # A moment that does not vary has a standard deviation of 0, and the series is
+        # NaN. kernel_optimal_bandwidth raises, so there is no need to warn
+        with errstate(divide="ignore", invalid="ignore"):
+            g = ze / ze.std(0)[None, :]
         g = g.sum(1)
         return kernel_optimal_bandwidth(g, self._kernel)
 

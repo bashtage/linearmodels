@@ -1130,3 +1130,21 @@ def test_factor_kernel_covariance_and_weight_raise_with_too_few_observations(ker
     explicit = FactorKernelWeight(moments, kernel=kernel, bandwidth=1)
     bandwidth = explicit.bandwidth
     assert bandwidth == 1
+
+
+@pytest.mark.filterwarnings("error::RuntimeWarning")
+@pytest.mark.parametrize("kernel", CANONICAL)
+def test_moments_that_do_not_vary_have_no_finite_bandwidth(kernel):
+    # The standard deviation of the moments is 0, and they are divided by it
+    nobs = fewest_observations(kernel) + 5
+    zeros = np.zeros((nobs, 2))
+    match = rf"The automatic bandwidth of the {kernel!r} kernel is not finite\."
+    iv_weight = IVKernelWeightMatrix(kernel=kernel, optimal_bw=True)
+    with pytest.raises(ValueError, match=match):
+        iv_weight._estimate_bandwidth(zeros)
+    system_weight = SystemKernelWeightMatrix(kernel=kernel, optimal_bw=True)
+    with pytest.raises(ValueError, match=match):
+        system_weight._optimal_bandwidth(zeros)
+    covariance = FactorKernelCovariance(zeros, jacobian=np.eye(2), kernel=kernel)
+    with pytest.raises(ValueError, match=match):
+        _ = covariance.bandwidth
