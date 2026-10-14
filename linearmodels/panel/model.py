@@ -2215,7 +2215,14 @@ class PanelOLS(_PanelModelBase):
         Flag indicating whether to keep singleton observations. If False, the
         observations that are alone in their group of an effect are dropped,
         repeatedly until there are none, and a ``SingletonWarning`` is issued.
-        The default is True.
+        The weights are then scaled to have a mean of 1 in the observations that
+        are retained. The default is True.
+
+        .. versionchanged:: 7.1
+
+           The weights were scaled before the singletons were dropped, so that
+           their mean was not 1 in the retained observations and ``s2`` differed
+           from that of the same model on data without the singletons.
     drop_absorbed : bool, optional
         Flag indicating whether to drop absorbed variables. If False, an
         ``AbsorbingEffectError`` is raised by ``fit`` for a model with an
@@ -2464,6 +2471,15 @@ class PanelOLS(_PanelModelBase):
         self.dependent.drop(drop)
         self.exog.drop(drop)
         self.weights.drop(drop)
+        # The weights have a mean of 1 in the rows that are retained
+        w_df = self.weights.dataframe
+        self.weights = PanelData(
+            DataFrame(
+                normalize_weights(np.asarray(w_df)),
+                index=w_df.index,
+                columns=w_df.columns,
+            )
+        )
         if self.other_effects:
             assert self._other_effect_cats is not None
             self._other_effect_cats.drop(drop)
