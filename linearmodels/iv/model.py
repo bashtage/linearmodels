@@ -64,6 +64,7 @@ from linearmodels.shared.alignment import (
 )
 from linearmodels.shared.exceptions import (
     IndexWarning,
+    check_cov_config,
     lookup_option,
     missing_warning,
     unknown_option_error,
@@ -90,6 +91,27 @@ __all__ = [
     "IVResultType",
 ]
 
+_CENTER = ("center",)
+# kappa is overwritten by fit. It is accepted so that the cov_config of results
+# can be passed to fit
+_LS_KEYS = (*_CENTER, "kappa")
+_COV_KEYS = {
+    HomoskedasticCovariance: _LS_KEYS,
+    HeteroskedasticCovariance: _LS_KEYS,
+    KernelCovariance: (*_LS_KEYS, "kernel", "bandwidth"),
+    ClusteredCovariance: (*_LS_KEYS, "clusters"),
+}
+# The keys of the covariance estimators of GMM models, which also select the
+# bandwidth from the data
+_GMM_COV_KEYS = {
+    "unadjusted": _CENTER,
+    "homoskedastic": _CENTER,
+    "robust": _CENTER,
+    "heteroskedastic": _CENTER,
+    "clustered": (*_CENTER, "clusters"),
+    "kernel": (*_CENTER, "kernel", "bandwidth", "optimal_bw"),
+}
+
 COVARIANCE_ESTIMATORS = {
     "homoskedastic": HomoskedasticCovariance,
     "unadjusted": HomoskedasticCovariance,
@@ -104,6 +126,10 @@ COVARIANCE_ESTIMATORS = {
     "one-way": ClusteredCovariance,
     "clustered": ClusteredCovariance,
     "OneWayClusteredCovariance": ClusteredCovariance,
+}
+_LS_COV_KEYS = {
+    name.lower(): _COV_KEYS[estimator]
+    for name, estimator in COVARIANCE_ESTIMATORS.items()
 }
 
 CovarianceEstimator = TypeVar(
@@ -863,6 +889,12 @@ class _IVLSModelBase(_IVModelBase):
         UnknownOptionError
             If ``cov_type`` or ``kernel`` is not supported. It is both a
             ``KeyError`` and a ``ValueError``.
+        TypeError
+            If a key of ``cov_config`` is not accepted by the covariance estimator
+            that ``cov_type`` selects. The message names the key and lists the
+            accepted keys. It is raised before the model is estimated. Releases
+            before 7.1 raised the ``TypeError`` of the constructor of the estimator,
+            or ignored the key.
 
         See Also
         --------
@@ -879,6 +911,7 @@ class _IVLSModelBase(_IVModelBase):
         supported options. Defaults are used if no covariance configuration
         is provided.
         """
+        check_cov_config(cov_config, cov_type, _LS_COV_KEYS)
         self._check_clusters(cov_config)
         wy, wx, wz = self._wy, self._wx, self._wz
         kappa = self._kappa
@@ -1977,6 +2010,12 @@ class IVGMM(_IVGMMBase):
         UnknownOptionError
             If ``cov_type`` is not supported. It is both a ``KeyError`` and a
             ``ValueError``.
+        TypeError
+            If a key of ``cov_config`` is not accepted by the covariance estimator
+            that ``cov_type`` selects. The message names the key and lists the
+            accepted keys. It is raised before the model is estimated. Releases
+            before 7.1 raised the ``TypeError`` of the constructor of the estimator,
+            or ignored the key.
 
         See Also
         --------
@@ -2001,6 +2040,7 @@ class IVGMM(_IVGMMBase):
         ``optimal_bw=False`` to use the kernel with fewer observations. See
         :func:`~linearmodels.iv.covariance.kernel_optimal_bandwidth`.
         """
+        check_cov_config(cov_config, cov_type, _GMM_COV_KEYS)
         self._check_clusters(cov_config)
         cov_config = self._check_default_bandwidth(cov_type, cov_config)
         wy, wx, wz = self._wy, self._wx, self._wz
@@ -2610,6 +2650,12 @@ class IVGMMCUE(_IVGMMBase):
         UnknownOptionError
             If ``cov_type`` is not supported. It is both a ``KeyError`` and a
             ``ValueError``.
+        TypeError
+            If a key of ``cov_config`` is not accepted by the covariance estimator
+            that ``cov_type`` selects. The message names the key and lists the
+            accepted keys. It is raised before the model is estimated. Releases
+            before 7.1 raised the ``TypeError`` of the constructor of the estimator,
+            or ignored the key.
 
         See Also
         --------
@@ -2648,6 +2694,7 @@ class IVGMMCUE(_IVGMMBase):
         ``optimal_bw=False`` to use the kernel with fewer observations. See
         :func:`~linearmodels.iv.covariance.kernel_optimal_bandwidth`.
         """
+        check_cov_config(cov_config, cov_type, _GMM_COV_KEYS)
         self._check_clusters(cov_config)
         cov_config = self._check_default_bandwidth(cov_type, cov_config)
         self._select_bandwidth()
@@ -3192,6 +3239,12 @@ class IVJIVE(_IVModelBase):
         UnknownOptionError
             If ``cov_type`` or ``kernel`` is not supported. It is both a
             ``KeyError`` and a ``ValueError``.
+        TypeError
+            If a key of ``cov_config`` is not accepted by the covariance estimator
+            that ``cov_type`` selects. The message names the key and lists the
+            accepted keys. It is raised before the model is estimated. Releases
+            before 7.1 raised the ``TypeError`` of the constructor of the estimator,
+            or ignored the key.
 
         See Also
         --------
@@ -3217,6 +3270,7 @@ class IVJIVE(_IVModelBase):
         ``InvalidTestStatistic`` if it is not defined. The model is estimated
         then. See the notes of the class.
         """
+        check_cov_config(cov_config, cov_type, _GMM_COV_KEYS)
         self._check_clusters(cov_config)
         wy, wx, wz = self._wy, self._wx, self._wz
 

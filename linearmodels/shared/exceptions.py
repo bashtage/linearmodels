@@ -2,7 +2,7 @@
 Warnings and errors that linearmodels raises.
 """
 
-from collections.abc import Iterable, Mapping
+from collections.abc import Iterable, Mapping, Sequence
 import difflib
 from typing import TypeVar
 import warnings
@@ -229,6 +229,46 @@ def lookup_option(table: Mapping[str, _T], value: str, parameter: str) -> _T:
         raise unknown_option_error(parameter, value, table) from None
 
 
+def check_cov_config(
+    cov_config: Mapping[str, object],
+    cov_type: str,
+    allowed: Mapping[str, Sequence[str]],
+) -> None:
+    """
+    Check that the keyword arguments of a covariance estimator are supported.
+
+    Parameters
+    ----------
+    cov_config : dict
+        The keyword arguments of ``fit`` that configure the covariance estimator.
+    cov_type : str
+        Name of the covariance estimator.
+    allowed : dict of str to sequence of str
+        The keys that each covariance estimator accepts, by lower-case name.
+
+    Raises
+    ------
+    TypeError
+        If a key of ``cov_config`` is not accepted by the estimator. The message
+        is that of Python for an unexpected keyword argument, and also names the
+        keys that are accepted. An unknown ``cov_type`` is not checked here.
+    """
+    keys = allowed.get(str(cov_type).lower())
+    if keys is None:
+        return
+    unknown = [repr(str(key)) for key in cov_config if key not in keys]
+    if unknown:
+        article = "an unexpected keyword argument"
+        if len(unknown) > 1:
+            article = "unexpected keyword arguments"
+        accepted = ", ".join(keys) if keys else "none"
+        raise TypeError(
+            f"fit() got {article} {', '.join(unknown)}. "
+            f"The keyword arguments that are accepted with cov_type={cov_type!r} "
+            f"are: {accepted}."
+        )
+
+
 __all__ = [
     "DefaultBandwidthWarning",
     "IndexWarning",
@@ -237,6 +277,7 @@ __all__ = [
     "MissingValueWarning",
     "SingletonWarning",
     "UnknownOptionError",
+    "check_cov_config",
     "lookup_option",
     "missing_value_warning_msg",
     "missing_warning",

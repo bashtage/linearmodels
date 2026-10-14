@@ -28,7 +28,11 @@ from linearmodels.asset_pricing.results import (
 from linearmodels.iv.data import IVData, IVDataLike
 from linearmodels.shared import hypotheses
 from linearmodels.shared.alignment import check_alignment, row_labels
-from linearmodels.shared.exceptions import missing_warning, unknown_option_error
+from linearmodels.shared.exceptions import (
+    check_cov_config,
+    missing_warning,
+    unknown_option_error,
+)
 from linearmodels.shared.hypotheses import WaldTestStatistic
 from linearmodels.shared.linalg import has_constant
 from linearmodels.shared.rsquared import r_squared
@@ -38,6 +42,7 @@ import linearmodels.typing.data
 
 # The names of the covariance estimators of the models
 COV_TYPES = ("heteroskedastic", "kernel", "robust")
+_COV_KEYS = {"heteroskedastic": (), "robust": (), "kernel": ("kernel", "bandwidth")}
 
 
 def callback_factory(
@@ -446,6 +451,12 @@ class TradedFactorModel(_FactorModelBase):
             If ``debiased`` is True and the number of observations is not larger
             than the number of factors plus one, or if the bandwidth is selected
             from the data and there are too few observations. See Notes.
+        TypeError
+            If a key of ``cov_config`` is not accepted by the covariance estimator
+            that ``cov_type`` selects. The message names the key and lists the
+            accepted keys. It is raised before the model is estimated. Releases
+            before 7.1 raised the ``TypeError`` of the constructor of the estimator,
+            or ignored the key.
 
         Notes
         -----
@@ -492,6 +503,7 @@ class TradedFactorModel(_FactorModelBase):
            alphas and the loadings, ``risk_premia_se`` and the covariance with
            ``debiased=False`` do not change.
         """
+        check_cov_config(cov_config, cov_type, _COV_KEYS)
         self._check_debiased(debiased)
         p = self.portfolios.ndarray
         f = self.factors.ndarray
@@ -957,6 +969,12 @@ class LinearFactorModel(_LinearFactorModelBase):
             If ``debiased`` is True and the number of observations is not larger
             than the number of factors plus one, or if the bandwidth is selected
             from the data and there are too few observations. See Notes.
+        TypeError
+            If a key of ``cov_config`` is not accepted by the covariance estimator
+            that ``cov_type`` selects. The message names the key and lists the
+            accepted keys. It is raised before the model is estimated. Releases
+            before 7.1 raised the ``TypeError`` of the constructor of the estimator,
+            or ignored the key.
 
         Notes
         -----
@@ -972,6 +990,7 @@ class LinearFactorModel(_LinearFactorModelBase):
         the kernel with fewer observations. See
         :func:`~linearmodels.iv.covariance.kernel_optimal_bandwidth`.
         """
+        check_cov_config(cov_config, cov_type, _COV_KEYS)
         nobs, nf, nport, _, s1, s2, s3 = self._boundaries()
         excess_returns = not self._risk_free
         self._check_debiased(debiased)
@@ -1404,6 +1423,12 @@ class LinearFactorModelGMM(_LinearFactorModelBase):
             If ``starting`` does not have one element for each parameter, or if
             the bandwidth is selected from the data and there are too few
             observations. See Notes.
+        TypeError
+            If a key of ``cov_config`` is not accepted by the covariance estimator
+            that ``cov_type`` selects. The message names the key and lists the
+            accepted keys. It is raised before the model is estimated. Releases
+            before 7.1 raised the ``TypeError`` of the constructor of the estimator,
+            or ignored the key.
 
         Notes
         -----
@@ -1420,6 +1445,7 @@ class LinearFactorModelGMM(_LinearFactorModelBase):
         observations. See
         :func:`~linearmodels.iv.covariance.kernel_optimal_bandwidth`.
         """
+        check_cov_config(cov_config, cov_type, _COV_KEYS)
 
         nobs, n = self.portfolios.shape
         k = self.factors.shape[1]

@@ -34,6 +34,7 @@ from linearmodels.panel.covariance import (
     FamaMacBethCovariance,
     HeteroskedasticCovariance,
     HomoskedasticCovariance,
+    check_covariance_kwargs,
     setup_covariance_estimator,
 )
 from linearmodels.panel.data import PanelData, PanelDataLike
@@ -1978,6 +1979,7 @@ class PooledOLS(_PanelModelBase):
         >>> mod = PooledOLS(y, x)
         >>> res = mod.fit(cov_type="clustered", cluster_entity=True)
         """
+        check_covariance_kwargs(self._cov_estimators, cov_type, cov_config)
         y = self.dependent.values2d
         x = self.exog.values2d
         w = self.weights.values2d
@@ -3248,6 +3250,7 @@ class PanelOLS(_PanelModelBase):
         >>> mod = PanelOLS(y, x, entity_effects=True)
         >>> res = mod.fit(cov_type="clustered", cluster_entity=True)
         """
+        check_covariance_kwargs(self._cov_estimators, cov_type, cov_config)
 
         weighted = np.any(self.weights.values2d != 1.0)
 
@@ -3766,6 +3769,7 @@ class BetweenOLS(_PanelModelBase):
         >>> mod = BetweenOLS(y, x)
         >>> res = mod.fit(cov_type='robust')
         """
+        check_covariance_kwargs(self._cov_estimators, cov_type, cov_config)
         y, x, w = self._prepare_between()
         if np.all(self.weights.values2d == 1.0) and not reweight:
             w = root_w = np.ones_like(y)
@@ -4284,6 +4288,7 @@ class FirstDifferenceOLS(_PanelModelBase):
         >>> robust = mod.fit(cov_type="robust")
         >>> clustered = mod.fit(cov_type="clustered", cluster_entity=True)
         """
+        check_covariance_kwargs(self._cov_estimators, cov_type, cov_config)
         y_fd = self.dependent.first_difference()
         time_ids = y_fd.time_ids
         entity_ids = y_fd.entity_ids
@@ -4810,6 +4815,7 @@ class RandomEffects(_PanelModelBase):
         >>> mod = RandomEffects(y, x)
         >>> res = mod.fit(cov_type="clustered", cluster_entity=True)
         """
+        check_covariance_kwargs(self._cov_estimators, cov_type, cov_config)
         w = self.weights.values2d
         root_w = cast("linearmodels.typing.data.Float64Array", np.sqrt(w))
         demeaned_dep = self.dependent.demean("entity", weights=self.weights)

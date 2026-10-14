@@ -48,6 +48,7 @@ from scipy.sparse.linalg import lsmr
 from linearmodels.iv.common import f_statistic
 from linearmodels.iv.data import IVData
 from linearmodels.iv.model import (
+    _LS_COV_KEYS,
     COVARIANCE_ESTIMATORS,
     ClusteredCovariance,
     HeteroskedasticCovariance,
@@ -69,7 +70,11 @@ from linearmodels.shared.alignment import (
     reference_labels,
     row_labels,
 )
-from linearmodels.shared.exceptions import lookup_option, missing_warning
+from linearmodels.shared.exceptions import (
+    check_cov_config,
+    lookup_option,
+    missing_warning,
+)
 from linearmodels.shared.hypotheses import InvalidTestStatistic, WaldTestStatistic
 from linearmodels.shared.inputs import as_array_like
 from linearmodels.shared.rsquared import r_squared
@@ -1514,6 +1519,12 @@ class AbsorbingLS:
         UnknownOptionError
             If ``cov_type`` or ``kernel`` is not supported. It is both a
             ``KeyError`` and a ``ValueError``.
+        TypeError
+            If a key of ``cov_config`` is not accepted by the covariance estimator
+            that ``cov_type`` selects. The message names the key and lists the
+            accepted keys. It is raised before the model is estimated. Releases
+            before 7.1 raised the ``TypeError`` of the constructor of the estimator,
+            or ignored the key.
 
         Warns
         -----
@@ -1577,6 +1588,7 @@ class AbsorbingLS:
         changing only the covariance estimator is fast. If any of them differs,
         the variables are absorbed again using the new values.
         """
+        check_cov_config(cov_config, cov_type, _LS_COV_KEYS)
         method = _check_method(method)
         if lsmr_options and absorb_options is None:
             # The options are options of LSMR, so they can not be passed to HDFE

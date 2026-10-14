@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+from collections.abc import Mapping
 from functools import cached_property
 from typing import Any, ClassVar, Union
 
@@ -1022,6 +1023,56 @@ class FamaMacBethCovariance(HomoskedasticCovariance):
         return self._all_params
 
 
+def check_covariance_kwargs(
+    cov_estimators: CovarianceManager,
+    cov_type: str,
+    cov_config: Mapping[str, Any],
+) -> CovarianceEstimatorType:
+    """
+    Check that the keyword arguments are supported by a covariance estimator.
+
+    Parameters
+    ----------
+    cov_estimators : CovarianceManager
+        The manager of the covariance estimators that the model supports.
+    cov_type : str
+        Name of the covariance estimator.
+    cov_config : dict
+        The keyword arguments of ``fit`` for the covariance estimator.
+
+    Returns
+    -------
+    type
+        The covariance estimator class that `cov_type` selects.
+
+    Raises
+    ------
+    UnknownOptionError
+        If `cov_type` is unknown or is not supported.
+    ValueError
+        If `cov_config` contains a key that the estimator does not support.
+    """
+    estimator = cov_estimators[cov_type]
+    # fit also accepts extra_df, and the options that make clusters
+    accepted = (*estimator.ALLOWED_KWARGS, "extra_df")
+    if "clusters" in estimator.ALLOWED_KWARGS:
+        accepted = (*accepted, "cluster_entity", "cluster_time")
+    unknown_kwargs = [str(key) for key in cov_config if str(key) not in accepted]
+    if unknown_kwargs:
+        if estimator.ALLOWED_KWARGS:
+            allowed = ", ".join(estimator.ALLOWED_KWARGS)
+            kwarg_err = f"only supports the keyword arguments: {allowed}"
+        else:
+            kwarg_err = "does not support any keyword arguments"
+        msg = (
+            f"Covariance estimator {estimator.__name__} {kwarg_err}. Unknown keyword "
+            f"arguments were passed to the estimator. The unknown keyword argument(s) "
+            f"are: {', '.join(unknown_kwargs)} "
+        )
+        raise ValueError(msg)
+    return estimator
+
+
 def setup_covariance_estimator(
     cov_estimators: CovarianceManager,
     cov_type: str,
@@ -1084,22 +1135,7 @@ def setup_covariance_estimator(
     TypeError
         If a value of `cov_config` does not have the type that its key requires.
     """
-    estimator = cov_estimators[cov_type]
-    unknown_kwargs = [
-        str(key) for key in cov_config if str(key) not in estimator.ALLOWED_KWARGS
-    ]
-    if unknown_kwargs:
-        if estimator.ALLOWED_KWARGS:
-            allowed = ", ".join(estimator.ALLOWED_KWARGS)
-            kwarg_err = f"only supports the keyword arguments: {allowed}"
-        else:
-            kwarg_err = "does not support any keyword arguments"
-        msg = (
-            f"Covariance estimator {estimator.__name__} {kwarg_err}. Unknown keyword "
-            f"arguments were passed to the estimator. The unknown keyword argument(s) "
-            f"are: {', '.join(unknown_kwargs)} "
-        )
-        raise ValueError(msg)
+    estimator = check_covariance_kwargs(cov_estimators, cov_type, cov_config)
     kernel = get_string(cov_config, "kernel")
     bandwidth = get_float(cov_config, "bandwidth")
     group_debias = get_bool(cov_config, "group_debias")
