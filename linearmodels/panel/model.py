@@ -1971,6 +1971,10 @@ class PooledOLS(_PanelModelBase):
         Examples
         --------
         >>> from linearmodels import PooledOLS
+        >>> from linearmodels.datasets import wage_panel
+        >>> data = wage_panel.load().set_index(["nr", "year"])
+        >>> y = data["lwage"]
+        >>> x = data[["married", "union"]]
         >>> mod = PooledOLS(y, x)
         >>> res = mod.fit(cov_type="clustered", cluster_entity=True)
         """
@@ -3237,6 +3241,10 @@ class PanelOLS(_PanelModelBase):
         Examples
         --------
         >>> from linearmodels import PanelOLS
+        >>> from linearmodels.datasets import wage_panel
+        >>> data = wage_panel.load().set_index(["nr", "year"])
+        >>> y = data["lwage"]
+        >>> x = data[["married", "union"]]
         >>> mod = PanelOLS(y, x, entity_effects=True)
         >>> res = mod.fit(cov_type="clustered", cluster_entity=True)
         """
@@ -3751,6 +3759,10 @@ class BetweenOLS(_PanelModelBase):
         Examples
         --------
         >>> from linearmodels import BetweenOLS
+        >>> from linearmodels.datasets import wage_panel
+        >>> data = wage_panel.load().set_index(["nr", "year"])
+        >>> y = data["lwage"]
+        >>> x = data[["married", "union"]]
         >>> mod = BetweenOLS(y, x)
         >>> res = mod.fit(cov_type='robust')
         """
@@ -4264,6 +4276,10 @@ class FirstDifferenceOLS(_PanelModelBase):
         Examples
         --------
         >>> from linearmodels import FirstDifferenceOLS
+        >>> from linearmodels.datasets import wage_panel
+        >>> data = wage_panel.load().set_index(["nr", "year"])
+        >>> y = data["lwage"]
+        >>> x = data[["married", "union"]]
         >>> mod = FirstDifferenceOLS(y, x)
         >>> robust = mod.fit(cov_type="robust")
         >>> clustered = mod.fit(cov_type="clustered", cluster_entity=True)
@@ -4787,6 +4803,10 @@ class RandomEffects(_PanelModelBase):
         Examples
         --------
         >>> from linearmodels import RandomEffects
+        >>> from linearmodels.datasets import wage_panel
+        >>> data = wage_panel.load().set_index(["nr", "year"])
+        >>> y = data["lwage"]
+        >>> x = data[["married", "union"]]
         >>> mod = RandomEffects(y, x)
         >>> res = mod.fit(cov_type="clustered", cluster_entity=True)
         """
@@ -5318,6 +5338,10 @@ class FamaMacBeth(_PanelModelBase):
         Examples
         --------
         >>> from linearmodels import FamaMacBeth
+        >>> from linearmodels.datasets import wage_panel
+        >>> data = wage_panel.load().set_index(["nr", "year"])
+        >>> y = data["lwage"]
+        >>> x = data[["married", "union"]]
         >>> mod = FamaMacBeth(y, x)
         >>> res = mod.fit(cov_type="kernel", kernel="parzen")
         """

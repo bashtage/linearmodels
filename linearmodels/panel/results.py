@@ -1508,10 +1508,20 @@ class RandomEffectsResults(PanelResults):
         Examples
         --------
         >>> from linearmodels import PanelOLS, RandomEffects
+        >>> from linearmodels.datasets import wage_panel
+        >>> data = wage_panel.load().set_index(["nr", "year"])
+        >>> y = data["lwage"]
+        >>> x = data[["hours"]]
         >>> fe_res = PanelOLS(y, x, entity_effects=True).fit()
         >>> re_res = RandomEffects(y, x).fit()
         >>> results = re_res.hausman(fe_res)
-        >>> print(results)
+        >>> print(results)  # doctest: +ELLIPSIS
+        Hausman specification test
+        H0: No systematic difference in coefficients between models
+        Statistic: ...
+        P-value: ...
+        Distributed: chi2(1)
+        ...
 
         The statistic and the estimates can be unpacked.
 
