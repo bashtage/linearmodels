@@ -718,3 +718,18 @@ def test_labels_of_the_periods_of_a_single_entity_are_read_as_before():
     wrong = pd.Series(values, index=[f"label{i}" for i in range(5)])
     with pytest.raises(ValueError, match="time index of weights"):
         PooledOLS(panel.y, panel.x_const, weights=wrong)
+
+
+@pytest.mark.parametrize("reading", ["rows", "periods", "entities"])
+@pytest.mark.parametrize("layout", LAYOUTS)
+def test_data_frame_with_one_column_is_read_as_the_series_with_its_index(
+    layout, reading
+):
+    panel = main_panel(layout, "entity-major")
+    given, expected = values_of_reading(panel, reading)
+    labels = {"rows": panel.index, "periods": panel.periods, "entities": panel.entities}
+    index = labels[reading]
+    for name in ("weight", 0):
+        weights = pd.DataFrame({name: given}, index=index)
+        mod = PooledOLS(panel.y, panel.x_const, weights=weights)
+        assert_weights_equal(mod, expected)

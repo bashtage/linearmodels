@@ -897,7 +897,8 @@ class _PanelModelBase:
         and one indexed by the entities is a value for each entity. Weights without
         labels, which are an array, a list, a tuple, and a Series or a DataFrame with
         one column that has the default index, are read by their number of values. A
-        DataFrame with one column is read as an array with a column is. If dependent
+        DataFrame with one column is read as an array with a column is if it has the
+        default index, and as a Series with the same index if it has any other. If dependent
         is not balanced, this happens if every time period or entity has a single
         row, and they are a value for each row. If it is balanced, this happens if
         there is a single entity or time period, and they are a value for each time
@@ -950,6 +951,13 @@ class _PanelModelBase:
             column = as_float64(np.asarray(weights), "weights")
             weights = cast("linearmodels.typing.data.Float64Array", column[:, 0])
             labelled = False
+        elif (
+            isinstance(weights, DataFrame)
+            and weights.shape[1] == 1
+            and not isinstance(weights.index, MultiIndex)
+        ):
+            # The labels decide, as they do for a Series with the same index
+            weights = weights.iloc[:, 0]
         unbalanced = nrows != nobs * nentity
         # The labels of a pandas object with a MultiIndex identify the rows
         row_labels = (
@@ -1758,7 +1766,10 @@ class PooledOLS(_PanelModelBase):
        the numbers of time periods and entities were equal. A DataFrame with one
        column and the default index is read as an array with a column is. It raised
        an error from pandas or NumPy if ``dependent`` was balanced, and "Weights do
-       not have a supported shape" if it was not.
+       not have a supported shape" if it was not. A DataFrame with one column and
+       an index that is not the default index is read as a Series with that index
+       is, so that its labels decide. It raised "Weights do not have a supported
+       shape".
     """
 
     def __init__(
@@ -2315,7 +2326,10 @@ class PanelOLS(_PanelModelBase):
        the numbers of time periods and entities were equal. A DataFrame with one
        column and the default index is read as an array with a column is. It raised
        an error from pandas or NumPy if ``dependent`` was balanced, and "Weights do
-       not have a supported shape" if it was not.
+       not have a supported shape" if it was not. A DataFrame with one column and
+       an index that is not the default index is read as a Series with that index
+       is, so that its labels decide. It raised "Weights do not have a supported
+       shape".
 
     If both ``entity_effect`` and ``time_effects`` are ``False``, and no other
     effects are included, the model reduces to :class:`PooledOLS`.
@@ -3598,7 +3612,10 @@ class BetweenOLS(_PanelModelBase):
        the numbers of time periods and entities were equal. A DataFrame with one
        column and the default index is read as an array with a column is. It raised
        an error from pandas or NumPy if ``dependent`` was balanced, and "Weights do
-       not have a supported shape" if it was not.
+       not have a supported shape" if it was not. A DataFrame with one column and
+       an index that is not the default index is read as a Series with that index
+       is, so that its labels decide. It raised "Weights do not have a supported
+       shape".
     """
 
     def __init__(
@@ -4067,7 +4084,10 @@ class FirstDifferenceOLS(_PanelModelBase):
        the numbers of time periods and entities were equal. A DataFrame with one
        column and the default index is read as an array with a column is. It raised
        an error from pandas or NumPy if ``dependent`` was balanced, and "Weights do
-       not have a supported shape" if it was not.
+       not have a supported shape" if it was not. A DataFrame with one column and
+       an index that is not the default index is read as a Series with that index
+       is, so that its labels decide. It raised "Weights do not have a supported
+       shape".
     """
 
     def __init__(
@@ -4575,7 +4595,10 @@ class RandomEffects(_PanelModelBase):
        the numbers of time periods and entities were equal. A DataFrame with one
        column and the default index is read as an array with a column is. It raised
        an error from pandas or NumPy if ``dependent`` was balanced, and "Weights do
-       not have a supported shape" if it was not.
+       not have a supported shape" if it was not. A DataFrame with one column and
+       an index that is not the default index is read as a Series with that index
+       is, so that its labels decide. It raised "Weights do not have a supported
+       shape".
     """
 
     def __init__(
@@ -5153,7 +5176,10 @@ class FamaMacBeth(_PanelModelBase):
        the numbers of time periods and entities were equal. A DataFrame with one
        column and the default index is read as an array with a column is. It raised
        an error from pandas or NumPy if ``dependent`` was balanced, and "Weights do
-       not have a supported shape" if it was not.
+       not have a supported shape" if it was not. A DataFrame with one column and
+       an index that is not the default index is read as a Series with that index
+       is, so that its labels decide. It raised "Weights do not have a supported
+       shape".
 
     References
     ----------
