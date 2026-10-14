@@ -4,6 +4,7 @@ not accept
 """
 
 import numpy as np
+from numpy.testing import assert_allclose
 import pandas as pd
 import pytest
 
@@ -16,6 +17,7 @@ from linearmodels.iv import IV2SLS, IVGMM, IVGMMCUE, IVJIVE, IVLIML, AbsorbingLS
 from linearmodels.panel import (
     BetweenOLS,
     FamaMacBeth,
+    FirstDifferenceOLS,
     PanelOLS,
     PooledOLS,
     RandomEffects,
@@ -79,7 +81,7 @@ def test_unexpected_keyword(data, name, cov_type):
 def test_accepted_keywords_depend_on_cov_type(data):
     # The keywords that a covariance estimator accepts depend on its type
     model = IV2SLS(*data["iv"])
-    match = r"cov_type='robust' are: center, kappa\."
+    match = r"cov_type='robust' are: center, kappa, extra_df\."
     with pytest.raises(TypeError, match=match):
         model.fit(cov_type="robust", clusters=np.arange(NOBS))
     model.fit(cov_type="clustered", clusters=np.arange(NOBS))
@@ -124,3 +126,30 @@ def test_unknown_weight_kernel_of_iv_gmm(data, cls):
 def test_unknown_weight_kernel_of_system_gmm(data):
     with pytest.raises(UnknownOptionError, match=r"Unknown kernel: 'bogus'"):
         IVSystemGMM(data["iv_equations"], weight_type="kernel", kernel="bogus")
+
+
+@pytest.mark.parametrize("cov_type", ["robust", "unadjusted"])
+@pytest.mark.parametrize("cls", [IV2SLS, IVLIML])
+def test_extra_df_is_accepted_by_the_iv_models(data, cls, cov_type):
+    model = cls(*data["iv"])
+    base = model.fit(cov_type=cov_type, debiased=True)
+    extra = model.fit(cov_type=cov_type, debiased=True, extra_df=2)
+    nobs, nvar = NOBS, 1
+    scale = (nobs - nvar) / (nobs - nvar - 2)
+    assert_allclose(extra.cov, base.cov * scale)
+
+
+def test_cluster_options_that_the_model_does_not_support_raise(data):
+    between = BetweenOLS(*data["panel"])
+    for option in ("cluster_entity", "cluster_time"):
+        with pytest.raises(ValueError, match=option):
+            between.fit(cov_type="clustered", **{option: True})
+    first_difference = FirstDifferenceOLS(*data["panel"])
+    with pytest.raises(ValueError, match="cluster_time"):
+        first_difference.fit(cov_type="clustered", cluster_time=True)
+    first_difference.fit(cov_type="clustered", cluster_entity=True)
+
+
+def test_unknown_kernel_is_shown_in_lower_case(data):
+    with pytest.raises(UnknownOptionError, match=r"Unknown kernel: 'bogus'"):
+        IV2SLS(*data["iv"]).fit(cov_type="kernel", kernel="Bogus")

@@ -70,16 +70,6 @@ CASES = {
         KERNEL_MIXED,
     ),
     "IVGMM": (lambda d: IVGMM(*d["iv"]), KERNEL, KERNEL_MIXED),
-    "IVGMM-weight": (
-        lambda d: IVGMM(*d["iv"], weight_type="kernel", kernel="bartlett", bandwidth=3),
-        {"cov_type": "robust"},
-        {"cov_type": "Robust"},
-    ),
-    "IVGMM-weight-mixed": (
-        lambda d: IVGMM(*d["iv"], weight_type="Kernel", kernel="Bartlett", bandwidth=3),
-        {"cov_type": "robust"},
-        {"cov_type": "Robust"},
-    ),
     "IVGMMCUE": (lambda d: IVGMMCUE(*d["iv"]), KERNEL, KERNEL_MIXED),
     "IVJIVE": (lambda d: IVJIVE(*d["iv"]), KERNEL, KERNEL_MIXED),
     "SUR": (lambda d: SUR(d["equations"]), KERNEL, KERNEL_MIXED),
@@ -145,3 +135,24 @@ def test_group_is_not_case_sensitive(data, method):
     expected = getattr(panel, method)("time")
     result = getattr(panel, method)("Time")
     assert_allclose(as_array(result), as_array(expected))
+
+
+WEIGHT_MODELS = {
+    "IVGMM": lambda d, **kw: IVGMM(*d["iv"], **kw),
+    "IVGMMCUE": lambda d, **kw: IVGMMCUE(*d["iv"], **kw),
+    "IVSystemGMM": lambda d, **kw: IVSystemGMM(d["iv_equations"], **kw),
+}
+
+
+@pytest.mark.parametrize("weight_type", ["robust", "kernel"])
+@pytest.mark.parametrize("name", list(WEIGHT_MODELS))
+def test_mixed_case_weight_type_gives_the_results_of_lower_case(
+    data, name, weight_type
+):
+    options = {"kernel": "bartlett", "bandwidth": 3} if weight_type == "kernel" else {}
+    mixed_options = {"kernel": "Bartlett", "bandwidth": 3} if options else {}
+    make = WEIGHT_MODELS[name]
+    expected = make(data, weight_type=weight_type, **options).fit()
+    result = make(data, weight_type=weight_type.capitalize(), **mixed_options).fit()
+    assert_allclose(result.params, expected.params)
+    assert_allclose(result.cov, expected.cov)
