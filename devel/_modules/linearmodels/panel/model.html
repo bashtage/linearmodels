@@ -19,7 +19,7 @@
     
   
       
-        <title>linearmodels.panel.model - linearmodels v7.1 (+468)</title>
+        <title>linearmodels.panel.model - linearmodels v7.1 (+480)</title>
       
     
 
@@ -91,7 +91,7 @@
 
 <header class="md-header md-header--shadow" data-md-component="header">
   <nav class="md-header__inner md-grid" aria-label="Header">
-    <a href="../../../index.html" title="linearmodels v7.1 (+468)" class="md-header__button md-logo" aria-label="linearmodels v7.1 (+468)" data-md-component="logo">
+    <a href="../../../index.html" title="linearmodels v7.1 (+480)" class="md-header__button md-logo" aria-label="linearmodels v7.1 (+480)" data-md-component="logo">
       <img src="../../../_static/bw-logo.svg" alt="logo">
     </a>
     <label class="md-header__button md-icon" for="__drawer">
@@ -102,7 +102,7 @@
       <div class="md-header__ellipsis">
         <div class="md-header__topic">
           <span class="md-ellipsis">
-            linearmodels v7.1 (+468)
+            linearmodels v7.1 (+480)
           </span>
         </div>
         <div class="md-header__topic" data-md-component="header-topic">
@@ -197,10 +197,10 @@
 
 <nav class="md-nav md-nav--primary" aria-label="Navigation" data-md-level="0">
   <label class="md-nav__title" for="__drawer">
-    <a href="../../../index.html" title="linearmodels v7.1 (+468)" class="md-nav__button md-logo" aria-label="linearmodels v7.1 (+468)" data-md-component="logo">
+    <a href="../../../index.html" title="linearmodels v7.1 (+480)" class="md-nav__button md-logo" aria-label="linearmodels v7.1 (+480)" data-md-component="logo">
       <img src="../../../_static/bw-logo.svg" alt="logo">
     </a>
-    linearmodels v7.1 (+468)
+    linearmodels v7.1 (+480)
   </label>
   
     <div class="md-nav__source">
@@ -581,6 +581,7 @@
 <span class="kn">from</span><span class="w"> </span><span class="nn">linearmodels.shared.alignment</span><span class="w"> </span><span class="kn">import</span> <span class="p">(</span>
     <span class="n">check_row_alignment</span><span class="p">,</span>
     <span class="n">differs</span><span class="p">,</span>
+    <span class="n">is_default_index</span><span class="p">,</span>
     <span class="n">is_labelled</span><span class="p">,</span>
     <span class="n">labels_1d</span><span class="p">,</span>
     <span class="n">misaligned</span><span class="p">,</span>
@@ -1053,6 +1054,21 @@
 <span class="sd">        Dependent need not be balanced when the weights are given for each time</span>
 <span class="sd">        period, entity or combination: the weights of the combinations that</span>
 <span class="sd">        dependent does not have are not used.</span>
+<span class="sd">        A 1-d array has a value for each row of dependent, in the order of the</span>
+<span class="sd">        rows, if it has as many values as dependent has rows. It has a value for</span>
+<span class="sd">        each time period if it has as many values as there are time periods, and</span>
+<span class="sd">        a value for each entity if it has as many as there are entities. Weights</span>
+<span class="sd">        with labels (a pandas object with an index that is not the default index)</span>
+<span class="sd">        are read by their labels, so that a Series indexed by the time periods has</span>
+<span class="sd">        a value for each time period, and one indexed by the entities has a value</span>
+<span class="sd">        for each entity. Weights without labels (an array, a list, a tuple, or a</span>
+<span class="sd">        Series or a DataFrame with one column that has the default index) are read</span>
+<span class="sd">        by their number of values. If dependent is not balanced and has as many</span>
+<span class="sd">        rows as time periods or entities, they have a value for each row. An</span>
+<span class="sd">        ``AmbiguityError`` is raised if the numbers of time periods and entities</span>
+<span class="sd">        are equal and the weights have that many values, unless they have no</span>
+<span class="sd">        labels and a value for each row. Any other number of values raises a</span>
+<span class="sd">        ``ValueError``.</span>
 <span class="sd">    check_rank : bool</span>
 <span class="sd">        Flag indicating whether to perform a rank check on the exogenous</span>
 <span class="sd">        variables to ensure that the model is identified. Skipping this</span>
@@ -1305,7 +1321,63 @@
         <span class="k">return</span> <span class="n">entity_info</span><span class="p">,</span> <span class="n">time_info</span><span class="p">,</span> <span class="n">other_info</span>
 
     <span class="k">def</span><span class="w"> </span><span class="nf">_adapt_weights</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">weights</span><span class="p">:</span> <span class="n">PanelDataLike</span> <span class="o">|</span> <span class="kc">None</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">PanelData</span><span class="p">:</span>
-<span class="w">        </span><span class="sd">"""Check and transform weights depending on size"""</span>
+<span class="w">        </span><span class="sd">"""</span>
+<span class="sd">        Check the weights and place them on the rows of dependent</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        weights : array_like or None</span>
+<span class="sd">            The weights. None gives every observation the same weight.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        PanelData</span>
+<span class="sd">            The weights of the rows of dependent, before the observations with</span>
+<span class="sd">            missing values are dropped.</span>
+
+<span class="sd">        Raises</span>
+<span class="sd">        ------</span>
+<span class="sd">        AmbiguityError</span>
+<span class="sd">            If the number of time periods is the number of entities and 1-d weights</span>
+<span class="sd">            have this number of values, so that they could be a value for each time</span>
+<span class="sd">            period or for each entity.</span>
+<span class="sd">        ValueError</span>
+<span class="sd">            If the weights do not have a supported shape, or have labels that are</span>
+<span class="sd">            not those of the other inputs.</span>
+
+<span class="sd">        Notes</span>
+<span class="sd">        -----</span>
+<span class="sd">        The shape of the weights decides how they are read. Let nobs be the number</span>
+<span class="sd">        of time periods, nentity the number of entities and nrows the number of rows</span>
+<span class="sd">        of dependent. nrows is nobs * nentity if dependent is balanced and less if it</span>
+<span class="sd">        is not. The weights have</span>
+
+<span class="sd">        * a value for each combination of a time period and an entity if they are a</span>
+<span class="sd">          3-d array, a PanelData or have the shape (nobs, nentity);</span>
+<span class="sd">        * a value for each row if they are 1-d with nrows values. A pandas object</span>
+<span class="sd">          with a MultiIndex is paired by label, and anything else by position</span>
+<span class="sd">          with the rows of dependent;</span>
+<span class="sd">        * a value for each time period if they are 1-d with nobs values;</span>
+<span class="sd">        * a value for each entity if they are 1-d with nentity values.</span>
+
+<span class="sd">        If nrows is also nobs or nentity, labels decide. Weights with labels, a</span>
+<span class="sd">        pandas object with an index that is not the default index, are read by their</span>
+<span class="sd">        labels: a Series indexed by the time periods is a value for each time period</span>
+<span class="sd">        and one indexed by the entities is a value for each entity. Weights without</span>
+<span class="sd">        labels, which are an array, a list, a tuple, and a Series or a DataFrame with</span>
+<span class="sd">        one column that has the default index, are read by their number of values. A</span>
+<span class="sd">        DataFrame with one column is read as an array with a column is. If dependent</span>
+<span class="sd">        is not balanced, this happens if every time period or entity has a single</span>
+<span class="sd">        row, and they are a value for each row. If it is balanced, this happens if</span>
+<span class="sd">        there is a single entity or time period, and they are a value for each time</span>
+<span class="sd">        period or entity.</span>
+
+<span class="sd">        An ``AmbiguityError`` is raised if nobs and nentity are equal and 1-d weights</span>
+<span class="sd">        have that many values, since they could be either, and labels do not decide</span>
+<span class="sd">        it. The exception is weights without labels that are a value for each row of</span>
+<span class="sd">        a dependent that is not balanced. Any other number of values raises a</span>
+<span class="sd">        ``ValueError`` that gives the accepted numbers.</span>
+<span class="sd">        """</span>
         <span class="k">if</span> <span class="n">weights</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">_is_weighted</span> <span class="o">=</span> <span class="kc">False</span>
             <span class="n">frame</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">dependent</span><span class="o">.</span><span class="n">dataframe</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
@@ -1319,6 +1391,7 @@
         <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">weights</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">):</span>
             <span class="n">weights</span> <span class="o">=</span> <span class="n">as_float64</span><span class="p">(</span><span class="n">weights</span><span class="p">,</span> <span class="s2">"weights"</span><span class="p">)</span>
         <span class="n">nobs</span><span class="p">,</span> <span class="n">nentity</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">exog</span><span class="o">.</span><span class="n">nobs</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">exog</span><span class="o">.</span><span class="n">nentity</span>
+        <span class="n">nrows</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">dependent</span><span class="o">.</span><span class="n">dataframe</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
         <span class="n">entities</span><span class="p">,</span> <span class="n">times</span> <span class="o">=</span> <span class="n">_grid_axes</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">dependent</span><span class="o">.</span><span class="n">index</span><span class="p">)</span>
         <span class="n">labelled</span> <span class="o">=</span> <span class="n">_is_labelled</span><span class="p">(</span><span class="n">weights</span><span class="p">)</span>
         <span class="c1"># Weights for each time period or entity have to use the time periods or</span>
@@ -1336,19 +1409,56 @@
 
         <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">weights</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">):</span>
             <span class="n">weights</span> <span class="o">=</span> <span class="n">cast</span><span class="p">(</span><span class="s2">"linearmodels.typing.data.Float64Array"</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">squeeze</span><span class="p">(</span><span class="n">weights</span><span class="p">))</span>
-        <span class="k">if</span> <span class="n">weights</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">==</span> <span class="n">nobs</span> <span class="ow">and</span> <span class="n">nobs</span> <span class="o">==</span> <span class="n">nentity</span><span class="p">:</span>
-            <span class="k">raise</span> <span class="n">AmbiguityError</span><span class="p">(</span>
-                <span class="s2">"Unable to distinguish nobs form nentity since they are "</span>
-                <span class="s2">"equal. You must use an 2-d array to avoid ambiguity."</span>
-            <span class="p">)</span>
-        <span class="k">if</span> <span class="p">(</span>
+        <span class="k">elif</span> <span class="p">(</span>
+            <span class="nb">isinstance</span><span class="p">(</span><span class="n">weights</span><span class="p">,</span> <span class="n">DataFrame</span><span class="p">)</span>
+            <span class="ow">and</span> <span class="n">weights</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">==</span> <span class="mi">1</span>
+            <span class="ow">and</span> <span class="n">is_default_index</span><span class="p">(</span><span class="n">weights</span><span class="o">.</span><span class="n">index</span><span class="p">)</span>
+        <span class="p">):</span>
+            <span class="c1"># A column of values with a default index has no labels. It is read as the</span>
+            <span class="c1"># array with a column is, whatever the name of the column is</span>
+            <span class="n">column</span> <span class="o">=</span> <span class="n">as_float64</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">asarray</span><span class="p">(</span><span class="n">weights</span><span class="p">),</span> <span class="s2">"weights"</span><span class="p">)</span>
+            <span class="n">weights</span> <span class="o">=</span> <span class="n">cast</span><span class="p">(</span><span class="s2">"linearmodels.typing.data.Float64Array"</span><span class="p">,</span> <span class="n">column</span><span class="p">[:,</span> <span class="mi">0</span><span class="p">])</span>
+            <span class="n">labelled</span> <span class="o">=</span> <span class="kc">False</span>
+        <span class="n">unbalanced</span> <span class="o">=</span> <span class="n">nrows</span> <span class="o">!=</span> <span class="n">nobs</span> <span class="o">*</span> <span class="n">nentity</span>
+        <span class="c1"># The labels of a pandas object with a MultiIndex identify the rows</span>
+        <span class="n">row_labels</span> <span class="o">=</span> <span class="p">(</span>
             <span class="nb">isinstance</span><span class="p">(</span><span class="n">weights</span><span class="p">,</span> <span class="p">(</span><span class="n">Series</span><span class="p">,</span> <span class="n">DataFrame</span><span class="p">))</span>
             <span class="ow">and</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">weights</span><span class="o">.</span><span class="n">index</span><span class="p">,</span> <span class="n">MultiIndex</span><span class="p">)</span>
-            <span class="ow">and</span> <span class="n">weights</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">==</span> <span class="bp">self</span><span class="o">.</span><span class="n">dependent</span><span class="o">.</span><span class="n">dataframe</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+            <span class="ow">and</span> <span class="n">weights</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">==</span> <span class="n">nrows</span>
+        <span class="p">)</span>
+        <span class="c1"># 1-d weights with a value for each row of dependent. If dependent is not</span>
+        <span class="c1"># balanced it has fewer rows than combinations of a time period and an entity</span>
+        <span class="c1"># (nobs * nentity), so that the weights cannot be a value for each combination.</span>
+        <span class="c1"># Weights without labels are a value for each row also if the number of rows is</span>
+        <span class="c1"># nobs or nentity, which happens if every time period or entity has a single</span>
+        <span class="c1"># row. Weights with labels are read by their labels in that case, so that a</span>
+        <span class="c1"># Series indexed by the time periods is a value for each time period, and one</span>
+        <span class="c1"># indexed by the entities a value for each entity. If dependent is balanced, a</span>
+        <span class="c1"># single entity or time period makes the number of rows nobs or nentity, and the</span>
+        <span class="c1"># weights are read as before, as a value for each time period or entity</span>
+        <span class="n">by_row</span> <span class="o">=</span> <span class="p">(</span>
+            <span class="n">weights</span><span class="o">.</span><span class="n">ndim</span> <span class="o">==</span> <span class="mi">1</span>
+            <span class="ow">and</span> <span class="n">weights</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">==</span> <span class="n">nrows</span>
+            <span class="ow">and</span> <span class="p">(</span>
+                <span class="n">weights</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="ow">not</span> <span class="ow">in</span> <span class="p">(</span><span class="n">nobs</span><span class="p">,</span> <span class="n">nentity</span><span class="p">)</span> <span class="ow">or</span> <span class="p">(</span><span class="n">unbalanced</span> <span class="ow">and</span> <span class="ow">not</span> <span class="n">labelled</span><span class="p">)</span>
+            <span class="p">)</span>
+        <span class="p">)</span>
+        <span class="k">if</span> <span class="p">(</span>
+            <span class="n">weights</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">==</span> <span class="n">nobs</span>
+            <span class="ow">and</span> <span class="n">nobs</span> <span class="o">==</span> <span class="n">nentity</span>
+            <span class="ow">and</span> <span class="ow">not</span> <span class="n">by_row</span>
+            <span class="ow">and</span> <span class="ow">not</span> <span class="p">(</span><span class="n">row_labels</span> <span class="ow">and</span> <span class="n">unbalanced</span><span class="p">)</span>
         <span class="p">):</span>
+            <span class="k">raise</span> <span class="n">AmbiguityError</span><span class="p">(</span>
+                <span class="s2">"Unable to distinguish nobs from nentity since they are "</span>
+                <span class="s2">"equal. You must use a 2-d array to avoid ambiguity."</span>
+            <span class="p">)</span>
+        <span class="k">if</span> <span class="n">row_labels</span><span class="p">:</span>
             <span class="n">panel</span> <span class="o">=</span> <span class="n">PanelData</span><span class="p">(</span><span class="n">DataFrame</span><span class="p">(</span><span class="n">weights</span><span class="p">))</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">_check_labels</span><span class="p">(</span><span class="s2">"weights"</span><span class="p">,</span> <span class="n">panel</span><span class="o">.</span><span class="n">index</span><span class="p">,</span> <span class="n">labelled</span><span class="p">)</span>
             <span class="k">return</span> <span class="n">panel</span>
+        <span class="k">elif</span> <span class="n">by_row</span><span class="p">:</span>
+            <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_weights_by_row</span><span class="p">(</span><span class="n">weights</span><span class="p">,</span> <span class="n">labelled</span><span class="p">)</span>
         <span class="k">elif</span> <span class="n">weights</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">==</span> <span class="n">nobs</span> <span class="ow">and</span> <span class="n">weights</span><span class="o">.</span><span class="n">ndim</span> <span class="o">==</span> <span class="mi">1</span><span class="p">:</span>
             <span class="k">if</span> <span class="p">(</span>
                 <span class="n">labelled</span>
@@ -1369,16 +1479,50 @@
             <span class="n">weights_arr</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">asarray</span><span class="p">(</span><span class="n">weights</span><span class="p">)[</span><span class="kc">None</span><span class="p">,</span> <span class="p">:]</span>
             <span class="n">weights_arr</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">ones</span><span class="p">((</span><span class="n">nobs</span><span class="p">,</span> <span class="mi">1</span><span class="p">))</span> <span class="o">@</span> <span class="n">weights_arr</span>
             <span class="n">grid</span> <span class="o">=</span> <span class="n">DataFrame</span><span class="p">(</span><span class="n">weights_arr</span><span class="p">,</span> <span class="n">index</span><span class="o">=</span><span class="n">times</span><span class="p">,</span> <span class="n">columns</span><span class="o">=</span><span class="n">entities</span><span class="p">)</span>
-        <span class="k">elif</span> <span class="n">weights</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">==</span> <span class="n">nentity</span> <span class="o">*</span> <span class="n">nobs</span> <span class="ow">and</span> <span class="n">weights</span><span class="o">.</span><span class="n">size</span><span class="p">:</span>
-            <span class="k">if</span> <span class="n">labelled</span><span class="p">:</span>
-                <span class="bp">self</span><span class="o">.</span><span class="n">_check_labels</span><span class="p">(</span><span class="s2">"weights"</span><span class="p">,</span> <span class="n">labels_1d</span><span class="p">(</span><span class="n">weights</span><span class="p">),</span> <span class="n">labelled</span><span class="p">)</span>
-            <span class="n">frame</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">dependent</span><span class="o">.</span><span class="n">dataframe</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
-            <span class="c1"># TODO: Fix this for pandas 3</span>
-            <span class="n">frame</span><span class="o">.</span><span class="n">iloc</span><span class="p">[:,</span> <span class="p">:]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">asarray</span><span class="p">(</span><span class="n">weights</span><span class="p">)[:,</span> <span class="kc">None</span><span class="p">]</span>
-            <span class="k">return</span> <span class="n">PanelData</span><span class="p">(</span><span class="n">frame</span><span class="p">)</span>
         <span class="k">else</span><span class="p">:</span>
-            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">"Weights do not have a supported shape."</span><span class="p">)</span>
+            <span class="n">ncells</span> <span class="o">=</span> <span class="n">nobs</span> <span class="o">*</span> <span class="n">nentity</span>
+            <span class="n">msg</span> <span class="o">=</span> <span class="p">(</span>
+                <span class="s2">"Weights do not have a supported shape. The weights have shape "</span>
+                <span class="sa">f</span><span class="s2">"</span><span class="si">{</span><span class="n">weights</span><span class="o">.</span><span class="n">shape</span><span class="si">}</span><span class="s2">. 1-d weights must have </span><span class="si">{</span><span class="n">nrows</span><span class="si">}</span><span class="s2"> values (one for "</span>
+                <span class="sa">f</span><span class="s2">"each row of dependent), </span><span class="si">{</span><span class="n">nobs</span><span class="si">}</span><span class="s2"> values (one for each time period) "</span>
+                <span class="sa">f</span><span class="s2">"or </span><span class="si">{</span><span class="n">nentity</span><span class="si">}</span><span class="s2"> values (one for each entity). 2-d weights must have "</span>
+                <span class="sa">f</span><span class="s2">"</span><span class="si">{</span><span class="n">nobs</span><span class="si">}</span><span class="s2"> rows (time periods) and </span><span class="si">{</span><span class="n">nentity</span><span class="si">}</span><span class="s2"> columns (entities)."</span>
+            <span class="p">)</span>
+            <span class="k">if</span> <span class="n">weights</span><span class="o">.</span><span class="n">ndim</span> <span class="o">==</span> <span class="mi">1</span> <span class="ow">and</span> <span class="n">weights</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">==</span> <span class="n">ncells</span> <span class="ow">and</span> <span class="n">ncells</span> <span class="o">!=</span> <span class="n">nrows</span><span class="p">:</span>
+                <span class="n">msg</span> <span class="o">+=</span> <span class="p">(</span>
+                    <span class="sa">f</span><span class="s2">" dependent has </span><span class="si">{</span><span class="n">nrows</span><span class="si">}</span><span class="s2"> rows and not </span><span class="si">{</span><span class="n">ncells</span><span class="si">}</span><span class="s2">, the number of "</span>
+                    <span class="s2">"combinations of a time period and an entity, since it is not "</span>
+                    <span class="s2">"balanced."</span>
+                <span class="p">)</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="n">msg</span><span class="p">)</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_grid_to_rows</span><span class="p">(</span><span class="n">PanelData</span><span class="p">(</span><span class="n">grid</span><span class="p">),</span> <span class="kc">False</span><span class="p">)</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">_weights_by_row</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">weights</span><span class="p">:</span> <span class="n">Any</span><span class="p">,</span> <span class="n">labelled</span><span class="p">:</span> <span class="nb">bool</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">PanelData</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">"""</span>
+<span class="sd">        Place weights that have a value for each row on the rows of dependent</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        weights : array_like</span>
+<span class="sd">            1-d weights with as many values as dependent has rows. The values are</span>
+<span class="sd">            paired with the rows of dependent by position, whatever the order of the</span>
+<span class="sd">            rows is, as a 1-d array of clusters or other effects is.</span>
+<span class="sd">        labelled : bool</span>
+<span class="sd">            Whether the weights carry labels, which have to be those of the inputs</span>
+<span class="sd">            with labels.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        PanelData</span>
+<span class="sd">            The weights, with the rows of dependent before the observations with</span>
+<span class="sd">            missing values are dropped.</span>
+<span class="sd">        """</span>
+        <span class="k">if</span> <span class="n">labelled</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_check_labels</span><span class="p">(</span><span class="s2">"weights"</span><span class="p">,</span> <span class="n">labels_1d</span><span class="p">(</span><span class="n">weights</span><span class="p">),</span> <span class="n">labelled</span><span class="p">)</span>
+        <span class="n">frame</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">dependent</span><span class="o">.</span><span class="n">dataframe</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
+        <span class="c1"># TODO: Fix this for pandas 3</span>
+        <span class="n">frame</span><span class="o">.</span><span class="n">iloc</span><span class="p">[:,</span> <span class="p">:]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">asarray</span><span class="p">(</span><span class="n">weights</span><span class="p">)[:,</span> <span class="kc">None</span><span class="p">]</span>
+        <span class="k">return</span> <span class="n">PanelData</span><span class="p">(</span><span class="n">frame</span><span class="p">)</span>
 
     <span class="k">def</span><span class="w"> </span><span class="nf">_grid_to_rows</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span> <span class="n">grid</span><span class="p">:</span> <span class="n">PanelData</span><span class="p">,</span> <span class="n">labelled</span><span class="p">:</span> <span class="nb">bool</span><span class="p">,</span> <span class="n">name</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">"weights"</span>
@@ -1994,6 +2138,21 @@
 <span class="sd">        Dependent need not be balanced when the weights are given for each time</span>
 <span class="sd">        period, entity or combination: the weights of the combinations that</span>
 <span class="sd">        dependent does not have are not used.</span>
+<span class="sd">        A 1-d array has a value for each row of dependent, in the order of the</span>
+<span class="sd">        rows, if it has as many values as dependent has rows. It has a value for</span>
+<span class="sd">        each time period if it has as many values as there are time periods, and</span>
+<span class="sd">        a value for each entity if it has as many as there are entities. Weights</span>
+<span class="sd">        with labels (a pandas object with an index that is not the default index)</span>
+<span class="sd">        are read by their labels, so that a Series indexed by the time periods has</span>
+<span class="sd">        a value for each time period, and one indexed by the entities has a value</span>
+<span class="sd">        for each entity. Weights without labels (an array, a list, a tuple, or a</span>
+<span class="sd">        Series or a DataFrame with one column that has the default index) are read</span>
+<span class="sd">        by their number of values. If dependent is not balanced and has as many</span>
+<span class="sd">        rows as time periods or entities, they have a value for each row. An</span>
+<span class="sd">        ``AmbiguityError`` is raised if the numbers of time periods and entities</span>
+<span class="sd">        are equal and the weights have that many values, unless they have no</span>
+<span class="sd">        labels and a value for each row. Any other number of values raises a</span>
+<span class="sd">        ``ValueError``.</span>
 <span class="sd">    check_rank : bool</span>
 <span class="sd">        Flag indicating whether to perform a rank check on the exogenous</span>
 <span class="sd">        variables to ensure that the model is identified. Skipping this</span>
@@ -2014,6 +2173,26 @@
 <span class="sd">       ``weights`` for each time period, each entity or each time period and</span>
 <span class="sd">       entity can be used if ``dependent`` is not balanced. Earlier versions</span>
 <span class="sd">       raised "weights must have the same number of observations as dependent".</span>
+
+<span class="sd">    .. versionchanged:: 7.1</span>
+
+<span class="sd">       ``weights`` that are a 1-d array with a value for each row of ``dependent``</span>
+<span class="sd">       can be used if ``dependent`` is not balanced. Earlier versions raised</span>
+<span class="sd">       "Weights do not have a supported shape". An array with a value for each</span>
+<span class="sd">       combination of a time period and an entity is not a value for each row if</span>
+<span class="sd">       ``dependent`` is not balanced. It raised an error from pandas or NumPy, e.g.,</span>
+<span class="sd">       "could not broadcast input array from shape (30,1) into shape (27,1)", and</span>
+<span class="sd">       raises "Weights do not have a supported shape" now, which names the numbers</span>
+<span class="sd">       of values that are accepted. If ``dependent`` is not balanced and has as many</span>
+<span class="sd">       rows as time periods or entities, weights without labels (an array, or a</span>
+<span class="sd">       Series with the default index) with that many values are a value for each</span>
+<span class="sd">       row, and a Series indexed by the time periods or by the entities is a value</span>
+<span class="sd">       for each time period or entity. Earlier versions raised "weights must have</span>
+<span class="sd">       the same number of observations as dependent", or an ``AmbiguityError`` if</span>
+<span class="sd">       the numbers of time periods and entities were equal. A DataFrame with one</span>
+<span class="sd">       column and the default index is read as an array with a column is. It raised</span>
+<span class="sd">       an error from pandas or NumPy if ``dependent`` was balanced, and "Weights do</span>
+<span class="sd">       not have a supported shape" if it was not.</span>
 <span class="sd">    """</span>
 
     <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span>
@@ -2397,6 +2576,21 @@
 <span class="sd">        Dependent need not be balanced when the weights are given for each time</span>
 <span class="sd">        period, entity or combination: the weights of the combinations that</span>
 <span class="sd">        dependent does not have are not used.</span>
+<span class="sd">        A 1-d array has a value for each row of dependent, in the order of the</span>
+<span class="sd">        rows, if it has as many values as dependent has rows. It has a value for</span>
+<span class="sd">        each time period if it has as many values as there are time periods, and</span>
+<span class="sd">        a value for each entity if it has as many as there are entities. Weights</span>
+<span class="sd">        with labels (a pandas object with an index that is not the default index)</span>
+<span class="sd">        are read by their labels, so that a Series indexed by the time periods has</span>
+<span class="sd">        a value for each time period, and one indexed by the entities has a value</span>
+<span class="sd">        for each entity. Weights without labels (an array, a list, a tuple, or a</span>
+<span class="sd">        Series or a DataFrame with one column that has the default index) are read</span>
+<span class="sd">        by their number of values. If dependent is not balanced and has as many</span>
+<span class="sd">        rows as time periods or entities, they have a value for each row. An</span>
+<span class="sd">        ``AmbiguityError`` is raised if the numbers of time periods and entities</span>
+<span class="sd">        are equal and the weights have that many values, unless they have no</span>
+<span class="sd">        labels and a value for each row. Any other number of values raises a</span>
+<span class="sd">        ``ValueError``.</span>
 <span class="sd">    entity_effects : bool</span>
 <span class="sd">        Flag whether to include entity (fixed) effects in the model</span>
 <span class="sd">    time_effects : bool</span>
@@ -2464,6 +2658,26 @@
 <span class="sd">       only if the rows are sorted by entity and then time: if they were sorted by</span>
 <span class="sd">       time and then entity, an array was attached to the wrong observations</span>
 <span class="sd">       without an error, and a pandas object with labels was rejected.</span>
+
+<span class="sd">    .. versionchanged:: 7.1</span>
+
+<span class="sd">       ``weights`` that are a 1-d array with a value for each row of ``dependent``</span>
+<span class="sd">       can be used if ``dependent`` is not balanced. Earlier versions raised</span>
+<span class="sd">       "Weights do not have a supported shape". An array with a value for each</span>
+<span class="sd">       combination of a time period and an entity is not a value for each row if</span>
+<span class="sd">       ``dependent`` is not balanced. It raised an error from pandas or NumPy, e.g.,</span>
+<span class="sd">       "could not broadcast input array from shape (30,1) into shape (27,1)", and</span>
+<span class="sd">       raises "Weights do not have a supported shape" now, which names the numbers</span>
+<span class="sd">       of values that are accepted. If ``dependent`` is not balanced and has as many</span>
+<span class="sd">       rows as time periods or entities, weights without labels (an array, or a</span>
+<span class="sd">       Series with the default index) with that many values are a value for each</span>
+<span class="sd">       row, and a Series indexed by the time periods or by the entities is a value</span>
+<span class="sd">       for each time period or entity. Earlier versions raised "weights must have</span>
+<span class="sd">       the same number of observations as dependent", or an ``AmbiguityError`` if</span>
+<span class="sd">       the numbers of time periods and entities were equal. A DataFrame with one</span>
+<span class="sd">       column and the default index is read as an array with a column is. It raised</span>
+<span class="sd">       an error from pandas or NumPy if ``dependent`` was balanced, and "Weights do</span>
+<span class="sd">       not have a supported shape" if it was not.</span>
 
 <span class="sd">    If both ``entity_effect`` and ``time_effects`` are ``False``, and no other</span>
 <span class="sd">    effects are included, the model reduces to :class:`PooledOLS`.</span>
@@ -3627,6 +3841,21 @@
 <span class="sd">        Dependent need not be balanced when the weights are given for each time</span>
 <span class="sd">        period, entity or combination: the weights of the combinations that</span>
 <span class="sd">        dependent does not have are not used.</span>
+<span class="sd">        A 1-d array has a value for each row of dependent, in the order of the</span>
+<span class="sd">        rows, if it has as many values as dependent has rows. It has a value for</span>
+<span class="sd">        each time period if it has as many values as there are time periods, and</span>
+<span class="sd">        a value for each entity if it has as many as there are entities. Weights</span>
+<span class="sd">        with labels (a pandas object with an index that is not the default index)</span>
+<span class="sd">        are read by their labels, so that a Series indexed by the time periods has</span>
+<span class="sd">        a value for each time period, and one indexed by the entities has a value</span>
+<span class="sd">        for each entity. Weights without labels (an array, a list, a tuple, or a</span>
+<span class="sd">        Series or a DataFrame with one column that has the default index) are read</span>
+<span class="sd">        by their number of values. If dependent is not balanced and has as many</span>
+<span class="sd">        rows as time periods or entities, they have a value for each row. An</span>
+<span class="sd">        ``AmbiguityError`` is raised if the numbers of time periods and entities</span>
+<span class="sd">        are equal and the weights have that many values, unless they have no</span>
+<span class="sd">        labels and a value for each row. Any other number of values raises a</span>
+<span class="sd">        ``ValueError``.</span>
 
 <span class="sd">    Notes</span>
 <span class="sd">    -----</span>
@@ -3643,6 +3872,26 @@
 <span class="sd">       ``weights`` for each time period, each entity or each time period and</span>
 <span class="sd">       entity can be used if ``dependent`` is not balanced. Earlier versions</span>
 <span class="sd">       raised "weights must have the same number of observations as dependent".</span>
+
+<span class="sd">    .. versionchanged:: 7.1</span>
+
+<span class="sd">       ``weights`` that are a 1-d array with a value for each row of ``dependent``</span>
+<span class="sd">       can be used if ``dependent`` is not balanced. Earlier versions raised</span>
+<span class="sd">       "Weights do not have a supported shape". An array with a value for each</span>
+<span class="sd">       combination of a time period and an entity is not a value for each row if</span>
+<span class="sd">       ``dependent`` is not balanced. It raised an error from pandas or NumPy, e.g.,</span>
+<span class="sd">       "could not broadcast input array from shape (30,1) into shape (27,1)", and</span>
+<span class="sd">       raises "Weights do not have a supported shape" now, which names the numbers</span>
+<span class="sd">       of values that are accepted. If ``dependent`` is not balanced and has as many</span>
+<span class="sd">       rows as time periods or entities, weights without labels (an array, or a</span>
+<span class="sd">       Series with the default index) with that many values are a value for each</span>
+<span class="sd">       row, and a Series indexed by the time periods or by the entities is a value</span>
+<span class="sd">       for each time period or entity. Earlier versions raised "weights must have</span>
+<span class="sd">       the same number of observations as dependent", or an ``AmbiguityError`` if</span>
+<span class="sd">       the numbers of time periods and entities were equal. A DataFrame with one</span>
+<span class="sd">       column and the default index is read as an array with a column is. It raised</span>
+<span class="sd">       an error from pandas or NumPy if ``dependent`` was balanced, and "Weights do</span>
+<span class="sd">       not have a supported shape" if it was not.</span>
 <span class="sd">    """</span>
 
     <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span>
@@ -3988,6 +4237,21 @@
 <span class="sd">        Dependent need not be balanced when the weights are given for each time</span>
 <span class="sd">        period, entity or combination: the weights of the combinations that</span>
 <span class="sd">        dependent does not have are not used.</span>
+<span class="sd">        A 1-d array has a value for each row of dependent, in the order of the</span>
+<span class="sd">        rows, if it has as many values as dependent has rows. It has a value for</span>
+<span class="sd">        each time period if it has as many values as there are time periods, and</span>
+<span class="sd">        a value for each entity if it has as many as there are entities. Weights</span>
+<span class="sd">        with labels (a pandas object with an index that is not the default index)</span>
+<span class="sd">        are read by their labels, so that a Series indexed by the time periods has</span>
+<span class="sd">        a value for each time period, and one indexed by the entities has a value</span>
+<span class="sd">        for each entity. Weights without labels (an array, a list, a tuple, or a</span>
+<span class="sd">        Series or a DataFrame with one column that has the default index) are read</span>
+<span class="sd">        by their number of values. If dependent is not balanced and has as many</span>
+<span class="sd">        rows as time periods or entities, they have a value for each row. An</span>
+<span class="sd">        ``AmbiguityError`` is raised if the numbers of time periods and entities</span>
+<span class="sd">        are equal and the weights have that many values, unless they have no</span>
+<span class="sd">        labels and a value for each row. Any other number of values raises a</span>
+<span class="sd">        ``ValueError``.</span>
 
 <span class="sd">    Notes</span>
 <span class="sd">    -----</span>
@@ -4025,6 +4289,26 @@
 <span class="sd">       ``weights`` for each time period, each entity or each time period and</span>
 <span class="sd">       entity can be used if ``dependent`` is not balanced. Earlier versions</span>
 <span class="sd">       raised "weights must have the same number of observations as dependent".</span>
+
+<span class="sd">    .. versionchanged:: 7.1</span>
+
+<span class="sd">       ``weights`` that are a 1-d array with a value for each row of ``dependent``</span>
+<span class="sd">       can be used if ``dependent`` is not balanced. Earlier versions raised</span>
+<span class="sd">       "Weights do not have a supported shape". An array with a value for each</span>
+<span class="sd">       combination of a time period and an entity is not a value for each row if</span>
+<span class="sd">       ``dependent`` is not balanced. It raised an error from pandas or NumPy, e.g.,</span>
+<span class="sd">       "could not broadcast input array from shape (30,1) into shape (27,1)", and</span>
+<span class="sd">       raises "Weights do not have a supported shape" now, which names the numbers</span>
+<span class="sd">       of values that are accepted. If ``dependent`` is not balanced and has as many</span>
+<span class="sd">       rows as time periods or entities, weights without labels (an array, or a</span>
+<span class="sd">       Series with the default index) with that many values are a value for each</span>
+<span class="sd">       row, and a Series indexed by the time periods or by the entities is a value</span>
+<span class="sd">       for each time period or entity. Earlier versions raised "weights must have</span>
+<span class="sd">       the same number of observations as dependent", or an ``AmbiguityError`` if</span>
+<span class="sd">       the numbers of time periods and entities were equal. A DataFrame with one</span>
+<span class="sd">       column and the default index is read as an array with a column is. It raised</span>
+<span class="sd">       an error from pandas or NumPy if ``dependent`` was balanced, and "Weights do</span>
+<span class="sd">       not have a supported shape" if it was not.</span>
 <span class="sd">    """</span>
 
     <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span>
@@ -4438,6 +4722,21 @@
 <span class="sd">        Dependent need not be balanced when the weights are given for each time</span>
 <span class="sd">        period, entity or combination: the weights of the combinations that</span>
 <span class="sd">        dependent does not have are not used.</span>
+<span class="sd">        A 1-d array has a value for each row of dependent, in the order of the</span>
+<span class="sd">        rows, if it has as many values as dependent has rows. It has a value for</span>
+<span class="sd">        each time period if it has as many values as there are time periods, and</span>
+<span class="sd">        a value for each entity if it has as many as there are entities. Weights</span>
+<span class="sd">        with labels (a pandas object with an index that is not the default index)</span>
+<span class="sd">        are read by their labels, so that a Series indexed by the time periods has</span>
+<span class="sd">        a value for each time period, and one indexed by the entities has a value</span>
+<span class="sd">        for each entity. Weights without labels (an array, a list, a tuple, or a</span>
+<span class="sd">        Series or a DataFrame with one column that has the default index) are read</span>
+<span class="sd">        by their number of values. If dependent is not balanced and has as many</span>
+<span class="sd">        rows as time periods or entities, they have a value for each row. An</span>
+<span class="sd">        ``AmbiguityError`` is raised if the numbers of time periods and entities</span>
+<span class="sd">        are equal and the weights have that many values, unless they have no</span>
+<span class="sd">        labels and a value for each row. Any other number of values raises a</span>
+<span class="sd">        ``ValueError``.</span>
 
 <span class="sd">    Notes</span>
 <span class="sd">    -----</span>
@@ -4455,6 +4754,26 @@
 <span class="sd">       ``weights`` for each time period, each entity or each time period and</span>
 <span class="sd">       entity can be used if ``dependent`` is not balanced. Earlier versions</span>
 <span class="sd">       raised "weights must have the same number of observations as dependent".</span>
+
+<span class="sd">    .. versionchanged:: 7.1</span>
+
+<span class="sd">       ``weights`` that are a 1-d array with a value for each row of ``dependent``</span>
+<span class="sd">       can be used if ``dependent`` is not balanced. Earlier versions raised</span>
+<span class="sd">       "Weights do not have a supported shape". An array with a value for each</span>
+<span class="sd">       combination of a time period and an entity is not a value for each row if</span>
+<span class="sd">       ``dependent`` is not balanced. It raised an error from pandas or NumPy, e.g.,</span>
+<span class="sd">       "could not broadcast input array from shape (30,1) into shape (27,1)", and</span>
+<span class="sd">       raises "Weights do not have a supported shape" now, which names the numbers</span>
+<span class="sd">       of values that are accepted. If ``dependent`` is not balanced and has as many</span>
+<span class="sd">       rows as time periods or entities, weights without labels (an array, or a</span>
+<span class="sd">       Series with the default index) with that many values are a value for each</span>
+<span class="sd">       row, and a Series indexed by the time periods or by the entities is a value</span>
+<span class="sd">       for each time period or entity. Earlier versions raised "weights must have</span>
+<span class="sd">       the same number of observations as dependent", or an ``AmbiguityError`` if</span>
+<span class="sd">       the numbers of time periods and entities were equal. A DataFrame with one</span>
+<span class="sd">       column and the default index is read as an array with a column is. It raised</span>
+<span class="sd">       an error from pandas or NumPy if ``dependent`` was balanced, and "Weights do</span>
+<span class="sd">       not have a supported shape" if it was not.</span>
 <span class="sd">    """</span>
 
     <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span>
@@ -4891,6 +5210,21 @@
 <span class="sd">        Dependent need not be balanced when the weights are given for each time</span>
 <span class="sd">        period, entity or combination: the weights of the combinations that</span>
 <span class="sd">        dependent does not have are not used.</span>
+<span class="sd">        A 1-d array has a value for each row of dependent, in the order of the</span>
+<span class="sd">        rows, if it has as many values as dependent has rows. It has a value for</span>
+<span class="sd">        each time period if it has as many values as there are time periods, and</span>
+<span class="sd">        a value for each entity if it has as many as there are entities. Weights</span>
+<span class="sd">        with labels (a pandas object with an index that is not the default index)</span>
+<span class="sd">        are read by their labels, so that a Series indexed by the time periods has</span>
+<span class="sd">        a value for each time period, and one indexed by the entities has a value</span>
+<span class="sd">        for each entity. Weights without labels (an array, a list, a tuple, or a</span>
+<span class="sd">        Series or a DataFrame with one column that has the default index) are read</span>
+<span class="sd">        by their number of values. If dependent is not balanced and has as many</span>
+<span class="sd">        rows as time periods or entities, they have a value for each row. An</span>
+<span class="sd">        ``AmbiguityError`` is raised if the numbers of time periods and entities</span>
+<span class="sd">        are equal and the weights have that many values, unless they have no</span>
+<span class="sd">        labels and a value for each row. Any other number of values raises a</span>
+<span class="sd">        ``ValueError``.</span>
 
 <span class="sd">    Notes</span>
 <span class="sd">    -----</span>
@@ -4951,6 +5285,26 @@
 <span class="sd">       ``weights`` for each time period, each entity or each time period and</span>
 <span class="sd">       entity can be used if ``dependent`` is not balanced. Earlier versions</span>
 <span class="sd">       raised "weights must have the same number of observations as dependent".</span>
+
+<span class="sd">    .. versionchanged:: 7.1</span>
+
+<span class="sd">       ``weights`` that are a 1-d array with a value for each row of ``dependent``</span>
+<span class="sd">       can be used if ``dependent`` is not balanced. Earlier versions raised</span>
+<span class="sd">       "Weights do not have a supported shape". An array with a value for each</span>
+<span class="sd">       combination of a time period and an entity is not a value for each row if</span>
+<span class="sd">       ``dependent`` is not balanced. It raised an error from pandas or NumPy, e.g.,</span>
+<span class="sd">       "could not broadcast input array from shape (30,1) into shape (27,1)", and</span>
+<span class="sd">       raises "Weights do not have a supported shape" now, which names the numbers</span>
+<span class="sd">       of values that are accepted. If ``dependent`` is not balanced and has as many</span>
+<span class="sd">       rows as time periods or entities, weights without labels (an array, or a</span>
+<span class="sd">       Series with the default index) with that many values are a value for each</span>
+<span class="sd">       row, and a Series indexed by the time periods or by the entities is a value</span>
+<span class="sd">       for each time period or entity. Earlier versions raised "weights must have</span>
+<span class="sd">       the same number of observations as dependent", or an ``AmbiguityError`` if</span>
+<span class="sd">       the numbers of time periods and entities were equal. A DataFrame with one</span>
+<span class="sd">       column and the default index is read as an array with a column is. It raised</span>
+<span class="sd">       an error from pandas or NumPy if ``dependent`` was balanced, and "Weights do</span>
+<span class="sd">       not have a supported shape" if it was not.</span>
 
 <span class="sd">    References</span>
 <span class="sd">    ----------</span>

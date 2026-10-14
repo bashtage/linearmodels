@@ -23,7 +23,7 @@
     
   
       
-        <title>linearmodels.panel.model.FirstDifferenceOLS - linearmodels v7.1 (+468)</title>
+        <title>linearmodels.panel.model.FirstDifferenceOLS - linearmodels v7.1 (+480)</title>
       
     
 
@@ -100,7 +100,7 @@
 
 <header class="md-header md-header--shadow" data-md-component="header">
   <nav class="md-header__inner md-grid" aria-label="Header">
-    <a href="../../index.html" title="linearmodels v7.1 (+468)" class="md-header__button md-logo" aria-label="linearmodels v7.1 (+468)" data-md-component="logo">
+    <a href="../../index.html" title="linearmodels v7.1 (+480)" class="md-header__button md-logo" aria-label="linearmodels v7.1 (+480)" data-md-component="logo">
       <img src="../../_static/bw-logo.svg" alt="logo">
     </a>
     <label class="md-header__button md-icon" for="__drawer">
@@ -111,7 +111,7 @@
       <div class="md-header__ellipsis">
         <div class="md-header__topic">
           <span class="md-ellipsis">
-            linearmodels v7.1 (+468)
+            linearmodels v7.1 (+480)
           </span>
         </div>
         <div class="md-header__topic" data-md-component="header-topic">
@@ -206,10 +206,10 @@
 
 <nav class="md-nav md-nav--primary" aria-label="Navigation" data-md-level="0">
   <label class="md-nav__title" for="__drawer">
-    <a href="../../index.html" title="linearmodels v7.1 (+468)" class="md-nav__button md-logo" aria-label="linearmodels v7.1 (+468)" data-md-component="logo">
+    <a href="../../index.html" title="linearmodels v7.1 (+480)" class="md-nav__button md-logo" aria-label="linearmodels v7.1 (+480)" data-md-component="logo">
       <img src="../../_static/bw-logo.svg" alt="logo">
     </a>
-    linearmodels v7.1 (+468)
+    linearmodels v7.1 (+480)
   </label>
   
     <div class="md-nav__source">
@@ -1638,7 +1638,22 @@ as dependent or, if dependent has no labels, as exog. See
 <a class="reference internal" href="../faq.html#panel-input-alignment"><span class="std std-ref">Aligning Inputs</span></a>.
 Dependent need not be balanced when the weights are given for each time
 period, entity or combination: the weights of the combinations that
-dependent does not have are not used.</p>
+dependent does not have are not used.
+A 1-d array has a value for each row of dependent, in the order of the
+rows, if it has as many values as dependent has rows. It has a value for
+each time period if it has as many values as there are time periods, and
+a value for each entity if it has as many as there are entities. Weights
+with labels (a pandas object with an index that is not the default index)
+are read by their labels, so that a Series indexed by the time periods has
+a value for each time period, and one indexed by the entities has a value
+for each entity. Weights without labels (an array, a list, a tuple, or a
+Series or a DataFrame with one column that has the default index) are read
+by their number of values. If dependent is not balanced and has as many
+rows as time periods or entities, they have a value for each row. An
+<code class="docutils literal notranslate"><span class="pre">AmbiguityError</span></code> is raised if the numbers of time periods and entities
+are equal and the weights have that many values, unless they have no
+labels and a value for each row. Any other number of values raises a
+<code class="docutils literal notranslate"><span class="pre">ValueError</span></code>.</p>
 </dd>
 </dl>
 </dd>
@@ -1671,6 +1686,25 @@ has a gap.</p>
 <p class="admonition-title"><span class="versionmodified changed">Changed in version 7.1: </span><code class="docutils literal notranslate"><span class="pre">weights</span></code> for each time period, each entity or each time period and
 entity can be used if <code class="docutils literal notranslate"><span class="pre">dependent</span></code> is not balanced. Earlier versions
 raised “weights must have the same number of observations as dependent”.</p>
+</div>
+<div class="admonition versionchanged">
+<p class="admonition-title"><span class="versionmodified changed">Changed in version 7.1: </span><code class="docutils literal notranslate"><span class="pre">weights</span></code> that are a 1-d array with a value for each row of <code class="docutils literal notranslate"><span class="pre">dependent</span></code>
+can be used if <code class="docutils literal notranslate"><span class="pre">dependent</span></code> is not balanced. Earlier versions raised
+“Weights do not have a supported shape”. An array with a value for each
+combination of a time period and an entity is not a value for each row if
+<code class="docutils literal notranslate"><span class="pre">dependent</span></code> is not balanced. It raised an error from pandas or NumPy, e.g.,
+“could not broadcast input array from shape (30,1) into shape (27,1)”, and
+raises “Weights do not have a supported shape” now, which names the numbers
+of values that are accepted. If <code class="docutils literal notranslate"><span class="pre">dependent</span></code> is not balanced and has as many
+rows as time periods or entities, weights without labels (an array, or a
+Series with the default index) with that many values are a value for each
+row, and a Series indexed by the time periods or by the entities is a value
+for each time period or entity. Earlier versions raised “weights must have
+the same number of observations as dependent”, or an <code class="docutils literal notranslate"><span class="pre">AmbiguityError</span></code> if
+the numbers of time periods and entities were equal. A DataFrame with one
+column and the default index is read as an array with a column is. It raised
+an error from pandas or NumPy if <code class="docutils literal notranslate"><span class="pre">dependent</span></code> was balanced, and “Weights do
+not have a supported shape” if it was not.</p>
 </div>
 <p class="rubric">Methods</p>
 <table class="autosummary longtable docutils data align-default">
