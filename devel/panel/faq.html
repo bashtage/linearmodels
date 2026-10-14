@@ -23,7 +23,7 @@
     
   
       
-        <title>Implementation Choices - linearmodels v7.1 (+507)</title>
+        <title>Implementation Choices - linearmodels v7.1 (+513)</title>
       
     
 
@@ -100,7 +100,7 @@
 
 <header class="md-header md-header--shadow" data-md-component="header">
   <nav class="md-header__inner md-grid" aria-label="Header">
-    <a href="../index.html" title="linearmodels v7.1 (+507)" class="md-header__button md-logo" aria-label="linearmodels v7.1 (+507)" data-md-component="logo">
+    <a href="../index.html" title="linearmodels v7.1 (+513)" class="md-header__button md-logo" aria-label="linearmodels v7.1 (+513)" data-md-component="logo">
       <img src="../_static/bw-logo.svg" alt="logo">
     </a>
     <label class="md-header__button md-icon" for="__drawer">
@@ -111,7 +111,7 @@
       <div class="md-header__ellipsis">
         <div class="md-header__topic">
           <span class="md-ellipsis">
-            linearmodels v7.1 (+507)
+            linearmodels v7.1 (+513)
           </span>
         </div>
         <div class="md-header__topic" data-md-component="header-topic">
@@ -206,10 +206,10 @@
 
 <nav class="md-nav md-nav--primary" aria-label="Navigation" data-md-level="0">
   <label class="md-nav__title" for="__drawer">
-    <a href="../index.html" title="linearmodels v7.1 (+507)" class="md-nav__button md-logo" aria-label="linearmodels v7.1 (+507)" data-md-component="logo">
+    <a href="../index.html" title="linearmodels v7.1 (+513)" class="md-nav__button md-logo" aria-label="linearmodels v7.1 (+513)" data-md-component="logo">
       <img src="../_static/bw-logo.svg" alt="logo">
     </a>
-    linearmodels v7.1 (+507)
+    linearmodels v7.1 (+513)
   </label>
   
     <div class="md-nav__source">
@@ -1041,7 +1041,7 @@ default. This is the case for <a class="reference internal" href="panel/linearmo
 <a class="reference internal" href="panel/linearmodels.panel.model.FirstDifferenceOLS.html#linearmodels.panel.model.FirstDifferenceOLS" title="linearmodels.panel.model.FirstDifferenceOLS (Python class) — First difference model for panel data"><code class="xref py py-class docutils literal notranslate"><span class="pre">FirstDifferenceOLS</span></code></a>,
 <a class="reference internal" href="panel/linearmodels.panel.model.RandomEffects.html#linearmodels.panel.model.RandomEffects" title="linearmodels.panel.model.RandomEffects (Python class) — One-way Random Effects model for panel data"><code class="xref py py-class docutils literal notranslate"><span class="pre">RandomEffects</span></code></a> and
 <a class="reference internal" href="panel/linearmodels.panel.model.FamaMacBeth.html#linearmodels.panel.model.FamaMacBeth" title="linearmodels.panel.model.FamaMacBeth (Python class) — Pooled coefficient estimator for panel data"><code class="xref py py-class docutils literal notranslate"><span class="pre">FamaMacBeth</span></code></a>. The IV estimators, including
-<a class="reference internal" href="../iv/absorbing/linearmodels.iv.absorbing.AbsorbingLS.html#linearmodels.iv.absorbing.AbsorbingLS" title="linearmodels.iv.absorbing.AbsorbingLS (Python class) — Linear regression with high-dimensional effects"><code class="xref py py-class docutils literal notranslate"><span class="pre">AbsorbingLS</span></code></a>, have <code class="docutils literal notranslate"><span class="pre">debiased=False</span></code>.</p>
+<a class="reference internal" href="../iv/absorbing/linearmodels.iv.absorbing.AbsorbingLS.html#linearmodels.iv.absorbing.AbsorbingLS" title="linearmodels.iv.absorbing.AbsorbingLS (Python class) — Linear regression with high-dimensional effects."><code class="xref py py-class docutils literal notranslate"><span class="pre">AbsorbingLS</span></code></a>, have <code class="docutils literal notranslate"><span class="pre">debiased=False</span></code>.</p>
 <p>With <code class="docutils literal notranslate"><span class="pre">debiased=True</span></code>, the covariance is scaled by <span class="math notranslate nohighlight">\(n/(n-k)\)</span>, where
 <span class="math notranslate nohighlight">\(n\)</span> is the number of observations and <span class="math notranslate nohighlight">\(k\)</span> is the number of
 regressors. The p-values and the confidence intervals of the parameters use a
@@ -1107,7 +1107,7 @@ fit option <code class="docutils literal notranslate"><span class="pre">auto_df=
 of the variable. Entity effects are nested in the clusters of <code class="docutils literal notranslate"><span class="pre">cluster_entity=True</span></code>,
 and in clusters that are the industries of the entities if every entity is in one
 industry. The effect is nested in the clusters if it is nested in <strong>every</strong>
-cluster variable. This is the rule of <a class="reference internal" href="../iv/absorbing/linearmodels.iv.absorbing.AbsorbingLS.html#linearmodels.iv.absorbing.AbsorbingLS" title="linearmodels.iv.absorbing.AbsorbingLS (Python class) — Linear regression with high-dimensional effects"><code class="xref py py-class docutils literal notranslate"><span class="pre">AbsorbingLS</span></code></a>.
+cluster variable. This is the rule of <a class="reference internal" href="../iv/absorbing/linearmodels.iv.absorbing.AbsorbingLS.html#linearmodels.iv.absorbing.AbsorbingLS" title="linearmodels.iv.absorbing.AbsorbingLS (Python class) — Linear regression with high-dimensional effects."><code class="xref py py-class docutils literal notranslate"><span class="pre">AbsorbingLS</span></code></a>.
 It does not depend on the order of the cluster variables, which is why it is not
 enough that the effect is nested in one of them. For example:</p>
 <ul class="simple">
@@ -1230,7 +1230,7 @@ time effect to 0.</p>
 <h2 id="absorbingls-or-panelols"><span id="panel-absorbing-ls"></span>AbsorbingLS or PanelOLS<a class="headerlink" href="#absorbingls-or-panelols" title="Link to this heading">¶</a></h2>
 <p><a class="reference internal" href="panel/linearmodels.panel.model.PanelOLS.html#linearmodels.panel.model.PanelOLS" title="linearmodels.panel.model.PanelOLS (Python class) — One- and two-way fixed effects estimator for panel data"><code class="xref py py-class docutils literal notranslate"><span class="pre">PanelOLS</span></code></a> has up to two effects. It has the
 statistics of a panel estimator, and inference that matches Stata’s <code class="docutils literal notranslate"><span class="pre">xtreg</span></code>.
-<a class="reference internal" href="../iv/absorbing/linearmodels.iv.absorbing.AbsorbingLS.html#linearmodels.iv.absorbing.AbsorbingLS" title="linearmodels.iv.absorbing.AbsorbingLS (Python class) — Linear regression with high-dimensional effects"><code class="xref py py-class docutils literal notranslate"><span class="pre">AbsorbingLS</span></code></a> can absorb any number of effects,
+<a class="reference internal" href="../iv/absorbing/linearmodels.iv.absorbing.AbsorbingLS.html#linearmodels.iv.absorbing.AbsorbingLS" title="linearmodels.iv.absorbing.AbsorbingLS (Python class) — Linear regression with high-dimensional effects."><code class="xref py py-class docutils literal notranslate"><span class="pre">AbsorbingLS</span></code></a> can absorb any number of effects,
 and effects interacted with continuous variables, and it is designed for models
 with very many groups. It is not a panel estimator, and it reports the
 statistics of a regression. See <a class="reference internal" href="../iv/introduction.html#iv-absorbing-ls"><span class="std std-ref">Absorbing Least Squares</span></a> for more.</p>

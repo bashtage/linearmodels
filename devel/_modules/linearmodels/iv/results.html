@@ -19,7 +19,7 @@
     
   
       
-        <title>linearmodels.iv.results - linearmodels v7.1 (+507)</title>
+        <title>linearmodels.iv.results - linearmodels v7.1 (+513)</title>
       
     
 
@@ -91,7 +91,7 @@
 
 <header class="md-header md-header--shadow" data-md-component="header">
   <nav class="md-header__inner md-grid" aria-label="Header">
-    <a href="../../../index.html" title="linearmodels v7.1 (+507)" class="md-header__button md-logo" aria-label="linearmodels v7.1 (+507)" data-md-component="logo">
+    <a href="../../../index.html" title="linearmodels v7.1 (+513)" class="md-header__button md-logo" aria-label="linearmodels v7.1 (+513)" data-md-component="logo">
       <img src="../../../_static/bw-logo.svg" alt="logo">
     </a>
     <label class="md-header__button md-icon" for="__drawer">
@@ -102,7 +102,7 @@
       <div class="md-header__ellipsis">
         <div class="md-header__topic">
           <span class="md-ellipsis">
-            linearmodels v7.1 (+507)
+            linearmodels v7.1 (+513)
           </span>
         </div>
         <div class="md-header__topic" data-md-component="header-topic">
@@ -197,10 +197,10 @@
 
 <nav class="md-nav md-nav--primary" aria-label="Navigation" data-md-level="0">
   <label class="md-nav__title" for="__drawer">
-    <a href="../../../index.html" title="linearmodels v7.1 (+507)" class="md-nav__button md-logo" aria-label="linearmodels v7.1 (+507)" data-md-component="logo">
+    <a href="../../../index.html" title="linearmodels v7.1 (+513)" class="md-nav__button md-logo" aria-label="linearmodels v7.1 (+513)" data-md-component="logo">
       <img src="../../../_static/bw-logo.svg" alt="logo">
     </a>
-    linearmodels v7.1 (+507)
+    linearmodels v7.1 (+513)
   </label>
   
     <div class="md-nav__source">
@@ -528,7 +528,7 @@
 
 <h1>Source code for linearmodels.iv.results</h1><div class="highlight"><pre>
 <span></span><code><span class="sd">"""</span>
-<span class="sd">Results containers and post-estimation diagnostics for IV models</span>
+<span class="sd">Results containers and post-estimation diagnostics for IV models.</span>
 <span class="sd">"""</span>
 
 <span class="kn">from</span><span class="w"> </span><span class="nn">__future__</span><span class="w"> </span><span class="kn">import</span> <span class="n">annotations</span>
@@ -594,6 +594,21 @@
 <span class="k">def</span><span class="w"> </span><span class="nf">stub_concat</span><span class="p">(</span>
     <span class="n">lists</span><span class="p">:</span> <span class="n">Sequence</span><span class="p">[</span><span class="nb">list</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">|</span> <span class="nb">tuple</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="o">...</span><span class="p">]],</span> <span class="n">sep</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">"="</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">list</span><span class="p">[</span><span class="nb">str</span><span class="p">]:</span>
+<span class="w">    </span><span class="sd">"""</span>
+<span class="sd">    Concatenate the stubs of tables, separating them by a line.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    lists : sequence of list of str or sequence of tuple of str</span>
+<span class="sd">        The stubs of each table.</span>
+<span class="sd">    sep : str, optional</span>
+<span class="sd">        The character that makes up the separating line. The default is "=".</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    list of str</span>
+<span class="sd">        The stubs, with a separating line between the tables.</span>
+<span class="sd">    """</span>
     <span class="n">col_size</span> <span class="o">=</span> <span class="nb">max</span><span class="p">(</span><span class="nb">max</span><span class="p">(</span><span class="nb">map</span><span class="p">(</span><span class="nb">len</span><span class="p">,</span> <span class="n">stubs</span><span class="p">))</span> <span class="k">for</span> <span class="n">stubs</span> <span class="ow">in</span> <span class="n">lists</span><span class="p">)</span>
     <span class="n">out</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="p">[]</span>
     <span class="k">for</span> <span class="n">stubs</span> <span class="ow">in</span> <span class="n">lists</span><span class="p">:</span>
@@ -603,6 +618,21 @@
 
 
 <span class="k">def</span><span class="w"> </span><span class="nf">table_concat</span><span class="p">(</span><span class="n">lists</span><span class="p">:</span> <span class="n">Sequence</span><span class="p">[</span><span class="nb">list</span><span class="p">[</span><span class="nb">list</span><span class="p">[</span><span class="nb">str</span><span class="p">]]],</span> <span class="n">sep</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">"="</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">list</span><span class="p">[</span><span class="nb">list</span><span class="p">[</span><span class="nb">str</span><span class="p">]]:</span>
+<span class="w">    </span><span class="sd">"""</span>
+<span class="sd">    Concatenate the rows of tables, separating them by a line.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    lists : sequence of list of list of str</span>
+<span class="sd">        The rows of each table.</span>
+<span class="sd">    sep : str, optional</span>
+<span class="sd">        The character that makes up the separating line. The default is "=".</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    list of list of str</span>
+<span class="sd">        The rows, with a separating line between the tables.</span>
+<span class="sd">    """</span>
     <span class="n">col_sizes</span> <span class="o">=</span> <span class="p">[]</span>
     <span class="k">for</span> <span class="n">table</span> <span class="ow">in</span> <span class="n">lists</span><span class="p">:</span>
         <span class="n">size</span> <span class="o">=</span> <span class="p">[[</span><span class="nb">len</span><span class="p">(</span><span class="n">item</span><span class="p">)</span> <span class="k">for</span> <span class="n">item</span> <span class="ow">in</span> <span class="n">row</span><span class="p">]</span> <span class="k">for</span> <span class="n">row</span> <span class="ow">in</span> <span class="n">table</span><span class="p">]</span>
@@ -619,11 +649,11 @@
 
 <span class="k">class</span><span class="w"> </span><span class="nc">_LSModelResultsBase</span><span class="p">(</span><span class="n">_SummaryStr</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">"""</span>
-<span class="sd">    Results from OLS model estimation</span>
+<span class="sd">    Results from the estimation of a linear model.</span>
 
 <span class="sd">    Parameters</span>
 <span class="sd">    ----------</span>
-<span class="sd">    results : dict[str, any]</span>
+<span class="sd">    results : dict of str to object</span>
 <span class="sd">        A dictionary of results from the model estimation.</span>
 <span class="sd">    model : _OLS</span>
 <span class="sd">        The model used to estimate parameters.</span>
@@ -654,38 +684,38 @@
 
     <span class="nd">@property</span>
     <span class="k">def</span><span class="w"> </span><span class="nf">cov_config</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]:</span>
-<span class="w">        </span><span class="sd">"""Parameter values from covariance estimator"""</span>
+<span class="w">        </span><span class="sd">"""Parameter values from covariance estimator."""</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_cov_config</span>
 
     <span class="nd">@property</span>
     <span class="k">def</span><span class="w"> </span><span class="nf">cov_estimator</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
-<span class="w">        </span><span class="sd">"""Type of covariance estimator used to compute covariance"""</span>
+<span class="w">        </span><span class="sd">"""Type of covariance estimator used to compute covariance."""</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_cov_type</span>
 
     <span class="nd">@property</span>
     <span class="k">def</span><span class="w"> </span><span class="nf">cov</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">DataFrame</span><span class="p">:</span>
-<span class="w">        </span><span class="sd">"""Estimated covariance of parameters"""</span>
+<span class="w">        </span><span class="sd">"""Estimated covariance of parameters."""</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_cov</span>
 
     <span class="nd">@property</span>
     <span class="k">def</span><span class="w"> </span><span class="nf">params</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Series</span><span class="p">:</span>
-<span class="w">        </span><span class="sd">"""Estimated parameters"""</span>
+<span class="w">        </span><span class="sd">"""Estimated parameters."""</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_params</span>
 
     <span class="nd">@cached_property</span>
     <span class="k">def</span><span class="w"> </span><span class="nf">resids</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Series</span><span class="p">:</span>
-<span class="w">        </span><span class="sd">"""Estimated residuals"""</span>
+<span class="w">        </span><span class="sd">"""Estimated residuals."""</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_resid</span><span class="p">()</span>
 
     <span class="nd">@cached_property</span>
     <span class="k">def</span><span class="w"> </span><span class="nf">fitted_values</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Series</span><span class="p">:</span>
-<span class="w">        </span><span class="sd">"""Fitted values"""</span>
+<span class="w">        </span><span class="sd">"""Fitted values."""</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_fitted</span><span class="p">()</span>
 
     <span class="nd">@property</span>
     <span class="k">def</span><span class="w"> </span><span class="nf">idiosyncratic</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Series</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">"""</span>
-<span class="sd">        Idiosyncratic error</span>
+<span class="sd">        Idiosyncratic error.</span>
 
 <span class="sd">        Notes</span>
 <span class="sd">        -----</span>
@@ -699,33 +729,33 @@
 
     <span class="nd">@cached_property</span>
     <span class="k">def</span><span class="w"> </span><span class="nf">wresids</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Series</span><span class="p">:</span>
-<span class="w">        </span><span class="sd">"""Weighted estimated residuals"""</span>
+<span class="w">        </span><span class="sd">"""Weighted estimated residuals."""</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_wresid</span><span class="p">()</span>
 
     <span class="nd">@property</span>
     <span class="k">def</span><span class="w"> </span><span class="nf">nobs</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">int</span><span class="p">:</span>
-<span class="w">        </span><span class="sd">"""Number of observations"""</span>
+<span class="w">        </span><span class="sd">"""Number of observations."""</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">model</span><span class="o">.</span><span class="n">dependent</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
 
     <span class="nd">@property</span>
     <span class="k">def</span><span class="w"> </span><span class="nf">df_resid</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">int</span><span class="p">:</span>
-<span class="w">        </span><span class="sd">"""Residual degree of freedom"""</span>
+<span class="w">        </span><span class="sd">"""Residual degree of freedom."""</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">nobs</span> <span class="o">-</span> <span class="bp">self</span><span class="o">.</span><span class="n">df_model</span>
 
     <span class="nd">@property</span>
     <span class="k">def</span><span class="w"> </span><span class="nf">df_model</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">int</span><span class="p">:</span>
-<span class="w">        </span><span class="sd">"""Model degree of freedom"""</span>
+<span class="w">        </span><span class="sd">"""Model degree of freedom."""</span>
         <span class="k">return</span> <span class="nb">int</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_df_model</span><span class="p">)</span>
 
     <span class="nd">@property</span>
     <span class="k">def</span><span class="w"> </span><span class="nf">has_constant</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
-<span class="w">        </span><span class="sd">"""Flag indicating the model includes a constant or equivalent"""</span>
+<span class="w">        </span><span class="sd">"""Flag indicating the model includes a constant or equivalent."""</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">model</span><span class="o">.</span><span class="n">has_constant</span>
 
     <span class="nd">@property</span>
     <span class="k">def</span><span class="w"> </span><span class="nf">rsquared</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">float</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">"""</span>
-<span class="sd">        Coefficient of determination (R**2)</span>
+<span class="sd">        Coefficient of determination (R**2).</span>
 
 <span class="sd">        Returns</span>
 <span class="sd">        -------</span>
@@ -745,7 +775,7 @@
     <span class="nd">@property</span>
     <span class="k">def</span><span class="w"> </span><span class="nf">rsquared_adj</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">float</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">"""</span>
-<span class="sd">        Sample-size adjusted coefficient of determination (R**2)</span>
+<span class="sd">        Sample-size adjusted coefficient of determination (R**2).</span>
 
 <span class="sd">        Returns</span>
 <span class="sd">        -------</span>
@@ -764,24 +794,24 @@
 
     <span class="nd">@property</span>
     <span class="k">def</span><span class="w"> </span><span class="nf">cov_type</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
-<span class="w">        </span><span class="sd">"""Covariance estimator used"""</span>
+<span class="w">        </span><span class="sd">"""Covariance estimator used."""</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_cov_type</span>
 
     <span class="nd">@cached_property</span>
     <span class="k">def</span><span class="w"> </span><span class="nf">std_errors</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Series</span><span class="p">:</span>
-<span class="w">        </span><span class="sd">"""Estimated parameter standard errors"""</span>
+<span class="w">        </span><span class="sd">"""Estimated parameter standard errors."""</span>
         <span class="n">std_errors</span> <span class="o">=</span> <span class="n">sqrt</span><span class="p">(</span><span class="n">diag</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">cov</span><span class="p">))</span>
         <span class="k">return</span> <span class="n">Series</span><span class="p">(</span><span class="n">std_errors</span><span class="p">,</span> <span class="n">index</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">_vars</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="s2">"stderr"</span><span class="p">)</span>
 
     <span class="nd">@cached_property</span>
     <span class="k">def</span><span class="w"> </span><span class="nf">tstats</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Series</span><span class="p">:</span>
-<span class="w">        </span><span class="sd">"""Parameter t-statistics"""</span>
+<span class="w">        </span><span class="sd">"""Parameter t-statistics."""</span>
         <span class="k">return</span> <span class="n">Series</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_params</span> <span class="o">/</span> <span class="bp">self</span><span class="o">.</span><span class="n">std_errors</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="s2">"tstat"</span><span class="p">)</span>
 
     <span class="nd">@cached_property</span>
     <span class="k">def</span><span class="w"> </span><span class="nf">pvalues</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Series</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">"""</span>
-<span class="sd">        Parameter p-vals. Uses t(df_resid) if ``debiased`` is True, else normal</span>
+<span class="sd">        Parameter p-values. Uses t(df_resid) if ``debiased`` is True, else normal.</span>
 <span class="sd">        """</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">debiased</span><span class="p">:</span>
             <span class="n">pvals</span> <span class="o">=</span> <span class="mi">2</span> <span class="o">*</span> <span class="n">stats</span><span class="o">.</span><span class="n">t</span><span class="o">.</span><span class="n">sf</span><span class="p">(</span><span class="nb">abs</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">tstats</span><span class="p">),</span> <span class="bp">self</span><span class="o">.</span><span class="n">df_resid</span><span class="p">)</span>
@@ -792,33 +822,33 @@
 
     <span class="nd">@property</span>
     <span class="k">def</span><span class="w"> </span><span class="nf">total_ss</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">float</span><span class="p">:</span>
-<span class="w">        </span><span class="sd">"""Total sum of squares"""</span>
+<span class="w">        </span><span class="sd">"""Total sum of squares."""</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_tss</span>
 
     <span class="nd">@property</span>
     <span class="k">def</span><span class="w"> </span><span class="nf">model_ss</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">float</span><span class="p">:</span>
-<span class="w">        </span><span class="sd">"""Residual sum of squares"""</span>
+<span class="w">        </span><span class="sd">"""Model sum of squares."""</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_tss</span> <span class="o">-</span> <span class="bp">self</span><span class="o">.</span><span class="n">_rss</span>
 
     <span class="nd">@property</span>
     <span class="k">def</span><span class="w"> </span><span class="nf">resid_ss</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">float</span><span class="p">:</span>
-<span class="w">        </span><span class="sd">"""Residual sum of squares"""</span>
+<span class="w">        </span><span class="sd">"""Residual sum of squares."""</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_rss</span>
 
     <span class="nd">@property</span>
     <span class="k">def</span><span class="w"> </span><span class="nf">s2</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">float</span><span class="p">:</span>
-<span class="w">        </span><span class="sd">"""Residual variance estimator"""</span>
+<span class="w">        </span><span class="sd">"""Residual variance estimator."""</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_s2</span>
 
     <span class="nd">@property</span>
     <span class="k">def</span><span class="w"> </span><span class="nf">debiased</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
-<span class="w">        </span><span class="sd">"""Flag indicating whether covariance uses a small-sample adjustment"""</span>
+<span class="w">        </span><span class="sd">"""Flag indicating whether covariance uses a small-sample adjustment."""</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_debiased</span>
 
     <span class="nd">@property</span>
     <span class="k">def</span><span class="w"> </span><span class="nf">f_statistic</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">WaldTestStatistic</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">"""</span>
-<span class="sd">        Model F-statistic</span>
+<span class="sd">        Model F-statistic.</span>
 
 <span class="sd">        Returns</span>
 <span class="sd">        -------</span>
@@ -844,22 +874,22 @@
 
     <span class="nd">@property</span>
     <span class="k">def</span><span class="w"> </span><span class="nf">method</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
-<span class="w">        </span><span class="sd">"""Method used to estimate model parameters"""</span>
+<span class="w">        </span><span class="sd">"""Method used to estimate model parameters."""</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_method</span>
 
     <span class="k">def</span><span class="w"> </span><span class="nf">conf_int</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">level</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">0.95</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">DataFrame</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">"""</span>
-<span class="sd">        Confidence interval construction</span>
+<span class="sd">        Confidence interval construction.</span>
 
 <span class="sd">        Parameters</span>
 <span class="sd">        ----------</span>
-<span class="sd">        level : float</span>
-<span class="sd">            Confidence level for interval</span>
+<span class="sd">        level : float, optional</span>
+<span class="sd">            Confidence level for interval. The default is 0.95.</span>
 
 <span class="sd">        Returns</span>
 <span class="sd">        -------</span>
 <span class="sd">        DataFrame</span>
-<span class="sd">            Confidence interval of the form [lower, upper] for each parameters</span>
+<span class="sd">            Confidence interval of the form [lower, upper] for each parameters.</span>
 
 <span class="sd">        Notes</span>
 <span class="sd">        -----</span>
@@ -897,7 +927,7 @@
 <span class="sd">        Returns</span>
 <span class="sd">        -------</span>
 <span class="sd">        Summary</span>
-<span class="sd">            Summary table of model estimation results</span>
+<span class="sd">            Summary table of model estimation results.</span>
 
 <span class="sd">        Notes</span>
 <span class="sd">        -----</span>
@@ -994,18 +1024,20 @@
         <span class="n">formula</span><span class="p">:</span> <span class="nb">str</span> <span class="o">|</span> <span class="nb">list</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">|</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">float</span><span class="p">]</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
     <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">WaldTestStatistic</span><span class="p">:</span>
 <span class="w">        </span><span class="sa">r</span><span class="sd">"""</span>
-<span class="sd">        Test linear equality constraints using a Wald test</span>
+<span class="sd">        Test linear equality constraints using a Wald test.</span>
 
 <span class="sd">        Parameters</span>
 <span class="sd">        ----------</span>
-<span class="sd">        restriction : {ndarray, DataFrame}</span>
-<span class="sd">            q by nvar array containing linear weights to apply to parameters</span>
-<span class="sd">            when forming the restrictions. It is not possible to use both</span>
-<span class="sd">            restriction and formula.</span>
-<span class="sd">        value : {ndarray, Series}</span>
-<span class="sd">            q element array containing the restricted values.</span>
-<span class="sd">        formula : {str, list[str]}</span>
-<span class="sd">            formulaic linear constraints. The simplest formats are one of:</span>
+<span class="sd">        restriction : array_like, optional</span>
+<span class="sd">            Array with q rows and nvar columns containing linear weights to apply</span>
+<span class="sd">            to parameters when forming the restrictions. It is not possible to use</span>
+<span class="sd">            both restriction and formula.</span>
+<span class="sd">        value : array_like, optional</span>
+<span class="sd">            Array with q elements containing the restricted values. The default is</span>
+<span class="sd">            zeros.</span>
+<span class="sd">        formula : str, list of str or dict of str to float, optional</span>
+<span class="sd">            Linear constraints in the formulaic syntax. The simplest formats are</span>
+<span class="sd">            one of:</span>
 
 <span class="sd">            * A single comma-separated string such as "x1=0, x2+x3=1"</span>
 <span class="sd">            * A list of strings where each element is a single constraint</span>
@@ -1026,6 +1058,11 @@
 <span class="sd">        -------</span>
 <span class="sd">        WaldTestStatistic</span>
 <span class="sd">            Test statistic for null that restrictions are valid.</span>
+
+<span class="sd">        Raises</span>
+<span class="sd">        ------</span>
+<span class="sd">        ValueError</span>
+<span class="sd">            If both ``restriction`` and ``formula`` are provided.</span>
 
 <span class="sd">        Notes</span>
 <span class="sd">        -----</span>
@@ -1079,11 +1116,11 @@
 <a class="viewcode-back" href="../../../iv/iv/linearmodels.iv.results.OLSResults.html#linearmodels.iv.absorbing.OLSResults">[docs]</a>
 <span class="k">class</span><span class="w"> </span><span class="nc">OLSResults</span><span class="p">(</span><span class="n">_LSModelResultsBase</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">"""</span>
-<span class="sd">    Results from OLS model estimation</span>
+<span class="sd">    Results from OLS model estimation.</span>
 
 <span class="sd">    Parameters</span>
 <span class="sd">    ----------</span>
-<span class="sd">    results : dict[str, any]</span>
+<span class="sd">    results : dict of str to object</span>
 <span class="sd">        A dictionary of results from the model estimation.</span>
 <span class="sd">    model : _OLS</span>
 <span class="sd">        The model used to estimate parameters.</span>
@@ -1103,7 +1140,7 @@
         <span class="n">data</span><span class="p">:</span> <span class="n">linearmodels</span><span class="o">.</span><span class="n">typing</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">ArrayLike</span> <span class="o">|</span> <span class="kc">None</span><span class="p">,</span>
         <span class="n">missing</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">|</span> <span class="kc">None</span><span class="p">,</span>
     <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">DataFrame</span><span class="p">:</span>
-<span class="w">        </span><span class="sd">"""Interface between model predict and predict for OOS fits"""</span>
+<span class="w">        </span><span class="sd">"""Interface between model predict and predict for OOS fits."""</span>
         <span class="k">if</span> <span class="ow">not</span> <span class="p">(</span><span class="n">exog</span> <span class="ow">is</span> <span class="kc">None</span> <span class="ow">and</span> <span class="n">endog</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">)</span> <span class="ow">and</span> <span class="n">data</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
             <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
                 <span class="s2">"Predictions can only be constructed using one "</span>
@@ -1130,31 +1167,42 @@
         <span class="n">missing</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
     <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">DataFrame</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">"""</span>
-<span class="sd">        In- and out-of-sample predictions</span>
+<span class="sd">        In- and out-of-sample predictions.</span>
 
 <span class="sd">        Parameters</span>
 <span class="sd">        ----------</span>
-<span class="sd">        exog : array_like</span>
-<span class="sd">            Exogenous values to use in out-of-sample prediction (nobs by nexog)</span>
-<span class="sd">        endog : array_like</span>
-<span class="sd">            Endogenous values to use in out-of-sample prediction (nobs by nendog)</span>
-<span class="sd">        data : DataFrame</span>
+<span class="sd">        exog : array_like, optional</span>
+<span class="sd">            Exogenous values to use in out-of-sample prediction (nobs by nexog).</span>
+<span class="sd">        endog : array_like, optional</span>
+<span class="sd">            Endogenous values to use in out-of-sample prediction (nobs by nendog).</span>
+<span class="sd">        data : DataFrame, optional</span>
 <span class="sd">            DataFrame to use for out-of-sample predictions when model was</span>
 <span class="sd">            constructed using a formula.</span>
-<span class="sd">        fitted : bool</span>
-<span class="sd">            Flag indicating whether to include the fitted values</span>
-<span class="sd">        idiosyncratic : bool</span>
-<span class="sd">            Flag indicating whether to include the estimated idiosyncratic shock</span>
-<span class="sd">        missing : bool</span>
+<span class="sd">        fitted : bool, optional</span>
+<span class="sd">            Flag indicating whether to include the fitted values. The default is</span>
+<span class="sd">            True.</span>
+<span class="sd">        idiosyncratic : bool, optional</span>
+<span class="sd">            Flag indicating whether to include the estimated idiosyncratic shock.</span>
+<span class="sd">            The default is False.</span>
+<span class="sd">        missing : bool, optional</span>
 <span class="sd">            Flag indicating to adjust for dropped observations.  If True, the</span>
 <span class="sd">            values returned will have the same size as the original input data</span>
 <span class="sd">            before filtering missing values.  If False, then missing</span>
-<span class="sd">            observations will not be returned.</span>
+<span class="sd">            observations will not be returned. The default is False.</span>
 
 <span class="sd">        Returns</span>
 <span class="sd">        -------</span>
 <span class="sd">        DataFrame</span>
-<span class="sd">            DataFrame containing columns for all selected outputs</span>
+<span class="sd">            DataFrame containing columns for all selected outputs.</span>
+
+<span class="sd">        Raises</span>
+<span class="sd">        ------</span>
+<span class="sd">        ValueError</span>
+<span class="sd">            If neither ``fitted`` nor ``idiosyncratic`` is selected for an</span>
+<span class="sd">            in-sample prediction, or if ``data`` is used with ``exog`` or</span>
+<span class="sd">            ``endog``. The errors of</span>
+<span class="sd">            :meth:`~linearmodels.iv.model.IV2SLS.predict` are raised for an</span>
+<span class="sd">            out-of-sample prediction.</span>
 
 <span class="sd">        Notes</span>
 <span class="sd">        -----</span>
@@ -1186,7 +1234,7 @@
 
     <span class="nd">@property</span>
     <span class="k">def</span><span class="w"> </span><span class="nf">kappa</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">float</span> <span class="o">|</span> <span class="kc">None</span><span class="p">:</span>
-<span class="w">        </span><span class="sd">"""k-class estimator value"""</span>
+<span class="w">        </span><span class="sd">"""Value of kappa in the k-class estimator."""</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_kappa</span>
 
     <span class="k">def</span><span class="w"> </span><span class="nf">_update_extra_text</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">extra_text</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="nb">str</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="nb">list</span><span class="p">[</span><span class="nb">str</span><span class="p">]:</span>
@@ -1206,11 +1254,11 @@
 <a class="viewcode-back" href="../../../iv/absorbing/linearmodels.iv.absorbing.AbsorbingLSResults.html#linearmodels.iv.absorbing.AbsorbingLSResults">[docs]</a>
 <span class="k">class</span><span class="w"> </span><span class="nc">AbsorbingLSResults</span><span class="p">(</span><span class="n">_LSModelResultsBase</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">"""</span>
-<span class="sd">    Results from IV estimation</span>
+<span class="sd">    Results from the estimation of a model with absorbed effects.</span>
 
 <span class="sd">    Parameters</span>
 <span class="sd">    ----------</span>
-<span class="sd">    results : dict[str, any]</span>
+<span class="sd">    results : dict of str to object</span>
 <span class="sd">        A dictionary of results from the model estimation.</span>
 <span class="sd">    model : AbsorbingLS</span>
 <span class="sd">        The model used to estimate parameters.</span>
@@ -1241,7 +1289,7 @@
     <span class="nd">@property</span>
     <span class="k">def</span><span class="w"> </span><span class="nf">absorbed_rsquared</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">float</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">"""</span>
-<span class="sd">        Coefficient of determination (R**2), ignoring absorbed variables</span>
+<span class="sd">        Coefficient of determination (R**2), ignoring absorbed variables.</span>
 
 <span class="sd">        Returns</span>
 <span class="sd">        -------</span>
@@ -1270,7 +1318,7 @@
     <span class="nd">@cached_property</span>
     <span class="k">def</span><span class="w"> </span><span class="nf">absorbed_effects</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">DataFrame</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">"""</span>
-<span class="sd">        Fitted values from only absorbed terms</span>
+<span class="sd">        Fitted values from only absorbed terms.</span>
 
 <span class="sd">        The part of ``fitted_values`` that the absorbed terms explain, which is</span>
 <span class="sd">        ``fitted_values - exog @ params``, in the units of the dependent variable. It</span>
@@ -1288,7 +1336,7 @@
 
     <span class="nd">@property</span>
     <span class="k">def</span><span class="w"> </span><span class="nf">df_absorbed</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">int</span><span class="p">:</span>
-<span class="w">        </span><span class="sd">"""Number of variables absorbed"""</span>
+<span class="w">        </span><span class="sd">"""Number of variables absorbed."""</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">df_model</span> <span class="o">-</span> <span class="bp">self</span><span class="o">.</span><span class="n">params</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span></div>
 
 
@@ -1297,7 +1345,25 @@
 <a class="viewcode-back" href="../../../iv/iv/linearmodels.iv.results.FirstStageResults.html#linearmodels.iv.absorbing.FirstStageResults">[docs]</a>
 <span class="k">class</span><span class="w"> </span><span class="nc">FirstStageResults</span><span class="p">(</span><span class="n">_SummaryStr</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">"""</span>
-<span class="sd">    First stage estimation results and diagnostics</span>
+<span class="sd">    First stage estimation results and diagnostics.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    dep : IVData</span>
+<span class="sd">        Dependent variable.</span>
+<span class="sd">    exog : IVData</span>
+<span class="sd">        Exogenous regressors.</span>
+<span class="sd">    endog : IVData</span>
+<span class="sd">        Endogenous regressors.</span>
+<span class="sd">    instr : IVData</span>
+<span class="sd">        Instruments.</span>
+<span class="sd">    weights : IVData</span>
+<span class="sd">        Observation weights, scaled to have a mean of 1.</span>
+<span class="sd">    cov_type : str</span>
+<span class="sd">        Name of the covariance estimator of the model. It is used for the first</span>
+<span class="sd">        stage regressions and for the rank tests.</span>
+<span class="sd">    cov_config : dict</span>
+<span class="sd">        Options of the covariance estimator of the model.</span>
 <span class="sd">    """</span>
 
     <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span>
@@ -1327,7 +1393,7 @@
         <span class="n">linearmodels</span><span class="o">.</span><span class="n">typing</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">Float64Array</span><span class="p">,</span>
         <span class="n">linearmodels</span><span class="o">.</span><span class="n">typing</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">Float64Array</span><span class="p">,</span>
     <span class="p">]:</span>
-<span class="w">        </span><span class="sd">"""Weighted endogenous, instrument and exogenous arrays"""</span>
+<span class="w">        </span><span class="sd">"""Weighted endogenous, instrument and exogenous arrays."""</span>
         <span class="n">w</span> <span class="o">=</span> <span class="n">sqrt</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">weights</span><span class="o">.</span><span class="n">ndarray</span><span class="p">)</span>
         <span class="n">endog</span> <span class="o">=</span> <span class="n">w</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">endog</span><span class="o">.</span><span class="n">ndarray</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="nb">float</span><span class="p">,</span> <span class="n">copy</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
         <span class="n">instr</span> <span class="o">=</span> <span class="n">w</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">instr</span><span class="o">.</span><span class="n">ndarray</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="nb">float</span><span class="p">,</span> <span class="n">copy</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
@@ -1339,7 +1405,7 @@
     <span class="nd">@cached_property</span>
     <span class="k">def</span><span class="w"> </span><span class="nf">cragg_donald</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">WaldTestStatistic</span> <span class="o">|</span> <span class="n">InvalidTestStatistic</span><span class="p">:</span>
 <span class="w">        </span><span class="sa">r</span><span class="sd">"""</span>
-<span class="sd">        Cragg-Donald test of underidentification</span>
+<span class="sd">        Cragg-Donald test of underidentification.</span>
 
 <span class="sd">        Returns</span>
 <span class="sd">        -------</span>
@@ -1390,7 +1456,7 @@
     <span class="nd">@cached_property</span>
     <span class="k">def</span><span class="w"> </span><span class="nf">cragg_donald_f</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">float</span><span class="p">:</span>
 <span class="w">        </span><span class="sa">r</span><span class="sd">"""</span>
-<span class="sd">        Cragg-Donald Wald F statistic</span>
+<span class="sd">        Cragg-Donald Wald F statistic.</span>
 
 <span class="sd">        Returns</span>
 <span class="sd">        -------</span>
@@ -1434,7 +1500,7 @@
     <span class="nd">@property</span>
     <span class="k">def</span><span class="w"> </span><span class="nf">kleibergen_paap</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">WaldTestStatistic</span> <span class="o">|</span> <span class="n">InvalidTestStatistic</span><span class="p">:</span>
 <span class="w">        </span><span class="sa">r</span><span class="sd">"""</span>
-<span class="sd">        Kleibergen-Paap rk LM test of underidentification</span>
+<span class="sd">        Kleibergen-Paap rk LM test of underidentification.</span>
 
 <span class="sd">        Returns</span>
 <span class="sd">        -------</span>
@@ -1488,7 +1554,7 @@
     <span class="nd">@property</span>
     <span class="k">def</span><span class="w"> </span><span class="nf">kleibergen_paap_f</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">float</span><span class="p">:</span>
 <span class="w">        </span><span class="sa">r</span><span class="sd">"""</span>
-<span class="sd">        Kleibergen-Paap rk Wald F statistic</span>
+<span class="sd">        Kleibergen-Paap rk Wald F statistic.</span>
 
 <span class="sd">        Returns</span>
 <span class="sd">        -------</span>
@@ -1526,7 +1592,7 @@
     <span class="nd">@cached_property</span>
     <span class="k">def</span><span class="w"> </span><span class="nf">diagnostics</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">DataFrame</span><span class="p">:</span>
 <span class="w">        </span><span class="sa">r</span><span class="sd">"""</span>
-<span class="sd">        Post estimation diagnostics of first-stage fit</span>
+<span class="sd">        Post estimation diagnostics of first-stage fit.</span>
 
 <span class="sd">        Returns</span>
 <span class="sd">        -------</span>
@@ -1649,11 +1715,11 @@
     <span class="nd">@cached_property</span>
     <span class="k">def</span><span class="w"> </span><span class="nf">individual</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">OLSResults</span><span class="p">]:</span>
 <span class="w">        </span><span class="sd">"""</span>
-<span class="sd">        Individual model results from first-stage regressions</span>
+<span class="sd">        Individual model results from first-stage regressions.</span>
 
 <span class="sd">        Returns</span>
 <span class="sd">        -------</span>
-<span class="sd">        dict</span>
+<span class="sd">        dict of str to OLSResults</span>
 <span class="sd">            Dictionary containing first stage estimation results. Keys are</span>
 <span class="sd">            the variable names of the endogenous regressors.</span>
 <span class="sd">        """</span>
@@ -1680,7 +1746,7 @@
 <span class="sd">        Returns</span>
 <span class="sd">        -------</span>
 <span class="sd">        Summary</span>
-<span class="sd">            Summary table of model estimation results</span>
+<span class="sd">            Summary table of model estimation results.</span>
 
 <span class="sd">        Notes</span>
 <span class="sd">        -----</span>
@@ -1766,7 +1832,7 @@
     <span class="nd">@property</span>
     <span class="k">def</span><span class="w"> </span><span class="nf">first_stage</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">FirstStageResults</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">"""</span>
-<span class="sd">        First stage regression results</span>
+<span class="sd">        First stage regression results.</span>
 
 <span class="sd">        Returns</span>
 <span class="sd">        -------</span>
@@ -1788,13 +1854,13 @@
 <a class="viewcode-back" href="../../../iv/iv/linearmodels.iv.results.IVResults.html#linearmodels.iv.absorbing.IVResults">[docs]</a>
 <span class="k">class</span><span class="w"> </span><span class="nc">IVResults</span><span class="p">(</span><span class="n">_CommonIVResults</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">"""</span>
-<span class="sd">    Results from IV estimation</span>
+<span class="sd">    Results from IV estimation.</span>
 
 <span class="sd">    Parameters</span>
 <span class="sd">    ----------</span>
-<span class="sd">    results : dict[str, any]</span>
+<span class="sd">    results : dict of str to object</span>
 <span class="sd">        A dictionary of results from the model estimation.</span>
-<span class="sd">    model : {IV2SLS, IVLIML, IVJIVE}</span>
+<span class="sd">    model : IV2SLS, IVLIML or IVJIVE</span>
 <span class="sd">        The model used to estimate parameters.</span>
 <span class="sd">    """</span>
 
@@ -1809,12 +1875,14 @@
     <span class="nd">@cached_property</span>
     <span class="k">def</span><span class="w"> </span><span class="nf">sargan</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">InvalidTestStatistic</span> <span class="o">|</span> <span class="n">WaldTestStatistic</span><span class="p">:</span>
 <span class="w">        </span><span class="sa">r</span><span class="sd">"""</span>
-<span class="sd">        Sargan test of overidentifying restrictions</span>
+<span class="sd">        Sargan test of overidentifying restrictions.</span>
 
 <span class="sd">        Returns</span>
 <span class="sd">        -------</span>
-<span class="sd">        WaldTestStatistic</span>
-<span class="sd">            Object containing test statistic, p-value, distribution and null</span>
+<span class="sd">        WaldTestStatistic or InvalidTestStatistic</span>
+<span class="sd">            Object containing test statistic, p-value, distribution and null.</span>
+<span class="sd">            An InvalidTestStatistic is returned if the model does not have more</span>
+<span class="sd">            instruments than endogenous variables.</span>
 
 <span class="sd">        See Also</span>
 <span class="sd">        --------</span>
@@ -1824,7 +1892,7 @@
 
 <span class="sd">        Notes</span>
 <span class="sd">        -----</span>
-<span class="sd">        Requires more instruments than endogenous variables</span>
+<span class="sd">        Requires more instruments than endogenous variables.</span>
 
 <span class="sd">        The test assumes that the errors are homoskedastic. It does not use the</span>
 <span class="sd">        covariance estimator that was used to fit the model, so it is the same</span>
@@ -1845,7 +1913,7 @@
 
 <span class="sd">        .. math ::</span>
 
-<span class="sd">          v = n_{instr} - n_{exog}</span>
+<span class="sd">          v = n_{instr} - n_{endog}</span>
 <span class="sd">        """</span>
         <span class="n">z</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">model</span><span class="o">.</span><span class="n">instruments</span><span class="o">.</span><span class="n">ndarray</span>
         <span class="n">nobs</span><span class="p">,</span> <span class="n">ninstr</span> <span class="o">=</span> <span class="n">z</span><span class="o">.</span><span class="n">shape</span>
@@ -1870,12 +1938,14 @@
     <span class="nd">@cached_property</span>
     <span class="k">def</span><span class="w"> </span><span class="nf">basmann</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">InvalidTestStatistic</span> <span class="o">|</span> <span class="n">WaldTestStatistic</span><span class="p">:</span>
 <span class="w">        </span><span class="sa">r</span><span class="sd">"""</span>
-<span class="sd">        Basmann's test of overidentifying restrictions</span>
+<span class="sd">        Basmann's test of overidentifying restrictions.</span>
 
 <span class="sd">        Returns</span>
 <span class="sd">        -------</span>
-<span class="sd">        WaldTestStatistic</span>
-<span class="sd">            Object containing test statistic, p-value, distribution and null</span>
+<span class="sd">        WaldTestStatistic or InvalidTestStatistic</span>
+<span class="sd">            Object containing test statistic, p-value, distribution and null.</span>
+<span class="sd">            An InvalidTestStatistic is returned if the model does not have more</span>
+<span class="sd">            instruments than endogenous variables.</span>
 
 <span class="sd">        See Also</span>
 <span class="sd">        --------</span>
@@ -1885,18 +1955,18 @@
 
 <span class="sd">        Notes</span>
 <span class="sd">        -----</span>
-<span class="sd">        Requires more instruments than endogenous variables</span>
+<span class="sd">        Requires more instruments than endogenous variables.</span>
 
 <span class="sd">        The test assumes that the errors are homoskedastic. It does not use the</span>
 <span class="sd">        covariance estimator that was used to fit the model, so it is the same</span>
 <span class="sd">        for every ``cov_type``.</span>
 
-<span class="sd">        Tests is a small-sample version of Sargan's test that has the same</span>
-<span class="sd">        distribution.</span>
+<span class="sd">        The test is a small-sample version of Sargan's test that has the same</span>
+<span class="sd">        distribution. With :math:`s` the Sargan statistic,</span>
 
 <span class="sd">        .. math ::</span>
 
-<span class="sd">          s (n - n_{instr}) / (n - s) \sim \chi^2_{v}</span>
+<span class="sd">          s (n - n_{exog} - n_{instr}) / (n - s) \sim \chi^2_{v}</span>
 
 <span class="sd">        where :math:`n_{instr}` is the number of instruments, :math:`n_{exog}`</span>
 <span class="sd">        is the number of exogenous regressors and :math:`n_{endog}` is the</span>
@@ -1906,7 +1976,7 @@
 
 <span class="sd">        .. math ::</span>
 
-<span class="sd">          v = n_{instr} - n_{exog}</span>
+<span class="sd">          v = n_{instr} - n_{endog}</span>
 <span class="sd">        """</span>
         <span class="n">mod</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">model</span>
         <span class="n">ninstr</span> <span class="o">=</span> <span class="n">mod</span><span class="o">.</span><span class="n">instruments</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span>
@@ -1927,7 +1997,7 @@
     <span class="k">def</span><span class="w"> </span><span class="nf">_endogeneity_setup</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span> <span class="n">variables</span><span class="p">:</span> <span class="nb">str</span> <span class="o">|</span> <span class="nb">list</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span>
     <span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">tuple</span><span class="p">[</span><span class="n">ndarray</span><span class="p">,</span> <span class="n">ndarray</span><span class="p">,</span> <span class="n">ndarray</span><span class="p">,</span> <span class="nb">int</span><span class="p">,</span> <span class="nb">int</span><span class="p">,</span> <span class="nb">int</span><span class="p">,</span> <span class="nb">int</span><span class="p">]:</span>
-<span class="w">        </span><span class="sd">"""Setup function for some endogeneity iv"""</span>
+<span class="w">        </span><span class="sd">"""Setup function for some endogeneity iv."""</span>
         <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">variables</span><span class="p">,</span> <span class="nb">str</span><span class="p">):</span>
             <span class="n">variables</span> <span class="o">=</span> <span class="p">[</span><span class="n">variables</span><span class="p">]</span>
         <span class="k">elif</span> <span class="n">variables</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="ow">and</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">variables</span><span class="p">,</span> <span class="nb">list</span><span class="p">):</span>
@@ -1971,18 +2041,26 @@
 <a class="viewcode-back" href="../../../iv/iv/linearmodels.iv.results.IVResults.durbin.html#linearmodels.iv.absorbing.IVResults.durbin">[docs]</a>
     <span class="k">def</span><span class="w"> </span><span class="nf">durbin</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">variables</span><span class="p">:</span> <span class="nb">str</span> <span class="o">|</span> <span class="nb">list</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">WaldTestStatistic</span><span class="p">:</span>
 <span class="w">        </span><span class="sa">r</span><span class="sd">"""</span>
-<span class="sd">        Durbin's test of exogeneity</span>
+<span class="sd">        Compute Durbin's test of exogeneity.</span>
 
 <span class="sd">        Parameters</span>
 <span class="sd">        ----------</span>
-<span class="sd">        variables : {str, list[str]}</span>
-<span class="sd">            List of variables to test for exogeneity.  If None, all variables</span>
-<span class="sd">            are jointly tested.</span>
+<span class="sd">        variables : str or list of str, optional</span>
+<span class="sd">            Name or list of names of the endogenous regressors to test for</span>
+<span class="sd">            exogeneity.  If not provided, all endogenous regressors are jointly</span>
+<span class="sd">            tested.</span>
 
 <span class="sd">        Returns</span>
 <span class="sd">        -------</span>
 <span class="sd">        WaldTestStatistic</span>
-<span class="sd">            Object containing test statistic, p-value, distribution and null</span>
+<span class="sd">            Object containing test statistic, p-value, distribution and null.</span>
+
+<span class="sd">        Raises</span>
+<span class="sd">        ------</span>
+<span class="sd">        TypeError</span>
+<span class="sd">            If ``variables`` is not a str or a list of str.</span>
+<span class="sd">        KeyError</span>
+<span class="sd">            If a name in ``variables`` is not an endogenous regressor.</span>
 
 <span class="sd">        See Also</span>
 <span class="sd">        --------</span>
@@ -2010,11 +2088,11 @@
 <span class="sd">                     \hat{\epsilon}'_c P_{z} \hat{\epsilon}_c</span>
 
 <span class="sd">        where :math:`\hat{\epsilon}_e` are the regression residuals from a</span>
-<span class="sd">        model where ``vars`` are treated as exogenous,</span>
+<span class="sd">        model where ``variables`` are treated as exogenous,</span>
 <span class="sd">        :math:`\hat{\epsilon}_c` are the regression residuals from the model</span>
-<span class="sd">        leaving ``vars`` as endogenous, :math:`P_{[z,w]}` is a projection</span>
+<span class="sd">        leaving ``variables`` as endogenous, :math:`P_{[z,w]}` is a projection</span>
 <span class="sd">        matrix onto the exogenous variables and instruments (`z`) as well as</span>
-<span class="sd">        ``vars``, and :math:`P_{z}` is a projection matrix only onto `z`.</span>
+<span class="sd">        ``variables``, and :math:`P_{z}` is a projection matrix only onto `z`.</span>
 
 <span class="sd">        The test statistic is then</span>
 
@@ -2041,18 +2119,26 @@
 <a class="viewcode-back" href="../../../iv/iv/linearmodels.iv.results.IVResults.wu_hausman.html#linearmodels.iv.absorbing.IVResults.wu_hausman">[docs]</a>
     <span class="k">def</span><span class="w"> </span><span class="nf">wu_hausman</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">variables</span><span class="p">:</span> <span class="nb">str</span> <span class="o">|</span> <span class="nb">list</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">WaldTestStatistic</span><span class="p">:</span>
 <span class="w">        </span><span class="sa">r</span><span class="sd">"""</span>
-<span class="sd">        Wu-Hausman test of exogeneity</span>
+<span class="sd">        Wu-Hausman test of exogeneity.</span>
 
 <span class="sd">        Parameters</span>
 <span class="sd">        ----------</span>
-<span class="sd">        variables : {str, list[str]}</span>
-<span class="sd">            List of variables to test for exogeneity.  If None, all variables</span>
-<span class="sd">            are jointly tested.</span>
+<span class="sd">        variables : str or list of str, optional</span>
+<span class="sd">            Name or list of names of the endogenous regressors to test for</span>
+<span class="sd">            exogeneity.  If not provided, all endogenous regressors are jointly</span>
+<span class="sd">            tested.</span>
 
 <span class="sd">        Returns</span>
 <span class="sd">        -------</span>
 <span class="sd">        WaldTestStatistic</span>
-<span class="sd">            Object containing test statistic, p-value, distribution and null</span>
+<span class="sd">            Object containing test statistic, p-value, distribution and null.</span>
+
+<span class="sd">        Raises</span>
+<span class="sd">        ------</span>
+<span class="sd">        TypeError</span>
+<span class="sd">            If ``variables`` is not a str or a list of str.</span>
+<span class="sd">        KeyError</span>
+<span class="sd">            If a name in ``variables`` is not an endogenous regressor.</span>
 
 <span class="sd">        See Also</span>
 <span class="sd">        --------</span>
@@ -2080,11 +2166,11 @@
 <span class="sd">                     \hat{\epsilon}'_c P_{z} \hat{\epsilon}_c</span>
 
 <span class="sd">        where :math:`\hat{\epsilon}_e` are the regression residuals from a</span>
-<span class="sd">        model where ``vars`` are treated as exogenous,</span>
+<span class="sd">        model where ``variables`` are treated as exogenous,</span>
 <span class="sd">        :math:`\hat{\epsilon}_c` are the regression residuals from the model</span>
-<span class="sd">        leaving ``vars`` as endogenous, :math:`P_{[z,w]}` is a projection</span>
+<span class="sd">        leaving ``variables`` as endogenous, :math:`P_{[z,w]}` is a projection</span>
 <span class="sd">        matrix onto the exogenous variables and instruments (`z`) as well as</span>
-<span class="sd">        ``vars``, and :math:`P_{z}` is a projection matrix only onto `z`.</span>
+<span class="sd">        ``variables``, and :math:`P_{z}` is a projection matrix only onto `z`.</span>
 
 <span class="sd">        The test statistic is then</span>
 
@@ -2092,7 +2178,7 @@
 
 <span class="sd">            \frac{\delta / q}{(\hat{\epsilon}'_e\hat{\epsilon}_e - \delta) / v}</span>
 
-<span class="sd">        where :math:`q` is the number of variables iv,</span>
+<span class="sd">        where :math:`q` is the number of variables tested,</span>
 <span class="sd">        :math:`v = n - n_{endog} - n_{exog} - q`. The test statistic has a</span>
 <span class="sd">        :math:`F_{q, v}` distribution.</span>
 <span class="sd">        """</span>
@@ -2118,12 +2204,12 @@
     <span class="nd">@cached_property</span>
     <span class="k">def</span><span class="w"> </span><span class="nf">wooldridge_score</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">WaldTestStatistic</span><span class="p">:</span>
 <span class="w">        </span><span class="sa">r</span><span class="sd">"""</span>
-<span class="sd">        Wooldridge's score test of exogeneity</span>
+<span class="sd">        Wooldridge's score test of exogeneity.</span>
 
 <span class="sd">        Returns</span>
 <span class="sd">        -------</span>
 <span class="sd">        WaldTestStatistic</span>
-<span class="sd">            Object containing test statistic, p-value, distribution and null</span>
+<span class="sd">            Object containing test statistic, p-value, distribution and null.</span>
 
 <span class="sd">        Notes</span>
 <span class="sd">        -----</span>
@@ -2166,12 +2252,12 @@
     <span class="nd">@cached_property</span>
     <span class="k">def</span><span class="w"> </span><span class="nf">wooldridge_regression</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">WaldTestStatistic</span><span class="p">:</span>
 <span class="w">        </span><span class="sa">r</span><span class="sd">"""</span>
-<span class="sd">        Wooldridge's regression test of exogeneity</span>
+<span class="sd">        Wooldridge's regression test of exogeneity.</span>
 
 <span class="sd">        Returns</span>
 <span class="sd">        -------</span>
 <span class="sd">        WaldTestStatistic</span>
-<span class="sd">            Object containing test statistic, p-value, distribution and null</span>
+<span class="sd">            Object containing test statistic, p-value, distribution and null.</span>
 
 <span class="sd">        Notes</span>
 <span class="sd">        -----</span>
@@ -2217,12 +2303,14 @@
     <span class="nd">@cached_property</span>
     <span class="k">def</span><span class="w"> </span><span class="nf">wooldridge_overid</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">InvalidTestStatistic</span> <span class="o">|</span> <span class="n">WaldTestStatistic</span><span class="p">:</span>
 <span class="w">        </span><span class="sa">r</span><span class="sd">"""</span>
-<span class="sd">        Wooldridge's score test of overidentification</span>
+<span class="sd">        Wooldridge's score test of overidentification.</span>
 
 <span class="sd">        Returns</span>
 <span class="sd">        -------</span>
-<span class="sd">        WaldTestStatistic</span>
-<span class="sd">            Object containing test statistic, p-value, distribution and null</span>
+<span class="sd">        WaldTestStatistic or InvalidTestStatistic</span>
+<span class="sd">            Object containing test statistic, p-value, distribution and null.</span>
+<span class="sd">            An InvalidTestStatistic is returned if the model does not have more</span>
+<span class="sd">            instruments than endogenous variables.</span>
 
 <span class="sd">        Notes</span>
 <span class="sd">        -----</span>
@@ -2274,12 +2362,12 @@
     <span class="nd">@cached_property</span>
     <span class="k">def</span><span class="w"> </span><span class="nf">anderson_rubin</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">InvalidTestStatistic</span> <span class="o">|</span> <span class="n">WaldTestStatistic</span><span class="p">:</span>
 <span class="w">        </span><span class="sa">r</span><span class="sd">"""</span>
-<span class="sd">        Anderson-Rubin test of overidentifying restrictions</span>
+<span class="sd">        Anderson-Rubin test of overidentifying restrictions.</span>
 
 <span class="sd">        Returns</span>
 <span class="sd">        -------</span>
 <span class="sd">        WaldTestStatistic or InvalidTestStatistic</span>
-<span class="sd">            Object containing test statistic, p-value, distribution and null</span>
+<span class="sd">            Object containing test statistic, p-value, distribution and null.</span>
 
 <span class="sd">        Notes</span>
 <span class="sd">        -----</span>
@@ -2328,12 +2416,12 @@
     <span class="nd">@cached_property</span>
     <span class="k">def</span><span class="w"> </span><span class="nf">basmann_f</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">InvalidTestStatistic</span> <span class="o">|</span> <span class="n">WaldTestStatistic</span><span class="p">:</span>
 <span class="w">        </span><span class="sa">r</span><span class="sd">"""</span>
-<span class="sd">        Basmann's F test of overidentifying restrictions</span>
+<span class="sd">        Basmann's F test of overidentifying restrictions.</span>
 
 <span class="sd">        Returns</span>
 <span class="sd">        -------</span>
 <span class="sd">        WaldTestStatistic or InvalidTestStatistic</span>
-<span class="sd">            Object containing test statistic, p-value, distribution and null</span>
+<span class="sd">            Object containing test statistic, p-value, distribution and null.</span>
 
 <span class="sd">        Notes</span>
 <span class="sd">        -----</span>
@@ -2343,7 +2431,7 @@
 
 <span class="sd">        .. math ::</span>
 
-<span class="sd">          \hat{\kappa} (n -n_{instr})/q \sim F_{q, n - n_{instr}}</span>
+<span class="sd">          (\hat{\kappa} - 1) (n - n_{exog} - n_{instr})/q \sim F_{q, n - n_{exog} - n_{instr}}</span>
 
 <span class="sd">        where :math:`q = n_{instr} - n_{endog}`.</span>
 
@@ -2384,13 +2472,13 @@
 <a class="viewcode-back" href="../../../iv/iv/linearmodels.iv.results.IVGMMResults.html#linearmodels.iv.absorbing.IVGMMResults">[docs]</a>
 <span class="k">class</span><span class="w"> </span><span class="nc">IVGMMResults</span><span class="p">(</span><span class="n">_CommonIVResults</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">"""</span>
-<span class="sd">    Results from GMM estimation of IV models</span>
+<span class="sd">    Results from GMM estimation of IV models.</span>
 
 <span class="sd">    Parameters</span>
 <span class="sd">    ----------</span>
-<span class="sd">    results : dict[str, any]</span>
+<span class="sd">    results : dict of str to object</span>
 <span class="sd">        A dictionary of results from the model estimation.</span>
-<span class="sd">    model : {IVGMM, IVGMMCUE}</span>
+<span class="sd">    model : IVGMM or IVGMMCUE</span>
 <span class="sd">        The model used to estimate parameters.</span>
 <span class="sd">    """</span>
 
@@ -2407,23 +2495,23 @@
 
     <span class="nd">@property</span>
     <span class="k">def</span><span class="w"> </span><span class="nf">weight_matrix</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">linearmodels</span><span class="o">.</span><span class="n">typing</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">Float64Array</span><span class="p">:</span>
-<span class="w">        </span><span class="sd">"""Weight matrix used in the final-step GMM estimation"""</span>
+<span class="w">        </span><span class="sd">"""Weight matrix used in the final-step GMM estimation."""</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_weight_mat</span>
 
     <span class="nd">@property</span>
     <span class="k">def</span><span class="w"> </span><span class="nf">iterations</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">int</span><span class="p">:</span>
-<span class="w">        </span><span class="sd">"""Iterations used in GMM estimation"""</span>
+<span class="w">        </span><span class="sd">"""Iterations used in GMM estimation."""</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_iterations</span>
 
     <span class="nd">@property</span>
     <span class="k">def</span><span class="w"> </span><span class="nf">weight_type</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
-<span class="w">        </span><span class="sd">"""Weighting matrix method used in estimation"""</span>
+<span class="w">        </span><span class="sd">"""Weighting matrix method used in estimation."""</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_weight_type</span>
 
     <span class="nd">@property</span>
     <span class="k">def</span><span class="w"> </span><span class="nf">weight_config</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]:</span>
 <span class="w">        </span><span class="sd">"""</span>
-<span class="sd">        Weighting matrix configuration used in estimation</span>
+<span class="sd">        Weighting matrix configuration used in estimation.</span>
 
 <span class="sd">        Notes</span>
 <span class="sd">        -----</span>
@@ -2438,7 +2526,7 @@
     <span class="nd">@property</span>
     <span class="k">def</span><span class="w"> </span><span class="nf">j_stat</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">InvalidTestStatistic</span> <span class="o">|</span> <span class="n">WaldTestStatistic</span><span class="p">:</span>
 <span class="w">        </span><span class="sa">r</span><span class="sd">"""</span>
-<span class="sd">        J-test of overidentifying restrictions</span>
+<span class="sd">        J-test of overidentifying restrictions.</span>
 
 <span class="sd">        Returns</span>
 <span class="sd">        -------</span>
@@ -2490,7 +2578,7 @@
     <span class="nd">@property</span>
     <span class="k">def</span><span class="w"> </span><span class="nf">centered_j_stat</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">InvalidTestStatistic</span> <span class="o">|</span> <span class="n">WaldTestStatistic</span><span class="p">:</span>
 <span class="w">        </span><span class="sa">r</span><span class="sd">"""</span>
-<span class="sd">        J-test of overidentifying restrictions using a centered moment covariance</span>
+<span class="sd">        J-test of overidentifying restrictions using a centered moment covariance.</span>
 
 <span class="sd">        Returns</span>
 <span class="sd">        -------</span>
@@ -2568,13 +2656,14 @@
         <span class="bp">self</span><span class="p">,</span> <span class="n">variables</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">|</span> <span class="nb">str</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span>
     <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">InvalidTestStatistic</span> <span class="o">|</span> <span class="n">WaldTestStatistic</span><span class="p">:</span>
 <span class="w">        </span><span class="sa">r</span><span class="sd">"""</span>
-<span class="sd">        C-test of endogeneity</span>
+<span class="sd">        C-test of endogeneity.</span>
 
 <span class="sd">        Parameters</span>
 <span class="sd">        ----------</span>
-<span class="sd">        variables : {str, list[str]}</span>
-<span class="sd">            List of variables to test for exogeneity.  If None, all variables</span>
-<span class="sd">            are jointly tested.</span>
+<span class="sd">        variables : str or list of str, optional</span>
+<span class="sd">            Name or list of names of the endogenous regressors to test for</span>
+<span class="sd">            exogeneity.  If not provided, all endogenous regressors are jointly</span>
+<span class="sd">            tested.</span>
 
 <span class="sd">        Returns</span>
 <span class="sd">        -------</span>
@@ -2583,6 +2672,13 @@
 <span class="sd">            An InvalidTestStatistic is returned if the covariance of the</span>
 <span class="sd">            moment conditions of the first model is singular, which can happen</span>
 <span class="sd">            if there are too few clusters.</span>
+
+<span class="sd">        Raises</span>
+<span class="sd">        ------</span>
+<span class="sd">        TypeError</span>
+<span class="sd">            If ``variables`` is not a str or a list of str.</span>
+<span class="sd">        KeyError</span>
+<span class="sd">            If a name in ``variables`` is not an endogenous regressor.</span>
 
 <span class="sd">        Notes</span>
 <span class="sd">        -----</span>
@@ -2723,19 +2819,27 @@
 <a class="viewcode-back" href="../../../iv/iv/linearmodels.iv.results.IVModelComparison.html#linearmodels.iv.absorbing.IVModelComparison">[docs]</a>
 <span class="k">class</span><span class="w"> </span><span class="nc">IVModelComparison</span><span class="p">(</span><span class="n">_ModelComparison</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">"""</span>
-<span class="sd">    Comparison of multiple models</span>
+<span class="sd">    Comparison of multiple models.</span>
 
 <span class="sd">    Parameters</span>
 <span class="sd">    ----------</span>
-<span class="sd">    results : {list, dict}</span>
-<span class="sd">        Set of results to compare.  If a dict, the keys will be used as model</span>
-<span class="sd">        names.</span>
-<span class="sd">    precision : {"tstats","std_errors", "std-errors", "pvalues"}</span>
-<span class="sd">        Estimator precision estimator to include in the comparison output.</span>
-<span class="sd">        Default is "tstats".</span>
-<span class="sd">    stars : bool</span>
+<span class="sd">    results : sequence of results or dict of str to results</span>
+<span class="sd">        Set of results to compare, which are IVResults, IVGMMResults or</span>
+<span class="sd">        OLSResults.  If a dict, the keys will be used as model names.</span>
+<span class="sd">    precision : {"tstats", "std_errors", "std-errors", "pvalues"}, optional</span>
+<span class="sd">        Estimator precision estimator to include in the comparison output. The</span>
+<span class="sd">        name is not case sensitive. The default is "tstats".</span>
+<span class="sd">    stars : bool, optional</span>
 <span class="sd">        Add stars based on the p-value of the coefficient where 1, 2 and</span>
-<span class="sd">        3-stars correspond to p-values of 10%, 5% and 1%, respectively.</span>
+<span class="sd">        3-stars correspond to p-values of 10%, 5% and 1%, respectively. The</span>
+<span class="sd">        default is False.</span>
+
+<span class="sd">    Raises</span>
+<span class="sd">    ------</span>
+<span class="sd">    TypeError</span>
+<span class="sd">        If a result is not an IVResults, IVGMMResults or OLSResults.</span>
+<span class="sd">    ValueError</span>
+<span class="sd">        If ``precision`` is not supported.</span>
 <span class="sd">    """</span>
 
     <span class="n">_supported</span> <span class="o">=</span> <span class="p">(</span><span class="n">IVResults</span><span class="p">,</span> <span class="n">IVGMMResults</span><span class="p">,</span> <span class="n">OLSResults</span><span class="p">)</span>
@@ -2752,7 +2856,7 @@
     <span class="nd">@property</span>
     <span class="k">def</span><span class="w"> </span><span class="nf">rsquared_adj</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Series</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">"""</span>
-<span class="sd">        Sample-size adjusted coefficients of determination (R**2)</span>
+<span class="sd">        Sample-size adjusted coefficients of determination (R**2).</span>
 
 <span class="sd">        Returns</span>
 <span class="sd">        -------</span>
@@ -2770,12 +2874,12 @@
 
     <span class="nd">@property</span>
     <span class="k">def</span><span class="w"> </span><span class="nf">estimator_method</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Series</span><span class="p">:</span>
-<span class="w">        </span><span class="sd">"""Estimation methods"""</span>
+<span class="w">        </span><span class="sd">"""Estimation methods."""</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_get_property</span><span class="p">(</span><span class="s2">"_method"</span><span class="p">)</span>
 
     <span class="nd">@property</span>
     <span class="k">def</span><span class="w"> </span><span class="nf">cov_estimator</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Series</span><span class="p">:</span>
-<span class="w">        </span><span class="sd">"""Covariance estimator descriptions"""</span>
+<span class="w">        </span><span class="sd">"""Covariance estimator descriptions."""</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_get_property</span><span class="p">(</span><span class="s2">"cov_estimator"</span><span class="p">)</span>
 
     <span class="nd">@property</span>
@@ -2786,7 +2890,7 @@
 <span class="sd">        Returns</span>
 <span class="sd">        -------</span>
 <span class="sd">        Summary</span>
-<span class="sd">            Summary table of model estimation results</span>
+<span class="sd">            Summary table of model estimation results.</span>
 
 <span class="sd">        Notes</span>
 <span class="sd">        -----</span>
@@ -2895,24 +2999,32 @@
     <span class="n">stars</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">IVModelComparison</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">"""</span>
-<span class="sd">    Compare the results of multiple models</span>
+<span class="sd">    Compare the results of multiple models.</span>
 
 <span class="sd">    Parameters</span>
 <span class="sd">    ----------</span>
-<span class="sd">    results : {list, dict}</span>
-<span class="sd">        Set of results to compare.  If a dict, the keys will be used as model</span>
-<span class="sd">        names.</span>
-<span class="sd">    precision : {"tstats","std_errors", "std-errors", "pvalues"}</span>
-<span class="sd">        Estimator precision estimator to include in the comparison output.</span>
-<span class="sd">        Default is "tstats".</span>
-<span class="sd">    stars : bool</span>
+<span class="sd">    results : sequence of results or dict of str to results</span>
+<span class="sd">        Set of results to compare, which are IVResults, IVGMMResults or</span>
+<span class="sd">        OLSResults.  If a dict, the keys will be used as model names.</span>
+<span class="sd">    precision : {"tstats", "std_errors", "std-errors", "pvalues"}, optional</span>
+<span class="sd">        Estimator precision estimator to include in the comparison output. The</span>
+<span class="sd">        name is not case sensitive. The default is "tstats".</span>
+<span class="sd">    stars : bool, optional</span>
 <span class="sd">        Add stars based on the p-value of the coefficient where 1, 2 and</span>
-<span class="sd">        3-stars correspond to p-values of 10%, 5% and 1%, respectively.</span>
+<span class="sd">        3-stars correspond to p-values of 10%, 5% and 1%, respectively. The</span>
+<span class="sd">        default is False.</span>
 
 <span class="sd">    Returns</span>
 <span class="sd">    -------</span>
 <span class="sd">    IVModelComparison</span>
 <span class="sd">        The model comparison object.</span>
+
+<span class="sd">    Raises</span>
+<span class="sd">    ------</span>
+<span class="sd">    TypeError</span>
+<span class="sd">        If a result is not an IVResults, IVGMMResults or OLSResults.</span>
+<span class="sd">    ValueError</span>
+<span class="sd">        If ``precision`` is not supported.</span>
 <span class="sd">    """</span>
     <span class="k">return</span> <span class="n">IVModelComparison</span><span class="p">(</span><span class="n">results</span><span class="p">,</span> <span class="n">precision</span><span class="o">=</span><span class="n">precision</span><span class="p">,</span> <span class="n">stars</span><span class="o">=</span><span class="n">stars</span><span class="p">)</span></div>
 

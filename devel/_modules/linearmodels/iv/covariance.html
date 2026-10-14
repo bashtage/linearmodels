@@ -19,7 +19,7 @@
     
   
       
-        <title>linearmodels.iv.covariance - linearmodels v7.1 (+507)</title>
+        <title>linearmodels.iv.covariance - linearmodels v7.1 (+513)</title>
       
     
 
@@ -91,7 +91,7 @@
 
 <header class="md-header md-header--shadow" data-md-component="header">
   <nav class="md-header__inner md-grid" aria-label="Header">
-    <a href="../../../index.html" title="linearmodels v7.1 (+507)" class="md-header__button md-logo" aria-label="linearmodels v7.1 (+507)" data-md-component="logo">
+    <a href="../../../index.html" title="linearmodels v7.1 (+513)" class="md-header__button md-logo" aria-label="linearmodels v7.1 (+513)" data-md-component="logo">
       <img src="../../../_static/bw-logo.svg" alt="logo">
     </a>
     <label class="md-header__button md-icon" for="__drawer">
@@ -102,7 +102,7 @@
       <div class="md-header__ellipsis">
         <div class="md-header__topic">
           <span class="md-ellipsis">
-            linearmodels v7.1 (+507)
+            linearmodels v7.1 (+513)
           </span>
         </div>
         <div class="md-header__topic" data-md-component="header-topic">
@@ -197,10 +197,10 @@
 
 <nav class="md-nav md-nav--primary" aria-label="Navigation" data-md-level="0">
   <label class="md-nav__title" for="__drawer">
-    <a href="../../../index.html" title="linearmodels v7.1 (+507)" class="md-nav__button md-logo" aria-label="linearmodels v7.1 (+507)" data-md-component="logo">
+    <a href="../../../index.html" title="linearmodels v7.1 (+513)" class="md-nav__button md-logo" aria-label="linearmodels v7.1 (+513)" data-md-component="logo">
       <img src="../../../_static/bw-logo.svg" alt="logo">
     </a>
-    linearmodels v7.1 (+507)
+    linearmodels v7.1 (+513)
   </label>
   
     <div class="md-nav__source">
@@ -528,7 +528,7 @@
 
 <h1>Source code for linearmodels.iv.covariance</h1><div class="highlight"><pre>
 <span></span><code><span class="sd">"""</span>
-<span class="sd">Covariance estimation for 2SLS and LIML IV estimators</span>
+<span class="sd">Covariance estimation for 2SLS and LIML IV estimators.</span>
 <span class="sd">"""</span>
 
 <span class="kn">from</span><span class="w"> </span><span class="nn">__future__</span><span class="w"> </span><span class="kn">import</span> <span class="n">annotations</span>
@@ -650,17 +650,20 @@
     <span class="n">bw</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">:</span> <span class="nb">int</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">linearmodels</span><span class="o">.</span><span class="n">typing</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">Float64Array</span><span class="p">:</span>
 <span class="w">    </span><span class="sa">r</span><span class="sd">"""</span>
-<span class="sd">    Kernel weights from a Bartlett kernel</span>
+<span class="sd">    Kernel weights from a Bartlett kernel.</span>
 
 <span class="sd">    Parameters</span>
 <span class="sd">    ----------</span>
-<span class="sd">    bw: int</span>
-<span class="sd">       Maximum lag to used in kernel</span>
+<span class="sd">    bw : int</span>
+<span class="sd">        Maximum lag to use in the kernel.</span>
+<span class="sd">    *args : int</span>
+<span class="sd">        Ignored. Accepted so that every kernel weight function can be called</span>
+<span class="sd">        with the same arguments.</span>
 
 <span class="sd">    Returns</span>
 <span class="sd">    -------</span>
 <span class="sd">    ndarray</span>
-<span class="sd">        Weight array  ordered by lag position (maxlag + 1)</span>
+<span class="sd">        Weight array ordered by lag position (maxlag + 1).</span>
 
 <span class="sd">    Notes</span>
 <span class="sd">    -----</span>
@@ -678,19 +681,19 @@
     <span class="n">bw</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span> <span class="n">n</span><span class="p">:</span> <span class="nb">int</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">linearmodels</span><span class="o">.</span><span class="n">typing</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">Float64Array</span><span class="p">:</span>
 <span class="w">    </span><span class="sa">r</span><span class="sd">"""</span>
-<span class="sd">    Kernel weights from a quadratic-spectral kernel</span>
+<span class="sd">    Kernel weights from a quadratic-spectral kernel.</span>
 
 <span class="sd">    Parameters</span>
 <span class="sd">    ----------</span>
-<span class="sd">    bw: {int, float}</span>
-<span class="sd">       Maximum lag to used in kernel</span>
+<span class="sd">    bw : int or float</span>
+<span class="sd">        Bandwidth of the kernel.</span>
 <span class="sd">    n : int</span>
-<span class="sd">        Positive number of weight to return</span>
+<span class="sd">        Positive number of weights to return.</span>
 
 <span class="sd">    Returns</span>
 <span class="sd">    -------</span>
 <span class="sd">    ndarray</span>
-<span class="sd">        Weight array  ordered by lag position (maxlag + 1)</span>
+<span class="sd">        Weight array ordered by lag position (n + 1).</span>
 
 <span class="sd">    Notes</span>
 <span class="sd">    -----</span>
@@ -726,17 +729,20 @@
     <span class="n">bw</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">:</span> <span class="nb">int</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">linearmodels</span><span class="o">.</span><span class="n">typing</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">Float64Array</span><span class="p">:</span>
 <span class="w">    </span><span class="sa">r</span><span class="sd">"""</span>
-<span class="sd">    Kernel weights from a Parzen kernel</span>
+<span class="sd">    Kernel weights from a Parzen kernel.</span>
 
 <span class="sd">    Parameters</span>
 <span class="sd">    ----------</span>
 <span class="sd">    bw : int</span>
-<span class="sd">       Maximum lag to used in kernel</span>
+<span class="sd">        Maximum lag to use in the kernel.</span>
+<span class="sd">    *args : int</span>
+<span class="sd">        Ignored. Accepted so that every kernel weight function can be called</span>
+<span class="sd">        with the same arguments.</span>
 
 <span class="sd">    Returns</span>
 <span class="sd">    -------</span>
 <span class="sd">    ndarray</span>
-<span class="sd">        Weight array  ordered by lag position (maxlag + 1)</span>
+<span class="sd">        Weight array ordered by lag position (maxlag + 1).</span>
 
 <span class="sd">    Notes</span>
 <span class="sd">    -----</span>
@@ -755,7 +761,7 @@
 
 <span class="k">def</span><span class="w"> </span><span class="nf">_bandwidth_rule</span><span class="p">(</span><span class="n">kernel</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">tuple</span><span class="p">[</span><span class="nb">int</span><span class="p">,</span> <span class="nb">float</span><span class="p">,</span> <span class="nb">float</span><span class="p">]:</span>
 <span class="w">    </span><span class="sd">"""</span>
-<span class="sd">    The constants of the automatic bandwidth rule of a kernel</span>
+<span class="sd">    The constants of the automatic bandwidth rule of a kernel.</span>
 
 <span class="sd">    Parameters</span>
 <span class="sd">    ----------</span>
@@ -786,13 +792,13 @@
 
 
 <span class="k">def</span><span class="w"> </span><span class="nf">_pilot_lags</span><span class="p">(</span><span class="n">nobs</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span> <span class="n">exponent</span><span class="p">:</span> <span class="nb">float</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">int</span><span class="p">:</span>
-<span class="w">    </span><span class="sd">"""The number of lags in the pilot estimates of the automatic bandwidth"""</span>
+<span class="w">    </span><span class="sd">"""The number of lags in the pilot estimates of the automatic bandwidth."""</span>
     <span class="k">return</span> <span class="nb">int</span><span class="p">(</span><span class="n">ceil</span><span class="p">(</span><span class="mi">4</span> <span class="o">*</span> <span class="p">(</span><span class="n">nobs</span> <span class="o">/</span> <span class="mi">100</span><span class="p">)</span> <span class="o">**</span> <span class="n">exponent</span><span class="p">))</span>
 
 
 <span class="k">def</span><span class="w"> </span><span class="nf">_min_nobs_automatic_bandwidth</span><span class="p">(</span><span class="n">kernel</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">int</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">"""</span>
-<span class="sd">    The fewest observations for which the automatic bandwidth of a kernel exists</span>
+<span class="sd">    The fewest observations for which the automatic bandwidth of a kernel exists.</span>
 
 <span class="sd">    The pilot estimates use the autocovariances up to the pilot lag, and the pilot</span>
 <span class="sd">    lag has to be below nobs - 1. It grows by at most 1 for each additional</span>
@@ -826,15 +832,16 @@
     <span class="n">x</span><span class="p">:</span> <span class="n">linearmodels</span><span class="o">.</span><span class="n">typing</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">Float64Array</span><span class="p">,</span> <span class="n">kernel</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">"bartlett"</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">int</span><span class="p">:</span>
 <span class="w">    </span><span class="sa">r</span><span class="sd">"""</span>
-<span class="sd">    Select the bandwidth of a kernel covariance estimator from the data</span>
+<span class="sd">    Select the bandwidth of a kernel covariance estimator from the data.</span>
 
 <span class="sd">    Parameters</span>
 <span class="sd">    ----------</span>
 <span class="sd">    x : ndarray</span>
 <span class="sd">        The series to use when computing the bandwidth. It has t observations,</span>
 <span class="sd">        and is a 1-d array of length t or an array with t rows and 1 column.</span>
-<span class="sd">    kernel : str</span>
-<span class="sd">        Name of kernel to use.  Supported kernels include:</span>
+<span class="sd">    kernel : str, optional</span>
+<span class="sd">        Name of the kernel to use. The default is "bartlett". Supported kernels</span>
+<span class="sd">        are:</span>
 
 <span class="sd">        * "bartlett", "newey-west" - Bartlett's kernel</span>
 <span class="sd">        * "parzen", "gallant" - Parzen's kernel</span>
@@ -856,6 +863,13 @@
 <span class="sd">    UnknownOptionError</span>
 <span class="sd">        If kernel is not one of the supported names. It is both a ``KeyError``</span>
 <span class="sd">        and a ``ValueError``.</span>
+
+<span class="sd">    See Also</span>
+<span class="sd">    --------</span>
+<span class="sd">    kernel_weight_bartlett : Kernel weights from a Bartlett kernel.</span>
+<span class="sd">    kernel_weight_parzen : Kernel weights from a Parzen kernel.</span>
+<span class="sd">    kernel_weight_quadratic_spectral : Kernel weights from a quadratic-spectral</span>
+<span class="sd">        kernel.</span>
 
 <span class="sd">    Notes</span>
 <span class="sd">    -----</span>
@@ -920,12 +934,6 @@
 <span class="sd">    .. [1] Newey, W. K. and West, K. D. (1994). Automatic lag selection in</span>
 <span class="sd">       covariance matrix estimation. The Review of Economic Studies, 61(4),</span>
 <span class="sd">       631-653.</span>
-
-<span class="sd">    See Also</span>
-<span class="sd">    --------</span>
-<span class="sd">    linearmodels.iv.covariance.kernel_weight_bartlett,</span>
-<span class="sd">    linearmodels.iv.covariance.kernel_weight_parzen,</span>
-<span class="sd">    linearmodels.iv.covariance.kernel_weight_quadratic_spectral</span>
 <span class="sd">    """</span>
     <span class="n">t</span> <span class="o">=</span> <span class="n">x</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
     <span class="n">x</span> <span class="o">=</span> <span class="n">x</span><span class="o">.</span><span class="n">squeeze</span><span class="p">()</span>
@@ -976,27 +984,35 @@
 <a class="viewcode-back" href="../../../iv/iv/linearmodels.iv.covariance.HomoskedasticCovariance.html#linearmodels.iv.covariance.HomoskedasticCovariance">[docs]</a>
 <span class="k">class</span><span class="w"> </span><span class="nc">HomoskedasticCovariance</span><span class="p">:</span>
 <span class="w">    </span><span class="sa">r</span><span class="sd">"""</span>
-<span class="sd">    Covariance estimation for homoskedastic data</span>
+<span class="sd">    Covariance estimation for homoskedastic data.</span>
 
 <span class="sd">    Parameters</span>
 <span class="sd">    ----------</span>
 <span class="sd">    x : ndarray</span>
-<span class="sd">        Model regressors (nobs by nvar)</span>
+<span class="sd">        Model regressors (nobs by nvar).</span>
 <span class="sd">    y : ndarray</span>
-<span class="sd">        Series modeled (nobs by 1)</span>
+<span class="sd">        Series modeled (nobs by 1).</span>
 <span class="sd">    z : ndarray</span>
-<span class="sd">        Instruments used for endogenous regressors (nobs by ninstr)</span>
+<span class="sd">        Instruments used for endogenous regressors (nobs by ninstr).</span>
 <span class="sd">    params : ndarray</span>
-<span class="sd">        Estimated model parameters (nvar by 1)</span>
-<span class="sd">    debiased : bool</span>
-<span class="sd">        Flag indicating whether to use a small-sample adjustment</span>
-<span class="sd">    kappa : float</span>
-<span class="sd">        Value of kappa in k-class estimator</span>
+<span class="sd">        Estimated model parameters (nvar by 1).</span>
+<span class="sd">    debiased : bool, optional</span>
+<span class="sd">        Flag indicating whether to use a small-sample adjustment. The default is</span>
+<span class="sd">        False.</span>
+<span class="sd">    kappa : float, optional</span>
+<span class="sd">        Value of kappa in the k-class estimator. The default is 1.</span>
 <span class="sd">    extra_df : int, optional</span>
 <span class="sd">        Degrees of freedom that the model uses in addition to the nvar columns</span>
 <span class="sd">        of x, for example the absorbed effects of AbsorbingLS. The default is 0.</span>
 <span class="sd">        It is only used if ``debiased`` is True, when n / (n-k) becomes</span>
 <span class="sd">        n / (n-k-extra_df).</span>
+
+<span class="sd">    Raises</span>
+<span class="sd">    ------</span>
+<span class="sd">    ValueError</span>
+<span class="sd">        If the number of rows of x, y and z differ, if x and params have</span>
+<span class="sd">        incompatible dimensions or if ``debiased`` is True and there are no more</span>
+<span class="sd">        observations than the columns of x plus ``extra_df``.</span>
 
 <span class="sd">    Notes</span>
 <span class="sd">    -----</span>
@@ -1070,7 +1086,7 @@
 
     <span class="nd">@property</span>
     <span class="k">def</span><span class="w"> </span><span class="nf">s</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">linearmodels</span><span class="o">.</span><span class="n">typing</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">Float64Array</span><span class="p">:</span>
-<span class="w">        </span><span class="sd">"""Score covariance estimate"""</span>
+<span class="w">        </span><span class="sd">"""Return the score covariance estimate."""</span>
         <span class="n">x</span><span class="p">,</span> <span class="n">z</span><span class="p">,</span> <span class="n">eps</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">x</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">z</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">eps</span>
         <span class="n">nobs</span> <span class="o">=</span> <span class="n">x</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
         <span class="n">s2</span> <span class="o">=</span> <span class="n">eps</span><span class="o">.</span><span class="n">T</span> <span class="o">@</span> <span class="n">eps</span> <span class="o">/</span> <span class="n">nobs</span>
@@ -1085,8 +1101,7 @@
 
     <span class="nd">@property</span>
     <span class="k">def</span><span class="w"> </span><span class="nf">cov</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">linearmodels</span><span class="o">.</span><span class="n">typing</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">Float64Array</span><span class="p">:</span>
-<span class="w">        </span><span class="sd">"""Covariance of estimated parameters"""</span>
-
+<span class="w">        </span><span class="sd">"""Return the covariance of the estimated parameters."""</span>
         <span class="n">x</span><span class="p">,</span> <span class="n">z</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">x</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">z</span>
         <span class="n">nobs</span> <span class="o">=</span> <span class="n">x</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
 
@@ -1103,9 +1118,7 @@
 
     <span class="nd">@property</span>
     <span class="k">def</span><span class="w"> </span><span class="nf">s2</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">linearmodels</span><span class="o">.</span><span class="n">typing</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">Float64Array</span><span class="p">:</span>
-<span class="w">        </span><span class="sd">"""</span>
-<span class="sd">        Estimated variance of residuals. Small-sample adjusted if debiased.</span>
-<span class="sd">        """</span>
+<span class="w">        </span><span class="sd">"""Return the variance of the residuals, adjusted if debiased."""</span>
         <span class="n">nobs</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">x</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
         <span class="n">eps</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">eps</span>
 
@@ -1113,11 +1126,12 @@
 
     <span class="nd">@property</span>
     <span class="k">def</span><span class="w"> </span><span class="nf">debiased</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
-<span class="w">        </span><span class="sd">"""Flag indicating if covariance is debiased"""</span>
+<span class="w">        </span><span class="sd">"""Return a flag indicating if the covariance is debiased."""</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_debiased</span>
 
     <span class="nd">@property</span>
     <span class="k">def</span><span class="w"> </span><span class="nf">config</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]:</span>
+<span class="w">        </span><span class="sd">"""Return the options of the covariance estimator as a dict."""</span>
         <span class="k">return</span> <span class="p">{</span><span class="s2">"debiased"</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">debiased</span><span class="p">,</span> <span class="s2">"kappa"</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">_kappa</span><span class="p">}</span></div>
 
 
@@ -1126,27 +1140,35 @@
 <a class="viewcode-back" href="../../../iv/iv/linearmodels.iv.covariance.HeteroskedasticCovariance.html#linearmodels.iv.covariance.HeteroskedasticCovariance">[docs]</a>
 <span class="k">class</span><span class="w"> </span><span class="nc">HeteroskedasticCovariance</span><span class="p">(</span><span class="n">HomoskedasticCovariance</span><span class="p">):</span>
 <span class="w">    </span><span class="sa">r</span><span class="sd">"""</span>
-<span class="sd">    Covariance estimation for heteroskedastic data</span>
+<span class="sd">    Covariance estimation for heteroskedastic data.</span>
 
 <span class="sd">    Parameters</span>
 <span class="sd">    ----------</span>
 <span class="sd">    x : ndarray</span>
-<span class="sd">        Model regressors (nobs by nvar)</span>
+<span class="sd">        Model regressors (nobs by nvar).</span>
 <span class="sd">    y : ndarray</span>
-<span class="sd">        Series ,modeled (nobs by 1)</span>
+<span class="sd">        Series modeled (nobs by 1).</span>
 <span class="sd">    z : ndarray</span>
-<span class="sd">        Instruments used for endogenous regressors (nobs by ninstr)</span>
+<span class="sd">        Instruments used for endogenous regressors (nobs by ninstr).</span>
 <span class="sd">    params : ndarray</span>
-<span class="sd">        Estimated model parameters (nvar by 1)</span>
-<span class="sd">    debiased : bool</span>
-<span class="sd">        Flag indicating whether to use a small-sample adjustment</span>
-<span class="sd">    kappa : float</span>
-<span class="sd">        Value of kappa in k-class estimator</span>
+<span class="sd">        Estimated model parameters (nvar by 1).</span>
+<span class="sd">    debiased : bool, optional</span>
+<span class="sd">        Flag indicating whether to use a small-sample adjustment. The default is</span>
+<span class="sd">        False.</span>
+<span class="sd">    kappa : float, optional</span>
+<span class="sd">        Value of kappa in the k-class estimator. The default is 1.</span>
 <span class="sd">    extra_df : int, optional</span>
 <span class="sd">        Degrees of freedom that the model uses in addition to the nvar columns</span>
 <span class="sd">        of x, for example the absorbed effects of AbsorbingLS. The default is 0.</span>
 <span class="sd">        It is only used if ``debiased`` is True, when n / (n-k) becomes</span>
 <span class="sd">        n / (n-k-extra_df).</span>
+
+<span class="sd">    Raises</span>
+<span class="sd">    ------</span>
+<span class="sd">    ValueError</span>
+<span class="sd">        If the number of rows of x, y and z differ, if x and params have</span>
+<span class="sd">        incompatible dimensions or if ``debiased`` is True and there are no more</span>
+<span class="sd">        observations than the columns of x plus ``extra_df``.</span>
 
 <span class="sd">    Notes</span>
 <span class="sd">    -----</span>
@@ -1190,7 +1212,7 @@
 
     <span class="nd">@property</span>
     <span class="k">def</span><span class="w"> </span><span class="nf">s</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">linearmodels</span><span class="o">.</span><span class="n">typing</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">Float64Array</span><span class="p">:</span>
-<span class="w">        </span><span class="sd">"""Heteroskedasticity-robust score covariance estimate"""</span>
+<span class="w">        </span><span class="sd">"""Return the heteroskedasticity-robust score covariance estimate."""</span>
         <span class="n">x</span><span class="p">,</span> <span class="n">z</span><span class="p">,</span> <span class="n">eps</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">x</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">z</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">eps</span>
         <span class="n">nobs</span> <span class="o">=</span> <span class="n">x</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
         <span class="n">pinvz</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_pinvz</span>
@@ -1205,41 +1227,59 @@
 <a class="viewcode-back" href="../../../iv/iv/linearmodels.iv.covariance.KernelCovariance.html#linearmodels.iv.covariance.KernelCovariance">[docs]</a>
 <span class="k">class</span><span class="w"> </span><span class="nc">KernelCovariance</span><span class="p">(</span><span class="n">HomoskedasticCovariance</span><span class="p">):</span>
 <span class="w">    </span><span class="sa">r</span><span class="sd">"""</span>
-<span class="sd">    Kernel weighted (HAC) covariance estimation</span>
+<span class="sd">    Kernel weighted (HAC) covariance estimation.</span>
 
 <span class="sd">    Parameters</span>
 <span class="sd">    ----------</span>
 <span class="sd">    x : ndarray</span>
-<span class="sd">        Model regressors (nobs by nvar)</span>
+<span class="sd">        Model regressors (nobs by nvar).</span>
 <span class="sd">    y : ndarray</span>
-<span class="sd">        Series ,modeled (nobs by 1)</span>
+<span class="sd">        Series modeled (nobs by 1).</span>
 <span class="sd">    z : ndarray</span>
-<span class="sd">        Instruments used for endogenous regressors (nobs by ninstr)</span>
+<span class="sd">        Instruments used for endogenous regressors (nobs by ninstr).</span>
 <span class="sd">    params : ndarray</span>
-<span class="sd">        Estimated model parameters (nvar by 1)</span>
-<span class="sd">    kernel : str</span>
-<span class="sd">        Kernel name. Supported kernels are:</span>
+<span class="sd">        Estimated model parameters (nvar by 1).</span>
+<span class="sd">    kernel : str, optional</span>
+<span class="sd">        Kernel name. The default is "bartlett". Supported kernels are:</span>
 
 <span class="sd">        * "bartlett", "newey-west" - Triangular kernel</span>
 <span class="sd">        * "qs", "quadratic-spectral", "andrews" - Quadratic spectral kernel</span>
-<span class="sd">        * "parzen", "gallant" - Parzen's kernel;</span>
+<span class="sd">        * "parzen", "gallant" - Parzen's kernel.</span>
 
-<span class="sd">    bandwidth : {int, None}</span>
-<span class="sd">        Non-negative bandwidth to use with kernel. If None, automatic</span>
+<span class="sd">    bandwidth : int, optional</span>
+<span class="sd">        Non-negative bandwidth to use with kernel. If not provided, automatic</span>
 <span class="sd">        bandwidth selection is used. It needs at least 4 observations with the</span>
 <span class="sd">        Bartlett kernel, 5 with the Parzen kernel and 6 with the quadratic</span>
 <span class="sd">        spectral kernel, and a ``ValueError`` is raised for fewer when the</span>
 <span class="sd">        covariance is first used. See</span>
 <span class="sd">        :func:`~linearmodels.iv.covariance.kernel_optimal_bandwidth`.</span>
-<span class="sd">    debiased : bool</span>
-<span class="sd">        Flag indicating whether to use a small-sample adjustment</span>
-<span class="sd">    kappa : float</span>
-<span class="sd">        Value of kappa in k-class estimator</span>
+<span class="sd">    debiased : bool, optional</span>
+<span class="sd">        Flag indicating whether to use a small-sample adjustment. The default is</span>
+<span class="sd">        False.</span>
+<span class="sd">    kappa : float, optional</span>
+<span class="sd">        Value of kappa in the k-class estimator. The default is 1.</span>
 <span class="sd">    extra_df : int, optional</span>
 <span class="sd">        Degrees of freedom that the model uses in addition to the nvar columns</span>
 <span class="sd">        of x, for example the absorbed effects of AbsorbingLS. The default is 0.</span>
 <span class="sd">        It is only used if ``debiased`` is True, when n / (n-k) becomes</span>
 <span class="sd">        n / (n-k-extra_df).</span>
+
+<span class="sd">    Raises</span>
+<span class="sd">    ------</span>
+<span class="sd">    ValueError</span>
+<span class="sd">        If the number of rows of x, y and z differ, if x and params have</span>
+<span class="sd">        incompatible dimensions or if ``debiased`` is True and there are no more</span>
+<span class="sd">        observations than the columns of x plus ``extra_df``.</span>
+<span class="sd">    UnknownOptionError</span>
+<span class="sd">        If ``kernel`` is not one of the supported kernels. It is both a</span>
+<span class="sd">        ``KeyError`` and a ``ValueError``.</span>
+
+<span class="sd">    See Also</span>
+<span class="sd">    --------</span>
+<span class="sd">    kernel_weight_bartlett : Kernel weights from a Bartlett kernel.</span>
+<span class="sd">    kernel_weight_parzen : Kernel weights from a Parzen kernel.</span>
+<span class="sd">    kernel_weight_quadratic_spectral : Kernel weights from a quadratic-spectral</span>
+<span class="sd">        kernel.</span>
 
 <span class="sd">    Notes</span>
 <span class="sd">    -----</span>
@@ -1285,12 +1325,6 @@
 <span class="sd">       ``OverflowError``) or "cannot convert float NaN to integer" for some</span>
 <span class="sd">       series, and used a bandwidth of :math:`n - 1`, or another bandwidth, for</span>
 <span class="sd">       the others.</span>
-
-<span class="sd">    See Also</span>
-<span class="sd">    --------</span>
-<span class="sd">    linearmodels.iv.covariance.kernel_weight_bartlett,</span>
-<span class="sd">    linearmodels.iv.covariance.kernel_weight_parzen,</span>
-<span class="sd">    linearmodels.iv.covariance.kernel_weight_quadratic_spectral</span>
 <span class="sd">    """</span>
 
     <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span>
@@ -1325,7 +1359,7 @@
 
     <span class="nd">@property</span>
     <span class="k">def</span><span class="w"> </span><span class="nf">s</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">linearmodels</span><span class="o">.</span><span class="n">typing</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">Float64Array</span><span class="p">:</span>
-<span class="w">        </span><span class="sd">"""HAC score covariance estimate"""</span>
+<span class="w">        </span><span class="sd">"""Return the HAC score covariance estimate."""</span>
         <span class="n">x</span><span class="p">,</span> <span class="n">z</span><span class="p">,</span> <span class="n">eps</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">x</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">z</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">eps</span>
         <span class="n">nobs</span> <span class="o">=</span> <span class="n">x</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
 
@@ -1353,6 +1387,7 @@
 
     <span class="nd">@property</span>
     <span class="k">def</span><span class="w"> </span><span class="nf">config</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]:</span>
+<span class="w">        </span><span class="sd">"""Return the options of the covariance estimator as a dict."""</span>
         <span class="k">return</span> <span class="p">{</span>
             <span class="s2">"debiased"</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">debiased</span><span class="p">,</span>
             <span class="s2">"bandwidth"</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">_bandwidth</span><span class="p">,</span>
@@ -1366,32 +1401,40 @@
 <a class="viewcode-back" href="../../../iv/iv/linearmodels.iv.covariance.ClusteredCovariance.html#linearmodels.iv.covariance.ClusteredCovariance">[docs]</a>
 <span class="k">class</span><span class="w"> </span><span class="nc">ClusteredCovariance</span><span class="p">(</span><span class="n">HomoskedasticCovariance</span><span class="p">):</span>
 <span class="w">    </span><span class="sa">r</span><span class="sd">"""</span>
-<span class="sd">    Covariance estimation for clustered data</span>
+<span class="sd">    Covariance estimation for clustered data.</span>
 
 <span class="sd">    Parameters</span>
 <span class="sd">    ----------</span>
 <span class="sd">    x : ndarray</span>
-<span class="sd">        Model regressors (nobs by nvar)</span>
+<span class="sd">        Model regressors (nobs by nvar).</span>
 <span class="sd">    y : ndarray</span>
-<span class="sd">        Series ,modeled (nobs by 1)</span>
+<span class="sd">        Series modeled (nobs by 1).</span>
 <span class="sd">    z : ndarray</span>
-<span class="sd">        Instruments used for endogenous regressors (nobs by ninstr)</span>
+<span class="sd">        Instruments used for endogenous regressors (nobs by ninstr).</span>
 <span class="sd">    params : ndarray</span>
-<span class="sd">        Estimated model parameters (nvar by 1)</span>
-<span class="sd">    debiased : bool</span>
-<span class="sd">        Flag indicating whether to use a small-sample adjustment</span>
-<span class="sd">    clusters : array_like</span>
-<span class="sd">        Cluster group assignment.  If not provided, uses clusters of 1.</span>
-<span class="sd">        Either nobs by ncluster where ncluster is 1 or 2. A ``ValueError`` is</span>
-<span class="sd">        raised for more columns.</span>
-<span class="sd">    kappa : float</span>
-<span class="sd">        Value of kappa in k-class estimator</span>
+<span class="sd">        Estimated model parameters (nvar by 1).</span>
+<span class="sd">    clusters : array_like, optional</span>
+<span class="sd">        Cluster group assignment, with shape nobs by ncluster where ncluster is</span>
+<span class="sd">        1 or 2. If not provided, every observation is its own cluster. A</span>
+<span class="sd">        ``ValueError`` is raised for more columns.</span>
+<span class="sd">    debiased : bool, optional</span>
+<span class="sd">        Flag indicating whether to use a small-sample adjustment. The default is</span>
+<span class="sd">        False.</span>
+<span class="sd">    kappa : float, optional</span>
+<span class="sd">        Value of kappa in the k-class estimator. The default is 1.</span>
 <span class="sd">    extra_df : int, optional</span>
 <span class="sd">        Degrees of freedom that the model uses in addition to the nvar columns</span>
 <span class="sd">        of x, for example the absorbed effects of AbsorbingLS. The default is 0.</span>
 <span class="sd">        It is only used if ``debiased`` is True, when n / (n-k) becomes</span>
 <span class="sd">        n / (n-k-extra_df).</span>
 
+<span class="sd">    Raises</span>
+<span class="sd">    ------</span>
+<span class="sd">    ValueError</span>
+<span class="sd">        If the number of rows of x, y and z differ, if x and params have</span>
+<span class="sd">        incompatible dimensions, if clusters does not have one row for each</span>
+<span class="sd">        observation or has more than 2 columns, or if ``debiased`` is True and</span>
+<span class="sd">        there are no more observations than the columns of x plus ``extra_df``.</span>
 
 <span class="sd">    Notes</span>
 <span class="sd">    -----</span>
@@ -1465,7 +1508,7 @@
 
     <span class="nd">@property</span>
     <span class="k">def</span><span class="w"> </span><span class="nf">s</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">linearmodels</span><span class="o">.</span><span class="n">typing</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">Float64Array</span><span class="p">:</span>
-<span class="w">        </span><span class="sd">"""Clustered estimator of score covariance"""</span>
+<span class="w">        </span><span class="sd">"""Return the clustered estimator of the score covariance."""</span>
 
         <span class="k">def</span><span class="w"> </span><span class="nf">rescale</span><span class="p">(</span>
             <span class="n">s</span><span class="p">:</span> <span class="n">linearmodels</span><span class="o">.</span><span class="n">typing</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">Float64Array</span><span class="p">,</span> <span class="n">nc</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span> <span class="n">nobs</span><span class="p">:</span> <span class="nb">int</span>
@@ -1502,6 +1545,7 @@
 
     <span class="nd">@property</span>
     <span class="k">def</span><span class="w"> </span><span class="nf">config</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]:</span>
+<span class="w">        </span><span class="sd">"""Return the options of the covariance estimator as a dict."""</span>
         <span class="k">return</span> <span class="p">{</span>
             <span class="s2">"debiased"</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">debiased</span><span class="p">,</span>
             <span class="s2">"clusters"</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">_clusters</span><span class="p">,</span>

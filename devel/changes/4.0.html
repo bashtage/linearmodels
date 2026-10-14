@@ -23,7 +23,7 @@
     
   
       
-        <title>Version 4 - linearmodels v7.1 (+507)</title>
+        <title>Version 4 - linearmodels v7.1 (+513)</title>
       
     
 
@@ -100,7 +100,7 @@
 
 <header class="md-header md-header--shadow" data-md-component="header">
   <nav class="md-header__inner md-grid" aria-label="Header">
-    <a href="../index.html" title="linearmodels v7.1 (+507)" class="md-header__button md-logo" aria-label="linearmodels v7.1 (+507)" data-md-component="logo">
+    <a href="../index.html" title="linearmodels v7.1 (+513)" class="md-header__button md-logo" aria-label="linearmodels v7.1 (+513)" data-md-component="logo">
       <img src="../_static/bw-logo.svg" alt="logo">
     </a>
     <label class="md-header__button md-icon" for="__drawer">
@@ -111,7 +111,7 @@
       <div class="md-header__ellipsis">
         <div class="md-header__topic">
           <span class="md-ellipsis">
-            linearmodels v7.1 (+507)
+            linearmodels v7.1 (+513)
           </span>
         </div>
         <div class="md-header__topic" data-md-component="header-topic">
@@ -206,10 +206,10 @@
 
 <nav class="md-nav md-nav--primary" aria-label="Navigation" data-md-level="0">
   <label class="md-nav__title" for="__drawer">
-    <a href="../index.html" title="linearmodels v7.1 (+507)" class="md-nav__button md-logo" aria-label="linearmodels v7.1 (+507)" data-md-component="logo">
+    <a href="../index.html" title="linearmodels v7.1 (+513)" class="md-nav__button md-logo" aria-label="linearmodels v7.1 (+513)" data-md-component="logo">
       <img src="../_static/bw-logo.svg" alt="logo">
     </a>
-    linearmodels v7.1 (+507)
+    linearmodels v7.1 (+513)
   </label>
   
     <div class="md-nav__source">
@@ -1524,8 +1524,8 @@ data models (<a class="extlink-issue reference external" href="https://github.co
 </ul>
 <h2 id="version-4-26">Version 4.26<a class="headerlink" href="#version-4-26" title="Link to this heading">¶</a></h2>
 <ul class="simple">
-<li><p>Fixed a bug in <a class="reference internal" href="../iv/iv/linearmodels.iv.model.IV2SLS.html#linearmodels.iv.model.IV2SLS" title="linearmodels.iv.model.IV2SLS (Python class) — Estimation of IV models using two-stage least squares"><code class="xref py py-class docutils literal notranslate"><span class="pre">IV2SLS</span></code></a> and related models
-where <a class="reference internal" href="../iv/iv/linearmodels.iv.model.IV2SLS.predict.html#linearmodels.iv.model.IV2SLS.predict" title="linearmodels.iv.model.IV2SLS.predict (Python method) — Predict values for additional data"><code class="xref py py-func docutils literal notranslate"><span class="pre">predict()</span></code></a> would produce <code class="docutils literal notranslate"><span class="pre">NaN</span></code>
+<li><p>Fixed a bug in <a class="reference internal" href="../iv/iv/linearmodels.iv.model.IV2SLS.html#linearmodels.iv.model.IV2SLS" title="linearmodels.iv.model.IV2SLS (Python class) — Estimation of IV models using two-stage least squares."><code class="xref py py-class docutils literal notranslate"><span class="pre">IV2SLS</span></code></a> and related models
+where <a class="reference internal" href="../iv/iv/linearmodels.iv.model.IV2SLS.predict.html#linearmodels.iv.model.IV2SLS.predict" title="linearmodels.iv.model.IV2SLS.predict (Python method) — Predict values for additional data."><code class="xref py py-func docutils literal notranslate"><span class="pre">predict()</span></code></a> would produce <code class="docutils literal notranslate"><span class="pre">NaN</span></code>
 values when <code class="docutils literal notranslate"><span class="pre">exog</span></code> and <code class="docutils literal notranslate"><span class="pre">endog</span></code> had different indices. An
 <code class="docutils literal notranslate"><span class="pre">IndexWarning</span></code> is now shown.</p></li>
 <li><p>Added <code class="docutils literal notranslate"><span class="pre">stacklevel</span></code> to all warnings to improve accuracy of warning
@@ -1574,10 +1574,10 @@ that the <code class="docutils literal notranslate"><span class="pre">lapack_dri
 </ul>
 <h2 id="version-4-18">Version 4.18<a class="headerlink" href="#version-4-18" title="Link to this heading">¶</a></h2>
 <ul class="simple">
-<li><p>Improved performance of <a class="reference internal" href="../iv/absorbing/linearmodels.iv.absorbing.AbsorbingLS.fit.html#linearmodels.iv.absorbing.AbsorbingLS.fit" title="linearmodels.iv.absorbing.AbsorbingLS.fit (Python method) — Estimate model parameters"><code class="xref py py-meth docutils literal notranslate"><span class="pre">fit()</span></code></a> by
+<li><p>Improved performance of <a class="reference internal" href="../iv/absorbing/linearmodels.iv.absorbing.AbsorbingLS.fit.html#linearmodels.iv.absorbing.AbsorbingLS.fit" title="linearmodels.iv.absorbing.AbsorbingLS.fit (Python method) — Estimate model parameters."><code class="xref py py-meth docutils literal notranslate"><span class="pre">fit()</span></code></a> by
 deferring some operations.</p></li>
 <li><p>Added support for the method available in <a class="reference external" href="https://pypi.org/project/pyhdfe">PyHDFE</a>  in
-<a class="reference internal" href="../iv/absorbing/linearmodels.iv.absorbing.AbsorbingLS.html#linearmodels.iv.absorbing.AbsorbingLS" title="linearmodels.iv.absorbing.AbsorbingLS (Python class) — Linear regression with high-dimensional effects"><code class="xref py py-class docutils literal notranslate"><span class="pre">AbsorbingLS</span></code></a>. These methods can only be
+<a class="reference internal" href="../iv/absorbing/linearmodels.iv.absorbing.AbsorbingLS.html#linearmodels.iv.absorbing.AbsorbingLS" title="linearmodels.iv.absorbing.AbsorbingLS (Python class) — Linear regression with high-dimensional effects."><code class="xref py py-class docutils literal notranslate"><span class="pre">AbsorbingLS</span></code></a>. These methods can only be
 used when the variables absorbed are categorical (i.e., fixed-effects only) and
 when the model is unweighted.</p></li>
 <li><p>Added alternative measures of <span class="math notranslate nohighlight">\(R^2\)</span> using the squared correlation. See
@@ -1587,7 +1587,7 @@ when the model is unweighted.</p></li>
 <li><p>Added a clustered covariance estimator
 (<a class="reference internal" href="../system/system/linearmodels.system.covariance.ClusteredCovariance.html#linearmodels.system.covariance.ClusteredCovariance" title="linearmodels.system.covariance.ClusteredCovariance (Python class) — Heteroskedastic covariance estimation for system regression"><code class="xref py py-class docutils literal notranslate"><span class="pre">linearmodels.system.covariance.ClusteredCovariance</span></code></a>) for system regressions
 (<a class="extlink-issue reference external" href="https://github.com/bashtage/linearmodels/issues/241">GH241</a>).</p></li>
-<li><p>Fixed a bug in <a class="reference internal" href="../iv/iv/linearmodels.iv.covariance.kernel_optimal_bandwidth.html#linearmodels.iv.covariance.kernel_optimal_bandwidth" title="linearmodels.iv.covariance.kernel_optimal_bandwidth (Python function) — Select the bandwidth of a kernel covariance estimator from the data"><code class="xref py py-class docutils literal notranslate"><span class="pre">kernel_optimal_bandwidth</span></code></a>
+<li><p>Fixed a bug in <a class="reference internal" href="../iv/iv/linearmodels.iv.covariance.kernel_optimal_bandwidth.html#linearmodels.iv.covariance.kernel_optimal_bandwidth" title="linearmodels.iv.covariance.kernel_optimal_bandwidth (Python function) — Select the bandwidth of a kernel covariance estimator from the data."><code class="xref py py-class docutils literal notranslate"><span class="pre">kernel_optimal_bandwidth</span></code></a>
 which used incorrect values for a tuning parameter in the bandwidth estimation
 for the Parzen and Quadratic Spectral kernels (<a class="extlink-issue reference external" href="https://github.com/bashtage/linearmodels/issues/242">GH242</a>).</p></li>
 </ul>
@@ -1618,7 +1618,7 @@ period (<a class="extlink-issue reference external" href="https://github.com/bas
 </ul>
 <h2 id="version-4-13">Version 4.13<a class="headerlink" href="#version-4-13" title="Link to this heading">¶</a></h2>
 <ul class="simple">
-<li><p>Added <a class="reference internal" href="../iv/absorbing/linearmodels.iv.absorbing.AbsorbingLS.html#linearmodels.iv.absorbing.AbsorbingLS" title="linearmodels.iv.absorbing.AbsorbingLS (Python class) — Linear regression with high-dimensional effects"><code class="xref py py-class docutils literal notranslate"><span class="pre">AbsorbingLS</span></code></a> which allows a large number
+<li><p>Added <a class="reference internal" href="../iv/absorbing/linearmodels.iv.absorbing.AbsorbingLS.html#linearmodels.iv.absorbing.AbsorbingLS" title="linearmodels.iv.absorbing.AbsorbingLS (Python class) — Linear regression with high-dimensional effects."><code class="xref py py-class docutils literal notranslate"><span class="pre">AbsorbingLS</span></code></a> which allows a large number
 of variables to be absorbed. This model can handle very high-dimensional dummy
 variables and has been tested using up to 1,000,000 categories in a data set
 with 5,000,000 observations.</p></li>
@@ -1655,7 +1655,7 @@ that avoids constructing dummy variables. Only used when both <code class="docut
 and <code class="docutils literal notranslate"><span class="pre">time_effects</span></code> are <code class="docutils literal notranslate"><span class="pre">True</span></code>. By default, the low memory algorithm will be
 used whenever constructing the dummy variable array would require more than
 1 GiB. (<a class="extlink-issue reference external" href="https://github.com/bashtage/linearmodels/issues/182">GH182</a>)</p></li>
-<li><p>Added an option in model comparison (<a class="reference internal" href="../iv/iv/linearmodels.iv.results.compare.html#linearmodels.iv.results.compare" title="linearmodels.iv.results.compare (Python function) — Compare the results of multiple models"><code class="xref py py-func docutils literal notranslate"><span class="pre">compare()</span></code></a> and
+<li><p>Added an option in model comparison (<a class="reference internal" href="../iv/iv/linearmodels.iv.results.compare.html#linearmodels.iv.results.compare" title="linearmodels.iv.results.compare (Python function) — Compare the results of multiple models."><code class="xref py py-func docutils literal notranslate"><span class="pre">compare()</span></code></a> and
 <a class="reference internal" href="../panel/panel/linearmodels.panel.results.compare.html#linearmodels.panel.results.compare" title="linearmodels.panel.results.compare (Python function) — Compare the results of multiple models"><code class="xref py py-func docutils literal notranslate"><span class="pre">compare()</span></code></a>) to report standard errors or pvalues
 instead of t-stats. (<a class="extlink-issue reference external" href="https://github.com/bashtage/linearmodels/issues/178">GH178</a>)</p></li>
 </ul>
@@ -1678,7 +1678,7 @@ when the weight function was <code class="docutils literal notranslate"><span cl
 <li><p>Changed the return type of Wooldridge’s over identification test when
 invalid to <code class="docutils literal notranslate"><span class="pre">InvalidTestStatistic</span></code></p></li>
 <li><p>Add typing information to IV models</p></li>
-<li><p>Allow optimization parameters to be passed to <a class="reference internal" href="../iv/iv/linearmodels.iv.model.IVGMMCUE.html#linearmodels.iv.model.IVGMMCUE" title="linearmodels.iv.model.IVGMMCUE (Python class) — Estimation of IV models using continuously updating GMM"><code class="xref py py-class docutils literal notranslate"><span class="pre">IVGMMCUE</span></code></a></p></li>
+<li><p>Allow optimization parameters to be passed to <a class="reference internal" href="../iv/iv/linearmodels.iv.model.IVGMMCUE.html#linearmodels.iv.model.IVGMMCUE" title="linearmodels.iv.model.IVGMMCUE (Python class) — Estimation of IV models using continuously updating GMM."><code class="xref py py-class docutils literal notranslate"><span class="pre">IVGMMCUE</span></code></a></p></li>
 <li><p>Removed internal use of pandas Panel</p></li>
 <li><p>Improved performance in panel models when using
 <a class="reference internal" href="../panel/panel/linearmodels.panel.model.PanelOLS.from_formula.html#linearmodels.panel.model.PanelOLS.from_formula" title="linearmodels.panel.model.PanelOLS.from_formula (Python method) — Create a model from a formula"><code class="xref py py-func docutils literal notranslate"><span class="pre">from_formula()</span></code></a></p></li>

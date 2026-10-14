@@ -19,7 +19,7 @@
     
   
       
-        <title>linearmodels.iv.absorbing - linearmodels v7.1 (+507)</title>
+        <title>linearmodels.iv.absorbing - linearmodels v7.1 (+513)</title>
       
     
 
@@ -91,7 +91,7 @@
 
 <header class="md-header md-header--shadow" data-md-component="header">
   <nav class="md-header__inner md-grid" aria-label="Header">
-    <a href="../../../index.html" title="linearmodels v7.1 (+507)" class="md-header__button md-logo" aria-label="linearmodels v7.1 (+507)" data-md-component="logo">
+    <a href="../../../index.html" title="linearmodels v7.1 (+513)" class="md-header__button md-logo" aria-label="linearmodels v7.1 (+513)" data-md-component="logo">
       <img src="../../../_static/bw-logo.svg" alt="logo">
     </a>
     <label class="md-header__button md-icon" for="__drawer">
@@ -102,7 +102,7 @@
       <div class="md-header__ellipsis">
         <div class="md-header__topic">
           <span class="md-ellipsis">
-            linearmodels v7.1 (+507)
+            linearmodels v7.1 (+513)
           </span>
         </div>
         <div class="md-header__topic" data-md-component="header-topic">
@@ -197,10 +197,10 @@
 
 <nav class="md-nav md-nav--primary" aria-label="Navigation" data-md-level="0">
   <label class="md-nav__title" for="__drawer">
-    <a href="../../../index.html" title="linearmodels v7.1 (+507)" class="md-nav__button md-logo" aria-label="linearmodels v7.1 (+507)" data-md-component="logo">
+    <a href="../../../index.html" title="linearmodels v7.1 (+513)" class="md-nav__button md-logo" aria-label="linearmodels v7.1 (+513)" data-md-component="logo">
       <img src="../../../_static/bw-logo.svg" alt="logo">
     </a>
-    linearmodels v7.1 (+507)
+    linearmodels v7.1 (+513)
   </label>
   
     <div class="md-nav__source">
@@ -527,7 +527,11 @@
 
 
 <h1>Source code for linearmodels.iv.absorbing</h1><div class="highlight"><pre>
-<span></span><code><span class="kn">from</span><span class="w"> </span><span class="nn">__future__</span><span class="w"> </span><span class="kn">import</span> <span class="n">annotations</span>
+<span></span><code><span class="sd">"""</span>
+<span class="sd">Linear regression with high-dimensional effects.</span>
+<span class="sd">"""</span>
+
+<span class="kn">from</span><span class="w"> </span><span class="nn">__future__</span><span class="w"> </span><span class="kn">import</span> <span class="n">annotations</span>
 
 <span class="kn">from</span><span class="w"> </span><span class="nn">linearmodels.compat.scipy</span><span class="w"> </span><span class="kn">import</span> <span class="n">csc_array</span><span class="p">,</span> <span class="n">diags_array</span>
 
@@ -612,11 +616,15 @@
 
 
 <span class="k">def</span><span class="w"> </span><span class="nf">_non_negative</span><span class="p">(</span><span class="n">r2</span><span class="p">:</span> <span class="nb">float</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">float</span><span class="p">:</span>
-<span class="w">    </span><span class="sd">"""Clip an R2 at 0, which is not clipped if it is NaN since it is not defined"""</span>
+<span class="w">    </span><span class="sd">"""Clip an R2 at 0, which is not clipped if it is NaN since it is not defined."""</span>
     <span class="k">return</span> <span class="n">r2</span> <span class="k">if</span> <span class="n">isnan</span><span class="p">(</span><span class="n">r2</span><span class="p">)</span> <span class="k">else</span> <span class="nb">max</span><span class="p">(</span><span class="n">r2</span><span class="p">,</span> <span class="mf">0.0</span><span class="p">)</span>
 
 
 <span class="k">class</span><span class="w"> </span><span class="nc">Hasher</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">"""</span>
+<span class="sd">    Hash the values of an array using xxhash if it is installed, and SHA-256 if not.</span>
+<span class="sd">    """</span>
+
     <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_hasher</span><span class="p">:</span> <span class="n">hashlib</span><span class="o">.</span><span class="n">_Hash</span> <span class="o">|</span> <span class="n">xxh64</span>
         <span class="k">if</span> <span class="n">HAVE_XXHASH</span><span class="p">:</span>
@@ -627,6 +635,7 @@
             <span class="bp">self</span><span class="o">.</span><span class="n">_use_xxh64</span> <span class="o">=</span> <span class="kc">False</span>
 
     <span class="k">def</span><span class="w"> </span><span class="nf">reset</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">"""Reset the hasher to its initial state."""</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_use_xxh64</span><span class="p">:</span>
             <span class="k">assert</span> <span class="nb">isinstance</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_hasher</span><span class="p">,</span> <span class="n">xxh64</span><span class="p">)</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">_hasher</span><span class="o">.</span><span class="n">reset</span><span class="p">()</span>
@@ -634,12 +643,36 @@
             <span class="bp">self</span><span class="o">.</span><span class="n">_hasher</span> <span class="o">=</span> <span class="n">hashlib</span><span class="o">.</span><span class="n">sha256</span><span class="p">()</span>
 
     <span class="k">def</span><span class="w"> </span><span class="nf">update</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">data</span><span class="p">:</span> <span class="nb">memoryview</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">"""</span>
+<span class="sd">        Add data to the hash.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        data : memoryview</span>
+<span class="sd">            The values to hash.</span>
+<span class="sd">        """</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_hasher</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="n">data</span><span class="p">)</span>
 
     <span class="k">def</span><span class="w"> </span><span class="nf">digest</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bytes</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">"""</span>
+<span class="sd">        Return the digest of the data added so far.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        bytes</span>
+<span class="sd">            The digest.</span>
+<span class="sd">        """</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_hasher</span><span class="o">.</span><span class="n">digest</span><span class="p">()</span>
 
     <span class="k">def</span><span class="w"> </span><span class="nf">hexdigest</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">"""</span>
+<span class="sd">        Return the digest of the data added so far as a string of hexadecimal digits.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        str</span>
+<span class="sd">            The digest.</span>
+<span class="sd">        """</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_hasher</span><span class="o">.</span><span class="n">hexdigest</span><span class="p">()</span>
 
 
@@ -647,13 +680,13 @@
 
 
 <span class="k">def</span><span class="w"> </span><span class="nf">clear_cache</span><span class="p">()</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
-<span class="w">    </span><span class="sd">"""Clear the absorbed variable cache"""</span>
+<span class="w">    </span><span class="sd">"""Clear the absorbed variable cache."""</span>
     <span class="n">_VARIABLE_CACHE</span><span class="o">.</span><span class="n">clear</span><span class="p">()</span>
 
 
 <span class="k">def</span><span class="w"> </span><span class="nf">_options_key</span><span class="p">(</span><span class="n">options</span><span class="p">:</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="nb">tuple</span><span class="p">[</span><span class="n">Any</span><span class="p">,</span> <span class="o">...</span><span class="p">]:</span>
 <span class="w">    </span><span class="sd">"""</span>
-<span class="sd">    Hashable key that identifies options of an absorption algorithm</span>
+<span class="sd">    Hashable key that identifies options of an absorption algorithm.</span>
 
 <span class="sd">    Parameters</span>
 <span class="sd">    ----------</span>
@@ -682,17 +715,17 @@
 
 <span class="k">def</span><span class="w"> </span><span class="nf">_check_method</span><span class="p">(</span><span class="n">method</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">"""</span>
-<span class="sd">    Check the method used to absorb the variables</span>
+<span class="sd">    Check the method used to absorb the variables.</span>
 
 <span class="sd">    Parameters</span>
 <span class="sd">    ----------</span>
 <span class="sd">    method : str</span>
-<span class="sd">        The method that was passed to fit</span>
+<span class="sd">        The method that was passed to fit.</span>
 
 <span class="sd">    Returns</span>
 <span class="sd">    -------</span>
 <span class="sd">    str</span>
-<span class="sd">        The method in lower case</span>
+<span class="sd">        The method in lower case.</span>
 
 <span class="sd">    Raises</span>
 <span class="sd">    ------</span>
@@ -710,7 +743,7 @@
 <span class="k">def</span><span class="w"> </span><span class="nf">_absorb_args</span><span class="p">(</span>
     <span class="n">method</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">use_cache</span><span class="p">:</span> <span class="nb">bool</span><span class="p">,</span> <span class="n">absorb_options</span><span class="p">:</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]</span> <span class="o">|</span> <span class="kc">None</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">tuple</span><span class="p">[</span><span class="n">Any</span><span class="p">,</span> <span class="o">...</span><span class="p">]:</span>
-<span class="w">    </span><span class="sd">"""The arguments of AbsorbingLS.fit that determine the absorbed variables"""</span>
+<span class="w">    </span><span class="sd">"""The arguments of AbsorbingLS.fit that determine the absorbed variables."""</span>
     <span class="n">options</span> <span class="o">=</span> <span class="p">{}</span> <span class="k">if</span> <span class="n">absorb_options</span> <span class="ow">is</span> <span class="kc">None</span> <span class="k">else</span> <span class="n">absorb_options</span>
     <span class="k">return</span> <span class="n">method</span><span class="p">,</span> <span class="n">use_cache</span><span class="p">,</span> <span class="n">_options_key</span><span class="p">(</span><span class="n">options</span><span class="p">)</span>
 
@@ -720,19 +753,19 @@
     <span class="n">cluster</span><span class="p">:</span> <span class="n">linearmodels</span><span class="o">.</span><span class="n">typing</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">AnyArray</span><span class="p">,</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">"""</span>
-<span class="sd">    Test whether every category of an effect is in a single cluster</span>
+<span class="sd">    Test whether every category of an effect is in a single cluster.</span>
 
 <span class="sd">    Parameters</span>
 <span class="sd">    ----------</span>
 <span class="sd">    effect : ndarray</span>
-<span class="sd">        Integer codes of the categories of the effect, with shape (nobs,)</span>
+<span class="sd">        Integer codes of the categories of the effect, with shape (nobs,).</span>
 <span class="sd">    cluster : ndarray</span>
-<span class="sd">        Cluster of each observation, with shape (nobs,)</span>
+<span class="sd">        Cluster of each observation, with shape (nobs,).</span>
 
 <span class="sd">    Returns</span>
 <span class="sd">    -------</span>
 <span class="sd">    bool</span>
-<span class="sd">        True if each category of the effect has observations in one cluster only</span>
+<span class="sd">        True if each category of the effect has observations in one cluster only.</span>
 <span class="sd">    """</span>
     <span class="n">_</span><span class="p">,</span> <span class="n">effect_codes</span> <span class="o">=</span> <span class="n">unique</span><span class="p">(</span><span class="n">effect</span><span class="p">,</span> <span class="n">return_inverse</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
     <span class="n">_</span><span class="p">,</span> <span class="n">cluster_codes</span> <span class="o">=</span> <span class="n">unique</span><span class="p">(</span><span class="n">cluster</span><span class="p">,</span> <span class="n">return_inverse</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
@@ -742,16 +775,16 @@
 
 <span class="k">def</span><span class="w"> </span><span class="nf">_check_absorb_options</span><span class="p">(</span><span class="n">options</span><span class="p">:</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">],</span> <span class="n">use_hdfe</span><span class="p">:</span> <span class="nb">bool</span><span class="p">,</span> <span class="n">method</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">"""</span>
-<span class="sd">    Raise a ValueError if options are those of the algorithm that is not used</span>
+<span class="sd">    Raise a ValueError if options are those of the algorithm that is not used.</span>
 
 <span class="sd">    Parameters</span>
 <span class="sd">    ----------</span>
 <span class="sd">    options : dict</span>
-<span class="sd">        The options of the algorithm that absorbs the variables</span>
+<span class="sd">        The options of the algorithm that absorbs the variables.</span>
 <span class="sd">    use_hdfe : bool</span>
-<span class="sd">        Flag indicating that pyhdfe absorbs the variables and not LSMR</span>
+<span class="sd">        Flag indicating that pyhdfe absorbs the variables and not LSMR.</span>
 <span class="sd">    method : str</span>
-<span class="sd">        The method that was passed to fit</span>
+<span class="sd">        The method that was passed to fit.</span>
 
 <span class="sd">    Notes</span>
 <span class="sd">    -----</span>
@@ -799,26 +832,28 @@
     <span class="p">),</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">linearmodels</span><span class="o">.</span><span class="n">typing</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">Float64Array</span><span class="p">:</span>
 <span class="w">    </span><span class="sa">r</span><span class="sd">"""</span>
-<span class="sd">    Removes projection of x on y from y</span>
+<span class="sd">    Remove the projection of y on x from y.</span>
 
 <span class="sd">    Parameters</span>
 <span class="sd">    ----------</span>
 <span class="sd">    x : csc_array</span>
-<span class="sd">        Sparse array of regressors</span>
+<span class="sd">        Sparse array of regressors.</span>
 <span class="sd">    y : ndarray</span>
-<span class="sd">        Array with shape (nobs, nvar)</span>
-<span class="sd">    use_cache : bool</span>
+<span class="sd">        Array with shape (nobs, nvar).</span>
+<span class="sd">    use_cache : bool, optional</span>
 <span class="sd">        Flag indicating whether results should be stored in the cache,</span>
-<span class="sd">        and retrieved if available.</span>
-<span class="sd">    x_hash : object</span>
-<span class="sd">        Hashable object representing the values in x</span>
-<span class="sd">    lsmr_options: dict</span>
-<span class="sd">        Dictionary of options to pass to scipy.sparse.linalg.lsmr</span>
+<span class="sd">        and retrieved if available. The default is True.</span>
+<span class="sd">    x_hash : object, optional</span>
+<span class="sd">        Hashable object representing the values in x. The cache is not used if</span>
+<span class="sd">        it is not provided.</span>
+<span class="sd">    **lsmr_options : dict</span>
+<span class="sd">        Options to pass to scipy.sparse.linalg.lsmr. The defaults are</span>
+<span class="sd">        ``atol=1e-8``, ``btol=1e-8`` and ``show=False``.</span>
 
 <span class="sd">    Returns</span>
 <span class="sd">    -------</span>
 <span class="sd">    ndarray</span>
-<span class="sd">        Returns the residuals from regressing y on x, (nobs, nvar)</span>
+<span class="sd">        The residuals from regressing y on x, with shape (nobs, nvar).</span>
 
 <span class="sd">    Notes</span>
 <span class="sd">    -----</span>
@@ -867,11 +902,11 @@
 
 <span class="k">def</span><span class="w"> </span><span class="nf">category_product</span><span class="p">(</span><span class="n">cats</span><span class="p">:</span> <span class="n">linearmodels</span><span class="o">.</span><span class="n">typing</span><span class="o">.</span><span class="n">AnyPandas</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Series</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">"""</span>
-<span class="sd">    Construct category from all combination of input categories</span>
+<span class="sd">    Construct category from all combination of input categories.</span>
 
 <span class="sd">    Parameters</span>
 <span class="sd">    ----------</span>
-<span class="sd">    cats : {Series, DataFrame}</span>
+<span class="sd">    cats : Series or DataFrame</span>
 <span class="sd">        DataFrame containing categorical variables.  If cats is a Series, cats</span>
 <span class="sd">        is returned unmodified.</span>
 
@@ -879,7 +914,14 @@
 <span class="sd">    -------</span>
 <span class="sd">    Series</span>
 <span class="sd">        Categorical series containing the cartesian product of the categories</span>
-<span class="sd">        in cats</span>
+<span class="sd">        in cats.</span>
+
+<span class="sd">    Raises</span>
+<span class="sd">    ------</span>
+<span class="sd">    TypeError</span>
+<span class="sd">        If a column of cats is not categorical.</span>
+<span class="sd">    ValueError</span>
+<span class="sd">        If the categories have too many states to be combined.</span>
 <span class="sd">    """</span>
     <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">cats</span><span class="p">,</span> <span class="n">Series</span><span class="p">):</span>
         <span class="k">return</span> <span class="n">cats</span>
@@ -927,17 +969,20 @@
 
 <span class="k">def</span><span class="w"> </span><span class="nf">category_interaction</span><span class="p">(</span><span class="n">cat</span><span class="p">:</span> <span class="n">Series</span><span class="p">,</span> <span class="n">precondition</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">csc_array</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">"""</span>
+<span class="sd">    Convert a categorical series to a sparse matrix of dummy variables.</span>
+
 <span class="sd">    Parameters</span>
 <span class="sd">    ----------</span>
 <span class="sd">    cat : Series</span>
-<span class="sd">        Categorical series to convert to dummy variables</span>
-<span class="sd">    precondition : bool</span>
-<span class="sd">        Flag whether dummies should be preconditioned</span>
+<span class="sd">        Categorical series to convert to dummy variables.</span>
+<span class="sd">    precondition : bool, optional</span>
+<span class="sd">        Flag whether dummies should be preconditioned. The default is True.</span>
 
 <span class="sd">    Returns</span>
 <span class="sd">    -------</span>
 <span class="sd">    csc_array</span>
-<span class="sd">        Sparse matrix of dummies with unit column norm</span>
+<span class="sd">        Sparse matrix of dummies. The columns have unit norm if the dummies are</span>
+<span class="sd">        preconditioned.</span>
 <span class="sd">    """</span>
     <span class="n">codes</span> <span class="o">=</span> <span class="n">asarray</span><span class="p">(</span><span class="n">category_product</span><span class="p">(</span><span class="n">cat</span><span class="p">)</span><span class="o">.</span><span class="n">cat</span><span class="o">.</span><span class="n">codes</span><span class="p">)[:,</span> <span class="kc">None</span><span class="p">]</span>
     <span class="n">mat</span> <span class="o">=</span> <span class="n">dummy_matrix</span><span class="p">(</span><span class="n">codes</span><span class="p">,</span> <span class="n">precondition</span><span class="o">=</span><span class="n">precondition</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span>
@@ -951,19 +996,23 @@
     <span class="n">precondition</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">csc_array</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">"""</span>
+<span class="sd">    Interact a categorical series with continuous variables.</span>
+
 <span class="sd">    Parameters</span>
 <span class="sd">    ----------</span>
-<span class="sd">    cat : Series</span>
-<span class="sd">        Categorical series to convert to dummy variables</span>
-<span class="sd">    cont : {Series, DataFrame}</span>
-<span class="sd">        Continuous variable values to use in the dummy interaction</span>
-<span class="sd">    precondition : bool</span>
-<span class="sd">        Flag whether dummies should be preconditioned</span>
+<span class="sd">    cat : Series or DataFrame</span>
+<span class="sd">        Categorical series to convert to dummy variables. The cartesian product</span>
+<span class="sd">        of the categories of a DataFrame is used.</span>
+<span class="sd">    cont : Series or DataFrame</span>
+<span class="sd">        Continuous variable values to use in the dummy interaction.</span>
+<span class="sd">    precondition : bool, optional</span>
+<span class="sd">        Flag whether dummies should be preconditioned. The default is True.</span>
 
 <span class="sd">    Returns</span>
 <span class="sd">    -------</span>
 <span class="sd">    csc_array</span>
-<span class="sd">        Sparse matrix of dummy interactions with unit column norm</span>
+<span class="sd">        Sparse matrix of dummy interactions. The columns have unit norm if the</span>
+<span class="sd">        dummies are preconditioned.</span>
 <span class="sd">    """</span>
     <span class="n">codes</span> <span class="o">=</span> <span class="n">category_product</span><span class="p">(</span><span class="n">cat</span><span class="p">)</span><span class="o">.</span><span class="n">cat</span><span class="o">.</span><span class="n">codes</span>
     <span class="n">interact</span> <span class="o">=</span> <span class="n">csc_array</span><span class="p">((</span><span class="n">cont</span><span class="o">.</span><span class="n">to_numpy</span><span class="p">()</span><span class="o">.</span><span class="n">flat</span><span class="p">,</span> <span class="p">(</span><span class="n">arange</span><span class="p">(</span><span class="n">codes</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]),</span> <span class="n">codes</span><span class="p">)))</span>
@@ -979,18 +1028,30 @@
 <a class="viewcode-back" href="../../../iv/absorbing/linearmodels.iv.absorbing.Interaction.html#linearmodels.iv.absorbing.Interaction">[docs]</a>
 <span class="k">class</span><span class="w"> </span><span class="nc">Interaction</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">"""</span>
-<span class="sd">    Class that simplifies specifying interactions</span>
+<span class="sd">    Class that simplifies specifying interactions.</span>
 
 <span class="sd">    Parameters</span>
 <span class="sd">    ----------</span>
-<span class="sd">    cat : array_like</span>
+<span class="sd">    cat : array_like, optional</span>
 <span class="sd">        Variables to treat as categoricals. Best format is a Categorical</span>
 <span class="sd">        Series or DataFrame containing Categorical Series. Other formats</span>
-<span class="sd">        are converted to Categorical Series, column-by-column. cats has</span>
+<span class="sd">        are converted to Categorical Series, column-by-column. cat has</span>
 <span class="sd">        shape (nobs, ncat).</span>
-<span class="sd">    cont : array_like</span>
+<span class="sd">    cont : array_like, optional</span>
 <span class="sd">        Variables to treat as continuous, (nobs, ncont). A ``TypeError`` is</span>
 <span class="sd">        raised if the values are complex or cannot be converted to float64.</span>
+<span class="sd">    nobs : int, optional</span>
+<span class="sd">        Number of observations. It is required if both ``cat`` and ``cont`` are</span>
+<span class="sd">        not provided, and it is otherwise the number of rows of the inputs.</span>
+
+<span class="sd">    Raises</span>
+<span class="sd">    ------</span>
+<span class="sd">    TypeError</span>
+<span class="sd">        If ``cat`` or ``cont`` is complex or cannot be converted to float64.</span>
+<span class="sd">    ValueError</span>
+<span class="sd">        If ``nobs`` is not provided when ``cat`` and ``cont`` are not provided,</span>
+<span class="sd">        if both are empty, if they have different numbers of rows, or if they</span>
+<span class="sd">        carry labels that differ.</span>
 
 <span class="sd">    Notes</span>
 <span class="sd">    -----</span>
@@ -1086,16 +1147,17 @@
 
     <span class="nd">@property</span>
     <span class="k">def</span><span class="w"> </span><span class="nf">cat</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">DataFrame</span><span class="p">:</span>
-<span class="w">        </span><span class="sd">"""Categorical Variables"""</span>
+<span class="w">        </span><span class="sd">"""Categorical variables."""</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_cat_data</span><span class="o">.</span><span class="n">pandas</span>
 
     <span class="nd">@property</span>
     <span class="k">def</span><span class="w"> </span><span class="nf">cont</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">DataFrame</span><span class="p">:</span>
-<span class="w">        </span><span class="sd">"""Continuous Variables"""</span>
+<span class="w">        </span><span class="sd">"""Continuous variables."""</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_cont_data</span><span class="o">.</span><span class="n">pandas</span>
 
     <span class="nd">@property</span>
     <span class="k">def</span><span class="w"> </span><span class="nf">isnull</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Series</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">"""Return a Series that is True for the rows that contain a missing value."""</span>
         <span class="n">cat_null</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">cat</span><span class="o">.</span><span class="n">isnull</span><span class="p">()</span><span class="o">.</span><span class="n">any</span><span class="p">(</span><span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
         <span class="n">cont_null</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">cont</span><span class="o">.</span><span class="n">isnull</span><span class="p">()</span><span class="o">.</span><span class="n">any</span><span class="p">(</span><span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
         <span class="c1"># Rows are paired by position since cat and cont need not have labels</span>
@@ -1128,7 +1190,7 @@
     <span class="nd">@property</span>
     <span class="k">def</span><span class="w"> </span><span class="nf">sparse</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">csc_array</span><span class="p">:</span>
 <span class="w">        </span><span class="sa">r</span><span class="sd">"""</span>
-<span class="sd">        Construct a sparse interaction matrix</span>
+<span class="sd">        Construct a sparse interaction matrix.</span>
 
 <span class="sd">        Returns</span>
 <span class="sd">        -------</span>
@@ -1138,7 +1200,7 @@
 
 <span class="sd">        Notes</span>
 <span class="sd">        -----</span>
-<span class="sd">        The number of columns in `dummy_interact` is</span>
+<span class="sd">        The number of columns is</span>
 
 <span class="sd">        .. math::</span>
 
@@ -1164,8 +1226,15 @@
     <span class="nd">@property</span>
     <span class="k">def</span><span class="w"> </span><span class="nf">hash</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">list</span><span class="p">[</span><span class="nb">tuple</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="o">...</span><span class="p">]]:</span>
 <span class="w">        </span><span class="sd">"""</span>
-<span class="sd">        Construct a hash that will be invariant for any permutation of</span>
-<span class="sd">        inputs that produce the same fit when used as regressors"""</span>
+<span class="sd">        Construct a hash that is invariant to the order of the inputs.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        list of tuple of str</span>
+<span class="sd">            The sorted hashes of the interactions of the categorical variables</span>
+<span class="sd">            with each continuous variable. Inputs that produce the same fit when</span>
+<span class="sd">            they are used as regressors have the same hash.</span>
+<span class="sd">        """</span>
         <span class="c1"># Sorted hashes of any categoricals</span>
         <span class="n">hasher</span> <span class="o">=</span> <span class="n">Hasher</span><span class="p">()</span>
         <span class="n">cat_hashes</span> <span class="o">=</span> <span class="p">[]</span>
@@ -1192,7 +1261,7 @@
     <span class="nd">@staticmethod</span>
     <span class="k">def</span><span class="w"> </span><span class="nf">from_frame</span><span class="p">(</span><span class="n">frame</span><span class="p">:</span> <span class="n">DataFrame</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Interaction</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">"""</span>
-<span class="sd">        Convenience function the simplifies using a DataFrame</span>
+<span class="sd">        Create an Interaction from the columns of a DataFrame.</span>
 
 <span class="sd">        Parameters</span>
 <span class="sd">        ----------</span>
@@ -1204,7 +1273,13 @@
 <span class="sd">        Returns</span>
 <span class="sd">        -------</span>
 <span class="sd">        Interaction</span>
-<span class="sd">            Instance using the columns of frame</span>
+<span class="sd">            Instance using the columns of frame.</span>
+
+<span class="sd">        Raises</span>
+<span class="sd">        ------</span>
+<span class="sd">        TypeError</span>
+<span class="sd">            If ``frame`` is not a DataFrame, or a column that is not categorical</span>
+<span class="sd">            is not numeric.</span>
 
 <span class="sd">        Examples</span>
 <span class="sd">        --------</span>
@@ -1228,7 +1303,7 @@
 
     <span class="nd">@staticmethod</span>
     <span class="k">def</span><span class="w"> </span><span class="nf">_from_frame</span><span class="p">(</span><span class="n">frame</span><span class="p">:</span> <span class="n">DataFrame</span><span class="p">,</span> <span class="n">name</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Interaction</span><span class="p">:</span>
-<span class="w">        </span><span class="sd">"""from_frame, where name is used to refer to frame in error messages"""</span>
+<span class="w">        </span><span class="sd">"""from_frame, where name is used to refer to frame in error messages."""</span>
         <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">frame</span><span class="p">,</span> <span class="n">DataFrame</span><span class="p">):</span>
             <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="sa">f</span><span class="s2">"</span><span class="si">{</span><span class="n">name</span><span class="si">}</span><span class="s2"> must be a DataFrame. Got </span><span class="si">{</span><span class="nb">type</span><span class="p">(</span><span class="n">frame</span><span class="p">)</span><span class="o">.</span><span class="vm">__name__</span><span class="si">}</span><span class="s2">."</span><span class="p">)</span>
         <span class="n">cat_cols</span> <span class="o">=</span> <span class="p">[</span>
@@ -1260,18 +1335,19 @@
 <a class="viewcode-back" href="../../../iv/absorbing/linearmodels.iv.absorbing.AbsorbingRegressor.html#linearmodels.iv.absorbing.AbsorbingRegressor">[docs]</a>
 <span class="k">class</span><span class="w"> </span><span class="nc">AbsorbingRegressor</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">"""</span>
-<span class="sd">    Constructed weights sparse matrix from components</span>
+<span class="sd">    Construct a sparse matrix of regressors from components.</span>
 
 <span class="sd">    Parameters</span>
 <span class="sd">    ----------</span>
-<span class="sd">    cat : DataFrame</span>
-<span class="sd">        List of categorical variables (factors) to absorb</span>
-<span class="sd">    cont : DataFrame</span>
-<span class="sd">        List of continuous variables to absorb</span>
-<span class="sd">    interactions : list[Interaction]</span>
-<span class="sd">        List of included interactions</span>
-<span class="sd">    weights : ndarray</span>
-<span class="sd">        Weights, if any</span>
+<span class="sd">    cat : DataFrame, optional</span>
+<span class="sd">        Categorical variables (factors) to absorb.</span>
+<span class="sd">    cont : DataFrame, optional</span>
+<span class="sd">        Continuous variables to absorb.</span>
+<span class="sd">    interactions : list of Interaction, optional</span>
+<span class="sd">        Included interactions.</span>
+<span class="sd">    weights : ndarray, optional</span>
+<span class="sd">        Weights, if any. The regressors are multiplied by the square root of the</span>
+<span class="sd">        weights.</span>
 <span class="sd">    """</span>
 
     <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span>
@@ -1290,11 +1366,12 @@
 
     <span class="nd">@property</span>
     <span class="k">def</span><span class="w"> </span><span class="nf">has_constant</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
-<span class="w">        </span><span class="sd">"""Flag indicating whether the regressors have a constant equivalent"""</span>
+<span class="w">        </span><span class="sd">"""Flag indicating whether the regressors have a constant equivalent."""</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_cat</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="ow">and</span> <span class="bp">self</span><span class="o">.</span><span class="n">_cat</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">&gt;</span> <span class="mi">0</span>
 
     <span class="nd">@property</span>
     <span class="k">def</span><span class="w"> </span><span class="nf">approx_rank</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">int</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">"""Return the number of columns of the regressors, an upper bound of their rank."""</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_approx_rank</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">_regressors</span><span class="p">()</span>
         <span class="k">assert</span> <span class="bp">self</span><span class="o">.</span><span class="n">_approx_rank</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span>
@@ -1302,6 +1379,7 @@
 
     <span class="nd">@property</span>
     <span class="k">def</span><span class="w"> </span><span class="nf">hash</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">tuple</span><span class="p">[</span><span class="nb">tuple</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="o">...</span><span class="p">],</span> <span class="o">...</span><span class="p">]:</span>
+<span class="w">        </span><span class="sd">"""Return a hash of the regressors, which does not depend on their order."""</span>
         <span class="n">hashes</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="nb">tuple</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="o">...</span><span class="p">]]</span> <span class="o">=</span> <span class="p">[]</span>
         <span class="n">hasher</span> <span class="o">=</span> <span class="n">Hasher</span><span class="p">()</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_cat</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
@@ -1332,6 +1410,7 @@
 
     <span class="nd">@property</span>
     <span class="k">def</span><span class="w"> </span><span class="nf">regressors</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">csc_array</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">"""Return the sparse matrix of regressors."""</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_regressors</span><span class="p">()</span>
 
     <span class="k">def</span><span class="w"> </span><span class="nf">_regressors</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">csc_array</span><span class="p">:</span>
@@ -1363,14 +1442,14 @@
 <a class="viewcode-back" href="../../../iv/absorbing/linearmodels.iv.absorbing.AbsorbingLS.html#linearmodels.iv.absorbing.AbsorbingLS">[docs]</a>
 <span class="k">class</span><span class="w"> </span><span class="nc">AbsorbingLS</span><span class="p">:</span>
 <span class="w">    </span><span class="sa">r</span><span class="sd">"""</span>
-<span class="sd">    Linear regression with high-dimensional effects</span>
+<span class="sd">    Linear regression with high-dimensional effects.</span>
 
 <span class="sd">    Parameters</span>
 <span class="sd">    ----------</span>
 <span class="sd">    dependent : array_like</span>
-<span class="sd">        Endogenous variables (nobs by 1)</span>
+<span class="sd">        Dependent variable (nobs by 1).</span>
 <span class="sd">    exog : array_like, optional</span>
-<span class="sd">        Exogenous regressors  (nobs by nexog)</span>
+<span class="sd">        Exogenous regressors (nobs by nexog).</span>
 <span class="sd">    absorb : DataFrame or Interaction, optional</span>
 <span class="sd">        The effects or continuous variables to absorb. When using a DataFrame,</span>
 <span class="sd">        effects must be categorical variables. Other variable types are treated</span>
@@ -1388,9 +1467,30 @@
 <span class="sd">    weights : array_like, optional</span>
 <span class="sd">        Observation weights used in estimation. The weights must be strictly positive</span>
 <span class="sd">        and finite. They are rescaled to have a mean of 1. A NaN weight is missing, and</span>
-<span class="sd">        its observation is dropped.</span>
-<span class="sd">    drop_absorbed : bool</span>
-<span class="sd">        Flag indicating whether to drop absorbed variables</span>
+<span class="sd">        its observation is dropped. The default is to weight all observations equally.</span>
+<span class="sd">    drop_absorbed : bool, optional</span>
+<span class="sd">        Flag indicating whether to drop absorbed variables. The default is False.</span>
+
+<span class="sd">    Raises</span>
+<span class="sd">    ------</span>
+<span class="sd">    TypeError</span>
+<span class="sd">        If ``absorb`` or ``interactions`` is not a DataFrame or an Interaction</span>
+<span class="sd">        (a list of them for ``interactions``), or if a column that is not</span>
+<span class="sd">        categorical is not numeric.</span>
+<span class="sd">    ValueError</span>
+<span class="sd">        If ``dependent``, ``exog``, ``absorb``, ``interactions`` and ``weights``</span>
+<span class="sd">        have different numbers of observations or labels that do not match (see</span>
+<span class="sd">        Notes), if all observations have a missing value, or if ``weights`` are</span>
+<span class="sd">        not strictly positive and finite.</span>
+
+<span class="sd">    See Also</span>
+<span class="sd">    --------</span>
+<span class="sd">    Interaction : Specify interactions between categorical and continuous variables.</span>
+<span class="sd">    linearmodels.iv.model.IVLIML : Limited information ML and k-class estimation of</span>
+<span class="sd">        IV models.</span>
+<span class="sd">    linearmodels.iv.model.IV2SLS : Estimation of IV models using two-stage least</span>
+<span class="sd">        squares.</span>
+<span class="sd">    scipy.sparse.linalg.lsmr : Iterative solver for sparse least squares problems.</span>
 
 <span class="sd">    Notes</span>
 <span class="sd">    -----</span>
@@ -1449,13 +1549,6 @@
 <span class="sd">    Dates and time deltas are compared by value, so that the same dates at</span>
 <span class="sd">    different resolutions, e.g., ``datetime64[us]`` and ``datetime64[ns]``, are</span>
 <span class="sd">    the same labels.</span>
-
-<span class="sd">    See also</span>
-<span class="sd">    --------</span>
-<span class="sd">    Interaction</span>
-<span class="sd">    linearmodels.iv.model.IVLIML</span>
-<span class="sd">    linearmodels.iv.model.IV2SLS</span>
-<span class="sd">    scipy.sparse.linalg.lsmr</span>
 
 <span class="sd">    Examples</span>
 <span class="sd">    --------</span>
@@ -1596,7 +1689,7 @@
                 <span class="p">)</span>
 
     <span class="k">def</span><span class="w"> </span><span class="nf">_check_alignment</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
-<span class="w">        </span><span class="sd">"""Check that inputs with labels use the labels of dependent, or the first"""</span>
+<span class="w">        </span><span class="sd">"""Check that inputs with labels use the labels of dependent, or the first."""</span>
         <span class="n">inputs</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="nb">tuple</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">object</span><span class="p">]]</span> <span class="o">=</span> <span class="p">[(</span><span class="s2">"exog"</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_exog</span><span class="p">)]</span>
         <span class="n">interactions</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="nb">tuple</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Interaction</span><span class="p">]]</span> <span class="o">=</span> <span class="p">[(</span><span class="s2">"absorb"</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_absorb_inter</span><span class="p">)]</span>
         <span class="n">single</span> <span class="o">=</span> <span class="nb">isinstance</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_interactions</span><span class="p">,</span> <span class="p">(</span><span class="n">DataFrame</span><span class="p">,</span> <span class="n">Interaction</span><span class="p">))</span>
@@ -1615,12 +1708,12 @@
     <span class="nd">@property</span>
     <span class="k">def</span><span class="w"> </span><span class="nf">absorbed_dependent</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">DataFrame</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">"""</span>
-<span class="sd">        Dependent variable with effects absorbed</span>
+<span class="sd">        Dependent variable with effects absorbed.</span>
 
 <span class="sd">        Returns</span>
 <span class="sd">        -------</span>
 <span class="sd">        DataFrame</span>
-<span class="sd">            Dependent after effects have been absorbed</span>
+<span class="sd">            Dependent after effects have been absorbed.</span>
 
 <span class="sd">        Raises</span>
 <span class="sd">        ------</span>
@@ -1636,12 +1729,12 @@
     <span class="nd">@property</span>
     <span class="k">def</span><span class="w"> </span><span class="nf">absorbed_exog</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">DataFrame</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">"""</span>
-<span class="sd">        Exogenous variables with effects absorbed</span>
+<span class="sd">        Exogenous variables with effects absorbed.</span>
 
 <span class="sd">        Returns</span>
 <span class="sd">        -------</span>
 <span class="sd">        DataFrame</span>
-<span class="sd">            Exogenous after effects have been absorbed</span>
+<span class="sd">            Exogenous after effects have been absorbed.</span>
 
 <span class="sd">        Raises</span>
 <span class="sd">        ------</span>
@@ -1654,22 +1747,27 @@
 
     <span class="nd">@property</span>
     <span class="k">def</span><span class="w"> </span><span class="nf">weights</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">IVData</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">"""Return the weights, which have a mean of 1."""</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_weight_data</span>
 
     <span class="nd">@property</span>
     <span class="k">def</span><span class="w"> </span><span class="nf">dependent</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">IVData</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">"""Return the dependent variable."""</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_dependent</span>
 
     <span class="nd">@property</span>
     <span class="k">def</span><span class="w"> </span><span class="nf">exog</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">IVData</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">"""Return the exogenous regressors."""</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_exog</span>
 
     <span class="nd">@property</span>
     <span class="k">def</span><span class="w"> </span><span class="nf">has_constant</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">"""Flag indicating whether the model has a constant or equivalent."""</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_has_constant</span>
 
     <span class="nd">@property</span>
     <span class="k">def</span><span class="w"> </span><span class="nf">instruments</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">IVData</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">"""Return the instruments, of which there are none."""</span>
         <span class="k">return</span> <span class="n">IVData</span><span class="p">(</span><span class="kc">None</span><span class="p">,</span> <span class="s2">"instrument"</span><span class="p">,</span> <span class="n">nobs</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">_dependent</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
 
     <span class="k">def</span><span class="w"> </span><span class="nf">_prepare_interactions</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
@@ -1837,7 +1935,7 @@
         <span class="n">absorb_options</span><span class="p">:</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]</span> <span class="o">|</span> <span class="kc">None</span><span class="p">,</span>
         <span class="n">lsmr_options</span><span class="p">:</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">float</span> <span class="o">|</span> <span class="nb">bool</span><span class="p">]</span> <span class="o">|</span> <span class="kc">None</span><span class="p">,</span>
     <span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
-<span class="w">        </span><span class="sd">"""Discard the absorbed variables if fit uses other options to absorb"""</span>
+<span class="w">        </span><span class="sd">"""Discard the absorbed variables if fit uses other options to absorb."""</span>
         <span class="k">if</span> <span class="n">absorb_options</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="ow">and</span> <span class="n">lsmr_options</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
             <span class="k">return</span>  <span class="c1"># fit raises an error</span>
         <span class="n">options</span> <span class="o">=</span> <span class="n">lsmr_options</span> <span class="k">if</span> <span class="n">absorb_options</span> <span class="ow">is</span> <span class="kc">None</span> <span class="k">else</span> <span class="n">absorb_options</span>
@@ -1870,24 +1968,27 @@
         <span class="o">**</span><span class="n">cov_config</span><span class="p">:</span> <span class="n">Any</span><span class="p">,</span>
     <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">AbsorbingLSResults</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">"""</span>
-<span class="sd">        Estimate model parameters</span>
+<span class="sd">        Estimate model parameters.</span>
 
 <span class="sd">        Parameters</span>
 <span class="sd">        ----------</span>
-<span class="sd">        cov_type : str</span>
-<span class="sd">            Name of covariance estimator to use. Supported covariance</span>
-<span class="sd">            estimators are:</span>
+<span class="sd">        cov_type : str, optional</span>
+<span class="sd">            Name of covariance estimator to use. The default is "robust". Supported</span>
+<span class="sd">            covariance estimators are:</span>
 
-<span class="sd">            * "unadjusted", "homoskedastic" - Classic homoskedastic inference</span>
-<span class="sd">            * "robust", "heteroskedastic" - Heteroskedasticity robust inference</span>
-<span class="sd">            * "kernel" - Heteroskedasticity and autocorrelation robust</span>
-<span class="sd">              inference</span>
-<span class="sd">            * "clustered" - One-way cluster dependent inference.</span>
-<span class="sd">              Heteroskedasticity robust</span>
+<span class="sd">            * "unadjusted", "homoskedastic", "homo", "HomoskedasticCovariance" -</span>
+<span class="sd">              Classic homoskedastic inference</span>
+<span class="sd">            * "robust", "heteroskedastic", "hccm", "HeteroskedasticCovariance" -</span>
+<span class="sd">              Heteroskedasticity robust inference</span>
+<span class="sd">            * "kernel", "KernelCovariance" - Heteroskedasticity and autocorrelation</span>
+<span class="sd">              robust inference</span>
+<span class="sd">            * "clustered", "one-way", "OneWayClusteredCovariance" - Cluster</span>
+<span class="sd">              dependent inference, which is heteroskedasticity robust. It is</span>
+<span class="sd">              one-way unless ``clusters`` has two columns.</span>
 
-<span class="sd">        debiased : bool</span>
-<span class="sd">            Flag indicating whether to debiased the covariance estimator using</span>
-<span class="sd">            a degree of freedom adjustment.</span>
+<span class="sd">        debiased : bool, optional</span>
+<span class="sd">            Flag indicating whether to debias the covariance estimator using</span>
+<span class="sd">            a degree of freedom adjustment. The default is False.</span>
 <span class="sd">        method : {"auto", "hdfe", "lsmr"}, optional</span>
 <span class="sd">            The algorithm that absorbs the variables. The name is not case</span>
 <span class="sd">            sensitive, and a ValueError is raised for any other value. One of:</span>
@@ -1898,7 +1999,7 @@
 <span class="sd">              continuous variables or continuous-binary interactions to absorb or</span>
 <span class="sd">              if the model is weighted.</span>
 
-<span class="sd">        absorb_options : dict</span>
+<span class="sd">        absorb_options : dict, optional</span>
 <span class="sd">            Dictionary of options to pass to the absorber. Passed to either</span>
 <span class="sd">            scipy.sparse.linalg.lsmr or pyhdfe.create depending on the method used</span>
 <span class="sd">            to absorb the absorbed regressors. The options have to be those of</span>
@@ -1906,13 +2007,13 @@
 <span class="sd">            model can be absorbed using it. A ValueError is raised for options</span>
 <span class="sd">            of LSMR if the variables are absorbed using HDFE, and for options</span>
 <span class="sd">            of pyhdfe.create if they are absorbed using LSMR.</span>
-<span class="sd">        use_cache : bool</span>
+<span class="sd">        use_cache : bool, optional</span>
 <span class="sd">            Flag indicating whether the variables, once purged from the</span>
 <span class="sd">            absorbed variables and interactions, should be stored in the cache,</span>
 <span class="sd">            and retrieved if available. Cache can dramatically speed up</span>
 <span class="sd">            re-fitting large models when the set of absorbed variables and</span>
-<span class="sd">            interactions are identical.</span>
-<span class="sd">        lsmr_options : dict</span>
+<span class="sd">            interactions are identical. The default is True.</span>
+<span class="sd">        lsmr_options : dict, optional</span>
 <span class="sd">            Options to pass to scipy.sparse.linalg.lsmr. If they are not empty,</span>
 <span class="sd">            method "auto" absorbs the variables using LSMR, and method "hdfe"</span>
 <span class="sd">            raises a ValueError.</span>
@@ -1922,22 +2023,63 @@
 <span class="sd">               Use absorb_options with method="lsmr" to pass options.</span>
 <span class="sd">               ``lsmr_options`` will be removed in linearmodels 8.0.</span>
 
-<span class="sd">        cov_config</span>
-<span class="sd">            Additional parameters to pass to covariance estimator. The list</span>
-<span class="sd">            of optional parameters differ according to ``cov_type``. See</span>
-<span class="sd">            the documentation of the alternative covariance estimators for</span>
-<span class="sd">            the complete list of available commands.</span>
-
+<span class="sd">        **cov_config : dict</span>
+<span class="sd">            Additional parameters to pass to the covariance estimator. The keys that</span>
+<span class="sd">            are used depend on ``cov_type``. "unadjusted" and "robust" do not use any.</span>
+<span class="sd">            "kernel" uses ``kernel`` (str), the name of the kernel, which is "bartlett"</span>
+<span class="sd">            if it is not provided, and ``bandwidth`` (int), which is selected from the</span>
+<span class="sd">            data if it is not provided. "clustered" uses ``clusters`` (array_like),</span>
+<span class="sd">            the cluster assignment of each observation, with one or two columns.</span>
+<span class="sd">            A ``center`` key is accepted and ignored. See</span>
+<span class="sd">            :class:`~linearmodels.iv.covariance.HomoskedasticCovariance`,</span>
+<span class="sd">            :class:`~linearmodels.iv.covariance.HeteroskedasticCovariance`,</span>
+<span class="sd">            :class:`~linearmodels.iv.covariance.KernelCovariance` and</span>
+<span class="sd">            :class:`~linearmodels.iv.covariance.ClusteredCovariance` for the details.</span>
 
 <span class="sd">        Returns</span>
 <span class="sd">        -------</span>
 <span class="sd">        AbsorbingLSResults</span>
-<span class="sd">            Results container</span>
+<span class="sd">            Results container.</span>
+
+<span class="sd">        Raises</span>
+<span class="sd">        ------</span>
+<span class="sd">        ValueError</span>
+<span class="sd">            If ``method`` is not supported, if ``absorb_options`` contains options</span>
+<span class="sd">            of the algorithm that is not used, if ``lsmr_options`` is used with</span>
+<span class="sd">            ``absorb_options`` or with ``method="hdfe"``, if all columns in ``exog``</span>
+<span class="sd">            are absorbed and ``drop_absorbed`` is True, if ``debiased`` is True and</span>
+<span class="sd">            the model has no degrees of freedom left, or if the labels of</span>
+<span class="sd">            ``clusters`` do not match the labels of the other inputs.</span>
+<span class="sd">        RuntimeError</span>
+<span class="sd">            If ``method`` is "hdfe" and the model cannot be absorbed using HDFE.</span>
+<span class="sd">        Exception</span>
+<span class="sd">            An ``AbsorbingEffectError``, which is defined in</span>
+<span class="sd">            ``linearmodels.panel.utility``, if a variable in ``exog`` is absorbed by</span>
+<span class="sd">            the effects and ``drop_absorbed`` is False.</span>
+<span class="sd">        UnknownOptionError</span>
+<span class="sd">            If ``cov_type`` or ``kernel`` is not supported. It is both a</span>
+<span class="sd">            ``KeyError`` and a ``ValueError``.</span>
+
+<span class="sd">        Warns</span>
+<span class="sd">        -----</span>
+<span class="sd">        AbsorbingEffectWarning</span>
+<span class="sd">            If a variable in ``exog`` is absorbed by the effects and</span>
+<span class="sd">            ``drop_absorbed`` is True. The variable is dropped.</span>
+<span class="sd">        FutureWarning</span>
+<span class="sd">            If ``lsmr_options`` is used.</span>
+
+<span class="sd">        See Also</span>
+<span class="sd">        --------</span>
+<span class="sd">        linearmodels.iv.covariance.HomoskedasticCovariance : Homoskedastic covariance.</span>
+<span class="sd">        linearmodels.iv.covariance.HeteroskedasticCovariance : Heteroskedasticity</span>
+<span class="sd">            robust covariance.</span>
+<span class="sd">        linearmodels.iv.covariance.KernelCovariance : Kernel (HAC) covariance.</span>
+<span class="sd">        linearmodels.iv.covariance.ClusteredCovariance : Clustered covariance.</span>
 
 <span class="sd">        Notes</span>
 <span class="sd">        -----</span>
 <span class="sd">        Additional covariance parameters depend on specific covariance used.</span>
-<span class="sd">        The see the docstring of specific covariance estimator for a list of</span>
+<span class="sd">        See the docstring of the specific covariance estimator for a list of</span>
 <span class="sd">        supported options. Defaults are used if no covariance configuration</span>
 <span class="sd">        is provided.</span>
 
@@ -1979,13 +2121,6 @@
 <span class="sd">        ``absorb_options`` and ``use_cache`` have the same values, so that</span>
 <span class="sd">        changing only the covariance estimator is fast. If any of them differs,</span>
 <span class="sd">        the variables are absorbed again using the new values.</span>
-
-<span class="sd">        See also</span>
-<span class="sd">        --------</span>
-<span class="sd">        linearmodels.iv.covariance.HomoskedasticCovariance</span>
-<span class="sd">        linearmodels.iv.covariance.HeteroskedasticCovariance</span>
-<span class="sd">        linearmodels.iv.covariance.KernelCovariance</span>
-<span class="sd">        linearmodels.iv.covariance.ClusteredCovariance</span>
 <span class="sd">        """</span>
         <span class="n">method</span> <span class="o">=</span> <span class="n">_check_method</span><span class="p">(</span><span class="n">method</span><span class="p">)</span>
         <span class="k">if</span> <span class="n">lsmr_options</span> <span class="ow">and</span> <span class="n">absorb_options</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
@@ -2058,14 +2193,14 @@
         <span class="n">clusters</span><span class="p">:</span> <span class="n">linearmodels</span><span class="o">.</span><span class="n">typing</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">ArrayLike</span> <span class="o">|</span> <span class="kc">None</span><span class="p">,</span>
     <span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">int</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">"""</span>
-<span class="sd">        Degrees of freedom of the absorbed terms that a debiased covariance counts</span>
+<span class="sd">        Degrees of freedom of the absorbed terms that a debiased covariance counts.</span>
 
 <span class="sd">        Parameters</span>
 <span class="sd">        ----------</span>
 <span class="sd">        cov_estimator : type</span>
-<span class="sd">            The class of the covariance estimator</span>
+<span class="sd">            The class of the covariance estimator.</span>
 <span class="sd">        clusters : array_like</span>
-<span class="sd">            The clusters that are passed to fit, if any</span>
+<span class="sd">            The clusters that are passed to fit, if any.</span>
 
 <span class="sd">        Returns</span>
 <span class="sd">        -------</span>
@@ -2103,17 +2238,17 @@
         <span class="bp">self</span><span class="p">,</span> <span class="n">params</span><span class="p">:</span> <span class="n">linearmodels</span><span class="o">.</span><span class="n">typing</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">Float64Array</span>
     <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">linearmodels</span><span class="o">.</span><span class="n">typing</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">Float64Array</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">"""</span>
-<span class="sd">        Compute model residuals</span>
+<span class="sd">        Compute model residuals.</span>
 
 <span class="sd">        Parameters</span>
 <span class="sd">        ----------</span>
 <span class="sd">        params : ndarray</span>
-<span class="sd">            Model parameters (nvar by 1)</span>
+<span class="sd">            Model parameters (nvar by 1).</span>
 
 <span class="sd">        Returns</span>
 <span class="sd">        -------</span>
 <span class="sd">        ndarray</span>
-<span class="sd">            Model residuals</span>
+<span class="sd">            Model residuals.</span>
 <span class="sd">        """</span>
         <span class="n">resids</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">wresids</span><span class="p">(</span><span class="n">params</span><span class="p">)</span>
         <span class="k">return</span> <span class="n">resids</span> <span class="o">/</span> <span class="n">sqrt</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">weights</span><span class="o">.</span><span class="n">ndarray</span><span class="p">)</span></div>
@@ -2125,17 +2260,17 @@
         <span class="bp">self</span><span class="p">,</span> <span class="n">params</span><span class="p">:</span> <span class="n">linearmodels</span><span class="o">.</span><span class="n">typing</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">Float64Array</span>
     <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">linearmodels</span><span class="o">.</span><span class="n">typing</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">Float64Array</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">"""</span>
-<span class="sd">        Compute weighted model residuals</span>
+<span class="sd">        Compute weighted model residuals.</span>
 
 <span class="sd">        Parameters</span>
 <span class="sd">        ----------</span>
 <span class="sd">        params : ndarray</span>
-<span class="sd">            Model parameters (nvar by 1)</span>
+<span class="sd">            Model parameters (nvar by 1).</span>
 
 <span class="sd">        Returns</span>
 <span class="sd">        -------</span>
 <span class="sd">        ndarray</span>
-<span class="sd">            Weighted model residuals</span>
+<span class="sd">            Weighted model residuals.</span>
 
 <span class="sd">        Notes</span>
 <span class="sd">        -----</span>
@@ -2161,7 +2296,7 @@
         <span class="k">return</span> <span class="n">f_statistic</span><span class="p">(</span><span class="n">params</span><span class="p">,</span> <span class="n">cov</span><span class="p">,</span> <span class="n">debiased</span><span class="p">,</span> <span class="n">resid_df</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_const_loc</span><span class="p">)</span>
 
     <span class="k">def</span><span class="w"> </span><span class="nf">_retained_exog</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">linearmodels</span><span class="o">.</span><span class="n">typing</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">Float64Array</span><span class="p">:</span>
-<span class="w">        </span><span class="sd">"""The regressors that were estimated, in the units of exog"""</span>
+<span class="w">        </span><span class="sd">"""The regressors that were estimated, in the units of exog."""</span>
         <span class="n">locs</span> <span class="o">=</span> <span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">_exog</span><span class="o">.</span><span class="n">cols</span><span class="o">.</span><span class="n">index</span><span class="p">(</span><span class="n">col</span><span class="p">)</span> <span class="k">for</span> <span class="n">col</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_columns</span><span class="p">]</span>
         <span class="k">return</span> <span class="n">cast</span><span class="p">(</span>
             <span class="s2">"linearmodels.typing.data.Float64Array"</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_exog</span><span class="o">.</span><span class="n">ndarray</span><span class="p">[:,</span> <span class="n">locs</span><span class="p">]</span>

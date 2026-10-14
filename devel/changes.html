@@ -23,7 +23,7 @@
     
   
       
-        <title>Change Log - linearmodels v7.1 (+507)</title>
+        <title>Change Log - linearmodels v7.1 (+513)</title>
       
     
 
@@ -100,7 +100,7 @@
 
 <header class="md-header md-header--shadow" data-md-component="header">
   <nav class="md-header__inner md-grid" aria-label="Header">
-    <a href="index.html" title="linearmodels v7.1 (+507)" class="md-header__button md-logo" aria-label="linearmodels v7.1 (+507)" data-md-component="logo">
+    <a href="index.html" title="linearmodels v7.1 (+513)" class="md-header__button md-logo" aria-label="linearmodels v7.1 (+513)" data-md-component="logo">
       <img src="_static/bw-logo.svg" alt="logo">
     </a>
     <label class="md-header__button md-icon" for="__drawer">
@@ -111,7 +111,7 @@
       <div class="md-header__ellipsis">
         <div class="md-header__topic">
           <span class="md-ellipsis">
-            linearmodels v7.1 (+507)
+            linearmodels v7.1 (+513)
           </span>
         </div>
         <div class="md-header__topic" data-md-component="header-topic">
@@ -206,10 +206,10 @@
 
 <nav class="md-nav md-nav--primary" aria-label="Navigation" data-md-level="0">
   <label class="md-nav__title" for="__drawer">
-    <a href="index.html" title="linearmodels v7.1 (+507)" class="md-nav__button md-logo" aria-label="linearmodels v7.1 (+507)" data-md-component="logo">
+    <a href="index.html" title="linearmodels v7.1 (+513)" class="md-nav__button md-logo" aria-label="linearmodels v7.1 (+513)" data-md-component="logo">
       <img src="_static/bw-logo.svg" alt="logo">
     </a>
-    linearmodels v7.1 (+507)
+    linearmodels v7.1 (+513)
   </label>
   
     <div class="md-nav__source">
@@ -1157,7 +1157,7 @@
 <h2 id="version-7-1">Version 7.1<a class="headerlink" href="#version-7-1" title="Link to this heading">¶</a></h2>
 <p class="rubric">Highlights</p>
 <ul class="simple">
-<li><p>New estimators and tests: <a class="reference internal" href="iv/iv/linearmodels.iv.model.IVJIVE.html#linearmodels.iv.model.IVJIVE" title="linearmodels.iv.model.IVJIVE (Python class) — Jackknife instrumental variables estimator (JIVE)"><code class="xref py py-class docutils literal notranslate"><span class="pre">IVJIVE</span></code></a>, first-stage rank
+<li><p>New estimators and tests: <a class="reference internal" href="iv/iv/linearmodels.iv.model.IVJIVE.html#linearmodels.iv.model.IVJIVE" title="linearmodels.iv.model.IVJIVE (Python class) — Jackknife instrumental variables estimator (JIVE)."><code class="xref py py-class docutils literal notranslate"><span class="pre">IVJIVE</span></code></a>, first-stage rank
 tests, a centered J test, and the Hausman and Pesaran CD tests for panel models.</p></li>
 <li><p>Several corrections change the numbers that unchanged code produced in 7.0. See
 <em>Changes that alter results</em>.</p></li>
@@ -1168,15 +1168,15 @@ NumPy 1.x.</strong></p></li>
 </ul>
 <p class="rubric">New features</p>
 <ul class="simple">
-<li><p>Added <a class="reference internal" href="iv/iv/linearmodels.iv.model.IVJIVE.html#linearmodels.iv.model.IVJIVE" title="linearmodels.iv.model.IVJIVE (Python class) — Jackknife instrumental variables estimator (JIVE)"><code class="xref py py-class docutils literal notranslate"><span class="pre">IVJIVE</span></code></a>, the jackknife IV estimator (JIVE1), with
+<li><p>Added <a class="reference internal" href="iv/iv/linearmodels.iv.model.IVJIVE.html#linearmodels.iv.model.IVJIVE" title="linearmodels.iv.model.IVJIVE (Python class) — Jackknife instrumental variables estimator (JIVE)."><code class="xref py py-class docutils literal notranslate"><span class="pre">IVJIVE</span></code></a>, the jackknife IV estimator (JIVE1), with
 unadjusted, robust, kernel and one-way clustered covariances. It can be imported from
 <code class="docutils literal notranslate"><span class="pre">linearmodels</span></code> (<a class="extlink-issue reference external" href="https://github.com/bashtage/linearmodels/issues/750">GH750</a>).</p></li>
 <li><p>Added the Cragg-Donald and Kleibergen-Paap tests of the rank of the first-stage
 coefficient matrix. They are available as properties of
-<a class="reference internal" href="iv/iv/linearmodels.iv.results.FirstStageResults.html#linearmodels.iv.results.FirstStageResults" title="linearmodels.iv.results.FirstStageResults (Python class) — First stage estimation results and diagnostics"><code class="xref py py-class docutils literal notranslate"><span class="pre">FirstStageResults</span></code></a> and as the functions
+<a class="reference internal" href="iv/iv/linearmodels.iv.results.FirstStageResults.html#linearmodels.iv.results.FirstStageResults" title="linearmodels.iv.results.FirstStageResults (Python class) — First stage estimation results and diagnostics."><code class="xref py py-class docutils literal notranslate"><span class="pre">FirstStageResults</span></code></a> and as the functions
 <code class="docutils literal notranslate"><span class="pre">cragg_donald</span></code>, <code class="docutils literal notranslate"><span class="pre">cragg_donald_f</span></code>, <code class="docutils literal notranslate"><span class="pre">kleibergen_paap</span></code> and <code class="docutils literal notranslate"><span class="pre">kleibergen_paap_f</span></code> of
 <code class="docutils literal notranslate"><span class="pre">linearmodels.iv</span></code> (<a class="extlink-issue reference external" href="https://github.com/bashtage/linearmodels/issues/741">GH741</a>, <a class="extlink-issue reference external" href="https://github.com/bashtage/linearmodels/issues/622">GH622</a>).</p></li>
-<li><p>Added <a class="reference internal" href="iv/iv/linearmodels.iv.results.IVGMMResults.centered_j_stat.html#linearmodels.iv.results.IVGMMResults.centered_j_stat" title="linearmodels.iv.results.IVGMMResults.centered_j_stat (Python property) — J-test of overidentifying restrictions using a centered moment covariance"><code class="xref py py-attr docutils literal notranslate"><span class="pre">centered_j_stat</span></code></a>, a J test of the
+<li><p>Added <a class="reference internal" href="iv/iv/linearmodels.iv.results.IVGMMResults.centered_j_stat.html#linearmodels.iv.results.IVGMMResults.centered_j_stat" title="linearmodels.iv.results.IVGMMResults.centered_j_stat (Python property) — J-test of overidentifying restrictions using a centered moment covariance."><code class="xref py py-attr docutils literal notranslate"><span class="pre">centered_j_stat</span></code></a>, a J test of the
 overidentifying restrictions that uses a centered moment covariance (<a class="extlink-issue reference external" href="https://github.com/bashtage/linearmodels/issues/749">GH749</a>).</p></li>
 <li><p>Added <a class="reference internal" href="panel/panel/linearmodels.panel.results.RandomEffectsResults.hausman.html#linearmodels.panel.results.RandomEffectsResults.hausman" title="linearmodels.panel.results.RandomEffectsResults.hausman (Python method) — Hausman specification test against results from a consistent model."><code class="xref py py-meth docutils literal notranslate"><span class="pre">hausman()</span></code></a>, the Hausman
 test of random effects against fixed effects. It matches Stata and returns a
@@ -1191,16 +1191,16 @@ effects or effects concentrated in some periods (<a class="extlink-issue referen
 </ul>
 <p class="rubric">Changes that alter results</p>
 <ul class="simple">
-<li><p><a class="reference internal" href="iv/iv/linearmodels.iv.results.IVResults.durbin.html#linearmodels.iv.results.IVResults.durbin" title="linearmodels.iv.results.IVResults.durbin (Python method) — Durbin's test of exogeneity"><code class="xref py py-meth docutils literal notranslate"><span class="pre">durbin()</span></code></a> and
-<a class="reference internal" href="iv/iv/linearmodels.iv.results.IVResults.wu_hausman.html#linearmodels.iv.results.IVResults.wu_hausman" title="linearmodels.iv.results.IVResults.wu_hausman (Python method) — Wu-Hausman test of exogeneity"><code class="xref py py-meth docutils literal notranslate"><span class="pre">wu_hausman()</span></code></a> of <code class="docutils literal notranslate"><span class="pre">IV2SLS</span></code> and <code class="docutils literal notranslate"><span class="pre">IVLIML</span></code>
+<li><p><a class="reference internal" href="iv/iv/linearmodels.iv.results.IVResults.durbin.html#linearmodels.iv.results.IVResults.durbin" title="linearmodels.iv.results.IVResults.durbin (Python method) — Compute Durbin's test of exogeneity."><code class="xref py py-meth docutils literal notranslate"><span class="pre">durbin()</span></code></a> and
+<a class="reference internal" href="iv/iv/linearmodels.iv.results.IVResults.wu_hausman.html#linearmodels.iv.results.IVResults.wu_hausman" title="linearmodels.iv.results.IVResults.wu_hausman (Python method) — Wu-Hausman test of exogeneity."><code class="xref py py-meth docutils literal notranslate"><span class="pre">wu_hausman()</span></code></a> of <code class="docutils literal notranslate"><span class="pre">IV2SLS</span></code> and <code class="docutils literal notranslate"><span class="pre">IVLIML</span></code>
 project the residuals on all of the instruments, as documented (<a class="extlink-issue reference external" href="https://github.com/bashtage/linearmodels/issues/725">GH725</a>).</p></li>
 <li><p>The specification tests of weighted IV models (<code class="docutils literal notranslate"><span class="pre">sargan</span></code>, <code class="docutils literal notranslate"><span class="pre">basmann</span></code>, <code class="docutils literal notranslate"><span class="pre">durbin</span></code>,
 <code class="docutils literal notranslate"><span class="pre">wu_hausman</span></code>, <code class="docutils literal notranslate"><span class="pre">wooldridge_*</span></code> and <code class="docutils literal notranslate"><span class="pre">c_stat</span></code>) use the weights, which 7.0 ignored
 (<a class="extlink-issue reference external" href="https://github.com/bashtage/linearmodels/issues/737">GH737</a>).</p></li>
-<li><p><a class="reference internal" href="iv/iv/linearmodels.iv.results.IVGMMResults.c_stat.html#linearmodels.iv.results.IVGMMResults.c_stat" title="linearmodels.iv.results.IVGMMResults.c_stat (Python method) — C-test of endogeneity"><code class="xref py py-meth docutils literal notranslate"><span class="pre">c_stat()</span></code></a> of overidentified <code class="docutils literal notranslate"><span class="pre">IVGMM</span></code> and
+<li><p><a class="reference internal" href="iv/iv/linearmodels.iv.results.IVGMMResults.c_stat.html#linearmodels.iv.results.IVGMMResults.c_stat" title="linearmodels.iv.results.IVGMMResults.c_stat (Python method) — C-test of endogeneity."><code class="xref py py-meth docutils literal notranslate"><span class="pre">c_stat()</span></code></a> of overidentified <code class="docutils literal notranslate"><span class="pre">IVGMM</span></code> and
 <code class="docutils literal notranslate"><span class="pre">IVGMMCUE</span></code> models uses the correct moment conditions and the <code class="docutils literal notranslate"><span class="pre">weight_type</span></code> of the
 model. 7.0 ignored the weight type (<a class="extlink-issue reference external" href="https://github.com/bashtage/linearmodels/issues/744">GH744</a>).</p></li>
-<li><p><a class="reference internal" href="iv/iv/linearmodels.iv.model.IVGMMCUE.html#linearmodels.iv.model.IVGMMCUE" title="linearmodels.iv.model.IVGMMCUE (Python class) — Estimation of IV models using continuously updating GMM"><code class="xref py py-class docutils literal notranslate"><span class="pre">IVGMMCUE</span></code></a> centers the moment conditions by default, as
+<li><p><a class="reference internal" href="iv/iv/linearmodels.iv.model.IVGMMCUE.html#linearmodels.iv.model.IVGMMCUE" title="linearmodels.iv.model.IVGMMCUE (Python class) — Estimation of IV models using continuously updating GMM."><code class="xref py py-class docutils literal notranslate"><span class="pre">IVGMMCUE</span></code></a> centers the moment conditions by default, as
 documented. This changes its estimates and J statistic (J goes from 0.775 to 2.096 in
 the <code class="docutils literal notranslate"><span class="pre">mroz</span></code> example with kernel weights). Pass <code class="docutils literal notranslate"><span class="pre">center=False</span></code> to get the 7.0
 results. With clustered weights it needs more clusters than moment conditions
@@ -1243,7 +1243,7 @@ return sparse arrays, where <code class="docutils literal notranslate"><span cla
 </ul>
 <p class="rubric">Bug fixes</p>
 <ul class="simple">
-<li><p>Fixed <a class="reference internal" href="iv/iv/linearmodels.iv.results.OLSResults.predict.html#linearmodels.iv.results.OLSResults.predict" title="linearmodels.iv.results.OLSResults.predict (Python method) — In- and out-of-sample predictions"><code class="xref py py-meth docutils literal notranslate"><span class="pre">predict()</span></code></a> for models without exogenous
+<li><p>Fixed <a class="reference internal" href="iv/iv/linearmodels.iv.results.OLSResults.predict.html#linearmodels.iv.results.OLSResults.predict" title="linearmodels.iv.results.OLSResults.predict (Python method) — In- and out-of-sample predictions."><code class="xref py py-meth docutils literal notranslate"><span class="pre">predict()</span></code></a> for models without exogenous
 or without endogenous regressors (<a class="extlink-issue reference external" href="https://github.com/bashtage/linearmodels/issues/677">GH677</a>).</p></li>
 <li><p>A missing value in the entity or time index of a panel raises a clear <code class="docutils literal notranslate"><span class="pre">ValueError</span></code>
 (<a class="extlink-issue reference external" href="https://github.com/bashtage/linearmodels/issues/614">GH614</a>, <a class="extlink-issue reference external" href="https://github.com/bashtage/linearmodels/issues/716">GH716</a>).</p></li>
@@ -1277,7 +1277,7 @@ development versions are gone (<a class="extlink-issue reference external" href=
 <li><p><strong>7.1 is the last release to support Python 3.10 and NumPy 1.x.</strong> Later releases will
 raise the minimum versions of Python, NumPy and the other dependencies.</p></li>
 <li><p>The <code class="docutils literal notranslate"><span class="pre">lsmr_options</span></code> argument of
-<a class="reference internal" href="iv/absorbing/linearmodels.iv.absorbing.AbsorbingLS.fit.html#linearmodels.iv.absorbing.AbsorbingLS.fit" title="linearmodels.iv.absorbing.AbsorbingLS.fit (Python method) — Estimate model parameters"><code class="xref py py-meth docutils literal notranslate"><span class="pre">fit()</span></code></a> and the
+<a class="reference internal" href="iv/absorbing/linearmodels.iv.absorbing.AbsorbingLS.fit.html#linearmodels.iv.absorbing.AbsorbingLS.fit" title="linearmodels.iv.absorbing.AbsorbingLS.fit (Python method) — Estimate model parameters."><code class="xref py py-meth docutils literal notranslate"><span class="pre">fit()</span></code></a> and the
 <code class="docutils literal notranslate"><span class="pre">linearmodels.__future__.ordering</span></code> module will be removed in 8.0. Importing the
 module now emits a <code class="docutils literal notranslate"><span class="pre">FutureWarning</span></code>.</p></li>
 </ul>
