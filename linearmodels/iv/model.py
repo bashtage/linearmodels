@@ -1,5 +1,5 @@
 """
-Instrumental variable estimators
+Instrumental variable estimators.
 """
 
 from __future__ import annotations
@@ -136,28 +136,48 @@ _KAPPA_TOLERANCE = float(sqrt(finfo(float64).eps))
 
 class _IVModelBase:
     r"""
-    Limited information ML and k-class estimation of IV models
+    Limited information ML and k-class estimation of IV models.
 
     Parameters
     ----------
     dependent : array_like
-        Endogenous variables (nobs by 1)
-    exog : array_like
-        Exogenous regressors  (nobs by nexog)
-    endog : array_like
-        Endogenous regressors (nobs by nendog)
-    instruments : array_like
-        Instrumental variables (nobs by ninstr)
-    weights : array_like
+        Dependent variable (nobs by 1).
+    exog : array_like or None
+        Exogenous regressors (nobs by nexog). None if the model has no exogenous
+        regressors.
+    endog : array_like or None
+        Endogenous regressors (nobs by nendog). None if the model has no endogenous
+        regressors.
+    instruments : array_like or None
+        Instrumental variables (nobs by ninstr). None if the model has no instruments.
+    weights : array_like, optional
         Observation weights used in estimation. The weights must be strictly positive
         and finite. They are rescaled to have a mean of 1. A NaN weight is missing, and
-        its observation is dropped.
-    fuller : float
-        Fuller's alpha to modify LIML estimator. Default returns unmodified
-        LIML estimator.
-    kappa : float
-        Parameter value for k-class estimation.  If None, computed to
-        produce LIML parameter estimate.
+        its observation is dropped. The default is to weight all observations equally.
+    fuller : float, optional
+        Fuller's alpha to modify the LIML estimator. The default is 0, which returns
+        the unmodified LIML estimator.
+    kappa : float, optional
+        Parameter value for k-class estimation. If not provided, it is computed to
+        produce the LIML parameter estimate.
+
+    Raises
+    ------
+    ValueError
+        If the model has no regressors, if there are fewer instruments than
+        endogenous regressors, if ``[exog, endog]`` or ``[exog, instruments]``
+        does not have full column rank, if all observations have a missing value,
+        if the inputs have different numbers of observations or labels that do
+        not match (see Notes), if ``weights`` are not strictly positive and
+        finite, or if ``kappa`` or ``fuller`` is not a scalar.
+    TypeError
+        If an input is complex or cannot be converted to float64.
+
+    See Also
+    --------
+    IV2SLS : Estimation of IV models using two-stage least squares.
+    IVGMM : Estimation of IV models using the generalized method of moments.
+    IVGMMCUE : Estimation of IV models using continuously updating GMM.
 
     Notes
     -----
@@ -187,10 +207,6 @@ class _IVModelBase:
     .. todo::
 
       * VCV: bootstrap
-
-    See Also
-    --------
-    IV2SLS, IVGMM, IVGMMCUE
     """
 
     def __init__(
@@ -293,19 +309,19 @@ class _IVModelBase:
         eval_env: int = 2,
     ) -> DataFrame:
         """
-        Predict values for additional data
+        Predict values for additional data.
 
         Parameters
         ----------
         params : array_like
-            Model parameters (nvar by 1)
-        exog : array_like
-            Exogenous regressors (nobs by nexog)
-        endog : array_like
-            Endogenous regressors (nobs by nendog)
-        data : DataFrame
+            Model parameters (nvar by 1).
+        exog : array_like, optional
+            Exogenous regressors (nobs by nexog).
+        endog : array_like, optional
+            Endogenous regressors (nobs by nendog).
+        data : DataFrame, optional
             Values to use when making predictions from a model constructed
-            from a formula
+            from a formula.
         eval_env : int, optional
             Depth of the stack frame whose variables are used when evaluating the
             formula, counted from the formula parser. The default is 2, which is
@@ -314,7 +330,21 @@ class _IVModelBase:
         Returns
         -------
         DataFrame
-            Fitted values from supplied data and parameters
+            Fitted values from supplied data and parameters.
+
+        Raises
+        ------
+        ValueError
+            If ``data`` is used and the model was not created using a formula,
+            if ``data`` is used with ``exog`` or ``endog``, if none of ``exog``,
+            ``endog`` and ``data`` is provided, or if ``exog`` and ``endog`` have
+            different numbers of rows.
+
+        Warns
+        -----
+        IndexWarning
+            If the indices of ``exog`` and ``endog`` do not match. The index of
+            ``exog`` is used.
 
         Notes
         -----
@@ -322,7 +352,7 @@ class _IVModelBase:
 
         When using `exog` and `endog`, regressor matrix is constructed as
         `[exog, endog]` and so parameters must be aligned to this structure.
-        The the the same structure used in model estimation.
+        This is the same structure used in model estimation.
 
         If `data` is not none, then `exog` and `endog` must be none.
         Predictions from models constructed using formulas can
@@ -380,12 +410,19 @@ class _IVModelBase:
 
     @property
     def formula(self) -> str:
-        """Formula used to create the model"""
+        """Formula used to create the model."""
         return self._formula
 
     @formula.setter
     def formula(self, value: str) -> None:
-        """Formula used to create the model"""
+        """
+        Set the formula used to create the model.
+
+        Parameters
+        ----------
+        value : str
+            The formula.
+        """
         self._formula = value
 
     def _validate_inputs(self) -> None:
@@ -439,17 +476,17 @@ class _IVModelBase:
         self, params: linearmodels.typing.data.Float64Array
     ) -> linearmodels.typing.data.Float64Array:
         """
-        Compute weighted model residuals
+        Compute weighted model residuals.
 
         Parameters
         ----------
         params : ndarray
-            Model parameters (nvar by 1)
+            Model parameters (nvar by 1).
 
         Returns
         -------
         ndarray
-            Weighted model residuals
+            Weighted model residuals.
 
         Notes
         -----
@@ -462,33 +499,33 @@ class _IVModelBase:
         self, params: linearmodels.typing.data.Float64Array
     ) -> linearmodels.typing.data.Float64Array:
         """
-        Compute model residuals
+        Compute model residuals.
 
         Parameters
         ----------
         params : ndarray
-            Model parameters (nvar by 1)
+            Model parameters (nvar by 1).
 
         Returns
         -------
         ndarray
-            Model residuals
+            Model residuals.
         """
         return self._y - self._x @ params
 
     @property
     def has_constant(self) -> bool:
-        """Flag indicating the model includes a constant or equivalent"""
+        """Flag indicating the model includes a constant or equivalent."""
         return self._has_constant
 
     @property
     def isnull(self) -> linearmodels.typing.data.BoolArray:
-        """Locations of observations with missing values"""
+        """Locations of observations with missing values."""
         return self._drop_locs
 
     @property
     def notnull(self) -> linearmodels.typing.data.BoolArray:
-        """Locations of observations included in estimation"""
+        """Locations of observations included in estimation."""
         return cast("linearmodels.typing.data.BoolArray", logical_not(self._drop_locs))
 
     def _f_statistic(
@@ -637,28 +674,48 @@ class _IVModelBase:
 
 class _IVLSModelBase(_IVModelBase):
     r"""
-    Limited information ML and k-class estimation of IV models
+    Limited information ML and k-class estimation of IV models.
 
     Parameters
     ----------
     dependent : array_like
-        Endogenous variables (nobs by 1)
-    exog : array_like
-        Exogenous regressors  (nobs by nexog)
-    endog : array_like
-        Endogenous regressors (nobs by nendog)
-    instruments : array_like
-        Instrumental variables (nobs by ninstr)
-    weights : array_like
+        Dependent variable (nobs by 1).
+    exog : array_like or None
+        Exogenous regressors (nobs by nexog). None if the model has no exogenous
+        regressors.
+    endog : array_like or None
+        Endogenous regressors (nobs by nendog). None if the model has no endogenous
+        regressors.
+    instruments : array_like or None
+        Instrumental variables (nobs by ninstr). None if the model has no instruments.
+    weights : array_like, optional
         Observation weights used in estimation. The weights must be strictly positive
         and finite. They are rescaled to have a mean of 1. A NaN weight is missing, and
-        its observation is dropped.
-    fuller : float
-        Fuller's alpha to modify LIML estimator. Default returns unmodified
-        LIML estimator.
-    kappa : float
-        Parameter value for k-class estimation.  If None, computed to
-        produce LIML parameter estimate.
+        its observation is dropped. The default is to weight all observations equally.
+    fuller : float, optional
+        Fuller's alpha to modify the LIML estimator. The default is 0, which returns
+        the unmodified LIML estimator.
+    kappa : float, optional
+        Parameter value for k-class estimation. If not provided, it is computed to
+        produce the LIML parameter estimate.
+
+    Raises
+    ------
+    ValueError
+        If the model has no regressors, if there are fewer instruments than
+        endogenous regressors, if ``[exog, endog]`` or ``[exog, instruments]``
+        does not have full column rank, if all observations have a missing value,
+        if the inputs have different numbers of observations or labels that do
+        not match (see Notes), if ``weights`` are not strictly positive and
+        finite, or if ``kappa`` or ``fuller`` is not a scalar.
+    TypeError
+        If an input is complex or cannot be converted to float64.
+
+    See Also
+    --------
+    IV2SLS : Estimation of IV models using two-stage least squares.
+    IVGMM : Estimation of IV models using the generalized method of moments.
+    IVGMMCUE : Estimation of IV models using continuously updating GMM.
 
     Notes
     -----
@@ -688,10 +745,6 @@ class _IVLSModelBase(_IVModelBase):
     .. todo::
 
       * VCV: bootstrap
-
-    See Also
-    --------
-    IV2SLS, IVGMM, IVGMMCUE
     """
 
     def __init__(
@@ -723,23 +776,23 @@ class _IVLSModelBase(_IVModelBase):
         kappa: linearmodels.typing.Numeric,
     ) -> linearmodels.typing.data.Float64Array:
         """
-        Parameter estimation without error checking
+        Parameter estimation without error checking.
 
         Parameters
         ----------
         x : ndarray
-            Regressor matrix (nobs by nvar)
+            Regressor matrix (nobs by nvar).
         y : ndarray
-            Regressand matrix (nobs by 1)
+            Regressand matrix (nobs by 1).
         z : ndarray
-            Instrument matrix (nobs by ninstr)
-        kappa : scalar
-            Parameter value for k-class estimator
+            Instrument matrix (nobs by ninstr).
+        kappa : float
+            Parameter value for k-class estimator.
 
         Returns
         -------
         ndarray
-            Estimated parameters (nvar by 1)
+            Estimated parameters (nvar by 1).
 
         Notes
         -----
@@ -755,34 +808,45 @@ class _IVLSModelBase(_IVModelBase):
         self, *, cov_type: str = "robust", debiased: bool = False, **cov_config: Any
     ) -> OLSResults | IVResults:
         r"""
-        Estimate model parameters
+        Estimate model parameters.
 
         Parameters
         ----------
-        cov_type : str
-            Name of covariance estimator to use. Supported covariance
-            estimators are:
+        cov_type : str, optional
+            Name of covariance estimator to use. The default is "robust". Supported
+            covariance estimators are:
 
-            * "unadjusted", "homoskedastic" - Classic homoskedastic inference
-            * "robust", "heteroskedastic" - Heteroskedasticity robust inference
-            * "kernel" - Heteroskedasticity and autocorrelation robust
-              inference
-            * "clustered" - One-way cluster dependent inference.
-              Heteroskedasticity robust
+            * "unadjusted", "homoskedastic", "homo", "HomoskedasticCovariance" -
+              Classic homoskedastic inference
+            * "robust", "heteroskedastic", "hccm", "HeteroskedasticCovariance" -
+              Heteroskedasticity robust inference
+            * "kernel", "KernelCovariance" - Heteroskedasticity and autocorrelation
+              robust inference
+            * "clustered", "one-way", "OneWayClusteredCovariance" - Cluster
+              dependent inference, which is heteroskedasticity robust. It is
+              one-way unless ``clusters`` has two columns.
 
-        debiased : bool
-            Flag indicating whether to debiased the covariance estimator using
-            a degree of freedom adjustment.
-        cov_config
-            Additional parameters to pass to covariance estimator. The list
-            of optional parameters differ according to ``cov_type``. See
-            the documentation of the alternative covariance estimators for
-            the complete list of available commands.
+        debiased : bool, optional
+            Flag indicating whether to debias the covariance estimator using
+            a degree of freedom adjustment. The default is False.
+        **cov_config : dict
+            Additional parameters to pass to the covariance estimator. The keys that
+            are used depend on ``cov_type``. "unadjusted" and "robust" do not use any.
+            "kernel" uses ``kernel`` (str), the name of the kernel, which is "bartlett"
+            if it is not provided, and ``bandwidth`` (int), which is selected from the
+            data if it is not provided. "clustered" uses ``clusters`` (array_like),
+            the cluster assignment of each observation, with one or two columns.
+            A ``center`` key is accepted and ignored. See
+            :class:`~linearmodels.iv.covariance.HomoskedasticCovariance`,
+            :class:`~linearmodels.iv.covariance.HeteroskedasticCovariance`,
+            :class:`~linearmodels.iv.covariance.KernelCovariance` and
+            :class:`~linearmodels.iv.covariance.ClusteredCovariance` for the details.
 
         Returns
         -------
-        IVResults
-            Results container
+        IVResults or OLSResults
+            Results container. It is an OLSResults if the model has no endogenous
+            regressors and no instruments.
 
         Raises
         ------
@@ -794,21 +858,26 @@ class _IVLSModelBase(_IVModelBase):
             of exogenous regressors and instruments, or the residuals of the
             dependent variable and the endogenous regressors on the exogenous
             regressors and instruments are collinear. See the notes of
-            :class:`~linearmodels.iv.model.IVLIML`.
+            :class:`~linearmodels.iv.model.IVLIML`. It is also raised if the
+            labels of ``clusters`` do not match the labels of the other inputs.
+        UnknownOptionError
+            If ``cov_type`` or ``kernel`` is not supported. It is both a
+            ``KeyError`` and a ``ValueError``.
+
+        See Also
+        --------
+        linearmodels.iv.covariance.HomoskedasticCovariance : Homoskedastic covariance.
+        linearmodels.iv.covariance.HeteroskedasticCovariance : Heteroskedasticity
+            robust covariance.
+        linearmodels.iv.covariance.KernelCovariance : Kernel (HAC) covariance.
+        linearmodels.iv.covariance.ClusteredCovariance : Clustered covariance.
 
         Notes
         -----
         Additional covariance parameters depend on specific covariance used.
-        The see the docstring of specific covariance estimator for a list of
+        See the docstring of the specific covariance estimator for a list of
         supported options. Defaults are used if no covariance configuration
         is provided.
-
-        See also
-        --------
-        linearmodels.iv.covariance.HomoskedasticCovariance
-        linearmodels.iv.covariance.HeteroskedasticCovariance
-        linearmodels.iv.covariance.KernelCovariance
-        linearmodels.iv.covariance.ClusteredCovariance
         """
         self._check_clusters(cov_config)
         wy, wx, wz = self._wy, self._wx, self._wz
@@ -854,28 +923,48 @@ class _IVLSModelBase(_IVModelBase):
 
 class IVLIML(_IVLSModelBase):
     r"""
-    Limited information ML and k-class estimation of IV models
+    Limited information ML and k-class estimation of IV models.
 
     Parameters
     ----------
     dependent : array_like
-        Endogenous variables (nobs by 1)
-    exog : array_like
-        Exogenous regressors  (nobs by nexog)
-    endog : array_like
-        Endogenous regressors (nobs by nendog)
-    instruments : array_like
-        Instrumental variables (nobs by ninstr)
-    weights : array_like
+        Dependent variable (nobs by 1).
+    exog : array_like or None
+        Exogenous regressors (nobs by nexog). None if the model has no exogenous
+        regressors.
+    endog : array_like or None
+        Endogenous regressors (nobs by nendog). None if the model has no endogenous
+        regressors.
+    instruments : array_like or None
+        Instrumental variables (nobs by ninstr). None if the model has no instruments.
+    weights : array_like, optional
         Observation weights used in estimation. The weights must be strictly positive
         and finite. They are rescaled to have a mean of 1. A NaN weight is missing, and
-        its observation is dropped.
-    fuller : float
-        Fuller's alpha to modify LIML estimator. Default returns unmodified
-        LIML estimator.
-    kappa : float
-        Parameter value for k-class estimation.  If None, computed to
-        produce LIML parameter estimate.
+        its observation is dropped. The default is to weight all observations equally.
+    fuller : float, optional
+        Fuller's alpha to modify the LIML estimator. The default is 0, which returns
+        the unmodified LIML estimator.
+    kappa : float, optional
+        Parameter value for k-class estimation. If not provided, it is computed to
+        produce the LIML parameter estimate.
+
+    Raises
+    ------
+    ValueError
+        If the model has no regressors, if there are fewer instruments than
+        endogenous regressors, if ``[exog, endog]`` or ``[exog, instruments]``
+        does not have full column rank, if all observations have a missing value,
+        if the inputs have different numbers of observations or labels that do
+        not match (see Notes), if ``weights`` are not strictly positive and
+        finite, or if ``kappa`` or ``fuller`` is not a scalar.
+    TypeError
+        If an input is complex or cannot be converted to float64.
+
+    See Also
+    --------
+    IV2SLS : Estimation of IV models using two-stage least squares.
+    IVGMM : Estimation of IV models using the generalized method of moments.
+    IVGMMCUE : Estimation of IV models using continuously updating GMM.
 
     Notes
     -----
@@ -952,10 +1041,6 @@ class IVLIML(_IVLSModelBase):
     .. todo::
 
       * VCV: bootstrap
-
-    See Also
-    --------
-    IV2SLS, IVGMM, IVGMMCUE
     """
 
     def __init__(
@@ -989,28 +1074,37 @@ class IVLIML(_IVLSModelBase):
         kappa: linearmodels.typing.OptionalNumeric = None,
     ) -> IVLIML:
         """
+        Create a model from a formula.
+
         Parameters
         ----------
         formula : str
             Formula modified for the IV syntax described in the notes
-            section
+            section.
         data : DataFrame
-            DataFrame containing the variables used in the formula
-        weights : array_like
+            DataFrame containing the variables used in the formula.
+        weights : array_like, optional
             Observation weights used in estimation. The weights must be strictly
             positive and finite. They are rescaled to have a mean of 1. A NaN weight is
-            missing, and its observation is dropped.
-        fuller : float
-            Fuller's alpha to modify LIML estimator. Default returns unmodified
-            LIML estimator.
-        kappa : float
-            Parameter value for k-class estimation.  If not provided, computed to
-            produce LIML parameter estimate.
+            missing, and its observation is dropped. The default is to weight all
+            observations equally.
+        fuller : float, optional
+            Fuller's alpha to modify the LIML estimator. The default is 0, which
+            returns the unmodified LIML estimator.
+        kappa : float, optional
+            Parameter value for k-class estimation. If not provided, it is computed
+            to produce the LIML parameter estimate.
 
         Returns
         -------
         IVLIML
-            Model instance
+            Model instance.
+
+        Raises
+        ------
+        ValueError
+            If the formula is not an IV formula, or if the model that it describes is
+            not valid. See the class for the errors that the model raises.
 
         Notes
         -----
@@ -1022,7 +1116,9 @@ class IVLIML(_IVLSModelBase):
         `dependent ~ exog endog` and `dependent ~ exog instruments` are both
         valid formulas.
 
-        A constant must be explicitly included using '1 +' if required.
+        A constant must be explicitly included using "1 +" if required. Use
+        `I(exper ** 2)` for the square of a variable, since `exper ** 2` is
+        the power of a set of terms in a formula, which is `exper`.
 
         Examples
         --------
@@ -1030,7 +1126,7 @@ class IVLIML(_IVLSModelBase):
         >>> from linearmodels.datasets import wage
         >>> from linearmodels.iv import IVLIML
         >>> data = wage.load()
-        >>> formula = "np.log(wage) ~ 1 + exper + exper ** 2 + brthord + [educ ~ sibs]"
+        >>> formula = "np.log(wage) ~ 1 + exper + I(exper ** 2) + brthord + [educ ~ sibs]"
         >>> mod = IVLIML.from_formula(formula, data)
         """
         parser = IVFormulaParser(formula, data)
@@ -1044,22 +1140,42 @@ class IVLIML(_IVLSModelBase):
 
 class IV2SLS(_IVLSModelBase):
     r"""
-    Estimation of IV models using two-stage least squares
+    Estimation of IV models using two-stage least squares.
 
     Parameters
     ----------
     dependent : array_like
-        Endogenous variables (nobs by 1)
-    exog : array_like
-        Exogenous regressors  (nobs by nexog)
-    endog : array_like
-        Endogenous regressors (nobs by nendog)
-    instruments : array_like
-        Instrumental variables (nobs by ninstr)
-    weights : array_like
+        Dependent variable (nobs by 1).
+    exog : array_like or None
+        Exogenous regressors (nobs by nexog). None if the model has no exogenous
+        regressors.
+    endog : array_like or None
+        Endogenous regressors (nobs by nendog). None if the model has no endogenous
+        regressors.
+    instruments : array_like or None
+        Instrumental variables (nobs by ninstr). None if the model has no instruments.
+    weights : array_like, optional
         Observation weights used in estimation. The weights must be strictly positive
         and finite. They are rescaled to have a mean of 1. A NaN weight is missing, and
-        its observation is dropped.
+        its observation is dropped. The default is to weight all observations equally.
+
+    Raises
+    ------
+    ValueError
+        If the model has no regressors, if there are fewer instruments than
+        endogenous regressors, if ``[exog, endog]`` or ``[exog, instruments]``
+        does not have full column rank, if all observations have a missing value,
+        if the inputs have different numbers of observations or labels that do
+        not match (see Notes), or if ``weights`` are not strictly positive and
+        finite.
+    TypeError
+        If an input is complex or cannot be converted to float64.
+
+    See Also
+    --------
+    IVLIML : Limited information ML and k-class estimation of IV models.
+    IVGMM : Estimation of IV models using the generalized method of moments.
+    IVGMMCUE : Estimation of IV models using continuously updating GMM.
 
     Notes
     -----
@@ -1109,10 +1225,6 @@ class IV2SLS(_IVLSModelBase):
     .. todo::
 
       * VCV: bootstrap
-
-    See Also
-    --------
-    IVLIML, IVGMM, IVGMMCUE
     """
 
     def __init__(
@@ -1134,22 +1246,31 @@ class IV2SLS(_IVLSModelBase):
         formula: str, data: DataFrame, *, weights: IVDataLike | None = None
     ) -> IV2SLS:
         """
+        Create a model from a formula.
+
         Parameters
         ----------
         formula : str
             Formula modified for the IV syntax described in the notes
-            section
+            section.
         data : DataFrame
-            DataFrame containing the variables used in the formula
-        weights : array_like
+            DataFrame containing the variables used in the formula.
+        weights : array_like, optional
             Observation weights used in estimation. The weights must be strictly
             positive and finite. They are rescaled to have a mean of 1. A NaN weight is
-            missing, and its observation is dropped.
+            missing, and its observation is dropped. The default is to weight all
+            observations equally.
 
         Returns
         -------
         IV2SLS
-            Model instance
+            Model instance.
+
+        Raises
+        ------
+        ValueError
+            If the formula is not an IV formula, or if the model that it describes is
+            not valid. See the class for the errors that the model raises.
 
         Notes
         -----
@@ -1161,7 +1282,9 @@ class IV2SLS(_IVLSModelBase):
         `dependent ~ exog endog` and `dependent ~ exog instruments` are both
         valid formulas.
 
-        A constant must be explicitly included using "1 +" if required.
+        A constant must be explicitly included using "1 +" if required. Use
+        `I(exper ** 2)` for the square of a variable, since `exper ** 2` is
+        the power of a set of terms in a formula, which is `exper`.
 
         Examples
         --------
@@ -1169,7 +1292,7 @@ class IV2SLS(_IVLSModelBase):
         >>> from linearmodels.datasets import wage
         >>> from linearmodels.iv import IV2SLS
         >>> data = wage.load()
-        >>> formula = 'np.log(wage) ~ 1 + exper + exper ** 2 + brthord + [educ ~ sibs]'
+        >>> formula = 'np.log(wage) ~ 1 + exper + I(exper ** 2) + brthord + [educ ~ sibs]'
         >>> mod = IV2SLS.from_formula(formula, data)
         """
         parser = IVFormulaParser(formula, data)
@@ -1211,27 +1334,65 @@ def _is_singular(cov: linearmodels.typing.data.Float64Array) -> bool:
 
 class _IVGMMBase(_IVModelBase):
     r"""
-    Estimation of IV models using the generalized method of moments (GMM)
+    Estimation of IV models using the generalized method of moments (GMM).
 
     Parameters
     ----------
     dependent : array_like
-        Endogenous variables (nobs by 1)
-    exog : array_like
-        Exogenous regressors  (nobs by nexog)
-    endog : array_like
-        Endogenous regressors (nobs by nendog)
-    instruments : array_like
-        Instrumental variables (nobs by ninstr)
-    weights : array_like
+        Dependent variable (nobs by 1).
+    exog : array_like or None
+        Exogenous regressors (nobs by nexog). None if the model has no exogenous
+        regressors.
+    endog : array_like or None
+        Endogenous regressors (nobs by nendog). None if the model has no endogenous
+        regressors.
+    instruments : array_like or None
+        Instrumental variables (nobs by ninstr). None if the model has no instruments.
+    weights : array_like, optional
         Observation weights used in estimation. The weights must be strictly positive
         and finite. They are rescaled to have a mean of 1. A NaN weight is missing, and
-        its observation is dropped.
-    weight_type : str
-        Name of moment condition weight function to use in the GMM estimation
-    weight_config
+        its observation is dropped. The default is to weight all observations equally.
+    weight_type : str, optional
+        Name of moment condition weight function to use in the GMM estimation. The
+        default is "robust". The supported weight functions are:
+
+        * "unadjusted", "homoskedastic"
+        * "robust", "heteroskedastic"
+        * "kernel"
+        * "clustered", "one-way"
+
+        See Notes for their assumptions.
+    **weight_config : dict
         Additional keyword arguments to pass to the moment condition weight
-        function
+        function. The keys are ``center`` (bool) and ``debiased`` (bool) for every
+        weight function, ``kernel`` (str), ``bandwidth`` (int) and ``optimal_bw``
+        (bool) for "kernel", and ``clusters`` (array_like) for "clustered".
+        ``clusters`` is required and has one element for each observation.
+        See :class:`~linearmodels.iv.gmm.HomoskedasticWeightMatrix`,
+        :class:`~linearmodels.iv.gmm.HeteroskedasticWeightMatrix`,
+        :class:`~linearmodels.iv.gmm.KernelWeightMatrix` and
+        :class:`~linearmodels.iv.gmm.OneWayClusteredWeightMatrix` for the details.
+
+    Raises
+    ------
+    ValueError
+        If the model has no regressors, if there are fewer instruments than
+        endogenous regressors, if ``[exog, endog]`` or ``[exog, instruments]``
+        does not have full column rank, if all observations have a missing value,
+        if the inputs have different numbers of observations or labels that do
+        not match (see Notes), or if ``weights`` are not strictly positive and
+        finite.
+    UnknownOptionError
+        If ``weight_type`` is not supported. It is both a ``KeyError`` and a
+        ``ValueError``.
+    TypeError
+        If an input is complex or cannot be converted to float64.
+
+    See Also
+    --------
+    IV2SLS : Estimation of IV models using two-stage least squares.
+    IVLIML : Limited information ML and k-class estimation of IV models.
+    IVGMMCUE : Estimation of IV models using continuously updating GMM.
 
     Notes
     -----
@@ -1239,10 +1400,10 @@ class _IVGMMBase(_IVModelBase):
 
     * "unadjusted", "homoskedastic" - Assumes moment conditions are
       homoskedastic
-    * "robust", "heteroskedastic" - Allows for heteroskedasticity by not
+    * "robust", "heteroskedastic" - Allows for heteroskedasticity but not
       autocorrelation
     * "kernel" - Allows for heteroskedasticity and autocorrelation
-    * "clustered" - Allows for one-way cluster dependence
+    * "clustered", "one-way" - Allows for one-way cluster dependence
 
     The estimator is defined as
 
@@ -1256,10 +1417,6 @@ class _IVGMMBase(_IVModelBase):
     .. todo::
 
       * VCV: bootstrap
-
-    See Also
-    --------
-    IV2SLS, IVLIML, IVGMMCUE
     """
 
     def __init__(
@@ -1478,27 +1635,65 @@ class _IVGMMBase(_IVModelBase):
 
 class IVGMM(_IVGMMBase):
     r"""
-    Estimation of IV models using the generalized method of moments (GMM)
+    Estimation of IV models using the generalized method of moments (GMM).
 
     Parameters
     ----------
     dependent : array_like
-        Endogenous variables (nobs by 1)
-    exog : array_like
-        Exogenous regressors  (nobs by nexog)
-    endog : array_like
-        Endogenous regressors (nobs by nendog)
-    instruments : array_like
-        Instrumental variables (nobs by ninstr)
-    weights : array_like
+        Dependent variable (nobs by 1).
+    exog : array_like or None
+        Exogenous regressors (nobs by nexog). None if the model has no exogenous
+        regressors.
+    endog : array_like or None
+        Endogenous regressors (nobs by nendog). None if the model has no endogenous
+        regressors.
+    instruments : array_like or None
+        Instrumental variables (nobs by ninstr). None if the model has no instruments.
+    weights : array_like, optional
         Observation weights used in estimation. The weights must be strictly positive
         and finite. They are rescaled to have a mean of 1. A NaN weight is missing, and
-        its observation is dropped.
-    weight_type : str
-        Name of moment condition weight function to use in the GMM estimation
-    weight_config
+        its observation is dropped. The default is to weight all observations equally.
+    weight_type : str, optional
+        Name of moment condition weight function to use in the GMM estimation. The
+        default is "robust". The supported weight functions are:
+
+        * "unadjusted", "homoskedastic"
+        * "robust", "heteroskedastic"
+        * "kernel"
+        * "clustered", "one-way"
+
+        See Notes for their assumptions.
+    **weight_config : dict
         Additional keyword arguments to pass to the moment condition weight
-        function
+        function. The keys are ``center`` (bool) and ``debiased`` (bool) for every
+        weight function, ``kernel`` (str), ``bandwidth`` (int) and ``optimal_bw``
+        (bool) for "kernel", and ``clusters`` (array_like) for "clustered".
+        ``clusters`` is required and has one element for each observation.
+        See :class:`~linearmodels.iv.gmm.HomoskedasticWeightMatrix`,
+        :class:`~linearmodels.iv.gmm.HeteroskedasticWeightMatrix`,
+        :class:`~linearmodels.iv.gmm.KernelWeightMatrix` and
+        :class:`~linearmodels.iv.gmm.OneWayClusteredWeightMatrix` for the details.
+
+    Raises
+    ------
+    ValueError
+        If the model has no regressors, if there are fewer instruments than
+        endogenous regressors, if ``[exog, endog]`` or ``[exog, instruments]``
+        does not have full column rank, if all observations have a missing value,
+        if the inputs have different numbers of observations or labels that do
+        not match (see Notes), or if ``weights`` are not strictly positive and
+        finite.
+    UnknownOptionError
+        If ``weight_type`` is not supported. It is both a ``KeyError`` and a
+        ``ValueError``.
+    TypeError
+        If an input is complex or cannot be converted to float64.
+
+    See Also
+    --------
+    IV2SLS : Estimation of IV models using two-stage least squares.
+    IVLIML : Limited information ML and k-class estimation of IV models.
+    IVGMMCUE : Estimation of IV models using continuously updating GMM.
 
     Notes
     -----
@@ -1506,10 +1701,10 @@ class IVGMM(_IVGMMBase):
 
     * "unadjusted", "homoskedastic" - Assumes moment conditions are
       homoskedastic
-    * "robust", "heteroskedastic" - Allows for heteroskedasticity by not
+    * "robust", "heteroskedastic" - Allows for heteroskedasticity but not
       autocorrelation
     * "kernel" - Allows for heteroskedasticity and autocorrelation
-    * "clustered" - Allows for one-way cluster dependence
+    * "clustered", "one-way" - Allows for one-way cluster dependence
 
     The estimator is defined as
 
@@ -1578,10 +1773,6 @@ class IVGMM(_IVGMMBase):
     .. todo::
 
       * VCV: bootstrap
-
-    See Also
-    --------
-    IV2SLS, IVLIML, IVGMMCUE
     """
 
     def __init__(
@@ -1615,22 +1806,38 @@ class IVGMM(_IVGMMBase):
         **weight_config: Any,
     ) -> IVGMM:
         """
+        Create a model from a formula.
+
         Parameters
         ----------
         formula : str
             Formula modified for the IV syntax described in the notes
-            section
+            section.
         data : DataFrame
-            DataFrame containing the variables used in the formula
-        weights : array_like
+            DataFrame containing the variables used in the formula.
+        weights : array_like, optional
             Observation weights used in estimation. The weights must be strictly
             positive and finite. They are rescaled to have a mean of 1. A NaN weight is
-            missing, and its observation is dropped.
-        weight_type : str
-            Name of moment condition weight function to use in the GMM estimation
-        weight_config
+            missing, and its observation is dropped. The default is to weight all
+            observations equally.
+        weight_type : str, optional
+            Name of moment condition weight function to use in the GMM estimation.
+            The default is "robust". See :class:`~linearmodels.iv.model.IVGMM` for the
+            supported weight functions.
+        **weight_config : dict
             Additional keyword arguments to pass to the moment condition weight
-            function
+            function. See :class:`~linearmodels.iv.model.IVGMM` for the keys.
+
+        Returns
+        -------
+        IVGMM
+            Model instance.
+
+        Raises
+        ------
+        ValueError
+            If the formula is not an IV formula, or if the model that it describes is
+            not valid. See the class for the errors that the model raises.
 
         Notes
         -----
@@ -1642,12 +1849,9 @@ class IVGMM(_IVGMMBase):
         `dependent ~ exog endog` and `dependent ~ exog instruments` are both
         valid formulas.
 
-        A constant must be explicitly included using "1 +" if required.
-
-        Returns
-        -------
-        IVGMM
-            Model instance
+        A constant must be explicitly included using "1 +" if required. Use
+        `I(exper ** 2)` for the square of a variable, since `exper ** 2` is
+        the power of a set of terms in a formula, which is `exper`.
 
         Examples
         --------
@@ -1655,7 +1859,7 @@ class IVGMM(_IVGMMBase):
         >>> from linearmodels.datasets import wage
         >>> from linearmodels.iv import IVGMM
         >>> data = wage.load()
-        >>> formula = "np.log(wage) ~ 1 + exper + exper ** 2 + brthord + [educ ~ sibs]"
+        >>> formula = "np.log(wage) ~ 1 + exper + I(exper ** 2) + brthord + [educ ~ sibs]"
         >>> mod = IVGMM.from_formula(formula, data)
         """
         mod = _gmm_model_from_formula(
@@ -1672,21 +1876,23 @@ class IVGMM(_IVGMMBase):
         w: linearmodels.typing.data.Float64Array,
     ) -> linearmodels.typing.data.Float64Array:
         """
+        Parameter estimation without error checking.
+
         Parameters
         ----------
         x : ndarray
-            Regressor matrix (nobs by nvar)
+            Regressor matrix (nobs by nvar).
         y : ndarray
-            Regressand matrix (nobs by 1)
+            Regressand matrix (nobs by 1).
         z : ndarray
-            Instrument matrix (nobs by ninstr)
+            Instrument matrix (nobs by ninstr).
         w : ndarray
-            GMM weight matrix (ninstr by ninstr)
+            GMM weight matrix (ninstr by ninstr).
 
         Returns
         -------
         ndarray
-            Estimated parameters (nvar by 1)
+            Estimated parameters (nvar by 1).
 
         Notes
         -----
@@ -1708,26 +1914,27 @@ class IVGMM(_IVGMMBase):
         **cov_config: Any,
     ) -> OLSResults | IVGMMResults:
         """
-        Estimate model parameters
+        Estimate model parameters.
 
         Parameters
         ----------
-        iter_limit : int
+        iter_limit : int, optional
             Maximum number of iterations.  Default is 2, which produces
             two-step efficient GMM estimates.  Larger values can be used
             to iterate between parameter estimation and optimal weight
             matrix estimation until convergence.
-        tol : float
+        tol : float, optional
             Convergence criteria.  Measured as covariance normalized change in
             parameters across iterations where the covariance estimator is
-            based on the first step parameter estimates.
-        initial_weight : numpy.ndarray
-            Initial weighting matrix to use in the first step.  If not
-            specified, uses the average outer-product of the set containing
-            the exogenous variables and instruments.
-        cov_type : str
-            Name of covariance estimator to use. Available covariance
-            functions are:
+            based on the first step parameter estimates. The default is 1e-4.
+        initial_weight : array_like, optional
+            Initial weighting matrix to use in the first step, with shape
+            (nexog + ninstr, nexog + ninstr).  If not specified, uses the inverse of
+            the average outer-product of the set containing the exogenous variables
+            and instruments.
+        cov_type : str, optional
+            Name of covariance estimator to use. The default is "robust". Supported
+            covariance estimators are:
 
             * "unadjusted", "homoskedastic" - Assumes moment conditions are
               homoskedastic
@@ -1736,20 +1943,22 @@ class IVGMM(_IVGMMBase):
             * "kernel" - Allows for heteroskedasticity and autocorrelation
             * "clustered" - Allows for one-way cluster dependence
 
-        debiased : bool
-            Flag indicating whether to debiased the covariance estimator using
-            a degree of freedom adjustment.
-        cov_config
-            Additional parameters to pass to covariance estimator. Supported
-            parameters depend on specific covariance structure assumed. See
-            :class:`linearmodels.iv.gmm.IVGMMCovariance` for details
-            on the available options. Defaults are used if no covariance
-            configuration is provided.
+        debiased : bool, optional
+            Flag indicating whether to debias the covariance estimator using
+            a degree of freedom adjustment. The default is False.
+        **cov_config : dict
+            Additional parameters to pass to the covariance estimator. The keys are
+            ``center`` (bool) for every covariance estimator, ``kernel`` (str),
+            ``bandwidth`` (int) and ``optimal_bw`` (bool) for "kernel", and
+            ``clusters`` (array_like) for "clustered". See
+            :class:`~linearmodels.iv.gmm.IVGMMCovariance` for details on the
+            available options. Defaults are used if no covariance configuration is
+            provided.
 
         Returns
         -------
         IVGMMResults
-            Results container
+            Results container.
 
         Raises
         ------
@@ -1762,11 +1971,16 @@ class IVGMM(_IVGMMBase):
             used if ``iter_limit`` is 1. The error is also raised if the
             bandwidth of a kernel weight matrix or of the kernel covariance is
             estimated from the data and there are fewer observations than the
-            kernel needs, or the estimated bandwidth is not finite.
+            kernel needs, or the estimated bandwidth is not finite, if
+            ``initial_weight`` does not have the right shape, and if the labels
+            of ``clusters`` do not match the labels of the other inputs.
+        UnknownOptionError
+            If ``cov_type`` is not supported. It is both a ``KeyError`` and a
+            ``ValueError``.
 
         See Also
         --------
-        linearmodels.iv.gmm.IVGMMCovariance
+        linearmodels.iv.gmm.IVGMMCovariance : Covariance estimation for GMM models.
 
         Notes
         -----
@@ -1858,27 +2072,65 @@ class IVGMM(_IVGMMBase):
 
 class IVGMMCUE(_IVGMMBase):
     r"""
-    Estimation of IV models using continuously updating GMM
+    Estimation of IV models using continuously updating GMM.
 
     Parameters
     ----------
     dependent : array_like
-        Endogenous variables (nobs by 1)
-    exog : array_like
-        Exogenous regressors  (nobs by nexog)
-    endog : array_like
-        Endogenous regressors (nobs by nendog)
-    instruments : array_like
-        Instrumental variables (nobs by ninstr)
-    weights : array_like
+        Dependent variable (nobs by 1).
+    exog : array_like or None
+        Exogenous regressors (nobs by nexog). None if the model has no exogenous
+        regressors.
+    endog : array_like or None
+        Endogenous regressors (nobs by nendog). None if the model has no endogenous
+        regressors.
+    instruments : array_like or None
+        Instrumental variables (nobs by ninstr). None if the model has no instruments.
+    weights : array_like, optional
         Observation weights used in estimation. The weights must be strictly positive
         and finite. They are rescaled to have a mean of 1. A NaN weight is missing, and
-        its observation is dropped.
-    weight_type : str
-        Name of moment condition weight function to use in the GMM estimation
-    weight_config
+        its observation is dropped. The default is to weight all observations equally.
+    weight_type : str, optional
+        Name of moment condition weight function to use in the GMM estimation. The
+        default is "robust". The supported weight functions are:
+
+        * "unadjusted", "homoskedastic"
+        * "robust", "heteroskedastic"
+        * "kernel"
+        * "clustered", "one-way"
+
+        See Notes for their assumptions.
+    **weight_config : dict
         Additional keyword arguments to pass to the moment condition weight
-        function
+        function. The keys are ``center`` (bool) and ``debiased`` (bool) for every
+        weight function, ``kernel`` (str), ``bandwidth`` (int) and ``optimal_bw``
+        (bool) for "kernel", and ``clusters`` (array_like) for "clustered".
+        ``clusters`` is required and has one element for each observation.
+        See :class:`~linearmodels.iv.gmm.HomoskedasticWeightMatrix`,
+        :class:`~linearmodels.iv.gmm.HeteroskedasticWeightMatrix`,
+        :class:`~linearmodels.iv.gmm.KernelWeightMatrix` and
+        :class:`~linearmodels.iv.gmm.OneWayClusteredWeightMatrix` for the details.
+
+    Raises
+    ------
+    ValueError
+        If the model has no regressors, if there are fewer instruments than
+        endogenous regressors, if ``[exog, endog]`` or ``[exog, instruments]``
+        does not have full column rank, if all observations have a missing value,
+        if the inputs have different numbers of observations or labels that do
+        not match (see Notes), or if ``weights`` are not strictly positive and
+        finite.
+    UnknownOptionError
+        If ``weight_type`` is not supported. It is both a ``KeyError`` and a
+        ``ValueError``.
+    TypeError
+        If an input is complex or cannot be converted to float64.
+
+    See Also
+    --------
+    IV2SLS : Estimation of IV models using two-stage least squares.
+    IVLIML : Limited information ML and k-class estimation of IV models.
+    IVGMM : Estimation of IV models using the generalized method of moments.
 
     Notes
     -----
@@ -1886,10 +2138,10 @@ class IVGMMCUE(_IVGMMBase):
 
     * "unadjusted", "homoskedastic" - Assumes moment conditions are
       homoskedastic
-    * "robust", "heteroskedastic" - Allows for heteroskedasticity by not
+    * "robust", "heteroskedastic" - Allows for heteroskedasticity but not
       autocorrelation
     * "kernel" - Allows for heteroskedasticity and autocorrelation
-    * "clustered" - Allows for one-way cluster dependence
+    * "clustered", "one-way" - Allows for one-way cluster dependence
 
     In most circumstances, the ``center`` weight option should be ``True`` to
     avoid starting value dependence. It is ``True`` unless ``center`` is
@@ -1969,10 +2221,6 @@ class IVGMMCUE(_IVGMMBase):
     Dates and time deltas are compared by value, so that the same dates at
     different resolutions, e.g., ``datetime64[us]`` and ``datetime64[ns]``, are
     the same labels.
-
-    See Also
-    --------
-    IV2SLS, IVLIML, IVGMM
     """
 
     def __init__(
@@ -2011,27 +2259,38 @@ class IVGMMCUE(_IVGMMBase):
         **weight_config: Any,
     ) -> IVGMMCUE:
         """
+        Create a model from a formula.
+
         Parameters
         ----------
         formula : str
             Formula modified for the IV syntax described in the notes
-            section
+            section.
         data : DataFrame
-            DataFrame containing the variables used in the formula
-        weights : array_like
+            DataFrame containing the variables used in the formula.
+        weights : array_like, optional
             Observation weights used in estimation. The weights must be strictly
             positive and finite. They are rescaled to have a mean of 1. A NaN weight is
-            missing, and its observation is dropped.
-        weight_type : str
-            Name of moment condition weight function to use in the GMM estimation
-        weight_config
+            missing, and its observation is dropped. The default is to weight all
+            observations equally.
+        weight_type : str, optional
+            Name of moment condition weight function to use in the GMM estimation.
+            The default is "robust". See :class:`~linearmodels.iv.model.IVGMMCUE` for
+            the supported weight functions.
+        **weight_config : dict
             Additional keyword arguments to pass to the moment condition weight
-            function
+            function. See :class:`~linearmodels.iv.model.IVGMMCUE` for the keys.
 
         Returns
         -------
         IVGMMCUE
-            Model instance
+            Model instance.
+
+        Raises
+        ------
+        ValueError
+            If the formula is not an IV formula, or if the model that it describes is
+            not valid. See the class for the errors that the model raises.
 
         Notes
         -----
@@ -2043,7 +2302,9 @@ class IVGMMCUE(_IVGMMBase):
         `dependent ~ exog endog` and `dependent ~ exog instruments` are both
         valid formulas.
 
-        A constant must be explicitly included using "1 +" if required.
+        A constant must be explicitly included using "1 +" if required. Use
+        `I(exper ** 2)` for the square of a variable, since `exper ** 2` is
+        the power of a set of terms in a formula, which is `exper`.
 
         Examples
         --------
@@ -2051,7 +2312,7 @@ class IVGMMCUE(_IVGMMBase):
         >>> from linearmodels.datasets import wage
         >>> from linearmodels.iv import IVGMMCUE
         >>> data = wage.load()
-        >>> formula = "np.log(wage) ~ 1 + exper + exper ** 2 + brthord + [educ ~ sibs]"
+        >>> formula = "np.log(wage) ~ 1 + exper + I(exper ** 2) + brthord + [educ ~ sibs]"
         >>> mod = IVGMMCUE.from_formula(formula, data)
         """
         mod = _gmm_model_from_formula(
@@ -2068,27 +2329,26 @@ class IVGMMCUE(_IVGMMBase):
         z: linearmodels.typing.data.Float64Array,
     ) -> float:
         r"""
-        Optimization target
+        Optimization target.
 
         Parameters
         ----------
         params : ndarray
-            Parameter vector (nvar)
+            Parameter vector (nvar).
         x : ndarray
-            Regressor matrix (nobs by nvar)
+            Regressor matrix (nobs by nvar).
         y : ndarray
-            Regressand matrix (nobs by 1)
+            Regressand matrix (nobs by 1).
         z : ndarray
-            Instrument matrix (nobs by ninstr)
+            Instrument matrix (nobs by ninstr).
 
         Returns
         -------
         float
-            GMM objective function, also known as the J statistic
+            GMM objective function, also known as the J statistic.
 
         Notes
         -----
-
         The GMM objective function is defined as
 
         .. math::
@@ -2128,26 +2388,35 @@ class IVGMMCUE(_IVGMMBase):
         opt_options: dict[str, Any] | None = None,
     ) -> tuple[linearmodels.typing.data.Float64Array, int]:
         r"""
+        Estimate the parameters by minimizing the objective function.
+
         Parameters
         ----------
-        starting : ndarray
-            Starting values for the optimization
+        starting : array_like
+            Starting values for the optimization.
         x : ndarray
-            Regressor matrix (nobs by nvar)
+            Regressor matrix (nobs by nvar).
         y : ndarray
-            Regressand matrix (nobs by 1)
+            Regressand matrix (nobs by 1).
         z : ndarray
-            Instrument matrix (nobs by ninstr)
-        display : int
+            Instrument matrix (nobs by ninstr).
+        display : int, optional
             Number of iterations between displaying. Set to 0 to suppress output.
-        opt_options : dict
+            The default is 0.
+        opt_options : dict, optional
             Dictionary containing additional keyword arguments to pass to
-            scipy.optimize.minimize.
+            scipy.optimize.minimize. The default is to pass none.
 
         Returns
         -------
-        ndarray
-            Estimated parameters (nvar by 1)
+        params : ndarray
+            Estimated parameters (nvar by 1).
+        iterations : int
+            Number of iterations used by the optimizer.
+
+        See Also
+        --------
+        scipy.optimize.minimize : Minimization of a scalar function.
 
         Notes
         -----
@@ -2157,10 +2426,6 @@ class IVGMMCUE(_IVGMMBase):
         from the data of the model, see
         :meth:`~linearmodels.iv.model.IVGMMCUE.j`, and not from ``x``, ``y``
         and ``z``.
-
-        See Also
-        --------
-        scipy.optimize.minimize
         """
         args = (x, y, z)
         if opt_options is None:
@@ -2285,36 +2550,48 @@ class IVGMMCUE(_IVGMMBase):
         **cov_config: Any,
     ) -> OLSResults | IVGMMResults:
         r"""
-        Estimate model parameters
+        Estimate model parameters.
 
         Parameters
         ----------
-        starting : ndarray
-            Starting values to use in optimization.  If not provided, the
-            estimates of IVGMM are used. See Notes.
-        display : bool
-            Flag indicating whether to display optimization output
-        cov_type : str
-            Name of covariance estimator to use
-        debiased : bool
-            Flag indicating whether to debiased the covariance estimator using
-            a degree of freedom adjustment.
-        opt_options : dict
+        starting : array_like, optional
+            Starting values to use in optimization, with one value for each
+            regressor. If not provided, the estimates of IVGMM are used. See Notes.
+        display : bool, optional
+            Flag indicating whether to display optimization output. The default is
+            False.
+        cov_type : str, optional
+            Name of covariance estimator to use. The default is "robust". Supported
+            covariance estimators are:
+
+            * "unadjusted", "homoskedastic" - Assumes moment conditions are
+              homoskedastic
+            * "robust", "heteroskedastic" - Allows for heteroskedasticity but
+              not autocorrelation
+            * "kernel" - Allows for heteroskedasticity and autocorrelation
+            * "clustered" - Allows for one-way cluster dependence
+
+        debiased : bool, optional
+            Flag indicating whether to debias the covariance estimator using
+            a degree of freedom adjustment. The default is False.
+        opt_options : dict, optional
             Additional options to pass to scipy.optimize.minimize when
             optimizing the objective function. If not provided, defers to
             scipy to choose an appropriate optimizer. All minimize inputs
             except ``fun``, ``x0``, and ``args`` can be overridden.
-        cov_config
-            Additional parameters to pass to covariance estimator. Supported
-            parameters depend on specific covariance structure assumed. See
-            :class:`linearmodels.iv.gmm.IVGMMCovariance` for details
-            on the available options. Defaults are used if no covariance
-            configuration is provided.
+        **cov_config : dict
+            Additional parameters to pass to the covariance estimator. The keys are
+            ``center`` (bool) for every covariance estimator, ``kernel`` (str),
+            ``bandwidth`` (int) and ``optimal_bw`` (bool) for "kernel", and
+            ``clusters`` (array_like) for "clustered". See
+            :class:`~linearmodels.iv.gmm.IVGMMCovariance` for details on the
+            available options. Defaults are used if no covariance configuration is
+            provided.
 
         Returns
         -------
         IVGMMResults
-            Results container
+            Results container.
 
         Raises
         ------
@@ -2327,11 +2604,16 @@ class IVGMMCUE(_IVGMMBase):
             conditions. The error is also raised if the bandwidth of a kernel
             weight matrix or of the kernel covariance is estimated from the data
             and there are fewer observations than the kernel needs, or the
-            estimated bandwidth is not finite.
+            estimated bandwidth is not finite, if ``starting`` does not have one
+            value for each regressor, and if the labels of ``clusters`` do not match
+            the labels of the other inputs.
+        UnknownOptionError
+            If ``cov_type`` is not supported. It is both a ``KeyError`` and a
+            ``ValueError``.
 
         See Also
         --------
-        linearmodels.iv.gmm.IVGMMCovariance
+        linearmodels.iv.gmm.IVGMMCovariance : Covariance estimation for GMM models.
 
         Notes
         -----
@@ -2422,7 +2704,7 @@ class IVGMMCUE(_IVGMMBase):
 
 class _OLS(IVLIML):
     """
-    Computes OLS estimates when required
+    Compute OLS estimates when required.
 
     Private class used when model reduces to OLS. Should use the statsmodels
     version when needing a supported public API.
@@ -2430,13 +2712,18 @@ class _OLS(IVLIML):
     Parameters
     ----------
     dependent : array_like
-        Endogenous variables (nobs by 1)
+        Dependent variable (nobs by 1).
     exog : array_like
-        Exogenous regressors  (nobs by nexog)
-    weights : array_like
+        Exogenous regressors (nobs by nexog).
+    weights : array_like, optional
         Observation weights used in estimation. The weights must be strictly positive
         and finite. They are rescaled to have a mean of 1. A NaN weight is missing, and
-        its observation is dropped.
+        its observation is dropped. The default is to weight all observations equally.
+
+    See Also
+    --------
+    statsmodels.regression.linear_model.OLS : Ordinary least squares.
+    statsmodels.regression.linear_model.GLS : Generalized least squares.
 
     Notes
     -----
@@ -2458,11 +2745,6 @@ class _OLS(IVLIML):
     Dates and time deltas are compared by value, so that the same dates at
     different resolutions, e.g., ``datetime64[us]`` and ``datetime64[ns]``, are
     the same labels.
-
-    See Also
-    --------
-    statsmodels.regression.linear_model.OLS,
-    statsmodels.regression.linear_model.GLS
     """
 
     def __init__(
@@ -2485,27 +2767,31 @@ def _gmm_model_from_formula(
     **weight_config: Any,
 ) -> IVGMM | IVGMMCUE:
     """
+    Create a GMM model from a formula.
+
     Parameters
     ----------
+    cls : type
+        The class of the model, IVGMM or IVGMMCUE.
     formula : str
         Formula modified for the IV syntax described in the notes
-        section
+        section.
     data : DataFrame
-        DataFrame containing the variables used in the formula
-    weights : array_like
+        DataFrame containing the variables used in the formula.
+    weights : array_like or None
         Observation weights used in estimation. The weights must be strictly positive
         and finite. They are rescaled to have a mean of 1. A NaN weight is missing, and
         its observation is dropped.
     weight_type : str
-        Name of moment condition weight function to use in the GMM estimation
-    weight_config
+        Name of moment condition weight function to use in the GMM estimation.
+    **weight_config : dict
         Additional keyword arguments to pass to the moment condition weight
-        function
+        function.
 
     Returns
     -------
-    {IVGMM, IVGMMCUE}
-        Model instance
+    IVGMM or IVGMMCUE
+        Model instance.
     """
     parser = IVFormulaParser(formula, data, eval_env=3)
     dep, exog, endog, instr = parser.data
@@ -2539,6 +2825,23 @@ class _UncenteredHomoskedasticWeightMatrix(HomoskedasticWeightMatrix):
         z: linearmodels.typing.data.Float64Array,
         eps: linearmodels.typing.data.Float64Array,
     ) -> linearmodels.typing.data.Float64Array:
+        """
+        Compute the covariance of the moment conditions.
+
+        Parameters
+        ----------
+        x : ndarray
+            Model regressors (exog and endog), (nobs by nvar).
+        z : ndarray
+            Model instruments (exog and instruments), (nobs by ninstr).
+        eps : ndarray
+            Model errors (nobs by 1).
+
+        Returns
+        -------
+        ndarray
+            Covariance of GMM moment conditions.
+        """
         nobs, nvar = x.shape
         s2 = float(squeeze(eps.T @ eps)) / nobs
         w = s2 * z.T @ z / nobs
@@ -2619,6 +2922,7 @@ class _JIVECovariance(IVGMMCovariance):
 
     @property
     def cov(self) -> linearmodels.typing.data.Float64Array:
+        """Return the covariance of the estimated parameters."""
         # Not the GMM covariance with an identity weight matrix, which forms
         # the inverse of (X'X~)(X~'X) and squares the condition number. That is
         # not accurate when the regressors have different scales
@@ -2636,22 +2940,43 @@ class _JIVECovariance(IVGMMCovariance):
 
 class IVJIVE(_IVModelBase):
     r"""
-    Jackknife instrumental variables estimator (JIVE)
+    Jackknife instrumental variables estimator (JIVE).
 
     Parameters
     ----------
     dependent : array_like
-        Dependent variable (nobs by 1)
-    exog : array_like
-        Exogenous regressors  (nobs by nexog)
-    endog : array_like
-        Endogenous regressors (nobs by nendog)
-    instruments : array_like
-        Instrumental variables (nobs by ninstr)
-    weights : array_like
+        Dependent variable (nobs by 1).
+    exog : array_like or None
+        Exogenous regressors (nobs by nexog). None if the model has no exogenous
+        regressors.
+    endog : array_like or None
+        Endogenous regressors (nobs by nendog). None if the model has no endogenous
+        regressors.
+    instruments : array_like or None
+        Instrumental variables (nobs by ninstr). None if the model has no instruments.
+    weights : array_like, optional
         Observation weights used in estimation. The weights must be strictly positive
         and finite. They are rescaled to have a mean of 1. A NaN weight is missing, and
-        its observation is dropped.
+        its observation is dropped. The default is to weight all observations equally.
+
+    Raises
+    ------
+    ValueError
+        If the model has no regressors, if there are fewer instruments than
+        endogenous regressors, if ``[exog, endog]`` or ``[exog, instruments]``
+        does not have full column rank, if all observations have a missing value,
+        if the inputs have different numbers of observations or labels that do
+        not match (see Notes), or if ``weights`` are not strictly positive and
+        finite.
+    TypeError
+        If an input is complex or cannot be converted to float64.
+
+    See Also
+    --------
+    IV2SLS : Estimation of IV models using two-stage least squares.
+    IVLIML : Limited information ML and k-class estimation of IV models.
+    IVGMM : Estimation of IV models using the generalized method of moments.
+    IVGMMCUE : Estimation of IV models using continuously updating GMM.
 
     Notes
     -----
@@ -2726,10 +3051,6 @@ class IVJIVE(_IVModelBase):
     different resolutions, e.g., ``datetime64[us]`` and ``datetime64[ns]``, are
     the same labels.
 
-    See Also
-    --------
-    IV2SLS, IVLIML, IVGMM, IVGMMCUE
-
     References
     ----------
     Angrist, J. D., Imbens, G. W., & Krueger, A. B. (1999). Jackknife
@@ -2774,21 +3095,30 @@ class IVJIVE(_IVModelBase):
         formula: str, data: DataFrame, *, weights: IVDataLike | None = None
     ) -> IVJIVE:
         """
+        Create a model from a formula.
+
         Parameters
         ----------
         formula : str
-            Formula modified for the IV syntax described in the notes section
+            Formula modified for the IV syntax described in the notes section.
         data : DataFrame
-            DataFrame containing the variables used in the formula
-        weights : array_like
+            DataFrame containing the variables used in the formula.
+        weights : array_like, optional
             Observation weights used in estimation. The weights must be strictly
             positive and finite. They are rescaled to have a mean of 1. A NaN weight is
-            missing, and its observation is dropped.
+            missing, and its observation is dropped. The default is to weight all
+            observations equally.
 
         Returns
         -------
         IVJIVE
-            Model instance
+            Model instance.
+
+        Raises
+        ------
+        ValueError
+            If the formula is not an IV formula, or if the model that it describes is
+            not valid. See the class for the errors that the model raises.
 
         Notes
         -----
@@ -2822,13 +3152,13 @@ class IVJIVE(_IVModelBase):
         self, *, cov_type: str = "robust", debiased: bool = False, **cov_config: Any
     ) -> IVResults:
         r"""
-        Estimate model parameters
+        Estimate model parameters.
 
         Parameters
         ----------
-        cov_type : str
-            Name of covariance estimator to use. Supported covariance
-            estimators are:
+        cov_type : str, optional
+            Name of covariance estimator to use. The default is "robust". Supported
+            covariance estimators are:
 
             * "unadjusted", "homoskedastic" - Classic homoskedastic inference
             * "robust", "heteroskedastic" - Heteroskedasticity robust inference
@@ -2837,19 +3167,35 @@ class IVJIVE(_IVModelBase):
             * "clustered" - One-way cluster dependent inference.
               Heteroskedasticity robust
 
-        debiased : bool
-            Flag indicating whether to debiased the covariance estimator using
-            a degree of freedom adjustment.
-        cov_config
-            Additional parameters to pass to covariance estimator. The list
-            of optional parameters differ according to ``cov_type``. See
-            the documentation of the alternative covariance estimators for
-            the complete list of available commands.
+        debiased : bool, optional
+            Flag indicating whether to debias the covariance estimator using
+            a degree of freedom adjustment. The default is False.
+        **cov_config : dict
+            Additional parameters to pass to the covariance estimator. The keys are
+            ``center`` (bool) for every covariance estimator, ``kernel`` (str),
+            ``bandwidth`` (int) and ``optimal_bw`` (bool) for "kernel", and
+            ``clusters`` (array_like, one column) for "clustered". See the Notes.
 
         Returns
         -------
         IVResults
-            Results container
+            Results container.
+
+        Raises
+        ------
+        ValueError
+            If JIVE cannot be computed because an observation has a leverage of 1,
+            if the bandwidth of the kernel is estimated from the data and there are
+            fewer observations than the kernel needs, if ``clusters`` has more than
+            one column, or if the labels of ``clusters`` do not match the labels of
+            the other inputs.
+        UnknownOptionError
+            If ``cov_type`` or ``kernel`` is not supported. It is both a
+            ``KeyError`` and a ``ValueError``.
+
+        See Also
+        --------
+        linearmodels.iv.gmm.IVGMMCovariance : Covariance estimation for GMM models.
 
         Notes
         -----
@@ -2870,10 +3216,6 @@ class IVJIVE(_IVModelBase):
         Anderson-Rubin and Basmann F tests of overidentification, which are an
         ``InvalidTestStatistic`` if it is not defined. The model is estimated
         then. See the notes of the class.
-
-        See Also
-        --------
-        linearmodels.iv.gmm.IVGMMCovariance
         """
         self._check_clusters(cov_config)
         wy, wx, wz = self._wy, self._wx, self._wz
