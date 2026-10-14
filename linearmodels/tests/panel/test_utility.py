@@ -352,3 +352,14 @@ def test_dummy_matrix_bad_order():
     cats = np.array([[0, 1], [1, 0]])
     with pytest.raises(ValueError, match="Unknown drop option: bad"):
         dummy_matrix(cats, drop="bad")
+
+
+def test_case_insensitive_drop_option():
+    cats = np.array([[0, 1], [1, 0]])
+    # Should not raise an error for "First" or "LAST"
+    first_0 = dummy_matrix(cats, drop="first")
+    first_1 = dummy_matrix(cats, drop="First")
+    last_0 = dummy_matrix(cats, drop="last")
+    last_1 = dummy_matrix(cats, drop="LAST")
+    assert_allclose(first_0[0].toarray(), first_1[0].toarray())
+    assert_allclose(last_0[0].toarray(), last_1[0].toarray())
