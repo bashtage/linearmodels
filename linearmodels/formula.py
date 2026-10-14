@@ -1,3 +1,7 @@
+"""
+Functions that estimate a model from a formula.
+"""
+
 from linearmodels.asset_pricing import (
     LinearFactorModel,
     LinearFactorModelGMM,

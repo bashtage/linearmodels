@@ -1,3 +1,7 @@
+"""
+Type aliases used in the annotations of linearmodels.
+"""
+
 from collections.abc import Hashable, Sequence
 from typing import Any, Optional, Union
 

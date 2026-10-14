@@ -1,3 +1,7 @@
+"""
+Warnings and errors that linearmodels raises.
+"""
+
 from collections.abc import Iterable, Mapping
 import difflib
 from typing import TypeVar
@@ -30,19 +34,40 @@ Inputs contain missing values. Dropping rows with missing observations."""
 
 
 class MemoryWarning(Warning):
-    pass
+    """
+    Warning that an estimator uses the algorithm that saves memory.
+
+    ``PanelOLS`` issues it when a model has entity and time effects, ``low_memory``
+    is not given and the dummy variables of the smaller of the two effects would
+    need more than 1 GiB.
+    """
 
 
 class InferenceUnavailableWarning(Warning):
-    pass
+    """
+    Warning that inference on the parameters is not available.
+
+    ``FamaMacBeth`` issues it if the number of cross-sectional regressions that
+    can be estimated is smaller than the number of parameters.
+    """
 
 
 class SingletonWarning(Warning):
-    pass
+    """
+    Warning that observations of singleton groups were dropped.
+
+    ``PanelOLS`` issues it when ``singletons=False`` and the model drops
+    observations that are the only observation of a group of an effect.
+    """
 
 
 class IndexWarning(Warning):
-    pass
+    """
+    Warning that the indices of two inputs do not match.
+
+    ``predict`` issues it if the index of ``exog`` is not the index of ``endog``.
+    The predictions use the index of ``exog``.
+    """
 
 
 class DefaultBandwidthWarning(UserWarning):
@@ -80,7 +105,16 @@ class DefaultBandwidthWarning(UserWarning):
 
 
 def missing_warning(missing: BoolArray, stacklevel: int = 4) -> None:
-    """Utility function to perform missing value check and warning"""
+    """
+    Warn if any observation has a missing value.
+
+    Parameters
+    ----------
+    missing : ndarray
+        Boolean array that is True for the observations that have a missing value.
+    stacklevel : int, optional
+        Stack level of the warning. The default is 4.
+    """
     if not np.any(missing):
         return
     import linearmodels  # noqa: PLC0415

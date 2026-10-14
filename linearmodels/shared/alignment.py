@@ -1,5 +1,5 @@
 """
-Pairing the rows of inputs that carry labels
+Pairing the rows of inputs that carry labels.
 
 Estimators pair the rows of their inputs by position: the first row of the
 regressors belongs to the first row of the dependent variable, and so on. An

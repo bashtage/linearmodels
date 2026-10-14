@@ -1,5 +1,5 @@
 """
-Results for linear factor models
+Results for linear factor models.
 """
 
 from __future__ import annotations
@@ -60,7 +60,7 @@ class LinearFactorModelResults(_SummaryStr):
 
     Parameters
     ----------
-    results : dict[str, any]
+    results : AttrDict
         A dictionary of results from the model estimation.
     """
 
@@ -94,7 +94,7 @@ class LinearFactorModelResults(_SummaryStr):
         Returns
         -------
         Summary
-            Summary table of model estimation results
+            Summary table of model estimation results.
 
         Notes
         -----
@@ -229,7 +229,7 @@ class LinearFactorModelResults(_SummaryStr):
 
     @property
     def full_summary(self) -> Summary:
-        """Complete summary including factor loadings and mispricing measures"""
+        """Complete summary including factor loadings and mispricing measures."""
         smry = self.summary
         params = self.params
         se = self.std_errors
@@ -252,27 +252,27 @@ class LinearFactorModelResults(_SummaryStr):
 
     @property
     def nobs(self) -> int:
-        """Number of observations"""
+        """Number of observations."""
         return self._nobs
 
     @property
     def name(self) -> str:
-        """Model type"""
+        """Model type."""
         return self._name
 
     @property
     def alphas(self) -> pd.Series:
-        """Mispricing estimates"""
+        """Mispricing estimates."""
         return self.params.iloc[:, 0]
 
     @property
     def betas(self) -> pd.DataFrame:
-        """Estimated factor loadings"""
+        """Estimated factor loadings."""
         return self.params.iloc[:, 1:]
 
     @property
     def params(self) -> pd.DataFrame:
-        """Estimated parameters"""
+        """Estimated parameters."""
         return pd.DataFrame(
             self._params, columns=self._cols, index=self._portfolio_names
         )
@@ -322,11 +322,12 @@ class LinearFactorModelResults(_SummaryStr):
     @cached_property
     def pvalues(self) -> pd.DataFrame:
         """
-        Parameter p-vals. Uses t(df_resid) if ``debiased`` is True, else normal
+        Parameter p-values.
 
         Notes
         -----
-        The p-value is NaN where the t-statistic is NaN.
+        The p-values use the normal distribution for the t-statistics. The p-value
+        is NaN where the t-statistic is NaN.
         """
         pvals = self.tstats.copy()
         pvals.loc[:, :] = 2 * stats.norm.sf(np.abs(pvals))
@@ -334,12 +335,12 @@ class LinearFactorModelResults(_SummaryStr):
 
     @property
     def cov_estimator(self) -> str:
-        """Type of covariance estimator used to compute covariance"""
+        """Type of covariance estimator used to compute covariance."""
         return str(self._cov_est)
 
     @property
     def cov(self) -> pd.DataFrame:
-        """Estimated covariance of parameters"""
+        """Estimated covariance of parameters."""
         return pd.DataFrame(
             self._cov, columns=self._param_names, index=self._param_names
         )
@@ -347,7 +348,7 @@ class LinearFactorModelResults(_SummaryStr):
     @property
     def j_statistic(self) -> WaldTestStatistic:
         r"""
-        Model J statistic
+        Model J statistic.
 
         Returns
         -------
@@ -380,7 +381,7 @@ class LinearFactorModelResults(_SummaryStr):
 
     @property
     def risk_premia(self) -> pd.Series:
-        """Estimated factor risk premia (lambda)"""
+        """Estimated factor risk premia (lambda)."""
         return pd.Series(self._rp.squeeze(), index=self._rp_names)
 
     @property
@@ -415,7 +416,7 @@ class LinearFactorModelResults(_SummaryStr):
     @property
     def rsquared(self) -> float:
         """
-        Coefficient of determination (R**2)
+        Coefficient of determination (R**2).
 
         Returns
         -------
@@ -433,16 +434,25 @@ class LinearFactorModelResults(_SummaryStr):
 
     @property
     def total_ss(self) -> float:
-        """Total sum of squares"""
+        """Total sum of squares."""
         return self._total_ss
 
     @property
     def residual_ss(self) -> float:
-        """Residual sum of squares"""
+        """Residual sum of squares."""
         return self._residual_ss
 
 
 class GMMFactorModelResults(LinearFactorModelResults):
+    """
+    Model results from a GMM Linear Factor Model.
+
+    Parameters
+    ----------
+    results : AttrDict
+        A dictionary of results from the model estimation.
+    """
+
     def __init__(self, results: AttrDict):
         super().__init__(results)
         self._iter = results.iter
@@ -475,5 +485,5 @@ class GMMFactorModelResults(LinearFactorModelResults):
 
     @property
     def iterations(self) -> int:
-        """Number of steps in GMM estimation"""
+        """Number of steps in GMM estimation."""
         return self._iter

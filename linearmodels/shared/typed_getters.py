@@ -1,3 +1,7 @@
+"""
+Getters that check the type of a value in a mapping.
+"""
+
 from __future__ import annotations
 
 from collections.abc import Mapping
@@ -12,21 +16,25 @@ import linearmodels.typing.data
 
 def get_string(d: Mapping[str, Any], key: str) -> str | None:
     """
-    Helper function that gets a string or None
+    Get a string or None from a mapping.
 
     Parameters
     ----------
-    d : Mapping[str, Any]
+    d : dict of str to object
         A mapping.
     key : str
-        The key to lookup.
+        The key to look up.
 
     Returns
     -------
-    {str, None}
-        The string or None if the key is not in the dictionary. If in the
-        dictionary, a type check is performed and TypeError is raised if
-        not found.
+    str or None
+        The string, or None if the key is not in the mapping or its value is
+        None.
+
+    Raises
+    ------
+    TypeError
+        If the value of the key is not a str or None.
     """
     out: str | None = None
     if key in d:
@@ -41,21 +49,25 @@ def get_string(d: Mapping[str, Any], key: str) -> str | None:
 
 def get_float(d: Mapping[str, Any], key: str) -> float | None:
     """
-    Helper function that gets a float or None
+    Get a float or None from a mapping.
 
     Parameters
     ----------
-    d : Mapping[str, Any]
+    d : dict of str to object
         A mapping.
     key : str
-        The key to lookup.
+        The key to look up.
 
     Returns
     -------
-    {float, None}
-        The string or None if the key is not in the dictionary. If in the
-        dictionary, a type check is performed and TypeError is raised if
-        not found.
+    float or None
+        The value as a float, or None if the key is not in the mapping or its
+        value is None.
+
+    Raises
+    ------
+    TypeError
+        If the value of the key is not an int, a float or None.
     """
     out: float | None = None
     if key in d:
@@ -70,20 +82,25 @@ def get_float(d: Mapping[str, Any], key: str) -> float | None:
 
 def get_bool(d: Mapping[str, Any], key: str) -> bool:
     """
-    Helper function that gets a bool, defaulting to False.
+    Get a bool from a mapping, defaulting to False.
 
     Parameters
     ----------
-    d : Mapping[str, Any]
+    d : dict of str to object
         A mapping.
     key : str
-        The key to lookup.
+        The key to look up.
 
     Returns
     -------
     bool
-        The boolean if the key is in the dictionary. If not found, returns
-        False.
+        The value if the key is in the mapping. False if the key is not in the
+        mapping or its value is None.
+
+    Raises
+    ------
+    TypeError
+        If the value of the key is not a bool or None.
     """
     out: bool | None = False
     if key in d:
@@ -97,21 +114,26 @@ def get_array_like(
     d: Mapping[str, Any], key: str
 ) -> linearmodels.typing.data.ArrayLike | None:
     """
-    Helper function that gets an array_like or None
+    Get an array_like or None from a mapping.
 
     Parameters
     ----------
-    d : Mapping[str, Any]
+    d : dict of str to object
         A mapping.
     key : str
-        The key to lookup.
+        The key to look up.
 
     Returns
     -------
-    {array_like, None}
-        The string or None if the key is not in the dictionary. If in the
-        dictionary, a type check is performed and TypeError is raised if
-        not found.
+    ndarray, DataFrame, Series, DataArray or None
+        The value, or None if the key is not in the mapping or its value is
+        None. A DataArray is possible only if xarray is installed.
+
+    Raises
+    ------
+    TypeError
+        If the value of the key is not an ndarray, a DataFrame, a Series, a
+        DataArray or None.
     """
 
     out: linearmodels.typing.data.ArrayLike | None = None
@@ -137,21 +159,26 @@ def get_array_like(
 
 def get_panel_data_like(d: Mapping[str, Any], key: str) -> PanelDataLike | None:
     """
-    Helper function that gets an panel_data_like or None
+    Get a value that can be converted to panel data, or None, from a mapping.
 
     Parameters
     ----------
-    d : Mapping[str, Any]
+    d : dict of str to object
         A mapping.
     key : str
-        The key to lookup.
+        The key to look up.
 
     Returns
     -------
-    {panel_data_like, None}
-        The string or None if the key is not in the dictionary. If in the
-        dictionary, a type check is performed and TypeError is raised if
-        not found.
+    ndarray, DataFrame, Series, DataArray, PanelData or None
+        The value, or None if the key is not in the mapping or its value is
+        None. A DataArray is possible only if xarray is installed.
+
+    Raises
+    ------
+    TypeError
+        If the value of the key is not an ndarray, a DataFrame, a Series, a
+        DataArray, a PanelData or None.
     """
 
     out: PanelDataLike | None = None

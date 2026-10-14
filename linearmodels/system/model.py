@@ -1,5 +1,5 @@
 """
-Estimators for systems of equations
+Estimators for systems of equations.
 
 References
 ----------
@@ -110,7 +110,7 @@ GMM_TYPES = {name: cov for name, cov in COV_TYPES.items() if cov in GMM_W_EST}
 def _missing_weights(
     weights: Mapping[str, linearmodels.typing.data.ArrayLike | None],
 ) -> None:
-    """Raise warning if missing weighs found"""
+    """Raise warning if missing weights found."""
     missing = [key for key in weights if weights[key] is None]
     if missing:
         msg = "Weights not found for equation labels:\n{}".format(", ".join(missing))
@@ -123,21 +123,21 @@ def _parameters_from_xprod(
     constraints: LinearConstraint | None = None,
 ) -> linearmodels.typing.data.Float64Array:
     r"""
-    Estimate regression parameters from cross produces
+    Estimate regression parameters from cross products.
 
     Parameters
     ----------
     xpx : ndarray
-        Cross product measuring variation in x (nvar by nvar)
+        Cross product measuring variation in x (nvar by nvar).
     xpy : ndarray
-        Cross produce measuring covariation between x and y (nvar by 1)
-    constraints : LinearConstraint
-        Constraints to use in estimation
+        Cross product measuring covariation between x and y (nvar by 1).
+    constraints : LinearConstraint, optional
+        Constraints to use in estimation. The default is no constraints.
 
     Returns
     -------
-    params : ndarray
-        Estimated parameters (nvar by 1)
+    ndarray
+        Estimated parameters (nvar by 1).
 
     Notes
     -----
@@ -163,6 +163,27 @@ def _parameters_from_xprod(
 
 
 class SystemFormulaParser:
+    """
+    Parser for the formulas of a system of equations.
+
+    Parameters
+    ----------
+    formula : str or dict of str to str
+        Either a string with the equations in curly braces, or a dictionary of
+        formulas where each key is an equation label.
+    data : DataFrame
+        Frame containing named variables.
+    weights : dict of str to array_like, optional
+        Weights of the equations, where each key is an equation label. The
+        default is no weights.
+    eval_env : int, optional
+        Depth of the frame, relative to the caller of the parser, used to
+        evaluate the formulas when ``context`` is not given. The default is 2.
+    context : dict of str to object, optional
+        Namespace used to evaluate the formulas. The default is the namespace
+        of the frame at depth ``eval_env``.
+    """
+
     def __init__(
         self,
         formula: Mapping[str, str] | str,
@@ -277,16 +298,16 @@ class SystemFormulaParser:
 
     @property
     def formula(self) -> dict[str, str]:
-        """Cleaned version of formula"""
+        """Cleaned version of formula."""
         return self._clean_formula
 
     @property
     def eval_env(self) -> int:
-        """Set or get the eval env depth"""
+        """Set or get the eval env depth."""
         return self._eval_env
 
     @eval_env.setter
-    def eval_env(self, value: int) -> None:
+    def eval_env(self, value: int) -> None:  # numpydoc ignore=GL08
         self._eval_env = value
         self._context = capture_context(self._eval_env)
         # Update parsers for new level
@@ -301,10 +322,12 @@ class SystemFormulaParser:
 
     @property
     def equation_labels(self) -> list[str]:
+        """Labels of the equations."""
         return list(self._parsers.keys())
 
     @property
     def data(self) -> dict[str, dict[str, linearmodels.typing.data.ArrayLike | None]]:
+        """Dependent, exogenous, endogenous, instruments and weights by equation."""
         out: dict[str, dict[str, linearmodels.typing.data.ArrayLike | None]] = {}
         dep = self.dependent
         for key in dep:
@@ -325,18 +348,22 @@ class SystemFormulaParser:
 
     @property
     def dependent(self) -> dict[str, DataFrame | None]:
+        """Dependent variable of each equation."""
         return self._get_variable("dependent")
 
     @property
     def exog(self) -> dict[str, DataFrame | None]:
+        """Exogenous regressors of each equation."""
         return self._get_variable("exog")
 
     @property
     def endog(self) -> dict[str, DataFrame | None]:
+        """Endogenous regressors of each equation."""
         return self._get_variable("endog")
 
     @property
     def instruments(self) -> dict[str, DataFrame | None]:
+        """Instruments of each equation."""
         return self._get_variable("instruments")
 
 
@@ -346,7 +373,7 @@ class _SystemModelBase:
 
     Parameters
     ----------
-    equations : dict
+    equations : dict of str to tuple or dict
         Dictionary-like structure containing dependent, exogenous, endogenous
         and instrumental variables.  Each key is an equations label and must
         be a string. Each value must be either a tuple of the form (dependent,
@@ -364,9 +391,10 @@ class _SystemModelBase:
         array_like, such as lists, NumPy arrays, pandas objects and xarray
         DataArrays, and a ``TypeError`` that names the variable is raised for
         complex values or text.
-    sigma : array_like
-        Prespecified residual covariance to use in GLS estimation. If not
-        provided, FGLS is implemented based on an estimate of sigma.
+    sigma : array_like, optional
+        Prespecified residual covariance to use in GLS estimation, with shape
+        (nequations, nequations). If not provided, FGLS is implemented based on an
+        estimate of sigma.
     """
 
     def __init__(
@@ -423,11 +451,13 @@ class _SystemModelBase:
 
     @property
     def formula(self) -> str | dict[str, str] | None:
-        """Set or get the formula used to construct the model"""
+        """Set or get the formula used to construct the model."""
         return self._formula
 
     @formula.setter
-    def formula(self, value: str | dict[str, str] | None) -> None:
+    def formula(
+        self, value: str | dict[str, str] | None
+    ) -> None:  # numpydoc ignore=GL08
         self._formula = value
 
     def _validate_data(self) -> None:
@@ -699,29 +729,36 @@ class _SystemModelBase:
         eval_env: int = 1,
     ) -> DataFrame:
         """
-        Predict values for additional data
+        Predict values for additional data.
 
         Parameters
         ----------
         params : array_like
-            Model parameters (nvar by 1)
-        equations : dict
+            Model parameters (nvar by 1).
+        equations : dict of str to dict, optional
             Dictionary-like structure containing exogenous and endogenous
             variables.  Each key is an equations label and must
-            match the labels used to fir the model. Each value must be a
+            match the labels used to fit the model. Each value must be a
             dictionary with keys "exog" and "endog". If predictions are not
             required for one of more of the model equations, these keys can
             be omitted.
-        data : DataFrame
+        data : DataFrame, optional
             Values to use when making predictions from a model constructed
-            from a formula
-        eval_env : int
-            Depth to  use when evaluating formulas.
+            from a formula.
+        eval_env : int, optional
+            Depth to use when evaluating formulas. The default is 1.
 
         Returns
         -------
-        predictions : DataFrame
-            Fitted values from supplied data and parameters
+        DataFrame
+            Fitted values from supplied data and parameters, with a column for
+            each equation that has predictions.
+
+        Raises
+        ------
+        ValueError
+            If neither ``equations`` nor ``data`` is provided, or if ``params`` does
+            not have one element for each parameter of the model.
 
         Notes
         -----
@@ -961,7 +998,7 @@ class _SystemModelBase:
 
     @property
     def has_constant(self) -> Series:
-        """Vector indicating which equations contain constants"""
+        """Vector indicating which equations contain constants."""
         return self._has_constant
 
     def _f_stat(
@@ -1355,12 +1392,12 @@ class _SystemModelBase:
     @property
     def constraints(self) -> LinearConstraint | None:
         """
-        Model constraints
+        Model constraints.
 
         Returns
         -------
-        cons : {LinearConstraint, None}
-            Constraint object
+        LinearConstraint or None
+            Constraint object, which is None if the model has no constraints.
         """
         return self._constraints
 
@@ -1371,9 +1408,9 @@ class _SystemModelBase:
         Parameters
         ----------
         r : DataFrame
-            Constraint matrix. nconstraints by nparameters
-        q : Series
-            Constraint values (nconstraints).  If not set, set to 0
+            Constraint matrix. nconstraints by nparameters.
+        q : Series, optional
+            Constraint values (nconstraints).  If not set, set to 0.
 
         Notes
         -----
@@ -1391,24 +1428,24 @@ class _SystemModelBase:
         )
 
     def reset_constraints(self) -> None:
-        """Remove all model constraints"""
+        """Remove all model constraints."""
         self._constraints = None
 
     @property
     def param_names(self) -> list[str]:
         """
-        Model parameter names
+        Model parameter names.
 
         Returns
         -------
-        names : list[str]
-            Normalized, unique model parameter names
+        list of str
+            Normalized, unique model parameter names.
         """
         return self._param_names
 
 
 class _LSSystemModelBase(_SystemModelBase):
-    """Base class for least-squares-based system estimators"""
+    """Base class for least-squares-based system estimators."""
 
     def fit(
         self,
@@ -1422,49 +1459,73 @@ class _LSSystemModelBase(_SystemModelBase):
         **cov_config: bool,
     ) -> SystemResults:
         """
-        Estimate model parameters
+        Estimate model parameters.
 
         Parameters
         ----------
-        method : {None, "gls", "ols"}
-            Estimation method.  Default auto selects based on regressors,
-            using OLS only if all regressors are identical. The other two
-            arguments force the use of GLS or OLS.
-        full_cov : bool
+        method : {"ols", "gls"}, optional
+            Estimation method. The name is not case sensitive. If not provided, the
+            method is selected based on the regressors, using OLS only if all
+            regressors are identical and the model has no constraints, and GLS
+            otherwise. The two names force the use of OLS or GLS.
+        full_cov : bool, optional
             Flag indicating whether to utilize information in correlations
-            when estimating the model with GLS
-        iterate : bool
-            Flag indicating to iterate GLS until convergence of iter limit
-            iterations have been completed
-        iter_limit : int
-            Maximum number of iterations for iterative GLS
-        tol : float
-            Tolerance to use when checking for convergence in iterative GLS
-        cov_type : str
-            Name of covariance estimator. Valid options are
+            when estimating the model with GLS. The default is True.
+        iterate : bool, optional
+            Flag indicating to iterate GLS until convergence or until iter_limit
+            iterations have been completed. The default is False.
+        iter_limit : int, optional
+            Maximum number of iterations for iterative GLS. The default is 100.
+        tol : float, optional
+            Tolerance to use when checking for convergence in iterative GLS. The
+            default is 1e-6.
+        cov_type : str, optional
+            Name of covariance estimator. The name is not case sensitive. The
+            default is "robust". Valid options are
 
             * "unadjusted", "homoskedastic" - Classic covariance estimator
             * "robust", "heteroskedastic" - Heteroskedasticity robust
               covariance estimator
-            * "kernel" - Allows for heteroskedasticity and autocorrelation
+            * "kernel", "hac" - Allows for heteroskedasticity and autocorrelation
             * "clustered" - Allows for 1 and 2-way clustering of errors
               (Rogers).
 
-        cov_config
-            Additional parameters to pass to covariance estimator. All
-            estimators support debiased which employs a small-sample adjustment
+        **cov_config : dict
+            Additional parameters to pass to the covariance estimator. The keys
+            that are used depend on ``cov_type``. All estimators accept ``debiased``
+            (bool), which employs a small-sample adjustment and is False by
+            default. "kernel" also accepts ``kernel`` (str), the name of the kernel,
+            which is "bartlett" if it is not provided, and ``bandwidth`` (float),
+            which is estimated from the data if it is not provided. "clustered" also
+            accepts ``clusters`` (array_like), the cluster assignment of each
+            observation with one or two columns, and ``group_debias`` (bool), which
+            debiases by the number of groups and is False by default. "unadjusted"
+            and "robust" accept only ``debiased``.
 
         Returns
         -------
-        results : SystemResults
-            Estimation results
+        SystemResults
+            Estimation results.
+
+        Raises
+        ------
+        ValueError
+            If ``method`` is not "ols" or "gls", or if the labels of ``clusters``
+            do not match the labels of the inputs.
+        UnknownOptionError
+            If ``cov_type`` or ``kernel`` is not supported. It is both a
+            ``KeyError`` and a ``ValueError``.
 
         See Also
         --------
         linearmodels.system.covariance.HomoskedasticCovariance
+            Homoskedastic covariance.
         linearmodels.system.covariance.HeteroskedasticCovariance
+            Heteroskedasticity robust covariance.
         linearmodels.system.covariance.KernelCovariance
+            Kernel (HAC) covariance.
         linearmodels.system.covariance.ClusteredCovariance
+            Clustered covariance.
         """
         self._check_clusters(cov_config)
         if method is None:
@@ -1542,11 +1603,11 @@ class _LSSystemModelBase(_SystemModelBase):
 
 class IV3SLS(_LSSystemModelBase):
     r"""
-    Three-stage Least Squares (3SLS) Estimator
+    Three-stage Least Squares (3SLS) Estimator.
 
     Parameters
     ----------
-    equations : dict
+    equations : dict of str to tuple or dict
         Dictionary-like structure containing dependent, exogenous, endogenous
         and instrumental variables.  Each key is an equations label and must
         be a string. Each value must be either a tuple of the form (dependent,
@@ -1564,9 +1625,10 @@ class IV3SLS(_LSSystemModelBase):
         array_like, such as lists, NumPy arrays, pandas objects and xarray
         DataArrays, and a ``TypeError`` that names the variable is raised for
         complex values or text.
-    sigma : array_like
-        Prespecified residual covariance to use in GLS estimation. If not
-        provided, FGLS is implemented based on an estimate of sigma.
+    sigma : array_like, optional
+        Prespecified residual covariance to use in GLS estimation, with shape
+        (nequations, nequations). If not provided, FGLS is implemented based on an
+        estimate of sigma.
 
     Notes
     -----
@@ -1591,7 +1653,7 @@ class IV3SLS(_LSSystemModelBase):
 
     .. math::
 
-        Y = \left[\begin{array}{x}Y_1 \\ Y_2 \\ \vdots \\ Y_K\end{array}\right]
+        Y = \left[\begin{array}{c}Y_1 \\ Y_2 \\ \vdots \\ Y_K\end{array}\right]
 
     and
 
@@ -1611,7 +1673,7 @@ class IV3SLS(_LSSystemModelBase):
         \hat{\beta}_{IV} & = (X'Z(Z'Z)^{-1}Z'X)^{-1}X'Z(Z'Z)^{-1}Z'Y \\
                          & = (\hat{X}'\hat{X})^{-1}\hat{X}'Y
 
-    where :math:`\hat{X} = Z(Z'Z)^{-1}Z'X` and.  When certain conditions are
+    where :math:`\hat{X} = Z(Z'Z)^{-1}Z'X`.  When certain conditions are
     satisfied, a GLS estimator of the form
 
     .. math::
@@ -1671,23 +1733,30 @@ class IV3SLS(_LSSystemModelBase):
         instruments: linearmodels.typing.data.ArrayLike | None = None,
     ) -> IV3SLS:
         """
-        Interface for specification of multivariate IV models
+        Interface for specification of multivariate IV models.
 
         Parameters
         ----------
         dependent : array_like
-            nobs by ndep array of dependent variables
-        exog : array_like
-            nobs by nexog array of exogenous regressors common to all models
-        endog : array_like
-            nobs by nendog array of endogenous regressors common to all models
-        instruments : array_like
-            nobs by ninstr array of instruments to use in all equations
+            Array of dependent variables with shape (nobs, ndep).
+        exog : array_like, optional
+            Array of exogenous regressors common to all models with shape
+            (nobs, nexog).
+        endog : array_like, optional
+            Array of endogenous regressors common to all models with shape
+            (nobs, nendog).
+        instruments : array_like, optional
+            Array of instruments to use in all equations with shape (nobs, ninstr).
 
         Returns
         -------
-        model : IV3SLS
-            Model instance
+        IV3SLS
+            Model instance.
+
+        Raises
+        ------
+        ValueError
+            If neither ``exog`` nor ``endog`` is provided.
 
         Notes
         -----
@@ -1728,20 +1797,21 @@ class IV3SLS(_LSSystemModelBase):
         weights: Mapping[str, linearmodels.typing.data.ArrayLike] | None = None,
     ) -> IV3SLS:
         """
-        Specify a 3SLS using the formula interface
+        Specify a 3SLS using the formula interface.
 
         Parameters
         ----------
-        formula : {str, dict-like}
+        formula : str or dict of str to str
             Either a string or a dictionary of strings where each value in
             the dictionary represents a single equation. See Notes for a
-            description of the accepted syntax
+            description of the accepted syntax.
         data : DataFrame
-            Frame containing named variables
-        sigma : array_like
-            Prespecified residual covariance to use in GLS estimation. If
-            not provided, FGLS is implemented based on an estimate of sigma.
-        weights : dict-like
+            Frame containing named variables.
+        sigma : array_like, optional
+            Prespecified residual covariance to use in GLS estimation, with shape
+            (nequations, nequations). If not provided, FGLS is implemented based on
+            an estimate of sigma.
+        weights : dict of str to array_like, optional
             Dictionary like object (e.g. a DataFrame) containing variable
             weights.  Each entry must have the same number of observations as
             data.  If an equation label is not a key weights, the weights will
@@ -1752,8 +1822,8 @@ class IV3SLS(_LSSystemModelBase):
 
         Returns
         -------
-        model : IV3SLS
-            Model instance
+        IV3SLS
+            Model instance.
 
         Notes
         -----
@@ -1795,11 +1865,11 @@ class IV3SLS(_LSSystemModelBase):
 
 class SUR(_LSSystemModelBase):
     r"""
-    Seemingly unrelated regression estimation (SUR/SURE)
+    Seemingly unrelated regression estimation (SUR/SURE).
 
     Parameters
     ----------
-    equations : dict
+    equations : dict of str to tuple or dict
         Dictionary-like structure containing dependent and exogenous variable
         values.  Each key is an equations label and must be a string. Each
         value must be either a tuple of the form (dependent,
@@ -1807,9 +1877,10 @@ class SUR(_LSSystemModelBase):
         the optional key "weights". The variables are array_like, such as lists,
         NumPy arrays, pandas objects and xarray DataArrays, and a ``TypeError``
         that names the variable is raised for complex values or text.
-    sigma : array_like
-        Prespecified residual covariance to use in GLS estimation. If not
-        provided, FGLS is implemented based on an estimate of sigma.
+    sigma : array_like, optional
+        Prespecified residual covariance to use in GLS estimation, with shape
+        (nequations, nequations). If not provided, FGLS is implemented based on an
+        estimate of sigma.
 
     Notes
     -----
@@ -1834,7 +1905,7 @@ class SUR(_LSSystemModelBase):
 
     .. math::
 
-        Y = \left[\begin{array}{x}Y_1 \\ Y_2 \\ \vdots \\ Y_K\end{array}\right]
+        Y = \left[\begin{array}{c}Y_1 \\ Y_2 \\ \vdots \\ Y_K\end{array}\right]
 
     and
 
@@ -1930,19 +2001,20 @@ class SUR(_LSSystemModelBase):
         exog: linearmodels.typing.data.ArrayLike,
     ) -> SUR:
         """
-        Interface for specification of multivariate regression models
+        Interface for specification of multivariate regression models.
 
         Parameters
         ----------
         dependent : array_like
-            nobs by ndep array of dependent variables
+            Array of dependent variables with shape (nobs, ndep).
         exog : array_like
-            nobs by nvar array of exogenous regressors common to all models
+            Array of exogenous regressors common to all models with shape
+            (nobs, nvar).
 
         Returns
         -------
-        model : SUR
-            Model instance
+        SUR
+            Model instance.
 
         Notes
         -----
@@ -1982,20 +2054,21 @@ class SUR(_LSSystemModelBase):
         weights: Mapping[str, linearmodels.typing.data.ArrayLike] | None = None,
     ) -> SUR:
         """
-        Specify a SUR using the formula interface
+        Specify a SUR using the formula interface.
 
         Parameters
         ----------
-        formula : {str, dict[str, str]}
+        formula : str or dict of str to str
             Either a string or a dictionary of strings where each value in
             the dictionary represents a single equation. See Notes for a
-            description of the accepted syntax
+            description of the accepted syntax.
         data : DataFrame
-            Frame containing named variables
-        sigma : array_like
-            Prespecified residual covariance to use in GLS estimation. If
-            not provided, FGLS is implemented based on an estimate of sigma.
-        weights : dict[str, array_like]
+            Frame containing named variables.
+        sigma : array_like, optional
+            Prespecified residual covariance to use in GLS estimation, with shape
+            (nequations, nequations). If not provided, FGLS is implemented based on
+            an estimate of sigma.
+        weights : dict of str to array_like, optional
             Dictionary like object (e.g. a DataFrame) containing variable
             weights.  Each entry must have the same number of observations as
             data.  If an equation label is not a key weights, the weights will
@@ -2006,8 +2079,8 @@ class SUR(_LSSystemModelBase):
 
         Returns
         -------
-        model : SUR
-            Model instance
+        SUR
+            Model instance.
 
         Notes
         -----
@@ -2048,11 +2121,11 @@ class SUR(_LSSystemModelBase):
 
 class IVSystemGMM(_SystemModelBase):
     r"""
-    System Generalized Method of Moments (GMM) estimation of linear IV models
+    System Generalized Method of Moments (GMM) estimation of linear IV models.
 
     Parameters
     ----------
-    equations : dict
+    equations : dict of str to tuple or dict
         Dictionary-like structure containing dependent, exogenous, endogenous
         and instrumental variables.  Each key is an equations label and must
         be a string. Each value must be either a tuple of the form (dependent,
@@ -2063,15 +2136,37 @@ class IVSystemGMM(_SystemModelBase):
         array_like, such as lists, NumPy arrays, pandas objects and xarray
         DataArrays, and a ``TypeError`` that names the variable is raised for
         complex values or text.
-    sigma : array_like
-        Prespecified residual covariance to use in GLS estimation. If not
-        provided, FGLS is implemented based on an estimate of sigma. Only used
-        if weight_type is "unadjusted"
-    weight_type : str
-        Name of moment condition weight function to use in the GMM estimation
-    weight_config
+    sigma : array_like, optional
+        Prespecified residual covariance to use in GLS estimation, with shape
+        (nequations, nequations). If not provided, FGLS is implemented based on an
+        estimate of sigma. Only used if weight_type is "unadjusted" or
+        "homoskedastic". A ``UserWarning`` is issued, and sigma is ignored, if it is
+        provided with another weight type.
+    weight_type : str, optional
+        Name of moment condition weight function to use in the GMM estimation. The
+        default is "robust". The names are case sensitive. Supported weight
+        types are:
+
+        * "unadjusted", "homoskedastic" - Assume moments are homoskedastic
+        * "robust", "heteroskedastic" - Allow for heteroskedasticity
+        * "kernel", "hac" - Allow for heteroskedasticity and autocorrelation
+
+    **weight_config : dict
         Additional keyword arguments to pass to the moment condition weight
-        function
+        function. All weight types accept ``center`` (bool), whether to center the
+        moment conditions, and ``debiased`` (bool), whether to use small-sample
+        adjustments. Both are False by default. "kernel" also accepts ``kernel``
+        (str), the name of the kernel, which is "bartlett" if it is not provided,
+        ``bandwidth`` (float), and ``optimal_bw`` (bool). See
+        :class:`~linearmodels.system.gmm.HomoskedasticWeightMatrix`,
+        :class:`~linearmodels.system.gmm.HeteroskedasticWeightMatrix` and
+        :class:`~linearmodels.system.gmm.KernelWeightMatrix` for the details.
+
+    Raises
+    ------
+    UnknownOptionError
+        If ``weight_type`` is not supported or ``kernel`` is not a supported
+        kernel. It is both a ``KeyError`` and a ``ValueError``.
 
     Notes
     -----
@@ -2094,7 +2189,7 @@ class IVSystemGMM(_SystemModelBase):
 
     .. math::
 
-        Y = \left[\begin{array}{x}Y_1 \\ Y_2 \\ \vdots \\ Y_K\end{array}\right]
+        Y = \left[\begin{array}{c}Y_1 \\ Y_2 \\ \vdots \\ Y_K\end{array}\right]
 
     and
 
@@ -2227,40 +2322,47 @@ class IVSystemGMM(_SystemModelBase):
         **cov_config: bool | float,
     ) -> GMMSystemResults:
         """
-        Estimate model parameters
+        Estimate model parameters.
 
         Parameters
         ----------
-        iter_limit : int
-            Maximum number of iterations for iterative GLS
-        tol : float
-            Tolerance to use when checking for convergence in iterative GLS
-        initial_weight : ndarray
+        iter_limit : int, optional
+            Maximum number of iterations for iterative GLS. The default is 2.
+        tol : float, optional
+            Tolerance to use when checking for convergence in iterative GLS. The
+            default is 1e-6.
+        initial_weight : ndarray, optional
             Initial weighting matrix to use in the first step. If not
             specified, uses the average outer-product of the set containing
             the exogenous variables and instruments.
-        cov_type : str
-            Name of covariance estimator. Valid options are
+        cov_type : str, optional
+            Name of covariance estimator. The names are case sensitive. The default
+            is "robust". Valid options are
 
             * "unadjusted", "homoskedastic" - Classic covariance estimator
             * "robust", "heteroskedastic" - Heteroskedasticity robust
               covariance estimator
-            * "kernel", ``"hac"`` - Heteroskedasticity and autocorrelation
+            * "kernel", "hac" - Heteroskedasticity and autocorrelation
               robust covariance estimator
 
-        cov_config
-            Additional parameters to pass to covariance estimator. All
-            estimators support debiased which employs a small-sample adjustment.
-            "kernel" also supports kernel, the name of the kernel, and
-            bandwidth, which is estimated from the data if it is not given.
+        **cov_config : dict
+            Additional parameters to pass to the covariance estimator. All
+            estimators accept ``debiased`` (bool), which employs a small-sample
+            adjustment and is False by default. "kernel" also accepts ``kernel``
+            (str), the name of the kernel, which is "bartlett" if it is not
+            provided, and ``bandwidth`` (float), which is estimated from the data
+            if it is not given.
 
         Returns
         -------
         GMMSystemResults
-            Estimation results
+            Estimation results.
 
         Raises
         ------
+        UnknownOptionError
+            If ``cov_type`` or ``kernel`` is not supported. It is both a
+            ``KeyError`` and a ``ValueError``.
         ValueError
             If a bandwidth is estimated from the data, for the kernel weight
             matrix or for the kernel covariance, and there are fewer
@@ -2484,17 +2586,17 @@ class IVSystemGMM(_SystemModelBase):
         **weight_config: bool | str | float,
     ) -> IVSystemGMM:
         """
-        Specify a 3SLS using the formula interface
+        Specify a system GMM model using the formula interface.
 
         Parameters
         ----------
-        formula : {str, dict-like}
+        formula : str or dict of str to str
             Either a string or a dictionary of strings where each value in
             the dictionary represents a single equation. See Notes for a
-            description of the accepted syntax
+            description of the accepted syntax.
         data : DataFrame
-            Frame containing named variables
-        weights : dict-like
+            Frame containing named variables.
+        weights : dict of str to array_like, optional
             Dictionary like object (e.g. a DataFrame) containing variable
             weights.  Each entry must have the same number of observations as
             data.  If an equation label is not a key weights, the weights will
@@ -2502,21 +2604,33 @@ class IVSystemGMM(_SystemModelBase):
             The weights of an equation must be strictly positive and finite. They are
             rescaled to have a mean of 1 in the equation. A NaN weight is missing, and
             its observation is dropped from all of the equations.
-        weight_type : str
+        weight_type : str, optional
             Name of moment condition weight function to use in the GMM
-            estimation. Valid options are:
+            estimation. The default is "robust". The names are case sensitive.
+            Valid options are:
 
             * "unadjusted", "homoskedastic" - Assume moments are homoskedastic
             * "robust", "heteroskedastic" - Allow for heteroskedasticity
+            * "kernel", "hac" - Allow for heteroskedasticity and autocorrelation
 
-        weight_config
+        **weight_config : dict
             Additional keyword arguments to pass to the moment condition weight
-            function
+            function. All weight types accept ``center`` (bool) and ``debiased``
+            (bool), which are False by default. "kernel" also accepts ``kernel``
+            (str), the name of the kernel, which is "bartlett" if it is not
+            provided, ``bandwidth`` (float), and ``optimal_bw`` (bool). See the
+            parameters of :class:`~linearmodels.system.model.IVSystemGMM`.
 
         Returns
         -------
-        model : IVSystemGMM
-            Model instance
+        IVSystemGMM
+            Model instance.
+
+        Raises
+        ------
+        UnknownOptionError
+            If ``weight_type`` is not supported or ``kernel`` is not a supported
+            kernel. It is both a ``KeyError`` and a ``ValueError``.
 
         Notes
         -----
@@ -2561,19 +2675,19 @@ class IVSystemGMM(_SystemModelBase):
         weight_mat: linearmodels.typing.data.Float64Array,
     ) -> WaldTestStatistic:
         """
-        J stat and test
+        J stat and test.
 
         Parameters
         ----------
         params : ndarray
-            Estimated model parameters
+            Estimated model parameters.
         weight_mat : ndarray
-            Weighting matrix used in estimation of the parameters
+            Weighting matrix used in estimation of the parameters.
 
         Returns
         -------
-        stat : WaldTestStatistic
-            Test statistic
+        WaldTestStatistic
+            Test statistic.
 
         Notes
         -----

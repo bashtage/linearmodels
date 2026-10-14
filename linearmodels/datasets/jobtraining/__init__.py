@@ -1,3 +1,7 @@
+"""
+Job training subsidies data of Holzer, Block, Cheatham and Knott (1993).
+"""
+
 from pandas import DataFrame
 
 from linearmodels import datasets
@@ -41,5 +45,12 @@ lhrsemp                 lhrsemp - lhrsemp[t-1]
 
 
 def load() -> DataFrame:
+    """
+    Load the job training subsidies data.
 
+    Returns
+    -------
+    DataFrame
+        The data. ``DESCR`` describes the variables.
+    """
     return datasets.load(__file__, "jobtraining.csv.bz2")

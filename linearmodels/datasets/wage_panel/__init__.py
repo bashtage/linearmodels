@@ -1,3 +1,7 @@
+"""
+Panel of wages and union membership of Vella and Verbeek (1998).
+"""
+
 from pandas import DataFrame
 
 from linearmodels import datasets
@@ -23,5 +27,12 @@ occupation               Occupation code
 
 
 def load() -> DataFrame:
+    """
+    Load the wages and union membership data.
 
+    Returns
+    -------
+    DataFrame
+        The data. ``DESCR`` describes the variables.
+    """
     return datasets.load(__file__, "wage_panel.csv.bz2")

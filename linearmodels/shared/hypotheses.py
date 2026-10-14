@@ -1,3 +1,7 @@
+"""
+Test statistics and hypothesis tests that the models share.
+"""
+
 from __future__ import annotations
 
 from collections.abc import Mapping
@@ -13,25 +17,30 @@ import linearmodels.typing.data
 
 class WaldTestStatistic:
     """
-    Test statistic holder for Wald-type tests
+    Test statistic holder for Wald-type tests.
 
     Parameters
     ----------
     stat : float
-        The test statistic
+        The test statistic.
     null : str
-        A statement of the test's null hypothesis
+        A statement of the test's null hypothesis.
     df : int
-        Degree of freedom.
-    df_denom : int
-        Numerator degree of freedom.  If provided, uses an
-        F(df, df_denom) distribution.
-    name : str
-        Name of test
+        Degree of freedom, which is the numerator degree of freedom if
+        ``df_denom`` is given.
+    df_denom : int, optional
+        Denominator degree of freedom. If provided, the p-value and the critical
+        values use an F(df, df_denom) distribution. Otherwise they use a
+        chi-squared distribution with ``df`` degrees of freedom.
+    name : str, optional
+        Name of test.
 
     See Also
     --------
     InvalidTestStatistic
+        Returned if a requested test is not valid for a model.
+    InapplicableTestStatistic
+        Returned if a requested test is not applicable for a specification.
     """
 
     def __init__(
@@ -57,24 +66,24 @@ class WaldTestStatistic:
 
     @property
     def stat(self) -> float:
-        """Test statistic"""
+        """Test statistic."""
         return self._stat
 
     @property
     def pval(self) -> float:
-        """P-value of test statistic"""
+        """P-value of the test statistic."""
         return self.dist.sf(self.stat)
 
     @property
     def critical_values(self) -> dict[str, float] | None:
-        """Critical values test for common test sizes"""
+        """Critical values for common test sizes."""
         return dict(
             zip(["10%", "5%", "1%"], self.dist.ppf([0.9, 0.95, 0.99]), strict=False)
         )
 
     @property
     def null(self) -> str:
-        """Null hypothesis"""
+        """Null hypothesis of the test."""
         return self._null
 
     def __str__(self) -> str:
@@ -145,19 +154,19 @@ class NormalTestStatistic:
 
     @property
     def stat(self) -> float:
-        """Test statistic"""
+        """Test statistic."""
         return self._stat
 
     @property
     def pval(self) -> float:
-        """P-value of test statistic"""
+        """P-value of the test statistic."""
         if self._two_sided:
             return 2 * self.dist.sf(abs(self.stat))
         return self.dist.sf(self.stat)
 
     @property
     def critical_values(self) -> dict[str, float]:
-        """Critical values for common test sizes"""
+        """Critical values for common test sizes."""
         if self._two_sided:
             quantiles = [0.95, 0.975, 0.995]
         else:
@@ -166,7 +175,7 @@ class NormalTestStatistic:
 
     @property
     def null(self) -> str:
-        """Null hypothesis"""
+        """Null hypothesis of the test."""
         return self._null
 
     def __str__(self) -> str:
@@ -192,23 +201,24 @@ class NormalTestStatistic:
 
 
 class InvalidTestWarning(UserWarning):
-    pass
+    """Warning that a test is not valid."""
 
 
 class InvalidTestStatistic(WaldTestStatistic):
     """
-    Class returned if a requested test is not valid for a model
+    Class returned if a requested test is not valid for a model.
 
     Parameters
     ----------
     reason : str
-        Explanation why test is invalid
-    name : str
-        Name of test
+        Explanation why test is invalid.
+    name : str, optional
+        Name of test.
 
     See Also
     --------
     WaldTestStatistic
+        Test statistic holder for Wald-type tests.
     """
 
     def __init__(self, reason: str, *, name: str | None = None) -> None:
@@ -218,12 +228,12 @@ class InvalidTestStatistic(WaldTestStatistic):
 
     @property
     def pval(self) -> float:
-        """Always returns np.nan"""
+        """P-value, which is always NaN."""
         return np.nan
 
     @property
     def critical_values(self) -> None:
-        """Always returns None"""
+        """Critical values, which are always None."""
         return None
 
     def __str__(self) -> str:
@@ -235,18 +245,20 @@ class InvalidTestStatistic(WaldTestStatistic):
 
 class InapplicableTestStatistic(WaldTestStatistic):
     """
-    Class returned if a requested test is not applicable for a specification
+    Class returned if a requested test is not applicable for a specification.
 
     Parameters
     ----------
-    reason : str
-        Explanation why test is invalid
-    name : str
-        Name of test
+    reason : str, optional
+        Explanation why the test is not applicable. The default says that the
+        test is not applicable to the model specification.
+    name : str, optional
+        Name of test.
 
     See Also
     --------
     WaldTestStatistic
+        Test statistic holder for Wald-type tests.
     """
 
     def __init__(self, *, reason: str | None = None, name: str | None = None):
@@ -259,12 +271,12 @@ class InapplicableTestStatistic(WaldTestStatistic):
 
     @property
     def pval(self) -> float:
-        """Always returns np.nan"""
+        """P-value, which is always NaN."""
         return np.nan
 
     @property
     def critical_values(self) -> None:
-        """Always returns None"""
+        """Critical values, which are always None."""
         return None
 
     def __str__(self) -> str:
@@ -317,6 +329,58 @@ def quadratic_form_test(
     value: linearmodels.typing.data.ArrayLike | None = None,
     formula: str | list[str] | dict[str, float] | None = None,
 ) -> WaldTestStatistic:
+    r"""
+    Test linear equality constraints using a Wald test.
+
+    Parameters
+    ----------
+    params : array_like
+        Parameter estimates with p elements. It must be a Series, indexed by the
+        names of the parameters, if ``formula`` is used.
+    cov : array_like
+        Covariance of the parameter estimates, with shape (p, p).
+    restriction : array_like, optional
+        Array with q rows and p columns containing linear weights to apply to
+        parameters when forming the restrictions. It is not possible to use both
+        ``restriction`` and ``formula``.
+    value : array_like, optional
+        Array with q elements containing the restricted values. The default is
+        zeros.
+    formula : str, list of str or dict of str to float, optional
+        Linear constraints in the formulaic syntax. The names in the constraints
+        are the entries of the index of ``params``. It is one of:
+
+        * A single comma-separated string such as "x1=0, x2+x3=1"
+        * A list of strings where each element is a single constraint
+          such as ["x1=0", "x2+x3=1"]
+        * A single string without commas to test simple constraints such
+          as "x1=x2=x3=0"
+        * A dictionary where each key is a parameter restriction and
+          the corresponding value is the restriction value, e.g.,
+          {"x1": 0, "x2+x3": 1}.
+
+    Returns
+    -------
+    WaldTestStatistic
+        Test statistic for the null that the restrictions are valid. It has a
+        chi-squared distribution with q degrees of freedom.
+
+    Raises
+    ------
+    ValueError
+        If both ``restriction`` and ``formula`` are provided, or if a string
+        constraint does not contain an equal sign.
+    TypeError
+        If ``formula`` is used and ``params`` is not a Series, or if the value of
+        a constraint cannot be converted to a float.
+
+    Notes
+    -----
+    The null hypothesis is :math:`H_0:C\theta=v`, where the matrix C is
+    ``restriction`` and v is ``value``. The statistic is
+    :math:`(C\hat\theta-v)'(C\hat\Sigma C')^{-1}(C\hat\theta-v)`, where
+    :math:`\hat\Sigma` is ``cov``.
+    """
     if formula is not None and restriction is not None:
         raise ValueError("restriction and formula cannot be used simultaneously.")
     if formula is not None:

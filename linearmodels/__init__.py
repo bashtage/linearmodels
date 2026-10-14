@@ -160,7 +160,37 @@ def test(
     append: bool = True,
     location: str = "",
 ) -> int:
+    """
+    Run the tests of linearmodels using pytest.
 
+    Parameters
+    ----------
+    extra_args : str or list of str, optional
+        Command line arguments for pytest. A single string is used as one
+        argument.
+    exit : bool, optional
+        If True, the default, exit the interpreter with the status of pytest
+        when the tests finish. If False, return the status instead.
+    append : bool, optional
+        If True, the default, add ``extra_args`` to ``--tb=auto``. If False,
+        use only ``extra_args``.
+    location : str, optional
+        Path, relative to the directory of the package, of the tests to run.
+        The default is the empty string, which runs all the tests.
+
+    Returns
+    -------
+    int
+        The exit status of pytest. The function returns only if ``exit`` is
+        False.
+
+    Raises
+    ------
+    ImportError
+        If pytest is not installed.
+    RuntimeError
+        If the directory of the tests does not exist.
+    """
     try:
         import pytest  # noqa: PLC0415
     except ImportError as exc:  # pragma: no cover

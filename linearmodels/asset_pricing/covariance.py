@@ -1,5 +1,5 @@
 """
-Covariance estimators for linear factor models
+Covariance estimators for linear factor models.
 """
 
 from __future__ import annotations
@@ -26,13 +26,13 @@ class _HACMixin:
 
     @property
     def kernel(self) -> str:
-        """Kernel used in estimation"""
+        """Kernel used in estimation."""
         assert self._kernel is not None
         return self._kernel
 
     @property
     def bandwidth(self) -> float:
-        """Bandwidth used in estimation"""
+        """Bandwidth used in estimation."""
         if self._bandwidth is None:
             assert self._moments is not None
             moments = self._moments
@@ -76,25 +76,30 @@ class _HACMixin:
 
 class HeteroskedasticCovariance:
     """
-    Heteroskedasticity robust covariance estimator
+    Heteroskedasticity robust covariance estimator.
 
     Parameters
     ----------
     xe : ndarray
-        Scores/moment conditions
-    jacobian : ndarray
-        Jacobian.  One and only one of jacobian and inv_jacobian must
-        be provided
-    inv_jacobian : {ndarray, None}
-        Inverse jacobian.  One and only one of jacobian and inv_jacobian must
-        be provided. Default is None.
-    center : bool
-        Flag indicating to center the scores when computing the covariance. Default
-        is true.
-    debiased : bool
-        Flag indicating to use a debiased estimator. Default is False.
-    df : int
-        Degree of freedom value to use if debiasing. Default is 0.
+        Scores/moment conditions, with shape (nobs, nmoments).
+    jacobian : ndarray, optional
+        Jacobian, with shape (nmoments, nparams). One and only one of jacobian and
+        inv_jacobian must be provided.
+    inv_jacobian : ndarray, optional
+        Inverse jacobian. One and only one of jacobian and inv_jacobian must
+        be provided.
+    center : bool, optional
+        Flag indicating to center the scores when computing the covariance. The
+        default is True.
+    debiased : bool, optional
+        Flag indicating to use a debiased estimator. The default is False.
+    df : int, optional
+        Degree of freedom value to use if debiasing. The default is 0.
+
+    Raises
+    ------
+    ValueError
+        If both or neither of ``jacobian`` and ``inv_jacobian`` are provided.
     """
 
     def __init__(
@@ -131,17 +136,18 @@ class HeteroskedasticCovariance:
 
     @property
     def config(self) -> dict[str, str | float]:
+        """Configuration of the covariance estimator."""
         return {"type": self.__class__.__name__}
 
     @property
     def s(self) -> linearmodels.typing.data.Float64Array:
         """
-        Score/moment condition covariance
+        Score/moment condition covariance.
 
         Returns
         -------
         ndarray
-            Covariance of the scores or moment conditions
+            Covariance of the scores or moment conditions.
         """
         xe = self._xe
         nobs = xe.shape[0]
@@ -153,7 +159,7 @@ class HeteroskedasticCovariance:
 
     @property
     def jacobian(self) -> linearmodels.typing.data.Float64Array:
-        """The Jacobian"""
+        """The Jacobian."""
         if self._jac is None:
             assert self._inv_jac is not None
             self._jac = inv(self._inv_jac)
@@ -162,7 +168,7 @@ class HeteroskedasticCovariance:
 
     @property
     def inv_jacobian(self) -> linearmodels.typing.data.Float64Array:
-        """Inverse Jacobian"""
+        """Inverse Jacobian."""
         if self._inv_jac is None:
             assert self._jac is not None
             self._inv_jac = inv(self._jac)
@@ -171,7 +177,7 @@ class HeteroskedasticCovariance:
 
     @property
     def square(self) -> bool:
-        """Flag indicating if jacobian is square"""
+        """Flag indicating if jacobian is square."""
         return self._square
 
     @property
@@ -183,12 +189,12 @@ class HeteroskedasticCovariance:
     @property
     def cov(self) -> linearmodels.typing.data.Float64Array:
         """
-        Compute parameter covariance
+        Compute parameter covariance.
 
         Returns
         -------
         ndarray
-            Parameter covariance
+            Parameter covariance.
         """
         s = self.s
         scale = self._scale
@@ -243,32 +249,59 @@ class HeteroskedasticCovariance:
 
 class KernelCovariance(HeteroskedasticCovariance, _HACMixin):
     """
-    Heteroskedasticity-autocorrelation (HAC) robust covariance estimator
+    Heteroskedasticity-autocorrelation (HAC) robust covariance estimator.
 
     Parameters
     ----------
     xe : ndarray
-        The scores (moment) conditions.
-    jacobian : ndarray
-        Jacobian.  One and only one of jacobian and inv_jacobian must
+        The scores (moment) conditions, with shape (nobs, nmoments).
+    jacobian : ndarray, optional
+        Jacobian, with shape (nmoments, nparams). One and only one of jacobian and
+        inv_jacobian must be provided.
+    inv_jacobian : ndarray, optional
+        Inverse jacobian. One and only one of jacobian and inv_jacobian must
         be provided.
-    inv_jacobian : ndarray
-        Inverse jacobian.  One and only one of jacobian and inv_jacobian must
-        be provided.
-    kernel : str
-        Kernel name. See notes for available kernels. The default is "bartlett".
-    bandwidth : int
-        Non-negative integer bandwidth. If None, the optimal bandwidth is
+    kernel : str, optional
+        Name of the kernel. The name is not case sensitive. The default is
+        "bartlett". Supported kernels are:
+
+        * "bartlett", "newey-west" - Bartlett's kernel
+        * "parzen", "gallant" - Parzen's kernel
+        * "qs", "quadratic-spectral", "andrews" - Quadratic spectral kernel
+
+    bandwidth : float, optional
+        Non-negative bandwidth. If None, the optimal bandwidth is
         estimated. It needs at least 4 observations with the Bartlett kernel, 5
         with the Parzen kernel and 6 with the quadratic spectral kernel, and a
         ``ValueError`` is raised for fewer when the bandwidth is first used. See
         :func:`~linearmodels.iv.covariance.kernel_optimal_bandwidth`.
-    center : bool
-        Flag indicating to center the scores when computing the covariance.
-    debiased : bool
-        Flag indicating to use a debiased estimator.
-    df : int
-        Degree of freedom value to use if debiasing.
+    center : bool, optional
+        Flag indicating to center the scores when computing the covariance. The
+        default is True.
+    debiased : bool, optional
+        Flag indicating to use a debiased estimator. The default is False.
+    df : int, optional
+        Degree of freedom value to use if debiasing. The default is 0.
+
+    Raises
+    ------
+    ValueError
+        If both or neither of ``jacobian`` and ``inv_jacobian`` are provided, or
+        if ``bandwidth`` is negative.
+    TypeError
+        If ``kernel`` is not a str, or ``bandwidth`` is not a number.
+    UnknownOptionError
+        If ``kernel`` is not supported. It is both a ``KeyError`` and a
+        ``ValueError``.
+
+    See Also
+    --------
+    linearmodels.iv.covariance.kernel_weight_bartlett
+        Weights of the Bartlett kernel.
+    linearmodels.iv.covariance.kernel_weight_parzen
+        Weights of the Parzen kernel.
+    linearmodels.iv.covariance.kernel_weight_quadratic_spectral
+        Weights of the quadratic spectral kernel.
 
     Notes
     -----
@@ -280,12 +313,6 @@ class KernelCovariance(HeteroskedasticCovariance, _HACMixin):
        ``OverflowError``) or "cannot convert float NaN to integer" for some
        data, and used a bandwidth of nobs - 1, or another bandwidth, for other
        data.
-
-    See Also
-    --------
-    linearmodels.iv.covariance.kernel_weight_bartlett,
-    linearmodels.iv.covariance.kernel_weight_parzen,
-    linearmodels.iv.covariance.kernel_weight_quadratic_spectral
     """
 
     def __init__(
@@ -317,6 +344,7 @@ class KernelCovariance(HeteroskedasticCovariance, _HACMixin):
 
     @property
     def config(self) -> dict[str, str | float]:
+        """Configuration of the covariance estimator."""
         out = super().config
         out["kernel"] = self.kernel
         out["bandwidth"] = self.bandwidth
@@ -325,12 +353,12 @@ class KernelCovariance(HeteroskedasticCovariance, _HACMixin):
     @property
     def s(self) -> linearmodels.typing.data.Float64Array:
         """
-        Score/moment condition covariance
+        Score/moment condition covariance.
 
         Returns
         -------
         ndarray
-            Covariance of the scores or moment conditions
+            Covariance of the scores or moment conditions.
         """
         xe = self._xe
         out = self._kernel_cov(xe)
@@ -340,14 +368,15 @@ class KernelCovariance(HeteroskedasticCovariance, _HACMixin):
 
 class HeteroskedasticWeight:
     """
-    GMM weighing matrix estimation
+    GMM weighing matrix estimation.
 
     Parameters
     ----------
     moments : ndarray
-        Moment conditions (nobs by nmoments)
-    center : bool
-        Flag indicating to center the moments when computing the weights
+        Moment conditions (nobs by nmoments).
+    center : bool, optional
+        Flag indicating to center the moments when computing the weights. The
+        default is True.
     """
 
     def __init__(
@@ -360,17 +389,17 @@ class HeteroskedasticWeight:
         self, moments: linearmodels.typing.data.Float64Array
     ) -> linearmodels.typing.data.Float64Array:
         """
-        Score/moment condition weighting matrix
+        Score/moment condition weighting matrix.
 
         Parameters
         ----------
         moments : ndarray
-            Moment conditions (nobs by nmoments)
+            Moment conditions (nobs by nmoments).
 
         Returns
         -------
         ndarray
-            Weighting matrix computed from moment conditions
+            Weighting matrix computed from moment conditions.
         """
         if self._center:
             moments = moments - moments.mean(0)[None, :]
@@ -382,19 +411,25 @@ class HeteroskedasticWeight:
 
 class KernelWeight(HeteroskedasticWeight, _HACMixin):
     """
-    HAC GMM weighing matrix estimation
+    HAC GMM weighing matrix estimation.
 
     Parameters
     ----------
     moments : ndarray
-        Moment conditions (nobs by nmoments)
-    center : bool
-        Flag indicating to center the moments when computing the weights
-    kernel : str
-        Kernel name. See notes for available kernels. If None, the kernel
-        is set to "bartlett".
-    bandwidth : int.
-        Non-negative integer bandwidth. If None, the optimal bandwidth is
+        Moment conditions (nobs by nmoments).
+    center : bool, optional
+        Flag indicating to center the moments when computing the weights. The
+        default is True.
+    kernel : str, optional
+        Name of the kernel. The name is not case sensitive. The default is
+        "bartlett". Supported kernels are:
+
+        * "bartlett", "newey-west" - Bartlett's kernel
+        * "parzen", "gallant" - Parzen's kernel
+        * "qs", "quadratic-spectral", "andrews" - Quadratic spectral kernel
+
+    bandwidth : float, optional
+        Non-negative bandwidth. If None, the optimal bandwidth is
         estimated. It needs at least 4 observations with the Bartlett kernel, 5
         with the Parzen kernel and 6 with the quadratic spectral kernel, and a
         ``ValueError`` is raised for fewer when the bandwidth is first used. See
@@ -427,17 +462,17 @@ class KernelWeight(HeteroskedasticWeight, _HACMixin):
         self, moments: linearmodels.typing.data.Float64Array
     ) -> linearmodels.typing.data.Float64Array:
         """
-        Score/moment condition weighting matrix
+        Score/moment condition weighting matrix.
 
         Parameters
         ----------
         moments : ndarray
-            Moment conditions (nobs by nmoments)
+            Moment conditions (nobs by nmoments).
 
         Returns
         -------
         ndarray
-            Weighting matrix computed from moment conditions
+            Weighting matrix computed from moment conditions.
         """
         if self._center:
             moments = moments - moments.mean(0)[None, :]

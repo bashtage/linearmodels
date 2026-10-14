@@ -14,6 +14,8 @@ def blocked_column_product(
     x: linearmodels.typing.ArraySequence, s: linearmodels.typing.data.Float64Array
 ) -> linearmodels.typing.data.Float64Array:
     """
+    Compute the weighted sums of the blocks of a list of arrays.
+
     Parameters
     ----------
     x : list of ndarray
@@ -24,8 +26,8 @@ def blocked_column_product(
     Returns
     -------
     ndarray
-        Blocked product.  k x nobs rows and the number of columns is the same
-        the number of columns as any member of x.
+        Blocked product. It has k x nobs rows and the same number of columns
+        as any member of x.
     """
     k = len(x)
     out = []
@@ -41,6 +43,8 @@ def blocked_diag_product(
     x: linearmodels.typing.ArraySequence, s: linearmodels.typing.data.Float64Array
 ) -> linearmodels.typing.data.Float64Array:
     """
+    Compute the product of a weighting matrix and a block diagonal matrix.
+
     Parameters
     ----------
     x : list of ndarray
@@ -51,8 +55,8 @@ def blocked_diag_product(
     Returns
     -------
     ndarray
-        Blocked product.  k x nobs rows and the number of columns is the same
-        as the total number of columns in x.
+        Blocked product. It has k x nobs rows and as many columns as the total
+        number of columns in x.
     """
     k = len(x)
     out = []
@@ -68,6 +72,8 @@ def blocked_inner_prod(
     x: linearmodels.typing.ArraySequence, s: linearmodels.typing.data.Float64Array
 ) -> linearmodels.typing.data.Float64Array:
     r"""
+    Compute a weighted inner product of the blocks of a list of arrays.
+
     Parameters
     ----------
     x : list of ndarray
@@ -78,7 +84,7 @@ def blocked_inner_prod(
     Returns
     -------
     ndarray
-        Weighted inner product constructed from x and s
+        Weighted inner product constructed from x and s.
 
     Notes
     -----
@@ -137,6 +143,8 @@ def blocked_cross_prod(
     s: linearmodels.typing.data.Float64Array,
 ) -> linearmodels.typing.data.Float64Array:
     r"""
+    Compute a weighted cross product of the blocks of two lists of arrays.
+
     Parameters
     ----------
     x : list of ndarray
@@ -149,7 +157,7 @@ def blocked_cross_prod(
     Returns
     -------
     ndarray
-        Weighted cross product constructed from x and s
+        Weighted cross product constructed from x and s.
 
     Notes
     -----
@@ -176,12 +184,19 @@ def blocked_full_inner_product(
     x: linearmodels.typing.data.Float64Array, s: linearmodels.typing.data.Float64Array
 ) -> linearmodels.typing.data.Float64Array:
     r"""
+    Compute a weighted inner product of an array that is stacked by equation.
+
     Parameters
     ----------
-        x : ndarray
-            Array of shape KT by KT
-        s : ndarray
-            Array of shape K by K
+    x : ndarray
+        Array with shape (K * T, m), which stacks K blocks of T rows.
+    s : ndarray
+        Array with shape (K, K).
+
+    Returns
+    -------
+    ndarray
+        The product, with shape (m, m).
 
     Notes
     -----
@@ -205,6 +220,19 @@ def blocked_full_inner_product(
 def inv_matrix_sqrt(
     s: linearmodels.typing.data.Float64Array,
 ) -> linearmodels.typing.data.Float64Array:
+    """
+    Compute the inverse of the symmetric square root of a matrix.
+
+    Parameters
+    ----------
+    s : ndarray
+        Symmetric positive definite matrix.
+
+    Returns
+    -------
+    ndarray
+        The inverse of the symmetric square root of ``s``.
+    """
     vecs, vals = np.linalg.eigh(s)
     vecs = 1.0 / np.sqrt(vecs)
     out = vals @ np.diag(vecs) @ vals.T
@@ -213,18 +241,33 @@ def inv_matrix_sqrt(
 
 class LinearConstraint:
     r"""
-    Linear constraint for regression estimation
+    Linear constraint for regression estimation.
 
     Parameters
     ----------
-    r : {ndarray, DataFrame}
-        Restriction loading matrix
-    q : {ndarray, Series}
-        Restriction value
-    num_params : int
-        Number of model parameter.  Used to test for correctness
-    require_pandas : bool
-        Flag indicating whether r and q must be pandas
+    r : ndarray or DataFrame
+        Restriction loading matrix, with one row for each constraint and one
+        column for each parameter. It must be a DataFrame if ``require_pandas``
+        is True.
+    q : ndarray or Series, optional
+        Restriction value, with one element for each constraint. It must be a
+        Series if ``require_pandas`` is True. The default is zeros.
+    num_params : int, optional
+        Number of model parameters. If given, it is used to check that ``r`` has
+        a column for each parameter. The default is not to check.
+    require_pandas : bool, optional
+        Flag indicating whether r and q must be pandas objects. The default is
+        True.
+
+    Raises
+    ------
+    TypeError
+        If ``r`` or ``q`` is not of a supported type, or is not a pandas object
+        when ``require_pandas`` is True.
+    ValueError
+        If ``r`` is not 2-dimensional, ``r`` and ``q`` have different numbers of
+        rows, ``r`` does not have ``num_params`` columns, or the constraints are
+        redundant, not finite or infeasible.
 
     Notes
     -----
@@ -314,22 +357,22 @@ class LinearConstraint:
 
     @property
     def r(self) -> pd.DataFrame:
-        """Constraint loading matrix"""
+        """Constraint loading matrix."""
         return self._r_pd
 
     @property
     def t(self) -> linearmodels.typing.data.Float64Array:
         """
-        Constraint transformation matrix
+        Constraint transformation matrix.
 
         Returns
         -------
         ndarray
-            Constraint transformation matrix
+            Constraint transformation matrix.
 
         Notes
         -----
-        Constrained regressors are constructed as x @ t
+        Constrained regressors are constructed as x @ t.
         """
         if not self._computed:
             self._compute_transform()
@@ -339,12 +382,12 @@ class LinearConstraint:
     @property
     def a(self) -> linearmodels.typing.data.Float64Array:
         r"""
-        Transformed constraint target
+        Transformed constraint target.
 
         Returns
         -------
         ndarray
-            Transformed target
+            Transformed target.
 
         Notes
         -----
@@ -353,7 +396,7 @@ class LinearConstraint:
 
         .. math ::
 
-           beta = t  beta_c + ^\prime
+           \beta = t \beta_c + a^\prime
 
         Also used in estimation or restricted model to demean the dependent
         variable
@@ -369,5 +412,5 @@ class LinearConstraint:
 
     @property
     def q(self) -> pd.Series | ndarray:
-        """Constrain target values"""
+        """Constraint target values."""
         return self._q_pd

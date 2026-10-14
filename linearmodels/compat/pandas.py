@@ -1,3 +1,7 @@
+"""
+Version flags and names that depend on the version of pandas.
+"""
+
 from packaging.version import parse
 import pandas as pd
 

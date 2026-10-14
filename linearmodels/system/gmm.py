@@ -1,5 +1,5 @@
 """
-Covariance and weight estimation for GMM IV estimators
+Covariance and weight estimation for GMM IV estimators.
 """
 
 from __future__ import annotations
@@ -19,15 +19,16 @@ import linearmodels.typing.data
 
 class HomoskedasticWeightMatrix:
     r"""
-    Homoskedastic (unadjusted) weight estimation
+    Homoskedastic (unadjusted) weight estimation.
 
     Parameters
     ----------
-    center : bool
+    center : bool, optional
         Flag indicating whether to center the moment conditions by subtracting
-        the mean before computing the weight matrix.
-    debiased : bool
-        Flag indicating whether to use small-sample adjustments
+        the mean before computing the weight matrix. The default is False.
+    debiased : bool, optional
+        Flag indicating whether to use small-sample adjustments. The default is
+        False.
 
     Notes
     -----
@@ -78,9 +79,10 @@ class HomoskedasticWeightMatrix:
         Parameters
         ----------
         eps : ndarray
-            The residuals from the system of equations.
-        x : list[ndarray]
-            A list of the regressor matrices for each equation in the system.
+            The residuals from the system of equations, with shape (nobs, neq).
+        x : sequence of ndarray
+            The regressors of each equation in the system, with shape
+            (nobs, k_i) for equation i.
 
         Returns
         -------
@@ -112,19 +114,23 @@ class HomoskedasticWeightMatrix:
 
         Parameters
         ----------
-        x : list[ndarray]
-            List of containing model regressors for each equation in the system
-        z : list[ndarray]
-            List of containing instruments for each equation in the system
+        x : sequence of ndarray
+            The regressors of each equation in the system, with shape
+            (nobs, k_i) for equation i.
+        z : sequence of ndarray
+            The instruments of each equation in the system, with shape
+            (nobs, nz_i) for equation i.
         eps : ndarray
-            Model errors (nobs by neqn)
+            Model errors, with shape (nobs, neqn). They are not used by this
+            estimator, which uses ``sigma``.
         sigma : ndarray
-            Fixed covariance of model errors. If None, estimated from eps.
+            Covariance of the model errors, with shape (neqn, neqn).
 
         Returns
         -------
         ndarray
-            Covariance of GMM moment conditions.
+            Weight matrix, which is the covariance of the GMM moment conditions
+            with shape (nmoments, nmoments).
         """
         nobs = z[0].shape[0]
         w = cast("ndarray", blocked_inner_prod(z, sigma) / nobs)
@@ -133,27 +139,28 @@ class HomoskedasticWeightMatrix:
     @property
     def config(self) -> AttrDict:
         """
-        Weight estimator configuration
+        Weight estimator configuration.
 
         Returns
         -------
         AttrDict
-            Dictionary containing weight estimator configuration information
+            Dictionary containing weight estimator configuration information.
         """
         return self._config
 
 
 class HeteroskedasticWeightMatrix(HomoskedasticWeightMatrix):
     r"""
-    Heteroskedasticity robust weight estimation
+    Heteroskedasticity robust weight estimation.
 
     Parameters
     ----------
-    center : bool
+    center : bool, optional
         Flag indicating whether to center the moment conditions by subtracting
-        the mean before computing the weight matrix.
-    debiased : bool
-        Flag indicating whether to use small-sample adjustments
+        the mean before computing the weight matrix. The default is False.
+    debiased : bool, optional
+        Flag indicating whether to use small-sample adjustments. The default is
+        False.
 
     Notes
     -----
@@ -188,19 +195,23 @@ class HeteroskedasticWeightMatrix(HomoskedasticWeightMatrix):
 
         Parameters
         ----------
-        x : list[ndarray]
-            Model regressors (exog and endog), (nobs by nvar)
-        z : list[ndarray]
-            Model instruments (exog and instruments), (nobs by ninstr)
+        x : sequence of ndarray
+            The regressors (exog and endog) of each equation in the system, with
+            shape (nobs, k_i) for equation i.
+        z : sequence of ndarray
+            The instruments (exog and instruments) of each equation in the
+            system, with shape (nobs, nz_i) for equation i.
         eps : ndarray
-            Model errors (nobs by 1)
-        sigma : ndarray
-            Fixed covariance of model errors. If None, estimated from eps.
+            Model errors, with shape (nobs, neqn).
+        sigma : ndarray, optional
+            Not used by this estimator. It is accepted so that all the weight
+            matrix estimators have the same signature.
 
         Returns
         -------
         ndarray
-            Covariance of GMM moment conditions.
+            Weight matrix, which is the covariance of the GMM moment conditions
+            with shape (nmoments, nmoments).
         """
         nobs = x[0].shape[0]
         k = len(x)
@@ -238,25 +249,27 @@ class HeteroskedasticWeightMatrix(HomoskedasticWeightMatrix):
 
 class KernelWeightMatrix(HeteroskedasticWeightMatrix, _HACMixin):
     r"""
-    Heteroskedasticity robust weight estimation
+    Heteroskedasticity and autocorrelation robust (HAC) weight estimation.
 
     Parameters
     ----------
-    center : bool
+    center : bool, optional
         Flag indicating whether to center the moment conditions by subtracting
-        the mean before computing the weight matrix.
-    debiased : bool
-        Flag indicating whether to use small-sample adjustments
-    kernel : str
-        Name of kernel to use.  Supported kernels include:
+        the mean before computing the weight matrix. The default is False.
+    debiased : bool, optional
+        Flag indicating whether to use small-sample adjustments. The default is
+        False.
+    kernel : str, optional
+        Name of kernel to use. The name is not case sensitive. The default is
+        "bartlett". Supported kernels are:
 
         * "bartlett", "newey-west" : Bartlett's kernel
         * "parzen", "gallant" : Parzen's kernel
         * "qs", "quadratic-spectral", "andrews" : Quadratic spectral kernel
 
     bandwidth : float, optional
-        Bandwidth to use for the kernel. If not provided, the bandwidth is
-        selected by ``optimal_bw``.
+        Non-negative bandwidth to use for the kernel. If not provided, the
+        bandwidth is selected by ``optimal_bw``.
     optimal_bw : bool, optional
         Flag indicating whether to estimate the bandwidth from the data when
         ``bandwidth`` is not provided. If False, nobs - 2 is used. If True, the
@@ -273,7 +286,7 @@ class KernelWeightMatrix(HeteroskedasticWeightMatrix, _HACMixin):
 
     .. math::
 
-      W & = \hat{\Gamma}_0+\sum_{i=1}^{n-1} w_i (\hat{\Gamma}_i+\hat{\Gamma}_i^\prime)
+      W & = \hat{\Gamma}_0+\sum_{i=1}^{n-1} w_i (\hat{\Gamma}_i+\hat{\Gamma}_i^\prime) \\
       \hat{\Gamma}_j & = n^{-1}\sum_{i=1}^{n-j} g'_ig_{i+j} \\
       g_i & = (z_{1i}\epsilon_{1i},z_{2i}\epsilon_{2i},\ldots,z_{ki}\epsilon_{ki})
 
@@ -338,19 +351,23 @@ class KernelWeightMatrix(HeteroskedasticWeightMatrix, _HACMixin):
 
         Parameters
         ----------
-        x : list[ndarray]
-            Model regressors (exog and endog)
-        z : list[ndarray]
-            Model instruments (exog and instruments)
+        x : sequence of ndarray
+            The regressors (exog and endog) of each equation in the system, with
+            shape (nobs, k_i) for equation i.
+        z : sequence of ndarray
+            The instruments (exog and instruments) of each equation in the
+            system, with shape (nobs, nz_i) for equation i.
         eps : ndarray
-            Model errors (nobs by nequation)
-        sigma : ndarray
-            Fixed covariance of model errors. If None, estimated from eps.
+            Model errors, with shape (nobs, neqn).
+        sigma : ndarray, optional
+            Not used by this estimator. It is accepted so that all the weight
+            matrix estimators have the same signature.
 
         Returns
         -------
         ndarray
-            Covariance of GMM moment conditions.
+            Weight matrix, which is the covariance of the GMM moment conditions
+            with shape (nmoments, nmoments).
         """
         nobs = x[0].shape[0]
         k = len(x)
@@ -374,7 +391,7 @@ class KernelWeightMatrix(HeteroskedasticWeightMatrix, _HACMixin):
     def _optimal_bandwidth(
         self, moments: linearmodels.typing.data.Float64Array
     ) -> float:
-        """Compute optimal bandwidth used in estimation if needed"""
+        """Compute optimal bandwidth used in estimation if needed."""
         if self._predefined_bw is not None:
             return self._predefined_bw
         elif not self._optimal_bw:
@@ -394,14 +411,14 @@ class KernelWeightMatrix(HeteroskedasticWeightMatrix, _HACMixin):
 
     @property
     def bandwidth(self) -> float:
-        """Bandwidth used to estimate covariance of moment conditions"""
+        """Bandwidth used to estimate covariance of moment conditions."""
         assert self._bandwidth is not None
         return self._bandwidth
 
     @property
     def config(self) -> AttrDict:
         """
-        Weight estimator configuration
+        Weight estimator configuration.
 
         Returns
         -------

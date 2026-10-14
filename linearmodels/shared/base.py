@@ -1,3 +1,7 @@
+"""
+Base classes for the summaries and the comparisons of results.
+"""
+
 from __future__ import annotations
 
 from linearmodels.compat.statsmodels import Summary
@@ -16,6 +20,7 @@ class _SummaryStr:
 
     @property
     def summary(self) -> Summary:
+        """Summary of the estimation results."""
         return Summary()
 
     def __str__(self) -> str:
@@ -91,33 +96,33 @@ class _ModelComparison(_SummaryStr):
 
     @property
     def nobs(self) -> Series:
-        """Parameters for all models"""
+        """Number of observations used to estimate each model."""
         return self._get_property("nobs")
 
     @property
     def params(self) -> DataFrame:
-        """Parameters for all models"""
+        """Parameter estimates of all models."""
         return self._get_series_property("params")
 
     @property
     def tstats(self) -> DataFrame:
-        """Parameter t-stats for all models"""
+        """Parameter t-statistics of all models."""
         return self._get_series_property("tstats")
 
     @property
     def std_errors(self) -> DataFrame:
-        """Parameter standard errors for all models"""
+        """Parameter standard errors of all models."""
         return self._get_series_property("std_errors")
 
     @property
     def pvalues(self) -> DataFrame:
-        """Parameter p-vals for all models"""
+        """Parameter p-values of all models."""
         return self._get_series_property("pvalues")
 
     @property
     def rsquared(self) -> Series:
         """
-        Coefficients of determination (R**2)
+        Coefficients of determination (R**2).
 
         Returns
         -------
@@ -134,7 +139,7 @@ class _ModelComparison(_SummaryStr):
 
     @property
     def f_statistic(self) -> DataFrame:
-        """F-statistics and P-values"""
+        """F-statistics and P-values of all models."""
         out = self._get_property("f_statistic")
         out_df = DataFrame(
             np.empty((len(out), 2)), columns=["F stat", "P-value"], index=out.index
