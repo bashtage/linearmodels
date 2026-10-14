@@ -552,7 +552,7 @@ def test_case_of_kernel_names_of_the_system_and_asset_pricing_models(inputs):
     check_error(
         lambda: SUR(inputs.equations).fit(cov_type="kernel", kernel="Foo"),
         "kernel",
-        "Foo",
+        "foo",
         KERNELS,
     )
 

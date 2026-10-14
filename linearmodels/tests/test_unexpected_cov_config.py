@@ -27,7 +27,10 @@ from linearmodels.shared.exceptions import UnknownOptionError
 from linearmodels.system import IV3SLS, SUR, IVSystemGMM
 
 NOBS = 60
-UNEXPECTED = r"fit\(\) got an unexpected keyword argument 'bogus'\. "
+UNEXPECTED = (
+    r"The keyword argument 'bogus' is not accepted with cov_type='{}'\. "
+    r"The accepted keyword arguments are: "
+)
 
 
 @pytest.fixture(scope="module")
@@ -74,15 +77,30 @@ MODELS = {
 @pytest.mark.parametrize("cov_type", ["robust", "kernel"])
 def test_unexpected_keyword(data, name, cov_type):
     model = MODELS[name](data)
-    with pytest.raises(TypeError, match=UNEXPECTED + r"The keyword arguments"):
+    with pytest.raises(ValueError, match=UNEXPECTED.format(cov_type)):
         model.fit(cov_type=cov_type, bogus=1)
+
+
+def test_message_of_unexpected_keywords(data):
+    model = IV2SLS(*data["iv"])
+    expected = (
+        "The keyword argument 'bogus' is not accepted with cov_type='robust'. "
+        "The accepted keyword arguments are: center, extra_df, kappa."
+    )
+    with pytest.raises(ValueError) as one:
+        model.fit(cov_type="robust", bogus=1)
+    assert str(one.value) == expected
+    with pytest.raises(ValueError, match=r"The keyword arguments 'a', 'b' are not"):
+        model.fit(cov_type="robust", a=1, b=2)
+    with pytest.raises(ValueError, match=r"arguments are: none\.$"):
+        LinearFactorModel(data["portfolios"], data["factors"]).fit(bogus=1)
 
 
 def test_accepted_keywords_depend_on_cov_type(data):
     # The keywords that a covariance estimator accepts depend on its type
     model = IV2SLS(*data["iv"])
-    match = r"cov_type='robust' are: center, kappa, extra_df\."
-    with pytest.raises(TypeError, match=match):
+    match = r"cov_type='robust'\. The accepted keyword arguments are: center, extra_df"
+    with pytest.raises(ValueError, match=match):
         model.fit(cov_type="robust", clusters=np.arange(NOBS))
     model.fit(cov_type="clustered", clusters=np.arange(NOBS))
 
@@ -90,13 +108,13 @@ def test_accepted_keywords_depend_on_cov_type(data):
 @pytest.mark.parametrize("cls", [PooledOLS, PanelOLS, BetweenOLS, RandomEffects])
 def test_panel_unexpected_keyword(data, cls):
     model = cls(*data["panel"])
-    with pytest.raises(ValueError, match=r"are: bogus"):
+    with pytest.raises(ValueError, match=UNEXPECTED.format("robust")):
         model.fit(cov_type="robust", bogus=1)
 
 
 def test_panel_cluster_options_need_clustered(data):
     model = PooledOLS(*data["panel"])
-    with pytest.raises(ValueError, match=r"are: cluster_entity"):
+    with pytest.raises(ValueError, match=r"argument 'cluster_entity' is not accepted"):
         model.fit(cov_type="robust", cluster_entity=True)
 
 

@@ -280,10 +280,10 @@ def check_cov_config(
 
     Raises
     ------
-    TypeError
+    ValueError
         If a key of ``cov_config`` is not accepted by the estimator. The message
-        is that of Python for an unexpected keyword argument, and also names the
-        keys that are accepted. An unknown ``cov_type`` is not checked here.
+        names the keys that are not accepted and the keys that are. An unknown
+        ``cov_type`` is not checked here.
     UnknownOptionError
         If the ``kernel`` is not one of ``kernels``.
     """
@@ -292,14 +292,14 @@ def check_cov_config(
         return
     unknown = [repr(str(key)) for key in cov_config if key not in keys]
     if unknown:
-        article = "an unexpected keyword argument"
         if len(unknown) > 1:
-            article = "unexpected keyword arguments"
-        accepted = ", ".join(keys) if keys else "none"
-        raise TypeError(
-            f"fit() got {article} {', '.join(unknown)}. "
-            f"The keyword arguments that are accepted with cov_type={cov_type!r} "
-            f"are: {accepted}."
+            problem = f"The keyword arguments {', '.join(unknown)} are"
+        else:
+            problem = f"The keyword argument {unknown[0]} is"
+        accepted = ", ".join(sorted(keys)) if keys else "none"
+        raise ValueError(
+            f"{problem} not accepted with cov_type={cov_type!r}. "
+            f"The accepted keyword arguments are: {accepted}."
         )
     if kernels is not None and "kernel" in cov_config:
         kernel = cov_config["kernel"]

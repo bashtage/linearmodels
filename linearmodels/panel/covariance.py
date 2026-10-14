@@ -20,6 +20,7 @@ from linearmodels.iv.covariance import (
 )
 from linearmodels.shared.covariance import cluster_union, group_debias_coefficient
 from linearmodels.shared.exceptions import (
+    check_cov_config,
     lookup_option,
     lower_option,
     unknown_option_error,
@@ -1066,22 +1067,8 @@ def check_covariance_kwargs(
     accepted = (*estimator.ALLOWED_KWARGS, "extra_df")
     if "clusters" in estimator.ALLOWED_KWARGS:
         accepted = (*accepted, *cluster_options)
-    unknown_kwargs = [str(key) for key in cov_config if str(key) not in accepted]
-    if unknown_kwargs:
-        if estimator.ALLOWED_KWARGS:
-            allowed = ", ".join(estimator.ALLOWED_KWARGS)
-            kwarg_err = f"only supports the keyword arguments: {allowed}"
-        else:
-            kwarg_err = "does not support any keyword arguments"
-        msg = (
-            f"Covariance estimator {estimator.__name__} {kwarg_err}. Unknown keyword "
-            f"arguments were passed to the estimator. The unknown keyword argument(s) "
-            f"are: {', '.join(unknown_kwargs)} "
-        )
-        raise ValueError(msg)
-    kernel = cov_config.get("kernel")
-    if isinstance(kernel, str) and "kernel" in estimator.ALLOWED_KWARGS:
-        lookup_option(KERNEL_LOOKUP, kernel.lower(), "kernel")
+    name = str(cov_type).lower()
+    check_cov_config(cov_config, name, {name: accepted}, KERNEL_LOOKUP)
     return estimator
 
 

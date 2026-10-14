@@ -453,12 +453,11 @@ class TradedFactorModel(_FactorModelBase):
             If ``debiased`` is True and the number of observations is not larger
             than the number of factors plus one, or if the bandwidth is selected
             from the data and there are too few observations. See Notes.
-        TypeError
+        ValueError
             If a key of ``cov_config`` is not accepted by the covariance estimator
             that ``cov_type`` selects. The message names the key and lists the
             accepted keys. It is raised before the model is estimated. Releases
-            before 7.1 raised the ``TypeError`` of the constructor of the estimator,
-            or ignored the key.
+            before 7.1 ignored the key.
 
         Notes
         -----
@@ -972,12 +971,11 @@ class LinearFactorModel(_LinearFactorModelBase):
             If ``debiased`` is True and the number of observations is not larger
             than the number of factors plus one, or if the bandwidth is selected
             from the data and there are too few observations. See Notes.
-        TypeError
+        ValueError
             If a key of ``cov_config`` is not accepted by the covariance estimator
             that ``cov_type`` selects. The message names the key and lists the
             accepted keys. It is raised before the model is estimated. Releases
-            before 7.1 raised the ``TypeError`` of the constructor of the estimator,
-            or ignored the key.
+            before 7.1 ignored the key.
 
         Notes
         -----
@@ -1427,12 +1425,11 @@ class LinearFactorModelGMM(_LinearFactorModelBase):
             If ``starting`` does not have one element for each parameter, or if
             the bandwidth is selected from the data and there are too few
             observations. See Notes.
-        TypeError
+        ValueError
             If a key of ``cov_config`` is not accepted by the covariance estimator
             that ``cov_type`` selects. The message names the key and lists the
             accepted keys. It is raised before the model is estimated. Releases
-            before 7.1 raised the ``TypeError`` of the constructor of the estimator,
-            or ignored the key.
+            before 7.1 ignored the key.
 
         Notes
         -----

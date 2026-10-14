@@ -1655,15 +1655,8 @@ def test_unknown_covconfig_kwargs(data, cov_config):
     c, fig = cov_config
     with warns_if_missing(data.y, data.x):
         mod = PanelOLS(data.y, data.x)
-    if c == "clustered":
-        cov = "ClusteredCovariance"
-    elif c == "kernel":
-        cov = "DriscollKraay"
-    elif c == "robust":
-        cov = "HeteroskedasticCovariance"
-    else:
-        cov = "HomoskedasticCovariance"
-    with pytest.raises(ValueError, match=f"Covariance estimator {cov}"):
+    match = f"The keyword argument '{fig}' is not accepted with cov_type='{c}'"
+    with pytest.raises(ValueError, match=match):
         mod.fit(cov_type=c, **{fig: data.vc1})
 
 

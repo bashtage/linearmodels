@@ -1890,7 +1890,8 @@ class PooledOLS(_PanelModelBase):
             It is both a ``ValueError`` and a ``KeyError``.
         ValueError
             If a key of ``cov_config`` is not supported by the covariance
-            estimator, if ``clusters`` does not have the shape of the data, if
+            estimator (this is checked before the model is estimated), if
+            ``clusters`` does not have the shape of the data, if
             ``bandwidth`` is not below the number of time periods, or if the model
             has no residual degrees of freedom.
         TypeError
@@ -3147,7 +3148,8 @@ class PanelOLS(_PanelModelBase):
             collinear, and ``drop_absorbed`` is False in the model.
         ValueError
             If a key of ``cov_config`` is not supported by the covariance
-            estimator, if ``clusters`` does not have the shape of the data, if
+            estimator (this is checked before the model is estimated), if
+            ``clusters`` does not have the shape of the data, if
             ``bandwidth`` is not below the number of time periods, if the model
             has no residual degrees of freedom, or if all of the variables of
             ``exog`` are absorbed.
@@ -4229,7 +4231,8 @@ class FirstDifferenceOLS(_PanelModelBase):
             It is both a ``ValueError`` and a ``KeyError``.
         ValueError
             If a key of ``cov_config`` is not supported by the covariance
-            estimator, if ``clusters`` does not have the shape of the data, if
+            estimator (this is checked before the model is estimated), if
+            ``clusters`` does not have the shape of the data, if
             ``bandwidth`` is not below the number of time periods, or if the model
             has no residual degrees of freedom.
         TypeError
@@ -4734,7 +4737,8 @@ class RandomEffects(_PanelModelBase):
             It is both a ``ValueError`` and a ``KeyError``.
         ValueError
             If a key of ``cov_config`` is not supported by the covariance
-            estimator, if ``clusters`` does not have the shape of the data, if
+            estimator (this is checked before the model is estimated), if
+            ``clusters`` does not have the shape of the data, if
             ``bandwidth`` is not below the number of time periods, if the model
             has no residual degrees of freedom, or if the within or the between
             regression has no residual degrees of freedom, so that the variance of

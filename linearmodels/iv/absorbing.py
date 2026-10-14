@@ -1520,12 +1520,12 @@ class AbsorbingLS:
         UnknownOptionError
             If ``cov_type`` or ``kernel`` is not supported. It is both a
             ``KeyError`` and a ``ValueError``.
-        TypeError
+        ValueError
             If a key of ``cov_config`` is not accepted by the covariance estimator
             that ``cov_type`` selects. The message names the key and lists the
             accepted keys. It is raised before the model is estimated. Releases
-            before 7.1 raised the ``TypeError`` of the constructor of the estimator,
-            or ignored the key.
+            before 7.1 raised the ``TypeError`` of the constructor of the covariance
+            estimator.
 
         Warns
         -----

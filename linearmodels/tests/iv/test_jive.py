@@ -651,11 +651,11 @@ def test_options_for_a_different_covariance_estimator_are_not_ignored():
     # The covariance options used to be silently ignored
     y, exog, endog, z = simulate(8)
     mod = IVJIVE(y, exog, endog, z)
-    with pytest.raises(TypeError):
+    with pytest.raises(ValueError):
         mod.fit(cov_type="robust", bandwidth=4)
-    with pytest.raises(TypeError):
+    with pytest.raises(ValueError):
         mod.fit(cov_type="unadjusted", clusters=np.arange(y.shape[0]) % 5)
-    with pytest.raises(TypeError):
+    with pytest.raises(ValueError):
         mod.fit(cov_type="kernel", clusters=np.arange(y.shape[0]) % 5)
 
 
