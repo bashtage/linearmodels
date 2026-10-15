@@ -20,13 +20,13 @@ else
 fi
 echo "Show information about directories"
 echo "PWD: ${PWD}"
-echo ls ${PWD}/doc/build/html
-ls ${PWD}/doc/build/html
+echo find ${PWD}/doc/build/html
+find ${PWD}/doc/build/html
 echo "Copy docs to devel"
 echo "cp -r ${PWD}/doc/build/html/. ${PWD}/devel/"
 cp -r "${PWD}/doc/build/html/." "${PWD}/devel/"
 echo "List devel directory"
-ls -R "${PWD}/devel"
+find "${PWD}/devel"
 echo "Remove build directory"
 echo "rm -rf ${PWD}/doc/build/"
 rm -rf ${PWD}/doc/build/
