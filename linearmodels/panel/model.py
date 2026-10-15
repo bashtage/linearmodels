@@ -2789,7 +2789,7 @@ class PanelOLS(_PanelModelBase):
             wy += wy_gm
             wx += wx_gm
         else:
-            wybar = 0
+            wybar = np.array(0.0)
 
         y_effects = y - wy / root_w
         x_effects = x - wx / root_w
@@ -2992,7 +2992,7 @@ class PanelOLS(_PanelModelBase):
             wy_arr += wy_gm
             wx_arr += wx_gm
         else:
-            wybar = 0
+            wybar = np.array(0.0)
 
         wy_effects = y.values2d - wy_arr / root_w
         wx_effects = x.values2d - wx_arr / root_w

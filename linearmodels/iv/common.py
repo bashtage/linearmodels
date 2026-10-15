@@ -80,7 +80,7 @@ def find_constant(x: linearmodels.typing.data.Float64Array) -> int | None:
     """
     loc = where(ptp(x, 0) == 0)[0]
     if loc.shape != (0,):
-        return loc[0]
+        return int(loc[0])
     else:
         return None
 
