@@ -19,7 +19,7 @@
     
   
       
-        <title>linearmodels.panel.model - linearmodels v7.1 (+576)</title>
+        <title>linearmodels.panel.model - linearmodels v7.1 (+580)</title>
       
     
 
@@ -91,7 +91,7 @@
 
 <header class="md-header md-header--shadow" data-md-component="header">
   <nav class="md-header__inner md-grid" aria-label="Header">
-    <a href="../../../index.html" title="linearmodels v7.1 (+576)" class="md-header__button md-logo" aria-label="linearmodels v7.1 (+576)" data-md-component="logo">
+    <a href="../../../index.html" title="linearmodels v7.1 (+580)" class="md-header__button md-logo" aria-label="linearmodels v7.1 (+580)" data-md-component="logo">
       <img src="../../../_static/bw-logo.svg" alt="logo">
     </a>
     <label class="md-header__button md-icon" for="__drawer">
@@ -102,7 +102,7 @@
       <div class="md-header__ellipsis">
         <div class="md-header__topic">
           <span class="md-ellipsis">
-            linearmodels v7.1 (+576)
+            linearmodels v7.1 (+580)
           </span>
         </div>
         <div class="md-header__topic" data-md-component="header-topic">
@@ -197,10 +197,10 @@
 
 <nav class="md-nav md-nav--primary" aria-label="Navigation" data-md-level="0">
   <label class="md-nav__title" for="__drawer">
-    <a href="../../../index.html" title="linearmodels v7.1 (+576)" class="md-nav__button md-logo" aria-label="linearmodels v7.1 (+576)" data-md-component="logo">
+    <a href="../../../index.html" title="linearmodels v7.1 (+580)" class="md-nav__button md-logo" aria-label="linearmodels v7.1 (+580)" data-md-component="logo">
       <img src="../../../_static/bw-logo.svg" alt="logo">
     </a>
-    linearmodels v7.1 (+576)
+    linearmodels v7.1 (+580)
   </label>
   
     <div class="md-nav__source">
@@ -1306,7 +1306,10 @@
 <span class="sd">            If clusters does not have the numbers of entities and time periods of</span>
 <span class="sd">            dependent, or has labels that are not those of dependent in the same</span>
 <span class="sd">            order. A value for each time period and entity must have the time</span>
-<span class="sd">            periods and entities in the order that the Notes describe.</span>
+<span class="sd">            periods and entities in the order that the Notes describe. Also if</span>
+<span class="sd">            clusters has a missing value for an observation that the model uses,</span>
+<span class="sd">            i.e., one that is not dropped because dependent, exog, weights or</span>
+<span class="sd">            other_effects has a missing value.</span>
 
 <span class="sd">        Notes</span>
 <span class="sd">        -----</span>
@@ -1361,6 +1364,11 @@
             <span class="c1"># they have the labels of these rows</span>
             <span class="n">frame</span> <span class="o">=</span> <span class="n">frame</span><span class="o">.</span><span class="n">set_axis</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_original_index</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
             <span class="n">changed</span> <span class="o">=</span> <span class="kc">True</span>
+        <span class="c1"># This comes before text and categories are replaced by codes, which give a</span>
+        <span class="c1"># missing value the code -1 and so a cluster of its own. The clusters of the</span>
+        <span class="c1"># observations that the model drops are not used, and can be missing</span>
+        <span class="k">if</span> <span class="n">frame</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">not_null</span><span class="p">]</span><span class="o">.</span><span class="n">isnull</span><span class="p">()</span><span class="o">.</span><span class="n">to_numpy</span><span class="p">()</span><span class="o">.</span><span class="n">any</span><span class="p">():</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">"clusters cannot contain missing values."</span><span class="p">)</span>
         <span class="n">categories</span> <span class="o">=</span> <span class="p">[</span><span class="n">col</span> <span class="k">for</span> <span class="n">col</span> <span class="ow">in</span> <span class="n">frame</span> <span class="k">if</span> <span class="ow">not</span> <span class="n">is_numeric_dtype</span><span class="p">(</span><span class="n">frame</span><span class="p">[</span><span class="n">col</span><span class="p">]</span><span class="o">.</span><span class="n">dtype</span><span class="p">)]</span>
         <span class="k">if</span> <span class="n">categories</span><span class="p">:</span>
             <span class="c1"># Text and categories identify the clusters, but they are not numbers</span>
@@ -2436,7 +2444,8 @@
 <span class="sd">        ValueError</span>
 <span class="sd">            If a key of ``cov_config`` is not supported by the covariance</span>
 <span class="sd">            estimator (this is checked before the model is estimated), if</span>
-<span class="sd">            ``clusters`` does not have the shape of the data, if</span>
+<span class="sd">            ``clusters`` does not have the shape of the data, if ``clusters`` has</span>
+<span class="sd">            a missing value for an observation that the model uses, if</span>
 <span class="sd">            ``bandwidth`` is not below the number of time periods, or if the model</span>
 <span class="sd">            has no residual degrees of freedom.</span>
 <span class="sd">        TypeError</span>
@@ -2529,6 +2538,15 @@
 <span class="sd">           observations without an error, and a pandas object with labels was</span>
 <span class="sd">           rejected.</span>
 
+<span class="sd">        .. versionchanged:: 7.1</span>
+
+<span class="sd">           A ``ValueError`` is raised if ``clusters`` has a missing value for an</span>
+<span class="sd">           observation that the model uses, as in the IV and system models. Earlier</span>
+<span class="sd">           versions made the observations with a missing value a cluster of their</span>
+<span class="sd">           own, so that the standard errors changed without an error. The clusters</span>
+<span class="sd">           of the observations that are dropped because a value of ``dependent``,</span>
+<span class="sd">           ``exog`` or ``weights`` is missing are not used, and can be missing.</span>
+
 <span class="sd">        Examples</span>
 <span class="sd">        --------</span>
 <span class="sd">        &gt;&gt;&gt; from linearmodels import PooledOLS</span>
@@ -2541,6 +2559,7 @@
 <span class="sd">        """</span>
         <span class="n">cov_type</span> <span class="o">=</span> <span class="n">lower_option</span><span class="p">(</span><span class="n">cov_type</span><span class="p">)</span>
         <span class="n">check_covariance_kwargs</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_cov_estimators</span><span class="p">,</span> <span class="n">cov_type</span><span class="p">,</span> <span class="n">cov_config</span><span class="p">)</span>
+        <span class="n">cov_config</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_setup_clusters</span><span class="p">(</span><span class="n">cov_config</span><span class="p">)</span>
         <span class="n">y</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">dependent</span><span class="o">.</span><span class="n">values2d</span>
         <span class="n">x</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">exog</span><span class="o">.</span><span class="n">values2d</span>
         <span class="n">w</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">weights</span><span class="o">.</span><span class="n">values2d</span>
@@ -2553,7 +2572,6 @@
         <span class="n">nobs</span> <span class="o">=</span> <span class="n">y</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
         <span class="n">df_model</span> <span class="o">=</span> <span class="n">x</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span>
         <span class="n">df_resid</span> <span class="o">=</span> <span class="n">nobs</span> <span class="o">-</span> <span class="n">df_model</span>
-        <span class="n">cov_config</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_setup_clusters</span><span class="p">(</span><span class="n">cov_config</span><span class="p">)</span>
         <span class="n">extra_df</span> <span class="o">=</span> <span class="mi">0</span>
         <span class="k">if</span> <span class="s2">"extra_df"</span> <span class="ow">in</span> <span class="n">cov_config</span><span class="p">:</span>
             <span class="n">cov_config</span> <span class="o">=</span> <span class="n">cov_config</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
@@ -3710,7 +3728,8 @@
 <span class="sd">        ValueError</span>
 <span class="sd">            If a key of ``cov_config`` is not supported by the covariance</span>
 <span class="sd">            estimator (this is checked before the model is estimated), if</span>
-<span class="sd">            ``clusters`` does not have the shape of the data, if</span>
+<span class="sd">            ``clusters`` does not have the shape of the data, if ``clusters`` has</span>
+<span class="sd">            a missing value for an observation that the model uses, if</span>
 <span class="sd">            ``bandwidth`` is not below the number of time periods, if the model</span>
 <span class="sd">            has no residual degrees of freedom, or if all of the variables of</span>
 <span class="sd">            ``exog`` are absorbed.</span>
@@ -3843,6 +3862,16 @@
 <span class="sd">           observations without an error, and a pandas object with labels was</span>
 <span class="sd">           rejected.</span>
 
+<span class="sd">        .. versionchanged:: 7.1</span>
+
+<span class="sd">           A ``ValueError`` is raised if ``clusters`` has a missing value for an</span>
+<span class="sd">           observation that the model uses, as in the IV and system models. Earlier</span>
+<span class="sd">           versions made the observations with a missing value a cluster of their</span>
+<span class="sd">           own, so that the standard errors changed without an error. The clusters</span>
+<span class="sd">           of the observations that are dropped because a value of ``dependent``,</span>
+<span class="sd">           ``exog``, ``weights`` or ``other_effects`` is missing are not used, and</span>
+<span class="sd">           can be missing.</span>
+
 <span class="sd">        Examples</span>
 <span class="sd">        --------</span>
 <span class="sd">        &gt;&gt;&gt; from linearmodels import PanelOLS</span>
@@ -3858,6 +3887,8 @@
         <span class="n">check_covariance_kwargs</span><span class="p">(</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">_cov_estimators</span><span class="p">,</span> <span class="n">cov_type</span><span class="p">,</span> <span class="n">cov_config</span><span class="p">,</span> <span class="n">fit_options</span><span class="o">=</span><span class="p">()</span>
         <span class="p">)</span>
+        <span class="c1"># Check clusters if singletons were removed</span>
+        <span class="n">cov_config</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_setup_clusters</span><span class="p">(</span><span class="n">cov_config</span><span class="p">)</span>
 
         <span class="n">weighted</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">any</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">weights</span><span class="o">.</span><span class="n">values2d</span> <span class="o">!=</span> <span class="mf">1.0</span><span class="p">)</span>
 
@@ -3936,8 +3967,6 @@
         <span class="n">nobs</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">dependent</span><span class="o">.</span><span class="n">dataframe</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
         <span class="n">df_model</span> <span class="o">=</span> <span class="n">x</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">+</span> <span class="n">neffects</span>
         <span class="n">df_resid</span> <span class="o">=</span> <span class="n">nobs</span> <span class="o">-</span> <span class="n">df_model</span>
-        <span class="c1"># Check clusters if singletons were removed</span>
-        <span class="n">cov_config</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_setup_clusters</span><span class="p">(</span><span class="n">cov_config</span><span class="p">)</span>
         <span class="k">if</span> <span class="n">auto_df</span><span class="p">:</span>
             <span class="n">count_effects</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_determine_df_adjustment</span><span class="p">(</span><span class="n">cov_type</span><span class="p">,</span> <span class="o">**</span><span class="n">cov_config</span><span class="p">)</span>
         <span class="n">extra_df</span> <span class="o">=</span> <span class="n">neffects</span> <span class="k">if</span> <span class="n">count_effects</span> <span class="k">else</span> <span class="mi">0</span>
@@ -4318,8 +4347,9 @@
 <span class="sd">            if a regressor is a combination of the others only in the means, e.g.,</span>
 <span class="sd">            the dummy variables of the periods and the constant in a balanced</span>
 <span class="sd">            panel. It is also raised if a key of ``cov_config`` is not supported by</span>
-<span class="sd">            the covariance estimator, if the clusters vary within an entity, or if</span>
-<span class="sd">            the model has no residual degrees of freedom.</span>
+<span class="sd">            the covariance estimator, if the clusters vary within an entity, if</span>
+<span class="sd">            ``clusters`` has a missing value for an observation that the model</span>
+<span class="sd">            uses, or if the model has no residual degrees of freedom.</span>
 <span class="sd">        TypeError</span>
 <span class="sd">            If the value of a key of ``cov_config`` does not have the type that the</span>
 <span class="sd">            key needs.</span>
@@ -4379,6 +4409,16 @@
 <span class="sd">           observations without an error, and a pandas object with labels was</span>
 <span class="sd">           rejected.</span>
 
+<span class="sd">        .. versionchanged:: 7.1</span>
+
+<span class="sd">           A ``ValueError`` is raised if ``clusters`` has a missing value for an</span>
+<span class="sd">           observation that the model uses, as in the IV and system models. Earlier</span>
+<span class="sd">           versions ignored a missing number if another observation of the entity</span>
+<span class="sd">           had a cluster, and reported the other cases as clusters that vary within</span>
+<span class="sd">           an entity. The clusters of the observations that are dropped because a</span>
+<span class="sd">           value of ``dependent``, ``exog`` or ``weights`` is missing are not used,</span>
+<span class="sd">           and can be missing.</span>
+
 <span class="sd">        Examples</span>
 <span class="sd">        --------</span>
 <span class="sd">        &gt;&gt;&gt; from linearmodels import BetweenOLS</span>
@@ -4393,6 +4433,7 @@
         <span class="n">check_covariance_kwargs</span><span class="p">(</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">_cov_estimators</span><span class="p">,</span> <span class="n">cov_type</span><span class="p">,</span> <span class="n">cov_config</span><span class="p">,</span> <span class="n">cluster_options</span><span class="o">=</span><span class="p">()</span>
         <span class="p">)</span>
+        <span class="n">cov_config</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_setup_clusters</span><span class="p">(</span><span class="n">cov_config</span><span class="p">)</span>
         <span class="n">y</span><span class="p">,</span> <span class="n">x</span><span class="p">,</span> <span class="n">w</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_prepare_between</span><span class="p">()</span>
         <span class="k">if</span> <span class="n">np</span><span class="o">.</span><span class="n">all</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">weights</span><span class="o">.</span><span class="n">values2d</span> <span class="o">==</span> <span class="mf">1.0</span><span class="p">)</span> <span class="ow">and</span> <span class="ow">not</span> <span class="n">reweight</span><span class="p">:</span>
             <span class="n">w</span> <span class="o">=</span> <span class="n">root_w</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">ones_like</span><span class="p">(</span><span class="n">y</span><span class="p">)</span>
@@ -4416,7 +4457,6 @@
         <span class="n">df_resid</span> <span class="o">=</span> <span class="n">y</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">-</span> <span class="n">x</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span>
         <span class="n">df_model</span> <span class="o">=</span> <span class="n">x</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span>
         <span class="n">nobs</span> <span class="o">=</span> <span class="n">y</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
-        <span class="n">cov_config</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_setup_clusters</span><span class="p">(</span><span class="n">cov_config</span><span class="p">)</span>
         <span class="n">extra_df</span> <span class="o">=</span> <span class="mi">0</span>
         <span class="k">if</span> <span class="s2">"extra_df"</span> <span class="ow">in</span> <span class="n">cov_config</span><span class="p">:</span>
             <span class="n">cov_config</span> <span class="o">=</span> <span class="n">cov_config</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
@@ -4825,7 +4865,8 @@
 <span class="sd">        ValueError</span>
 <span class="sd">            If a key of ``cov_config`` is not supported by the covariance</span>
 <span class="sd">            estimator (this is checked before the model is estimated), if</span>
-<span class="sd">            ``clusters`` does not have the shape of the data, if</span>
+<span class="sd">            ``clusters`` does not have the shape of the data, if ``clusters`` has</span>
+<span class="sd">            a missing value for an observation that the model uses, if</span>
 <span class="sd">            ``bandwidth`` is not below the number of time periods, or if the model</span>
 <span class="sd">            has no residual degrees of freedom.</span>
 <span class="sd">        TypeError</span>
@@ -4917,6 +4958,16 @@
 <span class="sd">           observations without an error, and a pandas object with labels was</span>
 <span class="sd">           rejected.</span>
 
+<span class="sd">        .. versionchanged:: 7.1</span>
+
+<span class="sd">           A ``ValueError`` is raised if ``clusters`` has a missing value for an</span>
+<span class="sd">           observation that the model uses, as in the IV and system models. Earlier</span>
+<span class="sd">           versions ignored a missing value in the first period of an entity, and</span>
+<span class="sd">           raised other errors for the others, such as the error of pandas about</span>
+<span class="sd">           the conversion of NaN to an integer. The clusters of the observations</span>
+<span class="sd">           that are dropped because a value of ``dependent``, ``exog`` or</span>
+<span class="sd">           ``weights`` is missing are not used, and can be missing.</span>
+
 <span class="sd">        Examples</span>
 <span class="sd">        --------</span>
 <span class="sd">        &gt;&gt;&gt; from linearmodels import FirstDifferenceOLS</span>
@@ -4935,6 +4986,7 @@
             <span class="n">cov_config</span><span class="p">,</span>
             <span class="n">cluster_options</span><span class="o">=</span><span class="p">(</span><span class="s2">"cluster_entity"</span><span class="p">,),</span>
         <span class="p">)</span>
+        <span class="n">cov_config</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_setup_clusters</span><span class="p">(</span><span class="n">cov_config</span><span class="p">)</span>
         <span class="n">y_fd</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">dependent</span><span class="o">.</span><span class="n">first_difference</span><span class="p">()</span>
         <span class="n">time_ids</span> <span class="o">=</span> <span class="n">y_fd</span><span class="o">.</span><span class="n">time_ids</span>
         <span class="n">entity_ids</span> <span class="o">=</span> <span class="n">y_fd</span><span class="o">.</span><span class="n">entity_ids</span>
@@ -4971,7 +5023,6 @@
         <span class="n">wy</span> <span class="o">=</span> <span class="n">root_w</span> <span class="o">*</span> <span class="n">y</span>
         <span class="n">params</span> <span class="o">=</span> <span class="n">_lstsq</span><span class="p">(</span><span class="n">wx</span><span class="p">,</span> <span class="n">wy</span><span class="p">,</span> <span class="n">rcond</span><span class="o">=</span><span class="kc">None</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span>
         <span class="n">df_resid</span> <span class="o">=</span> <span class="n">y</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">-</span> <span class="n">x</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span>
-        <span class="n">cov_config</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_setup_clusters</span><span class="p">(</span><span class="n">cov_config</span><span class="p">)</span>
         <span class="n">extra_df</span> <span class="o">=</span> <span class="mi">0</span>
         <span class="k">if</span> <span class="s2">"extra_df"</span> <span class="ow">in</span> <span class="n">cov_config</span><span class="p">:</span>
             <span class="n">cov_config</span> <span class="o">=</span> <span class="n">cov_config</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
@@ -5347,7 +5398,8 @@
 <span class="sd">        ValueError</span>
 <span class="sd">            If a key of ``cov_config`` is not supported by the covariance</span>
 <span class="sd">            estimator (this is checked before the model is estimated), if</span>
-<span class="sd">            ``clusters`` does not have the shape of the data, if</span>
+<span class="sd">            ``clusters`` does not have the shape of the data, if ``clusters`` has</span>
+<span class="sd">            a missing value for an observation that the model uses, if</span>
 <span class="sd">            ``bandwidth`` is not below the number of time periods, if the model</span>
 <span class="sd">            has no residual degrees of freedom, or if the within or the between</span>
 <span class="sd">            regression has no residual degrees of freedom, so that the variance of</span>
@@ -5471,6 +5523,15 @@
 <span class="sd">           observations without an error, and a pandas object with labels was</span>
 <span class="sd">           rejected.</span>
 
+<span class="sd">        .. versionchanged:: 7.1</span>
+
+<span class="sd">           A ``ValueError`` is raised if ``clusters`` has a missing value for an</span>
+<span class="sd">           observation that the model uses, as in the IV and system models. Earlier</span>
+<span class="sd">           versions made the observations with a missing value a cluster of their</span>
+<span class="sd">           own, so that the standard errors changed without an error. The clusters</span>
+<span class="sd">           of the observations that are dropped because a value of ``dependent``,</span>
+<span class="sd">           ``exog`` or ``weights`` is missing are not used, and can be missing.</span>
+
 <span class="sd">        Examples</span>
 <span class="sd">        --------</span>
 <span class="sd">        &gt;&gt;&gt; from linearmodels import RandomEffects</span>
@@ -5483,6 +5544,7 @@
 <span class="sd">        """</span>
         <span class="n">cov_type</span> <span class="o">=</span> <span class="n">lower_option</span><span class="p">(</span><span class="n">cov_type</span><span class="p">)</span>
         <span class="n">check_covariance_kwargs</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_cov_estimators</span><span class="p">,</span> <span class="n">cov_type</span><span class="p">,</span> <span class="n">cov_config</span><span class="p">)</span>
+        <span class="n">cov_config</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_setup_clusters</span><span class="p">(</span><span class="n">cov_config</span><span class="p">)</span>
         <span class="n">w</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">weights</span><span class="o">.</span><span class="n">values2d</span>
         <span class="n">root_w</span> <span class="o">=</span> <span class="n">cast</span><span class="p">(</span><span class="s2">"linearmodels.typing.data.Float64Array"</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="n">w</span><span class="p">))</span>
         <span class="n">demeaned_dep</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">dependent</span><span class="o">.</span><span class="n">demean</span><span class="p">(</span><span class="s2">"entity"</span><span class="p">,</span> <span class="n">weights</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">weights</span><span class="p">)</span>
@@ -5584,7 +5646,6 @@
         <span class="n">params</span> <span class="o">=</span> <span class="n">_lstsq</span><span class="p">(</span><span class="n">wx</span><span class="p">,</span> <span class="n">wy</span><span class="p">,</span> <span class="n">rcond</span><span class="o">=</span><span class="kc">None</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span>
 
         <span class="n">df_resid</span> <span class="o">=</span> <span class="n">wy</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">-</span> <span class="n">wx</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span>
-        <span class="n">cov_config</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_setup_clusters</span><span class="p">(</span><span class="n">cov_config</span><span class="p">)</span>
         <span class="n">extra_df</span> <span class="o">=</span> <span class="mi">0</span>
         <span class="k">if</span> <span class="s2">"extra_df"</span> <span class="ow">in</span> <span class="n">cov_config</span><span class="p">:</span>
             <span class="n">cov_config</span> <span class="o">=</span> <span class="n">cov_config</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>

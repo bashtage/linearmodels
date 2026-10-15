@@ -19,7 +19,7 @@
     
   
       
-        <title>Version 7.1 - linearmodels v7.1 (+576)</title>
+        <title>Version 7.1 - linearmodels v7.1 (+580)</title>
       
     
 
@@ -91,7 +91,7 @@
 
 <header class="md-header md-header--shadow" data-md-component="header">
   <nav class="md-header__inner md-grid" aria-label="Header">
-    <a href="../index.html" title="linearmodels v7.1 (+576)" class="md-header__button md-logo" aria-label="linearmodels v7.1 (+576)" data-md-component="logo">
+    <a href="../index.html" title="linearmodels v7.1 (+580)" class="md-header__button md-logo" aria-label="linearmodels v7.1 (+580)" data-md-component="logo">
       <img src="../_static/bw-logo.svg" alt="logo">
     </a>
     <label class="md-header__button md-icon" for="__drawer">
@@ -102,7 +102,7 @@
       <div class="md-header__ellipsis">
         <div class="md-header__topic">
           <span class="md-ellipsis">
-            linearmodels v7.1 (+576)
+            linearmodels v7.1 (+580)
           </span>
         </div>
         <div class="md-header__topic" data-md-component="header-topic">
@@ -197,10 +197,10 @@
 
 <nav class="md-nav md-nav--primary" aria-label="Navigation" data-md-level="0">
   <label class="md-nav__title" for="__drawer">
-    <a href="../index.html" title="linearmodels v7.1 (+576)" class="md-nav__button md-logo" aria-label="linearmodels v7.1 (+576)" data-md-component="logo">
+    <a href="../index.html" title="linearmodels v7.1 (+580)" class="md-nav__button md-logo" aria-label="linearmodels v7.1 (+580)" data-md-component="logo">
       <img src="../_static/bw-logo.svg" alt="logo">
     </a>
-    linearmodels v7.1 (+576)
+    linearmodels v7.1 (+580)
   </label>
   
     <div class="md-nav__source">
@@ -805,8 +805,10 @@ the absorbed terms leave no degrees of freedom (<a class="extlink-issue referenc
 and a <code class="docutils literal notranslate"><span class="pre">BetweenOLS</span></code> with regressors that are collinear in the entity means
 (<a class="extlink-issue reference external" href="https://github.com/bashtage/linearmodels/issues/799">GH799</a>).</p></li>
 <li><p>IV, system and panel models raise a <code class="docutils literal notranslate"><span class="pre">ValueError</span></code> if the cluster ids are a single
-group, and IV and system models if they have missing values. 7.0 returned a wrong
-covariance, or raised <code class="docutils literal notranslate"><span class="pre">ZeroDivisionError</span></code> (<a class="extlink-issue reference external" href="https://github.com/bashtage/linearmodels/issues/789">GH789</a>).</p></li>
+group or have missing values. 7.0 returned a wrong covariance or raised
+<code class="docutils literal notranslate"><span class="pre">ZeroDivisionError</span></code>, and panel models made the missing ids a cluster of their own.
+The ids of observations that are dropped for other missing values may be missing
+(<a class="extlink-issue reference external" href="https://github.com/bashtage/linearmodels/issues/789">GH789</a>).</p></li>
 <li><p><code class="docutils literal notranslate"><span class="pre">LinearFactorModelGMM</span></code> raises a <code class="docutils literal notranslate"><span class="pre">ValueError</span></code> when the model is created if there
 are not more observations than moment conditions. A <code class="docutils literal notranslate"><span class="pre">sigma</span></code> of <code class="docutils literal notranslate"><span class="pre">LinearFactorModel</span></code>
 that is not symmetric and positive definite, and a saturated debiased asset pricing

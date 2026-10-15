@@ -23,7 +23,7 @@
     
   
       
-        <title>linearmodels.panel.model.PanelOLS.fit - linearmodels v7.1 (+576)</title>
+        <title>linearmodels.panel.model.PanelOLS.fit - linearmodels v7.1 (+580)</title>
       
     
 
@@ -100,7 +100,7 @@
 
 <header class="md-header md-header--shadow" data-md-component="header">
   <nav class="md-header__inner md-grid" aria-label="Header">
-    <a href="../../index.html" title="linearmodels v7.1 (+576)" class="md-header__button md-logo" aria-label="linearmodels v7.1 (+576)" data-md-component="logo">
+    <a href="../../index.html" title="linearmodels v7.1 (+580)" class="md-header__button md-logo" aria-label="linearmodels v7.1 (+580)" data-md-component="logo">
       <img src="../../_static/bw-logo.svg" alt="logo">
     </a>
     <label class="md-header__button md-icon" for="__drawer">
@@ -111,7 +111,7 @@
       <div class="md-header__ellipsis">
         <div class="md-header__topic">
           <span class="md-ellipsis">
-            linearmodels v7.1 (+576)
+            linearmodels v7.1 (+580)
           </span>
         </div>
         <div class="md-header__topic" data-md-component="header-topic">
@@ -206,10 +206,10 @@
 
 <nav class="md-nav md-nav--primary" aria-label="Navigation" data-md-level="0">
   <label class="md-nav__title" for="__drawer">
-    <a href="../../index.html" title="linearmodels v7.1 (+576)" class="md-nav__button md-logo" aria-label="linearmodels v7.1 (+576)" data-md-component="logo">
+    <a href="../../index.html" title="linearmodels v7.1 (+580)" class="md-nav__button md-logo" aria-label="linearmodels v7.1 (+580)" data-md-component="logo">
       <img src="../../_static/bw-logo.svg" alt="logo">
     </a>
-    linearmodels v7.1 (+576)
+    linearmodels v7.1 (+580)
   </label>
   
     <div class="md-nav__source">
@@ -1870,7 +1870,8 @@ estimator does not support raises a <code class="docutils literal notranslate"><
     collinear, and <code class="docutils literal notranslate"><span class="pre">drop_absorbed</span></code> is False in the model.</p></li>
 <li><p><a class="reference external" href="https://docs.python.org/3/builtins/exceptions.html#ValueError" title="(in Python v3.15)"><strong>ValueError</strong></a> – If a key of <code class="docutils literal notranslate"><span class="pre">cov_config</span></code> is not supported by the covariance
     estimator (this is checked before the model is estimated), if
-    <code class="docutils literal notranslate"><span class="pre">clusters</span></code> does not have the shape of the data, if
+    <code class="docutils literal notranslate"><span class="pre">clusters</span></code> does not have the shape of the data, if <code class="docutils literal notranslate"><span class="pre">clusters</span></code> has
+    a missing value for an observation that the model uses, if
     <code class="docutils literal notranslate"><span class="pre">bandwidth</span></code> is not below the number of time periods, if the model
     has no residual degrees of freedom, or if all of the variables of
     <code class="docutils literal notranslate"><span class="pre">exog</span></code> are absorbed.</p></li>
@@ -1995,6 +1996,15 @@ only if the rows are sorted by entity and then time: if they were sorted
 by time and then entity, an array was attached to the wrong
 observations without an error, and a pandas object with labels was
 rejected.</p>
+</div>
+<div class="admonition versionchanged">
+<p class="admonition-title"><span class="versionmodified changed">Changed in version 7.1: </span>A <code class="docutils literal notranslate"><span class="pre">ValueError</span></code> is raised if <code class="docutils literal notranslate"><span class="pre">clusters</span></code> has a missing value for an
+observation that the model uses, as in the IV and system models. Earlier
+versions made the observations with a missing value a cluster of their
+own, so that the standard errors changed without an error. The clusters
+of the observations that are dropped because a value of <code class="docutils literal notranslate"><span class="pre">dependent</span></code>,
+<code class="docutils literal notranslate"><span class="pre">exog</span></code>, <code class="docutils literal notranslate"><span class="pre">weights</span></code> or <code class="docutils literal notranslate"><span class="pre">other_effects</span></code> is missing are not used, and
+can be missing.</p>
 </div>
 <p class="example rubric">Examples</p>
 <div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><code><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span><span class="w"> </span><span class="nn">linearmodels</span><span class="w"> </span><span class="kn">import</span> <span class="n">PanelOLS</span>
