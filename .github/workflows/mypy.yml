@@ -27,12 +27,12 @@ jobs:
         python -m pip install mypy pandas-stubs scipy-stubs xarray
         python -m pip list
     # mypy is informational. New releases of mypy and of the stubs of NumPy, pandas
-    # and SciPy often add errors, so a failure does not fail the check. It adds a
-    # warning with the number of errors instead, and the log of this step lists them.
+    # and SciPy often add errors, so a failure does not fail the check. The step
+    # records the failure instead of failing, so that the only annotation is a
+    # warning with the number of errors. The log of this step lists them.
     - name: Run mypy
       id: mypy
-      continue-on-error: true
-      run: python -m mypy linearmodels | tee mypy.txt
+      run: python -m mypy linearmodels | tee mypy.txt || echo "failed=true" >> "$GITHUB_OUTPUT"
     - name: Report the result of mypy
-      if: steps.mypy.outcome == 'failure'
+      if: steps.mypy.outputs.failed == 'true'
       run: echo "::warning title=mypy::$(tail -n 1 mypy.txt). This check is informational."
