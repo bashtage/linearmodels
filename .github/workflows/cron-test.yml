@@ -20,6 +20,10 @@ jobs:
       matrix:
         python: [cp314, cp315]
         os: [ubuntu-latest, windows-latest, macos-latest]
+        include:
+          # Intel macOS, which none of the jobs above covers
+          - os: macos-15-intel
+            python: cp314
     env:
       BUILD_COMMIT: "main"
       CIBW_ARCHS_LINUX: "x86_64"
