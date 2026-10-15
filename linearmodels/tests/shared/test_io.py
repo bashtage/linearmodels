@@ -3,6 +3,7 @@ Tests of the number formatters of the summaries
 """
 
 import numpy as np
+from numpy.testing import assert_allclose
 import pytest
 
 from linearmodels.shared.io import _str, pval_format
@@ -46,15 +47,20 @@ def test_pval_format():
 
 
 def test_summary_with_a_zero_standard_error():
-    # An exact fit has a zero standard error and an infinite t-statistic
+    # An exact fit has a zero standard error and an infinite t-statistic. The
+    # regressor is 1 or -1 in 64 observations, so that its sums of squares and of
+    # products, 64 and 128, are integers and the fit is exact whatever the rounding of
+    # the linear algebra of the platform. With a normal regressor the standard error
+    # is 0 on some platforms and about 1e-16 (7.5e-17 on Intel macOS) on others, and
+    # then the t-statistic is large and not infinite.
     rng = np.random.default_rng(0)
-    x = rng.standard_normal((50, 1))
+    x = rng.choice([-1.0, 1.0], size=(64, 1))
     equations = {
         "a": {"dependent": 2 * x[:, 0], "exog": x},
-        "b": {"dependent": x[:, 0] + rng.standard_normal(50), "exog": x},
+        "b": {"dependent": x[:, 0] + rng.standard_normal(64), "exog": x},
     }
     res = SUR(equations).fit(method="ols")
-    assert np.asarray(res.std_errors)[0] == 0.0
+    assert_allclose(np.asarray(res.std_errors)[0], 0.0, atol=1e-12)
     assert np.isinf(res.tstats.iloc[0])
     summary = str(res.summary)
     assert "inf" in summary
