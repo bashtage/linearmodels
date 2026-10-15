@@ -26,7 +26,8 @@ if TYPE_CHECKING:
 try:
     from numpy.exceptions import VisibleDeprecationWarning
 except ImportError:  # NumPy < 1.25
-    VisibleDeprecationWarning = np.VisibleDeprecationWarning
+    # The stubs of NumPy 2 do not have the name in the main namespace
+    VisibleDeprecationWarning = np.VisibleDeprecationWarning  # type: ignore[misc,attr-defined]
 
 __all__ = [
     "as_array_like",
@@ -36,12 +37,12 @@ __all__ = [
     "reject_complex",
 ]
 
-COMPLEX_MSG = (
 # The containers that as_array_like returns unchanged
 _Container = TypeVar(
     "_Container", np.ndarray, Series, DataFrame, "DataArray", "IVData", "PanelData"
 )
 
+COMPLEX_MSG = (
     "{name} has a complex dtype. Complex values are not supported since the "
     "imaginary part would be discarded. Use real values, for example the real "
     "part of the array."
@@ -107,7 +108,6 @@ def reject_complex(value: object, name: str) -> None:
         raise TypeError(COMPLEX_MSG.format(name=name))
 
 
-def as_array_like(value: Any, name: str) -> Any:
 @overload
 def as_array_like(  # numpydoc ignore=GL08
     value: list[Any] | tuple[Any, ...], name: str
@@ -120,6 +120,7 @@ def as_array_like(  # numpydoc ignore=GL08
 ) -> _Container: ...
 
 
+def as_array_like(value: Any, name: str) -> Any:
     """
     Convert an array_like input to an array unless it is a known container.
 

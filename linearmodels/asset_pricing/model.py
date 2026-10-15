@@ -573,7 +573,7 @@ class TradedFactorModel(_FactorModelBase):
         vcv = full_vcv[:nloading, :nloading]
 
         # Rearrange VCV
-        order = np.reshape(
+        order: np.ndarray = np.reshape(
             np.arange((nfactor + 1) * nportfolio), (nportfolio, nfactor + 1)
         )
         order = order.T.ravel()
@@ -653,7 +653,7 @@ class _LinearFactorModelBase(_FactorModelBase):
 
     def _validate_sigma(
         self, sigma: linearmodels.typing.data.ArrayLike
-    ) -> linearmodels.typing.data.Float64Array:
+    ) -> linearmodels.typing.data.FloatArray2D:
         """Check that sigma is a symmetric positive definite matrix of the right size"""
         nportfolio = self.portfolios.shape[1]
         sigma_arr = np.asarray(sigma, dtype=float)
@@ -1066,7 +1066,7 @@ class LinearFactorModel(_LinearFactorModelBase):
         param_names.extend([f"lambda-{factor}" for factor in self.factors.cols])
 
         # Pivot vcv to remove unnecessary and have correct order
-        order = np.reshape(np.arange(s1), (nport, nf + 1))
+        order: np.ndarray = np.reshape(np.arange(s1), (nport, nf + 1))
         order[:, 0] = np.arange(s2, s3)
         order = order.ravel()
         order = np.r_[order, s1:s2]

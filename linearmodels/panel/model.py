@@ -1459,7 +1459,7 @@ class _PanelModelBase:
         nobs = weps.shape[0]
         sigma2 = float(np.squeeze(weps.T @ weps) / nobs)
         if sigma2 > 0.0:
-            loglik = -0.5 * nobs * (np.log(2 * np.pi) + np.log(sigma2) + 1)
+            loglik: float = -0.5 * nobs * (np.log(2 * np.pi) + np.log(sigma2) + 1)
             if weights is not None:
                 loglik += 0.5 * float(np.sum(np.log(weights)))
         else:

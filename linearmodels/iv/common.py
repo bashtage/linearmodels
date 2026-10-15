@@ -383,7 +383,9 @@ def _score_covariance(
     nobs = z.shape[0]
     scores = column_stack([v[:, [j]] * z for j in range(v.shape[1])])
     eps = ones((nobs, 1))
-    estimator: HeteroskedasticWeightMatrix
+    estimator: (
+        HeteroskedasticWeightMatrix | OneWayClusteredWeightMatrix | KernelWeightMatrix
+    )
     if family == "robust":
         estimator = HeteroskedasticWeightMatrix(center=False, debiased=False)
     elif family == "clustered":

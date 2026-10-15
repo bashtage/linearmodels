@@ -399,7 +399,7 @@ class PanelResults(_SummaryStr):
         """
         ci_quantiles = np.array([(1 - level) / 2, 1 - (1 - level) / 2])
         if self._debiased:
-            q = stats.t.ppf(ci_quantiles, self.df_resid)
+            q: np.ndarray = stats.t.ppf(ci_quantiles, self.df_resid)
         else:
             q = stats.norm.ppf(ci_quantiles)
         q = q[None, :]

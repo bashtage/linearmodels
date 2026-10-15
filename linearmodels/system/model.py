@@ -1223,7 +1223,7 @@ class _SystemModelBase:
             for weights in w
         ]
         if method == "ols":
-            est_sigma = np.eye(len(wy))
+            est_sigma: linearmodels.typing.data.Float64Array = np.eye(len(wy))
         else:  # gls
             est_sigma = sigma
             if not full_cov:
@@ -1402,7 +1402,9 @@ class _SystemModelBase:
         if not debiased:
             return 1.0
         nobs = float(self._wx[0].shape[0])
-        scales = np.array([nobs - x.shape[1] for x in self._wx], dtype=np.float64)
+        scales: linearmodels.typing.data.Float64Array = np.array(
+            [nobs - x.shape[1] for x in self._wx], dtype=np.float64
+        )
         scales = cast("linearmodels.typing.data.Float64Array", np.sqrt(nobs / scales))
         return scales[:, None] @ scales[None, :]
 

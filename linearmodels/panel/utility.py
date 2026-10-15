@@ -6,7 +6,8 @@ from linearmodels.compat.pandas import ANNUAL_FREQ
 from linearmodels.compat.scipy import coo_array, csc_array, csr_array
 
 from collections import defaultdict
-from typing import Literal, NamedTuple, TypeVar, cast
+from collections.abc import Callable
+from typing import Any, Literal, NamedTuple, TypeVar, cast
 
 import numpy as np
 import numpy.random
@@ -103,7 +104,7 @@ def preconditioner(
     """
     # Dense path
     if not sp.issparse(d):
-        klass = None if type(d) is np.ndarray else d.__class__
+        klass: Any = None if type(d) is np.ndarray else d.__class__
         d_id = id(d)
         d = np.asarray(d)
         if id(d) == d_id or copy:
@@ -128,7 +129,7 @@ def preconditioner(
         "linearmodels.typing.data.Float64Array",
         np.asarray(np.sqrt(d_csc.multiply(d_csc).sum(0))).ravel(),
     )
-    locs = np.zeros_like(d_csc.indices)
+    locs: np.ndarray = np.zeros_like(d_csc.indices)
     locs[d_csc.indptr[1:-1]] = 1
     locs = np.cumsum(locs)
     d_csc.data /= np.take(cond, locs)
@@ -243,7 +244,7 @@ def dummy_matrix(
         total_dummies += ncategories - (i > 0)
 
     if output_format == "csc":
-        fmt = csc_array
+        fmt: Callable[..., Any] = csc_array
     elif output_format == "csr":
         fmt = csr_array
     elif output_format == "coo":
