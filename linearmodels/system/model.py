@@ -17,7 +17,7 @@ from __future__ import annotations
 from collections.abc import Mapping, Sequence
 from functools import reduce
 import textwrap
-from typing import Any, Literal, Optional, cast
+from typing import Any, Literal, Optional, TypedDict, cast
 import warnings
 
 from formulaic.utils.context import capture_context
@@ -108,6 +108,35 @@ GMM_COV_EST = {
     "robust": GMMHeteroskedasticCovariance,
     "kernel": GMMKernelCovariance,
 }
+
+
+class _WeightConfig(TypedDict, total=False):
+    """The options of the unadjusted and robust weight matrices of IVSystemGMM."""
+
+    center: bool
+    debiased: bool
+
+
+class _KernelWeightConfig(_WeightConfig, total=False):
+    """The options of the kernel weight matrix of IVSystemGMM."""
+
+    kernel: str
+    bandwidth: float | None
+    optimal_bw: bool | None
+
+
+class _GMMCovConfig(TypedDict, total=False):
+    """The options of the unadjusted and robust covariances of IVSystemGMM."""
+
+    debiased: bool
+
+
+class _GMMKernelCovConfig(_GMMCovConfig, total=False):
+    """The options of the kernel covariance of IVSystemGMM."""
+
+    kernel: str
+    bandwidth: float | None
+
 
 _LS_KEYS = {
     "unadjusted": ("debiased",),
@@ -2339,7 +2368,16 @@ class IVSystemGMM(_SystemModelBase):
         )
         if self._default_weight_bandwidth:
             weight_config = {**weight_config, "optimal_bw": True}
-        self._weight_est = GMM_W_EST[weight_type](**weight_config)
+        # Only the kernel weight matrix takes kernel, bandwidth and optimal_bw
+        self._weight_est: HomoskedasticWeightMatrix
+        if weight_type == "kernel":
+            self._weight_est = KernelWeightMatrix(
+                **cast("_KernelWeightConfig", weight_config)
+            )
+        else:
+            self._weight_est = GMM_W_EST[weight_type](
+                **cast("_WeightConfig", weight_config)
+            )
 
     def fit(
         self,
@@ -2488,10 +2526,28 @@ class IVSystemGMM(_SystemModelBase):
             iters += 1
 
         cov_type = COV_TYPES[cov_type]
-        cov_est = GMM_COV_EST[cov_type]
-        cov = cov_est(
-            wx, wz, eps, w, sigma=sigma, constraints=self._constraints, **cov_config
-        )
+        # Only the kernel covariance takes kernel and bandwidth
+        cov: GMMHomoskedasticCovariance
+        if cov_type == "kernel":
+            cov = GMMKernelCovariance(
+                wx,
+                wz,
+                eps,
+                w,
+                sigma=sigma,
+                constraints=self._constraints,
+                **cast("_GMMKernelCovConfig", cov_config),
+            )
+        else:
+            cov = GMM_COV_EST[cov_type](
+                wx,
+                wz,
+                eps,
+                w,
+                sigma=sigma,
+                constraints=self._constraints,
+                **cast("_GMMCovConfig", cov_config),
+            )
 
         weps = eps
         _eps = []

@@ -7,12 +7,12 @@ from __future__ import annotations
 from linearmodels.compat.scipy import csc_array, diags_array
 
 from collections import defaultdict
-from collections.abc import Hashable, Iterable
+from collections.abc import Hashable, Iterable, Mapping
 from copy import deepcopy
 import hashlib
 from inspect import signature
 from math import isnan
-from typing import Any, DefaultDict, Union, cast
+from typing import Any, DefaultDict, TypedDict, Union, cast
 import warnings
 
 from numpy import (
@@ -161,7 +161,7 @@ def clear_cache() -> None:
     _VARIABLE_CACHE.clear()
 
 
-def _options_key(options: dict[str, Any]) -> tuple[Any, ...]:
+def _options_key(options: Mapping[str, Any]) -> tuple[Any, ...]:
     """
     Hashable key that identifies options of an absorption algorithm.
 
@@ -299,6 +299,18 @@ def _check_absorb_options(options: dict[str, Any], use_hdfe: bool, method: str) 
     )
 
 
+class _LSMROptions(TypedDict, total=False):
+    """The keyword arguments of scipy.sparse.linalg.lsmr that can be passed."""
+
+    damp: float
+    atol: float
+    btol: float
+    conlim: float
+    maxiter: int | None
+    show: bool
+    x0: linearmodels.typing.data.Float64Array | None
+
+
 def lsmr_annihilate(
     x: csc_array,
     y: linearmodels.typing.data.Float64Array,
@@ -349,12 +361,11 @@ def lsmr_annihilate(
     if y.shape[1] == 0:
         return empty_like(y)
     use_cache = use_cache and x_hash is not None
-    default_opts: dict[
-        str,
-        bool | float | str | linearmodels.typing.data.ArrayLike | dict[str, Any] | None,
-    ] = {"atol": 1e-8, "btol": 1e-8, "show": False}
+    default_opts: _LSMROptions = {"atol": 1e-8, "btol": 1e-8, "show": False}
     assert lsmr_options is not None
-    default_opts.update(lsmr_options)
+    # The options are keyword arguments of lsmr. AbsorbingLS.fit rejects the options
+    # of pyhdfe with _check_absorb_options before they reach this function
+    default_opts.update(cast("_LSMROptions", lsmr_options))
     cache_key = (x_hash, _options_key(default_opts))
     resids = []
     for i in range(y.shape[1]):
