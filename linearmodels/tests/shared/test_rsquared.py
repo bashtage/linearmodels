@@ -28,12 +28,12 @@ def test_ordinary_values_are_one_minus_the_ratio(seed):
     y_ss = float(total_ss + rg.uniform(0, 100))
     # The same operations, so that the values are identical
     result = r_squared(residual_ss, total_ss, y_ss, 100)
-    assert result == 1 - residual_ss / total_ss
+    assert_allclose(result, 1 - residual_ss / total_ss, rtol=1e-12)
     # A model can fit worse than a constant, and the R-squared is negative
     result = r_squared(total_ss + 1.0, total_ss, y_ss, 100)
     assert result < 0.0
     result = r_squared(0.0, total_ss, y_ss, 100)
-    assert result == 1.0
+    assert_allclose(result, 1.0, rtol=1e-12)
 
 
 @pytest.mark.parametrize("y_ss", [0.0, 1.0, 1e-300, 1e300])

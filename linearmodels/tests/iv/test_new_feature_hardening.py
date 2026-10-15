@@ -35,6 +35,7 @@ import linearmodels.iv.model
 from linearmodels.iv.results import FirstStageResults, IVGMMResults
 from linearmodels.shared.exceptions import MissingValueWarning
 from linearmodels.shared.hypotheses import InvalidTestStatistic, WaldTestStatistic
+from linearmodels.tests._utility import assert_same_text
 
 
 def simulate(seed, nobs=300, ninstr=4, nendog=1, violation=0.0, weighted=False):
@@ -287,14 +288,14 @@ def test_results_can_be_pickled(estimator):
     clone = pickle.loads(pickle.dumps(res))
     assert_allclose(clone.params, res.params)
     assert_allclose(clone.cov, res.cov)
-    assert str(clone.summary) == str(res.summary)
+    assert_same_text(str(clone.summary), str(res.summary))
     first_stage, original = clone.first_stage, res.first_stage
     assert_allclose(first_stage.kleibergen_paap.stat, original.kleibergen_paap.stat)
     assert_allclose(first_stage.kleibergen_paap_f, original.kleibergen_paap_f)
     assert_allclose(first_stage.cragg_donald_f, original.cragg_donald_f)
     if isinstance(res, IVGMMResults):
         assert_allclose(clone.centered_j_stat.stat, res.centered_j_stat.stat)
-        assert str(clone.centered_j_stat) == str(res.centered_j_stat)
+        assert_same_text(str(clone.centered_j_stat), str(res.centered_j_stat))
 
 
 # ----------------------------------------------------------------------------

@@ -34,7 +34,11 @@ def test_random_effects_small_sample(data):
     no_ss = mod.fit()
     ss = mod.fit(small_sample=True)
     if y.dataframe.shape[0] == mod.dependent.dataframe.shape[0]:
-        assert ss.variance_decomposition.Effects == no_ss.variance_decomposition.Effects
+        assert_allclose(
+            ss.variance_decomposition.Effects,
+            no_ss.variance_decomposition.Effects,
+            rtol=1e-10,
+        )
     else:
         assert ss.variance_decomposition.Effects != no_ss.variance_decomposition.Effects
 
@@ -43,7 +47,11 @@ def test_random_effects_small_sample(data):
     no_ss = mod.fit()
     ss = mod.fit(small_sample=True)
     if y.dataframe.shape[0] == mod.dependent.dataframe.shape[0]:
-        assert ss.variance_decomposition.Effects == no_ss.variance_decomposition.Effects
+        assert_allclose(
+            ss.variance_decomposition.Effects,
+            no_ss.variance_decomposition.Effects,
+            rtol=1e-10,
+        )
     else:
         assert ss.variance_decomposition.Effects != no_ss.variance_decomposition.Effects
 

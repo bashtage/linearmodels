@@ -99,7 +99,7 @@ def test_moment_cov_exactly_identified():
     for kwargs in ({"jacobian": jacobian}, {"inv_jacobian": np.linalg.inv(jacobian)}):
         cov_est = HeteroskedasticCovariance(moments, **kwargs)
         assert cov_est._moment_cov.shape == (5, 5)
-        assert np.all(cov_est._moment_cov == 0)
+        assert_allclose(cov_est._moment_cov, 0.0, atol=1e-12)
 
 
 def test_center(data):

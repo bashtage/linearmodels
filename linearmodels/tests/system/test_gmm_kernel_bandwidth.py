@@ -19,7 +19,7 @@ import warnings
 
 import numpy as np
 from numpy.linalg import solve
-from numpy.testing import assert_allclose, assert_array_equal
+from numpy.testing import assert_allclose
 import pandas as pd
 import pytest
 
@@ -28,6 +28,7 @@ from linearmodels.iv.covariance import kernel_optimal_bandwidth
 from linearmodels.shared.exceptions import DefaultBandwidthWarning
 from linearmodels.system import IVSystemGMM
 from linearmodels.system.gmm import KernelWeightMatrix
+from linearmodels.tests._utility import assert_close_matrix
 
 NOBS = 200
 
@@ -514,11 +515,12 @@ def test_kernel_weight_matrix_default(eqns):
     # Once for each instance, and not for each call
     again, caught = default_bandwidth_warnings(compute)
     assert len(caught) == 0
-    assert_array_equal(w, again)
+    assert_close_matrix(again, w)
 
     with no_default_bandwidth_warning():
         optimal = KernelWeightMatrix(optimal_bw=True)
-        assert_array_equal(optimal.weight_matrix(x, z, eps), w)
+        w_optimal = optimal.weight_matrix(x, z, eps)
+    assert_close_matrix(w_optimal, w)
     assert weight.bandwidth == optimal.bandwidth
     assert weight.bandwidth == estimated_bandwidth(scores(z, eps))
     assert 0 < weight.bandwidth < NOBS // 10

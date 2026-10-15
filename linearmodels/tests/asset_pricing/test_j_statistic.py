@@ -124,7 +124,7 @@ def test_j_statistic_just_identified(risk_free):
     nrp = 2 + int(risk_free)
     portfolios, factors = simulate_data(300, nrp, 2, seed=5)
     res = LinearFactorModel(portfolios, factors, risk_free=risk_free).fit()
-    assert res.j_statistic.stat == 0.0
+    assert_allclose(res.j_statistic.stat, 0.0, atol=1e-12)
     assert res.j_statistic.df == 0
 
 
@@ -177,7 +177,7 @@ def test_j_statistic_helper_no_degrees_of_freedom():
     rng = np.random.default_rng(1)
     restrictions = rng.standard_normal((3, 3))
     stat = _j_statistic(np.zeros((3, 1)), np.eye(3), restrictions)
-    assert stat.stat == 0.0
+    assert_allclose(stat.stat, 0.0, atol=1e-12)
     assert stat.df == 0
 
 

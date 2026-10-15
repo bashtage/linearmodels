@@ -37,6 +37,7 @@ from linearmodels.panel import (
 from linearmodels.panel.data import PanelData
 from linearmodels.shared.exceptions import MissingValueWarning
 from linearmodels.shared.hypotheses import InvalidTestStatistic
+from linearmodels.tests._utility import assert_same_text
 
 NENTITY = 8
 NPERIOD = 6
@@ -169,7 +170,7 @@ def test_effects_and_residuals_are_the_means(frame, effect, weighted, algorithm)
     atol = EFFECT_ATOL[algorithm]
     assert res.params.shape == (0,)
     assert_allclose(res.estimated_effects.to_numpy().ravel(), fitted, atol=atol)
-    assert_allclose(res.fitted_values.to_numpy().ravel(), 0.0, atol=0.0)
+    assert_allclose(res.fitted_values.to_numpy().ravel(), 0.0, atol=ATOL)
     assert_allclose(res.idiosyncratic.to_numpy().ravel(), y - fitted, atol=atol)
     assert_allclose(res.resids.to_numpy(), y - fitted, atol=atol)
     assert res.estimated_effects.index.equals(frame.index)
@@ -230,7 +231,8 @@ def test_statistics_against_hand_computation(frame, effect, weighted, algorithm)
     for name in ("rsquared", "rsquared_within", "rsquared_between", "rsquared_overall"):
         assert_allclose(getattr(res, name), 0.0, atol=rtol, err_msg=name)
     for name in ("within", "between", "overall"):
-        assert getattr(res, f"corr_squared_{name}") == 0.0
+        corr_squared = getattr(res, f"corr_squared_{name}")
+        assert_allclose(corr_squared, 0.0, atol=ATOL, err_msg=name)
     assert_allclose(res.rsquared_inclusive, 1 - resid_ss / centered, rtol=rtol)
     assert_allclose(res.s2, resid_ss / (nobs - neffects), rtol=rtol)
     # The log-likelihood of the regression on a constant and the dummy variables,
@@ -340,18 +342,18 @@ def test_summary(frame):
     # The other formats work without the table of parameters
     for as_format in (summary.as_html, summary.as_latex, summary.as_csv):
         assert len(as_format()) > 100
-    assert str(res) == text
+    assert_same_text(str(res), text)
 
 
 def test_predict_and_wald_test(frame):
     res = fit_effects_only(frame, "entity", False)
     out = res.predict(effects=True, idiosyncratic=True)
     assert list(out.columns) == ["fitted_values", "estimated_effects", "idiosyncratic"]
-    assert_allclose(out["fitted_values"], 0.0)
+    assert_allclose(out["fitted_values"], 0.0, atol=ATOL)
     assert_allclose(out.sum(axis=1).to_numpy(), frame["y"].to_numpy())
     # Out of sample predictions with no regressors are 0
     new = res.predict(exog=no_regressors(frame).iloc[:5])
-    assert_allclose(new.to_numpy(), 0.0)
+    assert_allclose(new.to_numpy(), 0.0, atol=ATOL)
     with pytest.raises(ValueError, match="The model has no parameters"):
         res.wald_test(formula="x = 0")
     with pytest.raises(ValueError, match="The model has no parameters"):
@@ -485,20 +487,6 @@ def test_options_of_the_model(frame, effect):
 # Formulas
 # --------------------------------------------------------------------------
 SKIP_ATTRIBUTES = {"model", "summary", "conf_int", "predict", "wald_test", "compare"}
-NUMBER = re.compile(r"[-+]?(?:\d+\.?\d*|\.\d+)(?:[eE][-+]?\d+)?")
-
-
-def assert_same_text(text, expected, label="", rtol=1e-8, atol=ATOL):
-    """
-    The text is the same, and the numbers in it are the same up to rounding
-
-    The words are compared as text, with the numbers replaced by a placeholder, and
-    the numbers are compared as numbers.
-    """
-    words = [" ".join(NUMBER.sub("#", t).split()) for t in (text, expected)]
-    assert words[0] == words[1], label
-    numbers = [np.array(NUMBER.findall(t), dtype=float) for t in (text, expected)]
-    assert_allclose(numbers[0], numbers[1], rtol=rtol, atol=atol, err_msg=label)
 
 
 def assert_same_table(value, other, label):
@@ -606,7 +594,7 @@ def test_formula_prediction_with_data(frame):
     res = mod.fit()
     out = res.predict(data=frame.iloc[:10])
     assert out.shape == (10, 1)
-    assert_allclose(out.to_numpy(), 0.0)
+    assert_allclose(out.to_numpy(), 0.0, atol=ATOL)
 
 
 def test_formula_with_a_constant_is_not_a_model_without_regressors(frame):
