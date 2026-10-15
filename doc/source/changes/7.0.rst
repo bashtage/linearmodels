@@ -1,7 +1,7 @@
 Version 7.1
 -----------
 
-.. TODO(REL1): Add the release date.
+Released on 2026-10-15.
 
 .. rubric:: Highlights
 
@@ -284,7 +284,7 @@ Version 7.1
   group or have missing values. 7.0 returned a wrong covariance or raised
   ``ZeroDivisionError``, and panel models made the missing ids a cluster of their own.
   The ids of observations that are dropped for other missing values may be missing
-  (:issue:`789`).
+  (:issue:`789`, :issue:`845`).
 - ``LinearFactorModelGMM`` raises a ``ValueError`` when the model is created if there
   are not more observations than moment conditions. A ``sigma`` of ``LinearFactorModel``
   that is not symmetric and positive definite, and a saturated debiased asset pricing
@@ -384,6 +384,8 @@ Version 7.1
 - The tests do not leak warnings with any supported combination of versions, and the
   minimum versions of statsmodels (0.14.6) and pyhdfe (0.2.0) were raised for this
   (:issue:`751`, :issue:`826`).
+- The tests compare floating-point results with a tolerance, since their last digits
+  differ between platforms, and the CI also tests a wheel on Intel macOS (:issue:`846`).
 - The type annotations describe what the code accepts and returns: ``ArrayLike``
   includes lists and tuples, and ``fitted_values``, ``estimated_effects`` and
   ``idiosyncratic`` of the panel results are ``DataFrame``. A GitHub workflow runs mypy,
