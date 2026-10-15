@@ -238,13 +238,19 @@ def fit_spec(eqns, name, options):
     return mod.fit(**fit_kwargs)
 
 
-def assert_identical(res, other):
-    """The results are the same to the last bit"""
-    assert_array_equal(res.params, other.params)
-    assert_array_equal(res.std_errors, other.std_errors)
-    assert_array_equal(res.cov, other.cov)
-    assert_array_equal(res.w, other.w)
-    assert res.j_stat.stat == other.j_stat.stat
+# The two fits are the same calculation, which only differs in the rounding of the
+# linear algebra of the platform. Changing the data in the last bit changes the
+# results by up to 4e-10 (the covariance, with the Parzen kernel)
+SAME_RTOL = 1e-8
+
+
+def assert_same_results(res, other):
+    """The results are the same, up to rounding"""
+    assert_allclose(res.params, other.params, rtol=SAME_RTOL)
+    assert_allclose(res.std_errors, other.std_errors, rtol=SAME_RTOL)
+    assert_allclose(res.cov, other.cov, rtol=SAME_RTOL)
+    assert_allclose(res.w, other.w, rtol=SAME_RTOL)
+    assert_allclose(res.j_stat.stat, other.j_stat.stat, rtol=SAME_RTOL)
     assert dict(res.weight_config) == dict(other.weight_config)
     assert dict(res.cov_config) == dict(other.cov_config)
 
@@ -270,7 +276,7 @@ def test_both_ways_to_restore_the_old_bandwidth_are_identical(eqns, name):
     with no_default_bandwidth_warning():
         by_bandwidth = fit_spec(eqns, name, RESTORE["bandwidth"])
         by_flag = fit_spec(eqns, name, RESTORE["optimal_bw=False"])
-    assert_identical(by_bandwidth, by_flag)
+    assert_same_results(by_bandwidth, by_flag)
 
 
 @pytest.mark.parametrize("name", SPECS)
@@ -279,7 +285,7 @@ def test_the_default_is_optimal_bw(eqns, name):
     assert len(caught) == 1
     with no_default_bandwidth_warning():
         optimal = fit_spec(eqns, name, {"optimal_bw": True})
-    assert_identical(res, optimal)
+    assert_same_results(res, optimal)
     # It is a bandwidth that was estimated, and not the old default of 7.0
     assert 0 < res.weight_config["bandwidth"] < NOBS // 10
     # The numbers of 7.0 were not close to these ones
@@ -302,7 +308,7 @@ def test_the_default_bandwidth_is_estimated_from_the_first_step(eqns, kernel, ce
         fixed = IVSystemGMM(
             eqns, weight_type="kernel", kernel=kernel, center=center, bandwidth=expected
         ).fit()
-    assert_identical(res, fixed)
+    assert_same_results(res, fixed)
 
 
 def test_kernel_covariance_always_estimated_its_bandwidth(eqns):

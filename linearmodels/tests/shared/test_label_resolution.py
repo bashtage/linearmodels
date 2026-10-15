@@ -115,11 +115,11 @@ def assert_different(left, right):
     assert backward
 
 
-def assert_same_results(result, expected, resids=True):
-    assert_allclose(result.params, expected.params, rtol=1e-10)
-    assert_allclose(result.std_errors, expected.std_errors, rtol=1e-10)
+def assert_same_results(result, expected, resids=True, rtol=1e-10):
+    assert_allclose(result.params, expected.params, rtol=rtol)
+    assert_allclose(result.std_errors, expected.std_errors, rtol=rtol)
     if resids:
-        assert_allclose(result.resids, expected.resids, rtol=1e-10, atol=1e-12)
+        assert_allclose(result.resids, expected.resids, rtol=rtol, atol=1e-12)
 
 
 # The comparison of two sets of labels
@@ -1186,13 +1186,20 @@ def fit_asset(cls, portfolios, factors):
     return mod.fit()
 
 
+# LinearFactorModelGMM minimizes the GMM objective with BFGS, whose gradient is a finite
+# difference. Fits of the same data that only differ by rounding stop at estimates that
+# differ by up to 1e-7 (4e-8 on Intel macOS), and not by 1e-16.
+ASSET_RTOL = {LinearFactorModelGMM: 1e-6}
+
+
 @pytest.mark.parametrize("cls", ASSET_MODELS, ids=ASSET_IDS)
 @pytest.mark.parametrize(("p_unit", "f_unit"), UNIT_PAIRS)
 def test_asset_pricing_inputs(returns, cls, p_unit, f_unit):
     expected = fit_asset(cls, returns.portfolio_frame(), returns.factor_frame())
     portfolios, factors = returns.portfolio_frame(p_unit), returns.factor_frame(f_unit)
     result = fit_asset(cls, portfolios, factors)
-    assert_same_results(result, expected, resids=False)
+    rtol = ASSET_RTOL.get(cls, 1e-10)
+    assert_same_results(result, expected, resids=False, rtol=rtol)
 
 
 @pytest.mark.parametrize("cls", ASSET_MODELS, ids=ASSET_IDS)
