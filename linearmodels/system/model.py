@@ -1223,7 +1223,7 @@ class _SystemModelBase:
             for weights in w
         ]
         if method == "ols":
-            est_sigma = np.eye(len(wy))
+            est_sigma: linearmodels.typing.data.Float64Array = np.eye(len(wy))
         else:  # gls
             est_sigma = sigma
             if not full_cov:
@@ -1402,7 +1402,9 @@ class _SystemModelBase:
         if not debiased:
             return 1.0
         nobs = float(self._wx[0].shape[0])
-        scales = np.array([nobs - x.shape[1] for x in self._wx], dtype=np.float64)
+        scales: linearmodels.typing.data.Float64Array = np.array(
+            [nobs - x.shape[1] for x in self._wx], dtype=np.float64
+        )
         scales = cast("linearmodels.typing.data.Float64Array", np.sqrt(nobs / scales))
         return scales[:, None] @ scales[None, :]
 
@@ -2346,7 +2348,7 @@ class IVSystemGMM(_SystemModelBase):
         tol: float = 1e-6,
         initial_weight: linearmodels.typing.data.Float64Array | None = None,
         cov_type: str = "robust",
-        **cov_config: bool | float,
+        **cov_config: bool | float | str,
     ) -> GMMSystemResults:
         """
         Estimate model parameters.
@@ -2546,7 +2548,7 @@ class IVSystemGMM(_SystemModelBase):
         sigma: linearmodels.typing.data.Float64Array,
         iter_count: int,
         cov_type: str,
-        cov_config: dict[str, bool | float],
+        cov_config: dict[str, bool | float | str],
         cov_est: GMMHeteroskedasticCovariance | GMMHomoskedasticCovariance,
     ) -> GMMSystemResults:
         """Collect results to return after GLS estimation"""

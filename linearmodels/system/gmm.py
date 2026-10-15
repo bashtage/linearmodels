@@ -92,9 +92,9 @@ class HomoskedasticWeightMatrix:
         nobs = eps.shape[0]
         eps = eps - eps.mean(0)
         sigma = eps.T @ eps / nobs
-        scale = 1.0
+        scale: float | ndarray = 1.0
         if self._debiased:
-            k = array([a.shape[1] for a in x])[:, None]
+            k: ndarray = array([a.shape[1] for a in x])[:, None]
             k = sqrt(k)
             scale = nobs / (nobs - k @ k.T)
         sigma *= scale
@@ -237,7 +237,7 @@ class HeteroskedasticWeightMatrix(HomoskedasticWeightMatrix):
         x: Sequence[linearmodels.typing.data.Float64Array],
         z: Sequence[linearmodels.typing.data.Float64Array],
     ) -> linearmodels.typing.data.Float64Array:
-        nvar = array([a.shape[1] for a in x])
+        nvar: ndarray = array([a.shape[1] for a in x])
         ninstr = array([a.shape[1] for a in z])
         nvar = repeat(nvar, ninstr)
         if not self._debiased:

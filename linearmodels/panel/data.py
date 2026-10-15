@@ -27,7 +27,7 @@ from linearmodels.shared.inputs import as_float64, reject_complex
 from linearmodels.shared.utility import ensure_unique_column, panel_to_frame
 import linearmodels.typing.data
 
-__all__ = ["PanelData", "PanelDataLike"]
+__all__ = ["PanelArrayLike", "PanelData", "PanelDataLike"]
 
 
 class _Panel:
@@ -96,7 +96,7 @@ class _Panel:
         index = list(product(minor_axis, major_axis))
         multi_index = MultiIndex.from_tuples(index)
         i, j, k = len(items), len(major_axis), len(minor_axis)
-        values_flat = np.swapaxes(values.copy(), 0, 2).ravel()
+        values_flat: np.ndarray = np.swapaxes(values.copy(), 0, 2).ravel()
         values_flat = np.reshape(values_flat, ((j * k), i))
         # TODO: Remove Index when pandas-stubs is fixed
         df = DataFrame(values_flat, index=multi_index, columns=Index(items))
@@ -1045,4 +1045,7 @@ class PanelData:
         return dummies[dummy_cols].astype(np.float64)
 
 
-PanelDataLike = Union[PanelData, linearmodels.typing.data.ArrayLike]
+# The inputs that PanelData accepts. A list or a tuple does not have a layout.
+PanelDataLike = Union[PanelData, linearmodels.typing.data.DataContainer]
+# The inputs that are array_like, which also include a list or a tuple
+PanelArrayLike = Union[PanelData, linearmodels.typing.data.ArrayLike]

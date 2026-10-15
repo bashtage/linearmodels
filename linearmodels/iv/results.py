@@ -33,7 +33,7 @@ from statsmodels.iolib.table import default_txt_fmt
 import linearmodels
 from linearmodels.iv._utility import annihilate, proj
 from linearmodels.iv.common import _kleibergen_paap, cragg_donald, cragg_donald_f
-from linearmodels.iv.data import IVData
+from linearmodels.iv.data import IVData, IVDataLike
 from linearmodels.shared.base import _ModelComparison, _SummaryStr
 from linearmodels.shared.hypotheses import (
     InvalidTestStatistic,
@@ -368,7 +368,7 @@ class _LSModelResultsBase(_SummaryStr):
         """
         ci_quantiles = array([(1 - level) / 2, 1 - (1 - level) / 2])
         if self._debiased:
-            q = stats.t.ppf(ci_quantiles, self.df_resid)
+            q: ndarray = stats.t.ppf(ci_quantiles, self.df_resid)
         else:
             q = stats.norm.ppf(ci_quantiles)
         q = q[None, :]
@@ -604,9 +604,9 @@ class OLSResults(_LSModelResultsBase):
 
     def _out_of_sample(
         self,
-        exog: linearmodels.typing.data.ArrayLike | None,
-        endog: linearmodels.typing.data.ArrayLike | None,
-        data: linearmodels.typing.data.ArrayLike | None,
+        exog: IVDataLike | None,
+        endog: IVDataLike | None,
+        data: DataFrame | None,
         missing: bool | None,
     ) -> DataFrame:
         """Interface between model predict and predict for OOS fits."""
@@ -625,8 +625,8 @@ class OLSResults(_LSModelResultsBase):
 
     def predict(
         self,
-        exog: linearmodels.typing.data.ArrayLike | None = None,
-        endog: linearmodels.typing.data.ArrayLike | None = None,
+        exog: IVDataLike | None = None,
+        endog: IVDataLike | None = None,
         *,
         data: DataFrame | None = None,
         fitted: bool = True,

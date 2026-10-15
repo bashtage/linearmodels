@@ -217,7 +217,7 @@ class IVData:
         return self._pandas
 
     @property
-    def ndarray(self) -> linearmodels.typing.NumericArray:
+    def ndarray(self) -> linearmodels.typing.data.Float64Array:
         """Return an ndarray view of the data, which is always 2d."""
         return self._ndarray
 

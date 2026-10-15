@@ -18,6 +18,7 @@ from statsmodels.iolib.summary import SimpleTable, fmt_2cols, fmt_params
 
 from linearmodels.iv.results import default_txt_fmt, stub_concat, table_concat
 from linearmodels.panel.covariance import HomoskedasticCovariance
+from linearmodels.panel.data import PanelDataLike
 from linearmodels.shared.alignment import same_labels
 from linearmodels.shared.base import _ModelComparison, _SummaryStr
 from linearmodels.shared.hypotheses import (
@@ -398,7 +399,7 @@ class PanelResults(_SummaryStr):
         """
         ci_quantiles = np.array([(1 - level) / 2, 1 - (1 - level) / 2])
         if self._debiased:
-            q = stats.t.ppf(ci_quantiles, self.df_resid)
+            q: np.ndarray = stats.t.ppf(ci_quantiles, self.df_resid)
         else:
             q = stats.norm.ppf(ci_quantiles)
         q = q[None, :]
@@ -543,7 +544,7 @@ class PanelResults(_SummaryStr):
 
     def _out_of_sample(
         self,
-        exog: linearmodels.typing.data.ArrayLike | None,
+        exog: PanelDataLike | None,
         data: DataFrame | None,
         missing: bool,
         context: Mapping[str, Any] | None = None,
@@ -561,7 +562,7 @@ class PanelResults(_SummaryStr):
 
     def predict(
         self,
-        exog: linearmodels.typing.data.ArrayLike | None = None,
+        exog: PanelDataLike | None = None,
         *,
         data: DataFrame | None = None,
         fitted: bool = True,
@@ -638,12 +639,12 @@ class PanelResults(_SummaryStr):
         return out_df
 
     @property
-    def fitted_values(self) -> Series:
+    def fitted_values(self) -> DataFrame:
         """Fitted values."""
         return self._fitted
 
     @property
-    def estimated_effects(self) -> Series:
+    def estimated_effects(self) -> DataFrame:
         """
         Estimated effects.
 
@@ -676,7 +677,7 @@ class PanelResults(_SummaryStr):
         return self._effects
 
     @property
-    def idiosyncratic(self) -> Series:
+    def idiosyncratic(self) -> DataFrame:
         r"""
         Idiosyncratic error.
 

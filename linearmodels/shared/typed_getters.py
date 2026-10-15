@@ -112,7 +112,7 @@ def get_bool(d: Mapping[str, Any], key: str) -> bool:
 
 def get_array_like(
     d: Mapping[str, Any], key: str
-) -> linearmodels.typing.data.ArrayLike | None:
+) -> linearmodels.typing.data.DataContainer | None:
     """
     Get an array_like or None from a mapping.
 
@@ -136,7 +136,7 @@ def get_array_like(
         DataArray or None.
     """
 
-    out: linearmodels.typing.data.ArrayLike | None = None
+    out: linearmodels.typing.data.DataContainer | None = None
     if key in d:
         out = d[key]
         if out is not None:

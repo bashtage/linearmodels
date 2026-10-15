@@ -2,23 +2,33 @@
 Type aliases for arrays and array-like inputs.
 """
 
-from typing import Any, Union
+from typing import TYPE_CHECKING, Any, Union
 
 import numpy as np
 import pandas as pd
 
 base_data_types = [np.ndarray, pd.DataFrame, pd.Series]
 
-try:
+# A data container is a NumPy array, a pandas Series or DataFrame, or an xarray
+# DataArray. An array_like input is also allowed to be a list or a tuple, which is
+# converted using np.asarray when it is received. xarray is optional, so the runtime
+# alias is built without it if it is not installed.
+if TYPE_CHECKING:
     import xarray as xr
 
-    ArrayLike = Union[np.ndarray, xr.DataArray, pd.DataFrame, pd.Series]
+    DataContainer = Union[np.ndarray, xr.DataArray, pd.DataFrame, pd.Series]
+else:
+    try:
+        import xarray as xr
 
-except ImportError:
+        DataContainer = Union[np.ndarray, xr.DataArray, pd.DataFrame, pd.Series]
 
-    # Always needed to allow optional xarray
-    ArrayLike = Union[np.ndarray, pd.DataFrame, pd.Series]
+    except ImportError:
 
+        # Always needed to allow optional xarray
+        DataContainer = Union[np.ndarray, pd.DataFrame, pd.Series]
+
+ArrayLike = Union[DataContainer, list[Any], tuple[Any, ...]]
 
 NDArray = Union[np.ndarray]
 
@@ -37,6 +47,7 @@ __all__ = [
     "AnyIntArray",
     "ArrayLike",
     "BoolArray",
+    "DataContainer",
     "Float64Array",
     "FloatArray1D",
     "FloatArray2D",

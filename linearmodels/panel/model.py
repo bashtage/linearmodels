@@ -38,7 +38,7 @@ from linearmodels.panel.covariance import (
     check_covariance_kwargs,
     setup_covariance_estimator,
 )
-from linearmodels.panel.data import PanelData, PanelDataLike
+from linearmodels.panel.data import PanelArrayLike, PanelData, PanelDataLike
 from linearmodels.panel.results import (
     FamaMacBethResults,
     PanelEffectsResults,
@@ -125,7 +125,9 @@ def _lstsq(
     return sp_lstsq(x, y, cond=cond, lapack_driver="gelsy")
 
 
-def panel_structure_stats(ids: linearmodels.typing.data.IntArray, name: str) -> Series:
+def panel_structure_stats(
+    ids: linearmodels.typing.data.AnyIntArray, name: str
+) -> Series:
     """
     Compute statistics of the number of observations in each group.
 
@@ -614,7 +616,7 @@ class _PanelModelBase:
         dependent: PanelDataLike,
         exog: PanelDataLike,
         *,
-        weights: PanelDataLike | None = None,
+        weights: PanelArrayLike | None = None,
         check_rank: bool = True,
     ) -> None:
         self.dependent = _panel_data(dependent, "dependent", "Dep")
@@ -743,7 +745,7 @@ class _PanelModelBase:
         return _panel_data(value, name, var_name, convert_dummies=False)
 
     def reformat_clusters(
-        self, clusters: linearmodels.typing.data.IntArray | PanelDataLike
+        self, clusters: linearmodels.typing.data.IntArray | PanelArrayLike
     ) -> PanelData:
         """
         Reformat cluster variables.
@@ -852,7 +854,7 @@ class _PanelModelBase:
 
         return entity_info, time_info, other_info
 
-    def _adapt_weights(self, weights: PanelDataLike | None) -> PanelData:
+    def _adapt_weights(self, weights: PanelArrayLike | None) -> PanelData:
         """
         Check the weights and place them on the rows of dependent
 
@@ -1457,7 +1459,7 @@ class _PanelModelBase:
         nobs = weps.shape[0]
         sigma2 = float(np.squeeze(weps.T @ weps) / nobs)
         if sigma2 > 0.0:
-            loglik = -0.5 * nobs * (np.log(2 * np.pi) + np.log(sigma2) + 1)
+            loglik: float = -0.5 * nobs * (np.log(2 * np.pi) + np.log(sigma2) + 1)
             if weights is not None:
                 loglik += 0.5 * float(np.sum(np.log(weights)))
         else:
@@ -1778,7 +1780,7 @@ class PooledOLS(_PanelModelBase):
         dependent: PanelDataLike,
         exog: PanelDataLike,
         *,
-        weights: PanelDataLike | None = None,
+        weights: PanelArrayLike | None = None,
         check_rank: bool = True,
     ) -> None:
         super().__init__(dependent, exog, weights=weights, check_rank=check_rank)
@@ -1789,7 +1791,7 @@ class PooledOLS(_PanelModelBase):
         formula: str,
         data: PanelDataLike,
         *,
-        weights: PanelDataLike | None = None,
+        weights: PanelArrayLike | None = None,
         check_rank: bool = True,
     ) -> PooledOLS:
         """
@@ -2426,10 +2428,10 @@ class PanelOLS(_PanelModelBase):
         dependent: PanelDataLike,
         exog: PanelDataLike,
         *,
-        weights: PanelDataLike | None = None,
+        weights: PanelArrayLike | None = None,
         entity_effects: bool = False,
         time_effects: bool = False,
-        other_effects: PanelDataLike | None = None,
+        other_effects: PanelArrayLike | None = None,
         singletons: bool = True,
         drop_absorbed: bool = False,
         check_rank: bool = True,
@@ -2632,8 +2634,8 @@ class PanelOLS(_PanelModelBase):
         formula: str,
         data: PanelDataLike,
         *,
-        weights: PanelDataLike | None = None,
-        other_effects: PanelDataLike | None = None,
+        weights: PanelArrayLike | None = None,
+        other_effects: PanelArrayLike | None = None,
         singletons: bool = True,
         drop_absorbed: bool = False,
         check_rank: bool = True,
@@ -2747,7 +2749,7 @@ class PanelOLS(_PanelModelBase):
         root_w_sparse = csc_array(root_w)
 
         cats_l: list[
-            linearmodels.typing.data.IntArray | linearmodels.typing.data.Float64Array
+            linearmodels.typing.data.AnyIntArray | linearmodels.typing.data.Float64Array
         ] = []
         if self.entity_effects:
             cats_l.append(self.dependent.entity_ids)
@@ -3645,7 +3647,7 @@ class BetweenOLS(_PanelModelBase):
         dependent: PanelDataLike,
         exog: PanelDataLike,
         *,
-        weights: PanelDataLike | None = None,
+        weights: PanelArrayLike | None = None,
         check_rank: bool = True,
     ) -> None:
         super().__init__(dependent, exog, weights=weights, check_rank=check_rank)
@@ -3931,7 +3933,7 @@ class BetweenOLS(_PanelModelBase):
         formula: str,
         data: PanelDataLike,
         *,
-        weights: PanelDataLike | None = None,
+        weights: PanelArrayLike | None = None,
         check_rank: bool = True,
     ) -> BetweenOLS:
         """
@@ -4124,7 +4126,7 @@ class FirstDifferenceOLS(_PanelModelBase):
         dependent: PanelDataLike,
         exog: PanelDataLike,
         *,
-        weights: PanelDataLike | None = None,
+        weights: PanelArrayLike | None = None,
         check_rank: bool = True,
     ):
         super().__init__(dependent, exog, weights=weights, check_rank=check_rank)
@@ -4474,7 +4476,7 @@ class FirstDifferenceOLS(_PanelModelBase):
         formula: str,
         data: PanelDataLike,
         *,
-        weights: PanelDataLike | None = None,
+        weights: PanelArrayLike | None = None,
         check_rank: bool = True,
     ) -> FirstDifferenceOLS:
         """
@@ -4646,7 +4648,7 @@ class RandomEffects(_PanelModelBase):
         dependent: PanelDataLike,
         exog: PanelDataLike,
         *,
-        weights: PanelDataLike | None = None,
+        weights: PanelArrayLike | None = None,
         check_rank: bool = True,
     ) -> None:
         super().__init__(dependent, exog, weights=weights, check_rank=check_rank)
@@ -4657,7 +4659,7 @@ class RandomEffects(_PanelModelBase):
         formula: str,
         data: PanelDataLike,
         *,
-        weights: PanelDataLike | None = None,
+        weights: PanelArrayLike | None = None,
         check_rank: bool = True,
     ) -> RandomEffects:
         """
@@ -5241,7 +5243,7 @@ class FamaMacBeth(_PanelModelBase):
         dependent: PanelDataLike,
         exog: PanelDataLike,
         *,
-        weights: PanelDataLike | None = None,
+        weights: PanelArrayLike | None = None,
         check_rank: bool = True,
     ):
         super().__init__(dependent, exog, weights=weights, check_rank=check_rank)
@@ -5597,7 +5599,7 @@ class FamaMacBeth(_PanelModelBase):
         formula: str,
         data: PanelDataLike,
         *,
-        weights: PanelDataLike | None = None,
+        weights: PanelArrayLike | None = None,
         check_rank: bool = True,
     ) -> FamaMacBeth:
         """

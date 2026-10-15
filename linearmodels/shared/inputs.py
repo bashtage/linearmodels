@@ -10,17 +10,24 @@ converted with ``np.asarray`` when it is received.
 
 from __future__ import annotations
 
-from typing import Any
+from typing import TYPE_CHECKING, Any, TypeVar, overload
 import warnings
 
 import numpy as np
 from pandas import DataFrame, Series
 from pandas.api.types import is_complex_dtype
 
+if TYPE_CHECKING:
+    from xarray import DataArray
+
+    from linearmodels.iv.data import IVData
+    from linearmodels.panel.data import PanelData
+
 try:
     from numpy.exceptions import VisibleDeprecationWarning
 except ImportError:  # NumPy < 1.25
-    VisibleDeprecationWarning = np.VisibleDeprecationWarning
+    # The stubs of NumPy 2 do not have the name in the main namespace
+    VisibleDeprecationWarning = np.VisibleDeprecationWarning  # type: ignore[misc,attr-defined]
 
 __all__ = [
     "as_array_like",
@@ -29,6 +36,11 @@ __all__ = [
     "is_data_array",
     "reject_complex",
 ]
+
+# The containers that as_array_like returns unchanged
+_Container = TypeVar(
+    "_Container", np.ndarray, Series, DataFrame, "DataArray", "IVData", "PanelData"
+)
 
 COMPLEX_MSG = (
     "{name} has a complex dtype. Complex values are not supported since the "
@@ -94,6 +106,18 @@ def reject_complex(value: object, name: str) -> None:
         return
     if complex_data:
         raise TypeError(COMPLEX_MSG.format(name=name))
+
+
+@overload
+def as_array_like(  # numpydoc ignore=GL08
+    value: list[Any] | tuple[Any, ...], name: str
+) -> np.ndarray: ...
+
+
+@overload
+def as_array_like(  # numpydoc ignore=GL08
+    value: _Container, name: str
+) -> _Container: ...
 
 
 def as_array_like(value: Any, name: str) -> Any:

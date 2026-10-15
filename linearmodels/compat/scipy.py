@@ -13,10 +13,11 @@ if not SP_LT_2:
 else:
     import scipy.sparse
 
-    csr_array = scipy.sparse.csr_matrix
-    csc_array = scipy.sparse.csc_matrix
-    coo_array = scipy.sparse.coo_matrix
-    diags_array = scipy.sparse.diags
-    lil_array = scipy.sparse.lil_matrix
+    # The matrix classes are not the array classes that the stubs have for SciPy 2
+    csr_array = scipy.sparse.csr_matrix  # type: ignore[misc,assignment]
+    csc_array = scipy.sparse.csc_matrix  # type: ignore[misc,assignment]
+    coo_array = scipy.sparse.coo_matrix  # type: ignore[misc,assignment]
+    diags_array = scipy.sparse.diags  # type: ignore[assignment]
+    lil_array = scipy.sparse.lil_matrix  # type: ignore[misc,assignment]
 
 __all__ = ["coo_array", "csc_array", "csr_array", "diags_array", "lil_array"]

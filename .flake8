@@ -6,3 +6,4 @@ per-file-ignores =
     linearmodels/panel/data.py: E704
     linearmodels/shared/utility.py: F811, E704
     linearmodels/panel/utility.py: F811
+    linearmodels/shared/inputs.py: E704
