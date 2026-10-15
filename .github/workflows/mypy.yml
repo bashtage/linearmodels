@@ -1,0 +1,38 @@
+name: Type checking
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+
+jobs:
+  mypy:
+    name: mypy (informational)
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        shell: bash
+    steps:
+    - name: Checkout
+      uses: actions/checkout@v7
+    - name: Set up Python
+      uses: actions/setup-python@v7
+      with:
+        python-version: "3.14"
+    - name: Install dependencies
+      run: |
+        python -m pip install --upgrade pip
+        python -m pip install -r requirements.txt
+        python -m pip install mypy pandas-stubs scipy-stubs xarray
+        python -m pip list
+    # mypy is informational. New releases of mypy and of the stubs of NumPy, pandas
+    # and SciPy often add errors, so a failure does not fail the check. It adds a
+    # warning with the number of errors instead, and the log of this step lists them.
+    - name: Run mypy
+      id: mypy
+      continue-on-error: true
+      run: python -m mypy linearmodels | tee mypy.txt
+    - name: Report the result of mypy
+      if: steps.mypy.outcome == 'failure'
+      run: echo "::warning title=mypy::$(tail -n 1 mypy.txt). This check is informational."
