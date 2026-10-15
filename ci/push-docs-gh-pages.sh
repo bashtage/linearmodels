@@ -36,7 +36,6 @@ git add .
 popd
 git add -f devel/.
 git add -f devel/_static
-git add -f devel/_static/mathjax
 echo "Add new HTML/JS/CSS"
 git add ./\*.html
 git add ./\*.js
