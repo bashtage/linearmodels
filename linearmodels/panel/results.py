@@ -638,12 +638,12 @@ class PanelResults(_SummaryStr):
         return out_df
 
     @property
-    def fitted_values(self) -> Series:
+    def fitted_values(self) -> DataFrame:
         """Fitted values."""
         return self._fitted
 
     @property
-    def estimated_effects(self) -> Series:
+    def estimated_effects(self) -> DataFrame:
         """
         Estimated effects.
 
@@ -676,7 +676,7 @@ class PanelResults(_SummaryStr):
         return self._effects
 
     @property
-    def idiosyncratic(self) -> Series:
+    def idiosyncratic(self) -> DataFrame:
         r"""
         Idiosyncratic error.
 
