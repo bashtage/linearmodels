@@ -651,8 +651,10 @@ def test_grids_without_labels_are_paired_by_position_in_the_grid(layout, order):
     assert_allclose(
         mod.fit(cov_type="clustered", clusters=default).cov, expected.cov, rtol=1e-12
     )
-    # Reversed values in the same positions are not the values of the rows
-    reversed_grid = pd.DataFrame(frame.to_numpy()[::-1])
+    # Reversed values in the same positions are not the values of the rows. The cells
+    # without a row are filled, since reversing moves their missing values to rows,
+    # and the cluster of a row cannot be missing
+    reversed_grid = pd.DataFrame(np.nan_to_num(frame.to_numpy())[::-1])
     other = mod.fit(cov_type="clustered", clusters=reversed_grid)
     unchanged = np.allclose(other.cov, expected.cov)
     assert not unchanged

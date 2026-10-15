@@ -375,6 +375,20 @@ clusters of the standard errors in either of the two ways
     res = mod.fit(cov_type="clustered", clusters=clusters)
     res = mod.fit(cov_type="clustered", clusters=data[["industry"]])
 
+The cluster of an observation that the model uses cannot be missing, since the
+observation would not belong to any cluster, and a ``ValueError`` is raised, as
+in the IV and system models. The clusters of the observations that the model drops
+because a value of ``dependent``, ``exog``, ``weights`` or ``other_effects`` is
+missing are not used, and can be missing.
+
+.. versionchanged:: 7.1
+
+   Earlier versions did not report a missing cluster as such. ``PooledOLS``,
+   ``PanelOLS`` and ``RandomEffects`` made the observations with a missing cluster
+   a cluster of their own, so that the standard errors changed without an error.
+   ``BetweenOLS`` and ``FirstDifferenceOLS`` ignored some missing clusters and
+   raised errors that did not name the missing values for the others.
+
 In an unbalanced panel the order in which the time periods and entities first
 appear can differ from the order of the time periods and entities. If the first
 entity enters late and the rows are sorted by entity, for example, the first

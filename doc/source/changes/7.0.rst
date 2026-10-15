@@ -281,8 +281,10 @@ Version 7.1
   and a ``BetweenOLS`` with regressors that are collinear in the entity means
   (:issue:`799`).
 - IV, system and panel models raise a ``ValueError`` if the cluster ids are a single
-  group, and IV and system models if they have missing values. 7.0 returned a wrong
-  covariance, or raised ``ZeroDivisionError`` (:issue:`789`).
+  group or have missing values. 7.0 returned a wrong covariance or raised
+  ``ZeroDivisionError``, and panel models made the missing ids a cluster of their own.
+  The ids of observations that are dropped for other missing values may be missing
+  (:issue:`789`).
 - ``LinearFactorModelGMM`` raises a ``ValueError`` when the model is created if there
   are not more observations than moment conditions. A ``sigma`` of ``LinearFactorModel``
   that is not symmetric and positive definite, and a saturated debiased asset pricing

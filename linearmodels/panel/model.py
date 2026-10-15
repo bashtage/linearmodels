@@ -774,7 +774,10 @@ class _PanelModelBase:
             If clusters does not have the numbers of entities and time periods of
             dependent, or has labels that are not those of dependent in the same
             order. A value for each time period and entity must have the time
-            periods and entities in the order that the Notes describe.
+            periods and entities in the order that the Notes describe. Also if
+            clusters has a missing value for an observation that the model uses,
+            i.e., one that is not dropped because dependent, exog, weights or
+            other_effects has a missing value.
 
         Notes
         -----
@@ -829,6 +832,11 @@ class _PanelModelBase:
             # they have the labels of these rows
             frame = frame.set_axis(self._original_index, axis=0)
             changed = True
+        # This comes before text and categories are replaced by codes, which give a
+        # missing value the code -1 and so a cluster of its own. The clusters of the
+        # observations that the model drops are not used, and can be missing
+        if frame.loc[self.not_null].isnull().to_numpy().any():
+            raise ValueError("clusters cannot contain missing values.")
         categories = [col for col in frame if not is_numeric_dtype(frame[col].dtype)]
         if categories:
             # Text and categories identify the clusters, but they are not numbers
@@ -1897,7 +1905,8 @@ class PooledOLS(_PanelModelBase):
         ValueError
             If a key of ``cov_config`` is not supported by the covariance
             estimator (this is checked before the model is estimated), if
-            ``clusters`` does not have the shape of the data, if
+            ``clusters`` does not have the shape of the data, if ``clusters`` has
+            a missing value for an observation that the model uses, if
             ``bandwidth`` is not below the number of time periods, or if the model
             has no residual degrees of freedom.
         TypeError
@@ -1990,6 +1999,15 @@ class PooledOLS(_PanelModelBase):
            observations without an error, and a pandas object with labels was
            rejected.
 
+        .. versionchanged:: 7.1
+
+           A ``ValueError`` is raised if ``clusters`` has a missing value for an
+           observation that the model uses, as in the IV and system models. Earlier
+           versions made the observations with a missing value a cluster of their
+           own, so that the standard errors changed without an error. The clusters
+           of the observations that are dropped because a value of ``dependent``,
+           ``exog`` or ``weights`` is missing are not used, and can be missing.
+
         Examples
         --------
         >>> from linearmodels import PooledOLS
@@ -2002,6 +2020,7 @@ class PooledOLS(_PanelModelBase):
         """
         cov_type = lower_option(cov_type)
         check_covariance_kwargs(self._cov_estimators, cov_type, cov_config)
+        cov_config = self._setup_clusters(cov_config)
         y = self.dependent.values2d
         x = self.exog.values2d
         w = self.weights.values2d
@@ -2014,7 +2033,6 @@ class PooledOLS(_PanelModelBase):
         nobs = y.shape[0]
         df_model = x.shape[1]
         df_resid = nobs - df_model
-        cov_config = self._setup_clusters(cov_config)
         extra_df = 0
         if "extra_df" in cov_config:
             cov_config = cov_config.copy()
@@ -3159,7 +3177,8 @@ class PanelOLS(_PanelModelBase):
         ValueError
             If a key of ``cov_config`` is not supported by the covariance
             estimator (this is checked before the model is estimated), if
-            ``clusters`` does not have the shape of the data, if
+            ``clusters`` does not have the shape of the data, if ``clusters`` has
+            a missing value for an observation that the model uses, if
             ``bandwidth`` is not below the number of time periods, if the model
             has no residual degrees of freedom, or if all of the variables of
             ``exog`` are absorbed.
@@ -3292,6 +3311,16 @@ class PanelOLS(_PanelModelBase):
            observations without an error, and a pandas object with labels was
            rejected.
 
+        .. versionchanged:: 7.1
+
+           A ``ValueError`` is raised if ``clusters`` has a missing value for an
+           observation that the model uses, as in the IV and system models. Earlier
+           versions made the observations with a missing value a cluster of their
+           own, so that the standard errors changed without an error. The clusters
+           of the observations that are dropped because a value of ``dependent``,
+           ``exog``, ``weights`` or ``other_effects`` is missing are not used, and
+           can be missing.
+
         Examples
         --------
         >>> from linearmodels import PanelOLS
@@ -3307,6 +3336,8 @@ class PanelOLS(_PanelModelBase):
         check_covariance_kwargs(
             self._cov_estimators, cov_type, cov_config, fit_options=()
         )
+        # Check clusters if singletons were removed
+        cov_config = self._setup_clusters(cov_config)
 
         weighted = np.any(self.weights.values2d != 1.0)
 
@@ -3385,8 +3416,6 @@ class PanelOLS(_PanelModelBase):
         nobs = self.dependent.dataframe.shape[0]
         df_model = x.shape[1] + neffects
         df_resid = nobs - df_model
-        # Check clusters if singletons were removed
-        cov_config = self._setup_clusters(cov_config)
         if auto_df:
             count_effects = self._determine_df_adjustment(cov_type, **cov_config)
         extra_df = neffects if count_effects else 0
@@ -3761,8 +3790,9 @@ class BetweenOLS(_PanelModelBase):
             if a regressor is a combination of the others only in the means, e.g.,
             the dummy variables of the periods and the constant in a balanced
             panel. It is also raised if a key of ``cov_config`` is not supported by
-            the covariance estimator, if the clusters vary within an entity, or if
-            the model has no residual degrees of freedom.
+            the covariance estimator, if the clusters vary within an entity, if
+            ``clusters`` has a missing value for an observation that the model
+            uses, or if the model has no residual degrees of freedom.
         TypeError
             If the value of a key of ``cov_config`` does not have the type that the
             key needs.
@@ -3822,6 +3852,16 @@ class BetweenOLS(_PanelModelBase):
            observations without an error, and a pandas object with labels was
            rejected.
 
+        .. versionchanged:: 7.1
+
+           A ``ValueError`` is raised if ``clusters`` has a missing value for an
+           observation that the model uses, as in the IV and system models. Earlier
+           versions ignored a missing number if another observation of the entity
+           had a cluster, and reported the other cases as clusters that vary within
+           an entity. The clusters of the observations that are dropped because a
+           value of ``dependent``, ``exog`` or ``weights`` is missing are not used,
+           and can be missing.
+
         Examples
         --------
         >>> from linearmodels import BetweenOLS
@@ -3836,6 +3876,7 @@ class BetweenOLS(_PanelModelBase):
         check_covariance_kwargs(
             self._cov_estimators, cov_type, cov_config, cluster_options=()
         )
+        cov_config = self._setup_clusters(cov_config)
         y, x, w = self._prepare_between()
         if np.all(self.weights.values2d == 1.0) and not reweight:
             w = root_w = np.ones_like(y)
@@ -3859,7 +3900,6 @@ class BetweenOLS(_PanelModelBase):
         df_resid = y.shape[0] - x.shape[1]
         df_model = x.shape[1]
         nobs = y.shape[0]
-        cov_config = self._setup_clusters(cov_config)
         extra_df = 0
         if "extra_df" in cov_config:
             cov_config = cov_config.copy()
@@ -4259,7 +4299,8 @@ class FirstDifferenceOLS(_PanelModelBase):
         ValueError
             If a key of ``cov_config`` is not supported by the covariance
             estimator (this is checked before the model is estimated), if
-            ``clusters`` does not have the shape of the data, if
+            ``clusters`` does not have the shape of the data, if ``clusters`` has
+            a missing value for an observation that the model uses, if
             ``bandwidth`` is not below the number of time periods, or if the model
             has no residual degrees of freedom.
         TypeError
@@ -4351,6 +4392,16 @@ class FirstDifferenceOLS(_PanelModelBase):
            observations without an error, and a pandas object with labels was
            rejected.
 
+        .. versionchanged:: 7.1
+
+           A ``ValueError`` is raised if ``clusters`` has a missing value for an
+           observation that the model uses, as in the IV and system models. Earlier
+           versions ignored a missing value in the first period of an entity, and
+           raised other errors for the others, such as the error of pandas about
+           the conversion of NaN to an integer. The clusters of the observations
+           that are dropped because a value of ``dependent``, ``exog`` or
+           ``weights`` is missing are not used, and can be missing.
+
         Examples
         --------
         >>> from linearmodels import FirstDifferenceOLS
@@ -4369,6 +4420,7 @@ class FirstDifferenceOLS(_PanelModelBase):
             cov_config,
             cluster_options=("cluster_entity",),
         )
+        cov_config = self._setup_clusters(cov_config)
         y_fd = self.dependent.first_difference()
         time_ids = y_fd.time_ids
         entity_ids = y_fd.entity_ids
@@ -4405,7 +4457,6 @@ class FirstDifferenceOLS(_PanelModelBase):
         wy = root_w * y
         params = _lstsq(wx, wy, rcond=None)[0]
         df_resid = y.shape[0] - x.shape[1]
-        cov_config = self._setup_clusters(cov_config)
         extra_df = 0
         if "extra_df" in cov_config:
             cov_config = cov_config.copy()
@@ -4769,7 +4820,8 @@ class RandomEffects(_PanelModelBase):
         ValueError
             If a key of ``cov_config`` is not supported by the covariance
             estimator (this is checked before the model is estimated), if
-            ``clusters`` does not have the shape of the data, if
+            ``clusters`` does not have the shape of the data, if ``clusters`` has
+            a missing value for an observation that the model uses, if
             ``bandwidth`` is not below the number of time periods, if the model
             has no residual degrees of freedom, or if the within or the between
             regression has no residual degrees of freedom, so that the variance of
@@ -4893,6 +4945,15 @@ class RandomEffects(_PanelModelBase):
            observations without an error, and a pandas object with labels was
            rejected.
 
+        .. versionchanged:: 7.1
+
+           A ``ValueError`` is raised if ``clusters`` has a missing value for an
+           observation that the model uses, as in the IV and system models. Earlier
+           versions made the observations with a missing value a cluster of their
+           own, so that the standard errors changed without an error. The clusters
+           of the observations that are dropped because a value of ``dependent``,
+           ``exog`` or ``weights`` is missing are not used, and can be missing.
+
         Examples
         --------
         >>> from linearmodels import RandomEffects
@@ -4905,6 +4966,7 @@ class RandomEffects(_PanelModelBase):
         """
         cov_type = lower_option(cov_type)
         check_covariance_kwargs(self._cov_estimators, cov_type, cov_config)
+        cov_config = self._setup_clusters(cov_config)
         w = self.weights.values2d
         root_w = cast("linearmodels.typing.data.Float64Array", np.sqrt(w))
         demeaned_dep = self.dependent.demean("entity", weights=self.weights)
@@ -5006,7 +5068,6 @@ class RandomEffects(_PanelModelBase):
         params = _lstsq(wx, wy, rcond=None)[0]
 
         df_resid = wy.shape[0] - wx.shape[1]
-        cov_config = self._setup_clusters(cov_config)
         extra_df = 0
         if "extra_df" in cov_config:
             cov_config = cov_config.copy()
