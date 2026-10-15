@@ -92,6 +92,10 @@ ALGORITHMS = {"means": {}, "lsdv": {"use_lsdv": True}, "lsmr": {"use_lsmr": True
 # their sums of squares are accurate to the square of that
 EFFECT_ATOL = {"means": 1e-6, "lsdv": 1e-10, "lsmr": 1e-5}
 SUM_OF_SQUARES_RTOL = 1e-8
+# The tolerance of the numbers that are zero in exact arithmetic, for example the
+# R-squared of a model that only has effects, which is 1 - residual_ss / total_ss and
+# is -2.22e-16, 0 or 1.11e-16 depending on the rounding of the platform
+ATOL = 1e-12
 # The number of effects that are estimated, with no constant to absorb one of them
 NEFFECTS = {
     "entity": NENTITY,
@@ -481,10 +485,40 @@ def test_options_of_the_model(frame, effect):
 # Formulas
 # --------------------------------------------------------------------------
 SKIP_ATTRIBUTES = {"model", "summary", "conf_int", "predict", "wald_test", "compare"}
+NUMBER = re.compile(r"[-+]?(?:\d+\.?\d*|\.\d+)(?:[eE][-+]?\d+)?")
+
+
+def assert_same_text(text, expected, label="", rtol=1e-8, atol=ATOL):
+    """
+    The text is the same, and the numbers in it are the same up to rounding
+
+    The words are compared as text, with the numbers replaced by a placeholder, and
+    the numbers are compared as numbers.
+    """
+    words = [" ".join(NUMBER.sub("#", t).split()) for t in (text, expected)]
+    assert words[0] == words[1], label
+    numbers = [np.array(NUMBER.findall(t), dtype=float) for t in (text, expected)]
+    assert_allclose(numbers[0], numbers[1], rtol=rtol, atol=atol, err_msg=label)
+
+
+def assert_same_table(value, other, label):
+    """The labels of two Series or DataFrames are the same, and the values are close"""
+    assert type(value) is type(other), label
+    assert value.index.equals(other.index), label
+    assert value.shape == other.shape, label
+    if isinstance(value, pd.DataFrame):
+        assert value.columns.equals(other.columns), label
+    assert_allclose(
+        value.to_numpy(dtype=float),
+        other.to_numpy(dtype=float),
+        atol=ATOL,
+        equal_nan=True,
+        err_msg=label,
+    )
 
 
 def assert_same_results(res, expected):
-    """Every public attribute of two results is the same"""
+    """Every public attribute of two results is the same, up to rounding"""
     assert type(res) is type(expected)
     for name in dir(res):
         if name.startswith("_") or name in SKIP_ATTRIBUTES:
@@ -492,39 +526,30 @@ def assert_same_results(res, expected):
         value, other = getattr(res, name), getattr(expected, name)
         label = f"attribute {name}"
         if isinstance(value, (pd.Series, pd.DataFrame)):
-            assert type(value) is type(other), label
-            assert value.index.equals(other.index), label
-            assert value.shape == other.shape, label
-            if isinstance(value, pd.DataFrame):
-                assert value.columns.equals(other.columns), label
-            assert_allclose(
-                value.to_numpy(dtype=float),
-                other.to_numpy(dtype=float),
-                atol=1e-12,
-                equal_nan=True,
-                err_msg=label,
-            )
+            assert_same_table(value, other, label)
         elif hasattr(value, "stat"):
             assert type(value) is type(other), label
-            assert str(value) == str(other), label
+            assert_same_text(str(value), str(other), label)
             assert_allclose(value.stat, other.stat, equal_nan=True, err_msg=label)
             assert_allclose(value.pval, other.pval, equal_nan=True, err_msg=label)
         elif isinstance(value, (int, float, np.number)):
-            assert_allclose(value, other, atol=1e-12, equal_nan=True, err_msg=label)
+            assert_allclose(value, other, atol=ATOL, equal_nan=True, err_msg=label)
         else:
+            # Names of the effects, which are text
             assert value == other, label
-    assert res.conf_int().equals(expected.conf_int())
-    assert res.conf_int(0.8).equals(expected.conf_int(0.8))
+    assert_same_table(res.conf_int(), expected.conf_int(), "conf_int")
+    assert_same_table(res.conf_int(0.8), expected.conf_int(0.8), "conf_int(0.8)")
 
     def text(results):
         out = results.summary.as_text()
         out = re.sub(r"Date:\s+\w+, \w+ \d+ \d+", "Date:", out)
         return re.sub(r"Time:\s+\d+:\d+:\d+", "Time:", out)
 
-    assert text(res) == text(expected)
+    assert_same_text(text(res), text(expected), "summary")
     assert_allclose(
         res.predict(effects=True, idiosyncratic=True),
         expected.predict(effects=True, idiosyncratic=True),
+        atol=ATOL,
     )
 
 
