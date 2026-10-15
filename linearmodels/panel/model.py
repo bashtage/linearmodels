@@ -125,7 +125,9 @@ def _lstsq(
     return sp_lstsq(x, y, cond=cond, lapack_driver="gelsy")
 
 
-def panel_structure_stats(ids: linearmodels.typing.data.IntArray, name: str) -> Series:
+def panel_structure_stats(
+    ids: linearmodels.typing.data.AnyIntArray, name: str
+) -> Series:
     """
     Compute statistics of the number of observations in each group.
 
@@ -2747,7 +2749,7 @@ class PanelOLS(_PanelModelBase):
         root_w_sparse = csc_array(root_w)
 
         cats_l: list[
-            linearmodels.typing.data.IntArray | linearmodels.typing.data.Float64Array
+            linearmodels.typing.data.AnyIntArray | linearmodels.typing.data.Float64Array
         ] = []
         if self.entity_effects:
             cats_l.append(self.dependent.entity_ids)

@@ -2346,7 +2346,7 @@ class IVSystemGMM(_SystemModelBase):
         tol: float = 1e-6,
         initial_weight: linearmodels.typing.data.Float64Array | None = None,
         cov_type: str = "robust",
-        **cov_config: bool | float,
+        **cov_config: bool | float | str,
     ) -> GMMSystemResults:
         """
         Estimate model parameters.
@@ -2546,7 +2546,7 @@ class IVSystemGMM(_SystemModelBase):
         sigma: linearmodels.typing.data.Float64Array,
         iter_count: int,
         cov_type: str,
-        cov_config: dict[str, bool | float],
+        cov_config: dict[str, bool | float | str],
         cov_est: GMMHeteroskedasticCovariance | GMMHomoskedasticCovariance,
     ) -> GMMSystemResults:
         """Collect results to return after GLS estimation"""
