@@ -85,7 +85,7 @@ doc = [
   "wheel",
   "setuptools_scm[toml]>=9.2.0,<10",
   "cython>=3.1.0,<4",  # Sync with the Cython check in meson.build
-  "numpy >=1.22",
+  "numpy >=1.23.5",
   "scipy >=1.5.0",
   "ipython >=8.0.1",
   "matplotlib >=3.0",
