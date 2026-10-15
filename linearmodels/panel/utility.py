@@ -354,7 +354,7 @@ if not HAS_CYTHON:
 
 
 def in_2core_graph(
-    cats: linearmodels.typing.data.ArrayLike,
+    cats: DataFrame | np.ndarray,
 ) -> linearmodels.typing.data.BoolArray:
     """
     Find the observations that are in the 2-core of the graph.
@@ -430,7 +430,7 @@ def in_2core_graph(
 
 
 def in_2core_graph_slow(
-    cats: linearmodels.typing.data.ArrayLike,
+    cats: DataFrame | np.ndarray,
 ) -> linearmodels.typing.data.BoolArray:
     """
     Find the observations in the 2-core using a reference method.

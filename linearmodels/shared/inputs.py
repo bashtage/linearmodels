@@ -10,12 +10,18 @@ converted with ``np.asarray`` when it is received.
 
 from __future__ import annotations
 
-from typing import Any
+from typing import TYPE_CHECKING, Any, TypeVar, overload
 import warnings
 
 import numpy as np
 from pandas import DataFrame, Series
 from pandas.api.types import is_complex_dtype
+
+if TYPE_CHECKING:
+    from xarray import DataArray
+
+    from linearmodels.iv.data import IVData
+    from linearmodels.panel.data import PanelData
 
 try:
     from numpy.exceptions import VisibleDeprecationWarning
@@ -31,6 +37,11 @@ __all__ = [
 ]
 
 COMPLEX_MSG = (
+# The containers that as_array_like returns unchanged
+_Container = TypeVar(
+    "_Container", np.ndarray, Series, DataFrame, "DataArray", "IVData", "PanelData"
+)
+
     "{name} has a complex dtype. Complex values are not supported since the "
     "imaginary part would be discarded. Use real values, for example the real "
     "part of the array."
@@ -97,6 +108,18 @@ def reject_complex(value: object, name: str) -> None:
 
 
 def as_array_like(value: Any, name: str) -> Any:
+@overload
+def as_array_like(  # numpydoc ignore=GL08
+    value: list[Any] | tuple[Any, ...], name: str
+) -> np.ndarray: ...
+
+
+@overload
+def as_array_like(  # numpydoc ignore=GL08
+    value: _Container, name: str
+) -> _Container: ...
+
+
     """
     Convert an array_like input to an array unless it is a known container.
 

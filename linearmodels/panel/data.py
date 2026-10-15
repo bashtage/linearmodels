@@ -27,7 +27,7 @@ from linearmodels.shared.inputs import as_float64, reject_complex
 from linearmodels.shared.utility import ensure_unique_column, panel_to_frame
 import linearmodels.typing.data
 
-__all__ = ["PanelData", "PanelDataLike"]
+__all__ = ["PanelArrayLike", "PanelData", "PanelDataLike"]
 
 
 class _Panel:
@@ -1045,4 +1045,7 @@ class PanelData:
         return dummies[dummy_cols].astype(np.float64)
 
 
-PanelDataLike = Union[PanelData, linearmodels.typing.data.ArrayLike]
+# The inputs that PanelData accepts. A list or a tuple does not have a layout.
+PanelDataLike = Union[PanelData, linearmodels.typing.data.DataContainer]
+# The inputs that are array_like, which also include a list or a tuple
+PanelArrayLike = Union[PanelData, linearmodels.typing.data.ArrayLike]

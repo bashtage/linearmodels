@@ -18,6 +18,7 @@ from statsmodels.iolib.summary import SimpleTable, fmt_2cols, fmt_params
 
 from linearmodels.iv.results import default_txt_fmt, stub_concat, table_concat
 from linearmodels.panel.covariance import HomoskedasticCovariance
+from linearmodels.panel.data import PanelDataLike
 from linearmodels.shared.alignment import same_labels
 from linearmodels.shared.base import _ModelComparison, _SummaryStr
 from linearmodels.shared.hypotheses import (
@@ -543,7 +544,7 @@ class PanelResults(_SummaryStr):
 
     def _out_of_sample(
         self,
-        exog: linearmodels.typing.data.ArrayLike | None,
+        exog: PanelDataLike | None,
         data: DataFrame | None,
         missing: bool,
         context: Mapping[str, Any] | None = None,
@@ -561,7 +562,7 @@ class PanelResults(_SummaryStr):
 
     def predict(
         self,
-        exog: linearmodels.typing.data.ArrayLike | None = None,
+        exog: PanelDataLike | None = None,
         *,
         data: DataFrame | None = None,
         fitted: bool = True,
