@@ -19,7 +19,7 @@
     
   
       
-        <title>linearmodels.iv.results - linearmodels v7.1 (+564)</title>
+        <title>linearmodels.iv.results - linearmodels v7.1 (+569)</title>
       
     
 
@@ -91,7 +91,7 @@
 
 <header class="md-header md-header--shadow" data-md-component="header">
   <nav class="md-header__inner md-grid" aria-label="Header">
-    <a href="../../../index.html" title="linearmodels v7.1 (+564)" class="md-header__button md-logo" aria-label="linearmodels v7.1 (+564)" data-md-component="logo">
+    <a href="../../../index.html" title="linearmodels v7.1 (+569)" class="md-header__button md-logo" aria-label="linearmodels v7.1 (+569)" data-md-component="logo">
       <img src="../../../_static/bw-logo.svg" alt="logo">
     </a>
     <label class="md-header__button md-icon" for="__drawer">
@@ -102,7 +102,7 @@
       <div class="md-header__ellipsis">
         <div class="md-header__topic">
           <span class="md-ellipsis">
-            linearmodels v7.1 (+564)
+            linearmodels v7.1 (+569)
           </span>
         </div>
         <div class="md-header__topic" data-md-component="header-topic">
@@ -197,10 +197,10 @@
 
 <nav class="md-nav md-nav--primary" aria-label="Navigation" data-md-level="0">
   <label class="md-nav__title" for="__drawer">
-    <a href="../../../index.html" title="linearmodels v7.1 (+564)" class="md-nav__button md-logo" aria-label="linearmodels v7.1 (+564)" data-md-component="logo">
+    <a href="../../../index.html" title="linearmodels v7.1 (+569)" class="md-nav__button md-logo" aria-label="linearmodels v7.1 (+569)" data-md-component="logo">
       <img src="../../../_static/bw-logo.svg" alt="logo">
     </a>
-    linearmodels v7.1 (+564)
+    linearmodels v7.1 (+569)
   </label>
   
     <div class="md-nav__source">
@@ -562,7 +562,7 @@
 <span class="kn">import</span><span class="w"> </span><span class="nn">linearmodels</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">linearmodels.iv._utility</span><span class="w"> </span><span class="kn">import</span> <span class="n">annihilate</span><span class="p">,</span> <span class="n">proj</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">linearmodels.iv.common</span><span class="w"> </span><span class="kn">import</span> <span class="n">_kleibergen_paap</span><span class="p">,</span> <span class="n">cragg_donald</span><span class="p">,</span> <span class="n">cragg_donald_f</span>
-<span class="kn">from</span><span class="w"> </span><span class="nn">linearmodels.iv.data</span><span class="w"> </span><span class="kn">import</span> <span class="n">IVData</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">linearmodels.iv.data</span><span class="w"> </span><span class="kn">import</span> <span class="n">IVData</span><span class="p">,</span> <span class="n">IVDataLike</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">linearmodels.shared.base</span><span class="w"> </span><span class="kn">import</span> <span class="n">_ModelComparison</span><span class="p">,</span> <span class="n">_SummaryStr</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">linearmodels.shared.hypotheses</span><span class="w"> </span><span class="kn">import</span> <span class="p">(</span>
     <span class="n">InvalidTestStatistic</span><span class="p">,</span>
@@ -897,7 +897,7 @@
 <span class="sd">        """</span>
         <span class="n">ci_quantiles</span> <span class="o">=</span> <span class="n">array</span><span class="p">([(</span><span class="mi">1</span> <span class="o">-</span> <span class="n">level</span><span class="p">)</span> <span class="o">/</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">1</span> <span class="o">-</span> <span class="p">(</span><span class="mi">1</span> <span class="o">-</span> <span class="n">level</span><span class="p">)</span> <span class="o">/</span> <span class="mi">2</span><span class="p">])</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_debiased</span><span class="p">:</span>
-            <span class="n">q</span> <span class="o">=</span> <span class="n">stats</span><span class="o">.</span><span class="n">t</span><span class="o">.</span><span class="n">ppf</span><span class="p">(</span><span class="n">ci_quantiles</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">df_resid</span><span class="p">)</span>
+            <span class="n">q</span><span class="p">:</span> <span class="n">ndarray</span> <span class="o">=</span> <span class="n">stats</span><span class="o">.</span><span class="n">t</span><span class="o">.</span><span class="n">ppf</span><span class="p">(</span><span class="n">ci_quantiles</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">df_resid</span><span class="p">)</span>
         <span class="k">else</span><span class="p">:</span>
             <span class="n">q</span> <span class="o">=</span> <span class="n">stats</span><span class="o">.</span><span class="n">norm</span><span class="o">.</span><span class="n">ppf</span><span class="p">(</span><span class="n">ci_quantiles</span><span class="p">)</span>
         <span class="n">q</span> <span class="o">=</span> <span class="n">q</span><span class="p">[</span><span class="kc">None</span><span class="p">,</span> <span class="p">:]</span>
@@ -1135,9 +1135,9 @@
 
     <span class="k">def</span><span class="w"> </span><span class="nf">_out_of_sample</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span>
-        <span class="n">exog</span><span class="p">:</span> <span class="n">linearmodels</span><span class="o">.</span><span class="n">typing</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">ArrayLike</span> <span class="o">|</span> <span class="kc">None</span><span class="p">,</span>
-        <span class="n">endog</span><span class="p">:</span> <span class="n">linearmodels</span><span class="o">.</span><span class="n">typing</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">ArrayLike</span> <span class="o">|</span> <span class="kc">None</span><span class="p">,</span>
-        <span class="n">data</span><span class="p">:</span> <span class="n">linearmodels</span><span class="o">.</span><span class="n">typing</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">ArrayLike</span> <span class="o">|</span> <span class="kc">None</span><span class="p">,</span>
+        <span class="n">exog</span><span class="p">:</span> <span class="n">IVDataLike</span> <span class="o">|</span> <span class="kc">None</span><span class="p">,</span>
+        <span class="n">endog</span><span class="p">:</span> <span class="n">IVDataLike</span> <span class="o">|</span> <span class="kc">None</span><span class="p">,</span>
+        <span class="n">data</span><span class="p">:</span> <span class="n">DataFrame</span> <span class="o">|</span> <span class="kc">None</span><span class="p">,</span>
         <span class="n">missing</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">|</span> <span class="kc">None</span><span class="p">,</span>
     <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">DataFrame</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">"""Interface between model predict and predict for OOS fits."""</span>
@@ -1158,8 +1158,8 @@
 <a class="viewcode-back" href="../../../iv/iv/linearmodels.iv.results.OLSResults.predict.html#linearmodels.iv.absorbing.OLSResults.predict">[docs]</a>
     <span class="k">def</span><span class="w"> </span><span class="nf">predict</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span>
-        <span class="n">exog</span><span class="p">:</span> <span class="n">linearmodels</span><span class="o">.</span><span class="n">typing</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">ArrayLike</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
-        <span class="n">endog</span><span class="p">:</span> <span class="n">linearmodels</span><span class="o">.</span><span class="n">typing</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">ArrayLike</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+        <span class="n">exog</span><span class="p">:</span> <span class="n">IVDataLike</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+        <span class="n">endog</span><span class="p">:</span> <span class="n">IVDataLike</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
         <span class="o">*</span><span class="p">,</span>
         <span class="n">data</span><span class="p">:</span> <span class="n">DataFrame</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
         <span class="n">fitted</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span>

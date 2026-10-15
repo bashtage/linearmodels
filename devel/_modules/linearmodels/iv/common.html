@@ -19,7 +19,7 @@
     
   
       
-        <title>linearmodels.iv.common - linearmodels v7.1 (+564)</title>
+        <title>linearmodels.iv.common - linearmodels v7.1 (+569)</title>
       
     
 
@@ -91,7 +91,7 @@
 
 <header class="md-header md-header--shadow" data-md-component="header">
   <nav class="md-header__inner md-grid" aria-label="Header">
-    <a href="../../../index.html" title="linearmodels v7.1 (+564)" class="md-header__button md-logo" aria-label="linearmodels v7.1 (+564)" data-md-component="logo">
+    <a href="../../../index.html" title="linearmodels v7.1 (+569)" class="md-header__button md-logo" aria-label="linearmodels v7.1 (+569)" data-md-component="logo">
       <img src="../../../_static/bw-logo.svg" alt="logo">
     </a>
     <label class="md-header__button md-icon" for="__drawer">
@@ -102,7 +102,7 @@
       <div class="md-header__ellipsis">
         <div class="md-header__topic">
           <span class="md-ellipsis">
-            linearmodels v7.1 (+564)
+            linearmodels v7.1 (+569)
           </span>
         </div>
         <div class="md-header__topic" data-md-component="header-topic">
@@ -197,10 +197,10 @@
 
 <nav class="md-nav md-nav--primary" aria-label="Navigation" data-md-level="0">
   <label class="md-nav__title" for="__drawer">
-    <a href="../../../index.html" title="linearmodels v7.1 (+564)" class="md-nav__button md-logo" aria-label="linearmodels v7.1 (+564)" data-md-component="logo">
+    <a href="../../../index.html" title="linearmodels v7.1 (+569)" class="md-nav__button md-logo" aria-label="linearmodels v7.1 (+569)" data-md-component="logo">
       <img src="../../../_static/bw-logo.svg" alt="logo">
     </a>
-    linearmodels v7.1 (+564)
+    linearmodels v7.1 (+569)
   </label>
   
     <div class="md-nav__source">
@@ -918,7 +918,9 @@
     <span class="n">nobs</span> <span class="o">=</span> <span class="n">z</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
     <span class="n">scores</span> <span class="o">=</span> <span class="n">column_stack</span><span class="p">([</span><span class="n">v</span><span class="p">[:,</span> <span class="p">[</span><span class="n">j</span><span class="p">]]</span> <span class="o">*</span> <span class="n">z</span> <span class="k">for</span> <span class="n">j</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">v</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">])])</span>
     <span class="n">eps</span> <span class="o">=</span> <span class="n">ones</span><span class="p">((</span><span class="n">nobs</span><span class="p">,</span> <span class="mi">1</span><span class="p">))</span>
-    <span class="n">estimator</span><span class="p">:</span> <span class="n">HeteroskedasticWeightMatrix</span>
+    <span class="n">estimator</span><span class="p">:</span> <span class="p">(</span>
+        <span class="n">HeteroskedasticWeightMatrix</span> <span class="o">|</span> <span class="n">OneWayClusteredWeightMatrix</span> <span class="o">|</span> <span class="n">KernelWeightMatrix</span>
+    <span class="p">)</span>
     <span class="k">if</span> <span class="n">family</span> <span class="o">==</span> <span class="s2">"robust"</span><span class="p">:</span>
         <span class="n">estimator</span> <span class="o">=</span> <span class="n">HeteroskedasticWeightMatrix</span><span class="p">(</span><span class="n">center</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">debiased</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
     <span class="k">elif</span> <span class="n">family</span> <span class="o">==</span> <span class="s2">"clustered"</span><span class="p">:</span>
