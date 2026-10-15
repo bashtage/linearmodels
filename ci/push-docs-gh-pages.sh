@@ -25,12 +25,18 @@ ls ${PWD}/doc/build/html
 echo "Copy docs to devel"
 echo "cp -r ${PWD}/doc/build/html/. ${PWD}/devel/"
 cp -r "${PWD}/doc/build/html/." "${PWD}/devel/"
+echo "List devel directory"
+ls -R "${PWD}/devel"
 echo "Remove build directory"
 echo "rm -rf ${PWD}/doc/build/"
 rm -rf ${PWD}/doc/build/
 echo "Add devel"
-git add devel/.
-git add devel/_static/.
+pushd devel
+git add .
+popd
+git add -f devel/.
+git add -f devel/_static
+git add -f devel/_static/mathjax
 echo "Add new HTML/JS/CSS"
 git add ./\*.html
 git add ./\*.js
