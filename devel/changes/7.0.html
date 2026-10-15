@@ -19,7 +19,7 @@
     
   
       
-        <title>Version 7.1 - linearmodels v7.1 (+551)</title>
+        <title>Version 7.1 - linearmodels v7.1 (+556)</title>
       
     
 
@@ -91,7 +91,7 @@
 
 <header class="md-header md-header--shadow" data-md-component="header">
   <nav class="md-header__inner md-grid" aria-label="Header">
-    <a href="../index.html" title="linearmodels v7.1 (+551)" class="md-header__button md-logo" aria-label="linearmodels v7.1 (+551)" data-md-component="logo">
+    <a href="../index.html" title="linearmodels v7.1 (+556)" class="md-header__button md-logo" aria-label="linearmodels v7.1 (+556)" data-md-component="logo">
       <img src="../_static/bw-logo.svg" alt="logo">
     </a>
     <label class="md-header__button md-icon" for="__drawer">
@@ -102,7 +102,7 @@
       <div class="md-header__ellipsis">
         <div class="md-header__topic">
           <span class="md-ellipsis">
-            linearmodels v7.1 (+551)
+            linearmodels v7.1 (+556)
           </span>
         </div>
         <div class="md-header__topic" data-md-component="header-topic">
@@ -197,10 +197,10 @@
 
 <nav class="md-nav md-nav--primary" aria-label="Navigation" data-md-level="0">
   <label class="md-nav__title" for="__drawer">
-    <a href="../index.html" title="linearmodels v7.1 (+551)" class="md-nav__button md-logo" aria-label="linearmodels v7.1 (+551)" data-md-component="logo">
+    <a href="../index.html" title="linearmodels v7.1 (+556)" class="md-nav__button md-logo" aria-label="linearmodels v7.1 (+556)" data-md-component="logo">
       <img src="../_static/bw-logo.svg" alt="logo">
     </a>
-    linearmodels v7.1 (+551)
+    linearmodels v7.1 (+556)
   </label>
   
     <div class="md-nav__source">
@@ -530,36 +530,62 @@
 <p class="rubric">Highlights</p>
 <ul class="simple">
 <li><p>New estimators and tests: <a class="reference internal" href="../iv/iv/linearmodels.iv.model.IVJIVE.html#linearmodels.iv.model.IVJIVE" title="linearmodels.iv.model.IVJIVE (Python class) — Jackknife instrumental variables estimator (JIVE)."><code class="xref py py-class docutils literal notranslate"><span class="pre">IVJIVE</span></code></a>, first-stage rank
-tests, a centered J test, and the Hausman and Pesaran CD tests for panel models.</p></li>
-<li><p>Several corrections change the numbers that unchanged code produced in 7.0. See
-<em>Changes that alter results</em>.</p></li>
-<li><p>Inputs with labels must have the same index as <code class="docutils literal notranslate"><span class="pre">dependent</span></code> in every estimator. See
-<em>Backward-incompatible changes</em>.</p></li>
-<li><p>Python 3.15 is supported. <strong>7.1 is the last release to support Python 3.10 and
-NumPy 1.x.</strong></p></li>
+tests, a centered J test, the Hausman and Pesaran CD tests for panel models, and panel
+models that only have effects.</p></li>
+<li><p>Many corrections change the numbers that unchanged code produced in 7.0, including the
+default bandwidth of the kernel estimators of <code class="docutils literal notranslate"><span class="pre">IVGMM</span></code>, <code class="docutils literal notranslate"><span class="pre">IVGMMCUE</span></code> and
+<code class="docutils literal notranslate"><span class="pre">IVSystemGMM</span></code>, the Fama-MacBeth p-values and the weighted panel and system models.
+See <em>Changes that alter results</em>.</p></li>
+<li><p>Inputs with labels must have the same index as <code class="docutils literal notranslate"><span class="pre">dependent</span></code> (or as the first input
+with labels) in every estimator, and input of the wrong type now raises a clear
+<code class="docutils literal notranslate"><span class="pre">TypeError</span></code> or <code class="docutils literal notranslate"><span class="pre">ValueError</span></code>. See <em>Backward-incompatible changes</em>.</p></li>
+<li><p>Python 3.15 is supported. <strong>7.1 is the last release to support Python 3.10 and NumPy
+1.x.</strong></p></li>
 </ul>
 <p class="rubric">New features</p>
 <ul class="simple">
 <li><p>Added <a class="reference internal" href="../iv/iv/linearmodels.iv.model.IVJIVE.html#linearmodels.iv.model.IVJIVE" title="linearmodels.iv.model.IVJIVE (Python class) — Jackknife instrumental variables estimator (JIVE)."><code class="xref py py-class docutils literal notranslate"><span class="pre">IVJIVE</span></code></a>, the jackknife IV estimator (JIVE1), with
-unadjusted, robust, kernel and one-way clustered covariances. It can be imported from
-<code class="docutils literal notranslate"><span class="pre">linearmodels</span></code> (<a class="extlink-issue reference external" href="https://github.com/bashtage/linearmodels/issues/750">GH750</a>).</p></li>
+unadjusted, robust, kernel and one-way clustered covariances. The bandwidth of its
+kernel covariance is selected from the data, as in <code class="docutils literal notranslate"><span class="pre">IV2SLS</span></code> and <code class="docutils literal notranslate"><span class="pre">IVLIML</span></code>. Two-way
+clusters raise a <code class="docutils literal notranslate"><span class="pre">ValueError</span></code>. It can be imported from <code class="docutils literal notranslate"><span class="pre">linearmodels</span></code>
+(<a class="extlink-issue reference external" href="https://github.com/bashtage/linearmodels/issues/750">GH750</a>, <a class="extlink-issue reference external" href="https://github.com/bashtage/linearmodels/issues/763">GH763</a>, <a class="extlink-issue reference external" href="https://github.com/bashtage/linearmodels/issues/765">GH765</a>).</p></li>
 <li><p>Added the Cragg-Donald and Kleibergen-Paap tests of the rank of the first-stage
-coefficient matrix. They are available as properties of
-<a class="reference internal" href="../iv/iv/linearmodels.iv.results.FirstStageResults.html#linearmodels.iv.results.FirstStageResults" title="linearmodels.iv.results.FirstStageResults (Python class) — First stage estimation results and diagnostics."><code class="xref py py-class docutils literal notranslate"><span class="pre">FirstStageResults</span></code></a> and as the functions
-<code class="docutils literal notranslate"><span class="pre">cragg_donald</span></code>, <code class="docutils literal notranslate"><span class="pre">cragg_donald_f</span></code>, <code class="docutils literal notranslate"><span class="pre">kleibergen_paap</span></code> and <code class="docutils literal notranslate"><span class="pre">kleibergen_paap_f</span></code> of
-<code class="docutils literal notranslate"><span class="pre">linearmodels.iv</span></code> (<a class="extlink-issue reference external" href="https://github.com/bashtage/linearmodels/issues/741">GH741</a>, <a class="extlink-issue reference external" href="https://github.com/bashtage/linearmodels/issues/622">GH622</a>).</p></li>
+coefficients, as properties of <a class="reference internal" href="../iv/iv/linearmodels.iv.results.FirstStageResults.html#linearmodels.iv.results.FirstStageResults" title="linearmodels.iv.results.FirstStageResults (Python class) — First stage estimation results and diagnostics."><code class="xref py py-class docutils literal notranslate"><span class="pre">FirstStageResults</span></code></a> and
+as functions that can be imported from <code class="docutils literal notranslate"><span class="pre">linearmodels.iv</span></code> (<a class="extlink-issue reference external" href="https://github.com/bashtage/linearmodels/issues/741">GH741</a>,
+<a class="extlink-issue reference external" href="https://github.com/bashtage/linearmodels/issues/622">GH622</a>, <a class="extlink-issue reference external" href="https://github.com/bashtage/linearmodels/issues/765">GH765</a>).</p></li>
 <li><p>Added <a class="reference internal" href="../iv/iv/linearmodels.iv.results.IVGMMResults.centered_j_stat.html#linearmodels.iv.results.IVGMMResults.centered_j_stat" title="linearmodels.iv.results.IVGMMResults.centered_j_stat (Python property) — J-test of overidentifying restrictions using a centered moment covariance."><code class="xref py py-attr docutils literal notranslate"><span class="pre">centered_j_stat</span></code></a>, a J test of the
-overidentifying restrictions that uses a centered moment covariance (<a class="extlink-issue reference external" href="https://github.com/bashtage/linearmodels/issues/749">GH749</a>).</p></li>
+overidentifying restrictions that uses a centered moment covariance (<a class="extlink-issue reference external" href="https://github.com/bashtage/linearmodels/issues/749">GH749</a>,
+<a class="extlink-issue reference external" href="https://github.com/bashtage/linearmodels/issues/763">GH763</a>).</p></li>
 <li><p>Added <a class="reference internal" href="../panel/panel/linearmodels.panel.results.RandomEffectsResults.hausman.html#linearmodels.panel.results.RandomEffectsResults.hausman" title="linearmodels.panel.results.RandomEffectsResults.hausman (Python method) — Hausman specification test against results from a consistent model."><code class="xref py py-meth docutils literal notranslate"><span class="pre">hausman()</span></code></a>, the Hausman
-test of random effects against fixed effects. It matches Stata and returns a
-<a class="reference internal" href="../panel/panel/linearmodels.panel.results.HausmanTestResults.html#linearmodels.panel.results.HausmanTestResults" title="linearmodels.panel.results.HausmanTestResults (Python class) — Results of a Hausman specification test."><code class="xref py py-class docutils literal notranslate"><span class="pre">HausmanTestResults</span></code></a> named tuple (<a class="extlink-issue reference external" href="https://github.com/bashtage/linearmodels/issues/740">GH740</a>).</p></li>
+test of random effects against fixed effects. It matches Stata and <code class="docutils literal notranslate"><span class="pre">plm::phtest</span></code>,
+and raises a <code class="docutils literal notranslate"><span class="pre">ValueError</span></code> if the models differ in observations, dependent variable
+or weights (<a class="extlink-issue reference external" href="https://github.com/bashtage/linearmodels/issues/740">GH740</a>, <a class="extlink-issue reference external" href="https://github.com/bashtage/linearmodels/issues/761">GH761</a>).</p></li>
 <li><p>Added <a class="reference internal" href="../panel/panel/linearmodels.panel.results.PanelResults.pesaran_cd.html#linearmodels.panel.results.PanelResults.pesaran_cd" title="linearmodels.panel.results.PanelResults.pesaran_cd (Python property) — Pesaran CD test of residual cross-sectional dependence."><code class="xref py py-attr docutils literal notranslate"><span class="pre">pesaran_cd</span></code></a>, the Pesaran CD test
-of cross-sectional dependence, which returns a new
-<a class="reference internal" href="../utility/linearmodels.shared.hypotheses.NormalTestStatistic.html#linearmodels.shared.hypotheses.NormalTestStatistic" title="linearmodels.shared.hypotheses.NormalTestStatistic (Python class) — Test statistic holder for tests with an asymptotic standard normal law."><code class="xref py py-class docutils literal notranslate"><span class="pre">NormalTestStatistic</span></code></a>. It returns an
-<code class="docutils literal notranslate"><span class="pre">InapplicableTestStatistic</span></code> for <code class="docutils literal notranslate"><span class="pre">BetweenOLS</span></code>, <code class="docutils literal notranslate"><span class="pre">FamaMacBeth</span></code> and models with time
-effects or effects concentrated in some periods (<a class="extlink-issue reference external" href="https://github.com/bashtage/linearmodels/issues/739">GH739</a>).</p></li>
+of cross-sectional dependence. It uses the idiosyncratic shocks (for
+<code class="docutils literal notranslate"><span class="pre">FirstDifferenceOLS</span></code> the residuals of the differenced equation) and is inapplicable
+to <code class="docutils literal notranslate"><span class="pre">BetweenOLS</span></code>, <code class="docutils literal notranslate"><span class="pre">FamaMacBeth</span></code> and models with time effects (<a class="extlink-issue reference external" href="https://github.com/bashtage/linearmodels/issues/739">GH739</a>,
+<a class="extlink-issue reference external" href="https://github.com/bashtage/linearmodels/issues/771">GH771</a>).</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">PanelOLS</span></code> estimates models that only have effects, <code class="docutils literal notranslate"><span class="pre">y</span> <span class="pre">=</span> <span class="pre">a_i</span> <span class="pre">+</span> <span class="pre">g_t</span> <span class="pre">+</span> <span class="pre">e</span></code>, with an
+<code class="docutils literal notranslate"><span class="pre">exog</span></code> that has no columns or the formula <code class="docutils literal notranslate"><span class="pre">&quot;y</span> <span class="pre">~</span> <span class="pre">EntityEffects&quot;</span></code>. These raised
+pandas’ “No objects to concatenate” (<a class="extlink-issue reference external" href="https://github.com/bashtage/linearmodels/issues/809">GH809</a>).</p></li>
+<li><p>A <code class="docutils literal notranslate"><span class="pre">PeriodIndex</span></code> of time labels is accepted by the panel models and converted to
+timestamps (<a class="extlink-issue reference external" href="https://github.com/bashtage/linearmodels/issues/810">GH810</a>).</p></li>
+<li><p>Lists, tuples and other <code class="docutils literal notranslate"><span class="pre">array_like</span></code> objects are accepted for every <code class="docutils literal notranslate"><span class="pre">array_like</span></code>
+parameter of the IV, absorbing, system, asset pricing and panel models, including
+<code class="docutils literal notranslate"><span class="pre">clusters</span></code>, <code class="docutils literal notranslate"><span class="pre">weights</span></code> and <code class="docutils literal notranslate"><span class="pre">other_effects</span></code>. 7.0 raised <code class="docutils literal notranslate"><span class="pre">AttributeError:</span> <span class="pre">'list'</span>
+<span class="pre">object</span> <span class="pre">has</span> <span class="pre">no</span> <span class="pre">attribute</span> <span class="pre">'ndim'</span></code> for many of them (<a class="extlink-issue reference external" href="https://github.com/bashtage/linearmodels/issues/776">GH776</a>).</p></li>
+<li><p>1-d arrays are accepted as the <code class="docutils literal notranslate"><span class="pre">clusters</span></code> and <code class="docutils literal notranslate"><span class="pre">other_effects</span></code> of the panel models,
+and as <code class="docutils literal notranslate"><span class="pre">weights</span></code> with a value for each row of an unbalanced panel. A one-column
+DataFrame of panel weights is read by its labels. <code class="docutils literal notranslate"><span class="pre">BetweenOLS</span></code> and
+<code class="docutils literal notranslate"><span class="pre">FirstDifferenceOLS</span></code> accept text and categorical <code class="docutils literal notranslate"><span class="pre">clusters</span></code> (<a class="extlink-issue reference external" href="https://github.com/bashtage/linearmodels/issues/776">GH776</a>,
+<a class="extlink-issue reference external" href="https://github.com/bashtage/linearmodels/issues/825">GH825</a>, <a class="extlink-issue reference external" href="https://github.com/bashtage/linearmodels/issues/827">GH827</a>, <a class="extlink-issue reference external" href="https://github.com/bashtage/linearmodels/issues/833">GH833</a>).</p></li>
+<li><p>The names of options are not case sensitive: <code class="docutils literal notranslate"><span class="pre">cov_type</span></code>, <code class="docutils literal notranslate"><span class="pre">weight_type</span></code> and
+<code class="docutils literal notranslate"><span class="pre">kernel</span></code> in every model, the <code class="docutils literal notranslate"><span class="pre">group</span></code> of <code class="docutils literal notranslate"><span class="pre">PanelData</span></code> and the <code class="docutils literal notranslate"><span class="pre">drop</span></code> of
+<code class="docutils literal notranslate"><span class="pre">dummy_matrix</span></code>. <code class="docutils literal notranslate"><span class="pre">cov_type=&quot;Robust&quot;</span></code> and <code class="docutils literal notranslate"><span class="pre">kernel=&quot;Bartlett&quot;</span></code> give the results of
+the lower case names (<a class="extlink-issue reference external" href="https://github.com/bashtage/linearmodels/issues/833">GH833</a>, <a class="extlink-issue reference external" href="https://github.com/bashtage/linearmodels/issues/836">GH836</a>).</p></li>
 <li><p><code class="docutils literal notranslate"><span class="pre">linearmodels.iv.common</span></code> and <code class="docutils literal notranslate"><span class="pre">linearmodels.iv.results</span></code> define <code class="docutils literal notranslate"><span class="pre">__all__</span></code>, so that
-<code class="docutils literal notranslate"><span class="pre">import</span> <span class="pre">*</span></code> no longer imports the modules and functions that they import.</p></li>
+<code class="docutils literal notranslate"><span class="pre">import</span> <span class="pre">*</span></code> no longer imports the modules and functions that they import
+(<a class="extlink-issue reference external" href="https://github.com/bashtage/linearmodels/issues/765">GH765</a>).</p></li>
 </ul>
 <p class="rubric">Changes that alter results</p>
 <ul class="simple">
@@ -573,42 +599,180 @@ project the residuals on all of the instruments, as documented (<a class="extlin
 <code class="docutils literal notranslate"><span class="pre">IVGMMCUE</span></code> models uses the correct moment conditions and the <code class="docutils literal notranslate"><span class="pre">weight_type</span></code> of the
 model. 7.0 ignored the weight type (<a class="extlink-issue reference external" href="https://github.com/bashtage/linearmodels/issues/744">GH744</a>).</p></li>
 <li><p><a class="reference internal" href="../iv/iv/linearmodels.iv.model.IVGMMCUE.html#linearmodels.iv.model.IVGMMCUE" title="linearmodels.iv.model.IVGMMCUE (Python class) — Estimation of IV models using continuously updating GMM."><code class="xref py py-class docutils literal notranslate"><span class="pre">IVGMMCUE</span></code></a> centers the moment conditions by default, as
-documented. This changes its estimates and J statistic (J goes from 0.775 to 2.096 in
-the <code class="docutils literal notranslate"><span class="pre">mroz</span></code> example with kernel weights). Pass <code class="docutils literal notranslate"><span class="pre">center=False</span></code> to get the 7.0
-results. With clustered weights it needs more clusters than moment conditions
-(<a class="extlink-issue reference external" href="https://github.com/bashtage/linearmodels/issues/746">GH746</a>).</p></li>
+documented. With the new default bandwidth (below) the J statistic of the <code class="docutils literal notranslate"><span class="pre">mroz</span></code>
+example with kernel weights goes from 0.775 to 0.379 and the coefficient on <code class="docutils literal notranslate"><span class="pre">educ</span></code>
+from 0.0419 to 0.0637. Pass <code class="docutils literal notranslate"><span class="pre">center=False</span></code> and <code class="docutils literal notranslate"><span class="pre">optimal_bw=False</span></code> to get the 7.0
+results (<a class="extlink-issue reference external" href="https://github.com/bashtage/linearmodels/issues/746">GH746</a>).</p></li>
+<li><p><strong>The default bandwidth of the kernel estimators of</strong> <code class="docutils literal notranslate"><span class="pre">IVGMM</span></code> <strong>and</strong> <code class="docutils literal notranslate"><span class="pre">IVGMMCUE</span></code>
+<strong>is selected from the data.</strong> 7.0 used <code class="docutils literal notranslate"><span class="pre">nobs</span> <span class="pre">-</span> <span class="pre">2</span></code>, and the 95% intervals covered
+64% to 70% in a simulation (92% to 95% now). In the <code class="docutils literal notranslate"><span class="pre">mroz</span></code> example the bandwidth
+goes from 426 to 3 and the J statistic of <code class="docutils literal notranslate"><span class="pre">IVGMM</span></code> from 0.797 to 0.377
+(<a class="extlink-issue reference external" href="https://github.com/bashtage/linearmodels/issues/794">GH794</a>).</p></li>
+<li><p>A model that uses the default bandwidth issues a <code class="docutils literal notranslate"><span class="pre">DefaultBandwidthWarning</span></code>. Pass
+<code class="docutils literal notranslate"><span class="pre">optimal_bw=False</span></code> (or <code class="docutils literal notranslate"><span class="pre">bandwidth=nobs</span> <span class="pre">-</span> <span class="pre">2</span></code>) to get the 7.0 numbers, or
+<code class="docutils literal notranslate"><span class="pre">optimal_bw=True</span></code> to silence the warning. <code class="docutils literal notranslate"><span class="pre">IVGMMCUE</span></code> estimates the bandwidth once,
+from the first step residuals, so its results with <code class="docutils literal notranslate"><span class="pre">optimal_bw=True</span></code> change slightly
+(<a class="extlink-issue reference external" href="https://github.com/bashtage/linearmodels/issues/794">GH794</a>).</p></li>
+<li><p><strong>The default bandwidth of the kernel weight matrix of</strong> <code class="docutils literal notranslate"><span class="pre">IVSystemGMM</span></code> <strong>is selected
+from the data,</strong> with the same warning and the same <code class="docutils literal notranslate"><span class="pre">optimal_bw=False</span></code> to restore
+<code class="docutils literal notranslate"><span class="pre">nobs</span> <span class="pre">-</span> <span class="pre">2</span></code>. In a simulation with AR(1) errors the 5% J test never rejected valid
+instruments in 7.0, and rejects 2% to 5% of the time now (<a class="extlink-issue reference external" href="https://github.com/bashtage/linearmodels/issues/794">GH794</a>).</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">IVGMM</span></code> raises a <code class="docutils literal notranslate"><span class="pre">ValueError</span></code> when the covariance of the moment conditions is
+singular, which happens with too few clusters. 7.0 returned meaningless estimates.
+<code class="docutils literal notranslate"><span class="pre">IVGMMCUE</span></code> raises it instead of <code class="docutils literal notranslate"><span class="pre">LinAlgError</span></code>, and also for as many clusters as
+moment conditions with <code class="docutils literal notranslate"><span class="pre">center=False</span></code>. <code class="docutils literal notranslate"><span class="pre">c_stat</span></code> is an <code class="docutils literal notranslate"><span class="pre">InvalidTestStatistic</span></code> if
+its model has too few clusters (<a class="extlink-issue reference external" href="https://github.com/bashtage/linearmodels/issues/754">GH754</a>, <a class="extlink-issue reference external" href="https://github.com/bashtage/linearmodels/issues/785">GH785</a>).</p></li>
 <li><p><code class="docutils literal notranslate"><span class="pre">IVGMMResults.weight_config</span></code> is the <code class="docutils literal notranslate"><span class="pre">dict</span></code> of the weight configuration. 7.0
 returned the name of the weight type, which is <code class="docutils literal notranslate"><span class="pre">weight_type</span></code> (<a class="extlink-issue reference external" href="https://github.com/bashtage/linearmodels/issues/747">GH747</a>).</p></li>
-<li><p>Weighted <code class="docutils literal notranslate"><span class="pre">RandomEffects</span></code> scales the entity means by the root weights, which changes
-its estimates, R-squared and F statistic (<a class="extlink-issue reference external" href="https://github.com/bashtage/linearmodels/issues/738">GH738</a>).</p></li>
-<li><p><code class="docutils literal notranslate"><span class="pre">FirstDifferenceOLS</span></code> differences in time order. 7.0 differenced against non-adjacent
-periods if the first entity enters late or has a gap (<a class="extlink-issue reference external" href="https://github.com/bashtage/linearmodels/issues/726">GH726</a>).</p></li>
-<li><p><code class="docutils literal notranslate"><span class="pre">PanelOLS(drop_absorbed=True)</span></code> with entity effects and a constant now drops the
-regressors if none of them varies within entities. 7.0 kept them (<a class="extlink-issue reference external" href="https://github.com/bashtage/linearmodels/issues/730">GH730</a>).</p></li>
-<li><p>Panel weights given by period, by entity or as a table are placed by label. 7.0 used
-the wrong rows unless the data was sorted by entity and then by period (<a class="extlink-issue reference external" href="https://github.com/bashtage/linearmodels/issues/748">GH748</a>).</p></li>
-<li><p>Weighted <code class="docutils literal notranslate"><span class="pre">IV3SLS</span></code> uses a weighted first stage, which changes its estimates.
-<code class="docutils literal notranslate"><span class="pre">IVSystemGMM</span></code> is unchanged (<a class="extlink-issue reference external" href="https://github.com/bashtage/linearmodels/issues/734">GH734</a>).</p></li>
-<li><p>The default <code class="docutils literal notranslate"><span class="pre">unadjusted</span></code> covariance of <code class="docutils literal notranslate"><span class="pre">SUR</span></code> and <code class="docutils literal notranslate"><span class="pre">IV3SLS</span></code> with <code class="docutils literal notranslate"><span class="pre">iterate=True</span></code>
-uses the final residual covariance, which changes standard errors (<a class="extlink-issue reference external" href="https://github.com/bashtage/linearmodels/issues/736">GH736</a>).</p></li>
-<li><p>Repeated calls to <code class="docutils literal notranslate"><span class="pre">AbsorbingLS.fit</span></code> no longer change <code class="docutils literal notranslate"><span class="pre">df_model</span></code>, <code class="docutils literal notranslate"><span class="pre">df_resid</span></code> and
-the adjusted R-squared of later fits (<a class="extlink-issue reference external" href="https://github.com/bashtage/linearmodels/issues/735">GH735</a>). They also use the <code class="docutils literal notranslate"><span class="pre">method</span></code> and
-<code class="docutils literal notranslate"><span class="pre">absorb_options</span></code> of each call, not those of the first call.</p></li>
 <li><p><code class="docutils literal notranslate"><span class="pre">IVGMMCUE</span></code> results report <code class="docutils literal notranslate"><span class="pre">IV-GMM-CUE</span></code> as the estimator (<code class="docutils literal notranslate"><span class="pre">method</span></code>, the summary
-and <code class="docutils literal notranslate"><span class="pre">compare</span></code>) instead of <code class="docutils literal notranslate"><span class="pre">IV-GMM</span></code>.</p></li>
+and <code class="docutils literal notranslate"><span class="pre">compare</span></code>) instead of <code class="docutils literal notranslate"><span class="pre">IV-GMM</span></code> (<a class="extlink-issue reference external" href="https://github.com/bashtage/linearmodels/issues/753">GH753</a>).</p></li>
+<li><p>The weights of the IV models are scaled to a mean of 1 after the observations with
+missing values are dropped. <code class="docutils literal notranslate"><span class="pre">resid_ss</span></code>, <code class="docutils literal notranslate"><span class="pre">s2</span></code>, <code class="docutils literal notranslate"><span class="pre">total_ss</span></code> and <code class="docutils literal notranslate"><span class="pre">wresids</span></code> were
+off by the ratio of the means of the weights (1.0023 in a simulation). Only models
+with both weights and missing values change (<a class="extlink-issue reference external" href="https://github.com/bashtage/linearmodels/issues/776">GH776</a>).</p></li>
+<li><p>The Anderson-Rubin and Basmann F tests are an <code class="docutils literal notranslate"><span class="pre">InvalidTestStatistic</span></code>, and <code class="docutils literal notranslate"><span class="pre">IVLIML</span></code>
+raises, when kappa cannot be estimated from so few observations. 7.0 returned its
+rounding error (<a class="extlink-issue reference external" href="https://github.com/bashtage/linearmodels/issues/824">GH824</a>).</p></li>
+<li><p>Every R-squared is NaN, with no error or warning, if the total sum of squares of the
+dependent variable is zero, for example if it is constant. 7.0 raised a
+<code class="docutils literal notranslate"><span class="pre">ZeroDivisionError</span></code>, or returned -inf or rounding noise (<a class="extlink-issue reference external" href="https://github.com/bashtage/linearmodels/issues/814">GH814</a>).</p></li>
 <li><p>p-values use the survival function, so p-values below about 1e-16 are no longer 0.
 Tiny p-values print in scientific notation in first-stage summaries and <code class="docutils literal notranslate"><span class="pre">compare()</span></code>
 (<a class="extlink-issue reference external" href="https://github.com/bashtage/linearmodels/issues/742">GH742</a>).</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">AbsorbingLS(debiased=True)</span></code> counts the absorbed terms in the small-sample
+adjustment, as <code class="docutils literal notranslate"><span class="pre">PanelOLS</span></code> does. The standard errors are larger, by 7.7% for the
+Grunfeld data with firm and year effects. <code class="docutils literal notranslate"><span class="pre">debiased=False</span></code> is unchanged
+(<a class="extlink-issue reference external" href="https://github.com/bashtage/linearmodels/issues/778">GH778</a>).</p></li>
+<li><p>The regressors that the effects absorb in <code class="docutils literal notranslate"><span class="pre">AbsorbingLS</span></code> and <code class="docutils literal notranslate"><span class="pre">PanelOLS</span></code> are found
+with a relative tolerance of 1e-5. 7.0 kept some of them, with huge standard errors,
+and depended on the units. With a constant, <code class="docutils literal notranslate"><span class="pre">drop_absorbed=True</span></code> keeps the constant,
+and <code class="docutils literal notranslate"><span class="pre">absorbed_effects</span></code> is <code class="docutils literal notranslate"><span class="pre">fitted_values</span> <span class="pre">-</span> <span class="pre">exog</span> <span class="pre">&#64;</span> <span class="pre">params</span></code> (<a class="extlink-issue reference external" href="https://github.com/bashtage/linearmodels/issues/779">GH779</a>,
+<a class="extlink-issue reference external" href="https://github.com/bashtage/linearmodels/issues/786">GH786</a>).</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">PanelOLS(drop_absorbed=True)</span></code> with entity effects and a constant now drops the
+regressors if none of them varies within entities. 7.0 kept them (<a class="extlink-issue reference external" href="https://github.com/bashtage/linearmodels/issues/730">GH730</a>).</p></li>
+<li><p>Repeated calls to <code class="docutils literal notranslate"><span class="pre">AbsorbingLS.fit</span></code> no longer change <code class="docutils literal notranslate"><span class="pre">df_model</span></code>, <code class="docutils literal notranslate"><span class="pre">df_resid</span></code> and
+the adjusted R-squared of later fits, and use the <code class="docutils literal notranslate"><span class="pre">method</span></code> and <code class="docutils literal notranslate"><span class="pre">absorb_options</span></code> of
+each call (<a class="extlink-issue reference external" href="https://github.com/bashtage/linearmodels/issues/735">GH735</a>, <a class="extlink-issue reference external" href="https://github.com/bashtage/linearmodels/issues/752">GH752</a>).</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">FirstDifferenceOLS</span></code> differences in time order and only adjacent periods. 7.0
+differenced against non-adjacent periods if the first entity enters late or has a gap
+(<a class="extlink-issue reference external" href="https://github.com/bashtage/linearmodels/issues/726">GH726</a>, <a class="extlink-issue reference external" href="https://github.com/bashtage/linearmodels/issues/813">GH813</a>).</p></li>
+<li><p>Weighted <code class="docutils literal notranslate"><span class="pre">RandomEffects</span></code> scales the entity means by the root weights, which changes
+its estimates, R-squared and F statistic (<a class="extlink-issue reference external" href="https://github.com/bashtage/linearmodels/issues/738">GH738</a>).</p></li>
+<li><p>The variance components of <code class="docutils literal notranslate"><span class="pre">RandomEffects</span></code> use the ranks of the within and between
+regressions as degrees of freedom, as plm and Stata do. Models with regressors that
+are constant within entities change slightly (theta 0.6429 instead of 0.6451 in the
+wage panel), and so does <code class="docutils literal notranslate"><span class="pre">small_sample=True</span></code> (<a class="extlink-issue reference external" href="https://github.com/bashtage/linearmodels/issues/798">GH798</a>).</p></li>
+<li><p>The classical F statistic of weighted panel models (and of <code class="docutils literal notranslate"><span class="pre">RandomEffects</span></code> on
+unbalanced panels) was wrong by a factor of about 4 in the wage panel with <code class="docutils literal notranslate"><span class="pre">hours</span></code>
+as weights. The fit measures of weighted <code class="docutils literal notranslate"><span class="pre">FamaMacBeth</span></code> no longer depend on the scale
+of the weights (R-squared -2183 instead of 0.0033) (<a class="extlink-issue reference external" href="https://github.com/bashtage/linearmodels/issues/797">GH797</a>).</p></li>
+<li><p>The log-likelihood of weighted panel models includes the term 0.5 sum(ln w), as
+statsmodels’ <code class="docutils literal notranslate"><span class="pre">WLS</span></code> does. It goes from -3065.75 to -3153.16 for <code class="docutils literal notranslate"><span class="pre">PooledOLS</span></code> in the
+wage panel with <code class="docutils literal notranslate"><span class="pre">hours</span></code> as weights (<a class="extlink-issue reference external" href="https://github.com/bashtage/linearmodels/issues/815">GH815</a>). <code class="docutils literal notranslate"><span class="pre">PanelOLS</span></code> scales the weights
+after it drops singletons, which changes <code class="docutils literal notranslate"><span class="pre">s2</span></code> only (<a class="extlink-issue reference external" href="https://github.com/bashtage/linearmodels/issues/833">GH833</a>).</p></li>
+<li><p>Panel weights given by period, by entity or as a table are placed by label. 7.0 used
+the wrong rows unless the data was sorted by entity and then by period. Clusters and
+other effects given as a table of time periods by entities are placed in the same way,
+and work on unbalanced panels (<a class="extlink-issue reference external" href="https://github.com/bashtage/linearmodels/issues/748">GH748</a>, <a class="extlink-issue reference external" href="https://github.com/bashtage/linearmodels/issues/822">GH822</a>).</p></li>
+<li><p>The panel models can combine <code class="docutils literal notranslate"><span class="pre">clusters</span></code> without the labels of <code class="docutils literal notranslate"><span class="pre">dependent</span></code> with
+<code class="docutils literal notranslate"><span class="pre">cluster_entity=True</span></code> or <code class="docutils literal notranslate"><span class="pre">cluster_time=True</span></code>. 7.0 gave wrong standard errors
+without an error (<a class="extlink-issue reference external" href="https://github.com/bashtage/linearmodels/issues/776">GH776</a>).</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">cov_type=&quot;ac&quot;</span></code> of the panel models sums the products of the scores over entities,
+as plm and statsmodels do, so unbalanced panels change (7% in an example). Entities
+that are shorter than the bandwidth keep the weights of the kernel (0.4% to 11% in a
+panel of short entities) (<a class="extlink-issue reference external" href="https://github.com/bashtage/linearmodels/issues/800">GH800</a>, <a class="extlink-issue reference external" href="https://github.com/bashtage/linearmodels/issues/813">GH813</a>).</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">PanelOLS</span></code> with two cluster variables no longer depends on their order. The degrees
+of freedom are corrected if the effect is nested in the last variable but not the
+first (7% in an example) (<a class="extlink-issue reference external" href="https://github.com/bashtage/linearmodels/issues/795">GH795</a>).</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">FamaMacBeth</span></code> p-values and confidence intervals use a t distribution with T - 1
+degrees of freedom, where 7.0 used <code class="docutils literal notranslate"><span class="pre">nobs</span> <span class="pre">-</span> <span class="pre">nvar</span></code> (the p-value of <code class="docutils literal notranslate"><span class="pre">union</span></code> in the
+wage panel goes from 7e-20 to 4e-5). <code class="docutils literal notranslate"><span class="pre">f_statistic_robust</span></code> is Hotelling’s test, which
+rejected a true null 20% to 41% of the time in 7.0. <code class="docutils literal notranslate"><span class="pre">debiased=False</span></code> is unchanged
+(<a class="extlink-issue reference external" href="https://github.com/bashtage/linearmodels/issues/772">GH772</a>, <a class="extlink-issue reference external" href="https://github.com/bashtage/linearmodels/issues/796">GH796</a>).</p></li>
+<li><p>Models fit with <code class="docutils literal notranslate"><span class="pre">check_rank=False</span></code> use the number of columns as the rank, and
+constants that are not columns (dummies that sum to one) are detected exactly.
+R-squared values were wrong (0.2942 instead of 0.1877 in one example) (<a class="extlink-issue reference external" href="https://github.com/bashtage/linearmodels/issues/799">GH799</a>,
+<a class="extlink-issue reference external" href="https://github.com/bashtage/linearmodels/issues/812">GH812</a>).</p></li>
+<li><p>Weighted <code class="docutils literal notranslate"><span class="pre">SUR</span></code> and <code class="docutils literal notranslate"><span class="pre">IV3SLS</span></code> with GLS use the weighted residuals in the robust,
+kernel and clustered covariances, which were too small by up to 29%. Their R-squared
+use the weighted residuals, and <code class="docutils literal notranslate"><span class="pre">resids</span></code> are always <code class="docutils literal notranslate"><span class="pre">y</span> <span class="pre">-</span> <span class="pre">x</span> <span class="pre">b</span></code> (<a class="extlink-issue reference external" href="https://github.com/bashtage/linearmodels/issues/787">GH787</a>,
+<a class="extlink-issue reference external" href="https://github.com/bashtage/linearmodels/issues/784">GH784</a>).</p></li>
+<li><p>Weighted <code class="docutils literal notranslate"><span class="pre">IV3SLS</span></code> uses a weighted first stage, which changes its estimates.
+<code class="docutils literal notranslate"><span class="pre">IVSystemGMM</span></code> is unchanged (<a class="extlink-issue reference external" href="https://github.com/bashtage/linearmodels/issues/734">GH734</a>). The default <code class="docutils literal notranslate"><span class="pre">unadjusted</span></code> covariance of
+<code class="docutils literal notranslate"><span class="pre">SUR</span></code> and <code class="docutils literal notranslate"><span class="pre">IV3SLS</span></code> with <code class="docutils literal notranslate"><span class="pre">iterate=True</span></code> uses the final residual covariance
+(<a class="extlink-issue reference external" href="https://github.com/bashtage/linearmodels/issues/736">GH736</a>).</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">IV3SLS</span></code> uses GLS (3SLS) when the equations have the same regressors but different
+instruments, where 7.0 used equation by equation 2SLS (<a class="extlink-issue reference external" href="https://github.com/bashtage/linearmodels/issues/793">GH793</a>).</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">nobs</span></code> of the results of <code class="docutils literal notranslate"><span class="pre">SUR</span></code>, <code class="docutils literal notranslate"><span class="pre">IV3SLS</span></code> and <code class="docutils literal notranslate"><span class="pre">IVSystemGMM</span></code> is the number of
+observations of each equation, not of all equations (360 for 3 equations with 120
+observations). <code class="docutils literal notranslate"><span class="pre">df_resid</span></code> is unchanged (<a class="extlink-issue reference external" href="https://github.com/bashtage/linearmodels/issues/803">GH803</a>).</p></li>
+<li><p>The J statistic of <code class="docutils literal notranslate"><span class="pre">LinearFactorModel</span></code> uses the rank of the pricing errors, and
+rejected a correct model too often (12.5% at the 5% level in a simulation, 10% now)
+(<a class="extlink-issue reference external" href="https://github.com/bashtage/linearmodels/issues/805">GH805</a>).</p></li>
+<li><p>The standard errors of the alphas of <code class="docutils literal notranslate"><span class="pre">LinearFactorModelGMM</span></code> account for the
+estimation of the parameters and were up to 3 times too large. The risk premia block
+of <code class="docutils literal notranslate"><span class="pre">cov</span></code> of <code class="docutils literal notranslate"><span class="pre">TradedFactorModel</span></code> with <code class="docutils literal notranslate"><span class="pre">debiased=True</span></code> divides by <code class="docutils literal notranslate"><span class="pre">nobs</span> <span class="pre">-</span> <span class="pre">1</span></code>
+(<a class="extlink-issue reference external" href="https://github.com/bashtage/linearmodels/issues/805">GH805</a>).</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">LinearFactorModelGMM</span></code> reports the J statistic of the minimized CUE objective (0.5%
+to 8% smaller), and its <code class="docutils literal notranslate"><span class="pre">std_errors</span></code> table is laid out correctly: in 7.0 most cells
+held the standard error of another parameter (<a class="extlink-issue reference external" href="https://github.com/bashtage/linearmodels/issues/781">GH781</a>, <a class="extlink-issue reference external" href="https://github.com/bashtage/linearmodels/issues/788">GH788</a>).</p></li>
 </ul>
 <p class="rubric">Backward-incompatible changes</p>
 <ul class="simple">
 <li><p>Inputs with labels, such as a pandas <code class="docutils literal notranslate"><span class="pre">Series</span></code> or <code class="docutils literal notranslate"><span class="pre">DataFrame</span></code> with an index, must
 have the same index as <code class="docutils literal notranslate"><span class="pre">dependent</span></code> in every IV, absorbing, system, asset pricing and
-panel model. 7.0 paired inputs with different labels by position without an error.
-They now raise a <code class="docutils literal notranslate"><span class="pre">ValueError</span></code>: reindex the input, or use <code class="docutils literal notranslate"><span class="pre">.to_numpy()</span></code> to pair by
-position. Nothing is compared if <code class="docutils literal notranslate"><span class="pre">dependent</span></code> has no labels (<a class="extlink-issue reference external" href="https://github.com/bashtage/linearmodels/issues/748">GH748</a>).</p></li>
+panel model. If <code class="docutils literal notranslate"><span class="pre">dependent</span></code> has no labels, the first input with labels is the
+reference. 7.0 paired inputs with different labels by position without an error
+(<a class="extlink-issue reference external" href="https://github.com/bashtage/linearmodels/issues/748">GH748</a>, <a class="extlink-issue reference external" href="https://github.com/bashtage/linearmodels/issues/756">GH756</a>, <a class="extlink-issue reference external" href="https://github.com/bashtage/linearmodels/issues/776">GH776</a>).</p></li>
+<li><p>Inputs whose labels do not match raise a <code class="docutils literal notranslate"><span class="pre">ValueError</span></code>: reindex the input, or use
+<code class="docutils literal notranslate"><span class="pre">.to_numpy()</span></code> to pair by position. The same dates stored at different resolutions
+are the same labels (<a class="extlink-issue reference external" href="https://github.com/bashtage/linearmodels/issues/820">GH820</a>).</p></li>
 <li><p>A system of equations whose equations have different numbers of observations raises a
-<code class="docutils literal notranslate"><span class="pre">ValueError</span></code> when the model is created.</p></li>
+<code class="docutils literal notranslate"><span class="pre">ValueError</span></code> when the model is created (<a class="extlink-issue reference external" href="https://github.com/bashtage/linearmodels/issues/756">GH756</a>).</p></li>
+<li><p>Input that cannot be used raises a <code class="docutils literal notranslate"><span class="pre">TypeError</span></code> or <code class="docutils literal notranslate"><span class="pre">ValueError</span></code> that names the
+input: complex values (7.0 dropped the imaginary part with a <code class="docutils literal notranslate"><span class="pre">ComplexWarning</span></code>), text
+that is not a number, objects that are not <code class="docutils literal notranslate"><span class="pre">array_like</span></code>, and a panel <code class="docutils literal notranslate"><span class="pre">dependent</span></code>
+or <code class="docutils literal notranslate"><span class="pre">exog</span></code> that is not a pandas, xarray or NumPy panel object, such as a list
+(<a class="extlink-issue reference external" href="https://github.com/bashtage/linearmodels/issues/776">GH776</a>).</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">clusters</span></code> with 3 or more columns raise a <code class="docutils literal notranslate"><span class="pre">ValueError</span></code> in <code class="docutils literal notranslate"><span class="pre">IV2SLS</span></code>, <code class="docutils literal notranslate"><span class="pre">IVLIML</span></code>
+and <code class="docutils literal notranslate"><span class="pre">AbsorbingLS</span></code>, which ignored the others, and <code class="docutils literal notranslate"><span class="pre">IVGMM</span></code> and <code class="docutils literal notranslate"><span class="pre">IVGMMCUE</span></code> accept a
+single column. Weights given as the name of a column to <code class="docutils literal notranslate"><span class="pre">from_formula</span></code> raise a
+<code class="docutils literal notranslate"><span class="pre">TypeError</span></code>. Text columns of <code class="docutils literal notranslate"><span class="pre">absorb</span></code> and <code class="docutils literal notranslate"><span class="pre">interactions</span></code> of <code class="docutils literal notranslate"><span class="pre">AbsorbingLS</span></code>
+raise a <code class="docutils literal notranslate"><span class="pre">TypeError</span></code> (<a class="extlink-issue reference external" href="https://github.com/bashtage/linearmodels/issues/259">GH259</a>, <a class="extlink-issue reference external" href="https://github.com/bashtage/linearmodels/issues/776">GH776</a>).</p></li>
+<li><p>Weights that are zero, negative or infinite raise a <code class="docutils literal notranslate"><span class="pre">ValueError</span></code> in every model (the
+system models name the equation). 7.0 accepted zero weights in <code class="docutils literal notranslate"><span class="pre">AbsorbingLS</span></code> and the
+system models, and failed with unclear errors for the others. A missing weight still
+drops the observation (<a class="extlink-issue reference external" href="https://github.com/bashtage/linearmodels/issues/776">GH776</a>, <a class="extlink-issue reference external" href="https://github.com/bashtage/linearmodels/issues/792">GH792</a>, <a class="extlink-issue reference external" href="https://github.com/bashtage/linearmodels/issues/799">GH799</a>, <a class="extlink-issue reference external" href="https://github.com/bashtage/linearmodels/issues/811">GH811</a>).</p></li>
+<li><p>Options are checked at the start of <code class="docutils literal notranslate"><span class="pre">fit</span></code>, and kernels when the model is created. A
+keyword argument that <code class="docutils literal notranslate"><span class="pre">cov_type</span></code> does not accept raises one <code class="docutils literal notranslate"><span class="pre">ValueError</span></code> in every
+model with <code class="docutils literal notranslate"><span class="pre">**cov_config</span></code> (7.0 raised <code class="docutils literal notranslate"><span class="pre">TypeError</span></code> in IV, absorbing and system
+models; asset pricing ignored it). An unknown <code class="docutils literal notranslate"><span class="pre">group</span></code> of <code class="docutils literal notranslate"><span class="pre">PanelData</span></code> and a panel
+<code class="docutils literal notranslate"><span class="pre">predict</span></code> without <code class="docutils literal notranslate"><span class="pre">exog</span></code> or <code class="docutils literal notranslate"><span class="pre">data</span></code> raise too (<a class="extlink-issue reference external" href="https://github.com/bashtage/linearmodels/issues/822">GH822</a>, <a class="extlink-issue reference external" href="https://github.com/bashtage/linearmodels/issues/833">GH833</a>).</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">dummy_matrix</span></code> raises a <code class="docutils literal notranslate"><span class="pre">ValueError</span></code> for a <code class="docutils literal notranslate"><span class="pre">drop</span></code> other than <code class="docutils literal notranslate"><span class="pre">&quot;first&quot;</span></code> or
+<code class="docutils literal notranslate"><span class="pre">&quot;last&quot;</span></code>. It treated any other value as <code class="docutils literal notranslate"><span class="pre">&quot;last&quot;</span></code> (<a class="extlink-issue reference external" href="https://github.com/bashtage/linearmodels/issues/835">GH835</a>, <a class="extlink-issue reference external" href="https://github.com/bashtage/linearmodels/issues/836">GH836</a>).</p></li>
+<li><p>Panel models raise a <code class="docutils literal notranslate"><span class="pre">ValueError</span></code> for duplicated (entity, time) rows, which 7.0
+treated as separate observations, and a <code class="docutils literal notranslate"><span class="pre">ValueError</span></code> if the bandwidth of a
+Driscoll-Kraay or Fama-MacBeth kernel covariance is not below the number of periods.
+The quadratic spectral kernel returned standard errors that were too small instead
+(<a class="extlink-issue reference external" href="https://github.com/bashtage/linearmodels/issues/810">GH810</a>, <a class="extlink-issue reference external" href="https://github.com/bashtage/linearmodels/issues/813">GH813</a>).</p></li>
+<li><p>Kernel estimators that select the bandwidth from the data need at least 4 observations
+(Bartlett), 5 (Parzen) or 6 (quadratic spectral), and raise a <code class="docutils literal notranslate"><span class="pre">ValueError</span></code> with
+fewer. 7.0 returned a bandwidth of <code class="docutils literal notranslate"><span class="pre">T</span> <span class="pre">-</span> <span class="pre">1</span></code> or an <code class="docutils literal notranslate"><span class="pre">OverflowError</span></code>. This includes
+<code class="docutils literal notranslate"><span class="pre">IVGMM</span></code> with its new default bandwidth (<a class="extlink-issue reference external" href="https://github.com/bashtage/linearmodels/issues/821">GH821</a>).</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">IVLIML</span></code> raises “Unable to estimate kappa” when there are too few observations for
+the cross product that LIML inverts. 7.0 returned the rounding error as kappa (for
+example 0.8125 instead of 1 with 3 observations) (<a class="extlink-issue reference external" href="https://github.com/bashtage/linearmodels/issues/824">GH824</a>).</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">AbsorbingLS.fit</span></code> raises a <code class="docutils literal notranslate"><span class="pre">ValueError</span></code> for a <code class="docutils literal notranslate"><span class="pre">method</span></code> other than <code class="docutils literal notranslate"><span class="pre">&quot;auto&quot;</span></code>,
+<code class="docutils literal notranslate"><span class="pre">&quot;hdfe&quot;</span></code> and <code class="docutils literal notranslate"><span class="pre">&quot;lsmr&quot;</span></code>, which used LSMR, and for <code class="docutils literal notranslate"><span class="pre">absorb_options</span></code> that belong to
+the other algorithm (<a class="extlink-issue reference external" href="https://github.com/bashtage/linearmodels/issues/752">GH752</a>, <a class="extlink-issue reference external" href="https://github.com/bashtage/linearmodels/issues/783">GH783</a>).</p></li>
+<li><p>Panel models raise a <code class="docutils literal notranslate"><span class="pre">ValueError</span></code> that says why when they cannot be estimated, where
+7.0 raised <code class="docutils literal notranslate"><span class="pre">ZeroDivisionError</span></code> or <code class="docutils literal notranslate"><span class="pre">LinAlgError</span></code>: no residual degrees of freedom, a
+<code class="docutils literal notranslate"><span class="pre">BetweenOLS</span></code> with regressors that are collinear in the entity means, and cluster ids
+that are missing or a single group (<a class="extlink-issue reference external" href="https://github.com/bashtage/linearmodels/issues/789">GH789</a>, <a class="extlink-issue reference external" href="https://github.com/bashtage/linearmodels/issues/799">GH799</a>).</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">LinearFactorModelGMM</span></code> raises a <code class="docutils literal notranslate"><span class="pre">ValueError</span></code> when the model is created if there
+are not more observations than moment conditions. A <code class="docutils literal notranslate"><span class="pre">sigma</span></code> of <code class="docutils literal notranslate"><span class="pre">LinearFactorModel</span></code>
+that is not symmetric and positive definite, and a saturated debiased asset pricing
+model, raise a <code class="docutils literal notranslate"><span class="pre">ValueError</span></code> (<a class="extlink-issue reference external" href="https://github.com/bashtage/linearmodels/issues/807">GH807</a>).</p></li>
 <li><p>With SciPy 2, the sparse helpers (<code class="docutils literal notranslate"><span class="pre">Interaction.sparse</span></code>, <code class="docutils literal notranslate"><span class="pre">dummy_matrix</span></code> and others)
 return sparse arrays, where <code class="docutils literal notranslate"><span class="pre">*</span></code> is elementwise. Use <code class="docutils literal notranslate"><span class="pre">&#64;</span></code> for matrix products
 (<a class="extlink-issue reference external" href="https://github.com/bashtage/linearmodels/issues/733">GH733</a>).</p></li>
@@ -618,28 +782,90 @@ return sparse arrays, where <code class="docutils literal notranslate"><span cla
 <li><p>Fixed <a class="reference internal" href="../iv/iv/linearmodels.iv.results.OLSResults.predict.html#linearmodels.iv.results.OLSResults.predict" title="linearmodels.iv.results.OLSResults.predict (Python method) — In- and out-of-sample predictions."><code class="xref py py-meth docutils literal notranslate"><span class="pre">predict()</span></code></a> for models without exogenous
 or without endogenous regressors (<a class="extlink-issue reference external" href="https://github.com/bashtage/linearmodels/issues/677">GH677</a>).</p></li>
 <li><p>A missing value in the entity or time index of a panel raises a clear <code class="docutils literal notranslate"><span class="pre">ValueError</span></code>
-(<a class="extlink-issue reference external" href="https://github.com/bashtage/linearmodels/issues/614">GH614</a>, <a class="extlink-issue reference external" href="https://github.com/bashtage/linearmodels/issues/716">GH716</a>).</p></li>
-<li><p><code class="docutils literal notranslate"><span class="pre">quadratic_form_test</span></code> raises a <code class="docutils literal notranslate"><span class="pre">TypeError</span></code> instead of an <code class="docutils literal notranslate"><span class="pre">AssertionError</span></code> if
-<code class="docutils literal notranslate"><span class="pre">formula</span></code> is used with <code class="docutils literal notranslate"><span class="pre">params</span></code> that is not a <code class="docutils literal notranslate"><span class="pre">Series</span></code> (<a class="extlink-issue reference external" href="https://github.com/bashtage/linearmodels/issues/690">GH690</a>).</p></li>
+in every panel model and in the group methods of <code class="docutils literal notranslate"><span class="pre">PanelData</span></code>. 7.0 raised a
+<code class="docutils literal notranslate"><span class="pre">LinAlgError</span></code> or returned data with NaN (<a class="extlink-issue reference external" href="https://github.com/bashtage/linearmodels/issues/614">GH614</a>, <a class="extlink-issue reference external" href="https://github.com/bashtage/linearmodels/issues/716">GH716</a>, <a class="extlink-issue reference external" href="https://github.com/bashtage/linearmodels/issues/764">GH764</a>).</p></li>
 <li><p>Fixed <code class="docutils literal notranslate"><span class="pre">AbsorbingLS</span></code> with missing values, which raised a <code class="docutils literal notranslate"><span class="pre">ValueError</span></code> in every
 release since 4.13. The incomplete observations are now dropped with a
 <code class="docutils literal notranslate"><span class="pre">MissingValueWarning</span></code>. With clustered covariances, <code class="docutils literal notranslate"><span class="pre">clusters</span></code> must have one row
-for each remaining observation.</p></li>
+for each remaining observation (<a class="extlink-issue reference external" href="https://github.com/bashtage/linearmodels/issues/766">GH766</a>).</p></li>
 <li><p>Fixed <code class="docutils literal notranslate"><span class="pre">AbsorbingLS</span></code> with an <code class="docutils literal notranslate"><span class="pre">Interaction</span></code> in which only <code class="docutils literal notranslate"><span class="pre">cat</span></code> or <code class="docutils literal notranslate"><span class="pre">cont</span></code> has
-labels, and <code class="docutils literal notranslate"><span class="pre">AbsorbingLS.fit</span></code> adding <code class="docutils literal notranslate"><span class="pre">drop_singletons</span></code> to its <code class="docutils literal notranslate"><span class="pre">absorb_options</span></code>.</p></li>
+labels, <code class="docutils literal notranslate"><span class="pre">AbsorbingLS.fit</span></code> adding <code class="docutils literal notranslate"><span class="pre">drop_singletons</span></code> to the <code class="docutils literal notranslate"><span class="pre">absorb_options</span></code> that
+were passed to it, and <code class="docutils literal notranslate"><span class="pre">fit</span></code> with the deprecated <code class="docutils literal notranslate"><span class="pre">lsmr_options</span></code> and the default
+method, which raised a <code class="docutils literal notranslate"><span class="pre">TypeError</span></code> when pyhdfe is used (<a class="extlink-issue reference external" href="https://github.com/bashtage/linearmodels/issues/752">GH752</a>, <a class="extlink-issue reference external" href="https://github.com/bashtage/linearmodels/issues/756">GH756</a>).</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">quadratic_form_test</span></code> raises a <code class="docutils literal notranslate"><span class="pre">TypeError</span></code> instead of an <code class="docutils literal notranslate"><span class="pre">AssertionError</span></code> if
+<code class="docutils literal notranslate"><span class="pre">formula</span></code> is used with <code class="docutils literal notranslate"><span class="pre">params</span></code> that is not a <code class="docutils literal notranslate"><span class="pre">Series</span></code> (<a class="extlink-issue reference external" href="https://github.com/bashtage/linearmodels/issues/690">GH690</a>).</p></li>
+<li><p>A <code class="docutils literal notranslate"><span class="pre">cov_type</span></code>, <code class="docutils literal notranslate"><span class="pre">weight_type</span></code> or <code class="docutils literal notranslate"><span class="pre">kernel</span></code> that is not supported raises an
+<code class="docutils literal notranslate"><span class="pre">UnknownOptionError</span></code> (both a <code class="docutils literal notranslate"><span class="pre">ValueError</span></code> and a <code class="docutils literal notranslate"><span class="pre">KeyError</span></code>) that suggests the
+closest name and lists the supported names, in every model. 7.0 raised a bare
+<code class="docutils literal notranslate"><span class="pre">KeyError</span></code> in many (<a class="extlink-issue reference external" href="https://github.com/bashtage/linearmodels/issues/808">GH808</a>).</p></li>
+<li><p>The <code class="docutils literal notranslate"><span class="pre">predict</span></code> method of the IV models with <code class="docutils literal notranslate"><span class="pre">data</span></code> evaluates the formula in the
+frame that calls it, and works at the top level of a script. Missing values in the
+dependent variable, the endogenous regressors or the instruments of an IV or system
+formula are dropped with a warning (<a class="extlink-issue reference external" href="https://github.com/bashtage/linearmodels/issues/774">GH774</a>).</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">from_formula</span></code> of the asset pricing models evaluates the formulas in the namespace
+of the caller, and drops the observations with missing values. <code class="docutils literal notranslate"><span class="pre">multivariate_iv</span></code>
+accepts <code class="docutils literal notranslate"><span class="pre">endog</span></code> and <code class="docutils literal notranslate"><span class="pre">instruments</span></code> without <code class="docutils literal notranslate"><span class="pre">exog</span></code> (<a class="extlink-issue reference external" href="https://github.com/bashtage/linearmodels/issues/777">GH777</a>, <a class="extlink-issue reference external" href="https://github.com/bashtage/linearmodels/issues/806">GH806</a>,
+<a class="extlink-issue reference external" href="https://github.com/bashtage/linearmodels/issues/804">GH804</a>).</p></li>
+<li><p>Fixed <code class="docutils literal notranslate"><span class="pre">LinearFactorModelGMM</span></code> ignoring <code class="docutils literal notranslate"><span class="pre">opt_options</span></code> after the first step, and the
+asset pricing models failing with an <code class="docutils literal notranslate"><span class="pre">OverflowError</span></code> in summaries with an infinite
+t-statistic, and with a <code class="docutils literal notranslate"><span class="pre">RuntimeWarning</span></code> for variances that are zero up to rounding
+(<a class="extlink-issue reference external" href="https://github.com/bashtage/linearmodels/issues/788">GH788</a>, <a class="extlink-issue reference external" href="https://github.com/bashtage/linearmodels/issues/807">GH807</a>).</p></li>
+<li><p>The adjusted R-squared of an IV model with as many parameters as observations is NaN,
+and the pooled F of <code class="docutils literal notranslate"><span class="pre">PanelOLS</span></code> with a zero residual sum of squares and the F
+statistic with a singular covariance are an <code class="docutils literal notranslate"><span class="pre">InvalidTestStatistic</span></code>. These raised
+errors. Weights of any finite size are scaled without overflow (<a class="extlink-issue reference external" href="https://github.com/bashtage/linearmodels/issues/811">GH811</a>,
+<a class="extlink-issue reference external" href="https://github.com/bashtage/linearmodels/issues/814">GH814</a>).</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">PanelOLS(singletons=False)</span></code> with clustered covariances, <code class="docutils literal notranslate"><span class="pre">RandomEffects</span></code> with
+arrays, <code class="docutils literal notranslate"><span class="pre">FirstDifferenceOLS</span></code> with array clusters and <code class="docutils literal notranslate"><span class="pre">PanelOLS</span></code> with entity and
+time effects for a single entity no longer fail with <code class="docutils literal notranslate"><span class="pre">IndexError</span></code>, <code class="docutils literal notranslate"><span class="pre">KeyError</span></code> or a
+misleading <code class="docutils literal notranslate"><span class="pre">ValueError</span></code>. A missing value in <code class="docutils literal notranslate"><span class="pre">other_effects</span></code> drops the observation
+(<a class="extlink-issue reference external" href="https://github.com/bashtage/linearmodels/issues/776">GH776</a>, <a class="extlink-issue reference external" href="https://github.com/bashtage/linearmodels/issues/795">GH795</a>, <a class="extlink-issue reference external" href="https://github.com/bashtage/linearmodels/issues/799">GH799</a>, <a class="extlink-issue reference external" href="https://github.com/bashtage/linearmodels/issues/810">GH810</a>).</p></li>
+<li><p>Fixed the time labels of a 3-d <code class="docutils literal notranslate"><span class="pre">xarray.DataArray</span></code> with <code class="docutils literal notranslate"><span class="pre">datetime64[ns]</span></code>
+coordinates, which were integers such as <code class="docutils literal notranslate"><span class="pre">946684800000000000</span></code>, and the
+<code class="docutils literal notranslate"><span class="pre">SettingWithCopyWarning</span></code> of pandas 2 in the clusters of <code class="docutils literal notranslate"><span class="pre">PanelOLS</span></code> (<a class="extlink-issue reference external" href="https://github.com/bashtage/linearmodels/issues/809">GH809</a>,
+<a class="extlink-issue reference external" href="https://github.com/bashtage/linearmodels/issues/822">GH822</a>).</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">IVSystemGMM(weight_type=&quot;kernel&quot;).fit(iter_limit=1)</span></code> no longer raises an
+<code class="docutils literal notranslate"><span class="pre">AssertionError</span></code>, <code class="docutils literal notranslate"><span class="pre">generate_panel_data</span></code> accepts a NumPy <code class="docutils literal notranslate"><span class="pre">Generator</span></code> and returns
+<code class="docutils literal notranslate"><span class="pre">clusters</span></code> with one row for each observation, and the helpers <code class="docutils literal notranslate"><span class="pre">has_constant</span></code> and
+<code class="docutils literal notranslate"><span class="pre">get_float</span></code> accept several constant columns and NumPy integers (<a class="extlink-issue reference external" href="https://github.com/bashtage/linearmodels/issues/775">GH775</a>,
+<a class="extlink-issue reference external" href="https://github.com/bashtage/linearmodels/issues/794">GH794</a>, <a class="extlink-issue reference external" href="https://github.com/bashtage/linearmodels/issues/799">GH799</a>).</p></li>
+<li><p>The Fama-MacBeth error for a panel that cannot be estimated says what a cross-section
+needs, and its kernel covariance no longer issues a <code class="docutils literal notranslate"><span class="pre">RuntimeWarning</span></code> before the
+<code class="docutils literal notranslate"><span class="pre">ValueError</span></code> for an estimate that does not vary (<a class="extlink-issue reference external" href="https://github.com/bashtage/linearmodels/issues/772">GH772</a>, <a class="extlink-issue reference external" href="https://github.com/bashtage/linearmodels/issues/826">GH826</a>).</p></li>
+<li><p>Fixed the LaTeX output of <code class="docutils literal notranslate"><span class="pre">Summary</span></code>, which did not escape special characters such as
+underscores in the extra text (<a class="extlink-issue reference external" href="https://github.com/bashtage/linearmodels/issues/791">GH791</a>).</p></li>
 <li><p>Fixed the <code class="docutils literal notranslate"><span class="pre">dev</span></code> extra, which listed <code class="docutils literal notranslate"><span class="pre">pandas-stubsl</span></code>, and added xarray to the
-<code class="docutils literal notranslate"><span class="pre">test</span></code> extra.</p></li>
+<code class="docutils literal notranslate"><span class="pre">test</span></code> extra (<a class="extlink-issue reference external" href="https://github.com/bashtage/linearmodels/issues/757">GH757</a>).</p></li>
 </ul>
 <p class="rubric">Documentation and maintenance</p>
 <ul class="simple">
 <li><p>Corrected the Driscoll-Kraay index in the math documentation, fixed typos and improved
-the type annotations (<a class="extlink-issue reference external" href="https://github.com/bashtage/linearmodels/issues/704">GH704</a>, <a class="extlink-issue reference external" href="https://github.com/bashtage/linearmodels/issues/697">GH697</a>, <a class="extlink-issue reference external" href="https://github.com/bashtage/linearmodels/issues/721">GH721</a>).</p></li>
-<li><p>Added a security policy (<code class="docutils literal notranslate"><span class="pre">SECURITY.md</span></code>).</p></li>
+the type annotations (<a class="extlink-issue reference external" href="https://github.com/bashtage/linearmodels/issues/704">GH704</a>, <a class="extlink-issue reference external" href="https://github.com/bashtage/linearmodels/issues/697">GH697</a>, <a class="extlink-issue reference external" href="https://github.com/bashtage/linearmodels/issues/721">GH721</a>). Added a security
+policy (<code class="docutils literal notranslate"><span class="pre">SECURITY.md</span></code>) (<a class="extlink-issue reference external" href="https://github.com/bashtage/linearmodels/issues/757">GH757</a>).</p></li>
+<li><p>The docstrings follow the numpydoc rules, which are checked by a lint, and say which
+option names are accepted, that they are not case sensitive, and where <code class="docutils literal notranslate"><span class="pre">extra_df</span></code> is
+accepted. The panel <code class="docutils literal notranslate"><span class="pre">fit</span></code> examples run as they are, and the documentation builds
+without warnings (<a class="extlink-issue reference external" href="https://github.com/bashtage/linearmodels/issues/759">GH759</a>, <a class="extlink-issue reference external" href="https://github.com/bashtage/linearmodels/issues/767">GH767</a>, <a class="extlink-issue reference external" href="https://github.com/bashtage/linearmodels/issues/828">GH828</a>, <a class="extlink-issue reference external" href="https://github.com/bashtage/linearmodels/issues/829">GH829</a>,
+<a class="extlink-issue reference external" href="https://github.com/bashtage/linearmodels/issues/830">GH830</a>, <a class="extlink-issue reference external" href="https://github.com/bashtage/linearmodels/issues/834">GH834</a>).</p></li>
+<li><p>New and extended pages of the user guide: aligning inputs, the mathematics of
+<code class="docutils literal notranslate"><span class="pre">IVJIVE</span></code>, the J and C statistics and the specification tests, the panel
+specification tests, small-sample adjustments, estimated effects and
+<code class="docutils literal notranslate"><span class="pre">WARN_ON_MISSING</span></code>, which turns off the <code class="docutils literal notranslate"><span class="pre">MissingValueWarning</span></code> (<a class="extlink-issue reference external" href="https://github.com/bashtage/linearmodels/issues/531">GH531</a>,
+<a class="extlink-issue reference external" href="https://github.com/bashtage/linearmodels/issues/773">GH773</a>, <a class="extlink-issue reference external" href="https://github.com/bashtage/linearmodels/issues/782">GH782</a>).</p></li>
+<li><p>The IV and panel example notebooks show the new features and the corrected statements
+(<a class="extlink-issue reference external" href="https://github.com/bashtage/linearmodels/issues/770">GH770</a>, <a class="extlink-issue reference external" href="https://github.com/bashtage/linearmodels/issues/790">GH790</a>).</p></li>
+<li><p>The tests do not leak warnings with any supported combination of versions, and the
+minimum versions of statsmodels (0.14.6) and pyhdfe (0.2.0) were raised for this
+(<a class="extlink-issue reference external" href="https://github.com/bashtage/linearmodels/issues/751">GH751</a>, <a class="extlink-issue reference external" href="https://github.com/bashtage/linearmodels/issues/826">GH826</a>).</p></li>
 </ul>
 <p class="rubric">Compatibility</p>
 <ul class="simple">
 <li><p>Python 3.10 to 3.15, NumPy 1.23.5 and later including NumPy 2, and pandas 1.4.0 and
-later including pandas 3 are supported. Wheels are built for Python 3.15.</p></li>
+later including pandas 3 are supported (<a class="extlink-issue reference external" href="https://github.com/bashtage/linearmodels/issues/757">GH757</a>).</p></li>
+<li><p>Wheels are built for CPython 3.10 to 3.15 on manylinux (x86-64 and aarch64), musllinux
+(x86-64), Windows (AMD64) and macOS (x86-64 and arm64). There are no wheels for the
+free-threaded builds (3.14t and 3.15t) or Windows ARM64. Wheels are built against
+NumPy 2 and run with NumPy 1.23.5 or later.</p></li>
 <li><p>Ready for SciPy 2 and pandas 4: the deprecation warnings that 7.0 gave with their
 development versions are gone (<a class="extlink-issue reference external" href="https://github.com/bashtage/linearmodels/issues/733">GH733</a>).</p></li>
 <li><p>The tests of the oldest supported versions now install them (<a class="extlink-issue reference external" href="https://github.com/bashtage/linearmodels/issues/751">GH751</a>).</p></li>
@@ -648,26 +874,34 @@ development versions are gone (<a class="extlink-issue reference external" href=
 <ul class="simple">
 <li><p><strong>7.1 is the last release to support Python 3.10 and NumPy 1.x.</strong> Later releases will
 raise the minimum versions of Python, NumPy and the other dependencies.</p></li>
-<li><p>The <code class="docutils literal notranslate"><span class="pre">lsmr_options</span></code> argument of
-<a class="reference internal" href="../iv/absorbing/linearmodels.iv.absorbing.AbsorbingLS.fit.html#linearmodels.iv.absorbing.AbsorbingLS.fit" title="linearmodels.iv.absorbing.AbsorbingLS.fit (Python method) — Estimate model parameters."><code class="xref py py-meth docutils literal notranslate"><span class="pre">fit()</span></code></a> and the
-<code class="docutils literal notranslate"><span class="pre">linearmodels.__future__.ordering</span></code> module will be removed in 8.0. Importing the
-module now emits a <code class="docutils literal notranslate"><span class="pre">FutureWarning</span></code>.</p></li>
+<li><p>The <code class="docutils literal notranslate"><span class="pre">lsmr_options</span></code> argument of <a class="reference internal" href="../iv/absorbing/linearmodels.iv.absorbing.AbsorbingLS.fit.html#linearmodels.iv.absorbing.AbsorbingLS.fit" title="linearmodels.iv.absorbing.AbsorbingLS.fit (Python method) — Estimate model parameters."><code class="xref py py-meth docutils literal notranslate"><span class="pre">fit()</span></code></a>
+and the <code class="docutils literal notranslate"><span class="pre">linearmodels.__future__.ordering</span></code> module will be removed in 8.0. Importing
+the module now emits a <code class="docutils literal notranslate"><span class="pre">FutureWarning</span></code> (<a class="extlink-issue reference external" href="https://github.com/bashtage/linearmodels/issues/752">GH752</a>).</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">linearmodels.DROP_MISSING</span></code> and the environment variable
+<code class="docutils literal notranslate"><span class="pre">LINEARMODELS_DROP_MISSING</span></code> have never had an effect, since observations with
+missing values are always dropped. Reading them emits a <code class="docutils literal notranslate"><span class="pre">FutureWarning</span></code>, and both
+will be removed in 8.0. Use <code class="docutils literal notranslate"><span class="pre">WARN_ON_MISSING</span></code> to turn off the
+<code class="docutils literal notranslate"><span class="pre">MissingValueWarning</span></code> (<a class="extlink-issue reference external" href="https://github.com/bashtage/linearmodels/issues/531">GH531</a>, <a class="extlink-issue reference external" href="https://github.com/bashtage/linearmodels/issues/782">GH782</a>).</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">DefaultBandwidthWarning</span></code>, which <code class="docutils literal notranslate"><span class="pre">IVGMM</span></code>, <code class="docutils literal notranslate"><span class="pre">IVGMMCUE</span></code> and <code class="docutils literal notranslate"><span class="pre">IVSystemGMM</span></code> issue
+when a kernel estimator uses the default bandwidth, which changed in 7.1, will be
+removed in 8.0. Passing <code class="docutils literal notranslate"><span class="pre">bandwidth</span></code> or <code class="docutils literal notranslate"><span class="pre">optimal_bw</span></code> silences it (<a class="extlink-issue reference external" href="https://github.com/bashtage/linearmodels/issues/794">GH794</a>).</p></li>
 </ul>
 <p class="rubric">Minimum versions</p>
 <ul class="simple">
-<li><p>Unchanged (Python 3.10, NumPy 1.23.5, SciPy 1.8.0, pandas 1.4.0, formulaic 1.2.1)
-except numpy, which moved from 1.22 to 1.23, and statsmodels, which is 0.13.1, the first
-release with a Python 3.10 wheel. The 7.0 notes listed formulaic 1.0.0, but 7.0
-already required 1.2.1.</p></li>
-<li><p><code class="docutils literal notranslate"><span class="pre">packaging</span></code> is now a declared dependency. Building from source requires
-Cython 3.1.0, and running the tests requires pytest 9.</p></li>
+<li><p>Unchanged (Python 3.10, SciPy 1.8.0, pandas 1.4.0, formulaic 1.2.1) except NumPy,
+which moved from 1.22 to 1.23.5, statsmodels, which moved from 0.13.0 to 0.14.6, the
+first release that imports with pandas 3, and pyhdfe, which moved from 0.1 to 0.2.0
+(0.1.0 and 0.1.1 fail on NumPy 1.24 to 1.26). The 7.0 notes listed formulaic 1.0.0,
+but 7.0 already required 1.2.1.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">packaging</span></code> is now a declared dependency. Building from source requires Cython
+3.1.0, and running the tests requires pytest 9 and xarray (<a class="extlink-issue reference external" href="https://github.com/bashtage/linearmodels/issues/757">GH757</a>).</p></li>
 </ul>
 <p class="rubric">Contributors</p>
 <ul class="simple">
 <li><p>Thanks to shaneraphel (<a class="extlink-issue reference external" href="https://github.com/bashtage/linearmodels/issues/725">GH725</a>, <a class="extlink-issue reference external" href="https://github.com/bashtage/linearmodels/issues/726">GH726</a>, <a class="extlink-issue reference external" href="https://github.com/bashtage/linearmodels/issues/730">GH730</a>), raashish1601
 (<a class="extlink-issue reference external" href="https://github.com/bashtage/linearmodels/issues/734">GH734</a>, <a class="extlink-issue reference external" href="https://github.com/bashtage/linearmodels/issues/735">GH735</a>, <a class="extlink-issue reference external" href="https://github.com/bashtage/linearmodels/issues/736">GH736</a>, <a class="extlink-issue reference external" href="https://github.com/bashtage/linearmodels/issues/737">GH737</a>, <a class="extlink-issue reference external" href="https://github.com/bashtage/linearmodels/issues/738">GH738</a>), nyxst4ck
-(<a class="extlink-issue reference external" href="https://github.com/bashtage/linearmodels/issues/704">GH704</a>), shuxue6662-a11y (<a class="extlink-issue reference external" href="https://github.com/bashtage/linearmodels/issues/716">GH716</a>), aeshef (<a class="extlink-issue reference external" href="https://github.com/bashtage/linearmodels/issues/690">GH690</a>) and maxime2476
-(<a class="extlink-issue reference external" href="https://github.com/bashtage/linearmodels/issues/697">GH697</a>).</p></li>
+(<a class="extlink-issue reference external" href="https://github.com/bashtage/linearmodels/issues/704">GH704</a>), shuxue6662-a11y (<a class="extlink-issue reference external" href="https://github.com/bashtage/linearmodels/issues/716">GH716</a>), aeshef (<a class="extlink-issue reference external" href="https://github.com/bashtage/linearmodels/issues/690">GH690</a>), maxime2476
+(<a class="extlink-issue reference external" href="https://github.com/bashtage/linearmodels/issues/697">GH697</a>) and omadson (<a class="extlink-issue reference external" href="https://github.com/bashtage/linearmodels/issues/791">GH791</a>).</p></li>
 <li><p>The new features complete earlier pull requests by hass-nation (<a class="extlink-issue reference external" href="https://github.com/bashtage/linearmodels/issues/701">GH701</a>,
 <a class="extlink-issue reference external" href="https://github.com/bashtage/linearmodels/issues/702">GH702</a>, <a class="extlink-issue reference external" href="https://github.com/bashtage/linearmodels/issues/703">GH703</a>), AyuG619 (<a class="extlink-issue reference external" href="https://github.com/bashtage/linearmodels/issues/713">GH713</a>), eirki (<a class="extlink-issue reference external" href="https://github.com/bashtage/linearmodels/issues/249">GH249</a>) and
 shaneraphel (<a class="extlink-issue reference external" href="https://github.com/bashtage/linearmodels/issues/731">GH731</a>).</p></li>

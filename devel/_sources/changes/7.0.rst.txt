@@ -1,44 +1,73 @@
 Version 7.1
 -----------
 
-.. TODO(R2): Add the release date.
-.. TODO(R2): Add PR numbers to the entries from PKG1, BUG1, BUG3a/b, DOC1, BUG6, FIX1.
+.. TODO(REL1): Add the release date.
+.. TODO(RC1): Rerun the REG1 comparison of 7.0 and the release candidate and check the
+   entries above against it. The differences that REG1 expects are the ones of the label
+   rule, the default kernel bandwidths, the panel clusters and weights, and the IV
+   features, so add any other difference that it finds.
+.. TODO(RC1): State the versions that RC1 tested (Python 3.15.0, NumPy, pandas, SciPy,
+   statsmodels and formulaic) in "Compatibility".
 
 .. rubric:: Highlights
 
 - New estimators and tests: :class:`~linearmodels.iv.model.IVJIVE`, first-stage rank
-  tests, a centered J test, and the Hausman and Pesaran CD tests for panel models.
-- Several corrections change the numbers that unchanged code produced in 7.0. See
-  *Changes that alter results*.
-- Inputs with labels must have the same index as ``dependent`` in every estimator. See
-  *Backward-incompatible changes*.
-- Python 3.15 is supported. **7.1 is the last release to support Python 3.10 and
-  NumPy 1.x.**
+  tests, a centered J test, the Hausman and Pesaran CD tests for panel models, and panel
+  models that only have effects.
+- Many corrections change the numbers that unchanged code produced in 7.0, including the
+  default bandwidth of the kernel estimators of ``IVGMM``, ``IVGMMCUE`` and
+  ``IVSystemGMM``, the Fama-MacBeth p-values and the weighted panel and system models.
+  See *Changes that alter results*.
+- Inputs with labels must have the same index as ``dependent`` (or as the first input
+  with labels) in every estimator, and input of the wrong type now raises a clear
+  ``TypeError`` or ``ValueError``. See *Backward-incompatible changes*.
+- Python 3.15 is supported. **7.1 is the last release to support Python 3.10 and NumPy
+  1.x.**
 
 .. rubric:: New features
 
 - Added :class:`~linearmodels.iv.model.IVJIVE`, the jackknife IV estimator (JIVE1), with
-  unadjusted, robust, kernel and one-way clustered covariances. It can be imported from
-  ``linearmodels`` (:issue:`750`).
+  unadjusted, robust, kernel and one-way clustered covariances. The bandwidth of its
+  kernel covariance is selected from the data, as in ``IV2SLS`` and ``IVLIML``. Two-way
+  clusters raise a ``ValueError``. It can be imported from ``linearmodels``
+  (:issue:`750`, :issue:`763`, :issue:`765`).
 - Added the Cragg-Donald and Kleibergen-Paap tests of the rank of the first-stage
-  coefficient matrix. They are available as properties of
-  :class:`~linearmodels.iv.results.FirstStageResults` and as the functions
-  ``cragg_donald``, ``cragg_donald_f``, ``kleibergen_paap`` and ``kleibergen_paap_f`` of
-  ``linearmodels.iv`` (:issue:`741`, :issue:`622`).
+  coefficients, as properties of :class:`~linearmodels.iv.results.FirstStageResults` and
+  as functions that can be imported from ``linearmodels.iv`` (:issue:`741`,
+  :issue:`622`, :issue:`765`).
 - Added :attr:`~linearmodels.iv.results.IVGMMResults.centered_j_stat`, a J test of the
-  overidentifying restrictions that uses a centered moment covariance (:issue:`749`).
+  overidentifying restrictions that uses a centered moment covariance (:issue:`749`,
+  :issue:`763`).
 - Added :meth:`~linearmodels.panel.results.RandomEffectsResults.hausman`, the Hausman
-  test of random effects against fixed effects. It matches Stata and returns a
-  :class:`~linearmodels.panel.results.HausmanTestResults` named tuple (:issue:`740`).
+  test of random effects against fixed effects. It matches Stata and ``plm::phtest``,
+  and raises a ``ValueError`` if the models differ in observations, dependent variable
+  or weights (:issue:`740`, :issue:`761`).
 - Added :attr:`~linearmodels.panel.results.PanelResults.pesaran_cd`, the Pesaran CD test
-  of cross-sectional dependence, which returns a new
-  :class:`~linearmodels.shared.hypotheses.NormalTestStatistic`. It returns an
-  ``InapplicableTestStatistic`` for ``BetweenOLS``, ``FamaMacBeth`` and models with time
-  effects or effects concentrated in some periods (:issue:`739`).
+  of cross-sectional dependence. It uses the idiosyncratic shocks (for
+  ``FirstDifferenceOLS`` the residuals of the differenced equation) and is inapplicable
+  to ``BetweenOLS``, ``FamaMacBeth`` and models with time effects (:issue:`739`,
+  :issue:`771`).
+- ``PanelOLS`` estimates models that only have effects, ``y = a_i + g_t + e``, with an
+  ``exog`` that has no columns or the formula ``"y ~ EntityEffects"``. These raised
+  pandas' "No objects to concatenate" (:issue:`809`).
+- A ``PeriodIndex`` of time labels is accepted by the panel models and converted to
+  timestamps (:issue:`810`).
+- Lists, tuples and other ``array_like`` objects are accepted for every ``array_like``
+  parameter of the IV, absorbing, system, asset pricing and panel models, including
+  ``clusters``, ``weights`` and ``other_effects``. 7.0 raised ``AttributeError: 'list'
+  object has no attribute 'ndim'`` for many of them (:issue:`776`).
+- 1-d arrays are accepted as the ``clusters`` and ``other_effects`` of the panel models,
+  and as ``weights`` with a value for each row of an unbalanced panel. A one-column
+  DataFrame of panel weights is read by its labels. ``BetweenOLS`` and
+  ``FirstDifferenceOLS`` accept text and categorical ``clusters`` (:issue:`776`,
+  :issue:`825`, :issue:`827`, :issue:`833`).
+- The names of options are not case sensitive: ``cov_type``, ``weight_type`` and
+  ``kernel`` in every model, the ``group`` of ``PanelData`` and the ``drop`` of
+  ``dummy_matrix``. ``cov_type="Robust"`` and ``kernel="Bartlett"`` give the results of
+  the lower case names (:issue:`833`, :issue:`836`).
 - ``linearmodels.iv.common`` and ``linearmodels.iv.results`` define ``__all__``, so that
-  ``import *`` no longer imports the modules and functions that they import.
-
-.. TODO(R2): State the series that FirstDifferenceOLS.pesaran_cd uses (open decision).
+  ``import *`` no longer imports the modules and functions that they import
+  (:issue:`765`).
 
 .. rubric:: Changes that alter results
 
@@ -52,117 +81,309 @@ Version 7.1
   ``IVGMMCUE`` models uses the correct moment conditions and the ``weight_type`` of the
   model. 7.0 ignored the weight type (:issue:`744`).
 - :class:`~linearmodels.iv.model.IVGMMCUE` centers the moment conditions by default, as
-  documented. This changes its estimates and J statistic (J goes from 0.775 to 2.096 in
-  the ``mroz`` example with kernel weights). Pass ``center=False`` to get the 7.0
-  results. With clustered weights it needs more clusters than moment conditions
-  (:issue:`746`).
+  documented. With the new default bandwidth (below) the J statistic of the ``mroz``
+  example with kernel weights goes from 0.775 to 0.379 and the coefficient on ``educ``
+  from 0.0419 to 0.0637. Pass ``center=False`` and ``optimal_bw=False`` to get the 7.0
+  results (:issue:`746`).
+- **The default bandwidth of the kernel estimators of** ``IVGMM`` **and** ``IVGMMCUE``
+  **is selected from the data.** 7.0 used ``nobs - 2``, and the 95% intervals covered
+  64% to 70% in a simulation (92% to 95% now). In the ``mroz`` example the bandwidth
+  goes from 426 to 3 and the J statistic of ``IVGMM`` from 0.797 to 0.377
+  (:issue:`794`).
+- A model that uses the default bandwidth issues a ``DefaultBandwidthWarning``. Pass
+  ``optimal_bw=False`` (or ``bandwidth=nobs - 2``) to get the 7.0 numbers, or
+  ``optimal_bw=True`` to silence the warning. ``IVGMMCUE`` estimates the bandwidth once,
+  from the first step residuals, so its results with ``optimal_bw=True`` change slightly
+  (:issue:`794`).
+- **The default bandwidth of the kernel weight matrix of** ``IVSystemGMM`` **is selected
+  from the data,** with the same warning and the same ``optimal_bw=False`` to restore
+  ``nobs - 2``. In a simulation with AR(1) errors the 5% J test never rejected valid
+  instruments in 7.0, and rejects 2% to 5% of the time now (:issue:`794`).
+- ``IVGMM`` raises a ``ValueError`` when the covariance of the moment conditions is
+  singular, which happens with too few clusters. 7.0 returned meaningless estimates.
+  ``IVGMMCUE`` raises it instead of ``LinAlgError``, and also for as many clusters as
+  moment conditions with ``center=False``. ``c_stat`` is an ``InvalidTestStatistic`` if
+  its model has too few clusters (:issue:`754`, :issue:`785`).
 - ``IVGMMResults.weight_config`` is the ``dict`` of the weight configuration. 7.0
   returned the name of the weight type, which is ``weight_type`` (:issue:`747`).
-- Weighted ``RandomEffects`` scales the entity means by the root weights, which changes
-  its estimates, R-squared and F statistic (:issue:`738`).
-- ``FirstDifferenceOLS`` differences in time order. 7.0 differenced against non-adjacent
-  periods if the first entity enters late or has a gap (:issue:`726`).
-- ``PanelOLS(drop_absorbed=True)`` with entity effects and a constant now drops the
-  regressors if none of them varies within entities. 7.0 kept them (:issue:`730`).
-- Panel weights given by period, by entity or as a table are placed by label. 7.0 used
-  the wrong rows unless the data was sorted by entity and then by period (:issue:`748`).
-- Weighted ``IV3SLS`` uses a weighted first stage, which changes its estimates.
-  ``IVSystemGMM`` is unchanged (:issue:`734`).
-- The default ``unadjusted`` covariance of ``SUR`` and ``IV3SLS`` with ``iterate=True``
-  uses the final residual covariance, which changes standard errors (:issue:`736`).
-- Repeated calls to ``AbsorbingLS.fit`` no longer change ``df_model``, ``df_resid`` and
-  the adjusted R-squared of later fits (:issue:`735`). They also use the ``method`` and
-  ``absorb_options`` of each call, not those of the first call.
 - ``IVGMMCUE`` results report ``IV-GMM-CUE`` as the estimator (``method``, the summary
-  and ``compare``) instead of ``IV-GMM``.
+  and ``compare``) instead of ``IV-GMM`` (:issue:`753`).
+- The weights of the IV models are scaled to a mean of 1 after the observations with
+  missing values are dropped. ``resid_ss``, ``s2``, ``total_ss`` and ``wresids`` were
+  off by the ratio of the means of the weights (1.0023 in a simulation). Only models
+  with both weights and missing values change (:issue:`776`).
+- The Anderson-Rubin and Basmann F tests are an ``InvalidTestStatistic``, and ``IVLIML``
+  raises, when kappa cannot be estimated from so few observations. 7.0 returned its
+  rounding error (:issue:`824`).
+- Every R-squared is NaN, with no error or warning, if the total sum of squares of the
+  dependent variable is zero, for example if it is constant. 7.0 raised a
+  ``ZeroDivisionError``, or returned -inf or rounding noise (:issue:`814`).
 - p-values use the survival function, so p-values below about 1e-16 are no longer 0.
   Tiny p-values print in scientific notation in first-stage summaries and ``compare()``
   (:issue:`742`).
-
-.. TODO(R2): State the default kernel bandwidth of IVGMM and IVGMMCUE (open decision).
-.. TODO(R2): Add the FIX2 errors for c_stat and clustered IVGMMCUE with few clusters.
-.. TODO(R2): Check the entries above against the REG1 rerun on the release candidate.
+- ``AbsorbingLS(debiased=True)`` counts the absorbed terms in the small-sample
+  adjustment, as ``PanelOLS`` does. The standard errors are larger, by 7.7% for the
+  Grunfeld data with firm and year effects. ``debiased=False`` is unchanged
+  (:issue:`778`).
+- The regressors that the effects absorb in ``AbsorbingLS`` and ``PanelOLS`` are found
+  with a relative tolerance of 1e-5. 7.0 kept some of them, with huge standard errors,
+  and depended on the units. With a constant, ``drop_absorbed=True`` keeps the constant,
+  and ``absorbed_effects`` is ``fitted_values - exog @ params`` (:issue:`779`,
+  :issue:`786`).
+- ``PanelOLS(drop_absorbed=True)`` with entity effects and a constant now drops the
+  regressors if none of them varies within entities. 7.0 kept them (:issue:`730`).
+- Repeated calls to ``AbsorbingLS.fit`` no longer change ``df_model``, ``df_resid`` and
+  the adjusted R-squared of later fits, and use the ``method`` and ``absorb_options`` of
+  each call (:issue:`735`, :issue:`752`).
+- ``FirstDifferenceOLS`` differences in time order and only adjacent periods. 7.0
+  differenced against non-adjacent periods if the first entity enters late or has a gap
+  (:issue:`726`, :issue:`813`).
+- Weighted ``RandomEffects`` scales the entity means by the root weights, which changes
+  its estimates, R-squared and F statistic (:issue:`738`).
+- The variance components of ``RandomEffects`` use the ranks of the within and between
+  regressions as degrees of freedom, as plm and Stata do. Models with regressors that
+  are constant within entities change slightly (theta 0.6429 instead of 0.6451 in the
+  wage panel), and so does ``small_sample=True`` (:issue:`798`).
+- The classical F statistic of weighted panel models (and of ``RandomEffects`` on
+  unbalanced panels) was wrong by a factor of about 4 in the wage panel with ``hours``
+  as weights. The fit measures of weighted ``FamaMacBeth`` no longer depend on the scale
+  of the weights (R-squared -2183 instead of 0.0033) (:issue:`797`).
+- The log-likelihood of weighted panel models includes the term 0.5 sum(ln w), as
+  statsmodels' ``WLS`` does. It goes from -3065.75 to -3153.16 for ``PooledOLS`` in the
+  wage panel with ``hours`` as weights (:issue:`815`). ``PanelOLS`` scales the weights
+  after it drops singletons, which changes ``s2`` only (:issue:`833`).
+- Panel weights given by period, by entity or as a table are placed by label. 7.0 used
+  the wrong rows unless the data was sorted by entity and then by period. Clusters and
+  other effects given as a table of time periods by entities are placed in the same way,
+  and work on unbalanced panels (:issue:`748`, :issue:`822`).
+- The panel models can combine ``clusters`` without the labels of ``dependent`` with
+  ``cluster_entity=True`` or ``cluster_time=True``. 7.0 gave wrong standard errors
+  without an error (:issue:`776`).
+- ``cov_type="ac"`` of the panel models sums the products of the scores over entities,
+  as plm and statsmodels do, so unbalanced panels change (7% in an example). Entities
+  that are shorter than the bandwidth keep the weights of the kernel (0.4% to 11% in a
+  panel of short entities) (:issue:`800`, :issue:`813`).
+- ``PanelOLS`` with two cluster variables no longer depends on their order. The degrees
+  of freedom are corrected if the effect is nested in the last variable but not the
+  first (7% in an example) (:issue:`795`).
+- ``FamaMacBeth`` p-values and confidence intervals use a t distribution with T - 1
+  degrees of freedom, where 7.0 used ``nobs - nvar`` (the p-value of ``union`` in the
+  wage panel goes from 7e-20 to 4e-5). ``f_statistic_robust`` is Hotelling's test, which
+  rejected a true null 20% to 41% of the time in 7.0. ``debiased=False`` is unchanged
+  (:issue:`772`, :issue:`796`).
+- Models fit with ``check_rank=False`` use the number of columns as the rank, and
+  constants that are not columns (dummies that sum to one) are detected exactly.
+  R-squared values were wrong (0.2942 instead of 0.1877 in one example) (:issue:`799`,
+  :issue:`812`).
+- Weighted ``SUR`` and ``IV3SLS`` with GLS use the weighted residuals in the robust,
+  kernel and clustered covariances, which were too small by up to 29%. Their R-squared
+  use the weighted residuals, and ``resids`` are always ``y - x b`` (:issue:`787`,
+  :issue:`784`).
+- Weighted ``IV3SLS`` uses a weighted first stage, which changes its estimates.
+  ``IVSystemGMM`` is unchanged (:issue:`734`). The default ``unadjusted`` covariance of
+  ``SUR`` and ``IV3SLS`` with ``iterate=True`` uses the final residual covariance
+  (:issue:`736`).
+- ``IV3SLS`` uses GLS (3SLS) when the equations have the same regressors but different
+  instruments, where 7.0 used equation by equation 2SLS (:issue:`793`).
+- ``nobs`` of the results of ``SUR``, ``IV3SLS`` and ``IVSystemGMM`` is the number of
+  observations of each equation, not of all equations (360 for 3 equations with 120
+  observations). ``df_resid`` is unchanged (:issue:`803`).
+- The J statistic of ``LinearFactorModel`` uses the rank of the pricing errors, and
+  rejected a correct model too often (12.5% at the 5% level in a simulation, 10% now)
+  (:issue:`805`).
+- The standard errors of the alphas of ``LinearFactorModelGMM`` account for the
+  estimation of the parameters and were up to 3 times too large. The risk premia block
+  of ``cov`` of ``TradedFactorModel`` with ``debiased=True`` divides by ``nobs - 1``
+  (:issue:`805`).
+- ``LinearFactorModelGMM`` reports the J statistic of the minimized CUE objective (0.5%
+  to 8% smaller), and its ``std_errors`` table is laid out correctly: in 7.0 most cells
+  held the standard error of another parameter (:issue:`781`, :issue:`788`).
 
 .. rubric:: Backward-incompatible changes
 
 - Inputs with labels, such as a pandas ``Series`` or ``DataFrame`` with an index, must
   have the same index as ``dependent`` in every IV, absorbing, system, asset pricing and
-  panel model. 7.0 paired inputs with different labels by position without an error.
-  They now raise a ``ValueError``: reindex the input, or use ``.to_numpy()`` to pair by
-  position. Nothing is compared if ``dependent`` has no labels (:issue:`748`).
+  panel model. If ``dependent`` has no labels, the first input with labels is the
+  reference. 7.0 paired inputs with different labels by position without an error
+  (:issue:`748`, :issue:`756`, :issue:`776`).
+- Inputs whose labels do not match raise a ``ValueError``: reindex the input, or use
+  ``.to_numpy()`` to pair by position. The same dates stored at different resolutions
+  are the same labels (:issue:`820`).
 - A system of equations whose equations have different numbers of observations raises a
-  ``ValueError`` when the model is created.
+  ``ValueError`` when the model is created (:issue:`756`).
+- Input that cannot be used raises a ``TypeError`` or ``ValueError`` that names the
+  input: complex values (7.0 dropped the imaginary part with a ``ComplexWarning``), text
+  that is not a number, objects that are not ``array_like``, and a panel ``dependent``
+  or ``exog`` that is not a pandas, xarray or NumPy panel object, such as a list
+  (:issue:`776`).
+- ``clusters`` with 3 or more columns raise a ``ValueError`` in ``IV2SLS``, ``IVLIML``
+  and ``AbsorbingLS``, which ignored the others, and ``IVGMM`` and ``IVGMMCUE`` accept a
+  single column. Weights given as the name of a column to ``from_formula`` raise a
+  ``TypeError``. Text columns of ``absorb`` and ``interactions`` of ``AbsorbingLS``
+  raise a ``TypeError`` (:issue:`259`, :issue:`776`).
+- Weights that are zero, negative or infinite raise a ``ValueError`` in every model (the
+  system models name the equation). 7.0 accepted zero weights in ``AbsorbingLS`` and the
+  system models, and failed with unclear errors for the others. A missing weight still
+  drops the observation (:issue:`776`, :issue:`792`, :issue:`799`, :issue:`811`).
+- Options are checked at the start of ``fit``, and kernels when the model is created. A
+  keyword argument that ``cov_type`` does not accept raises one ``ValueError`` in every
+  model with ``**cov_config`` (7.0 raised ``TypeError`` in IV, absorbing and system
+  models; asset pricing ignored it). An unknown ``group`` of ``PanelData`` and a panel
+  ``predict`` without ``exog`` or ``data`` raise too (:issue:`822`, :issue:`833`).
+- ``dummy_matrix`` raises a ``ValueError`` for a ``drop`` other than ``"first"`` or
+  ``"last"``. It treated any other value as ``"last"`` (:issue:`835`, :issue:`836`).
+- Panel models raise a ``ValueError`` for duplicated (entity, time) rows, which 7.0
+  treated as separate observations, and a ``ValueError`` if the bandwidth of a
+  Driscoll-Kraay or Fama-MacBeth kernel covariance is not below the number of periods.
+  The quadratic spectral kernel returned standard errors that were too small instead
+  (:issue:`810`, :issue:`813`).
+- Kernel estimators that select the bandwidth from the data need at least 4 observations
+  (Bartlett), 5 (Parzen) or 6 (quadratic spectral), and raise a ``ValueError`` with
+  fewer. 7.0 returned a bandwidth of ``T - 1`` or an ``OverflowError``. This includes
+  ``IVGMM`` with its new default bandwidth (:issue:`821`).
+- ``IVLIML`` raises "Unable to estimate kappa" when there are too few observations for
+  the cross product that LIML inverts. 7.0 returned the rounding error as kappa (for
+  example 0.8125 instead of 1 with 3 observations) (:issue:`824`).
+- ``AbsorbingLS.fit`` raises a ``ValueError`` for a ``method`` other than ``"auto"``,
+  ``"hdfe"`` and ``"lsmr"``, which used LSMR, and for ``absorb_options`` that belong to
+  the other algorithm (:issue:`752`, :issue:`783`).
+- Panel models raise a ``ValueError`` that says why when they cannot be estimated, where
+  7.0 raised ``ZeroDivisionError`` or ``LinAlgError``: no residual degrees of freedom, a
+  ``BetweenOLS`` with regressors that are collinear in the entity means, and cluster ids
+  that are missing or a single group (:issue:`789`, :issue:`799`).
+- ``LinearFactorModelGMM`` raises a ``ValueError`` when the model is created if there
+  are not more observations than moment conditions. A ``sigma`` of ``LinearFactorModel``
+  that is not symmetric and positive definite, and a saturated debiased asset pricing
+  model, raise a ``ValueError`` (:issue:`807`).
 - With SciPy 2, the sparse helpers (``Interaction.sparse``, ``dummy_matrix`` and others)
   return sparse arrays, where ``*`` is elementwise. Use ``@`` for matrix products
   (:issue:`733`).
-
-.. TODO(R2): Add BUG2: TypeError for unsupported panel containers and the list inputs.
-.. TODO(R2): Update the label rule if the decision on an unlabelled dependent changes.
 
 .. rubric:: Bug fixes
 
 - Fixed :meth:`~linearmodels.iv.results.OLSResults.predict` for models without exogenous
   or without endogenous regressors (:issue:`677`).
 - A missing value in the entity or time index of a panel raises a clear ``ValueError``
-  (:issue:`614`, :issue:`716`).
-- ``quadratic_form_test`` raises a ``TypeError`` instead of an ``AssertionError`` if
-  ``formula`` is used with ``params`` that is not a ``Series`` (:issue:`690`).
+  in every panel model and in the group methods of ``PanelData``. 7.0 raised a
+  ``LinAlgError`` or returned data with NaN (:issue:`614`, :issue:`716`, :issue:`764`).
 - Fixed ``AbsorbingLS`` with missing values, which raised a ``ValueError`` in every
   release since 4.13. The incomplete observations are now dropped with a
   ``MissingValueWarning``. With clustered covariances, ``clusters`` must have one row
-  for each remaining observation.
+  for each remaining observation (:issue:`766`).
 - Fixed ``AbsorbingLS`` with an ``Interaction`` in which only ``cat`` or ``cont`` has
-  labels, and ``AbsorbingLS.fit`` adding ``drop_singletons`` to its ``absorb_options``.
+  labels, ``AbsorbingLS.fit`` adding ``drop_singletons`` to the ``absorb_options`` that
+  were passed to it, and ``fit`` with the deprecated ``lsmr_options`` and the default
+  method, which raised a ``TypeError`` when pyhdfe is used (:issue:`752`, :issue:`756`).
+- ``quadratic_form_test`` raises a ``TypeError`` instead of an ``AssertionError`` if
+  ``formula`` is used with ``params`` that is not a ``Series`` (:issue:`690`).
+- A ``cov_type``, ``weight_type`` or ``kernel`` that is not supported raises an
+  ``UnknownOptionError`` (both a ``ValueError`` and a ``KeyError``) that suggests the
+  closest name and lists the supported names, in every model. 7.0 raised a bare
+  ``KeyError`` in many (:issue:`808`).
+- The ``predict`` method of the IV models with ``data`` evaluates the formula in the
+  frame that calls it, and works at the top level of a script. Missing values in the
+  dependent variable, the endogenous regressors or the instruments of an IV or system
+  formula are dropped with a warning (:issue:`774`).
+- ``from_formula`` of the asset pricing models evaluates the formulas in the namespace
+  of the caller, and drops the observations with missing values. ``multivariate_iv``
+  accepts ``endog`` and ``instruments`` without ``exog`` (:issue:`777`, :issue:`806`,
+  :issue:`804`).
+- Fixed ``LinearFactorModelGMM`` ignoring ``opt_options`` after the first step, and the
+  asset pricing models failing with an ``OverflowError`` in summaries with an infinite
+  t-statistic, and with a ``RuntimeWarning`` for variances that are zero up to rounding
+  (:issue:`788`, :issue:`807`).
+- The adjusted R-squared of an IV model with as many parameters as observations is NaN,
+  and the pooled F of ``PanelOLS`` with a zero residual sum of squares and the F
+  statistic with a singular covariance are an ``InvalidTestStatistic``. These raised
+  errors. Weights of any finite size are scaled without overflow (:issue:`811`,
+  :issue:`814`).
+- ``PanelOLS(singletons=False)`` with clustered covariances, ``RandomEffects`` with
+  arrays, ``FirstDifferenceOLS`` with array clusters and ``PanelOLS`` with entity and
+  time effects for a single entity no longer fail with ``IndexError``, ``KeyError`` or a
+  misleading ``ValueError``. A missing value in ``other_effects`` drops the observation
+  (:issue:`776`, :issue:`795`, :issue:`799`, :issue:`810`).
+- Fixed the time labels of a 3-d ``xarray.DataArray`` with ``datetime64[ns]``
+  coordinates, which were integers such as ``946684800000000000``, and the
+  ``SettingWithCopyWarning`` of pandas 2 in the clusters of ``PanelOLS`` (:issue:`809`,
+  :issue:`822`).
+- ``IVSystemGMM(weight_type="kernel").fit(iter_limit=1)`` no longer raises an
+  ``AssertionError``, ``generate_panel_data`` accepts a NumPy ``Generator`` and returns
+  ``clusters`` with one row for each observation, and the helpers ``has_constant`` and
+  ``get_float`` accept several constant columns and NumPy integers (:issue:`775`,
+  :issue:`794`, :issue:`799`).
+- The Fama-MacBeth error for a panel that cannot be estimated says what a cross-section
+  needs, and its kernel covariance no longer issues a ``RuntimeWarning`` before the
+  ``ValueError`` for an estimate that does not vary (:issue:`772`, :issue:`826`).
+- Fixed the LaTeX output of ``Summary``, which did not escape special characters such as
+  underscores in the extra text (:issue:`791`).
 - Fixed the ``dev`` extra, which listed ``pandas-stubsl``, and added xarray to the
-  ``test`` extra.
-
-.. TODO(R2): Add the BUG4a-c, BUG5 and FIX2 fixes (panel NaN entity, lsmr_options).
+  ``test`` extra (:issue:`757`).
 
 .. rubric:: Documentation and maintenance
 
 - Corrected the Driscoll-Kraay index in the math documentation, fixed typos and improved
-  the type annotations (:issue:`704`, :issue:`697`, :issue:`721`).
-- Added a security policy (``SECURITY.md``).
-
-.. TODO(R2): Summarize DS1-DS3, DOC2, DOC3, NB1 and NB2 (docstrings, docs, notebooks).
-.. TODO(R2): Confirm that GitHub private vulnerability reporting is enabled (D8).
+  the type annotations (:issue:`704`, :issue:`697`, :issue:`721`). Added a security
+  policy (``SECURITY.md``) (:issue:`757`).
+- The docstrings follow the numpydoc rules, which are checked by a lint, and say which
+  option names are accepted, that they are not case sensitive, and where ``extra_df`` is
+  accepted. The panel ``fit`` examples run as they are, and the documentation builds
+  without warnings (:issue:`759`, :issue:`767`, :issue:`828`, :issue:`829`,
+  :issue:`830`, :issue:`834`).
+- New and extended pages of the user guide: aligning inputs, the mathematics of
+  ``IVJIVE``, the J and C statistics and the specification tests, the panel
+  specification tests, small-sample adjustments, estimated effects and
+  ``WARN_ON_MISSING``, which turns off the ``MissingValueWarning`` (:issue:`531`,
+  :issue:`773`, :issue:`782`).
+- The IV and panel example notebooks show the new features and the corrected statements
+  (:issue:`770`, :issue:`790`).
+- The tests do not leak warnings with any supported combination of versions, and the
+  minimum versions of statsmodels (0.14.6) and pyhdfe (0.2.0) were raised for this
+  (:issue:`751`, :issue:`826`).
 
 .. rubric:: Compatibility
 
 - Python 3.10 to 3.15, NumPy 1.23.5 and later including NumPy 2, and pandas 1.4.0 and
-  later including pandas 3 are supported. Wheels are built for Python 3.15.
+  later including pandas 3 are supported (:issue:`757`).
+- Wheels are built for CPython 3.10 to 3.15 on manylinux (x86-64 and aarch64), musllinux
+  (x86-64), Windows (AMD64) and macOS (x86-64 and arm64). There are no wheels for the
+  free-threaded builds (3.14t and 3.15t) or Windows ARM64. Wheels are built against
+  NumPy 2 and run with NumPy 1.23.5 or later.
 - Ready for SciPy 2 and pandas 4: the deprecation warnings that 7.0 gave with their
   development versions are gone (:issue:`733`).
 - The tests of the oldest supported versions now install them (:issue:`751`).
-
-.. TODO(R2): State the wheels (WHL1, CI1) and the versions that RC1 tested.
 
 .. rubric:: Deprecations and future changes
 
 - **7.1 is the last release to support Python 3.10 and NumPy 1.x.** Later releases will
   raise the minimum versions of Python, NumPy and the other dependencies.
-- The ``lsmr_options`` argument of
-  :meth:`~linearmodels.iv.absorbing.AbsorbingLS.fit` and the
-  ``linearmodels.__future__.ordering`` module will be removed in 8.0. Importing the
-  module now emits a ``FutureWarning``.
-
-.. TODO(R2): Add a bullet if the default kernel bandwidth of IVGMM is to change in 8.0.
+- The ``lsmr_options`` argument of :meth:`~linearmodels.iv.absorbing.AbsorbingLS.fit`
+  and the ``linearmodels.__future__.ordering`` module will be removed in 8.0. Importing
+  the module now emits a ``FutureWarning`` (:issue:`752`).
+- ``linearmodels.DROP_MISSING`` and the environment variable
+  ``LINEARMODELS_DROP_MISSING`` have never had an effect, since observations with
+  missing values are always dropped. Reading them emits a ``FutureWarning``, and both
+  will be removed in 8.0. Use ``WARN_ON_MISSING`` to turn off the
+  ``MissingValueWarning`` (:issue:`531`, :issue:`782`).
+- ``DefaultBandwidthWarning``, which ``IVGMM``, ``IVGMMCUE`` and ``IVSystemGMM`` issue
+  when a kernel estimator uses the default bandwidth, which changed in 7.1, will be
+  removed in 8.0. Passing ``bandwidth`` or ``optimal_bw`` silences it (:issue:`794`).
 
 .. rubric:: Minimum versions
 
-- Unchanged (Python 3.10, NumPy 1.23.5, SciPy 1.8.0, pandas 1.4.0, formulaic 1.2.1)
-  except numpy, which moved from 1.22 to 1.23, and statsmodels, which is 0.13.1, the first
-  release with a Python 3.10 wheel. The 7.0 notes listed formulaic 1.0.0, but 7.0
-  already required 1.2.1.
-- ``packaging`` is now a declared dependency. Building from source requires
-  Cython 3.1.0, and running the tests requires pytest 9.
+- Unchanged (Python 3.10, SciPy 1.8.0, pandas 1.4.0, formulaic 1.2.1) except NumPy,
+  which moved from 1.22 to 1.23.5, statsmodels, which moved from 0.13.0 to 0.14.6, the
+  first release that imports with pandas 3, and pyhdfe, which moved from 0.1 to 0.2.0
+  (0.1.0 and 0.1.1 fail on NumPy 1.24 to 1.26). The 7.0 notes listed formulaic 1.0.0,
+  but 7.0 already required 1.2.1.
+- ``packaging`` is now a declared dependency. Building from source requires Cython
+  3.1.0, and running the tests requires pytest 9 and xarray (:issue:`757`).
 
 .. rubric:: Contributors
 
 - Thanks to shaneraphel (:issue:`725`, :issue:`726`, :issue:`730`), raashish1601
   (:issue:`734`, :issue:`735`, :issue:`736`, :issue:`737`, :issue:`738`), nyxst4ck
-  (:issue:`704`), shuxue6662-a11y (:issue:`716`), aeshef (:issue:`690`) and maxime2476
-  (:issue:`697`).
+  (:issue:`704`), shuxue6662-a11y (:issue:`716`), aeshef (:issue:`690`), maxime2476
+  (:issue:`697`) and omadson (:issue:`791`).
 - The new features complete earlier pull requests by hass-nation (:issue:`701`,
   :issue:`702`, :issue:`703`), AyuG619 (:issue:`713`), eirki (:issue:`249`) and
   shaneraphel (:issue:`731`).
