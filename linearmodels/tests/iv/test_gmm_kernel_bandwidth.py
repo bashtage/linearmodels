@@ -19,7 +19,7 @@ import warnings
 
 import numpy as np
 from numpy.linalg import inv
-from numpy.testing import assert_allclose, assert_array_equal
+from numpy.testing import assert_allclose
 import pandas as pd
 import pytest
 
@@ -28,7 +28,7 @@ from linearmodels.iv.covariance import kernel_optimal_bandwidth
 from linearmodels.iv.gmm import IVGMMCovariance, KernelWeightMatrix
 from linearmodels.shared.exceptions import DefaultBandwidthWarning
 from linearmodels.shared.utility import AttrDict
-from linearmodels.tests._utility import warns_if_default_bandwidth
+from linearmodels.tests._utility import assert_close_matrix, warns_if_default_bandwidth
 
 CWD = os.path.split(os.path.abspath(__file__))[0]
 SIMULATED = pd.read_stata(os.path.join(CWD, "results", "simulated-data.dta"))
@@ -171,14 +171,26 @@ def check_against_reference(res, name):
     assert_allclose(res.centered_j_stat.stat, centered_j_stat, rtol=1e-6)
 
 
-def assert_identical(res, other):
-    """The results are the same to the last bit"""
-    assert_array_equal(res.params, other.params)
-    assert_array_equal(res.std_errors, other.std_errors)
-    assert_array_equal(res.cov, other.cov)
-    assert res.j_stat.stat == other.j_stat.stat
-    assert res.centered_j_stat.stat == other.centered_j_stat.stat
-    assert_array_equal(res.weight_matrix, other.weight_matrix)
+def same_rtol(name):
+    """
+    The relative tolerance of fits that are the same calculation, up to rounding
+
+    The fits of IVGMM are closed form. Changing the data in the last bit changes them
+    by 1e-12 or less, and the elements of the weight matrix by 6e-11. IVGMMCUE
+    minimizes its objective with BFGS, and the estimates and the covariance of its
+    fits differ by up to 6e-6 and 3e-6.
+    """
+    return 1e-4 if name.startswith("cue") else 1e-8
+
+
+def assert_same_results(res, other, rtol=1e-8):
+    """The results are the same, up to rounding"""
+    assert_allclose(res.params, other.params, rtol=rtol)
+    assert_allclose(res.std_errors, other.std_errors, rtol=rtol)
+    assert_close_matrix(res.cov, other.cov, rtol)
+    assert_allclose(res.j_stat.stat, other.j_stat.stat, rtol=1e-8)
+    assert_allclose(res.centered_j_stat.stat, other.centered_j_stat.stat, rtol=1e-8)
+    assert_close_matrix(res.weight_matrix, other.weight_matrix, rtol)
     assert res.weight_config == other.weight_config
     assert res.cov_config == other.cov_config
 
@@ -203,7 +215,7 @@ def test_both_ways_to_restore_the_old_bandwidth_are_identical(args, name):
     with no_default_bandwidth_warning():
         by_bandwidth = fit_spec(args, name, RESTORE["bandwidth"])
         by_flag = fit_spec(args, name, RESTORE["optimal_bw=False"])
-    assert_identical(by_bandwidth, by_flag)
+    assert_same_results(by_bandwidth, by_flag, same_rtol(name))
 
 
 @pytest.mark.parametrize("name", SPECS)
@@ -212,7 +224,7 @@ def test_the_default_is_optimal_bw(args, name):
     assert len(caught) == 1
     with no_default_bandwidth_warning():
         optimal = fit_spec(args, name, {"optimal_bw": True})
-    assert_identical(res, optimal)
+    assert_same_results(res, optimal, same_rtol(name))
     # It is a bandwidth that was estimated, and not the old default of 7.0
     _, weights, covariance, _ = SPECS[name]
     if weights is not None:
@@ -250,7 +262,7 @@ def test_the_default_weight_bandwidth_is_estimated_from_the_first_step(args):
     assert res.weight_config["bandwidth"] == bandwidth
     with no_default_bandwidth_warning():
         fixed = IVGMM(*args, weight_type="kernel", bandwidth=bandwidth).fit()
-    assert_identical(res, fixed)
+    assert_same_results(res, fixed)
 
 
 def hac_covariance(res, bandwidth):
@@ -471,7 +483,7 @@ def test_c_stat_uses_the_bandwidth_that_the_model_estimates(args):
     with no_default_bandwidth_warning():
         optimal = IVGMM(*args, weight_type="kernel", optimal_bw=True).fit()
         old = IVGMM(*args, weight_type="kernel", bandwidth=NOBS - 2).fit()
-    assert res.c_stat("x1").stat == optimal.c_stat("x1").stat
+    assert_allclose(res.c_stat("x1").stat, optimal.c_stat("x1").stat, rtol=1e-8)
     assert res.c_stat("x1").stat != old.c_stat("x1").stat
 
 
@@ -500,9 +512,9 @@ def test_cue_starting_values_have_the_bandwidth_of_the_objective(
         res_start = IVGMMCUE(*args, weight_type="kernel", **options).fit(
             starting=start.params
         )
-    assert_array_equal(res.params, res_start.params)
+    assert_allclose(res.params, res_start.params, rtol=same_rtol("cue"))
     assert res.iterations == res_start.iterations
-    assert res.j_stat.stat == res_start.j_stat.stat
+    assert_allclose(res.j_stat.stat, res_start.j_stat.stat, rtol=1e-8)
     if start_options.get("optimal_bw"):
         # and the weight matrix of the objective has the same bandwidth too
         assert res.weight_config["bandwidth"] == start.weight_config["bandwidth"]
@@ -558,11 +570,12 @@ def test_kernel_weight_matrix_default(arrays):
     # Once for each instance, and not for each call
     again, caught = default_bandwidth_warnings(compute)
     assert len(caught) == 0
-    assert_array_equal(w, again)
+    assert_close_matrix(again, w, 1e-10)
 
     with no_default_bandwidth_warning():
         optimal = KernelWeightMatrix(optimal_bw=True)
-        assert_array_equal(optimal.weight_matrix(x, z, eps), w)
+        w_optimal = optimal.weight_matrix(x, z, eps)
+    assert_close_matrix(w_optimal, w, 1e-10)
     assert weight.bandwidth == optimal.bandwidth
     assert 0 < weight.bandwidth < NOBS // 10
 
@@ -612,7 +625,8 @@ def test_gmm_covariance_default(arrays):
     assert caught[0].lineno == compute.__code__.co_firstlineno + 1
     with no_default_bandwidth_warning():
         optimal = IVGMMCovariance(x, y, z, params, w, "kernel", optimal_bw=True)
-        assert_array_equal(optimal.cov, default)
+        optimal_cov = optimal.cov
+    assert_close_matrix(optimal_cov, default, 1e-10)
     assert cov.config["bandwidth"] == optimal.config["bandwidth"]
     assert 0 < cov.config["bandwidth"] < NOBS // 10
 

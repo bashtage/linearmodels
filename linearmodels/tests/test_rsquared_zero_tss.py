@@ -180,7 +180,7 @@ def test_constant_dependent_variable_without_a_constant_is_not_centered(name):
     y = pd.Series(5.0, index=index, name="y")
     res = NO_CONSTANT[name](y, x).fit()
     assert_finite(res, ["rsquared"])
-    assert res.rsquared == 1 - res.resid_ss / res.total_ss
+    assert_allclose(res.rsquared, 1 - res.resid_ss / res.total_ss, rtol=1e-12)
     if name != "BetweenOLS":
         assert_allclose(res.total_ss, 5.0**2 * len(index))
     # The within and the correlation measures remove the mean
@@ -232,9 +232,9 @@ def test_constant_only_model(name):
     y = pd.Series(np.random.default_rng(5).standard_normal(len(index)) + 2, index=index)
     res = build(y, const).fit()
     # The constant explains nothing, whatever the data
-    assert res.rsquared_between == 0.0
-    assert res.rsquared_overall == 0.0
-    assert res.rsquared_within == 0.0
+    assert_allclose(res.rsquared_between, 0.0, atol=1e-12)
+    assert_allclose(res.rsquared_overall, 0.0, atol=1e-12)
+    assert_allclose(res.rsquared_within, 0.0, atol=1e-12)
     assert_allclose(res.rsquared, 0.0, atol=1e-12)
     # A model with only a constant has no R-squared when the dependent does not vary
     y = pd.Series(5.0, index=index, name="y")
@@ -266,7 +266,7 @@ def test_ordinary_values_of_panel_models(name):
     for w in (None, weights):
         res = build(y, xc, w).fit()
         # 1 - RSS / TSS, with the operations of the model
-        assert res.rsquared == 1 - res.resid_ss / res.total_ss
+        assert_allclose(res.rsquared, 1 - res.resid_ss / res.total_ss, rtol=1e-12)
         assert_finite(res, PANEL_MEASURES)
         for measure in PANEL_MEASURES:
             value = getattr(res, measure)
@@ -353,7 +353,7 @@ def test_iv_model_without_a_constant_is_not_centered():
     y = np.full(NIV, 5.0)
     res = IV2SLS(y, x, endog, z).fit()
     assert_allclose(res.total_ss, 25.0 * NIV)
-    assert res.rsquared == 1 - res.resid_ss / res.total_ss
+    assert_allclose(res.rsquared, 1 - res.resid_ss / res.total_ss, rtol=1e-12)
     assert_finite(res, ["rsquared", "rsquared_adj"])
 
 
@@ -376,9 +376,11 @@ def test_ordinary_values_of_iv_models(name, weighted):
     y = exog @ [1, 0.5, -0.3] + 0.4 * endog[:, 0] + rg.standard_normal(NIV)
     w = 0.5 + rg.chisquare(3, NIV) if weighted else None
     res = IV_MODELS[name](y, data, w).fit()
-    assert res.rsquared == 1 - res.resid_ss / res.total_ss
+    assert_allclose(res.rsquared, 1 - res.resid_ss / res.total_ss, rtol=1e-12)
     n, k, c = res.nobs, res.df_model, int(res.has_constant)
-    assert res.rsquared_adj == 1 - ((n - c) / (n - k)) * (1 - res.rsquared)
+    assert_allclose(
+        res.rsquared_adj, 1 - ((n - c) / (n - k)) * (1 - res.rsquared), rtol=1e-12
+    )
     assert_finite(res, ["rsquared", "rsquared_adj"])
 
 
@@ -456,9 +458,11 @@ def test_ordinary_values_of_system_models(name):
     y_a = exog @ [1, 0.5, -0.3] + 0.4 * endog[:, 0] + rg.standard_normal(NIV)
     y_b = exog @ [0.5, 0.2, 0.1] + rg.standard_normal(NIV)
     res = SYSTEM_MODELS[name](system_equations(y_a, y_b, name != "SUR")).fit()
-    assert res.rsquared == 1.0 - res.resid_ss / res.total_ss
+    assert_allclose(res.rsquared, 1.0 - res.resid_ss / res.total_ss, rtol=1e-12)
     for equation in res.equations.values():
-        assert equation.rsquared == 1.0 - equation.resid_ss / equation.total_ss
+        assert_allclose(
+            equation.rsquared, 1.0 - equation.resid_ss / equation.total_ss, rtol=1e-12
+        )
         assert_finite(equation, ["rsquared_adj"])
     defined = res.system_rsquared.notna().sum()
     assert defined >= 3
@@ -474,7 +478,7 @@ def test_ordinary_values_of_asset_pricing_models(model):
     factors = rg.standard_normal((200, 2))
     portfolios = factors @ rg.standard_normal((2, 6)) + rg.standard_normal((200, 6))
     res = model(portfolios, factors).fit()
-    assert res.rsquared == 1 - res.residual_ss / res.total_ss
+    assert_allclose(res.rsquared, 1 - res.residual_ss / res.total_ss, rtol=1e-12)
     assert 0.0 < res.rsquared < 1.0
     with pytest.raises(ValueError, match="portfolios must not contain a constant"):
         model(np.c_[portfolios, np.full(200, 0.5)], factors)

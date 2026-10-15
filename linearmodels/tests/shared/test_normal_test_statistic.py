@@ -21,6 +21,7 @@ from linearmodels.shared.hypotheses import (
     NormalTestStatistic,
     WaldTestStatistic,
 )
+from linearmodels.tests._utility import assert_same_text
 
 SIZES = {"10%": 0.10, "5%": 0.05, "1%": 0.01}
 PROTOCOLS = range(pickle.HIGHEST_PROTOCOL + 1)
@@ -91,10 +92,14 @@ def test_nonfinite_statistics():
         list(ts.critical_values.values()),
         list(NormalTestStatistic(1.0, "_NULL_").critical_values.values()),
     )
-    assert NormalTestStatistic(np.inf, "_NULL_").pval == 0.0
-    assert NormalTestStatistic(-np.inf, "_NULL_").pval == 0.0
-    assert NormalTestStatistic(np.inf, "_NULL_", two_sided=False).pval == 0.0
-    assert NormalTestStatistic(-np.inf, "_NULL_", two_sided=False).pval == 1.0
+    for stat, two_sided, pval in (
+        (np.inf, True, 0.0),
+        (-np.inf, True, 0.0),
+        (np.inf, False, 0.0),
+        (-np.inf, False, 1.0),
+    ):
+        ts = NormalTestStatistic(stat, "_NULL_", two_sided=two_sided)
+        assert_allclose(ts.pval, pval, atol=1e-12)
 
 
 @pytest.mark.parametrize(
@@ -149,7 +154,7 @@ def assert_same_statistic(clone, original):
     if hasattr(original, "df"):
         assert clone.df == original.df
         assert clone.df_denom == original.df_denom
-    assert str(clone) == str(original)
+    assert_same_text(str(clone), str(original))
     assert_allclose(clone.stat, original.stat)
     assert_allclose(clone.pval, original.pval)
     assert clone.null == original.null

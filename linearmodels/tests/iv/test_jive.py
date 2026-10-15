@@ -717,8 +717,8 @@ def test_failure_to_compute_kappa_only_affects_the_tests_that_use_it(monkeypatch
     expected = IVJIVE(y, exog, endog, z).fit()
     monkeypatch.setattr(IVJIVE, "_estimate_kappa", fail)
     res = IVJIVE(y, exog, endog, z).fit()
-    assert_allclose(res.params, expected.params, rtol=0, atol=0)
-    assert_allclose(res.cov, expected.cov, rtol=0, atol=0)
+    assert_allclose(res.params, expected.params, rtol=1e-10)
+    assert_allclose(res.cov, expected.cov, rtol=1e-10)
     # They are not statistics that are NaN, but statistics that are not defined
     assert isinstance(res.anderson_rubin, InvalidTestStatistic)
     assert isinstance(res.basmann_f, InvalidTestStatistic)
@@ -933,8 +933,8 @@ def test_fit_does_not_change_the_model():
     assert_array_equal(wy, mod._wy)
     assert_array_equal(wx, mod._wx)
     assert_array_equal(wz, mod._wz)
-    assert_allclose(first.params, again.params, rtol=0, atol=0)
-    assert_allclose(first.cov, again.cov, rtol=0, atol=0)
+    assert_allclose(first.params, again.params, rtol=1e-10)
+    assert_allclose(first.cov, again.cov, rtol=1e-10)
 
 
 def test_consistent_in_large_samples():

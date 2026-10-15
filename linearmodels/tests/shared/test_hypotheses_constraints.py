@@ -1,4 +1,5 @@
 import numpy as np
+from numpy.testing import assert_allclose
 import pandas as pd
 import pytest
 
@@ -72,7 +73,7 @@ def test_quadratic_form_formula_end_to_end():
     params = pd.Series([0.0, 1.0], index=["x0", "x1"])
     cov = np.eye(2)
     res = quadratic_form_test(params, cov, formula="x0=0")
-    assert res.stat == 0.0
+    assert_allclose(res.stat, 0.0, atol=1e-12)
     assert res.df == 1
 
 

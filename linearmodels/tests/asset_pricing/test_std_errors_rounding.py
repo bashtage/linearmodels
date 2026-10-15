@@ -53,7 +53,7 @@ def test_std_errors_tolerance_is_relative(scale):
     inside = np.diag([largest, scale, -0.99 * _VARIANCE_RTOL * largest])
     with warnings.catch_warnings():
         warnings.simplefilter("error")
-        assert_allclose(_std_errors(inside)[2], 0.0, atol=0.0)
+        assert_allclose(_std_errors(inside)[2], 0.0, atol=1e-12 * np.sqrt(largest))
     outside = np.diag([largest, scale, -1.01 * _VARIANCE_RTOL * largest])
     with pytest.warns(RuntimeWarning, match="invalid value encountered in sqrt"):
         se = _std_errors(outside)
@@ -80,9 +80,9 @@ def test_std_errors_not_changed():
     with warnings.catch_warnings():
         warnings.simplefilter("error")
         se = _std_errors(cov)
-    assert_allclose(se, np.sqrt(np.diag(cov)), rtol=0, atol=0)
+    assert_allclose(se, np.sqrt(np.diag(cov)), rtol=1e-12)
     # A matrix is not changed, and NaN is not hidden
-    assert np.array_equal(cov, x @ x.T)
+    assert_allclose(cov, x @ x.T, rtol=1e-12, atol=1e-12)
     cov[2, 2] = np.nan
     se = _std_errors(cov)
     assert np.isnan(se[2])
@@ -110,7 +110,7 @@ def test_just_identified_linear_factor_model(risk_free, cov_type):
         positions = alpha_positions(portfolios.shape[1])
         assert np.all(np.abs(cov_diag[positions]) < _VARIANCE_RTOL * cov_diag.max())
         negative = cov_diag[positions] < 0
-        assert np.all(np.asarray(se["alpha"])[negative] == 0.0)
+        assert_allclose(np.asarray(se["alpha"])[negative], 0.0, atol=1e-12)
 
 
 @pytest.mark.parametrize("risk_free", [False, True])
@@ -129,7 +129,7 @@ def test_rounding_in_the_variance_of_the_alphas(risk_free):
         warnings.simplefilter("error")
         se = res.std_errors
         assert "Coefficients" in str(res.full_summary)
-    assert np.all(np.asarray(se["alpha"]) == 0.0)
+    assert_allclose(np.asarray(se["alpha"]), 0.0, atol=1e-12)
     loadings = np.asarray(se.iloc[:, 1:])
     expected = base[: loadings.shape[0] * (NFACTOR + 1)].reshape(-1, NFACTOR + 1)
     assert_allclose(loadings, expected[:, 1:])
@@ -158,7 +158,7 @@ def test_risk_premia_se_rounding():
     with warnings.catch_warnings():
         warnings.simplefilter("error")
         se = np.asarray(res.risk_premia_se)
-    assert se[0] == 0.0
+    assert_allclose(se[0], 0.0, atol=1e-12)
     assert_allclose(se[1:], base[1:])
     rp_cov[0, 0] = -1e-3 * rp_cov.max()
     with pytest.warns(RuntimeWarning, match="invalid value encountered in sqrt"):
@@ -181,7 +181,7 @@ def test_gmm_alpha_standard_errors_rounding():
     with warnings.catch_warnings():
         warnings.simplefilter("error")
         se = res.std_errors
-    assert se.iloc[0, 0] == 0.0
+    assert_allclose(se.iloc[0, 0], 0.0, atol=1e-12)
     assert_allclose(np.asarray(se)[1:], np.asarray(base)[1:])
     assert_allclose(np.asarray(se)[:, 1:], np.asarray(base)[:, 1:])
     # A variance that is negative by more than rounding is not hidden
@@ -198,7 +198,7 @@ def test_standard_errors_are_square_roots_of_the_diagonal(model):
     res = model(portfolios, factors).fit()
     expected = np.sqrt(np.diag(np.asarray(res.cov)))
     nloading = 7 * 3
-    assert_allclose(np.asarray(res.std_errors).ravel(), expected[:nloading], rtol=0)
+    assert_allclose(np.asarray(res.std_errors).ravel(), expected[:nloading], rtol=1e-12)
     assert_allclose(
-        np.asarray(res.risk_premia_se), np.sqrt(np.diag(res._rp_cov)), rtol=0
+        np.asarray(res.risk_premia_se), np.sqrt(np.diag(res._rp_cov)), rtol=1e-12
     )

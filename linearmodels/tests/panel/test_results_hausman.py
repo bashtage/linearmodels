@@ -24,6 +24,7 @@ from linearmodels.panel.results import (
     RandomEffectsResults,
 )
 from linearmodels.shared.hypotheses import InvalidTestStatistic, WaldTestStatistic
+from linearmodels.tests._utility import assert_same_text
 
 HAUSMAN_NAMES = ["exper", "expersq"]
 
@@ -105,7 +106,7 @@ def test_hausman_str_repr(hausman_results):
     re_res, fe_res = hausman_results
     result = re_res.hausman(fe_res)
     text = str(result)
-    assert repr(result) == text
+    assert_same_text(repr(result), text)
     # The statistic comes first, followed by the estimates
     assert text.startswith(str(result.statistic))
     assert "Hausman specification test" in text
@@ -128,7 +129,7 @@ def test_hausman_str_repr_invalid():
         result = re_res.hausman(fe_res)
     assert isinstance(result.statistic, InvalidTestStatistic)
     text = str(result)
-    assert repr(result) == text
+    assert_same_text(repr(result), text)
     assert text.startswith(str(result.statistic))
     assert "Invalid test statistic" in text
     assert "negative" in text
@@ -150,7 +151,7 @@ def test_hausman_pickle(hausman_results, protocol):
     assert loaded.statistic.dist_name == result.statistic.dist_name
     assert loaded.statistic.null == result.statistic.null
     assert_frame_equal(loaded.estimates, result.estimates)
-    assert str(loaded) == str(result)
+    assert_same_text(str(loaded), str(result))
 
 
 def test_hausman_pickle_invalid():
@@ -163,7 +164,7 @@ def test_hausman_pickle_invalid():
     assert np.isnan(loaded.statistic.stat)
     assert np.isnan(loaded.statistic.pval)
     assert_frame_equal(loaded.estimates, result.estimates)
-    assert str(loaded) == str(result)
+    assert_same_text(str(loaded), str(result))
 
 
 def test_hausman_pval(hausman_results):

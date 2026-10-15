@@ -2,12 +2,66 @@
 
 from collections.abc import Mapping
 from contextlib import nullcontext
+import re
 
 import numpy as np
+from numpy.testing import assert_allclose
 import pandas as pd
 import pytest
 
 from linearmodels.shared.exceptions import DefaultBandwidthWarning, MissingValueWarning
+
+NUMBER = re.compile(r"[-+]?(?:\d+\.?\d*|\.\d+)(?:[eE][-+]?\d+)?")
+
+
+def assert_same_text(text, expected, label="", rtol=1e-8, atol=1e-12):
+    """
+    Assert that two texts have the same words and numbers that are close
+
+    A summary or a representation of a result prints numbers that are computed, and
+    the last digits of a number that is zero in exact arithmetic depend on the
+    platform: -2.22e-16, 0.0000 and 1.11e-16 are printed for the same zero. The words
+    of the two texts, with the numbers replaced by a placeholder, are compared as
+    text, and the numbers are compared as numbers.
+
+    Parameters
+    ----------
+    text : str
+        The text to check.
+    expected : str
+        The text with the words and the numbers that are expected.
+    label : str, optional
+        A message that is shown if the texts differ.
+    rtol : float, optional
+        Relative tolerance of the numbers.
+    atol : float, optional
+        Absolute tolerance of the numbers.
+    """
+    words = [" ".join(NUMBER.sub("#", t).split()) for t in (text, expected)]
+    assert words[0] == words[1], label
+    numbers = [np.array(NUMBER.findall(t), dtype=float) for t in (text, expected)]
+    assert_allclose(numbers[0], numbers[1], rtol=rtol, atol=atol, err_msg=label)
+
+
+def assert_close_matrix(actual, desired, rtol=1e-10):
+    """
+    Assert that two matrices are close, relative to their largest element
+
+    The relative rounding error of an element that is close to 0 is larger than that
+    of the largest elements, so that the tolerance of every element is relative to
+    the largest.
+
+    Parameters
+    ----------
+    actual : array_like
+        The matrix to check.
+    desired : array_like
+        The matrix that is expected.
+    rtol : float, optional
+        The tolerance, relative to each element and to the largest element.
+    """
+    desired = np.asarray(desired)
+    assert_allclose(actual, desired, rtol=rtol, atol=rtol * np.abs(desired).max())
 
 
 def has_missing(*inputs):

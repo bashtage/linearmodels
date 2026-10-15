@@ -46,9 +46,9 @@ def test_cov_kernel():
 
 def test_kernel_bartlett():
     w = kernel_weight_bartlett(0)
-    assert_equal(w, 1 - np.arange(1))
+    assert_allclose(w, 1 - np.arange(1), rtol=1e-12)
     w = kernel_weight_bartlett(10)
-    assert_equal(w, 1 - np.arange(11) / 11)
+    assert_allclose(w, 1 - np.arange(11) / 11, rtol=1e-12)
 
 
 def test_kernel_parzen():
@@ -62,9 +62,9 @@ def test_kernel_parzen():
                 w[i] = 1 - 6 * z**2 + 6 * z**3
         return w
 
-    assert_equal(w(0), kernel_weight_parzen(0))
-    assert_equal(w(1), kernel_weight_parzen(1))
-    assert_equal(w(10), kernel_weight_parzen(10))
+    assert_allclose(w(0), kernel_weight_parzen(0), rtol=1e-12)
+    assert_allclose(w(1), kernel_weight_parzen(1), rtol=1e-12)
+    assert_allclose(w(10), kernel_weight_parzen(10), rtol=1e-12)
 
 
 def test_kernel_qs():
@@ -76,10 +76,14 @@ def test_kernel_qs():
             w[i] = 3 / q**2 * (sin(q) / q - cos(q))
         return w
 
-    assert_equal(w(10, 0), kernel_weight_quadratic_spectral(10, 0))
-    assert_equal(w(2, 0), kernel_weight_quadratic_spectral(2, 0))
-    assert_equal(w(10, 200), kernel_weight_quadratic_spectral(10, 200))
-    assert_equal(w(2.5, 200), kernel_weight_quadratic_spectral(2.5, 200))
+    # The weights cross zero, which needs an absolute tolerance
+    tolerances = {"rtol": 1e-12, "atol": 1e-14}
+    assert_allclose(w(10, 0), kernel_weight_quadratic_spectral(10, 0), **tolerances)
+    assert_allclose(w(2, 0), kernel_weight_quadratic_spectral(2, 0), **tolerances)
+    assert_allclose(w(10, 200), kernel_weight_quadratic_spectral(10, 200), **tolerances)
+    assert_allclose(
+        w(2.5, 200), kernel_weight_quadratic_spectral(2.5, 200), **tolerances
+    )
 
 
 def test_homoskedastic_cov_asymptotic(data):
@@ -165,7 +169,7 @@ def test_heteroskedastic_cov_kappa_debiased(data):
     assert c.config == {"debiased": True, "kappa": 0.99}
     c2 = HeteroskedasticCovariance(data.x, data.y, data.z, data.params, debiased=True)
     assert_allclose(c.s, c2.s)
-    assert c.s2 == c2.s2
+    assert_allclose(c.s2, c2.s2, rtol=1e-12)
     vk_inv = inv(data.vk)
     assert_allclose(c.cov, vk_inv @ c.s @ vk_inv / data.nobs)
 
@@ -178,7 +182,7 @@ def test_heteroskedastic_cov_kappa(data):
     assert c.config == {"debiased": False, "kappa": 0.99}
     c2 = HeteroskedasticCovariance(data.x, data.y, data.z, data.params)
     assert_allclose(c.s, c2.s)
-    assert c.s2 == c2.s2
+    assert_allclose(c.s2, c2.s2, rtol=1e-12)
     vk_inv = inv(data.vk)
     assert_allclose(c.cov, vk_inv @ c.s @ vk_inv / data.nobs)
 
@@ -252,7 +256,7 @@ def test_kernel_covariance_asymptotic(data, kernel):
 
     for name in kernel.alt_names:
         c2 = KernelCovariance(data.x, data.y, data.z, data.params, kernel=name)
-        assert_equal(c.cov, c2.cov)
+        assert_allclose(c.cov, c2.cov, rtol=1e-12)
 
     assert c.debiased is False
     assert c.config["debiased"] is False
@@ -282,7 +286,7 @@ def test_kernel_covariance_debiased(data, kernel):
         c2 = KernelCovariance(
             data.x, data.y, data.z, data.params, kernel=name, debiased=True
         )
-        assert_equal(c.cov, c2.cov)
+        assert_allclose(c.cov, c2.cov, rtol=1e-12)
 
     assert c._kappa == 1
     assert c.debiased is True

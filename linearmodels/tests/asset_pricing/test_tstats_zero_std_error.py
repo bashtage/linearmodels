@@ -114,7 +114,7 @@ def test_risk_premia_with_a_standard_error_of_0():
     rp_cov[:, 0] = 0.0
     res._rp_cov = rp_cov
     se = np.asarray(res.risk_premia_se)
-    assert se[0] == 0.0
+    assert_allclose(se[0], 0.0, atol=1e-12)
     with warnings.catch_warnings():
         warnings.simplefilter("error")
         tstats = np.asarray(res.risk_premia_tstats)
@@ -131,9 +131,9 @@ def test_tests_are_not_changed(model):
     res = model(portfolios, factors).fit()
     params = np.asarray(res.params)
     se = np.asarray(res.std_errors)
-    assert_allclose(np.asarray(res.tstats), params / se, rtol=0)
+    assert_allclose(np.asarray(res.tstats), params / se, rtol=1e-12)
     assert_allclose(
-        np.asarray(res.pvalues), 2 * stats.norm.sf(np.abs(params / se)), rtol=0
+        np.asarray(res.pvalues), 2 * stats.norm.sf(np.abs(params / se)), rtol=1e-12
     )
     rp = np.asarray(res.risk_premia)
     assert_allclose(np.asarray(res.risk_premia_tstats), rp / res.risk_premia_se)

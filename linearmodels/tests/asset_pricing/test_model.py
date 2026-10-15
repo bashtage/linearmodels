@@ -1,5 +1,5 @@
 import numpy as np
-from numpy.testing import assert_allclose, assert_equal
+from numpy.testing import assert_allclose
 import pandas as pd
 import pytest
 from scipy import stats
@@ -209,7 +209,7 @@ def test_drop_missing(data):
     f.drop(isnull)
 
     res2 = TradedFactorModel(p, f).fit()
-    assert_equal(np.asarray(res.params), np.asarray(res2.params))
+    assert_allclose(np.asarray(res.params), np.asarray(res2.params), rtol=1e-10)
 
 
 def test_unknown_kernel(data):

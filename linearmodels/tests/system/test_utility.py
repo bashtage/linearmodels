@@ -113,9 +113,10 @@ def test_linear_constraint():
     r = np.zeros((2, 5))
     r[0, 0] = r[1, 1] = 1
     lc = LinearConstraint(r, require_pandas=False)
-    assert np.all(lc.t[:2] == 0)
-    assert np.all(np.sum(lc.t, 1)[2:] == 1)
-    assert np.all(lc.a == 0)
+    # t is a basis of the null space of r, from an eigendecomposition
+    assert_allclose(lc.t[:2], 0.0, atol=1e-12)
+    assert_allclose(np.sum(lc.t, 1)[2:], 1.0, rtol=1e-12)
+    assert_allclose(lc.a, 0.0, atol=1e-12)
 
     x = np.random.randn(200, 5)
     y = np.random.randn(200, 1)
@@ -127,7 +128,7 @@ def test_linear_constraint():
     assert_allclose(ec.T @ ec, e.T @ e)
 
     lc = LinearConstraint(r, require_pandas=False)
-    assert np.all(lc.a == 0)
+    assert_allclose(lc.a, 0.0, atol=1e-12)
 
 
 def test_linear_constraint_errors():

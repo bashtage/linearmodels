@@ -37,6 +37,7 @@ from linearmodels.panel import (
 from linearmodels.panel.data import PanelData
 from linearmodels.shared.exceptions import MissingValueWarning
 from linearmodels.shared.hypotheses import InvalidTestStatistic
+from linearmodels.tests._utility import assert_same_text
 
 NENTITY = 8
 NPERIOD = 6
@@ -92,6 +93,10 @@ ALGORITHMS = {"means": {}, "lsdv": {"use_lsdv": True}, "lsmr": {"use_lsmr": True
 # their sums of squares are accurate to the square of that
 EFFECT_ATOL = {"means": 1e-6, "lsdv": 1e-10, "lsmr": 1e-5}
 SUM_OF_SQUARES_RTOL = 1e-8
+# The tolerance of the numbers that are zero in exact arithmetic, for example the
+# R-squared of a model that only has effects, which is 1 - residual_ss / total_ss and
+# is -2.22e-16, 0 or 1.11e-16 depending on the rounding of the platform
+ATOL = 1e-12
 # The number of effects that are estimated, with no constant to absorb one of them
 NEFFECTS = {
     "entity": NENTITY,
@@ -165,7 +170,7 @@ def test_effects_and_residuals_are_the_means(frame, effect, weighted, algorithm)
     atol = EFFECT_ATOL[algorithm]
     assert res.params.shape == (0,)
     assert_allclose(res.estimated_effects.to_numpy().ravel(), fitted, atol=atol)
-    assert_allclose(res.fitted_values.to_numpy().ravel(), 0.0, atol=0.0)
+    assert_allclose(res.fitted_values.to_numpy().ravel(), 0.0, atol=ATOL)
     assert_allclose(res.idiosyncratic.to_numpy().ravel(), y - fitted, atol=atol)
     assert_allclose(res.resids.to_numpy(), y - fitted, atol=atol)
     assert res.estimated_effects.index.equals(frame.index)
@@ -226,7 +231,8 @@ def test_statistics_against_hand_computation(frame, effect, weighted, algorithm)
     for name in ("rsquared", "rsquared_within", "rsquared_between", "rsquared_overall"):
         assert_allclose(getattr(res, name), 0.0, atol=rtol, err_msg=name)
     for name in ("within", "between", "overall"):
-        assert getattr(res, f"corr_squared_{name}") == 0.0
+        corr_squared = getattr(res, f"corr_squared_{name}")
+        assert_allclose(corr_squared, 0.0, atol=ATOL, err_msg=name)
     assert_allclose(res.rsquared_inclusive, 1 - resid_ss / centered, rtol=rtol)
     assert_allclose(res.s2, resid_ss / (nobs - neffects), rtol=rtol)
     # The log-likelihood of the regression on a constant and the dummy variables,
@@ -336,18 +342,18 @@ def test_summary(frame):
     # The other formats work without the table of parameters
     for as_format in (summary.as_html, summary.as_latex, summary.as_csv):
         assert len(as_format()) > 100
-    assert str(res) == text
+    assert_same_text(str(res), text)
 
 
 def test_predict_and_wald_test(frame):
     res = fit_effects_only(frame, "entity", False)
     out = res.predict(effects=True, idiosyncratic=True)
     assert list(out.columns) == ["fitted_values", "estimated_effects", "idiosyncratic"]
-    assert_allclose(out["fitted_values"], 0.0)
+    assert_allclose(out["fitted_values"], 0.0, atol=ATOL)
     assert_allclose(out.sum(axis=1).to_numpy(), frame["y"].to_numpy())
     # Out of sample predictions with no regressors are 0
     new = res.predict(exog=no_regressors(frame).iloc[:5])
-    assert_allclose(new.to_numpy(), 0.0)
+    assert_allclose(new.to_numpy(), 0.0, atol=ATOL)
     with pytest.raises(ValueError, match="The model has no parameters"):
         res.wald_test(formula="x = 0")
     with pytest.raises(ValueError, match="The model has no parameters"):
@@ -483,8 +489,24 @@ def test_options_of_the_model(frame, effect):
 SKIP_ATTRIBUTES = {"model", "summary", "conf_int", "predict", "wald_test", "compare"}
 
 
+def assert_same_table(value, other, label):
+    """The labels of two Series or DataFrames are the same, and the values are close"""
+    assert type(value) is type(other), label
+    assert value.index.equals(other.index), label
+    assert value.shape == other.shape, label
+    if isinstance(value, pd.DataFrame):
+        assert value.columns.equals(other.columns), label
+    assert_allclose(
+        value.to_numpy(dtype=float),
+        other.to_numpy(dtype=float),
+        atol=ATOL,
+        equal_nan=True,
+        err_msg=label,
+    )
+
+
 def assert_same_results(res, expected):
-    """Every public attribute of two results is the same"""
+    """Every public attribute of two results is the same, up to rounding"""
     assert type(res) is type(expected)
     for name in dir(res):
         if name.startswith("_") or name in SKIP_ATTRIBUTES:
@@ -492,39 +514,30 @@ def assert_same_results(res, expected):
         value, other = getattr(res, name), getattr(expected, name)
         label = f"attribute {name}"
         if isinstance(value, (pd.Series, pd.DataFrame)):
-            assert type(value) is type(other), label
-            assert value.index.equals(other.index), label
-            assert value.shape == other.shape, label
-            if isinstance(value, pd.DataFrame):
-                assert value.columns.equals(other.columns), label
-            assert_allclose(
-                value.to_numpy(dtype=float),
-                other.to_numpy(dtype=float),
-                atol=1e-12,
-                equal_nan=True,
-                err_msg=label,
-            )
+            assert_same_table(value, other, label)
         elif hasattr(value, "stat"):
             assert type(value) is type(other), label
-            assert str(value) == str(other), label
+            assert_same_text(str(value), str(other), label)
             assert_allclose(value.stat, other.stat, equal_nan=True, err_msg=label)
             assert_allclose(value.pval, other.pval, equal_nan=True, err_msg=label)
         elif isinstance(value, (int, float, np.number)):
-            assert_allclose(value, other, atol=1e-12, equal_nan=True, err_msg=label)
+            assert_allclose(value, other, atol=ATOL, equal_nan=True, err_msg=label)
         else:
+            # Names of the effects, which are text
             assert value == other, label
-    assert res.conf_int().equals(expected.conf_int())
-    assert res.conf_int(0.8).equals(expected.conf_int(0.8))
+    assert_same_table(res.conf_int(), expected.conf_int(), "conf_int")
+    assert_same_table(res.conf_int(0.8), expected.conf_int(0.8), "conf_int(0.8)")
 
     def text(results):
         out = results.summary.as_text()
         out = re.sub(r"Date:\s+\w+, \w+ \d+ \d+", "Date:", out)
         return re.sub(r"Time:\s+\d+:\d+:\d+", "Time:", out)
 
-    assert text(res) == text(expected)
+    assert_same_text(text(res), text(expected), "summary")
     assert_allclose(
         res.predict(effects=True, idiosyncratic=True),
         expected.predict(effects=True, idiosyncratic=True),
+        atol=ATOL,
     )
 
 
@@ -581,7 +594,7 @@ def test_formula_prediction_with_data(frame):
     res = mod.fit()
     out = res.predict(data=frame.iloc[:10])
     assert out.shape == (10, 1)
-    assert_allclose(out.to_numpy(), 0.0)
+    assert_allclose(out.to_numpy(), 0.0, atol=ATOL)
 
 
 def test_formula_with_a_constant_is_not_a_model_without_regressors(frame):

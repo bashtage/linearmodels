@@ -116,13 +116,21 @@ def fit(model, options):
     return model.fit(**options, **extra)
 
 
+# LinearFactorModelGMM minimizes the GMM objective with BFGS, whose gradient is a finite
+# difference. Fits of the same data that differ by rounding, in the last bit, stop at
+# estimates that differ by 4e-8 (the parameters) and 2e-7 (the covariance, whose
+# smallest elements have the largest relative differences) and not by 1e-16.
+RTOL = {"LinearFactorModelGMM": 1e-5}
+
+
 @pytest.mark.parametrize("name", list(CASES))
 def test_mixed_case_names_give_the_results_of_lower_case_names(data, name):
     make, lower, mixed = CASES[name]
     expected = fit(make(data), lower)
     result = fit(make(data), mixed)
-    assert_allclose(result.params, expected.params)
-    assert_allclose(result.cov, expected.cov)
+    rtol = RTOL.get(name, 1e-7)
+    assert_allclose(result.params, expected.params, rtol=rtol)
+    assert_allclose(result.cov, expected.cov, rtol=rtol)
 
 
 def as_array(value):

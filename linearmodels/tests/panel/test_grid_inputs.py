@@ -280,9 +280,12 @@ def compare_results(res, expected):
     # The covariance of two-way clusters is not positive in some of the small samples,
     # so the standard errors, which would warn, are not used
     assert res.nobs == expected.nobs
-    assert_allclose(res.params, expected.params, rtol=1e-12)
-    assert_allclose(res.cov, expected.cov, rtol=1e-12)
-    assert_allclose(res.resids, expected.resids, rtol=1e-12)
+    assert_allclose(res.params, expected.params, rtol=1e-10)
+    assert_allclose(res.cov, expected.cov, rtol=1e-10)
+    # The relative rounding error of a residual that is close to 0 is larger, up to
+    # 2e-11 if the data change in the last bit, than that of the parameters and the
+    # covariance, which is 1e-13
+    assert_allclose(res.resids, expected.resids, rtol=1e-10, atol=1e-12)
 
 
 @functools.lru_cache(maxsize=None)
