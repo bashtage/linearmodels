@@ -36,6 +36,7 @@ from `statsmodels <https://statsmodels.org>`_:
 * Limited Information ML (LIML, :class:`~linearmodels.iv.model.IVLIML`)
 * Generalized Method of Moments (GMM, :class:`~linearmodels.iv.model.IVGMM`)
 * Continuously Updating GMM (CUE-GMM, :class:`~linearmodels.iv.model.IVGMMCUE`)
+* Jackknife IV (JIVE, :class:`~linearmodels.iv.model.IVJIVE`)
 
 
 **System Regression Estimators**
@@ -54,6 +55,22 @@ from `statsmodels <https://statsmodels.org>`_:
 * Linear factor model (1-step SUR, only for traded factors)
   (:class:`~linearmodels.asset_pricing.model.TradedFactorModel`)
 
+**Specification Tests and Diagnostics**
+
+* Cragg-Donald and Kleibergen-Paap tests of the rank of the first-stage
+  coefficient matrix of IV models, and the F statistics that are compared with
+  weak-instrument critical values (:ref:`testing identification
+  <iv-testing-identification>`)
+* Classical and heteroskedasticity-robust tests of the exogeneity of the
+  endogenous regressors and of the overidentifying restrictions of IV models, and
+  the J, centered J and C statistics of IV-GMM models (:ref:`IV specification
+  tests <iv-specification-tests>`)
+* Hausman test of random effects against fixed effects
+  (:meth:`~linearmodels.panel.results.RandomEffectsResults.hausman`) and Pesaran CD
+  test of cross-sectional dependence
+  (:attr:`~linearmodels.panel.results.PanelResults.pesaran_cd`) for panel models
+  (:ref:`panel specification tests <panel-specification-tests>`)
+
 linearmodels
 ============
 
@@ -65,6 +82,7 @@ linearmodels
    panel/index
    asset-pricing/index
    system/index
+   input-alignment
    utility
    compatibility
    types

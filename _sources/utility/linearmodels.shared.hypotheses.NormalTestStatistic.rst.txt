@@ -1,0 +1,32 @@
+﻿linearmodels.shared.hypotheses.NormalTestStatistic
+==================================================
+
+.. currentmodule:: linearmodels.shared.hypotheses
+
+.. autoclass:: NormalTestStatistic
+   :exclude-members: 
+
+   
+   
+   .. rubric:: Methods
+
+   .. autosummary::
+      :toctree:
+
+   
+   
+   
+   
+   
+   .. rubric:: Properties
+
+   .. autosummary::
+      :toctree:
+
+      ~NormalTestStatistic.critical_values
+      ~NormalTestStatistic.null
+      ~NormalTestStatistic.pval
+      ~NormalTestStatistic.stat
+   
+   
+   

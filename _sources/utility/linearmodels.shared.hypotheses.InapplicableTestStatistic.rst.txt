@@ -1,0 +1,32 @@
+﻿linearmodels.shared.hypotheses.InapplicableTestStatistic
+========================================================
+
+.. currentmodule:: linearmodels.shared.hypotheses
+
+.. autoclass:: InapplicableTestStatistic
+   :exclude-members: 
+
+   
+   
+   .. rubric:: Methods
+
+   .. autosummary::
+      :toctree:
+
+   
+   
+   
+   
+   
+   .. rubric:: Properties
+
+   .. autosummary::
+      :toctree:
+
+      ~InapplicableTestStatistic.critical_values
+      ~InapplicableTestStatistic.null
+      ~InapplicableTestStatistic.pval
+      ~InapplicableTestStatistic.stat
+   
+   
+   

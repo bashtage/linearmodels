@@ -23,7 +23,7 @@
     
   
       
-        <title>Basic Examples - linearmodels 7.0</title>
+        <title>Basic Examples - linearmodels 7.1</title>
       
     
 
@@ -54,7 +54,7 @@
         <style>:root{--md-text-font:"Roboto";--md-code-font:"Roboto Mono"}</style>
       
     
-        <link rel="stylesheet" type="text/css" href="../../_static/sphinx_immaterial_theme.acf80fe7f4d9ef9e2.min.css?v=9e56d0d2" />
+        <link rel="stylesheet" type="text/css" href="../../_static/sphinx_immaterial_theme.6efbe22605a23fcd6.min.css?v=b2ceb110" />
         <link rel="stylesheet" type="text/css" href="../../_static/nbsphinx-code-cells.css?v=2aa19091" />
         <link rel="stylesheet" type="text/css" href="../../_static/css/small_fixes.css?v=34934119" />
     <script>__md_scope=new URL("../..",location),__md_hash=e=>[...e].reduce(((e,_)=>(e<<5)-e+_.charCodeAt(0)),0),__md_get=(e,_=localStorage,t=__md_scope)=>JSON.parse(_.getItem(t.pathname+"."+e)),__md_set=(e,_,t=localStorage,a=__md_scope)=>{try{t.setItem(a.pathname+"."+e,JSON.stringify(_))}catch(e){}}</script>
@@ -101,7 +101,7 @@
 
 <header class="md-header md-header--shadow" data-md-component="header">
   <nav class="md-header__inner md-grid" aria-label="Header">
-    <a href="../../index.html" title="linearmodels 7.0" class="md-header__button md-logo" aria-label="linearmodels 7.0" data-md-component="logo">
+    <a href="../../index.html" title="linearmodels 7.1" class="md-header__button md-logo" aria-label="linearmodels 7.1" data-md-component="logo">
       <img src="../../_static/bw-logo.svg" alt="logo">
     </a>
     <label class="md-header__button md-icon" for="__drawer">
@@ -112,7 +112,7 @@
       <div class="md-header__ellipsis">
         <div class="md-header__topic">
           <span class="md-ellipsis">
-            linearmodels 7.0
+            linearmodels 7.1
           </span>
         </div>
         <div class="md-header__topic" data-md-component="header-topic">
@@ -207,10 +207,10 @@
 
 <nav class="md-nav md-nav--primary" aria-label="Navigation" data-md-level="0">
   <label class="md-nav__title" for="__drawer">
-    <a href="../../index.html" title="linearmodels 7.0" class="md-nav__button md-logo" aria-label="linearmodels 7.0" data-md-component="logo">
+    <a href="../../index.html" title="linearmodels 7.1" class="md-nav__button md-logo" aria-label="linearmodels 7.1" data-md-component="logo">
       <img src="../../_static/bw-logo.svg" alt="logo">
     </a>
-    linearmodels 7.0
+    linearmodels 7.1
   </label>
   
     <div class="md-nav__source">
@@ -656,6 +656,29 @@
   
   
     <li class="md-nav__item">
+      <a href="../../input-alignment.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    <span title="/input-alignment.rst (reference label)"><span>Aligning Inputs</span></span>
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+  
+    <li class="md-nav__item">
       <a href="../../utility.html" class="md-nav__link">
         
   
@@ -958,7 +981,7 @@
 <span class="nb">print</span><span class="p">(</span><span class="n">mroz</span><span class="o">.</span><span class="n">DESCR</span><span class="p">)</span>
 <span class="n">data</span> <span class="o">=</span> <span class="n">mroz</span><span class="o">.</span><span class="n">load</span><span class="p">()</span>
 <span class="n">data</span> <span class="o">=</span> <span class="n">data</span><span class="o">.</span><span class="n">dropna</span><span class="p">()</span>
-<span class="n">data</span> <span class="o">=</span> <span class="n">add_constant</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="n">has_constant</span><span class="o">=</span><span class="s2">&quot;add&quot;</span><span class="p">)</span>
+<span class="n">data</span> <span class="o">=</span> <span class="n">add_constant</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="n">has_constant</span><span class="o">=</span><span class="s2">"add"</span><span class="p">)</span>
 </code></pre></div>
 </div>
 </div>
@@ -1005,8 +1028,8 @@ expersq    exper^2
 </div>
 <div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><code><span class="kn">from</span><span class="w"> </span><span class="nn">linearmodels.iv</span><span class="w"> </span><span class="kn">import</span> <span class="n">IV2SLS</span>
 
-<span class="n">res_ols</span> <span class="o">=</span> <span class="n">IV2SLS</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">log</span><span class="p">(</span><span class="n">data</span><span class="o">.</span><span class="n">wage</span><span class="p">),</span> <span class="n">data</span><span class="p">[[</span><span class="s2">&quot;const&quot;</span><span class="p">,</span> <span class="s2">&quot;educ&quot;</span><span class="p">]],</span> <span class="kc">None</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span><span class="o">.</span><span class="n">fit</span><span class="p">(</span>
-    <span class="n">cov_type</span><span class="o">=</span><span class="s2">&quot;unadjusted&quot;</span>
+<span class="n">res_ols</span> <span class="o">=</span> <span class="n">IV2SLS</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">log</span><span class="p">(</span><span class="n">data</span><span class="o">.</span><span class="n">wage</span><span class="p">),</span> <span class="n">data</span><span class="p">[[</span><span class="s2">"const"</span><span class="p">,</span> <span class="s2">"educ"</span><span class="p">]],</span> <span class="kc">None</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span><span class="o">.</span><span class="n">fit</span><span class="p">(</span>
+    <span class="n">cov_type</span><span class="o">=</span><span class="s2">"unadjusted"</span>
 <span class="p">)</span>
 <span class="nb">print</span><span class="p">(</span><span class="n">res_ols</span><span class="p">)</span>
 </code></pre></div>
@@ -1022,8 +1045,8 @@ expersq    exper^2
 Dep. Variable:                   wage   R-squared:                      0.1179
 Estimator:                        OLS   Adj. R-squared:                 0.1158
 No. Observations:                 428   F-statistic:                    57.196
-Date:                Tue, Oct 21 2025   P-value (F-stat)                0.0000
-Time:                        13:38:19   Distribution:                  chi2(1)
+Date:                Fri, Oct 16 2026   P-value (F-stat)                0.0000
+Time:                        08:36:36   Distribution:                  chi2(1)
 Cov. Estimator:            unadjusted
 
                              Parameter Estimates
@@ -1041,11 +1064,11 @@ educ           0.1086     0.0144     7.5628     0.0000      0.0805      0.1368
 <div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span><code>[3]:
 </code></pre></div>
 </div>
-<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><code><span class="n">res_first</span> <span class="o">=</span> <span class="n">IV2SLS</span><span class="p">(</span><span class="n">data</span><span class="o">.</span><span class="n">educ</span><span class="p">,</span> <span class="n">data</span><span class="p">[[</span><span class="s2">&quot;const&quot;</span><span class="p">,</span> <span class="s2">&quot;fatheduc&quot;</span><span class="p">]],</span> <span class="kc">None</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span><span class="o">.</span><span class="n">fit</span><span class="p">(</span>
-    <span class="n">cov_type</span><span class="o">=</span><span class="s2">&quot;unadjusted&quot;</span>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><code><span class="n">res_first</span> <span class="o">=</span> <span class="n">IV2SLS</span><span class="p">(</span><span class="n">data</span><span class="o">.</span><span class="n">educ</span><span class="p">,</span> <span class="n">data</span><span class="p">[[</span><span class="s2">"const"</span><span class="p">,</span> <span class="s2">"fatheduc"</span><span class="p">]],</span> <span class="kc">None</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span><span class="o">.</span><span class="n">fit</span><span class="p">(</span>
+    <span class="n">cov_type</span><span class="o">=</span><span class="s2">"unadjusted"</span>
 <span class="p">)</span>
 <span class="nb">print</span><span class="p">(</span><span class="n">res_first</span><span class="p">)</span>
-<span class="n">data</span><span class="p">[</span><span class="s2">&quot;educ_hat&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">data</span><span class="o">.</span><span class="n">educ</span> <span class="o">-</span> <span class="n">res_first</span><span class="o">.</span><span class="n">resids</span>
+<span class="n">data</span><span class="p">[</span><span class="s2">"educ_hat"</span><span class="p">]</span> <span class="o">=</span> <span class="n">data</span><span class="o">.</span><span class="n">educ</span> <span class="o">-</span> <span class="n">res_first</span><span class="o">.</span><span class="n">resids</span>
 </code></pre></div>
 </div>
 </div>
@@ -1059,8 +1082,8 @@ educ           0.1086     0.0144     7.5628     0.0000      0.0805      0.1368
 Dep. Variable:                   educ   R-squared:                      0.1726
 Estimator:                        OLS   Adj. R-squared:                 0.1706
 No. Observations:                 428   F-statistic:                    89.258
-Date:                Tue, Oct 21 2025   P-value (F-stat)                0.0000
-Time:                        13:38:19   Distribution:                  chi2(1)
+Date:                Fri, Oct 16 2026   P-value (F-stat)                0.0000
+Time:                        08:36:36   Distribution:                  chi2(1)
 Cov. Estimator:            unadjusted
 
                              Parameter Estimates
@@ -1077,8 +1100,8 @@ fatheduc       0.2694     0.0285     9.4476     0.0000      0.2135      0.3253
 <div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span><code>[4]:
 </code></pre></div>
 </div>
-<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><code><span class="n">res_second</span> <span class="o">=</span> <span class="n">IV2SLS</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">log</span><span class="p">(</span><span class="n">data</span><span class="o">.</span><span class="n">wage</span><span class="p">),</span> <span class="n">data</span><span class="p">[[</span><span class="s2">&quot;const&quot;</span><span class="p">]],</span> <span class="n">data</span><span class="o">.</span><span class="n">educ</span><span class="p">,</span> <span class="n">data</span><span class="o">.</span><span class="n">fatheduc</span><span class="p">)</span><span class="o">.</span><span class="n">fit</span><span class="p">(</span>
-    <span class="n">cov_type</span><span class="o">=</span><span class="s2">&quot;unadjusted&quot;</span>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><code><span class="n">res_second</span> <span class="o">=</span> <span class="n">IV2SLS</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">log</span><span class="p">(</span><span class="n">data</span><span class="o">.</span><span class="n">wage</span><span class="p">),</span> <span class="n">data</span><span class="p">[[</span><span class="s2">"const"</span><span class="p">]],</span> <span class="n">data</span><span class="o">.</span><span class="n">educ</span><span class="p">,</span> <span class="n">data</span><span class="o">.</span><span class="n">fatheduc</span><span class="p">)</span><span class="o">.</span><span class="n">fit</span><span class="p">(</span>
+    <span class="n">cov_type</span><span class="o">=</span><span class="s2">"unadjusted"</span>
 <span class="p">)</span>
 <span class="nb">print</span><span class="p">(</span><span class="n">res_second</span><span class="p">)</span>
 </code></pre></div>
@@ -1094,8 +1117,8 @@ fatheduc       0.2694     0.0285     9.4476     0.0000      0.2135      0.3253
 Dep. Variable:                   wage   R-squared:                      0.0934
 Estimator:                    IV-2SLS   Adj. R-squared:                 0.0913
 No. Observations:                 428   F-statistic:                    2.8487
-Date:                Tue, Oct 21 2025   P-value (F-stat)                0.0914
-Time:                        13:38:19   Distribution:                  chi2(1)
+Date:                Fri, Oct 16 2026   P-value (F-stat)                0.0914
+Time:                        08:36:36   Distribution:                  chi2(1)
 Cov. Estimator:            unadjusted
 
                              Parameter Estimates
@@ -1120,10 +1143,10 @@ Debiased: False
 </div>
 <div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><code><span class="kn">from</span><span class="w"> </span><span class="nn">linearmodels.iv</span><span class="w"> </span><span class="kn">import</span> <span class="n">compare</span>
 
-<span class="n">res_direct</span> <span class="o">=</span> <span class="n">IV2SLS</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">log</span><span class="p">(</span><span class="n">data</span><span class="o">.</span><span class="n">wage</span><span class="p">),</span> <span class="n">data</span><span class="p">[[</span><span class="s2">&quot;const&quot;</span><span class="p">,</span> <span class="s2">&quot;educ_hat&quot;</span><span class="p">]],</span> <span class="kc">None</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span><span class="o">.</span><span class="n">fit</span><span class="p">(</span>
-    <span class="n">cov_type</span><span class="o">=</span><span class="s2">&quot;unadjusted&quot;</span>
+<span class="n">res_direct</span> <span class="o">=</span> <span class="n">IV2SLS</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">log</span><span class="p">(</span><span class="n">data</span><span class="o">.</span><span class="n">wage</span><span class="p">),</span> <span class="n">data</span><span class="p">[[</span><span class="s2">"const"</span><span class="p">,</span> <span class="s2">"educ_hat"</span><span class="p">]],</span> <span class="kc">None</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span><span class="o">.</span><span class="n">fit</span><span class="p">(</span>
+    <span class="n">cov_type</span><span class="o">=</span><span class="s2">"unadjusted"</span>
 <span class="p">)</span>
-<span class="nb">print</span><span class="p">(</span><span class="n">compare</span><span class="p">({</span><span class="s2">&quot;OLS&quot;</span><span class="p">:</span> <span class="n">res_ols</span><span class="p">,</span> <span class="s2">&quot;2SLS&quot;</span><span class="p">:</span> <span class="n">res_second</span><span class="p">,</span> <span class="s2">&quot;Direct&quot;</span><span class="p">:</span> <span class="n">res_direct</span><span class="p">}))</span>
+<span class="nb">print</span><span class="p">(</span><span class="n">compare</span><span class="p">({</span><span class="s2">"OLS"</span><span class="p">:</span> <span class="n">res_ols</span><span class="p">,</span> <span class="s2">"2SLS"</span><span class="p">:</span> <span class="n">res_second</span><span class="p">,</span> <span class="s2">"Direct"</span><span class="p">:</span> <span class="n">res_direct</span><span class="p">}))</span>
 </code></pre></div>
 </div>
 </div>
@@ -1143,7 +1166,7 @@ Cov. Est.                unadjusted     unadjusted     unadjusted
 R-squared                    0.1179         0.0934         0.0060
 Adj. R-squared               0.1158         0.0913         0.0037
 F-statistic                  57.196         2.8487         2.5982
-P-value (F-stat)          3.941e-14         0.0914         0.1070
+P-value (F-stat)          3.944e-14         0.0914         0.1070
 ==================     ============   ============   ============
 const                       -0.1852         0.4411         0.4411
                           (-1.0022)       (0.9911)       (0.9465)
@@ -1168,7 +1191,7 @@ T-stats reported in parentheses
 
 <span class="n">men</span> <span class="o">=</span> <span class="n">wage</span><span class="o">.</span><span class="n">load</span><span class="p">()</span>
 <span class="nb">print</span><span class="p">(</span><span class="n">wage</span><span class="o">.</span><span class="n">DESCR</span><span class="p">)</span>
-<span class="n">men</span> <span class="o">=</span> <span class="n">men</span><span class="p">[[</span><span class="s2">&quot;educ&quot;</span><span class="p">,</span> <span class="s2">&quot;wage&quot;</span><span class="p">,</span> <span class="s2">&quot;sibs&quot;</span><span class="p">,</span> <span class="s2">&quot;exper&quot;</span><span class="p">]]</span>
+<span class="n">men</span> <span class="o">=</span> <span class="n">men</span><span class="p">[[</span><span class="s2">"educ"</span><span class="p">,</span> <span class="s2">"wage"</span><span class="p">,</span> <span class="s2">"sibs"</span><span class="p">,</span> <span class="s2">"exper"</span><span class="p">]]</span>
 <span class="n">men</span> <span class="o">=</span> <span class="n">add_constant</span><span class="p">(</span><span class="n">men</span><span class="p">)</span>
 <span class="n">men</span> <span class="o">=</span> <span class="n">men</span><span class="o">.</span><span class="n">dropna</span><span class="p">()</span>
 </code></pre></div>
@@ -1208,8 +1231,8 @@ lwage                    natural log of wage
 <div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span><code>[7]:
 </code></pre></div>
 </div>
-<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><code><span class="n">res_ols</span> <span class="o">=</span> <span class="n">IV2SLS</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">log</span><span class="p">(</span><span class="n">men</span><span class="o">.</span><span class="n">wage</span><span class="p">),</span> <span class="n">men</span><span class="p">[[</span><span class="s2">&quot;const&quot;</span><span class="p">,</span> <span class="s2">&quot;educ&quot;</span><span class="p">]],</span> <span class="kc">None</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span><span class="o">.</span><span class="n">fit</span><span class="p">(</span>
-    <span class="n">cov_type</span><span class="o">=</span><span class="s2">&quot;unadjusted&quot;</span>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><code><span class="n">res_ols</span> <span class="o">=</span> <span class="n">IV2SLS</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">log</span><span class="p">(</span><span class="n">men</span><span class="o">.</span><span class="n">wage</span><span class="p">),</span> <span class="n">men</span><span class="p">[[</span><span class="s2">"const"</span><span class="p">,</span> <span class="s2">"educ"</span><span class="p">]],</span> <span class="kc">None</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span><span class="o">.</span><span class="n">fit</span><span class="p">(</span>
+    <span class="n">cov_type</span><span class="o">=</span><span class="s2">"unadjusted"</span>
 <span class="p">)</span>
 <span class="nb">print</span><span class="p">(</span><span class="n">res_ols</span><span class="p">)</span>
 </code></pre></div>
@@ -1225,8 +1248,8 @@ lwage                    natural log of wage
 Dep. Variable:                   wage   R-squared:                      0.0973
 Estimator:                        OLS   Adj. R-squared:                 0.0964
 No. Observations:                 934   F-statistic:                    100.71
-Date:                Tue, Oct 21 2025   P-value (F-stat)                0.0000
-Time:                        13:38:19   Distribution:                  chi2(1)
+Date:                Fri, Oct 16 2026   P-value (F-stat)                0.0000
+Time:                        08:36:36   Distribution:                  chi2(1)
 Cov. Estimator:            unadjusted
 
                              Parameter Estimates
@@ -1243,8 +1266,8 @@ educ           0.0598     0.0060     10.035     0.0000      0.0481      0.0715
 <div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span><code>[8]:
 </code></pre></div>
 </div>
-<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><code><span class="n">res_first</span> <span class="o">=</span> <span class="n">IV2SLS</span><span class="p">(</span><span class="n">men</span><span class="o">.</span><span class="n">educ</span><span class="p">,</span> <span class="n">men</span><span class="p">[[</span><span class="s2">&quot;const&quot;</span><span class="p">,</span> <span class="s2">&quot;sibs&quot;</span><span class="p">]],</span> <span class="kc">None</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span><span class="o">.</span><span class="n">fit</span><span class="p">(</span>
-    <span class="n">cov_type</span><span class="o">=</span><span class="s2">&quot;unadjusted&quot;</span>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><code><span class="n">res_first</span> <span class="o">=</span> <span class="n">IV2SLS</span><span class="p">(</span><span class="n">men</span><span class="o">.</span><span class="n">educ</span><span class="p">,</span> <span class="n">men</span><span class="p">[[</span><span class="s2">"const"</span><span class="p">,</span> <span class="s2">"sibs"</span><span class="p">]],</span> <span class="kc">None</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span><span class="o">.</span><span class="n">fit</span><span class="p">(</span>
+    <span class="n">cov_type</span><span class="o">=</span><span class="s2">"unadjusted"</span>
 <span class="p">)</span>
 <span class="nb">print</span><span class="p">(</span><span class="n">res_first</span><span class="o">.</span><span class="n">summary</span><span class="p">)</span>
 </code></pre></div>
@@ -1260,8 +1283,8 @@ educ           0.0598     0.0060     10.035     0.0000      0.0481      0.0715
 Dep. Variable:                   educ   R-squared:                      0.0576
 Estimator:                        OLS   Adj. R-squared:                 0.0566
 No. Observations:                 934   F-statistic:                    57.107
-Date:                Tue, Oct 21 2025   P-value (F-stat)                0.0000
-Time:                        13:38:19   Distribution:                  chi2(1)
+Date:                Fri, Oct 16 2026   P-value (F-stat)                0.0000
+Time:                        08:36:36   Distribution:                  chi2(1)
 Cov. Estimator:            unadjusted
 
                              Parameter Estimates
@@ -1278,7 +1301,7 @@ sibs          -0.2287     0.0303    -7.5569     0.0000     -0.2880     -0.1694
 <div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span><code>[9]:
 </code></pre></div>
 </div>
-<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><code><span class="n">res</span> <span class="o">=</span> <span class="n">IV2SLS</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">log</span><span class="p">(</span><span class="n">men</span><span class="o">.</span><span class="n">wage</span><span class="p">),</span> <span class="n">men</span><span class="o">.</span><span class="n">const</span><span class="p">,</span> <span class="n">men</span><span class="o">.</span><span class="n">educ</span><span class="p">,</span> <span class="n">men</span><span class="o">.</span><span class="n">sibs</span><span class="p">)</span><span class="o">.</span><span class="n">fit</span><span class="p">(</span><span class="n">cov_type</span><span class="o">=</span><span class="s2">&quot;unadjusted&quot;</span><span class="p">)</span>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><code><span class="n">res</span> <span class="o">=</span> <span class="n">IV2SLS</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">log</span><span class="p">(</span><span class="n">men</span><span class="o">.</span><span class="n">wage</span><span class="p">),</span> <span class="n">men</span><span class="o">.</span><span class="n">const</span><span class="p">,</span> <span class="n">men</span><span class="o">.</span><span class="n">educ</span><span class="p">,</span> <span class="n">men</span><span class="o">.</span><span class="n">sibs</span><span class="p">)</span><span class="o">.</span><span class="n">fit</span><span class="p">(</span><span class="n">cov_type</span><span class="o">=</span><span class="s2">"unadjusted"</span><span class="p">)</span>
 <span class="nb">print</span><span class="p">(</span><span class="n">res</span><span class="o">.</span><span class="n">summary</span><span class="p">)</span>
 </code></pre></div>
 </div>
@@ -1293,8 +1316,8 @@ sibs          -0.2287     0.0303    -7.5569     0.0000     -0.2880     -0.1694
 Dep. Variable:                   wage   R-squared:                     -0.0090
 Estimator:                    IV-2SLS   Adj. R-squared:                -0.0101
 No. Observations:                 934   F-statistic:                    21.715
-Date:                Tue, Oct 21 2025   P-value (F-stat)                0.0000
-Time:                        13:38:19   Distribution:                  chi2(1)
+Date:                Fri, Oct 16 2026   P-value (F-stat)                0.0000
+Time:                        08:36:36   Distribution:                  chi2(1)
 Cov. Estimator:            unadjusted
 
                              Parameter Estimates
@@ -1319,7 +1342,7 @@ Debiased: False
 </code></pre></div>
 </div>
 <div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><code><span class="n">res2</span> <span class="o">=</span> <span class="n">res</span><span class="o">.</span><span class="n">resids</span><span class="o">**</span><span class="mi">2</span>
-<span class="n">fgls_mod</span> <span class="o">=</span> <span class="n">IV2SLS</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">log</span><span class="p">(</span><span class="n">res2</span><span class="p">),</span> <span class="n">men</span><span class="p">[[</span><span class="s2">&quot;const&quot;</span><span class="p">,</span> <span class="s2">&quot;sibs&quot;</span><span class="p">,</span> <span class="s2">&quot;exper&quot;</span><span class="p">]],</span> <span class="kc">None</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
+<span class="n">fgls_mod</span> <span class="o">=</span> <span class="n">IV2SLS</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">log</span><span class="p">(</span><span class="n">res2</span><span class="p">),</span> <span class="n">men</span><span class="p">[[</span><span class="s2">"const"</span><span class="p">,</span> <span class="s2">"sibs"</span><span class="p">,</span> <span class="s2">"exper"</span><span class="p">]],</span> <span class="kc">None</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
 <span class="n">fgls_res</span> <span class="o">=</span> <span class="n">fgls_mod</span><span class="o">.</span><span class="n">fit</span><span class="p">()</span>
 <span class="n">sigma2_hat</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">exp</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">log</span><span class="p">(</span><span class="n">res2</span><span class="p">)</span> <span class="o">-</span> <span class="n">fgls_res</span><span class="o">.</span><span class="n">resids</span><span class="p">)</span>
 <span class="nb">print</span><span class="p">(</span><span class="n">fgls_res</span><span class="p">)</span>
@@ -1336,8 +1359,8 @@ Debiased: False
 Dep. Variable:               residual   R-squared:                      0.0045
 Estimator:                        OLS   Adj. R-squared:                 0.0024
 No. Observations:                 934   F-statistic:                    3.9903
-Date:                Tue, Oct 21 2025   P-value (F-stat)                0.1360
-Time:                        13:38:19   Distribution:                  chi2(2)
+Date:                Fri, Oct 16 2026   P-value (F-stat)                0.1360
+Time:                        08:36:36   Distribution:                  chi2(2)
 Cov. Estimator:                robust
 
                              Parameter Estimates
@@ -1357,7 +1380,7 @@ exper          0.0084     0.0158     0.5311     0.5953     -0.0226      0.0394
 </div>
 <div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><code><span class="n">res_gls</span> <span class="o">=</span> <span class="n">IV2SLS</span><span class="p">(</span>
     <span class="n">np</span><span class="o">.</span><span class="n">log</span><span class="p">(</span><span class="n">men</span><span class="o">.</span><span class="n">wage</span><span class="p">),</span> <span class="n">men</span><span class="o">.</span><span class="n">const</span><span class="p">,</span> <span class="n">men</span><span class="o">.</span><span class="n">educ</span><span class="p">,</span> <span class="n">men</span><span class="o">.</span><span class="n">sibs</span><span class="p">,</span> <span class="n">weights</span><span class="o">=</span><span class="mi">1</span> <span class="o">/</span> <span class="n">sigma2_hat</span>
-<span class="p">)</span><span class="o">.</span><span class="n">fit</span><span class="p">(</span><span class="n">cov_type</span><span class="o">=</span><span class="s2">&quot;unadjusted&quot;</span><span class="p">)</span>
+<span class="p">)</span><span class="o">.</span><span class="n">fit</span><span class="p">(</span><span class="n">cov_type</span><span class="o">=</span><span class="s2">"unadjusted"</span><span class="p">)</span>
 <span class="nb">print</span><span class="p">(</span><span class="n">res_gls</span><span class="p">)</span>
 </code></pre></div>
 </div>
@@ -1372,8 +1395,8 @@ exper          0.0084     0.0158     0.5311     0.5953     -0.0226      0.0394
 Dep. Variable:                   wage   R-squared:                      0.0090
 Estimator:                    IV-2SLS   Adj. R-squared:                 0.0080
 No. Observations:                 934   F-statistic:                    23.520
-Date:                Tue, Oct 21 2025   P-value (F-stat)                0.0000
-Time:                        13:38:20   Distribution:                  chi2(1)
+Date:                Fri, Oct 16 2026   P-value (F-stat)                0.0000
+Time:                        08:36:36   Distribution:                  chi2(1)
 Cov. Estimator:            unadjusted
 
                              Parameter Estimates
@@ -1436,8 +1459,8 @@ faminc                   log(faminc)
 <div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span><code>[13]:
 </code></pre></div>
 </div>
-<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><code><span class="n">res</span> <span class="o">=</span> <span class="n">IV2SLS</span><span class="p">(</span><span class="n">data</span><span class="o">.</span><span class="n">packs</span><span class="p">,</span> <span class="n">data</span><span class="p">[[</span><span class="s2">&quot;const&quot;</span><span class="p">,</span> <span class="s2">&quot;cigprice&quot;</span><span class="p">]],</span> <span class="kc">None</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span><span class="o">.</span><span class="n">fit</span><span class="p">(</span>
-    <span class="n">cov_type</span><span class="o">=</span><span class="s2">&quot;unadjusted&quot;</span>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><code><span class="n">res</span> <span class="o">=</span> <span class="n">IV2SLS</span><span class="p">(</span><span class="n">data</span><span class="o">.</span><span class="n">packs</span><span class="p">,</span> <span class="n">data</span><span class="p">[[</span><span class="s2">"const"</span><span class="p">,</span> <span class="s2">"cigprice"</span><span class="p">]],</span> <span class="kc">None</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span><span class="o">.</span><span class="n">fit</span><span class="p">(</span>
+    <span class="n">cov_type</span><span class="o">=</span><span class="s2">"unadjusted"</span>
 <span class="p">)</span>
 <span class="nb">print</span><span class="p">(</span><span class="n">res</span><span class="p">)</span>
 </code></pre></div>
@@ -1453,8 +1476,8 @@ faminc                   log(faminc)
 Dep. Variable:                  packs   R-squared:                      0.0015
 Estimator:                        OLS   Adj. R-squared:                 0.0008
 No. Observations:                1388   F-statistic:                    2.0731
-Date:                Tue, Oct 21 2025   P-value (F-stat)                0.1499
-Time:                        13:38:20   Distribution:                  chi2(1)
+Date:                Fri, Oct 16 2026   P-value (F-stat)                0.1499
+Time:                        08:36:36   Distribution:                  chi2(1)
 Cov. Estimator:            unadjusted
 
                              Parameter Estimates
@@ -1472,7 +1495,7 @@ cigprice       0.0356     0.0247     1.4398     0.1499     -0.0129      0.0840
 </code></pre></div>
 </div>
 <div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><code><span class="n">res</span> <span class="o">=</span> <span class="n">IV2SLS</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">log</span><span class="p">(</span><span class="n">data</span><span class="o">.</span><span class="n">bwght</span><span class="p">),</span> <span class="n">data</span><span class="o">.</span><span class="n">const</span><span class="p">,</span> <span class="n">data</span><span class="o">.</span><span class="n">packs</span><span class="p">,</span> <span class="n">data</span><span class="o">.</span><span class="n">cigprice</span><span class="p">)</span><span class="o">.</span><span class="n">fit</span><span class="p">(</span>
-    <span class="n">cov_type</span><span class="o">=</span><span class="s2">&quot;unadjusted&quot;</span>
+    <span class="n">cov_type</span><span class="o">=</span><span class="s2">"unadjusted"</span>
 <span class="p">)</span>
 <span class="nb">print</span><span class="p">(</span><span class="n">res</span><span class="p">)</span>
 </code></pre></div>
@@ -1488,8 +1511,8 @@ cigprice       0.0356     0.0247     1.4398     0.1499     -0.0129      0.0840
 Dep. Variable:                  bwght   R-squared:                     -1.5224
 Estimator:                    IV-2SLS   Adj. R-squared:                -1.5242
 No. Observations:                1388   F-statistic:                    1.1356
-Date:                Tue, Oct 21 2025   P-value (F-stat)                0.2866
-Time:                        13:38:20   Distribution:                  chi2(1)
+Date:                Fri, Oct 16 2026   P-value (F-stat)                0.2866
+Time:                        08:36:36   Distribution:                  chi2(1)
 Cov. Estimator:            unadjusted
 
                              Parameter Estimates
@@ -1573,26 +1596,26 @@ xpersq                   exper**2
 <div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span><code>[16]:
 </code></pre></div>
 </div>
-<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><code><span class="n">dep</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;wage&quot;</span><span class="p">]</span>
-<span class="n">endog</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;educ&quot;</span><span class="p">]</span>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><code><span class="n">dep</span> <span class="o">=</span> <span class="p">[</span><span class="s2">"wage"</span><span class="p">]</span>
+<span class="n">endog</span> <span class="o">=</span> <span class="p">[</span><span class="s2">"educ"</span><span class="p">]</span>
 <span class="n">exog</span> <span class="o">=</span> <span class="p">[</span>
-    <span class="s2">&quot;const&quot;</span><span class="p">,</span>
-    <span class="s2">&quot;exper&quot;</span><span class="p">,</span>
-    <span class="s2">&quot;expersq&quot;</span><span class="p">,</span>
-    <span class="s2">&quot;black&quot;</span><span class="p">,</span>
-    <span class="s2">&quot;smsa&quot;</span><span class="p">,</span>
-    <span class="s2">&quot;south&quot;</span><span class="p">,</span>
-    <span class="s2">&quot;smsa66&quot;</span><span class="p">,</span>
-    <span class="s2">&quot;reg662&quot;</span><span class="p">,</span>
-    <span class="s2">&quot;reg663&quot;</span><span class="p">,</span>
-    <span class="s2">&quot;reg664&quot;</span><span class="p">,</span>
-    <span class="s2">&quot;reg665&quot;</span><span class="p">,</span>
-    <span class="s2">&quot;reg666&quot;</span><span class="p">,</span>
-    <span class="s2">&quot;reg667&quot;</span><span class="p">,</span>
-    <span class="s2">&quot;reg668&quot;</span><span class="p">,</span>
-    <span class="s2">&quot;reg669&quot;</span><span class="p">,</span>
+    <span class="s2">"const"</span><span class="p">,</span>
+    <span class="s2">"exper"</span><span class="p">,</span>
+    <span class="s2">"expersq"</span><span class="p">,</span>
+    <span class="s2">"black"</span><span class="p">,</span>
+    <span class="s2">"smsa"</span><span class="p">,</span>
+    <span class="s2">"south"</span><span class="p">,</span>
+    <span class="s2">"smsa66"</span><span class="p">,</span>
+    <span class="s2">"reg662"</span><span class="p">,</span>
+    <span class="s2">"reg663"</span><span class="p">,</span>
+    <span class="s2">"reg664"</span><span class="p">,</span>
+    <span class="s2">"reg665"</span><span class="p">,</span>
+    <span class="s2">"reg666"</span><span class="p">,</span>
+    <span class="s2">"reg667"</span><span class="p">,</span>
+    <span class="s2">"reg668"</span><span class="p">,</span>
+    <span class="s2">"reg669"</span><span class="p">,</span>
 <span class="p">]</span>
-<span class="n">instr</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;nearc4&quot;</span><span class="p">]</span>
+<span class="n">instr</span> <span class="o">=</span> <span class="p">[</span><span class="s2">"nearc4"</span><span class="p">]</span>
 <span class="n">data</span> <span class="o">=</span> <span class="n">data</span><span class="p">[</span><span class="n">dep</span> <span class="o">+</span> <span class="n">exog</span> <span class="o">+</span> <span class="n">endog</span> <span class="o">+</span> <span class="n">instr</span><span class="p">]</span><span class="o">.</span><span class="n">dropna</span><span class="p">()</span>
 </code></pre></div>
 </div>
@@ -1617,8 +1640,8 @@ xpersq                   exper**2
 Dep. Variable:                   educ   R-squared:                      0.4771
 Estimator:                        OLS   Adj. R-squared:                 0.4745
 No. Observations:                3010   F-statistic:                    3693.4
-Date:                Tue, Oct 21 2025   P-value (F-stat)                0.0000
-Time:                        13:38:20   Distribution:                 chi2(15)
+Date:                Fri, Oct 16 2026   P-value (F-stat)                0.0000
+Time:                        08:36:36   Distribution:                 chi2(15)
 Cov. Estimator:                robust
 
                              Parameter Estimates
@@ -1664,8 +1687,8 @@ reg669         0.2103     0.1988     1.0575     0.2903     -0.1794      0.6000
 Dep. Variable:                   wage   R-squared:                      0.2998
 Estimator:                        OLS   Adj. R-squared:                 0.2963
 No. Observations:                3010   F-statistic:                    1377.0
-Date:                Tue, Oct 21 2025   P-value (F-stat)                0.0000
-Time:                        13:38:20   Distribution:                 chi2(15)
+Date:                Fri, Oct 16 2026   P-value (F-stat)                0.0000
+Time:                        08:36:36   Distribution:                 chi2(15)
 Cov. Estimator:                robust
 
                              Parameter Estimates
@@ -1711,8 +1734,8 @@ educ           0.0747     0.0036     20.540     0.0000      0.0676      0.0818
 Dep. Variable:                   wage   R-squared:                      0.2382
 Estimator:                    IV-2SLS   Adj. R-squared:                 0.2343
 No. Observations:                3010   F-statistic:                    840.83
-Date:                Tue, Oct 21 2025   P-value (F-stat)                0.0000
-Time:                        13:38:20   Distribution:                 chi2(15)
+Date:                Fri, Oct 16 2026   P-value (F-stat)                0.0000
+Time:                        08:36:36   Distribution:                 chi2(15)
 Cov. Estimator:                robust
 
                              Parameter Estimates
@@ -1807,6 +1830,50 @@ T-stats reported in parentheses
 T-stats use same covariance type as original model
 </pre></div></div>
 </div>
+<p><code class="docutils literal notranslate"><span class="pre">first_stage</span></code> also contains tests of whether the model is identified. Identification requires that the matrix of first-stage coefficients on the excluded instruments has full column rank, which here means that the coefficient on the instrument is not zero. The null hypothesis of both tests is that the matrix does not have full rank, so that the model is <strong>underidentified</strong>.</p>
+<ul class="simple">
+<li><p>The Cragg-Donald test, <code class="docutils literal notranslate"><span class="pre">cragg_donald</span></code>, requires that the first-stage errors are conditionally homoskedastic and serially uncorrelated, and does not use the covariance estimator that was used to fit the model.</p></li>
+<li><p>The Kleibergen-Paap rk LM test, <code class="docutils literal notranslate"><span class="pre">kleibergen_paap</span></code>, uses the covariance estimator of the model, which is the robust estimator here.</p></li>
+</ul>
+<p><code class="docutils literal notranslate"><span class="pre">cragg_donald_f</span></code> and <code class="docutils literal notranslate"><span class="pre">kleibergen_paap_f</span></code> are the F statistics that Stata’s <code class="docutils literal notranslate"><span class="pre">ivreg2</span></code> reports as the “Cragg-Donald Wald F statistic” and the “Kleibergen-Paap rk Wald F statistic”. They are the statistics that are usually compared with weak-instrument critical values. They are not tests and do not have p-values.</p>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span><code>[21]:
+</code></pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><code><span class="n">first_stage</span> <span class="o">=</span> <span class="n">res_2sls</span><span class="o">.</span><span class="n">first_stage</span>
+<span class="nb">print</span><span class="p">(</span><span class="n">first_stage</span><span class="o">.</span><span class="n">cragg_donald</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="n">first_stage</span><span class="o">.</span><span class="n">kleibergen_paap</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">"Cragg-Donald F statistic: </span><span class="si">{</span><span class="n">first_stage</span><span class="o">.</span><span class="n">cragg_donald_f</span><span class="si">:</span><span class="s2">0.2f</span><span class="si">}</span><span class="s2">"</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">"Kleibergen-Paap F statistic: </span><span class="si">{</span><span class="n">first_stage</span><span class="o">.</span><span class="n">kleibergen_paap_f</span><span class="si">:</span><span class="s2">0.2f</span><span class="si">}</span><span class="s2">"</span><span class="p">)</span>
+</code></pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+Cragg-Donald Test
+H0: The first-stage coefficient matrix does not have full column rank (the model is underidentified)
+Statistic: 13.2558
+P-value: 0.0003
+Distributed: chi2(1)
+Kleibergen-Paap rk LM Test
+H0: The first-stage coefficient matrix does not have full column rank (the model is underidentified)
+Statistic: 14.0275
+P-value: 0.0002
+Distributed: chi2(1)
+Cragg-Donald F statistic: 13.26
+Kleibergen-Paap F statistic: 14.14
+</pre></div></div>
+</div>
+<p>The Kleibergen-Paap F statistic differs from the Cragg-Donald F statistic because the model uses a robust covariance estimator. With <code class="docutils literal notranslate"><span class="pre">cov_type=&quot;unadjusted&quot;</span></code> the two are the same.</p>
+<p>These statistics are easy to over-interpret.</p>
+<ul class="simple">
+<li><p>Rejecting the null of underidentification does <strong>not</strong> show that the instrument is strong. These are not tests of weak instruments, and a large F statistic does not guarantee that 2SLS inference is reliable.</p></li>
+<li><p>Stock-Yogo critical values apply only to the Cragg-Donald F statistic, and only when the errors are conditionally homoskedastic and serially uncorrelated. They are not valid for the Kleibergen-Paap F statistic when the errors are not i.i.d., and comparing it with them is only a heuristic. For a single endogenous regressor the effective F statistic of Olea and Pflueger (2013) is better founded, but it is not implemented.</p></li>
+<li><p>The Cragg-Donald statistic ignores heteroskedasticity, clustering and serial correlation. The Kleibergen-Paap statistic is only as robust as the covariance estimator that it uses, and both statistics are asymptotic.</p></li>
+</ul>
 <h2 id="Formula-interface">Formula interface<a class="headerlink" href="#Formula-interface" title="Link to this heading">¶</a></h2>
 <p>This model was large and so it might be simpler to use a formula. While formulas are discussed in <a class="reference internal" href="using-formulas.html"><span class="doc">detail in another notebook</span></a>, they use the formula language of <a class="reference external" href="https://matthewwardrop.github.io/formulaic/">formulaic</a> with an augmentation to specify the endogenous and instrumental variables. The generic form is</p>
 <div class="highlight-none notranslate"><div class="highlight"><pre><span></span><code>dependent ~ exog + [endog ~ instr]
@@ -1815,17 +1882,17 @@ T-stats use same covariance type as original model
 <p>where each block can contain multiple variables.</p>
 <p>Here the model is compared to the direct parameterization using DataFrames by differencing the <span class="math notranslate nohighlight">\(R^2\)</span>.</p>
 <div class="nbinput docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span><code>[21]:
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span><code>[22]:
 </code></pre></div>
 </div>
 <div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><code><span class="kn">import</span><span class="w"> </span><span class="nn">numpy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">np</span>
 
 <span class="n">formula</span> <span class="o">=</span> <span class="p">(</span>
-    <span class="s2">&quot;np.log(wage) ~ 1 + exper + expersq + black + smsa + south + smsa66 + reg662 + reg663 + reg664 + &quot;</span>
-    <span class="s2">&quot;reg665 + reg666 + reg667 + reg668 + reg669 + [educ ~ nearc4]&quot;</span>
+    <span class="s2">"np.log(wage) ~ 1 + exper + expersq + black + smsa + south + smsa66 + reg662 + reg663 + reg664 + "</span>
+    <span class="s2">"reg665 + reg666 + reg667 + reg668 + reg669 + [educ ~ nearc4]"</span>
 <span class="p">)</span>
 <span class="n">mod</span> <span class="o">=</span> <span class="n">IV2SLS</span><span class="o">.</span><span class="n">from_formula</span><span class="p">(</span><span class="n">formula</span><span class="p">,</span> <span class="n">data</span><span class="p">)</span>
-<span class="n">res_formula</span> <span class="o">=</span> <span class="n">mod</span><span class="o">.</span><span class="n">fit</span><span class="p">(</span><span class="n">cov_type</span><span class="o">=</span><span class="s2">&quot;unadjusted&quot;</span><span class="p">)</span>
+<span class="n">res_formula</span> <span class="o">=</span> <span class="n">mod</span><span class="o">.</span><span class="n">fit</span><span class="p">(</span><span class="n">cov_type</span><span class="o">=</span><span class="s2">"unadjusted"</span><span class="p">)</span>
 <span class="nb">print</span><span class="p">(</span><span class="n">res_formula</span><span class="o">.</span><span class="n">rsquared</span> <span class="o">-</span> <span class="n">res_2sls</span><span class="o">.</span><span class="n">rsquared</span><span class="p">)</span>
 </code></pre></div>
 </div>
@@ -1841,18 +1908,18 @@ T-stats use same covariance type as original model
 <h2 id="Categorical-Variables">Categorical Variables<a class="headerlink" href="#Categorical-Variables" title="Link to this heading">¶</a></h2>
 <p>pandas <code class="docutils literal notranslate"><span class="pre">categorical</span></code>s are automatically treated as factors and expanded to dummies. The first is always dropped. This next block constructs a categorical from the region dummies and then uses it instead of the individual dummies. The model is identical.</p>
 <div class="nbinput docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span><code>[22]:
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span><code>[23]:
 </code></pre></div>
 </div>
-<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><code><span class="n">data</span><span class="p">[</span><span class="s2">&quot;reg&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="s2">&quot;661&quot;</span>  <span class="c1"># The default region, which was omitted</span>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><code><span class="n">data</span><span class="p">[</span><span class="s2">"reg"</span><span class="p">]</span> <span class="o">=</span> <span class="s2">"661"</span>  <span class="c1"># The default region, which was omitted</span>
 <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">2</span><span class="p">,</span> <span class="mi">10</span><span class="p">):</span>
-    <span class="n">region</span> <span class="o">=</span> <span class="s2">&quot;reg66&quot;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="n">i</span><span class="p">)</span>
-    <span class="n">data</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span><span class="n">data</span><span class="p">[</span><span class="n">region</span><span class="p">]</span> <span class="o">==</span> <span class="mi">1</span><span class="p">,</span> <span class="s2">&quot;reg&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">region</span><span class="p">[</span><span class="mi">3</span><span class="p">:]</span>
-<span class="n">data</span><span class="p">[</span><span class="s2">&quot;reg&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">data</span><span class="p">[</span><span class="s2">&quot;reg&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="s2">&quot;category&quot;</span><span class="p">)</span>
+    <span class="n">region</span> <span class="o">=</span> <span class="s2">"reg66"</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="n">i</span><span class="p">)</span>
+    <span class="n">data</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span><span class="n">data</span><span class="p">[</span><span class="n">region</span><span class="p">]</span> <span class="o">==</span> <span class="mi">1</span><span class="p">,</span> <span class="s2">"reg"</span><span class="p">]</span> <span class="o">=</span> <span class="n">region</span><span class="p">[</span><span class="mi">3</span><span class="p">:]</span>
+<span class="n">data</span><span class="p">[</span><span class="s2">"reg"</span><span class="p">]</span> <span class="o">=</span> <span class="n">data</span><span class="p">[</span><span class="s2">"reg"</span><span class="p">]</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="s2">"category"</span><span class="p">)</span>
 <span class="n">data</span><span class="o">.</span><span class="n">describe</span><span class="p">()</span>
 <span class="n">res_cat</span> <span class="o">=</span> <span class="n">IV2SLS</span><span class="p">(</span>
     <span class="n">np</span><span class="o">.</span><span class="n">log</span><span class="p">(</span><span class="n">data</span><span class="o">.</span><span class="n">wage</span><span class="p">),</span>
-    <span class="n">data</span><span class="p">[[</span><span class="s2">&quot;const&quot;</span><span class="p">,</span> <span class="s2">&quot;exper&quot;</span><span class="p">,</span> <span class="s2">&quot;expersq&quot;</span><span class="p">,</span> <span class="s2">&quot;black&quot;</span><span class="p">,</span> <span class="s2">&quot;smsa&quot;</span><span class="p">,</span> <span class="s2">&quot;south&quot;</span><span class="p">,</span> <span class="s2">&quot;smsa66&quot;</span><span class="p">,</span> <span class="s2">&quot;reg&quot;</span><span class="p">]],</span>
+    <span class="n">data</span><span class="p">[[</span><span class="s2">"const"</span><span class="p">,</span> <span class="s2">"exper"</span><span class="p">,</span> <span class="s2">"expersq"</span><span class="p">,</span> <span class="s2">"black"</span><span class="p">,</span> <span class="s2">"smsa"</span><span class="p">,</span> <span class="s2">"south"</span><span class="p">,</span> <span class="s2">"smsa66"</span><span class="p">,</span> <span class="s2">"reg"</span><span class="p">]],</span>
     <span class="n">data</span><span class="o">.</span><span class="n">educ</span><span class="p">,</span>
     <span class="n">data</span><span class="o">.</span><span class="n">nearc4</span><span class="p">,</span>
 <span class="p">)</span><span class="o">.</span><span class="n">fit</span><span class="p">()</span>
@@ -1870,8 +1937,8 @@ T-stats use same covariance type as original model
 Dep. Variable:                   wage   R-squared:                      0.2382
 Estimator:                    IV-2SLS   Adj. R-squared:                 0.2343
 No. Observations:                3010   F-statistic:                    840.83
-Date:                Tue, Oct 21 2025   P-value (F-stat)                0.0000
-Time:                        13:38:20   Distribution:                 chi2(15)
+Date:                Fri, Oct 16 2026   P-value (F-stat)                0.0000
+Time:                        08:36:37   Distribution:                 chi2(15)
 Cov. Estimator:                robust
 
                              Parameter Estimates
@@ -1905,26 +1972,26 @@ Debiased: False
 <h2 id="Post-estimation-diagnostics">Post-estimation diagnostics<a class="headerlink" href="#Post-estimation-diagnostics" title="Link to this heading">¶</a></h2>
 <p>Common post-estimation diagnostics are to test the assumption of endogeneity and to examine if instruments are valid (when there are more instruments than endogenous variables).</p>
 <div class="nbinput nblast docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span><code>[23]:
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span><code>[24]:
 </code></pre></div>
 </div>
 <div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><code><span class="n">data</span> <span class="o">=</span> <span class="n">mroz</span><span class="o">.</span><span class="n">load</span><span class="p">()</span>
 <span class="n">data</span> <span class="o">=</span> <span class="n">data</span><span class="o">.</span><span class="n">dropna</span><span class="p">()</span>
-<span class="n">data</span> <span class="o">=</span> <span class="n">add_constant</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="n">has_constant</span><span class="o">=</span><span class="s2">&quot;add&quot;</span><span class="p">)</span>
-<span class="n">data</span><span class="p">[</span><span class="s2">&quot;lnwage&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">log</span><span class="p">(</span><span class="n">data</span><span class="o">.</span><span class="n">wage</span><span class="p">)</span>
-<span class="n">dep</span> <span class="o">=</span> <span class="s2">&quot;lnwage&quot;</span>
-<span class="n">exog</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;const&quot;</span><span class="p">,</span> <span class="s2">&quot;exper&quot;</span><span class="p">,</span> <span class="s2">&quot;expersq&quot;</span><span class="p">]</span>
-<span class="n">endog</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;educ&quot;</span><span class="p">]</span>
-<span class="n">instr</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;fatheduc&quot;</span><span class="p">,</span> <span class="s2">&quot;motheduc&quot;</span><span class="p">]</span>
+<span class="n">data</span> <span class="o">=</span> <span class="n">add_constant</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="n">has_constant</span><span class="o">=</span><span class="s2">"add"</span><span class="p">)</span>
+<span class="n">data</span><span class="p">[</span><span class="s2">"lnwage"</span><span class="p">]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">log</span><span class="p">(</span><span class="n">data</span><span class="o">.</span><span class="n">wage</span><span class="p">)</span>
+<span class="n">dep</span> <span class="o">=</span> <span class="s2">"lnwage"</span>
+<span class="n">exog</span> <span class="o">=</span> <span class="p">[</span><span class="s2">"const"</span><span class="p">,</span> <span class="s2">"exper"</span><span class="p">,</span> <span class="s2">"expersq"</span><span class="p">]</span>
+<span class="n">endog</span> <span class="o">=</span> <span class="p">[</span><span class="s2">"educ"</span><span class="p">]</span>
+<span class="n">instr</span> <span class="o">=</span> <span class="p">[</span><span class="s2">"fatheduc"</span><span class="p">,</span> <span class="s2">"motheduc"</span><span class="p">]</span>
 </code></pre></div>
 </div>
 </div>
 <p>The first step is to fit the model using 2SLS.</p>
 <div class="nbinput docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span><code>[24]:
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span><code>[25]:
 </code></pre></div>
 </div>
-<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><code><span class="n">res</span> <span class="o">=</span> <span class="n">IV2SLS</span><span class="p">(</span><span class="n">data</span><span class="p">[</span><span class="n">dep</span><span class="p">],</span> <span class="n">data</span><span class="p">[</span><span class="n">exog</span><span class="p">],</span> <span class="n">data</span><span class="p">[</span><span class="n">endog</span><span class="p">],</span> <span class="n">data</span><span class="p">[</span><span class="n">instr</span><span class="p">])</span><span class="o">.</span><span class="n">fit</span><span class="p">(</span><span class="n">cov_type</span><span class="o">=</span><span class="s2">&quot;unadjusted&quot;</span><span class="p">)</span>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><code><span class="n">res</span> <span class="o">=</span> <span class="n">IV2SLS</span><span class="p">(</span><span class="n">data</span><span class="p">[</span><span class="n">dep</span><span class="p">],</span> <span class="n">data</span><span class="p">[</span><span class="n">exog</span><span class="p">],</span> <span class="n">data</span><span class="p">[</span><span class="n">endog</span><span class="p">],</span> <span class="n">data</span><span class="p">[</span><span class="n">instr</span><span class="p">])</span><span class="o">.</span><span class="n">fit</span><span class="p">(</span><span class="n">cov_type</span><span class="o">=</span><span class="s2">"unadjusted"</span><span class="p">)</span>
 <span class="nb">print</span><span class="p">(</span><span class="n">res</span><span class="p">)</span>
 </code></pre></div>
 </div>
@@ -1939,8 +2006,8 @@ Debiased: False
 Dep. Variable:                 lnwage   R-squared:                      0.1357
 Estimator:                    IV-2SLS   Adj. R-squared:                 0.1296
 No. Observations:                 428   F-statistic:                    24.653
-Date:                Tue, Oct 21 2025   P-value (F-stat)                0.0000
-Time:                        13:38:20   Distribution:                  chi2(3)
+Date:                Fri, Oct 16 2026   P-value (F-stat)                0.0000
+Time:                        08:36:37   Distribution:                  chi2(3)
 Cov. Estimator:            unadjusted
 
                              Parameter Estimates
@@ -1961,7 +2028,7 @@ Debiased: False
 </div>
 <p>Wooldridge”s regression test of exogeneity uses regression residual where the endogenous variables are regressed on the exogenous and the instrument to test for endogeneity. IF the endogenous variable is actually exogenous these residuals should not be correlated with the variable of interest.</p>
 <div class="nbinput docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span><code>[25]:
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span><code>[26]:
 </code></pre></div>
 </div>
 <div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><code><span class="n">res</span><span class="o">.</span><span class="n">wooldridge_regression</span>
@@ -1969,7 +2036,7 @@ Debiased: False
 </div>
 </div>
 <div class="nboutput nblast docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span><code>[25]:
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span><code>[26]:
 </code></pre></div>
 </div>
 <div class="output_area docutils container">
@@ -1979,13 +2046,13 @@ H0: Endogenous variables are exogenous
 Statistic: 2.8256
 P-value: 0.0928
 Distributed: chi2(1)
-WaldTestStatistic, id: 0x7f02abf57bd0
+WaldTestStatistic, id: 0x7f9c75226850
 </pre></div></div>
 </div>
 <p>This test can be easily implemented using two regression. The first one constructs the residuals and the second re-fits the model using 2SLS but including the residuals.</p>
-<p>Note that the p-value of the t-state on <code class="docutils literal notranslate"><span class="pre">residuals</span></code> is the same as the P-value of the previous test – this is not an accident.</p>
+<p>Note that the p-value of the t-stat on <code class="docutils literal notranslate"><span class="pre">residuals</span></code> is the same as the P-value of the previous test – this is not an accident.</p>
 <div class="nbinput docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span><code>[26]:
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span><code>[27]:
 </code></pre></div>
 </div>
 <div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><code><span class="n">v</span> <span class="o">=</span> <span class="n">IV2SLS</span><span class="p">(</span><span class="n">data</span><span class="p">[</span><span class="n">endog</span><span class="p">],</span> <span class="n">data</span><span class="p">[</span><span class="n">exog</span> <span class="o">+</span> <span class="n">instr</span><span class="p">],</span> <span class="kc">None</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span><span class="o">.</span><span class="n">fit</span><span class="p">()</span><span class="o">.</span><span class="n">resids</span>
@@ -1994,7 +2061,7 @@ WaldTestStatistic, id: 0x7f02abf57bd0
 
 <span class="n">res_direct</span> <span class="o">=</span> <span class="n">IV2SLS</span><span class="p">(</span>
     <span class="n">data</span><span class="p">[</span><span class="n">dep</span><span class="p">],</span> <span class="n">pd</span><span class="o">.</span><span class="n">concat</span><span class="p">([</span><span class="n">v</span><span class="p">,</span> <span class="n">data</span><span class="p">[</span><span class="n">exog</span><span class="p">]],</span> <span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">),</span> <span class="n">data</span><span class="p">[</span><span class="n">endog</span><span class="p">],</span> <span class="n">data</span><span class="p">[</span><span class="n">instr</span><span class="p">]</span>
-<span class="p">)</span><span class="o">.</span><span class="n">fit</span><span class="p">(</span><span class="n">cov_type</span><span class="o">=</span><span class="s2">&quot;unadjusted&quot;</span><span class="p">)</span>
+<span class="p">)</span><span class="o">.</span><span class="n">fit</span><span class="p">(</span><span class="n">cov_type</span><span class="o">=</span><span class="s2">"unadjusted"</span><span class="p">)</span>
 <span class="nb">print</span><span class="p">(</span><span class="n">res_direct</span><span class="p">)</span>
 </code></pre></div>
 </div>
@@ -2009,8 +2076,8 @@ WaldTestStatistic, id: 0x7f02abf57bd0
 Dep. Variable:                 lnwage   R-squared:                      0.1624
 Estimator:                    IV-2SLS   Adj. R-squared:                 0.1544
 No. Observations:                 428   F-statistic:                    82.954
-Date:                Tue, Oct 21 2025   P-value (F-stat)                0.0000
-Time:                        13:38:20   Distribution:                  chi2(4)
+Date:                Fri, Oct 16 2026   P-value (F-stat)                0.0000
+Time:                        08:36:37   Distribution:                  chi2(4)
 Cov. Estimator:            unadjusted
 
                              Parameter Estimates
@@ -2032,7 +2099,7 @@ Debiased: False
 </div>
 <p>Since this regression has two instrument it is possible to test for overidentification. Wooldridge”s overidentification test uses a regression to test whether the 2SLS residuals are uncorrelated with the instruments, which should be the case if the model is correct and the instruments are not needed in the original model.</p>
 <div class="nbinput docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span><code>[27]:
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span><code>[28]:
 </code></pre></div>
 </div>
 <div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><code><span class="n">res</span><span class="o">.</span><span class="n">wooldridge_overid</span>
@@ -2040,7 +2107,7 @@ Debiased: False
 </div>
 </div>
 <div class="nboutput nblast docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span><code>[27]:
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span><code>[28]:
 </code></pre></div>
 </div>
 <div class="output_area docutils container">
@@ -2050,22 +2117,22 @@ H0: Model is not overidentified.
 Statistic: 0.4435
 P-value: 0.5055
 Distributed: chi2(1)
-WaldTestStatistic, id: 0x7f02a9d829d0
+WaldTestStatistic, id: 0x7f9c75291050
 </pre></div></div>
 </div>
 <p>A naive version of this test can be directly implemented. This direct implementation is different from the formal test but would be consistent if the model was overidentified.</p>
 <div class="nbinput nblast docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span><code>[28]:
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span><code>[29]:
 </code></pre></div>
 </div>
 <div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><code><span class="n">u</span> <span class="o">=</span> <span class="n">res</span><span class="o">.</span><span class="n">resids</span>
-<span class="n">res</span> <span class="o">=</span> <span class="n">IV2SLS</span><span class="p">(</span><span class="n">u</span><span class="p">,</span> <span class="n">data</span><span class="p">[[</span><span class="s2">&quot;exper&quot;</span><span class="p">,</span> <span class="s2">&quot;expersq&quot;</span><span class="p">]</span> <span class="o">+</span> <span class="n">instr</span><span class="p">],</span> <span class="kc">None</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span><span class="o">.</span><span class="n">fit</span><span class="p">()</span>
+<span class="n">res</span> <span class="o">=</span> <span class="n">IV2SLS</span><span class="p">(</span><span class="n">u</span><span class="p">,</span> <span class="n">data</span><span class="p">[[</span><span class="s2">"exper"</span><span class="p">,</span> <span class="s2">"expersq"</span><span class="p">]</span> <span class="o">+</span> <span class="n">instr</span><span class="p">],</span> <span class="kc">None</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span><span class="o">.</span><span class="n">fit</span><span class="p">()</span>
 </code></pre></div>
 </div>
 </div>
 <p>The test is <span class="math notranslate nohighlight">\(n\times R^2\)</span>, and has the same <span class="math notranslate nohighlight">\(\chi^2_1\)</span> distribution. The test statistic is slightly smaller but the conclusions are the same.</p>
 <div class="nbinput docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span><code>[29]:
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span><code>[30]:
 </code></pre></div>
 </div>
 <div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><code><span class="n">res</span><span class="o">.</span><span class="n">nobs</span> <span class="o">*</span> <span class="n">res</span><span class="o">.</span><span class="n">rsquared</span>
@@ -2073,27 +2140,27 @@ WaldTestStatistic, id: 0x7f02a9d829d0
 </div>
 </div>
 <div class="nboutput nblast docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span><code>[29]:
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span><code>[30]:
 </code></pre></div>
 </div>
 <div class="output_area docutils container">
 <div class="highlight"><pre>
-0.3719811106150277
+0.3719811106150752
 </pre></div></div>
 </div>
 <p>Husband”s education can be used as an additional instrument, and its validity tested.</p>
 <div class="nbinput nblast docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span><code>[30]:
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span><code>[31]:
 </code></pre></div>
 </div>
-<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><code><span class="n">instr</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;fatheduc&quot;</span><span class="p">,</span> <span class="s2">&quot;motheduc&quot;</span><span class="p">,</span> <span class="s2">&quot;huseduc&quot;</span><span class="p">]</span>
-<span class="n">res</span> <span class="o">=</span> <span class="n">IV2SLS</span><span class="p">(</span><span class="n">data</span><span class="p">[</span><span class="n">dep</span><span class="p">],</span> <span class="n">data</span><span class="p">[</span><span class="n">exog</span><span class="p">],</span> <span class="n">data</span><span class="p">[</span><span class="n">endog</span><span class="p">],</span> <span class="n">data</span><span class="p">[</span><span class="n">instr</span><span class="p">])</span><span class="o">.</span><span class="n">fit</span><span class="p">(</span><span class="n">cov_type</span><span class="o">=</span><span class="s2">&quot;unadjusted&quot;</span><span class="p">)</span>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><code><span class="n">instr</span> <span class="o">=</span> <span class="p">[</span><span class="s2">"fatheduc"</span><span class="p">,</span> <span class="s2">"motheduc"</span><span class="p">,</span> <span class="s2">"huseduc"</span><span class="p">]</span>
+<span class="n">res</span> <span class="o">=</span> <span class="n">IV2SLS</span><span class="p">(</span><span class="n">data</span><span class="p">[</span><span class="n">dep</span><span class="p">],</span> <span class="n">data</span><span class="p">[</span><span class="n">exog</span><span class="p">],</span> <span class="n">data</span><span class="p">[</span><span class="n">endog</span><span class="p">],</span> <span class="n">data</span><span class="p">[</span><span class="n">instr</span><span class="p">])</span><span class="o">.</span><span class="n">fit</span><span class="p">(</span><span class="n">cov_type</span><span class="o">=</span><span class="s2">"unadjusted"</span><span class="p">)</span>
 </code></pre></div>
 </div>
 </div>
 <p>Testing overidentification does not indicate any difference from the previous result.</p>
 <div class="nbinput docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span><code>[31]:
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span><code>[32]:
 </code></pre></div>
 </div>
 <div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><code><span class="n">res</span><span class="o">.</span><span class="n">wooldridge_overid</span>
@@ -2101,7 +2168,7 @@ WaldTestStatistic, id: 0x7f02a9d829d0
 </div>
 </div>
 <div class="nboutput nblast docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span><code>[31]:
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span><code>[32]:
 </code></pre></div>
 </div>
 <div class="output_area docutils container">
@@ -2111,33 +2178,33 @@ H0: Model is not overidentified.
 Statistic: 1.0421
 P-value: 0.5939
 Distributed: chi2(2)
-WaldTestStatistic, id: 0x7f02a9d81a50
+WaldTestStatistic, id: 0x7f9c75291550
 </pre></div></div>
 </div>
 <p>Directly testing using two regression would reach the same conclusion.</p>
 <div class="nbinput docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span><code>[32]:
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span><code>[33]:
 </code></pre></div>
 </div>
 <div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><code><span class="n">u</span> <span class="o">=</span> <span class="n">res</span><span class="o">.</span><span class="n">resids</span>
-<span class="n">res</span> <span class="o">=</span> <span class="n">IV2SLS</span><span class="p">(</span><span class="n">u</span><span class="p">,</span> <span class="n">data</span><span class="p">[[</span><span class="s2">&quot;exper&quot;</span><span class="p">,</span> <span class="s2">&quot;expersq&quot;</span><span class="p">]</span> <span class="o">+</span> <span class="n">instr</span><span class="p">],</span> <span class="kc">None</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span><span class="o">.</span><span class="n">fit</span><span class="p">()</span>
+<span class="n">res</span> <span class="o">=</span> <span class="n">IV2SLS</span><span class="p">(</span><span class="n">u</span><span class="p">,</span> <span class="n">data</span><span class="p">[[</span><span class="s2">"exper"</span><span class="p">,</span> <span class="s2">"expersq"</span><span class="p">]</span> <span class="o">+</span> <span class="n">instr</span><span class="p">],</span> <span class="kc">None</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span><span class="o">.</span><span class="n">fit</span><span class="p">()</span>
 <span class="n">res</span><span class="o">.</span><span class="n">nobs</span> <span class="o">*</span> <span class="n">res</span><span class="o">.</span><span class="n">rsquared</span>
 </code></pre></div>
 </div>
 </div>
 <div class="nboutput nblast docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span><code>[32]:
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span><code>[33]:
 </code></pre></div>
 </div>
 <div class="output_area docutils container">
 <div class="highlight"><pre>
-1.1126588681969989
+1.1126588681971414
 </pre></div></div>
 </div>
 <h2 id="Panel-IV">Panel IV<a class="headerlink" href="#Panel-IV" title="Link to this heading">¶</a></h2>
 <p>Instrumental variable regression can also be used with panel data. This example makes use of first differences to eliminate a year-specific effect and then uses</p>
 <div class="nbinput docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span><code>[33]:
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span><code>[34]:
 </code></pre></div>
 </div>
 <div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><code><span class="kn">from</span><span class="w"> </span><span class="nn">linearmodels.datasets</span><span class="w"> </span><span class="kn">import</span> <span class="n">jobtraining</span>
@@ -2146,10 +2213,10 @@ WaldTestStatistic, id: 0x7f02a9d81a50
 <span class="nb">print</span><span class="p">(</span><span class="n">jobtraining</span><span class="o">.</span><span class="n">DESCR</span><span class="p">)</span>
 <span class="n">data</span><span class="o">.</span><span class="n">head</span><span class="p">()</span>
 <span class="n">data</span> <span class="o">=</span> <span class="n">data</span><span class="o">.</span><span class="n">where</span><span class="p">(</span><span class="n">data</span><span class="o">.</span><span class="n">year</span><span class="o">.</span><span class="n">isin</span><span class="p">((</span><span class="mi">1987</span><span class="p">,</span> <span class="mi">1988</span><span class="p">)))</span>
-<span class="n">data</span> <span class="o">=</span> <span class="n">data</span><span class="o">.</span><span class="n">dropna</span><span class="p">(</span><span class="n">how</span><span class="o">=</span><span class="s2">&quot;all&quot;</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span><span class="o">.</span><span class="n">sort_values</span><span class="p">([</span><span class="s2">&quot;fcode&quot;</span><span class="p">,</span> <span class="s2">&quot;year&quot;</span><span class="p">])</span>
+<span class="n">data</span> <span class="o">=</span> <span class="n">data</span><span class="o">.</span><span class="n">dropna</span><span class="p">(</span><span class="n">how</span><span class="o">=</span><span class="s2">"all"</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span><span class="o">.</span><span class="n">sort_values</span><span class="p">([</span><span class="s2">"fcode"</span><span class="p">,</span> <span class="s2">"year"</span><span class="p">])</span>
 <span class="nb">print</span><span class="p">(</span><span class="n">data</span><span class="o">.</span><span class="n">describe</span><span class="p">())</span>
-<span class="n">data</span> <span class="o">=</span> <span class="n">data</span><span class="o">.</span><span class="n">set_index</span><span class="p">(</span><span class="s2">&quot;fcode&quot;</span><span class="p">)</span>
-<span class="n">data</span> <span class="o">=</span> <span class="n">data</span><span class="p">[[</span><span class="s2">&quot;year&quot;</span><span class="p">,</span> <span class="s2">&quot;hrsemp&quot;</span><span class="p">,</span> <span class="s2">&quot;grant&quot;</span><span class="p">,</span> <span class="s2">&quot;scrap&quot;</span><span class="p">,</span> <span class="s2">&quot;lscrap&quot;</span><span class="p">]]</span>
+<span class="n">data</span> <span class="o">=</span> <span class="n">data</span><span class="o">.</span><span class="n">set_index</span><span class="p">(</span><span class="s2">"fcode"</span><span class="p">)</span>
+<span class="n">data</span> <span class="o">=</span> <span class="n">data</span><span class="p">[[</span><span class="s2">"year"</span><span class="p">,</span> <span class="s2">"hrsemp"</span><span class="p">,</span> <span class="s2">"grant"</span><span class="p">,</span> <span class="s2">"scrap"</span><span class="p">,</span> <span class="s2">"lscrap"</span><span class="p">]]</span>
 </code></pre></div>
 </div>
 </div>
@@ -2238,11 +2305,11 @@ max      0.568912       0.0  107.027800    4.394449
 </pre></div></div>
 </div>
 <div class="nbinput docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span><code>[34]:
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span><code>[35]:
 </code></pre></div>
 </div>
 <div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><code><span class="n">deltas</span> <span class="o">=</span> <span class="n">data</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span><span class="n">data</span><span class="o">.</span><span class="n">year</span> <span class="o">==</span> <span class="mi">1988</span><span class="p">]</span> <span class="o">-</span> <span class="n">data</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span><span class="n">data</span><span class="o">.</span><span class="n">year</span> <span class="o">==</span> <span class="mi">1987</span><span class="p">]</span>
-<span class="n">deltas</span> <span class="o">=</span> <span class="n">add_constant</span><span class="p">(</span><span class="n">deltas</span><span class="p">,</span> <span class="n">has_constant</span><span class="o">=</span><span class="s2">&quot;add&quot;</span><span class="p">)</span>
+<span class="n">deltas</span> <span class="o">=</span> <span class="n">add_constant</span><span class="p">(</span><span class="n">deltas</span><span class="p">,</span> <span class="n">has_constant</span><span class="o">=</span><span class="s2">"add"</span><span class="p">)</span>
 <span class="n">deltas</span> <span class="o">=</span> <span class="n">deltas</span><span class="o">.</span><span class="n">dropna</span><span class="p">()</span>
 <span class="nb">print</span><span class="p">(</span><span class="n">deltas</span><span class="o">.</span><span class="n">describe</span><span class="p">())</span>
 </code></pre></div>
@@ -2266,11 +2333,11 @@ max      1.0   1.0  80.000000   1.000000   5.000000   2.397895
 </div>
 <p>The first stage indicates a relatively strong relationship between grant and the number of hours employed. Note that grant is a dummy and so the coefficient is just the difference in means.</p>
 <div class="nbinput docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span><code>[35]:
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span><code>[36]:
 </code></pre></div>
 </div>
-<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><code><span class="n">mod</span> <span class="o">=</span> <span class="n">IV2SLS</span><span class="p">(</span><span class="n">deltas</span><span class="o">.</span><span class="n">hrsemp</span><span class="p">,</span> <span class="n">deltas</span><span class="p">[[</span><span class="s2">&quot;const&quot;</span><span class="p">,</span> <span class="s2">&quot;grant&quot;</span><span class="p">]],</span> <span class="kc">None</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
-<span class="nb">print</span><span class="p">(</span><span class="n">mod</span><span class="o">.</span><span class="n">fit</span><span class="p">(</span><span class="n">cov_type</span><span class="o">=</span><span class="s2">&quot;unadjusted&quot;</span><span class="p">))</span>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><code><span class="n">mod</span> <span class="o">=</span> <span class="n">IV2SLS</span><span class="p">(</span><span class="n">deltas</span><span class="o">.</span><span class="n">hrsemp</span><span class="p">,</span> <span class="n">deltas</span><span class="p">[[</span><span class="s2">"const"</span><span class="p">,</span> <span class="s2">"grant"</span><span class="p">]],</span> <span class="kc">None</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="n">mod</span><span class="o">.</span><span class="n">fit</span><span class="p">(</span><span class="n">cov_type</span><span class="o">=</span><span class="s2">"unadjusted"</span><span class="p">))</span>
 </code></pre></div>
 </div>
 </div>
@@ -2284,8 +2351,8 @@ max      1.0   1.0  80.000000   1.000000   5.000000   2.397895
 Dep. Variable:                 hrsemp   R-squared:                      0.3408
 Estimator:                        OLS   Adj. R-squared:                 0.3255
 No. Observations:                  45   F-statistic:                    23.266
-Date:                Tue, Oct 21 2025   P-value (F-stat)                0.0000
-Time:                        13:38:20   Distribution:                  chi2(1)
+Date:                Fri, Oct 16 2026   P-value (F-stat)                0.0000
+Time:                        08:36:37   Distribution:                  chi2(1)
 Cov. Estimator:            unadjusted
 
                              Parameter Estimates
@@ -2299,11 +2366,11 @@ grant          24.437     5.0662     4.8235     0.0000      14.507      34.367
 </div>
 <p>Here a formula is used to specify the model since it is cleaner. Note that the <code class="docutils literal notranslate"><span class="pre">[]</span></code> contains the endogenous variables and instruments.</p>
 <div class="nbinput docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span><code>[36]:
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span><code>[37]:
 </code></pre></div>
 </div>
-<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><code><span class="n">mod</span> <span class="o">=</span> <span class="n">IV2SLS</span><span class="o">.</span><span class="n">from_formula</span><span class="p">(</span><span class="s2">&quot;lscrap ~ 1 + [hrsemp ~ grant]&quot;</span><span class="p">,</span> <span class="n">deltas</span><span class="p">)</span>
-<span class="n">res_iv</span> <span class="o">=</span> <span class="n">mod</span><span class="o">.</span><span class="n">fit</span><span class="p">(</span><span class="n">cov_type</span><span class="o">=</span><span class="s2">&quot;unadjusted&quot;</span><span class="p">)</span>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><code><span class="n">mod</span> <span class="o">=</span> <span class="n">IV2SLS</span><span class="o">.</span><span class="n">from_formula</span><span class="p">(</span><span class="s2">"lscrap ~ 1 + [hrsemp ~ grant]"</span><span class="p">,</span> <span class="n">deltas</span><span class="p">)</span>
+<span class="n">res_iv</span> <span class="o">=</span> <span class="n">mod</span><span class="o">.</span><span class="n">fit</span><span class="p">(</span><span class="n">cov_type</span><span class="o">=</span><span class="s2">"unadjusted"</span><span class="p">)</span>
 <span class="nb">print</span><span class="p">(</span><span class="n">res_iv</span><span class="p">)</span>
 </code></pre></div>
 </div>
@@ -2318,8 +2385,8 @@ grant          24.437     5.0662     4.8235     0.0000      14.507      34.367
 Dep. Variable:                 lscrap   R-squared:                      0.0159
 Estimator:                    IV-2SLS   Adj. R-squared:                -0.0070
 No. Observations:                  45   F-statistic:                    3.3464
-Date:                Tue, Oct 21 2025   P-value (F-stat)                0.0674
-Time:                        13:38:20   Distribution:                  chi2(1)
+Date:                Fri, Oct 16 2026   P-value (F-stat)                0.0674
+Time:                        08:36:37   Distribution:                  chi2(1)
 Cov. Estimator:            unadjusted
 
                              Parameter Estimates
@@ -2338,11 +2405,11 @@ Debiased: False
 </div>
 <p>The 2SLS estimate is nearly twice as large as the OLS estimate and is slightly more significant.</p>
 <div class="nbinput docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span><code>[37]:
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span><code>[38]:
 </code></pre></div>
 </div>
-<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><code><span class="n">res_ols</span> <span class="o">=</span> <span class="n">IV2SLS</span><span class="o">.</span><span class="n">from_formula</span><span class="p">(</span><span class="s2">&quot;lscrap ~ 1 + hrsemp&quot;</span><span class="p">,</span> <span class="n">deltas</span><span class="p">)</span><span class="o">.</span><span class="n">fit</span><span class="p">(</span><span class="n">cov_type</span><span class="o">=</span><span class="s2">&quot;unadjusted&quot;</span><span class="p">)</span>
-<span class="nb">print</span><span class="p">(</span><span class="n">compare</span><span class="p">({</span><span class="s2">&quot;Panel OLS&quot;</span><span class="p">:</span> <span class="n">res_ols</span><span class="p">,</span> <span class="s2">&quot;Panel IV&quot;</span><span class="p">:</span> <span class="n">res_iv</span><span class="p">}))</span>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><code><span class="n">res_ols</span> <span class="o">=</span> <span class="n">IV2SLS</span><span class="o">.</span><span class="n">from_formula</span><span class="p">(</span><span class="s2">"lscrap ~ 1 + hrsemp"</span><span class="p">,</span> <span class="n">deltas</span><span class="p">)</span><span class="o">.</span><span class="n">fit</span><span class="p">(</span><span class="n">cov_type</span><span class="o">=</span><span class="s2">"unadjusted"</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="n">compare</span><span class="p">({</span><span class="s2">"Panel OLS"</span><span class="p">:</span> <span class="n">res_ols</span><span class="p">,</span> <span class="s2">"Panel IV"</span><span class="p">:</span> <span class="n">res_iv</span><span class="p">}))</span>
 </code></pre></div>
 </div>
 </div>
@@ -2376,19 +2443,19 @@ T-stats reported in parentheses
 </pre></div></div>
 </div>
 <div class="nbinput docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span><code>[38]:
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span><code>[39]:
 </code></pre></div>
 </div>
-<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><code><span class="n">mod</span> <span class="o">=</span> <span class="n">IV2SLS</span><span class="o">.</span><span class="n">from_formula</span><span class="p">(</span><span class="s2">&quot;lscrap ~ 1 + [hrsemp ~ grant]&quot;</span><span class="p">,</span> <span class="n">deltas</span><span class="p">)</span>
-<span class="n">res_iv</span> <span class="o">=</span> <span class="n">mod</span><span class="o">.</span><span class="n">fit</span><span class="p">(</span><span class="n">cov_type</span><span class="o">=</span><span class="s2">&quot;unadjusted&quot;</span><span class="p">)</span>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><code><span class="n">mod</span> <span class="o">=</span> <span class="n">IV2SLS</span><span class="o">.</span><span class="n">from_formula</span><span class="p">(</span><span class="s2">"lscrap ~ 1 + [hrsemp ~ grant]"</span><span class="p">,</span> <span class="n">deltas</span><span class="p">)</span>
+<span class="n">res_iv</span> <span class="o">=</span> <span class="n">mod</span><span class="o">.</span><span class="n">fit</span><span class="p">(</span><span class="n">cov_type</span><span class="o">=</span><span class="s2">"unadjusted"</span><span class="p">)</span>
 <span class="n">n</span> <span class="o">=</span> <span class="n">deltas</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
 <span class="n">pred_exog</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">ones</span><span class="p">((</span><span class="n">n</span><span class="p">,</span> <span class="mi">1</span><span class="p">)),</span> <span class="n">index</span><span class="o">=</span><span class="n">deltas</span><span class="o">.</span><span class="n">index</span><span class="p">)</span>
-<span class="n">res_iv</span><span class="o">.</span><span class="n">predict</span><span class="p">(</span><span class="n">exog</span><span class="o">=</span><span class="n">pred_exog</span><span class="p">,</span> <span class="n">endog</span><span class="o">=</span><span class="n">deltas</span><span class="p">[[</span><span class="s2">&quot;hrsemp&quot;</span><span class="p">]])</span>
+<span class="n">res_iv</span><span class="o">.</span><span class="n">predict</span><span class="p">(</span><span class="n">exog</span><span class="o">=</span><span class="n">pred_exog</span><span class="p">,</span> <span class="n">endog</span><span class="o">=</span><span class="n">deltas</span><span class="p">[[</span><span class="s2">"hrsemp"</span><span class="p">]])</span>
 </code></pre></div>
 </div>
 </div>
 <div class="nboutput nblast docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span><code>[38]:
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span><code>[39]:
 </code></pre></div>
 </div>
 <div class="output_area rendered_html docutils container">
@@ -2636,13 +2703,13 @@ T-stats reported in parentheses
       <div class="md-copyright">
   
     <div class="md-footer-copyright__highlight">
-        &#169; Copyright 2021, Kevin Sheppard.
+        &#169; Copyright 2017-2026, Kevin Sheppard.
         
     </div>
   
     Created using
     <a href="https://www.sphinx-doc.org/" target="_blank" rel="noopener">Sphinx</a>
-    8.1.3.
+    9.1.0.
      and
     <a href="https://github.com/jbms/sphinx-immaterial/" target="_blank" rel="noopener">Sphinx-Immaterial</a>
   
@@ -2699,7 +2766,7 @@ T-stats reported in parentheses
         <script src="../../_static/sphinx_immaterial_theme.32136f45f91ae6956.min.js?v=a7a9472a"></script>
         <script crossorigin="anonymous" integrity="sha256-Ae2Vz/4ePdIu6ZyI/5ZGsYnb+m0JlOmKPjt6XZ9JJkA=" src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.4/require.min.js"></script>
         <script>window.MathJax = {"tex": {"inlineMath": [["$", "$"], ["\\(", "\\)"]], "processEscapes": true}, "options": {"ignoreHtmlClass": "tex2jax_ignore|mathjax_ignore|document", "processHtmlClass": "tex2jax_process|mathjax_process|math|output_area"}}</script>
-        <script id="MathJax-script" src="../../_static/mathjax/tex-mml-chtml.js?v=cadf963e"></script>
+        <script id="MathJax-script" src="../../_static/mathjax/tex-mml-chtml.js"></script>
     
   </body>
 </html>

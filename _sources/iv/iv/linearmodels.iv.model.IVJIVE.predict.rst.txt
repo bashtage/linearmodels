@@ -1,0 +1,8 @@
+:orphan:
+
+linearmodels.iv.model.IVJIVE.predict
+====================================
+
+.. currentmodule:: linearmodels.iv.model
+
+.. automethod:: IVJIVE.predict

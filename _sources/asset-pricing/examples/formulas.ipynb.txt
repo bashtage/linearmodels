@@ -6,7 +6,7 @@
    "source": [
     "# Using Formulas\n",
     "\n",
-    "The asset pricing model estimators all all formulas.  Since the models have multiple dependent variables (test portfolios) as well as multiple independent variables (factors), the standard [formulaic](https://github.com/matthewwardrop/formulaic/) syntax needs to be modified. There are two methods to use formulas.  The first specified both the test portfolio and the factors.  The second specifies only the factors and the test portfolios are passed using an optional keyword argument. The second syntax exists since in many models the number of test portfolios might be large and interest is usually in modifying the factors.\n",
+    "The asset pricing model estimators all support formulas.  Since the models have multiple dependent variables (test portfolios) as well as multiple independent variables (factors), the standard [formulaic](https://github.com/matthewwardrop/formulaic/) syntax needs to be modified. There are two methods to use formulas.  The first specifies both the test portfolio and the factors.  The second specifies only the factors and the test portfolios are passed using an optional keyword argument. The second syntax exists since in many models the number of test portfolios might be large and interest is usually in modifying the factors.\n",
     "\n",
     "## Available Syntax \n",
     "\n",
@@ -36,7 +36,7 @@
    "source": [
     "## Import data and transform to be excess returns\n",
     "\n",
-    "The data used comes from Ken French\"s [website](http://mba.tuck.dartmouth.edu/pages/faculty/ken.french/data_library.html) and includes 4 factor returns, the excess market, the size factor, the value factor and the momentum factor.  The available test portfolios include the 12 industry portfolios, a subset of the size-value two way sort, and a subset of the size-momentum two way sort. "
+    "The data used comes from Ken French's [website](http://mba.tuck.dartmouth.edu/pages/faculty/ken.french/data_library.html) and includes 4 factor returns, the excess market, the size factor, the value factor and the momentum factor.  The available test portfolios include the 12 industry portfolios, a subset of the size-value two way sort, and a subset of the size-momentum two way sort. "
    ]
   },
   {

@@ -1,0 +1,6 @@
+linearmodels.iv.results.FirstStageResults.cragg\_donald\_f
+==========================================================
+
+.. currentmodule:: linearmodels.iv.results
+
+.. autoproperty:: FirstStageResults.cragg_donald_f

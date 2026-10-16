@@ -1,0 +1,6 @@
+linearmodels.panel.results.FamaMacBethResults.pesaran\_cd
+=========================================================
+
+.. currentmodule:: linearmodels.panel.results
+
+.. autoproperty:: FamaMacBethResults.pesaran_cd

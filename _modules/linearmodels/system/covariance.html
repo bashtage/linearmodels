@@ -19,7 +19,7 @@
     
   
       
-        <title>linearmodels.system.covariance - linearmodels 7.0</title>
+        <title>linearmodels.system.covariance - linearmodels 7.1</title>
       
     
 
@@ -50,7 +50,7 @@
         <style>:root{--md-text-font:"Roboto";--md-code-font:"Roboto Mono"}</style>
       
     
-        <link rel="stylesheet" type="text/css" href="../../../_static/sphinx_immaterial_theme.acf80fe7f4d9ef9e2.min.css?v=9e56d0d2" />
+        <link rel="stylesheet" type="text/css" href="../../../_static/sphinx_immaterial_theme.6efbe22605a23fcd6.min.css?v=b2ceb110" />
         <link rel="stylesheet" type="text/css" href="../../../_static/css/small_fixes.css?v=34934119" />
     <script>__md_scope=new URL("../../..",location),__md_hash=e=>[...e].reduce(((e,_)=>(e<<5)-e+_.charCodeAt(0)),0),__md_get=(e,_=localStorage,t=__md_scope)=>JSON.parse(_.getItem(t.pathname+"."+e)),__md_set=(e,_,t=localStorage,a=__md_scope)=>{try{t.setItem(a.pathname+"."+e,JSON.stringify(_))}catch(e){}}</script>
     
@@ -91,7 +91,7 @@
 
 <header class="md-header md-header--shadow" data-md-component="header">
   <nav class="md-header__inner md-grid" aria-label="Header">
-    <a href="../../../index.html" title="linearmodels 7.0" class="md-header__button md-logo" aria-label="linearmodels 7.0" data-md-component="logo">
+    <a href="../../../index.html" title="linearmodels 7.1" class="md-header__button md-logo" aria-label="linearmodels 7.1" data-md-component="logo">
       <img src="../../../_static/bw-logo.svg" alt="logo">
     </a>
     <label class="md-header__button md-icon" for="__drawer">
@@ -102,7 +102,7 @@
       <div class="md-header__ellipsis">
         <div class="md-header__topic">
           <span class="md-ellipsis">
-            linearmodels 7.0
+            linearmodels 7.1
           </span>
         </div>
         <div class="md-header__topic" data-md-component="header-topic">
@@ -197,10 +197,10 @@
 
 <nav class="md-nav md-nav--primary" aria-label="Navigation" data-md-level="0">
   <label class="md-nav__title" for="__drawer">
-    <a href="../../../index.html" title="linearmodels 7.0" class="md-nav__button md-logo" aria-label="linearmodels 7.0" data-md-component="logo">
+    <a href="../../../index.html" title="linearmodels 7.1" class="md-nav__button md-logo" aria-label="linearmodels 7.1" data-md-component="logo">
       <img src="../../../_static/bw-logo.svg" alt="logo">
     </a>
-    linearmodels 7.0
+    linearmodels 7.1
   </label>
   
     <div class="md-nav__source">
@@ -300,6 +300,29 @@
   
   <span class="md-ellipsis">
     <span title="/system/index.rst (reference label)"><span>System Regression Models</span></span>
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../input-alignment.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    <span title="/input-alignment.rst (reference label)"><span>Aligning Inputs</span></span>
     
   </span>
   
@@ -504,11 +527,15 @@
 
 
 <h1>Source code for linearmodels.system.covariance</h1><div class="highlight"><pre>
-<span></span><code><span class="kn">from</span><span class="w"> </span><span class="nn">__future__</span><span class="w"> </span><span class="kn">import</span> <span class="n">annotations</span>
+<span></span><code><span class="sd">"""</span>
+<span class="sd">Covariance estimators for system regression models.</span>
+<span class="sd">"""</span>
+
+<span class="kn">from</span><span class="w"> </span><span class="nn">__future__</span><span class="w"> </span><span class="kn">import</span> <span class="n">annotations</span>
 
 <span class="kn">from</span><span class="w"> </span><span class="nn">typing</span><span class="w"> </span><span class="kn">import</span> <span class="n">cast</span>
 
-<span class="kn">from</span><span class="w"> </span><span class="nn">numpy</span><span class="w"> </span><span class="kn">import</span> <span class="n">asarray</span><span class="p">,</span> <span class="n">empty</span><span class="p">,</span> <span class="n">eye</span><span class="p">,</span> <span class="n">ndarray</span><span class="p">,</span> <span class="n">ones</span><span class="p">,</span> <span class="n">sqrt</span><span class="p">,</span> <span class="n">vstack</span><span class="p">,</span> <span class="n">zeros</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">numpy</span><span class="w"> </span><span class="kn">import</span> <span class="n">empty</span><span class="p">,</span> <span class="n">eye</span><span class="p">,</span> <span class="n">ndarray</span><span class="p">,</span> <span class="n">ones</span><span class="p">,</span> <span class="n">sqrt</span><span class="p">,</span> <span class="n">vstack</span><span class="p">,</span> <span class="n">zeros</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">numpy.linalg</span><span class="w"> </span><span class="kn">import</span> <span class="n">inv</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">pandas</span><span class="w"> </span><span class="kn">import</span> <span class="n">DataFrame</span>
 
@@ -516,6 +543,7 @@
 <span class="kn">from</span><span class="w"> </span><span class="nn">linearmodels.iv.covariance</span><span class="w"> </span><span class="kn">import</span> <span class="n">cov_cluster</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">linearmodels.panel.covariance</span><span class="w"> </span><span class="kn">import</span> <span class="n">cluster_union</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">linearmodels.shared.covariance</span><span class="w"> </span><span class="kn">import</span> <span class="n">group_debias_coefficient</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">linearmodels.shared.inputs</span><span class="w"> </span><span class="kn">import</span> <span class="n">as_ndarray</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">linearmodels.shared.utility</span><span class="w"> </span><span class="kn">import</span> <span class="n">AttrDict</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">linearmodels.system._utility</span><span class="w"> </span><span class="kn">import</span> <span class="p">(</span>
     <span class="n">LinearConstraint</span><span class="p">,</span>
@@ -525,33 +553,40 @@
 <span class="p">)</span>
 <span class="kn">import</span><span class="w"> </span><span class="nn">linearmodels.typing.data</span>
 
-<span class="n">CLUSTERS_FORMAT</span> <span class="o">=</span> <span class="s2">&quot;&quot;&quot;</span><span class="se">\</span>
+<span class="n">CLUSTERS_FORMAT</span> <span class="o">=</span> <span class="s2">"""</span><span class="se">\</span>
 <span class="s2">clusters must be an ndarray with as shape (nobs, ncluster) where ncluster is the </span><span class="se">\</span>
 <span class="s2">number of clustering variables.  Clustering is only supported in 1 or 2 dimensions.</span>
-<span class="s2">&quot;&quot;&quot;</span>
+<span class="s2">"""</span>
 
 
 <div class="viewcode-block" id="HomoskedasticCovariance">
 <a class="viewcode-back" href="../../../system/system/linearmodels.system.covariance.HomoskedasticCovariance.html#linearmodels.system.covariance.HomoskedasticCovariance">[docs]</a>
 <span class="k">class</span><span class="w"> </span><span class="nc">HomoskedasticCovariance</span><span class="p">:</span>
-<span class="w">    </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">    Homoskedastic covariance estimation for system regression</span>
+<span class="w">    </span><span class="sa">r</span><span class="sd">"""</span>
+<span class="sd">    Homoskedastic covariance estimation for system regression.</span>
 
 <span class="sd">    Parameters</span>
 <span class="sd">    ----------</span>
-<span class="sd">    x : list[ndarray]</span>
-<span class="sd">        List of regressor arrays (ndependent)</span>
+<span class="sd">    x : list of ndarray</span>
+<span class="sd">        Regressors of each equation, with shape (nobs, k_i) for equation i.</span>
 <span class="sd">    eps : ndarray</span>
-<span class="sd">        Model residuals, ndependent by nobs</span>
+<span class="sd">        Model residuals, with shape (nobs, neq).</span>
 <span class="sd">    sigma : ndarray</span>
-<span class="sd">        Covariance matrix estimator of eps</span>
-<span class="sd">    gls : bool</span>
-<span class="sd">        Flag indicating to compute the GLS covariance estimator.  If False,</span>
-<span class="sd">        assume OLS was used</span>
-<span class="sd">    debiased : bool</span>
-<span class="sd">        Flag indicating to apply a small sample adjustment</span>
-<span class="sd">    constraints : {None, LinearConstraint}</span>
-<span class="sd">        Constraints used in estimation, if any</span>
+<span class="sd">        Covariance of the residuals of the equations that is used to weight the</span>
+<span class="sd">        equations if ``gls`` is True, with shape (neq, neq).</span>
+<span class="sd">    full_sigma : ndarray</span>
+<span class="sd">        Covariance of the residuals of the equations at the final estimates, with</span>
+<span class="sd">        shape (neq, neq). It differs from ``sigma`` if the weights are not the</span>
+<span class="sd">        covariance of the final residuals, e.g., if the model was given ``sigma``</span>
+<span class="sd">        or did not iterate. It is used to estimate the covariance of the scores</span>
+<span class="sd">        if ``gls`` is True.</span>
+<span class="sd">    gls : bool, optional</span>
+<span class="sd">        Flag indicating to compute the GLS covariance estimator. If False, assume</span>
+<span class="sd">        OLS was used. The default is False.</span>
+<span class="sd">    debiased : bool, optional</span>
+<span class="sd">        Flag indicating to apply a small sample adjustment. The default is False.</span>
+<span class="sd">    constraints : LinearConstraint, optional</span>
+<span class="sd">        Constraints used in estimation. The default is no constraints.</span>
 
 <span class="sd">    Notes</span>
 <span class="sd">    -----</span>
@@ -559,15 +594,15 @@
 
 <span class="sd">    .. math::</span>
 
-<span class="sd">        (X&#39;\Omega^{-1}X)^{-1}</span>
+<span class="sd">        (X'\Omega^{-1}X)^{-1}</span>
 
 <span class="sd">    where X is a block diagonal matrix of exogenous variables. When GLS is</span>
 <span class="sd">    not used, the covariance is estimated by</span>
 
 <span class="sd">    .. math::</span>
 
-<span class="sd">        (X&#39;X)^{-1}(X&#39;\Omega X)(X&#39;X)^{-1}</span>
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="sd">        (X'X)^{-1}(X'\Omega X)(X'X)^{-1}</span>
+<span class="sd">    """</span>
 
     <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span>
@@ -589,26 +624,26 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">_gls</span> <span class="o">=</span> <span class="n">gls</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_debiased</span> <span class="o">=</span> <span class="n">debiased</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_constraints</span> <span class="o">=</span> <span class="n">constraints</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">_name</span> <span class="o">=</span> <span class="s2">&quot;Homoskedastic (Unadjusted) Covariance&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_name</span> <span class="o">=</span> <span class="s2">"Homoskedastic (Unadjusted) Covariance"</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_str_extra</span> <span class="o">=</span> <span class="n">AttrDict</span><span class="p">(</span><span class="n">Debiased</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">_debiased</span><span class="p">,</span> <span class="n">GLS</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">_gls</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_cov_config</span> <span class="o">=</span> <span class="n">AttrDict</span><span class="p">(</span><span class="n">debiased</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">_debiased</span><span class="p">)</span>
 
     <span class="k">def</span><span class="w"> </span><span class="fm">__str__</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
         <span class="n">out</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_name</span>
         <span class="n">extra</span> <span class="o">=</span> <span class="p">[</span>
-            <span class="s2">&quot;: &quot;</span><span class="o">.</span><span class="n">join</span><span class="p">([</span><span class="nb">str</span><span class="p">(</span><span class="n">key</span><span class="p">),</span> <span class="nb">str</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_str_extra</span><span class="p">[</span><span class="n">key</span><span class="p">])])</span> <span class="k">for</span> <span class="n">key</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_str_extra</span>
+            <span class="s2">": "</span><span class="o">.</span><span class="n">join</span><span class="p">([</span><span class="nb">str</span><span class="p">(</span><span class="n">key</span><span class="p">),</span> <span class="nb">str</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_str_extra</span><span class="p">[</span><span class="n">key</span><span class="p">])])</span> <span class="k">for</span> <span class="n">key</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_str_extra</span>
         <span class="p">]</span>
         <span class="k">if</span> <span class="n">extra</span><span class="p">:</span>
-            <span class="n">out</span> <span class="o">+=</span> <span class="s2">&quot; (&quot;</span> <span class="o">+</span> <span class="s2">&quot;, &quot;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">extra</span><span class="p">)</span> <span class="o">+</span> <span class="s2">&quot;)&quot;</span>
+            <span class="n">out</span> <span class="o">+=</span> <span class="s2">" ("</span> <span class="o">+</span> <span class="s2">", "</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">extra</span><span class="p">)</span> <span class="o">+</span> <span class="s2">")"</span>
         <span class="k">return</span> <span class="n">out</span>
 
     <span class="k">def</span><span class="w"> </span><span class="fm">__repr__</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
         <span class="n">out</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="fm">__str__</span><span class="p">()</span>
-        <span class="k">return</span> <span class="n">out</span> <span class="o">+</span> <span class="sa">f</span><span class="s2">&quot;, id: </span><span class="si">{</span><span class="nb">hex</span><span class="p">(</span><span class="nb">id</span><span class="p">(</span><span class="bp">self</span><span class="p">))</span><span class="si">}</span><span class="s2">&quot;</span>
+        <span class="k">return</span> <span class="n">out</span> <span class="o">+</span> <span class="sa">f</span><span class="s2">", id: </span><span class="si">{</span><span class="nb">hex</span><span class="p">(</span><span class="nb">id</span><span class="p">(</span><span class="bp">self</span><span class="p">))</span><span class="si">}</span><span class="s2">"</span>
 
     <span class="nd">@property</span>
     <span class="k">def</span><span class="w"> </span><span class="nf">sigma</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">linearmodels</span><span class="o">.</span><span class="n">typing</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">Float64Array</span><span class="p">:</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;Error covariance&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">"""Covariance of the residuals of the equations."""</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_sigma</span>
 
     <span class="k">def</span><span class="w"> </span><span class="nf">_adjustment</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">float</span> <span class="o">|</span> <span class="n">ndarray</span><span class="p">:</span>
@@ -637,7 +672,7 @@
     <span class="k">def</span><span class="w"> </span><span class="nf">_gls_cov</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">linearmodels</span><span class="o">.</span><span class="n">typing</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">Float64Array</span><span class="p">:</span>
         <span class="n">x</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_x</span>
         <span class="n">sigma</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_sigma</span>
-        <span class="n">sigma_inv</span> <span class="o">=</span> <span class="n">cast</span><span class="p">(</span><span class="s2">&quot;linearmodels.typing.data.Float64Array&quot;</span><span class="p">,</span> <span class="n">inv</span><span class="p">(</span><span class="n">sigma</span><span class="p">))</span>
+        <span class="n">sigma_inv</span> <span class="o">=</span> <span class="n">cast</span><span class="p">(</span><span class="s2">"linearmodels.typing.data.Float64Array"</span><span class="p">,</span> <span class="n">inv</span><span class="p">(</span><span class="n">sigma</span><span class="p">))</span>
 
         <span class="n">xpx</span> <span class="o">=</span> <span class="n">blocked_inner_prod</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">sigma_inv</span><span class="p">)</span>
         <span class="c1"># Handles case where sigma_inv is not inverse of full_sigma</span>
@@ -657,16 +692,16 @@
 
     <span class="nd">@property</span>
     <span class="k">def</span><span class="w"> </span><span class="nf">cov</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">linearmodels</span><span class="o">.</span><span class="n">typing</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">Float64Array</span><span class="p">:</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;Parameter covariance&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">"""Covariance of the parameter estimates."""</span>
         <span class="n">adj</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_adjustment</span><span class="p">()</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_gls</span><span class="p">:</span>
-            <span class="k">return</span> <span class="n">cast</span><span class="p">(</span><span class="s2">&quot;ndarray&quot;</span><span class="p">,</span> <span class="n">adj</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">_gls_cov</span><span class="p">())</span>
+            <span class="k">return</span> <span class="n">cast</span><span class="p">(</span><span class="s2">"ndarray"</span><span class="p">,</span> <span class="n">adj</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">_gls_cov</span><span class="p">())</span>
         <span class="k">else</span><span class="p">:</span>
-            <span class="k">return</span> <span class="n">cast</span><span class="p">(</span><span class="s2">&quot;ndarray&quot;</span><span class="p">,</span> <span class="n">adj</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">_mvreg_cov</span><span class="p">())</span>
+            <span class="k">return</span> <span class="n">cast</span><span class="p">(</span><span class="s2">"ndarray"</span><span class="p">,</span> <span class="n">adj</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">_mvreg_cov</span><span class="p">())</span>
 
     <span class="nd">@property</span>
     <span class="k">def</span><span class="w"> </span><span class="nf">cov_config</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">AttrDict</span><span class="p">:</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;Optional configuration information used in covariance&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">"""Configuration of the covariance estimator."""</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_cov_config</span></div>
 
 
@@ -674,24 +709,31 @@
 <div class="viewcode-block" id="HeteroskedasticCovariance">
 <a class="viewcode-back" href="../../../system/system/linearmodels.system.covariance.HeteroskedasticCovariance.html#linearmodels.system.covariance.HeteroskedasticCovariance">[docs]</a>
 <span class="k">class</span><span class="w"> </span><span class="nc">HeteroskedasticCovariance</span><span class="p">(</span><span class="n">HomoskedasticCovariance</span><span class="p">):</span>
-<span class="w">    </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">    Heteroskedastic covariance estimation for system regression</span>
+<span class="w">    </span><span class="sa">r</span><span class="sd">"""</span>
+<span class="sd">    Heteroskedastic covariance estimation for system regression.</span>
 
 <span class="sd">    Parameters</span>
 <span class="sd">    ----------</span>
-<span class="sd">    x : list[ndarray]</span>
-<span class="sd">        ndependent element list of regressor</span>
+<span class="sd">    x : list of ndarray</span>
+<span class="sd">        Regressors of each equation, with shape (nobs, k_i) for equation i.</span>
 <span class="sd">    eps : ndarray</span>
-<span class="sd">        Model residuals, ndependent by nobs</span>
+<span class="sd">        Model residuals, with shape (nobs, neq).</span>
 <span class="sd">    sigma : ndarray</span>
-<span class="sd">        Covariance matrix estimator of eps</span>
-<span class="sd">    gls : bool</span>
-<span class="sd">        Flag indicating to compute the GLS covariance estimator.  If False,</span>
-<span class="sd">        assume OLS was used</span>
-<span class="sd">    debiased : bool</span>
-<span class="sd">        Flag indicating to apply a small sample adjustment</span>
-<span class="sd">    constraints : {None, LinearConstraint}</span>
-<span class="sd">        Constraints used in estimation, if any</span>
+<span class="sd">        Covariance of the residuals of the equations that is used to weight the</span>
+<span class="sd">        equations if ``gls`` is True, with shape (neq, neq).</span>
+<span class="sd">    full_sigma : ndarray</span>
+<span class="sd">        Covariance of the residuals of the equations at the final estimates, with</span>
+<span class="sd">        shape (neq, neq). It differs from ``sigma`` if the weights are not the</span>
+<span class="sd">        covariance of the final residuals, e.g., if the model was given ``sigma``</span>
+<span class="sd">        or did not iterate. It is used to estimate the covariance of the scores</span>
+<span class="sd">        if ``gls`` is True.</span>
+<span class="sd">    gls : bool, optional</span>
+<span class="sd">        Flag indicating to compute the GLS covariance estimator. If False, assume</span>
+<span class="sd">        OLS was used. The default is False.</span>
+<span class="sd">    debiased : bool, optional</span>
+<span class="sd">        Flag indicating to apply a small sample adjustment. The default is False.</span>
+<span class="sd">    constraints : LinearConstraint, optional</span>
+<span class="sd">        Constraints used in estimation. The default is no constraints.</span>
 
 <span class="sd">    Notes</span>
 <span class="sd">    -----</span>
@@ -699,7 +741,7 @@
 
 <span class="sd">    .. math::</span>
 
-<span class="sd">        (X&#39;\Omega^{-1}X)^{-1}\tilde{S}(X&#39;\Omega^{-1}X)^{-1}</span>
+<span class="sd">        (X'\Omega^{-1}X)^{-1}\tilde{S}(X'\Omega^{-1}X)^{-1}</span>
 
 <span class="sd">    where X is a block diagonal matrix of exogenous variables and where</span>
 <span class="sd">    :math:`\tilde{S}` is a estimator of the model scores based on the model</span>
@@ -709,10 +751,10 @@
 
 <span class="sd">    .. math::</span>
 
-<span class="sd">        (X&#39;X)^{-1}\hat{S}(X&#39;X)^{-1}</span>
+<span class="sd">        (X'X)^{-1}\hat{S}(X'X)^{-1}</span>
 
 <span class="sd">    where :math:`\hat{S}` is a estimator of the covariance of the model scores.</span>
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="sd">    """</span>
 
     <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span>
@@ -734,13 +776,13 @@
             <span class="n">debiased</span><span class="o">=</span><span class="n">debiased</span><span class="p">,</span>
             <span class="n">constraints</span><span class="o">=</span><span class="n">constraints</span><span class="p">,</span>
         <span class="p">)</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">_name</span> <span class="o">=</span> <span class="s2">&quot;Heteroskedastic (Robust) Covariance&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_name</span> <span class="o">=</span> <span class="s2">"Heteroskedastic (Robust) Covariance"</span>
 
         <span class="n">k</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">x</span><span class="p">)</span>
         <span class="n">nobs</span> <span class="o">=</span> <span class="n">eps</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
 
         <span class="k">if</span> <span class="n">gls</span><span class="p">:</span>
-            <span class="n">weights</span> <span class="o">=</span> <span class="n">cast</span><span class="p">(</span><span class="s2">&quot;linearmodels.typing.data.Float64Array&quot;</span><span class="p">,</span> <span class="n">inv</span><span class="p">(</span><span class="n">sigma</span><span class="p">))</span>
+            <span class="n">weights</span> <span class="o">=</span> <span class="n">cast</span><span class="p">(</span><span class="s2">"linearmodels.typing.data.Float64Array"</span><span class="p">,</span> <span class="n">inv</span><span class="p">(</span><span class="n">sigma</span><span class="p">))</span>
             <span class="n">bigx</span> <span class="o">=</span> <span class="n">blocked_diag_product</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">weights</span><span class="p">)</span>
             <span class="n">e</span> <span class="o">=</span> <span class="n">eps</span><span class="o">.</span><span class="n">T</span><span class="o">.</span><span class="n">ravel</span><span class="p">()[:,</span> <span class="kc">None</span><span class="p">]</span>
             <span class="n">bigxe</span> <span class="o">=</span> <span class="n">bigx</span> <span class="o">*</span> <span class="n">e</span>
@@ -770,7 +812,7 @@
         <span class="n">k</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">x</span><span class="p">)</span>
         <span class="n">sigma</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">sigma</span>
         <span class="n">weights</span> <span class="o">=</span> <span class="p">(</span>
-            <span class="n">cast</span><span class="p">(</span><span class="s2">&quot;linearmodels.typing.data.Float64Array&quot;</span><span class="p">,</span> <span class="n">inv</span><span class="p">(</span><span class="n">sigma</span><span class="p">))</span> <span class="k">if</span> <span class="n">gls</span> <span class="k">else</span> <span class="n">eye</span><span class="p">(</span><span class="n">k</span><span class="p">)</span>
+            <span class="n">cast</span><span class="p">(</span><span class="s2">"linearmodels.typing.data.Float64Array"</span><span class="p">,</span> <span class="n">inv</span><span class="p">(</span><span class="n">sigma</span><span class="p">))</span> <span class="k">if</span> <span class="n">gls</span> <span class="k">else</span> <span class="n">eye</span><span class="p">(</span><span class="n">k</span><span class="p">)</span>
         <span class="p">)</span>
         <span class="n">xpx</span> <span class="o">=</span> <span class="n">blocked_inner_prod</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">weights</span><span class="p">)</span> <span class="o">/</span> <span class="n">nobs</span>
         <span class="n">xeex</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_xeex</span><span class="p">()</span>
@@ -811,32 +853,55 @@
 <div class="viewcode-block" id="KernelCovariance">
 <a class="viewcode-back" href="../../../system/system/linearmodels.system.covariance.KernelCovariance.html#linearmodels.system.covariance.KernelCovariance">[docs]</a>
 <span class="k">class</span><span class="w"> </span><span class="nc">KernelCovariance</span><span class="p">(</span><span class="n">HeteroskedasticCovariance</span><span class="p">,</span> <span class="n">_HACMixin</span><span class="p">):</span>
-<span class="w">    </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">    Kernel (HAC) covariance estimation for system regression</span>
+<span class="w">    </span><span class="sa">r</span><span class="sd">"""</span>
+<span class="sd">    Kernel (HAC) covariance estimation for system regression.</span>
 
 <span class="sd">    Parameters</span>
 <span class="sd">    ----------</span>
-<span class="sd">    x : list[ndarray]</span>
-<span class="sd">        ndependent element list of regressor</span>
+<span class="sd">    x : list of ndarray</span>
+<span class="sd">        Regressors of each equation, with shape (nobs, k_i) for equation i.</span>
 <span class="sd">    eps : ndarray</span>
-<span class="sd">        Model residuals, ndependent by nobs</span>
+<span class="sd">        Model residuals, with shape (nobs, neq).</span>
 <span class="sd">    sigma : ndarray</span>
-<span class="sd">        Covariance matrix estimator of eps</span>
-<span class="sd">    gls : bool</span>
-<span class="sd">        Flag indicating to compute the GLS covariance estimator.  If False,</span>
-<span class="sd">        assume OLS was used</span>
-<span class="sd">    debiased : bool</span>
-<span class="sd">        Flag indicating to apply a small sample adjustment</span>
-<span class="sd">    kernel : str</span>
-<span class="sd">        Name of kernel to use.  Supported kernels include:</span>
+<span class="sd">        Covariance of the residuals of the equations that is used to weight the</span>
+<span class="sd">        equations if ``gls`` is True, with shape (neq, neq).</span>
+<span class="sd">    full_sigma : ndarray</span>
+<span class="sd">        Covariance of the residuals of the equations at the final estimates, with</span>
+<span class="sd">        shape (neq, neq). It differs from ``sigma`` if the weights are not the</span>
+<span class="sd">        covariance of the final residuals, e.g., if the model was given ``sigma``</span>
+<span class="sd">        or did not iterate. It is used to estimate the covariance of the scores</span>
+<span class="sd">        if ``gls`` is True.</span>
+<span class="sd">    gls : bool, optional</span>
+<span class="sd">        Flag indicating to compute the GLS covariance estimator. If False, assume</span>
+<span class="sd">        OLS was used. The default is False.</span>
+<span class="sd">    debiased : bool, optional</span>
+<span class="sd">        Flag indicating to apply a small sample adjustment. The default is False.</span>
+<span class="sd">    constraints : LinearConstraint, optional</span>
+<span class="sd">        Constraints used in estimation. The default is no constraints.</span>
+<span class="sd">    kernel : str, optional</span>
+<span class="sd">        Name of the kernel. The default is "bartlett". The names are not case</span>
+<span class="sd">        sensitive. Supported kernels are:</span>
 
-<span class="sd">        * &quot;bartlett&quot;, &quot;newey-west&quot; : Bartlett&#39;s kernel</span>
-<span class="sd">        * &quot;parzen&quot;, &quot;gallant&quot; : Parzen&#39;s kernel</span>
-<span class="sd">        * &quot;qs&quot;, &quot;quadratic-spectral&quot;, &quot;andrews&quot; : Quadratic spectral kernel</span>
+<span class="sd">        * "bartlett", "newey-west" - Bartlett's kernel</span>
+<span class="sd">        * "parzen", "gallant" - Parzen's kernel</span>
+<span class="sd">        * "qs", "quadratic-spectral", "andrews" - Quadratic spectral kernel</span>
 
-<span class="sd">    bandwidth : float</span>
-<span class="sd">        Bandwidth to use for the kernel.  If not provided the optimal</span>
-<span class="sd">        bandwidth will be estimated.</span>
+<span class="sd">    bandwidth : float, optional</span>
+<span class="sd">        Non-negative bandwidth to use for the kernel. If not provided, the optimal</span>
+<span class="sd">        bandwidth will be estimated. It needs at least 4 observations with the</span>
+<span class="sd">        Bartlett kernel, 5 with the Parzen kernel and 6 with the quadratic</span>
+<span class="sd">        spectral kernel, and a ``ValueError`` is raised for fewer when the</span>
+<span class="sd">        covariance is first used. See</span>
+<span class="sd">        :func:`~linearmodels.iv.covariance.kernel_optimal_bandwidth`.</span>
+
+<span class="sd">    See Also</span>
+<span class="sd">    --------</span>
+<span class="sd">    linearmodels.iv.covariance.kernel_weight_bartlett</span>
+<span class="sd">        Weights of the Bartlett kernel.</span>
+<span class="sd">    linearmodels.iv.covariance.kernel_weight_parzen</span>
+<span class="sd">        Weights of the Parzen kernel.</span>
+<span class="sd">    linearmodels.iv.covariance.kernel_weight_quadratic_spectral</span>
+<span class="sd">        Weights of the quadratic spectral kernel.</span>
 
 <span class="sd">    Notes</span>
 <span class="sd">    -----</span>
@@ -844,7 +909,7 @@
 
 <span class="sd">    .. math::</span>
 
-<span class="sd">        (X&#39;\Omega^{-1}X)^{-1}\tilde{S}(X&#39;\Omega^{-1}X)^{-1}</span>
+<span class="sd">        (X'\Omega^{-1}X)^{-1}\tilde{S}(X'\Omega^{-1}X)^{-1}</span>
 
 <span class="sd">    where X is a block diagonal matrix of exogenous variables and where</span>
 <span class="sd">    :math:`\tilde{S}` is a estimator of the covariance of the model scores</span>
@@ -854,16 +919,19 @@
 
 <span class="sd">    .. math::</span>
 
-<span class="sd">        (X&#39;X)^{-1}\hat{S}(X&#39;X)^{-1}</span>
+<span class="sd">        (X'X)^{-1}\hat{S}(X'X)^{-1}</span>
 
 <span class="sd">    where :math:`\hat{S}` is a estimator of the covariance of the model scores.</span>
 
-<span class="sd">    See Also</span>
-<span class="sd">    --------</span>
-<span class="sd">    linearmodels.iv.covariance.kernel_weight_bartlett,</span>
-<span class="sd">    linearmodels.iv.covariance.kernel_weight_parzen,</span>
-<span class="sd">    linearmodels.iv.covariance.kernel_weight_quadratic_spectral</span>
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="sd">    .. versionchanged:: 7.1</span>
+
+<span class="sd">       The optimal bandwidth raises a ``ValueError`` if there are fewer</span>
+<span class="sd">       observations than the kernel needs, and if it is not finite. Earlier</span>
+<span class="sd">       versions raised "cannot convert float infinity to integer" (an</span>
+<span class="sd">       ``OverflowError``) or "cannot convert float NaN to integer" for some</span>
+<span class="sd">       data, and used a bandwidth of nobs - 1, or another bandwidth, for other</span>
+<span class="sd">       data.</span>
+<span class="sd">    """</span>
 
     <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span>
@@ -875,7 +943,7 @@
         <span class="n">gls</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
         <span class="n">debiased</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
         <span class="n">constraints</span><span class="p">:</span> <span class="n">LinearConstraint</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
-        <span class="n">kernel</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;bartlett&quot;</span><span class="p">,</span>
+        <span class="n">kernel</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">"bartlett"</span><span class="p">,</span>
         <span class="n">bandwidth</span><span class="p">:</span> <span class="nb">float</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
     <span class="p">):</span>
         <span class="n">_HACMixin</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">kernel</span><span class="p">,</span> <span class="n">bandwidth</span><span class="p">)</span>
@@ -891,18 +959,18 @@
 
         <span class="bp">self</span><span class="o">.</span><span class="n">_check_kernel</span><span class="p">(</span><span class="n">kernel</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_check_bandwidth</span><span class="p">(</span><span class="n">bandwidth</span><span class="p">)</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">_name</span> <span class="o">=</span> <span class="s2">&quot;Kernel (HAC) Covariance&quot;</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">_str_extra</span><span class="p">[</span><span class="s2">&quot;Kernel&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">kernel</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">_cov_config</span><span class="p">[</span><span class="s2">&quot;kernel&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">kernel</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_name</span> <span class="o">=</span> <span class="s2">"Kernel (HAC) Covariance"</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_str_extra</span><span class="p">[</span><span class="s2">"Kernel"</span><span class="p">]</span> <span class="o">=</span> <span class="n">kernel</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_cov_config</span><span class="p">[</span><span class="s2">"kernel"</span><span class="p">]</span> <span class="o">=</span> <span class="n">kernel</span>
 
     <span class="k">def</span><span class="w"> </span><span class="nf">_xeex</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">linearmodels</span><span class="o">.</span><span class="n">typing</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">Float64Array</span><span class="p">:</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_kernel_cov</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_moments</span><span class="p">)</span>
 
     <span class="nd">@property</span>
     <span class="k">def</span><span class="w"> </span><span class="nf">cov_config</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">AttrDict</span><span class="p">:</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;Optional configuration information used in covariance&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">"""Configuration of the covariance estimator."""</span>
         <span class="n">out</span> <span class="o">=</span> <span class="n">AttrDict</span><span class="p">([(</span><span class="n">k</span><span class="p">,</span> <span class="n">v</span><span class="p">)</span> <span class="k">for</span> <span class="n">k</span><span class="p">,</span> <span class="n">v</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_cov_config</span><span class="o">.</span><span class="n">items</span><span class="p">()])</span>
-        <span class="n">out</span><span class="p">[</span><span class="s2">&quot;bandwidth&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">bandwidth</span>
+        <span class="n">out</span><span class="p">[</span><span class="s2">"bandwidth"</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">bandwidth</span>
         <span class="k">return</span> <span class="n">out</span></div>
 
 
@@ -910,29 +978,45 @@
 <div class="viewcode-block" id="ClusteredCovariance">
 <a class="viewcode-back" href="../../../system/system/linearmodels.system.covariance.ClusteredCovariance.html#linearmodels.system.covariance.ClusteredCovariance">[docs]</a>
 <span class="k">class</span><span class="w"> </span><span class="nc">ClusteredCovariance</span><span class="p">(</span><span class="n">HeteroskedasticCovariance</span><span class="p">):</span>
-<span class="w">    </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">    Heteroskedastic covariance estimation for system regression</span>
+<span class="w">    </span><span class="sa">r</span><span class="sd">"""</span>
+<span class="sd">    Clustered covariance estimation for system regression.</span>
 
 <span class="sd">    Parameters</span>
 <span class="sd">    ----------</span>
-<span class="sd">    x : list[ndarray]</span>
-<span class="sd">        ndependent element list of regressor</span>
+<span class="sd">    x : list of ndarray</span>
+<span class="sd">        Regressors of each equation, with shape (nobs, k_i) for equation i.</span>
 <span class="sd">    eps : ndarray</span>
-<span class="sd">        Model residuals, ndependent by nobs</span>
+<span class="sd">        Model residuals, with shape (nobs, neq).</span>
 <span class="sd">    sigma : ndarray</span>
-<span class="sd">        Covariance matrix estimator of eps</span>
-<span class="sd">    gls : bool</span>
-<span class="sd">        Flag indicating to compute the GLS covariance estimator.  If False,</span>
-<span class="sd">        assume OLS was used</span>
-<span class="sd">    debiased : bool</span>
-<span class="sd">        Flag indicating to apply a small sample adjustment</span>
-<span class="sd">    constraints : {None, LinearConstraint}</span>
-<span class="sd">        Constraints used in estimation, if any</span>
-<span class="sd">    clusters : ndarray</span>
-<span class="sd">        Optional array of cluster id.  Must be integer valued, and have shape</span>
-<span class="sd">        (nobs, ncluster) where ncluster is 1 or 2.</span>
-<span class="sd">    group_debias : bool</span>
-<span class="sd">        Flag indicating whether to debias by the number of groups.</span>
+<span class="sd">        Covariance of the residuals of the equations that is used to weight the</span>
+<span class="sd">        equations if ``gls`` is True, with shape (neq, neq).</span>
+<span class="sd">    full_sigma : ndarray</span>
+<span class="sd">        Covariance of the residuals of the equations at the final estimates, with</span>
+<span class="sd">        shape (neq, neq). It differs from ``sigma`` if the weights are not the</span>
+<span class="sd">        covariance of the final residuals, e.g., if the model was given ``sigma``</span>
+<span class="sd">        or did not iterate. It is used to estimate the covariance of the scores</span>
+<span class="sd">        if ``gls`` is True.</span>
+<span class="sd">    gls : bool, optional</span>
+<span class="sd">        Flag indicating to compute the GLS covariance estimator. If False, assume</span>
+<span class="sd">        OLS was used. The default is False.</span>
+<span class="sd">    debiased : bool, optional</span>
+<span class="sd">        Flag indicating to apply a small sample adjustment. The default is False.</span>
+<span class="sd">    constraints : LinearConstraint, optional</span>
+<span class="sd">        Constraints used in estimation. The default is no constraints.</span>
+<span class="sd">    clusters : array_like, optional</span>
+<span class="sd">        Array of cluster ids. It must be integer valued, and have shape (nobs,) or</span>
+<span class="sd">        (nobs, ncluster) where ncluster is 1 or 2. The default is no clusters,</span>
+<span class="sd">        which gives the heteroskedasticity robust covariance.</span>
+<span class="sd">    group_debias : bool, optional</span>
+<span class="sd">        Flag indicating whether to debias by the number of groups. The default is</span>
+<span class="sd">        False.</span>
+
+<span class="sd">    See Also</span>
+<span class="sd">    --------</span>
+<span class="sd">    linearmodels.shared.covariance.cov_cluster</span>
+<span class="sd">        Core cluster covariance estimator.</span>
+<span class="sd">    linearmodels.shared.covariance.group_debias_coefficient</span>
+<span class="sd">        Scale that debiases a covariance by the number of groups.</span>
 
 <span class="sd">    Notes</span>
 <span class="sd">    -----</span>
@@ -940,7 +1024,7 @@
 
 <span class="sd">    .. math::</span>
 
-<span class="sd">        (X&#39;\Omega^{-1}X)^{-1}\tilde{S}_{\mathcal{G}}(X&#39;\Omega^{-1}X)^{-1}</span>
+<span class="sd">        (X'\Omega^{-1}X)^{-1}\tilde{S}_{\mathcal{G}}(X'\Omega^{-1}X)^{-1}</span>
 
 <span class="sd">    where X is a block diagonal matrix of exogenous variables and where</span>
 <span class="sd">    :math:`\tilde{S}_{\mathcal{G}}` is a clustered estimator of the model</span>
@@ -951,16 +1035,11 @@
 
 <span class="sd">    .. math::</span>
 
-<span class="sd">        (X&#39;X)^{-1}\hat{S}_{\mathcal{G}}(X&#39;X)^{-1}</span>
+<span class="sd">        (X'X)^{-1}\hat{S}_{\mathcal{G}}(X'X)^{-1}</span>
 
 <span class="sd">    where :math:`\hat{S}` is a clustered estimator of the covariance of the</span>
 <span class="sd">    model scores.</span>
-
-<span class="sd">    See Also</span>
-<span class="sd">    --------</span>
-<span class="sd">    linearmodels.shared.covariance.cov_cluster</span>
-<span class="sd">    linearmodels.shared.covariance.group_debias_coefficient</span>
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="sd">    """</span>
 
     <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span>
@@ -987,27 +1066,27 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">_group_debias</span> <span class="o">=</span> <span class="n">group_debias</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_nclusters</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="nb">int</span><span class="p">]</span> <span class="o">=</span> <span class="p">[]</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_clusters</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_check_clusters</span><span class="p">(</span><span class="n">clusters</span><span class="p">)</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">_str_extra</span><span class="p">[</span><span class="s2">&quot;Number of Grouping Variables&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_clusters</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_str_extra</span><span class="p">[</span><span class="s2">"Number of Grouping Variables"</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_clusters</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_clusters</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
-            <span class="n">num_cl</span> <span class="o">=</span> <span class="p">[</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">nc</span><span class="si">}</span><span class="s2"> (Variable </span><span class="si">{</span><span class="n">i</span><span class="si">}</span><span class="s2">)&quot;</span> <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">nc</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_nclusters</span><span class="p">)]</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">_str_extra</span><span class="p">[</span><span class="s2">&quot;Number of Groups&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="s2">&quot; and &quot;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">num_cl</span><span class="p">)</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">_str_extra</span><span class="p">[</span><span class="s2">&quot;Group Debias&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_group_debias</span>
+            <span class="n">num_cl</span> <span class="o">=</span> <span class="p">[</span><span class="sa">f</span><span class="s2">"</span><span class="si">{</span><span class="n">nc</span><span class="si">}</span><span class="s2"> (Variable </span><span class="si">{</span><span class="n">i</span><span class="si">}</span><span class="s2">)"</span> <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">nc</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_nclusters</span><span class="p">)]</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_str_extra</span><span class="p">[</span><span class="s2">"Number of Groups"</span><span class="p">]</span> <span class="o">=</span> <span class="s2">" and "</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">num_cl</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_str_extra</span><span class="p">[</span><span class="s2">"Group Debias"</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_group_debias</span>
 
     <span class="k">def</span><span class="w"> </span><span class="nf">_check_clusters</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span> <span class="n">clusters</span><span class="p">:</span> <span class="n">linearmodels</span><span class="o">.</span><span class="n">typing</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">IntArray</span> <span class="o">|</span> <span class="kc">None</span>
     <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">linearmodels</span><span class="o">.</span><span class="n">typing</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">IntArray</span><span class="p">:</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;Check cluster dimension and ensure ndarray&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">"""Check cluster dimension and ensure ndarray."""</span>
         <span class="k">if</span> <span class="n">clusters</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
             <span class="k">return</span> <span class="n">empty</span><span class="p">((</span><span class="bp">self</span><span class="o">.</span><span class="n">_eps</span><span class="o">.</span><span class="n">size</span><span class="p">,</span> <span class="mi">0</span><span class="p">),</span> <span class="n">dtype</span><span class="o">=</span><span class="nb">int</span><span class="p">)</span>
-        <span class="n">_clusters</span> <span class="o">=</span> <span class="n">asarray</span><span class="p">(</span><span class="n">clusters</span><span class="p">)</span>
+        <span class="n">_clusters</span> <span class="o">=</span> <span class="n">as_ndarray</span><span class="p">(</span><span class="n">clusters</span><span class="p">,</span> <span class="s2">"clusters"</span><span class="p">)</span>
 
         <span class="k">if</span> <span class="n">_clusters</span><span class="o">.</span><span class="n">ndim</span> <span class="ow">not</span> <span class="ow">in</span> <span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">):</span>
-            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="n">CLUSTERS_FORMAT</span><span class="p">,</span> <span class="ne">ValueError</span><span class="p">)</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="n">CLUSTERS_FORMAT</span><span class="p">)</span>
         <span class="k">elif</span> <span class="n">_clusters</span><span class="o">.</span><span class="n">ndim</span> <span class="o">==</span> <span class="mi">1</span><span class="p">:</span>
             <span class="n">_clusters</span> <span class="o">=</span> <span class="n">_clusters</span><span class="p">[:,</span> <span class="kc">None</span><span class="p">]</span>
         <span class="n">shape</span> <span class="o">=</span> <span class="n">_clusters</span><span class="o">.</span><span class="n">shape</span>
         <span class="k">if</span> <span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">!=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_eps</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="ow">or</span> <span class="ow">not</span> <span class="mi">1</span> <span class="o">&lt;=</span> <span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">&lt;=</span> <span class="mi">2</span><span class="p">:</span>
-            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="n">CLUSTERS_FORMAT</span><span class="p">,</span> <span class="ne">ValueError</span><span class="p">)</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="n">CLUSTERS_FORMAT</span><span class="p">)</span>
 
         <span class="n">df</span> <span class="o">=</span> <span class="n">DataFrame</span><span class="p">(</span><span class="n">_clusters</span><span class="p">)</span>
         <span class="n">nunique</span> <span class="o">=</span> <span class="n">df</span><span class="o">.</span><span class="n">nunique</span><span class="p">()</span>
@@ -1015,9 +1094,9 @@
             <span class="n">both</span> <span class="o">=</span> <span class="n">df</span><span class="o">.</span><span class="n">groupby</span><span class="p">([</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">])</span><span class="o">.</span><span class="n">ngroups</span>
             <span class="k">if</span> <span class="n">both</span> <span class="o">==</span> <span class="n">nunique</span><span class="o">.</span><span class="n">max</span><span class="p">():</span>
                 <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
-                    <span class="s2">&quot;clusters must be non-nested. You must drop nested &quot;</span>
-                    <span class="s2">&quot;the nested cluster before computing the clustered&quot;</span>
-                    <span class="s2">&quot;covariance.&quot;</span>
+                    <span class="s2">"clusters must be non-nested. You must drop nested "</span>
+                    <span class="s2">"the nested cluster before computing the clustered"</span>
+                    <span class="s2">"covariance."</span>
                 <span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_nclusters</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="n">nunique</span><span class="p">)</span>
         <span class="k">return</span> <span class="n">_clusters</span>
@@ -1048,10 +1127,10 @@
 
     <span class="nd">@property</span>
     <span class="k">def</span><span class="w"> </span><span class="nf">cov_config</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">AttrDict</span><span class="p">:</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;Optional configuration information used in covariance&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">"""Configuration of the covariance estimator."""</span>
         <span class="n">out</span> <span class="o">=</span> <span class="n">AttrDict</span><span class="p">([(</span><span class="n">k</span><span class="p">,</span> <span class="n">v</span><span class="p">)</span> <span class="k">for</span> <span class="n">k</span><span class="p">,</span> <span class="n">v</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_cov_config</span><span class="o">.</span><span class="n">items</span><span class="p">()])</span>
-        <span class="n">out</span><span class="p">[</span><span class="s2">&quot;clusters&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_clusters</span>
-        <span class="n">out</span><span class="p">[</span><span class="s2">&quot;group_debias&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_group_debias</span>
+        <span class="n">out</span><span class="p">[</span><span class="s2">"clusters"</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_clusters</span>
+        <span class="n">out</span><span class="p">[</span><span class="s2">"group_debias"</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_group_debias</span>
         <span class="k">return</span> <span class="n">out</span></div>
 
 
@@ -1059,24 +1138,28 @@
 <div class="viewcode-block" id="GMMHomoskedasticCovariance">
 <a class="viewcode-back" href="../../../system/system/linearmodels.system.covariance.GMMHomoskedasticCovariance.html#linearmodels.system.covariance.GMMHomoskedasticCovariance">[docs]</a>
 <span class="k">class</span><span class="w"> </span><span class="nc">GMMHomoskedasticCovariance</span><span class="p">:</span>
-<span class="w">    </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">    Covariance estimator for IV system estimation with homoskedastic data</span>
+<span class="w">    </span><span class="sa">r</span><span class="sd">"""</span>
+<span class="sd">    Covariance estimator for IV system estimation with homoskedastic data.</span>
 
 <span class="sd">    Parameters</span>
 <span class="sd">    ----------</span>
-<span class="sd">    x : list[ndarray]</span>
-<span class="sd">        List containing the model regressors for each equation in the system</span>
-<span class="sd">    z : list[ndarray]</span>
-<span class="sd">        List containing the model instruments for each equation in the system</span>
+<span class="sd">    x : list of ndarray</span>
+<span class="sd">        Regressors of each equation, with shape (nobs, k_i) for equation i.</span>
+<span class="sd">    z : list of ndarray</span>
+<span class="sd">        Instruments of each equation, with shape (nobs, nz_i) for equation i.</span>
 <span class="sd">    eps : ndarray</span>
-<span class="sd">        nobs by neq array of residuals where each column corresponds an</span>
-<span class="sd">        equation in the system</span>
+<span class="sd">        Residuals with shape (nobs, neq), where each column corresponds to an</span>
+<span class="sd">        equation in the system.</span>
 <span class="sd">    w : ndarray</span>
-<span class="sd">        Weighting matrix used in estimation</span>
-<span class="sd">    sigma : ndarray</span>
-<span class="sd">        Residual covariance used in estimation</span>
-<span class="sd">    constraints : {None, LinearConstraint}</span>
-<span class="sd">        Constraints used in estimation, if any</span>
+<span class="sd">        Weighting matrix used in estimation, with shape (nmoments, nmoments).</span>
+<span class="sd">    sigma : ndarray, optional</span>
+<span class="sd">        Residual covariance used in estimation, with shape (neq, neq). It is</span>
+<span class="sd">        required by ``GMMHomoskedasticCovariance``, which uses it to estimate the</span>
+<span class="sd">        covariance of the moment conditions. The other estimators ignore it.</span>
+<span class="sd">    debiased : bool, optional</span>
+<span class="sd">        Flag indicating to apply a small sample adjustment. The default is False.</span>
+<span class="sd">    constraints : LinearConstraint, optional</span>
+<span class="sd">        Constraints used in estimation. The default is no constraints.</span>
 
 <span class="sd">    Notes</span>
 <span class="sd">    -----</span>
@@ -1084,11 +1167,11 @@
 
 <span class="sd">    .. math::</span>
 
-<span class="sd">      (X&#39;ZW^{-1}Z&#39;X)^{-1}(X&#39;ZW^{-1}\Omega W^{-1}Z&#39;X)(X&#39;ZW^{-1}Z&#39;X)^{-1}</span>
+<span class="sd">      (X'ZW^{-1}Z'X)^{-1}(X'ZW^{-1}\Omega W^{-1}Z'X)(X'ZW^{-1}Z'X)^{-1}</span>
 
-<span class="sd">    where :math:`\Omega = W = Z&#39;(\Sigma \otimes I_N)Z` where m is the number of</span>
+<span class="sd">    where :math:`\Omega = W = Z'(\Sigma \otimes I_N)Z` where m is the number of</span>
 <span class="sd">    moments in the system</span>
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="sd">    """</span>
 
     <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span>
@@ -1108,7 +1191,7 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">_w</span> <span class="o">=</span> <span class="n">w</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_debiased</span> <span class="o">=</span> <span class="n">debiased</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_constraints</span> <span class="o">=</span> <span class="n">constraints</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">_name</span> <span class="o">=</span> <span class="s2">&quot;GMM Homoskedastic (Unadjusted) Covariance&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_name</span> <span class="o">=</span> <span class="s2">"GMM Homoskedastic (Unadjusted) Covariance"</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_cov_config</span> <span class="o">=</span> <span class="n">AttrDict</span><span class="p">(</span><span class="n">debiased</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">_debiased</span><span class="p">)</span>
 
     <span class="k">def</span><span class="w"> </span><span class="fm">__str__</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
@@ -1117,11 +1200,11 @@
 
     <span class="k">def</span><span class="w"> </span><span class="fm">__repr__</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
         <span class="n">out</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="fm">__str__</span><span class="p">()</span>
-        <span class="k">return</span> <span class="n">out</span> <span class="o">+</span> <span class="sa">f</span><span class="s2">&quot;, id: </span><span class="si">{</span><span class="nb">hex</span><span class="p">(</span><span class="nb">id</span><span class="p">(</span><span class="bp">self</span><span class="p">))</span><span class="si">}</span><span class="s2">&quot;</span>
+        <span class="k">return</span> <span class="n">out</span> <span class="o">+</span> <span class="sa">f</span><span class="s2">", id: </span><span class="si">{</span><span class="nb">hex</span><span class="p">(</span><span class="nb">id</span><span class="p">(</span><span class="bp">self</span><span class="p">))</span><span class="si">}</span><span class="s2">"</span>
 
     <span class="nd">@property</span>
     <span class="k">def</span><span class="w"> </span><span class="nf">cov</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">linearmodels</span><span class="o">.</span><span class="n">typing</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">Float64Array</span><span class="p">:</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;Parameter covariance&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">"""Covariance of the parameter estimates."""</span>
         <span class="n">x</span><span class="p">,</span> <span class="n">z</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_x</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_z</span>
         <span class="n">k</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">x</span><span class="p">)</span>
         <span class="n">nobs</span> <span class="o">=</span> <span class="n">x</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
@@ -1175,7 +1258,7 @@
 
     <span class="nd">@property</span>
     <span class="k">def</span><span class="w"> </span><span class="nf">cov_config</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">AttrDict</span><span class="p">:</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;Optional configuration information used in covariance&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">"""Configuration of the covariance estimator."""</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_cov_config</span></div>
 
 
@@ -1183,24 +1266,28 @@
 <div class="viewcode-block" id="GMMHeteroskedasticCovariance">
 <a class="viewcode-back" href="../../../system/system/linearmodels.system.covariance.GMMHeteroskedasticCovariance.html#linearmodels.system.covariance.GMMHeteroskedasticCovariance">[docs]</a>
 <span class="k">class</span><span class="w"> </span><span class="nc">GMMHeteroskedasticCovariance</span><span class="p">(</span><span class="n">GMMHomoskedasticCovariance</span><span class="p">):</span>
-<span class="w">    </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">    Covariance estimator for IV system estimation with homoskedastic data</span>
+<span class="w">    </span><span class="sa">r</span><span class="sd">"""</span>
+<span class="sd">    Covariance estimator for IV system estimation with heteroskedastic data.</span>
 
 <span class="sd">    Parameters</span>
 <span class="sd">    ----------</span>
-<span class="sd">    x : list[ndarray]</span>
-<span class="sd">        List containing the model regressors for each equation in the system</span>
-<span class="sd">    z : list[ndarray]</span>
-<span class="sd">        List containing the model instruments for each equation in the system</span>
+<span class="sd">    x : list of ndarray</span>
+<span class="sd">        Regressors of each equation, with shape (nobs, k_i) for equation i.</span>
+<span class="sd">    z : list of ndarray</span>
+<span class="sd">        Instruments of each equation, with shape (nobs, nz_i) for equation i.</span>
 <span class="sd">    eps : ndarray</span>
-<span class="sd">        nobs by neq array of residuals where each column corresponds an</span>
-<span class="sd">        equation in the system</span>
+<span class="sd">        Residuals with shape (nobs, neq), where each column corresponds to an</span>
+<span class="sd">        equation in the system.</span>
 <span class="sd">    w : ndarray</span>
-<span class="sd">        Weighting matrix used in estimation</span>
-<span class="sd">    sigma : ndarray</span>
-<span class="sd">        Residual covariance used in estimation</span>
-<span class="sd">    constraints : {None, LinearConstraint}</span>
-<span class="sd">        Constraints used in estimation, if any</span>
+<span class="sd">        Weighting matrix used in estimation, with shape (nmoments, nmoments).</span>
+<span class="sd">    sigma : ndarray, optional</span>
+<span class="sd">        Residual covariance used in estimation, with shape (neq, neq). It is</span>
+<span class="sd">        required by ``GMMHomoskedasticCovariance``, which uses it to estimate the</span>
+<span class="sd">        covariance of the moment conditions. The other estimators ignore it.</span>
+<span class="sd">    debiased : bool, optional</span>
+<span class="sd">        Flag indicating to apply a small sample adjustment. The default is False.</span>
+<span class="sd">    constraints : LinearConstraint, optional</span>
+<span class="sd">        Constraints used in estimation. The default is no constraints.</span>
 
 <span class="sd">    Notes</span>
 <span class="sd">    -----</span>
@@ -1208,10 +1295,10 @@
 
 <span class="sd">    .. math::</span>
 
-<span class="sd">      (X&#39;ZW^{-1}Z&#39;X)^{-1}(X&#39;ZW^{-1}\Omega W^{-1}Z&#39;X)(X&#39;ZW^{-1}Z&#39;X)^{-1}</span>
+<span class="sd">      (X'ZW^{-1}Z'X)^{-1}(X'ZW^{-1}\Omega W^{-1}Z'X)(X'ZW^{-1}Z'X)^{-1}</span>
 
 <span class="sd">    where :math:`\Omega` is the covariance of the moment conditions.</span>
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="sd">    """</span>
 
     <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span>
@@ -1227,7 +1314,7 @@
         <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span>
             <span class="n">x</span><span class="p">,</span> <span class="n">z</span><span class="p">,</span> <span class="n">eps</span><span class="p">,</span> <span class="n">w</span><span class="p">,</span> <span class="n">sigma</span><span class="o">=</span><span class="n">sigma</span><span class="p">,</span> <span class="n">debiased</span><span class="o">=</span><span class="n">debiased</span><span class="p">,</span> <span class="n">constraints</span><span class="o">=</span><span class="n">constraints</span>
         <span class="p">)</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">_name</span> <span class="o">=</span> <span class="s2">&quot;GMM Heteroskedastic (Robust) Covariance&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_name</span> <span class="o">=</span> <span class="s2">"GMM Heteroskedastic (Robust) Covariance"</span>
 
         <span class="n">k</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">z</span><span class="p">)</span>
         <span class="n">k_total</span> <span class="o">=</span> <span class="nb">sum</span><span class="p">(</span><span class="n">a</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="k">for</span> <span class="n">a</span> <span class="ow">in</span> <span class="n">z</span><span class="p">)</span>
@@ -1252,34 +1339,43 @@
 <div class="viewcode-block" id="GMMKernelCovariance">
 <a class="viewcode-back" href="../../../system/system/linearmodels.system.covariance.GMMKernelCovariance.html#linearmodels.system.covariance.GMMKernelCovariance">[docs]</a>
 <span class="k">class</span><span class="w"> </span><span class="nc">GMMKernelCovariance</span><span class="p">(</span><span class="n">GMMHeteroskedasticCovariance</span><span class="p">,</span> <span class="n">_HACMixin</span><span class="p">):</span>
-<span class="w">    </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">    Covariance estimator for IV system estimation with homoskedastic data</span>
+<span class="w">    </span><span class="sa">r</span><span class="sd">"""</span>
+<span class="sd">    Kernel (HAC) covariance estimator for IV system estimation.</span>
 
 <span class="sd">    Parameters</span>
 <span class="sd">    ----------</span>
-<span class="sd">    x : list[ndarray]</span>
-<span class="sd">        List containing the model regressors for each equation in the system</span>
-<span class="sd">    z : list[ndarray]</span>
-<span class="sd">        List containing the model instruments for each equation in the system</span>
+<span class="sd">    x : list of ndarray</span>
+<span class="sd">        Regressors of each equation, with shape (nobs, k_i) for equation i.</span>
+<span class="sd">    z : list of ndarray</span>
+<span class="sd">        Instruments of each equation, with shape (nobs, nz_i) for equation i.</span>
 <span class="sd">    eps : ndarray</span>
-<span class="sd">        nobs by neq array of residuals where each column corresponds an</span>
-<span class="sd">        equation in the system</span>
+<span class="sd">        Residuals with shape (nobs, neq), where each column corresponds to an</span>
+<span class="sd">        equation in the system.</span>
 <span class="sd">    w : ndarray</span>
-<span class="sd">        Weighting matrix used in estimation</span>
-<span class="sd">    sigma : ndarray</span>
-<span class="sd">        Residual covariance used in estimation</span>
-<span class="sd">    constraints : {None, LinearConstraint}</span>
-<span class="sd">        Constraints used in estimation, if any</span>
-<span class="sd">    kernel : str</span>
-<span class="sd">        Name of kernel to use.  Supported kernels include:</span>
+<span class="sd">        Weighting matrix used in estimation, with shape (nmoments, nmoments).</span>
+<span class="sd">    sigma : ndarray, optional</span>
+<span class="sd">        Residual covariance used in estimation, with shape (neq, neq). It is</span>
+<span class="sd">        required by ``GMMHomoskedasticCovariance``, which uses it to estimate the</span>
+<span class="sd">        covariance of the moment conditions. The other estimators ignore it.</span>
+<span class="sd">    debiased : bool, optional</span>
+<span class="sd">        Flag indicating to apply a small sample adjustment. The default is False.</span>
+<span class="sd">    constraints : LinearConstraint, optional</span>
+<span class="sd">        Constraints used in estimation. The default is no constraints.</span>
+<span class="sd">    kernel : str, optional</span>
+<span class="sd">        Name of the kernel. The default is "bartlett". The names are not case</span>
+<span class="sd">        sensitive. Supported kernels are:</span>
 
-<span class="sd">        * &quot;bartlett&quot;, &quot;newey-west&quot; : Bartlett&#39;s kernel</span>
-<span class="sd">        * &quot;parzen&quot;, &quot;gallant&quot; : Parzen&#39;s kernel</span>
-<span class="sd">        * &quot;qs&quot;, &quot;quadratic-spectral&quot;, &quot;andrews&quot; : Quadratic spectral kernel</span>
+<span class="sd">        * "bartlett", "newey-west" - Bartlett's kernel</span>
+<span class="sd">        * "parzen", "gallant" - Parzen's kernel</span>
+<span class="sd">        * "qs", "quadratic-spectral", "andrews" - Quadratic spectral kernel</span>
 
-<span class="sd">    bandwidth : float</span>
-<span class="sd">        Bandwidth to use for the kernel.  If not provided the optimal</span>
-<span class="sd">        bandwidth will be estimated.</span>
+<span class="sd">    bandwidth : float, optional</span>
+<span class="sd">        Non-negative bandwidth to use for the kernel. If not provided, the optimal</span>
+<span class="sd">        bandwidth will be estimated. It needs at least 4 observations with the</span>
+<span class="sd">        Bartlett kernel, 5 with the Parzen kernel and 6 with the quadratic</span>
+<span class="sd">        spectral kernel, and a ``ValueError`` is raised for fewer when the</span>
+<span class="sd">        covariance is first used. See</span>
+<span class="sd">        :func:`~linearmodels.iv.covariance.kernel_optimal_bandwidth`.</span>
 
 <span class="sd">    Notes</span>
 <span class="sd">    -----</span>
@@ -1287,10 +1383,19 @@
 
 <span class="sd">    .. math::</span>
 
-<span class="sd">      (X&#39;ZW^{-1}Z&#39;X)^{-1}(X&#39;ZW^{-1}\Omega W^{-1}Z&#39;X)(X&#39;ZW^{-1}Z&#39;X)^{-1}</span>
+<span class="sd">      (X'ZW^{-1}Z'X)^{-1}(X'ZW^{-1}\Omega W^{-1}Z'X)(X'ZW^{-1}Z'X)^{-1}</span>
 
 <span class="sd">    where :math:`\Omega` is the covariance of the moment conditions.</span>
-<span class="sd">    &quot;&quot;&quot;</span>
+
+<span class="sd">    .. versionchanged:: 7.1</span>
+
+<span class="sd">       The optimal bandwidth raises a ``ValueError`` if there are fewer</span>
+<span class="sd">       observations than the kernel needs, and if it is not finite. Earlier</span>
+<span class="sd">       versions raised "cannot convert float infinity to integer" (an</span>
+<span class="sd">       ``OverflowError``) or "cannot convert float NaN to integer" for some</span>
+<span class="sd">       data, and used a bandwidth of nobs - 1, or another bandwidth, for other</span>
+<span class="sd">       data.</span>
+<span class="sd">    """</span>
 
     <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span>
@@ -1302,26 +1407,26 @@
         <span class="n">sigma</span><span class="p">:</span> <span class="n">ndarray</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
         <span class="n">debiased</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
         <span class="n">constraints</span><span class="p">:</span> <span class="n">LinearConstraint</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
-        <span class="n">kernel</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;bartlett&quot;</span><span class="p">,</span>
+        <span class="n">kernel</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">"bartlett"</span><span class="p">,</span>
         <span class="n">bandwidth</span><span class="p">:</span> <span class="nb">float</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
     <span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
         <span class="n">_HACMixin</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">kernel</span><span class="p">,</span> <span class="n">bandwidth</span><span class="p">)</span>
         <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span>
             <span class="n">x</span><span class="p">,</span> <span class="n">z</span><span class="p">,</span> <span class="n">eps</span><span class="p">,</span> <span class="n">w</span><span class="p">,</span> <span class="n">sigma</span><span class="o">=</span><span class="n">sigma</span><span class="p">,</span> <span class="n">debiased</span><span class="o">=</span><span class="n">debiased</span><span class="p">,</span> <span class="n">constraints</span><span class="o">=</span><span class="n">constraints</span>
         <span class="p">)</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">_name</span> <span class="o">=</span> <span class="s2">&quot;GMM Kernel (HAC) Covariance&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_name</span> <span class="o">=</span> <span class="s2">"GMM Kernel (HAC) Covariance"</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_check_bandwidth</span><span class="p">(</span><span class="n">bandwidth</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_check_kernel</span><span class="p">(</span><span class="n">kernel</span><span class="p">)</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">_cov_config</span><span class="p">[</span><span class="s2">&quot;kernel&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">kernel</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_cov_config</span><span class="p">[</span><span class="s2">"kernel"</span><span class="p">]</span> <span class="o">=</span> <span class="n">kernel</span>
 
     <span class="k">def</span><span class="w"> </span><span class="nf">_omega</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">linearmodels</span><span class="o">.</span><span class="n">typing</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">Float64Array</span><span class="p">:</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_kernel_cov</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_moments</span><span class="p">)</span>
 
     <span class="nd">@property</span>
     <span class="k">def</span><span class="w"> </span><span class="nf">cov_config</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">AttrDict</span><span class="p">:</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;Optional configuration information used in covariance&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">"""Configuration of the covariance estimator."""</span>
         <span class="n">out</span> <span class="o">=</span> <span class="n">AttrDict</span><span class="p">([(</span><span class="n">k</span><span class="p">,</span> <span class="n">v</span><span class="p">)</span> <span class="k">for</span> <span class="n">k</span><span class="p">,</span> <span class="n">v</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_cov_config</span><span class="o">.</span><span class="n">items</span><span class="p">()])</span>
-        <span class="n">out</span><span class="p">[</span><span class="s2">&quot;bandwidth&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">bandwidth</span>
+        <span class="n">out</span><span class="p">[</span><span class="s2">"bandwidth"</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">bandwidth</span>
         <span class="k">return</span> <span class="n">out</span></div>
 
 </code></pre></div>
@@ -1359,13 +1464,13 @@
       <div class="md-copyright">
   
     <div class="md-footer-copyright__highlight">
-        &#169; Copyright 2021, Kevin Sheppard.
+        &#169; Copyright 2017-2026, Kevin Sheppard.
         
     </div>
   
     Created using
     <a href="https://www.sphinx-doc.org/" target="_blank" rel="noopener">Sphinx</a>
-    8.1.3.
+    9.1.0.
      and
     <a href="https://github.com/jbms/sphinx-immaterial/" target="_blank" rel="noopener">Sphinx-Immaterial</a>
   

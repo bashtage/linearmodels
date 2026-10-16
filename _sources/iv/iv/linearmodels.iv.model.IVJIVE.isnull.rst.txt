@@ -1,0 +1,6 @@
+linearmodels.iv.model.IVJIVE.isnull
+===================================
+
+.. currentmodule:: linearmodels.iv.model
+
+.. autoproperty:: IVJIVE.isnull

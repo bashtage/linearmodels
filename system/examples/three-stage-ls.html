@@ -23,7 +23,7 @@
     
   
       
-        <title>Three-stage Least Squares (3SLS) - linearmodels 7.0</title>
+        <title>Three-stage Least Squares (3SLS) - linearmodels 7.1</title>
       
     
 
@@ -54,7 +54,7 @@
         <style>:root{--md-text-font:"Roboto";--md-code-font:"Roboto Mono"}</style>
       
     
-        <link rel="stylesheet" type="text/css" href="../../_static/sphinx_immaterial_theme.acf80fe7f4d9ef9e2.min.css?v=9e56d0d2" />
+        <link rel="stylesheet" type="text/css" href="../../_static/sphinx_immaterial_theme.6efbe22605a23fcd6.min.css?v=b2ceb110" />
         <link rel="stylesheet" type="text/css" href="../../_static/nbsphinx-code-cells.css?v=2aa19091" />
         <link rel="stylesheet" type="text/css" href="../../_static/css/small_fixes.css?v=34934119" />
     <script>__md_scope=new URL("../..",location),__md_hash=e=>[...e].reduce(((e,_)=>(e<<5)-e+_.charCodeAt(0)),0),__md_get=(e,_=localStorage,t=__md_scope)=>JSON.parse(_.getItem(t.pathname+"."+e)),__md_set=(e,_,t=localStorage,a=__md_scope)=>{try{t.setItem(a.pathname+"."+e,JSON.stringify(_))}catch(e){}}</script>
@@ -101,7 +101,7 @@
 
 <header class="md-header md-header--shadow" data-md-component="header">
   <nav class="md-header__inner md-grid" aria-label="Header">
-    <a href="../../index.html" title="linearmodels 7.0" class="md-header__button md-logo" aria-label="linearmodels 7.0" data-md-component="logo">
+    <a href="../../index.html" title="linearmodels 7.1" class="md-header__button md-logo" aria-label="linearmodels 7.1" data-md-component="logo">
       <img src="../../_static/bw-logo.svg" alt="logo">
     </a>
     <label class="md-header__button md-icon" for="__drawer">
@@ -112,7 +112,7 @@
       <div class="md-header__ellipsis">
         <div class="md-header__topic">
           <span class="md-ellipsis">
-            linearmodels 7.0
+            linearmodels 7.1
           </span>
         </div>
         <div class="md-header__topic" data-md-component="header-topic">
@@ -207,10 +207,10 @@
 
 <nav class="md-nav md-nav--primary" aria-label="Navigation" data-md-level="0">
   <label class="md-nav__title" for="__drawer">
-    <a href="../../index.html" title="linearmodels 7.0" class="md-nav__button md-logo" aria-label="linearmodels 7.0" data-md-component="logo">
+    <a href="../../index.html" title="linearmodels 7.1" class="md-nav__button md-logo" aria-label="linearmodels 7.1" data-md-component="logo">
       <img src="../../_static/bw-logo.svg" alt="logo">
     </a>
-    linearmodels 7.0
+    linearmodels 7.1
   </label>
   
     <div class="md-nav__source">
@@ -712,6 +712,29 @@
   
   
     <li class="md-nav__item">
+      <a href="../../input-alignment.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    <span title="/input-alignment.rst (reference label)"><span>Aligning Inputs</span></span>
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+  
+    <li class="md-nav__item">
       <a href="../../utility.html" class="md-nav__link">
         
   
@@ -962,11 +985,11 @@
 \[\begin{split}\begin{eqnarray}
 hours &amp; = &amp; \beta_0 + \beta_1 \ln(wage) + \beta_2 educ + \beta_3 age + \beta_4 kidslt6 + \beta_5 nwifeinc + \epsilon^h_i
 \\
-\ln(wage) &amp; = &amp; \gamma_0 + \gamma_1 hours + \gamma_2 educ + \gamma_3 educ^2 + \gamma_4 exper + \epsilon^w_i
+\ln(wage) &amp; = &amp; \gamma_0 + \gamma_1 hours + \gamma_2 educ + \gamma_3 exper + \gamma_4 exper^2 + \epsilon^w_i
 \end{eqnarray}\end{split}\]</div>
-<p>Each equation has a single exogenous variables. The instruments for the endogenous variables are the regressors that appear in one equation but not the other.</p>
+<p>Each equation has a single endogenous variable. The instruments for the endogenous variables are the regressors that appear in one equation but not the other.</p>
 <h2 id="Data">Data<a class="headerlink" href="#Data" title="Link to this heading">¶</a></h2>
-<p>The data set is the MORZ data set from Wooldridge (2002).</p>
+<p>The data set is the MROZ data set from Wooldridge (2002).</p>
 <div class="nbinput nblast docutils container">
 <div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span><code>[1]:
 </code></pre></div>
@@ -983,7 +1006,7 @@ hours &amp; = &amp; \beta_0 + \beta_1 \ln(wage) + \beta_2 educ + \beta_3 age + \
 </code></pre></div>
 </div>
 <div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><code><span class="n">data</span> <span class="o">=</span> <span class="n">data</span><span class="p">[</span>
-    <span class="p">[</span><span class="s2">&quot;hours&quot;</span><span class="p">,</span> <span class="s2">&quot;educ&quot;</span><span class="p">,</span> <span class="s2">&quot;age&quot;</span><span class="p">,</span> <span class="s2">&quot;kidslt6&quot;</span><span class="p">,</span> <span class="s2">&quot;nwifeinc&quot;</span><span class="p">,</span> <span class="s2">&quot;lwage&quot;</span><span class="p">,</span> <span class="s2">&quot;exper&quot;</span><span class="p">,</span> <span class="s2">&quot;expersq&quot;</span><span class="p">]</span>
+    <span class="p">[</span><span class="s2">"hours"</span><span class="p">,</span> <span class="s2">"educ"</span><span class="p">,</span> <span class="s2">"age"</span><span class="p">,</span> <span class="s2">"kidslt6"</span><span class="p">,</span> <span class="s2">"nwifeinc"</span><span class="p">,</span> <span class="s2">"lwage"</span><span class="p">,</span> <span class="s2">"exper"</span><span class="p">,</span> <span class="s2">"expersq"</span><span class="p">]</span>
 <span class="p">]</span>
 <span class="n">data</span> <span class="o">=</span> <span class="n">data</span><span class="o">.</span><span class="n">dropna</span><span class="p">()</span>
 </code></pre></div>
@@ -993,7 +1016,7 @@ hours &amp; = &amp; \beta_0 + \beta_1 \ln(wage) + \beta_2 educ + \beta_3 age + \
 <ul class="simple">
 <li><p><code class="docutils literal notranslate"><span class="pre">IV2SLS</span></code> - single equation 2-stage least squares</p></li>
 <li><p><code class="docutils literal notranslate"><span class="pre">IV3SLS</span></code> - system estimation using instrumental variables</p></li>
-<li><p><code class="docutils literal notranslate"><span class="pre">SUR</span></code> - system estimation without endogenous variables</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">IVSystemGMM</span></code> - system estimation using instrumental variables and GMM</p></li>
 </ul>
 <div class="nbinput nblast docutils container">
 <div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span><code>[3]:
@@ -1009,10 +1032,10 @@ hours &amp; = &amp; \beta_0 + \beta_1 \ln(wage) + \beta_2 educ + \beta_3 age + \
 <div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span><code>[4]:
 </code></pre></div>
 </div>
-<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><code><span class="n">hours</span> <span class="o">=</span> <span class="s2">&quot;hours ~ educ + age + kidslt6 + nwifeinc + [lwage ~ exper + expersq]&quot;</span>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><code><span class="n">hours</span> <span class="o">=</span> <span class="s2">"hours ~ educ + age + kidslt6 + nwifeinc + [lwage ~ exper + expersq]"</span>
 
 <span class="n">hours_mod</span> <span class="o">=</span> <span class="n">IV2SLS</span><span class="o">.</span><span class="n">from_formula</span><span class="p">(</span><span class="n">hours</span><span class="p">,</span> <span class="n">data</span><span class="p">)</span>
-<span class="n">hours_res</span> <span class="o">=</span> <span class="n">hours_mod</span><span class="o">.</span><span class="n">fit</span><span class="p">(</span><span class="n">cov_type</span><span class="o">=</span><span class="s2">&quot;unadjusted&quot;</span><span class="p">)</span>
+<span class="n">hours_res</span> <span class="o">=</span> <span class="n">hours_mod</span><span class="o">.</span><span class="n">fit</span><span class="p">(</span><span class="n">cov_type</span><span class="o">=</span><span class="s2">"unadjusted"</span><span class="p">)</span>
 <span class="nb">print</span><span class="p">(</span><span class="n">hours_res</span><span class="p">)</span>
 </code></pre></div>
 </div>
@@ -1027,8 +1050,8 @@ hours &amp; = &amp; \beta_0 + \beta_1 \ln(wage) + \beta_2 educ + \beta_3 age + \
 Dep. Variable:                  hours   R-squared:                      0.1903
 Estimator:                    IV-2SLS   Adj. R-squared:                 0.1807
 No. Observations:                 428   F-statistic:                    399.30
-Date:                Tue, Oct 21 2025   P-value (F-stat)                0.0000
-Time:                        13:37:57   Distribution:                  chi2(5)
+Date:                Fri, Oct 16 2026   P-value (F-stat)                0.0000
+Time:                        08:37:15   Distribution:                  chi2(5)
 Cov. Estimator:            unadjusted
 
                              Parameter Estimates
@@ -1053,10 +1076,10 @@ Debiased: False
 <div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span><code>[5]:
 </code></pre></div>
 </div>
-<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><code><span class="n">lwage</span> <span class="o">=</span> <span class="s2">&quot;lwage ~ educ + exper + expersq + [hours ~ age + kidslt6 + nwifeinc]&quot;</span>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><code><span class="n">lwage</span> <span class="o">=</span> <span class="s2">"lwage ~ educ + exper + expersq + [hours ~ age + kidslt6 + nwifeinc]"</span>
 
 <span class="n">lwage_mod</span> <span class="o">=</span> <span class="n">IV2SLS</span><span class="o">.</span><span class="n">from_formula</span><span class="p">(</span><span class="n">lwage</span><span class="p">,</span> <span class="n">data</span><span class="p">)</span>
-<span class="n">lwage_res</span> <span class="o">=</span> <span class="n">lwage_mod</span><span class="o">.</span><span class="n">fit</span><span class="p">(</span><span class="n">cov_type</span><span class="o">=</span><span class="s2">&quot;unadjusted&quot;</span><span class="p">)</span>
+<span class="n">lwage_res</span> <span class="o">=</span> <span class="n">lwage_mod</span><span class="o">.</span><span class="n">fit</span><span class="p">(</span><span class="n">cov_type</span><span class="o">=</span><span class="s2">"unadjusted"</span><span class="p">)</span>
 <span class="nb">print</span><span class="p">(</span><span class="n">lwage_res</span><span class="p">)</span>
 </code></pre></div>
 </div>
@@ -1071,8 +1094,8 @@ Debiased: False
 Dep. Variable:                  lwage   R-squared:                      0.7582
 Estimator:                    IV-2SLS   Adj. R-squared:                 0.7559
 No. Observations:                 428   F-statistic:                    1362.4
-Date:                Tue, Oct 21 2025   P-value (F-stat)                0.0000
-Time:                        13:37:57   Distribution:                  chi2(4)
+Date:                Fri, Oct 16 2026   P-value (F-stat)                0.0000
+Time:                        08:37:15   Distribution:                  chi2(4)
 Cov. Estimator:            unadjusted
 
                              Parameter Estimates
@@ -1097,9 +1120,9 @@ Debiased: False
 <div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span><code>[6]:
 </code></pre></div>
 </div>
-<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><code><span class="n">equations</span> <span class="o">=</span> <span class="p">{</span><span class="s2">&quot;hours&quot;</span><span class="p">:</span> <span class="n">hours</span><span class="p">,</span> <span class="s2">&quot;lwage&quot;</span><span class="p">:</span> <span class="n">lwage</span><span class="p">}</span>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><code><span class="n">equations</span> <span class="o">=</span> <span class="p">{</span><span class="s2">"hours"</span><span class="p">:</span> <span class="n">hours</span><span class="p">,</span> <span class="s2">"lwage"</span><span class="p">:</span> <span class="n">lwage</span><span class="p">}</span>
 <span class="n">system_2sls</span> <span class="o">=</span> <span class="n">IV3SLS</span><span class="o">.</span><span class="n">from_formula</span><span class="p">(</span><span class="n">equations</span><span class="p">,</span> <span class="n">data</span><span class="p">)</span>
-<span class="n">system_2sls_res</span> <span class="o">=</span> <span class="n">system_2sls</span><span class="o">.</span><span class="n">fit</span><span class="p">(</span><span class="n">method</span><span class="o">=</span><span class="s2">&quot;ols&quot;</span><span class="p">,</span> <span class="n">cov_type</span><span class="o">=</span><span class="s2">&quot;unadjusted&quot;</span><span class="p">)</span>
+<span class="n">system_2sls_res</span> <span class="o">=</span> <span class="n">system_2sls</span><span class="o">.</span><span class="n">fit</span><span class="p">(</span><span class="n">method</span><span class="o">=</span><span class="s2">"ols"</span><span class="p">,</span> <span class="n">cov_type</span><span class="o">=</span><span class="s2">"unadjusted"</span><span class="p">)</span>
 <span class="nb">print</span><span class="p">(</span><span class="n">system_2sls_res</span><span class="p">)</span>
 </code></pre></div>
 </div>
@@ -1114,8 +1137,8 @@ Debiased: False
 Estimator:                        OLS   Overall R-squared:                   0.1903
 No. Equations.:                     2   McElroy&#39;s R-squared:                 0.1276
 No. Observations:                 428   Judge&#39;s (OLS) R-squared:            -2.0961
-Date:                Tue, Oct 21 2025   Berndt&#39;s R-squared:                 -0.7279
-Time:                        13:37:57   Dhrymes&#39;s R-squared:                 0.1903
+Date:                Fri, Oct 16 2026   Berndt&#39;s R-squared:                 -0.7279
+Time:                        08:37:15   Dhrymes&#39;s R-squared:                 0.1903
                                         Cov. Estimator:                  unadjusted
                                         Num. Constraints:                      None
                   Equation: hours, Dependent Variable: hours
@@ -1151,13 +1174,13 @@ Covariance Estimator:
 Homoskedastic (Unadjusted) Covariance (Debiased: False, GLS: False)
 </pre></div></div>
 </div>
-<p>Using <code class="docutils literal notranslate"><span class="pre">method=&quot;gls&quot;</span></code> will use GLS estimates which can be more efficient than the usual estimates. Here only the first equation changes. This is due to the structure of the problem.</p>
+<p>Using <code class="docutils literal notranslate"><span class="pre">method=&quot;gls&quot;</span></code> will use GLS estimates which can be more efficient than the usual estimates. Here the estimates of both equations change.</p>
 <div class="nbinput docutils container">
 <div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span><code>[7]:
 </code></pre></div>
 </div>
 <div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><code><span class="n">system_3sls</span> <span class="o">=</span> <span class="n">IV3SLS</span><span class="o">.</span><span class="n">from_formula</span><span class="p">(</span><span class="n">equations</span><span class="p">,</span> <span class="n">data</span><span class="p">)</span>
-<span class="n">system_3sls_res</span> <span class="o">=</span> <span class="n">system_3sls</span><span class="o">.</span><span class="n">fit</span><span class="p">(</span><span class="n">method</span><span class="o">=</span><span class="s2">&quot;gls&quot;</span><span class="p">,</span> <span class="n">cov_type</span><span class="o">=</span><span class="s2">&quot;unadjusted&quot;</span><span class="p">)</span>
+<span class="n">system_3sls_res</span> <span class="o">=</span> <span class="n">system_3sls</span><span class="o">.</span><span class="n">fit</span><span class="p">(</span><span class="n">method</span><span class="o">=</span><span class="s2">"gls"</span><span class="p">,</span> <span class="n">cov_type</span><span class="o">=</span><span class="s2">"unadjusted"</span><span class="p">)</span>
 <span class="nb">print</span><span class="p">(</span><span class="n">system_3sls_res</span><span class="p">)</span>
 </code></pre></div>
 </div>
@@ -1172,8 +1195,8 @@ Homoskedastic (Unadjusted) Covariance (Debiased: False, GLS: False)
 Estimator:                        GLS   Overall R-squared:                   0.0120
 No. Equations.:                     2   McElroy&#39;s R-squared:                 0.0873
 No. Observations:                 428   Judge&#39;s (OLS) R-squared:            -2.7778
-Date:                Tue, Oct 21 2025   Berndt&#39;s R-squared:                 -0.7279
-Time:                        13:37:57   Dhrymes&#39;s R-squared:                 0.0120
+Date:                Fri, Oct 16 2026   Berndt&#39;s R-squared:                 -0.7279
+Time:                        08:37:15   Dhrymes&#39;s R-squared:                 0.0120
                                         Cov. Estimator:                  unadjusted
                                         Num. Constraints:                      None
                   Equation: hours, Dependent Variable: hours
@@ -1223,22 +1246,22 @@ Homoskedastic (Unadjusted) Covariance (Debiased: False, GLS: True)
 </code></pre></div>
 </div>
 <div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><code><span class="n">hours</span> <span class="o">=</span> <span class="p">{</span>
-    <span class="s2">&quot;dependent&quot;</span><span class="p">:</span> <span class="n">data</span><span class="p">[[</span><span class="s2">&quot;hours&quot;</span><span class="p">]],</span>
-    <span class="s2">&quot;exog&quot;</span><span class="p">:</span> <span class="n">data</span><span class="p">[[</span><span class="s2">&quot;educ&quot;</span><span class="p">,</span> <span class="s2">&quot;age&quot;</span><span class="p">,</span> <span class="s2">&quot;kidslt6&quot;</span><span class="p">,</span> <span class="s2">&quot;nwifeinc&quot;</span><span class="p">]],</span>
-    <span class="s2">&quot;endog&quot;</span><span class="p">:</span> <span class="n">data</span><span class="p">[[</span><span class="s2">&quot;lwage&quot;</span><span class="p">]],</span>
-    <span class="s2">&quot;instruments&quot;</span><span class="p">:</span> <span class="n">data</span><span class="p">[[</span><span class="s2">&quot;exper&quot;</span><span class="p">,</span> <span class="s2">&quot;expersq&quot;</span><span class="p">]],</span>
+    <span class="s2">"dependent"</span><span class="p">:</span> <span class="n">data</span><span class="p">[[</span><span class="s2">"hours"</span><span class="p">]],</span>
+    <span class="s2">"exog"</span><span class="p">:</span> <span class="n">data</span><span class="p">[[</span><span class="s2">"educ"</span><span class="p">,</span> <span class="s2">"age"</span><span class="p">,</span> <span class="s2">"kidslt6"</span><span class="p">,</span> <span class="s2">"nwifeinc"</span><span class="p">]],</span>
+    <span class="s2">"endog"</span><span class="p">:</span> <span class="n">data</span><span class="p">[[</span><span class="s2">"lwage"</span><span class="p">]],</span>
+    <span class="s2">"instruments"</span><span class="p">:</span> <span class="n">data</span><span class="p">[[</span><span class="s2">"exper"</span><span class="p">,</span> <span class="s2">"expersq"</span><span class="p">]],</span>
 <span class="p">}</span>
 
 <span class="n">lwage</span> <span class="o">=</span> <span class="p">{</span>
-    <span class="s2">&quot;dependent&quot;</span><span class="p">:</span> <span class="n">data</span><span class="p">[[</span><span class="s2">&quot;lwage&quot;</span><span class="p">]],</span>
-    <span class="s2">&quot;exog&quot;</span><span class="p">:</span> <span class="n">data</span><span class="p">[[</span><span class="s2">&quot;educ&quot;</span><span class="p">,</span> <span class="s2">&quot;exper&quot;</span><span class="p">,</span> <span class="s2">&quot;expersq&quot;</span><span class="p">]],</span>
-    <span class="s2">&quot;endog&quot;</span><span class="p">:</span> <span class="n">data</span><span class="p">[[</span><span class="s2">&quot;hours&quot;</span><span class="p">]],</span>
-    <span class="s2">&quot;instruments&quot;</span><span class="p">:</span> <span class="n">data</span><span class="p">[[</span><span class="s2">&quot;age&quot;</span><span class="p">,</span> <span class="s2">&quot;kidslt6&quot;</span><span class="p">,</span> <span class="s2">&quot;nwifeinc&quot;</span><span class="p">]],</span>
+    <span class="s2">"dependent"</span><span class="p">:</span> <span class="n">data</span><span class="p">[[</span><span class="s2">"lwage"</span><span class="p">]],</span>
+    <span class="s2">"exog"</span><span class="p">:</span> <span class="n">data</span><span class="p">[[</span><span class="s2">"educ"</span><span class="p">,</span> <span class="s2">"exper"</span><span class="p">,</span> <span class="s2">"expersq"</span><span class="p">]],</span>
+    <span class="s2">"endog"</span><span class="p">:</span> <span class="n">data</span><span class="p">[[</span><span class="s2">"hours"</span><span class="p">]],</span>
+    <span class="s2">"instruments"</span><span class="p">:</span> <span class="n">data</span><span class="p">[[</span><span class="s2">"age"</span><span class="p">,</span> <span class="s2">"kidslt6"</span><span class="p">,</span> <span class="s2">"nwifeinc"</span><span class="p">]],</span>
 <span class="p">}</span>
 
-<span class="n">equations</span> <span class="o">=</span> <span class="p">{</span><span class="s2">&quot;hours&quot;</span><span class="p">:</span> <span class="n">hours</span><span class="p">,</span> <span class="s2">&quot;lwage&quot;</span><span class="p">:</span> <span class="n">lwage</span><span class="p">}</span>
+<span class="n">equations</span> <span class="o">=</span> <span class="p">{</span><span class="s2">"hours"</span><span class="p">:</span> <span class="n">hours</span><span class="p">,</span> <span class="s2">"lwage"</span><span class="p">:</span> <span class="n">lwage</span><span class="p">}</span>
 <span class="n">system_3sls</span> <span class="o">=</span> <span class="n">IV3SLS</span><span class="p">(</span><span class="n">equations</span><span class="p">)</span>
-<span class="n">system_3sls_res</span> <span class="o">=</span> <span class="n">system_3sls</span><span class="o">.</span><span class="n">fit</span><span class="p">(</span><span class="n">cov_type</span><span class="o">=</span><span class="s2">&quot;unadjusted&quot;</span><span class="p">)</span>
+<span class="n">system_3sls_res</span> <span class="o">=</span> <span class="n">system_3sls</span><span class="o">.</span><span class="n">fit</span><span class="p">(</span><span class="n">cov_type</span><span class="o">=</span><span class="s2">"unadjusted"</span><span class="p">)</span>
 <span class="nb">print</span><span class="p">(</span><span class="n">system_3sls_res</span><span class="p">)</span>
 </code></pre></div>
 </div>
@@ -1253,8 +1276,8 @@ Homoskedastic (Unadjusted) Covariance (Debiased: False, GLS: True)
 Estimator:                        GLS   Overall R-squared:                   0.0120
 No. Equations.:                     2   McElroy&#39;s R-squared:                 0.0873
 No. Observations:                 428   Judge&#39;s (OLS) R-squared:            -2.7778
-Date:                Tue, Oct 21 2025   Berndt&#39;s R-squared:                 -0.7279
-Time:                        13:37:57   Dhrymes&#39;s R-squared:                 0.0120
+Date:                Fri, Oct 16 2026   Berndt&#39;s R-squared:                 -0.7279
+Time:                        08:37:15   Dhrymes&#39;s R-squared:                 0.0120
                                         Cov. Estimator:                  unadjusted
                                         Num. Constraints:                      None
                   Equation: hours, Dependent Variable: hours
@@ -1300,11 +1323,11 @@ Homoskedastic (Unadjusted) Covariance (Debiased: False, GLS: True)
 </code></pre></div>
 </div>
 <div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><code><span class="n">equations</span> <span class="o">=</span> <span class="p">{</span>
-    <span class="s2">&quot;hours&quot;</span><span class="p">:</span> <span class="s2">&quot;hours ~ educ + age + kidslt6 + nwifeinc + [lwage ~ exper + expersq]&quot;</span><span class="p">,</span>
-    <span class="s2">&quot;lwage&quot;</span><span class="p">:</span> <span class="s2">&quot;lwage ~ educ + exper + expersq + [hours ~ age + kidslt6 + nwifeinc]&quot;</span><span class="p">,</span>
+    <span class="s2">"hours"</span><span class="p">:</span> <span class="s2">"hours ~ educ + age + kidslt6 + nwifeinc + [lwage ~ exper + expersq]"</span><span class="p">,</span>
+    <span class="s2">"lwage"</span><span class="p">:</span> <span class="s2">"lwage ~ educ + exper + expersq + [hours ~ age + kidslt6 + nwifeinc]"</span><span class="p">,</span>
 <span class="p">}</span>
-<span class="n">system_gmm</span> <span class="o">=</span> <span class="n">IVSystemGMM</span><span class="o">.</span><span class="n">from_formula</span><span class="p">(</span><span class="n">equations</span><span class="p">,</span> <span class="n">data</span><span class="p">,</span> <span class="n">weight_type</span><span class="o">=</span><span class="s2">&quot;unadjusted&quot;</span><span class="p">)</span>
-<span class="n">system_gmm_res</span> <span class="o">=</span> <span class="n">system_gmm</span><span class="o">.</span><span class="n">fit</span><span class="p">(</span><span class="n">cov_type</span><span class="o">=</span><span class="s2">&quot;unadjusted&quot;</span><span class="p">)</span>
+<span class="n">system_gmm</span> <span class="o">=</span> <span class="n">IVSystemGMM</span><span class="o">.</span><span class="n">from_formula</span><span class="p">(</span><span class="n">equations</span><span class="p">,</span> <span class="n">data</span><span class="p">,</span> <span class="n">weight_type</span><span class="o">=</span><span class="s2">"unadjusted"</span><span class="p">)</span>
+<span class="n">system_gmm_res</span> <span class="o">=</span> <span class="n">system_gmm</span><span class="o">.</span><span class="n">fit</span><span class="p">(</span><span class="n">cov_type</span><span class="o">=</span><span class="s2">"unadjusted"</span><span class="p">)</span>
 <span class="nb">print</span><span class="p">(</span><span class="n">system_gmm_res</span><span class="p">)</span>
 </code></pre></div>
 </div>
@@ -1319,8 +1342,8 @@ Homoskedastic (Unadjusted) Covariance (Debiased: False, GLS: True)
 Estimator:          2-Step System GMM   Overall R-squared:                   0.0121
 No. Equations.:                     2   McElroy&#39;s R-squared:                 0.0871
 No. Observations:                 428   Judge&#39;s (OLS) R-squared:            -2.7776
-Date:                Tue, Oct 21 2025   Berndt&#39;s R-squared:                 -0.7268
-Time:                        13:37:57   Dhrymes&#39;s R-squared:                 0.0121
+Date:                Fri, Oct 16 2026   Berndt&#39;s R-squared:                 -0.7268
+Time:                        08:37:15   Dhrymes&#39;s R-squared:                 0.0121
                                         Cov. Estimator:                  unadjusted
                                         Num. Constraints:                      None
                   Equation: hours, Dependent Variable: hours
@@ -1363,9 +1386,9 @@ Homoskedastic (Unadjusted) Weighting (Debiased: False, Center: False)
 <div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span><code>[10]:
 </code></pre></div>
 </div>
-<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><code><span class="n">system_gmm</span> <span class="o">=</span> <span class="n">IVSystemGMM</span><span class="o">.</span><span class="n">from_formula</span><span class="p">(</span><span class="n">equations</span><span class="p">,</span> <span class="n">data</span><span class="p">,</span> <span class="n">weight_type</span><span class="o">=</span><span class="s2">&quot;robust&quot;</span><span class="p">)</span>
-<span class="n">system_gmm_res</span> <span class="o">=</span> <span class="n">system_gmm</span><span class="o">.</span><span class="n">fit</span><span class="p">(</span><span class="n">cov_type</span><span class="o">=</span><span class="s2">&quot;robust&quot;</span><span class="p">,</span> <span class="n">iter_limit</span><span class="o">=</span><span class="mi">100</span><span class="p">)</span>
-<span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Number of iterations: &quot;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="n">system_gmm_res</span><span class="o">.</span><span class="n">iterations</span><span class="p">))</span>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><code><span class="n">system_gmm</span> <span class="o">=</span> <span class="n">IVSystemGMM</span><span class="o">.</span><span class="n">from_formula</span><span class="p">(</span><span class="n">equations</span><span class="p">,</span> <span class="n">data</span><span class="p">,</span> <span class="n">weight_type</span><span class="o">=</span><span class="s2">"robust"</span><span class="p">)</span>
+<span class="n">system_gmm_res</span> <span class="o">=</span> <span class="n">system_gmm</span><span class="o">.</span><span class="n">fit</span><span class="p">(</span><span class="n">cov_type</span><span class="o">=</span><span class="s2">"robust"</span><span class="p">,</span> <span class="n">iter_limit</span><span class="o">=</span><span class="mi">100</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="s2">"Number of iterations: "</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="n">system_gmm_res</span><span class="o">.</span><span class="n">iterations</span><span class="p">))</span>
 <span class="nb">print</span><span class="p">(</span><span class="n">system_gmm_res</span><span class="p">)</span>
 </code></pre></div>
 </div>
@@ -1381,8 +1404,8 @@ Number of iterations: 20
 Estimator:         Iterative System GMM   Overall R-squared:                  -0.0345
 No. Equations.:                       2   McElroy&#39;s R-squared:                -0.2256
 No. Observations:                   428   Judge&#39;s (OLS) R-squared:            -2.9557
-Date:                  Tue, Oct 21 2025   Berndt&#39;s R-squared:                 -2.0361
-Time:                          13:37:57   Dhrymes&#39;s R-squared:                -0.0345
+Date:                  Fri, Oct 16 2026   Berndt&#39;s R-squared:                 -2.0361
+Time:                          08:37:15   Dhrymes&#39;s R-squared:                -0.0345
                                           Cov. Estimator:                      robust
                                           Num. Constraints:                      None
                   Equation: hours, Dependent Variable: hours
@@ -1425,13 +1448,13 @@ Heteroskedastic (Robust) Weighting (Debiased: False, Center: False)
 <div class="math notranslate nohighlight">
 \[\begin{split}\begin{align}
 y_1 = y_2 + x_1 + \epsilon_1 \\
-y_2 = -y_1 + x_2 + \epsilon_1 \\
+y_2 = -y_1 + x_2 + \epsilon_2 \\
 \end{align}\end{split}\]</div>
 <p>Substituting each equation in to the other, the reduced form of this model is</p>
 <div class="math notranslate nohighlight">
 \[\begin{split}\begin{align}
 y_1 = \frac{1}{2}\left(x_1 + x_2 + \epsilon_1 + \epsilon_2\right) \\
-y_1 = \frac{1}{2}\left(x_2 - x_1 + \epsilon_2 - \epsilon_1\right) \\
+y_2 = \frac{1}{2}\left(x_2 - x_1 + \epsilon_2 - \epsilon_1\right) \\
 \end{align}\end{split}\]</div>
 <p>Data from this model is simple to simulate.</p>
 <div class="nbinput docutils container">
@@ -1446,11 +1469,11 @@ y_1 = \frac{1}{2}\left(x_2 - x_1 + \epsilon_2 - \epsilon_1\right) \\
 <span class="n">x</span> <span class="o">=</span> <span class="n">rs</span><span class="o">.</span><span class="n">standard_normal</span><span class="p">((</span><span class="mi">50000</span><span class="p">,</span> <span class="mi">2</span><span class="p">))</span>
 <span class="n">y2</span> <span class="o">=</span> <span class="n">x</span><span class="p">[:,</span> <span class="mi">1</span><span class="p">]</span> <span class="o">/</span> <span class="mi">2</span> <span class="o">-</span> <span class="n">x</span><span class="p">[:,</span> <span class="mi">0</span><span class="p">]</span> <span class="o">/</span> <span class="mi">2</span> <span class="o">+</span> <span class="n">e</span><span class="p">[:,</span> <span class="mi">1</span><span class="p">]</span> <span class="o">/</span> <span class="mi">2</span> <span class="o">-</span> <span class="n">e</span><span class="p">[:,</span> <span class="mi">0</span><span class="p">]</span> <span class="o">/</span> <span class="mi">2</span>
 <span class="n">y1</span> <span class="o">=</span> <span class="n">x</span><span class="p">[:,</span> <span class="mi">1</span><span class="p">]</span> <span class="o">/</span> <span class="mi">2</span> <span class="o">+</span> <span class="n">x</span><span class="p">[:,</span> <span class="mi">0</span><span class="p">]</span> <span class="o">/</span> <span class="mi">2</span> <span class="o">+</span> <span class="n">e</span><span class="p">[:,</span> <span class="mi">1</span><span class="p">]</span> <span class="o">/</span> <span class="mi">2</span> <span class="o">+</span> <span class="n">e</span><span class="p">[:,</span> <span class="mi">0</span><span class="p">]</span> <span class="o">/</span> <span class="mi">2</span>
-<span class="n">df</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">column_stack</span><span class="p">([</span><span class="n">y1</span><span class="p">,</span> <span class="n">y2</span><span class="p">,</span> <span class="n">x</span><span class="p">]),</span> <span class="n">columns</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;y1&quot;</span><span class="p">,</span> <span class="s2">&quot;y2&quot;</span><span class="p">,</span> <span class="s2">&quot;x1&quot;</span><span class="p">,</span> <span class="s2">&quot;x2&quot;</span><span class="p">])</span>
+<span class="n">df</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">column_stack</span><span class="p">([</span><span class="n">y1</span><span class="p">,</span> <span class="n">y2</span><span class="p">,</span> <span class="n">x</span><span class="p">]),</span> <span class="n">columns</span><span class="o">=</span><span class="p">[</span><span class="s2">"y1"</span><span class="p">,</span> <span class="s2">"y2"</span><span class="p">,</span> <span class="s2">"x1"</span><span class="p">,</span> <span class="s2">"x2"</span><span class="p">])</span>
 <span class="n">in_sample</span> <span class="o">=</span> <span class="n">df</span><span class="o">.</span><span class="n">iloc</span><span class="p">[:</span><span class="o">-</span><span class="mi">10000</span><span class="p">]</span>
 <span class="n">oos</span> <span class="o">=</span> <span class="n">df</span><span class="o">.</span><span class="n">iloc</span><span class="p">[</span><span class="o">-</span><span class="mi">10000</span><span class="p">:]</span>
 <span class="n">mod</span> <span class="o">=</span> <span class="n">IV3SLS</span><span class="o">.</span><span class="n">from_formula</span><span class="p">(</span>
-    <span class="p">{</span><span class="s2">&quot;y1&quot;</span><span class="p">:</span> <span class="s2">&quot;y1 ~  x1 + [y2 ~ x2]&quot;</span><span class="p">,</span> <span class="s2">&quot;y2&quot;</span><span class="p">:</span> <span class="s2">&quot;y2 ~ x2 + [y1 ~ x1]&quot;</span><span class="p">},</span> <span class="n">data</span><span class="o">=</span><span class="n">df</span>
+    <span class="p">{</span><span class="s2">"y1"</span><span class="p">:</span> <span class="s2">"y1 ~  x1 + [y2 ~ x2]"</span><span class="p">,</span> <span class="s2">"y2"</span><span class="p">:</span> <span class="s2">"y2 ~ x2 + [y1 ~ x1]"</span><span class="p">},</span> <span class="n">data</span><span class="o">=</span><span class="n">in_sample</span>
 <span class="p">)</span>
 <span class="n">res</span> <span class="o">=</span> <span class="n">mod</span><span class="o">.</span><span class="n">fit</span><span class="p">()</span>
 <span class="nb">print</span><span class="p">(</span><span class="n">res</span><span class="p">)</span>
@@ -1464,19 +1487,19 @@ y_1 = \frac{1}{2}\left(x_2 - x_1 + \epsilon_2 - \epsilon_1\right) \\
 <div class="highlight"><pre>
                            System GLS Estimation Summary
 ===================================================================================
-Estimator:                        GLS   Overall R-squared:                   0.0013
-No. Equations.:                     2   McElroy&#39;s R-squared:                 0.0014
-No. Observations:               50000   Judge&#39;s (OLS) R-squared:             0.0013
-Date:                Tue, Oct 21 2025   Berndt&#39;s R-squared:                  0.0027
-Time:                        13:37:57   Dhrymes&#39;s R-squared:                 0.0013
+Estimator:                        GLS   Overall R-squared:                   0.0028
+No. Equations.:                     2   McElroy&#39;s R-squared:                 0.0028
+No. Observations:               40000   Judge&#39;s (OLS) R-squared:             0.0027
+Date:                Fri, Oct 16 2026   Berndt&#39;s R-squared:                  0.0055
+Time:                        08:37:16   Dhrymes&#39;s R-squared:                 0.0028
                                         Cov. Estimator:                      robust
                                         Num. Constraints:                      None
                      Equation: y1, Dependent Variable: y1
 ==============================================================================
             Parameter  Std. Err.     T-stat    P-value    Lower CI    Upper CI
 ------------------------------------------------------------------------------
-x1             0.9992     0.0063     157.74     0.0000      0.9868      1.0116
-y2             1.0053     0.0090     111.60     0.0000      0.9877      1.0230
+x1             0.9979     0.0071     141.07     0.0000      0.9841      1.0118
+y2             1.0079     0.0101     99.709     0.0000      0.9881      1.0277
 
 ===========
 Instruments
@@ -1487,8 +1510,8 @@ Instruments
 ==============================================================================
             Parameter  Std. Err.     T-stat    P-value    Lower CI    Upper CI
 ------------------------------------------------------------------------------
-x2             0.9970     0.0063     158.73     0.0000      0.9847      1.0093
-y1            -0.9809     0.0088    -111.59     0.0000     -0.9982     -0.9637
+x2             0.9946     0.0070     142.36     0.0000      0.9809      1.0083
+y1            -0.9763     0.0098    -99.650     0.0000     -0.9955     -0.9571
 ===========
 Instruments
 -----------
@@ -1538,28 +1561,28 @@ Heteroskedastic (Robust) Covariance (Debiased: False, GLS: True)
   <tbody>
     <tr>
       <th>40000</th>
-      <td>-0.125377</td>
-      <td>0.024812</td>
+      <td>-0.127495</td>
+      <td>0.024029</td>
     </tr>
     <tr>
       <th>40001</th>
-      <td>0.489893</td>
-      <td>-0.707565</td>
+      <td>0.490059</td>
+      <td>-0.700492</td>
     </tr>
     <tr>
       <th>40002</th>
-      <td>-0.189191</td>
-      <td>-0.727702</td>
+      <td>-0.190383</td>
+      <td>-0.723056</td>
     </tr>
     <tr>
       <th>40003</th>
-      <td>-2.081779</td>
-      <td>-2.756181</td>
+      <td>-2.088058</td>
+      <td>-2.749263</td>
     </tr>
     <tr>
       <th>40004</th>
-      <td>1.628805</td>
-      <td>0.227368</td>
+      <td>1.634626</td>
+      <td>0.227574</td>
     </tr>
     <tr>
       <th>...</th>
@@ -1568,28 +1591,28 @@ Heteroskedastic (Robust) Covariance (Debiased: False, GLS: True)
     </tr>
     <tr>
       <th>49995</th>
-      <td>-0.293820</td>
-      <td>-0.140007</td>
+      <td>-0.294604</td>
+      <td>-0.140195</td>
     </tr>
     <tr>
       <th>49996</th>
-      <td>-0.462017</td>
-      <td>1.848988</td>
+      <td>-0.462982</td>
+      <td>1.840749</td>
     </tr>
     <tr>
       <th>49997</th>
-      <td>0.698136</td>
-      <td>1.510755</td>
+      <td>0.698249</td>
+      <td>1.503851</td>
     </tr>
     <tr>
       <th>49998</th>
-      <td>0.862183</td>
-      <td>0.732983</td>
+      <td>0.863470</td>
+      <td>0.734216</td>
     </tr>
     <tr>
       <th>49999</th>
-      <td>1.118024</td>
-      <td>1.147715</td>
+      <td>1.122103</td>
+      <td>1.147391</td>
     </tr>
   </tbody>
 </table>
@@ -1603,7 +1626,7 @@ Heteroskedastic (Robust) Covariance (Debiased: False, GLS: True)
 </div>
 <div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><code><span class="n">y1_pred</span> <span class="o">=</span> <span class="n">res</span><span class="o">.</span><span class="n">params</span><span class="o">.</span><span class="n">y1_x1</span> <span class="o">*</span> <span class="n">oos</span><span class="o">.</span><span class="n">x1</span> <span class="o">+</span> <span class="n">res</span><span class="o">.</span><span class="n">params</span><span class="o">.</span><span class="n">y1_y2</span> <span class="o">*</span> <span class="n">oos</span><span class="o">.</span><span class="n">y2</span>
 <span class="n">y2_pred</span> <span class="o">=</span> <span class="n">res</span><span class="o">.</span><span class="n">params</span><span class="o">.</span><span class="n">y2_x2</span> <span class="o">*</span> <span class="n">oos</span><span class="o">.</span><span class="n">x2</span> <span class="o">+</span> <span class="n">res</span><span class="o">.</span><span class="n">params</span><span class="o">.</span><span class="n">y2_y1</span> <span class="o">*</span> <span class="n">oos</span><span class="o">.</span><span class="n">y1</span>
-<span class="n">pred_df</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">({</span><span class="s2">&quot;y1&quot;</span><span class="p">:</span> <span class="n">y1_pred</span><span class="p">,</span> <span class="s2">&quot;y2&quot;</span><span class="p">:</span> <span class="n">y2_pred</span><span class="p">})</span>
+<span class="n">pred_df</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">({</span><span class="s2">"y1"</span><span class="p">:</span> <span class="n">y1_pred</span><span class="p">,</span> <span class="s2">"y2"</span><span class="p">:</span> <span class="n">y2_pred</span><span class="p">})</span>
 <span class="n">pred_df</span>
 </code></pre></div>
 </div>
@@ -1638,28 +1661,28 @@ Heteroskedastic (Robust) Covariance (Debiased: False, GLS: True)
   <tbody>
     <tr>
       <th>40000</th>
-      <td>-0.125377</td>
-      <td>0.024812</td>
+      <td>-0.127495</td>
+      <td>0.024029</td>
     </tr>
     <tr>
       <th>40001</th>
-      <td>0.489893</td>
-      <td>-0.707565</td>
+      <td>0.490059</td>
+      <td>-0.700492</td>
     </tr>
     <tr>
       <th>40002</th>
-      <td>-0.189191</td>
-      <td>-0.727702</td>
+      <td>-0.190383</td>
+      <td>-0.723056</td>
     </tr>
     <tr>
       <th>40003</th>
-      <td>-2.081779</td>
-      <td>-2.756181</td>
+      <td>-2.088058</td>
+      <td>-2.749263</td>
     </tr>
     <tr>
       <th>40004</th>
-      <td>1.628805</td>
-      <td>0.227368</td>
+      <td>1.634626</td>
+      <td>0.227574</td>
     </tr>
     <tr>
       <th>...</th>
@@ -1668,28 +1691,28 @@ Heteroskedastic (Robust) Covariance (Debiased: False, GLS: True)
     </tr>
     <tr>
       <th>49995</th>
-      <td>-0.293820</td>
-      <td>-0.140007</td>
+      <td>-0.294604</td>
+      <td>-0.140195</td>
     </tr>
     <tr>
       <th>49996</th>
-      <td>-0.462017</td>
-      <td>1.848988</td>
+      <td>-0.462982</td>
+      <td>1.840749</td>
     </tr>
     <tr>
       <th>49997</th>
-      <td>0.698136</td>
-      <td>1.510755</td>
+      <td>0.698249</td>
+      <td>1.503851</td>
     </tr>
     <tr>
       <th>49998</th>
-      <td>0.862183</td>
-      <td>0.732983</td>
+      <td>0.863470</td>
+      <td>0.734216</td>
     </tr>
     <tr>
       <th>49999</th>
-      <td>1.118024</td>
-      <td>1.147715</td>
+      <td>1.122103</td>
+      <td>1.147391</td>
     </tr>
   </tbody>
 </table>
@@ -1730,13 +1753,13 @@ Heteroskedastic (Robust) Covariance (Debiased: False, GLS: True)
       <div class="md-copyright">
   
     <div class="md-footer-copyright__highlight">
-        &#169; Copyright 2021, Kevin Sheppard.
+        &#169; Copyright 2017-2026, Kevin Sheppard.
         
     </div>
   
     Created using
     <a href="https://www.sphinx-doc.org/" target="_blank" rel="noopener">Sphinx</a>
-    8.1.3.
+    9.1.0.
      and
     <a href="https://github.com/jbms/sphinx-immaterial/" target="_blank" rel="noopener">Sphinx-Immaterial</a>
   
@@ -1793,7 +1816,7 @@ Heteroskedastic (Robust) Covariance (Debiased: False, GLS: True)
         <script src="../../_static/sphinx_immaterial_theme.32136f45f91ae6956.min.js?v=a7a9472a"></script>
         <script crossorigin="anonymous" integrity="sha256-Ae2Vz/4ePdIu6ZyI/5ZGsYnb+m0JlOmKPjt6XZ9JJkA=" src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.4/require.min.js"></script>
         <script>window.MathJax = {"tex": {"inlineMath": [["$", "$"], ["\\(", "\\)"]], "processEscapes": true}, "options": {"ignoreHtmlClass": "tex2jax_ignore|mathjax_ignore|document", "processHtmlClass": "tex2jax_process|mathjax_process|math|output_area"}}</script>
-        <script id="MathJax-script" src="../../_static/mathjax/tex-mml-chtml.js?v=cadf963e"></script>
+        <script id="MathJax-script" src="../../_static/mathjax/tex-mml-chtml.js"></script>
     
   </body>
 </html>

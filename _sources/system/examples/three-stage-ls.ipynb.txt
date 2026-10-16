@@ -12,11 +12,11 @@
     "\\begin{eqnarray}\n",
     "hours & = & \\beta_0 + \\beta_1 \\ln(wage) + \\beta_2 educ + \\beta_3 age + \\beta_4 kidslt6 + \\beta_5 nwifeinc + \\epsilon^h_i \n",
     "\\\\\n",
-    "\\ln(wage) & = & \\gamma_0 + \\gamma_1 hours + \\gamma_2 educ + \\gamma_3 educ^2 + \\gamma_4 exper + \\epsilon^w_i \n",
+    "\\ln(wage) & = & \\gamma_0 + \\gamma_1 hours + \\gamma_2 educ + \\gamma_3 exper + \\gamma_4 exper^2 + \\epsilon^w_i \n",
     "\\end{eqnarray}\n",
     "$$\n",
     "\n",
-    "Each equation has a single exogenous variables.  The instruments for the endogenous variables are the regressors that appear in one equation but not the other. "
+    "Each equation has a single endogenous variable.  The instruments for the endogenous variables are the regressors that appear in one equation but not the other. "
    ]
   },
   {
@@ -25,7 +25,7 @@
    "source": [
     "## Data\n",
     "\n",
-    "The data set is the MORZ data set from Wooldridge (2002)."
+    "The data set is the MROZ data set from Wooldridge (2002)."
    ]
   },
   {
@@ -66,7 +66,7 @@
     "\n",
     "* `IV2SLS` - single equation 2-stage least squares\n",
     "* `IV3SLS` - system estimation using instrumental variables\n",
-    "* `SUR` - system estimation without endogenous variables\n"
+    "* `IVSystemGMM` - system estimation using instrumental variables and GMM\n"
    ]
   },
   {
@@ -145,7 +145,7 @@
    "cell_type": "markdown",
    "metadata": {},
    "source": [
-    "Using `method=\"gls\"` will use GLS estimates which can be more efficient than the usual estimates. Here only the first equation changes.  This is due to the structure of the problem."
+    "Using `method=\"gls\"` will use GLS estimates which can be more efficient than the usual estimates. Here the estimates of both equations change."
    ]
   },
   {
@@ -261,7 +261,7 @@
     "$$\n",
     "\\begin{align}\n",
     "y_1 = y_2 + x_1 + \\epsilon_1 \\\\\n",
-    "y_2 = -y_1 + x_2 + \\epsilon_1 \\\\\n",
+    "y_2 = -y_1 + x_2 + \\epsilon_2 \\\\\n",
     "\\end{align}\n",
     "$$\n",
     "\n",
@@ -269,7 +269,7 @@
     "$$\n",
     "\\begin{align}\n",
     "y_1 = \\frac{1}{2}\\left(x_1 + x_2 + \\epsilon_1 + \\epsilon_2\\right) \\\\\n",
-    "y_1 = \\frac{1}{2}\\left(x_2 - x_1 + \\epsilon_2 - \\epsilon_1\\right) \\\\\n",
+    "y_2 = \\frac{1}{2}\\left(x_2 - x_1 + \\epsilon_2 - \\epsilon_1\\right) \\\\\n",
     "\\end{align}\n",
     "$$\n",
     "\n",
@@ -294,7 +294,7 @@
     "in_sample = df.iloc[:-10000]\n",
     "oos = df.iloc[-10000:]\n",
     "mod = IV3SLS.from_formula(\n",
-    "    {\"y1\": \"y1 ~  x1 + [y2 ~ x2]\", \"y2\": \"y2 ~ x2 + [y1 ~ x1]\"}, data=df\n",
+    "    {\"y1\": \"y1 ~  x1 + [y2 ~ x2]\", \"y2\": \"y2 ~ x2 + [y1 ~ x1]\"}, data=in_sample\n",
     ")\n",
     "res = mod.fit()\n",
     "print(res)"

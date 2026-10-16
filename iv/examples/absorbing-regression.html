@@ -23,7 +23,7 @@
     
   
       
-        <title>Absorbing Regression - linearmodels 7.0</title>
+        <title>Absorbing Regression - linearmodels 7.1</title>
       
     
 
@@ -54,7 +54,7 @@
         <style>:root{--md-text-font:"Roboto";--md-code-font:"Roboto Mono"}</style>
       
     
-        <link rel="stylesheet" type="text/css" href="../../_static/sphinx_immaterial_theme.acf80fe7f4d9ef9e2.min.css?v=9e56d0d2" />
+        <link rel="stylesheet" type="text/css" href="../../_static/sphinx_immaterial_theme.6efbe22605a23fcd6.min.css?v=b2ceb110" />
         <link rel="stylesheet" type="text/css" href="../../_static/nbsphinx-code-cells.css?v=2aa19091" />
         <link rel="stylesheet" type="text/css" href="../../_static/css/small_fixes.css?v=34934119" />
     <script>__md_scope=new URL("../..",location),__md_hash=e=>[...e].reduce(((e,_)=>(e<<5)-e+_.charCodeAt(0)),0),__md_get=(e,_=localStorage,t=__md_scope)=>JSON.parse(_.getItem(t.pathname+"."+e)),__md_set=(e,_,t=localStorage,a=__md_scope)=>{try{t.setItem(a.pathname+"."+e,JSON.stringify(_))}catch(e){}}</script>
@@ -101,7 +101,7 @@
 
 <header class="md-header md-header--shadow" data-md-component="header">
   <nav class="md-header__inner md-grid" aria-label="Header">
-    <a href="../../index.html" title="linearmodels 7.0" class="md-header__button md-logo" aria-label="linearmodels 7.0" data-md-component="logo">
+    <a href="../../index.html" title="linearmodels 7.1" class="md-header__button md-logo" aria-label="linearmodels 7.1" data-md-component="logo">
       <img src="../../_static/bw-logo.svg" alt="logo">
     </a>
     <label class="md-header__button md-icon" for="__drawer">
@@ -112,7 +112,7 @@
       <div class="md-header__ellipsis">
         <div class="md-header__topic">
           <span class="md-ellipsis">
-            linearmodels 7.0
+            linearmodels 7.1
           </span>
         </div>
         <div class="md-header__topic" data-md-component="header-topic">
@@ -207,10 +207,10 @@
 
 <nav class="md-nav md-nav--primary" aria-label="Navigation" data-md-level="0">
   <label class="md-nav__title" for="__drawer">
-    <a href="../../index.html" title="linearmodels 7.0" class="md-nav__button md-logo" aria-label="linearmodels 7.0" data-md-component="logo">
+    <a href="../../index.html" title="linearmodels 7.1" class="md-nav__button md-logo" aria-label="linearmodels 7.1" data-md-component="logo">
       <img src="../../_static/bw-logo.svg" alt="logo">
     </a>
-    linearmodels 7.0
+    linearmodels 7.1
   </label>
   
     <div class="md-nav__source">
@@ -596,6 +596,29 @@
   
   
     <li class="md-nav__item">
+      <a href="../../input-alignment.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    <span title="/input-alignment.rst (reference label)"><span>Aligning Inputs</span></span>
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+  
+    <li class="md-nav__item">
       <a href="../../utility.html" class="md-nav__link">
         
   
@@ -843,7 +866,7 @@
 <span class="n">firm_effects</span> <span class="o">=</span> <span class="n">rs</span><span class="o">.</span><span class="n">standard_normal</span><span class="p">(</span><span class="n">firm_id</span><span class="o">.</span><span class="n">max</span><span class="p">()</span> <span class="o">+</span> <span class="mi">1</span><span class="p">)</span>
 <span class="n">firm_effects</span> <span class="o">=</span> <span class="n">firm_effects</span><span class="p">[</span><span class="n">firm_id</span><span class="p">]</span>
 <span class="n">cats</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">(</span>
-    <span class="p">{</span><span class="s2">&quot;state&quot;</span><span class="p">:</span> <span class="n">pd</span><span class="o">.</span><span class="n">Categorical</span><span class="p">(</span><span class="n">state_id</span><span class="p">),</span> <span class="s2">&quot;firm&quot;</span><span class="p">:</span> <span class="n">pd</span><span class="o">.</span><span class="n">Categorical</span><span class="p">(</span><span class="n">firm_id</span><span class="p">)}</span>
+    <span class="p">{</span><span class="s2">"state"</span><span class="p">:</span> <span class="n">pd</span><span class="o">.</span><span class="n">Categorical</span><span class="p">(</span><span class="n">state_id</span><span class="p">),</span> <span class="s2">"firm"</span><span class="p">:</span> <span class="n">pd</span><span class="o">.</span><span class="n">Categorical</span><span class="p">(</span><span class="n">firm_id</span><span class="p">)}</span>
 <span class="p">)</span>
 <span class="n">eps</span> <span class="o">=</span> <span class="n">rs</span><span class="o">.</span><span class="n">standard_normal</span><span class="p">(</span><span class="n">nobs</span><span class="p">)</span>
 <span class="n">x</span> <span class="o">=</span> <span class="n">rs</span><span class="o">.</span><span class="n">standard_normal</span><span class="p">((</span><span class="n">nobs</span><span class="p">,</span> <span class="mi">2</span><span class="p">))</span>
@@ -875,8 +898,8 @@
 Dep. Variable:              dependent   R-squared:                          0.8377
 Estimator:               Absorbing LS   Adj. R-squared:                     0.7975
 No. Observations:             1000000   F-statistic:                     1.962e+06
-Date:                Tue, Oct 21 2025   P-value (F-stat):                   0.0000
-Time:                        13:37:45   Distribution:                      chi2(2)
+Date:                Fri, Oct 16 2026   P-value (F-stat):                   0.0000
+Time:                        08:36:11   Distribution:                      chi2(2)
 Cov. Estimator:                robust   R-squared (No Effects):             0.6664
                                         Variables Absorbed:              1.987e+05
                              Parameter Estimates
@@ -912,8 +935,8 @@ exog.2         1.0008     0.0010     989.09     0.0000      0.9989      1.0028
 Dep. Variable:              dependent   R-squared:                          0.8377
 Estimator:               Absorbing LS   Adj. R-squared:                     0.7975
 No. Observations:             1000000   F-statistic:                     1.962e+06
-Date:                Tue, Oct 21 2025   P-value (F-stat):                   0.0000
-Time:                        13:37:56   Distribution:                      chi2(2)
+Date:                Fri, Oct 16 2026   P-value (F-stat):                   0.0000
+Time:                        08:36:15   Distribution:                      chi2(2)
 Cov. Estimator:                robust   R-squared (No Effects):             0.6664
                                         Variables Absorbed:              1.987e+05
                              Parameter Estimates
@@ -943,12 +966,12 @@ exog.1         1.0008     0.0010     989.09     0.0000      0.9989      1.0028
 <span class="n">mod</span> <span class="o">=</span> <span class="n">AbsorbingLS</span><span class="p">(</span><span class="n">y</span><span class="p">,</span> <span class="n">x</span><span class="p">[:,</span> <span class="mi">1</span><span class="p">:],</span> <span class="n">absorb</span><span class="o">=</span><span class="n">cats</span><span class="p">)</span>
 
 <span class="n">start</span> <span class="o">=</span> <span class="n">dt</span><span class="o">.</span><span class="n">datetime</span><span class="o">.</span><span class="n">now</span><span class="p">()</span>
-<span class="n">res</span> <span class="o">=</span> <span class="n">mod</span><span class="o">.</span><span class="n">fit</span><span class="p">(</span><span class="n">use_cache</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">method</span><span class="o">=</span><span class="s2">&quot;lsmr&quot;</span><span class="p">)</span>
-<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;LSMR Second: </span><span class="si">{</span><span class="p">(</span><span class="n">dt</span><span class="o">.</span><span class="n">datetime</span><span class="o">.</span><span class="n">now</span><span class="p">()</span><span class="w"> </span><span class="o">-</span><span class="w"> </span><span class="n">start</span><span class="p">)</span><span class="o">.</span><span class="n">total_seconds</span><span class="p">()</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+<span class="n">res</span> <span class="o">=</span> <span class="n">mod</span><span class="o">.</span><span class="n">fit</span><span class="p">(</span><span class="n">use_cache</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">method</span><span class="o">=</span><span class="s2">"lsmr"</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">"LSMR Second: </span><span class="si">{</span><span class="p">(</span><span class="n">dt</span><span class="o">.</span><span class="n">datetime</span><span class="o">.</span><span class="n">now</span><span class="p">()</span><span class="w"> </span><span class="o">-</span><span class="w"> </span><span class="n">start</span><span class="p">)</span><span class="o">.</span><span class="n">total_seconds</span><span class="p">()</span><span class="si">}</span><span class="s2">"</span><span class="p">)</span>
 
 <span class="n">start</span> <span class="o">=</span> <span class="n">dt</span><span class="o">.</span><span class="n">datetime</span><span class="o">.</span><span class="n">now</span><span class="p">()</span>
 <span class="n">res</span> <span class="o">=</span> <span class="n">mod</span><span class="o">.</span><span class="n">fit</span><span class="p">()</span>
-<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;HDFE Second: </span><span class="si">{</span><span class="p">(</span><span class="n">dt</span><span class="o">.</span><span class="n">datetime</span><span class="o">.</span><span class="n">now</span><span class="p">()</span><span class="w"> </span><span class="o">-</span><span class="w"> </span><span class="n">start</span><span class="p">)</span><span class="o">.</span><span class="n">total_seconds</span><span class="p">()</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">"HDFE Second: </span><span class="si">{</span><span class="p">(</span><span class="n">dt</span><span class="o">.</span><span class="n">datetime</span><span class="o">.</span><span class="n">now</span><span class="p">()</span><span class="w"> </span><span class="o">-</span><span class="w"> </span><span class="n">start</span><span class="p">)</span><span class="o">.</span><span class="n">total_seconds</span><span class="p">()</span><span class="si">}</span><span class="s2">"</span><span class="p">)</span>
 </code></pre></div>
 </div>
 </div>
@@ -957,8 +980,8 @@ exog.1         1.0008     0.0010     989.09     0.0000      0.9989      1.0028
 </div>
 <div class="output_area docutils container">
 <div class="highlight"><pre>
-LSMR Second: 4.286463
-HDFE Second: 2.082633
+LSMR Second: 1.638669
+HDFE Second: 3.011256
 </pre></div></div>
 </div>
 <p>LSMR is iterative and does not have a closed form. The tolerance can be set using <code class="docutils literal notranslate"><span class="pre">absorb_options</span></code> which is a dictionary. See <a class="reference external" href="https://docs.scipy.org/doc/scipy-1.2.1/reference/generated/scipy.sparse.linalg.lsmr.html#scipy.sparse.linalg.lsmr">scipy.sparse.linalg.lsmr</a> for details on the options.</p>
@@ -967,7 +990,7 @@ HDFE Second: 2.082633
 </code></pre></div>
 </div>
 <div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><code><span class="n">mod</span> <span class="o">=</span> <span class="n">AbsorbingLS</span><span class="p">(</span><span class="n">y</span><span class="p">,</span> <span class="n">x</span><span class="p">[:,</span> <span class="mi">1</span><span class="p">:],</span> <span class="n">absorb</span><span class="o">=</span><span class="n">cats</span><span class="p">)</span>
-<span class="n">res</span> <span class="o">=</span> <span class="n">mod</span><span class="o">.</span><span class="n">fit</span><span class="p">(</span><span class="n">method</span><span class="o">=</span><span class="s2">&quot;lsmr&quot;</span><span class="p">,</span> <span class="n">absorb_options</span><span class="o">=</span><span class="p">{</span><span class="s2">&quot;show&quot;</span><span class="p">:</span> <span class="kc">True</span><span class="p">})</span>
+<span class="n">res</span> <span class="o">=</span> <span class="n">mod</span><span class="o">.</span><span class="n">fit</span><span class="p">(</span><span class="n">method</span><span class="o">=</span><span class="s2">"lsmr"</span><span class="p">,</span> <span class="n">absorb_options</span><span class="o">=</span><span class="p">{</span><span class="s2">"show"</span><span class="p">:</span> <span class="kc">True</span><span class="p">})</span>
 </code></pre></div>
 </div>
 </div>
@@ -1111,13 +1134,13 @@ itn   =      12    condA = 7.9e+01
       <div class="md-copyright">
   
     <div class="md-footer-copyright__highlight">
-        &#169; Copyright 2021, Kevin Sheppard.
+        &#169; Copyright 2017-2026, Kevin Sheppard.
         
     </div>
   
     Created using
     <a href="https://www.sphinx-doc.org/" target="_blank" rel="noopener">Sphinx</a>
-    8.1.3.
+    9.1.0.
      and
     <a href="https://github.com/jbms/sphinx-immaterial/" target="_blank" rel="noopener">Sphinx-Immaterial</a>
   
@@ -1174,7 +1197,7 @@ itn   =      12    condA = 7.9e+01
         <script src="../../_static/sphinx_immaterial_theme.32136f45f91ae6956.min.js?v=a7a9472a"></script>
         <script crossorigin="anonymous" integrity="sha256-Ae2Vz/4ePdIu6ZyI/5ZGsYnb+m0JlOmKPjt6XZ9JJkA=" src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.4/require.min.js"></script>
         <script>window.MathJax = {"tex": {"inlineMath": [["$", "$"], ["\\(", "\\)"]], "processEscapes": true}, "options": {"ignoreHtmlClass": "tex2jax_ignore|mathjax_ignore|document", "processHtmlClass": "tex2jax_process|mathjax_process|math|output_area"}}</script>
-        <script id="MathJax-script" src="../../_static/mathjax/tex-mml-chtml.js?v=cadf963e"></script>
+        <script id="MathJax-script" src="../../_static/mathjax/tex-mml-chtml.js"></script>
     
   </body>
 </html>

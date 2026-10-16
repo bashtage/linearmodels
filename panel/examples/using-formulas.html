@@ -23,7 +23,7 @@
     
   
       
-        <title>Using formulas to specify models - linearmodels 7.0</title>
+        <title>Using formulas to specify models - linearmodels 7.1</title>
       
     
 
@@ -54,7 +54,7 @@
         <style>:root{--md-text-font:"Roboto";--md-code-font:"Roboto Mono"}</style>
       
     
-        <link rel="stylesheet" type="text/css" href="../../_static/sphinx_immaterial_theme.acf80fe7f4d9ef9e2.min.css?v=9e56d0d2" />
+        <link rel="stylesheet" type="text/css" href="../../_static/sphinx_immaterial_theme.6efbe22605a23fcd6.min.css?v=b2ceb110" />
         <link rel="stylesheet" type="text/css" href="../../_static/nbsphinx-code-cells.css?v=2aa19091" />
         <link rel="stylesheet" type="text/css" href="../../_static/css/small_fixes.css?v=34934119" />
     <script>__md_scope=new URL("../..",location),__md_hash=e=>[...e].reduce(((e,_)=>(e<<5)-e+_.charCodeAt(0)),0),__md_get=(e,_=localStorage,t=__md_scope)=>JSON.parse(_.getItem(t.pathname+"."+e)),__md_set=(e,_,t=localStorage,a=__md_scope)=>{try{t.setItem(a.pathname+"."+e,JSON.stringify(_))}catch(e){}}</script>
@@ -101,7 +101,7 @@
 
 <header class="md-header md-header--shadow" data-md-component="header">
   <nav class="md-header__inner md-grid" aria-label="Header">
-    <a href="../../index.html" title="linearmodels 7.0" class="md-header__button md-logo" aria-label="linearmodels 7.0" data-md-component="logo">
+    <a href="../../index.html" title="linearmodels 7.1" class="md-header__button md-logo" aria-label="linearmodels 7.1" data-md-component="logo">
       <img src="../../_static/bw-logo.svg" alt="logo">
     </a>
     <label class="md-header__button md-icon" for="__drawer">
@@ -112,7 +112,7 @@
       <div class="md-header__ellipsis">
         <div class="md-header__topic">
           <span class="md-ellipsis">
-            linearmodels 7.0
+            linearmodels 7.1
           </span>
         </div>
         <div class="md-header__topic" data-md-component="header-topic">
@@ -207,10 +207,10 @@
 
 <nav class="md-nav md-nav--primary" aria-label="Navigation" data-md-level="0">
   <label class="md-nav__title" for="__drawer">
-    <a href="../../index.html" title="linearmodels 7.0" class="md-nav__button md-logo" aria-label="linearmodels 7.0" data-md-component="logo">
+    <a href="../../index.html" title="linearmodels 7.1" class="md-nav__button md-logo" aria-label="linearmodels 7.1" data-md-component="logo">
       <img src="../../_static/bw-logo.svg" alt="logo">
     </a>
-    linearmodels 7.0
+    linearmodels 7.1
   </label>
   
     <div class="md-nav__source">
@@ -660,6 +660,29 @@
   
   
     <li class="md-nav__item">
+      <a href="../../input-alignment.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    <span title="/input-alignment.rst (reference label)"><span>Aligning Inputs</span></span>
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+  
+    <li class="md-nav__item">
       <a href="../../utility.html" class="md-nav__link">
         
   
@@ -925,7 +948,7 @@
 
 
 <h1 id="Using-formulas-to-specify-models">Using formulas to specify models<a class="headerlink" href="#Using-formulas-to-specify-models" title="Link to this heading">¶</a></h1>
-<p>All of the models can be specified using formulas. The formulas used here utilize <a class="reference external" href="https://matthewwardrop.github.io/formulaic/">formulaic</a> are similar to those in <a class="reference external" href="http://www.statsmodels.org">statsmodels</a>. The basis formula syntax for a single variable regression would be</p>
+<p>All of the models can be specified using formulas. The formulas used here utilize <a class="reference external" href="https://matthewwardrop.github.io/formulaic/">formulaic</a> and are similar to those in <a class="reference external" href="http://www.statsmodels.org">statsmodels</a>. The basic formula syntax for a single variable regression would be</p>
 <div class="highlight-none notranslate"><div class="highlight"><pre><span></span><code>y ~ 1 + x
 </code></pre></div>
 </div>
@@ -941,7 +964,7 @@
 <div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><code><span class="kn">from</span><span class="w"> </span><span class="nn">statsmodels.datasets</span><span class="w"> </span><span class="kn">import</span> <span class="n">grunfeld</span>
 
 <span class="n">data</span> <span class="o">=</span> <span class="n">grunfeld</span><span class="o">.</span><span class="n">load_pandas</span><span class="p">()</span><span class="o">.</span><span class="n">data</span>
-<span class="n">data</span> <span class="o">=</span> <span class="n">data</span><span class="o">.</span><span class="n">set_index</span><span class="p">([</span><span class="s2">&quot;firm&quot;</span><span class="p">,</span> <span class="s2">&quot;year&quot;</span><span class="p">])</span>
+<span class="n">data</span> <span class="o">=</span> <span class="n">data</span><span class="o">.</span><span class="n">set_index</span><span class="p">([</span><span class="s2">"firm"</span><span class="p">,</span> <span class="s2">"year"</span><span class="p">])</span>
 <span class="nb">print</span><span class="p">(</span><span class="n">data</span><span class="o">.</span><span class="n">head</span><span class="p">())</span>
 </code></pre></div>
 </div>
@@ -963,14 +986,14 @@ General Motors 1935.0   317.6  3078.5      2.8
 <h2 id="PanelOLS-with-Entity-Effects">PanelOLS with Entity Effects<a class="headerlink" href="#PanelOLS-with-Entity-Effects" title="Link to this heading">¶</a></h2>
 <p>Entity effects are specified using the special command <code class="docutils literal notranslate"><span class="pre">EntityEffects</span></code>. By default a constant is not included, and so if a constant is desired, <code class="docutils literal notranslate"><span class="pre">1+</span></code> should be included in the formula. When including effects, the model and fit are identical whether a constant is included or not.</p>
 <h2 id="PanelOLS-with-Entity-Effects-and-a-constant">PanelOLS with Entity Effects and a constant<a class="headerlink" href="#PanelOLS-with-Entity-Effects-and-a-constant" title="Link to this heading">¶</a></h2>
-<p>The constant can be explicitly included using the <code class="docutils literal notranslate"><span class="pre">1</span> <span class="pre">+</span></code> notation. When a constant is included in the model, and additional constraint is imposed that the number of the effects is 0. This allows the constant to be identified using the grand mean of the dependent and the regressors.</p>
+<p>The constant can be explicitly included using the <code class="docutils literal notranslate"><span class="pre">1</span> <span class="pre">+</span></code> notation. When a constant is included in the model, an additional constraint is imposed that the sum of the effects is 0. This allows the constant to be identified using the grand mean of the dependent and the regressors.</p>
 <div class="nbinput docutils container">
 <div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span><code>[2]:
 </code></pre></div>
 </div>
 <div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><code><span class="kn">from</span><span class="w"> </span><span class="nn">linearmodels</span><span class="w"> </span><span class="kn">import</span> <span class="n">PanelOLS</span>
 
-<span class="n">mod</span> <span class="o">=</span> <span class="n">PanelOLS</span><span class="o">.</span><span class="n">from_formula</span><span class="p">(</span><span class="s2">&quot;invest ~ value + capital + EntityEffects&quot;</span><span class="p">,</span> <span class="n">data</span><span class="o">=</span><span class="n">data</span><span class="p">)</span>
+<span class="n">mod</span> <span class="o">=</span> <span class="n">PanelOLS</span><span class="o">.</span><span class="n">from_formula</span><span class="p">(</span><span class="s2">"invest ~ value + capital + EntityEffects"</span><span class="p">,</span> <span class="n">data</span><span class="o">=</span><span class="n">data</span><span class="p">)</span>
 <span class="nb">print</span><span class="p">(</span><span class="n">mod</span><span class="o">.</span><span class="n">fit</span><span class="p">())</span>
 </code></pre></div>
 </div>
@@ -985,8 +1008,8 @@ General Motors 1935.0   317.6  3078.5      2.8
 Dep. Variable:                 invest   R-squared:                        0.7667
 Estimator:                   PanelOLS   R-squared (Between):              0.8223
 No. Observations:                 220   R-squared (Within):               0.7667
-Date:                Tue, Oct 21 2025   R-squared (Overall):              0.8132
-Time:                        13:38:13   Log-likelihood                   -1167.4
+Date:                Fri, Oct 16 2026   R-squared (Overall):              0.8132
+Time:                        08:36:58   Log-likelihood                   -1167.4
 Cov. Estimator:            Unadjusted
                                         F-statistic:                      340.08
 Entities:                          11   P-value                           0.0000
@@ -1018,7 +1041,7 @@ Included effects: Entity
 <div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span><code>[3]:
 </code></pre></div>
 </div>
-<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><code><span class="n">mod</span> <span class="o">=</span> <span class="n">PanelOLS</span><span class="o">.</span><span class="n">from_formula</span><span class="p">(</span><span class="s2">&quot;invest ~ 1 + value + capital + EntityEffects&quot;</span><span class="p">,</span> <span class="n">data</span><span class="o">=</span><span class="n">data</span><span class="p">)</span>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><code><span class="n">mod</span> <span class="o">=</span> <span class="n">PanelOLS</span><span class="o">.</span><span class="n">from_formula</span><span class="p">(</span><span class="s2">"invest ~ 1 + value + capital + EntityEffects"</span><span class="p">,</span> <span class="n">data</span><span class="o">=</span><span class="n">data</span><span class="p">)</span>
 <span class="nb">print</span><span class="p">(</span><span class="n">mod</span><span class="o">.</span><span class="n">fit</span><span class="p">())</span>
 </code></pre></div>
 </div>
@@ -1033,8 +1056,8 @@ Included effects: Entity
 Dep. Variable:                 invest   R-squared:                        0.7667
 Estimator:                   PanelOLS   R-squared (Between):              0.8193
 No. Observations:                 220   R-squared (Within):               0.7667
-Date:                Tue, Oct 21 2025   R-squared (Overall):              0.8071
-Time:                        13:38:13   Log-likelihood                   -1167.4
+Date:                Fri, Oct 16 2026   R-squared (Overall):              0.8071
+Time:                        08:36:58   Log-likelihood                   -1167.4
 Cov. Estimator:            Unadjusted
                                         F-statistic:                      340.08
 Entities:                          11   P-value                           0.0000
@@ -1070,7 +1093,7 @@ Included effects: Entity
 </code></pre></div>
 </div>
 <div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><code><span class="n">mod</span> <span class="o">=</span> <span class="n">PanelOLS</span><span class="o">.</span><span class="n">from_formula</span><span class="p">(</span>
-    <span class="s2">&quot;invest ~ 1 + value + capital + EntityEffects + TimeEffects&quot;</span><span class="p">,</span> <span class="n">data</span><span class="o">=</span><span class="n">data</span>
+    <span class="s2">"invest ~ 1 + value + capital + EntityEffects + TimeEffects"</span><span class="p">,</span> <span class="n">data</span><span class="o">=</span><span class="n">data</span>
 <span class="p">)</span>
 <span class="nb">print</span><span class="p">(</span><span class="n">mod</span><span class="o">.</span><span class="n">fit</span><span class="p">())</span>
 </code></pre></div>
@@ -1086,8 +1109,8 @@ Included effects: Entity
 Dep. Variable:                 invest   R-squared:                        0.7253
 Estimator:                   PanelOLS   R-squared (Between):              0.7944
 No. Observations:                 220   R-squared (Within):               0.7566
-Date:                Tue, Oct 21 2025   R-squared (Overall):              0.7856
-Time:                        13:38:13   Log-likelihood                   -1153.0
+Date:                Fri, Oct 16 2026   R-squared (Overall):              0.7856
+Time:                        08:36:58   Log-likelihood                   -1153.0
 Cov. Estimator:            Unadjusted
                                         F-statistic:                      248.15
 Entities:                          11   P-value                           0.0000
@@ -1124,7 +1147,7 @@ Included effects: Entity, Time
 </div>
 <div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><code><span class="kn">from</span><span class="w"> </span><span class="nn">linearmodels</span><span class="w"> </span><span class="kn">import</span> <span class="n">BetweenOLS</span><span class="p">,</span> <span class="n">FirstDifferenceOLS</span><span class="p">,</span> <span class="n">PooledOLS</span>
 
-<span class="n">mod</span> <span class="o">=</span> <span class="n">BetweenOLS</span><span class="o">.</span><span class="n">from_formula</span><span class="p">(</span><span class="s2">&quot;invest ~ 1 + value + capital&quot;</span><span class="p">,</span> <span class="n">data</span><span class="o">=</span><span class="n">data</span><span class="p">)</span>
+<span class="n">mod</span> <span class="o">=</span> <span class="n">BetweenOLS</span><span class="o">.</span><span class="n">from_formula</span><span class="p">(</span><span class="s2">"invest ~ 1 + value + capital"</span><span class="p">,</span> <span class="n">data</span><span class="o">=</span><span class="n">data</span><span class="p">)</span>
 <span class="nb">print</span><span class="p">(</span><span class="n">mod</span><span class="o">.</span><span class="n">fit</span><span class="p">())</span>
 </code></pre></div>
 </div>
@@ -1139,8 +1162,8 @@ Included effects: Entity, Time
 Dep. Variable:                 invest   R-squared:                        0.8644
 Estimator:                 BetweenOLS   R-squared (Between):              0.8644
 No. Observations:                  11   R-squared (Within):               0.4195
-Date:                Tue, Oct 21 2025   R-squared (Overall):              0.7616
-Time:                        13:38:13   Log-likelihood                   -61.997
+Date:                Fri, Oct 16 2026   R-squared (Overall):              0.7616
+Time:                        08:36:58   Log-likelihood                   -61.997
 Cov. Estimator:            Unadjusted
                                         F-statistic:                      25.500
 Entities:                          11   P-value                           0.0003
@@ -1169,7 +1192,7 @@ capital        0.0297     0.1746     0.1700     0.8692     -0.3730      0.4323
 <div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span><code>[6]:
 </code></pre></div>
 </div>
-<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><code><span class="n">mod</span> <span class="o">=</span> <span class="n">FirstDifferenceOLS</span><span class="o">.</span><span class="n">from_formula</span><span class="p">(</span><span class="s2">&quot;invest ~ value + capital&quot;</span><span class="p">,</span> <span class="n">data</span><span class="o">=</span><span class="n">data</span><span class="p">)</span>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><code><span class="n">mod</span> <span class="o">=</span> <span class="n">FirstDifferenceOLS</span><span class="o">.</span><span class="n">from_formula</span><span class="p">(</span><span class="s2">"invest ~ value + capital"</span><span class="p">,</span> <span class="n">data</span><span class="o">=</span><span class="n">data</span><span class="p">)</span>
 <span class="nb">print</span><span class="p">(</span><span class="n">mod</span><span class="o">.</span><span class="n">fit</span><span class="p">())</span>
 </code></pre></div>
 </div>
@@ -1184,8 +1207,8 @@ capital        0.0297     0.1746     0.1700     0.8692     -0.3730      0.4323
 Dep. Variable:                 invest   R-squared:                        0.4287
 Estimator:         FirstDifferenceOLS   R-squared (Between):              0.8643
 No. Observations:                 209   R-squared (Within):               0.7539
-Date:                Tue, Oct 21 2025   R-squared (Overall):              0.8461
-Time:                        13:38:13   Log-likelihood                   -1071.1
+Date:                Fri, Oct 16 2026   R-squared (Overall):              0.8461
+Time:                        08:36:58   Log-likelihood                   -1071.1
 Cov. Estimator:            Unadjusted
                                         F-statistic:                      77.679
 Entities:                          11   P-value                           0.0000
@@ -1213,7 +1236,7 @@ capital        0.2786     0.0449     6.1990     0.0000      0.1900      0.3673
 <div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span><code>[7]:
 </code></pre></div>
 </div>
-<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><code><span class="n">mod</span> <span class="o">=</span> <span class="n">PooledOLS</span><span class="o">.</span><span class="n">from_formula</span><span class="p">(</span><span class="s2">&quot;invest ~ 1 + value + capital&quot;</span><span class="p">,</span> <span class="n">data</span><span class="o">=</span><span class="n">data</span><span class="p">)</span>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><code><span class="n">mod</span> <span class="o">=</span> <span class="n">PooledOLS</span><span class="o">.</span><span class="n">from_formula</span><span class="p">(</span><span class="s2">"invest ~ 1 + value + capital"</span><span class="p">,</span> <span class="n">data</span><span class="o">=</span><span class="n">data</span><span class="p">)</span>
 <span class="nb">print</span><span class="p">(</span><span class="n">mod</span><span class="o">.</span><span class="n">fit</span><span class="p">())</span>
 </code></pre></div>
 </div>
@@ -1228,8 +1251,8 @@ capital        0.2786     0.0449     6.1990     0.0000      0.1900      0.3673
 Dep. Variable:                 invest   R-squared:                        0.8179
 Estimator:                  PooledOLS   R-squared (Between):              0.8426
 No. Observations:                 220   R-squared (Within):               0.7357
-Date:                Tue, Oct 21 2025   R-squared (Overall):              0.8179
-Time:                        13:38:13   Log-likelihood                   -1301.3
+Date:                Fri, Oct 16 2026   R-squared (Overall):              0.8179
+Time:                        08:36:58   Log-likelihood                   -1301.3
 Cov. Estimator:            Unadjusted
                                         F-statistic:                      487.28
 Entities:                          11   P-value                           0.0000
@@ -1286,13 +1309,13 @@ capital        0.2275     0.0242     9.3904     0.0000      0.1798      0.2753
       <div class="md-copyright">
   
     <div class="md-footer-copyright__highlight">
-        &#169; Copyright 2021, Kevin Sheppard.
+        &#169; Copyright 2017-2026, Kevin Sheppard.
         
     </div>
   
     Created using
     <a href="https://www.sphinx-doc.org/" target="_blank" rel="noopener">Sphinx</a>
-    8.1.3.
+    9.1.0.
      and
     <a href="https://github.com/jbms/sphinx-immaterial/" target="_blank" rel="noopener">Sphinx-Immaterial</a>
   
@@ -1349,7 +1372,7 @@ capital        0.2275     0.0242     9.3904     0.0000      0.1798      0.2753
         <script src="../../_static/sphinx_immaterial_theme.32136f45f91ae6956.min.js?v=a7a9472a"></script>
         <script crossorigin="anonymous" integrity="sha256-Ae2Vz/4ePdIu6ZyI/5ZGsYnb+m0JlOmKPjt6XZ9JJkA=" src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.4/require.min.js"></script>
         <script>window.MathJax = {"tex": {"inlineMath": [["$", "$"], ["\\(", "\\)"]], "processEscapes": true}, "options": {"ignoreHtmlClass": "tex2jax_ignore|mathjax_ignore|document", "processHtmlClass": "tex2jax_process|mathjax_process|math|output_area"}}</script>
-        <script id="MathJax-script" src="../../_static/mathjax/tex-mml-chtml.js?v=cadf963e"></script>
+        <script id="MathJax-script" src="../../_static/mathjax/tex-mml-chtml.js"></script>
     
   </body>
 </html>

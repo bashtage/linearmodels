@@ -23,7 +23,7 @@
     
   
       
-        <title>Introduction - linearmodels 7.0</title>
+        <title>Introduction - linearmodels 7.1</title>
       
     
 
@@ -54,7 +54,7 @@
         <style>:root{--md-text-font:"Roboto";--md-code-font:"Roboto Mono"}</style>
       
     
-        <link rel="stylesheet" type="text/css" href="../_static/sphinx_immaterial_theme.acf80fe7f4d9ef9e2.min.css?v=9e56d0d2" />
+        <link rel="stylesheet" type="text/css" href="../_static/sphinx_immaterial_theme.6efbe22605a23fcd6.min.css?v=b2ceb110" />
         <link rel="stylesheet" type="text/css" href="../_static/css/small_fixes.css?v=34934119" />
     <script>__md_scope=new URL("..",location),__md_hash=e=>[...e].reduce(((e,_)=>(e<<5)-e+_.charCodeAt(0)),0),__md_get=(e,_=localStorage,t=__md_scope)=>JSON.parse(_.getItem(t.pathname+"."+e)),__md_set=(e,_,t=localStorage,a=__md_scope)=>{try{t.setItem(a.pathname+"."+e,JSON.stringify(_))}catch(e){}}</script>
     
@@ -79,6 +79,11 @@
     <label class="md-overlay" for="__drawer"></label>
     <div data-md-component="skip">
       
+        
+        <a href="#aligning-inputs" class="md-skip">
+          Skip to content
+        </a>
+      
     </div>
     <div data-md-component="announce">
       
@@ -95,7 +100,7 @@
 
 <header class="md-header md-header--shadow" data-md-component="header">
   <nav class="md-header__inner md-grid" aria-label="Header">
-    <a href="../index.html" title="linearmodels 7.0" class="md-header__button md-logo" aria-label="linearmodels 7.0" data-md-component="logo">
+    <a href="../index.html" title="linearmodels 7.1" class="md-header__button md-logo" aria-label="linearmodels 7.1" data-md-component="logo">
       <img src="../_static/bw-logo.svg" alt="logo">
     </a>
     <label class="md-header__button md-icon" for="__drawer">
@@ -106,7 +111,7 @@
       <div class="md-header__ellipsis">
         <div class="md-header__topic">
           <span class="md-ellipsis">
-            linearmodels 7.0
+            linearmodels 7.1
           </span>
         </div>
         <div class="md-header__topic" data-md-component="header-topic">
@@ -201,10 +206,10 @@
 
 <nav class="md-nav md-nav--primary" aria-label="Navigation" data-md-level="0">
   <label class="md-nav__title" for="__drawer">
-    <a href="../index.html" title="linearmodels 7.0" class="md-nav__button md-logo" aria-label="linearmodels 7.0" data-md-component="logo">
+    <a href="../index.html" title="linearmodels 7.1" class="md-nav__button md-logo" aria-label="linearmodels 7.1" data-md-component="logo">
       <img src="../_static/bw-logo.svg" alt="logo">
     </a>
-    linearmodels 7.0
+    linearmodels 7.1
   </label>
   
     <div class="md-nav__source">
@@ -327,6 +332,19 @@
       
       <input class="md-nav__toggle md-toggle" type="checkbox" id="__toc">
       
+        <label class="md-nav__link md-nav__link--active" for="__toc">
+          
+  
+  
+  <span class="md-ellipsis">
+    <span title="/asset-pricing/introduction.rst (reference label)"><span>Introduction</span></span>
+    
+  </span>
+  
+
+          <span class="md-nav__icon md-icon"></span>
+        </label>
+      
       <a href="#" class="md-nav__link md-nav__link--active">
         
   
@@ -338,6 +356,36 @@
   
 
       </a>
+      
+        
+
+  
+
+<nav class="md-nav md-nav--secondary">
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Contents
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#aligning-inputs" class="md-nav__link">
+    
+    <span class="md-ellipsis">
+      <span title="/asset-pricing/introduction.rst#aligning-inputs (reference label)"><span>Aligning Inputs</span></span>
+    </span>
+  </a>
+  
+</li>
+      
+    </ul>
+  
+</nav>
       
     </li>
   
@@ -462,6 +510,29 @@
   
   <span class="md-ellipsis">
     <span title="/system/index.rst (reference label)"><span>System Regression Models</span></span>
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../input-alignment.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    <span title="/input-alignment.rst (reference label)"><span>Aligning Inputs</span></span>
     
   </span>
   
@@ -651,6 +722,24 @@
   
   
   
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Contents
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#aligning-inputs" class="md-nav__link">
+    
+    <span class="md-ellipsis">
+      <span title="/asset-pricing/introduction.rst#aligning-inputs (reference label)"><span>Aligning Inputs</span></span>
+    </span>
+  </a>
+  
+</li>
+      
+    </ul>
+  
 </nav>
                   </div>
                 </div>
@@ -668,15 +757,15 @@
 <h1 id="introduction">Introduction<a class="headerlink" href="#introduction" title="Link to this heading">¶</a></h1>
 <p>There are three estimators for linear factor asset pricing models:</p>
 <ul class="simple">
-<li><p><a class="reference internal" href="asset-pricing/linearmodels.asset_pricing.model.TradedFactorModel.html#linearmodels.asset_pricing.model.TradedFactorModel" title="linearmodels.asset_pricing.model.TradedFactorModel (Python class) — Linear factor models estimator applicable to traded factors"><code class="xref py py-class docutils literal notranslate"><span class="pre">TradedFactorModel</span></code></a> implements
+<li><p><a class="reference internal" href="asset-pricing/linearmodels.asset_pricing.model.TradedFactorModel.html#linearmodels.asset_pricing.model.TradedFactorModel" title="linearmodels.asset_pricing.model.TradedFactorModel (Python class) — Linear factor models estimator applicable to traded factors."><code class="xref py py-class docutils literal notranslate"><span class="pre">TradedFactorModel</span></code></a> implements
 an estimator which is appropriate when all factors are traded assets. When
 this is the case, the model can be estimated using regressions as a SUR.</p></li>
-<li><p><a class="reference internal" href="asset-pricing/linearmodels.asset_pricing.model.LinearFactorModel.html#linearmodels.asset_pricing.model.LinearFactorModel" title="linearmodels.asset_pricing.model.LinearFactorModel (Python class) — Linear factor model estimator"><code class="xref py py-class docutils literal notranslate"><span class="pre">LinearFactorModel</span></code></a> implements
+<li><p><a class="reference internal" href="asset-pricing/linearmodels.asset_pricing.model.LinearFactorModel.html#linearmodels.asset_pricing.model.LinearFactorModel" title="linearmodels.asset_pricing.model.LinearFactorModel (Python class) — Linear factor model estimator."><code class="xref py py-class docutils literal notranslate"><span class="pre">LinearFactorModel</span></code></a> implements
 a general purpose estimator based on the 2-step strategy where the first
 step estimated the factor loadings and the second step estimates the risk
 premia using the estimates from the first step.  This model is appropriate
 for both traded and non-traded factors.</p></li>
-<li><p><a class="reference internal" href="asset-pricing/linearmodels.asset_pricing.model.LinearFactorModelGMM.html#linearmodels.asset_pricing.model.LinearFactorModelGMM" title="linearmodels.asset_pricing.model.LinearFactorModelGMM (Python class) — GMM estimator of Linear factor models"><code class="xref py py-class docutils literal notranslate"><span class="pre">LinearFactorModelGMM</span></code></a> implements
+<li><p><a class="reference internal" href="asset-pricing/linearmodels.asset_pricing.model.LinearFactorModelGMM.html#linearmodels.asset_pricing.model.LinearFactorModelGMM" title="linearmodels.asset_pricing.model.LinearFactorModelGMM (Python class) — GMM estimator of Linear factor models."><code class="xref py py-class docutils literal notranslate"><span class="pre">LinearFactorModelGMM</span></code></a> implements
 a version of the 2-step model using GMM.  The GMM estimator is relatively
 efficient and so should be preferred. The continuously updating version can
 is available using an options when fitting the model (<code class="docutils literal notranslate"><span class="pre">use_cue=True</span></code>).</p></li>
@@ -697,19 +786,19 @@ and high value (V1 and V5).  The portfolios are transformed into excess returns
 prior to estimation.</p>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><code><span class="kn">from</span><span class="w"> </span><span class="nn">linearmodels.datasets</span><span class="w"> </span><span class="kn">import</span> <span class="n">french</span>
 <span class="n">data</span> <span class="o">=</span> <span class="n">french</span><span class="o">.</span><span class="n">load</span><span class="p">()</span>
-<span class="n">factors</span> <span class="o">=</span> <span class="n">data</span><span class="p">[[</span><span class="s1">&#39;MktRF&#39;</span><span class="p">,</span> <span class="s1">&#39;SMB&#39;</span><span class="p">,</span> <span class="s1">&#39;HML&#39;</span><span class="p">]]</span>
-<span class="n">portfolios</span> <span class="o">=</span> <span class="n">data</span><span class="p">[[</span><span class="s1">&#39;S1V1&#39;</span><span class="p">,</span><span class="s1">&#39;S1V3&#39;</span><span class="p">,</span><span class="s1">&#39;S1V5&#39;</span><span class="p">,</span><span class="s1">&#39;S5V1&#39;</span><span class="p">,</span><span class="s1">&#39;S5V3&#39;</span><span class="p">,</span><span class="s1">&#39;S5V5&#39;</span><span class="p">]]</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
-<span class="n">portfolios</span><span class="o">.</span><span class="n">loc</span><span class="p">[:,:]</span> <span class="o">=</span> <span class="n">portfolios</span><span class="o">.</span><span class="n">values</span> <span class="o">-</span> <span class="n">data</span><span class="p">[[</span><span class="s1">&#39;RF&#39;</span><span class="p">]]</span><span class="o">.</span><span class="n">values</span>
+<span class="n">factors</span> <span class="o">=</span> <span class="n">data</span><span class="p">[[</span><span class="s1">'MktRF'</span><span class="p">,</span> <span class="s1">'SMB'</span><span class="p">,</span> <span class="s1">'HML'</span><span class="p">]]</span>
+<span class="n">portfolios</span> <span class="o">=</span> <span class="n">data</span><span class="p">[[</span><span class="s1">'S1V1'</span><span class="p">,</span><span class="s1">'S1V3'</span><span class="p">,</span><span class="s1">'S1V5'</span><span class="p">,</span><span class="s1">'S5V1'</span><span class="p">,</span><span class="s1">'S5V3'</span><span class="p">,</span><span class="s1">'S5V5'</span><span class="p">]]</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
+<span class="n">portfolios</span><span class="o">.</span><span class="n">loc</span><span class="p">[:,:]</span> <span class="o">=</span> <span class="n">portfolios</span><span class="o">.</span><span class="n">values</span> <span class="o">-</span> <span class="n">data</span><span class="p">[[</span><span class="s1">'RF'</span><span class="p">]]</span><span class="o">.</span><span class="n">values</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">linearmodels.asset_pricing</span><span class="w"> </span><span class="kn">import</span> <span class="n">LinearFactorModel</span>
 <span class="n">mod</span> <span class="o">=</span> <span class="n">LinearFactorModel</span><span class="p">(</span><span class="n">portfolios</span><span class="p">,</span> <span class="n">factors</span><span class="p">)</span>
-<span class="n">res</span> <span class="o">=</span> <span class="n">mod</span><span class="o">.</span><span class="n">fit</span><span class="p">(</span><span class="n">cov_type</span><span class="o">=</span><span class="s1">&#39;kernel&#39;</span><span class="p">)</span>
+<span class="n">res</span> <span class="o">=</span> <span class="n">mod</span><span class="o">.</span><span class="n">fit</span><span class="p">(</span><span class="n">cov_type</span><span class="o">=</span><span class="s1">'kernel'</span><span class="p">)</span>
 <span class="nb">print</span><span class="p">(</span><span class="n">res</span><span class="p">)</span>
 </code></pre></div>
 </div>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><code>                      <span class="n">LinearFactorModel</span> <span class="n">Estimation</span> <span class="n">Summary</span>
 <span class="o">================================================================================</span>
 <span class="n">No</span><span class="o">.</span> <span class="n">Test</span> <span class="n">Portfolios</span><span class="p">:</span>                  <span class="mi">6</span>   <span class="n">R</span><span class="o">-</span><span class="n">squared</span><span class="p">:</span>                      <span class="mf">0.8879</span>
-<span class="n">No</span><span class="o">.</span> <span class="n">Factors</span><span class="p">:</span>                          <span class="mi">3</span>   <span class="n">J</span><span class="o">-</span><span class="n">statistic</span><span class="p">:</span>                    <span class="mf">39.109</span>
+<span class="n">No</span><span class="o">.</span> <span class="n">Factors</span><span class="p">:</span>                          <span class="mi">3</span>   <span class="n">J</span><span class="o">-</span><span class="n">statistic</span><span class="p">:</span>                    <span class="mf">30.291</span>
 <span class="n">No</span><span class="o">.</span> <span class="n">Observations</span><span class="p">:</span>                   <span class="mi">819</span>   <span class="n">P</span><span class="o">-</span><span class="n">value</span>                         <span class="mf">0.0000</span>
 <span class="n">Date</span><span class="p">:</span>                  <span class="n">Sun</span><span class="p">,</span> <span class="n">May</span> <span class="mi">21</span> <span class="mi">2017</span>   <span class="n">Distribution</span><span class="p">:</span>                  <span class="n">chi2</span><span class="p">(</span><span class="mi">3</span><span class="p">)</span>
 <span class="n">Time</span><span class="p">:</span>                          <span class="mi">21</span><span class="p">:</span><span class="mi">18</span><span class="p">:</span><span class="mi">56</span>
@@ -729,6 +818,11 @@ prior to estimation.</p>
 <span class="n">See</span> <span class="n">full_summary</span> <span class="k">for</span> <span class="n">complete</span> <span class="n">results</span>
 </code></pre></div>
 </div>
+<h2 id="aligning-inputs">Aligning Inputs<a class="headerlink" href="#aligning-inputs" title="Link to this heading">¶</a></h2>
+<p>The rows of <code class="docutils literal notranslate"><span class="pre">portfolios</span></code> and <code class="docutils literal notranslate"><span class="pre">factors</span></code> are paired by position. A <code class="docutils literal notranslate"><span class="pre">factors</span></code>
+input that carries labels, such as a pandas <code class="docutils literal notranslate"><span class="pre">DataFrame</span></code> with a date index,
+must use the same labels, in the same order, as <code class="docutils literal notranslate"><span class="pre">portfolios</span></code>. See
+<a class="reference internal" href="../input-alignment.html#input-alignment"><span class="std std-ref">Aligning Inputs</span></a>.</p>
 
 
 
@@ -763,13 +857,13 @@ prior to estimation.</p>
       <div class="md-copyright">
   
     <div class="md-footer-copyright__highlight">
-        &#169; Copyright 2021, Kevin Sheppard.
+        &#169; Copyright 2017-2026, Kevin Sheppard.
         
     </div>
   
     Created using
     <a href="https://www.sphinx-doc.org/" target="_blank" rel="noopener">Sphinx</a>
-    8.1.3.
+    9.1.0.
      and
     <a href="https://github.com/jbms/sphinx-immaterial/" target="_blank" rel="noopener">Sphinx-Immaterial</a>
   

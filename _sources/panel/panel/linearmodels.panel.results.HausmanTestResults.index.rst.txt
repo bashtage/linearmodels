@@ -1,0 +1,8 @@
+:orphan:
+
+linearmodels.panel.results.HausmanTestResults.index
+===================================================
+
+.. currentmodule:: linearmodels.panel.results
+
+.. automethod:: HausmanTestResults.index

@@ -1,0 +1,8 @@
+:orphan:
+
+linearmodels.iv.model.IVJIVE.wresids
+====================================
+
+.. currentmodule:: linearmodels.iv.model
+
+.. automethod:: IVJIVE.wresids

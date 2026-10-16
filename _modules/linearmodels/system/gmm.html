@@ -19,7 +19,7 @@
     
   
       
-        <title>linearmodels.system.gmm - linearmodels 7.0</title>
+        <title>linearmodels.system.gmm - linearmodels 7.1</title>
       
     
 
@@ -50,7 +50,7 @@
         <style>:root{--md-text-font:"Roboto";--md-code-font:"Roboto Mono"}</style>
       
     
-        <link rel="stylesheet" type="text/css" href="../../../_static/sphinx_immaterial_theme.acf80fe7f4d9ef9e2.min.css?v=9e56d0d2" />
+        <link rel="stylesheet" type="text/css" href="../../../_static/sphinx_immaterial_theme.6efbe22605a23fcd6.min.css?v=b2ceb110" />
         <link rel="stylesheet" type="text/css" href="../../../_static/css/small_fixes.css?v=34934119" />
     <script>__md_scope=new URL("../../..",location),__md_hash=e=>[...e].reduce(((e,_)=>(e<<5)-e+_.charCodeAt(0)),0),__md_get=(e,_=localStorage,t=__md_scope)=>JSON.parse(_.getItem(t.pathname+"."+e)),__md_set=(e,_,t=localStorage,a=__md_scope)=>{try{t.setItem(a.pathname+"."+e,JSON.stringify(_))}catch(e){}}</script>
     
@@ -91,7 +91,7 @@
 
 <header class="md-header md-header--shadow" data-md-component="header">
   <nav class="md-header__inner md-grid" aria-label="Header">
-    <a href="../../../index.html" title="linearmodels 7.0" class="md-header__button md-logo" aria-label="linearmodels 7.0" data-md-component="logo">
+    <a href="../../../index.html" title="linearmodels 7.1" class="md-header__button md-logo" aria-label="linearmodels 7.1" data-md-component="logo">
       <img src="../../../_static/bw-logo.svg" alt="logo">
     </a>
     <label class="md-header__button md-icon" for="__drawer">
@@ -102,7 +102,7 @@
       <div class="md-header__ellipsis">
         <div class="md-header__topic">
           <span class="md-ellipsis">
-            linearmodels 7.0
+            linearmodels 7.1
           </span>
         </div>
         <div class="md-header__topic" data-md-component="header-topic">
@@ -197,10 +197,10 @@
 
 <nav class="md-nav md-nav--primary" aria-label="Navigation" data-md-level="0">
   <label class="md-nav__title" for="__drawer">
-    <a href="../../../index.html" title="linearmodels 7.0" class="md-nav__button md-logo" aria-label="linearmodels 7.0" data-md-component="logo">
+    <a href="../../../index.html" title="linearmodels 7.1" class="md-nav__button md-logo" aria-label="linearmodels 7.1" data-md-component="logo">
       <img src="../../../_static/bw-logo.svg" alt="logo">
     </a>
-    linearmodels 7.0
+    linearmodels 7.1
   </label>
   
     <div class="md-nav__source">
@@ -300,6 +300,29 @@
   
   <span class="md-ellipsis">
     <span title="/system/index.rst (reference label)"><span>System Regression Models</span></span>
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../input-alignment.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    <span title="/input-alignment.rst (reference label)"><span>Aligning Inputs</span></span>
     
   </span>
   
@@ -504,19 +527,20 @@
 
 
 <h1>Source code for linearmodels.system.gmm</h1><div class="highlight"><pre>
-<span></span><code><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">Covariance and weight estimation for GMM IV estimators</span>
-<span class="sd">&quot;&quot;&quot;</span>
+<span></span><code><span class="sd">"""</span>
+<span class="sd">Covariance and weight estimation for GMM IV estimators.</span>
+<span class="sd">"""</span>
 
 <span class="kn">from</span><span class="w"> </span><span class="nn">__future__</span><span class="w"> </span><span class="kn">import</span> <span class="n">annotations</span>
 
 <span class="kn">from</span><span class="w"> </span><span class="nn">collections.abc</span><span class="w"> </span><span class="kn">import</span> <span class="n">Sequence</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">typing</span><span class="w"> </span><span class="kn">import</span> <span class="n">cast</span>
 
-<span class="kn">from</span><span class="w"> </span><span class="nn">numpy</span><span class="w"> </span><span class="kn">import</span> <span class="n">array</span><span class="p">,</span> <span class="n">empty</span><span class="p">,</span> <span class="n">ndarray</span><span class="p">,</span> <span class="n">repeat</span><span class="p">,</span> <span class="n">sqrt</span><span class="p">,</span> <span class="n">zeros_like</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">numpy</span><span class="w"> </span><span class="kn">import</span> <span class="n">array</span><span class="p">,</span> <span class="n">empty</span><span class="p">,</span> <span class="n">errstate</span><span class="p">,</span> <span class="n">ndarray</span><span class="p">,</span> <span class="n">repeat</span><span class="p">,</span> <span class="n">sqrt</span><span class="p">,</span> <span class="n">zeros_like</span>
 
 <span class="kn">from</span><span class="w"> </span><span class="nn">linearmodels.asset_pricing.covariance</span><span class="w"> </span><span class="kn">import</span> <span class="n">_HACMixin</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">linearmodels.iv.covariance</span><span class="w"> </span><span class="kn">import</span> <span class="n">kernel_optimal_bandwidth</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">linearmodels.iv.gmm</span><span class="w"> </span><span class="kn">import</span> <span class="n">_warn_default_bandwidth</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">linearmodels.shared.utility</span><span class="w"> </span><span class="kn">import</span> <span class="n">AttrDict</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">linearmodels.system._utility</span><span class="w"> </span><span class="kn">import</span> <span class="n">blocked_inner_prod</span>
 <span class="kn">import</span><span class="w"> </span><span class="nn">linearmodels.typing.data</span>
@@ -525,16 +549,17 @@
 <div class="viewcode-block" id="HomoskedasticWeightMatrix">
 <a class="viewcode-back" href="../../../system/system/linearmodels.system.gmm.HomoskedasticWeightMatrix.html#linearmodels.system.gmm.HomoskedasticWeightMatrix">[docs]</a>
 <span class="k">class</span><span class="w"> </span><span class="nc">HomoskedasticWeightMatrix</span><span class="p">:</span>
-<span class="w">    </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">    Homoskedastic (unadjusted) weight estimation</span>
+<span class="w">    </span><span class="sa">r</span><span class="sd">"""</span>
+<span class="sd">    Homoskedastic (unadjusted) weight estimation.</span>
 
 <span class="sd">    Parameters</span>
 <span class="sd">    ----------</span>
-<span class="sd">    center : bool</span>
+<span class="sd">    center : bool, optional</span>
 <span class="sd">        Flag indicating whether to center the moment conditions by subtracting</span>
-<span class="sd">        the mean before computing the weight matrix.</span>
-<span class="sd">    debiased : bool</span>
-<span class="sd">        Flag indicating whether to use small-sample adjustments</span>
+<span class="sd">        the mean before computing the weight matrix. The default is False.</span>
+<span class="sd">    debiased : bool, optional</span>
+<span class="sd">        Flag indicating whether to use small-sample adjustments. The default is</span>
+<span class="sd">        False.</span>
 
 <span class="sd">    Notes</span>
 <span class="sd">    -----</span>
@@ -542,33 +567,33 @@
 
 <span class="sd">    .. math::</span>
 
-<span class="sd">      Z&#39;(\Sigma \otimes I_N)Z</span>
+<span class="sd">      Z'(\Sigma \otimes I_N)Z</span>
 
 <span class="sd">    where :math:`Z` is a block diagonal matrix containing both the exogenous</span>
 <span class="sd">    regressors and instruments and :math:`\Sigma` is the covariance of the</span>
 <span class="sd">    model residuals.</span>
 
 <span class="sd">    ``center`` has no effect on this estimator since it is always centered.</span>
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="sd">    """</span>
 
     <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">center</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span> <span class="n">debiased</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_center</span> <span class="o">=</span> <span class="n">center</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_debiased</span> <span class="o">=</span> <span class="n">debiased</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_bandwidth</span><span class="p">:</span> <span class="nb">float</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="mi">0</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">_name</span> <span class="o">=</span> <span class="s2">&quot;Homoskedastic (Unadjusted) Weighting&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_name</span> <span class="o">=</span> <span class="s2">"Homoskedastic (Unadjusted) Weighting"</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_config</span> <span class="o">=</span> <span class="n">AttrDict</span><span class="p">(</span><span class="n">center</span><span class="o">=</span><span class="n">center</span><span class="p">,</span> <span class="n">debiased</span><span class="o">=</span><span class="n">debiased</span><span class="p">)</span>
 
     <span class="k">def</span><span class="w"> </span><span class="fm">__str__</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
         <span class="n">out</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_name</span>
         <span class="n">extra</span> <span class="o">=</span> <span class="p">[</span>
-            <span class="s2">&quot;: &quot;</span><span class="o">.</span><span class="n">join</span><span class="p">([</span><span class="nb">str</span><span class="p">(</span><span class="n">key</span><span class="p">),</span> <span class="nb">str</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_str_extra</span><span class="p">[</span><span class="n">key</span><span class="p">])])</span> <span class="k">for</span> <span class="n">key</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_str_extra</span>
+            <span class="s2">": "</span><span class="o">.</span><span class="n">join</span><span class="p">([</span><span class="nb">str</span><span class="p">(</span><span class="n">key</span><span class="p">),</span> <span class="nb">str</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_str_extra</span><span class="p">[</span><span class="n">key</span><span class="p">])])</span> <span class="k">for</span> <span class="n">key</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_str_extra</span>
         <span class="p">]</span>
         <span class="k">if</span> <span class="n">extra</span><span class="p">:</span>
-            <span class="n">out</span> <span class="o">+=</span> <span class="s2">&quot; (&quot;</span> <span class="o">+</span> <span class="s2">&quot;, &quot;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">extra</span><span class="p">)</span> <span class="o">+</span> <span class="s2">&quot;)&quot;</span>
+            <span class="n">out</span> <span class="o">+=</span> <span class="s2">" ("</span> <span class="o">+</span> <span class="s2">", "</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">extra</span><span class="p">)</span> <span class="o">+</span> <span class="s2">")"</span>
         <span class="k">return</span> <span class="n">out</span>
 
     <span class="k">def</span><span class="w"> </span><span class="fm">__repr__</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
-        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="fm">__str__</span><span class="p">()</span> <span class="o">+</span> <span class="sa">f</span><span class="s2">&quot;, id: </span><span class="si">{</span><span class="nb">hex</span><span class="p">(</span><span class="nb">id</span><span class="p">(</span><span class="bp">self</span><span class="p">))</span><span class="si">}</span><span class="s2">&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="fm">__str__</span><span class="p">()</span> <span class="o">+</span> <span class="sa">f</span><span class="s2">", id: </span><span class="si">{</span><span class="nb">hex</span><span class="p">(</span><span class="nb">id</span><span class="p">(</span><span class="bp">self</span><span class="p">))</span><span class="si">}</span><span class="s2">"</span>
 
     <span class="nd">@property</span>
     <span class="k">def</span><span class="w"> </span><span class="nf">_str_extra</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">AttrDict</span><span class="p">:</span>
@@ -581,27 +606,28 @@
         <span class="n">eps</span><span class="p">:</span> <span class="n">linearmodels</span><span class="o">.</span><span class="n">typing</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">Float64Array</span><span class="p">,</span>
         <span class="n">x</span><span class="p">:</span> <span class="n">Sequence</span><span class="p">[</span><span class="n">linearmodels</span><span class="o">.</span><span class="n">typing</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">Float64Array</span><span class="p">],</span>
     <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">linearmodels</span><span class="o">.</span><span class="n">typing</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">Float64Array</span><span class="p">:</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">"""</span>
 <span class="sd">        Estimate residual covariance.</span>
 
 <span class="sd">        Parameters</span>
 <span class="sd">        ----------</span>
 <span class="sd">        eps : ndarray</span>
-<span class="sd">            The residuals from the system of equations.</span>
-<span class="sd">        x : list[ndarray]</span>
-<span class="sd">            A list of the regressor matrices for each equation in the system.</span>
+<span class="sd">            The residuals from the system of equations, with shape (nobs, neq).</span>
+<span class="sd">        x : sequence of ndarray</span>
+<span class="sd">            The regressors of each equation in the system, with shape</span>
+<span class="sd">            (nobs, k_i) for equation i.</span>
 
 <span class="sd">        Returns</span>
 <span class="sd">        -------</span>
 <span class="sd">        ndarray</span>
 <span class="sd">            The estimated covariance matrix of the residuals.</span>
-<span class="sd">        &quot;&quot;&quot;</span>
+<span class="sd">        """</span>
         <span class="n">nobs</span> <span class="o">=</span> <span class="n">eps</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
         <span class="n">eps</span> <span class="o">=</span> <span class="n">eps</span> <span class="o">-</span> <span class="n">eps</span><span class="o">.</span><span class="n">mean</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>
         <span class="n">sigma</span> <span class="o">=</span> <span class="n">eps</span><span class="o">.</span><span class="n">T</span> <span class="o">@</span> <span class="n">eps</span> <span class="o">/</span> <span class="n">nobs</span>
-        <span class="n">scale</span> <span class="o">=</span> <span class="mf">1.0</span>
+        <span class="n">scale</span><span class="p">:</span> <span class="nb">float</span> <span class="o">|</span> <span class="n">ndarray</span> <span class="o">=</span> <span class="mf">1.0</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_debiased</span><span class="p">:</span>
-            <span class="n">k</span> <span class="o">=</span> <span class="n">array</span><span class="p">([</span><span class="n">a</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="k">for</span> <span class="n">a</span> <span class="ow">in</span> <span class="n">x</span><span class="p">])[:,</span> <span class="kc">None</span><span class="p">]</span>
+            <span class="n">k</span><span class="p">:</span> <span class="n">ndarray</span> <span class="o">=</span> <span class="n">array</span><span class="p">([</span><span class="n">a</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="k">for</span> <span class="n">a</span> <span class="ow">in</span> <span class="n">x</span><span class="p">])[:,</span> <span class="kc">None</span><span class="p">]</span>
             <span class="n">k</span> <span class="o">=</span> <span class="n">sqrt</span><span class="p">(</span><span class="n">k</span><span class="p">)</span>
             <span class="n">scale</span> <span class="o">=</span> <span class="n">nobs</span> <span class="o">/</span> <span class="p">(</span><span class="n">nobs</span> <span class="o">-</span> <span class="n">k</span> <span class="o">@</span> <span class="n">k</span><span class="o">.</span><span class="n">T</span><span class="p">)</span>
         <span class="n">sigma</span> <span class="o">*=</span> <span class="n">scale</span>
@@ -619,40 +645,44 @@
         <span class="o">*</span><span class="p">,</span>
         <span class="n">sigma</span><span class="p">:</span> <span class="n">ndarray</span><span class="p">,</span>
     <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">linearmodels</span><span class="o">.</span><span class="n">typing</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">Float64Array</span><span class="p">:</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">"""</span>
 <span class="sd">        Construct a GMM weight matrix for a model.</span>
 
 <span class="sd">        Parameters</span>
 <span class="sd">        ----------</span>
-<span class="sd">        x : list[ndarray]</span>
-<span class="sd">            List of containing model regressors for each equation in the system</span>
-<span class="sd">        z : list[ndarray]</span>
-<span class="sd">            List of containing instruments for each equation in the system</span>
+<span class="sd">        x : sequence of ndarray</span>
+<span class="sd">            The regressors of each equation in the system, with shape</span>
+<span class="sd">            (nobs, k_i) for equation i.</span>
+<span class="sd">        z : sequence of ndarray</span>
+<span class="sd">            The instruments of each equation in the system, with shape</span>
+<span class="sd">            (nobs, nz_i) for equation i.</span>
 <span class="sd">        eps : ndarray</span>
-<span class="sd">            Model errors (nobs by neqn)</span>
+<span class="sd">            Model errors, with shape (nobs, neqn). They are not used by this</span>
+<span class="sd">            estimator, which uses ``sigma``.</span>
 <span class="sd">        sigma : ndarray</span>
-<span class="sd">            Fixed covariance of model errors. If None, estimated from eps.</span>
+<span class="sd">            Covariance of the model errors, with shape (neqn, neqn).</span>
 
 <span class="sd">        Returns</span>
 <span class="sd">        -------</span>
 <span class="sd">        ndarray</span>
-<span class="sd">            Covariance of GMM moment conditions.</span>
-<span class="sd">        &quot;&quot;&quot;</span>
+<span class="sd">            Weight matrix, which is the covariance of the GMM moment conditions</span>
+<span class="sd">            with shape (nmoments, nmoments).</span>
+<span class="sd">        """</span>
         <span class="n">nobs</span> <span class="o">=</span> <span class="n">z</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
-        <span class="n">w</span> <span class="o">=</span> <span class="n">cast</span><span class="p">(</span><span class="s2">&quot;ndarray&quot;</span><span class="p">,</span> <span class="n">blocked_inner_prod</span><span class="p">(</span><span class="n">z</span><span class="p">,</span> <span class="n">sigma</span><span class="p">)</span> <span class="o">/</span> <span class="n">nobs</span><span class="p">)</span>
+        <span class="n">w</span> <span class="o">=</span> <span class="n">cast</span><span class="p">(</span><span class="s2">"ndarray"</span><span class="p">,</span> <span class="n">blocked_inner_prod</span><span class="p">(</span><span class="n">z</span><span class="p">,</span> <span class="n">sigma</span><span class="p">)</span> <span class="o">/</span> <span class="n">nobs</span><span class="p">)</span>
         <span class="k">return</span> <span class="n">w</span></div>
 
 
     <span class="nd">@property</span>
     <span class="k">def</span><span class="w"> </span><span class="nf">config</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">AttrDict</span><span class="p">:</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">        Weight estimator configuration</span>
+<span class="w">        </span><span class="sd">"""</span>
+<span class="sd">        Weight estimator configuration.</span>
 
 <span class="sd">        Returns</span>
 <span class="sd">        -------</span>
 <span class="sd">        AttrDict</span>
-<span class="sd">            Dictionary containing weight estimator configuration information</span>
-<span class="sd">        &quot;&quot;&quot;</span>
+<span class="sd">            Dictionary containing weight estimator configuration information.</span>
+<span class="sd">        """</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_config</span></div>
 
 
@@ -660,16 +690,17 @@
 <div class="viewcode-block" id="HeteroskedasticWeightMatrix">
 <a class="viewcode-back" href="../../../system/system/linearmodels.system.gmm.HeteroskedasticWeightMatrix.html#linearmodels.system.gmm.HeteroskedasticWeightMatrix">[docs]</a>
 <span class="k">class</span><span class="w"> </span><span class="nc">HeteroskedasticWeightMatrix</span><span class="p">(</span><span class="n">HomoskedasticWeightMatrix</span><span class="p">):</span>
-<span class="w">    </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">    Heteroskedasticity robust weight estimation</span>
+<span class="w">    </span><span class="sa">r</span><span class="sd">"""</span>
+<span class="sd">    Heteroskedasticity robust weight estimation.</span>
 
 <span class="sd">    Parameters</span>
 <span class="sd">    ----------</span>
-<span class="sd">    center : bool</span>
+<span class="sd">    center : bool, optional</span>
 <span class="sd">        Flag indicating whether to center the moment conditions by subtracting</span>
-<span class="sd">        the mean before computing the weight matrix.</span>
-<span class="sd">    debiased : bool</span>
-<span class="sd">        Flag indicating whether to use small-sample adjustments</span>
+<span class="sd">        the mean before computing the weight matrix. The default is False.</span>
+<span class="sd">    debiased : bool, optional</span>
+<span class="sd">        Flag indicating whether to use small-sample adjustments. The default is</span>
+<span class="sd">        False.</span>
 
 <span class="sd">    Notes</span>
 <span class="sd">    -----</span>
@@ -677,7 +708,7 @@
 
 <span class="sd">    .. math::</span>
 
-<span class="sd">      W   &amp; = n^{-1}\sum_{i=1}^{n}g&#39;_ig_i \\</span>
+<span class="sd">      W   &amp; = n^{-1}\sum_{i=1}^{n}g'_ig_i \\</span>
 <span class="sd">      g_i &amp; = (z_{1i}\epsilon_{1i},z_{2i}\epsilon_{2i},\ldots,z_{ki}\epsilon_{ki})</span>
 
 <span class="sd">    where :math:`g_i` is the vector of scores across all equations for</span>
@@ -685,11 +716,11 @@
 <span class="sd">    j and :math:`\epsilon_{ji}` is the error for equation j for observation</span>
 <span class="sd">    i.  This form allows for heteroskedasticity and arbitrary cross-sectional</span>
 <span class="sd">    dependence between the moment conditions.</span>
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="sd">    """</span>
 
     <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">center</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span> <span class="n">debiased</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
         <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">center</span><span class="p">,</span> <span class="n">debiased</span><span class="p">)</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">_name</span> <span class="o">=</span> <span class="s2">&quot;Heteroskedastic (Robust) Weighting&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_name</span> <span class="o">=</span> <span class="s2">"Heteroskedastic (Robust) Weighting"</span>
 
 <div class="viewcode-block" id="HeteroskedasticWeightMatrix.weight_matrix">
 <a class="viewcode-back" href="../../../system/system/linearmodels.system.gmm.HeteroskedasticWeightMatrix.weight_matrix.html#linearmodels.system.gmm.HeteroskedasticWeightMatrix.weight_matrix">[docs]</a>
@@ -701,25 +732,29 @@
         <span class="o">*</span><span class="p">,</span>
         <span class="n">sigma</span><span class="p">:</span> <span class="n">ndarray</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
     <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">linearmodels</span><span class="o">.</span><span class="n">typing</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">Float64Array</span><span class="p">:</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">"""</span>
 <span class="sd">        Construct a GMM weight matrix for a model.</span>
 
 <span class="sd">        Parameters</span>
 <span class="sd">        ----------</span>
-<span class="sd">        x : list[ndarray]</span>
-<span class="sd">            Model regressors (exog and endog), (nobs by nvar)</span>
-<span class="sd">        z : list[ndarray]</span>
-<span class="sd">            Model instruments (exog and instruments), (nobs by ninstr)</span>
+<span class="sd">        x : sequence of ndarray</span>
+<span class="sd">            The regressors (exog and endog) of each equation in the system, with</span>
+<span class="sd">            shape (nobs, k_i) for equation i.</span>
+<span class="sd">        z : sequence of ndarray</span>
+<span class="sd">            The instruments (exog and instruments) of each equation in the</span>
+<span class="sd">            system, with shape (nobs, nz_i) for equation i.</span>
 <span class="sd">        eps : ndarray</span>
-<span class="sd">            Model errors (nobs by 1)</span>
-<span class="sd">        sigma : ndarray</span>
-<span class="sd">            Fixed covariance of model errors. If None, estimated from eps.</span>
+<span class="sd">            Model errors, with shape (nobs, neqn).</span>
+<span class="sd">        sigma : ndarray, optional</span>
+<span class="sd">            Not used by this estimator. It is accepted so that all the weight</span>
+<span class="sd">            matrix estimators have the same signature.</span>
 
 <span class="sd">        Returns</span>
 <span class="sd">        -------</span>
 <span class="sd">        ndarray</span>
-<span class="sd">            Covariance of GMM moment conditions.</span>
-<span class="sd">        &quot;&quot;&quot;</span>
+<span class="sd">            Weight matrix, which is the covariance of the GMM moment conditions</span>
+<span class="sd">            with shape (nmoments, nmoments).</span>
+<span class="sd">        """</span>
         <span class="n">nobs</span> <span class="o">=</span> <span class="n">x</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
         <span class="n">k</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">x</span><span class="p">)</span>
         <span class="n">k_total</span> <span class="o">=</span> <span class="nb">sum</span><span class="p">(</span><span class="n">a</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="k">for</span> <span class="n">a</span> <span class="ow">in</span> <span class="n">z</span><span class="p">)</span>
@@ -745,12 +780,12 @@
         <span class="n">x</span><span class="p">:</span> <span class="n">Sequence</span><span class="p">[</span><span class="n">linearmodels</span><span class="o">.</span><span class="n">typing</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">Float64Array</span><span class="p">],</span>
         <span class="n">z</span><span class="p">:</span> <span class="n">Sequence</span><span class="p">[</span><span class="n">linearmodels</span><span class="o">.</span><span class="n">typing</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">Float64Array</span><span class="p">],</span>
     <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">linearmodels</span><span class="o">.</span><span class="n">typing</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">Float64Array</span><span class="p">:</span>
-        <span class="n">nvar</span> <span class="o">=</span> <span class="n">array</span><span class="p">([</span><span class="n">a</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="k">for</span> <span class="n">a</span> <span class="ow">in</span> <span class="n">x</span><span class="p">])</span>
+        <span class="n">nvar</span><span class="p">:</span> <span class="n">ndarray</span> <span class="o">=</span> <span class="n">array</span><span class="p">([</span><span class="n">a</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="k">for</span> <span class="n">a</span> <span class="ow">in</span> <span class="n">x</span><span class="p">])</span>
         <span class="n">ninstr</span> <span class="o">=</span> <span class="n">array</span><span class="p">([</span><span class="n">a</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="k">for</span> <span class="n">a</span> <span class="ow">in</span> <span class="n">z</span><span class="p">])</span>
         <span class="n">nvar</span> <span class="o">=</span> <span class="n">repeat</span><span class="p">(</span><span class="n">nvar</span><span class="p">,</span> <span class="n">ninstr</span><span class="p">)</span>
         <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">_debiased</span><span class="p">:</span>
             <span class="n">nvar</span> <span class="o">=</span> <span class="n">zeros_like</span><span class="p">(</span><span class="n">nvar</span><span class="p">)</span>
-        <span class="n">nvar</span> <span class="o">=</span> <span class="n">cast</span><span class="p">(</span><span class="s2">&quot;linearmodels.typing.data.Float64Array&quot;</span><span class="p">,</span> <span class="n">sqrt</span><span class="p">(</span><span class="n">nvar</span><span class="p">))[:,</span> <span class="kc">None</span><span class="p">]</span>
+        <span class="n">nvar</span> <span class="o">=</span> <span class="n">cast</span><span class="p">(</span><span class="s2">"linearmodels.typing.data.Float64Array"</span><span class="p">,</span> <span class="n">sqrt</span><span class="p">(</span><span class="n">nvar</span><span class="p">))[:,</span> <span class="kc">None</span><span class="p">]</span>
         <span class="n">scale</span> <span class="o">=</span> <span class="n">nobs</span> <span class="o">/</span> <span class="p">(</span><span class="n">nobs</span> <span class="o">-</span> <span class="n">nvar</span> <span class="o">@</span> <span class="n">nvar</span><span class="o">.</span><span class="n">T</span><span class="p">)</span>
         <span class="k">return</span> <span class="n">scale</span></div>
 
@@ -759,30 +794,37 @@
 <div class="viewcode-block" id="KernelWeightMatrix">
 <a class="viewcode-back" href="../../../system/system/linearmodels.system.gmm.KernelWeightMatrix.html#linearmodels.system.gmm.KernelWeightMatrix">[docs]</a>
 <span class="k">class</span><span class="w"> </span><span class="nc">KernelWeightMatrix</span><span class="p">(</span><span class="n">HeteroskedasticWeightMatrix</span><span class="p">,</span> <span class="n">_HACMixin</span><span class="p">):</span>
-<span class="w">    </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">    Heteroskedasticity robust weight estimation</span>
+<span class="w">    </span><span class="sa">r</span><span class="sd">"""</span>
+<span class="sd">    Heteroskedasticity and autocorrelation robust (HAC) weight estimation.</span>
 
 <span class="sd">    Parameters</span>
 <span class="sd">    ----------</span>
-<span class="sd">    center : bool</span>
+<span class="sd">    center : bool, optional</span>
 <span class="sd">        Flag indicating whether to center the moment conditions by subtracting</span>
-<span class="sd">        the mean before computing the weight matrix.</span>
-<span class="sd">    debiased : bool</span>
-<span class="sd">        Flag indicating whether to use small-sample adjustments</span>
-<span class="sd">    kernel : str</span>
-<span class="sd">        Name of kernel to use.  Supported kernels include:</span>
+<span class="sd">        the mean before computing the weight matrix. The default is False.</span>
+<span class="sd">    debiased : bool, optional</span>
+<span class="sd">        Flag indicating whether to use small-sample adjustments. The default is</span>
+<span class="sd">        False.</span>
+<span class="sd">    kernel : str, optional</span>
+<span class="sd">        Name of the kernel. The default is "bartlett". The names are not case</span>
+<span class="sd">        sensitive. Supported kernels are:</span>
 
-<span class="sd">        * &quot;bartlett&quot;, &quot;newey-west&quot; : Bartlett&#39;s kernel</span>
-<span class="sd">        * &quot;parzen&quot;, &quot;gallant&quot; : Parzen&#39;s kernel</span>
-<span class="sd">        * &quot;qs&quot;, &quot;quadratic-spectral&quot;, &quot;andrews&quot; : Quadratic spectral kernel</span>
+<span class="sd">        * "bartlett", "newey-west" - Bartlett's kernel</span>
+<span class="sd">        * "parzen", "gallant" - Parzen's kernel</span>
+<span class="sd">        * "qs", "quadratic-spectral", "andrews" - Quadratic spectral kernel</span>
 
-<span class="sd">    bandwidth : float</span>
-<span class="sd">        Bandwidth to use for the kernel.  If not provided the optimal</span>
-<span class="sd">        bandwidth will be estimated.</span>
-<span class="sd">    optimal_bw : bool</span>
-<span class="sd">        Flag indicating whether to estimate the optimal bandwidth, when</span>
-<span class="sd">        bandwidth is None.  If False, nobs - 2 is used</span>
-
+<span class="sd">    bandwidth : float, optional</span>
+<span class="sd">        Non-negative bandwidth to use for the kernel. If not provided, the</span>
+<span class="sd">        bandwidth is selected by ``optimal_bw``.</span>
+<span class="sd">    optimal_bw : bool, optional</span>
+<span class="sd">        Flag indicating whether to estimate the bandwidth from the data when</span>
+<span class="sd">        ``bandwidth`` is not provided. If False, nobs - 2 is used. If True, the</span>
+<span class="sd">        bandwidth is estimated using</span>
+<span class="sd">        :func:`~linearmodels.iv.covariance.kernel_optimal_bandwidth`, which</span>
+<span class="sd">        needs at least 4 observations with the Bartlett kernel, 5 with the</span>
+<span class="sd">        Parzen kernel and 6 with the quadratic spectral kernel. The default</span>
+<span class="sd">        also estimates the bandwidth, but it issues a</span>
+<span class="sd">        ``DefaultBandwidthWarning`` since it changed in 7.1.</span>
 
 <span class="sd">    Notes</span>
 <span class="sd">    -----</span>
@@ -790,8 +832,8 @@
 
 <span class="sd">    .. math::</span>
 
-<span class="sd">      W &amp; = \hat{\Gamma}_0+\sum_{i=1}^{n-1} w_i (\hat{\Gamma}_i+\hat{\Gamma}_i^\prime)</span>
-<span class="sd">      \hat{\Gamma}_j &amp; = n^{-1}\sum_{i=1}^{n-j} g&#39;_ig_{i+j} \\</span>
+<span class="sd">      W &amp; = \hat{\Gamma}_0+\sum_{i=1}^{n-1} w_i (\hat{\Gamma}_i+\hat{\Gamma}_i^\prime) \\</span>
+<span class="sd">      \hat{\Gamma}_j &amp; = n^{-1}\sum_{i=1}^{n-j} g'_ig_{i+j} \\</span>
 <span class="sd">      g_i &amp; = (z_{1i}\epsilon_{1i},z_{2i}\epsilon_{2i},\ldots,z_{ki}\epsilon_{ki})</span>
 
 <span class="sd">    where :math:`g_i` is the vector of scores across all equations for</span>
@@ -800,23 +842,47 @@
 <span class="sd">    for equation j and :math:`\epsilon_{ji}` is the error for equation j for</span>
 <span class="sd">    observation i.  This form allows for heteroskedasticity and autocorrelation</span>
 <span class="sd">    between the moment conditions.</span>
-<span class="sd">    &quot;&quot;&quot;</span>
+
+<span class="sd">    If neither ``bandwidth`` nor ``optimal_bw`` is given, the bandwidth is</span>
+<span class="sd">    estimated from the data every time that the weight matrix is computed.</span>
+<span class="sd">    In 7.0 and earlier the default was ``nobs - 2``, which is not a consistent</span>
+<span class="sd">    estimator of the covariance of the moment conditions. Using the default</span>
+<span class="sd">    issues a ``DefaultBandwidthWarning`` (a ``UserWarning``), once for each</span>
+<span class="sd">    instance. The previous behavior is restored by ``optimal_bw=False`` or by</span>
+<span class="sd">    ``bandwidth=nobs - 2``. Passing ``bandwidth`` or ``optimal_bw`` silences the</span>
+<span class="sd">    warning, and ``optimal_bw=True`` selects the new default without it.</span>
+
+<span class="sd">    .. versionchanged:: 7.1</span>
+
+<span class="sd">       ``weight_matrix`` raises a ``ValueError`` if the bandwidth is estimated</span>
+<span class="sd">       from the data and there are fewer observations than the kernel needs</span>
+<span class="sd">       (see ``optimal_bw``), or if the estimated bandwidth is not finite. Pass</span>
+<span class="sd">       ``bandwidth`` or ``optimal_bw=False`` to use the weight matrix with</span>
+<span class="sd">       fewer observations. Earlier versions raised "cannot convert float</span>
+<span class="sd">       infinity to integer" (an ``OverflowError``) or "cannot convert float NaN</span>
+<span class="sd">       to integer" for some data when ``optimal_bw`` was True, and used a</span>
+<span class="sd">       bandwidth of nobs - 1, or another bandwidth, for other data.</span>
+<span class="sd">    """</span>
 
     <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span>
         <span class="n">center</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
         <span class="n">debiased</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
-        <span class="n">kernel</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;bartlett&quot;</span><span class="p">,</span>
+        <span class="n">kernel</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">"bartlett"</span><span class="p">,</span>
         <span class="n">bandwidth</span><span class="p">:</span> <span class="nb">float</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
-        <span class="n">optimal_bw</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
+        <span class="n">optimal_bw</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
     <span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
         <span class="n">_HACMixin</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">kernel</span><span class="p">,</span> <span class="n">bandwidth</span><span class="p">)</span>
         <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">center</span><span class="p">,</span> <span class="n">debiased</span><span class="p">)</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">_name</span> <span class="o">=</span> <span class="s2">&quot;Kernel (HAC) Weighting&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_name</span> <span class="o">=</span> <span class="s2">"Kernel (HAC) Weighting"</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_check_kernel</span><span class="p">(</span><span class="n">kernel</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_check_bandwidth</span><span class="p">(</span><span class="n">bandwidth</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_predefined_bw</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_bandwidth</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">_optimal_bw</span> <span class="o">=</span> <span class="n">optimal_bw</span>
+        <span class="c1"># Selecting the bandwidth from the data is the default since 7.1, and it</span>
+        <span class="c1"># warns since the default was nobs - 2</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_default_bandwidth</span> <span class="o">=</span> <span class="n">bandwidth</span> <span class="ow">is</span> <span class="kc">None</span> <span class="ow">and</span> <span class="n">optimal_bw</span> <span class="ow">is</span> <span class="kc">None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_optimal_bw</span> <span class="o">=</span> <span class="kc">True</span> <span class="k">if</span> <span class="n">optimal_bw</span> <span class="ow">is</span> <span class="kc">None</span> <span class="k">else</span> <span class="n">optimal_bw</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_warned</span> <span class="o">=</span> <span class="kc">False</span>
 
 <div class="viewcode-block" id="KernelWeightMatrix.weight_matrix">
 <a class="viewcode-back" href="../../../system/system/linearmodels.system.gmm.KernelWeightMatrix.weight_matrix.html#linearmodels.system.gmm.KernelWeightMatrix.weight_matrix">[docs]</a>
@@ -828,25 +894,29 @@
         <span class="o">*</span><span class="p">,</span>
         <span class="n">sigma</span><span class="p">:</span> <span class="n">ndarray</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
     <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">linearmodels</span><span class="o">.</span><span class="n">typing</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">Float64Array</span><span class="p">:</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">"""</span>
 <span class="sd">        Construct a GMM weight matrix for a model.</span>
 
 <span class="sd">        Parameters</span>
 <span class="sd">        ----------</span>
-<span class="sd">        x : list[ndarray]</span>
-<span class="sd">            Model regressors (exog and endog)</span>
-<span class="sd">        z : list[ndarray]</span>
-<span class="sd">            Model instruments (exog and instruments)</span>
+<span class="sd">        x : sequence of ndarray</span>
+<span class="sd">            The regressors (exog and endog) of each equation in the system, with</span>
+<span class="sd">            shape (nobs, k_i) for equation i.</span>
+<span class="sd">        z : sequence of ndarray</span>
+<span class="sd">            The instruments (exog and instruments) of each equation in the</span>
+<span class="sd">            system, with shape (nobs, nz_i) for equation i.</span>
 <span class="sd">        eps : ndarray</span>
-<span class="sd">            Model errors (nobs by nequation)</span>
-<span class="sd">        sigma : ndarray</span>
-<span class="sd">            Fixed covariance of model errors. If None, estimated from eps.</span>
+<span class="sd">            Model errors, with shape (nobs, neqn).</span>
+<span class="sd">        sigma : ndarray, optional</span>
+<span class="sd">            Not used by this estimator. It is accepted so that all the weight</span>
+<span class="sd">            matrix estimators have the same signature.</span>
 
 <span class="sd">        Returns</span>
 <span class="sd">        -------</span>
 <span class="sd">        ndarray</span>
-<span class="sd">            Covariance of GMM moment conditions.</span>
-<span class="sd">        &quot;&quot;&quot;</span>
+<span class="sd">            Weight matrix, which is the covariance of the GMM moment conditions</span>
+<span class="sd">            with shape (nmoments, nmoments).</span>
+<span class="sd">        """</span>
         <span class="n">nobs</span> <span class="o">=</span> <span class="n">x</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
         <span class="n">k</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">x</span><span class="p">)</span>
         <span class="n">k_total</span> <span class="o">=</span> <span class="nb">sum</span><span class="p">(</span><span class="n">a</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="k">for</span> <span class="n">a</span> <span class="ow">in</span> <span class="n">z</span><span class="p">)</span>
@@ -870,13 +940,22 @@
     <span class="k">def</span><span class="w"> </span><span class="nf">_optimal_bandwidth</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span> <span class="n">moments</span><span class="p">:</span> <span class="n">linearmodels</span><span class="o">.</span><span class="n">typing</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">Float64Array</span>
     <span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">float</span><span class="p">:</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;Compute optimal bandwidth used in estimation if needed&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">"""Compute optimal bandwidth used in estimation if needed."""</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_predefined_bw</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
             <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_predefined_bw</span>
         <span class="k">elif</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">_optimal_bw</span><span class="p">:</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">_bandwidth</span> <span class="o">=</span> <span class="n">moments</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">-</span> <span class="mi">2</span>
         <span class="k">else</span><span class="p">:</span>
-            <span class="n">m</span> <span class="o">=</span> <span class="n">moments</span> <span class="o">/</span> <span class="n">moments</span><span class="o">.</span><span class="n">std</span><span class="p">(</span><span class="mi">0</span><span class="p">)[</span><span class="kc">None</span><span class="p">,</span> <span class="p">:]</span>
+            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_default_bandwidth</span> <span class="ow">and</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">_warned</span><span class="p">:</span>
+                <span class="c1"># Once for each instance, and not for each call</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">_warned</span> <span class="o">=</span> <span class="kc">True</span>
+                <span class="n">_warn_default_bandwidth</span><span class="p">(</span>
+                    <span class="n">weights</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">covariance</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">stacklevel</span><span class="o">=</span><span class="mi">4</span><span class="p">,</span> <span class="n">model</span><span class="o">=</span><span class="s2">"IVSystemGMM"</span>
+                <span class="p">)</span>
+            <span class="c1"># A moment that does not vary has a standard deviation of 0, and the</span>
+            <span class="c1"># series is NaN. kernel_optimal_bandwidth raises, so do not warn</span>
+            <span class="k">with</span> <span class="n">errstate</span><span class="p">(</span><span class="n">divide</span><span class="o">=</span><span class="s2">"ignore"</span><span class="p">,</span> <span class="n">invalid</span><span class="o">=</span><span class="s2">"ignore"</span><span class="p">):</span>
+                <span class="n">m</span> <span class="o">=</span> <span class="n">moments</span> <span class="o">/</span> <span class="n">moments</span><span class="o">.</span><span class="n">std</span><span class="p">(</span><span class="mi">0</span><span class="p">)[</span><span class="kc">None</span><span class="p">,</span> <span class="p">:]</span>
             <span class="n">m</span> <span class="o">=</span> <span class="n">m</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">_bandwidth</span> <span class="o">=</span> <span class="n">kernel_optimal_bandwidth</span><span class="p">(</span><span class="n">m</span><span class="p">,</span> <span class="n">kernel</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">kernel</span><span class="p">)</span>
         <span class="k">assert</span> <span class="bp">self</span><span class="o">.</span><span class="n">_bandwidth</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span>
@@ -884,22 +963,25 @@
 
     <span class="nd">@property</span>
     <span class="k">def</span><span class="w"> </span><span class="nf">bandwidth</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">float</span><span class="p">:</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;Bandwidth used to estimate covariance of moment conditions&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">"""Bandwidth used to estimate covariance of moment conditions."""</span>
         <span class="k">assert</span> <span class="bp">self</span><span class="o">.</span><span class="n">_bandwidth</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_bandwidth</span>
 
     <span class="nd">@property</span>
     <span class="k">def</span><span class="w"> </span><span class="nf">config</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">AttrDict</span><span class="p">:</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">        Weight estimator configuration</span>
+<span class="w">        </span><span class="sd">"""</span>
+<span class="sd">        Weight estimator configuration.</span>
 
 <span class="sd">        Returns</span>
 <span class="sd">        -------</span>
 <span class="sd">        AttrDict</span>
-<span class="sd">            Dictionary containing weight estimator configuration information</span>
-<span class="sd">        &quot;&quot;&quot;</span>
+<span class="sd">            Dictionary containing weight estimator configuration information.</span>
+<span class="sd">            The bandwidth is None if the bandwidth was not given and the weight</span>
+<span class="sd">            matrix has not been computed, as in ``IVSystemGMM.fit`` with</span>
+<span class="sd">            ``iter_limit=1``.</span>
+<span class="sd">        """</span>
         <span class="n">out</span> <span class="o">=</span> <span class="n">AttrDict</span><span class="p">([(</span><span class="n">k</span><span class="p">,</span> <span class="n">v</span><span class="p">)</span> <span class="k">for</span> <span class="n">k</span><span class="p">,</span> <span class="n">v</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_config</span><span class="o">.</span><span class="n">items</span><span class="p">()])</span>
-        <span class="n">out</span><span class="p">[</span><span class="s2">&quot;bandwidth&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">bandwidth</span>
+        <span class="n">out</span><span class="p">[</span><span class="s2">"bandwidth"</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_bandwidth</span>
         <span class="k">return</span> <span class="n">out</span></div>
 
 </code></pre></div>
@@ -937,13 +1019,13 @@
       <div class="md-copyright">
   
     <div class="md-footer-copyright__highlight">
-        &#169; Copyright 2021, Kevin Sheppard.
+        &#169; Copyright 2017-2026, Kevin Sheppard.
         
     </div>
   
     Created using
     <a href="https://www.sphinx-doc.org/" target="_blank" rel="noopener">Sphinx</a>
-    8.1.3.
+    9.1.0.
      and
     <a href="https://github.com/jbms/sphinx-immaterial/" target="_blank" rel="noopener">Sphinx-Immaterial</a>
   

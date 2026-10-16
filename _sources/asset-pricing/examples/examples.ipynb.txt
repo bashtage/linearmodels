@@ -24,7 +24,7 @@
    "source": [
     "## Import data\n",
     "\n",
-    "The data used comes from Ken French\"s [website](http://mba.tuck.dartmouth.edu/pages/faculty/ken.french/data_library.html) and includes 4 factor returns, the excess market, the size factor, the value factor and the momentum factor.  The available test portfolios include the 12 industry portfolios, a subset of the size-value two way sort, and a subset of the size-momentum two way sort. "
+    "The data used comes from Ken French's [website](http://mba.tuck.dartmouth.edu/pages/faculty/ken.french/data_library.html) and includes 4 factor returns, the excess market, the size factor, the value factor and the momentum factor.  The available test portfolios include the 12 industry portfolios, a subset of the size-value two way sort, and a subset of the size-momentum two way sort. "
    ]
   },
   {
@@ -93,7 +93,7 @@
    "source": [
     "The factor set is expanded to include both the size and the value factors.\n",
     "\n",
-    "While the extra factors lower the J statistic and increases the $R^2$, the model is still easily rejected."
+    "While the extra factors lower the J statistic and increase the $R^2$, the model is still easily rejected."
    ]
   },
   {
@@ -191,7 +191,7 @@
    "source": [
     "## 2-Step Estimation\n",
     "\n",
-    "When one of more factors are not returns on traded assets, it is necessary to use a two-step procedure (or GMM).  In the 2-step estimator, the first estimates factor loadings and the second uses the factor loadings to estimate the risk premia.  \n",
+    "When one or more factors are not returns on traded assets, it is necessary to use a two-step procedure (or GMM).  In the 2-step estimator, the first estimates factor loadings and the second uses the factor loadings to estimate the risk premia.  \n",
     "\n",
     "Here all four factors are used to attempt to price the size-momentum portfolios."
    ]
@@ -226,7 +226,7 @@
    "cell_type": "markdown",
    "metadata": {},
    "source": [
-    "The identification requirements for this model are the the $\\beta$s have unique variation -- this requires some cross-sectional differences in exposures and that the loadings are not excessively correlated.  Since these test portfolios do not attempt to sort on value, it is relatively non-dispersed and also correlated with both the market and size. This might make the inference unreliable.  "
+    "The identification requirements for this model are that the $\\beta$s have unique variation -- this requires some cross-sectional differences in exposures and that the loadings are not excessively correlated.  Since these test portfolios do not attempt to sort on value, it is relatively non-dispersed and also correlated with both the market and size. This might make the inference unreliable.  "
    ]
   },
   {
@@ -265,9 +265,9 @@
    "cell_type": "markdown",
    "metadata": {},
    "source": [
-    "The risk-free rate can be optionally estimated.  This is useful in case excess returns are not available of if the risk-free rate used to construct the excess returns might be misspecified.\n",
+    "The risk-free rate can be optionally estimated.  This is useful in case excess returns are not available or if the risk-free rate used to construct the excess returns might be misspecified.\n",
     "\n",
-    "Here the estimated risk-free rate is small and insignificant and has little impact on the model J-statistic."
+    "Here the estimated risk-free rate is small and insignificant, and the model is still rejected."
    ]
   },
   {
@@ -292,7 +292,7 @@
    "source": [
     "The default covariance estimator allows for heteroskedasticity but assumes there is no autocorrelation in the model errors or factor returns.  Kernel-based HAC estimators (e.g. Newey-West) can be used by setting `cov_type=\"kernel\"`.\n",
     "\n",
-    "This reduces the J-statistic indicating there might be some serial correlation although the model is still firmly rejected."
+    "This reduces the J-statistic indicating there might be some serial correlation although the model is still rejected."
    ]
   },
   {
@@ -316,7 +316,7 @@
    "cell_type": "markdown",
    "metadata": {},
    "source": [
-    "The final estimator is the GMM estimator which is similar to estimating the 2-step model in a single step.  In practice the GMM estimator is estimated at least twice, once to get an consistent estimate of the covariance of the moment conditions and the second time to efficiently estimate parameters. \n",
+    "The final estimator is the GMM estimator which is similar to estimating the 2-step model in a single step.  In practice the GMM estimator is estimated at least twice, once to get a consistent estimate of the covariance of the moment conditions and the second time to efficiently estimate parameters. \n",
     "\n",
     "The GMM estimator does not have a closed form and so a non-linear optimizer is required.  The default output prints the progress every 10 iterations.  Here the model is fit twice, which is the standard method to implement efficient GMM."
    ]

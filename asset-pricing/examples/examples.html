@@ -23,7 +23,7 @@
     
   
       
-        <title>Examples - linearmodels 7.0</title>
+        <title>Examples - linearmodels 7.1</title>
       
     
 
@@ -54,7 +54,7 @@
         <style>:root{--md-text-font:"Roboto";--md-code-font:"Roboto Mono"}</style>
       
     
-        <link rel="stylesheet" type="text/css" href="../../_static/sphinx_immaterial_theme.acf80fe7f4d9ef9e2.min.css?v=9e56d0d2" />
+        <link rel="stylesheet" type="text/css" href="../../_static/sphinx_immaterial_theme.6efbe22605a23fcd6.min.css?v=b2ceb110" />
         <link rel="stylesheet" type="text/css" href="../../_static/nbsphinx-code-cells.css?v=2aa19091" />
         <link rel="stylesheet" type="text/css" href="../../_static/css/small_fixes.css?v=34934119" />
     <script>__md_scope=new URL("../..",location),__md_hash=e=>[...e].reduce(((e,_)=>(e<<5)-e+_.charCodeAt(0)),0),__md_get=(e,_=localStorage,t=__md_scope)=>JSON.parse(_.getItem(t.pathname+"."+e)),__md_set=(e,_,t=localStorage,a=__md_scope)=>{try{t.setItem(a.pathname+"."+e,JSON.stringify(_))}catch(e){}}</script>
@@ -101,7 +101,7 @@
 
 <header class="md-header md-header--shadow" data-md-component="header">
   <nav class="md-header__inner md-grid" aria-label="Header">
-    <a href="../../index.html" title="linearmodels 7.0" class="md-header__button md-logo" aria-label="linearmodels 7.0" data-md-component="logo">
+    <a href="../../index.html" title="linearmodels 7.1" class="md-header__button md-logo" aria-label="linearmodels 7.1" data-md-component="logo">
       <img src="../../_static/bw-logo.svg" alt="logo">
     </a>
     <label class="md-header__button md-icon" for="__drawer">
@@ -112,7 +112,7 @@
       <div class="md-header__ellipsis">
         <div class="md-header__topic">
           <span class="md-ellipsis">
-            linearmodels 7.0
+            linearmodels 7.1
           </span>
         </div>
         <div class="md-header__topic" data-md-component="header-topic">
@@ -207,10 +207,10 @@
 
 <nav class="md-nav md-nav--primary" aria-label="Navigation" data-md-level="0">
   <label class="md-nav__title" for="__drawer">
-    <a href="../../index.html" title="linearmodels 7.0" class="md-nav__button md-logo" aria-label="linearmodels 7.0" data-md-component="logo">
+    <a href="../../index.html" title="linearmodels 7.1" class="md-nav__button md-logo" aria-label="linearmodels 7.1" data-md-component="logo">
       <img src="../../_static/bw-logo.svg" alt="logo">
     </a>
-    linearmodels 7.0
+    linearmodels 7.1
   </label>
   
     <div class="md-nav__source">
@@ -604,6 +604,29 @@
   
   
     <li class="md-nav__item">
+      <a href="../../input-alignment.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    <span title="/input-alignment.rst (reference label)"><span>Aligning Inputs</span></span>
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+  
+    <li class="md-nav__item">
       <a href="../../utility.html" class="md-nav__link">
         
   
@@ -889,7 +912,7 @@
 <p>Models include factors and returns. Factors can be traded or non-traded. Common examples of traded assets include the excess return on the market and the size and value factors. Examples of non-traded assets include macroeconomic shocks and measures of uncertainty.</p>
 <p>Models are tested using a set of test portfolios. Test portfolios are often excess returns although they do not need to be.</p>
 <h2 id="Import-data">Import data<a class="headerlink" href="#Import-data" title="Link to this heading">¶</a></h2>
-<p>The data used comes from Ken French”s <a class="reference external" href="http://mba.tuck.dartmouth.edu/pages/faculty/ken.french/data_library.html">website</a> and includes 4 factor returns, the excess market, the size factor, the value factor and the momentum factor. The available test portfolios include the 12 industry portfolios, a subset of the size-value two way sort, and a subset of the size-momentum two way sort.</p>
+<p>The data used comes from Ken French’s <a class="reference external" href="http://mba.tuck.dartmouth.edu/pages/faculty/ken.french/data_library.html">website</a> and includes 4 factor returns, the excess market, the size factor, the value factor and the momentum factor. The available test portfolios include the 12 industry portfolios, a subset of the size-value two way sort, and a subset of the size-momentum two way sort.</p>
 <div class="nbinput docutils container">
 <div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span><code>[1]:
 </code></pre></div>
@@ -955,7 +978,7 @@ S5M5     Large firms, winners
 <div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span><code>[2]:
 </code></pre></div>
 </div>
-<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><code><span class="n">data</span><span class="o">.</span><span class="n">iloc</span><span class="p">[:,</span> <span class="mi">6</span><span class="p">:]</span> <span class="o">=</span> <span class="n">data</span><span class="o">.</span><span class="n">iloc</span><span class="p">[:,</span> <span class="mi">6</span><span class="p">:]</span><span class="o">.</span><span class="n">values</span> <span class="o">-</span> <span class="n">data</span><span class="p">[[</span><span class="s2">&quot;RF&quot;</span><span class="p">]]</span><span class="o">.</span><span class="n">values</span>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><code><span class="n">data</span><span class="o">.</span><span class="n">iloc</span><span class="p">[:,</span> <span class="mi">6</span><span class="p">:]</span> <span class="o">=</span> <span class="n">data</span><span class="o">.</span><span class="n">iloc</span><span class="p">[:,</span> <span class="mi">6</span><span class="p">:]</span><span class="o">.</span><span class="n">values</span> <span class="o">-</span> <span class="n">data</span><span class="p">[[</span><span class="s2">"RF"</span><span class="p">]]</span><span class="o">.</span><span class="n">values</span>
 </code></pre></div>
 </div>
 </div>
@@ -970,9 +993,9 @@ S5M5     Large firms, winners
 <div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><code><span class="kn">from</span><span class="w"> </span><span class="nn">linearmodels.asset_pricing</span><span class="w"> </span><span class="kn">import</span> <span class="n">TradedFactorModel</span>
 
 <span class="n">portfolios</span> <span class="o">=</span> <span class="n">data</span><span class="p">[</span>
-    <span class="p">[</span><span class="s2">&quot;S1V1&quot;</span><span class="p">,</span> <span class="s2">&quot;S1V3&quot;</span><span class="p">,</span> <span class="s2">&quot;S1V5&quot;</span><span class="p">,</span> <span class="s2">&quot;S3V1&quot;</span><span class="p">,</span> <span class="s2">&quot;S3V3&quot;</span><span class="p">,</span> <span class="s2">&quot;S3V5&quot;</span><span class="p">,</span> <span class="s2">&quot;S5V1&quot;</span><span class="p">,</span> <span class="s2">&quot;S5V3&quot;</span><span class="p">,</span> <span class="s2">&quot;S5V5&quot;</span><span class="p">]</span>
+    <span class="p">[</span><span class="s2">"S1V1"</span><span class="p">,</span> <span class="s2">"S1V3"</span><span class="p">,</span> <span class="s2">"S1V5"</span><span class="p">,</span> <span class="s2">"S3V1"</span><span class="p">,</span> <span class="s2">"S3V3"</span><span class="p">,</span> <span class="s2">"S3V5"</span><span class="p">,</span> <span class="s2">"S5V1"</span><span class="p">,</span> <span class="s2">"S5V3"</span><span class="p">,</span> <span class="s2">"S5V5"</span><span class="p">]</span>
 <span class="p">]</span>
-<span class="n">factors</span> <span class="o">=</span> <span class="n">data</span><span class="p">[[</span><span class="s2">&quot;MktRF&quot;</span><span class="p">]]</span>
+<span class="n">factors</span> <span class="o">=</span> <span class="n">data</span><span class="p">[[</span><span class="s2">"MktRF"</span><span class="p">]]</span>
 <span class="n">mod</span> <span class="o">=</span> <span class="n">TradedFactorModel</span><span class="p">(</span><span class="n">portfolios</span><span class="p">,</span> <span class="n">factors</span><span class="p">)</span>
 <span class="n">res</span> <span class="o">=</span> <span class="n">mod</span><span class="o">.</span><span class="n">fit</span><span class="p">()</span>
 <span class="nb">print</span><span class="p">(</span><span class="n">res</span><span class="p">)</span>
@@ -989,8 +1012,8 @@ S5M5     Large firms, winners
 No. Test Portfolios:                  9   R-squared:                      0.6910
 No. Factors:                          1   J-statistic:                    70.034
 No. Observations:                   819   P-value                         0.0000
-Date:                  Tue, Oct 21 2025   Distribution:                  chi2(9)
-Time:                          13:37:36
+Date:                  Fri, Oct 16 2026   Distribution:                  chi2(9)
+Time:                          08:35:51
 Cov. Estimator:                  robust
 
                             Risk Premia Estimates
@@ -1006,12 +1029,12 @@ See full_summary for complete results
 </pre></div></div>
 </div>
 <p>The factor set is expanded to include both the size and the value factors.</p>
-<p>While the extra factors lower the J statistic and increases the <span class="math notranslate nohighlight">\(R^2\)</span>, the model is still easily rejected.</p>
+<p>While the extra factors lower the J statistic and increase the <span class="math notranslate nohighlight">\(R^2\)</span>, the model is still easily rejected.</p>
 <div class="nbinput docutils container">
 <div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span><code>[4]:
 </code></pre></div>
 </div>
-<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><code><span class="n">factors</span> <span class="o">=</span> <span class="n">data</span><span class="p">[[</span><span class="s2">&quot;MktRF&quot;</span><span class="p">,</span> <span class="s2">&quot;SMB&quot;</span><span class="p">,</span> <span class="s2">&quot;HML&quot;</span><span class="p">]]</span>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><code><span class="n">factors</span> <span class="o">=</span> <span class="n">data</span><span class="p">[[</span><span class="s2">"MktRF"</span><span class="p">,</span> <span class="s2">"SMB"</span><span class="p">,</span> <span class="s2">"HML"</span><span class="p">]]</span>
 <span class="n">mod</span> <span class="o">=</span> <span class="n">TradedFactorModel</span><span class="p">(</span><span class="n">portfolios</span><span class="p">,</span> <span class="n">factors</span><span class="p">)</span>
 <span class="n">res</span> <span class="o">=</span> <span class="n">mod</span><span class="o">.</span><span class="n">fit</span><span class="p">()</span>
 <span class="nb">print</span><span class="p">(</span><span class="n">res</span><span class="p">)</span>
@@ -1028,8 +1051,8 @@ See full_summary for complete results
 No. Test Portfolios:                  9   R-squared:                      0.8971
 No. Factors:                          3   J-statistic:                    53.271
 No. Observations:                   819   P-value                         0.0000
-Date:                  Tue, Oct 21 2025   Distribution:                  chi2(9)
-Time:                          13:37:36
+Date:                  Fri, Oct 16 2026   Distribution:                  chi2(9)
+Time:                          08:35:51
 Cov. Estimator:                  robust
 
                             Risk Premia Estimates
@@ -1052,18 +1075,18 @@ See full_summary for complete results
 </code></pre></div>
 </div>
 <div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><code><span class="n">indu</span> <span class="o">=</span> <span class="p">[</span>
-    <span class="s2">&quot;NoDur&quot;</span><span class="p">,</span>
-    <span class="s2">&quot;Durbl&quot;</span><span class="p">,</span>
-    <span class="s2">&quot;Manuf&quot;</span><span class="p">,</span>
-    <span class="s2">&quot;Enrgy&quot;</span><span class="p">,</span>
-    <span class="s2">&quot;Chems&quot;</span><span class="p">,</span>
-    <span class="s2">&quot;BusEq&quot;</span><span class="p">,</span>
-    <span class="s2">&quot;Telcm&quot;</span><span class="p">,</span>
-    <span class="s2">&quot;Utils&quot;</span><span class="p">,</span>
-    <span class="s2">&quot;Shops&quot;</span><span class="p">,</span>
-    <span class="s2">&quot;Hlth&quot;</span><span class="p">,</span>
-    <span class="s2">&quot;Money&quot;</span><span class="p">,</span>
-    <span class="s2">&quot;Other&quot;</span><span class="p">,</span>
+    <span class="s2">"NoDur"</span><span class="p">,</span>
+    <span class="s2">"Durbl"</span><span class="p">,</span>
+    <span class="s2">"Manuf"</span><span class="p">,</span>
+    <span class="s2">"Enrgy"</span><span class="p">,</span>
+    <span class="s2">"Chems"</span><span class="p">,</span>
+    <span class="s2">"BusEq"</span><span class="p">,</span>
+    <span class="s2">"Telcm"</span><span class="p">,</span>
+    <span class="s2">"Utils"</span><span class="p">,</span>
+    <span class="s2">"Shops"</span><span class="p">,</span>
+    <span class="s2">"Hlth"</span><span class="p">,</span>
+    <span class="s2">"Money"</span><span class="p">,</span>
+    <span class="s2">"Other"</span><span class="p">,</span>
 <span class="p">]</span>
 <span class="n">portfolios</span> <span class="o">=</span> <span class="n">data</span><span class="p">[</span><span class="n">indu</span><span class="p">]</span>
 <span class="n">mod</span> <span class="o">=</span> <span class="n">TradedFactorModel</span><span class="p">(</span><span class="n">portfolios</span><span class="p">,</span> <span class="n">factors</span><span class="p">)</span>
@@ -1082,8 +1105,8 @@ See full_summary for complete results
 No. Test Portfolios:                 12   R-squared:                      0.7118
 No. Factors:                          3   J-statistic:                    61.617
 No. Observations:                   819   P-value                         0.0000
-Date:                  Tue, Oct 21 2025   Distribution:                 chi2(12)
-Time:                          13:37:36
+Date:                  Fri, Oct 16 2026   Distribution:                 chi2(12)
+Time:                          08:35:51
 Cov. Estimator:                  robust
 
                             Risk Premia Estimates
@@ -1187,7 +1210,7 @@ Name: alpha, dtype: float64
 </pre></div></div>
 </div>
 <h2 id="2-Step-Estimation">2-Step Estimation<a class="headerlink" href="#2-Step-Estimation" title="Link to this heading">¶</a></h2>
-<p>When one of more factors are not returns on traded assets, it is necessary to use a two-step procedure (or GMM). In the 2-step estimator, the first estimates factor loadings and the second uses the factor loadings to estimate the risk premia.</p>
+<p>When one or more factors are not returns on traded assets, it is necessary to use a two-step procedure (or GMM). In the 2-step estimator, the first estimates factor loadings and the second uses the factor loadings to estimate the risk premia.</p>
 <p>Here all four factors are used to attempt to price the size-momentum portfolios.</p>
 <div class="nbinput docutils container">
 <div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span><code>[9]:
@@ -1195,9 +1218,9 @@ Name: alpha, dtype: float64
 </div>
 <div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><code><span class="kn">from</span><span class="w"> </span><span class="nn">linearmodels.asset_pricing</span><span class="w"> </span><span class="kn">import</span> <span class="n">LinearFactorModel</span>
 
-<span class="n">factors</span> <span class="o">=</span> <span class="n">data</span><span class="p">[[</span><span class="s2">&quot;MktRF&quot;</span><span class="p">,</span> <span class="s2">&quot;SMB&quot;</span><span class="p">,</span> <span class="s2">&quot;HML&quot;</span><span class="p">,</span> <span class="s2">&quot;Mom&quot;</span><span class="p">]]</span>
+<span class="n">factors</span> <span class="o">=</span> <span class="n">data</span><span class="p">[[</span><span class="s2">"MktRF"</span><span class="p">,</span> <span class="s2">"SMB"</span><span class="p">,</span> <span class="s2">"HML"</span><span class="p">,</span> <span class="s2">"Mom"</span><span class="p">]]</span>
 <span class="n">portfolios</span> <span class="o">=</span> <span class="n">data</span><span class="p">[</span>
-    <span class="p">[</span><span class="s2">&quot;S1M1&quot;</span><span class="p">,</span> <span class="s2">&quot;S1M3&quot;</span><span class="p">,</span> <span class="s2">&quot;S1M5&quot;</span><span class="p">,</span> <span class="s2">&quot;S3M1&quot;</span><span class="p">,</span> <span class="s2">&quot;S3M3&quot;</span><span class="p">,</span> <span class="s2">&quot;S3M5&quot;</span><span class="p">,</span> <span class="s2">&quot;S5M1&quot;</span><span class="p">,</span> <span class="s2">&quot;S5M3&quot;</span><span class="p">,</span> <span class="s2">&quot;S5M5&quot;</span><span class="p">]</span>
+    <span class="p">[</span><span class="s2">"S1M1"</span><span class="p">,</span> <span class="s2">"S1M3"</span><span class="p">,</span> <span class="s2">"S1M5"</span><span class="p">,</span> <span class="s2">"S3M1"</span><span class="p">,</span> <span class="s2">"S3M3"</span><span class="p">,</span> <span class="s2">"S3M5"</span><span class="p">,</span> <span class="s2">"S5M1"</span><span class="p">,</span> <span class="s2">"S5M3"</span><span class="p">,</span> <span class="s2">"S5M5"</span><span class="p">]</span>
 <span class="p">]</span>
 <span class="n">mod</span> <span class="o">=</span> <span class="n">LinearFactorModel</span><span class="p">(</span><span class="n">portfolios</span><span class="p">,</span> <span class="n">factors</span><span class="p">)</span>
 <span class="n">res</span> <span class="o">=</span> <span class="n">mod</span><span class="o">.</span><span class="n">fit</span><span class="p">()</span>
@@ -1213,10 +1236,10 @@ Name: alpha, dtype: float64
                       LinearFactorModel Estimation Summary
 ================================================================================
 No. Test Portfolios:                  9   R-squared:                      0.9051
-No. Factors:                          4   J-statistic:                    36.929
-No. Observations:                   819   P-value                         0.0000
-Date:                  Tue, Oct 21 2025   Distribution:                  chi2(5)
-Time:                          13:37:39
+No. Factors:                          4   J-statistic:                    22.820
+No. Observations:                   819   P-value                         0.0004
+Date:                  Fri, Oct 16 2026   Distribution:                  chi2(5)
+Time:                          08:35:52
 Cov. Estimator:                  robust
 
                             Risk Premia Estimates
@@ -1259,7 +1282,7 @@ S5M3  0.946214 -0.200052  0.095270 -0.100067
 S5M5  1.078098 -0.046531 -0.069780  0.467172
 </pre></div></div>
 </div>
-<p>The identification requirements for this model are the the <span class="math notranslate nohighlight">\(\beta\)</span>s have unique variation – this requires some cross-sectional differences in exposures and that the loadings are not excessively correlated. Since these test portfolios do not attempt to sort on value, it is relatively non-dispersed and also correlated with both the market and size. This might make the inference unreliable.</p>
+<p>The identification requirements for this model are that the <span class="math notranslate nohighlight">\(\beta\)</span>s have unique variation – this requires some cross-sectional differences in exposures and that the loadings are not excessively correlated. Since these test portfolios do not attempt to sort on value, it is relatively non-dispersed and also correlated with both the market and size. This might make the inference unreliable.</p>
 <div class="nbinput docutils container">
 <div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span><code>[11]:
 </code></pre></div>
@@ -1287,9 +1310,9 @@ Mom   -0.253675 -0.015628  0.002744  1.000000
 </div>
 <div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><code><span class="kn">from</span><span class="w"> </span><span class="nn">linearmodels.asset_pricing</span><span class="w"> </span><span class="kn">import</span> <span class="n">LinearFactorModel</span>
 
-<span class="n">factors</span> <span class="o">=</span> <span class="n">data</span><span class="p">[[</span><span class="s2">&quot;MktRF&quot;</span><span class="p">,</span> <span class="s2">&quot;HML&quot;</span><span class="p">,</span> <span class="s2">&quot;Mom&quot;</span><span class="p">]]</span>
+<span class="n">factors</span> <span class="o">=</span> <span class="n">data</span><span class="p">[[</span><span class="s2">"MktRF"</span><span class="p">,</span> <span class="s2">"HML"</span><span class="p">,</span> <span class="s2">"Mom"</span><span class="p">]]</span>
 <span class="n">portfolios</span> <span class="o">=</span> <span class="n">data</span><span class="p">[</span>
-    <span class="p">[</span><span class="s2">&quot;S1M1&quot;</span><span class="p">,</span> <span class="s2">&quot;S1M3&quot;</span><span class="p">,</span> <span class="s2">&quot;S1M5&quot;</span><span class="p">,</span> <span class="s2">&quot;S3M1&quot;</span><span class="p">,</span> <span class="s2">&quot;S3M3&quot;</span><span class="p">,</span> <span class="s2">&quot;S3M5&quot;</span><span class="p">,</span> <span class="s2">&quot;S5M1&quot;</span><span class="p">,</span> <span class="s2">&quot;S5M3&quot;</span><span class="p">,</span> <span class="s2">&quot;S5M5&quot;</span><span class="p">]</span>
+    <span class="p">[</span><span class="s2">"S1M1"</span><span class="p">,</span> <span class="s2">"S1M3"</span><span class="p">,</span> <span class="s2">"S1M5"</span><span class="p">,</span> <span class="s2">"S3M1"</span><span class="p">,</span> <span class="s2">"S3M3"</span><span class="p">,</span> <span class="s2">"S3M5"</span><span class="p">,</span> <span class="s2">"S5M1"</span><span class="p">,</span> <span class="s2">"S5M3"</span><span class="p">,</span> <span class="s2">"S5M5"</span><span class="p">]</span>
 <span class="p">]</span>
 <span class="n">mod</span> <span class="o">=</span> <span class="n">LinearFactorModel</span><span class="p">(</span><span class="n">portfolios</span><span class="p">,</span> <span class="n">factors</span><span class="p">)</span>
 <span class="nb">print</span><span class="p">(</span><span class="n">mod</span><span class="o">.</span><span class="n">fit</span><span class="p">())</span>
@@ -1304,10 +1327,10 @@ Mom   -0.253675 -0.015628  0.002744  1.000000
                       LinearFactorModel Estimation Summary
 ================================================================================
 No. Test Portfolios:                  9   R-squared:                      0.7915
-No. Factors:                          3   J-statistic:                    36.406
-No. Observations:                   819   P-value                         0.0000
-Date:                  Tue, Oct 21 2025   Distribution:                  chi2(6)
-Time:                          13:37:39
+No. Factors:                          3   J-statistic:                    24.860
+No. Observations:                   819   P-value                         0.0004
+Date:                  Fri, Oct 16 2026   Distribution:                  chi2(6)
+Time:                          08:35:52
 Cov. Estimator:                  robust
 
                             Risk Premia Estimates
@@ -1324,17 +1347,17 @@ HeteroskedasticCovariance
 See full_summary for complete results
 </pre></div></div>
 </div>
-<p>The risk-free rate can be optionally estimated. This is useful in case excess returns are not available of if the risk-free rate used to construct the excess returns might be misspecified.</p>
-<p>Here the estimated risk-free rate is small and insignificant and has little impact on the model J-statistic.</p>
+<p>The risk-free rate can be optionally estimated. This is useful in case excess returns are not available or if the risk-free rate used to construct the excess returns might be misspecified.</p>
+<p>Here the estimated risk-free rate is small and insignificant, and the model is still rejected.</p>
 <div class="nbinput docutils container">
 <div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span><code>[13]:
 </code></pre></div>
 </div>
 <div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><code><span class="kn">from</span><span class="w"> </span><span class="nn">linearmodels.asset_pricing</span><span class="w"> </span><span class="kn">import</span> <span class="n">LinearFactorModel</span>
 
-<span class="n">factors</span> <span class="o">=</span> <span class="n">data</span><span class="p">[[</span><span class="s2">&quot;MktRF&quot;</span><span class="p">,</span> <span class="s2">&quot;HML&quot;</span><span class="p">,</span> <span class="s2">&quot;Mom&quot;</span><span class="p">]]</span>
+<span class="n">factors</span> <span class="o">=</span> <span class="n">data</span><span class="p">[[</span><span class="s2">"MktRF"</span><span class="p">,</span> <span class="s2">"HML"</span><span class="p">,</span> <span class="s2">"Mom"</span><span class="p">]]</span>
 <span class="n">portfolios</span> <span class="o">=</span> <span class="n">data</span><span class="p">[</span>
-    <span class="p">[</span><span class="s2">&quot;S1M1&quot;</span><span class="p">,</span> <span class="s2">&quot;S1M3&quot;</span><span class="p">,</span> <span class="s2">&quot;S1M5&quot;</span><span class="p">,</span> <span class="s2">&quot;S3M1&quot;</span><span class="p">,</span> <span class="s2">&quot;S3M3&quot;</span><span class="p">,</span> <span class="s2">&quot;S3M5&quot;</span><span class="p">,</span> <span class="s2">&quot;S5M1&quot;</span><span class="p">,</span> <span class="s2">&quot;S5M3&quot;</span><span class="p">,</span> <span class="s2">&quot;S5M5&quot;</span><span class="p">]</span>
+    <span class="p">[</span><span class="s2">"S1M1"</span><span class="p">,</span> <span class="s2">"S1M3"</span><span class="p">,</span> <span class="s2">"S1M5"</span><span class="p">,</span> <span class="s2">"S3M1"</span><span class="p">,</span> <span class="s2">"S3M3"</span><span class="p">,</span> <span class="s2">"S3M5"</span><span class="p">,</span> <span class="s2">"S5M1"</span><span class="p">,</span> <span class="s2">"S5M3"</span><span class="p">,</span> <span class="s2">"S5M5"</span><span class="p">]</span>
 <span class="p">]</span>
 <span class="n">mod</span> <span class="o">=</span> <span class="n">LinearFactorModel</span><span class="p">(</span><span class="n">portfolios</span><span class="p">,</span> <span class="n">factors</span><span class="p">,</span> <span class="n">risk_free</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
 <span class="nb">print</span><span class="p">(</span><span class="n">mod</span><span class="o">.</span><span class="n">fit</span><span class="p">())</span>
@@ -1349,10 +1372,10 @@ See full_summary for complete results
                       LinearFactorModel Estimation Summary
 ================================================================================
 No. Test Portfolios:                  9   R-squared:                      0.7915
-No. Factors:                          3   J-statistic:                    36.003
-No. Observations:                   819   P-value                         0.0000
-Date:                  Tue, Oct 21 2025   Distribution:                  chi2(5)
-Time:                          13:37:39
+No. Factors:                          3   J-statistic:                    19.703
+No. Observations:                   819   P-value                         0.0014
+Date:                  Fri, Oct 16 2026   Distribution:                  chi2(5)
+Time:                          08:35:52
 Cov. Estimator:                  robust
 
                             Risk Premia Estimates
@@ -1371,13 +1394,13 @@ See full_summary for complete results
 </pre></div></div>
 </div>
 <p>The default covariance estimator allows for heteroskedasticity but assumes there is no autocorrelation in the model errors or factor returns. Kernel-based HAC estimators (e.g. Newey-West) can be used by setting <code class="docutils literal notranslate"><span class="pre">cov_type=&quot;kernel&quot;</span></code>.</p>
-<p>This reduces the J-statistic indicating there might be some serial correlation although the model is still firmly rejected.</p>
+<p>This reduces the J-statistic indicating there might be some serial correlation although the model is still rejected.</p>
 <div class="nbinput docutils container">
 <div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span><code>[14]:
 </code></pre></div>
 </div>
 <div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><code><span class="n">mod</span> <span class="o">=</span> <span class="n">LinearFactorModel</span><span class="p">(</span><span class="n">portfolios</span><span class="p">,</span> <span class="n">factors</span><span class="p">)</span>
-<span class="nb">print</span><span class="p">(</span><span class="n">mod</span><span class="o">.</span><span class="n">fit</span><span class="p">(</span><span class="n">cov_type</span><span class="o">=</span><span class="s2">&quot;kernel&quot;</span><span class="p">))</span>
+<span class="nb">print</span><span class="p">(</span><span class="n">mod</span><span class="o">.</span><span class="n">fit</span><span class="p">(</span><span class="n">cov_type</span><span class="o">=</span><span class="s2">"kernel"</span><span class="p">))</span>
 </code></pre></div>
 </div>
 </div>
@@ -1389,10 +1412,10 @@ See full_summary for complete results
                       LinearFactorModel Estimation Summary
 ================================================================================
 No. Test Portfolios:                  9   R-squared:                      0.7915
-No. Factors:                          3   J-statistic:                    25.841
-No. Observations:                   819   P-value                         0.0002
-Date:                  Tue, Oct 21 2025   Distribution:                  chi2(6)
-Time:                          13:37:39
+No. Factors:                          3   J-statistic:                    14.551
+No. Observations:                   819   P-value                         0.0240
+Date:                  Fri, Oct 16 2026   Distribution:                  chi2(6)
+Time:                          08:35:52
 Cov. Estimator:                  kernel
 
                             Risk Premia Estimates
@@ -1410,7 +1433,7 @@ See full_summary for complete results
 </pre></div></div>
 </div>
 <h2 id="GMM-Estimation">GMM Estimation<a class="headerlink" href="#GMM-Estimation" title="Link to this heading">¶</a></h2>
-<p>The final estimator is the GMM estimator which is similar to estimating the 2-step model in a single step. In practice the GMM estimator is estimated at least twice, once to get an consistent estimate of the covariance of the moment conditions and the second time to efficiently estimate parameters.</p>
+<p>The final estimator is the GMM estimator which is similar to estimating the 2-step model in a single step. In practice the GMM estimator is estimated at least twice, once to get a consistent estimate of the covariance of the moment conditions and the second time to efficiently estimate parameters.</p>
 <p>The GMM estimator does not have a closed form and so a non-linear optimizer is required. The default output prints the progress every 10 iterations. Here the model is fit twice, which is the standard method to implement efficient GMM.</p>
 <div class="nbinput docutils container">
 <div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span><code>[15]:
@@ -1429,22 +1452,22 @@ See full_summary for complete results
 </div>
 <div class="output_area docutils container">
 <div class="highlight"><pre>
-Iteration: 0, Objective: 47.7579158282351
-Iteration: 10, Objective: 28.10258618881301
-Iteration: 20, Objective: 26.36138406887324
-Iteration: 30, Objective: 26.019665546492007
-Iteration: 40, Objective: 22.325343252968423
-Iteration: 0, Objective: 22.519350241414017
-Iteration: 10, Objective: 22.303730189544734
-Iteration: 20, Objective: 22.22642653941578
-Iteration: 30, Objective: 22.193080894810542
+Iteration: 0, Objective: 47.75791582820265
+Iteration: 10, Objective: 28.102587814587807
+Iteration: 20, Objective: 26.361385130214934
+Iteration: 30, Objective: 26.01966713070102
+Iteration: 40, Objective: 22.325343252983014
+Iteration: 0, Objective: 22.519350362452933
+Iteration: 10, Objective: 22.303730473715678
+Iteration: 20, Objective: 22.226427162463825
+Iteration: 30, Objective: 22.193088986659294
                     LinearFactorModelGMM Estimation Summary
 ================================================================================
 No. Test Portfolios:                  9   R-squared:                      0.7904
 No. Factors:                          3   J-statistic:                    22.067
 No. Observations:                   819   P-value                         0.0012
-Date:                  Tue, Oct 21 2025   Distribution:                  chi2(6)
-Time:                          13:37:41
+Date:                  Fri, Oct 16 2026   Distribution:                  chi2(6)
+Time:                          08:35:53
 Cov. Estimator:                  robust
 
                             Risk Premia Estimates
@@ -1467,7 +1490,7 @@ See full_summary for complete results
 <div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span><code>[16]:
 </code></pre></div>
 </div>
-<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><code><span class="n">res</span> <span class="o">=</span> <span class="n">mod</span><span class="o">.</span><span class="n">fit</span><span class="p">(</span><span class="n">cov_type</span><span class="o">=</span><span class="s2">&quot;kernel&quot;</span><span class="p">,</span> <span class="n">kernel</span><span class="o">=</span><span class="s2">&quot;bartlett&quot;</span><span class="p">,</span> <span class="n">disp</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><code><span class="n">res</span> <span class="o">=</span> <span class="n">mod</span><span class="o">.</span><span class="n">fit</span><span class="p">(</span><span class="n">cov_type</span><span class="o">=</span><span class="s2">"kernel"</span><span class="p">,</span> <span class="n">kernel</span><span class="o">=</span><span class="s2">"bartlett"</span><span class="p">,</span> <span class="n">disp</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
 <span class="nb">print</span><span class="p">(</span><span class="n">res</span><span class="p">)</span>
 </code></pre></div>
 </div>
@@ -1482,8 +1505,8 @@ See full_summary for complete results
 No. Test Portfolios:                  9   R-squared:                      0.7901
 No. Factors:                          3   J-statistic:                    13.833
 No. Observations:                   819   P-value                         0.0316
-Date:                  Tue, Oct 21 2025   Distribution:                  chi2(6)
-Time:                          13:37:44
+Date:                  Fri, Oct 16 2026   Distribution:                  chi2(6)
+Time:                          08:35:55
 Cov. Estimator:                  kernel
 
                             Risk Premia Estimates
@@ -1517,23 +1540,23 @@ See full_summary for complete results
 </div>
 <div class="output_area docutils container">
 <div class="highlight"><pre>
-Iteration: 0, Objective: 47.7579158282351
-Iteration: 25, Objective: 26.28031931715628
-Iteration: 0, Objective: 22.519350241414017
-Iteration: 25, Objective: 22.22221725814185
-Iteration: 0, Objective: 22.09415705992026
-Iteration: 25, Objective: 22.09126661325285
-Iteration: 0, Objective: 22.08879828597695
-Iteration: 25, Objective: 22.088771421936666
-Iteration: 0, Objective: 22.088622402796993
-Iteration: 0, Objective: 22.088622326070173
+Iteration: 0, Objective: 47.75791582820265
+Iteration: 25, Objective: 26.280320271672313
+Iteration: 0, Objective: 22.519350362452933
+Iteration: 25, Objective: 22.222217866582703
+Iteration: 0, Objective: 22.094157065993617
+Iteration: 25, Objective: 22.09126664565184
+Iteration: 0, Objective: 22.08879828580615
+Iteration: 25, Objective: 22.088771425863143
+Iteration: 0, Objective: 22.08862239958595
+Iteration: 0, Objective: 22.088622322894484
                     LinearFactorModelGMM Estimation Summary
 ================================================================================
 No. Test Portfolios:                  9   R-squared:                      0.7904
 No. Factors:                          3   J-statistic:                    22.089
 No. Observations:                   819   P-value                         0.0012
-Date:                  Tue, Oct 21 2025   Distribution:                  chi2(6)
-Time:                          13:37:49
+Date:                  Fri, Oct 16 2026   Distribution:                  chi2(6)
+Time:                          08:35:58
 Cov. Estimator:                  robust
 
                             Risk Premia Estimates
@@ -1567,22 +1590,22 @@ See full_summary for complete results
 </div>
 <div class="output_area docutils container">
 <div class="highlight"><pre>
-Iteration: 0, Objective: 47.7579158282351
-Iteration: 10, Objective: 28.10258618881301
-Iteration: 20, Objective: 26.36138406887324
-Iteration: 30, Objective: 26.019665546492007
-Iteration: 40, Objective: 22.325343252968423
-Iteration: 0, Objective: 22.524476248542637
-Iteration: 10, Objective: 22.38605101192894
-Iteration: 20, Objective: 22.339801125802502
-Iteration: 30, Objective: 22.30830472911881
+Iteration: 0, Objective: 47.75791582820265
+Iteration: 10, Objective: 28.102587814587807
+Iteration: 20, Objective: 26.361385130214934
+Iteration: 30, Objective: 26.01966713070102
+Iteration: 40, Objective: 22.325343252983014
+Iteration: 0, Objective: 22.524470907898074
+Iteration: 10, Objective: 22.386038824380027
+Iteration: 20, Objective: 22.339791013874912
+Iteration: 30, Objective: 22.308295619460814
                     LinearFactorModelGMM Estimation Summary
 ================================================================================
 No. Test Portfolios:                  9   R-squared:                      0.7903
-No. Factors:                          3   J-statistic:                    22.719
-No. Observations:                   819   P-value                         0.0009
-Date:                  Tue, Oct 21 2025   Distribution:                  chi2(6)
-Time:                          13:37:56
+No. Factors:                          3   J-statistic:                    22.078
+No. Observations:                   819   P-value                         0.0012
+Date:                  Fri, Oct 16 2026   Distribution:                  chi2(6)
+Time:                          08:36:00
 Cov. Estimator:                  robust
 
                             Risk Premia Estimates
@@ -1633,13 +1656,13 @@ See full_summary for complete results
       <div class="md-copyright">
   
     <div class="md-footer-copyright__highlight">
-        &#169; Copyright 2021, Kevin Sheppard.
+        &#169; Copyright 2017-2026, Kevin Sheppard.
         
     </div>
   
     Created using
     <a href="https://www.sphinx-doc.org/" target="_blank" rel="noopener">Sphinx</a>
-    8.1.3.
+    9.1.0.
      and
     <a href="https://github.com/jbms/sphinx-immaterial/" target="_blank" rel="noopener">Sphinx-Immaterial</a>
   
@@ -1696,7 +1719,7 @@ See full_summary for complete results
         <script src="../../_static/sphinx_immaterial_theme.32136f45f91ae6956.min.js?v=a7a9472a"></script>
         <script crossorigin="anonymous" integrity="sha256-Ae2Vz/4ePdIu6ZyI/5ZGsYnb+m0JlOmKPjt6XZ9JJkA=" src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.4/require.min.js"></script>
         <script>window.MathJax = {"tex": {"inlineMath": [["$", "$"], ["\\(", "\\)"]], "processEscapes": true}, "options": {"ignoreHtmlClass": "tex2jax_ignore|mathjax_ignore|document", "processHtmlClass": "tex2jax_process|mathjax_process|math|output_area"}}</script>
-        <script id="MathJax-script" src="../../_static/mathjax/tex-mml-chtml.js?v=cadf963e"></script>
+        <script id="MathJax-script" src="../../_static/mathjax/tex-mml-chtml.js"></script>
     
   </body>
 </html>

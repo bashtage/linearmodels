@@ -1,0 +1,37 @@
+﻿linearmodels.iv.model.IVJIVE
+============================
+
+.. currentmodule:: linearmodels.iv.model
+
+.. autoclass:: IVJIVE
+   :exclude-members: fit,from_formula,predict,resids,wresids,
+
+   
+   
+   .. rubric:: Methods
+
+   .. autosummary::
+      :toctree:
+
+      ~IVJIVE.fit
+      ~IVJIVE.from_formula
+      ~IVJIVE.predict
+      ~IVJIVE.resids
+      ~IVJIVE.wresids
+   
+   
+   
+   
+   
+   .. rubric:: Properties
+
+   .. autosummary::
+      :toctree:
+
+      ~IVJIVE.formula
+      ~IVJIVE.has_constant
+      ~IVJIVE.isnull
+      ~IVJIVE.notnull
+   
+   
+   

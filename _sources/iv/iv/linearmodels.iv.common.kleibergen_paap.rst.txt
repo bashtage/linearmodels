@@ -1,0 +1,6 @@
+﻿linearmodels.iv.common.kleibergen\_paap
+=======================================
+
+.. currentmodule:: linearmodels.iv.common
+
+.. autofunction:: kleibergen_paap

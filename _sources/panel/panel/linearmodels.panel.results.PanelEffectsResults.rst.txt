@@ -46,6 +46,7 @@
       ~PanelEffectsResults.nobs
       ~PanelEffectsResults.other_info
       ~PanelEffectsResults.params
+      ~PanelEffectsResults.pesaran_cd
       ~PanelEffectsResults.pvalues
       ~PanelEffectsResults.resid_ss
       ~PanelEffectsResults.resids

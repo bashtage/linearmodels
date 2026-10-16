@@ -22,9 +22,10 @@ model and allows the specification to be testes with a J-statistic of the form
 
 .. math::
 
-    J = \hat{\alpha}^{\prime} \hat{\Sigma}_{\alpha} \hat{\alpha} \sim \chi^2_P
+    J = \hat{\alpha}^{\prime} \hat{\Sigma}_{\alpha}^{-1} \hat{\alpha} \sim \chi^2_P
 
-where there are P portfolios.
+where there are P portfolios and :math:`\hat{\Sigma}_{\alpha}` is the covariance
+of the estimated pricing errors.
 
 When some factors are not-traded, for example macroeconomic shocks, then a 2-step
 procedure is required since the average value of the factors does not
@@ -37,9 +38,13 @@ has a different distribution,
 
 .. math::
 
-    J = \hat{\alpha}^{\prime} \hat{\Sigma}_{\alpha} \hat{\alpha} \sim \chi^2_{P-K}
+    J = \hat{\alpha}^{\prime} \hat{\Sigma}_{\alpha}^{+} \hat{\alpha} \sim \chi^2_{P-K-n_{rf}}
 
-where K is the number of factors.
+where K is the number of factors, :math:`n_{rf}` is 1 if the risk-free rate is
+estimated and 0 if it is not, and :math:`\hat{\Sigma}_{\alpha}^{+}` is the
+generalized inverse of the covariance of the pricing errors, which has rank
+:math:`P-K-n_{rf}` since the pricing errors satisfy :math:`K+n_{rf}` linear
+restrictions.
 :class:`~linearmodels.asset_pricing.model.LinearFactorModel` implements this
 two-step estimator.
 :class:`~linearmodels.asset_pricing.model.LinearFactorModelGMM` contains a more

@@ -23,7 +23,7 @@
     
   
       
-        <title>Implementation Choices - linearmodels 7.0</title>
+        <title>Implementation Choices - linearmodels 7.1</title>
       
     
 
@@ -54,7 +54,7 @@
         <style>:root{--md-text-font:"Roboto";--md-code-font:"Roboto Mono"}</style>
       
     
-        <link rel="stylesheet" type="text/css" href="../_static/sphinx_immaterial_theme.acf80fe7f4d9ef9e2.min.css?v=9e56d0d2" />
+        <link rel="stylesheet" type="text/css" href="../_static/sphinx_immaterial_theme.6efbe22605a23fcd6.min.css?v=b2ceb110" />
         <link rel="stylesheet" type="text/css" href="../_static/css/small_fixes.css?v=34934119" />
     <script>__md_scope=new URL("..",location),__md_hash=e=>[...e].reduce(((e,_)=>(e<<5)-e+_.charCodeAt(0)),0),__md_get=(e,_=localStorage,t=__md_scope)=>JSON.parse(_.getItem(t.pathname+"."+e)),__md_set=(e,_,t=localStorage,a=__md_scope)=>{try{t.setItem(a.pathname+"."+e,JSON.stringify(_))}catch(e){}}</script>
     
@@ -80,7 +80,7 @@
     <div data-md-component="skip">
       
         
-        <a href="#clustered-covariance-with-fixed-effects" class="md-skip">
+        <a href="#small-sample-adjustments" class="md-skip">
           Skip to content
         </a>
       
@@ -100,7 +100,7 @@
 
 <header class="md-header md-header--shadow" data-md-component="header">
   <nav class="md-header__inner md-grid" aria-label="Header">
-    <a href="../index.html" title="linearmodels 7.0" class="md-header__button md-logo" aria-label="linearmodels 7.0" data-md-component="logo">
+    <a href="../index.html" title="linearmodels 7.1" class="md-header__button md-logo" aria-label="linearmodels 7.1" data-md-component="logo">
       <img src="../_static/bw-logo.svg" alt="logo">
     </a>
     <label class="md-header__button md-icon" for="__drawer">
@@ -111,7 +111,7 @@
       <div class="md-header__ellipsis">
         <div class="md-header__topic">
           <span class="md-ellipsis">
-            linearmodels 7.0
+            linearmodels 7.1
           </span>
         </div>
         <div class="md-header__topic" data-md-component="header-topic">
@@ -206,10 +206,10 @@
 
 <nav class="md-nav md-nav--primary" aria-label="Navigation" data-md-level="0">
   <label class="md-nav__title" for="__drawer">
-    <a href="../index.html" title="linearmodels 7.0" class="md-nav__button md-logo" aria-label="linearmodels 7.0" data-md-component="logo">
+    <a href="../index.html" title="linearmodels 7.1" class="md-nav__button md-logo" aria-label="linearmodels 7.1" data-md-component="logo">
       <img src="../_static/bw-logo.svg" alt="logo">
     </a>
-    linearmodels 7.0
+    linearmodels 7.1
   </label>
   
     <div class="md-nav__source">
@@ -519,10 +519,102 @@
     <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
       
         <li class="md-nav__item">
+  <a href="#small-sample-adjustments" class="md-nav__link">
+    
+    <span class="md-ellipsis">
+      <span title="/panel/faq.rst#small-sample-adjustments (reference label)"><span>Small-<wbr>sample Adjustments</span></span>
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Small-sample Adjustments">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#matching-stata" class="md-nav__link">
+    
+    <span class="md-ellipsis">
+      <span title="/panel/faq.rst#matching-stata (reference label)"><span>Matching Stata</span></span>
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#counting-the-effects" class="md-nav__link">
+    
+    <span class="md-ellipsis">
+      <span title="/panel/faq.rst#counting-the-effects (reference label)"><span>Counting the Effects</span></span>
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
   <a href="#clustered-covariance-with-fixed-effects" class="md-nav__link">
     
     <span class="md-ellipsis">
       <span title="/panel/faq.rst#clustered-covariance-with-fixed-effects (reference label)"><span>Clustered Covariance with Fixed Effects</span></span>
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#gaps-in-the-periods-of-an-entity" class="md-nav__link">
+    
+    <span class="md-ellipsis">
+      <span title="/panel/faq.rst#gaps-in-the-periods-of-an-entity (reference label)"><span>Gaps in the Periods of an Entity</span></span>
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#estimated-effects" class="md-nav__link">
+    
+    <span class="md-ellipsis">
+      <span title="/panel/faq.rst#estimated-effects (reference label)"><span>Estimated Effects</span></span>
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Estimated Effects">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#splitting-entity-and-time-effects" class="md-nav__link">
+    
+    <span class="md-ellipsis">
+      <span title="/panel/faq.rst#splitting-entity-and-time-effects (reference label)"><span>Splitting Entity and Time Effects</span></span>
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#absorbingls-or-panelols" class="md-nav__link">
+    
+    <span class="md-ellipsis">
+      <span title="/panel/faq.rst#absorbingls-or-panelols (reference label)"><span>Absorbing<wbr>LS or Panel<wbr>OLS</span></span>
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#aligning-inputs" class="md-nav__link">
+    
+    <span class="md-ellipsis">
+      <span title="/panel/faq.rst#aligning-inputs (reference label)"><span>Aligning Inputs</span></span>
     </span>
   </a>
   
@@ -592,6 +684,29 @@
   
   <span class="md-ellipsis">
     <span title="/system/index.rst (reference label)"><span>System Regression Models</span></span>
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../input-alignment.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    <span title="/input-alignment.rst (reference label)"><span>Aligning Inputs</span></span>
     
   </span>
   
@@ -788,10 +903,102 @@
     <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
       
         <li class="md-nav__item">
+  <a href="#small-sample-adjustments" class="md-nav__link">
+    
+    <span class="md-ellipsis">
+      <span title="/panel/faq.rst#small-sample-adjustments (reference label)"><span>Small-<wbr>sample Adjustments</span></span>
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Small-sample Adjustments">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#matching-stata" class="md-nav__link">
+    
+    <span class="md-ellipsis">
+      <span title="/panel/faq.rst#matching-stata (reference label)"><span>Matching Stata</span></span>
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#counting-the-effects" class="md-nav__link">
+    
+    <span class="md-ellipsis">
+      <span title="/panel/faq.rst#counting-the-effects (reference label)"><span>Counting the Effects</span></span>
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
   <a href="#clustered-covariance-with-fixed-effects" class="md-nav__link">
     
     <span class="md-ellipsis">
       <span title="/panel/faq.rst#clustered-covariance-with-fixed-effects (reference label)"><span>Clustered Covariance with Fixed Effects</span></span>
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#gaps-in-the-periods-of-an-entity" class="md-nav__link">
+    
+    <span class="md-ellipsis">
+      <span title="/panel/faq.rst#gaps-in-the-periods-of-an-entity (reference label)"><span>Gaps in the Periods of an Entity</span></span>
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#estimated-effects" class="md-nav__link">
+    
+    <span class="md-ellipsis">
+      <span title="/panel/faq.rst#estimated-effects (reference label)"><span>Estimated Effects</span></span>
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Estimated Effects">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#splitting-entity-and-time-effects" class="md-nav__link">
+    
+    <span class="md-ellipsis">
+      <span title="/panel/faq.rst#splitting-entity-and-time-effects (reference label)"><span>Splitting Entity and Time Effects</span></span>
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#absorbingls-or-panelols" class="md-nav__link">
+    
+    <span class="md-ellipsis">
+      <span title="/panel/faq.rst#absorbingls-or-panelols (reference label)"><span>Absorbing<wbr>LS or Panel<wbr>OLS</span></span>
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#aligning-inputs" class="md-nav__link">
+    
+    <span class="md-ellipsis">
+      <span title="/panel/faq.rst#aligning-inputs (reference label)"><span>Aligning Inputs</span></span>
     </span>
   </a>
   
@@ -826,12 +1033,351 @@
 <h1 id="implementation-choices"><span id="panel-implementation-choices"></span>Implementation Choices<a class="headerlink" href="#implementation-choices" title="Link to this heading">¶</a></h1>
 <p>While the implementation of the panel estimators is similar to Stata, there
 are some differenced worth noting.</p>
+<h2 id="small-sample-adjustments"><span id="panel-small-sample"></span>Small-sample Adjustments<a class="headerlink" href="#small-sample-adjustments" title="Link to this heading">¶</a></h2>
+<p>The <code class="docutils literal notranslate"><span class="pre">fit</span></code> method of every panel estimator has <code class="docutils literal notranslate"><span class="pre">debiased=True</span></code> as its
+default. This is the case for <a class="reference internal" href="panel/linearmodels.panel.model.PooledOLS.html#linearmodels.panel.model.PooledOLS" title="linearmodels.panel.model.PooledOLS (Python class) — Pooled coefficient estimator for panel data."><code class="xref py py-class docutils literal notranslate"><span class="pre">PooledOLS</span></code></a>,
+<a class="reference internal" href="panel/linearmodels.panel.model.PanelOLS.html#linearmodels.panel.model.PanelOLS" title="linearmodels.panel.model.PanelOLS (Python class) — One- and two-way fixed effects estimator for panel data."><code class="xref py py-class docutils literal notranslate"><span class="pre">PanelOLS</span></code></a>,
+<a class="reference internal" href="panel/linearmodels.panel.model.BetweenOLS.html#linearmodels.panel.model.BetweenOLS" title="linearmodels.panel.model.BetweenOLS (Python class) — Between estimator for panel data."><code class="xref py py-class docutils literal notranslate"><span class="pre">BetweenOLS</span></code></a>,
+<a class="reference internal" href="panel/linearmodels.panel.model.FirstDifferenceOLS.html#linearmodels.panel.model.FirstDifferenceOLS" title="linearmodels.panel.model.FirstDifferenceOLS (Python class) — First difference model for panel data."><code class="xref py py-class docutils literal notranslate"><span class="pre">FirstDifferenceOLS</span></code></a>,
+<a class="reference internal" href="panel/linearmodels.panel.model.RandomEffects.html#linearmodels.panel.model.RandomEffects" title="linearmodels.panel.model.RandomEffects (Python class) — One-way Random Effects model for panel data."><code class="xref py py-class docutils literal notranslate"><span class="pre">RandomEffects</span></code></a> and
+<a class="reference internal" href="panel/linearmodels.panel.model.FamaMacBeth.html#linearmodels.panel.model.FamaMacBeth" title="linearmodels.panel.model.FamaMacBeth (Python class) — Fama-MacBeth estimator for panel data."><code class="xref py py-class docutils literal notranslate"><span class="pre">FamaMacBeth</span></code></a>. The IV estimators, including
+<a class="reference internal" href="../iv/absorbing/linearmodels.iv.absorbing.AbsorbingLS.html#linearmodels.iv.absorbing.AbsorbingLS" title="linearmodels.iv.absorbing.AbsorbingLS (Python class) — Linear regression with high-dimensional effects."><code class="xref py py-class docutils literal notranslate"><span class="pre">AbsorbingLS</span></code></a>, have <code class="docutils literal notranslate"><span class="pre">debiased=False</span></code>.</p>
+<p>With <code class="docutils literal notranslate"><span class="pre">debiased=True</span></code>, the covariance is scaled by <span class="math notranslate nohighlight">\(n/(n-k)\)</span>, where
+<span class="math notranslate nohighlight">\(n\)</span> is the number of observations and <span class="math notranslate nohighlight">\(k\)</span> is the number of
+regressors. The p-values and the confidence intervals of the parameters use a
+Student’s t distribution with the residual degrees of freedom, and the joint
+tests of significance use an F distribution. With <code class="docutils literal notranslate"><span class="pre">debiased=False</span></code> the
+covariance is not scaled by this factor, and the normal and <span class="math notranslate nohighlight">\(\chi^2\)</span>
+distributions are used. <a class="reference internal" href="panel/linearmodels.panel.model.PanelOLS.html#linearmodels.panel.model.PanelOLS" title="linearmodels.panel.model.PanelOLS (Python class) — One- and two-way fixed effects estimator for panel data."><code class="xref py py-class docutils literal notranslate"><span class="pre">PanelOLS</span></code></a> is an
+exception, see <a class="reference internal" href="#counting-the-effects">Counting the Effects</a>.</p>
+<p>The clustered covariance, <code class="docutils literal notranslate"><span class="pre">cov_type=&quot;clustered&quot;</span></code>, has a second adjustment,
+which is for the number of clusters. <code class="docutils literal notranslate"><span class="pre">group_debias=True</span></code> multiplies the
+covariance by <span class="math notranslate nohighlight">\(g/(g-1) \times (n-1)/n\)</span>, where <span class="math notranslate nohighlight">\(g\)</span> is the number of
+distinct clusters. With two-way clustering, it is applied to each of the three
+one-way covariances that are combined. The default is <code class="docutils literal notranslate"><span class="pre">group_debias=False</span></code>.</p>
+<h3 id="matching-stata">Matching Stata<a class="headerlink" href="#matching-stata" title="Link to this heading">¶</a></h3>
+<p>Stata’s <code class="docutils literal notranslate"><span class="pre">regress</span></code> with <code class="docutils literal notranslate"><span class="pre">vce(cluster)</span></code> scales the clustered covariance by
+<span class="math notranslate nohighlight">\(g/(g-1) \times (n-1)/(n-k)\)</span>. This is <code class="docutils literal notranslate"><span class="pre">debiased=True</span></code>, which is the
+default, together with <code class="docutils literal notranslate"><span class="pre">group_debias=True</span></code>.</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><code><span class="kn">from</span><span class="w"> </span><span class="nn">linearmodels</span><span class="w"> </span><span class="kn">import</span> <span class="n">PooledOLS</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">linearmodels.datasets</span><span class="w"> </span><span class="kn">import</span> <span class="n">wage_panel</span>
+
+<span class="n">data</span> <span class="o">=</span> <span class="n">wage_panel</span><span class="o">.</span><span class="n">load</span><span class="p">()</span><span class="o">.</span><span class="n">set_index</span><span class="p">([</span><span class="s2">"nr"</span><span class="p">,</span> <span class="s2">"year"</span><span class="p">])</span>
+<span class="n">mod</span> <span class="o">=</span> <span class="n">PooledOLS</span><span class="o">.</span><span class="n">from_formula</span><span class="p">(</span><span class="s2">"lwage ~ 1 + expersq + married + union"</span><span class="p">,</span> <span class="n">data</span><span class="p">)</span>
+<span class="n">res</span> <span class="o">=</span> <span class="n">mod</span><span class="o">.</span><span class="n">fit</span><span class="p">(</span>
+    <span class="n">cov_type</span><span class="o">=</span><span class="s2">"clustered"</span><span class="p">,</span> <span class="n">cluster_entity</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">debiased</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">group_debias</span><span class="o">=</span><span class="kc">True</span>
+<span class="p">)</span>
+</code></pre></div>
+</div>
+<p>The standard errors agree with those of the same regression in R,
+<code class="docutils literal notranslate"><span class="pre">sandwich::vcovCL(model,</span> <span class="pre">cluster</span> <span class="pre">=</span> <span class="pre">~nr,</span> <span class="pre">type</span> <span class="pre">=</span> <span class="pre">&quot;HC1&quot;,</span> <span class="pre">cadjust</span> <span class="pre">=</span> <span class="pre">TRUE)</span></code>,
+which uses the same formula. The default, <code class="docutils literal notranslate"><span class="pre">group_debias=False</span></code>, gives smaller
+standard errors, which matters when there are few clusters. If the clusters are
+defined by a variable with two values, the ratio of the default standard errors
+to those of Stata is <span class="math notranslate nohighlight">\(\sqrt{n(g-1)/((n-1)g)}\)</span>, which is close to
+<span class="math notranslate nohighlight">\(\sqrt{1/2}\)</span>, or 71%, if <span class="math notranslate nohighlight">\(g=2\)</span> and <span class="math notranslate nohighlight">\(n\)</span> is large. Few clusters,
+such as two, give unreliable standard errors whichever adjustment is used. The
+tests of the package that compare clustered covariances with Stata’s
+<code class="docutils literal notranslate"><span class="pre">regress</span></code> and <code class="docutils literal notranslate"><span class="pre">xtreg</span></code> use <code class="docutils literal notranslate"><span class="pre">debiased=True</span></code> and <code class="docutils literal notranslate"><span class="pre">group_debias=True</span></code>.</p>
+<p><code class="docutils literal notranslate"><span class="pre">xtreg</span></code> and <code class="docutils literal notranslate"><span class="pre">regress</span></code> with a dummy variable for each entity count the effects
+differently when the effects are nested in the clusters, so expect differences if
+you compare the estimators with both commands.</p>
+<h3 id="counting-the-effects">Counting the Effects<a class="headerlink" href="#counting-the-effects" title="Link to this heading">¶</a></h3>
+<p><a class="reference internal" href="panel/linearmodels.panel.model.PanelOLS.html#linearmodels.panel.model.PanelOLS" title="linearmodels.panel.model.PanelOLS (Python class) — One- and two-way fixed effects estimator for panel data."><code class="xref py py-class docutils literal notranslate"><span class="pre">PanelOLS</span></code></a> counts the effects that it estimates
+in its degrees of freedom, which is the <code class="docutils literal notranslate"><span class="pre">extra_df</span></code> of its covariance
+estimators. If <span class="math notranslate nohighlight">\(d\)</span> is the number of effects, the covariance is scaled by
+<span class="math notranslate nohighlight">\(n/(n-d-k)\)</span> if <code class="docutils literal notranslate"><span class="pre">debiased</span></code> is <code class="docutils literal notranslate"><span class="pre">True</span></code>, and by <span class="math notranslate nohighlight">\(n/(n-d)\)</span> if it is
+<code class="docutils literal notranslate"><span class="pre">False</span></code>, so that the effects are counted whether or not <code class="docutils literal notranslate"><span class="pre">debiased</span></code> is
+<code class="docutils literal notranslate"><span class="pre">True</span></code>. With <code class="docutils literal notranslate"><span class="pre">debiased=True</span></code>, the unadjusted and robust standard errors are
+those of the regression that includes a dummy variable for each effect. The
+number of effects is the number of entities for entity effects, the number of
+time periods for time effects and the number of groups for each of the other
+effects. One is subtracted from the number of each of the effects after the first,
+and from the number of the first if the model has a constant, because the
+effects are not separately identified. Counting the effects is not needed when
+they are nested in the clusters, which is described next.</p>
 <h2 id="clustered-covariance-with-fixed-effects">Clustered Covariance with Fixed Effects<a class="headerlink" href="#clustered-covariance-with-fixed-effects" title="Link to this heading">¶</a></h2>
 <p>When using clustered standard errors and entity effects, it is not necessary
 to adjust for estimated effects. <code class="docutils literal notranslate"><span class="pre">PanelOLS</span></code> attempts to detect when this is
-the case and automatically adjust the degree of freedom. This can be
-overridden using by setting the fit option <code class="docutils literal notranslate"><span class="pre">auto_df=False</span></code> and then
-changing the value of <code class="docutils literal notranslate"><span class="pre">count_effects</span></code>.</p>
+the case and automatically adjust the degree of freedom. This is done when
+the model has a single effect and the effect is nested in the clusters. The
+effects are counted in all other cases. This can be overridden by setting the
+fit option <code class="docutils literal notranslate"><span class="pre">auto_df=False</span></code> and then changing the value of <code class="docutils literal notranslate"><span class="pre">count_effects</span></code>.</p>
+<p>An effect is nested in a cluster variable if each of its groups is in one group
+of the variable. Entity effects are nested in the clusters of <code class="docutils literal notranslate"><span class="pre">cluster_entity=True</span></code>,
+and in clusters that are the industries of the entities if every entity is in one
+industry. The effect is nested in the clusters if it is nested in <strong>every</strong>
+cluster variable. This is the rule of <a class="reference internal" href="../iv/absorbing/linearmodels.iv.absorbing.AbsorbingLS.html#linearmodels.iv.absorbing.AbsorbingLS" title="linearmodels.iv.absorbing.AbsorbingLS (Python class) — Linear regression with high-dimensional effects."><code class="xref py py-class docutils literal notranslate"><span class="pre">AbsorbingLS</span></code></a>.
+It does not depend on the order of the cluster variables, which is why it is not
+enough that the effect is nested in one of them. For example:</p>
+<ul class="simple">
+<li><p>Entity effects with <code class="docutils literal notranslate"><span class="pre">cluster_entity=True</span></code>, or with the clusters (industry,
+entity) when each entity is in one industry, are nested. The effects are not
+counted.</p></li>
+<li><p>Entity effects with the clusters (entity, time), the two-way clustering by
+<code class="docutils literal notranslate"><span class="pre">cluster_entity=True,</span> <span class="pre">cluster_time=True</span></code>, are not nested, since an entity
+has observations in several periods. The effects are counted. Time effects with
+these clusters are not nested for the same reason.</p></li>
+<li><p>A model with more than one effect, for example entity and time effects, counts
+its effects with every clustered covariance.</p></li>
+</ul>
+<div class="admonition versionchanged">
+<p class="admonition-title"><span class="versionmodified changed">Changed in version 7.1: </span>The effect has to be nested in every cluster variable. Earlier versions kept
+the result for the last cluster variable only, so that the standard errors of the
+same model depended on the order of the variables, for example entity effects with
+the clusters (time, entity) were treated as nested and with (entity, time)
+as not nested.</p>
+</div>
+<h2 id="gaps-in-the-periods-of-an-entity"><span id="panel-ac-lags"></span>Gaps in the Periods of an Entity<a class="headerlink" href="#gaps-in-the-periods-of-an-entity" title="Link to this heading">¶</a></h2>
+<p>Some estimators use the order of the observations of an entity. They treat an
+entity that is not observed in some period between two of its observations (a gap)
+in different ways from other packages.</p>
+<p>The autocorrelation robust covariance, <code class="docutils literal notranslate"><span class="pre">cov_type=&quot;ac&quot;</span></code>, counts lags as positions
+in the observations of the entity, in the order of time. Two observations on both sides of
+a gap are one lag apart. The cluster-HAC covariance of statsmodels
+(<code class="docutils literal notranslate"><span class="pre">cov_type=&quot;hac-panel&quot;</span></code>) does the same. plm (<code class="docutils literal notranslate"><span class="pre">vcovNW</span></code>) and sandwich (<code class="docutils literal notranslate"><span class="pre">vcovPL</span></code>)
+count calendar periods, so that the observations are two lags apart if one period is
+missing between them. The covariances are the same for an entity without gaps. In a
+panel where about a quarter of the periods are missing, the standard errors of plm
+were about 3% different from the standard errors of this package and of statsmodels.
+See <a class="reference internal" href="panel/linearmodels.panel.covariance.ACCovariance.html#linearmodels.panel.covariance.ACCovariance" title="linearmodels.panel.covariance.ACCovariance (Python class) — Autocorrelation robust covariance estimation."><code class="xref py py-class docutils literal notranslate"><span class="pre">ACCovariance</span></code></a>, which also describes the weights
+of the lags of entities that are shorter than the bandwidth.</p>
+<p><a class="reference internal" href="panel/linearmodels.panel.model.FirstDifferenceOLS.html#linearmodels.panel.model.FirstDifferenceOLS" title="linearmodels.panel.model.FirstDifferenceOLS (Python class) — First difference model for panel data."><code class="xref py py-class docutils literal notranslate"><span class="pre">FirstDifferenceOLS</span></code></a> differences adjacent periods only.
+An observation that follows a gap does not have a difference, and the estimator uses the
+differences between adjacent periods of the panel, which are the distinct time labels of
+the data. plm differences consecutive observations of an entity, also across a gap, so
+that its differences can span several periods. In the panel with the missing periods
+above plm had 210 differences and this package 167, and the coefficient of the first
+regressor was 0.474 and 0.562. The estimates are the same without gaps.</p>
+<h2 id="estimated-effects"><span id="panel-estimated-effects"></span>Estimated Effects<a class="headerlink" href="#estimated-effects" title="Link to this heading">¶</a></h2>
+<p><code class="docutils literal notranslate"><span class="pre">estimated_effects</span></code> in the results is the combined effect of all of the
+effects in the model. It is a <code class="docutils literal notranslate"><span class="pre">DataFrame</span></code> with one column, the sum of the
+entity, time and other effects of each observation, and the effects are not
+available separately. It is <code class="docutils literal notranslate"><span class="pre">NaN</span></code> for
+<a class="reference internal" href="panel/linearmodels.panel.model.PooledOLS.html#linearmodels.panel.model.PooledOLS" title="linearmodels.panel.model.PooledOLS (Python class) — Pooled coefficient estimator for panel data."><code class="xref py py-class docutils literal notranslate"><span class="pre">PooledOLS</span></code></a>,
+<a class="reference internal" href="panel/linearmodels.panel.model.FirstDifferenceOLS.html#linearmodels.panel.model.FirstDifferenceOLS" title="linearmodels.panel.model.FirstDifferenceOLS (Python class) — First difference model for panel data."><code class="xref py py-class docutils literal notranslate"><span class="pre">FirstDifferenceOLS</span></code></a> and
+<a class="reference internal" href="panel/linearmodels.panel.model.FamaMacBeth.html#linearmodels.panel.model.FamaMacBeth" title="linearmodels.panel.model.FamaMacBeth (Python class) — Fama-MacBeth estimator for panel data."><code class="xref py py-class docutils literal notranslate"><span class="pre">FamaMacBeth</span></code></a>, and 0 for a
+<a class="reference internal" href="panel/linearmodels.panel.model.PanelOLS.html#linearmodels.panel.model.PanelOLS" title="linearmodels.panel.model.PanelOLS (Python class) — One- and two-way fixed effects estimator for panel data."><code class="xref py py-class docutils literal notranslate"><span class="pre">PanelOLS</span></code></a> model without effects. It adds to
+<code class="docutils literal notranslate"><span class="pre">fitted_values</span></code> and <code class="docutils literal notranslate"><span class="pre">idiosyncratic</span></code> to give the dependent variable.</p>
+<p>The effects do not have standard errors or any other inference, since they are
+not estimated consistently when the number of time periods is fixed. The effect
+of an entity is estimated from its <span class="math notranslate nohighlight">\(T\)</span> observations, so the error does not
+shrink when the number of entities grows. In a simulation with
+<span class="math notranslate nohighlight">\(T=5\)</span> and 200, 2,000 and 20,000 entities, the standard deviation of the
+error of the estimated entity effects was 0.441, 0.452 and 0.445, which is
+close to <span class="math notranslate nohighlight">\(\sigma/\sqrt{T}=0.447\)</span>, where <span class="math notranslate nohighlight">\(\sigma=1\)</span> is the standard
+deviation of the idiosyncratic shocks. If you need inference for the effects of
+a small number of entities, include the effects as dummy variables in the
+regression, for example in <a class="reference internal" href="panel/linearmodels.panel.model.PooledOLS.html#linearmodels.panel.model.PooledOLS" title="linearmodels.panel.model.PooledOLS (Python class) — Pooled coefficient estimator for panel data."><code class="xref py py-class docutils literal notranslate"><span class="pre">PooledOLS</span></code></a>, and use
+the results for the parameters of the dummy variables.</p>
+<p>The estimated effects of <a class="reference internal" href="panel/linearmodels.panel.model.RandomEffects.html#linearmodels.panel.model.RandomEffects" title="linearmodels.panel.model.RandomEffects (Python class) — One-way Random Effects model for panel data."><code class="xref py py-class docutils literal notranslate"><span class="pre">RandomEffects</span></code></a> are
+<span class="math notranslate nohighlight">\(\hat{\theta}_i\)</span> times the entity mean of <span class="math notranslate nohighlight">\(y-x^{\prime}\hat{\beta}\)</span>,
+where <span class="math notranslate nohighlight">\(\hat{\theta}_i = 1-\sqrt{\hat{\sigma}^2_\epsilon/(T_i\hat{\sigma}^2_u +
+\hat{\sigma}^2_\epsilon)}\)</span> and <span class="math notranslate nohighlight">\(\hat{\sigma}^2_u\)</span> is the estimated variance
+of the random effect. The estimate is set to 0 if it is negative. Then
+<span class="math notranslate nohighlight">\(\hat{\theta}_i=0\)</span>, the model is the same as pooled OLS, and all of the
+estimated effects are 0. This is a property of the data, not a bug: the
+variation between the entities is not larger than the idiosyncratic shocks
+imply. The <code class="docutils literal notranslate"><span class="pre">Effects</span></code> entry of <code class="docutils literal notranslate"><span class="pre">variance_decomposition</span></code> is 0 and <code class="docutils literal notranslate"><span class="pre">theta</span></code> is
+0 in the results when this happens.</p>
+<h3 id="splitting-entity-and-time-effects">Splitting Entity and Time Effects<a class="headerlink" href="#splitting-entity-and-time-effects" title="Link to this heading">¶</a></h3>
+<p>The sum of an entity effect and a time effect is exactly additive, so the two
+can be recovered from the combined effect, up to a constant that can be moved
+from one to the other. The function below regresses the estimated effects on a
+set of dummy variables for the entities and a set for the time periods, using
+sparse matrices. The fit is exact, also in an unbalanced panel. Compare the
+differences of the effects, or normalize them, for example by setting the first
+time effect to 0.</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><code><span class="kn">import</span><span class="w"> </span><span class="nn">numpy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">np</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">pandas</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">pd</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">statsmodels.api</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">sm</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">scipy.sparse</span><span class="w"> </span><span class="kn">import</span> <span class="n">csr_array</span><span class="p">,</span> <span class="n">hstack</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">scipy.sparse.linalg</span><span class="w"> </span><span class="kn">import</span> <span class="n">lsqr</span>
+
+<span class="kn">from</span><span class="w"> </span><span class="nn">linearmodels</span><span class="w"> </span><span class="kn">import</span> <span class="n">PanelOLS</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">linearmodels.datasets</span><span class="w"> </span><span class="kn">import</span> <span class="n">wage_panel</span>
+
+
+<span class="k">def</span><span class="w"> </span><span class="nf">split_effects</span><span class="p">(</span><span class="n">res</span><span class="p">):</span>
+    <span class="n">effects</span> <span class="o">=</span> <span class="n">res</span><span class="o">.</span><span class="n">estimated_effects</span><span class="o">.</span><span class="n">iloc</span><span class="p">[:,</span> <span class="mi">0</span><span class="p">]</span>
+    <span class="n">entity</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">Categorical</span><span class="p">(</span><span class="n">effects</span><span class="o">.</span><span class="n">index</span><span class="o">.</span><span class="n">get_level_values</span><span class="p">(</span><span class="mi">0</span><span class="p">))</span>
+    <span class="n">time</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">Categorical</span><span class="p">(</span><span class="n">effects</span><span class="o">.</span><span class="n">index</span><span class="o">.</span><span class="n">get_level_values</span><span class="p">(</span><span class="mi">1</span><span class="p">))</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">dummies</span><span class="p">(</span><span class="n">cat</span><span class="p">):</span>
+        <span class="n">n</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">cat</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">csr_array</span><span class="p">(</span>
+            <span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">ones</span><span class="p">(</span><span class="n">n</span><span class="p">),</span> <span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="n">n</span><span class="p">),</span> <span class="n">cat</span><span class="o">.</span><span class="n">codes</span><span class="p">)),</span> <span class="n">shape</span><span class="o">=</span><span class="p">(</span><span class="n">n</span><span class="p">,</span> <span class="nb">len</span><span class="p">(</span><span class="n">cat</span><span class="o">.</span><span class="n">categories</span><span class="p">))</span>
+        <span class="p">)</span>
+
+    <span class="n">design</span> <span class="o">=</span> <span class="n">hstack</span><span class="p">([</span><span class="n">dummies</span><span class="p">(</span><span class="n">entity</span><span class="p">),</span> <span class="n">dummies</span><span class="p">(</span><span class="n">time</span><span class="p">)])</span><span class="o">.</span><span class="n">tocsr</span><span class="p">()</span>
+    <span class="n">solution</span> <span class="o">=</span> <span class="n">lsqr</span><span class="p">(</span>
+        <span class="n">design</span><span class="p">,</span> <span class="n">effects</span><span class="o">.</span><span class="n">to_numpy</span><span class="p">(),</span> <span class="n">atol</span><span class="o">=</span><span class="mf">1e-14</span><span class="p">,</span> <span class="n">btol</span><span class="o">=</span><span class="mf">1e-14</span><span class="p">,</span> <span class="n">iter_lim</span><span class="o">=</span><span class="mi">10000</span>
+    <span class="p">)[</span><span class="mi">0</span><span class="p">]</span>
+    <span class="n">k</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">entity</span><span class="o">.</span><span class="n">categories</span><span class="p">)</span>
+    <span class="k">return</span> <span class="p">(</span>
+        <span class="n">pd</span><span class="o">.</span><span class="n">Series</span><span class="p">(</span><span class="n">solution</span><span class="p">[:</span><span class="n">k</span><span class="p">],</span> <span class="n">index</span><span class="o">=</span><span class="n">entity</span><span class="o">.</span><span class="n">categories</span><span class="p">),</span>
+        <span class="n">pd</span><span class="o">.</span><span class="n">Series</span><span class="p">(</span><span class="n">solution</span><span class="p">[</span><span class="n">k</span><span class="p">:],</span> <span class="n">index</span><span class="o">=</span><span class="n">time</span><span class="o">.</span><span class="n">categories</span><span class="p">),</span>
+    <span class="p">)</span>
+
+
+<span class="n">data</span> <span class="o">=</span> <span class="n">wage_panel</span><span class="o">.</span><span class="n">load</span><span class="p">()</span><span class="o">.</span><span class="n">set_index</span><span class="p">([</span><span class="s2">"nr"</span><span class="p">,</span> <span class="s2">"year"</span><span class="p">])</span>
+<span class="n">exog</span> <span class="o">=</span> <span class="n">sm</span><span class="o">.</span><span class="n">add_constant</span><span class="p">(</span><span class="n">data</span><span class="p">[[</span><span class="s2">"expersq"</span><span class="p">]])</span>
+<span class="n">mod</span> <span class="o">=</span> <span class="n">PanelOLS</span><span class="p">(</span><span class="n">data</span><span class="o">.</span><span class="n">lwage</span><span class="p">,</span> <span class="n">exog</span><span class="p">,</span> <span class="n">entity_effects</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">time_effects</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+<span class="n">entity_effects</span><span class="p">,</span> <span class="n">time_effects</span> <span class="o">=</span> <span class="n">split_effects</span><span class="p">(</span><span class="n">mod</span><span class="o">.</span><span class="n">fit</span><span class="p">())</span>
+<span class="n">time_effects</span> <span class="o">-</span> <span class="n">time_effects</span><span class="o">.</span><span class="n">iloc</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+</code></pre></div>
+</div>
+<h2 id="absorbingls-or-panelols"><span id="panel-absorbing-ls"></span>AbsorbingLS or PanelOLS<a class="headerlink" href="#absorbingls-or-panelols" title="Link to this heading">¶</a></h2>
+<p><a class="reference internal" href="panel/linearmodels.panel.model.PanelOLS.html#linearmodels.panel.model.PanelOLS" title="linearmodels.panel.model.PanelOLS (Python class) — One- and two-way fixed effects estimator for panel data."><code class="xref py py-class docutils literal notranslate"><span class="pre">PanelOLS</span></code></a> has up to two effects. It has the
+statistics of a panel estimator, and inference that matches Stata’s <code class="docutils literal notranslate"><span class="pre">xtreg</span></code>.
+<a class="reference internal" href="../iv/absorbing/linearmodels.iv.absorbing.AbsorbingLS.html#linearmodels.iv.absorbing.AbsorbingLS" title="linearmodels.iv.absorbing.AbsorbingLS (Python class) — Linear regression with high-dimensional effects."><code class="xref py py-class docutils literal notranslate"><span class="pre">AbsorbingLS</span></code></a> can absorb any number of effects,
+and effects interacted with continuous variables, and it is designed for models
+with very many groups. It is not a panel estimator, and it reports the
+statistics of a regression. See <a class="reference internal" href="../iv/introduction.html#iv-absorbing-ls"><span class="std std-ref">Absorbing Least Squares</span></a> for more.</p>
+<h2 id="aligning-inputs"><span id="panel-input-alignment"></span>Aligning Inputs<a class="headerlink" href="#aligning-inputs" title="Link to this heading">¶</a></h2>
+<p>The rows of <code class="docutils literal notranslate"><span class="pre">dependent</span></code>, <code class="docutils literal notranslate"><span class="pre">exog</span></code>, <code class="docutils literal notranslate"><span class="pre">weights</span></code>, <code class="docutils literal notranslate"><span class="pre">other_effects</span></code> and
+the <code class="docutils literal notranslate"><span class="pre">clusters</span></code> used in covariance estimation are paired by position. To
+prevent a value from being attached to the wrong observation, an input that
+carries labels (a pandas <code class="docutils literal notranslate"><span class="pre">Series</span></code> or <code class="docutils literal notranslate"><span class="pre">DataFrame</span></code>, an xarray <code class="docutils literal notranslate"><span class="pre">DataArray</span></code>,
+or <a class="reference internal" href="panel/linearmodels.panel.data.PanelData.html#linearmodels.panel.data.PanelData" title="linearmodels.panel.data.PanelData (Python class) — Abstraction to handle alternative formats for panel data."><code class="xref py py-class docutils literal notranslate"><span class="pre">PanelData</span></code></a>) must use the same labels, in
+the same order, as <code class="docutils literal notranslate"><span class="pre">dependent</span></code>. A <code class="docutils literal notranslate"><span class="pre">ValueError</span></code> is raised if the labels
+differ, for example when the values of a regressor have been reversed or sorted
+differently from the outcome. Reindex the input to the index of <code class="docutils literal notranslate"><span class="pre">dependent</span></code>
+to correct this.</p>
+<p>Dates are compared by value, so the same dates are the same labels when they
+are stored at different resolutions, for example <code class="docutils literal notranslate"><span class="pre">datetime64[us]</span></code> and
+<code class="docutils literal notranslate"><span class="pre">datetime64[ns]</span></code>. This applies to the time periods of the weights that are
+given for each time period, and to every other input. See
+<a class="reference internal" href="../input-alignment.html#input-alignment"><span class="std std-ref">Aligning Inputs</span></a>.</p>
+<p>NumPy arrays do not have labels and are always paired by position. The same
+is true of a pandas object that only has a default index, 0, 1, …, n-1, (and
+default columns, if it is a <code class="docutils literal notranslate"><span class="pre">DataFrame</span></code> without a MultiIndex) since there are
+no labels to compare. A <code class="docutils literal notranslate"><span class="pre">DataFrame</span></code> with one column and a default index is a
+column of values, and has no labels whatever the name of its column is. Use
+<code class="docutils literal notranslate"><span class="pre">to_numpy()</span></code> to explicitly pair the values of any other pandas object by
+position.</p>
+<p>If <code class="docutils literal notranslate"><span class="pre">dependent</span></code> does not carry labels, for example if it is a NumPy array, the
+first of <code class="docutils literal notranslate"><span class="pre">exog</span></code>, <code class="docutils literal notranslate"><span class="pre">weights</span></code> and <code class="docutils literal notranslate"><span class="pre">other_effects</span></code> that carries labels is the
+reference instead. Each of the inputs after it that carries labels, and
+<code class="docutils literal notranslate"><span class="pre">clusters</span></code>, must use the same labels, in the same order, or a <code class="docutils literal notranslate"><span class="pre">ValueError</span></code>
+that names both inputs is raised. If none of the inputs carries labels, all of
+them are paired by position. A list or a tuple is accepted wherever an array is
+accepted for <code class="docutils literal notranslate"><span class="pre">weights</span></code>, <code class="docutils literal notranslate"><span class="pre">clusters</span></code> and <code class="docutils literal notranslate"><span class="pre">other_effects</span></code>. It does not carry
+labels.</p>
+<p>Weights can be provided in any of the following shapes, where <code class="docutils literal notranslate"><span class="pre">nobs</span></code> is the
+number of time periods, <code class="docutils literal notranslate"><span class="pre">nentity</span></code> is the number of entities and <code class="docutils literal notranslate"><span class="pre">nrows</span></code> is the
+number of rows of <code class="docutils literal notranslate"><span class="pre">dependent</span></code>. <code class="docutils literal notranslate"><span class="pre">nrows</span></code> is <code class="docutils literal notranslate"><span class="pre">nobs</span> <span class="pre">*</span> <span class="pre">nentity</span></code> if <code class="docutils literal notranslate"><span class="pre">dependent</span></code> is
+balanced and less if it is not.</p>
+<ul class="simple">
+<li><p>A single weight for each observation, either as a 1-d array with <code class="docutils literal notranslate"><span class="pre">nrows</span></code>
+values or as a Series or DataFrame with the same MultiIndex as <code class="docutils literal notranslate"><span class="pre">dependent</span></code>.</p></li>
+<li><p>A single weight for each time period, as a 1-d array or Series with <code class="docutils literal notranslate"><span class="pre">nobs</span></code>
+values. The weight is used for every entity.</p></li>
+<li><p>A single weight for each entity, as a 1-d array or Series with <code class="docutils literal notranslate"><span class="pre">nentity</span></code>
+values. The weight is used for every time period.</p></li>
+<li><p>A weight for each time period and entity, as a 2-d array or a DataFrame with
+<code class="docutils literal notranslate"><span class="pre">nobs</span></code> rows and <code class="docutils literal notranslate"><span class="pre">nentity</span></code> columns.</p></li>
+</ul>
+<p>The number of values of a 1-d array decides how it is read, whether or not
+<code class="docutils literal notranslate"><span class="pre">dependent</span></code> is balanced. A list, a tuple, a Series that has the default index and a
+DataFrame with one column and the default index have no labels, and are read in the
+same way as an array.</p>
+<ul class="simple">
+<li><p>An array with <code class="docutils literal notranslate"><span class="pre">nrows</span></code> values is a weight for each observation. Its values are
+paired with the rows of <code class="docutils literal notranslate"><span class="pre">dependent</span></code> by position, in the order of the rows,
+whatever that order is, as a 1-d array of <code class="docutils literal notranslate"><span class="pre">clusters</span></code> or <code class="docutils literal notranslate"><span class="pre">other_effects</span></code> is. They
+are paired before the observations with missing values are dropped, so the array has
+a value for every row of <code class="docutils literal notranslate"><span class="pre">dependent</span></code>, including the rows with a missing value of
+<code class="docutils literal notranslate"><span class="pre">dependent</span></code> or <code class="docutils literal notranslate"><span class="pre">exog</span></code>.</p></li>
+<li><p>An array with <code class="docutils literal notranslate"><span class="pre">nobs</span></code> values is a weight for each time period, and an array with
+<code class="docutils literal notranslate"><span class="pre">nentity</span></code> values is a weight for each entity.</p></li>
+<li><p>If <code class="docutils literal notranslate"><span class="pre">nobs</span></code> and <code class="docutils literal notranslate"><span class="pre">nentity</span></code> are equal, an array with that many values could be
+either, and an <code class="docutils literal notranslate"><span class="pre">AmbiguityError</span></code> is raised. Give the weights as a 2-d array or for
+each row instead.</p></li>
+<li><p>If <code class="docutils literal notranslate"><span class="pre">dependent</span></code> is not balanced and has as many rows as time periods or entities,
+which happens if every time period or entity has a single observation, an array with
+that many values is a weight for each observation.</p></li>
+<li><p>Any other number of values raises a <code class="docutils literal notranslate"><span class="pre">ValueError</span></code> that gives the numbers that are
+accepted. An array with <code class="docutils literal notranslate"><span class="pre">nobs</span> <span class="pre">*</span> <span class="pre">nentity</span></code> values is a weight for each observation
+only if <code class="docutils literal notranslate"><span class="pre">dependent</span></code> is balanced. If it is not, use a 2-d array to give a weight to
+each combination of a time period and an entity.</p></li>
+</ul>
+<p>Weights with labels, a pandas object with an index that is not the default index, are
+read by their labels instead. A Series with the MultiIndex of <code class="docutils literal notranslate"><span class="pre">dependent</span></code> is a weight
+for each observation. A Series that is indexed by the time periods is a weight for each
+time period, and a Series that is indexed by the entities is a weight for each entity,
+also if <code class="docutils literal notranslate"><span class="pre">dependent</span></code> is not balanced and has as many rows as time periods or entities,
+where the same values in an array are a weight for each observation. The time periods
+and entities must be in the order that is described below. The labels do not resolve the
+ambiguity of equal numbers of time periods and entities, and the <code class="docutils literal notranslate"><span class="pre">AmbiguityError</span></code> is
+raised for them.</p>
+<p>For example, the weights of a panel that is not balanced, whose rows are in any order,
+can be given as a column of the data that has a value for each row</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><code><span class="n">weights</span> <span class="o">=</span> <span class="n">data</span><span class="p">[</span><span class="s2">"weight"</span><span class="p">]</span><span class="o">.</span><span class="n">to_numpy</span><span class="p">()</span>  <span class="c1"># a value for each row, in the order of the rows</span>
+<span class="n">mod</span> <span class="o">=</span> <span class="n">PanelOLS</span><span class="p">(</span><span class="n">data</span><span class="p">[</span><span class="s2">"y"</span><span class="p">],</span> <span class="n">data</span><span class="p">[[</span><span class="s2">"x"</span><span class="p">]],</span> <span class="n">weights</span><span class="o">=</span><span class="n">weights</span><span class="p">,</span> <span class="n">entity_effects</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+</code></pre></div>
+</div>
+<div class="admonition versionchanged">
+<p class="admonition-title"><span class="versionmodified changed">Changed in version 7.1: </span>A 1-d array with a weight for each observation can be used if <code class="docutils literal notranslate"><span class="pre">dependent</span></code> is not
+balanced. Earlier versions raised “Weights do not have a supported shape” for it,
+although the same weights as a Series with the index of <code class="docutils literal notranslate"><span class="pre">dependent</span></code> worked, and
+an array with <code class="docutils literal notranslate"><span class="pre">nobs</span> <span class="pre">*</span> <span class="pre">nentity</span></code> values raised an error from pandas or NumPy. If
+<code class="docutils literal notranslate"><span class="pre">dependent</span></code> is not balanced and has as many rows as time periods or entities,
+weights without labels with that many values are a weight for each observation, and
+a Series indexed by the time periods or by the entities is a weight for each time
+period or entity. Earlier versions raised “weights must have the same number of
+observations as dependent” for them, or an <code class="docutils literal notranslate"><span class="pre">AmbiguityError</span></code> if the numbers of time
+periods and entities were equal. A DataFrame with one column and the default index is
+read as an array with a column is. It raised an error from pandas or NumPy if
+<code class="docutils literal notranslate"><span class="pre">dependent</span></code> was balanced, and “Weights do not have a supported shape” if it was
+not.</p>
+</div>
+<p>Weights that are defined for each time period, for each entity or for each
+combination of the two are matched to the time periods and entities in the
+order that they first appear in <code class="docutils literal notranslate"><span class="pre">dependent</span></code>. This is the case even if the
+rows of <code class="docutils literal notranslate"><span class="pre">dependent</span></code> are not sorted by entity and then time. When these
+weights are a pandas object, the index (and columns) must contain the time
+periods and entities in this order.</p>
+<p><code class="docutils literal notranslate"><span class="pre">clusters</span></code> and <code class="docutils literal notranslate"><span class="pre">other_effects</span></code> can be given for each combination of time
+period and entity in the same way as weights: a 2-d array or a DataFrame with
+<code class="docutils literal notranslate"><span class="pre">nobs</span></code> rows and <code class="docutils literal notranslate"><span class="pre">nentity</span></code> columns, or a 3-d array or a <code class="docutils literal notranslate"><span class="pre">DataArray</span></code> with the
+variables first, which two-way clusters and two effects need. They are placed on
+the rows of <code class="docutils literal notranslate"><span class="pre">dependent</span></code> by time period and entity, whatever the order of the
+rows is. <code class="docutils literal notranslate"><span class="pre">dependent</span></code> does not need to be balanced for any of these inputs. The
+values of the combinations of a time period and an entity that <code class="docutils literal notranslate"><span class="pre">dependent</span></code>
+does not have are not used, and can be missing. For example, the industry of each
+observation of a panel that is sorted by entity and time can be used for the
+clusters of the standard errors in either of the two ways</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><code><span class="n">clusters</span> <span class="o">=</span> <span class="n">data</span><span class="p">[</span><span class="s2">"industry"</span><span class="p">]</span><span class="o">.</span><span class="n">unstack</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>  <span class="c1"># time periods by entities</span>
+<span class="n">res</span> <span class="o">=</span> <span class="n">mod</span><span class="o">.</span><span class="n">fit</span><span class="p">(</span><span class="n">cov_type</span><span class="o">=</span><span class="s2">"clustered"</span><span class="p">,</span> <span class="n">clusters</span><span class="o">=</span><span class="n">clusters</span><span class="p">)</span>
+<span class="n">res</span> <span class="o">=</span> <span class="n">mod</span><span class="o">.</span><span class="n">fit</span><span class="p">(</span><span class="n">cov_type</span><span class="o">=</span><span class="s2">"clustered"</span><span class="p">,</span> <span class="n">clusters</span><span class="o">=</span><span class="n">data</span><span class="p">[[</span><span class="s2">"industry"</span><span class="p">]])</span>
+</code></pre></div>
+</div>
+<p>The cluster of an observation that the model uses cannot be missing, since the
+observation would not belong to any cluster, and a <code class="docutils literal notranslate"><span class="pre">ValueError</span></code> is raised, as
+in the IV and system models. The clusters of the observations that the model drops
+because a value of <code class="docutils literal notranslate"><span class="pre">dependent</span></code>, <code class="docutils literal notranslate"><span class="pre">exog</span></code>, <code class="docutils literal notranslate"><span class="pre">weights</span></code> or <code class="docutils literal notranslate"><span class="pre">other_effects</span></code> is
+missing are not used, and can be missing.</p>
+<div class="admonition versionchanged">
+<p class="admonition-title"><span class="versionmodified changed">Changed in version 7.1: </span>Earlier versions did not report a missing cluster as such. <code class="docutils literal notranslate"><span class="pre">PooledOLS</span></code>,
+<code class="docutils literal notranslate"><span class="pre">PanelOLS</span></code> and <code class="docutils literal notranslate"><span class="pre">RandomEffects</span></code> made the observations with a missing cluster
+a cluster of their own, so that the standard errors changed without an error.
+<code class="docutils literal notranslate"><span class="pre">BetweenOLS</span></code> and <code class="docutils literal notranslate"><span class="pre">FirstDifferenceOLS</span></code> ignored some missing clusters and
+raised errors that did not name the missing values for the others.</p>
+</div>
+<p>In an unbalanced panel the order in which the time periods and entities first
+appear can differ from the order of the time periods and entities. If the first
+entity enters late and the rows are sorted by entity, for example, the first
+periods appear last. The time periods are in order of time if the rows of every
+entity are in order of time, in either direction, and the entities are in the
+order of their labels if the rows of every time period are in order of the
+entities. This is how a panel that is sorted by entity and time, or by time and
+entity, is matched whether or not it is balanced, and a DataFrame that
+<code class="docutils literal notranslate"><span class="pre">unstack</span></code> makes from such a panel has its time periods and entities in order.
+If the rows are in another order, then the time periods and entities are in the
+order that they first appear, as in a balanced panel. A pandas object that does not
+use this order raises a <code class="docutils literal notranslate"><span class="pre">ValueError</span></code>. Values for each row, a pandas object with
+the index of <code class="docutils literal notranslate"><span class="pre">dependent</span></code> or a 1-d array, do not depend on this order.</p>
 <h2 id="r-2-definitions"><span class="math notranslate nohighlight">\(R^2\)</span> definitions<a class="headerlink" href="#r-2-definitions" title="Link to this heading">¶</a></h2>
 <p>The <span class="math notranslate nohighlight">\(R^2\)</span> definitions are all designed so that the reported value will
 match the original model using the estimated parameters.  This differs from
@@ -842,11 +1388,18 @@ adjustments to estimated parameters. The main reported <span class="math notrans
 the actual model fit, after adjusting the data for:</p>
 <ul class="simple">
 <li><p>weights (all estimators)</p></li>
-<li><p>effects (<a class="reference internal" href="panel/linearmodels.panel.model.PanelOLS.html#linearmodels.panel.model.PanelOLS" title="linearmodels.panel.model.PanelOLS (Python class) — One- and two-way fixed effects estimator for panel data"><code class="xref py py-class docutils literal notranslate"><span class="pre">PanelOLS</span></code></a>)</p></li>
-<li><p>re-centering (<a class="reference internal" href="panel/linearmodels.panel.model.RandomEffects.html#linearmodels.panel.model.RandomEffects" title="linearmodels.panel.model.RandomEffects (Python class) — One-way Random Effects model for panel data"><code class="xref py py-class docutils literal notranslate"><span class="pre">RandomEffects</span></code></a>)</p></li>
-<li><p>within entity aggregation (<a class="reference internal" href="panel/linearmodels.panel.model.BetweenOLS.html#linearmodels.panel.model.BetweenOLS" title="linearmodels.panel.model.BetweenOLS (Python class) — Between estimator for panel data"><code class="xref py py-class docutils literal notranslate"><span class="pre">BetweenOLS</span></code></a>)</p></li>
-<li><p>differencing (<a class="reference internal" href="panel/linearmodels.panel.model.FirstDifferenceOLS.html#linearmodels.panel.model.FirstDifferenceOLS" title="linearmodels.panel.model.FirstDifferenceOLS (Python class) — First difference model for panel data"><code class="xref py py-class docutils literal notranslate"><span class="pre">FirstDifferenceOLS</span></code></a>)</p></li>
+<li><p>effects (<a class="reference internal" href="panel/linearmodels.panel.model.PanelOLS.html#linearmodels.panel.model.PanelOLS" title="linearmodels.panel.model.PanelOLS (Python class) — One- and two-way fixed effects estimator for panel data."><code class="xref py py-class docutils literal notranslate"><span class="pre">PanelOLS</span></code></a>)</p></li>
+<li><p>re-centering (<a class="reference internal" href="panel/linearmodels.panel.model.RandomEffects.html#linearmodels.panel.model.RandomEffects" title="linearmodels.panel.model.RandomEffects (Python class) — One-way Random Effects model for panel data."><code class="xref py py-class docutils literal notranslate"><span class="pre">RandomEffects</span></code></a>)</p></li>
+<li><p>within entity aggregation (<a class="reference internal" href="panel/linearmodels.panel.model.BetweenOLS.html#linearmodels.panel.model.BetweenOLS" title="linearmodels.panel.model.BetweenOLS (Python class) — Between estimator for panel data."><code class="xref py py-class docutils literal notranslate"><span class="pre">BetweenOLS</span></code></a>)</p></li>
+<li><p>differencing (<a class="reference internal" href="panel/linearmodels.panel.model.FirstDifferenceOLS.html#linearmodels.panel.model.FirstDifferenceOLS" title="linearmodels.panel.model.FirstDifferenceOLS (Python class) — First difference model for panel data."><code class="xref py py-class docutils literal notranslate"><span class="pre">FirstDifferenceOLS</span></code></a>)</p></li>
 </ul>
+<p>An <span class="math notranslate nohighlight">\(R^2\)</span> is NaN, with no error or warning, if the total sum of squares that it
+divides by is zero, up to rounding error, since it is not defined then. This
+happens if the dependent variable does not vary, or if it has no variation left
+once the means or the effects of the measure are removed, e.g., the within
+<span class="math notranslate nohighlight">\(R^2\)</span> of a dependent variable that is constant within each entity, or of a
+panel with a single time period. See
+<a class="reference internal" href="panel/linearmodels.panel.results.PanelResults.rsquared_within.html#linearmodels.panel.results.PanelResults.rsquared_within" title="linearmodels.panel.results.PanelResults.rsquared_within (Python property) — Within coefficient of determination."><code class="xref py py-attr docutils literal notranslate"><span class="pre">rsquared_within</span></code></a>.</p>
 
 
 
@@ -881,13 +1434,13 @@ the actual model fit, after adjusting the data for:</p>
       <div class="md-copyright">
   
     <div class="md-footer-copyright__highlight">
-        &#169; Copyright 2021, Kevin Sheppard.
+        &#169; Copyright 2017-2026, Kevin Sheppard.
         
     </div>
   
     Created using
     <a href="https://www.sphinx-doc.org/" target="_blank" rel="noopener">Sphinx</a>
-    8.1.3.
+    9.1.0.
      and
     <a href="https://github.com/jbms/sphinx-immaterial/" target="_blank" rel="noopener">Sphinx-Immaterial</a>
   
@@ -944,7 +1497,7 @@ the actual model fit, after adjusting the data for:</p>
         <script src="../_static/sphinx_immaterial_theme.32136f45f91ae6956.min.js?v=a7a9472a"></script>
         <script crossorigin="anonymous" integrity="sha256-Ae2Vz/4ePdIu6ZyI/5ZGsYnb+m0JlOmKPjt6XZ9JJkA=" src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.4/require.min.js"></script>
         <script>window.MathJax = {"tex": {"inlineMath": [["$", "$"], ["\\(", "\\)"]], "processEscapes": true}, "options": {"ignoreHtmlClass": "tex2jax_ignore|mathjax_ignore|document", "processHtmlClass": "tex2jax_process|mathjax_process|math|output_area"}}</script>
-        <script id="MathJax-script" src="../_static/mathjax/tex-mml-chtml.js?v=cadf963e"></script>
+        <script id="MathJax-script" src="../_static/mathjax/tex-mml-chtml.js"></script>
     
   </body>
 </html>

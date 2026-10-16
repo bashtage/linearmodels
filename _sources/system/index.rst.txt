@@ -72,6 +72,11 @@ SUR which allows variables to be either exogenous or endogenous, and when there 
 variables, for instruments to be used.  SUR is a special case of 3SLS where there are no
 endogenous variables or instruments. 3SLS allows systems of IV equations to be jointly estimated.
 
+The rows of the variables of each equation are paired by position. An input that carries
+labels, such as a pandas ``Series`` or ``DataFrame`` with an index, must have the same
+labels, in the same order, as the ``dependent`` of its equation, and the dependent
+variables of the equations must share their labels. See :ref:`input-alignment`.
+
 .. toctree::
    :maxdepth: 1
    :glob:

@@ -1,0 +1,6 @@
+linearmodels.iv.results.FirstStageResults.kleibergen\_paap
+==========================================================
+
+.. currentmodule:: linearmodels.iv.results
+
+.. autoproperty:: FirstStageResults.kleibergen_paap
