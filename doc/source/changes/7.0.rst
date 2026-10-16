@@ -1,22 +1,27 @@
 Version 7.1
 -----------
 
-Released on 2026-10-15.
+Released on 2026-10-16.
+
+Version 7.1 is a significant release in the 7.x branch. It contains a number
+of new features, improvements, and bug fixes.
 
 .. rubric:: Highlights
 
 - New estimators and tests: :class:`~linearmodels.iv.model.IVJIVE`, first-stage rank
   tests, a centered J test, the Hausman and Pesaran CD tests for panel models, and panel
   models that only have effects.
-- Many corrections change the numbers that unchanged code produced in 7.0, including the
-  default bandwidth of the kernel estimators of ``IVGMM``, ``IVGMMCUE`` and
+- Many technical corrections change the numbers that that were produced in 7.0. The most important of
+  these include changes to the default bandwidth of the kernel estimators of ``IVGMM``, ``IVGMMCUE`` and
   ``IVSystemGMM``, the Fama-MacBeth p-values and the weighted panel and system models.
-  See *Changes that alter results*.
+  See :ref:`changes-alter-rubric-target`.
+- Increased reliability of weighted estimators including testing post-estimation statistics
+  for correctness with weights.
 - Inputs with labels must have the same index as ``dependent`` (or as the first input
   with labels) in every estimator, and input of the wrong type now raises a clear
   ``TypeError`` or ``ValueError``. See *Backward-incompatible changes*.
-- Python 3.15 is supported. **7.1 is the last release to support Python 3.10 and NumPy
-  1.x.**
+- Python 3.15 is supported. 7.1 is the final release to support Python 3.10 and NumPy
+  1.x.
 
 .. rubric:: New features
 
@@ -73,6 +78,9 @@ Released on 2026-10-15.
 - ``linearmodels.iv.common`` and ``linearmodels.iv.results`` define ``__all__``, so that
   ``import *`` no longer imports the modules and functions that they import
   (:issue:`765`).
+
+
+.. _changes-alter-rubric-target:
 
 .. rubric:: Changes that alter results
 
