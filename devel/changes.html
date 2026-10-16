@@ -23,7 +23,7 @@
     
   
       
-        <title>Change Log - linearmodels v7.1 (+586)</title>
+        <title>Change Log - linearmodels v7.1 (+588)</title>
       
     
 
@@ -100,7 +100,7 @@
 
 <header class="md-header md-header--shadow" data-md-component="header">
   <nav class="md-header__inner md-grid" aria-label="Header">
-    <a href="index.html" title="linearmodels v7.1 (+586)" class="md-header__button md-logo" aria-label="linearmodels v7.1 (+586)" data-md-component="logo">
+    <a href="index.html" title="linearmodels v7.1 (+588)" class="md-header__button md-logo" aria-label="linearmodels v7.1 (+588)" data-md-component="logo">
       <img src="_static/bw-logo.svg" alt="logo">
     </a>
     <label class="md-header__button md-icon" for="__drawer">
@@ -111,7 +111,7 @@
       <div class="md-header__ellipsis">
         <div class="md-header__topic">
           <span class="md-ellipsis">
-            linearmodels v7.1 (+586)
+            linearmodels v7.1 (+588)
           </span>
         </div>
         <div class="md-header__topic" data-md-component="header-topic">
@@ -206,10 +206,10 @@
 
 <nav class="md-nav md-nav--primary" aria-label="Navigation" data-md-level="0">
   <label class="md-nav__title" for="__drawer">
-    <a href="index.html" title="linearmodels v7.1 (+586)" class="md-nav__button md-logo" aria-label="linearmodels v7.1 (+586)" data-md-component="logo">
+    <a href="index.html" title="linearmodels v7.1 (+588)" class="md-nav__button md-logo" aria-label="linearmodels v7.1 (+588)" data-md-component="logo">
       <img src="_static/bw-logo.svg" alt="logo">
     </a>
-    linearmodels v7.1 (+586)
+    linearmodels v7.1 (+588)
   </label>
   
     <div class="md-nav__source">
@@ -1155,6 +1155,7 @@
 
 <h1 id="change-log">Change Log<a class="headerlink" href="#change-log" title="Link to this heading">¶</a></h1>
 <h2 id="version-7-1">Version 7.1<a class="headerlink" href="#version-7-1" title="Link to this heading">¶</a></h2>
+<p>Released on 2026-10-15.</p>
 <p class="rubric">Highlights</p>
 <ul class="simple">
 <li><p>New estimators and tests: <a class="reference internal" href="iv/iv/linearmodels.iv.model.IVJIVE.html#linearmodels.iv.model.IVJIVE" title="linearmodels.iv.model.IVJIVE (Python class) — Jackknife instrumental variables estimator (JIVE)."><code class="xref py py-class docutils literal notranslate"><span class="pre">IVJIVE</span></code></a>, first-stage rank
@@ -1436,7 +1437,7 @@ and a <code class="docutils literal notranslate"><span class="pre">BetweenOLS</s
 group or have missing values. 7.0 returned a wrong covariance or raised
 <code class="docutils literal notranslate"><span class="pre">ZeroDivisionError</span></code>, and panel models made the missing ids a cluster of their own.
 The ids of observations that are dropped for other missing values may be missing
-(<a class="extlink-issue reference external" href="https://github.com/bashtage/linearmodels/issues/789">GH789</a>).</p></li>
+(<a class="extlink-issue reference external" href="https://github.com/bashtage/linearmodels/issues/789">GH789</a>, <a class="extlink-issue reference external" href="https://github.com/bashtage/linearmodels/issues/845">GH845</a>).</p></li>
 <li><p><code class="docutils literal notranslate"><span class="pre">LinearFactorModelGMM</span></code> raises a <code class="docutils literal notranslate"><span class="pre">ValueError</span></code> when the model is created if there
 are not more observations than moment conditions. A <code class="docutils literal notranslate"><span class="pre">sigma</span></code> of <code class="docutils literal notranslate"><span class="pre">LinearFactorModel</span></code>
 that is not symmetric and positive definite, and a saturated debiased asset pricing
@@ -1536,6 +1537,8 @@ specification tests, small-sample adjustments, estimated effects and
 <li><p>The tests do not leak warnings with any supported combination of versions, and the
 minimum versions of statsmodels (0.14.6) and pyhdfe (0.2.0) were raised for this
 (<a class="extlink-issue reference external" href="https://github.com/bashtage/linearmodels/issues/751">GH751</a>, <a class="extlink-issue reference external" href="https://github.com/bashtage/linearmodels/issues/826">GH826</a>).</p></li>
+<li><p>The tests compare floating-point results with a tolerance, since their last digits
+differ between platforms, and the CI also tests a wheel on Intel macOS (<a class="extlink-issue reference external" href="https://github.com/bashtage/linearmodels/issues/846">GH846</a>).</p></li>
 <li><p>The type annotations describe what the code accepts and returns: <code class="docutils literal notranslate"><span class="pre">ArrayLike</span></code>
 includes lists and tuples, and <code class="docutils literal notranslate"><span class="pre">fitted_values</span></code>, <code class="docutils literal notranslate"><span class="pre">estimated_effects</span></code> and
 <code class="docutils literal notranslate"><span class="pre">idiosyncratic</span></code> of the panel results are <code class="docutils literal notranslate"><span class="pre">DataFrame</span></code>. A GitHub workflow runs mypy,
