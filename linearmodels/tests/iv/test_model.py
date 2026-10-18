@@ -119,6 +119,18 @@ def test_rank_deficient_instr_exception(data):
         IV2SLS(data.dep, data.exog, data.endog, data.exog)
 
 
+def test_instr_rank_check_is_scale_invariant(data):
+    """Instruments on very different scales must not look rank deficient.
+
+    Regression test for case 3 of https://github.com/bashtage/linearmodels/issues/823
+    """
+    instr = data.instr.copy()
+    instr[:, 0] *= 1.0e13
+    base = IV2SLS(data.dep, data.exog, data.endog, data.instr).fit()
+    scaled = IV2SLS(data.dep, data.exog, data.endog, instr).fit()
+    assert_allclose(scaled.params, base.params, rtol=1.0e-4)
+
+
 def test_kappa_error_exception(data):
     with pytest.raises(ValueError, match=r"kappa must be None or a scalar"):
         IVLIML(data.dep, data.exog, data.endog, data.instr, kappa=np.array([1]))
