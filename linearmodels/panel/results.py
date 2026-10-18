@@ -605,8 +605,9 @@ class PanelResults(_SummaryStr):
         Raises
         ------
         ValueError
-            If both `exog` and `data` are provided, or if no in-sample output
-            is selected.
+            If both `exog` and `data` are provided, if no in-sample output
+            is selected, or if `effects` or `idiosyncratic` is requested for
+            out-of-sample predictions.
 
         Notes
         -----
@@ -621,6 +622,13 @@ class PanelResults(_SummaryStr):
         predictions.
         """
         if not (exog is None and data is None):
+            if effects or idiosyncratic:
+                raise ValueError(
+                    "effects and idiosyncratic are not available for "
+                    "out-of-sample predictions"
+                )
+            if not fitted:
+                raise ValueError("At least one output must be selected")
             context = capture_context(1)
             return self._out_of_sample(exog, data, missing, context=context)
         out = []

@@ -387,6 +387,27 @@ def test_predict_no_selection(generated_data):
         res.predict(fitted=False, effects=False, idiosyncratic=False, missing=True)
 
 
+def test_predict_out_of_sample_flags(generated_data):
+    if np.any(np.isnan(generated_data.x)):
+        pytest.skip("Cannot test with missing values")
+    with warns_if_missing(generated_data.y, generated_data.x):
+        mod = PanelOLS(generated_data.y, generated_data.x, entity_effects=True)
+    res = mod.fit()
+    exog = generated_data.x
+    with pytest.raises(
+        ValueError, match=r"not available for out-of-sample predictions"
+    ):
+        res.predict(exog, effects=True)
+    with pytest.raises(
+        ValueError, match=r"not available for out-of-sample predictions"
+    ):
+        res.predict(exog, idiosyncratic=True)
+    with pytest.raises(ValueError, match=r"At least one output must be"):
+        res.predict(exog, fitted=False)
+    pred = res.predict(exog)
+    assert list(pred.columns) == ["predictions"]
+
+
 @pytest.mark.parametrize(
     "constraint_formula",
     [
