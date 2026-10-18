@@ -23,7 +23,7 @@
     
   
       
-        <title>linearmodels.panel.results.PanelEffectsResults.predict - linearmodels 7.1</title>
+        <title>linearmodels.panel.results.PanelEffectsResults.predict - linearmodels v7.2 (+2)</title>
       
     
 
@@ -100,7 +100,7 @@
 
 <header class="md-header md-header--shadow" data-md-component="header">
   <nav class="md-header__inner md-grid" aria-label="Header">
-    <a href="../../index.html" title="linearmodels 7.1" class="md-header__button md-logo" aria-label="linearmodels 7.1" data-md-component="logo">
+    <a href="../../index.html" title="linearmodels v7.2 (+2)" class="md-header__button md-logo" aria-label="linearmodels v7.2 (+2)" data-md-component="logo">
       <img src="../../_static/bw-logo.svg" alt="logo">
     </a>
     <label class="md-header__button md-icon" for="__drawer">
@@ -111,7 +111,7 @@
       <div class="md-header__ellipsis">
         <div class="md-header__topic">
           <span class="md-ellipsis">
-            linearmodels 7.1
+            linearmodels v7.2 (+2)
           </span>
         </div>
         <div class="md-header__topic" data-md-component="header-topic">
@@ -206,10 +206,10 @@
 
 <nav class="md-nav md-nav--primary" aria-label="Navigation" data-md-level="0">
   <label class="md-nav__title" for="__drawer">
-    <a href="../../index.html" title="linearmodels 7.1" class="md-nav__button md-logo" aria-label="linearmodels 7.1" data-md-component="logo">
+    <a href="../../index.html" title="linearmodels v7.2 (+2)" class="md-nav__button md-logo" aria-label="linearmodels v7.2 (+2)" data-md-component="logo">
       <img src="../../_static/bw-logo.svg" alt="logo">
     </a>
-    linearmodels 7.1
+    linearmodels v7.2 (+2)
   </label>
   
     <div class="md-nav__source">
@@ -2510,8 +2510,9 @@ before filtering missing values. The default is False.</p>
 <dd class="field-odd"><p><a class="reference external" href="https://pandas.pydata.org/pandas-docs/stable/reference/api/pandas.DataFrame.html#pandas.DataFrame" title="(in pandas v3.0.6)"><code class="xref py py-class docutils literal notranslate"><span class="pre">pandas.DataFrame</span></code></a></p>
 </dd>
 <dt class="field-even" id="linearmodels.panel.results.PanelEffectsResults.predict-raises">Raises<span class="colon">:</span><a class="headerlink" href="#linearmodels.panel.results.PanelEffectsResults.predict-raises" title="Permalink to this headline">¶</a></dt>
-<dd class="field-even"><p><a class="reference external" href="https://docs.python.org/3/builtins/exceptions.html#ValueError" title="(in Python v3.15)"><strong>ValueError</strong></a> – If both <cite>exog</cite> and <cite>data</cite> are provided, or if no in-sample output
-    is selected.</p>
+<dd class="field-even"><p><a class="reference external" href="https://docs.python.org/3/builtins/exceptions.html#ValueError" title="(in Python v3.15)"><strong>ValueError</strong></a> – If both <cite>exog</cite> and <cite>data</cite> are provided, if no in-sample output
+    is selected, or if <cite>effects</cite> or <cite>idiosyncratic</cite> is requested for
+    out-of-sample predictions.</p>
 </dd>
 </dl>
 <p class="rubric">Notes</p>

@@ -19,7 +19,7 @@
     
   
       
-        <title>linearmodels.panel.results - linearmodels 7.1</title>
+        <title>linearmodels.panel.results - linearmodels v7.2 (+2)</title>
       
     
 
@@ -91,7 +91,7 @@
 
 <header class="md-header md-header--shadow" data-md-component="header">
   <nav class="md-header__inner md-grid" aria-label="Header">
-    <a href="../../../index.html" title="linearmodels 7.1" class="md-header__button md-logo" aria-label="linearmodels 7.1" data-md-component="logo">
+    <a href="../../../index.html" title="linearmodels v7.2 (+2)" class="md-header__button md-logo" aria-label="linearmodels v7.2 (+2)" data-md-component="logo">
       <img src="../../../_static/bw-logo.svg" alt="logo">
     </a>
     <label class="md-header__button md-icon" for="__drawer">
@@ -102,7 +102,7 @@
       <div class="md-header__ellipsis">
         <div class="md-header__topic">
           <span class="md-ellipsis">
-            linearmodels 7.1
+            linearmodels v7.2 (+2)
           </span>
         </div>
         <div class="md-header__topic" data-md-component="header-topic">
@@ -197,10 +197,10 @@
 
 <nav class="md-nav md-nav--primary" aria-label="Navigation" data-md-level="0">
   <label class="md-nav__title" for="__drawer">
-    <a href="../../../index.html" title="linearmodels 7.1" class="md-nav__button md-logo" aria-label="linearmodels 7.1" data-md-component="logo">
+    <a href="../../../index.html" title="linearmodels v7.2 (+2)" class="md-nav__button md-logo" aria-label="linearmodels v7.2 (+2)" data-md-component="logo">
       <img src="../../../_static/bw-logo.svg" alt="logo">
     </a>
-    linearmodels 7.1
+    linearmodels v7.2 (+2)
   </label>
   
     <div class="md-nav__source">
@@ -1147,8 +1147,9 @@
 <span class="sd">        Raises</span>
 <span class="sd">        ------</span>
 <span class="sd">        ValueError</span>
-<span class="sd">            If both `exog` and `data` are provided, or if no in-sample output</span>
-<span class="sd">            is selected.</span>
+<span class="sd">            If both `exog` and `data` are provided, if no in-sample output</span>
+<span class="sd">            is selected, or if `effects` or `idiosyncratic` is requested for</span>
+<span class="sd">            out-of-sample predictions.</span>
 
 <span class="sd">        Notes</span>
 <span class="sd">        -----</span>
@@ -1163,6 +1164,13 @@
 <span class="sd">        predictions.</span>
 <span class="sd">        """</span>
         <span class="k">if</span> <span class="ow">not</span> <span class="p">(</span><span class="n">exog</span> <span class="ow">is</span> <span class="kc">None</span> <span class="ow">and</span> <span class="n">data</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">):</span>
+            <span class="k">if</span> <span class="n">effects</span> <span class="ow">or</span> <span class="n">idiosyncratic</span><span class="p">:</span>
+                <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
+                    <span class="s2">"effects and idiosyncratic are not available for "</span>
+                    <span class="s2">"out-of-sample predictions"</span>
+                <span class="p">)</span>
+            <span class="k">if</span> <span class="ow">not</span> <span class="n">fitted</span><span class="p">:</span>
+                <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">"At least one output must be selected"</span><span class="p">)</span>
             <span class="n">context</span> <span class="o">=</span> <span class="n">capture_context</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span>
             <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_out_of_sample</span><span class="p">(</span><span class="n">exog</span><span class="p">,</span> <span class="n">data</span><span class="p">,</span> <span class="n">missing</span><span class="p">,</span> <span class="n">context</span><span class="o">=</span><span class="n">context</span><span class="p">)</span>
         <span class="n">out</span> <span class="o">=</span> <span class="p">[]</span>
