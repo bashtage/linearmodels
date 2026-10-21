@@ -128,7 +128,11 @@ def test_instr_rank_check_is_scale_invariant(data):
     instr[:, 0] *= 1.0e13
     base = IV2SLS(data.dep, data.exog, data.endog, data.instr).fit()
     scaled = IV2SLS(data.dep, data.exog, data.endog, instr).fit()
-    assert_allclose(scaled.params, base.params, rtol=1.0e-4)
+    # The two designs differ only by a column scaling of the instruments, so the
+    # structural estimates should agree to solver precision.  The tolerance is
+    # loose because the residual differs by BLAS vendor (macOS/Accelerate
+    # disagrees with OpenBLAS by more than 1e-4 at this conditioning level).
+    assert_allclose(scaled.params, base.params, rtol=1.0e-3)
 
 
 def test_kappa_error_exception(data):
