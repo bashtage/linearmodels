@@ -125,6 +125,47 @@ python -m pip install -r requirements.txt -r requirements-dev.txt
 python -m pip install -e . --no-build-isolation
 ```
 
+## Running the tests
+
+The tests are installed with linearmodels. They need pytest 9 and xarray, and
+pytest-xdist to run in parallel.
+
+```bash
+python -c "import linearmodels; linearmodels.test(['--skip-slow', '-n', 'auto'])"
+```
+
+`--skip-slow` skips the slow tests and `--skip-examples` the example notebooks.
+
+pytest loads every plugin that is installed in the environment, and the test
+configuration of linearmodels is strict, so that, for example, a marker that is
+not registered is an error. A plugin that uses such a marker makes tests fail
+with a message such as `'gpu' not found in markers configuration option`. To run
+the tests without the other plugins, turn off their automatic loading and load
+pytest-xdist explicitly. This works with `python -m pytest` too.
+
+```bash
+PYTEST_DISABLE_PLUGIN_AUTOLOAD=1 python -c "import linearmodels; linearmodels.test(['-p', 'xdist', '-n', 'auto'])"
+```
+
+When the tests run in several processes with pytest-xdist, limit the BLAS
+libraries to one thread in each process. Otherwise every process starts as many
+threads as there are cores, and excessive context switching makes the tests run
+very slow. This problem is particularly acute on machines with high CPU counts.
+
+```bash
+export MKL_NUM_THREADS=1
+export OPENBLAS_NUM_THREADS=1
+export OMP_NUM_THREADS=1
+```
+
+or, in PowerShell,
+
+```powershell
+$env:MKL_NUM_THREADS = 1
+$env:OPENBLAS_NUM_THREADS = 1
+$env:OMP_NUM_THREADS = 1
+```
+
 ## Documentation
 
 [Stable Documentation](https://bashtage.github.io/linearmodels/) is
@@ -173,6 +214,8 @@ Python, NumPy and the other dependencies.
 ### Testing
 
 -   pytest (9.0+)
+-   xarray (0.16+)
+-   pytest-xdist (optional, to run the tests in parallel)
 
 ### Documentation
 
