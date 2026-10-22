@@ -325,8 +325,10 @@ def test_drop_missing_environment_variable_in_a_new_interpreter():
     proc = run_python("-c", ENVIRONMENT_SCRIPT, json.dumps(list(LEGACY_DROP_MISSING)))
     result = json.loads(proc.stdout.strip().splitlines()[-1])
     # No warning without the environment variable, also for import *
-    assert result.pop("plain import") == []
-    assert result.pop("import * defines DROP_MISSING") is False
+    plain_import = result.pop("plain import")
+    assert plain_import == []
+    drop_missing_import = result.pop("import * defines DROP_MISSING")
+    assert drop_missing_import is False
     # Any value, including the ones that turned it off, warns once and keeps what it
     # gave in 7.0
     for value, expected in LEGACY_DROP_MISSING.items():
