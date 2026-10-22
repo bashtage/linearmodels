@@ -874,6 +874,29 @@ def system_equations(nobs, endogenous=False):
     }
 
 
+def gmm_equations(nobs):
+    """
+    Two equations, each with one endogenous regressor and one instrument
+
+    IVSystemGMM inverts the covariance of the moment conditions, in the robust and
+    the kernel weights. The equations of system_equations(nobs, True) are exactly
+    identified, so that their 4 moment conditions sum to zero at the estimates and have
+    rank nobs - 1 or less: their covariance is singular with 4 or fewer observations,
+    and inverting it only works up to rounding (it raised "Singular matrix" on FreeBSD,
+    #853). These equations have no constant and 2 moment conditions, whose covariance
+    has full rank from 3 observations.
+    """
+    first, second = iv_data(nobs, seed=11), iv_data(nobs, seed=111)
+    return {
+        f"eq{i}": {
+            "dependent": data.y,
+            "endog": data[["xn"]],
+            "instruments": data[["z1"]],
+        }
+        for i, data in enumerate((first, second))
+    }
+
+
 @pytest.mark.parametrize("kernel", CANONICAL)
 @pytest.mark.parametrize(("model", "endogenous"), [(SUR, False), (IV3SLS, True)])
 def test_system_models_raise_when_fit_with_too_few_observations(
@@ -914,7 +937,7 @@ def test_system_models_explicit_bandwidth_works_with_the_observations_that_raise
 def test_system_gmm_weights_raise_when_fit_with_too_few_observations(kernel):
     nobs = fewest_observations(kernel) - 1
     mod = IVSystemGMM(
-        system_equations(nobs, True),
+        gmm_equations(nobs),
         weight_type="kernel",
         kernel=kernel,
         optimal_bw=True,
@@ -923,20 +946,24 @@ def test_system_gmm_weights_raise_when_fit_with_too_few_observations(kernel):
         mod.fit()
 
 
-# The robust weights of the two equations need 4 observations before the covariance
-# gets to the bandwidth: the Bartlett kernel is reached with 4
-SYSTEM_GMM_COVARIANCE_FEW = [("parzen", 4), ("qs", 4), ("qs", 5)]
+# Every number of observations from 3, where the robust weights of gmm_equations can
+# be estimated, to one less than the kernel needs
+SYSTEM_GMM_COVARIANCE_FEW = [
+    (kernel, nobs)
+    for kernel in CANONICAL
+    for nobs in range(3, fewest_observations(kernel))
+]
 
 
 @pytest.mark.parametrize(("kernel", "nobs"), SYSTEM_GMM_COVARIANCE_FEW)
 def test_system_gmm_covariance_raises_when_fit_with_too_few_observations(kernel, nobs):
-    mod = IVSystemGMM(system_equations(nobs, True))
+    mod = IVSystemGMM(gmm_equations(nobs))
     with pytest.raises(ValueError, match=re.escape(too_few_message(kernel, nobs))):
         mod.fit(cov_type="kernel", kernel=kernel)
 
 
 def test_system_gmm_default_bandwidth_raises_when_fit_with_too_few_observations():
-    mod = IVSystemGMM(system_equations(3, True), weight_type="kernel")
+    mod = IVSystemGMM(gmm_equations(3), weight_type="kernel")
     with pytest.warns(DefaultBandwidthWarning):
         with pytest.raises(ValueError, match=re.escape(too_few_message("bartlett", 3))):
             mod.fit()
@@ -945,7 +972,7 @@ def test_system_gmm_default_bandwidth_raises_when_fit_with_too_few_observations(
 @pytest.mark.parametrize("kernel", CANONICAL)
 def test_system_gmm_explicit_bandwidth_works_with_the_observations_that_raise(kernel):
     nobs = fewest_observations(kernel) - 1
-    equations = system_equations(nobs, True)
+    equations = gmm_equations(nobs)
     explicit = IVSystemGMM(
         equations, weight_type="kernel", kernel=kernel, bandwidth=1
     ).fit()
@@ -959,7 +986,7 @@ def test_system_gmm_explicit_bandwidth_works_with_the_observations_that_raise(ke
 @pytest.mark.parametrize("kernel", CANONICAL)
 def test_system_gmm_with_the_fewest_observations(kernel):
     nobs = fewest_observations(kernel)
-    equations = system_equations(nobs, True)
+    equations = gmm_equations(nobs)
     res = IVSystemGMM(
         equations, weight_type="kernel", kernel=kernel, optimal_bw=True
     ).fit(cov_type="kernel", kernel=kernel)
