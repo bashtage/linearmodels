@@ -162,6 +162,15 @@ WEIGHT_MATRICES = {
 _KAPPA_TOLERANCE = float(sqrt(finfo(float64).eps))
 
 
+def _unit_length_columns(
+    x: linearmodels.typing.data.Float64Array,
+) -> linearmodels.typing.data.Float64Array:
+    """Scale the columns of a matrix to unit length, leaving a 0 column at 0."""
+    scale = norm(x, axis=0)
+    scale[scale == 0.0] = 1.0
+    return x / scale
+
+
 class _IVModelBase:
     r"""
     Limited information ML and k-class estimation of IV models.
@@ -463,9 +472,12 @@ class _IVModelBase:
                 "as large as the number of endogenous regressors"
                 " ({}).".format(self.instruments.shape[1], self.endog.shape[1])
             )
-        if matrix_rank(x) < x.shape[1]:
+        # Test the rank after scaling the columns to unit length, so that the result
+        # does not depend on the units of the variables. A column that is exactly 0
+        # cannot be scaled and remains linearly dependent.
+        if matrix_rank(_unit_length_columns(x)) < x.shape[1]:
             raise ValueError("regressors [exog endog] do not have full column rank")
-        if matrix_rank(z) < z.shape[1]:
+        if matrix_rank(_unit_length_columns(z)) < z.shape[1]:
             raise ValueError(
                 "instruments [exog instruments]  do not have full column rank"
             )
