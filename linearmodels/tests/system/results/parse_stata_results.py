@@ -30,6 +30,7 @@ block = blocks[next(iter(blocks.keys()))]
 
 def split_block(block):
     block = block[:]
+    sigma = variance = stats = params = []
     for i, line in enumerate(block):
         if "** Sigma **" in line:
             sigma = block[i + 2 :]
