@@ -88,7 +88,9 @@ def run_docstring_examples(obj, name):
     failures = []
     with_examples = set()
     for test in finder.find(obj, name, globs={}):
-        runner = doctest.DocTestRunner(optionflags=doctest.ELLIPSIS)
+        # verbose=None, the default, is verbose when "-v" is in sys.argv, as it is in
+        # "pytest -v", and the examples that pass are then written to out as well
+        runner = doctest.DocTestRunner(verbose=False, optionflags=doctest.ELLIPSIS)
         with warnings.catch_warnings():
             warnings.simplefilter("ignore", MissingValueWarning)
             runner.run(test, out=failures.append)
