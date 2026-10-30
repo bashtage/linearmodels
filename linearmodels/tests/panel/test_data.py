@@ -958,3 +958,18 @@ def test_fake_panel_properties(mi_df):
     assert_index_equal(panel.minor_axis, mi_df.index.levels[0])
     df = panel.to_frame()
     assert_frame_equal(df, mi_df)
+
+
+@pytest.mark.parametrize("drop_first", [True, False])
+def test_categorical_missing_values(drop_first):
+    index = MultiIndex.from_product([["a", "b"], [0, 1]])
+    values = DataFrame(
+        {"group": Categorical(["first", None, "second", "first"])}, index=index
+    )
+    data = PanelData(values, drop_first=drop_first)
+    assert_equal(data.isnull.to_numpy(), [False, True, False, False])
+    assert np.isnan(data.values2d[1]).all()
+    assert_equal(data.dataframe["group.second"].iloc[[0, 2, 3]].to_numpy(), [0, 1, 0])
+    data.drop(data.isnull)
+    assert data.dataframe.index.tolist() == [("a", 0), ("b", 0), ("b", 1)]
+    assert not data.isnull.any()

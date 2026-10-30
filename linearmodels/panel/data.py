@@ -162,6 +162,8 @@ def convert_columns(s: Series, drop_first: bool) -> linearmodels.typing.AnyPanda
 
     if isinstance(s.dtype, pd.CategoricalDtype):
         out = get_dummies(s, drop_first=drop_first)
+        if s.hasnans:
+            out = out.astype(float).where(s.notna(), axis=0)
         # TODO: Remove once pandas typing fixed
         out.columns = Index([str(s.name) + "." + str(c) for c in out])
         return out
