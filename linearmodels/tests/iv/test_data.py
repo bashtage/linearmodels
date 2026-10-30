@@ -250,3 +250,15 @@ def test_duplicate_column_names():
     x = pd.DataFrame(np.ones((3, 2)), columns=["x", "x"])
     with pytest.raises(ValueError, match=r"DataFrame contains duplicate column names"):
         IVData(x)
+
+
+@pytest.mark.parametrize("drop_first", [True, False])
+def test_categorical_missing_values(drop_first: bool) -> None:
+    values = pd.Series(pd.Categorical(["a", None, "b", "a"]), name="group")
+    data = IVData(values, drop_first=drop_first)
+    assert_equal(data.isnull.to_numpy(), [False, True, False, False])
+    assert np.isnan(data.ndarray[1]).all()
+    assert_equal(data.pandas["group.b"].iloc[[0, 2, 3]].to_numpy(), [0, 1, 0])
+    data.drop(data.isnull)
+    assert data.rows == [0, 2, 3]
+    assert not data.isnull.any()

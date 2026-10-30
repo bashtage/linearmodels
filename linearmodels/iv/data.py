@@ -36,6 +36,8 @@ def convert_columns(s: pd.Series, drop_first: bool) -> linearmodels.typing.AnyPa
     """
     if isinstance(s.dtype, pd.CategoricalDtype):
         out = pd.get_dummies(s, drop_first=drop_first)
+        if s.hasnans:
+            out = out.astype(float).where(s.notna(), axis=0)
         # TODO: Remove once pandas typing fixed
         out.columns = pd.Index([str(s.name) + "." + str(c) for c in out])
         return out
