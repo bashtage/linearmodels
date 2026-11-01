@@ -564,6 +564,16 @@ class _IVModelBase:
     ) -> WaldTestStatistic | InvalidTestStatistic:
         const_loc = find_constant(self._x)
         nobs, nvar = self._x.shape
+        if self.has_constant and const_loc is None:
+            # Under the null, the coefficients are proportional to the vector
+            # that produces an intercept. Test its orthogonal complement rather
+            # than dropping an arbitrary dummy or testing the intercept itself.
+            scale = abs(self._x).max(axis=0)
+            intercept = pinv(self._x / scale) @ ones((nobs, 1))
+            basis, _ = qr(intercept, mode="complete")
+            restriction = basis[:, 1:].T * scale
+            params = restriction @ params
+            cov = restriction @ cov @ restriction.T
         return f_statistic(params, cov, debiased, nobs - nvar, const_loc)
 
     def _estimate_kappa(self) -> float:
