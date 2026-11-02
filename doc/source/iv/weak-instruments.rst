@@ -1,5 +1,5 @@
 Confidence intervals with a weak instrument
-==========================================
+===========================================
 
 :meth:`~linearmodels.iv.results.IVResults.tf_conf_int` constructs a conservative
 95% tF interval for one endogenous regressor and one excluded instrument. It is
