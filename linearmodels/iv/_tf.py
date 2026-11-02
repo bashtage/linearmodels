@@ -1,119 +1,92 @@
-"""Conservative tabulated tF critical values for single-instrument IV."""
+"""Generated tF critical values for single-instrument IV inference."""
 
-from numpy import array, inf, interp, isfinite
+from functools import lru_cache
+import hashlib
+from importlib import import_module
+from importlib.resources import files
+import io
+import json
+from math import inf, isfinite, sqrt
+from typing import Any
 
-# Table 3a, Lee, McCrary, Moreira and Porter, February 16, 2022 author version:
-# https://eml.berkeley.edu/~jmccrary/LMMP_2_15_22.pdf (page 16).
-# Both columns are rounded upward in the paper. Section 3.2 justifies linear
-# interpolation in F by convexity of the critical-value function.
-_TF_TABLE = array(
-    [
-        (4.000, 18.656),
-        (4.008, 18.236),
-        (4.015, 17.826),
-        (4.023, 17.425),
-        (4.031, 17.033),
-        (4.040, 16.649),
-        (4.049, 16.275),
-        (4.059, 15.909),
-        (4.068, 15.551),
-        (4.079, 15.201),
-        (4.090, 14.859),
-        (4.101, 14.524),
-        (4.113, 14.197),
-        (4.125, 13.878),
-        (4.138, 13.566),
-        (4.151, 13.260),
-        (4.166, 12.962),
-        (4.180, 12.670),
-        (4.196, 12.385),
-        (4.212, 12.107),
-        (4.229, 11.834),
-        (4.247, 11.568),
-        (4.265, 11.308),
-        (4.285, 11.053),
-        (4.305, 10.804),
-        (4.326, 10.561),
-        (4.349, 10.324),
-        (4.372, 10.091),
-        (4.396, 9.864),
-        (4.422, 9.642),
-        (4.449, 9.425),
-        (4.477, 9.213),
-        (4.507, 9.006),
-        (4.538, 8.803),
-        (4.570, 8.605),
-        (4.604, 8.412),
-        (4.640, 8.222),
-        (4.678, 8.037),
-        (4.717, 7.856),
-        (4.759, 7.680),
-        (4.803, 7.507),
-        (4.849, 7.338),
-        (4.897, 7.173),
-        (4.948, 7.011),
-        (5.002, 6.854),
-        (5.059, 6.699),
-        (5.119, 6.549),
-        (5.182, 6.401),
-        (5.248, 6.257),
-        (5.319, 6.117),
-        (5.393, 5.979),
-        (5.472, 5.844),
-        (5.556, 5.713),
-        (5.644, 5.584),
-        (5.738, 5.459),
-        (5.838, 5.336),
-        (5.944, 5.216),
-        (6.056, 5.098),
-        (6.176, 4.984),
-        (6.304, 4.872),
-        (6.440, 4.762),
-        (6.585, 4.655),
-        (6.741, 4.550),
-        (6.907, 4.448),
-        (7.085, 4.348),
-        (7.276, 4.250),
-        (7.482, 4.154),
-        (7.702, 4.061),
-        (7.940, 3.969),
-        (8.196, 3.880),
-        (8.473, 3.793),
-        (8.773, 3.707),
-        (9.098, 3.624),
-        (9.451, 3.542),
-        (9.835, 3.463),
-        (10.253, 3.385),
-        (10.711, 3.309),
-        (11.214, 3.234),
-        (11.766, 3.161),
-        (12.374, 3.090),
-        (13.048, 3.021),
-        (13.796, 2.953),
-        (14.631, 2.886),
-        (15.566, 2.821),
-        (16.618, 2.758),
-        (17.810, 2.696),
-        (19.167, 2.635),
-        (20.721, 2.576),
-        (22.516, 2.518),
-        (24.605, 2.461),
-        (27.058, 2.406),
-        (29.967, 2.352),
-        (33.457, 2.299),
-        (37.699, 2.247),
-        (42.930, 2.197),
-        (49.495, 2.147),
-        (57.902, 2.099),
-        (68.930, 2.052),
-        (83.823, 2.006),
-        (104.67, 1.960),
-    ]
+from numpy import load
+from scipy.interpolate import PchipInterpolator
+
+_TF_ALPHAS = (
+    0.0001,
+    0.0005,
+    0.001,
+    0.002,
+    0.005,
+    0.01,
+    0.02,
+    0.025,
+    0.03,
+    0.04,
+    0.05,
+    0.06,
+    0.075,
+    0.1,
+    0.125,
+    0.15,
+    0.2,
+    0.25,
 )
+_TF_LEVELS = {1 - alpha: alpha for alpha in _TF_ALPHAS}
 
 
-def _tf_critical_value(f_stat: float) -> float:
-    """Return the conservative 95% tF critical value from Table 3a."""
+@lru_cache(maxsize=32)
+def _tf_table(alpha: float) -> tuple[float, float, PchipInterpolator]:
+    root = files("linearmodels.iv").joinpath("_tf_data")
+    prefix = f"alpha-{alpha!r}"
+    metadata = json.loads(root.joinpath(prefix + ".json").read_text())
+    if metadata["schema_version"] != 1 or metadata["alpha"] != alpha:
+        raise ValueError("Unsupported or inconsistent tF table metadata.")
+    contents = root.joinpath(prefix + ".npz").read_bytes()
+    if hashlib.sha256(contents).hexdigest() != metadata["npz_sha256"]:
+        raise ValueError("tF table checksum does not match its metadata.")
+    with load(io.BytesIO(contents), allow_pickle=False) as data:
+        spline = PchipInterpolator(data["f"], data["regularized"], extrapolate=False)
+    return metadata["boundary"], metadata["plateau_f"], spline
+
+
+@lru_cache(maxsize=32)
+def _tf_calibration(alpha: float) -> Any:
+    try:
+        package = import_module("tf_inference")
+    except ImportError as exc:
+        raise ImportError(
+            "method='compute' requires the optional tf-inference package. "
+            "Install it from https://github.com/finite-sample/tf-inference."
+        ) from exc
+    return package.calibrate(alpha)
+
+
+def _tf_critical_value(
+    f_stat: float, level: float = 0.95, *, method: str = "table"
+) -> float:
+    """Evaluate a generated tF table or explicitly request numerical calibration."""
     if not isfinite(f_stat) or f_stat < 0:
         raise ValueError("The first-stage F statistic must be finite and nonnegative.")
-    return float(interp(f_stat, _TF_TABLE[:, 0], _TF_TABLE[:, 1], left=inf))
+    if not isfinite(level) or not 0.75 <= level <= 0.9999:
+        raise ValueError("level must be finite and between 0.75 and 0.9999.")
+    # Match confidence levels before subtraction to retain the exact bundled alpha.
+    alpha = _TF_LEVELS.get(level)
+    if method == "compute":
+        return float(
+            _tf_calibration(alpha if alpha is not None else 1 - level).critical_value(
+                f_stat
+            )
+        )
+    if method != "table":
+        raise ValueError("method must be 'table' or 'compute'.")
+    if alpha is None:
+        raise ValueError(
+            f"No bundled tF table for level={level}. "
+            "Use method='compute' with the optional tf-inference package."
+        )
+    boundary, plateau_f, spline = _tf_table(alpha)
+    if f_stat <= boundary:
+        return inf
+    value = min(f_stat, plateau_f)
+    return sqrt(float(spline(value)) / (value - boundary))
