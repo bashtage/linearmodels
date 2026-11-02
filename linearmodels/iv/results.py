@@ -1370,10 +1370,8 @@ class IVResults(_CommonIVResults):
            112(10), 3260-3290. https://doi.org/10.1257/aer.20211063.
            Author version: https://eml.berkeley.edu/~jmccrary/LMMP_2_15_22.pdf.
         """
-        from linearmodels.iv.model import IV2SLS
-
         if (
-            not isinstance(self.model, IV2SLS)
+            self.method != "IV-2SLS"
             or self.model.endog.shape[1] != 1
             or self.model.instruments.shape[1] != 1
         ):

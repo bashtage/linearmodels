@@ -202,11 +202,24 @@ def test_weak_first_stage(data):
     assert_array_equal(res.tf_conf_int(), [[-np.inf, np.inf]])
 
 
-@pytest.mark.parametrize("model", [IVLIML, IVJIVE])
-def test_unsupported_estimator(data, model):
+@pytest.mark.parametrize(
+    ("model", "config"),
+    [(IVLIML, {}), (IVLIML, {"kappa": 1}), (IVLIML, {"fuller": 1}), (IVJIVE, {})],
+)
+def test_unsupported_estimator(data, model, config):
     y, w, x, z = data
     with pytest.raises(ValueError, match="requires IV2SLS"):
-        model(y, w, x, z).fit().tf_conf_int()
+        model(y, w, x, z, **config).fit().tf_conf_int()
+
+
+def test_iv2sls_subclass(data):
+    class CustomIV2SLS(IV2SLS):
+        pass
+
+    y, w, x, z = data
+    expected = IV2SLS(y, w, x, z).fit().tf_conf_int()
+    actual = CustomIV2SLS(y, w, x, z).fit().tf_conf_int()
+    assert_frame_equal(actual, expected)
 
 
 @pytest.mark.parametrize("two_endog", [True, False])
