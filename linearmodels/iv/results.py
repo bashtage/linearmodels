@@ -1393,9 +1393,9 @@ class IVResults(_CommonIVResults):
             raise ValueError("tF inference does not support nonconstant weights.")
 
         name = self.model.endog.cols[0]
-        first_stage = self.first_stage.individual[name]
-        estimate = float(self.params.loc[name])
-        variance = float(self.cov.loc[name, name])
+        first_stage = self.first_stage.individual[str(name)]
+        estimate = float(self.params.iloc[-1])
+        variance = float(self.cov.to_numpy()[-1, -1])
         first_estimate = float(first_stage.params.iloc[-1])
         first_variance = float(first_stage.cov.to_numpy()[-1, -1])
         if (
@@ -1408,10 +1408,10 @@ class IVResults(_CommonIVResults):
             )
         first_t = float(first_stage.tstats.iloc[-1])
         critical = _tf_critical_value(first_t * first_t)
-        half_width = critical * float(self.std_errors.loc[name])
+        half_width = critical * float(self.std_errors.iloc[-1])
         return DataFrame(
             [[estimate - half_width, estimate + half_width]],
-            index=self.params.loc[[name]].index,
+            index=self.params.index[-1:],
             columns=["lower", "upper"],
         )
 

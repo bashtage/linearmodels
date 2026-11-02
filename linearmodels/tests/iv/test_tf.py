@@ -1,6 +1,6 @@
 import numpy as np
 from numpy.testing import assert_allclose, assert_array_equal
-from pandas import DataFrame
+from pandas import DataFrame, Series
 from pandas.testing import assert_frame_equal, assert_series_equal
 import pytest
 
@@ -139,6 +139,23 @@ def test_formula_labels_and_retained_sample(data):
     assert_frame_equal(res.tf_conf_int(), array_res.tf_conf_int())
     assert list(res.tf_conf_int().index) == ["x"]
     assert list(res.tf_conf_int().columns) == ["lower", "upper"]
+
+
+def test_duplicate_control_and_endogenous_labels(data):
+    y, w, x, z = data
+    expected = IV2SLS(y, w, DataFrame({"x": x}), z).fit().tf_conf_int()
+    controls = DataFrame(w, columns=["x", "w"])
+    res = IV2SLS(y, controls, DataFrame({"x": x}), z).fit()
+    assert_frame_equal(res.tf_conf_int(), expected)
+
+
+@pytest.mark.parametrize("label", [7, ("endogenous", "x")])
+def test_nonstring_endogenous_label(data, label):
+    y, w, x, z = data
+    expected = IV2SLS(y, w, x, z).fit().tf_conf_int()
+    actual = IV2SLS(y, w, Series(x, name=label), z).fit().tf_conf_int()
+    assert_allclose(actual, expected)
+    assert list(actual.index) == [label]
 
 
 @pytest.mark.parametrize("instrument_scale", [-1000, -1, 1e-6, 1e6])
