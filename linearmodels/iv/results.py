@@ -17,6 +17,7 @@ from numpy import (
     c_,
     diag,
     empty,
+    isfinite,
     isnan,
     log,
     ndarray,
@@ -31,8 +32,13 @@ from statsmodels.iolib.summary import SimpleTable, fmt_2cols, fmt_params
 from statsmodels.iolib.table import default_txt_fmt
 
 import linearmodels
+from linearmodels.iv._tf import _tf_critical_value
 from linearmodels.iv._utility import annihilate, proj
 from linearmodels.iv.common import _kleibergen_paap, cragg_donald, cragg_donald_f
+from linearmodels.iv.covariance import (
+    HeteroskedasticCovariance,
+    HomoskedasticCovariance,
+)
 from linearmodels.iv.data import IVData, IVDataLike
 from linearmodels.shared.base import _ModelComparison, _SummaryStr
 from linearmodels.shared.hypotheses import (
@@ -1311,6 +1317,103 @@ class IVResults(_CommonIVResults):
     ) -> None:
         super().__init__(results, model)
         self._kappa = results.get("kappa", 1)
+
+    def tf_conf_int(self) -> DataFrame:
+        """
+        Construct a conservative 95% tF confidence interval.
+
+        Returns
+        -------
+        DataFrame
+            Lower and upper bounds for the endogenous regressor's coefficient.
+            The columns are ``lower`` and ``upper``. When the first-stage
+            statistic is below 4, the bounds are negative and positive infinity.
+
+        Raises
+        ------
+        ValueError
+            If the result is not from unweighted IV2SLS with one endogenous
+            regressor, one excluded instrument, unadjusted or robust covariance,
+            and ``debiased=False``, or the required estimates are not finite
+            with strictly positive variances.
+
+        See Also
+        --------
+        conf_int
+            Construct conventional confidence intervals for all coefficients.
+        first_stage
+            Access first-stage regressions and diagnostics.
+
+        Notes
+        -----
+        The tF procedure of Lee et al. [1]_ adjusts the critical value using
+        the squared first-stage t statistic. It provides asymptotic inference
+        robust to weak identification under the single-instrument IV model's
+        assumptions. It does not address invalid instruments or guarantee
+        finite-sample coverage.
+
+        This implementation linearly interpolates the upward-rounded critical
+        values in Table 3a of the February 16, 2022 author version. Section 3.2
+        establishes that interpolation in F is conservative. Below the first
+        tabulated F of 4, the interval is the entire real line; above 104.67,
+        the critical value is 1.96. The extra conservatism below 4 includes
+        some cases where the underlying smooth tF procedure is bounded.
+
+        Only 95% confidence is supported. The adjustment does not define
+        p-values or other confidence levels. The coefficient estimate, reported
+        standard error and conventional inference are not changed.
+
+        References
+        ----------
+        .. [1] Lee, D. S., J. McCrary, M. J. Moreira, and J. Porter (2022).
+           "Valid t-Ratio Inference for IV." American Economic Review,
+           112(10), 3260-3290. https://doi.org/10.1257/aer.20211063.
+           Author version: https://eml.berkeley.edu/~jmccrary/LMMP_2_15_22.pdf.
+        """
+        from linearmodels.iv.model import IV2SLS
+
+        if (
+            not isinstance(self.model, IV2SLS)
+            or self.model.endog.shape[1] != 1
+            or self.model.instruments.shape[1] != 1
+        ):
+            raise ValueError(
+                "tF inference requires IV2SLS with one endogenous regressor "
+                "and one excluded instrument."
+            )
+        if self.debiased or type(self._cov_estimator) not in (
+            HomoskedasticCovariance,
+            HeteroskedasticCovariance,
+        ):
+            raise ValueError(
+                "tF inference requires unadjusted or robust covariance "
+                "with debiased=False."
+            )
+        if (self.model.weights.ndarray != 1).any():
+            raise ValueError("tF inference does not support nonconstant weights.")
+
+        name = self.model.endog.cols[0]
+        first_stage = self.first_stage.individual[name]
+        estimate = float(self.params.loc[name])
+        variance = float(self.cov.loc[name, name])
+        first_estimate = float(first_stage.params.iloc[-1])
+        first_variance = float(first_stage.cov.to_numpy()[-1, -1])
+        if (
+            not isfinite([estimate, variance, first_estimate, first_variance]).all()
+            or variance <= 0
+            or first_variance <= 0
+        ):
+            raise ValueError(
+                "tF inference requires finite estimates and positive variances."
+            )
+        first_t = float(first_stage.tstats.iloc[-1])
+        critical = _tf_critical_value(first_t * first_t)
+        half_width = critical * float(self.std_errors.loc[name])
+        return DataFrame(
+            [[estimate - half_width, estimate + half_width]],
+            index=self.params.loc[[name]].index,
+            columns=["lower", "upper"],
+        )
 
     @cached_property
     def sargan(self) -> InvalidTestStatistic | WaldTestStatistic:

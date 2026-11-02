@@ -829,7 +829,11 @@ def test_results():
     # JIVE is not a k-class estimator
     assert res.kappa is None
     for attr in dir(res):
-        if attr.startswith("_") or attr in ("test_linear_constraint", "wald_test"):
+        if attr.startswith("_") or attr in (
+            "test_linear_constraint",
+            "wald_test",
+            "tf_conf_int",
+        ):
             continue
         value = getattr(res, attr)
         if callable(value):
