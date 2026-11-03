@@ -508,3 +508,73 @@ def test_first_state_f(data):
         indiv = _OLS(endog[:, i], rhs).fit(cov_type="unadjusted")
         stat = indiv.wald_test(null_rest, null_value)
         assert_allclose(diag.iloc[i].loc["f.stat"], stat.stat / nz)
+
+
+def test_weights_all_one_not_materialized(data):
+    # GH 607: weighted copies of the data are not stored when all of the
+    # weights are 1, which is the case when weights is None or constant
+    mod = IV2SLS(data.dep, data.exog, data.endog, data.instr)
+    assert mod._wy is mod._y
+    assert mod._wx is mod._x
+    assert mod._wz is mod._z
+
+    weights = np.full(data.nobs, 2.5)
+    mod = IV2SLS(data.dep, data.exog, data.endog, data.instr, weights=weights)
+    assert mod._wy is mod._y
+    assert mod._wx is mod._x
+    assert mod._wz is mod._z
+
+
+def test_weights_nonconstant_materialized(data):
+    rs = np.random.RandomState(12345)
+    weights = 0.5 + rs.random_sample(data.nobs)
+    mod = IV2SLS(data.dep, data.exog, data.endog, data.instr, weights=weights)
+    assert mod._wz is not mod._z
+    root_w = np.sqrt(mod.weights.ndarray)
+    assert_allclose(mod._wy, mod._y * root_w)
+    assert_allclose(mod._wx, mod._x * root_w)
+    assert_allclose(mod._wz, mod._z * root_w)
+
+
+def test_weights_all_one_results_unchanged(data):
+    # Estimation with no weights or constant weights is identical to
+    # explicitly weighting by the square root of the normalized weights
+    res = IV2SLS(data.dep, data.exog, data.endog, data.instr).fit()
+    weights = np.full(data.nobs, 3.0)
+    res_const = IV2SLS(
+        data.dep, data.exog, data.endog, data.instr, weights=weights
+    ).fit()
+    assert_allclose(res_const.params, res.params, rtol=0, atol=0)
+    assert_allclose(res_const.cov, res.cov, rtol=0, atol=0)
+
+
+def test_weights_float32_not_upcast_by_weighting():
+    # GH 607: float32 data with float32 weights produces the same estimates
+    # as the float64 data, up to the precision of the float32 inputs, and
+    # constant float32 weights do not materialize weighted copies
+    rs = np.random.RandomState(12345)
+    n = 500
+    dep = rs.standard_normal((n, 1))
+    exog = rs.standard_normal((n, 2))
+    endog = rs.standard_normal((n, 1))
+    instr = rs.standard_normal((n, 2))
+    weights = 0.5 + rs.random_sample(n)
+
+    res64 = IV2SLS(dep, exog, endog, instr, weights=weights).fit()
+    res32 = IV2SLS(
+        dep.astype(np.float32),
+        exog.astype(np.float32),
+        endog.astype(np.float32),
+        instr.astype(np.float32),
+        weights=weights.astype(np.float32),
+    ).fit()
+    assert_allclose(res32.params, res64.params, rtol=1e-5, atol=1e-6)
+
+    mod32 = IV2SLS(
+        dep.astype(np.float32),
+        exog.astype(np.float32),
+        endog.astype(np.float32),
+        instr.astype(np.float32),
+        weights=np.ones(n, dtype=np.float32),
+    )
+    assert mod32._wz is mod32._z

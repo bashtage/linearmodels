@@ -282,13 +282,23 @@ class _IVModelBase:
         self._sqrt_weights = w = sqrt(self.weights.ndarray)
         # dependent variable
         self._y = self.dependent.ndarray
-        self._wy = self._y * w
         # model regressors
         self._x = c_[self.exog.ndarray, self.endog.ndarray]
-        self._wx = self._x * w
         # first-stage regressors
         self._z = c_[self.exog.ndarray, self.instruments.ndarray]
-        self._wz = self._z * w
+        if npall(w == 1.0):
+            # All of the weights are 1, as when weights is None or constant,
+            # and so scaling by the square root of the weights does not
+            # change the data. The weighted data is the data, and avoiding
+            # the copies substantially reduces the memory used when the
+            # data is large (GH 607).
+            self._wy = self._y
+            self._wx = self._x
+            self._wz = self._z
+        else:
+            self._wy = self._y * w
+            self._wx = self._x * w
+            self._wz = self._z * w
 
         self._has_constant = False
         self._regressor_is_exog = array(
