@@ -17,6 +17,7 @@ from linearmodels.datasets import card
 from linearmodels.iv import IV2SLS, IVGMM, IVGMMCUE, IVLIML
 from linearmodels.iv.model import _OLS
 from linearmodels.iv.results import compare
+from linearmodels.shared.exceptions import MissingValueWarning
 from linearmodels.shared.hypotheses import WaldTestStatistic
 from linearmodels.shared.utility import AttrDict
 
@@ -578,3 +579,132 @@ def test_weights_float32_not_upcast_by_weighting():
         weights=np.ones(n, dtype=np.float32),
     )
     assert mod32._wz is mod32._z
+
+
+def test_weights_float32_all_one_fit():
+    # GH 607: float32 data with all-one float32 weights are fitted through
+    # the unmaterialized path, and the estimates agree with the estimates
+    # of the same data stored as float64
+    rs = np.random.RandomState(12345)
+    n = 500
+    dep = rs.standard_normal((n, 1)).astype(np.float32)
+    exog = rs.standard_normal((n, 2)).astype(np.float32)
+    endog = rs.standard_normal((n, 1)).astype(np.float32)
+    instr = rs.standard_normal((n, 2)).astype(np.float32)
+    weights = np.ones(n, dtype=np.float32)
+
+    mod = IV2SLS(dep, exog, endog, instr, weights=weights)
+    assert mod._wy is mod._y
+    assert mod._wx is mod._x
+    assert mod._wz is mod._z
+    res = mod.fit()
+    res64 = IV2SLS(
+        dep.astype(np.float64),
+        exog.astype(np.float64),
+        endog.astype(np.float64),
+        instr.astype(np.float64),
+    ).fit()
+    assert_allclose(res.params, res64.params, rtol=1e-6, atol=1e-8)
+    assert_allclose(res.cov, res64.cov, rtol=1e-5, atol=1e-9)
+
+
+def test_weights_integer_inputs_fit():
+    # GH 607: integer data with constant integer weights are fitted through
+    # the unmaterialized path, and the estimates are identical to the
+    # estimates of the same data stored as float64
+    rs = np.random.RandomState(12345)
+    n = 500
+    dep = np.round(10 * rs.standard_normal((n, 1))).astype(np.int64)
+    exog = np.round(10 * rs.standard_normal((n, 2))).astype(np.int64)
+    endog = np.round(10 * rs.standard_normal((n, 1))).astype(np.int64)
+    instr = np.round(10 * rs.standard_normal((n, 2))).astype(np.int64)
+    weights = np.full(n, 2)
+
+    mod = IV2SLS(dep, exog, endog, instr, weights=weights)
+    assert mod._wy is mod._y
+    assert mod._wx is mod._x
+    assert mod._wz is mod._z
+    res = mod.fit()
+    res64 = IV2SLS(
+        dep.astype(np.float64),
+        exog.astype(np.float64),
+        endog.astype(np.float64),
+        instr.astype(np.float64),
+        weights=np.full(n, 2.0),
+    ).fit()
+    assert_allclose(res.params, res64.params, rtol=0, atol=0)
+    assert_allclose(res.cov, res64.cov, rtol=0, atol=0)
+
+
+def test_weights_all_one_matches_materialized_reference(data):
+    # GH 607: the estimates from the unmaterialized path agree with a
+    # reference computed directly from explicitly materialized weighted
+    # data, which is what the model stored before the copies were skipped
+    y = np.asarray(data.dep, dtype=np.float64)
+    x = np.c_[
+        np.asarray(data.exog, dtype=np.float64),
+        np.asarray(data.endog, dtype=np.float64),
+    ]
+    z = np.c_[
+        np.asarray(data.exog, dtype=np.float64),
+        np.asarray(data.instr, dtype=np.float64),
+    ]
+    n = y.shape[0]
+    root_w = np.ones((n, 1))
+    wy, wx, wz = y * root_w, x * root_w, z * root_w
+    pz = wz @ pinv(wz.T @ wz) @ wz.T
+    x_pz_x_inv = pinv(wx.T @ pz @ wx)
+    params_ref = x_pz_x_inv @ (wx.T @ pz @ wy)
+    resids_ref = wy - wx @ params_ref
+    s2 = float(np.squeeze(resids_ref.T @ resids_ref)) / n
+    cov_ref = s2 * x_pz_x_inv
+
+    res = IV2SLS(data.dep, data.exog, data.endog, data.instr).fit(
+        cov_type="unadjusted", debiased=False
+    )
+    assert_allclose(res.params, params_ref.ravel(), rtol=1e-8, atol=1e-10)
+    assert_allclose(
+        np.asarray(res.resids).ravel(), resids_ref.ravel(), rtol=1e-8, atol=1e-10
+    )
+    assert_allclose(res.cov, cov_ref, rtol=1e-8, atol=1e-12)
+
+
+def test_weights_single_non_one_materialized(data):
+    # GH 607: a single weight that is not 1 takes the materializing path,
+    # and the stored data is scaled by the square root of the weights
+    weights = np.ones(data.nobs)
+    weights[0] = 2.0
+    mod = IV2SLS(data.dep, data.exog, data.endog, data.instr, weights=weights)
+    assert mod._wy is not mod._y
+    assert mod._wx is not mod._x
+    assert mod._wz is not mod._z
+    root_w = np.sqrt(mod.weights.ndarray)
+    assert_allclose(mod._wy, mod._y * root_w)
+    assert_allclose(mod._wx, mod._x * root_w)
+    assert_allclose(mod._wz, mod._z * root_w)
+
+
+def test_weights_nan_weight_drops_observation():
+    # GH 607: a NaN weight is a missing value, so the observation is
+    # dropped, as it was before the weighted copies were skipped, and the
+    # remaining all-one weights use the unmaterialized path
+    rs = np.random.RandomState(12345)
+    n = 200
+    dep = rs.standard_normal((n, 1))
+    exog = np.column_stack([np.ones(n), rs.standard_normal(n)])
+    endog = rs.standard_normal((n, 1))
+    instr = rs.standard_normal((n, 2))
+    weights = np.ones(n)
+    weights[3] = np.nan
+
+    with pytest.warns(MissingValueWarning):
+        mod = IV2SLS(dep, exog, endog, instr, weights=weights)
+    res = mod.fit()
+    keep = np.ones(n, dtype=bool)
+    keep[3] = False
+    res_ref = IV2SLS(dep[keep], exog[keep], endog[keep], instr[keep]).fit()
+    assert res.nobs == n - 1
+    assert_allclose(res.params, res_ref.params, rtol=0, atol=0)
+    assert mod._wy is mod._y
+    assert mod._wx is mod._x
+    assert mod._wz is mod._z
