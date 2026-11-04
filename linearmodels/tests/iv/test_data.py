@@ -262,3 +262,14 @@ def test_categorical_missing_values(drop_first: bool) -> None:
     data.drop(data.isnull)
     assert data.rows == [0, 2, 3]
     assert not data.isnull.any()
+
+
+@pytest.mark.parametrize("drop_first", [True, False])
+def test_categorical_missing_values_with_unused_category(drop_first: bool) -> None:
+    values = pd.Series(
+        pd.Categorical(["a", None, "b", "a"], categories=["a", "b", "unused"]),
+        name="group",
+    )
+    data = IVData(values, drop_first=drop_first)
+    assert "group.unused" not in data.cols
+    assert_equal(data.isnull.to_numpy(), [False, True, False, False])

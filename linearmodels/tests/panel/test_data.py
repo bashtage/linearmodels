@@ -973,3 +973,20 @@ def test_categorical_missing_values(drop_first):
     data.drop(data.isnull)
     assert data.dataframe.index.tolist() == [("a", 0), ("b", 0), ("b", 1)]
     assert not data.isnull.any()
+
+
+@pytest.mark.parametrize("drop_first", [True, False])
+def test_categorical_missing_values_with_unused_category(drop_first):
+    index = MultiIndex.from_product([["a", "b"], [0, 1]])
+    values = DataFrame(
+        {
+            "group": Categorical(
+                ["first", None, "second", "first"],
+                categories=["first", "second", "unused"],
+            )
+        },
+        index=index,
+    )
+    data = PanelData(values, drop_first=drop_first)
+    assert "group.unused" not in data.dataframe
+    assert_equal(data.isnull.to_numpy(), [False, True, False, False])
