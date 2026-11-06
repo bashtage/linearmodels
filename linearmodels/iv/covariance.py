@@ -15,7 +15,6 @@ from numpy import (
     cos,
     empty,
     errstate,
-    int64,
     isfinite,
     ndarray,
     ones,
@@ -27,7 +26,7 @@ from numpy import (
 )
 from numpy.linalg import inv, pinv
 
-from linearmodels.shared.covariance import cov_cluster, cov_kernel
+from linearmodels.shared.covariance import cluster_union, cov_cluster, cov_kernel
 from linearmodels.shared.exceptions import lower_option, unknown_option_error
 from linearmodels.shared.inputs import as_ndarray
 from linearmodels.shared.linalg import has_constant
@@ -983,10 +982,10 @@ class ClusteredCovariance(HomoskedasticCovariance):
             s1 = cov_cluster(xhat_e, clusters[:, 1].squeeze())
             s1 = rescale(s1, self._num_clusters[1], nobs)
 
-            c0 = clusters[:, 0] - clusters[:, 0].min() + 1
-            c1 = clusters[:, 1] - clusters[:, 1].min() + 1
-            c01 = (c0 * (c1.max() + 1) + c1).astype(int64)
-            s01 = cov_cluster(xhat_e, c01.squeeze())
+            # Observations are in the same group of the intersection only if they
+            # are in the same group of both clusters
+            c01 = cluster_union(clusters)
+            s01 = cov_cluster(xhat_e, c01)
             nc = len(unique(c01))
             s01 = rescale(s01, nc, nobs)
 
