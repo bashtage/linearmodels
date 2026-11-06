@@ -29,8 +29,8 @@ def _tf_critical_value(
             raise
         raise ImportError(
             "tF inference requires the optional tf-inference package "
-            "(Python 3.12 or later). Install it using the instructions at "
-            "https://github.com/finite-sample/tf-inference."
+            "(Python 3.12 or later). "
+            "Install it with 'python -m pip install tf-inference'."
         ) from exc
 
     # Match levels before subtraction to preserve the package's exact table keys.
