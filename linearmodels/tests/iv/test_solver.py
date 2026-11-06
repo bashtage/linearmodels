@@ -27,6 +27,7 @@ about 2.4 / delta.
 """
 
 from fractions import Fraction
+import inspect
 import warnings
 
 import numpy as np
@@ -36,13 +37,20 @@ import pytest
 from scipy.linalg import eigh, hadamard
 
 from linearmodels.iv import IV2SLS, IVLIML
-from linearmodels.iv._utility import kclass_factors, orthonormal_basis
+from linearmodels.iv._utility import annihilate, kclass_factors, orthonormal_basis, proj
+from linearmodels.iv.common import (
+    cragg_donald,
+    cragg_donald_f,
+    kleibergen_paap,
+    kleibergen_paap_f,
+)
 from linearmodels.iv.covariance import (
     ClusteredCovariance,
     HeteroskedasticCovariance,
     HomoskedasticCovariance,
     KernelCovariance,
 )
+from linearmodels.iv.results import FirstStageResults
 
 NOBS = 64
 # A fixed assignment: contiguous blocks of the rows of H have scores that sum to 0
@@ -266,6 +274,33 @@ def test_default_is_pinv():
 def test_solver_is_not_case_sensitive(solver):
     mod = IV2SLS(*scaled_data(), solver=solver)
     assert mod._solver == solver.lower()
+
+
+@pytest.mark.parametrize(
+    "func",
+    [
+        IV2SLS,
+        IVLIML,
+        IV2SLS.from_formula,
+        IVLIML.from_formula,
+        IVLIML.estimate_parameters,
+        HomoskedasticCovariance,
+        HeteroskedasticCovariance,
+        KernelCovariance,
+        ClusteredCovariance,
+        FirstStageResults,
+        cragg_donald,
+        cragg_donald_f,
+        kleibergen_paap,
+        kleibergen_paap_f,
+        proj,
+        annihilate,
+    ],
+    ids=lambda func: func.__qualname__,
+)
+def test_solver_is_keyword_only(func):
+    parameter = inspect.signature(func).parameters["solver"]
+    assert parameter.kind is inspect.Parameter.KEYWORD_ONLY
 
 
 @pytest.mark.parametrize("solver", ["svd", 1, ""])

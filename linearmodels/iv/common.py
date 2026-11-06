@@ -103,7 +103,7 @@ class _FirstStageRank(NamedTuple):
     irqxx: linearmodels.typing.data.Float64Array
 
 
-def _rank(a: linearmodels.typing.data.Float64Array, solver: str) -> int:
+def _rank(a: linearmodels.typing.data.Float64Array, *, solver: str) -> int:
     """The rank of a, of its columns scaled to unit length if solver is "qr"."""
     if solver == "qr":
         scale = norm(a, axis=0)
@@ -117,6 +117,7 @@ def _first_stage_rank(
     instr: linearmodels.typing.data.Float64Array,
     exog: linearmodels.typing.data.Float64Array,
     name: str,
+    *,
     solver: str = "pinv",
 ) -> _FirstStageRank | InvalidTestStatistic:
     r"""
@@ -158,14 +159,14 @@ def _first_stage_rank(
     if nexog > 0:
         x = annihilate(x, exog, solver=solver)
         z = annihilate(z, exog, solver=solver)
-    if _rank(x, solver) < nendog:
+    if _rank(x, solver=solver) < nendog:
         return InvalidTestStatistic(
             "The endogenous regressors are collinear once the exogenous "
             f"regressors are partialled out; the {name} statistic is not "
             "defined.",
             name=name,
         )
-    if _rank(z, solver) < ninstr:
+    if _rank(z, solver=solver) < ninstr:
         return InvalidTestStatistic(
             "The instruments are collinear once the exogenous regressors are "
             f"partialled out; the {name} statistic is not defined.",
@@ -318,7 +319,7 @@ def cragg_donald(
     Cambridge University Press.
     """
     name = "Cragg-Donald Test"
-    dec = _first_stage_rank(endog, instr, exog, name, solver)
+    dec = _first_stage_rank(endog, instr, exog, name, solver=solver)
     if isinstance(dec, InvalidTestStatistic):
         return dec
     r2 = float(dec.s[-1]) ** 2
@@ -520,7 +521,7 @@ def _kleibergen_paap(
             reason = "The statistic requires at least two clusters."
             return InvalidTestStatistic(reason, name=name), nan
         config["clusters"] = clusters
-    dec = _first_stage_rank(endog, instr, exog, name, solver)
+    dec = _first_stage_rank(endog, instr, exog, name, solver=solver)
     if isinstance(dec, InvalidTestStatistic):
         return dec, nan
     df = dec.ninstr - dec.nendog + 1
