@@ -1,7 +1,10 @@
 from __future__ import annotations
 
 from collections.abc import Mapping
+import os
+import sys
 from typing import Any, NamedTuple
+import warnings
 
 from formulaic import model_matrix
 from formulaic.formula import Formula
@@ -27,6 +30,64 @@ The original error was:
 
 
 METHODS = ("pinv", "qr")
+
+# The directory of the linearmodels package, and of its tests, which call the functions
+# as a user does
+_PACKAGE_DIRECTORY = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+_TESTS_DIRECTORY = os.path.join(_PACKAGE_DIRECTORY, "tests")
+
+FUTURE_DEFAULT_WARNING = (
+    'The default numerical method of {name} will change from "pinv" to "qr" in '
+    'linearmodels 8.0. Use method="qr" to use it now, or method="pinv" to keep the '
+    "current method and silence this warning."
+)
+
+
+def _called_from_linearmodels(filename: str) -> bool:
+    """Whether code in filename is part of linearmodels, other than its tests."""
+    path = os.path.abspath(filename)
+    in_package = path.startswith(_PACKAGE_DIRECTORY + os.sep)
+    return in_package and not path.startswith(_TESTS_DIRECTORY + os.sep)
+
+
+def resolve_method(method: str | None, name: str) -> str:
+    """
+    Validate method of a function that is mostly used inside linearmodels.
+
+    Parameters
+    ----------
+    method : str, optional
+        The numerical method, "pinv" or "qr", not case sensitive.
+    name : str
+        The name of the function or class, which is used in the warning.
+
+    Returns
+    -------
+    str
+        The method in lower case. "pinv" if method is None.
+
+    Raises
+    ------
+    ValueError
+        If method is not "pinv", "qr" or None.
+
+    Warns
+    -----
+    FutureWarning
+        If method is None and the caller of the function that calls this one is not
+        part of linearmodels, since the default changes to "qr" in linearmodels 8.0.
+        linearmodels passes the method of the model, and does not warn.
+    """
+    if method is None:
+        caller = sys._getframe(2)
+        if not _called_from_linearmodels(caller.f_code.co_filename):
+            warnings.warn(
+                FUTURE_DEFAULT_WARNING.format(name=name), FutureWarning, stacklevel=3
+            )
+        return "pinv"
+    if not isinstance(method, str) or method.lower() not in METHODS:
+        raise ValueError(f'method must be "pinv", "qr" or None, but it is {method!r}.')
+    return method.lower()
 
 
 def proj(

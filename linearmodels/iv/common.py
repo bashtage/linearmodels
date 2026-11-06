@@ -24,7 +24,7 @@ from numpy import (
 from numpy.linalg import LinAlgError, eigh, inv, matrix_rank, norm, svd
 from scipy.linalg import cholesky, solve_triangular
 
-from linearmodels.iv._utility import annihilate
+from linearmodels.iv._utility import annihilate, resolve_method
 from linearmodels.iv.gmm import (
     HeteroskedasticWeightMatrix,
     KernelWeightMatrix,
@@ -197,7 +197,7 @@ def cragg_donald(
     instr: linearmodels.typing.data.Float64Array,
     exog: linearmodels.typing.data.Float64Array,
     *,
-    method: str = "pinv",
+    method: str | None = None,
 ) -> WaldTestStatistic | InvalidTestStatistic:
     r"""
     Cragg-Donald test of reduced rank for the first-stage regression.
@@ -213,13 +213,15 @@ def cragg_donald(
         before testing. Include a constant column here if the model has one.
 
     method : {"pinv", "qr"}, optional
-        The numerical method. "pinv", the default, partials out exog with
+        The numerical method. "pinv" partials out exog with
         ``pinv`` and tests whether the partialled regressors and instruments are
         collinear from their columns as they are. "qr" partials out exog with the
         columns scaled to unit length and tests their rank after scaling the
         columns to unit length, so that the statistic does not depend on the units
         of the variables. The first stage results of IV2SLS and IVLIML use the
-        method of the model.
+        numerical method of the model. If not provided, "pinv" is used, and a
+        ``FutureWarning`` says that the default will be "qr" in linearmodels 8.0 if
+        the caller is not part of linearmodels.
 
         .. versionadded:: 7.2
 
@@ -318,6 +320,7 @@ def cragg_donald(
     regression. In *Identification and Inference for Econometric Models*.
     Cambridge University Press.
     """
+    method = resolve_method(method, "cragg_donald")
     name = "Cragg-Donald Test"
     dec = _first_stage_rank(endog, instr, exog, name, method=method)
     if isinstance(dec, InvalidTestStatistic):
@@ -333,7 +336,7 @@ def cragg_donald_f(
     instr: linearmodels.typing.data.Float64Array,
     exog: linearmodels.typing.data.Float64Array,
     *,
-    method: str = "pinv",
+    method: str | None = None,
 ) -> float:
     r"""
     Cragg-Donald Wald F statistic.
@@ -349,13 +352,15 @@ def cragg_donald_f(
         before testing. Include a constant column here if the model has one.
 
     method : {"pinv", "qr"}, optional
-        The numerical method. "pinv", the default, partials out exog with
+        The numerical method. "pinv" partials out exog with
         ``pinv`` and tests whether the partialled regressors and instruments are
         collinear from their columns as they are. "qr" partials out exog with the
         columns scaled to unit length and tests their rank after scaling the
         columns to unit length, so that the statistic does not depend on the units
         of the variables. The first stage results of IV2SLS and IVLIML use the
-        method of the model.
+        numerical method of the model. If not provided, "pinv" is used, and a
+        ``FutureWarning`` says that the default will be "qr" in linearmodels 8.0 if
+        the caller is not part of linearmodels.
 
         .. versionadded:: 7.2
 
@@ -397,6 +402,7 @@ def cragg_donald_f(
     regression. In *Identification and Inference for Econometric Models*.
     Cambridge University Press.
     """
+    method = resolve_method(method, "cragg_donald_f")
     test = cragg_donald(endog, instr, exog, method=method)
     if isinstance(test, InvalidTestStatistic):
         return nan
@@ -566,7 +572,7 @@ def kleibergen_paap(
     cov_type: str = "robust",
     cov_config: dict[str, Any] | None = None,
     *,
-    method: str = "pinv",
+    method: str | None = None,
 ) -> WaldTestStatistic | InvalidTestStatistic:
     r"""
     Kleibergen-Paap rk LM test of underidentification.
@@ -606,13 +612,15 @@ def kleibergen_paap(
         lists the supported kernels.
 
     method : {"pinv", "qr"}, optional
-        The numerical method. "pinv", the default, partials out exog with
+        The numerical method. "pinv" partials out exog with
         ``pinv`` and tests whether the partialled regressors and instruments are
         collinear from their columns as they are. "qr" partials out exog with the
         columns scaled to unit length and tests their rank after scaling the
         columns to unit length, so that the statistic does not depend on the units
         of the variables. The first stage results of IV2SLS and IVLIML use the
-        method of the model.
+        numerical method of the model. If not provided, "pinv" is used, and a
+        ``FutureWarning`` says that the default will be "qr" in linearmodels 8.0 if
+        the caller is not part of linearmodels.
 
         .. versionadded:: 7.2
 
@@ -738,6 +746,7 @@ def kleibergen_paap(
     the rank of a matrix using the Kleibergen-Paap rk statistic. *Statistical
     Software Components* S456865, Boston College.
     """
+    method = resolve_method(method, "kleibergen_paap")
     return _kleibergen_paap(
         endog, instr, exog, cov_type, cov_config, wald=False, method=method
     )[0]
@@ -750,7 +759,7 @@ def kleibergen_paap_f(
     cov_type: str = "robust",
     cov_config: dict[str, Any] | None = None,
     *,
-    method: str = "pinv",
+    method: str | None = None,
 ) -> float:
     r"""
     Kleibergen-Paap rk Wald F statistic.
@@ -782,13 +791,15 @@ def kleibergen_paap_f(
         Options for the covariance estimator. See :func:`kleibergen_paap`.
 
     method : {"pinv", "qr"}, optional
-        The numerical method. "pinv", the default, partials out exog with
+        The numerical method. "pinv" partials out exog with
         ``pinv`` and tests whether the partialled regressors and instruments are
         collinear from their columns as they are. "qr" partials out exog with the
         columns scaled to unit length and tests their rank after scaling the
         columns to unit length, so that the statistic does not depend on the units
         of the variables. The first stage results of IV2SLS and IVLIML use the
-        method of the model.
+        numerical method of the model. If not provided, "pinv" is used, and a
+        ``FutureWarning`` says that the default will be "qr" in linearmodels 8.0 if
+        the caller is not part of linearmodels.
 
         .. versionadded:: 7.2
 
@@ -870,6 +881,7 @@ def kleibergen_paap_f(
     instrumental variables/GMM estimation and testing. *Stata Journal*, 7(4),
     465-506.
     """
+    method = resolve_method(method, "kleibergen_paap_f")
     return _kleibergen_paap(endog, instr, exog, cov_type, cov_config, method=method)[1]
 
 

@@ -40,7 +40,7 @@ import pytest
 from scipy.linalg import eigh, hadamard
 
 from linearmodels.formula import iv_2sls, iv_liml
-from linearmodels.iv import IV2SLS, IVGMM, IVLIML
+from linearmodels.iv import IV2SLS, IVGMM, IVLIML, AbsorbingLS
 from linearmodels.iv._utility import annihilate, kclass_factors, orthonormal_basis, proj
 from linearmodels.iv.common import (
     cragg_donald,
@@ -493,8 +493,8 @@ def test_covariance_estimators_agree(estimator, options, kappa):
     x = np.c_[exog, endog]
     z = np.c_[exog, instr]
     y = y[:, None]
-    params = IVLIML.estimate_parameters(x, y, z, kappa)
-    pinv = estimator(x, y, z, params, kappa=kappa, **options)
+    params = IVLIML.estimate_parameters(x, y, z, kappa, method="pinv")
+    pinv = estimator(x, y, z, params, kappa=kappa, method="pinv", **options)
     qr = estimator(x, y, z, params, kappa=kappa, method="qr", **options)
     assert_allclose(qr.cov, pinv.cov, rtol=1e-9)
     assert_allclose(qr.s, pinv.s, rtol=1e-9)
@@ -531,7 +531,7 @@ def test_ols_covariance_with_z_equal_to_x(estimator, options):
     x = np.c_[exog, endog]
     y = y[:, None]
     params = np.linalg.lstsq(x, y, rcond=None)[0]
-    pinv = estimator(x, y, x, params, kappa=0.0, **options)
+    pinv = estimator(x, y, x, params, kappa=0.0, method="pinv", **options)
     qr = estimator(x, y, x.copy(), params, kappa=0.0, method="qr", **options)
     assert_allclose(qr.cov, pinv.cov, rtol=1e-10)
     assert_allclose(qr.s, pinv.s, rtol=1e-10)
@@ -631,3 +631,84 @@ def test_models_without_the_method_keyword_do_not_warn():
     with warnings.catch_warnings():
         warnings.simplefilter("error")
         IVGMM(*data).fit()
+
+
+def lower_level_calls():
+    y, exog, endog, instr = scaled_data()
+    x = np.c_[exog, endog]
+    z = np.c_[exog, instr]
+    yc = y[:, None]
+    params = IVLIML.estimate_parameters(x, yc, z, 1.0, method="pinv")
+    clusters = np.arange(y.shape[0]) // 10
+    data = IV2SLS(y, exog, endog, instr, method="pinv")
+    return {
+        "HomoskedasticCovariance": lambda: HomoskedasticCovariance(x, yc, z, params),
+        "HeteroskedasticCovariance": lambda: HeteroskedasticCovariance(
+            x, yc, z, params
+        ),
+        "KernelCovariance": lambda: KernelCovariance(x, yc, z, params, bandwidth=4),
+        "ClusteredCovariance": lambda: ClusteredCovariance(
+            x, yc, z, params, clusters=clusters
+        ),
+        "cragg_donald": lambda: cragg_donald(endog, instr, exog),
+        "cragg_donald_f": lambda: cragg_donald_f(endog, instr, exog),
+        "kleibergen_paap": lambda: kleibergen_paap(endog, instr, exog),
+        "kleibergen_paap_f": lambda: kleibergen_paap_f(endog, instr, exog),
+        "FirstStageResults": lambda: FirstStageResults(
+            data.dependent,
+            data.exog,
+            data.endog,
+            data.instruments,
+            data.weights,
+            "robust",
+            {},
+        ),
+        "estimate_parameters": lambda: IVLIML.estimate_parameters(x, yc, z, 1.0),
+    }
+
+
+@pytest.mark.parametrize("name", list(lower_level_calls()))
+def test_lower_level_functions_warn_if_called_directly(name):
+    # The tests call the functions as a user does
+    call = lower_level_calls()[name]
+    with pytest.warns(FutureWarning) as record:
+        call()
+    assert len(record) == 1
+    message = str(record[0].message)
+    assert message.startswith(f"The default numerical method of {name} will change")
+    assert 'method="qr"' in message
+    assert 'method="pinv"' in message
+    assert record[0].filename == __file__
+
+
+@pytest.mark.parametrize("cov_type", list(COV_OPTIONS))
+def test_lower_level_functions_do_not_warn_inside_linearmodels(cov_type):
+    # The models create the covariance estimators, the first stage results and the
+    # rank tests with their own method. AbsorbingLS and IVGMM create IV covariance
+    # estimators without a method
+    y, exog, endog, instr = scaled_data()
+    cov_options = dict(COV_OPTIONS[cov_type])
+    if cov_type == "clustered":
+        cov_options["clusters"] = np.arange(y.shape[0]) // 10
+    with warnings.catch_warnings():
+        warnings.simplefilter("error")
+        for method in ("pinv", "qr"):
+            res = IV2SLS(y, exog, endog, instr, method=method).fit(
+                cov_type=cov_type, **cov_options
+            )
+            first_stage = res.first_stage
+            stats = (
+                first_stage.cragg_donald.stat,
+                first_stage.kleibergen_paap.stat,
+                first_stage.kleibergen_paap_f,
+                res.sargan.stat,
+            )
+        absorbing = AbsorbingLS(
+            y,
+            exog[:, 1:],
+            absorb=pd.DataFrame({"a": pd.Categorical(np.arange(500) % 9)}),
+        ).fit(cov_type=cov_type if cov_type != "kernel" else "robust")
+        gmm = IVGMM(y, exog, endog, instr).fit()
+    assert all(np.isfinite(stat) for stat in stats)
+    assert np.all(np.isfinite(absorbing.params))
+    assert np.all(np.isfinite(gmm.params))
