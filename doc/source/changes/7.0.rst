@@ -15,17 +15,17 @@ be added to 7.1. 7.2 also contains the fixes below.
   ``solver="qr"`` tests the rank of ``[exog, endog]`` and ``[exog, instruments]`` after
   scaling their columns to unit length, and treats them as rank deficient if their
   condition number is at least 1e9. It computes the estimates, their covariance and the
-  kappa of LIML from QR decompositions, as R's ``ivreg`` does. The results do not
-  depend on the units of the variables, and their rounding error grows with the
-  condition number of the scaled data, not with its square. With nearly collinear
-  regressors (a condition number of about 1e6), the median error of the 2SLS estimates
-  and of their robust standard errors falls from about 5e-4 to 4e-11 in simulations, and
-  columns on scales that differ by 1e13 or more are no longer rejected as rank
-  deficient. The kappa of LIML no longer depends on the units with 2 or more endogenous
-  regressors. The default, ``solver="legacy"``, computes as in 7.1. The IV covariance estimators, ``cragg_donald``, ``cragg_donald_f``,
-  ``kleibergen_paap`` and ``kleibergen_paap_f`` accept the same keyword, and the first
-  stage results and the tests of the results use the solver of the model (:issue:`823`,
-  :issue:`850`, :issue:`870`).
+  kappa of LIML from QR decompositions, as R's ``ivreg`` does. The results do not depend
+  on the units of the variables, and their rounding error grows with the condition
+  number of the scaled data, not with its square. With nearly collinear regressors (a
+  condition number of about 1e6), the median error of the 2SLS estimates and of their
+  robust standard errors falls from about 5e-4 to 4e-11 in simulations, and columns on
+  scales that differ by 1e13 or more are no longer rejected as rank deficient. The kappa
+  of LIML no longer depends on the units with 2 or more endogenous regressors. The
+  default, ``solver="legacy"``, computes as in 7.1. The IV covariance estimators,
+  ``cragg_donald``, ``cragg_donald_f``, ``kleibergen_paap`` and ``kleibergen_paap_f``
+  accept the same keyword, and the first stage results and the tests of the results use
+  the solver of the model (:issue:`823`, :issue:`850`, :issue:`870`).
 
 .. rubric:: Changes that alter results
 
