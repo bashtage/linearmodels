@@ -50,6 +50,7 @@ from linearmodels.iv.covariance import (
     HomoskedasticCovariance,
     KernelCovariance,
 )
+from linearmodels.iv.model import _rank_and_condition_number
 from linearmodels.iv.results import FirstStageResults
 
 NOBS = 64
@@ -489,3 +490,61 @@ def test_covariance_estimators_agree(estimator, options, kappa):
     assert_allclose(qr.s, pinv.s, rtol=1e-9)
     params_qr = IVLIML.estimate_parameters(x, y, z, kappa, solver="qr")
     assert_allclose(params_qr, params, rtol=1e-10)
+
+
+def test_kclass_factors_of_ols_do_not_need_the_instruments():
+    y, exog, endog, instr = scaled_data()
+    x = np.c_[exog, endog]
+    z = np.c_[exog, instr]
+    y = y[:, None]
+    with_basis = kclass_factors(x, orthonormal_basis(z), 0.0, y)
+    without = kclass_factors(x, None, 0.0, y)
+    assert without.u is None
+    assert_allclose(without.r, with_basis.r, rtol=1e-14)
+    assert_allclose(without.t, with_basis.t, rtol=1e-14)
+    with pytest.raises(ValueError, match="z_basis is required"):
+        kclass_factors(x, None, 0.5, y)
+
+
+@pytest.mark.parametrize(
+    ("estimator", "options"),
+    [
+        (HomoskedasticCovariance, {}),
+        (HeteroskedasticCovariance, {}),
+        (KernelCovariance, {"bandwidth": 6}),
+        (ClusteredCovariance, {"clusters": np.arange(500) // 25}),
+    ],
+)
+def test_ols_covariance_with_z_equal_to_x(estimator, options):
+    # z is x in OLS, and one QR decomposition of x is used for both
+    y, exog, endog, _ = scaled_data()
+    x = np.c_[exog, endog]
+    y = y[:, None]
+    params = np.linalg.lstsq(x, y, rcond=None)[0]
+    pinv = estimator(x, y, x, params, kappa=0.0, **options)
+    qr = estimator(x, y, x.copy(), params, kappa=0.0, solver="qr", **options)
+    assert_allclose(qr.cov, pinv.cov, rtol=1e-10)
+    assert_allclose(qr.s, pinv.s, rtol=1e-10)
+
+
+@pytest.mark.parametrize("scale", [1.0, 2.0**30, 2.0**-40])
+def test_rank_and_condition_number(scale):
+    _, exog, endog, _ = scaled_data()
+    x = np.c_[exog, endog * np.array([1, scale])]
+    rank, cond = _rank_and_condition_number(x)
+    assert rank == np.linalg.matrix_rank(x)
+    assert_allclose(cond, np.linalg.cond(x), rtol=1e-8)
+    deficient = np.c_[x, x[:, 1] + x[:, 2]]
+    assert _rank_and_condition_number(deficient)[0] == np.linalg.matrix_rank(deficient)
+    assert _rank_and_condition_number(x[:3])[1] == np.inf
+
+
+def test_no_warning_for_columns_on_different_scales():
+    # The condition number is about 1e9, from the units only. The columns scaled to
+    # unit length are well conditioned, so that there is no warning
+    y, exog, endog, instr = scaled_data()
+    with warnings.catch_warnings():
+        warnings.simplefilter("error")
+        res = IV2SLS(y, exog * np.array([1, 2.0**30, 1]), endog, instr).fit()
+    expected = IV2SLS(y, exog, endog, instr, solver="qr").fit()
+    assert_allclose(res.params.iloc[1] * 2.0**30, expected.params.iloc[1], rtol=1e-6)

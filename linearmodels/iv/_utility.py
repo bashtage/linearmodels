@@ -183,13 +183,13 @@ class KClassFactors(NamedTuple):
     """Symmetric middle factor (nvar by nvar), or None if it is the identity."""
     t: linearmodels.typing.data.Float64Array | None
     """Transformed cross product with y (nvar by 1), or None without y."""
-    u: linearmodels.typing.data.Float64Array
-    """Coordinates of the projected regressors (ninstr by nvar)."""
+    u: linearmodels.typing.data.Float64Array | None
+    """Coordinates of the projected regressors (ninstr by nvar), or None."""
 
 
 def kclass_factors(
     x: linearmodels.typing.data.Float64Array,
-    z_basis: linearmodels.typing.data.Float64Array,
+    z_basis: linearmodels.typing.data.Float64Array | None,
     kappa: float,
     y: linearmodels.typing.data.Float64Array | None = None,
 ) -> KClassFactors:
@@ -200,9 +200,10 @@ def kclass_factors(
     ----------
     x : ndarray
         Regressors (nobs by nvar).
-    z_basis : ndarray
+    z_basis : ndarray or None
         Orthonormal basis of the instruments (nobs by ninstr), with ninstr >= nvar.
-        See :func:`orthonormal_basis`.
+        See :func:`orthonormal_basis`. It can be None if kappa is 0, and U is then
+        None.
     kappa : float
         The parameter of the k-class estimator.
     y : ndarray, optional
@@ -237,9 +238,13 @@ def kclass_factors(
     nvar = x.shape[1]
     if nvar == 0:
         t0 = None if y is None else np.empty((0,) + y.shape[1:])
-        return KClassFactors(
-            np.empty((0, 0)), None, t0, np.empty((z_basis.shape[1], 0))
-        )
+        u0 = None if z_basis is None else np.empty((z_basis.shape[1], 0))
+        return KClassFactors(np.empty((0, 0)), None, t0, u0)
+    if z_basis is None:
+        if kappa != 0:
+            raise ValueError("z_basis is required if kappa is not 0.")
+        q_x, r_x = sp_qr(x, mode="economic", check_finite=False)
+        return KClassFactors(r_x, None, None if y is None else q_x.T @ y, None)
     qx = z_basis.T @ x
     if kappa < 1:
         q_x, r_x = sp_qr(x, mode="economic", check_finite=False)

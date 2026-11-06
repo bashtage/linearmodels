@@ -15,11 +15,13 @@ from numpy import (
     all as npall,
     any as npany,
     array,
+    array_equal,
     asarray,
     atleast_2d,
     average,
     c_,
     column_stack,
+    count_nonzero,
     diag,
     dtype,
     eye,
@@ -222,6 +224,27 @@ def _external_stacklevel() -> int:
         frame = frame.f_back
         level += 1
     return level
+
+
+def _rank_and_condition_number(
+    a: linearmodels.typing.data.Float64Array,
+) -> tuple[int, float]:
+    """
+    The rank of numpy.linalg.matrix_rank and the condition number of a.
+
+    The rank is computed from the singular values as matrix_rank computes it. The
+    association of its tolerance changed in NumPy 2, and matrix_rank is used if the
+    two orders give different ranks.
+    """
+    sv = svd(a, compute_uv=False)
+    smax = sv.max(initial=0.0)
+    m, eps = max(a.shape), finfo(sv.dtype).eps
+    rank = int(count_nonzero(sv > smax * (m * eps)))
+    if rank != int(count_nonzero(sv > smax * m * eps)):
+        rank = int(matrix_rank(a))
+    smin = sv.min(initial=smax) if sv.shape[0] == a.shape[1] else 0.0
+    cond = float(smax / smin) if smin > 0 else float("inf")
+    return rank, cond
 
 
 def _check_solver(solver: str | None) -> tuple[str, bool]:
@@ -597,14 +620,21 @@ class _IVModelBase:
                 "The instruments [exog instruments]",
             ),
         )
+        conds = []
         for a, message, _ in checks:
-            if matrix_rank(a) < a.shape[1]:
+            rank, cond = _rank_and_condition_number(a)
+            if rank < a.shape[1]:
                 hint = self._supports_qr and full_column_rank(a, _RANK_TOLERANCE)
                 raise ValueError(message + ("." + _SCALE_HINT if hint else ""))
+            conds.append(cond)
         if not (self._supports_qr and self._warn_solver):
             return
-        for a, _, name in checks:
-            if not full_column_rank(a, _RANK_TOLERANCE):
+        for (a, _, name), cond in zip(checks, conds, strict=True):
+            # Scaling the columns to unit length cannot increase the condition number
+            # by more than sqrt(ncol) (van der Sluis, 1969), so that the scaled
+            # columns only need to be tested if the condition number is large
+            limit = 1 / (2 * _RANK_TOLERANCE * sqrt(a.shape[1]))
+            if cond >= limit and not full_column_rank(a, _RANK_TOLERANCE):
                 warnings.warn(
                     _FUTURE_RANK_WARNING.format(name=name, limit=1 / _RANK_TOLERANCE),
                     FutureWarning,
@@ -717,7 +747,9 @@ class _IVModelBase:
             cov = restriction @ cov @ restriction.T
         return f_statistic(params, cov, debiased, nobs - nvar, const_loc)
 
-    def _estimate_kappa(self) -> float:
+    def _estimate_kappa(
+        self, z_basis: linearmodels.typing.data.Float64Array | None = None
+    ) -> float:
         """
         The value of kappa in LIML, which is the same for any estimator
 
@@ -771,14 +803,17 @@ class _IVModelBase:
             )
 
         if self._solver == "qr":
-            z_basis = orthonormal_basis(z)
+            z_basis = orthonormal_basis(z) if z_basis is None else z_basis
             ez = e - z_basis @ (z_basis.T @ e)
         else:
             ez = e - z @ (pinv(z) @ e)
         if x1.shape[1] == 0:  # No exogenous regressors
             ex1 = e
         elif self._solver == "qr":
-            x1_basis = orthonormal_basis(x1)
+            # The basis of z is that of x1 if x1 is z, as in a model without
+            # endogenous regressors and instruments
+            same = x1.shape == z.shape and array_equal(x1, z)
+            x1_basis = z_basis if same else orthonormal_basis(x1)
             ex1 = e - x1_basis @ (x1_basis.T @ e)
         else:
             ex1 = e - x1 @ (pinv(x1) @ e)
@@ -1132,9 +1167,16 @@ class _IVLSModelBase(_IVModelBase):
         self._check_clusters(cov_config)
         wy, wx, wz = self._wy, self._wx, self._wz
         kappa = self._kappa
+        # One QR decomposition of the instruments for kappa, the estimate and the
+        # covariance
+        z_basis = orthonormal_basis(wz) if self._solver == "qr" else None
 
         try:
-            liml_kappa: float = self._estimate_kappa()
+            liml_kappa: float = (
+                self._estimate_kappa()
+                if z_basis is None
+                else self._estimate_kappa(z_basis)
+            )
         except Exception as exc:
             liml_kappa = nan
             if kappa is None:
@@ -1152,7 +1194,12 @@ class _IVLSModelBase(_IVModelBase):
             nobs, ninstr = wz.shape
             est_kappa -= self._fuller / (nobs - ninstr)
 
-        params = self.estimate_parameters(wx, wy, wz, est_kappa, solver=self._solver)
+        if z_basis is None:
+            params = self.estimate_parameters(wx, wy, wz, est_kappa, solver="pinv")
+        else:
+            # OLS (kappa = 0) does not use the instruments
+            basis = None if est_kappa == 0 else z_basis
+            params = kclass_solve(kclass_factors(wx, basis, float(est_kappa), wy))
 
         cov_estimator = lookup_option(COVARIANCE_ESTIMATORS, cov_type, "cov_type")
         cov_config["debiased"] = debiased
@@ -1162,6 +1209,8 @@ class _IVLSModelBase(_IVModelBase):
         cov_estimator_inst = cov_estimator(
             wx, wy, wz, params, solver=self._solver, **cov_config_copy
         )
+        if z_basis is not None:
+            cov_estimator_inst._z_basis = z_basis
 
         results = {"kappa": est_kappa, "liml_kappa": liml_kappa}
         pe = self._post_estimation(params, cov_estimator_inst, cov_type)
