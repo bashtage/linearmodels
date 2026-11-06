@@ -1369,7 +1369,7 @@ class IVResults(_CommonIVResults):
         assumptions. It does not address invalid instruments or guarantee
         finite-sample coverage.
 
-        Both methods require tf-inference and Python 3.11 or later. Install
+        Both methods require tf-inference and Python 3.12 or later. Install
         tf-inference following https://github.com/finite-sample/tf-inference.
         Ordinary model fitting and conventional inference do not require it.
 

@@ -29,7 +29,7 @@ def _tf_critical_value(
             raise
         raise ImportError(
             "tF inference requires the optional tf-inference package "
-            "(Python 3.11 or later). Install it using the instructions at "
+            "(Python 3.12 or later). Install it using the instructions at "
             "https://github.com/finite-sample/tf-inference."
         ) from exc
 

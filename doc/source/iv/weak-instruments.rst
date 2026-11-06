@@ -10,10 +10,10 @@ It supports IV2SLS with unadjusted or heteroskedasticity-robust covariance,
 
 Both table lookup and numerical calibration require the optional
 `tf-inference <https://github.com/finite-sample/tf-inference>`_ package, Python
-3.11 or later, NumPy 1.26 or later and SciPy 1.12 or later. Install the validated
+3.12 or later, NumPy 1.26 or later and SciPy 1.12 or later and PyArrow 18 or later. Install the validated
 source revision before running the example::
 
-    python -m pip install git+https://github.com/finite-sample/tf-inference.git@ebaa0f8ff0286203b0a1488abdf3330ace84c4fe
+    python -m pip install git+https://github.com/finite-sample/tf-inference.git@3f3deaf9ee2d202221a1474819bf961db1d9db40
 
 The package is imported only when tF inference is requested. Ordinary model
 fitting and conventional inference do not require it. If it is missing,
