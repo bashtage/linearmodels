@@ -38,6 +38,11 @@ def convert_columns(s: pd.Series, drop_first: bool) -> linearmodels.typing.AnyPa
         out = pd.get_dummies(s, drop_first=drop_first)
         # TODO: Remove once pandas typing fixed
         out.columns = pd.Index([str(s.name) + "." + str(c) for c in out])
+        if s.isna().any():
+            used = out.ne(0).any(axis=0)
+            if used.any():
+                out = out.loc[:, used]
+            out = out.astype(float).where(s.notna(), axis=0)
         return out
     return s
 
