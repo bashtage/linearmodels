@@ -19,7 +19,7 @@
     
   
       
-        <title>Version 7.1 - linearmodels v7.2 (+26)</title>
+        <title>Version 7.2 - linearmodels v7.2 (+33)</title>
       
     
 
@@ -91,7 +91,7 @@
 
 <header class="md-header md-header--shadow" data-md-component="header">
   <nav class="md-header__inner md-grid" aria-label="Header">
-    <a href="../index.html" title="linearmodels v7.2 (+26)" class="md-header__button md-logo" aria-label="linearmodels v7.2 (+26)" data-md-component="logo">
+    <a href="../index.html" title="linearmodels v7.2 (+33)" class="md-header__button md-logo" aria-label="linearmodels v7.2 (+33)" data-md-component="logo">
       <img src="../_static/bw-logo.svg" alt="logo">
     </a>
     <label class="md-header__button md-icon" for="__drawer">
@@ -102,13 +102,13 @@
       <div class="md-header__ellipsis">
         <div class="md-header__topic">
           <span class="md-ellipsis">
-            linearmodels v7.2 (+26)
+            linearmodels v7.2 (+33)
           </span>
         </div>
         <div class="md-header__topic" data-md-component="header-topic">
           <span class="md-ellipsis">
             
-              Version 7.1
+              Version 7.2
             
           </span>
         </div>
@@ -197,10 +197,10 @@
 
 <nav class="md-nav md-nav--primary" aria-label="Navigation" data-md-level="0">
   <label class="md-nav__title" for="__drawer">
-    <a href="../index.html" title="linearmodels v7.2 (+26)" class="md-nav__button md-logo" aria-label="linearmodels v7.2 (+26)" data-md-component="logo">
+    <a href="../index.html" title="linearmodels v7.2 (+33)" class="md-nav__button md-logo" aria-label="linearmodels v7.2 (+33)" data-md-component="logo">
       <img src="../_static/bw-logo.svg" alt="logo">
     </a>
-    linearmodels v7.2 (+26)
+    linearmodels v7.2 (+33)
   </label>
   
     <div class="md-nav__source">
@@ -526,6 +526,61 @@
                   
 
 
+<h1 id="version-7-2">Version 7.2<a class="headerlink" href="#version-7-2" title="Link to this heading">¶</a></h1>
+<p>Version 7.2 adds wheels for Windows on ARM64 (CPython 3.13 to 3.15). PyPI accepts the
+files of a release only for 14 days after its first upload, so these wheels could not
+be added to 7.1. 7.2 also contains the fixes below.</p>
+<p class="rubric">Changes that alter results</p>
+<ul class="simple">
+<li><p>A missing value of a categorical or string column is a missing value of each of its
+dummy variables in <code class="docutils literal notranslate"><span class="pre">IVData</span></code> and <code class="docutils literal notranslate"><span class="pre">PanelData</span></code>, so that the observation is dropped
+with a <code class="docutils literal notranslate"><span class="pre">MissingValueWarning</span></code>. 7.1 converted it to a row of zeros, which kept the
+observation, in the first category when <code class="docutils literal notranslate"><span class="pre">drop_first</span></code> is True (<a class="extlink-issue reference external" href="https://github.com/bashtage/linearmodels/issues/858">GH858</a>,
+<a class="extlink-issue reference external" href="https://github.com/bashtage/linearmodels/issues/867">GH867</a>).</p></li>
+<li><p>The model F statistic of the IV estimators leaves out an intercept that dummy
+variables imply, such as dummies that sum to one in a model without a constant. 7.1
+also tested the implied intercept, with one more degree of freedom (<a class="extlink-issue reference external" href="https://github.com/bashtage/linearmodels/issues/780">GH780</a>,
+<a class="extlink-issue reference external" href="https://github.com/bashtage/linearmodels/issues/859">GH859</a>, <a class="extlink-issue reference external" href="https://github.com/bashtage/linearmodels/issues/866">GH866</a>).</p></li>
+</ul>
+<p class="rubric">Backward-incompatible changes</p>
+<ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">predict</span></code> of the panel models raises a <code class="docutils literal notranslate"><span class="pre">ValueError</span></code> for an out-of-sample
+prediction (<code class="docutils literal notranslate"><span class="pre">exog</span></code> or <code class="docutils literal notranslate"><span class="pre">data</span></code> is given) with <code class="docutils literal notranslate"><span class="pre">effects=True</span></code> or
+<code class="docutils literal notranslate"><span class="pre">idiosyncratic=True</span></code>, which are only available in sample, or with <code class="docutils literal notranslate"><span class="pre">fitted=False</span></code>
+and no other output. 7.1 ignored these options and returned the fitted values
+(<a class="extlink-issue reference external" href="https://github.com/bashtage/linearmodels/issues/768">GH768</a>, <a class="extlink-issue reference external" href="https://github.com/bashtage/linearmodels/issues/849">GH849</a>).</p></li>
+</ul>
+<p class="rubric">Bug fixes</p>
+<ul class="simple">
+<li><p>The IV estimators do not store weighted copies of the data when all of the weights
+are 1, which is the case without weights or with constant weights. This reduces the
+memory that a model uses by about a third (<a class="extlink-issue reference external" href="https://github.com/bashtage/linearmodels/issues/607">GH607</a>, <a class="extlink-issue reference external" href="https://github.com/bashtage/linearmodels/issues/862">GH862</a>,
+<a class="extlink-issue reference external" href="https://github.com/bashtage/linearmodels/issues/865">GH865</a>).</p></li>
+</ul>
+<p class="rubric">Documentation and maintenance</p>
+<ul class="simple">
+<li><p>The tests that failed on FreeBSD no longer depend on rounding or on <code class="docutils literal notranslate"><span class="pre">pytest</span> <span class="pre">-v</span></code>,
+and the README explains how to run the tests without the other pytest plugins of an
+environment (<a class="extlink-issue reference external" href="https://github.com/bashtage/linearmodels/issues/853">GH853</a>, <a class="extlink-issue reference external" href="https://github.com/bashtage/linearmodels/issues/854">GH854</a>).</p></li>
+<li><p>The CI builds and tests a wheel on Windows on ARM64 (<a class="extlink-issue reference external" href="https://github.com/bashtage/linearmodels/issues/868">GH868</a>).</p></li>
+</ul>
+<p class="rubric">Compatibility</p>
+<ul class="simple">
+<li><p>Wheels are built for Windows on ARM64 for CPython 3.13 to 3.15, the versions for which
+NumPy and statsmodels have Windows ARM64 wheels. The other wheels are built as in 7.1.</p></li>
+<li><p>Python 3.10 and NumPy 1.x are still supported, although the 7.1 notes said that 7.1
+would be the last release to support them.</p></li>
+</ul>
+<p class="rubric">Deprecations and future changes</p>
+<ul class="simple">
+<li><p>linearmodels 8.0 will raise the minimum versions of Python and NumPy, and of the other
+dependencies.</p></li>
+</ul>
+<p class="rubric">Contributors</p>
+<ul class="simple">
+<li><p>Thanks to inchang-ing (<a class="extlink-issue reference external" href="https://github.com/bashtage/linearmodels/issues/849">GH849</a>), jackiectl2 (<a class="extlink-issue reference external" href="https://github.com/bashtage/linearmodels/issues/858">GH858</a>), CodingSelim
+(<a class="extlink-issue reference external" href="https://github.com/bashtage/linearmodels/issues/859">GH859</a>) and DresdenGman (<a class="extlink-issue reference external" href="https://github.com/bashtage/linearmodels/issues/862">GH862</a>).</p></li>
+</ul>
 <h1 id="version-7-1">Version 7.1<a class="headerlink" href="#version-7-1" title="Link to this heading">¶</a></h1>
 <p>Released on 2026-10-16.</p>
 <p>Version 7.1 is a significant release in the 7.x branch. It contains a number
