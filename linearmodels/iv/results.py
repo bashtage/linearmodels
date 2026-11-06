@@ -826,9 +826,9 @@ class FirstStageResults(_SummaryStr):
         stage regressions and for the rank tests.
     cov_config : dict
         Options of the covariance estimator of the model.
-    solver : {"legacy", "qr"}, optional
+    solver : {"pinv", "qr"}, optional
         The numerical method of the model, which is used for the first stage
-        regressions. The default is "legacy".
+        regressions. The default is "pinv".
 
         .. versionadded:: 7.2
     """
@@ -843,7 +843,7 @@ class FirstStageResults(_SummaryStr):
         cov_type: str,
         cov_config: dict[str, Any],
         *,
-        solver: str = "legacy",
+        solver: str = "pinv",
     ) -> None:
         self.dep = dep
         self._solver = solver

@@ -471,8 +471,8 @@ class HomoskedasticCovariance:
         of x, for example the absorbed effects of AbsorbingLS. The default is 0.
         It is only used if ``debiased`` is True, when n / (n-k) becomes
         n / (n-k-extra_df).
-    solver : {"legacy", "qr"}, optional
-        The numerical method. The default is "legacy", which projects with
+    solver : {"pinv", "qr"}, optional
+        The numerical method. The default is "pinv", which projects with
         ``pinv(z)`` and inverts V. "qr" projects with the QR decomposition of z
         and computes the inverse of V from triangular factors, without forming V,
         so that the estimate does not depend on the units of the variables and its
@@ -523,7 +523,7 @@ class HomoskedasticCovariance:
         debiased: bool = False,
         kappa: linearmodels.typing.Numeric = 1,
         extra_df: int = 0,
-        solver: str = "legacy",
+        solver: str = "pinv",
     ):
         if not (x.shape[0] == y.shape[0] == z.shape[0]):
             raise ValueError("x, y and z must have the same number of rows")
@@ -538,7 +538,7 @@ class HomoskedasticCovariance:
         self.eps = y - x @ params
         self._kappa = kappa
         if solver not in SOLVERS:
-            raise ValueError(f'solver must be "legacy" or "qr", but it is {solver!r}.')
+            raise ValueError(f'solver must be "pinv" or "qr", but it is {solver!r}.')
         self._solver = solver
         self._pinvz: linearmodels.typing.data.Float64Array | None = None
         self._z_basis: linearmodels.typing.data.Float64Array | None = None
@@ -577,24 +577,24 @@ class HomoskedasticCovariance:
             self._z_basis = orthonormal_basis(self.z)
         return self._z_basis
 
-    def _legacy_pinvz(self) -> linearmodels.typing.data.Float64Array:
-        """The pseudo-inverse of z of solver="legacy", computed once."""
+    def _pinv_of_z(self) -> linearmodels.typing.data.Float64Array:
+        """The pseudo-inverse of z of solver="pinv", computed once."""
         if self._pinvz is None:
             self._pinvz = pinv(self.z)
         return self._pinvz
 
     def _xhat(self) -> linearmodels.typing.data.Float64Array:
         """The projection of x on z, which are the regressors of the scores."""
-        if self._solver == "legacy":
-            return self.z @ (self._legacy_pinvz() @ self.x)
+        if self._solver == "pinv":
+            return self.z @ (self._pinv_of_z() @ self.x)
         z_basis = self._basis()
         return z_basis @ (z_basis.T @ self.x)
 
-    def _legacy_v(self) -> linearmodels.typing.data.Float64Array:
-        """V of solver="legacy", the k-class cross product of x divided by nobs."""
+    def _pinv_v(self) -> linearmodels.typing.data.Float64Array:
+        """V of solver="pinv", the k-class cross product of x divided by nobs."""
         x, z = self.x, self.z
         nobs = x.shape[0]
-        v = (x.T @ z) @ (self._legacy_pinvz() @ x) / nobs
+        v = (x.T @ z) @ (self._pinv_of_z() @ x) / nobs
         if self._kappa != 1:
             kappa = self._kappa
             xpx = x.T @ x / nobs
@@ -633,8 +633,8 @@ class HomoskedasticCovariance:
         nobs = self.x.shape[0]
         eps = self.eps
         s2 = eps.T @ eps / nobs
-        if self._solver == "legacy":
-            v = self._legacy_v()
+        if self._solver == "pinv":
+            v = self._pinv_v()
         else:
             factors = self._kclass_factors()
             r, g = factors.r, factors.g
@@ -646,8 +646,8 @@ class HomoskedasticCovariance:
     def cov(self) -> linearmodels.typing.data.Float64Array:
         """Return the covariance of the estimated parameters."""
         nobs, nvar = self.x.shape
-        if self._solver == "legacy":
-            vinv = inv(self._legacy_v())
+        if self._solver == "pinv":
+            vinv = inv(self._pinv_v())
             c = vinv @ self.s @ vinv / nobs
             return (c + c.T) / 2
         if nvar == 0:
@@ -705,8 +705,8 @@ class HeteroskedasticCovariance(HomoskedasticCovariance):
         of x, for example the absorbed effects of AbsorbingLS. The default is 0.
         It is only used if ``debiased`` is True, when n / (n-k) becomes
         n / (n-k-extra_df).
-    solver : {"legacy", "qr"}, optional
-        The numerical method. The default is "legacy", which projects with
+    solver : {"pinv", "qr"}, optional
+        The numerical method. The default is "pinv", which projects with
         ``pinv(z)`` and inverts V. "qr" projects with the QR decomposition of z
         and computes the inverse of V from triangular factors, without forming V,
         so that the estimate does not depend on the units of the variables and its
@@ -759,7 +759,7 @@ class HeteroskedasticCovariance(HomoskedasticCovariance):
         debiased: bool = False,
         kappa: linearmodels.typing.Numeric = 1,
         extra_df: int = 0,
-        solver: str = "legacy",
+        solver: str = "pinv",
     ):
         super().__init__(x, y, z, params, debiased, kappa, extra_df, solver)
         self._name = "Robust Covariance (Heteroskedastic)"
@@ -818,8 +818,8 @@ class KernelCovariance(HomoskedasticCovariance):
         of x, for example the absorbed effects of AbsorbingLS. The default is 0.
         It is only used if ``debiased`` is True, when n / (n-k) becomes
         n / (n-k-extra_df).
-    solver : {"legacy", "qr"}, optional
-        The numerical method. The default is "legacy", which projects with
+    solver : {"pinv", "qr"}, optional
+        The numerical method. The default is "pinv", which projects with
         ``pinv(z)`` and inverts V. "qr" projects with the QR decomposition of z
         and computes the inverse of V from triangular factors, without forming V,
         so that the estimate does not depend on the units of the variables and its
@@ -903,7 +903,7 @@ class KernelCovariance(HomoskedasticCovariance):
         debiased: bool = False,
         kappa: linearmodels.typing.Numeric = 1,
         extra_df: int = 0,
-        solver: str = "legacy",
+        solver: str = "pinv",
     ):
         super().__init__(x, y, z, params, debiased, kappa, extra_df, solver)
         self._kernels = KERNEL_LOOKUP
@@ -995,8 +995,8 @@ class ClusteredCovariance(HomoskedasticCovariance):
         of x, for example the absorbed effects of AbsorbingLS. The default is 0.
         It is only used if ``debiased`` is True, when n / (n-k) becomes
         n / (n-k-extra_df).
-    solver : {"legacy", "qr"}, optional
-        The numerical method. The default is "legacy", which projects with
+    solver : {"pinv", "qr"}, optional
+        The numerical method. The default is "pinv", which projects with
         ``pinv(z)`` and inverts V. "qr" projects with the QR decomposition of z
         and computes the inverse of V from triangular factors, without forming V,
         so that the estimate does not depend on the units of the variables and its
@@ -1053,7 +1053,7 @@ class ClusteredCovariance(HomoskedasticCovariance):
         debiased: bool = False,
         kappa: linearmodels.typing.Numeric = 1,
         extra_df: int = 0,
-        solver: str = "legacy",
+        solver: str = "pinv",
     ):
         super().__init__(x, y, z, params, debiased, kappa, extra_df, solver)
 

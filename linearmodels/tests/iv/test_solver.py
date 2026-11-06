@@ -1,7 +1,7 @@
 """
 Tests of the solver of the k-class IV models (IV2SLS and IVLIML).
 
-solver="legacy", the default, tests the rank of [exog, endog] and [exog, instruments]
+solver="pinv", the default, tests the rank of [exog, endog] and [exog, instruments]
 as they are, projects with pinv and inverts the cross products of the k-class
 estimator. solver="qr" tests the rank of the columns scaled to unit length, with a
 relative tolerance of 1e-9, and computes the estimates, their covariance and the
@@ -132,7 +132,7 @@ COV_OPTIONS = {
 }
 # 2^-20 and 2^-27 are about 9.5e-7 and 7.5e-9. The condition numbers of the scaled
 # regressors are about 2.5e6 and 3.2e8, so that the error of QR is about 1e-10 and
-# 1e-8. The legacy solver is off by about 1e-4 and 300% (Windows, OpenBLAS)
+# 1e-8. solver="pinv" is off by about 1e-4 and 300% (Windows, OpenBLAS)
 DELTAS = {"2^-20": (2.0**-20, 1e-8), "2^-27": (2.0**-27, 1e-6)}
 
 
@@ -152,7 +152,7 @@ def test_kclass_estimates_are_exact(delta, options):
 
 def test_fuller_estimate_is_accurate():
     # kappa is 0.983 and y - Xb has a residual of norm 8, so that the error is about
-    # (1 - kappa) cond(X)^2 eps |e| / (|X| |b|), about 1e-6 here. legacy is 1.2e-4 off
+    # (1 - kappa) cond(X)^2 eps |e| / (|X| |b|), about 1e-6 here. solver="pinv" is 1.2e-4 off
     res = IVLIML(*hadamard_data(2.0**-20), solver="qr", fuller=1.0).fit()
     assert_allclose(res.kappa, 1 - 1 / (NOBS - 4), rtol=1e-12)
     assert_allclose(res.params.to_numpy(), np.ones(3), rtol=1e-5)
@@ -179,7 +179,7 @@ def test_2sls_estimates_and_covariance_are_exact(delta, cov_type):
 
 
 def test_nearly_collinear_regressors():
-    # A condition number of about 1e10, which the legacy check accepts
+    # A condition number of about 1e10, which the check of solver="pinv" accepts
     data = hadamard_data(2.0**-33)
     with pytest.raises(ValueError, match=r"regressors .* collinear"):
         IV2SLS(*data, solver="qr")
@@ -194,7 +194,7 @@ def test_nearly_collinear_regressors():
     assert record[0].filename == __file__
     with warnings.catch_warnings():
         warnings.simplefilter("error")
-        IV2SLS(*data, solver="legacy")
+        IV2SLS(*data, solver="pinv")
 
 
 def formula_frame(data):
@@ -244,7 +244,7 @@ def scaled_data():
     return y, exog, endog, instr
 
 
-def test_legacy_rank_check_depends_on_the_units():
+def test_unscaled_rank_check_depends_on_the_units():
     y, exog, endog, instr = scaled_data()
     instr = instr * np.array([2.0**50, 1, 1])
     with pytest.raises(ValueError, match=r'do not have full column rank.*solver="qr"'):
@@ -252,17 +252,17 @@ def test_legacy_rank_check_depends_on_the_units():
     IV2SLS(y, exog, endog, instr, solver="qr").fit()
 
 
-def test_default_is_legacy():
+def test_default_is_pinv():
     data = scaled_data()
     for model in (IV2SLS, IVLIML):
         default = model(*data).fit(cov_type="robust")
-        legacy = model(*data, solver="legacy").fit(cov_type="robust")
-        assert_allclose(default.params, legacy.params, rtol=1e-14)
-        assert_allclose(default.cov, legacy.cov, rtol=1e-14)
-        assert default.model._solver == "legacy"
+        pinv = model(*data, solver="pinv").fit(cov_type="robust")
+        assert_allclose(default.params, pinv.params, rtol=1e-14)
+        assert_allclose(default.cov, pinv.cov, rtol=1e-14)
+        assert default.model._solver == "pinv"
 
 
-@pytest.mark.parametrize("solver", ["QR", "Legacy"])
+@pytest.mark.parametrize("solver", ["QR", "Pinv"])
 def test_solver_is_not_case_sensitive(solver):
     mod = IV2SLS(*scaled_data(), solver=solver)
     assert mod._solver == solver.lower()
@@ -280,7 +280,7 @@ def test_invalid_solver(solver):
 
 
 # ----------------------------------------------------------------------------
-# qr agrees with legacy for well-conditioned data
+# qr agrees with pinv for well-conditioned data
 # ----------------------------------------------------------------------------
 
 MODELS = {
@@ -321,21 +321,21 @@ def statistics(res):
 @pytest.mark.parametrize("cov_type", list(COV_OPTIONS))
 @pytest.mark.parametrize("model", list(MODELS))
 @pytest.mark.parametrize("debiased", [False, True])
-def test_qr_agrees_with_legacy(model, cov_type, debiased):
+def test_qr_agrees_with_pinv(model, cov_type, debiased):
     cls, options = MODELS[model]
     data = scaled_data()
     cov_options = dict(COV_OPTIONS[cov_type])
     if cov_type == "clustered":
         cov_options["clusters"] = np.arange(data[0].shape[0]) // 10
-    legacy = cls(*data, solver="legacy", **options).fit(
+    pinv = cls(*data, solver="pinv", **options).fit(
         cov_type=cov_type, debiased=debiased, **cov_options
     )
     qr = cls(*data, solver="qr", **options).fit(
         cov_type=cov_type, debiased=debiased, **cov_options
     )
-    assert_allclose(qr.params, legacy.params, rtol=1e-10)
-    assert_allclose(qr.cov, legacy.cov, rtol=1e-9)
-    expected = statistics(legacy)
+    assert_allclose(qr.params, pinv.params, rtol=1e-10)
+    assert_allclose(qr.cov, pinv.cov, rtol=1e-9)
+    expected = statistics(pinv)
     for key, value in statistics(qr).items():
         assert_allclose(value, expected[key], rtol=1e-8, err_msg=key)
 
@@ -397,7 +397,7 @@ def reference_kappa(y, exog, endog, instr):
 
 @pytest.mark.parametrize("scales", [(1e6, 1, 1), (1, 1e-6, 1), (1e6, 1e-6, 1e3)])
 def test_kappa_with_two_endogenous_regressors_does_not_depend_on_the_units(scales):
-    # Case 2 of issue 823: the legacy kappa changes by up to 2.3e-4
+    # Case 2 of issue 823: the kappa of solver="pinv" changes by up to 2.3e-4
     y, exog, endog, instr = scaled_data()
     expected = reference_kappa(y, exog, endog, instr)
     y = y * scales[0]
@@ -448,9 +448,9 @@ def test_covariance_estimators_agree(estimator, options, kappa):
     z = np.c_[exog, instr]
     y = y[:, None]
     params = IVLIML.estimate_parameters(x, y, z, kappa)
-    legacy = estimator(x, y, z, params, kappa=kappa, **options)
+    pinv = estimator(x, y, z, params, kappa=kappa, **options)
     qr = estimator(x, y, z, params, kappa=kappa, solver="qr", **options)
-    assert_allclose(qr.cov, legacy.cov, rtol=1e-9)
-    assert_allclose(qr.s, legacy.s, rtol=1e-9)
+    assert_allclose(qr.cov, pinv.cov, rtol=1e-9)
+    assert_allclose(qr.s, pinv.s, rtol=1e-9)
     params_qr = IVLIML.estimate_parameters(x, y, z, kappa, solver="qr")
     assert_allclose(params_qr, params, rtol=1e-10)

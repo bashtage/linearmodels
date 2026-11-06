@@ -457,7 +457,7 @@ def test_count_of_observations_does_not_depend_on_the_instruments_conditioning(s
     endog = rng.standard_normal(nobs) + 0.5 * u + instr @ np.array([0.8, 0.5])
     y = endog + 1 + u
     # The instruments of seeds 4, 6 and 7 are rank deficient with solver="qr"
-    mod = IVLIML(y, np.ones((nobs, 1)), endog[:, None], instr, solver="legacy")
+    mod = IVLIML(y, np.ones((nobs, 1)), endog[:, None], instr, solver="pinv")
     with pytest.raises(ValueError, match="Unable to estimate kappa"):
         mod.fit()
 

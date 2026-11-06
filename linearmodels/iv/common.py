@@ -117,7 +117,7 @@ def _first_stage_rank(
     instr: linearmodels.typing.data.Float64Array,
     exog: linearmodels.typing.data.Float64Array,
     name: str,
-    solver: str = "legacy",
+    solver: str = "pinv",
 ) -> _FirstStageRank | InvalidTestStatistic:
     r"""
     Decompose the first stage into canonical correlations.
@@ -196,7 +196,7 @@ def cragg_donald(
     instr: linearmodels.typing.data.Float64Array,
     exog: linearmodels.typing.data.Float64Array,
     *,
-    solver: str = "legacy",
+    solver: str = "pinv",
 ) -> WaldTestStatistic | InvalidTestStatistic:
     r"""
     Cragg-Donald test of reduced rank for the first-stage regression.
@@ -211,8 +211,8 @@ def cragg_donald(
         Weighted exogenous regressor array (nobs, nexog), partialled out
         before testing. Include a constant column here if the model has one.
 
-    solver : {"legacy", "qr"}, optional
-        The numerical method. "legacy", the default, partials out exog with
+    solver : {"pinv", "qr"}, optional
+        The numerical method. "pinv", the default, partials out exog with
         ``pinv`` and tests whether the partialled regressors and instruments are
         collinear from their columns as they are. "qr" partials out exog with the
         columns scaled to unit length and tests their rank after scaling the
@@ -332,7 +332,7 @@ def cragg_donald_f(
     instr: linearmodels.typing.data.Float64Array,
     exog: linearmodels.typing.data.Float64Array,
     *,
-    solver: str = "legacy",
+    solver: str = "pinv",
 ) -> float:
     r"""
     Cragg-Donald Wald F statistic.
@@ -347,8 +347,8 @@ def cragg_donald_f(
         Weighted exogenous regressor array (nobs, nexog), partialled out
         before testing. Include a constant column here if the model has one.
 
-    solver : {"legacy", "qr"}, optional
-        The numerical method. "legacy", the default, partials out exog with
+    solver : {"pinv", "qr"}, optional
+        The numerical method. "pinv", the default, partials out exog with
         ``pinv`` and tests whether the partialled regressors and instruments are
         collinear from their columns as they are. "qr" partials out exog with the
         columns scaled to unit length and tests their rank after scaling the
@@ -494,7 +494,7 @@ def _kleibergen_paap(
     cov_config: dict[str, Any] | None,
     *,
     wald: bool = True,
-    solver: str = "legacy",
+    solver: str = "pinv",
 ) -> tuple[WaldTestStatistic | InvalidTestStatistic, float]:
     """
     Compute the rk LM test and the rk Wald F-statistic
@@ -565,7 +565,7 @@ def kleibergen_paap(
     cov_type: str = "robust",
     cov_config: dict[str, Any] | None = None,
     *,
-    solver: str = "legacy",
+    solver: str = "pinv",
 ) -> WaldTestStatistic | InvalidTestStatistic:
     r"""
     Kleibergen-Paap rk LM test of underidentification.
@@ -604,8 +604,8 @@ def kleibergen_paap(
         :func:`~linearmodels.iv.covariance.kernel_optimal_bandwidth`, which
         lists the supported kernels.
 
-    solver : {"legacy", "qr"}, optional
-        The numerical method. "legacy", the default, partials out exog with
+    solver : {"pinv", "qr"}, optional
+        The numerical method. "pinv", the default, partials out exog with
         ``pinv`` and tests whether the partialled regressors and instruments are
         collinear from their columns as they are. "qr" partials out exog with the
         columns scaled to unit length and tests their rank after scaling the
@@ -749,7 +749,7 @@ def kleibergen_paap_f(
     cov_type: str = "robust",
     cov_config: dict[str, Any] | None = None,
     *,
-    solver: str = "legacy",
+    solver: str = "pinv",
 ) -> float:
     r"""
     Kleibergen-Paap rk Wald F statistic.
@@ -780,8 +780,8 @@ def kleibergen_paap_f(
     cov_config : dict, optional
         Options for the covariance estimator. See :func:`kleibergen_paap`.
 
-    solver : {"legacy", "qr"}, optional
-        The numerical method. "legacy", the default, partials out exog with
+    solver : {"pinv", "qr"}, optional
+        The numerical method. "pinv", the default, partials out exog with
         ``pinv`` and tests whether the partialled regressors and instruments are
         collinear from their columns as they are. "qr" partials out exog with the
         columns scaled to unit length and tests their rank after scaling the
