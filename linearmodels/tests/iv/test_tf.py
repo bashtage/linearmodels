@@ -1,6 +1,4 @@
-from pathlib import Path
-import shutil
-from types import SimpleNamespace
+from types import ModuleType
 
 import numpy as np
 from numpy.testing import assert_allclose, assert_array_equal
@@ -13,6 +11,11 @@ from linearmodels.iv import IV2SLS, IVJIVE, IVLIML, _tf
 from linearmodels.iv._tf import _tf_critical_value
 from linearmodels.iv.results import FirstStageResults
 from linearmodels.shared.exceptions import MissingValueWarning
+
+
+@pytest.fixture
+def tf_package():
+    return pytest.importorskip("tf_inference")
 
 
 @pytest.fixture
@@ -33,13 +36,13 @@ def data():
     ("f_stat", "printed"),
     [(4, 18.656), (4.008, 18.236), (9.835, 3.463), (10.253, 3.385), (24.605, 2.461)],
 )
-def test_published_rounding_bounds(f_stat, printed):
+def test_published_rounding_bounds(tf_package, f_stat, printed):
     # Table 3a rounds both F and the critical value upward to three decimals.
     assert _tf_critical_value(f_stat) <= printed + 0.0001
     assert _tf_critical_value(f_stat - 0.001) >= printed - 0.0011
 
 
-def test_numerical_values():
+def test_numerical_values(tf_package):
     assert_allclose(_tf_critical_value(3.9), 30.92820746, rtol=1e-9)
     assert_allclose(_tf_critical_value(10), 3.43035370, rtol=1e-9)
     assert_allclose(_tf_critical_value(1e12), 1.95996398454, rtol=1e-11)
@@ -47,7 +50,7 @@ def test_numerical_values():
 
 
 @pytest.mark.parametrize("alpha", [0.05, 0.01, 0.1, 0.0001, 0.25])
-def test_exact_boundary(alpha):
+def test_exact_boundary(tf_package, alpha):
     q = float(ndtri(alpha / 2) ** 2)
     for f_stat in [0, np.nextafter(q, 0), q]:
         assert _tf_critical_value(f_stat, 1 - alpha) == np.inf
@@ -63,7 +66,7 @@ def test_invalid_f(f_stat):
         _tf_critical_value(f_stat)
 
 
-def test_monotonicity_and_plateau():
+def test_monotonicity_and_plateau(tf_package):
     q = float(ndtri(0.025) ** 2)
     f = q + np.geomspace(1e-12, 1e6, 1001)
     critical = np.array([_tf_critical_value(x) for x in f])
@@ -74,7 +77,7 @@ def test_monotonicity_and_plateau():
 @pytest.mark.parametrize(
     ("level", "critical"), [(0.95, 3.43035370), (0.99, 8.85766022)]
 )
-def test_hand_calculated_interval(data, level, critical):
+def test_hand_calculated_interval(tf_package, data, level, critical):
     y, w, x, z = data
     res = IV2SLS(y, w, x, z).fit(cov_type="unadjusted")
     # Orthogonal construction: first-stage F=10, beta=1, and IV SE=0.4.
@@ -110,7 +113,7 @@ def test_hand_calculated_interval(data, level, critical):
         0.9999,
     ],
 )
-def test_supported_levels(data, level):
+def test_supported_levels(tf_package, data, level):
     y, w, x, z = data
     result = IV2SLS(y, w, x, z).fit(cov_type="unadjusted")
     critical = _tf_critical_value(10, level)
@@ -122,7 +125,7 @@ def test_supported_levels(data, level):
     assert np.isfinite(_tf_critical_value(20, level))
 
 
-def test_fit_below_old_cutoff_is_finite(data):
+def test_fit_below_old_cutoff_is_finite(tf_package, data):
     y, w, x, z = data
     x = x + (np.sqrt(3.9 / len(y)) - np.sqrt(10 / len(y))) * z
     result = IV2SLS(y, w, x, z).fit(cov_type="unadjusted")
@@ -141,11 +144,11 @@ def test_invalid_level(data, level):
         IV2SLS(y, w, x, z).fit().tf_conf_int(level)
 
 
-def test_default_never_computes(data, monkeypatch):
-    def unexpected_import(name):
-        pytest.fail("Default lookup imported the optional calibration package")
+def test_default_never_computes(tf_package, data, monkeypatch):
+    def unexpected_calibration(*args, **kwargs):
+        pytest.fail("Default lookup requested numerical calibration")
 
-    monkeypatch.setattr(_tf, "import_module", unexpected_import)
+    monkeypatch.setattr(tf_package, "calibrate", unexpected_calibration)
     y, w, x, z = data
     result = IV2SLS(y, w, x, z).fit()
     assert np.isfinite(result.tf_conf_int(0.9)).all().all()
@@ -161,98 +164,73 @@ def test_invalid_method(data, method):
         IV2SLS(y, w, x, z).fit().tf_conf_int(method=method)
 
 
-def test_warm_table_no_io(monkeypatch):
-    _tf._tf_table.cache_clear()
+def test_warm_table_no_io(tf_package, monkeypatch):
     expected = _tf_critical_value(10)
 
     def unexpected_work(*args, **kwargs):
-        pytest.fail("Warm lookup accessed files or rebuilt its interpolator")
+        pytest.fail("Warm lookup accessed package data")
 
-    monkeypatch.setattr(_tf, "files", unexpected_work)
-    monkeypatch.setattr(_tf, "PchipInterpolator", unexpected_work)
-    monkeypatch.setattr(_tf.hashlib, "sha256", unexpected_work)
+    monkeypatch.setattr(tf_package, "available_alphas", unexpected_work)
+    monkeypatch.setattr(tf_package.tables, "files", unexpected_work)
     assert _tf_critical_value(10) == expected
 
 
-def test_compute_requires_optional_package(data, monkeypatch):
+@pytest.mark.parametrize("method", ["table", "compute"])
+def test_missing_optional_package(data, monkeypatch, method):
     def missing_package(name):
-        raise ModuleNotFoundError(name)
+        raise ModuleNotFoundError("No module named 'tf_inference'", name=name)
 
-    _tf._tf_calibration.cache_clear()
     monkeypatch.setattr(_tf, "import_module", missing_package)
     y, w, x, z = data
-    with pytest.raises(ImportError, match="optional tf-inference"):
-        IV2SLS(y, w, x, z).fit().tf_conf_int(0.963, method="compute")
+    result = IV2SLS(y, w, x, z).fit()
+    assert np.isfinite(result.conf_int()).all().all()
+    with pytest.raises(ImportError, match="optional tf-inference package"):
+        result.tf_conf_int(method=method)
 
 
-def test_explicit_calibration_cached_by_level(data, monkeypatch):
-    calls = []
-
-    def calibrate(alpha):
-        calls.append(alpha)
-        return SimpleNamespace(critical_value=lambda f_stat: 4.0)
-
-    _tf._tf_calibration.cache_clear()
-    monkeypatch.setattr(
-        _tf, "import_module", lambda name: SimpleNamespace(calibrate=calibrate)
+def test_package_import_failure_preserved(monkeypatch):
+    error = ModuleNotFoundError(
+        "No module named 'internal_dependency'", name="internal_dependency"
     )
-    y, w, x, z = data
-    result = IV2SLS(y, w, x, z).fit(cov_type="unadjusted")
-    try:
-        assert_allclose(result.tf_conf_int(0.963, method="compute"), [[-0.6, 2.6]])
-        result.tf_conf_int(0.963, method="compute")
-        result.tf_conf_int(0.95, method="compute")
-        assert_allclose(calls, [0.037, 0.05])
-        assert len(calls) == 2
-    finally:
-        _tf._tf_calibration.cache_clear()
+
+    def broken_package(name):
+        raise error
+
+    monkeypatch.setattr(_tf, "import_module", broken_package)
+    with pytest.raises(ModuleNotFoundError) as exc:
+        _tf_critical_value(10)
+    assert exc.value is error
 
 
-def test_optional_computation_with_real_package(data):
-    package = pytest.importorskip("tf_inference")
+@pytest.mark.parametrize("method", ["table", "compute"])
+@pytest.mark.parametrize("alpha", [0.0001, 0.05, 0.25])
+def test_exact_alpha_forwarding(monkeypatch, method, alpha):
+    calls = []
+    package = ModuleType("tf_inference")
+    package.available_alphas = lambda: (alpha,)
+
+    def critical_value(f_stat, *, alpha, method):
+        calls.append((f_stat, alpha, method))
+        return 4.0
+
+    package.critical_value = critical_value
+    monkeypatch.setattr(_tf, "import_module", lambda name: package)
+    assert _tf_critical_value(10, 1 - alpha, method=method) == 4.0
+    assert calls == [(10, alpha, method)]
+
+
+def test_optional_computation_with_real_package(tf_package, data, monkeypatch):
     y, w, x, z = data
     result = IV2SLS(y, w, x, z).fit(cov_type="unadjusted")
     interval = result.tf_conf_int(0.963, method="compute")
-    expected = package.confidence_interval(1, 0.4, 10, 1 - 0.963, method="compute")
+    expected = tf_package.confidence_interval(1, 0.4, 10, 1 - 0.963, method="compute")
     assert_allclose(interval.iloc[0], expected, rtol=1e-12)
 
+    def unexpected_calibration(*args, **kwargs):
+        pytest.fail("Repeated inference recalibrated the same level")
 
-def test_bundled_tables_match_source_package():
-    package = pytest.importorskip("tf_inference")
-    rng = np.random.default_rng(12908)
-    for alpha in package.available_alphas():
-        table = package.load_table(alpha)
-        f = table.boundary + np.exp(rng.uniform(np.log(1e-10), np.log(1e6), 100))
-        actual = [_tf_critical_value(value, 1 - alpha) for value in f]
-        assert_allclose(actual, table.critical_value(f), rtol=1e-14)
-
-
-@pytest.mark.parametrize("corruption", ["npz", "schema", "alpha"])
-def test_table_integrity(tmp_path, monkeypatch, corruption):
-    root = Path(_tf.__file__).parent / "_tf_data"
-    target = tmp_path / "_tf_data"
-    target.mkdir()
-    for suffix in [".npz", ".json"]:
-        shutil.copyfile(
-            root / ("alpha-0.05" + suffix), target / ("alpha-0.05" + suffix)
-        )
-    if corruption == "npz":
-        path = target / "alpha-0.05.npz"
-        path.write_bytes(path.read_bytes() + b"corruption")
-        message = "checksum"
-    else:
-        path = target / "alpha-0.05.json"
-        content = path.read_text()
-        if corruption == "schema":
-            content = content.replace('"schema_version": 1', '"schema_version": 2')
-        else:
-            content = content.replace('"alpha": 0.05', '"alpha": 0.06')
-        path.write_text(content)
-        message = "metadata"
-    _tf._tf_table.cache_clear()
-    monkeypatch.setattr(_tf, "files", lambda name: tmp_path)
-    with pytest.raises(ValueError, match=message):
-        _tf_critical_value(10)
+    monkeypatch.setattr(tf_package, "calibrate", unexpected_calibration)
+    assert_frame_equal(result.tf_conf_int(0.963, method="compute"), interval)
 
 
 @pytest.mark.parametrize(
@@ -269,7 +247,7 @@ def test_table_integrity(tmp_path, monkeypatch, corruption):
     ],
 )
 @pytest.mark.parametrize("controls", [True, False])
-def test_independent_covariance_calculation(data, cov_type, controls):
+def test_independent_covariance_calculation(tf_package, data, cov_type, controls):
     y, w, x, z = data
     if not controls:
         w = np.empty((len(y), 0))
@@ -299,7 +277,7 @@ def test_independent_covariance_calculation(data, cov_type, controls):
     assert_allclose(res.tf_conf_int().iloc[0], expected, rtol=1e-12, atol=1e-12)
 
 
-def test_formula_labels_and_retained_sample(data):
+def test_formula_labels_and_retained_sample(tf_package, data):
     y, w, x, z = data
     frame = DataFrame({"y": y, "w": w[:, 1], "x": x, "z": z})
     frame.index = np.arange(len(frame)) * 3
@@ -313,7 +291,7 @@ def test_formula_labels_and_retained_sample(data):
     assert list(res.tf_conf_int().columns) == ["lower", "upper"]
 
 
-def test_duplicate_control_and_endogenous_labels(data):
+def test_duplicate_control_and_endogenous_labels(tf_package, data):
     y, w, x, z = data
     expected = IV2SLS(y, w, DataFrame({"x": x}), z).fit().tf_conf_int()
     controls = DataFrame(w, columns=["x", "w"])
@@ -322,7 +300,7 @@ def test_duplicate_control_and_endogenous_labels(data):
 
 
 @pytest.mark.parametrize("label", [7, ("endogenous", "x")])
-def test_nonstring_endogenous_label(data, label):
+def test_nonstring_endogenous_label(tf_package, data, label):
     y, w, x, z = data
     expected = IV2SLS(y, w, x, z).fit().tf_conf_int()
     actual = IV2SLS(y, w, Series(x, name=label), z).fit().tf_conf_int()
@@ -331,7 +309,7 @@ def test_nonstring_endogenous_label(data, label):
 
 
 @pytest.mark.parametrize("instrument_scale", [-1000, -1, 1e-6, 1e6])
-def test_instrument_scale_and_sign(data, instrument_scale):
+def test_instrument_scale_and_sign(tf_package, data, instrument_scale):
     y, w, x, z = data
     expected = IV2SLS(y, w, x, z).fit().tf_conf_int()
     actual = IV2SLS(y, w, x, z * instrument_scale).fit().tf_conf_int()
@@ -341,7 +319,7 @@ def test_instrument_scale_and_sign(data, instrument_scale):
 @pytest.mark.parametrize(
     ("outcome_scale", "endog_scale"), [(2, 1), (-2, 1), (1, -3), (1e-4, 1e4)]
 )
-def test_coefficient_scale(data, outcome_scale, endog_scale):
+def test_coefficient_scale(tf_package, data, outcome_scale, endog_scale):
     y, w, x, z = data
     expected = IV2SLS(y, w, x, z).fit().tf_conf_int().to_numpy()
     expected = np.sort(expected * outcome_scale / endog_scale, axis=1)
@@ -349,7 +327,7 @@ def test_coefficient_scale(data, outcome_scale, endog_scale):
     assert_allclose(actual, expected, rtol=1e-8, atol=1e-12)
 
 
-def test_row_permutation_and_no_mutation(data):
+def test_row_permutation_and_no_mutation(tf_package, data):
     y, w, x, z = data
     res = IV2SLS(y, w, x, z).fit()
     params, se, pvalues, conventional = (
@@ -367,7 +345,7 @@ def test_row_permutation_and_no_mutation(data):
     assert_frame_equal(res.conf_int(), conventional)
 
 
-def test_weak_first_stage(data):
+def test_weak_first_stage(tf_package, data):
     y, w, x, z = data
     weak_x = x - (np.sqrt(10 / len(y)) - 0.01) * z
     res = IV2SLS(y, w, weak_x, z).fit(cov_type="unadjusted")
@@ -384,7 +362,7 @@ def test_unsupported_estimator(data, model, config):
         model(y, w, x, z, **config).fit().tf_conf_int()
 
 
-def test_iv2sls_subclass(data):
+def test_iv2sls_subclass(tf_package, data):
     class CustomIV2SLS(IV2SLS):
         pass
 
@@ -418,7 +396,7 @@ def test_unsupported_covariance(data, cov_type, config):
         IV2SLS(y, w, x, z).fit(cov_type=cov_type, **config).tf_conf_int()
 
 
-def test_weights(data):
+def test_weights(tf_package, data):
     y, w, x, z = data
     expected = IV2SLS(y, w, x, z).fit().tf_conf_int()
     actual = IV2SLS(y, w, x, z, weights=np.full(len(y), 7)).fit().tf_conf_int()
@@ -447,7 +425,7 @@ def test_invalid_first_stage_variance(data, variance, monkeypatch):
         res.tf_conf_int()
 
 
-def test_missing_observations(data):
+def test_missing_observations(tf_package, data):
     y, w, x, z = data
     y, x = y.copy(), x.copy()
     y[0], x[1] = np.nan, np.nan

@@ -12,6 +12,8 @@ pytest-randomly
 seaborn
 xarray>=0.13
 wheel
+# Python 3.11 CI pins NumPy/SciPy below tf-inference's minimum versions.
+tf-inference @ git+https://github.com/finite-sample/tf-inference.git@ebaa0f8ff0286203b0a1488abdf3330ace84c4fe ; python_version >= "3.12"
 pyarrow
 zipp>=3.19.1 # not directly required, pinned by Snyk to avoid a vulnerability
 fonttools>=4.61.0 # not directly required, pinned by Snyk to avoid a vulnerability

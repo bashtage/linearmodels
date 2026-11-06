@@ -4,7 +4,6 @@ recursive-include doc/source *
 recursive-include linearmodels *.pyx
 recursive-include linearmodels/tests *.txt *.csv *.dta
 recursive-include linearmodels/datasets *
-recursive-include linearmodels/iv/_tf_data *.npz *.json *.rst LICENSE
 recursive-include examples *
 include linearmodels/_version.py
 include LICENSE.md
