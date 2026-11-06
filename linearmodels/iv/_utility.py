@@ -9,7 +9,7 @@ from formulaic.materializers.types import NAAction as fNAAction
 from formulaic.utils.context import capture_context
 import numpy as np
 from pandas import DataFrame
-from scipy.linalg import qr as sp_qr, solve_triangular
+from scipy.linalg import qr as sp_qr, qr_multiply, solve_triangular
 
 import linearmodels.typing.data
 
@@ -66,10 +66,19 @@ def proj(
         return np.zeros_like(y)
     if solver == "pinv":
         return x @ (np.linalg.pinv(x) @ y)
+    nobs, nvar = x.shape
     scale = np.linalg.norm(x, axis=0)
     scale[scale == 0] = 1.0
+    cutoff = max(x.shape) * np.finfo(float).eps
+    if nobs >= nvar:
+        # The QR decomposition is the projection if no singular value is cut off,
+        # and it is cheaper than the SVD. sv(R) are the singular values of x / scale
+        q, r = sp_qr(x / scale, mode="economic", overwrite_a=True, check_finite=False)
+        sv = np.linalg.svd(r, compute_uv=False)
+        if sv[-1] > sv[0] * cutoff:
+            return q @ (q.T @ y)
     u, sv, _ = np.linalg.svd(x / scale, full_matrices=False)
-    u = u[:, sv > sv[0] * max(x.shape) * np.finfo(float).eps]
+    u = u[:, sv > sv[0] * cutoff]
     return u @ (u.T @ y)
 
 
@@ -129,7 +138,11 @@ def full_column_rank(x: linearmodels.typing.data.Float64Array, tol: float) -> bo
     scale = np.linalg.norm(x, axis=0)
     if not np.all(scale > 0):
         return False
-    sv = np.linalg.svd(x / scale, compute_uv=False)
+    # The singular values of the triangular factor of the Householder QR
+    # decomposition are those of the scaled columns, with the same backward error
+    # as an SVD of the scaled columns, and the decomposition is cheaper
+    r = sp_qr(x / scale, mode="raw", overwrite_a=True, check_finite=False)[1]
+    sv = np.linalg.svd(r, compute_uv=False)
     return bool(sv[-1] > tol * sv[0])
 
 
@@ -240,26 +253,24 @@ def kclass_factors(
         t0 = None if y is None else np.empty((0,) + y.shape[1:])
         u0 = None if z_basis is None else np.empty((z_basis.shape[1], 0))
         return KClassFactors(np.empty((0, 0)), None, t0, u0)
-    if z_basis is None:
-        if kappa != 0:
-            raise ValueError("z_basis is required if kappa is not 0.")
-        q_x, r_x = sp_qr(x, mode="economic", check_finite=False)
-        return KClassFactors(r_x, None, None if y is None else q_x.T @ y, None)
-    qx = z_basis.T @ x
+    if z_basis is None and kappa != 0:
+        raise ValueError("z_basis is required if kappa is not 0.")
     if kappa < 1:
-        q_x, r_x = sp_qr(x, mode="economic", check_finite=False)
-        t = None
+        # R_X and Q_X'y, applying the Householder reflections to y without forming
+        # Q_X
+        qx_y, r_x = _triangular_factor(x, y)
         if kappa == 0:
-            r = r_x
-            if y is not None:
-                t = q_x.T @ y
-        else:
-            w0, w1 = float(np.sqrt(1 - kappa)), float(np.sqrt(kappa))
-            q_s, r = sp_qr(np.vstack([w0 * r_x, w1 * qx]), mode="economic")
-            if y is not None:
-                t = q_s.T @ np.vstack([w0 * (q_x.T @ y), w1 * (z_basis.T @ y)])
+            u = None if z_basis is None else coordinates(x, z_basis, r_x)
+            return KClassFactors(r_x, None, qx_y, u)
+        qx = z_basis.T @ x
+        w0, w1 = float(np.sqrt(1 - kappa)), float(np.sqrt(kappa))
+        q_s, r = sp_qr(np.vstack([w0 * r_x, w1 * qx]), mode="economic")
+        t = None
+        if y is not None:
+            t = q_s.T @ np.vstack([w0 * qx_y, w1 * (z_basis.T @ y)])
         u = solve_triangular(r, qx.T, trans="T").T
         return KClassFactors(r, None, t, u)
+    qx = z_basis.T @ x
 
     q_a, r = sp_qr(qx, mode="economic")
     t = None if y is None else q_a.T @ (z_basis.T @ y)
@@ -272,6 +283,46 @@ def kclass_factors(
             resid_y = y - z_basis @ (z_basis.T @ y)
             t = t - (kappa - 1) * (f.T @ resid_y)
     return KClassFactors(r, g, t, q_a)
+
+
+def _triangular_factor(
+    x: linearmodels.typing.data.Float64Array,
+    y: linearmodels.typing.data.Float64Array | None,
+) -> tuple[
+    linearmodels.typing.data.Float64Array | None, linearmodels.typing.data.Float64Array
+]:
+    """Q'y and R of the Householder QR decomposition of x, without forming Q."""
+    if y is None:
+        return None, sp_qr(x, mode="raw", check_finite=False)[1]
+    y2 = y.reshape(y.shape[0], -1)
+    qy, r = qr_multiply(x, y2.T, mode="right")
+    qy = qy.T
+    return (qy[:, 0] if y.ndim == 1 else qy), r
+
+
+def coordinates(
+    x: linearmodels.typing.data.Float64Array,
+    z_basis: linearmodels.typing.data.Float64Array,
+    r: linearmodels.typing.data.Float64Array,
+) -> linearmodels.typing.data.Float64Array:
+    """
+    U with Q Q'x R^-1 = Q U, the coordinates of the projected regressors.
+
+    Parameters
+    ----------
+    x : ndarray
+        Regressors (nobs by nvar).
+    z_basis : ndarray
+        Orthonormal basis of the instruments (nobs by ninstr).
+    r : ndarray
+        Upper triangular factor (nvar by nvar), see :func:`kclass_factors`.
+
+    Returns
+    -------
+    ndarray
+        U (ninstr by nvar).
+    """
+    return solve_triangular(r, (z_basis.T @ x).T, trans="T").T
 
 
 def kclass_solve(factors: KClassFactors) -> linearmodels.typing.data.Float64Array:

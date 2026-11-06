@@ -250,7 +250,7 @@ def test_liml_kappa_message(data, monkeypatch):
     z = pd.DataFrame(rng.standard_normal((NOBS, 2)), columns=["z0", "z1"])
     endog = (z.sum(axis=1) + rng.standard_normal(NOBS)).to_frame("e")
 
-    def fail(self):
+    def fail(self, *args, **kwargs):
         raise np.linalg.LinAlgError("Eigenvalues did not converge")
 
     monkeypatch.setattr(_IVModelBase, "_estimate_kappa", fail)
