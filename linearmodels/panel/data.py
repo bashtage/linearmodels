@@ -214,7 +214,14 @@ class PanelData:
         xarray DataArrays. The default is ``"x"``.
     convert_dummies : bool, optional
         Flag indicating whether pandas categoricals or string input data
-        should be converted to dummy variables. The default is True.
+        should be converted to dummy variables. The default is True. A
+        missing categorical value is a missing value of each of its dummy
+        variables, so that the observation is dropped as missing.
+
+        .. versionchanged:: 7.2
+
+           A missing categorical value was a row of zeros, which kept the
+           observation (in the first category when ``drop_first`` is True).
     drop_first : bool, optional
         Flag indicating to drop first dummy category when converting. The
         default is True.

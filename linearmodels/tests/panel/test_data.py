@@ -10,8 +10,8 @@ from pandas.testing import assert_frame_equal, assert_index_equal
 import pytest
 
 from linearmodels.panel.data import PanelData, _Panel
-from linearmodels.panel.model import PanelOLS, panel_structure_stats
-from linearmodels.shared.exceptions import UnknownOptionError
+from linearmodels.panel.model import PanelOLS, PooledOLS, panel_structure_stats
+from linearmodels.shared.exceptions import MissingValueWarning, UnknownOptionError
 from linearmodels.shared.utility import panel_to_frame
 from linearmodels.tests._utility import warns_if_missing
 from linearmodels.tests.panel._utility import MISSING_XARRAY, datatypes, generate_data
@@ -990,3 +990,44 @@ def test_categorical_missing_values_with_unused_category(drop_first):
     data = PanelData(values, drop_first=drop_first)
     assert "group.unused" not in data.dataframe
     assert_equal(data.isnull.to_numpy(), [False, True, False, False])
+
+
+def test_categorical_all_missing_values():
+    # No dummy column is used, so the columns are kept and every observation is
+    # missing
+    index = MultiIndex.from_product([["a", "b"], [0, 1]])
+    values = DataFrame(
+        {"group": Categorical([None] * 4, categories=["first", "second"])},
+        index=index,
+    )
+    data = PanelData(values, drop_first=False)
+    assert list(data.dataframe.columns) == ["group.first", "group.second"]
+    assert data.isnull.all()
+
+
+def test_categorical_missing_values_in_a_model():
+    # The observations with a missing category are dropped with a warning, and the
+    # estimates are those of the model without them
+    rng = np.random.default_rng(858)
+    index = MultiIndex.from_product([range(20), range(10)])
+    nobs = len(index)
+    labels = rng.choice(["a", "b", "c"], nobs).astype(object)
+    labels[rng.choice(nobs, 20, replace=False)] = None
+    x = rng.standard_normal(nobs)
+    y = 1 + x + 0.5 * (labels == "b") - 0.7 * (labels == "c")
+    y = y + rng.standard_normal(nobs)
+    frame = DataFrame(
+        {"y": y, "const": 1.0, "x": x, "g": Categorical(labels)}, index=index
+    )
+    with pytest.warns(MissingValueWarning, match="missing values"):
+        res = PooledOLS(frame.y, frame[["const", "x", "g"]]).fit()
+
+    keep = frame["g"].notna().to_numpy()
+    dummies = get_dummies(
+        frame["g"][keep], prefix="g", prefix_sep=".", drop_first=True, dtype=float
+    )
+    regressors = np.column_stack([np.ones(keep.sum()), x[keep], dummies])
+    expected = lstsq(regressors, y[keep], rcond=None)[0]
+    assert res.nobs == keep.sum()
+    assert list(res.params.index) == ["const", "x", "g.b", "g.c"]
+    assert_allclose(res.params, expected, rtol=1e-10)
