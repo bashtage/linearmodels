@@ -784,9 +784,7 @@ class _IVModelBase:
         return f_statistic(params, cov, debiased, nobs - nvar, const_loc)
 
     def _estimate_kappa(
-        self,
-        z_basis: linearmodels.typing.data.Float64Array | None = None,
-        pinvz: linearmodels.typing.data.Float64Array | None = None,
+        self, shared: dict[str, linearmodels.typing.data.Float64Array] | None = None
     ) -> float:
         """
         The value of kappa in LIML, which is the same for any estimator
@@ -840,25 +838,32 @@ class _IVModelBase:
                 "and instruments are linearly independent."
             )
 
-        if self._solver == "qr":
-            z_basis = orthonormal_basis(z) if z_basis is None else z_basis
-            ez = e - z_basis @ (z_basis.T @ e)
-        else:
-            pinvz = pinv(z) if pinvz is None else pinvz
-            ez = e - z @ (pinvz @ e)
+        # The residuals on x1 are computed first, so that the decomposition of x1 is
+        # freed before the one of z, which is kept in shared for the estimate and the
+        # covariance. If x1 is z, as in a model without endogenous regressors and
+        # instruments, the residuals are the same
+        shared = {} if shared is None else shared
+        same = x1.shape == z.shape and array_equal(x1, z)
+        ex1 = None
         if x1.shape[1] == 0:  # No exogenous regressors
             ex1 = e
-        elif self._solver == "qr":
-            # The basis of z is that of x1 if x1 is z, as in a model without
-            # endogenous regressors and instruments
-            same = x1.shape == z.shape and array_equal(x1, z)
-            x1_basis = z_basis if same else orthonormal_basis(x1)
+        elif not same and self._solver == "qr":
+            x1_basis = orthonormal_basis(x1)
             ex1 = e - x1_basis @ (x1_basis.T @ e)
+            del x1_basis
+        elif not same:
+            ex1 = e - x1 @ (pinv(x1) @ e)
+        if self._solver == "qr":
+            if "z_basis" not in shared:
+                shared["z_basis"] = orthonormal_basis(z)
+            z_basis = shared["z_basis"]
+            ez = e - z_basis @ (z_basis.T @ e)
         else:
-            # pinv(x1) is pinv(z) if x1 is z, as in a model without endogenous
-            # regressors and instruments
-            same = x1.shape == z.shape and array_equal(x1, z)
-            ex1 = e - x1 @ ((pinvz if same else pinv(x1)) @ e)
+            if "pinvz" not in shared:
+                shared["pinvz"] = pinv(z)
+            ez = e - z @ (shared["pinvz"] @ e)
+        if ex1 is None:
+            ex1 = ez
 
         # The rank is tested on a copy of the residuals with columns of unit length, so
         # that it does not depend on the units of the variables. A column that is exactly
@@ -1208,13 +1213,9 @@ class _IVLSModelBase(_IVModelBase):
         kappa = self._kappa
         # One decomposition of the instruments, pinv(z) or the basis of z, for kappa,
         # the estimate and the covariance
-        z_basis = pinvz = None
+        shared: dict[str, linearmodels.typing.data.Float64Array] = {}
         try:
-            if self._solver == "qr":
-                z_basis = orthonormal_basis(wz)
-            else:
-                pinvz = pinv(wz)
-            liml_kappa: float = self._estimate_kappa(z_basis, pinvz)
+            liml_kappa: float = self._estimate_kappa(shared)
         except Exception as exc:
             liml_kappa = nan
             if kappa is None:
@@ -1234,12 +1235,15 @@ class _IVLSModelBase(_IVModelBase):
 
         products: dict[str, linearmodels.typing.data.Float64Array] = {}
         factors: KClassFactors | None = None
+        z_basis: linearmodels.typing.data.Float64Array | None = None
         if self._solver == "pinv":
             # pinv raises here, as in estimate_parameters, if it raised for kappa
-            pinvz = pinv(wz) if pinvz is None else pinvz
+            pinvz = shared["pinvz"] if "pinvz" in shared else pinv(wz)
             params, products = _kclass_pinv(wx, wy, wz, est_kappa, pinvz)
         else:
-            z_basis = orthonormal_basis(wz) if z_basis is None else z_basis
+            z_basis = (
+                shared["z_basis"] if "z_basis" in shared else orthonormal_basis(wz)
+            )
             # OLS (kappa = 0) does not use the instruments
             basis = None if est_kappa == 0 else z_basis
             factors = kclass_factors(wx, basis, float(est_kappa), wy)
