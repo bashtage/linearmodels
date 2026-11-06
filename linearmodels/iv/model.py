@@ -56,6 +56,7 @@ from scipy.optimize import minimize
 from linearmodels.iv._utility import (
     SOLVERS,
     IVFormulaParser,
+    KClassFactors,
     full_column_rank,
     kclass_factors,
     kclass_solve,
@@ -245,6 +246,41 @@ def _rank_and_condition_number(
     smin = sv.min(initial=smax) if sv.shape[0] == a.shape[1] else 0.0
     cond = float(smax / smin) if smin > 0 else float("inf")
     return rank, cond
+
+
+def _kclass_pinv(
+    x: linearmodels.typing.data.Float64Array,
+    y: linearmodels.typing.data.Float64Array,
+    z: linearmodels.typing.data.Float64Array,
+    kappa: linearmodels.typing.Numeric,
+    pinvz: linearmodels.typing.data.Float64Array,
+) -> tuple[
+    linearmodels.typing.data.Float64Array,
+    dict[str, linearmodels.typing.data.Float64Array],
+]:
+    """
+    The k-class estimate of solver="pinv", and the products the covariance uses.
+
+    The arithmetic is that of the estimator before solver was added. A term that is
+    multiplied by 0, (1 - kappa) x'x if kappa is 1 and kappa x'P_z x if kappa is 0,
+    is 0 exactly for finite data, and is not computed.
+    """
+    products = {"pinvz": pinvz}
+    if kappa == 0:
+        p1 = x.T @ x
+        p2 = x.T @ y
+    else:
+        xpz = x.T @ z
+        pinvz_x = pinvz @ x
+        a = xpz @ pinvz_x
+        products.update(pinvz_x=pinvz_x, xpz_pinvz_x=a)
+        if kappa == 1:
+            p1 = a
+            p2 = xpz @ (pinvz @ y)
+        else:
+            p1 = (x.T @ x) * (1 - kappa) + kappa * a
+            p2 = (x.T @ y) * (1 - kappa) + kappa * (xpz @ (pinvz @ y))
+    return inv(p1) @ p2, products
 
 
 def _check_solver(solver: str | None) -> tuple[str, bool]:
@@ -748,7 +784,9 @@ class _IVModelBase:
         return f_statistic(params, cov, debiased, nobs - nvar, const_loc)
 
     def _estimate_kappa(
-        self, z_basis: linearmodels.typing.data.Float64Array | None = None
+        self,
+        z_basis: linearmodels.typing.data.Float64Array | None = None,
+        pinvz: linearmodels.typing.data.Float64Array | None = None,
     ) -> float:
         """
         The value of kappa in LIML, which is the same for any estimator
@@ -806,7 +844,8 @@ class _IVModelBase:
             z_basis = orthonormal_basis(z) if z_basis is None else z_basis
             ez = e - z_basis @ (z_basis.T @ e)
         else:
-            ez = e - z @ (pinv(z) @ e)
+            pinvz = pinv(z) if pinvz is None else pinvz
+            ez = e - z @ (pinvz @ e)
         if x1.shape[1] == 0:  # No exogenous regressors
             ex1 = e
         elif self._solver == "qr":
@@ -816,7 +855,10 @@ class _IVModelBase:
             x1_basis = z_basis if same else orthonormal_basis(x1)
             ex1 = e - x1_basis @ (x1_basis.T @ e)
         else:
-            ex1 = e - x1 @ (pinv(x1) @ e)
+            # pinv(x1) is pinv(z) if x1 is z, as in a model without endogenous
+            # regressors and instruments
+            same = x1.shape == z.shape and array_equal(x1, z)
+            ex1 = e - x1 @ ((pinvz if same else pinv(x1)) @ e)
 
         # The rank is tested on a copy of the residuals with columns of unit length, so
         # that it does not depend on the units of the variables. A column that is exactly
@@ -838,7 +880,7 @@ class _IVModelBase:
             # The eigenvalues of (ez'ez)^(-1/2) (ex1'ex1) (ez'ez)^(-1/2) are the
             # squared singular values of ex1 R^-1, where ez = QR. This does not form
             # the cross products, and does not depend on the units of the variables
-            r = sp_qr(ez, mode="r", check_finite=False)[0][:ncol]
+            r = sp_qr(ez, mode="raw", check_finite=False)[1]
             scaled_ex1 = solve_triangular(r, ex1.T, trans="T").T
             return float(svd(scaled_ex1, compute_uv=False)[-1] ** 2)
 
@@ -1069,10 +1111,7 @@ class _IVLSModelBase(_IVModelBase):
            The ``solver`` keyword.
         """
         if solver == "pinv":
-            pinvz = pinv(z)
-            p1 = (x.T @ x) * (1 - kappa) + kappa * ((x.T @ z) @ (pinvz @ x))
-            p2 = (x.T @ y) * (1 - kappa) + kappa * ((x.T @ z) @ (pinvz @ y))
-            return inv(p1) @ p2
+            return _kclass_pinv(x, y, z, kappa, pinv(z))[0]
         factors = kclass_factors(x, orthonormal_basis(z), float(kappa), y)
         return kclass_solve(factors)
 
@@ -1167,16 +1206,15 @@ class _IVLSModelBase(_IVModelBase):
         self._check_clusters(cov_config)
         wy, wx, wz = self._wy, self._wx, self._wz
         kappa = self._kappa
-        # One QR decomposition of the instruments for kappa, the estimate and the
-        # covariance
-        z_basis = orthonormal_basis(wz) if self._solver == "qr" else None
-
+        # One decomposition of the instruments, pinv(z) or the basis of z, for kappa,
+        # the estimate and the covariance
+        z_basis = pinvz = None
         try:
-            liml_kappa: float = (
-                self._estimate_kappa()
-                if z_basis is None
-                else self._estimate_kappa(z_basis)
-            )
+            if self._solver == "qr":
+                z_basis = orthonormal_basis(wz)
+            else:
+                pinvz = pinv(wz)
+            liml_kappa: float = self._estimate_kappa(z_basis, pinvz)
         except Exception as exc:
             liml_kappa = nan
             if kappa is None:
@@ -1194,12 +1232,18 @@ class _IVLSModelBase(_IVModelBase):
             nobs, ninstr = wz.shape
             est_kappa -= self._fuller / (nobs - ninstr)
 
-        if z_basis is None:
-            params = self.estimate_parameters(wx, wy, wz, est_kappa, solver="pinv")
+        products: dict[str, linearmodels.typing.data.Float64Array] = {}
+        factors: KClassFactors | None = None
+        if self._solver == "pinv":
+            # pinv raises here, as in estimate_parameters, if it raised for kappa
+            pinvz = pinv(wz) if pinvz is None else pinvz
+            params, products = _kclass_pinv(wx, wy, wz, est_kappa, pinvz)
         else:
+            z_basis = orthonormal_basis(wz) if z_basis is None else z_basis
             # OLS (kappa = 0) does not use the instruments
             basis = None if est_kappa == 0 else z_basis
-            params = kclass_solve(kclass_factors(wx, basis, float(est_kappa), wy))
+            factors = kclass_factors(wx, basis, float(est_kappa), wy)
+            params = kclass_solve(factors)
 
         cov_estimator = lookup_option(COVARIANCE_ESTIMATORS, cov_type, "cov_type")
         cov_config["debiased"] = debiased
@@ -1209,8 +1253,7 @@ class _IVLSModelBase(_IVModelBase):
         cov_estimator_inst = cov_estimator(
             wx, wy, wz, params, solver=self._solver, **cov_config_copy
         )
-        if z_basis is not None:
-            cov_estimator_inst._z_basis = z_basis
+        cov_estimator_inst._reuse(z_basis=z_basis, factors=factors, products=products)
 
         results = {"kappa": est_kappa, "liml_kappa": liml_kappa}
         pe = self._post_estimation(params, cov_estimator_inst, cov_type)

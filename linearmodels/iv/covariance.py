@@ -32,6 +32,7 @@ from scipy.linalg import qr as sp_qr, solve_triangular
 from linearmodels.iv._utility import (
     SOLVERS,
     KClassFactors,
+    coordinates,
     kclass_factors,
     orthonormal_basis,
 )
@@ -542,7 +543,11 @@ class HomoskedasticCovariance:
         if solver not in SOLVERS:
             raise ValueError(f'solver must be "pinv" or "qr", but it is {solver!r}.')
         self._solver = solver
+        # Decompositions and products that are computed once, see _reuse
         self._pinvz: linearmodels.typing.data.Float64Array | None = None
+        self._pinvz_x: linearmodels.typing.data.Float64Array | None = None
+        self._xpz_pinvz_x: linearmodels.typing.data.Float64Array | None = None
+        self._v: linearmodels.typing.data.Float64Array | None = None
         self._z_basis: linearmodels.typing.data.Float64Array | None = None
         self._factors: KClassFactors | None = None
         nobs, nvar = x.shape
@@ -567,11 +572,40 @@ class HomoskedasticCovariance:
             self.__str__() + "\n" + self.__class__.__name__ + f", id: {hex(id(self))}"
         )
 
+    def _reuse(
+        self,
+        *,
+        z_basis: linearmodels.typing.data.Float64Array | None = None,
+        factors: KClassFactors | None = None,
+        products: dict[str, linearmodels.typing.data.Float64Array] | None = None,
+    ) -> None:
+        """
+        Use decompositions that the model computed from the same x, z and kappa.
+
+        The results are the same as if they were computed here. products holds
+        pinv(z), pinv(z) @ x and (x'z) @ (pinv(z) @ x) of solver="pinv" as
+        "pinvz", "pinvz_x" and "xpz_pinvz_x".
+        """
+        if z_basis is not None:
+            self._z_basis = z_basis
+        if factors is not None:
+            self._factors = factors
+        products = {} if products is None else products
+        self._pinvz = products.get("pinvz", self._pinvz)
+        self._pinvz_x = products.get("pinvz_x", self._pinvz_x)
+        self._xpz_pinvz_x = products.get("xpz_pinvz_x", self._xpz_pinvz_x)
+
     def _kclass_factors(self, with_u: bool = False) -> KClassFactors:
         """Factors of the cross products of the k-class estimator, computed once."""
-        if self._factors is not None and (self._factors.u is not None or not with_u):
-            return self._factors
+        factors = self._factors
+        if factors is not None and (factors.u is not None or not with_u):
+            return factors
         x, z = self.x, self.z
+        if factors is not None:
+            # Only U is missing (OLS), which needs the basis but no decomposition of x
+            u = coordinates(x, self._basis(), factors.r)
+            self._factors = KClassFactors(factors.r, factors.g, factors.t, u)
+            return self._factors
         kappa = float(self._kappa)
         if kappa == 0 and self._z_basis is None and x.shape == z.shape:
             if array_equal(x, z):
@@ -596,22 +630,36 @@ class HomoskedasticCovariance:
             self._pinvz = pinv(self.z)
         return self._pinvz
 
+    def _pinv_product(self) -> linearmodels.typing.data.Float64Array:
+        """pinv(z) @ x of solver="pinv", computed once."""
+        if self._pinvz_x is None:
+            self._pinvz_x = self._pinv_of_z() @ self.x
+        return self._pinvz_x
+
     def _xhat(self) -> linearmodels.typing.data.Float64Array:
         """The projection of x on z, which are the regressors of the scores."""
         if self._solver == "pinv":
-            return self.z @ (self._pinv_of_z() @ self.x)
+            return self.z @ self._pinv_product()
         z_basis = self._basis()
         return z_basis @ (z_basis.T @ self.x)
 
     def _pinv_v(self) -> linearmodels.typing.data.Float64Array:
         """V of solver="pinv", the k-class cross product of x divided by nobs."""
+        if self._v is not None:
+            return self._v
         x, z = self.x, self.z
         nobs = x.shape[0]
-        v = (x.T @ z) @ (self._pinv_of_z() @ x) / nobs
-        if self._kappa != 1:
-            kappa = self._kappa
-            xpx = x.T @ x / nobs
-            v = (1 - kappa) * xpx + kappa * v
+        kappa = self._kappa
+        if kappa == 0:
+            # (1 - 0) x'x / n + 0 V is x'x / n exactly, for finite data
+            v = x.T @ x / nobs
+        else:
+            a = self._xpz_pinvz_x
+            v = ((x.T @ z) @ self._pinv_product() if a is None else a) / nobs
+            if kappa != 1:
+                xpx = x.T @ x / nobs
+                v = (1 - kappa) * xpx + kappa * v
+        self._v = v
         return v
 
     def _rotated_scores(self) -> linearmodels.typing.data.Float64Array:
@@ -942,23 +990,33 @@ class KernelCovariance(HomoskedasticCovariance):
     @property
     def s(self) -> linearmodels.typing.data.Float64Array:
         """Return the HAC score covariance estimate."""
-        return self._kernel_s(asarray(self._xhat() * self.eps, dtype=float))
+        xhat = self._xhat()
+        return self._kernel_s(asarray(xhat * self.eps, dtype=float), xhat)
 
     def _rotated_s(self) -> linearmodels.typing.data.Float64Array:
         return self._kernel_s(self._rotated_scores())
 
     def _kernel_s(
-        self, scores: linearmodels.typing.data.Float64Array
+        self,
+        scores: linearmodels.typing.data.Float64Array,
+        xhat: linearmodels.typing.data.Float64Array | None = None,
     ) -> linearmodels.typing.data.Float64Array:
-        """The kernel estimate of the covariance of the scores."""
+        """
+        The kernel estimate of the covariance of the scores.
+
+        xhat is given if the scores are in the units of x, xhat * eps.
+        """
         nobs = self.x.shape[0]
         kernel = self.config["kernel"]
         bw = self.config["bandwidth"]
         if bw is None:
             self._auto_bandwidth = True
             # The bandwidth is selected from the scores in the units of x
-            xhat = self._xhat()
-            xhat_e = asarray(xhat * self.eps, dtype=float)
+            if xhat is None:
+                xhat = self._xhat()
+                xhat_e = asarray(xhat * self.eps, dtype=float)
+            else:
+                xhat_e = scores
             const, loc = has_constant(xhat)
             sel = ones((xhat.shape[1], 1))
             if const and xhat.shape[1] > 1:
