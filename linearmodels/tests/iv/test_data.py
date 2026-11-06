@@ -1,12 +1,14 @@
 from typing import cast
 
 import numpy as np
-from numpy.testing import assert_equal
+from numpy.testing import assert_allclose, assert_equal
 import pandas as pd
 from pandas.testing import assert_frame_equal, assert_series_equal
 import pytest
 
+from linearmodels.iv import IV2SLS
 from linearmodels.iv.data import IVData
+from linearmodels.shared.exceptions import MissingValueWarning
 from linearmodels.typing.data import BoolArray
 
 try:
@@ -273,3 +275,52 @@ def test_categorical_missing_values_with_unused_category(drop_first: bool) -> No
     data = IVData(values, drop_first=drop_first)
     assert "group.unused" not in data.cols
     assert_equal(data.isnull.to_numpy(), [False, True, False, False])
+
+
+def test_categorical_all_missing_values() -> None:
+    # No dummy column is used, so the columns are kept and every observation is
+    # missing
+    values = pd.Series(
+        pd.Categorical([None, None, None], categories=["a", "b"]), name="group"
+    )
+    data = IVData(values, drop_first=False)
+    assert data.cols == ["group.a", "group.b"]
+    assert data.isnull.all()
+    assert np.isnan(data.ndarray).all()
+
+
+def test_categorical_missing_values_in_several_columns() -> None:
+    frame = pd.DataFrame(
+        {
+            "g": pd.Categorical(["a", None, "b", "a", "b"]),
+            "h": pd.Categorical(["x", "y", None, "y", "x"]),
+            "v": [1.0, 2.0, 3.0, 4.0, 5.0],
+        }
+    )
+    data = IVData(frame)
+    assert_equal(data.isnull.to_numpy(), [False, True, True, False, False])
+
+
+def test_categorical_missing_values_in_a_model() -> None:
+    # The observations with a missing category are dropped with a warning, and the
+    # estimates are those of the model without them
+    rng = np.random.default_rng(858)
+    nobs = 200
+    labels = rng.choice(["a", "b", "c"], nobs).astype(object)
+    labels[rng.choice(nobs, 20, replace=False)] = None
+    x = rng.standard_normal(nobs)
+    y = 1 + x + 0.5 * (labels == "b") - 0.7 * (labels == "c")
+    y = y + rng.standard_normal(nobs)
+    exog = pd.DataFrame({"const": 1.0, "x": x, "g": pd.Categorical(labels)})
+    with pytest.warns(MissingValueWarning, match="missing values"):
+        res = IV2SLS(y, exog, None, None).fit()
+
+    keep = exog["g"].notna().to_numpy()
+    dummies = pd.get_dummies(
+        exog["g"][keep], prefix="g", prefix_sep=".", drop_first=True, dtype=float
+    )
+    regressors = np.column_stack([np.ones(keep.sum()), x[keep], dummies])
+    expected = np.linalg.lstsq(regressors, y[keep], rcond=None)[0]
+    assert res.nobs == keep.sum()
+    assert list(res.params.index) == ["const", "x", "g.b", "g.c"]
+    assert_allclose(res.params, expected, rtol=1e-10)
