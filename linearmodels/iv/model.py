@@ -204,7 +204,7 @@ _FUTURE_RANK_WARNING = (
     "length is at least {limit:g}, so that the estimates have few or no correct "
     "digits. linearmodels 8.0 will raise a ValueError for these data, and estimate "
     'IV2SLS and IVLIML by QR. Use solver="qr" to get this behavior now, or '
-    'solver="legacy" to keep the current behavior without this warning.'
+    'solver="pinv" to keep the current behavior without this warning.'
 )
 
 
@@ -227,11 +227,9 @@ def _external_stacklevel() -> int:
 def _check_solver(solver: str | None) -> tuple[str, bool]:
     """The numerical method, and whether to warn about the default of 8.0."""
     if solver is None:
-        return "legacy", True
+        return "pinv", True
     if not isinstance(solver, str) or solver.lower() not in SOLVERS:
-        raise ValueError(
-            f'solver must be "legacy", "qr" or None, but it is {solver!r}.'
-        )
+        raise ValueError(f'solver must be "pinv", "qr" or None, but it is {solver!r}.')
     return solver.lower(), False
 
 
@@ -261,12 +259,12 @@ class _IVModelBase:
     kappa : float, optional
         Parameter value for k-class estimation. If not provided, it is computed to
         produce the LIML parameter estimate.
-    solver : {"legacy", "qr"}, optional
-        The numerical method. The names are not case sensitive. "legacy" tests the
+    solver : {"pinv", "qr"}, optional
+        The numerical method. The names are not case sensitive. "pinv" tests the
         rank of ``[exog, endog]`` and ``[exog, instruments]`` from their columns as
         they are, projects with ``pinv`` and inverts cross products. "qr" tests the
         rank after scaling the columns to unit length, and computes the estimates,
-        their covariance and the kappa of LIML by QR. If not provided, "legacy" is
+        their covariance and the kappa of LIML by QR. If not provided, "pinv" is
         used, and a ``FutureWarning`` is issued if the data are rank deficient with
         "qr". See Notes.
 
@@ -279,7 +277,7 @@ class _IVModelBase:
         if the inputs have different numbers of observations or labels that do
         not match (see Notes), if ``weights`` are not strictly positive and
         finite, if ``kappa`` or ``fuller`` is not a scalar, or if ``solver`` is
-        not "legacy", "qr" or None.
+        not "pinv", "qr" or None.
     TypeError
         If an input is complex or cannot be converted to float64.
 
@@ -287,7 +285,7 @@ class _IVModelBase:
     -----
     FutureWarning
         If ``solver`` is not provided, and ``[exog, endog]`` or ``[exog,
-        instruments]`` passes the rank check of "legacy" but is rank deficient with
+        instruments]`` passes the rank check of "pinv" but is rank deficient with
         "qr". linearmodels 8.0 will raise a ``ValueError`` for these data.
 
     See Also
@@ -336,7 +334,7 @@ class _IVModelBase:
         weights: IVDataLike | None = None,
         fuller: linearmodels.typing.Numeric = 0,
         kappa: linearmodels.typing.OptionalNumeric = None,
-        solver: str | None = "legacy",
+        solver: str | None = "pinv",
     ):
         self._solver, self._warn_solver = _check_solver(solver)
         self.dependent = IVData(dependent, var_name="dependent")
@@ -579,14 +577,14 @@ class _IVModelBase:
                     + _RANK_MESSAGE
                 )
         else:
-            self._legacy_rank_check()
+            self._unscaled_rank_check()
         self._has_constant, self._const_loc = has_constant(x)
 
     # The k-class models can be estimated with solver="qr"
     _supports_qr = False
 
-    def _legacy_rank_check(self) -> None:
-        """The rank check of solver="legacy", on the columns as they are."""
+    def _unscaled_rank_check(self) -> None:
+        """The rank check of solver="pinv", on the columns as they are."""
         checks = (
             (
                 self._x,
@@ -894,12 +892,12 @@ class _IVLSModelBase(_IVModelBase):
     kappa : float, optional
         Parameter value for k-class estimation. If not provided, it is computed to
         produce the LIML parameter estimate.
-    solver : {"legacy", "qr"}, optional
-        The numerical method. The names are not case sensitive. "legacy" tests the
+    solver : {"pinv", "qr"}, optional
+        The numerical method. The names are not case sensitive. "pinv" tests the
         rank of ``[exog, endog]`` and ``[exog, instruments]`` from their columns as
         they are, projects with ``pinv`` and inverts cross products. "qr" tests the
         rank after scaling the columns to unit length, and computes the estimates,
-        their covariance and the kappa of LIML by QR. If not provided, "legacy" is
+        their covariance and the kappa of LIML by QR. If not provided, "pinv" is
         used, and a ``FutureWarning`` is issued if the data are rank deficient with
         "qr". See Notes.
 
@@ -912,7 +910,7 @@ class _IVLSModelBase(_IVModelBase):
         if the inputs have different numbers of observations or labels that do
         not match (see Notes), if ``weights`` are not strictly positive and
         finite, if ``kappa`` or ``fuller`` is not a scalar, or if ``solver`` is
-        not "legacy", "qr" or None.
+        not "pinv", "qr" or None.
     TypeError
         If an input is complex or cannot be converted to float64.
 
@@ -920,7 +918,7 @@ class _IVLSModelBase(_IVModelBase):
     -----
     FutureWarning
         If ``solver`` is not provided, and ``[exog, endog]`` or ``[exog,
-        instruments]`` passes the rank check of "legacy" but is rank deficient with
+        instruments]`` passes the rank check of "pinv" but is rank deficient with
         "qr". linearmodels 8.0 will raise a ``ValueError`` for these data.
 
     See Also
@@ -991,7 +989,7 @@ class _IVLSModelBase(_IVModelBase):
         z: linearmodels.typing.data.Float64Array,
         kappa: linearmodels.typing.Numeric,
         *,
-        solver: str = "legacy",
+        solver: str = "pinv",
     ) -> linearmodels.typing.data.Float64Array:
         """
         Parameter estimation without error checking.
@@ -1006,8 +1004,8 @@ class _IVLSModelBase(_IVModelBase):
             Instrument matrix (nobs by ninstr).
         kappa : float
             Parameter value for k-class estimator.
-        solver : {"legacy", "qr"}, optional
-            The numerical method. The default is "legacy". See Notes.
+        solver : {"pinv", "qr"}, optional
+            The numerical method. The default is "pinv". See Notes.
 
         Returns
         -------
@@ -1019,7 +1017,7 @@ class _IVLSModelBase(_IVModelBase):
         Exposed as a static method to facilitate estimation with other data,
         e.g., bootstrapped samples.  Performs no error checking.
 
-        "legacy" inverts the cross products of the k-class estimator, which squares
+        "pinv" inverts the cross products of the k-class estimator, which squares
         the condition number of the problem, and projects with ``pinv(z)``, which
         drops directions if the columns of z are on very different scales.
 
@@ -1035,7 +1033,7 @@ class _IVLSModelBase(_IVModelBase):
 
            The ``solver`` keyword.
         """
-        if solver == "legacy":
+        if solver == "pinv":
             pinvz = pinv(z)
             p1 = (x.T @ x) * (1 - kappa) + kappa * ((x.T @ z) @ (pinvz @ x))
             p2 = (x.T @ y) * (1 - kappa) + kappa * ((x.T @ z) @ (pinvz @ y))
@@ -1201,12 +1199,12 @@ class IVLIML(_IVLSModelBase):
     kappa : float, optional
         Parameter value for k-class estimation. If not provided, it is computed to
         produce the LIML parameter estimate.
-    solver : {"legacy", "qr"}, optional
-        The numerical method. The names are not case sensitive. "legacy" tests the
+    solver : {"pinv", "qr"}, optional
+        The numerical method. The names are not case sensitive. "pinv" tests the
         rank of ``[exog, endog]`` and ``[exog, instruments]`` from their columns as
         they are, projects with ``pinv`` and inverts cross products. "qr" tests the
         rank after scaling the columns to unit length, and computes the estimates,
-        their covariance and the kappa of LIML by QR. If not provided, "legacy" is
+        their covariance and the kappa of LIML by QR. If not provided, "pinv" is
         used, and a ``FutureWarning`` is issued if the data are rank deficient with
         "qr". See Notes.
 
@@ -1219,7 +1217,7 @@ class IVLIML(_IVLSModelBase):
         if the inputs have different numbers of observations or labels that do
         not match (see Notes), if ``weights`` are not strictly positive and
         finite, if ``kappa`` or ``fuller`` is not a scalar, or if ``solver`` is
-        not "legacy", "qr" or None.
+        not "pinv", "qr" or None.
     TypeError
         If an input is complex or cannot be converted to float64.
 
@@ -1227,7 +1225,7 @@ class IVLIML(_IVLSModelBase):
     -----
     FutureWarning
         If ``solver`` is not provided, and ``[exog, endog]`` or ``[exog,
-        instruments]`` passes the rank check of "legacy" but is rank deficient with
+        instruments]`` passes the rank check of "pinv" but is rank deficient with
         "qr". linearmodels 8.0 will raise a ``ValueError`` for these data.
 
     See Also
@@ -1298,12 +1296,12 @@ class IVLIML(_IVLSModelBase):
     their covariance are computed from QR decompositions of the instruments and of
     the projected regressors, without forming cross products, as in R's ``ivreg``.
     Their rounding error grows with the condition number of the scaled data, not with
-    its square, and does not depend on the units of the variables. "legacy" tests the
+    its square, and does not depend on the units of the variables. "pinv" tests the
     rank of the columns as they are, so that columns on very different scales (by a
     factor of about 1e13 or more) are rank deficient, while nearly collinear columns
-    pass and can give estimates with no correct digits. The error that "legacy"
+    pass and can give estimates with no correct digits. The error that "pinv"
     raises for columns that are only rank deficient because of their units says so.
-    linearmodels 8.0 will use "qr" by default. Until then, the default is "legacy",
+    linearmodels 8.0 will use "qr" by default. Until then, the default is "pinv",
     and a ``FutureWarning`` is issued for data that "qr" finds rank deficient.
 
     .. versionadded:: 7.2
@@ -1317,12 +1315,12 @@ class IVLIML(_IVLSModelBase):
     their covariance are computed from QR decompositions of the instruments and of
     the projected regressors, without forming cross products, as in R's ``ivreg``.
     Their rounding error grows with the condition number of the scaled data, not with
-    its square, and does not depend on the units of the variables. "legacy" tests the
+    its square, and does not depend on the units of the variables. "pinv" tests the
     rank of the columns as they are, so that columns on very different scales (by a
     factor of about 1e13 or more) are rank deficient, while nearly collinear columns
-    pass and can give estimates with no correct digits. The error that "legacy"
+    pass and can give estimates with no correct digits. The error that "pinv"
     raises for columns that are only rank deficient because of their units says so.
-    linearmodels 8.0 will use "qr" by default. Until then, the default is "legacy",
+    linearmodels 8.0 will use "qr" by default. Until then, the default is "pinv",
     and a ``FutureWarning`` is issued for data that "qr" finds rank deficient.
 
     .. versionadded:: 7.2
@@ -1405,12 +1403,12 @@ class IVLIML(_IVLSModelBase):
         kappa : float, optional
             Parameter value for k-class estimation. If not provided, it is computed
             to produce the LIML parameter estimate.
-        solver : {"legacy", "qr"}, optional
-            The numerical method. The names are not case sensitive. "legacy" tests the
+        solver : {"pinv", "qr"}, optional
+            The numerical method. The names are not case sensitive. "pinv" tests the
             rank of ``[exog, endog]`` and ``[exog, instruments]`` from their columns as
             they are, projects with ``pinv`` and inverts cross products. "qr" tests the
             rank after scaling the columns to unit length, and computes the estimates,
-            their covariance and the kappa of LIML by QR. If not provided, "legacy" is
+            their covariance and the kappa of LIML by QR. If not provided, "pinv" is
             used, and a ``FutureWarning`` is issued if the data are rank deficient with
             "qr". See Notes.
 
@@ -1484,12 +1482,12 @@ class IV2SLS(_IVLSModelBase):
         Observation weights used in estimation. The weights must be strictly positive
         and finite. They are rescaled to have a mean of 1. A NaN weight is missing, and
         its observation is dropped. The default is to weight all observations equally.
-    solver : {"legacy", "qr"}, optional
-        The numerical method. The names are not case sensitive. "legacy" tests the
+    solver : {"pinv", "qr"}, optional
+        The numerical method. The names are not case sensitive. "pinv" tests the
         rank of ``[exog, endog]`` and ``[exog, instruments]`` from their columns as
         they are, projects with ``pinv`` and inverts cross products. "qr" tests the
         rank after scaling the columns to unit length, and computes the estimates,
-        their covariance and the kappa of LIML by QR. If not provided, "legacy" is
+        their covariance and the kappa of LIML by QR. If not provided, "pinv" is
         used, and a ``FutureWarning`` is issued if the data are rank deficient with
         "qr". See Notes.
 
@@ -1501,7 +1499,7 @@ class IV2SLS(_IVLSModelBase):
         does not have full column rank, if all observations have a missing value,
         if the inputs have different numbers of observations or labels that do
         not match (see Notes), if ``weights`` are not strictly positive and
-        finite, or if ``solver`` is not "legacy", "qr" or None.
+        finite, or if ``solver`` is not "pinv", "qr" or None.
     TypeError
         If an input is complex or cannot be converted to float64.
 
@@ -1509,7 +1507,7 @@ class IV2SLS(_IVLSModelBase):
     -----
     FutureWarning
         If ``solver`` is not provided, and ``[exog, endog]`` or ``[exog,
-        instruments]`` passes the rank check of "legacy" but is rank deficient with
+        instruments]`` passes the rank check of "pinv" but is rank deficient with
         "qr". linearmodels 8.0 will raise a ``ValueError`` for these data.
 
     See Also
@@ -1553,12 +1551,12 @@ class IV2SLS(_IVLSModelBase):
     their covariance are computed from QR decompositions of the instruments and of
     the projected regressors, without forming cross products, as in R's ``ivreg``.
     Their rounding error grows with the condition number of the scaled data, not with
-    its square, and does not depend on the units of the variables. "legacy" tests the
+    its square, and does not depend on the units of the variables. "pinv" tests the
     rank of the columns as they are, so that columns on very different scales (by a
     factor of about 1e13 or more) are rank deficient, while nearly collinear columns
-    pass and can give estimates with no correct digits. The error that "legacy"
+    pass and can give estimates with no correct digits. The error that "pinv"
     raises for columns that are only rank deficient because of their units says so.
-    linearmodels 8.0 will use "qr" by default. Until then, the default is "legacy",
+    linearmodels 8.0 will use "qr" by default. Until then, the default is "pinv",
     and a ``FutureWarning`` is issued for data that "qr" finds rank deficient.
 
     .. versionadded:: 7.2
@@ -1632,12 +1630,12 @@ class IV2SLS(_IVLSModelBase):
             positive and finite. They are rescaled to have a mean of 1. A NaN weight is
             missing, and its observation is dropped. The default is to weight all
             observations equally.
-        solver : {"legacy", "qr"}, optional
-            The numerical method. The names are not case sensitive. "legacy" tests the
+        solver : {"pinv", "qr"}, optional
+            The numerical method. The names are not case sensitive. "pinv" tests the
             rank of ``[exog, endog]`` and ``[exog, instruments]`` from their columns as
             they are, projects with ``pinv`` and inverts cross products. "qr" tests the
             rank after scaling the columns to unit length, and computes the estimates,
-            their covariance and the kappa of LIML by QR. If not provided, "legacy" is
+            their covariance and the kappa of LIML by QR. If not provided, "pinv" is
             used, and a ``FutureWarning`` is issued if the data are rank deficient with
             "qr". See Notes.
 
@@ -3129,8 +3127,8 @@ class _OLS(IVLIML):
         Observation weights used in estimation. The weights must be strictly positive
         and finite. They are rescaled to have a mean of 1. A NaN weight is missing, and
         its observation is dropped. The default is to weight all observations equally.
-    solver : {"legacy", "qr"}, optional
-        The numerical method, see :class:`IV2SLS`. The default is "legacy", which
+    solver : {"pinv", "qr"}, optional
+        The numerical method, see :class:`IV2SLS`. The default is "pinv", which
         does not warn. The models pass their own solver.
 
     See Also
@@ -3166,7 +3164,7 @@ class _OLS(IVLIML):
         exog: IVDataLike,
         *,
         weights: IVDataLike | None = None,
-        solver: str | None = "legacy",
+        solver: str | None = "pinv",
     ):
         super().__init__(
             dependent, exog, None, None, weights=weights, kappa=0.0, solver=solver

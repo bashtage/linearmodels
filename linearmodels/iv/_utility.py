@@ -26,14 +26,14 @@ The original error was:
 """
 
 
-SOLVERS = ("legacy", "qr")
+SOLVERS = ("pinv", "qr")
 
 
 def proj(
     y: linearmodels.typing.data.Float64Array,
     x: linearmodels.typing.data.Float64Array,
     *,
-    solver: str = "legacy",
+    solver: str = "pinv",
 ) -> linearmodels.typing.data.Float64Array:
     """
     Projection of y on x from y.
@@ -44,8 +44,8 @@ def proj(
         Array to project (nobs by nseries).
     x : ndarray
         Array to project onto (nobs by nvar).
-    solver : {"legacy", "qr"}, optional
-        The numerical method. The default is "legacy". See Notes.
+    solver : {"pinv", "qr"}, optional
+        The numerical method. The default is "pinv". See Notes.
 
     Returns
     -------
@@ -54,7 +54,7 @@ def proj(
 
     Notes
     -----
-    "legacy" projects with ``pinv(x)``, which drops the singular values of x that
+    "pinv" projects with ``pinv(x)``, which drops the singular values of x that
     are smaller than the largest one times max(nobs, nvar) times the machine
     precision, so that directions are lost if the columns of x are on very
     different scales. "qr" projects on the left singular vectors of x with columns
@@ -64,7 +64,7 @@ def proj(
     """
     if x.shape[1] == 0:
         return np.zeros_like(y)
-    if solver == "legacy":
+    if solver == "pinv":
         return x @ (np.linalg.pinv(x) @ y)
     scale = np.linalg.norm(x, axis=0)
     scale[scale == 0] = 1.0
@@ -77,7 +77,7 @@ def annihilate(
     y: linearmodels.typing.data.Float64Array,
     x: linearmodels.typing.data.Float64Array,
     *,
-    solver: str = "legacy",
+    solver: str = "pinv",
 ) -> linearmodels.typing.data.Float64Array:
     """
     Remove projection of y on x from y.
@@ -88,9 +88,9 @@ def annihilate(
         Array to project (nobs by nseries).
     x : ndarray
         Array to project onto (nobs by nvar).
-    solver : {"legacy", "qr"}, optional
+    solver : {"pinv", "qr"}, optional
         The numerical method of the projection, see :func:`proj`. The default is
-        "legacy".
+        "pinv".
 
     Returns
     -------
