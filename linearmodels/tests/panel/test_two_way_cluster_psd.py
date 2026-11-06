@@ -191,3 +191,20 @@ def test_fix_psd_not_accepted(indefinite):
 def test_fix_psd_not_bool(indefinite):
     with pytest.raises(TypeError, match="fix_psd"):
         indefinite.fit(**TWO_WAY, fix_psd=1)
+
+
+def test_negative_variance_warns_without_two_way_hint(indefinite):
+    # Only the two-way clustered covariance points to fix_psd. A covariance with
+    # a negative variance from another source has the warning without the hint.
+    cov = np.asarray(indefinite.fit(cov_type="robust").cov)
+    res = indefinite.fit(cov_type="robust")
+    res._deferred_cov = lambda: cov * [[-1.0, 1.0], [1.0, 1.0]]
+    with warnings.catch_warnings(record=True) as record:
+        warnings.simplefilter("always")
+        std_errors = res.std_errors
+    assert len(record) == 1
+    assert record[0].category is NegativeVarianceWarning
+    message = str(record[0].message)
+    assert "variance of const is negative" in message
+    assert "fix_psd" not in message
+    assert np.isnan(std_errors["const"])
