@@ -109,6 +109,10 @@ def is_nested(data, effect, clusters):
     return all(by_effect[c].nunique().max() == 1 for c in clusters)
 
 
+# A variance of the two-way clustered covariance is negative in some of the samples
+@pytest.mark.filterwarnings(
+    "ignore::linearmodels.shared.exceptions.NegativeVarianceWarning"
+)
 @pytest.mark.parametrize("pair", PAIRS)
 @pytest.mark.parametrize("effect", list(EFFECTS))
 def test_clustered_covariance_against_hand_computation(data, effect, pair):
@@ -122,6 +126,10 @@ def test_clustered_covariance_against_hand_computation(data, effect, pair):
         assert_allclose(res.cov.to_numpy(), expected, rtol=1e-8)
 
 
+# A variance of the two-way clustered covariance is negative in some of the samples
+@pytest.mark.filterwarnings(
+    "ignore::linearmodels.shared.exceptions.NegativeVarianceWarning"
+)
 @pytest.mark.parametrize("pair", PAIRS)
 @pytest.mark.parametrize("effect", list(EFFECTS))
 def test_order_of_the_clusters_does_not_matter(data, effect, pair):

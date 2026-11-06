@@ -8,11 +8,13 @@ from numpy import (
     argsort,
     cumsum,
     lexsort,
+    maximum,
     r_,
     unique,
     where,
     zeros,
 )
+from numpy.linalg import eigh
 from pandas import isnull
 
 import linearmodels.typing.data
@@ -74,6 +76,42 @@ def cluster_union(
     union = cumsum(r_[0, diff])
     resort_locs = argsort(sorted_locs)
     return union[resort_locs]
+
+
+def clip_negative_eigenvalues(
+    cov: linearmodels.typing.data.Float64Array,
+) -> linearmodels.typing.data.Float64Array:
+    r"""
+    Make a symmetric covariance positive semi-definite.
+
+    Parameters
+    ----------
+    cov : ndarray
+        Symmetric covariance with shape (k, k).
+
+    Returns
+    -------
+    ndarray
+        The covariance with its negative eigenvalues set to zero. It is `cov`
+        if `cov` has no negative eigenvalues.
+
+    Notes
+    -----
+    The covariance is decomposed as :math:`V = U \Lambda U'` and is replaced by
+    :math:`U \Lambda_+ U'`, where :math:`\Lambda_+` sets the negative
+    eigenvalues to zero, as in Cameron, Gelbach and Miller (2011).
+
+    References
+    ----------
+    .. [*] Cameron, A. C., Gelbach, J. B. and Miller, D. L. (2011). "Robust
+       Inference With Multiway Clustering". Journal of Business & Economic
+       Statistics, 29(2), 238-249.
+    """
+    eigenvalues, eigenvectors = eigh(cov)
+    if not npany(eigenvalues < 0):
+        return cov
+    out = (eigenvectors * maximum(eigenvalues, 0.0)) @ eigenvectors.T
+    return (out + out.T) / 2
 
 
 def cov_cluster(
