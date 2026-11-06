@@ -853,6 +853,12 @@ class _IVModelBase:
             del x1_basis
         elif not same:
             ex1 = e - x1 @ (pinv(x1) @ e)
+        # solver="pinv" only uses the cross product of the residuals on x1, which is
+        # computed now so that the residuals are freed before z is decomposed
+        ex1_cross = None
+        if self._solver == "pinv" and ex1 is not None:
+            ex1_cross = ex1.T @ ex1
+            ex1 = None
         if self._solver == "qr":
             if "z_basis" not in shared:
                 shared["z_basis"] = orthonormal_basis(z)
@@ -862,7 +868,7 @@ class _IVModelBase:
             if "pinvz" not in shared:
                 shared["pinvz"] = pinv(z)
             ez = e - z @ (shared["pinvz"] @ e)
-        if ex1 is None:
+        if ex1 is None and ex1_cross is None:
             ex1 = ez
 
         # The rank is tested on a copy of the residuals with columns of unit length, so
@@ -886,11 +892,13 @@ class _IVModelBase:
             # squared singular values of ex1 R^-1, where ez = QR. This does not form
             # the cross products, and does not depend on the units of the variables
             r = sp_qr(ez, mode="raw", check_finite=False)[1]
-            scaled_ex1 = solve_triangular(r, ex1.T, trans="T").T
+            scaled_ex1 = solve_triangular(r, cast("ndarray", ex1).T, trans="T").T
             return float(svd(scaled_ex1, compute_uv=False)[-1] ** 2)
 
+        if ex1_cross is None:
+            ex1_cross = cast("ndarray", ex1).T @ cast("ndarray", ex1)
         vpmzv_sqinv = inv_sqrth(ez.T @ ez)
-        q = vpmzv_sqinv @ (ex1.T @ ex1) @ vpmzv_sqinv
+        q = vpmzv_sqinv @ ex1_cross @ vpmzv_sqinv
         return min(eigvalsh(q))
 
     def _post_estimation(

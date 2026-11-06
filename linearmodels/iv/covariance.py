@@ -671,7 +671,10 @@ class HomoskedasticCovariance:
         columns are well conditioned, even if the columns of :math:`\hat{x}` are
         nearly collinear or on very different scales.
         """
-        u = self._kclass_factors(with_u=True).u
+        u = cast(
+            "linearmodels.typing.data.Float64Array",
+            self._kclass_factors(with_u=True).u,
+        )
         return asarray((self._basis() @ u) * self.eps, dtype=float)
 
     def _rotated_s(self) -> linearmodels.typing.data.Float64Array:

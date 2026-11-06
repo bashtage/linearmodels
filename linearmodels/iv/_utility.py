@@ -253,24 +253,24 @@ def kclass_factors(
         t0 = None if y is None else np.empty((0,) + y.shape[1:])
         u0 = None if z_basis is None else np.empty((z_basis.shape[1], 0))
         return KClassFactors(np.empty((0, 0)), None, t0, u0)
-    if z_basis is None and kappa != 0:
-        raise ValueError("z_basis is required if kappa is not 0.")
-    if kappa < 1:
+    if kappa == 0:
         # R_X and Q_X'y, applying the Householder reflections to y without forming
         # Q_X
         qx_y, r_x = _triangular_factor(x, y)
-        if kappa == 0:
-            u = None if z_basis is None else coordinates(x, z_basis, r_x)
-            return KClassFactors(r_x, None, qx_y, u)
-        qx = z_basis.T @ x
+        u = None if z_basis is None else coordinates(x, z_basis, r_x)
+        return KClassFactors(r_x, None, qx_y, u)
+    if z_basis is None:
+        raise ValueError("z_basis is required if kappa is not 0.")
+    qx = z_basis.T @ x
+    if kappa < 1:
+        qx_y, r_x = _triangular_factor(x, y)
         w0, w1 = float(np.sqrt(1 - kappa)), float(np.sqrt(kappa))
         q_s, r = sp_qr(np.vstack([w0 * r_x, w1 * qx]), mode="economic")
         t = None
-        if y is not None:
+        if y is not None and qx_y is not None:
             t = q_s.T @ np.vstack([w0 * qx_y, w1 * (z_basis.T @ y)])
         u = solve_triangular(r, qx.T, trans="T").T
         return KClassFactors(r, None, t, u)
-    qx = z_basis.T @ x
 
     q_a, r = sp_qr(qx, mode="economic")
     t = None if y is None else q_a.T @ (z_basis.T @ y)
