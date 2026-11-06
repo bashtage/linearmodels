@@ -10,6 +10,7 @@ from typing import Any, Union, cast
 from mypy_extensions import VarArg
 from numpy import (
     arange,
+    array_equal,
     asarray,
     ceil,
     cos,
@@ -26,7 +27,7 @@ from numpy import (
     zeros,
 )
 from numpy.linalg import inv, pinv
-from scipy.linalg import solve_triangular
+from scipy.linalg import qr as sp_qr, solve_triangular
 
 from linearmodels.iv._utility import (
     SOLVERS,
@@ -566,10 +567,21 @@ class HomoskedasticCovariance:
             self.__str__() + "\n" + self.__class__.__name__ + f", id: {hex(id(self))}"
         )
 
-    def _kclass_factors(self) -> KClassFactors:
+    def _kclass_factors(self, with_u: bool = False) -> KClassFactors:
         """Factors of the cross products of the k-class estimator, computed once."""
-        if self._factors is None:
-            self._factors = kclass_factors(self.x, self._basis(), float(self._kappa))
+        if self._factors is not None and (self._factors.u is not None or not with_u):
+            return self._factors
+        x, z = self.x, self.z
+        kappa = float(self._kappa)
+        if kappa == 0 and self._z_basis is None and x.shape == z.shape:
+            if array_equal(x, z):
+                # OLS, where z is x: the QR decomposition of x gives both
+                q, r = sp_qr(x, mode="economic", check_finite=False)
+                self._z_basis = q
+                self._factors = KClassFactors(r, None, None, eye(x.shape[1]))
+                return self._factors
+        z_basis = self._basis() if (with_u or kappa != 0) else None
+        self._factors = kclass_factors(x, z_basis, kappa)
         return self._factors
 
     def _basis(self) -> linearmodels.typing.data.Float64Array:
@@ -611,8 +623,8 @@ class HomoskedasticCovariance:
         columns are well conditioned, even if the columns of :math:`\hat{x}` are
         nearly collinear or on very different scales.
         """
-        factors = self._kclass_factors()
-        return asarray((self._basis() @ factors.u) * self.eps, dtype=float)
+        u = self._kclass_factors(with_u=True).u
+        return asarray((self._basis() @ u) * self.eps, dtype=float)
 
     def _rotated_s(self) -> linearmodels.typing.data.Float64Array:
         r"""
