@@ -15,6 +15,7 @@ import pytest
 
 from linearmodels.iv import IV2SLS, IVGMM, IVGMMCUE, IVJIVE, IVLIML
 from linearmodels.shared.exceptions import MissingValueWarning
+from linearmodels.tests._utility import method_kwargs
 
 MODELS = [IV2SLS, IVLIML, IVGMM, IVGMMCUE, IVJIVE]
 FORMULA = "y ~ 1 + x + w + [e ~ z1 + z2]"
@@ -54,10 +55,12 @@ def test_missing_value_in_each_block(frame, cls, block):
     data = frame.copy()
     data.iloc[ROWS, data.columns.get_loc(BLOCKS[block])] = np.nan
     with pytest.warns(MissingValueWarning, match="missing values"):
-        mod = cls.from_formula(FORMULA, data)
+        mod = cls.from_formula(FORMULA, data, **method_kwargs(cls))
     assert mod.notnull.sum() == NOBS - 2
     assert not mod.notnull[ROWS].any()
-    expected = cls.from_formula(FORMULA, frame.drop(index=frame.index[ROWS])).fit()
+    expected = cls.from_formula(
+        FORMULA, frame.drop(index=frame.index[ROWS]), **method_kwargs(cls)
+    ).fit()
     assert_same_fit(mod.fit(), expected, cls)
 
 
@@ -68,11 +71,11 @@ def test_missing_values_in_every_block_in_different_rows(frame, cls):
     for col, row in rows.items():
         data.iloc[row, data.columns.get_loc(col)] = np.nan
     with pytest.warns(MissingValueWarning, match="missing values"):
-        mod = cls.from_formula(FORMULA, data)
+        mod = cls.from_formula(FORMULA, data, **method_kwargs(cls))
     keep = np.ones(NOBS, dtype=bool)
     keep[list(rows.values())] = False
     assert_array_equal(mod.notnull, keep)
-    expected = cls.from_formula(FORMULA, frame[keep]).fit()
+    expected = cls.from_formula(FORMULA, frame[keep], **method_kwargs(cls)).fit()
     assert_same_fit(mod.fit(), expected, cls)
 
 
@@ -82,9 +85,13 @@ def test_missing_values_with_weights(frame, cls, block):
     data = frame.copy()
     data.iloc[ROWS, data.columns.get_loc(BLOCKS[block])] = np.nan
     with pytest.warns(MissingValueWarning, match="missing values"):
-        mod = cls.from_formula(FORMULA, data, weights=data["weight"])
+        mod = cls.from_formula(
+            FORMULA, data, weights=data["weight"], **method_kwargs(cls)
+        )
     clean = frame.drop(index=frame.index[ROWS])
-    expected = cls.from_formula(FORMULA, clean, weights=clean["weight"]).fit()
+    expected = cls.from_formula(
+        FORMULA, clean, weights=clean["weight"], **method_kwargs(cls)
+    ).fit()
     res = mod.fit()
     assert res.nobs == NOBS - 2
     assert_allclose(res.params, expected.params, rtol=1e-10)
@@ -92,7 +99,7 @@ def test_missing_values_with_weights(frame, cls, block):
 
 
 def test_no_missing_values_do_not_warn(frame, recwarn):
-    IV2SLS.from_formula(FORMULA, frame).fit()
+    IV2SLS.from_formula(FORMULA, frame, method="pinv").fit()
     assert not [w for w in recwarn if issubclass(w.category, MissingValueWarning)]
 
 
@@ -100,12 +107,12 @@ def test_all_values_missing(frame):
     data = frame.copy()
     data["y"] = np.nan
     with pytest.raises(ValueError, match="All observations contain missing data"):
-        IV2SLS.from_formula(FORMULA, data)
+        IV2SLS.from_formula(FORMULA, data, method="pinv")
 
 
 @pytest.mark.parametrize("block", ["x", "e"])
 def test_predict_with_missing_values(frame, block):
-    res = IV2SLS.from_formula(FORMULA, frame).fit()
+    res = IV2SLS.from_formula(FORMULA, frame, method="pinv").fit()
     new = frame.iloc[:7].copy()
     new.iloc[2, new.columns.get_loc(block)] = np.nan
     pred = res.model.predict(res.params, data=new)

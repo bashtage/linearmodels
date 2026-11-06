@@ -5,6 +5,7 @@ import pytest
 from linearmodels.iv import IV2SLS, IVGMM, IVGMMCUE, IVLIML
 from linearmodels.shared.exceptions import MissingValueWarning
 from linearmodels.shared.utility import AttrDict
+from linearmodels.tests._utility import method_kwargs
 
 
 @pytest.fixture(scope="module", params=[IV2SLS, IVLIML, IVGMM, IVGMMCUE])
@@ -71,9 +72,15 @@ def get_all(v):
 
 def test_missing(data, model):
     with pytest.warns(MissingValueWarning, match="missing values"):
-        mod = model(data.dep, data.exog, data.endog, data.instr)
+        mod = model(data.dep, data.exog, data.endog, data.instr, **method_kwargs(model))
     res = mod.fit()
-    mod = model(data.dep_clean, data.exog_clean, data.endog_clean, data.instr_clean)
+    mod = model(
+        data.dep_clean,
+        data.exog_clean,
+        data.endog_clean,
+        data.instr_clean,
+        **method_kwargs(model),
+    )
     res2 = mod.fit()
     assert res.nobs == res2.nobs
     assert_series_equal(res.params, res2.params)
@@ -82,11 +89,17 @@ def test_missing(data, model):
 
 def test_missing_clustered(data):
     with pytest.warns(MissingValueWarning, match="missing values"):
-        mod = IV2SLS(data.dep, data.exog, data.endog, data.instr)
+        mod = IV2SLS(data.dep, data.exog, data.endog, data.instr, method="pinv")
     with pytest.raises(ValueError, match=r"clusters has the wrong nobs"):
         mod.fit(cov_type="clustered", clusters=data.clusters)
     res = mod.fit(cov_type="clustered", clusters=data.clusters_clean)
-    mod = IV2SLS(data.dep_clean, data.exog_clean, data.endog_clean, data.instr_clean)
+    mod = IV2SLS(
+        data.dep_clean,
+        data.exog_clean,
+        data.endog_clean,
+        data.instr_clean,
+        method="pinv",
+    )
     res2 = mod.fit(cov_type="clustered", clusters=data.clusters_clean)
     assert res.nobs == res2.nobs
     assert_series_equal(res.params, res2.params)
@@ -95,4 +108,6 @@ def test_missing_clustered(data):
 
 def test_all_missing(data, model):
     with pytest.raises(ValueError, match=r"All observations contain missing data"):
-        model(data.dep * np.nan, data.exog, data.endog, data.instr)
+        model(
+            data.dep * np.nan, data.exog, data.endog, data.instr, **method_kwargs(model)
+        )

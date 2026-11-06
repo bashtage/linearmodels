@@ -28,7 +28,11 @@ from linearmodels.iv.covariance import kernel_optimal_bandwidth
 from linearmodels.iv.gmm import IVGMMCovariance, KernelWeightMatrix
 from linearmodels.shared.exceptions import DefaultBandwidthWarning
 from linearmodels.shared.utility import AttrDict
-from linearmodels.tests._utility import assert_close_matrix, warns_if_default_bandwidth
+from linearmodels.tests._utility import (
+    assert_close_matrix,
+    method_kwargs,
+    warns_if_default_bandwidth,
+)
 
 CWD = os.path.split(os.path.abspath(__file__))[0]
 SIMULATED = pd.read_stata(os.path.join(CWD, "results", "simulated-data.dta"))
@@ -146,7 +150,7 @@ def default_bandwidth_warnings(func):
     """Result of func() and the DefaultBandwidthWarnings that it issued"""
     with warnings.catch_warnings(record=True) as caught:
         warnings.simplefilter("always")
-        result = func()
+        result = func(**method_kwargs(func))
     return result, [w for w in caught if w.category is DefaultBandwidthWarning]
 
 
@@ -154,9 +158,11 @@ def fit_spec(args, name, options):
     """Fit a spec, with the same options for each kernel estimator that it has"""
     model, weights, covariance, fit_kwargs = SPECS[name]
     if weights is None:
-        mod = model(*args)
+        mod = model(*args, **method_kwargs(model))
     else:
-        mod = model(*args, weight_type="kernel", **weights, **options)
+        mod = model(
+            *args, weight_type="kernel", **weights, **options, **method_kwargs(model)
+        )
     if covariance is None:
         return mod.fit(**fit_kwargs)
     return mod.fit(cov_type="kernel", **covariance, **options, **fit_kwargs)
@@ -355,9 +361,9 @@ SCENARIOS = {
 def test_warning_only_for_the_default(args, model, scenario):
     weights, fit_kwargs, where = SCENARIOS[scenario]
     if weights is None:
-        mod = model(*args)
+        mod = model(*args, **method_kwargs(model))
     else:
-        mod = model(*args, weight_type="kernel", **weights)
+        mod = model(*args, weight_type="kernel", **weights, **method_kwargs(model))
 
     def call_fit():
         return mod.fit(**fit_kwargs)
@@ -384,8 +390,8 @@ def test_warning_only_for_the_default(args, model, scenario):
 @pytest.mark.parametrize("model", [IVGMM, IVGMMCUE])
 def test_warning_is_not_issued_when_the_model_is_created(args, model):
     with no_default_bandwidth_warning():
-        model(*args, weight_type="kernel")
-        model(*args, weight_type="kernel", bandwidth=5)
+        model(*args, weight_type="kernel", **method_kwargs(model))
+        model(*args, weight_type="kernel", bandwidth=5, **method_kwargs(model))
 
 
 def test_warning_class():
@@ -454,7 +460,7 @@ def test_one_warning_for_a_fit_with_many_iterations(args):
 
 @pytest.mark.parametrize("model", [IVGMM, IVGMMCUE])
 def test_one_warning_for_each_fit(args, model):
-    mod = model(*args, weight_type="kernel")
+    mod = model(*args, weight_type="kernel", **method_kwargs(model))
     _, first = default_bandwidth_warnings(mod.fit)
     _, second = default_bandwidth_warnings(mod.fit)
     assert len(first) == 1
@@ -465,7 +471,9 @@ def test_one_warning_for_each_fit(args, model):
 def test_results_do_not_warn_again(args, model):
     # The statistics that are computed from the results estimate other models
     res, caught = default_bandwidth_warnings(
-        lambda: model(*args, weight_type="kernel").fit(cov_type="kernel")
+        lambda: model(*args, weight_type="kernel", **method_kwargs(model)).fit(
+            cov_type="kernel"
+        )
     )
     assert len(caught) == 1
     with no_default_bandwidth_warning():
@@ -523,11 +531,17 @@ def test_cue_starting_values_have_the_bandwidth_of_the_objective(
 def test_from_formula(args):
     formula = "y_kernel ~ 1 + x3 + [x1 ~ z1 + z2 + x4]"
     for model in (IVGMM, IVGMMCUE):
-        mod = model.from_formula(formula, SIMULATED, weight_type="kernel")
+        mod = model.from_formula(
+            formula, SIMULATED, weight_type="kernel", **method_kwargs(model)
+        )
         res, caught = default_bandwidth_warnings(mod.fit)
         assert len(caught) == 1
         mod = model.from_formula(
-            formula, SIMULATED, weight_type="kernel", optimal_bw=False
+            formula,
+            SIMULATED,
+            weight_type="kernel",
+            optimal_bw=False,
+            **method_kwargs(model),
         )
         with no_default_bandwidth_warning():
             old = mod.fit()
@@ -539,7 +553,7 @@ def test_other_estimators_are_silent(args):
     # They always estimate the bandwidth from the data
     with no_default_bandwidth_warning():
         for model in (IV2SLS, IVLIML, IVJIVE):
-            res = model(*args).fit(cov_type="kernel")
+            res = model(*args, **method_kwargs(model)).fit(cov_type="kernel")
             assert 0 < res.cov_config["bandwidth"] < NOBS // 10
 
 

@@ -6,6 +6,7 @@ import pytest
 
 from linearmodels.iv.data import IVData
 from linearmodels.iv.model import IV2SLS, IVGMM, IVGMMCUE, IVLIML
+from linearmodels.tests._utility import method_kwargs
 from linearmodels.tests.iv._utility import generate_data
 from linearmodels.tests.panel._utility import assert_frame_similar
 
@@ -41,9 +42,9 @@ def result_checker(res):
 # covariance, which is tested in test_gmm_kernel_bandwidth.py, so the bandwidth
 # is given
 def test_results(data, model):
-    mod = model(data.dep, data.exog, data.endog, data.instr)
+    mod = model(data.dep, data.exog, data.endog, data.instr, **method_kwargs(model))
     # OLS-like results
-    result_checker(model(data.dep, data.exog, None, None).fit())
+    result_checker(model(data.dep, data.exog, None, None, **method_kwargs(model)).fit())
 
     result_checker(mod.fit(cov_type="unadjusted"))
     result_checker(mod.fit(cov_type="robust"))
@@ -52,7 +53,13 @@ def test_results(data, model):
 
 
 def test_results_single(data, model):
-    mod = model(data.dep, data.exog[:, 0], data.endog[:, 0], data.instr[:, 0])
+    mod = model(
+        data.dep,
+        data.exog[:, 0],
+        data.endog[:, 0],
+        data.instr[:, 0],
+        **method_kwargs(model),
+    )
     result_checker(mod.fit(cov_type="unadjusted"))
     result_checker(mod.fit(cov_type="robust"))
     result_checker(mod.fit(cov_type="kernel", bandwidth=5))
@@ -60,7 +67,9 @@ def test_results_single(data, model):
 
 
 def test_results_no_exog(data, model):
-    mod = model(data.dep, None, data.endog[:, 0], data.instr[:, 0])
+    mod = model(
+        data.dep, None, data.endog[:, 0], data.instr[:, 0], **method_kwargs(model)
+    )
     result_checker(mod.fit(cov_type="unadjusted"))
     result_checker(mod.fit(cov_type="robust"))
     result_checker(mod.fit(cov_type="kernel", bandwidth=5))
@@ -68,7 +77,7 @@ def test_results_no_exog(data, model):
 
 
 def test_fitted_predict(data, model):
-    mod = model(data.dep, None, data.endog, data.instr)
+    mod = model(data.dep, None, data.endog, data.instr, **method_kwargs(model))
     res = mod.fit()
     assert_series_equal(res.idiosyncratic, res.resids)
     y = mod.dependent.pandas
@@ -87,7 +96,7 @@ def test_fitted_predict(data, model):
 
 
 def test_fitted_predict_exception(data, model):
-    mod = model(data.dep, None, data.endog, data.instr)
+    mod = model(data.dep, None, data.endog, data.instr, **method_kwargs(model))
     res = mod.fit()
     df = DataFrame([[1]])
     with pytest.raises(ValueError, match=r"Unable to use data when the model was "):
@@ -95,7 +104,7 @@ def test_fitted_predict_exception(data, model):
 
 
 def test_predict_no_selection(data, model):
-    mod = model(data.dep, None, data.endog, data.instr)
+    mod = model(data.dep, None, data.endog, data.instr, **method_kwargs(model))
     res = mod.fit()
     with pytest.raises(ValueError, match=r"At least one output must be selected"):
         res.predict(fitted=False, idiosyncratic=False, missing=True)
@@ -113,7 +122,7 @@ def test_fitted_predict_combinations(data, model, include_vars):
     else:
         args += (None, None)
 
-    mod = model(*args)
+    mod = model(*args, **method_kwargs(model))
     res = mod.fit()
     assert_series_equal(res.idiosyncratic, res.resids)
     y = mod.dependent.pandas

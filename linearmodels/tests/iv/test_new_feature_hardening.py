@@ -35,7 +35,7 @@ import linearmodels.iv.model
 from linearmodels.iv.results import FirstStageResults, IVGMMResults
 from linearmodels.shared.exceptions import MissingValueWarning
 from linearmodels.shared.hypotheses import InvalidTestStatistic, WaldTestStatistic
-from linearmodels.tests._utility import assert_same_text
+from linearmodels.tests._utility import assert_same_text, method_kwargs
 
 
 def simulate(seed, nobs=300, ninstr=4, nendog=1, violation=0.0, weighted=False):
@@ -172,8 +172,8 @@ def test_jive_compare_with_other_estimators_and_weights():
     y, exog, endog, z, w = simulate(3, weighted=True)
     results = {
         "JIVE": IVJIVE(y, exog, endog, z, weights=w).fit(),
-        "2SLS": IV2SLS(y, exog, endog, z, weights=w).fit(),
-        "LIML": IVLIML(y, exog, endog, z, weights=w).fit(),
+        "2SLS": IV2SLS(y, exog, endog, z, weights=w, method="pinv").fit(),
+        "LIML": IVLIML(y, exog, endog, z, weights=w, method="pinv").fit(),
         "GMM": IVGMM(y, exog, endog, z, weights=w).fit(),
     }
     comparison = compare(results)
@@ -204,7 +204,7 @@ def test_jive_compare_formula_models():
     data = simulated_frame(4)
     results = {
         "JIVE": IVJIVE.from_formula(FORMULA, data, weights=data.w).fit(),
-        "2SLS": IV2SLS.from_formula(FORMULA, data, weights=data.w).fit(),
+        "2SLS": IV2SLS.from_formula(FORMULA, data, weights=data.w, method="pinv").fit(),
     }
     comparison = compare(results)
     assert list(comparison.params.index) == ["Intercept", "x1", "x2"]
@@ -249,7 +249,9 @@ def test_jive_first_stage_rank_tests_match_2sls(cov_type, options, weighted):
     # estimator, the weights and the clusters of the model
     y, exog, endog, z, w = simulate(10, ninstr=5, nendog=2, weighted=weighted)
     jive = IVJIVE(y, exog, endog, z, weights=w).fit(cov_type=cov_type, **options)
-    tsls = IV2SLS(y, exog, endog, z, weights=w).fit(cov_type=cov_type, **options)
+    tsls = IV2SLS(y, exog, endog, z, weights=w, method="pinv").fit(
+        cov_type=cov_type, **options
+    )
     stats_jive, stats_tsls = jive.first_stage, tsls.first_stage
     assert type(stats_jive.kleibergen_paap) is WaldTestStatistic
     assert stats_jive.kleibergen_paap.df == 4
@@ -270,7 +272,9 @@ def test_first_stage_of_every_estimator_and_covariance(estimator, cov_type):
         options["clusters"] = np.arange(200) // 10
     elif cov_type == "kernel":
         options["bandwidth"] = 3
-    res = estimator(y, exog, endog, z, weights=w).fit(cov_type=cov_type, **options)
+    res = estimator(y, exog, endog, z, weights=w, **method_kwargs(estimator)).fit(
+        cov_type=cov_type, **options
+    )
     first_stage = res.first_stage
     assert "First Stage Estimation Results" in str(first_stage)
     assert first_stage.diagnostics.shape == (1, 6)
@@ -284,7 +288,7 @@ def test_first_stage_of_every_estimator_and_covariance(estimator, cov_type):
 def test_results_can_be_pickled(estimator):
     y, exog, endog, z, w = simulate(31, nobs=200, ninstr=3, weighted=True)
     clusters = np.arange(200) // 10
-    res = estimator(y, exog, endog, z, weights=w).fit(
+    res = estimator(y, exog, endog, z, weights=w, **method_kwargs(estimator)).fit(
         cov_type="clustered", clusters=clusters
     )
     clone = pickle.loads(pickle.dumps(res))
@@ -386,10 +390,17 @@ COV_CASES = [
 
 
 def all_rank_statistics(endog, instr, exog):
-    out = [cragg_donald(endog, instr, exog).stat, cragg_donald_f(endog, instr, exog)]
+    out = [
+        cragg_donald(endog, instr, exog, method="pinv").stat,
+        cragg_donald_f(endog, instr, exog, method="pinv"),
+    ]
     for cov_type, config in COV_CASES:
-        out.append(kleibergen_paap(endog, instr, exog, cov_type, config).stat)
-        out.append(kleibergen_paap_f(endog, instr, exog, cov_type, config))
+        out.append(
+            kleibergen_paap(endog, instr, exog, cov_type, config, method="pinv").stat
+        )
+        out.append(
+            kleibergen_paap_f(endog, instr, exog, cov_type, config, method="pinv")
+        )
     return np.array(out)
 
 
@@ -408,10 +419,18 @@ def test_rank_statistics_do_not_depend_on_the_scale_of_the_weights():
 def test_first_stage_does_not_depend_on_the_scale_of_the_weights():
     y, exog, endog, z, w = simulate(2, weighted=True)
     options = {"cov_type": "clustered", "clusters": np.arange(y.shape[0]) // 10}
-    base = IV2SLS(y, exog, endog, z, weights=w).fit(**options).first_stage
-    scaled = IV2SLS(y, exog, endog, z, weights=37.5 * w).fit(**options).first_stage
-    ones = IV2SLS(y, exog, endog, z, weights=np.ones(y.shape[0])).fit(**options)
-    plain = IV2SLS(y, exog, endog, z).fit(**options)
+    base = (
+        IV2SLS(y, exog, endog, z, weights=w, method="pinv").fit(**options).first_stage
+    )
+    scaled = (
+        IV2SLS(y, exog, endog, z, weights=37.5 * w, method="pinv")
+        .fit(**options)
+        .first_stage
+    )
+    ones = IV2SLS(y, exog, endog, z, weights=np.ones(y.shape[0]), method="pinv").fit(
+        **options
+    )
+    plain = IV2SLS(y, exog, endog, z, method="pinv").fit(**options)
     for name in ("kleibergen_paap_f", "cragg_donald_f"):
         assert_allclose(getattr(scaled, name), getattr(base, name), rtol=1e-10)
         assert_allclose(
@@ -426,20 +445,26 @@ def test_the_constant_of_a_weighted_model_is_the_root_of_the_weights():
     # The functions use the weighted arrays, including the constant
     y, exog, endog, z, w = simulate(3, weighted=True)
     first_stage = (
-        IV2SLS(y, exog, endog, z, weights=w).fit(cov_type="robust").first_stage
+        IV2SLS(y, exog, endog, z, weights=w, method="pinv")
+        .fit(cov_type="robust")
+        .first_stage
     )
     root = np.sqrt(w / w.mean())[:, None]
-    stat = kleibergen_paap(root * endog, root * z, root * exog, "robust").stat
+    stat = kleibergen_paap(
+        root * endog, root * z, root * exog, "robust", method="pinv"
+    ).stat
     assert_allclose(stat, first_stage.kleibergen_paap.stat, rtol=1e-10)
     assert_allclose(
-        cragg_donald_f(root * endog, root * z, root * exog),
+        cragg_donald_f(root * endog, root * z, root * exog, method="pinv"),
         first_stage.cragg_donald_f,
         rtol=1e-10,
     )
     # A column of ones is not the constant of the weighted model
     unit_constant = exog.copy()
     unit_constant[:, 0] = 1.0
-    wrong = kleibergen_paap(root * endog, root * z, unit_constant, "robust").stat
+    wrong = kleibergen_paap(
+        root * endog, root * z, unit_constant, "robust", method="pinv"
+    ).stat
     assert not np.isclose(wrong, first_stage.kleibergen_paap.stat, rtol=1e-3)
 
 
@@ -453,8 +478,12 @@ def test_first_stage_rank_tests_do_not_depend_on_the_estimator(
     options = {}
     if cov_type == "clustered":
         options["clusters"] = np.arange(y.shape[0]) // 10
-    reference = IV2SLS(y, exog, endog, z, weights=w).fit(cov_type=cov_type, **options)
-    res = estimator(y, exog, endog, z, weights=w).fit(cov_type=cov_type, **options)
+    reference = IV2SLS(y, exog, endog, z, weights=w, method="pinv").fit(
+        cov_type=cov_type, **options
+    )
+    res = estimator(y, exog, endog, z, weights=w, **method_kwargs(estimator)).fit(
+        cov_type=cov_type, **options
+    )
     expected, actual = reference.first_stage, res.first_stage
     assert_allclose(actual.kleibergen_paap.stat, expected.kleibergen_paap.stat)
     assert_allclose(actual.kleibergen_paap_f, expected.kleibergen_paap_f)
@@ -476,16 +505,18 @@ def test_number_of_clusters_needed(ninstr, nendog):
 
     with warnings.catch_warnings():
         warnings.filterwarnings("error", message=".*rank deficient.*")
-        lm = kleibergen_paap(x, z, exog, "clustered", config(df))
-        wald = kleibergen_paap_f(x, z, exog, "clustered", config(df + 1))
+        lm = kleibergen_paap(x, z, exog, "clustered", config(df), method="pinv")
+        wald = kleibergen_paap_f(x, z, exog, "clustered", config(df + 1), method="pinv")
     assert lm.df == df
     assert np.isfinite(lm.stat)
     assert np.isfinite(wald)
     with pytest.warns(UserWarning, match="rank deficient"):
-        short = kleibergen_paap_f(x, z, exog, "clustered", config(df))
+        short = kleibergen_paap_f(x, z, exog, "clustered", config(df), method="pinv")
     assert np.isfinite(short)
     with pytest.warns(UserWarning, match="rank deficient"):
-        lm_short = kleibergen_paap(x, z, exog, "clustered", config(df - 1))
+        lm_short = kleibergen_paap(
+            x, z, exog, "clustered", config(df - 1), method="pinv"
+        )
     assert lm_short.df == df - 1
 
 
@@ -496,7 +527,7 @@ def test_number_of_clusters_needed_through_the_model():
 
     def first_stage(nclusters):
         clusters = np.arange(y.shape[0]) % nclusters
-        mod = IV2SLS(y, exog, endog, z, weights=w)
+        mod = IV2SLS(y, exog, endog, z, weights=w, method="pinv")
         return mod.fit(cov_type="clustered", clusters=clusters).first_stage
 
     with warnings.catch_warnings():
@@ -511,7 +542,7 @@ def test_number_of_clusters_needed_through_the_model():
 
 def test_cragg_donald_ignores_the_covariance_estimator_and_clusters():
     y, exog, endog, z, w = simulate(15, weighted=True)
-    mod = IV2SLS(y, exog, endog, z, weights=w)
+    mod = IV2SLS(y, exog, endog, z, weights=w, method="pinv")
     clusters = np.arange(y.shape[0]) // 10
     fits = [
         mod.fit(cov_type="unadjusted"),

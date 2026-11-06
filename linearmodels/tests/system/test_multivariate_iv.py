@@ -48,7 +48,9 @@ def test_endog_and_instruments_without_exog(data, kind):
     # in each equation
     dep = np.asarray(dependent)
     for i, label in enumerate(res.equation_labels):
-        expected = IV2SLS(dep[:, i], None, np.asarray(endog), np.asarray(instruments))
+        expected = IV2SLS(
+            dep[:, i], None, np.asarray(endog), np.asarray(instruments), method="pinv"
+        )
         assert_allclose(
             res.equations[label].params, expected.fit().params, rtol=1e-8, atol=1e-10
         )

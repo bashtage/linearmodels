@@ -180,7 +180,7 @@ def test_c_stat_unadjusted_weight_is_durbin(exog, endog, instr, tested):
     data = SIMULATED
     args = (data.y_robust, data[exog], data[endog], data[instr])
     c_stat = IVGMM(*args, weight_type="unadjusted").fit().c_stat(tested)
-    durbin = IV2SLS(*args).fit().durbin(tested)
+    durbin = IV2SLS(*args, method="pinv").fit().durbin(tested)
     assert_allclose(c_stat.stat, durbin.stat, rtol=1e-9)
     assert c_stat.df == durbin.df
 

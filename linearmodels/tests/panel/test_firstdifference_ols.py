@@ -63,7 +63,7 @@ def test_firstdifference_ols(data):
     dy = dy.loc[~drop]
     dx = dx.loc[~drop]
 
-    ols_mod = IV2SLS(dy, dx, None, None)
+    ols_mod = IV2SLS(dy, dx, None, None, method="pinv")
     ols_res = ols_mod.fit(cov_type="unadjusted")
     assert_results_equal(res, ols_res)
 
@@ -143,7 +143,7 @@ def test_firstdifference_ols_weighted(data):
     dx = dx.loc[~drop]
     sw = sw.loc[~drop]
 
-    ols_mod = IV2SLS(dy, dx, None, None, weights=sw)
+    ols_mod = IV2SLS(dy, dx, None, None, weights=sw, method="pinv")
     ols_res = ols_mod.fit(cov_type="unadjusted")
     assert_results_equal(res, ols_res)
 

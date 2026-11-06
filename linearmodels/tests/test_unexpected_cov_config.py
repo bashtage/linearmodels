@@ -27,6 +27,7 @@ from linearmodels.panel import (
 import linearmodels.panel.model as panel_module
 from linearmodels.shared.exceptions import UnknownOptionError
 from linearmodels.system import IV3SLS, SUR, IVSystemGMM
+from linearmodels.tests._utility import method_kwargs
 
 NOBS = 60
 UNEXPECTED = (
@@ -58,8 +59,8 @@ def data():
 
 
 MODELS = {
-    "IV2SLS": lambda d: IV2SLS(*d["iv"]),
-    "IVLIML": lambda d: IVLIML(*d["iv"]),
+    "IV2SLS": lambda d: IV2SLS(*d["iv"], method="pinv"),
+    "IVLIML": lambda d: IVLIML(*d["iv"], method="pinv"),
     "IVGMM": lambda d: IVGMM(*d["iv"]),
     "IVGMMCUE": lambda d: IVGMMCUE(*d["iv"]),
     "IVJIVE": lambda d: IVJIVE(*d["iv"]),
@@ -84,7 +85,7 @@ def test_unexpected_keyword(data, name, cov_type):
 
 
 def test_message_of_unexpected_keywords(data):
-    model = IV2SLS(*data["iv"])
+    model = IV2SLS(*data["iv"], method="pinv")
     expected = (
         "The keyword argument 'bogus' is not accepted with cov_type='robust'. "
         "The accepted keyword arguments are: center, extra_df, kappa."
@@ -99,7 +100,7 @@ def test_message_of_unexpected_keywords(data):
 
 def test_accepted_keywords_depend_on_cov_type(data):
     # The keywords that a covariance estimator accepts depend on its type
-    model = IV2SLS(*data["iv"])
+    model = IV2SLS(*data["iv"], method="pinv")
     match = r"cov_type='robust'\. The accepted keyword arguments are: center, extra_df"
     with pytest.raises(ValueError, match=match):
         model.fit(cov_type="robust", clusters=np.arange(NOBS))
@@ -108,7 +109,7 @@ def test_accepted_keywords_depend_on_cov_type(data):
 
 @pytest.mark.parametrize("cls", [PooledOLS, PanelOLS, BetweenOLS, RandomEffects])
 def test_panel_unexpected_keyword(data, cls):
-    model = cls(*data["panel"])
+    model = cls(*data["panel"], **method_kwargs(cls))
     with pytest.raises(ValueError, match=UNEXPECTED.format("robust")):
         model.fit(cov_type="robust", bogus=1)
 
@@ -123,7 +124,7 @@ def test_unknown_kernel_of_fit_is_reported_before_estimation(data, monkeypatch):
     def estimated(*args, **kwargs):
         raise AssertionError("The model was estimated")
 
-    iv_model = IV2SLS(*data["iv"])
+    iv_model = IV2SLS(*data["iv"], method="pinv")
     pooled = PooledOLS(*data["panel"])
     fama_macbeth = FamaMacBeth(*data["panel"])
     monkeypatch.setattr(iv_model, "estimate_parameters", estimated)
@@ -139,7 +140,7 @@ def test_unknown_kernel_of_fit_is_reported_before_estimation(data, monkeypatch):
 @pytest.mark.parametrize("cls", [IVGMM, IVGMMCUE])
 def test_unknown_weight_kernel_of_iv_gmm(data, cls):
     with pytest.raises(UnknownOptionError, match=r"Unknown kernel: 'bogus'"):
-        cls(*data["iv"], weight_type="kernel", kernel="bogus")
+        cls(*data["iv"], weight_type="kernel", kernel="bogus", **method_kwargs(cls))
 
 
 def test_unknown_weight_kernel_of_system_gmm(data):
@@ -150,7 +151,7 @@ def test_unknown_weight_kernel_of_system_gmm(data):
 @pytest.mark.parametrize("cov_type", ["robust", "unadjusted"])
 @pytest.mark.parametrize("cls", [IV2SLS, IVLIML])
 def test_extra_df_is_accepted_by_the_iv_models(data, cls, cov_type):
-    model = cls(*data["iv"])
+    model = cls(*data["iv"], **method_kwargs(cls))
     base = model.fit(cov_type=cov_type, debiased=True)
     extra = model.fit(cov_type=cov_type, debiased=True, extra_df=2)
     nobs, nvar = NOBS, 1
@@ -182,4 +183,4 @@ def test_panel_ols_sets_extra_df_from_its_effects(data, cov_type):
 
 def test_unknown_kernel_is_shown_in_lower_case(data):
     with pytest.raises(UnknownOptionError, match=r"Unknown kernel: 'bogus'"):
-        IV2SLS(*data["iv"]).fit(cov_type="kernel", kernel="Bogus")
+        IV2SLS(*data["iv"], method="pinv").fit(cov_type="kernel", kernel="Bogus")

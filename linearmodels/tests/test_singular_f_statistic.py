@@ -48,7 +48,7 @@ def iv_data():
 
 IV_MODELS = {
     "OLS": lambda y, d: _OLS(y, d[0]),
-    "IV2SLS": lambda y, d: IV2SLS(y, d[0], d[1], d[2]),
+    "IV2SLS": lambda y, d: IV2SLS(y, d[0], d[1], d[2], method="pinv"),
     "IVJIVE": lambda y, d: IVJIVE(y, d[0], d[1], d[2]),
     "AbsorbingLS": lambda y, d: AbsorbingLS(y, d[0], absorb=d[3]),
     "AbsorbingLS without a constant": lambda y, d: AbsorbingLS(

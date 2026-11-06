@@ -16,6 +16,7 @@ from linearmodels.iv.covariance import (
 )
 from linearmodels.shared.covariance import cov_kernel
 from linearmodels.shared.utility import AttrDict
+from linearmodels.tests._utility import method_kwargs
 from linearmodels.tests.iv._utility import generate_data
 
 
@@ -87,7 +88,7 @@ def test_kernel_qs():
 
 
 def test_homoskedastic_cov_asymptotic(data):
-    c = HomoskedasticCovariance(data.x, data.y, data.z, data.params)
+    c = HomoskedasticCovariance(data.x, data.y, data.z, data.params, method="pinv")
     nobs = data.nobs
     xhat = data.xhat
     s2 = data.s2
@@ -100,7 +101,9 @@ def test_homoskedastic_cov_asymptotic(data):
 
 
 def test_homoskedastic_cov_debiased(data):
-    c = HomoskedasticCovariance(data.x, data.y, data.z, data.params, debiased=True)
+    c = HomoskedasticCovariance(
+        data.x, data.y, data.z, data.params, debiased=True, method="pinv"
+    )
     assert c.debiased is True
     assert c.config == {"debiased": True, "kappa": 1}
     assert_allclose(c.s2, data.s2_debiased)
@@ -113,7 +116,9 @@ def test_homoskedastic_cov_debiased(data):
 
 
 def test_homoskedastic_cov_kappa(data):
-    c = HomoskedasticCovariance(data.x, data.y, data.z, data.params, kappa=data.kappa)
+    c = HomoskedasticCovariance(
+        data.x, data.y, data.z, data.params, kappa=data.kappa, method="pinv"
+    )
     assert c.debiased is False
     assert c.config == {"debiased": False, "kappa": 0.99}
     assert_allclose(c.s, data.s2 * data.vk)
@@ -125,7 +130,13 @@ def test_homoskedastic_cov_kappa(data):
 
 def test_homoskedastic_cov_kappa_debiased(data):
     c = HomoskedasticCovariance(
-        data.x, data.y, data.z, data.params, debiased=True, kappa=data.kappa
+        data.x,
+        data.y,
+        data.z,
+        data.params,
+        debiased=True,
+        kappa=data.kappa,
+        method="pinv",
     )
     assert c.debiased is True
     assert c.config == {"debiased": True, "kappa": data.kappa}
@@ -137,13 +148,13 @@ def test_homoskedastic_cov_kappa_debiased(data):
 
 def test_homoskedastic_cov_errors(data):
     with pytest.raises(ValueError, match=r"x, y and z must have"):
-        HomoskedasticCovariance(data.x[:10], data.y, data.z, data.params)
+        HomoskedasticCovariance(data.x[:10], data.y, data.z, data.params, method="pinv")
     with pytest.raises(ValueError, match=r"x and params must have compatible"):
-        HomoskedasticCovariance(data.x, data.y, data.z, data.params[1:])
+        HomoskedasticCovariance(data.x, data.y, data.z, data.params[1:], method="pinv")
 
 
 def test_heteroskedastic_cov_asymptotic(data):
-    c = HeteroskedasticCovariance(data.x, data.y, data.z, data.params)
+    c = HeteroskedasticCovariance(data.x, data.y, data.z, data.params, method="pinv")
     assert c.debiased is False
     assert c.config == {"debiased": False, "kappa": 1}
     assert_allclose(c.s2, data.s2)
@@ -152,7 +163,9 @@ def test_heteroskedastic_cov_asymptotic(data):
 
 
 def test_heteroskedastic_cov_debiased(data):
-    c = HeteroskedasticCovariance(data.x, data.y, data.z, data.params, debiased=True)
+    c = HeteroskedasticCovariance(
+        data.x, data.y, data.z, data.params, debiased=True, method="pinv"
+    )
     xhat, eps, nobs, nvar = data.xhat, data.e, data.nobs, data.nvar
     assert c.debiased is True
     assert c.config == {"debiased": True, "kappa": 1}
@@ -163,11 +176,13 @@ def test_heteroskedastic_cov_debiased(data):
 
 def test_heteroskedastic_cov_kappa_debiased(data):
     c = HeteroskedasticCovariance(
-        data.x, data.y, data.z, data.params, debiased=True, kappa=0.99
+        data.x, data.y, data.z, data.params, debiased=True, kappa=0.99, method="pinv"
     )
     assert c.debiased is True
     assert c.config == {"debiased": True, "kappa": 0.99}
-    c2 = HeteroskedasticCovariance(data.x, data.y, data.z, data.params, debiased=True)
+    c2 = HeteroskedasticCovariance(
+        data.x, data.y, data.z, data.params, debiased=True, method="pinv"
+    )
     assert_allclose(c.s, c2.s)
     assert_allclose(c.s2, c2.s2, rtol=1e-12)
     vk_inv = inv(data.vk)
@@ -176,11 +191,11 @@ def test_heteroskedastic_cov_kappa_debiased(data):
 
 def test_heteroskedastic_cov_kappa(data):
     c = HeteroskedasticCovariance(
-        data.x, data.y, data.z, data.params, debiased=False, kappa=0.99
+        data.x, data.y, data.z, data.params, debiased=False, kappa=0.99, method="pinv"
     )
     assert c.debiased is False
     assert c.config == {"debiased": False, "kappa": 0.99}
-    c2 = HeteroskedasticCovariance(data.x, data.y, data.z, data.params)
+    c2 = HeteroskedasticCovariance(data.x, data.y, data.z, data.params, method="pinv")
     assert_allclose(c.s, c2.s)
     assert_allclose(c.s2, c2.s2, rtol=1e-12)
     vk_inv = inv(data.vk)
@@ -188,7 +203,9 @@ def test_heteroskedastic_cov_kappa(data):
 
 
 def test_clustered_cov_asymptotic(data):
-    c = ClusteredCovariance(data.x, data.y, data.z, data.params, clusters=data.clusters)
+    c = ClusteredCovariance(
+        data.x, data.y, data.z, data.params, clusters=data.clusters, method="pinv"
+    )
     assert c._kappa == 1
     assert c.debiased is False
     assert c.config["debiased"] is False
@@ -211,7 +228,13 @@ def test_clustered_cov_asymptotic(data):
 
 def test_clustered_cov_debiased(data):
     c = ClusteredCovariance(
-        data.x, data.y, data.z, data.params, debiased=True, clusters=data.clusters
+        data.x,
+        data.y,
+        data.z,
+        data.params,
+        debiased=True,
+        clusters=data.clusters,
+        method="pinv",
     )
     assert c.debiased is True
     assert c.config["debiased"] is True
@@ -245,17 +268,26 @@ def test_clustered_cov_debiased(data):
 def test_clustered_cov_errors(data):
     with pytest.raises(ValueError, match=r"clusters has the wrong nobs"):
         ClusteredCovariance(
-            data.x, data.y, data.z, data.params, clusters=data.clusters[:10]
+            data.x,
+            data.y,
+            data.z,
+            data.params,
+            clusters=data.clusters[:10],
+            method="pinv",
         )
 
 
 def test_kernel_covariance_asymptotic(data, kernel):
-    c = KernelCovariance(data.x, data.y, data.z, data.params, kernel=kernel.kernel)
+    c = KernelCovariance(
+        data.x, data.y, data.z, data.params, kernel=kernel.kernel, method="pinv"
+    )
     cs = str(c)
     assert "\nBandwidth" not in cs
 
     for name in kernel.alt_names:
-        c2 = KernelCovariance(data.x, data.y, data.z, data.params, kernel=name)
+        c2 = KernelCovariance(
+            data.x, data.y, data.z, data.params, kernel=name, method="pinv"
+        )
         assert_allclose(c.cov, c2.cov, rtol=1e-12)
 
     assert c.debiased is False
@@ -280,11 +312,23 @@ def test_kernel_covariance_asymptotic(data, kernel):
 
 def test_kernel_covariance_debiased(data, kernel):
     c = KernelCovariance(
-        data.x, data.y, data.z, data.params, kernel=kernel.kernel, debiased=True
+        data.x,
+        data.y,
+        data.z,
+        data.params,
+        kernel=kernel.kernel,
+        debiased=True,
+        method="pinv",
     )
     for name in kernel.alt_names:
         c2 = KernelCovariance(
-            data.x, data.y, data.z, data.params, kernel=name, debiased=True
+            data.x,
+            data.y,
+            data.z,
+            data.params,
+            kernel=name,
+            debiased=True,
+            method="pinv",
         )
         assert_allclose(c.cov, c2.cov, rtol=1e-12)
 
@@ -295,7 +339,13 @@ def test_kernel_covariance_debiased(data, kernel):
     assert_allclose(c.s2, data.s2_debiased)
 
     c2 = KernelCovariance(
-        data.x, data.y, data.z, data.params, kernel=kernel.kernel, debiased=False
+        data.x,
+        data.y,
+        data.z,
+        data.params,
+        kernel=kernel.kernel,
+        debiased=False,
+        method="pinv",
     )
     scale = data.nobs / (data.nobs - data.nvar)
     assert_allclose(c.s, scale * c2.s)
@@ -310,7 +360,12 @@ def test_kernel_covariance_debiased(data, kernel):
 def test_kernel_covariance_unknown_kernel(data, kernel):
     with pytest.raises(ValueError, match=r"Unknown kernel"):
         KernelCovariance(
-            data.x, data.y, data.z, data.params, kernel=kernel.kernel + "_unknown"
+            data.x,
+            data.y,
+            data.z,
+            data.params,
+            kernel=kernel.kernel + "_unknown",
+            method="pinv",
         )
 
 
@@ -334,15 +389,34 @@ def test_auto_bandwidth_unknown_kernel(data, kernel):
 )
 def test_extra_df(data, cls):
     options = {"bandwidth": 2} if cls is KernelCovariance else {}
-    c = cls(data.x, data.y, data.z, data.params, debiased=True, **options)
-    c2 = cls(data.x, data.y, data.z, data.params, debiased=True, extra_df=7, **options)
+    c = cls(
+        data.x,
+        data.y,
+        data.z,
+        data.params,
+        debiased=True,
+        **options,
+        **method_kwargs(cls),
+    )
+    c2 = cls(
+        data.x,
+        data.y,
+        data.z,
+        data.params,
+        debiased=True,
+        extra_df=7,
+        **options,
+        **method_kwargs(cls),
+    )
     scale = (data.nobs - data.nvar) / (data.nobs - data.nvar - 7)
     assert_allclose(c2.s, scale * c.s)
     assert_allclose(c2.cov, scale * c.cov)
     assert_allclose(c2.s2, scale * c.s2)
     # The degrees of freedom are only used if the covariance is debiased
-    plain = cls(data.x, data.y, data.z, data.params, **options)
-    c3 = cls(data.x, data.y, data.z, data.params, extra_df=7, **options)
+    plain = cls(data.x, data.y, data.z, data.params, **options, **method_kwargs(cls))
+    c3 = cls(
+        data.x, data.y, data.z, data.params, extra_df=7, **options, **method_kwargs(cls)
+    )
     assert_allclose(c3.cov, plain.cov)
     with pytest.raises(ValueError, match=r"needs more observations"):
         cls(
@@ -353,19 +427,32 @@ def test_extra_df(data, cls):
             debiased=True,
             extra_df=data.nobs - data.nvar,
             **options,
+            **method_kwargs(cls),
         )
 
 
 def test_clustered_extra_df(data):
     clusters = np.arange(data.nobs) % 11
     kwargs = {"clusters": clusters, "debiased": True}
-    c = ClusteredCovariance(data.x, data.y, data.z, data.params, **kwargs)
-    c2 = ClusteredCovariance(data.x, data.y, data.z, data.params, extra_df=7, **kwargs)
+    c = ClusteredCovariance(
+        data.x, data.y, data.z, data.params, **kwargs, method="pinv"
+    )
+    c2 = ClusteredCovariance(
+        data.x, data.y, data.z, data.params, extra_df=7, **kwargs, method="pinv"
+    )
     scale = (data.nobs - data.nvar) / (data.nobs - data.nvar - 7)
     assert_allclose(c2.s, scale * c.s)
     assert_allclose(c2.cov, scale * c.cov)
-    plain = ClusteredCovariance(data.x, data.y, data.z, data.params, clusters=clusters)
+    plain = ClusteredCovariance(
+        data.x, data.y, data.z, data.params, clusters=clusters, method="pinv"
+    )
     c3 = ClusteredCovariance(
-        data.x, data.y, data.z, data.params, clusters=clusters, extra_df=7
+        data.x,
+        data.y,
+        data.z,
+        data.params,
+        clusters=clusters,
+        extra_df=7,
+        method="pinv",
     )
     assert_allclose(c3.cov, plain.cov)

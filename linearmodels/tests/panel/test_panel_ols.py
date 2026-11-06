@@ -137,7 +137,7 @@ def test_const_data_only(const_data):
         mod = PanelOLS(y, x)
     res = mod.fit(debiased=False)
     with warns_if_missing(y, x, None, None):
-        res2 = IV2SLS(y, x, None, None).fit()
+        res2 = IV2SLS(y, x, None, None, method="pinv").fit()
     assert_allclose(res.params, res2.params)
 
 
@@ -147,7 +147,7 @@ def test_const_data_only_weights(const_data):
         mod = PanelOLS(y, x, weights=const_data.w)
     res = mod.fit(debiased=False)
     with warns_if_missing(y, x, None, None):
-        res2 = IV2SLS(y, x, None, None, weights=const_data.w).fit()
+        res2 = IV2SLS(y, x, None, None, weights=const_data.w, method="pinv").fit()
     assert_allclose(res.params, res2.params)
 
 
@@ -164,7 +164,7 @@ def test_const_data_entity(const_data):
     xd = np.c_[x.values, d.values]
     xd = pd.DataFrame(xd, index=x.index, columns=list(x.columns) + list(d.columns))
 
-    res2 = IV2SLS(mod.dependent.dataframe, xd, None, None).fit()
+    res2 = IV2SLS(mod.dependent.dataframe, xd, None, None, method="pinv").fit()
     assert_allclose(res.params, res2.params.iloc[:1])
 
 
@@ -181,7 +181,7 @@ def test_const_data_time(const_data):
     xd = np.c_[x.values, d.values]
     xd = pd.DataFrame(xd, index=x.index, columns=list(x.columns) + list(d.columns))
 
-    res2 = IV2SLS(mod.dependent.dataframe, xd, None, None).fit()
+    res2 = IV2SLS(mod.dependent.dataframe, xd, None, None, method="pinv").fit()
     assert_allclose(res.params, res2.params.iloc[:1])
 
 
@@ -210,7 +210,7 @@ def test_const_data_single_effect_weights(const_data, entity):
     xd = np.c_[x.values, d.values]
     xd = pd.DataFrame(xd, index=x.index, columns=list(x.columns) + d_columns)
 
-    res2 = IV2SLS(y, xd, None, None, weights=w).fit()
+    res2 = IV2SLS(y, xd, None, None, weights=w, method="pinv").fit()
     assert_allclose(res.params, res2.params.iloc[:1])
 
 
@@ -232,7 +232,7 @@ def test_const_data_both(const_data):
     xd = np.c_[x.values, d.values]
     xd = pd.DataFrame(xd, index=x.index, columns=list(x.columns) + list(d.columns))
 
-    res2 = IV2SLS(mod.dependent.dataframe, xd, None, None).fit()
+    res2 = IV2SLS(mod.dependent.dataframe, xd, None, None, method="pinv").fit()
     assert_allclose(res.params, res2.params.iloc[:1])
 
 
@@ -262,7 +262,9 @@ def test_const_data_both_weights(const_data):
     xd = np.c_[x.values, d.values]
     xd = pd.DataFrame(xd, index=x.index, columns=list(x.columns) + list(d.columns))
 
-    res2 = IV2SLS(mod.dependent.dataframe, xd, None, None, weights=w).fit()
+    res2 = IV2SLS(
+        mod.dependent.dataframe, xd, None, None, weights=w, method="pinv"
+    ).fit()
     assert_allclose(res.params, res2.params.iloc[:1])
 
 
@@ -304,7 +306,7 @@ def test_panel_entity_lsdv(data):
         xd, index=x.index, columns=list(x.columns) + [f"fe_{col}" for col in d.columns]
     )
 
-    ols_mod = IV2SLS(y, xd, None, None)
+    ols_mod = IV2SLS(y, xd, None, None, method="pinv")
     res2 = ols_mod.fit(cov_type="unadjusted", debiased=False)
     assert_results_equal(res, res2, test_fit=False)
     assert_allclose(res.rsquared_inclusive, res2.rsquared)
@@ -382,7 +384,7 @@ def test_panel_entity_fwl(data):
     x = x - d_demean @ lstsq(d_demean, x, rcond=None)[0]
     y = y - d_demean @ lstsq(d_demean, y, rcond=None)[0]
 
-    ols_mod = IV2SLS(y, x, None, None)
+    ols_mod = IV2SLS(y, x, None, None, method="pinv")
     res2 = ols_mod.fit(cov_type="unadjusted")
     assert_results_equal(res, res2, test_df=False)
 
@@ -410,7 +412,7 @@ def test_panel_time_lsdv(large_data):
         xd, index=x.index, columns=list(x.columns) + [f"fe_{col}" for col in d_cols]
     )
 
-    ols_mod = IV2SLS(y, xd, None, None)
+    ols_mod = IV2SLS(y, xd, None, None, method="pinv")
     res2 = ols_mod.fit(cov_type="unadjusted")
     assert_results_equal(res, res2, test_fit=False)
     assert_allclose(res.rsquared_inclusive, res2.rsquared)
@@ -486,7 +488,7 @@ def test_panel_time_fwl(data):
     x = x - d @ lstsq(d, x, rcond=None)[0]
     y = y - d @ lstsq(d, y, rcond=None)[0]
 
-    ols_mod = IV2SLS(y, x, None, None)
+    ols_mod = IV2SLS(y, x, None, None, method="pinv")
     res2 = ols_mod.fit(cov_type="unadjusted")
     assert_results_equal(res, res2, test_df=False)
 
@@ -519,7 +521,7 @@ def test_panel_both_lsdv(data):
         + [f"te_{col}" for col in d2.columns],
     )
 
-    ols_mod = IV2SLS(y, xd, None, None)
+    ols_mod = IV2SLS(y, xd, None, None, method="pinv")
     res2 = ols_mod.fit(cov_type="unadjusted")
     assert_results_equal(res, res2, test_fit=False)
     assert_allclose(res.rsquared_inclusive, res2.rsquared)
@@ -597,7 +599,7 @@ def test_panel_both_fwl(data):
     x = x - d @ lstsq(d, x, rcond=None)[0]
     y = y - d @ lstsq(d, y, rcond=None)[0]
 
-    ols_mod = IV2SLS(y, x, None, None)
+    ols_mod = IV2SLS(y, x, None, None, method="pinv")
     res2 = ols_mod.fit(cov_type="unadjusted")
     assert_results_equal(res, res2, test_df=False)
 
@@ -629,7 +631,7 @@ def test_panel_entity_lsdv_weighted(data):
         xd, index=x.index, columns=list(x.columns) + [f"fe_{col}" for col in d_cols]
     )
 
-    ols_mod = IV2SLS(y, xd, None, None, weights=w)
+    ols_mod = IV2SLS(y, xd, None, None, weights=w, method="pinv")
     res2 = ols_mod.fit(cov_type="unadjusted")
     assert_results_equal(res, res2, test_fit=False)
     assert_allclose(res.rsquared_inclusive, res2.rsquared)
@@ -714,7 +716,7 @@ def test_panel_time_lsdv_weighted(large_data):
         xd, index=x.index, columns=list(x.columns) + [f"te_{col}" for col in d_cols]
     )
 
-    ols_mod = IV2SLS(y, xd, None, None, weights=w)
+    ols_mod = IV2SLS(y, xd, None, None, weights=w, method="pinv")
     res2 = ols_mod.fit(cov_type="unadjusted")
     assert_results_equal(res, res2, test_fit=False)
 
@@ -803,7 +805,7 @@ def test_panel_both_lsdv_weighted(data):
         + [f"te_{col}" for col in d2.columns],
     )
 
-    ols_mod = IV2SLS(y, xd, None, None, weights=w)
+    ols_mod = IV2SLS(y, xd, None, None, weights=w, method="pinv")
     res2 = ols_mod.fit(cov_type="unadjusted")
     assert_results_equal(res, res2, test_fit=False)
     assert_allclose(res.rsquared_inclusive, res2.rsquared)
@@ -936,7 +938,7 @@ def test_panel_other_lsdv(data):
     xd = np.c_[x.values, d]
     xd = pd.DataFrame(xd, index=x.index, columns=list(x.columns) + list(d_columns))
 
-    ols_mod = IV2SLS(y, xd, None, None)
+    ols_mod = IV2SLS(y, xd, None, None, method="pinv")
     res2 = ols_mod.fit(cov_type="unadjusted")
     assert_results_equal(res, res2, test_fit=False)
 
@@ -1027,7 +1029,7 @@ def test_panel_other_fwl(data):
     x = x - d @ lstsq(d, x, rcond=None)[0]
     y = y - d @ lstsq(d, y, rcond=None)[0]
 
-    ols_mod = IV2SLS(y, x, None, None)
+    ols_mod = IV2SLS(y, x, None, None, method="pinv")
     res2 = ols_mod.fit(cov_type="unadjusted")
     assert_results_equal(res, res2, test_df=False)
 
