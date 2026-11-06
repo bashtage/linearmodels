@@ -19,7 +19,7 @@
     
   
       
-        <title>linearmodels.iv.data - linearmodels v7.2 (+33)</title>
+        <title>linearmodels.iv.data - linearmodels v7.2 (+35)</title>
       
     
 
@@ -91,7 +91,7 @@
 
 <header class="md-header md-header--shadow" data-md-component="header">
   <nav class="md-header__inner md-grid" aria-label="Header">
-    <a href="../../../index.html" title="linearmodels v7.2 (+33)" class="md-header__button md-logo" aria-label="linearmodels v7.2 (+33)" data-md-component="logo">
+    <a href="../../../index.html" title="linearmodels v7.2 (+35)" class="md-header__button md-logo" aria-label="linearmodels v7.2 (+35)" data-md-component="logo">
       <img src="../../../_static/bw-logo.svg" alt="logo">
     </a>
     <label class="md-header__button md-icon" for="__drawer">
@@ -102,7 +102,7 @@
       <div class="md-header__ellipsis">
         <div class="md-header__topic">
           <span class="md-ellipsis">
-            linearmodels v7.2 (+33)
+            linearmodels v7.2 (+35)
           </span>
         </div>
         <div class="md-header__topic" data-md-component="header-topic">
@@ -197,10 +197,10 @@
 
 <nav class="md-nav md-nav--primary" aria-label="Navigation" data-md-level="0">
   <label class="md-nav__title" for="__drawer">
-    <a href="../../../index.html" title="linearmodels v7.2 (+33)" class="md-nav__button md-logo" aria-label="linearmodels v7.2 (+33)" data-md-component="logo">
+    <a href="../../../index.html" title="linearmodels v7.2 (+35)" class="md-nav__button md-logo" aria-label="linearmodels v7.2 (+35)" data-md-component="logo">
       <img src="../../../_static/bw-logo.svg" alt="logo">
     </a>
-    linearmodels v7.2 (+33)
+    linearmodels v7.2 (+35)
   </label>
   
     <div class="md-nav__source">
@@ -621,7 +621,14 @@
 <span class="sd">        then nobs is used to check the number of observations in `x`.</span>
 <span class="sd">    convert_dummies : bool, optional</span>
 <span class="sd">        Flag indicating whether pandas categoricals or string input data</span>
-<span class="sd">        should be converted to dummy variables. The default is True.</span>
+<span class="sd">        should be converted to dummy variables. The default is True. A</span>
+<span class="sd">        missing categorical value is a missing value of each of its dummy</span>
+<span class="sd">        variables, so that the observation is dropped as missing.</span>
+
+<span class="sd">        .. versionchanged:: 7.2</span>
+
+<span class="sd">           A missing categorical value was a row of zeros, which kept the</span>
+<span class="sd">           observation (in the first category when ``drop_first`` is True).</span>
 <span class="sd">    drop_first : bool, optional</span>
 <span class="sd">        Flag indicating to drop the first dummy category. The default is True.</span>
 
