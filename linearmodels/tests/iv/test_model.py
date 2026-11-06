@@ -14,7 +14,7 @@ import scipy.linalg
 from statsmodels.tools.tools import add_constant
 
 from linearmodels.datasets import card
-from linearmodels.iv import IV2SLS, IVGMM, IVGMMCUE, IVLIML
+from linearmodels.iv import IV2SLS, IVGMM, IVGMMCUE, IVJIVE, IVLIML
 from linearmodels.iv.model import _OLS
 from linearmodels.iv.results import compare
 from linearmodels.shared.exceptions import MissingValueWarning
@@ -511,24 +511,29 @@ def test_first_state_f(data):
         assert_allclose(diag.iloc[i].loc["f.stat"], stat.stat / nz)
 
 
-def test_weights_all_one_not_materialized(data):
+# The weighted copies are made in _IVModelBase, which every IV estimator uses
+UNIT_WEIGHT_MODELS = [IV2SLS, IVLIML, IVGMM, IVGMMCUE, IVJIVE]
+
+
+@pytest.mark.parametrize("model", UNIT_WEIGHT_MODELS)
+def test_weights_all_one_not_materialized(data, model):
     # GH 607: weighted copies of the data are not stored when all of the
     # weights are 1, which is the case when weights is None or constant
-    mod = IV2SLS(data.dep, data.exog, data.endog, data.instr)
+    mod = model(data.dep, data.exog, data.endog, data.instr)
     assert mod._wy is mod._y
     assert mod._wx is mod._x
     assert mod._wz is mod._z
 
     weights = np.full(data.nobs, 2.5)
-    mod = IV2SLS(data.dep, data.exog, data.endog, data.instr, weights=weights)
+    mod = model(data.dep, data.exog, data.endog, data.instr, weights=weights)
     assert mod._wy is mod._y
     assert mod._wx is mod._x
     assert mod._wz is mod._z
 
 
 def test_weights_nonconstant_materialized(data):
-    rs = np.random.RandomState(12345)
-    weights = 0.5 + rs.random_sample(data.nobs)
+    rng = np.random.default_rng(12345)
+    weights = 0.5 + rng.random(data.nobs)
     mod = IV2SLS(data.dep, data.exog, data.endog, data.instr, weights=weights)
     assert mod._wz is not mod._z
     root_w = np.sqrt(mod.weights.ndarray)
@@ -537,29 +542,31 @@ def test_weights_nonconstant_materialized(data):
     assert_allclose(mod._wz, mod._z * root_w)
 
 
-def test_weights_all_one_results_unchanged(data):
+@pytest.mark.parametrize("model", UNIT_WEIGHT_MODELS)
+def test_weights_all_one_results_unchanged(data, model):
     # Estimation with no weights or constant weights is identical to
     # explicitly weighting by the square root of the normalized weights
-    res = IV2SLS(data.dep, data.exog, data.endog, data.instr).fit()
+    res = model(data.dep, data.exog, data.endog, data.instr).fit()
     weights = np.full(data.nobs, 3.0)
-    res_const = IV2SLS(
+    res_const = model(
         data.dep, data.exog, data.endog, data.instr, weights=weights
     ).fit()
-    assert_allclose(res_const.params, res.params, rtol=0, atol=0)
-    assert_allclose(res_const.cov, res.cov, rtol=0, atol=0)
+    assert_allclose(res_const.params, res.params, rtol=1e-12)
+    assert_allclose(res_const.cov, res.cov, rtol=1e-12)
 
 
-def test_weights_float32_not_upcast_by_weighting():
+def test_weights_float32_inputs():
     # GH 607: float32 data with float32 weights produces the same estimates
     # as the float64 data, up to the precision of the float32 inputs, and
-    # constant float32 weights do not materialize weighted copies
-    rs = np.random.RandomState(12345)
+    # constant float32 weights do not materialize weighted copies. IVData
+    # stores the data as float64, so the arrays of the model are float64
+    rng = np.random.default_rng(12345)
     n = 500
-    dep = rs.standard_normal((n, 1))
-    exog = rs.standard_normal((n, 2))
-    endog = rs.standard_normal((n, 1))
-    instr = rs.standard_normal((n, 2))
-    weights = 0.5 + rs.random_sample(n)
+    dep = rng.standard_normal((n, 1))
+    exog = rng.standard_normal((n, 2))
+    endog = rng.standard_normal((n, 1))
+    instr = rng.standard_normal((n, 2))
+    weights = 0.5 + rng.random(n)
 
     res64 = IV2SLS(dep, exog, endog, instr, weights=weights).fit()
     res32 = IV2SLS(
@@ -579,18 +586,19 @@ def test_weights_float32_not_upcast_by_weighting():
         weights=np.ones(n, dtype=np.float32),
     )
     assert mod32._wz is mod32._z
+    assert mod32._z.dtype == np.float64
 
 
 def test_weights_float32_all_one_fit():
     # GH 607: float32 data with all-one float32 weights are fitted through
     # the unmaterialized path, and the estimates agree with the estimates
     # of the same data stored as float64
-    rs = np.random.RandomState(12345)
+    rng = np.random.default_rng(12345)
     n = 500
-    dep = rs.standard_normal((n, 1)).astype(np.float32)
-    exog = rs.standard_normal((n, 2)).astype(np.float32)
-    endog = rs.standard_normal((n, 1)).astype(np.float32)
-    instr = rs.standard_normal((n, 2)).astype(np.float32)
+    dep = rng.standard_normal((n, 1)).astype(np.float32)
+    exog = rng.standard_normal((n, 2)).astype(np.float32)
+    endog = rng.standard_normal((n, 1)).astype(np.float32)
+    instr = rng.standard_normal((n, 2)).astype(np.float32)
     weights = np.ones(n, dtype=np.float32)
 
     mod = IV2SLS(dep, exog, endog, instr, weights=weights)
@@ -612,12 +620,12 @@ def test_weights_integer_inputs_fit():
     # GH 607: integer data with constant integer weights are fitted through
     # the unmaterialized path, and the estimates are identical to the
     # estimates of the same data stored as float64
-    rs = np.random.RandomState(12345)
+    rng = np.random.default_rng(12345)
     n = 500
-    dep = np.round(10 * rs.standard_normal((n, 1))).astype(np.int64)
-    exog = np.round(10 * rs.standard_normal((n, 2))).astype(np.int64)
-    endog = np.round(10 * rs.standard_normal((n, 1))).astype(np.int64)
-    instr = np.round(10 * rs.standard_normal((n, 2))).astype(np.int64)
+    dep = np.round(10 * rng.standard_normal((n, 1))).astype(np.int64)
+    exog = np.round(10 * rng.standard_normal((n, 2))).astype(np.int64)
+    endog = np.round(10 * rng.standard_normal((n, 1))).astype(np.int64)
+    instr = np.round(10 * rng.standard_normal((n, 2))).astype(np.int64)
     weights = np.full(n, 2)
 
     mod = IV2SLS(dep, exog, endog, instr, weights=weights)
@@ -632,8 +640,8 @@ def test_weights_integer_inputs_fit():
         instr.astype(np.float64),
         weights=np.full(n, 2.0),
     ).fit()
-    assert_allclose(res.params, res64.params, rtol=0, atol=0)
-    assert_allclose(res.cov, res64.cov, rtol=0, atol=0)
+    assert_allclose(res.params, res64.params, rtol=1e-12)
+    assert_allclose(res.cov, res64.cov, rtol=1e-12)
 
 
 def test_weights_all_one_matches_materialized_reference(data):
@@ -688,23 +696,23 @@ def test_weights_nan_weight_drops_observation():
     # GH 607: a NaN weight is a missing value, so the observation is
     # dropped, as it was before the weighted copies were skipped, and the
     # remaining all-one weights use the unmaterialized path
-    rs = np.random.RandomState(12345)
+    rng = np.random.default_rng(12345)
     n = 200
-    dep = rs.standard_normal((n, 1))
-    exog = np.column_stack([np.ones(n), rs.standard_normal(n)])
-    endog = rs.standard_normal((n, 1))
-    instr = rs.standard_normal((n, 2))
+    dep = rng.standard_normal((n, 1))
+    exog = np.column_stack([np.ones(n), rng.standard_normal(n)])
+    endog = rng.standard_normal((n, 1))
+    instr = rng.standard_normal((n, 2))
     weights = np.ones(n)
     weights[3] = np.nan
 
-    with pytest.warns(MissingValueWarning):
+    with pytest.warns(MissingValueWarning, match="missing values"):
         mod = IV2SLS(dep, exog, endog, instr, weights=weights)
     res = mod.fit()
     keep = np.ones(n, dtype=bool)
     keep[3] = False
     res_ref = IV2SLS(dep[keep], exog[keep], endog[keep], instr[keep]).fit()
     assert res.nobs == n - 1
-    assert_allclose(res.params, res_ref.params, rtol=0, atol=0)
+    assert_allclose(res.params, res_ref.params, rtol=1e-12)
     assert mod._wy is mod._y
     assert mod._wx is mod._x
     assert mod._wz is mod._z
