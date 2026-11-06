@@ -24,6 +24,9 @@ jobs:
           # Intel macOS, which none of the jobs above covers
           - os: macos-15-intel
             python: cp314
+          # Windows on ARM64, which none of the jobs above covers
+          - os: windows-11-arm
+            python: cp314
     env:
       BUILD_COMMIT: "main"
       CIBW_ARCHS_LINUX: "x86_64"
