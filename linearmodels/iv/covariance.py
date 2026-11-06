@@ -30,11 +30,11 @@ from numpy.linalg import inv, pinv
 from scipy.linalg import qr as sp_qr, solve_triangular
 
 from linearmodels.iv._utility import (
-    METHODS,
     KClassFactors,
     coordinates,
     kclass_factors,
     orthonormal_basis,
+    resolve_method,
 )
 from linearmodels.shared.covariance import cluster_union, cov_cluster, cov_kernel
 from linearmodels.shared.exceptions import lower_option, unknown_option_error
@@ -474,13 +474,14 @@ class HomoskedasticCovariance:
         It is only used if ``debiased`` is True, when n / (n-k) becomes
         n / (n-k-extra_df).
     method : {"pinv", "qr"}, optional
-        The numerical method. The default is "pinv", which projects with
-        ``pinv(z)`` and inverts V. "qr" projects with the QR decomposition of z
-        and computes the inverse of V from triangular factors, without forming V,
-        so that the estimate does not depend on the units of the variables and its
-        rounding error grows with the condition number of the regressors, not with
-        its square. z must have full column rank with "qr". IV2SLS and IVLIML use
-        the numerical method of the model.
+        The numerical method. "pinv" projects with ``pinv(z)`` and inverts V. "qr"
+        projects with the QR decomposition of z and computes the inverse of V from
+        triangular factors, without forming V, so that the estimate does not depend on
+        the units of the variables and its rounding error grows with the condition
+        number of the regressors, not with its square. z must have full column rank with
+        "qr". IV2SLS and IVLIML use the numerical method of the model. If not provided,
+        "pinv" is used, and a ``FutureWarning`` says that the default will be "qr" in
+        linearmodels 8.0 if the caller is not part of linearmodels.
 
         .. versionadded:: 7.2
 
@@ -526,7 +527,7 @@ class HomoskedasticCovariance:
         kappa: linearmodels.typing.Numeric = 1,
         extra_df: int = 0,
         *,
-        method: str = "pinv",
+        method: str | None = None,
     ):
         if not (x.shape[0] == y.shape[0] == z.shape[0]):
             raise ValueError("x, y and z must have the same number of rows")
@@ -540,9 +541,7 @@ class HomoskedasticCovariance:
         self._debiased = debiased
         self.eps = y - x @ params
         self._kappa = kappa
-        if method not in METHODS:
-            raise ValueError(f'method must be "pinv" or "qr", but it is {method!r}.')
-        self._numerical_method = method
+        self._numerical_method = resolve_method(method, type(self).__name__)
         # Decompositions and products that are computed once, see _reuse
         self._pinvz: linearmodels.typing.data.Float64Array | None = None
         self._pinvz_x: linearmodels.typing.data.Float64Array | None = None
@@ -770,13 +769,14 @@ class HeteroskedasticCovariance(HomoskedasticCovariance):
         It is only used if ``debiased`` is True, when n / (n-k) becomes
         n / (n-k-extra_df).
     method : {"pinv", "qr"}, optional
-        The numerical method. The default is "pinv", which projects with
-        ``pinv(z)`` and inverts V. "qr" projects with the QR decomposition of z
-        and computes the inverse of V from triangular factors, without forming V,
-        so that the estimate does not depend on the units of the variables and its
-        rounding error grows with the condition number of the regressors, not with
-        its square. z must have full column rank with "qr". IV2SLS and IVLIML use
-        the numerical method of the model.
+        The numerical method. "pinv" projects with ``pinv(z)`` and inverts V. "qr"
+        projects with the QR decomposition of z and computes the inverse of V from
+        triangular factors, without forming V, so that the estimate does not depend on
+        the units of the variables and its rounding error grows with the condition
+        number of the regressors, not with its square. z must have full column rank with
+        "qr". IV2SLS and IVLIML use the numerical method of the model. If not provided,
+        "pinv" is used, and a ``FutureWarning`` says that the default will be "qr" in
+        linearmodels 8.0 if the caller is not part of linearmodels.
 
         .. versionadded:: 7.2
 
@@ -824,8 +824,9 @@ class HeteroskedasticCovariance(HomoskedasticCovariance):
         kappa: linearmodels.typing.Numeric = 1,
         extra_df: int = 0,
         *,
-        method: str = "pinv",
+        method: str | None = None,
     ):
+        method = resolve_method(method, type(self).__name__)
         super().__init__(x, y, z, params, debiased, kappa, extra_df, method=method)
         self._name = "Robust Covariance (Heteroskedastic)"
 
@@ -884,13 +885,14 @@ class KernelCovariance(HomoskedasticCovariance):
         It is only used if ``debiased`` is True, when n / (n-k) becomes
         n / (n-k-extra_df).
     method : {"pinv", "qr"}, optional
-        The numerical method. The default is "pinv", which projects with
-        ``pinv(z)`` and inverts V. "qr" projects with the QR decomposition of z
-        and computes the inverse of V from triangular factors, without forming V,
-        so that the estimate does not depend on the units of the variables and its
-        rounding error grows with the condition number of the regressors, not with
-        its square. z must have full column rank with "qr". IV2SLS and IVLIML use
-        the numerical method of the model.
+        The numerical method. "pinv" projects with ``pinv(z)`` and inverts V. "qr"
+        projects with the QR decomposition of z and computes the inverse of V from
+        triangular factors, without forming V, so that the estimate does not depend on
+        the units of the variables and its rounding error grows with the condition
+        number of the regressors, not with its square. z must have full column rank with
+        "qr". IV2SLS and IVLIML use the numerical method of the model. If not provided,
+        "pinv" is used, and a ``FutureWarning`` says that the default will be "qr" in
+        linearmodels 8.0 if the caller is not part of linearmodels.
 
         .. versionadded:: 7.2
 
@@ -969,8 +971,9 @@ class KernelCovariance(HomoskedasticCovariance):
         kappa: linearmodels.typing.Numeric = 1,
         extra_df: int = 0,
         *,
-        method: str = "pinv",
+        method: str | None = None,
     ):
+        method = resolve_method(method, type(self).__name__)
         super().__init__(x, y, z, params, debiased, kappa, extra_df, method=method)
         self._kernels = KERNEL_LOOKUP
         kernel = lower_option(kernel)
@@ -1072,13 +1075,14 @@ class ClusteredCovariance(HomoskedasticCovariance):
         It is only used if ``debiased`` is True, when n / (n-k) becomes
         n / (n-k-extra_df).
     method : {"pinv", "qr"}, optional
-        The numerical method. The default is "pinv", which projects with
-        ``pinv(z)`` and inverts V. "qr" projects with the QR decomposition of z
-        and computes the inverse of V from triangular factors, without forming V,
-        so that the estimate does not depend on the units of the variables and its
-        rounding error grows with the condition number of the regressors, not with
-        its square. z must have full column rank with "qr". IV2SLS and IVLIML use
-        the numerical method of the model.
+        The numerical method. "pinv" projects with ``pinv(z)`` and inverts V. "qr"
+        projects with the QR decomposition of z and computes the inverse of V from
+        triangular factors, without forming V, so that the estimate does not depend on
+        the units of the variables and its rounding error grows with the condition
+        number of the regressors, not with its square. z must have full column rank with
+        "qr". IV2SLS and IVLIML use the numerical method of the model. If not provided,
+        "pinv" is used, and a ``FutureWarning`` says that the default will be "qr" in
+        linearmodels 8.0 if the caller is not part of linearmodels.
 
         .. versionadded:: 7.2
 
@@ -1130,8 +1134,9 @@ class ClusteredCovariance(HomoskedasticCovariance):
         kappa: linearmodels.typing.Numeric = 1,
         extra_df: int = 0,
         *,
-        method: str = "pinv",
+        method: str | None = None,
     ):
+        method = resolve_method(method, type(self).__name__)
         super().__init__(x, y, z, params, debiased, kappa, extra_df, method=method)
 
         nobs = x.shape[0]

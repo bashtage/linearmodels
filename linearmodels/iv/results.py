@@ -31,7 +31,7 @@ from statsmodels.iolib.summary import SimpleTable, fmt_2cols, fmt_params
 from statsmodels.iolib.table import default_txt_fmt
 
 import linearmodels
-from linearmodels.iv._utility import annihilate, proj
+from linearmodels.iv._utility import annihilate, proj, resolve_method
 from linearmodels.iv.common import _kleibergen_paap, cragg_donald, cragg_donald_f
 from linearmodels.iv.data import IVData, IVDataLike
 from linearmodels.shared.base import _ModelComparison, _SummaryStr
@@ -828,7 +828,9 @@ class FirstStageResults(_SummaryStr):
         Options of the covariance estimator of the model.
     method : {"pinv", "qr"}, optional
         The numerical method of the model, which is used for the first stage
-        regressions. The default is "pinv".
+        regressions. If not provided, "pinv" is used, and a ``FutureWarning`` says
+        that the default will be "qr" in linearmodels 8.0 if the caller is not part
+        of linearmodels.
 
         .. versionadded:: 7.2
     """
@@ -843,10 +845,10 @@ class FirstStageResults(_SummaryStr):
         cov_type: str,
         cov_config: dict[str, Any],
         *,
-        method: str = "pinv",
+        method: str | None = None,
     ) -> None:
         self.dep = dep
-        self._numerical_method = method
+        self._numerical_method = resolve_method(method, "FirstStageResults")
         self.exog = exog
         self.endog = endog
         self.instr = instr

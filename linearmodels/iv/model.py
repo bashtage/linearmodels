@@ -61,6 +61,7 @@ from linearmodels.iv._utility import (
     kclass_factors,
     kclass_solve,
     orthonormal_basis,
+    resolve_method,
 )
 from linearmodels.iv.common import f_statistic, find_constant
 from linearmodels.iv.covariance import (
@@ -1091,7 +1092,7 @@ class _IVLSModelBase(_IVModelBase):
         z: linearmodels.typing.data.Float64Array,
         kappa: linearmodels.typing.Numeric,
         *,
-        method: str = "pinv",
+        method: str | None = None,
     ) -> linearmodels.typing.data.Float64Array:
         """
         Parameter estimation without error checking.
@@ -1107,7 +1108,9 @@ class _IVLSModelBase(_IVModelBase):
         kappa : float
             Parameter value for k-class estimator.
         method : {"pinv", "qr"}, optional
-            The numerical method. The default is "pinv". See Notes.
+            The numerical method. If not provided, "pinv" is used, and a
+            ``FutureWarning`` says that the default will be "qr" in linearmodels 8.0
+            if the caller is not part of linearmodels. See Notes.
 
         Returns
         -------
@@ -1135,6 +1138,7 @@ class _IVLSModelBase(_IVModelBase):
 
            The ``method`` keyword.
         """
+        method = resolve_method(method, "estimate_parameters")
         if method == "pinv":
             return _kclass_pinv(x, y, z, kappa, pinv(z))[0]
         factors = kclass_factors(x, orthonormal_basis(z), float(kappa), y)
@@ -1225,6 +1229,14 @@ class _IVLSModelBase(_IVModelBase):
         See the docstring of the specific covariance estimator for a list of
         supported options. Defaults are used if no covariance configuration
         is provided.
+
+        The estimates and their covariance are computed with the numerical method
+        of the model, its ``method``. With "pinv", the relative error grows with
+        the square of the condition number c of the regressors or instruments with
+        columns scaled to unit length, so that only about 16 - 2 log10(c) digits
+        are correct, e.g., 6 at c = 1e5, also if the model passes the rank check.
+        With "qr", which is recommended, about 16 - log10(c) digits are correct. See
+        the notes of the model.
         """
         cov_type = lower_option(cov_type)
         check_cov_config(cov_config, cov_type, _LS_COV_KEYS, KERNEL_LOOKUP)
@@ -1420,6 +1432,16 @@ class IVLIML(_IVLSModelBase):
     factor of about 1e13 or more) are rank deficient, while nearly collinear columns
     pass and can give estimates with no correct digits. The error that "pinv"
     raises for columns that are only rank deficient because of their units says so.
+
+    The accuracy of the estimates also differs below the tolerance. Let c be the
+    condition number of ``[exog, endog]`` or ``[exog, instruments]`` with columns
+    scaled to unit length. The relative error of "qr" is about c times the machine
+    precision (2.2e-16), so that about 16 - log10(c) digits are correct. The error
+    of "pinv" grows with c squared, so that about 16 - 2 log10(c) digits are correct:
+    about 6 at c = 1e5 and none at c = 1e8, although its rank check accepts these
+    data. Nearly collinear variables, such as a variable in levels and its square,
+    can have such condition numbers. Use "qr" for these data.
+
     linearmodels 8.0 will use "qr" by default. Until then, the default is "pinv",
     and a ``FutureWarning`` is issued if ``method`` is not given. ``method="pinv"``
     keeps the current method without the warning.
@@ -1440,6 +1462,16 @@ class IVLIML(_IVLSModelBase):
     factor of about 1e13 or more) are rank deficient, while nearly collinear columns
     pass and can give estimates with no correct digits. The error that "pinv"
     raises for columns that are only rank deficient because of their units says so.
+
+    The accuracy of the estimates also differs below the tolerance. Let c be the
+    condition number of ``[exog, endog]`` or ``[exog, instruments]`` with columns
+    scaled to unit length. The relative error of "qr" is about c times the machine
+    precision (2.2e-16), so that about 16 - log10(c) digits are correct. The error
+    of "pinv" grows with c squared, so that about 16 - 2 log10(c) digits are correct:
+    about 6 at c = 1e5 and none at c = 1e8, although its rank check accepts these
+    data. Nearly collinear variables, such as a variable in levels and its square,
+    can have such condition numbers. Use "qr" for these data.
+
     linearmodels 8.0 will use "qr" by default. Until then, the default is "pinv",
     and a ``FutureWarning`` is issued if ``method`` is not given. ``method="pinv"``
     keeps the current method without the warning.
@@ -1680,6 +1712,16 @@ class IV2SLS(_IVLSModelBase):
     factor of about 1e13 or more) are rank deficient, while nearly collinear columns
     pass and can give estimates with no correct digits. The error that "pinv"
     raises for columns that are only rank deficient because of their units says so.
+
+    The accuracy of the estimates also differs below the tolerance. Let c be the
+    condition number of ``[exog, endog]`` or ``[exog, instruments]`` with columns
+    scaled to unit length. The relative error of "qr" is about c times the machine
+    precision (2.2e-16), so that about 16 - log10(c) digits are correct. The error
+    of "pinv" grows with c squared, so that about 16 - 2 log10(c) digits are correct:
+    about 6 at c = 1e5 and none at c = 1e8, although its rank check accepts these
+    data. Nearly collinear variables, such as a variable in levels and its square,
+    can have such condition numbers. Use "qr" for these data.
+
     linearmodels 8.0 will use "qr" by default. Until then, the default is "pinv",
     and a ``FutureWarning`` is issued if ``method`` is not given. ``method="pinv"``
     keeps the current method without the warning.
