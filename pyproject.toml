@@ -286,10 +286,6 @@ filterwarnings = [
   # Development versions of pandas 3.1
   "error:Constructing a DataFrame from a list of sequences with mismatched::",
   "error:assert_index_equal will check the::",
-  # 7.2 warns that the default numerical method of IV2SLS and IVLIML changes in 8.0
-  # whenever method is not given. The tests of the warning use pytest.warns, which
-  # records it anyway
-  "ignore:The default numerical method of IV2SLS and IVLIML:FutureWarning",
 ]
 junit_family = "xunit2"
 markers = [

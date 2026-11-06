@@ -17,6 +17,7 @@ import pandas as pd
 import pytest
 
 from linearmodels.iv import IV2SLS, IVGMM, IVGMMCUE, IVJIVE, IVLIML
+from linearmodels.tests._utility import method_kwargs
 
 MODELS = [IV2SLS, IVLIML, IVGMM, IVGMMCUE, IVJIVE]
 FORMULA = "y ~ 1 + I(x * mult) + [e ~ z]"
@@ -41,7 +42,7 @@ def expected_prediction(params, new):
 def predict_in_this_frame(cls, df, new):
     """Fit a model whose formula uses a variable of this function, and predict"""
     mult = MULT  # noqa: F841  Used by the formula
-    mod = cls.from_formula(FORMULA, df)
+    mod = cls.from_formula(FORMULA, df, **method_kwargs(cls))
     res = mod.fit()
     return res.params, mod.predict(res.params, data=new), res.predict(data=new)
 
@@ -75,7 +76,7 @@ def test_predict_in_the_test_function(frame):
     # The variables of this function are used, and not those of a frame above it
     mult = MULT  # noqa: F841  Used by the formula
     new = frame.iloc[:7]
-    mod = IV2SLS.from_formula(FORMULA, frame)
+    mod = IV2SLS.from_formula(FORMULA, frame, method="pinv")
     res = mod.fit()
     expected = expected_prediction(res.params, new)
     assert_allclose(
@@ -89,7 +90,7 @@ def test_explicit_depth_counts_the_frames_of_the_parser(frame):
     # that calls predict, and each wrapper function needs one more
     mult = MULT  # noqa: F841  Used by the formula
     new = frame.iloc[:7]
-    mod = IV2SLS.from_formula(FORMULA, frame)
+    mod = IV2SLS.from_formula(FORMULA, frame, method="pinv")
     res = mod.fit()
     expected = expected_prediction(res.params, new)
 
@@ -108,6 +109,7 @@ import numpy as np
 import pandas as pd
 
 from linearmodels.iv import IV2SLS
+from linearmodels.tests._utility import method_kwargs
 
 rng = np.random.default_rng(0)
 df = pd.DataFrame(rng.standard_normal((200, 4)), columns=["y", "x", "e", "z"])

@@ -29,6 +29,7 @@ from linearmodels.iv import (
 from linearmodels.iv.data import IVData
 from linearmodels.iv.model import _OLS
 from linearmodels.shared.exceptions import MissingValueWarning
+from linearmodels.tests._utility import method_kwargs
 
 NOBS = 120
 ESTIMATORS = [IV2SLS, IVLIML, IVGMM, IVGMMCUE, IVJIVE]
@@ -121,7 +122,7 @@ def build(cls, data, **replace):
     """Model using data, where some inputs are replaced"""
     weights = replace.pop("weights", None)
     parts = {**data.parts(), **replace}
-    return cls(*parts.values(), weights=weights)
+    return cls(*parts.values(), weights=weights, **method_kwargs(cls))
 
 
 def arrays(mod):
@@ -174,7 +175,9 @@ def test_dependent_reordered_rejected(simple, cls):
 def test_everything_reordered_together_is_allowed(simple, cls):
     expected = build(cls, simple, weights=simple.weights)
     flipped = {name: reverse(value) for name, value in simple.parts().items()}
-    reordered = cls(*flipped.values(), weights=reverse(simple.weights))
+    reordered = cls(
+        *flipped.values(), weights=reverse(simple.weights), **method_kwargs(cls)
+    )
     # The same observations in the opposite order
     for a, b in zip(arrays(expected), arrays(reordered), strict=True):
         assert_allclose(a, b[::-1])
@@ -185,14 +188,16 @@ def test_everything_reordered_together_is_allowed(simple, cls):
 @pytest.mark.parametrize("cls", ESTIMATORS, ids=ESTIMATOR_IDS)
 def test_same_labels_match_numpy(data, cls):
     labelled = build(cls, data, weights=data.weights)
-    raw = cls(*data.raw(), weights=data.weights.to_numpy())
+    raw = cls(*data.raw(), weights=data.weights.to_numpy(), **method_kwargs(cls))
     assert_same_arrays(labelled, raw)
 
 
 @pytest.mark.parametrize("cls", FAST, ids=FAST_IDS)
 def test_same_labels_match_numpy_results(simple, cls):
     labelled = build(cls, simple, weights=simple.weights).fit()
-    raw = cls(*simple.raw(), weights=simple.weights.to_numpy()).fit()
+    raw = cls(
+        *simple.raw(), weights=simple.weights.to_numpy(), **method_kwargs(cls)
+    ).fit()
     assert_allclose(labelled.params, raw.params)
     assert_allclose(labelled.std_errors, raw.std_errors)
     assert_allclose(labelled.resids, raw.resids)
@@ -202,9 +207,9 @@ def numpy_equivalent(cls, data, name, values):
     """Model where the labels of all inputs have been removed"""
     raw = {part: value.to_numpy() for part, value in data.parts().items()}
     if name == "weights":
-        return cls(*raw.values(), weights=values)
+        return cls(*raw.values(), weights=values, **method_kwargs(cls))
     raw[name] = values
-    return cls(*raw.values())
+    return cls(*raw.values(), **method_kwargs(cls))
 
 
 @pytest.mark.parametrize("cls", ESTIMATORS, ids=ESTIMATOR_IDS)
@@ -261,12 +266,13 @@ def test_unlabelled_dependent_is_paired_by_position(simple, cls):
             corrupt(simple.endog),
             corrupt(simple.instruments),
             weights=corrupt(simple.weights),
+            **method_kwargs(cls),
         )
         assert_allclose(mod.exog.ndarray, corrupt(simple.exog).to_numpy())
         assert_allclose(mod.dependent.ndarray, y[:, None])
     # The same holds if dependent has a default index
     flipped = (reverse(simple.exog), reverse(simple.endog), reverse(simple.instruments))
-    cls(pd.Series(y), *flipped)
+    cls(pd.Series(y), *flipped, **method_kwargs(cls))
 
 
 UNLABELLED_DEPENDENT = {
@@ -297,7 +303,13 @@ def test_inputs_must_agree_when_dependent_has_no_labels(
 def test_message_names_the_input_that_sets_the_labels(simple, cls):
     y = simple.dependent.to_numpy()
     with pytest.raises(ValueError, match="does not match") as exc:
-        cls(y, simple.exog, simple.endog, reverse(simple.instruments))
+        cls(
+            y,
+            simple.exog,
+            simple.endog,
+            reverse(simple.instruments),
+            **method_kwargs(cls),
+        )
     message = str(exc.value)
     assert message.startswith("The row index of instruments does not match exog.")
     assert "in the same order as exog" in message
@@ -308,14 +320,21 @@ def test_message_names_the_input_that_sets_the_labels(simple, cls):
 @pytest.mark.parametrize("cls", ESTIMATORS, ids=ESTIMATOR_IDS)
 def test_inputs_without_labels_do_not_set_the_labels(simple, cls):
     y, exog = simple.dependent.to_numpy(), simple.exog.to_numpy()
-    cls(y, exog, simple.endog, simple.instruments)
+    cls(y, exog, simple.endog, simple.instruments, **method_kwargs(cls))
     # endog is the first input with labels
     match = "row index of instruments does not match endog"
     with pytest.raises(ValueError, match=match):
-        cls(y, exog, simple.endog, reverse(simple.instruments))
+        cls(y, exog, simple.endog, reverse(simple.instruments), **method_kwargs(cls))
     match = "row index of weights does not match endog"
     with pytest.raises(ValueError, match=match):
-        cls(y, exog, simple.endog, simple.instruments, weights=reverse(simple.weights))
+        cls(
+            y,
+            exog,
+            simple.endog,
+            simple.instruments,
+            weights=reverse(simple.weights),
+            **method_kwargs(cls),
+        )
     # A default index has no labels, so exog does not set them
     default = pd.DataFrame(exog, columns=simple.exog.columns)
     with pytest.raises(ValueError, match=match):
@@ -325,24 +344,37 @@ def test_inputs_without_labels_do_not_set_the_labels(simple, cls):
             simple.endog,
             simple.instruments,
             weights=reverse(simple.weights),
+            **method_kwargs(cls),
         )
     # Only one input has labels
-    cls(y, exog, simple.endog.to_numpy(), reverse(simple.instruments))
-    cls(y, exog, reverse(simple.endog), simple.instruments.to_numpy())
+    cls(
+        y,
+        exog,
+        simple.endog.to_numpy(),
+        reverse(simple.instruments),
+        **method_kwargs(cls),
+    )
+    cls(
+        y,
+        exog,
+        reverse(simple.endog),
+        simple.instruments.to_numpy(),
+        **method_kwargs(cls),
+    )
     # weights set the labels if no other input has them
     raw = [y, exog, simple.endog.to_numpy(), simple.instruments.to_numpy()]
-    cls(*raw, weights=reverse(simple.weights))
+    cls(*raw, weights=reverse(simple.weights), **method_kwargs(cls))
 
 
 @pytest.mark.parametrize("corruption", list(CORRUPTIONS))
 def test_inputs_must_agree_for_every_index_style(data, corruption):
     y = data.dependent.to_numpy()
-    IV2SLS(y, data.exog, data.endog, data.instruments)
+    IV2SLS(y, data.exog, data.endog, data.instruments, method="pinv")
     bad = CORRUPTIONS[corruption](data.instruments)
     with pytest.raises(
         ValueError, match="row index of instruments does not match exog"
     ):
-        IV2SLS(y, data.exog, data.endog, bad)
+        IV2SLS(y, data.exog, data.endog, bad, method="pinv")
 
 
 def test_ols_inputs_must_agree_when_dependent_has_no_labels(simple):
@@ -351,7 +383,9 @@ def test_ols_inputs_must_agree_when_dependent_has_no_labels(simple):
     with pytest.raises(ValueError, match="row index of weights does not match exog"):
         OLS(y, simple.exog, weights=reverse(simple.weights))
     with pytest.raises(ValueError, match="row index of weights does not match exog"):
-        IV2SLS(y, simple.exog, None, None, weights=relabel(simple.weights))
+        IV2SLS(
+            y, simple.exog, None, None, weights=relabel(simple.weights), method="pinv"
+        )
     mod = OLS(y, simple.exog)
     mod.fit(cov_type="clustered", clusters=simple.clusters)
     with pytest.raises(ValueError, match="row index of clusters does not match exog"):
@@ -361,23 +395,41 @@ def test_ols_inputs_must_agree_when_dependent_has_no_labels(simple):
 @pytest.mark.parametrize("cls", ESTIMATORS, ids=ESTIMATOR_IDS)
 def test_ivdata_inputs_set_the_labels_when_dependent_has_none(simple, cls):
     y = simple.dependent.to_numpy()
-    cls(y, IVData(simple.exog), simple.endog, simple.instruments)
+    cls(y, IVData(simple.exog), simple.endog, simple.instruments, **method_kwargs(cls))
     with pytest.raises(ValueError, match="row index of endog does not match exog"):
-        cls(y, IVData(reverse(simple.exog)), simple.endog, simple.instruments)
+        cls(
+            y,
+            IVData(reverse(simple.exog)),
+            simple.endog,
+            simple.instruments,
+            **method_kwargs(cls),
+        )
     # IVData built from an array has no labels
-    cls(y, IVData(simple.exog.to_numpy()[::-1]), simple.endog, simple.instruments)
+    cls(
+        y,
+        IVData(simple.exog.to_numpy()[::-1]),
+        simple.endog,
+        simple.instruments,
+        **method_kwargs(cls),
+    )
 
 
 @pytest.mark.parametrize("cls", ESTIMATORS, ids=ESTIMATOR_IDS)
 def test_xarray_inputs_set_the_labels_when_dependent_has_none(simple, cls):
     y = simple.dependent.to_numpy()
     exog = to_xarray(simple.exog)
-    cls(y, exog, simple.endog, simple.instruments)
+    cls(y, exog, simple.endog, simple.instruments, **method_kwargs(cls))
     with pytest.raises(ValueError, match="row index of endog does not match exog"):
-        cls(y, to_xarray(reverse(simple.exog)), simple.endog, simple.instruments)
+        cls(
+            y,
+            to_xarray(reverse(simple.exog)),
+            simple.endog,
+            simple.instruments,
+            **method_kwargs(cls),
+        )
     # A DataArray without coordinates has no labels
     no_coords = to_xarray(reverse(simple.exog), coords=False)
-    cls(y, no_coords, simple.endog, simple.instruments)
+    cls(y, no_coords, simple.endog, simple.instruments, **method_kwargs(cls))
 
 
 @pytest.mark.parametrize("cls", ESTIMATORS, ids=ESTIMATOR_IDS)
@@ -397,9 +449,9 @@ def test_duplicate_labels(cls):
     z = pd.DataFrame(rng.standard_normal((NOBS, 2)), index=index)
     x = pd.Series(z.sum(axis=1) + rng.standard_normal(NOBS), index=index, name="x")
     y = pd.Series(x + rng.standard_normal(NOBS), index=index, name="y")
-    cls(y, exog, x, z)
+    cls(y, exog, x, z, **method_kwargs(cls))
     with pytest.raises(ValueError, match="row index of instruments"):
-        cls(y, exog, x, z.iloc[::-1])
+        cls(y, exog, x, z.iloc[::-1], **method_kwargs(cls))
 
 
 @pytest.mark.parametrize("cls", ESTIMATORS, ids=ESTIMATOR_IDS)
@@ -413,13 +465,18 @@ def test_different_length_reports_the_length(simple, cls):
 def test_ols(simple):
     # linearmodels.OLS is the same as _OLS
     assert OLS is _OLS
-    mod = IV2SLS(simple.dependent, simple.exog, None, None)
+    mod = IV2SLS(simple.dependent, simple.exog, None, None, method="pinv")
     assert mod._method == "OLS"
     with pytest.raises(ValueError, match="row index of exog does not match"):
-        IV2SLS(simple.dependent, reverse(simple.exog), None, None)
+        IV2SLS(simple.dependent, reverse(simple.exog), None, None, method="pinv")
     with pytest.raises(ValueError, match="row index of weights does not match"):
         IV2SLS(
-            simple.dependent, simple.exog, None, None, weights=reverse(simple.weights)
+            simple.dependent,
+            simple.exog,
+            None,
+            None,
+            weights=reverse(simple.weights),
+            method="pinv",
         )
     with pytest.raises(ValueError, match="row index of exog does not match"):
         OLS(simple.dependent, reverse(simple.exog))
@@ -446,9 +503,15 @@ def test_ols(simple):
 
 
 def test_inputs_that_are_not_present_are_not_compared(simple):
-    IV2SLS(simple.dependent, None, simple.endog, simple.instruments)
+    IV2SLS(simple.dependent, None, simple.endog, simple.instruments, method="pinv")
     with pytest.raises(ValueError, match="row index of instruments"):
-        IV2SLS(simple.dependent, None, simple.endog, reverse(simple.instruments))
+        IV2SLS(
+            simple.dependent,
+            None,
+            simple.endog,
+            reverse(simple.instruments),
+            method="pinv",
+        )
 
 
 @pytest.mark.parametrize("cls", ESTIMATORS, ids=ESTIMATOR_IDS)
@@ -558,7 +621,7 @@ def test_clusters_in_fit(simple, cls, corruption):
 
 @pytest.mark.parametrize("corruption", list(CORRUPTIONS))
 def test_clusters_index_styles(data, corruption):
-    mod = IV2SLS(*data.parts().values())
+    mod = IV2SLS(*data.parts().values(), method="pinv")
     res = mod.fit(cov_type="clustered", clusters=data.clusters)
     raw = mod.fit(cov_type="clustered", clusters=data.clusters.to_numpy())
     assert_allclose(res.std_errors, raw.std_errors)
@@ -570,7 +633,7 @@ def test_clusters_index_styles(data, corruption):
 @pytest.mark.parametrize("cls", FAST, ids=FAST_IDS)
 def test_clusters_use_the_labels_of_the_first_input_with_labels(simple, cls):
     y = simple.dependent.to_numpy()
-    mod = cls(y, simple.exog, simple.endog, simple.instruments)
+    mod = cls(y, simple.exog, simple.endog, simple.instruments, **method_kwargs(cls))
     res = mod.fit(cov_type="clustered", clusters=simple.clusters)
     raw = mod.fit(cov_type="clustered", clusters=simple.clusters.to_numpy())
     assert_allclose(res.std_errors, raw.std_errors)
@@ -579,10 +642,10 @@ def test_clusters_use_the_labels_of_the_first_input_with_labels(simple, cls):
         with pytest.raises(ValueError, match=match):
             mod.fit(cov_type="clustered", clusters=corrupt(simple.clusters))
     # Without labels in any input there is nothing to compare
-    mod = cls(*simple.raw())
+    mod = cls(*simple.raw(), **method_kwargs(cls))
     mod.fit(cov_type="clustered", clusters=reverse(simple.clusters))
     # weights can be the only input with labels
-    weighted = cls(*simple.raw(), weights=simple.weights)
+    weighted = cls(*simple.raw(), weights=simple.weights, **method_kwargs(cls))
     weighted.fit(cov_type="clustered", clusters=simple.clusters)
     match = "row index of clusters does not match weights"
     with pytest.raises(ValueError, match=match):
@@ -595,7 +658,7 @@ def test_clusters_and_missing_values_without_labels_in_dependent(simple, cls):
     exog.iloc[7, 1] = np.nan
     y = simple.dependent.to_numpy()
     with pytest.warns(MissingValueWarning):
-        mod = cls(y, exog, simple.endog, simple.instruments)
+        mod = cls(y, exog, simple.endog, simple.instruments, **method_kwargs(cls))
     kept = simple.clusters[mod.notnull]
     assert len(kept) == NOBS - 1
     res = mod.fit(cov_type="clustered", clusters=kept)
@@ -610,20 +673,32 @@ def test_weight_clusters_use_the_labels_of_the_first_input_with_labels(simple, c
     y = simple.dependent.to_numpy()
     args = (y, simple.exog, simple.endog, simple.instruments)
     clustered = {"weight_type": "clustered"}
-    cls(*args, clusters=simple.clusters, **clustered)
+    cls(*args, clusters=simple.clusters, **clustered, **method_kwargs(cls))
     for corrupt in CORRUPTIONS.values():
         match = "row index of clusters does not match exog"
         with pytest.raises(ValueError, match=match):
-            cls(*args, clusters=corrupt(simple.clusters), **clustered)
+            cls(
+                *args,
+                clusters=corrupt(simple.clusters),
+                **clustered,
+                **method_kwargs(cls),
+            )
     # Arrays have no labels
-    cls(*args, clusters=reverse(simple.clusters).to_numpy(), **clustered)
+    cls(
+        *args,
+        clusters=reverse(simple.clusters).to_numpy(),
+        **clustered,
+        **method_kwargs(cls),
+    )
 
 
 @pytest.mark.parametrize("cls", WITH_CLUSTERS, ids=WITH_CLUSTERS_IDS)
 def test_clusters_numpy_is_paired_by_position(simple, cls):
     mod = build(cls, simple)
     values = simple.clusters.to_numpy()[::-1]
-    raw = cls(*simple.raw()).fit(cov_type="clustered", clusters=values)
+    raw = cls(*simple.raw(), **method_kwargs(cls)).fit(
+        cov_type="clustered", clusters=values
+    )
     res = mod.fit(cov_type="clustered", clusters=values)
     assert_allclose(res.std_errors, raw.std_errors)
     # A default index carries no labels
@@ -657,26 +732,35 @@ def test_two_way_clusters(simple, cls):
 @pytest.mark.parametrize("corruption", list(CORRUPTIONS))
 def test_clusters_in_weight_config(simple, cls, corruption):
     clustered = {"weight_type": "clustered", "clusters": simple.clusters}
-    labelled = cls(*simple.parts().values(), **clustered)
+    labelled = cls(*simple.parts().values(), **clustered, **method_kwargs(cls))
     raw_clusters = {**clustered, "clusters": simple.clusters.to_numpy()}
-    raw = cls(*simple.raw(), **raw_clusters)
+    raw = cls(*simple.raw(), **raw_clusters, **method_kwargs(cls))
     assert_allclose(labelled.fit().params, raw.fit().params)
     bad = CORRUPTIONS[corruption](simple.clusters)
     with pytest.raises(ValueError, match="row index of clusters does not match"):
-        cls(*simple.parts().values(), **{**clustered, "clusters": bad})
+        cls(
+            *simple.parts().values(),
+            **{**clustered, "clusters": bad},
+            **method_kwargs(cls),
+        )
     # Arrays have no labels and are paired by position
-    cls(*simple.parts().values(), **{**clustered, "clusters": bad.to_numpy()})
+    cls(
+        *simple.parts().values(),
+        **{**clustered, "clusters": bad.to_numpy()},
+        **method_kwargs(cls),
+    )
     # As are pandas objects with a default index
     cls(
         *simple.parts().values(),
         **{**clustered, "clusters": pd.Series(bad.to_numpy())},
+        **method_kwargs(cls),
     )
 
 
 @pytest.mark.parametrize("cls", GMM, ids=GMM_IDS)
 def test_clusters_in_weight_config_and_fit(simple, cls):
     clustered = {"weight_type": "clustered", "clusters": simple.clusters}
-    mod = cls(*simple.parts().values(), **clustered)
+    mod = cls(*simple.parts().values(), **clustered, **method_kwargs(cls))
     mod.fit(cov_type="clustered", clusters=simple.clusters)
     with pytest.raises(ValueError, match="row index of clusters does not match"):
         mod.fit(cov_type="clustered", clusters=reverse(simple.clusters))
@@ -686,10 +770,20 @@ def test_clusters_in_weight_config_and_fit(simple, cls):
 def test_other_weight_config_is_unchanged(simple, cls):
     mod = build(cls, simple)
     assert mod._weight_type == "robust"
-    mod = cls(*simple.parts().values(), weight_type="kernel", kernel="parzen")
+    mod = cls(
+        *simple.parts().values(),
+        weight_type="kernel",
+        kernel="parzen",
+        **method_kwargs(cls),
+    )
     assert mod._weight_type == "kernel"
     assert mod._weight_config["kernel"] == "parzen"
-    mod = cls(*simple.parts().values(), weight_type="unadjusted", debiased=True)
+    mod = cls(
+        *simple.parts().values(),
+        weight_type="unadjusted",
+        debiased=True,
+        **method_kwargs(cls),
+    )
     assert mod._weight_config["debiased"]
     assert mod._weight_kwargs["debiased"]
     assert IVGMM(*simple.parts().values())._method == "IV-GMM"
@@ -724,13 +818,23 @@ def test_weight_clusters_and_missing_values(simple, cls):
     kept = simple.clusters[mask]
     parts = {**simple.parts(), "exog": exog}
     with pytest.warns(MissingValueWarning):
-        mod = cls(*parts.values(), weight_type="clustered", clusters=kept)
+        mod = cls(
+            *parts.values(),
+            weight_type="clustered",
+            clusters=kept,
+            **method_kwargs(cls),
+        )
     assert mod.fit().nobs == NOBS - 1
     with (
         pytest.warns(MissingValueWarning),
         pytest.raises(ValueError, match="row index of clusters"),
     ):
-        cls(*parts.values(), weight_type="clustered", clusters=reverse(kept))
+        cls(
+            *parts.values(),
+            weight_type="clustered",
+            clusters=reverse(kept),
+            **method_kwargs(cls),
+        )
 
 
 # Formulas use a single DataFrame
@@ -756,23 +860,33 @@ def frame(simple):
 @pytest.mark.parametrize("cls", ESTIMATORS, ids=ESTIMATOR_IDS)
 def test_from_formula(frame, cls):
     assert not isinstance(frame.index, pd.RangeIndex)
-    plain = cls.from_formula(FORMULA, frame)
+    plain = cls.from_formula(FORMULA, frame, **method_kwargs(cls))
     assert plain.exog.shape == (NOBS, 2)
-    weighted = cls.from_formula(FORMULA, frame, weights=frame["wt"])
-    raw = cls.from_formula(FORMULA, frame, weights=frame["wt"].to_numpy())
+    weighted = cls.from_formula(
+        FORMULA, frame, weights=frame["wt"], **method_kwargs(cls)
+    )
+    raw = cls.from_formula(
+        FORMULA, frame, weights=frame["wt"].to_numpy(), **method_kwargs(cls)
+    )
     assert_same_arrays(weighted, raw)
     for corrupt in CORRUPTIONS.values():
         with pytest.raises(ValueError, match="row index of weights does not match"):
-            cls.from_formula(FORMULA, frame, weights=corrupt(frame["wt"]))
+            cls.from_formula(
+                FORMULA, frame, weights=corrupt(frame["wt"]), **method_kwargs(cls)
+            )
     # The data has a default index, so there are no labels
     default = frame.reset_index(drop=True)
-    cls.from_formula(FORMULA, default, weights=default["wt"])
-    cls.from_formula(FORMULA, default, weights=default["wt"].to_numpy()[::-1])
+    cls.from_formula(FORMULA, default, weights=default["wt"], **method_kwargs(cls))
+    cls.from_formula(
+        FORMULA, default, weights=default["wt"].to_numpy()[::-1], **method_kwargs(cls)
+    )
 
 
 @pytest.mark.parametrize("cls", FAST, ids=FAST_IDS)
 def test_from_formula_matches_arrays(frame, cls):
-    formula = cls.from_formula(FORMULA, frame, weights=frame["wt"]).fit()
+    formula = cls.from_formula(
+        FORMULA, frame, weights=frame["wt"], **method_kwargs(cls)
+    ).fit()
     exog = np.c_[np.ones(NOBS), frame["w"].to_numpy()]
     arrays_ = cls(
         frame["y"].to_numpy(),
@@ -780,6 +894,7 @@ def test_from_formula_matches_arrays(frame, cls):
         frame[["x"]].to_numpy(),
         frame[["z1", "z2"]].to_numpy(),
         weights=frame["wt"].to_numpy(),
+        **method_kwargs(cls),
     ).fit()
     assert_allclose(formula.params, arrays_.params)
 

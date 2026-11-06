@@ -58,7 +58,7 @@ def test_single_entity(data):
 
     dep = mod.dependent.dataframe
     exog = mod.exog.dataframe
-    ols = IV2SLS(dep, exog, None, None)
+    ols = IV2SLS(dep, exog, None, None, method="pinv")
     ols_res = ols.fit(cov_type="unadjusted")
     assert_results_equal(res, ols_res)
 
@@ -96,7 +96,7 @@ def test_single_entity_weights(data):
 
     dep = mod.dependent.dataframe
     exog = mod.exog.dataframe
-    ols = IV2SLS(dep, exog, None, None, weights=mod.weights.values2d)
+    ols = IV2SLS(dep, exog, None, None, weights=mod.weights.values2d, method="pinv")
     ols_res = ols.fit(cov_type="unadjusted")
     assert_results_equal(res, ols_res)
 
@@ -118,7 +118,7 @@ def test_multiple_obs_per_entity(data):
 
     dep = mod.dependent.values3d.mean(1).T
     exog = pd.DataFrame(mod.exog.values3d.mean(1).T, columns=mod.exog.vars)
-    ols = IV2SLS(dep, exog, None, None)
+    ols = IV2SLS(dep, exog, None, None, method="pinv")
     ols_res = ols.fit(cov_type="unadjusted")
     assert_results_equal(res, ols_res)
 
@@ -151,7 +151,7 @@ def test_multiple_obs_per_entity_weighted(data):
     dep = wdep
     exog = pd.DataFrame(wexog, columns=mod.exog.vars)
 
-    ols = IV2SLS(dep, exog, None, None, weights=weights)
+    ols = IV2SLS(dep, exog, None, None, weights=weights, method="pinv")
     ols_res = ols.fit(cov_type="unadjusted")
     assert_results_equal(res, ols_res)
 
@@ -184,7 +184,7 @@ def test_missing(missing_data):
     exog = exog.reindex(mod.dependent.entities)
     weights = weights.reindex(mod.dependent.entities)
 
-    ols = IV2SLS(dep, exog, None, None, weights=weights)
+    ols = IV2SLS(dep, exog, None, None, weights=weights, method="pinv")
     ols_res = ols.fit(cov_type="unadjusted")
     assert_results_equal(res, ols_res)
 
@@ -221,7 +221,7 @@ def test_missing_weighted(missing_data):
     exog = exog.reindex(mod.dependent.entities)
     exog = (1.0 / weights.values) * exog
 
-    ols = IV2SLS(dep, exog, None, None, weights=weights)
+    ols = IV2SLS(dep, exog, None, None, weights=weights, method="pinv")
     ols_res = ols.fit(cov_type="unadjusted")
     assert_results_equal(res, ols_res)
 
@@ -284,7 +284,7 @@ def test_2way_cluster(data):
     dep = dep.reindex(list(res.resids.index))
     exog = exog.reindex(list(res.resids.index))
 
-    ols = IV2SLS(dep, exog, None, None)
+    ols = IV2SLS(dep, exog, None, None, method="pinv")
     ols_clusters = clusters.groupby(level=0).max()
     ols_clusters = ols_clusters.reindex(list(res.resids.index))
 
@@ -324,7 +324,7 @@ def test_default_clusters(data):
 
     dep = mod.dependent.dataframe
     exog = mod.exog.dataframe
-    ols = IV2SLS(dep, exog, None, None)
+    ols = IV2SLS(dep, exog, None, None, method="pinv")
     ols_res = ols.fit(cov_type="clustered")
     assert_results_equal(res, ols_res)
 

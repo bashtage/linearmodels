@@ -748,7 +748,7 @@ def test_ivgmm_exactly_identified_with_too_few_clusters(nclusters, center):
 @pytest.mark.parametrize("center", [False, True])
 def test_ivgmm_exactly_identified_with_enough_clusters(nclusters, center):
     res = fit(EXACTLY_IDENTIFIED, nclusters, center)
-    iv = IV2SLS(*EXACTLY_IDENTIFIED).fit()
+    iv = IV2SLS(*EXACTLY_IDENTIFIED, method="pinv").fit()
     assert_allclose(res.params, iv.params, rtol=1e-8)
     assert np.all(np.isfinite(res.std_errors))
 
