@@ -12,6 +12,8 @@ pytest-randomly
 seaborn
 xarray>=0.13
 wheel
+# tf-inference requires Python 3.12 or later.
+tf-inference==0.1.0; python_version >= "3.12"
 pyarrow
 zipp>=3.19.1 # not directly required, pinned by Snyk to avoid a vulnerability
 fonttools>=4.61.0 # not directly required, pinned by Snyk to avoid a vulnerability
