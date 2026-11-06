@@ -26,14 +26,14 @@ The original error was:
 """
 
 
-SOLVERS = ("pinv", "qr")
+METHODS = ("pinv", "qr")
 
 
 def proj(
     y: linearmodels.typing.data.Float64Array,
     x: linearmodels.typing.data.Float64Array,
     *,
-    solver: str = "pinv",
+    method: str = "pinv",
 ) -> linearmodels.typing.data.Float64Array:
     """
     Projection of y on x from y.
@@ -44,7 +44,7 @@ def proj(
         Array to project (nobs by nseries).
     x : ndarray
         Array to project onto (nobs by nvar).
-    solver : {"pinv", "qr"}, optional
+    method : {"pinv", "qr"}, optional
         The numerical method. The default is "pinv". See Notes.
 
     Returns
@@ -64,7 +64,7 @@ def proj(
     """
     if x.shape[1] == 0:
         return np.zeros_like(y)
-    if solver == "pinv":
+    if method == "pinv":
         return x @ (np.linalg.pinv(x) @ y)
     nobs, nvar = x.shape
     scale = np.linalg.norm(x, axis=0)
@@ -86,7 +86,7 @@ def annihilate(
     y: linearmodels.typing.data.Float64Array,
     x: linearmodels.typing.data.Float64Array,
     *,
-    solver: str = "pinv",
+    method: str = "pinv",
 ) -> linearmodels.typing.data.Float64Array:
     """
     Remove projection of y on x from y.
@@ -97,7 +97,7 @@ def annihilate(
         Array to project (nobs by nseries).
     x : ndarray
         Array to project onto (nobs by nvar).
-    solver : {"pinv", "qr"}, optional
+    method : {"pinv", "qr"}, optional
         The numerical method of the projection, see :func:`proj`. The default is
         "pinv".
 
@@ -106,7 +106,7 @@ def annihilate(
     ndarray
         Residuals values of y minus y projected on x (nobs by nseries).
     """
-    return y - proj(y, x, solver=solver)
+    return y - proj(y, x, method=method)
 
 
 def full_column_rank(x: linearmodels.typing.data.Float64Array, tol: float) -> bool:

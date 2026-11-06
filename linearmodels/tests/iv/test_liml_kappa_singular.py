@@ -172,6 +172,14 @@ JUST_IDENTIFIED = [d for d in DEFINED if d[2] == d[1]]
 MODELS = [IVLIML, IV2SLS, IVJIVE]
 
 
+def error_on_warnings():
+    """Make every warning an error, except the notice that the default changes in 8.0"""
+    warnings.simplefilter("error")
+    warnings.filterwarnings(
+        "ignore", message="The default numerical method", category=FutureWarning
+    )
+
+
 def ids(designs):
     return [design_label(d) for d in designs]
 
@@ -456,8 +464,8 @@ def test_count_of_observations_does_not_depend_on_the_instruments_conditioning(s
     u = rng.standard_normal(nobs)
     endog = rng.standard_normal(nobs) + 0.5 * u + instr @ np.array([0.8, 0.5])
     y = endog + 1 + u
-    # The instruments of seeds 4, 6 and 7 are rank deficient with solver="qr"
-    mod = IVLIML(y, np.ones((nobs, 1)), endog[:, None], instr, solver="pinv")
+    # The instruments of seeds 4, 6 and 7 are rank deficient with method="qr"
+    mod = IVLIML(y, np.ones((nobs, 1)), endog[:, None], instr, method="pinv")
     with pytest.raises(ValueError, match="Unable to estimate kappa"):
         mod.fit()
 
@@ -579,7 +587,7 @@ def test_no_warnings_if_kappa_is_not_defined(design):
     # (invalid value encountered in sqrt), and one that is 0 a divide by zero
     y, exog, endog, instr = data_for(design)
     with warnings.catch_warnings():
-        warnings.simplefilter("error")
+        error_on_warnings()
         with pytest.raises(ValueError, match="Unable to estimate kappa"):
             IVLIML(*args(y, exog, endog, instr)).fit()
         IVLIML(*args(y, exog, endog, instr), kappa=1.0).fit()
@@ -619,7 +627,7 @@ def test_collinear_residuals_are_detected_before_the_decomposition(scale, monkey
 def test_no_warnings_from_jive_if_kappa_is_not_defined(design):
     y, exog, endog, instr = data_for(design)
     with warnings.catch_warnings():
-        warnings.simplefilter("error")
+        error_on_warnings()
         IVJIVE(*args(y, exog, endog, instr)).fit()
 
 
@@ -629,7 +637,7 @@ def test_no_warnings_from_jive_if_kappa_is_not_defined(design):
 def test_no_warnings_from_the_tests_if_kappa_is_not_defined(design):
     y, exog, endog, instr = data_for(design)
     with warnings.catch_warnings():
-        warnings.simplefilter("error")
+        error_on_warnings()
         res = IV2SLS(*args(y, exog, endog, instr)).fit()
         # str of the tests does not warn
         anderson_rubin, basmann_f = str(res.anderson_rubin), str(res.basmann_f)
@@ -641,7 +649,7 @@ def test_no_warnings_from_the_tests_if_kappa_is_not_defined(design):
 def test_no_warnings_if_kappa_is_defined(design):
     y, exog, endog, instr = data_for(design)
     with warnings.catch_warnings():
-        warnings.simplefilter("error")
+        error_on_warnings()
         for model in MODELS:
             model(*args(y, exog, endog, instr)).fit()
 
@@ -664,7 +672,7 @@ def test_collinear_residuals_are_singular(scale):
     y, exog, endog, instr = collinear_data(scale)
     mod = IVLIML(*args(y, exog, endog, instr))
     with warnings.catch_warnings():
-        warnings.simplefilter("error")
+        error_on_warnings()
         with pytest.raises(ValueError, match="Unable to estimate kappa"):
             mod.fit()
         with pytest.raises(LinAlgError, match="linearly dependent"):
@@ -698,7 +706,7 @@ def test_zero_dependent_variable_is_singular():
     _, exog, endog, instr = make_data(60, 1, 1, 2, seed=2)
     y = np.zeros(60)
     with warnings.catch_warnings():
-        warnings.simplefilter("error")
+        error_on_warnings()
         with pytest.raises(ValueError, match="Unable to estimate kappa"):
             IVLIML(*args(y, exog, endog, instr)).fit()
         res = IV2SLS(*args(y, exog, endog, instr)).fit()

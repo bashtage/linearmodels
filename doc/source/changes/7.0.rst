@@ -11,8 +11,8 @@ be added to 7.1. 7.2 also contains the fixes below.
 
 .. rubric:: New features
 
-- ``IV2SLS`` and ``IVLIML``, and their ``from_formula``, have a ``solver`` keyword.
-  ``solver="qr"`` tests the rank of ``[exog, endog]`` and ``[exog, instruments]`` after
+- ``IV2SLS`` and ``IVLIML``, and their ``from_formula``, have a ``method`` keyword.
+  ``method="qr"`` tests the rank of ``[exog, endog]`` and ``[exog, instruments]`` after
   scaling their columns to unit length, and treats them as rank deficient if their
   condition number is at least 1e9. It computes the estimates, their covariance and the
   kappa of LIML from QR decompositions, as R's ``ivreg`` does. The results do not depend
@@ -22,10 +22,12 @@ be added to 7.1. 7.2 also contains the fixes below.
   robust standard errors falls from about 5e-4 to 4e-11 in simulations, and columns on
   scales that differ by 1e13 or more are no longer rejected as rank deficient. The kappa
   of LIML no longer depends on the units with 2 or more endogenous regressors. The
-  default, ``solver="pinv"``, computes as in 7.1. The IV covariance estimators,
+  default, ``method="pinv"``, gives the same results as 7.1. With either method, ``fit``
+  decomposes the instruments once instead of up to three times, which makes it about
+  twice as fast as in 7.1 for large models. The IV covariance estimators,
   ``cragg_donald``, ``cragg_donald_f``, ``kleibergen_paap`` and ``kleibergen_paap_f``
   accept the same keyword, and the first stage results and the tests of the results use
-  the solver of the model (:issue:`823`, :issue:`850`, :issue:`870`).
+  the numerical method of the model (:issue:`823`, :issue:`850`, :issue:`870`).
 
 .. rubric:: Changes that alter results
 
@@ -72,11 +74,12 @@ be added to 7.1. 7.2 also contains the fixes below.
 
 - linearmodels 8.0 will raise the minimum versions of Python and NumPy, and of the other
   dependencies.
-- linearmodels 8.0 will use ``solver="qr"`` by default in ``IV2SLS`` and ``IVLIML``. If
-  ``solver`` is not given, a ``FutureWarning`` is issued for data that ``solver="qr"``
-  finds rank deficient, which 8.0 will reject, and the error for columns that are only
-  rank deficient because of their units suggests ``solver="qr"``. Use
-  ``solver="pinv"`` to keep the current behavior without the warning (:issue:`870`).
+- linearmodels 8.0 will use ``method="qr"`` by default in ``IV2SLS`` and ``IVLIML``. If
+  ``method`` is not given, a ``FutureWarning`` says so, and that ``method="qr"`` gives
+  the new method now and ``method="pinv"`` keeps the current one without the warning.
+  For data that ``method="qr"`` finds rank deficient, which 8.0 will reject, the
+  warning also says so. The error for columns that are only rank deficient because of
+  their units suggests ``method="qr"`` (:issue:`870`).
 
 .. rubric:: Contributors
 

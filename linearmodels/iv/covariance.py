@@ -30,7 +30,7 @@ from numpy.linalg import inv, pinv
 from scipy.linalg import qr as sp_qr, solve_triangular
 
 from linearmodels.iv._utility import (
-    SOLVERS,
+    METHODS,
     KClassFactors,
     coordinates,
     kclass_factors,
@@ -473,14 +473,14 @@ class HomoskedasticCovariance:
         of x, for example the absorbed effects of AbsorbingLS. The default is 0.
         It is only used if ``debiased`` is True, when n / (n-k) becomes
         n / (n-k-extra_df).
-    solver : {"pinv", "qr"}, optional
+    method : {"pinv", "qr"}, optional
         The numerical method. The default is "pinv", which projects with
         ``pinv(z)`` and inverts V. "qr" projects with the QR decomposition of z
         and computes the inverse of V from triangular factors, without forming V,
         so that the estimate does not depend on the units of the variables and its
         rounding error grows with the condition number of the regressors, not with
         its square. z must have full column rank with "qr". IV2SLS and IVLIML use
-        the solver of the model.
+        the numerical method of the model.
 
         .. versionadded:: 7.2
 
@@ -526,7 +526,7 @@ class HomoskedasticCovariance:
         kappa: linearmodels.typing.Numeric = 1,
         extra_df: int = 0,
         *,
-        solver: str = "pinv",
+        method: str = "pinv",
     ):
         if not (x.shape[0] == y.shape[0] == z.shape[0]):
             raise ValueError("x, y and z must have the same number of rows")
@@ -540,9 +540,9 @@ class HomoskedasticCovariance:
         self._debiased = debiased
         self.eps = y - x @ params
         self._kappa = kappa
-        if solver not in SOLVERS:
-            raise ValueError(f'solver must be "pinv" or "qr", but it is {solver!r}.')
-        self._solver = solver
+        if method not in METHODS:
+            raise ValueError(f'method must be "pinv" or "qr", but it is {method!r}.')
+        self._numerical_method = method
         # Decompositions and products that are computed once, see _reuse
         self._pinvz: linearmodels.typing.data.Float64Array | None = None
         self._pinvz_x: linearmodels.typing.data.Float64Array | None = None
@@ -583,7 +583,7 @@ class HomoskedasticCovariance:
         Use decompositions that the model computed from the same x, z and kappa.
 
         The results are the same as if they were computed here. products holds
-        pinv(z), pinv(z) @ x and (x'z) @ (pinv(z) @ x) of solver="pinv" as
+        pinv(z), pinv(z) @ x and (x'z) @ (pinv(z) @ x) of method="pinv" as
         "pinvz", "pinvz_x" and "xpz_pinvz_x".
         """
         if z_basis is not None:
@@ -625,26 +625,26 @@ class HomoskedasticCovariance:
         return self._z_basis
 
     def _pinv_of_z(self) -> linearmodels.typing.data.Float64Array:
-        """The pseudo-inverse of z of solver="pinv", computed once."""
+        """The pseudo-inverse of z of method="pinv", computed once."""
         if self._pinvz is None:
             self._pinvz = pinv(self.z)
         return self._pinvz
 
     def _pinv_product(self) -> linearmodels.typing.data.Float64Array:
-        """pinv(z) @ x of solver="pinv", computed once."""
+        """pinv(z) @ x of method="pinv", computed once."""
         if self._pinvz_x is None:
             self._pinvz_x = self._pinv_of_z() @ self.x
         return self._pinvz_x
 
     def _xhat(self) -> linearmodels.typing.data.Float64Array:
         """The projection of x on z, which are the regressors of the scores."""
-        if self._solver == "pinv":
+        if self._numerical_method == "pinv":
             return self.z @ self._pinv_product()
         z_basis = self._basis()
         return z_basis @ (z_basis.T @ self.x)
 
     def _pinv_v(self) -> linearmodels.typing.data.Float64Array:
-        """V of solver="pinv", the k-class cross product of x divided by nobs."""
+        """V of method="pinv", the k-class cross product of x divided by nobs."""
         if self._v is not None:
             return self._v
         x, z = self.x, self.z
@@ -697,7 +697,7 @@ class HomoskedasticCovariance:
         nobs = self.x.shape[0]
         eps = self.eps
         s2 = eps.T @ eps / nobs
-        if self._solver == "pinv":
+        if self._numerical_method == "pinv":
             v = self._pinv_v()
         else:
             factors = self._kclass_factors()
@@ -710,7 +710,7 @@ class HomoskedasticCovariance:
     def cov(self) -> linearmodels.typing.data.Float64Array:
         """Return the covariance of the estimated parameters."""
         nobs, nvar = self.x.shape
-        if self._solver == "pinv":
+        if self._numerical_method == "pinv":
             vinv = inv(self._pinv_v())
             c = vinv @ self.s @ vinv / nobs
             return (c + c.T) / 2
@@ -769,14 +769,14 @@ class HeteroskedasticCovariance(HomoskedasticCovariance):
         of x, for example the absorbed effects of AbsorbingLS. The default is 0.
         It is only used if ``debiased`` is True, when n / (n-k) becomes
         n / (n-k-extra_df).
-    solver : {"pinv", "qr"}, optional
+    method : {"pinv", "qr"}, optional
         The numerical method. The default is "pinv", which projects with
         ``pinv(z)`` and inverts V. "qr" projects with the QR decomposition of z
         and computes the inverse of V from triangular factors, without forming V,
         so that the estimate does not depend on the units of the variables and its
         rounding error grows with the condition number of the regressors, not with
         its square. z must have full column rank with "qr". IV2SLS and IVLIML use
-        the solver of the model.
+        the numerical method of the model.
 
         .. versionadded:: 7.2
 
@@ -824,9 +824,9 @@ class HeteroskedasticCovariance(HomoskedasticCovariance):
         kappa: linearmodels.typing.Numeric = 1,
         extra_df: int = 0,
         *,
-        solver: str = "pinv",
+        method: str = "pinv",
     ):
-        super().__init__(x, y, z, params, debiased, kappa, extra_df, solver=solver)
+        super().__init__(x, y, z, params, debiased, kappa, extra_df, method=method)
         self._name = "Robust Covariance (Heteroskedastic)"
 
     @property
@@ -883,14 +883,14 @@ class KernelCovariance(HomoskedasticCovariance):
         of x, for example the absorbed effects of AbsorbingLS. The default is 0.
         It is only used if ``debiased`` is True, when n / (n-k) becomes
         n / (n-k-extra_df).
-    solver : {"pinv", "qr"}, optional
+    method : {"pinv", "qr"}, optional
         The numerical method. The default is "pinv", which projects with
         ``pinv(z)`` and inverts V. "qr" projects with the QR decomposition of z
         and computes the inverse of V from triangular factors, without forming V,
         so that the estimate does not depend on the units of the variables and its
         rounding error grows with the condition number of the regressors, not with
         its square. z must have full column rank with "qr". IV2SLS and IVLIML use
-        the solver of the model.
+        the numerical method of the model.
 
         .. versionadded:: 7.2
 
@@ -969,9 +969,9 @@ class KernelCovariance(HomoskedasticCovariance):
         kappa: linearmodels.typing.Numeric = 1,
         extra_df: int = 0,
         *,
-        solver: str = "pinv",
+        method: str = "pinv",
     ):
-        super().__init__(x, y, z, params, debiased, kappa, extra_df, solver=solver)
+        super().__init__(x, y, z, params, debiased, kappa, extra_df, method=method)
         self._kernels = KERNEL_LOOKUP
         kernel = lower_option(kernel)
         self._kernel = kernel
@@ -1071,14 +1071,14 @@ class ClusteredCovariance(HomoskedasticCovariance):
         of x, for example the absorbed effects of AbsorbingLS. The default is 0.
         It is only used if ``debiased`` is True, when n / (n-k) becomes
         n / (n-k-extra_df).
-    solver : {"pinv", "qr"}, optional
+    method : {"pinv", "qr"}, optional
         The numerical method. The default is "pinv", which projects with
         ``pinv(z)`` and inverts V. "qr" projects with the QR decomposition of z
         and computes the inverse of V from triangular factors, without forming V,
         so that the estimate does not depend on the units of the variables and its
         rounding error grows with the condition number of the regressors, not with
         its square. z must have full column rank with "qr". IV2SLS and IVLIML use
-        the solver of the model.
+        the numerical method of the model.
 
         .. versionadded:: 7.2
 
@@ -1130,9 +1130,9 @@ class ClusteredCovariance(HomoskedasticCovariance):
         kappa: linearmodels.typing.Numeric = 1,
         extra_df: int = 0,
         *,
-        solver: str = "pinv",
+        method: str = "pinv",
     ):
-        super().__init__(x, y, z, params, debiased, kappa, extra_df, solver=solver)
+        super().__init__(x, y, z, params, debiased, kappa, extra_df, method=method)
 
         nobs = x.shape[0]
         clusters = arange(nobs) if clusters is None else clusters

@@ -826,7 +826,7 @@ class FirstStageResults(_SummaryStr):
         stage regressions and for the rank tests.
     cov_config : dict
         Options of the covariance estimator of the model.
-    solver : {"pinv", "qr"}, optional
+    method : {"pinv", "qr"}, optional
         The numerical method of the model, which is used for the first stage
         regressions. The default is "pinv".
 
@@ -843,10 +843,10 @@ class FirstStageResults(_SummaryStr):
         cov_type: str,
         cov_config: dict[str, Any],
         *,
-        solver: str = "pinv",
+        method: str = "pinv",
     ) -> None:
         self.dep = dep
-        self._solver = solver
+        self._numerical_method = method
         self.exog = exog
         self.endog = endog
         self.instr = instr
@@ -916,7 +916,7 @@ class FirstStageResults(_SummaryStr):
         or the kernel of the model, and is the same for every covariance
         estimator.
         """
-        return cragg_donald(*self._weighted_arrays(), solver=self._solver)
+        return cragg_donald(*self._weighted_arrays(), method=self._numerical_method)
 
     @cached_property
     def cragg_donald_f(self) -> float:
@@ -947,7 +947,7 @@ class FirstStageResults(_SummaryStr):
         does not depend on the scale of the weights or on the clusters of the
         model.
         """
-        return cragg_donald_f(*self._weighted_arrays(), solver=self._solver)
+        return cragg_donald_f(*self._weighted_arrays(), method=self._numerical_method)
 
     @cached_property
     def _rk_lm(self) -> WaldTestStatistic | InvalidTestStatistic:
@@ -956,7 +956,7 @@ class FirstStageResults(_SummaryStr):
             self._cov_type,
             self._cov_config,
             wald=False,
-            solver=self._solver,
+            method=self._numerical_method,
         )[0]
 
     @cached_property
@@ -965,7 +965,7 @@ class FirstStageResults(_SummaryStr):
             *self._weighted_arrays(),
             self._cov_type,
             self._cov_config,
-            solver=self._solver,
+            method=self._numerical_method,
         )[1]
 
     @property
@@ -1116,7 +1116,7 @@ class FirstStageResults(_SummaryStr):
         z = w * instr.ndarray.astype(float, copy=False)
         nz = z.shape[1]
         x = w * exog.ndarray.astype(float, copy=False)
-        ez = annihilate(z, x, solver=self._solver)
+        ez = annihilate(z, x, method=self._numerical_method)
         individual_results = self.individual
         out_df = DataFrame(
             index=["rsquared", "partial.rsquared", "f.stat", "f.pval", "f.dist"],
@@ -1126,8 +1126,8 @@ class FirstStageResults(_SummaryStr):
             # TODO: BUG in pandas-stube
             #  https://github.com/pandas-dev/pandas-stubs/issues/97
             y = w * endog.pandas[[col]].to_numpy()
-            ey = annihilate(y, x, solver=self._solver)
-            partial = _OLS(ey, ez, solver=self._solver).fit(
+            ey = annihilate(y, x, method=self._numerical_method)
+            partial = _OLS(ey, ez, method=self._numerical_method).fit(
                 cov_type=self._cov_type, **self._cov_config
             )
             full = individual_results[str(col)]
@@ -1156,9 +1156,9 @@ class FirstStageResults(_SummaryStr):
 
         dep = self.dep
         r2sls = IV2SLS(
-            dep, exog, endog, instr, weights=weights, solver=self._solver
+            dep, exog, endog, instr, weights=weights, method=self._numerical_method
         ).fit(cov_type="unadjusted")
-        rols = _OLS(dep, self._reg, weights=weights, solver=self._solver).fit(
+        rols = _OLS(dep, self._reg, weights=weights, method=self._numerical_method).fit(
             cov_type="unadjusted"
         )
         shea = (rols.std_errors / r2sls.std_errors) ** 2
@@ -1203,7 +1203,10 @@ class FirstStageResults(_SummaryStr):
         for col in self.endog.pandas:
             dep = self.endog.pandas[col]
             mod = _OLS(
-                dep, exog_instr, weights=self.weights.ndarray, solver=self._solver
+                dep,
+                exog_instr,
+                weights=self.weights.ndarray,
+                method=self._numerical_method,
             )
             res[str(col)] = mod.fit(cov_type=self._cov_type, **self._cov_config)
 
@@ -1317,7 +1320,7 @@ class _CommonIVResults(OLSResults):
             self.model.weights,
             self._cov_type,
             self._cov_config,
-            solver=self.model._solver,
+            method=self.model._numerical_method,
         )
 
 
@@ -1393,7 +1396,7 @@ class IVResults(_CommonIVResults):
             )
 
         eps = self.wresids.to_numpy()[:, None]
-        u = annihilate(eps, self.model._wz, solver=self.model._solver)
+        u = annihilate(eps, self.model._wz, method=self.model._numerical_method)
         stat = nobs * (1 - (u.T @ u) / (eps.T @ eps)).squeeze()
         null = "The model is not overidentified."
 
@@ -1490,15 +1493,15 @@ class IVResults(_CommonIVResults):
             still_endog,
             self.model.instruments,
             weights=self.model.weights,
-            solver=self.model._solver,
+            method=self.model._numerical_method,
         )
         e0 = mod.fit().wresids.to_numpy()[:, None]
 
         z2 = self.model._wz
         z1 = c_[z2, assumed_exog * w]
 
-        e1 = proj(e0, z1, solver=self.model._solver)
-        e2 = proj(e2, z2, solver=self.model._solver)
+        e1 = proj(e0, z1, method=self.model._numerical_method)
+        e2 = proj(e2, z2, method=self.model._numerical_method)
         return e0, e1, e2, nobs, nexog, nendog, ntested
 
     def durbin(self, variables: str | list[str] | None = None) -> WaldTestStatistic:
@@ -1691,12 +1694,12 @@ class IVResults(_CommonIVResults):
         from linearmodels.iv.model import _OLS
 
         w = self.model._sqrt_weights
-        solver = self.model._solver
-        e = annihilate(self.model._wy, self.model._wx, solver=solver)
-        r = annihilate(self.model.endog.ndarray * w, self.model._wz, solver=solver)
+        method = self.model._numerical_method
+        e = annihilate(self.model._wy, self.model._wx, method=method)
+        r = annihilate(self.model.endog.ndarray * w, self.model._wz, method=method)
         nobs = e.shape[0]
-        r = annihilate(r, self.model._wx, solver=solver)
-        res = _OLS(ones((nobs, 1)), r * e, solver=solver).fit(cov_type="unadjusted")
+        r = annihilate(r, self.model._wx, method=method)
+        res = _OLS(ones((nobs, 1)), r * e, method=method).fit(cov_type="unadjusted")
         stat = res.nobs - res.resid_ss
         df = self.model.endog.shape[1]
         null = "Endogenous variables are exogenous"
@@ -1738,11 +1741,11 @@ class IVResults(_CommonIVResults):
         # The first-stage residuals are computed on the weighted data. They are
         # divided by the root weights since _OLS applies the weights again
         # when it forms its own weighted regressors.
-        solver = self.model._solver
-        r = annihilate(self.model.endog.ndarray * w, self.model._wz, solver=solver) / w
+        method = self.model._numerical_method
+        r = annihilate(self.model.endog.ndarray * w, self.model._wz, method=method) / w
         augx = c_[self.model._x, r]
         mod = _OLS(
-            self.model.dependent, augx, weights=self.model.weights, solver=solver
+            self.model.dependent, augx, weights=self.model.weights, method=method
         )
         res = mod.fit(cov_type=self.cov_type, **self.cov_config)
         norig = self.model._x.shape[1]
@@ -1799,12 +1802,12 @@ class IVResults(_CommonIVResults):
             )
 
         w = self.model._sqrt_weights
-        solver = self.model._solver
-        endog_hat = proj(endog.ndarray * w, self.model._wz, solver=solver)
+        method = self.model._numerical_method
+        endog_hat = proj(endog.ndarray * w, self.model._wz, method=method)
         q = instruments.ndarray[:, : (ninstr - nendog)] * w
-        q_res = annihilate(q, c_[exog.ndarray * w, endog_hat], solver=solver)
+        q_res = annihilate(q, c_[exog.ndarray * w, endog_hat], method=method)
         test_functions = q_res * self.wresids.to_numpy()[:, None]
-        res = _OLS(ones((nobs, 1)), test_functions, solver=solver).fit(
+        res = _OLS(ones((nobs, 1)), test_functions, method=method).fit(
             cov_type="unadjusted"
         )
 
