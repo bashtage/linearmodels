@@ -186,9 +186,9 @@ is built by the same workflow on every push to main.
 
 ## Requirements
 
-**linearmodels 7.1 is the last release that supports Python 3.10 and NumPy 1.x
-(NumPy < 2).** Later releases will raise the minimum supported versions of
-Python, NumPy and the other dependencies.
+**linearmodels 7.x supports Python 3.10 and NumPy 1.x (NumPy < 2).**
+linearmodels 8.0 will raise the minimum supported versions of Python, NumPy and
+the other dependencies.
 
 ### Running
 
