@@ -5,6 +5,9 @@ Instrumental variable estimators.
 from __future__ import annotations
 
 from collections.abc import Callable, Mapping
+import os
+import sys
+from types import FrameType
 from typing import Any, TypeVar, Union, cast
 import warnings
 
@@ -33,11 +36,29 @@ from numpy import (
     squeeze,
     unique,
 )
-from numpy.linalg import LinAlgError, eigvalsh, inv, matrix_rank, norm, pinv, qr, solve
+from numpy.linalg import (
+    LinAlgError,
+    eigvalsh,
+    inv,
+    matrix_rank,
+    norm,
+    pinv,
+    qr,
+    solve,
+    svd,
+)
 from pandas import DataFrame, Series, concat
+from scipy.linalg import qr as sp_qr, solve_triangular
 from scipy.optimize import minimize
 
-from linearmodels.iv._utility import IVFormulaParser
+from linearmodels.iv._utility import (
+    SOLVERS,
+    IVFormulaParser,
+    full_column_rank,
+    kclass_factors,
+    kclass_solve,
+    orthonormal_basis,
+)
 from linearmodels.iv.common import f_statistic, find_constant
 from linearmodels.iv.covariance import (
     KERNEL_LOOKUP,
@@ -161,6 +182,58 @@ WEIGHT_MATRICES = {
 # eigenvalue, and has no digits left.
 _KAPPA_TOLERANCE = float(sqrt(finfo(float64).eps))
 
+# With solver="qr", [exog, endog] and [exog, instruments] are rank deficient if the
+# condition number of the matrix with columns scaled to unit length is at least
+# 1 / _RANK_TOLERANCE = 1e9. The estimators use QR, so that their rounding error grows
+# with the condition number times the machine precision, about 2.2e-16. At the
+# tolerance, about 7 digits are left. The test does not depend on the units of the
+# variables.
+_RANK_TOLERANCE = 1e-9
+_RANK_MESSAGE = (
+    "The columns, scaled to unit length, are collinear: the smallest singular value "
+    f"is at most {_RANK_TOLERANCE:g} times the largest."
+)
+_SCALE_HINT = (
+    " The columns are linearly independent once they are scaled to unit length, so "
+    'that the rank depends on their units. With solver="qr", the rank is tested '
+    "on the scaled columns, and the model is estimated by QR. This will be the "
+    "default in linearmodels 8.0."
+)
+_FUTURE_RANK_WARNING = (
+    "{name} are nearly collinear: the condition number of the columns scaled to unit "
+    "length is at least {limit:g}, so that the estimates have few or no correct "
+    "digits. linearmodels 8.0 will raise a ValueError for these data, and estimate "
+    'IV2SLS and IVLIML by QR. Use solver="qr" to get this behavior now, or '
+    'solver="legacy" to keep the current behavior without this warning.'
+)
+
+
+_IV_DIRECTORY = os.path.dirname(os.path.abspath(__file__))
+
+
+def _external_stacklevel() -> int:
+    """The stacklevel of the first caller that is not in linearmodels.iv."""
+    frame: FrameType | None = sys._getframe(1)
+    level = 1
+    while (
+        frame is not None
+        and os.path.dirname(os.path.abspath(frame.f_code.co_filename)) == _IV_DIRECTORY
+    ):
+        frame = frame.f_back
+        level += 1
+    return level
+
+
+def _check_solver(solver: str | None) -> tuple[str, bool]:
+    """The numerical method, and whether to warn about the default of 8.0."""
+    if solver is None:
+        return "legacy", True
+    if not isinstance(solver, str) or solver.lower() not in SOLVERS:
+        raise ValueError(
+            f'solver must be "legacy", "qr" or None, but it is {solver!r}.'
+        )
+    return solver.lower(), False
+
 
 class _IVModelBase:
     r"""
@@ -188,6 +261,14 @@ class _IVModelBase:
     kappa : float, optional
         Parameter value for k-class estimation. If not provided, it is computed to
         produce the LIML parameter estimate.
+    solver : {"legacy", "qr"}, optional
+        The numerical method. The names are not case sensitive. "legacy" tests the
+        rank of ``[exog, endog]`` and ``[exog, instruments]`` from their columns as
+        they are, projects with ``pinv`` and inverts cross products. "qr" tests the
+        rank after scaling the columns to unit length, and computes the estimates,
+        their covariance and the kappa of LIML by QR. If not provided, "legacy" is
+        used, and a ``FutureWarning`` is issued if the data are rank deficient with
+        "qr". See Notes.
 
     Raises
     ------
@@ -197,9 +278,17 @@ class _IVModelBase:
         does not have full column rank, if all observations have a missing value,
         if the inputs have different numbers of observations or labels that do
         not match (see Notes), if ``weights`` are not strictly positive and
-        finite, or if ``kappa`` or ``fuller`` is not a scalar.
+        finite, if ``kappa`` or ``fuller`` is not a scalar, or if ``solver`` is
+        not "legacy", "qr" or None.
     TypeError
         If an input is complex or cannot be converted to float64.
+
+    Warns
+    -----
+    FutureWarning
+        If ``solver`` is not provided, and ``[exog, endog]`` or ``[exog,
+        instruments]`` passes the rank check of "legacy" but is rank deficient with
+        "qr". linearmodels 8.0 will raise a ``ValueError`` for these data.
 
     See Also
     --------
@@ -247,7 +336,9 @@ class _IVModelBase:
         weights: IVDataLike | None = None,
         fuller: linearmodels.typing.Numeric = 0,
         kappa: linearmodels.typing.OptionalNumeric = None,
+        solver: str | None = "legacy",
     ):
+        self._solver, self._warn_solver = _check_solver(solver)
         self.dependent = IVData(dependent, var_name="dependent")
         nobs: int = self.dependent.shape[0]
         self.exog = IVData(exog, var_name="exog", nobs=nobs)
@@ -473,13 +564,55 @@ class _IVModelBase:
                 "as large as the number of endogenous regressors"
                 " ({}).".format(self.instruments.shape[1], self.endog.shape[1])
             )
-        if matrix_rank(x) < x.shape[1]:
-            raise ValueError("regressors [exog endog] do not have full column rank")
-        if matrix_rank(z) < z.shape[1]:
-            raise ValueError(
-                "instruments [exog instruments]  do not have full column rank"
-            )
+        if self._solver == "qr":
+            # The rank is tested after scaling the columns to unit length, so that
+            # the result does not depend on the units of the variables. A column that
+            # is exactly 0 cannot be scaled and is linearly dependent
+            if not full_column_rank(x, _RANK_TOLERANCE):
+                raise ValueError(
+                    "regressors [exog endog] do not have full column rank. "
+                    + _RANK_MESSAGE
+                )
+            if not full_column_rank(z, _RANK_TOLERANCE):
+                raise ValueError(
+                    "instruments [exog instruments] do not have full column rank. "
+                    + _RANK_MESSAGE
+                )
+        else:
+            self._legacy_rank_check()
         self._has_constant, self._const_loc = has_constant(x)
+
+    # The k-class models can be estimated with solver="qr"
+    _supports_qr = False
+
+    def _legacy_rank_check(self) -> None:
+        """The rank check of solver="legacy", on the columns as they are."""
+        checks = (
+            (
+                self._x,
+                "regressors [exog endog] do not have full column rank",
+                "The regressors [exog endog]",
+            ),
+            (
+                self._z,
+                "instruments [exog instruments]  do not have full column rank",
+                "The instruments [exog instruments]",
+            ),
+        )
+        for a, message, _ in checks:
+            if matrix_rank(a) < a.shape[1]:
+                hint = self._supports_qr and full_column_rank(a, _RANK_TOLERANCE)
+                raise ValueError(message + ("." + _SCALE_HINT if hint else ""))
+        if not (self._supports_qr and self._warn_solver):
+            return
+        for a, _, name in checks:
+            if not full_column_rank(a, _RANK_TOLERANCE):
+                warnings.warn(
+                    _FUTURE_RANK_WARNING.format(name=name, limit=1 / _RANK_TOLERANCE),
+                    FutureWarning,
+                    stacklevel=_external_stacklevel(),
+                )
+                return
 
     def _drop_missing(self) -> linearmodels.typing.data.BoolArray:
         data = (self.dependent, self.exog, self.endog, self.instruments, self.weights)
@@ -639,9 +772,16 @@ class _IVModelBase:
                 "and instruments are linearly independent."
             )
 
-        ez = e - z @ (pinv(z) @ e)
+        if self._solver == "qr":
+            z_basis = orthonormal_basis(z)
+            ez = e - z_basis @ (z_basis.T @ e)
+        else:
+            ez = e - z @ (pinv(z) @ e)
         if x1.shape[1] == 0:  # No exogenous regressors
             ex1 = e
+        elif self._solver == "qr":
+            x1_basis = orthonormal_basis(x1)
+            ex1 = e - x1_basis @ (x1_basis.T @ e)
         else:
             ex1 = e - x1 @ (pinv(x1) @ e)
 
@@ -660,6 +800,14 @@ class _IVModelBase:
                 "dependent, so that the cross product of the residuals, which is "
                 "inverted to estimate kappa, is singular."
             )
+
+        if self._solver == "qr":
+            # The eigenvalues of (ez'ez)^(-1/2) (ex1'ex1) (ez'ez)^(-1/2) are the
+            # squared singular values of ex1 R^-1, where ez = QR. This does not form
+            # the cross products, and does not depend on the units of the variables
+            r = sp_qr(ez, mode="r", check_finite=False)[0][:ncol]
+            scaled_ex1 = solve_triangular(r, ex1.T, trans="T").T
+            return float(svd(scaled_ex1, compute_uv=False)[-1] ** 2)
 
         vpmzv_sqinv = inv_sqrth(ez.T @ ez)
         q = vpmzv_sqinv @ (ex1.T @ ex1) @ vpmzv_sqinv
@@ -746,6 +894,14 @@ class _IVLSModelBase(_IVModelBase):
     kappa : float, optional
         Parameter value for k-class estimation. If not provided, it is computed to
         produce the LIML parameter estimate.
+    solver : {"legacy", "qr"}, optional
+        The numerical method. The names are not case sensitive. "legacy" tests the
+        rank of ``[exog, endog]`` and ``[exog, instruments]`` from their columns as
+        they are, projects with ``pinv`` and inverts cross products. "qr" tests the
+        rank after scaling the columns to unit length, and computes the estimates,
+        their covariance and the kappa of LIML by QR. If not provided, "legacy" is
+        used, and a ``FutureWarning`` is issued if the data are rank deficient with
+        "qr". See Notes.
 
     Raises
     ------
@@ -755,9 +911,17 @@ class _IVLSModelBase(_IVModelBase):
         does not have full column rank, if all observations have a missing value,
         if the inputs have different numbers of observations or labels that do
         not match (see Notes), if ``weights`` are not strictly positive and
-        finite, or if ``kappa`` or ``fuller`` is not a scalar.
+        finite, if ``kappa`` or ``fuller`` is not a scalar, or if ``solver`` is
+        not "legacy", "qr" or None.
     TypeError
         If an input is complex or cannot be converted to float64.
+
+    Warns
+    -----
+    FutureWarning
+        If ``solver`` is not provided, and ``[exog, endog]`` or ``[exog,
+        instruments]`` passes the rank check of "legacy" but is rank deficient with
+        "qr". linearmodels 8.0 will raise a ``ValueError`` for these data.
 
     See Also
     --------
@@ -805,6 +969,7 @@ class _IVLSModelBase(_IVModelBase):
         weights: IVDataLike | None = None,
         fuller: linearmodels.typing.Numeric = 0,
         kappa: linearmodels.typing.OptionalNumeric = None,
+        solver: str | None = None,
     ):
         super().__init__(
             dependent,
@@ -814,7 +979,10 @@ class _IVLSModelBase(_IVModelBase):
             weights=weights,
             fuller=fuller,
             kappa=kappa,
+            solver=solver,
         )
+
+    _supports_qr = True
 
     @staticmethod
     def estimate_parameters(
@@ -822,6 +990,8 @@ class _IVLSModelBase(_IVModelBase):
         y: linearmodels.typing.data.Float64Array,
         z: linearmodels.typing.data.Float64Array,
         kappa: linearmodels.typing.Numeric,
+        *,
+        solver: str = "legacy",
     ) -> linearmodels.typing.data.Float64Array:
         """
         Parameter estimation without error checking.
@@ -836,6 +1006,8 @@ class _IVLSModelBase(_IVModelBase):
             Instrument matrix (nobs by ninstr).
         kappa : float
             Parameter value for k-class estimator.
+        solver : {"legacy", "qr"}, optional
+            The numerical method. The default is "legacy". See Notes.
 
         Returns
         -------
@@ -846,11 +1018,30 @@ class _IVLSModelBase(_IVModelBase):
         -----
         Exposed as a static method to facilitate estimation with other data,
         e.g., bootstrapped samples.  Performs no error checking.
+
+        "legacy" inverts the cross products of the k-class estimator, which squares
+        the condition number of the problem, and projects with ``pinv(z)``, which
+        drops directions if the columns of z are on very different scales.
+
+        "qr" computes the estimate from the Householder QR decomposition of z, and
+        factors the cross products of the k-class estimator without forming them.
+        With kappa = 1, this is the least squares solution of the regression of the
+        projection of y on the projection of x, computed by QR, as in R's
+        ``ivreg``. The result does not depend on the units of the variables, and
+        its rounding error grows with the condition number of the problem, not with
+        its square. z must have full column rank and at least as many columns as x.
+
+        .. versionadded:: 7.2
+
+           The ``solver`` keyword.
         """
-        pinvz = pinv(z)
-        p1 = (x.T @ x) * (1 - kappa) + kappa * ((x.T @ z) @ (pinvz @ x))
-        p2 = (x.T @ y) * (1 - kappa) + kappa * ((x.T @ z) @ (pinvz @ y))
-        return inv(p1) @ p2
+        if solver == "legacy":
+            pinvz = pinv(z)
+            p1 = (x.T @ x) * (1 - kappa) + kappa * ((x.T @ z) @ (pinvz @ x))
+            p2 = (x.T @ y) * (1 - kappa) + kappa * ((x.T @ z) @ (pinvz @ y))
+            return inv(p1) @ p2
+        factors = kclass_factors(x, orthonormal_basis(z), float(kappa), y)
+        return kclass_solve(factors)
 
     def fit(
         self, *, cov_type: str = "robust", debiased: bool = False, **cov_config: Any
@@ -963,14 +1154,16 @@ class _IVLSModelBase(_IVModelBase):
             nobs, ninstr = wz.shape
             est_kappa -= self._fuller / (nobs - ninstr)
 
-        params = self.estimate_parameters(wx, wy, wz, est_kappa)
+        params = self.estimate_parameters(wx, wy, wz, est_kappa, solver=self._solver)
 
         cov_estimator = lookup_option(COVARIANCE_ESTIMATORS, cov_type, "cov_type")
         cov_config["debiased"] = debiased
         cov_config["kappa"] = est_kappa
         cov_config_copy = dict(cov_config.items())
         cov_config_copy.pop("center", None)
-        cov_estimator_inst = cov_estimator(wx, wy, wz, params, **cov_config_copy)
+        cov_estimator_inst = cov_estimator(
+            wx, wy, wz, params, solver=self._solver, **cov_config_copy
+        )
 
         results = {"kappa": est_kappa, "liml_kappa": liml_kappa}
         pe = self._post_estimation(params, cov_estimator_inst, cov_type)
@@ -1008,6 +1201,14 @@ class IVLIML(_IVLSModelBase):
     kappa : float, optional
         Parameter value for k-class estimation. If not provided, it is computed to
         produce the LIML parameter estimate.
+    solver : {"legacy", "qr"}, optional
+        The numerical method. The names are not case sensitive. "legacy" tests the
+        rank of ``[exog, endog]`` and ``[exog, instruments]`` from their columns as
+        they are, projects with ``pinv`` and inverts cross products. "qr" tests the
+        rank after scaling the columns to unit length, and computes the estimates,
+        their covariance and the kappa of LIML by QR. If not provided, "legacy" is
+        used, and a ``FutureWarning`` is issued if the data are rank deficient with
+        "qr". See Notes.
 
     Raises
     ------
@@ -1017,9 +1218,17 @@ class IVLIML(_IVLSModelBase):
         does not have full column rank, if all observations have a missing value,
         if the inputs have different numbers of observations or labels that do
         not match (see Notes), if ``weights`` are not strictly positive and
-        finite, or if ``kappa`` or ``fuller`` is not a scalar.
+        finite, if ``kappa`` or ``fuller`` is not a scalar, or if ``solver`` is
+        not "legacy", "qr" or None.
     TypeError
         If an input is complex or cannot be converted to float64.
+
+    Warns
+    -----
+    FutureWarning
+        If ``solver`` is not provided, and ``[exog, endog]`` or ``[exog,
+        instruments]`` passes the rank check of "legacy" but is rank deficient with
+        "qr". linearmodels 8.0 will raise a ``ValueError`` for these data.
 
     See Also
     --------
@@ -1082,6 +1291,44 @@ class IVLIML(_IVLSModelBase):
        endogenous regressor and one instrument. It was NaN on some platforms, with
        the estimates and their covariance, and a ``RuntimeWarning`` was emitted.
 
+    With ``solver="qr"``, ``[exog, endog]`` or ``[exog, instruments]`` is rank
+    deficient if, with its columns scaled to unit length, the smallest singular value
+    is at most 1e-9 times the largest, that is, if the condition number is at least
+    1e9. The test does not depend on the units of the variables. The estimates and
+    their covariance are computed from QR decompositions of the instruments and of
+    the projected regressors, without forming cross products, as in R's ``ivreg``.
+    Their rounding error grows with the condition number of the scaled data, not with
+    its square, and does not depend on the units of the variables. "legacy" tests the
+    rank of the columns as they are, so that columns on very different scales (by a
+    factor of about 1e13 or more) are rank deficient, while nearly collinear columns
+    pass and can give estimates with no correct digits. The error that "legacy"
+    raises for columns that are only rank deficient because of their units says so.
+    linearmodels 8.0 will use "qr" by default. Until then, the default is "legacy",
+    and a ``FutureWarning`` is issued for data that "qr" finds rank deficient.
+
+    .. versionadded:: 7.2
+
+       The ``solver`` keyword.
+
+    With ``solver="qr"``, ``[exog, endog]`` or ``[exog, instruments]`` is rank
+    deficient if, with its columns scaled to unit length, the smallest singular value
+    is at most 1e-9 times the largest, that is, if the condition number is at least
+    1e9. The test does not depend on the units of the variables. The estimates and
+    their covariance are computed from QR decompositions of the instruments and of
+    the projected regressors, without forming cross products, as in R's ``ivreg``.
+    Their rounding error grows with the condition number of the scaled data, not with
+    its square, and does not depend on the units of the variables. "legacy" tests the
+    rank of the columns as they are, so that columns on very different scales (by a
+    factor of about 1e13 or more) are rank deficient, while nearly collinear columns
+    pass and can give estimates with no correct digits. The error that "legacy"
+    raises for columns that are only rank deficient because of their units says so.
+    linearmodels 8.0 will use "qr" by default. Until then, the default is "legacy",
+    and a ``FutureWarning`` is issued for data that "qr" finds rank deficient.
+
+    .. versionadded:: 7.2
+
+       The ``solver`` keyword.
+
     Rows are paired by position. An input that carries labels (a pandas
     Series or DataFrame with an index other than the default 0, 1, ..., n-1,
     or an xarray DataArray with coordinates) must use the same index, in the
@@ -1114,6 +1361,7 @@ class IVLIML(_IVLSModelBase):
         weights: IVDataLike | None = None,
         fuller: linearmodels.typing.Numeric = 0,
         kappa: linearmodels.typing.OptionalNumeric = None,
+        solver: str | None = None,
     ):
         super().__init__(
             dependent,
@@ -1123,6 +1371,7 @@ class IVLIML(_IVLSModelBase):
             weights=weights,
             fuller=fuller,
             kappa=kappa,
+            solver=solver,
         )
 
     @staticmethod
@@ -1133,6 +1382,7 @@ class IVLIML(_IVLSModelBase):
         weights: IVDataLike | None = None,
         fuller: float = 0,
         kappa: linearmodels.typing.OptionalNumeric = None,
+        solver: str | None = None,
     ) -> IVLIML:
         """
         Create a model from a formula.
@@ -1155,6 +1405,14 @@ class IVLIML(_IVLSModelBase):
         kappa : float, optional
             Parameter value for k-class estimation. If not provided, it is computed
             to produce the LIML parameter estimate.
+        solver : {"legacy", "qr"}, optional
+            The numerical method. The names are not case sensitive. "legacy" tests the
+            rank of ``[exog, endog]`` and ``[exog, instruments]`` from their columns as
+            they are, projects with ``pinv`` and inverts cross products. "qr" tests the
+            rank after scaling the columns to unit length, and computes the estimates,
+            their covariance and the kappa of LIML by QR. If not provided, "legacy" is
+            used, and a ``FutureWarning`` is issued if the data are rank deficient with
+            "qr". See Notes.
 
         Returns
         -------
@@ -1193,7 +1451,14 @@ class IVLIML(_IVLSModelBase):
         parser = IVFormulaParser(formula, data)
         dep, exog, endog, instr = parser.data
         mod: IVLIML = IVLIML(
-            dep, exog, endog, instr, weights=weights, fuller=fuller, kappa=kappa
+            dep,
+            exog,
+            endog,
+            instr,
+            weights=weights,
+            fuller=fuller,
+            kappa=kappa,
+            solver=solver,
         )
         mod.formula = formula
         return mod
@@ -1219,6 +1484,14 @@ class IV2SLS(_IVLSModelBase):
         Observation weights used in estimation. The weights must be strictly positive
         and finite. They are rescaled to have a mean of 1. A NaN weight is missing, and
         its observation is dropped. The default is to weight all observations equally.
+    solver : {"legacy", "qr"}, optional
+        The numerical method. The names are not case sensitive. "legacy" tests the
+        rank of ``[exog, endog]`` and ``[exog, instruments]`` from their columns as
+        they are, projects with ``pinv`` and inverts cross products. "qr" tests the
+        rank after scaling the columns to unit length, and computes the estimates,
+        their covariance and the kappa of LIML by QR. If not provided, "legacy" is
+        used, and a ``FutureWarning`` is issued if the data are rank deficient with
+        "qr". See Notes.
 
     Raises
     ------
@@ -1227,10 +1500,17 @@ class IV2SLS(_IVLSModelBase):
         endogenous regressors, if ``[exog, endog]`` or ``[exog, instruments]``
         does not have full column rank, if all observations have a missing value,
         if the inputs have different numbers of observations or labels that do
-        not match (see Notes), or if ``weights`` are not strictly positive and
-        finite.
+        not match (see Notes), if ``weights`` are not strictly positive and
+        finite, or if ``solver`` is not "legacy", "qr" or None.
     TypeError
         If an input is complex or cannot be converted to float64.
+
+    Warns
+    -----
+    FutureWarning
+        If ``solver`` is not provided, and ``[exog, endog]`` or ``[exog,
+        instruments]`` passes the rank check of "legacy" but is rank deficient with
+        "qr". linearmodels 8.0 will raise a ``ValueError`` for these data.
 
     See Also
     --------
@@ -1266,6 +1546,25 @@ class IV2SLS(_IVLSModelBase):
        :math:`\kappa` is not defined. Earlier versions computed them from the
        rounding error of a singular matrix, or the statistics were NaN.
 
+    With ``solver="qr"``, ``[exog, endog]`` or ``[exog, instruments]`` is rank
+    deficient if, with its columns scaled to unit length, the smallest singular value
+    is at most 1e-9 times the largest, that is, if the condition number is at least
+    1e9. The test does not depend on the units of the variables. The estimates and
+    their covariance are computed from QR decompositions of the instruments and of
+    the projected regressors, without forming cross products, as in R's ``ivreg``.
+    Their rounding error grows with the condition number of the scaled data, not with
+    its square, and does not depend on the units of the variables. "legacy" tests the
+    rank of the columns as they are, so that columns on very different scales (by a
+    factor of about 1e13 or more) are rank deficient, while nearly collinear columns
+    pass and can give estimates with no correct digits. The error that "legacy"
+    raises for columns that are only rank deficient because of their units says so.
+    linearmodels 8.0 will use "qr" by default. Until then, the default is "legacy",
+    and a ``FutureWarning`` is issued for data that "qr" finds rank deficient.
+
+    .. versionadded:: 7.2
+
+       The ``solver`` keyword.
+
     Rows are paired by position. An input that carries labels (a pandas
     Series or DataFrame with an index other than the default 0, 1, ..., n-1,
     or an xarray DataArray with coordinates) must use the same index, in the
@@ -1296,15 +1595,27 @@ class IV2SLS(_IVLSModelBase):
         instruments: IVDataLike | None,
         *,
         weights: IVDataLike | None = None,
+        solver: str | None = None,
     ):
         self._method = "IV-2SLS"
         super().__init__(
-            dependent, exog, endog, instruments, weights=weights, fuller=0, kappa=1
+            dependent,
+            exog,
+            endog,
+            instruments,
+            weights=weights,
+            fuller=0,
+            kappa=1,
+            solver=solver,
         )
 
     @staticmethod
     def from_formula(
-        formula: str, data: DataFrame, *, weights: IVDataLike | None = None
+        formula: str,
+        data: DataFrame,
+        *,
+        weights: IVDataLike | None = None,
+        solver: str | None = None,
     ) -> IV2SLS:
         """
         Create a model from a formula.
@@ -1321,6 +1632,14 @@ class IV2SLS(_IVLSModelBase):
             positive and finite. They are rescaled to have a mean of 1. A NaN weight is
             missing, and its observation is dropped. The default is to weight all
             observations equally.
+        solver : {"legacy", "qr"}, optional
+            The numerical method. The names are not case sensitive. "legacy" tests the
+            rank of ``[exog, endog]`` and ``[exog, instruments]`` from their columns as
+            they are, projects with ``pinv`` and inverts cross products. "qr" tests the
+            rank after scaling the columns to unit length, and computes the estimates,
+            their covariance and the kappa of LIML by QR. If not provided, "legacy" is
+            used, and a ``FutureWarning`` is issued if the data are rank deficient with
+            "qr". See Notes.
 
         Returns
         -------
@@ -1358,7 +1677,7 @@ class IV2SLS(_IVLSModelBase):
         """
         parser = IVFormulaParser(formula, data)
         dep, exog, endog, instr = parser.data
-        mod = IV2SLS(dep, exog, endog, instr, weights=weights)
+        mod = IV2SLS(dep, exog, endog, instr, weights=weights, solver=solver)
         mod.formula = formula
         return mod
 
@@ -2810,6 +3129,9 @@ class _OLS(IVLIML):
         Observation weights used in estimation. The weights must be strictly positive
         and finite. They are rescaled to have a mean of 1. A NaN weight is missing, and
         its observation is dropped. The default is to weight all observations equally.
+    solver : {"legacy", "qr"}, optional
+        The numerical method, see :class:`IV2SLS`. The default is "legacy", which
+        does not warn. The models pass their own solver.
 
     See Also
     --------
@@ -2844,8 +3166,11 @@ class _OLS(IVLIML):
         exog: IVDataLike,
         *,
         weights: IVDataLike | None = None,
+        solver: str | None = "legacy",
     ):
-        super().__init__(dependent, exog, None, None, weights=weights, kappa=0.0)
+        super().__init__(
+            dependent, exog, None, None, weights=weights, kappa=0.0, solver=solver
+        )
         self._result_container = OLSResults
 
 

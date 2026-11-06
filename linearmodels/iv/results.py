@@ -826,6 +826,11 @@ class FirstStageResults(_SummaryStr):
         stage regressions and for the rank tests.
     cov_config : dict
         Options of the covariance estimator of the model.
+    solver : {"legacy", "qr"}, optional
+        The numerical method of the model, which is used for the first stage
+        regressions. The default is "legacy".
+
+        .. versionadded:: 7.2
     """
 
     def __init__(
@@ -837,8 +842,11 @@ class FirstStageResults(_SummaryStr):
         weights: IVData,
         cov_type: str,
         cov_config: dict[str, Any],
+        *,
+        solver: str = "legacy",
     ) -> None:
         self.dep = dep
+        self._solver = solver
         self.exog = exog
         self.endog = endog
         self.instr = instr
@@ -908,7 +916,7 @@ class FirstStageResults(_SummaryStr):
         or the kernel of the model, and is the same for every covariance
         estimator.
         """
-        return cragg_donald(*self._weighted_arrays())
+        return cragg_donald(*self._weighted_arrays(), solver=self._solver)
 
     @cached_property
     def cragg_donald_f(self) -> float:
@@ -939,18 +947,25 @@ class FirstStageResults(_SummaryStr):
         does not depend on the scale of the weights or on the clusters of the
         model.
         """
-        return cragg_donald_f(*self._weighted_arrays())
+        return cragg_donald_f(*self._weighted_arrays(), solver=self._solver)
 
     @cached_property
     def _rk_lm(self) -> WaldTestStatistic | InvalidTestStatistic:
         return _kleibergen_paap(
-            *self._weighted_arrays(), self._cov_type, self._cov_config, wald=False
+            *self._weighted_arrays(),
+            self._cov_type,
+            self._cov_config,
+            wald=False,
+            solver=self._solver,
         )[0]
 
     @cached_property
     def _rk_wald_f(self) -> float:
         return _kleibergen_paap(
-            *self._weighted_arrays(), self._cov_type, self._cov_config
+            *self._weighted_arrays(),
+            self._cov_type,
+            self._cov_config,
+            solver=self._solver,
         )[1]
 
     @property
@@ -1101,7 +1116,7 @@ class FirstStageResults(_SummaryStr):
         z = w * instr.ndarray.astype(float, copy=False)
         nz = z.shape[1]
         x = w * exog.ndarray.astype(float, copy=False)
-        ez = annihilate(z, x)
+        ez = annihilate(z, x, solver=self._solver)
         individual_results = self.individual
         out_df = DataFrame(
             index=["rsquared", "partial.rsquared", "f.stat", "f.pval", "f.dist"],
@@ -1111,8 +1126,10 @@ class FirstStageResults(_SummaryStr):
             # TODO: BUG in pandas-stube
             #  https://github.com/pandas-dev/pandas-stubs/issues/97
             y = w * endog.pandas[[col]].to_numpy()
-            ey = annihilate(y, x)
-            partial = _OLS(ey, ez).fit(cov_type=self._cov_type, **self._cov_config)
+            ey = annihilate(y, x, solver=self._solver)
+            partial = _OLS(ey, ez, solver=self._solver).fit(
+                cov_type=self._cov_type, **self._cov_config
+            )
             full = individual_results[str(col)]
             params = full.params.to_numpy()[-nz:]
             params = params[:, None]
@@ -1138,10 +1155,12 @@ class FirstStageResults(_SummaryStr):
         out_df = out_df.T
 
         dep = self.dep
-        r2sls = IV2SLS(dep, exog, endog, instr, weights=weights).fit(
+        r2sls = IV2SLS(
+            dep, exog, endog, instr, weights=weights, solver=self._solver
+        ).fit(cov_type="unadjusted")
+        rols = _OLS(dep, self._reg, weights=weights, solver=self._solver).fit(
             cov_type="unadjusted"
         )
-        rols = _OLS(dep, self._reg, weights=weights).fit(cov_type="unadjusted")
         shea = (rols.std_errors / r2sls.std_errors) ** 2
         shea *= (1 - r2sls.rsquared) / (1 - rols.rsquared)
         out_df["shea.rsquared"] = shea[out_df.index]
@@ -1183,7 +1202,9 @@ class FirstStageResults(_SummaryStr):
         res: dict[str, OLSResults] = {}
         for col in self.endog.pandas:
             dep = self.endog.pandas[col]
-            mod = _OLS(dep, exog_instr, weights=self.weights.ndarray)
+            mod = _OLS(
+                dep, exog_instr, weights=self.weights.ndarray, solver=self._solver
+            )
             res[str(col)] = mod.fit(cov_type=self._cov_type, **self._cov_config)
 
         return res
@@ -1296,6 +1317,7 @@ class _CommonIVResults(OLSResults):
             self.model.weights,
             self._cov_type,
             self._cov_config,
+            solver=self.model._solver,
         )
 
 
@@ -1371,7 +1393,7 @@ class IVResults(_CommonIVResults):
             )
 
         eps = self.wresids.to_numpy()[:, None]
-        u = annihilate(eps, self.model._wz)
+        u = annihilate(eps, self.model._wz, solver=self.model._solver)
         stat = nobs * (1 - (u.T @ u) / (eps.T @ eps)).squeeze()
         null = "The model is not overidentified."
 
@@ -1468,14 +1490,15 @@ class IVResults(_CommonIVResults):
             still_endog,
             self.model.instruments,
             weights=self.model.weights,
+            solver=self.model._solver,
         )
         e0 = mod.fit().wresids.to_numpy()[:, None]
 
         z2 = self.model._wz
         z1 = c_[z2, assumed_exog * w]
 
-        e1 = proj(e0, z1)
-        e2 = proj(e2, z2)
+        e1 = proj(e0, z1, solver=self.model._solver)
+        e2 = proj(e2, z2, solver=self.model._solver)
         return e0, e1, e2, nobs, nexog, nendog, ntested
 
     def durbin(self, variables: str | list[str] | None = None) -> WaldTestStatistic:
@@ -1668,11 +1691,12 @@ class IVResults(_CommonIVResults):
         from linearmodels.iv.model import _OLS
 
         w = self.model._sqrt_weights
-        e = annihilate(self.model._wy, self.model._wx)
-        r = annihilate(self.model.endog.ndarray * w, self.model._wz)
+        solver = self.model._solver
+        e = annihilate(self.model._wy, self.model._wx, solver=solver)
+        r = annihilate(self.model.endog.ndarray * w, self.model._wz, solver=solver)
         nobs = e.shape[0]
-        r = annihilate(r, self.model._wx)
-        res = _OLS(ones((nobs, 1)), r * e).fit(cov_type="unadjusted")
+        r = annihilate(r, self.model._wx, solver=solver)
+        res = _OLS(ones((nobs, 1)), r * e, solver=solver).fit(cov_type="unadjusted")
         stat = res.nobs - res.resid_ss
         df = self.model.endog.shape[1]
         null = "Endogenous variables are exogenous"
@@ -1714,9 +1738,12 @@ class IVResults(_CommonIVResults):
         # The first-stage residuals are computed on the weighted data. They are
         # divided by the root weights since _OLS applies the weights again
         # when it forms its own weighted regressors.
-        r = annihilate(self.model.endog.ndarray * w, self.model._wz) / w
+        solver = self.model._solver
+        r = annihilate(self.model.endog.ndarray * w, self.model._wz, solver=solver) / w
         augx = c_[self.model._x, r]
-        mod = _OLS(self.model.dependent, augx, weights=self.model.weights)
+        mod = _OLS(
+            self.model.dependent, augx, weights=self.model.weights, solver=solver
+        )
         res = mod.fit(cov_type=self.cov_type, **self.cov_config)
         norig = self.model._x.shape[1]
         test_params = asarray(res.params.to_numpy()[norig:], dtype=float)
@@ -1772,11 +1799,14 @@ class IVResults(_CommonIVResults):
             )
 
         w = self.model._sqrt_weights
-        endog_hat = proj(endog.ndarray * w, self.model._wz)
+        solver = self.model._solver
+        endog_hat = proj(endog.ndarray * w, self.model._wz, solver=solver)
         q = instruments.ndarray[:, : (ninstr - nendog)] * w
-        q_res = annihilate(q, c_[exog.ndarray * w, endog_hat])
+        q_res = annihilate(q, c_[exog.ndarray * w, endog_hat], solver=solver)
         test_functions = q_res * self.wresids.to_numpy()[:, None]
-        res = _OLS(ones((nobs, 1)), test_functions).fit(cov_type="unadjusted")
+        res = _OLS(ones((nobs, 1)), test_functions, solver=solver).fit(
+            cov_type="unadjusted"
+        )
 
         stat = res.nobs * res.rsquared
         df = ninstr - nendog

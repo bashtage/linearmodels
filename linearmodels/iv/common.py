@@ -21,7 +21,7 @@ from numpy import (
     unique,
     where,
 )
-from numpy.linalg import LinAlgError, eigh, inv, matrix_rank, svd
+from numpy.linalg import LinAlgError, eigh, inv, matrix_rank, norm, svd
 from scipy.linalg import cholesky, solve_triangular
 
 from linearmodels.iv._utility import annihilate
@@ -103,11 +103,21 @@ class _FirstStageRank(NamedTuple):
     irqxx: linearmodels.typing.data.Float64Array
 
 
+def _rank(a: linearmodels.typing.data.Float64Array, solver: str) -> int:
+    """The rank of a, of its columns scaled to unit length if solver is "qr"."""
+    if solver == "qr":
+        scale = norm(a, axis=0)
+        scale[scale == 0] = 1.0
+        a = a / scale
+    return int(matrix_rank(a))
+
+
 def _first_stage_rank(
     endog: linearmodels.typing.data.Float64Array,
     instr: linearmodels.typing.data.Float64Array,
     exog: linearmodels.typing.data.Float64Array,
     name: str,
+    solver: str = "legacy",
 ) -> _FirstStageRank | InvalidTestStatistic:
     r"""
     Decompose the first stage into canonical correlations.
@@ -146,16 +156,16 @@ def _first_stage_rank(
     x = asarray(endog, dtype=float)
     z = asarray(instr, dtype=float)
     if nexog > 0:
-        x = annihilate(x, exog)
-        z = annihilate(z, exog)
-    if matrix_rank(x) < nendog:
+        x = annihilate(x, exog, solver=solver)
+        z = annihilate(z, exog, solver=solver)
+    if _rank(x, solver) < nendog:
         return InvalidTestStatistic(
             "The endogenous regressors are collinear once the exogenous "
             f"regressors are partialled out; the {name} statistic is not "
             "defined.",
             name=name,
         )
-    if matrix_rank(z) < ninstr:
+    if _rank(z, solver) < ninstr:
         return InvalidTestStatistic(
             "The instruments are collinear once the exogenous regressors are "
             f"partialled out; the {name} statistic is not defined.",
@@ -185,6 +195,8 @@ def cragg_donald(
     endog: linearmodels.typing.data.Float64Array,
     instr: linearmodels.typing.data.Float64Array,
     exog: linearmodels.typing.data.Float64Array,
+    *,
+    solver: str = "legacy",
 ) -> WaldTestStatistic | InvalidTestStatistic:
     r"""
     Cragg-Donald test of reduced rank for the first-stage regression.
@@ -198,6 +210,17 @@ def cragg_donald(
     exog : ndarray
         Weighted exogenous regressor array (nobs, nexog), partialled out
         before testing. Include a constant column here if the model has one.
+
+    solver : {"legacy", "qr"}, optional
+        The numerical method. "legacy", the default, partials out exog with
+        ``pinv`` and tests whether the partialled regressors and instruments are
+        collinear from their columns as they are. "qr" partials out exog with the
+        columns scaled to unit length and tests their rank after scaling the
+        columns to unit length, so that the statistic does not depend on the units
+        of the variables. The first stage results of IV2SLS and IVLIML use the
+        solver of the model.
+
+        .. versionadded:: 7.2
 
     Returns
     -------
@@ -295,7 +318,7 @@ def cragg_donald(
     Cambridge University Press.
     """
     name = "Cragg-Donald Test"
-    dec = _first_stage_rank(endog, instr, exog, name)
+    dec = _first_stage_rank(endog, instr, exog, name, solver)
     if isinstance(dec, InvalidTestStatistic):
         return dec
     r2 = float(dec.s[-1]) ** 2
@@ -308,6 +331,8 @@ def cragg_donald_f(
     endog: linearmodels.typing.data.Float64Array,
     instr: linearmodels.typing.data.Float64Array,
     exog: linearmodels.typing.data.Float64Array,
+    *,
+    solver: str = "legacy",
 ) -> float:
     r"""
     Cragg-Donald Wald F statistic.
@@ -321,6 +346,17 @@ def cragg_donald_f(
     exog : ndarray
         Weighted exogenous regressor array (nobs, nexog), partialled out
         before testing. Include a constant column here if the model has one.
+
+    solver : {"legacy", "qr"}, optional
+        The numerical method. "legacy", the default, partials out exog with
+        ``pinv`` and tests whether the partialled regressors and instruments are
+        collinear from their columns as they are. "qr" partials out exog with the
+        columns scaled to unit length and tests their rank after scaling the
+        columns to unit length, so that the statistic does not depend on the units
+        of the variables. The first stage results of IV2SLS and IVLIML use the
+        solver of the model.
+
+        .. versionadded:: 7.2
 
     Returns
     -------
@@ -360,7 +396,7 @@ def cragg_donald_f(
     regression. In *Identification and Inference for Econometric Models*.
     Cambridge University Press.
     """
-    test = cragg_donald(endog, instr, exog)
+    test = cragg_donald(endog, instr, exog, solver=solver)
     if isinstance(test, InvalidTestStatistic):
         return nan
     return float(test.stat) / instr.shape[1]
@@ -458,6 +494,7 @@ def _kleibergen_paap(
     cov_config: dict[str, Any] | None,
     *,
     wald: bool = True,
+    solver: str = "legacy",
 ) -> tuple[WaldTestStatistic | InvalidTestStatistic, float]:
     """
     Compute the rk LM test and the rk Wald F-statistic
@@ -483,7 +520,7 @@ def _kleibergen_paap(
             reason = "The statistic requires at least two clusters."
             return InvalidTestStatistic(reason, name=name), nan
         config["clusters"] = clusters
-    dec = _first_stage_rank(endog, instr, exog, name)
+    dec = _first_stage_rank(endog, instr, exog, name, solver)
     if isinstance(dec, InvalidTestStatistic):
         return dec, nan
     df = dec.ninstr - dec.nendog + 1
@@ -527,6 +564,8 @@ def kleibergen_paap(
     exog: linearmodels.typing.data.Float64Array,
     cov_type: str = "robust",
     cov_config: dict[str, Any] | None = None,
+    *,
+    solver: str = "legacy",
 ) -> WaldTestStatistic | InvalidTestStatistic:
     r"""
     Kleibergen-Paap rk LM test of underidentification.
@@ -564,6 +603,17 @@ def kleibergen_paap(
         with the quadratic spectral kernel. See
         :func:`~linearmodels.iv.covariance.kernel_optimal_bandwidth`, which
         lists the supported kernels.
+
+    solver : {"legacy", "qr"}, optional
+        The numerical method. "legacy", the default, partials out exog with
+        ``pinv`` and tests whether the partialled regressors and instruments are
+        collinear from their columns as they are. "qr" partials out exog with the
+        columns scaled to unit length and tests their rank after scaling the
+        columns to unit length, so that the statistic does not depend on the units
+        of the variables. The first stage results of IV2SLS and IVLIML use the
+        solver of the model.
+
+        .. versionadded:: 7.2
 
     Returns
     -------
@@ -687,7 +737,9 @@ def kleibergen_paap(
     the rank of a matrix using the Kleibergen-Paap rk statistic. *Statistical
     Software Components* S456865, Boston College.
     """
-    return _kleibergen_paap(endog, instr, exog, cov_type, cov_config, wald=False)[0]
+    return _kleibergen_paap(
+        endog, instr, exog, cov_type, cov_config, wald=False, solver=solver
+    )[0]
 
 
 def kleibergen_paap_f(
@@ -696,6 +748,8 @@ def kleibergen_paap_f(
     exog: linearmodels.typing.data.Float64Array,
     cov_type: str = "robust",
     cov_config: dict[str, Any] | None = None,
+    *,
+    solver: str = "legacy",
 ) -> float:
     r"""
     Kleibergen-Paap rk Wald F statistic.
@@ -725,6 +779,17 @@ def kleibergen_paap_f(
 
     cov_config : dict, optional
         Options for the covariance estimator. See :func:`kleibergen_paap`.
+
+    solver : {"legacy", "qr"}, optional
+        The numerical method. "legacy", the default, partials out exog with
+        ``pinv`` and tests whether the partialled regressors and instruments are
+        collinear from their columns as they are. "qr" partials out exog with the
+        columns scaled to unit length and tests their rank after scaling the
+        columns to unit length, so that the statistic does not depend on the units
+        of the variables. The first stage results of IV2SLS and IVLIML use the
+        solver of the model.
+
+        .. versionadded:: 7.2
 
     Returns
     -------
@@ -804,7 +869,7 @@ def kleibergen_paap_f(
     instrumental variables/GMM estimation and testing. *Stata Journal*, 7(4),
     465-506.
     """
-    return _kleibergen_paap(endog, instr, exog, cov_type, cov_config)[1]
+    return _kleibergen_paap(endog, instr, exog, cov_type, cov_config, solver=solver)[1]
 
 
 def f_statistic(
