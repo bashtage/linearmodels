@@ -337,6 +337,11 @@ class _LSModelResultsBase(_SummaryStr):
         This version of the F-statistic directly uses the model covariance
         estimator and so is robust against the same specification issues.
 
+        For IV estimators, if the regressors span a constant without an explicit
+        constant column, the null is that the fitted values are constant. For
+        example, with a dummy for every group, the group coefficients must be
+        equal and all other coefficients must be zero.
+
         An ``InvalidTestStatistic`` is returned if the model has no non-constant
         exogenous terms, or if the covariance of the parameters is singular, e.g.,
         the dependent variable is all zero, so that the model fits exactly.
