@@ -25,7 +25,7 @@ be added to 7.1. 7.2 also contains the fixes below.
   in 7.1. The IV covariance estimators, ``cragg_donald``, ``cragg_donald_f``,
   ``kleibergen_paap`` and ``kleibergen_paap_f`` accept the same keyword, and the first
   stage results and the tests of the results use the solver of the model (:issue:`823`,
-  :issue:`850`).
+  :issue:`850`, :issue:`870`).
 
 .. rubric:: Changes that alter results
 
@@ -76,7 +76,7 @@ be added to 7.1. 7.2 also contains the fixes below.
   ``solver`` is not given, a ``FutureWarning`` is issued for data that ``solver="qr"``
   finds rank deficient, which 8.0 will reject, and the error for columns that are only
   rank deficient because of their units suggests ``solver="qr"``. Use
-  ``solver="legacy"`` to keep the current behavior without the warning.
+  ``solver="legacy"`` to keep the current behavior without the warning (:issue:`870`).
 
 .. rubric:: Contributors
 
