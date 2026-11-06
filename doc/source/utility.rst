@@ -54,6 +54,7 @@ Covariance Estimation
 .. autosummary::
    :toctree: utility/
 
+   clip_negative_eigenvalues
    cov_cluster
    cov_kernel
    group_debias_coefficient

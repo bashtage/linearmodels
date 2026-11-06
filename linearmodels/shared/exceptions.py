@@ -70,6 +70,22 @@ class IndexWarning(Warning):
     """
 
 
+class NegativeVarianceWarning(RuntimeWarning):
+    """
+    Warning that the estimated variance of a parameter is negative.
+
+    The results of a panel model issue it when the estimated covariance of the
+    parameters has a negative variance on its diagonal. The standard errors,
+    t-statistics and p-values of those parameters are NaN. The two-way clustered
+    covariance is not guaranteed to be positive semi-definite, and in small samples
+    it can have a negative variance. Fitting with ``fix_psd=True`` sets its
+    negative eigenvalues to zero.
+
+    It is a ``RuntimeWarning``, the class of the warning that NumPy issues when it
+    takes the square root of a negative number.
+    """
+
+
 class DefaultBandwidthWarning(UserWarning):
     """
     Warning that a kernel estimator uses the bandwidth that it selects by default.
@@ -314,6 +330,7 @@ __all__ = [
     "InferenceUnavailableWarning",
     "MemoryWarning",
     "MissingValueWarning",
+    "NegativeVarianceWarning",
     "SingletonWarning",
     "UnknownOptionError",
     "check_cov_config",

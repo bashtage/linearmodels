@@ -1946,6 +1946,12 @@ class PooledOLS(_PanelModelBase):
             of distinct clusters and n is the number of observations. With
             two-way clustering, it is applied to each of the three one-way
             covariances that are combined. The default is False.
+          * ``fix_psd`` - Boolean flag indicating whether to make a two-way
+            clustered covariance positive semi-definite by setting its negative
+            eigenvalues to zero (Cameron, Gelbach and Miller, 2011). The
+            two-way clustered covariance can have a negative variance in small
+            samples. It has no effect with one-way clustering. The default is
+            False.
 
         * "kernel", "driscoll-kraay", "dk" - Driscoll-Kraay HAC estimator. The
           configuration options are:
@@ -3228,6 +3234,12 @@ class PanelOLS(_PanelModelBase):
             of distinct clusters and n is the number of observations. With
             two-way clustering, it is applied to each of the three one-way
             covariances that are combined. The default is False.
+          * ``fix_psd`` - Boolean flag indicating whether to make a two-way
+            clustered covariance positive semi-definite by setting its negative
+            eigenvalues to zero (Cameron, Gelbach and Miller, 2011). The
+            two-way clustered covariance can have a negative variance in small
+            samples. It has no effect with one-way clustering. The default is
+            False.
 
         * "kernel", "driscoll-kraay", "dk" - Driscoll-Kraay HAC estimator. The
           configuration options are:
@@ -3826,6 +3838,12 @@ class BetweenOLS(_PanelModelBase):
             of distinct clusters and n is the number of observations. With
             two-way clustering, it is applied to each of the three one-way
             covariances that are combined. The default is False.
+          * ``fix_psd`` - Boolean flag indicating whether to make a two-way
+            clustered covariance positive semi-definite by setting its negative
+            eigenvalues to zero (Cameron, Gelbach and Miller, 2011). The
+            two-way clustered covariance can have a negative variance in small
+            samples. It has no effect with one-way clustering. The default is
+            False.
 
         When using a clustered covariance estimator, all cluster ids must be
         identical within an entity. The options ``cluster_entity`` and
@@ -4338,6 +4356,12 @@ class FirstDifferenceOLS(_PanelModelBase):
             of distinct clusters and n is the number of observations. With
             two-way clustering, it is applied to each of the three one-way
             covariances that are combined. The default is False.
+          * ``fix_psd`` - Boolean flag indicating whether to make a two-way
+            clustered covariance positive semi-definite by setting its negative
+            eigenvalues to zero (Cameron, Gelbach and Miller, 2011). The
+            two-way clustered covariance can have a negative variance in small
+            samples. It has no effect with one-way clustering. The default is
+            False.
 
         * "kernel", "driscoll-kraay", "dk" - Driscoll-Kraay HAC estimator. The
           configuration options are:
@@ -4863,6 +4887,12 @@ class RandomEffects(_PanelModelBase):
             of distinct clusters and n is the number of observations. With
             two-way clustering, it is applied to each of the three one-way
             covariances that are combined. The default is False.
+          * ``fix_psd`` - Boolean flag indicating whether to make a two-way
+            clustered covariance positive semi-definite by setting its negative
+            eigenvalues to zero (Cameron, Gelbach and Miller, 2011). The
+            two-way clustered covariance can have a negative variance in small
+            samples. It has no effect with one-way clustering. The default is
+            False.
 
         * "kernel", "driscoll-kraay", "dk" - Driscoll-Kraay HAC estimator. The
           configuration options are:

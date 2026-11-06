@@ -24,6 +24,7 @@ make the grid, and the estimates with a closed form that does not use the models
 from linearmodels.compat.pandas import ANNUAL_FREQ
 
 import functools
+import warnings
 
 import numpy as np
 from numpy.testing import assert_allclose
@@ -40,7 +41,7 @@ from linearmodels.panel import (
     RandomEffects,
 )
 from linearmodels.panel.model import _grid_axes
-from linearmodels.shared.exceptions import MissingValueWarning
+from linearmodels.shared.exceptions import MissingValueWarning, NegativeVarianceWarning
 
 NENTITY = 12
 NPERIOD = 8
@@ -278,10 +279,12 @@ def assert_same_index(index, expected):
 
 def compare_results(res, expected):
     # The covariance of two-way clusters is not positive in some of the small samples,
-    # so the standard errors, which would warn, are not used
+    # so it warns that a variance is negative, and the standard errors are not used
     assert res.nobs == expected.nobs
     assert_allclose(res.params, expected.params, rtol=1e-10)
-    assert_allclose(res.cov, expected.cov, rtol=1e-10)
+    with warnings.catch_warnings():
+        warnings.simplefilter("ignore", NegativeVarianceWarning)
+        assert_allclose(res.cov, expected.cov, rtol=1e-10)
     # The relative rounding error of a residual that is close to 0 is larger, up to
     # 2e-11 if the data change in the last bit, than that of the parameters and the
     # covariance, which is 1e-13

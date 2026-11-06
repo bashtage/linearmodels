@@ -18,7 +18,11 @@ from linearmodels.iv.covariance import (
     cov_kernel,
     kernel_optimal_bandwidth,
 )
-from linearmodels.shared.covariance import cluster_union, group_debias_coefficient
+from linearmodels.shared.covariance import (
+    clip_negative_eigenvalues,
+    cluster_union,
+    group_debias_coefficient,
+)
 from linearmodels.shared.exceptions import (
     check_cov_config,
     lookup_option,
@@ -284,6 +288,10 @@ class ClusteredCovariance(HomoskedasticCovariance):
     group_debias : bool, optional
         Flag indicating whether to apply small-number of groups adjustment.
         The default is False.
+    fix_psd : bool, optional
+        Flag indicating whether to set the negative eigenvalues of a two-way
+        clustered covariance to zero so that it is positive semi-definite. It
+        has no effect with one-way clustering. The default is False.
 
     Raises
     ------
@@ -323,9 +331,22 @@ class ClusteredCovariance(HomoskedasticCovariance):
 
     where g is the number of distinct groups and n is the number of
     observations.
+
+    The two-way clustered covariance is not guaranteed to be positive
+    semi-definite, and in small samples a variance can be negative.
+    ``fix_psd=True`` replaces the covariance :math:`V = U \Lambda U'` with
+    :math:`U \Lambda_+ U'`, where :math:`\Lambda_+` sets the negative
+    eigenvalues to zero (Cameron, Gelbach and Miller, 2011). The covariance is
+    not changed if it has no negative eigenvalues.
+
+    References
+    ----------
+    .. [*] Cameron, A. C., Gelbach, J. B. and Miller, D. L. (2011). "Robust
+       Inference With Multiway Clustering". Journal of Business & Economic
+       Statistics, 29(2), 238-249.
     """
 
-    ALLOWED_KWARGS = ("clusters", "group_debias")
+    ALLOWED_KWARGS = ("clusters", "group_debias", "fix_psd")
 
     def __init__(
         self,
@@ -339,6 +360,7 @@ class ClusteredCovariance(HomoskedasticCovariance):
         extra_df: int = 0,
         clusters: linearmodels.typing.data.ArrayLike | None = None,
         group_debias: bool = False,
+        fix_psd: bool = False,
     ) -> None:
         super().__init__(
             y, x, params, entity_ids, time_ids, debiased=debiased, extra_df=extra_df
@@ -348,6 +370,7 @@ class ClusteredCovariance(HomoskedasticCovariance):
         clusters = np.asarray(clusters).squeeze()
         assert clusters is not None
         self._group_debias = bool(group_debias)
+        self._fix_psd = bool(fix_psd)
         dim1 = 1 if clusters.ndim == 1 else clusters.shape[1]
         if clusters.ndim > 2 or dim1 > 2:
             raise ValueError("Only 1 or 2-way clustering supported.")
@@ -389,7 +412,10 @@ class ClusteredCovariance(HomoskedasticCovariance):
 
         xeex *= self._scale
         out = (xpxi @ xeex @ xpxi) / nobs
-        return (out + out.T) / 2
+        out = (out + out.T) / 2
+        if self._fix_psd and self._clusters.ndim == 2:
+            out = clip_negative_eigenvalues(out)
+        return out
 
 
 class DriscollKraay(HomoskedasticCovariance):
@@ -1115,10 +1141,10 @@ def setup_covariance_estimator(
         columns in x. The default is 0.
     **cov_config
         Keyword arguments of the covariance estimator. The keys that are
-        allowed depend on the estimator: ``clusters`` and ``group_debias`` for
-        the clustered estimator, ``kernel`` and ``bandwidth`` for the
-        Driscoll-Kraay and autocorrelation robust estimators, and none for the
-        homoskedastic and heteroskedastic estimators.
+        allowed depend on the estimator: ``clusters``, ``group_debias`` and
+        ``fix_psd`` for the clustered estimator, ``kernel`` and ``bandwidth``
+        for the Driscoll-Kraay and autocorrelation robust estimators, and none
+        for the homoskedastic and heteroskedastic estimators.
 
     Returns
     -------
@@ -1141,6 +1167,7 @@ def setup_covariance_estimator(
     kernel = get_string(cov_config, "kernel")
     bandwidth = get_float(cov_config, "bandwidth")
     group_debias = get_bool(cov_config, "group_debias")
+    fix_psd = get_bool(cov_config, "fix_psd")
     clusters = get_array_like(cov_config, "clusters")
 
     if estimator is HomoskedasticCovariance:
@@ -1162,6 +1189,7 @@ def setup_covariance_estimator(
             extra_df=extra_df,
             clusters=clusters,
             group_debias=group_debias,
+            fix_psd=fix_psd,
         )
     elif estimator is DriscollKraay:
         return DriscollKraay(
