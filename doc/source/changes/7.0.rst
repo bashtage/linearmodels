@@ -80,8 +80,8 @@ be added to 7.1. 7.2 also contains the fixes below.
 
 .. rubric:: Contributors
 
-- Thanks to inchang-ing (:issue:`849`, :issue:`850`), jackiectl2 (:issue:`858`), CodingSelim
-  (:issue:`859`) and DresdenGman (:issue:`862`).
+- Thanks to inchang-ing (:issue:`849`, :issue:`850`), jackiectl2 (:issue:`858`),
+  CodingSelim (:issue:`859`) and DresdenGman (:issue:`862`).
 
 Version 7.1
 -----------
