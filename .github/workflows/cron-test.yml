@@ -30,9 +30,6 @@ jobs:
     env:
       BUILD_COMMIT: "main"
       CIBW_ARCHS_LINUX: "x86_64"
-      MKL_NUM_THREADS: 1
-      OMP_NUM_THREADS: 1
-      OPENBLAS_NUM_THREADS: 1
 
     steps:
       - uses: actions/checkout@v7
@@ -48,6 +45,6 @@ jobs:
         env:
           CIBW_BUILD: ${{ matrix.python }}-*
           CIBW_BEFORE_BUILD: python -m pip install wheel>=0.41.0 pip --upgrade
-          CIBW_TEST_COMMAND: python -c "import linearmodels; linearmodels.test(['--skip-examples','--skip-slow','-n','2'])"
+          CIBW_TEST_COMMAND: python -c "import linearmodels; linearmodels.test(['--skip-examples','--skip-slow'])"
           CIBW_TEST_REQUIRES: pytest pytest-xdist  pytest-cov matplotlib numpy scipy xarray pandas seaborn
           CIBW_SKIP: "pp* *-musllinux_* *-win32"
