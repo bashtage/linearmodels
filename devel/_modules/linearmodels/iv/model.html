@@ -19,7 +19,7 @@
     
   
       
-        <title>linearmodels.iv.model - linearmodels v7.2 (+19)</title>
+        <title>linearmodels.iv.model - linearmodels v7.2 (+21)</title>
       
     
 
@@ -91,7 +91,7 @@
 
 <header class="md-header md-header--shadow" data-md-component="header">
   <nav class="md-header__inner md-grid" aria-label="Header">
-    <a href="../../../index.html" title="linearmodels v7.2 (+19)" class="md-header__button md-logo" aria-label="linearmodels v7.2 (+19)" data-md-component="logo">
+    <a href="../../../index.html" title="linearmodels v7.2 (+21)" class="md-header__button md-logo" aria-label="linearmodels v7.2 (+21)" data-md-component="logo">
       <img src="../../../_static/bw-logo.svg" alt="logo">
     </a>
     <label class="md-header__button md-icon" for="__drawer">
@@ -102,7 +102,7 @@
       <div class="md-header__ellipsis">
         <div class="md-header__topic">
           <span class="md-ellipsis">
-            linearmodels v7.2 (+19)
+            linearmodels v7.2 (+21)
           </span>
         </div>
         <div class="md-header__topic" data-md-component="header-topic">
@@ -197,10 +197,10 @@
 
 <nav class="md-nav md-nav--primary" aria-label="Navigation" data-md-level="0">
   <label class="md-nav__title" for="__drawer">
-    <a href="../../../index.html" title="linearmodels v7.2 (+19)" class="md-nav__button md-logo" aria-label="linearmodels v7.2 (+19)" data-md-component="logo">
+    <a href="../../../index.html" title="linearmodels v7.2 (+21)" class="md-nav__button md-logo" aria-label="linearmodels v7.2 (+21)" data-md-component="logo">
       <img src="../../../_static/bw-logo.svg" alt="logo">
     </a>
-    linearmodels v7.2 (+19)
+    linearmodels v7.2 (+21)
   </label>
   
     <div class="md-nav__source">
@@ -1093,6 +1093,16 @@
     <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">WaldTestStatistic</span> <span class="o">|</span> <span class="n">InvalidTestStatistic</span><span class="p">:</span>
         <span class="n">const_loc</span> <span class="o">=</span> <span class="n">find_constant</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_x</span><span class="p">)</span>
         <span class="n">nobs</span><span class="p">,</span> <span class="n">nvar</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_x</span><span class="o">.</span><span class="n">shape</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">has_constant</span> <span class="ow">and</span> <span class="n">const_loc</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="c1"># Under the null, the coefficients are proportional to the vector</span>
+            <span class="c1"># that produces an intercept. Test its orthogonal complement rather</span>
+            <span class="c1"># than dropping an arbitrary dummy or testing the intercept itself.</span>
+            <span class="n">scale</span> <span class="o">=</span> <span class="nb">abs</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_x</span><span class="p">)</span><span class="o">.</span><span class="n">max</span><span class="p">(</span><span class="n">axis</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
+            <span class="n">intercept</span> <span class="o">=</span> <span class="n">pinv</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_x</span> <span class="o">/</span> <span class="n">scale</span><span class="p">)</span> <span class="o">@</span> <span class="n">ones</span><span class="p">((</span><span class="n">nobs</span><span class="p">,</span> <span class="mi">1</span><span class="p">))</span>
+            <span class="n">basis</span><span class="p">,</span> <span class="n">_</span> <span class="o">=</span> <span class="n">qr</span><span class="p">(</span><span class="n">intercept</span><span class="p">,</span> <span class="n">mode</span><span class="o">=</span><span class="s2">"complete"</span><span class="p">)</span>
+            <span class="n">restriction</span> <span class="o">=</span> <span class="n">basis</span><span class="p">[:,</span> <span class="mi">1</span><span class="p">:]</span><span class="o">.</span><span class="n">T</span> <span class="o">*</span> <span class="n">scale</span>
+            <span class="n">params</span> <span class="o">=</span> <span class="n">restriction</span> <span class="o">@</span> <span class="n">params</span>
+            <span class="n">cov</span> <span class="o">=</span> <span class="n">restriction</span> <span class="o">@</span> <span class="n">cov</span> <span class="o">@</span> <span class="n">restriction</span><span class="o">.</span><span class="n">T</span>
         <span class="k">return</span> <span class="n">f_statistic</span><span class="p">(</span><span class="n">params</span><span class="p">,</span> <span class="n">cov</span><span class="p">,</span> <span class="n">debiased</span><span class="p">,</span> <span class="n">nobs</span> <span class="o">-</span> <span class="n">nvar</span><span class="p">,</span> <span class="n">const_loc</span><span class="p">)</span>
 
     <span class="k">def</span><span class="w"> </span><span class="nf">_estimate_kappa</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">float</span><span class="p">:</span>
