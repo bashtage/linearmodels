@@ -1,3 +1,39 @@
+Version 7.2
+-----------
+
+.. TODO(REL): Add the release date.
+
+Version 7.2 adds wheels for Windows on ARM64 (CPython 3.13 to 3.15). PyPI accepts the
+files of a release only for 14 days after its first upload, so these wheels could not
+be added to 7.1. 7.2 also contains the fixes below.
+
+.. TODO(R2): Add the pull requests that are merged for 7.2 (#850, #858, #859, #860,
+   #862) and the answer to decision 85 (Python 3.10 and NumPy 1.x).
+
+.. rubric:: Backward-incompatible changes
+
+- ``predict`` of the panel models raises a ``ValueError`` for an out-of-sample
+  prediction (``exog`` or ``data`` is given) with ``effects=True`` or
+  ``idiosyncratic=True``, which are only available in sample, or with ``fitted=False``
+  and no other output. 7.1 ignored these options and returned the fitted values
+  (:issue:`768`, :issue:`849`).
+
+.. rubric:: Documentation and maintenance
+
+- The tests that failed on FreeBSD no longer depend on rounding or on ``pytest -v``,
+  and the README explains how to run the tests without the other pytest plugins of an
+  environment (:issue:`853`, :issue:`854`).
+- The CI builds and tests a wheel on Windows on ARM64.
+
+.. rubric:: Compatibility
+
+- Wheels are built for Windows on ARM64 for CPython 3.13 to 3.15, the versions for which
+  NumPy and statsmodels have Windows ARM64 wheels. The other wheels are built as in 7.1.
+
+.. rubric:: Contributors
+
+- Thanks to inchang-ing (:issue:`849`).
+
 Version 7.1
 -----------
 
