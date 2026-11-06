@@ -523,6 +523,7 @@ class HomoskedasticCovariance:
         debiased: bool = False,
         kappa: linearmodels.typing.Numeric = 1,
         extra_df: int = 0,
+        *,
         solver: str = "pinv",
     ):
         if not (x.shape[0] == y.shape[0] == z.shape[0]):
@@ -759,9 +760,10 @@ class HeteroskedasticCovariance(HomoskedasticCovariance):
         debiased: bool = False,
         kappa: linearmodels.typing.Numeric = 1,
         extra_df: int = 0,
+        *,
         solver: str = "pinv",
     ):
-        super().__init__(x, y, z, params, debiased, kappa, extra_df, solver)
+        super().__init__(x, y, z, params, debiased, kappa, extra_df, solver=solver)
         self._name = "Robust Covariance (Heteroskedastic)"
 
     @property
@@ -903,9 +905,10 @@ class KernelCovariance(HomoskedasticCovariance):
         debiased: bool = False,
         kappa: linearmodels.typing.Numeric = 1,
         extra_df: int = 0,
+        *,
         solver: str = "pinv",
     ):
-        super().__init__(x, y, z, params, debiased, kappa, extra_df, solver)
+        super().__init__(x, y, z, params, debiased, kappa, extra_df, solver=solver)
         self._kernels = KERNEL_LOOKUP
         kernel = lower_option(kernel)
         self._kernel = kernel
@@ -1053,9 +1056,10 @@ class ClusteredCovariance(HomoskedasticCovariance):
         debiased: bool = False,
         kappa: linearmodels.typing.Numeric = 1,
         extra_df: int = 0,
+        *,
         solver: str = "pinv",
     ):
-        super().__init__(x, y, z, params, debiased, kappa, extra_df, solver)
+        super().__init__(x, y, z, params, debiased, kappa, extra_df, solver=solver)
 
         nobs = x.shape[0]
         clusters = arange(nobs) if clusters is None else clusters
