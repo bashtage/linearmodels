@@ -4,10 +4,16 @@ import numpy as np
 from numpy.testing import assert_allclose
 import pytest
 
-from linearmodels.iv import IV2SLS, IVGMM, IVLIML
+from linearmodels.iv import IV2SLS, IVGMM, IVGMMCUE, IVJIVE, IVLIML
+
+# IVGMMCUE minimizes its objective with BFGS, so the model with an explicit constant
+# stops at estimates that differ by rounding from those of the model with the dummies,
+# and its F statistic differs by up to 4e-8. The p-values are also compared with an
+# absolute tolerance, since a p-value of 1e-16 changes by 1e-6 relative to itself
+EXPLICIT_RTOL = {IVGMMCUE: 1e-6}
 
 
-@pytest.mark.parametrize("model", [IV2SLS, IVLIML, IVGMM])
+@pytest.mark.parametrize("model", [IV2SLS, IVLIML, IVGMM, IVGMMCUE, IVJIVE])
 @pytest.mark.parametrize("debiased", [False, True])
 @pytest.mark.parametrize("cov_type", ["unadjusted", "robust"])
 @pytest.mark.parametrize("weighted", [False, True])
@@ -35,5 +41,8 @@ def test_model_f_statistic_with_implicit_constant(
     explicit = model(
         y, np.column_stack([np.ones(nobs), group, x]), endog, z, weights=weights
     ).fit(cov_type=cov_type, debiased=debiased)
-    assert_allclose(res.f_statistic.stat, explicit.f_statistic.stat, rtol=1e-10)
-    assert_allclose(res.f_statistic.pval, explicit.f_statistic.pval, rtol=1e-10)
+    rtol = EXPLICIT_RTOL.get(model, 1e-10)
+    assert_allclose(res.f_statistic.stat, explicit.f_statistic.stat, rtol=rtol)
+    assert_allclose(
+        res.f_statistic.pval, explicit.f_statistic.pval, rtol=rtol, atol=1e-12
+    )
