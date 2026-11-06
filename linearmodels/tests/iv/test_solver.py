@@ -17,10 +17,13 @@ The error h5 is orthogonal to the instruments and to the regressors, so that eve
 k-class estimate is exactly (1, 1, 1), and the projection of the regressors on the
 instruments is [h0, h1, h1 + delta h2]. The residual of the projected problem of 2SLS
 is 0, so that the rounding error of QR is about the condition number times the machine
-precision. With kappa < 1, the k-class estimator also fits y - Xb, which has a large
-residual, and the error of any backward stable method grows with the square of the
-condition number times the norm of the residual. Those estimates are tested without
-the error, y = X(1, 1, 1)'. The entries are dyadic, so that the data are
+precision. With kappa < 1, the k-class estimator also fits y - Xb, and with
+kappa > 1 it subtracts the fit of M_z(y - Xb). Both have a large residual, and the
+error of any backward stable method grows with the square of the condition number
+times the norm of the residual. Those estimates are tested without the error,
+y = X(1, 1, 1)'. Whether the rounding error of the products of the Hadamard data happens
+to cancel depends on the order of the sums in BLAS, so that the tests also permute the
+rows. The entries are dyadic, so that the data are
 exact in float64, and the covariances are computed exactly with fractions. delta makes
 the regressors nearly collinear: the condition number of the scaled regressors is
 about 2.4 / delta.
@@ -151,20 +154,27 @@ DELTAS = {"2^-20": (2.0**-20, 1e-8), "2^-27": (2.0**-27, 1e-6)}
     [{}, {"kappa": 0.0}, {"kappa": 0.5}, {"kappa": 1.25}],
     ids=["liml", "ols", "kappa-0.5", "kappa-1.25"],
 )
-def test_kclass_estimates_are_exact(delta, options):
+@pytest.mark.parametrize("permute", [False, True], ids=["rows", "permuted"])
+def test_kclass_estimates_are_exact(delta, options, permute):
     delta, rtol = delta
-    # kappa < 1 also fits the residual of y - Xb, which is 0 without the error
-    error = options.get("kappa", 1) >= 1
-    res = IVLIML(*hadamard_data(delta, error), solver="qr", **options).fit()
+    # A fixed kappa other than 1 also fits a residual of y - Xb, which is 0 without
+    # the error. The estimated kappa of LIML is 1 up to rounding with the error
+    error = "kappa" not in options
+    data = hadamard_data(delta, error)
+    if permute:
+        rows = np.random.default_rng(0).permutation(NOBS)
+        data = tuple(a[rows] for a in data)
+    res = IVLIML(*data, solver="qr", **options).fit()
     assert_allclose(res.params.to_numpy(), np.ones(3), rtol=rtol)
 
 
 def test_fuller_estimate_is_accurate():
-    # kappa is 0.983 and y - Xb has a residual of norm 8, so that the error is about
-    # (1 - kappa) cond(X)^2 eps |e| / (|X| |b|), about 1e-6 here. solver="pinv" is 1.2e-4 off
+    # kappa is 0.983 and y - Xb has a residual of norm 8, so that the error is bounded
+    # by about (1 - kappa) cond(X)^2 eps, 2.4e-5 here. It is at most 1.6e-6 over 40
+    # orders of the rows (Windows, OpenBLAS). solver="pinv" is 1.2e-4 off
     res = IVLIML(*hadamard_data(2.0**-20), solver="qr", fuller=1.0).fit()
     assert_allclose(res.kappa, 1 - 1 / (NOBS - 4), rtol=1e-12)
-    assert_allclose(res.params.to_numpy(), np.ones(3), rtol=1e-5)
+    assert_allclose(res.params.to_numpy(), np.ones(3), rtol=5e-5)
 
 
 @pytest.mark.parametrize("delta", DELTAS.values(), ids=list(DELTAS))
