@@ -3,7 +3,7 @@ from __future__ import annotations
 from collections.abc import Mapping
 import os
 import sys
-from typing import Any, NamedTuple
+from typing import Any, NamedTuple, cast
 import warnings
 
 from formulaic import model_matrix
@@ -127,17 +127,18 @@ def proj(
         return np.zeros_like(y)
     if method == "pinv":
         return x @ (np.linalg.pinv(x) @ y)
-    nobs, nvar = x.shape
     scale = np.linalg.norm(x, axis=0)
     scale[scale == 0] = 1.0
     cutoff = max(x.shape) * np.finfo(float).eps
-    if nobs >= nvar:
-        # The QR decomposition is the projection if no singular value is cut off,
-        # and it is cheaper than the SVD. sv(R) are the singular values of x / scale
-        q, r = sp_qr(x / scale, mode="economic", overwrite_a=True, check_finite=False)
-        sv = np.linalg.svd(r, compute_uv=False)
-        if sv[-1] > sv[0] * cutoff:
-            return q @ (q.T @ y)
+    # The QR decomposition is the projection if no singular value is cut off, and it
+    # is cheaper than the SVD. sv(R) are the singular values of x / scale, and Q is
+    # square if x has fewer rows than columns
+    q, r = sp_qr(x / scale, mode="economic", overwrite_a=True, check_finite=False)
+    sv = np.linalg.svd(r, compute_uv=False)
+    if sv[-1] > sv[0] * cutoff:
+        return q @ (q.T @ y)
+    # x is rank deficient, e.g., a constant and a full set of dummies, and the
+    # projection is on the left singular vectors that are not cut off, as with pinv
     u, sv, _ = np.linalg.svd(x / scale, full_matrices=False)
     u = u[:, sv > sv[0] * cutoff]
     return u @ (u.T @ y)
@@ -311,6 +312,8 @@ def kclass_factors(
     """
     nvar = x.shape[1]
     if nvar == 0:
+        # No regressors, which the covariance estimators accept. qr_multiply fails if
+        # x has no columns
         t0 = None if y is None else np.empty((0,) + y.shape[1:])
         u0 = None if z_basis is None else np.empty((z_basis.shape[1], 0))
         return KClassFactors(np.empty((0, 0)), None, t0, u0)
@@ -400,11 +403,8 @@ def kclass_solve(factors: KClassFactors) -> linearmodels.typing.data.Float64Arra
     ndarray
         The estimate :math:`R^{-1}G^{-1}t` (nvar by 1).
     """
-    r, g, t = factors.r, factors.g, factors.t
-    if t is None:
-        raise ValueError("The factors must be computed with y.")
-    if r.shape[0] == 0:
-        return t
+    r, g = factors.r, factors.g
+    t = cast("linearmodels.typing.data.Float64Array", factors.t)
     if g is not None:
         t = np.linalg.solve(g, t)
     return solve_triangular(r, t)
