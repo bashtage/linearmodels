@@ -405,6 +405,10 @@ def kclass_solve(factors: KClassFactors) -> linearmodels.typing.data.Float64Arra
     """
     r, g = factors.r, factors.g
     t = cast("linearmodels.typing.data.Float64Array", factors.t)
+    if r.shape[0] == 0:
+        # No regressors. solve_triangular of SciPy 1.13 and earlier raises
+        # LinAlgError for empty arrays
+        return t
     if g is not None:
         t = np.linalg.solve(g, t)
     return solve_triangular(r, t)
