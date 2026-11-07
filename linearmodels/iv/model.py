@@ -240,16 +240,14 @@ def _rank_and_condition_number(
     """
     The rank of numpy.linalg.matrix_rank and the condition number of a.
 
-    The rank is computed from the singular values as matrix_rank computes it. The
-    association of its tolerance changed in NumPy 2, and matrix_rank is used if the
-    two orders give different ranks.
+    The rank is computed from the singular values as matrix_rank computes it, with
+    the tolerance smax * (m * eps) of NumPy 2. NumPy 1 computes (smax * m) * eps,
+    which is the same number, since eps is a power of 2, unless smax * m overflows.
     """
     sv = svd(a, compute_uv=False)
     smax = sv.max(initial=0.0)
     m, eps = max(a.shape), finfo(sv.dtype).eps
     rank = int(count_nonzero(sv > smax * (m * eps)))
-    if rank != int(count_nonzero(sv > smax * m * eps)):
-        rank = int(matrix_rank(a))
     smin = sv.min(initial=smax) if sv.shape[0] == a.shape[1] else 0.0
     cond = float(smax / smin) if smin > 0 else float("inf")
     return rank, cond
@@ -870,14 +868,11 @@ class _IVModelBase:
             ex1_cross = ex1.T @ ex1
             ex1 = None
         if self._numerical_method == "qr":
-            if "z_basis" not in shared:
-                shared["z_basis"] = orthonormal_basis(z)
-            z_basis = shared["z_basis"]
+            z_basis = shared["z_basis"] = orthonormal_basis(z)
             ez = e - z_basis @ (z_basis.T @ e)
         else:
-            if "pinvz" not in shared:
-                shared["pinvz"] = pinv(z)
-            ez = e - z @ (shared["pinvz"] @ e)
+            pinvz = shared["pinvz"] = pinv(z)
+            ez = e - z @ (pinvz @ e)
         if ex1 is None and ex1_cross is None:
             ex1 = ez
 

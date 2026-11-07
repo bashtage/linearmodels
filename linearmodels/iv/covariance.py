@@ -606,13 +606,12 @@ class HomoskedasticCovariance:
             self._factors = KClassFactors(factors.r, factors.g, factors.t, u)
             return self._factors
         kappa = float(self._kappa)
-        if kappa == 0 and self._z_basis is None and x.shape == z.shape:
-            if array_equal(x, z):
-                # OLS, where z is x: the QR decomposition of x gives both
-                q, r = sp_qr(x, mode="economic", check_finite=False)
-                self._z_basis = q
-                self._factors = KClassFactors(r, None, None, eye(x.shape[1]))
-                return self._factors
+        if kappa == 0 and self._z_basis is None and array_equal(x, z):
+            # OLS, where z is x: the QR decomposition of x gives both
+            q, r = sp_qr(x, mode="economic", check_finite=False)
+            self._z_basis = q
+            self._factors = KClassFactors(r, None, None, eye(x.shape[1]))
+            return self._factors
         z_basis = self._basis() if (with_u or kappa != 0) else None
         self._factors = kclass_factors(x, z_basis, kappa)
         return self._factors
@@ -714,6 +713,8 @@ class HomoskedasticCovariance:
             c = vinv @ self.s @ vinv / nobs
             return (c + c.T) / 2
         if nvar == 0:
+            # No regressors, as with "pinv". The triangular solves of the coordinates
+            # of OLS use trans="T", which fails with empty arrays in SciPy 2.0.dev
             return empty((0, 0))
         factors = self._kclass_factors()
         # V = R'GR / n, so that V^-1 S V^-1 / n = n R^-1 G^-1 (R^-T S R^-1) G^-1 R^-T.
