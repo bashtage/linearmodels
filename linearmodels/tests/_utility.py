@@ -174,9 +174,6 @@ def method_kwargs(model, method="pinv"):
         ("linearmodels.iv", "linearmodels.formula")
     ):
         return {}
-    try:
-        parameters = inspect.signature(model).parameters
-    except (TypeError, ValueError):
-        return {}
+    parameters = inspect.signature(model).parameters
     takes_method = "method" in parameters and parameters["method"].default is None
     return {"method": method} if takes_method else {}

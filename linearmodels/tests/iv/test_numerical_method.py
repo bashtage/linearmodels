@@ -249,6 +249,17 @@ def test_exactly_collinear_or_zero_columns_are_rank_deficient():
         IV2SLS(y, exog, endog, zero, method="qr")
 
 
+@pytest.mark.parametrize("method", ["pinv", "qr"])
+def test_fewer_observations_than_regressors_are_rank_deficient(method):
+    # The triangular factor of the QR decomposition of a matrix with fewer rows than
+    # columns has full row rank, which is not full column rank
+    rng = np.random.default_rng(5)
+    nobs = 4
+    exog = rng.standard_normal((nobs, 5))
+    with pytest.raises(ValueError, match="do not have full column rank"):
+        IV2SLS(rng.standard_normal(nobs), exog, None, None, method=method)
+
+
 def scaled_data():
     rng = np.random.default_rng(1)
     nobs = 500
@@ -488,10 +499,13 @@ def test_kclass_factors(kappa):
         (ClusteredCovariance, {"clusters": np.arange(500) // 25}),
     ],
 )
-def test_covariance_estimators_agree(estimator, options, kappa):
+@pytest.mark.parametrize("ninstr", [3, 2], ids=["overidentified", "just-identified"])
+def test_covariance_estimators_agree(estimator, options, kappa, ninstr):
+    # Just identified, z has the shape of x, and OLS (kappa = 0) uses the instruments
+    # as z, not x
     y, exog, endog, instr = scaled_data()
     x = np.c_[exog, endog]
-    z = np.c_[exog, instr]
+    z = np.c_[exog, instr[:, :ninstr]]
     y = y[:, None]
     params = IVLIML.estimate_parameters(x, y, z, kappa, method="pinv")
     pinv = estimator(x, y, z, params, kappa=kappa, method="pinv", **options)
@@ -535,6 +549,85 @@ def test_ols_covariance_with_z_equal_to_x(estimator, options):
     qr = estimator(x, y, x.copy(), params, kappa=0.0, method="qr", **options)
     assert_allclose(qr.cov, pinv.cov, rtol=1e-10)
     assert_allclose(qr.s, pinv.s, rtol=1e-10)
+
+
+COVARIANCE_ESTIMATORS = {
+    "homoskedastic": (HomoskedasticCovariance, {}),
+    "heteroskedastic": (HeteroskedasticCovariance, {}),
+    "kernel": (KernelCovariance, {"bandwidth": 6}),
+    "clustered": (ClusteredCovariance, {"clusters": np.arange(500) // 25}),
+}
+
+
+@pytest.mark.parametrize("kappa", [0.0, 0.5, 1.0, 1.5])
+@pytest.mark.parametrize("estimator", list(COVARIANCE_ESTIMATORS))
+def test_no_regressors(estimator, kappa):
+    # The models need a regressor, but estimate_parameters and the covariance
+    # estimators accept none, and both methods return empty arrays
+    estimator, options = COVARIANCE_ESTIMATORS[estimator]
+    y, _, _, instr = scaled_data()
+    x = np.empty((y.shape[0], 0))
+    y = y[:, None]
+    for method in ("pinv", "qr"):
+        params = IVLIML.estimate_parameters(x, y, instr, kappa, method=method)
+        assert params.shape == (0, 1)
+        cov = estimator(x, y, instr, params, kappa=kappa, method=method, **options)
+        assert cov.cov.shape == (0, 0)
+        assert cov.s.shape == (0, 0)
+
+
+def rank_deficient_exog_data():
+    # A constant and a full set of dummies, which have rank 3
+    rng = np.random.default_rng(0)
+    nobs = 200
+    groups = rng.integers(0, 3, nobs)
+    dummies = (groups[:, None] == np.arange(3)).astype(float)
+    instr = rng.standard_normal((nobs, 3))
+    endog = instr @ [1.0, 0.5, 0.2] + dummies @ [1.0, 2.0, 3.0]
+    endog = (endog + rng.standard_normal(nobs))[:, None]
+    return endog, instr, np.c_[np.ones(nobs), dummies]
+
+
+@pytest.mark.parametrize(
+    "test", [cragg_donald, cragg_donald_f, kleibergen_paap, kleibergen_paap_f]
+)
+def test_rank_tests_with_rank_deficient_exog(test):
+    # The exogenous regressors are partialled out by projecting on their column
+    # space, which "qr" does with the SVD if they are rank deficient, as pinv does
+    endog, instr, exog = rank_deficient_exog_data()
+    expected = test(endog, instr, exog, method="pinv")
+    actual = test(endog, instr, exog, method="qr")
+    if not isinstance(expected, float):
+        expected, actual = expected.stat, actual.stat
+    assert_allclose(actual, expected, rtol=1e-10)
+
+
+@pytest.mark.parametrize("method", ["pinv", "qr"])
+def test_kleibergen_paap_does_not_depend_on_a_redundant_regressor(method):
+    # Unlike the other tests, the statistic does not count the exogenous regressors,
+    # and it is the same without the redundant dummy
+    endog, instr, exog = rank_deficient_exog_data()
+    full_rank = exog[:, :-1]
+    expected = kleibergen_paap(endog, instr, full_rank, method=method).stat
+    actual = kleibergen_paap(endog, instr, exog, method=method).stat
+    assert_allclose(actual, expected, rtol=1e-10)
+
+
+@pytest.mark.parametrize("shape", ["full rank", "rank deficient", "wide"])
+def test_projections_agree(shape):
+    rng = np.random.default_rng(2)
+    nobs = 4 if shape == "wide" else 50
+    x = rng.standard_normal((nobs, 6)) * np.array([1, 1e3, 1, 1e-3, 1, 1])
+    if shape == "rank deficient":
+        x[:, -1] = x[:, 0] - x[:, 2]
+    y = rng.standard_normal((nobs, 2))
+    expected = proj(y, x, method="pinv")
+    assert_allclose(proj(y, x, method="qr"), expected, rtol=1e-10, atol=1e-12)
+    resid = annihilate(y, x, method="qr")
+    assert_allclose(resid, y - expected, rtol=1e-8, atol=1e-12)
+    if shape == "wide":
+        # x has full row rank, and the projection is y
+        assert_allclose(proj(y, x, method="qr"), y, rtol=1e-12)
 
 
 @pytest.mark.parametrize("scale", [1.0, 2.0**30, 2.0**-40])
