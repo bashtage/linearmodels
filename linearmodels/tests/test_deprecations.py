@@ -238,7 +238,7 @@ def test_drop_missing_has_no_effect(restore_drop_missing, drop_missing):
 
     linearmodels.DROP_MISSING = drop_missing
     with pytest.warns(MissingValueWarning):
-        res = IV2SLS(y, exog, endog, instruments).fit()
+        res = IV2SLS(y, exog, endog, instruments, method="pinv").fit()
     # The rows with a missing value are dropped, whatever DROP_MISSING is
     assert res.nobs == nobs - 3
     assert_allclose(res.params, expected, rtol=1e-10)

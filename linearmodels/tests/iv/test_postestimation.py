@@ -34,9 +34,9 @@ def test_sargan(data):
     # Stata code:
     # ivregress 2sls y_robust x3 x4 x5 (x1=z1 z2)
     # estat overid
-    res = IV2SLS(data.dep, data.exog, data.endog[["x1"]], data.instr).fit(
-        cov_type="unadjusted"
-    )
+    res = IV2SLS(
+        data.dep, data.exog, data.endog[["x1"]], data.instr, method="pinv"
+    ).fit(cov_type="unadjusted")
     assert_allclose(res.sargan.stat, 0.176535, rtol=1e-4)
     assert_allclose(res.sargan.pval, 0.6744, rtol=1e-4)
 
@@ -45,15 +45,17 @@ def test_basmann(data):
     # Stata code:
     # ivregress 2sls y_robust x3 x4 x5 (x1=z1 z2)
     # estat overid
-    res = IV2SLS(data.dep, data.exog, data.endog[["x1"]], data.instr).fit(
-        cov_type="unadjusted"
-    )
+    res = IV2SLS(
+        data.dep, data.exog, data.endog[["x1"]], data.instr, method="pinv"
+    ).fit(cov_type="unadjusted")
     assert_allclose(res.basmann.stat, 0.174822, rtol=1e-4)
     assert_allclose(res.basmann.pval, 0.6759, rtol=1e-3)
 
 
 def test_durbin(data):
-    res = IV2SLS(data.dep, data.exog, data.endog, data.instr).fit(cov_type="unadjusted")
+    res = IV2SLS(data.dep, data.exog, data.endog, data.instr, method="pinv").fit(
+        cov_type="unadjusted"
+    )
     assert_allclose(res.durbin().stat, 35.1258, rtol=1e-4)
     assert_allclose(res.durbin().pval, 0.0000, atol=1e-6)
 
@@ -62,7 +64,9 @@ def test_durbin(data):
 
 
 def test_wu_hausman(data):
-    res = IV2SLS(data.dep, data.exog, data.endog, data.instr).fit(cov_type="unadjusted")
+    res = IV2SLS(data.dep, data.exog, data.endog, data.instr, method="pinv").fit(
+        cov_type="unadjusted"
+    )
     assert_allclose(res.wu_hausman().stat, 18.4063, rtol=1e-4)
     assert_allclose(res.wu_hausman().pval, 0.0000, atol=1e-6)
 
@@ -80,7 +84,7 @@ def test_durbin_wu_hausman_invariant_to_instrument_shift(data):
         instr = data.instr.copy()
         instr["z1"] = instr["z1"] + shift
         instr["z2"] = instr["z2"] + 0.5 * shift
-        res = IV2SLS(data.dep, data.exog, data.endog[["x1"]], instr).fit(
+        res = IV2SLS(data.dep, data.exog, data.endog[["x1"]], instr, method="pinv").fit(
             cov_type="unadjusted"
         )
         stats.append((res.durbin().stat, res.wu_hausman().stat))
@@ -92,15 +96,17 @@ def test_durbin_wu_hausman_invariant_to_instrument_shift(data):
 
 
 def test_wooldridge_score(data):
-    res = IV2SLS(data.dep, data.exog, data.endog[["x1", "x2"]], data.instr).fit(
-        cov_type="robust"
-    )
+    res = IV2SLS(
+        data.dep, data.exog, data.endog[["x1", "x2"]], data.instr, method="pinv"
+    ).fit(cov_type="robust")
     assert_allclose(res.wooldridge_score.stat, 22.684, rtol=1e-4)
     assert_allclose(res.wooldridge_score.pval, 0.0000, atol=1e-4)
 
 
 def test_wooldridge_regression(data):
-    mod = IV2SLS(data.dep, data.exog, data.endog[["x1", "x2"]], data.instr)
+    mod = IV2SLS(
+        data.dep, data.exog, data.endog[["x1", "x2"]], data.instr, method="pinv"
+    )
     res = mod.fit(cov_type="robust", debiased=True)
     # Scale to correct for F vs Wald treatment
     assert_allclose(res.wooldridge_regression.stat, 2 * 13.3461, rtol=1e-4)
@@ -108,24 +114,24 @@ def test_wooldridge_regression(data):
 
 
 def test_wooldridge_overid(data):
-    res = IV2SLS(data.dep, data.exog, data.endog[["x1"]], data.instr).fit(
-        cov_type="robust"
-    )
+    res = IV2SLS(
+        data.dep, data.exog, data.endog[["x1"]], data.instr, method="pinv"
+    ).fit(cov_type="robust")
     assert_allclose(res.wooldridge_overid.stat, 0.221648, rtol=1e-4)
     assert_allclose(res.wooldridge_overid.pval, 0.6378, rtol=1e-3)
 
 
 def test_anderson_rubin(data):
-    res = IV2SLS(data.dep, data.exog, data.endog[["x1"]], data.instr).fit(
-        cov_type="unadjusted"
-    )
+    res = IV2SLS(
+        data.dep, data.exog, data.endog[["x1"]], data.instr, method="pinv"
+    ).fit(cov_type="unadjusted")
     assert_allclose(res.nobs * (res._liml_kappa - 1), 0.176587, rtol=1e-4)
 
 
 def test_basmann_f(data):
-    res = IV2SLS(data.dep, data.exog, data.endog[["x1"]], data.instr).fit(
-        cov_type="unadjusted"
-    )
+    res = IV2SLS(
+        data.dep, data.exog, data.endog[["x1"]], data.instr, method="pinv"
+    ).fit(cov_type="unadjusted")
     assert_allclose(res.basmann_f.stat, 0.174821, rtol=1e-4)
     assert_allclose(res.basmann_f.pval, 0.6760, rtol=1e-3)
 
@@ -164,6 +170,7 @@ def test_weighted_sargan_wu_hausman(data):
         data.endog[["x1"]],
         data.instr,
         weights=SIMULATED_DATA.weights,
+        method="pinv",
     ).fit(cov_type="unadjusted")
     assert_allclose(res.sargan.stat, 1.3091639082, rtol=1e-6)
     assert_allclose(res.wu_hausman().stat, 0.0126420296, rtol=1e-6)
@@ -179,10 +186,12 @@ def test_weighted_diagnostics_match_rescaled_data(data):
     endog_s = data.endog.mul(root_w, axis=0)
     instr = data.instr.mul(root_w, axis=0)
     for endog in (["x1"], ["x1", "x2"]):
-        res = IV2SLS(data.dep, data.exog, data.endog[endog], data.instr, weights=w).fit(
+        res = IV2SLS(
+            data.dep, data.exog, data.endog[endog], data.instr, weights=w, method="pinv"
+        ).fit(cov_type="robust")
+        expected = IV2SLS(dep, exog, endog_s[endog], instr, method="pinv").fit(
             cov_type="robust"
         )
-        expected = IV2SLS(dep, exog, endog_s[endog], instr).fit(cov_type="robust")
         names = ["wooldridge_score", "wooldridge_regression"]
         if len(endog) == 1:
             # Overidentification tests need more instruments than endogenous
@@ -216,7 +225,9 @@ def test_weighted_diagnostics_match_rescaled_data(data):
 
 
 def test_linear_restriction(data):
-    res = IV2SLS(data.dep, data.exog, data.endog, data.instr).fit(cov_type="robust")
+    res = IV2SLS(data.dep, data.exog, data.endog, data.instr, method="pinv").fit(
+        cov_type="robust"
+    )
     nvar = len(res.params)
     q = np.eye(nvar)
     ts = res.wald_test(q, np.zeros(nvar))
@@ -242,7 +253,9 @@ def test_linear_restriction(data):
 
 
 def test_cragg_donald(data):
-    res = IV2SLS(data.dep, data.exog, data.endog, data.instr).fit(cov_type="unadjusted")
+    res = IV2SLS(data.dep, data.exog, data.endog, data.instr, method="pinv").fit(
+        cov_type="unadjusted"
+    )
     cd = res.first_stage.cragg_donald
     assert cd.df == data.instr.shape[1] - data.endog.shape[1] + 1
     # The Cragg-Donald Wald F statistic reported by ivreg2 (computed using the
@@ -254,7 +267,9 @@ def test_cragg_donald(data):
 
 def test_cragg_donald_null_hypothesis(data):
     # The null is underidentification, not that the model is identified
-    res = IV2SLS(data.dep, data.exog, data.endog, data.instr).fit(cov_type="unadjusted")
+    res = IV2SLS(data.dep, data.exog, data.endog, data.instr, method="pinv").fit(
+        cov_type="unadjusted"
+    )
     cd = res.first_stage.cragg_donald
     assert "underidentified" in cd.null
     assert "full column rank" in cd.null
@@ -268,7 +283,7 @@ def test_cragg_donald_degenerate():
     x = rng.normal(size=(n, 2))  # 2 endogenous -- k < m
     exog_empty = np.empty((n, 0))
 
-    result = cragg_donald(x, z, exog_empty)
+    result = cragg_donald(x, z, exog_empty, method="pinv")
     assert np.isnan(result.pval)
 
 
@@ -283,7 +298,7 @@ def test_cragg_donald_known_value():
     x = z @ np.ones((3, 2)) + h @ np.array([[1, 0], [0, -1], [0, 0]])
 
     exog_empty = np.empty((n, 0))
-    result = cragg_donald(x, z, exog_empty)
+    result = cragg_donald(x, z, exog_empty, method="pinv")
     assert_allclose(result.stat, 0.8939161043879634, rtol=1e-6)
     assert_allclose(result.pval, 0.6395707363012899, rtol=1e-6)
 
@@ -293,5 +308,5 @@ def test_cragg_donald_no_endog():
     empty_endog = np.empty((n, 0))
     z = np.random.default_rng(0).normal(size=(n, 3))
     exog_empty = np.empty((n, 0))
-    result = cragg_donald(empty_endog, z, exog_empty)
+    result = cragg_donald(empty_endog, z, exog_empty, method="pinv")
     assert np.isnan(result.pval)

@@ -49,6 +49,7 @@ from linearmodels.panel import (
 from linearmodels.shared import alignment
 from linearmodels.shared.alignment import check_row_alignment, differs
 from linearmodels.system import IV3SLS, SUR, IVSystemGMM
+from linearmodels.tests._utility import method_kwargs
 
 UNITS = ["s", "ms", "us", "ns"]
 # (resolution of the first input, resolution of the second input)
@@ -430,7 +431,7 @@ def panel():
 
 
 def fit_panel(model, options, dependent, exog, clusters=None, **kwargs):
-    mod = model(dependent, exog, **options, **kwargs)
+    mod = model(dependent, exog, **options, **kwargs, **method_kwargs(model))
     if clusters is None:
         return mod.fit()
     return mod.fit(cov_type="clustered", clusters=clusters)
@@ -447,7 +448,7 @@ def test_panel_dependent_and_exog(panel, model, options, y_unit, x_unit):
 @pytest.mark.parametrize("model", [PooledOLS, RandomEffects])
 def test_panel_results_use_the_dates_of_dependent(panel, model):
     y, x = panel.dependent("us"), panel.exog("ns")
-    result = model(y, x).fit()
+    result = model(y, x, **method_kwargs(model)).fit()
     resids_match = result.resids.index.equals(y.index)
     fitted_match = result.fitted_values.index.equals(y.index)
     model_match = result.model.dependent.index.equals(y.index)
@@ -585,7 +586,7 @@ def test_panel_other_dates_in_exog_are_rejected(panel, model, options, corruptio
     match = "row index of exog does not match dependent"
     for unit in ("ns", "us"):
         with pytest.raises(ValueError, match=match):
-            model(panel.dependent(unit), exog, **options)
+            model(panel.dependent(unit), exog, **options, **method_kwargs(model))
 
 
 WEIGHT_CORRUPTIONS = {
@@ -603,7 +604,13 @@ WEIGHT_CORRUPTIONS = {
 def test_panel_other_dates_in_weights_are_rejected(panel, model, options, corruption):
     weights = WEIGHT_CORRUPTIONS[corruption](panel)
     with pytest.raises(ValueError, match="index of weights does not match dependent"):
-        model(panel.dependent(), panel.exog(), weights=weights, **options)
+        model(
+            panel.dependent(),
+            panel.exog(),
+            weights=weights,
+            **options,
+            **method_kwargs(model),
+        )
 
 
 CLUSTER_CORRUPTIONS = {
@@ -618,7 +625,7 @@ CLUSTER_CORRUPTIONS = {
 @pytest.mark.parametrize("corruption", CLUSTER_CORRUPTIONS)
 def test_panel_other_dates_in_clusters_are_rejected(panel, model, options, corruption):
     clusters = CLUSTER_CORRUPTIONS[corruption](panel)
-    mod = model(panel.dependent(), panel.exog(), **options)
+    mod = model(panel.dependent(), panel.exog(), **options, **method_kwargs(model))
     with pytest.raises(ValueError, match="index of clusters does not match dependent"):
         mod.fit(cov_type="clustered", clusters=clusters)
 
@@ -759,7 +766,9 @@ def iv():
 
 def fit_iv(cls, inputs, **weight_config):
     args = [inputs[name] for name in ("dependent", "exog", "endog", "instruments")]
-    return cls(*args, weights=inputs["weights"], **weight_config).fit()
+    return cls(
+        *args, weights=inputs["weights"], **weight_config, **method_kwargs(cls)
+    ).fit()
 
 
 @pytest.mark.parametrize("cls", IV_ESTIMATORS, ids=IV_IDS)
@@ -792,7 +801,7 @@ def fit_with_clusters(cls, inputs):
     args = [inputs["dependent"], inputs["exog"]]
     if cls is not OLS:
         args += [inputs["endog"], inputs["instruments"]]
-    mod = cls(*args, weights=inputs["weights"])
+    mod = cls(*args, weights=inputs["weights"], **method_kwargs(cls))
     return mod.fit(cov_type="clustered", clusters=inputs["clusters"])
 
 
@@ -819,7 +828,7 @@ def test_iv_dependent_without_labels(iv):
     # exog sets the labels, and the other inputs have to use them
     def fit(inputs):
         args = [iv.dependent, *(inputs[k] for k in ("exog", "endog", "instruments"))]
-        mod = IV2SLS(*args, weights=inputs["weights"])
+        mod = IV2SLS(*args, weights=inputs["weights"], method="pinv")
         return mod.fit(cov_type="clustered", clusters=inputs["clusters"])
 
     units = {"exog": "us", "endog": "ns", "instruments": "ms", "weights": "s"}
@@ -888,13 +897,17 @@ def test_iv_formula_with_weights(iv, cls, unit):
     parts = [inputs[k] for k in ("dependent", "endog", "instruments")]
     frame = pd.concat([*parts, inputs["exog"][["w"]]], axis=1)
     formula = "y ~ 1 + w + [x ~ z0 + z1]"
-    expected = cls.from_formula(formula, frame, weights=inputs["weights"]).fit()
+    expected = cls.from_formula(
+        formula, frame, weights=inputs["weights"], **method_kwargs(cls)
+    ).fit()
     weights = iv.inputs({"weights": unit})["weights"]
-    result = cls.from_formula(formula, frame, weights=weights).fit()
+    result = cls.from_formula(
+        formula, frame, weights=weights, **method_kwargs(cls)
+    ).fit()
     assert_same_results(result, expected)
     shifted = iv.inputs({"weights": unit}, shifted=["weights"])["weights"]
     with pytest.raises(ValueError, match="row index of weights does not match"):
-        cls.from_formula(formula, frame, weights=shifted)
+        cls.from_formula(formula, frame, weights=shifted, **method_kwargs(cls))
 
 
 @needs_units
@@ -908,6 +921,7 @@ def test_iv_dates_outside_the_nanosecond_range(iv, year):
             pd.DataFrame(iv.exog, index=exog, columns=["const", "w"]),
             pd.DataFrame(iv.endog, index=endog, columns=["x"]),
             pd.DataFrame(iv.instruments, index=instruments, columns=["z0", "z1"]),
+            method="pinv",
         )
         return mod.fit()
 
@@ -1104,15 +1118,15 @@ def system():
 @pytest.mark.parametrize(("cls", "kind"), SYSTEM_MODELS)
 @pytest.mark.parametrize("units", SYSTEM_UNITS, ids=SYSTEM_UNIT_IDS)
 def test_system_inputs(system, cls, kind, units):
-    expected = cls(system.equations(kind)).fit()
-    result = cls(system.equations(kind, units)).fit()
+    expected = cls(system.equations(kind), **method_kwargs(cls)).fit()
+    result = cls(system.equations(kind, units), **method_kwargs(cls)).fit()
     assert_same_results(result, expected, resids=False)
 
 
 @pytest.mark.parametrize(("cls", "kind"), SYSTEM_MODELS[:2])
 @pytest.mark.parametrize("unit", ["us", "s"])
 def test_system_clusters(system, cls, kind, unit):
-    mod = cls(system.equations(kind))
+    mod = cls(system.equations(kind), **method_kwargs(cls))
     clusters = pd.Series(system.clusters, index=dates("ns", system.nobs))
     expected = mod.fit(cov_type="clustered", clusters=clusters)
     clusters = pd.Series(system.clusters, index=dates(unit, system.nobs))
@@ -1131,7 +1145,7 @@ def test_system_other_dates_in_the_dependent_are_rejected(system, cls, kind, lab
         "dependent in equation 'eq_a'"
     )
     with pytest.raises(ValueError, match=match):
-        cls(equations)
+        cls(equations, **method_kwargs(cls))
 
 
 @pytest.mark.parametrize(("cls", "kind"), SYSTEM_MODELS)
@@ -1144,7 +1158,7 @@ def test_system_other_dates_in_the_inputs_are_rejected(system, cls, kind, name, 
         f"dependent in equation 'eq_{label}'"
     )
     with pytest.raises(ValueError, match=match):
-        cls(equations)
+        cls(equations, **method_kwargs(cls))
 
 
 # Asset pricing models
@@ -1180,7 +1194,7 @@ def returns():
 
 
 def fit_asset(cls, portfolios, factors):
-    mod = cls(portfolios, factors)
+    mod = cls(portfolios, factors, **method_kwargs(cls))
     if cls is LinearFactorModelGMM:
         return mod.fit(disp=0)
     return mod.fit()
@@ -1210,4 +1224,4 @@ def test_asset_pricing_other_dates_are_rejected(returns, cls, corruption):
     else:
         factors = returns.factor_frame("us", shift=1)
     with pytest.raises(ValueError, match="row index of factors does not match"):
-        cls(returns.portfolio_frame(), factors)
+        cls(returns.portfolio_frame(), factors, **method_kwargs(cls))

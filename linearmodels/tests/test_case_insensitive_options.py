@@ -58,9 +58,9 @@ def data():
 # Each case has a function that makes the model and the arguments of fit with the
 # names in lower case and with the names in mixed case
 CASES = {
-    "IV2SLS": (lambda d: IV2SLS(*d["iv"]), KERNEL, KERNEL_MIXED),
+    "IV2SLS": (lambda d: IV2SLS(*d["iv"], method="pinv"), KERNEL, KERNEL_MIXED),
     "IVLIML": (
-        lambda d: IVLIML(*d["iv"]),
+        lambda d: IVLIML(*d["iv"], method="pinv"),
         {"cov_type": "unadjusted"},
         {"cov_type": "Unadjusted"},
     ),

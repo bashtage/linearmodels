@@ -53,6 +53,7 @@ from linearmodels.iv import IV2SLS, IVJIVE, IVLIML
 import linearmodels.iv.model
 from linearmodels.shared.hypotheses import InvalidTestStatistic, WaldTestStatistic
 from linearmodels.shared.linalg import inv_sqrth
+from linearmodels.tests._utility import method_kwargs
 
 # ----------------------------------------------------------------------------
 # Data and the definitions of the expected values
@@ -192,7 +193,7 @@ def data_for(design, seed=0, constant=True):
 def test_kappa_is_the_generalized_eigenvalue(model, design):
     y, exog, endog, instr = data_for(design)
     expected = reference_kappa(y, exog, endog, instr)
-    res = model(*args(y, exog, endog, instr)).fit()
+    res = model(*args(y, exog, endog, instr), **method_kwargs(model)).fit()
     liml_kappa = res._liml_kappa
     assert_allclose(liml_kappa, expected, rtol=1e-8)
     if model is IVLIML:
@@ -205,7 +206,7 @@ def test_kappa_is_the_generalized_eigenvalue(model, design):
 def test_kappa_of_just_identified_models_is_one(design):
     # Closed form: the objective of LIML is 1 where the model is exactly identified
     y, exog, endog, instr = data_for(design)
-    kappa = IVLIML(*args(y, exog, endog, instr)).fit().kappa
+    kappa = IVLIML(*args(y, exog, endog, instr), method="pinv").fit().kappa
     assert_allclose(kappa, 1.0, rtol=1e-8)
 
 
@@ -214,7 +215,7 @@ def test_overidentification_tests_use_kappa(design):
     nexog, nendog, ninstr, nobs = design
     y, exog, endog, instr = data_for(design)
     kappa = reference_kappa(y, exog, endog, instr)
-    res = IV2SLS(*args(y, exog, endog, instr)).fit()
+    res = IV2SLS(*args(y, exog, endog, instr), method="pinv").fit()
     q = ninstr - nendog
     df_denom = nobs - nexog - ninstr
     ar = res.anderson_rubin
@@ -233,7 +234,7 @@ def test_weighted_kappa_is_the_generalized_eigenvalue():
     y, exog, endog, instr = data_for(design)
     weights = np.random.default_rng(5).uniform(0.4, 2.5, y.shape[0])
     expected = reference_kappa(y, exog, endog, instr, weights)
-    res = IVLIML(*args(y, exog, endog, instr), weights=weights).fit()
+    res = IVLIML(*args(y, exog, endog, instr), weights=weights, method="pinv").fit()
     assert_allclose(res.kappa, expected, rtol=1e-8)
 
 
@@ -276,7 +277,7 @@ def test_kappa_with_one_endogenous_regressor_does_not_depend_on_the_units(
     # This is not true of 2 or more endogenous regressors, see issue 823
     design = (1, 1, 3, 120)
     expected = reference_kappa(*data_for(design, seed=3))
-    res = model(*args(*scaled(design, scales))).fit()
+    res = model(*args(*scaled(design, scales)), **method_kwargs(model)).fit()
     assert_allclose(res._liml_kappa, expected, rtol=1e-9)
 
 
@@ -287,7 +288,7 @@ def test_too_few_observations_are_singular_in_any_units(scales):
     design = (1, nendog, nendog + 1, fewest_observations(1, nendog, nendog + 1) - 1)
     y, exog, endog, instr = scaled(design, scales)
     with pytest.raises(ValueError, match="Unable to estimate kappa"):
-        IVLIML(*args(y, exog, endog, instr)).fit()
+        IVLIML(*args(y, exog, endog, instr), method="pinv").fit()
 
 
 # ----------------------------------------------------------------------------
@@ -334,7 +335,9 @@ def check_computed_as_before(model):
 @pytest.mark.parametrize("design", DEFINED, ids=ids(DEFINED))
 def test_kappa_is_computed_as_before(design):
     y, exog, endog, instr = data_for(design)
-    check_computed_as_before(IVLIML(*args(y, exog, endog, instr), kappa=1.0))
+    check_computed_as_before(
+        IVLIML(*args(y, exog, endog, instr), kappa=1.0, method="pinv")
+    )
 
 
 def span_data(seed):
@@ -354,7 +357,7 @@ def test_kappa_of_a_regressor_in_the_span_of_the_instruments_is_computed_as_befo
     # The residuals of the regressor are rounding error, and so is kappa (issue 823),
     # which is near 1. Dividing the residuals by their norms magnified the rounding
     # error by 1e14, and kappa was -5.5e10 where it is 1.002657 (seed 0, Windows)
-    check_computed_as_before(IVLIML(*span_data(seed), kappa=1.0))
+    check_computed_as_before(IVLIML(*span_data(seed), kappa=1.0, method="pinv"))
 
 
 @pytest.mark.parametrize(
@@ -363,7 +366,9 @@ def test_kappa_of_a_regressor_in_the_span_of_the_instruments_is_computed_as_befo
 def test_kappa_of_regressors_on_different_scales_is_computed_as_before(scales):
     # The values are not the kappa of the data if the scales differ much (issue 823)
     design = (1, 2, 4, 120)
-    check_computed_as_before(IVLIML(*args(*scaled(design, scales)), kappa=1.0))
+    check_computed_as_before(
+        IVLIML(*args(*scaled(design, scales)), kappa=1.0, method="pinv")
+    )
 
 
 # ----------------------------------------------------------------------------
@@ -384,10 +389,10 @@ def test_liml_raises_in_the_example_of_the_bug():
     # The matrix has an eigenvalue of 5.6e-17 and kappa was 0.8125 instead of 1, or
     # NaN where the eigenvalue is negative. 4 observations are the fewest
     with pytest.raises(ValueError, match=re.escape("It needs at least 4 observations")):
-        IVLIML(*bug_design(3)).fit()
+        IVLIML(*bug_design(3), method="pinv").fit()
     y, exog, endog, instr = bug_design(4)
     expected = reference_kappa(y, exog, endog, instr)
-    kappa = IVLIML(y, exog, endog, instr).fit().kappa
+    kappa = IVLIML(y, exog, endog, instr, method="pinv").fit().kappa
     assert_allclose(kappa, expected, rtol=1e-8)
     assert_allclose(kappa, 1.0, rtol=1e-8)
 
@@ -406,7 +411,7 @@ def expected_message(design):
 )
 def test_liml_raises_if_kappa_is_not_defined(design):
     y, exog, endog, instr = data_for(design)
-    mod = IVLIML(*args(y, exog, endog, instr))
+    mod = IVLIML(*args(y, exog, endog, instr), method="pinv")
     with pytest.raises(ValueError, match="Unable to estimate kappa") as info:
         mod.fit()
     message = str(info.value)
@@ -418,7 +423,7 @@ def test_liml_raises_if_kappa_is_not_defined(design):
 @pytest.mark.parametrize("design", TOO_FEW, ids=ids(TOO_FEW))
 def test_liml_with_fuller_raises_if_kappa_is_not_defined(design):
     y, exog, endog, instr = data_for(design)
-    mod = IVLIML(*args(y, exog, endog, instr), fuller=1)
+    mod = IVLIML(*args(y, exog, endog, instr), fuller=1, method="pinv")
     with pytest.raises(ValueError, match="Unable to estimate kappa"):
         mod.fit()
 
@@ -429,7 +434,7 @@ def test_liml_with_fuller_raises_if_kappa_is_not_defined(design):
 def test_estimate_kappa_raises_linalg_error(design):
     # IVJIVE catches a LinAlgError, and fit of the other models any exception
     y, exog, endog, instr = data_for(design)
-    mod = IVLIML(*args(y, exog, endog, instr), kappa=1.0)
+    mod = IVLIML(*args(y, exog, endog, instr), kappa=1.0, method="pinv")
     with pytest.raises(LinAlgError, match=re.escape(expected_message(design))):
         mod._estimate_kappa()
 
@@ -438,7 +443,7 @@ def test_weighted_liml_raises_if_kappa_is_not_defined():
     design = TOO_FEW[7]
     y, exog, endog, instr = data_for(design)
     weights = np.random.default_rng(9).uniform(0.4, 2.5, y.shape[0])
-    mod = IVLIML(*args(y, exog, endog, instr), weights=weights)
+    mod = IVLIML(*args(y, exog, endog, instr), weights=weights, method="pinv")
     with pytest.raises(ValueError, match="Unable to estimate kappa"):
         mod.fit()
 
@@ -456,7 +461,8 @@ def test_count_of_observations_does_not_depend_on_the_instruments_conditioning(s
     u = rng.standard_normal(nobs)
     endog = rng.standard_normal(nobs) + 0.5 * u + instr @ np.array([0.8, 0.5])
     y = endog + 1 + u
-    mod = IVLIML(y, np.ones((nobs, 1)), endog[:, None], instr)
+    # The instruments of seeds 4, 6 and 7 are rank deficient with method="qr"
+    mod = IVLIML(y, np.ones((nobs, 1)), endog[:, None], instr, method="pinv")
     with pytest.raises(ValueError, match="Unable to estimate kappa"):
         mod.fit()
 
@@ -465,7 +471,7 @@ def test_count_of_observations_does_not_depend_on_the_instruments_conditioning(s
 def test_liml_fits_with_the_fewest_observations(design):
     # One more observation than TOO_FEW
     y, exog, endog, instr = data_for(design)
-    res = IVLIML(*args(y, exog, endog, instr)).fit()
+    res = IVLIML(*args(y, exog, endog, instr), method="pinv").fit()
     params_are_finite = np.all(np.isfinite(res.params))
     kappa_is_finite = np.isfinite(res.kappa)
     assert params_are_finite
@@ -481,7 +487,7 @@ def test_liml_fits_with_the_fewest_observations(design):
 @pytest.mark.parametrize("design", TOO_FEW, ids=ids(TOO_FEW))
 def test_liml_with_kappa_fits_if_kappa_is_not_defined(design, kappa):
     y, exog, endog, instr = data_for(design)
-    res = IVLIML(*args(y, exog, endog, instr), kappa=kappa).fit()
+    res = IVLIML(*args(y, exog, endog, instr), kappa=kappa, method="pinv").fit()
     expected = k_class(y, exog, endog, instr, kappa)
     assert_allclose(res.params.to_numpy(), expected, rtol=1e-6, atol=1e-8)
     liml_kappa_is_nan = np.isnan(res._liml_kappa)
@@ -494,7 +500,7 @@ def test_liml_with_kappa_fits_if_kappa_is_not_defined(design, kappa):
 )
 def test_liml_with_kappa_has_invalid_overidentification_tests(design):
     y, exog, endog, instr = data_for(design)
-    res = IVLIML(*args(y, exog, endog, instr), kappa=1.0).fit()
+    res = IVLIML(*args(y, exog, endog, instr), kappa=1.0, method="pinv").fit()
     for test in (res.anderson_rubin, res.basmann_f):
         assert isinstance(test, InvalidTestStatistic)
 
@@ -507,7 +513,7 @@ def test_liml_with_kappa_has_invalid_overidentification_tests(design):
 @pytest.mark.parametrize("design", TOO_FEW, ids=ids(TOO_FEW))
 def test_2sls_sets_kappa_of_liml_to_nan(design):
     y, exog, endog, instr = data_for(design)
-    res = IV2SLS(*args(y, exog, endog, instr)).fit()
+    res = IV2SLS(*args(y, exog, endog, instr), method="pinv").fit()
     liml_kappa_is_nan = np.isnan(res._liml_kappa)
     assert liml_kappa_is_nan
     assert res.kappa == 1
@@ -532,7 +538,7 @@ def test_jive_sets_kappa_of_liml_to_nan(design):
 )
 def test_overidentification_tests_are_invalid_if_kappa_is_not_defined(model, design):
     y, exog, endog, instr = data_for(design)
-    res = model(*args(y, exog, endog, instr)).fit()
+    res = model(*args(y, exog, endog, instr), **method_kwargs(model)).fit()
     for test in (res.anderson_rubin, res.basmann_f):
         stat_is_nan = np.isnan(test.stat)
         pval_is_nan = np.isnan(test.pval)
@@ -549,7 +555,7 @@ def test_overidentification_tests_are_invalid_if_kappa_is_not_defined(model, des
 @pytest.mark.parametrize("model", [IV2SLS, IVJIVE])
 def test_just_identified_tests_keep_their_reason(model):
     y, exog, endog, instr = bug_design(3)
-    res = model(y, exog, endog, instr).fit()
+    res = model(y, exog, endog, instr, **method_kwargs(model)).fit()
     for test in (res.anderson_rubin, res.basmann_f):
         reason = str(test)
         assert isinstance(test, InvalidTestStatistic)
@@ -560,7 +566,7 @@ def test_just_identified_tests_keep_their_reason(model):
 def test_tests_that_do_not_use_kappa_are_unchanged(model):
     design = (1, 1, 2, 4)
     y, exog, endog, instr = data_for(design)
-    res = model(*args(y, exog, endog, instr)).fit()
+    res = model(*args(y, exog, endog, instr), **method_kwargs(model)).fit()
     assert isinstance(res.sargan, WaldTestStatistic)
     assert isinstance(res.wooldridge_overid, WaldTestStatistic)
 
@@ -580,9 +586,9 @@ def test_no_warnings_if_kappa_is_not_defined(design):
     with warnings.catch_warnings():
         warnings.simplefilter("error")
         with pytest.raises(ValueError, match="Unable to estimate kappa"):
-            IVLIML(*args(y, exog, endog, instr)).fit()
-        IVLIML(*args(y, exog, endog, instr), kappa=1.0).fit()
-        IV2SLS(*args(y, exog, endog, instr)).fit()
+            IVLIML(*args(y, exog, endog, instr), method="pinv").fit()
+        IVLIML(*args(y, exog, endog, instr), kappa=1.0, method="pinv").fit()
+        IV2SLS(*args(y, exog, endog, instr), method="pinv").fit()
 
 
 def fail_if_decomposed(matrix):
@@ -600,7 +606,7 @@ def test_too_few_observations_are_detected_before_the_decomposition(
     # observations is not decomposed, so that nothing depends on it
     monkeypatch.setattr(linearmodels.iv.model, "inv_sqrth", fail_if_decomposed)
     y, exog, endog, instr = data_for(design)
-    mod = IVLIML(*args(y, exog, endog, instr), kappa=1.0)
+    mod = IVLIML(*args(y, exog, endog, instr), kappa=1.0, method="pinv")
     with pytest.raises(LinAlgError, match="Kappa cannot be estimated"):
         mod._estimate_kappa()
 
@@ -609,7 +615,7 @@ def test_too_few_observations_are_detected_before_the_decomposition(
 def test_collinear_residuals_are_detected_before_the_decomposition(scale, monkeypatch):
     monkeypatch.setattr(linearmodels.iv.model, "inv_sqrth", fail_if_decomposed)
     y, exog, endog, instr = collinear_data(scale)
-    mod = IVLIML(*args(y, exog, endog, instr), kappa=1.0)
+    mod = IVLIML(*args(y, exog, endog, instr), kappa=1.0, method="pinv")
     with pytest.raises(LinAlgError, match="linearly dependent"):
         mod._estimate_kappa()
 
@@ -629,7 +635,7 @@ def test_no_warnings_from_the_tests_if_kappa_is_not_defined(design):
     y, exog, endog, instr = data_for(design)
     with warnings.catch_warnings():
         warnings.simplefilter("error")
-        res = IV2SLS(*args(y, exog, endog, instr)).fit()
+        res = IV2SLS(*args(y, exog, endog, instr), method="pinv").fit()
         # str of the tests does not warn
         anderson_rubin, basmann_f = str(res.anderson_rubin), str(res.basmann_f)
     assert "kappa of LIML" in anderson_rubin
@@ -642,7 +648,7 @@ def test_no_warnings_if_kappa_is_defined(design):
     with warnings.catch_warnings():
         warnings.simplefilter("error")
         for model in MODELS:
-            model(*args(y, exog, endog, instr)).fit()
+            model(*args(y, exog, endog, instr), **method_kwargs(model)).fit()
 
 
 # ----------------------------------------------------------------------------
@@ -661,14 +667,14 @@ def collinear_data(scale=1.0, nobs=80):
 @pytest.mark.parametrize("scale", [1e-6, 1.0, 1e6])
 def test_collinear_residuals_are_singular(scale):
     y, exog, endog, instr = collinear_data(scale)
-    mod = IVLIML(*args(y, exog, endog, instr))
+    mod = IVLIML(*args(y, exog, endog, instr), method="pinv")
     with warnings.catch_warnings():
         warnings.simplefilter("error")
         with pytest.raises(ValueError, match="Unable to estimate kappa"):
             mod.fit()
         with pytest.raises(LinAlgError, match="linearly dependent"):
             mod._estimate_kappa()
-        res = IV2SLS(*args(y, exog, endog, instr)).fit()
+        res = IV2SLS(*args(y, exog, endog, instr), method="pinv").fit()
     liml_kappa_is_nan = np.isnan(res._liml_kappa)
     assert liml_kappa_is_nan
     assert isinstance(res.anderson_rubin, InvalidTestStatistic)
@@ -676,7 +682,7 @@ def test_collinear_residuals_are_singular(scale):
 
 def test_collinear_residuals_fit_with_kappa():
     y, exog, endog, instr = collinear_data()
-    res = IVLIML(*args(y, exog, endog, instr), kappa=1.0).fit()
+    res = IVLIML(*args(y, exog, endog, instr), kappa=1.0, method="pinv").fit()
     expected = k_class(y, exog, endog, instr, 1.0)
     assert_allclose(res.params.to_numpy(), expected, rtol=1e-6, atol=1e-8)
 
@@ -688,7 +694,7 @@ def test_nearly_collinear_residuals_are_not_singular(delta):
     noise = np.random.default_rng(1).standard_normal(200)
     endog = np.column_stack([endog[:, 0], endog[:, 0] + delta * noise])
     expected = reference_kappa(y, exog, endog, instr)
-    kappa = IVLIML(*args(y, exog, endog, instr)).fit().kappa
+    kappa = IVLIML(*args(y, exog, endog, instr), method="pinv").fit().kappa
     assert_allclose(kappa, expected, rtol=1e-6)
 
 
@@ -699,8 +705,8 @@ def test_zero_dependent_variable_is_singular():
     with warnings.catch_warnings():
         warnings.simplefilter("error")
         with pytest.raises(ValueError, match="Unable to estimate kappa"):
-            IVLIML(*args(y, exog, endog, instr)).fit()
-        res = IV2SLS(*args(y, exog, endog, instr)).fit()
+            IVLIML(*args(y, exog, endog, instr), method="pinv").fit()
+        res = IV2SLS(*args(y, exog, endog, instr), method="pinv").fit()
     liml_kappa_is_nan = np.isnan(res._liml_kappa)
     assert liml_kappa_is_nan
     assert isinstance(res.anderson_rubin, InvalidTestStatistic)
@@ -714,5 +720,5 @@ def test_ols_with_as_many_observations_as_regressors_does_not_warn():
     y = rng.standard_normal(4)
     with warnings.catch_warnings():
         warnings.simplefilter("error", RuntimeWarning)
-        res = IV2SLS(y, x, None, None).fit()
+        res = IV2SLS(y, x, None, None, method="pinv").fit()
     assert_allclose(res.params.to_numpy(), np.linalg.solve(x, y), rtol=1e-8)

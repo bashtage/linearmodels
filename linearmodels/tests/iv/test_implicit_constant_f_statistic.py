@@ -5,6 +5,7 @@ from numpy.testing import assert_allclose
 import pytest
 
 from linearmodels.iv import IV2SLS, IVGMM, IVGMMCUE, IVJIVE, IVLIML
+from linearmodels.tests._utility import method_kwargs
 
 # IVGMMCUE minimizes its objective with BFGS, so the model with an explicit constant
 # stops at estimates that differ by rounding from those of the model with the dummies,
@@ -30,7 +31,7 @@ def test_model_f_statistic_with_implicit_constant(
     y = 1.0 + 0.3 * group + 0.2 * x + 0.4 * endog + rng.standard_normal(nobs)
     exog = np.column_stack([scales[0] * (group == 0), scales[1] * (group == 1), x])
     weights = rng.uniform(0.5, 2.0, nobs) if weighted else None
-    res = model(y, exog, endog, z, weights=weights).fit(
+    res = model(y, exog, endog, z, weights=weights, **method_kwargs(model)).fit(
         cov_type=cov_type, debiased=debiased
     )
     # A constant fitted value requires equal group effects and zero slopes.
@@ -39,7 +40,12 @@ def test_model_f_statistic_with_implicit_constant(
     assert res.f_statistic.df == 3
     assert_allclose(res.f_statistic.stat, expected, rtol=1e-10)
     explicit = model(
-        y, np.column_stack([np.ones(nobs), group, x]), endog, z, weights=weights
+        y,
+        np.column_stack([np.ones(nobs), group, x]),
+        endog,
+        z,
+        weights=weights,
+        **method_kwargs(model),
     ).fit(cov_type=cov_type, debiased=debiased)
     rtol = EXPLICIT_RTOL.get(model, 1e-10)
     assert_allclose(res.f_statistic.stat, explicit.f_statistic.stat, rtol=rtol)

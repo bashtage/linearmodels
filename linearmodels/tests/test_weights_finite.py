@@ -113,11 +113,11 @@ def system_equations(d, w):
 MODELS = {
     "IV2SLS": (
         IVSample,
-        lambda d, w: IV2SLS(d.dep, d.exog, d.endog, d.instr, weights=w),
+        lambda d, w: IV2SLS(d.dep, d.exog, d.endog, d.instr, weights=w, method="pinv"),
     ),
     "IVLIML": (
         IVSample,
-        lambda d, w: IVLIML(d.dep, d.exog, d.endog, d.instr, weights=w),
+        lambda d, w: IVLIML(d.dep, d.exog, d.endog, d.instr, weights=w, method="pinv"),
     ),
     "IVGMM": (IVSample, lambda d, w: IVGMM(d.dep, d.exog, d.endog, d.instr, weights=w)),
     "IVGMMCUE": (

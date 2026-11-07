@@ -16,7 +16,7 @@ def test_3sls_2sls_equiv():
     tsls_mod = IV3SLS(eqns)
     tsls = tsls_mod.fit(method="ols", cov_type="unadjusted", debiased=False)
     eqn = eqns[next(iter(eqns.keys()))]
-    ivmod = IV2SLS(eqn.dependent, eqn.exog, eqn.endog, eqn.instruments)
+    ivmod = IV2SLS(eqn.dependent, eqn.exog, eqn.endog, eqn.instruments, method="pinv")
     iv = ivmod.fit(cov_type="unadjusted", debiased=False)
     assert_allclose(iv.params, tsls.params)
     assert_allclose(iv.tstats, tsls.tstats)

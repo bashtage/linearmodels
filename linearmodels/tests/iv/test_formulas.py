@@ -12,6 +12,7 @@ from linearmodels.formula import iv_2sls, iv_gmm, iv_gmm_cue, iv_liml
 from linearmodels.iv import IV2SLS, IVGMM, IVGMMCUE, IVLIML
 from linearmodels.iv._utility import IVFormulaParser
 from linearmodels.shared.exceptions import IndexWarning
+from linearmodels.tests._utility import method_kwargs
 
 # IVGMMCUE minimizes its objective with BFGS. Fits that only differ by the rounding
 # of the linear algebra stop at estimates whose R-squared differ by 1e-8 or less. The
@@ -82,16 +83,16 @@ def data():
 
 def test_formula(data, model_and_func, formula):
     model, func = model_and_func
-    mod = model.from_formula(formula, data)
+    mod = model.from_formula(formula, data, **method_kwargs(model))
     res = mod.fit()
     exog = data[["Intercept", "x3", "x4", "x5"]]
     endog = data[["x1", "x2"]]
     instr = data[["z1", "z2", "z3"]]
-    res2 = model(data.y, exog, endog, instr).fit()
+    res2 = model(data.y, exog, endog, instr, **method_kwargs(model)).fit()
     assert_same_rsquared(model, res, res2)
     assert mod.formula == formula
 
-    mod = func(formula, data)
+    mod = func(formula, data, **method_kwargs(func))
     res = mod.fit()
     assert_same_rsquared(model, res, res2)
     assert mod.formula == formula
@@ -105,16 +106,20 @@ def test_formula(data, model_and_func, formula):
 
 def test_formula_weights(data, model_and_func, formula):
     model, func = model_and_func
-    mod = model.from_formula(formula, data, weights=data.weights)
+    mod = model.from_formula(
+        formula, data, weights=data.weights, **method_kwargs(model)
+    )
     res = mod.fit()
     exog = data[["Intercept", "x3", "x4", "x5"]]
     endog = data[["x1", "x2"]]
     instr = data[["z1", "z2", "z3"]]
-    res2 = model(data.y, exog, endog, instr, weights=data.weights).fit()
+    res2 = model(
+        data.y, exog, endog, instr, weights=data.weights, **method_kwargs(model)
+    ).fit()
     assert_same_rsquared(model, res, res2)
     assert mod.formula == formula
 
-    mod = func(formula, data, weights=data.weights)
+    mod = func(formula, data, weights=data.weights, **method_kwargs(func))
     res = mod.fit()
     assert_same_rsquared(model, res, res2)
     assert mod.formula == formula
@@ -124,19 +129,19 @@ def test_formula_weights(data, model_and_func, formula):
 # test_gmm_kernel_bandwidth.py, so the bandwidth is given
 def test_formula_kernel(data, model_and_func, formula):
     model, func = model_and_func
-    mod = model.from_formula(formula, data)
+    mod = model.from_formula(formula, data, **method_kwargs(model))
     mod.fit(cov_type="kernel", bandwidth=5)
-    func(formula, data).fit(cov_type="kernel", bandwidth=5)
+    func(formula, data, **method_kwargs(func)).fit(cov_type="kernel", bandwidth=5)
 
 
 def test_formula_ols(data, model_and_func):
     model, func = model_and_func
     formula = "y ~ 1 + x1 + x2 + x3 + x4 + x5"
     exog = data[["Intercept", "x1", "x2", "x3", "x4", "x5"]]
-    res2 = model(data.y, exog, None, None)
+    res2 = model(data.y, exog, None, None, **method_kwargs(model))
     res2 = res2.fit()
-    res = model.from_formula(formula, data).fit()
-    res3 = func(formula, data).fit()
+    res = model.from_formula(formula, data, **method_kwargs(model)).fit()
+    res3 = func(formula, data, **method_kwargs(func)).fit()
 
     assert_same_rsquared(model, res, res2)
     assert_same_rsquared(model, res, res3)
@@ -146,10 +151,12 @@ def test_formula_ols_weights(data, model_and_func):
     model, func = model_and_func
     formula = "y ~ 1 + x1 + x2 + x3 + x4 + x5"
     exog = data[["Intercept", "x1", "x2", "x3", "x4", "x5"]]
-    res2 = model(data.y, exog, None, None, weights=data.weights)
+    res2 = model(data.y, exog, None, None, weights=data.weights, **method_kwargs(model))
     res2 = res2.fit()
-    res = model.from_formula(formula, data, weights=data.weights).fit()
-    res3 = func(formula, data, weights=data.weights).fit()
+    res = model.from_formula(
+        formula, data, weights=data.weights, **method_kwargs(model)
+    ).fit()
+    res3 = func(formula, data, weights=data.weights, **method_kwargs(func)).fit()
 
     assert_same_rsquared(model, res, res2)
     assert_same_rsquared(model, res, res3)
@@ -158,14 +165,20 @@ def test_formula_ols_weights(data, model_and_func):
 def test_no_exog(data, model_and_func):
     model, func = model_and_func
     formula = "y ~ [x1 + x2 ~ z1 + z2 + z3]"
-    mod = model.from_formula(formula, data)
+    mod = model.from_formula(formula, data, **method_kwargs(model))
     res = mod.fit()
-    res2 = func(formula, data).fit()
+    res2 = func(formula, data, **method_kwargs(func)).fit()
 
     assert_same_rsquared(model, res, res2)
     assert mod.formula == formula
 
-    mod2 = model(data.y, None, data[["x1", "x2"]], data[["z1", "z2", "z3"]])
+    mod2 = model(
+        data.y,
+        None,
+        data[["x1", "x2"]],
+        data[["z1", "z2", "z3"]],
+        **method_kwargs(model),
+    )
     res3 = mod2.fit()
 
     assert_allclose(res.rsquared, res3.rsquared)
@@ -175,21 +188,21 @@ def test_invalid_formula(data, model_and_func):
     model, func = model_and_func
     formula = "y ~ 1 + x1 + x2 ~ x3 + [x4  x5 ~ z1 z2]"
     with pytest.raises(ValueError, match=r"formula contains more than"):
-        model.from_formula(formula, data).fit()
+        model.from_formula(formula, data, **method_kwargs(model)).fit()
     with pytest.raises(ValueError, match=r"formula contains more than"):
-        func(formula, data).fit()
+        func(formula, data, **method_kwargs(func)).fit()
     formula = "y ~ 1 + x1 + x2 + x3 + x4 + x5 ~ z1 z2"
     with pytest.raises(ValueError, match=r"formula not understood"):
-        model.from_formula(formula, data).fit()
+        model.from_formula(formula, data, **method_kwargs(model)).fit()
     formula = "y y2 ~ 1 + x1 + x2 + x3 + [x4 + x5 ~ + z1 + z2]"
     with pytest.raises(ValueError, match=r"instrument block must not start or"):
-        model.from_formula(formula, data).fit()
+        model.from_formula(formula, data, **method_kwargs(model)).fit()
     formula = "y y2 ~ 1 + x1 + x2 + x3 [ + x4 + x5 ~ z1 + z2]"
     with pytest.raises(ValueError, match=r"endogenous block must not start or"):
-        model.from_formula(formula, data).fit()
+        model.from_formula(formula, data, **method_kwargs(model)).fit()
     formula = "y y2 ~ 1 + x1 + x2 + x3 + [x4 + x5 ~ z1 + z2]"
     with pytest.raises(FormulaSyntaxError, match=r"Missing operator between"):
-        model.from_formula(formula, data).fit()
+        model.from_formula(formula, data, **method_kwargs(model)).fit()
 
 
 def test_categorical(model_and_func):
@@ -201,10 +214,12 @@ def test_categorical(model_and_func):
     data = DataFrame({"y": y, "x1": x1, "d": d})
     data["Intercept"] = 1.0
     model, func = model_and_func
-    mod = model.from_formula(formula, data)
+    mod = model.from_formula(formula, data, **method_kwargs(model))
     res3 = mod.fit()
-    res2 = func(formula, data).fit()
-    res = model(data.y, data[["Intercept", "x1", "d"]], None, None).fit()
+    res2 = func(formula, data, **method_kwargs(func)).fit()
+    res = model(
+        data.y, data[["Intercept", "x1", "d"]], None, None, **method_kwargs(model)
+    ).fit()
 
     assert_allclose(res.rsquared, res2.rsquared)
     assert_allclose(res2.rsquared, res3.rsquared)
@@ -213,7 +228,7 @@ def test_categorical(model_and_func):
 
 def test_predict_formula(data, model_and_func, formula):
     model, _ = model_and_func
-    mod = model.from_formula(formula, data)
+    mod = model.from_formula(formula, data, **method_kwargs(model))
     res = mod.fit()
     exog = data[["Intercept", "x3", "x4", "x5"]]
     endog = data[["x1", "x2"]]
@@ -231,7 +246,7 @@ def test_predict_formula(data, model_and_func, formula):
 def test_formula_function(data, model_and_func):
     model, func = model_and_func
     fmla = "y ~ 1 + sigmoid(x3) + x4 + [x1 + x2 ~ z1 + z2 + z3] + np.exp(x5)"
-    fmla_mod = model.from_formula(fmla, data)
+    fmla_mod = model.from_formula(fmla, data, **method_kwargs(model))
     fmla_res = fmla_mod.fit()
 
     dep = data.y
@@ -244,9 +259,9 @@ def test_formula_function(data, model_and_func):
     exog = concat(exog, axis=1, sort=False)
     endog = data[["x1", "x2"]]
     instr = data[["z1", "z2", "z3"]]
-    mod = model(dep, exog, endog, instr)
+    mod = model(dep, exog, endog, instr, **method_kwargs(model))
     array_res = mod.fit()
-    func_res = func(fmla, data).fit()
+    func_res = func(fmla, data, **method_kwargs(func)).fit()
 
     assert_allclose(fmla_res.params.values, array_res.params.values, rtol=1e-5)
     assert_allclose(fmla_res.params.values, func_res.params.values, rtol=1e-5)
@@ -258,7 +273,7 @@ def test_formula_function(data, model_and_func):
 def test_predict_formula_function(data, model_and_func):
     model, func = model_and_func
     fmla = "y ~ 1 + sigmoid(x3) + x4 + [x1 + x2 ~ z1 + z2 + z3] + np.exp(x5)"
-    mod = model.from_formula(fmla, data)
+    mod = model.from_formula(fmla, data, **method_kwargs(model))
     res = mod.fit()
 
     exog = [
@@ -274,7 +289,7 @@ def test_predict_formula_function(data, model_and_func):
     assert_frame_equal(pred, pred2)
     assert_allclose(res.fitted_values, pred)
 
-    res2 = func(fmla, data).fit()
+    res2 = func(fmla, data, **method_kwargs(func)).fit()
     pred3 = res2.predict(exog, endog)
     pred4 = res2.predict(data=data)
     assert_frame_equal(pred, pred3)
@@ -283,7 +298,7 @@ def test_predict_formula_function(data, model_and_func):
 
 def test_predict_formula_error(data, model_and_func, formula):
     model, _ = model_and_func
-    mod = model.from_formula(formula, data)
+    mod = model.from_formula(formula, data, **method_kwargs(model))
     res = mod.fit()
     exog = data[["Intercept", "x3", "x4", "x5"]]
     endog = data[["x1", "x2"]]
@@ -302,17 +317,17 @@ def test_single_character_names(data, model_and_func):
     data["a"] = data["z2"]
     fmla = "y ~ 1 + [x ~ z]"
     model, _ = model_and_func
-    mod = model.from_formula(fmla, data)
+    mod = model.from_formula(fmla, data, **method_kwargs(model))
     mod.fit()
 
     fmla = "y ~ 1 + [x ~ z + a]"
     model, _ = model_and_func
-    mod = model.from_formula(fmla, data)
+    mod = model.from_formula(fmla, data, **method_kwargs(model))
     mod.fit()
 
     fmla = "y ~ 1 + [x + v ~ z + a]"
     model, _ = model_and_func
-    mod = model.from_formula(fmla, data)
+    mod = model.from_formula(fmla, data, **method_kwargs(model))
     mod.fit()
 
 
@@ -320,7 +335,7 @@ def test_ols_formula(data):
     # GH 185
     data = data.copy()
     fmla = "y ~ 1 + x1"
-    mod = IV2SLS.from_formula(fmla, data)
+    mod = IV2SLS.from_formula(fmla, data, method="pinv")
     res = mod.fit()
     assert "OLS Estimation Summary" in str(res)
 
@@ -337,7 +352,7 @@ def test_predict_exception(data, model_and_func, formula):
     model, _ = model_and_func
     data = data.copy()
     data.index = np.arange(100000, 100000 + data.shape[0])
-    mod = model.from_formula(formula, data)
+    mod = model.from_formula(formula, data, **method_kwargs(model))
     res = mod.fit()
     exog = data[["Intercept", "x3", "x4", "x5"]]
     endog = data[["x1", "x2"]]
@@ -354,8 +369,14 @@ def test_predict_exception(data, model_and_func, formula):
 
 def test_predict_no_formula_predict_data(data, model_and_func, formula):
     model, _ = model_and_func
-    mod_fmla: IV2SLS = model.from_formula(formula, data)
-    mod = model(mod_fmla.dependent, mod_fmla.exog, mod_fmla.endog, mod_fmla.instruments)
+    mod_fmla: IV2SLS = model.from_formula(formula, data, **method_kwargs(model))
+    mod = model(
+        mod_fmla.dependent,
+        mod_fmla.exog,
+        mod_fmla.endog,
+        mod_fmla.instruments,
+        **method_kwargs(model),
+    )
     res = mod.fit()
 
     x = np.asarray(mod_fmla.exog.pandas)
@@ -370,7 +391,7 @@ def test_predict_no_formula_predict_data(data, model_and_func, formula):
 def test_formula_escaped_simple():
     rs = np.random.RandomState(1232)
     data = pd.DataFrame({"y": np.arange(100), "var x": rs.standard_normal(100)})
-    IV2SLS.from_formula("y ~ 1 + `var x`", data)
+    IV2SLS.from_formula("y ~ 1 + `var x`", data, method="pinv")
 
 
 def test_formula_escape():
@@ -379,7 +400,7 @@ def test_formula_escape():
     )
     data.loc[:, "x 1"] *= data.loc[:, "z 0"]
     formula = "`y space` ~ 1 + [`x 1` ~ `z 0`]"
-    mod = IV2SLS.from_formula(formula, data=data)
+    mod = IV2SLS.from_formula(formula, data=data, method="pinv")
     res = mod.fit()
     summ = res.summary
     assert len(res.params) == 2
@@ -396,7 +417,7 @@ def test_formula_categorical_equiv(data, model_and_func, dtype):
     data["d"] = rs.choice(["a", "b", "c", "d"], size=data.shape[0])
     data["d"] = data["d"].astype(dtype)
     formula = "y ~ 1 + d + x2 + [x3 ~ z1 + z2]"
-    mod = model.from_formula(formula, data)
+    mod = model.from_formula(formula, data, **method_kwargs(model))
     res = mod.fit()
     print(res)
     aug_data = data.copy()
@@ -407,7 +428,11 @@ def test_formula_categorical_equiv(data, model_and_func, dtype):
     endog = ["x3"]
     instr = ["z1", "z2"]
     res_direct = model(
-        aug_data["y"], aug_data[exog], aug_data[endog], aug_data[instr]
+        aug_data["y"],
+        aug_data[exog],
+        aug_data[endog],
+        aug_data[instr],
+        **method_kwargs(model),
     ).fit()
     assert_allclose(res.rsquared, res_direct.rsquared)
     assert list(res.params.index) == [
@@ -422,7 +447,7 @@ def test_formula_categorical_equiv(data, model_and_func, dtype):
 
 def test_predict_no_rhs(data, model_and_func):
     model, _ = model_and_func
-    mod = model.from_formula("y ~", data)
+    mod = model.from_formula("y ~", data, **method_kwargs(model))
     res = mod.fit()
     pred0 = res.predict()
     pred1 = res.predict(data=data)
@@ -441,11 +466,11 @@ def test_predict_no_rhs(data, model_and_func):
 )
 def test_formula_single(data, model_and_func, fmla):
     model, func = model_and_func
-    res = model.from_formula(fmla, data).fit()
+    res = model.from_formula(fmla, data, **method_kwargs(model)).fit()
     pred0 = res.predict()
     pred1 = res.predict(data=data)
 
-    mod2 = func(fmla, data)
+    mod2 = func(fmla, data, **method_kwargs(func))
     res2 = mod2.fit()
     pred2 = res2.predict(data=data)
     pred1.columns = pred0.columns
