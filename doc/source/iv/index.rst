@@ -26,6 +26,7 @@ tests.
    examples/advanced-examples.ipynb
    examples/using-formulas.ipynb
    examples/absorbing-regression.ipynb
+   weak-instruments
    reference
    mathematical-formula
 

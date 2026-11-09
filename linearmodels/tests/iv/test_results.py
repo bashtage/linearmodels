@@ -22,7 +22,11 @@ def model(request):
 
 def result_checker(res):
     for attr in dir(res):
-        if attr.startswith("_") or attr in ("test_linear_constraint", "wald_test"):
+        if attr.startswith("_") or attr in (
+            "test_linear_constraint",
+            "wald_test",
+            "tf_conf_int",
+        ):
             continue
         print(attr)
         if attr == "summary":
