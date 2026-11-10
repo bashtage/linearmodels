@@ -12,33 +12,20 @@ be added to 7.1. 7.2 also contains the fixes below.
 .. rubric:: New features
 
 - ``IV2SLS`` and ``IVLIML``, and their ``from_formula``, have a ``method`` keyword.
-  ``method="qr"`` tests the rank of ``[exog, endog]`` and ``[exog, instruments]`` after
-  scaling their columns to unit length, and treats them as rank deficient if their
-  condition number is at least 1e9. It computes the estimates, their covariance and the
-  kappa of LIML from QR decompositions, as R's ``ivreg`` does. The results do not depend
-  on the units of the variables, and their rounding error grows with the condition
-  number of the scaled data, not with its square. With nearly collinear regressors (a
-  condition number of about 1e6), the median error of the 2SLS estimates and of their
-  robust standard errors falls from about 5e-4 to 4e-11 in simulations, and columns on
-  scales that differ by 1e13 or more are no longer rejected as rank deficient. The kappa
-  of LIML no longer depends on the units with 2 or more endogenous regressors. The
-  default, ``method="pinv"``, gives the same results as 7.1. With either method, ``fit``
-  decomposes the instruments once instead of up to three times, which makes it about
-  twice as fast as in 7.1 for large models. The IV covariance estimators,
-  ``cragg_donald``, ``cragg_donald_f``, ``kleibergen_paap`` and ``kleibergen_paap_f``
-  accept the same keyword, and the first stage results and the tests of the results use
-  the numerical method of the model (:issue:`823`, :issue:`850`, :issue:`870`).
-- With ``method="pinv"``, the estimates can lose digits well below the condition number
-  of 1e9 at which ``method="qr"`` rejects the data. If ``c`` is the condition number of the
-  regressors or the instruments with columns scaled to unit length, about ``16 - 2
-  log10(c)`` digits are correct with ``method="pinv"``, e.g., 6 at c = 1e5 and none at c =
-  1e8, and about ``16 - log10(c)`` with ``method="qr"``. Nearly collinear variables, such as
-  a variable in levels and its square, can have such condition numbers. ``method="qr"``
-  is recommended (:issue:`870`).
-- ``IVGMM``, ``IVGMMCUE`` and ``IVJIVE`` do not have ``method``, and keep their
-  computation and rank check. GMM weights the moments with the inverse of their
-  estimated covariance and JIVE is not a k-class estimator, so the QR form of the
-  k-class estimator does not apply to them (:issue:`870`).
+  ``method="qr"`` computes the estimates, their covariance and the kappa of LIML from QR
+  decompositions, as R's ``ivreg`` does, and tests the rank of ``[exog, endog]`` and
+  ``[exog, instruments]`` after scaling their columns to unit length. It does not depend
+  on the units of the variables, and it is more accurate: with c the condition number of
+  the scaled data, about 16 - log10(c) digits are correct, against 16 - 2 log10(c) with
+  ``method="pinv"``. With nearly collinear regressors (c of about 1e6), the median error
+  of the 2SLS estimates and their robust standard errors falls from about 5e-4 to 4e-11
+  in simulations. ``method="pinv"``, the default, gives the same results as 7.1. The IV
+  covariance estimators, ``estimate_parameters``, ``cragg_donald``, ``cragg_donald_f``,
+  ``kleibergen_paap``, ``kleibergen_paap_f`` and ``FirstStageResults`` take the same
+  keyword. ``IVGMM``, ``IVGMMCUE`` and ``IVJIVE`` do not, since they are not k-class
+  estimators (:issue:`823`, :issue:`850`, :issue:`870`).
+- ``fit`` of ``IV2SLS`` and ``IVLIML`` decomposes the instruments once instead of three
+  times (:issue:`870`).
 
 .. rubric:: Changes that alter results
 
@@ -85,16 +72,9 @@ be added to 7.1. 7.2 also contains the fixes below.
 
 - linearmodels 8.0 will raise the minimum versions of Python and NumPy, and of the other
   dependencies.
-- linearmodels 8.0 will use ``method="qr"`` by default in ``IV2SLS`` and ``IVLIML``. If
-  ``method`` is not given, a ``FutureWarning`` says so, and that ``method="qr"`` gives
-  the new method now and ``method="pinv"`` keeps the current one without the warning.
-  For data that ``method="qr"`` finds rank deficient, which 8.0 will reject, the
-  warning also says so. The error for columns that are only rank deficient because of
-  their units suggests ``method="qr"``. The IV covariance estimators,
-  ``estimate_parameters``, ``cragg_donald``, ``cragg_donald_f``, ``kleibergen_paap``,
-  ``kleibergen_paap_f`` and ``FirstStageResults`` issue the same warning if they are
-  called directly without ``method``. They do not warn when a model calls them, since
-  the model passes its own method (:issue:`870`).
+- linearmodels 8.0 will use ``method="qr"`` by default in ``IV2SLS`` and ``IVLIML``.
+  Until then, they and the functions above issue a ``FutureWarning`` if ``method`` is
+  not given. Pass ``method="pinv"`` to keep the current results (:issue:`870`).
 
 .. rubric:: Contributors
 
