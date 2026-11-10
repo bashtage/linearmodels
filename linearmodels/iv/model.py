@@ -1120,7 +1120,7 @@ class _IVLSModelBase(_IVModelBase):
         else:
             pinvz = pinv(wz) if z_dec is None else z_dec
             params, pinvz_x, xpz_pinvz_x = _kclass_pinv(wx, wy, wz, est_kappa, pinvz)
-            reuse = {"pinvz": pinvz, "pinvz_x": pinvz_x, "xpz_pinvz_x": xpz_pinvz_x}
+            reuse = {"pinvz_x": pinvz_x, "xpz_pinvz_x": xpz_pinvz_x}
 
         cov_estimator = lookup_option(COVARIANCE_ESTIMATORS, cov_type, "cov_type")
         cov_config["debiased"] = debiased
