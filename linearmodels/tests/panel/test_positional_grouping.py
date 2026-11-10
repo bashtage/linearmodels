@@ -17,7 +17,6 @@ from linearmodels import (
 )
 from linearmodels.shared.exceptions import MissingValueWarning
 
-
 MODELS = [
     PooledOLS,
     PanelOLS,

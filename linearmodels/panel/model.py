@@ -629,10 +629,9 @@ class _PanelModelBase:
         self._check_labels("exog", self.exog.index, _is_labelled(exog))
         # Positional inputs must use dependent's groups for transformations and
         # weight shapes. Leave unequal row counts to the existing validation.
-        if (
-            self.exog.dataframe.shape[0] == self.dependent.dataframe.shape[0]
-            and not self.exog.index.equals(self.dependent.index)
-        ):
+        if self.exog.dataframe.shape[0] == self.dependent.dataframe.shape[
+            0
+        ] and not self.exog.index.equals(self.dependent.index):
             self.exog = PanelData(
                 self.exog.dataframe.set_axis(self.dependent.index),
                 convert_dummies=False,
