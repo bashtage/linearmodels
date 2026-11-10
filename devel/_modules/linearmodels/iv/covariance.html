@@ -19,7 +19,7 @@
     
   
       
-        <title>linearmodels.iv.covariance - linearmodels v7.2 (+41)</title>
+        <title>linearmodels.iv.covariance - linearmodels v7.2 (+67)</title>
       
     
 
@@ -91,7 +91,7 @@
 
 <header class="md-header md-header--shadow" data-md-component="header">
   <nav class="md-header__inner md-grid" aria-label="Header">
-    <a href="../../../index.html" title="linearmodels v7.2 (+41)" class="md-header__button md-logo" aria-label="linearmodels v7.2 (+41)" data-md-component="logo">
+    <a href="../../../index.html" title="linearmodels v7.2 (+67)" class="md-header__button md-logo" aria-label="linearmodels v7.2 (+67)" data-md-component="logo">
       <img src="../../../_static/bw-logo.svg" alt="logo">
     </a>
     <label class="md-header__button md-icon" for="__drawer">
@@ -102,7 +102,7 @@
       <div class="md-header__ellipsis">
         <div class="md-header__topic">
           <span class="md-ellipsis">
-            linearmodels v7.2 (+41)
+            linearmodels v7.2 (+67)
           </span>
         </div>
         <div class="md-header__topic" data-md-component="header-topic">
@@ -197,10 +197,10 @@
 
 <nav class="md-nav md-nav--primary" aria-label="Navigation" data-md-level="0">
   <label class="md-nav__title" for="__drawer">
-    <a href="../../../index.html" title="linearmodels v7.2 (+41)" class="md-nav__button md-logo" aria-label="linearmodels v7.2 (+41)" data-md-component="logo">
+    <a href="../../../index.html" title="linearmodels v7.2 (+67)" class="md-nav__button md-logo" aria-label="linearmodels v7.2 (+67)" data-md-component="logo">
       <img src="../../../_static/bw-logo.svg" alt="logo">
     </a>
-    linearmodels v7.2 (+41)
+    linearmodels v7.2 (+67)
   </label>
   
     <div class="md-nav__source">
@@ -534,7 +534,7 @@
 <span class="kn">from</span><span class="w"> </span><span class="nn">__future__</span><span class="w"> </span><span class="kn">import</span> <span class="n">annotations</span>
 
 <span class="kn">from</span><span class="w"> </span><span class="nn">collections.abc</span><span class="w"> </span><span class="kn">import</span> <span class="n">Callable</span>
-<span class="kn">from</span><span class="w"> </span><span class="nn">typing</span><span class="w"> </span><span class="kn">import</span> <span class="n">Any</span><span class="p">,</span> <span class="n">Union</span><span class="p">,</span> <span class="n">cast</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">typing</span><span class="w"> </span><span class="kn">import</span> <span class="n">Any</span><span class="p">,</span> <span class="n">Literal</span><span class="p">,</span> <span class="n">Union</span><span class="p">,</span> <span class="n">cast</span>
 
 <span class="kn">from</span><span class="w"> </span><span class="nn">mypy_extensions</span><span class="w"> </span><span class="kn">import</span> <span class="n">VarArg</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">numpy</span><span class="w"> </span><span class="kn">import</span> <span class="p">(</span>
@@ -544,6 +544,7 @@
     <span class="n">cos</span><span class="p">,</span>
     <span class="n">empty</span><span class="p">,</span>
     <span class="n">errstate</span><span class="p">,</span>
+    <span class="n">eye</span><span class="p">,</span>
     <span class="n">isfinite</span><span class="p">,</span>
     <span class="n">ndarray</span><span class="p">,</span>
     <span class="n">ones</span><span class="p">,</span>
@@ -554,7 +555,14 @@
     <span class="n">zeros</span><span class="p">,</span>
 <span class="p">)</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">numpy.linalg</span><span class="w"> </span><span class="kn">import</span> <span class="n">inv</span><span class="p">,</span> <span class="n">pinv</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">scipy.linalg</span><span class="w"> </span><span class="kn">import</span> <span class="n">solve_triangular</span>
 
+<span class="kn">from</span><span class="w"> </span><span class="nn">linearmodels.iv._utility</span><span class="w"> </span><span class="kn">import</span> <span class="p">(</span>
+    <span class="n">KClassFactors</span><span class="p">,</span>
+    <span class="n">kclass_factors</span><span class="p">,</span>
+    <span class="n">orthonormal_basis</span><span class="p">,</span>
+    <span class="n">resolve_method</span><span class="p">,</span>
+<span class="p">)</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">linearmodels.shared.covariance</span><span class="w"> </span><span class="kn">import</span> <span class="n">cluster_union</span><span class="p">,</span> <span class="n">cov_cluster</span><span class="p">,</span> <span class="n">cov_kernel</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">linearmodels.shared.exceptions</span><span class="w"> </span><span class="kn">import</span> <span class="n">lower_option</span><span class="p">,</span> <span class="n">unknown_option_error</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">linearmodels.shared.inputs</span><span class="w"> </span><span class="kn">import</span> <span class="n">as_ndarray</span>
@@ -1006,6 +1014,13 @@
 <span class="sd">        of x, for example the absorbed effects of AbsorbingLS. The default is 0.</span>
 <span class="sd">        It is only used if ``debiased`` is True, when n / (n-k) becomes</span>
 <span class="sd">        n / (n-k-extra_df).</span>
+<span class="sd">    method : {"pinv", "qr"}, optional</span>
+<span class="sd">        Numerical method, see :class:`~linearmodels.iv.model.IV2SLS`. With "qr", z</span>
+<span class="sd">        must have full column rank. If not given, "pinv" is used and a</span>
+<span class="sd">        ``FutureWarning`` is issued, since the default will be "qr" in linearmodels</span>
+<span class="sd">        8.0.</span>
+
+<span class="sd">        .. versionadded:: 7.2</span>
 
 <span class="sd">    Raises</span>
 <span class="sd">    ------</span>
@@ -1048,6 +1063,8 @@
         <span class="n">debiased</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
         <span class="n">kappa</span><span class="p">:</span> <span class="n">linearmodels</span><span class="o">.</span><span class="n">typing</span><span class="o">.</span><span class="n">Numeric</span> <span class="o">=</span> <span class="mi">1</span><span class="p">,</span>
         <span class="n">extra_df</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">0</span><span class="p">,</span>
+        <span class="o">*</span><span class="p">,</span>
+        <span class="n">method</span><span class="p">:</span> <span class="n">Literal</span><span class="p">[</span><span class="s2">"pinv"</span><span class="p">,</span> <span class="s2">"qr"</span><span class="p">]</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
     <span class="p">):</span>
         <span class="k">if</span> <span class="ow">not</span> <span class="p">(</span><span class="n">x</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">==</span> <span class="n">y</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">==</span> <span class="n">z</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]):</span>
             <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">"x, y and z must have the same number of rows"</span><span class="p">)</span>
@@ -1061,7 +1078,14 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">_debiased</span> <span class="o">=</span> <span class="n">debiased</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">eps</span> <span class="o">=</span> <span class="n">y</span> <span class="o">-</span> <span class="n">x</span> <span class="o">@</span> <span class="n">params</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_kappa</span> <span class="o">=</span> <span class="n">kappa</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">_pinvz</span> <span class="o">=</span> <span class="n">pinv</span><span class="p">(</span><span class="n">z</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_numerical_method</span> <span class="o">=</span> <span class="n">resolve_method</span><span class="p">(</span><span class="n">method</span><span class="p">,</span> <span class="nb">type</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="vm">__name__</span><span class="p">)</span>
+        <span class="c1"># Decompositions of z and products with it, computed when first used or given</span>
+        <span class="c1"># by the model, see _reuse</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_pinvz</span><span class="p">:</span> <span class="n">linearmodels</span><span class="o">.</span><span class="n">typing</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">Float64Array</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_pinvz_x</span><span class="p">:</span> <span class="n">linearmodels</span><span class="o">.</span><span class="n">typing</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">Float64Array</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_xpz_pinvz_x</span><span class="p">:</span> <span class="n">linearmodels</span><span class="o">.</span><span class="n">typing</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">Float64Array</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_z_basis</span><span class="p">:</span> <span class="n">linearmodels</span><span class="o">.</span><span class="n">typing</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">Float64Array</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_factors</span><span class="p">:</span> <span class="n">KClassFactors</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span>
         <span class="n">nobs</span><span class="p">,</span> <span class="n">nvar</span> <span class="o">=</span> <span class="n">x</span><span class="o">.</span><span class="n">shape</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_debiased</span> <span class="ow">and</span> <span class="n">extra_df</span> <span class="o">&gt;</span> <span class="mi">0</span> <span class="ow">and</span> <span class="n">nobs</span> <span class="o">-</span> <span class="n">nvar</span> <span class="o">-</span> <span class="n">extra_df</span> <span class="o">&lt;=</span> <span class="mi">0</span><span class="p">:</span>
             <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
@@ -1084,36 +1108,125 @@
             <span class="bp">self</span><span class="o">.</span><span class="fm">__str__</span><span class="p">()</span> <span class="o">+</span> <span class="s2">"</span><span class="se">\n</span><span class="s2">"</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="vm">__class__</span><span class="o">.</span><span class="vm">__name__</span> <span class="o">+</span> <span class="sa">f</span><span class="s2">", id: </span><span class="si">{</span><span class="nb">hex</span><span class="p">(</span><span class="nb">id</span><span class="p">(</span><span class="bp">self</span><span class="p">))</span><span class="si">}</span><span class="s2">"</span>
         <span class="p">)</span>
 
-    <span class="nd">@property</span>
-    <span class="k">def</span><span class="w"> </span><span class="nf">s</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">linearmodels</span><span class="o">.</span><span class="n">typing</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">Float64Array</span><span class="p">:</span>
-<span class="w">        </span><span class="sd">"""Return the score covariance estimate."""</span>
-        <span class="n">x</span><span class="p">,</span> <span class="n">z</span><span class="p">,</span> <span class="n">eps</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">x</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">z</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">eps</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">_reuse</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span>
+        <span class="o">*</span><span class="p">,</span>
+        <span class="n">pinvz</span><span class="p">:</span> <span class="n">linearmodels</span><span class="o">.</span><span class="n">typing</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">Float64Array</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+        <span class="n">pinvz_x</span><span class="p">:</span> <span class="n">linearmodels</span><span class="o">.</span><span class="n">typing</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">Float64Array</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+        <span class="n">xpz_pinvz_x</span><span class="p">:</span> <span class="n">linearmodels</span><span class="o">.</span><span class="n">typing</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">Float64Array</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+        <span class="n">z_basis</span><span class="p">:</span> <span class="n">linearmodels</span><span class="o">.</span><span class="n">typing</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">Float64Array</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+        <span class="n">factors</span><span class="p">:</span> <span class="n">KClassFactors</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">"""</span>
+<span class="sd">        Use what the model computed from the same x, z and kappa.</span>
+
+<span class="sd">        With method="pinv", pinv(z), pinv(z) @ x and x'z @ pinv(z) @ x. With "qr",</span>
+<span class="sd">        the orthonormal basis of z and the factors of the k-class estimator.</span>
+<span class="sd">        """</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_pinvz</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_pinvz_x</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_xpz_pinvz_x</span> <span class="o">=</span> <span class="n">pinvz</span><span class="p">,</span> <span class="n">pinvz_x</span><span class="p">,</span> <span class="n">xpz_pinvz_x</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_z_basis</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_factors</span> <span class="o">=</span> <span class="n">z_basis</span><span class="p">,</span> <span class="n">factors</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">_pinv_z</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">linearmodels</span><span class="o">.</span><span class="n">typing</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">Float64Array</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">"""pinv(z), used with method="pinv", computed once."""</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_pinvz</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_pinvz</span> <span class="o">=</span> <span class="n">pinv</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">z</span><span class="p">)</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_pinvz</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">_pinv_z_x</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">linearmodels</span><span class="o">.</span><span class="n">typing</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">Float64Array</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">"""pinv(z) @ x, used with method="pinv", computed once."""</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_pinvz_x</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_pinvz_x</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_pinv_z</span><span class="p">()</span> <span class="o">@</span> <span class="bp">self</span><span class="o">.</span><span class="n">x</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_pinvz_x</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">_basis</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">linearmodels</span><span class="o">.</span><span class="n">typing</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">Float64Array</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">"""Orthonormal basis of the instruments, used with method="qr"."""</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_z_basis</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_z_basis</span> <span class="o">=</span> <span class="n">orthonormal_basis</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">z</span><span class="p">)</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_z_basis</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">_kclass_factors</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">KClassFactors</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">"""Factors of the cross products of the k-class estimator, computed once."""</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_factors</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_factors</span> <span class="o">=</span> <span class="n">kclass_factors</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">x</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_basis</span><span class="p">(),</span> <span class="nb">float</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_kappa</span><span class="p">))</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_factors</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">_xhat</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">linearmodels</span><span class="o">.</span><span class="n">typing</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">Float64Array</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">"""The projection of x on z, which are the regressors of the scores."""</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_numerical_method</span> <span class="o">==</span> <span class="s2">"pinv"</span><span class="p">:</span>
+            <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">z</span> <span class="o">@</span> <span class="bp">self</span><span class="o">.</span><span class="n">_pinv_z_x</span><span class="p">()</span>
+        <span class="n">z_basis</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_basis</span><span class="p">()</span>
+        <span class="k">return</span> <span class="n">z_basis</span> <span class="o">@</span> <span class="p">(</span><span class="n">z_basis</span><span class="o">.</span><span class="n">T</span> <span class="o">@</span> <span class="bp">self</span><span class="o">.</span><span class="n">x</span><span class="p">)</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">_pinv_v</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">linearmodels</span><span class="o">.</span><span class="n">typing</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">Float64Array</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">"""V of method="pinv", the k-class cross product of x divided by nobs."""</span>
+        <span class="n">x</span><span class="p">,</span> <span class="n">z</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">x</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">z</span>
         <span class="n">nobs</span> <span class="o">=</span> <span class="n">x</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
-        <span class="n">s2</span> <span class="o">=</span> <span class="n">eps</span><span class="o">.</span><span class="n">T</span> <span class="o">@</span> <span class="n">eps</span> <span class="o">/</span> <span class="n">nobs</span>
-        <span class="n">pinvz</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_pinvz</span>
-        <span class="n">v</span> <span class="o">=</span> <span class="p">(</span><span class="n">x</span><span class="o">.</span><span class="n">T</span> <span class="o">@</span> <span class="n">z</span><span class="p">)</span> <span class="o">@</span> <span class="p">(</span><span class="n">pinvz</span> <span class="o">@</span> <span class="n">x</span><span class="p">)</span> <span class="o">/</span> <span class="n">nobs</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_xpz_pinvz_x</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_xpz_pinvz_x</span> <span class="o">=</span> <span class="p">(</span><span class="n">x</span><span class="o">.</span><span class="n">T</span> <span class="o">@</span> <span class="n">z</span><span class="p">)</span> <span class="o">@</span> <span class="bp">self</span><span class="o">.</span><span class="n">_pinv_z_x</span><span class="p">()</span>
+        <span class="n">v</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_xpz_pinvz_x</span> <span class="o">/</span> <span class="n">nobs</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_kappa</span> <span class="o">!=</span> <span class="mi">1</span><span class="p">:</span>
             <span class="n">kappa</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_kappa</span>
             <span class="n">xpx</span> <span class="o">=</span> <span class="n">x</span><span class="o">.</span><span class="n">T</span> <span class="o">@</span> <span class="n">x</span> <span class="o">/</span> <span class="n">nobs</span>
             <span class="n">v</span> <span class="o">=</span> <span class="p">(</span><span class="mi">1</span> <span class="o">-</span> <span class="n">kappa</span><span class="p">)</span> <span class="o">*</span> <span class="n">xpx</span> <span class="o">+</span> <span class="n">kappa</span> <span class="o">*</span> <span class="n">v</span>
+        <span class="k">return</span> <span class="n">v</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">_rotated_scores</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">linearmodels</span><span class="o">.</span><span class="n">typing</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">Float64Array</span><span class="p">:</span>
+<span class="w">        </span><span class="sa">r</span><span class="sd">"""</span>
+<span class="sd">        The scores in the coordinates of the triangular factor.</span>
+
+<span class="sd">        These are :math:`\hat{\epsilon}_i \hat{x}_i R^{-1}`, where</span>
+<span class="sd">        :math:`\hat{x}_i` is the projection of :math:`x_i` on the instruments. The</span>
+<span class="sd">        columns are well conditioned, even if the columns of :math:`\hat{x}` are</span>
+<span class="sd">        nearly collinear or on very different scales.</span>
+<span class="sd">        """</span>
+        <span class="n">u</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_kclass_factors</span><span class="p">()</span><span class="o">.</span><span class="n">u</span>
+        <span class="k">return</span> <span class="n">asarray</span><span class="p">((</span><span class="bp">self</span><span class="o">.</span><span class="n">_basis</span><span class="p">()</span> <span class="o">@</span> <span class="n">u</span><span class="p">)</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">eps</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="nb">float</span><span class="p">)</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">_rotated_s</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">linearmodels</span><span class="o">.</span><span class="n">typing</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">Float64Array</span><span class="p">:</span>
+<span class="w">        </span><span class="sa">r</span><span class="sd">"""</span>
+<span class="sd">        The score covariance in the coordinates of the triangular factor.</span>
+
+<span class="sd">        This is :math:`R^{-T} \hat{S} R^{-1}`. It is computed from the rotated</span>
+<span class="sd">        scores, or from :math:`G` if the covariance is homoskedastic.</span>
+<span class="sd">        """</span>
+        <span class="n">nobs</span><span class="p">,</span> <span class="n">nvar</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">x</span><span class="o">.</span><span class="n">shape</span>
+        <span class="n">eps</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">eps</span>
+        <span class="n">s2</span> <span class="o">=</span> <span class="n">eps</span><span class="o">.</span><span class="n">T</span> <span class="o">@</span> <span class="n">eps</span> <span class="o">/</span> <span class="n">nobs</span>
+        <span class="n">g</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_kclass_factors</span><span class="p">()</span><span class="o">.</span><span class="n">g</span>
+        <span class="n">g</span> <span class="o">=</span> <span class="n">eye</span><span class="p">(</span><span class="n">nvar</span><span class="p">)</span> <span class="k">if</span> <span class="n">g</span> <span class="ow">is</span> <span class="kc">None</span> <span class="k">else</span> <span class="n">g</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_scale</span> <span class="o">*</span> <span class="n">s2</span> <span class="o">*</span> <span class="n">g</span> <span class="o">/</span> <span class="n">nobs</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">s</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">linearmodels</span><span class="o">.</span><span class="n">typing</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">Float64Array</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">"""Return the score covariance estimate."""</span>
+        <span class="n">nobs</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">x</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+        <span class="n">eps</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">eps</span>
+        <span class="n">s2</span> <span class="o">=</span> <span class="n">eps</span><span class="o">.</span><span class="n">T</span> <span class="o">@</span> <span class="n">eps</span> <span class="o">/</span> <span class="n">nobs</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_numerical_method</span> <span class="o">==</span> <span class="s2">"pinv"</span><span class="p">:</span>
+            <span class="n">v</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_pinv_v</span><span class="p">()</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">factors</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_kclass_factors</span><span class="p">()</span>
+            <span class="n">r</span><span class="p">,</span> <span class="n">g</span> <span class="o">=</span> <span class="n">factors</span><span class="o">.</span><span class="n">r</span><span class="p">,</span> <span class="n">factors</span><span class="o">.</span><span class="n">g</span>
+            <span class="n">v</span> <span class="o">=</span> <span class="p">(</span><span class="n">r</span><span class="o">.</span><span class="n">T</span> <span class="o">@</span> <span class="n">r</span> <span class="k">if</span> <span class="n">g</span> <span class="ow">is</span> <span class="kc">None</span> <span class="k">else</span> <span class="n">r</span><span class="o">.</span><span class="n">T</span> <span class="o">@</span> <span class="n">g</span> <span class="o">@</span> <span class="n">r</span><span class="p">)</span> <span class="o">/</span> <span class="n">nobs</span>
 
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_scale</span> <span class="o">*</span> <span class="n">s2</span> <span class="o">*</span> <span class="n">v</span>
 
     <span class="nd">@property</span>
     <span class="k">def</span><span class="w"> </span><span class="nf">cov</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">linearmodels</span><span class="o">.</span><span class="n">typing</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">Float64Array</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">"""Return the covariance of the estimated parameters."""</span>
-        <span class="n">x</span><span class="p">,</span> <span class="n">z</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">x</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">z</span>
-        <span class="n">nobs</span> <span class="o">=</span> <span class="n">x</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
-
-        <span class="n">pinvz</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_pinvz</span>
-        <span class="n">v</span> <span class="o">=</span> <span class="p">(</span><span class="n">x</span><span class="o">.</span><span class="n">T</span> <span class="o">@</span> <span class="n">z</span><span class="p">)</span> <span class="o">@</span> <span class="p">(</span><span class="n">pinvz</span> <span class="o">@</span> <span class="n">x</span><span class="p">)</span> <span class="o">/</span> <span class="n">nobs</span>
-        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_kappa</span> <span class="o">!=</span> <span class="mi">1</span><span class="p">:</span>
-            <span class="n">kappa</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_kappa</span>
-            <span class="n">xpx</span> <span class="o">=</span> <span class="n">x</span><span class="o">.</span><span class="n">T</span> <span class="o">@</span> <span class="n">x</span> <span class="o">/</span> <span class="n">nobs</span>
-            <span class="n">v</span> <span class="o">=</span> <span class="p">(</span><span class="mi">1</span> <span class="o">-</span> <span class="n">kappa</span><span class="p">)</span> <span class="o">*</span> <span class="n">xpx</span> <span class="o">+</span> <span class="n">kappa</span> <span class="o">*</span> <span class="n">v</span>
-
-        <span class="n">vinv</span> <span class="o">=</span> <span class="n">inv</span><span class="p">(</span><span class="n">v</span><span class="p">)</span>
-        <span class="n">c</span> <span class="o">=</span> <span class="n">vinv</span> <span class="o">@</span> <span class="bp">self</span><span class="o">.</span><span class="n">s</span> <span class="o">@</span> <span class="n">vinv</span> <span class="o">/</span> <span class="n">nobs</span>
+        <span class="n">nobs</span><span class="p">,</span> <span class="n">nvar</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">x</span><span class="o">.</span><span class="n">shape</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_numerical_method</span> <span class="o">==</span> <span class="s2">"pinv"</span><span class="p">:</span>
+            <span class="n">vinv</span> <span class="o">=</span> <span class="n">inv</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_pinv_v</span><span class="p">())</span>
+            <span class="n">c</span> <span class="o">=</span> <span class="n">vinv</span> <span class="o">@</span> <span class="bp">self</span><span class="o">.</span><span class="n">s</span> <span class="o">@</span> <span class="n">vinv</span> <span class="o">/</span> <span class="n">nobs</span>
+            <span class="k">return</span> <span class="p">(</span><span class="n">c</span> <span class="o">+</span> <span class="n">c</span><span class="o">.</span><span class="n">T</span><span class="p">)</span> <span class="o">/</span> <span class="mi">2</span>
+        <span class="n">factors</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_kclass_factors</span><span class="p">()</span>
+        <span class="c1"># V = R'GR / n, so that V^-1 S V^-1 / n = n R^-1 G^-1 (R^-T S R^-1) G^-1 R^-T.</span>
+        <span class="c1"># R is only used in triangular solves, so that the condition number of the</span>
+        <span class="c1"># regressors is not squared</span>
+        <span class="n">b</span> <span class="o">=</span> <span class="n">solve_triangular</span><span class="p">(</span><span class="n">factors</span><span class="o">.</span><span class="n">r</span><span class="p">,</span> <span class="n">eye</span><span class="p">(</span><span class="n">nvar</span><span class="p">))</span>
+        <span class="k">if</span> <span class="n">factors</span><span class="o">.</span><span class="n">g</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">b</span> <span class="o">=</span> <span class="n">b</span> <span class="o">@</span> <span class="n">inv</span><span class="p">(</span><span class="n">factors</span><span class="o">.</span><span class="n">g</span><span class="p">)</span>
+        <span class="n">c</span> <span class="o">=</span> <span class="n">nobs</span> <span class="o">*</span> <span class="p">(</span><span class="n">b</span> <span class="o">@</span> <span class="bp">self</span><span class="o">.</span><span class="n">_rotated_s</span><span class="p">()</span> <span class="o">@</span> <span class="n">b</span><span class="o">.</span><span class="n">T</span><span class="p">)</span>
         <span class="k">return</span> <span class="p">(</span><span class="n">c</span> <span class="o">+</span> <span class="n">c</span><span class="o">.</span><span class="n">T</span><span class="p">)</span> <span class="o">/</span> <span class="mi">2</span>
 
     <span class="nd">@property</span>
@@ -1162,6 +1275,13 @@
 <span class="sd">        of x, for example the absorbed effects of AbsorbingLS. The default is 0.</span>
 <span class="sd">        It is only used if ``debiased`` is True, when n / (n-k) becomes</span>
 <span class="sd">        n / (n-k-extra_df).</span>
+<span class="sd">    method : {"pinv", "qr"}, optional</span>
+<span class="sd">        Numerical method, see :class:`~linearmodels.iv.model.IV2SLS`. With "qr", z</span>
+<span class="sd">        must have full column rank. If not given, "pinv" is used and a</span>
+<span class="sd">        ``FutureWarning`` is issued, since the default will be "qr" in linearmodels</span>
+<span class="sd">        8.0.</span>
+
+<span class="sd">        .. versionadded:: 7.2</span>
 
 <span class="sd">    Raises</span>
 <span class="sd">    ------</span>
@@ -1206,20 +1326,25 @@
         <span class="n">debiased</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
         <span class="n">kappa</span><span class="p">:</span> <span class="n">linearmodels</span><span class="o">.</span><span class="n">typing</span><span class="o">.</span><span class="n">Numeric</span> <span class="o">=</span> <span class="mi">1</span><span class="p">,</span>
         <span class="n">extra_df</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">0</span><span class="p">,</span>
+        <span class="o">*</span><span class="p">,</span>
+        <span class="n">method</span><span class="p">:</span> <span class="n">Literal</span><span class="p">[</span><span class="s2">"pinv"</span><span class="p">,</span> <span class="s2">"qr"</span><span class="p">]</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
     <span class="p">):</span>
-        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">z</span><span class="p">,</span> <span class="n">params</span><span class="p">,</span> <span class="n">debiased</span><span class="p">,</span> <span class="n">kappa</span><span class="p">,</span> <span class="n">extra_df</span><span class="p">)</span>
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">z</span><span class="p">,</span> <span class="n">params</span><span class="p">,</span> <span class="n">debiased</span><span class="p">,</span> <span class="n">kappa</span><span class="p">,</span> <span class="n">extra_df</span><span class="p">,</span> <span class="n">method</span><span class="o">=</span><span class="n">method</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_name</span> <span class="o">=</span> <span class="s2">"Robust Covariance (Heteroskedastic)"</span>
 
     <span class="nd">@property</span>
     <span class="k">def</span><span class="w"> </span><span class="nf">s</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">linearmodels</span><span class="o">.</span><span class="n">typing</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">Float64Array</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">"""Return the heteroskedasticity-robust score covariance estimate."""</span>
-        <span class="n">x</span><span class="p">,</span> <span class="n">z</span><span class="p">,</span> <span class="n">eps</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">x</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">z</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">eps</span>
-        <span class="n">nobs</span> <span class="o">=</span> <span class="n">x</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
-        <span class="n">pinvz</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_pinvz</span>
-        <span class="n">xhat_e</span> <span class="o">=</span> <span class="n">z</span> <span class="o">@</span> <span class="p">(</span><span class="n">pinvz</span> <span class="o">@</span> <span class="n">x</span><span class="p">)</span> <span class="o">*</span> <span class="n">eps</span>
+        <span class="n">nobs</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">x</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+        <span class="n">xhat_e</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_xhat</span><span class="p">()</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">eps</span>
         <span class="n">s</span> <span class="o">=</span> <span class="n">xhat_e</span><span class="o">.</span><span class="n">T</span> <span class="o">@</span> <span class="n">xhat_e</span> <span class="o">/</span> <span class="n">nobs</span>
 
-        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_scale</span> <span class="o">*</span> <span class="n">s</span></div>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_scale</span> <span class="o">*</span> <span class="n">s</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">_rotated_s</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">linearmodels</span><span class="o">.</span><span class="n">typing</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">Float64Array</span><span class="p">:</span>
+        <span class="n">nobs</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">x</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+        <span class="n">scores</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_rotated_scores</span><span class="p">()</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_scale</span> <span class="o">*</span> <span class="p">(</span><span class="n">scores</span><span class="o">.</span><span class="n">T</span> <span class="o">@</span> <span class="n">scores</span><span class="p">)</span> <span class="o">/</span> <span class="n">nobs</span></div>
 
 
 
@@ -1264,6 +1389,13 @@
 <span class="sd">        of x, for example the absorbed effects of AbsorbingLS. The default is 0.</span>
 <span class="sd">        It is only used if ``debiased`` is True, when n / (n-k) becomes</span>
 <span class="sd">        n / (n-k-extra_df).</span>
+<span class="sd">    method : {"pinv", "qr"}, optional</span>
+<span class="sd">        Numerical method, see :class:`~linearmodels.iv.model.IV2SLS`. With "qr", z</span>
+<span class="sd">        must have full column rank. If not given, "pinv" is used and a</span>
+<span class="sd">        ``FutureWarning`` is issued, since the default will be "qr" in linearmodels</span>
+<span class="sd">        8.0.</span>
+
+<span class="sd">        .. versionadded:: 7.2</span>
 
 <span class="sd">    Raises</span>
 <span class="sd">    ------</span>
@@ -1339,8 +1471,10 @@
         <span class="n">debiased</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
         <span class="n">kappa</span><span class="p">:</span> <span class="n">linearmodels</span><span class="o">.</span><span class="n">typing</span><span class="o">.</span><span class="n">Numeric</span> <span class="o">=</span> <span class="mi">1</span><span class="p">,</span>
         <span class="n">extra_df</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">0</span><span class="p">,</span>
+        <span class="o">*</span><span class="p">,</span>
+        <span class="n">method</span><span class="p">:</span> <span class="n">Literal</span><span class="p">[</span><span class="s2">"pinv"</span><span class="p">,</span> <span class="s2">"qr"</span><span class="p">]</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
     <span class="p">):</span>
-        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">z</span><span class="p">,</span> <span class="n">params</span><span class="p">,</span> <span class="n">debiased</span><span class="p">,</span> <span class="n">kappa</span><span class="p">,</span> <span class="n">extra_df</span><span class="p">)</span>
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">z</span><span class="p">,</span> <span class="n">params</span><span class="p">,</span> <span class="n">debiased</span><span class="p">,</span> <span class="n">kappa</span><span class="p">,</span> <span class="n">extra_df</span><span class="p">,</span> <span class="n">method</span><span class="o">=</span><span class="n">method</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_kernels</span> <span class="o">=</span> <span class="n">KERNEL_LOOKUP</span>
         <span class="n">kernel</span> <span class="o">=</span> <span class="n">lower_option</span><span class="p">(</span><span class="n">kernel</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_kernel</span> <span class="o">=</span> <span class="n">kernel</span>
@@ -1362,28 +1496,40 @@
     <span class="nd">@property</span>
     <span class="k">def</span><span class="w"> </span><span class="nf">s</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">linearmodels</span><span class="o">.</span><span class="n">typing</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">Float64Array</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">"""Return the HAC score covariance estimate."""</span>
-        <span class="n">x</span><span class="p">,</span> <span class="n">z</span><span class="p">,</span> <span class="n">eps</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">x</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">z</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">eps</span>
-        <span class="n">nobs</span> <span class="o">=</span> <span class="n">x</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+        <span class="n">xhat</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_xhat</span><span class="p">()</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_kernel_s</span><span class="p">(</span><span class="n">asarray</span><span class="p">(</span><span class="n">xhat</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">eps</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="nb">float</span><span class="p">),</span> <span class="n">xhat</span><span class="p">)</span>
 
-        <span class="n">pinvz</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_pinvz</span>
-        <span class="n">xhat</span> <span class="o">=</span> <span class="n">z</span> <span class="o">@</span> <span class="p">(</span><span class="n">pinvz</span> <span class="o">@</span> <span class="n">x</span><span class="p">)</span>
-        <span class="n">xhat_e</span> <span class="o">=</span> <span class="n">asarray</span><span class="p">(</span><span class="n">xhat</span> <span class="o">*</span> <span class="n">eps</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="nb">float</span><span class="p">)</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">_rotated_s</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">linearmodels</span><span class="o">.</span><span class="n">typing</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">Float64Array</span><span class="p">:</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_kernel_s</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_rotated_scores</span><span class="p">())</span>
 
+    <span class="k">def</span><span class="w"> </span><span class="nf">_kernel_s</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span>
+        <span class="n">scores</span><span class="p">:</span> <span class="n">linearmodels</span><span class="o">.</span><span class="n">typing</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">Float64Array</span><span class="p">,</span>
+        <span class="n">xhat</span><span class="p">:</span> <span class="n">linearmodels</span><span class="o">.</span><span class="n">typing</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">Float64Array</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">linearmodels</span><span class="o">.</span><span class="n">typing</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">Float64Array</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">"""</span>
+<span class="sd">        The kernel estimate of the covariance of the scores.</span>
+
+<span class="sd">        The automatic bandwidth is selected from xhat * eps, the scores in the units</span>
+<span class="sd">        of x, whatever the coordinates of scores. xhat, the projection of x on z, is</span>
+<span class="sd">        computed if it is not given.</span>
+<span class="sd">        """</span>
+        <span class="n">nobs</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">x</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
         <span class="n">kernel</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">config</span><span class="p">[</span><span class="s2">"kernel"</span><span class="p">]</span>
         <span class="n">bw</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">config</span><span class="p">[</span><span class="s2">"bandwidth"</span><span class="p">]</span>
         <span class="k">if</span> <span class="n">bw</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">_auto_bandwidth</span> <span class="o">=</span> <span class="kc">True</span>
-
+            <span class="n">xhat</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_xhat</span><span class="p">()</span> <span class="k">if</span> <span class="n">xhat</span> <span class="ow">is</span> <span class="kc">None</span> <span class="k">else</span> <span class="n">xhat</span>
+            <span class="n">xhat_e</span> <span class="o">=</span> <span class="n">asarray</span><span class="p">(</span><span class="n">xhat</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">eps</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="nb">float</span><span class="p">)</span>
             <span class="n">const</span><span class="p">,</span> <span class="n">loc</span> <span class="o">=</span> <span class="n">has_constant</span><span class="p">(</span><span class="n">xhat</span><span class="p">)</span>
             <span class="n">sel</span> <span class="o">=</span> <span class="n">ones</span><span class="p">((</span><span class="n">xhat</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="mi">1</span><span class="p">))</span>
             <span class="k">if</span> <span class="n">const</span> <span class="ow">and</span> <span class="n">xhat</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">&gt;</span> <span class="mi">1</span><span class="p">:</span>
                 <span class="n">sel</span><span class="p">[</span><span class="n">loc</span><span class="p">]</span> <span class="o">=</span> <span class="mi">0</span>
-            <span class="n">scores</span> <span class="o">=</span> <span class="n">xhat_e</span> <span class="o">@</span> <span class="n">sel</span>
-            <span class="n">bw</span> <span class="o">=</span> <span class="n">kernel_optimal_bandwidth</span><span class="p">(</span><span class="n">scores</span><span class="p">,</span> <span class="n">kernel</span><span class="p">)</span>
+            <span class="n">bw</span> <span class="o">=</span> <span class="n">kernel_optimal_bandwidth</span><span class="p">(</span><span class="n">xhat_e</span> <span class="o">@</span> <span class="n">sel</span><span class="p">,</span> <span class="n">kernel</span><span class="p">)</span>
 
         <span class="bp">self</span><span class="o">.</span><span class="n">_bandwidth</span> <span class="o">=</span> <span class="n">bw</span>
         <span class="n">w</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_kernels</span><span class="p">[</span><span class="n">kernel</span><span class="p">](</span><span class="n">bw</span><span class="p">,</span> <span class="n">nobs</span> <span class="o">-</span> <span class="mi">1</span><span class="p">)</span>
-        <span class="n">s</span> <span class="o">=</span> <span class="n">cov_kernel</span><span class="p">(</span><span class="n">xhat_e</span><span class="p">,</span> <span class="n">w</span><span class="p">)</span>
+        <span class="n">s</span> <span class="o">=</span> <span class="n">cov_kernel</span><span class="p">(</span><span class="n">scores</span><span class="p">,</span> <span class="n">w</span><span class="p">)</span>
 
         <span class="k">return</span> <span class="n">cast</span><span class="p">(</span><span class="s2">"ndarray"</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_scale</span> <span class="o">*</span> <span class="n">s</span><span class="p">)</span>
 
@@ -1429,6 +1575,13 @@
 <span class="sd">        of x, for example the absorbed effects of AbsorbingLS. The default is 0.</span>
 <span class="sd">        It is only used if ``debiased`` is True, when n / (n-k) becomes</span>
 <span class="sd">        n / (n-k-extra_df).</span>
+<span class="sd">    method : {"pinv", "qr"}, optional</span>
+<span class="sd">        Numerical method, see :class:`~linearmodels.iv.model.IV2SLS`. With "qr", z</span>
+<span class="sd">        must have full column rank. If not given, "pinv" is used and a</span>
+<span class="sd">        ``FutureWarning`` is issued, since the default will be "qr" in linearmodels</span>
+<span class="sd">        8.0.</span>
+
+<span class="sd">        .. versionadded:: 7.2</span>
 
 <span class="sd">    Raises</span>
 <span class="sd">    ------</span>
@@ -1477,8 +1630,10 @@
         <span class="n">debiased</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
         <span class="n">kappa</span><span class="p">:</span> <span class="n">linearmodels</span><span class="o">.</span><span class="n">typing</span><span class="o">.</span><span class="n">Numeric</span> <span class="o">=</span> <span class="mi">1</span><span class="p">,</span>
         <span class="n">extra_df</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">0</span><span class="p">,</span>
+        <span class="o">*</span><span class="p">,</span>
+        <span class="n">method</span><span class="p">:</span> <span class="n">Literal</span><span class="p">[</span><span class="s2">"pinv"</span><span class="p">,</span> <span class="s2">"qr"</span><span class="p">]</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
     <span class="p">):</span>
-        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">z</span><span class="p">,</span> <span class="n">params</span><span class="p">,</span> <span class="n">debiased</span><span class="p">,</span> <span class="n">kappa</span><span class="p">,</span> <span class="n">extra_df</span><span class="p">)</span>
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">z</span><span class="p">,</span> <span class="n">params</span><span class="p">,</span> <span class="n">debiased</span><span class="p">,</span> <span class="n">kappa</span><span class="p">,</span> <span class="n">extra_df</span><span class="p">,</span> <span class="n">method</span><span class="o">=</span><span class="n">method</span><span class="p">)</span>
 
         <span class="n">nobs</span> <span class="o">=</span> <span class="n">x</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
         <span class="n">clusters</span> <span class="o">=</span> <span class="n">arange</span><span class="p">(</span><span class="n">nobs</span><span class="p">)</span> <span class="k">if</span> <span class="n">clusters</span> <span class="ow">is</span> <span class="kc">None</span> <span class="k">else</span> <span class="n">clusters</span>
@@ -1511,6 +1666,15 @@
     <span class="nd">@property</span>
     <span class="k">def</span><span class="w"> </span><span class="nf">s</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">linearmodels</span><span class="o">.</span><span class="n">typing</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">Float64Array</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">"""Return the clustered estimator of the score covariance."""</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_cluster_s</span><span class="p">(</span><span class="n">asarray</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_xhat</span><span class="p">()</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">eps</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="nb">float</span><span class="p">))</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">_rotated_s</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">linearmodels</span><span class="o">.</span><span class="n">typing</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">Float64Array</span><span class="p">:</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_cluster_s</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_rotated_scores</span><span class="p">())</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">_cluster_s</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span> <span class="n">xhat_e</span><span class="p">:</span> <span class="n">linearmodels</span><span class="o">.</span><span class="n">typing</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">Float64Array</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">linearmodels</span><span class="o">.</span><span class="n">typing</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">Float64Array</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">"""The clustered estimate of the covariance of the scores."""</span>
 
         <span class="k">def</span><span class="w"> </span><span class="nf">rescale</span><span class="p">(</span>
             <span class="n">s</span><span class="p">:</span> <span class="n">linearmodels</span><span class="o">.</span><span class="n">typing</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">Float64Array</span><span class="p">,</span> <span class="n">nc</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span> <span class="n">nobs</span><span class="p">:</span> <span class="nb">int</span>
@@ -1518,11 +1682,7 @@
             <span class="n">scale</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_scale</span> <span class="o">*</span> <span class="p">(</span><span class="n">nc</span> <span class="o">/</span> <span class="p">(</span><span class="n">nc</span> <span class="o">-</span> <span class="mi">1</span><span class="p">))</span> <span class="o">*</span> <span class="p">((</span><span class="n">nobs</span> <span class="o">-</span> <span class="mi">1</span><span class="p">)</span> <span class="o">/</span> <span class="n">nobs</span><span class="p">))</span>
             <span class="k">return</span> <span class="n">cast</span><span class="p">(</span><span class="s2">"ndarray"</span><span class="p">,</span> <span class="n">s</span> <span class="o">*</span> <span class="n">scale</span><span class="p">)</span> <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">debiased</span> <span class="k">else</span> <span class="n">s</span>
 
-        <span class="n">x</span><span class="p">,</span> <span class="n">z</span><span class="p">,</span> <span class="n">eps</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">x</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">z</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">eps</span>
-        <span class="n">pinvz</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_pinvz</span>
-        <span class="n">xhat_e</span> <span class="o">=</span> <span class="n">asarray</span><span class="p">(</span><span class="n">z</span> <span class="o">@</span> <span class="p">(</span><span class="n">pinvz</span> <span class="o">@</span> <span class="n">x</span><span class="p">)</span> <span class="o">*</span> <span class="n">eps</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="nb">float</span><span class="p">)</span>
-
-        <span class="n">nobs</span> <span class="o">=</span> <span class="n">x</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+        <span class="n">nobs</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">x</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
         <span class="n">clusters</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_clusters</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_clusters</span><span class="o">.</span><span class="n">ndim</span> <span class="o">==</span> <span class="mi">1</span><span class="p">:</span>
             <span class="n">s</span> <span class="o">=</span> <span class="n">cov_cluster</span><span class="p">(</span><span class="n">xhat_e</span><span class="p">,</span> <span class="n">clusters</span><span class="p">)</span>

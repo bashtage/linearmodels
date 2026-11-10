@@ -19,7 +19,7 @@
     
   
       
-        <title>linearmodels.iv.common - linearmodels v7.2 (+41)</title>
+        <title>linearmodels.iv.common - linearmodels v7.2 (+67)</title>
       
     
 
@@ -91,7 +91,7 @@
 
 <header class="md-header md-header--shadow" data-md-component="header">
   <nav class="md-header__inner md-grid" aria-label="Header">
-    <a href="../../../index.html" title="linearmodels v7.2 (+41)" class="md-header__button md-logo" aria-label="linearmodels v7.2 (+41)" data-md-component="logo">
+    <a href="../../../index.html" title="linearmodels v7.2 (+67)" class="md-header__button md-logo" aria-label="linearmodels v7.2 (+67)" data-md-component="logo">
       <img src="../../../_static/bw-logo.svg" alt="logo">
     </a>
     <label class="md-header__button md-icon" for="__drawer">
@@ -102,7 +102,7 @@
       <div class="md-header__ellipsis">
         <div class="md-header__topic">
           <span class="md-ellipsis">
-            linearmodels v7.2 (+41)
+            linearmodels v7.2 (+67)
           </span>
         </div>
         <div class="md-header__topic" data-md-component="header-topic">
@@ -197,10 +197,10 @@
 
 <nav class="md-nav md-nav--primary" aria-label="Navigation" data-md-level="0">
   <label class="md-nav__title" for="__drawer">
-    <a href="../../../index.html" title="linearmodels v7.2 (+41)" class="md-nav__button md-logo" aria-label="linearmodels v7.2 (+41)" data-md-component="logo">
+    <a href="../../../index.html" title="linearmodels v7.2 (+67)" class="md-nav__button md-logo" aria-label="linearmodels v7.2 (+67)" data-md-component="logo">
       <img src="../../../_static/bw-logo.svg" alt="logo">
     </a>
-    linearmodels v7.2 (+41)
+    linearmodels v7.2 (+67)
   </label>
   
     <div class="md-nav__source">
@@ -533,7 +533,7 @@
 
 <span class="kn">from</span><span class="w"> </span><span class="nn">__future__</span><span class="w"> </span><span class="kn">import</span> <span class="n">annotations</span>
 
-<span class="kn">from</span><span class="w"> </span><span class="nn">typing</span><span class="w"> </span><span class="kn">import</span> <span class="n">Any</span><span class="p">,</span> <span class="n">NamedTuple</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">typing</span><span class="w"> </span><span class="kn">import</span> <span class="n">Any</span><span class="p">,</span> <span class="n">Literal</span><span class="p">,</span> <span class="n">NamedTuple</span>
 <span class="kn">import</span><span class="w"> </span><span class="nn">warnings</span>
 
 <span class="kn">from</span><span class="w"> </span><span class="nn">numpy</span><span class="w"> </span><span class="kn">import</span> <span class="p">(</span>
@@ -550,10 +550,10 @@
     <span class="n">unique</span><span class="p">,</span>
     <span class="n">where</span><span class="p">,</span>
 <span class="p">)</span>
-<span class="kn">from</span><span class="w"> </span><span class="nn">numpy.linalg</span><span class="w"> </span><span class="kn">import</span> <span class="n">LinAlgError</span><span class="p">,</span> <span class="n">eigh</span><span class="p">,</span> <span class="n">inv</span><span class="p">,</span> <span class="n">matrix_rank</span><span class="p">,</span> <span class="n">svd</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">numpy.linalg</span><span class="w"> </span><span class="kn">import</span> <span class="n">LinAlgError</span><span class="p">,</span> <span class="n">eigh</span><span class="p">,</span> <span class="n">inv</span><span class="p">,</span> <span class="n">matrix_rank</span><span class="p">,</span> <span class="n">norm</span><span class="p">,</span> <span class="n">svd</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">scipy.linalg</span><span class="w"> </span><span class="kn">import</span> <span class="n">cholesky</span><span class="p">,</span> <span class="n">solve_triangular</span>
 
-<span class="kn">from</span><span class="w"> </span><span class="nn">linearmodels.iv._utility</span><span class="w"> </span><span class="kn">import</span> <span class="n">annihilate</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">linearmodels.iv._utility</span><span class="w"> </span><span class="kn">import</span> <span class="n">annihilate</span><span class="p">,</span> <span class="n">resolve_method</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">linearmodels.iv.gmm</span><span class="w"> </span><span class="kn">import</span> <span class="p">(</span>
     <span class="n">HeteroskedasticWeightMatrix</span><span class="p">,</span>
     <span class="n">KernelWeightMatrix</span><span class="p">,</span>
@@ -632,11 +632,29 @@
     <span class="n">irqxx</span><span class="p">:</span> <span class="n">linearmodels</span><span class="o">.</span><span class="n">typing</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">Float64Array</span>
 
 
+<span class="k">def</span><span class="w"> </span><span class="nf">_rank</span><span class="p">(</span>
+    <span class="n">a</span><span class="p">:</span> <span class="n">linearmodels</span><span class="o">.</span><span class="n">typing</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">Float64Array</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">method</span><span class="p">:</span> <span class="n">Literal</span><span class="p">[</span><span class="s2">"pinv"</span><span class="p">,</span> <span class="s2">"qr"</span><span class="p">]</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">int</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">"""</span>
+<span class="sd">    The rank of a, of its columns scaled to unit length if method is "qr".</span>
+
+<span class="sd">    Both use the tolerance of matrix_rank, as pinv does. The models use 1e-9 with</span>
+<span class="sd">    "qr", for the accuracy of the estimates, which these tests do not compute.</span>
+<span class="sd">    """</span>
+    <span class="k">if</span> <span class="n">method</span> <span class="o">==</span> <span class="s2">"qr"</span><span class="p">:</span>
+        <span class="n">scale</span> <span class="o">=</span> <span class="n">norm</span><span class="p">(</span><span class="n">a</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
+        <span class="n">scale</span><span class="p">[</span><span class="n">scale</span> <span class="o">==</span> <span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="mf">1.0</span>
+        <span class="n">a</span> <span class="o">=</span> <span class="n">a</span> <span class="o">/</span> <span class="n">scale</span>
+    <span class="k">return</span> <span class="nb">int</span><span class="p">(</span><span class="n">matrix_rank</span><span class="p">(</span><span class="n">a</span><span class="p">))</span>
+
+
 <span class="k">def</span><span class="w"> </span><span class="nf">_first_stage_rank</span><span class="p">(</span>
     <span class="n">endog</span><span class="p">:</span> <span class="n">linearmodels</span><span class="o">.</span><span class="n">typing</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">Float64Array</span><span class="p">,</span>
     <span class="n">instr</span><span class="p">:</span> <span class="n">linearmodels</span><span class="o">.</span><span class="n">typing</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">Float64Array</span><span class="p">,</span>
     <span class="n">exog</span><span class="p">:</span> <span class="n">linearmodels</span><span class="o">.</span><span class="n">typing</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">Float64Array</span><span class="p">,</span>
     <span class="n">name</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
+    <span class="o">*</span><span class="p">,</span>
+    <span class="n">method</span><span class="p">:</span> <span class="n">Literal</span><span class="p">[</span><span class="s2">"pinv"</span><span class="p">,</span> <span class="s2">"qr"</span><span class="p">]</span> <span class="o">=</span> <span class="s2">"pinv"</span><span class="p">,</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">_FirstStageRank</span> <span class="o">|</span> <span class="n">InvalidTestStatistic</span><span class="p">:</span>
 <span class="w">    </span><span class="sa">r</span><span class="sd">"""</span>
 <span class="sd">    Decompose the first stage into canonical correlations.</span>
@@ -675,16 +693,16 @@
     <span class="n">x</span> <span class="o">=</span> <span class="n">asarray</span><span class="p">(</span><span class="n">endog</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="nb">float</span><span class="p">)</span>
     <span class="n">z</span> <span class="o">=</span> <span class="n">asarray</span><span class="p">(</span><span class="n">instr</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="nb">float</span><span class="p">)</span>
     <span class="k">if</span> <span class="n">nexog</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
-        <span class="n">x</span> <span class="o">=</span> <span class="n">annihilate</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">exog</span><span class="p">)</span>
-        <span class="n">z</span> <span class="o">=</span> <span class="n">annihilate</span><span class="p">(</span><span class="n">z</span><span class="p">,</span> <span class="n">exog</span><span class="p">)</span>
-    <span class="k">if</span> <span class="n">matrix_rank</span><span class="p">(</span><span class="n">x</span><span class="p">)</span> <span class="o">&lt;</span> <span class="n">nendog</span><span class="p">:</span>
+        <span class="n">x</span> <span class="o">=</span> <span class="n">annihilate</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">exog</span><span class="p">,</span> <span class="n">method</span><span class="o">=</span><span class="n">method</span><span class="p">)</span>
+        <span class="n">z</span> <span class="o">=</span> <span class="n">annihilate</span><span class="p">(</span><span class="n">z</span><span class="p">,</span> <span class="n">exog</span><span class="p">,</span> <span class="n">method</span><span class="o">=</span><span class="n">method</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">_rank</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">method</span><span class="o">=</span><span class="n">method</span><span class="p">)</span> <span class="o">&lt;</span> <span class="n">nendog</span><span class="p">:</span>
         <span class="k">return</span> <span class="n">InvalidTestStatistic</span><span class="p">(</span>
             <span class="s2">"The endogenous regressors are collinear once the exogenous "</span>
             <span class="sa">f</span><span class="s2">"regressors are partialled out; the </span><span class="si">{</span><span class="n">name</span><span class="si">}</span><span class="s2"> statistic is not "</span>
             <span class="s2">"defined."</span><span class="p">,</span>
             <span class="n">name</span><span class="o">=</span><span class="n">name</span><span class="p">,</span>
         <span class="p">)</span>
-    <span class="k">if</span> <span class="n">matrix_rank</span><span class="p">(</span><span class="n">z</span><span class="p">)</span> <span class="o">&lt;</span> <span class="n">ninstr</span><span class="p">:</span>
+    <span class="k">if</span> <span class="n">_rank</span><span class="p">(</span><span class="n">z</span><span class="p">,</span> <span class="n">method</span><span class="o">=</span><span class="n">method</span><span class="p">)</span> <span class="o">&lt;</span> <span class="n">ninstr</span><span class="p">:</span>
         <span class="k">return</span> <span class="n">InvalidTestStatistic</span><span class="p">(</span>
             <span class="s2">"The instruments are collinear once the exogenous regressors are "</span>
             <span class="sa">f</span><span class="s2">"partialled out; the </span><span class="si">{</span><span class="n">name</span><span class="si">}</span><span class="s2"> statistic is not defined."</span><span class="p">,</span>
@@ -716,6 +734,8 @@
     <span class="n">endog</span><span class="p">:</span> <span class="n">linearmodels</span><span class="o">.</span><span class="n">typing</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">Float64Array</span><span class="p">,</span>
     <span class="n">instr</span><span class="p">:</span> <span class="n">linearmodels</span><span class="o">.</span><span class="n">typing</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">Float64Array</span><span class="p">,</span>
     <span class="n">exog</span><span class="p">:</span> <span class="n">linearmodels</span><span class="o">.</span><span class="n">typing</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">Float64Array</span><span class="p">,</span>
+    <span class="o">*</span><span class="p">,</span>
+    <span class="n">method</span><span class="p">:</span> <span class="n">Literal</span><span class="p">[</span><span class="s2">"pinv"</span><span class="p">,</span> <span class="s2">"qr"</span><span class="p">]</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">WaldTestStatistic</span> <span class="o">|</span> <span class="n">InvalidTestStatistic</span><span class="p">:</span>
 <span class="w">    </span><span class="sa">r</span><span class="sd">"""</span>
 <span class="sd">    Cragg-Donald test of reduced rank for the first-stage regression.</span>
@@ -729,6 +749,14 @@
 <span class="sd">    exog : ndarray</span>
 <span class="sd">        Weighted exogenous regressor array (nobs, nexog), partialled out</span>
 <span class="sd">        before testing. Include a constant column here if the model has one.</span>
+
+<span class="sd">    method : {"pinv", "qr"}, optional</span>
+<span class="sd">        Numerical method of partialling out exog and of the rank tests. "qr" scales</span>
+<span class="sd">        the columns to unit length, so the statistic does not depend on the units of</span>
+<span class="sd">        the variables. If not given, "pinv" is used and a ``FutureWarning`` is</span>
+<span class="sd">        issued, since the default will be "qr" in linearmodels 8.0.</span>
+
+<span class="sd">        .. versionadded:: 7.2</span>
 
 <span class="sd">    Returns</span>
 <span class="sd">    -------</span>
@@ -825,8 +853,9 @@
 <span class="sd">    regression. In *Identification and Inference for Econometric Models*.</span>
 <span class="sd">    Cambridge University Press.</span>
 <span class="sd">    """</span>
+    <span class="n">method</span> <span class="o">=</span> <span class="n">resolve_method</span><span class="p">(</span><span class="n">method</span><span class="p">,</span> <span class="s2">"cragg_donald"</span><span class="p">)</span>
     <span class="n">name</span> <span class="o">=</span> <span class="s2">"Cragg-Donald Test"</span>
-    <span class="n">dec</span> <span class="o">=</span> <span class="n">_first_stage_rank</span><span class="p">(</span><span class="n">endog</span><span class="p">,</span> <span class="n">instr</span><span class="p">,</span> <span class="n">exog</span><span class="p">,</span> <span class="n">name</span><span class="p">)</span>
+    <span class="n">dec</span> <span class="o">=</span> <span class="n">_first_stage_rank</span><span class="p">(</span><span class="n">endog</span><span class="p">,</span> <span class="n">instr</span><span class="p">,</span> <span class="n">exog</span><span class="p">,</span> <span class="n">name</span><span class="p">,</span> <span class="n">method</span><span class="o">=</span><span class="n">method</span><span class="p">)</span>
     <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">dec</span><span class="p">,</span> <span class="n">InvalidTestStatistic</span><span class="p">):</span>
         <span class="k">return</span> <span class="n">dec</span>
     <span class="n">r2</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="n">dec</span><span class="o">.</span><span class="n">s</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">])</span> <span class="o">**</span> <span class="mi">2</span>
@@ -842,6 +871,8 @@
     <span class="n">endog</span><span class="p">:</span> <span class="n">linearmodels</span><span class="o">.</span><span class="n">typing</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">Float64Array</span><span class="p">,</span>
     <span class="n">instr</span><span class="p">:</span> <span class="n">linearmodels</span><span class="o">.</span><span class="n">typing</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">Float64Array</span><span class="p">,</span>
     <span class="n">exog</span><span class="p">:</span> <span class="n">linearmodels</span><span class="o">.</span><span class="n">typing</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">Float64Array</span><span class="p">,</span>
+    <span class="o">*</span><span class="p">,</span>
+    <span class="n">method</span><span class="p">:</span> <span class="n">Literal</span><span class="p">[</span><span class="s2">"pinv"</span><span class="p">,</span> <span class="s2">"qr"</span><span class="p">]</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">float</span><span class="p">:</span>
 <span class="w">    </span><span class="sa">r</span><span class="sd">"""</span>
 <span class="sd">    Cragg-Donald Wald F statistic.</span>
@@ -855,6 +886,14 @@
 <span class="sd">    exog : ndarray</span>
 <span class="sd">        Weighted exogenous regressor array (nobs, nexog), partialled out</span>
 <span class="sd">        before testing. Include a constant column here if the model has one.</span>
+
+<span class="sd">    method : {"pinv", "qr"}, optional</span>
+<span class="sd">        Numerical method of partialling out exog and of the rank tests. "qr" scales</span>
+<span class="sd">        the columns to unit length, so the statistic does not depend on the units of</span>
+<span class="sd">        the variables. If not given, "pinv" is used and a ``FutureWarning`` is</span>
+<span class="sd">        issued, since the default will be "qr" in linearmodels 8.0.</span>
+
+<span class="sd">        .. versionadded:: 7.2</span>
 
 <span class="sd">    Returns</span>
 <span class="sd">    -------</span>
@@ -894,7 +933,8 @@
 <span class="sd">    regression. In *Identification and Inference for Econometric Models*.</span>
 <span class="sd">    Cambridge University Press.</span>
 <span class="sd">    """</span>
-    <span class="n">test</span> <span class="o">=</span> <span class="n">cragg_donald</span><span class="p">(</span><span class="n">endog</span><span class="p">,</span> <span class="n">instr</span><span class="p">,</span> <span class="n">exog</span><span class="p">)</span>
+    <span class="n">method</span> <span class="o">=</span> <span class="n">resolve_method</span><span class="p">(</span><span class="n">method</span><span class="p">,</span> <span class="s2">"cragg_donald_f"</span><span class="p">)</span>
+    <span class="n">test</span> <span class="o">=</span> <span class="n">cragg_donald</span><span class="p">(</span><span class="n">endog</span><span class="p">,</span> <span class="n">instr</span><span class="p">,</span> <span class="n">exog</span><span class="p">,</span> <span class="n">method</span><span class="o">=</span><span class="n">method</span><span class="p">)</span>
     <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">test</span><span class="p">,</span> <span class="n">InvalidTestStatistic</span><span class="p">):</span>
         <span class="k">return</span> <span class="n">nan</span>
     <span class="k">return</span> <span class="nb">float</span><span class="p">(</span><span class="n">test</span><span class="o">.</span><span class="n">stat</span><span class="p">)</span> <span class="o">/</span> <span class="n">instr</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span></div>
@@ -993,6 +1033,7 @@
     <span class="n">cov_config</span><span class="p">:</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]</span> <span class="o">|</span> <span class="kc">None</span><span class="p">,</span>
     <span class="o">*</span><span class="p">,</span>
     <span class="n">wald</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span>
+    <span class="n">method</span><span class="p">:</span> <span class="n">Literal</span><span class="p">[</span><span class="s2">"pinv"</span><span class="p">,</span> <span class="s2">"qr"</span><span class="p">]</span> <span class="o">=</span> <span class="s2">"pinv"</span><span class="p">,</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">tuple</span><span class="p">[</span><span class="n">WaldTestStatistic</span> <span class="o">|</span> <span class="n">InvalidTestStatistic</span><span class="p">,</span> <span class="nb">float</span><span class="p">]:</span>
 <span class="w">    </span><span class="sd">"""</span>
 <span class="sd">    Compute the rk LM test and the rk Wald F-statistic</span>
@@ -1018,7 +1059,7 @@
             <span class="n">reason</span> <span class="o">=</span> <span class="s2">"The statistic requires at least two clusters."</span>
             <span class="k">return</span> <span class="n">InvalidTestStatistic</span><span class="p">(</span><span class="n">reason</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="n">name</span><span class="p">),</span> <span class="n">nan</span>
         <span class="n">config</span><span class="p">[</span><span class="s2">"clusters"</span><span class="p">]</span> <span class="o">=</span> <span class="n">clusters</span>
-    <span class="n">dec</span> <span class="o">=</span> <span class="n">_first_stage_rank</span><span class="p">(</span><span class="n">endog</span><span class="p">,</span> <span class="n">instr</span><span class="p">,</span> <span class="n">exog</span><span class="p">,</span> <span class="n">name</span><span class="p">)</span>
+    <span class="n">dec</span> <span class="o">=</span> <span class="n">_first_stage_rank</span><span class="p">(</span><span class="n">endog</span><span class="p">,</span> <span class="n">instr</span><span class="p">,</span> <span class="n">exog</span><span class="p">,</span> <span class="n">name</span><span class="p">,</span> <span class="n">method</span><span class="o">=</span><span class="n">method</span><span class="p">)</span>
     <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">dec</span><span class="p">,</span> <span class="n">InvalidTestStatistic</span><span class="p">):</span>
         <span class="k">return</span> <span class="n">dec</span><span class="p">,</span> <span class="n">nan</span>
     <span class="n">df</span> <span class="o">=</span> <span class="n">dec</span><span class="o">.</span><span class="n">ninstr</span> <span class="o">-</span> <span class="n">dec</span><span class="o">.</span><span class="n">nendog</span> <span class="o">+</span> <span class="mi">1</span>
@@ -1064,6 +1105,8 @@
     <span class="n">exog</span><span class="p">:</span> <span class="n">linearmodels</span><span class="o">.</span><span class="n">typing</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">Float64Array</span><span class="p">,</span>
     <span class="n">cov_type</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">"robust"</span><span class="p">,</span>
     <span class="n">cov_config</span><span class="p">:</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+    <span class="o">*</span><span class="p">,</span>
+    <span class="n">method</span><span class="p">:</span> <span class="n">Literal</span><span class="p">[</span><span class="s2">"pinv"</span><span class="p">,</span> <span class="s2">"qr"</span><span class="p">]</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">WaldTestStatistic</span> <span class="o">|</span> <span class="n">InvalidTestStatistic</span><span class="p">:</span>
 <span class="w">    </span><span class="sa">r</span><span class="sd">"""</span>
 <span class="sd">    Kleibergen-Paap rk LM test of underidentification.</span>
@@ -1101,6 +1144,14 @@
 <span class="sd">        with the quadratic spectral kernel. See</span>
 <span class="sd">        :func:`~linearmodels.iv.covariance.kernel_optimal_bandwidth`, which</span>
 <span class="sd">        lists the supported kernels.</span>
+
+<span class="sd">    method : {"pinv", "qr"}, optional</span>
+<span class="sd">        Numerical method of partialling out exog and of the rank tests. "qr" scales</span>
+<span class="sd">        the columns to unit length, so the statistic does not depend on the units of</span>
+<span class="sd">        the variables. If not given, "pinv" is used and a ``FutureWarning`` is</span>
+<span class="sd">        issued, since the default will be "qr" in linearmodels 8.0.</span>
+
+<span class="sd">        .. versionadded:: 7.2</span>
 
 <span class="sd">    Returns</span>
 <span class="sd">    -------</span>
@@ -1224,7 +1275,10 @@
 <span class="sd">    the rank of a matrix using the Kleibergen-Paap rk statistic. *Statistical</span>
 <span class="sd">    Software Components* S456865, Boston College.</span>
 <span class="sd">    """</span>
-    <span class="k">return</span> <span class="n">_kleibergen_paap</span><span class="p">(</span><span class="n">endog</span><span class="p">,</span> <span class="n">instr</span><span class="p">,</span> <span class="n">exog</span><span class="p">,</span> <span class="n">cov_type</span><span class="p">,</span> <span class="n">cov_config</span><span class="p">,</span> <span class="n">wald</span><span class="o">=</span><span class="kc">False</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span></div>
+    <span class="n">method</span> <span class="o">=</span> <span class="n">resolve_method</span><span class="p">(</span><span class="n">method</span><span class="p">,</span> <span class="s2">"kleibergen_paap"</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">_kleibergen_paap</span><span class="p">(</span>
+        <span class="n">endog</span><span class="p">,</span> <span class="n">instr</span><span class="p">,</span> <span class="n">exog</span><span class="p">,</span> <span class="n">cov_type</span><span class="p">,</span> <span class="n">cov_config</span><span class="p">,</span> <span class="n">wald</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">method</span><span class="o">=</span><span class="n">method</span>
+    <span class="p">)[</span><span class="mi">0</span><span class="p">]</span></div>
 
 
 
@@ -1236,6 +1290,8 @@
     <span class="n">exog</span><span class="p">:</span> <span class="n">linearmodels</span><span class="o">.</span><span class="n">typing</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">Float64Array</span><span class="p">,</span>
     <span class="n">cov_type</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">"robust"</span><span class="p">,</span>
     <span class="n">cov_config</span><span class="p">:</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+    <span class="o">*</span><span class="p">,</span>
+    <span class="n">method</span><span class="p">:</span> <span class="n">Literal</span><span class="p">[</span><span class="s2">"pinv"</span><span class="p">,</span> <span class="s2">"qr"</span><span class="p">]</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">float</span><span class="p">:</span>
 <span class="w">    </span><span class="sa">r</span><span class="sd">"""</span>
 <span class="sd">    Kleibergen-Paap rk Wald F statistic.</span>
@@ -1265,6 +1321,14 @@
 
 <span class="sd">    cov_config : dict, optional</span>
 <span class="sd">        Options for the covariance estimator. See :func:`kleibergen_paap`.</span>
+
+<span class="sd">    method : {"pinv", "qr"}, optional</span>
+<span class="sd">        Numerical method of partialling out exog and of the rank tests. "qr" scales</span>
+<span class="sd">        the columns to unit length, so the statistic does not depend on the units of</span>
+<span class="sd">        the variables. If not given, "pinv" is used and a ``FutureWarning`` is</span>
+<span class="sd">        issued, since the default will be "qr" in linearmodels 8.0.</span>
+
+<span class="sd">        .. versionadded:: 7.2</span>
 
 <span class="sd">    Returns</span>
 <span class="sd">    -------</span>
@@ -1344,7 +1408,8 @@
 <span class="sd">    instrumental variables/GMM estimation and testing. *Stata Journal*, 7(4),</span>
 <span class="sd">    465-506.</span>
 <span class="sd">    """</span>
-    <span class="k">return</span> <span class="n">_kleibergen_paap</span><span class="p">(</span><span class="n">endog</span><span class="p">,</span> <span class="n">instr</span><span class="p">,</span> <span class="n">exog</span><span class="p">,</span> <span class="n">cov_type</span><span class="p">,</span> <span class="n">cov_config</span><span class="p">)[</span><span class="mi">1</span><span class="p">]</span></div>
+    <span class="n">method</span> <span class="o">=</span> <span class="n">resolve_method</span><span class="p">(</span><span class="n">method</span><span class="p">,</span> <span class="s2">"kleibergen_paap_f"</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">_kleibergen_paap</span><span class="p">(</span><span class="n">endog</span><span class="p">,</span> <span class="n">instr</span><span class="p">,</span> <span class="n">exog</span><span class="p">,</span> <span class="n">cov_type</span><span class="p">,</span> <span class="n">cov_config</span><span class="p">,</span> <span class="n">method</span><span class="o">=</span><span class="n">method</span><span class="p">)[</span><span class="mi">1</span><span class="p">]</span></div>
 
 
 

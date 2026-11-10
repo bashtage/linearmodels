@@ -136,7 +136,9 @@
    "metadata": {},
    "outputs": [],
    "source": [
-    "ivolsmod = IV2SLS(data.ldrugexp, data[[\"hi_empunion\"] + controls], None, None)\n",
+    "ivolsmod = IV2SLS(\n",
+    "    data.ldrugexp, data[[\"hi_empunion\"] + controls], None, None, method=\"qr\"\n",
+    ")\n",
     "res_ols = ivolsmod.fit()\n",
     "print(res_ols)"
    ]
@@ -156,7 +158,9 @@
    "metadata": {},
    "outputs": [],
    "source": [
-    "ivmod = IV2SLS(data.ldrugexp, data[controls], data.hi_empunion, data.ssiratio)\n",
+    "ivmod = IV2SLS(\n",
+    "    data.ldrugexp, data[controls], data.hi_empunion, data.ssiratio, method=\"qr\"\n",
+    ")\n",
     "res_2sls = ivmod.fit()\n",
     "print(res_2sls.summary)"
    ]
@@ -177,7 +181,11 @@
    "outputs": [],
    "source": [
     "ivmod = IV2SLS(\n",
-    "    data.ldrugexp, data[controls], data.hi_empunion, data[[\"ssiratio\", \"multlc\"]]\n",
+    "    data.ldrugexp,\n",
+    "    data[controls],\n",
+    "    data.hi_empunion,\n",
+    "    data[[\"ssiratio\", \"multlc\"]],\n",
+    "    method=\"qr\",\n",
     ")\n",
     "res_2sls_robust = ivmod.fit()"
    ]
@@ -208,7 +216,11 @@
    "outputs": [],
    "source": [
     "ivmod = IV2SLS(\n",
-    "    data.ldrugexp, data[controls], data.hi_empunion, data[[\"ssiratio\", \"multlc\"]]\n",
+    "    data.ldrugexp,\n",
+    "    data[controls],\n",
+    "    data.hi_empunion,\n",
+    "    data[[\"ssiratio\", \"multlc\"]],\n",
+    "    method=\"qr\",\n",
     ")\n",
     "res_2sls_std = ivmod.fit(cov_type=\"unadjusted\")"
    ]
@@ -363,10 +375,12 @@
    "source": [
     "import pandas as pd\n",
     "\n",
-    "step1 = IV2SLS(data.hi_empunion, data[[\"ssiratio\"] + controls], None, None).fit()\n",
+    "step1 = IV2SLS(\n",
+    "    data.hi_empunion, data[[\"ssiratio\"] + controls], None, None, method=\"qr\"\n",
+    ").fit()\n",
     "resids = step1.resids\n",
     "exog = pd.concat([data[[\"hi_empunion\"] + controls], resids], axis=1)\n",
-    "step2 = IV2SLS(data.ldrugexp, exog, None, None).fit(cov_type=\"unadjusted\")\n",
+    "step2 = IV2SLS(data.ldrugexp, exog, None, None, method=\"qr\").fit(cov_type=\"unadjusted\")\n",
     "print(step2.tstats.residual**2)"
    ]
   },
@@ -500,9 +514,9 @@
    "source": [
     "od = OrderedDict()\n",
     "for col in instruments:\n",
-    "    od[col] = IV2SLS(data.ldrugexp, data[controls], data.hi_empunion, data[col]).fit(\n",
-    "        cov_type=\"robust\"\n",
-    "    )\n",
+    "    od[col] = IV2SLS(\n",
+    "        data.ldrugexp, data[controls], data.hi_empunion, data[col], method=\"qr\"\n",
+    "    ).fit(cov_type=\"robust\")\n",
     "od[\"OLS\"] = res_ols\n",
     "print(compare(od))"
    ]
@@ -537,7 +551,9 @@
    "metadata": {},
    "outputs": [],
    "source": [
-    "ivmod = IV2SLS(data.ldrugexp, data[controls], data.hi_empunion, data[instruments])\n",
+    "ivmod = IV2SLS(\n",
+    "    data.ldrugexp, data[controls], data.hi_empunion, data[instruments], method=\"qr\"\n",
+    ")\n",
     "res_2sls_all = ivmod.fit()\n",
     "print(res_2sls_all.first_stage)"
    ]
@@ -557,7 +573,11 @@
    "outputs": [],
    "source": [
     "ivmod = IVLIML(\n",
-    "    data.ldrugexp, data[controls], data.hi_empunion, data[[\"ssiratio\", \"multlc\"]]\n",
+    "    data.ldrugexp,\n",
+    "    data[controls],\n",
+    "    data.hi_empunion,\n",
+    "    data[[\"ssiratio\", \"multlc\"]],\n",
+    "    method=\"qr\",\n",
     ")\n",
     "res_liml = ivmod.fit(cov_type=\"robust\")\n",
     "print(compare({\"2SLS\": res_2sls_robust, \"LIML\": res_liml, \"GMM\": res_gmm}))"
@@ -629,7 +649,12 @@
     "\n",
     "nsim, nobs, ninstr, pi, beta, rho = 300, 200, 30, 0.1, 1.0, 0.5\n",
     "rng = np.random.default_rng(20261008)\n",
-    "estimators = {\"2SLS\": IV2SLS, \"LIML\": IVLIML, \"JIVE\": IVJIVE}\n",
+    "# JIVE has no numerical method to choose\n",
+    "estimators = {\n",
+    "    \"2SLS\": (IV2SLS, {\"method\": \"qr\"}),\n",
+    "    \"LIML\": (IVLIML, {\"method\": \"qr\"}),\n",
+    "    \"JIVE\": (IVJIVE, {}),\n",
+    "}\n",
     "errors = {name: [] for name in estimators}\n",
     "ones = np.ones((nobs, 1))\n",
     "for _ in range(nsim):\n",
@@ -637,8 +662,8 @@
     "    v = rng.standard_normal(nobs)\n",
     "    x = z @ np.full(ninstr, pi) + v\n",
     "    y = beta * x + rho * v + np.sqrt(1 - rho**2) * rng.standard_normal(nobs)\n",
-    "    for name, estimator in estimators.items():\n",
-    "        fit = estimator(y, ones, x, z).fit()\n",
+    "    for name, (estimator, options) in estimators.items():\n",
+    "        fit = estimator(y, ones, x, z, **options).fit()\n",
     "        errors[name].append(fit.params[\"endog\"] - beta)\n",
     "errors = pd.DataFrame(errors)"
    ]
@@ -679,7 +704,9 @@
    "source": [
     "import pandas as pd\n",
     "\n",
-    "ivolsmod = IV2SLS(data.ldrugexp, data[[\"hi_empunion\"] + controls], None, None)\n",
+    "ivolsmod = IV2SLS(\n",
+    "    data.ldrugexp, data[[\"hi_empunion\"] + controls], None, None, method=\"qr\"\n",
+    ")\n",
     "res_ivols = ivolsmod.fit()\n",
     "sm_ols = res_ols.params\n",
     "sm_ols.name = \"sm\"\n",
