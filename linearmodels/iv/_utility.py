@@ -3,7 +3,7 @@ from __future__ import annotations
 from collections.abc import Mapping
 import os
 import sys
-from typing import Any, NamedTuple, cast
+from typing import Any, Literal, NamedTuple, cast
 import warnings
 
 from formulaic import model_matrix
@@ -50,13 +50,13 @@ def _called_from_linearmodels(filename: str) -> bool:
     return in_package and not path.startswith(_TESTS_DIRECTORY + os.sep)
 
 
-def resolve_method(method: str | None, name: str) -> str:
+def resolve_method(method: Literal["pinv", "qr"] | None, name: str) -> str:
     """
     Validate method of a function that is mostly used inside linearmodels.
 
     Parameters
     ----------
-    method : str, optional
+    method : {"pinv", "qr"}, optional
         The numerical method, "pinv" or "qr", not case sensitive.
     name : str
         The name of the function or class, which is used in the warning.
@@ -94,7 +94,7 @@ def proj(
     y: linearmodels.typing.data.Float64Array,
     x: linearmodels.typing.data.Float64Array,
     *,
-    method: str = "pinv",
+    method: Literal["pinv", "qr"] = "pinv",
 ) -> linearmodels.typing.data.Float64Array:
     """
     Projection of y on x from y.
@@ -148,7 +148,7 @@ def annihilate(
     y: linearmodels.typing.data.Float64Array,
     x: linearmodels.typing.data.Float64Array,
     *,
-    method: str = "pinv",
+    method: Literal["pinv", "qr"] = "pinv",
 ) -> linearmodels.typing.data.Float64Array:
     """
     Remove projection of y on x from y.

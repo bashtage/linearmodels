@@ -8,7 +8,7 @@ from collections.abc import Callable, Mapping
 import os
 import sys
 from types import FrameType
-from typing import Any, TypeVar, Union, cast
+from typing import Any, Literal, TypeVar, Union, cast
 import warnings
 
 from numpy import (
@@ -288,7 +288,7 @@ def _kclass_pinv(
     return inv(p1) @ p2, products
 
 
-def _check_method(method: str | None) -> tuple[str, bool]:
+def _check_method(method: Literal["pinv", "qr"] | None) -> tuple[str, bool]:
     """The numerical method, and whether to warn about the default of 8.0."""
     if method is None:
         return "pinv", True
@@ -401,7 +401,7 @@ class _IVModelBase:
         weights: IVDataLike | None = None,
         fuller: linearmodels.typing.Numeric = 0,
         kappa: linearmodels.typing.OptionalNumeric = None,
-        method: str | None = "pinv",
+        method: Literal["pinv", "qr"] | None = "pinv",
     ):
         self._numerical_method, self._warn_method = _check_method(method)
         self.dependent = IVData(dependent, var_name="dependent")
@@ -1065,7 +1065,7 @@ class _IVLSModelBase(_IVModelBase):
         weights: IVDataLike | None = None,
         fuller: linearmodels.typing.Numeric = 0,
         kappa: linearmodels.typing.OptionalNumeric = None,
-        method: str | None = None,
+        method: Literal["pinv", "qr"] | None = None,
     ):
         super().__init__(
             dependent,
@@ -1087,7 +1087,7 @@ class _IVLSModelBase(_IVModelBase):
         z: linearmodels.typing.data.Float64Array,
         kappa: linearmodels.typing.Numeric,
         *,
-        method: str | None = None,
+        method: Literal["pinv", "qr"] | None = None,
     ) -> linearmodels.typing.data.Float64Array:
         """
         Parameter estimation without error checking.
@@ -1507,7 +1507,7 @@ class IVLIML(_IVLSModelBase):
         weights: IVDataLike | None = None,
         fuller: linearmodels.typing.Numeric = 0,
         kappa: linearmodels.typing.OptionalNumeric = None,
-        method: str | None = None,
+        method: Literal["pinv", "qr"] | None = None,
     ):
         super().__init__(
             dependent,
@@ -1528,7 +1528,7 @@ class IVLIML(_IVLSModelBase):
         weights: IVDataLike | None = None,
         fuller: float = 0,
         kappa: linearmodels.typing.OptionalNumeric = None,
-        method: str | None = None,
+        method: Literal["pinv", "qr"] | None = None,
     ) -> IVLIML:
         """
         Create a model from a formula.
@@ -1755,7 +1755,7 @@ class IV2SLS(_IVLSModelBase):
         instruments: IVDataLike | None,
         *,
         weights: IVDataLike | None = None,
-        method: str | None = None,
+        method: Literal["pinv", "qr"] | None = None,
     ):
         self._method = "IV-2SLS"
         super().__init__(
@@ -1775,7 +1775,7 @@ class IV2SLS(_IVLSModelBase):
         data: DataFrame,
         *,
         weights: IVDataLike | None = None,
-        method: str | None = None,
+        method: Literal["pinv", "qr"] | None = None,
     ) -> IV2SLS:
         """
         Create a model from a formula.
@@ -3326,7 +3326,7 @@ class _OLS(IVLIML):
         exog: IVDataLike,
         *,
         weights: IVDataLike | None = None,
-        method: str | None = "pinv",
+        method: Literal["pinv", "qr"] | None = "pinv",
     ):
         super().__init__(
             dependent, exog, None, None, weights=weights, kappa=0.0, method=method

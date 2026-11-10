@@ -9,7 +9,7 @@ from linearmodels.compat.statsmodels import Summary
 from collections.abc import Sequence
 import datetime as dt
 from functools import cached_property
-from typing import Any, Union
+from typing import Any, Literal, Union
 
 from numpy import (
     array,
@@ -845,7 +845,7 @@ class FirstStageResults(_SummaryStr):
         cov_type: str,
         cov_config: dict[str, Any],
         *,
-        method: str | None = None,
+        method: Literal["pinv", "qr"] | None = None,
     ) -> None:
         self.dep = dep
         self._numerical_method = resolve_method(method, "FirstStageResults")

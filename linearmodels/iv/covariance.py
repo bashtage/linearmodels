@@ -5,7 +5,7 @@ Covariance estimation for 2SLS and LIML IV estimators.
 from __future__ import annotations
 
 from collections.abc import Callable
-from typing import Any, Union, cast
+from typing import Any, Literal, Union, cast
 
 from mypy_extensions import VarArg
 from numpy import (
@@ -527,7 +527,7 @@ class HomoskedasticCovariance:
         kappa: linearmodels.typing.Numeric = 1,
         extra_df: int = 0,
         *,
-        method: str | None = None,
+        method: Literal["pinv", "qr"] | None = None,
     ):
         if not (x.shape[0] == y.shape[0] == z.shape[0]):
             raise ValueError("x, y and z must have the same number of rows")
@@ -825,7 +825,7 @@ class HeteroskedasticCovariance(HomoskedasticCovariance):
         kappa: linearmodels.typing.Numeric = 1,
         extra_df: int = 0,
         *,
-        method: str | None = None,
+        method: Literal["pinv", "qr"] | None = None,
     ):
         method = resolve_method(method, type(self).__name__)
         super().__init__(x, y, z, params, debiased, kappa, extra_df, method=method)
@@ -972,7 +972,7 @@ class KernelCovariance(HomoskedasticCovariance):
         kappa: linearmodels.typing.Numeric = 1,
         extra_df: int = 0,
         *,
-        method: str | None = None,
+        method: Literal["pinv", "qr"] | None = None,
     ):
         method = resolve_method(method, type(self).__name__)
         super().__init__(x, y, z, params, debiased, kappa, extra_df, method=method)
@@ -1135,7 +1135,7 @@ class ClusteredCovariance(HomoskedasticCovariance):
         kappa: linearmodels.typing.Numeric = 1,
         extra_df: int = 0,
         *,
-        method: str | None = None,
+        method: Literal["pinv", "qr"] | None = None,
     ):
         method = resolve_method(method, type(self).__name__)
         super().__init__(x, y, z, params, debiased, kappa, extra_df, method=method)

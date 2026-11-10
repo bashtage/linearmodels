@@ -4,7 +4,7 @@ Rank tests of the first stage and the model F-statistic.
 
 from __future__ import annotations
 
-from typing import Any, NamedTuple
+from typing import Any, Literal, NamedTuple
 import warnings
 
 from numpy import (
@@ -103,7 +103,9 @@ class _FirstStageRank(NamedTuple):
     irqxx: linearmodels.typing.data.Float64Array
 
 
-def _rank(a: linearmodels.typing.data.Float64Array, *, method: str) -> int:
+def _rank(
+    a: linearmodels.typing.data.Float64Array, *, method: Literal["pinv", "qr"]
+) -> int:
     """The rank of a, of its columns scaled to unit length if method is "qr"."""
     if method == "qr":
         scale = norm(a, axis=0)
@@ -118,7 +120,7 @@ def _first_stage_rank(
     exog: linearmodels.typing.data.Float64Array,
     name: str,
     *,
-    method: str = "pinv",
+    method: Literal["pinv", "qr"] = "pinv",
 ) -> _FirstStageRank | InvalidTestStatistic:
     r"""
     Decompose the first stage into canonical correlations.
@@ -197,7 +199,7 @@ def cragg_donald(
     instr: linearmodels.typing.data.Float64Array,
     exog: linearmodels.typing.data.Float64Array,
     *,
-    method: str | None = None,
+    method: Literal["pinv", "qr"] | None = None,
 ) -> WaldTestStatistic | InvalidTestStatistic:
     r"""
     Cragg-Donald test of reduced rank for the first-stage regression.
@@ -336,7 +338,7 @@ def cragg_donald_f(
     instr: linearmodels.typing.data.Float64Array,
     exog: linearmodels.typing.data.Float64Array,
     *,
-    method: str | None = None,
+    method: Literal["pinv", "qr"] | None = None,
 ) -> float:
     r"""
     Cragg-Donald Wald F statistic.
@@ -501,7 +503,7 @@ def _kleibergen_paap(
     cov_config: dict[str, Any] | None,
     *,
     wald: bool = True,
-    method: str = "pinv",
+    method: Literal["pinv", "qr"] = "pinv",
 ) -> tuple[WaldTestStatistic | InvalidTestStatistic, float]:
     """
     Compute the rk LM test and the rk Wald F-statistic
@@ -572,7 +574,7 @@ def kleibergen_paap(
     cov_type: str = "robust",
     cov_config: dict[str, Any] | None = None,
     *,
-    method: str | None = None,
+    method: Literal["pinv", "qr"] | None = None,
 ) -> WaldTestStatistic | InvalidTestStatistic:
     r"""
     Kleibergen-Paap rk LM test of underidentification.
@@ -759,7 +761,7 @@ def kleibergen_paap_f(
     cov_type: str = "robust",
     cov_config: dict[str, Any] | None = None,
     *,
-    method: str | None = None,
+    method: Literal["pinv", "qr"] | None = None,
 ) -> float:
     r"""
     Kleibergen-Paap rk Wald F statistic.

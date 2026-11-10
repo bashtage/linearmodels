@@ -29,10 +29,10 @@ be added to 7.1. 7.2 also contains the fixes below.
   accept the same keyword, and the first stage results and the tests of the results use
   the numerical method of the model (:issue:`823`, :issue:`850`, :issue:`870`).
 - With ``method="pinv"``, the estimates can lose digits well below the condition number
-  of 1e9 at which ``method="qr"`` rejects the data. With c the condition number of the
-  regressors or the instruments with columns scaled to unit length, about 16 - 2
-  log10(c) digits are correct with ``method="pinv"``, e.g., 6 at c = 1e5 and none at c =
-  1e8, and about 16 - log10(c) with ``method="qr"``. Nearly collinear variables, such as
+  of 1e9 at which ``method="qr"`` rejects the data. If ``c`` is the condition number of the
+  regressors or the instruments with columns scaled to unit length, about ``16 - 2
+  log10(c)`` digits are correct with ``method="pinv"``, e.g., 6 at c = 1e5 and none at c =
+  1e8, and about ``16 - log10(c)`` with ``method="qr"``. Nearly collinear variables, such as
   a variable in levels and its square, can have such condition numbers. ``method="qr"``
   is recommended (:issue:`870`).
 - ``IVGMM``, ``IVGMMCUE`` and ``IVJIVE`` do not have ``method``, and keep their
