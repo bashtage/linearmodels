@@ -102,9 +102,7 @@ def test_many_weak_instruments():
         x = z @ np.full(ninstr, pi) + v
         y = beta * x + rho * v + np.sqrt(1 - rho**2) * rng.standard_normal(nobs)
         exog = np.ones((nobs, 1))
-        tsls.append(
-            IV2SLS(y, exog, x[:, None], z, method="pinv").fit().params.iloc[-1] - beta
-        )
+        tsls.append(IV2SLS(y, exog, x[:, None], z).fit().params.iloc[-1] - beta)
         jive.append(IVJIVE(y, exog, x[:, None], z).fit().params.iloc[-1] - beta)
 
     def iqr(values):
@@ -126,6 +124,6 @@ def test_jive_and_2sls_are_close_with_few_instruments(ninstr):
     x = z @ np.full(ninstr, 0.8) + v
     y = 1.0 + x + 0.5 * v + rng.standard_normal(nobs)
     jive = IVJIVE(y, np.ones((nobs, 1)), x[:, None], z).fit()
-    tsls = IV2SLS(y, np.ones((nobs, 1)), x[:, None], z, method="pinv").fit()
+    tsls = IV2SLS(y, np.ones((nobs, 1)), x[:, None], z).fit()
     assert abs(jive.params.iloc[-1] - tsls.params.iloc[-1]) < 0.02
     assert abs(jive.std_errors.iloc[-1] / tsls.std_errors.iloc[-1] - 1) < 0.05

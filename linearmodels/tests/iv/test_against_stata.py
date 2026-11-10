@@ -9,7 +9,6 @@ import pytest
 from statsmodels.tools.tools import add_constant
 
 from linearmodels.iv import IV2SLS, IVGMM, IVLIML
-from linearmodels.tests._utility import method_kwargs
 from linearmodels.tests.iv.results.read_stata_results import process_results
 
 CWD = os.path.split(os.path.abspath(__file__))[0]
@@ -57,9 +56,7 @@ def housing(request):
     else:
         weight_opts = {}
 
-    model_result = mod(
-        endog, exog, instd, instr, **weight_opts, **method_kwargs(mod)
-    ).fit(**cov_opts)
+    model_result = mod(endog, exog, instd, instr, **weight_opts).fit(**cov_opts)
     return model_result, result
 
 
@@ -154,9 +151,7 @@ def construct_model(key):
         del mod_options["cov_type"]
         mod_options["center"] = "center" in other
 
-    model_result = mod(
-        dep, exog, endog, instr, **mod_options, **method_kwargs(mod)
-    ).fit(**cov_opts)
+    model_result = mod(dep, exog, endog, instr, **mod_options).fit(**cov_opts)
     if model == "gmm" and "True" in weighted:
         pytest.skip("Weighted GMM differs slightly")
     return model_result

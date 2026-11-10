@@ -377,12 +377,7 @@ def test_independent_reference():
     exog = pd.concat([cleaned["exog"], dummies], axis=1)
     exog.insert(0, "const", 1.0)
     benchmark = IV2SLS(
-        cleaned["dependent"],
-        exog,
-        None,
-        None,
-        weights=cleaned["weights"],
-        method="pinv",
+        cleaned["dependent"], exog, None, None, weights=cleaned["weights"]
     ).fit(cov_type="robust")
 
     with pytest.warns(MissingValueWarning, match="missing values"):

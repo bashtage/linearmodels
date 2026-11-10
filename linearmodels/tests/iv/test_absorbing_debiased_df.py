@@ -82,7 +82,7 @@ def assert_matches_dummy_regression(
     """res is the fit of the regression on x and the controls, for the x parameters"""
     exog = np.column_stack([x.to_numpy(), controls])
     k = x.shape[1]
-    reference = IV2SLS(y, exog, None, None, weights=weights, method="pinv").fit(
+    reference = IV2SLS(y, exog, None, None, weights=weights).fit(
         cov_type=cov_type, debiased=True, **cov_config
     )
     assert_allclose(res.params, reference.params.iloc[:k], rtol=1e-6)
@@ -124,9 +124,7 @@ def test_constant_in_exog(cov_type, cov_config, neffects):
         cov_type=cov_type, debiased=True, **cov_config
     )
     assert res.df_absorbed == sum(cats[c].nunique() for c in cats) - neffects
-    reference = IV2SLS(
-        y, np.column_stack([exog, dummies(cats, True)]), None, None, method="pinv"
-    )
+    reference = IV2SLS(y, np.column_stack([exog, dummies(cats, True)]), None, None)
     reference_res = reference.fit(cov_type=cov_type, debiased=True, **cov_config)
     assert res.df_resid == reference_res.df_resid
     # The constant is the mean level in AbsorbingLS, and the level of a category in the
@@ -186,9 +184,7 @@ def test_not_debiased_is_not_adjusted(cov_type, cov_config):
     y, x, cats, _, clusters = make_data(2, seed=5)
     cov_config = config(cov_config, clusters)
     res = AbsorbingLS(y, x, absorb=cats).fit(cov_type=cov_type, **cov_config)
-    reference = IV2SLS(
-        y, np.column_stack([x.to_numpy(), dummies(cats)]), None, None, method="pinv"
-    )
+    reference = IV2SLS(y, np.column_stack([x.to_numpy(), dummies(cats)]), None, None)
     expected = reference.fit(cov_type=cov_type, **cov_config)
     assert_allclose(res.cov, expected.cov.iloc[:2, :2], rtol=1e-6)
     assert not res.debiased

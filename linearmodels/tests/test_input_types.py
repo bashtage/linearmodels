@@ -49,7 +49,6 @@ from linearmodels.panel.data import PanelData
 from linearmodels.panel.utility import dummy_matrix
 from linearmodels.shared.exceptions import MissingValueWarning
 from linearmodels.system import IV3SLS, SUR, IVSystemGMM
-from linearmodels.tests._utility import method_kwargs
 
 try:
     import xarray as xr
@@ -148,19 +147,13 @@ def make(value, kind):
 def build_iv(cls, data, **replace):
     values = {**data, **replace}
     if cls is OLS:
-        return cls(
-            values["dependent"],
-            values["exog"],
-            weights=values["weights"],
-            **method_kwargs(cls),
-        )
+        return cls(values["dependent"], values["exog"], weights=values["weights"])
     return cls(
         values["dependent"],
         values["exog"],
         values["endog"],
         values["instruments"],
         weights=values["weights"],
-        **method_kwargs(cls),
     )
 
 
@@ -354,6 +347,7 @@ def test_complex_input_raises_and_names_the_input(data, name, kind):
     with warnings.catch_warnings():
         # The imaginary part must not be discarded with a warning
         warnings.simplefilter("error")
+        warnings.filterwarnings("ignore", "The default method", FutureWarning)
         with pytest.raises(TypeError, match=rf"{name} has a complex dtype"):
             build_iv(IV2SLS, data, **{name: value})
 
@@ -433,7 +427,6 @@ def test_wrong_number_of_observations_in_a_list(data):
             data["exog"].iloc[:-1].to_numpy().tolist(),
             data["endog"],
             data["instruments"],
-            method="pinv",
         )
 
 
@@ -443,9 +436,7 @@ def test_ivdata_input_has_its_number_of_observations_checked(data):
     with pytest.raises(ValueError, match="exog has the wrong number of observations"):
         IVData(exog, var_name="exog", nobs=NOBS)
     with pytest.raises(ValueError, match="exog has the wrong number of observations"):
-        IV2SLS(
-            data["dependent"], exog, data["endog"], data["instruments"], method="pinv"
-        )
+        IV2SLS(data["dependent"], exog, data["endog"], data["instruments"])
 
 
 @pytest.mark.parametrize("cls", IV_ESTIMATORS, ids=IV_IDS)
@@ -457,9 +448,9 @@ def test_column_name_as_weights_raises(cls, data):
     frame["wt"] = data["weights"]
     formula = "y ~ 1 + w + [x ~ z1 + z2 + z3]"
     with pytest.raises(TypeError, match=r"weights must be array_like.*data\['wt'\]"):
-        cls.from_formula(formula, frame, weights="wt", **method_kwargs(cls))
+        cls.from_formula(formula, frame, weights="wt")
     # The values of the column work
-    mod = cls.from_formula(formula, frame, weights=frame["wt"], **method_kwargs(cls))
+    mod = cls.from_formula(formula, frame, weights=frame["wt"])
     expected = data["weights"] / data["weights"].mean()
     assert_allclose(mod.weights.ndarray[:, 0], expected)
 
@@ -521,7 +512,6 @@ def test_gmm_weight_config_clusters_containers(data, cls, kind):
             data["instruments"],
             weight_type="clustered",
             clusters=clusters,
-            **method_kwargs(cls),
         )
         return estimates(mod.fit())
 
@@ -575,7 +565,6 @@ def test_weight_config_cluster_columns_raise(data, cls):
             data["instruments"],
             weight_type="clustered",
             clusters=data["clusters2"],
-            **method_kwargs(cls),
         )
 
 
@@ -981,9 +970,7 @@ def system_arrays(mod):
 
 @pytest.fixture(scope="module")
 def system_reference(system):
-    return {
-        cls: cls(equations(system, cls), **method_kwargs(cls)) for cls in SYSTEM_MODELS
-    }
+    return {cls: cls(equations(system, cls)) for cls in SYSTEM_MODELS}
 
 
 @pytest.mark.parametrize(
@@ -996,7 +983,7 @@ def system_reference(system):
 )
 def test_system_equation_containers(system, system_reference, cls, name, kind):
     new = make(system["eq1"][name], kind)
-    mod = cls(equations(system, cls, **{name: new}), **method_kwargs(cls))
+    mod = cls(equations(system, cls, **{name: new}))
     for a, b in zip(
         system_arrays(mod), system_arrays(system_reference[cls]), strict=True
     ):
@@ -1008,8 +995,8 @@ def test_system_equation_containers(system, system_reference, cls, name, kind):
 def test_system_lists_give_the_same_estimates(system, cls, form):
     names = SYSTEM_INPUTS[cls]
     lists = {name: make(system["eq1"][name], "list") for name in names}
-    reference = cls(equations(system, cls, form), **method_kwargs(cls)).fit()
-    res = cls(equations(system, cls, form, **lists), **method_kwargs(cls)).fit()
+    reference = cls(equations(system, cls, form)).fit()
+    res = cls(equations(system, cls, form, **lists)).fit()
     assert_allclose(res.params, reference.params, rtol=1e-12)
     assert_allclose(res.cov, reference.cov, rtol=1e-12)
 
@@ -1027,12 +1014,8 @@ def test_system_gmm_lists_give_the_same_estimates(system):
 def test_system_sigma_containers(system, cls, kind):
     sigma = pd.DataFrame([[1.0, 0.25], [0.25, 1.5]])
     eqns = equations(system, cls)
-    expected = cls(eqns, sigma=sigma.to_numpy(), **method_kwargs(cls)).fit()
-    res = cls(
-        eqns,
-        sigma=make(sigma, "list2d" if kind == "list" else kind),
-        **method_kwargs(cls),
-    ).fit()
+    expected = cls(eqns, sigma=sigma.to_numpy()).fit()
+    res = cls(eqns, sigma=make(sigma, "list2d" if kind == "list" else kind)).fit()
     assert_allclose(res.params, expected.params, rtol=1e-12)
 
 
@@ -1050,14 +1033,14 @@ def test_system_complex_input_raises(system, cls, name, form):
     value = complex_inputs(system["eq1"][name])["ndarray"]
     stem = {"instruments": "instr"}.get(name, name)
     with pytest.raises(TypeError, match=rf"{stem}_0 has a complex dtype"):
-        cls(equations(system, cls, form, **{name: value}), **method_kwargs(cls))
+        cls(equations(system, cls, form, **{name: value}))
 
 
 @pytest.mark.parametrize("cls", SYSTEM_MODELS, ids=SYSTEM_IDS)
 def test_system_text_input_raises(system, cls):
     text = np.full(system["eq1"]["exog"].shape, "abc")
     with pytest.raises(TypeError, match="exog_0 must contain numbers"):
-        cls(equations(system, cls, exog=text), **method_kwargs(cls))
+        cls(equations(system, cls, exog=text))
 
 
 @pytest.mark.parametrize("kind", ["list", "tuple", "ndarray", "series"])
@@ -1174,7 +1157,7 @@ def test_system_predict_accepts_lists(system):
 @pytest.mark.parametrize("cls", [SUR, IV3SLS], ids=["SUR", "IV3SLS"])
 @pytest.mark.parametrize("kind", ["list", "tuple", "series", "strings"])
 def test_system_clusters_containers(system, cls, kind):
-    mod = cls(equations(system, cls), **method_kwargs(cls))
+    mod = cls(equations(system, cls))
     expected = mod.fit(cov_type="clustered", clusters=system["clusters"].to_numpy())
     clusters = make_clusters(system["clusters"], kind)
     res = mod.fit(cov_type="clustered", clusters=clusters)
@@ -1184,7 +1167,7 @@ def test_system_clusters_containers(system, cls, kind):
 @pytest.mark.parametrize("cls", [SUR, IV3SLS], ids=["SUR", "IV3SLS"])
 @pytest.mark.parametrize("shape", [(NOBS, 3), (NOBS, 2, 2), (NOBS - 1,)])
 def test_system_clusters_with_the_wrong_shape_raise_a_plain_message(system, cls, shape):
-    mod = cls(equations(system, cls), **method_kwargs(cls))
+    mod = cls(equations(system, cls))
     clusters = np.arange(np.prod(shape)).reshape(shape) % 5
     with pytest.raises(ValueError, match="clusters must be an ndarray") as exc:
         mod.fit(cov_type="clustered", clusters=clusters)
@@ -1224,9 +1207,9 @@ def factors_data():
 def test_factor_model_containers(factors_data, cls, name, kind):
     portfolios, factors = factors_data
     values = {"portfolios": portfolios, "factors": factors}
-    expected = cls(**values, **method_kwargs(cls))
+    expected = cls(**values)
     values[name] = make(values[name], kind)
-    mod = cls(**values, **method_kwargs(cls))
+    mod = cls(**values)
     assert_array_equal(mod.portfolios.ndarray, expected.portfolios.ndarray)
     assert_array_equal(mod.factors.ndarray, expected.factors.ndarray)
 
@@ -1236,10 +1219,8 @@ def test_factor_model_containers(factors_data, cls, name, kind):
 )
 def test_factor_model_lists_give_the_same_estimates(factors_data, cls):
     portfolios, factors = factors_data
-    expected = cls(portfolios, factors, **method_kwargs(cls)).fit()
-    res = cls(
-        make(portfolios, "list"), make(factors, "list"), **method_kwargs(cls)
-    ).fit()
+    expected = cls(portfolios, factors).fit()
+    res = cls(make(portfolios, "list"), make(factors, "list")).fit()
     assert_allclose(res.risk_premia, expected.risk_premia, rtol=1e-12)
     assert_allclose(res.params, expected.params, rtol=1e-12)
     assert_allclose(res.cov, expected.cov, rtol=1e-12)
@@ -1261,13 +1242,9 @@ def test_factor_model_sigma_containers(factors_data, kind):
 def test_factor_model_formula_portfolios_accept_lists(factors_data, cls):
     portfolios, factors = factors_data
     frame = pd.concat([factors, portfolios], axis=1)
-    expected = cls.from_formula(
-        "f1 + f2", frame, portfolios=portfolios, **method_kwargs(cls)
-    ).fit()
+    expected = cls.from_formula("f1 + f2", frame, portfolios=portfolios).fit()
     listed = make(portfolios, "list")
-    res = cls.from_formula(
-        "f1 + f2", frame, portfolios=listed, **method_kwargs(cls)
-    ).fit()
+    res = cls.from_formula("f1 + f2", frame, portfolios=listed).fit()
     assert_allclose(res.risk_premia, expected.risk_premia, rtol=1e-12)
 
 
@@ -1280,7 +1257,7 @@ def test_factor_model_complex_input_raises(factors_data, cls, name, kind):
     values[name] = complex_inputs(values[name])[kind]
     stem = name[:-1]
     with pytest.raises(TypeError, match=rf"{stem} has a complex dtype"):
-        cls(**values, **method_kwargs(cls))
+        cls(**values)
 
 
 @pytest.mark.parametrize("name", ["portfolios", "factors"])
@@ -1405,13 +1382,7 @@ def build_panel(cls, panel, **replace):
         **replace,
     }
     kw = {"entity_effects": True} if cls is PanelOLS else {}
-    return cls(
-        values["dependent"],
-        values["exog"],
-        weights=values["weights"],
-        **kw,
-        **method_kwargs(cls),
-    )
+    return cls(values["dependent"], values["exog"], weights=values["weights"], **kw)
 
 
 def panel_arrays(mod):

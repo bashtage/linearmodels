@@ -32,7 +32,6 @@ from linearmodels.iv.common import (
     kleibergen_paap_f,
 )
 from linearmodels.shared.hypotheses import InvalidTestStatistic, WaldTestStatistic
-from linearmodels.tests._utility import method_kwargs
 
 CWD = os.path.split(os.path.abspath(__file__))[0]
 SIMULATED_DATA = pd.read_stata(os.path.join(CWD, "results", "simulated-data.dta"))
@@ -184,21 +183,17 @@ def first_stage_wald(x, z, exog, clusters=None):
 def test_reference_values(key):
     (endog, instr, exog), cov_type, options = function_arguments(key)
     underid, underid_df, cd_f, kp_f = REFERENCE[key]
-    test = kleibergen_paap(endog, instr, exog, cov_type, options, method="pinv")
+    test = kleibergen_paap(endog, instr, exog, cov_type, options)
     assert isinstance(test, WaldTestStatistic)
     assert not isinstance(test, InvalidTestStatistic)
     assert_allclose(test.stat, underid, rtol=1e-8)
     assert test.df == underid_df
     assert_allclose(
-        kleibergen_paap_f(endog, instr, exog, cov_type, options, method="pinv"),
-        kp_f,
-        rtol=1e-8,
+        kleibergen_paap_f(endog, instr, exog, cov_type, options), kp_f, rtol=1e-8
     )
-    assert_allclose(cragg_donald_f(endog, instr, exog, method="pinv"), cd_f, rtol=1e-8)
+    assert_allclose(cragg_donald_f(endog, instr, exog), cd_f, rtol=1e-8)
     assert_allclose(
-        cragg_donald(endog, instr, exog, method="pinv").stat,
-        cd_f * instr.shape[1],
-        rtol=1e-8,
+        cragg_donald(endog, instr, exog).stat, cd_f * instr.shape[1], rtol=1e-8
     )
 
 
@@ -208,12 +203,7 @@ def test_first_stage_reference_values(key):
     endog, controls, instr = simulated_inputs(spec)
     weights = SIMULATED_DATA.weights if weighted else None
     mod = IV2SLS(
-        SIMULATED_DATA.y_robust,
-        add_constant(controls),
-        endog,
-        instr,
-        weights=weights,
-        method="pinv",
+        SIMULATED_DATA.y_robust, add_constant(controls), endog, instr, weights=weights
     )
     first_stage = mod.fit(**COV_FIT_OPTIONS[cov]).first_stage
     underid, underid_df, cd_f, kp_f = REFERENCE[key]
@@ -227,13 +217,7 @@ def test_first_stage_reference_values(key):
 @pytest.mark.parametrize("fit_type", [IV2SLS, IVLIML, IVGMM])
 def test_first_stage_model_types(fit_type):
     endog, controls, instr = simulated_inputs("B")
-    mod = fit_type(
-        SIMULATED_DATA.y_robust,
-        add_constant(controls),
-        endog,
-        instr,
-        **method_kwargs(fit_type),
-    )
+    mod = fit_type(SIMULATED_DATA.y_robust, add_constant(controls), endog, instr)
     first_stage = mod.fit(cov_type="robust").first_stage
     assert_allclose(
         first_stage.kleibergen_paap.stat, REFERENCE["B|robust"][0], rtol=1e-8
@@ -257,20 +241,18 @@ def test_first_stage_model_types(fit_type):
 )
 def test_cov_type_aliases(alias, canonical, key):
     (endog, instr, exog), _, options = function_arguments(key)
-    expected = kleibergen_paap(endog, instr, exog, canonical, options, method="pinv")
-    result = kleibergen_paap(endog, instr, exog, alias, options, method="pinv")
+    expected = kleibergen_paap(endog, instr, exog, canonical, options)
+    result = kleibergen_paap(endog, instr, exog, alias, options)
     assert_allclose(result.stat, expected.stat)
     assert_allclose(
-        kleibergen_paap_f(endog, instr, exog, alias, options, method="pinv"),
-        kleibergen_paap_f(endog, instr, exog, canonical, options, method="pinv"),
+        kleibergen_paap_f(endog, instr, exog, alias, options),
+        kleibergen_paap_f(endog, instr, exog, canonical, options),
     )
 
 
 def test_aliases_through_model():
     endog, controls, instr = simulated_inputs("B")
-    mod = IV2SLS(
-        SIMULATED_DATA.y_robust, add_constant(controls), endog, instr, method="pinv"
-    )
+    mod = IV2SLS(SIMULATED_DATA.y_robust, add_constant(controls), endog, instr)
     for alias in ("hccm", "heteroskedastic", "robust"):
         first_stage = mod.fit(cov_type=alias).first_stage
         assert_allclose(first_stage.kleibergen_paap.stat, REFERENCE["B|robust"][0])
@@ -285,15 +267,13 @@ def test_unadjusted_is_anderson_and_cragg_donald(nendog):
     x, z, exog = random_design(nendog, nendog=nendog, ninstr=5)
     nobs = x.shape[0]
     r2 = canonical_correlations(x, z, exog)[-1] ** 2
-    lm = kleibergen_paap(x, z, exog, "unadjusted", method="pinv")
+    lm = kleibergen_paap(x, z, exog, "unadjusted")
     assert_allclose(lm.stat, nobs * r2)
     assert lm.df == 5 - nendog + 1
-    cd = cragg_donald(x, z, exog, method="pinv")
+    cd = cragg_donald(x, z, exog)
     assert_allclose(cd.stat, (nobs - 5 - 2) * r2 / (1 - r2))
-    assert_allclose(cragg_donald_f(x, z, exog, method="pinv"), cd.stat / 5)
-    assert_allclose(
-        kleibergen_paap_f(x, z, exog, "unadjusted", method="pinv"), cd.stat / 5
-    )
+    assert_allclose(cragg_donald_f(x, z, exog), cd.stat / 5)
+    assert_allclose(kleibergen_paap_f(x, z, exog, "unadjusted"), cd.stat / 5)
 
 
 def test_cragg_donald_single_endogenous_is_classical_f():
@@ -303,8 +283,8 @@ def test_cragg_donald_single_endogenous_is_classical_f():
     full = partial_out(x, np.c_[exog, z])
     rss_r, rss_u = float((restricted**2).sum()), float((full**2).sum())
     classical_f = (rss_r - rss_u) / 3 / (rss_u / (nobs - 3 - 2))
-    assert_allclose(cragg_donald_f(x, z, exog, method="pinv"), classical_f)
-    assert_allclose(cragg_donald(x, z, exog, method="pinv").stat, 3 * classical_f)
+    assert_allclose(cragg_donald_f(x, z, exog), classical_f)
+    assert_allclose(cragg_donald(x, z, exog).stat, 3 * classical_f)
 
 
 @pytest.mark.parametrize("seed", range(4))
@@ -312,9 +292,7 @@ def test_cragg_donald_matches_canonical_correlations(seed):
     x, z, exog = random_design(seed, nendog=seed % 3 + 1, ninstr=4 + seed % 2)
     r2 = canonical_correlations(x, z, exog)[-1] ** 2
     nobs, k = z.shape[0], z.shape[1]
-    assert_allclose(
-        cragg_donald(x, z, exog, method="pinv").stat, (nobs - k - 2) * r2 / (1 - r2)
-    )
+    assert_allclose(cragg_donald(x, z, exog).stat, (nobs - k - 2) * r2 / (1 - r2))
 
 
 @pytest.mark.parametrize("nendog", [2, 3])
@@ -325,13 +303,9 @@ def test_robust_matches_paper_formulation(nendog):
     x, z, exog = random_design(20 + nendog, nendog=nendog, ninstr=5)
     nobs, k = x.shape[0], z.shape[1]
     lm_chi2, wald_chi2 = kp_paper(x, z, exog)
-    assert_allclose(
-        kleibergen_paap(x, z, exog, "robust", method="pinv").stat, lm_chi2, rtol=1e-8
-    )
+    assert_allclose(kleibergen_paap(x, z, exog, "robust").stat, lm_chi2, rtol=1e-8)
     expected_f = wald_chi2 / nobs * (nobs - k - 2) / k
-    assert_allclose(
-        kleibergen_paap_f(x, z, exog, "robust", method="pinv"), expected_f, rtol=1e-8
-    )
+    assert_allclose(kleibergen_paap_f(x, z, exog, "robust"), expected_f, rtol=1e-8)
 
 
 @pytest.mark.parametrize("clustered", [False, True])
@@ -345,13 +319,11 @@ def test_single_endogenous_f_is_first_stage_wald(clustered):
         nclusters = np.unique(clusters).shape[0]
         wald = first_stage_wald(x[:, 0], z, exog, clusters)
         expected = wald / (nobs - 1) * (nobs - k - 2) * (nclusters - 1) / nclusters / k
-        actual = kleibergen_paap_f(
-            x, z, exog, "clustered", {"clusters": clusters}, method="pinv"
-        )
+        actual = kleibergen_paap_f(x, z, exog, "clustered", {"clusters": clusters})
     else:
         wald = first_stage_wald(x[:, 0], z, exog)
         expected = wald / nobs * (nobs - k - 2) / k
-        actual = kleibergen_paap_f(x, z, exog, "robust", method="pinv")
+        actual = kleibergen_paap_f(x, z, exog, "robust")
     assert_allclose(actual, expected, rtol=1e-8)
 
 
@@ -364,46 +336,36 @@ def test_invariance_to_linear_transformations(cov_type):
     b = rs.standard_normal((4, 4))
     x2, z2 = 5.0 * x @ a, z @ b / 3.0
     for func in (kleibergen_paap, kleibergen_paap_f):
-        original = func(x, z, exog, cov_type, options, **method_kwargs(func))
-        transformed = func(x2, z2, exog, cov_type, options, **method_kwargs(func))
+        original = func(x, z, exog, cov_type, options)
+        transformed = func(x2, z2, exog, cov_type, options)
         if func is kleibergen_paap:
             original, transformed = original.stat, transformed.stat
         assert_allclose(transformed, original, rtol=1e-8)
-    assert_allclose(
-        cragg_donald_f(x2, z2, exog, method="pinv"),
-        cragg_donald_f(x, z, exog, method="pinv"),
-    )
-    assert_allclose(
-        cragg_donald(x2, z2, exog, method="pinv").stat,
-        cragg_donald(x, z, exog, method="pinv").stat,
-    )
+    assert_allclose(cragg_donald_f(x2, z2, exog), cragg_donald_f(x, z, exog))
+    assert_allclose(cragg_donald(x2, z2, exog).stat, cragg_donald(x, z, exog).stat)
 
 
 def test_invariant_to_ordering_of_endogenous():
     x, z, exog = random_design(50, nendog=3, ninstr=5)
-    original = kleibergen_paap(x, z, exog, "robust", method="pinv").stat
-    permuted = kleibergen_paap(x[:, [2, 0, 1]], z, exog, "robust", method="pinv").stat
+    original = kleibergen_paap(x, z, exog, "robust").stat
+    permuted = kleibergen_paap(x[:, [2, 0, 1]], z, exog, "robust").stat
     assert_allclose(permuted, original, rtol=1e-8)
 
 
 def test_no_exogenous_regressors():
     x, z, _ = random_design(60, nendog=2, ninstr=4)
     exog = np.empty((x.shape[0], 0))
-    lm = kleibergen_paap(x, z, exog, "robust", method="pinv")
+    lm = kleibergen_paap(x, z, exog, "robust")
     expected, _ = kp_paper(x, z, exog)
     assert_allclose(lm.stat, expected, rtol=1e-8)
-    assert np.isfinite(kleibergen_paap_f(x, z, exog, "robust", method="pinv"))
+    assert np.isfinite(kleibergen_paap_f(x, z, exog, "robust"))
 
 
 def test_clusters_as_column_vector():
     x, z, exog = random_design(70, nendog=2, ninstr=4)
     clusters = np.arange(x.shape[0]) // 10
-    expected = kleibergen_paap(
-        x, z, exog, "clustered", {"clusters": clusters}, method="pinv"
-    )
-    column = kleibergen_paap(
-        x, z, exog, "clustered", {"clusters": clusters[:, None]}, method="pinv"
-    )
+    expected = kleibergen_paap(x, z, exog, "clustered", {"clusters": clusters})
+    column = kleibergen_paap(x, z, exog, "clustered", {"clusters": clusters[:, None]})
     assert_allclose(column.stat, expected.stat)
 
 
@@ -414,23 +376,23 @@ def test_clusters_as_column_vector():
 )
 def test_kernel_options(options):
     x, z, exog = random_design(80, nendog=2, ninstr=4, heteroskedastic=False)
-    test = kleibergen_paap(x, z, exog, "kernel", options, method="pinv")
+    test = kleibergen_paap(x, z, exog, "kernel", options)
     assert isinstance(test, WaldTestStatistic)
     assert np.isfinite(test.stat)
     assert test.df == 3
-    assert np.isfinite(kleibergen_paap_f(x, z, exog, "kernel", options, method="pinv"))
+    assert np.isfinite(kleibergen_paap_f(x, z, exog, "kernel", options))
 
 
 def test_kernel_bandwidth_changes_result():
     x, z, exog = random_design(81, nendog=2, ninstr=4)
-    short = kleibergen_paap(x, z, exog, "kernel", {"bandwidth": 1}, method="pinv").stat
-    long = kleibergen_paap(x, z, exog, "kernel", {"bandwidth": 12}, method="pinv").stat
+    short = kleibergen_paap(x, z, exog, "kernel", {"bandwidth": 1}).stat
+    long = kleibergen_paap(x, z, exog, "kernel", {"bandwidth": 12}).stat
     assert short != pytest.approx(long, rel=1e-6)
 
 
 def test_exactly_identified():
     x, z, exog = random_design(90, nendog=2, ninstr=2)
-    test = kleibergen_paap(x, z, exog, "robust", method="pinv")
+    test = kleibergen_paap(x, z, exog, "robust")
     assert test.df == 1
     lm_chi2, _ = kp_paper(x, z, exog)
     assert_allclose(test.stat, lm_chi2, rtol=1e-8)
@@ -439,7 +401,7 @@ def test_exactly_identified():
 @pytest.mark.parametrize("func", [cragg_donald, kleibergen_paap])
 def test_no_endogenous(func):
     x, z, exog = random_design(100, nendog=2, ninstr=4)
-    result = func(np.empty((x.shape[0], 0)), z, exog, **method_kwargs(func))
+    result = func(np.empty((x.shape[0], 0)), z, exog)
     assert isinstance(result, InvalidTestStatistic)
     assert np.isnan(result.pval)
     assert "no endogenous regressors" in str(result)
@@ -448,7 +410,7 @@ def test_no_endogenous(func):
 @pytest.mark.parametrize("func", [cragg_donald, kleibergen_paap])
 def test_too_few_instruments(func):
     x, z, exog = random_design(101, nendog=3, ninstr=4)
-    result = func(x, z[:, :2], exog, **method_kwargs(func))
+    result = func(x, z[:, :2], exog)
     assert isinstance(result, InvalidTestStatistic)
     assert "less than the number of endogenous" in str(result)
 
@@ -457,7 +419,7 @@ def test_too_few_instruments(func):
 def test_collinear_endogenous(func):
     x, z, exog = random_design(102, nendog=2, ninstr=4)
     x = np.c_[x, x[:, 0] + 2 * x[:, 1]]
-    result = func(x, z, exog, **method_kwargs(func))
+    result = func(x, z, exog)
     assert isinstance(result, InvalidTestStatistic)
     assert "endogenous regressors are collinear" in str(result)
 
@@ -466,7 +428,7 @@ def test_collinear_endogenous(func):
 def test_collinear_instruments(func):
     x, z, exog = random_design(103, nendog=2, ninstr=4)
     z = np.c_[z, z[:, 0] - z[:, 1]]
-    result = func(x, z, exog, **method_kwargs(func))
+    result = func(x, z, exog)
     assert isinstance(result, InvalidTestStatistic)
     assert "instruments are collinear" in str(result)
 
@@ -476,7 +438,7 @@ def test_exact_first_stage(func):
     x, z, exog = random_design(104, nendog=2, ninstr=4)
     rs = np.random.RandomState(0)
     x = z @ rs.standard_normal((4, 2)) + exog @ rs.standard_normal((2, 2))
-    result = func(x, z, exog, **method_kwargs(func))
+    result = func(x, z, exog)
     assert isinstance(result, InvalidTestStatistic)
     assert "exactly predicted" in str(result)
 
@@ -484,16 +446,13 @@ def test_exact_first_stage(func):
 def test_invalid_statistics_have_nan_f():
     x, z, exog = random_design(105, nendog=2, ninstr=4)
     empty = np.empty((x.shape[0], 0))
-    assert np.isnan(cragg_donald_f(empty, z, exog, method="pinv"))
-    assert np.isnan(kleibergen_paap_f(empty, z, exog, "robust", method="pinv"))
+    assert np.isnan(cragg_donald_f(empty, z, exog))
+    assert np.isnan(kleibergen_paap_f(empty, z, exog, "robust"))
 
 
 def test_null_hypothesis_is_underidentification():
     x, z, exog = random_design(106, nendog=2, ninstr=4)
-    for test in (
-        cragg_donald(x, z, exog, method="pinv"),
-        kleibergen_paap(x, z, exog, "robust", method="pinv"),
-    ):
+    for test in (cragg_donald(x, z, exog), kleibergen_paap(x, z, exog, "robust")):
         assert "underidentified" in test.null
         assert "does not have full column rank" in test.null
         assert "jointly identify" not in test.null
@@ -503,54 +462,41 @@ def test_null_hypothesis_is_underidentification():
 
 def test_names():
     x, z, exog = random_design(107)
-    assert "Cragg-Donald" in str(cragg_donald(x, z, exog, method="pinv"))
-    assert "Kleibergen-Paap" in str(
-        kleibergen_paap(x, z, exog, "robust", method="pinv")
-    )
+    assert "Cragg-Donald" in str(cragg_donald(x, z, exog))
+    assert "Kleibergen-Paap" in str(kleibergen_paap(x, z, exog, "robust"))
 
 
 def test_unsupported_cov_type():
     x, z, exog = random_design(108)
     with pytest.raises(ValueError, match="Unknown cov_type"):
-        kleibergen_paap(x, z, exog, "unknown", method="pinv")
+        kleibergen_paap(x, z, exog, "unknown")
     with pytest.raises(ValueError, match="Unknown cov_type"):
-        kleibergen_paap_f(x, z, exog, "unknown", method="pinv")
+        kleibergen_paap_f(x, z, exog, "unknown")
 
 
 def test_clusters_required():
     x, z, exog = random_design(109)
     with pytest.raises(ValueError, match="clusters are required"):
-        kleibergen_paap(x, z, exog, "clustered", method="pinv")
+        kleibergen_paap(x, z, exog, "clustered")
     with pytest.raises(ValueError, match="clusters are required"):
-        kleibergen_paap(x, z, exog, "clustered", {"clusters": None}, method="pinv")
+        kleibergen_paap(x, z, exog, "clustered", {"clusters": None})
 
 
 def test_clusters_wrong_length():
     x, z, exog = random_design(110)
     with pytest.raises(ValueError, match="clusters has the wrong nobs"):
         kleibergen_paap(
-            x,
-            z,
-            exog,
-            "clustered",
-            {"clusters": np.arange(x.shape[0] - 1)},
-            method="pinv",
+            x, z, exog, "clustered", {"clusters": np.arange(x.shape[0] - 1)}
         )
 
 
 def test_two_way_clustering_not_supported():
     x, z, exog = random_design(111)
     clusters = np.c_[np.arange(x.shape[0]) // 10, np.arange(x.shape[0]) // 7]
-    result = kleibergen_paap(
-        x, z, exog, "clustered", {"clusters": clusters}, method="pinv"
-    )
+    result = kleibergen_paap(x, z, exog, "clustered", {"clusters": clusters})
     assert isinstance(result, InvalidTestStatistic)
     assert "two-way clustering" in str(result)
-    assert np.isnan(
-        kleibergen_paap_f(
-            x, z, exog, "clustered", {"clusters": clusters}, method="pinv"
-        )
-    )
+    assert np.isnan(kleibergen_paap_f(x, z, exog, "clustered", {"clusters": clusters}))
 
 
 def test_too_few_clusters_warns_and_reduces_df():
@@ -560,32 +506,22 @@ def test_too_few_clusters_warns_and_reduces_df():
     x, z, exog = random_design(112, nendog=1, ninstr=5)
     clusters = np.arange(x.shape[0]) // 100
     with pytest.warns(UserWarning, match="rank deficient"):
-        test = kleibergen_paap(
-            x, z, exog, "clustered", {"clusters": clusters}, method="pinv"
-        )
+        test = kleibergen_paap(x, z, exog, "clustered", {"clusters": clusters})
     assert test.df == 3
     assert np.isfinite(test.stat)
     with pytest.warns(UserWarning, match="rank deficient"):
         assert np.isfinite(
-            kleibergen_paap_f(
-                x, z, exog, "clustered", {"clusters": clusters}, method="pinv"
-            )
+            kleibergen_paap_f(x, z, exog, "clustered", {"clusters": clusters})
         )
 
 
 def test_one_cluster_is_invalid():
     x, z, exog = random_design(113, nendog=1, ninstr=3)
     clusters = np.zeros(x.shape[0], dtype=int)
-    test = kleibergen_paap(
-        x, z, exog, "clustered", {"clusters": clusters}, method="pinv"
-    )
+    test = kleibergen_paap(x, z, exog, "clustered", {"clusters": clusters})
     assert isinstance(test, InvalidTestStatistic)
     assert "at least two clusters" in str(test)
-    assert np.isnan(
-        kleibergen_paap_f(
-            x, z, exog, "clustered", {"clusters": clusters}, method="pinv"
-        )
-    )
+    assert np.isnan(kleibergen_paap_f(x, z, exog, "clustered", {"clusters": clusters}))
 
 
 def test_singular_covariance_is_invalid():
@@ -598,14 +534,10 @@ def test_singular_covariance_is_invalid():
     x_full, z_full = np.r_[x, x], np.r_[z, -z]
     clusters = np.r_[np.arange(half), np.arange(half)]
     exog = np.empty((2 * half, 0))
-    result = kleibergen_paap(
-        x_full, z_full, exog, "clustered", {"clusters": clusters}, method="pinv"
-    )
+    result = kleibergen_paap(x_full, z_full, exog, "clustered", {"clusters": clusters})
     assert isinstance(result, InvalidTestStatistic)
     assert "singular" in str(result)
-    nan = kleibergen_paap_f(
-        x_full, z_full, exog, "clustered", {"clusters": clusters}, method="pinv"
-    )
+    nan = kleibergen_paap_f(x_full, z_full, exog, "clustered", {"clusters": clusters})
     assert np.isnan(nan)
 
 
@@ -624,9 +556,7 @@ def test_first_stage_kernel_default_bandwidth():
     # The model selects the bandwidth when it is not provided, and the
     # statistic uses the one that the model selected
     endog, controls, instr = simulated_inputs("B")
-    mod = IV2SLS(
-        SIMULATED_DATA.y_robust, add_constant(controls), endog, instr, method="pinv"
-    )
+    mod = IV2SLS(SIMULATED_DATA.y_robust, add_constant(controls), endog, instr)
     res = mod.fit(cov_type="kernel")
     bandwidth = res.cov_config["bandwidth"]
     explicit = mod.fit(cov_type="kernel", bandwidth=bandwidth).first_stage
@@ -638,9 +568,7 @@ def test_first_stage_kernel_default_bandwidth():
 
 def test_debiased_has_no_effect():
     endog, controls, instr = simulated_inputs("B")
-    mod = IV2SLS(
-        SIMULATED_DATA.y_robust, add_constant(controls), endog, instr, method="pinv"
-    )
+    mod = IV2SLS(SIMULATED_DATA.y_robust, add_constant(controls), endog, instr)
     plain = mod.fit(cov_type="robust").first_stage
     debiased = mod.fit(cov_type="robust", debiased=True).first_stage
     assert_allclose(debiased.kleibergen_paap.stat, plain.kleibergen_paap.stat)
@@ -649,9 +577,7 @@ def test_debiased_has_no_effect():
 
 def test_first_stage_clusters_are_used():
     endog, controls, instr = simulated_inputs("B")
-    mod = IV2SLS(
-        SIMULATED_DATA.y_robust, add_constant(controls), endog, instr, method="pinv"
-    )
+    mod = IV2SLS(SIMULATED_DATA.y_robust, add_constant(controls), endog, instr)
     robust = mod.fit(cov_type="robust").first_stage
     clustered = mod.fit(
         cov_type="clustered", clusters=SIMULATED_DATA.cluster_id

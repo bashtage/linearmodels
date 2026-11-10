@@ -44,7 +44,7 @@ def iv_model(rng, missing):
         y[3] = np.nan
         endog[40] = np.nan
         instruments[77, 0] = np.nan
-    return IV2SLS(y, exog, endog, instruments, method="pinv")
+    return IV2SLS(y, exog, endog, instruments)
 
 
 def absorbing_model(rng, missing):

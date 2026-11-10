@@ -313,7 +313,7 @@ def test_categorical_missing_values_in_a_model() -> None:
     y = y + rng.standard_normal(nobs)
     exog = pd.DataFrame({"const": 1.0, "x": x, "g": pd.Categorical(labels)})
     with pytest.warns(MissingValueWarning, match="missing values"):
-        res = IV2SLS(y, exog, None, None, method="pinv").fit()
+        res = IV2SLS(y, exog, None, None).fit()
 
     keep = exog["g"].notna().to_numpy()
     dummies = pd.get_dummies(

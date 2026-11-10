@@ -297,7 +297,6 @@ def test_weighted_just_identified_against_iv2sls():
             eqn["endog"],
             eqn["instruments"],
             weights=weights,
-            method="pinv",
         ).fit(cov_type="unadjusted")
         params = res.params[[f"{key}_{col}" for col in iv2sls.params.index]]
         assert_allclose(params.values, iv2sls.params.values)

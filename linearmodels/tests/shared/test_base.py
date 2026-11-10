@@ -58,11 +58,7 @@ def test_summary_latex_end_to_end():
         endog["my_x"] + rng.standard_normal(nobs), name="my_y", dtype=float
     )
     exog = pd.DataFrame({"my_const": np.ones(nobs)})
-    latex = (
-        IV2SLS(dependent, exog, endog, instruments, method="pinv")
-        .fit()
-        .summary.as_latex()
-    )
+    latex = IV2SLS(dependent, exog, endog, instruments).fit().summary.as_latex()
     assert r"Endogenous: my\_x" in latex
     assert r"Instruments: my\_z1, my\_z2" in latex
     assert "my_x" not in latex

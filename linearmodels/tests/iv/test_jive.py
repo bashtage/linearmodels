@@ -307,7 +307,7 @@ def test_without_endogenous_variables_jive_is_ols(cov_type, debiased, weighted):
     jive = IVJIVE(y, exog, None, None, weights=w).fit(
         cov_type=cov_type, debiased=debiased, **options
     )
-    ols = IV2SLS(y, exog, None, None, weights=w, method="pinv").fit(
+    ols = IV2SLS(y, exog, None, None, weights=w).fit(
         cov_type=cov_type, debiased=debiased, **options
     )
     assert_allclose(jive.params, ols.params, rtol=1e-10)
@@ -437,7 +437,7 @@ def test_many_instruments_is_not_2sls():
     # JIVE differs from 2SLS when the leverages are not small
     y, exog, endog, z = simulate(28, nobs=60, ninstr=20)
     jive = IVJIVE(y, exog, endog, z).fit()
-    tsls = IV2SLS(y, exog, endog, z, method="pinv").fit()
+    tsls = IV2SLS(y, exog, endog, z).fit()
     assert abs(jive.params.iloc[-1] - tsls.params.iloc[-1]) > 1e-3
 
 
@@ -588,7 +588,7 @@ def test_two_way_clusters_are_not_supported():
     nobs = y.shape[0]
     two_way = np.column_stack([np.arange(nobs) // 10, np.arange(nobs) % 7])
     # The other models do support two-way clustering
-    IV2SLS(y, exog, endog, z, method="pinv").fit(cov_type="clustered", clusters=two_way)
+    IV2SLS(y, exog, endog, z).fit(cov_type="clustered", clusters=two_way)
     with pytest.raises(ValueError, match="one-way clustering"):
         IVJIVE(y, exog, endog, z).fit(cov_type="clustered", clusters=two_way)
     # A column is one-way clustering
@@ -644,9 +644,7 @@ def test_unknown_kernel():
     with pytest.raises(ValueError, match="Unknown kernel: 'unknown'"):
         IVJIVE(y, exog, endog, z).fit(cov_type="kernel", kernel="unknown", bandwidth=3)
     with pytest.raises(ValueError, match="Unknown kernel: 'unknown'"):
-        IV2SLS(y, exog, endog, z, method="pinv").fit(
-            cov_type="kernel", kernel="unknown"
-        )
+        IV2SLS(y, exog, endog, z).fit(cov_type="kernel", kernel="unknown")
 
 
 def test_options_for_a_different_covariance_estimator_are_not_ignored():
@@ -704,7 +702,7 @@ def test_endogenous_variable_that_is_an_instrument():
     y, exog, _, z = simulate(31)
     endog = z[:, :1] + 0.0
     res = IVJIVE(y, exog, endog, z).fit()
-    ols = IV2SLS(y, np.column_stack([exog, endog]), None, None, method="pinv").fit()
+    ols = IV2SLS(y, np.column_stack([exog, endog]), None, None).fit()
     assert_allclose(res.params.to_numpy(), ols.params.to_numpy(), rtol=1e-8)
     assert_allclose(res.cov.to_numpy(), ols.cov.to_numpy(), rtol=1e-7)
 
@@ -768,11 +766,7 @@ def test_pandas_names_and_index_are_kept():
         data.y_robust, data[["const", "x3"]], data[["x1"]], data[["z1", "z2", "x4"]]
     ).fit()
     tsls = IV2SLS(
-        data.y_robust,
-        data[["const", "x3"]],
-        data[["x1"]],
-        data[["z1", "z2", "x4"]],
-        method="pinv",
+        data.y_robust, data[["const", "x3"]], data[["x1"]], data[["z1", "z2", "x4"]]
     ).fit()
     assert list(res.params.index) == ["const", "x3", "x1"]
     assert list(res.std_errors.index) == ["const", "x3", "x1"]
@@ -788,7 +782,7 @@ def test_pandas_names_and_index_are_kept():
 def test_numpy_names_match_the_other_models():
     y, exog, endog, z = simulate(15)
     jive = IVJIVE(y, exog, endog, z).fit()
-    tsls = IV2SLS(y, exog, endog, z, method="pinv").fit()
+    tsls = IV2SLS(y, exog, endog, z).fit()
     assert list(jive.params.index) == list(tsls.params.index)
 
 
@@ -849,7 +843,7 @@ def test_overidentification_tests_agree_with_2sls_data():
     # only depends on the data
     y, exog, endog, z = simulate(15)
     jive = IVJIVE(y, exog, endog, z).fit()
-    tsls = IV2SLS(y, exog, endog, z, method="pinv").fit()
+    tsls = IV2SLS(y, exog, endog, z).fit()
     assert_allclose(jive.anderson_rubin.stat, tsls.anderson_rubin.stat)
     assert_allclose(jive.basmann_f.stat, tsls.basmann_f.stat)
 
@@ -858,7 +852,7 @@ def test_first_stage_is_the_same_as_for_2sls():
     # The first stage does not depend on the estimator
     y, exog, endog, z = simulate(16, nendog=2)
     jive = IVJIVE(y, exog, endog, z).fit(cov_type="unadjusted")
-    tsls = IV2SLS(y, exog, endog, z, method="pinv").fit(cov_type="unadjusted")
+    tsls = IV2SLS(y, exog, endog, z).fit(cov_type="unadjusted")
     pd.testing.assert_frame_equal(
         jive.first_stage.diagnostics, tsls.first_stage.diagnostics, rtol=1e-10
     )
@@ -902,7 +896,7 @@ def test_compare_with_other_estimators():
     y, exog, endog, z = simulate(32)
     results = {
         "JIVE": IVJIVE(y, exog, endog, z).fit(),
-        "2SLS": IV2SLS(y, exog, endog, z, method="pinv").fit(),
+        "2SLS": IV2SLS(y, exog, endog, z).fit(),
     }
     comparison = compare(results)
     text = str(comparison.summary)

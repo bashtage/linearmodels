@@ -2,7 +2,6 @@
 
 from collections.abc import Mapping
 from contextlib import nullcontext
-import inspect
 import re
 
 import numpy as np
@@ -147,33 +146,3 @@ def warns_if_default_bandwidth(**options):
     if options.get("bandwidth") is None and options.get("optimal_bw") is None:
         return pytest.warns(DefaultBandwidthWarning, match=r"7\.1")
     return nullcontext()
-
-
-def method_kwargs(model, method="pinv"):
-    """
-    The numerical method for the models and functions that take one
-
-    IV2SLS and IVLIML, their from_formula, the formula functions iv_2sls and iv_liml
-    and the IV covariance estimators and rank tests warn if method is not given. The
-    tests pass it explicitly, also when the model is a parameter that can be another
-    estimator, which does not take method.
-
-    Parameters
-    ----------
-    model : callable
-        A model class or a function.
-    method : str, optional
-        The numerical method. The default is "pinv".
-
-    Returns
-    -------
-    dict
-        {"method": method} if model takes method, otherwise an empty dict.
-    """
-    if not getattr(model, "__module__", "").startswith(
-        ("linearmodels.iv", "linearmodels.formula")
-    ):
-        return {}
-    parameters = inspect.signature(model).parameters
-    takes_method = "method" in parameters and parameters["method"].default is None
-    return {"method": method} if takes_method else {}

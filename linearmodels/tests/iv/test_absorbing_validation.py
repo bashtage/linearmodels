@@ -208,8 +208,8 @@ def test_cluster_message_names_only_what_the_models_have(data):
     endog = (z.sum(axis=1) + x["x0"]).to_frame("e")
     with pytest.warns(MissingValueWarning, match="missing values"):
         models = {
-            "IV2SLS": IV2SLS(y, x, endog, z, method="pinv"),
-            "IVLIML": IVLIML(y, x, endog, z, method="pinv"),
+            "IV2SLS": IV2SLS(y, x, endog, z),
+            "IVLIML": IVLIML(y, x, endog, z),
             "AbsorbingLS": AbsorbingLS(y, x, absorb=cats),
         }
     for name, mod in models.items():
@@ -255,7 +255,7 @@ def test_liml_kappa_message(data, monkeypatch):
 
     monkeypatch.setattr(_IVModelBase, "_estimate_kappa", fail)
     with pytest.raises(ValueError, match="Unable to estimate kappa") as info:
-        IVLIML(y, x, endog, z, method="pinv").fit()
+        IVLIML(y, x, endog, z).fit()
     message = str(info.value)
     assert (
         "This most likely occurs if the instrument matrix is rank deficient." in message

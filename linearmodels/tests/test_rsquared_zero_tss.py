@@ -311,8 +311,8 @@ def iv_data(seed=0):
 
 IV_MODELS = {
     "OLS": lambda y, d, w: _OLS(y, d[1], weights=w),
-    "IV2SLS": lambda y, d, w: IV2SLS(y, d[1], d[2], d[3], weights=w, method="pinv"),
-    "IVLIML": lambda y, d, w: IVLIML(y, d[1], d[2], d[3], weights=w, method="pinv"),
+    "IV2SLS": lambda y, d, w: IV2SLS(y, d[1], d[2], d[3], weights=w),
+    "IVLIML": lambda y, d, w: IVLIML(y, d[1], d[2], d[3], weights=w),
     "IVJIVE": lambda y, d, w: IVJIVE(y, d[1], d[2], d[3], weights=w),
     "IVGMM": lambda y, d, w: IVGMM(y, d[1], d[2], d[3], weights=w),
     "AbsorbingLS": lambda y, d, w: AbsorbingLS(y, d[1], absorb=d[4], weights=w),
@@ -351,7 +351,7 @@ def test_all_zero_dependent_variable_iv(name):
 def test_iv_model_without_a_constant_is_not_centered():
     x, _, endog, z, _ = iv_data()
     y = np.full(NIV, 5.0)
-    res = IV2SLS(y, x, endog, z, method="pinv").fit()
+    res = IV2SLS(y, x, endog, z).fit()
     assert_allclose(res.total_ss, 25.0 * NIV)
     assert_allclose(res.rsquared, 1 - res.resid_ss / res.total_ss, rtol=1e-12)
     assert_finite(res, ["rsquared", "rsquared_adj"])
@@ -389,7 +389,7 @@ def test_adjusted_r_squared_without_residual_degrees_of_freedom():
     # observations. It was a ZeroDivisionError, which the summary raised as well
     rg = np.random.default_rng(10)
     exog = np.c_[np.ones(4), rg.standard_normal((4, 3))]
-    res = IV2SLS(rg.standard_normal(4), exog, None, None, method="pinv").fit()
+    res = IV2SLS(rg.standard_normal(4), exog, None, None).fit()
     assert_allclose(res.rsquared, 1.0)
     assert_nan(res, ["rsquared_adj"])
     assert_summary_has(res, "Adj. R-squared")

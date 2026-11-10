@@ -61,7 +61,6 @@ from linearmodels.panel.covariance import FamaMacBethCovariance
 from linearmodels.shared.exceptions import DefaultBandwidthWarning, MissingValueWarning
 from linearmodels.system import IV3SLS, SUR, IVSystemGMM
 from linearmodels.system.gmm import KernelWeightMatrix as SystemKernelWeightMatrix
-from linearmodels.tests._utility import method_kwargs
 
 BARTLETT = ("bartlett", "newey-west")
 PARZEN = ("parzen", "gallant")
@@ -642,7 +641,7 @@ IV_MODELS = [IV2SLS, IVLIML, IVJIVE]
 def test_iv_models_raise_when_fit_with_too_few_observations(model, kernel):
     nobs = fewest_observations(kernel) - 1
     # Without the constant, see the explicit bandwidth test below
-    mod = model(*iv_args(iv_data(nobs), constant=False), **method_kwargs(model))
+    mod = model(*iv_args(iv_data(nobs), constant=False))
     with pytest.raises(ValueError, match=re.escape(too_few_message(kernel, nobs))):
         mod.fit(cov_type="kernel", kernel=kernel)
 
@@ -651,9 +650,7 @@ def test_iv_models_raise_when_fit_with_too_few_observations(model, kernel):
 @pytest.mark.parametrize("model", IV_MODELS)
 def test_iv_models_with_the_fewest_observations(model, kernel):
     nobs = fewest_observations(kernel)
-    res = model(*iv_args(iv_data(nobs)), **method_kwargs(model)).fit(
-        cov_type="kernel", kernel=kernel
-    )
+    res = model(*iv_args(iv_data(nobs))).fit(cov_type="kernel", kernel=kernel)
     bandwidth = res.cov_config["bandwidth"]
     assert 0 <= bandwidth <= nobs - 1
     check_covariance_is_finite(res)
@@ -670,7 +667,7 @@ def test_iv_models_explicit_bandwidth_works_with_the_observations_that_raise(
     # the 3 observations of the Bartlett kernel leave 1 for 2, and a matrix with an
     # eigenvalue that is rounding error is inverted: kappa was NaN on macOS arm64 and
     # rounding error elsewhere. Without the constant, the model is well posed.
-    mod = model(*iv_args(iv_data(nobs), constant=False), **method_kwargs(model))
+    mod = model(*iv_args(iv_data(nobs), constant=False))
     res = mod.fit(cov_type="kernel", kernel=kernel, bandwidth=1)
     assert res.cov_config["bandwidth"] == 1
     check_covariance_is_finite(res)
@@ -681,7 +678,7 @@ def test_iv_models_explicit_bandwidth_works_with_the_observations_that_raise(
 def test_iv2sls_automatic_bandwidth_is_the_rule_for_the_scores(kernel, extra):
     nobs = fewest_observations(kernel) + extra
     data = iv_data(nobs)
-    res = IV2SLS(*iv_args(data), method="pinv").fit(cov_type="kernel", kernel=kernel)
+    res = IV2SLS(*iv_args(data)).fit(cov_type="kernel", kernel=kernel)
     x, _, y, xhat, params = two_stage_least_squares(data)
     assert_allclose(res.params, params, rtol=1e-8)
     # The scores of the regressors that are not the constant: xhat * eps
@@ -718,11 +715,7 @@ def test_absorbing_ls_with_the_fewest_observations(kernel):
 def test_gmm_weights_raise_when_fit_with_too_few_observations(model, kernel):
     nobs = fewest_observations(kernel) - 1
     mod = model(
-        *iv_args(iv_data(nobs)),
-        weight_type="kernel",
-        kernel=kernel,
-        optimal_bw=True,
-        **method_kwargs(model),
+        *iv_args(iv_data(nobs)), weight_type="kernel", kernel=kernel, optimal_bw=True
     )
     with pytest.raises(ValueError, match=re.escape(too_few_message(kernel, nobs))):
         mod.fit()
@@ -739,7 +732,7 @@ def test_gmm_kernel_covariance_raises_when_fit_with_too_few_observations(kernel)
 @pytest.mark.parametrize("model", [IVGMM, IVGMMCUE])
 def test_gmm_default_bandwidth_raises_when_fit_with_too_few_observations(model):
     # The default is to estimate the bandwidth, and fit warns about the change
-    mod = model(*iv_args(iv_data(3)), weight_type="kernel", **method_kwargs(model))
+    mod = model(*iv_args(iv_data(3)), weight_type="kernel")
     with pytest.warns(DefaultBandwidthWarning):
         with pytest.raises(ValueError, match=re.escape(too_few_message("bartlett", 3))):
             mod.fit()
@@ -750,18 +743,10 @@ def test_gmm_default_bandwidth_raises_when_fit_with_too_few_observations(model):
 def test_gmm_explicit_bandwidth_works_with_the_observations_that_raise(model, kernel):
     nobs = fewest_observations(kernel) - 1
     args = iv_args(iv_data(nobs))
-    explicit = model(
-        *args, weight_type="kernel", kernel=kernel, bandwidth=1, **method_kwargs(model)
-    ).fit()
+    explicit = model(*args, weight_type="kernel", kernel=kernel, bandwidth=1).fit()
     assert explicit.weight_config["bandwidth"] == 1
     # The bandwidth of 7.0, which the weight matrix can be restored to
-    restored = model(
-        *args,
-        weight_type="kernel",
-        kernel=kernel,
-        optimal_bw=False,
-        **method_kwargs(model),
-    ).fit()
+    restored = model(*args, weight_type="kernel", kernel=kernel, optimal_bw=False).fit()
     assert restored.weight_config["bandwidth"] == nobs - 2
 
 
@@ -780,7 +765,6 @@ def test_gmm_weight_bandwidth_is_the_rule_for_the_first_step_residuals(
         weight_type="kernel",
         kernel=kernel,
         optimal_bw=True,
-        **method_kwargs(model),
     )
     res = mod.fit()
     x, z, y, params = gmm_step_one(data)
@@ -844,9 +828,7 @@ RANK_TEST_ENOUGH = [("bartlett", 4), ("parzen", 5), ("qs", 6)]
 def test_rank_tests_raise_with_too_few_observations(statistic, kernel, nobs):
     endog, instr, exog = rank_test_arrays(nobs)
     with pytest.raises(ValueError, match=re.escape(too_few_message(kernel, nobs))):
-        statistic(
-            endog, instr, exog, "kernel", {"kernel": kernel}, **method_kwargs(statistic)
-        )
+        statistic(endog, instr, exog, "kernel", {"kernel": kernel})
 
 
 @pytest.mark.parametrize("statistic", [kleibergen_paap, kleibergen_paap_f])
@@ -856,7 +838,7 @@ def test_rank_tests_with_an_explicit_bandwidth_work_with_too_few_observations(
 ):
     endog, instr, exog = rank_test_arrays(nobs)
     config = {"kernel": kernel, "bandwidth": 1}
-    result = statistic(endog, instr, exog, "kernel", config, **method_kwargs(statistic))
+    result = statistic(endog, instr, exog, "kernel", config)
     # kleibergen_paap returns a test statistic and kleibergen_paap_f a float
     value = float(getattr(result, "stat", result))
     finite = np.isfinite(value)
@@ -866,9 +848,7 @@ def test_rank_tests_with_an_explicit_bandwidth_work_with_too_few_observations(
 @pytest.mark.parametrize(("kernel", "nobs"), RANK_TEST_ENOUGH)
 def test_rank_tests_with_enough_observations(kernel, nobs):
     endog, instr, exog = rank_test_arrays(nobs)
-    stat = kleibergen_paap_f(
-        endog, instr, exog, "kernel", {"kernel": kernel}, method="pinv"
-    )
+    stat = kleibergen_paap_f(endog, instr, exog, "kernel", {"kernel": kernel})
     finite = np.isfinite(stat)
     assert finite
 
@@ -923,7 +903,7 @@ def test_system_models_raise_when_fit_with_too_few_observations(
     model, endogenous, kernel
 ):
     nobs = fewest_observations(kernel) - 1
-    mod = model(system_equations(nobs, endogenous), **method_kwargs(model))
+    mod = model(system_equations(nobs, endogenous))
     with pytest.raises(ValueError, match=re.escape(too_few_message(kernel, nobs))):
         mod.fit(cov_type="kernel", kernel=kernel)
 
@@ -932,7 +912,7 @@ def test_system_models_raise_when_fit_with_too_few_observations(
 @pytest.mark.parametrize(("model", "endogenous"), [(SUR, False), (IV3SLS, True)])
 def test_system_models_with_the_fewest_observations(model, endogenous, kernel):
     nobs = fewest_observations(kernel)
-    mod = model(system_equations(nobs, endogenous), **method_kwargs(model))
+    mod = model(system_equations(nobs, endogenous))
     res = mod.fit(cov_type="kernel", kernel=kernel)
     assert 0 <= res.cov_config["bandwidth"] <= nobs - 1
     check_covariance_is_finite(res)
@@ -946,7 +926,7 @@ def test_system_models_explicit_bandwidth_works_with_the_observations_that_raise
     model, endogenous, kernel
 ):
     nobs = fewest_observations(kernel) - 1
-    res = model(system_equations(nobs, endogenous), **method_kwargs(model)).fit(
+    res = model(system_equations(nobs, endogenous)).fit(
         cov_type="kernel", kernel=kernel, bandwidth=1
     )
     assert res.cov_config["bandwidth"] == 1
@@ -1085,7 +1065,7 @@ FACTOR_MODELS = [TradedFactorModel, LinearFactorModel]
 @pytest.mark.parametrize("model", FACTOR_MODELS)
 def test_factor_models_raise_when_fit_with_too_few_observations(model, kernel):
     nobs = fewest_observations(kernel) - 1
-    mod = model(*factor_data(nobs), **method_kwargs(model))
+    mod = model(*factor_data(nobs))
     with pytest.raises(ValueError, match=re.escape(too_few_message(kernel, nobs))):
         mod.fit(cov_type="kernel", kernel=kernel)
 
@@ -1096,9 +1076,7 @@ def test_factor_models_explicit_bandwidth_works_with_the_observations_that_raise
     model, kernel
 ):
     nobs = fewest_observations(kernel) - 1
-    res = model(*factor_data(nobs), **method_kwargs(model)).fit(
-        cov_type="kernel", kernel=kernel, bandwidth=1
-    )
+    res = model(*factor_data(nobs)).fit(cov_type="kernel", kernel=kernel, bandwidth=1)
     bandwidth = bandwidth_of(res)
     assert bandwidth == 1
     check_covariance_is_finite(res)
@@ -1108,9 +1086,7 @@ def test_factor_models_explicit_bandwidth_works_with_the_observations_that_raise
 @pytest.mark.parametrize("model", FACTOR_MODELS)
 def test_factor_models_with_the_fewest_observations(model, kernel):
     nobs = fewest_observations(kernel)
-    res = model(*factor_data(nobs), **method_kwargs(model)).fit(
-        cov_type="kernel", kernel=kernel
-    )
+    res = model(*factor_data(nobs)).fit(cov_type="kernel", kernel=kernel)
     bandwidth = bandwidth_of(res)
     assert 0 <= bandwidth <= nobs - 1
     check_covariance_is_finite(res)

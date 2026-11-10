@@ -39,7 +39,7 @@ def test_pooled_ols(data):
     y.index = np.arange(len(y))
     x.index = y.index
 
-    res2 = IV2SLS(y, x, None, None, method="pinv").fit(cov_type="unadjusted")
+    res2 = IV2SLS(y, x, None, None).fit(cov_type="unadjusted")
     assert_results_equal(res, res2)
 
     res3 = mod.fit(cov_type="homoskedastic", debiased=False)
@@ -57,7 +57,7 @@ def test_pooled_ols_weighted(data):
     y.index = np.arange(len(y))
     w.index = x.index = y.index
 
-    res2 = IV2SLS(y, x, None, None, weights=w, method="pinv").fit(cov_type="unadjusted")
+    res2 = IV2SLS(y, x, None, None, weights=w).fit(cov_type="unadjusted")
     assert_results_equal(res, res2)
 
 
@@ -131,7 +131,7 @@ def test_cov_equiv(data):
     x = mod.exog.dataframe.copy()
     y.index = np.arange(len(y))
     x.index = y.index
-    res2 = IV2SLS(y, x, None, None, method="pinv").fit(cov_type="robust")
+    res2 = IV2SLS(y, x, None, None).fit(cov_type="robust")
     assert_results_equal(res, res2)
 
     res3 = mod.fit(cov_type="heteroskedastic", debiased=False)
@@ -148,7 +148,7 @@ def test_cov_equiv_weighted(data):
     y.index = np.arange(len(y))
     w.index = x.index = y.index
 
-    res2 = IV2SLS(y, x, None, None, weights=w, method="pinv").fit(cov_type="robust")
+    res2 = IV2SLS(y, x, None, None, weights=w).fit(cov_type="robust")
     assert_results_equal(res, res2)
 
     res3 = mod.fit(cov_type="heteroskedastic", debiased=False)
@@ -175,7 +175,7 @@ def test_cov_equiv_cluster(data):
     y.index = np.arange(len(y))
     x.index = y.index
     clusters = mod.reformat_clusters(data.vc1)
-    ols_mod = IV2SLS(y, x, None, None, method="pinv")
+    ols_mod = IV2SLS(y, x, None, None)
     res2 = ols_mod.fit(
         cov_type="clustered", clusters=clusters.dataframe, debiased=False
     )
@@ -193,7 +193,7 @@ def test_cov_equiv_cluster_weighted(data):
     y.index = np.arange(len(y))
     w.index = x.index = y.index
     clusters = mod.reformat_clusters(data.vc1)
-    ols_mod = IV2SLS(y, x, None, None, weights=w, method="pinv")
+    ols_mod = IV2SLS(y, x, None, None, weights=w)
     res2 = ols_mod.fit(cov_type="clustered", clusters=clusters.dataframe)
     assert_results_equal(res, res2)
 
@@ -216,7 +216,7 @@ def test_two_way_clustering(data):
     x.index = y.index
     clusters = mod.reformat_clusters(clusters)
 
-    ols_mod = IV2SLS(y, x, None, None, method="pinv")
+    ols_mod = IV2SLS(y, x, None, None)
     ols_res = ols_mod.fit(cov_type="clustered", clusters=clusters.dataframe)
     assert_results_equal(res, ols_res)
 

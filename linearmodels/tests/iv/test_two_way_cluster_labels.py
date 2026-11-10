@@ -54,10 +54,8 @@ LABELS = {
 def test_iv_two_way_clusters_do_not_depend_on_labels(data, labels):
     y, exog, entity, time = data
     clusters = LABELS[labels](entity, time)
-    res = IV2SLS(y, exog, None, None, method="pinv").fit(
-        cov_type="clustered", clusters=clusters
-    )
-    expected = IV2SLS(y, exog, None, None, method="pinv").fit(
+    res = IV2SLS(y, exog, None, None).fit(cov_type="clustered", clusters=clusters)
+    expected = IV2SLS(y, exog, None, None).fit(
         cov_type="clustered", clusters=np.column_stack([entity, time])
     )
     assert_allclose(res.cov, expected.cov)

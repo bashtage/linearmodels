@@ -15,7 +15,6 @@ import pandas as pd
 import pytest
 
 from linearmodels.iv import IV2SLS, IVGMM, IVGMMCUE, IVJIVE, IVLIML, compare
-from linearmodels.tests._utility import method_kwargs
 
 CWD = os.path.split(os.path.abspath(__file__))[0]
 SIMULATED = pd.read_stata(os.path.join(CWD, "results", "simulated-data.dta"))
@@ -76,7 +75,7 @@ def check_name(mod, name):
     ],
 )
 def test_estimator_name(args, cls, options, name):
-    check_name(cls(*args, **options, **method_kwargs(cls)), name)
+    check_name(cls(*args, **options), name)
 
 
 @pytest.mark.parametrize(("weight_type", "options"), WEIGHT_TYPES)
@@ -116,7 +115,7 @@ def test_without_endogenous_regressors(args):
 
 def test_comparison(args):
     results = {
-        "2sls": IV2SLS(*args, method="pinv").fit(),
+        "2sls": IV2SLS(*args).fit(),
         "gmm": IVGMM(*args).fit(),
         "cue": IVGMMCUE(*args).fit(),
     }

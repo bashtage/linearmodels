@@ -318,9 +318,7 @@ def test_incorrect_type(data):
     exog = add_constant(data.set_index(["nr", "year"])[["expersq", "married", "union"]])
     mod = PanelOLS(dependent, exog)
     res = mod.fit()
-    mod2 = IV2SLS(
-        mod.dependent.dataframe, mod.exog.dataframe, None, None, method="pinv"
-    )
+    mod2 = IV2SLS(mod.dependent.dataframe, mod.exog.dataframe, None, None)
     res2 = mod2.fit()
     with pytest.raises(TypeError, match=r"Results from unknown model"):
         compare({"model1": res, "model2": res2})

@@ -62,9 +62,7 @@ def test_iv_pvalues(debiased):
     x = z + 0.3 * rng.standard_normal(n)
     y = 1.0 + x + 0.5 * rng.standard_normal(n)
     exog = pd.DataFrame({"const": np.ones(n)})
-    res = IV2SLS(y, exog, x, z, method="pinv").fit(
-        cov_type="unadjusted", debiased=debiased
-    )
+    res = IV2SLS(y, exog, x, z).fit(cov_type="unadjusted", debiased=debiased)
     df = res.df_resid if debiased else None
     check_two_sided(res.tstats, res.pvalues, df)
 

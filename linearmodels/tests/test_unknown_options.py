@@ -32,7 +32,6 @@ from linearmodels.panel import (
 )
 from linearmodels.shared.exceptions import UnknownOptionError
 from linearmodels.system import IV3SLS, SUR, IVSystemGMM
-from linearmodels.tests._utility import method_kwargs
 
 NOBS = 120
 
@@ -222,14 +221,7 @@ class Site(NamedTuple):
 
 
 def iv(cls, inputs, **kwargs):
-    return cls(
-        inputs.y,
-        inputs.exog,
-        inputs.endog,
-        inputs.instruments,
-        **kwargs,
-        **method_kwargs(cls),
-    )
+    return cls(inputs.y, inputs.exog, inputs.endog, inputs.instruments, **kwargs)
 
 
 def absorbing(inputs):
@@ -237,11 +229,11 @@ def absorbing(inputs):
 
 
 def panel(cls, inputs, **kwargs):
-    return cls(inputs.panel_y, inputs.panel_x, **kwargs, **method_kwargs(cls))
+    return cls(inputs.panel_y, inputs.panel_x, **kwargs)
 
 
 def factor(cls, inputs):
-    return cls(inputs.portfolios, inputs.factors, **method_kwargs(cls))
+    return cls(inputs.portfolios, inputs.factors)
 
 
 # One entry for each place in the package that looks up a name. The models that share
@@ -299,7 +291,7 @@ SITES = {
     # iv/common.py
     "kleibergen_paap(cov_type)": Site(
         lambda d, v: kleibergen_paap(
-            d.endog, d.instruments, d.exog, v, cluster_config(d, v), method="pinv"
+            d.endog, d.instruments, d.exog, v, cluster_config(d, v)
         ),
         "cov_type",
         RANK_TEST_COV_TYPES,
