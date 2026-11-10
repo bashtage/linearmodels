@@ -538,7 +538,6 @@ class HomoskedasticCovariance:
         self._numerical_method = resolve_method(method, type(self).__name__)
         # Decompositions of z and products with it, computed when first used or given
         # by the model, see _reuse
-        self._pinvz: linearmodels.typing.data.Float64Array | None = None
         self._pinvz_x: linearmodels.typing.data.Float64Array | None = None
         self._xpz_pinvz_x: linearmodels.typing.data.Float64Array | None = None
         self._z_basis: linearmodels.typing.data.Float64Array | None = None
@@ -568,7 +567,6 @@ class HomoskedasticCovariance:
     def _reuse(
         self,
         *,
-        pinvz: linearmodels.typing.data.Float64Array | None = None,
         pinvz_x: linearmodels.typing.data.Float64Array | None = None,
         xpz_pinvz_x: linearmodels.typing.data.Float64Array | None = None,
         z_basis: linearmodels.typing.data.Float64Array | None = None,
@@ -577,22 +575,16 @@ class HomoskedasticCovariance:
         """
         Use what the model computed from the same x, z and kappa.
 
-        With method="pinv", pinv(z), pinv(z) @ x and x'z @ pinv(z) @ x. With "qr",
-        the orthonormal basis of z and the factors of the k-class estimator.
+        With method="pinv", pinv(z) @ x and x'z @ pinv(z) @ x. With "qr", the
+        orthonormal basis of z and the factors of the k-class estimator.
         """
-        self._pinvz, self._pinvz_x, self._xpz_pinvz_x = pinvz, pinvz_x, xpz_pinvz_x
+        self._pinvz_x, self._xpz_pinvz_x = pinvz_x, xpz_pinvz_x
         self._z_basis, self._factors = z_basis, factors
-
-    def _pinv_z(self) -> linearmodels.typing.data.Float64Array:
-        """pinv(z), used with method="pinv", computed once."""
-        if self._pinvz is None:
-            self._pinvz = pinv(self.z)
-        return self._pinvz
 
     def _pinv_z_x(self) -> linearmodels.typing.data.Float64Array:
         """pinv(z) @ x, used with method="pinv", computed once."""
         if self._pinvz_x is None:
-            self._pinvz_x = self._pinv_z() @ self.x
+            self._pinvz_x = pinv(self.z) @ self.x
         return self._pinvz_x
 
     def _basis(self) -> linearmodels.typing.data.Float64Array:
